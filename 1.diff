@@ -1,0 +1,857 @@
+diff --git a/frameworks/js/napi/formManager/napi_form_manager.cpp b/frameworks/js/napi/formManager/napi_form_manager.cpp
+index 323c7f3..c0eac7c 100644
+--- a/frameworks/js/napi/formManager/napi_form_manager.cpp
++++ b/frameworks/js/napi/formManager/napi_form_manager.cpp
+@@ -1243,7 +1243,6 @@ napi_value NAPI_SetFormNextRefreshTime(napi_env env, napi_callback_info info)
+         return RetErrMsg(asyncErrorInfo);
+     }
+ 
+-
+     int32_t time;
+     napi_get_value_int32(env, argv[1], &time);
+ 
+diff --git a/frameworks/js/napi/formProvider/napi_form_provider.cpp b/frameworks/js/napi/formProvider/napi_form_provider.cpp
+index 29757ff..4af0514 100644
+--- a/frameworks/js/napi/formProvider/napi_form_provider.cpp
++++ b/frameworks/js/napi/formProvider/napi_form_provider.cpp
+@@ -318,7 +318,7 @@ static void InnerSetFormNextRefreshTime(napi_env, AsyncNextRefreshTimeFormCallba
+  *
+  * @return This is an opaque pointer that is used to represent a JavaScript value
+  */
+-napi_value NAPI_SetFormNextRefreshTime(napi_env env, napi_callback_info info)
++static napi_value NAPI_SetFormNextRefreshTime(napi_env env, napi_callback_info info)
+ {
+     HILOG_INFO("%{public}s called.", __func__);
+ 
+@@ -528,7 +528,7 @@ static void InnerUpdateForm(napi_env env, AsyncUpdateFormCallbackInfo* const asy
+  *
+  * @return This is an opaque pointer that is used to represent a JavaScript value
+  */
+-napi_value NAPI_UpdateForm(napi_env env, napi_callback_info info)
++static napi_value NAPI_UpdateForm(napi_env env, napi_callback_info info)
+ {
+     HILOG_INFO("%{public}s called.", __func__);
+ 
+@@ -875,7 +875,7 @@ static napi_value RequestPublishFormPromise(napi_env env, napi_value *argv, bool
+  *
+  * @return This is an opaque pointer that is used to represent a JavaScript value
+  */
+-napi_value NAPI_RequestPublishForm(napi_env env, napi_callback_info info)
++static napi_value NAPI_RequestPublishForm(napi_env env, napi_callback_info info)
+ {
+     HILOG_INFO("%{public}s called.", __func__);
+     // Check the number of the arguments
+@@ -1008,7 +1008,7 @@ static napi_value AddFormInfoPromise(napi_env env, AsyncAddFormInfoCallbackInfo
+  *
+  * @return This is an opaque pointer that is used to represent a JavaScript value
+  */
+-napi_value NAPI_AddFormInfo(napi_env env, napi_callback_info info)
++static napi_value NAPI_AddFormInfo(napi_env env, napi_callback_info info)
+ {
+     HILOG_INFO("%{public}s called.", __func__);
+     // Check the number of the arguments
+@@ -1197,7 +1197,7 @@ static ErrCode GetRemoveFormInfoArgs(napi_env env, napi_value *argv, std::string
+  *
+  * @return This is an opaque pointer that is used to represent a JavaScript value
+  */
+-napi_value NAPI_RemoveFormInfo(napi_env env, napi_callback_info info)
++static napi_value NAPI_RemoveFormInfo(napi_env env, napi_callback_info info)
+ {
+     HILOG_INFO("%{public}s called.", __func__);
+     // Check the number of the arguments
+diff --git a/frameworks/js/napi/formProvider/napi_form_provider.h b/frameworks/js/napi/formProvider/napi_form_provider.h
+index 7275506..6805ba1 100644
+--- a/frameworks/js/napi/formProvider/napi_form_provider.h
++++ b/frameworks/js/napi/formProvider/napi_form_provider.h
+@@ -79,10 +79,10 @@ struct AsyncRemoveFormInfoCallbackInfo {
+     int32_t result = OHOS::ERR_OK;
+ };
+ 
+-napi_value NAPI_SetFormNextRefreshTime(napi_env env, napi_callback_info info);
+-napi_value NAPI_UpdateForm(napi_env env, napi_callback_info info);
+-napi_value NAPI_RequestPublishForm(napi_env env, napi_callback_info info);
+-napi_value NAPI_AddFormInfo(napi_env env, napi_callback_info info);
+-napi_value NAPI_RemoveFormInfo(napi_env env, napi_callback_info info);
++static napi_value NAPI_SetFormNextRefreshTime(napi_env env, napi_callback_info info);
++static napi_value NAPI_UpdateForm(napi_env env, napi_callback_info info);
++static napi_value NAPI_RequestPublishForm(napi_env env, napi_callback_info info);
++static napi_value NAPI_AddFormInfo(napi_env env, napi_callback_info info);
++static napi_value NAPI_RemoveFormInfo(napi_env env, napi_callback_info info);
+ 
+ #endif /* NAPI_FORM_PROVIDER_H_ */
+diff --git a/interfaces/inner_api/src/form_host_proxy.cpp b/interfaces/inner_api/src/form_host_proxy.cpp
+index 97b52da..3699464 100644
+--- a/interfaces/inner_api/src/form_host_proxy.cpp
++++ b/interfaces/inner_api/src/form_host_proxy.cpp
+@@ -14,8 +14,8 @@
+  */
+ 
+ #include "appexecfwk_errors.h"
+-#include "form_host_proxy.h"
+ #include "string_ex.h"
++#include "form_host_proxy.h"
+ 
+ namespace OHOS {
+ namespace AppExecFwk {
+diff --git a/interfaces/inner_api/src/form_host_stub.cpp b/interfaces/inner_api/src/form_host_stub.cpp
+index 7a8f700..908da28 100644
+--- a/interfaces/inner_api/src/form_host_stub.cpp
++++ b/interfaces/inner_api/src/form_host_stub.cpp
+@@ -16,12 +16,12 @@
+ #include "appexecfwk_errors.h"
+ #include "app_scheduler_interface.h"
+ #include "errors.h"
+-#include "form_host_stub.h"
+ #include "form_mgr_errors.h"
+ #include "hilog_wrapper.h"
+ #include "ipc_skeleton.h"
+ #include "ipc_types.h"
+ #include "iremote_object.h"
++#include "form_host_stub.h"
+ 
+ namespace OHOS {
+ namespace AppExecFwk {
+diff --git a/interfaces/inner_api/src/form_mgr_proxy.cpp b/interfaces/inner_api/src/form_mgr_proxy.cpp
+index f54d29d..eef02a6 100644
+--- a/interfaces/inner_api/src/form_mgr_proxy.cpp
++++ b/interfaces/inner_api/src/form_mgr_proxy.cpp
+@@ -15,9 +15,9 @@
+ 
+ #include "appexecfwk_errors.h"
+ #include "form_mgr_errors.h"
+-#include "form_mgr_proxy.h"
+ #include "hilog_wrapper.h"
+ #include "string_ex.h"
++#include "form_mgr_proxy.h"
+ 
+ namespace OHOS {
+ namespace AppExecFwk {
+diff --git a/interfaces/inner_api/src/form_mgr_stub.cpp b/interfaces/inner_api/src/form_mgr_stub.cpp
+index ee2bd0f..588a513 100644
+--- a/interfaces/inner_api/src/form_mgr_stub.cpp
++++ b/interfaces/inner_api/src/form_mgr_stub.cpp
+@@ -16,11 +16,11 @@
+ #include "appexecfwk_errors.h"
+ #include "form_info.h"
+ #include "form_mgr_errors.h"
+-#include "form_mgr_stub.h"
+ #include "hilog_wrapper.h"
+ #include "ipc_skeleton.h"
+ #include "ipc_types.h"
+ #include "iremote_object.h"
++#include "form_mgr_stub.h"
+ 
+ namespace OHOS {
+ namespace AppExecFwk {
+diff --git a/interfaces/inner_api/src/form_provider_data.cpp b/interfaces/inner_api/src/form_provider_data.cpp
+index 97328b7..7fa01c1 100644
+--- a/interfaces/inner_api/src/form_provider_data.cpp
++++ b/interfaces/inner_api/src/form_provider_data.cpp
+@@ -105,7 +105,7 @@ std::string FormProviderData::GetDataString() const
+  */
+ void FormProviderData::AddImageData(std::string picName, char *data, int32_t size)
+ {
+-    if ((picName.length() == 0) || (sizeof(data) == 0)) {
++    if ((picName.length() == 0) || (!data)) {
+         HILOG_ERROR("input param is NULL!");
+         return;
+     }
+diff --git a/interfaces/inner_api/src/form_supply_stub.cpp b/interfaces/inner_api/src/form_supply_stub.cpp
+index 5f63537..ca6010f 100644
+--- a/interfaces/inner_api/src/form_supply_stub.cpp
++++ b/interfaces/inner_api/src/form_supply_stub.cpp
+@@ -16,11 +16,11 @@
+ #include "appexecfwk_errors.h"
+ #include "form_constants.h"
+ #include "form_mgr_errors.h"
+-#include "form_supply_stub.h"
+ #include "hilog_wrapper.h"
+ #include "ipc_skeleton.h"
+ #include "ipc_types.h"
+ #include "iremote_object.h"
++#include "form_supply_stub.h"
+ 
+ namespace OHOS {
+ namespace AppExecFwk {
+diff --git a/interfaces/kits/native/src/form_mgr.cpp b/interfaces/kits/native/src/form_mgr.cpp
+index 5ce3566..c521c50 100644
+--- a/interfaces/kits/native/src/form_mgr.cpp
++++ b/interfaces/kits/native/src/form_mgr.cpp
+@@ -14,9 +14,7 @@
+  */
+ 
+ #include "form_mgr.h"
+-
+ #include <thread>
+-
+ #include "appexecfwk_errors.h"
+ #include "form_errors.h"
+ #include "form_mgr_errors.h"
+diff --git a/services/include/form_db_info.h b/services/include/form_db_info.h
+index deb1ba5..7684971 100644
+--- a/services/include/form_db_info.h
++++ b/services/include/form_db_info.h
+@@ -174,7 +174,7 @@ public:
+      * @brief Destructor
+      *
+      */
+-    virtual ~InnerFormInfo(){};
++    virtual ~InnerFormInfo() {};
+     /**
+      * @brief overloaded == for Indicates the formInfo by formId
+      * @return Returns true if the data equal; returns false otherwise.
+diff --git a/services/include/form_provider_mgr.h b/services/include/form_provider_mgr.h
+index 876b68a..710f8b3 100644
+--- a/services/include/form_provider_mgr.h
++++ b/services/include/form_provider_mgr.h
+@@ -59,7 +59,6 @@ public:
+     ErrCode UpdateForm(const int64_t formId, FormRecord &formRecord, const FormProviderData &formProviderData);
+     /**
+      * @brief Refresh form.
+-     * 
+      * @param formId The form id.
+      * @param want The want of the form to request.
+      * @param isVisibleToFresh The form is visible to fresh.
+@@ -68,7 +67,6 @@ public:
+     ErrCode RefreshForm(const int64_t formId, const Want &want, bool isVisibleToFresh);
+     /**
+      * @brief Connect ams for refresh form
+-     * 
+      * @param formId The form id.
+      * @param record Form data.
+      * @param want The want of the form.
+@@ -76,7 +74,7 @@ public:
+      * @return Returns ERR_OK on success, others on failure.
+      */
+     ErrCode ConnectAmsForRefresh(const int64_t formId, const FormRecord &record, const Want &want, 
+-    const bool isTimerRefresh);
++        const bool isTimerRefresh);
+     /**
+      * @brief Notify provider form delete.
+      * @param formId The form id.
+@@ -92,7 +90,7 @@ public:
+      * @return Returns ERR_OK on success, others on failure.
+      */
+     ErrCode NotifyProviderFormsBatchDelete(const std::string &bundleName, const std::string &abilityName, 
+-    const std::set<int64_t> &formIds);
++        const std::set<int64_t> &formIds);
+     /**
+      * @brief Acquire form state.
+      * @param state form state.
+@@ -115,7 +113,6 @@ private:
+     FormRecord GetFormAbilityInfo(const FormRecord &record) const;
+     /**
+      * @brief Increase the timer refresh count.
+-     * 
+      * @param formId The form id.
+      */
+     void IncreaseTimerRefreshCount(const int64_t formId);
+diff --git a/services/include/form_timer.h b/services/include/form_timer.h
+index 0dfc464..ee6112a 100644
+--- a/services/include/form_timer.h
++++ b/services/include/form_timer.h
+@@ -96,8 +96,8 @@ public:
+         refreshTime = INT64_MAX;
+         type = UpdateType::TYPE_INTERVAL_CHANGE;
+     }
+-    ~FormTimer(void){
+-    }
++
++    ~FormTimer(void) {}
+ };
+ /**
+  * @class UpdateAtItem
+@@ -117,7 +117,8 @@ public:
+     int64_t formId = 0L;
+     int64_t settedTime = INT64_MAX;
+     int32_t userId = -1;
+-    DynamicRefreshItem(){}
++    
++    DynamicRefreshItem() {}
+ 
+     DynamicRefreshItem(int64_t id, int64_t time, int32_t uId = 0)
+     {
+@@ -125,8 +126,8 @@ public:
+         settedTime = time;
+         userId = uId;
+     }
+-    ~DynamicRefreshItem(void){
+-    }
++
++    ~DynamicRefreshItem(void) {}
+ };
+ /**
+  * @struct LimitInfo
+diff --git a/services/src/form_ability_connection.cpp b/services/src/form_ability_connection.cpp
+index 793f98b..a3fee20 100644
+--- a/services/src/form_ability_connection.cpp
++++ b/services/src/form_ability_connection.cpp
+@@ -17,13 +17,13 @@
+ #include <cinttypes>
+ 
+ #include "appexecfwk_errors.h"
+-#include "form_ability_connection.h"
+ #include "form_supply_callback.h"
+ #include "form_task_mgr.h"
+ #include "hilog_wrapper.h"
+ #include "ipc_types.h"
+ #include "message_parcel.h"
+ #include "want.h"
++#include "form_ability_connection.h"
+ 
+ namespace OHOS {
+ namespace AppExecFwk {
+diff --git a/services/src/form_acquire_connection.cpp b/services/src/form_acquire_connection.cpp
+index f7b86c3..e2c5c3b 100644
+--- a/services/src/form_acquire_connection.cpp
++++ b/services/src/form_acquire_connection.cpp
+@@ -17,7 +17,6 @@
+ #include <cinttypes>
+ 
+ #include "appexecfwk_errors.h"
+-#include "form_acquire_connection.h"
+ #include "form_constants.h"
+ #include "form_supply_callback.h"
+ #include "form_task_mgr.h"
+@@ -26,6 +25,7 @@
+ #include "ipc_types.h"
+ #include "message_parcel.h"
+ #include "want.h"
++#include "form_acquire_connection.h"
+ 
+ namespace OHOS {
+ namespace AppExecFwk {
+diff --git a/services/src/form_ams_helper.cpp b/services/src/form_ams_helper.cpp
+index 4624873..e192b5d 100644
+--- a/services/src/form_ams_helper.cpp
++++ b/services/src/form_ams_helper.cpp
+@@ -27,8 +27,9 @@
+ namespace OHOS {
+ namespace AppExecFwk {
+ const int FORM_DISCONNECT_DELAY_TIME = 5000; // ms
+-FormAmsHelper::FormAmsHelper(){}
+-FormAmsHelper::~FormAmsHelper(){}
++FormAmsHelper::FormAmsHelper() {}
++FormAmsHelper::~FormAmsHelper() {
++}
+ 
+ /**
+  * @brief acquire a form ability manager, if it not existed,
+diff --git a/services/src/form_batch_delete_connection.cpp b/services/src/form_batch_delete_connection.cpp
+index 6090279..7f9165a 100644
+--- a/services/src/form_batch_delete_connection.cpp
++++ b/services/src/form_batch_delete_connection.cpp
+@@ -15,7 +15,6 @@
+  */
+ 
+ #include "appexecfwk_errors.h"
+-#include "form_batch_delete_connection.h"
+ #include "form_constants.h"
+ #include "form_supply_callback.h"
+ #include "form_task_mgr.h"
+@@ -24,6 +23,7 @@
+ #include "ipc_types.h"
+ #include "message_parcel.h"
+ #include "want.h"
++#include "form_batch_delete_connection.h"
+ 
+ namespace OHOS {
+ namespace AppExecFwk {
+diff --git a/services/src/form_cast_temp_connection.cpp b/services/src/form_cast_temp_connection.cpp
+index fea9ee6..5dfe5a0 100644
+--- a/services/src/form_cast_temp_connection.cpp
++++ b/services/src/form_cast_temp_connection.cpp
+@@ -17,18 +17,18 @@
+ #include <cinttypes>
+ 
+ #include "appexecfwk_errors.h"
+-#include "form_cast_temp_connection.h"
+ #include "form_constants.h"
+ #include "form_supply_callback.h"
+ #include "form_task_mgr.h"
+ #include "hilog_wrapper.h"
+ #include "ipc_types.h"
+ #include "message_parcel.h"
++#include "form_cast_temp_connection.h"
+ 
+ namespace OHOS {
+ namespace AppExecFwk {
+ FormCastTempConnection::FormCastTempConnection(const int64_t formId, const std::string &bundleName,
+-        const std::string &abilityName)
++    const std::string &abilityName)
+     :formId_(formId)
+ {
+     SetProviderKey(bundleName, abilityName);
+diff --git a/services/src/form_data_mgr.cpp b/services/src/form_data_mgr.cpp
+index 265da0a..118994e 100644
+--- a/services/src/form_data_mgr.cpp
++++ b/services/src/form_data_mgr.cpp
+@@ -18,13 +18,12 @@
+ #include "appexecfwk_errors.h"
+ #include "form_cache_mgr.h"
+ #include "form_constants.h"
+-#include "form_data_mgr.h"
+ #include "form_mgr_errors.h"
+ #include "form_provider_mgr.h"
+ #include "form_util.h"
+ #include "hilog_wrapper.h"
+ #include "ipc_skeleton.h"
+-
++#include "form_data_mgr.h"
+ 
+ namespace OHOS {
+ namespace AppExecFwk {
+@@ -1086,16 +1085,17 @@ void FormDataMgr::GetNoHostTempForms(
+                 itFormRecord->second.formUserUids.end(), uid);
+             if (itUid != itFormRecord->second.formUserUids.end()) {
+                 itFormRecord->second.formUserUids.erase(itUid);
+-                if (itFormRecord->second.formUserUids.empty()) {
+-                    FormIdKey formIdKey(itFormRecord->second.bundleName, itFormRecord->second.abilityName);
+-                    auto itIdsSet = noHostTempFormsMap.find(formIdKey);
+-                    if (itIdsSet == noHostTempFormsMap.end()) {
+-                        std::set<int64_t> formIdsSet;
+-                        formIdsSet.emplace(itFormRecord->second.formId);
+-                        noHostTempFormsMap.emplace(formIdKey, formIdsSet);
+-                    } else {
+-                        itIdsSet->second.emplace(itFormRecord->second.formId);
+-                    }
++                if (!itFormRecord->second.formUserUids.empty()) {
++                    continue;
++                }
++                FormIdKey formIdKey(itFormRecord->second.bundleName, itFormRecord->second.abilityName);
++                auto itIdsSet = noHostTempFormsMap.find(formIdKey);
++                if (itIdsSet == noHostTempFormsMap.end()) {
++                    std::set<int64_t> formIdsSet;
++                    formIdsSet.emplace(itFormRecord->second.formId);
++                    noHostTempFormsMap.emplace(formIdKey, formIdsSet);
++                } else {
++                    itIdsSet->second.emplace(itFormRecord->second.formId);
+                 }
+             } else {
+                 foundFormsMap.emplace(itFormRecord->second.formId, false);
+diff --git a/services/src/form_db_cache.cpp b/services/src/form_db_cache.cpp
+index 9afb891..2ccaae0 100644
+--- a/services/src/form_db_cache.cpp
++++ b/services/src/form_db_cache.cpp
+@@ -18,11 +18,11 @@
+ #include "appexecfwk_errors.h"
+ #include "form_bms_helper.h"
+ #include "form_data_mgr.h"
+-#include "form_db_cache.h"
+ #include "form_db_info.h"
+ #include "form_mgr_errors.h"
+ #include "form_provider_mgr.h"
+ #include "hilog_wrapper.h"
++#include "form_db_cache.h"
+ 
+ namespace OHOS {
+ namespace AppExecFwk {
+@@ -145,7 +145,7 @@ ErrCode FormDbCache::DeleteFormInfoByBundleName(const std::string &bundleName, c
+ {
+     std::lock_guard<std::mutex> lock(formDBInfosMutex_);
+     std::vector<FormDBInfo>::iterator itRecord;
+-    for (itRecord = formDBInfos_.begin(); itRecord != formDBInfos_.end(); ) {
++    for (itRecord = formDBInfos_.begin(); itRecord != formDBInfos_.end();) {
+         if ((bundleName == itRecord->bundleName) && (userId == itRecord->userId)) {
+             int64_t formId = itRecord->formId;
+             if (dataStorage_->DeleteStorageFormInfo(std::to_string(formId)) == ERR_OK) {
+diff --git a/services/src/form_delete_connection.cpp b/services/src/form_delete_connection.cpp
+index 58092b9..496815a 100644
+--- a/services/src/form_delete_connection.cpp
++++ b/services/src/form_delete_connection.cpp
+@@ -18,13 +18,13 @@
+ 
+ #include "appexecfwk_errors.h"
+ #include "form_constants.h"
+-#include "form_delete_connection.h"
+ #include "form_supply_callback.h"
+ #include "form_task_mgr.h"
+ #include "hilog_wrapper.h"
+ #include "ipc_types.h"
+ #include "message_parcel.h"
+ #include "want.h"
++#include "form_delete_connection.h"
+ 
+ namespace OHOS {
+ namespace AppExecFwk {
+diff --git a/services/src/form_dump_mgr.cpp b/services/src/form_dump_mgr.cpp
+index 467909d..92d5fbe 100644
+--- a/services/src/form_dump_mgr.cpp
++++ b/services/src/form_dump_mgr.cpp
+@@ -20,8 +20,8 @@ namespace OHOS {
+ namespace AppExecFwk {
+ const std::string LINE_SEPARATOR = "\n";
+ 
+-FormDumpMgr::FormDumpMgr(){}
+-FormDumpMgr::~FormDumpMgr(){}
++FormDumpMgr::FormDumpMgr() {}
++FormDumpMgr::~FormDumpMgr() {}
+ /**
+  * @brief Dump all of form storage infos.
+  * @param storageInfos Form storage infos
+diff --git a/services/src/form_event_notify_connection.cpp b/services/src/form_event_notify_connection.cpp
+index 1a466f1..6cc188c 100644
+--- a/services/src/form_event_notify_connection.cpp
++++ b/services/src/form_event_notify_connection.cpp
+@@ -16,13 +16,13 @@
+ 
+ #include "appexecfwk_errors.h"
+ #include "form_constants.h"
+-#include "form_event_notify_connection.h"
+ #include "form_supply_callback.h"
+ #include "form_task_mgr.h"
+ #include "hilog_wrapper.h"
+ #include "ipc_types.h"
+ #include "message_parcel.h"
+ #include "want.h"
++#include "form_event_notify_connection.h"
+ 
+ namespace OHOS {
+ namespace AppExecFwk {
+diff --git a/services/src/form_mgr_adapter.cpp b/services/src/form_mgr_adapter.cpp
+index 571ba04..0ff9fc2 100644
+--- a/services/src/form_mgr_adapter.cpp
++++ b/services/src/form_mgr_adapter.cpp
+@@ -642,7 +642,7 @@ int FormMgrAdapter::DumpStorageFormInfos(std::string &formInfos) const
+     FormDbCache::GetInstance().GetAllFormInfo(formDBInfos);
+     if (formDBInfos.size() > 0) {
+         std::sort(formDBInfos.begin(), formDBInfos.end(),
+-        [] (FormDBInfo &formDBInfoA, FormDBInfo &formDBInfoB) -> bool {
++            [] (FormDBInfo &formDBInfoA, FormDBInfo &formDBInfoB) -> bool {
+             return formDBInfoA.formId < formDBInfoB.formId;
+         });
+         FormDumpMgr::GetInstance().DumpStorageFormInfos(formDBInfos, formInfos);
+diff --git a/services/src/form_provider_mgr.cpp b/services/src/form_provider_mgr.cpp
+index c2a7577..6294e39 100644
+--- a/services/src/form_provider_mgr.cpp
++++ b/services/src/form_provider_mgr.cpp
+@@ -24,18 +24,18 @@
+ #include "form_delete_connection.h"
+ #include "form_mgr_errors.h"
+ #include "form_msg_event_connection.h"
+-#include "form_provider_mgr.h"
+ #include "form_record.h"
+ #include "form_refresh_connection.h"
+ #include "form_timer_mgr.h"
+ #include "hilog_wrapper.h"
++#include "form_provider_mgr.h"
+ #ifdef SUPPORT_POWER
+ #include "power_mgr_client.h"
+ #endif
+ namespace OHOS {
+ namespace AppExecFwk {
+-FormProviderMgr::FormProviderMgr(){}
+-FormProviderMgr::~FormProviderMgr(){}
++FormProviderMgr::FormProviderMgr() {}
++FormProviderMgr::~FormProviderMgr() {}
+ /**
+  * @brief handle for acquire back from ams.
+  * @param formId The id of the form.
+diff --git a/services/src/form_supply_callback.cpp b/services/src/form_supply_callback.cpp
+index f21abe9..ef03b42 100644
+--- a/services/src/form_supply_callback.cpp
++++ b/services/src/form_supply_callback.cpp
+@@ -20,10 +20,10 @@
+ #include "form_constants.h"
+ #include "form_mgr_errors.h"
+ #include "form_provider_mgr.h"
+-#include "form_supply_callback.h"
+ #include "form_util.h"
+ #include "hilog_wrapper.h"
+ #include "string_ex.h"
++#include "form_supply_callback.h"
+ 
+ namespace OHOS {
+ namespace AppExecFwk {
+diff --git a/services/src/form_sys_event_receiver.cpp b/services/src/form_sys_event_receiver.cpp
+index ed0e9d8..9aa129f 100644
+--- a/services/src/form_sys_event_receiver.cpp
++++ b/services/src/form_sys_event_receiver.cpp
+@@ -335,7 +335,7 @@ void FormSysEventReceiver::BatchDeleteNoHostDBForms(const int uid, std::map<Form
+         int result = FormProviderMgr::GetInstance().NotifyProviderFormsBatchDelete(bundleName, abilityName, formIds);
+         if (result != ERR_OK) {
+             HILOG_ERROR("%{public}s error, NotifyProviderFormsBatchDelete failed! bundleName:%{public}s,\
+-            abilityName:%{public}s",
++                abilityName:%{public}s",
+                 __func__, bundleName.c_str(), abilityName.c_str());
+             for (int64_t formId : formIds) {
+                 FormDBInfo dbInfo;
+@@ -384,7 +384,7 @@ void FormSysEventReceiver::BatchDeleteNoHostTempForms(const int uid, std::map<Fo
+         int result = FormProviderMgr::GetInstance().NotifyProviderFormsBatchDelete(bundleName, abilityName, formIds);
+         if (result != ERR_OK) {
+             HILOG_ERROR("%{public}s error, NotifyProviderFormsBatchDelete failed! bundleName:%{public}s,\
+-            abilityName:%{public}s",
++                abilityName:%{public}s",
+                 __func__, bundleName.c_str(), abilityName.c_str());
+             for (int64_t formId : formIds) {
+                 FormDataMgr::GetInstance().AddFormUserUid(formId, uid);
+diff --git a/services/src/form_task_mgr.cpp b/services/src/form_task_mgr.cpp
+index faa1ee3..8526b20 100644
+--- a/services/src/form_task_mgr.cpp
++++ b/services/src/form_task_mgr.cpp
+@@ -22,9 +22,9 @@
+ #include "form_mgr_adapter.h"
+ #include "form_provider_interface.h"
+ #include "form_supply_callback.h"
+-#include "form_task_mgr.h"
+ #include "form_util.h"
+ #include "hilog_wrapper.h"
++#include "form_task_mgr.h"
+ 
+ namespace OHOS {
+ namespace AppExecFwk {
+diff --git a/test/mock/include/mock_form_provider_client.h b/test/mock/include/mock_form_provider_client.h
+index bfadb87..0962f1c 100644
+--- a/test/mock/include/mock_form_provider_client.h
++++ b/test/mock/include/mock_form_provider_client.h
+@@ -43,7 +43,7 @@ private:
+      * @return none.
+      */
+     virtual int AcquireProviderFormInfo(const int64_t formId, const Want &want, 
+-    const sptr<IRemoteObject> &callerToken) override;
++        const sptr<IRemoteObject> &callerToken) override;
+ 
+     /**
+      * Notify provider when the form was deleted.
+@@ -53,7 +53,7 @@ private:
+      * @return none.
+      */
+     virtual int NotifyFormDelete(const int64_t formId, const Want &want, 
+-    const sptr<IRemoteObject> &callerToken) override;
++        const sptr<IRemoteObject> &callerToken) override;
+ 
+     /**
+      * Notify provider when the form was deleted.
+@@ -64,7 +64,7 @@ private:
+      * @return none.
+      */
+     virtual int NotifyFormsDelete(const std::vector<int64_t> &formIds, const Want &want, 
+-    const sptr<IRemoteObject> &callerToken) override;
++        const sptr<IRemoteObject> &callerToken) override;
+     
+     /**
+      * @brief Notify provider when the form need update.
+@@ -73,11 +73,10 @@ private:
+      * @param callerToken Caller ability token.
+      */
+     virtual int NotifyFormUpdate(const int64_t formId, const Want &want, 
+-    const sptr<IRemoteObject> &callerToken) override;
++        const sptr<IRemoteObject> &callerToken) override;
+ 
+     /**
+      * @brief Event notify when change the form visible.
+-     * 
+      * @param formEvents The vector of form ids.
+      * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
+      * @param want Indicates the structure containing form info.
+@@ -95,7 +94,7 @@ private:
+      * @return none.
+      */
+     virtual int NotifyFormCastTempForm(const int64_t formId, const Want &want, 
+-    const sptr<IRemoteObject> &callerToken) override;
++        const sptr<IRemoteObject> &callerToken) override;
+     /**
+      * @brief Fire message event to form provider.
+      * @param formId The Id of the from.
+@@ -105,7 +104,7 @@ private:
+      * @return Returns ERR_OK on success, others on failure.
+      */
+     virtual int FireFormEvent(const int64_t formId, const std::string &message, const Want &want, 
+-    const sptr<IRemoteObject> &callerToken) override;
++        const sptr<IRemoteObject> &callerToken) override;
+ 
+     /**
+      * @brief Acquire form state to form provider.
+diff --git a/test/resource/formsystemtestability/formSystemTestServiceA/include/form_st_service_ability_A.h b/test/resource/formsystemtestability/formSystemTestServiceA/include/form_st_service_ability_A.h
+index d1e22c4..fd68264 100644
+--- a/test/resource/formsystemtestability/formSystemTestServiceA/include/form_st_service_ability_A.h
++++ b/test/resource/formsystemtestability/formSystemTestServiceA/include/form_st_service_ability_A.h
+@@ -131,7 +131,7 @@ private:
+     };
+     class AppEventSubscriber : public EventFwk::CommonEventSubscriber {
+     public:
+-        AppEventSubscriber(const EventFwk::CommonEventSubscribeInfo &sp) : CommonEventSubscriber(sp){};
++        AppEventSubscriber(const EventFwk::CommonEventSubscribeInfo &sp) : CommonEventSubscriber(sp) {};
+         ~AppEventSubscriber() = default;
+         virtual void OnReceiveEvent(const EventFwk::CommonEventData &data) override;
+ 
+diff --git a/test/resource/formsystemtestability/formSystemTestServiceA/src/form_st_service_ability_A.cpp b/test/resource/formsystemtestability/formSystemTestServiceA/src/form_st_service_ability_A.cpp
+index b26cd51..bd7ed05 100644
+--- a/test/resource/formsystemtestability/formSystemTestServiceA/src/form_st_service_ability_A.cpp
++++ b/test/resource/formsystemtestability/formSystemTestServiceA/src/form_st_service_ability_A.cpp
+@@ -294,7 +294,7 @@ FormProviderInfo FormStServiceAbilityA::OnCreate(const Want &want)
+     HILOG_INFO("%{public}s start", __func__);
+     FormProviderInfo formProviderInfo;
+     if (!want.HasParameter(Constants::PARAM_FORM_IDENTITY_KEY)) {
+-         HILOG_ERROR("%{public}s, formId not exist", __func__);
++        HILOG_ERROR("%{public}s, formId not exist", __func__);
+         return formProviderInfo;
+     }
+     std::string formId = want.GetStringParam(Constants::PARAM_FORM_IDENTITY_KEY);
+@@ -353,7 +353,8 @@ void FormStServiceAbilityA::OnCastTemptoNormal(const int64_t formId)
+     clock_gettime(CLOCK_REALTIME, &ts);
+     long currentTime = ts.tv_sec * SEC_TO_MILLISEC + ts.tv_nsec / MILLISEC_TO_NANOSEC;
+ 
+-    PublishEvent(COMMON_EVENT_TEST_ACTION1, FORM_EVENT_TRIGGER_RESULT::FORM_EVENT_TRIGGER_RESULT_OK, "OnCastTemptoNormal");
++    PublishEvent(COMMON_EVENT_TEST_ACTION1, FORM_EVENT_TRIGGER_RESULT::FORM_EVENT_TRIGGER_RESULT_OK,
++        "OnCastTemptoNormal");
+     HILOG_INFO("%{public}s end, formId: %{public}s, current time: %{public}ld", __func__,
+         std::to_string(formId).c_str(), currentTime);
+ }
+@@ -366,7 +367,8 @@ void FormStServiceAbilityA::OnVisibilityChanged(const std::map<int64_t, int32_t>
+     clock_gettime(CLOCK_REALTIME, &ts);
+     long currentTime = ts.tv_sec * SEC_TO_MILLISEC + ts.tv_nsec / MILLISEC_TO_NANOSEC;
+ 
+-    PublishEvent(COMMON_EVENT_TEST_ACTION1, FORM_EVENT_TRIGGER_RESULT::FORM_EVENT_TRIGGER_RESULT_OK, "OnVisibilityChanged");
++    PublishEvent(COMMON_EVENT_TEST_ACTION1, FORM_EVENT_TRIGGER_RESULT::FORM_EVENT_TRIGGER_RESULT_OK,
++        "OnVisibilityChanged");
+     HILOG_INFO("%{public}s end, current time: %{public}ld", __func__, currentTime);
+ }
+ 
+diff --git a/test/unittest/fms_form_db_record_test/fms_form_db_record_test.cpp b/test/unittest/fms_form_db_record_test/fms_form_db_record_test.cpp
+index 5514c6c..880cff8 100644
+--- a/test/unittest/fms_form_db_record_test/fms_form_db_record_test.cpp
++++ b/test/unittest/fms_form_db_record_test/fms_form_db_record_test.cpp
+@@ -121,7 +121,7 @@ HWTEST_F(FmsFormDbRecordTest, FmsFormDbRecordTest_006, TestSize.Level0) // GetAl
+     GTEST_LOG_(INFO) << "FmsFormDbRecordTest_006 bundleName:" << record.bundleName;
+     GTEST_LOG_(INFO) << "FmsFormDbRecordTest_006 moduleName:" << record.moduleName;
+     GTEST_LOG_(INFO) << "FmsFormDbRecordTest_006 abilityName:" << record.abilityName;
+-    for (unsigned int j = 0; j < record.formUserUids.size(); j++){
++    for (unsigned int j = 0; j < record.formUserUids.size(); j++) {
+         GTEST_LOG_(INFO) << "FmsFormDbRecordTest_006 formUserUids:" << record.formUserUids[j];
+     }
+ 
+@@ -132,7 +132,7 @@ HWTEST_F(FmsFormDbRecordTest, FmsFormDbRecordTest_006, TestSize.Level0) // GetAl
+     GTEST_LOG_(INFO) << "FmsFormDbRecordTest_006 bundleName:" << record.bundleName;
+     GTEST_LOG_(INFO) << "FmsFormDbRecordTest_006 moduleName:" << record.moduleName;
+     GTEST_LOG_(INFO) << "FmsFormDbRecordTest_006 abilityName:" << record.abilityName;
+-    for (unsigned int j = 0; j < record.formUserUids.size(); j++){
++    for (unsigned int j = 0; j < record.formUserUids.size(); j++) {
+         GTEST_LOG_(INFO) << "FmsFormDbRecordTest_006 formUserUids:" << record.formUserUids[j];
+     }
+     FormDbCache::GetInstance().DeleteFormInfo(0);
+@@ -156,7 +156,7 @@ HWTEST_F(FmsFormDbRecordTest, FmsFormDbRecordTest_007, TestSize.Level0) // GetAl
+     GTEST_LOG_(INFO) << "FmsFormDbRecordTest_007 bundleName:" << record.bundleName;
+     GTEST_LOG_(INFO) << "FmsFormDbRecordTest_007 moduleName:" << record.moduleName;
+     GTEST_LOG_(INFO) << "FmsFormDbRecordTest_007 abilityName:" << record.abilityName;
+-    for (unsigned int j = 0; j < record.formUserUids.size(); j++){
++    for (unsigned int j = 0; j < record.formUserUids.size(); j++) {
+         GTEST_LOG_(INFO) << "FmsFormDbRecordTest_007 formUserUids:" << record.formUserUids[j];
+     }
+ 
+@@ -167,7 +167,7 @@ HWTEST_F(FmsFormDbRecordTest, FmsFormDbRecordTest_007, TestSize.Level0) // GetAl
+     GTEST_LOG_(INFO) << "FmsFormDbRecordTest_007 bundleName:" << record.bundleName;
+     GTEST_LOG_(INFO) << "FmsFormDbRecordTest_007 moduleName:" << record.moduleName;
+     GTEST_LOG_(INFO) << "FmsFormDbRecordTest_007 abilityName:" << record.abilityName;
+-    for (unsigned int j = 0; j < record.formUserUids.size(); j++){
++    for (unsigned int j = 0; j < record.formUserUids.size(); j++) {
+         GTEST_LOG_(INFO) << "FmsFormDbRecordTest_007 formUserUids:" << record.formUserUids[j];
+     }
+     FormDbCache::GetInstance().DeleteFormInfo(0);
+diff --git a/test/unittest/fms_form_mgr_add_form_test/fms_form_mgr_add_form_test.cpp b/test/unittest/fms_form_mgr_add_form_test/fms_form_mgr_add_form_test.cpp
+index 204e6d4..e0f0fc6 100644
+--- a/test/unittest/fms_form_mgr_add_form_test/fms_form_mgr_add_form_test.cpp
++++ b/test/unittest/fms_form_mgr_add_form_test/fms_form_mgr_add_form_test.cpp
+@@ -160,7 +160,7 @@ HWTEST_F(FmsFormMgrAddFormTest, AddForm_001, TestSize.Level0)
+     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().AddForm(0L, want, token_, formJsInfo));
+     token_->Wait();
+ 
+-    size_t dataCnt{1};
++    size_t dataCnt {1};
+     int64_t formId = formJsInfo.formId;
+     // Form record alloted.
+     FormRecord formInfo;
+@@ -233,8 +233,8 @@ HWTEST_F(FmsFormMgrAddFormTest, AddForm_002, TestSize.Level0)
+     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().AddForm(formId, want, token_, formJsInfo));
+     token_->Wait();
+ 
+-    size_t dataCnt{1};
+-    size_t formUserUidCnt{1};
++    size_t dataCnt {1};
++    size_t formUserUidCnt {1};
+     // Cache params updated.
+     FormRecord formInfo;
+     bool ret = FormDataMgr::GetInstance().GetFormRecord(formId, formInfo);
+@@ -302,8 +302,8 @@ HWTEST_F(FmsFormMgrAddFormTest, AddForm_003, TestSize.Level0)
+     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().AddForm(formId, want, token_, formJsInfo));
+     token_->Wait();
+ 
+-    size_t dataCnt{1};
+-    size_t formUserUidCnt{1};
++    size_t dataCnt {1};
++    size_t formUserUidCnt {1};
+     // Cache params updated.
+     FormRecord formInfo;
+     bool ret = FormDataMgr::GetInstance().GetFormRecord(formId, formInfo);
+@@ -529,7 +529,7 @@ HWTEST_F(FmsFormMgrAddFormTest, AddForm_008, TestSize.Level0)
+     int callingUid {0}, tempCount = 0;
+     // Set cache info .
+     FormItemInfo record1[Constants::MAX_FORMS+7];
+-    for (; tempCount<Constants::MAX_FORMS+7; tempCount++){
++    for (; tempCount<Constants::MAX_FORMS+7; tempCount++) {
+         record1[tempCount].SetFormId(formId+tempCount);
+         record1[tempCount].SetProviderBundleName(FORM_PROVIDER_BUNDLE_NAME);
+         record1[tempCount].SetModuleName(PARAM_FORM_NAME);
+@@ -564,7 +564,7 @@ HWTEST_F(FmsFormMgrAddFormTest, AddForm_008, TestSize.Level0)
+     FormDbCache::GetInstance().DeleteFormInfo(formId);
+     FormDataMgr::GetInstance().DeleteHostRecord(token_, formId);
+ 
+-    for (tempCount = 0; tempCount<Constants::MAX_FORMS+7; tempCount++){
++    for (tempCount = 0; tempCount<Constants::MAX_FORMS+7; tempCount++) {
+     FormDataMgr::GetInstance().DeleteFormRecord(formId + tempCount);
+     FormDbCache::GetInstance().DeleteFormInfo(formId + tempCount);
+     FormDataMgr::GetInstance().DeleteHostRecord(token_, tempCount);
+diff --git a/test/unittest/fms_form_mgr_delete_form_test/fms_form_mgr_delete_form_test.cpp b/test/unittest/fms_form_mgr_delete_form_test/fms_form_mgr_delete_form_test.cpp
+index 18e7d07..23825b8 100644
+--- a/test/unittest/fms_form_mgr_delete_form_test/fms_form_mgr_delete_form_test.cpp
++++ b/test/unittest/fms_form_mgr_delete_form_test/fms_form_mgr_delete_form_test.cpp
+@@ -137,7 +137,7 @@ HWTEST_F(FmsFormMgrDeleteFormTest, DeleteForm_001, TestSize.Level0)
+     FormRecord formInfo;
+     bool ret = FormDataMgr::GetInstance().GetFormRecord(formId, formInfo);
+     EXPECT_TRUE(ret);
+-    size_t dataCnt{1};
++    size_t dataCnt {1};
+     EXPECT_EQ(dataCnt, formInfo.formUserUids.size());
+     // Database is not deleted yet.
+     std::vector<FormDBInfo> formDBInfos;
+@@ -192,7 +192,7 @@ HWTEST_F(FmsFormMgrDeleteFormTest, DeleteForm_002, TestSize.Level0)
+     bool ret = FormDataMgr::GetInstance().GetFormRecord(formId, formInfo);
+     EXPECT_FALSE(ret);
+     // Database is deleted.
+-    size_t dataCnt{0};
++    size_t dataCnt {0};
+     std::vector<FormDBInfo> formDBInfos;
+     FormDbCache::GetInstance().GetAllFormInfo(formDBInfos);
+     EXPECT_EQ(dataCnt, formDBInfos.size());
+@@ -291,7 +291,7 @@ HWTEST_F(FmsFormMgrDeleteFormTest, DeleteForm_007, TestSize.Level0)
+     FormRecord formInfo;
+     bool ret = FormDataMgr::GetInstance().GetFormRecord(formId, formInfo);
+     EXPECT_TRUE(ret);
+-    size_t dataCnt{1};
++    size_t dataCnt {1};
+     EXPECT_EQ(dataCnt, formInfo.formUserUids.size());
+     // Database is not deleted yet.
+     std::vector<FormDBInfo> formDBInfos;
+@@ -344,7 +344,7 @@ HWTEST_F(FmsFormMgrDeleteFormTest, DeleteForm_008, TestSize.Level0)
+     FormRecord formInfo;
+     bool ret = FormDataMgr::GetInstance().GetFormRecord(formId, formInfo);
+     EXPECT_TRUE(ret);
+-    size_t dataCnt{1};
++    size_t dataCnt {1};
+     EXPECT_EQ(dataCnt, formInfo.formUserUids.size());
+     // Database is not deleted yet.
+     std::vector<FormDBInfo> formDBInfos;
+diff --git a/test/unittest/fms_form_provider_mgr_test/fms_form_provider_mgr_test.cpp b/test/unittest/fms_form_provider_mgr_test/fms_form_provider_mgr_test.cpp
+index 140fa49..9f5da64 100644
+--- a/test/unittest/fms_form_provider_mgr_test/fms_form_provider_mgr_test.cpp
++++ b/test/unittest/fms_form_provider_mgr_test/fms_form_provider_mgr_test.cpp
+@@ -110,7 +110,8 @@ HWTEST_F(FmsFormProviderMgrTest, AcquireForm_001, TestSize.Level0)
+     GTEST_LOG_(INFO) << "fms_form_mgr_provider_test_001 start";
+     int64_t formId = 0x114514aa00000000;
+     FormProviderInfo formProviderInfo;
+-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, FormProviderMgr::GetInstance().AcquireForm(-114514L, formProviderInfo));
++    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
++        FormProviderMgr::GetInstance().AcquireForm(-114514L, formProviderInfo));
+     int callingUid {0};
+     FormItemInfo record;
+     record.SetFormId(formId);
