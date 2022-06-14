@@ -1,17 +1,17 @@
 {
-    "name": "@ohos/form_runtime",
+    "name": "@ohos/form_fwk",
     "description": "提供卡片创建、卡片删除、卡片释放等能力，包含接口和服务",
     "version": "3.1",
     "license": "Apache License 2.0",
     "publishAs": "code-segment",
     "segment": {
-        "destPath": "foundation/aafwk/standard/form_runtime"
+        "destPath": "foundation/ability/form_fwk"
     },
     "dirs": {},
     "scripts": {},
     "component": {
-        "name": "form_runtime",
-        "subsystem": "aafwk",
+        "name": "form_fwk",
+        "subsystem": "ability",
         "syscap": [],
         "features": [],
         "adapted_system_type": [
@@ -45,16 +45,16 @@
         },
         "build": {
             "sub_component": [
-              "//foundation/aafwk/standard/form_runtime/sa_profile:form_sa_profile",
-              "//foundation/aafwk/standard/form_runtime:fms_services_target",
-              "//foundation/aafwk/standard/form_runtime:fms_innerkits_target",
-              "//foundation/aafwk/standard/form_runtime:fmskit_native",
-              "//foundation/aafwk/standard/form_runtime:form_napi_packages"
+              "//foundation/ability/form_fwk/sa_profile:form_sa_profile",
+              "//foundation/ability/form_fwk:fms_services_target",
+              "//foundation/ability/form_fwk:fms_innerkits_target",
+              "//foundation/ability/form_fwk:fmskit_native",
+              "//foundation/ability/form_fwk:form_napi_packages"
             ],
             "inner_kits": [
               {
                 "header": {
-                  "header_base": "//foundation/aafwk/standard/form_runtime/interfaces/inner_api/include",
+                  "header_base": "//foundation/ability/form_fwk/interfaces/inner_api/include",
                   "header_files": [
                     "form_death_callback.h",
                     "form_host_interface.h",
@@ -72,22 +72,22 @@
                     "form_js_info.h"
                   ]
                 },
-                "name": "//foundation/aafwk/standard/form_runtime:form_manager"
+                "name": "//foundation/ability/form_fwk:form_manager"
               },
               {
                 "header": {
-                  "header_base": "//foundation/aafwk/standard/form_runtime/interfaces/kits/native/include",
+                  "header_base": "//foundation/ability/form_fwk/interfaces/kits/native/include",
                   "header_files": [
                     "form_callback_interface.h",
                     "form_host_client.h",
                     "form_mgr.h"
                   ]
                 },
-                "name": "//foundation/aafwk/standard/form_runtime:fmskit_native"
+                "name": "//foundation/ability/form_fwk:fmskit_native"
               }
           ],
           "test": [
-              "//foundation/aafwk/standard/form_runtime/test:unittest"
+              "//foundation/ability/form_fwk/test:unittest"
           ]
         }
     }

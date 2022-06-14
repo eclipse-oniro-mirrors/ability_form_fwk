@@ -859,10 +859,8 @@ ErrCode FormMgrAdapter::AddExistFormRecord(const FormItemInfo &info, const sptr<
 
     // create form info for js
     std::string cacheData;
-    std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageMap;
-    if (FormCacheMgr::GetInstance().GetData(formId, cacheData, imageMap)) {
+    if (FormCacheMgr::GetInstance().GetData(formId, cacheData)) {
         formInfo.formData = cacheData;
-        formInfo.formProviderData.SetImageDataMap(imageMap);
     }
     FormDataMgr::GetInstance().CreateFormInfo(formId, record, formInfo);
 
@@ -1595,9 +1593,9 @@ ErrCode FormMgrAdapter::AddRequestPublishForm(const int64_t formId, const Want &
     if (formProviderData != nullptr) {
         formJsInfo.formData = formProviderData->GetDataString();
         formJsInfo.formProviderData = *formProviderData;
-        if (formJsInfo.formData.size() <= Constants::MAX_FORM_DATA_SIZE) {
-            HILOG_INFO("%{public}s, updateJsForm, data is less than 1k, cache data.", __func__);
-            FormCacheMgr::GetInstance().AddData(formId, formJsInfo.formData, formProviderData->GetImageDataMap());
+        if (formProviderData->NeedCache()) {
+            HILOG_INFO("%{public}s, data is less than 1k, cache data.", __func__);
+            FormCacheMgr::GetInstance().AddData(formId, formJsInfo.formData);
         }
     }
     // storage info
@@ -2032,11 +2030,9 @@ bool FormMgrAdapter::UpdateProviderInfoToHost(const int64_t matchedFormId, const
     // If the form need refrsh flag is true and form visibleType is FORM_VISIBLE, refresh the form host.
     if (formRecord.needRefresh && formVisibleType == Constants::FORM_VISIBLE) {
         std::string cacheData;
-        std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageMap;
         // If the form has business cache, refresh the form host.
-        if (FormCacheMgr::GetInstance().GetData(matchedFormId, cacheData, imageMap)) {
+        if (FormCacheMgr::GetInstance().GetData(matchedFormId, cacheData)) {
             formRecord.formProviderInfo.SetFormDataString(cacheData);
-            formRecord.formProviderInfo.SetImageDataMap(imageMap);
             formHostRecord.OnUpdate(matchedFormId, formRecord);
         }
     }
@@ -2311,7 +2307,7 @@ int FormMgrAdapter::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
  * @param formInfos Return the forms' information of the specify application name.
  * @return Returns ERR_OK on success, others on failure.
  */
-int FormMgrAdapter::GetFormsInfoByApp(std::string &bundleName, std::vector<FormInfo> &formInfos)
+int FormMgrAdapter::GetFormsInfoByApp(const std::string &bundleName, std::vector<FormInfo> &formInfos)
 {
     return FormInfoMgr::GetInstance().GetFormsInfoByBundle(bundleName, formInfos);
 }
@@ -2323,7 +2319,7 @@ int FormMgrAdapter::GetFormsInfoByApp(std::string &bundleName, std::vector<FormI
  * @param formInfos Return the forms' information of the specify bundle name and module name.
  * @return Returns ERR_OK on success, others on failure.
  */
-int FormMgrAdapter::GetFormsInfoByModule(std::string &bundleName, std::string &moduleName,
+int FormMgrAdapter::GetFormsInfoByModule(const std::string &bundleName, const std::string &moduleName,
                                          std::vector<FormInfo> &formInfos)
 {
     return FormInfoMgr::GetInstance().GetFormsInfoByModule(bundleName, moduleName, formInfos);

@@ -11,7 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//foundation/aafwk/standard/form_runtime/form_runtime.gni")
+import("//foundation/ability/form_fwk/form_fwk.gni")
 
 config("formmgr_test_config") {
   include_dirs = [
@@ -19,7 +19,7 @@ config("formmgr_test_config") {
     "mock/include",
   ]
 
-  configs = [ "${form_runtime_path}:formmgr_config" ]
+  configs = [ "${form_fwk_path}:formmgr_config" ]
 }
 
 public_configs = [
@@ -50,6 +50,7 @@ group("unittest") {
     "unittest/fms_form_mgr_message_event_test:unittest",
     "unittest/fms_form_mgr_notify_invisible_forms_test:unittest",
     "unittest/fms_form_mgr_notify_visible_forms_test:unittest",
+    "unittest/fms_form_mgr_publish_form_test:unittest",
     "unittest/fms_form_mgr_release_form_test:unittest",
     "unittest/fms_form_mgr_request_form_test:unittest",
     "unittest/fms_form_mgr_update_form_test:unittest",
@@ -58,6 +59,9 @@ group("unittest") {
     "unittest/fms_form_set_next_refresh_test:unittest",
     "unittest/fms_form_sys_event_receiver_test:unittest",
     "unittest/fms_form_timer_mgr_test:unittest",
+    "unittest/form_mgr_proxy_test:unittest",
+    "unittest/form_mgr_stub_test:unittest",
+    "unittest/form_mgr_test:unittest",
   ]
 }
 

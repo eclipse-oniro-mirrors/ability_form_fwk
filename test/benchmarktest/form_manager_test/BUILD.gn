@@ -12,7 +12,7 @@
 # limitations under the License.
 
 import("//build/test.gni")
-import("//foundation/aafwk/standard/form_runtime/form_runtime.gni")
+import("//foundation/ability/form_fwk/form_fwk.gni")
 
 module_output_path = "aafwk_standard/interfaces"
 
@@ -26,20 +26,19 @@ ohos_benchmarktest("BenchmarkTestForFormManager") {
   }
 
   deps = [
-    "${ability_base_path}:want",
-    "${form_runtime_path}:fmskit_native",
-    "${form_runtime_path}:form_manager",
+    "${form_fwk_path}:fmskit_native",
+    "${form_fwk_path}:form_manager",
     "//third_party/benchmark:benchmark",
     "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
+    "ability_base:want",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "utils_base:utils",
   ]
-  resource_config_file =
-      "//foundation/aafwk/standard/test/resource/benchmark/ohos_test.xml"
+  resource_config_file = "//foundation/ability/form_fwk/test/resource/benchmark/ohos_test.xml"
 }
 
 group("benchmarktest") {
