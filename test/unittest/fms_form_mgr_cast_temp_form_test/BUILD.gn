@@ -12,36 +12,35 @@
 # limitations under the License.
 
 import("//build/test.gni")
-import("//foundation/aafwk/standard/form_runtime/form_runtime.gni")
+import("//foundation/ability/form_fwk/form_fwk.gni")
 
-module_output_path = "form_runtime/formmgrservice"
+module_output_path = "form_fwk/formmgrservice"
 
 ohos_unittest("FmsFormMgrCastTempFormTest") {
   module_out_path = module_output_path
 
   sources = [
-    "${form_runtime_path}/test/mock/src/mock_bundle_manager.cpp",
-    "${form_runtime_path}/test/mock/src/mock_form_host_client.cpp",
-    "${form_runtime_path}/test/mock/src/mock_form_provider_client.cpp",
+    "${form_fwk_path}/test/mock/src/mock_bundle_manager.cpp",
+    "${form_fwk_path}/test/mock/src/mock_form_host_client.cpp",
+    "${form_fwk_path}/test/mock/src/mock_form_provider_client.cpp",
   ]
   sources += [ "fms_form_mgr_cast_temp_form_test.cpp" ]
 
   include_dirs = [
+    "//base/notification/eventhandler/interfaces/inner_api",
     "//third_party/zlib/contrib/minizip",
     "//third_party/zlib",
-    "${bundlefwk_innerkits_path}/libeventhandler/include",
     "${ability_runtime_path}/services/formmgr/include",
+    "${bundlefwk_inner_api_path}/appexecfwk_base/include",
     "${bundlefwk_path}/services/bundlemgr/include",
-    "${distributedschedule_path}/samgr/interfaces/innerkits/samgr_proxy/include",
-    "${bundlefwk_inner_api_path}/appexecfwk_base/include/",
-    "${form_runtime_path}/interfaces/inner_api/include",
-    "${distributedschedule_path}/samgr/interfaces/innerkits/samgr_proxy/include/",
-    "${distributedschedule_path}/samgr/adapter/interfaces/innerkits/include/",
     "${distributeddatamgr_path}/distributeddatamgr/interfaces/innerkits/distributeddata/include",
+    "${distributedschedule_path}/samgr/adapter/interfaces/innerkits/include",
+    "${distributedschedule_path}/samgr/interfaces/innerkits/samgr_proxy/include",
+    "${form_fwk_path}/interfaces/inner_api/include",
   ]
 
   configs = [
-    "${form_runtime_path}/test:formmgr_test_config",
+    "${form_fwk_path}/test:formmgr_test_config",
     "${ability_runtime_path}/services/abilitymgr:abilityms_config",
   ]
   cflags = []
@@ -49,27 +48,27 @@ ohos_unittest("FmsFormMgrCastTempFormTest") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
   deps = [
-    "${ability_base_path}:base",
-    "${ability_base_path}:configuration",
-    "${ability_base_path}:want",
-    "${ability_runtime_path}/interfaces/innerkits/app_manager:app_manager",
+    "${ability_runtime_path}/interfaces/inner_api/app_manager:app_manager",
     "${ability_runtime_path}/services/abilitymgr:abilityms_target",
     "${bundlefwk_inner_api_path}/appexecfwk_base:appexecfwk_base",
-    "${bundlefwk_path}/libs/libeventhandler:libeventhandler_target",
     "${distributedschedule_path}/safwk/interfaces/innerkits/safwk:system_ability_fwk",
     "${distributedschedule_path}/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
-    "${form_runtime_path}:fms_target",
-    "${form_runtime_path}:fmskit_native",
+    "${form_fwk_path}:fms_target",
+    "${form_fwk_path}:fmskit_native",
+    "//base/notification/eventhandler/frameworks/eventhandler:libeventhandler",
     "//third_party/googletest:gmock_main",
     "//utils/native/base:utils",
   ]
 
   external_deps = [
+    "ability_base:base",
+    "ability_base:configuration",
+    "ability_base:want",
     "access_token:libaccesstoken_sdk",
     "appspawn:appspawn_socket_client",
     "bundle_framework:appexecfwk_core",
     "common_event_service:cesfwk_innerkits",
-    "form_runtime:form_manager",
+    "form_fwk:form_manager",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
   ]

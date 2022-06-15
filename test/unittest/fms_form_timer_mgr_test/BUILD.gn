@@ -12,9 +12,9 @@
 # limitations under the License.
 
 import("//build/test.gni")
-import("//foundation/aafwk/standard/form_runtime/form_runtime.gni")
+import("//foundation/ability/form_fwk/form_fwk.gni")
 
-module_output_path = "form_runtime/formmgrservice"
+module_output_path = "form_fwk/formmgrservice"
 
 ohos_unittest("FmsFormTimerMgrTest") {
   module_out_path = module_output_path
@@ -25,18 +25,18 @@ ohos_unittest("FmsFormTimerMgrTest") {
     "${ability_runtime_path}/services/formmgr/include",
     "${distributedschedule_path}/samgr/interfaces/innerkits/samgr_proxy/include",
     "${bundlefwk_inner_api_path}/appexecfwk_base/include/",
-    "${form_runtime_path}/interfaces/inner_api/include",
+    "${form_fwk_path}/interfaces/inner_api/include",
     "//base/miscservices/time/interfaces/innerkits/include",
   ]
 
-  configs = [ "${form_runtime_path}/test:formmgr_test_config" ]
+  configs = [ "${form_fwk_path}/test:formmgr_test_config" ]
   cflags = []
   if (target_cpu == "arm") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
   deps = [
     "${ability_runtime_path}/frameworks/kits/wantagent:wantagent_innerkits",
-    "${form_runtime_path}:fms_target",
+    "${form_fwk_path}:fms_target",
     "//base/miscservices/time/services:time_service",
     "//third_party/googletest:gmock_main",
     "//utils/native/base:utils",
@@ -52,7 +52,7 @@ ohos_unittest("FmsFormTimerMgrTest") {
     "common_event_service:cesfwk_core",
     "common_event_service:cesfwk_innerkits",
     "eventhandler:libeventhandler",
-    "form_runtime:form_manager",
+    "form_fwk:form_manager",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
   ]
