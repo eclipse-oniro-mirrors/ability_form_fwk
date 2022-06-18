@@ -142,7 +142,6 @@ config("fmskit_public_config") {
     "interfaces/kits/native/include",
     "${ability_runtime_path}/services/common/include",
     "${form_fwk_path}/interfaces/inner_api/include",
-    "${bundlefwk_inner_api_path}/appexecfwk_base/include",
   ]
 }
 
@@ -231,8 +230,6 @@ ohos_shared_library("form_manager") {
     "dataability:native_dataability",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
-    "relational_store:native_appdatafwk",
-    "relational_store:native_rdb",
     "utils_base:utils",
   ]
 
