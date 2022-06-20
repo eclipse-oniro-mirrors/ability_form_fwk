@@ -1808,6 +1808,7 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want)
         return result;
     }
 
+#ifdef DEVICE_USAGE_STATISTICS_ENABLE
     if (!FormDataMgr::GetInstance().ExistTempForm(matchedFormId)) {
         int32_t callingUid = IPCSkeleton::GetCallingUid();
         int32_t userId = GetCurrentUserId(callingUid);
@@ -1815,6 +1816,7 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want)
             record.specification, record.formId, DeviceUsageStats::BundleActiveEvent::FORM_IS_CLICKED);
         DeviceUsageStats::BundleActiveClient::GetInstance().ReportEvent(event, userId);
     }
+#endif
     return ERR_OK;
 }
 
