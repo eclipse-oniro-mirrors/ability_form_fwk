@@ -1279,7 +1279,7 @@ static void InnerGetFormsInfo(napi_env env, AsyncGetFormsInfoCallbackInfo *const
 }
 
 // Internal of GetFormsInfo when Promise is used.
-static napi_value GetFormsInfoPromise(napi_env env, AsyncGetFormsInfoCallbackInfo *const asyncCallbackInfo)
+static napi_value GetFormsInfoPromise(napi_env env, AsyncGetFormsInfoCallbackInfo *asyncCallbackInfo)
 {
     HILOG_INFO("%{public}s calls.", __func__);
     napi_deferred deferred;
@@ -1337,6 +1337,7 @@ static napi_value GetFormsInfoPromise(napi_env env, AsyncGetFormsInfoCallbackInf
             }
             napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
             delete asyncCallbackInfo;
+            asyncCallbackInfo = nullptr;
         },
         (void *)asyncCallbackInfo,
         &asyncCallbackInfo->asyncWork);
@@ -1350,6 +1351,7 @@ static napi_value GetFormsInfoPromise(napi_env env, AsyncGetFormsInfoCallbackInf
             error);
         napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
         delete asyncCallbackInfo;
+        asyncCallbackInfo = nullptr;
     }
     return promise;
 }
@@ -1421,6 +1423,7 @@ static napi_value GetFormsInfoCallBack(napi_env env, napi_value argv, AsyncGetFo
             }
             napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
             delete asyncCallbackInfo;
+            asyncCallbackInfo = nullptr;
         },
         (void *)asyncCallbackInfo,
         &asyncCallbackInfo->asyncWork);
@@ -1437,6 +1440,7 @@ static napi_value GetFormsInfoCallBack(napi_env env, napi_value argv, AsyncGetFo
         napi_delete_reference(env, asyncCallbackInfo->callback);
         napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
         delete asyncCallbackInfo;
+        asyncCallbackInfo = nullptr;
     }
     return NapiGetResult(env, 1);
 }
