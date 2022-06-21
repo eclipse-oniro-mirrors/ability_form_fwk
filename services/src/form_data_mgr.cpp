@@ -1556,10 +1556,7 @@ bool FormDataMgr::IsRequestPublishForm(int64_t formId)
 {
     std::lock_guard<std::mutex> lock(formRequestPublishFormsMutex_);
     auto result = formRequestPublishForms_.find(formId);
-    if (result == formRequestPublishForms_.end()) {
-        return false;
-    }
-    return true;
+    return result != formRequestPublishForms_.end();
 }
 
 ErrCode FormDataMgr::GetRequestPublishFormInfo(int64_t formId, Want &want,
