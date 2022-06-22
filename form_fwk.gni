@@ -16,10 +16,17 @@ ability_runtime_innerapi_path = "${ability_runtime_path}/interfaces/inner_api"
 ability_runtime_kits_path = "${ability_runtime_path}/frameworks/kits"
 ability_runtime_services_path = "${ability_runtime_path}/services"
 bundlefwk_path = "//foundation/bundlemanager/bundle_framework"
-bundlefwk_innerkits_path = "${bundlefwk_path}/interfaces/innerkits"
 bundlefwk_inner_api_path = "${bundlefwk_path}/interfaces/inner_api"
 distributeddatamgr_path = "//foundation/distributeddatamgr"
 distributedschedule_path = "//foundation/distributedschedule"
 form_fwk_path = "//foundation/ability/form_fwk"
 form_fwk_napi_path = "${form_fwk_path}/frameworks/js/napi"
 global_path = "//base/global"
+
+declare_args() {
+  device_usage_statistics = true
+  if (defined(global_parts_info) &&
+      !defined(global_parts_info.device_usage_statistics)) {
+    device_usage_statistics = false
+  }
+}

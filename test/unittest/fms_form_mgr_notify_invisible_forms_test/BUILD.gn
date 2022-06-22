@@ -26,14 +26,10 @@ ohos_unittest("FmsFormMgrNotifyInvisibleFormsTest") {
   ]
 
   include_dirs = [
-    "//base/notification/eventhandler/interfaces/inner_api",
     "//third_party/json/include",
     "${ability_runtime_path}/frameworks/kits/ability/native/include",
     "${ability_runtime_path}/frameworks/kits/appkit/native/app/include",
     "${ability_runtime_path}/services/formmgr/include",
-    "${bundlefwk_inner_api_path}/appexecfwk_base/include",
-    "${bundlefwk_inner_api_path}/appexecfwk_core/include/bundlemgr",
-    "${bundlefwk_path}/services/bundlemgr/include",
     "${distributeddatamgr_path}/distributeddatamgr/interfaces/innerkits/distributeddata/include",
     "${distributedschedule_path}/samgr/adapter/interfaces/innerkits/include",
     "${distributedschedule_path}/samgr/interfaces/innerkits/samgr_proxy/include",
@@ -43,17 +39,13 @@ ohos_unittest("FmsFormMgrNotifyInvisibleFormsTest") {
     "${global_path}/resource_management/interfaces/inner_api/include",
   ]
 
-  configs = [
-    #"${bundlefwk_inner_api_path}/appexecfwk_core:bundlemgr_sdk_config",
-    #"${form_fwk_path}:formmgr_config",
-  ]
+  configs = []
   cflags = []
   if (target_cpu == "arm") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
   deps = [
     "${ability_runtime_path}/interfaces/inner_api/app_manager:app_manager",
-    "${bundlefwk_inner_api_path}/appexecfwk_base:appexecfwk_base",
     "${distributedschedule_path}/safwk/interfaces/innerkits/safwk:system_ability_fwk",
     "${distributedschedule_path}/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
     "${form_fwk_path}:fms_target",
@@ -66,8 +58,10 @@ ohos_unittest("FmsFormMgrNotifyInvisibleFormsTest") {
     "ability_base:base",
     "ability_base:want",
     "access_token:libaccesstoken_sdk",
+    "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "common_event_service:cesfwk_innerkits",
+    "eventhandler:libeventhandler",
     "form_fwk:form_manager",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
