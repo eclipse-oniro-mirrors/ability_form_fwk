@@ -1531,25 +1531,30 @@ napi_value NAPI_GetFormsInfo(napi_env env, napi_callback_info info)
 }
 
 static void InnerIsRequestPublishFormSupported(napi_env env,
-    AsyncIsRequestPublishFormSupportedCallbackInfo *const asyncCallbackInfo)
+    void *data)
 {
+    HILOG_INFO("InnerIsRequestPublishFormSupported called");
+    if (data == nullptr) {
+        HILOG_ERROR("InnerIsRequestPublishFormSupported data is a nullptr");
+        return;
+    }
+    AsyncIsRequestPublishFormSupportedCallbackInfo *asyncCallbackInfo =
+        static_cast<AsyncIsRequestPublishFormSupportedCallbackInfo *>(data);
     bool value = FormMgr::GetInstance().IsRequestPublishFormSupported();
     asyncCallbackInfo->result = value;
 }
 
 // callback version of NAPI_IsRequestPublishFormSupported
 static napi_value IsRequestPublishFormSupportedCallback(napi_env env, napi_value argv,
-    AsyncIsRequestPublishFormSupportedCallbackInfo *const asyncCallbackInfo)
+    AsyncIsRequestPublishFormSupportedCallbackInfo *asyncCallbackInfo)
 {
     HILOG_INFO("%{public}s starts.", __func__);
     // Check the type of the argv, expect to be a callback function.
     napi_valuetype valueType;
     NAPI_CALL(env, napi_typeof(env, argv, &valueType));
     if (valueType != napi_function) {
-        HILOG_ERROR("GetFormsInfoCallBack callback is not a function");
-        napi_value result;
-        NAPI_CALL(env, napi_get_boolean(env, false, &result));
-        return result;
+        HILOG_ERROR("IsRequestPublishFormSupportedCallback callback is not a function");
+        return nullptr;
     }
     // store callback function that user passed in.
     napi_create_reference(env, argv, REF_COUNT, &asyncCallbackInfo->callback);
@@ -1561,15 +1566,8 @@ static napi_value IsRequestPublishFormSupportedCallback(napi_env env, napi_value
         nullptr,
         resourceName,
         [](napi_env env, void *data) {
-            HILOG_INFO("IsRequestPublishFormSupportedCallback callback running");
-            if (data == nullptr) {
-                HILOG_ERROR("IsRequestPublishFormSupportedCallback data is a nullptr");
-                return;
-            }
-            AsyncIsRequestPublishFormSupportedCallbackInfo *asyncCallbackInfo =
-                static_cast<AsyncIsRequestPublishFormSupportedCallbackInfo *>(data);
             // entry to the core of this functionality.
-            InnerIsRequestPublishFormSupported(env, asyncCallbackInfo);
+            InnerIsRequestPublishFormSupported(env, data);
         },
         [](napi_env env, napi_status status, void *data) {
             HILOG_INFO("IsRequestPublishFormSupportedCallback callback completed");
@@ -1584,7 +1582,7 @@ static napi_value IsRequestPublishFormSupportedCallback(napi_env env, napi_value
             if (asyncCallbackInfo->callback != nullptr) {
                 napi_value callbackValues[ARGS_SIZE_TWO] = {0};
                 napi_value callback;
-                // store GetFormsInfoCallBack return-message to callbackValues[0].
+                // store return-message to callbackValues[0].
                 InnerCreateCallbackRetMsg(env, ERR_OK, callbackValues);
                 // store result
                 napi_value result;
@@ -1598,6 +1596,7 @@ static napi_value IsRequestPublishFormSupportedCallback(napi_env env, napi_value
             }
             napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
             delete asyncCallbackInfo;
+            asyncCallbackInfo = nullptr;
         },
         (void *)asyncCallbackInfo,
         &asyncCallbackInfo->asyncWork);
@@ -1605,7 +1604,7 @@ static napi_value IsRequestPublishFormSupportedCallback(napi_env env, napi_value
      // execute work.
     if (napi_queue_async_work(env, asyncCallbackInfo->asyncWork) != napi_ok) {
         napi_value callbackValues[ARGS_SIZE_TWO] = {0};
-        // store GetFormsInfoCallBack return-message to callbackValues[0].
+        // store return-message to callbackValues[0].
         InnerCreateCallbackRetMsg(env, ERR_APPEXECFWK_FORM_COMMON_CODE, callbackValues);
         napi_value callback;
         napi_get_reference_value(env, asyncCallbackInfo->callback, &callback);
@@ -1615,13 +1614,16 @@ static napi_value IsRequestPublishFormSupportedCallback(napi_env env, napi_value
         napi_delete_reference(env, asyncCallbackInfo->callback);
         napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
         delete asyncCallbackInfo;
+        asyncCallbackInfo = nullptr;
     }
-    return NapiGetResult(env, 1);
+    napi_value result = nullptr;
+    napi_get_undefined(env, &result);
+    return result;
 }
 
 
 static napi_value IsRequestPublishFormSupportedPromise(napi_env env,
-    AsyncIsRequestPublishFormSupportedCallbackInfo *const asyncCallbackInfo)
+    AsyncIsRequestPublishFormSupportedCallbackInfo *asyncCallbackInfo)
 {
     HILOG_INFO("%{public}s calls.", __func__);
     napi_deferred deferred;
@@ -1636,14 +1638,7 @@ static napi_value IsRequestPublishFormSupportedPromise(napi_env env,
         nullptr,
         resourceName,
         [](napi_env env, void *data) {
-            HILOG_INFO("IsRequestPublishFormSupportedPromise running");
-            if (data == nullptr) {
-                HILOG_ERROR("IsRequestPublishFormSupportedPromise data is a nullptr");
-                return;
-            }
-            AsyncIsRequestPublishFormSupportedCallbackInfo *asyncCallbackInfo =
-                static_cast<AsyncIsRequestPublishFormSupportedCallbackInfo *>(data);
-            InnerIsRequestPublishFormSupported(env, asyncCallbackInfo);
+            InnerIsRequestPublishFormSupported(env, data);
         },
         [](napi_env env, napi_status status, void *data) {
             HILOG_INFO("IsRequestPublishFormSupportedCallback callback completed");
@@ -1661,6 +1656,7 @@ static napi_value IsRequestPublishFormSupportedPromise(napi_env env,
                 result);
             napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
             delete asyncCallbackInfo;
+            asyncCallbackInfo = nullptr;
         },
         (void *)asyncCallbackInfo,
         &asyncCallbackInfo->asyncWork);
@@ -1674,6 +1670,7 @@ static napi_value IsRequestPublishFormSupportedPromise(napi_env env,
             error);
         napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
         delete asyncCallbackInfo;
+        asyncCallbackInfo = nullptr;
     }
     return promise;
 }
@@ -1686,12 +1683,11 @@ napi_value NAPI_IsRequestPublishFormSupported(napi_env env, napi_callback_info i
     napi_value argv[ARGS_SIZE_ONE] = {nullptr};
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr));
     if (argc > ARGS_SIZE_ONE) {
-        napi_value result;
-        NAPI_CALL(env, napi_get_boolean(env, false, &result));
-        return result;
+        HILOG_ERROR("%{public}s, wrong number of arguments.", __func__);
+        return nullptr;
     }
 
-    AsyncIsRequestPublishFormSupportedCallbackInfo* asyncCallbackInfo = new (std::nothrow)
+    AsyncIsRequestPublishFormSupportedCallbackInfo *asyncCallbackInfo = new (std::nothrow)
     AsyncIsRequestPublishFormSupportedCallbackInfo {
         .env = env,
         .asyncWork = nullptr,

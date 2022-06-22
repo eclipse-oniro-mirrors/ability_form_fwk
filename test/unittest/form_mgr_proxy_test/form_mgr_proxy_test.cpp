@@ -108,4 +108,23 @@ HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0002, TestSize.Level1) {
     EXPECT_EQ(formInfos.size(), 0);
     GTEST_LOG_(INFO) << "FormMgrProxyTest_0002 test ends";
 }
+
+/**
+ * @tc.name: FormMgrProxyTest_0003
+ * @tc.desc: Verify IsRequestPublishFormSupported
+ * @tc.type: FUNC
+ * @tc.require: #I58Y0A
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0003, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_0003 starts";
+    // initialize input parameters.
+    EXPECT_CALL(*mockFormMgrService, IsRequestPublishFormSupported())
+        .Times(1)
+        .WillOnce(Return(true));
+    // test.
+    bool result = formMgrProxy->IsRequestPublishFormSupported();
+    // expect result.
+    EXPECT_EQ(result, true);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_0003 test ends";
+}
 }

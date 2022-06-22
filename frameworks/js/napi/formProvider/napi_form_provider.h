@@ -114,10 +114,10 @@ napi_value NAPI_RemoveFormInfo(napi_env env, napi_callback_info info);
 napi_value NAPI_GetFormsInfo(napi_env env, napi_callback_info info);
 
 /**
- * @brief Request to publish a form to the form host.
+ * @brief Check if the request to publish a form to the form host is supported.
  *
  * @param[in] env The environment that the Node-API call is invoked under
- * @param[in] value This is an opaque pointer that is used to represent a JavaScript value
+ * @param[in] info This is an opaque pointer that is used to represent a JavaScript value
  *
  * @return This is an opaque pointer that is used to represent a JavaScript value
  *         which is true if the request of pubishing form is supported and false otherwise
