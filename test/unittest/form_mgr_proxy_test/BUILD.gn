@@ -57,7 +57,7 @@ ohos_unittest("form_mgr_proxy_test") {
 
   if (device_usage_statistics) {
     external_deps += [ "device_usage_statistics:usagestatsinner" ]
-    defines += [ "DEVICE_USAGE_STATISTICS_ENABLE" ]
+    defines = [ "DEVICE_USAGE_STATISTICS_ENABLE" ]
   }
 }
 
