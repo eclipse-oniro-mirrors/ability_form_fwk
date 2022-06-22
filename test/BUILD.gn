@@ -14,10 +14,7 @@
 import("//foundation/ability/form_fwk/form_fwk.gni")
 
 config("formmgr_test_config") {
-  include_dirs = [
-    "//utils/native/base/include",
-    "mock/include",
-  ]
+  include_dirs = [ "mock/include" ]
 
   configs = [ "${form_fwk_path}:formmgr_config" ]
 }
