@@ -23,9 +23,7 @@ config("fmsSystemTestHostCommonBConfig") {
     "${ability_runtime_path}/interfaces/inner_api/app_manager/include/appmgr",
     "${ability_runtime_path}/services/abilitymgr/include",
     "${ability_runtime_path}/services/common/include",
-    "${bundlefwk_path}/services/bundlemgr/include",
     "${distributedschedule_path}/safwk/services/safwk/include",
-    "//base/notification/eventhandler/interfaces/inner_api",
     "//third_party/jsoncpp/include",
   ]
   defines = [
@@ -54,7 +52,6 @@ ohos_shared_library("fmsSystemTestHostCommonB") {
     "${ability_runtime_path}/frameworks/kits/appkit:appkit_native",
     "${ability_runtime_path}/interfaces/inner_api/ability_manager:ability_manager",
     "${ability_runtime_path}/services/abilitymgr:abilityms",
-    "${bundlefwk_path}/services/bundlemgr:libbms",
     "//third_party/jsoncpp:jsoncpp",
     "//utils/native/base:utilsbase",
   ]
@@ -67,6 +64,7 @@ ohos_shared_library("fmsSystemTestHostCommonB") {
     "bundle_framework:appexecfwk_core",
     "common_event_service:cesfwk_core",
     "common_event_service:cesfwk_innerkits",
+    "eventhandler:libeventhandler",
     "form_fwk:form_manager",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",

@@ -25,11 +25,8 @@ ohos_unittest("FmsFormSetNextRefreshTest") {
   ]
 
   include_dirs = [
-    "//base/notification/eventhandler/interfaces/inner_api",
     "//third_party/json/include",
     "${ability_runtime_path}/services/formmgr/include",
-    "${bundlefwk_inner_api_path}/appexecfwk_base/include",
-    "${bundlefwk_path}/services/bundlemgr/include",
     "${distributeddatamgr_path}/distributeddatamgr/interfaces/innerkits/distributeddata/include",
     "${distributedschedule_path}/samgr/adapter/interfaces/innerkits/include",
     "${distributedschedule_path}/samgr/interfaces/innerkits/samgr_proxy/include",
@@ -48,13 +45,11 @@ ohos_unittest("FmsFormSetNextRefreshTest") {
   deps = [
     "${ability_runtime_path}/frameworks/kits/wantagent:wantagent_innerkits",
     "${ability_runtime_path}/interfaces/inner_api/app_manager:app_manager",
-    "${bundlefwk_inner_api_path}/appexecfwk_base:appexecfwk_base",
     "${distributeddatamgr_path}/distributeddatamgr/interfaces/innerkits/distributeddata:distributeddata_inner",
     "${distributedschedule_path}/safwk/interfaces/innerkits/safwk:system_ability_fwk",
     "${distributedschedule_path}/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
-    "//base/miscservices/time/services:time_service",
     "//third_party/googletest:gmock_main",
     "//utils/native/base:utils",
   ]
@@ -64,6 +59,7 @@ ohos_unittest("FmsFormSetNextRefreshTest") {
     "ability_base:want",
     "ability_base:zuri",
     "appspawn:appspawn_socket_client",
+    "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "common_event_service:cesfwk_core",
     "common_event_service:cesfwk_innerkits",

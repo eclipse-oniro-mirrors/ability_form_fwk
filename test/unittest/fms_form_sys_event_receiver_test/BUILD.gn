@@ -27,12 +27,9 @@ ohos_unittest("FmsFormSysEventReceiverTest") {
   sources += [ "fms_form_sys_event_receiver_test.cpp" ]
 
   include_dirs = [
-    "//base/notification/eventhandler/interfaces/inner_api",
     "//third_party/zlib/contrib/minizip",
     "//third_party/zlib",
     "${ability_runtime_path}/services/formmgr/include",
-    "${bundlefwk_inner_api_path}/appexecfwk_base/include",
-    "${bundlefwk_path}/services/bundlemgr/include",
     "${distributeddatamgr_path}/distributeddatamgr/interfaces/innerkits/distributeddata/include",
     "${distributedschedule_path}/samgr/adapter/interfaces/innerkits/include",
     "${distributedschedule_path}/samgr/interfaces/innerkits/samgr_proxy/include",
@@ -42,8 +39,6 @@ ohos_unittest("FmsFormSysEventReceiverTest") {
   configs = [
     "${form_fwk_path}/test:formmgr_test_config",
     "${ability_runtime_path}/services/abilitymgr:abilityms_config",
-
-    # "${bundlefwk_inner_api_path}/appexecfwk_core:bundlemgr_sdk_config",
   ]
   cflags = []
   if (target_cpu == "arm") {
@@ -59,8 +54,6 @@ ohos_unittest("FmsFormSysEventReceiverTest") {
     "${distributedschedule_path}/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
-    "//base/miscservices/time/services:time_service",
-    "//base/notification/eventhandler/frameworks/eventhandler:libeventhandler",
     "//third_party/googletest:gmock_main",
     "//utils/native/base:utils",
   ]
@@ -71,9 +64,11 @@ ohos_unittest("FmsFormSysEventReceiverTest") {
     "ability_base:zuri",
     "access_token:libaccesstoken_sdk",
     "appspawn:appspawn_socket_client",
+    "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "common_event_service:cesfwk_core",
     "common_event_service:cesfwk_innerkits",
+    "eventhandler:libeventhandler",
     "form_fwk:form_manager",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",

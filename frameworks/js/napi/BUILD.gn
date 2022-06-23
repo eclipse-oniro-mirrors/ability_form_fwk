@@ -185,6 +185,7 @@ ohos_shared_library("formhost_napi") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "napi:ace_napi",
+    "utils_base:utils",
   ]
 
   relative_install_dir = "module/application"
@@ -220,6 +221,7 @@ ohos_shared_library("formmanager") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "napi:ace_napi",
+    "utils_base:utils",
   ]
 
   relative_install_dir = "module/ability"
@@ -257,6 +259,7 @@ ohos_shared_library("formprovider_napi") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "napi:ace_napi",
+    "utils_base:utils",
   ]
 
   relative_install_dir = "module/application"
