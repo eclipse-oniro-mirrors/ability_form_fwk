@@ -1411,13 +1411,13 @@ ErrCode FormMgrAdapter::QueryPublishFormToHost(Want &want)
 
     if (!abilityInfo.name.empty()) {
         /* highest priority ability */
-        HILOG_INFO("Start the highest priority ability. bundleName: %{public}s, ability:%{public}s",
+        HILOG_INFO("Query highest priority ability success. bundleName: %{public}s, ability:%{public}s",
             abilityInfo.bundleName.c_str(), abilityInfo.name.c_str());
         want.SetParam(Constants::PARAM_BUNDLE_NAME_KEY, abilityInfo.bundleName);
         want.SetParam(Constants::PARAM_ABILITY_NAME_KEY, abilityInfo.name);
     } else {
         /* highest priority extension ability */
-        HILOG_INFO("Start the highest priority extension ability. bundleName: %{public}s, ability:%{public}s",
+        HILOG_INFO("Query highest priority extension ability success. bundleName: %{public}s, ability:%{public}s",
             extensionAbilityInfo.bundleName.c_str(), extensionAbilityInfo.name.c_str());
         want.SetParam(Constants::PARAM_BUNDLE_NAME_KEY, extensionAbilityInfo.bundleName);
         want.SetParam(Constants::PARAM_ABILITY_NAME_KEY, extensionAbilityInfo.name);
