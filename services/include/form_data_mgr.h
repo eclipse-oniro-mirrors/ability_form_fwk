@@ -23,6 +23,7 @@
 #include <singleton.h>
 #include <string>
 
+#include "bundle_pack_info.h"
 #include "form_constants.h"
 #include "form_host_record.h"
 #include "form_id_key.h"
@@ -471,7 +472,23 @@ public:
      */
     ErrCode GetRequestPublishFormInfo(int64_t formId, Want &want,
                                       std::unique_ptr<FormProviderData> &formProviderData);
+    /**
+     * @brief Get updated form info.
+     * @param record Indicates the form record.
+     * @param bundlePackInfo Indicates the BundlePackInfo object.
+     * @param abilityFormInfo Indicates the obtained abilityFormInfo object.
+     * @return Returns true on success, false on failure.
+     */
+    bool GetPackageForm(const FormRecord &record, const BundlePackInfo &bundlePackInfo,
+        AbilityFormInfo &abilityFormInfo);
 
+    /**
+     * @brief Set form free install flag.
+     * @param formId Indicates the form ID.
+     * @param isNeedFreeInstall Indicates the free install flag is true or false.
+     * @return Returns true on success, false on failure.
+     */
+    bool SetRecordNeedFreeInstall(int64_t formId, bool isNeedFreeInstall);
 private:
     /**
      * @brief Create form record.
@@ -524,6 +541,15 @@ private:
      * @return Returns true on success, false on failure.
      */
     bool IsSameForm(const FormRecord &record, const FormInfo &formInfo);
+
+    /**
+     * @brief Check if two forms is same or not.
+     * @param record Indicates the form record.
+     * @param abilityFormInfo Indicates the AbilityFormInfo.
+     * @return Returns true on success, false on failure.
+     */
+    bool IsSameForm(const FormRecord &record, const AbilityFormInfo &abilityFormInfo);
+
     /**
      * @brief handle update form flag.
      * @param formIDs The id of the forms.
@@ -544,6 +570,17 @@ private:
     */
     ErrCode HandleUpdateHostFormFlag(const std::vector<int64_t> &formIds, bool flag, bool isOnlyEnableUpdate,
                                      FormHostRecord &formHostRecord, std::vector<int64_t> &refreshForms);
+
+    /**
+    * @brief Get ability form info.
+    * @param record Indicates form record.
+    * @param abilities Indicates the ModuleAbilityInfo in FA model or ExtensionAbilities in stage model.
+    * @param abilityFormInfo Indicates the obtained abilityFormInfo object.
+    * @return Returns ERR_OK on success, others on failure.
+    */
+    template<typename T>
+    bool GetAbilityFormInfo(const FormRecord &record, const std::vector<T> &abilities,
+        AbilityFormInfo &abilityFormInfo);
 private:
     mutable std::mutex formRecordMutex_;
     mutable std::mutex formHostRecordMutex_;

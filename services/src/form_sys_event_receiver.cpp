@@ -125,24 +125,25 @@ void FormSysEventReceiver::HandleProviderUpdated(const std::string &bundleName, 
         return;
     }
 
-    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
-    if (iBundleMgr == nullptr) {
-        // GetBundleMgr() has error log
-        return;
-    }
-
     std::vector<FormInfo> targetForms;
     if (FormInfoMgr::GetInstance().GetFormsInfoByBundle(bundleName, targetForms) != ERR_OK) {
         HILOG_ERROR("%{public}s error, failed to get forms info.", __func__);
         return;
     }
 
+    BundlePackInfo bundlePackInfo;
+    bool hasPackInfo = FormBmsHelper::GetInstance().GetBundlePackInfo(bundleName, userId, bundlePackInfo);
     std::vector<int64_t> removedForms;
     std::vector<int64_t> updatedForms;
     for (FormRecord& formRecord : formInfos) {
         HILOG_INFO("%{public}s, provider update, formName:%{public}s", __func__, formRecord.formName.c_str());
         int64_t formId = formRecord.formId;
+
         if (ProviderFormUpdated(formId, formRecord, targetForms)) {
+            updatedForms.emplace_back(formId);
+            continue;
+        }
+        if (hasPackInfo && ProviderFormUpdated(formId, formRecord, bundlePackInfo)) {
             updatedForms.emplace_back(formId);
             continue;
         }
@@ -232,6 +233,26 @@ bool FormSysEventReceiver::ProviderFormUpdated(const int64_t formId,
         FormDataMgr::GetInstance().SetVersionUpgrade(formId, true);
         return true;
     }
+
+    HILOG_INFO("%{public}s, no updated form.", __func__);
+    return false;
+}
+
+bool FormSysEventReceiver::ProviderFormUpdated(const int64_t formId, const FormRecord &formRecord,
+    const BundlePackInfo &bundlePackInfo)
+{
+    HILOG_INFO("%{public}s start", __func__);
+    AbilityFormInfo packForm;
+    if (FormDataMgr::GetInstance().GetPackageForm(formRecord, bundlePackInfo, packForm)) {
+        HILOG_INFO("%{public}s, form is still in package info, form:%{public}s", __func__, formRecord.formName.c_str());
+        FormDataMgr::GetInstance().SetRecordNeedFreeInstall(formId, true);
+        FormTimerCfg timerCfg;
+        GetTimerCfg(packForm.updateEnabled, packForm.updateDuration, packForm.scheduledUpdateTime, timerCfg);
+        HandleTimerUpdate(formId, formRecord, timerCfg);
+        FormDataMgr::GetInstance().SetVersionUpgrade(formId, true);
+        return true;
+    }
+
     HILOG_INFO("%{public}s, no updated form.", __func__);
     return false;
 }
