@@ -133,4 +133,29 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0002, TestSize.Level1) {
     EXPECT_EQ(0, resultInfos.size());
     GTEST_LOG_(INFO) << "FormMgrStubTest_0002 ends";
 }
+
+/**
+ * @tc.name: FormMgrStubTest_0003
+ * @tc.desc: Verify HandleIsRequestPublishFormSupported
+ * @tc.type: FUNC
+ * @tc.require: #I58Y0A
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0003, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0003 starts";
+    // initialize input parameters.
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_CALL(*mockFormMgrService, IsRequestPublishFormSupported())
+        .Times(1)
+        .WillOnce(Return(true));
+    // test.
+    int32_t errCode = mockFormMgrService->HandleIsRequestPublishFormSupported(data, reply);
+    // check errorcode
+    EXPECT_EQ(ERR_OK, errCode);
+    // check resulting infos.
+    bool result;
+    reply.ReadBool(result);
+    EXPECT_EQ(result, true);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0003 ends";
+}
 }

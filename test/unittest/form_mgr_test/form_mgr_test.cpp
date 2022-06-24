@@ -120,4 +120,20 @@ HWTEST_F(FormMgrTest, FormMgrTest_0002, TestSize.Level1) {
     testing::Mock::AllowLeak(mockProxy);
     GTEST_LOG_(INFO) << "FormMgrTest_0002 test ends";
 }
+
+/**
+ * @tc.name: FormMgrTest_0003
+ * @tc.desc: Verify IsRequestPublishFormSupported
+ * @tc.type: FUNC
+ * @tc.require: #I58Y0A
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_003, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0003 starts";
+    EXPECT_CALL(*mockProxy, IsRequestPublishFormSupported())
+        .Times(1)
+        .WillOnce(Return(false));
+    bool result = FormMgr::GetInstance().IsRequestPublishFormSupported();
+    EXPECT_EQ(result, false);
+    GTEST_LOG_(INFO) << "FormMgrTest_0003 test ends";
+}
 } // namespace

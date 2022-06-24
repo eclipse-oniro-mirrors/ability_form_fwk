@@ -33,12 +33,9 @@ ohos_unittest("form_mgr_proxy_test") {
   ]
 
   external_deps = [
-    "ability_base:base",
+    "ability_base:configuration",
     "ability_base:want",
-    "ability_base:zuri",
-    "ability_runtime:ability_manager",
     "ability_runtime:app_manager",
-    "ability_runtime:wantagent_innerkits",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "common_event_service:cesfwk_core",
@@ -49,9 +46,8 @@ ohos_unittest("form_mgr_proxy_test") {
     "hisysevent_native:libhisysevent",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
-    "safwk:system_ability_fwk",
-    "samgr_standard:samgr_proxy",
-    "time_native:time_service",
+    "relational_store:native_appdatafwk",
+    "relational_store:native_rdb",
     "utils_base:utils",
   ]
 

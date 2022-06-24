@@ -25,6 +25,7 @@ class MockFormMgrProxy : public FormMgrProxy {
 public:
     MockFormMgrProxy(const sptr<IRemoteObject> &impl) : FormMgrProxy(impl) {};
     MOCK_METHOD2(GetFormsInfo, int(const std::string &moduleName, std::vector<FormInfo> &formInfos));
+    MOCK_METHOD0(IsRequestPublishFormSupported, bool());
 };
 }
 }
