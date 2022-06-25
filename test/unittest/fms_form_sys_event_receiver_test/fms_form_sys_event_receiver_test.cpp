@@ -25,6 +25,8 @@
 #include "form_data_mgr.h"
 #include "form_db_cache.h"
 #include "form_host_interface.h"
+#include "form_info_mgr.h"
+#include "form_info_storage.h"
 #include "form_mgr.h"
 #undef private
 #include "form_mgr_errors.h"
@@ -106,7 +108,7 @@ public:
         int callingUid, int32_t userId, std::string actionType, EventFwk::CommonEventData &eventData);
     void CreateFormRecordAndFormInfo(std::string bundle, int64_t formId, int callingUid);
     void ClearFormRecord(int64_t formId);
-
+    void CreateProviderData();
 protected:
     sptr<MockFormHostClient> token_;
     std::shared_ptr<FormMgrService> formyMgrServ_ = DelayedSingleton<FormMgrService>::GetInstance();
@@ -135,6 +137,32 @@ void FmsFormSysEventReceiverTest::SetUp()
 
 void FmsFormSysEventReceiverTest::TearDown()
 {}
+
+void FmsFormSysEventReceiverTest::CreateProviderData()
+{
+    std::unordered_map<std::string, std::shared_ptr<BundleFormInfo>> bundleFormInfoMap;
+    std::shared_ptr<BundleFormInfo> bundleFormInfo = std::make_shared<BundleFormInfo>(FORM_PROVIDER_BUNDLE_NAME);
+    std::vector<FormInfoStorage> formInfoStorages;
+    FormInfo formInfo;
+    formInfo.bundleName = FORM_PROVIDER_BUNDLE_NAME;
+    formInfo.abilityName = FORM_PROVIDER_ABILITY_NAME;
+    formInfo.moduleName = PARAM_PROVIDER_MODULE_NAME;
+    formInfo.name = PARAM_FORM_NAME;
+    formInfo.updateEnabled = true;
+    formInfo.updateDuration = 1;
+    formInfo.scheduledUpdateTime = "06:06";
+    formInfo.jsComponentName = FORM_JS_COMPOMENT_NAME;
+    formInfo.formVisibleNotify = true;
+    formInfo.supportDimensions = {1, 2};
+    formInfo.defaultDimension = 1;
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = 0;
+    formInfoStorage.formInfos.push_back(formInfo);
+    bundleFormInfo->formInfoStorages_.emplace_back(formInfoStorage);
+    bundleFormInfoMap.emplace(FORM_PROVIDER_BUNDLE_NAME, bundleFormInfo);
+
+    FormInfoMgr::GetInstance().bundleFormInfoMap_ = bundleFormInfoMap;
+}
 
 void FmsFormSysEventReceiverTest::CreateEventData(std::string bundle, int64_t formId,
     int callingUid, std::string actionType, EventFwk::CommonEventData &eventData)
@@ -513,5 +541,82 @@ HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_008, TestSize.Level0)
     ClearFormRecord(formId);
 
     GTEST_LOG_(INFO) << "fms_form_sys_event_receiver_test_008 end";
+}
+
+/*
+ * Feature: FormMgrService
+ * Function: FormMgr
+ * SubFunction: OnReceiveEvent Functions
+ * FunctionPoints: FormMgr OnReceiveEvent interface
+ * EnvConditions: Mobile that can run ohos test framework
+ * CaseDescription: Verify if HandleProviderUpdated works.
+ * [COMMON_EVENT_PACKAGE_CHANGED] ProviderFormUpdated return false. delete formRecord.
+ */
+HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_009, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "fms_form_sys_event_receiver_test_009 start";
+
+    std::string bundle = FORM_PROVIDER_BUNDLE_NAME;
+    int64_t formId = 0x0ffabcdf00000000;
+    int callingUid {0};
+    CreateProviderData();
+    std::string actionType = EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_CHANGED;
+    EventFwk::CommonEventData eventData;
+    CreateEventData(bundle, formId, callingUid, actionType, eventData);
+    CreateFormRecordAndFormInfo(bundle, formId, callingUid);
+
+    FormRecord tempFormRecord;
+    ASSERT_TRUE(FormDataMgr::GetInstance().GetFormRecord(formId, tempFormRecord));
+
+    FormSysEventReceiver testCase;
+    auto handler = std::make_shared<EventHandler>(EventRunner::Create());
+    testCase.SetEventHandler(handler);
+    testCase.OnReceiveEvent(eventData);
+    WaitUntilTaskDone(handler);
+
+    ASSERT_FALSE(FormDataMgr::GetInstance().GetFormRecord(formId, tempFormRecord));
+
+    ClearFormRecord(formId);
+
+    // clear provider data
+    FormInfoMgr::GetInstance().bundleFormInfoMap_.clear();
+    GTEST_LOG_(INFO) << "fms_form_sys_event_receiver_test_009 end";
+}
+
+/*
+ * Feature: FormMgrService
+ * Function: FormMgr
+ * SubFunction: OnReceiveEvent Functions
+ * FunctionPoints: FormMgr OnReceiveEvent interface
+ * EnvConditions: Mobile that can run ohos test framework
+ * CaseDescription: Verify if HandleProviderUpdated works.
+ * [COMMON_EVENT_PACKAGE_CHANGED] ProviderFormUpdated return true. refresh form.
+ */
+HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_0010, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "fms_form_sys_event_receiver_test_0010 start";
+
+    std::string bundle = FORM_PROVIDER_BUNDLE_NAME;
+    int64_t formId = 0x0ffabcdf00000000;
+    int callingUid {0};
+    std::string actionType = EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_CHANGED;
+    EventFwk::CommonEventData eventData;
+    CreateEventData(bundle, formId, callingUid, actionType, eventData);
+    CreateFormRecordAndFormInfo(bundle, formId, callingUid);
+
+    FormRecord tempFormRecord;
+    ASSERT_TRUE(FormDataMgr::GetInstance().GetFormRecord(formId, tempFormRecord));
+
+    FormSysEventReceiver testCase;
+    auto handler = std::make_shared<EventHandler>(EventRunner::Create());
+    testCase.SetEventHandler(handler);
+    testCase.OnReceiveEvent(eventData);
+    WaitUntilTaskDone(handler);
+
+    ASSERT_TRUE(FormDataMgr::GetInstance().GetFormRecord(formId, tempFormRecord));
+
+    ClearFormRecord(formId);
+
+    GTEST_LOG_(INFO) << "fms_form_sys_event_receiver_test_0010 end";
 }
 }
