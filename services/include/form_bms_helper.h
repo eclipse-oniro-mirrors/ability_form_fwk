@@ -47,7 +47,7 @@ public:
      * @param bundleName Provider ability bundleName.
      * @param moduleName Provider ability moduleName.
      */
-    void NotifyModuleNotRemovable(const std::string &bundleName, const std::string &moduleName) const;
+    void NotifyModuleNotRemovable(const std::string &bundleName, const std::string &moduleName);
 
     /**
      * @brief Acquire a bundle manager, if it not existed,
@@ -61,6 +61,14 @@ public:
      */
     void SetBundleManager(const sptr<IBundleMgr> &bundleManager);
 
+    /**
+     * @brief Get bundle package info.
+     * @param bundleName Indicates the bundle name.
+     * @param bundleName Indicates the user ID.
+     * @param bundlePackInfo Indicates the obtained BundlePackInfo object.
+     * @return Returns true on success, false on failure.
+     */
+    bool GetBundlePackInfo(const std::string &bundleName, int32_t userId, BundlePackInfo &bundlePackInfo);
 private:
     /**
      * @brief Generate module key.

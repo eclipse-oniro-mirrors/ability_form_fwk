@@ -1411,13 +1411,13 @@ ErrCode FormMgrAdapter::QueryPublishFormToHost(Want &want)
 
     if (!abilityInfo.name.empty()) {
         /* highest priority ability */
-        HILOG_INFO("Start the highest priority ability. bundleName: %{public}s, ability:%{public}s",
+        HILOG_INFO("Query highest priority ability success. bundleName: %{public}s, ability:%{public}s",
             abilityInfo.bundleName.c_str(), abilityInfo.name.c_str());
         want.SetParam(Constants::PARAM_BUNDLE_NAME_KEY, abilityInfo.bundleName);
         want.SetParam(Constants::PARAM_ABILITY_NAME_KEY, abilityInfo.name);
     } else {
         /* highest priority extension ability */
-        HILOG_INFO("Start the highest priority extension ability. bundleName: %{public}s, ability:%{public}s",
+        HILOG_INFO("Query highest priority extension ability success. bundleName: %{public}s, ability:%{public}s",
             extensionAbilityInfo.bundleName.c_str(), extensionAbilityInfo.name.c_str());
         want.SetParam(Constants::PARAM_BUNDLE_NAME_KEY, extensionAbilityInfo.bundleName);
         want.SetParam(Constants::PARAM_ABILITY_NAME_KEY, extensionAbilityInfo.name);
@@ -2378,6 +2378,29 @@ int FormMgrAdapter::UpdateRouterAction(const int64_t formId, std::string &action
     actionObject["bundleName"] = record.bundleName;
     action = actionObject.dump();
     return ERR_OK;
+}
+
+bool FormMgrAdapter::IsRequestPublishFormSupported()
+{
+    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
+    /* Query the highest priority ability or extension ability for publishing form */
+    Want wantAction;
+    wantAction.SetAction(Constants::FORM_PUBLISH_ACTION);
+    AppExecFwk::AbilityInfo abilityInfo;
+    AppExecFwk::ExtensionAbilityInfo extensionAbilityInfo;
+    int callingUid = IPCSkeleton::GetCallingUid();
+    int32_t userId = GetCurrentUserId(callingUid);
+    if (!IN_PROCESS_CALL(iBundleMgr->ImplicitQueryInfoByPriority(wantAction,
+        AppExecFwk::AbilityInfoFlag::GET_ABILITY_INFO_DEFAULT, userId, abilityInfo, extensionAbilityInfo))) {
+        HILOG_ERROR("Failed to ImplicitQueryInfoByPriority for publishing form");
+        return false;
+    }
+
+    if (abilityInfo.name.empty() && extensionAbilityInfo.name.empty()) {
+        HILOG_ERROR("Query highest priority ability failed, no form host ability found.");
+        return false;
+    }
+    return true;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

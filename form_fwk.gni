@@ -14,6 +14,7 @@
 ability_runtime_path = "//foundation/ability/ability_runtime"
 ability_runtime_innerapi_path = "${ability_runtime_path}/interfaces/inner_api"
 ability_runtime_kits_path = "${ability_runtime_path}/frameworks/kits"
+ability_runtime_native_path = "${ability_runtime_path}/frameworks/native"
 ability_runtime_services_path = "${ability_runtime_path}/services"
 bundlefwk_path = "//foundation/bundlemanager/bundle_framework"
 bundlefwk_inner_api_path = "${bundlefwk_path}/interfaces/inner_api"
@@ -26,7 +27,7 @@ global_path = "//base/global"
 declare_args() {
   device_usage_statistics = true
   if (defined(global_parts_info) &&
-      !defined(global_parts_info.device_usage_statistics)) {
+      !defined(global_parts_info.resourceschedule_device_usage_statistics)) {
     device_usage_statistics = false
   }
 }
