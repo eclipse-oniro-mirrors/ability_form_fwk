@@ -55,7 +55,12 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
     const AAFwk::Want& want = eventData.GetWant();
     std::string action = want.GetAction();
     std::string bundleName = want.GetElement().GetBundleName();
-    if (action.empty() || (action != EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED && bundleName.empty())) {
+    if (action.empty()) {
+        HILOG_ERROR("%{public}s failed, empty action", __func__);
+        return;
+    }
+    if (bundleName.empty() && action != EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED &&
+        action != EventFwk::CommonEventSupport::COMMON_EVENT_BUNDLE_SCAN_FINISHED) {
         HILOG_ERROR("%{public}s failed, invalid param, action: %{public}s, bundleName: %{public}s",
             __func__, action.c_str(), bundleName.c_str());
         return;
@@ -104,6 +109,12 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
                 return;
             }
             HandleUserIdRemoved(userId);
+        };
+        eventHandler_->PostTask(task);
+    } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_BUNDLE_SCAN_FINISHED) {
+        auto task = [this, want, bundleName]() {
+            int32_t userId = want.GetIntParam(KEY_USER_ID, Constants::DEFAULT_USERID);
+            HandleBundleScanFinished(userId);
         };
         eventHandler_->PostTask(task);
     } else {
@@ -570,6 +581,12 @@ void FormSysEventReceiver::HandleUserIdRemoved(const int32_t userId)
     for (itRemoved = removedFormIds.begin();itRemoved != removedFormIds.end(); ++itRemoved) {
         FormTimerMgr::GetInstance().RemoveFormTimer(*itRemoved);
     }
+}
+
+void FormSysEventReceiver::HandleBundleScanFinished(const int32_t userId)
+{
+    HILOG_INFO("%{public}s start", __func__);
+    FormInfoMgr::GetInstance().ReloadFormInfos(userId);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

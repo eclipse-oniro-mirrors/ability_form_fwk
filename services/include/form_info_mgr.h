@@ -94,6 +94,8 @@ public:
 
     ErrCode RemoveAllDynamicFormsInfo(const std::string &bundleName, int32_t userId);
 
+    ErrCode ReloadFormInfos(int32_t userId);
+
 private:
     std::shared_ptr<BundleFormInfo> GetOrCreateBundleFromInfo(const std::string &bundleName);
     static bool IsCaller(std::string bundleName);
