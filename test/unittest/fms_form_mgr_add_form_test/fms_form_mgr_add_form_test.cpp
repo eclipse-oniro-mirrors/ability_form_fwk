@@ -106,7 +106,6 @@ void FmsFormMgrAddFormTest::CreateProviderData()
 {
     std::unordered_map<std::string, std::shared_ptr<BundleFormInfo>> bundleFormInfoMap;
     std::shared_ptr<BundleFormInfo> bundleFormInfo = std::make_shared<BundleFormInfo>(FORM_PROVIDER_BUNDLE_NAME);
-    std::vector<FormInfoStorage> formInfoStorages;
     FormInfo formInfo;
     formInfo.bundleName = FORM_PROVIDER_BUNDLE_NAME;
     formInfo.abilityName = FORM_PROVIDER_ABILITY_NAME;
