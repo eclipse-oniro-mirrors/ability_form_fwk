@@ -106,6 +106,8 @@ FormMgrStub::FormMgrStub()
         &FormMgrStub::HandleRequestPublishForm;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_IS_REQUEST_PUBLISH_FORM_SUPPORTED)] =
         &FormMgrStub::HandleIsRequestPublishFormSupported;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_START_ABILITY)] =
+        &FormMgrStub::HandleStartAbility;
 }
 
 FormMgrStub::~FormMgrStub()
@@ -846,6 +848,29 @@ int32_t FormMgrStub::HandleIsRequestPublishFormSupported(MessageParcel &data, Me
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
+}
+
+int32_t FormMgrStub::HandleStartAbility(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    // retrieve want
+    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
+    if (want == nullptr) {
+        HILOG_ERROR("%{public}s, failed to get want.", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    // retrieve callerToken
+    sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
+    if (callerToken == nullptr) {
+        HILOG_ERROR("%{public}s, failed to get remote object.", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int32_t result = StartAbility(*want, callerToken);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("%{public}s, failed to write result", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return result;
 }
 
 /**

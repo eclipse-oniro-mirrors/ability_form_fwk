@@ -752,6 +752,17 @@ bool FormMgr::IsRequestPublishFormSupported()
     return remoteProxy_->IsRequestPublishFormSupported();
 }
 
+int32_t FormMgr::StartAbility(const Want &want, const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("%{public}s starts.", __func__);
+    int32_t errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
+        return errCode;
+    }
+    return remoteProxy_->StartAbility(want, callerToken);
+}
+
 /**
  * @brief Update action string for router event.
  * @param formId Indicates the unique id of form.

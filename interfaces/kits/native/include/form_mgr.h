@@ -359,6 +359,14 @@ public:
     bool IsRequestPublishFormSupported();
 
     /**
+     * @brief Start an ability. This function can only be called by a form extension of a system app.
+     * @param want includes ability name, parameters and relative info sending to an ability.
+     * @param callerToken token of the ability that initially calls this function.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t StartAbility(const Want &want, const sptr<IRemoteObject> &callerToken);
+
+    /**
      * @brief Update action string for router event.
      * @param formId Indicates the unique id of form.
      * @param action Indicates the origin action string.

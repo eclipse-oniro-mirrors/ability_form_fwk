@@ -704,6 +704,44 @@ bool FormMgrService::IsRequestPublishFormSupported()
     return FormMgrAdapter::GetInstance().IsRequestPublishFormSupported();
 }
 
+int32_t FormMgrService::StartAbility(const Want &want, const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    sptr<IBundleMgr> bundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
+    if (bundleMgr == nullptr) {
+        HILOG_ERROR("%{public}s error, failed to get bundleMgr.", __func__);
+        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
+    }
+    // check if system app
+    auto callingUid = IPCSkeleton::GetCallingUid();
+    auto isSystemApp = bundleMgr->CheckIsSystemAppByUid(callingUid);
+    if (!isSystemApp) {
+        HILOG_ERROR("%{public}s error, permission denied.", __func__);
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    }
+    // retrieve bundleName of the calling ability.
+    std::string callerBundleName;
+    if (!IN_PROCESS_CALL(bundleMgr->GetBundleNameForUid(callingUid, callerBundleName))) {
+        HILOG_ERROR("StartAbility, failed to get form config info.");
+        return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
+    }
+    // caller and callee should be in the same bundle.
+    if (want.GetElement().GetBundleName() != callerBundleName) {
+        return ERR_APPEXECFWK_FORM_INVALID_BUNDLENAME;
+    }
+    // check abilityName to void implicit want.
+    if (want.GetElement().GetAbilityName() == "") {
+        HILOG_ERROR("%{public}s error, AbilityName is empty", __func__);
+        return ERR_APPEXECFWK_FORM_NO_SUCH_ABILITY;
+    }
+    sptr<AAFwk::IAbilityManager> ams = FormAmsHelper::GetInstance().GetAbilityManager();
+    if (ams == nullptr) {
+        HILOG_ERROR("%{public}s error, failed to get ams.", __func__);
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    return ams->StartAbility(want, callerToken, -1, -1);
+}
+
 /**
  * @brief Update action string for router event.
  * @param formId Indicates the unique id of form.
