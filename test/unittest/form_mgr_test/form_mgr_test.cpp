@@ -17,6 +17,7 @@
 #include "form_mgr.h"
 #include "gmock/gmock.h"
 #include "mock_form_mgr_proxy.h"
+#include "mock_form_token.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -135,5 +136,24 @@ HWTEST_F(FormMgrTest, FormMgrTest_003, TestSize.Level1) {
     bool result = FormMgr::GetInstance().IsRequestPublishFormSupported();
     EXPECT_EQ(result, false);
     GTEST_LOG_(INFO) << "FormMgrTest_0003 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0004
+ * @tc.desc: Verify StartAbility
+ * @tc.type: FUNC
+ * @tc.require: #I5EFDX
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0004, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0004 starts";
+    EXPECT_CALL(*mockProxy, StartAbility(_, _))
+        .Times(1)
+        .WillOnce(Return(0));
+    Want want;
+    want = want.SetElementName("", "com.example.FormAbility", "MainAbility");
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    int32_t result = FormMgr::GetInstance().StartAbility(want, token);
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrTest_0004 test ends";
 }
 } // namespace
