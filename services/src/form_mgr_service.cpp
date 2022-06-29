@@ -18,7 +18,9 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <type_traits>
 #include <unistd.h>
+#include <unordered_map>
 
 #include "appexecfwk_errors.h"
 #include "common_event_manager.h"
@@ -52,12 +54,30 @@ const bool REGISTER_RESULT =
 
 const std::string NAME_FORM_MGR_SERVICE = "FormMgrService";
 
+constexpr int32_t FORM_DUMP_ARGC_MAX = 2;
+
+const std::string FORM_DUMP_HELP = "options list:\n"
+    "  -h, --help                               list available commands\n"
+    "  -s, --storage                            query form storage info\n"
+    "  -n  <bundle-name>                        query form info by a bundle name\n"
+    "  -i  <form-id>                            query form info by a form ID\n";
+
+const std::map<std::string, FormMgrService::DumpKey> FormMgrService::dumpKeyMap_ = {
+    {"-h", FormMgrService::DumpKey::KEY_DUMP_HELP},
+    {"--help", FormMgrService::DumpKey::KEY_DUMP_HELP},
+    {"-s", FormMgrService::DumpKey::KEY_DUMP_STORAGE},
+    {"--storage", FormMgrService::DumpKey::KEY_DUMP_STORAGE},
+    {"-n", FormMgrService::DumpKey::KEY_DUMP_BY_BUNDLE_NAME},
+    {"-i", FormMgrService::DumpKey::KEY_DUMP_BY_FORM_ID},
+};
+
 FormMgrService::FormMgrService()
     : SystemAbility(FORM_MGR_SERVICE_ID, true),
       state_(ServiceRunningState::STATE_NOT_START),
       runner_(nullptr),
       handler_(nullptr)
 {
+    DumpInit();
 }
 
 FormMgrService::~FormMgrService()
@@ -712,6 +732,113 @@ int FormMgrService::UpdateRouterAction(const int64_t formId, std::string &action
 {
     HILOG_INFO("%{public}s called.", __func__);
     return FormMgrAdapter::GetInstance().UpdateRouterAction(formId, action);
+}
+
+void FormMgrService::DumpInit()
+{
+    dumpFuncMap_[DumpKey::KEY_DUMP_HELP] = &FormMgrService::HiDumpHelp;
+    dumpFuncMap_[DumpKey::KEY_DUMP_STORAGE] = &FormMgrService::HiDumpStorageFormInfos;
+    dumpFuncMap_[DumpKey::KEY_DUMP_BY_BUNDLE_NAME] = &FormMgrService::HiDumpFormInfoByBundleName;
+    dumpFuncMap_[DumpKey::KEY_DUMP_BY_FORM_ID] = &FormMgrService::HiDumpFormInfoByFormId;
+}
+
+int FormMgrService::Dump(int fd, const std::vector<std::u16string> &args)
+{
+    if (!IsReady()) {
+        HILOG_ERROR("%{public}s, fms is not ready.", __func__);
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
+    std::string result;
+    Dump(args, result);
+    int ret = dprintf(fd, "%s\n", result.c_str());
+    if (ret < 0) {
+        HILOG_ERROR("%{public}s, dprintf error.", __func__);
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    return ERR_OK;
+}
+
+void FormMgrService::Dump(const std::vector<std::u16string> &args, std::string &result)
+{
+    DumpKey key;
+    std::string value;
+    if (!ParseOption(args, key, value, result)) {
+        result.append('\n' + FORM_DUMP_HELP);
+        return;
+    }
+
+    auto iter = dumpFuncMap_.find(key);
+    if (iter == dumpFuncMap_.end() || iter->second == nullptr) {
+        result = "error: unknow function.";
+        return;
+    }
+
+    auto dumpFunc = iter->second;
+    (this->*dumpFunc)(value, result);
+}
+
+bool FormMgrService::ParseOption(const std::vector<std::u16string> &args, DumpKey &key, std::string &value,
+    std::string &result)
+{
+    auto size = args.size();
+    if (size == 0) {
+        result = "error: must contain arguments.";
+        return false;
+    }
+
+    if (size > FORM_DUMP_ARGC_MAX) {
+        result = "error: arguments numer out of limit.";
+        return false;
+    }
+
+    std::string optionKey = Str16ToStr8(args[0]);
+    auto iter = dumpKeyMap_.find(optionKey);
+    if (iter == dumpKeyMap_.end()) {
+        result = "error: unkown option.";
+        return false;
+    }
+
+    key = iter->second;
+
+    if (args.size() == FORM_DUMP_ARGC_MAX) {
+        value = Str16ToStr8(args[1]);
+    }
+
+    return true;
+}
+
+void FormMgrService::HiDumpHelp([[maybe_unused]] const std::string &args, std::string &result)
+{
+    result = FORM_DUMP_HELP;
+}
+
+void FormMgrService::HiDumpStorageFormInfos([[maybe_unused]] const std::string &args, std::string &result)
+{
+    DumpStorageFormInfos(result);
+}
+
+void FormMgrService::HiDumpFormInfoByBundleName(const std::string &args, std::string &result)
+{
+    if (args.empty()) {
+        result = "error: request a bundle name.";
+        return;
+    }
+    DumpFormInfoByBundleName(args, result);
+}
+
+void FormMgrService::HiDumpFormInfoByFormId(const std::string &args, std::string &result)
+{
+    if (args.empty()) {
+        result = "error: request a form ID.";
+        return;
+    }
+    int64_t formId = atoll(args.c_str());
+    if (formId == 0) {
+        result = "error: form ID is invalid.";
+        return;
+    }
+    DumpFormInfoByFormId(formId, result);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

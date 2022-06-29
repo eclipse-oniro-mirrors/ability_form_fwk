@@ -325,14 +325,40 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     int UpdateRouterAction(const int64_t formId, std::string &action) override;
+
+    /**
+     * @brief Dump form.
+     * @param fd Indicates the file descriptor for result.
+     * @param args Indicates the input arguments.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int Dump(int fd, const std::vector<std::u16string> &args) override;
 private:
+    enum class DumpKey {
+        KEY_DUMP_HELP = 0,
+        KEY_DUMP_STORAGE,
+        KEY_DUMP_BY_BUNDLE_NAME,
+        KEY_DUMP_BY_FORM_ID,
+    };
     /**
      * @brief initialization of form manager service.
      */
     ErrCode Init();
 
     ErrCode CheckFormPermission();
+
+    void DumpInit();
+    void Dump(const std::vector<std::u16string> &args, std::string &result);
+    bool ParseOption(const std::vector<std::u16string> &args, DumpKey &key, std::string &value, std::string &result);
+    void HiDumpHelp([[maybe_unused]] const std::string &args, std::string &result);
+    void HiDumpStorageFormInfos([[maybe_unused]] const std::string &args, std::string &result);
+    void HiDumpFormInfoByBundleName(const std::string &args, std::string &result);
+    void HiDumpFormInfoByFormId(const std::string &args, std::string &result);
 private:
+    const static std::map<std::string, DumpKey> dumpKeyMap_;
+    using DumpFuncType = void (FormMgrService::*)(const std::string &args, std::string &result);
+    std::map<DumpKey, DumpFuncType> dumpFuncMap_;
+
     ServiceRunningState state_;
 
     std::shared_ptr<EventRunner> runner_ = nullptr;
