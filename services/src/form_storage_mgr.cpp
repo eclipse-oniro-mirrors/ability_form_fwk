@@ -24,6 +24,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "form_constants.h"
 #include "form_mgr_errors.h"
 #include "form_storage_mgr.h"
 #include "hilog_wrapper.h"
@@ -298,7 +299,9 @@ DistributedKv::Status FormStorageMgr::GetKvStore()
         .createIfMissing = true,
         .encrypt = false,
         .autoSync = true,
-        .kvStoreType = DistributedKv::KvStoreType::SINGLE_VERSION
+        .kvStoreType = DistributedKv::KvStoreType::SINGLE_VERSION,
+        .baseDir = Constants::FORM_STORAGE_DIR,
+        .area = DistributedKv::EL1
         };
 
     DistributedKv::Status status = dataManager_.GetSingleKvStore(options, appId_, storeId_, kvStorePtr_);
