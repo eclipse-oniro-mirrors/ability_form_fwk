@@ -2431,11 +2431,14 @@ napi_value AcquireFormStateCallback(napi_env env, AsyncAcquireFormStateCallbackI
         [](napi_env env, napi_status status, void *data) {
             HILOG_INFO("%{public}s, napi_create_async_work complete", __func__);
             auto *asyncCallbackInfo = (AsyncAcquireFormStateCallbackInfo *) data;
+            // asyncCallbackInfo will be freed in OnAcquireState, so save the member variable asyncWork.
+            napi_async_work asyncWork = asyncCallbackInfo->asyncWork;
+            // When the result is not ERR_OK, OnAcquireState will be called here,
+            // else OnAcquireState will be called after the form state is acquired.
             if (asyncCallbackInfo->result != ERR_OK) {
                 FormHostClient::GetInstance()->OnAcquireState(FormState::UNKNOWN, asyncCallbackInfo->want);
             }
-            napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
-            delete asyncCallbackInfo;
+            napi_delete_async_work(env, asyncWork);
         },
         (void *) asyncCallbackInfo,
         &asyncCallbackInfo->asyncWork);
@@ -2465,11 +2468,14 @@ napi_value AcquireFormStatePromise(napi_env env, AsyncAcquireFormStateCallbackIn
         [](napi_env env, napi_status status, void *data) {
             HILOG_INFO("%{public}s, promise complete", __func__);
             auto *asyncCallbackInfo = (AsyncAcquireFormStateCallbackInfo *) data;
+            // asyncCallbackInfo will be freed in OnAcquireState, so save the member variable asyncWork.
+            napi_async_work asyncWork = asyncCallbackInfo->asyncWork;
+            // When the result is not ERR_OK, OnAcquireState will be called here,
+            // else OnAcquireState will be called after the form state is acquired.
             if (asyncCallbackInfo->result != ERR_OK) {
                 FormHostClient::GetInstance()->OnAcquireState(FormState::UNKNOWN, asyncCallbackInfo->want);
             }
-            napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
-            delete asyncCallbackInfo;
+            napi_delete_async_work(env, asyncWork);
         },
         (void *) asyncCallbackInfo,
         &asyncCallbackInfo->asyncWork);
