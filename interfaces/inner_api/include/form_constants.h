@@ -181,6 +181,8 @@ namespace Constants {
         // ipc id for dumping state (2001)
         FORM_MGR_DUMP_STATE = 2001,
     };
+
+    const std::string FORM_STORAGE_DIR = "/data/service/el1/public/database/form_storage";
 }  // namespace Constants
 }  // namespace AppExecFwk
 }  // namespace OHOS
