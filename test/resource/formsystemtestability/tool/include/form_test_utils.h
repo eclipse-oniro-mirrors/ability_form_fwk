@@ -22,7 +22,7 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-const int OnStateChangedEventWant = LifeCycle::Event::UNDEFINED;
+const int OnStateChangedEventWant = (int)LifeCycle::Event::UNDEFINED;
 const int OnStateChangedEvent = (int)LifeCycle::Event::UNDEFINED + 1;
 const int requestCodeForTerminate = 10;
 const int requestCodeForResult = 20;

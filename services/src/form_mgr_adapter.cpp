@@ -2383,6 +2383,10 @@ int FormMgrAdapter::UpdateRouterAction(const int64_t formId, std::string &action
 bool FormMgrAdapter::IsRequestPublishFormSupported()
 {
     sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
+    if (iBundleMgr == nullptr) {
+        HILOG_ERROR("%{public}s error, failed to get IBundleMgr.", __func__);
+        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
+    }
     /* Query the highest priority ability or extension ability for publishing form */
     Want wantAction;
     wantAction.SetAction(Constants::FORM_PUBLISH_ACTION);

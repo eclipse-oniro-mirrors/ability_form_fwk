@@ -18,12 +18,15 @@
 
 #include "ability.h"
 #include "form_provider_info.h"
+#include "napi_form_util.h"
 #include "napi/native_api.h"
 #include "napi/native_common.h"
 #include "napi/native_node_api.h"
 #include "nlohmann/json.hpp"
 #include "want.h"
 
+namespace OHOS {
+namespace AbilityRuntime {
 struct AsyncNextRefreshTimeFormCallbackInfo {
     napi_env env;
     OHOS::AppExecFwk::Ability *ability;
@@ -80,22 +83,20 @@ struct AsyncRemoveFormInfoCallbackInfo {
     int32_t result = OHOS::ERR_OK;
 };
 
-struct AsyncGetFormsInfoCallbackInfo {
-    napi_env env;
-    napi_async_work asyncWork;
-    napi_deferred deferred;
-    napi_ref callback;
-    std::string moduleName;
-    std::vector<OHOS::AppExecFwk::FormInfo> formInfos;
+struct AsyncGetFormsInfoCallbackInfo : AsyncCallbackInfoBase {
     int32_t result = OHOS::ERR_OK;
+    std::string moduleName {};
+    std::vector<OHOS::AppExecFwk::FormInfo> formInfos {};
+
+    explicit AsyncGetFormsInfoCallbackInfo(napi_env env) : AsyncCallbackInfoBase(env) {};
+    ~AsyncGetFormsInfoCallbackInfo() override = default;
 };
 
-struct AsyncIsRequestPublishFormSupportedCallbackInfo {
-    napi_env env;
-    napi_async_work asyncWork;
-    napi_deferred deferred;
-    napi_ref callback;
+struct AsyncIsRequestPublishFormSupportedCallbackInfo : AsyncCallbackInfoBase {
     bool result = false;
+
+    explicit AsyncIsRequestPublishFormSupportedCallbackInfo(napi_env env) : AsyncCallbackInfoBase(env) {};
+    ~AsyncIsRequestPublishFormSupportedCallbackInfo() override = default;
 };
 
 napi_value NAPI_SetFormNextRefreshTime(napi_env env, napi_callback_info info);
@@ -120,8 +121,9 @@ napi_value NAPI_GetFormsInfo(napi_env env, napi_callback_info info);
  * @param[in] info This is an opaque pointer that is used to represent a JavaScript value
  *
  * @return This is an opaque pointer that is used to represent a JavaScript value
- *         which is true if the request of pubishing form is supported and false otherwise
+ *         which is true if the request of publishing form is supported and false otherwise
  */
 napi_value NAPI_IsRequestPublishFormSupported(napi_env env, napi_callback_info info);
-
+}  // namespace AbilityRuntime
+}  // namespace OHOS
 #endif /* NAPI_FORM_PROVIDER_H_ */

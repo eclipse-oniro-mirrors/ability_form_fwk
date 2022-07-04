@@ -39,6 +39,9 @@ uint32_t Convert2Uint32(const uint8_t* ptr)
 
 bool DoSomethingInterestingWithMyAPI(const uint8_t* rawData, size_t size)
 {
+    if (rawData == nullptr) {
+        return false;
+    }
     uint32_t code = Convert2Uint32(rawData);
     rawData = rawData + OFFSET;
     size = size - OFFSET;

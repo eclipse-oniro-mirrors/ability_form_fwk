@@ -19,7 +19,7 @@
 #include "napi_form_provider.h"
 
 EXTERN_C_START
-
+using namespace OHOS::AbilityRuntime;
 /**
  * @brief  For N-API modules registration
  *

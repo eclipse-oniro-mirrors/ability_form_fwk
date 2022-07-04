@@ -20,13 +20,13 @@ ohos_systemtest("FormReleaseFormTest") {
   module_out_path = module_output_path
   include_dirs = [
     "${ability_runtime_path}/interfaces/inner_api/ability_manager/include",
-    "../common/fms/common/include",
+    "../common/include",
     "${distributedschedule_path}/safwk/services/safwk/include",
   ]
 
   sources = [
-    "../common/fms/common/src/form_event.cpp",
-    "../common/fms/common/src/system_test_form_util.cpp",
+    "../common/src/form_event.cpp",
+    "../common/src/system_test_form_util.cpp",
     "fms_release_form_test.cpp",
   ]
 
@@ -45,6 +45,7 @@ ohos_systemtest("FormReleaseFormTest") {
     "${ability_runtime_path}/interfaces/inner_api/ability_manager:ability_manager",
     "${ability_runtime_path}/services/abilitymgr:abilityms",
     "//third_party/googletest:gtest_main",
+    "//utils/native/base:utilsbase",
   ]
 
   defines = [ "AMS_LOG_TAG = \"FMSReleaseFormTest\"" ]
