@@ -43,7 +43,6 @@ ohos_unittest("FmsFormSetNextRefreshTest") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
   deps = [
-    "${ability_runtime_path}/frameworks/kits/wantagent:wantagent_innerkits",
     "${ability_runtime_path}/interfaces/inner_api/app_manager:app_manager",
     "${distributeddatamgr_path}/distributeddatamgr/interfaces/innerkits/distributeddata:distributeddata_inner",
     "${distributedschedule_path}/safwk/interfaces/innerkits/safwk:system_ability_fwk",
@@ -58,6 +57,7 @@ ohos_unittest("FmsFormSetNextRefreshTest") {
     "ability_base:base",
     "ability_base:want",
     "ability_base:zuri",
+    "ability_runtime:wantagent_innerkits",
     "appspawn:appspawn_socket_client",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
