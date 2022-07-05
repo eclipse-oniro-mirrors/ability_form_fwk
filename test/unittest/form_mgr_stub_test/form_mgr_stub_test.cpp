@@ -19,6 +19,7 @@
 #undef private
 #include "gmock/gmock.h"
 #include "mock_form_mgr_service.h"
+#include "mock_form_token.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -157,5 +158,37 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0003, TestSize.Level1) {
     reply.ReadBool(result);
     EXPECT_EQ(result, true);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0003 ends";
+}
+
+/**
+ * @tc.name: FormMgrStubTest_0004
+ * @tc.desc: Verify HandleStartAbility
+ * @tc.type: FUNC
+ * @tc.require: #I5EFDX
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0004, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0004 starts";
+    // initialize input parameters.
+    MessageParcel data;
+    MessageParcel reply;
+    Want want;
+    want = want.SetElementName("", "com.example.FormAbility", "MainAbility");
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    // write in want
+    data.WriteParcelable(&want);
+    // write in token
+    data.WriteRemoteObject(token);
+    EXPECT_CALL(*mockFormMgrService, StartAbility(_, _))
+        .Times(1)
+        .WillOnce(Return(0));
+    // test.
+    int32_t errCode = mockFormMgrService->HandleStartAbility(data, reply);
+    // check errorcode
+    EXPECT_EQ(ERR_OK, errCode);
+    // check resulting infos.
+    int32_t result;
+    reply.ReadInt32(result);
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0004 ends";
 }
 }

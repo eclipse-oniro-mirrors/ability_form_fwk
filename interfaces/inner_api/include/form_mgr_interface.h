@@ -299,6 +299,14 @@ public:
     virtual bool IsRequestPublishFormSupported() = 0;
 
     /**
+     * @brief Start an ability. This function can only be called by a form extension of a system app.
+     * @param want includes ability name, parameters and relative info sending to an ability.
+     * @param callerToken token of the ability that initially calls this function.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int32_t StartAbility(const Want &want, const sptr<IRemoteObject> &callerToken) = 0;
+
+    /**
      * @brief Update action string for router event.
      * @param formId Indicates the unique id of form.
      * @param action Indicates the origin action string.
@@ -347,6 +355,7 @@ public:
         FORM_MGR_REMOVE_FORM_INFO,
         FORM_MGR_REQUEST_PUBLISH_FORM,
         FORM_MGR_IS_REQUEST_PUBLISH_FORM_SUPPORTED,
+        FORM_MGR_START_ABILITY,
     };
 };
 }  // namespace AppExecFwk

@@ -14,9 +14,12 @@
  */
 #include <gtest/gtest.h>
 #include <memory>
+
+#include "appexecfwk_errors.h"
 #include "form_mgr_proxy.h"
 #include "gmock/gmock.h"
 #include "mock_form_mgr_service.h"
+#include "mock_form_token.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -126,5 +129,42 @@ HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0003, TestSize.Level1) {
     // expect result.
     EXPECT_EQ(result, true);
     GTEST_LOG_(INFO) << "FormMgrProxyTest_0003 test ends";
+}
+
+/**
+ * @tc.name: FormMgrProxyTest_0004
+ * @tc.desc: Verify StartAbility
+ * @tc.type: FUNC
+ * @tc.require: #I5EFDX
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0004, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_0004 starts";
+    // initialize input parameters.
+    EXPECT_CALL(*mockFormMgrService, StartAbility(_, _))
+        .Times(1)
+        .WillOnce(Return(0));
+    Want want;
+    want = want.SetElementName("", "com.example.FormAbility", "MainAbility");
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    int32_t result = formMgrProxy->StartAbility(want, token);
+    // expect result.
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_0004 test ends";
+}
+
+/**
+ * @tc.name: FormMgrProxyTest_0005
+ * @tc.desc: Verify StartAbility
+ * @tc.type: FUNC
+ * @tc.require: #I5EFDX
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0005, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_0005 starts";
+    Want want;
+    want = want.SetElementName("", "com.example.FormAbility", "MainAbility");
+    int32_t result = formMgrProxy->StartAbility(want, nullptr);
+    // expect result.
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_0005 test ends";
 }
 }
