@@ -170,8 +170,8 @@ ohos_shared_library("formhost_napi") {
 
   deps = [
     ":formutil_napi",
+    "${ability_runtime_napi_path}/inner/napi_common:napi_common",
     "${ability_runtime_native_path}/appkit:appkit_native",
-    "${ability_runtime_path}/frameworks/js/napi/aafwk/inner/napi_common:napi_common",
     "${form_fwk_path}:fmskit_native",
   ]
 
@@ -206,8 +206,8 @@ ohos_shared_library("formmanager") {
   configs = [ ":fmskit_config" ]
 
   deps = [
+    "${ability_runtime_napi_path}/inner/napi_common:napi_common",
     "${ability_runtime_native_path}/appkit:appkit_native",
-    "${ability_runtime_path}/frameworks/js/napi/aafwk/inner/napi_common:napi_common",
   ]
 
   external_deps = [
@@ -243,8 +243,8 @@ ohos_shared_library("formprovider_napi") {
 
   deps = [
     ":formutil_napi",
+    "${ability_runtime_napi_path}/inner/napi_common:napi_common",
     "${ability_runtime_native_path}/appkit:appkit_native",
-    "${ability_runtime_path}/frameworks/js/napi/aafwk/inner/napi_common:napi_common",
     "${form_fwk_path}:fmskit_native",
   ]
 
