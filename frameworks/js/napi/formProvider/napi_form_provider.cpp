@@ -28,6 +28,8 @@
 #include "napi/native_node_api.h"
 #include "runtime.h"
 
+namespace OHOS {
+namespace AbilityRuntime {
 using namespace OHOS;
 using namespace OHOS::AAFwk;
 using namespace OHOS::AppExecFwk;
@@ -74,6 +76,42 @@ static OHOS::AppExecFwk::Ability* GetGlobalAbility(napi_env env)
         HILOG_INFO("%{public}s, Use Local tmp Ability for Stage Module", __func__);
     }
     return ability;
+}
+
+napi_value ExecuteAsyncCallbackWork(napi_env env, AsyncCallbackInfoBase* asyncCallbackInfo)
+{
+    if (napi_queue_async_work(env, asyncCallbackInfo->asyncWork) != napi_ok) {
+        napi_value callbackValues[ARGS_SIZE_TWO] = {nullptr, nullptr};
+        // store return-message to callbackValues[0].
+        InnerCreateCallbackRetMsg(env, ERR_APPEXECFWK_FORM_COMMON_CODE, callbackValues);
+        napi_value callback;
+        napi_get_reference_value(env, asyncCallbackInfo->callback, &callback);
+        napi_value callResult;
+        // call.
+        napi_call_function(env, nullptr, callback, ARGS_SIZE_TWO, callbackValues, &callResult);
+        napi_delete_reference(env, asyncCallbackInfo->callback);
+        napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
+        delete asyncCallbackInfo;
+        asyncCallbackInfo = nullptr;
+    }
+    napi_value result = nullptr;
+    napi_get_undefined(env, &result);
+    return result;
+}
+
+napi_value ExecuteAsyncPromiseWork(napi_env env, AsyncCallbackInfoBase* asyncCallbackInfo)
+{
+    if (napi_queue_async_work(env, asyncCallbackInfo->asyncWork) != napi_ok) {
+        napi_value error;
+        InnerCreatePromiseRetMsg(env, ERR_APPEXECFWK_FORM_COMMON_CODE, &error);
+        napi_reject_deferred(asyncCallbackInfo->env, asyncCallbackInfo->deferred, error);
+        napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
+        delete asyncCallbackInfo;
+        asyncCallbackInfo = nullptr;
+    }
+    napi_value result = nullptr;
+    napi_get_undefined(env, &result);
+    return result;
 }
 
 /**
@@ -1270,9 +1308,13 @@ napi_value NAPI_RemoveFormInfo(napi_env env, napi_callback_info info)
 }
 
 // Internal of GetFormsInfo.
-static void InnerGetFormsInfo(napi_env env, AsyncGetFormsInfoCallbackInfo *const asyncCallbackInfo)
+static void InnerGetFormsInfo(napi_env env, AsyncGetFormsInfoCallbackInfo *asyncCallbackInfo)
 {
     HILOG_INFO("%{public}s starts.", __func__);
+    if (asyncCallbackInfo == nullptr) {
+        HILOG_ERROR("GetFormsInfoPromise data is a nullptr");
+        return;
+    }
     asyncCallbackInfo->result = FormMgr::GetInstance().GetFormsInfo(asyncCallbackInfo->moduleName,
                                                                     asyncCallbackInfo->formInfos);
     HILOG_INFO("%{public}s ends.", __func__);
@@ -1294,12 +1336,7 @@ static napi_value GetFormsInfoPromise(napi_env env, AsyncGetFormsInfoCallbackInf
         nullptr,
         resourceName,
         [](napi_env env, void *data) {
-            HILOG_INFO("GetFormsInfoPromise running");
-            if (data == nullptr) {
-                HILOG_ERROR("GetFormsInfoPromise data is a nullptr");
-                return;
-            }
-            AsyncGetFormsInfoCallbackInfo *asyncCallbackInfo = static_cast<AsyncGetFormsInfoCallbackInfo *>(data);
+            auto *asyncCallbackInfo = static_cast<AsyncGetFormsInfoCallbackInfo *>(data);
             InnerGetFormsInfo(env, asyncCallbackInfo);
         },
         [](napi_env env, napi_status status, void *data) {
@@ -1341,19 +1378,7 @@ static napi_value GetFormsInfoPromise(napi_env env, AsyncGetFormsInfoCallbackInf
         },
         (void *)asyncCallbackInfo,
         &asyncCallbackInfo->asyncWork);
-    // execute work.
-    if (napi_queue_async_work(env, asyncCallbackInfo->asyncWork) != napi_ok) {
-        napi_value error;
-        InnerCreatePromiseRetMsg(env, ERR_APPEXECFWK_FORM_COMMON_CODE, &error);
-        napi_reject_deferred(
-            asyncCallbackInfo->env,
-            asyncCallbackInfo->deferred,
-            error);
-        napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
-        delete asyncCallbackInfo;
-        asyncCallbackInfo = nullptr;
-    }
-    return promise;
+    return ExecuteAsyncPromiseWork(env, asyncCallbackInfo);
 }
 
 // Internal of GetFormsInfo when CallBack is used.
@@ -1378,13 +1403,7 @@ static napi_value GetFormsInfoCallBack(napi_env env, napi_value argv,
         nullptr,
         resourceName,
         [](napi_env env, void *data) {
-            HILOG_INFO("GetFormsInfoCallBack callback running");
-            if (data == nullptr) {
-                HILOG_ERROR("GetFormsInfoCallBack data is a nullptr");
-                return;
-            }
-            AsyncGetFormsInfoCallbackInfo *asyncCallbackInfo = static_cast<AsyncGetFormsInfoCallbackInfo *>(data);
-            // entry to the core of this functionality.
+            auto *asyncCallbackInfo = static_cast<AsyncGetFormsInfoCallbackInfo *>(data);
             InnerGetFormsInfo(env, asyncCallbackInfo);
         },
         [](napi_env env, napi_status status, void *data) {
@@ -1428,22 +1447,7 @@ static napi_value GetFormsInfoCallBack(napi_env env, napi_value argv,
         },
         (void *)asyncCallbackInfo,
         &asyncCallbackInfo->asyncWork);
-     // execute work.
-    if (napi_queue_async_work(env, asyncCallbackInfo->asyncWork) != napi_ok) {
-        napi_value callbackValues[ARGS_SIZE_TWO] = {0};
-        // store GetFormsInfoCallBack return-message to callbackValues[0].
-        InnerCreateCallbackRetMsg(env, ERR_APPEXECFWK_FORM_COMMON_CODE, callbackValues);
-        napi_value callback;
-        napi_get_reference_value(env, asyncCallbackInfo->callback, &callback);
-        napi_value callResult;
-        // call.
-        napi_call_function(env, nullptr, callback, ARGS_SIZE_TWO, callbackValues, &callResult);
-        napi_delete_reference(env, asyncCallbackInfo->callback);
-        napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
-        delete asyncCallbackInfo;
-        asyncCallbackInfo = nullptr;
-    }
-    return NapiGetResult(env, 1);
+    return ExecuteAsyncCallbackWork(env, asyncCallbackInfo);
 }
 
 // A helper function that parses formInfoFilter for getFormsInfo
@@ -1475,16 +1479,7 @@ napi_value NAPI_GetFormsInfo(napi_env env, napi_callback_info info)
     }
     HILOG_INFO("%{public}s, argc = [%{public}zu]", __func__, argc);
     // initialize a struct that will store all the info through out the whole procedure.
-    AsyncGetFormsInfoCallbackInfo *asyncCallbackInfo = new (std::nothrow)
-    AsyncGetFormsInfoCallbackInfo {
-        .env = env,
-        .asyncWork = nullptr,
-        .deferred = nullptr,
-        .callback = nullptr,
-        .moduleName = "", // moduleName is initialized as an empty string.
-        .formInfos = std::vector<OHOS::AppExecFwk::FormInfo>(), // return value.
-        .result = 0,
-    };
+    auto *asyncCallbackInfo = new (std::nothrow) AsyncGetFormsInfoCallbackInfo(env);
     if (asyncCallbackInfo == nullptr) {
         HILOG_ERROR("%{public}s, fail to allocate asyncCallbackInfo", __func__);
         return nullptr;
@@ -1531,15 +1526,13 @@ napi_value NAPI_GetFormsInfo(napi_env env, napi_callback_info info)
 }
 
 static void InnerIsRequestPublishFormSupported(napi_env env,
-    void *data)
+    AsyncIsRequestPublishFormSupportedCallbackInfo *asyncCallbackInfo)
 {
     HILOG_INFO("InnerIsRequestPublishFormSupported called");
-    if (data == nullptr) {
+    if (asyncCallbackInfo == nullptr) {
         HILOG_ERROR("InnerIsRequestPublishFormSupported data is a nullptr");
         return;
     }
-    AsyncIsRequestPublishFormSupportedCallbackInfo *asyncCallbackInfo =
-        static_cast<AsyncIsRequestPublishFormSupportedCallbackInfo *>(data);
     bool value = FormMgr::GetInstance().IsRequestPublishFormSupported();
     asyncCallbackInfo->result = value;
 }
@@ -1567,7 +1560,8 @@ static napi_value IsRequestPublishFormSupportedCallback(napi_env env, napi_value
         resourceName,
         [](napi_env env, void *data) {
             // entry to the core of this functionality.
-            InnerIsRequestPublishFormSupported(env, data);
+            auto *asyncCallbackInfo = static_cast<AsyncIsRequestPublishFormSupportedCallbackInfo *>(data);
+            InnerIsRequestPublishFormSupported(env, asyncCallbackInfo);
         },
         [](napi_env env, napi_status status, void *data) {
             HILOG_INFO("IsRequestPublishFormSupportedCallback callback completed");
@@ -1600,27 +1594,8 @@ static napi_value IsRequestPublishFormSupportedCallback(napi_env env, napi_value
         },
         (void *)asyncCallbackInfo,
         &asyncCallbackInfo->asyncWork);
-
-     // execute work.
-    if (napi_queue_async_work(env, asyncCallbackInfo->asyncWork) != napi_ok) {
-        napi_value callbackValues[ARGS_SIZE_TWO] = {0};
-        // store return-message to callbackValues[0].
-        InnerCreateCallbackRetMsg(env, ERR_APPEXECFWK_FORM_COMMON_CODE, callbackValues);
-        napi_value callback;
-        napi_get_reference_value(env, asyncCallbackInfo->callback, &callback);
-        napi_value callResult;
-        // call.
-        napi_call_function(env, nullptr, callback, ARGS_SIZE_TWO, callbackValues, &callResult);
-        napi_delete_reference(env, asyncCallbackInfo->callback);
-        napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
-        delete asyncCallbackInfo;
-        asyncCallbackInfo = nullptr;
-    }
-    napi_value result = nullptr;
-    napi_get_undefined(env, &result);
-    return result;
+    return ExecuteAsyncCallbackWork(env, asyncCallbackInfo);
 }
-
 
 static napi_value IsRequestPublishFormSupportedPromise(napi_env env,
     AsyncIsRequestPublishFormSupportedCallbackInfo *asyncCallbackInfo)
@@ -1638,7 +1613,8 @@ static napi_value IsRequestPublishFormSupportedPromise(napi_env env,
         nullptr,
         resourceName,
         [](napi_env env, void *data) {
-            InnerIsRequestPublishFormSupported(env, data);
+            auto *asyncCallbackInfo = static_cast<AsyncIsRequestPublishFormSupportedCallbackInfo *>(data);
+            InnerIsRequestPublishFormSupported(env, asyncCallbackInfo);
         },
         [](napi_env env, napi_status status, void *data) {
             HILOG_INFO("IsRequestPublishFormSupportedCallback callback completed");
@@ -1660,19 +1636,7 @@ static napi_value IsRequestPublishFormSupportedPromise(napi_env env,
         },
         (void *)asyncCallbackInfo,
         &asyncCallbackInfo->asyncWork);
-    // execute work.
-    if (napi_queue_async_work(env, asyncCallbackInfo->asyncWork) != napi_ok) {
-        napi_value error;
-        InnerCreatePromiseRetMsg(env, ERR_APPEXECFWK_FORM_COMMON_CODE, &error);
-        napi_reject_deferred(
-            asyncCallbackInfo->env,
-            asyncCallbackInfo->deferred,
-            error);
-        napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
-        delete asyncCallbackInfo;
-        asyncCallbackInfo = nullptr;
-    }
-    return promise;
+    return ExecuteAsyncPromiseWork(env, asyncCallbackInfo);
 }
 
 napi_value NAPI_IsRequestPublishFormSupported(napi_env env, napi_callback_info info)
@@ -1687,16 +1651,16 @@ napi_value NAPI_IsRequestPublishFormSupported(napi_env env, napi_callback_info i
         return nullptr;
     }
 
-    AsyncIsRequestPublishFormSupportedCallbackInfo *asyncCallbackInfo = new (std::nothrow)
-    AsyncIsRequestPublishFormSupportedCallbackInfo {
-        .env = env,
-        .asyncWork = nullptr,
-        .deferred = nullptr,
-        .callback = nullptr,
-    };
+    auto *asyncCallbackInfo = new (std::nothrow) AsyncIsRequestPublishFormSupportedCallbackInfo(env);
+    if (asyncCallbackInfo == nullptr) {
+        HILOG_ERROR("asyncCallbackInfo == nullptr");
+        return nullptr;
+    }
     // callback
     if (argc == ARGS_SIZE_ONE) {
         return IsRequestPublishFormSupportedCallback(env, argv[ARGS_SIZE_ZERO], asyncCallbackInfo);
     }
     return IsRequestPublishFormSupportedPromise(env, asyncCallbackInfo);
 }
+}  // namespace AbilityRuntime
+}  // namespace OHOS

@@ -47,6 +47,16 @@ const int32_t ERR_IN_RECOVERY = 36;
 
 const int32_t CALLBACK_RETURN_MSG_SIZE = 2;
 
+struct AsyncCallbackInfoBase {
+    napi_env env = nullptr;
+    napi_async_work asyncWork = nullptr;
+    napi_deferred deferred = nullptr;
+    napi_ref callback = nullptr;
+
+    explicit AsyncCallbackInfoBase(napi_env env) : env(env) {};
+    virtual ~AsyncCallbackInfoBase() = default;;
+};
+
 struct AsyncErrMsgCallbackInfo {
     napi_env env;
     napi_async_work asyncWork;

@@ -30,8 +30,8 @@ bool FormTestUtils::PublishEvent(const std::string &eventName, const int &code, 
     return CommonEventManager::PublishCommonEvent(commonData);
 }
 
-Want FormTestUtils::MakeWant(
-    std::string deviceId, std::string abilityName, std::string bundleName, std::map<std::string, std::string> params)
+Want FormTestUtils::MakeWant(std::string deviceId, std::string abilityName, std::string bundleName,
+                             std::map<std::string, std::string> params)
 {
     ElementName element(deviceId, bundleName, abilityName);
     Want want;

@@ -108,7 +108,7 @@ public:
         int callingUid, int32_t userId, std::string actionType, EventFwk::CommonEventData &eventData);
     void CreateFormRecordAndFormInfo(std::string bundle, int64_t formId, int callingUid);
     void ClearFormRecord(int64_t formId);
-    void CreateProviderData();
+    void CreateProviderData() const;
 protected:
     sptr<MockFormHostClient> token_;
     std::shared_ptr<FormMgrService> formyMgrServ_ = DelayedSingleton<FormMgrService>::GetInstance();
@@ -138,7 +138,7 @@ void FmsFormSysEventReceiverTest::SetUp()
 void FmsFormSysEventReceiverTest::TearDown()
 {}
 
-void FmsFormSysEventReceiverTest::CreateProviderData()
+void FmsFormSysEventReceiverTest::CreateProviderData() const
 {
     std::unordered_map<std::string, std::shared_ptr<BundleFormInfo>> bundleFormInfoMap;
     std::shared_ptr<BundleFormInfo> bundleFormInfo = std::make_shared<BundleFormInfo>(FORM_PROVIDER_BUNDLE_NAME);
