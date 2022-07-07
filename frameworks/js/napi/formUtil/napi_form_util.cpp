@@ -458,38 +458,19 @@ void ParseFormInfoIntoNapi(napi_env env, const FormInfo &formInfo, napi_value &r
 
     // defaultFlag
     napi_value defaultFlag;
-    napi_create_int32(env, (int32_t)formInfo.defaultFlag, &defaultFlag);
+    napi_get_boolean(env, formInfo.defaultFlag, &defaultFlag);
     HILOG_DEBUG("%{public}s, defaultFlag=%{public}d.", __func__, formInfo.defaultFlag);
     napi_set_named_property(env, result, "isDefault", defaultFlag);
 
     // updateEnabled
     napi_value updateEnabled;
-    napi_create_int32(env, (int32_t)formInfo.updateEnabled, &updateEnabled);
+    napi_get_boolean(env, formInfo.updateEnabled, &updateEnabled);
     HILOG_DEBUG("%{public}s, updateEnabled=%{public}d.", __func__, formInfo.updateEnabled);
     napi_set_named_property(env, result, "updateEnabled", updateEnabled);
 
-    // isStatic
-    napi_value isStatic;
-    napi_get_boolean(env, formInfo.isStatic, &isStatic);
-    HILOG_DEBUG("%{public}s, isStatic=%{public}d.", __func__, formInfo.isStatic);
-    napi_set_named_property(env, result, "isStatic", isStatic);
-
-    // window
-    napi_value formWindowObject = nullptr;
-    napi_create_object(env, &formWindowObject);
-    napi_value autoDesignWidth;
-    napi_get_boolean(env, formInfo.window.autoDesignWidth, &autoDesignWidth);
-    HILOG_DEBUG("%{public}s, window.autoDesignWidth=%{public}d.", __func__, formInfo.window.autoDesignWidth);
-    napi_set_named_property(env, formWindowObject, "autoDesignWidth", autoDesignWidth);
-    napi_value designWidth;
-    napi_create_int32(env, formInfo.window.designWidth, &designWidth);
-    HILOG_DEBUG("%{public}s, window.designWidth=%{public}d.", __func__, formInfo.window.designWidth);
-    napi_set_named_property(env, formWindowObject, "designWidth", designWidth);
-    napi_set_named_property(env, result, "window", formWindowObject);
-
     // formVisibleNotify
     napi_value formVisibleNotify;
-    napi_create_int32(env, (int32_t)formInfo.formVisibleNotify, &formVisibleNotify);
+    napi_get_boolean(env, formInfo.formVisibleNotify, &formVisibleNotify);
     HILOG_DEBUG("%{public}s, formVisibleNotify=%{public}d.", __func__, formInfo.formVisibleNotify);
     napi_set_named_property(env, result, "formVisibleNotify", formVisibleNotify);
 
@@ -531,36 +512,29 @@ void ParseFormInfoIntoNapi(napi_env env, const FormInfo &formInfo, napi_value &r
     HILOG_DEBUG("%{public}s, supportDimensions size=%{public}zu.", __func__, formInfo.supportDimensions.size());
     napi_set_named_property(env, result, "supportDimensions", supportDimensions);
 
-    // metaData
-    napi_value metaData;
-    napi_create_object(env, &metaData);
+    // customizeData
+    napi_value customizeData;
+    napi_create_array(env, &customizeData);
+    int iCustomizeDataCount = 0;
+    for (const auto& data : formInfo.customizeDatas) {
+        napi_value customizeDataObject = nullptr;
+        napi_create_object(env, &customizeDataObject);
 
-    // metaData: customizeDatas
-    napi_value customizeDatas;
-    napi_create_array(env, &customizeDatas);
-    int iCustomizeDatasCount = 0;
-    for (auto customizeData : formInfo.customizeDatas) {
-        napi_value customizeDataOnject = nullptr;
-        napi_create_object(env, &customizeDataOnject);
-
-        // customizeData : name
+        // data : name
         napi_value customizeDataName;
-        napi_create_string_utf8(env, customizeData.name.c_str(), NAPI_AUTO_LENGTH, &customizeDataName);
-        HILOG_DEBUG("%{public}s, customizeData.name=%{public}s.", __func__, customizeData.name.c_str());
-        napi_set_named_property(env, customizeDataOnject, "name", customizeDataName);
+        napi_create_string_utf8(env, data.name.c_str(), NAPI_AUTO_LENGTH, &customizeDataName);
+        HILOG_DEBUG("%{public}s, data.name=%{public}s.", __func__, data.name.c_str());
+        napi_set_named_property(env, customizeDataObject, "name", customizeDataName);
 
-        // customizeData : value
+        // data : value
         napi_value customizeDataValue;
-        napi_create_string_utf8(env, customizeData.value.c_str(), NAPI_AUTO_LENGTH, &customizeDataValue);
-        HILOG_DEBUG("%{public}s, customizeData.value=%{public}s.", __func__, customizeData.value.c_str());
-        napi_set_named_property(env, customizeDataOnject, "value", customizeDataValue);
+        napi_create_string_utf8(env, data.value.c_str(), NAPI_AUTO_LENGTH, &customizeDataValue);
+        HILOG_DEBUG("%{public}s, data.value=%{public}s.", __func__, data.value.c_str());
+        napi_set_named_property(env, customizeDataObject, "value", customizeDataValue);
 
-        napi_set_element(env, customizeDatas, iCustomizeDatasCount, customizeDataOnject);
-        ++iDimensionsCount;
+        napi_set_element(env, customizeData, iCustomizeDataCount, customizeDataObject);
+        ++iCustomizeDataCount;
     }
     HILOG_DEBUG("%{public}s, customizeDatas size=%{public}zu.", __func__, formInfo.customizeDatas.size());
-    napi_set_named_property(env, metaData, "customizeData", customizeDatas);
-    napi_set_named_property(env, result, "metaData", metaData);
-
-    return;
+    napi_set_named_property(env, result, "customizeData", customizeData);
 }

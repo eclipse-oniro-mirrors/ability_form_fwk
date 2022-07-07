@@ -35,8 +35,6 @@ static napi_value Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("setFormNextRefreshTime", NAPI_SetFormNextRefreshTime),
         DECLARE_NAPI_FUNCTION("updateForm", NAPI_UpdateForm),
         DECLARE_NAPI_FUNCTION("requestPublishForm", NAPI_RequestPublishForm),
-        DECLARE_NAPI_FUNCTION("addFormInfo", NAPI_AddFormInfo),
-        DECLARE_NAPI_FUNCTION("removeFormInfo", NAPI_RemoveFormInfo),
         DECLARE_NAPI_FUNCTION("getFormsInfo", NAPI_GetFormsInfo),
         DECLARE_NAPI_FUNCTION("isRequestPublishFormSupported", NAPI_IsRequestPublishFormSupported),
     };
