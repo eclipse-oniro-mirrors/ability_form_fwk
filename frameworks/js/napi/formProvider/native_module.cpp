@@ -15,11 +15,35 @@
 #include "napi/native_api.h"
 
 #include "hilog_wrapper.h"
+#include "js_runtime_utils.h"
 #include "napi/native_node_api.h"
 #include "napi_form_provider.h"
 
 EXTERN_C_START
 using namespace OHOS::AbilityRuntime;
+
+static NativeValue* JsProviderInit(NativeEngine* engine, NativeValue* exports)
+{
+    HILOG_INFO("JsProviderInit is called");
+    if (engine == nullptr || exports == nullptr) {
+        HILOG_ERROR("Invalid input parameters");
+        return nullptr;
+    }
+
+    NativeObject* object = ConvertNativeValueTo<NativeObject>(exports);
+    if (object == nullptr) {
+        HILOG_ERROR("object is nullptr");
+        return nullptr;
+    }
+
+    std::unique_ptr<JsFormProvider> jsFormPorivder = std::make_unique<JsFormProvider>();
+    object->SetNativePointer(jsFormPorivder.release(), JsFormProvider::Finalizer, nullptr);
+
+    BindNativeFunction(*engine, *object, "getFormsInfo", JsFormProvider::GetFormsInfo);
+
+    return exports;
+}
+
 /**
  * @brief  For N-API modules registration
  *
@@ -35,12 +59,12 @@ static napi_value Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("setFormNextRefreshTime", NAPI_SetFormNextRefreshTime),
         DECLARE_NAPI_FUNCTION("updateForm", NAPI_UpdateForm),
         DECLARE_NAPI_FUNCTION("requestPublishForm", NAPI_RequestPublishForm),
-        DECLARE_NAPI_FUNCTION("getFormsInfo", NAPI_GetFormsInfo),
         DECLARE_NAPI_FUNCTION("isRequestPublishFormSupported", NAPI_IsRequestPublishFormSupported),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(properties) / sizeof(properties[0]), properties));
     HILOG_INFO("napi_module Init end...");
-    return exports;
+    return reinterpret_cast<napi_value>(JsProviderInit(reinterpret_cast<NativeEngine*>(env),
+        reinterpret_cast<NativeValue*>(exports)));
 }
 
 EXTERN_C_END
