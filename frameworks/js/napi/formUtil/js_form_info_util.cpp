@@ -15,8 +15,9 @@
 
 #include "js_form_info_util.h"
 
-#include "napi_form_util.h"
+#include "hilog_wrapper.h"
 #include "js_runtime_utils.h"
+#include "napi_form_util.h"
 
 namespace OHOS {
 namespace AbilityRuntime {
@@ -24,7 +25,19 @@ EXTERN_C_START
 
 bool ConvertFormInfoFilter(NativeEngine &engine, NativeValue* jsValue, FormInfoFilter &formInfoFilter)
 {
-    ConvertFromJsValue(engine, jsValue, formInfoFilter.moduleName);
+    NativeObject* nativeObject = ConvertNativeValueTo<NativeObject>(jsValue);
+    if (nativeObject == nullptr) {
+        HILOG_ERROR("%{public}s called, nativeObject is nullptr.", __func__);
+        return false;
+    }
+    NativeValue* nativeDataValue = nativeObject->GetProperty("moduleName");
+    if (nativeDataValue == nullptr || (nativeDataValue->TypeOf() != NATIVE_UNDEFINED &&
+        !ConvertFromJsValue(engine, nativeDataValue, formInfoFilter.moduleName))) {
+        HILOG_ERROR("%{public}s called, convert nativeDataValue failed.", __func__);
+        return false;
+    }
+    HILOG_INFO("%{public}s called, module name is %{public}s.", __func__, formInfoFilter.moduleName.c_str());
+
     return true;
 }
 

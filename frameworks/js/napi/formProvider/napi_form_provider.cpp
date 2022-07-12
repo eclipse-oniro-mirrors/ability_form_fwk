@@ -45,7 +45,6 @@ namespace {
     constexpr int CALLBACK_FLG = 1;
     constexpr int PROMISE_FLG = 2;
     OHOS::AppExecFwk::Ability* g_ability = nullptr;
-    const std::string MODULE_NAME = "moduleName";
 }
 
 /**
