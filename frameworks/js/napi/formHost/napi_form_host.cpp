@@ -23,6 +23,7 @@
 #include "form_info.h"
 #include "form_callback_interface.h"
 #include "form_host_client.h"
+#include "form_mgr.h"
 #include "form_mgr_errors.h"
 #include "hilog_wrapper.h"
 #include "napi_form_util.h"
@@ -45,39 +46,6 @@ namespace {
     constexpr int REF_COUNT = 1;
     constexpr int CALLBACK_FLG = 1;
     constexpr int PROMISE_FLG = 2;
-    OHOS::AppExecFwk::Ability* g_ability = nullptr;
-}
-
-/**
- * @brief GetGlobalAbility
- *
- * @param[in] env The environment that the Node-API call is invoked under
- *
- * @return OHOS::AppExecFwk::Ability*
- */
-static OHOS::AppExecFwk::Ability* GetGlobalAbility(napi_env env)
-{
-    // get global value
-    napi_value global = nullptr;
-    napi_get_global(env, &global);
-
-    // get ability
-    napi_value abilityObj = nullptr;
-    napi_get_named_property(env, global, "ability", &abilityObj);
-
-    // get ability pointer
-    OHOS::AppExecFwk::Ability* ability = nullptr;
-    napi_get_value_external(env, abilityObj, (void**)&ability);
-    HILOG_INFO("%{public}s, ability", __func__);
-    if (ability == nullptr) {
-        if (g_ability == nullptr) {
-            std::unique_ptr<AbilityRuntime::Runtime> runtime;
-            g_ability = OHOS::AppExecFwk::Ability::Create(runtime);
-        }
-        ability = g_ability;
-        HILOG_INFO("%{public}s, Use Local tmp Ability for Stage Module", __func__);
-    }
-    return ability;
 }
 
 /**
@@ -157,9 +125,8 @@ static napi_value GetFormIds(napi_env env, napi_value value, ErrCode &errCode, s
 static void InnerDelForm(napi_env env, AsyncDelFormCallbackInfo* const asyncCallbackInfo)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
-    OHOS::AppExecFwk::Ability *ability = asyncCallbackInfo->ability;
-    ErrCode ret = ability->DeleteForm(asyncCallbackInfo->formId);
-    asyncCallbackInfo->result = ret;
+    asyncCallbackInfo->result = FormMgr::GetInstance().DeleteForm(asyncCallbackInfo->formId,
+        FormHostClient::GetInstance());
     HILOG_DEBUG("%{public}s, end", __func__);
 }
 
@@ -195,9 +162,9 @@ napi_value NAPI_DeleteForm(napi_env env, napi_callback_info info)
                 .asyncWork = nullptr,
                 .deferred = nullptr,
                 .callback = nullptr,
+                .callbackValue = argv[1],
                 .code = ERR_APPEXECFWK_FORM_INVALID_FORM_ID,
-                .type = 0,
-                .callbackValue = argv[1]
+                .type = 0
             };
 
         if (argc == ARGS_SIZE_TWO) {
@@ -218,9 +185,9 @@ napi_value NAPI_DeleteForm(napi_env env, napi_callback_info info)
                 .asyncWork = nullptr,
                 .deferred = nullptr,
                 .callback = nullptr,
+                .callbackValue = argv[1],
                 .code = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR,
-                .type = 0,
-                .callbackValue = argv[1]
+                .type = 0
             };
 
         if (argc == ARGS_SIZE_TWO) {
@@ -234,7 +201,6 @@ napi_value NAPI_DeleteForm(napi_env env, napi_callback_info info)
     AsyncDelFormCallbackInfo *asyncCallbackInfo = new
         AsyncDelFormCallbackInfo {
             .env = env,
-            .ability = GetGlobalAbility(env),
             .asyncWork = nullptr,
             .deferred = nullptr,
             .callback = nullptr,
@@ -337,9 +303,8 @@ napi_value NAPI_DeleteForm(napi_env env, napi_callback_info info)
 static void InnerReleaseForm(napi_env env, AsyncReleaseFormCallbackInfo* const asyncCallbackInfo)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
-    OHOS::AppExecFwk::Ability *ability = asyncCallbackInfo->ability;
-    ErrCode ret = ability->ReleaseForm(asyncCallbackInfo->formId, asyncCallbackInfo->isReleaseCache);
-    asyncCallbackInfo->result = ret;
+    asyncCallbackInfo->result = FormMgr::GetInstance().ReleaseForm(
+        asyncCallbackInfo->formId, FormHostClient::GetInstance(), asyncCallbackInfo->isReleaseCache);
     HILOG_DEBUG("%{public}s end", __func__);
 }
 
@@ -463,9 +428,9 @@ napi_value NAPI_ReleaseForm(napi_env env, napi_callback_info info)
                     .asyncWork = nullptr,
                     .deferred = nullptr,
                     .callback = nullptr,
+                    .callbackValue = argv[ARGS_SIZE_TWO],
                     .code = ERR_APPEXECFWK_FORM_RELEASE_FLG_ERR,
-                    .type = CALLBACK_FLG,
-                    .callbackValue = argv[ARGS_SIZE_TWO]
+                    .type = CALLBACK_FLG
                 };
             return RetErrMsg(asyncErrorInfo);
         }
@@ -478,9 +443,9 @@ napi_value NAPI_ReleaseForm(napi_env env, napi_callback_info info)
                     .asyncWork = nullptr,
                     .deferred = nullptr,
                     .callback = nullptr,
+                    .callbackValue = argv[ARGS_SIZE_ONE],
                     .code = ERR_APPEXECFWK_FORM_RELEASE_FLG_ERR,
-                    .type = PROMISE_FLG,
-                    .callbackValue = argv[ARGS_SIZE_ONE]
+                    .type = PROMISE_FLG
                 };
             return RetErrMsg(asyncErrorInfo);
         }
@@ -495,9 +460,9 @@ napi_value NAPI_ReleaseForm(napi_env env, napi_callback_info info)
                 .asyncWork = nullptr,
                 .deferred = nullptr,
                 .callback = nullptr,
+                .callbackValue = argv[ARGS_SIZE_TWO],
                 .code = ERR_APPEXECFWK_FORM_INVALID_FORM_ID,
-                .type = 0,
-                .callbackValue = argv[ARGS_SIZE_TWO]
+                .type = 0
             };
 
         if (argc == ARGS_SIZE_ONE) {
@@ -530,9 +495,9 @@ napi_value NAPI_ReleaseForm(napi_env env, napi_callback_info info)
                 .asyncWork = nullptr,
                 .deferred = nullptr,
                 .callback = nullptr,
+                .callbackValue = argv[ARGS_SIZE_TWO],
                 .code = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR,
-                .type = 0,
-                .callbackValue = argv[ARGS_SIZE_TWO]
+                .type = 0
             };
 
         if (argc == ARGS_SIZE_ONE) {
@@ -559,7 +524,6 @@ napi_value NAPI_ReleaseForm(napi_env env, napi_callback_info info)
     AsyncReleaseFormCallbackInfo *asyncCallbackInfo = new
     AsyncReleaseFormCallbackInfo {
         .env = env,
-        .ability = GetGlobalAbility(env),
         .asyncWork = nullptr,
         .deferred = nullptr,
         .callback = nullptr,
@@ -614,8 +578,9 @@ napi_value NAPI_ReleaseForm(napi_env env, napi_callback_info info)
 static void InnerRequestForm(napi_env env, AsyncRequestFormCallbackInfo* const asyncCallbackInfo)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
-    OHOS::AppExecFwk::Ability *ability = asyncCallbackInfo->ability;
-    asyncCallbackInfo->result = ability->RequestForm(asyncCallbackInfo->formId);
+    Want want;
+    asyncCallbackInfo->result = FormMgr::GetInstance().RequestForm(asyncCallbackInfo->formId,
+        FormHostClient::GetInstance(), want);
     HILOG_DEBUG("%{public}s, end", __func__);
 }
 
@@ -651,9 +616,9 @@ napi_value NAPI_RequestForm(napi_env env, napi_callback_info info)
                 .asyncWork = nullptr,
                 .deferred = nullptr,
                 .callback = nullptr,
+                .callbackValue = argv[1],
                 .code = ERR_APPEXECFWK_FORM_INVALID_FORM_ID,
-                .type = 0,
-                .callbackValue = argv[1]
+                .type = 0
             };
 
         if (argc == ARGS_SIZE_TWO) {
@@ -673,9 +638,9 @@ napi_value NAPI_RequestForm(napi_env env, napi_callback_info info)
                 .asyncWork = nullptr,
                 .deferred = nullptr,
                 .callback = nullptr,
+                .callbackValue = argv[1],
                 .code = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR,
-                .type = 0,
-                .callbackValue = argv[1]
+                .type = 0
             };
 
         if (argc == ARGS_SIZE_TWO) {
@@ -689,7 +654,6 @@ napi_value NAPI_RequestForm(napi_env env, napi_callback_info info)
     AsyncRequestFormCallbackInfo *asyncCallbackInfo = new
     AsyncRequestFormCallbackInfo {
         .env = env,
-        .ability = GetGlobalAbility(env),
         .asyncWork = nullptr,
         .deferred = nullptr,
         .callback = nullptr,
@@ -791,8 +755,8 @@ napi_value NAPI_RequestForm(napi_env env, napi_callback_info info)
 static void InnerCastTempForm(napi_env env, AsyncCastTempFormCallbackInfo* const asyncCallbackInfo)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
-    OHOS::AppExecFwk::Ability *ability = asyncCallbackInfo->ability;
-    asyncCallbackInfo->result = ability->CastTempForm(asyncCallbackInfo->formId);
+    asyncCallbackInfo->result = FormMgr::GetInstance().CastTempForm(asyncCallbackInfo->formId,
+        FormHostClient::GetInstance());
     HILOG_DEBUG("%{public}s, end", __func__);
 }
 
@@ -828,9 +792,9 @@ napi_value NAPI_CastTempForm(napi_env env, napi_callback_info info)
                 .asyncWork = nullptr,
                 .deferred = nullptr,
                 .callback = nullptr,
+                .callbackValue = argv[1],
                 .code = ERR_APPEXECFWK_FORM_INVALID_FORM_ID,
-                .type = 0,
-                .callbackValue = argv[1]
+                .type = 0
             };
 
         if (argc == ARGS_SIZE_TWO) {
@@ -850,9 +814,9 @@ napi_value NAPI_CastTempForm(napi_env env, napi_callback_info info)
                 .asyncWork = nullptr,
                 .deferred = nullptr,
                 .callback = nullptr,
+                .callbackValue = argv[1],
                 .code = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR,
-                .type = 0,
-                .callbackValue = argv[1]
+                .type = 0
             };
 
         if (argc == ARGS_SIZE_TWO) {
@@ -866,7 +830,6 @@ napi_value NAPI_CastTempForm(napi_env env, napi_callback_info info)
     AsyncCastTempFormCallbackInfo *asyncCallbackInfo = new
     AsyncCastTempFormCallbackInfo {
         .env = env,
-        .ability = GetGlobalAbility(env),
         .asyncWork = nullptr,
         .deferred = nullptr,
         .callback = nullptr,
@@ -968,8 +931,8 @@ napi_value NAPI_CastTempForm(napi_env env, napi_callback_info info)
 static void InnerNotifyVisibleForms(napi_env env, AsyncNotifyVisibleFormsCallbackInfo* const asyncCallbackInfo)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
-    OHOS::AppExecFwk::Ability *ability = asyncCallbackInfo->ability;
-    asyncCallbackInfo->result = ability->NotifyVisibleForms(asyncCallbackInfo->formIds);
+    asyncCallbackInfo->result = FormMgr::GetInstance().NotifyWhetherVisibleForms(asyncCallbackInfo->formIds,
+        FormHostClient::GetInstance(), Constants::FORM_VISIBLE);
     HILOG_DEBUG("%{public}s, end", __func__);
 }
 
@@ -1004,9 +967,9 @@ napi_value NAPI_NotifyVisibleForms(napi_env env, napi_callback_info info)
                 .asyncWork = nullptr,
                 .deferred = nullptr,
                 .callback = nullptr,
+                .callbackValue = argv[1],
                 .code = ERR_APPEXECFWK_FORM_FORM_ARRAY_ERR,
-                .type = 0,
-                .callbackValue = argv[1]
+                .type = 0
             };
         if (argc == ARGS_SIZE_TWO) {
             asyncErrorInfo->type = CALLBACK_FLG;
@@ -1025,9 +988,9 @@ napi_value NAPI_NotifyVisibleForms(napi_env env, napi_callback_info info)
                 .asyncWork = nullptr,
                 .deferred = nullptr,
                 .callback = nullptr,
+                .callbackValue = argv[1],
                 .code = ERR_APPEXECFWK_FORM_FORM_ID_ARRAY_ERR,
-                .type = 0,
-                .callbackValue = argv[1]
+                .type = 0
             };
 
         if (argc == ARGS_SIZE_TWO) {
@@ -1055,9 +1018,9 @@ napi_value NAPI_NotifyVisibleForms(napi_env env, napi_callback_info info)
                     .asyncWork = nullptr,
                     .deferred = nullptr,
                     .callback = nullptr,
+                    .callbackValue = argv[1],
                     .code = ERR_APPEXECFWK_FORM_INVALID_FORM_ID,
-                    .type = 0,
-                    .callbackValue = argv[1]
+                    .type = 0
                 };
 
             if (argc == ARGS_SIZE_TWO) {
@@ -1077,9 +1040,9 @@ napi_value NAPI_NotifyVisibleForms(napi_env env, napi_callback_info info)
                     .asyncWork = nullptr,
                     .deferred = nullptr,
                     .callback = nullptr,
+                    .callbackValue = argv[1],
                     .code = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR,
-                    .type = 0,
-                    .callbackValue = argv[1]
+                    .type = 0
                 };
 
             if (argc == ARGS_SIZE_TWO) {
@@ -1096,7 +1059,6 @@ napi_value NAPI_NotifyVisibleForms(napi_env env, napi_callback_info info)
     AsyncNotifyVisibleFormsCallbackInfo *asyncCallbackInfo = new
         AsyncNotifyVisibleFormsCallbackInfo {
             .env = env,
-            .ability = GetGlobalAbility(env),
             .asyncWork = nullptr,
             .deferred = nullptr,
             .callback = nullptr,
@@ -1208,8 +1170,8 @@ napi_value NAPI_NotifyVisibleForms(napi_env env, napi_callback_info info)
 static void InnerNotifyInvisibleForms(napi_env env, AsyncNotifyInvisibleFormsCallbackInfo* const asyncCallbackInfo)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
-    OHOS::AppExecFwk::Ability *ability = asyncCallbackInfo->ability;
-    asyncCallbackInfo->result = ability->NotifyInvisibleForms(asyncCallbackInfo->formIds);
+    asyncCallbackInfo->result = FormMgr::GetInstance().NotifyWhetherVisibleForms(asyncCallbackInfo->formIds,
+        FormHostClient::GetInstance(), Constants::FORM_INVISIBLE);
     HILOG_DEBUG("%{public}s, end", __func__);
 }
 
@@ -1244,9 +1206,9 @@ napi_value NAPI_NotifyInvisibleForms(napi_env env, napi_callback_info info)
                 .asyncWork = nullptr,
                 .deferred = nullptr,
                 .callback = nullptr,
+                .callbackValue = argv[1],
                 .code = ERR_APPEXECFWK_FORM_FORM_ARRAY_ERR,
-                .type = 0,
-                .callbackValue = argv[1]
+                .type = 0
             };
         if (argc == ARGS_SIZE_TWO) {
             asyncErrorInfo->type = CALLBACK_FLG;
@@ -1265,9 +1227,9 @@ napi_value NAPI_NotifyInvisibleForms(napi_env env, napi_callback_info info)
                 .asyncWork = nullptr,
                 .deferred = nullptr,
                 .callback = nullptr,
+                .callbackValue = argv[1],
                 .code = ERR_APPEXECFWK_FORM_FORM_ID_ARRAY_ERR,
                 .type = 0,
-                .callbackValue = argv[1]
             };
 
         if (argc == ARGS_SIZE_TWO) {
@@ -1295,9 +1257,9 @@ napi_value NAPI_NotifyInvisibleForms(napi_env env, napi_callback_info info)
                     .asyncWork = nullptr,
                     .deferred = nullptr,
                     .callback = nullptr,
+                    .callbackValue = argv[1],
                     .code = ERR_APPEXECFWK_FORM_INVALID_FORM_ID,
                     .type = 0,
-                    .callbackValue = argv[1]
                 };
 
             if (argc == ARGS_SIZE_TWO) {
@@ -1317,9 +1279,9 @@ napi_value NAPI_NotifyInvisibleForms(napi_env env, napi_callback_info info)
                     .asyncWork = nullptr,
                     .deferred = nullptr,
                     .callback = nullptr,
+                    .callbackValue = argv[1],
                     .code = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR,
                     .type = 0,
-                    .callbackValue = argv[1]
                 };
 
             if (argc == ARGS_SIZE_TWO) {
@@ -1336,7 +1298,6 @@ napi_value NAPI_NotifyInvisibleForms(napi_env env, napi_callback_info info)
     AsyncNotifyInvisibleFormsCallbackInfo *asyncCallbackInfo = new
         AsyncNotifyInvisibleFormsCallbackInfo {
             .env = env,
-            .ability = GetGlobalAbility(env),
             .asyncWork = nullptr,
             .deferred = nullptr,
             .callback = nullptr,
@@ -1448,8 +1409,8 @@ napi_value NAPI_NotifyInvisibleForms(napi_env env, napi_callback_info info)
 static void InnerEnableFormsUpdate(napi_env env, AsyncEnableUpdateFormCallbackInfo* const asyncCallbackInfo)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
-    OHOS::AppExecFwk::Ability *ability = asyncCallbackInfo->ability;
-    asyncCallbackInfo->result = ability->EnableUpdateForm(asyncCallbackInfo->formIds);
+    asyncCallbackInfo->result = FormMgr::GetInstance().LifecycleUpdate(asyncCallbackInfo->formIds,
+        FormHostClient::GetInstance(), true);
     HILOG_DEBUG("%{public}s, end", __func__);
 }
 
@@ -1484,9 +1445,9 @@ napi_value NAPI_EnableFormsUpdate(napi_env env, napi_callback_info info)
                 .asyncWork = nullptr,
                 .deferred = nullptr,
                 .callback = nullptr,
+                .callbackValue = argv[1],
                 .code = ERR_APPEXECFWK_FORM_FORM_ARRAY_ERR,
-                .type = 0,
-                .callbackValue = argv[1]
+                .type = 0
             };
         if (argc == ARGS_SIZE_TWO) {
             asyncErrorInfo->type = CALLBACK_FLG;
@@ -1505,9 +1466,9 @@ napi_value NAPI_EnableFormsUpdate(napi_env env, napi_callback_info info)
                 .asyncWork = nullptr,
                 .deferred = nullptr,
                 .callback = nullptr,
+                .callbackValue = argv[1],
                 .code = ERR_APPEXECFWK_FORM_FORM_ID_ARRAY_ERR,
                 .type = 0,
-                .callbackValue = argv[1]
             };
 
         if (argc == ARGS_SIZE_TWO) {
@@ -1535,9 +1496,9 @@ napi_value NAPI_EnableFormsUpdate(napi_env env, napi_callback_info info)
                     .asyncWork = nullptr,
                     .deferred = nullptr,
                     .callback = nullptr,
+                    .callbackValue = argv[1],
                     .code = ERR_APPEXECFWK_FORM_INVALID_FORM_ID,
                     .type = 0,
-                    .callbackValue = argv[1]
                 };
 
             if (argc == ARGS_SIZE_TWO) {
@@ -1557,9 +1518,9 @@ napi_value NAPI_EnableFormsUpdate(napi_env env, napi_callback_info info)
                     .asyncWork = nullptr,
                     .deferred = nullptr,
                     .callback = nullptr,
+                    .callbackValue = argv[1],
                     .code = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR,
-                    .type = 0,
-                    .callbackValue = argv[1]
+                    .type = 0
                 };
 
             if (argc == ARGS_SIZE_TWO) {
@@ -1576,7 +1537,6 @@ napi_value NAPI_EnableFormsUpdate(napi_env env, napi_callback_info info)
     AsyncEnableUpdateFormCallbackInfo *asyncCallbackInfo = new
     AsyncEnableUpdateFormCallbackInfo {
         .env = env,
-        .ability = GetGlobalAbility(env),
         .asyncWork = nullptr,
         .deferred = nullptr,
         .callback = nullptr,
@@ -1687,8 +1647,9 @@ napi_value NAPI_EnableFormsUpdate(napi_env env, napi_callback_info info)
 static void InnerDisableFormsUpdate(napi_env env, AsyncDisableUpdateFormCallbackInfo* const asyncCallbackInfo)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
-    OHOS::AppExecFwk::Ability *ability = asyncCallbackInfo->ability;
-    asyncCallbackInfo->result = ability->DisableUpdateForm(asyncCallbackInfo->formIds);
+
+    asyncCallbackInfo->result = FormMgr::GetInstance().LifecycleUpdate(asyncCallbackInfo->formIds,
+        FormHostClient::GetInstance(), false);
     HILOG_DEBUG("%{public}s, end", __func__);
 }
 
@@ -1723,9 +1684,9 @@ napi_value NAPI_DisableFormsUpdate(napi_env env, napi_callback_info info)
                 .asyncWork = nullptr,
                 .deferred = nullptr,
                 .callback = nullptr,
+                .callbackValue = argv[1],
                 .code = ERR_APPEXECFWK_FORM_FORM_ARRAY_ERR,
-                .type = 0,
-                .callbackValue = argv[1]
+                .type = 0
             };
         if (argc == ARGS_SIZE_TWO) {
             asyncErrorInfo->type = CALLBACK_FLG;
@@ -1744,9 +1705,9 @@ napi_value NAPI_DisableFormsUpdate(napi_env env, napi_callback_info info)
                 .asyncWork = nullptr,
                 .deferred = nullptr,
                 .callback = nullptr,
+                .callbackValue = argv[1],
                 .code = ERR_APPEXECFWK_FORM_FORM_ID_ARRAY_ERR,
-                .type = 0,
-                .callbackValue = argv[1]
+                .type = 0
             };
         if (argc == ARGS_SIZE_TWO) {
             asyncErrorInfo->type = CALLBACK_FLG;
@@ -1773,9 +1734,9 @@ napi_value NAPI_DisableFormsUpdate(napi_env env, napi_callback_info info)
                     .asyncWork = nullptr,
                     .deferred = nullptr,
                     .callback = nullptr,
+                    .callbackValue = argv[1],
                     .code = ERR_APPEXECFWK_FORM_INVALID_FORM_ID,
                     .type = 0,
-                    .callbackValue = argv[1]
                 };
 
             if (argc == ARGS_SIZE_TWO) {
@@ -1795,9 +1756,9 @@ napi_value NAPI_DisableFormsUpdate(napi_env env, napi_callback_info info)
                     .asyncWork = nullptr,
                     .deferred = nullptr,
                     .callback = nullptr,
+                    .callbackValue = argv[1],
                     .code = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR,
-                    .type = 0,
-                    .callbackValue = argv[1]
+                    .type = 0
                 };
 
             if (argc == ARGS_SIZE_TWO) {
@@ -1814,7 +1775,6 @@ napi_value NAPI_DisableFormsUpdate(napi_env env, napi_callback_info info)
     AsyncDisableUpdateFormCallbackInfo *asyncCallbackInfo = new
         AsyncDisableUpdateFormCallbackInfo {
             .env = env,
-            .ability = GetGlobalAbility(env),
             .asyncWork = nullptr,
             .deferred = nullptr,
             .callback = nullptr,
@@ -1926,12 +1886,7 @@ napi_value NAPI_DisableFormsUpdate(napi_env env, napi_callback_info info)
 static void InnerCheckFMSReady(napi_env env, AsyncCheckFMSReadyCallbackInfo* const asyncCallbackInfo)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
-    OHOS::AppExecFwk::Ability *ability = asyncCallbackInfo->ability;
-    if (ability->CheckFMSReady()) {
-        asyncCallbackInfo->isFMSReady = 0;
-    } else {
-        asyncCallbackInfo->isFMSReady = 1;
-    }
+    asyncCallbackInfo->isFMSReady = FormMgr::GetInstance().CheckFMSReady() ? 0 : 1;
     HILOG_DEBUG("%{public}s, end", __func__);
 }
 
@@ -1960,7 +1915,6 @@ napi_value NAPI_CheckFMSReady(napi_env env, napi_callback_info info)
     AsyncCheckFMSReadyCallbackInfo *asyncCallbackInfo = new
     AsyncCheckFMSReadyCallbackInfo {
         .env = env,
-        .ability = GetGlobalAbility(env),
         .asyncWork = nullptr,
         .deferred = nullptr,
         .callback = nullptr,
@@ -1998,15 +1952,17 @@ napi_value NAPI_CheckFMSReady(napi_env env, napi_callback_info info)
                     (AsyncCheckFMSReadyCallbackInfo *)data;
 
                 if (asyncCallbackInfo->callback != nullptr) {
-                    napi_value isFMSReadyResult;
-                    napi_create_int32(env, asyncCallbackInfo->isFMSReady, &isFMSReadyResult);
                     napi_value callbackValues[ARGS_SIZE_TWO] = {0};
-                    InnerCreateCallbackRetMsg(env, 0, callbackValues);
-                    callbackValues[1] = isFMSReadyResult;
+                    InnerCreateCallbackRetMsg(env, asyncCallbackInfo->isFMSReady, callbackValues);
+
+                    napi_value undefined;
+                    napi_get_undefined(env, &undefined);
+
                     napi_value callback;
                     napi_get_reference_value(env, asyncCallbackInfo->callback, &callback);
+
                     napi_value callResult;
-                    napi_call_function(env, nullptr, callback, ARGS_SIZE_TWO, callbackValues, &callResult);
+                    napi_call_function(env, undefined, callback, ARGS_SIZE_TWO, callbackValues, &callResult);
                     napi_delete_reference(env, asyncCallbackInfo->callback);
                 }
                 napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
@@ -2044,8 +2000,16 @@ napi_value NAPI_CheckFMSReady(napi_env env, napi_callback_info info)
                 (AsyncCheckFMSReadyCallbackInfo *)data;
 
                 napi_value result;
-                napi_create_int32(env, asyncCallbackInfo->isFMSReady, &result);
-                napi_resolve_deferred(asyncCallbackInfo->env, asyncCallbackInfo->deferred, result);
+                InnerCreatePromiseRetMsg(env, asyncCallbackInfo->isFMSReady, &result);
+                if (asyncCallbackInfo->isFMSReady == ERR_OK) {
+                    napi_resolve_deferred(asyncCallbackInfo->env, asyncCallbackInfo->deferred, result);
+                } else {
+                    napi_reject_deferred(
+                        asyncCallbackInfo->env,
+                        asyncCallbackInfo->deferred,
+                        result);
+                }
+
                 napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
                 delete asyncCallbackInfo;
             },
@@ -2059,8 +2023,9 @@ napi_value NAPI_CheckFMSReady(napi_env env, napi_callback_info info)
 static void InnerDeleteInvalidForms(napi_env env, AsyncDeleteInvalidFormsCallbackInfo *const asyncCallbackInfo)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
-    OHOS::AppExecFwk::Ability *ability = asyncCallbackInfo->ability;
-    ErrCode ret = ability->DeleteInvalidForms(asyncCallbackInfo->formIds, asyncCallbackInfo->numFormsDeleted);
+
+    ErrCode ret = FormMgr::GetInstance().DeleteInvalidForms(asyncCallbackInfo->formIds,
+        FormHostClient::GetInstance(), asyncCallbackInfo->numFormsDeleted);
     asyncCallbackInfo->result = ret;
     if (ret != ERR_OK) {
         asyncCallbackInfo->numFormsDeleted = 0;
@@ -2203,7 +2168,6 @@ napi_value NAPI_DeleteInvalidForms(napi_env env, napi_callback_info info)
 
     auto *asyncCallbackInfo = new AsyncDeleteInvalidFormsCallbackInfo {
         .env = env,
-        .ability = GetGlobalAbility(env),
         .formIds = formIds,
     };
 
@@ -2408,10 +2372,9 @@ static void InnerAcquireFormState(napi_env env, AsyncAcquireFormStateCallbackInf
     std::shared_ptr<FormStateCallbackInterface> formStateCallback = std::make_shared<FormStateCallbackClient>(
         asyncCallbackInfo);
     FormHostClient::GetInstance()->AddFormState(formStateCallback, asyncCallbackInfo->want);
-    OHOS::AppExecFwk::Ability *ability = asyncCallbackInfo->ability;
 
-    ErrCode ret = ability->AcquireFormState(asyncCallbackInfo->want, asyncCallbackInfo->stateInfo);
-    asyncCallbackInfo->result = ret;
+    asyncCallbackInfo->result = FormMgr::GetInstance().AcquireFormState(asyncCallbackInfo->want,
+        FormHostClient::GetInstance(), asyncCallbackInfo->stateInfo);
     HILOG_DEBUG("%{public}s, end", __func__);
 }
 
@@ -2515,7 +2478,6 @@ napi_value NAPI_AcquireFormState(napi_env env, napi_callback_info info)
 
     auto *asyncCallbackInfo = new AsyncAcquireFormStateCallbackInfo {
         .env = env,
-        .ability = GetGlobalAbility(env),
         .asyncWork = nullptr,
         .deferred = nullptr,
         .callback = nullptr,
@@ -2653,9 +2615,9 @@ napi_value NAPI_UnregisterFormUninstallObserver(napi_env env, napi_callback_info
 static void InnerNotifyFormsVisible(napi_env env, AsyncNotifyFormsVisibleCallbackInfo *const asyncCallbackInfo)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
-    OHOS::AppExecFwk::Ability *ability = asyncCallbackInfo->ability;
-    ErrCode ret = ability->NotifyFormsVisible(asyncCallbackInfo->formIds, asyncCallbackInfo->isVisible);
-    asyncCallbackInfo->result = ret;
+
+    asyncCallbackInfo->result = FormMgr::GetInstance().NotifyFormsVisible(asyncCallbackInfo->formIds,
+        asyncCallbackInfo->isVisible, FormHostClient::GetInstance());
     HILOG_DEBUG("%{public}s, end", __func__);
 }
 
@@ -2772,7 +2734,6 @@ napi_value NAPI_NotifyFormsVisible(napi_env env, napi_callback_info info)
 
     auto *asyncCallbackInfo = new AsyncNotifyFormsVisibleCallbackInfo {
         .env = env,
-        .ability = GetGlobalAbility(env),
         .asyncWork = nullptr,
         .deferred = nullptr,
         .callback = nullptr,
@@ -2797,9 +2758,9 @@ static void InnerNotifyFormsEnableUpdate(napi_env env,
                                          AsyncNotifyFormsEnableUpdateCallbackInfo *const asyncCallbackInfo)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
-    OHOS::AppExecFwk::Ability *ability = asyncCallbackInfo->ability;
-    ErrCode ret = ability->NotifyFormsEnableUpdate(asyncCallbackInfo->formIds, asyncCallbackInfo->isEnableUpdate);
-    asyncCallbackInfo->result = ret;
+
+    asyncCallbackInfo->result = FormMgr::GetInstance().NotifyFormsEnableUpdate(asyncCallbackInfo->formIds,
+        asyncCallbackInfo->isEnableUpdate, FormHostClient::GetInstance());
     HILOG_DEBUG("%{public}s, end", __func__);
 }
 
@@ -2918,7 +2879,6 @@ napi_value NAPI_NotifyFormsEnableUpdate(napi_env env, napi_callback_info info)
 
     auto *asyncCallbackInfo = new AsyncNotifyFormsEnableUpdateCallbackInfo {
         .env = env,
-        .ability = GetGlobalAbility(env),
         .asyncWork = nullptr,
         .deferred = nullptr,
         .callback = nullptr,
@@ -2950,8 +2910,7 @@ napi_value NAPI_NotifyFormsEnableUpdate(napi_env env, napi_callback_info info)
 static void InnerGetAllFormsInfo(napi_env env, AsyncGetFormsInfoCallbackInfo* const asyncCallbackInfo)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
-    OHOS::AppExecFwk::Ability *ability = asyncCallbackInfo->ability;
-    asyncCallbackInfo->result = ability->GetAllFormsInfo(asyncCallbackInfo->formInfos);
+    asyncCallbackInfo->result = FormMgr::GetInstance().GetAllFormsInfo(asyncCallbackInfo->formInfos);
     HILOG_DEBUG("%{public}s, end", __func__);
 }
 
@@ -3053,7 +3012,6 @@ napi_value NAPI_GetAllFormsInfo(napi_env env, napi_callback_info info)
     AsyncGetFormsInfoCallbackInfo *asyncCallbackInfo = new
     AsyncGetFormsInfoCallbackInfo {
         .env = env,
-        .ability = GetGlobalAbility(env),
         .asyncWork = nullptr,
         .deferred = nullptr,
         .callback = nullptr,
@@ -3118,8 +3076,7 @@ napi_value NAPI_GetAllFormsInfo(napi_env env, napi_callback_info info)
 static void InnerGetFormsInfoByApp(napi_env env, AsyncGetFormsInfoCallbackInfo* const asyncCallbackInfo)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
-    OHOS::AppExecFwk::Ability *ability = asyncCallbackInfo->ability;
-    asyncCallbackInfo->result = ability->GetFormsInfoByApp(
+    asyncCallbackInfo->result = FormMgr::GetInstance().GetFormsInfoByApp(
         asyncCallbackInfo->bundleName,
         asyncCallbackInfo->formInfos);
     HILOG_DEBUG("%{public}s, end", __func__);
@@ -3136,8 +3093,7 @@ static void InnerGetFormsInfoByApp(napi_env env, AsyncGetFormsInfoCallbackInfo* 
 static void InnerGetFormsInfoByModule(napi_env env, AsyncGetFormsInfoCallbackInfo* const asyncCallbackInfo)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
-    OHOS::AppExecFwk::Ability *ability = asyncCallbackInfo->ability;
-    asyncCallbackInfo->result = ability->GetFormsInfoByModule(
+    asyncCallbackInfo->result = FormMgr::GetInstance().GetFormsInfoByModule(
         asyncCallbackInfo->bundleName,
         asyncCallbackInfo->moduleName,
         asyncCallbackInfo->formInfos);
@@ -3254,9 +3210,9 @@ napi_value GetFormsInfoTwoArgv(napi_env env, napi_value *argv, AsyncGetFormsInfo
                 .asyncWork = nullptr,
                 .deferred = nullptr,
                 .callback = nullptr,
+                .callbackValue = argv[1],
                 .code = ERR_APPEXECFWK_FORM_INVALID_MODULENAME,
-                .type = PROMISE_FLG,
-                .callbackValue = argv[1]
+                .type = PROMISE_FLG
             };
         return RetErrMsg(asyncErrorInfo);
     }
@@ -3293,7 +3249,6 @@ napi_value NAPI_GetFormsInfo(napi_env env, napi_callback_info info)
     AsyncGetFormsInfoCallbackInfo *asyncCallbackInfo = new
     AsyncGetFormsInfoCallbackInfo {
         .env = env,
-        .ability = GetGlobalAbility(env),
         .asyncWork = nullptr,
         .deferred = nullptr,
         .callback = nullptr,

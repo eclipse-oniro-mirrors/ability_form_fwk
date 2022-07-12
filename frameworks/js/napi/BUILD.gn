@@ -208,6 +208,7 @@ ohos_shared_library("formmanager") {
   deps = [
     "${ability_runtime_napi_path}/inner/napi_common:napi_common",
     "${ability_runtime_native_path}/appkit:appkit_native",
+    "${form_fwk_path}:fmskit_native",
   ]
 
   external_deps = [

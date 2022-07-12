@@ -110,9 +110,8 @@ HWTEST_F(FmsFormMgrLifecycleUpdateTest, FmsFormMgrLifecycleUpdateTest_LifecycleU
     GTEST_LOG_(INFO) << "FmsFormMgrLifecycleUpdateTest_LifecycleUpdate_002 start";
 
     std::vector<int64_t> formIds;
-    int32_t updateType = OHOS::AppExecFwk::FormMgrService::ENABLE_FORM_UPDATE;
 
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, FormMgr::GetInstance().LifecycleUpdate(formIds, token_, updateType));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, FormMgr::GetInstance().LifecycleUpdate(formIds, token_, true));
 
     GTEST_LOG_(INFO) << "FmsFormMgrLifecycleUpdateTest_LifecycleUpdate_002 end";
 }
@@ -129,11 +128,8 @@ HWTEST_F(FmsFormMgrLifecycleUpdateTest, FmsFormMgrLifecycleUpdateTest_LifecycleU
 
     std::vector<int64_t> formIds;
     formIds.push_back(3);
-
-    int32_t updateType = OHOS::AppExecFwk::FormMgrService::ENABLE_FORM_UPDATE;
-
     EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF,
-        FormMgr::GetInstance().LifecycleUpdate(formIds, token_, updateType));
+        FormMgr::GetInstance().LifecycleUpdate(formIds, token_, true));
 
     GTEST_LOG_(INFO) << "FmsFormMgrLifecycleUpdateTest_LifecycleUpdate_003 end";
 }
@@ -154,8 +150,6 @@ HWTEST_F(FmsFormMgrLifecycleUpdateTest, FmsFormMgrLifecycleUpdateTest_LifecycleU
     int64_t formId = 4;
     formIds.push_back(formId);
 
-    int32_t updateType = OHOS::AppExecFwk::FormMgrService::ENABLE_FORM_UPDATE;
-
     // create clientRecords_
     FormHostRecord formHostRecord;
     formHostRecord.SetClientStub(token_);
@@ -163,7 +157,7 @@ HWTEST_F(FmsFormMgrLifecycleUpdateTest, FmsFormMgrLifecycleUpdateTest_LifecycleU
     formHostRecord.SetNeedRefresh(formId, true);
     FormDataMgr::GetInstance().clientRecords_.push_back(formHostRecord);
 
-    EXPECT_EQ(ERR_OK, FormMgr::GetInstance().LifecycleUpdate(formIds, token_, updateType));
+    EXPECT_EQ(ERR_OK, FormMgr::GetInstance().LifecycleUpdate(formIds, token_, true));
 
     GTEST_LOG_(INFO) << "FmsFormMgrLifecycleUpdateTest_LifecycleUpdate_004 end";
 }
@@ -185,8 +179,6 @@ HWTEST_F(FmsFormMgrLifecycleUpdateTest, FmsFormMgrLifecycleUpdateTest_LifecycleU
     int64_t formId = 5;
     formIds.push_back(formId);
 
-    int32_t updateType = OHOS::AppExecFwk::FormMgrService::ENABLE_FORM_UPDATE;
-
     // create clientRecords_
     FormHostRecord formHostRecord;
     formHostRecord.SetClientStub(token_);
@@ -203,7 +195,7 @@ HWTEST_F(FmsFormMgrLifecycleUpdateTest, FmsFormMgrLifecycleUpdateTest_LifecycleU
     record.needRefresh = true;
     FormDataMgr::GetInstance().formRecords_.emplace(formId, record);
 
-    EXPECT_EQ(ERR_OK, FormMgr::GetInstance().LifecycleUpdate(formIds, token_, updateType));
+    EXPECT_EQ(ERR_OK, FormMgr::GetInstance().LifecycleUpdate(formIds, token_, true));
 
     GTEST_LOG_(INFO) << "FmsFormMgrLifecycleUpdateTest_LifecycleUpdate_005 end";
 }
@@ -225,8 +217,6 @@ HWTEST_F(FmsFormMgrLifecycleUpdateTest, FmsFormMgrLifecycleUpdateTest_LifecycleU
     int64_t formId = 6;
     formIds.push_back(formId);
 
-    int32_t updateType = OHOS::AppExecFwk::FormMgrService::ENABLE_FORM_UPDATE;
-
     // create clientRecords_
     FormHostRecord formHostRecord;
     formHostRecord.SetClientStub(token_);
@@ -246,7 +236,7 @@ HWTEST_F(FmsFormMgrLifecycleUpdateTest, FmsFormMgrLifecycleUpdateTest_LifecycleU
     record.versionUpgrade = false;
     FormDataMgr::GetInstance().formRecords_.emplace(formId, record);
 
-    EXPECT_EQ(ERR_OK, FormMgr::GetInstance().LifecycleUpdate(formIds, token_, updateType));
+    EXPECT_EQ(ERR_OK, FormMgr::GetInstance().LifecycleUpdate(formIds, token_, true));
 
     // judge hostrecord's needRefresh_ is false.
     EXPECT_EQ(false, FormDataMgr::GetInstance().clientRecords_.at(0).IsNeedRefresh(formId));
