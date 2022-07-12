@@ -13,10 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_ACQUIRE_CONNECTION_H
-#define FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_ACQUIRE_CONNECTION_H
+#ifndef FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_ACQUIRE_CONNECTION_H
+#define FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_ACQUIRE_CONNECTION_H
 
-#include "event_handler.h"
 #include "form_ability_connection.h"
 #include "form_item_info.h"
 #include "want.h"
@@ -42,15 +41,15 @@ public:
      */
     void OnAbilityConnectDone(
         const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode) override;
-    
+
 private:
-    int64_t formId_;
+    int64_t formId_ = -1;
     FormItemInfo info_;
     WantParams wantParams_;
-    
+
     DISALLOW_COPY_AND_MOVE(FormAcquireConnection);
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
 
-#endif // FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_ACQUIRE_CONNECTION_H
+#endif // FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_ACQUIRE_CONNECTION_H

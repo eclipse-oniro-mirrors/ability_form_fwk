@@ -27,12 +27,11 @@ const std::string INNER_FORM_INFO_BUNDLE_NAME = "bundleName";
 const std::string INNER_FORM_INFO_MODULE_NAME = "moduleName";
 const std::string INNER_FORM_INFO_ABILITY_NAME = "abilityName";
 const std::string INNER_FORM_INFO_FORM_USER_UIDS = "formUserUids";
-}
+} // namespace
 
 /**
  * @brief Transform the InnerFormInfo object to json.
  * @param jsonObject Indicates the obtained json object.
- * @return
  */
 void InnerFormInfo::ToJson(nlohmann::json &jsonObject) const
 {
@@ -48,7 +47,7 @@ void InnerFormInfo::ToJson(nlohmann::json &jsonObject) const
 /**
  * @brief Transform the json object to InnerFormInfo object.
  * @param jsonObject Indicates the obtained json object.
- * @return
+ * @return true on success or false on failure
  */
 bool InnerFormInfo::FromJson(const nlohmann::json &jsonObject)
 {

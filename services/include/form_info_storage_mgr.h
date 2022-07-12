@@ -13,13 +13,11 @@
  * limitations under the License.
  */
 
-#ifndef FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_INFO_STORAGE_MGR_H
-#define FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_INFO_STORAGE_MGR_H
+#ifndef FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_INFO_STORAGE_MGR_H
+#define FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_INFO_STORAGE_MGR_H
 
-#include <map>
 #include <singleton.h>
 #include <string>
-#include "appexecfwk_errors.h"
 #include "distributed_kv_data_manager.h"
 #include "kvstore_death_recipient.h"
 
@@ -70,10 +68,10 @@ private:
     DistributedKv::DistributedKvDataManager dataManager_;
     std::shared_ptr<DistributedKv::SingleKvStore> kvStorePtr_;
     mutable std::mutex kvStorePtrMutex_;
-    const int32_t MAX_TIMES = 600;              // 1min
+    const int32_t MAX_TIMES = 600;              // 600 * 100ms = 1min
     const int32_t SLEEP_INTERVAL = 100 * 1000;  // 100ms
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
 
-#endif // FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_INFO_STORAGE_MGR_H
+#endif // FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_INFO_STORAGE_MGR_H

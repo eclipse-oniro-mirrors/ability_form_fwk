@@ -17,11 +17,9 @@
 
 #include <cinttypes>
 
-#include "appexecfwk_errors.h"
 #include "form_host_interface.h"
 #include "form_task_mgr.h"
 #include "hilog_wrapper.h"
-#include "string_ex.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -30,7 +28,6 @@ namespace AppExecFwk {
  * @param formId The Id of the forms to create.
  * @param record Form record.
  * @param callerToken Caller ability token.
- * @return Returns ERR_OK on success, others on failure.
  */
 void FormHostCallback::OnAcquired(const int64_t formId, const FormRecord& record,
     const sptr<IRemoteObject> &callerToken)
@@ -44,7 +41,6 @@ void FormHostCallback::OnAcquired(const int64_t formId, const FormRecord& record
 * @param formId The Id of the form to update.
 * @param record Form record.
 * @param callerToken Caller ability token.
-* @return Returns ERR_OK on success, others on failure.
 */
 void FormHostCallback::OnUpdate(const int64_t formId, const FormRecord &record, const sptr<IRemoteObject> &callerToken)
 {
@@ -69,12 +65,11 @@ void FormHostCallback::OnUpdate(const int64_t formId, const FormRecord &record, 
  * @brief Form provider is uninstalled
  * @param formIds The Id list of the forms.
  * @param callerToken Caller ability token.
- * @return Returns ERR_OK on success, others on failure.
  */
-void  FormHostCallback::OnUninstall(std::vector<int64_t> &formIds, const sptr<IRemoteObject> &callerToken)
+void FormHostCallback::OnUninstall(std::vector<int64_t> &formIds, const sptr<IRemoteObject> &callerToken)
 {
     // check formId
-    if (formIds.size() <= 0) {
+    if (formIds.empty()) {
         HILOG_ERROR("%{public}s: OnUninstall invalid param, formIds is empty.", __func__);
         return;
     }
@@ -92,7 +87,6 @@ void  FormHostCallback::OnUninstall(std::vector<int64_t> &formIds, const sptr<IR
  * @param state The form state.
  * @param want The want of onAcquireFormState.
  * @param callerToken Caller ability token.
- * @return Returns ERR_OK on success, others on failure.
  */
 void FormHostCallback::OnAcquireState(AppExecFwk::FormState state, const AAFwk::Want &want,
                                       const sptr<IRemoteObject> &callerToken)

@@ -281,7 +281,7 @@ HWTEST_F(FmsFormMgrAddFormTest, AddForm_003, TestSize.Level0)
     record1.formName = PARAM_FORM_NAME;
     record1.specification = PARAM_FORM_DIMENSION_VALUE;
     record1.formUserUids.emplace_back(callingUid);
-    record1.formTempFlg = false;
+    record1.formTempFlag = false;
     FormDBInfo formDBInfo(formId, record1);
     FormDbCache::GetInstance().SaveFormInfo(formDBInfo);
     // Set form host record

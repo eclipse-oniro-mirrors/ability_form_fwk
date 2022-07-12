@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORMMGR_FORM_SUPPLY_CALLBACK_H
-#define FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORMMGR_FORM_SUPPLY_CALLBACK_H
+#ifndef FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORMMGR_FORM_SUPPLY_CALLBACK_H
+#define FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORMMGR_FORM_SUPPLY_CALLBACK_H
 
 #include "form_ability_connection.h"
 #include "form_supply_stub.h"
@@ -73,7 +73,7 @@ private:
      * @brief check if disconnect ability or not.
      * @param connection The ability connection.
      */
-    bool CanDisConnect(sptr<FormAbilityConnection> &connection);
+    bool CanDisconnect(sptr<FormAbilityConnection> &connection);
 private:
     static std::mutex mutex_;
     static sptr<FormSupplyCallback> instance_;
@@ -84,4 +84,4 @@ private:
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
-#endif  // FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORMMGR_FORM_SUPPLY_CALLBACK_H
+#endif  // FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORMMGR_FORM_SUPPLY_CALLBACK_H

@@ -13,15 +13,14 @@
  * limitations under the License.
  */
 
-#ifndef FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_AMS_HELPER_H
-#define FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_AMS_HELPER_H
+#ifndef FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_AMS_HELPER_H
+#define FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_AMS_HELPER_H
 
 #include <singleton.h>
-#include <string>
+
 #include "ability_connect_callback_interface.h"
 #include "ability_manager_interface.h"
 #include "event_handler.h"
-#include "iremote_object.h"
 #include "uri.h"
 
 namespace OHOS {
@@ -63,14 +62,14 @@ public:
      * @param connect Callback used to notify caller the result of connecting or disconnecting.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode DisConnectServiceAbility(const sptr<AAFwk::IAbilityConnection> &connect);
+    ErrCode DisconnectServiceAbility(const sptr<AAFwk::IAbilityConnection> &connect);
     /**
      * @brief Disconnect ability delay, disconnect session with service ability.
      * @param want Special want for service type's ability.
      * @param connect Callback used to notify caller the result of connecting or disconnecting.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode DisConnectServiceAbilityDelay(const sptr<AAFwk::IAbilityConnection> &connect);
+    ErrCode DisconnectServiceAbilityDelay(const sptr<AAFwk::IAbilityConnection> &connect);
     /**
      * @brief Add the ability manager instance for debug.
      * @param abilityManager the ability manager ipc object.
@@ -82,7 +81,7 @@ private:
      * @param want Special want for service type's ability.
      * @param connect Callback used to notify caller the result of connecting or disconnecting.
      */
-    void DisConnectAbilityTask(const sptr<AAFwk::IAbilityConnection> &connect);
+    void DisconnectAbilityTask(const sptr<AAFwk::IAbilityConnection> &connect);
 private:
     sptr<AAFwk::IAbilityManager> abilityManager_ = nullptr;
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ = nullptr;
@@ -90,4 +89,4 @@ private:
 }  // namespace AppExecFwk
 }  // namespace OHOS
 
-#endif // FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_AMS_HELPER_H
+#endif // FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_AMS_HELPER_H

@@ -85,16 +85,16 @@ bool FormHostRecord::IsEnableRefresh(int64_t formId) const
 /**
  * @brief Set Update enable flag.
  * @param formId The Id of the form.
- * @param flag True for enable, false for disable.
+ * @param enable True for enable, false for disable.
  */
-void FormHostRecord::SetEnableUpdate(int64_t formId, bool flag)
+void FormHostRecord::SetEnableUpdate(int64_t formId, bool enable)
 {
     auto result = forms_.find(formId);
     if (result == forms_.end()) {
         HILOG_ERROR("%{public}s: formId: %{public}" PRId64 "not found", __func__, formId);
         return;
     }
-    enableUpdateMap_[formId] = flag;
+    enableUpdateMap_[formId] = enable;
 }
 /**
  * @brief update enable or not.
@@ -104,7 +104,7 @@ void FormHostRecord::SetEnableUpdate(int64_t formId, bool flag)
 bool FormHostRecord::IsEnableUpdate(int64_t formId) const
 {
     auto result = enableUpdateMap_.find(formId);
-    if (result == forms_.end()) {
+    if (result == enableUpdateMap_.end()) {
         return false;
     }
     return result->second;
@@ -132,12 +132,12 @@ bool FormHostRecord::IsNeedRefresh(int64_t formId) const
     return false;
 }
 /**
- * @brief Get clientStub_.
- * @return clientStub_.
+ * @brief Get formHostClient_.
+ * @return formHostClient_.
  */
-sptr<IRemoteObject> FormHostRecord::GetClientStub() const
+sptr<IRemoteObject> FormHostRecord::GetFormHostClient() const
 {
-    return clientStub_;
+    return formHostClient_;
 }
 
 /**
@@ -148,12 +148,11 @@ sptr<IRemoteObject> FormHostRecord::GetClientStub() const
 void FormHostRecord::OnAcquire(int64_t id, const FormRecord &record)
 {
     HILOG_DEBUG("FormHostRecord OnAcquire");
-    if (clientImpl_ == nullptr) {
-        HILOG_ERROR("%{public}s: clientImpl_ can not be NULL", __func__);
+    if (formHostCallback_ == nullptr) {
+        HILOG_ERROR("%{public}s: formHostCallback_ can not be NULL", __func__);
         return;
     }
-
-    clientImpl_->OnAcquired(id, record, clientStub_);
+    formHostCallback_->OnAcquired(id, record, formHostClient_);
 }
 
 /**
@@ -164,29 +163,25 @@ void FormHostRecord::OnAcquire(int64_t id, const FormRecord &record)
 void FormHostRecord::OnUpdate(int64_t id, const FormRecord &record)
 {
     HILOG_INFO("%{public}s start.", __func__);
-
-    if (clientImpl_ == nullptr) {
-        HILOG_ERROR("%{public}s: clientImpl_ can not be null.", __func__);
+    if (formHostCallback_ == nullptr) {
+        HILOG_ERROR("%{public}s: formHostCallback_ can not be null.", __func__);
         return;
     }
-
-    clientImpl_->OnUpdate(id, record, clientStub_);
+    formHostCallback_->OnUpdate(id, record, formHostClient_);
 }
 
 /**
  * @brief Send form uninstall message to form host.
- * @param id The Id of the form.
- * @param record Form record.
+ * @param formIds The id list of the form.
  */
 void FormHostRecord::OnFormUninstalled(std::vector<int64_t> &formIds)
 {
     HILOG_INFO("%{public}s start.", __func__);
-
-    if (clientImpl_ == nullptr) {
-        HILOG_ERROR("%{public}s: clientImpl_ can not be null.", __func__);
+    if (formHostCallback_ == nullptr) {
+        HILOG_ERROR("%{public}s: formHostCallback_ can not be null.", __func__);
         return;
     }
-    clientImpl_->OnUninstall(formIds, clientStub_);
+    formHostCallback_->OnUninstall(formIds, formHostClient_);
 }
 
 /**
@@ -198,12 +193,11 @@ void FormHostRecord::OnFormUninstalled(std::vector<int64_t> &formIds)
 void FormHostRecord::OnAcquireState(AppExecFwk::FormState state, const AAFwk::Want &want)
 {
     HILOG_INFO("%{public}s start.", __func__);
-
-    if (clientImpl_ == nullptr) {
-        HILOG_ERROR("%{public}s: clientImpl_ can not be null.", __func__);
+    if (formHostCallback_ == nullptr) {
+        HILOG_ERROR("%{public}s: formHostCallback_ can not be null.", __func__);
         return;
     }
-    clientImpl_->OnAcquireState(state, want, clientStub_);
+    formHostCallback_->OnAcquireState(state, want, formHostClient_);
 }
 
 /**
@@ -213,9 +207,9 @@ void FormHostRecord::OnAcquireState(AppExecFwk::FormState state, const AAFwk::Wa
  */
 void FormHostRecord::CleanResource()
 {
-    if (clientStub_ != nullptr && deathRecipient_ != nullptr) {
-        clientStub_->RemoveDeathRecipient(deathRecipient_);
-        clientStub_ = nullptr;
+    if (formHostClient_ != nullptr && deathRecipient_ != nullptr) {
+        formHostClient_->RemoveDeathRecipient(deathRecipient_);
+        formHostClient_ = nullptr;
         deathRecipient_ = nullptr;
     }
 }
@@ -228,20 +222,20 @@ void FormHostRecord::SetCallerUid(const int callerUid)
     callerUid_ = callerUid;
 }
 /**
- * @brief Set value of clientStub_.
- * @param clientStub remote object.
+ * @brief Set value of formHostClient_.
+ * @param formHostClient remote object.
  */
-void FormHostRecord::SetClientStub(const sptr<IRemoteObject> &clientStub)
+void FormHostRecord::SetFormHostClient(const sptr<IRemoteObject> &formHostClient)
 {
-    clientStub_ = clientStub;
+    formHostClient_ = formHostClient;
 }
 /**
- * @brief Set value of clientImpl_.
- * @param clientImpl Form host callback object.
+ * @brief Set value of formHostCallback_.
+ * @param formHostCallback Form host callback object.
  */
-void FormHostRecord::SetClientImpl(const std::shared_ptr<FormHostCallback> &clientImpl)
+void FormHostRecord::SetCallback(const std::shared_ptr<FormHostCallback> &formHostCallback)
 {
-    clientImpl_ = clientImpl;
+    formHostCallback_ = formHostCallback;
 }
 /**
  * @brief Get deathRecipient_.
@@ -253,19 +247,19 @@ sptr<IRemoteObject::DeathRecipient> FormHostRecord::GetDeathRecipient() const
 }
 /**
  * @brief Set value of deathRecipient_.
- * @param clientImpl DeathRecipient object.
+ * @param formHostCallback DeathRecipient object.
  */
 void FormHostRecord::SetDeathRecipient(const sptr<IRemoteObject::DeathRecipient> &deathRecipient)
 {
     deathRecipient_ = deathRecipient;
 }
 /**
- * @brief Add deathRecipient object to clientStub_.
+ * @brief Add deathRecipient object to formHostClient_.
  * @param deathRecipient DeathRecipient object.
  */
 void FormHostRecord::AddDeathRecipient(const sptr<IRemoteObject::DeathRecipient> &deathRecipient)
 {
-    clientStub_->AddDeathRecipient(deathRecipient);
+    formHostClient_->AddDeathRecipient(deathRecipient);
 }
 
 /**
@@ -280,11 +274,10 @@ FormHostRecord FormHostRecord::CreateRecord(const FormItemInfo &info,
     FormHostRecord record;
     record.SetHostBundleName(info.GetHostBundleName());
     record.SetCallerUid(callingUid);
-    record.SetClientStub(callback);
-    record.SetClientImpl(std::make_shared<FormHostCallback>());
+    record.SetFormHostClient(callback);
+    record.SetCallback(std::make_shared<FormHostCallback>());
     record.SetDeathRecipient(new FormHostRecord::ClientDeathRecipient());
     record.AddDeathRecipient(record.GetDeathRecipient());
-
     return record;
 }
 
@@ -308,7 +301,7 @@ std::string FormHostRecord::GetHostBundleName() const
 }
 /**
  * @brief Set hostBundleName_.
- * @param hostBandleName Host bundle name.
+ * @param hostBundleName Host bundle name.
  */
 void FormHostRecord::SetHostBundleName(const std::string &hostBundleName)
 {

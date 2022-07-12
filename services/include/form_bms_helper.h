@@ -13,13 +13,11 @@
  * limitations under the License.
  */
 
-#ifndef FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_BMS_HELPER_H
-#define FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_BMS_HELPER_H
+#ifndef FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_BMS_HELPER_H
+#define FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_BMS_HELPER_H
 
 #include <singleton.h>
-#include "ability_connect_callback_interface.h"
 #include "ability_manager_interface.h"
-#include "bundle_info.h"
 #include "bundle_mgr_interface.h"
 
 namespace OHOS {
@@ -84,4 +82,4 @@ private:
 }  // namespace AppExecFwk
 }  // namespace OHOS
 
-#endif // FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_BMS_HELPER_H
+#endif // FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_BMS_HELPER_H

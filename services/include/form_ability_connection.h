@@ -13,11 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_ABILITY_CONNECTION_H
-#define FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_ABILITY_CONNECTION_H
+#ifndef FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_ABILITY_CONNECTION_H
+#define FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_ABILITY_CONNECTION_H
 
-#include "event_handler.h"
-#include "form_item_info.h"
 #include "provider_connect_stub.h"
 #include "want.h"
 
@@ -60,7 +58,7 @@ public:
      * @brief Get connectId.
      * @return The ability connection id.
      */
-    long GetConnectId();
+    long GetConnectId() const;
 
     /**
      * @brief Set connectId.
@@ -72,7 +70,7 @@ public:
      *
      * @return The provider Key
      */
-    std::string GetProviderKey();
+    std::string GetProviderKey() const;
     /**
      * @brief Set the Provider Key
      *
@@ -100,7 +98,7 @@ public:
      */
     int64_t GetFormId() const;
 private:
-    int64_t formId_ = 0;
+    int64_t formId_ = -1;
     std::string deviceId_ = "";
     std::string bundleName_ = "";
     std::string abilityName_ = "";
@@ -112,4 +110,4 @@ private:
 }  // namespace AppExecFwk
 }  // namespace OHOS
 
-#endif // FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_ABILITY_CONNECTION_H
+#endif // FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_ABILITY_CONNECTION_H

@@ -356,7 +356,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_AllotFormHostRecord_001, TestSiz
 
     // create clientRecords_
     FormHostRecord formHostRecord;
-    formHostRecord.SetClientStub(token_);
+    formHostRecord.SetFormHostClient(token_);
     formDataMgr_.clientRecords_.push_back(formHostRecord);
 
     EXPECT_EQ(true, formDataMgr_.AllotFormHostRecord(formItemInfo, token_, formId, callingUid));
@@ -432,14 +432,14 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CreateFormInfo_001, TestSize.Lev
     record.bundleName = FORM_HOST_BUNDLE_NAME;
     record.abilityName = FORM_PROVIDER_ABILITY_NAME;
     record.formName = FORM_NAME;
-    record.formTempFlg = true;
+    record.formTempFlag = true;
 
     FormJsInfo formInfo;
 
     formDataMgr_.CreateFormInfo(formId, record, formInfo);
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CreateFormInfo_001 output=>bundleName:"<<formInfo.bundleName
-    <<"abilityName:"<<formInfo.abilityName<<"formName:"<<formInfo.formName<<"formTempFlg:"<<formInfo.formTempFlg;
+    <<"abilityName:"<<formInfo.abilityName<<"formName:"<<formInfo.formName<<"formTempFlag:"<<formInfo.formTempFlag;
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CreateFormInfo_001 end";
 }
 
@@ -588,37 +588,37 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_DeleteTempForm_002, TestSize.Lev
 }
 
 /**
- * @tc.number: FmsFormDataMgrTest_ModifyFormTempFlg_001
- * @tc.name: ModifyFormTempFlg
+ * @tc.number: FmsFormDataMgrTest_ModifyFormTempFlag_001
+ * @tc.name: ModifyFormTempFlag
  * @tc.desc: Verify that the return value is correct.
  * @tc.details:
  *       formRecords is not found.
  */
-HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_ModifyFormTempFlg_001, TestSize.Level0)
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_ModifyFormTempFlag_001, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_ModifyFormTempFlg_001 start";
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_ModifyFormTempFlag_001 start";
 
     int64_t formId = 1;
-    bool formTempFlg = true;
+    bool formTempFlag = true;
 
-    EXPECT_EQ(false, formDataMgr_.ModifyFormTempFlg(formId, formTempFlg));
+    EXPECT_EQ(false, formDataMgr_.ModifyFormTempFlag(formId, formTempFlag));
 
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_ModifyFormTempFlg_001 end";
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_ModifyFormTempFlag_001 end";
 }
 
 /**
- * @tc.number: FmsFormDataMgrTest_ModifyFormTempFlg_002
- * @tc.name: ModifyFormTempFlg
+ * @tc.number: FmsFormDataMgrTest_ModifyFormTempFlag_002
+ * @tc.name: ModifyFormTempFlag
  * @tc.desc: Verify that the return value is correct.
  * @tc.details:
  *       formRecords is found.
  */
-HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_ModifyFormTempFlg_002, TestSize.Level0)
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_ModifyFormTempFlag_002, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_ModifyFormTempFlg_002 start";
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_ModifyFormTempFlag_002 start";
 
     int64_t formId = 2;
-    bool formTempFlg = false;
+    bool formTempFlag = false;
 
     // create formRecords
     int callingUid = 0;
@@ -627,10 +627,10 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_ModifyFormTempFlg_002, TestSize.
     FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
     formDataMgr_.formRecords_.emplace(formId, record);
 
-    EXPECT_EQ(true, formDataMgr_.ModifyFormTempFlg(formId, formTempFlg));
-    EXPECT_EQ(false, formDataMgr_.formRecords_[formId].formTempFlg);
+    EXPECT_EQ(true, formDataMgr_.ModifyFormTempFlag(formId, formTempFlag));
+    EXPECT_EQ(false, formDataMgr_.formRecords_[formId].formTempFlag);
 
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_ModifyFormTempFlg_002 end";
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_ModifyFormTempFlag_002 end";
 }
 
 /**
@@ -972,7 +972,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormHostRecord_002, TestSize.
 
     // create clientRecords_
     FormHostRecord form_host_record;
-    form_host_record.SetClientStub(token_);
+    form_host_record.SetFormHostClient(token_);
     form_host_record.AddForm(formId);
     formDataMgr_.clientRecords_.push_back(form_host_record);
 
@@ -997,7 +997,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_DeleteHostRecord_001, TestSize.L
 
     // create clientRecords_
     FormHostRecord formHostRecord;
-    formHostRecord.SetClientStub(token_);
+    formHostRecord.SetFormHostClient(token_);
     formHostRecord.AddForm(formId);
     formDataMgr_.clientRecords_.push_back(formHostRecord);
 
@@ -1024,7 +1024,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CleanHostRemovedForms_001, TestS
 
     // create clientRecords_
     FormHostRecord formHostRecord;
-    formHostRecord.SetClientStub(token_);
+    formHostRecord.SetFormHostClient(token_);
     formHostRecord.AddForm(formId);
     formDataMgr_.clientRecords_.push_back(formHostRecord);
 
@@ -1051,7 +1051,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_HandleHostDied_001, TestSize.Lev
 
     // create clientRecords_
     FormHostRecord formHostRecord;
-    formHostRecord.SetClientStub(token_);
+    formHostRecord.SetFormHostClient(token_);
     formHostRecord.AddForm(formId);
     formDataMgr_.clientRecords_.push_back(formHostRecord);
 
@@ -1086,7 +1086,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_HandleHostDied_002, TestSize.Lev
 
     // create clientRecords_
     FormHostRecord formHostRecord;
-    formHostRecord.SetClientStub(token_);
+    formHostRecord.SetFormHostClient(token_);
     formHostRecord.AddForm(formId);
     formDataMgr_.clientRecords_.push_back(formHostRecord);
 
@@ -1118,7 +1118,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_HandleHostDied_003, TestSize.Lev
     // create clientRecords_
     sptr<OHOS::AppExecFwk::MockFormHostClient> token_2;
     FormHostRecord formHostRecord;
-    formHostRecord.SetClientStub(token_2);
+    formHostRecord.SetFormHostClient(token_2);
     formHostRecord.AddForm(formId);
     formDataMgr_.clientRecords_.push_back(formHostRecord);
 
@@ -1167,7 +1167,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_IsEnableRefresh_002, TestSize.Le
     // create clientRecords_
     sptr<OHOS::AppExecFwk::MockFormHostClient> token_;
     FormHostRecord formHostRecord;
-    formHostRecord.SetClientStub(token_);
+    formHostRecord.SetFormHostClient(token_);
     formHostRecord.AddForm(formId);
     formDataMgr_.clientRecords_.push_back(formHostRecord);
 
@@ -1244,7 +1244,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetMatchedHostClient_002, TestSi
 
     // create clientRecords_
     FormHostRecord formHostRecord;
-    formHostRecord.SetClientStub(token_);
+    formHostRecord.SetFormHostClient(token_);
     formHostRecord.AddForm(formId);
     formDataMgr_.clientRecords_.push_back(formHostRecord);
 
@@ -1900,7 +1900,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_UpdateHostFormFlag_002, TestSize
 
     // create clientRecords_
     FormHostRecord formHostRecord;
-    formHostRecord.SetClientStub(token_);
+    formHostRecord.SetFormHostClient(token_);
     formHostRecord.AddForm(formId);
     // SetNeedRefresh:true
     formHostRecord.SetNeedRefresh(formId, true);
@@ -1941,7 +1941,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_UpdateHostFormFlag_003, TestSize
 
     // create clientRecords_
     FormHostRecord formHostRecord;
-    formHostRecord.SetClientStub(token_);
+    formHostRecord.SetFormHostClient(token_);
     formHostRecord.AddForm(formId);
     // SetNeedRefresh:true
     formHostRecord.SetNeedRefresh(formId, true);
@@ -1982,7 +1982,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_UpdateHostFormFlag_004, TestSize
 
     // create clientRecords_
     FormHostRecord formHostRecord;
-    formHostRecord.SetClientStub(token_);
+    formHostRecord.SetFormHostClient(token_);
     formHostRecord.AddForm(formId);
     // SetNeedRefresh:false
     formHostRecord.SetNeedRefresh(formId, false);
@@ -2022,7 +2022,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_UpdateHostFormFlag_005, TestSize
     // create clientRecords_
     int64_t otherformId = 500;
     FormHostRecord formHostRecord;
-    formHostRecord.SetClientStub(token_);
+    formHostRecord.SetFormHostClient(token_);
     formHostRecord.AddForm(otherformId);
     formDataMgr_.clientRecords_.push_back(formHostRecord);
 
@@ -2059,7 +2059,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_UpdateHostFormFlag_006, TestSize
 
     // create clientRecords_
     FormHostRecord formHostRecord;
-    formHostRecord.SetClientStub(token_);
+    formHostRecord.SetFormHostClient(token_);
     formHostRecord.AddForm(formId);
     formDataMgr_.clientRecords_.push_back(formHostRecord);
 
@@ -2096,7 +2096,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_UpdateHostFormFlag_007, TestSize
 
     // create clientRecords_
     FormHostRecord formHostRecord;
-    formHostRecord.SetClientStub(token_);
+    formHostRecord.SetFormHostClient(token_);
     formHostRecord.AddForm(formId);
     formDataMgr_.clientRecords_.push_back(formHostRecord);
 
@@ -2135,7 +2135,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_UpdateHostFormFlag_008, TestSize
 
     // create clientRecords_
     FormHostRecord formHostRecord;
-    formHostRecord.SetClientStub(token_);
+    formHostRecord.SetFormHostClient(token_);
     formHostRecord.AddForm(formId);
     formDataMgr_.clientRecords_.push_back(formHostRecord);
 

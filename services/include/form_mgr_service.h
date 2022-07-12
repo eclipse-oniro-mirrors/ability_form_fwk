@@ -13,15 +13,11 @@
  * limitations under the License.
  */
 
-#ifndef FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_MGR_SERVICE_H
-#define FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_MGR_SERVICE_H
+#ifndef FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_MGR_SERVICE_H
+#define FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_MGR_SERVICE_H
 
-#include <codecvt>
-#include <memory>
 #include <singleton.h>
 #include <system_ability.h>
-#include <thread_ex.h>
-#include <unordered_map>
 
 #include "event_handler.h"
 #include "form_mgr_stub.h"
@@ -31,7 +27,10 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-enum class ServiceRunningState { STATE_NOT_START, STATE_RUNNING };
+enum class ServiceRunningState {
+    STATE_NOT_START,
+    STATE_RUNNING,
+};
 /**
  * @class FormMgrService
  * FormMgrService provides a facility for managing form life cycle.
@@ -43,11 +42,11 @@ class FormMgrService : public SystemAbility,
     DECLEAR_SYSTEM_ABILITY(FormMgrService);
 public:
     /**
-     * @brief Start envent for the form manager service.
+     * @brief Start event for the form manager service.
      */
     void OnStart() override;
     /**
-     * @brief Stop envent for the form manager service.
+     * @brief Stop event for the form manager service.
      */
     void OnStop() override;
 
@@ -127,7 +126,7 @@ public:
 
     /**
      * @brief lifecycle update.
-     * @param formIds formIds of hostclient.
+     * @param formIds formIds of host client.
      * @param callerToken Caller ability token.
      * @param updateType update type,enable or disable.
      * @return Returns true on success, false on failure.
@@ -363,27 +362,17 @@ private:
     void HiDumpFormInfoByBundleName(const std::string &args, std::string &result);
     void HiDumpFormInfoByFormId(const std::string &args, std::string &result);
 private:
+    static const int32_t ENABLE_FORM_UPDATE = 5;
     const static std::map<std::string, DumpKey> dumpKeyMap_;
     using DumpFuncType = void (FormMgrService::*)(const std::string &args, std::string &result);
     std::map<DumpKey, DumpFuncType> dumpFuncMap_;
-
-    ServiceRunningState state_;
-
+    ServiceRunningState state_ = ServiceRunningState::STATE_NOT_START;
     std::shared_ptr<EventRunner> runner_ = nullptr;
     std::shared_ptr<EventHandler> handler_ = nullptr;
     std::shared_ptr<FormSysEventReceiver> formSysEventReceiver_ = nullptr;
-
-    bool resetFlag = false;
-
     mutable std::mutex instanceMutex_;
-
-    sptr<IRemoteObject> remote = nullptr;
-
-    static const int32_t ENABLE_FORM_UPDATE = 5;
-
     DISALLOW_COPY_AND_MOVE(FormMgrService);
 };
-static bool resetFlag = false;
 }  // namespace AppExecFwk
 }  // namespace OHOS
-#endif  // FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_MGR_SERVICE_H
+#endif  // FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_MGR_SERVICE_H

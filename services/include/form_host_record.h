@@ -13,16 +13,14 @@
  * limitations under the License.
  */
 
-#ifndef FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_HOST_RECORD_H
-#define FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_HOST_RECORD_H
+#ifndef FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_HOST_RECORD_H
+#define FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_HOST_RECORD_H
 
-#include <stdint.h>
 #include <unordered_map>
 #include <vector>
 #include "form_host_callback.h"
 #include "form_item_info.h"
 #include "form_record.h"
-#include "form_state_info.h"
 #include "hilog_wrapper.h"
 #include "iremote_object.h"
 
@@ -79,9 +77,9 @@ public:
     /**
      * @brief Set Update enable flag.
      * @param formId The Id of the form.
-     * @param flag True for enable, false for disable.
+     * @param enable True for enable, false for disable.
      */
-    void SetEnableUpdate(int64_t formId, bool flag);
+    void SetEnableUpdate(int64_t formId, bool enable);
 
     /**
      * @brief update enable or not.
@@ -119,8 +117,7 @@ public:
     /**
      * Send form uninstall message to form host.
      *
-     * @param id The Id of the form.
-     * @param record Form record.
+     * @param formIds the uninstalled form id list.
      */
     void OnFormUninstalled(std::vector<int64_t> &formIds);
     /**
@@ -133,50 +130,48 @@ public:
 
     /**
      * @brief Release resource.
-     * @param id The Id of the form.
-     * @param record Form record.
      */
     void CleanResource();
     /**
-     * @brief Get callerUid_.
-     * @return callerUid_.
+     * @brief Get caller Uid.
+     * @return the caller Uid.
      */
     int GetCallerUid() const
     {
         return callerUid_;
     }
     /**
-     * @brief Get clientStub_.
-     * @return clientStub_.
+     * @brief Get client stub.
+     * @return client stub.
      */
-    sptr<IRemoteObject> GetClientStub() const;
+    sptr<IRemoteObject> GetFormHostClient() const;
     /**
-     * @brief Get deathRecipient_.
-     * @return deathRecipient_.
+     * @brief Get death recipient.
+     * @return death recipient.
      */
     sptr<IRemoteObject::DeathRecipient> GetDeathRecipient() const;
     /**
-     * @brief Set value of callerUid_.
+     * @brief Set value of caller uid.
      * @param callerUid Caller uid.
      */
     void SetCallerUid(const int callerUid);
     /**
-     * @brief Set value of clientStub_.
-     * @param clientStub remote object.
+     * @brief Set value of client stub.
+     * @param formHostClient remote object.
      */
-    void SetClientStub(const sptr<IRemoteObject> &clientStub);
+    void SetFormHostClient(const sptr<IRemoteObject> &formHostClient);
     /**
-     * @brief Set value of clientImpl_.
-     * @param clientImpl Form host callback object.
+     * @brief Set value of formHostCallback_.
+     * @param formHostCallback Form host callback object.
      */
-    void SetClientImpl(const std::shared_ptr<FormHostCallback> &clientImpl);
+    void SetCallback(const std::shared_ptr<FormHostCallback> &formHostCallback);
     /**
      * @brief Set value of deathRecipient_.
-     * @param clientImpl DeathRecipient object.
+     * @param formHostCallback DeathRecipient object.
      */
     void SetDeathRecipient(const sptr<IRemoteObject::DeathRecipient> &deathRecipient);
     /**
-     * @brief Add deathRecipient object to clientStub_.
+     * @brief Add deathRecipient object to formHostClient_.
      * @param deathRecipient DeathRecipient object.
      */
     void AddDeathRecipient(const sptr<IRemoteObject::DeathRecipient>& deathRecipient);
@@ -193,8 +188,8 @@ public:
 
 private:
     int callerUid_ = 0;
-    sptr<IRemoteObject> clientStub_ = nullptr;
-    std::shared_ptr<FormHostCallback>  clientImpl_ = nullptr;
+    sptr<IRemoteObject> formHostClient_ = nullptr;
+    std::shared_ptr<FormHostCallback> formHostCallback_ = nullptr;
     sptr<IRemoteObject::DeathRecipient> deathRecipient_ = nullptr;
     std::unordered_map<int64_t, bool> forms_;
     std::unordered_map<int64_t, bool> enableUpdateMap_;
@@ -222,4 +217,4 @@ private:
 }  // namespace AppExecFwk
 }  // namespace OHOS
 
-#endif // FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_HOST_RECORD_H
+#endif // FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_HOST_RECORD_H

@@ -13,20 +13,13 @@
  * limitations under the License.
  */
 
-#ifndef FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_TIMER_MGR_H
-#define FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_TIMER_MGR_H
+#ifndef FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_TIMER_MGR_H
+#define FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_TIMER_MGR_H
 
-#include <array>
-#include <chrono>
-#include <ctime>
-#include <limits.h>
 #include <list>
 #include <map>
 #include <mutex>
 #include <singleton.h>
-#include <stdint.h>
-#include <string>
-#include <time.h>
 #include <vector>
 
 #include "common_event_subscriber.h"
@@ -34,8 +27,8 @@
 #include "form_refresh_limiter.h"
 #include "form_timer.h"
 #include "thread_pool.h"
-#include "time_service_client.h"
 #include "timer.h"
+#include "want_agent.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -115,7 +108,7 @@ public:
      * @param formId The Id of the form.
      * @return true or false.
      */
-    void MarkRemind(const int64_t  formId);
+    void MarkRemind(const int64_t formId);
 
     /**
      * @brief Handle system time changed.
@@ -128,7 +121,7 @@ public:
      */
     bool HandleResetLimiter();
     /**
-     * @brief Update attime trigger.
+     * @brief Update at time trigger.
      * @param updateTime Update time.
      * @return Returns true on success, false on failure.
      */
@@ -142,18 +135,21 @@ public:
     /**
      * @brief Get interval timer task.
      * @param formId The Id of the form.
+     * @param formTimer update timer.
      * @return Returns true on success, false on failure.
      */
     bool GetIntervalTimer(const int64_t formId, FormTimer &formTimer);
     /**
      * @brief Get update at timer.
      * @param formId The Id of the form.
+     * @param updateAtItem update timer.
      * @return Returns true on success, false on failure.
      */
     bool GetUpdateAtTimer(const int64_t formId, UpdateAtItem &updateAtItem);
     /**
      * @brief Get dynamic refresh item.
      * @param formId The Id of the form.
+     * @param dynamicItem update timer.
      * @return Returns true on success, false on failure.
      */
     bool GetDynamicItem(const int64_t formId, DynamicRefreshItem &dynamicItem);
@@ -172,7 +168,7 @@ private:
     bool AddUpdateAtTimer(const FormTimer &task);
     /**
      * @brief Add update at timer item.
-     * @param task Update at timer item.
+     * @param atItem Update at timer item.
      */
     void AddUpdateAtItem(const UpdateAtItem &atItem);
     /**
@@ -267,7 +263,7 @@ private:
      */
     void ClearDynamicResource();
     /**
-     * @brief Fint next at timer item.
+     * @brief Find next at timer item.
      * @param nowTime Update time.
      * @param updateAtItem Next at timer item.
      * @return Returns true on success, false on failure.
@@ -354,10 +350,9 @@ private:
         }
     } CompareDynamicRefreshItem;
 
-    mutable std::mutex intervalMutex_;
-    mutable std::mutex updateAtMutex_;
-    mutable std::mutex dynamicMutex_;
-    mutable std::mutex refreshMutex_;
+    mutable std::recursive_mutex intervalMutex_;
+    mutable std::recursive_mutex updateAtMutex_;
+    mutable std::recursive_mutex dynamicMutex_;
     FormRefreshLimiter refreshLimiter_;
     std::map<int64_t, FormTimer> intervalTimerTasks_;
     std::list<UpdateAtItem> updateAtTimerTasks_;
@@ -380,4 +375,4 @@ private:
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
-#endif // FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_TIMER_MGR_H
+#endif // FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_TIMER_MGR_H

@@ -26,7 +26,7 @@ struct FormInfoStorage {
     std::vector<AppExecFwk::FormInfo> formInfos;
 
     FormInfoStorage() = default;
-    FormInfoStorage(int32_t userId, std::vector<AppExecFwk::FormInfo> &formInfos);
+    FormInfoStorage(int32_t userId, const std::vector<AppExecFwk::FormInfo> &formInfos);
     ~FormInfoStorage() = default;
 
     void GetAllFormsInfo(int32_t userId, std::vector<AppExecFwk::FormInfo> &formInfos) const;

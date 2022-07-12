@@ -17,14 +17,12 @@
 
 #include <cinttypes>
 
-#include "appexecfwk_errors.h"
 #include "form_ams_helper.h"
 #include "form_constants.h"
 #include "form_mgr_errors.h"
 #include "form_provider_mgr.h"
 #include "form_util.h"
 #include "hilog_wrapper.h"
-#include "string_ex.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -59,15 +57,15 @@ int FormSupplyCallback::OnAcquire(const FormProviderInfo &formProviderInfo, cons
         return errCode;
     }
 
-    std::string strFormId  = want.GetStringParam(Constants::PARAM_FORM_IDENTITY_KEY);
+    std::string strFormId = want.GetStringParam(Constants::PARAM_FORM_IDENTITY_KEY);
     if (strFormId.empty()) {
         HILOG_ERROR("%{public}s error, formId is empty.", __func__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     int64_t formId = std::stoll(strFormId);
     int type = want.GetIntParam(Constants::ACQUIRE_TYPE, 0);
-    HILOG_DEBUG("%{public}s come: %{public}" PRId64 ", %{public}ld, %{public}d", __func__,
-    formId, connectId, type);
+    HILOG_DEBUG("%{public}s come: %{public}" PRId64 ", %{public}ld, %{public}d",
+        __func__, formId, connectId, type);
     RemoveConnection(connectId);
 
     switch (type) {
@@ -106,15 +104,15 @@ int FormSupplyCallback::OnEventHandle(const Want &want)
  * @param want input data.
  * @return Returns ERR_OK on success, others on failure.
  */
-int FormSupplyCallback::OnAcquireStateResult(FormState state, const std::string &provider, const Want &wantArg,
-                                             const Want &want)
+int FormSupplyCallback::OnAcquireStateResult(FormState state,
+    const std::string &provider, const Want &wantArg, const Want &want)
 {
     HILOG_INFO("%{public}s called.", __func__);
     long connectId = want.GetLongParam(Constants::FORM_CONNECT_ID, 0);
     RemoveConnection(connectId);
 
     ErrCode errCode = FormProviderMgr::GetInstance().AcquireFormStateBack(state, provider, wantArg);
-    HILOG_INFO("%{public}s end.", __func__);
+    HILOG_INFO("%{public}s end, errCode:%{public}d.", __func__, errCode);
     return errCode;
 }
 
@@ -125,8 +123,8 @@ int FormSupplyCallback::OnAcquireStateResult(FormState state, const std::string 
 void FormSupplyCallback::AddConnection(sptr<FormAbilityConnection> connection)
 {
     HILOG_INFO("%{public}s called.", __func__);
-    std::lock_guard<std::mutex> lock_l(conMutex_);
     long connectKey = FormUtil::GetCurrentMillisecond();
+    std::lock_guard<std::mutex> lock_l(conMutex_);
     while (connections_.find(connectKey) != connections_.end()) {
         connectKey++;
     }
@@ -153,11 +151,11 @@ void FormSupplyCallback::RemoveConnection(long connectId)
     }
 
     if (connection != nullptr) {
-        if (CanDisConnect(connection)) {
-            FormAmsHelper::GetInstance().DisConnectServiceAbility(connection);
+        if (CanDisconnect(connection)) {
+            FormAmsHelper::GetInstance().DisconnectServiceAbility(connection);
             HILOG_INFO("%{public}s end, disconnect service ability", __func__);
         } else {
-            FormAmsHelper::GetInstance().DisConnectServiceAbilityDelay(connection);
+            FormAmsHelper::GetInstance().DisconnectServiceAbilityDelay(connection);
             HILOG_INFO("%{public}s end, disconnect service ability delay", __func__);
         }
     }
@@ -167,10 +165,11 @@ void FormSupplyCallback::RemoveConnection(long connectId)
  * @brief check if disconnect ability or not.
  * @param connection The ability connection.
  */
-bool FormSupplyCallback::CanDisConnect(sptr<FormAbilityConnection> &connection)
+bool FormSupplyCallback::CanDisconnect(sptr<FormAbilityConnection> &connection)
 {
     HILOG_INFO("%{public}s called.", __func__);
     int count = 0;
+    std::lock_guard<std::mutex> lock_l(conMutex_);
     for (auto &conn : connections_) {
         if (connection->GetProviderKey() == conn.second->GetProviderKey()) {
             HILOG_INFO("%{public}s, key: %{public}s", __func__, conn.second->GetProviderKey().c_str());
@@ -181,7 +180,7 @@ bool FormSupplyCallback::CanDisConnect(sptr<FormAbilityConnection> &connection)
             }
         }
     }
-    HILOG_INFO("%{public}s end, false.", __func__);
+    HILOG_INFO("%{public}s end, false count:%{public}d.", __func__, count);
     return false;
 }
 }  // namespace AppExecFwk

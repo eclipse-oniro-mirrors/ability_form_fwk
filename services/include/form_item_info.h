@@ -13,14 +13,13 @@
  * limitations under the License.
  */
 
-#ifndef FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_CONFIG_INFO_H
-#define FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_CONFIG_INFO_H
+#ifndef FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_CONFIG_INFO_H
+#define FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_CONFIG_INFO_H
 
-#include <stdint.h>
 #include <string>
-#include <vector>
 #include <unordered_map>
-#include "form_info_base.h"
+#include <vector>
+
 #include "form_record.h"
 
 namespace OHOS {
@@ -56,7 +55,7 @@ public:
      * @brief Set value of providerBundleName_.
      * @param providerBundleName Provider bundle Name.
      */
-    void SetProviderBundleName(const std::string &providerBundleName_);
+    void SetProviderBundleName(const std::string &providerBundleName);
     /**
      * @brief Get hostBundleName_.
      * @return hostBundleName_.
@@ -66,7 +65,7 @@ public:
      * @brief Set value of hostBundleName_.
      * @param hostBundleName_ Host bundle Name.
      */
-    void SetHostBundleName(const std::string &hostBundleName_);
+    void SetHostBundleName(const std::string &hostBundleName);
     /**
      * @brief Get moduleName_.
      * @return moduleName_.
@@ -129,15 +128,15 @@ public:
     void SetSpecificationId(const int specificationId);
 
     /**
-     * @brief Obtains the updageFlag.
-     * @return Returns updageFlag.
+     * @brief Obtains the updateFlag.
+     * @return Returns updateFlag.
      */
     bool IsEnableUpdateFlag() const;
     /**
      * @brief Set value of updateFlag_.
-     * @param IsEnableUpdateFlag Enable update flag or not.
+     * @param isEnableUpdateFlag Enable update flag or not.
      */
-    void SetEnableUpdateFlag(bool IsEnableUpdateFlag);
+    void SetEnableUpdateFlag(bool isEnableUpdateFlag);
     /**
      * @brief Get updateDuration_.
      * @return updateDuration_.
@@ -330,4 +329,4 @@ private:
 } // namespace AppExecFwk
 } // namespace OHOS
 
-#endif // FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_CONFIG_INFO_H
+#endif // FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_CONFIG_INFO_H

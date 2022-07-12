@@ -54,7 +54,7 @@ void FmsFormDbRecordTest::InitFormRecord()
     formRecord_.updateAtMin = 0;
     formRecord_.hapSourceDirs.emplace_back("hapSourceDirs1");
     formRecord_.formName = "formNameTest";
-    formRecord_.formTempFlg = false;
+    formRecord_.formTempFlag = false;
     formRecord_.formUserUids.emplace_back(1);
     formRecord_.formVisibleNotify = false;
     formRecord_.formVisibleNotifyState = 0;

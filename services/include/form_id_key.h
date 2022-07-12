@@ -13,8 +13,8 @@
 * limitations under the License.
 */
 
-#ifndef FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_ID_KEY_H
-#define FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_ID_KEY_H
+#ifndef FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_ID_KEY_H
+#define FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_ID_KEY_H
 
 #include <string>
 
@@ -23,7 +23,7 @@ namespace AppExecFwk {
 struct FormIdKey {
 public:
     FormIdKey(std::string &bundleName, std::string &abilityName)
-        : bundleName(bundleName), moduleName(), abilityName(abilityName), formName(), specificationId(0), orientation(0)
+        : bundleName(bundleName), abilityName(abilityName)
     {
     }
 
@@ -31,8 +31,8 @@ public:
     std::string moduleName;
     std::string abilityName;
     std::string formName;
-    int specificationId;
-    int orientation;
+    int specificationId = 0;
+    int orientation = 0;
 
     bool operator== (const FormIdKey &formIdKey) const
     {
@@ -69,4 +69,4 @@ public:
 }  // namespace AppExecFwk
 }  // namespace OHOS
 
-#endif // FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_ID_KEY_H
+#endif // FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_ID_KEY_H

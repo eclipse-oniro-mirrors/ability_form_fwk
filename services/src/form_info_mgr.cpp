@@ -15,8 +15,6 @@
 
 #include "form_info_mgr.h"
 
-#include <utility>
-
 #include "bundle_mgr_client.h"
 #include "extension_form_profile.h"
 #include "form_bms_helper.h"
@@ -46,7 +44,7 @@ ErrCode FormInfoHelper::LoadFormConfigInfoByBundleName(const std::string &bundle
 
     sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
     if (iBundleMgr == nullptr) {
-        HILOG_ERROR("GetBundleMgr, failed to get IBundleMgr.");
+        HILOG_ERROR("failed to get IBundleMgr.");
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
 
@@ -56,14 +54,14 @@ ErrCode FormInfoHelper::LoadFormConfigInfoByBundleName(const std::string &bundle
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
 
-    ErrCode errCode = LoadAbilityFormConfigInfo(bundleInfo, formInfos);
-    if (errCode != ERR_OK) {
-        HILOG_ERROR("failed to load FA form config info, error code=%{public}d.", errCode);
+    // Check if current bundle contains FA forms.
+    if (LoadAbilityFormConfigInfo(bundleInfo, formInfos) != ERR_OK) {
+        HILOG_INFO("No fa form config info found for %{public}s.", bundleName.c_str());
     }
 
-    errCode = LoadStageFormConfigInfo(bundleInfo, formInfos);
-    if (errCode != ERR_OK) {
-        HILOG_ERROR("failed to load stage form config info, error code=%{public}d.", errCode);
+    // Check if current bundle contains Stage forms.
+    if (LoadStageFormConfigInfo(bundleInfo, formInfos) != ERR_OK) {
+        HILOG_INFO("No stage form config info found for %{public}s.", bundleName.c_str());
     }
 
     return ERR_OK;
@@ -127,7 +125,7 @@ ErrCode FormInfoHelper::LoadAbilityFormConfigInfo(const BundleInfo &bundleInfo, 
     return ERR_OK;
 }
 
-BundleFormInfo::BundleFormInfo(std::string bundleName) : bundleName_(std::move(bundleName))
+BundleFormInfo::BundleFormInfo(const std::string &bundleName) : bundleName_(bundleName)
 {
 }
 
@@ -153,6 +151,7 @@ ErrCode BundleFormInfo::UpdateStaticFormInfos(int32_t userId)
     std::vector<FormInfo> formInfos;
     ErrCode errCode = FormInfoHelper::LoadFormConfigInfoByBundleName(bundleName_, formInfos, userId);
     if (errCode != ERR_OK) {
+        HILOG_ERROR("LoadFormConfigInfoByBundleName failed, errCode:%{public}d.", errCode);
         return errCode;
     }
 
@@ -259,6 +258,7 @@ ErrCode BundleFormInfo::RemoveAllDynamicFormsInfo(int32_t userId)
         }
         for (auto item = formInfoStorage.formInfos.begin(); item != formInfoStorage.formInfos.end();) {
             if (!item->isStatic) {
+                ++numRemoved;
                 item = formInfoStorage.formInfos.erase(item);
             } else {
                 ++item;
@@ -273,7 +273,7 @@ ErrCode BundleFormInfo::RemoveAllDynamicFormsInfo(int32_t userId)
     return ERR_OK;
 }
 
-bool BundleFormInfo::Empty()
+bool BundleFormInfo::Empty() const
 {
     std::shared_lock<std::shared_timed_mutex> guard(formInfosMutex_);
     return formInfoStorages_.empty();
@@ -327,13 +327,13 @@ FormInfoMgr::~FormInfoMgr() = default;
 ErrCode FormInfoMgr::Start()
 {
     std::vector<std::pair<std::string, std::string>> formInfoStorages;
-    std::unique_lock<std::shared_timed_mutex> guard(bundleFormInfoMapMutex_);
     ErrCode errCode = FormInfoStorageMgr::GetInstance().LoadFormInfos(formInfoStorages);
     if (errCode != ERR_OK) {
-        HILOG_ERROR("LoadFormData failed.");
+        HILOG_ERROR("LoadFormInfos failed.");
         return errCode;
     }
 
+    std::unique_lock<std::shared_timed_mutex> guard(bundleFormInfoMapMutex_);
     for (const auto &item: formInfoStorages) {
         const std::string &bundleName = item.first;
         const std::string &formInfoStoragesJson = item.second;
@@ -342,7 +342,7 @@ ErrCode FormInfoMgr::Start()
         if (errCode != ERR_OK) {
             continue;
         }
-        HILOG_ERROR("load bundle %{public}s form infos success.", bundleName.c_str());
+        HILOG_INFO("load bundle %{public}s form infos success.", bundleName.c_str());
         bundleFormInfoMap_[bundleName] = bundleFormInfoPtr;
     }
     HILOG_INFO("load bundle form infos from db done.");
@@ -411,13 +411,13 @@ ErrCode FormInfoMgr::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
     bool hasPermission = CheckBundlePermission();
     std::shared_lock<std::shared_timed_mutex> guard(bundleFormInfoMapMutex_);
     if (hasPermission) {
-        for (const auto &bundleFormInfo: bundleFormInfoMap_) {
+        for (const auto &bundleFormInfo : bundleFormInfoMap_) {
             if (bundleFormInfo.second != nullptr) {
                 bundleFormInfo.second->GetAllFormsInfo(formInfos);
             }
         }
     } else {
-        for (const auto &bundleFormInfo: bundleFormInfoMap_) {
+        for (const auto &bundleFormInfo : bundleFormInfoMap_) {
             if (IsCaller(bundleFormInfo.first)) {
                 if (bundleFormInfo.second != nullptr) {
                     bundleFormInfo.second->GetAllFormsInfo(formInfos);
@@ -462,6 +462,7 @@ ErrCode FormInfoMgr::GetFormsInfoByModule(const std::string &bundleName, const s
     }
 
     if (!CheckBundlePermission() && !IsCaller(bundleName)) {
+        HILOG_ERROR("CheckBundlePermission and IsCaller failed.");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
     }
 
@@ -510,7 +511,7 @@ ErrCode FormInfoMgr::AddDynamicFormInfo(FormInfo &formInfo, int32_t userId)
 {
     sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
     if (iBundleMgr == nullptr) {
-        HILOG_ERROR("GetBundleMgr, failed to get IBundleMgr.");
+        HILOG_ERROR("failed to get IBundleMgr.");
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
 
@@ -523,6 +524,7 @@ ErrCode FormInfoMgr::AddDynamicFormInfo(FormInfo &formInfo, int32_t userId)
 
     ErrCode errCode = CheckDynamicFormInfo(formInfo, bundleInfo);
     if (errCode != ERR_OK) {
+        HILOG_ERROR("failed to CheckDynamicFormInfo.");
         return errCode;
     }
 
@@ -587,10 +589,11 @@ std::shared_ptr<BundleFormInfo> FormInfoMgr::GetOrCreateBundleFromInfo(const std
     return bundleFormInfoPtr;
 }
 
-bool FormInfoMgr::IsCaller(std::string bundleName)
+bool FormInfoMgr::IsCaller(const std::string& bundleName)
 {
     auto bms = FormBmsHelper::GetInstance().GetBundleMgr();
-    if (!bms) {
+    if (bms == nullptr) {
+        HILOG_ERROR("Failed to get Bundle Mgr.");
         return false;
     }
     AppExecFwk::BundleInfo bundleInfo;
@@ -627,14 +630,13 @@ ErrCode FormInfoMgr::ReloadFormInfos(const int32_t userId)
     HILOG_INFO("ReloadFormInfos userId: %{public}d.", userId);
     sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
     if (iBundleMgr == nullptr) {
-        HILOG_ERROR("GetBundleMgr, failed to get IBundleMgr.");
+        HILOG_ERROR("failed to get IBundleMgr.");
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
 
-    std::unique_lock<std::shared_timed_mutex> guard(bundleFormInfoMapMutex_);
     std::vector<ApplicationInfo> appInfos {};
     if (!IN_PROCESS_CALL(iBundleMgr->GetApplicationInfos(GET_BASIC_APPLICATION_INFO, userId, appInfos))) {
-        HILOG_ERROR("failed to get bundle info.");
+        HILOG_ERROR("failed to get Application info.");
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
 
@@ -643,6 +645,7 @@ ErrCode FormInfoMgr::ReloadFormInfos(const int32_t userId)
         bundleNameSet.emplace(appInfo.bundleName);
     }
 
+    std::unique_lock<std::shared_timed_mutex> guard(bundleFormInfoMapMutex_);
     for (auto const &bundleFormInfoPair : bundleFormInfoMap_) {
         const std::string &bundleName = bundleFormInfoPair.first;
         auto setFindIter = bundleNameSet.find(bundleName);

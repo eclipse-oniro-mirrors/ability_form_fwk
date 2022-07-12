@@ -160,7 +160,7 @@ HWTEST_F(FmsFormMgrDeathCallbackTest, OnRemoteDied_001, TestSize.Level0)
 
     FormHostRecord hostRecord;
     EXPECT_EQ(true, FormDataMgr::GetInstance().GetFormHostRecord(formId, hostRecord));
-    EXPECT_EQ(true, token_->AsObject() == hostRecord.clientStub_);
+    EXPECT_EQ(true, token_->AsObject() == hostRecord.formHostClient_);
     EXPECT_EQ(true, FormMgr::GetRecoverStatus() == Constants::NOT_IN_RECOVERY);
 
     FormMgr::GetInstance().UnRegisterDeathCallback(deathCallback);

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_INFO_MGR_H
-#define FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_INFO_MGR_H
+#ifndef FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_INFO_MGR_H
+#define FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_INFO_MGR_H
 
 #include <shared_mutex>
 #include <singleton.h>
@@ -40,7 +40,7 @@ private:
 
 class BundleFormInfo {
 public:
-    explicit BundleFormInfo(std::string bundleName);
+    explicit BundleFormInfo(const std::string &bundleName);
 
     ErrCode InitFromJson(const std::string &formInfoStoragesJson);
 
@@ -54,7 +54,7 @@ public:
 
     ErrCode RemoveAllDynamicFormsInfo(int32_t userId);
 
-    bool Empty();
+    bool Empty() const;
 
     ErrCode GetAllFormsInfo(std::vector<FormInfo> &formInfos);
 
@@ -98,7 +98,7 @@ public:
 
 private:
     std::shared_ptr<BundleFormInfo> GetOrCreateBundleFromInfo(const std::string &bundleName);
-    static bool IsCaller(std::string bundleName);
+    static bool IsCaller(const std::string& bundleName);
     static bool CheckBundlePermission();
     static ErrCode CheckDynamicFormInfo(FormInfo &formInfo, const BundleInfo &bundleInfo);
 
@@ -107,4 +107,4 @@ private:
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
-#endif // FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_INFO_MGR_H
+#endif // FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_INFO_MGR_H

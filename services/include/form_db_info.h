@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_INNER_FORM_INFO_H
-#define FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_INNER_FORM_INFO_H
+#ifndef FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_INNER_FORM_INFO_H
+#define FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_INNER_FORM_INFO_H
 
 #include <string>
 
@@ -24,8 +24,8 @@
 namespace OHOS {
 namespace AppExecFwk {
 struct FormDBInfo {
-    int64_t formId;
-    int32_t userId;
+    int64_t formId = -1;
+    int32_t userId = 0;
     std::string formName;
     std::string bundleName;
     std::string moduleName;
@@ -36,11 +36,7 @@ struct FormDBInfo {
      * @brief Constructors
      *
      */
-    FormDBInfo()
-    {
-        formId = -1;
-        userId = 0;
-    }
+    FormDBInfo() = default;
 
     /**
      * @brief Constructors
@@ -160,15 +156,15 @@ public:
     }
     std::string ToString() const
     {
-        nlohmann::json j;
-        j["formId"] = formDBInfo_.formId;
-        j["userId"] = formDBInfo_.userId;
-        j["formName"] = formDBInfo_.formName;
-        j["bundleName"] = formDBInfo_.bundleName;
-        j["moduleName"] = formDBInfo_.moduleName;
-        j["abilityName"] = formDBInfo_.abilityName;
-        j["formUserUids"] = formDBInfo_.formUserUids;
-        return j.dump();
+        nlohmann::json obj;
+        obj["formId"] = formDBInfo_.formId;
+        obj["userId"] = formDBInfo_.userId;
+        obj["formName"] = formDBInfo_.formName;
+        obj["bundleName"] = formDBInfo_.bundleName;
+        obj["moduleName"] = formDBInfo_.moduleName;
+        obj["abilityName"] = formDBInfo_.abilityName;
+        obj["formUserUids"] = formDBInfo_.formUserUids;
+        return obj.dump();
     }
     /**
      * @brief Destructor
@@ -349,4 +345,4 @@ private:
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
-#endif  // FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_INNER_FORM_INFO_H
+#endif  // FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_INNER_FORM_INFO_H

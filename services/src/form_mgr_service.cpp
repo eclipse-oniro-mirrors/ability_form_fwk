@@ -15,20 +15,11 @@
 
 #include "form_mgr_service.h"
 
-#include <functional>
-#include <memory>
-#include <string>
-#include <type_traits>
-#include <unistd.h>
-#include <unordered_map>
-
-#include "appexecfwk_errors.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "form_ams_helper.h"
 #include "form_bms_helper.h"
 #include "form_constants.h"
-#include "form_data_mgr.h"
 #include "form_db_cache.h"
 #include "form_info_mgr.h"
 #include "form_mgr_adapter.h"
@@ -40,7 +31,6 @@
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
 #include "permission_verification.h"
-#include "string_ex.h"
 #include "system_ability_definition.h"
 #include "event_report.h"
 #include "hisysevent.h"
@@ -170,7 +160,6 @@ int FormMgrService::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> 
 /**
  * @brief Update form with formId, send formId to form manager service.
  * @param formId The Id of the form to update.
- * @param bundleName Provider ability bundleName.
  * @param formBindingData Form binding data.
  * @return Returns ERR_OK on success, others on failure.
  */
@@ -220,7 +209,6 @@ int FormMgrService::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
 /**
  * @brief set next refresh time.
  * @param formId The id of the form.
- * @param bundleManager the bundle manager ipc object.
  * @param nextTime next refresh time.
  * @return Returns ERR_OK on success, others on failure.
  */
@@ -229,8 +217,7 @@ int FormMgrService::SetNextRefreshTime(const int64_t formId, const int64_t nextT
     HILOG_INFO("%{public}s called.", __func__);
     AAFWK::EventInfo eventInfo;
     eventInfo.userId = formId;
-    AAFWK::EventReport::SendFormEvent(AAFWK::SET_NEXT_REFRESH_TIME_FORM,
-        HiSysEventType::BEHAVIOR, eventInfo);
+    AAFWK::EventReport::SendFormEvent(AAFWK::SET_NEXT_REFRESH_TIME_FORM, HiSysEventType::BEHAVIOR, eventInfo);
 
     return FormMgrAdapter::GetInstance().SetNextRefreshTime(formId, nextTime);
 }
@@ -250,7 +237,7 @@ ErrCode FormMgrService::RemoveFormInfo(const std::string &moduleName, const std:
 }
 
 ErrCode FormMgrService::RequestPublishForm(Want &want, bool withFormBindingData,
-                                           std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId)
+    std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId)
 {
     HILOG_INFO("%{public}s called.", __func__);
 
@@ -291,15 +278,14 @@ int FormMgrService::CastTempForm(const int64_t formId, const sptr<IRemoteObject>
     }
     AAFWK::EventInfo eventInfo;
     eventInfo.userId = formId;
-    AAFWK::EventReport::SendFormEvent(AAFWK::CASTTEMP_FORM,
-        HiSysEventType::BEHAVIOR, eventInfo);
+    AAFWK::EventReport::SendFormEvent(AAFWK::CASTTEMP_FORM, HiSysEventType::BEHAVIOR, eventInfo);
 
     return FormMgrAdapter::GetInstance().CastTempForm(formId, callerToken);
 }
 
 /**
  * @brief lifecycle update.
- * @param formIds formIds of hostclient.
+ * @param formIds formIds of host client.
  * @param callerToken Caller ability token.
  * @param updateType update type,enable or disable.
  * @return Returns true on success, false on failure.
@@ -379,8 +365,7 @@ int FormMgrService::MessageEvent(const int64_t formId, const Want &want, const s
     eventInfo.bundleName = want.GetElement().GetBundleName();
     eventInfo.moduleName = want.GetStringParam(AppExecFwk::Constants::PARAM_MODULE_NAME_KEY);
     eventInfo.abilityName = want.GetElement().GetAbilityName();
-    AAFWK::EventReport::SendFormEvent(AAFWK::MESSAGE_EVENT_FORM,
-        HiSysEventType::BEHAVIOR, eventInfo);
+    AAFWK::EventReport::SendFormEvent(AAFWK::MESSAGE_EVENT_FORM, HiSysEventType::BEHAVIOR, eventInfo);
     return FormMgrAdapter::GetInstance().MessageEvent(formId, want, callerToken);
 }
 
@@ -403,8 +388,7 @@ int FormMgrService::RouterEvent(const int64_t formId, Want &want)
     eventInfo.bundleName = want.GetElement().GetBundleName();
     eventInfo.moduleName = want.GetStringParam(AppExecFwk::Constants::PARAM_MODULE_NAME_KEY);
     eventInfo.abilityName = want.GetElement().GetAbilityName();
-    AAFWK::EventReport::SendFormEvent(AAFWK::ROUTE_EVENT_FORM,
-        HiSysEventType::BEHAVIOR, eventInfo);
+    AAFWK::EventReport::SendFormEvent(AAFWK::ROUTE_EVENT_FORM, HiSysEventType::BEHAVIOR, eventInfo);
     return FormMgrAdapter::GetInstance().RouterEvent(formId, want);
 }
 
@@ -426,7 +410,7 @@ int FormMgrService::ClearFormRecords()
     return FormMgrAdapter::GetInstance().ClearFormRecords();
 }
 /**
- * @brief Start envent for the form manager service.
+ * @brief Start event for the form manager service.
  */
 void FormMgrService::OnStart()
 {
@@ -443,11 +427,10 @@ void FormMgrService::OnStart()
     }
 
     state_ = ServiceRunningState::STATE_RUNNING;
-
     HILOG_INFO("Form Mgr Service start success.");
 }
 /**
- * @brief Stop envent for the form manager service.
+ * @brief Stop event for the form manager service.
  */
 void FormMgrService::OnStop()
 {
@@ -470,12 +453,12 @@ ErrCode FormMgrService::Init()
 {
     HILOG_INFO("FormMgrService Init start");
     runner_ = EventRunner::Create(NAME_FORM_MGR_SERVICE);
-    if (!runner_) {
+    if (runner_ == nullptr) {
         HILOG_ERROR("%{public}s fail, Failed to init due to create runner error", __func__);
         return ERR_INVALID_OPERATION;
     }
     handler_ = std::make_shared<EventHandler>(runner_);
-    if (!handler_) {
+    if (handler_ == nullptr) {
         HILOG_ERROR("%{public}s fail, Failed to init due to create handler error", __func__);
         return ERR_INVALID_OPERATION;
     }
@@ -525,7 +508,7 @@ ErrCode FormMgrService::CheckFormPermission()
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
 
-    // check if system appint
+    // check if system app
     auto isSystemApp = iBundleMgr->CheckIsSystemAppByUid(IPCSkeleton::GetCallingUid());
     if (!isSystemApp) {
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
@@ -541,7 +524,7 @@ ErrCode FormMgrService::CheckFormPermission()
 }
 
 /**
- * @brief  Add forms to storage for st .
+ * @brief  Add forms to storage for st.
  * @param Want The Want of the form to add.
  * @return Returns ERR_OK on success, others on failure.
  */
@@ -569,8 +552,8 @@ int FormMgrService::DistributedDataDeleteForm(const std::string &formId)
  * @param numFormsDeleted Returns the number of the deleted forms.
  * @return Returns ERR_OK on success, others on failure.
  */
-int FormMgrService::DeleteInvalidForms(const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &callerToken,
-                                       int32_t &numFormsDeleted)
+int FormMgrService::DeleteInvalidForms(const std::vector<int64_t> &formIds,
+    const sptr<IRemoteObject> &callerToken, int32_t &numFormsDeleted)
 {
     HILOG_INFO("%{public}s called.", __func__);
     ErrCode ret = CheckFormPermission();
@@ -579,8 +562,7 @@ int FormMgrService::DeleteInvalidForms(const std::vector<int64_t> &formIds, cons
         return ret;
     }
     AAFWK::EventInfo eventInfo;
-    AAFWK::EventReport::SendFormEvent(AAFWK::DELETE_INVALID_FORM,
-        HiSysEventType::BEHAVIOR, eventInfo);
+    AAFWK::EventReport::SendFormEvent(AAFWK::DELETE_INVALID_FORM, HiSysEventType::BEHAVIOR, eventInfo);
     return FormMgrAdapter::GetInstance().DeleteInvalidForms(formIds, callerToken, numFormsDeleted);
 }
 
@@ -591,7 +573,8 @@ int FormMgrService::DeleteInvalidForms(const std::vector<int64_t> &formIds, cons
   * @param stateInfo Returns the form's state info of the specify.
   * @return Returns ERR_OK on success, others on failure.
   */
-int FormMgrService::AcquireFormState(const Want &want, const sptr<IRemoteObject> &callerToken, FormStateInfo &stateInfo)
+int FormMgrService::AcquireFormState(const Want &want,
+    const sptr<IRemoteObject> &callerToken, FormStateInfo &stateInfo)
 {
     HILOG_INFO("%{public}s called.", __func__);
     ErrCode ret = CheckFormPermission();
@@ -603,8 +586,7 @@ int FormMgrService::AcquireFormState(const Want &want, const sptr<IRemoteObject>
     eventInfo.bundleName = want.GetElement().GetBundleName();
     eventInfo.moduleName = want.GetStringParam(AppExecFwk::Constants::PARAM_MODULE_NAME_KEY);
     eventInfo.abilityName = want.GetElement().GetAbilityName();
-    AAFWK::EventReport::SendFormEvent(AAFWK::ACQUIREFORMSTATE_FORM,
-        HiSysEventType::BEHAVIOR, eventInfo);
+    AAFWK::EventReport::SendFormEvent(AAFWK::ACQUIREFORMSTATE_FORM, HiSysEventType::BEHAVIOR, eventInfo);
     return FormMgrAdapter::GetInstance().AcquireFormState(want, callerToken, stateInfo);
 }
 
@@ -615,8 +597,8 @@ int FormMgrService::AcquireFormState(const Want &want, const sptr<IRemoteObject>
  * @param callerToken Host client.
  * @return Returns ERR_OK on success, others on failure.
  */
-int FormMgrService::NotifyFormsVisible(const std::vector<int64_t> &formIds, bool isVisible,
-                                       const sptr<IRemoteObject> &callerToken)
+int FormMgrService::NotifyFormsVisible(const std::vector<int64_t> &formIds,
+    bool isVisible, const sptr<IRemoteObject> &callerToken)
 {
     HILOG_INFO("%{public}s called.", __func__);
     ErrCode ret = CheckFormPermission();
@@ -634,8 +616,8 @@ int FormMgrService::NotifyFormsVisible(const std::vector<int64_t> &formIds, bool
  * @param callerToken Host client.
  * @return Returns ERR_OK on success, others on failure.
  */
-int FormMgrService::NotifyFormsEnableUpdate(const std::vector<int64_t> &formIds, bool isEnableUpdate,
-                                            const sptr<IRemoteObject> &callerToken)
+int FormMgrService::NotifyFormsEnableUpdate(const std::vector<int64_t> &formIds,
+    bool isEnableUpdate, const sptr<IRemoteObject> &callerToken)
 {
     HILOG_INFO("%{public}s called.", __func__);
     ErrCode ret = CheckFormPermission();
@@ -648,7 +630,7 @@ int FormMgrService::NotifyFormsEnableUpdate(const std::vector<int64_t> &formIds,
 
 /**
  * @brief Get All FormsInfo.
- * @param formInfos Return the forms' information of all forms provided.
+ * @param formInfos Return the form information of all forms provided.
  * @return Returns ERR_OK on success, others on failure.
  */
 int FormMgrService::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
@@ -658,9 +640,9 @@ int FormMgrService::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
 }
 
 /**
- * @brief Get forms info by bundle name .
+ * @brief Get forms info by bundle name.
  * @param bundleName Application name.
- * @param formInfos Return the forms' information of the specify application name.
+ * @param formInfos Return the form information of the specify application name.
  * @return Returns ERR_OK on success, others on failure.
  */
 int FormMgrService::GetFormsInfoByApp(std::string &bundleName, std::vector<FormInfo> &formInfos)
@@ -673,7 +655,7 @@ int FormMgrService::GetFormsInfoByApp(std::string &bundleName, std::vector<FormI
  * @brief Get forms info by bundle name and module name.
  * @param bundleName bundle name.
  * @param moduleName Module name of hap.
- * @param formInfos Return the forms' information of the specify bundle name and module name.
+ * @param formInfos Return the forms information of the specify bundle name and module name.
  * @return Returns ERR_OK on success, others on failure.
  */
 int FormMgrService::GetFormsInfoByModule(std::string &bundleName, std::string &moduleName,
@@ -716,7 +698,7 @@ bool FormMgrService::IsRequestPublishFormSupported()
         HILOG_ERROR("%{public}s error, failed to get IBundleMgr.", __func__);
         return false;
     }
-    // check if system appint
+    // check if system app
     auto isSystemApp = iBundleMgr->CheckIsSystemAppByUid(IPCSkeleton::GetCallingUid());
     if (!isSystemApp) {
         return false;

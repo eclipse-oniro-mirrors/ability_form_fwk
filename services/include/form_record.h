@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_RECORD_H
-#define FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_RECORD_H
+#ifndef FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_RECORD_H
+#define FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_RECORD_H
 
 #include <vector>
 #include "form_info_base.h"
@@ -28,7 +28,7 @@ namespace AppExecFwk {
  */
 class FormRecord {
 public:
-    int64_t formId;
+    int64_t formId = 0;
     bool isInited = false;
     bool needFreeInstall = false;
     bool versionUpgrade = false;
@@ -42,13 +42,13 @@ public:
     int32_t specification;
     bool isEnableUpdate = false;
     bool isVisible = false;
-    long updateDuration = false;
+    int64_t updateDuration = 0;
     int updateAtHour = -1;
     int updateAtMin = -1;
     FormProviderInfo formProviderInfo;
     std::vector<std::string> hapSourceDirs;
     std::string jsFormCodePath = "";
-    bool formTempFlg = false;
+    bool formTempFlag = false;
     std::vector<int> formUserUids;
     bool formVisibleNotify = false;
     int formVisibleNotifyState = 0;
@@ -63,4 +63,4 @@ public:
 }  // namespace AppExecFwk
 }  // namespace OHOS
 
-#endif // FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_RECORD_H
+#endif // FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_RECORD_H

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_UTIL_H
-#define FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_UTIL_H
+#ifndef FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_UTIL_H
+#define FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_UTIL_H
 
 #include "want.h"
 
@@ -34,8 +34,8 @@ public:
      * @param isTemporaryForm temporary form or not.
      * @param want The want of the form.
      */
-    static void CreateFormWant(const std::string &formName, const int32_t specificationId, const bool isTemporaryForm,
-    Want &want);
+    static void CreateFormWant(const std::string &formName, const int32_t specificationId,
+        const bool isTemporaryForm, Want &want);
     /**
      * @brief create default want for form.
      * @param want The want of the form..
@@ -63,7 +63,7 @@ public:
      * @param udidHash udid hash.
      * @return new form id.
      */
-    static int64_t PaddingUDIDHash(uint64_t formId, uint64_t udidHash);
+    static int64_t PaddingUdidHash(uint64_t formId, uint64_t udidHash);
 
     /**
      * @brief create udid hash.
@@ -104,4 +104,4 @@ public:
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
-#endif  // FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_UTIL_H
+#endif  // FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_UTIL_H

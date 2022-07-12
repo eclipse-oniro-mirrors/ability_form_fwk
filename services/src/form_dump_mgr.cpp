@@ -12,9 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#include "form_dump_mgr.h"
+
 #include "form_cache_mgr.h"
 #include "hilog_wrapper.h"
-#include "form_dump_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -65,12 +67,12 @@ void FormDumpMgr::DumpFormInfos(const std::vector<FormRecord> &formRecordInfos, 
         formInfos += "    updateDuration [" + std::to_string(info.updateDuration) + "]\n";
         formInfos += "    updateAtHour [" + std::to_string(info.updateAtHour) + "]\n";
         formInfos += "    updateAtMin [" + std::to_string(info.updateAtMin) + "]\n";
-        formInfos += "    formTempFlg [" + std::to_string(info.formTempFlg) + "]\n";
+        formInfos += "    formTempFlag [" + std::to_string(info.formTempFlag) + "]\n";
         formInfos += "    formVisibleNotify [" + std::to_string(info.formVisibleNotify) + "]\n";
         formInfos += "    formVisibleNotifyState [" + std::to_string(info.formVisibleNotifyState) + "]\n";
         formInfos += "    userId [" + std::to_string(info.userId) + "]\n";
 
-        if (info.hapSourceDirs.size() > 0) {
+        if (!info.hapSourceDirs.empty()) {
             formInfos += "    hapSourceDirs [";
             for (auto &hapDir : info.hapSourceDirs) {
                 formInfos += " hapSourceDir[" + hapDir + "]";
@@ -78,7 +80,7 @@ void FormDumpMgr::DumpFormInfos(const std::vector<FormRecord> &formRecordInfos, 
             formInfos += "]\n";
         }
 
-        if (info.formUserUids.size() > 0) {
+        if (!info.formUserUids.empty()) {
             formInfos += "    formUserUids [";
             for (auto &uId : info.formUserUids) {
                 formInfos += " Uid[" + std::to_string(uId) + "] ";
@@ -133,7 +135,7 @@ void FormDumpMgr::DumpFormInfo(const FormRecord &formRecordInfo, std::string &fo
     formInfo += "    updateDuration [" + std::to_string(formRecordInfo.updateDuration) + "]\n";
     formInfo += "    updateAtHour [" + std::to_string(formRecordInfo.updateAtHour) + "]\n";
     formInfo += "    updateAtMin [" + std::to_string(formRecordInfo.updateAtMin) + "]\n";
-    formInfo += "    formTempFlg [" + std::to_string(formRecordInfo.formTempFlg) + "]\n";
+    formInfo += "    formTempFlag [" + std::to_string(formRecordInfo.formTempFlag) + "]\n";
     formInfo += "    formVisibleNotify [" + std::to_string(formRecordInfo.formVisibleNotify) + "]\n";
     formInfo += "    formVisibleNotifyState [" + std::to_string(formRecordInfo.formVisibleNotifyState) + "]\n";
     formInfo += "    formSrc [" + formRecordInfo.formSrc + "]\n";
@@ -145,7 +147,7 @@ void FormDumpMgr::DumpFormInfo(const FormRecord &formRecordInfo, std::string &fo
     formInfo += "    icon [" + formRecordInfo.icon + "]\n";
     formInfo += "    userId [" + std::to_string(formRecordInfo.userId) + "]\n";
 
-    if (formRecordInfo.hapSourceDirs.size() > 0) {
+    if (!formRecordInfo.hapSourceDirs.empty()) {
         formInfo += "    hapSourceDirs [";
         for (auto &hapDir : formRecordInfo.hapSourceDirs) {
             formInfo += " hapSourceDir[" + hapDir + "] ";
@@ -153,7 +155,7 @@ void FormDumpMgr::DumpFormInfo(const FormRecord &formRecordInfo, std::string &fo
         formInfo += "]\n";
     }
 
-    if (formRecordInfo.formUserUids.size() > 0) {
+    if (!formRecordInfo.formUserUids.empty()) {
         formInfo += "    formUserUids [";
         for (auto &uId : formRecordInfo.formUserUids) {
             formInfo += " Uid[" + std::to_string(uId) + "] ";

@@ -17,7 +17,6 @@
 
 #include <cinttypes>
 
-#include "appexecfwk_errors.h"
 #include "form_bms_helper.h"
 #include "form_data_mgr.h"
 #include "form_db_info.h"
@@ -31,7 +30,6 @@ FormDbCache::FormDbCache()
 {
     HILOG_INFO("FormDbCache is created");
     dataStorage_ = std::make_shared<FormStorageMgr>();
-    formDBInfos_.clear();
 }
 
 FormDbCache::~FormDbCache()
@@ -267,7 +265,7 @@ ErrCode FormDbCache::GetNoHostDBForms(const int uid, std::map<FormIdKey,
  */
 int FormDbCache::GetMatchCount(const std::string &bundleName, const std::string &moduleName)
 {
-    int32_t matchCount {0};
+    int32_t matchCount = 0;
     std::vector<FormDBInfo> formDBInfos;
     std::lock_guard<std::mutex> lock(formDBInfosMutex_);
     for (FormDBInfo &dbInfo : formDBInfos_) {

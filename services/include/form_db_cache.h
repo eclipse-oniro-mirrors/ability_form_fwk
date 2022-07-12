@@ -13,15 +13,14 @@
  * limitations under the License.
  */
 
-#ifndef FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_DB_CACHE_H
-#define FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_DB_CACHE_H
+#ifndef FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_DB_CACHE_H
+#define FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_DB_CACHE_H
 
 #include <mutex>
 #include <set>
 #include <singleton.h>
 #include <vector>
 
-#include "appexecfwk_errors.h"
 #include "form_id_key.h"
 #include "form_record.h"
 #include "form_storage_mgr.h"
@@ -35,14 +34,12 @@ public:
 
     /**
      * @brief Load form data from DB to DbCache when starting.
-     * @return Void.
      */
     void Start();
 
     /**
      * @brief Get all form data from DbCache.
      * @param formDBInfos Storage all DbCache.
-     * @return Void
      */
     void GetAllFormInfo(std::vector<FormDBInfo> &formDBInfos);
 
@@ -52,13 +49,6 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode SaveFormInfo(const FormDBInfo &formDBInfo);
-
-    /**
-     * @brief Save or update form data to DbCache and DB.
-     * @param formDBInfo Form data.
-     * @return Returns ERR_OK on success, others on failure.(NoLock)
-     */
-    ErrCode SaveFormInfoNolock(const FormDBInfo &formDBInfo);
 
     /**
      * @brief Delete form data in DbCache and DB with formId.
@@ -93,7 +83,8 @@ public:
 
     /**
      * @brief Delete form data in DbCache and DB with formId.
-     * @param formId form data Id.
+     * @param bundleName BundleName.
+     * @param userId user ID.
      * @param removedDBForms Removed db form infos
      * @return Returns ERR_OK on success, others on failure.
      */
@@ -123,8 +114,8 @@ public:
      * @return Returns data storage.
      */
     std::shared_ptr<FormStorageMgr> GetDataStorage() const;
-	
-	/**
+
+    /**
      * @brief delete forms bu userId.
      * @param userId user ID.
      */
@@ -162,10 +153,17 @@ public:
     ErrCode DeleteInvalidDBForms(int32_t userId, int32_t callingUid, std::set<int64_t> &matchedFormIds,
                                  std::map<int64_t, bool> &removedFormsMap);
 private:
+    /**
+     * @brief Save or update form data to DbCache and DB.
+     * @param formDBInfo Form data.
+     * @return Returns ERR_OK on success, others on failure.(NoLock)
+     */
+    ErrCode SaveFormInfoNolock(const FormDBInfo &formDBInfo);
+
     std::shared_ptr<FormStorageMgr> dataStorage_;
     mutable std::mutex formDBInfosMutex_;
     std::vector<FormDBInfo> formDBInfos_;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
-#endif  // FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_DB_CACHE_H
+#endif  // FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_DB_CACHE_H

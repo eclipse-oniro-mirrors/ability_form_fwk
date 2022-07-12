@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_TIMER_INFO_H
-#define FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_TIMER_INFO_H
+#ifndef FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_TIMER_INFO_H
+#define FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_TIMER_INFO_H
 
 #include "itimer_info.h"
 
@@ -36,7 +36,7 @@ public:
     void SetCallbackInfo(std::function<void()> callBack);
 
 private:
-    std::function<void()> callBack;
+    std::function<void()> callBack_;
 };
 
 FormTimerOption::FormTimerOption()
@@ -49,14 +49,14 @@ FormTimerOption::~FormTimerOption()
 
 void FormTimerOption::OnTrigger()
 {
-    if (this->callBack) {
-        this->callBack();
+    if (callBack_) {
+        callBack_();
     }
 }
 
 void FormTimerOption::SetCallbackInfo(std::function<void()> callBack)
 {
-    this->callBack = callBack;
+    callBack_ = callBack;
 }
 
 void FormTimerOption::SetType(const int &type)
@@ -80,4 +80,4 @@ void FormTimerOption::SetWantAgent(std::shared_ptr<AbilityRuntime::WantAgent::Wa
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
-#endif // FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_TIMER_INFO_H
+#endif // FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_TIMER_INFO_H

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_TIMER_REFRESH_LIMITER_H
-#define FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_TIMER_REFRESH_LIMITER_H
+#ifndef FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_TIMER_REFRESH_LIMITER_H
+#define FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_TIMER_REFRESH_LIMITER_H
 
 #include <mutex>
 #include <vector>
@@ -24,7 +24,7 @@ namespace OHOS {
 namespace AppExecFwk {
 /**
  * @class FormRefreshLimiter
- * Form refresh limite manager.
+ * Form refresh limit manager.
  */
 class FormRefreshLimiter {
 public:
@@ -87,4 +87,4 @@ private:
 }  // namespace AppExecFwk
 }  // namespace OHOS
 
-#endif // FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_TIMER_REFRESH_LIMITER_H
+#endif // FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_TIMER_REFRESH_LIMITER_H

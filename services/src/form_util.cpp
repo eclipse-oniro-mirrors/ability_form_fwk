@@ -17,9 +17,7 @@
 
 #include <chrono>
 #include <cinttypes>
-#include <ctime>
 #include <regex>
-#include <sys/time.h>
 
 #include "bundle_constants.h"
 #include "form_constants.h"
@@ -31,9 +29,7 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-using namespace std;
-using namespace std::chrono;
-
+namespace {
 constexpr int64_t SEC_TO_NANOSEC = 1000000000;
 constexpr int64_t SEC_TO_MILLISEC = 1000;
 constexpr int64_t MILLISEC_TO_NANOSEC = 1000000;
@@ -41,6 +37,10 @@ constexpr int64_t INVALID_UDID_HASH = 0;
 #ifndef OS_ACCOUNT_PART_ENABLED
 constexpr int32_t DEFAULT_OS_ACCOUNT_ID = 0; // 0 is the default id when there is no os_account part
 #endif // OS_ACCOUNT_PART_ENABLED
+} // namespace
+
+using namespace std;
+using namespace std::chrono;
 
 /**
  * @brief create want for form.
@@ -94,8 +94,8 @@ int64_t FormUtil::GenerateFormId(int64_t udidHash)
     int64_t elapsedTime { ((t.tv_sec) * SEC_TO_NANOSEC + t.tv_nsec) };
     size_t elapsedHash = std::hash<std::string>()(std::to_string(elapsedTime));
     HILOG_INFO("%{public}s, GenerateFormId generate elapsed hash %{public}zu", __func__, elapsedHash);
-    uint64_t unsignedudidHash = static_cast<uint64_t>(udidHash);
-    uint64_t formId = unsignedudidHash | (uint32_t)(elapsedHash & 0x000000007fffffffL);
+    uint64_t unsignedUdidHash = static_cast<uint64_t>(udidHash);
+    uint64_t formId = unsignedUdidHash | (uint32_t)(elapsedHash & 0x000000007fffffffL);
     int64_t ret = static_cast<int64_t>(formId);
     HILOG_INFO("%{public}s, GenerateFormId generate formId %{public}" PRId64 "", __func__, ret);
     return ret;
@@ -107,7 +107,7 @@ int64_t FormUtil::GenerateFormId(int64_t udidHash)
  * @param udidHash udid hash
  * @return new form id.
  */
-int64_t FormUtil::PaddingUDIDHash(uint64_t formId, uint64_t udidHash)
+int64_t FormUtil::PaddingUdidHash(uint64_t formId, uint64_t udidHash)
 {
     // Compatible with int form id.
     if ((formId & 0xffffffff00000000L) == 0) {

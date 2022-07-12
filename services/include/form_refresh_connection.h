@@ -13,10 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_REFRESH_CONNECTION_H
-#define FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_REFRESH_CONNECTION_H
+#ifndef FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_REFRESH_CONNECTION_H
+#define FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_REFRESH_CONNECTION_H
 
-#include "event_handler.h"
 #include "form_ability_connection.h"
 #include "want.h"
 
@@ -40,8 +39,8 @@ public:
      * @param remoteObject the session proxy of service ability.
      * @param resultCode ERR_OK on success, others on failure.
      */
-    void OnAbilityConnectDone(
-        const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode) override;
+    void OnAbilityConnectDone(const AppExecFwk::ElementName &element,
+        const sptr<IRemoteObject> &remoteObject, int resultCode) override;
 
 private:
     Want want_;
@@ -50,4 +49,4 @@ private:
 }  // namespace AppExecFwk
 }  // namespace OHOS
 
-#endif // FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_REFRESH_CONNECTION_H
+#endif // FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_REFRESH_CONNECTION_H
