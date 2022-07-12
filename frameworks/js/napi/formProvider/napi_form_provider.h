@@ -83,15 +83,6 @@ struct AsyncRemoveFormInfoCallbackInfo {
     int32_t result = OHOS::ERR_OK;
 };
 
-struct AsyncGetFormsInfoCallbackInfo : AsyncCallbackInfoBase {
-    int32_t result = OHOS::ERR_OK;
-    std::string moduleName {};
-    std::vector<OHOS::AppExecFwk::FormInfo> formInfos {};
-
-    explicit AsyncGetFormsInfoCallbackInfo(napi_env env) : AsyncCallbackInfoBase(env) {};
-    ~AsyncGetFormsInfoCallbackInfo() override = default;
-};
-
 struct AsyncIsRequestPublishFormSupportedCallbackInfo : AsyncCallbackInfoBase {
     bool result = false;
 
@@ -104,15 +95,6 @@ napi_value NAPI_UpdateForm(napi_env env, napi_callback_info info);
 napi_value NAPI_RequestPublishForm(napi_env env, napi_callback_info info);
 napi_value NAPI_AddFormInfo(napi_env env, napi_callback_info info);
 napi_value NAPI_RemoveFormInfo(napi_env env, napi_callback_info info);
-/**
- * @brief  The implementation of Node-API interface: GetFormsInfo
- *
- * @param[in] env The environment that the Node-API call is invoked under
- * @param[out] info An opaque datatype that is passed to a callback function
- *
- * @return This is an opaque pointer that is used to represent a JavaScript value
- */
-napi_value NAPI_GetFormsInfo(napi_env env, napi_callback_info info);
 
 /**
  * @brief Check if the request to publish a form to the form host is supported.
@@ -124,6 +106,17 @@ napi_value NAPI_GetFormsInfo(napi_env env, napi_callback_info info);
  *         which is true if the request of publishing form is supported and false otherwise
  */
 napi_value NAPI_IsRequestPublishFormSupported(napi_env env, napi_callback_info info);
+
+class JsFormProvider {
+public:
+    JsFormProvider() = default;
+    ~JsFormProvider() = default;
+
+    static void Finalizer(NativeEngine* engine, void* data, void* hint);
+    static NativeValue* GetFormsInfo(NativeEngine* engine, NativeCallbackInfo* info);
+private:
+    NativeValue* OnGetFormsInfo(NativeEngine &engine, NativeCallbackInfo &info);
+};
 }  // namespace AbilityRuntime
 }  // namespace OHOS
 #endif /* NAPI_FORM_PROVIDER_H_ */

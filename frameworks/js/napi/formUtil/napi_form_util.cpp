@@ -389,6 +389,30 @@ AsyncErrMsgCallbackInfo *InitErrMsg(napi_env env, int32_t code, int32_t type, na
     return asyncErrorInfo;
 }
 
+void SetFormInfoPropertyString(napi_env env, const char *inValue, napi_value &result, const char *outName)
+{
+    napi_value temp;
+    napi_create_string_utf8(env, inValue, NAPI_AUTO_LENGTH, &temp);
+    HILOG_DEBUG("%{public}s, %{public}s=%{public}s.", __func__, outName, inValue);
+    napi_set_named_property(env, result, outName, temp);
+}
+
+void SetFormInfoPropertyInt32(napi_env env, int32_t inValue, napi_value &result, const char *outName)
+{
+    napi_value temp;
+    napi_create_int32(env, inValue, &temp);
+    HILOG_DEBUG("%{public}s, %{public}s=%{public}d.", __func__, outName, inValue);
+    napi_set_named_property(env, result, outName, temp);
+}
+
+void SetFormInfoPropertyBoolean(napi_env env, bool inValue, napi_value &result, const char *outName)
+{
+    napi_value temp;
+    napi_get_boolean(env, inValue, &temp);
+    HILOG_DEBUG("%{public}s, %{public}s=%{public}d.", __func__, outName, inValue);
+    napi_set_named_property(env, result, outName, temp);
+}
+
 /**
  * @brief Parse form info into Node-API
  *
@@ -400,103 +424,24 @@ AsyncErrMsgCallbackInfo *InitErrMsg(napi_env env, int32_t code, int32_t type, na
  */
 void ParseFormInfoIntoNapi(napi_env env, const FormInfo &formInfo, napi_value &result)
 {
-    // bundleName
-    napi_value bundleName;
-    napi_create_string_utf8(env, formInfo.bundleName.c_str(), NAPI_AUTO_LENGTH, &bundleName);
-    HILOG_DEBUG("%{public}s, bundleName=%{public}s.", __func__, formInfo.bundleName.c_str());
-    napi_set_named_property(env, result, "bundleName", bundleName);
-
-    // moduleName
-    napi_value moduleName;
-    napi_create_string_utf8(env, formInfo.moduleName.c_str(), NAPI_AUTO_LENGTH, &moduleName);
-    HILOG_DEBUG("%{public}s, moduleName=%{public}s.", __func__, formInfo.moduleName.c_str());
-    napi_set_named_property(env, result, "moduleName", moduleName);
-
-    // abilityName
-    napi_value abilityName;
-    napi_create_string_utf8(env, formInfo.abilityName.c_str(), NAPI_AUTO_LENGTH, &abilityName);
-    HILOG_DEBUG("%{public}s, abilityName=%{public}s.", __func__, formInfo.abilityName.c_str());
-    napi_set_named_property(env, result, "abilityName", abilityName);
-
-    // name
-    napi_value name;
-    napi_create_string_utf8(env, formInfo.name.c_str(), NAPI_AUTO_LENGTH, &name);
-    HILOG_DEBUG("%{public}s, name=%{public}s.", __func__, formInfo.name.c_str());
-    napi_set_named_property(env, result, "name", name);
-
-    // description
-    napi_value description;
-    napi_create_string_utf8(env, formInfo.description.c_str(), NAPI_AUTO_LENGTH, &description);
-    HILOG_DEBUG("%{public}s, description=%{public}s.", __func__, formInfo.description.c_str());
-    napi_set_named_property(env, result, "description", description);
-
-    // descriptionId
-    napi_value descriptionId;
-    napi_create_int32(env, formInfo.descriptionId, &descriptionId);
-    HILOG_DEBUG("%{public}s, descriptionId=%{public}d.", __func__, formInfo.descriptionId);
-    napi_set_named_property(env, result, "descriptionId", descriptionId);
-
-    // type
-    napi_value type;
+    SetFormInfoPropertyString(env, formInfo.bundleName.c_str(), result, "bundleName");
+    SetFormInfoPropertyString(env, formInfo.moduleName.c_str(), result, "moduleName");
+    SetFormInfoPropertyString(env, formInfo.abilityName.c_str(), result, "abilityName");
+    SetFormInfoPropertyString(env, formInfo.name.c_str(), result, "name");
+    SetFormInfoPropertyString(env, formInfo.description.c_str(), result, "description");
+    SetFormInfoPropertyInt32(env, formInfo.descriptionId, result, "descriptionId");
     FormType formType = formInfo.type;
-    napi_create_int32(env, (int32_t)formType, &type);
-    HILOG_DEBUG("%{public}s, formInfo_type=%{public}d.", __func__, (int32_t)formType);
-    napi_set_named_property(env, result, "type", type);
-
-    // jsComponentName
-    napi_value jsComponentName;
-    napi_create_string_utf8(env, formInfo.jsComponentName.c_str(), NAPI_AUTO_LENGTH, &jsComponentName);
-    HILOG_DEBUG("%{public}s, jsComponentName=%{public}s.", __func__, formInfo.jsComponentName.c_str());
-    napi_set_named_property(env, result, "jsComponentName", jsComponentName);
-
-    // colorMode
-    napi_value colorMode;
+    SetFormInfoPropertyInt32(env, (int32_t)formType, result, "type");
+    SetFormInfoPropertyString(env, formInfo.jsComponentName.c_str(), result, "jsComponentName");
     FormsColorMode  formsColorMode = formInfo.colorMode;
-    napi_create_int32(env, (int32_t)formsColorMode, &colorMode);
-    HILOG_DEBUG("%{public}s, formInfo_type=%{public}d.", __func__, (int32_t)formsColorMode);
-    napi_set_named_property(env, result, "colorMode", colorMode);
-
-    // defaultFlag
-    napi_value defaultFlag;
-    napi_get_boolean(env, formInfo.defaultFlag, &defaultFlag);
-    HILOG_DEBUG("%{public}s, defaultFlag=%{public}d.", __func__, formInfo.defaultFlag);
-    napi_set_named_property(env, result, "isDefault", defaultFlag);
-
-    // updateEnabled
-    napi_value updateEnabled;
-    napi_get_boolean(env, formInfo.updateEnabled, &updateEnabled);
-    HILOG_DEBUG("%{public}s, updateEnabled=%{public}d.", __func__, formInfo.updateEnabled);
-    napi_set_named_property(env, result, "updateEnabled", updateEnabled);
-
-    // formVisibleNotify
-    napi_value formVisibleNotify;
-    napi_get_boolean(env, formInfo.formVisibleNotify, &formVisibleNotify);
-    HILOG_DEBUG("%{public}s, formVisibleNotify=%{public}d.", __func__, formInfo.formVisibleNotify);
-    napi_set_named_property(env, result, "formVisibleNotify", formVisibleNotify);
-
-    // formConfigAbility
-    napi_value formConfigAbility;
-    napi_create_string_utf8(env, formInfo.formConfigAbility.c_str(), NAPI_AUTO_LENGTH, &formConfigAbility);
-    HILOG_DEBUG("%{public}s, formConfigAbility=%{public}s.", __func__, formInfo.formConfigAbility.c_str());
-    napi_set_named_property(env, result, "formConfigAbility", formConfigAbility);
-
-    // updateDuration
-    napi_value updateDuration;
-    napi_create_int32(env, formInfo.updateDuration, &updateDuration);
-    HILOG_DEBUG("%{public}s, updateDuration=%{public}d.", __func__, formInfo.updateDuration);
-    napi_set_named_property(env, result, "updateDuration", updateDuration);
-
-    // scheduledUpdateTime
-    napi_value scheduledUpdateTime;
-    napi_create_string_utf8(env, formInfo.scheduledUpdateTime.c_str(), NAPI_AUTO_LENGTH, &scheduledUpdateTime);
-    HILOG_DEBUG("%{public}s, scheduledUpdateTime=%{public}s.", __func__, formInfo.scheduledUpdateTime.c_str());
-    napi_set_named_property(env, result, "scheduledUpdateTime", scheduledUpdateTime);
-
-    // defaultDimension
-    napi_value defaultDimension;
-    napi_create_int32(env, formInfo.defaultDimension, &defaultDimension);
-    HILOG_DEBUG("%{public}s, defaultDimension=%{public}d.", __func__, formInfo.defaultDimension);
-    napi_set_named_property(env, result, "defaultDimension", defaultDimension);
+    SetFormInfoPropertyInt32(env, (int32_t)formsColorMode, result, "colorMode");
+    SetFormInfoPropertyBoolean(env, formInfo.defaultFlag, result, "isDefault");
+    SetFormInfoPropertyBoolean(env, formInfo.updateEnabled, result, "updateEnabled");
+    SetFormInfoPropertyBoolean(env, formInfo.formVisibleNotify, result, "formVisibleNotify");
+    SetFormInfoPropertyString(env, formInfo.formConfigAbility.c_str(), result, "formConfigAbility");
+    SetFormInfoPropertyInt32(env, formInfo.updateDuration, result, "updateDuration");
+    SetFormInfoPropertyString(env, formInfo.scheduledUpdateTime.c_str(), result, "scheduledUpdateTime");
+    SetFormInfoPropertyInt32(env, formInfo.defaultDimension, result, "defaultDimension");
 
     // supportDimensions
     napi_value supportDimensions;
@@ -519,19 +464,10 @@ void ParseFormInfoIntoNapi(napi_env env, const FormInfo &formInfo, napi_value &r
     for (const auto& data : formInfo.customizeDatas) {
         napi_value customizeDataObject = nullptr;
         napi_create_object(env, &customizeDataObject);
-
         // data : name
-        napi_value customizeDataName;
-        napi_create_string_utf8(env, data.name.c_str(), NAPI_AUTO_LENGTH, &customizeDataName);
-        HILOG_DEBUG("%{public}s, data.name=%{public}s.", __func__, data.name.c_str());
-        napi_set_named_property(env, customizeDataObject, "name", customizeDataName);
-
+        SetFormInfoPropertyString(env, data.name.c_str(), customizeDataObject, "name");
         // data : value
-        napi_value customizeDataValue;
-        napi_create_string_utf8(env, data.value.c_str(), NAPI_AUTO_LENGTH, &customizeDataValue);
-        HILOG_DEBUG("%{public}s, data.value=%{public}s.", __func__, data.value.c_str());
-        napi_set_named_property(env, customizeDataObject, "value", customizeDataValue);
-
+        SetFormInfoPropertyString(env, data.value.c_str(), customizeDataObject, "value");
         napi_set_element(env, customizeData, iCustomizeDataCount, customizeDataObject);
         ++iCustomizeDataCount;
     }
