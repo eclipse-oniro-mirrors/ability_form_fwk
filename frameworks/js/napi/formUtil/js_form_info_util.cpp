@@ -45,7 +45,7 @@ NativeValue* CreateJsFormInfo(NativeEngine &engine, const AppExecFwk::FormInfo &
 {
     NativeValue* objValue = engine.CreateObject();
     napi_value napiValue = reinterpret_cast<napi_value>(objValue);
-    ::ParseFormInfoIntoNapi(reinterpret_cast<napi_env>(&engine), formInfo, napiValue);
+    ParseFormInfoIntoNapi(reinterpret_cast<napi_env>(&engine), formInfo, napiValue);
     return objValue;
 }
 

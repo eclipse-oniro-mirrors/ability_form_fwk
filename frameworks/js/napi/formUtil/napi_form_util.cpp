@@ -30,7 +30,8 @@ using namespace OHOS;
 using namespace OHOS::AAFwk;
 using namespace OHOS::AppExecFwk;
 
-namespace {
+namespace OHOS {
+namespace AbilityRuntime {
 constexpr size_t ARGS_SIZE_TWO = 2;
 constexpr int INT_64_LENGTH = 19;
 constexpr int ZERO_VALUE = 0;
@@ -107,7 +108,6 @@ const std::map<int32_t, std::string> CODE_MSG_MAP = {
     { ERR_FORM_DUPLICATE_ADDED, "failed to obtain the form requested by the client" },
     { ERR_IN_RECOVERY, "the form is being restored" }
 };
-} // namespace
 
 /**
  * @brief query the error message by error code
@@ -474,3 +474,5 @@ void ParseFormInfoIntoNapi(napi_env env, const FormInfo &formInfo, napi_value &r
     HILOG_DEBUG("%{public}s, customizeDatas size=%{public}zu.", __func__, formInfo.customizeDatas.size());
     napi_set_named_property(env, result, "customizeData", customizeData);
 }
+}  // namespace AbilityRuntime
+}  // namespace OHOS

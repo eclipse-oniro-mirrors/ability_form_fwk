@@ -68,9 +68,3 @@ group("benchmarktest") {
 
   deps = [ "benchmarktest:benchmarktest" ]
 }
-
-group("systemtest") {
-  testonly = true
-
-  deps = [ "systemtest:systemtest" ]
-}
