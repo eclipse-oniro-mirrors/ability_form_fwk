@@ -1446,7 +1446,7 @@ napi_value NAPI_IsRequestPublishFormSupported(napi_env env, napi_callback_info i
     return IsRequestPublishFormSupportedPromise(env, asyncCallbackInfo);
 }
 
-void JsFormProvider::Finalizer(NativeEngine* engine, void* data, void* hint)
+void JsFormProvider::Finalizer(NativeEngine* engine, const void* data)
 {
     HILOG_INFO("JsFormProvider::Finalizer is called");
     std::unique_ptr<JsFormProvider>(static_cast<JsFormProvider*>(data));
@@ -1467,7 +1467,7 @@ NativeValue* JsFormProvider::OnGetFormsInfo(NativeEngine &engine, NativeCallback
         errCode = ERR_COMMON;
     }
 
-    int32_t convertArgc = 0;
+    size_t convertArgc = 0;
     FormInfoFilter formInfoFilter;
     if (info.argc > 0 && info.argv[0]->TypeOf() == NATIVE_OBJECT) {
         if (!ConvertFormInfoFilter(engine, info.argv[0], formInfoFilter)) {
