@@ -112,7 +112,7 @@ public:
     JsFormProvider() = default;
     ~JsFormProvider() = default;
 
-    static void Finalizer(NativeEngine* engine, const void* data);
+    static void Finalizer(NativeEngine* engine, void* data, void* hint);
     static NativeValue* GetFormsInfo(NativeEngine* engine, NativeCallbackInfo* info);
 private:
     NativeValue* OnGetFormsInfo(NativeEngine &engine, NativeCallbackInfo &info);

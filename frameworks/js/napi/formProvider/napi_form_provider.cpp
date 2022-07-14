@@ -1446,7 +1446,7 @@ napi_value NAPI_IsRequestPublishFormSupported(napi_env env, napi_callback_info i
     return IsRequestPublishFormSupportedPromise(env, asyncCallbackInfo);
 }
 
-void JsFormProvider::Finalizer(NativeEngine* engine, const void* data)
+void JsFormProvider::Finalizer(NativeEngine* engine, void* data, void* hint)
 {
     HILOG_INFO("JsFormProvider::Finalizer is called");
     std::unique_ptr<JsFormProvider>(static_cast<JsFormProvider*>(data));
