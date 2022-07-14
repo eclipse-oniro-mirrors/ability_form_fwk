@@ -14,7 +14,7 @@
  */
 
 #include "form_binding_data.h"
-#include "native_engine/native_engine.h"
+#include "module_manager/native_module_manager.h"
 
 extern "C" __attribute__((constructor)) void NAPI_application_formBindingData_AutoRegister()
 {

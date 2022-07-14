@@ -18,11 +18,12 @@
 
 #include <map>
 #include <singleton.h>
+#include <cstring>
+
 #include "__functional_base"
 #include "errors.h"
 #include "iosfwd"
 #include "nocopyable.h"
-#include "string"
 
 namespace OHOS {
 namespace AppExecFwk {

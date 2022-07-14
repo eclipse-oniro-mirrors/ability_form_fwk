@@ -13,8 +13,11 @@
  * limitations under the License.
  */
 
+#include <memory>
+#include <string>
+
+#include "__functional_base"
 #include "form_provider_info.h"
-#include "string_ex.h"
 
 namespace OHOS {
 namespace AppExecFwk {
