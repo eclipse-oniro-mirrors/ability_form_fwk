@@ -15,7 +15,6 @@
 
 #include "js_form_info.h"
 #include "module_manager/native_module_manager.h"
-#include "native_engine/native_engine.h"
 
 extern "C" __attribute__((constructor)) void NAPI_application_formInfo_AutoRegister()
 {

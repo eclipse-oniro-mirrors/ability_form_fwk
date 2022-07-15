@@ -16,14 +16,13 @@
 #ifndef FOUNDATION_APPEXECFWK_OHOS_FORM_ERRORS_H
 #define FOUNDATION_APPEXECFWK_OHOS_FORM_ERRORS_H
 
-#include <map>
-#include <singleton.h>
 #include <cstring>
+#include <iosfwd>
+#include <map>
 
-#include "__functional_base"
 #include "errors.h"
-#include "iosfwd"
 #include "nocopyable.h"
+#include "singleton.h"
 
 namespace OHOS {
 namespace AppExecFwk {
