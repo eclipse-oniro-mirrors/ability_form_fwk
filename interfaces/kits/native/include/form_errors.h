@@ -17,7 +17,6 @@
 #define FOUNDATION_APPEXECFWK_OHOS_FORM_ERRORS_H
 
 #include <cstring>
-#include <iosfwd>
 #include <map>
 
 #include "errors.h"

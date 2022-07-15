@@ -17,7 +17,6 @@
 #define FOUNDATION_APPEXECFWK_OHOS_FORM_PROVIDER_INFO_H
 
 #include <cstdint>
-#include <iosfwd>
 #include <utility>
 
 #include "form_ashmem.h"
