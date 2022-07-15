@@ -1467,7 +1467,7 @@ NativeValue* JsFormProvider::OnGetFormsInfo(NativeEngine &engine, NativeCallback
         errCode = ERR_COMMON;
     }
 
-    int32_t convertArgc = 0;
+    size_t convertArgc = 0;
     FormInfoFilter formInfoFilter;
     if (info.argc > 0 && info.argv[0]->TypeOf() == NATIVE_OBJECT) {
         if (!ConvertFormInfoFilter(engine, info.argv[0], formInfoFilter)) {
