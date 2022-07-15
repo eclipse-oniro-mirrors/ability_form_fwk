@@ -51,7 +51,6 @@
 #include "in_process_call_wrapper.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
-#include "ohos_account_kits.h"
 #include "system_ability_definition.h"
 
 namespace OHOS {
