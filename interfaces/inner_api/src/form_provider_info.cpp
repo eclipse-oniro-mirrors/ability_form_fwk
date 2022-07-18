@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-#include "__functional_base"
 #include "form_provider_info.h"
 
 namespace OHOS {
