@@ -64,7 +64,7 @@ public:
     /**
      * @brief Get bundle package info.
      * @param bundleName Indicates the bundle name.
-     * @param bundleName Indicates the user ID.
+     * @param userId Indicates the user ID.
      * @param bundlePackInfo Indicates the obtained BundlePackInfo object.
      * @return Returns true on success, false on failure.
      */

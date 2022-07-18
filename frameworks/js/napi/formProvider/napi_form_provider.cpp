@@ -1480,7 +1480,7 @@ NativeValue* JsFormProvider::OnGetFormsInfo(NativeEngine &engine, NativeCallback
     AsyncTask::CompleteCallback complete =
         [formInfoFilter, errCode](NativeEngine &engine, AsyncTask &task, int32_t status) {
             if (errCode != ERR_OK) {
-                task.Reject(engine, CreateJsError(engine, errCode, "Invalidate params."));
+                task.Reject(engine, CreateJsError(engine, errCode, QueryRetMsg(errCode)));
                 return;
             }
 
@@ -1489,7 +1489,8 @@ NativeValue* JsFormProvider::OnGetFormsInfo(NativeEngine &engine, NativeCallback
             if (ret == ERR_OK) {
                 task.Resolve(engine, CreateJsFormInfoArray(engine, formInfos));
             } else {
-                task.Reject(engine, CreateJsError(engine, ret, "Get form infos failed."));
+                auto retCode = QueryRetCode(ret);
+                task.Reject(engine, CreateJsError(engine, retCode, QueryRetMsg(retCode)));
             }
         };
 
