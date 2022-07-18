@@ -442,6 +442,7 @@ void ParseFormInfoIntoNapi(napi_env env, const FormInfo &formInfo, napi_value &r
     SetFormInfoPropertyInt32(env, formInfo.updateDuration, result, "updateDuration");
     SetFormInfoPropertyString(env, formInfo.scheduledUpdateTime.c_str(), result, "scheduledUpdateTime");
     SetFormInfoPropertyInt32(env, formInfo.defaultDimension, result, "defaultDimension");
+    SetFormInfoPropertyString(env, formInfo.relatedBundleName.c_str(), result, "relatedBundleName");
 
     // supportDimensions
     napi_value supportDimensions;
@@ -459,18 +460,10 @@ void ParseFormInfoIntoNapi(napi_env env, const FormInfo &formInfo, napi_value &r
 
     // customizeData
     napi_value customizeData;
-    napi_create_array(env, &customizeData);
-    int iCustomizeDataCount = 0;
+    napi_create_object(env, &customizeData);
     for (const auto& data : formInfo.customizeDatas) {
-        napi_value customizeDataObject = nullptr;
-        napi_create_object(env, &customizeDataObject);
-        // data : name
-        SetFormInfoPropertyString(env, data.name.c_str(), customizeDataObject, "name");
-        // data : value
-        SetFormInfoPropertyString(env, data.value.c_str(), customizeDataObject, "value");
-        napi_set_element(env, customizeData, iCustomizeDataCount, customizeDataObject);
-        ++iCustomizeDataCount;
+        SetFormInfoPropertyString(env, data.value.c_str(), customizeData, data.name.c_str());
     }
-    HILOG_DEBUG("%{public}s, customizeDatas size=%{public}zu.", __func__, formInfo.customizeDatas.size());
+    HILOG_DEBUG("%{public}s, customizeData size=%{public}zu.", __func__, formInfo.customizeDatas.size());
     napi_set_named_property(env, result, "customizeData", customizeData);
 }
