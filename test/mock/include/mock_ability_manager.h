@@ -667,9 +667,13 @@ public:
         return 0;
     }
     virtual int GetMissionSnapshot(const std::string& deviceId, int32_t missionId,
-	MissionSnapshot& snapshot, bool isLowResolution) override
+	    MissionSnapshot& snapshot, bool isLowResolution) override
     {
         return 0;
+    }
+    virtual void UpdateMissionSnapShot(const sptr<IRemoteObject>& token) override
+    {
+        return;
     }
     virtual int RegisterSnapshotHandler(const sptr<ISnapshotHandler>& handler) override
     {
