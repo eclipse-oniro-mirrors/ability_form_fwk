@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef FOUNDATION_APPEXECFWK_OHOS_FORM_PROVIDER_INFO_H
-#define FOUNDATION_APPEXECFWK_OHOS_FORM_PROVIDER_INFO_H
+#ifndef OHOS_FORM_FWK_FORM_PROVIDER_INFO_H
+#define OHOS_FORM_FWK_FORM_PROVIDER_INFO_H
 
 #include <string>
 #include "form_provider_data.h"
@@ -113,4 +113,4 @@ private:
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
-#endif  // FOUNDATION_APPEXECFWK_OHOS_FORM_PROVIDER_INFO_H
+#endif  // OHOS_FORM_FWK_FORM_PROVIDER_INFO_H

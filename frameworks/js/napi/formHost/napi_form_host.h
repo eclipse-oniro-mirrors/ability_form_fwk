@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef NAPI_FORM_HOST_H_
-#define NAPI_FORM_HOST_H_
+#ifndef OHOS_FORM_FWK_NAPI_FORM_HOST_H_
+#define OHOS_FORM_FWK_NAPI_FORM_HOST_H_
 
 #include "ability.h"
 #include "napi/native_api.h"
@@ -187,4 +187,4 @@ napi_value NAPI_NotifyFormsEnableUpdate(napi_env env, napi_callback_info info);
 napi_value NAPI_GetAllFormsInfo(napi_env env, napi_callback_info info);
 napi_value NAPI_GetFormsInfo(napi_env env, napi_callback_info info);
 
-#endif /* NAPI_FORM_HOST_H_ */
+#endif /* OHOS_FORM_FWK_NAPI_FORM_HOST_H_ */

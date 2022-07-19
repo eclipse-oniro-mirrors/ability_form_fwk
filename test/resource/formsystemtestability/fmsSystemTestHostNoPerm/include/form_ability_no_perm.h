@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef _FORM_ABILITY_NO_PERM_H_
-#define _FORM_ABILITY_NO_PERM_H_
+#ifndef OHOS_FORM_FWK_FORM_ABILITY_NO_PERM_H
+#define OHOS_FORM_FWK_FORM_ABILITY_NO_PERM_H
 #include "ability_loader.h"
 #include "common_event.h"
 #include "common_event_manager.h"
@@ -78,4 +78,4 @@ public:
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
-#endif  // _FORM_ABILITY_NO_PERM_H_
+#endif  // OHOS_FORM_FWK_FORM_ABILITY_NO_PERM_H

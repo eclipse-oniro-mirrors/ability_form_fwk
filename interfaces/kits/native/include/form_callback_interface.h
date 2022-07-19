@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef FOUNDATION_APPEXECFWK_OHOS_FORM_ABILITY_INTERFACE_H
-#define FOUNDATION_APPEXECFWK_OHOS_FORM_ABILITY_INTERFACE_H
+#ifndef OHOS_FORM_FWK_FORM_CALLBACK_INTERFACE_H
+#define OHOS_FORM_FWK_FORM_CALLBACK_INTERFACE_H
 
 #include "form_js_info.h"
 #include "form_state_info.h"
@@ -54,4 +54,4 @@ virtual void ProcessAcquireState(FormState state) = 0;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
-#endif  // FOUNDATION_APPEXECFWK_OHOS_FORM_ABILITY_INTERFACE_H
+#endif  // OHOS_FORM_FWK_FORM_CALLBACK_INTERFACE_H

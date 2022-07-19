@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef FOUNDATION_APPEXECFWK_OHOS_FORM_ERRORS_H
-#define FOUNDATION_APPEXECFWK_OHOS_FORM_ERRORS_H
+#ifndef OHOS_FORM_FWK_FORM_ERRORS_H
+#define OHOS_FORM_FWK_FORM_ERRORS_H
 
 #include <map>
 #include <singleton.h>
@@ -52,4 +52,4 @@ private:
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
-#endif  // FOUNDATION_APPEXECFWK_OHOS_FORM_ERRORS_H
+#endif  // OHOS_FORM_FWK_FORM_ERRORS_H

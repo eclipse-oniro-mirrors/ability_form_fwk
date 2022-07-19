@@ -13,8 +13,8 @@
 * limitations under the License.
 */
 
-#ifndef FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_ID_KEY_H
-#define FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_ID_KEY_H
+#ifndef OHOS_FORM_FWK_FORM_ID_KEY_H
+#define OHOS_FORM_FWK_FORM_ID_KEY_H
 
 #include <string>
 
@@ -69,4 +69,4 @@ public:
 }  // namespace AppExecFwk
 }  // namespace OHOS
 
-#endif // FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_ID_KEY_H
+#endif // OHOS_FORM_FWK_FORM_ID_KEY_H

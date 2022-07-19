@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef FOUNDATION_APPEXECFWK_SERVICES_MOCK_FORM_DEATH_CALLBACK_H
-#define FOUNDATION_APPEXECFWK_SERVICES_MOCK_FORM_DEATH_CALLBACK_H
+#ifndef OHOS_FORM_FWK_MOCK_FORM_DEATH_CALLBACK_H
+#define OHOS_FORM_FWK_MOCK_FORM_DEATH_CALLBACK_H
 
 #include <codecvt>
 #include <memory>
@@ -71,4 +71,4 @@ public:
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
-#endif  // FOUNDATION_APPEXECFWK_SERVICES_MOCK_FORM_DEATH_CALLBACK_H
+#endif  // OHOS_FORM_FWK_MOCK_FORM_DEATH_CALLBACK_H

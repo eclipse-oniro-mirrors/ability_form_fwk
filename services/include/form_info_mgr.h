@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_INFO_MGR_H
-#define FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_INFO_MGR_H
+#ifndef OHOS_FORM_FWK_FORM_INFO_MGR_H
+#define OHOS_FORM_FWK_FORM_INFO_MGR_H
 
 #include <shared_mutex>
 #include <singleton.h>
@@ -107,4 +107,4 @@ private:
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
-#endif // FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_INFO_MGR_H
+#endif // OHOS_FORM_FWK_FORM_INFO_MGR_H

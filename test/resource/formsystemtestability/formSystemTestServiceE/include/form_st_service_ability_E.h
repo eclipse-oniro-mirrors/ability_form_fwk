@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef FORM_ST_SERVICE_ABILITY_E_
-#define FORM_ST_SERVICE_ABILITY_E_
+#ifndef OHOS_FORM_FWK_FORM_ST_SERVICE_ABILITY_E
+#define OHOS_FORM_FWK_FORM_ST_SERVICE_ABILITY_E
 #include <string>
 #include <map>
 #include "ability_connect_callback_stub.h"
@@ -139,4 +139,4 @@ private:
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
-#endif  // FORM_ST_SERVICE_ABILITY_E_
+#endif  // OHOS_FORM_FWK_FORM_ST_SERVICE_ABILITY_E
