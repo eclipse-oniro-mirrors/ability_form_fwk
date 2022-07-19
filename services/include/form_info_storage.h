@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef FOUNDATION_AAFWK_SERVICES_FORMMGR_INCLUDE_FORM_INFO_STORAGE_H
-#define FOUNDATION_AAFWK_SERVICES_FORMMGR_INCLUDE_FORM_INFO_STORAGE_H
+#ifndef OHOS_FORM_FWK_FORM_INFO_STORAGE_H
+#define OHOS_FORM_FWK_FORM_INFO_STORAGE_H
 
 #include "form_info.h"
 #include "nlohmann/json.hpp"
@@ -38,4 +38,4 @@ void to_json(nlohmann::json &jsonObject, const FormInfoStorage &formInfoStorage)
 void from_json(const nlohmann::json &jsonObject, FormInfoStorage &formInfoStorage);
 } // namespace AAFwk
 } // namespace OHOS
-#endif // FOUNDATION_AAFWK_SERVICES_FORMMGR_INCLUDE_FORM_INFO_STORAGE_H
+#endif // OHOS_FORM_FWK_FORM_INFO_STORAGE_H

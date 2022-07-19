@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_MGR_SERVICE_H
-#define FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_MGR_SERVICE_H
+#ifndef OHOS_FORM_FWK_FORM_MGR_SERVICE_H
+#define OHOS_FORM_FWK_FORM_MGR_SERVICE_H
 
 #include <codecvt>
 #include <memory>
@@ -386,4 +386,4 @@ private:
 static bool resetFlag = false;
 }  // namespace AppExecFwk
 }  // namespace OHOS
-#endif  // FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_MGR_SERVICE_H
+#endif  // OHOS_FORM_FWK_FORM_MGR_SERVICE_H

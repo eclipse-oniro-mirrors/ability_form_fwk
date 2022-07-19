@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef NAPI_FORM_UTIL_H
-#define NAPI_FORM_UTIL_H
+#ifndef OHOS_FORM_FWK_NAPI_FORM_UTIL_H
+#define OHOS_FORM_FWK_NAPI_FORM_UTIL_H
 
 #include "ability.h"
 #include "napi/native_api.h"
@@ -80,4 +80,4 @@ void ParseFormInfoIntoNapi(napi_env env, const OHOS::AppExecFwk::FormInfo &formI
 AsyncErrMsgCallbackInfo *InitErrMsg(napi_env env, int32_t code, int32_t type, napi_value callbackValue);
 }  // namespace AbilityRuntime
 }  // namespace OHOS
-#endif /* NAPI_FORM_UTIL_H */
+#endif /* OHOS_FORM_FWK_NAPI_FORM_UTIL_H */

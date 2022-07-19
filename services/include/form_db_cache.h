@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_DB_CACHE_H
-#define FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_DB_CACHE_H
+#ifndef OHOS_FORM_FWK_FORM_DB_CACHE_H
+#define OHOS_FORM_FWK_FORM_DB_CACHE_H
 
 #include <mutex>
 #include <set>
@@ -168,4 +168,4 @@ private:
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
-#endif  // FOUNDATION_APPEXECFWK_SERVICES_FORMMGR_INCLUDE_FORM_DB_CACHE_H
+#endif  // OHOS_FORM_FWK_FORM_DB_CACHE_H

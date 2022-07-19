@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef FOUNDATION_APPEXECFWK_SERVICES_BUNDLEMGR_TEST_MOCK_MOCK_APP_MGR_HOST_H
-#define FOUNDATION_APPEXECFWK_SERVICES_BUNDLEMGR_TEST_MOCK_MOCK_APP_MGR_HOST_H
+#ifndef OHOS_FORM_FWK_MOCK_ABILITY_MANAGER_H
+#define OHOS_FORM_FWK_MOCK_ABILITY_MANAGER_H
 
 #include <iremote_object.h>
 #include <iremote_stub.h>
@@ -738,4 +738,4 @@ private:
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
-#endif  // FOUNDATION_APPEXECFWK_SERVICES_BUNDLEMGR_TEST_MOCK_MOCK_APP_MGR_HOST_H
+#endif  // OHOS_FORM_FWK_MOCK_ABILITY_MANAGER_H

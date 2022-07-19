@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef FOUNDATION_APPEXECFWK_OHOS_MOCK_FORM_MGR_PROXY_H
-#define FOUNDATION_APPEXECFWK_OHOS_MOCK_FORM_MGR_PROXY_H
+#ifndef OHOS_FORM_FWK_MOCK_FORM_MGR_PROXY_H
+#define OHOS_FORM_FWK_MOCK_FORM_MGR_PROXY_H
 
 #include <gtest/gtest.h>
 #include "gmock/gmock.h"
@@ -30,4 +30,4 @@ public:
 };
 }
 }
-#endif // FOUNDATION_APPEXECFWK_OHOS_MOCK_FORM_MGR_PROXY_H
+#endif // OHOS_FORM_FWK_MOCK_FORM_MGR_PROXY_H

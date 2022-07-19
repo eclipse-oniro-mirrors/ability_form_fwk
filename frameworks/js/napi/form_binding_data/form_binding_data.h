@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_APPEXECFWK_FORM_BINDING_DATA_H
-#define OHOS_APPEXECFWK_FORM_BINDING_DATA_H
+#ifndef OHOS_FORM_FWK_FORM_BINDING_DATA_H
+#define OHOS_FORM_FWK_FORM_BINDING_DATA_H
 
 class NativeEngine;
 class NativeValue;
@@ -24,4 +24,4 @@ namespace AbilityRuntime {
 NativeValue* FormBindingDataInit(NativeEngine* engine, NativeValue* exportObj);
 }  // namespace AbilityRuntime
 }  // namespace OHOS
-#endif // OHOS_APPEXECFWK_FORM_BINDING_DATA_H
+#endif // OHOS_FORM_FWK_FORM_BINDING_DATA_H
