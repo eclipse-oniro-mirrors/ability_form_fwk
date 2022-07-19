@@ -1464,15 +1464,15 @@ NativeValue* JsFormProvider::OnGetFormsInfo(NativeEngine &engine, NativeCallback
     int32_t errCode = ERR_OK;
     if (info.argc > ARGS_SIZE_TWO) {
         HILOG_ERROR("%{public}s, wrong number of arguments.", __func__);
-        errCode = ERR_COMMON;
+        errCode = ERR_ADD_INVALID_PARAM;
     }
 
     size_t convertArgc = 0;
     FormInfoFilter formInfoFilter;
-    if (info.argc > 0 && info.argv[0]->TypeOf() == NATIVE_OBJECT) {
+    if (info.argc > 0 && info.argv[0]->TypeOf() != NATIVE_FUNCTION) {
         if (!ConvertFormInfoFilter(engine, info.argv[0], formInfoFilter)) {
             HILOG_ERROR("%{public}s, convert form info filter failed.", __func__);
-            errCode = ERR_COMMON;
+            errCode = ERR_ADD_INVALID_PARAM;
         }
         convertArgc++;
     }

@@ -25,6 +25,11 @@ EXTERN_C_START
 
 bool ConvertFormInfoFilter(NativeEngine &engine, NativeValue* jsValue, FormInfoFilter &formInfoFilter)
 {
+    if (jsValue->TypeOf() != NATIVE_OBJECT) {
+        HILOG_ERROR("%{public}s, an object is expected, but an argument of different type is passed in.", __func__);
+        return false;
+    }
+
     NativeObject* nativeObject = ConvertNativeValueTo<NativeObject>(jsValue);
     if (nativeObject == nullptr) {
         HILOG_ERROR("%{public}s called, nativeObject is nullptr.", __func__);
