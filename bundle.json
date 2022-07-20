@@ -43,13 +43,18 @@
           ]
         },
         "build": {
-            "sub_component": [
-              "//foundation/ability/form_fwk/sa_profile:form_sa_profile",
-              "//foundation/ability/form_fwk:fms_services_target",
-              "//foundation/ability/form_fwk:fms_innerkits_target",
-              "//foundation/ability/form_fwk:fmskit_native",
-              "//foundation/ability/form_fwk:form_napi_packages"
-            ],
+            "group_type": {
+              "fwk_group": [
+                "//foundation/ability/form_fwk:fms_innerkits_target",
+                "//foundation/ability/form_fwk:fmskit_native",
+                "//foundation/ability/form_fwk:form_napi_packages"
+              ],
+              "service_group": [
+                "//foundation/ability/form_fwk/sa_profile:form_sa_profile",
+                "//foundation/ability/form_fwk:fms_services_target"
+              ],
+              "base_group": []
+            },
             "inner_kits": [
               {
                 "header": {
