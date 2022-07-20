@@ -91,6 +91,7 @@ ohos_shared_library("libfms") {
     "ability_base:base",
     "ability_base:want",
     "ability_base:zuri",
+    "ability_runtime:ability_deps_wrapper",
     "ability_runtime:ability_manager",
     "ability_runtime:app_manager",
     "ability_runtime:wantagent_innerkits",
@@ -109,14 +110,6 @@ ohos_shared_library("libfms") {
     "time_native:time_service",
     "utils_base:utils",
   ]
-
-  if (os_account_part_enabled) {
-    cflags_cc += [ "-DOS_ACCOUNT_PART_ENABLED" ]
-    external_deps += [
-      "os_account:libaccountkits",
-      "os_account:os_account_innerkits",
-    ]
-  }
 
   defines = []
   if (ability_runtime_power) {
