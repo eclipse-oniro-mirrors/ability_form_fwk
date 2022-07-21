@@ -297,15 +297,8 @@ int FormMgrService::CastTempForm(const int64_t formId, const sptr<IRemoteObject>
     return FormMgrAdapter::GetInstance().CastTempForm(formId, callerToken);
 }
 
-/**
- * @brief lifecycle update.
- * @param formIds formIds of hostclient.
- * @param callerToken Caller ability token.
- * @param updateType update type,enable or disable.
- * @return Returns true on success, false on failure.
- */
 int FormMgrService::LifecycleUpdate(const std::vector<int64_t> &formIds,
-    const sptr<IRemoteObject> &callerToken, const int32_t updateType)
+    const sptr<IRemoteObject> &callerToken, bool updateType)
 {
     HILOG_INFO("lifecycleUpdate.");
 
@@ -315,7 +308,7 @@ int FormMgrService::LifecycleUpdate(const std::vector<int64_t> &formIds,
         return ret;
     }
 
-    if (updateType == ENABLE_FORM_UPDATE) {
+    if (updateType) {
         return FormMgrAdapter::GetInstance().EnableUpdateForm(formIds, callerToken);
     } else {
         return FormMgrAdapter::GetInstance().DisableUpdateForm(formIds, callerToken);

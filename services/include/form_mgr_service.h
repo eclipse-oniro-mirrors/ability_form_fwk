@@ -129,11 +129,11 @@ public:
      * @brief lifecycle update.
      * @param formIds formIds of hostclient.
      * @param callerToken Caller ability token.
-     * @param updateType update type,enable or disable.
+     * @param updateType update type, enable if true and disable if false.
      * @return Returns true on success, false on failure.
      */
     int LifecycleUpdate(const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &callerToken,
-        const int32_t updateType) override;
+        bool updateType) override;
 
     /**
      * @brief Request form with formId and want, send formId and want to form manager service.
@@ -378,8 +378,6 @@ private:
     mutable std::mutex instanceMutex_;
 
     sptr<IRemoteObject> remote = nullptr;
-
-    static const int32_t ENABLE_FORM_UPDATE = 5;
 
     DISALLOW_COPY_AND_MOVE(FormMgrService);
 };

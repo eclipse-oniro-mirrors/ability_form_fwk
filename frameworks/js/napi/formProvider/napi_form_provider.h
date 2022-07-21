@@ -29,7 +29,6 @@ namespace OHOS {
 namespace AbilityRuntime {
 struct AsyncNextRefreshTimeFormCallbackInfo {
     napi_env env;
-    OHOS::AppExecFwk::Ability *ability;
     napi_async_work asyncWork;
     napi_deferred deferred;
     napi_ref callback;
@@ -40,7 +39,6 @@ struct AsyncNextRefreshTimeFormCallbackInfo {
 
 struct AsyncUpdateFormCallbackInfo {
     napi_env env;
-    OHOS::AppExecFwk::Ability *ability;
     napi_async_work asyncWork;
     napi_deferred deferred;
     napi_ref callback;
@@ -51,7 +49,6 @@ struct AsyncUpdateFormCallbackInfo {
 
 struct AsyncRequestPublishFormCallbackInfo {
     napi_env env = nullptr;
-    OHOS::AppExecFwk::Ability *ability = nullptr;
     napi_async_work asyncWork = nullptr;
     napi_deferred deferred = nullptr;
     napi_ref callback = nullptr;
@@ -64,7 +61,6 @@ struct AsyncRequestPublishFormCallbackInfo {
 
 struct AsyncAddFormInfoCallbackInfo {
     napi_env env = nullptr;
-    OHOS::AppExecFwk::Ability *ability = nullptr;
     napi_async_work asyncWork = nullptr;
     napi_deferred deferred = nullptr;
     napi_ref callback = nullptr;
@@ -74,7 +70,6 @@ struct AsyncAddFormInfoCallbackInfo {
 
 struct AsyncRemoveFormInfoCallbackInfo {
     napi_env env = nullptr;
-    OHOS::AppExecFwk::Ability *ability = nullptr;
     napi_async_work asyncWork = nullptr;
     napi_deferred deferred = nullptr;
     napi_ref callback = nullptr;

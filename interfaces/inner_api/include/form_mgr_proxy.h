@@ -109,11 +109,11 @@ public:
      * @brief Lifecycle update.
      * @param formIds The Id of the forms.
      * @param callerToken Caller ability token.
-     * @param updateType update type.
+     * @param updateType update type, enable if true and disable if false.
      * @return Returns ERR_OK on success, others on failure.
      */
     virtual int LifecycleUpdate(const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &callerToken,
-    const int32_t updateType) override;
+    bool updateType) override;
 
     /**
      * @brief Request form with formId and want, send formId and want to form manager service.

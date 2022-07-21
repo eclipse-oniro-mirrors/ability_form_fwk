@@ -314,17 +314,10 @@ ErrCode FormMgrProxy::RequestPublishForm(Want &want, bool withFormBindingData,
     return errCode;
 }
 
-/**
- * @brief Lifecycle update.
- * @param formIds The Id of the forms.
- * @param callerToken Caller ability token.
- * @param updateType update type.
- * @return Returns ERR_OK on success, others on failure.
- */
 int FormMgrProxy::LifecycleUpdate(
     const std::vector<int64_t> &formIds,
     const sptr<IRemoteObject> &callerToken,
-    const int32_t updateType)
+    bool updateType)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -341,7 +334,7 @@ int FormMgrProxy::LifecycleUpdate(
         HILOG_ERROR("%{public}s, failed to write bundleName", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (!data.WriteInt32(updateType)) {
+    if (!data.WriteBool(updateType)) {
         HILOG_ERROR("%{public}s, failed to write nextTime", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }

@@ -228,11 +228,11 @@ public:
      * @brief Lifecycle Update.
      * @param formIds The id of the forms.
      * @param callerToken Host client.
-     * @param updateType Next refresh time.
+     * @param updateType update type, enable if true and disable if false.
      * @return Returns ERR_OK on success, others on failure.
      */
     int LifecycleUpdate(const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &callerToken,
-                        const int32_t updateType);
+                        bool updateType);
 
     /**
      * @brief Set fms recoverStatus.
@@ -373,6 +373,14 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     int UpdateRouterAction(const int64_t formId, std::string &action);
+
+    /**
+     * @brief Check form manager service ready.
+     *
+     * @return Return true if form manager service ready; returns false otherwise.
+     */
+    bool CheckFMSReady();
+
 private:
     /**
      * @brief Connect form manager service.
