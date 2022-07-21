@@ -124,8 +124,7 @@ namespace Constants {
         {2, "2*2"},
         {3, "2*4"},
         {4, "4*4"},
-        {5, "1*1"},
-        {6, "2*1"},
+        {5, "2*1"}
     };
     const int32_t DIM_KEY_MIN = 1;
     const int32_t DIM_KEY_MAX = 4;
