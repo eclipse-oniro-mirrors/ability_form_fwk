@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef NAPI_FORM_UTIL_H_
-#define NAPI_FORM_UTIL_H_
+#ifndef NAPI_FORM_UTIL_H
+#define NAPI_FORM_UTIL_H
 
 #include "ability.h"
 #include "napi/native_api.h"
@@ -22,6 +22,8 @@
 #include "napi/native_node_api.h"
 #include "nlohmann/json.hpp"
 
+namespace OHOS {
+namespace AbilityRuntime {
 const int32_t ERR_COMMON = 1;
 const int32_t ERR_PERMISSION_DENY = 2;
 const int32_t ERR_GET_INFO_FAILED = 4;
@@ -76,5 +78,6 @@ void InnerCreatePromiseRetMsg(napi_env env, int32_t code, napi_value* result);
 napi_value RetErrMsg(AsyncErrMsgCallbackInfo* asyncCallbackInfo);
 void ParseFormInfoIntoNapi(napi_env env, const OHOS::AppExecFwk::FormInfo &formInfo, napi_value &result);
 AsyncErrMsgCallbackInfo *InitErrMsg(napi_env env, int32_t code, int32_t type, napi_value callbackValue);
-
-#endif /* NAPI_FORM_UTIL_H_ */
+}  // namespace AbilityRuntime
+}  // namespace OHOS
+#endif /* NAPI_FORM_UTIL_H */

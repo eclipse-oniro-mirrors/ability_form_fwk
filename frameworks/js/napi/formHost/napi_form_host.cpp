@@ -35,6 +35,7 @@
 using namespace OHOS;
 using namespace OHOS::AAFwk;
 using namespace OHOS::AppExecFwk;
+using namespace OHOS::AbilityRuntime;
 
 namespace {
     constexpr size_t ARGS_SIZE_ZERO = 0;
