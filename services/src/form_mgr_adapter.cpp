@@ -2147,7 +2147,7 @@ int FormMgrAdapter::DeleteInvalidForms(const std::vector<int64_t> &formIds,
         FormDataMgr::GetInstance().DeleteInvalidPublishForms(userId, bundleName, matchedFormIds);
     }
 
-    numFormsDeleted = (int32_t)removedFormsMap.size();
+    numFormsDeleted = static_cast<int32_t>(removedFormsMap.size());
     HILOG_INFO("%{public}s done, %{public}d forms deleted.", __func__, numFormsDeleted);
     return ERR_OK;
 }

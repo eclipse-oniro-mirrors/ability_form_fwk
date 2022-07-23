@@ -32,7 +32,7 @@ std::mutex FormSupplyCallback::mutex_;
 sptr<FormSupplyCallback> FormSupplyCallback::GetInstance()
 {
     if (instance_ == nullptr) {
-        std::lock_guard<std::mutex> lock_l(mutex_);
+        std::lock_guard<std::mutex> lock(mutex_);
         if (instance_ == nullptr) {
             instance_ = new FormSupplyCallback();
         }
@@ -124,7 +124,7 @@ void FormSupplyCallback::AddConnection(sptr<FormAbilityConnection> connection)
 {
     HILOG_INFO("%{public}s called.", __func__);
     long connectKey = FormUtil::GetCurrentMillisecond();
-    std::lock_guard<std::mutex> lock_l(conMutex_);
+    std::lock_guard<std::mutex> lock(conMutex_);
     while (connections_.find(connectKey) != connections_.end()) {
         connectKey++;
     }
@@ -142,7 +142,7 @@ void FormSupplyCallback::RemoveConnection(long connectId)
     HILOG_INFO("%{public}s called.", __func__);
     sptr<FormAbilityConnection> connection = nullptr;
     {
-        std::lock_guard<std::mutex> lock_l(conMutex_);
+        std::lock_guard<std::mutex> lock(conMutex_);
         auto conIterator = connections_.find(connectId);
         if (conIterator != connections_.end()) {
             connection = conIterator->second;
@@ -169,7 +169,7 @@ bool FormSupplyCallback::CanDisconnect(sptr<FormAbilityConnection> &connection)
 {
     HILOG_INFO("%{public}s called.", __func__);
     int count = 0;
-    std::lock_guard<std::mutex> lock_l(conMutex_);
+    std::lock_guard<std::mutex> lock(conMutex_);
     for (auto &conn : connections_) {
         if (connection->GetProviderKey() == conn.second->GetProviderKey()) {
             HILOG_INFO("%{public}s, key: %{public}s", __func__, conn.second->GetProviderKey().c_str());
