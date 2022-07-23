@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef _FORM_ABILITY_PERFORMANCE_H_
-#define _FORM_ABILITY_PERFORMANCE_H_
+#ifndef OHOS_FORM_FWK_FORM_ABILITY_PERFORMANCE_H
+#define OHOS_FORM_FWK_FORM_ABILITY_PERFORMANCE_H
 #include <string>
 #include <unistd.h>
 #include <vector>
@@ -95,4 +95,4 @@ public:
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
-#endif  // _FORM_ABILITY_PERFORMANCE_H_
+#endif  // OHOS_FORM_FWK_FORM_ABILITY_PERFORMANCE_H

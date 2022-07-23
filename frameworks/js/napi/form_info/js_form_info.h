@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_ABILITY_RUNTIME_FORM_INFO_H
-#define OHOS_ABILITY_RUNTIME_FORM_INFO_H
+#ifndef OHOS_FORM_FWK_JS_FORM_INFO_H
+#define OHOS_FORM_FWK_JS_FORM_INFO_H
 
 class NativeEngine;
 class NativeValue;
@@ -24,4 +24,4 @@ namespace AbilityRuntime {
 NativeValue* FormInfoInit(NativeEngine *engine, NativeValue *exportObj);
 }  // namespace AbilityRuntime
 }  // namespace OHOS
-#endif // OHOS_ABILITY_RUNTIME_FORM_INFO_H
+#endif // OHOS_FORM_FWK_JS_FORM_INFO_H

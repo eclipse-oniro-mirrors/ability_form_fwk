@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_CACHE_MGR_H
-#define FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_CACHE_MGR_H
+#ifndef OHOS_FORM_FWK_FORM_CACHE_MGR_H
+#define OHOS_FORM_FWK_FORM_CACHE_MGR_H
 
 #include <map>
 #include <mutex>
@@ -75,4 +75,4 @@ private:
 }  // namespace AppExecFwk
 }  // namespace OHOS
 
-#endif // FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_CACHE_MGR_H
+#endif // OHOS_FORM_FWK_FORM_CACHE_MGR_H

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_HOST_RECORD_H
-#define FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_HOST_RECORD_H
+#ifndef OHOS_FORM_FWK_FORM_HOST_RECORD_H
+#define OHOS_FORM_FWK_FORM_HOST_RECORD_H
 
 #include <unordered_map>
 #include <vector>
@@ -217,4 +217,4 @@ private:
 }  // namespace AppExecFwk
 }  // namespace OHOS
 
-#endif // FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_HOST_RECORD_H
+#endif // OHOS_FORM_FWK_FORM_HOST_RECORD_H

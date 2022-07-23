@@ -662,10 +662,7 @@ ErrCode FormInfoMgr::ReloadFormInfos(const int32_t userId)
     for (auto const &bundleName : bundleNameSet) {
         std::shared_ptr<BundleFormInfo> bundleFormInfoPtr = std::make_shared<BundleFormInfo>(bundleName);
         ErrCode errCode = bundleFormInfoPtr->UpdateStaticFormInfos(userId);
-        if (errCode != ERR_OK) {
-            continue;
-        }
-        if (bundleFormInfoPtr->Empty()) {
+        if (errCode != ERR_OK || bundleFormInfoPtr->Empty()) {
             continue;
         }
         bundleFormInfoMap_[bundleName] = bundleFormInfoPtr;

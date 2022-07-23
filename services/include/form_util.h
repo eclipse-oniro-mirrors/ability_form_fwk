@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_UTIL_H
-#define FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_UTIL_H
+#ifndef OHOS_FORM_FWK_FORM_UTIL_H
+#define OHOS_FORM_FWK_FORM_UTIL_H
 
 #include "want.h"
 
@@ -104,4 +104,4 @@ public:
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
-#endif  // FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_UTIL_H
+#endif  // OHOS_FORM_FWK_FORM_UTIL_H

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef FOUNDATION_APPEXECFWK_INTERFACES_INNERKITS_APPEXECFWK_CORE_INCLUDE_FORMMGR_FORM_MGR_INTERFACE_H
-#define FOUNDATION_APPEXECFWK_INTERFACES_INNERKITS_APPEXECFWK_CORE_INCLUDE_FORMMGR_FORM_MGR_INTERFACE_H
+#ifndef OHOS_FORM_FWK_FORM_MGR_INTERFACE_H
+#define OHOS_FORM_FWK_FORM_MGR_INTERFACE_H
 
 #include <vector>
 #include "form_info.h"
@@ -115,11 +115,11 @@ public:
      * @brief Lifecycle update.
      * @param formIds The Id of the forms.
      * @param callerToken Caller ability token.
-     * @param updateType update type.
+     * @param updateType update type, enable if true and disable if false.
      * @return Returns ERR_OK on success, others on failure.
      */
     virtual int LifecycleUpdate(const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &callerToken,
-    const int32_t updateType) = 0;
+    bool updateType) = 0;
 
     /**
      * @brief Request form with formId and want, send formId and want to form manager service.
@@ -360,4 +360,4 @@ public:
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
-#endif  // FOUNDATION_APPEXECFWK_INTERFACES_INNERKITS_APPEXECFWK_CORE_INCLUDE_FORMMGR_FORM_MGR_INTERFACE_H
+#endif  // OHOS_FORM_FWK_FORM_MGR_INTERFACE_H

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef FOUNDATION_APPEXECFWK_OHOS_FORM_PROVIDER_CLIENT_H
-#define FOUNDATION_APPEXECFWK_OHOS_FORM_PROVIDER_CLIENT_H
+#ifndef OHOS_FORM_FWK_MOCK_FORM_PROVIDER_CLIENT_H
+#define OHOS_FORM_FWK_MOCK_FORM_PROVIDER_CLIENT_H
 
 #include <map>
 #include <iremote_object.h>
@@ -121,4 +121,4 @@ private:
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
-#endif  // FOUNDATION_APPEXECFWK_OHOS_FORM_PROVIDER_CLIENT_H
+#endif  // OHOS_FORM_FWK_MOCK_FORM_PROVIDER_CLIENT_H

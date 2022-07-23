@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_TIMER_INFO_H
-#define FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_TIMER_INFO_H
+#ifndef OHOS_FORM_FWK_FORM_TIMER_OPTION_H
+#define OHOS_FORM_FWK_FORM_TIMER_OPTION_H
 
 #include "itimer_info.h"
 
@@ -80,4 +80,4 @@ void FormTimerOption::SetWantAgent(std::shared_ptr<AbilityRuntime::WantAgent::Wa
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
-#endif // FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_TIMER_INFO_H
+#endif // OHOS_FORM_FWK_FORM_TIMER_OPTION_H

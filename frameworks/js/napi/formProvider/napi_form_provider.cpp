@@ -44,40 +44,7 @@ namespace {
     constexpr int REF_COUNT = 1;
     constexpr int CALLBACK_FLG = 1;
     constexpr int PROMISE_FLG = 2;
-    OHOS::AppExecFwk::Ability* g_ability = nullptr;
     const std::string MODULE_NAME = "moduleName";
-}
-
-/**
- * @brief GetGlobalAbility
- *
- * @param[in] env The environment that the Node-API call is invoked under
- *
- * @return OHOS::AppExecFwk::Ability*
- */
-static OHOS::AppExecFwk::Ability* GetGlobalAbility(napi_env env)
-{
-    // get global value
-    napi_value global = nullptr;
-    napi_get_global(env, &global);
-
-    // get ability
-    napi_value abilityObj = nullptr;
-    napi_get_named_property(env, global, "ability", &abilityObj);
-
-    // get ability pointer
-    OHOS::AppExecFwk::Ability* ability = nullptr;
-    napi_get_value_external(env, abilityObj, (void**)&ability);
-    HILOG_INFO("%{public}s, ability", __func__);
-    if (ability == nullptr) {
-        if (g_ability == nullptr) {
-            std::unique_ptr<AbilityRuntime::Runtime> runtime;
-            g_ability = OHOS::AppExecFwk::Ability::Create(runtime);
-        }
-        ability = g_ability;
-        HILOG_INFO("%{public}s, Use Local tmp Ability for Stage Module", __func__);
-    }
-    return ability;
 }
 
 napi_value ExecuteAsyncCallbackWork(napi_env env, AsyncCallbackInfoBase* asyncCallbackInfo)
@@ -349,8 +316,8 @@ static ErrCode UnwrapFormInfo(napi_env env, napi_value value, FormInfo &formInfo
 static void InnerSetFormNextRefreshTime(napi_env, AsyncNextRefreshTimeFormCallbackInfo *const asyncCallbackInfo)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
-    OHOS::AppExecFwk::Ability *ability = asyncCallbackInfo->ability;
-    asyncCallbackInfo->result = ability->SetFormNextRefreshTime(asyncCallbackInfo->formId, asyncCallbackInfo->time);
+    asyncCallbackInfo->result = FormMgr::GetInstance().SetNextRefreshTime(asyncCallbackInfo->formId,
+        asyncCallbackInfo->time);
     HILOG_DEBUG("%{public}s, end", __func__);
 }
 
@@ -448,7 +415,6 @@ napi_value NAPI_SetFormNextRefreshTime(napi_env env, napi_callback_info info)
     AsyncNextRefreshTimeFormCallbackInfo *asyncCallbackInfo = new
         AsyncNextRefreshTimeFormCallbackInfo {
             .env = env,
-            .ability = GetGlobalAbility(env),
             .asyncWork = nullptr,
             .deferred = nullptr,
             .callback = nullptr,
@@ -559,8 +525,8 @@ napi_value NAPI_SetFormNextRefreshTime(napi_env env, napi_callback_info info)
 static void InnerUpdateForm(napi_env env, AsyncUpdateFormCallbackInfo* const asyncCallbackInfo)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
-    OHOS::AppExecFwk::Ability *ability = asyncCallbackInfo->ability;
-    asyncCallbackInfo->result = ability->UpdateForm(asyncCallbackInfo->formId, *asyncCallbackInfo->formProviderData);
+    asyncCallbackInfo->result = FormMgr::GetInstance().UpdateForm(asyncCallbackInfo->formId,
+        *asyncCallbackInfo->formProviderData);
     HILOG_DEBUG("%{public}s, end", __func__);
 }
 
@@ -664,7 +630,6 @@ napi_value NAPI_UpdateForm(napi_env env, napi_callback_info info)
     AsyncUpdateFormCallbackInfo *asyncCallbackInfo = new
         AsyncUpdateFormCallbackInfo {
             .env = env,
-            .ability = GetGlobalAbility(env),
             .asyncWork = nullptr,
             .deferred = nullptr,
             .callback = nullptr,
@@ -817,7 +782,6 @@ static napi_value RequestPublishFormCallback(napi_env env, napi_value *argv, boo
 
     auto *asyncCallbackInfo = new (std::nothrow) AsyncRequestPublishFormCallbackInfo {
         .env = env,
-        .ability = GetGlobalAbility(env),
         .withFormBindingData = withFormBindingData,
     };
     if (asyncCallbackInfo == nullptr) {
@@ -882,7 +846,6 @@ static napi_value RequestPublishFormPromise(napi_env env, napi_value *argv, bool
 
     auto *asyncCallbackInfo = new (std::nothrow) AsyncRequestPublishFormCallbackInfo {
         .env = env,
-        .ability = GetGlobalAbility(env),
         .deferred = deferred,
         .withFormBindingData = withFormBindingData,
     };
@@ -1093,7 +1056,6 @@ napi_value NAPI_AddFormInfo(napi_env env, napi_callback_info info)
 
     auto *asyncCallbackInfo = new (std::nothrow) AsyncAddFormInfoCallbackInfo {
         .env = env,
-        .ability = GetGlobalAbility(env),
         .asyncWork = nullptr,
         .deferred = nullptr,
         .callback = nullptr,
@@ -1287,7 +1249,6 @@ napi_value NAPI_RemoveFormInfo(napi_env env, napi_callback_info info)
 
     auto *asyncCallbackInfo = new (std::nothrow) AsyncRemoveFormInfoCallbackInfo {
         .env = env,
-        .ability = GetGlobalAbility(env),
         .moduleName = moduleName,
         .formName = formName,
     };
@@ -1465,15 +1426,15 @@ NativeValue* JsFormProvider::OnGetFormsInfo(NativeEngine &engine, NativeCallback
     int32_t errCode = ERR_OK;
     if (info.argc > ARGS_SIZE_TWO) {
         HILOG_ERROR("%{public}s, wrong number of arguments.", __func__);
-        errCode = ERR_COMMON;
+        errCode = ERR_ADD_INVALID_PARAM;
     }
 
-    int32_t convertArgc = 0;
+    size_t convertArgc = 0;
     FormInfoFilter formInfoFilter;
-    if (info.argc > 0 && info.argv[0]->TypeOf() == NATIVE_OBJECT) {
+    if (info.argc > 0 && info.argv[0]->TypeOf() != NATIVE_FUNCTION) {
         if (!ConvertFormInfoFilter(engine, info.argv[0], formInfoFilter)) {
             HILOG_ERROR("%{public}s, convert form info filter failed.", __func__);
-            errCode = ERR_COMMON;
+            errCode = ERR_ADD_INVALID_PARAM;
         }
         convertArgc++;
     }
@@ -1481,7 +1442,7 @@ NativeValue* JsFormProvider::OnGetFormsInfo(NativeEngine &engine, NativeCallback
     AsyncTask::CompleteCallback complete =
         [formInfoFilter, errCode](NativeEngine &engine, AsyncTask &task, int32_t status) {
             if (errCode != ERR_OK) {
-                task.Reject(engine, CreateJsError(engine, errCode, "Invalidate params."));
+                task.Reject(engine, CreateJsError(engine, errCode, QueryRetMsg(errCode)));
                 return;
             }
 
@@ -1490,7 +1451,8 @@ NativeValue* JsFormProvider::OnGetFormsInfo(NativeEngine &engine, NativeCallback
             if (ret == ERR_OK) {
                 task.Resolve(engine, CreateJsFormInfoArray(engine, formInfos));
             } else {
-                task.Reject(engine, CreateJsError(engine, ret, "Get form infos failed."));
+                auto retCode = QueryRetCode(ret);
+                task.Reject(engine, CreateJsError(engine, retCode, QueryRetMsg(retCode)));
             }
         };
 

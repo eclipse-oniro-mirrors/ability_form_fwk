@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_MGR_SERVICE_H
-#define FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_MGR_SERVICE_H
+#ifndef OHOS_FORM_FWK_FORM_MGR_SERVICE_H
+#define OHOS_FORM_FWK_FORM_MGR_SERVICE_H
 
 #include <singleton.h>
 #include <system_ability.h>
@@ -128,11 +128,11 @@ public:
      * @brief lifecycle update.
      * @param formIds formIds of host client.
      * @param callerToken Caller ability token.
-     * @param updateType update type,enable or disable.
+     * @param updateType update type, enable if true and disable if false.
      * @return Returns true on success, false on failure.
      */
     int LifecycleUpdate(const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &callerToken,
-        const int32_t updateType) override;
+        bool updateType) override;
 
     /**
      * @brief Request form with formId and want, send formId and want to form manager service.
@@ -375,4 +375,4 @@ private:
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
-#endif  // FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_MGR_SERVICE_H
+#endif  // OHOS_FORM_FWK_FORM_MGR_SERVICE_H

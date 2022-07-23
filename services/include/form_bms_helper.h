@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_BMS_HELPER_H
-#define FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_BMS_HELPER_H
+#ifndef OHOS_FORM_FWK_FORM_BMS_HELPER_H
+#define OHOS_FORM_FWK_FORM_BMS_HELPER_H
 
 #include <singleton.h>
 #include "ability_manager_interface.h"
@@ -62,7 +62,7 @@ public:
     /**
      * @brief Get bundle package info.
      * @param bundleName Indicates the bundle name.
-     * @param bundleName Indicates the user ID.
+     * @param userId Indicates the user ID.
      * @param bundlePackInfo Indicates the obtained BundlePackInfo object.
      * @return Returns true on success, false on failure.
      */
@@ -82,4 +82,4 @@ private:
 }  // namespace AppExecFwk
 }  // namespace OHOS
 
-#endif // FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_BMS_HELPER_H
+#endif // OHOS_FORM_FWK_FORM_BMS_HELPER_H

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef NAPI_FORM_PROVIDER_H_
-#define NAPI_FORM_PROVIDER_H_
+#ifndef OHOS_FORM_FWK_NAPI_FORM_PROVIDER_H_
+#define OHOS_FORM_FWK_NAPI_FORM_PROVIDER_H_
 
 #include "ability.h"
 #include "form_provider_info.h"
@@ -29,7 +29,6 @@ namespace OHOS {
 namespace AbilityRuntime {
 struct AsyncNextRefreshTimeFormCallbackInfo {
     napi_env env;
-    OHOS::AppExecFwk::Ability *ability;
     napi_async_work asyncWork;
     napi_deferred deferred;
     napi_ref callback;
@@ -40,7 +39,6 @@ struct AsyncNextRefreshTimeFormCallbackInfo {
 
 struct AsyncUpdateFormCallbackInfo {
     napi_env env;
-    OHOS::AppExecFwk::Ability *ability;
     napi_async_work asyncWork;
     napi_deferred deferred;
     napi_ref callback;
@@ -51,7 +49,6 @@ struct AsyncUpdateFormCallbackInfo {
 
 struct AsyncRequestPublishFormCallbackInfo {
     napi_env env = nullptr;
-    OHOS::AppExecFwk::Ability *ability = nullptr;
     napi_async_work asyncWork = nullptr;
     napi_deferred deferred = nullptr;
     napi_ref callback = nullptr;
@@ -64,7 +61,6 @@ struct AsyncRequestPublishFormCallbackInfo {
 
 struct AsyncAddFormInfoCallbackInfo {
     napi_env env = nullptr;
-    OHOS::AppExecFwk::Ability *ability = nullptr;
     napi_async_work asyncWork = nullptr;
     napi_deferred deferred = nullptr;
     napi_ref callback = nullptr;
@@ -74,7 +70,6 @@ struct AsyncAddFormInfoCallbackInfo {
 
 struct AsyncRemoveFormInfoCallbackInfo {
     napi_env env = nullptr;
-    OHOS::AppExecFwk::Ability *ability = nullptr;
     napi_async_work asyncWork = nullptr;
     napi_deferred deferred = nullptr;
     napi_ref callback = nullptr;
@@ -119,4 +114,4 @@ private:
 };
 }  // namespace AbilityRuntime
 }  // namespace OHOS
-#endif /* NAPI_FORM_PROVIDER_H_ */
+#endif /* OHOS_FORM_FWK_NAPI_FORM_PROVIDER_H_ */

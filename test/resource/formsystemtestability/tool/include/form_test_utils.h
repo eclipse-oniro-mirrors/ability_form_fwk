@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef _FORM_TEST_UTILS_H_
-#define _FORM_TEST_UTILS_H_
+#ifndef OHOS_FORM_FWK_FORM_TEST_UTILS_H
+#define OHOS_FORM_FWK_FORM_TEST_UTILS_H
 #include "ability_info.h"
 #include "ability_lifecycle.h"
 #include "application_info.h"
@@ -37,4 +37,4 @@ public:
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
-#endif  // _FORM_TEST_UTILS_H_
+#endif  // OHOS_FORM_FWK_FORM_TEST_UTILS_H

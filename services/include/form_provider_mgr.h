@@ -13,9 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_PROVIDER_MGR_H
-#define FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_PROVIDER_MGR_H
-
+#ifndef OHOS_FORM_FWK_FORM_PROVIDER_MGR_H
+#define OHOS_FORM_FWK_FORM_PROVIDER_MGR_H
 #include <set>
 #include <singleton.h>
 #include "ability_connect_callback_interface.h"
@@ -131,4 +130,4 @@ private:
 }  // namespace AppExecFwk
 }  // namespace OHOS
 
-#endif // FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_PROVIDER_MGR_H
+#endif // OHOS_FORM_FWK_FORM_PROVIDER_MGR_H

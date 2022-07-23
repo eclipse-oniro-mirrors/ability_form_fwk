@@ -26,9 +26,7 @@
 #include "form_util.h"
 #include "hilog_wrapper.h"
 #include "in_process_call_wrapper.h"
-#ifdef OS_ACCOUNT_PART_ENABLED
-#include "os_account_manager.h"
-#endif // OS_ACCOUNT_PART_ENABLED
+#include "os_account_manager_wrapper.h"
 #include "time_service_client.h"
 #include "want.h"
 
@@ -40,9 +38,6 @@ const int REQUEST_LIMITER_CODE = 2;
 const int REQUEST_DYNAMIC_CODE = 3;
 const int SHIFT_BIT_LENGTH = 32;
 const std::string FMS_TIME_SPEED = "fms.time_speed";
-#ifndef OS_ACCOUNT_PART_ENABLED
-const int DEFAULT_OS_ACCOUNT_ID = 0; // 0 is the default id when there is no os_account part
-#endif // OS_ACCOUNT_PART_ENABLED
 } // namespace
 
 FormTimerMgr::FormTimerMgr()
@@ -1339,14 +1334,9 @@ void FormTimerMgr::TimerReceiver::OnReceiveEvent(const EventFwk::CommonEventData
 bool FormTimerMgr::IsActiveUser(const int32_t userId)
 {
     std::vector<int32_t> activeList;
-#ifdef OS_ACCOUNT_PART_ENABLED
-    auto refCode = AccountSA::OsAccountManager::QueryActiveOsAccountIds(activeList);
-#else // OS_ACCOUNT_PART_ENABLED
-    ErrCode refCode = ERR_OK;
-    activeList.push_back(DEFAULT_OS_ACCOUNT_ID);
-#endif // OS_ACCOUNT_PART_ENABLED
+    auto errCode = DelayedSingleton<OsAccountManagerWrapper>::GetInstance()->QueryActiveOsAccountIds(activeList);
     auto iter = std::find(activeList.begin(), activeList.end(), userId);
-    if (iter != activeList.end() && refCode == ERR_OK) {
+    if (iter != activeList.end() && errCode == ERR_OK) {
         return true;
     }
     return false;

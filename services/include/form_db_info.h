@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_INNER_FORM_INFO_H
-#define FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_INNER_FORM_INFO_H
+#ifndef OHOS_FORM_FWK_FORM_DB_INFO_H
+#define OHOS_FORM_FWK_FORM_DB_INFO_H
 
 #include <string>
 
@@ -345,4 +345,4 @@ private:
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
-#endif  // FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_INNER_FORM_INFO_H
+#endif  // OHOS_FORM_FWK_FORM_DB_INFO_H

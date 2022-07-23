@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef NAPI_FORM_HOST_H_
-#define NAPI_FORM_HOST_H_
+#ifndef OHOS_FORM_FWK_NAPI_FORM_HOST_H_
+#define OHOS_FORM_FWK_NAPI_FORM_HOST_H_
 
 #include "ability.h"
 #include "napi/native_api.h"
@@ -24,7 +24,6 @@
 
 struct AsyncDelFormCallbackInfo {
     napi_env env;
-    OHOS::AppExecFwk::Ability *ability;
     napi_async_work asyncWork;
     napi_deferred deferred;
     napi_ref callback;
@@ -34,7 +33,6 @@ struct AsyncDelFormCallbackInfo {
 
 struct AsyncReleaseFormCallbackInfo {
     napi_env env;
-    OHOS::AppExecFwk::Ability *ability;
     napi_async_work asyncWork;
     napi_deferred deferred;
     napi_ref callback;
@@ -45,7 +43,6 @@ struct AsyncReleaseFormCallbackInfo {
 
 struct AsyncRequestFormCallbackInfo {
     napi_env env;
-    OHOS::AppExecFwk::Ability *ability;
     napi_async_work asyncWork;
     napi_deferred deferred;
     napi_ref callback;
@@ -55,7 +52,6 @@ struct AsyncRequestFormCallbackInfo {
 
 struct AsyncCastTempFormCallbackInfo {
     napi_env env;
-    OHOS::AppExecFwk::Ability *ability;
     napi_async_work asyncWork;
     napi_deferred deferred;
     napi_ref callback;
@@ -65,7 +61,6 @@ struct AsyncCastTempFormCallbackInfo {
 
 struct AsyncNotifyVisibleFormsCallbackInfo {
     napi_env env;
-    OHOS::AppExecFwk::Ability *ability;
     napi_async_work asyncWork;
     napi_deferred deferred;
     napi_ref callback;
@@ -75,7 +70,6 @@ struct AsyncNotifyVisibleFormsCallbackInfo {
 
 struct AsyncNotifyInvisibleFormsCallbackInfo {
     napi_env env;
-    OHOS::AppExecFwk::Ability *ability;
     napi_async_work asyncWork;
     napi_deferred deferred;
     napi_ref callback;
@@ -85,7 +79,6 @@ struct AsyncNotifyInvisibleFormsCallbackInfo {
 
 struct AsyncEnableUpdateFormCallbackInfo {
     napi_env env;
-    OHOS::AppExecFwk::Ability *ability;
     napi_async_work asyncWork;
     napi_deferred deferred;
     napi_ref callback;
@@ -95,7 +88,6 @@ struct AsyncEnableUpdateFormCallbackInfo {
 
 struct AsyncDisableUpdateFormCallbackInfo {
     napi_env env;
-    OHOS::AppExecFwk::Ability *ability;
     napi_async_work asyncWork;
     napi_deferred deferred;
     napi_ref callback;
@@ -105,7 +97,6 @@ struct AsyncDisableUpdateFormCallbackInfo {
 
 struct AsyncCheckFMSReadyCallbackInfo {
     napi_env env;
-    OHOS::AppExecFwk::Ability *ability;
     napi_async_work asyncWork;
     napi_deferred deferred;
     napi_ref callback;
@@ -114,7 +105,6 @@ struct AsyncCheckFMSReadyCallbackInfo {
 
 struct AsyncDeleteInvalidFormsCallbackInfo {
     napi_env env;
-    OHOS::AppExecFwk::Ability *ability;
     napi_async_work asyncWork = nullptr;
     napi_deferred deferred = nullptr;
     napi_ref callback = nullptr;
@@ -125,7 +115,6 @@ struct AsyncDeleteInvalidFormsCallbackInfo {
 
 struct AsyncAcquireFormStateCallbackInfo {
     napi_env env;
-    OHOS::AppExecFwk::Ability *ability;
     napi_async_work asyncWork;
     napi_deferred deferred;
     napi_ref callback;
@@ -137,7 +126,6 @@ struct AsyncAcquireFormStateCallbackInfo {
 
 struct AsyncNotifyFormsVisibleCallbackInfo {
     napi_env env;
-    OHOS::AppExecFwk::Ability *ability;
     napi_async_work asyncWork;
     napi_deferred deferred;
     napi_ref callback;
@@ -148,7 +136,6 @@ struct AsyncNotifyFormsVisibleCallbackInfo {
 
 struct AsyncNotifyFormsEnableUpdateCallbackInfo {
     napi_env env;
-    OHOS::AppExecFwk::Ability *ability;
     napi_async_work asyncWork;
     napi_deferred deferred;
     napi_ref callback;
@@ -159,7 +146,6 @@ struct AsyncNotifyFormsEnableUpdateCallbackInfo {
 
 struct AsyncGetFormsInfoCallbackInfo {
     napi_env env;
-    OHOS::AppExecFwk::Ability *ability;
     napi_async_work asyncWork;
     napi_deferred deferred;
     napi_ref callback;
@@ -187,4 +173,4 @@ napi_value NAPI_NotifyFormsEnableUpdate(napi_env env, napi_callback_info info);
 napi_value NAPI_GetAllFormsInfo(napi_env env, napi_callback_info info);
 napi_value NAPI_GetFormsInfo(napi_env env, napi_callback_info info);
 
-#endif /* NAPI_FORM_HOST_H_ */
+#endif /* OHOS_FORM_FWK_NAPI_FORM_HOST_H_ */

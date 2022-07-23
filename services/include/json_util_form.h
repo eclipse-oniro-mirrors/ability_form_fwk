@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_JSON_UTIL_FORM_H
-#define FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_JSON_UTIL_FORM_H
+#ifndef OHOS_FORM_FWK_FORM_UTIL_FORM_H
+#define OHOS_FORM_FWK_FORM_UTIL_FORM_H
 
 #include <string>
 
@@ -184,4 +184,4 @@ bool ParseInfoFromJsonStr(const char *data, T &t)
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
-#endif  // FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_JSON_UTIL_FORM_H
+#endif  // OHOS_FORM_FWK_FORM_UTIL_FORM_H

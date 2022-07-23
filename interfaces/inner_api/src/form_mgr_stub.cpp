@@ -313,7 +313,7 @@ int32_t FormMgrStub::HandleLifecycleUpdate(MessageParcel &data, MessageParcel &r
         HILOG_ERROR("%{public}s, failed to get remote object.", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    int32_t updateType = data.ReadInt32();
+    bool updateType = data.ReadBool();
     int32_t result = LifecycleUpdate(formIds, client, updateType);
     reply.WriteInt32(result);
     return result;

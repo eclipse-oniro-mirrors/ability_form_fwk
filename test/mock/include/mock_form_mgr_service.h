@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef FOUNDATION_APPEXECFWK_OHOS_MOCK_FORM_MGR_SERVICE_H
-#define FOUNDATION_APPEXECFWK_OHOS_MOCK_FORM_MGR_SERVICE_H
+#ifndef OHOS_FORM_FWK_MOCK_FORM_MGR_SERVICE_H
+#define OHOS_FORM_FWK_MOCK_FORM_MGR_SERVICE_H
 
 #include <gtest/gtest.h>
 #include "gmock/gmock.h"
@@ -34,7 +34,7 @@ public:
     MOCK_METHOD4(RequestPublishForm, ErrCode(Want &want, bool withFormBindingData,
         std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId));
     MOCK_METHOD3(LifecycleUpdate, int(const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &callerToken,
-        const int32_t updateType));
+        bool updateType));
     MOCK_METHOD3(RequestForm, int(const int64_t formId, const sptr<IRemoteObject> &callerToken, const Want &want));
     MOCK_METHOD3(NotifyWhetherVisibleForms, int(const std::vector<int64_t> &formIds,
         const sptr<IRemoteObject> &callerToken, const int32_t formVisibleType));
@@ -69,4 +69,4 @@ public:
 };
 }
 }
-#endif // FOUNDATION_APPEXECFWK_OHOS_MOCK_FORM_MGR_SERVICE_H
+#endif // OHOS_FORM_FWK_MOCK_FORM_MGR_SERVICE_H

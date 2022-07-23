@@ -47,7 +47,6 @@
 #include "in_process_call_wrapper.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
-#include "ohos_account_kits.h"
 #include "system_ability_definition.h"
 
 namespace OHOS {
@@ -984,7 +983,7 @@ ErrCode FormMgrAdapter::HandleEventNotify(const std::string &providerKey, const 
     HILOG_INFO("%{public}s called.", __func__);
     size_t position = providerKey.find(Constants::NAME_DELIMITER);
     std::string bundleName = providerKey.substr(0, position);
-    std::string abilityName = providerKey.substr(position + Constants::NAME_DELIMITER.size());
+    std::string abilityName = providerKey.substr(position + strlen(Constants::NAME_DELIMITER));
     sptr<IAbilityConnection> formEventNotifyConnection = new FormEventNotifyConnection(formIdsByProvider,
         formVisibleType, bundleName, abilityName);
     Want connectWant;
