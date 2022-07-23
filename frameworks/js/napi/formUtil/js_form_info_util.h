@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef JS_FORM_INFO_UTIL_H_
-#define JS_FORM_INFO_UTIL_H_
+#ifndef JS_FORM_INFO_UTIL_H
+#define JS_FORM_INFO_UTIL_H
 
 #include "form_info.h"
 #include "native_engine/native_engine.h"
@@ -34,4 +34,4 @@ NativeValue* CreateJsFormInfoArray(NativeEngine &engine, const std::vector<AppEx
 EXTERN_C_END
 } // namespace AppExecFwk
 } // namespace OHOS
-#endif /* JS_FORM_INFO_UTIL_H_ */
+#endif /* JS_FORM_INFO_UTIL_H */
