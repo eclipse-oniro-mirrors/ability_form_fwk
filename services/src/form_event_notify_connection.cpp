@@ -16,21 +16,17 @@
 
 #include "form_event_notify_connection.h"
 
-#include "appexecfwk_errors.h"
 #include "form_constants.h"
 #include "form_supply_callback.h"
 #include "form_task_mgr.h"
 #include "hilog_wrapper.h"
-#include "ipc_types.h"
-#include "message_parcel.h"
 #include "want.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 FormEventNotifyConnection::FormEventNotifyConnection(const std::vector<int64_t> formEvents,
     const int32_t formVisibleType, const std::string &bundleName, const std::string &abilityName)
-    :formEvents_(formEvents),
-    formVisibleType_(formVisibleType)
+    : formEvents_(formEvents), formVisibleType_(formVisibleType)
 {
     SetProviderKey(bundleName, abilityName);
 }
@@ -40,7 +36,6 @@ FormEventNotifyConnection::FormEventNotifyConnection(const std::vector<int64_t> 
  * @param element Service ability's ElementName.
  * @param remoteObject The session proxy of service ability.
  * @param resultCode ERR_OK on success, others on failure.
- * @return none.
  */
 void FormEventNotifyConnection::OnAbilityConnectDone(
     const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode)

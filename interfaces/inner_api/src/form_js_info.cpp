@@ -26,7 +26,7 @@ bool FormJsInfo::ReadFromParcel(Parcel &parcel)
     bundleName = Str16ToStr8(parcel.ReadString16());
     abilityName = Str16ToStr8(parcel.ReadString16());
 
-    formTempFlg = parcel.ReadBool();
+    formTempFlag = parcel.ReadBool();
     jsFormCodePath = Str16ToStr8(parcel.ReadString16());
     formData = Str16ToStr8(parcel.ReadString16());
 
@@ -78,7 +78,7 @@ bool FormJsInfo::Marshalling(Parcel &parcel) const
     }
 
     // write tempFlag
-    if (!parcel.WriteBool(formTempFlg)) {
+    if (!parcel.WriteBool(formTempFlag)) {
         return false;
     }
 

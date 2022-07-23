@@ -18,7 +18,6 @@
 
 #include <set>
 
-#include "event_handler.h"
 #include "form_ability_connection.h"
 #include "want.h"
 

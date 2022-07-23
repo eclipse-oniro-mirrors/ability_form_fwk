@@ -16,7 +16,6 @@
 #ifndef OHOS_FORM_FWK_FORM_EVENT_NOTIFY_CONNECTION_H
 #define OHOS_FORM_FWK_FORM_EVENT_NOTIFY_CONNECTION_H
 
-#include "event_handler.h"
 #include "form_ability_connection.h"
 #include "want.h"
 
@@ -45,7 +44,7 @@ public:
 
 private:
     std::vector<int64_t> formEvents_;
-    int32_t formVisibleType_;
+    int32_t formVisibleType_ = 0;
     DISALLOW_COPY_AND_MOVE(FormEventNotifyConnection);
 };
 }  // namespace AppExecFwk

@@ -14,28 +14,28 @@
  */
 
 #include "form_info_storage_mgr.h"
+
 #include <thread>
 #include <unistd.h>
 #include "form_constants.h"
 #include "form_mgr_errors.h"
 #include "hilog_wrapper.h"
-#include "kvstore_death_recipient_callback.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
 const int32_t CHECK_TIMES = 300;
 const int32_t CHECK_INTERVAL = 100000;  // 100ms
-}  // namespace
+} // namespace
 
 KvStoreDeathRecipientCallbackFormInfoStorage::KvStoreDeathRecipientCallbackFormInfoStorage()
 {
-    HILOG_INFO("create kvstore death recipient callback instance");
+    HILOG_INFO("create kv store death recipient callback instance");
 }
 
 KvStoreDeathRecipientCallbackFormInfoStorage::~KvStoreDeathRecipientCallbackFormInfoStorage()
 {
-    HILOG_INFO("destroy kvstore death recipient callback instance");
+    HILOG_INFO("destroy kv store death recipient callback instance");
 }
 
 void KvStoreDeathRecipientCallbackFormInfoStorage::OnRemoteDied()
@@ -168,7 +168,7 @@ ErrCode FormInfoStorageMgr::SaveBundleFormInfos(const std::string &bundleName, c
         status = kvStorePtr_->Put(key, value);
         if (status == DistributedKv::Status::IPC_ERROR) {
             status = kvStorePtr_->Put(key, value);
-            HILOG_WARN("distribute database ipc error and try to call again, result = %{public}d", status);
+            HILOG_WARN("distribute database ipc error and try to call again, result:%{public}d", status);
         }
     }
     if (status != DistributedKv::Status::SUCCESS) {
@@ -307,7 +307,7 @@ bool FormInfoStorageMgr::ResetKvStore()
     if (status == DistributedKv::Status::SUCCESS && kvStorePtr_ != nullptr) {
         return true;
     }
-    HILOG_WARN("failed");
+    HILOG_WARN("ResetKvStore failed");
     return false;
 }
 

@@ -16,10 +16,8 @@
 #ifndef OHOS_FORM_FWK_FORM_INFO_STORAGE_MGR_H
 #define OHOS_FORM_FWK_FORM_INFO_STORAGE_MGR_H
 
-#include <map>
 #include <singleton.h>
 #include <string>
-#include "appexecfwk_errors.h"
 #include "distributed_kv_data_manager.h"
 #include "kvstore_death_recipient.h"
 
@@ -70,7 +68,7 @@ private:
     DistributedKv::DistributedKvDataManager dataManager_;
     std::shared_ptr<DistributedKv::SingleKvStore> kvStorePtr_;
     mutable std::mutex kvStorePtrMutex_;
-    const int32_t MAX_TIMES = 600;              // 1min
+    const int32_t MAX_TIMES = 600;              // 600 * 100ms = 1min
     const int32_t SLEEP_INTERVAL = 100 * 1000;  // 100ms
 };
 }  // namespace AppExecFwk

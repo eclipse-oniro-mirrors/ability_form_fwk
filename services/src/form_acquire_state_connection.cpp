@@ -16,19 +16,16 @@
 
 #include "form_acquire_state_connection.h"
 
-#include "appexecfwk_errors.h"
 #include "form_constants.h"
 #include "form_supply_callback.h"
 #include "form_task_mgr.h"
-#include "form_util.h"
 #include "hilog_wrapper.h"
-#include "message_parcel.h"
 #include "want.h"
 
 namespace OHOS {
 namespace AppExecFwk {
-FormAcquireStateConnection::FormAcquireStateConnection(const std::string &bundleName, const std::string &abilityName,
-                                                       const Want &want, std::string &provider)
+FormAcquireStateConnection::FormAcquireStateConnection(const std::string &bundleName,
+    const std::string &abilityName, const Want &want, std::string &provider)
     : want_(want), provider_(provider)
 {
     SetProviderKey(bundleName, abilityName);

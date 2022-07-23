@@ -25,7 +25,7 @@ const std::string JSON_KEY_USER_ID = "userId";
 const std::string JSON_KEY_FORM_INFO = "formInfos";
 } // namespace
 
-FormInfoStorage::FormInfoStorage(int32_t userId, std::vector<AppExecFwk::FormInfo> &formInfos)
+FormInfoStorage::FormInfoStorage(int32_t userId, const std::vector<AppExecFwk::FormInfo> &formInfos)
 {
     this->userId = userId;
     for (const auto &item : formInfos) {
@@ -67,8 +67,12 @@ void to_json(nlohmann::json &jsonObject, const FormInfoStorage &formInfoStorage)
 
 void from_json(const nlohmann::json &jsonObject, FormInfoStorage &formInfoStorage)
 {
-    formInfoStorage.userId = jsonObject.at(JSON_KEY_USER_ID).get<int32_t>();
-    formInfoStorage.formInfos = jsonObject.at(JSON_KEY_FORM_INFO).get<std::vector<AppExecFwk::FormInfo>>();
+    if (!jsonObject.at(JSON_KEY_USER_ID).is_null()) {
+        formInfoStorage.userId = jsonObject.at(JSON_KEY_USER_ID).get<int32_t>();
+    }
+    if (!jsonObject.at(JSON_KEY_FORM_INFO).is_null()) {
+        formInfoStorage.formInfos = jsonObject.at(JSON_KEY_FORM_INFO).get<std::vector<AppExecFwk::FormInfo>>();
+    }
 }
 } // namespace AppExecFwk
 } // namespace OHOS

@@ -99,8 +99,8 @@ int FormItemInfo::GetSpecificationId() const
 }
 
 /**
- * @brief Obtains the updageFlag.
- * @return Returns updageFlag.
+ * @brief Obtains the updateFlag.
+ * @return Returns updateFlag.
  */
 bool FormItemInfo::IsEnableUpdateFlag() const
 {
@@ -311,11 +311,11 @@ void FormItemInfo::SetSpecificationId(const int specificationId)
 }
 /**
  * @brief Set value of updateFlag_.
- * @param IsEnableUpdateFlag Enable update flag or not.
+ * @param isEnableUpdateFlag Enable update flag or not.
  */
-void FormItemInfo::SetEnableUpdateFlag(bool IsEnableUpdateFlag)
+void FormItemInfo::SetEnableUpdateFlag(bool isEnableUpdateFlag)
 {
-    updateFlag_ = IsEnableUpdateFlag;
+    updateFlag_ = isEnableUpdateFlag;
 }
 /**
  * @brief Set value of updateDuration_.

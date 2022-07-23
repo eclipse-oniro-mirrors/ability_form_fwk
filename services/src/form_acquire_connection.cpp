@@ -18,25 +18,17 @@
 
 #include <cinttypes>
 
-#include "appexecfwk_errors.h"
 #include "form_constants.h"
 #include "form_supply_callback.h"
 #include "form_task_mgr.h"
 #include "form_util.h"
 #include "hilog_wrapper.h"
-#include "ipc_types.h"
-#include "message_parcel.h"
 #include "want.h"
 
 namespace OHOS {
 namespace AppExecFwk {
-FormAcquireConnection::FormAcquireConnection(
-    const int64_t formId,
-    const FormItemInfo &info,
-    const WantParams &wantParams)
-    :formId_(formId),
-    info_(info),
-    wantParams_(wantParams)
+FormAcquireConnection::FormAcquireConnection(const int64_t formId, const FormItemInfo &info,
+    const WantParams &wantParams) : formId_(formId), info_(info), wantParams_(wantParams)
 {
     SetProviderKey(info.GetProviderBundleName(), info.GetAbilityName());
 }
@@ -46,11 +38,10 @@ FormAcquireConnection::FormAcquireConnection(
  * @param remoteObject the session proxy of service ability.
  * @param resultCode ERR_OK on success, others on failure.
  */
-void FormAcquireConnection::OnAbilityConnectDone(
-    const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode)
+void FormAcquireConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &element,
+    const sptr<IRemoteObject> &remoteObject, int resultCode)
 {
     HILOG_INFO("%{public}s called.", __func__);
-
     if (resultCode != ERR_OK) {
         HILOG_ERROR("%{public}s, abilityName:%{public}s, formId:%{public}" PRId64 ", resultCode:%{public}d",
            __func__, element.GetAbilityName().c_str(), formId_, resultCode);

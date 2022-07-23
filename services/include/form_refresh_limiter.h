@@ -24,7 +24,7 @@ namespace OHOS {
 namespace AppExecFwk {
 /**
  * @class FormRefreshLimiter
- * Form refresh limite manager.
+ * Form refresh limit manager.
  */
 class FormRefreshLimiter {
 public:
