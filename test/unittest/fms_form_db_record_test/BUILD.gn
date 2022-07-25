@@ -25,7 +25,7 @@ ohos_unittest("FmsFormDbRecordTest") {
     "//third_party/json/include",
     "${ability_runtime_path}/services/formmgr/include",
     "${distributeddatamgr_path}/distributeddatamgr/interfaces/innerkits/distributeddata/include",
-    "${distributedschedule_path}/samgr/interfaces/innerkits/samgr_proxy/include/",
+    "${systemabilitymgr_path}/samgr/interfaces/innerkits/samgr_proxy/include/",
     "${form_fwk_path}/interfaces/inner_api/include",
   ]
 
@@ -36,9 +36,9 @@ ohos_unittest("FmsFormDbRecordTest") {
   }
   deps = [
     "${ability_runtime_path}/interfaces/inner_api/app_manager:app_manager",
-    "${distributedschedule_path}/safwk/interfaces/innerkits/safwk:system_ability_fwk",
-    "${distributedschedule_path}/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
     "${form_fwk_path}:fms_target",
+    "${systemabilitymgr_path}/safwk/interfaces/innerkits/safwk:system_ability_fwk",
+    "${systemabilitymgr_path}/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
     "//utils/native/base:utils",
   ]
 
