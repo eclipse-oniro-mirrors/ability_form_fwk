@@ -255,7 +255,7 @@ static ErrCode UnwrapFormInfoCustomData(napi_env env, napi_value value, std::vec
         UnwrapStringByPropertyName(env, value, "name", customizeDataName);
         std::string customizeDataValue;
         UnwrapStringByPropertyName(env, value, "value", customizeDataValue);
-        customizeData.push_back({customizeDataName, customizeDataValue});
+        customizeData.push_back({ customizeDataName, customizeDataValue });
     }
     return ERR_OK;
 }
