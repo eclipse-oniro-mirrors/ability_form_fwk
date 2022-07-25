@@ -1196,6 +1196,7 @@ void FormTimerMgr::EnsureInitIntervalTimer()
 void FormTimerMgr::ClearIntervalTimer()
 {
     HILOG_INFO("%{public}s start", __func__);
+    std::lock_guard<std::recursive_mutex> lock(intervalMutex_);
     if (intervalTimer_ != nullptr) {
         intervalTimer_->Shutdown();
         intervalTimer_.reset();
