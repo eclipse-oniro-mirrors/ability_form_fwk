@@ -16,12 +16,8 @@
 #ifndef OHOS_FORM_FWK_FORM_STORAGE_MGR_H
 #define OHOS_FORM_FWK_FORM_STORAGE_MGR_H
 
-#include <map>
 #include <string>
-#include <stdint.h>
-#include <iostream>
 
-#include "appexecfwk_errors.h"
 #include "distributed_kv_data_manager.h"
 #include "form_db_info.h"
 
@@ -74,8 +70,7 @@ public:
     bool ResetKvStore();
 
 private:
-    void SaveEntries(
-    const std::vector<DistributedKv::Entry> &allEntries, std::vector<InnerFormInfo> &innerFormInfos);
+    void SaveEntries(const std::vector<DistributedKv::Entry> &allEntries, std::vector<InnerFormInfo> &innerFormInfos);
     DistributedKv::Status GetEntries(std::vector<DistributedKv::Entry> &allEntries);
     void TryTwice(const std::function<DistributedKv::Status()> &func);
     bool CheckKvStore();
@@ -86,7 +81,6 @@ private:
     const DistributedKv::StoreId storeId_ {"installed_form_datas"};
     DistributedKv::DistributedKvDataManager dataManager_;
     std::shared_ptr<DistributedKv::SingleKvStore> kvStorePtr_;
-    // std::shared_ptr<DataChangeListener> dataChangeListener_;
     mutable std::mutex kvStorePtrMutex_;
 };
 }  // namespace AppExecFwk

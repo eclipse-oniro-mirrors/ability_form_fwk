@@ -18,19 +18,15 @@
 
 #include <cinttypes>
 
-#include "appexecfwk_errors.h"
 #include "form_constants.h"
 #include "form_supply_callback.h"
 #include "form_task_mgr.h"
 #include "hilog_wrapper.h"
-#include "ipc_types.h"
-#include "message_parcel.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 FormCastTempConnection::FormCastTempConnection(const int64_t formId, const std::string &bundleName,
-    const std::string &abilityName)
-    :formId_(formId)
+    const std::string &abilityName) : formId_(formId)
 {
     SetProviderKey(bundleName, abilityName);
 }

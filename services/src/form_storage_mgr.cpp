@@ -16,12 +16,7 @@
 #include "form_storage_mgr.h"
 
 #include <cinttypes>
-#include <cstdio>
-#include <dirent.h>
 #include <fstream>
-#include <iomanip>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <unistd.h>
 
 #include "form_constants.h"
@@ -30,13 +25,12 @@
 #include "hilog_wrapper.h"
 #include "kvstore_death_recipient_callback.h"
 #include "securec.h"
-#include "string_ex.h"
 #include "types.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-const int32_t MAX_TIMES = 600;              // 1min
+const int32_t MAX_TIMES = 600;              // 600 * 100ms = 1min
 const int32_t SLEEP_INTERVAL = 100 * 1000;  // 100ms
 }  // namespace
 
@@ -57,9 +51,7 @@ void FormStorageMgr::SaveEntries(
     const std::vector<DistributedKv::Entry> &allEntries, std::vector<InnerFormInfo> &innerFormInfos)
 {
     for (const auto &item : allEntries) {
-        std::string formId;
         InnerFormInfo innerFormInfo;
-
         nlohmann::json jsonObject = nlohmann::json::parse(item.value.ToString(), nullptr, false);
         if (jsonObject.is_discarded()) {
             HILOG_ERROR("error key: %{private}s", item.key.ToString().c_str());
@@ -81,9 +73,6 @@ void FormStorageMgr::SaveEntries(
         }
 
         if (std::find(innerFormInfos.begin(), innerFormInfos.end(), innerFormInfo) == innerFormInfos.end()) {
-            HILOG_DEBUG("emplace FormInfos: %{public}s", formId.c_str());
-            std::map<std::string, InnerFormInfo> allDevicesInfos;
-            allDevicesInfos.emplace(formId, innerFormInfo);
             innerFormInfos.emplace_back(innerFormInfo);
         }
     }
@@ -131,9 +120,7 @@ ErrCode FormStorageMgr::LoadFormData(std::vector<InnerFormInfo> &innerFormInfos)
  */
 ErrCode FormStorageMgr::GetStorageFormInfoById(const std::string &formId, InnerFormInfo &innerFormInfo)
 {
-    ErrCode ret = ERR_OK;
     HILOG_DEBUG("%{public}s called, formId[%{public}s]", __func__, formId.c_str());
-
     {
         std::lock_guard<std::mutex> lock(kvStorePtrMutex_);
         if (!CheckKvStore()) {
@@ -150,6 +137,7 @@ ErrCode FormStorageMgr::GetStorageFormInfoById(const std::string &formId, InnerF
         status = kvStorePtr_->GetEntries(key, allEntries);
     }
 
+    ErrCode ret = ERR_OK;
     if (status != DistributedKv::Status::SUCCESS) {
         HILOG_ERROR("get entries error: %{public}d", status);
         ret = ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -169,7 +157,6 @@ ErrCode FormStorageMgr::GetStorageFormInfoById(const std::string &formId, InnerF
             }
         }
     }
-
     return ret;
 }
 
@@ -181,9 +168,6 @@ ErrCode FormStorageMgr::GetStorageFormInfoById(const std::string &formId, InnerF
 ErrCode FormStorageMgr::SaveStorageFormInfo(const InnerFormInfo &innerFormInfo)
 {
     HILOG_INFO("%{public}s called, formId[%{public}" PRId64 "]", __func__, innerFormInfo.GetFormId());
-    ErrCode ret = ERR_OK;
-    std::string formId = std::to_string(innerFormInfo.GetFormId());
-
     {
         std::lock_guard<std::mutex> lock(kvStorePtrMutex_);
         if (!CheckKvStore()) {
@@ -192,6 +176,7 @@ ErrCode FormStorageMgr::SaveStorageFormInfo(const InnerFormInfo &innerFormInfo)
         }
     }
 
+    std::string formId = std::to_string(innerFormInfo.GetFormId());
     DistributedKv::Key key(formId);
     DistributedKv::Value value(innerFormInfo.ToString());
     DistributedKv::Status status;
@@ -203,6 +188,7 @@ ErrCode FormStorageMgr::SaveStorageFormInfo(const InnerFormInfo &innerFormInfo)
             HILOG_WARN("distribute database ipc error and try to call again, result = %{public}d", status);
         }
     }
+    ErrCode ret = ERR_OK;
     if (status != DistributedKv::Status::SUCCESS) {
         HILOG_ERROR("put innerFormInfo to kvStore error: %{public}d", status);
         ret = ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -218,10 +204,8 @@ ErrCode FormStorageMgr::SaveStorageFormInfo(const InnerFormInfo &innerFormInfo)
 ErrCode FormStorageMgr::ModifyStorageFormInfo(const InnerFormInfo &innerFormInfo)
 {
     HILOG_INFO("%{public}s called, formId[%{public}" PRId64 "]", __func__, innerFormInfo.GetFormId());
-
-    ErrCode ret = ERR_OK;
     std::string formId = std::to_string(innerFormInfo.GetFormId());
-    ret = DeleteStorageFormInfo(formId);
+    ErrCode ret = DeleteStorageFormInfo(formId);
     if (ret == ERR_OK) {
         SaveStorageFormInfo(innerFormInfo);
     }
@@ -237,7 +221,6 @@ ErrCode FormStorageMgr::ModifyStorageFormInfo(const InnerFormInfo &innerFormInfo
 ErrCode FormStorageMgr::DeleteStorageFormInfo(const std::string &formId)
 {
     HILOG_INFO("%{public}s called, formId[%{public}s]", __func__, formId.c_str());
-
     {
         std::lock_guard<std::mutex> lock(kvStorePtrMutex_);
         if (!CheckKvStore()) {
@@ -260,10 +243,8 @@ ErrCode FormStorageMgr::DeleteStorageFormInfo(const std::string &formId)
     if (status != DistributedKv::Status::SUCCESS) {
         HILOG_ERROR("delete key error: %{public}d", status);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    } else {
-        HILOG_ERROR("delete value to kvStore success");
     }
-
+    HILOG_INFO("delete value to kvStore success");
     return ERR_OK;
 }
 
@@ -302,7 +283,7 @@ DistributedKv::Status FormStorageMgr::GetKvStore()
         .kvStoreType = DistributedKv::KvStoreType::SINGLE_VERSION,
         .baseDir = Constants::FORM_STORAGE_DIR,
         .area = DistributedKv::EL1
-        };
+    };
 
     DistributedKv::Status status = dataManager_.GetSingleKvStore(options, appId_, storeId_, kvStorePtr_);
     if (status != DistributedKv::Status::SUCCESS) {
@@ -343,7 +324,7 @@ bool FormStorageMgr::ResetKvStore()
     if (status == DistributedKv::Status::SUCCESS && kvStorePtr_ != nullptr) {
         return true;
     }
-    HILOG_WARN("failed");
+    HILOG_WARN("ResetKvStore failed");
     return false;
 }
 }  // namespace AppExecFwk

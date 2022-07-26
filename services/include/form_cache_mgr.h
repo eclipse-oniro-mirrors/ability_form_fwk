@@ -16,13 +16,9 @@
 #define OHOS_FORM_FWK_FORM_CACHE_MGR_H
 
 #include <map>
-#include <memory>
 #include <mutex>
 #include <singleton.h>
 #include <string>
-
-#include "form_ashmem.h"
-#include "form_provider_data.h"
 
 namespace OHOS {
 namespace AppExecFwk {

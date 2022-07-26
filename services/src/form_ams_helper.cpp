@@ -14,8 +14,8 @@
  */
 
 #include "form_ams_helper.h"
+
 #include "ability_manager_interface.h"
-#include "appexecfwk_errors.h"
 #include "form_mgr_errors.h"
 #include "hilog_wrapper.h"
 #include "if_system_ability_manager.h"
@@ -81,7 +81,7 @@ ErrCode FormAmsHelper::ConnectServiceAbility(
  * @param connect Callback used to notify caller the result of connecting or disconnecting.
  * @return Returns ERR_OK on success, others on failure.
  */
-ErrCode FormAmsHelper::DisConnectServiceAbility(const sptr<AAFwk::IAbilityConnection> &connect)
+ErrCode FormAmsHelper::DisconnectServiceAbility(const sptr<AAFwk::IAbilityConnection> &connect)
 {
     HILOG_INFO("%{public}s called.", __func__);
     sptr<AAFwk::IAbilityManager> ams = GetAbilityManager();
@@ -97,16 +97,15 @@ ErrCode FormAmsHelper::DisConnectServiceAbility(const sptr<AAFwk::IAbilityConnec
  * @param connect Callback used to notify caller the result of connecting or disconnecting.
  * @return Returns ERR_OK on success, others on failure.
  */
-ErrCode FormAmsHelper::DisConnectServiceAbilityDelay(const sptr<AAFwk::IAbilityConnection> &connect)
+ErrCode FormAmsHelper::DisconnectServiceAbilityDelay(const sptr<AAFwk::IAbilityConnection> &connect)
 {
     if (eventHandler_ == nullptr) {
         HILOG_ERROR("%{public}s fail, eventhandler invalidate", __func__);
         return ERR_INVALID_OPERATION;
     }
-    std::function<void()> disConnectAbilityFunc = std::bind(
-        &FormAmsHelper::DisConnectAbilityTask,
-        this,
-        connect);
+    auto disConnectAbilityFunc = [connect]() {
+        FormAmsHelper::GetInstance().DisconnectAbilityTask(connect);
+    };
     if (!eventHandler_->PostTask(disConnectAbilityFunc, FORM_DISCONNECT_DELAY_TIME)) {
         HILOG_ERROR("%{public}s, failed to disconnect ability", __func__);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
@@ -127,7 +126,7 @@ void FormAmsHelper::SetAbilityManager(const sptr<AAFwk::IAbilityManager> &abilit
  * @param want Special want for service type's ability.
  * @param connect Callback used to notify caller the result of connecting or disconnecting.
  */
-void FormAmsHelper::DisConnectAbilityTask(const sptr<AAFwk::IAbilityConnection> &connect)
+void FormAmsHelper::DisconnectAbilityTask(const sptr<AAFwk::IAbilityConnection> &connect)
 {
     sptr<AAFwk::IAbilityManager> ams = GetAbilityManager();
     if (ams == nullptr) {

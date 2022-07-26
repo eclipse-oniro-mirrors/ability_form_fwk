@@ -41,8 +41,8 @@ enum class ArrayType {
 };
 
 template<typename T, typename dataType>
-void CheckArrayType(
-    const nlohmann::json &jsonObject, const std::string &key, dataType &data, ArrayType arrayType, int32_t &parseResult)
+void CheckArrayType(const nlohmann::json &jsonObject, const std::string &key,
+    dataType &data, ArrayType arrayType, int32_t &parseResult)
 {
     auto arrays = jsonObject.at(key);
     if (arrays.empty()) {
@@ -85,7 +85,7 @@ void CheckArrayType(
             }
             break;
         case ArrayType::NOT_ARRAY:
-            HILOG_ERROR("array %{public}s is not string type", key.c_str());
+            HILOG_ERROR("array %{public}s is not array type", key.c_str());
             break;
         default:
             HILOG_ERROR("array %{public}s type error", key.c_str());
@@ -169,13 +169,13 @@ template<typename T>
 bool ParseInfoFromJsonStr(const char *data, T &t)
 {
     if (data == nullptr) {
-        HILOG_ERROR("%{public}s faile due to data is nullptr", __func__);
+        HILOG_ERROR("%{public}s failed due to data is nullptr", __func__);
         return false;
     }
 
     nlohmann::json jsonObject = nlohmann::json::parse(data, nullptr, false);
     if (jsonObject.is_discarded()) {
-        HILOG_ERROR("%{public}s faile due to data is discarded", __func__);
+        HILOG_ERROR("%{public}s failed due to data is discarded", __func__);
         return false;
     }
 

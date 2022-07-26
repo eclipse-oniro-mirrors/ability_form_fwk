@@ -16,9 +16,14 @@
 #ifndef OHOS_FORM_FWK_FORM_PROVIDER_INFO_H
 #define OHOS_FORM_FWK_FORM_PROVIDER_INFO_H
 
-#include <string>
+#include <cstdint>
+#include <utility>
+
+#include "form_ashmem.h"
 #include "form_provider_data.h"
+#include "nlohmann/json_fwd.hpp"
 #include "parcel.h"
+#include "refbase.h"
 
 namespace OHOS {
 namespace AppExecFwk {

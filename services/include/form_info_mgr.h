@@ -40,7 +40,7 @@ private:
 
 class BundleFormInfo {
 public:
-    explicit BundleFormInfo(std::string bundleName);
+    explicit BundleFormInfo(const std::string &bundleName);
 
     ErrCode InitFromJson(const std::string &formInfoStoragesJson);
 
@@ -54,7 +54,7 @@ public:
 
     ErrCode RemoveAllDynamicFormsInfo(int32_t userId);
 
-    bool Empty();
+    bool Empty() const;
 
     ErrCode GetAllFormsInfo(std::vector<FormInfo> &formInfos);
 
@@ -98,7 +98,7 @@ public:
 
 private:
     std::shared_ptr<BundleFormInfo> GetOrCreateBundleFromInfo(const std::string &bundleName);
-    static bool IsCaller(std::string bundleName);
+    static bool IsCaller(const std::string& bundleName);
     static bool CheckBundlePermission();
     static ErrCode CheckDynamicFormInfo(FormInfo &formInfo, const BundleInfo &bundleInfo);
 

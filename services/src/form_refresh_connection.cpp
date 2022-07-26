@@ -18,13 +18,10 @@
 
 #include <cinttypes>
 
-#include "appexecfwk_errors.h"
 #include "form_constants.h"
 #include "form_supply_callback.h"
 #include "form_task_mgr.h"
 #include "hilog_wrapper.h"
-#include "ipc_types.h"
-#include "message_parcel.h"
 #include "want.h"
 
 namespace OHOS {
@@ -43,7 +40,6 @@ FormRefreshConnection::FormRefreshConnection(const int64_t formId, const Want& w
  * @param element Service ability's ElementName.
  * @param remoteObject The session proxy of service ability.
  * @param resultCode ERR_OK on success, others on failure.
- * @return none.
  */
 void FormRefreshConnection::OnAbilityConnectDone(
     const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode)

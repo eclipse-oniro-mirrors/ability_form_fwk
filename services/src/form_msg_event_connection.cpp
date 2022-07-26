@@ -18,21 +18,17 @@
 
 #include <cinttypes>
 
-#include "appexecfwk_errors.h"
 #include "form_constants.h"
 #include "form_supply_callback.h"
 #include "form_task_mgr.h"
 #include "hilog_wrapper.h"
-#include "ipc_types.h"
-#include "message_parcel.h"
 #include "want.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 FormMsgEventConnection::FormMsgEventConnection(const int64_t formId, const Want& want,
     const std::string &bundleName, const std::string &abilityName)
-    :formId_(formId),
-    want_(want)
+    : formId_(formId), want_(want)
 {
     SetProviderKey(bundleName, abilityName);
 }
@@ -42,7 +38,6 @@ FormMsgEventConnection::FormMsgEventConnection(const int64_t formId, const Want&
  * @param element Service ability's ElementName.
  * @param remoteObject The session proxy of service ability.
  * @param resultCode ERR_OK on success, others on failure.
- * @return none.
  */
 void FormMsgEventConnection::OnAbilityConnectDone(
     const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode)
@@ -54,15 +49,14 @@ void FormMsgEventConnection::OnAbilityConnectDone(
         return;
     }
     FormSupplyCallback::GetInstance()->AddConnection(this);
-
-    if (want_.HasParameter(Constants::PARAM_MESSAGE_KEY)) {
-        std::string message = want_.GetStringParam(Constants::PARAM_MESSAGE_KEY);
-        Want eventWant = Want(want_);
-        eventWant.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
-        FormTaskMgr::GetInstance().PostFormEventTask(formId_, message, eventWant, remoteObject);
-    } else {
+    if (!want_.HasParameter(Constants::PARAM_MESSAGE_KEY)) {
         HILOG_ERROR("%{public}s error, message info is not exist", __func__);
+        return;
     }
+    std::string message = want_.GetStringParam(Constants::PARAM_MESSAGE_KEY);
+    Want eventWant = Want(want_);
+    eventWant.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
+    FormTaskMgr::GetInstance().PostFormEventTask(formId_, message, eventWant, remoteObject);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -17,9 +17,7 @@
 #define OHOS_FORM_FWK_FORM_BMS_HELPER_H
 
 #include <singleton.h>
-#include "ability_connect_callback_interface.h"
 #include "ability_manager_interface.h"
-#include "bundle_info.h"
 #include "bundle_mgr_interface.h"
 
 namespace OHOS {

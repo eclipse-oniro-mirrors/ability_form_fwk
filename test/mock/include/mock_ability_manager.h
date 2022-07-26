@@ -499,9 +499,6 @@ public:
         return 0;
     }
 
-    virtual void GetSystemMemoryAttr(AppExecFwk::SystemMemoryAttr &memoryInfo)
-    {}
-
     int GetWantSenderInfo(const sptr<IWantSender> &target, std::shared_ptr<WantSenderInfo> &info) override
     {
         return 0;

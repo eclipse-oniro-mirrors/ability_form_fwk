@@ -17,7 +17,6 @@
 
 #include <cinttypes>
 
-#include "appexecfwk_errors.h"
 #include "form_ams_helper.h"
 #include "form_batch_delete_connection.h"
 #include "form_cache_mgr.h"
@@ -90,7 +89,7 @@ ErrCode FormProviderMgr::AcquireForm(const int64_t formId, const FormProviderInf
     if (formProviderInfo.NeedCache()) {
         HILOG_WARN("%{public}s, acquire js card, cache the card", __func__);
         std::string jsonData = formProviderInfo.GetFormDataString();
-        HILOG_DEBUG("%{public}s , jsonData is %{public}s.", __func__, jsonData.c_str());
+        HILOG_DEBUG("%{public}s, jsonData is %{public}s.", __func__, jsonData.c_str());
         FormCacheMgr::GetInstance().AddData(formId, jsonData);
     }
     return ERR_OK;
@@ -268,7 +267,6 @@ ErrCode FormProviderMgr::NotifyProviderFormsBatchDelete(const std::string &bundl
 /**
  * @brief Update form.
  * @param formId The form's id.
-
  * @param formProviderData form provider data.
  * @return Returns ERR_OK on success, others on failure.
  */
@@ -323,7 +321,6 @@ ErrCode FormProviderMgr::UpdateForm(const int64_t formId,
             formRecord.formProviderInfo.SetUpgradeFlg(false);
         }
     }
-
     HILOG_DEBUG("%{public}s screenOn:%{public}d.", __func__, screenOnFlag);
 #endif
 
@@ -433,7 +430,6 @@ FormRecord FormProviderMgr::GetFormAbilityInfo(const FormRecord &record) const
     newRecord.isInited = record.isInited;
     newRecord.versionUpgrade = record.versionUpgrade;
     newRecord.needFreeInstall = record.needFreeInstall;
-
     return newRecord;
 }
 

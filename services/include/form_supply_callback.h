@@ -73,7 +73,7 @@ private:
      * @brief check if disconnect ability or not.
      * @param connection The ability connection.
      */
-    bool CanDisConnect(sptr<FormAbilityConnection> &connection);
+    bool CanDisconnect(sptr<FormAbilityConnection> &connection);
 private:
     static std::mutex mutex_;
     static sptr<FormSupplyCallback> instance_;

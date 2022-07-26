@@ -33,8 +33,7 @@ bool FormRefreshLimiter::AddItem(const int64_t formId)
     auto info = limiterMap_.find(formId);
     if (info == limiterMap_.end()) {
         LimitInfo limitInfo;
-        std::pair<std::map<int64_t, LimitInfo>::iterator, bool> retVal =
-            limiterMap_.emplace(formId, limitInfo);
+        auto retVal = limiterMap_.emplace(formId, limitInfo);
         HILOG_INFO("%{public}s end", __func__);
         return retVal.second;
     } else {
@@ -88,7 +87,7 @@ bool FormRefreshLimiter::IsEnableRefresh(const int64_t formId)
 
         if (info->second.refreshCount == Constants::LIMIT_COUNT && !info->second.isReported) {
             info->second.isReported = true;
-            HILOG_INFO("report refresh to 50 count,formId:%{public}" PRId64 "", formId);
+            HILOG_INFO("report refresh to 50 count, formId:%{public}" PRId64 "", formId);
         }
     }
     HILOG_INFO("%{public}s end", __func__);
@@ -191,6 +190,7 @@ std::vector<int64_t> FormRefreshLimiter::GetRemindListAndResetLimit()
  */
 int FormRefreshLimiter::GetItemCount() const
 {
+    std::lock_guard<std::mutex> lock(limiterMutex_);
     return limiterMap_.size();
 }
 }  // namespace AppExecFwk

@@ -16,19 +16,15 @@
 #ifndef OHOS_FORM_FWK_FORM_MGR_ADAPTER_H
 #define OHOS_FORM_FWK_FORM_MGR_ADAPTER_H
 
-#include <mutex>
 #include <singleton.h>
 
 #include "bundle_info.h"
 #include "bundle_mgr_interface.h"
-#include "form_db_info.h"
-#include "form_host_record.h"
 #include "form_info.h"
 #include "form_item_info.h"
 #include "form_js_info.h"
 #include "form_provider_data.h"
 #include "form_state_info.h"
-#include "ipc_types.h"
 #include "iremote_object.h"
 #include "want.h"
 
@@ -100,7 +96,7 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode NotifyWhetherVisibleForms(const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &callerToken,
-    const int32_t formVisibleType);
+        const int32_t formVisibleType);
 
     /**
      * @brief temp form to normal form.
@@ -133,7 +129,7 @@ public:
     /**
      * @brief Dump form timer by form id.
      * @param formId The id of the form.
-     * @param formInfo Form timer.
+     * @param isTimingService "true" or "false".
      * @return Returns ERR_OK on success, others on failure.
      */
     int DumpFormTimerByFormId(const std::int64_t formId, std::string &isTimingService) const;
@@ -358,7 +354,7 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode GetFormItemInfo(const AAFwk::Want &want, const BundleInfo &bundleInfo, const FormInfo &formInfo,
-    FormItemInfo &formItemInfo);
+        FormItemInfo &formItemInfo);
     /**
      * @brief Dimension valid check.
      * @param formInfo Form info.
@@ -383,7 +379,7 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode AllotFormById(const FormItemInfo &info, const sptr<IRemoteObject> &callerToken,
-    const WantParams &wantParams, FormJsInfo &formInfo);
+        const WantParams &wantParams, FormJsInfo &formInfo);
     /**
      * @brief Allocate form by form configure info.
      * @param info Form configure info.
@@ -393,7 +389,7 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode AllotFormByInfo(const FormItemInfo &info, const sptr<IRemoteObject> &callerToken,
-    const WantParams& wantParams, FormJsInfo &formInfo);
+        const WantParams& wantParams, FormJsInfo &formInfo);
     /**
      * @brief Acquire form data from form provider.
      * @param formId The Id of the form..
@@ -441,7 +437,7 @@ private:
      * @param formId The form id.
      * @return Padded form id.
      */
-    int64_t PaddingUDIDHash(const int64_t formId) const;
+    int64_t PaddingUdidHash(const int64_t formId) const;
 
     /**
      * @brief Add existed form record.
@@ -483,7 +479,6 @@ private:
      * @brief Increase the timer refresh count.
      *
      * @param formId The form id.
-     * @return none.
      */
     void IncreaseTimerRefreshCount(const int64_t formId);
 
@@ -499,25 +494,23 @@ private:
                                  bool flag, bool isOnlyEnableUpdate);
 
     /**
-     * @brief handle update form flag.
-     * @param formIDs The id of the forms.
-     * @param callerToken Caller ability token.
-     * @param flag form flag.
-     * @return Returns ERR_OK on success, others on failure.
+     * @brief check form cached.
+     * @param record Form information.
+     * @return Returns true on cached, false on not.
      */
     bool IsFormCached(const FormRecord record);
 
     /**
-     * @brief set next refresht time locked.
+     * @brief set next refresh time locked.
      * @param formId The form's id.
      * @param nextTime next refresh time.
      * @param userId User ID.
      * @return Returns ERR_OK on success, others on failure.
      */
-    int SetNextRefreshtTimeLocked(const int64_t formId, const int64_t nextTime, const int32_t userId = 0);
+    int SetNextRefreshTimeLocked(const int64_t formId, const int64_t nextTime, const int32_t userId = 0);
 
     /**
-     * @brief set next refresht time locked.
+     * @brief check if update is valid.
      * @param formId The form's id.
      * @param bundleName Provider ability bundleName.
      * @return Returns true or false.
@@ -601,6 +594,7 @@ private:
      * @brief If the form provider is system app and the config item 'formVisibleNotify' is true,
      *        notify the form provider that the current form is visible.
      *
+     * @param iBundleMgr BundleManager
      * @param bundleName BundleName
      * @return Returns true if the form provider is system app, false if not.
      */

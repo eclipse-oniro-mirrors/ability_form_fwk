@@ -18,20 +18,16 @@
 
 #include <cinttypes>
 
-#include "appexecfwk_errors.h"
 #include "form_constants.h"
 #include "form_supply_callback.h"
 #include "form_task_mgr.h"
 #include "hilog_wrapper.h"
-#include "ipc_types.h"
-#include "message_parcel.h"
 #include "want.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 FormDeleteConnection::FormDeleteConnection(const int64_t formId, const std::string &bundleName,
-    const std::string &abilityName)
-    :formId_(formId)
+    const std::string &abilityName) : formId_(formId)
 {
     SetProviderKey(bundleName, abilityName);
 }
@@ -54,7 +50,7 @@ void FormDeleteConnection::OnAbilityConnectDone(
 
     Want want;
     want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
-    HILOG_DEBUG("%{public}s, connectId :%{public}ld", __func__, this->GetConnectId());
+    HILOG_DEBUG("%{public}s, connectId:%{public}ld", __func__, this->GetConnectId());
     FormTaskMgr::GetInstance().PostDeleteTask(formId_, want, remoteObject);
 }
 }  // namespace AppExecFwk

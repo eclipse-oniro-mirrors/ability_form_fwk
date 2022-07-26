@@ -152,7 +152,7 @@ HWTEST_F(FmsFormMgrLifecycleUpdateTest, FmsFormMgrLifecycleUpdateTest_LifecycleU
 
     // create clientRecords_
     FormHostRecord formHostRecord;
-    formHostRecord.SetClientStub(token_);
+    formHostRecord.SetFormHostClient(token_);
     formHostRecord.AddForm(formId);
     formHostRecord.SetNeedRefresh(formId, true);
     FormDataMgr::GetInstance().clientRecords_.push_back(formHostRecord);
@@ -181,7 +181,7 @@ HWTEST_F(FmsFormMgrLifecycleUpdateTest, FmsFormMgrLifecycleUpdateTest_LifecycleU
 
     // create clientRecords_
     FormHostRecord formHostRecord;
-    formHostRecord.SetClientStub(token_);
+    formHostRecord.SetFormHostClient(token_);
     formHostRecord.AddForm(formId);
     formHostRecord.SetNeedRefresh(formId, true);
     FormDataMgr::GetInstance().clientRecords_.push_back(formHostRecord);
@@ -219,7 +219,7 @@ HWTEST_F(FmsFormMgrLifecycleUpdateTest, FmsFormMgrLifecycleUpdateTest_LifecycleU
 
     // create clientRecords_
     FormHostRecord formHostRecord;
-    formHostRecord.SetClientStub(token_);
+    formHostRecord.SetFormHostClient(token_);
     formHostRecord.AddForm(formId);
     // needRefresh:true
     formHostRecord.SetNeedRefresh(formId, true);

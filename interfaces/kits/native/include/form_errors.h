@@ -16,10 +16,12 @@
 #ifndef OHOS_FORM_FWK_FORM_ERRORS_H
 #define OHOS_FORM_FWK_FORM_ERRORS_H
 
+#include <cstring>
 #include <map>
-#include <singleton.h>
 
 #include "errors.h"
+#include "nocopyable.h"
+#include "singleton.h"
 
 namespace OHOS {
 namespace AppExecFwk {

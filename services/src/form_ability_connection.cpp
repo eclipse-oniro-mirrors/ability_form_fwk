@@ -18,18 +18,14 @@
 
 #include <cinttypes>
 
-#include "appexecfwk_errors.h"
 #include "form_bms_helper.h"
 #include "form_data_mgr.h"
 #include "form_db_cache.h"
 #include "form_info.h"
 #include "form_info_mgr.h"
 #include "form_supply_callback.h"
-#include "form_task_mgr.h"
 #include "form_timer_mgr.h"
 #include "hilog_wrapper.h"
-#include "ipc_types.h"
-#include "message_parcel.h"
 #include "want.h"
 
 namespace OHOS {
@@ -45,7 +41,7 @@ void FormAbilityConnection::OnAbilityConnectDone(
 {
     if (resultCode != ERR_OK) {
         HILOG_ERROR("%{public}s, formId:%{public}" PRId64 ", resultCode:%{public}d",
-        __func__, formId_, resultCode);
+            __func__, formId_, resultCode);
         return;
     }
 
@@ -56,7 +52,7 @@ void FormAbilityConnection::OnAbilityConnectDone(
 
     std::vector<FormInfo> targetForms;
     if (FormInfoMgr::GetInstance().GetFormsInfoByBundle(bundleName_, targetForms) != ERR_OK) {
-        HILOG_ERROR("%{public}s error, failed to get forms info.", __func__);
+        HILOG_ERROR("%{public}s error, failed to get forms info for %{public}s.", __func__, bundleName_.c_str());
         return;
     }
 
@@ -76,7 +72,7 @@ void FormAbilityConnection::OnAbilityConnectDone(
     }
 
     // delete form
-    if (formRecord.formTempFlg) {
+    if (formRecord.formTempFlag) {
         FormDataMgr::GetInstance().DeleteTempForm(formId_);
     } else {
         FormDbCache::GetInstance().DeleteFormInfo(formId_);
@@ -94,13 +90,13 @@ void FormAbilityConnection::OnAbilityConnectDone(
  */
 void FormAbilityConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
 {
-    HILOG_DEBUG(
-        "%{public}s, element:%{public}s, resultCode:%{public}d", __func__, element.GetURI().c_str(), resultCode);
+    HILOG_DEBUG("%{public}s, element:%{public}s, resultCode:%{public}d",
+        __func__, element.GetURI().c_str(), resultCode);
     if (connectId_ != 0) {
         FormSupplyCallback::GetInstance()->RemoveConnection(connectId_);
         connectId_ = 0;
     } else {
-        HILOG_ERROR("%{public}s fail, connectId_ invalidate. connectId_: %{public}ld", __func__, connectId_);
+        HILOG_ERROR("%{public}s fail, invalid connectId_: %{public}ld", __func__, connectId_);
     }
 }
 
@@ -132,7 +128,7 @@ void FormAbilityConnection::SetConnectId(long connectId)
  * @brief Get connectId.
  * @return The ability connection id.
  */
-long FormAbilityConnection::GetConnectId()
+long FormAbilityConnection::GetConnectId() const
 {
     return connectId_;
 }
@@ -142,7 +138,7 @@ long FormAbilityConnection::GetConnectId()
  *
  * @return The provider Key
  */
-std::string FormAbilityConnection::GetProviderKey()
+std::string FormAbilityConnection::GetProviderKey() const
 {
     if (bundleName_.empty() || abilityName_.empty()) {
         return "";

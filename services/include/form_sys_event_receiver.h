@@ -64,7 +64,7 @@ private:
     void ClearFormDBRecordData(const int uid, std::map<int64_t, bool> &removedFormsMap);
     void ClearTempFormRecordData(const int uid, std::map<int64_t, bool> &removedFormsMap);
     void BatchDeleteNoHostDBForms(const int uid, std::map<FormIdKey, std::set<int64_t>> &noHostFormDbMap,
-    std::map<int64_t, bool> &removedFormsMap);
+        std::map<int64_t, bool> &removedFormsMap);
     void HandleUserIdRemoved(const int32_t userId); // multiuser
     /**
      * @brief Delete no host temp forms.
@@ -73,11 +73,11 @@ private:
      * @param foundFormsMap Form Id list.
      */
     void BatchDeleteNoHostTempForms(const int uid, std::map<FormIdKey, std::set<int64_t>> &noHostTempFormsMap,
-    std::map<int64_t, bool> &foundFormsMap);
+        std::map<int64_t, bool> &foundFormsMap);
     void ReCreateForm(const int64_t formId);
     bool IsSameForm(const FormRecord &record, const FormInfo &formInfo);
     void GetTimerCfg(const bool updateEnabled, const int updateDuration, const std::string &configUpdateAt,
-    FormTimerCfg &cfg);
+        FormTimerCfg &cfg);
     void HandleTimerUpdate(const int64_t formId, const FormRecord &record, const FormTimerCfg &timerCfg);
     void HandleBundleScanFinished(int32_t userId);
 private:

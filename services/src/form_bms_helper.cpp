@@ -14,8 +14,8 @@
  */
 
 #include "form_bms_helper.h"
+
 #include "ability_manager_interface.h"
-#include "appexecfwk_errors.h"
 #include "hilog_wrapper.h"
 #include "if_system_ability_manager.h"
 #include "in_process_call_wrapper.h"
@@ -64,7 +64,6 @@ sptr<IBundleMgr> FormBmsHelper::GetBundleMgr()
 void FormBmsHelper::SetBundleManager(const sptr<IBundleMgr> &bundleManager)
 {
     HILOG_INFO("%{public}s called.", __func__);
-
     iBundleMgr_ = bundleManager;
 }
 /**
@@ -99,6 +98,11 @@ void FormBmsHelper::NotifyModuleRemovable(const std::string &bundleName, const s
  */
 void FormBmsHelper::NotifyModuleNotRemovable(const std::string &bundleName, const std::string &moduleName)
 {
+    HILOG_INFO("%{public}s, bundleName:%{public}s, moduleName:%{public}s",
+        __func__, bundleName.c_str(), moduleName.c_str());
+    if (bundleName.empty() || moduleName.empty()) {
+        return;
+    }
     std::string key = GenerateModuleKey(bundleName, moduleName);
     HILOG_INFO("%{public}s, begin to notify %{public}s not removable", __func__, key.c_str());
     sptr<IBundleMgr> iBundleMgr = GetBundleMgr();

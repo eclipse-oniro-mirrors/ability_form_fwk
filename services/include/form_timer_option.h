@@ -36,7 +36,7 @@ public:
     void SetCallbackInfo(std::function<void()> callBack);
 
 private:
-    std::function<void()> callBack;
+    std::function<void()> callBack_;
 };
 
 FormTimerOption::FormTimerOption()
@@ -49,14 +49,14 @@ FormTimerOption::~FormTimerOption()
 
 void FormTimerOption::OnTrigger()
 {
-    if (this->callBack) {
-        this->callBack();
+    if (callBack_) {
+        callBack_();
     }
 }
 
 void FormTimerOption::SetCallbackInfo(std::function<void()> callBack)
 {
-    this->callBack = callBack;
+    callBack_ = callBack;
 }
 
 void FormTimerOption::SetType(const int &type)

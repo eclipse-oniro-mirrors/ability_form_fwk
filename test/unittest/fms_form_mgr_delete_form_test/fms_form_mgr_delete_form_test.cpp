@@ -218,7 +218,7 @@ HWTEST_F(FmsFormMgrDeleteFormTest, DeleteForm_003, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "fms_form_mgr_delete_form_test_003 start";
     // case when formId<=0
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, FormMgr::GetInstance().DeleteForm(0, token_));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_FORM_ID, FormMgr::GetInstance().DeleteForm(0, token_));
     // case when token is nullptr
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, FormMgr::GetInstance().DeleteForm(123L, nullptr));
     GTEST_LOG_(INFO) << "fms_form_mgr_delete_form_test_003 end";

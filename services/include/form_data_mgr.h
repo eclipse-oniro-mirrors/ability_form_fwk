@@ -17,7 +17,6 @@
 #define OHOS_FORM_FWK_FORM_FORM_DATA_MGR_H
 
 #include <map>
-#include <memory>
 #include <mutex>
 #include <set>
 #include <singleton.h>
@@ -48,20 +47,18 @@ public:
     DISALLOW_COPY_AND_MOVE(FormDataMgr);
     /**
      * @brief Allot form info by item info.
-     * @param formId The Id of the form.
      * @param formInfo Form item info.
      * @param callingUid The UID of the proxy.
      * @param userId User ID.
      * @return Returns form record.
      */
     FormRecord AllotFormRecord(const FormItemInfo &formInfo, const int callingUid,
-    const int32_t userId = Constants::DEFAULT_USER_ID);
+        const int32_t userId = Constants::DEFAULT_USER_ID);
     /**
      * @brief Create form js info by form record.
      * @param formId The Id of the form.
      * @param record Form record.
      * @param formInfo Js info.
-     * @return None.
      */
     void CreateFormInfo(const int64_t formId, const FormRecord &record, FormJsInfo &formInfo);
     /**
@@ -112,10 +109,10 @@ public:
     /**
      * @brief Modify form temp flag by formId.
      * @param formId The Id of the form.
-     * @param formTempFlg The form temp flag.
+     * @param formTempFlag The form temp flag.
      * @return Returns true if this function is successfully called; returns false otherwise.
      */
-    bool ModifyFormTempFlg(const int64_t formId, const bool formTempFlg);
+    bool ModifyFormTempFlag(const int64_t formId, const bool formTempFlag);
     /**
      * @brief Add form user uid from form record.
      * @param formId The Id of the form.
@@ -185,13 +182,13 @@ public:
     /**
      * @brief Refresh enable or not.
      * @param formId The Id of the form.
-     * @return true on enbale, false on disable.
+     * @return true on enable, false on disable.
      */
     bool IsEnableRefresh(int64_t formId);
     /**
      * @brief update enable or not.
      * @param formId The Id of the form.
-     * @return true on enbale, false on disable.
+     * @return true on enable, false on disable.
      */
     bool IsEnableUpdate(int64_t formId);
     /**
@@ -498,7 +495,7 @@ private:
      * @return Form record.
      */
     FormRecord CreateFormRecord(const FormItemInfo &formInfo, const int callingUid,
-    const int32_t userId = Constants::DEFAULT_USER_ID) const;
+        const int32_t userId = Constants::DEFAULT_USER_ID) const;
     /**
      * @brief Create host record.
      * @param info The form item info.
@@ -508,7 +505,7 @@ private:
      * @return Returns true if this function is successfully called; returns false otherwise.
      */
     bool CreateHostRecord(const FormItemInfo &info, const sptr<IRemoteObject> &callerToken,
-    const int callingUid, FormHostRecord &record);
+        const int callingUid, FormHostRecord &record);
     /**
      * @brief Parse update config.
      * @param record The form record.
@@ -531,7 +528,7 @@ private:
     /**
      * @brief Get the temp forms from host and delete temp form in cache.
      * @param record The form record.
-     * @param recordTempForms Getted the temp forms.
+     * @param recordTempForms the temp forms.
      */
     void HandleHostDiedForTempForms(const FormHostRecord &record, std::vector<int64_t> &recordTempForms);
     /**
@@ -551,11 +548,9 @@ private:
     bool IsSameForm(const FormRecord &record, const AbilityFormInfo &abilityFormInfo);
 
     /**
-     * @brief handle update form flag.
-     * @param formIDs The id of the forms.
-     * @param callerToken Caller ability token.
-     * @param flag form flag.
-     * @return Returns ERR_OK on success, others on failure.
+     * @brief check if form cached.
+     * @param record The form record.
+     * @return Returns ERR_OK on cached, others on not cached.
      */
     bool IsFormCached(const FormRecord record);
 
@@ -582,18 +577,18 @@ private:
     bool GetAbilityFormInfo(const FormRecord &record, const std::vector<T> &abilities,
         AbilityFormInfo &abilityFormInfo);
 private:
-    mutable std::mutex formRecordMutex_;
-    mutable std::mutex formHostRecordMutex_;
-    mutable std::mutex formTempMutex_;
-    mutable std::mutex formStateRecordMutex_;
-    mutable std::mutex formRequestPublishFormsMutex_;
+    mutable std::recursive_mutex formRecordMutex_;
+    mutable std::recursive_mutex formHostRecordMutex_;
+    mutable std::recursive_mutex formTempMutex_;
+    mutable std::recursive_mutex formStateRecordMutex_;
+    mutable std::recursive_mutex formRequestPublishFormsMutex_;
     std::map<int64_t, FormRecord> formRecords_;
     std::vector<FormHostRecord> clientRecords_;
     std::vector<int64_t> tempForms_;
     std::map<std::string, FormHostRecord> formStateRecord_;
     using FormRequestPublishFormInfo = std::pair<Want, std::unique_ptr<FormProviderData>>;
     std::map<int64_t, FormRequestPublishFormInfo> formRequestPublishForms_;
-    int64_t udidHash_;
+    int64_t udidHash_ = 0;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -14,7 +14,6 @@
  */
 
 #include "form_provider_info.h"
-#include "string_ex.h"
 
 namespace OHOS {
 namespace AppExecFwk {

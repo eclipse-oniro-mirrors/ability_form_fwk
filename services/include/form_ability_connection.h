@@ -16,8 +16,6 @@
 #ifndef OHOS_FORM_FWK_FORM_ABILITY_CONNECTION_H
 #define OHOS_FORM_FWK_FORM_ABILITY_CONNECTION_H
 
-#include "event_handler.h"
-#include "form_item_info.h"
 #include "provider_connect_stub.h"
 #include "want.h"
 
@@ -60,7 +58,7 @@ public:
      * @brief Get connectId.
      * @return The ability connection id.
      */
-    long GetConnectId();
+    long GetConnectId() const;
 
     /**
      * @brief Set connectId.
@@ -72,7 +70,7 @@ public:
      *
      * @return The provider Key
      */
-    std::string GetProviderKey();
+    std::string GetProviderKey() const;
     /**
      * @brief Set the Provider Key
      *
@@ -100,7 +98,7 @@ public:
      */
     int64_t GetFormId() const;
 private:
-    int64_t formId_ = 0;
+    int64_t formId_ = -1;
     std::string deviceId_ = "";
     std::string bundleName_ = "";
     std::string abilityName_ = "";

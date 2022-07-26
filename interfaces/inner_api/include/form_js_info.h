@@ -34,7 +34,7 @@ struct FormJsInfo : public Parcelable {
     std::string formName;
     std::string bundleName;
     std::string abilityName;
-    bool formTempFlg = false;
+    bool formTempFlag = false;
     std::string jsFormCodePath;
     std::string formData;
     std::map<std::string, sptr<FormAshmem>> imageDataMap;

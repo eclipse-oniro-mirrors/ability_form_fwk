@@ -51,7 +51,7 @@ void FormAbilityStress::StressFormCallback::OnAcquired(const int32_t result, con
     HILOG_INFO("%{public}s bundleName: %{public}s", __func__, formJsInfo.bundleName.c_str());
     HILOG_INFO("%{public}s abilityName: %{public}s", __func__, formJsInfo.abilityName.c_str());
     HILOG_INFO("%{public}s formName: %{public}s", __func__, formJsInfo.formName.c_str());
-    HILOG_INFO("%{public}s formTempFlg: %{public}d", __func__, formJsInfo.formTempFlg);
+    HILOG_INFO("%{public}s formTempFlag: %{public}d", __func__, formJsInfo.formTempFlag);
     HILOG_INFO("%{public}s jsFormCodePath: %{public}s", __func__, formJsInfo.jsFormCodePath.c_str());
     HILOG_INFO("%{public}s formData: %{public}s", __func__, formJsInfo.formData.c_str());
     HILOG_INFO("%{public}s formProviderData GetDataString: %{public}s",
@@ -90,7 +90,7 @@ void FormAbilityStress::StressFormCallback::OnUpdate(const int32_t result, const
     HILOG_INFO("%{public}s bundleName: %{public}s", __func__, formJsInfo.bundleName.c_str());
     HILOG_INFO("%{public}s abilityName: %{public}s", __func__, formJsInfo.abilityName.c_str());
     HILOG_INFO("%{public}s formName: %{public}s", __func__, formJsInfo.formName.c_str());
-    HILOG_INFO("%{public}s formTempFlg: %{public}d", __func__, formJsInfo.formTempFlg);
+    HILOG_INFO("%{public}s formTempFlag: %{public}d", __func__, formJsInfo.formTempFlag);
     HILOG_INFO("%{public}s jsFormCodePath: %{public}s", __func__, formJsInfo.jsFormCodePath.c_str());
     HILOG_INFO("%{public}s formData: %{public}s", __func__, formJsInfo.formData.c_str());
     HILOG_INFO("%{public}s formProviderData GetDataString: %{public}s",

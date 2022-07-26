@@ -52,7 +52,7 @@ ohos_unittest("FmsFormTimerMgrTest") {
     "form_fwk:form_manager",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
-    "time_native:time_service",
+    "time_service:time_service",
   ]
 }
 

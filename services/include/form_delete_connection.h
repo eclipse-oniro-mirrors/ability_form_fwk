@@ -16,7 +16,6 @@
 #ifndef OHOS_FORM_FWK_FORM_DELETE_CONNECTION_H
 #define OHOS_FORM_FWK_FORM_DELETE_CONNECTION_H
 
-#include "event_handler.h"
 #include "form_ability_connection.h"
 
 namespace OHOS {
@@ -40,7 +39,7 @@ public:
         const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode) override;
 
 private:
-    int64_t formId_;
+    int64_t formId_ = -1;
     DISALLOW_COPY_AND_MOVE(FormDeleteConnection);
 };
 }  // namespace AppExecFwk

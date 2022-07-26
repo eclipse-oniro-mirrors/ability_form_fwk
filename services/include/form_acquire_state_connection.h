@@ -16,9 +16,6 @@
 #ifndef OHOS_FORM_FWK_FORM_ACQUIRE_STATE_CONNECTION_H
 #define OHOS_FORM_FWK_FORM_ACQUIRE_STATE_CONNECTION_H
 
-#include <set>
-
-#include "event_handler.h"
 #include "form_ability_connection.h"
 #include "want.h"
 
