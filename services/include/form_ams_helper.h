@@ -71,6 +71,13 @@ public:
      */
     ErrCode DisconnectServiceAbilityDelay(const sptr<AAFwk::IAbilityConnection> &connect);
     /**
+     * @brief StartAbility with want, send want to ability manager service.
+     * @param want The want of the ability to start.
+     * @param userId Designation User ID.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode StartAbility(const Want &want, int32_t userId);
+    /**
      * @brief Add the ability manager instance for debug.
      * @param abilityManager the ability manager ipc object.
      */
