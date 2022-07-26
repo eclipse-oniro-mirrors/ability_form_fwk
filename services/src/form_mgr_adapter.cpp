@@ -1446,7 +1446,7 @@ ErrCode FormMgrAdapter::RequestPublishFormToHost(Want &want)
     wantToHost.SetElementName(bundleName, abilityName);
     int32_t userId = want.GetIntParam(Constants::PARAM_FORM_USER_ID, -1);
 
-    return FormAmsHelper::GetInstance().GetAbilityManager()->StartAbility(wantToHost, userId, DEFAULT_INVAL_VALUE);
+    return FormAmsHelper::GetInstance().StartAbility(wantToHost, userId);
 }
 
 ErrCode FormMgrAdapter::RequestPublishForm(Want &want, bool withFormBindingData,
