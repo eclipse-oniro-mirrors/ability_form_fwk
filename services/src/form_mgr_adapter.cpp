@@ -1421,6 +1421,7 @@ ErrCode FormMgrAdapter::QueryPublishFormToHost(Want &want)
         want.SetParam(Constants::PARAM_ABILITY_NAME_KEY, extensionAbilityInfo.name);
     }
     want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
+    want.SetAction(Constants::FORM_PUBLISH_ACTION);
     return ERR_OK;
 }
 
