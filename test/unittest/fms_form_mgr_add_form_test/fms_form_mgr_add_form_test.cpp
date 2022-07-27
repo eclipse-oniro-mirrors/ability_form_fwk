@@ -47,13 +47,13 @@ using namespace OHOS::Security;
 
 namespace {
 const std::string PERMISSION_NAME_REQUIRE_FORM = "ohos.permission.REQUIRE_FORM";
-const std::string PARAM_PROVIDER_PACKAGE_NAME = "com.form.provider.app.test.abiliy";
+const std::string PARAM_PROVIDER_PACKAGE_NAME = "com.form.provider.app.test.ability";
 const std::string FORM_PROVIDER_BUNDLE_NAME = "com.form.provider.service";
-const std::string PARAM_PROVIDER_MODULE_NAME = "com.form.provider.app.test.abiliy";
-const std::string FORM_PROVIDER_ABILITY_NAME = "com.form.provider.app.test.abiliy";
+const std::string PARAM_PROVIDER_MODULE_NAME = "com.form.provider.app.test.ability";
+const std::string FORM_PROVIDER_ABILITY_NAME = "com.form.provider.app.test.ability";
 const std::string PARAM_FORM_NAME = "com.form.name.test";
 
-const std::string FORM_JS_COMPOMENT_NAME = "jsComponentName";
+const std::string FORM_JS_COMPONENT_NAME = "jsComponentName";
 const std::string FORM_PROVIDER_MODULE_SOURCE_DIR = "";
 
 const std::string FORM_HOST_BUNDLE_NAME = "com.form.host.app";
@@ -114,7 +114,7 @@ void FmsFormMgrAddFormTest::CreateProviderData()
     formInfo.updateEnabled = true;
     formInfo.updateDuration = 1;
     formInfo.scheduledUpdateTime = "06:06";
-    formInfo.jsComponentName = FORM_JS_COMPOMENT_NAME;
+    formInfo.jsComponentName = FORM_JS_COMPONENT_NAME;
     formInfo.formVisibleNotify = true;
     formInfo.supportDimensions = {1, 2};
     formInfo.defaultDimension = 1;

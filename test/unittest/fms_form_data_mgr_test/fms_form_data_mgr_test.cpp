@@ -31,8 +31,8 @@ using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::AppExecFwk;
 static const std::string FORM_HOST_BUNDLE_NAME = "com.form.provider.service";
-static const std::string FORM_PROVIDER_ABILITY_NAME = "com.form.provider.app.test.abiliy";
-static const std::string PARAM_PROVIDER_MODULE_NAME = "com.form.provider.app.test.abiliy";
+static const std::string FORM_PROVIDER_ABILITY_NAME = "com.form.provider.app.test.ability";
+static const std::string PARAM_PROVIDER_MODULE_NAME = "com.form.provider.app.test.ability";
 static const std::string FORM_NAME = "formName";
 
 namespace {
