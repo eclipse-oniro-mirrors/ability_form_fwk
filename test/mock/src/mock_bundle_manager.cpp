@@ -23,11 +23,11 @@
 namespace OHOS {
 namespace AppExecFwk {
 const std::string FORM_PROVIDER_BUNDLE_NAME = "com.form.provider.service";
-const std::string PARAM_PROVIDER_PACKAGE_NAME = "com.form.provider.app.test.abiliy";
-const std::string PARAM_PROVIDER_MODULE_NAME = "com.form.provider.app.test.abiliy";
-const std::string FORM_PROVIDER_ABILITY_NAME = "com.form.provider.app.test.abiliy";
+const std::string PARAM_PROVIDER_PACKAGE_NAME = "com.form.provider.app.test.ability";
+const std::string PARAM_PROVIDER_MODULE_NAME = "com.form.provider.app.test.ability";
+const std::string FORM_PROVIDER_ABILITY_NAME = "com.form.provider.app.test.ability";
 const std::string FORM_PROVIDER_MODULE_SOURCE_DIR = "";
-const std::string FORM_JS_COMPOMENT_NAME = "jsComponentName";
+const std::string FORM_JS_COMPONENT_NAME = "jsComponentName";
 const std::string PARAM_FORM_NAME = "com.form.name.test";
 const std::string DEVICE_ID = "ohos-phone1";
 
@@ -132,7 +132,7 @@ bool BundleMgrService::GetFormsInfoByApp(const std::string &bundleName, std::vec
     form.updateEnabled = true;
     form.updateDuration = 1;
     form.scheduledUpdateTime = "06:06";
-    form.jsComponentName = FORM_JS_COMPOMENT_NAME;
+    form.jsComponentName = FORM_JS_COMPONENT_NAME;
     form.formVisibleNotify = true;
     form.supportDimensions = {1, 2};
     form.defaultDimension = 1;
@@ -150,7 +150,7 @@ bool BundleMgrService::GetFormsInfoByModule(const std::string &bundleName, const
     form.updateEnabled = true;
     form.updateDuration = 1;
     form.scheduledUpdateTime = "06:06";
-    form.jsComponentName = FORM_JS_COMPOMENT_NAME;
+    form.jsComponentName = FORM_JS_COMPONENT_NAME;
     form.formVisibleNotify = true;
     form.supportDimensions = {1, 2};
     form.defaultDimension = 1;

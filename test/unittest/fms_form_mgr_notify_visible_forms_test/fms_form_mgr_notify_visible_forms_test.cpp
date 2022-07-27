@@ -40,7 +40,7 @@ using namespace OHOS::Security;
 namespace {
 const std::string NON_SYSTEM_APP_BUNDLE_NAME = "com.form.host.app600";
 const std::string FORM_PROVIDER_BUNDLE_NAME = "com.form.provider.service";
-const std::string FORM_PROVIDER_ABILITY_NAME = "com.form.provider.app.test.abiliy";
+const std::string FORM_PROVIDER_ABILITY_NAME = "com.form.provider.app.test.ability";
 const std::string PERMISSION_NAME_REQUIRE_FORM = "ohos.permission.REQUIRE_FORM";
 const std::string DEF_LABEL1 = "PermissionFormRequireGrant";
 
