@@ -1445,6 +1445,7 @@ ErrCode FormMgrAdapter::RequestPublishFormToHost(Want &want)
     std::string abilityName = want.GetStringParam(Constants::PARAM_ABILITY_NAME_KEY);
     wantToHost.SetElementName(bundleName, abilityName);
     int32_t userId = want.GetIntParam(Constants::PARAM_FORM_USER_ID, -1);
+    wantToHost.SetAction(Constants::FORM_PUBLISH_ACTION);
 
     return FormAmsHelper::GetInstance().StartAbility(wantToHost, userId);
 }
