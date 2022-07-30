@@ -83,7 +83,7 @@ bool FormTimerMgr::AddFormTimer(const FormTimer &task)
  * @param userId User ID.
  * @return Returns true on success, false on failure.
  */
-bool FormTimerMgr::AddFormTimer(const int64_t formId, const long updateDuration, const int32_t userId)
+bool FormTimerMgr::AddFormTimer(int64_t formId, long updateDuration, int32_t userId)
 {
     auto duration = updateDuration / timeSpeed_;
     HILOG_INFO("%{public}s formId:%{public}s duration:%{public}s", __func__,
@@ -99,8 +99,7 @@ bool FormTimerMgr::AddFormTimer(const int64_t formId, const long updateDuration,
  * @param userId User ID.
  * @return Returns true on success, false on failure.
  */
-bool FormTimerMgr::AddFormTimer(const int64_t formId, const long updateAtHour,
-                                const long updateAtMin, const int32_t userId)
+bool FormTimerMgr::AddFormTimer(int64_t formId, long updateAtHour, long updateAtMin, int32_t userId)
 {
     HILOG_INFO("%{public}s formId:%{public}s time:%{public}s-%{public}s", __func__,
         std::to_string(formId).c_str(), std::to_string(updateAtHour).c_str(), std::to_string(updateAtMin).c_str());
@@ -112,7 +111,7 @@ bool FormTimerMgr::AddFormTimer(const int64_t formId, const long updateAtHour,
  * @param formId The Id of the form.
  * @return Returns true on success, false on failure.
  */
-bool FormTimerMgr::RemoveFormTimer(const int64_t formId)
+bool FormTimerMgr::RemoveFormTimer(int64_t formId)
 {
     HILOG_INFO("%{public}s, task: %{public}" PRId64 "", __func__, formId);
 
@@ -138,7 +137,7 @@ bool FormTimerMgr::RemoveFormTimer(const int64_t formId)
  * @param timerCfg Timer config.
  * @return Returns true on success, false on failure.
  */
-bool FormTimerMgr::UpdateFormTimer(const int64_t formId, const UpdateType &type, const FormTimerCfg &timerCfg)
+bool FormTimerMgr::UpdateFormTimer(int64_t formId, const UpdateType &type, const FormTimerCfg &timerCfg)
 {
     if (!timerCfg.enableUpdate) {
         HILOG_WARN("%{public}s, enableUpdate is false", __func__);
@@ -170,7 +169,7 @@ bool FormTimerMgr::UpdateFormTimer(const int64_t formId, const UpdateType &type,
  * @param timerCfg task value.
  * @return Returns true on success, false on failure.
  */
-bool FormTimerMgr::UpdateIntervalValue(const int64_t formId, const FormTimerCfg &timerCfg)
+bool FormTimerMgr::UpdateIntervalValue(int64_t formId, const FormTimerCfg &timerCfg)
 {
     if (timerCfg.updateDuration < Constants::MIN_PERIOD || timerCfg.updateDuration > Constants::MAX_PERIOD
         || (timerCfg.updateDuration % Constants::MIN_PERIOD) != 0) {
@@ -194,7 +193,7 @@ bool FormTimerMgr::UpdateIntervalValue(const int64_t formId, const FormTimerCfg 
  * @param timerCfg task value.
  * @return Returns true on success, false on failure.
  */
-bool FormTimerMgr::UpdateAtTimerValue(const int64_t formId, const FormTimerCfg &timerCfg)
+bool FormTimerMgr::UpdateAtTimerValue(int64_t formId, const FormTimerCfg &timerCfg)
 {
     if (timerCfg.updateAtHour < Constants::MIN_TIME || timerCfg.updateAtHour > Constants::MAX_HOUR
         || timerCfg.updateAtMin < Constants::MIN_TIME || timerCfg.updateAtMin > Constants::MAX_MINUTE) {
@@ -224,7 +223,7 @@ bool FormTimerMgr::UpdateAtTimerValue(const int64_t formId, const FormTimerCfg &
     }
 
     if (!UpdateAtTimerAlarm()) {
-        HILOG_ERROR("%{public}s, failed to update attimer alarm.", __func__);
+        HILOG_ERROR("%{public}s, failed to update at timer alarm.", __func__);
         return false;
     }
     return true;
@@ -235,7 +234,7 @@ bool FormTimerMgr::UpdateAtTimerValue(const int64_t formId, const FormTimerCfg &
  * @param timerCfg task value.
  * @return Returns true on success, false on failure.
  */
-bool FormTimerMgr::IntervalToAtTimer(const int64_t formId, const FormTimerCfg &timerCfg)
+bool FormTimerMgr::IntervalToAtTimer(int64_t formId, const FormTimerCfg &timerCfg)
 {
     if (timerCfg.updateAtHour < Constants::MIN_TIME || timerCfg.updateAtHour > Constants::MAX_HOUR
         || timerCfg.updateAtMin < Constants::MIN_TIME || timerCfg.updateAtMin > Constants::MAX_MINUTE) {
@@ -269,7 +268,7 @@ bool FormTimerMgr::IntervalToAtTimer(const int64_t formId, const FormTimerCfg &t
  * @param timerCfg task value.
  * @return Returns true on success, false on failure.
  */
-bool FormTimerMgr::AtTimerToIntervalTimer(const int64_t formId, const FormTimerCfg &timerCfg)
+bool FormTimerMgr::AtTimerToIntervalTimer(int64_t formId, const FormTimerCfg &timerCfg)
 {
     if (timerCfg.updateDuration < Constants::MIN_PERIOD || timerCfg.updateDuration > Constants::MAX_PERIOD
         || (timerCfg.updateDuration % Constants::MIN_PERIOD) != 0) {
@@ -313,7 +312,7 @@ bool FormTimerMgr::AtTimerToIntervalTimer(const int64_t formId, const FormTimerC
  * @param formId The Id of the form.
  * @return Returns true on success, false on failure.
  */
-bool FormTimerMgr::IsLimiterEnableRefresh(const int64_t formId)
+bool FormTimerMgr::IsLimiterEnableRefresh(int64_t formId)
 {
     return refreshLimiter_.IsEnableRefresh(formId);
 }
@@ -321,7 +320,7 @@ bool FormTimerMgr::IsLimiterEnableRefresh(const int64_t formId)
  * @brief Increase refresh count.
  * @param formId The Id of the form.
  */
-void FormTimerMgr::IncreaseRefreshCount(const int64_t formId)
+void FormTimerMgr::IncreaseRefreshCount(int64_t formId)
 {
     refreshLimiter_.Increase(formId);
 }
@@ -332,7 +331,7 @@ void FormTimerMgr::IncreaseRefreshCount(const int64_t formId)
  * @param userId User ID.
  * @return Returns true on success, false on failure.
  */
-bool FormTimerMgr::SetNextRefreshTime(const int64_t formId, const long nextGapTime, const int32_t userId)
+bool FormTimerMgr::SetNextRefreshTime(int64_t formId, long nextGapTime, int32_t userId)
 {
     if (nextGapTime < Constants::MIN_NEXT_TIME) {
         HILOG_ERROR("%{public}s failed, nextGapTime is invalid, nextGapTime:%{public}ld", __func__, nextGapTime);
@@ -391,7 +390,7 @@ void FormTimerMgr::SetEnableFlag(int64_t formId, bool flag)
  * @param formId The Id of the form.
  * @return Returns refresh count.
  */
-int FormTimerMgr::GetRefreshCount(const int64_t formId) const
+int FormTimerMgr::GetRefreshCount(int64_t formId) const
 {
     return refreshLimiter_.GetRefreshCount(formId);
 }
@@ -400,7 +399,7 @@ int FormTimerMgr::GetRefreshCount(const int64_t formId) const
  * @param formId The Id of the form.
  * @return true or false.
  */
-void FormTimerMgr::MarkRemind(const int64_t formId)
+void FormTimerMgr::MarkRemind(int64_t formId)
 {
     refreshLimiter_.MarkRemind(formId);
 }
@@ -656,7 +655,7 @@ void FormTimerMgr::SetIntervalEnableFlag(int64_t formId, bool flag)
  * @param formId The Id of the form.
  * @return Returns true on success, false on failure.
  */
-bool FormTimerMgr::GetIntervalTimer(const int64_t formId, FormTimer &formTimer)
+bool FormTimerMgr::GetIntervalTimer(int64_t formId, FormTimer &formTimer)
 {
     HILOG_INFO("%{public}s start", __func__);
     std::lock_guard<std::recursive_mutex> lock(intervalMutex_);
@@ -674,7 +673,7 @@ bool FormTimerMgr::GetIntervalTimer(const int64_t formId, FormTimer &formTimer)
  * @param formId The Id of the form.
  * @return Returns true on success, false on failure.
  */
-bool FormTimerMgr::GetUpdateAtTimer(const int64_t formId, UpdateAtItem &updateAtItem)
+bool FormTimerMgr::GetUpdateAtTimer(int64_t formId, UpdateAtItem &updateAtItem)
 {
     HILOG_INFO("%{public}s start", __func__);
     {
@@ -697,7 +696,7 @@ bool FormTimerMgr::GetUpdateAtTimer(const int64_t formId, UpdateAtItem &updateAt
  * @param formId The Id of the form.
  * @return Returns true on success, false on failure.
  */
-bool FormTimerMgr::GetDynamicItem(const int64_t formId, DynamicRefreshItem &dynamicItem)
+bool FormTimerMgr::GetDynamicItem(int64_t formId, DynamicRefreshItem &dynamicItem)
 {
     HILOG_INFO("%{public}s start", __func__);
     std::lock_guard<std::recursive_mutex> lock(dynamicMutex_);
@@ -730,7 +729,7 @@ void FormTimerMgr::SetTimeSpeed(int32_t timeSpeed)
  * @param formId The Id of the form.
  * @return Returns true on success, false on failure.
  */
-bool FormTimerMgr::DeleteIntervalTimer(const int64_t formId)
+bool FormTimerMgr::DeleteIntervalTimer(int64_t formId)
 {
     HILOG_INFO("%{public}s start", __func__);
     bool isExist = false;
@@ -752,7 +751,7 @@ bool FormTimerMgr::DeleteIntervalTimer(const int64_t formId)
  * @param formId The Id of the form.
  * @return Returns true on success, false on failure.
  */
-bool FormTimerMgr::DeleteUpdateAtTimer(const int64_t formId)
+bool FormTimerMgr::DeleteUpdateAtTimer(int64_t formId)
 {
     HILOG_INFO("%{public}s start", __func__);
     {
@@ -777,7 +776,7 @@ bool FormTimerMgr::DeleteUpdateAtTimer(const int64_t formId)
  * @brief Delete dynamic refresh item.
  * @param formId The Id of the form.
  */
-bool FormTimerMgr::DeleteDynamicItem(const int64_t formId)
+bool FormTimerMgr::DeleteDynamicItem(int64_t formId)
 {
     HILOG_INFO("%{public}s start", __func__);
     std::lock_guard<std::recursive_mutex> lock(dynamicMutex_);
@@ -892,7 +891,7 @@ bool FormTimerMgr::UpdateAtTimerAlarm()
     timerOption->SetWantAgent(wantAgent);
 
     atTimerWakeUpTime_ = nextWakeUpTime;
-    if (currentUpdateAtWantAgent != nullptr) {
+    if (currentUpdateAtWantAgent_ != nullptr) {
         ClearUpdateAtTimerResource();
     }
     auto timeSinceEpoch = std::chrono::steady_clock::now().time_since_epoch();
@@ -900,7 +899,7 @@ bool FormTimerMgr::UpdateAtTimerAlarm()
     int64_t nextTime = timeInSec + (selectTime - currentTime);
     HILOG_INFO("%{public}s, nextTime: %{public}" PRId64 ".", __func__, nextTime);
 
-    currentUpdateAtWantAgent = wantAgent;
+    currentUpdateAtWantAgent_ = wantAgent;
     updateAtTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption);
     bool bRet = MiscServices::TimeServiceClient::GetInstance()->StartTimer(updateAtTimerId_,
         static_cast<uint64_t>(nextTime));
@@ -947,9 +946,9 @@ void FormTimerMgr::ClearUpdateAtTimerResource()
         HILOG_INFO("%{public}s clear update at timer end", __func__);
         updateAtTimerId_ = 0L;
     }
-    if (currentUpdateAtWantAgent != nullptr) {
-        WantAgentHelper::Cancel(currentUpdateAtWantAgent);
-        currentUpdateAtWantAgent = nullptr;
+    if (currentUpdateAtWantAgent_ != nullptr) {
+        WantAgentHelper::Cancel(currentUpdateAtWantAgent_);
+        currentUpdateAtWantAgent_ = nullptr;
     }
     HILOG_INFO("%{public}s end", __func__);
 }
@@ -993,10 +992,10 @@ bool FormTimerMgr::UpdateLimiterAlarm()
     }
     timerOption->SetWantAgent(wantAgent);
 
-    if (currentLimiterWantAgent != nullptr) {
+    if (currentLimiterWantAgent_ != nullptr) {
         ClearLimiterTimerResource();
     }
-    currentLimiterWantAgent = wantAgent;
+    currentLimiterWantAgent_ = wantAgent;
 
     limiterTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption);
     bool bRet = MiscServices::TimeServiceClient::GetInstance()->StartTimer(limiterTimerId_,
@@ -1021,9 +1020,9 @@ void FormTimerMgr::ClearLimiterTimerResource()
         HILOG_INFO("%{public}s clear limiter timer end", __func__);
         limiterTimerId_ = 0L;
     }
-    if (currentLimiterWantAgent != nullptr) {
-        WantAgentHelper::Cancel(currentLimiterWantAgent);
-        currentLimiterWantAgent = nullptr;
+    if (currentLimiterWantAgent_ != nullptr) {
+        WantAgentHelper::Cancel(currentLimiterWantAgent_);
+        currentLimiterWantAgent_ = nullptr;
     }
     HILOG_INFO("%{public}s end", __func__);
 }
@@ -1085,10 +1084,10 @@ bool FormTimerMgr::UpdateDynamicAlarm()
     }
     timerOption->SetWantAgent(wantAgent);
 
-    if (currentDynamicWantAgent != nullptr) {
+    if (currentDynamicWantAgent_ != nullptr) {
         ClearDynamicResource();
     }
-    currentDynamicWantAgent = wantAgent;
+    currentDynamicWantAgent_ = wantAgent;
 
     dynamicAlarmTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption);
     bool bRet = MiscServices::TimeServiceClient::GetInstance()->StartTimer(dynamicAlarmTimerId_,
@@ -1137,9 +1136,9 @@ void FormTimerMgr::ClearDynamicResource()
         dynamicAlarmTimerId_ = 0L;
     }
 
-    if (currentDynamicWantAgent != nullptr) {
-        WantAgentHelper::Cancel(currentDynamicWantAgent);
-        currentDynamicWantAgent = nullptr;
+    if (currentDynamicWantAgent_ != nullptr) {
+        WantAgentHelper::Cancel(currentDynamicWantAgent_);
+        currentDynamicWantAgent_ = nullptr;
     }
     HILOG_INFO("%{public}s end", __func__);
 }
@@ -1149,7 +1148,7 @@ void FormTimerMgr::ClearDynamicResource()
  * @param updateAtItem Next at timer item.
  * @return Returns true on success, false on failure.
  */
-bool FormTimerMgr::FindNextAtTimerItem(const long nowTime, UpdateAtItem &updateAtItem)
+bool FormTimerMgr::FindNextAtTimerItem(long nowTime, UpdateAtItem &updateAtItem)
 {
     HILOG_INFO("%{public}s start", __func__);
     std::lock_guard<std::recursive_mutex> lock(updateAtMutex_);
@@ -1238,9 +1237,9 @@ void FormTimerMgr::ExecTimerTask(const FormTimer &timerTask)
             want.SetParam(Constants::PARAM_FORM_USER_ID, timerTask.userId);
         }
         HILOG_INFO("%{public}s, userId:%{public}d", __func__, timerTask.userId);
-
-        auto task = std::bind(&FormProviderMgr::RefreshForm, &FormProviderMgr::GetInstance(), timerTask.formId, want,
-            false);
+        auto task = [id = timerTask.formId, want]() {
+            FormProviderMgr::GetInstance().RefreshForm(id, want, false);
+        };
         taskExecutor_->AddTask(task);
     }
     HILOG_INFO("%{public}s end", __func__);
@@ -1332,7 +1331,7 @@ void FormTimerMgr::TimerReceiver::OnReceiveEvent(const EventFwk::CommonEventData
  * @param userId User ID.
  * @return true:active, false:inactive
  */
-bool FormTimerMgr::IsActiveUser(const int32_t userId)
+bool FormTimerMgr::IsActiveUser(int32_t userId)
 {
     std::vector<int32_t> activeList;
     auto errCode = DelayedSingleton<OsAccountManagerWrapper>::GetInstance()->QueryActiveOsAccountIds(activeList);
