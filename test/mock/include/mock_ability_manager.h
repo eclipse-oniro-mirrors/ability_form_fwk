@@ -692,7 +692,7 @@ public:
     {
         return 0;
     }
-    virtual int ReleaseAbility(
+    virtual int ReleaseCall(
         const sptr<IAbilityConnection> &connect, const AppExecFwk::ElementName &element) override
     {
         return 0;
