@@ -26,6 +26,7 @@ namespace MSG {
 const int64_t FORM_SHARE_INFO_DELAY_MSG = 1;
 const int64_t FORM_PACKAGE_FREE_INSTALL_DELAY_MSG = 2;
 }
+
 /**
  * @class FormEventHandler
  * FormEventHandler handling the form event.
