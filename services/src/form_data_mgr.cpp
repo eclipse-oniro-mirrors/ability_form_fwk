@@ -83,7 +83,7 @@ bool FormDataMgr::DeleteFormRecord(const int64_t formId)
     auto iter = formRecords_.find(formId);
     if (iter == formRecords_.end()) {
         HILOG_ERROR("%{public}s, form info is not exist", __func__);
-        return true;
+        return false;
     }
     formRecords_.erase(iter);
     return true;
