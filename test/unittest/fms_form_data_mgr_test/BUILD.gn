@@ -42,7 +42,6 @@ ohos_unittest("FmsFormDataMgrTest") {
     "${distributedschedule_path}/safwk/interfaces/innerkits/safwk:system_ability_fwk",
     "${distributedschedule_path}/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
     "${form_fwk_path}:fms_target",
-    "//utils/native/base:utils",
   ]
 
   external_deps = [
@@ -50,6 +49,7 @@ ohos_unittest("FmsFormDataMgrTest") {
     "ability_base:zuri",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
+    "c_utils:utils",
     "form_fwk:form_manager",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",

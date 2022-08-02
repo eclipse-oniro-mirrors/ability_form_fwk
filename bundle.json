@@ -34,7 +34,7 @@
               "power_manager",
               "safwk",
               "samgr_standard",
-              "utils_base"
+              "c_utils"
           ],
           "third_party": [
               "node",

@@ -38,11 +38,11 @@ ohos_shared_library("formbindingdata_napi") {
   external_deps = [
     "ability_runtime:runtime",
     "bundle_framework:appexecfwk_base",
+    "c_utils:utils",
     "form_fwk:form_manager",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "napi:ace_napi",
-    "utils_base:utils",
   ]
 
   relative_install_dir = "module/application"
@@ -144,11 +144,11 @@ ohos_shared_library("forminfo_napi") {
     "ability_base:want",
     "ability_runtime:runtime",
     "bundle_framework:appexecfwk_base",
+    "c_utils:utils",
     "form_fwk:form_manager",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "napi:ace_napi",
-    "utils_base:utils",
   ]
 
   relative_install_dir = "module/application"
@@ -182,10 +182,10 @@ ohos_shared_library("formhost_napi") {
     "ability_runtime:abilitykit_native",
     "ability_runtime:runtime",
     "bundle_framework:appexecfwk_base",
+    "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "napi:ace_napi",
-    "utils_base:utils",
   ]
 
   relative_install_dir = "module/application"
@@ -218,11 +218,11 @@ ohos_shared_library("formmanager") {
     "ability_runtime:abilitykit_native",
     "ability_runtime:runtime",
     "bundle_framework:appexecfwk_base",
+    "c_utils:utils",
     "form_fwk:form_manager",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "napi:ace_napi",
-    "utils_base:utils",
   ]
 
   relative_install_dir = "module/ability"
@@ -256,11 +256,11 @@ ohos_shared_library("formprovider_napi") {
     "ability_runtime:abilitykit_native",
     "ability_runtime:runtime",
     "bundle_framework:appexecfwk_base",
+    "c_utils:utils",
     "form_fwk:form_manager",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "napi:ace_napi",
-    "utils_base:utils",
   ]
 
   relative_install_dir = "module/application"
