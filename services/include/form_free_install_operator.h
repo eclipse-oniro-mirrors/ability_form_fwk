@@ -47,14 +47,15 @@ class FreeInstallStatusCallBack final : public FreeInstallStatusCallBackStub {
 public:
     FreeInstallStatusCallBack(const std::weak_ptr<FormFreeInstallOperator> &freeInstallOperator);
     virtual ~FreeInstallStatusCallBack() = default;
+
     /**
-     * OnInstallFinished, FreeInstall is complete.
+     * Callback triggered by free installation completion.
      *
      * @param resultCode, ERR_OK on success, others on failure.
-     * @param want, installed ability.
+     * @param want Indicates the ability to free install.
      * @param userId, user`s id.
      */
-    virtual void OnInstallFinished(int32_t resultCode, const Want &want, int32_t userId) override;
+    void OnInstallFinished(int32_t resultCode, const Want &want, int32_t userId) override;
 
 private:
     std::weak_ptr<FormFreeInstallOperator> formFreeInstallOperator_;
