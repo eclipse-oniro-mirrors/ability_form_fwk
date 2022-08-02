@@ -54,7 +54,7 @@ int32_t FormFreeInstallOperator::StartFreeInstall(
     Want want;
     want.SetElementName(bundleName, abilityName);
     want.SetModuleName(moduleName);
-    AppExecFwk::AbilityInfo abilityInfo = {};
+    AbilityInfo abilityInfo = {};
     constexpr auto flag = AppExecFwk::AbilityInfoFlag::GET_ABILITY_INFO_WITH_APPLICATION;
     if (iBundleMgr->QueryAbilityInfo(
         want, flag, FormUtil::GetCurrentAccountId(), abilityInfo, freeInstallStatusCallBack_)) {

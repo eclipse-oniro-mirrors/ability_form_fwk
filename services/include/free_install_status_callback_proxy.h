@@ -27,7 +27,7 @@ namespace AppExecFwk {
  */
 class FreeInstallStatusCallBackProxy : public IRemoteProxy<IFreeInstallStatusCallBack> {
 public:
-    explicit FreeInstallStatusCallBackProxy(const sptr<IRemoteObject>& impl);
+    explicit FreeInstallStatusCallBackProxy(const sptr<IRemoteObject> &impl);
 
     /**
      * OnInstallFinished, FreeInstall is complete.
