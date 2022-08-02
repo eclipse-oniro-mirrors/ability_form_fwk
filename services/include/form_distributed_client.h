@@ -30,7 +30,7 @@ namespace AppExecFwk {
 class FormDistributedClient {
 public:
     FormDistributedClient() = default;
-    virtual ~FormDistributedClient() = default;
+    ~FormDistributedClient() = default;
 
     int32_t ShareForm(const std::string &remoteDeviceId, const FormShareInfo &formShareInfo);
 

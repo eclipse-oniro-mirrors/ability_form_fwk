@@ -31,7 +31,7 @@ void FormDistributedClient::GetDmsServiceProxy()
 {
     HILOG_DEBUG("SHAREFORM:: func call");
     if (dmsProxy_ != nullptr) {
-        HILOG_DEBUG("samgr to get.");
+        HILOG_DEBUG("dms proxy already get.");
         return;
     }
 
@@ -77,7 +77,7 @@ int32_t FormDistributedClient::ShareForm(
     }
 
     int32_t error = dmsProxy_->SendRequest(START_REMOTE_SHARE_FORM, data, reply, option);
-    if (error != ERR_NONE) {
+    if (error != NO_ERROR) {
         HILOG_ERROR("request failed, error: %{public}d", error);
         return error;
     }
@@ -85,10 +85,7 @@ int32_t FormDistributedClient::ShareForm(
     HILOG_DEBUG("get result from server data = %{public}d", result);
     return result;
 }
-/**
- * @brief Add the DmsProxy instance for debug.
- * @param dmsProxy the dmsProxy object.
- */
+
 void FormDistributedClient::SetDmsProxy(const sptr<IRemoteObject> &dmsProxy)
 {
     dmsProxy_ = dmsProxy;
