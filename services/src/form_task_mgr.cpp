@@ -44,8 +44,9 @@ void FormTaskMgr::PostAcquireTask(const int64_t formId, const Want &want, const 
         HILOG_ERROR("%{public}s fail, event handler invalidate", __func__);
         return;
     }
-    std::function<void()> acquireProviderFormInfoFunc = std::bind(&FormTaskMgr::AcquireProviderFormInfo,
-        this, formId, want, remoteObject);
+    auto acquireProviderFormInfoFunc = [formId, want, remoteObject]() {
+        FormTaskMgr::GetInstance().AcquireProviderFormInfo(formId, want, remoteObject);
+    };
     eventHandler_->PostTask(acquireProviderFormInfoFunc, FORM_TASK_DELAY_TIME);
 }
 /**
@@ -60,8 +61,9 @@ void FormTaskMgr::PostDeleteTask(const int64_t formId, const Want &want, const s
         HILOG_ERROR("%{public}s fail, event handler invalidate", __func__);
         return;
     }
-    std::function<void()> notifyFormDeleteFunc = std::bind(&FormTaskMgr::NotifyFormDelete,
-        this, formId, want, remoteObject);
+    auto notifyFormDeleteFunc = [formId, want, remoteObject]() {
+        FormTaskMgr::GetInstance().NotifyFormDelete(formId, want, remoteObject);
+    };
     eventHandler_->PostTask(notifyFormDeleteFunc, FORM_TASK_DELAY_TIME);
 }
 
@@ -79,8 +81,9 @@ void FormTaskMgr::PostRefreshTask(const int64_t formId, const Want &want, const 
         HILOG_ERROR("%{public}s fail, event handler invalidate.", __func__);
         return;
     }
-    std::function<void()> notifyFormUpdateFunc = std::bind(&FormTaskMgr::NotifyFormUpdate,
-        this, formId, want, remoteObject);
+    auto notifyFormUpdateFunc = [formId, want, remoteObject]() {
+        FormTaskMgr::GetInstance().NotifyFormUpdate(formId, want, remoteObject);
+    };
     eventHandler_->PostTask(notifyFormUpdateFunc, FORM_TASK_DELAY_TIME);
 }
 
@@ -98,8 +101,9 @@ void FormTaskMgr::PostCastTempTask(const int64_t formId, const Want &want, const
         HILOG_ERROR("%{public}s fail, event handler invalidate", __func__);
         return;
     }
-    std::function<void()> notifyCastTempFunc = std::bind(&FormTaskMgr::NotifyCastTemp,
-        this, formId, want, remoteObject);
+    auto notifyCastTempFunc = [formId, want, remoteObject]() {
+        FormTaskMgr::GetInstance().NotifyCastTemp(formId, want, remoteObject);
+    };
     eventHandler_->PostTask(notifyCastTempFunc, FORM_TASK_DELAY_TIME);
 }
 
@@ -118,8 +122,9 @@ void FormTaskMgr::PostAcquireTaskToHost(const int64_t formId, const FormRecord &
         HILOG_ERROR("%{public}s fail, event handler invalidate", __func__);
         return;
     }
-    std::function<void()> acquireTaskToHostFunc = std::bind(&FormTaskMgr::AcquireTaskToHost,
-        this, formId, record, remoteObject);
+    auto acquireTaskToHostFunc = [formId, record, remoteObject]() {
+        FormTaskMgr::GetInstance().AcquireTaskToHost(formId, record, remoteObject);
+    };
     eventHandler_->PostTask(acquireTaskToHostFunc, FORM_TASK_DELAY_TIME);
 }
 
@@ -142,8 +147,9 @@ void FormTaskMgr::PostUpdateTaskToHost(const int64_t formId, const FormRecord &r
     }
 
     HILOG_DEBUG("%{public}s, post the task of updateTaskToHostFunc.", __func__);
-    std::function<void()> updateTaskToHostFunc = std::bind(&FormTaskMgr::UpdateTaskToHost,
-        this, formId, record, remoteObject);
+    auto updateTaskToHostFunc = [formId, record, remoteObject]() {
+        FormTaskMgr::GetInstance().UpdateTaskToHost(formId, record, remoteObject);
+    };
     eventHandler_->PostTask(updateTaskToHostFunc, FORM_TASK_DELAY_TIME);
 }
 
@@ -164,8 +170,9 @@ void FormTaskMgr::PostHostDiedTask(const sptr<IRemoteObject> &remoteHost)
         HILOG_ERROR("%{public}s fail, event handler invalidate", __func__);
         return;
     }
-    std::function<void()> postTaskFunc = std::bind(&FormTaskMgr::HostDied,
-        this, remoteHost);
+    auto postTaskFunc = [remoteHost]() {
+        FormTaskMgr::GetInstance().HostDied(remoteHost);
+    };
     eventHandler_->PostTask(postTaskFunc, FORM_TASK_DELAY_TIME);
 }
 
@@ -185,8 +192,9 @@ void FormTaskMgr::PostEventNotifyTask(const std::vector<int64_t> &formEvent, con
         HILOG_ERROR("%{public}s fail, event handler invalidate.", __func__);
         return;
     }
-    std::function<void()> eventNotifyFunc = std::bind(&FormTaskMgr::EventNotify,
-        this, formEvent, formVisibleType, want, remoteObject);
+    auto eventNotifyFunc = [formEvent, formVisibleType, want, remoteObject]() {
+        FormTaskMgr::GetInstance().EventNotify(formEvent, formVisibleType, want, remoteObject);
+    };
     eventHandler_->PostTask(eventNotifyFunc, FORM_TASK_DELAY_TIME);
 }
 /**
@@ -202,8 +210,9 @@ void FormTaskMgr::PostProviderBatchDeleteTask(std::set<int64_t> &formIds, const 
         HILOG_ERROR("%{public}s fail, event handler invalidate.", __func__);
         return;
     }
-    std::function<void()> batchDeleteFunc = std::bind(&FormTaskMgr::ProviderBatchDelete,
-        this, formIds, want, remoteObject);
+    auto batchDeleteFunc = [&formIds, want, remoteObject]() {
+        FormTaskMgr::GetInstance().ProviderBatchDelete(formIds, want, remoteObject);
+    };
     eventHandler_->PostTask(batchDeleteFunc, FORM_TASK_DELAY_TIME);
 }
 /**
@@ -220,8 +229,9 @@ void FormTaskMgr::PostFormEventTask(const int64_t formId, const std::string &mes
         HILOG_ERROR("%{public}s fail, event handler invalidate.", __func__);
         return;
     }
-    std::function<void()> formEventFunc = std::bind(&FormTaskMgr::FireFormEvent,
-        this, formId, message, want, remoteObject);
+    auto formEventFunc = [formId, message, want, remoteObject]() {
+        FormTaskMgr::GetInstance().FireFormEvent(formId, message, want, remoteObject);
+    };
     eventHandler_->PostTask(formEventFunc, FORM_TASK_DELAY_TIME);
 }
 
@@ -239,8 +249,9 @@ void FormTaskMgr::PostAcquireStateTask(const Want &wantArg, const std::string &p
         HILOG_ERROR("%{public}s fail, event handler invalidate.", __func__);
         return;
     }
-    std::function<void()> acquireStateFunc = std::bind(&FormTaskMgr::AcquireState,
-        this, wantArg, provider, want, remoteObject);
+    auto acquireStateFunc = [wantArg, provider, want, remoteObject]() {
+        FormTaskMgr::GetInstance().AcquireState(wantArg, provider, want, remoteObject);
+    };
     eventHandler_->PostTask(acquireStateFunc, FORM_TASK_DELAY_TIME);
 }
 
@@ -256,8 +267,9 @@ void FormTaskMgr::PostUninstallTaskToHost(const std::vector<int64_t> &formIds, c
         HILOG_ERROR("%{public}s fail, event handler invalidate.", __func__);
         return;
     }
-    std::function<void()> uninstallFunc = std::bind(&FormTaskMgr::FormUninstall,
-        this, formIds, remoteObject);
+    auto uninstallFunc = [formIds, remoteObject]() {
+        FormTaskMgr::GetInstance().FormUninstall(formIds, remoteObject);
+    };
     eventHandler_->PostTask(uninstallFunc, FORM_TASK_DELAY_TIME);
     HILOG_INFO("%{public}s end", __func__);
 }
@@ -276,8 +288,9 @@ void FormTaskMgr::PostAcquireStateTaskToHost(AppExecFwk::FormState state, const 
         HILOG_ERROR("%{public}s fail, event handler invalidate.", __func__);
         return;
     }
-    std::function<void()> acquireStateFunc = std::bind(&FormTaskMgr::AcquireStateBack,
-        this, state, want, remoteObject);
+    auto acquireStateFunc = [state, want, remoteObject]() {
+        FormTaskMgr::GetInstance().AcquireStateBack(state, want, remoteObject);
+    };
     eventHandler_->PostTask(acquireStateFunc, FORM_TASK_DELAY_TIME);
     HILOG_INFO("%{public}s end", __func__);
 }

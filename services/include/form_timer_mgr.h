@@ -54,7 +54,7 @@ public:
      * @param userId User ID.
      * @return Returns true on success, false on failure.
      */
-    bool AddFormTimer(const int64_t formId, const long updateDuration, const int32_t userId = 0);
+    bool AddFormTimer(int64_t formId, long updateDuration, int32_t userId = 0);
     /**
      * @brief Add scheduled form timer.
      * @param formId The Id of the form.
@@ -63,13 +63,13 @@ public:
      * @param userId User ID.
      * @return Returns true on success, false on failure.
      */
-    bool AddFormTimer(const int64_t formId, const long updateAtHour, const long updateAtMin, const int32_t userId = 0);
+    bool AddFormTimer(int64_t formId, long updateAtHour, long updateAtMin, int32_t userId = 0);
     /**
      * @brief Remove form timer by form id.
      * @param formId The Id of the form.
      * @return Returns true on success, false on failure.
      */
-    bool RemoveFormTimer(const int64_t formId);
+    bool RemoveFormTimer(int64_t formId);
     /**
      * @brief Update form timer.
      * @param formId The Id of the form.
@@ -77,18 +77,18 @@ public:
      * @param timerCfg Timer config.
      * @return Returns true on success, false on failure.
      */
-    bool UpdateFormTimer(const int64_t formId, const UpdateType &type, const FormTimerCfg &timerCfg);
+    bool UpdateFormTimer(int64_t formId, const UpdateType &type, const FormTimerCfg &timerCfg);
     /**
      * @brief Is limiter enable refresh.
      * @param formId The Id of the form.
      * @return Returns true on success, false on failure.
      */
-    bool IsLimiterEnableRefresh(const int64_t formId);
+    bool IsLimiterEnableRefresh(int64_t formId);
     /**
      * @brief Increase refresh count.
      * @param formId The Id of the form.
      */
-    void IncreaseRefreshCount(const int64_t formId);
+    void IncreaseRefreshCount(int64_t formId);
     /**
      * @brief Set next refresh time.
      * @param formId The Id of the form.
@@ -96,19 +96,19 @@ public:
      * @param userId User ID.
      * @return Returns true on success, false on failure.
      */
-    bool SetNextRefreshTime(const int64_t formId, const long nextGapTime, const int32_t userId = 0);
+    bool SetNextRefreshTime(int64_t formId, long nextGapTime, int32_t userId = 0);
     /**
      * @brief Get refresh count.
      * @param formId The Id of the form.
      * @return Returns refresh count.
      */
-    int GetRefreshCount(const int64_t formId) const;
+    int GetRefreshCount(int64_t formId) const;
     /**
      * @brief Mark remind.
      * @param formId The Id of the form.
      * @return true or false.
      */
-    void MarkRemind(const int64_t formId);
+    void MarkRemind(int64_t formId);
 
     /**
      * @brief Handle system time changed.
@@ -138,21 +138,21 @@ public:
      * @param formTimer update timer.
      * @return Returns true on success, false on failure.
      */
-    bool GetIntervalTimer(const int64_t formId, FormTimer &formTimer);
+    bool GetIntervalTimer(int64_t formId, FormTimer &formTimer);
     /**
      * @brief Get update at timer.
      * @param formId The Id of the form.
      * @param updateAtItem update timer.
      * @return Returns true on success, false on failure.
      */
-    bool GetUpdateAtTimer(const int64_t formId, UpdateAtItem &updateAtItem);
+    bool GetUpdateAtTimer(int64_t formId, UpdateAtItem &updateAtItem);
     /**
      * @brief Get dynamic refresh item.
      * @param formId The Id of the form.
      * @param dynamicItem update timer.
      * @return Returns true on success, false on failure.
      */
-    bool GetDynamicItem(const int64_t formId, DynamicRefreshItem &dynamicItem);
+    bool GetDynamicItem(int64_t formId, DynamicRefreshItem &dynamicItem);
     /**
      * @brief Set time speed.
      * @param timeSpeed The time speed.
@@ -199,40 +199,40 @@ private:
      * @param timerCfg task value.
      * @return Returns true on success, false on failure.
      */
-    bool UpdateIntervalValue(const int64_t formId, const FormTimerCfg &timerCfg);
+    bool UpdateIntervalValue(int64_t formId, const FormTimerCfg &timerCfg);
     /**
      * @brief Update update at timer task value.
      * @param formId The Id of the form.
      * @param timerCfg task value.
      * @return Returns true on success, false on failure.
      */
-    bool UpdateAtTimerValue(const int64_t formId, const FormTimerCfg &timerCfg);
+    bool UpdateAtTimerValue(int64_t formId, const FormTimerCfg &timerCfg);
     /**
      * @brief Interval timer task to update at timer task.
      * @param formId The Id of the form.
      * @param timerCfg task value.
      * @return Returns true on success, false on failure.
      */
-    bool IntervalToAtTimer(const int64_t formId, const FormTimerCfg &timerCfg);
+    bool IntervalToAtTimer(int64_t formId, const FormTimerCfg &timerCfg);
     /**
      * @brief Update at timer task to interval timer task.
      * @param formId The Id of the form.
      * @param timerCfg task value.
      * @return Returns true on success, false on failure.
      */
-    bool AtTimerToIntervalTimer(const int64_t formId, const FormTimerCfg &timerCfg);
+    bool AtTimerToIntervalTimer(int64_t formId, const FormTimerCfg &timerCfg);
     /**
      * @brief Delete interval timer task.
      * @param formId The Id of the form.
      * @return Returns true on success, false on failure.
      */
-    bool DeleteIntervalTimer(const int64_t formId);
+    bool DeleteIntervalTimer(int64_t formId);
     /**
      * @brief Delete update at timer.
      * @param formId The Id of the form.
      * @return Returns true on success, false on failure.
      */
-    bool DeleteUpdateAtTimer(const int64_t formId);
+    bool DeleteUpdateAtTimer(int64_t formId);
     /**
      * @brief Update at timer task alarm.
      * @return Returns true on success, false on failure.
@@ -252,7 +252,7 @@ private:
      * @param formId The Id of the form.
      * @return Returns true on success, false on failure.
      */
-    bool DeleteDynamicItem(const int64_t formId);
+    bool DeleteDynamicItem(int64_t formId);
     /**
      * @brief Update dynamic refresh task alarm.
      * @return Returns true on success, false on failure.
@@ -268,7 +268,7 @@ private:
      * @param updateAtItem Next at timer item.
      * @return Returns true on success, false on failure.
      */
-    bool FindNextAtTimerItem(const long nowTime, UpdateAtItem &updateAtItem);
+    bool FindNextAtTimerItem(long nowTime, UpdateAtItem &updateAtItem);
     /**
      * @brief Clear update at timer resource.
      */
@@ -325,7 +325,7 @@ private:
      * @param userId User ID.
      * @return true:active, false:inactive
      */
-    bool IsActiveUser(const int32_t userId);
+    bool IsActiveUser(int32_t userId);
 private:
     /**
      * @class TimerReceiver
@@ -366,9 +366,9 @@ private:
     uint64_t dynamicAlarmTimerId_ = 0L;
     uint64_t limiterTimerId_ = 0L;
 
-    std::shared_ptr<WantAgent> currentUpdateAtWantAgent = nullptr;
-    std::shared_ptr<WantAgent> currentDynamicWantAgent = nullptr;
-    std::shared_ptr<WantAgent> currentLimiterWantAgent = nullptr;
+    std::shared_ptr<WantAgent> currentUpdateAtWantAgent_ = nullptr;
+    std::shared_ptr<WantAgent> currentDynamicWantAgent_ = nullptr;
+    std::shared_ptr<WantAgent> currentLimiterWantAgent_ = nullptr;
 
     int64_t dynamicWakeUpTime_ = INT64_MAX;
     long atTimerWakeUpTime_ = LONG_MAX;

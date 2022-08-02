@@ -32,6 +32,7 @@ using WantParams = OHOS::AAFwk::WantParams;
 class FormAcquireConnection : public FormAbilityConnection {
 public:
     FormAcquireConnection(const int64_t formId, const FormItemInfo &info, const WantParams &wantParams);
+    FormAcquireConnection() = delete; // disable default constructor.
     virtual ~FormAcquireConnection() = default;
 
     /**
@@ -42,12 +43,12 @@ public:
      */
     void OnAbilityConnectDone(
         const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode) override;
-    
+
 private:
-    int64_t formId_;
+    int64_t formId_ = -1;
     FormItemInfo info_;
     WantParams wantParams_;
-    
+
     DISALLOW_COPY_AND_MOVE(FormAcquireConnection);
 };
 }  // namespace AppExecFwk
