@@ -16,7 +16,6 @@
 #ifndef FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_FREE_INSTALL_OPERATOR_H
 #define FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_FREE_INSTALL_OPERATOR_H
 
-#include <future>
 #include "event_handler.h"
 #include "free_install_status_callback_stub.h"
 
