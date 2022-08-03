@@ -31,12 +31,6 @@ FormShareConnection::FormShareConnection(int64_t formId, const std::string &bund
     SetProviderKey(bundleName, abilityName);
 }
 
-/**
- * @brief OnAbilityConnectDone, AbilityMs notify caller ability the result of connect.
- * @param element service ability's ElementName.
- * @param remoteObject The session proxy of service ability.
- * @param resultCode ERR_OK on success, others on failure.
- */
 void FormShareConnection::OnAbilityConnectDone(
     const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int32_t resultCode)
 {
