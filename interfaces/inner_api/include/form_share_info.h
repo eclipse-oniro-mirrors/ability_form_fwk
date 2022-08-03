@@ -34,14 +34,14 @@ struct FormShareInfo : public Parcelable {
     std::string abilityName;
     bool formTempFlag = false;
     int32_t dimensionId;
-    OHOS::AAFwk::WantParams providerShareData;
+    AAFwk::WantParams providerShareData;
     std::string deviceId;
     std::string deviceName;
     // No serialization required, fms uses natively
     bool isFreeInstall = false;
 
     bool ReadFromParcel(Parcel &parcel);
-    virtual bool Marshalling(Parcel &parcel) const override;
+    bool Marshalling(Parcel &parcel) const override;
     static FormShareInfo *Unmarshalling(Parcel &parcel);
 };
 } // namespace AppExecFwk
