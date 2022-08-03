@@ -44,8 +44,8 @@ public:
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
     static int64_t GetEventId();
 private:
-    void ProcessFormShareInfoTimeOut(int64_t eventId);
-    void ProcessFreeInstallTimeOut(int64_t eventId);
+    void ProcessFormShareInfoTimeout(int64_t eventId);
+    void ProcessFreeInstallTimeout(int64_t eventId);
 
 private:
     static int64_t eventId_;

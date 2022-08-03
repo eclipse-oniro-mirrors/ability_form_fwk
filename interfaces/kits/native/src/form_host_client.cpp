@@ -275,5 +275,45 @@ void FormHostClient::OnAcquireState(FormState state, const AAFwk::Want &want)
     }
     HILOG_INFO("%{public}s done", __func__);
 }
+
+bool FormHostClient::AddShareFormCallback(const std::shared_ptr<ShareFormCallBack> &shareFormCallback,
+    int64_t requestCode)
+{
+    HILOG_DEBUG("%{public}s called.", __func__);
+    std::lock_guard<std::mutex> lock(shareFormCallbackMutex_);
+    auto iter = shareFormCallbackMap_.find(requestCode);
+    if (iter == shareFormCallbackMap_.end()) {
+        shareFormCallbackMap_.emplace(requestCode, shareFormCallback);
+    }
+    HILOG_DEBUG("%{public}s done.", __func__);
+    return true;
+}
+
+void FormHostClient::OnShareFormResponse(int64_t requestCode, int32_t result)
+{
+    HILOG_DEBUG("%{public}s result:%{public}d.", __func__, result);
+    std::lock_guard<std::mutex> lock(shareFormCallbackMutex_);
+    auto iter = shareFormCallbackMap_.find(requestCode);
+    if (iter == shareFormCallbackMap_.end()) {
+        HILOG_DEBUG("share form callback not found");
+    } else {
+        if (iter->second) {
+            iter->second->ProcessShareFormResponse(result);
+        }
+        shareFormCallbackMap_.erase(requestCode);
+    }
+    HILOG_DEBUG("%{public}s done", __func__);
+}
+
+void FormHostClient::RemoveShareFormCallback(int64_t requestCode)
+{
+    HILOG_DEBUG("%{public}s called", __func__);
+    std::lock_guard<std::mutex> lock(shareFormCallbackMutex_);
+    auto iter = shareFormCallbackMap_.find(requestCode);
+    if (iter != shareFormCallbackMap_.end()) {
+        shareFormCallbackMap_.erase(requestCode);
+    }
+    HILOG_INFO("%{public}s end.", __func__);
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

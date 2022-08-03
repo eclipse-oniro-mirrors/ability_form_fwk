@@ -20,6 +20,7 @@
 #include "form_info.h"
 #include "form_js_info.h"
 #include "form_provider_data.h"
+#include "form_share_info.h"
 #include "form_state_info.h"
 #include "ipc_types.h"
 #include "iremote_broker.h"
@@ -314,6 +315,24 @@ public:
      */
     virtual int UpdateRouterAction(const int64_t formId, std::string &action) = 0;
 
+    /**
+     * @brief Share forms by formID and deviceID.
+     * @param formId Indicates the unique id of form.
+     * @param deviceId Indicates the device ID to share.
+     * @param callerToken Host client.
+     * @param requestCode Indicates the request code of this share form.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int32_t ShareForm(int64_t formId, const std::string &deviceId, const sptr<IRemoteObject> &callerToken,
+        int64_t requestCode) = 0;
+
+    /**
+     * @brief Receive form sharing information from remote.
+     * @param info Indicates form sharing information.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int32_t RecvFormShareInfoFromRemote(const FormShareInfo &info) = 0;
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -355,6 +374,8 @@ public:
         FORM_MGR_REMOVE_FORM_INFO,
         FORM_MGR_REQUEST_PUBLISH_FORM,
         FORM_MGR_IS_REQUEST_PUBLISH_FORM_SUPPORTED,
+        FORM_MGR_SHARE_FORM,
+        FORM_MGR_RECV_FORM_SHARE_INFO_FROM_REMOTE,
         FORM_MGR_START_ABILITY,
     };
 };

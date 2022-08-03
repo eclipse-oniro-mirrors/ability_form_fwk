@@ -68,6 +68,9 @@ public:
      */
     void RemoveConnection(long connectId);
 
+    void OnShareAcquire(int64_t formId, const std::string &remoteDeviceId,
+        const AAFwk::WantParams &wantParams, int64_t requestCode, const bool &result) override;
+
 private:
     /**
      * @brief check if disconnect ability or not.

@@ -58,6 +58,12 @@ public:
      */
     virtual void OnAcquireState(AppExecFwk::FormState state, const AAFwk::Want &want) = 0;
 
+    /**
+     * @brief Responsive form sharing.
+     * @param requestCode The request code of this share form.
+     * @param result Share form result.
+     */
+    virtual void OnShareFormResponse(int64_t requestCode, int32_t result) = 0;
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -73,6 +79,9 @@ public:
 
         // ipc id for uninstall (3684)
         FORM_HOST_ON_ACQUIRE_FORM_STATE,
+
+        // ipc id for uninstall (3685)
+        FORM_HOST_ON_SHARE_FORM_RESPONSE,
     };
 };
 }  // namespace AppExecFwk

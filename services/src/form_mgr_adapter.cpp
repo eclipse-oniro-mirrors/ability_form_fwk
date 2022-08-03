@@ -39,6 +39,7 @@
 #include "form_provider_info.h"
 #include "form_provider_interface.h"
 #include "form_provider_mgr.h"
+#include "form_share_mgr.h"
 #include "form_supply_callback.h"
 #include "form_timer_mgr.h"
 #include "form_util.h"
@@ -1014,7 +1015,15 @@ ErrCode FormMgrAdapter::AcquireProviderFormInfoAsync(const int64_t formId,
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    sptr<IAbilityConnection> formAcquireConnection = new FormAcquireConnection(formId, info, wantParams);
+    // If add a share form, need to add provider data
+    WantParams newWantParams(wantParams);
+    if (!FormShareMgr::GetInstance().AddProviderData(info, newWantParams)) {
+        HILOG_ERROR("%{public}s add share provider data failed.", __func__);
+        return ERR_APPEXECFWK_FORM_ADD_SAHRE_PROVIDER_DATA_FAILED;
+    }
+
+    sptr<IAbilityConnection> formAcquireConnection
+        = new FormAcquireConnection(formId, info, newWantParams);
     Want want;
     want.SetElementName(info.GetProviderBundleName(), info.GetAbilityName());
     want.AddFlags(Want::FLAG_ABILITY_FORM_ENABLED);

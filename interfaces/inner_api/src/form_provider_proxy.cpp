@@ -422,5 +422,56 @@ bool  FormProviderProxy::WriteInterfaceToken(MessageParcel &data)
     }
     return true;
 }
+
+int32_t FormProviderProxy::ShareAcquireProviderFormInfo(int64_t formId, const std::string &remoteDeviceId,
+    const sptr<IRemoteObject> &formSupplyCallback, int64_t requestCode)
+{
+    int32_t result;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("%{public}s, failed to write interface token", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteInt64(formId)) {
+        HILOG_ERROR("%{public}s, failed to write formId", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteString(remoteDeviceId)) {
+        HILOG_ERROR("%{public}s, failed to write remoteDeviceId", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteRemoteObject(formSupplyCallback)) {
+        HILOG_ERROR("%{public}s, failed to write formSupplyCallback", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteInt64(requestCode)) {
+        HILOG_ERROR("%{public}s, failed to write requestCode", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    result = Remote()->SendRequest(
+        static_cast<uint32_t>(IFormProvider::Message::FORM_ACQUIRE_PROVIDER_SHARE_FOMR_INFO),
+        data,
+        reply,
+        option);
+    if (result != ERR_OK) {
+        HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d", __func__, result);
+        return result;
+    }
+
+    auto retval = reply.ReadInt32();
+    if (retval != ERR_OK) {
+        HILOG_ERROR("%{public}s, failed to replyData: %{public}d", __func__, retval);
+        return retval;
+    }
+
+    return ERR_OK;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

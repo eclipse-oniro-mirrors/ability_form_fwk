@@ -375,6 +375,17 @@ public:
     int UpdateRouterAction(const int64_t formId, std::string &action);
 
     /**
+     * @brief Share forms with formId and remote device id.
+     * @param formId The Id of the forms to share.
+     * @param remoteDeviceId The Id of the remote revice to share.
+     * @param callerToken Indicates the host client.
+     * @param requestCode The request code of this share form.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t ShareForm(int64_t formId, const std::string &remoteDeviceId, const sptr<IRemoteObject> &callerToken,
+        int64_t requestCode);
+
+    /**
      * @brief Check form manager service ready.
      *
      * @return Return true if form manager service ready; returns false otherwise.
