@@ -253,7 +253,7 @@ ErrCode FormMgrAdapter::HandleDeleteForm(const int64_t formId, const sptr<IRemot
 #ifdef DEVICE_USAGE_STATISTICS_ENABLE
     DeviceUsageStats::BundleActiveEvent event(record.bundleName, record.moduleName, record.formName,
         record.specification, record.formId, DeviceUsageStats::BundleActiveEvent::FORM_IS_REMOVED);
-
+#endif
     int callingUid = IPCSkeleton::GetCallingUid();
     int32_t userId = GetCurrentUserId(callingUid);
     bool isSelfDbFormId = (userId == dbRecord.userId) && ((std::find(dbRecord.formUserUids.begin(),
@@ -274,6 +274,7 @@ ErrCode FormMgrAdapter::HandleDeleteForm(const int64_t formId, const sptr<IRemot
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
+#ifdef DEVICE_USAGE_STATISTICS_ENABLE
     DeviceUsageStats::BundleActiveClient::GetInstance().ReportEvent(event, userId);
 #endif
     return ERR_OK;
