@@ -20,10 +20,33 @@
 #include <unistd.h>
 
 #include "hilog_wrapper.h"
+#include "js_runtime_utils.h"
 #include "napi/native_node_api.h"
 #include "napi_form_host.h"
 
 EXTERN_C_START
+
+static NativeValue* JsFormHostInit(NativeEngine* engine, NativeValue* exports)
+{
+    HILOG_INFO("JsFormHostInit is called");
+    if (engine == nullptr || exports == nullptr) {
+        HILOG_ERROR("Invalid input parameters");
+        return nullptr;
+    }
+
+    NativeObject* object = OHOS::AbilityRuntime::ConvertNativeValueTo<NativeObject>(exports);
+    if (object == nullptr) {
+        HILOG_ERROR("object is nullptr");
+        return nullptr;
+    }
+
+    std::unique_ptr<JsFormHost> jsFormHost = std::make_unique<JsFormHost>();
+    object->SetNativePointer(jsFormHost.release(), JsFormHost::Finalizer, nullptr);
+
+    OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "shareForm", JsFormHost::ShareForm);
+
+    return exports;
+}
 
 /**
  * @brief  For N-API modules registration
@@ -58,7 +81,8 @@ static napi_value Init(napi_env env, napi_value exports)
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(properties) / sizeof(properties[0]), properties));
     HILOG_INFO("napi_moudule Init end...");
 
-    return exports;
+    return reinterpret_cast<napi_value>(JsFormHostInit(reinterpret_cast<NativeEngine*>(env),
+        reinterpret_cast<NativeValue*>(exports)));
 }
 
 EXTERN_C_END

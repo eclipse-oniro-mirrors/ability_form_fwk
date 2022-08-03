@@ -46,6 +46,10 @@ namespace {
     constexpr int REF_COUNT = 1;
     constexpr int CALLBACK_FLG = 1;
     constexpr int PROMISE_FLG = 2;
+    // NANOSECONDS mean 10^9 nano second
+    constexpr int64_t NANOSECONDS = 1000000000;
+    // MICROSECONDS mean 10^6 millias second
+    constexpr int64_t MICROSECONDS = 1000000;
 }
 
 /**
@@ -3270,3 +3274,124 @@ napi_value NAPI_GetFormsInfo(napi_env env, napi_callback_info info)
     return NapiGetResult(env, 1);
 }
 
+int64_t SystemTimeMillis() noexcept
+{
+    struct timespec t;
+    t.tv_sec = 0;
+    t.tv_nsec = 0;
+    clock_gettime(CLOCK_MONOTONIC, &t);
+    return static_cast<int64_t>(((t.tv_sec) * NANOSECONDS + t.tv_nsec) / MICROSECONDS);
+}
+
+class ShareFormCallBackClient : public ShareFormCallBack {
+public:
+    explicit ShareFormCallBackClient(ShareFormTask &&task) : task_(std::move(task))
+    {
+        handler_ = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
+    }
+
+    virtual ~ShareFormCallBackClient() = default;
+
+    /**
+     * @brief share form callback.
+     *
+     * @param result Indicates the result for ShareForm.
+     */
+    void ProcessShareFormResponse(int32_t result)
+    {
+        if (handler_) {
+            handler_->PostSyncTask([this, result] () {
+                this->task_(result);
+            });
+        }
+    }
+
+private:
+    ShareFormTask task_;
+    std::shared_ptr<AppExecFwk::EventHandler> handler_;
+};
+
+void JsFormHost::Finalizer(NativeEngine* engine, void* data, void* hint)
+{
+    HILOG_INFO("JsFormHost::Finalizer is called");
+    std::unique_ptr<JsFormHost>(static_cast<JsFormHost*>(data));
+}
+
+NativeValue* JsFormHost::ShareForm(NativeEngine* engine, NativeCallbackInfo* info)
+{
+    JsFormHost* me = OHOS::AbilityRuntime::CheckParamsAndGetThis<JsFormHost>(engine, info);
+    return (me != nullptr) ? me->OnShareForm(*engine, *info) : nullptr;
+}
+
+NativeValue* JsFormHost::OnShareForm(NativeEngine &engine, NativeCallbackInfo &info)
+{
+    HILOG_INFO("%{public}s is called", __FUNCTION__);
+    int32_t errCode = ERR_OK;
+    if (info.argc > ARGS_SIZE_THREE || info.argc < ARGS_SIZE_TWO) {
+        HILOG_ERROR("%{public}s, wrong number of arguments.", __func__);
+        errCode = ERR_ADD_INVALID_PARAM;
+    }
+
+    std::string strFormId =
+        ::GetStringFromNAPI(reinterpret_cast<napi_env>(&engine), reinterpret_cast<napi_value>(info.argv[0]));
+    std::string remoteDeviceId =
+        ::GetStringFromNAPI(reinterpret_cast<napi_env>(&engine), reinterpret_cast<napi_value>(info.argv[1]));
+    decltype(info.argc) unwrapArgc = 2;
+
+    int64_t formId;
+    if (!ConvertStringToInt64(strFormId, formId)) {
+        HILOG_ERROR("%{public}s, convert string formId to int64 failed.", __func__);
+        errCode = ERR_COMMON;
+    }
+    if (formId == 0 || remoteDeviceId.empty()) {
+        errCode = ERR_COMMON;
+    }
+
+    NativeValue* lastParam = (info.argc <= unwrapArgc) ? nullptr : info.argv[unwrapArgc];
+    NativeValue* result = nullptr;
+
+    std::unique_ptr<OHOS::AbilityRuntime::AsyncTask> uasyncTask =
+        OHOS::AbilityRuntime::CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, nullptr, &result);
+    std::shared_ptr<OHOS::AbilityRuntime::AsyncTask> asyncTask = std::move(uasyncTask);
+
+    ShareFormTask task = [&engine, asyncTask](int32_t code) {
+        HILOG_INFO("%{public}s, task complete code: %{public}d", __func__, code);
+        if (code == ERR_OK) {
+            asyncTask->Resolve(engine, engine.CreateUndefined());
+        } else {
+            auto retCode = QueryRetCode(code);
+            auto retMsg = QueryRetMsg(retCode);
+            asyncTask->Reject(engine, OHOS::AbilityRuntime::CreateJsError(engine, retCode, retMsg));
+        }
+    };
+
+    if (errCode != ERR_OK) {
+        asyncTask->Reject(engine, OHOS::AbilityRuntime::CreateJsError(engine, errCode, "Invalidate params."));
+    } else {
+        InnerShareForm(engine, asyncTask, std::move(task), formId, remoteDeviceId);
+    }
+
+    return result;
+}
+
+void JsFormHost::InnerShareForm(
+    NativeEngine &engine,
+    const std::shared_ptr<OHOS::AbilityRuntime::AsyncTask> &asyncTask,
+    ShareFormTask &&task,
+    int64_t formId,
+    const std::string &remoteDeviceId)
+{
+    auto shareFormCallback = std::make_shared<ShareFormCallBackClient>(std::move(task));
+    int64_t requestCode = SystemTimeMillis();
+    FormHostClient::GetInstance()->AddShareFormCallback(shareFormCallback, requestCode);
+
+    ErrCode ret = FormMgr::GetInstance().ShareForm(
+        formId, remoteDeviceId, FormHostClient::GetInstance(), requestCode);
+    if (ret != ERR_OK) {
+        HILOG_INFO("%{public}s, share form failed.", __func__);
+        auto retCode = QueryRetCode(ret);
+        auto retMsg = QueryRetMsg(retCode);
+        asyncTask->Reject(engine, OHOS::AbilityRuntime::CreateJsError(engine, retCode, retMsg));
+        FormHostClient::GetInstance()->RemoveShareFormCallback(requestCode);
+    }
+}

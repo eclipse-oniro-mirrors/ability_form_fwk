@@ -62,6 +62,9 @@ NativeValue* CreateJsFormParam(NativeEngine &engine)
     object->SetProperty("WIDTH_KEY", CreateJsValue(engine, AppExecFwk::Constants::PARAM_FORM_WIDTH_KEY));
     object->SetProperty("HEIGHT_KEY", CreateJsValue(engine, AppExecFwk::Constants::PARAM_FORM_HEIGHT_KEY));
     object->SetProperty("TEMPORARY_KEY", CreateJsValue(engine, AppExecFwk::Constants::PARAM_FORM_TEMPORARY_KEY));
+    object->SetProperty("BUNDLE_NAME_KEY", CreateJsValue(engine, AppExecFwk::Constants::PARAM_BUNDLE_NAME_KEY));
+    object->SetProperty("ABILITY_NAME_KEY", CreateJsValue(engine, AppExecFwk::Constants::PARAM_ABILITY_NAME_KEY));
+    object->SetProperty("DEVICE_ID_KEY", CreateJsValue(engine, AppExecFwk::Constants::PARAM_DEVICE_ID_KEY));
     return objValue;
 }
 
