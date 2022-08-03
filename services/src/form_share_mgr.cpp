@@ -85,7 +85,7 @@ int32_t FormShareMgr::ShareForm(int64_t formId, const std::string &deviceId, con
     }
 
     {
-        std::unique_lock<std::shared_timed_mutex> guard(mapMutex_);
+        std::unique_lock<std::shared_mutex> guard(mapMutex_);
         requestMap_.emplace(requestCode, callerToken);
     }
 
@@ -97,7 +97,7 @@ int32_t FormShareMgr::ShareForm(int64_t formId, const std::string &deviceId, con
     ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbility(want, formShareConnection);
     if (errorCode != ERR_OK) {
         HILOG_ERROR("ConnectServiceAbility failed.");
-        std::unique_lock<std::shared_timed_mutex> guard(mapMutex_);
+        std::unique_lock<std::shared_mutex> guard(mapMutex_);
         requestMap_.erase(requestCode);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
@@ -138,7 +138,7 @@ int32_t FormShareMgr::HandleRecvFormShareInfoFromRemoteTask(const FormShareInfo 
 
     auto formShareInfoKey = MakeFormShareInfoKey(info);
     {
-        std::unique_lock<std::shared_timed_mutex> guard(mapMutex_);
+        std::unique_lock<std::shared_mutex> guard(mapMutex_);
         if (shareInfo_.find(formShareInfoKey) != shareInfo_.end()) {
             HILOG_ERROR("form is beging shared.");
             return ERR_APPEXECFWK_FORM_SHARING;
@@ -183,7 +183,7 @@ int32_t FormShareMgr::CheckFormPackage(const FormShareInfo &info, const std::str
             MSG::FORM_PACKAGE_FREE_INSTALL_DELAY_MSG, eventId, FORM_PACKAGE_FREE_INSTALL_TIMER);
 
         {
-            std::unique_lock<std::shared_timed_mutex> guard(mapMutex_);
+            std::unique_lock<std::shared_mutex> guard(mapMutex_);
             freeInstallOperatorMap_.emplace(eventId, freeInstallOperator);
         }
 
@@ -285,7 +285,7 @@ bool FormShareMgr::IsExistFormPackage(const std::string &bundleName, const std::
 void FormShareMgr::RemoveFormShareInfo(const std::string &formShareInfoKey)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
-    std::unique_lock<std::shared_timed_mutex> guard(mapMutex_);
+    std::unique_lock<std::shared_mutex> guard(mapMutex_);
     int64_t eventId = 0;
     for (auto iter = eventMap_.begin(); iter != eventMap_.end(); iter++) {
         if (iter->second == formShareInfoKey) {
@@ -305,7 +305,7 @@ void FormShareMgr::RemoveFormShareInfo(const std::string &formShareInfoKey)
 void FormShareMgr::FinishFreeInstallTask(const std::shared_ptr<FormFreeInstallOperator> &freeInstallOperator)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
-    std::unique_lock<std::shared_timed_mutex> guard(mapMutex_);
+    std::unique_lock<std::shared_mutex> guard(mapMutex_);
 
     int64_t eventId = 0;
     for (auto iter = freeInstallOperatorMap_.begin(); iter != freeInstallOperatorMap_.end(); iter++) {
@@ -336,7 +336,7 @@ void FormShareMgr::OnInstallFinished(const std::shared_ptr<FormFreeInstallOperat
 
     FormShareInfo info;
     {
-        std::shared_lock<std::shared_timed_mutex> guard(mapMutex_);
+        std::shared_lock<std::shared_mutex> guard(mapMutex_);
         auto it = shareInfo_.find(formShareInfoKey);
         if (it != shareInfo_.end()) {
             it->second.isFreeInstall = true;
@@ -356,7 +356,7 @@ void FormShareMgr::HandleFormShareInfoTimeout(int64_t eventId)
 
     std::string formShareInfoKey;
     {
-        std::unique_lock<std::shared_timed_mutex> guard(mapMutex_);
+        std::unique_lock<std::shared_mutex> guard(mapMutex_);
         auto it = eventMap_.find(eventId);
         if (it == eventMap_.end()) {
             HILOG_ERROR("event id is not find.");
@@ -373,7 +373,7 @@ void FormShareMgr::HandleFormShareInfoTimeout(int64_t eventId)
 void FormShareMgr::HandleFreeInstallTimeout(int64_t eventId)
 {
     HILOG_DEBUG("%{public}s called, eventId:%{public}" PRId64 "", __func__, eventId);
-    std::unique_lock<std::shared_timed_mutex> guard(mapMutex_);
+    std::unique_lock<std::shared_mutex> guard(mapMutex_);
     freeInstallOperatorMap_.erase(eventId);
 }
 
@@ -388,7 +388,7 @@ bool FormShareMgr::AddProviderData(const FormItemInfo &info, WantParams &wantPar
     bool isFreeInstall = false;
     std::map<std::string, sptr<IInterface>> providerWantParams;
     {
-        std::shared_lock<std::shared_timed_mutex> guard(mapMutex_);
+        std::shared_lock<std::shared_mutex> guard(mapMutex_);
         auto it = shareInfo_.find(formShareInfoKey);
         if (it == shareInfo_.end()) {
             HILOG_DEBUG("No shared provider data.");
@@ -427,7 +427,7 @@ bool FormShareMgr::AddProviderData(const FormItemInfo &info, WantParams &wantPar
     return true;
 }
 
-void FormShareMgr::ShareAcquireProviderFormInfo(int64_t formId, const std::string &remoteDeviceId,
+void FormShareMgr::AcquireProviderShareData(int64_t formId, const std::string &remoteDeviceId,
     const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
@@ -442,7 +442,7 @@ void FormShareMgr::ShareAcquireProviderFormInfo(int64_t formId, const std::strin
         return;
     }
 
-    int32_t error = formProviderProxy->ShareAcquireProviderFormInfo(formId, remoteDeviceId,
+    int32_t error = formProviderProxy->AcquireProviderShareData(formId, remoteDeviceId,
         FormSupplyCallback::GetInstance(), requestCode);
     if (error != ERR_OK) {
         SendResponse(requestCode, error);
@@ -452,7 +452,7 @@ void FormShareMgr::ShareAcquireProviderFormInfo(int64_t formId, const std::strin
     FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
 }
 
-void FormShareMgr::AcquireFormProviderInfo(int64_t formId, const std::string &remoteDeviceId,
+void FormShareMgr::HandleProviderShareData(int64_t formId, const std::string &remoteDeviceId,
     const AAFwk::WantParams &wantParams, int64_t requestCode, const bool &result)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
@@ -474,7 +474,7 @@ void FormShareMgr::AcquireFormProviderInfo(int64_t formId, const std::string &re
     OHOS::DistributedHardware::DmDeviceInfo deviceInfo;
     auto ret = GetLocalDeviceInfo(formRecord.bundleName, deviceInfo);
     if (ret != ERR_OK) {
-        HILOG_ERROR("AcquireFormProviderInfo Failed to get local device info.");
+        HILOG_ERROR("failed to get local device info.");
         SendResponse(requestCode, ERR_APPEXECFWK_FORM_GET_DEVICE_INFO_FAILED);
         return;
     }
@@ -496,7 +496,7 @@ void FormShareMgr::AcquireFormProviderInfo(int64_t formId, const std::string &re
     }
     int32_t retval = formDmsClient_->ShareForm(remoteDeviceId, formShareInfo);
     if (retval != ERR_OK) {
-        HILOG_ERROR("AcquireFormProviderInfo Failed to share form from DMS retval = %{public}d.", retval);
+        HILOG_ERROR("failed to share form from DMS retval = %{public}d.", retval);
         SendResponse(requestCode, ERR_APPEXECFWK_FORM_DISTRIBUTED_SCHEDULE_FAILED);
         return;
     }
@@ -530,7 +530,7 @@ void FormShareMgr::SendResponse(int64_t requestCode, int32_t result)
 {
     HILOG_DEBUG("FormMgrService SendResponse called, requestCode:%{public}" PRId64 " result:%{public}d",
         requestCode, result);
-    std::unique_lock<std::shared_timed_mutex> guard(mapMutex_);
+    std::unique_lock<std::shared_mutex> guard(mapMutex_);
     auto iter = requestMap_.find(requestCode);
     if (iter == requestMap_.end()) {
         HILOG_DEBUG("No form shared request.");

@@ -70,9 +70,9 @@ public:
      * @param want Indicates the want containing information about sharing information and sharing data.
      * @param remoteObject Form provider proxy object.
      */
-    void ShareAcquireProviderFormInfo(int64_t formId, const std::string &remoteDeviceId, const Want &want,
+    void AcquireProviderShareData(int64_t formId, const std::string &remoteDeviceId, const Want &want,
         const sptr<IRemoteObject> &remoteObject);
-    void AcquireFormProviderInfo(int64_t formId, const std::string &remoteDeviceId,
+    void HandleProviderShareData(int64_t formId, const std::string &remoteDeviceId,
         const AAFwk::WantParams &wantParams, int64_t requestCode, const bool &result);
     bool AddProviderData(const FormItemInfo &info, WantParams &wantParams);
     void HandleFormShareInfoTimeout(int64_t eventId);
@@ -110,7 +110,7 @@ private:
     std::map<int64_t, std::shared_ptr<FormFreeInstallOperator>> freeInstallOperatorMap_;
     // map for <requestCode, formHostClient>
     std::map<int64_t, sptr<IRemoteObject>> requestMap_;
-    mutable std::shared_timed_mutex mapMutex_ {};
+    mutable std::shared_mutex mapMutex_ {};
 };
 
 class MyDmInitCallback final : public OHOS::DistributedHardware::DmInitCallback {
