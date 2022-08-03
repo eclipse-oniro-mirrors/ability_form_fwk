@@ -30,7 +30,7 @@ bool FormShareInfo::ReadFromParcel(Parcel &parcel)
     formTempFlag = parcel.ReadBool();
     dimensionId = parcel.ReadUint32();
 
-    std::unique_ptr<OHOS::AAFwk::WantParams> wantParams(parcel.ReadParcelable<OHOS::AAFwk::WantParams>());
+    std::unique_ptr<AAFwk::WantParams> wantParams(parcel.ReadParcelable<AAFwk::WantParams>());
     if (wantParams == nullptr) {
         return false;
     }
@@ -102,6 +102,7 @@ FormShareInfo* FormShareInfo::Unmarshalling(Parcel &parcel)
     std::unique_ptr<FormShareInfo> object = std::make_unique<FormShareInfo>();
     if (object && !object->ReadFromParcel(parcel)) {
         object = nullptr;
+        return nullptr;
     }
     return object.release();
 }
