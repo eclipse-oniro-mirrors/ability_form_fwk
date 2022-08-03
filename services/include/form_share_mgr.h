@@ -35,16 +35,18 @@ using WantParams = OHOS::AAFwk::WantParams;
  * Form share manager.
  */
 class FormShareMgr final : public DelayedRefSingleton<FormShareMgr> {
+private:
     DECLARE_DELAYED_REF_SINGLETON(FormShareMgr);
 public:
     DISALLOW_COPY_AND_MOVE(FormShareMgr);
 
-    inline void SetEventHandler(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+    void SetEventHandler(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
     {
         if (eventHandler_ == nullptr) {
             eventHandler_ = handler;
         }
     }
+
     /**
      * @brief Share forms by formID and deviceID.
      * @param formId Indicates the unique id of form.
@@ -55,11 +57,17 @@ public:
      */
     int32_t ShareForm(int64_t formId, const std::string &deviceId, const sptr<IRemoteObject> &callerToken,
         int64_t requestCode);
+    /**
+     * @brief Receive form sharing information from remote.
+     * @param info Indicates form sharing information.
+     * @return Returns ERR_OK on success, others on failure.
+     */
     int32_t RecvFormShareInfoFromRemote(const FormShareInfo &info);
     /**
      * @brief Acquire share form data from form provider.
      * @param formId The Id of the from.
      * @param remoteDeviceId The device ID to share.
+     * @param want Indicates the want containing information about sharing information and sharing data.
      * @param remoteObject Form provider proxy object.
      */
     void ShareAcquireProviderFormInfo(int64_t formId, const std::string &remoteDeviceId, const Want &want,
@@ -67,9 +75,8 @@ public:
     void AcquireFormProviderInfo(int64_t formId, const std::string &remoteDeviceId,
         const AAFwk::WantParams &wantParams, int64_t requestCode, const bool &result);
     bool AddProviderData(const FormItemInfo &info, WantParams &wantParams);
-    void HandleFormShareInfoTimeOut(int64_t eventId);
-    void HandleFreeInstallTimeOut(int64_t eventId);
-
+    void HandleFormShareInfoTimeout(int64_t eventId);
+    void HandleFreeInstallTimeout(int64_t eventId);
     /**
      * @brief Free install was finished.
      * @param FormFreeInstallOperator Indicates the free install operator object.
@@ -80,9 +87,9 @@ public:
         int32_t resultCode, const std::string &formShareInfoKey);
     void SendResponse(int64_t requestCode, int32_t result);
 private:
-    int32_t GetLocalDeviceInfo(const std::string &bundleName, OHOS::DistributedHardware::DmDeviceInfo &deviceInfo);
-    std::string makeFormShareInfoKey(const FormItemInfo &info);
-    std::string makeFormShareInfoKey(const FormShareInfo &info);
+    int32_t GetLocalDeviceInfo(const std::string &bundleName, DistributedHardware::DmDeviceInfo &deviceInfo);
+    std::string MakeFormShareInfoKey(const FormItemInfo &info);
+    std::string MakeFormShareInfoKey(const FormShareInfo &info);
     void RemoveFormShareInfo(const std::string &formShareInfoKey);
     void FinishFreeInstallTask(const std::shared_ptr<FormFreeInstallOperator> &freeInstallOperator);
     bool IsExistFormPackage(const std::string &bundleName, const std::string &moduleName);
