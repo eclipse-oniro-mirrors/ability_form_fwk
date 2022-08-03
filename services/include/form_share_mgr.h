@@ -26,6 +26,7 @@
 #include "form_free_install_operator.h"
 #include "form_item_info.h"
 #include "form_share_info.h"
+#include "hilog_wrapper.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -35,8 +36,6 @@ using WantParams = OHOS::AAFwk::WantParams;
  * Form share manager.
  */
 class FormShareMgr final : public DelayedRefSingleton<FormShareMgr> {
-private:
-    DECLARE_DELAYED_REF_SINGLETON(FormShareMgr);
 public:
     DISALLOW_COPY_AND_MOVE(FormShareMgr);
 
@@ -70,7 +69,7 @@ public:
      * @param want Indicates the want containing information about sharing information and sharing data.
      * @param remoteObject Form provider proxy object.
      */
-    void AcquireProviderShareData(int64_t formId, const std::string &remoteDeviceId, const Want &want,
+    void AcquireShareFormData(int64_t formId, const std::string &remoteDeviceId, const Want &want,
         const sptr<IRemoteObject> &remoteObject);
     void HandleProviderShareData(int64_t formId, const std::string &remoteDeviceId,
         const AAFwk::WantParams &wantParams, int64_t requestCode, const bool &result);
@@ -100,6 +99,7 @@ private:
     bool GetAbilityInfoByAction(const std::string action, AppExecFwk::AbilityInfo &abilityInfo,
         AppExecFwk::ExtensionAbilityInfo &extensionAbilityInfo);
 private:
+    DECLARE_DELAYED_REF_SINGLETON(FormShareMgr);
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ = nullptr;
     std::shared_ptr<FormDistributedClient> formDmsClient_ = nullptr;
     // map for <formShareInfoKey, FormShareInfo>
@@ -113,9 +113,11 @@ private:
     mutable std::shared_mutex mapMutex_ {};
 };
 
-class MyDmInitCallback final : public OHOS::DistributedHardware::DmInitCallback {
+class DeviceInitCallback final : public DistributedHardware::DmInitCallback {
     void OnRemoteDied() override
-    {}
+    {
+        HILOG_DEBUG("on remote died.");
+    }
 };
 } // namespace AppExecFwk
 } // namespace OHOS

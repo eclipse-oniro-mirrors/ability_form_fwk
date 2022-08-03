@@ -24,7 +24,6 @@
 #include "form_share_connection.h"
 #include "form_supply_callback.h"
 #include "form_util.h"
-#include "hilog_wrapper.h"
 #include "in_process_call_wrapper.h"
 #include "nlohmann/json.hpp"
 #include "string_wrapper.h"
@@ -114,7 +113,7 @@ int32_t FormShareMgr::RecvFormShareInfoFromRemote(const FormShareInfo &info)
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
-    auto task = [this, info]() { this->HandleRecvFormShareInfoFromRemoteTask(info); };
+    auto task = [info]() { FormShareMgr::GetInstance().HandleRecvFormShareInfoFromRemoteTask(info); };
     eventHandler_->PostTask(task);
 
     return ERR_OK;
@@ -140,7 +139,7 @@ int32_t FormShareMgr::HandleRecvFormShareInfoFromRemoteTask(const FormShareInfo 
     {
         std::unique_lock<std::shared_mutex> guard(mapMutex_);
         if (shareInfo_.find(formShareInfoKey) != shareInfo_.end()) {
-            HILOG_ERROR("form is beging shared.");
+            HILOG_ERROR("form is sharing.");
             return ERR_APPEXECFWK_FORM_SHARING;
         }
 
@@ -342,7 +341,7 @@ void FormShareMgr::OnInstallFinished(const std::shared_ptr<FormFreeInstallOperat
             it->second.isFreeInstall = true;
             info = it->second;
         } else {
-            HILOG_ERROR("form share info is not find.");
+            HILOG_ERROR("form share info is not found.");
             return;
         }
     }
@@ -427,7 +426,7 @@ bool FormShareMgr::AddProviderData(const FormItemInfo &info, WantParams &wantPar
     return true;
 }
 
-void FormShareMgr::AcquireProviderShareData(int64_t formId, const std::string &remoteDeviceId,
+void FormShareMgr::AcquireShareFormData(int64_t formId, const std::string &remoteDeviceId,
     const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
@@ -442,7 +441,7 @@ void FormShareMgr::AcquireProviderShareData(int64_t formId, const std::string &r
         return;
     }
 
-    int32_t error = formProviderProxy->AcquireProviderShareData(formId, remoteDeviceId,
+    int32_t error = formProviderProxy->AcquireShareFormData(formId, remoteDeviceId,
         FormSupplyCallback::GetInstance(), requestCode);
     if (error != ERR_OK) {
         SendResponse(requestCode, error);
@@ -488,8 +487,8 @@ void FormShareMgr::HandleProviderShareData(int64_t formId, const std::string &re
     formShareInfo.formTempFlag = formRecord.formTempFlag;
     formShareInfo.dimensionId = formRecord.specification;
     formShareInfo.providerShareData = wantParams;
-    formShareInfo.deviceId = std::string(deviceInfo.deviceId);
-    formShareInfo.deviceName = std::string(deviceInfo.deviceName);
+    formShareInfo.deviceId = deviceInfo.deviceId;
+    formShareInfo.deviceName = deviceInfo.deviceName;
 
     if (formDmsClient_ == nullptr) {
         formDmsClient_ = std::make_shared<FormDistributedClient>();
@@ -509,16 +508,16 @@ int32_t FormShareMgr::GetLocalDeviceInfo(
     HILOG_DEBUG("%{public}s called.", __func__);
     auto &deviceManager = OHOS::DistributedHardware::DeviceManager::GetInstance();
 
-    std::shared_ptr<MyDmInitCallback> deviceInitCallback_ = std::make_shared<MyDmInitCallback>();
+    std::shared_ptr<DeviceInitCallback> deviceInitCallback_ = std::make_shared<DeviceInitCallback>();
     if (deviceInitCallback_ == nullptr) {
-        HILOG_ERROR("FormShareMgr::GetLocalDeviceInfo MyDmInitCallback make_shared failed!");
+        HILOG_ERROR("DeviceInitCallback make_shared failed!");
         return ERR_INVALID_VALUE;
     }
     deviceManager.InitDeviceManager(bundleName, deviceInitCallback_);
 
     auto ret = deviceManager.GetLocalDeviceInfo(bundleName, deviceInfo);
     if (ret != ERR_OK) {
-        HILOG_ERROR("FormShareMgr::GetLocalDeviceInfo Failed to get local device info.");
+        HILOG_ERROR("failed to get local device info.");
         return ret;
     }
     deviceManager.UnInitDeviceManager(bundleName);
