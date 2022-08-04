@@ -3283,7 +3283,8 @@ int64_t SystemTimeMillis() noexcept
     return static_cast<int64_t>(((t.tv_sec) * NANOSECONDS + t.tv_nsec) / MICROSECONDS);
 }
 
-class ShareFormCallBackClient : public ShareFormCallBack {
+class ShareFormCallBackClient : public ShareFormCallBack, 
+                                public std::enable_shared_from_this<ShareFormCallBackClient> {
 public:
     explicit ShareFormCallBackClient(ShareFormTask &&task) : task_(std::move(task))
     {
@@ -3300,8 +3301,8 @@ public:
     void ProcessShareFormResponse(int32_t result)
     {
         if (handler_) {
-            handler_->PostSyncTask([this, result] () {
-                this->task_(result);
+            handler_->PostSyncTask([client = shared_from_this(), result] () {
+                client->task_(result);
             });
         }
     }
@@ -3350,9 +3351,9 @@ NativeValue* JsFormHost::OnShareForm(NativeEngine &engine, NativeCallbackInfo &i
     NativeValue* lastParam = (info.argc <= unwrapArgc) ? nullptr : info.argv[unwrapArgc];
     NativeValue* result = nullptr;
 
-    std::unique_ptr<OHOS::AbilityRuntime::AsyncTask> uasyncTask =
-        OHOS::AbilityRuntime::CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, nullptr, &result);
-    std::shared_ptr<OHOS::AbilityRuntime::AsyncTask> asyncTask = std::move(uasyncTask);
+    std::unique_ptr<AbilityRuntime::AsyncTask> uasyncTask =
+        AbilityRuntime::CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, nullptr, &result);
+    std::shared_ptr<AbilityRuntime::AsyncTask> asyncTask = std::move(uasyncTask);
 
     ShareFormTask task = [&engine, asyncTask](int32_t code) {
         HILOG_INFO("%{public}s, task complete code: %{public}d", __func__, code);
@@ -3361,12 +3362,12 @@ NativeValue* JsFormHost::OnShareForm(NativeEngine &engine, NativeCallbackInfo &i
         } else {
             auto retCode = QueryRetCode(code);
             auto retMsg = QueryRetMsg(retCode);
-            asyncTask->Reject(engine, OHOS::AbilityRuntime::CreateJsError(engine, retCode, retMsg));
+            asyncTask->Reject(engine, AbilityRuntime::CreateJsError(engine, retCode, retMsg));
         }
     };
 
     if (errCode != ERR_OK) {
-        asyncTask->Reject(engine, OHOS::AbilityRuntime::CreateJsError(engine, errCode, "Invalidate params."));
+        asyncTask->Reject(engine, AbilityRuntime::CreateJsError(engine, errCode, "Invalidate params."));
     } else {
         InnerShareForm(engine, asyncTask, std::move(task), formId, remoteDeviceId);
     }
@@ -3376,7 +3377,7 @@ NativeValue* JsFormHost::OnShareForm(NativeEngine &engine, NativeCallbackInfo &i
 
 void JsFormHost::InnerShareForm(
     NativeEngine &engine,
-    const std::shared_ptr<OHOS::AbilityRuntime::AsyncTask> &asyncTask,
+    const std::shared_ptr<AbilityRuntime::AsyncTask> &asyncTask,
     ShareFormTask &&task,
     int64_t formId,
     const std::string &remoteDeviceId)
@@ -3391,7 +3392,7 @@ void JsFormHost::InnerShareForm(
         HILOG_INFO("%{public}s, share form failed.", __func__);
         auto retCode = QueryRetCode(ret);
         auto retMsg = QueryRetMsg(retCode);
-        asyncTask->Reject(engine, OHOS::AbilityRuntime::CreateJsError(engine, retCode, retMsg));
+        asyncTask->Reject(engine, AbilityRuntime::CreateJsError(engine, retCode, retMsg));
         FormHostClient::GetInstance()->RemoveShareFormCallback(requestCode);
     }
 }
