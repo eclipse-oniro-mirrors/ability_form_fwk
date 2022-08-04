@@ -47,34 +47,62 @@ public:
     }
 
     /**
-     * @brief Share forms by formID and deviceID.
+     * @brief Share form by formID and deviceID.
      * @param formId Indicates the unique id of form.
-     * @param deviceId Indicates the device ID to share.
+     * @param deviceId Indicates the remote device ID.
      * @param callerToken Indicates the host client.
      * @param requestCode The request code of this share form.
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t ShareForm(int64_t formId, const std::string &deviceId, const sptr<IRemoteObject> &callerToken,
         int64_t requestCode);
+
     /**
      * @brief Receive form sharing information from remote.
      * @param info Indicates form sharing information.
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t RecvFormShareInfoFromRemote(const FormShareInfo &info);
+
     /**
      * @brief Acquire share form data from form provider.
      * @param formId The Id of the from.
-     * @param remoteDeviceId The device ID to share.
+     * @param remoteDeviceId Indicates the remote device ID.
      * @param want Indicates the want containing information about sharing information and sharing data.
      * @param remoteObject Form provider proxy object.
      */
     void AcquireShareFormData(int64_t formId, const std::string &remoteDeviceId, const Want &want,
         const sptr<IRemoteObject> &remoteObject);
+
+    /**
+     * @brief Handle data shared by provider.
+     * @param formId The Id of the from.
+     * @param remoteDeviceId Indicates the remote device ID.
+     * @param wantParams Indicates the data shared by the provider.
+     * @param requestCode The request code of this share form.
+     * @param result Indicates the result of parsing the shared data.
+     */
     void HandleProviderShareData(int64_t formId, const std::string &remoteDeviceId,
         const AAFwk::WantParams &wantParams, int64_t requestCode, const bool &result);
+
+    /**
+     * @brief Add provider data.
+     * @param info Form configure info.
+     * @param wantParams Indicates the data shared by the provider.
+     * @return Returns true on success, false on failure.
+     */
     bool AddProviderData(const FormItemInfo &info, WantParams &wantParams);
+
+    /**
+     * @brief Handle form share timeout.
+     * @param eventId Event id.
+     */
     void HandleFormShareInfoTimeout(int64_t eventId);
+
+    /**
+     * @brief Handle free install timeout.
+     * @param eventId Event id.
+     */
     void HandleFreeInstallTimeout(int64_t eventId);
     /**
      * @brief Free install was finished.
@@ -84,6 +112,12 @@ public:
      */
     void OnInstallFinished(const std::shared_ptr<FormFreeInstallOperator> &freeInstallOperator,
         int32_t resultCode, const std::string &formShareInfoKey);
+
+    /**
+     * @brief Send form to share asyn result.
+     * @param requestCode The request code of this share form.
+     * @param result Indicates form to share asyn result.
+     */
     void SendResponse(int64_t requestCode, int32_t result);
 private:
     int32_t GetLocalDeviceInfo(const std::string &bundleName, DistributedHardware::DmDeviceInfo &deviceInfo);
@@ -96,8 +130,6 @@ private:
     void StartFormUser(const FormShareInfo &info);
     int32_t HandleRecvFormShareInfoFromRemoteTask(const FormShareInfo &info);
     int32_t CheckFormPackage(const FormShareInfo &info, const std::string &formShareInfoKey);
-    bool GetAbilityInfoByAction(const std::string action, AppExecFwk::AbilityInfo &abilityInfo,
-        AppExecFwk::ExtensionAbilityInfo &extensionAbilityInfo);
 private:
     DECLARE_DELAYED_REF_SINGLETON(FormShareMgr);
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ = nullptr;
@@ -110,7 +142,10 @@ private:
     std::map<int64_t, std::shared_ptr<FormFreeInstallOperator>> freeInstallOperatorMap_;
     // map for <requestCode, formHostClient>
     std::map<int64_t, sptr<IRemoteObject>> requestMap_;
-    mutable std::shared_mutex mapMutex_ {};
+    mutable std::shared_mutex shareInfoMapMutex_ {};
+    mutable std::shared_mutex eventMapMutex_ {};
+    mutable std::shared_mutex freeInstallMapMutex_ {};
+    mutable std::shared_mutex requestMapMutex_ {};
 };
 
 class DeviceInitCallback final : public DistributedHardware::DmInitCallback {
