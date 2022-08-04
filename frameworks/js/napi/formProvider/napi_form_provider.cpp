@@ -68,7 +68,7 @@ napi_value ExecuteAsyncCallbackWork(napi_env env, AsyncCallbackInfoBase* asyncCa
     return result;
 }
 
-napi_value ExecuteAsyncPromiseWork(napi_env env, AsyncCallbackInfoBase* asyncCallbackInfo)
+void ExecuteAsyncPromiseWork(napi_env env, AsyncCallbackInfoBase* asyncCallbackInfo)
 {
     if (napi_queue_async_work(env, asyncCallbackInfo->asyncWork) != napi_ok) {
         napi_value error;
@@ -78,9 +78,6 @@ napi_value ExecuteAsyncPromiseWork(napi_env env, AsyncCallbackInfoBase* asyncCal
         delete asyncCallbackInfo;
         asyncCallbackInfo = nullptr;
     }
-    napi_value result = nullptr;
-    napi_get_undefined(env, &result);
-    return result;
 }
 
 /**
@@ -1361,9 +1358,9 @@ static napi_value IsRequestPublishFormSupportedPromise(napi_env env,
             InnerIsRequestPublishFormSupported(env, asyncCallbackInfo);
         },
         [](napi_env env, napi_status status, void *data) {
-            HILOG_INFO("IsRequestPublishFormSupportedCallback callback completed");
+            HILOG_INFO("IsRequestPublishFormSupportedPromise completed");
             if (data == nullptr) {
-                HILOG_ERROR("IsRequestPublishFormSupportedCallback data is a nullptr");
+                HILOG_ERROR("IsRequestPublishFormSupportedPromise data is a nullptr");
                 return;
             }
             AsyncIsRequestPublishFormSupportedCallbackInfo *asyncCallbackInfo =
@@ -1380,7 +1377,8 @@ static napi_value IsRequestPublishFormSupportedPromise(napi_env env,
         },
         (void *)asyncCallbackInfo,
         &asyncCallbackInfo->asyncWork);
-    return ExecuteAsyncPromiseWork(env, asyncCallbackInfo);
+    ExecuteAsyncPromiseWork(env, asyncCallbackInfo);
+    return promise;
 }
 
 napi_value NAPI_IsRequestPublishFormSupported(napi_env env, napi_callback_info info)
