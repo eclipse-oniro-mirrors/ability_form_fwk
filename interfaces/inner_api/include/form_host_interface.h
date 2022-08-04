@@ -80,7 +80,7 @@ public:
         // ipc id for uninstall (3684)
         FORM_HOST_ON_ACQUIRE_FORM_STATE,
 
-        // ipc id for uninstall (3685)
+        // ipc id for share form response(3685)
         FORM_HOST_ON_SHARE_FORM_RESPONSE,
     };
 };

@@ -961,7 +961,7 @@ int32_t FormMgr::ShareForm(int64_t formId, const std::string &remoteDeviceId, co
     HILOG_INFO("%{public}s called.", __func__);
     int32_t errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
+        HILOG_ERROR("share form failed, errCode:%{public}d.", errCode);
         return errCode;
     }
     return remoteProxy_->ShareForm(formId, remoteDeviceId, callerToken, requestCode);

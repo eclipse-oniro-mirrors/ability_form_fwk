@@ -36,7 +36,6 @@ struct FormShareInfo : public Parcelable {
     int32_t dimensionId;
     AAFwk::WantParams providerShareData;
     std::string deviceId;
-    std::string deviceName;
     // No serialization required, fms uses natively
     bool isFreeInstall = false;
 

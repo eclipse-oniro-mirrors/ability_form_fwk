@@ -117,12 +117,12 @@ public:
     /**
      * @brief Acquire to share form information data. This is sync API.
      * @param formId The Id of the from.
-     * @param remoteDeviceId Indicates the device ID to share.
+     * @param remoteDeviceId Indicates the remote device ID.
      * @param formSupplyCallback Indicates lifecycle callbacks.
      * @param requestCode Indicates the request code of this share form.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual int32_t ShareAcquireProviderFormInfo(int64_t formId, const std::string &remoteDeviceId,
+    virtual int32_t AcquireShareFormData(int64_t formId, const std::string &remoteDeviceId,
         const sptr<IRemoteObject> &formSupplyCallback, int64_t requestCode) = 0;
 
     enum class Message {

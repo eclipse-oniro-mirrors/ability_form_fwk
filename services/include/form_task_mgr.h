@@ -194,7 +194,7 @@ private:
      * @param want The want of the request.
      * @param remoteObject Form provider proxy object.
      */
-    void ShareAcquireProviderFormInfo(int64_t formId, const std::string &remoteDeviceId, const Want &want,
+    void AcquireShareFormData(int64_t formId, const std::string &remoteDeviceId, const Want &want,
         const sptr<IRemoteObject> &remoteObject);
 
     /**

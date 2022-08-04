@@ -56,12 +56,12 @@ void FormTaskMgr::PostShareAcquireTask(int64_t formId, const std::string &remote
     const sptr<IRemoteObject> &remoteObject)
 {
     if (eventHandler_ == nullptr) {
-        HILOG_ERROR("%{public}s fail, eventhandler invalidate", __func__);
+        HILOG_ERROR("eventHandler_ is nullptr");
         int64_t requestCode = static_cast<int64_t>(want.GetLongParam(Constants::FORM_SHARE_REQUEST_CODE, 0));
         PostFormShareSendResponse(requestCode, ERR_APPEXECFWK_FORM_COMMON_CODE);
         return;
     }
-    std::function<void()> acquireShareProviderFormInfoFunc = std::bind(&FormTaskMgr::ShareAcquireProviderFormInfo,
+    std::function<void()> acquireShareProviderFormInfoFunc = std::bind(&FormTaskMgr::AcquireShareFormData,
         this, formId, remoteDeviceId, want, remoteObject);
     eventHandler_->PostTask(acquireShareProviderFormInfoFunc, FORM_TASK_DELAY_TIME);
 }
@@ -315,7 +315,7 @@ void FormTaskMgr::PostFormShareSendResponse(int64_t formShareRequestCode, int32_
 {
     HILOG_INFO("%{public}s start", __func__);
     if (eventHandler_ == nullptr) {
-        HILOG_ERROR("%{public}s fail, eventhandler invalidate.", __func__);
+        HILOG_ERROR("eventHandler_ is nullptr.");
         return;
     }
     std::function<void()> formShareSendResponseFunc = std::bind(&FormTaskMgr::FormShareSendResponse,
@@ -336,10 +336,10 @@ void FormTaskMgr::AcquireProviderFormInfo(const int64_t formId, const Want &want
     FormMgrAdapter::GetInstance().AcquireProviderFormInfo(formId, want, remoteObject);
 }
 
-void FormTaskMgr::ShareAcquireProviderFormInfo(int64_t formId, const std::string &remoteDeviceId,
+void FormTaskMgr::AcquireShareFormData(int64_t formId, const std::string &remoteDeviceId,
     const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
-    FormShareMgr::GetInstance().ShareAcquireProviderFormInfo(formId, remoteDeviceId, want, remoteObject);
+    FormShareMgr::GetInstance().AcquireShareFormData(formId, remoteDeviceId, want, remoteObject);
 }
 /**
  * @brief Notify form provider for delete form.

@@ -336,7 +336,7 @@ public:
     /**
      * @brief Share forms by formID and deviceID.
      * @param formId Indicates the unique id of form.
-     * @param deviceId Indicates the device ID to share.
+     * @param deviceId Indicates the remote device ID.
      * @param callerToken Indicates the host client.
      * @param requestCode The request code of this share form.
      * @return Returns ERR_OK on success, others on failure.

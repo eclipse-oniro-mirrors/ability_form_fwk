@@ -1022,8 +1022,8 @@ ErrCode FormMgrAdapter::AcquireProviderFormInfoAsync(const int64_t formId,
     // If add a share form, need to add provider data
     WantParams newWantParams(wantParams);
     if (!FormShareMgr::GetInstance().AddProviderData(info, newWantParams)) {
-        HILOG_ERROR("%{public}s add share provider data failed.", __func__);
-        return ERR_APPEXECFWK_FORM_ADD_SAHRE_PROVIDER_DATA_FAILED;
+        HILOG_ERROR("add share provider data failed.");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
     sptr<IAbilityConnection> formAcquireConnection

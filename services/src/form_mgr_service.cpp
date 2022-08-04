@@ -769,28 +769,28 @@ int32_t FormMgrService::ShareForm(int64_t formId, const std::string &deviceId, c
     HILOG_DEBUG("FormMgrService ShareForm called deviceId : %{public}s, formId: %{public}" PRId64 "",
         deviceId.c_str(), formId);
     if (formId <= 0) {
-        HILOG_ERROR("%{public}s form formId  is invalid", __func__);
+        HILOG_ERROR("form formId  is invalid.");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
     if (deviceId.empty()) {
-        HILOG_ERROR("%{public}s form deviceId is empty", __func__);
+        HILOG_ERROR("form deviceId is empty.");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
     if (callerToken == nullptr) {
-        HILOG_ERROR("%{public}s callerToken is nullptr", __func__);
+        HILOG_ERROR("callerToken is nullptr.");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
     if (requestCode <= 0) {
-        HILOG_ERROR("%{public}s form requestCode  is invalid", __func__);
+        HILOG_ERROR("form requestCode is invalid.");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
     auto ret = CheckFormPermission();
     if (ret != ERR_OK) {
-        HILOG_ERROR("%{public}s fail, share form permission denied", __func__);
+        HILOG_ERROR("share form permission denied.");
         return ret;
     }
 

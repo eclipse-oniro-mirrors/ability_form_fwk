@@ -423,7 +423,7 @@ bool  FormProviderProxy::WriteInterfaceToken(MessageParcel &data)
     return true;
 }
 
-int32_t FormProviderProxy::ShareAcquireProviderFormInfo(int64_t formId, const std::string &remoteDeviceId,
+int32_t FormProviderProxy::AcquireShareFormData(int64_t formId, const std::string &remoteDeviceId,
     const sptr<IRemoteObject> &formSupplyCallback, int64_t requestCode)
 {
     int32_t result;
@@ -432,27 +432,27 @@ int32_t FormProviderProxy::ShareAcquireProviderFormInfo(int64_t formId, const st
     MessageOption option;
 
     if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("%{public}s, failed to write interface token", __func__);
+        HILOG_ERROR("failed to write interface token.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     if (!data.WriteInt64(formId)) {
-        HILOG_ERROR("%{public}s, failed to write formId", __func__);
+        HILOG_ERROR("failed to write formId.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     if (!data.WriteString(remoteDeviceId)) {
-        HILOG_ERROR("%{public}s, failed to write remoteDeviceId", __func__);
+        HILOG_ERROR("failed to write remoteDeviceId.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     if (!data.WriteRemoteObject(formSupplyCallback)) {
-        HILOG_ERROR("%{public}s, failed to write formSupplyCallback", __func__);
+        HILOG_ERROR("failed to write formSupplyCallback.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     if (!data.WriteInt64(requestCode)) {
-        HILOG_ERROR("%{public}s, failed to write requestCode", __func__);
+        HILOG_ERROR("failed to write requestCode.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     result = Remote()->SendRequest(
@@ -461,13 +461,13 @@ int32_t FormProviderProxy::ShareAcquireProviderFormInfo(int64_t formId, const st
         reply,
         option);
     if (result != ERR_OK) {
-        HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d", __func__, result);
+        HILOG_ERROR("failed to SendRequest: %{public}d", result);
         return result;
     }
 
     auto retval = reply.ReadInt32();
     if (retval != ERR_OK) {
-        HILOG_ERROR("%{public}s, failed to replyData: %{public}d", __func__, retval);
+        HILOG_ERROR("failed to replyData: %{public}d", retval);
         return retval;
     }
 

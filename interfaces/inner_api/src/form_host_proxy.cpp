@@ -176,17 +176,17 @@ void FormHostProxy::OnShareFormResponse(int64_t requestCode, int32_t result)
     MessageOption option;
 
     if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("%{public}s, failed to write interface token", __func__);
+        HILOG_ERROR("failed to write interface token.");
         return;
     }
 
     if (!data.WriteInt64(requestCode)) {
-        HILOG_ERROR("%{public}s, failed to write requestCode", __func__);
+        HILOG_ERROR("failed to write requestCode.");
         return;
     }
 
     if (!data.WriteInt32(result)) {
-        HILOG_ERROR("%{public}s, failed to write result", __func__);
+        HILOG_ERROR("failed to write result.");
         return;
     }
 
@@ -196,7 +196,7 @@ void FormHostProxy::OnShareFormResponse(int64_t requestCode, int32_t result)
         reply,
         option);
     if (error != ERR_OK) {
-        HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d", __func__, error);
+        HILOG_ERROR("failed to SendRequest: %{public}d", error);
     }
 }
 }  // namespace AppExecFwk

@@ -154,10 +154,10 @@ int MockFormProviderClient::AcquireState(const Want &wantArg, const std::string 
     return ERR_OK;
 }
 
-int32_t MockFormProviderClient::ShareAcquireProviderFormInfo(int64_t formId, const std::string &remoteDeviceId,
+int32_t MockFormProviderClient::AcquireShareFormData(int64_t formId, const std::string &remoteDeviceId,
     const sptr<IRemoteObject> &formSupplyCallback, int64_t requestCode)
 {
-    HILOG_DEBUG("MockFormProviderClient::ShareAcquireProviderFormInfo");
+    HILOG_DEBUG("MockFormProviderClient::AcquireShareFormData");
     return ERR_OK;
 }
 }  // namespace AppExecFwk

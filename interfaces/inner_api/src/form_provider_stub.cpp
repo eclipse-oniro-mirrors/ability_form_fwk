@@ -43,7 +43,7 @@ FormProviderStub::FormProviderStub()
     memberFuncMap_[static_cast<uint32_t>(IFormProvider::Message::FORM_PROVIDER_NOTIFY_STATE_ACQUIRE)] =
         &FormProviderStub::HandleAcquireState;
     memberFuncMap_[static_cast<uint32_t>(IFormProvider::Message::FORM_ACQUIRE_PROVIDER_SHARE_FOMR_INFO)] =
-        &FormProviderStub::HandleShareAcquireProviderFormInfo;
+        &FormProviderStub::HandleAcquireShareFormData;
 }
 
 FormProviderStub::~FormProviderStub()
@@ -298,34 +298,34 @@ int FormProviderStub::HandleAcquireState(MessageParcel &data, MessageParcel &rep
     return result;
 }
 
-int32_t FormProviderStub::HandleShareAcquireProviderFormInfo(MessageParcel &data, MessageParcel &reply)
+int32_t FormProviderStub::HandleAcquireShareFormData(MessageParcel &data, MessageParcel &reply)
 {
     auto formId = data.ReadInt64();
     if (formId <= 0) {
-        HILOG_ERROR("%{public}s, failed to get remote formId.", __func__);
+        HILOG_ERROR("failed to get remote formId.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     auto remoteDeviceId = data.ReadString();
     if (remoteDeviceId.empty()) {
-        HILOG_ERROR("%{public}s, failed to get remote remoteDeviceId.", __func__);
+        HILOG_ERROR("failed to get remote remoteDeviceId.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     auto remoteObj = data.ReadRemoteObject();
     if (remoteObj == nullptr) {
-        HILOG_ERROR("%{public}s, failed to get remote object.", __func__);
+        HILOG_ERROR("failed to get remote object.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     auto requestCode = data.ReadInt64();
     if (requestCode <= 0) {
-        HILOG_ERROR("%{public}s, failed to get remote requestCode.", __func__);
+        HILOG_ERROR("failed to get remote requestCode.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    ShareAcquireProviderFormInfo(formId, remoteDeviceId, remoteObj, requestCode);
+    AcquireShareFormData(formId, remoteDeviceId, remoteObj, requestCode);
     if (!reply.WriteInt32(ERR_OK)) {
-        HILOG_ERROR("%{public}s, failed to WriteParcelable object.", __func__);
+        HILOG_ERROR("failed to WriteParcelable object.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 

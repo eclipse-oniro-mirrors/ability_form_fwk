@@ -190,7 +190,7 @@ void FormSupplyCallback::OnShareAcquire(int64_t formId, const std::string &remot
     const AAFwk::WantParams &wantParams, int64_t requestCode, const bool &result)
 {
     HILOG_DEBUG("%{public}s formId %{public}d called.", __func__, static_cast<int32_t>(formId));
-    DelayedRefSingleton<FormShareMgr>::GetInstance().AcquireFormProviderInfo(
+    DelayedRefSingleton<FormShareMgr>::GetInstance().HandleProviderShareData(
         formId, remoteDeviceId, wantParams, requestCode, result);
 }
 }  // namespace AppExecFwk

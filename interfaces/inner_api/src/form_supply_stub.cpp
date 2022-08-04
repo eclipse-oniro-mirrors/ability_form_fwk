@@ -161,25 +161,25 @@ int32_t FormSupplyStub::HandleOnShareAcquire(MessageParcel &data, MessageParcel 
 {
     auto formId = data.ReadInt64();
     if (formId <= 0) {
-        HILOG_ERROR("%{public}s, failed to ReadInt64<formId>", __func__);
+        HILOG_ERROR("failed to ReadInt64<formId>");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     auto remoteDeviceId = data.ReadString();
     if (remoteDeviceId.empty()) {
-        HILOG_ERROR("%{public}s, failed to ReadString<DeviceId>", __func__);
+        HILOG_ERROR("failed to ReadString<DeviceId>");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     std::shared_ptr<AAFwk::WantParams> wantParams(data.ReadParcelable<AAFwk::WantParams>());
     if (wantParams == nullptr) {
-        HILOG_ERROR("%{public}s, failed to ReadParcelable<wantParams>", __func__);
+        HILOG_ERROR("failed to ReadParcelable<wantParams>");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     auto requestCode = data.ReadInt64();
     if (requestCode <= 0) {
-        HILOG_ERROR("%{public}s, failed to ReadInt64<requestCode>", __func__);
+        HILOG_ERROR("failed to ReadInt64<requestCode>");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 

@@ -861,7 +861,7 @@ int32_t FormMgrStub::HandleRecvFormShareInfoFromRemote(MessageParcel &data, Mess
     HILOG_INFO("%{public}s called.", __func__);
     std::unique_ptr<FormShareInfo> info(data.ReadParcelable<FormShareInfo>());
     if (!info) {
-        HILOG_ERROR("%{public}s, failed to ReadParcelable<FormShareInfo>", __func__);
+        HILOG_ERROR("failed to ReadParcelable<FormShareInfo>");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     auto result = RecvFormShareInfoFromRemote(*info);

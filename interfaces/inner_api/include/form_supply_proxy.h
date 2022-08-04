@@ -62,7 +62,7 @@ public:
     /**
      * @brief Accept form sharing data from form provider.
      * @param formId The Id of the from.
-     * @param remoteDeviceId Indicates the device ID to share.
+     * @param remoteDeviceId Indicates the remote device ID.
      * @param wantParams Indicates the data information shared by the form.
      * @param requestCode Indicates the requested id.
      * @param result Indicates the results of parsing shared data.

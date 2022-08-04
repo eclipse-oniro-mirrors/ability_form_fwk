@@ -171,27 +171,27 @@ void FormSupplyProxy::OnShareAcquire(int64_t formId, const std::string &remoteDe
     MessageOption option;
 
     if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("%{public}s, failed to WriteInterfaceToken", __func__);
+        HILOG_ERROR("failed to WriteInterfaceToken.");
         return;
     }
     if (!data.WriteInt64(formId)) {
-        HILOG_ERROR("%{public}s, failed to write form formId", __func__);
+        HILOG_ERROR("failed to write form formId.");
         return;
     }
     if (!data.WriteString(remoteDeviceId)) {
-        HILOG_ERROR("%{public}s, failed to write form remoteDeviceId", __func__);
+        HILOG_ERROR("failed to write form remoteDeviceId.");
         return;
     }
     if (!data.WriteParcelable(&wantParams)) {
-        HILOG_ERROR("%{public}s, failed to write form wantParams", __func__);
+        HILOG_ERROR("failed to write form wantParams.");
         return;
     }
     if (!data.WriteInt64(requestCode)) {
-        HILOG_ERROR("%{public}s, failed to write form requestCode", __func__);
+        HILOG_ERROR("failed to write form requestCode.");
         return;
     }
     if (!data.WriteBool(result)) {
-        HILOG_ERROR("%{public}s, failed to write form result", __func__);
+        HILOG_ERROR("failed to write form result.");
         return;
     }
     auto error = Remote()->SendRequest(
@@ -200,7 +200,7 @@ void FormSupplyProxy::OnShareAcquire(int64_t formId, const std::string &remoteDe
         reply,
         option);
     if (error != ERR_OK) {
-        HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d", __func__, error);
+        HILOG_ERROR("failed to SendRequest: %{public}d", error);
     }
 }
 }  // namespace AppExecFwk
