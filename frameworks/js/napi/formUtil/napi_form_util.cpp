@@ -81,8 +81,6 @@ const std::map<int32_t, int32_t> ERROR_CODE_MAP = {
     { ERR_APPEXECFWK_FORM_SEND_FMS_MSG,                   ERR_COMMON },
     { ERR_APPEXECFWK_FORM_FORM_DUPLICATE_ADDED,           ERR_FORM_DUPLICATE_ADDED },
     { ERR_APPEXECFWK_FORM_IN_RECOVER,                     ERR_IN_RECOVERY },
-    { ERR_APPEXECFWK_FORM_PARSE_SHARE_DATA_FAILED,        ERR_PARSE_SHARE_DATA_FAILED},
-    { ERR_APPEXECFWK_FORM_GET_DEVICE_INFO_FAILED,         ERR_GET_DEVICE_INFO_FAILED },
     { ERR_APPEXECFWK_FORM_DISTRIBUTED_SCHEDULE_FAILED,    ERR_DISTRIBUTED_SCHEDULE_FAILED },
     { ERR_APPEXECFWK_FORM_GET_SYSMGR_FAILED,              ERR_SYSTEM_RESPONSES_FAILED }
 };
@@ -109,9 +107,7 @@ const std::map<int32_t, std::string> CODE_MSG_MAP = {
     { ERR_FORM_FA_NOT_INSTALLED, "the ability is not installed" },
     { ERR_SYSTEM_RESPONSES_FAILED, "failed to obtain the RPC object" },
     { ERR_FORM_DUPLICATE_ADDED, "failed to obtain the form requested by the client" },
-    { ERR_GET_DEVICE_INFO_FAILED, "failed to get local device info" },
     { ERR_DISTRIBUTED_SCHEDULE_FAILED, "failed to distributed schedule" },
-    { ERR_PARSE_SHARE_DATA_FAILED, "failed to parse shared data" },
     { ERR_IN_RECOVERY, "the form is being restored" }
 };
 
