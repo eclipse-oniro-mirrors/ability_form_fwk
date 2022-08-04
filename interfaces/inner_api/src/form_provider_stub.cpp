@@ -309,10 +309,9 @@ int32_t FormProviderStub::HandleAcquireShareFormData(MessageParcel &data, Messag
     }
 
     auto requestCode = data.ReadInt64();
-    AcquireShareFormData(formId, remoteDeviceId, remoteObj, requestCode);
-
-    if (!reply.WriteInt32(ERR_OK)) {
-        HILOG_ERROR("failed to WriteParcelable object.");
+    auto result = AcquireShareFormData(formId, remoteDeviceId, remoteObj, requestCode);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("failed to Write result.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 

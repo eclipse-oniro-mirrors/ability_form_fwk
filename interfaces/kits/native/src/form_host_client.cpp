@@ -296,12 +296,13 @@ void FormHostClient::OnShareFormResponse(int64_t requestCode, int32_t result)
     auto iter = shareFormCallbackMap_.find(requestCode);
     if (iter == shareFormCallbackMap_.end()) {
         HILOG_DEBUG("share form callback not found");
-    } else {
-        if (iter->second) {
-            iter->second->ProcessShareFormResponse(result);
-        }
-        shareFormCallbackMap_.erase(requestCode);
+        return;
     }
+
+    if (iter->second) {
+        iter->second->ProcessShareFormResponse(result);
+    }
+    shareFormCallbackMap_.erase(requestCode);
     HILOG_DEBUG("%{public}s done", __func__);
 }
 

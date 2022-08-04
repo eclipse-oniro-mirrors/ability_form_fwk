@@ -320,8 +320,10 @@ void FormTaskMgr::PostFormShareSendResponse(int64_t formShareRequestCode, int32_
         HILOG_ERROR("eventHandler_ is nullptr.");
         return;
     }
-    std::function<void()> formShareSendResponseFunc = std::bind(&FormTaskMgr::FormShareSendResponse,
-        this, formShareRequestCode, result);
+
+    auto formShareSendResponseFunc = [formShareRequestCode, result]() {
+        FormTaskMgr::GetInstance().FormShareSendResponse(formShareRequestCode, result);
+    };
     eventHandler_->PostTask(formShareSendResponseFunc, FORM_TASK_DELAY_TIME);
     HILOG_INFO("%{public}s end", __func__);
 }
