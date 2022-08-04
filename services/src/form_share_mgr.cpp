@@ -105,7 +105,11 @@ int32_t FormShareMgr::HandleRecvFormShareInfoFromRemoteTask(const FormShareInfo 
     ExtensionAbilityInfo extensionAbilityInfo;
     int32_t userId = FormUtil::GetCurrentAccountId();
     if (!FormBmsHelper::GetInstance().GetAbilityInfoByAction(
-        Want::ACTION_SHARE_FORM, abilityInfo, extensionAbilityInfo, userId)) {
+        Want::ACTION_SHARE_FORM, userId, abilityInfo, extensionAbilityInfo)) {
+        HILOG_ERROR("get ability info by action failed.");
+        return ERR_APPEXECFWK_FORM_FORM_USER_NOT_EXIST;
+    }
+    if (abilityInfo.name.empty() && extensionAbilityInfo.name.empty()) {
         HILOG_ERROR("form user is not exist.");
         return ERR_APPEXECFWK_FORM_FORM_USER_NOT_EXIST;
     }
@@ -199,16 +203,19 @@ void FormShareMgr::StartFormUser(const FormShareInfo &info)
     ExtensionAbilityInfo extensionAbilityInfo;
     int32_t userId = FormUtil::GetCurrentAccountId();
     if (!FormBmsHelper::GetInstance().GetAbilityInfoByAction(
-        Want::ACTION_SHARE_FORM, abilityInfo, extensionAbilityInfo, userId)) {
-        HILOG_ERROR("form user is not exist.");
+        Want::ACTION_SHARE_FORM, userId, abilityInfo, extensionAbilityInfo)) {
+        HILOG_ERROR("get ability info by action failed.");
         return;
     }
 
     Want want;
     if (!abilityInfo.name.empty()) {
         want.SetElementName(abilityInfo.bundleName, abilityInfo.name);
-    } else {
+    } else if (!extensionAbilityInfo.name.empty()) {
         want.SetElementName(extensionAbilityInfo.bundleName, extensionAbilityInfo.name);
+    } else {
+        HILOG_ERROR("form user is not exist.");
+        return;
     }
 
     want.SetAction(Want::ACTION_SHARE_FORM);
@@ -231,7 +238,7 @@ bool FormShareMgr::IsExistFormPackage(const std::string &bundleName, const std::
     HILOG_DEBUG("%{public}s called.", __func__);
     BundleInfo bundleInfo;
     auto userId = FormUtil::GetCurrentAccountId();
-    if (!FormBmsHelper::GetInstance().GetBundleInfo(bundleName, bundleInfo, userId)) {
+    if (!FormBmsHelper::GetInstance().GetBundleInfo(bundleName, userId, bundleInfo)) {
         HILOG_ERROR("get bundle info failed");
         return false;
     }

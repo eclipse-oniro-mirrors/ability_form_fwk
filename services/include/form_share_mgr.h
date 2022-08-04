@@ -104,6 +104,7 @@ public:
      * @param eventId Event id.
      */
     void HandleFreeInstallTimeout(int64_t eventId);
+
     /**
      * @brief Free install was finished.
      * @param FormFreeInstallOperator Indicates the free install operator object.
