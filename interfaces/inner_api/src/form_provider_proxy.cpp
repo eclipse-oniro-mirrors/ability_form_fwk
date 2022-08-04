@@ -468,10 +468,9 @@ int32_t FormProviderProxy::AcquireShareFormData(int64_t formId, const std::strin
     auto retval = reply.ReadInt32();
     if (retval != ERR_OK) {
         HILOG_ERROR("failed to replyData: %{public}d", retval);
-        return retval;
     }
 
-    return ERR_OK;
+    return retval;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

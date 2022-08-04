@@ -375,7 +375,7 @@ public:
     int UpdateRouterAction(const int64_t formId, std::string &action);
 
     /**
-     * @brief Share forms with formId and remote device id.
+     * @brief Share form with formId and remote device id.
      * @param formId The Id of the forms to share.
      * @param remoteDeviceId The Id of the remote revice to share.
      * @param callerToken Indicates the host client.

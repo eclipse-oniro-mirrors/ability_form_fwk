@@ -64,7 +64,7 @@ public:
      * @param requestCode The request code of this share form.
      * @param result Share form result.
      */
-    virtual void OnShareFormResponse(int64_t requestCode, int32_t result) override;
+    void OnShareFormResponse(int64_t requestCode, int32_t result) override;
 private:
     template <typename T>
     int GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos);

@@ -316,7 +316,7 @@ public:
     virtual int UpdateRouterAction(const int64_t formId, std::string &action) = 0;
 
     /**
-     * @brief Share forms by formID and deviceID.
+     * @brief Share form by formID and deviceID.
      * @param formId Indicates the unique id of form.
      * @param deviceId Indicates the remote device ID.
      * @param callerToken Host client.

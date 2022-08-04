@@ -117,11 +117,11 @@ private:
     virtual int AcquireState(const Want &wantArg, const std::string &provider, const Want &want,
                              const sptr<IRemoteObject> &callerToken) override;
 
-    virtual int32_t AcquireShareFormData(int64_t formId, const std::string &remoteDeviceId,
+    int32_t AcquireShareFormData(int64_t formId, const std::string &remoteDeviceId,
         const sptr<IRemoteObject> &formSupplyCallback, int64_t requestCode) override;
 private:
     DISALLOW_COPY_AND_MOVE(MockFormProviderClient);
 };
-}  // namespace AppExecFwk
-}  // namespace OHOS
-#endif  // OHOS_FORM_FWK_MOCK_FORM_PROVIDER_CLIENT_H
+} // namespace AppExecFwk
+} // namespace OHOS
+#endif // OHOS_FORM_FWK_MOCK_FORM_PROVIDER_CLIENT_H

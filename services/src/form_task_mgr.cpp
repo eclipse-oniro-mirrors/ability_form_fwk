@@ -61,8 +61,10 @@ void FormTaskMgr::PostShareAcquireTask(int64_t formId, const std::string &remote
         PostFormShareSendResponse(requestCode, ERR_APPEXECFWK_FORM_COMMON_CODE);
         return;
     }
-    std::function<void()> acquireShareProviderFormInfoFunc = std::bind(&FormTaskMgr::AcquireShareFormData,
-        this, formId, remoteDeviceId, want, remoteObject);
+
+    auto acquireShareProviderFormInfoFunc = [formId, remoteDeviceId, want, remoteObject]() {
+        FormTaskMgr::GetInstance().AcquireShareFormData(formId, remoteDeviceId, want, remoteObject);
+    };
     eventHandler_->PostTask(acquireShareProviderFormInfoFunc, FORM_TASK_DELAY_TIME);
 }
 /**

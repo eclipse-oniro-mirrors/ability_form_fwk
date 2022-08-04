@@ -301,17 +301,7 @@ int FormProviderStub::HandleAcquireState(MessageParcel &data, MessageParcel &rep
 int32_t FormProviderStub::HandleAcquireShareFormData(MessageParcel &data, MessageParcel &reply)
 {
     auto formId = data.ReadInt64();
-    if (formId <= 0) {
-        HILOG_ERROR("failed to get remote formId.");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-
     auto remoteDeviceId = data.ReadString();
-    if (remoteDeviceId.empty()) {
-        HILOG_ERROR("failed to get remote remoteDeviceId.");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-
     auto remoteObj = data.ReadRemoteObject();
     if (remoteObj == nullptr) {
         HILOG_ERROR("failed to get remote object.");
@@ -319,11 +309,8 @@ int32_t FormProviderStub::HandleAcquireShareFormData(MessageParcel &data, Messag
     }
 
     auto requestCode = data.ReadInt64();
-    if (requestCode <= 0) {
-        HILOG_ERROR("failed to get remote requestCode.");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
     AcquireShareFormData(formId, remoteDeviceId, remoteObj, requestCode);
+
     if (!reply.WriteInt32(ERR_OK)) {
         HILOG_ERROR("failed to WriteParcelable object.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
