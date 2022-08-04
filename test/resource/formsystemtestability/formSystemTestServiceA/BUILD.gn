@@ -25,10 +25,7 @@ config("formSystemTestAConfig") {
     "${even_path}/cesfwk/kits/native/include",
     "${subdemosystem_path}/include",
   ]
-  defines = [
-    "AMS_LOG_TAG = \"formSystemTestServiceA\"",
-    "AMS_LOG_DOMAIN = 0xD002200",
-  ]
+  defines = [ "AMS_LOG_TAG = \"formSystemTestServiceA\"" ]
 }
 ohos_shared_library("formSystemTestServiceA") {
   sources = [ "${subdemosystem_path}/src/form_st_service_ability_A.cpp" ]

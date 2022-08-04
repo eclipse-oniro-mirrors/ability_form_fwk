@@ -17,10 +17,7 @@ import("//foundation/ability/form_fwk/form_fwk.gni")
 
 ################################### libfms ########################################
 config("formmgr_log_config") {
-  defines = [
-    "AMS_LOG_TAG = \"FormMgrService\"",
-    "AMS_LOG_DOMAIN = 0xD001120",
-  ]
+  defines = [ "AMS_LOG_TAG = \"FormMgrService\"" ]
 }
 
 config("formmgr_config") {
@@ -127,10 +124,7 @@ ohos_shared_library("libfms") {
 
 ################################### fmskit_native ########################################
 config("fmskit_config") {
-  defines = [
-    "AMS_LOG_TAG = \"FmskitNative\"",
-    "AMS_LOG_DOMAIN = 0xD001151",
-  ]
+  defines = [ "AMS_LOG_TAG = \"FmskitNative\"" ]
 }
 
 config("fmskit_public_config") {
