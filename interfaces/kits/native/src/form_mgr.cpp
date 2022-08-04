@@ -366,8 +366,8 @@ int FormMgr::SetNextRefreshTime(const int64_t formId, const int64_t nextTime)
 {
     HILOG_INFO("%{public}s called.", __func__);
 
-    if (nextTime < Constants::MIN_NEXT_TIME) {
-        HILOG_ERROR("next time less than 300 seconds.");
+    if (nextTime < (Constants::MIN_NEXT_TIME / Constants::SEC_PER_MIN)) {
+        HILOG_ERROR("next time less than 5 mins");
         return ERR_APPEXECFWK_FORM_INVALID_REFRESH_TIME;
     }
 

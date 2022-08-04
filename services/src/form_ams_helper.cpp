@@ -135,5 +135,15 @@ void FormAmsHelper::DisconnectAbilityTask(const sptr<AAFwk::IAbilityConnection> 
     }
     IN_PROCESS_CALL_WITHOUT_RET(ams->DisconnectAbility(connect));
 }
+
+ErrCode FormAmsHelper::StartAbility(const Want &want, int32_t userId)
+{
+    sptr<AAFwk::IAbilityManager> ams = GetAbilityManager();
+    if (ams == nullptr) {
+        HILOG_ERROR("%{public}s, ability service not connect", __func__);
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+    }
+    return IN_PROCESS_CALL(ams->StartAbility(want, userId));
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

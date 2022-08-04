@@ -253,7 +253,7 @@ ErrCode FormMgrAdapter::HandleDeleteForm(const int64_t formId, const sptr<IRemot
 #ifdef DEVICE_USAGE_STATISTICS_ENABLE
     DeviceUsageStats::BundleActiveEvent event(record.bundleName, record.moduleName, record.formName,
         record.specification, record.formId, DeviceUsageStats::BundleActiveEvent::FORM_IS_REMOVED);
-
+#endif
     int callingUid = IPCSkeleton::GetCallingUid();
     int32_t userId = GetCurrentUserId(callingUid);
     bool isSelfDbFormId = (userId == dbRecord.userId) && ((std::find(dbRecord.formUserUids.begin(),
@@ -274,6 +274,7 @@ ErrCode FormMgrAdapter::HandleDeleteForm(const int64_t formId, const sptr<IRemot
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
+#ifdef DEVICE_USAGE_STATISTICS_ENABLE
     DeviceUsageStats::BundleActiveClient::GetInstance().ReportEvent(event, userId);
 #endif
     return ERR_OK;
@@ -310,7 +311,10 @@ ErrCode FormMgrAdapter::HandleDeleteTempForm(const int64_t formId, const sptr<IR
             FormDataMgr::GetInstance().AddFormUserUid(formId, uid);
             return result;
         }
-        FormDataMgr::GetInstance().DeleteTempForm(formId);
+        if (!FormDataMgr::GetInstance().DeleteTempForm(formId)) {
+            HILOG_ERROR("%{public}s, form id is not existed.", __func__);
+            return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+        }
         FormDataMgr::GetInstance().DeleteFormRecord(formId);
         if (!FormCacheMgr::GetInstance().DeleteData(formId)) {
             HILOG_ERROR("%{public}s, failed to remove cache data", __func__);
@@ -351,7 +355,7 @@ ErrCode FormMgrAdapter::HandleDeleteFormCache(FormRecord &dbRecord, const int ui
         }
         if (!FormDataMgr::GetInstance().DeleteFormRecord(formId)) {
             HILOG_ERROR("%{public}s, failed to remove cache data", __func__);
-            return ERR_APPEXECFWK_FORM_COMMON_CODE;
+            return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
         }
         if (result = FormDbCache::GetInstance().DeleteFormInfo(formId); result != ERR_OK) {
             HILOG_ERROR("%{public}s, failed to remove db data", __func__);
@@ -1421,6 +1425,7 @@ ErrCode FormMgrAdapter::QueryPublishFormToHost(Want &want)
         want.SetParam(Constants::PARAM_ABILITY_NAME_KEY, extensionAbilityInfo.name);
     }
     want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
+    want.SetAction(Constants::FORM_PUBLISH_ACTION);
     return ERR_OK;
 }
 
@@ -1444,8 +1449,9 @@ ErrCode FormMgrAdapter::RequestPublishFormToHost(Want &want)
     std::string abilityName = want.GetStringParam(Constants::PARAM_ABILITY_NAME_KEY);
     wantToHost.SetElementName(bundleName, abilityName);
     int32_t userId = want.GetIntParam(Constants::PARAM_FORM_USER_ID, -1);
+    wantToHost.SetAction(Constants::FORM_PUBLISH_ACTION);
 
-    return FormAmsHelper::GetInstance().GetAbilityManager()->StartAbility(wantToHost, userId, DEFAULT_INVAL_VALUE);
+    return FormAmsHelper::GetInstance().StartAbility(wantToHost, userId);
 }
 
 ErrCode FormMgrAdapter::RequestPublishForm(Want &want, bool withFormBindingData,
