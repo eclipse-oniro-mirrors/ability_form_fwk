@@ -126,7 +126,6 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
     if (formId == 0 && FormShareMgr::GetInstance().IsShareForm(want)) {
         FormShareMgr::GetInstance().AddProviderData(want, wantParams);
     }
-
     if (formId > 0) {
         return AllotFormById(formItemInfo, callerToken, wantParams, formInfo);
     } else {
@@ -1023,8 +1022,7 @@ ErrCode FormMgrAdapter::AcquireProviderFormInfoAsync(const int64_t formId,
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    sptr<IAbilityConnection> formAcquireConnection
-        = new FormAcquireConnection(formId, info, wantParams);
+    sptr<IAbilityConnection> formAcquireConnection = new FormAcquireConnection(formId, info, wantParams);
     Want want;
     want.SetElementName(info.GetProviderBundleName(), info.GetAbilityName());
     want.AddFlags(Want::FLAG_ABILITY_FORM_ENABLED);
