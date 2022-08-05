@@ -25,10 +25,7 @@ config("fmsSystemTestHostNotSysConfig") {
     "${ability_runtime_path}/services/common/include",
     "//third_party/jsoncpp/include",
   ]
-  defines = [
-    "AMS_LOG_TAG = \"formManagerSystemTest\"",
-    "AMS_LOG_DOMAIN = 0xD002666",
-  ]
+  defines = [ "AMS_LOG_TAG = \"formManagerSystemTest\"" ]
 }
 ohos_shared_library("fmsSystemTestHostNotSys") {
   sources = [

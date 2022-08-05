@@ -26,10 +26,7 @@ config("fmsSystemTestHostNormalBConfig") {
     "${distributedschedule_path}/safwk/services/safwk/include",
     "//third_party/jsoncpp/include",
   ]
-  defines = [
-    "AMS_LOG_TAG = \"formManagerSystemTest\"",
-    "AMS_LOG_DOMAIN = 0xD002666",
-  ]
+  defines = [ "AMS_LOG_TAG = \"formManagerSystemTest\"" ]
 }
 ohos_shared_library("fmsSystemTestHostNormalB") {
   sources = [
