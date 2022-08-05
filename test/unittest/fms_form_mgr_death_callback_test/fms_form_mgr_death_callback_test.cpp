@@ -28,6 +28,7 @@
 #include "form_mgr.h"
 #undef private
 #include "form_mgr_service.h"
+#include "form_util.h"
 #include "if_system_ability_manager.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
@@ -61,7 +62,6 @@ const int32_t PARAM_FORM_DIMENSION_VALUE = 1;
 
 const std::string DEVICE_ID = "ohos-phone1";
 const std::string DEF_LABEL1 = "PermissionFormRequireGrant";
-const int32_t USER_ID = 100;
 
 class FmsFormMgrDeathCallbackTest : public testing::Test {
 public:
@@ -74,6 +74,7 @@ public:
 protected:
     sptr<MockFormHostClient> token_;
     std::shared_ptr<FormMgrService> formyMgrServ_ = DelayedSingleton<FormMgrService>::GetInstance();
+    int32_t userId_ = FormUtil::GetCurrentAccountId();
 };
 
 void FmsFormMgrDeathCallbackTest::SetUpTestCase()
@@ -118,7 +119,7 @@ void FmsFormMgrDeathCallbackTest::CreateProviderData()
     formInfo.supportDimensions = {1, 2};
     formInfo.defaultDimension = 1;
     FormInfoStorage formInfoStorage;
-    formInfoStorage.userId = USER_ID;
+    formInfoStorage.userId = userId_;
     formInfoStorage.formInfos.push_back(formInfo);
     bundleFormInfo->formInfoStorages_.emplace_back(formInfoStorage);
     bundleFormInfoMap.emplace(FORM_PROVIDER_BUNDLE_NAME, bundleFormInfo);

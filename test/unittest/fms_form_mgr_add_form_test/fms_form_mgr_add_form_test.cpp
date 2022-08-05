@@ -30,6 +30,7 @@
 #undef private
 #include "form_mgr_errors.h"
 #include "form_mgr_service.h"
+#include "form_util.h"
 #include "if_system_ability_manager.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
@@ -62,7 +63,6 @@ const int32_t PARAM_FORM_DIMENSION_VALUE = 1;
 
 const std::string DEVICE_ID = "ohos-phone1";
 const std::string DEF_LABEL1 = "PermissionFormRequireGrant";
-const int32_t USER_ID = 100;
 
 class FmsFormMgrAddFormTest : public testing::Test {
 public:
@@ -75,6 +75,7 @@ public:
 protected:
     sptr<MockFormHostClient> token_;
     std::shared_ptr<FormMgrService> formyMgrServ_ = DelayedSingleton<FormMgrService>::GetInstance();
+    int32_t userId_ = FormUtil::GetCurrentAccountId();
 };
 
 void FmsFormMgrAddFormTest::SetUpTestCase()
@@ -119,7 +120,7 @@ void FmsFormMgrAddFormTest::CreateProviderData()
     formInfo.supportDimensions = {1, 2};
     formInfo.defaultDimension = 1;
     FormInfoStorage formInfoStorage;
-    formInfoStorage.userId = USER_ID;
+    formInfoStorage.userId = userId_;
     formInfoStorage.formInfos.push_back(formInfo);
     bundleFormInfo->formInfoStorages_.emplace_back(formInfoStorage);
     bundleFormInfoMap.emplace(FORM_PROVIDER_BUNDLE_NAME, bundleFormInfo);
@@ -153,7 +154,7 @@ HWTEST_F(FmsFormMgrAddFormTest, AddForm_001, TestSize.Level0)
     FormDataMgr::GetInstance().ClearFormRecords();
     std::vector<FormDBInfo> oldFormDBInfos;
     FormDbCache::GetInstance().GetAllFormInfo(oldFormDBInfos);
-    FormDbCache::GetInstance().DeleteFormInfoByBundleName(FORM_PROVIDER_BUNDLE_NAME, USER_ID, oldFormDBInfos);
+    FormDbCache::GetInstance().DeleteFormInfoByBundleName(FORM_PROVIDER_BUNDLE_NAME, userId_, oldFormDBInfos);
 
     // add form
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().AddForm(0L, want, token_, formJsInfo));
@@ -522,7 +523,7 @@ HWTEST_F(FmsFormMgrAddFormTest, AddForm_008, TestSize.Level0)
     FormDataMgr::GetInstance().tempForms_.clear();
     std::vector<FormDBInfo> oldFormDBInfos;
     FormDbCache::GetInstance().GetAllFormInfo(oldFormDBInfos);
-    FormDbCache::GetInstance().DeleteFormInfoByBundleName(FORM_PROVIDER_BUNDLE_NAME, USER_ID, oldFormDBInfos);
+    FormDbCache::GetInstance().DeleteFormInfoByBundleName(FORM_PROVIDER_BUNDLE_NAME, userId_, oldFormDBInfos);
 
     int64_t formId = 0x0ab5bc5f00000000;
     int callingUid {0}, tempCount = 0;
@@ -608,7 +609,7 @@ HWTEST_F(FmsFormMgrAddFormTest, AddForm_009, TestSize.Level0)
     formInfo1.bundleName = FORM_PROVIDER_BUNDLE_NAME;
     formInfo1.supportDimensions.push_back(PARAM_FORM_DIMENSION_VALUE);
     FormInfoStorage formInfoStor;
-    formInfoStor.userId = USER_ID;
+    formInfoStor.userId = userId_;
     formInfoStor.formInfos.push_back(formInfo1);
     FormInfoMgr::GetInstance().bundleFormInfoMap_[FORM_PROVIDER_BUNDLE_NAME]->formInfoStorages_.push_back(formInfoStor);
 
