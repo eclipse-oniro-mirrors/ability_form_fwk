@@ -123,7 +123,6 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
     }
     formItemInfo.SetDeviceId(want.GetElement().GetDeviceID());
     WantParams wantParams = want.GetParams();
-
     if (formId == 0 && FormShareMgr::GetInstance().IsShareForm(want)) {
         FormShareMgr::GetInstance().AddProviderData(want, wantParams);
     }
