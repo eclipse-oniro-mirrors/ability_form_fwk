@@ -123,6 +123,11 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
     }
     formItemInfo.SetDeviceId(want.GetElement().GetDeviceID());
     WantParams wantParams = want.GetParams();
+
+    if (formId == 0 && FormShareMgr::GetInstance().IsShareForm(want)) {
+        FormShareMgr::GetInstance().AddProviderData(want, wantParams);
+    }
+
     if (formId > 0) {
         return AllotFormById(formItemInfo, callerToken, wantParams, formInfo);
     } else {
@@ -1019,15 +1024,8 @@ ErrCode FormMgrAdapter::AcquireProviderFormInfoAsync(const int64_t formId,
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    // If add a share form, need to add provider data
-    WantParams newWantParams(wantParams);
-    if (!FormShareMgr::GetInstance().AddProviderData(info, newWantParams)) {
-        HILOG_ERROR("add share provider data failed.");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
-
     sptr<IAbilityConnection> formAcquireConnection
-        = new FormAcquireConnection(formId, info, newWantParams);
+        = new FormAcquireConnection(formId, info, wantParams);
     Want want;
     want.SetElementName(info.GetProviderBundleName(), info.GetAbilityName());
     want.AddFlags(Want::FLAG_ABILITY_FORM_ENABLED);

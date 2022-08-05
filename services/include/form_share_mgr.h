@@ -87,11 +87,10 @@ public:
 
     /**
      * @brief Add provider data.
-     * @param info Form configure info.
-     * @param wantParams Indicates the data shared by the provider.
-     * @return Returns true on success, false on failure.
+     * @param want The want of the form to add.
+     * @param wantParams WantParams of the request.
      */
-    bool AddProviderData(const FormItemInfo &info, WantParams &wantParams);
+    void AddProviderData(const Want &want, WantParams &wantParams);
 
     /**
      * @brief Handle form share timeout.
@@ -120,10 +119,17 @@ public:
      * @param result Indicates form to share asyn result.
      */
     void SendResponse(int64_t requestCode, int32_t result);
+
+    /**
+     * @brief Whether the added form is a share form.
+     * @param want The want of the form to add.
+     * @return Returns true is a shared form, false is not.
+     */
+    bool IsShareForm(const Want &want);
 private:
     int32_t GetLocalDeviceInfo(const std::string &bundleName, DistributedHardware::DmDeviceInfo &deviceInfo);
-    std::string MakeFormShareInfoKey(const FormItemInfo &info);
     std::string MakeFormShareInfoKey(const FormShareInfo &info);
+    std::string MakeFormShareInfoKey(const Want &want);
     void RemoveFormShareInfo(const std::string &formShareInfoKey);
     void FinishFreeInstallTask(const std::shared_ptr<FormFreeInstallOperator> &freeInstallOperator);
     bool IsExistFormPackage(const std::string &bundleName, const std::string &moduleName);
