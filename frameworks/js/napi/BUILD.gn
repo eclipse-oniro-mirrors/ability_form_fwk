@@ -180,6 +180,7 @@ ohos_shared_library("formhost_napi") {
     "ability_runtime:runtime",
     "bundle_framework:appexecfwk_base",
     "c_utils:utils",
+    "form_fwk:fmskit_native",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "napi:ace_napi",

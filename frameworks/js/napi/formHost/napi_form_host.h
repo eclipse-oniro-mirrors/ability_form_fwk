@@ -17,6 +17,7 @@
 #define OHOS_FORM_FWK_NAPI_FORM_HOST_H_
 
 #include "ability.h"
+#include "js_runtime_utils.h"
 #include "napi/native_api.h"
 #include "napi/native_common.h"
 #include "napi/native_node_api.h"
@@ -173,4 +174,17 @@ napi_value NAPI_NotifyFormsEnableUpdate(napi_env env, napi_callback_info info);
 napi_value NAPI_GetAllFormsInfo(napi_env env, napi_callback_info info);
 napi_value NAPI_GetFormsInfo(napi_env env, napi_callback_info info);
 
+using ShareFormTask = std::function<void(int32_t)>;
+class JsFormHost {
+public:
+    JsFormHost() = default;
+    ~JsFormHost() = default;
+
+    static void Finalizer(NativeEngine* engine, void* data, void* hint);
+    static NativeValue* ShareForm(NativeEngine* engine, NativeCallbackInfo* info);
+private:
+    NativeValue* OnShareForm(NativeEngine &engine, NativeCallbackInfo &info);
+    void InnerShareForm(NativeEngine &engine, const std::shared_ptr<OHOS::AbilityRuntime::AsyncTask> &asyncTask,
+        ShareFormTask &&task, int64_t formId, const std::string &remoteDeviceId);
+};
 #endif /* OHOS_FORM_FWK_NAPI_FORM_HOST_H_ */
