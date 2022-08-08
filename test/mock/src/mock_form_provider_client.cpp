@@ -153,5 +153,12 @@ int MockFormProviderClient::AcquireState(const Want &wantArg, const std::string 
     HILOG_DEBUG("Acquire state");
     return ERR_OK;
 }
+
+int32_t MockFormProviderClient::AcquireShareFormData(int64_t formId, const std::string &remoteDeviceId,
+    const sptr<IRemoteObject> &formSupplyCallback, int64_t requestCode)
+{
+    HILOG_DEBUG("MockFormProviderClient::AcquireShareFormData");
+    return ERR_OK;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

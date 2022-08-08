@@ -30,10 +30,10 @@ public:
     explicit FreeInstallStatusCallBackProxy(const sptr<IRemoteObject> &impl);
 
     /**
-     * OnInstallFinished, FreeInstall is complete.
+     * Callback triggered by free installation completion.
      *
      * @param resultCode, ERR_OK on success, others on failure.
-     * @param want, installed ability.
+     * @param want Indicates the ability to free install.
      * @param userId, user`s id.
      */
     void OnInstallFinished(int32_t resultCode, const Want &want, int32_t userId) override;

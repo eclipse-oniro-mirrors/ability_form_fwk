@@ -34,11 +34,11 @@ void FormEventHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event
 
     switch (event->GetInnerEventId()) {
         case MSG::FORM_SHARE_INFO_DELAY_MSG: {
-            ProcessFormShareInfoTimeOut(event->GetParam());
+            ProcessFormShareInfoTimeout(event->GetParam());
             break;
         }
         case MSG::FORM_PACKAGE_FREE_INSTALL_DELAY_MSG: {
-            ProcessFreeInstallTimeOut(event->GetParam());
+            ProcessFreeInstallTimeout(event->GetParam());
             break;
         }
         default: {
@@ -53,16 +53,16 @@ int64_t FormEventHandler::GetEventId()
     return eventId_;
 }
 
-void FormEventHandler::ProcessFormShareInfoTimeOut(int64_t eventId)
+void FormEventHandler::ProcessFormShareInfoTimeout(int64_t eventId)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
-    FormShareMgr::GetInstance().HandleFormShareInfoTimeOut(eventId);
+    FormShareMgr::GetInstance().HandleFormShareInfoTimeout(eventId);
 }
 
-void FormEventHandler::ProcessFreeInstallTimeOut(int64_t eventId)
+void FormEventHandler::ProcessFreeInstallTimeout(int64_t eventId)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
-    FormShareMgr::GetInstance().HandleFreeInstallTimeOut(eventId);
+    FormShareMgr::GetInstance().HandleFreeInstallTimeout(eventId);
 }
 } // namespace AppExecFwk
 } // namespace OHOS

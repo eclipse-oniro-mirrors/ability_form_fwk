@@ -334,6 +334,24 @@ public:
     int UpdateRouterAction(const int64_t formId, std::string &action) override;
 
     /**
+     * @brief Share form by formID and deviceID.
+     * @param formId Indicates the unique id of form.
+     * @param deviceId Indicates the remote device ID.
+     * @param callerToken Indicates the host client.
+     * @param requestCode The request code of this share form.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t ShareForm(int64_t formId, const std::string &deviceId,
+        const sptr<IRemoteObject> &callerToken, int64_t requestCode) override;
+
+    /**
+     * @brief Receive form sharing information from remote.
+     * @param info Indicates form sharing information.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t RecvFormShareInfoFromRemote(const FormShareInfo &info) override;
+
+    /**
      * @brief Dump form.
      * @param fd Indicates the file descriptor for result.
      * @param args Indicates the input arguments.
@@ -353,6 +371,8 @@ private:
     ErrCode Init();
 
     ErrCode CheckFormPermission();
+
+    void InitFormShareMgrEventHandler();
 
     void DumpInit();
     void Dump(const std::vector<std::u16string> &args, std::string &result);

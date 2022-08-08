@@ -37,7 +37,6 @@ bool FormShareInfo::ReadFromParcel(Parcel &parcel)
     providerShareData = *wantParams;
 
     deviceId = Str16ToStr8(parcel.ReadString16());
-    deviceName = Str16ToStr8(parcel.ReadString16());
 
     return true;
 }
@@ -86,11 +85,6 @@ bool FormShareInfo::Marshalling(Parcel &parcel) const
 
     // write deviceId
     if (!parcel.WriteString16(Str8ToStr16(deviceId))) {
-        return false;
-    }
-
-    // write deviceName
-    if (!parcel.WriteString16(Str8ToStr16(deviceName))) {
         return false;
     }
 

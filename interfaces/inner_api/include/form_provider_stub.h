@@ -101,6 +101,14 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     int HandleAcquireState(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle request provider share form info message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t HandleAcquireShareFormData(MessageParcel &data, MessageParcel &reply);
 private:
     using FormProviderFunc = int32_t (FormProviderStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, FormProviderFunc> memberFuncMap_;

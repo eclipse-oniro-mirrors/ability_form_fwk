@@ -191,9 +191,13 @@ std::string FormShareMgr::MakeFormShareInfoKey(const FormShareInfo &info)
     return (info.bundleName + info.moduleName + info.abilityName + info.formName);
 }
 
-std::string FormShareMgr::MakeFormShareInfoKey(const FormItemInfo &info)
+std::string FormShareMgr::MakeFormShareInfoKey(const Want &want)
 {
-    return (info.GetProviderBundleName() + info.GetModuleName() + info.GetAbilityName() + info.GetFormName());
+    std::string bundleName = want.GetElement().GetBundleName();
+    std::string abilityName = want.GetElement().GetAbilityName();
+    std::string moduleName = want.GetStringParam(Constants::PARAM_MODULE_NAME_KEY);
+    std::string formName = want.GetStringParam(Constants::PARAM_FORM_NAME_KEY);
+    return (bundleName + moduleName + abilityName + formName);
 }
 
 void FormShareMgr::StartFormUser(const FormShareInfo &info)
@@ -358,11 +362,11 @@ void FormShareMgr::HandleFreeInstallTimeout(int64_t eventId)
     freeInstallOperatorMap_.erase(eventId);
 }
 
-bool FormShareMgr::AddProviderData(const FormItemInfo &info, WantParams &wantParams)
+void FormShareMgr::AddProviderData(const Want &want, WantParams &wantParams)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
 
-    auto formShareInfoKey = MakeFormShareInfoKey(info);
+    auto formShareInfoKey = MakeFormShareInfoKey(want);
     std::string deviceId;
     std::string bundleName;
     std::string moduleName;
@@ -373,7 +377,7 @@ bool FormShareMgr::AddProviderData(const FormItemInfo &info, WantParams &wantPar
         auto it = shareInfo_.find(formShareInfoKey);
         if (it == shareInfo_.end()) {
             HILOG_DEBUG("No shared provider data.");
-            return true;
+            return;
         }
 
         providerWantParams = it->second.providerShareData.GetParams();
@@ -383,17 +387,9 @@ bool FormShareMgr::AddProviderData(const FormItemInfo &info, WantParams &wantPar
         isFreeInstall = it->second.isFreeInstall;
     }
 
-    for (auto iter = providerWantParams.begin(); iter != providerWantParams.end(); iter++) {
-        if (wantParams.HasParam(iter->first)) {
-            HILOG_ERROR("Provider defines form base data.");
-            return false;
-        }
-    }
-
     if (!wantParams.HasParam(Constants::PARAM_DEVICE_ID_KEY)) {
         wantParams.SetParam(Constants::PARAM_DEVICE_ID_KEY, AAFwk::String::Box(deviceId));
     }
-
     for (auto iter = providerWantParams.begin(); iter != providerWantParams.end(); iter++) {
         wantParams.SetParam(iter->first, iter->second);
     }
@@ -405,7 +401,6 @@ bool FormShareMgr::AddProviderData(const FormItemInfo &info, WantParams &wantPar
     }
 
     RemoveFormShareInfo(formShareInfoKey);
-    return true;
 }
 
 void FormShareMgr::AcquireShareFormData(int64_t formId, const std::string &remoteDeviceId,
@@ -524,6 +519,21 @@ void FormShareMgr::SendResponse(int64_t requestCode, int32_t result)
     }
     remoteFormHost->OnShareFormResponse(requestCode, result);
     requestMap_.erase(requestCode);
+}
+
+bool FormShareMgr::IsShareForm(const Want &want)
+{
+    HILOG_DEBUG("%{public}s called.", __func__);
+    auto formShareInfoKey = MakeFormShareInfoKey(want);
+    HILOG_DEBUG("formShareInfoKey: %{public}s", formShareInfoKey.c_str());
+
+    std::shared_lock<std::shared_mutex> guard(shareInfoMapMutex_);
+    auto it = shareInfo_.find(formShareInfoKey);
+    if (it == shareInfo_.end()) {
+        HILOG_DEBUG("This form is not a shared form");
+        return false;
+    }
+    return true;
 }
 } // namespace AppExecFwk
 } // namespace OHOS

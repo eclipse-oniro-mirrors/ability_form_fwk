@@ -21,7 +21,9 @@
 #include "form_data_mgr.h"
 #include "form_host_interface.h"
 #include "form_mgr_adapter.h"
+#include "form_mgr_errors.h"
 #include "form_provider_interface.h"
+#include "form_share_mgr.h"
 #include "form_supply_callback.h"
 #include "hilog_wrapper.h"
 
@@ -48,6 +50,22 @@ void FormTaskMgr::PostAcquireTask(const int64_t formId, const Want &want, const 
         FormTaskMgr::GetInstance().AcquireProviderFormInfo(formId, want, remoteObject);
     };
     eventHandler_->PostTask(acquireProviderFormInfoFunc, FORM_TASK_DELAY_TIME);
+}
+
+void FormTaskMgr::PostShareAcquireTask(int64_t formId, const std::string &remoteDeviceId, const Want &want,
+    const sptr<IRemoteObject> &remoteObject)
+{
+    if (eventHandler_ == nullptr) {
+        HILOG_ERROR("eventHandler_ is nullptr");
+        int64_t requestCode = static_cast<int64_t>(want.GetLongParam(Constants::FORM_SHARE_REQUEST_CODE, 0));
+        PostFormShareSendResponse(requestCode, ERR_APPEXECFWK_FORM_COMMON_CODE);
+        return;
+    }
+
+    auto acquireShareProviderFormInfoFunc = [formId, remoteDeviceId, want, remoteObject]() {
+        FormTaskMgr::GetInstance().AcquireShareFormData(formId, remoteDeviceId, want, remoteObject);
+    };
+    eventHandler_->PostTask(acquireShareProviderFormInfoFunc, FORM_TASK_DELAY_TIME);
 }
 /**
  * @brief Delete form data from form provider(task).
@@ -295,6 +313,21 @@ void FormTaskMgr::PostAcquireStateTaskToHost(AppExecFwk::FormState state, const 
     HILOG_INFO("%{public}s end", __func__);
 }
 
+void FormTaskMgr::PostFormShareSendResponse(int64_t formShareRequestCode, int32_t result)
+{
+    HILOG_INFO("%{public}s start", __func__);
+    if (eventHandler_ == nullptr) {
+        HILOG_ERROR("eventHandler_ is nullptr.");
+        return;
+    }
+
+    auto formShareSendResponseFunc = [formShareRequestCode, result]() {
+        FormTaskMgr::GetInstance().FormShareSendResponse(formShareRequestCode, result);
+    };
+    eventHandler_->PostTask(formShareSendResponseFunc, FORM_TASK_DELAY_TIME);
+    HILOG_INFO("%{public}s end", __func__);
+}
+
 /**
  * @brief Acquire form data from form provider.
  * @param formId The Id of the from.
@@ -307,6 +340,11 @@ void FormTaskMgr::AcquireProviderFormInfo(const int64_t formId, const Want &want
     FormMgrAdapter::GetInstance().AcquireProviderFormInfo(formId, want, remoteObject);
 }
 
+void FormTaskMgr::AcquireShareFormData(int64_t formId, const std::string &remoteDeviceId,
+    const Want &want, const sptr<IRemoteObject> &remoteObject)
+{
+    FormShareMgr::GetInstance().AcquireShareFormData(formId, remoteDeviceId, want, remoteObject);
+}
 /**
  * @brief Notify form provider for delete form.
  *
@@ -606,6 +644,11 @@ FormJsInfo FormTaskMgr::CreateFormJsInfo(const int64_t formId, const FormRecord 
     HILOG_INFO("%{public}s end, jsPath: %{public}s, data: %{public}s", __func__,
         form.jsFormCodePath.c_str(), form.formData.c_str());
     return form;
+}
+
+void FormTaskMgr::FormShareSendResponse(int64_t formShareRequestCode, int32_t result)
+{
+    FormShareMgr::GetInstance().SendResponse(formShareRequestCode, result);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

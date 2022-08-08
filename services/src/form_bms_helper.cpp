@@ -141,5 +141,38 @@ bool FormBmsHelper::GetBundlePackInfo(const std::string &bundleName, const int32
     HILOG_INFO("%{public}s, get bundle pack info success", __func__);
     return true;
 }
+
+bool FormBmsHelper::GetAbilityInfoByAction(const std::string &action, int32_t userId,
+    AbilityInfo &abilityInfo, ExtensionAbilityInfo &extensionAbilityInfo)
+{
+    HILOG_DEBUG("%{public}s called.", __func__);
+    if (action.empty()) {
+        HILOG_ERROR("input parasm error.");
+        return false;
+    }
+
+    Want wantAction;
+    wantAction.SetAction(action);
+    sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
+    if (iBundleMgr == nullptr) {
+        HILOG_ERROR("iBundleMgr is nullptr");
+        return false;
+    }
+
+    return (IN_PROCESS_CALL(iBundleMgr->ImplicitQueryInfoByPriority(wantAction,
+        AbilityInfoFlag::GET_ABILITY_INFO_DEFAULT, userId, abilityInfo, extensionAbilityInfo)));
+}
+
+bool FormBmsHelper::GetBundleInfo(const std::string &bundleName, int32_t userId, BundleInfo &bundleInfo)
+{
+    sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
+    if (iBundleMgr == nullptr) {
+        HILOG_ERROR("iBundleMgr is nullptr");
+        return false;
+    }
+
+    int32_t flags = BundleFlag::GET_BUNDLE_WITH_ABILITIES;
+    return (IN_PROCESS_CALL(iBundleMgr->GetBundleInfo(bundleName, flags, bundleInfo, userId)));
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -72,6 +72,14 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     int HandleOnAcquireState(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief handle OnShareFormResponse message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t HandleOnShareFormResponse(MessageParcel &data, MessageParcel &reply);
 private:
     using FormHostFunc = int32_t (FormHostStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, FormHostFunc> memberFuncMap_;

@@ -162,5 +162,46 @@ bool  FormSupplyProxy::WriteInterfaceToken(MessageParcel &data)
     }
     return true;
 }
+
+void FormSupplyProxy::OnShareAcquire(int64_t formId, const std::string &remoteDeviceId,
+    const AAFwk::WantParams &wantParams, int64_t requestCode, const bool &result)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("failed to WriteInterfaceToken.");
+        return;
+    }
+    if (!data.WriteInt64(formId)) {
+        HILOG_ERROR("failed to write form formId.");
+        return;
+    }
+    if (!data.WriteString(remoteDeviceId)) {
+        HILOG_ERROR("failed to write form remoteDeviceId.");
+        return;
+    }
+    if (!data.WriteParcelable(&wantParams)) {
+        HILOG_ERROR("failed to write form wantParams.");
+        return;
+    }
+    if (!data.WriteInt64(requestCode)) {
+        HILOG_ERROR("failed to write form requestCode.");
+        return;
+    }
+    if (!data.WriteBool(result)) {
+        HILOG_ERROR("failed to write form result.");
+        return;
+    }
+    auto error = Remote()->SendRequest(
+        static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_SHARE_ACQUIRED),
+        data,
+        reply,
+        option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("failed to SendRequest: %{public}d", error);
+    }
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS
