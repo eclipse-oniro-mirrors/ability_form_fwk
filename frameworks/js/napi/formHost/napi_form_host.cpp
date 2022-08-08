@@ -3283,7 +3283,7 @@ int64_t SystemTimeMillis() noexcept
     return static_cast<int64_t>(((t.tv_sec) * NANOSECONDS + t.tv_nsec) / MICROSECONDS);
 }
 
-class ShareFormCallBackClient : public ShareFormCallBack, 
+class ShareFormCallBackClient : public ShareFormCallBack,
                                 public std::enable_shared_from_this<ShareFormCallBackClient> {
 public:
     explicit ShareFormCallBackClient(ShareFormTask &&task) : task_(std::move(task))
