@@ -54,6 +54,7 @@ namespace Constants {
     constexpr const char* LOCAL_CODE_PATH = "/data/storage/el1/bundle";
     constexpr const char* LOCAL_BUNDLES = "/data/bundles";
     constexpr const char* FORM_PUBLISH_ACTION = "action.form.publish";
+    constexpr const char* PARAM_DEVICE_ID_KEY = "ohos.extra.param.key.device_id";
     constexpr int32_t TYPE_RESET_LIMIT = 1;
     constexpr int32_t TYPE_STATIC_UPDATE = 2;
     constexpr int32_t TYPE_DYNAMIC_UPDATE = 3;
@@ -112,7 +113,7 @@ namespace Constants {
     constexpr const char* PROVIDER_FLAG = "provider_flag";
     constexpr const char* FORM_CONNECT_ID = "form_connect_id";
     constexpr const char* FORM_SUPPLY_INFO = "form_supply_info";
-
+    constexpr const char* FORM_SHARE_REQUEST_CODE = "form_share_request_code";
     // the delimiter between bundleName and abilityName
     constexpr const char* NAME_DELIMITER = "::";
 

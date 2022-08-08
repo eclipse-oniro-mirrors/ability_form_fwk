@@ -42,6 +42,8 @@ FormProviderStub::FormProviderStub()
         &FormProviderStub::HandleFireFormEvent;
     memberFuncMap_[static_cast<uint32_t>(IFormProvider::Message::FORM_PROVIDER_NOTIFY_STATE_ACQUIRE)] =
         &FormProviderStub::HandleAcquireState;
+    memberFuncMap_[static_cast<uint32_t>(IFormProvider::Message::FORM_ACQUIRE_PROVIDER_SHARE_FOMR_INFO)] =
+        &FormProviderStub::HandleAcquireShareFormData;
 }
 
 FormProviderStub::~FormProviderStub()
@@ -294,6 +296,26 @@ int FormProviderStub::HandleAcquireState(MessageParcel &data, MessageParcel &rep
     int32_t result = AcquireState(*wantArg, provider, *want, client);
     reply.WriteInt32(result);
     return result;
+}
+
+int32_t FormProviderStub::HandleAcquireShareFormData(MessageParcel &data, MessageParcel &reply)
+{
+    auto formId = data.ReadInt64();
+    auto remoteDeviceId = data.ReadString();
+    auto remoteObj = data.ReadRemoteObject();
+    if (remoteObj == nullptr) {
+        HILOG_ERROR("failed to get remote object.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    auto requestCode = data.ReadInt64();
+    auto result = AcquireShareFormData(formId, remoteDeviceId, remoteObj, requestCode);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("failed to Write result.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    return ERR_OK;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -67,6 +67,26 @@ public:
      * @return Returns true on success, false on failure.
      */
     bool GetBundlePackInfo(const std::string &bundleName, int32_t userId, BundlePackInfo &bundlePackInfo);
+
+    /**
+     * @brief Get ability info by action
+     * @param action The desired action to look for.
+     * @param userId Indicates the user ID.
+     * @param abilityInfo Indicates the obtained AbilityInfo object.
+     * @param extensionAbilityInfo Indicates the obtained extension.
+     * @return Returns true on success, false on failure.
+     */
+    bool GetAbilityInfoByAction(const std::string &action, int32_t userId, AbilityInfo &abilityInfo,
+        ExtensionAbilityInfo &extensionAbilityInfo);
+
+    /**
+     * @brief Obtains the BundleInfo based on a given bundle name.
+     * @param bundleName Indicates the application bundle name to be queried.
+     * @param userId Indicates the user ID.
+     * @param bundleInfo Indicates the obtained BundleInfo object.
+     * @return Returns true if the BundleInfo is successfully obtained; returns false otherwise.
+     */
+    bool GetBundleInfo(const std::string &bundleName, int32_t userId, BundleInfo &bundleInfo);
 private:
     /**
      * @brief Generate module key.

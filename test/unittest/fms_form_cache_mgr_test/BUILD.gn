@@ -25,8 +25,8 @@ ohos_unittest("FmsFormCacheMgrTest") {
     "//third_party/zlib/contrib/minizip",
     "//third_party/zlib",
     "${ability_runtime_path}/services/formmgr/include",
-    "${distributedschedule_path}/samgr/interfaces/innerkits/samgr_proxy/include",
-    "${distributedschedule_path}/samgr/adapter/interfaces/innerkits/include",
+    "${systemabilitymgr_path}/samgr/interfaces/innerkits/samgr_proxy/include",
+    "${systemabilitymgr_path}/samgr/adapter/interfaces/innerkits/include",
     "${form_fwk_path}/interfaces/inner_api/include",
   ]
 
@@ -41,8 +41,6 @@ ohos_unittest("FmsFormCacheMgrTest") {
   deps = [
     "${ability_runtime_path}/interfaces/inner_api/app_manager:app_manager",
     "${ability_runtime_path}/services/abilitymgr:abilityms_target",
-    "${distributedschedule_path}/safwk/interfaces/innerkits/safwk:system_ability_fwk",
-    "${distributedschedule_path}/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
   ]

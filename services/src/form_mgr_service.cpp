@@ -21,9 +21,11 @@
 #include "form_bms_helper.h"
 #include "form_constants.h"
 #include "form_db_cache.h"
+#include "form_event_handler.h"
 #include "form_info_mgr.h"
 #include "form_mgr_adapter.h"
 #include "form_mgr_errors.h"
+#include "form_share_mgr.h"
 #include "form_task_mgr.h"
 #include "form_timer_mgr.h"
 #include "hilog_wrapper.h"
@@ -457,7 +459,7 @@ ErrCode FormMgrService::Init()
         HILOG_ERROR("%{public}s fail, Failed to init due to create runner error", __func__);
         return ERR_INVALID_OPERATION;
     }
-    handler_ = std::make_shared<EventHandler>(runner_);
+    handler_ = std::make_shared<FormEventHandler>(runner_);
     if (handler_ == nullptr) {
         HILOG_ERROR("%{public}s fail, Failed to init due to create handler error", __func__);
         return ERR_INVALID_OPERATION;
@@ -754,6 +756,55 @@ int FormMgrService::UpdateRouterAction(const int64_t formId, std::string &action
 {
     HILOG_INFO("%{public}s called.", __func__);
     return FormMgrAdapter::GetInstance().UpdateRouterAction(formId, action);
+}
+
+void FormMgrService::InitFormShareMgrEventHandler()
+{
+    FormShareMgr::GetInstance().SetEventHandler(handler_);
+}
+
+int32_t FormMgrService::ShareForm(int64_t formId, const std::string &deviceId, const sptr<IRemoteObject> &callerToken,
+    int64_t requestCode)
+{
+    HILOG_DEBUG("FormMgrService ShareForm called deviceId : %{public}s, formId: %{public}" PRId64 "",
+        deviceId.c_str(), formId);
+    if (formId <= 0) {
+        HILOG_ERROR("form formId  is invalid.");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
+    if (deviceId.empty()) {
+        HILOG_ERROR("form deviceId is empty.");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
+    if (callerToken == nullptr) {
+        HILOG_ERROR("callerToken is nullptr.");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
+    if (requestCode <= 0) {
+        HILOG_ERROR("form requestCode is invalid.");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
+    auto ret = CheckFormPermission();
+    if (ret != ERR_OK) {
+        HILOG_ERROR("share form permission denied.");
+        return ret;
+    }
+
+    InitFormShareMgrEventHandler();
+
+    return FormShareMgr::GetInstance().ShareForm(formId, deviceId, callerToken, requestCode);
+}
+
+int32_t FormMgrService::RecvFormShareInfoFromRemote(const FormShareInfo &info)
+{
+    HILOG_DEBUG("%{public}s called.", __func__);
+    InitFormShareMgrEventHandler();
+
+    return FormShareMgr::GetInstance().RecvFormShareInfoFromRemote(info);
 }
 
 void FormMgrService::DumpInit()

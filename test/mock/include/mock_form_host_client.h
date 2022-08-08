@@ -82,6 +82,12 @@ public:
      */
     virtual void OnAcquireState(AppExecFwk::FormState state, const AAFwk::Want &want) override;
 
+    /**
+     * @brief Responsive form sharing.
+     * @param requestCode The request code of this share form.
+     * @param result Share form result.
+     */
+    virtual void OnShareFormResponse(int64_t requestCode, int32_t result) override;
 private:
     Semaphore sem_;
     DISALLOW_COPY_AND_MOVE(MockFormHostClient);

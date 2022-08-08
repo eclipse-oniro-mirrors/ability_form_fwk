@@ -167,5 +167,36 @@ bool  FormHostProxy::WriteInterfaceToken(MessageParcel &data)
     }
     return true;
 }
+
+void FormHostProxy::OnShareFormResponse(int64_t requestCode, int32_t result)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("failed to write interface token.");
+        return;
+    }
+
+    if (!data.WriteInt64(requestCode)) {
+        HILOG_ERROR("failed to write requestCode.");
+        return;
+    }
+
+    if (!data.WriteInt32(result)) {
+        HILOG_ERROR("failed to write result.");
+        return;
+    }
+
+    int32_t error = Remote()->SendRequest(
+        static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_SHARE_FORM_RESPONSE),
+        data,
+        reply,
+        option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("failed to SendRequest: %{public}d", error);
+    }
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

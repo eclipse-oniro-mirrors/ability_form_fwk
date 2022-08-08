@@ -104,6 +104,10 @@ FormMgrStub::FormMgrStub()
         &FormMgrStub::HandleRemoveFormInfo;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_FORM)] =
         &FormMgrStub::HandleRequestPublishForm;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_SHARE_FORM)] =
+        &FormMgrStub::HandleShareForm;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_RECV_FORM_SHARE_INFO_FROM_REMOTE)] =
+        &FormMgrStub::HandleRecvFormShareInfoFromRemote;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_IS_REQUEST_PUBLISH_FORM_SUPPORTED)] =
         &FormMgrStub::HandleIsRequestPublishFormSupported;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_START_ABILITY)] =
@@ -836,6 +840,32 @@ int32_t FormMgrStub::HandleUpdateRouterAction(MessageParcel &data, MessageParcel
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
+    return result;
+}
+
+int32_t FormMgrStub::HandleShareForm(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("%{public}s called.", __func__);
+    int64_t formId = data.ReadInt64();
+    std::string deviceId = data.ReadString();
+    sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
+    int64_t requestCode = data.ReadInt64();
+
+    auto result = ShareForm(formId, deviceId, callerToken, requestCode);
+    reply.WriteInt32(result);
+    return result;
+}
+
+int32_t FormMgrStub::HandleRecvFormShareInfoFromRemote(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("%{public}s called.", __func__);
+    std::unique_ptr<FormShareInfo> info(data.ReadParcelable<FormShareInfo>());
+    if (!info) {
+        HILOG_ERROR("failed to ReadParcelable<FormShareInfo>");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    auto result = RecvFormShareInfoFromRemote(*info);
+    reply.WriteInt32(result);
     return result;
 }
 

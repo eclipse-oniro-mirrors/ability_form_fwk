@@ -17,10 +17,7 @@ import("//foundation/ability/form_fwk/form_fwk.gni")
 
 ################################### libfms ########################################
 config("formmgr_log_config") {
-  defines = [
-    "AMS_LOG_TAG = \"FormMgrService\"",
-    "AMS_LOG_DOMAIN = 0xD001120",
-  ]
+  defines = [ "AMS_LOG_TAG = \"FormMgrService\"" ]
 }
 
 config("formmgr_config") {
@@ -49,8 +46,11 @@ ohos_shared_library("libfms") {
     "services/src/form_db_cache.cpp",
     "services/src/form_db_info.cpp",
     "services/src/form_delete_connection.cpp",
+    "services/src/form_distributed_client.cpp",
     "services/src/form_dump_mgr.cpp",
+    "services/src/form_event_handler.cpp",
     "services/src/form_event_notify_connection.cpp",
+    "services/src/form_free_install_operator.cpp",
     "services/src/form_host_callback.cpp",
     "services/src/form_host_record.cpp",
     "services/src/form_info_mgr.cpp",
@@ -63,12 +63,16 @@ ohos_shared_library("libfms") {
     "services/src/form_provider_mgr.cpp",
     "services/src/form_refresh_connection.cpp",
     "services/src/form_refresh_limiter.cpp",
+    "services/src/form_share_connection.cpp",
+    "services/src/form_share_mgr.cpp",
     "services/src/form_storage_mgr.cpp",
     "services/src/form_supply_callback.cpp",
     "services/src/form_sys_event_receiver.cpp",
     "services/src/form_task_mgr.cpp",
     "services/src/form_timer_mgr.cpp",
     "services/src/form_util.cpp",
+    "services/src/free_install_status_callback_proxy.cpp",
+    "services/src/free_install_status_callback_stub.cpp",
     "services/src/kvstore_death_recipient_callback.cpp",
   ]
 
@@ -99,6 +103,8 @@ ohos_shared_library("libfms") {
     "c_utils:utils",
     "common_event_service:cesfwk_core",
     "common_event_service:cesfwk_innerkits",
+    "device_manager:devicemanagersdk",
+    "device_usage_statistics:usagestatsinner",
     "distributeddatamgr:distributeddata_inner",
     "eventhandler:libeventhandler",
     "form_fwk:form_manager",
@@ -106,7 +112,7 @@ ohos_shared_library("libfms") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
     "time_service:time_service",
   ]
 
@@ -127,10 +133,7 @@ ohos_shared_library("libfms") {
 
 ################################### fmskit_native ########################################
 config("fmskit_config") {
-  defines = [
-    "AMS_LOG_TAG = \"FmskitNative\"",
-    "AMS_LOG_DOMAIN = 0xD001151",
-  ]
+  defines = [ "AMS_LOG_TAG = \"FmskitNative\"" ]
 }
 
 config("fmskit_public_config") {
@@ -166,7 +169,7 @@ ohos_shared_library("fmskit_native") {
     "form_fwk:form_manager",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
   ]
 
   subsystem_name = "ability"
@@ -202,6 +205,7 @@ ohos_shared_library("form_manager") {
     "interfaces/inner_api/src/form_provider_info.cpp",
     "interfaces/inner_api/src/form_provider_proxy.cpp",
     "interfaces/inner_api/src/form_provider_stub.cpp",
+    "interfaces/inner_api/src/form_share_info.cpp",
     "interfaces/inner_api/src/form_supply_proxy.cpp",
     "interfaces/inner_api/src/form_supply_stub.cpp",
     "interfaces/inner_api/src/provider_connect_proxy.cpp",

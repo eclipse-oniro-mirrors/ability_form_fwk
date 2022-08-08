@@ -39,6 +39,7 @@
 #include "form_provider_info.h"
 #include "form_provider_interface.h"
 #include "form_provider_mgr.h"
+#include "form_share_mgr.h"
 #include "form_supply_callback.h"
 #include "form_timer_mgr.h"
 #include "form_util.h"
@@ -122,6 +123,9 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
     }
     formItemInfo.SetDeviceId(want.GetElement().GetDeviceID());
     WantParams wantParams = want.GetParams();
+    if (formId == 0 && FormShareMgr::GetInstance().IsShareForm(want)) {
+        FormShareMgr::GetInstance().AddProviderData(want, wantParams);
+    }
     if (formId > 0) {
         return AllotFormById(formItemInfo, callerToken, wantParams, formInfo);
     } else {
@@ -311,7 +315,10 @@ ErrCode FormMgrAdapter::HandleDeleteTempForm(const int64_t formId, const sptr<IR
             FormDataMgr::GetInstance().AddFormUserUid(formId, uid);
             return result;
         }
-        FormDataMgr::GetInstance().DeleteTempForm(formId);
+        if (!FormDataMgr::GetInstance().DeleteTempForm(formId)) {
+            HILOG_ERROR("%{public}s, form id is not existed.", __func__);
+            return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+        }
         FormDataMgr::GetInstance().DeleteFormRecord(formId);
         if (!FormCacheMgr::GetInstance().DeleteData(formId)) {
             HILOG_ERROR("%{public}s, failed to remove cache data", __func__);
@@ -352,7 +359,7 @@ ErrCode FormMgrAdapter::HandleDeleteFormCache(FormRecord &dbRecord, const int ui
         }
         if (!FormDataMgr::GetInstance().DeleteFormRecord(formId)) {
             HILOG_ERROR("%{public}s, failed to remove cache data", __func__);
-            return ERR_APPEXECFWK_FORM_COMMON_CODE;
+            return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
         }
         if (result = FormDbCache::GetInstance().DeleteFormInfo(formId); result != ERR_OK) {
             HILOG_ERROR("%{public}s, failed to remove db data", __func__);

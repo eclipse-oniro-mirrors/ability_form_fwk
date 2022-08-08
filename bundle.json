@@ -33,7 +33,7 @@
               "os_account",
               "power_manager",
               "safwk",
-              "samgr_standard",
+              "samgr",
               "c_utils"
           ],
           "third_party": [
@@ -73,7 +73,8 @@
                     "form_supply_stub.h",
                     "provider_connect_stub.h",
                     "form_constants.h",
-                    "form_js_info.h"
+                    "form_js_info.h",
+                    "form_share_info.h"
                   ]
                 },
                 "name": "//foundation/ability/form_fwk:form_manager"

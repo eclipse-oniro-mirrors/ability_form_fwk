@@ -65,5 +65,11 @@ void MockFormHostClient::OnAcquireState(AppExecFwk::FormState state, const AAFwk
     HILOG_DEBUG("MockFormHostClient OnAcquireState");
     PostVoid();
 }
+
+void MockFormHostClient::OnShareFormResponse(int64_t requestCode, int32_t result)
+{
+    HILOG_DEBUG("MockFormHostClient OnShareFormResponse");
+    PostVoid();
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -23,13 +23,10 @@ config("fmsSystemTestHostCommonAConfig") {
     "${ability_runtime_path}/interfaces/inner_api/app_manager/include/appmgr",
     "${ability_runtime_path}/services/abilitymgr/include",
     "${ability_runtime_path}/services/common/include",
-    "${distributedschedule_path}/safwk/services/safwk/include",
+    "${systemabilitymgr_path}/safwk/services/safwk/include",
     "//third_party/jsoncpp/include",
   ]
-  defines = [
-    "AMS_LOG_TAG = \"formManagerSystemTest\"",
-    "AMS_LOG_DOMAIN = 0xD002666",
-  ]
+  defines = [ "AMS_LOG_TAG = \"formManagerSystemTest\"" ]
 }
 ohos_shared_library("fmsSystemTestHostCommonA") {
   sources = [
@@ -69,7 +66,7 @@ ohos_shared_library("fmsSystemTestHostCommonA") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
   ]
   subsystem_name = "formsystemtestability"
 }

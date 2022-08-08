@@ -955,6 +955,18 @@ int FormMgr::UpdateRouterAction(const int64_t formId, std::string &action)
     return remoteProxy_->UpdateRouterAction(formId, action);
 }
 
+int32_t FormMgr::ShareForm(int64_t formId, const std::string &remoteDeviceId, const sptr<IRemoteObject> &callerToken,
+    int64_t requestCode)
+{
+    HILOG_DEBUG("%{public}s called.", __func__);
+    int32_t errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("share form failed, errCode:%{public}d.", errCode);
+        return errCode;
+    }
+    return remoteProxy_->ShareForm(formId, remoteDeviceId, callerToken, requestCode);
+}
+
 bool FormMgr::CheckFMSReady()
 {
     HILOG_INFO("%{public}s called.", __func__);

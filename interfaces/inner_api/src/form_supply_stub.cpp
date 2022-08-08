@@ -34,6 +34,8 @@ FormSupplyStub::FormSupplyStub()
         &FormSupplyStub::HandleOnEventHandle;
     memberFuncMap_[static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_STATE_ACQUIRED)] =
         &FormSupplyStub::HandleOnAcquireStateResult;
+    memberFuncMap_[static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_SHARE_ACQUIRED)] =
+        &FormSupplyStub::HandleOnShareAcquire;
 }
 
 FormSupplyStub::~FormSupplyStub()
@@ -153,6 +155,37 @@ int FormSupplyStub::HandleOnAcquireStateResult(MessageParcel &data, MessageParce
     int32_t result = OnAcquireStateResult(state, provider, *wantArg, *want);
     reply.WriteInt32(result);
     return result;
+}
+
+int32_t FormSupplyStub::HandleOnShareAcquire(MessageParcel &data, MessageParcel &reply)
+{
+    auto formId = data.ReadInt64();
+    if (formId <= 0) {
+        HILOG_ERROR("failed to ReadInt64<formId>");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    auto remoteDeviceId = data.ReadString();
+    if (remoteDeviceId.empty()) {
+        HILOG_ERROR("failed to ReadString<DeviceId>");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    std::shared_ptr<AAFwk::WantParams> wantParams(data.ReadParcelable<AAFwk::WantParams>());
+    if (wantParams == nullptr) {
+        HILOG_ERROR("failed to ReadParcelable<wantParams>");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    auto requestCode = data.ReadInt64();
+    if (requestCode <= 0) {
+        HILOG_ERROR("failed to ReadInt64<requestCode>");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    auto result = data.ReadBool();
+    OnShareAcquire(formId, remoteDeviceId, *wantParams, requestCode, result);
+    return ERR_OK;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
