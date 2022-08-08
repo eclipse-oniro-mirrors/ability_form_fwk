@@ -3293,12 +3293,7 @@ public:
 
     virtual ~ShareFormCallBackClient() = default;
 
-    /**
-     * @brief share form callback.
-     *
-     * @param result Indicates the result for ShareForm.
-     */
-    void ProcessShareFormResponse(int32_t result)
+    void ProcessShareFormResponse(int32_t result) override
     {
         if (handler_) {
             handler_->PostSyncTask([client = shared_from_this(), result] () {
@@ -3337,7 +3332,7 @@ NativeValue* JsFormHost::OnShareForm(NativeEngine &engine, NativeCallbackInfo &i
         ::GetStringFromNAPI(reinterpret_cast<napi_env>(&engine), reinterpret_cast<napi_value>(info.argv[0]));
     std::string remoteDeviceId =
         ::GetStringFromNAPI(reinterpret_cast<napi_env>(&engine), reinterpret_cast<napi_value>(info.argv[1]));
-    decltype(info.argc) unwrapArgc = 2;
+    decltype(info.argc) unwrapArgc = ARGS_SIZE_TWO;
 
     int64_t formId;
     if (!ConvertStringToInt64(strFormId, formId)) {
