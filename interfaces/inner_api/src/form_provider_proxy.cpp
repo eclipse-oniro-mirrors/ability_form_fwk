@@ -426,7 +426,6 @@ bool  FormProviderProxy::WriteInterfaceToken(MessageParcel &data)
 int32_t FormProviderProxy::AcquireShareFormData(int64_t formId, const std::string &remoteDeviceId,
     const sptr<IRemoteObject> &formSupplyCallback, int64_t requestCode)
 {
-    int32_t result;
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -455,7 +454,7 @@ int32_t FormProviderProxy::AcquireShareFormData(int64_t formId, const std::strin
         HILOG_ERROR("failed to write requestCode.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    result = Remote()->SendRequest(
+    int32_t result = Remote()->SendRequest(
         static_cast<uint32_t>(IFormProvider::Message::FORM_ACQUIRE_PROVIDER_SHARE_FOMR_INFO),
         data,
         reply,

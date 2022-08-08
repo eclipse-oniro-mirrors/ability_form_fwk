@@ -68,7 +68,7 @@ public:
      * @param result Indicates the results of parsing shared data.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual void OnShareAcquire(int64_t formId, const std::string &remoteDeviceId,
+    void OnShareAcquire(int64_t formId, const std::string &remoteDeviceId,
         const AAFwk::WantParams &wantParams, int64_t requestCode, const bool &result) override;
 
 private:

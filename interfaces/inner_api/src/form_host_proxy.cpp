@@ -170,7 +170,6 @@ bool  FormHostProxy::WriteInterfaceToken(MessageParcel &data)
 
 void FormHostProxy::OnShareFormResponse(int64_t requestCode, int32_t result)
 {
-    int32_t error;
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -190,7 +189,7 @@ void FormHostProxy::OnShareFormResponse(int64_t requestCode, int32_t result)
         return;
     }
 
-    error = Remote()->SendRequest(
+    int32_t error = Remote()->SendRequest(
         static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_SHARE_FORM_RESPONSE),
         data,
         reply,

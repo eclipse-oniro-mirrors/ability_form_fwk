@@ -845,7 +845,7 @@ int32_t FormMgrStub::HandleUpdateRouterAction(MessageParcel &data, MessageParcel
 
 int32_t FormMgrStub::HandleShareForm(MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_DEBUG("%{public}s called.", __func__);
     int64_t formId = data.ReadInt64();
     std::string deviceId = data.ReadString();
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
@@ -858,7 +858,7 @@ int32_t FormMgrStub::HandleShareForm(MessageParcel &data, MessageParcel &reply)
 
 int32_t FormMgrStub::HandleRecvFormShareInfoFromRemote(MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_DEBUG("%{public}s called.", __func__);
     std::unique_ptr<FormShareInfo> info(data.ReadParcelable<FormShareInfo>());
     if (!info) {
         HILOG_ERROR("failed to ReadParcelable<FormShareInfo>");
