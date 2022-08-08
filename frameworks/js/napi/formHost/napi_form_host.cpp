@@ -3332,7 +3332,8 @@ NativeValue* JsFormHost::OnShareForm(NativeEngine &engine, NativeCallbackInfo &i
         ::GetStringFromNAPI(reinterpret_cast<napi_env>(&engine), reinterpret_cast<napi_value>(info.argv[0]));
     std::string remoteDeviceId =
         ::GetStringFromNAPI(reinterpret_cast<napi_env>(&engine), reinterpret_cast<napi_value>(info.argv[1]));
-    decltype(info.argc) unwrapArgc = ARGS_SIZE_TWO;
+    // The promise form has only two parameters
+    decltype(info.argc) unwrapArgc = 2;
 
     int64_t formId;
     if (!ConvertStringToInt64(strFormId, formId)) {
