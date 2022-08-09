@@ -29,7 +29,6 @@ namespace AppExecFwk {
 FormDbCache::FormDbCache()
 {
     HILOG_INFO("FormDbCache is created");
-    dataStorage_ = std::make_shared<FormStorageMgr>();
 }
 
 FormDbCache::~FormDbCache()
@@ -47,7 +46,7 @@ void FormDbCache::Start()
     std::lock_guard<std::mutex> lock(formDBInfosMutex_);
     std::vector<InnerFormInfo> innerFormInfos;
     innerFormInfos.clear();
-    if (dataStorage_->LoadFormData(innerFormInfos) != ERR_OK) {
+    if (FormInfoStorageMgr::GetInstance().LoadFormData(innerFormInfos) != ERR_OK) {
         HILOG_ERROR("%{public}s, LoadFormData failed.", __func__);
         return;
     }
@@ -73,7 +72,7 @@ ErrCode FormDbCache::SaveFormInfo(const FormDBInfo &formDBInfo)
             HILOG_WARN("%{public}s, need update, formId[%{public}" PRId64 "].", __func__, formDBInfo.formId);
             *iter = formDBInfo;
             InnerFormInfo innerFormInfo(formDBInfo);
-            return dataStorage_->ModifyStorageFormInfo(innerFormInfo);
+            return FormInfoStorageMgr::GetInstance().ModifyStorageFormInfo(innerFormInfo);
         } else {
             HILOG_WARN("%{public}s, already exist, formId[%{public}" PRId64 "].", __func__, formDBInfo.formId);
             return ERR_OK;
@@ -81,7 +80,7 @@ ErrCode FormDbCache::SaveFormInfo(const FormDBInfo &formDBInfo)
     } else {
         formDBInfos_.emplace_back(formDBInfo);
         InnerFormInfo innerFormInfo(formDBInfo);
-        return dataStorage_->SaveStorageFormInfo(innerFormInfo);
+        return FormInfoStorageMgr::GetInstance().SaveStorageFormInfo(innerFormInfo);
     }
 }
 
@@ -99,7 +98,7 @@ ErrCode FormDbCache::SaveFormInfoNolock(const FormDBInfo &formDBInfo)
             HILOG_WARN("%{public}s, need update, formId[%{public}" PRId64 "].", __func__, formDBInfo.formId);
             *iter = formDBInfo;
             InnerFormInfo innerFormInfo(formDBInfo);
-            return dataStorage_->ModifyStorageFormInfo(innerFormInfo);
+            return FormInfoStorageMgr::GetInstance().ModifyStorageFormInfo(innerFormInfo);
         } else {
             HILOG_WARN("%{public}s, already exist, formId[%{public}" PRId64 "].", __func__, formDBInfo.formId);
             return ERR_OK;
@@ -107,7 +106,7 @@ ErrCode FormDbCache::SaveFormInfoNolock(const FormDBInfo &formDBInfo)
     } else {
         formDBInfos_.emplace_back(formDBInfo);
         InnerFormInfo innerFormInfo(formDBInfo);
-        return dataStorage_->SaveStorageFormInfo(innerFormInfo);
+        return FormInfoStorageMgr::GetInstance().SaveStorageFormInfo(innerFormInfo);
     }
 }
 
@@ -127,7 +126,7 @@ ErrCode FormDbCache::DeleteFormInfo(int64_t formId)
     } else {
         formDBInfos_.erase(iter);
     }
-    if (dataStorage_->DeleteStorageFormInfo(std::to_string(formId)) == ERR_OK) {
+    if (FormInfoStorageMgr::GetInstance().DeleteStorageFormInfo(std::to_string(formId)) == ERR_OK) {
         return ERR_OK;
     } else {
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -147,7 +146,7 @@ ErrCode FormDbCache::DeleteFormInfoByBundleName(const std::string &bundleName, c
     for (itRecord = formDBInfos_.begin(); itRecord != formDBInfos_.end();) {
         if ((bundleName == itRecord->bundleName) && (userId == itRecord->userId)) {
             int64_t formId = itRecord->formId;
-            if (dataStorage_->DeleteStorageFormInfo(std::to_string(formId)) == ERR_OK) {
+            if (FormInfoStorageMgr::GetInstance().DeleteStorageFormInfo(std::to_string(formId)) == ERR_OK) {
                 removedDBForms.emplace_back(*itRecord);
                 itRecord = formDBInfos_.erase(itRecord);
             } else {
@@ -287,7 +286,7 @@ void FormDbCache::DeleteDBFormsByUserId(const int32_t userId)
     for (itRecord = formDBInfos_.begin(); itRecord != formDBInfos_.end();) {
         if (userId == itRecord->userId) {
             int64_t formId = itRecord->formId;
-            if (dataStorage_->DeleteStorageFormInfo(std::to_string(formId)) == ERR_OK) {
+            if (FormInfoStorageMgr::GetInstance().DeleteStorageFormInfo(std::to_string(formId)) == ERR_OK) {
                 itRecord = formDBInfos_.erase(itRecord);
             } else {
                 HILOG_ERROR("%{public}s, failed to delete form, formId[%{public}" PRId64 "]", __func__, formId);
@@ -297,10 +296,6 @@ void FormDbCache::DeleteDBFormsByUserId(const int32_t userId)
             itRecord++;
         }
     }
-}
-std::shared_ptr<FormStorageMgr> FormDbCache::GetDataStorage() const
-{
-    return dataStorage_;
 }
 
 /**

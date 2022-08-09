@@ -65,7 +65,6 @@ ohos_shared_library("libfms") {
     "services/src/form_refresh_limiter.cpp",
     "services/src/form_share_connection.cpp",
     "services/src/form_share_mgr.cpp",
-    "services/src/form_storage_mgr.cpp",
     "services/src/form_supply_callback.cpp",
     "services/src/form_sys_event_receiver.cpp",
     "services/src/form_task_mgr.cpp",
@@ -73,7 +72,6 @@ ohos_shared_library("libfms") {
     "services/src/form_util.cpp",
     "services/src/free_install_status_callback_proxy.cpp",
     "services/src/free_install_status_callback_stub.cpp",
-    "services/src/kvstore_death_recipient_callback.cpp",
   ]
 
   configs = [

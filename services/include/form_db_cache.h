@@ -23,7 +23,7 @@
 
 #include "form_id_key.h"
 #include "form_record.h"
-#include "form_storage_mgr.h"
+#include "form_info_storage_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -110,12 +110,6 @@ public:
     int GetMatchCount(const std::string &bundleName, const std::string &moduleName);
 
     /**
-     * @brief Get data storage.
-     * @return Returns data storage.
-     */
-    std::shared_ptr<FormStorageMgr> GetDataStorage() const;
-
-    /**
      * @brief delete forms bu userId.
      * @param userId user ID.
      */
@@ -160,7 +154,6 @@ private:
      */
     ErrCode SaveFormInfoNolock(const FormDBInfo &formDBInfo);
 
-    std::shared_ptr<FormStorageMgr> dataStorage_;
     mutable std::mutex formDBInfosMutex_;
     std::vector<FormDBInfo> formDBInfos_;
 };

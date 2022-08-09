@@ -19,7 +19,6 @@
 #define private public
 #include "form_db_cache.h"
 #include "form_mgr_adapter.h"
-#include "form_storage_mgr.h"
 #undef private
 #include "form_record.h"
 #include "hilog_wrapper.h"
