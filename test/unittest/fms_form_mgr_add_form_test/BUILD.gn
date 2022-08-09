@@ -46,7 +46,7 @@ ohos_unittest("FmsFormMgrAddFormTest") {
   deps = [
     "${ability_runtime_path}/interfaces/inner_api/app_manager:app_manager",
     "${ability_runtime_path}/services/abilitymgr:abilityms_target",
-    "${distributeddatamgr_path}/distributeddatamgr/interfaces/innerkits/distributeddata:distributeddata_inner",
+    "${distributeddatamgr_path}/kv_store/interfaces/innerkits/distributeddata:distributeddata_inner",
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
     "${systemabilitymgr_path}/safwk/interfaces/innerkits/safwk:system_ability_fwk",
