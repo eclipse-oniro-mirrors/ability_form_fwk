@@ -33,6 +33,7 @@ namespace AppExecFwk {
 namespace {
 constexpr int64_t FORM_SHARE_INFO_DELAY_TIMER = 50000;
 constexpr int64_t FORM_PACKAGE_FREE_INSTALL_TIMER = 40000;
+constexpr const char* ACTION_SHARE_FORM = "action.form.share";
 }
 
 FormShareMgr::FormShareMgr()
@@ -105,7 +106,7 @@ int32_t FormShareMgr::HandleRecvFormShareInfoFromRemoteTask(const FormShareInfo 
     ExtensionAbilityInfo extensionAbilityInfo;
     int32_t userId = FormUtil::GetCurrentAccountId();
     if (!FormBmsHelper::GetInstance().GetAbilityInfoByAction(
-        Want::ACTION_SHARE_FORM, userId, abilityInfo, extensionAbilityInfo)) {
+        ACTION_SHARE_FORM, userId, abilityInfo, extensionAbilityInfo)) {
         HILOG_ERROR("get ability info by action failed.");
         return ERR_APPEXECFWK_FORM_FORM_USER_NOT_EXIST;
     }
@@ -207,7 +208,7 @@ void FormShareMgr::StartFormUser(const FormShareInfo &info)
     ExtensionAbilityInfo extensionAbilityInfo;
     int32_t userId = FormUtil::GetCurrentAccountId();
     if (!FormBmsHelper::GetInstance().GetAbilityInfoByAction(
-        Want::ACTION_SHARE_FORM, userId, abilityInfo, extensionAbilityInfo)) {
+        ACTION_SHARE_FORM, userId, abilityInfo, extensionAbilityInfo)) {
         HILOG_ERROR("get ability info by action failed.");
         return;
     }
@@ -222,7 +223,7 @@ void FormShareMgr::StartFormUser(const FormShareInfo &info)
         return;
     }
 
-    want.SetAction(Want::ACTION_SHARE_FORM);
+    want.SetAction(ACTION_SHARE_FORM);
     want.SetParam(Constants::PARAM_BUNDLE_NAME_KEY, info.bundleName);
     want.SetParam(Constants::PARAM_MODULE_NAME_KEY, info.moduleName);
     want.SetParam(Constants::PARAM_ABILITY_NAME_KEY, info.abilityName);
