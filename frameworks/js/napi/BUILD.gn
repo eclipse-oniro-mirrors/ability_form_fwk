@@ -176,12 +176,12 @@ ohos_shared_library("formhost_napi") {
   external_deps = [
     "ability_base:want",
     "ability_runtime:abilitykit_native",
+    "ability_runtime:runtime",
     "bundle_framework:appexecfwk_base",
     "c_utils:utils",
     "form_fwk:fmskit_native",
     "hiviewdfx_hilog_native:libhilog",
     "napi:ace_napi",
-    "ability_runtime:runtime",
   ]
 
   relative_install_dir = "module/application"
