@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace AppExecFwk {
 FormFreeInstallOperator::FormFreeInstallOperator(const std::string &formShareInfoKey,
-    const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+    const std::shared_ptr<FormEventHandler> &handler)
     : formShareInfoKey_(formShareInfoKey), handler_(handler)
 {
 }
@@ -70,7 +70,7 @@ void FormFreeInstallOperator::OnInstallFinished(int32_t resultCode)
 
     auto self = shared_from_this();
     auto task = [self, resultCode]() {
-        FormShareMgr::GetInstance().OnInstallFinished(self, resultCode, self->formShareInfoKey_);
+        DelayedSingleton<FormShareMgr>::GetInstance()->OnInstallFinished(self, resultCode, self->formShareInfoKey_);
     };
     handler_->PostTask(task);
 }

@@ -19,7 +19,7 @@
 #include <singleton.h>
 #include <system_ability.h>
 
-#include "event_handler.h"
+#include "form_event_handler.h"
 #include "form_mgr_stub.h"
 #include "form_provider_data.h"
 #include "form_sys_event_receiver.h"
@@ -388,7 +388,7 @@ private:
     std::map<DumpKey, DumpFuncType> dumpFuncMap_;
     ServiceRunningState state_ = ServiceRunningState::STATE_NOT_START;
     std::shared_ptr<EventRunner> runner_ = nullptr;
-    std::shared_ptr<EventHandler> handler_ = nullptr;
+    std::shared_ptr<FormEventHandler> handler_ = nullptr;
     std::shared_ptr<FormSysEventReceiver> formSysEventReceiver_ = nullptr;
     mutable std::mutex instanceMutex_;
     DISALLOW_COPY_AND_MOVE(FormMgrService);

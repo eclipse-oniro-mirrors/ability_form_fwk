@@ -20,7 +20,7 @@
 
 #include "ability_connect_callback_interface.h"
 #include "ability_manager_interface.h"
-#include "event_handler.h"
+#include "form_event_handler.h"
 #include "uri.h"
 
 namespace OHOS {
@@ -39,7 +39,7 @@ public:
      * @brief SetEventHandler.
      * @param handler event handler
      */
-    inline void SetEventHandler(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+    inline void SetEventHandler(const std::shared_ptr<FormEventHandler> &handler)
     {
         eventHandler_ = handler;
     }
@@ -91,7 +91,7 @@ private:
     void DisconnectAbilityTask(const sptr<AAFwk::IAbilityConnection> &connect);
 private:
     sptr<AAFwk::IAbilityManager> abilityManager_ = nullptr;
-    std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ = nullptr;
+    std::shared_ptr<FormEventHandler> eventHandler_ = nullptr;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

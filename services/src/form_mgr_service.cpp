@@ -760,7 +760,7 @@ int FormMgrService::UpdateRouterAction(const int64_t formId, std::string &action
 
 void FormMgrService::InitFormShareMgrEventHandler()
 {
-    FormShareMgr::GetInstance().SetEventHandler(handler_);
+    DelayedSingleton<FormShareMgr>::GetInstance()->SetEventHandler(handler_);
 }
 
 int32_t FormMgrService::ShareForm(int64_t formId, const std::string &deviceId, const sptr<IRemoteObject> &callerToken,
@@ -796,7 +796,7 @@ int32_t FormMgrService::ShareForm(int64_t formId, const std::string &deviceId, c
 
     InitFormShareMgrEventHandler();
 
-    return FormShareMgr::GetInstance().ShareForm(formId, deviceId, callerToken, requestCode);
+    return DelayedSingleton<FormShareMgr>::GetInstance()->ShareForm(formId, deviceId, callerToken, requestCode);
 }
 
 int32_t FormMgrService::RecvFormShareInfoFromRemote(const FormShareInfo &info)
@@ -804,7 +804,7 @@ int32_t FormMgrService::RecvFormShareInfoFromRemote(const FormShareInfo &info)
     HILOG_DEBUG("%{public}s called.", __func__);
     InitFormShareMgrEventHandler();
 
-    return FormShareMgr::GetInstance().RecvFormShareInfoFromRemote(info);
+    return DelayedSingleton<FormShareMgr>::GetInstance()->RecvFormShareInfoFromRemote(info);
 }
 
 void FormMgrService::DumpInit()

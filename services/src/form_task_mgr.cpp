@@ -343,7 +343,7 @@ void FormTaskMgr::AcquireProviderFormInfo(const int64_t formId, const Want &want
 void FormTaskMgr::AcquireShareFormData(int64_t formId, const std::string &remoteDeviceId,
     const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
-    FormShareMgr::GetInstance().AcquireShareFormData(formId, remoteDeviceId, want, remoteObject);
+    DelayedSingleton<FormShareMgr>::GetInstance()->AcquireShareFormData(formId, remoteDeviceId, want, remoteObject);
 }
 /**
  * @brief Notify form provider for delete form.
@@ -648,7 +648,7 @@ FormJsInfo FormTaskMgr::CreateFormJsInfo(const int64_t formId, const FormRecord 
 
 void FormTaskMgr::FormShareSendResponse(int64_t formShareRequestCode, int32_t result)
 {
-    FormShareMgr::GetInstance().SendResponse(formShareRequestCode, result);
+    DelayedSingleton<FormShareMgr>::GetInstance()->SendResponse(formShareRequestCode, result);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

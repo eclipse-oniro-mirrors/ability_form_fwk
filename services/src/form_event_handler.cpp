@@ -14,7 +14,6 @@
  */
 
 #include "form_event_handler.h"
-#include "form_share_mgr.h"
 #include "hilog_wrapper.h"
 
 namespace OHOS {
@@ -32,18 +31,14 @@ void FormEventHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event
         return;
     }
 
-    switch (event->GetInnerEventId()) {
-        case MSG::FORM_SHARE_INFO_DELAY_MSG: {
-            ProcessFormShareInfoTimeout(event->GetParam());
-            break;
+    std::lock_guard<std::mutex> lock(observerMutex_);
+    for (auto &observer : observers_) {
+        if (observer == nullptr) {
+            HILOG_ERROR("observer is nullptr");
+            continue;;
         }
-        case MSG::FORM_PACKAGE_FREE_INSTALL_DELAY_MSG: {
-            ProcessFreeInstallTimeout(event->GetParam());
-            break;
-        }
-        default: {
-            break;
-        }
+
+        observer->OnEventTimeoutResponse(event->GetInnerEventId(), event->GetParam());
     }
 }
 
@@ -53,16 +48,29 @@ int64_t FormEventHandler::GetEventId()
     return eventId_;
 }
 
-void FormEventHandler::ProcessFormShareInfoTimeout(int64_t eventId)
+void FormEventHandler::RegisterEventTimeoutObserver(const std::shared_ptr<FormEventTimeoutObserver> &observer)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
-    FormShareMgr::GetInstance().HandleFormShareInfoTimeout(eventId);
+    std::lock_guard<std::mutex> lock(observerMutex_);
+    auto iter = observers_.find(observer);
+    if (iter != observers_.end()) {
+        HILOG_ERROR("observer repeat attach.");
+        return;
+    }
+    observers_.emplace(observer);
 }
 
-void FormEventHandler::ProcessFreeInstallTimeout(int64_t eventId)
+void FormEventHandler::UnregisterEventTimeoutObserver(const std::shared_ptr<FormEventTimeoutObserver> &observer)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
-    FormShareMgr::GetInstance().HandleFreeInstallTimeout(eventId);
+    std::lock_guard<std::mutex> lock(observerMutex_);
+    auto iter = observers_.find(observer);
+    if (iter == observers_.end()) {
+        HILOG_ERROR("observer is not exist.");
+        return;
+    }
+
+    observers_.erase(iter);
 }
 } // namespace AppExecFwk
 } // namespace OHOS
