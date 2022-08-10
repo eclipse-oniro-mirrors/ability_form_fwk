@@ -1,0 +1,102 @@
+diff --git a/frameworks/js/napi/BUILD.gn b/frameworks/js/napi/BUILD.gn
+index f759370..532ea1f 100644
+--- a/frameworks/js/napi/BUILD.gn
++++ b/frameworks/js/napi/BUILD.gn
+@@ -159,7 +159,9 @@ ohos_shared_library("forminfo_napi") {
+ 
+ ################################### formhost_napi ########################################
+ ohos_shared_library("formhost_napi") {
+-  include_dirs = []
++  include_dirs = [
++    "//foundation/ability/ability_runtime/interfaces/inner_api/runtime/include",
++  ]
+ 
+   sources = [
+     "formHost/napi_form_host.cpp",
+@@ -171,20 +173,15 @@ ohos_shared_library("formhost_napi") {
+   deps = [
+     ":formutil_napi",
+     "${ability_runtime_napi_path}/inner/napi_common:napi_common",
+-    "${ability_runtime_native_path}/appkit:appkit_native",
+     "${form_fwk_path}:fmskit_native",
+   ]
+ 
+   external_deps = [
+-    "ability_base:base",
+     "ability_base:want",
+-    "ability_runtime:ability_manager",
+     "ability_runtime:abilitykit_native",
+-    "ability_runtime:runtime",
+     "bundle_framework:appexecfwk_base",
+     "c_utils:utils",
+     "hiviewdfx_hilog_native:libhilog",
+-    "ipc:ipc_core",
+     "napi:ace_napi",
+   ]
+ 
+@@ -196,7 +193,7 @@ ohos_shared_library("formhost_napi") {
+ 
+ ################################### formmanager ########################################
+ ohos_shared_library("formmanager") {
+-  include_dirs = []
++  include_dirs = [ "//foundation/ability/ability_runtime/interfaces/inner_api/runtime/include/" ]
+ 
+   sources = [
+     "formManager/napi_form_manager.cpp",
+@@ -207,21 +204,16 @@ ohos_shared_library("formmanager") {
+ 
+   deps = [
+     "${ability_runtime_napi_path}/inner/napi_common:napi_common",
+-    "${ability_runtime_native_path}/appkit:appkit_native",
+     "${form_fwk_path}:fmskit_native",
+   ]
+ 
+   external_deps = [
+-    "ability_base:base",
+     "ability_base:want",
+-    "ability_runtime:ability_manager",
+     "ability_runtime:abilitykit_native",
+-    "ability_runtime:runtime",
+     "bundle_framework:appexecfwk_base",
+     "c_utils:utils",
+     "form_fwk:form_manager",
+     "hiviewdfx_hilog_native:libhilog",
+-    "ipc:ipc_core",
+     "napi:ace_napi",
+   ]
+ 
+@@ -233,7 +225,9 @@ ohos_shared_library("formmanager") {
+ 
+ ################################### formprovider_napi ########################################
+ ohos_shared_library("formprovider_napi") {
+-  include_dirs = []
++  include_dirs = [
++    "//foundation/ability/ability_runtime/interfaces/inner_api/runtime/include",
++  ]
+ 
+   sources = [
+     "formProvider/napi_form_provider.cpp",
+@@ -245,22 +239,18 @@ ohos_shared_library("formprovider_napi") {
+   deps = [
+     ":formutil_napi",
+     "${ability_runtime_napi_path}/inner/napi_common:napi_common",
+-    "${ability_runtime_native_path}/appkit:appkit_native",
+     "${form_fwk_path}:fmskit_native",
+   ]
+ 
+   external_deps = [
+-    "ability_base:base",
+     "ability_base:want",
+-    "ability_runtime:ability_manager",
+     "ability_runtime:abilitykit_native",
+-    "ability_runtime:runtime",
+     "bundle_framework:appexecfwk_base",
+     "c_utils:utils",
+     "form_fwk:form_manager",
+     "hiviewdfx_hilog_native:libhilog",
+-    "ipc:ipc_core",
+     "napi:ace_napi",
++    "ability_runtime:runtime",
+   ]
+ 
+   relative_install_dir = "module/application"
