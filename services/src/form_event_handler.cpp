@@ -35,7 +35,7 @@ void FormEventHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event
     for (auto &observer : observers_) {
         if (observer == nullptr) {
             HILOG_ERROR("observer is nullptr");
-            continue;;
+            continue;
         }
 
         observer->OnEventTimeoutResponse(event->GetInnerEventId(), event->GetParam());
