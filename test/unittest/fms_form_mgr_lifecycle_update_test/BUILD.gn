@@ -30,7 +30,7 @@ ohos_unittest("FmsFormMgrLifecycleUpdateTest") {
     "${ability_runtime_path}/interfaces/kits/native/ability/native",
     "${ability_runtime_path}/interfaces/kits/native/appkit/app",
     "${ability_runtime_path}/services/formmgr/include",
-    "${distributeddatamgr_path}/distributeddatamgr/interfaces/innerkits/distributeddata/include",
+    "${distributeddatamgr_path}/kv_store/interfaces/innerkits/distributeddata/include",
     "${systemabilitymgr_path}/samgr/adapter/interfaces/innerkits/include",
     "${systemabilitymgr_path}/samgr/interfaces/innerkits/samgr_proxy/include",
     "${form_fwk_path}/interfaces/inner_api/include",
