@@ -12,7 +12,9 @@
     "component": {
         "name": "form_fwk",
         "subsystem": "ability",
-        "syscap": [],
+        "syscap": [
+          "SystemCapability.Ability.Form"
+        ],
         "features": [],
         "adapted_system_type": [
             "standard"
