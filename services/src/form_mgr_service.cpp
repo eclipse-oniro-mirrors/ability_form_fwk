@@ -489,8 +489,8 @@ ErrCode FormMgrService::Init()
         formSysEventReceiver_->SetEventHandler(handler_);
         EventFwk::CommonEventManager::SubscribeCommonEvent(formSysEventReceiver_);
     }
-    FormDbCache::GetInstance().Start();
     FormInfoMgr::GetInstance().Start();
+    FormDbCache::GetInstance().Start();
     FormTimerMgr::GetInstance(); // Init FormTimerMgr
     HILOG_INFO("init success");
     return ERR_OK;

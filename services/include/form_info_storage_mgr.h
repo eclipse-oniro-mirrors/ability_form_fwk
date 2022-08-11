@@ -19,6 +19,7 @@
 #include <singleton.h>
 #include <string>
 #include "distributed_kv_data_manager.h"
+#include "form_db_info.h"
 #include "kvstore_death_recipient.h"
 
 namespace OHOS {
@@ -38,15 +39,10 @@ public:
  */
 class FormInfoStorageMgr final : public DelayedRefSingleton<FormInfoStorageMgr> {
 DECLARE_DELAYED_REF_SINGLETON(FormInfoStorageMgr)
-
 public:
     DISALLOW_COPY_AND_MOVE(FormInfoStorageMgr);
 
     ErrCode LoadFormInfos(std::vector<std::pair<std::string, std::string>> &formInfoStorages);
-
-    ErrCode GetBundleFormInfos(const std::string &bundleName, std::string &formInfoStorages);
-
-    ErrCode SaveBundleFormInfos(const std::string &bundleName, const std::string &formInfoStorages);
 
     ErrCode RemoveBundleFormInfos(const std::string &bundleName);
 
@@ -54,22 +50,55 @@ public:
 
     bool ResetKvStore();
 
+    /**
+     * @brief Load all form data from DB to innerFormInfos.
+     * @param innerFormInfos Storage all form data.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode LoadFormData(std::vector<InnerFormInfo> &innerFormInfos);
+
+    /**
+     * @brief Get form data from DB to innerFormInfo with formId.
+     * @param formId Indicates the form ID.
+     * @param innerFormInfo Storage form data.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode GetStorageFormInfoById(const std::string &formId, InnerFormInfo &innerFormInfo);
+
+    /**
+     * @brief Save or update the form data in DB.
+     * @param innerFormInfo Indicates the InnerFormInfo object to be save.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode SaveStorageFormInfo(const InnerFormInfo &innerFormInfo);
+
+    /**
+     * @brief Modify the form data in DB.
+     * @param innerFormInfo Indicates the InnerFormInfo object to be Modify.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode ModifyStorageFormInfo(const InnerFormInfo &innerFormInfo);
+
+    /**
+     * @brief Delete the form data in DB.
+     * @param formId The form data Id.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode DeleteStorageFormInfo(const std::string &formId);
+
 private:
     void RegisterKvStoreDeathListener();
-
     DistributedKv::Status GetKvStore();
-
     bool CheckKvStore();
-
-    DistributedKv::Status GetEntries(std::vector<DistributedKv::Entry> &allEntries);
+    DistributedKv::Status GetEntries(const std::string &keyPrefix, std::vector<DistributedKv::Entry> &allEntries);
+    void SaveEntries(const std::vector<DistributedKv::Entry> &allEntries, std::vector<InnerFormInfo> &innerFormInfos);
+    void TryTwice(const std::function<DistributedKv::Status()> &func);
 
     const DistributedKv::AppId appId_ {"form_storage"};
     const DistributedKv::StoreId storeId_ {"form_infos"};
     DistributedKv::DistributedKvDataManager dataManager_;
     std::shared_ptr<DistributedKv::SingleKvStore> kvStorePtr_;
     mutable std::mutex kvStorePtrMutex_;
-    const int32_t MAX_TIMES = 600;              // 600 * 100ms = 1min
-    const int32_t SLEEP_INTERVAL = 100 * 1000;  // 100ms
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
