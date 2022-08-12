@@ -328,12 +328,6 @@ void FormTaskMgr::PostFormShareSendResponse(int64_t formShareRequestCode, int32_
     HILOG_INFO("%{public}s end", __func__);
 }
 
-/**
- * @brief Acquire form data from form provider.
- * @param formId The Id of the from.
- * @param want The want of the request.
- * @param remoteObject Form provider proxy object.
- */
 void FormTaskMgr::AcquireProviderFormInfo(const int64_t formId, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {

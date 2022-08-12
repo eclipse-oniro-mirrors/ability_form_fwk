@@ -30,7 +30,7 @@ namespace AppExecFwk {
  * @param callerToken, Caller ability token.
  * @return none.
  */
-int MockFormProviderClient::AcquireProviderFormInfo(const int64_t formId, const Want &want,
+int MockFormProviderClient::AcquireProviderFormInfo(const FormJsInfo &formJsInfo, const Want &want,
     const sptr<IRemoteObject> &callerToken)
 {
     // avoid the user modify the number in onCreate
@@ -49,7 +49,7 @@ int MockFormProviderClient::AcquireProviderFormInfo(const int64_t formId, const 
     newWant.SetParam(Constants::FORM_CONNECT_ID, want.GetLongParam(Constants::FORM_CONNECT_ID, 0));
     newWant.SetParam(Constants::FORM_SUPPLY_INFO, want.GetStringParam(Constants::FORM_SUPPLY_INFO));
     newWant.SetParam(Constants::PROVIDER_FLAG, true);
-    newWant.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, std::to_string(formId));
+    newWant.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, std::to_string(formJsInfo.formId));
     formSupply->OnAcquire(formProviderInfo, newWant);
     return ERR_OK;
 }

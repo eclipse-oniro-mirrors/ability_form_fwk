@@ -436,7 +436,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CreateFormInfo_001, TestSize.Lev
 
     FormJsInfo formInfo;
 
-    formDataMgr_.CreateFormInfo(formId, record, formInfo);
+    formDataMgr_.CreateFormJsInfo(formId, record, formInfo);
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CreateFormInfo_001 output=>bundleName:"<<formInfo.bundleName
     <<"abilityName:"<<formInfo.abilityName<<"formName:"<<formInfo.formName<<"formTempFlag:"<<formInfo.formTempFlag;

@@ -166,10 +166,10 @@ int32_t FormMgrStub::HandleAddForm(MessageParcel &data, MessageParcel &reply)
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    FormJsInfo formInfo;
-    int32_t result = AddForm(formId, *want, client, formInfo);
+    FormJsInfo formJsInfo;
+    int32_t result = AddForm(formId, *want, client, formJsInfo);
     reply.WriteInt32(result);
-    reply.WriteParcelable(&formInfo);
+    reply.WriteParcelable(&formJsInfo);
 
     return result;
 }
