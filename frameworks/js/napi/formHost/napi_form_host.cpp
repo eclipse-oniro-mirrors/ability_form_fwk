@@ -2200,9 +2200,21 @@ napi_value ParseFormStateInfo(napi_env env, FormStateInfo &stateInfo)
     return formStateInfoObject;
 }
 
-void AcquireFormStateCallbackComplete(napi_env env, AsyncAcquireFormStateCallbackInfo *const asyncCallbackInfo)
+void AcquireFormStateCallbackComplete(uv_work_t *work, int32_t status)
 {
     HILOG_INFO("%{public}s, onAcquireFormState back", __func__);
+    if (work == nullptr) {
+        HILOG_ERROR("work == nullptr.");
+        return;
+    }
+    auto *asyncCallbackInfo = static_cast<AsyncAcquireFormStateCallbackInfo *>(work->data);
+    if (asyncCallbackInfo == nullptr) {
+        HILOG_ERROR("asyncCallbackInfo == nullptr.");
+        delete work;
+        return;
+    }
+    napi_env env = asyncCallbackInfo->env;
+
     if (asyncCallbackInfo->callback != nullptr) {
         napi_value callback;
         napi_value callbackValues[ARGS_SIZE_TWO] = {nullptr, nullptr};
@@ -2216,12 +2228,29 @@ void AcquireFormStateCallbackComplete(napi_env env, AsyncAcquireFormStateCallbac
         napi_call_function(env, nullptr, callback, ARGS_SIZE_TWO, callbackValues, &callResult);
         napi_delete_reference(env, asyncCallbackInfo->callback);
     }
+
+    delete asyncCallbackInfo;
+    asyncCallbackInfo = nullptr;
+    delete work;
+    work = nullptr;
     HILOG_INFO("%{public}s, onAcquireFormState back done", __func__);
 }
 
-void AcquireFormStatePromiseComplete(napi_env env, AsyncAcquireFormStateCallbackInfo *const asyncCallbackInfo)
+void AcquireFormStatePromiseComplete(uv_work_t *work, int32_t status)
 {
     HILOG_INFO("%{public}s, onAcquireFormState back", __func__);
+    if (work == nullptr) {
+        HILOG_ERROR("%{public}s, work == nullptr.", __func__);
+        return;
+    }
+    auto *asyncCallbackInfo = static_cast<AsyncAcquireFormStateCallbackInfo *>(work->data);
+    if (asyncCallbackInfo == nullptr) {
+        HILOG_ERROR("asyncCallbackInfo == nullptr.");
+        delete work;
+        return;
+    }
+    napi_env env = asyncCallbackInfo->env;
+
     if (asyncCallbackInfo->result != ERR_OK) {
         napi_value result;
         InnerCreatePromiseRetMsg(env, asyncCallbackInfo->result, &result);
@@ -2230,6 +2259,11 @@ void AcquireFormStatePromiseComplete(napi_env env, AsyncAcquireFormStateCallback
         napi_value result = ParseFormStateInfo(env, asyncCallbackInfo->stateInfo);
         napi_resolve_deferred(asyncCallbackInfo->env, asyncCallbackInfo->deferred, result);
     }
+
+    delete asyncCallbackInfo;
+    asyncCallbackInfo = nullptr;
+    delete work;
+    work = nullptr;
     HILOG_INFO("%{public}s, onAcquireFormState back done", __func__);
 }
 
@@ -2241,13 +2275,7 @@ public:
         asyncCallbackInfo_ = asyncCallbackInfo;
     }
 
-    virtual ~FormStateCallbackClient()
-    {
-        if (asyncCallbackInfo_ != nullptr) {
-            delete asyncCallbackInfo_;
-            asyncCallbackInfo_ = nullptr;
-        }
-    }
+    virtual ~FormStateCallbackClient() = default;
 
     void ProcessAcquireState(FormState state) override
     {
@@ -2255,13 +2283,34 @@ public:
             return;
         }
         asyncCallbackInfo_->stateInfo.state = state;
-        if (asyncCallbackInfo_->callbackType == CALLBACK_FLG) {
-            AcquireFormStateCallbackComplete(asyncCallbackInfo_->env, asyncCallbackInfo_);
-        } else {
-            AcquireFormStatePromiseComplete(asyncCallbackInfo_->env, asyncCallbackInfo_);
+
+        uv_loop_s *loop = nullptr;
+        napi_get_uv_event_loop(asyncCallbackInfo_->env, &loop);
+        if (loop == nullptr) {
+            HILOG_ERROR("%{public}s, loop == nullptr.", __func__);
+            return;
         }
-        delete asyncCallbackInfo_;
-        asyncCallbackInfo_ = nullptr;
+
+        auto *work = new (std::nothrow) uv_work_t;
+        if (work == nullptr) {
+            HILOG_ERROR("%{public}s, work == nullptr.", __func__);
+            return;
+        }
+        work->data = asyncCallbackInfo_;
+
+        int32_t result = 0;
+        if (asyncCallbackInfo_->callbackType == CALLBACK_FLG) {
+            result = uv_queue_work(loop, work, [](uv_work_t *work) {}, AcquireFormStateCallbackComplete);
+        } else {
+            result = uv_queue_work(loop, work, [](uv_work_t *work) {}, AcquireFormStatePromiseComplete);
+        }
+        // When uv_queue_work returns 0, asyncCallbackInfo_ and work will be freed in the callback function.
+        if (result != 0) {
+            delete asyncCallbackInfo_;
+            asyncCallbackInfo_ = nullptr;
+            delete work;
+            work = nullptr;
+        }
     }
 
 private:
