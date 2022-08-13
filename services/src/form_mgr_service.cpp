@@ -667,7 +667,7 @@ int FormMgrService::GetFormsInfoByModule(std::string &bundleName, std::string &m
     return FormMgrAdapter::GetInstance().GetFormsInfoByModule(bundleName, moduleName, formInfos);
 }
 
-int32_t FormMgrService::GetFormsInfo(const std::string &moduleName, std::vector<FormInfo> &formInfos)
+int32_t FormMgrService::GetFormsInfo(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos)
 {
     HILOG_INFO("%{public}s called.", __func__);
     sptr<IBundleMgr> bundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
@@ -682,6 +682,8 @@ int32_t FormMgrService::GetFormsInfo(const std::string &moduleName, std::vector<
         HILOG_ERROR("GetFormsInfoByModule, failed to get form config info.");
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
+    // retrieve moduleName from filter.
+    std::string moduleName = filter.moduleName;
     if (moduleName.empty()) {
         // fulfill formInfos, the process should be the same as GetFormsInfoByApp.
         HILOG_INFO("GetFormsInfo flows to GetFormsInfoByAPP");

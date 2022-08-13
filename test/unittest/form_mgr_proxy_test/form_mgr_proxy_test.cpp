@@ -68,7 +68,8 @@ public:
 HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0001, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrProxyTest_001 starts";
     // initialize input parameters.
-    std::string moduleName = "";
+    FormInfoFilter filter;
+    filter.moduleName = "";
     std::vector<FormInfo> formInfos;
     // setup expectations.
     std::vector<FormInfo> expectFormInfos;
@@ -79,7 +80,7 @@ HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0001, TestSize.Level1) {
         .Times(1)
         .WillOnce(DoAll(SetArgReferee<1>(expectFormInfos), Return(ERR_OK)));
     // test.
-    formMgrProxy->GetFormsInfo(moduleName, formInfos);
+    formMgrProxy->GetFormsInfo(filter, formInfos);
     // expect result.
     EXPECT_THAT(formInfos, ContainerEq(expectFormInfos));
     GTEST_LOG_(INFO) << "FormMgrProxyTest_0001 test ends";
@@ -94,7 +95,8 @@ HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0001, TestSize.Level1) {
 HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0002, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrProxyTest_0002 starts";
     // initialize input parameters.
-    std::string moduleName = "empty";
+    FormInfoFilter filter;
+    filter.moduleName = "empty";
     std::vector<FormInfo> formInfos;
     // setup expectations.
     std::vector<FormInfo> expectFormInfos;
@@ -106,7 +108,7 @@ HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0002, TestSize.Level1) {
         .Times(1)
         .WillOnce(Return(ERR_OK));
     // test.
-    formMgrProxy->GetFormsInfo(moduleName, formInfos);
+    formMgrProxy->GetFormsInfo(filter, formInfos);
     // expect result.
     EXPECT_EQ(formInfos.size(), 0);
     GTEST_LOG_(INFO) << "FormMgrProxyTest_0002 test ends";

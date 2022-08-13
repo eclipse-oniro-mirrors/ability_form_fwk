@@ -1444,7 +1444,7 @@ NativeValue* JsFormProvider::OnGetFormsInfo(NativeEngine &engine, NativeCallback
             }
 
             std::vector<FormInfo> formInfos;
-            auto ret = FormMgr::GetInstance().GetFormsInfo(formInfoFilter.moduleName, formInfos);
+            auto ret = FormMgr::GetInstance().GetFormsInfo(formInfoFilter, formInfos);
             if (ret == ERR_OK) {
                 task.Resolve(engine, CreateJsFormInfoArray(engine, formInfos));
             } else {
