@@ -14,8 +14,8 @@
  */
 
 #include <gtest/gtest.h>
-#include "mock_distributed_sched.h"
 #include "ipc_skeleton.h"
+#include "mock_distributed_sched.h"
 
 namespace OHOS {
 namespace DistributedSchedule {

@@ -87,15 +87,10 @@ public:
 
     void CreateProviderData();
     void CreateForm(FormJsInfo &formInfo);
-    FormShareInfo CreateFormShareInfo(const int64_t formId, const std::string &formName, const std::string &bundleName,
-        const std::string &moduleName, const std::string &abilityName, const int32_t dimensionId,
-        const std::string &deviceId, const std::string &deviceName, const bool &formTempFlag,
-        const WantParams &wantParams);
     void ClearFormShareMgrMapData();
 
 protected:
     sptr<MockFormHostClient> token_;
-    static sptr<BundleMgrService> bundleMgr_;
     std::shared_ptr<FormMgrService> formyMgrServ_ = DelayedSingleton<FormMgrService>::GetInstance();
     sptr<DistributedSchedService> dmsSerice = new DistributedSchedService();
 };
@@ -112,7 +107,7 @@ public:
     MOCK_METHOD2(OnShareFormResponse, void(const int64_t requestCode, const int32_t result));
 };
 
-sptr<BundleMgrService> FmsFormShareMgrTest::bundleMgr_ = nullptr;
+static sptr<BundleMgrService> bundleMgr_ = nullptr;
 
 void FmsFormShareMgrTest::SetUpTestCase()
 {
@@ -193,24 +188,6 @@ void FmsFormShareMgrTest::CreateForm(FormJsInfo &formJsInfo)
     token_->Wait();
 }
 
-FormShareInfo FmsFormShareMgrTest::CreateFormShareInfo(const int64_t formId, const std::string &formName,
-    const std::string &bundleName, const std::string &moduleName, const std::string &abilityName,
-    const int32_t dimensionId, const std::string &deviceId, const std::string &deviceName, const bool &formTempFlag,
-    const WantParams &wantParams)
-{
-    FormShareInfo info;
-    info.formId = formId;
-    info.formName = formName;
-    info.bundleName = bundleName;
-    info.moduleName = moduleName;
-    info.abilityName = abilityName;
-    info.dimensionId = dimensionId;
-    info.formTempFlag = formTempFlag;
-    info.deviceId = deviceId;
-    info.providerShareData = wantParams;
-    return info;
-}
-
 void FmsFormShareMgrTest::ClearFormShareMgrMapData()
 {
     FormShareMgr::GetInstance().shareInfo_.clear();
@@ -253,40 +230,46 @@ HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_001, TestSiz
 
     WantParams wantParams;
     wantParams.SetParam(Constants::PARAM_DEVICE_ID_KEY, AAFwk::String::Box("device"));
-
-    auto info = CreateFormShareInfo(
-        1, "", "form_bundle", "form_module", "form_ability", 1, "device", "device_name", false, wantParams);
+    FormShareInfo info;
+    info.formId = 1;
+    info.formName = "";
+    info.bundleName = "form_bundle";
+    info.moduleName = "form_module";
+    info.abilityName = "form_ability";
+    info.dimensionId = 1;
+    info.formTempFlag = false;
+    info.deviceId = "device";
+    info.providerShareData = wantParams;
     auto result = FormShareMgr::GetInstance().HandleRecvFormShareInfoFromRemoteTask(info);
     EXPECT_NE(result, ERR_OK);
 
-    auto info1 = CreateFormShareInfo(
-        1, "form", "", "form_module", "form_ability", 1, "device", "device_name", false, wantParams);
-    result = FormShareMgr::GetInstance().HandleRecvFormShareInfoFromRemoteTask(info1);
+    info.formName = "form";
+    info.bundleName = "";
+    result = FormShareMgr::GetInstance().HandleRecvFormShareInfoFromRemoteTask(info);
     EXPECT_NE(result, ERR_OK);
 
-    auto info2 = CreateFormShareInfo(
-        1, "form", "form_bundle", "", "form_ability", 1, "device", "device_name", false, wantParams);
-    result = FormShareMgr::GetInstance().HandleRecvFormShareInfoFromRemoteTask(info2);
+    info.bundleName = "form_bundle";
+    info.moduleName = "";
+    result = FormShareMgr::GetInstance().HandleRecvFormShareInfoFromRemoteTask(info);
     EXPECT_NE(result, ERR_OK);
 
-    auto info3 =
-        CreateFormShareInfo(1, "form", "form_bundle", "form_module", "", 1, "device", "device_name", false, wantParams);
-    result = FormShareMgr::GetInstance().HandleRecvFormShareInfoFromRemoteTask(info3);
+    info.moduleName = "form_module";
+    info.abilityName = "";
+    result = FormShareMgr::GetInstance().HandleRecvFormShareInfoFromRemoteTask(info);
     EXPECT_NE(result, ERR_OK);
 
-    auto info4 = CreateFormShareInfo(
-        1, "form", "form_bundle", "form_module", "form_ability", -1, "device", "device_name", false, wantParams);
-    result = FormShareMgr::GetInstance().HandleRecvFormShareInfoFromRemoteTask(info4);
+    info.abilityName = "form_ability";
+    info.dimensionId = -1;
+    result = FormShareMgr::GetInstance().HandleRecvFormShareInfoFromRemoteTask(info);
     EXPECT_EQ(result, ERR_OK);
 
-    auto info5 = CreateFormShareInfo(
-        1, "form", "form_bundle", "form_module", "form_ability", 1, "", "device_name", false, wantParams);
-    result = FormShareMgr::GetInstance().HandleRecvFormShareInfoFromRemoteTask(info5);
+    info.dimensionId = 1;
+    info.deviceId = "";
+    result = FormShareMgr::GetInstance().HandleRecvFormShareInfoFromRemoteTask(info);
     EXPECT_NE(result, ERR_OK);
 
-    auto info6 = CreateFormShareInfo(
-        1, "form", "form_bundle", "form_module", "form_ability", 1, "device", "", false, wantParams);
-    result = FormShareMgr::GetInstance().HandleRecvFormShareInfoFromRemoteTask(info6);
+    info.deviceId = "device";
+    result = FormShareMgr::GetInstance().HandleRecvFormShareInfoFromRemoteTask(info);
     EXPECT_NE(result, ERR_OK);
 
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest HandleRecvFormShareInfoFromRemoteTask_001 end";
@@ -307,8 +290,16 @@ HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_002, TestSiz
     WantParams wantParams;
     wantParams.SetParam(Constants::PARAM_DEVICE_ID_KEY, AAFwk::String::Box("device"));
 
-    auto info = CreateFormShareInfo(
-        1, "form", "form_bundle", "form_module", "form_ability", 1, "device", "device_name", false, wantParams);
+    FormShareInfo info;
+    info.formId = 1;
+    info.formName = "form";
+    info.bundleName = "form_bundle";
+    info.moduleName = "form_module";
+    info.abilityName = "form_ability";
+    info.dimensionId = 1;
+    info.formTempFlag = false;
+    info.deviceId = "device";
+    info.providerShareData = wantParams;
     auto key = FormShareMgr::GetInstance().MakeFormShareInfoKey(info);
     FormShareMgr::GetInstance().shareInfo_.emplace(key, info);
 
@@ -334,8 +325,16 @@ HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_003, TestSiz
     WantParams wantParams;
     wantParams.SetParam(Constants::PARAM_DEVICE_ID_KEY, AAFwk::String::Box("device"));
 
-    auto info = CreateFormShareInfo(
-        1, "form", "form_bundle", "form_module", "form_ability", 1, "device", "device_name", false, wantParams);
+    FormShareInfo info;
+    info.formId = 1;
+    info.formName = "form";
+    info.bundleName = "form_bundle";
+    info.moduleName = "form_module";
+    info.abilityName = "form_ability";
+    info.dimensionId = 1;
+    info.formTempFlag = false;
+    info.deviceId = "device";
+    info.providerShareData = wantParams;
 
     auto func = [](const Want &want,
                     int32_t flags,
@@ -376,8 +375,16 @@ HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_004, TestSiz
     WantParams wantParams;
     wantParams.SetParam(Constants::PARAM_DEVICE_ID_KEY, AAFwk::String::Box("device"));
 
-    auto info = CreateFormShareInfo(
-        1, "form", "form_bundle", "form_module", "form_ability", 1, "device", "device_name", false, wantParams);
+    FormShareInfo info;
+    info.formId = 1;
+    info.formName = "form";
+    info.bundleName = "form_bundle";
+    info.moduleName = "form_module";
+    info.abilityName = "form_ability";
+    info.dimensionId = 1;
+    info.formTempFlag = false;
+    info.deviceId = "device";
+    info.providerShareData = wantParams;
 
     auto func = [](const Want &want,
                     int32_t flags,
@@ -414,8 +421,16 @@ HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_005, TestSiz
     WantParams wantParams;
     wantParams.SetParam(Constants::PARAM_DEVICE_ID_KEY, AAFwk::String::Box("device"));
 
-    auto info = CreateFormShareInfo(
-        1, "form", "form_bundle", "form_module", "form_ability", 1, "device", "device_name", false, wantParams);
+    FormShareInfo info;
+    info.formId = 1;
+    info.formName = "form";
+    info.bundleName = "form_bundle";
+    info.moduleName = "form_module";
+    info.abilityName = "form_ability";
+    info.dimensionId = 1;
+    info.formTempFlag = false;
+    info.deviceId = "device";
+    info.providerShareData = wantParams;
 
     auto func = [](const Want &want,
                     int32_t flags,
@@ -968,8 +983,16 @@ HWTEST_F(FmsFormShareMgrTest, AddProviderData_001, TestSize.Level0)
         .SetElementName(bundleName, abilityName);
 
     WantParams wantParams;
-    auto info = CreateFormShareInfo(
-        1, "form", "form_bundle", "form_module", "form_ability", 1, "device", "device_name", false, wantParams);
+    FormShareInfo info;
+    info.formId = 1;
+    info.formName = "form";
+    info.bundleName = "form_bundle";
+    info.moduleName = "form_module";
+    info.abilityName = "form_ability";
+    info.dimensionId = 1;
+    info.formTempFlag = false;
+    info.deviceId = "device";
+    info.providerShareData = wantParams;
     auto key = FormShareMgr::GetInstance().MakeFormShareInfoKey(want);
     FormShareMgr::GetInstance().shareInfo_.emplace(key, info);
 

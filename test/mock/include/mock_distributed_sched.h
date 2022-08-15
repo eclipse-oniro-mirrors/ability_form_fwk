@@ -44,14 +44,12 @@ public:
 
 
 class DistributedSchedService : public DistributedSchedStub {
-
 public:
     DistributedSchedService() = default;
     ~DistributedSchedService() = default;
 
     MOCK_METHOD5(SendResultFromRemote,
         int32_t(OHOS::AAFwk::Want&, int32_t, const CallerInfo&, const AccountInfo&, int32_t));
-    
 
     int32_t StartRemoteAbility(const OHOS::AAFwk::Want& want, int32_t callerUid, int32_t requestCode,
         uint32_t accessToken) override
