@@ -37,7 +37,6 @@ bool FormJsInfo::ReadFromParcel(Parcel &parcel)
     versionCode = parcel.ReadUint32();
     versionName = Str16ToStr8(parcel.ReadString16());
     compatibleVersion = parcel.ReadUint32();
-    icon = Str16ToStr8(parcel.ReadString16());
 
     std::unique_ptr<FormProviderData> bindingData(parcel.ReadParcelable<FormProviderData>());
     if (bindingData == nullptr) {
@@ -115,12 +114,6 @@ bool FormJsInfo::Marshalling(Parcel &parcel) const
     if (!parcel.WriteUint32(compatibleVersion)) {
         return false;
     }
-
-    // write icon
-    if (!parcel.WriteString16(Str8ToStr16(icon))) {
-        return false;
-    }
-
     // write formProviderData
     if (!parcel.WriteParcelable(&formProviderData)) {
         return false;
@@ -207,5 +200,5 @@ void FormJsInfo::ReadImageData(Parcel &parcel)
     HILOG_INFO("%{public}s end", __func__);
     return;
 }
-}  // namespace AppExecFwk
-}  // namespace OHOS
+} // namespace AppExecFwk
+} // namespace OHOS

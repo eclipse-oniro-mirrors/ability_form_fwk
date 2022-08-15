@@ -77,18 +77,17 @@ int FormProviderStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messag
 
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
-/**
- * @brief handle AcquireProviderFormInfo message.
- * @param data input param.
- * @param reply output param.
- * @return Returns ERR_OK on success, others on failure.
- */
+
 int FormProviderStub::HandleAcquireProviderFormInfo(MessageParcel &data, MessageParcel &reply)
 {
-    int64_t formId = data.ReadInt64();
+    std::unique_ptr<FormJsInfo> formJsInfo(data.ReadParcelable<FormJsInfo>());
+    if (!formJsInfo) {
+        HILOG_ERROR("%{public}s, failed to ReadParcelable<formJsInfo>", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
-        HILOG_ERROR("%{public}s, failed to ReadParcelable<FormReqInfo>", __func__);
+        HILOG_ERROR("%{public}s, failed to ReadParcelable<Want>", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -98,7 +97,7 @@ int FormProviderStub::HandleAcquireProviderFormInfo(MessageParcel &data, Message
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    int32_t result = AcquireProviderFormInfo(formId, *want, client);
+    int32_t result = AcquireProviderFormInfo(*formJsInfo, *want, client);
     reply.WriteInt32(result);
     return result;
 }

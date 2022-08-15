@@ -39,17 +39,11 @@ struct FormJsInfo : public Parcelable {
     std::string formData;
     std::map<std::string, sptr<FormAshmem>> imageDataMap;
     FormProviderData formProviderData;
-
-    std::string htmlPath;
-    std::string cssPath;
-    std::string jsPath;
-    std::string fileReousePath;
     std::string formSrc;
     FormWindow formWindow;
     uint32_t versionCode = 0;
     std::string versionName;
     uint32_t compatibleVersion = 0;
-    std::string icon;
 
     bool ReadFromParcel(Parcel &parcel);
     virtual bool Marshalling(Parcel &parcel) const override;
@@ -57,6 +51,6 @@ struct FormJsInfo : public Parcelable {
     bool WriteImageData(Parcel &parcel) const;
     void ReadImageData(Parcel &parcel);
 };
-}  // namespace AppExecFwk
-}  // namespace OHOS
-#endif  // OHOS_FORM_FWK_FORM_JS_INFO_H
+} // namespace AppExecFwk
+} // namespace OHOS
+#endif // OHOS_FORM_FWK_FORM_JS_INFO_H

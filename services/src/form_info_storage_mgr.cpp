@@ -29,6 +29,7 @@ constexpr int32_t CHECK_TIMES = 300;
 constexpr int32_t CHECK_INTERVAL = 100000; // 100ms
 constexpr int32_t MAX_TIMES = 600; // 600 * 100ms = 1min
 constexpr int32_t SLEEP_INTERVAL = 100 * 1000; // 100ms
+constexpr const char* FORM_STORAGE_DIR = "/data/service/el1/public/database/form_storage";
 const std::string FORM_INFO_PREFIX = "formInfo_";
 const std::string FORM_ID_PREFIX = "formId_";
 } // namespace
@@ -185,7 +186,7 @@ DistributedKv::Status FormInfoStorageMgr::GetKvStore()
         .encrypt = false,
         .autoSync = true,
         .kvStoreType = DistributedKv::KvStoreType::SINGLE_VERSION,
-        .baseDir = Constants::FORM_STORAGE_DIR,
+        .baseDir = FORM_STORAGE_DIR,
         .area = DistributedKv::EL1
     };
 

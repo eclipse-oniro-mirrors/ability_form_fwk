@@ -282,13 +282,11 @@ void FormSysEventReceiver::HandleBundleDataCleared(const std::string &bundleName
         }
     }
 
-    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
-    if (iBundleMgr == nullptr) {
-        HILOG_ERROR("%{public}s error, failed to get IBundleMgr.", __func__);
+    int32_t uid = FormBmsHelper::GetInstance().GetUidByBundleName(bundleName, userId);
+    if (uid == FormBmsHelper::INVALID_UID) {
+        HILOG_ERROR("invalid uid");
         return;
     }
-    int uid = IN_PROCESS_CALL(iBundleMgr->GetUidByBundleName(bundleName, userId));
-
     // as form host data is cleared
     HandleFormHostDataCleared(uid);
 }
