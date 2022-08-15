@@ -33,6 +33,7 @@ class MockFormProviderClient : public FormProviderStub {
 public:
     MockFormProviderClient() = default;
     virtual ~MockFormProviderClient() = default;
+    bool state_AcquireShareFormData_ = false;
 
 private:
     /**

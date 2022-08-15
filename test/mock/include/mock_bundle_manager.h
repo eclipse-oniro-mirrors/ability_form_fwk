@@ -37,6 +37,8 @@ public:
     MOCK_METHOD2(GetNameForUid, bool(const int uid, std::string &name));
     MOCK_METHOD2(GetBundlesForUid, bool(const int uid, std::vector<std::string> &));
     MOCK_METHOD1(IsAbilityEnabled, bool(const AbilityInfo &));
+    MOCK_METHOD5(QueryAbilityInfo, bool(const Want &want, int32_t flags, int32_t userId, AbilityInfo &abilityInfo,
+        const sptr<IRemoteObject> &callBack));
     bool QueryAbilityInfo(const AAFwk::Want &want, AbilityInfo &abilityInfo) override
     {
         return true;
@@ -226,6 +228,8 @@ public:
     MOCK_METHOD2(GetBundlesForUid, bool(const int uid, std::vector<std::string> &));
     MOCK_METHOD1(IsAbilityEnabled, bool(const AbilityInfo &));
     bool QueryAbilityInfo(const AAFwk::Want &want, AbilityInfo &abilityInfo) override;
+    MOCK_METHOD5(QueryAbilityInfo, bool(const Want &want, int32_t flags, int32_t userId, AbilityInfo &abilityInfo,
+        const sptr<IRemoteObject> &callBack));
     bool QueryAbilityInfoByUri(const std::string &uri, AbilityInfo &abilityInfo) override;
 
     std::string GetAppType(const std::string &bundleName) override;
@@ -381,6 +385,8 @@ public:
     {
         abilityInfo.name = "MainAbility";
         abilityInfo.bundleName = "com.ohos.launcher";
+        extensionInfo.name = "MainAbility";
+        extensionInfo.bundleName = "com.ohos.launcher";
         return true;
     }
     virtual bool CheckIsSystemAppByUid(const int uid) override
