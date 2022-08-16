@@ -20,7 +20,6 @@ ohos_unittest("FmsFormDistributedClientTest") {
   module_out_path = module_output_path
 
   sources = [
-    "${form_fwk_path}/interfaces/kits/native/src/form_mgr.cpp",
     "${form_fwk_path}/test/mock/src/mock_bundle_manager.cpp",
     "${form_fwk_path}/test/mock/src/mock_distributed_sched.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_host_client.cpp",
@@ -56,18 +55,20 @@ ohos_unittest("FmsFormDistributedClientTest") {
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}:form_manager",
+    "${systemabilitymgr_path}/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
     "//third_party/googletest:gmock_main",
-    "//utils/native/base:utils",
   ]
 
   external_deps = [
     "ability_base:base",
     "ability_base:want",
+    "ability_base:zuri",
     "ability_runtime:app_manager",
     "access_token:libaccesstoken_sdk",
     "appspawn:appspawn_socket_client",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
+    "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "distributeddatamgr:distributeddata_inner",
     "eventhandler:libeventhandler",
@@ -75,7 +76,6 @@ ohos_unittest("FmsFormDistributedClientTest") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
-    "samgr_standard:samgr_proxy",
   ]
 }
 
