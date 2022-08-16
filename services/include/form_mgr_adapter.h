@@ -433,13 +433,6 @@ private:
     ErrCode HandleDeleteFormCache(FormRecord &dbRecord, const int uid, const int64_t formId);
 
     /**
-     * @brief Padding udid hash.
-     * @param formId The form id.
-     * @return Padded form id.
-     */
-    int64_t PaddingUdidHash(const int64_t formId) const;
-
-    /**
      * @brief Add existed form record.
      * @param info Form configure info.
      * @param callerToken Caller ability token.
@@ -562,14 +555,14 @@ private:
 
     /**
      * @brief add request publish form.
-     * @param formId The Id of the forms to add.
+     * @param formItemInfo Form configure info.
      * @param want The want of the form to add.
      * @param callerToken Caller ability token.
      * @param formJsInfo Return form info to form host.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode AddRequestPublishForm(const int64_t formId, const Want &want, const sptr<IRemoteObject> &callerToken,
-                                  FormJsInfo &formJsInfo);
+    ErrCode AddRequestPublishForm(const FormItemInfo &formItemInfo, const Want &want,
+        const sptr<IRemoteObject> &callerToken, FormJsInfo &formJsInfo);
 
     /**
      * @brief get bundleName.

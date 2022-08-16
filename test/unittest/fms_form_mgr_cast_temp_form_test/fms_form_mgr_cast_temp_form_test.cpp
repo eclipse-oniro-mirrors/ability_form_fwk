@@ -151,9 +151,9 @@ HWTEST_F(FmsFormMgrCastTempFormTest, CastTempForm_001, TestSize.Level0)
     }
     EXPECT_TRUE(formExist);
     // host is added
-    FormHostRecord hostRecord;
-    ret = FormDataMgr::GetInstance().GetFormHostRecord(formId, hostRecord);
-    EXPECT_TRUE(ret);
+    std::vector<FormHostRecord> hostRecords;
+    FormDataMgr::GetInstance().GetFormHostRecord(formId, hostRecords);
+    EXPECT_FALSE(hostRecords.empty());
 
     FormDataMgr::GetInstance().DeleteFormRecord(formId);
     FormDbCache::GetInstance().DeleteFormInfo(formId);

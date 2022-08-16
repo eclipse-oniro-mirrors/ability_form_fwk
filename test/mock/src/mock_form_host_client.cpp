@@ -27,7 +27,7 @@ namespace AppExecFwk {
  * @param formInfo, Form info.
  * @return none.
  */
-void MockFormHostClient::OnAcquired(const FormJsInfo &formInfo)
+void MockFormHostClient::OnAcquired(const FormJsInfo &formInfo, const sptr<IRemoteObject> &token)
 {
     HILOG_DEBUG("MockFormHostClient OnAcquired");
 
