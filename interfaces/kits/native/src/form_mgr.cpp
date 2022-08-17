@@ -905,7 +905,7 @@ int FormMgr::GetFormsInfoByModule(std::string &bundleName, std::string &moduleNa
     }
     return resultCode;
 }
-int32_t FormMgr::GetFormsInfo(const std::string &moduleName, std::vector<FormInfo> &formInfos)
+int32_t FormMgr::GetFormsInfo(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos)
 {
     HILOG_INFO("%{public}s starts.", __func__);
     int errCode = Connect();
@@ -913,7 +913,7 @@ int32_t FormMgr::GetFormsInfo(const std::string &moduleName, std::vector<FormInf
         HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
         return errCode;
     }
-    return remoteProxy_->GetFormsInfo(moduleName, formInfos);
+    return remoteProxy_->GetFormsInfo(filter, formInfos);
 }
 
 bool FormMgr::IsRequestPublishFormSupported()

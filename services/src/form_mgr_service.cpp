@@ -661,7 +661,7 @@ int FormMgrService::GetFormsInfoByModule(std::string &bundleName, std::string &m
     return FormMgrAdapter::GetInstance().GetFormsInfoByModule(bundleName, moduleName, formInfos);
 }
 
-int32_t FormMgrService::GetFormsInfo(const std::string &moduleName, std::vector<FormInfo> &formInfos)
+int32_t FormMgrService::GetFormsInfo(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos)
 {
     HILOG_INFO("%{public}s called.", __func__);
     std::string callerBundleName;
@@ -670,6 +670,8 @@ int32_t FormMgrService::GetFormsInfo(const std::string &moduleName, std::vector<
         HILOG_ERROR("%{public}s fail, get host bundle name failed", __func__);
         return ret;
     }
+    // retrieve moduleName from filter.
+    std::string moduleName = filter.moduleName;
     if (moduleName.empty()) {
         // fulfill formInfos, the process should be the same as GetFormsInfoByApp.
         HILOG_INFO("GetFormsInfo flows to GetFormsInfoByAPP");
