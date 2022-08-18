@@ -55,6 +55,7 @@ ohos_unittest("FmsFormInfoMgrTest") {
   ]
 
   external_deps = [
+    "ability_base:want",
     "appspawn:appspawn_socket_client",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
