@@ -39,7 +39,8 @@ static NativeValue* JsProviderInit(NativeEngine* engine, NativeValue* exports)
     std::unique_ptr<JsFormProvider> jsFormPorivder = std::make_unique<JsFormProvider>();
     object->SetNativePointer(jsFormPorivder.release(), JsFormProvider::Finalizer, nullptr);
 
-    BindNativeFunction(*engine, *object, "getFormsInfo", JsFormProvider::GetFormsInfo);
+    const char *moduleName = "JsFormProvider";
+    BindNativeFunction(*engine, *object, "getFormsInfo", moduleName, JsFormProvider::GetFormsInfo);
 
     return exports;
 }
