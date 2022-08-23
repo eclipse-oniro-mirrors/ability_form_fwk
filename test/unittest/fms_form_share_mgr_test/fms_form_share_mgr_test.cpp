@@ -23,7 +23,6 @@
 #include "form_mgr_errors.h"
 #include "form_mgr_service.h"
 #define private public
-#include "want.h"
 #include "form_data_mgr.h"
 #include "form_distributed_client.h"
 #include "form_mgr.h"
@@ -31,7 +30,10 @@
 #include "form_info_mgr.h"
 #include "form_share_mgr.h"
 #include "form_event_handler.h"
+#include "want.h"
 #undef private
+#include "dm_constants.h"
+#include "dm_device_info.h"
 #include "iremote_proxy.h"
 #include "mock_ability_manager.h"
 #include "mock_bundle_manager.h"
@@ -39,8 +41,6 @@
 #include "mock_form_host_client.h"
 #include "mock_form_provider_client.h"
 #include "string_wrapper.h"
-#include "dm_constants.h"
-#include "dm_device_info.h"
 
 using namespace testing;
 using namespace testing::ext;
@@ -58,7 +58,7 @@ const std::string PARAM_PROVIDER_MODULE_NAME = "com.form.provider.app.test.abili
 const std::string FORM_PROVIDER_ABILITY_NAME = "com.form.provider.app.test.ability";
 const std::string PARAM_FORM_NAME = "com.form.name.test";
 
-const std::string FORM_JS_COMPOMENT_NAME = "jsComponentName";
+const std::string FORM_JS_COMPONENT_NAME = "jsComponentName";
 const std::string FORM_PROVIDER_MODULE_SOURCE_DIR = "";
 
 const std::string FORM_HOST_BUNDLE_NAME = "com.form.host.app";
@@ -153,7 +153,7 @@ void FmsFormShareMgrTest::CreateProviderData()
     formInfo.updateEnabled = true;
     formInfo.updateDuration = 1;
     formInfo.scheduledUpdateTime = "06:06";
-    formInfo.jsComponentName = FORM_JS_COMPOMENT_NAME;
+    formInfo.jsComponentName = FORM_JS_COMPONENT_NAME;
     formInfo.formVisibleNotify = true;
     formInfo.supportDimensions = {1, 2};
     formInfo.defaultDimension = 1;
@@ -195,13 +195,11 @@ void FmsFormShareMgrTest::ClearFormShareMgrMapData()
     FormShareMgr::GetInstance().freeInstallOperatorMap_.clear();
 }
 
-/*
- * Feature: FmsFormShareMgrTest
- * Function: RecvFormShareInfoFromRemote
- * SubFunction: RecvFormShareInfoFromRemote
- * FunctionPoints: -
- * EnvConditions: -
- * CaseDescription: check form share info case.
+/**
+ * @tc.name: RecvFormShareInfoFromRemote_001
+ * @tc.desc: check form share info case.
+ * @tc.type: RecvFormShareInfoFromRemote
+ * @tc.require: Issue I5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, RecvFormShareInfoFromRemote_001, TestSize.Level0)
 {
@@ -216,13 +214,11 @@ HWTEST_F(FmsFormShareMgrTest, RecvFormShareInfoFromRemote_001, TestSize.Level0)
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest RecvFormShareInfoFromRemote_001 end";
 }
 
-/*
- * Feature: FmsFormShareMgrTest
- * Function: HandleRecvFormShareInfoFromRemoteTask
- * SubFunction: CheckFormShareInfo
- * FunctionPoints: -
- * EnvConditions: -
- * CaseDescription: check form share info case.
+/**
+ * @tc.name: HandleRecvFormShareInfoFromRemoteTask_001
+ * @tc.desc: check form share info case.
+ * @tc.type: HandleRecvFormShareInfoFromRemoteTask
+ * @tc.require: Issue I5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_001, TestSize.Level0)
 {
@@ -275,13 +271,11 @@ HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_001, TestSiz
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest HandleRecvFormShareInfoFromRemoteTask_001 end";
 }
 
-/*
- * Feature: FmsFormShareMgrTest
- * Function: HandleRecvFormShareInfoFromRemoteTask
- * SubFunction: HandleRecvFormShareInfoFromRemoteTask
- * FunctionPoints: -
- * EnvConditions: -
- * CaseDescription: Failed to Recv Form Share info.
+/**
+ * @tc.name: HandleRecvFormShareInfoFromRemoteTask_002
+ * @tc.desc: Failed to Recv Form Share info.
+ * @tc.type: HandleRecvFormShareInfoFromRemoteTask
+ * @tc.require: Issue I5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_002, TestSize.Level0)
 {
@@ -310,13 +304,11 @@ HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_002, TestSiz
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest HandleRecvFormShareInfoFromRemoteTask_002 end";
 }
 
-/*
- * Feature: FmsFormShareMgrTest
- * Function: HandleRecvFormShareInfoFromRemoteTask
- * SubFunction: HandleRecvFormShareInfoFromRemoteTask
- * FunctionPoints: -
- * EnvConditions: -
- * CaseDescription: free install success case.
+/**
+ * @tc.name: HandleRecvFormShareInfoFromRemoteTask_003
+ * @tc.desc: free install success case.
+ * @tc.type: HandleRecvFormShareInfoFromRemoteTask
+ * @tc.require: Issue I5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_003, TestSize.Level0)
 {
@@ -360,13 +352,11 @@ HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_003, TestSiz
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest HandleRecvFormShareInfoFromRemoteTask_003 end";
 }
 
-/*
- * Feature: FmsFormShareMgrTest
- * Function: HandleRecvFormShareInfoFromRemoteTask
- * SubFunction: HandleRecvFormShareInfoFromRemoteTask
- * FunctionPoints: -
- * EnvConditions: -
- * CaseDescription: free install failed case.
+/**
+ * @tc.name: HandleRecvFormShareInfoFromRemoteTask_004
+ * @tc.desc: free install success case.
+ * @tc.type: HandleRecvFormShareInfoFromRemoteTask
+ * @tc.require: Issue I5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_004, TestSize.Level0)
 {
@@ -406,13 +396,11 @@ HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_004, TestSiz
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest HandleRecvFormShareInfoFromRemoteTask_004 end";
 }
 
-/*
- * Feature: FmsFormShareMgrTest
- * Function: HandleRecvFormShareInfoFromRemoteTask
- * SubFunction: HandleRecvFormShareInfoFromRemoteTask
- * FunctionPoints: -
- * EnvConditions: -
- * CaseDescription: free install failed case.
+/**
+ * @tc.name: HandleRecvFormShareInfoFromRemoteTask_005
+ * @tc.desc: free install failed case.
+ * @tc.type: HandleRecvFormShareInfoFromRemoteTask
+ * @tc.require: Issue I5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_005, TestSize.Level0)
 {
@@ -450,13 +438,11 @@ HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_005, TestSiz
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest HandleRecvFormShareInfoFromRemoteTask_005 end";
 }
 
-/*
- * Feature: FmsFormShareMgrTest
- * Function: ShareForm
- * SubFunction: ShareForm
- * FunctionPoints: .
- * EnvConditions: .
- * CaseDescription: shareForm function success
+/**
+ * @tc.name: FmsFormShareMgrTest_ShareForm_001
+ * @tc.desc: shareForm function success
+ * @tc.type: ShareForm
+ * @tc.require: Issue I5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, FmsFormShareMgrTest_ShareForm_001, TestSize.Level0)
 {
@@ -481,13 +467,11 @@ HWTEST_F(FmsFormShareMgrTest, FmsFormShareMgrTest_ShareForm_001, TestSize.Level0
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest FmsFormShareMgrTest_ShareForm_001  end";
 }
 
-/*
- * Feature: FmsFormShareMgrTest
- * Function: ShareForm
- * SubFunction: ShareForm
- * FunctionPoints: .
- * EnvConditions: .
- * CaseDescription: shareForm function fail
+/**
+ * @tc.name: FmsFormShareMgrTest_ShareForm_002
+ * @tc.desc: shareForm function fail
+ * @tc.type: ShareForm
+ * @tc.require: Issue I5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, FmsFormShareMgrTest_ShareForm_002, TestSize.Level0)
 {
@@ -516,13 +500,11 @@ HWTEST_F(FmsFormShareMgrTest, FmsFormShareMgrTest_ShareForm_002, TestSize.Level0
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest FmsFormShareMgrTest_ShareForm_002 end";
 }
 
-/*
- * Feature: FmsFormShareMgrTest
- * Function: ShareForm
- * SubFunction: ShareForm
- * FunctionPoints: .
- * EnvConditions: .
- * CaseDescription: shareForm function fail
+/**
+ * @tc.name: FmsFormShareMgrTest_ShareForm_003
+ * @tc.desc: shareForm function fail
+ * @tc.type: ShareForm
+ * @tc.require: Issue I5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, FmsFormShareMgrTest_ShareForm_003, TestSize.Level0)
 {
@@ -548,13 +530,11 @@ HWTEST_F(FmsFormShareMgrTest, FmsFormShareMgrTest_ShareForm_003, TestSize.Level0
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest FmsFormShareMgrTest_ShareForm_003 end";
 }
 
-/*
- * Feature: FmsFormShareMgrTest
- * Function: ShareForm
- * SubFunction: ShareForm
- * FunctionPoints: .
- * EnvConditions: .
- * CaseDescription: shareForm function fail
+/**
+ * @tc.name: FmsFormShareMgrTest_ShareForm_004
+ * @tc.desc: shareForm function fail
+ * @tc.type: ShareForm
+ * @tc.require: Issue I5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, FmsFormShareMgrTest_ShareForm_004, TestSize.Level0)
 {
@@ -582,13 +562,11 @@ HWTEST_F(FmsFormShareMgrTest, FmsFormShareMgrTest_ShareForm_004, TestSize.Level0
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest FmsFormShareMgrTest_ShareForm_004 end";
 }
 
-/*
- * Feature: FmsFormShareMgrTest
- * Function: AcquireShareFormData
- * SubFunction: AcquireShareFormData
- * FunctionPoints: .
- * EnvConditions: .
- * CaseDescription: AcquireShareFormData function success
+/**
+ * @tc.name: AcquireShareFormData_001
+ * @tc.desc: AcquireShareFormData function success
+ * @tc.type: AcquireShareFormData
+ * @tc.require: Issue I5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, AcquireShareFormData_001, TestSize.Level0)
 {
@@ -611,13 +589,11 @@ HWTEST_F(FmsFormShareMgrTest, AcquireShareFormData_001, TestSize.Level0)
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest AcquireShareFormData_001 end";
 }
 
-/*
- * Feature: FmsFormShareMgrTest
- * Function: AcquireShareFormData
- * SubFunction: AcquireShareFormData
- * FunctionPoints: .
- * EnvConditions: .
- * CaseDescription: AcquireShareFormData function success
+/**
+ * @tc.name: AcquireShareFormData_002
+ * @tc.desc: AcquireShareFormData function success
+ * @tc.type: AcquireShareFormData
+ * @tc.require: Issue I5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, AcquireShareFormData_002, TestSize.Level0)
 {
@@ -640,13 +616,11 @@ HWTEST_F(FmsFormShareMgrTest, AcquireShareFormData_002, TestSize.Level0)
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest AcquireShareFormData_001 end";
 }
 
-/*
- * Feature: FmsFormShareMgrTest
- * Function:  HandleProviderShareData
- * SubFunction:  HandleProviderShareData
- * FunctionPoints: .
- * EnvConditions: .
- * CaseDescription:  HandleProviderShareData function success
+/**
+ * @tc.name: HandleProviderShareData_001
+ * @tc.desc: HandleProviderShareData function success
+ * @tc.type: HandleProviderShareData
+ * @tc.require: Issue I5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, HandleProviderShareData_001, TestSize.Level0)
 {
@@ -688,13 +662,11 @@ HWTEST_F(FmsFormShareMgrTest, HandleProviderShareData_001, TestSize.Level0)
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest HandleProviderShareData_001 end";
 }
 
-/*
- * Feature: FmsFormShareMgrTest
- * Function:  HandleProviderShareData
- * SubFunction:  HandleProviderShareData
- * FunctionPoints: .
- * EnvConditions: .
- * CaseDescription:  HandleProviderShareData function success
+/**
+ * @tc.name: HandleProviderShareData_002
+ * @tc.desc: HandleProviderShareData function success
+ * @tc.type: HandleProviderShareData
+ * @tc.require: Issue I5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, HandleProviderShareData_002, TestSize.Level0)
 {
@@ -729,13 +701,11 @@ HWTEST_F(FmsFormShareMgrTest, HandleProviderShareData_002, TestSize.Level0)
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest HandleProviderShareData_002 end";
 }
 
-/*
- * Feature: FmsFormShareMgrTest
- * Function:  HandleProviderShareData
- * SubFunction:  HandleProviderShareData
- * FunctionPoints: .
- * EnvConditions: .
- * CaseDescription:  HandleProviderShareData function success
+/**
+ * @tc.name: HandleProviderShareData_003
+ * @tc.desc: HandleProviderShareData function success
+ * @tc.type: HandleProviderShareData
+ * @tc.require: Issue I5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, HandleProviderShareData_003, TestSize.Level0)
 {
@@ -771,13 +741,11 @@ HWTEST_F(FmsFormShareMgrTest, HandleProviderShareData_003, TestSize.Level0)
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest HandleProviderShareData_003 end";
 }
 
-/*
- * Feature: FmsFormShareMgrTest
- * Function: ShareForm
- * SubFunction: ShareForm Function
- * FunctionPoints: FormMgr AddForm interface
- * EnvConditions: Mobile that can run ohos test framework
- * CaseDescription: .
+/**
+ * @tc.name: ShareForm_001
+ * @tc.desc: .
+ * @tc.type: ShareForm
+ * @tc.require: Issue I5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, ShareForm_001, TestSize.Level0)
 {
@@ -807,13 +775,11 @@ HWTEST_F(FmsFormShareMgrTest, ShareForm_001, TestSize.Level0)
     GTEST_LOG_(INFO) << "FmsFormMgrAddFormTest ShareForm_001  end";
 }
 
-/*
- * Feature: FmsFormShareMgrTest
- * Function: ShareForm
- * SubFunction: ShareForm Function
- * FunctionPoints: FormMgr AddForm interface
- * EnvConditions: Mobile that can run ohos test framework
- * CaseDescription: .
+/**
+ * @tc.name: ShareForm_002
+ * @tc.desc: .
+ * @tc.type: ShareForm
+ * @tc.require: Issue I5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, ShareForm_002, TestSize.Level0)
 {
@@ -838,13 +804,11 @@ HWTEST_F(FmsFormShareMgrTest, ShareForm_002, TestSize.Level0)
     GTEST_LOG_(INFO) << "FmsFormMgrAddFormTest ShareForm_002 end";
 }
 
-/*
- * Feature: FmsFormShareMgrTest
- * Function: ShareForm
- * SubFunction: ShareForm Function
- * FunctionPoints: FormMgr AddForm interface
- * EnvConditions: Mobile that can run ohos test framework
- * CaseDescription: .
+/**
+ * @tc.name: ShareForm_003
+ * @tc.desc: .
+ * @tc.type: ShareForm
+ * @tc.require: Issue I5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, ShareForm_003, TestSize.Level0)
 {
@@ -870,13 +834,11 @@ HWTEST_F(FmsFormShareMgrTest, ShareForm_003, TestSize.Level0)
     GTEST_LOG_(INFO) << "FmsFormMgrAddFormTest ShareForm_003  end";
 }
 
-/*
- * Feature: FmsFormShareMgrTest
- * Function: ShareForm
- * SubFunction: ShareForm Function
- * FunctionPoints: FormMgr AddForm interface
- * EnvConditions: Mobile that can run ohos test framework
- * CaseDescription: .
+/**
+ * @tc.name: ShareForm_004
+ * @tc.desc: .
+ * @tc.type: ShareForm
+ * @tc.require: Issue I5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, ShareForm_004, TestSize.Level0)
 {
@@ -900,13 +862,12 @@ HWTEST_F(FmsFormShareMgrTest, ShareForm_004, TestSize.Level0)
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FmsFormMgrAddFormTest ShareForm_004  end";
 }
-/*
- * Feature: FmsFormShareMgrTest
- * Function: GetLocalDeviceInfo
- * SubFunction: GetLocalDeviceInfo
- * FunctionPoints: .
- * EnvConditions: .
- * CaseDescription: GetLocalDeviceInfo function success
+
+/**
+ * @tc.name: GetLocalDeviceInfo_001
+ * @tc.desc: GetLocalDeviceInfo function success
+ * @tc.type: GetLocalDeviceInfo
+ * @tc.require: Issue I5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, GetLocalDeviceInfo_001, TestSize.Level0)
 {
@@ -931,13 +892,11 @@ HWTEST_F(FmsFormShareMgrTest, GetLocalDeviceInfo_001, TestSize.Level0)
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest GetLocalDeviceInfo_001 end";
 }
 
-/*
- * Feature: FmsFormShareMgrTest
- * Function: GetLocalDeviceInfo
- * SubFunction: GetLocalDeviceInfo
- * FunctionPoints: .
- * EnvConditions: .
- * CaseDescription: GetLocalDeviceInfo function success
+/**
+ * @tc.name: GetLocalDeviceInfo_002
+ * @tc.desc: GetLocalDeviceInfo function success
+ * @tc.type: GetLocalDeviceInfo
+ * @tc.require: Issue I5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, GetLocalDeviceInfo_002, TestSize.Level0)
 {
@@ -959,13 +918,11 @@ HWTEST_F(FmsFormShareMgrTest, GetLocalDeviceInfo_002, TestSize.Level0)
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest GetLocalDeviceInfo_002 end";
 }
 
-/*
- * Feature: FmsFormShareMgrTest
- * Function: AddProviderData
- * SubFunction: AddProviderData
- * FunctionPoints: .
- * EnvConditions: .
- * CaseDescription: AddProviderData function success
+/**
+ * @tc.name: AddProviderData_001
+ * @tc.desc: AddProviderData function success
+ * @tc.type: AddProviderData
+ * @tc.require: Issue I5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, AddProviderData_001, TestSize.Level0)
 {
@@ -1006,13 +963,11 @@ HWTEST_F(FmsFormShareMgrTest, AddProviderData_001, TestSize.Level0)
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest AddProviderData_001 end";
 }
 
-/*
- * Feature: FmsFormShareMgrTest
- * Function: AddProviderData
- * SubFunction: AddProviderData
- * FunctionPoints: .
- * EnvConditions: .
- * CaseDescription: AddProviderData function success
+/**
+ * @tc.name: AddProviderData_002
+ * @tc.desc: AddProviderData function success
+ * @tc.type: AddProviderData
+ * @tc.require: Issue I5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, AddProviderData_002, TestSize.Level0)
 {

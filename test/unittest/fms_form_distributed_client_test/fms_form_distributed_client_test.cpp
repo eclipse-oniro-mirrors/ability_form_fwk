@@ -68,13 +68,11 @@ void FmsFormDistributedClientTest::SetUp()
 void FmsFormDistributedClientTest::TearDown()
 {}
 
-/*
- * Feature: FmsFormDistributedClientTest
- * Function: ShareForm
- * SubFunction: ShareForm Function
- * FunctionPoints: FormMgr AddForm interface
- * EnvConditions: Mobile that can run ohos test framework
- * CaseDescription: .
+/**
+ * @tc.name: ShareForm_0100
+ * @tc.desc: Mobile that can run ohos test framework
+ * @tc.type: ShareForm
+ * @tc.require: Issue I5MDLJ
  */
 HWTEST_F(FmsFormDistributedClientTest, ShareForm_0100, TestSize.Level0)
 {
@@ -87,13 +85,11 @@ HWTEST_F(FmsFormDistributedClientTest, ShareForm_0100, TestSize.Level0)
     GTEST_LOG_(INFO) << "FmsFormDistributedClientTest ShareForm_0100 end";
 }
 
-/*
- * Feature: FmsFormDistributedClientTest
- * Function: ShareForm
- * SubFunction: ShareForm Function
- * FunctionPoints: FormMgr AddForm interface
- * EnvConditions: Mobile that can run ohos test framework
- * CaseDescription: .
+/**
+ * @tc.name: ShareForm_0200
+ * @tc.desc: Mobile that can run ohos test framework
+ * @tc.type: ShareForm
+ * @tc.require: Issue I5MDLJ
  */
 HWTEST_F(FmsFormDistributedClientTest, ShareForm_0200, TestSize.Level0)
 {
@@ -105,13 +101,11 @@ HWTEST_F(FmsFormDistributedClientTest, ShareForm_0200, TestSize.Level0)
     GTEST_LOG_(INFO) << "FmsFormDistributedClientTest ShareForm_0200 end";
 }
 
-/*
- * Feature: FmsFormDistributedClientTest
- * Function: GetDmsServiceProxy
- * SubFunction: GetDmsServiceProxy Function
- * FunctionPoints: FormMgr AddForm interface
- * EnvConditions: Mobile that can run ohos test framework
- * CaseDescription: .
+/**
+ * @tc.name: GetDmsServiceProxy_0100
+ * @tc.desc: Mobile that can run ohos test framework
+ * @tc.type: GetDmsServiceProxy
+ * @tc.require: Issue I5MDLJ
  */
 HWTEST_F(FmsFormDistributedClientTest, GetDmsServiceProxy_0100, TestSize.Level0)
 {
