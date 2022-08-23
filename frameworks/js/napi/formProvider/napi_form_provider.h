@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_FORM_FWK_NAPI_FORM_PROVIDER_H_
-#define OHOS_FORM_FWK_NAPI_FORM_PROVIDER_H_
+#ifndef OHOS_FORM_FWK_NAPI_FORM_PROVIDER_H
+#define OHOS_FORM_FWK_NAPI_FORM_PROVIDER_H
 
 #include "ability.h"
 #include "form_provider_info.h"
@@ -114,4 +114,4 @@ private:
 };
 }  // namespace AbilityRuntime
 }  // namespace OHOS
-#endif /* OHOS_FORM_FWK_NAPI_FORM_PROVIDER_H_ */
+#endif /* OHOS_FORM_FWK_NAPI_FORM_PROVIDER_H */
