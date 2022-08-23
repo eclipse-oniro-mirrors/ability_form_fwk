@@ -17,6 +17,8 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include "accesstoken_kit.h"
+#include "dm_constants.h"
+#include "dm_device_info.h"
 #include "form_ams_helper.h"
 #include "form_bms_helper.h"
 #include "form_db_cache.h"
@@ -25,15 +27,12 @@
 #define private public
 #include "form_data_mgr.h"
 #include "form_distributed_client.h"
-#include "form_mgr.h"
+#include "form_event_handler.h"
 #include "form_info.h"
 #include "form_info_mgr.h"
+#include "form_mgr.h"
 #include "form_share_mgr.h"
-#include "form_event_handler.h"
-#include "want.h"
 #undef private
-#include "dm_constants.h"
-#include "dm_device_info.h"
 #include "iremote_proxy.h"
 #include "mock_ability_manager.h"
 #include "mock_bundle_manager.h"
@@ -41,6 +40,7 @@
 #include "mock_form_host_client.h"
 #include "mock_form_provider_client.h"
 #include "string_wrapper.h"
+#include "want.h"
 
 using namespace testing;
 using namespace testing::ext;
@@ -199,7 +199,7 @@ void FmsFormShareMgrTest::ClearFormShareMgrMapData()
  * @tc.name: RecvFormShareInfoFromRemote_001
  * @tc.desc: check form share info case.
  * @tc.type: RecvFormShareInfoFromRemote
- * @tc.require: Issue I5MDLJ
+ * @tc.require: issueI5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, RecvFormShareInfoFromRemote_001, TestSize.Level0)
 {
@@ -218,7 +218,7 @@ HWTEST_F(FmsFormShareMgrTest, RecvFormShareInfoFromRemote_001, TestSize.Level0)
  * @tc.name: HandleRecvFormShareInfoFromRemoteTask_001
  * @tc.desc: check form share info case.
  * @tc.type: HandleRecvFormShareInfoFromRemoteTask
- * @tc.require: Issue I5MDLJ
+ * @tc.require: issueI5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_001, TestSize.Level0)
 {
@@ -275,7 +275,7 @@ HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_001, TestSiz
  * @tc.name: HandleRecvFormShareInfoFromRemoteTask_002
  * @tc.desc: Failed to Recv Form Share info.
  * @tc.type: HandleRecvFormShareInfoFromRemoteTask
- * @tc.require: Issue I5MDLJ
+ * @tc.require: issueI5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_002, TestSize.Level0)
 {
@@ -308,7 +308,7 @@ HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_002, TestSiz
  * @tc.name: HandleRecvFormShareInfoFromRemoteTask_003
  * @tc.desc: free install success case.
  * @tc.type: HandleRecvFormShareInfoFromRemoteTask
- * @tc.require: Issue I5MDLJ
+ * @tc.require: issueI5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_003, TestSize.Level0)
 {
@@ -356,7 +356,7 @@ HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_003, TestSiz
  * @tc.name: HandleRecvFormShareInfoFromRemoteTask_004
  * @tc.desc: free install success case.
  * @tc.type: HandleRecvFormShareInfoFromRemoteTask
- * @tc.require: Issue I5MDLJ
+ * @tc.require: issueI5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_004, TestSize.Level0)
 {
@@ -400,7 +400,7 @@ HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_004, TestSiz
  * @tc.name: HandleRecvFormShareInfoFromRemoteTask_005
  * @tc.desc: free install failed case.
  * @tc.type: HandleRecvFormShareInfoFromRemoteTask
- * @tc.require: Issue I5MDLJ
+ * @tc.require: issueI5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_005, TestSize.Level0)
 {
@@ -442,7 +442,7 @@ HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_005, TestSiz
  * @tc.name: FmsFormShareMgrTest_ShareForm_001
  * @tc.desc: shareForm function success
  * @tc.type: ShareForm
- * @tc.require: Issue I5MDLJ
+ * @tc.require: issueI5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, FmsFormShareMgrTest_ShareForm_001, TestSize.Level0)
 {
@@ -471,7 +471,7 @@ HWTEST_F(FmsFormShareMgrTest, FmsFormShareMgrTest_ShareForm_001, TestSize.Level0
  * @tc.name: FmsFormShareMgrTest_ShareForm_002
  * @tc.desc: shareForm function fail
  * @tc.type: ShareForm
- * @tc.require: Issue I5MDLJ
+ * @tc.require: issueI5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, FmsFormShareMgrTest_ShareForm_002, TestSize.Level0)
 {
@@ -504,7 +504,7 @@ HWTEST_F(FmsFormShareMgrTest, FmsFormShareMgrTest_ShareForm_002, TestSize.Level0
  * @tc.name: FmsFormShareMgrTest_ShareForm_003
  * @tc.desc: shareForm function fail
  * @tc.type: ShareForm
- * @tc.require: Issue I5MDLJ
+ * @tc.require: issueI5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, FmsFormShareMgrTest_ShareForm_003, TestSize.Level0)
 {
@@ -534,7 +534,7 @@ HWTEST_F(FmsFormShareMgrTest, FmsFormShareMgrTest_ShareForm_003, TestSize.Level0
  * @tc.name: FmsFormShareMgrTest_ShareForm_004
  * @tc.desc: shareForm function fail
  * @tc.type: ShareForm
- * @tc.require: Issue I5MDLJ
+ * @tc.require: issueI5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, FmsFormShareMgrTest_ShareForm_004, TestSize.Level0)
 {
@@ -566,7 +566,7 @@ HWTEST_F(FmsFormShareMgrTest, FmsFormShareMgrTest_ShareForm_004, TestSize.Level0
  * @tc.name: AcquireShareFormData_001
  * @tc.desc: AcquireShareFormData function success
  * @tc.type: AcquireShareFormData
- * @tc.require: Issue I5MDLJ
+ * @tc.require: issueI5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, AcquireShareFormData_001, TestSize.Level0)
 {
@@ -593,7 +593,7 @@ HWTEST_F(FmsFormShareMgrTest, AcquireShareFormData_001, TestSize.Level0)
  * @tc.name: AcquireShareFormData_002
  * @tc.desc: AcquireShareFormData function success
  * @tc.type: AcquireShareFormData
- * @tc.require: Issue I5MDLJ
+ * @tc.require: issueI5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, AcquireShareFormData_002, TestSize.Level0)
 {
@@ -620,7 +620,7 @@ HWTEST_F(FmsFormShareMgrTest, AcquireShareFormData_002, TestSize.Level0)
  * @tc.name: HandleProviderShareData_001
  * @tc.desc: HandleProviderShareData function success
  * @tc.type: HandleProviderShareData
- * @tc.require: Issue I5MDLJ
+ * @tc.require: issueI5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, HandleProviderShareData_001, TestSize.Level0)
 {
@@ -666,7 +666,7 @@ HWTEST_F(FmsFormShareMgrTest, HandleProviderShareData_001, TestSize.Level0)
  * @tc.name: HandleProviderShareData_002
  * @tc.desc: HandleProviderShareData function success
  * @tc.type: HandleProviderShareData
- * @tc.require: Issue I5MDLJ
+ * @tc.require: issueI5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, HandleProviderShareData_002, TestSize.Level0)
 {
@@ -705,7 +705,7 @@ HWTEST_F(FmsFormShareMgrTest, HandleProviderShareData_002, TestSize.Level0)
  * @tc.name: HandleProviderShareData_003
  * @tc.desc: HandleProviderShareData function success
  * @tc.type: HandleProviderShareData
- * @tc.require: Issue I5MDLJ
+ * @tc.require: issueI5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, HandleProviderShareData_003, TestSize.Level0)
 {
@@ -745,7 +745,7 @@ HWTEST_F(FmsFormShareMgrTest, HandleProviderShareData_003, TestSize.Level0)
  * @tc.name: ShareForm_001
  * @tc.desc: .
  * @tc.type: ShareForm
- * @tc.require: Issue I5MDLJ
+ * @tc.require: issueI5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, ShareForm_001, TestSize.Level0)
 {
@@ -779,7 +779,7 @@ HWTEST_F(FmsFormShareMgrTest, ShareForm_001, TestSize.Level0)
  * @tc.name: ShareForm_002
  * @tc.desc: .
  * @tc.type: ShareForm
- * @tc.require: Issue I5MDLJ
+ * @tc.require: issueI5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, ShareForm_002, TestSize.Level0)
 {
@@ -808,7 +808,7 @@ HWTEST_F(FmsFormShareMgrTest, ShareForm_002, TestSize.Level0)
  * @tc.name: ShareForm_003
  * @tc.desc: .
  * @tc.type: ShareForm
- * @tc.require: Issue I5MDLJ
+ * @tc.require: issueI5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, ShareForm_003, TestSize.Level0)
 {
@@ -838,7 +838,7 @@ HWTEST_F(FmsFormShareMgrTest, ShareForm_003, TestSize.Level0)
  * @tc.name: ShareForm_004
  * @tc.desc: .
  * @tc.type: ShareForm
- * @tc.require: Issue I5MDLJ
+ * @tc.require: issueI5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, ShareForm_004, TestSize.Level0)
 {
@@ -867,7 +867,7 @@ HWTEST_F(FmsFormShareMgrTest, ShareForm_004, TestSize.Level0)
  * @tc.name: GetLocalDeviceInfo_001
  * @tc.desc: GetLocalDeviceInfo function success
  * @tc.type: GetLocalDeviceInfo
- * @tc.require: Issue I5MDLJ
+ * @tc.require: issueI5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, GetLocalDeviceInfo_001, TestSize.Level0)
 {
@@ -896,7 +896,7 @@ HWTEST_F(FmsFormShareMgrTest, GetLocalDeviceInfo_001, TestSize.Level0)
  * @tc.name: GetLocalDeviceInfo_002
  * @tc.desc: GetLocalDeviceInfo function success
  * @tc.type: GetLocalDeviceInfo
- * @tc.require: Issue I5MDLJ
+ * @tc.require: issueI5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, GetLocalDeviceInfo_002, TestSize.Level0)
 {
@@ -922,7 +922,7 @@ HWTEST_F(FmsFormShareMgrTest, GetLocalDeviceInfo_002, TestSize.Level0)
  * @tc.name: AddProviderData_001
  * @tc.desc: AddProviderData function success
  * @tc.type: AddProviderData
- * @tc.require: Issue I5MDLJ
+ * @tc.require: issueI5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, AddProviderData_001, TestSize.Level0)
 {
@@ -967,7 +967,7 @@ HWTEST_F(FmsFormShareMgrTest, AddProviderData_001, TestSize.Level0)
  * @tc.name: AddProviderData_002
  * @tc.desc: AddProviderData function success
  * @tc.type: AddProviderData
- * @tc.require: Issue I5MDLJ
+ * @tc.require: issueI5MDLJ
  */
 HWTEST_F(FmsFormShareMgrTest, AddProviderData_002, TestSize.Level0)
 {

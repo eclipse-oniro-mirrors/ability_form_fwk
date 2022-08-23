@@ -72,7 +72,7 @@ void FmsFormDistributedClientTest::TearDown()
  * @tc.name: ShareForm_0100
  * @tc.desc: Mobile that can run ohos test framework
  * @tc.type: ShareForm
- * @tc.require: Issue I5MDLJ
+ * @tc.require: issueI5MDLJ
  */
 HWTEST_F(FmsFormDistributedClientTest, ShareForm_0100, TestSize.Level0)
 {
@@ -89,7 +89,7 @@ HWTEST_F(FmsFormDistributedClientTest, ShareForm_0100, TestSize.Level0)
  * @tc.name: ShareForm_0200
  * @tc.desc: Mobile that can run ohos test framework
  * @tc.type: ShareForm
- * @tc.require: Issue I5MDLJ
+ * @tc.require: issueI5MDLJ
  */
 HWTEST_F(FmsFormDistributedClientTest, ShareForm_0200, TestSize.Level0)
 {
@@ -105,7 +105,7 @@ HWTEST_F(FmsFormDistributedClientTest, ShareForm_0200, TestSize.Level0)
  * @tc.name: GetDmsServiceProxy_0100
  * @tc.desc: Mobile that can run ohos test framework
  * @tc.type: GetDmsServiceProxy
- * @tc.require: Issue I5MDLJ
+ * @tc.require: issueI5MDLJ
  */
 HWTEST_F(FmsFormDistributedClientTest, GetDmsServiceProxy_0100, TestSize.Level0)
 {
