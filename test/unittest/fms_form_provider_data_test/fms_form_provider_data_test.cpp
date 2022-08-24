@@ -165,4 +165,23 @@ HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_004, TestSize.Level0) 
     EXPECT_EQ(true, CreateMergeJsonFileByJsonData3(formProviderData.jsonFormProviderData_));
     GTEST_LOG_(INFO) << "FmsFormProviderDataTest_004 end";
 }
+
+/**
+ * @tc.name: FmsFormProviderDataTest_005
+ * @tc.desc: Verify the ConvertRawImageData function.
+ * @tc.type: FUNC
+ * @tc.require: issueI5MVKZ
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_005, TestSize.Level0) // test MergeData
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_005 start";
+    EXPECT_EQ(true, InitJsonData());
+    FormProviderData formProviderData(jsonData_);
+    std::string picName = "image";
+    char data = 'a';
+    formProviderData.AddImageData(picName, &data, 1);
+    EXPECT_TRUE(formProviderData.ConvertRawImageData());
+    EXPECT_EQ(1, formProviderData.GetImageDataMap().size());
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_005 end";
+}
 }
