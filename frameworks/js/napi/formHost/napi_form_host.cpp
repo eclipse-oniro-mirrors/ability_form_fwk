@@ -33,10 +33,11 @@
 #include "napi_common_want.h"
 #include "runtime.h"
 
+namespace OHOS {
+namespace AbilityRuntime {
 using namespace OHOS;
 using namespace OHOS::AAFwk;
 using namespace OHOS::AppExecFwk;
-using namespace OHOS::AbilityRuntime;
 
 namespace {
     constexpr size_t ARGS_SIZE_ZERO = 0;
@@ -3378,13 +3379,13 @@ NativeValue* JsFormHost::OnShareForm(NativeEngine &engine, NativeCallbackInfo &i
     }
 
     std::string strFormId =
-        ::GetStringFromNAPI(reinterpret_cast<napi_env>(&engine), reinterpret_cast<napi_value>(info.argv[0]));
+        GetStringFromNAPI(reinterpret_cast<napi_env>(&engine), reinterpret_cast<napi_value>(info.argv[0]));
     std::string remoteDeviceId =
-        ::GetStringFromNAPI(reinterpret_cast<napi_env>(&engine), reinterpret_cast<napi_value>(info.argv[1]));
+        GetStringFromNAPI(reinterpret_cast<napi_env>(&engine), reinterpret_cast<napi_value>(info.argv[1]));
     // The promise form has only two parameters
     decltype(info.argc) unwrapArgc = 2;
 
-    int64_t formId;
+    int64_t formId = 0;
     if (!ConvertStringToInt64(strFormId, formId)) {
         HILOG_ERROR("%{public}s, convert string formId to int64 failed.", __func__);
         errCode = ERR_COMMON;
@@ -3441,3 +3442,6 @@ void JsFormHost::InnerShareForm(
         FormHostClient::GetInstance()->RemoveShareFormCallback(requestCode);
     }
 }
+}  // namespace AbilityRuntime
+}  // namespace OHOS
+

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_FORM_FWK_NAPI_FORM_HOST_H_
-#define OHOS_FORM_FWK_NAPI_FORM_HOST_H_
+#ifndef OHOS_FORM_FWK_NAPI_FORM_HOST_H
+#define OHOS_FORM_FWK_NAPI_FORM_HOST_H
 
 #include "ability.h"
 #include "js_runtime_utils.h"
@@ -23,6 +23,8 @@
 #include "napi/native_node_api.h"
 #include "nlohmann/json.hpp"
 
+namespace OHOS {
+namespace AbilityRuntime {
 struct AsyncDelFormCallbackInfo {
     napi_env env;
     napi_async_work asyncWork;
@@ -187,4 +189,6 @@ private:
     void InnerShareForm(NativeEngine &engine, const std::shared_ptr<OHOS::AbilityRuntime::AsyncTask> &asyncTask,
         ShareFormTask &&task, int64_t formId, const std::string &remoteDeviceId);
 };
-#endif /* OHOS_FORM_FWK_NAPI_FORM_HOST_H_ */
+}  // namespace AbilityRuntime
+}  // namespace OHOS
+#endif /* OHOS_FORM_FWK_NAPI_FORM_HOST_H */

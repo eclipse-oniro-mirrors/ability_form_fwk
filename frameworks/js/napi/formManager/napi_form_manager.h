@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_FORM_FWK_NAPI_FORM_ABILITY_H_
-#define OHOS_FORM_FWK_NAPI_FORM_ABILITY_H_
+#ifndef OHOS_FORM_FWK_NAPI_FORM_ABILITY_H
+#define OHOS_FORM_FWK_NAPI_FORM_ABILITY_H
 
 #include "ability.h"
 #include "appexecfwk_errors.h"
@@ -219,4 +219,4 @@ napi_value NAPI_NotifyFormsEnableUpdate(napi_env env, napi_callback_info info);
 napi_value NAPI_GetAllFormsInfo(napi_env env, napi_callback_info info);
 napi_value NAPI_GetFormsInfo(napi_env env, napi_callback_info info);
 
-#endif /* OHOS_FORM_FWK_NAPI_FORM_ABILITY_H_ */
+#endif /* OHOS_FORM_FWK_NAPI_FORM_ABILITY_H */

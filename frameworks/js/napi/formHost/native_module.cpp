@@ -25,6 +25,7 @@
 #include "napi_form_host.h"
 
 EXTERN_C_START
+using namespace OHOS::AbilityRuntime;
 
 static NativeValue* JsFormHostInit(NativeEngine* engine, NativeValue* exports)
 {
