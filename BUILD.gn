@@ -146,9 +146,11 @@ ohos_shared_library("fmskit_native") {
   configs = [ ":fmskit_config" ]
   public_configs = [ ":fmskit_public_config" ]
   sources = [
+    "interfaces/kits/native/src/form_caller_mgr.cpp",
     "interfaces/kits/native/src/form_errors.cpp",
     "interfaces/kits/native/src/form_host_client.cpp",
     "interfaces/kits/native/src/form_mgr.cpp",
+    "interfaces/kits/native/src/form_provider_caller.cpp",
   ]
 
   cflags = []

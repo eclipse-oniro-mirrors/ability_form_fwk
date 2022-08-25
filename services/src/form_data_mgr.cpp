@@ -16,6 +16,7 @@
 #include "form_data_mgr.h"
 
 #include <cinttypes>
+#include <type_traits>
 
 #include "form_cache_mgr.h"
 #include "form_constants.h"
@@ -439,19 +440,15 @@ bool FormDataMgr::HasFormUserUids(const int64_t formId) const
  * @param formHostRecord The form host record.
  * @return Returns true if this function is successfully called; returns false otherwise.
  */
-bool FormDataMgr::GetFormHostRecord(const int64_t formId, FormHostRecord &formHostRecord) const
+void FormDataMgr::GetFormHostRecord(const int64_t formId, std::vector<FormHostRecord> &formHostRecords) const
 {
-    HILOG_INFO("%{public}s, get form host record by formId", __func__);
     std::lock_guard<std::recursive_mutex> lock(formHostRecordMutex_);
     for (auto &record : clientRecords_) {
         if (record.Contains(formId)) {
-            formHostRecord = record;
-            return true;
+            formHostRecords.emplace_back(record);
         }
     }
-
-    HILOG_ERROR("%{public}s, form host record not find", __func__);
-    return false;
+    HILOG_DEBUG("%{public}s, get form host record by formId, size is %{public}zu", __func__, formHostRecords.size());
 }
 /**
  * @brief Delete form host record.
@@ -607,6 +604,22 @@ bool FormDataMgr::IsEnableUpdate(int64_t formId)
     return false;
 }
 
+int64_t FormDataMgr::PaddingUdidHash(const int64_t formId)
+{
+    if (!GenerateUdidHash()) {
+        return -1;
+    }
+    // Compatible with int form id.
+    uint64_t unsignedFormId = static_cast<uint64_t>(formId);
+    if ((unsignedFormId & 0xffffffff00000000L) == 0) {
+        uint64_t unsignedUdidHash  = static_cast<uint64_t>(udidHash_);
+        uint64_t unsignedUdidHashFormId = unsignedUdidHash | unsignedFormId;
+        int64_t udidHashFormId = static_cast<int64_t>(unsignedUdidHashFormId);
+        return udidHashFormId;
+    }
+    return formId;
+}
+
 /**
  * @brief Generate form id.
  * @return form id.
@@ -614,9 +627,9 @@ bool FormDataMgr::IsEnableUpdate(int64_t formId)
 int64_t FormDataMgr::GenerateFormId()
 {
     // generate by udidHash_
-    if (udidHash_ < 0) {
+    if (!GenerateUdidHash()) {
         HILOG_ERROR("%{public}s fail, generateFormId no invalid udidHash_", __func__);
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+        return -1;
     }
     return FormUtil::GenerateFormId(udidHash_);
 }

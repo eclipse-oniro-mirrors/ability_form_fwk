@@ -79,10 +79,6 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    if (formId > 0 && FormDataMgr::GetInstance().IsRequestPublishForm(formId)) {
-        return AddRequestPublishForm(formId, want, callerToken, formInfo);
-    }
-
     // check form count limit
     bool tempFormFlag = want.GetBoolParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
     int callingUid = IPCSkeleton::GetCallingUid();
@@ -108,23 +104,27 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
     // get from config info
     FormItemInfo formItemInfo;
     int32_t errCode = GetFormConfigInfo(want, formItemInfo);
-    formItemInfo.SetFormId(formId);
     if (errCode != ERR_OK) {
         HILOG_ERROR("%{public}s fail, get form config info failed.", __func__);
         return errCode;
     }
-    if (!formItemInfo.IsValidItem()) {
-        HILOG_ERROR("%{public}s fail, input param itemInfo is invalid", __func__);
-        return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
+    formItemInfo.SetFormId(formId);
+
+    // publish form
+    if (formId > 0 && FormDataMgr::GetInstance().IsRequestPublishForm(formId)) {
+        return AddRequestPublishForm(formItemInfo, want, callerToken, formInfo);
     }
-    if (!FormDataMgr::GetInstance().GenerateUdidHash()) {
-        HILOG_ERROR("%{public}s fail, generate udid hash failed", __func__);
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+
+    Want newWant(want);
+    // in application form
+    if (formItemInfo.GetProviderBundleName() == formItemInfo.GetHostBundleName()) {
+        HILOG_DEBUG("form in application");
+        newWant.SetParam(Constants::PARAM_FORM_HOST_TOKEN, callerToken);
     }
-    formItemInfo.SetDeviceId(want.GetElement().GetDeviceID());
-    WantParams wantParams = want.GetParams();
-    if (formId == 0 && FormShareMgr::GetInstance().IsShareForm(want)) {
-        FormShareMgr::GetInstance().AddProviderData(want, wantParams);
+    WantParams wantParams = newWant.GetParams();
+    // share form
+    if (formId == 0 && FormShareMgr::GetInstance().IsShareForm(newWant)) {
+        FormShareMgr::GetInstance().AddProviderData(newWant, wantParams);
     }
     if (formId > 0) {
         return AllotFormById(formItemInfo, callerToken, wantParams, formInfo);
@@ -691,9 +691,10 @@ int FormMgrAdapter::DumpFormInfoByFormId(const std::int64_t formId, std::string 
         reply = ERR_OK;
     }
 
-    FormHostRecord formHostRecord;
-    if (FormDataMgr::GetInstance().GetFormHostRecord(formId, formHostRecord)) {
-        FormDumpMgr::GetInstance().DumpFormHostInfo(formHostRecord, formInfo);
+    std::vector<FormHostRecord> formHostRecords;
+    FormDataMgr::GetInstance().GetFormHostRecord(formId, formHostRecords);
+    for (const auto &iter : formHostRecords) {
+        FormDumpMgr::GetInstance().DumpFormHostInfo(iter, formInfo);
         reply = ERR_OK;
     }
 
@@ -757,6 +758,12 @@ ErrCode FormMgrAdapter::GetFormConfigInfo(const Want &want, FormItemInfo &formCo
         return errCode;
     }
     formConfigInfo.SetPackageName(packageName);
+    formConfigInfo.SetDeviceId(want.GetElement().GetDeviceID());
+
+    if (!formConfigInfo.IsValidItem()) {
+        HILOG_ERROR("%{public}s fail, input param itemInfo is invalid", __func__);
+        return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
+    }
 
     HILOG_DEBUG("GetFormConfigInfo end.");
     return ERR_OK;
@@ -772,7 +779,7 @@ ErrCode FormMgrAdapter::GetFormConfigInfo(const Want &want, FormItemInfo &formCo
 ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
     const sptr<IRemoteObject> &callerToken, const WantParams &wantParams, FormJsInfo &formInfo)
 {
-    int64_t formId = PaddingUdidHash(info.GetFormId());
+    int64_t formId = FormDataMgr::GetInstance().PaddingUdidHash(info.GetFormId());
     FormRecord record;
     bool hasRecord = FormDataMgr::GetInstance().GetFormRecord(formId, record);
     if (hasRecord && record.formTempFlag) {
@@ -810,19 +817,7 @@ ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
 
     return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
 }
-int64_t FormMgrAdapter::PaddingUdidHash(const int64_t formId) const
-{
-    // Compatible with int form id.
-    uint64_t unsignedFormId = static_cast<uint64_t>(formId);
-    if ((unsignedFormId & 0xffffffff00000000L) == 0) {
-        int64_t udidHash = FormDataMgr::GetInstance().GetUdidHash();
-        uint64_t unsignedUdidHash  = static_cast<uint64_t>(udidHash);
-        uint64_t unsignedUdidHashFormId = unsignedUdidHash | unsignedFormId;
-        int64_t udidHashFormId = static_cast<int64_t>(unsignedUdidHashFormId);
-        return udidHashFormId;
-    }
-    return formId;
-}
+
 ErrCode FormMgrAdapter::AddExistFormRecord(const FormItemInfo &info, const sptr<IRemoteObject> &callerToken,
     const FormRecord &record, const int64_t formId, const WantParams &wantParams, FormJsInfo &formInfo)
 {
@@ -941,7 +936,11 @@ ErrCode FormMgrAdapter::AddNewFormRecord(const FormItemInfo &info, const int64_t
     }
 
     // start update timer
-    return AddFormTimer(formRecord);
+    if (info.GetProviderBundleName() != info.GetHostBundleName()) {
+        return AddFormTimer(formRecord);
+    }
+
+    return ERR_OK;
 }
 
 /**
@@ -1533,12 +1532,13 @@ ErrCode FormMgrAdapter::CheckAddRequestPublishForm(const Want &want, const Want 
     return ERR_OK;
 }
 
-ErrCode FormMgrAdapter::AddRequestPublishForm(const int64_t formId, const Want &want,
+ErrCode FormMgrAdapter::AddRequestPublishForm(const FormItemInfo &formItemInfo, const Want &want,
     const sptr<IRemoteObject> &callerToken, FormJsInfo &formJsInfo)
 {
     HILOG_INFO("Add request publish form.");
     Want formProviderWant;
     std::unique_ptr<FormProviderData> formProviderData = nullptr;
+    auto formId = formItemInfo.GetFormId();
     ErrCode errCode = FormDataMgr::GetInstance().GetRequestPublishFormInfo(formId, formProviderWant, formProviderData);
     if (errCode != ERR_OK) {
         HILOG_ERROR("Failed to get request publish form");
@@ -1548,19 +1548,6 @@ ErrCode FormMgrAdapter::AddRequestPublishForm(const int64_t formId, const Want &
     errCode = CheckAddRequestPublishForm(want, formProviderWant);
     if (errCode != ERR_OK) {
         return errCode;
-    }
-
-    FormItemInfo formItemInfo;
-    errCode = GetFormConfigInfo(want, formItemInfo);
-    formItemInfo.SetFormId(formId);
-    formItemInfo.SetDeviceId(want.GetElement().GetDeviceID());
-    if (errCode != ERR_OK) {
-        HILOG_ERROR("%{public}s fail, get form config info failed.", __func__);
-        return errCode;
-    }
-    if (!formItemInfo.IsValidItem()) {
-        HILOG_ERROR("%{public}s fail, input param itemInfo is invalid", __func__);
-        return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
 
     int32_t callingUid = IPCSkeleton::GetCallingUid();
@@ -1586,7 +1573,8 @@ ErrCode FormMgrAdapter::AddRequestPublishForm(const int64_t formId, const Want &
     }
     // storage info
     if (!formItemInfo.IsTemporaryForm()) {
-        if (ErrCode errorCode = FormDbCache::GetInstance().UpdateDBRecord(formId, formRecord); errorCode != ERR_OK) {
+        if (ErrCode errorCode = FormDbCache::GetInstance().UpdateDBRecord(formId, formRecord);
+            errorCode != ERR_OK) {
             HILOG_ERROR("%{public}s fail, UpdateDBRecord failed", __func__);
             return errorCode;
         }
@@ -1908,15 +1896,6 @@ int FormMgrAdapter::BatchAddFormRecords(const Want &want)
             HILOG_ERROR("%{public}s fail, get form config info failed.", __func__);
             return errCode;
         }
-        if (!formItemInfo.IsValidItem()) {
-            HILOG_ERROR("%{public}s fail, input param itemInfo is invalid", __func__);
-            return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
-        }
-        if (!FormDataMgr::GetInstance().GenerateUdidHash()) {
-            HILOG_ERROR("%{public}s fail, generate udid hash failed", __func__);
-            return ERR_APPEXECFWK_FORM_COMMON_CODE;
-        }
-
         // generate formId
         int64_t newFormId = FormDataMgr::GetInstance().GenerateFormId();
         if (newFormId < 0) {

@@ -159,9 +159,9 @@ HWTEST_F(FmsFormMgrDeathCallbackTest, OnRemoteDied_001, TestSize.Level0)
 
     int64_t formId = formJsInfo.formId;
 
-    FormHostRecord hostRecord;
-    EXPECT_EQ(true, FormDataMgr::GetInstance().GetFormHostRecord(formId, hostRecord));
-    EXPECT_EQ(true, token_->AsObject() == hostRecord.formHostClient_);
+    std::vector<FormHostRecord> hostRecords;
+    FormDataMgr::GetInstance().GetFormHostRecord(formId, hostRecords);
+    EXPECT_EQ(true, token_->AsObject() == hostRecords[0].formHostClient_);
     EXPECT_EQ(true, FormMgr::GetRecoverStatus() == Constants::NOT_IN_RECOVERY);
 
     FormMgr::GetInstance().UnRegisterDeathCallback(deathCallback);

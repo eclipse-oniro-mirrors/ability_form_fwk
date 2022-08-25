@@ -949,9 +949,10 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormHostRecord_001, TestSize.
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormHostRecord_001 start";
 
     int64_t formId = 1;
-    FormHostRecord formHostRecord;
+    std::vector<FormHostRecord> formHostRecords;
 
-    EXPECT_EQ(false, formDataMgr_.GetFormHostRecord(formId, formHostRecord));
+    formDataMgr_.GetFormHostRecord(formId, formHostRecords);
+    EXPECT_EQ(true, formHostRecords.empty());
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormHostRecord_001 end";
 }
@@ -968,7 +969,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormHostRecord_002, TestSize.
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormHostRecord_002 start";
 
     int64_t formId = 2;
-    FormHostRecord formHostRecord;
+    std::vector<FormHostRecord> formHostRecords;
 
     // create clientRecords_
     FormHostRecord form_host_record;
@@ -976,8 +977,8 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormHostRecord_002, TestSize.
     form_host_record.AddForm(formId);
     formDataMgr_.clientRecords_.push_back(form_host_record);
 
-    EXPECT_EQ(true, formDataMgr_.GetFormHostRecord(formId, formHostRecord));
-    EXPECT_EQ(true, formHostRecord.forms_[formId]);
+    formDataMgr_.GetFormHostRecord(formId, formHostRecords);
+    EXPECT_EQ(true, formHostRecords[0].forms_[formId]);
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormHostRecord_002 end";
 }

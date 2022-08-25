@@ -13,11 +13,13 @@
  * limitations under the License.
  */
 
+#include "form_host_client.h"
+
 #include <cinttypes>
 
 #include "hilog_wrapper.h"
 #include "form_constants.h"
-#include "form_host_client.h"
+#include "form_caller_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -152,21 +154,20 @@ bool FormHostClient::RegisterUninstallCallback(UninstallCallback callback)
     return true;
 }
 
-/**
- * @brief Request to give back a form.
- *
- * @param formJsInfo Form js info.
- * @return none.
- */
-void FormHostClient::OnAcquired(const FormJsInfo &formJsInfo)
+void FormHostClient::OnAcquired(const FormJsInfo &formJsInfo, const sptr<IRemoteObject> &token)
 {
-    HILOG_INFO("%{public}s called.", __func__);
-    HILOG_INFO("Imamge number is %{public}zu.", formJsInfo.imageDataMap.size());
+    HILOG_DEBUG("%{public}s called, image number is %{public}zu.",  __func__, formJsInfo.imageDataMap.size());
     int64_t formId = formJsInfo.formId;
     if (formId < 0) {
         HILOG_ERROR("%{public}s error, the passed form id can't be negative.", __func__);
         return;
     }
+
+    if (token != nullptr) {
+        HILOG_DEBUG("save token to form remote mgr.");
+        FormCallerMgr::GetInstance().SetFormHostCaller(formId, token);
+    }
+
     std::lock_guard<std::mutex> lock(callbackMutex_);
     auto iter = formCallbackMap_.find(formId);
     if (iter == formCallbackMap_.end()) {
