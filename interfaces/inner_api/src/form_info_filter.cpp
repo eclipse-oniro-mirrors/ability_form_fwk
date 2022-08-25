@@ -12,22 +12,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_FORM_FWK_MOCK_FORM_MGR_PROXY_H
-#define OHOS_FORM_FWK_MOCK_FORM_MGR_PROXY_H
-
-#include <gtest/gtest.h>
-#include "gmock/gmock.h"
-#include "form_mgr_proxy.h"
+#include "form_info_filter.h"
+#include "hilog_wrapper.h"
+// for string conversions
+#include "string_ex.h"
 
 namespace OHOS {
 namespace AppExecFwk {
-class MockFormMgrProxy : public FormMgrProxy {
-public:
-    MockFormMgrProxy(const sptr<IRemoteObject> &impl) : FormMgrProxy(impl) {};
-    MOCK_METHOD2(GetFormsInfo, int(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos));
-    MOCK_METHOD0(IsRequestPublishFormSupported, bool());
-    MOCK_METHOD2(StartAbility, int32_t(const Want &want, const sptr<IRemoteObject> &callerToken));
-};
+bool FormInfoFilter::Marshalling(Parcel &parcel) const
+{
+    if (!parcel.WriteString16(Str8ToStr16(moduleName))) {
+        HILOG_ERROR("FormInfoFilter::Marshalling: failed to marshall moduleName");
+        return false;
+    }
+    return true;
 }
+
+FormInfoFilter *FormInfoFilter::Unmarshalling(Parcel &parcel)
+{
+    FormInfoFilter *filter = new (std::nothrow) FormInfoFilter();
+
+    // deserializations
+    filter->moduleName = Str16ToStr8(parcel.ReadString16());
+    return filter;
 }
-#endif // OHOS_FORM_FWK_MOCK_FORM_MGR_PROXY_H
+} // OHOS
+} // AppExecFwk

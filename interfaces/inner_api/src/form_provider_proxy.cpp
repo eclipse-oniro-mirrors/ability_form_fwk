@@ -18,15 +18,8 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-/**
- * @brief Acquire to give back an ProviderFormInfo. This is sync API.
- * @param formId The Id of the from.
- * @param want Indicates the {@link Want} structure containing form info.
- * @param callerToken Caller ability token.
- * @return Returns ERR_OK on success, others on failure.
- */
 int FormProviderProxy::AcquireProviderFormInfo(
-    const int64_t formId,
+    const FormJsInfo &formJsInfo,
     const Want &want,
     const sptr<IRemoteObject> &callerToken)
 {
@@ -39,8 +32,8 @@ int FormProviderProxy::AcquireProviderFormInfo(
         HILOG_ERROR("%{public}s, failed to write interface token", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (!data.WriteInt64(formId)) {
-        HILOG_ERROR("%{public}s fail, write want error", __func__);
+    if (!data.WriteParcelable(&formJsInfo)) {
+        HILOG_ERROR("%{public}s fail, write formJsInfo error", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.WriteParcelable(&want)) {

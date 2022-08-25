@@ -75,7 +75,8 @@ sptr<MockFormMgrProxy> FormMgrTest::mockProxy = nullptr;
 HWTEST_F(FormMgrTest, FormMgrTest_0001, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0001 starts";
     // initialize input parameters.
-    std::string moduleName = "";
+    FormInfoFilter filter;
+    filter.moduleName = "";
     std::vector<FormInfo> formInfos;
     // setup expectations.
     std::vector<FormInfo> expectFormInfos;
@@ -86,7 +87,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0001, TestSize.Level1) {
         .Times(1)
         .WillOnce(DoAll(SetArgReferee<1>(expectFormInfos), Return(ERR_OK)));
     // test.
-    FormMgr::GetInstance().GetFormsInfo(moduleName, formInfos);
+    FormMgr::GetInstance().GetFormsInfo(filter, formInfos);
     // expect result.
     EXPECT_THAT(formInfos, ContainerEq(expectFormInfos));
     // FormMgr is a singleton, therefore, deleteing it will cause segfault for other invocations.
@@ -103,7 +104,8 @@ HWTEST_F(FormMgrTest, FormMgrTest_0001, TestSize.Level1) {
 HWTEST_F(FormMgrTest, FormMgrTest_0002, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0002 starts";
     // initialize input parameters.
-    std::string moduleName = "empty";
+    FormInfoFilter filter;
+    filter.moduleName = "empty";
     std::vector<FormInfo> formInfos;
     // setup expectations.
     std::vector<FormInfo> expectFormInfos;
@@ -115,7 +117,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0002, TestSize.Level1) {
         .Times(1)
         .WillOnce(Return(ERR_OK));
     // test.
-    FormMgr::GetInstance().GetFormsInfo(moduleName, formInfos);
+    FormMgr::GetInstance().GetFormsInfo(filter, formInfos);
     // expect result.
     EXPECT_EQ(formInfos.size(), 0);
     testing::Mock::AllowLeak(mockProxy);

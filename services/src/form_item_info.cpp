@@ -456,14 +456,6 @@ std::string FormItemInfo::GetIcon() const
     return icon_;
 }
 /**
- * @brief Set value of icon_.
- * @param icon bundle version name.
- */
-void FormItemInfo::SetIcon(const std::string &icon)
-{
-    icon_ = icon;
-}
-/**
  * @brief Get deviceId_.
  * @return deviceId_.
  */

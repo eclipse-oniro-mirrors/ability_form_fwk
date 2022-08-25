@@ -43,7 +43,7 @@ private:
      * @param callerToken, Caller ability token.
      * @return none.
      */
-    virtual int AcquireProviderFormInfo(const int64_t formId, const Want &want,
+    virtual int AcquireProviderFormInfo(const FormJsInfo &formJsInfo, const Want &want,
         const sptr<IRemoteObject> &callerToken) override;
 
     /**
@@ -66,7 +66,7 @@ private:
      */
     virtual int NotifyFormsDelete(const std::vector<int64_t> &formIds, const Want &want,
         const sptr<IRemoteObject> &callerToken) override;
-    
+
     /**
      * @brief Notify provider when the form need update.
      * @param formId The Id of the form.

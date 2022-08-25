@@ -182,7 +182,7 @@ public:
     std::string GetHostBundleName() const;
     /**
      * @brief Set hostBundleName_.
-     * @param hostBandleName Host bundle name.
+     * @param hostBundleName Host bundle name.
      */
     void SetHostBundleName(const std::string &hostBundleName);
 

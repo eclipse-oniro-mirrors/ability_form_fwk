@@ -390,5 +390,26 @@ bool FormProviderData::WriteImageDataToParcel(Parcel &parcel, std::string picNam
 
     return true;
 }
+
+bool FormProviderData::ConvertRawImageData()
+{
+    HILOG_INFO("%{public}s called", __func__);
+    for (auto &entry : rawImageBytesMap_) {
+        sptr<FormAshmem> formAshmem = new (std::nothrow) FormAshmem();
+        if (formAshmem == nullptr) {
+            HILOG_ERROR("%{public}s alloc shmem failed", __func__);
+            return false;
+        }
+        if (!formAshmem->WriteToAshmem(entry.first, entry.second.first, entry.second.second)) {
+            HILOG_ERROR("%{public}s write to shmem failed", __func__);
+            return false;
+        }
+        std::pair<sptr<FormAshmem>, int32_t> imageDataRecord = std::make_pair(formAshmem, entry.second.second);
+        imageDataMap_[entry.first] = imageDataRecord;
+    }
+    rawImageBytesMap_.clear();
+    HILOG_INFO("%{public}s end", __func__);
+    return true;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -127,8 +127,9 @@ NativeValue* FormBindingDataInit(NativeEngine* engine, NativeValue* exportObj)
     auto formBindingData = std::make_unique<FormBindingData>(formProviderData);
     object->SetNativePointer(formBindingData.release(), FormBindingData::Finalizer, nullptr);
 
-    BindNativeFunction(*engine, *object, "createFormBindingData", FormBindingData::CreateFormBindingData);
-    BindNativeFunction(*engine, *object, "addFormBindingImage", FormBindingData::AddFormBindingImage);
+    const char *moduleName = "FormBindingData";
+    BindNativeFunction(*engine, *object, "createFormBindingData", moduleName, FormBindingData::CreateFormBindingData);
+    BindNativeFunction(*engine, *object, "addFormBindingImage", moduleName, FormBindingData::AddFormBindingImage);
 
     HILOG_INFO("%{public}s called end.", __func__);
     return exportObj;

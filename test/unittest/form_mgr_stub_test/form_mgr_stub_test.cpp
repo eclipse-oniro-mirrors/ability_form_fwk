@@ -77,8 +77,9 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0001, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0001 starts";
     // initialize input parameters.
     MessageParcel data;
-    std::string moduleName = "";
-    data.WriteString(moduleName);
+    FormInfoFilter filter;
+    filter.moduleName = "";
+    data.WriteParcelable(&filter);
     MessageParcel reply;
     // set up return vector.
     std::vector<FormInfo> returnInfos;
@@ -118,8 +119,9 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0002, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrStubTest_0002 starts";
     // initialize input parameters.
     MessageParcel data;
-    std::string moduleName = "";
-    data.WriteString(moduleName);
+    FormInfoFilter filter;
+    filter.moduleName = "";
+    data.WriteParcelable(&filter);
     MessageParcel reply;
     EXPECT_CALL(*mockFormMgrService, GetFormsInfo(_, _))
         .Times(1)

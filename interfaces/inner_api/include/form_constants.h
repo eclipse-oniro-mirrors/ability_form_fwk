@@ -55,6 +55,7 @@ namespace Constants {
     constexpr const char* LOCAL_BUNDLES = "/data/bundles";
     constexpr const char* FORM_PUBLISH_ACTION = "action.form.publish";
     constexpr const char* PARAM_DEVICE_ID_KEY = "ohos.extra.param.key.device_id";
+    constexpr const char* PARAM_FORM_HOST_CALLBACK = "ohos.extra.param.host.callback";
     constexpr int32_t TYPE_RESET_LIMIT = 1;
     constexpr int32_t TYPE_STATIC_UPDATE = 2;
     constexpr int32_t TYPE_DYNAMIC_UPDATE = 3;
@@ -183,8 +184,6 @@ namespace Constants {
         // ipc id for dumping state (2001)
         FORM_MGR_DUMP_STATE = 2001,
     };
-
-    constexpr const char* FORM_STORAGE_DIR = "/data/service/el1/public/database/form_storage";
 }  // namespace Constants
 }  // namespace AppExecFwk
 }  // namespace OHOS

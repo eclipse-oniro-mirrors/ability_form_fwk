@@ -18,6 +18,7 @@
 
 #include <vector>
 #include "form_info.h"
+#include "form_info_filter.h"
 #include "form_js_info.h"
 #include "form_provider_data.h"
 #include "form_share_info.h"
@@ -287,11 +288,11 @@ public:
     /**
     * @brief This function is called by formProvider and gets forms info by the bundle name of the calling ability.
     *        The bundle name will be retrieved by form service manager.
-    * @param moduleName the module that the formInfos have to belong to.
+    * @param filter Filter that contains attributes that the formInfos have to have.
     * @param formInfos Return the forms' information of the calling bundle name
     * @return Returns ERR_OK on success, others on failure.
     */
-    virtual int32_t GetFormsInfo(const std::string &moduleName, std::vector<FormInfo> &formInfos) = 0;
+    virtual int32_t GetFormsInfo(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos) = 0;
 
     /**
      * @brief Check if the request of publishing a form is supported by the host.

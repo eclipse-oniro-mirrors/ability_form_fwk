@@ -16,6 +16,7 @@
 #include "form_bms_helper.h"
 
 #include "ability_manager_interface.h"
+#include "form_mgr_errors.h"
 #include "hilog_wrapper.h"
 #include "if_system_ability_manager.h"
 #include "in_process_call_wrapper.h"
@@ -174,5 +175,30 @@ bool FormBmsHelper::GetBundleInfo(const std::string &bundleName, int32_t userId,
     int32_t flags = BundleFlag::GET_BUNDLE_WITH_ABILITIES;
     return (IN_PROCESS_CALL(iBundleMgr->GetBundleInfo(bundleName, flags, bundleInfo, userId)));
 }
-}  // namespace AppExecFwk
-}  // namespace OHOS
+
+int32_t FormBmsHelper::GetCallerBundleName(std::string &callerBundleName)
+{
+    sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
+    if (iBundleMgr == nullptr) {
+        HILOG_ERROR("%{public}s, failed to get IBundleMgr.", __func__);
+        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
+    }
+    auto callingUid = IPCSkeleton::GetCallingUid();
+    if (!IN_PROCESS_CALL(iBundleMgr->GetBundleNameForUid(callingUid, callerBundleName))) {
+        HILOG_ERROR("%{public}s, failed to get form config info.", __func__);
+        return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
+    }
+    return ERR_OK;
+}
+
+int32_t FormBmsHelper::GetUidByBundleName(const std::string &bundleName, const int32_t userId)
+{
+    sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
+    if (iBundleMgr == nullptr) {
+        HILOG_ERROR("%{public}s, failed to get IBundleMgr.", __func__);
+        return INVALID_UID;
+    }
+    return IN_PROCESS_CALL(iBundleMgr->GetUidByBundleName(bundleName, userId));
+}
+} // namespace AppExecFwk
+} // namespace OHOS

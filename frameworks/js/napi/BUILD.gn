@@ -283,6 +283,7 @@ ohos_shared_library("formutil_napi") {
     "ability_runtime:abilitykit_native",
     "ability_runtime:runtime",
     "bundle_framework:appexecfwk_base",
+    "form_fwk:form_manager",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "napi:ace_napi",

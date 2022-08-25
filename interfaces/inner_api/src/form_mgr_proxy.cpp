@@ -1110,7 +1110,7 @@ int FormMgrProxy::GetFormsInfoByModule(std::string &bundleName, std::string &mod
     return error;
 }
 
-int32_t FormMgrProxy::GetFormsInfo(const std::string &moduleName, std::vector<FormInfo> &formInfos)
+int32_t FormMgrProxy::GetFormsInfo(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos)
 {
     HILOG_INFO("%{public}s start.", __func__);
     MessageParcel data;
@@ -1119,8 +1119,8 @@ int32_t FormMgrProxy::GetFormsInfo(const std::string &moduleName, std::vector<Fo
         HILOG_ERROR("%{public}s, failed to write interface token", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (!data.WriteString(moduleName)) {
-        HILOG_ERROR("%{public}s, failed to write moduleName [%{public}s]", __func__, moduleName.c_str());
+    if (!data.WriteParcelable(&filter)) {
+        HILOG_ERROR("%{public}s, failed to write FormInfoFilter", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     // call private GetFormsInfo with Message which will send request to tell stub which handle function to be used.

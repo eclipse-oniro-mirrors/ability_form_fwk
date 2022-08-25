@@ -60,7 +60,7 @@ public:
      * @param record Form record.
      * @param formInfo Js info.
      */
-    void CreateFormInfo(const int64_t formId, const FormRecord &record, FormJsInfo &formInfo);
+    void CreateFormJsInfo(const int64_t formId, const FormRecord &record, FormJsInfo &formInfo);
     /**
      * @brief Delete form js info by form record.
      * @param formId The Id of the form.

@@ -144,7 +144,6 @@ void FormDumpMgr::DumpFormInfo(const FormRecord &formRecordInfo, std::string &fo
     formInfo += "    versionCode [" + std::to_string(formRecordInfo.versionCode) + "]\n";
     formInfo += "    versionName [" + formRecordInfo.versionName + "]\n";
     formInfo += "    compatibleVersion [" + std::to_string(formRecordInfo.compatibleVersion) + "]\n";
-    formInfo += "    icon [" + formRecordInfo.icon + "]\n";
     formInfo += "    userId [" + std::to_string(formRecordInfo.userId) + "]\n";
 
     if (!formRecordInfo.hapSourceDirs.empty()) {

@@ -23,7 +23,7 @@ namespace OHOS {
 namespace AbilityRuntime {
 EXTERN_C_START
 
-bool ConvertFormInfoFilter(NativeEngine &engine, NativeValue* jsValue, FormInfoFilter &formInfoFilter)
+bool ConvertFormInfoFilter(NativeEngine &engine, NativeValue* jsValue, AppExecFwk::FormInfoFilter &formInfoFilter)
 {
     if (jsValue->TypeOf() != NATIVE_OBJECT) {
         HILOG_ERROR("%{public}s, an object is expected, but an argument of different type is passed in.", __func__);

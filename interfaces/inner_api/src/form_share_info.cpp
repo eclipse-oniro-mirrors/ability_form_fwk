@@ -28,7 +28,7 @@ bool FormShareInfo::ReadFromParcel(Parcel &parcel)
     moduleName = Str16ToStr8(parcel.ReadString16());
     abilityName = Str16ToStr8(parcel.ReadString16());
     formTempFlag = parcel.ReadBool();
-    dimensionId = parcel.ReadUint32();
+    dimensionId = parcel.ReadInt32();
 
     std::unique_ptr<AAFwk::WantParams> wantParams(parcel.ReadParcelable<AAFwk::WantParams>());
     if (wantParams == nullptr) {
