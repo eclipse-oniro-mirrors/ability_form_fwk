@@ -37,9 +37,9 @@ DistributedSchedStub::~DistributedSchedStub()
 }
 
 int32_t DistributedSchedStub::OnRemoteRequest(uint32_t code,
-    MessageParcel& data, MessageParcel& reply, MessageOption& option)
+    MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    const auto& funcsMap = localFuncsMap_;
+    const auto &funcsMap = localFuncsMap_;
     auto iter = funcsMap.find(code);
     if (iter != funcsMap.end()) {
         auto func = iter->second;
@@ -54,7 +54,7 @@ int32_t DistributedSchedStub::OnRemoteRequest(uint32_t code,
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 
-bool DistributedSchedStub::EnforceInterfaceToken(MessageParcel& data)
+bool DistributedSchedStub::EnforceInterfaceToken(MessageParcel &data)
 {
     u16string interfaceToken = data.ReadInterfaceToken();
     return interfaceToken == DMS_STUB_INTERFACE_TOKEN;

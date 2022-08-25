@@ -31,14 +31,14 @@ namespace DistributedSchedule {
 class DistributedSchedStub : public IRemoteStub<IDistributedSched> {
 public:
     DistributedSchedStub();
-    ~DistributedSchedStub();
-    int32_t OnRemoteRequest(uint32_t code, MessageParcel& data,
-        MessageParcel& reply, MessageOption& option) override;
+    virtual ~DistributedSchedStub();
+    int32_t OnRemoteRequest(uint32_t code, MessageParcel &data,
+        MessageParcel &reply, MessageOption &option) override;
 
     int32_t StartRemoteShareFormInner(MessageParcel &data, MessageParcel &reply);
-    bool EnforceInterfaceToken(MessageParcel& data);
-    MOCK_METHOD2(StartRemoteShareForm, int32_t(const std::string &, const AppExecFwk::FormShareInfo &));
-    using DistributedSchedFunc = int32_t(DistributedSchedStub::*)(MessageParcel& data, MessageParcel& reply);
+    bool EnforceInterfaceToken(MessageParcel &data);
+    MOCK_METHOD2(StartRemoteShareForm, int32_t(const std::string&, const AppExecFwk::FormShareInfo&));
+    using DistributedSchedFunc = int32_t(DistributedSchedStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, DistributedSchedFunc> localFuncsMap_;
 };
 
@@ -46,33 +46,33 @@ public:
 class DistributedSchedService : public DistributedSchedStub {
 public:
     DistributedSchedService() = default;
-    ~DistributedSchedService() = default;
+    virtual ~DistributedSchedService() = default;
 
     MOCK_METHOD5(SendResultFromRemote,
         int32_t(OHOS::AAFwk::Want&, int32_t, const CallerInfo&, const AccountInfo&, int32_t));
 
-    int32_t StartRemoteAbility(const OHOS::AAFwk::Want& want, int32_t callerUid, int32_t requestCode,
+    int32_t StartRemoteAbility(const OHOS::AAFwk::Want &want, int32_t callerUid, int32_t requestCode,
         uint32_t accessToken) override
     {
         return 0;
     }
-    int32_t StartAbilityFromRemote(const OHOS::AAFwk::Want& want,
-        const OHOS::AppExecFwk::AbilityInfo& abilityInfo, int32_t requestCode, const CallerInfo& callerInfo,
-        const AccountInfo& accountInfo) override
+    int32_t StartAbilityFromRemote(const OHOS::AAFwk::Want &want,
+        const OHOS::AppExecFwk::AbilityInfo &abilityInfo, int32_t requestCode, const CallerInfo &callerInfo,
+        const AccountInfo &accountInfo) override
     {
         return 0;
     }
-    int32_t ContinueMission(const std::string& srcDeviceId, const std::string& dstDeviceId,
-        int32_t missionId, const sptr<IRemoteObject>& callback, const OHOS::AAFwk::WantParams& wantParams) override
+    int32_t ContinueMission(const std::string &srcDeviceId, const std::string &dstDeviceId,
+        int32_t missionId, const sptr<IRemoteObject> &callback, const OHOS::AAFwk::WantParams &wantParams) override
     {
         return 0;
     }
-    int32_t StartContinuation(const OHOS::AAFwk::Want& want, int32_t missionId, int32_t callerUid,
+    int32_t StartContinuation(const OHOS::AAFwk::Want &want, int32_t missionId, int32_t callerUid,
         int32_t status, uint32_t accessToken) override
     {
         return 0;
     }
-    void NotifyCompleteContinuation(const std::u16string& devId, int32_t sessionId, bool isSuccess) override
+    void NotifyCompleteContinuation(const std::u16string &devId, int32_t sessionId, bool isSuccess) override
     {
         return;
     }
@@ -80,55 +80,55 @@ public:
     {
         return 0;
     }
-    int32_t ConnectRemoteAbility(const OHOS::AAFwk::Want& want, const sptr<IRemoteObject>& connect,
+    int32_t ConnectRemoteAbility(const OHOS::AAFwk::Want &want, const sptr<IRemoteObject> &connect,
         int32_t callerUid, int32_t callerPid, uint32_t accessToken) override
     {
         return 0;
     }
-    int32_t DisconnectRemoteAbility(const sptr<IRemoteObject>& connect, int32_t callerUid,
+    int32_t DisconnectRemoteAbility(const sptr<IRemoteObject> &connect, int32_t callerUid,
         uint32_t accessToken) override
     {
         return 0;
     }
-    int32_t ConnectAbilityFromRemote(const OHOS::AAFwk::Want& want, const AppExecFwk::AbilityInfo& abilityInfo,
-        const sptr<IRemoteObject>& connect, const CallerInfo& callerInfo, const AccountInfo& accountInfo) override
+    int32_t ConnectAbilityFromRemote(const OHOS::AAFwk::Want &want, const AppExecFwk::AbilityInfo &abilityInfo,
+        const sptr<IRemoteObject> &connect, const CallerInfo &callerInfo, const AccountInfo &accountInfo) override
     {
         return 0;
     }
-    int32_t DisconnectAbilityFromRemote(const sptr<IRemoteObject>& connect,
-        int32_t uid, const std::string& sourceDeviceId) override
+    int32_t DisconnectAbilityFromRemote(const sptr<IRemoteObject> &connect,
+        int32_t uid, const std::string &sourceDeviceId) override
     {
         return 0;
     }
-    int32_t NotifyProcessDiedFromRemote(const CallerInfo& callerInfo) override
+    int32_t NotifyProcessDiedFromRemote(const CallerInfo &callerInfo) override
     {
         return 0;
     }
 #ifdef SUPPORT_DISTRIBUTED_MISSION_MANAGER
-    int32_t GetMissionInfos(const std::string& deviceId, int32_t numMissions,
-        std::vector<AAFwk::MissionInfo>& missionInfos) override
+    int32_t GetMissionInfos(const std::string &deviceId, int32_t numMissions,
+        std::vector<AAFwk::MissionInfo> &missionInfos) override
     {
         return 0;
     }
-    int32_t StoreSnapshotInfo(const std::string& deviceId, int32_t missionId,
+    int32_t StoreSnapshotInfo(const std::string &deviceId, int32_t missionId,
         const uint8_t* byteStream, size_t len) override
     {
         return 0;
     }
-    int32_t RemoveSnapshotInfo(const std::string& deviceId, int32_t missionId) override
+    int32_t RemoveSnapshotInfo(const std::string &deviceId, int32_t missionId) override
     {
         return 0;
     }
-    int32_t NotifyMissionsChangedFromRemote(const std::vector<DstbMissionInfo>& missionInfos,
-        const CallerInfo& callerInfo) override
+    int32_t NotifyMissionsChangedFromRemote(const std::vector<DstbMissionInfo> &missionInfos,
+        const CallerInfo &callerInfo) override
     {
         return 0;
     }
-    int32_t CheckSupportOsd(const std::string& deviceId) override
+    int32_t CheckSupportOsd(const std::string &deviceId) override
     {
         return 0;
     }
-    void GetCachedOsdSwitch(std::vector<std::u16string>& deviceIds, std::vector<int32_t>& values) override
+    void GetCachedOsdSwitch(std::vector<std::u16string> &deviceIds, std::vector<int32_t> &values) override
     {
         return 0;
     }
@@ -136,62 +136,62 @@ public:
     {
         return 0;
     }
-    int32_t UpdateOsdSwitchValueFromRemote(int32_t switchVal, const std::string& sourceDeviceId) override
+    int32_t UpdateOsdSwitchValueFromRemote(int32_t switchVal, const std::string &sourceDeviceId) override
     {
         return 0;
     }
-    std::unique_ptr<Snapshot> GetRemoteSnapshotInfo(const std::u16string& deviceId, int32_t missionId) override
+    std::unique_ptr<Snapshot> GetRemoteSnapshotInfo(const std::u16string &deviceId, int32_t missionId) override
     {
         return 0;
     }
-    int32_t GetRemoteMissionSnapshotInfo(const std::string& networkId, int32_t missionId,
-        std::unique_ptr<AAFwk::MissionSnapshot>& missionSnapshot) override
+    int32_t GetRemoteMissionSnapshotInfo(const std::string &networkId, int32_t missionId,
+        std::unique_ptr<AAFwk::MissionSnapshot> &missionSnapshot) override
     {
         return 0;
     }
-    int32_t StartSyncRemoteMissions(const std::string& devId, bool fixConflict, int64_t tag) override
+    int32_t StartSyncRemoteMissions(const std::string &devId, bool fixConflict, int64_t tag) override
     {
         return 0;
     }
-    int32_t StartSyncMissionsFromRemote(const CallerInfo& callerInfo,
-        std::vector<DstbMissionInfo>& missionInfos) override
+    int32_t StartSyncMissionsFromRemote(const CallerInfo &callerInfo,
+        std::vector<DstbMissionInfo> &missionInfos) override
     {
         return 0;
     }
-    int32_t StopSyncRemoteMissions(const std::string& devId) override
+    int32_t StopSyncRemoteMissions(const std::string &devId) override
     {
         return 0;
     }
-    int32_t StopSyncMissionsFromRemote(const CallerInfo& callerInfo) override
+    int32_t StopSyncMissionsFromRemote(const CallerInfo &callerInfo) override
     {
         return 0;
     }
-    int32_t RegisterMissionListener(const std::u16string& devId, const sptr<IRemoteObject>& obj) override
+    int32_t RegisterMissionListener(const std::u16string &devId, const sptr<IRemoteObject> &obj) override
     {
         return 0;
     }
-    int32_t UnRegisterMissionListener(const std::u16string& devId, const sptr<IRemoteObject>& obj) override
+    int32_t UnRegisterMissionListener(const std::u16string &devId, const sptr<IRemoteObject> &obj) override
     {
         return 0;
     }
 #endif
-    int32_t StartRemoteAbilityByCall(const OHOS::AAFwk::Want& want, const sptr<IRemoteObject>& connect,
+    int32_t StartRemoteAbilityByCall(const OHOS::AAFwk::Want &want, const sptr<IRemoteObject> &connect,
         int32_t callerUid, int32_t callerPid, uint32_t accessToken) override
     {
         return 0;
     }
-    int32_t ReleaseRemoteAbility(const sptr<IRemoteObject>& connect,
+    int32_t ReleaseRemoteAbility(const sptr<IRemoteObject> &connect,
         const AppExecFwk::ElementName &element) override
     {
         return 0;
     }
-    int32_t StartAbilityByCallFromRemote(const OHOS::AAFwk::Want& want, const sptr<IRemoteObject>& connect,
-        const CallerInfo& callerInfo, const AccountInfo& accountInfo) override
+    int32_t StartAbilityByCallFromRemote(const OHOS::AAFwk::Want &want, const sptr<IRemoteObject> &connect,
+        const CallerInfo &callerInfo, const AccountInfo &accountInfo) override
     {
         return 0;
     }
-    int32_t ReleaseAbilityFromRemote(const sptr<IRemoteObject>& connect, const AppExecFwk::ElementName &element,
-        const CallerInfo& callerInfo) override
+    int32_t ReleaseAbilityFromRemote(const sptr<IRemoteObject> &connect, const AppExecFwk::ElementName &element,
+        const CallerInfo &callerInfo) override
     {
         return 0;
     }
@@ -202,11 +202,11 @@ public:
         return 0;
     }
     #endif
-    int32_t RegisterDistributedComponentListener(const sptr<IRemoteObject>& callback) override
+    int32_t RegisterDistributedComponentListener(const sptr<IRemoteObject> &callback) override
     {
         return 0;
     }
-    int32_t GetDistributedComponentList(std::vector<std::string>& distributedComponents) override
+    int32_t GetDistributedComponentList(std::vector<std::string> &distributedComponents) override
     {
         return 0;
     }

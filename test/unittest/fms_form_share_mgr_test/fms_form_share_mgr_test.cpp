@@ -129,7 +129,7 @@ void FmsFormShareMgrTest::SetUp()
     token_ = new (std::nothrow) MockFormHostClient();
 
     // Permission install
-    int32_t userId = 0;
+    int32_t userId = 100;
     auto tokenId = AccessToken::AccessTokenKit::GetHapTokenID(userId, FORM_PROVIDER_BUNDLE_NAME, 0);
     auto flag = OHOS::Security::AccessToken::PERMISSION_USER_FIXED;
     AccessToken::AccessTokenKit::GrantPermission(tokenId, PERMISSION_NAME_REQUIRE_FORM, flag);
@@ -197,7 +197,7 @@ void FmsFormShareMgrTest::ClearFormShareMgrMapData()
 
 /**
  * @tc.name: RecvFormShareInfoFromRemote_001
- * @tc.desc: check form share info case.
+ * @tc.desc: Check form share info case.
  * @tc.type: RecvFormShareInfoFromRemote
  * @tc.require: issueI5MDLJ
  */
@@ -216,7 +216,7 @@ HWTEST_F(FmsFormShareMgrTest, RecvFormShareInfoFromRemote_001, TestSize.Level0)
 
 /**
  * @tc.name: HandleRecvFormShareInfoFromRemoteTask_001
- * @tc.desc: check form share info case.
+ * @tc.desc: Check form share info case.
  * @tc.type: HandleRecvFormShareInfoFromRemoteTask
  * @tc.require: issueI5MDLJ
  */
@@ -306,7 +306,7 @@ HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_002, TestSiz
 
 /**
  * @tc.name: HandleRecvFormShareInfoFromRemoteTask_003
- * @tc.desc: free install success case.
+ * @tc.desc: Free install success case.
  * @tc.type: HandleRecvFormShareInfoFromRemoteTask
  * @tc.require: issueI5MDLJ
  */
@@ -354,7 +354,7 @@ HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_003, TestSiz
 
 /**
  * @tc.name: HandleRecvFormShareInfoFromRemoteTask_004
- * @tc.desc: free install success case.
+ * @tc.desc: Free install success case.
  * @tc.type: HandleRecvFormShareInfoFromRemoteTask
  * @tc.require: issueI5MDLJ
  */
@@ -398,7 +398,7 @@ HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_004, TestSiz
 
 /**
  * @tc.name: HandleRecvFormShareInfoFromRemoteTask_005
- * @tc.desc: free install failed case.
+ * @tc.desc: Free install failed case.
  * @tc.type: HandleRecvFormShareInfoFromRemoteTask
  * @tc.require: issueI5MDLJ
  */
@@ -440,7 +440,7 @@ HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_005, TestSiz
 
 /**
  * @tc.name: FmsFormShareMgrTest_ShareForm_001
- * @tc.desc: shareForm function success
+ * @tc.desc: Share form success.
  * @tc.type: ShareForm
  * @tc.require: issueI5MDLJ
  */
@@ -469,7 +469,7 @@ HWTEST_F(FmsFormShareMgrTest, FmsFormShareMgrTest_ShareForm_001, TestSize.Level0
 
 /**
  * @tc.name: FmsFormShareMgrTest_ShareForm_002
- * @tc.desc: shareForm function fail
+ * @tc.desc: FormId invalid, share form failed.
  * @tc.type: ShareForm
  * @tc.require: issueI5MDLJ
  */
@@ -493,8 +493,8 @@ HWTEST_F(FmsFormShareMgrTest, FmsFormShareMgrTest_ShareForm_002, TestSize.Level0
     int32_t result = FormShareMgr::GetInstance().ShareForm(formJsInfo.formId, REMOTE_DEVICE_ID, nullptr, requestCode);
     EXPECT_EQ(result, ERR_OK);
 
-    int64_t inValidFormId = -1;
-    result = FormShareMgr::GetInstance().ShareForm(inValidFormId, REMOTE_DEVICE_ID, nullptr, requestCode);
+    int64_t invalidFormId = -1;
+    result = FormShareMgr::GetInstance().ShareForm(invalidFormId, REMOTE_DEVICE_ID, nullptr, requestCode);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
 
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest FmsFormShareMgrTest_ShareForm_002 end";
@@ -502,7 +502,7 @@ HWTEST_F(FmsFormShareMgrTest, FmsFormShareMgrTest_ShareForm_002, TestSize.Level0
 
 /**
  * @tc.name: FmsFormShareMgrTest_ShareForm_003
- * @tc.desc: shareForm function fail
+ * @tc.desc: FormId invalid, share form failed.
  * @tc.type: ShareForm
  * @tc.require: issueI5MDLJ
  */
@@ -523,8 +523,8 @@ HWTEST_F(FmsFormShareMgrTest, FmsFormShareMgrTest_ShareForm_003, TestSize.Level0
     EXPECT_TRUE(ret);
     EXPECT_EQ(PARAM_FORM_NAME, formInfo1.formName);
 
-    int64_t inValidFormId = 123456789;
-    int32_t result = FormShareMgr::GetInstance().ShareForm(inValidFormId, REMOTE_DEVICE_ID, nullptr, requestCode);
+    int64_t invalidFormId = 123456789;
+    int32_t result = FormShareMgr::GetInstance().ShareForm(invalidFormId, REMOTE_DEVICE_ID, nullptr, requestCode);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
 
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest FmsFormShareMgrTest_ShareForm_003 end";
@@ -532,7 +532,7 @@ HWTEST_F(FmsFormShareMgrTest, FmsFormShareMgrTest_ShareForm_003, TestSize.Level0
 
 /**
  * @tc.name: FmsFormShareMgrTest_ShareForm_004
- * @tc.desc: shareForm function fail
+ * @tc.desc: Share form success.
  * @tc.type: ShareForm
  * @tc.require: issueI5MDLJ
  */
@@ -564,7 +564,7 @@ HWTEST_F(FmsFormShareMgrTest, FmsFormShareMgrTest_ShareForm_004, TestSize.Level0
 
 /**
  * @tc.name: AcquireShareFormData_001
- * @tc.desc: AcquireShareFormData function success
+ * @tc.desc: Acquire share form data success.
  * @tc.type: AcquireShareFormData
  * @tc.require: issueI5MDLJ
  */
@@ -582,16 +582,16 @@ HWTEST_F(FmsFormShareMgrTest, AcquireShareFormData_001, TestSize.Level0)
     want.SetParam(Constants::ACQUIRE_TYPE, Constants::ACQUIRE_TYPE_CREATE_FORM);
 
     sptr<MockFormProviderClient> mockClient = new (std::nothrow) MockFormProviderClient();
-    EXPECT_FALSE(mockClient->state_AcquireShareFormData_);
+    EXPECT_FALSE(mockClient->acquireShareFormState_);
     FormShareMgr::GetInstance().AcquireShareFormData(UNKNOWN_FORM_ID, REMOTE_DEVICE_ID, want, mockClient);
 
-    EXPECT_TRUE(mockClient->state_AcquireShareFormData_);
+    EXPECT_TRUE(mockClient->acquireShareFormState_);
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest AcquireShareFormData_001 end";
 }
 
 /**
  * @tc.name: AcquireShareFormData_002
- * @tc.desc: AcquireShareFormData function success
+ * @tc.desc: Acquire share form data success.
  * @tc.type: AcquireShareFormData
  * @tc.require: issueI5MDLJ
  */
@@ -609,16 +609,16 @@ HWTEST_F(FmsFormShareMgrTest, AcquireShareFormData_002, TestSize.Level0)
     want.SetParam(Constants::ACQUIRE_TYPE, Constants::ACQUIRE_TYPE_CREATE_FORM);
 
     sptr<MockFormProviderClient> mockClient = new (std::nothrow) MockFormProviderClient();
-    EXPECT_FALSE(mockClient->state_AcquireShareFormData_);
+    EXPECT_FALSE(mockClient->acquireShareFormState_);
     FormShareMgr::GetInstance().AcquireShareFormData(0, REMOTE_DEVICE_ID, want, mockClient);
 
-    EXPECT_TRUE(mockClient->state_AcquireShareFormData_);
+    EXPECT_TRUE(mockClient->acquireShareFormState_);
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest AcquireShareFormData_001 end";
 }
 
 /**
  * @tc.name: HandleProviderShareData_001
- * @tc.desc: HandleProviderShareData function success
+ * @tc.desc: Handle provider share data success.
  * @tc.type: HandleProviderShareData
  * @tc.require: issueI5MDLJ
  */
@@ -664,7 +664,7 @@ HWTEST_F(FmsFormShareMgrTest, HandleProviderShareData_001, TestSize.Level0)
 
 /**
  * @tc.name: HandleProviderShareData_002
- * @tc.desc: HandleProviderShareData function success
+ * @tc.desc: Handle provider share data success.
  * @tc.type: HandleProviderShareData
  * @tc.require: issueI5MDLJ
  */
@@ -703,7 +703,7 @@ HWTEST_F(FmsFormShareMgrTest, HandleProviderShareData_002, TestSize.Level0)
 
 /**
  * @tc.name: HandleProviderShareData_003
- * @tc.desc: HandleProviderShareData function success
+ * @tc.desc: Handle provider share data success.
  * @tc.type: HandleProviderShareData
  * @tc.require: issueI5MDLJ
  */
@@ -743,7 +743,7 @@ HWTEST_F(FmsFormShareMgrTest, HandleProviderShareData_003, TestSize.Level0)
 
 /**
  * @tc.name: ShareForm_001
- * @tc.desc: .
+ * @tc.desc: FormId invalid, share form failed.
  * @tc.type: ShareForm
  * @tc.require: issueI5MDLJ
  */
@@ -764,12 +764,13 @@ HWTEST_F(FmsFormShareMgrTest, ShareForm_001, TestSize.Level0)
     EXPECT_TRUE(ret);
     EXPECT_EQ(PARAM_FORM_NAME, formInfo1.formName);
 
-    int64_t inValidFormId = 0;
-    int32_t result = FormMgr::GetInstance().ShareForm(inValidFormId, REMOTE_DEVICE_ID, nullptr, requestCode);
+    int64_t invalidFormId = 0;
+    sptr<MockFormHostCallback> mockHost = new (std::nothrow) MockFormHostCallback();
+    int32_t result = FormMgr::GetInstance().ShareForm(invalidFormId, REMOTE_DEVICE_ID, mockHost, requestCode);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
 
-    inValidFormId = -1;
-    result = FormMgr::GetInstance().ShareForm(inValidFormId, REMOTE_DEVICE_ID, nullptr, requestCode);
+    invalidFormId = -1;
+    result = FormMgr::GetInstance().ShareForm(invalidFormId, REMOTE_DEVICE_ID, mockHost, requestCode);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
 
     GTEST_LOG_(INFO) << "FmsFormMgrAddFormTest ShareForm_001  end";
@@ -777,7 +778,7 @@ HWTEST_F(FmsFormShareMgrTest, ShareForm_001, TestSize.Level0)
 
 /**
  * @tc.name: ShareForm_002
- * @tc.desc: .
+ * @tc.desc: DeviceId is empty, share form failed.
  * @tc.type: ShareForm
  * @tc.require: issueI5MDLJ
  */
@@ -798,74 +799,16 @@ HWTEST_F(FmsFormShareMgrTest, ShareForm_002, TestSize.Level0)
     EXPECT_TRUE(ret);
     EXPECT_EQ(PARAM_FORM_NAME, formInfo1.formName);
 
-    int32_t result = FormMgr::GetInstance().ShareForm(formJsInfo.formId, "", nullptr, requestCode);
+    sptr<MockFormHostCallback> mockHost = new (std::nothrow) MockFormHostCallback();
+    int32_t result = FormMgr::GetInstance().ShareForm(formJsInfo.formId, "", mockHost, requestCode);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
 
     GTEST_LOG_(INFO) << "FmsFormMgrAddFormTest ShareForm_002 end";
 }
 
 /**
- * @tc.name: ShareForm_003
- * @tc.desc: .
- * @tc.type: ShareForm
- * @tc.require: issueI5MDLJ
- */
-HWTEST_F(FmsFormShareMgrTest, ShareForm_003, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FmsFormMgrAddFormTest ShareForm_003 start";
-    FormJsInfo formJsInfo;
-    CreateProviderData();
-    CreateForm(formJsInfo);
-
-    const int64_t requestCode = 10;
-    FormRecord formInfo;
-    formInfo.formName = PARAM_FORM_NAME;
-    formInfo.formId = formJsInfo.formId;
-    FormRecord formInfo1;
-    FormDataMgr::GetInstance().formRecords_.emplace(formJsInfo.formId, formInfo);
-    bool ret = FormDataMgr::GetInstance().GetFormRecord(formJsInfo.formId, formInfo1);
-    EXPECT_TRUE(ret);
-    EXPECT_EQ(PARAM_FORM_NAME, formInfo1.formName);
-
-    int64_t unExistFormId = 12345678;
-    int32_t result = FormMgr::GetInstance().ShareForm(unExistFormId, REMOTE_DEVICE_ID, nullptr, requestCode);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
-
-    GTEST_LOG_(INFO) << "FmsFormMgrAddFormTest ShareForm_003  end";
-}
-
-/**
- * @tc.name: ShareForm_004
- * @tc.desc: .
- * @tc.type: ShareForm
- * @tc.require: issueI5MDLJ
- */
-HWTEST_F(FmsFormShareMgrTest, ShareForm_004, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FmsFormMgrAddFormTest ShareForm_004 start";
-    FormJsInfo formJsInfo;
-    CreateProviderData();
-    CreateForm(formJsInfo);
-
-    const int64_t requestCode = 11;
-    FormRecord formInfo;
-    formInfo.formName = PARAM_FORM_NAME;
-    formInfo.formId = formJsInfo.formId;
-    FormRecord formInfo1;
-    FormDataMgr::GetInstance().formRecords_.emplace(formJsInfo.formId, formInfo);
-    bool ret = FormDataMgr::GetInstance().GetFormRecord(formJsInfo.formId, formInfo1);
-    EXPECT_TRUE(ret);
-    EXPECT_EQ(PARAM_FORM_NAME, formInfo1.formName);
-
-    sptr<MockFormHostCallback> mockHost = new (std::nothrow) MockFormHostCallback();
-    int32_t result = FormMgr::GetInstance().ShareForm(formJsInfo.formId, REMOTE_DEVICE_ID, mockHost, requestCode);
-    EXPECT_EQ(result, ERR_OK);
-    GTEST_LOG_(INFO) << "FmsFormMgrAddFormTest ShareForm_004  end";
-}
-
-/**
  * @tc.name: GetLocalDeviceInfo_001
- * @tc.desc: GetLocalDeviceInfo function success
+ * @tc.desc: Verify that the local device is successfully obtained.
  * @tc.type: GetLocalDeviceInfo
  * @tc.require: issueI5MDLJ
  */
@@ -894,7 +837,7 @@ HWTEST_F(FmsFormShareMgrTest, GetLocalDeviceInfo_001, TestSize.Level0)
 
 /**
  * @tc.name: GetLocalDeviceInfo_002
- * @tc.desc: GetLocalDeviceInfo function success
+ * @tc.desc: BundleName is empty, get local device info failed.
  * @tc.type: GetLocalDeviceInfo
  * @tc.require: issueI5MDLJ
  */
@@ -920,7 +863,7 @@ HWTEST_F(FmsFormShareMgrTest, GetLocalDeviceInfo_002, TestSize.Level0)
 
 /**
  * @tc.name: AddProviderData_001
- * @tc.desc: AddProviderData function success
+ * @tc.desc: Add provider data success.
  * @tc.type: AddProviderData
  * @tc.require: issueI5MDLJ
  */
@@ -965,7 +908,7 @@ HWTEST_F(FmsFormShareMgrTest, AddProviderData_001, TestSize.Level0)
 
 /**
  * @tc.name: AddProviderData_002
- * @tc.desc: AddProviderData function success
+ * @tc.desc: Verify that deviceId does not exist.
  * @tc.type: AddProviderData
  * @tc.require: issueI5MDLJ
  */
