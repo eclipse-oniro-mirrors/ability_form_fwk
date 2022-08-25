@@ -39,7 +39,7 @@ ohos_unittest("FmsFormDistributedClientTest") {
     "//foundation/distributedschedule/samgr/adapter/interfaces/innerkits/include/",
     "${form_fwk_path}/interfaces/inner_api/include",
     "${form_fwk_path}/test/mock/include",
-    "${distributeddatamgr_path}/distributeddatamgr/interfaces/innerkits/distributeddata/include",
+    "${distributeddatamgr_path}/kv_store/interfaces/innerkits/distributeddata/include",
     "//foundation/ability/dmsfwk/services/dtbschedmgr/include/",
   ]
 
@@ -70,11 +70,11 @@ ohos_unittest("FmsFormDistributedClientTest") {
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
-    "distributeddatamgr:distributeddata_inner",
     "eventhandler:libeventhandler",
     "form_fwk:form_manager",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "kv_store:distributeddata_inner",
     "safwk:system_ability_fwk",
   ]
 }
