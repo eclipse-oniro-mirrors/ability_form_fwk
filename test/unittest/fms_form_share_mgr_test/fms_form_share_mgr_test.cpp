@@ -100,7 +100,7 @@ public:
     MockFormHostCallback() = default;
     virtual ~MockFormHostCallback() = default;
 
-    MOCK_METHOD1(OnAcquired, void(const FormJsInfo &formInfo, const sptr<IRemoteObject> &token));
+    MOCK_METHOD2(OnAcquired, void(const FormJsInfo &formInfo, const sptr<IRemoteObject> &token));
     MOCK_METHOD1(OnUpdate, void(const FormJsInfo &formInfo));
     MOCK_METHOD1(OnUninstall, void(const std::vector<int64_t> &formIds));
     MOCK_METHOD2(OnAcquireState, void(AppExecFwk::FormState state, const AAFwk::Want &want));
