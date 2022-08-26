@@ -131,8 +131,9 @@ HWTEST_F(FmsFormMgrReleaseFormTest, ReleaseForm_001, TestSize.Level0)
     ret = FormDataMgr::GetInstance().GetFormRecord(formId2, formInfo);
     EXPECT_TRUE(ret);
     // Form host record is deleted.
-    FormHostRecord hostRecord;
-    EXPECT_FALSE(FormDataMgr::GetInstance().GetFormHostRecord(formId, hostRecord));
+    std::vector<FormHostRecord> hostRecords;
+    FormDataMgr::GetInstance().GetFormHostRecord(formId, hostRecords);
+    EXPECT_TRUE(hostRecords.empty());
 
     FormDataMgr::GetInstance().DeleteFormRecord(formId);
     FormDataMgr::GetInstance().DeleteFormRecord(formId2);

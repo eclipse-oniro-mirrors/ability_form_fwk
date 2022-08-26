@@ -454,7 +454,7 @@ void FormTaskMgr::AcquireTaskToHost(const int64_t formId, const FormRecord &reco
     }
 
     HILOG_DEBUG("FormTaskMgr remoteFormHost OnAcquired");
-    remoteFormHost->OnAcquired(CreateFormJsInfo(formId, record));
+    remoteFormHost->OnAcquired(CreateFormJsInfo(formId, record), nullptr);
 }
 
 /**

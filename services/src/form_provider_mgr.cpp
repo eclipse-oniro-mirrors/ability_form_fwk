@@ -58,18 +58,18 @@ ErrCode FormProviderMgr::AcquireForm(const int64_t formId, const FormProviderInf
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
-    FormHostRecord clientHost;
-    bool isGetFormHostRecord = FormDataMgr::GetInstance().GetFormHostRecord(formId, clientHost);
-    if (!isGetFormHostRecord) {
-        HILOG_ERROR("%{public}s fail, clientHost is null", __func__);
+    std::vector<FormHostRecord> clientHosts;
+    FormDataMgr::GetInstance().GetFormHostRecord(formId, clientHosts);
+    if (clientHosts.empty()) {
+        HILOG_ERROR("%{public}s fail, clientHosst is empty", __func__);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
     if (formRecord.isInited) {
         if (IsFormCached(formRecord)) {
-            if (clientHost.Contains(formId)) {
-                formRecord.formProviderInfo = formProviderInfo;
-                clientHost.OnAcquire(formId, formRecord);
+            formRecord.formProviderInfo = formProviderInfo;
+            for (auto &iter : clientHosts) {
+                iter.OnAcquire(formId, formRecord);
             }
         } else {
             Want want;
@@ -81,9 +81,9 @@ ErrCode FormProviderMgr::AcquireForm(const int64_t formId, const FormProviderInf
     formRecord.needRefresh = false;
     FormDataMgr::GetInstance().SetFormCacheInited(formId, true);
 
-    if (clientHost.Contains(formId)) {
-        formRecord.formProviderInfo = formProviderInfo;
-        clientHost.OnAcquire(formId, formRecord);
+    formRecord.formProviderInfo = formProviderInfo;
+    for (auto &iter : clientHosts) {
+        iter.OnAcquire(formId, formRecord);
     }
 
     if (formProviderInfo.NeedCache()) {

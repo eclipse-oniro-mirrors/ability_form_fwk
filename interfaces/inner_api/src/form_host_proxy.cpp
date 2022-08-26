@@ -20,11 +20,7 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-/**
- * @brief Request to give back a Form.
- * @param formInfo Form info.
- */
-void FormHostProxy::OnAcquired(const FormJsInfo &formInfo)
+void FormHostProxy::OnAcquired(const FormJsInfo &formInfo, const sptr<IRemoteObject> &token)
 {
     int error;
     MessageParcel data;
@@ -37,6 +33,16 @@ void FormHostProxy::OnAcquired(const FormJsInfo &formInfo)
 
     if (!data.WriteParcelable(&formInfo)) {
         HILOG_ERROR("%{public}s, failed to write formInfo", __func__);
+    }
+
+    if (token != nullptr) {
+        if (!data.WriteBool(true) || !data.WriteRemoteObject(token)) {
+            HILOG_ERROR("flag or token write failed.");
+        }
+    } else {
+        if (!data.WriteBool(false)) {
+            HILOG_ERROR("flag write failed.");
+        }
     }
 
     error = Remote()->SendRequest(
