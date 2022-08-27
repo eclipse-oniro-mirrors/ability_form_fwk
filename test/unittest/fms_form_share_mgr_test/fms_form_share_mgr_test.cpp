@@ -199,7 +199,7 @@ void FmsFormShareMgrTest::ClearFormShareMgrMapData()
  * @tc.name: RecvFormShareInfoFromRemote_001
  * @tc.desc: Check form share info case.
  * @tc.type: RecvFormShareInfoFromRemote
- * @tc.require: issueI5MDLJ
+ * @tc.require: issueI581YL
  */
 HWTEST_F(FmsFormShareMgrTest, RecvFormShareInfoFromRemote_001, TestSize.Level0)
 {
@@ -218,7 +218,7 @@ HWTEST_F(FmsFormShareMgrTest, RecvFormShareInfoFromRemote_001, TestSize.Level0)
  * @tc.name: HandleRecvFormShareInfoFromRemoteTask_001
  * @tc.desc: Check form share info case.
  * @tc.type: HandleRecvFormShareInfoFromRemoteTask
- * @tc.require: issueI5MDLJ
+ * @tc.require: issueI581YL
  */
 HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_001, TestSize.Level0)
 {
@@ -275,7 +275,7 @@ HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_001, TestSiz
  * @tc.name: HandleRecvFormShareInfoFromRemoteTask_002
  * @tc.desc: Failed to Recv Form Share info.
  * @tc.type: HandleRecvFormShareInfoFromRemoteTask
- * @tc.require: issueI5MDLJ
+ * @tc.require: issueI581YL
  */
 HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_002, TestSize.Level0)
 {
@@ -308,7 +308,7 @@ HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_002, TestSiz
  * @tc.name: HandleRecvFormShareInfoFromRemoteTask_003
  * @tc.desc: Free install success case.
  * @tc.type: HandleRecvFormShareInfoFromRemoteTask
- * @tc.require: issueI5MDLJ
+ * @tc.require: issueI581YL
  */
 HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_003, TestSize.Level0)
 {
@@ -356,7 +356,7 @@ HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_003, TestSiz
  * @tc.name: HandleRecvFormShareInfoFromRemoteTask_004
  * @tc.desc: Free install success case.
  * @tc.type: HandleRecvFormShareInfoFromRemoteTask
- * @tc.require: issueI5MDLJ
+ * @tc.require: issueI581YL
  */
 HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_004, TestSize.Level0)
 {
@@ -400,7 +400,7 @@ HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_004, TestSiz
  * @tc.name: HandleRecvFormShareInfoFromRemoteTask_005
  * @tc.desc: Free install failed case.
  * @tc.type: HandleRecvFormShareInfoFromRemoteTask
- * @tc.require: issueI5MDLJ
+ * @tc.require: issueI581YL
  */
 HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_005, TestSize.Level0)
 {
@@ -442,7 +442,7 @@ HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_005, TestSiz
  * @tc.name: FmsFormShareMgrTest_ShareForm_001
  * @tc.desc: Share form success.
  * @tc.type: ShareForm
- * @tc.require: issueI5MDLJ
+ * @tc.require: issueI581YL
  */
 HWTEST_F(FmsFormShareMgrTest, FmsFormShareMgrTest_ShareForm_001, TestSize.Level0)
 {
@@ -471,7 +471,7 @@ HWTEST_F(FmsFormShareMgrTest, FmsFormShareMgrTest_ShareForm_001, TestSize.Level0
  * @tc.name: FmsFormShareMgrTest_ShareForm_002
  * @tc.desc: FormId invalid, share form failed.
  * @tc.type: ShareForm
- * @tc.require: issueI5MDLJ
+ * @tc.require: issueI581YL
  */
 HWTEST_F(FmsFormShareMgrTest, FmsFormShareMgrTest_ShareForm_002, TestSize.Level0)
 {
@@ -504,7 +504,7 @@ HWTEST_F(FmsFormShareMgrTest, FmsFormShareMgrTest_ShareForm_002, TestSize.Level0
  * @tc.name: FmsFormShareMgrTest_ShareForm_003
  * @tc.desc: FormId invalid, share form failed.
  * @tc.type: ShareForm
- * @tc.require: issueI5MDLJ
+ * @tc.require: issueI581YL
  */
 HWTEST_F(FmsFormShareMgrTest, FmsFormShareMgrTest_ShareForm_003, TestSize.Level0)
 {
@@ -534,7 +534,7 @@ HWTEST_F(FmsFormShareMgrTest, FmsFormShareMgrTest_ShareForm_003, TestSize.Level0
  * @tc.name: FmsFormShareMgrTest_ShareForm_004
  * @tc.desc: Share form success.
  * @tc.type: ShareForm
- * @tc.require: issueI5MDLJ
+ * @tc.require: issueI581YL
  */
 HWTEST_F(FmsFormShareMgrTest, FmsFormShareMgrTest_ShareForm_004, TestSize.Level0)
 {
@@ -566,7 +566,7 @@ HWTEST_F(FmsFormShareMgrTest, FmsFormShareMgrTest_ShareForm_004, TestSize.Level0
  * @tc.name: AcquireShareFormData_001
  * @tc.desc: Acquire share form data success.
  * @tc.type: AcquireShareFormData
- * @tc.require: issueI5MDLJ
+ * @tc.require: issueI581YL
  */
 HWTEST_F(FmsFormShareMgrTest, AcquireShareFormData_001, TestSize.Level0)
 {
@@ -593,7 +593,7 @@ HWTEST_F(FmsFormShareMgrTest, AcquireShareFormData_001, TestSize.Level0)
  * @tc.name: AcquireShareFormData_002
  * @tc.desc: Acquire share form data success.
  * @tc.type: AcquireShareFormData
- * @tc.require: issueI5MDLJ
+ * @tc.require: issueI581YL
  */
 HWTEST_F(FmsFormShareMgrTest, AcquireShareFormData_002, TestSize.Level0)
 {
@@ -620,7 +620,7 @@ HWTEST_F(FmsFormShareMgrTest, AcquireShareFormData_002, TestSize.Level0)
  * @tc.name: HandleProviderShareData_001
  * @tc.desc: Handle provider share data success.
  * @tc.type: HandleProviderShareData
- * @tc.require: issueI5MDLJ
+ * @tc.require: issueI581YL
  */
 HWTEST_F(FmsFormShareMgrTest, HandleProviderShareData_001, TestSize.Level0)
 {
@@ -666,7 +666,7 @@ HWTEST_F(FmsFormShareMgrTest, HandleProviderShareData_001, TestSize.Level0)
  * @tc.name: HandleProviderShareData_002
  * @tc.desc: Handle provider share data success.
  * @tc.type: HandleProviderShareData
- * @tc.require: issueI5MDLJ
+ * @tc.require: issueI581YL
  */
 HWTEST_F(FmsFormShareMgrTest, HandleProviderShareData_002, TestSize.Level0)
 {
@@ -705,7 +705,7 @@ HWTEST_F(FmsFormShareMgrTest, HandleProviderShareData_002, TestSize.Level0)
  * @tc.name: HandleProviderShareData_003
  * @tc.desc: Handle provider share data success.
  * @tc.type: HandleProviderShareData
- * @tc.require: issueI5MDLJ
+ * @tc.require: issueI581YL
  */
 HWTEST_F(FmsFormShareMgrTest, HandleProviderShareData_003, TestSize.Level0)
 {
@@ -745,7 +745,7 @@ HWTEST_F(FmsFormShareMgrTest, HandleProviderShareData_003, TestSize.Level0)
  * @tc.name: ShareForm_001
  * @tc.desc: FormId invalid, share form failed.
  * @tc.type: ShareForm
- * @tc.require: issueI5MDLJ
+ * @tc.require: issueI581YL
  */
 HWTEST_F(FmsFormShareMgrTest, ShareForm_001, TestSize.Level0)
 {
@@ -780,7 +780,7 @@ HWTEST_F(FmsFormShareMgrTest, ShareForm_001, TestSize.Level0)
  * @tc.name: ShareForm_002
  * @tc.desc: DeviceId is empty, share form failed.
  * @tc.type: ShareForm
- * @tc.require: issueI5MDLJ
+ * @tc.require: issueI581YL
  */
 HWTEST_F(FmsFormShareMgrTest, ShareForm_002, TestSize.Level0)
 {
@@ -810,7 +810,7 @@ HWTEST_F(FmsFormShareMgrTest, ShareForm_002, TestSize.Level0)
  * @tc.name: GetLocalDeviceInfo_001
  * @tc.desc: Verify that the local device is successfully obtained.
  * @tc.type: GetLocalDeviceInfo
- * @tc.require: issueI5MDLJ
+ * @tc.require: issueI581YL
  */
 HWTEST_F(FmsFormShareMgrTest, GetLocalDeviceInfo_001, TestSize.Level0)
 {
@@ -839,7 +839,7 @@ HWTEST_F(FmsFormShareMgrTest, GetLocalDeviceInfo_001, TestSize.Level0)
  * @tc.name: GetLocalDeviceInfo_002
  * @tc.desc: BundleName is empty, get local device info failed.
  * @tc.type: GetLocalDeviceInfo
- * @tc.require: issueI5MDLJ
+ * @tc.require: issueI581YL
  */
 HWTEST_F(FmsFormShareMgrTest, GetLocalDeviceInfo_002, TestSize.Level0)
 {
@@ -865,7 +865,7 @@ HWTEST_F(FmsFormShareMgrTest, GetLocalDeviceInfo_002, TestSize.Level0)
  * @tc.name: AddProviderData_001
  * @tc.desc: Add provider data success.
  * @tc.type: AddProviderData
- * @tc.require: issueI5MDLJ
+ * @tc.require: issueI581YL
  */
 HWTEST_F(FmsFormShareMgrTest, AddProviderData_001, TestSize.Level0)
 {
@@ -910,7 +910,7 @@ HWTEST_F(FmsFormShareMgrTest, AddProviderData_001, TestSize.Level0)
  * @tc.name: AddProviderData_002
  * @tc.desc: Verify that deviceId does not exist.
  * @tc.type: AddProviderData
- * @tc.require: issueI5MDLJ
+ * @tc.require: issueI581YL
  */
 HWTEST_F(FmsFormShareMgrTest, AddProviderData_002, TestSize.Level0)
 {
