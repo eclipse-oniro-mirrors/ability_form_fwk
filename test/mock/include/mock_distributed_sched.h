@@ -202,10 +202,6 @@ public:
         return 0;
     }
     #endif
-    int32_t RegisterDistributedComponentListener(const sptr<IRemoteObject> &callback) override
-    {
-        return 0;
-    }
     int32_t GetDistributedComponentList(std::vector<std::string> &distributedComponents) override
     {
         return 0;
