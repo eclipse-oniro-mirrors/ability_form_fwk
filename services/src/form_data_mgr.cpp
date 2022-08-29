@@ -1633,7 +1633,7 @@ bool FormDataMgr::GetAbilityFormInfo(const FormRecord &record, const std::vector
 
 bool FormDataMgr::IsSameForm(const FormRecord &record, const AbilityFormInfo &abilityFormInfo)
 {
-    auto dimensionIter = Constants::DIMENSION_MAP.find(record.specification);
+    auto dimensionIter = Constants::DIMENSION_MAP.find(static_cast<Constants::Dimension>(record.specification));
     if (dimensionIter == Constants::DIMENSION_MAP.end()) {
         HILOG_ERROR("%{public}s, specification:%{public}d is invalid", __func__, record.specification);
         return false;

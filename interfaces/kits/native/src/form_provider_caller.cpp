@@ -29,16 +29,16 @@ sptr<IRemoteObject> FormProviderCaller::GetCallerToken() const
     return callerToken_;
 }
 
-void FormProviderCaller::AddFormJsInfo(const FormJsInfo &formJsInfo)
+void FormProviderCaller::AddForm(const FormJsInfo &formJsInfo)
 {
     std::lock_guard<std::recursive_mutex> lock(formJsInfoMutex_);
     formJsInfoMap_[formJsInfo.formId] = formJsInfo;
 }
 
-void FormProviderCaller::DeleteFormJsInfo(const FormJsInfo &formJsInfo)
+void FormProviderCaller::DeleteForm(int64_t formId)
 {
     std::lock_guard<std::recursive_mutex> lock(formJsInfoMutex_);
-    formJsInfoMap_.erase(formJsInfo.formId);
+    formJsInfoMap_.erase(formId);
 }
 
 bool FormProviderCaller::GetFormJsInfo(int64_t formId, FormJsInfo &formJsInfo)
@@ -52,9 +52,16 @@ bool FormProviderCaller::GetFormJsInfo(int64_t formId, FormJsInfo &formJsInfo)
     return false;
 }
 
-bool FormProviderCaller::HasFormId(int64_t formId)
+bool FormProviderCaller::HasForm(int64_t formId)
 {
+    std::lock_guard<std::recursive_mutex> lock(formJsInfoMutex_);
     return (formJsInfoMap_.find(formId) != formJsInfoMap_.end());
+}
+
+bool FormProviderCaller::IsFormEmpty()
+{
+    std::lock_guard<std::recursive_mutex> lock(formJsInfoMutex_);
+    return formJsInfoMap_.empty();
 }
 
 int32_t FormProviderCaller::OnAcquire(const FormProviderInfo &formProviderInfo, const AAFwk::Want &want,

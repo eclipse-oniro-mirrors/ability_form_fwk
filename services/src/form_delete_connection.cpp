@@ -50,7 +50,7 @@ void FormDeleteConnection::OnAbilityConnectDone(
 
     Want want;
     want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
-    HILOG_DEBUG("%{public}s, connectId:%{public}ld", __func__, this->GetConnectId());
+    HILOG_DEBUG("%{public}s, connectId:%{public}d", __func__, this->GetConnectId());
     FormTaskMgr::GetInstance().PostDeleteTask(formId_, want, remoteObject);
 }
 }  // namespace AppExecFwk

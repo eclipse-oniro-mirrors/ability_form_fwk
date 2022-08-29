@@ -409,7 +409,7 @@ void FormShareMgr::AcquireShareFormData(int64_t formId, const std::string &remot
 {
     HILOG_DEBUG("%{public}s called.", __func__);
     int64_t requestCode = static_cast<int64_t>(want.GetLongParam(Constants::FORM_SHARE_REQUEST_CODE, 0));
-    long connectId = want.GetLongParam(Constants::FORM_CONNECT_ID, 0);
+    auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
 
     if (formProviderProxy == nullptr) {

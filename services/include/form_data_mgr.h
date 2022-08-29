@@ -595,6 +595,6 @@ private:
     std::map<int64_t, FormRequestPublishFormInfo> formRequestPublishForms_;
     int64_t udidHash_ = 0;
 };
-}  // namespace AppExecFwk
-}  // namespace OHOS
+} // namespace AppExecFwk
+} // namespace OHOS
 #endif // OHOS_FORM_FWK_FORM_FORM_DATA_MGR_H
