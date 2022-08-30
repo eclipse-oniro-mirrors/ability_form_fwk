@@ -34,6 +34,7 @@ public:
     MockFormProviderClient() = default;
     virtual ~MockFormProviderClient() = default;
 
+    bool acquireShareFormState_ = false;
 private:
     /**
      * Acquire to give back an ProviderFormInfo. This is sync API.
