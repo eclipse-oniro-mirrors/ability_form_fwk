@@ -286,7 +286,6 @@ void FormInfoStorageMgr::SaveEntries(
 ErrCode FormInfoStorageMgr::LoadFormData(std::vector<InnerFormInfo> &innerFormInfos)
 {
     HILOG_INFO("%{public}s called.", __func__);
-    bool ret = ERR_OK;
     {
         std::lock_guard<std::mutex> lock(kvStorePtrMutex_);
         if (!CheckKvStore()) {
@@ -301,6 +300,7 @@ ErrCode FormInfoStorageMgr::LoadFormData(std::vector<InnerFormInfo> &innerFormIn
         return status;
     });
 
+    bool ret = ERR_OK;
     if (status != DistributedKv::Status::SUCCESS) {
         HILOG_ERROR("get entries error: %{public}d", status);
         ret = ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -345,7 +345,7 @@ ErrCode FormInfoStorageMgr::GetStorageFormInfoById(const std::string &formId, In
                 HILOG_ERROR("error key: %{private}s", allEntries.front().key.ToString().c_str());
                 ret = ERR_APPEXECFWK_FORM_COMMON_CODE;
             }
-            if (innerFormInfo.FromJson(jsonObject) != true) {
+            if (!innerFormInfo.FromJson(jsonObject)) {
                 HILOG_ERROR("error key: %{private}s", allEntries.front().key.ToString().c_str());
                 ret = ERR_APPEXECFWK_FORM_COMMON_CODE;
             }
