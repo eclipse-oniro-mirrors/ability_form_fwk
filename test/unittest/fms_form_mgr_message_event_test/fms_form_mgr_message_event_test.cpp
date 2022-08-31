@@ -35,6 +35,7 @@
 #ifdef SUPPORT_POWER
 #include "power_mgr_client.h"
 #endif
+#include "remote_native_token.h"
 #include "running_process_info.h"
 #include "system_ability_definition.h"
 
@@ -74,6 +75,7 @@ protected:
 
 void FmsFormMgrMessageEventTest::SetUpTestCase()
 {
+    RemoteNativeToken::SetNativeToken();
     FormBmsHelper::GetInstance().SetBundleManager(new BundleMgrService());
     FormAmsHelper::GetInstance().SetAbilityManager(new MockAbilityMgrService());
 }

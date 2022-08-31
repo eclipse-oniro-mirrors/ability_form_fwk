@@ -29,6 +29,7 @@
 #include "if_system_ability_manager.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
+#include "remote_native_token.h"
 #include "running_process_info.h"
 #include "mock_bundle_manager.h"
 #include "mock_ability_manager.h"
@@ -64,6 +65,7 @@ protected:
 
 void FmsFormMgrRequestFormTest::SetUpTestCase()
 {
+    RemoteNativeToken::SetNativeToken();
     FormBmsHelper::GetInstance().SetBundleManager(new BundleMgrService());
     FormAmsHelper::GetInstance().SetAbilityManager(new MockAbilityMgrService());
 }

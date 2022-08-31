@@ -38,6 +38,7 @@
 #include "mock_ability_manager.h"
 #include "mock_bundle_manager.h"
 #include "mock_form_host_client.h"
+#include "remote_native_token.h"
 #include "running_process_info.h"
 #include "system_ability_definition.h"
 
@@ -80,6 +81,7 @@ protected:
 
 void FmsFormMgrAddFormTest::SetUpTestCase()
 {
+    RemoteNativeToken::SetNativeToken();
     FormBmsHelper::GetInstance().SetBundleManager(new BundleMgrService());
     FormAmsHelper::GetInstance().SetAbilityManager(new MockAbilityMgrService());
 }

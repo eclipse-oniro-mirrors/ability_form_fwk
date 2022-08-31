@@ -22,6 +22,7 @@ ohos_unittest("FmsFormMgrLifecycleUpdateTest") {
   sources = [
     "${form_fwk_path}/test/mock/src/mock_bundle_manager.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_host_client.cpp",
+    "${form_fwk_path}/test/mock/src/remote_native_token.cpp",
     "${form_fwk_path}/test/unittest/fms_form_mgr_lifecycle_update_test/fms_form_mgr_lifecycle_update_test.cpp",
   ]
 
@@ -57,6 +58,8 @@ ohos_unittest("FmsFormMgrLifecycleUpdateTest") {
     "ability_base:base",
     "ability_base:want",
     "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
