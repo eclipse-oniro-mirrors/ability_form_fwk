@@ -156,29 +156,12 @@ bool FormHostClient::RegisterUninstallCallback(UninstallCallback callback)
 
 void FormHostClient::OnAcquired(const FormJsInfo &formJsInfo, const sptr<IRemoteObject> &token)
 {
-    HILOG_DEBUG("%{public}s called, image number is %{public}zu.",  __func__, formJsInfo.imageDataMap.size());
-    int64_t formId = formJsInfo.formId;
-    if (formId < 0) {
-        HILOG_ERROR("%{public}s error, the passed form id can't be negative.", __func__);
-        return;
-    }
-
+    HILOG_DEBUG("%{public}s called.",  __func__);
     if (token != nullptr) {
         HILOG_DEBUG("save token to form remote mgr.");
-        FormCallerMgr::GetInstance().AddFormHostCaller(formId, token);
+        FormCallerMgr::GetInstance().AddFormHostCaller(formJsInfo, token);
     }
-
-    std::lock_guard<std::mutex> lock(callbackMutex_);
-    auto iter = formCallbackMap_.find(formId);
-    if (iter == formCallbackMap_.end()) {
-        HILOG_ERROR("%{public}s error, not find formId:%{public}s.", __func__, std::to_string(formId).c_str());
-        return;
-    }
-    for (const auto& callback : iter->second) {
-        HILOG_INFO("%{public}s, formId: %{public}" PRId64 ", jspath: %{public}s, data: %{public}s",
-            __func__, formId, formJsInfo.jsFormCodePath.c_str(), formJsInfo.formData.c_str());
-        callback->ProcessFormUpdate(formJsInfo);
-    }
+    UpdateForm(formJsInfo);
 }
 
 /**
@@ -189,24 +172,8 @@ void FormHostClient::OnAcquired(const FormJsInfo &formJsInfo, const sptr<IRemote
  */
 void FormHostClient::OnUpdate(const FormJsInfo &formJsInfo)
 {
-    HILOG_INFO("%{public}s called.", __func__);
-    HILOG_INFO("Imamge number is %{public}zu.", formJsInfo.imageDataMap.size());
-    int64_t formId = formJsInfo.formId;
-    if (formId < 0) {
-        HILOG_ERROR("%{public}s error, the passed form id can't be negative.", __func__);
-        return;
-    }
-    std::lock_guard<std::mutex> lock(callbackMutex_);
-    auto iter = formCallbackMap_.find(formId);
-    if (iter == formCallbackMap_.end()) {
-        HILOG_ERROR("%{public}s error, not find formId:%{public}s.", __func__, std::to_string(formId).c_str());
-        return;
-    }
-    for (const auto& callback : iter->second) {
-        HILOG_INFO("%{public}s, formId: %{public}" PRId64 ", jspath: %{public}s, data: %{public}s",
-            __func__, formId, formJsInfo.jsFormCodePath.c_str(), formJsInfo.formData.c_str());
-        callback->ProcessFormUpdate(formJsInfo);
-    }
+    HILOG_DEBUG("%{public}s called.",  __func__);
+    UpdateForm(formJsInfo);
 }
 
 /**
@@ -317,5 +284,26 @@ void FormHostClient::RemoveShareFormCallback(int64_t requestCode)
     }
     HILOG_INFO("%{public}s end.", __func__);
 }
-}  // namespace AppExecFwk
-}  // namespace OHOS
+
+void FormHostClient::UpdateForm(const FormJsInfo &formJsInfo)
+{
+    HILOG_DEBUG("%{public}s called, image number is %{public}zu.",  __func__, formJsInfo.imageDataMap.size());
+    int64_t formId = formJsInfo.formId;
+    if (formId < 0) {
+        HILOG_ERROR("%{public}s error, the passed form id can't be negative.", __func__);
+        return;
+    }
+    std::lock_guard<std::mutex> lock(callbackMutex_);
+    auto iter = formCallbackMap_.find(formId);
+    if (iter == formCallbackMap_.end()) {
+        HILOG_ERROR("%{public}s error, not find formId:%{public}s.", __func__, std::to_string(formId).c_str());
+        return;
+    }
+    for (const auto& callback : iter->second) {
+        HILOG_INFO("%{public}s, formId: %{public}" PRId64 ", jspath: %{public}s, data: %{public}s",
+            __func__, formId, formJsInfo.jsFormCodePath.c_str(), formJsInfo.formData.c_str());
+        callback->ProcessFormUpdate(formJsInfo);
+    }
+}
+} // namespace AppExecFwk
+} // namespace OHOS

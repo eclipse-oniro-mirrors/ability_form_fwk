@@ -200,5 +200,23 @@ void FormJsInfo::ReadImageData(Parcel &parcel)
     HILOG_INFO("%{public}s end", __func__);
     return;
 }
+
+bool FormJsInfo::ConvertRawImageData()
+{
+    HILOG_DEBUG("%{public}s called", __func__);
+    if (!formProviderData.ConvertRawImageData()) {
+        return false;
+    }
+    auto sharedImageMap = formProviderData.GetImageDataMap();
+    auto size = sharedImageMap.size();
+    if (size > IMAGE_DATA_THRESHOLD) {
+        HILOG_ERROR("%{public}s unexpected image number %{public}zu", __func__, size);
+        return false;
+    }
+    for (const auto &entry : sharedImageMap) {
+        imageDataMap[entry.first] = entry.second.first;
+    }
+    return true;
+}
 } // namespace AppExecFwk
 } // namespace OHOS

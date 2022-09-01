@@ -18,6 +18,8 @@
 
 #include <iremote_object.h>
 
+#include "form_js_info.h"
+
 namespace OHOS {
 namespace AppExecFwk {
 /**
@@ -26,9 +28,18 @@ namespace AppExecFwk {
  */
 class FormHostCaller {
 public:
-    explicit FormHostCaller(const sptr<IRemoteObject> &callerToken) : callerToken_(callerToken) {}
+    FormHostCaller(const FormJsInfo &formJsInfo, const sptr<IRemoteObject> &callerToken) :
+        formJsInfo_(formJsInfo), callerToken_(callerToken) {}
     ~FormHostCaller() = default;
+
+    /**
+     * @brief Update form with formId.
+     * @param formId Indicates the Id of the form to update.
+     * @param formProviderData Indicates the form provider data.
+     */
+    void UpdateForm(int64_t formId, const FormProviderData &formProviderData);
 private:
+    FormJsInfo formJsInfo_;
     sptr<IRemoteObject> callerToken_;
 };
 } // namespace AppExecFwk

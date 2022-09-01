@@ -79,9 +79,17 @@ public:
      */
     int32_t OnAcquire(const FormProviderInfo &formProviderInfo, const AAFwk::Want &want,
         const sptr<IRemoteObject> &token);
+
+    /**
+     * @brief Update form with formId.
+     * @param formId Indicates the Id of the form to update.
+     * @param formProviderData Indicates the form provider data.
+     */
+    void UpdateForm(int64_t formId, const FormProviderData &formProviderData);
 private:
     bool GetFormJsInfo(int64_t formId, FormJsInfo &formJsInfo);
-    int32_t OnAcquired(const FormJsInfo &formJsInfo, const sptr<IRemoteObject> &token);
+    int32_t OnAcquire(const FormJsInfo &formJsInfo, const sptr<IRemoteObject> &token);
+    void UpdateForm(const FormJsInfo &formJsInfo);
 
     mutable std::recursive_mutex formJsInfoMutex_;
     std::map<int64_t, FormJsInfo> formJsInfoMap_;

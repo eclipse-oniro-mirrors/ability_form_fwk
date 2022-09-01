@@ -139,6 +139,13 @@ public:
      * @param requestCode The request code of this share form.
      */
     void RemoveShareFormCallback(int64_t requestCode);
+
+    /**
+     * @brief Update form.
+     * @param formJsInfo Form js info.
+     * @return none.
+     */
+    void UpdateForm(const FormJsInfo &formJsInfo);
 private:
     static std::mutex instanceMutex_;
     static sptr<FormHostClient> instance_;
