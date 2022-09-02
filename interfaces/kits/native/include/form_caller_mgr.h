@@ -34,12 +34,14 @@ class FormCallerMgr final : public DelayedRefSingleton<FormCallerMgr> {
 public:
     DISALLOW_COPY_AND_MOVE(FormCallerMgr);
     // for host
-    void SetFormHostCaller(int64_t formId, const sptr<IRemoteObject> &callerToken);
+    void AddFormHostCaller(int64_t formId, const sptr<IRemoteObject> &callerToken);
 
     // for provider
-    void SetFormProviderCaller(const FormJsInfo &formJsInfo, const sptr<IRemoteObject> &callerToken);
+    void AddFormProviderCaller(const FormJsInfo &formJsInfo, const sptr<IRemoteObject> &callerToken);
 
     void GetFormProviderCaller(int64_t formId, std::vector<std::shared_ptr<FormProviderCaller>> &formProviderCallers);
+
+    void RemoveFormProviderCaller(int64_t formId, const sptr<IRemoteObject> &callerToken);
 private:
     // for host
     mutable std::recursive_mutex formHostCallerMutex_;

@@ -97,7 +97,7 @@ void FormAbilityConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementNam
         FormSupplyCallback::GetInstance()->RemoveConnection(connectId_);
         connectId_ = 0;
     } else {
-        HILOG_ERROR("%{public}s fail, invalid connectId_: %{public}ld", __func__, connectId_);
+        HILOG_ERROR("%{public}s fail, invalid connectId_: %{public}d", __func__, connectId_);
     }
 }
 
@@ -111,7 +111,7 @@ void FormAbilityConnection::OnConnectDied(const wptr<IRemoteObject> &remoteObjec
         FormSupplyCallback::GetInstance()->RemoveConnection(connectId_);
         connectId_ = 0;
     } else {
-        HILOG_ERROR("%{public}s fail, connectId_ invalidate. connectId_: %{public}ld", __func__, connectId_);
+        HILOG_ERROR("%{public}s fail, connectId_ invalidate. connectId_: %{public}d", __func__, connectId_);
     }
 }
 
@@ -119,9 +119,9 @@ void FormAbilityConnection::OnConnectDied(const wptr<IRemoteObject> &remoteObjec
  * @brief Set connectId.
  * @param connectId The ability connection id.
  */
-void FormAbilityConnection::SetConnectId(long connectId)
+void FormAbilityConnection::SetConnectId(int32_t connectId)
 {
-    HILOG_INFO("%{public}s, connectId_: %{public}ld", __func__, connectId);
+    HILOG_INFO("%{public}s, connectId_: %{public}d", __func__, connectId);
     connectId_ = connectId;
 }
 
@@ -129,7 +129,7 @@ void FormAbilityConnection::SetConnectId(long connectId)
  * @brief Get connectId.
  * @return The ability connection id.
  */
-long FormAbilityConnection::GetConnectId() const
+int32_t FormAbilityConnection::GetConnectId() const
 {
     return connectId_;
 }
@@ -173,5 +173,25 @@ int64_t FormAbilityConnection::GetFormId() const
 {
     return formId_;
 }
-}  // namespace AppExecFwk
-}  // namespace OHOS
+
+void FormAbilityConnection::SetHostToken(const sptr<IRemoteObject> hostToken)
+{
+    hostToken_ = hostToken;
+}
+
+sptr<IRemoteObject> FormAbilityConnection::GetHostToken() const
+{
+    return hostToken_;
+}
+
+void FormAbilityConnection::SetProviderToken(const sptr<IRemoteObject> providerToken)
+{
+    providerToken_ = providerToken;
+}
+
+sptr<IRemoteObject> FormAbilityConnection::GetProviderToken() const
+{
+    return providerToken_;
+}
+} // namespace AppExecFwk
+} // namespace OHOS

@@ -43,7 +43,7 @@ public:
      * @brief Add form js info to formJsInfoMap_.
      * @param formJsInfo The form js info.
      */
-    void AddFormJsInfo(const FormJsInfo &formJsInfo);
+    void AddForm(const FormJsInfo &formJsInfo);
 
     /**
      * @brief Delete form js info form formJsInfoMap_.
@@ -52,10 +52,23 @@ public:
     void DeleteFormJsInfo(const FormJsInfo &formJsInfo);
 
     /**
-     * @brief whether has the Specific form ID.
+     * @brief Whether has the specific form.
+     * @param formId The form ID.
+     * @return Returns true if has the specific form; returns false otherwise.
+     */
+    bool HasForm(int64_t formId);
+
+    /**
+     * @brief Delete the Specific form.
      * @param formId The form ID.
      */
-    bool HasFormId(int64_t formId);
+    void DeleteForm(int64_t formId);
+
+    /**
+     * @brief Whether the form is empty.
+     * @return Returns true if the form is empty; returns false otherwise.
+     */
+    bool IsFormEmpty();
 
     /**
      * @brief Callback acquire.

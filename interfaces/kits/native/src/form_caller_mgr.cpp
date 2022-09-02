@@ -24,7 +24,7 @@ FormCallerMgr::FormCallerMgr() {}
 
 FormCallerMgr::~FormCallerMgr() {}
 
-void FormCallerMgr::SetFormHostCaller(int64_t formId, const sptr<IRemoteObject> &callerToken)
+void FormCallerMgr::AddFormHostCaller(int64_t formId, const sptr<IRemoteObject> &callerToken)
 {
     HILOG_DEBUG("%{public}s called", __func__);
     std::lock_guard<std::recursive_mutex> lock(formHostCallerMutex_);
@@ -32,19 +32,19 @@ void FormCallerMgr::SetFormHostCaller(int64_t formId, const sptr<IRemoteObject> 
     formHostCallers_[formId] = caller;
 }
 
-void FormCallerMgr::SetFormProviderCaller(const FormJsInfo &formJsInfo, const sptr<IRemoteObject> &callerToken)
+void FormCallerMgr::AddFormProviderCaller(const FormJsInfo &formJsInfo, const sptr<IRemoteObject> &callerToken)
 {
     HILOG_DEBUG("%{public}s called", __func__);
     std::lock_guard<std::recursive_mutex> lock(formProviderCallerMutex_);
     for (const auto &formProviderCaller : formProviderCallers_) {
         if (callerToken == formProviderCaller->GetCallerToken()) {
-            formProviderCaller->AddFormJsInfo(formJsInfo);
+            formProviderCaller->AddForm(formJsInfo);
             return;
         }
     }
 
     std::shared_ptr<FormProviderCaller> caller = std::make_shared<FormProviderCaller>(callerToken);
-    caller->AddFormJsInfo(formJsInfo);
+    caller->AddForm(formJsInfo);
     formProviderCallers_.emplace_back(caller);
 }
 
@@ -54,9 +54,26 @@ void FormCallerMgr::GetFormProviderCaller(int64_t formId,
     HILOG_DEBUG("%{public}s called", __func__);
     std::lock_guard<std::recursive_mutex> lock(formProviderCallerMutex_);
     for (const auto &formProviderCaller : formProviderCallers_) {
-        if (formProviderCaller->HasFormId(formId)) {
+        if (formProviderCaller->HasForm(formId)) {
             formProviderCallers.emplace_back(formProviderCaller);
         }
+    }
+}
+
+void FormCallerMgr::RemoveFormProviderCaller(int64_t formId, const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_DEBUG("%{public}s called", __func__);
+    std::shared_ptr<FormProviderCaller> providerCaller = nullptr;
+    std::lock_guard<std::recursive_mutex> lock(formProviderCallerMutex_);
+    for (auto iter = formProviderCallers_.begin(); iter != formProviderCallers_.end(); ++iter) {
+        if (callerToken != (*iter)->GetCallerToken()) {
+            continue;
+        }
+        (*iter)->DeleteForm(formId);
+        if ((*iter)->IsFormEmpty()) {
+            iter = formProviderCallers_.erase(iter);
+        }
+        break;
     }
 }
 } // namespace AppExecFwk

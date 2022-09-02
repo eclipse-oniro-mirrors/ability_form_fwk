@@ -364,7 +364,7 @@ void FormTaskMgr::NotifyFormUpdate(const int64_t formId, const Want &want, const
 {
     HILOG_INFO("%{public}s called.", __func__);
 
-    long connectId = want.GetLongParam(Constants::FORM_CONNECT_ID, 0);
+    auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
     if (formProviderProxy == nullptr) {
         FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
@@ -392,7 +392,7 @@ void FormTaskMgr::EventNotify(const std::vector<int64_t> &formEvents, const int3
 {
     HILOG_INFO("%{public}s called.", __func__);
 
-    long connectId = want.GetLongParam(Constants::FORM_CONNECT_ID, 0);
+    auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
     if (formProviderProxy == nullptr) {
         FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
@@ -419,7 +419,7 @@ void FormTaskMgr::NotifyCastTemp(const int64_t formId, const Want &want, const s
 {
     HILOG_INFO("%{public}s called.", __func__);
 
-    long connectId = want.GetLongParam(Constants::FORM_CONNECT_ID, 0);
+    auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
     if (formProviderProxy == nullptr) {
         FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
@@ -505,7 +505,7 @@ void FormTaskMgr::ProviderBatchDelete(std::set<int64_t> &formIds, const Want &wa
     const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_INFO("%{public}s called.", __func__);
-    long connectId = want.GetLongParam(Constants::FORM_CONNECT_ID, 0);
+    auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
     if (formProviderProxy == nullptr) {
         FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
@@ -531,7 +531,7 @@ void FormTaskMgr::FireFormEvent(const int64_t formId, const std::string &message
     const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_INFO("%{public}s start", __func__);
-    long connectId = want.GetLongParam(Constants::FORM_CONNECT_ID, 0);
+    auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
     if (formProviderProxy == nullptr) {
         FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
@@ -558,10 +558,10 @@ void FormTaskMgr::AcquireState(const Want &wantArg, const std::string &provider,
                                const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_INFO("%{public}s start", __func__);
-    long connectId = want.GetLongParam(Constants::FORM_CONNECT_ID, 0);
+    auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
     if (formProviderProxy == nullptr) {
-        FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
+    FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
         HILOG_ERROR("%{public}s, Failed to get formProviderProxy", __func__);
         return;
     }
@@ -644,5 +644,5 @@ void FormTaskMgr::FormShareSendResponse(int64_t formShareRequestCode, int32_t re
 {
     FormShareMgr::GetInstance().SendResponse(formShareRequestCode, result);
 }
-}  // namespace AppExecFwk
-}  // namespace OHOS
+} // namespace AppExecFwk
+} // namespace OHOS

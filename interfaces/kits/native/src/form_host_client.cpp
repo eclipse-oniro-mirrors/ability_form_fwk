@@ -165,7 +165,7 @@ void FormHostClient::OnAcquired(const FormJsInfo &formJsInfo, const sptr<IRemote
 
     if (token != nullptr) {
         HILOG_DEBUG("save token to form remote mgr.");
-        FormCallerMgr::GetInstance().SetFormHostCaller(formId, token);
+        FormCallerMgr::GetInstance().AddFormHostCaller(formId, token);
     }
 
     std::lock_guard<std::mutex> lock(callbackMutex_);
