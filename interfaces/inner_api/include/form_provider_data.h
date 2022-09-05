@@ -172,7 +172,7 @@ public:
     static constexpr int IMAGE_DATA_STATE_ADDED = 1;
 
 private:
-    bool WriteImageDataToParcel(Parcel &parcel, const std::string &picName, const std::shared_ptr<char> &data,
+    bool WriteImageDataToParcel(Parcel &parcel, const std::string &picName, const std::shared_ptr<char[]> &data,
         int32_t size) const;
 
     /**
@@ -180,16 +180,11 @@ private:
      * @param picName Indicates the name of the image to add.
      * @param data Indicates the binary data of the image content.
      */
-    void AddImageData(const std::string &picName, const std::shared_ptr<char> &data, int32_t size);
+    void AddImageData(const std::string &picName, const std::shared_ptr<char[]> &data, int32_t size);
 private:
-    struct DeleteBytes {
-        void operator()(char* bytes) const {
-            delete[] bytes;
-        }
-    };
     nlohmann::json jsonFormProviderData_;
     std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap_;
-    std::map<std::string, std::pair<std::shared_ptr<char>, int32_t>> rawImageBytesMap_;
+    std::map<std::string, std::pair<std::shared_ptr<char[]>, int32_t>> rawImageBytesMap_;
     int32_t imageDataState_ = 0;
 };
 }  // namespace AppExecFwk

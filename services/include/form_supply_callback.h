@@ -76,6 +76,12 @@ public:
 
     void OnShareAcquire(int64_t formId, const std::string &remoteDeviceId,
         const AAFwk::WantParams &wantParams, int64_t requestCode, const bool &result) override;
+
+    /**
+     * @brief Handle form host died.
+     * @param hostToken Form host proxy object.
+     */
+    void HandleHostDied(const sptr<IRemoteObject> &hostToken);
 private:
     /**
      * @brief check if disconnect ability or not.

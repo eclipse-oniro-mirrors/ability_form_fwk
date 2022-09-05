@@ -97,7 +97,7 @@ int32_t FormProviderCaller::OnAcquire(const FormJsInfo &formJsInfo, const sptr<I
     sptr<IFormHost> callerToken = iface_cast<IFormHost>(callerToken_);
     if (callerToken == nullptr) {
         HILOG_ERROR("%{public}s error, callerToken is nullptr.", __func__);
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     callerToken->OnAcquired(formJsInfo, token);
     return ERR_OK;

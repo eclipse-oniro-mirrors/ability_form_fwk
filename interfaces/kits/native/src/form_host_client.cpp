@@ -299,7 +299,7 @@ void FormHostClient::UpdateForm(const FormJsInfo &formJsInfo)
         HILOG_ERROR("%{public}s error, not find formId:%{public}s.", __func__, std::to_string(formId).c_str());
         return;
     }
-    for (const auto& callback : iter->second) {
+    for (const auto &callback : iter->second) {
         HILOG_INFO("%{public}s, formId: %{public}" PRId64 ", jspath: %{public}s, data: %{public}s",
             __func__, formId, formJsInfo.jsFormCodePath.c_str(), formJsInfo.formData.c_str());
         callback->ProcessFormUpdate(formJsInfo);

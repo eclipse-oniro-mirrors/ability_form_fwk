@@ -201,6 +201,11 @@ int FormMgr::RequestForm(const int64_t formId, const sptr<IRemoteObject> &caller
         HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
         return errCode;
     }
+    auto hostCaller = FormCallerMgr::GetInstance().GetFormHostCaller(formId);
+    if (hostCaller != nullptr) {
+        HILOG_DEBUG("request form by host caller");
+        return hostCaller->RequestForm(formId, callerToken, want);
+    }
     ErrCode resultCode = remoteProxy_->RequestForm(formId, callerToken, want);
     if (resultCode != ERR_OK) {
         HILOG_ERROR(
@@ -348,6 +353,11 @@ int FormMgr::MessageEvent(const int64_t formId, const Want &want, const sptr<IRe
     if (errCode != ERR_OK) {
         HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
         return errCode;
+    }
+    auto hostCaller = FormCallerMgr::GetInstance().GetFormHostCaller(formId);
+    if (hostCaller != nullptr) {
+        HILOG_DEBUG("send message by host caller");
+        return hostCaller->MessageEvent(formId, want, callerToken);
     }
     return remoteProxy_->MessageEvent(formId, want, callerToken);
 }

@@ -19,6 +19,7 @@
 #include <iremote_object.h>
 
 #include "form_js_info.h"
+#include "want.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -38,6 +39,27 @@ public:
      * @param formProviderData Indicates the form provider data.
      */
     void UpdateForm(int64_t formId, const FormProviderData &formProviderData);
+
+    /**
+    * @brief Notify the form service that the form user's lifecycle is updated.
+    *
+    * This should be called when form user request form.
+    *
+    * @param formId Indicates the unique id of form.
+    * @param callerToken Indicates the callback remote object of specified form user.
+    * @param want Indicates information passed to supplier.
+    * @return Returns ERR_OK on success, others on failure.
+    */
+    ErrCode RequestForm(int64_t formId, const sptr<IRemoteObject> &callerToken, const AAFwk::Want &want);
+
+    /**
+     * @brief Process js message event.
+     * @param formId Indicates the unique id of form.
+     * @param want Indicates information passed to supplier.
+     * @param callerToken Caller ability token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode MessageEvent(int64_t formId, const AAFwk::Want &want, const sptr<IRemoteObject> &callerToken);
 private:
     FormJsInfo formJsInfo_;
     sptr<IRemoteObject> callerToken_;

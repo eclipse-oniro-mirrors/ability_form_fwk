@@ -143,7 +143,6 @@ public:
     /**
      * @brief Update form.
      * @param formJsInfo Form js info.
-     * @return none.
      */
     void UpdateForm(const FormJsInfo &formJsInfo);
 private:

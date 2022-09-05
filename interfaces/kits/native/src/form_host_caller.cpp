@@ -15,7 +15,10 @@
 
 #include "form_host_caller.h"
 
+#include "form_constants.h"
 #include "form_host_client.h"
+#include "form_mgr_errors.h"
+#include "form_provider_interface.h"
 #include "hilog_wrapper.h"
 
 namespace OHOS {
@@ -23,8 +26,7 @@ namespace AppExecFwk {
 void FormHostCaller::UpdateForm(int64_t formId, const FormProviderData &formProviderData)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
-    FormJsInfo formJsInfo;
-    formJsInfo = formJsInfo_;
+    FormJsInfo formJsInfo = formJsInfo_;
     formJsInfo.formData = formProviderData.GetDataString();
     formJsInfo.formProviderData = formProviderData;
     if (!formJsInfo.ConvertRawImageData()) {
@@ -32,5 +34,27 @@ void FormHostCaller::UpdateForm(int64_t formId, const FormProviderData &formProv
     }
     FormHostClient::GetInstance()->UpdateForm(formJsInfo);
 }
+
+ErrCode FormHostCaller::RequestForm(int64_t formId, const sptr<IRemoteObject> &callerToken, const AAFwk::Want &want)
+{
+    sptr<IFormProvider> providerToken = iface_cast<IFormProvider>(callerToken_);
+    if (providerToken == nullptr) {
+        HILOG_ERROR("%{public}s error, callerToken is nullptr.", __func__);
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    return providerToken->NotifyFormUpdate(formId, want, callerToken);
+}
+
+ErrCode FormHostCaller::MessageEvent(int64_t formId, const AAFwk::Want &want, const sptr<IRemoteObject> &callerToken)
+{
+    std::string message = want.GetStringParam(Constants::PARAM_MESSAGE_KEY);
+    sptr<IFormProvider> providerToken = iface_cast<IFormProvider>(callerToken_);
+    if (providerToken == nullptr) {
+        HILOG_ERROR("%{public}s error, callerToken is nullptr.", __func__);
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    return providerToken->FireFormEvent(formId, message, want, callerToken);
+}
+
 } // namespace AppExecFwk
 } // namespace OHOS
