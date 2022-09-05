@@ -14,7 +14,6 @@
  */
 
 #include <remote_native_token.h>
-#include "hilog_wrapper.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -35,7 +34,6 @@ void RemoteNativeToken::SetNativeToken()
 
     infoInstance.processName = "SetUpTestCase";
     tokenId = GetAccessTokenId(&infoInstance);
-    HILOG_DEBUG("SetNativeToken tokenId = %{public}llu", tokenId);
     SetSelfTokenID(tokenId);
     delete[] perms;
 }
