@@ -55,6 +55,7 @@ namespace Constants {
     constexpr const char* LOCAL_BUNDLES = "/data/bundles";
     constexpr const char* FORM_PUBLISH_ACTION = "action.form.publish";
     constexpr const char* PARAM_DEVICE_ID_KEY = "ohos.extra.param.key.device_id";
+    constexpr const char* PARAM_FORM_HOST_TOKEN = "ohos.extra.param.form.host.token";
     constexpr int32_t TYPE_RESET_LIMIT = 1;
     constexpr int32_t TYPE_STATIC_UPDATE = 2;
     constexpr int32_t TYPE_DYNAMIC_UPDATE = 3;
@@ -120,15 +121,6 @@ namespace Constants {
     constexpr const char* PARAM_FORM_ADD_COUNT = "form.add.count";
 
     const size_t MAX_LAYOUT = 8;
-    const std::map<int32_t, std::string> DIMENSION_MAP = {
-        {1, "1*2"},
-        {2, "2*2"},
-        {3, "2*4"},
-        {4, "4*4"},
-        {5, "2*1"}
-    };
-    constexpr int32_t DIM_KEY_MIN = 1;
-    constexpr int32_t DIM_KEY_MAX = 4;
     constexpr int32_t MAX_FORMS = 512;
     constexpr int32_t MAX_RECORD_PER_APP = 256;
     constexpr int32_t MAX_TEMP_FORMS = 256;
@@ -154,37 +146,23 @@ namespace Constants {
 
     constexpr int64_t INVALID_UDID_HASH = 0L;
 
-    enum class FormMgrMessage {
-        // ipc id 1-1000 for kit
-        // ipc id 1001-2000 for DMS
-        // ipc id 2001-3000 for tools
-        // ipc id for add form (3001)
-        FORM_MGR_ADD_FORM = 3001,
-
-        // ipc id for delete form (3002)
-        FORM_MGR_DELETE_FORM,
-
-        // ipc id for form done release form (3003)
-        FORM_MGR_RELEASE_FORM,
-
-        // ipc id for connecting update form (3004)
-        FORM_MGR_UPDATE_FORM,
-
-        // ipc id for form visible notify (3005)
-        FORM_MGR_NOTIFY_FORM_VISIBLE,
-
-        // ipc id for form invisible notify (3006)
-        FORM_MGR_NOTIFY_FORM_INVISIBLE,
-
-        // ipc id for refreshing data cache (3007)
-        FORM_MGR_CAST_TEMP_FORM,
-
-        // ipc id 2001-3000 for tools
-        // ipc id for dumping state (2001)
-        FORM_MGR_DUMP_STATE = 2001,
+    enum class Dimension : int8_t {
+        DIMENSION_MIN = 1,
+        DIMENSION_1_2 = DIMENSION_MIN,
+        DIMENSION_2_2,
+        DIMENSION_2_4,
+        DIMENSION_4_4,
+        DIMENSION_2_1,
+        DIMENSION_MAX = DIMENSION_2_1
     };
 
-    constexpr const char* FORM_STORAGE_DIR = "/data/service/el1/public/database/form_storage";
+    const std::map<Dimension, std::string> DIMENSION_MAP = {
+        {Dimension::DIMENSION_1_2, "1*2"},
+        {Dimension::DIMENSION_2_2, "2*2"},
+        {Dimension::DIMENSION_2_4, "2*4"},
+        {Dimension::DIMENSION_4_4, "4*4"},
+        {Dimension::DIMENSION_2_1, "2*1"}
+    };
 }  // namespace Constants
 }  // namespace AppExecFwk
 }  // namespace OHOS

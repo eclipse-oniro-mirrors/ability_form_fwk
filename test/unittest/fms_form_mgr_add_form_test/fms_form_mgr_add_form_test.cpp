@@ -38,6 +38,7 @@
 #include "mock_ability_manager.h"
 #include "mock_bundle_manager.h"
 #include "mock_form_host_client.h"
+#include "remote_native_token.h"
 #include "running_process_info.h"
 #include "system_ability_definition.h"
 
@@ -80,6 +81,7 @@ protected:
 
 void FmsFormMgrAddFormTest::SetUpTestCase()
 {
+    RemoteNativeToken::SetNativeToken();
     FormBmsHelper::GetInstance().SetBundleManager(new BundleMgrService());
     FormAmsHelper::GetInstance().SetAbilityManager(new MockAbilityMgrService());
 }
@@ -175,9 +177,9 @@ HWTEST_F(FmsFormMgrAddFormTest, AddForm_001, TestSize.Level0)
     EXPECT_EQ(formId, dbInfo.formId);
     EXPECT_EQ(dataCnt, dbInfo.formUserUids.size());
     // Form host record alloted.
-    FormHostRecord hostRecord;
-    ret = FormDataMgr::GetInstance().GetFormHostRecord(formId, hostRecord);
-    EXPECT_TRUE(ret);
+    std::vector<FormHostRecord> hostRecords;
+    FormDataMgr::GetInstance().GetFormHostRecord(formId, hostRecords);
+    EXPECT_FALSE(hostRecords.empty());
 
     FormDataMgr::GetInstance().DeleteFormRecord(formId);
     FormDbCache::GetInstance().DeleteFormInfo(formId);
@@ -248,9 +250,9 @@ HWTEST_F(FmsFormMgrAddFormTest, AddForm_002, TestSize.Level0)
     EXPECT_EQ(formId, dbInfo.formId);
     EXPECT_EQ(formUserUidCnt, dbInfo.formUserUids.size());
     // Form host record not changed.
-    FormHostRecord hostRecord;
-    ret = FormDataMgr::GetInstance().GetFormHostRecord(formId, hostRecord);
-    EXPECT_TRUE(ret);
+    std::vector<FormHostRecord> hostRecords;
+    FormDataMgr::GetInstance().GetFormHostRecord(formId, hostRecords);
+    EXPECT_FALSE(hostRecords.empty());
 
     FormDataMgr::GetInstance().DeleteFormRecord(formId);
     FormDbCache::GetInstance().DeleteFormInfo(formId);
@@ -317,9 +319,9 @@ HWTEST_F(FmsFormMgrAddFormTest, AddForm_003, TestSize.Level0)
     EXPECT_EQ(formId, dbInfo.formId);
     EXPECT_EQ(formUserUidCnt, dbInfo.formUserUids.size());
     // Form host record not changed.
-    FormHostRecord hostRecord;
-    ret = FormDataMgr::GetInstance().GetFormHostRecord(formId, hostRecord);
-    EXPECT_TRUE(ret);
+    std::vector<FormHostRecord> hostRecords;
+    FormDataMgr::GetInstance().GetFormHostRecord(formId, hostRecords);
+    EXPECT_FALSE(hostRecords.empty());
 
     FormDataMgr::GetInstance().DeleteFormRecord(formId);
     FormDbCache::GetInstance().DeleteFormInfo(formId);

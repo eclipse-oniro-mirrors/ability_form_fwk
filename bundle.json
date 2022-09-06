@@ -12,7 +12,9 @@
     "component": {
         "name": "form_fwk",
         "subsystem": "ability",
-        "syscap": [],
+        "syscap": [
+          "SystemCapability.Ability.Form"
+        ],
         "features": [],
         "adapted_system_type": [
             "standard"
@@ -73,7 +75,6 @@
                     "form_supply_stub.h",
                     "provider_connect_stub.h",
                     "form_constants.h",
-                    "form_js_info.h",
                     "form_share_info.h"
                   ]
                 },

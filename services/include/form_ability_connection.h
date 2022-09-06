@@ -58,13 +58,13 @@ public:
      * @brief Get connectId.
      * @return The ability connection id.
      */
-    long GetConnectId() const;
+    int32_t GetConnectId() const;
 
     /**
      * @brief Set connectId.
      * @param connectId The ability connection id.
      */
-    void SetConnectId(long connectId);
+    void SetConnectId(int32_t connectId);
     /**
      * @brief Get the provider Key
      *
@@ -97,13 +97,37 @@ public:
      * @brief Get form ID.
      */
     int64_t GetFormId() const;
+
+    /**
+     * @brief Set host token.
+     * @param hostToken Indicates the host token.
+     */
+    void SetHostToken(const sptr<IRemoteObject> hostToken);
+
+    /**
+     * @brief Get host token.
+     */
+    sptr<IRemoteObject> GetHostToken() const;
+
+    /**
+     * @brief Set provider token.
+     * @param hostToken Indicates the provider token.
+     */
+    void SetProviderToken(const sptr<IRemoteObject> providerToken);
+
+    /**
+     * @brief Get provider token.
+     */
+    sptr<IRemoteObject> GetProviderToken() const;
 private:
     int64_t formId_ = -1;
     std::string deviceId_ = "";
     std::string bundleName_ = "";
     std::string abilityName_ = "";
     bool isFreeInstall_ = false;
-    long connectId_ = 0;
+    int32_t connectId_ = 0;
+    sptr<IRemoteObject> hostToken_ = nullptr;
+    sptr<IRemoteObject> providerToken_ = nullptr;
 
     DISALLOW_COPY_AND_MOVE(FormAbilityConnection);
 };

@@ -23,6 +23,7 @@ ohos_unittest("FmsFormMgrPublishFormTest") {
     "${form_fwk_path}/test/mock/src/mock_bundle_manager.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_host_client.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_provider_client.cpp",
+    "${form_fwk_path}/test/mock/src/remote_native_token.cpp",
   ]
   sources += [ "fms_form_mgr_publish_form_test.cpp" ]
 
@@ -46,7 +47,7 @@ ohos_unittest("FmsFormMgrPublishFormTest") {
   deps = [
     "${ability_runtime_path}/interfaces/inner_api/app_manager:app_manager",
     "${ability_runtime_path}/services/abilitymgr:abilityms_target",
-    "${distributeddatamgr_path}/distributeddatamgr/interfaces/innerkits/distributeddata:distributeddata_inner",
+    "${distributeddatamgr_path}/kv_store/interfaces/innerkits/distributeddata:distributeddata_inner",
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
     "${systemabilitymgr_path}/safwk/interfaces/innerkits/safwk:system_ability_fwk",
@@ -59,6 +60,8 @@ ohos_unittest("FmsFormMgrPublishFormTest") {
     "ability_base:configuration",
     "ability_base:want",
     "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
     "appspawn:appspawn_socket_client",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",

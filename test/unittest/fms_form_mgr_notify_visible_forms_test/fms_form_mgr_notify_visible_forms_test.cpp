@@ -31,6 +31,7 @@
 #include "hilog_wrapper.h"
 #include "mock_bundle_manager.h"
 #include "mock_form_host_client.h"
+#include "remote_native_token.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -60,6 +61,7 @@ protected:
 };
 void FmsFormMgrNotifyVisibleFormsTest::SetUpTestCase(void)
 {
+    RemoteNativeToken::SetNativeToken();
     FormBmsHelper::GetInstance().SetBundleManager(new BundleMgrService());
 }
 

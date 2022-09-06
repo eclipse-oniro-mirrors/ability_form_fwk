@@ -37,8 +37,9 @@ public:
     /**
      * @brief Request to give back a Form.
      * @param formInfo Form info.
+     * @param token Provider client token.
      */
-    virtual void OnAcquired(const FormJsInfo &formInfo) override;
+    void OnAcquired(const FormJsInfo &formInfo, const sptr<IRemoteObject> &token) override;
 
     /**
      * @brief Form is updated.

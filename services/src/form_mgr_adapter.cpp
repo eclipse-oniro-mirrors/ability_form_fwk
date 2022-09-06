@@ -79,10 +79,6 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    if (formId > 0 && FormDataMgr::GetInstance().IsRequestPublishForm(formId)) {
-        return AddRequestPublishForm(formId, want, callerToken, formInfo);
-    }
-
     // check form count limit
     bool tempFormFlag = want.GetBoolParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
     int callingUid = IPCSkeleton::GetCallingUid();
@@ -108,24 +104,27 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
     // get from config info
     FormItemInfo formItemInfo;
     int32_t errCode = GetFormConfigInfo(want, formItemInfo);
-    formItemInfo.SetFormId(formId);
     if (errCode != ERR_OK) {
         HILOG_ERROR("%{public}s fail, get form config info failed.", __func__);
         return errCode;
     }
-    if (!formItemInfo.IsValidItem()) {
-        HILOG_ERROR("%{public}s fail, input param itemInfo is invalid", __func__);
-        return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
-    }
-    if (!FormDataMgr::GetInstance().GenerateUdidHash()) {
-        HILOG_ERROR("%{public}s fail, generate udid hash failed", __func__);
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
-    formItemInfo.SetDeviceId(want.GetElement().GetDeviceID());
-    WantParams wantParams = want.GetParams();
+    formItemInfo.SetFormId(formId);
 
-    if (formId == 0 && DelayedSingleton<FormShareMgr>::GetInstance()->IsShareForm(want)) {
-        DelayedSingleton<FormShareMgr>::GetInstance()->AddProviderData(want, wantParams);
+    // publish form
+    if (formId > 0 && FormDataMgr::GetInstance().IsRequestPublishForm(formId)) {
+        return AddRequestPublishForm(formItemInfo, want, callerToken, formInfo);
+    }
+
+    Want newWant(want);
+    // in application form
+    if (formItemInfo.GetProviderBundleName() == formItemInfo.GetHostBundleName()) {
+        HILOG_DEBUG("form in application");
+        newWant.SetParam(Constants::PARAM_FORM_HOST_TOKEN, callerToken);
+    }
+    WantParams wantParams = newWant.GetParams();
+    // share form
+    if (formId == 0 && DelayedSingleton<FormShareMgr>::GetInstance()->IsShareForm(newWant)) {
+        DelayedSingleton<FormShareMgr>::GetInstance()->AddProviderData(newWant, wantParams);
     }
     if (formId > 0) {
         return AllotFormById(formItemInfo, callerToken, wantParams, formInfo);
@@ -146,6 +145,9 @@ int FormMgrAdapter::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
         HILOG_ERROR("%{public}s, deleteForm invalid param", __func__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
+
+    // remove connection for in application form
+    FormSupplyCallback::GetInstance()->RemoveConnection(formId, callerToken);
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
     if (FormDataMgr::GetInstance().ExistTempForm(matchedFormId)) {
         // delete temp form if receive delete form call
@@ -410,18 +412,12 @@ int FormMgrAdapter::UpdateForm(const int64_t formId,
         HILOG_ERROR("%{public}s error, invalid formId or bundleName.", __func__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
-
-    // get IBundleMgr
-    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
-    if (iBundleMgr == nullptr) {
-        HILOG_ERROR("%{public}s error, failed to get IBundleMgr.", __func__);
-        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
-    }
-
     // check bundle uid for permission
-    int callingUid = IPCSkeleton::GetCallingUid();
+    int32_t callingUid = IPCSkeleton::GetCallingUid();
     int32_t userId = GetCurrentUserId(callingUid);
-    int32_t bundleUid = IN_PROCESS_CALL(iBundleMgr->GetUidByBundleName(bundleName, userId));
+
+    // get uid
+    int32_t bundleUid = FormBmsHelper::GetInstance().GetUidByBundleName(bundleName, userId);
     if (bundleUid != callingUid) {
         HILOG_ERROR("%{public}s error, permission denied, the updated form is not your own.", __func__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -698,9 +694,10 @@ int FormMgrAdapter::DumpFormInfoByFormId(const std::int64_t formId, std::string 
         reply = ERR_OK;
     }
 
-    FormHostRecord formHostRecord;
-    if (FormDataMgr::GetInstance().GetFormHostRecord(formId, formHostRecord)) {
-        FormDumpMgr::GetInstance().DumpFormHostInfo(formHostRecord, formInfo);
+    std::vector<FormHostRecord> formHostRecords;
+    FormDataMgr::GetInstance().GetFormHostRecord(formId, formHostRecords);
+    for (const auto &iter : formHostRecords) {
+        FormDumpMgr::GetInstance().DumpFormHostInfo(iter, formInfo);
         reply = ERR_OK;
     }
 
@@ -764,6 +761,12 @@ ErrCode FormMgrAdapter::GetFormConfigInfo(const Want &want, FormItemInfo &formCo
         return errCode;
     }
     formConfigInfo.SetPackageName(packageName);
+    formConfigInfo.SetDeviceId(want.GetElement().GetDeviceID());
+
+    if (!formConfigInfo.IsValidItem()) {
+        HILOG_ERROR("%{public}s fail, input param itemInfo is invalid", __func__);
+        return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
+    }
 
     HILOG_DEBUG("GetFormConfigInfo end.");
     return ERR_OK;
@@ -779,7 +782,7 @@ ErrCode FormMgrAdapter::GetFormConfigInfo(const Want &want, FormItemInfo &formCo
 ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
     const sptr<IRemoteObject> &callerToken, const WantParams &wantParams, FormJsInfo &formInfo)
 {
-    int64_t formId = PaddingUdidHash(info.GetFormId());
+    int64_t formId = FormDataMgr::GetInstance().PaddingUdidHash(info.GetFormId());
     FormRecord record;
     bool hasRecord = FormDataMgr::GetInstance().GetFormRecord(formId, record);
     if (hasRecord && record.formTempFlag) {
@@ -817,19 +820,7 @@ ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
 
     return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
 }
-int64_t FormMgrAdapter::PaddingUdidHash(const int64_t formId) const
-{
-    // Compatible with int form id.
-    uint64_t unsignedFormId = static_cast<uint64_t>(formId);
-    if ((unsignedFormId & 0xffffffff00000000L) == 0) {
-        int64_t udidHash = FormDataMgr::GetInstance().GetUdidHash();
-        uint64_t unsignedUdidHash  = static_cast<uint64_t>(udidHash);
-        uint64_t unsignedUdidHashFormId = unsignedUdidHash | unsignedFormId;
-        int64_t udidHashFormId = static_cast<int64_t>(unsignedUdidHashFormId);
-        return udidHashFormId;
-    }
-    return formId;
-}
+
 ErrCode FormMgrAdapter::AddExistFormRecord(const FormItemInfo &info, const sptr<IRemoteObject> &callerToken,
     const FormRecord &record, const int64_t formId, const WantParams &wantParams, FormJsInfo &formInfo)
 {
@@ -866,7 +857,7 @@ ErrCode FormMgrAdapter::AddExistFormRecord(const FormItemInfo &info, const sptr<
     if (FormCacheMgr::GetInstance().GetData(formId, cacheData)) {
         formInfo.formData = cacheData;
     }
-    FormDataMgr::GetInstance().CreateFormInfo(formId, record, formInfo);
+    FormDataMgr::GetInstance().CreateFormJsInfo(formId, record, formInfo);
 
     // start update timer
     ErrCode errorCode = AddFormTimer(newRecord);
@@ -936,7 +927,7 @@ ErrCode FormMgrAdapter::AddNewFormRecord(const FormItemInfo &info, const int64_t
     }
 
     // create form info for js
-    FormDataMgr::GetInstance().CreateFormInfo(formId, formRecord, formInfo);
+    FormDataMgr::GetInstance().CreateFormJsInfo(formId, formRecord, formInfo);
 
     // storage info
     if (!newInfo.IsTemporaryForm()) {
@@ -948,7 +939,11 @@ ErrCode FormMgrAdapter::AddNewFormRecord(const FormItemInfo &info, const int64_t
     }
 
     // start update timer
-    return AddFormTimer(formRecord);
+    if (info.GetProviderBundleName() != info.GetHostBundleName()) {
+        return AddFormTimer(formRecord);
+    }
+
+    return ERR_OK;
 }
 
 /**
@@ -1023,7 +1018,15 @@ ErrCode FormMgrAdapter::AcquireProviderFormInfoAsync(const int64_t formId,
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    sptr<IAbilityConnection> formAcquireConnection = new FormAcquireConnection(formId, info, wantParams);
+    Want newWant;
+    newWant.SetParams(wantParams);
+    auto hostToken = newWant.GetRemoteObject(Constants::PARAM_FORM_HOST_TOKEN);
+    sptr<IAbilityConnection> formAcquireConnection = new  (std::nothrow) FormAcquireConnection(formId, info, wantParams,
+        hostToken);
+    if (formAcquireConnection == nullptr) {
+        HILOG_ERROR("formAcquireConnection is null.");
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+    }
     Want want;
     want.SetElementName(info.GetProviderBundleName(), info.GetAbilityName());
     want.AddFlags(Want::FLAG_ABILITY_FORM_ENABLED);
@@ -1195,16 +1198,11 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
     itemInfo.SetVersionName(bundleInfo.versionName);
     itemInfo.SetCompatibleVersion(bundleInfo.compatibleVersion);
 
-    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
-    if (iBundleMgr == nullptr) {
-        HILOG_ERROR("GetFormInfo, failed to get IBundleMgr.");
-        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
-    }
-    std::string hostBundleName {};
-    auto callingUid = IPCSkeleton::GetCallingUid();
-    if (!IN_PROCESS_CALL(iBundleMgr->GetBundleNameForUid(callingUid, hostBundleName))) {
+    std::string hostBundleName;
+    auto ret = FormBmsHelper::GetInstance().GetCallerBundleName(hostBundleName);
+    if (ret != ERR_OK) {
         HILOG_ERROR("GetFormsInfoByModule, failed to get form config info.");
-        return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
+        return ret;
     }
     itemInfo.SetHostBundleName(hostBundleName);
     itemInfo.SetAbilityName(formInfo.abilityName);
@@ -1261,19 +1259,12 @@ int FormMgrAdapter::SetNextRefreshTime(const int64_t formId, const int64_t nextT
         HILOG_ERROR("%{public}s failed to get BundleName", __func__);
         return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
     }
-
-    // get IBundleMgr
-    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
-    if (iBundleMgr == nullptr) {
-        HILOG_ERROR("%{public}s error, failed to get IBundleMgr.", __func__);
-        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
-    }
-
-    int callingUid = IPCSkeleton::GetCallingUid();
+    int32_t callingUid = IPCSkeleton::GetCallingUid();
     int32_t userId = GetCurrentUserId(callingUid);
     HILOG_INFO("%{public}s, userId:%{public}d, callingUid:%{public}d.", __func__, userId, callingUid);
 
-    int32_t bundleUid = IN_PROCESS_CALL(iBundleMgr->GetUidByBundleName(bundleName, userId));
+    // get IBundleMgr
+    int32_t bundleUid = FormBmsHelper::GetInstance().GetUidByBundleName(bundleName, userId);
     if (bundleUid != callingUid) {
         HILOG_ERROR("%{public}s error, permission denied, the form is not your own.", __func__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -1393,20 +1384,13 @@ ErrCode FormMgrAdapter::CheckPublishForm(Want &want)
 
 ErrCode FormMgrAdapter::QueryPublishFormToHost(Want &want)
 {
-    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
-    if (iBundleMgr == nullptr) {
-        HILOG_ERROR("%{public}s fail, failed to get IBundleMgr.", __func__);
-        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
-    }
     /* Query the highest priority ability or extension ability for publishing form */
-    Want wantAction;
-    wantAction.SetAction(Constants::FORM_PUBLISH_ACTION);
     AppExecFwk::AbilityInfo abilityInfo;
     AppExecFwk::ExtensionAbilityInfo extensionAbilityInfo;
     int callingUid = IPCSkeleton::GetCallingUid();
     int32_t userId = GetCurrentUserId(callingUid);
-    if (!IN_PROCESS_CALL(iBundleMgr->ImplicitQueryInfoByPriority(wantAction,
-        AppExecFwk::AbilityInfoFlag::GET_ABILITY_INFO_DEFAULT, userId, abilityInfo, extensionAbilityInfo))) {
+    if (!FormBmsHelper::GetInstance().GetAbilityInfoByAction(
+        Constants::FORM_PUBLISH_ACTION, userId, abilityInfo, extensionAbilityInfo)) {
         HILOG_ERROR("Failed to ImplicitQueryInfoByPriority for publishing form");
         return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
     }
@@ -1559,12 +1543,13 @@ ErrCode FormMgrAdapter::CheckAddRequestPublishForm(const Want &want, const Want 
     return ERR_OK;
 }
 
-ErrCode FormMgrAdapter::AddRequestPublishForm(const int64_t formId, const Want &want,
+ErrCode FormMgrAdapter::AddRequestPublishForm(const FormItemInfo &formItemInfo, const Want &want,
     const sptr<IRemoteObject> &callerToken, FormJsInfo &formJsInfo)
 {
     HILOG_INFO("Add request publish form.");
     Want formProviderWant;
     std::unique_ptr<FormProviderData> formProviderData = nullptr;
+    auto formId = formItemInfo.GetFormId();
     ErrCode errCode = FormDataMgr::GetInstance().GetRequestPublishFormInfo(formId, formProviderWant, formProviderData);
     if (errCode != ERR_OK) {
         HILOG_ERROR("Failed to get request publish form");
@@ -1574,19 +1559,6 @@ ErrCode FormMgrAdapter::AddRequestPublishForm(const int64_t formId, const Want &
     errCode = CheckAddRequestPublishForm(want, formProviderWant);
     if (errCode != ERR_OK) {
         return errCode;
-    }
-
-    FormItemInfo formItemInfo;
-    errCode = GetFormConfigInfo(want, formItemInfo);
-    formItemInfo.SetFormId(formId);
-    formItemInfo.SetDeviceId(want.GetElement().GetDeviceID());
-    if (errCode != ERR_OK) {
-        HILOG_ERROR("%{public}s fail, get form config info failed.", __func__);
-        return errCode;
-    }
-    if (!formItemInfo.IsValidItem()) {
-        HILOG_ERROR("%{public}s fail, input param itemInfo is invalid", __func__);
-        return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
 
     int32_t callingUid = IPCSkeleton::GetCallingUid();
@@ -1601,7 +1573,7 @@ ErrCode FormMgrAdapter::AddRequestPublishForm(const int64_t formId, const Want &
     FormRecord formRecord = FormDataMgr::GetInstance().AllotFormRecord(formItemInfo, callingUid, currentUserId);
 
     // create form info for js
-    FormDataMgr::GetInstance().CreateFormInfo(formId, formRecord, formJsInfo);
+    FormDataMgr::GetInstance().CreateFormJsInfo(formId, formRecord, formJsInfo);
     if (formProviderData != nullptr) {
         formJsInfo.formData = formProviderData->GetDataString();
         formJsInfo.formProviderData = *formProviderData;
@@ -1612,7 +1584,8 @@ ErrCode FormMgrAdapter::AddRequestPublishForm(const int64_t formId, const Want &
     }
     // storage info
     if (!formItemInfo.IsTemporaryForm()) {
-        if (ErrCode errorCode = FormDbCache::GetInstance().UpdateDBRecord(formId, formRecord); errorCode != ERR_OK) {
+        if (ErrCode errorCode = FormDbCache::GetInstance().UpdateDBRecord(formId, formRecord);
+            errorCode != ERR_OK) {
             HILOG_ERROR("%{public}s fail, UpdateDBRecord failed", __func__);
             return errorCode;
         }
@@ -1865,25 +1838,22 @@ bool FormMgrAdapter::IsFormCached(const FormRecord record)
     return true;
 }
 
-/**
- * @brief Acquire form data from form provider.
- * @param formId The Id of the from.
- * @param want The want of the request.
- * @param remoteObject Form provider proxy object.
- */
 void FormMgrAdapter::AcquireProviderFormInfo(const int64_t formId, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_INFO("%{public}s called.", __func__);
-    long connectId = want.GetLongParam(Constants::FORM_CONNECT_ID, 0);
+    auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
     if (formProviderProxy == nullptr) {
         FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
         HILOG_ERROR("%{public}s fail, Failed to get formProviderProxy", __func__);
         return;
     }
-
-    int error = formProviderProxy->AcquireProviderFormInfo(formId, want, FormSupplyCallback::GetInstance());
+    FormRecord formRecord;
+    FormDataMgr::GetInstance().GetFormRecord(formId, formRecord);
+    FormJsInfo formJsInfo;
+    FormDataMgr::GetInstance().CreateFormJsInfo(formId, formRecord, formJsInfo);
+    int error = formProviderProxy->AcquireProviderFormInfo(formJsInfo, want, FormSupplyCallback::GetInstance());
     if (error != ERR_OK) {
         FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
         HILOG_ERROR("%{public}s fail, Failed to get acquire provider form info", __func__);
@@ -1900,7 +1870,7 @@ void FormMgrAdapter::AcquireProviderFormInfo(const int64_t formId, const Want &w
 void FormMgrAdapter::NotifyFormDelete(const int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_INFO("%{public}s called.", __func__);
-    long connectId = want.GetLongParam(Constants::FORM_CONNECT_ID, 0);
+    auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
     if (formProviderProxy == nullptr) {
         HILOG_ERROR("%{public}s fail, Failed to get formProviderProxy", __func__);
@@ -1937,15 +1907,6 @@ int FormMgrAdapter::BatchAddFormRecords(const Want &want)
             HILOG_ERROR("%{public}s fail, get form config info failed.", __func__);
             return errCode;
         }
-        if (!formItemInfo.IsValidItem()) {
-            HILOG_ERROR("%{public}s fail, input param itemInfo is invalid", __func__);
-            return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
-        }
-        if (!FormDataMgr::GetInstance().GenerateUdidHash()) {
-            HILOG_ERROR("%{public}s fail, generate udid hash failed", __func__);
-            return ERR_APPEXECFWK_FORM_COMMON_CODE;
-        }
-
         // generate formId
         int64_t newFormId = FormDataMgr::GetInstance().GenerateFormId();
         if (newFormId < 0) {
@@ -2370,20 +2331,13 @@ int FormMgrAdapter::UpdateRouterAction(const int64_t formId, std::string &action
 
 bool FormMgrAdapter::IsRequestPublishFormSupported()
 {
-    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
-    if (iBundleMgr == nullptr) {
-        HILOG_ERROR("%{public}s error, failed to get IBundleMgr.", __func__);
-        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
-    }
     /* Query the highest priority ability or extension ability for publishing form */
-    Want wantAction;
-    wantAction.SetAction(Constants::FORM_PUBLISH_ACTION);
     AppExecFwk::AbilityInfo abilityInfo;
     AppExecFwk::ExtensionAbilityInfo extensionAbilityInfo;
     int callingUid = IPCSkeleton::GetCallingUid();
     int32_t userId = GetCurrentUserId(callingUid);
-    if (!IN_PROCESS_CALL(iBundleMgr->ImplicitQueryInfoByPriority(wantAction,
-        AppExecFwk::AbilityInfoFlag::GET_ABILITY_INFO_DEFAULT, userId, abilityInfo, extensionAbilityInfo))) {
+    if (!FormBmsHelper::GetInstance().GetAbilityInfoByAction(
+        Constants::FORM_PUBLISH_ACTION, userId, abilityInfo, extensionAbilityInfo)) {
         HILOG_ERROR("Failed to ImplicitQueryInfoByPriority for publishing form");
         return false;
     }
@@ -2394,5 +2348,5 @@ bool FormMgrAdapter::IsRequestPublishFormSupported()
     }
     return true;
 }
-}  // namespace AppExecFwk
-}  // namespace OHOS
+} // namespace AppExecFwk
+} // namespace OHOS

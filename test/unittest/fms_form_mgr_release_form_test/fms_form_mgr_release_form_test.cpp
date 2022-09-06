@@ -34,6 +34,7 @@
 #include "mock_bundle_manager.h"
 #include "mock_form_host_client.h"
 #include "mock_form_token.h"
+#include "remote_native_token.h"
 #include "running_process_info.h"
 #include "system_ability_definition.h"
 
@@ -66,6 +67,7 @@ protected:
 
 void FmsFormMgrReleaseFormTest::SetUpTestCase()
 {
+    RemoteNativeToken::SetNativeToken();
     FormBmsHelper::GetInstance().SetBundleManager(new BundleMgrService());
 }
 
@@ -131,8 +133,9 @@ HWTEST_F(FmsFormMgrReleaseFormTest, ReleaseForm_001, TestSize.Level0)
     ret = FormDataMgr::GetInstance().GetFormRecord(formId2, formInfo);
     EXPECT_TRUE(ret);
     // Form host record is deleted.
-    FormHostRecord hostRecord;
-    EXPECT_FALSE(FormDataMgr::GetInstance().GetFormHostRecord(formId, hostRecord));
+    std::vector<FormHostRecord> hostRecords;
+    FormDataMgr::GetInstance().GetFormHostRecord(formId, hostRecords);
+    EXPECT_TRUE(hostRecords.empty());
 
     FormDataMgr::GetInstance().DeleteFormRecord(formId);
     FormDataMgr::GetInstance().DeleteFormRecord(formId2);

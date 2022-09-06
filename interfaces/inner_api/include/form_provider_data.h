@@ -168,6 +168,11 @@ public:
      */
     bool NeedCache() const;
 
+    /**
+     * @brief Convert raw image data to shmem image data
+     * @return Returns {@code true} if the image data converted successfully; returns {@code false} otherwise.
+     */
+    bool ConvertRawImageData();
 public:
     static constexpr int IMAGE_DATA_STATE_REMOVED = -1;
     static constexpr int IMAGE_DATA_STATE_NO_OPERATION = 0;

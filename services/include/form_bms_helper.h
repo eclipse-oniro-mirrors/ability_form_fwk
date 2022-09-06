@@ -87,6 +87,23 @@ public:
      * @return Returns true if the BundleInfo is successfully obtained; returns false otherwise.
      */
     bool GetBundleInfo(const std::string &bundleName, int32_t userId, BundleInfo &bundleInfo);
+
+    /**
+     * @brief Get caller bundle name.
+     * @param callerBundleName Indicates the caller bundle name.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t GetCallerBundleName(std::string &callerBundleName);
+
+    /**
+     * @brief Obtains the application UID based on the given bundle name and user ID.
+     * @param bundleName Indicates the bundle name of the application.
+     * @param userId Indicates the user ID.
+     * @return Returns the uid if successfully obtained; returns -1 otherwise.
+     */
+    int32_t GetUidByBundleName(const std::string &bundleName, int32_t userId);
+
+    static constexpr int64_t INVALID_UID = -1;
 private:
     /**
      * @brief Generate module key.

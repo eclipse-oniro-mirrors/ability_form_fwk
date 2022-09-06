@@ -166,10 +166,10 @@ int32_t FormMgrStub::HandleAddForm(MessageParcel &data, MessageParcel &reply)
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    FormJsInfo formInfo;
-    int32_t result = AddForm(formId, *want, client, formInfo);
+    FormJsInfo formJsInfo;
+    int32_t result = AddForm(formId, *want, client, formJsInfo);
     reply.WriteInt32(result);
-    reply.WriteParcelable(&formInfo);
+    reply.WriteParcelable(&formJsInfo);
 
     return result;
 }
@@ -807,12 +807,12 @@ int32_t FormMgrStub::HandleGetFormsInfoByModule(MessageParcel &data, MessageParc
 int32_t FormMgrStub::HandleGetFormsInfo(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_INFO("%{public}s called.", __func__);
-    // read moduleName from data.
-    std::string moduleName = data.ReadString();
+    // read filter from data.
+    std::unique_ptr<FormInfoFilter> filter(data.ReadParcelable<FormInfoFilter>());
     // write result of calling FMS into reply.
     std::vector<FormInfo> infos;
     // call FormMgrService to get formInfos into infos.
-    int32_t result = GetFormsInfo(moduleName, infos);
+    int32_t result = GetFormsInfo(*filter, infos);
     reply.WriteBool(result);
     if (result == ERR_OK) {
         // write fetched formInfos into reply.

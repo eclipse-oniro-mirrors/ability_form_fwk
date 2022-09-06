@@ -17,6 +17,7 @@
 #define OHOS_FORM_FWK_JS_FORM_INFO_UTIL_H
 
 #include "form_info.h"
+#include "form_info_filter.h"
 #include "native_engine/native_engine.h"
 #include "native_engine/native_value.h"
 
@@ -24,11 +25,7 @@ namespace OHOS {
 namespace AbilityRuntime {
 EXTERN_C_START
 
-struct FormInfoFilter {
-    std::string moduleName = "";
-};
-
-bool ConvertFormInfoFilter(NativeEngine &engine, NativeValue* jsValue, FormInfoFilter &formInfoFilter);
+bool ConvertFormInfoFilter(NativeEngine &engine, NativeValue *jsValue, AppExecFwk::FormInfoFilter &formInfoFilter);
 NativeValue* CreateJsFormInfoArray(NativeEngine &engine, const std::vector<AppExecFwk::FormInfo> &formInfos);
 
 EXTERN_C_END

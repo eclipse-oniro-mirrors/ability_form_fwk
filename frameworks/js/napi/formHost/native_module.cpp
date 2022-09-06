@@ -25,6 +25,7 @@
 #include "napi_form_host.h"
 
 EXTERN_C_START
+using namespace OHOS::AbilityRuntime;
 
 static NativeValue* JsFormHostInit(NativeEngine* engine, NativeValue* exports)
 {
@@ -43,7 +44,8 @@ static NativeValue* JsFormHostInit(NativeEngine* engine, NativeValue* exports)
     std::unique_ptr<JsFormHost> jsFormHost = std::make_unique<JsFormHost>();
     object->SetNativePointer(jsFormHost.release(), JsFormHost::Finalizer, nullptr);
 
-    OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "shareForm", JsFormHost::ShareForm);
+    const char *moduleName = "JsFormHost";
+    OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "shareForm", moduleName, JsFormHost::ShareForm);
 
     return exports;
 }

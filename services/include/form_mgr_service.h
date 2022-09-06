@@ -305,11 +305,11 @@ public:
     /**
     * @brief This function is called by formProvider and gets forms info by the bundle name of the calling ability.
     *        The bundle name will be retrieved here.
-    * @param the module that the formInfos have to belong to.
+    * @param filter Filter that contains attributes that the formInfos have to have.
     * @param formInfos Return the forms' information of the calling bundle name
     * @return Returns ERR_OK on success, others on failure.
     */
-    int32_t GetFormsInfo(const std::string &moduleName, std::vector<FormInfo> &formInfos) override;
+    int32_t GetFormsInfo(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos) override;
 
     /**
      * @brief Check if the request of publishing a form is supported by the host.

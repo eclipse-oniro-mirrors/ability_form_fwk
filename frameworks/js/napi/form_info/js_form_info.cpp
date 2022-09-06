@@ -68,6 +68,18 @@ NativeValue* CreateJsFormParam(NativeEngine &engine)
     return objValue;
 }
 
+NativeValue* CreateJsFormDimension(NativeEngine &engine)
+{
+    NativeValue* objValue = engine.CreateObject();
+    NativeObject* object = ConvertNativeValueTo<NativeObject>(objValue);
+    object->SetProperty("Dimension_1_2", CreateJsValue(engine, AppExecFwk::Constants::Dimension::DIMENSION_1_2));
+    object->SetProperty("Dimension_2_2", CreateJsValue(engine, AppExecFwk::Constants::Dimension::DIMENSION_2_2));
+    object->SetProperty("Dimension_2_4", CreateJsValue(engine, AppExecFwk::Constants::Dimension::DIMENSION_2_4));
+    object->SetProperty("Dimension_4_4", CreateJsValue(engine, AppExecFwk::Constants::Dimension::DIMENSION_4_4));
+    object->SetProperty("Dimension_2_1", CreateJsValue(engine, AppExecFwk::Constants::Dimension::DIMENSION_2_1));
+    return objValue;
+}
+
 NativeValue* FormInfoInit(NativeEngine *engine, NativeValue *exportObj)
 {
     HILOG_INFO("%{public}s called.", __func__);
@@ -85,6 +97,7 @@ NativeValue* FormInfoInit(NativeEngine *engine, NativeValue *exportObj)
     object->SetProperty("ColorMode", CreateJsColorMode(*engine));
     object->SetProperty("FormState", CreateJsFormState(*engine));
     object->SetProperty("FormParam", CreateJsFormParam(*engine));
+    object->SetProperty("FormDimension", CreateJsFormDimension(*engine));
 
     HILOG_INFO("%{public}s called end.", __func__);
     return exportObj;

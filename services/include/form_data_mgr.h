@@ -60,7 +60,7 @@ public:
      * @param record Form record.
      * @param formInfo Js info.
      */
-    void CreateFormInfo(const int64_t formId, const FormRecord &record, FormJsInfo &formInfo);
+    void CreateFormJsInfo(const int64_t formId, const FormRecord &record, FormJsInfo &formInfo);
     /**
      * @brief Delete form js info by form record.
      * @param formId The Id of the form.
@@ -163,10 +163,9 @@ public:
     /**
      * @brief Get form host record.
      * @param formId The id of the form.
-     * @param formHostRecord The form host record.
-     * @return Returns true if this function is successfully called; returns false otherwise.
+     * @param formHostRecords The form host records.
      */
-    bool GetFormHostRecord(const int64_t formId, FormHostRecord &formHostRecord) const;
+    void GetFormHostRecord(const int64_t formId, std::vector<FormHostRecord> &formHostRecords) const;
     /**
      * @brief Delete form host record.
      * @param callerToken The client stub of the form host record.
@@ -202,6 +201,12 @@ public:
      * @return Returns true if this function is successfully called; returns false otherwise.
      */
     bool GenerateUdidHash();
+    /**
+     * @brief Padding udid hash.
+     * @param formId The form id.
+     * @return Padded form id.
+     */
+    int64_t PaddingUdidHash(int64_t formId);
     /**
      * @brief Generate form id.
      * @return form id.
@@ -590,6 +595,6 @@ private:
     std::map<int64_t, FormRequestPublishFormInfo> formRequestPublishForms_;
     int64_t udidHash_ = 0;
 };
-}  // namespace AppExecFwk
-}  // namespace OHOS
+} // namespace AppExecFwk
+} // namespace OHOS
 #endif // OHOS_FORM_FWK_FORM_FORM_DATA_MGR_H

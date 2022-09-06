@@ -56,7 +56,7 @@ public:
      * @param formInfo, Form info.
      * @return none.
      */
-    virtual void OnAcquired(const FormJsInfo &formInfo) override;
+    void OnAcquired(const FormJsInfo &formInfo, const sptr<IRemoteObject> &token) override;
 
      /**
      * Form is updated.

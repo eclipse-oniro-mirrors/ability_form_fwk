@@ -84,7 +84,13 @@ int FormHostStub::HandleAcquired(MessageParcel &data, MessageParcel &reply)
         HILOG_ERROR("%{public}s, failed to ReadParcelable<FormJsInfo>", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    OnAcquired(*formInfo);
+
+    sptr<IRemoteObject> token = nullptr;
+    if (data.ReadBool()) {
+        token = data.ReadRemoteObject();
+    }
+
+    OnAcquired(*formInfo, token);
     reply.WriteInt32(ERR_OK);
     return ERR_OK;
 }

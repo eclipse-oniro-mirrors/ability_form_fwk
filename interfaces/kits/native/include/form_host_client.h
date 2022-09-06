@@ -91,9 +91,10 @@ public:
      * @brief Request to give back a form.
      *
      * @param formJsInfo Form js info.
+     * @param token Provider client token.
      * @return none.
      */
-    virtual void OnAcquired(const FormJsInfo &formJsInfo);
+    virtual void OnAcquired(const FormJsInfo &formJsInfo, const sptr<IRemoteObject> &token);
 
      /**
      * @brief Update form.

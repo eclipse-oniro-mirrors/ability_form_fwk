@@ -276,11 +276,6 @@ public:
      */
     std::string GetIcon() const;
     /**
-     * @brief Set value of icon_.
-     * @param icon ability icon.
-     */
-    void SetIcon(const std::string &icon);
-    /**
      * @brief Get deviceId_.
      * @return deviceId_.
      */

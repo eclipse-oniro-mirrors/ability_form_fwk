@@ -123,9 +123,9 @@ HWTEST_F(FmsFormHostRecordTest, OnRemoteDied_001, TestSize.Level0)
     FormItemInfo info;
     FormDataMgr::GetInstance().AllotFormHostRecord(info, token_, formId1, callingUid);
 
-    FormHostRecord hostRecord;
-    FormDataMgr::GetInstance().GetFormHostRecord(formId1, hostRecord);
-    hostRecord.GetDeathRecipient()->OnRemoteDied(token_);
+    std::vector<FormHostRecord> hostRecords;
+    FormDataMgr::GetInstance().GetFormHostRecord(formId1, hostRecords);
+    hostRecords[0].GetDeathRecipient()->OnRemoteDied(token_);
 
     FormDataMgr::GetInstance().DeleteFormRecord(formId1);
     FormDataMgr::GetInstance().DeleteFormRecord(formId2);
