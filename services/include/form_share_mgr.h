@@ -42,7 +42,7 @@ public:
 
     void SetEventHandler(const std::shared_ptr<FormEventHandler> &handler)
     {
-        if (eventHandler_ != nullptr) {
+        if (eventHandler_ != nullptr || handler == nullptr) {
             return;
         }
         eventHandler_ = handler;
