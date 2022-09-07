@@ -24,12 +24,30 @@ FormCallerMgr::FormCallerMgr() {}
 
 FormCallerMgr::~FormCallerMgr() {}
 
-void FormCallerMgr::AddFormHostCaller(int64_t formId, const sptr<IRemoteObject> &callerToken)
+void FormCallerMgr::AddFormHostCaller(const FormJsInfo &formJsInfo, const sptr<IRemoteObject> &callerToken)
 {
     HILOG_DEBUG("%{public}s called", __func__);
     std::lock_guard<std::recursive_mutex> lock(formHostCallerMutex_);
-    std::shared_ptr<FormHostCaller> caller = std::make_shared<FormHostCaller>(callerToken);
-    formHostCallers_[formId] = caller;
+    std::shared_ptr<FormHostCaller> caller = std::make_shared<FormHostCaller>(formJsInfo, callerToken);
+    formHostCallers_[formJsInfo.formId] = caller;
+}
+
+std::shared_ptr<FormHostCaller> FormCallerMgr::GetFormHostCaller(int64_t formId)
+{
+    HILOG_DEBUG("%{public}s called", __func__);
+    std::lock_guard<std::recursive_mutex> lock(formHostCallerMutex_);
+    auto iter = formHostCallers_.find(formId);
+    if (iter == formHostCallers_.end()) {
+        return nullptr;
+    }
+    return iter->second;
+}
+
+void FormCallerMgr::DeleteFormHostCaller(int64_t formId)
+{
+    HILOG_DEBUG("%{public}s called", __func__);
+    std::lock_guard<std::recursive_mutex> lock(formHostCallerMutex_);
+    formHostCallers_.erase(formId);
 }
 
 void FormCallerMgr::AddFormProviderCaller(const FormJsInfo &formJsInfo, const sptr<IRemoteObject> &callerToken)

@@ -241,5 +241,29 @@ void FormSupplyCallback::RemoveConnection(int64_t formId, const sptr<IRemoteObje
         }
     }
 }
+
+void FormSupplyCallback::HandleHostDied(const sptr<IRemoteObject> &hostToken)
+{
+    HILOG_DEBUG("%{public}s called.", __func__);
+    if (hostToken == nullptr) {
+        HILOG_ERROR("host token is nullptr.");
+        return;
+    }
+
+    std::vector<int32_t> connectIds;
+    {
+        std::lock_guard<std::mutex> lock(conMutex_);
+        for (const auto &conn : connections_) {
+            if (hostToken == conn.second->GetHostToken()) {
+                connectIds.push_back(conn.first);
+                HILOG_DEBUG("remove the connection, connect id is %{public}d", conn.first);
+            }
+        }
+    }
+
+    for (const auto &connectId : connectIds) {
+        RemoveConnection(connectId);
+    }
+}
 } // namespace AppExecFwk
 } // namespace OHOS

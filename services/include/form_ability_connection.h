@@ -119,6 +119,11 @@ public:
      * @brief Get provider token.
      */
     sptr<IRemoteObject> GetProviderToken() const;
+
+    /**
+     * @brief Add death recipient.
+     */
+    void AddHostDeathRecipient();
 private:
     int64_t formId_ = -1;
     std::string deviceId_ = "";

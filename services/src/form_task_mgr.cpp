@@ -494,6 +494,7 @@ void FormTaskMgr::HostDied(const sptr<IRemoteObject> &remoteHost)
         return;
     }
     FormDataMgr::GetInstance().HandleHostDied(remoteHost);
+    FormSupplyCallback::GetInstance()->HandleHostDied(remoteHost);
 }
 /**
  * @brief Post provider batch delete.

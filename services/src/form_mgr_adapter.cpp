@@ -146,9 +146,9 @@ int FormMgrAdapter::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    // remove connection for in application form
-    FormSupplyCallback::GetInstance()->RemoveConnection(formId, callerToken);
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+    // remove connection for in application form
+    FormSupplyCallback::GetInstance()->RemoveConnection(matchedFormId, callerToken);
     if (FormDataMgr::GetInstance().ExistTempForm(matchedFormId)) {
         // delete temp form if receive delete form call
         return HandleDeleteTempForm(matchedFormId, callerToken);
@@ -171,6 +171,8 @@ int FormMgrAdapter::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> 
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+    // remove connection for in application form
+    FormSupplyCallback::GetInstance()->RemoveConnection(matchedFormId, callerToken);
     if (FormDataMgr::GetInstance().ExistTempForm(matchedFormId)) {
         // delete temp form if receive release form call
         return HandleDeleteTempForm(matchedFormId, callerToken);

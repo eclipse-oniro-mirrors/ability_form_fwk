@@ -38,17 +38,9 @@ public:
         FormBindingData* me = CheckParamsAndGetThis<FormBindingData>(engine, info);
         return (me != nullptr) ? me->OnCreateFormBindingData(*engine, *info) : nullptr;
     }
-
-    static NativeValue* AddFormBindingImage(NativeEngine* engine, NativeCallbackInfo* info)
-    {
-        HILOG_INFO("%{public}s called.", __func__);
-        FormBindingData* me = CheckParamsAndGetThis<FormBindingData>(engine, info);
-        return (me != nullptr) ? me->OnAddFormBindingImage(*engine, *info) : nullptr;
-    }
 private:
     NativeValue* OnCreateFormBindingData(NativeEngine& engine, NativeCallbackInfo& info);
     std::shared_ptr<AppExecFwk::FormProviderData> formProviderData_;
-    NativeValue* OnAddFormBindingImage(NativeEngine& engine, NativeCallbackInfo& info);
 };
 
 NativeValue* FormBindingData::OnCreateFormBindingData(NativeEngine& engine, NativeCallbackInfo& info)
@@ -91,22 +83,6 @@ NativeValue* FormBindingData::OnCreateFormBindingData(NativeEngine& engine, Nati
     HILOG_INFO("%{public}s called:%{public}s", __func__, formDataStr.c_str());
     return objValue;
 }
-
-NativeValue* FormBindingData::OnAddFormBindingImage(NativeEngine& engine, NativeCallbackInfo& info)
-{
-    HILOG_INFO("%{public}s called.", __func__);
-    if (info.argc == 0) {
-        HILOG_ERROR("%{public}s, not enough params", __func__);
-        return engine.CreateUndefined();
-    }
-
-    NativeValue* objValue = info.argv[1];
-    NativeObject* object = ConvertNativeValueTo<NativeObject>(objValue);
-
-    object->SetProperty("image", info.argv[0]);
-    HILOG_INFO("%{public}s called end.", __func__);
-    return objValue;
-}
 }
 
 NativeValue* FormBindingDataInit(NativeEngine* engine, NativeValue* exportObj)
@@ -129,10 +105,9 @@ NativeValue* FormBindingDataInit(NativeEngine* engine, NativeValue* exportObj)
 
     const char *moduleName = "FormBindingData";
     BindNativeFunction(*engine, *object, "createFormBindingData", moduleName, FormBindingData::CreateFormBindingData);
-    BindNativeFunction(*engine, *object, "addFormBindingImage", moduleName, FormBindingData::AddFormBindingImage);
 
     HILOG_INFO("%{public}s called end.", __func__);
     return exportObj;
 }
-}  // namespace AbilityRuntime
-}  // namespace OHOS
+} // namespace AbilityRuntime
+} // namespace OHOS
