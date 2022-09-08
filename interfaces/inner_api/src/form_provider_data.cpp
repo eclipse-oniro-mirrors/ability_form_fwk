@@ -104,7 +104,7 @@ std::string FormProviderData::GetDataString() const
  * @param picName Indicates the name of the image to add.
  * @param data Indicates the binary data of the image content.
  */
-void FormProviderData::AddImageData(const std::string &picName, const std::shared_ptr<char[]> &data, int32_t size)
+void FormProviderData::AddImageData(const std::string &picName, const std::shared_ptr<char> &data, int32_t size)
 {
     if ((picName.length() == 0) || (!data)) {
         HILOG_ERROR("input param is NULL!");
@@ -147,7 +147,7 @@ void FormProviderData::AddImageData(const std::string &picName, int fd)
         HILOG_ERROR("Read failed, errno is %{public}d", errno);
         return;
     }
-    std::shared_ptr<char[]> data(bytes);
+    std::shared_ptr<char> data(bytes, DeleteBytes());
     AddImageData(picName, data, size);
     HILOG_INFO("%{public}s called end.", __func__);
 }
@@ -376,7 +376,7 @@ bool FormProviderData::NeedCache() const
 }
 
 bool FormProviderData::WriteImageDataToParcel(Parcel &parcel, const std::string &picName,
-    const std::shared_ptr<char[]> &data, int32_t size) const
+    const std::shared_ptr<char> &data, int32_t size) const
 {
     FormAshmem formAshmem;
     if (!formAshmem.WriteToAshmem(picName, data.get(), size)) {
