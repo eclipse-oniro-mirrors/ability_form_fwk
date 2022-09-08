@@ -30,6 +30,8 @@ using ::testing::Return;
 using ::testing::SetArgReferee;
 using ::testing::ContainerEq;
 using ::testing::_;
+using ::testing::DoAll;
+
 // overload operator for ContainerEq
 namespace OHOS::AppExecFwk {
     bool operator==(const FormInfo& lhs, const FormInfo& rhs)
