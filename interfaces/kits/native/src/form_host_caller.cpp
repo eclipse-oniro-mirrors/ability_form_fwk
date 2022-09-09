@@ -23,6 +23,14 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+void FormHostCallerRecipient::OnRemoteDied(const wptr<IRemoteObject> &__attribute__((unused)) remote)
+{
+    HILOG_DEBUG("On remote died.");
+    if (handler_ != nullptr) {
+        handler_(remote);
+    }
+}
+
 void FormHostCaller::UpdateForm(int64_t formId, const FormProviderData &formProviderData)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
@@ -56,5 +64,15 @@ ErrCode FormHostCaller::MessageEvent(int64_t formId, const AAFwk::Want &want, co
     return providerToken->FireFormEvent(formId, message, want, callerToken);
 }
 
+bool FormHostCaller::IsSameToken(const sptr<IRemoteObject> &callerToken) const
+{
+    return (callerToken == callerToken_);
+}
+
+void FormHostCaller::AddDeathRecipient(sptr<IRemoteObject::DeathRecipient> deathRecipient)
+{
+    HILOG_DEBUG("%{public}s called.", __func__);
+    callerToken_->AddDeathRecipient(deathRecipient);
+}
 } // namespace AppExecFwk
 } // namespace OHOS
