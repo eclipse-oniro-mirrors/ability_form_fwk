@@ -33,12 +33,6 @@ const std::string DEVICE_ID = "ohos-phone1";
 
 bool BundleMgrService::IsSystemApp = false;
 
-bool BundleMgrProxy::GetBundleInfo(
-    const std::string &bundleName, const BundleFlag flag, BundleInfo &bundleInfo, int32_t userId)
-{
-    return true;
-}
-
 int BundleMgrService::GetUidByBundleName(const std::string &bundleName, const int userId)
 {
     if (bundleName.compare("com.form.host.app600") == 0) {
@@ -47,37 +41,12 @@ int BundleMgrService::GetUidByBundleName(const std::string &bundleName, const in
     return 0;
 }
 
-bool BundleMgrProxy::GetAllFormsInfo(std::vector<FormInfo> &formInfo)
-{
-    return true;
-}
-bool BundleMgrProxy::GetFormsInfoByApp(const std::string &bundleName, std::vector<FormInfo> &formInfo)
-{
-    return true;
-}
-bool BundleMgrProxy::GetFormsInfoByModule(const std::string &bundleName, const std::string &moduleName,
-    std::vector<FormInfo> &formInfo)
-{
-    return true;
-}
-
 int BundleMgrStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     return 0;
 }
 
 bool BundleMgrService::QueryAbilityInfo(const AAFwk::Want &want, AbilityInfo &abilityInfo)
-{
-    return true;
-}
-
-bool BundleMgrService::QueryAbilityInfoByUri(const std::string &uri, AbilityInfo &abilityInfo)
-{
-    return false;
-}
-
-bool BundleMgrService::GetApplicationInfo(
-    const std::string &appName, const ApplicationFlag flag, const int userId, ApplicationInfo &appInfo)
 {
     return true;
 }
@@ -113,15 +82,7 @@ bool BundleMgrService::GetBundleInfo(
 
     return true;
 }
-bool BundleMgrService::GetBundleGids(const std::string &bundleName, std::vector<int> &gids)
-{
-    return true;
-}
 
-bool BundleMgrService::GetAllFormsInfo(std::vector<FormInfo> &formInfo)
-{
-    return true;
-}
 bool BundleMgrService::GetFormsInfoByApp(const std::string &bundleName, std::vector<FormInfo> &formInfo)
 {
     FormInfo form;
