@@ -123,8 +123,8 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
     }
     WantParams wantParams = newWant.GetParams();
     // share form
-    if (formId == 0 && FormShareMgr::GetInstance().IsShareForm(newWant)) {
-        FormShareMgr::GetInstance().AddProviderData(newWant, wantParams);
+    if (formId == 0 && DelayedSingleton<FormShareMgr>::GetInstance()->IsShareForm(newWant)) {
+        DelayedSingleton<FormShareMgr>::GetInstance()->AddProviderData(newWant, wantParams);
     }
     if (formId > 0) {
         return AllotFormById(formItemInfo, callerToken, wantParams, formInfo);

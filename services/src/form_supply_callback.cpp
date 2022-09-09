@@ -193,7 +193,7 @@ void FormSupplyCallback::OnShareAcquire(int64_t formId, const std::string &remot
     const AAFwk::WantParams &wantParams, int64_t requestCode, const bool &result)
 {
     HILOG_DEBUG("%{public}s formId %{public}" PRId64 " called.", __func__, formId);
-    DelayedRefSingleton<FormShareMgr>::GetInstance().HandleProviderShareData(
+    DelayedSingleton<FormShareMgr>::GetInstance()->HandleProviderShareData(
         formId, remoteDeviceId, wantParams, requestCode, result);
 }
 

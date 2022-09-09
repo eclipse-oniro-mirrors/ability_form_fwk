@@ -21,8 +21,8 @@
 #include <singleton.h>
 #include "ability_info.h"
 #include "device_manager.h"
-#include "event_handler.h"
 #include "form_distributed_client.h"
+#include "form_event_handler.h"
 #include "form_free_install_operator.h"
 #include "form_item_info.h"
 #include "form_share_info.h"
@@ -35,15 +35,18 @@ using WantParams = OHOS::AAFwk::WantParams;
  * @class FormShareMgr
  * Form share manager.
  */
-class FormShareMgr final : public DelayedRefSingleton<FormShareMgr> {
+class FormShareMgr final : public std::enable_shared_from_this<FormShareMgr>,
+                           public FormEventTimeoutObserver {
 public:
     DISALLOW_COPY_AND_MOVE(FormShareMgr);
 
-    void SetEventHandler(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+    void SetEventHandler(const std::shared_ptr<FormEventHandler> &handler)
     {
-        if (eventHandler_ == nullptr) {
-            eventHandler_ = handler;
+        if (eventHandler_ != nullptr || handler == nullptr) {
+            return;
         }
+        eventHandler_ = handler;
+        eventHandler_->RegisterEventTimeoutObserver(shared_from_this());
     }
 
     /**
@@ -137,9 +140,10 @@ private:
     void StartFormUser(const FormShareInfo &info);
     int32_t HandleRecvFormShareInfoFromRemoteTask(const FormShareInfo &info);
     int32_t CheckFormPackage(const FormShareInfo &info, const std::string &formShareInfoKey);
+    void OnEventTimeoutResponse(int64_t msg, int64_t eventId) override;
 private:
-    DECLARE_DELAYED_REF_SINGLETON(FormShareMgr);
-    std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ = nullptr;
+    DECLARE_DELAYED_SINGLETON(FormShareMgr);
+    std::shared_ptr<FormEventHandler> eventHandler_ = nullptr;
     std::shared_ptr<FormDistributedClient> formDmsClient_ = nullptr;
     // map for <formShareInfoKey, FormShareInfo>
     std::map<std::string, FormShareInfo> shareInfo_;

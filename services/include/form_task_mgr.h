@@ -19,7 +19,7 @@
 #include <singleton.h>
 #include <vector>
 
-#include "event_handler.h"
+#include "form_event_handler.h"
 #include "form_js_info.h"
 #include "form_record.h"
 #include "form_state_info.h"
@@ -45,7 +45,7 @@ public:
      * @brief SetEventHandler.
      * @param handler event handler
      */
-    inline void SetEventHandler(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+    inline void SetEventHandler(const std::shared_ptr<FormEventHandler> &handler)
     {
         eventHandler_ = handler;
     }
@@ -313,7 +313,7 @@ private:
     */
     void FormShareSendResponse(int64_t formShareRequestCode, int32_t result);
 private:
-    std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ = nullptr;
+    std::shared_ptr<FormEventHandler> eventHandler_ = nullptr;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
