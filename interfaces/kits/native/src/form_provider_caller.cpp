@@ -24,9 +24,17 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-sptr<IRemoteObject> FormProviderCaller::GetCallerToken() const
+void FormProviderCallerRecipient::OnRemoteDied(const wptr<IRemoteObject> &__attribute__((unused)) remote)
 {
-    return callerToken_;
+    HILOG_DEBUG("On remote died.");
+    if (handler_) {
+        handler_(remote);
+    }
+}
+
+bool FormProviderCaller::IsSameToken(const sptr<IRemoteObject> &callerToken) const
+{
+    return (callerToken == callerToken_);
 }
 
 void FormProviderCaller::AddForm(const FormJsInfo &formJsInfo)
@@ -130,6 +138,12 @@ void FormProviderCaller::UpdateForm(const FormJsInfo &formJsInfo)
         return;
     }
     callerToken->OnUpdate(formJsInfo);
+}
+
+void FormProviderCaller::AddDeathRecipient(sptr<IRemoteObject::DeathRecipient> deathRecipient)
+{
+    HILOG_DEBUG("%{public}s called.", __func__);
+    callerToken_->AddDeathRecipient(deathRecipient);
 }
 } // namespace AppExecFwk
 } // namespace OHOS
