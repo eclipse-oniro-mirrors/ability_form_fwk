@@ -99,7 +99,7 @@ public:
      * @param formId Indicates the unique id of form.
      * @param callerToken Indicates the callback remote object of specified form user.
      * @param want information passed to supplier.
-     * @return Returns true if execute success, false otherwise.
+     * @return Returns ERR_OK on success, others on failure.
      */
     int RequestForm(const int64_t formId, const sptr<IRemoteObject> &callerToken, const Want &want);
 
@@ -153,7 +153,7 @@ public:
      * @param formId Indicates the unique id of form.
      * @param want information passed to supplier.
      * @param callerToken Caller ability token.
-     * @return Returns true if execute success, false otherwise.
+     * @return Returns ERR_OK on success, others on failure.
      */
     int MessageEvent(const int64_t formId, const Want &want, const sptr<IRemoteObject> &callerToken);
 
@@ -161,7 +161,7 @@ public:
      * @brief Process js router event.
      * @param formId Indicates the unique id of form.
      * @param want the want of the ability to start.
-     * @return Returns true if execute success, false otherwise.
+     * @return Returns ERR_OK on success, others on failure.
      */
     int RouterEvent(const int64_t formId, Want &want);
 

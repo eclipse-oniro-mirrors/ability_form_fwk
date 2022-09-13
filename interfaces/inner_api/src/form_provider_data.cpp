@@ -104,17 +104,13 @@ std::string FormProviderData::GetDataString() const
  * @param picName Indicates the name of the image to add.
  * @param data Indicates the binary data of the image content.
  */
-void FormProviderData::AddImageData(std::string picName, char *data, int32_t size)
+void FormProviderData::AddImageData(const std::string &picName, const std::shared_ptr<char> &data, int32_t size)
 {
     if ((picName.length() == 0) || (!data)) {
         HILOG_ERROR("input param is NULL!");
         return;
     }
 
-    auto iterator = rawImageBytesMap_.find(picName);
-    if (iterator != rawImageBytesMap_.end()) {
-        delete[] iterator->second.first;
-    }
     rawImageBytesMap_[picName] = std::make_pair(data, size);
 
     imageDataState_ = IMAGE_DATA_STATE_ADDED;
@@ -125,7 +121,7 @@ void FormProviderData::AddImageData(std::string picName, char *data, int32_t siz
  * @param picName Indicates the name of the image to add.
  * @param data Indicates the binary data of the image content.
  */
-void FormProviderData::AddImageData(std::string picName, int fd)
+void FormProviderData::AddImageData(const std::string &picName, int fd)
 {
     HILOG_INFO("%{public}s called. fd is %{public}d", __func__, fd);
     if (fd < 0) {
@@ -142,12 +138,16 @@ void FormProviderData::AddImageData(std::string picName, int fd)
     if (lseek(fd, 0L, SEEK_SET) == -1) {
         return;
     }
-    char *data = new char[size];
-    if (read(fd, data, size) < 0) {
-        delete[] data;
+    char* bytes = new (std::nothrow) char[size];
+    if (bytes == nullptr) {
+        HILOG_ERROR("malloc memory failed", errno);
+    }
+    if (read(fd, bytes, size) < 0) {
+        delete[] bytes;
         HILOG_ERROR("Read failed, errno is %{public}d", errno);
         return;
     }
+    std::shared_ptr<char> data(bytes, DeleteBytes());
     AddImageData(picName, data, size);
     HILOG_INFO("%{public}s called end.", __func__);
 }
@@ -375,10 +375,11 @@ bool FormProviderData::NeedCache() const
     return true;
 }
 
-bool FormProviderData::WriteImageDataToParcel(Parcel &parcel, std::string picName, char *data, int32_t size) const
+bool FormProviderData::WriteImageDataToParcel(Parcel &parcel, const std::string &picName,
+    const std::shared_ptr<char> &data, int32_t size) const
 {
     FormAshmem formAshmem;
-    if (!formAshmem.WriteToAshmem(picName, data, size)) {
+    if (!formAshmem.WriteToAshmem(picName, data.get(), size)) {
         return false;
     }
 
@@ -400,7 +401,7 @@ bool FormProviderData::ConvertRawImageData()
             HILOG_ERROR("%{public}s alloc shmem failed", __func__);
             return false;
         }
-        if (!formAshmem->WriteToAshmem(entry.first, entry.second.first, entry.second.second)) {
+        if (!formAshmem->WriteToAshmem(entry.first, entry.second.first.get(), entry.second.second)) {
             HILOG_ERROR("%{public}s write to shmem failed", __func__);
             return false;
         }
@@ -411,5 +412,5 @@ bool FormProviderData::ConvertRawImageData()
     HILOG_INFO("%{public}s end", __func__);
     return true;
 }
-}  // namespace AppExecFwk
-}  // namespace OHOS
+} // namespace AppExecFwk
+} // namespace OHOS

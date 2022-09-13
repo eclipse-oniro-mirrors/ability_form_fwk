@@ -24,6 +24,7 @@ systemabilitymgr_path = "//foundation/systemabilitymgr"
 form_fwk_path = "//foundation/ability/form_fwk"
 form_fwk_napi_path = "${form_fwk_path}/frameworks/js/napi"
 global_path = "//base/global"
+ipc_core_path = "//foundation/communication/ipc/interfaces/innerkits/ipc_core"
 
 declare_args() {
   device_usage_statistics = true

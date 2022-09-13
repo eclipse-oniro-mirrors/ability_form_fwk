@@ -24,21 +24,29 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-sptr<IRemoteObject> FormProviderCaller::GetCallerToken() const
+void FormProviderCallerRecipient::OnRemoteDied(const wptr<IRemoteObject> &__attribute__((unused)) remote)
 {
-    return callerToken_;
+    HILOG_DEBUG("On remote died.");
+    if (handler_) {
+        handler_(remote);
+    }
 }
 
-void FormProviderCaller::AddFormJsInfo(const FormJsInfo &formJsInfo)
+bool FormProviderCaller::IsSameToken(const sptr<IRemoteObject> &callerToken) const
+{
+    return (callerToken == callerToken_);
+}
+
+void FormProviderCaller::AddForm(const FormJsInfo &formJsInfo)
 {
     std::lock_guard<std::recursive_mutex> lock(formJsInfoMutex_);
     formJsInfoMap_[formJsInfo.formId] = formJsInfo;
 }
 
-void FormProviderCaller::DeleteFormJsInfo(const FormJsInfo &formJsInfo)
+void FormProviderCaller::DeleteForm(int64_t formId)
 {
     std::lock_guard<std::recursive_mutex> lock(formJsInfoMutex_);
-    formJsInfoMap_.erase(formJsInfo.formId);
+    formJsInfoMap_.erase(formId);
 }
 
 bool FormProviderCaller::GetFormJsInfo(int64_t formId, FormJsInfo &formJsInfo)
@@ -52,9 +60,16 @@ bool FormProviderCaller::GetFormJsInfo(int64_t formId, FormJsInfo &formJsInfo)
     return false;
 }
 
-bool FormProviderCaller::HasFormId(int64_t formId)
+bool FormProviderCaller::HasForm(int64_t formId)
 {
+    std::lock_guard<std::recursive_mutex> lock(formJsInfoMutex_);
     return (formJsInfoMap_.find(formId) != formJsInfoMap_.end());
+}
+
+bool FormProviderCaller::IsFormEmpty()
+{
+    std::lock_guard<std::recursive_mutex> lock(formJsInfoMutex_);
+    return formJsInfoMap_.empty();
 }
 
 int32_t FormProviderCaller::OnAcquire(const FormProviderInfo &formProviderInfo, const AAFwk::Want &want,
@@ -70,27 +85,65 @@ int32_t FormProviderCaller::OnAcquire(const FormProviderInfo &formProviderInfo, 
     HILOG_DEBUG("%{public}s come: formId is %{public}" PRId64 ", type is %{public}d", __func__, formId, type);
 
     auto formProviderData = formProviderInfo.GetFormData();
-    formProviderData.ConvertRawImageData();
+    if (!formProviderData.ConvertRawImageData()) {
+        HILOG_ERROR("convert raw image data failed.");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
     FormJsInfo formJsInfo;
     GetFormJsInfo(formId, formJsInfo);
     formJsInfo.formData = formProviderData.GetDataString();
     formJsInfo.formProviderData = formProviderData;
     if (type == Constants::ACQUIRE_TYPE_CREATE_FORM) {
-        return OnAcquired(formJsInfo, token);
+        return OnAcquire(formJsInfo, token);
     }
     return ERR_APPEXECFWK_FORM_INVALID_PARAM;
 }
 
-int32_t FormProviderCaller::OnAcquired(const FormJsInfo &formJsInfo, const sptr<IRemoteObject> &token)
+int32_t FormProviderCaller::OnAcquire(const FormJsInfo &formJsInfo, const sptr<IRemoteObject> &token)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
     sptr<IFormHost> callerToken = iface_cast<IFormHost>(callerToken_);
     if (callerToken == nullptr) {
         HILOG_ERROR("%{public}s error, callerToken is nullptr.", __func__);
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     callerToken->OnAcquired(formJsInfo, token);
     return ERR_OK;
+}
+
+void FormProviderCaller::UpdateForm(int64_t formId, const FormProviderData &formProviderData)
+{
+    HILOG_DEBUG("%{public}s called, formId is %{public}" PRId64, __func__, formId);
+    FormJsInfo formJsInfo;
+    if (!GetFormJsInfo(formId, formJsInfo)) {
+        HILOG_ERROR("get form js info failed, formId is %{public}" PRId64, formId);
+        return;
+    }
+    formJsInfo.formData = formProviderData.GetDataString();
+    formJsInfo.formProviderData = formProviderData;
+    if (!formJsInfo.formProviderData.ConvertRawImageData()) {
+        HILOG_ERROR("convert raw image data failed");
+        return;
+    }
+
+    UpdateForm(formJsInfo);
+}
+
+void FormProviderCaller::UpdateForm(const FormJsInfo &formJsInfo)
+{
+    HILOG_DEBUG("%{public}s called.", __func__);
+    sptr<IFormHost> callerToken = iface_cast<IFormHost>(callerToken_);
+    if (callerToken == nullptr) {
+        HILOG_ERROR("%{public}s error, callerToken is nullptr.", __func__);
+        return;
+    }
+    callerToken->OnUpdate(formJsInfo);
+}
+
+void FormProviderCaller::AddDeathRecipient(sptr<IRemoteObject::DeathRecipient> deathRecipient)
+{
+    HILOG_DEBUG("%{public}s called.", __func__);
+    callerToken_->AddDeathRecipient(deathRecipient);
 }
 } // namespace AppExecFwk
 } // namespace OHOS

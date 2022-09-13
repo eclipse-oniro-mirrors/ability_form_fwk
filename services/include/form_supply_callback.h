@@ -66,23 +66,36 @@ public:
      * @brief Delete ability connection after the callback come.
      * @param connectId The ability connection id generated when save.
      */
-    void RemoveConnection(long connectId);
+    void RemoveConnection(int32_t connectId);
+    /**
+     * @brief Delete ability connection by formId and hostToken.
+     * @param formId Indicates the ID of the form.
+     * @param hostToken Indicates the host token for matching connection.
+     */
+    void RemoveConnection(int64_t formId, const sptr<IRemoteObject> &hostToken);
 
     void OnShareAcquire(int64_t formId, const std::string &remoteDeviceId,
         const AAFwk::WantParams &wantParams, int64_t requestCode, const bool &result) override;
 
+    /**
+     * @brief Handle form host died.
+     * @param hostToken Form host proxy object.
+     */
+    void HandleHostDied(const sptr<IRemoteObject> &hostToken);
 private:
     /**
      * @brief check if disconnect ability or not.
      * @param connection The ability connection.
      */
     bool CanDisconnect(sptr<FormAbilityConnection> &connection);
+
+    bool IsRemoveConnection(int64_t formId, const sptr<IRemoteObject> &hostToken);
 private:
     static std::mutex mutex_;
     static sptr<FormSupplyCallback> instance_;
 
     mutable std::mutex conMutex_;
-    std::map<long, sptr<FormAbilityConnection>> connections_;
+    std::map<int32_t, sptr<FormAbilityConnection>> connections_;
     DISALLOW_COPY_AND_MOVE(FormSupplyCallback);
 };
 }  // namespace AppExecFwk

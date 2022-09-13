@@ -18,6 +18,9 @@
 
 #include <iremote_object.h>
 
+#include "form_js_info.h"
+#include "want.h"
+
 namespace OHOS {
 namespace AppExecFwk {
 /**
@@ -26,10 +29,71 @@ namespace AppExecFwk {
  */
 class FormHostCaller {
 public:
-    explicit FormHostCaller(const sptr<IRemoteObject> &callerToken) : callerToken_(callerToken) {}
+    FormHostCaller(const FormJsInfo &formJsInfo, const sptr<IRemoteObject> &callerToken) :
+        formJsInfo_(formJsInfo), callerToken_(callerToken) {}
     ~FormHostCaller() = default;
+
+    /**
+     * @brief Update form with formId.
+     * @param formId Indicates the Id of the form to update.
+     * @param formProviderData Indicates the form provider data.
+     */
+    void UpdateForm(int64_t formId, const FormProviderData &formProviderData);
+
+    /**
+    * @brief Notify the form service that the form user's lifecycle is updated.
+    *
+    * This should be called when form user request form.
+    *
+    * @param formId Indicates the unique id of form.
+    * @param callerToken Indicates the callback remote object of specified form user.
+    * @param want Indicates information passed to supplier.
+    * @return Returns ERR_OK on success, others on failure.
+    */
+    ErrCode RequestForm(int64_t formId, const sptr<IRemoteObject> &callerToken, const AAFwk::Want &want);
+
+    /**
+     * @brief Process js message event.
+     * @param formId Indicates the unique id of form.
+     * @param want Indicates information passed to supplier.
+     * @param callerToken Caller ability token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode MessageEvent(int64_t formId, const AAFwk::Want &want, const sptr<IRemoteObject> &callerToken);
+
+    /**
+     * @brief Add deathRecipient object to formHostClient_.
+     * @param deathRecipient DeathRecipient object.
+     */
+    void AddDeathRecipient(sptr<IRemoteObject::DeathRecipient> deathRecipient);
+
+    /**
+     * @brief Is the same caller token.
+     * @param callerToken Caller ability token.
+     */
+    bool IsSameToken(const sptr<IRemoteObject> &callerToken) const;
 private:
+    FormJsInfo formJsInfo_;
     sptr<IRemoteObject> callerToken_;
+};
+
+/**
+ * @class FormHostCallerRecipient
+ * FormHostCallerRecipient notices IRemoteBroker died.
+ */
+class FormHostCallerRecipient : public IRemoteObject::DeathRecipient {
+public:
+    using RemoteDiedHandler = std::function<void(const wptr<IRemoteObject> &)>;
+    FormHostCallerRecipient(RemoteDiedHandler handler) : handler_(handler) {}
+    ~FormHostCallerRecipient() = default;
+
+    /**
+     * @brief handle remote object died event.
+     * @param remote remote object.
+     */
+    void OnRemoteDied(const wptr<IRemoteObject> &remote) override;
+private:
+    RemoteDiedHandler handler_;
 };
 } // namespace AppExecFwk
 } // namespace OHOS

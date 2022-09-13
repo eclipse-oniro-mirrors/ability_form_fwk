@@ -123,8 +123,8 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
     }
     WantParams wantParams = newWant.GetParams();
     // share form
-    if (formId == 0 && FormShareMgr::GetInstance().IsShareForm(newWant)) {
-        FormShareMgr::GetInstance().AddProviderData(newWant, wantParams);
+    if (formId == 0 && DelayedSingleton<FormShareMgr>::GetInstance()->IsShareForm(newWant)) {
+        DelayedSingleton<FormShareMgr>::GetInstance()->AddProviderData(newWant, wantParams);
     }
     if (formId > 0) {
         return AllotFormById(formItemInfo, callerToken, wantParams, formInfo);
@@ -145,7 +145,10 @@ int FormMgrAdapter::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
         HILOG_ERROR("%{public}s, deleteForm invalid param", __func__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
+
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+    // remove connection for in application form
+    FormSupplyCallback::GetInstance()->RemoveConnection(matchedFormId, callerToken);
     if (FormDataMgr::GetInstance().ExistTempForm(matchedFormId)) {
         // delete temp form if receive delete form call
         return HandleDeleteTempForm(matchedFormId, callerToken);
@@ -168,6 +171,8 @@ int FormMgrAdapter::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> 
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+    // remove connection for in application form
+    FormSupplyCallback::GetInstance()->RemoveConnection(matchedFormId, callerToken);
     if (FormDataMgr::GetInstance().ExistTempForm(matchedFormId)) {
         // delete temp form if receive release form call
         return HandleDeleteTempForm(matchedFormId, callerToken);
@@ -1015,7 +1020,15 @@ ErrCode FormMgrAdapter::AcquireProviderFormInfoAsync(const int64_t formId,
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    sptr<IAbilityConnection> formAcquireConnection = new FormAcquireConnection(formId, info, wantParams);
+    Want newWant;
+    newWant.SetParams(wantParams);
+    auto hostToken = newWant.GetRemoteObject(Constants::PARAM_FORM_HOST_TOKEN);
+    sptr<IAbilityConnection> formAcquireConnection = new  (std::nothrow) FormAcquireConnection(formId, info, wantParams,
+        hostToken);
+    if (formAcquireConnection == nullptr) {
+        HILOG_ERROR("formAcquireConnection is null.");
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+    }
     Want want;
     want.SetElementName(info.GetProviderBundleName(), info.GetAbilityName());
     want.AddFlags(Want::FLAG_ABILITY_FORM_ENABLED);
@@ -1831,7 +1844,7 @@ void FormMgrAdapter::AcquireProviderFormInfo(const int64_t formId, const Want &w
     const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_INFO("%{public}s called.", __func__);
-    long connectId = want.GetLongParam(Constants::FORM_CONNECT_ID, 0);
+    auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
     if (formProviderProxy == nullptr) {
         FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
@@ -1859,7 +1872,7 @@ void FormMgrAdapter::AcquireProviderFormInfo(const int64_t formId, const Want &w
 void FormMgrAdapter::NotifyFormDelete(const int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_INFO("%{public}s called.", __func__);
-    long connectId = want.GetLongParam(Constants::FORM_CONNECT_ID, 0);
+    auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
     if (formProviderProxy == nullptr) {
         HILOG_ERROR("%{public}s fail, Failed to get formProviderProxy", __func__);
@@ -2337,5 +2350,5 @@ bool FormMgrAdapter::IsRequestPublishFormSupported()
     }
     return true;
 }
-}  // namespace AppExecFwk
-}  // namespace OHOS
+} // namespace AppExecFwk
+} // namespace OHOS

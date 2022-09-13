@@ -178,8 +178,10 @@ HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_005, TestSize.Level0) 
     EXPECT_EQ(true, InitJsonData());
     FormProviderData formProviderData(jsonData_);
     std::string picName = "image";
-    char data = 'a';
-    formProviderData.AddImageData(picName, &data, 1);
+    char* bytes = new char[1];
+    bytes[0] = 'a';
+    std::shared_ptr<char> data(bytes);
+    formProviderData.AddImageData(picName, data, 1);
     EXPECT_TRUE(formProviderData.ConvertRawImageData());
     EXPECT_EQ(1, formProviderData.GetImageDataMap().size());
     GTEST_LOG_(INFO) << "FmsFormProviderDataTest_005 end";

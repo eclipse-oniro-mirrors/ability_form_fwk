@@ -19,7 +19,7 @@
 #include "bundle_pack_info.h"
 #include "common_event_subscriber.h"
 #include "common_event_subscribe_info.h"
-#include "event_handler.h"
+#include "form_event_handler.h"
 #include "form_id_key.h"
 #include "form_info.h"
 #include "form_record.h"
@@ -46,7 +46,7 @@ public:
      * @brief SetEventHandler.
      * @param handler event handler
      */
-    inline void SetEventHandler(const std::shared_ptr<AppExecFwk::EventHandler> &handler)
+    inline void SetEventHandler(const std::shared_ptr<FormEventHandler> &handler)
     {
         eventHandler_ = handler;
     }
@@ -81,7 +81,7 @@ private:
     void HandleTimerUpdate(const int64_t formId, const FormRecord &record, const FormTimerCfg &timerCfg);
     void HandleBundleScanFinished(int32_t userId);
 private:
-    std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ = nullptr;
+    std::shared_ptr<FormEventHandler> eventHandler_ = nullptr;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

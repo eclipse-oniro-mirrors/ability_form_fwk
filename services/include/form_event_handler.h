@@ -17,6 +17,7 @@
 #define FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_EVENT_HANDLER_H
 
 #include <memory>
+#include <set>
 #include "event_handler.h"
 #include "event_runner.h"
 
@@ -27,6 +28,14 @@ const int64_t FORM_SHARE_INFO_DELAY_MSG = 1;
 const int64_t FORM_PACKAGE_FREE_INSTALL_DELAY_MSG = 2;
 }
 
+class FormEventTimeoutObserver {
+public:
+    FormEventTimeoutObserver() = default;
+    virtual ~FormEventTimeoutObserver() = default;
+
+    virtual void OnEventTimeoutResponse(int64_t msg, int64_t eventId) = 0;
+};
+
 /**
  * @class FormEventHandler
  * FormEventHandler handling the form event.
@@ -36,19 +45,34 @@ public:
     FormEventHandler(const std::shared_ptr<EventRunner> &runner);
     virtual ~FormEventHandler() = default;
 
+    static int64_t GetEventId();
+
+    /**
+     * Register event timeout observer.
+     *
+     * @param observer The observer of form event timeout.
+     */
+    void RegisterEventTimeoutObserver(const std::shared_ptr<FormEventTimeoutObserver> &observer);
+
+    /**
+     * Unregister event timeout observer.
+     *
+     * @param observer The observer of form event timeout.
+     */
+    void UnregisterEventTimeoutObserver(const std::shared_ptr<FormEventTimeoutObserver> &observer);
+
+private:
     /**
      * ProcessEvent with request.
      *
      * @param event, inner event loop.
      */
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
-    static int64_t GetEventId();
-private:
-    void ProcessFormShareInfoTimeout(int64_t eventId);
-    void ProcessFreeInstallTimeout(int64_t eventId);
 
 private:
     static int64_t eventId_;
+    std::set<std::shared_ptr<FormEventTimeoutObserver>> observers_;
+    mutable std::mutex observerMutex_;
 };
 } // namespace AppExecFwk
 } // namespace OHOS

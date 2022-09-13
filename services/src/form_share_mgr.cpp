@@ -44,6 +44,9 @@ FormShareMgr::FormShareMgr()
 FormShareMgr::~FormShareMgr()
 {
     HILOG_DEBUG("FormShareMgr is destroyed");
+    if (eventHandler_ != nullptr) {
+        eventHandler_->UnregisterEventTimeoutObserver(shared_from_this());
+    }
 };
 
 int32_t FormShareMgr::ShareForm(int64_t formId, const std::string &deviceId, const sptr<IRemoteObject> &callerToken,
@@ -87,7 +90,9 @@ int32_t FormShareMgr::RecvFormShareInfoFromRemote(const FormShareInfo &info)
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
-    auto task = [info]() { FormShareMgr::GetInstance().HandleRecvFormShareInfoFromRemoteTask(info); };
+    auto task = [info]() {
+        DelayedSingleton<FormShareMgr>::GetInstance()->HandleRecvFormShareInfoFromRemoteTask(info);
+    };
     eventHandler_->PostTask(task);
 
     return ERR_OK;
@@ -409,7 +414,7 @@ void FormShareMgr::AcquireShareFormData(int64_t formId, const std::string &remot
 {
     HILOG_DEBUG("%{public}s called.", __func__);
     int64_t requestCode = static_cast<int64_t>(want.GetLongParam(Constants::FORM_SHARE_REQUEST_CODE, 0));
-    long connectId = want.GetLongParam(Constants::FORM_CONNECT_ID, 0);
+    auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
 
     if (formProviderProxy == nullptr) {
@@ -535,6 +540,24 @@ bool FormShareMgr::IsShareForm(const Want &want)
         return false;
     }
     return true;
+}
+
+void FormShareMgr::OnEventTimeoutResponse(int64_t msg, int64_t eventId)
+{
+    HILOG_DEBUG("%{public}s called.", __func__);
+    switch (msg) {
+        case MSG::FORM_SHARE_INFO_DELAY_MSG: {
+            HandleFormShareInfoTimeout(eventId);
+            break;
+        }
+        case MSG::FORM_PACKAGE_FREE_INSTALL_DELAY_MSG: {
+            HandleFreeInstallTimeout(eventId);
+            break;
+        }
+        default: {
+            break;
+        }
+    }
 }
 } // namespace AppExecFwk
 } // namespace OHOS

@@ -21,6 +21,7 @@
 #include "form_constants.h"
 #include "form_refresh_limiter.h"
 #include "form_timer_mgr.h"
+#include "remote_native_token.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -44,7 +45,10 @@ public:
 protected:
 };
 
-void FmsFormTimerMgrTest::SetUpTestCase() {}
+void FmsFormTimerMgrTest::SetUpTestCase()
+{
+    RemoteNativeToken::SetNativeToken();
+}
 void FmsFormTimerMgrTest::TearDownTestCase() {}
 void FmsFormTimerMgrTest::SetUp() {}
 void FmsFormTimerMgrTest::TearDown() {}

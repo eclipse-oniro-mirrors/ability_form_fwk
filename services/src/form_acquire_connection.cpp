@@ -28,9 +28,11 @@
 namespace OHOS {
 namespace AppExecFwk {
 FormAcquireConnection::FormAcquireConnection(const int64_t formId, const FormItemInfo &info,
-    const WantParams &wantParams) : formId_(formId), info_(info), wantParams_(wantParams)
+    const WantParams &wantParams, const sptr<IRemoteObject> hostToken) : info_(info), wantParams_(wantParams)
 {
+    SetFormId(formId);
     SetProviderKey(info.GetProviderBundleName(), info.GetAbilityName());
+    SetHostToken(hostToken);
 }
 /**
  * @brief OnAbilityConnectDone, AbilityMs notify caller ability the result of connect.
@@ -44,7 +46,7 @@ void FormAcquireConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &
     HILOG_INFO("%{public}s called.", __func__);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("%{public}s, abilityName:%{public}s, formId:%{public}" PRId64 ", resultCode:%{public}d",
-           __func__, element.GetAbilityName().c_str(), formId_, resultCode);
+           __func__, element.GetAbilityName().c_str(), GetFormId(), resultCode);
         return;
     }
     FormSupplyCallback::GetInstance()->AddConnection(this);
@@ -62,7 +64,10 @@ void FormAcquireConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &
     HILOG_INFO("%{public}s , deviceId: %{public}s, bundleName: %{public}s, abilityName: %{public}s.",
         __func__, info_.GetDeviceId().c_str(), info_.GetProviderBundleName().c_str(), info_.GetAbilityName().c_str());
 
-    FormTaskMgr::GetInstance().PostAcquireTask(formId_, want, remoteObject);
+    FormTaskMgr::GetInstance().PostAcquireTask(GetFormId(), want, remoteObject);
+    if (GetHostToken() != nullptr) {
+        SetProviderToken(remoteObject);
+    }
 }
-}  // namespace AppExecFwk
-}  // namespace OHOS
+} // namespace AppExecFwk
+} // namespace OHOS

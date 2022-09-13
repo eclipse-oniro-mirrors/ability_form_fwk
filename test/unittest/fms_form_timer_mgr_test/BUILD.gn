@@ -19,7 +19,10 @@ module_output_path = "form_fwk/formmgrservice"
 ohos_unittest("FmsFormTimerMgrTest") {
   module_out_path = module_output_path
 
-  sources = [ "fms_form_timer_mgr_test.cpp" ]
+  sources = [
+    "${form_fwk_path}/test/mock/src/remote_native_token.cpp",
+    "fms_form_timer_mgr_test.cpp",
+  ]
 
   include_dirs = [
     "${ability_runtime_path}/services/formmgr/include",
@@ -43,6 +46,8 @@ ohos_unittest("FmsFormTimerMgrTest") {
     "ability_base:zuri",
     "ability_runtime:app_manager",
     "ability_runtime:wantagent_innerkits",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",

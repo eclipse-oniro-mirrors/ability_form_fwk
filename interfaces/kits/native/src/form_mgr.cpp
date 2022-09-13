@@ -16,6 +16,7 @@
 #include "form_mgr.h"
 
 #include "appexecfwk_errors.h"
+#include "form_caller_mgr.h"
 #include "form_errors.h"
 #include "form_mgr_errors.h"
 #include "hilog_wrapper.h"
@@ -96,6 +97,7 @@ int FormMgr::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &callerT
         HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
         return errCode;
     }
+    FormCallerMgr::GetInstance().RemoveFormHostCaller(formId);
     return remoteProxy_->DeleteForm(formId, callerToken);
 }
 
@@ -125,6 +127,7 @@ int FormMgr::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> &caller
         HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
         return errCode;
     }
+    FormCallerMgr::GetInstance().RemoveFormHostCaller(formId);
     return remoteProxy_->ReleaseForm(formId, callerToken, delCache);
 }
 
@@ -159,6 +162,16 @@ int FormMgr::UpdateForm(const int64_t formId, const FormProviderData &formBindin
         HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
         return errCode;
     }
+    auto hostCaller = FormCallerMgr::GetInstance().GetFormHostCaller(formId);
+    if (hostCaller != nullptr) {
+        hostCaller->UpdateForm(formId, formBindingData);
+    } else {
+        std::vector<std::shared_ptr<FormProviderCaller>> formProviderCallers;
+        FormCallerMgr::GetInstance().GetFormProviderCaller(formId, formProviderCallers);
+        for (const auto &formProviderCaller : formProviderCallers) {
+            formProviderCaller->UpdateForm(formId, formBindingData);
+        }
+    }
     return remoteProxy_->UpdateForm(formId, formBindingData);
 }
 
@@ -187,6 +200,11 @@ int FormMgr::RequestForm(const int64_t formId, const sptr<IRemoteObject> &caller
     if (errCode != ERR_OK) {
         HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
         return errCode;
+    }
+    auto hostCaller = FormCallerMgr::GetInstance().GetFormHostCaller(formId);
+    if (hostCaller != nullptr) {
+        HILOG_DEBUG("request form by host caller");
+        return hostCaller->RequestForm(formId, callerToken, want);
     }
     ErrCode resultCode = remoteProxy_->RequestForm(formId, callerToken, want);
     if (resultCode != ERR_OK) {
@@ -335,6 +353,11 @@ int FormMgr::MessageEvent(const int64_t formId, const Want &want, const sptr<IRe
     if (errCode != ERR_OK) {
         HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
         return errCode;
+    }
+    auto hostCaller = FormCallerMgr::GetInstance().GetFormHostCaller(formId);
+    if (hostCaller != nullptr) {
+        HILOG_DEBUG("send message by host caller");
+        return hostCaller->MessageEvent(formId, want, callerToken);
     }
     return remoteProxy_->MessageEvent(formId, want, callerToken);
 }

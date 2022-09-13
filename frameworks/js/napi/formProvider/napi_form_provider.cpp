@@ -239,7 +239,8 @@ static ErrCode FormInfoCheck(const FormInfo &formInfo)
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    if (formInfo.defaultDimension < Constants::DIM_KEY_MIN || formInfo.defaultDimension > Constants::DIM_KEY_MAX) {
+    if (formInfo.defaultDimension < static_cast<int32_t>(Constants::Dimension::DIMENSION_MIN) ||
+        formInfo.defaultDimension > static_cast<int32_t>(Constants::Dimension::DIMENSION_MAX)) {
         HILOG_ERROR("%{public}s called. Invalid dimension: %{public}d.", __func__, formInfo.defaultDimension);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
@@ -249,7 +250,8 @@ static ErrCode FormInfoCheck(const FormInfo &formInfo)
     }
     bool inSupportDimensions = false;
     for (int32_t supportDimension : formInfo.supportDimensions) {
-        if (supportDimension < Constants::DIM_KEY_MIN || supportDimension > Constants::DIM_KEY_MAX) {
+        if (supportDimension < static_cast<int32_t>(Constants::Dimension::DIMENSION_MIN) ||
+            supportDimension > static_cast<int32_t>(Constants::Dimension::DIMENSION_MAX)) {
             HILOG_ERROR("%{public}s called. Invalid dimension: %{public}d.", __func__, supportDimension);
             return ERR_APPEXECFWK_FORM_INVALID_PARAM;
         }

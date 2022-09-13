@@ -185,7 +185,6 @@ public:
      * @param hostBundleName Host bundle name.
      */
     void SetHostBundleName(const std::string &hostBundleName);
-
 private:
     int callerUid_ = 0;
     sptr<IRemoteObject> formHostClient_ = nullptr;

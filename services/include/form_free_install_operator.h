@@ -16,7 +16,7 @@
 #ifndef FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_FREE_INSTALL_OPERATOR_H
 #define FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_FREE_INSTALL_OPERATOR_H
 
-#include "event_handler.h"
+#include "form_event_handler.h"
 #include "free_install_status_callback_stub.h"
 
 namespace OHOS {
@@ -29,7 +29,7 @@ class FreeInstallStatusCallBack;
 class FormFreeInstallOperator final : public std::enable_shared_from_this<FormFreeInstallOperator> {
 public:
     FormFreeInstallOperator(const std::string &formShareInfoKey,
-        const std::shared_ptr<AppExecFwk::EventHandler> &handler);
+        const std::shared_ptr<FormEventHandler> &handler);
     ~FormFreeInstallOperator();
 
     int32_t StartFreeInstall(
@@ -39,7 +39,7 @@ public:
 private:
     std::string formShareInfoKey_;
     sptr<FreeInstallStatusCallBack> freeInstallStatusCallBack_ = nullptr;
-    std::shared_ptr<AppExecFwk::EventHandler> handler_ = nullptr;
+    std::shared_ptr<FormEventHandler> handler_ = nullptr;
 };
 
 class FreeInstallStatusCallBack final : public FreeInstallStatusCallBackStub {

@@ -22,7 +22,7 @@
 #include "form_mgr_errors.h"
 #include "form_provider_mgr.h"
 #include "form_share_mgr.h"
-#include "form_supply_callback.h"
+#include "form_task_mgr.h"
 #include "form_util.h"
 #include "hilog_wrapper.h"
 
@@ -51,7 +51,7 @@ sptr<FormSupplyCallback> FormSupplyCallback::GetInstance()
 int FormSupplyCallback::OnAcquire(const FormProviderInfo &formProviderInfo, const Want &want)
 {
     HILOG_INFO("%{public}s called.", __func__);
-    long connectId = want.GetLongParam(Constants::FORM_CONNECT_ID, 0);
+    auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     int errCode = want.GetIntParam(Constants::PROVIDER_FLAG, ERR_OK);
     if (errCode != ERR_OK) {
         RemoveConnection(connectId);
@@ -66,9 +66,12 @@ int FormSupplyCallback::OnAcquire(const FormProviderInfo &formProviderInfo, cons
     }
     int64_t formId = std::stoll(strFormId);
     int type = want.GetIntParam(Constants::ACQUIRE_TYPE, 0);
-    HILOG_DEBUG("%{public}s come: %{public}" PRId64 ", %{public}ld, %{public}d",
+    HILOG_DEBUG("%{public}s come: %{public}" PRId64 ", %{public}d, %{public}d",
         __func__, formId, connectId, type);
-    RemoveConnection(connectId);
+
+    if (IsRemoveConnection(formId, want.GetRemoteObject(Constants::PARAM_FORM_HOST_TOKEN))) {
+        RemoveConnection(connectId);
+    }
 
     switch (type) {
         case Constants::ACQUIRE_TYPE_CREATE_FORM:
@@ -90,9 +93,9 @@ int FormSupplyCallback::OnAcquire(const FormProviderInfo &formProviderInfo, cons
 int FormSupplyCallback::OnEventHandle(const Want &want)
 {
     HILOG_INFO("%{public}s called.", __func__);
-    long connectId = want.GetLongParam(Constants::FORM_CONNECT_ID, 0);
+    auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     std::string supplyInfo = want.GetStringParam(Constants::FORM_SUPPLY_INFO);
-    HILOG_DEBUG("%{public}s come: %{public}ld, %{public}s", __func__, connectId, supplyInfo.c_str());
+    HILOG_DEBUG("%{public}s come: %{public}d, %{public}s", __func__, connectId, supplyInfo.c_str());
     RemoveConnection(connectId);
     HILOG_INFO("%{public}s end.", __func__);
     return ERR_OK;
@@ -110,7 +113,7 @@ int FormSupplyCallback::OnAcquireStateResult(FormState state,
     const std::string &provider, const Want &wantArg, const Want &want)
 {
     HILOG_INFO("%{public}s called.", __func__);
-    long connectId = want.GetLongParam(Constants::FORM_CONNECT_ID, 0);
+    auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     RemoveConnection(connectId);
 
     ErrCode errCode = FormProviderMgr::GetInstance().AcquireFormStateBack(state, provider, wantArg);
@@ -125,7 +128,7 @@ int FormSupplyCallback::OnAcquireStateResult(FormState state,
 void FormSupplyCallback::AddConnection(sptr<FormAbilityConnection> connection)
 {
     HILOG_INFO("%{public}s called.", __func__);
-    long connectKey = FormUtil::GetCurrentMillisecond();
+    int32_t connectKey = static_cast<int32_t>(FormUtil::GetCurrentMillisecond());
     std::lock_guard<std::mutex> lock(conMutex_);
     while (connections_.find(connectKey) != connections_.end()) {
         connectKey++;
@@ -139,7 +142,7 @@ void FormSupplyCallback::AddConnection(sptr<FormAbilityConnection> connection)
  * @brief Delete ability connection after the callback come.
  * @param connectId The ability connection id generated when save.
  */
-void FormSupplyCallback::RemoveConnection(long connectId)
+void FormSupplyCallback::RemoveConnection(int32_t connectId)
 {
     HILOG_INFO("%{public}s called.", __func__);
     sptr<FormAbilityConnection> connection = nullptr;
@@ -189,9 +192,78 @@ bool FormSupplyCallback::CanDisconnect(sptr<FormAbilityConnection> &connection)
 void FormSupplyCallback::OnShareAcquire(int64_t formId, const std::string &remoteDeviceId,
     const AAFwk::WantParams &wantParams, int64_t requestCode, const bool &result)
 {
-    HILOG_DEBUG("%{public}s formId %{public}d called.", __func__, static_cast<int32_t>(formId));
-    DelayedRefSingleton<FormShareMgr>::GetInstance().HandleProviderShareData(
+    HILOG_DEBUG("%{public}s formId %{public}" PRId64 " called.", __func__, formId);
+    DelayedSingleton<FormShareMgr>::GetInstance()->HandleProviderShareData(
         formId, remoteDeviceId, wantParams, requestCode, result);
 }
-}  // namespace AppExecFwk
-}  // namespace OHOS
+
+bool FormSupplyCallback::IsRemoveConnection(int64_t formId, const sptr<IRemoteObject> &hostToken)
+{
+    HILOG_DEBUG("%{public}s called. formId is %{public}" PRId64, __func__, formId);
+    if (hostToken == nullptr) {
+        return true;
+    }
+
+    std::lock_guard<std::mutex> lock(conMutex_);
+    // keep one connection for each in application form in the same host
+    int32_t count = 0;
+    for (const auto &conn : connections_) {
+        if (hostToken == conn.second->GetHostToken() && formId == conn.second->GetFormId()) {
+            count++;
+            if (count > 1) {
+                break;
+            }
+        }
+    }
+    HILOG_DEBUG("%{public}s called. count is %{public}d", __func__, count);
+    if (count == 1) {
+        HILOG_DEBUG("keep the connection");
+        return false;
+    }
+    return true;
+}
+
+void FormSupplyCallback::RemoveConnection(int64_t formId, const sptr<IRemoteObject> &hostToken)
+{
+    HILOG_DEBUG("%{public}s called. formId is %{public}" PRId64, __func__, formId);
+    if (hostToken == nullptr) {
+        return;
+    }
+
+    std::lock_guard<std::mutex> lock(conMutex_);
+    for (const auto &conn : connections_) {
+        if (hostToken == conn.second->GetHostToken() && formId == conn.second->GetFormId()) {
+            Want want;
+            want.SetParam(Constants::FORM_CONNECT_ID, conn.first);
+            want.SetParam(Constants::PARAM_FORM_HOST_TOKEN, hostToken);
+            FormTaskMgr::GetInstance().PostDeleteTask(formId, want, conn.second->GetProviderToken());
+            HILOG_DEBUG("remove the connection, connect id is %{public}d", conn.first);
+        }
+    }
+}
+
+void FormSupplyCallback::HandleHostDied(const sptr<IRemoteObject> &hostToken)
+{
+    HILOG_DEBUG("%{public}s called.", __func__);
+    if (hostToken == nullptr) {
+        HILOG_ERROR("host token is nullptr.");
+        return;
+    }
+
+    std::vector<int32_t> connectIds;
+    {
+        std::lock_guard<std::mutex> lock(conMutex_);
+        for (const auto &conn : connections_) {
+            if (hostToken == conn.second->GetHostToken()) {
+                connectIds.push_back(conn.first);
+                HILOG_DEBUG("remove the connection, connect id is %{public}d", conn.first);
+            }
+        }
+    }
+
+    for (const auto &connectId : connectIds) {
+        RemoveConnection(connectId);
+    }
+}
+} // namespace AppExecFwk
+} // namespace OHOS
