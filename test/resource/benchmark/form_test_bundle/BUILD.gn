@@ -18,7 +18,7 @@ ohos_hap("formTestWidget1") {
   hap_name = "formTestWidget1"
   subsystem_name = "ability"
   part_name = "form_fwk"
-  final_hap_path = $root_out_dir/tests/benchmark/form_fwk/interfaces/resource/form_test_bundle/${hap_name}.hap
+  final_hap_path = "$root_out_dir/tests/benchmark/form_fwk/interfaces/resource/form_test_bundle/${hap_name}.hap"
   testonly = true
   deps = [
     ":formtestwidget1_ets_assets",
