@@ -30,6 +30,7 @@
 #undef private
 #include "form_mgr_errors.h"
 #include "form_mgr_service.h"
+#include "form_supply_callback.h"
 #include "form_util.h"
 #include "if_system_ability_manager.h"
 #include "ipc_skeleton.h"
@@ -61,6 +62,7 @@ const std::string FORM_PROVIDER_MODULE_SOURCE_DIR = "";
 const std::string FORM_HOST_BUNDLE_NAME = "com.form.host.app";
 
 const int32_t PARAM_FORM_DIMENSION_VALUE = 1;
+const int32_t PARAM_FORM_DIMENSION_2_1 = 5;
 
 const std::string DEVICE_ID = "ohos-phone1";
 const std::string DEF_LABEL1 = "PermissionFormRequireGrant";
@@ -119,7 +121,7 @@ void FmsFormMgrAddFormTest::CreateProviderData()
     formInfo.scheduledUpdateTime = "06:06";
     formInfo.jsComponentName = FORM_JS_COMPONENT_NAME;
     formInfo.formVisibleNotify = true;
-    formInfo.supportDimensions = {1, 2};
+    formInfo.supportDimensions = {1, 2, 5};
     formInfo.defaultDimension = 1;
     FormInfoStorage formInfoStorage;
     formInfoStorage.userId = userId_;
@@ -129,15 +131,12 @@ void FmsFormMgrAddFormTest::CreateProviderData()
 
     FormInfoMgr::GetInstance().bundleFormInfoMap_ = bundleFormInfoMap;
 }
-/*
- * Feature: FormMgrService
- * Function: FormMgr
- * SubFunction: AddForm Function
- * FunctionPoints: FormMgr AddForm interface
- * EnvConditions: Mobile that can run ohos test framework
- * CaseDescription: Verify if FormMgr invoke AddForm works.
+/**
+ * @tc.name: AddForm_001
+ * @tc.desc: Add 2_1 form
+ * @tc.type: FUNC
+ * @tc.require: issueI5G2SH
  */
-
 HWTEST_F(FmsFormMgrAddFormTest, AddForm_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "fms_form_mgr_add_form_test_001 start";
@@ -148,7 +147,7 @@ HWTEST_F(FmsFormMgrAddFormTest, AddForm_001, TestSize.Level0)
     want.SetParam(Constants::PARAM_FORM_HOST_BUNDLENAME_KEY, FORM_HOST_BUNDLE_NAME);
     want.SetParam(Constants::PARAM_MODULE_NAME_KEY, PARAM_PROVIDER_MODULE_NAME);
     want.SetParam(Constants::PARAM_FORM_NAME_KEY, PARAM_FORM_NAME);
-    want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, PARAM_FORM_DIMENSION_VALUE);
+    want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, PARAM_FORM_DIMENSION_2_1);
     want.SetElementName(DEVICE_ID, FORM_PROVIDER_BUNDLE_NAME, FORM_PROVIDER_ABILITY_NAME);
     want.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
     want.SetParam(Constants::ACQUIRE_TYPE, Constants::ACQUIRE_TYPE_CREATE_FORM);
@@ -704,5 +703,61 @@ HWTEST_F(FmsFormMgrAddFormTest, AddForm_009, TestSize.Level0)
     FormDataMgr::GetInstance().DeleteHostRecord(token_, formId);
 
     GTEST_LOG_(INFO) << "fms_form_mgr_add_form_test_009 end";
+}
+
+/**
+ * @tc.name: AddForm_010
+ * @tc.desc: Add in application form
+ * @tc.type: FUNC
+ * @tc.require: issueI5MVKZ
+ */
+HWTEST_F(FmsFormMgrAddFormTest, AddForm_010, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "fms_form_mgr_add_form_test_010 start";
+    CreateProviderData();
+    // No cache
+    FormJsInfo formJsInfo;
+    Want want;
+    want.SetParam(Constants::PARAM_FORM_HOST_BUNDLENAME_KEY, FORM_PROVIDER_BUNDLE_NAME);
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, PARAM_PROVIDER_MODULE_NAME);
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, PARAM_FORM_NAME);
+    want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, PARAM_FORM_DIMENSION_VALUE);
+    want.SetElementName(DEVICE_ID, FORM_PROVIDER_BUNDLE_NAME, FORM_PROVIDER_ABILITY_NAME);
+    want.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
+    want.SetParam(Constants::ACQUIRE_TYPE, Constants::ACQUIRE_TYPE_CREATE_FORM);
+    // clear old data
+    FormDataMgr::GetInstance().ClearFormRecords();
+    std::vector<FormDBInfo> oldFormDBInfos;
+    FormDbCache::GetInstance().GetAllFormInfo(oldFormDBInfos);
+    FormDbCache::GetInstance().DeleteFormInfoByBundleName(FORM_PROVIDER_BUNDLE_NAME, userId_, oldFormDBInfos);
+
+    // add form
+    EXPECT_EQ(ERR_OK, FormMgr::GetInstance().AddForm(0L, want, token_, formJsInfo));
+    token_->Wait();
+
+    size_t dataCnt {1};
+    int64_t formId = formJsInfo.formId;
+    // Form record alloted.
+    FormRecord formInfo;
+    bool ret = FormDataMgr::GetInstance().GetFormRecord(formId, formInfo);
+    EXPECT_TRUE(ret);
+    EXPECT_EQ(dataCnt, formInfo.formUserUids.size());
+    // Database info alloted.
+    std::vector<FormDBInfo> formDBInfos;
+    FormDbCache::GetInstance().GetAllFormInfo(formDBInfos);
+    EXPECT_EQ(dataCnt, formDBInfos.size());
+    FormDBInfo dbInfo {formDBInfos[0]};
+    EXPECT_EQ(formId, dbInfo.formId);
+    EXPECT_EQ(dataCnt, dbInfo.formUserUids.size());
+    // Form host record alloted.
+    std::vector<FormHostRecord> hostRecords;
+    FormDataMgr::GetInstance().GetFormHostRecord(formId, hostRecords);
+    EXPECT_FALSE(hostRecords.empty());
+
+    FormSupplyCallback::GetInstance()->RemoveConnection(formId, token_);
+    FormDataMgr::GetInstance().DeleteFormRecord(formId);
+    FormDbCache::GetInstance().DeleteFormInfo(formId);
+    FormDataMgr::GetInstance().DeleteHostRecord(token_, formId);
+    GTEST_LOG_(INFO) << "fms_form_mgr_add_form_test_010 end";
 }
 }
