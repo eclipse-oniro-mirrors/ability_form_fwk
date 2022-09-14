@@ -391,4 +391,68 @@ HWTEST_F(FmsFormMgrDeleteFormTest, DeleteForm_008, TestSize.Level0)
     FormDataMgr::GetInstance().DeleteHostRecord(token_, formId);
     GTEST_LOG_(INFO) << "fms_form_mgr_delete_form_test_008 end";
 }
+
+/**
+ * @tc.name: DeleteForm_009
+ * @tc.desc: Delete in application form
+ * @tc.type: FUNC
+ * @tc.require: issueI5OORU
+ */
+HWTEST_F(FmsFormMgrDeleteFormTest, DeleteForm_009, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "fms_form_mgr_delete_form_test_009 start";
+
+    // clear old data
+    FormDataMgr::GetInstance().ClearFormRecords();
+    std::vector<FormDBInfo> oldFormDBInfos;
+    FormDbCache::GetInstance().GetAllFormInfo(oldFormDBInfos);
+    FormDbCache::GetInstance().DeleteFormInfoByBundleName(FORM_PROVIDER_BUNDLE_NAME, 0, oldFormDBInfos);
+
+    int64_t formId {12001};
+    int callingUid = IPCSkeleton::GetCallingUid();
+    // Create cache
+    FormItemInfo record1;
+    record1.SetFormId(formId);
+    record1.SetProviderBundleName(FORM_PROVIDER_BUNDLE_NAME);
+    record1.SetAbilityName(FORM_PROVIDER_ABILITY_NAME);
+    record1.SetTemporaryFlag(false);
+    FormRecord retFormRec = FormDataMgr::GetInstance().AllotFormRecord(record1, callingUid);
+    // User Uid Add some Useruids into a form in cache
+    int formUserUid {1};
+    FormDataMgr::GetInstance().AddFormUserUid(formId, formUserUid);
+    // Set form host record
+    retFormRec.formUserUids.emplace_back(formUserUid);
+    FormDBInfo formDBInfo(formId, retFormRec);
+    FormDbCache::GetInstance().SaveFormInfo(formDBInfo);
+    // Set host record
+    FormItemInfo info;
+    info.SetHostBundleName(FORM_PROVIDER_BUNDLE_NAME);
+    FormDataMgr::GetInstance().AllotFormHostRecord(info, token_, formId, callingUid);
+
+    EXPECT_EQ(ERR_OK, FormMgr::GetInstance().DeleteForm(formId, token_));
+    token_->Wait();
+
+    // Cache uid is not deleted yet.
+    FormRecord formInfo;
+    bool ret = FormDataMgr::GetInstance().GetFormRecord(formId, formInfo);
+    EXPECT_TRUE(ret);
+    size_t dataCnt {1};
+    EXPECT_EQ(dataCnt, formInfo.formUserUids.size());
+    // Database is not deleted yet.
+    std::vector<FormDBInfo> formDBInfos;
+    FormDbCache::GetInstance().GetAllFormInfo(formDBInfos);
+    EXPECT_EQ(dataCnt, formDBInfos.size());
+    FormDBInfo dbInfo {formDBInfos[0]};
+    EXPECT_EQ(formId, dbInfo.formId);
+    EXPECT_EQ(dataCnt, dbInfo.formUserUids.size());
+    // Form host record is deleted.
+    std::vector<FormHostRecord> hostRecords;
+    FormDataMgr::GetInstance().GetFormHostRecord(formId, hostRecords);
+    EXPECT_TRUE(hostRecords.empty());
+
+    FormDataMgr::GetInstance().DeleteFormRecord(formId);
+    FormDbCache::GetInstance().DeleteFormInfo(formId);
+    FormDataMgr::GetInstance().DeleteHostRecord(token_, formId);
+    GTEST_LOG_(INFO) << "fms_form_mgr_delete_form_test_009 end";
+}
 }

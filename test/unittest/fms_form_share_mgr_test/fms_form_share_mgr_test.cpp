@@ -767,11 +767,11 @@ HWTEST_F(FmsFormShareMgrTest, ShareForm_001, TestSize.Level0)
     int64_t invalidFormId = 0;
     sptr<MockFormHostCallback> mockHost = new (std::nothrow) MockFormHostCallback();
     int32_t result = FormMgr::GetInstance().ShareForm(invalidFormId, REMOTE_DEVICE_ID, mockHost, requestCode);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    EXPECT_NE(result, ERR_OK);
 
     invalidFormId = -1;
     result = FormMgr::GetInstance().ShareForm(invalidFormId, REMOTE_DEVICE_ID, mockHost, requestCode);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    EXPECT_NE(result, ERR_OK);
 
     GTEST_LOG_(INFO) << "FmsFormMgrAddFormTest ShareForm_001  end";
 }
@@ -801,7 +801,7 @@ HWTEST_F(FmsFormShareMgrTest, ShareForm_002, TestSize.Level0)
 
     sptr<MockFormHostCallback> mockHost = new (std::nothrow) MockFormHostCallback();
     int32_t result = FormMgr::GetInstance().ShareForm(formJsInfo.formId, "", mockHost, requestCode);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    EXPECT_NE(result, ERR_OK);
 
     GTEST_LOG_(INFO) << "FmsFormMgrAddFormTest ShareForm_002 end";
 }

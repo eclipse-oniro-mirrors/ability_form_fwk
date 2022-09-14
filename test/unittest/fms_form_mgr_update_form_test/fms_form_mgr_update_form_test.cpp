@@ -336,4 +336,41 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_007, TestSize.Level0)
 
     GTEST_LOG_(INFO) << "fms_form_mgr_client_updateForm_test_007 end";
 }
+
+/**
+ * @tc.name: UpdateForm_008
+ * @tc.desc: Verify linkage update
+ * @tc.type: FUNC
+ * @tc.require: issueI5KIZC
+ */
+HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_008, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "UpdateForm_008 starts";
+    // param editor
+    int64_t formId {100L};
+    int32_t callingUid {20000001};
+    FormProviderData formProviderData = FormProviderData(std::string("{\"city\": \"beijing001\"}"));
+
+    // add formRecord
+    FormItemInfo formItemInfo;
+    formItemInfo.SetFormId(formId);
+    formItemInfo.SetProviderBundleName(FORM_PROVIDER_BUNDLE_NAME);
+    formItemInfo.SetAbilityName(FORM_PROVIDER_ABILITY_NAME);
+    formItemInfo.SetTemporaryFlag(false);
+    FormDataMgr::GetInstance().AllotFormRecord(formItemInfo, callingUid);
+
+    // add formHostRecord
+    FormItemInfo itemInfo;
+    itemInfo.SetHostBundleName(FORM_HOST_BUNDLE_NAME);
+    FormDataMgr::GetInstance().AllotFormHostRecord(itemInfo, token_, formId, callingUid);
+    FormItemInfo itemInfo1;
+    itemInfo1.SetHostBundleName(FORM_PROVIDER_BUNDLE_NAME);
+    FormDataMgr::GetInstance().AllotFormHostRecord(itemInfo, token_, formId, callingUid);
+
+    // test exec
+    EXPECT_EQ(ERR_OK, FormMgr::GetInstance().UpdateForm(formId, formProviderData));
+
+    token_->Wait();
+
+    GTEST_LOG_(INFO) << "UpdateForm_008 test ends";
+}
 }
