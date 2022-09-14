@@ -36,7 +36,7 @@ public:
     {}
     MOCK_METHOD2(GetNameForUid, bool(const int uid, std::string &name));
     MOCK_METHOD2(GetBundlesForUid, bool(const int uid, std::vector<std::string> &));
-    MOCK_METHOD1(IsAbilityEnabled, bool(const AbilityInfo &));
+    MOCK_METHOD2(IsAbilityEnabled, ErrCode(const AbilityInfo &, bool &isEnable));
     MOCK_METHOD5(QueryAbilityInfo, bool(const Want &want, int32_t flags, int32_t userId, AbilityInfo &abilityInfo,
         const sptr<IRemoteObject> &callBack));
     bool QueryAbilityInfo(const AAFwk::Want &want, AbilityInfo &abilityInfo) override
@@ -200,9 +200,9 @@ public:
         return true;
     }
 
-    virtual bool IsApplicationEnabled(const std::string &bundleName)override
+    virtual ErrCode IsApplicationEnabled(const std::string &bundleName, bool &isEnable)override
     {
-        return true;
+        return ERR_OK;
     }
 
     virtual bool GetBundleInfo(
@@ -226,7 +226,7 @@ public:
     MOCK_METHOD2(CleanBundleDataFiles, bool(const std::string &bundleName, const int userId));
     MOCK_METHOD2(GetNameForUid, bool(const int uid, std::string &name));
     MOCK_METHOD2(GetBundlesForUid, bool(const int uid, std::vector<std::string> &));
-    MOCK_METHOD1(IsAbilityEnabled, bool(const AbilityInfo &));
+    MOCK_METHOD2(IsAbilityEnabled, ErrCode(const AbilityInfo &, bool &isEnable));
     bool QueryAbilityInfo(const AAFwk::Want &want, AbilityInfo &abilityInfo) override;
     MOCK_METHOD5(QueryAbilityInfo, bool(const Want &want, int32_t flags, int32_t userId, AbilityInfo &abilityInfo,
         const sptr<IRemoteObject> &callBack));
@@ -330,9 +330,9 @@ public:
     {
         return nullptr;
     }
-    virtual bool IsApplicationEnabled(const std::string &bundleName) override
+    virtual ErrCode IsApplicationEnabled(const std::string &bundleName, bool &isEnable) override
     {
-        return true;
+        return ERR_OK;
     };
     virtual bool GetBundleGidsByUid(const std::string &bundleName, const int &uid, std::vector<int> &gids) override
     {
