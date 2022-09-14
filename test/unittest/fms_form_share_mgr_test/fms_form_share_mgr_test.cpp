@@ -124,8 +124,8 @@ void FmsFormShareMgrTest::TearDownTestCase()
 void FmsFormShareMgrTest::SetUp()
 {
     formyMgrServ_->OnStart();
-    FormShareMgr::GetInstance().formDmsClient_ = std::make_shared<FormDistributedClient>();
-    FormShareMgr::GetInstance().formDmsClient_->SetDmsProxy(dmsSerice->AsObject());
+    DelayedSingleton<FormShareMgr>::GetInstance()->formDmsClient_ = std::make_shared<FormDistributedClient>();
+    DelayedSingleton<FormShareMgr>::GetInstance()->formDmsClient_->SetDmsProxy(dmsSerice->AsObject());
     token_ = new (std::nothrow) MockFormHostClient();
 
     // Permission install
@@ -190,9 +190,9 @@ void FmsFormShareMgrTest::CreateForm(FormJsInfo &formJsInfo)
 
 void FmsFormShareMgrTest::ClearFormShareMgrMapData()
 {
-    FormShareMgr::GetInstance().shareInfo_.clear();
-    FormShareMgr::GetInstance().eventMap_.clear();
-    FormShareMgr::GetInstance().freeInstallOperatorMap_.clear();
+    DelayedSingleton<FormShareMgr>::GetInstance()->shareInfo_.clear();
+    DelayedSingleton<FormShareMgr>::GetInstance()->eventMap_.clear();
+    DelayedSingleton<FormShareMgr>::GetInstance()->freeInstallOperatorMap_.clear();
 }
 
 /**
@@ -206,9 +206,9 @@ HWTEST_F(FmsFormShareMgrTest, RecvFormShareInfoFromRemote_001, TestSize.Level0)
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest RecvFormShareInfoFromRemote_001 start";
     auto runner = EventRunner::Create("FormMgrService");
     auto handler = std::make_shared<FormEventHandler>(runner);
-    FormShareMgr::GetInstance().SetEventHandler(handler);
+    DelayedSingleton<FormShareMgr>::GetInstance()->SetEventHandler(handler);
     FormShareInfo info;
-    auto result = FormShareMgr::GetInstance().RecvFormShareInfoFromRemote(info);
+    auto result = DelayedSingleton<FormShareMgr>::GetInstance()->RecvFormShareInfoFromRemote(info);
     EXPECT_EQ(result, ERR_OK);
 
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest RecvFormShareInfoFromRemote_001 end";
@@ -236,36 +236,36 @@ HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_001, TestSiz
     info.formTempFlag = false;
     info.deviceId = "device";
     info.providerShareData = wantParams;
-    auto result = FormShareMgr::GetInstance().HandleRecvFormShareInfoFromRemoteTask(info);
+    auto result = DelayedSingleton<FormShareMgr>::GetInstance()->HandleRecvFormShareInfoFromRemoteTask(info);
     EXPECT_NE(result, ERR_OK);
 
     info.formName = "form";
     info.bundleName = "";
-    result = FormShareMgr::GetInstance().HandleRecvFormShareInfoFromRemoteTask(info);
+    result = DelayedSingleton<FormShareMgr>::GetInstance()->HandleRecvFormShareInfoFromRemoteTask(info);
     EXPECT_NE(result, ERR_OK);
 
     info.bundleName = "form_bundle";
     info.moduleName = "";
-    result = FormShareMgr::GetInstance().HandleRecvFormShareInfoFromRemoteTask(info);
+    result = DelayedSingleton<FormShareMgr>::GetInstance()->HandleRecvFormShareInfoFromRemoteTask(info);
     EXPECT_NE(result, ERR_OK);
 
     info.moduleName = "form_module";
     info.abilityName = "";
-    result = FormShareMgr::GetInstance().HandleRecvFormShareInfoFromRemoteTask(info);
+    result = DelayedSingleton<FormShareMgr>::GetInstance()->HandleRecvFormShareInfoFromRemoteTask(info);
     EXPECT_NE(result, ERR_OK);
 
     info.abilityName = "form_ability";
     info.dimensionId = -1;
-    result = FormShareMgr::GetInstance().HandleRecvFormShareInfoFromRemoteTask(info);
+    result = DelayedSingleton<FormShareMgr>::GetInstance()->HandleRecvFormShareInfoFromRemoteTask(info);
     EXPECT_EQ(result, ERR_OK);
 
     info.dimensionId = 1;
     info.deviceId = "";
-    result = FormShareMgr::GetInstance().HandleRecvFormShareInfoFromRemoteTask(info);
+    result = DelayedSingleton<FormShareMgr>::GetInstance()->HandleRecvFormShareInfoFromRemoteTask(info);
     EXPECT_NE(result, ERR_OK);
 
     info.deviceId = "device";
-    result = FormShareMgr::GetInstance().HandleRecvFormShareInfoFromRemoteTask(info);
+    result = DelayedSingleton<FormShareMgr>::GetInstance()->HandleRecvFormShareInfoFromRemoteTask(info);
     EXPECT_NE(result, ERR_OK);
 
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest HandleRecvFormShareInfoFromRemoteTask_001 end";
@@ -294,13 +294,13 @@ HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_002, TestSiz
     info.formTempFlag = false;
     info.deviceId = "device";
     info.providerShareData = wantParams;
-    auto key = FormShareMgr::GetInstance().MakeFormShareInfoKey(info);
-    FormShareMgr::GetInstance().shareInfo_.emplace(key, info);
+    auto key = DelayedSingleton<FormShareMgr>::GetInstance()->MakeFormShareInfoKey(info);
+    DelayedSingleton<FormShareMgr>::GetInstance()->shareInfo_.emplace(key, info);
 
-    auto result = FormShareMgr::GetInstance().HandleRecvFormShareInfoFromRemoteTask(info);
+    auto result = DelayedSingleton<FormShareMgr>::GetInstance()->HandleRecvFormShareInfoFromRemoteTask(info);
     EXPECT_NE(result, ERR_OK);
 
-    FormShareMgr::GetInstance().shareInfo_.erase(key);
+    DelayedSingleton<FormShareMgr>::GetInstance()->shareInfo_.erase(key);
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest HandleRecvFormShareInfoFromRemoteTask_002 end";
 }
 
@@ -343,7 +343,7 @@ HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_003, TestSiz
     ExtensionAbilityInfo extensionInfo;
     bundleMgr_->ImplicitQueryInfoByPriority(want, flags, userId, abilityInfo, extensionInfo);
 
-    auto result = FormShareMgr::GetInstance().HandleRecvFormShareInfoFromRemoteTask(info);
+    auto result = DelayedSingleton<FormShareMgr>::GetInstance()->HandleRecvFormShareInfoFromRemoteTask(info);
     EXPECT_EQ(result, ERR_OK);
 
     ClearFormShareMgrMapData();
@@ -384,10 +384,10 @@ HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_004, TestSiz
 
     EXPECT_CALL(*bundleMgr_, QueryAbilityInfo(_, _, _, _, _)).Times(1).WillOnce(testing::Invoke(func));
 
-    auto key = FormShareMgr::GetInstance().MakeFormShareInfoKey(info);
-    FormShareMgr::GetInstance().shareInfo_.emplace(key, info);
+    auto key = DelayedSingleton<FormShareMgr>::GetInstance()->MakeFormShareInfoKey(info);
+    DelayedSingleton<FormShareMgr>::GetInstance()->shareInfo_.emplace(key, info);
 
-    auto result = FormShareMgr::GetInstance().HandleRecvFormShareInfoFromRemoteTask(info);
+    auto result = DelayedSingleton<FormShareMgr>::GetInstance()->HandleRecvFormShareInfoFromRemoteTask(info);
     EXPECT_NE(result, ERR_OK);
 
     ClearFormShareMgrMapData();
@@ -428,10 +428,10 @@ HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_005, TestSiz
 
     EXPECT_CALL(*bundleMgr_, QueryAbilityInfo(_, _, _, _, _)).Times(1).WillOnce(testing::Invoke(func));
 
-    auto key = FormShareMgr::GetInstance().MakeFormShareInfoKey(info);
-    FormShareMgr::GetInstance().shareInfo_.emplace(key, info);
+    auto key = DelayedSingleton<FormShareMgr>::GetInstance()->MakeFormShareInfoKey(info);
+    DelayedSingleton<FormShareMgr>::GetInstance()->shareInfo_.emplace(key, info);
 
-    auto result = FormShareMgr::GetInstance().HandleRecvFormShareInfoFromRemoteTask(info);
+    auto result = DelayedSingleton<FormShareMgr>::GetInstance()->HandleRecvFormShareInfoFromRemoteTask(info);
     EXPECT_NE(result, ERR_OK);
 
     testing::Mock::AllowLeak(bundleMgr_);
@@ -461,7 +461,8 @@ HWTEST_F(FmsFormShareMgrTest, FmsFormShareMgrTest_ShareForm_001, TestSize.Level0
     EXPECT_TRUE(ret);
     EXPECT_EQ(PARAM_FORM_NAME, formInfo1.formName);
 
-    int32_t result = FormShareMgr::GetInstance().ShareForm(formInfo1.formId, REMOTE_DEVICE_ID, nullptr, requestCode);
+    int32_t result = DelayedSingleton<FormShareMgr>::GetInstance()->ShareForm(
+        formInfo1.formId, REMOTE_DEVICE_ID, nullptr, requestCode);
     EXPECT_EQ(result, ERR_OK);
 
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest FmsFormShareMgrTest_ShareForm_001  end";
@@ -490,11 +491,13 @@ HWTEST_F(FmsFormShareMgrTest, FmsFormShareMgrTest_ShareForm_002, TestSize.Level0
     EXPECT_TRUE(ret);
     EXPECT_EQ(PARAM_FORM_NAME, formInfo1.formName);
 
-    int32_t result = FormShareMgr::GetInstance().ShareForm(formJsInfo.formId, REMOTE_DEVICE_ID, nullptr, requestCode);
+    int32_t result = DelayedSingleton<FormShareMgr>::GetInstance()->ShareForm(
+        formJsInfo.formId, REMOTE_DEVICE_ID, nullptr, requestCode);
     EXPECT_EQ(result, ERR_OK);
 
     int64_t invalidFormId = -1;
-    result = FormShareMgr::GetInstance().ShareForm(invalidFormId, REMOTE_DEVICE_ID, nullptr, requestCode);
+    result = DelayedSingleton<FormShareMgr>::GetInstance()->ShareForm(
+        invalidFormId, REMOTE_DEVICE_ID, nullptr, requestCode);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
 
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest FmsFormShareMgrTest_ShareForm_002 end";
@@ -524,7 +527,8 @@ HWTEST_F(FmsFormShareMgrTest, FmsFormShareMgrTest_ShareForm_003, TestSize.Level0
     EXPECT_EQ(PARAM_FORM_NAME, formInfo1.formName);
 
     int64_t invalidFormId = 123456789;
-    int32_t result = FormShareMgr::GetInstance().ShareForm(invalidFormId, REMOTE_DEVICE_ID, nullptr, requestCode);
+    int32_t result = DelayedSingleton<FormShareMgr>::GetInstance()->ShareForm(
+        invalidFormId, REMOTE_DEVICE_ID, nullptr, requestCode);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
 
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest FmsFormShareMgrTest_ShareForm_003 end";
@@ -556,7 +560,8 @@ HWTEST_F(FmsFormShareMgrTest, FmsFormShareMgrTest_ShareForm_004, TestSize.Level0
     FormDataMgr::GetInstance().UpdateFormRecord(formJsInfo.formId, formInfo1);
     EXPECT_EQ(PARAM_FORM_NAME, formInfo1.formName);
 
-    int32_t result = FormShareMgr::GetInstance().ShareForm(formJsInfo.formId, REMOTE_DEVICE_ID, nullptr, requestCode);
+    int32_t result = DelayedSingleton<FormShareMgr>::GetInstance()->ShareForm(
+        formJsInfo.formId, REMOTE_DEVICE_ID, nullptr, requestCode);
     EXPECT_EQ(result, ERR_OK);
 
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest FmsFormShareMgrTest_ShareForm_004 end";
@@ -583,7 +588,8 @@ HWTEST_F(FmsFormShareMgrTest, AcquireShareFormData_001, TestSize.Level0)
 
     sptr<MockFormProviderClient> mockClient = new (std::nothrow) MockFormProviderClient();
     EXPECT_FALSE(mockClient->acquireShareFormState_);
-    FormShareMgr::GetInstance().AcquireShareFormData(UNKNOWN_FORM_ID, REMOTE_DEVICE_ID, want, mockClient);
+    DelayedSingleton<FormShareMgr>::GetInstance()->AcquireShareFormData(
+        UNKNOWN_FORM_ID, REMOTE_DEVICE_ID, want, mockClient);
 
     EXPECT_TRUE(mockClient->acquireShareFormState_);
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest AcquireShareFormData_001 end";
@@ -610,7 +616,7 @@ HWTEST_F(FmsFormShareMgrTest, AcquireShareFormData_002, TestSize.Level0)
 
     sptr<MockFormProviderClient> mockClient = new (std::nothrow) MockFormProviderClient();
     EXPECT_FALSE(mockClient->acquireShareFormState_);
-    FormShareMgr::GetInstance().AcquireShareFormData(0, REMOTE_DEVICE_ID, want, mockClient);
+    DelayedSingleton<FormShareMgr>::GetInstance()->AcquireShareFormData(0, REMOTE_DEVICE_ID, want, mockClient);
 
     EXPECT_TRUE(mockClient->acquireShareFormState_);
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest AcquireShareFormData_001 end";
@@ -654,9 +660,9 @@ HWTEST_F(FmsFormShareMgrTest, HandleProviderShareData_001, TestSize.Level0)
     auto hostCallback = [&](const int64_t requestCode, const int32_t result) { testFlag = true; };
     bool results = true;
     sptr<MockFormHostCallback> mockHost = new (std::nothrow) MockFormHostCallback();
-    FormShareMgr::GetInstance().requestMap_.emplace(requestCode, mockHost);
+    DelayedSingleton<FormShareMgr>::GetInstance()->requestMap_.emplace(requestCode, mockHost);
     EXPECT_CALL(*mockHost, OnShareFormResponse(_, _)).Times(1).WillOnce(Invoke(hostCallback));
-    FormShareMgr::GetInstance().HandleProviderShareData(
+    DelayedSingleton<FormShareMgr>::GetInstance()->HandleProviderShareData(
         UNKNOWN_FORM_ID, REMOTE_DEVICE_ID, wantParams, requestCode, results);
     EXPECT_TRUE(testFlag);
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest HandleProviderShareData_001 end";
@@ -691,10 +697,10 @@ HWTEST_F(FmsFormShareMgrTest, HandleProviderShareData_002, TestSize.Level0)
     bool testFlag = false;
     auto hostCallback = [&](const int64_t requestCode, const int32_t result) { testFlag = true; };
     sptr<MockFormHostCallback> mockHost = new (std::nothrow) MockFormHostCallback();
-    FormShareMgr::GetInstance().requestMap_.emplace(requestCode, mockHost);
+    DelayedSingleton<FormShareMgr>::GetInstance()->requestMap_.emplace(requestCode, mockHost);
     EXPECT_CALL(*mockHost, OnShareFormResponse(_, _)).Times(1).WillOnce(Invoke(hostCallback));
     bool results = true;
-    FormShareMgr::GetInstance().HandleProviderShareData(
+    DelayedSingleton<FormShareMgr>::GetInstance()->HandleProviderShareData(
         DIFF_FORM_ID, REMOTE_DEVICE_ID, wantParams, requestCode, results);
 
     EXPECT_TRUE(testFlag);
@@ -731,10 +737,10 @@ HWTEST_F(FmsFormShareMgrTest, HandleProviderShareData_003, TestSize.Level0)
     bool testFlag = false;
     auto hostCallback = [&](const int64_t requestCode, const int32_t result) { testFlag = true; };
     sptr<MockFormHostCallback> mockHost = new (std::nothrow) MockFormHostCallback();
-    FormShareMgr::GetInstance().requestMap_.emplace(requestCode, mockHost);
+    DelayedSingleton<FormShareMgr>::GetInstance()->requestMap_.emplace(requestCode, mockHost);
     EXPECT_CALL(*mockHost, OnShareFormResponse(_, _)).Times(1).WillOnce(Invoke(hostCallback));
     bool results = true;
-    FormShareMgr::GetInstance().HandleProviderShareData(
+    DelayedSingleton<FormShareMgr>::GetInstance()->HandleProviderShareData(
         formJsInfo.formId, REMOTE_DEVICE_ID, wantParams, requestCode, results);
 
     EXPECT_TRUE(testFlag);
@@ -827,7 +833,8 @@ HWTEST_F(FmsFormShareMgrTest, GetLocalDeviceInfo_001, TestSize.Level0)
     bool ret = FormDataMgr::GetInstance().GetFormRecord(formJsInfo.formId, formInfo1);
     EXPECT_TRUE(ret);
     OHOS::DistributedHardware::DmDeviceInfo deviceInfo = {{0}, {0}, 0, {0}};
-    auto result = FormShareMgr::GetInstance().GetLocalDeviceInfo(FORM_PROVIDER_BUNDLE_NAME, deviceInfo);
+    auto result =
+        DelayedSingleton<FormShareMgr>::GetInstance()->GetLocalDeviceInfo(FORM_PROVIDER_BUNDLE_NAME, deviceInfo);
     EXPECT_EQ(result, ERR_OK);
     std::string deviceId(deviceInfo.deviceId);
     EXPECT_FALSE(deviceId.empty());
@@ -856,7 +863,7 @@ HWTEST_F(FmsFormShareMgrTest, GetLocalDeviceInfo_002, TestSize.Level0)
     bool ret = FormDataMgr::GetInstance().GetFormRecord(formJsInfo.formId, formInfo1);
     EXPECT_TRUE(ret);
     OHOS::DistributedHardware::DmDeviceInfo deviceInfo;
-    auto result = FormShareMgr::GetInstance().GetLocalDeviceInfo(FORM_NULL_BUNDLE_NAME, deviceInfo);
+    auto result = DelayedSingleton<FormShareMgr>::GetInstance()->GetLocalDeviceInfo(FORM_NULL_BUNDLE_NAME, deviceInfo);
     EXPECT_EQ(result, DistributedHardware::ERR_DM_IPC_SEND_REQUEST_FAILED);
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest GetLocalDeviceInfo_002 end";
 }
@@ -871,7 +878,7 @@ HWTEST_F(FmsFormShareMgrTest, AddProviderData_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest AddProviderData_001 start";
 
-    FormShareMgr::GetInstance().shareInfo_.clear();
+    DelayedSingleton<FormShareMgr>::GetInstance()->shareInfo_.clear();
 
     std::string formName = "Form0200";
     std::string moduleName = "ModuleName0200";
@@ -893,10 +900,10 @@ HWTEST_F(FmsFormShareMgrTest, AddProviderData_001, TestSize.Level0)
     info.formTempFlag = false;
     info.deviceId = "device";
     info.providerShareData = wantParams;
-    auto key = FormShareMgr::GetInstance().MakeFormShareInfoKey(want);
-    FormShareMgr::GetInstance().shareInfo_.emplace(key, info);
+    auto key = DelayedSingleton<FormShareMgr>::GetInstance()->MakeFormShareInfoKey(want);
+    DelayedSingleton<FormShareMgr>::GetInstance()->shareInfo_.emplace(key, info);
 
-    FormShareMgr::GetInstance().AddProviderData(want, wantParams);
+    DelayedSingleton<FormShareMgr>::GetInstance()->AddProviderData(want, wantParams);
     auto result = wantParams.GetParam(Constants::PARAM_DEVICE_ID_KEY);
     IString *ao = IString::Query(result);
     if (ao != nullptr) {
@@ -916,7 +923,7 @@ HWTEST_F(FmsFormShareMgrTest, AddProviderData_002, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest AddProviderData_002 start";
 
-    FormShareMgr::GetInstance().shareInfo_.clear();
+    DelayedSingleton<FormShareMgr>::GetInstance()->shareInfo_.clear();
 
     std::string formName = "Form0200";
     std::string moduleName = "ModuleName0200";
@@ -928,7 +935,7 @@ HWTEST_F(FmsFormShareMgrTest, AddProviderData_002, TestSize.Level0)
         .SetElementName(bundleName, abilityName);
 
     WantParams wantParams;
-    FormShareMgr::GetInstance().AddProviderData(want, wantParams);
+    DelayedSingleton<FormShareMgr>::GetInstance()->AddProviderData(want, wantParams);
     auto result = wantParams.GetParam(Constants::PARAM_DEVICE_ID_KEY);
     EXPECT_EQ(result, nullptr);
 

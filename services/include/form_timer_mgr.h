@@ -344,9 +344,9 @@ private:
     };
 
     struct {
-        bool operator()(DynamicRefreshItem a, DynamicRefreshItem b) const
+        bool operator()(const DynamicRefreshItem& a, const DynamicRefreshItem& b) const
         {
-            return (a.settedTime > b.settedTime ? true : false);
+            return a.settedTime < b.settedTime;
         }
     } CompareDynamicRefreshItem;
 

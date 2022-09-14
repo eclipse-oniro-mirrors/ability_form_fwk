@@ -34,10 +34,10 @@ public:
     ~FormProviderCaller() = default;
 
     /**
-     * @brief Get form host caller token.
-     * @return Returns callerToken_.
+     * @brief Is the same caller token.
+     * @param callerToken Caller ability token.
      */
-    sptr<IRemoteObject> GetCallerToken() const;
+    bool IsSameToken(const sptr<IRemoteObject> &callerToken) const;
 
     /**
      * @brief Add form js info to formJsInfoMap_.
@@ -86,6 +86,12 @@ public:
      * @param formProviderData Indicates the form provider data.
      */
     void UpdateForm(int64_t formId, const FormProviderData &formProviderData);
+
+    /**
+     * @brief Add deathRecipient object to formHostClient_.
+     * @param deathRecipient DeathRecipient object.
+     */
+    void AddDeathRecipient(sptr<IRemoteObject::DeathRecipient> deathRecipient);
 private:
     bool GetFormJsInfo(int64_t formId, FormJsInfo &formJsInfo);
     int32_t OnAcquire(const FormJsInfo &formJsInfo, const sptr<IRemoteObject> &token);
@@ -95,6 +101,25 @@ private:
     std::map<int64_t, FormJsInfo> formJsInfoMap_;
     std::vector<FormJsInfo> formJsInfos_;
     sptr<IRemoteObject> callerToken_ = nullptr;
+};
+
+/**
+ * @class FormProviderCallerRecipient
+ * FormProviderCallerRecipient notices IRemoteBroker died.
+ */
+class FormProviderCallerRecipient : public IRemoteObject::DeathRecipient {
+public:
+    using RemoteDiedHandler = std::function<void(const wptr<IRemoteObject> &)>;
+    FormProviderCallerRecipient(RemoteDiedHandler handler) : handler_(handler) {}
+    ~FormProviderCallerRecipient() = default;
+
+    /**
+     * @brief handle remote object died event.
+     * @param remote remote object.
+     */
+    void OnRemoteDied(const wptr<IRemoteObject> &remote) override;
+private:
+    RemoteDiedHandler handler_;
 };
 } // namespace AppExecFwk
 } // namespace OHOS

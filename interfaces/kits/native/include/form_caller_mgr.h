@@ -18,6 +18,7 @@
 
 #include <singleton.h>
 
+#include "event_handler.h"
 #include "form_host_caller.h"
 #include "form_provider_interface.h"
 #include "form_provider_caller.h"
@@ -38,7 +39,7 @@ public:
 
     std::shared_ptr<FormHostCaller> GetFormHostCaller(int64_t formId);
 
-    void DeleteFormHostCaller(int64_t formId);
+    void RemoveFormHostCaller(int64_t formId);
 
     // for provider
     void AddFormProviderCaller(const FormJsInfo &formJsInfo, const sptr<IRemoteObject> &callerToken);
@@ -47,6 +48,19 @@ public:
 
     void RemoveFormProviderCaller(int64_t formId, const sptr<IRemoteObject> &callerToken);
 private:
+    std::shared_ptr<EventHandler> GetEventHandler();
+
+    // for host
+    void OnHostCallBackDied(const wptr<IRemoteObject> &remote);
+    void HandleHostCallBackDiedTask(const sptr<IRemoteObject> &remote);
+    void RemoveFormHostCaller(const sptr<IRemoteObject> &callerToken);
+
+    // for provider
+    void OnProviderCallBackDied(const wptr<IRemoteObject> &remote);
+    void HandleProviderCallBackDiedTask(const sptr<IRemoteObject> &remote);
+    void RemoveFormProviderCaller(const sptr<IRemoteObject> &callerToken);
+
+    std::shared_ptr<EventHandler> eventHandler_ = nullptr;
     // for host
     mutable std::recursive_mutex formHostCallerMutex_;
     std::map<int64_t, std::shared_ptr<FormHostCaller>> formHostCallers_;

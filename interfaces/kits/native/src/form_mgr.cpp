@@ -97,7 +97,7 @@ int FormMgr::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &callerT
         HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
         return errCode;
     }
-    FormCallerMgr::GetInstance().DeleteFormHostCaller(formId);
+    FormCallerMgr::GetInstance().RemoveFormHostCaller(formId);
     return remoteProxy_->DeleteForm(formId, callerToken);
 }
 
@@ -127,7 +127,7 @@ int FormMgr::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> &caller
         HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
         return errCode;
     }
-    FormCallerMgr::GetInstance().DeleteFormHostCaller(formId);
+    FormCallerMgr::GetInstance().RemoveFormHostCaller(formId);
     return remoteProxy_->ReleaseForm(formId, callerToken, delCache);
 }
 
