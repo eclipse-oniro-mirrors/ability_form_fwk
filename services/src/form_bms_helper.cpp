@@ -134,7 +134,8 @@ bool FormBmsHelper::GetBundlePackInfo(const std::string &bundleName, const int32
         return false;
     }
 
-    if (!IN_PROCESS_CALL(iBundleMgr->GetBundlePackInfo(bundleName, GET_PACK_INFO_ALL, bundlePackInfo, userId))) {
+    if (IN_PROCESS_CALL(iBundleMgr->GetBundlePackInfo(bundleName, GET_PACK_INFO_ALL, bundlePackInfo, userId))
+        != ERR_OK) {
         HILOG_ERROR("%{public}s error, failed to get bundle pack info.", __func__);
         return false;
     }
