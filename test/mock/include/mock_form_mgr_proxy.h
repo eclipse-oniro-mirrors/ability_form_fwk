@@ -18,6 +18,7 @@
 #include <gtest/gtest.h>
 #include "gmock/gmock.h"
 #include "form_mgr_proxy.h"
+#include "form_provider_data.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -27,6 +28,9 @@ public:
     MOCK_METHOD2(GetFormsInfo, int(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos));
     MOCK_METHOD0(IsRequestPublishFormSupported, bool());
     MOCK_METHOD2(StartAbility, int32_t(const Want &want, const sptr<IRemoteObject> &callerToken));
+    MOCK_METHOD2(UpdateForm, int32_t(int64_t formId, const FormProviderData &formBindingData));
+    MOCK_METHOD3(RequestForm, int32_t(int64_t formId, const sptr<IRemoteObject> &callerToken, const Want &want));
+    MOCK_METHOD3(MessageEvent, int32_t(int64_t formId, const Want &want, const sptr<IRemoteObject> &callerToken));
 };
 }
 }

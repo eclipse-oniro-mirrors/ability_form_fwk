@@ -14,7 +14,9 @@
  */
 #include <gtest/gtest.h>
 #include <memory>
+#include "form_caller_mgr.h"
 #include "form_mgr.h"
+#include "mock_form_provider_client.h"
 #include "gmock/gmock.h"
 #include "mock_form_mgr_proxy.h"
 #include "mock_form_token.h"
@@ -158,5 +160,71 @@ HWTEST_F(FormMgrTest, FormMgrTest_0004, TestSize.Level1) {
     int32_t result = FormMgr::GetInstance().StartAbility(want, token);
     EXPECT_EQ(result, 0);
     GTEST_LOG_(INFO) << "FormMgrTest_0004 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0005
+ * @tc.desc: Verify UpdateForm
+ * @tc.type: FUNC
+ * @tc.require: issueI5PFT9
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0005, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0005 starts";
+    EXPECT_CALL(*mockProxy, UpdateForm(_, _))
+        .Times(1)
+        .WillOnce(Return(0));
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = 1;
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    sptr<IRemoteObject> providerToken = new (std::nothrow) MockFormProviderClient();
+    FormCallerMgr::GetInstance().AddFormHostCaller(formJsInfo, providerToken);
+    FormProviderData formProviderData = FormProviderData(std::string("{\"city\": \"beijing001\"}"));
+    int32_t result = FormMgr::GetInstance().UpdateForm(formJsInfo.formId, formProviderData);
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrTest_0005 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0006
+ * @tc.desc: Verify RequestForm
+ * @tc.type: FUNC
+ * @tc.require: issueI5Q8IU
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0006, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0006 starts";
+    EXPECT_CALL(*mockProxy, RequestForm(_, _, _))
+        .Times(1)
+        .WillOnce(Return(0));
+    Want want;
+    want = want.SetElementName("", "com.example.FormAbility", "MainAbility");
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    FormJsInfo formJsInfo;
+    sptr<IRemoteObject> providerToken = new (std::nothrow) MockFormProviderClient();
+    FormCallerMgr::GetInstance().AddFormHostCaller(formJsInfo, providerToken);
+    int32_t result = FormMgr::GetInstance().RequestForm(formJsInfo.formId, token, want);
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrTest_0006 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0007
+ * @tc.desc: Verify MessageEvent
+ * @tc.type: FUNC
+ * @tc.require: issueI5QGMS
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0007, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0007 starts";
+    EXPECT_CALL(*mockProxy, MessageEvent(_, _, _))
+        .Times(1)
+        .WillOnce(Return(0));
+    Want want;
+    want = want.SetElementName("", "com.example.FormAbility", "MainAbility");
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    FormJsInfo formJsInfo;
+    sptr<IRemoteObject> providerToken = new (std::nothrow) MockFormProviderClient();
+    FormCallerMgr::GetInstance().AddFormHostCaller(formJsInfo, providerToken);
+    int32_t result = FormMgr::GetInstance().MessageEvent(formJsInfo.formId, want, token);
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrTest_0007 test ends";
 }
 } // namespace

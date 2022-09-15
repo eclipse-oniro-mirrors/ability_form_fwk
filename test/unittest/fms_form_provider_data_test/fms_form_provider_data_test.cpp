@@ -170,7 +170,7 @@ HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_004, TestSize.Level0) 
  * @tc.name: FmsFormProviderDataTest_005
  * @tc.desc: Verify the ConvertRawImageData function.
  * @tc.type: FUNC
- * @tc.require: issueI5MVKZ
+ * @tc.require: issueI5KIZC
  */
 HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_005, TestSize.Level0) // test MergeData
 {
