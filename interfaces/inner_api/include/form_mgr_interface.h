@@ -251,6 +251,16 @@ public:
                                    const sptr<IRemoteObject> &callerToken) = 0;
 
     /**
+     * @brief Notify the form is privacy protected or not.
+     * @param formIds Indicates the ID of the forms.
+     * @param isProtected isProtected or not.
+     * @param callerToken Host client.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int NotifyFormsPrivacyProtected(const std::vector<int64_t> &formIds, bool isProtected,
+                                            const sptr<IRemoteObject> &callerToken) = 0;
+
+    /**
      * @brief Notify the form is enable to be updated or not.
      * @param formIds Indicates the ID of the forms.
      * @param isEnableUpdate enable update or not.
@@ -378,6 +388,7 @@ public:
         FORM_MGR_SHARE_FORM,
         FORM_MGR_RECV_FORM_SHARE_INFO_FROM_REMOTE,
         FORM_MGR_START_ABILITY,
+        FORM_MGR_NOTIFY_FORMS_PRIVACY_PROTECTED,
     };
 };
 }  // namespace AppExecFwk

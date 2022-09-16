@@ -979,6 +979,47 @@ int FormMgrProxy::NotifyFormsVisible(const std::vector<int64_t> &formIds, bool i
     return result;
 }
 
+int FormMgrProxy::NotifyFormsPrivacyProtected(const std::vector<int64_t> &formIds, bool isProtected,
+                                              const sptr<IRemoteObject> &callerToken)
+{
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("%{public}s, failed to write interface token", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt64Vector(formIds)) {
+        HILOG_ERROR("%{public}s, failed to write vector formIds", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteBool(isProtected)) {
+        HILOG_ERROR("%{public}s, failed to write bool isProtected", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteRemoteObject(callerToken)) {
+        HILOG_ERROR("%{public}s, failed to write callerToken", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int error = Remote()->SendRequest(
+        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_NOTIFY_FORMS_PRIVACY_PROTECTED),
+        data,
+        reply,
+        option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d", __func__, error);
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+
+    int32_t result = reply.ReadInt32();
+    if (result != ERR_OK) {
+        HILOG_ERROR("%{public}s, failed to read reply result", __func__);
+        return result;
+    }
+    return result;
+}
+
 /**
  * @brief Notify the form is enable to be updated or not.
  * @param formIds Indicates the ID of the forms.

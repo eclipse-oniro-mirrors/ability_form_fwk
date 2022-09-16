@@ -84,6 +84,8 @@ FormMgrStub::FormMgrStub()
         &FormMgrStub::HandleAcquireFormState;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_NOTIFY_FORMS_VISIBLE)] =
         &FormMgrStub::HandleNotifyFormsVisible;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_NOTIFY_FORMS_PRIVACY_PROTECTED)] =
+        &FormMgrStub::HandleNotifyFormsPrivacyProtected;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_NOTIFY_FORMS_ENABLE_UPDATE)] =
         &FormMgrStub::HandleNotifyFormsEnableUpdate;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_ALL_FORMS_INFO)] =
@@ -698,6 +700,33 @@ int32_t FormMgrStub::HandleNotifyFormsVisible(MessageParcel &data, MessageParcel
     }
 
     int32_t result = NotifyFormsVisible(formIds, isVisible, callerToken);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("%{public}s, failed to write result", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return result;
+}
+
+int32_t FormMgrStub::HandleNotifyFormsPrivacyProtected(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("%{public}s called.", __func__);
+    std::vector<int64_t> formIds;
+    if (!data.ReadInt64Vector(&formIds)) {
+        HILOG_ERROR("%{public}s, failed to ReadInt64Vector", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    bool isProtected = false;
+    if (!data.ReadBool(isProtected)) {
+        HILOG_ERROR("%{public}s, failed to ReadBool", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
+    if (callerToken == nullptr) {
+        HILOG_ERROR("%{public}s, failed to get remote object.", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    int32_t result = NotifyFormsPrivacyProtected(formIds, isProtected, callerToken);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("%{public}s, failed to write result", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;

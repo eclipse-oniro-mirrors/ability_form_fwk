@@ -184,8 +184,10 @@ public:
 
     static void Finalizer(NativeEngine* engine, void* data, void* hint);
     static NativeValue* ShareForm(NativeEngine* engine, NativeCallbackInfo* info);
+    static NativeValue* NotifyFormsPrivacyProtected(NativeEngine *engine, NativeCallbackInfo *info);
 private:
     NativeValue* OnShareForm(NativeEngine &engine, NativeCallbackInfo &info);
+    NativeValue* OnNotifyFormsPrivacyProtected(NativeEngine &engine, NativeCallbackInfo &info);
     void InnerShareForm(NativeEngine &engine, const std::shared_ptr<OHOS::AbilityRuntime::AsyncTask> &asyncTask,
         ShareFormTask &&task, int64_t formId, const std::string &remoteDeviceId);
 };

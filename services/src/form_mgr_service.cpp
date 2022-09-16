@@ -605,6 +605,18 @@ int FormMgrService::NotifyFormsVisible(const std::vector<int64_t> &formIds,
     return FormMgrAdapter::GetInstance().NotifyFormsVisible(formIds, isVisible, callerToken);
 }
 
+int FormMgrService::NotifyFormsPrivacyProtected(const std::vector<int64_t> &formIds, bool isProtected,
+    const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    ErrCode ret = CheckFormPermission();
+    if (ret != ERR_OK) {
+        HILOG_ERROR("%{public}s fail, notify form is privacy protected permission denied", __func__);
+        return ret;
+    }
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+}
+
 /**
  * @brief Notify the form is enable to be updated or not.
  * @param formIds Indicates the ID of the forms.

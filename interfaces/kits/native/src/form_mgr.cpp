@@ -800,6 +800,30 @@ int FormMgr::NotifyFormsVisible(const std::vector<int64_t> &formIds, bool isVisi
     return resultCode;
 }
 
+int FormMgr::NotifyFormsPrivacyProtected(const std::vector<int64_t> &formIds, bool isProtected,
+                                         const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("%{public}s start.", __func__);
+
+    if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
+        HILOG_ERROR("%{public}s error, form is in recover status, can't do action on form.", __func__);
+        return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
+    }
+
+    int errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("%{public}s failed, errCode: %{public}d.", __func__, errCode);
+        return errCode;
+    }
+
+    int resultCode = remoteProxy_->NotifyFormsPrivacyProtected(formIds, isProtected, callerToken);
+    if (resultCode != ERR_OK) {
+        HILOG_ERROR("%{public}s error, failed to NotifyFormsPrivacyProtected, error code is %{public}d.", __func__,
+            resultCode);
+    }
+    return resultCode;
+}
+
 /**
  * @brief Notify the form is enable to be updated or not.
  * @param formIds Indicates the ID of the forms.

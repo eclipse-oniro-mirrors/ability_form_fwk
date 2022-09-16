@@ -226,6 +226,13 @@ private:
      */
     int32_t HandleNotifyFormsVisible(MessageParcel &data, MessageParcel &reply);
     /**
+     * @brief Handle NotifyFormsPrivacyProtected message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t HandleNotifyFormsPrivacyProtected(MessageParcel &data, MessageParcel &reply);
+    /**
      * @brief Handle NotifyFormsEnableUpdate message.
      * @param data input param.
      * @param reply output param.
