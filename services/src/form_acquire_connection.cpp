@@ -61,7 +61,7 @@ void FormAcquireConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &
     want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
     want.SetElementName(info_.GetDeviceId(), info_.GetProviderBundleName(),
         info_.GetAbilityName(), info_.GetModuleName());
-    HILOG_INFO("%{public}s , deviceId: %{public}s, bundleName: %{public}s, abilityName: %{public}s.",
+    HILOG_DEBUG("%{public}s , deviceId: %{public}s, bundleName: %{public}s, abilityName: %{public}s.",
         __func__, info_.GetDeviceId().c_str(), info_.GetProviderBundleName().c_str(), info_.GetAbilityName().c_str());
 
     FormTaskMgr::GetInstance().PostAcquireTask(GetFormId(), want, remoteObject);
