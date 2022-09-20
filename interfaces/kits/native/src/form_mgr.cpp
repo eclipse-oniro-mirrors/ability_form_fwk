@@ -961,23 +961,6 @@ int32_t FormMgr::StartAbility(const Want &want, const sptr<IRemoteObject> &calle
     return remoteProxy_->StartAbility(want, callerToken);
 }
 
-/**
- * @brief Update action string for router event.
- * @param formId Indicates the unique id of form.
- * @param action Indicates the origin action string.
- * @return Returns ERR_OK on success, others on failure.
- */
-int FormMgr::UpdateRouterAction(const int64_t formId, std::string &action)
-{
-    HILOG_INFO("%{public}s start.", __func__);
-    int errCode = Connect();
-    if (errCode != ERR_OK) {
-        HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
-        return errCode;
-    }
-    return remoteProxy_->UpdateRouterAction(formId, action);
-}
-
 int32_t FormMgr::ShareForm(int64_t formId, const std::string &remoteDeviceId, const sptr<IRemoteObject> &callerToken,
     int64_t requestCode)
 {

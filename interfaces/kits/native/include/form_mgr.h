@@ -367,14 +367,6 @@ public:
     int32_t StartAbility(const Want &want, const sptr<IRemoteObject> &callerToken);
 
     /**
-     * @brief Update action string for router event.
-     * @param formId Indicates the unique id of form.
-     * @param action Indicates the origin action string.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    int UpdateRouterAction(const int64_t formId, std::string &action);
-
-    /**
      * @brief Share form with formId and remote device id.
      * @param formId The Id of the forms to share.
      * @param remoteDeviceId The Id of the remote revice to share.

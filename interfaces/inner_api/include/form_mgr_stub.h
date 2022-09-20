@@ -262,14 +262,6 @@ private:
     int32_t HandleGetFormsInfo(MessageParcel &data, MessageParcel &reply);
 
     /**
-     * @brief Update action string for router event.
-     * @param formId Indicates the unique id of form.
-     * @param action Indicates the origin action string.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    int32_t HandleUpdateRouterAction(MessageParcel &data, MessageParcel &reply);
-
-    /**
      * @brief Handle share form message.
      * @param data input param.
      * @param reply output param.
