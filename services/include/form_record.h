@@ -58,6 +58,7 @@ public:
     uint32_t versionCode = 0;
     std::string versionName = "";
     uint32_t compatibleVersion = 0;
+    FormType type = FormType::JS;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

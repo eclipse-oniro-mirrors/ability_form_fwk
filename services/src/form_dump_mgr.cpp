@@ -71,6 +71,7 @@ void FormDumpMgr::DumpFormInfos(const std::vector<FormRecord> &formRecordInfos, 
         formInfos += "    formVisibleNotify [" + std::to_string(info.formVisibleNotify) + "]\n";
         formInfos += "    formVisibleNotifyState [" + std::to_string(info.formVisibleNotifyState) + "]\n";
         formInfos += "    userId [" + std::to_string(info.userId) + "]\n";
+        formInfos += "    type [" + std::to_string(static_cast<int32_t>(info.type)) + "]\n";
 
         if (!info.hapSourceDirs.empty()) {
             formInfos += "    hapSourceDirs [";

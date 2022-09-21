@@ -37,6 +37,8 @@ bool FormJsInfo::ReadFromParcel(Parcel &parcel)
     versionCode = parcel.ReadUint32();
     versionName = Str16ToStr8(parcel.ReadString16());
     compatibleVersion = parcel.ReadUint32();
+    int32_t typeData = parcel.ReadInt32();
+    type = static_cast<FormType>(typeData);
 
     std::unique_ptr<FormProviderData> bindingData(parcel.ReadParcelable<FormProviderData>());
     if (bindingData == nullptr) {
@@ -112,6 +114,9 @@ bool FormJsInfo::Marshalling(Parcel &parcel) const
         return false;
     }
     if (!parcel.WriteUint32(compatibleVersion)) {
+        return false;
+    }
+    if (!parcel.WriteInt32(static_cast<int32_t>(type))) {
         return false;
     }
     // write formProviderData
