@@ -2035,25 +2035,6 @@ bool FormMgrAdapter::CheckIsSystemAppByBundleName(const sptr<IBundleMgr> &iBundl
 }
 
 /**
- * @brief Add forms to storage for st.
- * @param Want The Want of the form to add.
- * @return Returns ERR_OK on success, others on failure.
- */
-int FormMgrAdapter::DistributedDataAddForm(const Want &want)
-{
-    HILOG_INFO("%{public}s called.", __func__);
-    FormDBInfo formDBInfo;
-    ElementName elementName = want.GetElement();
-    formDBInfo.formId = want.GetIntParam(Constants::PARAM_FORM_ADD_COUNT, 0);
-    formDBInfo.formName = want.GetStringParam(Constants::PARAM_FORM_NAME_KEY);
-    formDBInfo.bundleName = elementName.GetBundleName();
-    formDBInfo.moduleName = want.GetStringParam(Constants::PARAM_MODULE_NAME_KEY);
-    formDBInfo.abilityName = elementName.GetAbilityName();
-    formDBInfo.formUserUids.push_back(HUNDRED);
-    return FormDbCache::GetInstance().SaveFormInfo(formDBInfo);
-}
-
-/**
  * @brief Get current user ID.
  * @param callingUid calling Uid.
  * @return Returns user ID.

@@ -74,8 +74,6 @@ FormMgrStub::FormMgrStub()
         &FormMgrStub::HandleBatchAddFormRecords;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_CLEAR_FORM_RECORDS_ST)] =
         &FormMgrStub::HandleClearFormRecords;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_DISTRIBUTED_DATA_ADD_FORM__ST)] =
-        &FormMgrStub::HandleDistributedDataAddForm;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_DELETE_INVALID_FORMS)] =
         &FormMgrStub::HandleDeleteInvalidForms;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_ACQUIRE_FORM_STATE)] =
@@ -558,27 +556,6 @@ int32_t FormMgrStub::HandleClearFormRecords(MessageParcel &data, MessageParcel &
 {
     HILOG_INFO("%{public}s called.", __func__);
     int32_t result = ClearFormRecords();
-    reply.WriteInt32(result);
-    return result;
-}
-
-/**
- * @brief Handle DistributedDataAddForm message.
- * @param data input param.
- * @param reply output param.
- * @return Returns ERR_OK on success, others on failure.
- */
-int32_t FormMgrStub::HandleDistributedDataAddForm(MessageParcel &data, MessageParcel &reply)
-{
-    HILOG_INFO("%{public}s called.", __func__);
-
-    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
-    if (!want) {
-        HILOG_ERROR("%{public}s, failed to ReadParcelable<Want>", __func__);
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-
-    int32_t result = DistributedDataAddForm(*want);
     reply.WriteInt32(result);
     return result;
 }

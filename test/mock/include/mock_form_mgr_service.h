@@ -47,7 +47,6 @@ public:
     MOCK_METHOD2(RouterEvent, int(const int64_t formId, Want &want));
     MOCK_METHOD1(BatchAddFormRecords, int(const Want &want));
     MOCK_METHOD0(ClearFormRecords, int());
-    MOCK_METHOD1(DistributedDataAddForm, int(const Want &want));
     MOCK_METHOD3(DeleteInvalidForms, int(const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &callerToken,
         int32_t &numFormsDeleted));
     MOCK_METHOD3(AcquireFormState, int(const Want &want, const sptr<IRemoteObject> &callerToken,

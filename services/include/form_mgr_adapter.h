@@ -239,13 +239,6 @@ public:
     int ClearFormRecords();
 
     /**
-     * @brief  Add forms to storage for st .
-     * @param Want The Want of the form to add.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    int DistributedDataAddForm(const Want &want);
-
-    /**
      * @brief Delete the invalid forms.
      * @param formIds Indicates the ID of the valid forms.
      * @param callerToken Caller ability token.

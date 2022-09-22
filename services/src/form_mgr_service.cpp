@@ -520,17 +520,6 @@ ErrCode FormMgrService::CheckFormPermission()
 }
 
 /**
- * @brief  Add forms to storage for st.
- * @param Want The Want of the form to add.
- * @return Returns ERR_OK on success, others on failure.
- */
-int FormMgrService::DistributedDataAddForm(const Want &want)
-{
-    HILOG_INFO("%{public}s called.", __func__);
-    return FormMgrAdapter::GetInstance().DistributedDataAddForm(want);
-}
-
-/**
  * @brief Delete the invalid forms.
  * @param formIds Indicates the ID of the valid forms.
  * @param callerToken Caller ability token.
