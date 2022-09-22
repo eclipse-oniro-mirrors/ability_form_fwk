@@ -2054,15 +2054,6 @@ int FormMgrAdapter::DistributedDataAddForm(const Want &want)
 }
 
 /**
- * @brief  Delete form form storage for st.
- * @param formId The formId of the form to delete.
- * @return Returns ERR_OK on success, others on failure.
- */
-int FormMgrAdapter::DistributedDataDeleteForm(const std::string &formId)
-{
-    return FormDbCache::GetInstance().DeleteFormInfo(std::stoll(formId));
-}
-/**
  * @brief Get current user ID.
  * @param callingUid calling Uid.
  * @return Returns user ID.

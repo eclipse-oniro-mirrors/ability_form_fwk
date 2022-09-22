@@ -531,17 +531,6 @@ int FormMgrService::DistributedDataAddForm(const Want &want)
 }
 
 /**
- * @brief  Delete form form storage for st.
- * @param formId The formId of the form to delete.
- * @return Returns ERR_OK on success, others on failure.
- */
-int FormMgrService::DistributedDataDeleteForm(const std::string &formId)
-{
-    HILOG_INFO("%{public}s called.", __func__);
-    return FormMgrAdapter::GetInstance().DistributedDataDeleteForm(formId);
-}
-
-/**
  * @brief Delete the invalid forms.
  * @param formIds Indicates the ID of the valid forms.
  * @param callerToken Caller ability token.

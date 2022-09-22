@@ -808,37 +808,6 @@ int FormMgrProxy::DistributedDataAddForm(const Want &want)
 }
 
 /**
- * @brief  Delete form form storage for st.
- * @param formId The formId of the form to delete.
- * @return Returns ERR_OK on success, others on failure.
- */
-int FormMgrProxy::DistributedDataDeleteForm(const std::string &formId)
-{
-    MessageParcel data;
-    if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("%{public}s, failed to write interface token", __func__);
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    if (!data.WriteInt64(std::stoll(formId))) {
-        HILOG_ERROR("%{public}s, failed to write formId", __func__);
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-
-    MessageParcel reply;
-    MessageOption option;
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_DISTRIBUTED_DATA_DELETE_FORM__ST),
-        data,
-        reply,
-        option);
-    if (error != ERR_OK) {
-        HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d", __func__, error);
-        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
-    }
-    return reply.ReadInt32();
-}
-
-/**
  * @brief Delete the invalid forms.
  * @param formIds Indicates the ID of the valid forms.
  * @param callerToken Caller ability token.

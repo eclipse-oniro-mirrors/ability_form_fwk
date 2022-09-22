@@ -214,13 +214,6 @@ public:
     virtual int DistributedDataAddForm(const Want &want) = 0;
 
     /**
-     * @brief  Delete form form storage for st.
-     * @param formId The formId of the form to delete.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    virtual int DistributedDataDeleteForm(const std::string &formId) = 0;
-
-    /**
      * @brief Delete the invalid forms.
      * @param formIds Indicates the ID of the valid forms.
      * @param callerToken Caller ability token.

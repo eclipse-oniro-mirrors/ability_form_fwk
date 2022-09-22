@@ -698,22 +698,6 @@ int FormMgr::DistributedDataAddForm(const Want &want)
 }
 
 /**
- * @brief  Delete form form storage for st.
- * @param formId The formId of the form to delete.
- * @return Returns ERR_OK on success, others on failure.
- */
-int FormMgr::DistributedDataDeleteForm(const std::string &formId)
-{
-    HILOG_INFO("%{public}s called.", __func__);
-    int errCode = Connect();
-    if (errCode != ERR_OK) {
-        HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
-        return errCode;
-    }
-    return remoteProxy_->DistributedDataDeleteForm(formId);
-}
-
-/**
  * @brief Delete the invalid forms.
  * @param formIds Indicates the ID of the valid forms.
  * @param callerToken Host client.

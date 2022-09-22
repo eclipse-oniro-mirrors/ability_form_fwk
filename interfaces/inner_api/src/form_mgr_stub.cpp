@@ -76,8 +76,6 @@ FormMgrStub::FormMgrStub()
         &FormMgrStub::HandleClearFormRecords;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_DISTRIBUTED_DATA_ADD_FORM__ST)] =
         &FormMgrStub::HandleDistributedDataAddForm;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_DISTRIBUTED_DATA_DELETE_FORM__ST)] =
-        &FormMgrStub::HandleDistributedDataDeleteForm;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_DELETE_INVALID_FORMS)] =
         &FormMgrStub::HandleDeleteInvalidForms;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_ACQUIRE_FORM_STATE)] =
@@ -581,27 +579,6 @@ int32_t FormMgrStub::HandleDistributedDataAddForm(MessageParcel &data, MessagePa
     }
 
     int32_t result = DistributedDataAddForm(*want);
-    reply.WriteInt32(result);
-    return result;
-}
-
-/**
- * @brief Handle DistributedDataDeleteForm message.
- * @param data input param.
- * @param reply output param.
- * @return Returns ERR_OK on success, others on failure.
- */
-int32_t FormMgrStub::HandleDistributedDataDeleteForm(MessageParcel &data, MessageParcel &reply)
-{
-    HILOG_INFO("%{public}s called.", __func__);
-
-    std::string formId = data.ReadString();
-    if (formId.empty()) {
-        HILOG_ERROR("%{public}s, failed to get formId", __func__);
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-
-    int32_t result = DistributedDataDeleteForm(formId);
     reply.WriteInt32(result);
     return result;
 }
