@@ -214,33 +214,6 @@ int FormMgrProxy::SetNextRefreshTime(const int64_t formId, const int64_t nextTim
     return reply.ReadInt32();
 }
 
-ErrCode FormMgrProxy::AddFormInfo(FormInfo &formInfo)
-{
-    MessageParcel data;
-    MessageParcel reply;
-
-    if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("%{public}s, failed to write interface token", __func__);
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    if (!data.WriteParcelable(&formInfo)) {
-        HILOG_ERROR("%{public}s, failed to write formInfo", __func__);
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-
-    MessageOption option;
-    int32_t error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_ADD_FORM_INFO),
-        data,
-        reply,
-        option);
-    if (error != ERR_OK) {
-        HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d", __func__, error);
-        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
-    }
-    return reply.ReadInt32();
-}
-
 ErrCode FormMgrProxy::RemoveFormInfo(const std::string &moduleName, const std::string &formName)
 {
     MessageParcel data;

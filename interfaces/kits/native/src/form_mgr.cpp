@@ -407,17 +407,6 @@ int FormMgr::SetNextRefreshTime(const int64_t formId, const int64_t nextTime)
     return remoteProxy_->SetNextRefreshTime(formId, nextTime);
 }
 
-ErrCode FormMgr::AddFormInfo(FormInfo &formInfo)
-{
-    HILOG_INFO("%{public}s called.", __func__);
-    ErrCode errCode = Connect();
-    if (errCode != ERR_OK) {
-        HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
-        return errCode;
-    }
-    return remoteProxy_->AddFormInfo(formInfo);
-}
-
 ErrCode FormMgr::RemoveFormInfo(const std::string &moduleName, const std::string &formName)
 {
     HILOG_INFO("%{public}s called.", __func__);

@@ -59,15 +59,6 @@ struct AsyncRequestPublishFormCallbackInfo {
     int64_t formId = 0;
 };
 
-struct AsyncAddFormInfoCallbackInfo {
-    napi_env env = nullptr;
-    napi_async_work asyncWork = nullptr;
-    napi_deferred deferred = nullptr;
-    napi_ref callback = nullptr;
-    OHOS::AppExecFwk::FormInfo formInfo {};
-    int32_t result = OHOS::ERR_OK;
-};
-
 struct AsyncRemoveFormInfoCallbackInfo {
     napi_env env = nullptr;
     napi_async_work asyncWork = nullptr;
@@ -88,7 +79,6 @@ struct AsyncIsRequestPublishFormSupportedCallbackInfo : AsyncCallbackInfoBase {
 napi_value NAPI_SetFormNextRefreshTime(napi_env env, napi_callback_info info);
 napi_value NAPI_UpdateForm(napi_env env, napi_callback_info info);
 napi_value NAPI_RequestPublishForm(napi_env env, napi_callback_info info);
-napi_value NAPI_AddFormInfo(napi_env env, napi_callback_info info);
 napi_value NAPI_RemoveFormInfo(napi_env env, napi_callback_info info);
 
 /**

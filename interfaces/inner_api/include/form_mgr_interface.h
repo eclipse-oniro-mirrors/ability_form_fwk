@@ -85,14 +85,6 @@ public:
     virtual int SetNextRefreshTime(const int64_t formId, const int64_t nextTime) = 0;
 
     /**
-     * @brief Add the form info.
-     *
-     * @param formInfo Indicates the form info to be added.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    virtual ErrCode AddFormInfo(FormInfo &formInfo) = 0;
-
-    /**
      * @brief Remove the specified form info.
      *
      * @param moduleName Indicates the module name of the dynamic form info to be removed.

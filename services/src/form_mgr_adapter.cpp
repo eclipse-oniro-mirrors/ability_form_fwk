@@ -1294,28 +1294,6 @@ int FormMgrAdapter::SetNextRefreshTime(const int64_t formId, const int64_t nextT
     return SetNextRefreshTimeLocked(matchedFormId, nextTime, userId);
 }
 
-ErrCode FormMgrAdapter::AddFormInfo(FormInfo &formInfo)
-{
-    std::string bundleName;
-    if (!GetBundleName(bundleName)) {
-        HILOG_ERROR("%{public}s failed to get BundleName", __func__);
-        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
-    }
-    if (formInfo.bundleName != bundleName) {
-        HILOG_WARN("The bundleName in formInfo does not match the bundleName of current calling user.");
-        formInfo.bundleName = bundleName;
-    }
-    if (formInfo.isStatic) {
-        HILOG_WARN("Only dynamic forms can be added.");
-        formInfo.isStatic = false;
-    }
-
-    int32_t callingUid = IPCSkeleton::GetCallingUid();
-    int32_t userId = GetCurrentUserId(callingUid);
-
-    return FormInfoMgr::GetInstance().AddDynamicFormInfo(formInfo, userId);
-}
-
 ErrCode FormMgrAdapter::RemoveFormInfo(const std::string &moduleName, const std::string &formName)
 {
     std::string bundleName;
