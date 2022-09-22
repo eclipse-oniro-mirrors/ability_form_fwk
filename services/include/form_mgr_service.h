@@ -206,13 +206,6 @@ public:
     int RouterEvent(const int64_t formId, Want &want) override;
 
     /**
-     * @brief Batch add forms to form records for st limit value test.
-     * @param want The want of the form to add.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    int BatchAddFormRecords(const Want &want) override;
-
-    /**
      * @brief Check whether if the form manager service is ready.
      * @return Returns true if the form manager service is ready; returns false otherwise.
      */

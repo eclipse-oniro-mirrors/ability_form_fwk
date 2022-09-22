@@ -389,16 +389,6 @@ int FormMgrService::RouterEvent(const int64_t formId, Want &want)
 }
 
 /**
- * @brief Batch add forms to form records for st limit value test.
- * @param want The want of the form to add.
- * @return Returns forms count to add.
- */
-int FormMgrService::BatchAddFormRecords(const Want &want)
-{
-    return FormMgrAdapter::GetInstance().BatchAddFormRecords(want);
-}
-
-/**
  * @brief Start event for the form manager service.
  */
 void FormMgrService::OnStart()

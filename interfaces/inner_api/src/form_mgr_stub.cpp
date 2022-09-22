@@ -70,8 +70,6 @@ FormMgrStub::FormMgrStub()
         &FormMgrStub::HandleLifecycleUpdate;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_MESSAGE_EVENT)] =
         &FormMgrStub::HandleMessageEvent;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_BATCH_ADD_FORM_RECORDS_ST)] =
-        &FormMgrStub::HandleBatchAddFormRecords;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_DELETE_INVALID_FORMS)] =
         &FormMgrStub::HandleDeleteInvalidForms;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_ACQUIRE_FORM_STATE)] =
@@ -520,26 +518,6 @@ int32_t FormMgrStub::HandleRouterEvent(MessageParcel &data, MessageParcel &reply
     }
 
     int32_t result = RouterEvent(formId, *want);
-    reply.WriteInt32(result);
-    return result;
-}
-
-/**
- * @brief Handle BatchAddFormRecords message.
- * @param data input param.
- * @param reply output param.
- * @return Returns ERR_OK on success, others on failure.
- */
-int32_t FormMgrStub::HandleBatchAddFormRecords(MessageParcel &data, MessageParcel &reply)
-{
-    HILOG_INFO("%{public}s called.", __func__);
-    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
-    if (!want) {
-        HILOG_ERROR("%{public}s, failed to ReadParcelable<Want>", __func__);
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-
-    int32_t result = BatchAddFormRecords(*want);
     reply.WriteInt32(result);
     return result;
 }

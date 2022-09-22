@@ -227,13 +227,6 @@ public:
     void NotifyFormDelete(const int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject);
 
     /**
-     * @brief Batch add forms to form records for st limit value test.
-     * @param want The want of the form to add.
-     * @return Returns forms count to add.
-     */
-    int BatchAddFormRecords(const Want &want);
-
-    /**
      * @brief Delete the invalid forms.
      * @param formIds Indicates the ID of the valid forms.
      * @param callerToken Caller ability token.

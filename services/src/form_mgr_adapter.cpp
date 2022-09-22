@@ -1887,49 +1887,6 @@ void FormMgrAdapter::NotifyFormDelete(const int64_t formId, const Want &want, co
 }
 
 /**
- * @brief Batch add forms to form records for st limit value test.
- * @param want The want of the form to add.
- * @return Returns ERR_OK on success, others on failure.
- */
-int FormMgrAdapter::BatchAddFormRecords(const Want &want)
-{
-    HILOG_INFO("%{public}s called.", __func__);
-    ElementName elementName = want.GetElement();
-    std::string bundleName = elementName.GetBundleName();
-    std::string abilityName = elementName.GetAbilityName();
-    int formCount = want.GetIntParam(Constants::PARAM_FORM_ADD_COUNT, 0);
-    HILOG_INFO("%{public}s, batch add form, bundleName: %{public}s, abilityName: %{public}s, count: %{public}d.",
-        __func__, bundleName.c_str(), abilityName.c_str(), formCount);
-
-    for (int count = 0; count < formCount; count++) {
-        // get from config info
-        FormItemInfo formItemInfo;
-        int32_t errCode = GetFormConfigInfo(want, formItemInfo);
-        if (errCode != ERR_OK) {
-            HILOG_ERROR("%{public}s fail, get form config info failed.", __func__);
-            return errCode;
-        }
-        // generate formId
-        int64_t newFormId = FormDataMgr::GetInstance().GenerateFormId();
-        if (newFormId < 0) {
-            HILOG_ERROR("%{public}s fail, generateFormId no invalid formId", __func__);
-            return ERR_APPEXECFWK_FORM_COMMON_CODE;
-        }
-
-        formItemInfo.SetFormId(newFormId);
-        // allot form host record
-        int callingUid = IPCSkeleton::GetCallingUid();
-        int32_t currentUserId = GetCurrentUserId(callingUid);
-        // allot form record
-        FormRecord formRecord = FormDataMgr::GetInstance().AllotFormRecord(formItemInfo, callingUid, currentUserId);
-        HILOG_INFO("%{public}s, batch add form, formId:" "%{public}" PRId64 ".", __func__, formRecord.formId);
-        HILOG_INFO("%{public}s, count: %{public}d", __func__, count + 1);
-    }
-    HILOG_INFO("%{public}s end.", __func__);
-    return ERR_OK;
-}
-
-/**
  * @brief Create eventMaps for event notify.
  *
  * @param matchedFormId The Id of the form

@@ -195,13 +195,6 @@ public:
     virtual int RouterEvent(const int64_t formId, Want &want) = 0;
 
     /**
-     * @brief Batch add forms to form records for st limit value test.
-     * @param want The want of the form to add.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    virtual int BatchAddFormRecords(const Want &want) = 0;
-
-    /**
      * @brief Delete the invalid forms.
      * @param formIds Indicates the ID of the valid forms.
      * @param callerToken Caller ability token.

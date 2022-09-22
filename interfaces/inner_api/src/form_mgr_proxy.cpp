@@ -645,17 +645,6 @@ int FormMgrProxy::RouterEvent(const int64_t formId, Want &want)
     return reply.ReadInt32();
 }
 
-/**
- * @brief Batch add forms to form records for st limit value test.
- * @param want The want of the form to add.
- * @return Returns ERR_OK on success, others on failure.
- */
-int FormMgrProxy::BatchAddFormRecords(const Want &want)
-{
-    // must not implement, just for st
-    return ERR_OK;
-}
-
 template<typename T>
 int  FormMgrProxy::GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos)
 {
