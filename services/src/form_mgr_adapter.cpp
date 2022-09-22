@@ -53,7 +53,6 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-constexpr int32_t HUNDRED = 100;
 constexpr int32_t CALLING_UID_TRANSFORM_DIVISOR = 200000;
 } // namespace
 
