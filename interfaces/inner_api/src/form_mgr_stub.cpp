@@ -72,8 +72,6 @@ FormMgrStub::FormMgrStub()
         &FormMgrStub::HandleMessageEvent;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_BATCH_ADD_FORM_RECORDS_ST)] =
         &FormMgrStub::HandleBatchAddFormRecords;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_CLEAR_FORM_RECORDS_ST)] =
-        &FormMgrStub::HandleClearFormRecords;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_DELETE_INVALID_FORMS)] =
         &FormMgrStub::HandleDeleteInvalidForms;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_ACQUIRE_FORM_STATE)] =
@@ -542,20 +540,6 @@ int32_t FormMgrStub::HandleBatchAddFormRecords(MessageParcel &data, MessageParce
     }
 
     int32_t result = BatchAddFormRecords(*want);
-    reply.WriteInt32(result);
-    return result;
-}
-
-/**
- * @brief Handle BatchDeleteFormRecords message.
- * @param data input param.
- * @param reply output param.
- * @return Returns ERR_OK on success, others on failure.
- */
-int32_t FormMgrStub::HandleClearFormRecords(MessageParcel &data, MessageParcel &reply)
-{
-    HILOG_INFO("%{public}s called.", __func__);
-    int32_t result = ClearFormRecords();
     reply.WriteInt32(result);
     return result;
 }

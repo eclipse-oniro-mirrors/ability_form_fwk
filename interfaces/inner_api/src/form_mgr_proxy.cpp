@@ -655,15 +655,6 @@ int FormMgrProxy::BatchAddFormRecords(const Want &want)
     // must not implement, just for st
     return ERR_OK;
 }
-/**
- * @brief Clear form records for st limit value test.
- * @return Returns ERR_OK on success, others on failure.
- */
-int FormMgrProxy::ClearFormRecords()
-{
-    // must not implement, just for st
-    return ERR_OK;
-}
 
 template<typename T>
 int  FormMgrProxy::GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos)

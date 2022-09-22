@@ -211,11 +211,6 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     int BatchAddFormRecords(const Want &want) override;
-    /**
-     * @brief Clear form records for st limit value test.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    int ClearFormRecords() override;
 
     /**
      * @brief Check whether if the form manager service is ready.

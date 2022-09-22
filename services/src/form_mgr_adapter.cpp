@@ -1928,17 +1928,7 @@ int FormMgrAdapter::BatchAddFormRecords(const Want &want)
     HILOG_INFO("%{public}s end.", __func__);
     return ERR_OK;
 }
-/**
- * @brief Clear form records for st limit value test.
- * @return Returns ERR_OK on success, others on failure.
- */
-int FormMgrAdapter::ClearFormRecords()
-{
-    HILOG_INFO("%{public}s called.", __func__);
-    FormDataMgr::GetInstance().ClearFormRecords();
-    HILOG_INFO("%{public}s end.", __func__);
-    return ERR_OK;
-}
+
 /**
  * @brief Create eventMaps for event notify.
  *

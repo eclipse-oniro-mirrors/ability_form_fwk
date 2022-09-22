@@ -192,11 +192,6 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     virtual int BatchAddFormRecords(const Want &want) override;
-    /**
-     * @brief Clear form records for st limit value test.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    virtual int ClearFormRecords() override;
 
     /**
      * @brief Delete the invalid forms.

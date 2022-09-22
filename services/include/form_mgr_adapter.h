@@ -232,11 +232,6 @@ public:
      * @return Returns forms count to add.
      */
     int BatchAddFormRecords(const Want &want);
-    /**
-     * @brief Clear form records for st limit value test.
-     * @return Returns forms count to delete.
-     */
-    int ClearFormRecords();
 
     /**
      * @brief Delete the invalid forms.

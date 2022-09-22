@@ -397,14 +397,7 @@ int FormMgrService::BatchAddFormRecords(const Want &want)
 {
     return FormMgrAdapter::GetInstance().BatchAddFormRecords(want);
 }
-/**
- * @brief Clear form records for st limit value test.
- * @return Returns forms count to delete.
- */
-int FormMgrService::ClearFormRecords()
-{
-    return FormMgrAdapter::GetInstance().ClearFormRecords();
-}
+
 /**
  * @brief Start event for the form manager service.
  */
