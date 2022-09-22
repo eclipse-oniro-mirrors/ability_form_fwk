@@ -88,8 +88,6 @@ FormMgrStub::FormMgrStub()
         &FormMgrStub::HandleGetFormsInfo;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_ROUTER_EVENT)] =
         &FormMgrStub::HandleRouterEvent;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REMOVE_FORM_INFO)] =
-        &FormMgrStub::HandleRemoveFormInfo;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_FORM)] =
         &FormMgrStub::HandleRequestPublishForm;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_SHARE_FORM)] =
@@ -222,21 +220,6 @@ int32_t FormMgrStub::HandleSetNextRefreshTime(MessageParcel &data, MessageParcel
     int64_t formId = data.ReadInt64();
     int64_t nextTime = data.ReadInt64();
     int32_t result = SetNextRefreshTime(formId, nextTime);
-    reply.WriteInt32(result);
-    return result;
-}
-
-/**
- * @brief handle RemoveFormInfo message.
- * @param data input param.
- * @param reply output param.
- * @return Returns ERR_OK on success, others on failure.
- */
-ErrCode FormMgrStub::HandleRemoveFormInfo(MessageParcel &data, MessageParcel &reply)
-{
-    std::string moduleName = data.ReadString();
-    std::string formName = data.ReadString();
-    ErrCode result = RemoveFormInfo(moduleName, formName);
     reply.WriteInt32(result);
     return result;
 }

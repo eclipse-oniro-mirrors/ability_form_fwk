@@ -29,7 +29,6 @@ public:
     MOCK_METHOD3(ReleaseForm, int(const int64_t formId, const sptr<IRemoteObject> &callerToken, const bool delCache));
     MOCK_METHOD2(UpdateForm, int(const int64_t formId, const FormProviderData &formProviderData));
     MOCK_METHOD2(SetNextRefreshTime, int(const int64_t formId, const int64_t nextTime));
-    MOCK_METHOD2(RemoveFormInfo, ErrCode(const std::string &moduleName, const std::string &formName));
     MOCK_METHOD4(RequestPublishForm, ErrCode(Want &want, bool withFormBindingData,
         std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId));
     MOCK_METHOD3(LifecycleUpdate, int(const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &callerToken,

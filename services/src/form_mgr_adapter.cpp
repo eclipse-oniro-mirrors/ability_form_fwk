@@ -1294,20 +1294,6 @@ int FormMgrAdapter::SetNextRefreshTime(const int64_t formId, const int64_t nextT
     return SetNextRefreshTimeLocked(matchedFormId, nextTime, userId);
 }
 
-ErrCode FormMgrAdapter::RemoveFormInfo(const std::string &moduleName, const std::string &formName)
-{
-    std::string bundleName;
-    if (!GetBundleName(bundleName)) {
-        HILOG_ERROR("%{public}s failed to get BundleName", __func__);
-        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
-    }
-
-    int32_t callingUid = IPCSkeleton::GetCallingUid();
-    int32_t userId = GetCurrentUserId(callingUid);
-
-    return FormInfoMgr::GetInstance().RemoveDynamicFormInfo(bundleName, moduleName, formName, userId);
-}
-
 ErrCode FormMgrAdapter::CheckPublishForm(Want &want)
 {
     std::string bundleName;

@@ -218,13 +218,6 @@ int FormMgrService::SetNextRefreshTime(const int64_t formId, const int64_t nextT
     return FormMgrAdapter::GetInstance().SetNextRefreshTime(formId, nextTime);
 }
 
-ErrCode FormMgrService::RemoveFormInfo(const std::string &moduleName, const std::string &formName)
-{
-    HILOG_INFO("%{public}s called.", __func__);
-
-    return FormMgrAdapter::GetInstance().RemoveFormInfo(moduleName, formName);
-}
-
 ErrCode FormMgrService::RequestPublishForm(Want &want, bool withFormBindingData,
     std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId)
 {
