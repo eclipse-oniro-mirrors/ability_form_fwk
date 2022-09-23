@@ -28,6 +28,8 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+const int32_t APP_600 = 600;
+
 class BundleMgrProxy : public IRemoteProxy<IBundleMgr> {
 public:
     explicit BundleMgrProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IBundleMgr>(impl)
@@ -72,7 +74,7 @@ public:
     virtual int GetUidByBundleName(const std::string &bundleName, const int userId) override
     {
         if (bundleName.compare("com.form.host.app600") == 0) {
-            return 600;
+            return APP_600;
         }
         return 0;
     }
