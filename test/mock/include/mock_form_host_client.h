@@ -65,7 +65,7 @@ public:
      * @param formInfo, Form info.
      * @return none.
      */
-    virtual void OnUpdate(const FormJsInfo &formInfo) override;
+    void OnUpdate(const FormJsInfo &formInfo) override;
 
     /**
      * Form provider is uninstalled.
@@ -73,21 +73,21 @@ public:
      * @param formIds, The Id list of the forms.
      * @return none.
      */
-    virtual void OnUninstall(const std::vector<int64_t> &formIds) override;
+    void OnUninstall(const std::vector<int64_t> &formIds) override;
 
     /**
      * @brief Form provider is acquire state
      * @param state The form state.
      * @param want The form want.
      */
-    virtual void OnAcquireState(AppExecFwk::FormState state, const AAFwk::Want &want) override;
+    void OnAcquireState(AppExecFwk::FormState state, const AAFwk::Want &want) override;
 
     /**
      * @brief Responsive form sharing.
      * @param requestCode The request code of this share form.
      * @param result Share form result.
      */
-    virtual void OnShareFormResponse(int64_t requestCode, int32_t result) override;
+    void OnShareFormResponse(int64_t requestCode, int32_t result) override;
 private:
     Semaphore sem_;
     DISALLOW_COPY_AND_MOVE(MockFormHostClient);

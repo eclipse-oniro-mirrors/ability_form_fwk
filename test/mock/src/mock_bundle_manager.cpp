@@ -30,6 +30,7 @@ const std::string FORM_PROVIDER_MODULE_SOURCE_DIR = "";
 const std::string FORM_JS_COMPONENT_NAME = "jsComponentName";
 const std::string PARAM_FORM_NAME = "com.form.name.test";
 const std::string DEVICE_ID = "ohos-phone1";
+const int32_t APP_600 = 600;
 
 bool BundleMgrService::IsSystemApp = false;
 
@@ -42,7 +43,7 @@ bool BundleMgrProxy::GetBundleInfo(
 int BundleMgrService::GetUidByBundleName(const std::string &bundleName, const int userId)
 {
     if (bundleName.compare("com.form.host.app600") == 0) {
-        return 600;
+        return APP_600;
     }
     return 0;
 }

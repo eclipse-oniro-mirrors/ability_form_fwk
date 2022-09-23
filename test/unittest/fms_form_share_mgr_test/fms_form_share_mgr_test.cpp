@@ -657,7 +657,7 @@ HWTEST_F(FmsFormShareMgrTest, HandleProviderShareData_001, TestSize.Level0)
     std::string valueString = WANT_PARAM_VALUE;
     wantParams.SetParam(keyStr, AAFwk::String::Box(valueString));
     bool testFlag = false;
-    auto hostCallback = [&](const int64_t requestCode, const int32_t result) { testFlag = true; };
+    auto hostCallback = [&testFlag](const int64_t requestCode, const int32_t result) { testFlag = true; };
     bool results = true;
     sptr<MockFormHostCallback> mockHost = new (std::nothrow) MockFormHostCallback();
     DelayedSingleton<FormShareMgr>::GetInstance()->requestMap_.emplace(requestCode, mockHost);
@@ -695,7 +695,7 @@ HWTEST_F(FmsFormShareMgrTest, HandleProviderShareData_002, TestSize.Level0)
     std::string valueString = WANT_PARAM_VALUE;
     wantParams.SetParam(keyStr, AAFwk::String::Box(valueString));
     bool testFlag = false;
-    auto hostCallback = [&](const int64_t requestCode, const int32_t result) { testFlag = true; };
+    auto hostCallback = [&testFlag](const int64_t requestCode, const int32_t result) { testFlag = true; };
     sptr<MockFormHostCallback> mockHost = new (std::nothrow) MockFormHostCallback();
     DelayedSingleton<FormShareMgr>::GetInstance()->requestMap_.emplace(requestCode, mockHost);
     EXPECT_CALL(*mockHost, OnShareFormResponse(_, _)).Times(1).WillOnce(Invoke(hostCallback));
@@ -735,7 +735,7 @@ HWTEST_F(FmsFormShareMgrTest, HandleProviderShareData_003, TestSize.Level0)
     wantParams.SetParam(keyStr, AAFwk::String::Box(valueString));
 
     bool testFlag = false;
-    auto hostCallback = [&](const int64_t requestCode, const int32_t result) { testFlag = true; };
+    auto hostCallback = [&testFlag](const int64_t requestCode, const int32_t result) { testFlag = true; };
     sptr<MockFormHostCallback> mockHost = new (std::nothrow) MockFormHostCallback();
     DelayedSingleton<FormShareMgr>::GetInstance()->requestMap_.emplace(requestCode, mockHost);
     EXPECT_CALL(*mockHost, OnShareFormResponse(_, _)).Times(1).WillOnce(Invoke(hostCallback));
