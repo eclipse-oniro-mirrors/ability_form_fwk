@@ -183,7 +183,7 @@ private:
     void AddImageData(const std::string &picName, const std::shared_ptr<char> &data, int32_t size);
 private:
     struct DeleteBytes {
-        void operator()(char* bytes) const 
+        void operator()(char* bytes) const
         {
             delete[] bytes;
         }
