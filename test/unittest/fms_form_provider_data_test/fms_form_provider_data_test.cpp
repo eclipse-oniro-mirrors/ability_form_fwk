@@ -186,4 +186,23 @@ HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_005, TestSize.Level0) 
     EXPECT_EQ(1, formProviderData.GetImageDataMap().size());
     GTEST_LOG_(INFO) << "FmsFormProviderDataTest_005 end";
 }
+
+/**
+ * @tc.name: FmsFormProviderDataTest_006
+ * @tc.desc: Verify the AddImageData and WriteImageDataToParcel function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_006, TestSize.Level0) // test MergeData
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_006 start";
+    FormProviderData formProviderData(jsonData_);
+    std::string picName = "image";
+    formProviderData.AddImageData(picName, 1);
+    Parcel parcel;
+    char* bytes = new char[1];
+    bytes[0] = 'a';
+    std::shared_ptr<char> data(bytes);
+    EXPECT_EQ(true, formProviderData.WriteImageDataToParcel(parcel, picName, data, 1));
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_006 end";
+}
 }
