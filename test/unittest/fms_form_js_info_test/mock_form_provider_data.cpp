@@ -17,8 +17,10 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+namespace {
 bool g_mockConvertRawImageDataRet = true;
 bool g_mockGetImageDataMapRet = true;
+}
 
 void MockConvertRawImageData(bool mockRet)
 {
