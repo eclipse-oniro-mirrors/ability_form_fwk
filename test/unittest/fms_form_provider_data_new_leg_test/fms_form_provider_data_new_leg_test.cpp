@@ -32,7 +32,7 @@ using namespace OHOS;
 using namespace OHOS::AppExecFwk;
 
 namespace {
-const int32_t ten = 10;
+const int32_t AGE = 10;
 
 class FmsFormProviderDataNewLegTest : public testing::Test {
 public:
@@ -47,7 +47,7 @@ bool FmsFormProviderDataNewLegTest::InitJsonData()
 {
     nlohmann::json tmpJson;
     tmpJson["name"] = "li";
-    tmpJson["age"] = ten;
+    tmpJson["age"] = AGE;
     jsonData_["0"] = tmpJson;
     return true;
 }
