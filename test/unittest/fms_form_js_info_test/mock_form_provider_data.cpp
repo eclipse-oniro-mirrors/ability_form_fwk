@@ -15,27 +15,24 @@
 
 #include "form_provider_data.h"
 
-namespace {
-    bool g_MockConvertRawImageDataRet = true;
-    bool g_MockGetImageDataMapRet = true;
-}
+namespace OHOS {
+namespace AppExecFwk {
+bool g_mockConvertRawImageDataRet = true;
+bool g_mockGetImageDataMapRet = true;
 
 void MockConvertRawImageData(bool mockRet)
 {
-    g_MockConvertRawImageDataRet = mockRet;
+    g_mockConvertRawImageDataRet = mockRet;
 }
 
 void MockGetImageDataMap(bool mockRet)
 {
-    g_MockGetImageDataMapRet = mockRet;
+    g_mockGetImageDataMapRet = mockRet;
 }
-
-namespace OHOS {
-namespace AppExecFwk {
 
 bool FormProviderData::ConvertRawImageData()
 {
-    return g_MockConvertRawImageDataRet;
+    return g_mockConvertRawImageDataRet;
 }
 
 std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> FormProviderData::GetImageDataMap() const
@@ -45,13 +42,12 @@ std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> FormProviderData::Ge
     int32_t a = 1;
     int32_t maxNumber = 130;
     int32_t normalNumber = 100;
-    if (g_MockGetImageDataMapRet)
-    {
-        for(int32_t i = 0; i < maxNumber; i++) {
+    if (g_mockGetImageDataMapRet) {
+        for (int32_t i = 0; i < maxNumber; i++) {
             imageDataMap.emplace("aa" + std::to_string(i), std::make_pair(formAshmem, a));
         }
     } else {
-        for(int32_t i = 0; i < normalNumber; i++) {
+        for (int32_t i = 0; i < normalNumber; i++) {
             imageDataMap.emplace("aa" + std::to_string(i), std::make_pair(formAshmem, a));
         }
     }
