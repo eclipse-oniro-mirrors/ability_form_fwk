@@ -25,9 +25,9 @@
 #include "nlohmann/json.hpp"
 
 using namespace testing::ext;
-using namespace OHOS;
-using namespace OHOS::AppExecFwk;
 
+namespace OHOS {
+namespace AppExecFwk {
 extern void MockConvertRawImageData(bool mockRet);
 extern void MockGetImageDataMap(bool mockRet);
 
@@ -103,3 +103,5 @@ HWTEST_F(FmsFormJsInfoTest, FmsFormJsInfoTest_003, TestSize.Level0)
     EXPECT_EQ(true, formJsInfo.ConvertRawImageData());
     GTEST_LOG_(INFO) << "FmsFormJsInfoTest_003 end";
 }
+} // namespace AppExecFwk
+} // namespace OHOS
