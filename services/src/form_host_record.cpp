@@ -276,7 +276,7 @@ FormHostRecord FormHostRecord::CreateRecord(const FormItemInfo &info,
     record.SetCallerUid(callingUid);
     record.SetFormHostClient(callback);
     record.SetCallback(std::make_shared<FormHostCallback>());
-    record.SetDeathRecipient(new FormHostRecord::ClientDeathRecipient());
+    record.SetDeathRecipient(new (std::nothrow) FormHostRecord::ClientDeathRecipient());
     record.AddDeathRecipient(record.GetDeathRecipient());
     return record;
 }

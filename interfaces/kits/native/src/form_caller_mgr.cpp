@@ -36,10 +36,14 @@ void FormCallerMgr::AddFormHostCaller(const FormJsInfo &formJsInfo, const sptr<I
     formHostCallers_[formJsInfo.formId] = caller;
 
     sptr<IRemoteObject::DeathRecipient> deathRecipient =
-        new FormHostCallerRecipient([](const wptr<IRemoteObject> &remote) {
+        new (std::nothrow) FormHostCallerRecipient([](const wptr<IRemoteObject> &remote) {
             FormCallerMgr::GetInstance().OnHostCallBackDied(remote);
         });
-    caller->AddDeathRecipient(deathRecipient);
+    if (deathRecipient == nullptr) {
+        HILOG_ERROR("%{public}s fail, create FormHostCallerRecipient error", __func__);
+    } else {
+        caller->AddDeathRecipient(deathRecipient);
+    }
 }
 
 std::shared_ptr<FormHostCaller> FormCallerMgr::GetFormHostCaller(int64_t formId)
@@ -111,10 +115,14 @@ void FormCallerMgr::AddFormProviderCaller(const FormJsInfo &formJsInfo, const sp
     formProviderCallers_.emplace_back(caller);
 
     sptr<IRemoteObject::DeathRecipient> deathRecipient =
-        new FormProviderCallerRecipient([](const wptr<IRemoteObject> &remote) {
+        new (std::nothrow) FormProviderCallerRecipient([](const wptr<IRemoteObject> &remote) {
             FormCallerMgr::GetInstance().OnProviderCallBackDied(remote);
         });
-    caller->AddDeathRecipient(deathRecipient);
+    if (deathRecipient == nullptr) {
+        HILOG_ERROR("%{public}s fail, create FormProviderCallerRecipient error", __func__);
+    } else {
+        caller->AddDeathRecipient(deathRecipient);
+    }
 }
 
 void FormCallerMgr::GetFormProviderCaller(int64_t formId,

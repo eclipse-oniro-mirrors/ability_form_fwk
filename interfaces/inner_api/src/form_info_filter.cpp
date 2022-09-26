@@ -32,8 +32,11 @@ FormInfoFilter *FormInfoFilter::Unmarshalling(Parcel &parcel)
 {
     FormInfoFilter *filter = new (std::nothrow) FormInfoFilter();
 
-    // deserializations
-    filter->moduleName = Str16ToStr8(parcel.ReadString16());
+    if (filter != nullptr) {
+        // deserializations
+        filter->moduleName = Str16ToStr8(parcel.ReadString16());
+    }
+
     return filter;
 }
 } // OHOS
