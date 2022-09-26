@@ -44,7 +44,10 @@ sptr<FormHostClient> FormHostClient::GetInstance()
     if (instance_ == nullptr) {
         std::lock_guard<std::mutex> lock_l(instanceMutex_);
         if (instance_ == nullptr) {
-            instance_ = new FormHostClient();
+            instance_ = new (std::nothrow) FormHostClient();
+            if (instance_ == nullptr) {
+                HILOG_ERROR("%{public}s error, failed to create FormHostClient.", __func__);
+            }
         }
     }
     return instance_;
