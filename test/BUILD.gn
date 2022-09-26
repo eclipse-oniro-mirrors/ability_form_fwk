@@ -64,6 +64,7 @@ group("unittest") {
     "unittest/form_mgr_proxy_test:unittest",
     "unittest/form_mgr_stub_test:unittest",
     "unittest/form_mgr_test:unittest",
+    "unittest/form_provider_caller_test:unittest",
   ]
 }
 
