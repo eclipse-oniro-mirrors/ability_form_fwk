@@ -199,6 +199,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0006, TestSize.Level1) {
     want = want.SetElementName("", "com.example.FormAbility", "MainAbility");
     sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
     FormJsInfo formJsInfo;
+    formJsInfo.formId = 1;
     sptr<IRemoteObject> providerToken = new (std::nothrow) MockFormProviderClient();
     FormCallerMgr::GetInstance().AddFormHostCaller(formJsInfo, providerToken);
     int32_t result = FormMgr::GetInstance().RequestForm(formJsInfo.formId, token, want);
