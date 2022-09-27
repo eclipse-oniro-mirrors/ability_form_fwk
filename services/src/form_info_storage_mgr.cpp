@@ -262,6 +262,10 @@ void FormInfoStorageMgr::SaveEntries(
             // it's an bad json, delete it
             {
                 std::lock_guard<std::mutex> lock(kvStorePtrMutex_);
+                if (!CheckKvStore()) {
+                    HILOG_ERROR("kvStore is nullptr");
+                    return;
+                }
                 kvStorePtr_->Delete(item.key);
             }
             continue;
@@ -271,6 +275,10 @@ void FormInfoStorageMgr::SaveEntries(
             // it's an error value, delete it
             {
                 std::lock_guard<std::mutex> lock(kvStorePtrMutex_);
+                if (!CheckKvStore()) {
+                    HILOG_ERROR("kvStore is nullptr");
+                    return;
+                }
                 kvStorePtr_->Delete(item.key);
             }
             continue;

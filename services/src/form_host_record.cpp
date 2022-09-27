@@ -259,6 +259,9 @@ void FormHostRecord::SetDeathRecipient(const sptr<IRemoteObject::DeathRecipient>
  */
 void FormHostRecord::AddDeathRecipient(const sptr<IRemoteObject::DeathRecipient> &deathRecipient)
 {
+    if (formHostClient_ == nullptr) {
+        return;
+    }
     formHostClient_->AddDeathRecipient(deathRecipient);
 }
 

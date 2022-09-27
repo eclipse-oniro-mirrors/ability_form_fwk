@@ -67,7 +67,9 @@ int32_t FormFreeInstallOperator::StartFreeInstall(
 void FormFreeInstallOperator::OnInstallFinished(int32_t resultCode)
 {
     HILOG_DEBUG("%{public}s called, resultCode: %{public}d", __func__, resultCode);
-
+    if (handler_ == nullptr) {
+        return;
+    }
     auto self = shared_from_this();
     auto task = [self, resultCode]() {
         DelayedSingleton<FormShareMgr>::GetInstance()->OnInstallFinished(self, resultCode, self->formShareInfoKey_);
