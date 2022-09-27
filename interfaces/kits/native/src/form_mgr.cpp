@@ -632,7 +632,7 @@ ErrCode FormMgr::Connect()
         HILOG_ERROR("%{private}s fail to connect FormMgrService", __func__);
         return ERR_APPEXECFWK_FORM_GET_FMS_FAILED;
     }
-    deathRecipient_ = sptr<IRemoteObject::DeathRecipient>(new FormMgrDeathRecipient());
+    deathRecipient_ = sptr<IRemoteObject::DeathRecipient>(new (std::nothrow) FormMgrDeathRecipient());
     if (deathRecipient_ == nullptr) {
         HILOG_ERROR("%{public}s Failed to create FormMgrDeathRecipient!", __func__);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
