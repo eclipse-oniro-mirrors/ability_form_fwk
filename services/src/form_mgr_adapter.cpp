@@ -53,7 +53,6 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-constexpr int32_t HUNDRED = 100;
 constexpr int32_t CALLING_UID_TRANSFORM_DIVISOR = 200000;
 } // namespace
 
@@ -1297,42 +1296,6 @@ int FormMgrAdapter::SetNextRefreshTime(const int64_t formId, const int64_t nextT
     return SetNextRefreshTimeLocked(matchedFormId, nextTime, userId);
 }
 
-ErrCode FormMgrAdapter::AddFormInfo(FormInfo &formInfo)
-{
-    std::string bundleName;
-    if (!GetBundleName(bundleName)) {
-        HILOG_ERROR("%{public}s failed to get BundleName", __func__);
-        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
-    }
-    if (formInfo.bundleName != bundleName) {
-        HILOG_WARN("The bundleName in formInfo does not match the bundleName of current calling user.");
-        formInfo.bundleName = bundleName;
-    }
-    if (formInfo.isStatic) {
-        HILOG_WARN("Only dynamic forms can be added.");
-        formInfo.isStatic = false;
-    }
-
-    int32_t callingUid = IPCSkeleton::GetCallingUid();
-    int32_t userId = GetCurrentUserId(callingUid);
-
-    return FormInfoMgr::GetInstance().AddDynamicFormInfo(formInfo, userId);
-}
-
-ErrCode FormMgrAdapter::RemoveFormInfo(const std::string &moduleName, const std::string &formName)
-{
-    std::string bundleName;
-    if (!GetBundleName(bundleName)) {
-        HILOG_ERROR("%{public}s failed to get BundleName", __func__);
-        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
-    }
-
-    int32_t callingUid = IPCSkeleton::GetCallingUid();
-    int32_t userId = GetCurrentUserId(callingUid);
-
-    return FormInfoMgr::GetInstance().RemoveDynamicFormInfo(bundleName, moduleName, formName, userId);
-}
-
 ErrCode FormMgrAdapter::CheckPublishForm(Want &want)
 {
     std::string bundleName;
@@ -1890,59 +1853,6 @@ void FormMgrAdapter::NotifyFormDelete(const int64_t formId, const Want &want, co
 }
 
 /**
- * @brief Batch add forms to form records for st limit value test.
- * @param want The want of the form to add.
- * @return Returns ERR_OK on success, others on failure.
- */
-int FormMgrAdapter::BatchAddFormRecords(const Want &want)
-{
-    HILOG_INFO("%{public}s called.", __func__);
-    ElementName elementName = want.GetElement();
-    std::string bundleName = elementName.GetBundleName();
-    std::string abilityName = elementName.GetAbilityName();
-    int formCount = want.GetIntParam(Constants::PARAM_FORM_ADD_COUNT, 0);
-    HILOG_INFO("%{public}s, batch add form, bundleName: %{public}s, abilityName: %{public}s, count: %{public}d.",
-        __func__, bundleName.c_str(), abilityName.c_str(), formCount);
-
-    for (int count = 0; count < formCount; count++) {
-        // get from config info
-        FormItemInfo formItemInfo;
-        int32_t errCode = GetFormConfigInfo(want, formItemInfo);
-        if (errCode != ERR_OK) {
-            HILOG_ERROR("%{public}s fail, get form config info failed.", __func__);
-            return errCode;
-        }
-        // generate formId
-        int64_t newFormId = FormDataMgr::GetInstance().GenerateFormId();
-        if (newFormId < 0) {
-            HILOG_ERROR("%{public}s fail, generateFormId no invalid formId", __func__);
-            return ERR_APPEXECFWK_FORM_COMMON_CODE;
-        }
-
-        formItemInfo.SetFormId(newFormId);
-        // allot form host record
-        int callingUid = IPCSkeleton::GetCallingUid();
-        int32_t currentUserId = GetCurrentUserId(callingUid);
-        // allot form record
-        FormRecord formRecord = FormDataMgr::GetInstance().AllotFormRecord(formItemInfo, callingUid, currentUserId);
-        HILOG_INFO("%{public}s, batch add form, formId:" "%{public}" PRId64 ".", __func__, formRecord.formId);
-        HILOG_INFO("%{public}s, count: %{public}d", __func__, count + 1);
-    }
-    HILOG_INFO("%{public}s end.", __func__);
-    return ERR_OK;
-}
-/**
- * @brief Clear form records for st limit value test.
- * @return Returns ERR_OK on success, others on failure.
- */
-int FormMgrAdapter::ClearFormRecords()
-{
-    HILOG_INFO("%{public}s called.", __func__);
-    FormDataMgr::GetInstance().ClearFormRecords();
-    HILOG_INFO("%{public}s end.", __func__);
-    return ERR_OK;
-}
-/**
  * @brief Create eventMaps for event notify.
  *
  * @param matchedFormId The Id of the form
@@ -2037,34 +1947,6 @@ bool FormMgrAdapter::CheckIsSystemAppByBundleName(const sptr<IBundleMgr> &iBundl
     return true;
 }
 
-/**
- * @brief Add forms to storage for st.
- * @param Want The Want of the form to add.
- * @return Returns ERR_OK on success, others on failure.
- */
-int FormMgrAdapter::DistributedDataAddForm(const Want &want)
-{
-    HILOG_INFO("%{public}s called.", __func__);
-    FormDBInfo formDBInfo;
-    ElementName elementName = want.GetElement();
-    formDBInfo.formId = want.GetIntParam(Constants::PARAM_FORM_ADD_COUNT, 0);
-    formDBInfo.formName = want.GetStringParam(Constants::PARAM_FORM_NAME_KEY);
-    formDBInfo.bundleName = elementName.GetBundleName();
-    formDBInfo.moduleName = want.GetStringParam(Constants::PARAM_MODULE_NAME_KEY);
-    formDBInfo.abilityName = elementName.GetAbilityName();
-    formDBInfo.formUserUids.push_back(HUNDRED);
-    return FormDbCache::GetInstance().SaveFormInfo(formDBInfo);
-}
-
-/**
- * @brief  Delete form form storage for st.
- * @param formId The formId of the form to delete.
- * @return Returns ERR_OK on success, others on failure.
- */
-int FormMgrAdapter::DistributedDataDeleteForm(const std::string &formId)
-{
-    return FormDbCache::GetInstance().DeleteFormInfo(std::stoll(formId));
-}
 /**
  * @brief Get current user ID.
  * @param callingUid calling Uid.
@@ -2289,53 +2171,6 @@ int FormMgrAdapter::GetFormsInfoByModule(const std::string &bundleName,
     const std::string &moduleName, std::vector<FormInfo> &formInfos)
 {
     return FormInfoMgr::GetInstance().GetFormsInfoByModule(bundleName, moduleName, formInfos);
-}
-
-/**
- * @brief Update action string for router event.
- * @param formId Indicates the unique id of form.
- * @param action Indicates the origin action string.
- * @return Returns ERR_OK on success, others on failure.
- */
-int FormMgrAdapter::UpdateRouterAction(const int64_t formId, std::string &action)
-{
-    HILOG_INFO("%{public}s called.", __func__);
-    if (formId <= 0) {
-        HILOG_ERROR("%{public}s form formId or bundleName is invalid", __func__);
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
-    }
-
-    int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
-    FormRecord record;
-    bool bGetRecord = FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record);
-    if (!bGetRecord) {
-        HILOG_ERROR("%{public}s fail, not exist such form:%{public}" PRId64 "", __func__, matchedFormId);
-        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
-    }
-
-    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
-    if (iBundleMgr == nullptr) {
-        HILOG_ERROR("%{public}s fail, failed to get IBundleMgr.", __func__);
-        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
-    }
-
-    if (CheckIsSystemAppByBundleName(iBundleMgr, record.bundleName)) {
-        return ERR_OK;
-    }
-
-    if (action.empty()) {
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
-    }
-
-    nlohmann::json actionObject = nlohmann::json::parse(action, nullptr, false);
-    if (actionObject.is_discarded()) {
-        HILOG_ERROR("failed to parse jsonDataString: %{public}s.", action.c_str());
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
-    }
-
-    actionObject["bundleName"] = record.bundleName;
-    action = actionObject.dump();
-    return ERR_OK;
 }
 
 bool FormMgrAdapter::IsRequestPublishFormSupported()

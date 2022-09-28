@@ -85,23 +85,6 @@ public:
     virtual int SetNextRefreshTime(const int64_t formId, const int64_t nextTime) = 0;
 
     /**
-     * @brief Add the form info.
-     *
-     * @param formInfo Indicates the form info to be added.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    virtual ErrCode AddFormInfo(FormInfo &formInfo) = 0;
-
-    /**
-     * @brief Remove the specified form info.
-     *
-     * @param moduleName Indicates the module name of the dynamic form info to be removed.
-     * @param formName Indicates the form name of the dynamic form info to be removed.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    virtual ErrCode RemoveFormInfo(const std::string &moduleName, const std::string &formName) = 0;
-
-    /**
      * @brief Request to publish a form to the form host.
      *
      * @param want The want of the form to publish.
@@ -195,32 +178,6 @@ public:
     virtual int RouterEvent(const int64_t formId, Want &want) = 0;
 
     /**
-     * @brief Batch add forms to form records for st limit value test.
-     * @param want The want of the form to add.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    virtual int BatchAddFormRecords(const Want &want) = 0;
-    /**
-     * @brief Clear form records for st limit value test.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    virtual int ClearFormRecords() = 0;
-
-    /**
-     * @brief  Add forms to storage for st .
-     * @param Want The Want of the form to add.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    virtual int DistributedDataAddForm(const Want &want) = 0;
-
-    /**
-     * @brief  Delete form form storage for st.
-     * @param formId The formId of the form to delete.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    virtual int DistributedDataDeleteForm(const std::string &formId) = 0;
-
-    /**
      * @brief Delete the invalid forms.
      * @param formIds Indicates the ID of the valid forms.
      * @param callerToken Caller ability token.
@@ -307,14 +264,6 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     virtual int32_t StartAbility(const Want &want, const sptr<IRemoteObject> &callerToken) = 0;
-
-    /**
-     * @brief Update action string for router event.
-     * @param formId Indicates the unique id of form.
-     * @param action Indicates the origin action string.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    virtual int UpdateRouterAction(const int64_t formId, std::string &action) = 0;
 
     /**
      * @brief Share form by formID and deviceID.

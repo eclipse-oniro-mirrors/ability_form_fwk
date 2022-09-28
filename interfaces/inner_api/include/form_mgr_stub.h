@@ -88,22 +88,6 @@ private:
     int32_t HandleSetNextRefreshTime(MessageParcel &data, MessageParcel &reply);
 
     /**
-     * @brief handle AddFormInfo message.
-     * @param data input param.
-     * @param reply output param.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    ErrCode HandleAddFormInfo(MessageParcel &data, MessageParcel &reply);
-
-    /**
-     * @brief handle RemoveFormInfo message.
-     * @param data input param.
-     * @param reply output param.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    ErrCode HandleRemoveFormInfo(MessageParcel &data, MessageParcel &reply);
-
-    /**
      * @brief handle RequestPublishForm message.
      * @param data input param.
      * @param reply output param.
@@ -177,34 +161,6 @@ private:
     int32_t HandleRouterEvent(MessageParcel &data, MessageParcel &reply);
 
     /**
-     * @brief Handle BatchAddFormRecords message.
-     * @param data input param.
-     * @param reply output param.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    int32_t HandleBatchAddFormRecords(MessageParcel &data, MessageParcel &reply);
-    /**
-     * @brief Handle ClearFormRecords message.
-     * @param data input param.
-     * @param reply output param.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    int32_t HandleClearFormRecords(MessageParcel &data, MessageParcel &reply);
-   /**
-     * @brief Handle DistributedDataAddForm message.
-     * @param data input param.
-     * @param reply output param.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    int32_t HandleDistributedDataAddForm(MessageParcel &data, MessageParcel &reply);
-    /**
-     * @brief Handle DistributedDataDeleteForm message.
-     * @param data input param.
-     * @param reply output param.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    int32_t HandleDistributedDataDeleteForm(MessageParcel &data, MessageParcel &reply);
-    /**
      * @brief Handle DeleteInvalidForms message.
      * @param data input param.
      * @param reply output param.
@@ -260,14 +216,6 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t HandleGetFormsInfo(MessageParcel &data, MessageParcel &reply);
-
-    /**
-     * @brief Update action string for router event.
-     * @param formId Indicates the unique id of form.
-     * @param action Indicates the origin action string.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    int32_t HandleUpdateRouterAction(MessageParcel &data, MessageParcel &reply);
 
     /**
      * @brief Handle share form message.

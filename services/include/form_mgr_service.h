@@ -96,23 +96,6 @@ public:
     int SetNextRefreshTime(const int64_t formId, const int64_t nextTime) override;
 
     /**
-     * @brief Add the form info.
-     *
-     * @param formInfo Indicates the form info to be added.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    ErrCode AddFormInfo(FormInfo &formInfo) override;
-
-    /**
-     * @brief Remove the specified form info.
-     *
-     * @param moduleName Indicates the module name of the dynamic form info to be removed.
-     * @param formName Indicates the form name of the dynamic form info to be removed.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    ErrCode RemoveFormInfo(const std::string &moduleName, const std::string &formName) override;
-
-    /**
      * @brief Request to publish a form to the form host.
      *
      * @param want The want of the form to publish.
@@ -206,36 +189,10 @@ public:
     int RouterEvent(const int64_t formId, Want &want) override;
 
     /**
-     * @brief Batch add forms to form records for st limit value test.
-     * @param want The want of the form to add.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    int BatchAddFormRecords(const Want &want) override;
-    /**
-     * @brief Clear form records for st limit value test.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    int ClearFormRecords() override;
-
-    /**
      * @brief Check whether if the form manager service is ready.
      * @return Returns true if the form manager service is ready; returns false otherwise.
      */
     bool IsReady() const;
-
-    /**
-     * @brief  Add forms to storage for st .
-     * @param Want The Want of the form to add.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    int DistributedDataAddForm(const Want &want) override;
-
-    /**
-     * @brief  Delete form form storage for st.
-     * @param formId The formId of the form to delete.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    int DistributedDataDeleteForm(const std::string &formId) override;
 
     /**
      * @brief Delete the invalid forms.
@@ -324,14 +281,6 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t StartAbility(const Want &want, const sptr<IRemoteObject> &callerToken) override;
-
-    /**
-     * @brief Update action string for router event.
-     * @param formId Indicates the unique id of form.
-     * @param action Indicates the origin action string.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    int UpdateRouterAction(const int64_t formId, std::string &action) override;
 
     /**
      * @brief Share form by formID and deviceID.

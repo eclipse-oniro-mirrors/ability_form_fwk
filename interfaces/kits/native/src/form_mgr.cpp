@@ -407,28 +407,6 @@ int FormMgr::SetNextRefreshTime(const int64_t formId, const int64_t nextTime)
     return remoteProxy_->SetNextRefreshTime(formId, nextTime);
 }
 
-ErrCode FormMgr::AddFormInfo(FormInfo &formInfo)
-{
-    HILOG_INFO("%{public}s called.", __func__);
-    ErrCode errCode = Connect();
-    if (errCode != ERR_OK) {
-        HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
-        return errCode;
-    }
-    return remoteProxy_->AddFormInfo(formInfo);
-}
-
-ErrCode FormMgr::RemoveFormInfo(const std::string &moduleName, const std::string &formName)
-{
-    HILOG_INFO("%{public}s called.", __func__);
-    ErrCode errCode = Connect();
-    if (errCode != ERR_OK) {
-        HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
-        return errCode;
-    }
-    return remoteProxy_->RemoveFormInfo(moduleName, formName);
-}
-
 ErrCode FormMgr::RequestPublishForm(Want &want, bool withFormBindingData,
                                     std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId)
 {
@@ -682,38 +660,6 @@ void FormMgr::SetFormMgrService(sptr<IFormMgr> formMgrService)
 }
 
 /**
- * @brief  Add forms to storage for st .
- * @param Want The Want of the form to add.
- * @return Returns ERR_OK on success, others on failure.
- */
-int FormMgr::DistributedDataAddForm(const Want &want)
-{
-    HILOG_INFO("%{public}s called.", __func__);
-    int errCode = Connect();
-    if (errCode != ERR_OK) {
-        HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
-        return errCode;
-    }
-    return remoteProxy_->DistributedDataAddForm(want);
-}
-
-/**
- * @brief  Delete form form storage for st.
- * @param formId The formId of the form to delete.
- * @return Returns ERR_OK on success, others on failure.
- */
-int FormMgr::DistributedDataDeleteForm(const std::string &formId)
-{
-    HILOG_INFO("%{public}s called.", __func__);
-    int errCode = Connect();
-    if (errCode != ERR_OK) {
-        HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
-        return errCode;
-    }
-    return remoteProxy_->DistributedDataDeleteForm(formId);
-}
-
-/**
  * @brief Delete the invalid forms.
  * @param formIds Indicates the ID of the valid forms.
  * @param callerToken Host client.
@@ -959,23 +905,6 @@ int32_t FormMgr::StartAbility(const Want &want, const sptr<IRemoteObject> &calle
         return errCode;
     }
     return remoteProxy_->StartAbility(want, callerToken);
-}
-
-/**
- * @brief Update action string for router event.
- * @param formId Indicates the unique id of form.
- * @param action Indicates the origin action string.
- * @return Returns ERR_OK on success, others on failure.
- */
-int FormMgr::UpdateRouterAction(const int64_t formId, std::string &action)
-{
-    HILOG_INFO("%{public}s start.", __func__);
-    int errCode = Connect();
-    if (errCode != ERR_OK) {
-        HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
-        return errCode;
-    }
-    return remoteProxy_->UpdateRouterAction(formId, action);
 }
 
 int32_t FormMgr::ShareForm(int64_t formId, const std::string &remoteDeviceId, const sptr<IRemoteObject> &callerToken,

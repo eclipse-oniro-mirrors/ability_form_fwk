@@ -70,14 +70,6 @@ FormMgrStub::FormMgrStub()
         &FormMgrStub::HandleLifecycleUpdate;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_MESSAGE_EVENT)] =
         &FormMgrStub::HandleMessageEvent;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_BATCH_ADD_FORM_RECORDS_ST)] =
-        &FormMgrStub::HandleBatchAddFormRecords;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_CLEAR_FORM_RECORDS_ST)] =
-        &FormMgrStub::HandleClearFormRecords;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_DISTRIBUTED_DATA_ADD_FORM__ST)] =
-        &FormMgrStub::HandleDistributedDataAddForm;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_DISTRIBUTED_DATA_DELETE_FORM__ST)] =
-        &FormMgrStub::HandleDistributedDataDeleteForm;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_DELETE_INVALID_FORMS)] =
         &FormMgrStub::HandleDeleteInvalidForms;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_ACQUIRE_FORM_STATE)] =
@@ -96,12 +88,6 @@ FormMgrStub::FormMgrStub()
         &FormMgrStub::HandleGetFormsInfo;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_ROUTER_EVENT)] =
         &FormMgrStub::HandleRouterEvent;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UPDATE_ROUTER_ACTION)] =
-        &FormMgrStub::HandleUpdateRouterAction;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_ADD_FORM_INFO)] =
-        &FormMgrStub::HandleAddFormInfo;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REMOVE_FORM_INFO)] =
-        &FormMgrStub::HandleRemoveFormInfo;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_FORM)] =
         &FormMgrStub::HandleRequestPublishForm;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_SHARE_FORM)] =
@@ -234,39 +220,6 @@ int32_t FormMgrStub::HandleSetNextRefreshTime(MessageParcel &data, MessageParcel
     int64_t formId = data.ReadInt64();
     int64_t nextTime = data.ReadInt64();
     int32_t result = SetNextRefreshTime(formId, nextTime);
-    reply.WriteInt32(result);
-    return result;
-}
-
-/**
-  * @brief handle AddFormInfo message.
-  * @param data input param.
-  * @param reply output param.
-  * @return Returns ERR_OK on success, others on failure.
-  */
-ErrCode FormMgrStub::HandleAddFormInfo(MessageParcel &data, MessageParcel &reply)
-{
-    std::unique_ptr<FormInfo> formInfo(data.ReadParcelable<FormInfo>());
-    if (formInfo == nullptr) {
-        HILOG_ERROR("%{public}s, failed to get formInfo.", __func__);
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    ErrCode result = AddFormInfo(*formInfo);
-    reply.WriteInt32(result);
-    return result;
-}
-
-/**
- * @brief handle RemoveFormInfo message.
- * @param data input param.
- * @param reply output param.
- * @return Returns ERR_OK on success, others on failure.
- */
-ErrCode FormMgrStub::HandleRemoveFormInfo(MessageParcel &data, MessageParcel &reply)
-{
-    std::string moduleName = data.ReadString();
-    std::string formName = data.ReadString();
-    ErrCode result = RemoveFormInfo(moduleName, formName);
     reply.WriteInt32(result);
     return result;
 }
@@ -533,82 +486,6 @@ int32_t FormMgrStub::HandleRouterEvent(MessageParcel &data, MessageParcel &reply
 }
 
 /**
- * @brief Handle BatchAddFormRecords message.
- * @param data input param.
- * @param reply output param.
- * @return Returns ERR_OK on success, others on failure.
- */
-int32_t FormMgrStub::HandleBatchAddFormRecords(MessageParcel &data, MessageParcel &reply)
-{
-    HILOG_INFO("%{public}s called.", __func__);
-    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
-    if (!want) {
-        HILOG_ERROR("%{public}s, failed to ReadParcelable<Want>", __func__);
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-
-    int32_t result = BatchAddFormRecords(*want);
-    reply.WriteInt32(result);
-    return result;
-}
-
-/**
- * @brief Handle BatchDeleteFormRecords message.
- * @param data input param.
- * @param reply output param.
- * @return Returns ERR_OK on success, others on failure.
- */
-int32_t FormMgrStub::HandleClearFormRecords(MessageParcel &data, MessageParcel &reply)
-{
-    HILOG_INFO("%{public}s called.", __func__);
-    int32_t result = ClearFormRecords();
-    reply.WriteInt32(result);
-    return result;
-}
-
-/**
- * @brief Handle DistributedDataAddForm message.
- * @param data input param.
- * @param reply output param.
- * @return Returns ERR_OK on success, others on failure.
- */
-int32_t FormMgrStub::HandleDistributedDataAddForm(MessageParcel &data, MessageParcel &reply)
-{
-    HILOG_INFO("%{public}s called.", __func__);
-
-    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
-    if (!want) {
-        HILOG_ERROR("%{public}s, failed to ReadParcelable<Want>", __func__);
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-
-    int32_t result = DistributedDataAddForm(*want);
-    reply.WriteInt32(result);
-    return result;
-}
-
-/**
- * @brief Handle DistributedDataDeleteForm message.
- * @param data input param.
- * @param reply output param.
- * @return Returns ERR_OK on success, others on failure.
- */
-int32_t FormMgrStub::HandleDistributedDataDeleteForm(MessageParcel &data, MessageParcel &reply)
-{
-    HILOG_INFO("%{public}s called.", __func__);
-
-    std::string formId = data.ReadString();
-    if (formId.empty()) {
-        HILOG_ERROR("%{public}s, failed to get formId", __func__);
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-
-    int32_t result = DistributedDataDeleteForm(formId);
-    reply.WriteInt32(result);
-    return result;
-}
-
-/**
  * @brief Handle DeleteInvalidForms message.
  * @param data input param.
  * @param reply output param.
@@ -821,25 +698,6 @@ int32_t FormMgrStub::HandleGetFormsInfo(MessageParcel &data, MessageParcel &repl
             return ERR_APPEXECFWK_PARCEL_ERROR;
         }
     }
-    return result;
-}
-
-int32_t FormMgrStub::HandleUpdateRouterAction(MessageParcel &data, MessageParcel &reply)
-{
-    HILOG_INFO("%{public}s called.", __func__);
-    int64_t formId = data.ReadInt64();
-    std::string action = data.ReadString();
-    std::vector<FormInfo> infos;
-    int32_t result = UpdateRouterAction(formId, action);
-    if (result != ERR_OK) {
-        HILOG_ERROR("%{public}s, failed to write result", __func__);
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    if (!reply.WriteString(action)) {
-        HILOG_ERROR("%{public}s, failed to write action", __func__);
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-
     return result;
 }
 

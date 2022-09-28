@@ -143,23 +143,6 @@ public:
     int SetNextRefreshTime(const int64_t formId, const int64_t nextTime);
 
     /**
-     * @brief Add the form info.
-     *
-     * @param formInfo Indicates the form info to be added.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    ErrCode AddFormInfo(FormInfo &formInfo);
-
-    /**
-     * @brief Remove the specified form info.
-     *
-     * @param moduleName Indicates the module name of the dynamic form info to be removed.
-     * @param formName Indicates the form name of the dynamic form info to be removed.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    ErrCode RemoveFormInfo(const std::string &moduleName, const std::string &formName);
-
-    /**
      * @brief Request to publish a form to the form host.
      *
      * @param want The want of the form to publish.
@@ -227,32 +210,6 @@ public:
     void NotifyFormDelete(const int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject);
 
     /**
-     * @brief Batch add forms to form records for st limit value test.
-     * @param want The want of the form to add.
-     * @return Returns forms count to add.
-     */
-    int BatchAddFormRecords(const Want &want);
-    /**
-     * @brief Clear form records for st limit value test.
-     * @return Returns forms count to delete.
-     */
-    int ClearFormRecords();
-
-    /**
-     * @brief  Add forms to storage for st .
-     * @param Want The Want of the form to add.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    int DistributedDataAddForm(const Want &want);
-
-    /**
-     * @brief  Delete form form storage for st.
-     * @param formId The formId of the form to delete.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    int DistributedDataDeleteForm(const std::string &formId);
-
-    /**
      * @brief Delete the invalid forms.
      * @param formIds Indicates the ID of the valid forms.
      * @param callerToken Caller ability token.
@@ -314,14 +271,6 @@ public:
      */
     int GetFormsInfoByModule(const std::string &bundleName, const std::string &moduleName,
         std::vector<FormInfo> &formInfos);
-
-    /**
-     * @brief Update action string for router event.
-     * @param formId Indicates the unique id of form.
-     * @param action Indicates the origin action string.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    int UpdateRouterAction(const int64_t formId, std::string &action);
 private:
     /**
      * @brief Get form configure info.

@@ -214,64 +214,6 @@ int FormMgrProxy::SetNextRefreshTime(const int64_t formId, const int64_t nextTim
     return reply.ReadInt32();
 }
 
-ErrCode FormMgrProxy::AddFormInfo(FormInfo &formInfo)
-{
-    MessageParcel data;
-    MessageParcel reply;
-
-    if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("%{public}s, failed to write interface token", __func__);
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    if (!data.WriteParcelable(&formInfo)) {
-        HILOG_ERROR("%{public}s, failed to write formInfo", __func__);
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-
-    MessageOption option;
-    int32_t error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_ADD_FORM_INFO),
-        data,
-        reply,
-        option);
-    if (error != ERR_OK) {
-        HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d", __func__, error);
-        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
-    }
-    return reply.ReadInt32();
-}
-
-ErrCode FormMgrProxy::RemoveFormInfo(const std::string &moduleName, const std::string &formName)
-{
-    MessageParcel data;
-    MessageParcel reply;
-
-    if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("%{public}s, failed to write interface token", __func__);
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    if (!data.WriteString(moduleName)) {
-        HILOG_ERROR("%{public}s, failed to write moduleName", __func__);
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    if (!data.WriteString(formName)) {
-        HILOG_ERROR("%{public}s, failed to write formName", __func__);
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-
-    MessageOption option;
-    int32_t error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REMOVE_FORM_INFO),
-        data,
-        reply,
-        option);
-    if (error != ERR_OK) {
-        HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d", __func__, error);
-        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
-    }
-    return reply.ReadInt32();
-}
-
 ErrCode FormMgrProxy::RequestPublishForm(Want &want, bool withFormBindingData,
                                          std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId)
 {
@@ -645,26 +587,6 @@ int FormMgrProxy::RouterEvent(const int64_t formId, Want &want)
     return reply.ReadInt32();
 }
 
-/**
- * @brief Batch add forms to form records for st limit value test.
- * @param want The want of the form to add.
- * @return Returns ERR_OK on success, others on failure.
- */
-int FormMgrProxy::BatchAddFormRecords(const Want &want)
-{
-    // must not implement, just for st
-    return ERR_OK;
-}
-/**
- * @brief Clear form records for st limit value test.
- * @return Returns ERR_OK on success, others on failure.
- */
-int FormMgrProxy::ClearFormRecords()
-{
-    // must not implement, just for st
-    return ERR_OK;
-}
-
 template<typename T>
 int  FormMgrProxy::GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos)
 {
@@ -774,68 +696,6 @@ int FormMgrProxy::SendTransactCmd(IFormMgr::Message code, MessageParcel &data, M
         return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
     }
     return ERR_OK;
-}
-
-/**
- * @brief  Add forms to storage for st .
- * @param Want The formDBInfo of the form to add.
- * @return Returns ERR_OK on success, others on failure.
- */
-int FormMgrProxy::DistributedDataAddForm(const Want &want)
-{
-    MessageParcel data;
-    if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("%{public}s, failed to write interface token", __func__);
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    if (!data.WriteParcelable(&want)) {
-        HILOG_ERROR("%{public}s, failed to write want", __func__);
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-
-    MessageParcel reply;
-    MessageOption option;
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_DISTRIBUTED_DATA_ADD_FORM__ST),
-        data,
-        reply,
-        option);
-    if (error != ERR_OK) {
-        HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d", __func__, error);
-        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
-    }
-    return reply.ReadInt32();
-}
-
-/**
- * @brief  Delete form form storage for st.
- * @param formId The formId of the form to delete.
- * @return Returns ERR_OK on success, others on failure.
- */
-int FormMgrProxy::DistributedDataDeleteForm(const std::string &formId)
-{
-    MessageParcel data;
-    if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("%{public}s, failed to write interface token", __func__);
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    if (!data.WriteInt64(std::stoll(formId))) {
-        HILOG_ERROR("%{public}s, failed to write formId", __func__);
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-
-    MessageParcel reply;
-    MessageOption option;
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_DISTRIBUTED_DATA_DELETE_FORM__ST),
-        data,
-        reply,
-        option);
-    if (error != ERR_OK) {
-        HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d", __func__, error);
-        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
-    }
-    return reply.ReadInt32();
 }
 
 /**
@@ -1192,41 +1052,6 @@ int32_t FormMgrProxy::StartAbility(const Want &want, const sptr<IRemoteObject> &
     }
     // retrieve and return result.
     return reply.ReadInt32();
-}
-
-/**
- * @brief Update action string for router event.
- * @param formId Indicates the unique id of form.
- * @param action Indicates the origin action string.
- * @return Returns ERR_OK on success, others on failure.
- */
-int FormMgrProxy::UpdateRouterAction(const int64_t formId, std::string &action)
-{
-    MessageParcel data;
-    if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("%{public}s, failed to write interface token", __func__);
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    if (!data.WriteInt64(formId)) {
-        HILOG_ERROR("%{public}s, failed to write formId", __func__);
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-
-    if (!data.WriteString(action)) {
-        HILOG_ERROR("%{public}s, failed to write action", __func__);
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-
-    MessageParcel reply;
-    MessageOption option;
-    int error = Remote()->SendRequest(static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UPDATE_ROUTER_ACTION),
-        data, reply, option);
-    if (error != ERR_OK) {
-        HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d", __func__, error);
-        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
-    }
-    action = reply.ReadString();
-    return error;
 }
 
 int32_t FormMgrProxy::ShareForm(int64_t formId, const std::string &deviceId, const sptr<IRemoteObject> &callerToken,

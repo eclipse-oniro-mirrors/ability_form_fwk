@@ -29,8 +29,6 @@ public:
     MOCK_METHOD3(ReleaseForm, int(const int64_t formId, const sptr<IRemoteObject> &callerToken, const bool delCache));
     MOCK_METHOD2(UpdateForm, int(const int64_t formId, const FormProviderData &formProviderData));
     MOCK_METHOD2(SetNextRefreshTime, int(const int64_t formId, const int64_t nextTime));
-    MOCK_METHOD1(AddFormInfo, ErrCode(FormInfo &formInfo));
-    MOCK_METHOD2(RemoveFormInfo, ErrCode(const std::string &moduleName, const std::string &formName));
     MOCK_METHOD4(RequestPublishForm, ErrCode(Want &want, bool withFormBindingData,
         std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId));
     MOCK_METHOD3(LifecycleUpdate, int(const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &callerToken,
@@ -45,10 +43,6 @@ public:
     MOCK_METHOD2(DumpFormTimerByFormId, int(const std::int64_t formId, std::string &isTimingService));
     MOCK_METHOD3(MessageEvent, int(const int64_t formId, const Want &want, const sptr<IRemoteObject> &callerToken));
     MOCK_METHOD2(RouterEvent, int(const int64_t formId, Want &want));
-    MOCK_METHOD1(BatchAddFormRecords, int(const Want &want));
-    MOCK_METHOD0(ClearFormRecords, int());
-    MOCK_METHOD1(DistributedDataAddForm, int(const Want &want));
-    MOCK_METHOD1(DistributedDataDeleteForm, int(const std::string &formId));
     MOCK_METHOD3(DeleteInvalidForms, int(const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &callerToken,
         int32_t &numFormsDeleted));
     MOCK_METHOD3(AcquireFormState, int(const Want &want, const sptr<IRemoteObject> &callerToken,
@@ -65,7 +59,6 @@ public:
     MOCK_METHOD2(GetFormsInfo, int(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos));
     MOCK_METHOD0(IsRequestPublishFormSupported, bool());
     MOCK_METHOD2(StartAbility, int32_t(const Want &want, const sptr<IRemoteObject> &callerToken));
-    MOCK_METHOD2(UpdateRouterAction, int(const int64_t formId, std::string &action));
     MOCK_METHOD4(ShareForm, int32_t(int64_t, const std::string&, const sptr<IRemoteObject>&, int64_t));
     MOCK_METHOD1(RecvFormShareInfoFromRemote, int32_t(const FormShareInfo&));
 };

@@ -218,20 +218,6 @@ int FormMgrService::SetNextRefreshTime(const int64_t formId, const int64_t nextT
     return FormMgrAdapter::GetInstance().SetNextRefreshTime(formId, nextTime);
 }
 
-ErrCode FormMgrService::AddFormInfo(FormInfo &formInfo)
-{
-    HILOG_INFO("%{public}s called.", __func__);
-
-    return FormMgrAdapter::GetInstance().AddFormInfo(formInfo);
-}
-
-ErrCode FormMgrService::RemoveFormInfo(const std::string &moduleName, const std::string &formName)
-{
-    HILOG_INFO("%{public}s called.", __func__);
-
-    return FormMgrAdapter::GetInstance().RemoveFormInfo(moduleName, formName);
-}
-
 ErrCode FormMgrService::RequestPublishForm(Want &want, bool withFormBindingData,
     std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId)
 {
@@ -389,23 +375,6 @@ int FormMgrService::RouterEvent(const int64_t formId, Want &want)
 }
 
 /**
- * @brief Batch add forms to form records for st limit value test.
- * @param want The want of the form to add.
- * @return Returns forms count to add.
- */
-int FormMgrService::BatchAddFormRecords(const Want &want)
-{
-    return FormMgrAdapter::GetInstance().BatchAddFormRecords(want);
-}
-/**
- * @brief Clear form records for st limit value test.
- * @return Returns forms count to delete.
- */
-int FormMgrService::ClearFormRecords()
-{
-    return FormMgrAdapter::GetInstance().ClearFormRecords();
-}
-/**
  * @brief Start event for the form manager service.
  */
 void FormMgrService::OnStart()
@@ -517,28 +486,6 @@ ErrCode FormMgrService::CheckFormPermission()
     }
     HILOG_ERROR("Permission verification ok!");
     return ERR_OK;
-}
-
-/**
- * @brief  Add forms to storage for st.
- * @param Want The Want of the form to add.
- * @return Returns ERR_OK on success, others on failure.
- */
-int FormMgrService::DistributedDataAddForm(const Want &want)
-{
-    HILOG_INFO("%{public}s called.", __func__);
-    return FormMgrAdapter::GetInstance().DistributedDataAddForm(want);
-}
-
-/**
- * @brief  Delete form form storage for st.
- * @param formId The formId of the form to delete.
- * @return Returns ERR_OK on success, others on failure.
- */
-int FormMgrService::DistributedDataDeleteForm(const std::string &formId)
-{
-    HILOG_INFO("%{public}s called.", __func__);
-    return FormMgrAdapter::GetInstance().DistributedDataDeleteForm(formId);
 }
 
 /**
@@ -734,18 +681,6 @@ int32_t FormMgrService::StartAbility(const Want &want, const sptr<IRemoteObject>
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return ams->StartAbility(want, callerToken, -1, -1);
-}
-
-/**
- * @brief Update action string for router event.
- * @param formId Indicates the unique id of form.
- * @param action Indicates the origin action string.
- * @return Returns ERR_OK on success, others on failure.
- */
-int FormMgrService::UpdateRouterAction(const int64_t formId, std::string &action)
-{
-    HILOG_INFO("%{public}s called.", __func__);
-    return FormMgrAdapter::GetInstance().UpdateRouterAction(formId, action);
 }
 
 void FormMgrService::InitFormShareMgrEventHandler()
