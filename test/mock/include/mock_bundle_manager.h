@@ -95,6 +95,11 @@ public:
 
     virtual std::string GetAppType(const std::string &bundleName);
 
+    virtual bool CheckIsSystemAppByUid(const int uid) override
+    {
+        return IsSystemApp;
+    }
+
     virtual bool GetFormsInfoByApp(const std::string &bundleName, std::vector<FormInfo> &formInfo) override;
     virtual bool GetFormsInfoByModule(const std::string &bundleName, const std::string &moduleName,
         std::vector<FormInfo> &formInfo) override;
