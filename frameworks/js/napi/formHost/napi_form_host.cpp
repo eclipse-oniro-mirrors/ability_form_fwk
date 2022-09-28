@@ -2171,10 +2171,11 @@ napi_value NAPI_DeleteInvalidForms(napi_env env, napi_callback_info info)
         formIds.push_back(formIdValue);
     }
 
-    auto *asyncCallbackInfo = new AsyncDeleteInvalidFormsCallbackInfo {
-        .env = env,
-        .formIds = formIds,
-    };
+    auto *asyncCallbackInfo = new (std::nothrow) AsyncDeleteInvalidFormsCallbackInfo {.env = env, .formIds = formIds, };
+    if (asyncCallbackInfo == nullptr) {
+        HILOG_ERROR("asyncCallbackInfo == nullptr.");
+        return RetErrMsg(InitErrMsg(env, ERR_APPEXECFWK_FORM_COMMON_CODE, callbackType, argv[1]));
+    }
 
     if (argc == ARGS_SIZE_TWO) {
         // Check the value type of the arguments
@@ -2530,7 +2531,7 @@ napi_value NAPI_AcquireFormState(napi_env env, napi_callback_info info)
         return RetErrMsg(InitErrMsg(env, ERR_APPEXECFWK_FORM_INVALID_PARAM, callbackType, argv[1]));
     }
 
-    auto *asyncCallbackInfo = new AsyncAcquireFormStateCallbackInfo {
+    auto *asyncCallbackInfo = new (std::nothrow) AsyncAcquireFormStateCallbackInfo {
         .env = env,
         .asyncWork = nullptr,
         .deferred = nullptr,
@@ -2540,6 +2541,10 @@ napi_value NAPI_AcquireFormState(napi_env env, napi_callback_info info)
         .callbackType = callbackType,
         .result = ERR_OK,
     };
+    if (asyncCallbackInfo == nullptr) {
+        HILOG_ERROR("asyncCallbackInfo == nullptr.");
+        return RetErrMsg(InitErrMsg(env, ERR_APPEXECFWK_FORM_COMMON_CODE, callbackType, argv[1]));
+    }
 
     bool parseResult = UnwrapWant(env, argv[0], asyncCallbackInfo->want);
     if (!parseResult) {
@@ -2786,7 +2791,7 @@ napi_value NAPI_NotifyFormsVisible(napi_env env, napi_callback_info info)
         return RetErrMsg(InitErrMsg(env, ERR_APPEXECFWK_FORM_INVALID_PARAM, callbackType, argv[ARGS_SIZE_TWO]));
     }
 
-    auto *asyncCallbackInfo = new AsyncNotifyFormsVisibleCallbackInfo {
+    auto *asyncCallbackInfo = new (std::nothrow) AsyncNotifyFormsVisibleCallbackInfo {
         .env = env,
         .asyncWork = nullptr,
         .deferred = nullptr,
@@ -2794,6 +2799,11 @@ napi_value NAPI_NotifyFormsVisible(napi_env env, napi_callback_info info)
         .formIds = formIds,
         .isVisible = false,
     };
+    if (asyncCallbackInfo == nullptr) {
+        HILOG_ERROR("asyncCallbackInfo == nullptr.");
+        return RetErrMsg(InitErrMsg(env, ERR_APPEXECFWK_FORM_COMMON_CODE, callbackType, argv[1]));
+    }
+
     napi_get_value_bool(env, argv[1], &asyncCallbackInfo->isVisible);
 
     if (argc == ARGS_SIZE_THREE) {
@@ -2931,7 +2941,7 @@ napi_value NAPI_NotifyFormsEnableUpdate(napi_env env, napi_callback_info info)
         return RetErrMsg(InitErrMsg(env, ERR_APPEXECFWK_FORM_INVALID_PARAM, callbackType, argv[ARGS_SIZE_TWO]));
     }
 
-    auto *asyncCallbackInfo = new AsyncNotifyFormsEnableUpdateCallbackInfo {
+    auto *asyncCallbackInfo = new (std::nothrow) AsyncNotifyFormsEnableUpdateCallbackInfo {
         .env = env,
         .asyncWork = nullptr,
         .deferred = nullptr,
@@ -2939,6 +2949,11 @@ napi_value NAPI_NotifyFormsEnableUpdate(napi_env env, napi_callback_info info)
         .formIds = formIds,
         .isEnableUpdate = false,
     };
+    if (asyncCallbackInfo == nullptr) {
+        HILOG_ERROR("asyncCallbackInfo == nullptr.");
+        return RetErrMsg(InitErrMsg(env, ERR_APPEXECFWK_FORM_COMMON_CODE, callbackType, argv[1]));
+    }
+
     napi_get_value_bool(env, argv[1], &asyncCallbackInfo->isEnableUpdate);
 
     if (argc == ARGS_SIZE_THREE) {

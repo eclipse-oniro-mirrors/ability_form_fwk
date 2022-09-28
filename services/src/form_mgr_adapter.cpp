@@ -990,12 +990,15 @@ ErrCode FormMgrAdapter::HandleEventNotify(const std::string &providerKey, const 
     size_t position = providerKey.find(Constants::NAME_DELIMITER);
     std::string bundleName = providerKey.substr(0, position);
     std::string abilityName = providerKey.substr(position + strlen(Constants::NAME_DELIMITER));
-    sptr<IAbilityConnection> formEventNotifyConnection = new FormEventNotifyConnection(formIdsByProvider,
+    sptr<IAbilityConnection> formEventNotifyConnection = new (std::nothrow) FormEventNotifyConnection(formIdsByProvider,
         formVisibleType, bundleName, abilityName);
+    if (formEventNotifyConnection == nullptr) {
+        HILOG_ERROR("failed to create FormEventNotifyConnection.");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
     Want connectWant;
     connectWant.AddFlags(Want::FLAG_ABILITY_FORM_ENABLED);
     connectWant.SetElementName(bundleName, abilityName);
-
     ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbility(connectWant, formEventNotifyConnection);
     if (errorCode != ERR_OK) {
         HILOG_ERROR("%{public}s fail, ConnectServiceAbility failed.", __func__);
@@ -1023,7 +1026,7 @@ ErrCode FormMgrAdapter::AcquireProviderFormInfoAsync(const int64_t formId,
     Want newWant;
     newWant.SetParams(wantParams);
     auto hostToken = newWant.GetRemoteObject(Constants::PARAM_FORM_HOST_TOKEN);
-    sptr<IAbilityConnection> formAcquireConnection = new  (std::nothrow) FormAcquireConnection(formId, info, wantParams,
+    sptr<IAbilityConnection> formAcquireConnection = new (std::nothrow) FormAcquireConnection(formId, info, wantParams,
         hostToken);
     if (formAcquireConnection == nullptr) {
         HILOG_ERROR("formAcquireConnection is null.");
@@ -2208,8 +2211,12 @@ int FormMgrAdapter::AcquireFormState(const Want &want, const sptr<IRemoteObject>
     FormDataMgr::GetInstance().CreateFormStateRecord(provider, info, callerToken, callingUid);
 
     HILOG_DEBUG("bundleName:%{public}s, abilityName:%{public}s", bundleName.c_str(), abilityName.c_str());
-    sptr<IAbilityConnection> connection = new FormAcquireStateConnection(bundleName, abilityName, want, provider);
-
+    sptr<IAbilityConnection> connection =
+        new (std::nothrow) FormAcquireStateConnection(bundleName, abilityName, want, provider);
+    if (connection == nullptr) {
+        HILOG_ERROR("failed to create FormAcquireStateConnection.");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
     Want targetWant;
     targetWant.AddFlags(Want::FLAG_ABILITY_FORM_ENABLED);
     targetWant.SetElementName(bundleName, abilityName);

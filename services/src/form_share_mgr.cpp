@@ -67,6 +67,10 @@ int32_t FormShareMgr::ShareForm(int64_t formId, const std::string &deviceId, con
 
     sptr<FormShareConnection> formShareConnection = new (std::nothrow) FormShareConnection(
         formId, formRecord.bundleName, formRecord.abilityName, deviceId, requestCode);
+    if (formShareConnection == nullptr) {
+        HILOG_ERROR("failed to create formShareConnection.");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
     Want want;
     want.SetElementName(formRecord.bundleName, formRecord.abilityName);
     want.AddFlags(Want::FLAG_ABILITY_FORM_ENABLED);

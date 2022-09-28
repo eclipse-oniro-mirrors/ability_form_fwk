@@ -36,7 +36,10 @@ sptr<FormSupplyCallback> FormSupplyCallback::GetInstance()
     if (instance_ == nullptr) {
         std::lock_guard<std::mutex> lock(mutex_);
         if (instance_ == nullptr) {
-            instance_ = new FormSupplyCallback();
+            instance_ = new (std::nothrow) FormSupplyCallback();
+            if (instance_ == nullptr) {
+                HILOG_ERROR("%{public}s error, failed to create FormSupplyCallback.", __func__);
+            }
         }
     }
     return instance_;

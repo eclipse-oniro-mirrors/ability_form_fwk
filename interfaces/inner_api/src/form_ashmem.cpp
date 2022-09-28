@@ -49,7 +49,7 @@ bool FormAshmem::ReadFromParcel(Parcel &parcel)
 
 FormAshmem* FormAshmem::Unmarshalling(Parcel &parcel)
 {
-    FormAshmem* formAshmem = new FormAshmem();
+    FormAshmem* formAshmem = new (std::nothrow) FormAshmem();
     if (formAshmem != nullptr && !formAshmem->ReadFromParcel(parcel)) {
         delete formAshmem;
         formAshmem = nullptr;

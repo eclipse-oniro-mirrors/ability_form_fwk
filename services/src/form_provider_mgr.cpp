@@ -166,8 +166,12 @@ ErrCode FormProviderMgr::ConnectAmsForRefresh(const int64_t formId,
     HILOG_DEBUG("%{public}s called, bundleName:%{public}s, abilityName:%{public}s, needFreeInstall:%{public}d.",
         __func__, record.bundleName.c_str(), record.abilityName.c_str(), record.needFreeInstall);
 
-    sptr<IAbilityConnection> formRefreshConnection = new FormRefreshConnection(formId, want,
+    sptr<IAbilityConnection> formRefreshConnection = new (std::nothrow) FormRefreshConnection(formId, want,
         record.bundleName, record.abilityName, record.needFreeInstall);
+    if (formRefreshConnection == nullptr) {
+        HILOG_ERROR("failed to create FormRefreshConnection.");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
     Want connectWant;
     connectWant.AddFlags(Want::FLAG_ABILITY_FORM_ENABLED);
     connectWant.SetElementName(record.bundleName, record.abilityName);
@@ -216,8 +220,12 @@ ErrCode FormProviderMgr::NotifyProviderFormDelete(const int64_t formId, const Fo
 
     HILOG_DEBUG("%{public}s, connectAbility,bundleName:%{public}s, abilityName:%{public}s",
         __func__, formRecord.bundleName.c_str(), formRecord.abilityName.c_str());
-    sptr<IAbilityConnection> formDeleteConnection = new FormDeleteConnection(formId,
+    sptr<IAbilityConnection> formDeleteConnection = new (std::nothrow) FormDeleteConnection(formId,
         formRecord.bundleName, formRecord.abilityName);
+    if (formDeleteConnection == nullptr) {
+        HILOG_ERROR("failed to create FormDeleteConnection.");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
     Want want;
     want.SetElementName(formRecord.bundleName, formRecord.abilityName);
     want.SetFlags(Want::FLAG_ABILITY_FORM_ENABLED);
@@ -253,6 +261,10 @@ ErrCode FormProviderMgr::NotifyProviderFormsBatchDelete(const std::string &bundl
     HILOG_DEBUG("%{public}s, bundleName:%{public}s, abilityName:%{public}s",
         __func__, bundleName.c_str(), abilityName.c_str());
     sptr<IAbilityConnection> batchDeleteConnection = new FormBatchDeleteConnection(formIds, bundleName, abilityName);
+    if (batchDeleteConnection == nullptr) {
+        HILOG_ERROR("failed to create FormBatchDeleteConnection.");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
     Want want;
     want.AddFlags(Want::FLAG_ABILITY_FORM_ENABLED);
     want.SetElementName(bundleName, abilityName);
@@ -355,8 +367,12 @@ int FormProviderMgr::MessageEvent(const int64_t formId, const FormRecord &record
     }
 #endif
 
-    sptr<IAbilityConnection> formMsgEventConnection = new FormMsgEventConnection(formId, want,
+    sptr<IAbilityConnection> formMsgEventConnection = new (std::nothrow) FormMsgEventConnection(formId, want,
         record.bundleName, record.abilityName);
+    if (formMsgEventConnection == nullptr) {
+        HILOG_ERROR("failed to create FormMsgEventConnection.");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
     Want connectWant;
     connectWant.AddFlags(Want::FLAG_ABILITY_FORM_ENABLED);
     connectWant.SetElementName(record.bundleName, record.abilityName);
