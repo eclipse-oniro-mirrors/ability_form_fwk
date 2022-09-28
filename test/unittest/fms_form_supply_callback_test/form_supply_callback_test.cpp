@@ -17,13 +17,16 @@
 #include <memory>
 #define private public
 #include "form_cache_mgr.h"
+#include "form_event_handler.h"
 #include "form_supply_callback.h"
+#include "form_share_mgr.h"
 #undef private
 #include "form_ability_connection.h"
 #include "form_acquire_connection.h"
 #include "form_host_caller.h"
 #include "form_mgr.h"
 #include "hilog_wrapper.h"
+#include "mock_event_handler.h"
 #include "mock_form_provider_client.h"
 #include "gmock/gmock.h"
 #include "mock_form_mgr_proxy.h"
@@ -215,5 +218,125 @@ HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0009, TestSize.Lev
     // test HandleHostDied function
     formSupplyCallback.HandleHostDied(hostToken);
     GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0009 end";
+}
+
+/**
+ * @tc.name: FormAcquireConnectionTest_0010
+ * @tc.desc: test RegisterEventTimeoutObserver function and iter != observers_.end()
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0010, TestSize.Level0)
+{
+    HILOG_INFO("FormAcquireConnectionTest_0010 start");
+    FormEventHandler formEventHandler(nullptr);
+    // emplace observer
+    formEventHandler.RegisterEventTimeoutObserver(nullptr);
+    // text RegisterEventTimeoutObserver
+    formEventHandler.RegisterEventTimeoutObserver(nullptr);
+
+    GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0010 end";
+}
+
+/**
+ * @tc.name: FormAcquireConnectionTest_0011
+ * @tc.desc: test UnregisterEventTimeoutObserver function and iter != observers_.end()
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0011, TestSize.Level0)
+{
+    HILOG_INFO("FormAcquireConnectionTest_0011 start");
+    FormEventHandler formEventHandler(nullptr);
+    // text UnregisterEventTimeoutObserver
+    formEventHandler.UnregisterEventTimeoutObserver(nullptr);
+
+    GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0011 end";
+}
+
+/**
+ * @tc.name: FormAcquireConnectionTest_0012
+ * @tc.desc: test UnregisterEventTimeoutObserver function and iter == observers_.end()
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0012, TestSize.Level0)
+{
+    HILOG_INFO("FormAcquireConnectionTest_0012 start");
+    FormEventHandler formEventHandler(nullptr);
+    // erase iter
+    formEventHandler.UnregisterEventTimeoutObserver(nullptr);
+    // text UnregisterEventTimeoutObserver
+    formEventHandler.UnregisterEventTimeoutObserver(nullptr);
+
+    GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0012 end";
+}
+
+/**
+ * @tc.name: FormAcquireConnectionTest_0013
+ * @tc.desc: test ~FormShareMgr and eventHandler_ != nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0013, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0013 start";
+    FormShareMgr* aa = new FormShareMgr();
+    std::shared_ptr<FormEventHandler> handler = std::make_shared<FormEventHandler>(EventRunner::Create());
+    DelayedSingleton<FormShareMgr>::GetInstance()->SetEventHandler(handler);
+    delete aa;
+    GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0013 start end";
+}
+
+/**
+ * @tc.name: FormAcquireConnectionTest_0014
+ * @tc.desc: test ProcessEvent function and observers_ is nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0014, TestSize.Level0)
+{
+    HILOG_INFO("FormAcquireConnectionTest_0014 start");
+    FormEventHandler formEventHandler(nullptr);
+    // init InnerEvent::Pointer
+    auto event = InnerEvent::Get();
+    // text ProcessEvent
+    formEventHandler.ProcessEvent(event);
+
+    GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0014 end";
+}
+
+/**
+ * @tc.name: FormAcquireConnectionTest_0015
+ * @tc.desc: test ProcessEvent function and observers_ is not nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0015, TestSize.Level0)
+{
+    HILOG_INFO("FormAcquireConnectionTest_0015 start");
+    FormEventHandler formEventHandler(nullptr);
+    // init InnerEvent::Pointer
+    auto event = InnerEvent::Get();
+    // emplace observer
+    formEventHandler.RegisterEventTimeoutObserver(nullptr);
+    // text ProcessEvent
+    formEventHandler.ProcessEvent(event);
+
+    GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0015 end";
+}
+
+/**
+ * @tc.name: FormAcquireConnectionTest_0016
+ * @tc.desc: test ProcessEvent function and observers is not nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0016, TestSize.Level0)
+{
+    HILOG_INFO("FormAcquireConnectionTest_0016 start");
+    FormEventHandler formEventHandler(nullptr);
+    std::shared_ptr<MockFormEventTimeoutObserver> observer = std::make_shared<MockFormEventTimeoutObserver>();
+    // init InnerEvent::Pointer
+    auto event = InnerEvent::Get();
+    // emplace observer
+    formEventHandler.RegisterEventTimeoutObserver(observer);
+    // text ProcessEvent
+    formEventHandler.ProcessEvent(event);
+
+    GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0016 end";
 }
 }
