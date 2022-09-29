@@ -80,6 +80,15 @@ NativeValue* CreateJsFormDimension(NativeEngine &engine)
     return objValue;
 }
 
+NativeValue* CreateJsFormVisibilityType(NativeEngine &engine)
+{
+    NativeValue* objValue = engine.CreateObject();
+    NativeObject* object = ConvertNativeValueTo<NativeObject>(objValue);
+    object->SetProperty("FORM_VISIBLE", CreateJsValue(engine, AppExecFwk::Constants::FORM_VISIBLE));
+    object->SetProperty("FORM_INVISIBLE", CreateJsValue(engine, AppExecFwk::Constants::FORM_INVISIBLE));
+    return objValue;
+}
+
 NativeValue* FormInfoInit(NativeEngine *engine, NativeValue *exportObj)
 {
     HILOG_INFO("%{public}s called.", __func__);
@@ -98,7 +107,7 @@ NativeValue* FormInfoInit(NativeEngine *engine, NativeValue *exportObj)
     object->SetProperty("FormState", CreateJsFormState(*engine));
     object->SetProperty("FormParam", CreateJsFormParam(*engine));
     object->SetProperty("FormDimension", CreateJsFormDimension(*engine));
-
+    object->SetProperty("VisibilityType", CreateJsFormVisibilityType(*engine));
     HILOG_INFO("%{public}s called end.", __func__);
     return exportObj;
 }
