@@ -20,7 +20,7 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-class MockFormEventTimeoutObserver : public FormEventTimeoutObserver{
+class MockFormEventTimeoutObserver : public FormEventTimeoutObserver {
 public:
     MockFormEventTimeoutObserver() = default;
     virtual ~MockFormEventTimeoutObserver() = default;
