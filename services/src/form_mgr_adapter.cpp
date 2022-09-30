@@ -1219,6 +1219,7 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
     itemInfo.SetFormVisibleNotify(formInfo.formVisibleNotify);
     itemInfo.SetFormSrc(formInfo.src);
     itemInfo.SetFormWindow(formInfo.window);
+    itemInfo.SetType(formInfo.type);
 
     for (const auto &abilityInfo : bundleInfo.abilityInfos) {
         if (abilityInfo.name == formInfo.abilityName) {

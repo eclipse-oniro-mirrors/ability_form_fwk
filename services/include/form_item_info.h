@@ -285,6 +285,16 @@ public:
      * @param deviceId.
      */
     void SetDeviceId(const std::string &deviceId);
+    /**
+     * @brief Get type_.
+     * @return type_.
+     */
+    FormType GetType() const;
+    /**
+     * @brief Set value of type_.
+     * @param type.
+     */
+    void SetType(const FormType &type);
 private:
     /**
      * @brief Equal or not.
@@ -314,6 +324,7 @@ private:
     uint32_t versionCode_ = 0;
     std::string versionName_ = "";
     uint32_t compatibleVersion_ = 0;
+    FormType type_ = FormType::JS;
     std::string icon_ = "";
 
     std::string jsComponentName_ = "";

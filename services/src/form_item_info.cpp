@@ -472,5 +472,15 @@ void FormItemInfo::SetDeviceId(const std::string &deviceId)
 {
     deviceId_ = deviceId;
 }
+
+FormType FormItemInfo::GetType() const
+{
+    return type_;
+}
+
+void FormItemInfo::SetType(const FormType &type)
+{
+    type_ = type;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS
