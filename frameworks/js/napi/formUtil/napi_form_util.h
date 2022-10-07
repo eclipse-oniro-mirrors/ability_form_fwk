@@ -17,6 +17,7 @@
 #define OHOS_FORM_FWK_NAPI_FORM_UTIL_H
 
 #include "ability.h"
+#include "js_runtime_utils.h"
 #include "napi/native_api.h"
 #include "napi/native_common.h"
 #include "napi/native_node_api.h"
@@ -79,6 +80,10 @@ void InnerCreatePromiseRetMsg(napi_env env, int32_t code, napi_value* result);
 napi_value RetErrMsg(AsyncErrMsgCallbackInfo* asyncCallbackInfo);
 void ParseFormInfoIntoNapi(napi_env env, const OHOS::AppExecFwk::FormInfo &formInfo, napi_value &result);
 AsyncErrMsgCallbackInfo *InitErrMsg(napi_env env, int32_t code, int32_t type, napi_value callbackValue);
+NativeValue* CreateFormInfos(NativeEngine &engine, const std::vector<OHOS::AppExecFwk::FormInfo> &formInfos);
+NativeValue* CreateFormInfo(NativeEngine &engine, const OHOS::AppExecFwk::FormInfo &formInfo);
+NativeValue *CreateFormCustomizeDatas(
+    NativeEngine &engine, const std::vector<OHOS::AppExecFwk::FormCustomizeData> &customizeDatas);
 }  // namespace AbilityRuntime
 }  // namespace OHOS
 #endif /* OHOS_FORM_FWK_NAPI_FORM_UTIL_H */

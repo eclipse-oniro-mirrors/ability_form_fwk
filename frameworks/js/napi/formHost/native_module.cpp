@@ -27,15 +27,15 @@
 EXTERN_C_START
 using namespace OHOS::AbilityRuntime;
 
-static NativeValue* JsFormHostInit(NativeEngine* engine, NativeValue* exports)
+static NativeValue* JsFormHostInit(NativeEngine *engine, NativeValue *exports)
 {
-    HILOG_INFO("JsFormHostInit is called");
+    HILOG_DEBUG("JsFormHostInit is called");
     if (engine == nullptr || exports == nullptr) {
         HILOG_ERROR("Invalid input parameters");
         return nullptr;
     }
 
-    NativeObject* object = OHOS::AbilityRuntime::ConvertNativeValueTo<NativeObject>(exports);
+    NativeObject *object = OHOS::AbilityRuntime::ConvertNativeValueTo<NativeObject>(exports);
     if (object == nullptr) {
         HILOG_ERROR("object is nullptr");
         return nullptr;
@@ -46,7 +46,18 @@ static NativeValue* JsFormHostInit(NativeEngine* engine, NativeValue* exports)
 
     const char *moduleName = "JsFormHost";
     OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "shareForm", moduleName, JsFormHost::ShareForm);
-
+    OHOS::AbilityRuntime::BindNativeFunction(
+        *engine, *object, "disableFormsUpdate", moduleName, JsFormHost::DisableFormsUpdate);
+    OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "isSystemReady", moduleName, JsFormHost::IsSystemReady);
+    OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "deleteForm", moduleName, JsFormHost::DeleteForm);
+    OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "releaseForm", moduleName, JsFormHost::ReleaseForm);
+    OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "requestForm", moduleName, JsFormHost::RequestForm);
+    OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "castTempForm", moduleName, JsFormHost::CastTempForm);
+    OHOS::AbilityRuntime::BindNativeFunction(
+        *engine, *object, "getAllFormsInfo", moduleName, JsFormHost::GetAllFormsInfo);
+    OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "getFormsInfo", moduleName, JsFormHost::GetFormsInfo);
+    OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "enableFormsUpdate", moduleName,
+        JsFormHost::EnableFormsUpdate);
     return exports;
 }
 
@@ -60,28 +71,19 @@ static NativeValue* JsFormHostInit(NativeEngine* engine, NativeValue* exports)
  */
 static napi_value Init(napi_env env, napi_value exports)
 {
-    HILOG_INFO("napi_moudule Init start...");
+    HILOG_INFO("napi_module Init start...");
     napi_property_descriptor properties[] = {
-        DECLARE_NAPI_FUNCTION("deleteForm", NAPI_DeleteForm),
-        DECLARE_NAPI_FUNCTION("releaseForm", NAPI_ReleaseForm),
-        DECLARE_NAPI_FUNCTION("requestForm", NAPI_RequestForm),
-        DECLARE_NAPI_FUNCTION("castTempForm", NAPI_CastTempForm),
         DECLARE_NAPI_FUNCTION("notifyVisibleForms", NAPI_NotifyVisibleForms),
         DECLARE_NAPI_FUNCTION("notifyInvisibleForms", NAPI_NotifyInvisibleForms),
-        DECLARE_NAPI_FUNCTION("enableFormsUpdate", NAPI_EnableFormsUpdate),
-        DECLARE_NAPI_FUNCTION("disableFormsUpdate", NAPI_DisableFormsUpdate),
-        DECLARE_NAPI_FUNCTION("isSystemReady", NAPI_CheckFMSReady),
         DECLARE_NAPI_FUNCTION("deleteInvalidForms", NAPI_DeleteInvalidForms),
         DECLARE_NAPI_FUNCTION("acquireFormState", NAPI_AcquireFormState),
         DECLARE_NAPI_FUNCTION("on", NAPI_RegisterFormUninstallObserver),
         DECLARE_NAPI_FUNCTION("off", NAPI_UnregisterFormUninstallObserver),
         DECLARE_NAPI_FUNCTION("notifyFormsVisible", NAPI_NotifyFormsVisible),
         DECLARE_NAPI_FUNCTION("notifyFormsEnableUpdate", NAPI_NotifyFormsEnableUpdate),
-        DECLARE_NAPI_FUNCTION("getAllFormsInfo", NAPI_GetAllFormsInfo),
-        DECLARE_NAPI_FUNCTION("getFormsInfo", NAPI_GetFormsInfo),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(properties) / sizeof(properties[0]), properties));
-    HILOG_INFO("napi_moudule Init end...");
+    HILOG_INFO("napi_module Init end...");
 
     return reinterpret_cast<napi_value>(JsFormHostInit(reinterpret_cast<NativeEngine*>(env),
         reinterpret_cast<NativeValue*>(exports)));

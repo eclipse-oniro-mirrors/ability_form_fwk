@@ -469,5 +469,76 @@ void ParseFormInfoIntoNapi(napi_env env, const FormInfo &formInfo, napi_value &r
     HILOG_DEBUG("%{public}s, customizeData size=%{public}zu.", __func__, formInfo.customizeDatas.size());
     napi_set_named_property(env, result, "customizeData", customizeData);
 }
+
+NativeValue* CreateFormInfos(NativeEngine &engine, const std::vector<FormInfo> &formInfos)
+{
+    NativeValue* arrayValue = engine.CreateArray(formInfos.size());
+    NativeArray* array = ConvertNativeValueTo<NativeArray>(arrayValue);
+    uint32_t index = 0;
+    for (const auto &formInfo : formInfos) {
+        array->SetElement(index++, CreateFormInfo(engine, formInfo));
+    }
+    return arrayValue;
+}
+
+NativeValue* CreateFormInfo(NativeEngine &engine, const FormInfo &formInfo)
+{
+    HILOG_DEBUG("called");
+
+    auto objContext = engine.CreateObject();
+    if (objContext == nullptr) {
+        HILOG_ERROR("CreateObject failed");
+        return engine.CreateUndefined();
+    }
+
+    auto object = ConvertNativeValueTo<NativeObject>(objContext);
+    if (object == nullptr) {
+        HILOG_ERROR("ConvertNativeValueTo object failed");
+        return engine.CreateUndefined();
+    }
+
+    object->SetProperty("bundleName", CreateJsValue(engine, formInfo.bundleName));
+    object->SetProperty("moduleName", CreateJsValue(engine, formInfo.moduleName));
+    object->SetProperty("abilityName", CreateJsValue(engine, formInfo.abilityName));
+    object->SetProperty("name", CreateJsValue(engine, formInfo.name));
+    object->SetProperty("description", CreateJsValue(engine, formInfo.description));
+    object->SetProperty("descriptionId", CreateJsValue(engine, formInfo.descriptionId));
+    object->SetProperty("type", CreateJsValue(engine, formInfo.type));
+    object->SetProperty("jsComponentName", CreateJsValue(engine, formInfo.jsComponentName));
+    object->SetProperty("colorMode", CreateJsValue(engine, formInfo.colorMode));
+    object->SetProperty("isDefault", engine.CreateBoolean(formInfo.defaultFlag));
+    object->SetProperty("updateEnabled", engine.CreateBoolean(formInfo.updateEnabled));
+    object->SetProperty("formVisibleNotify", engine.CreateBoolean(formInfo.formVisibleNotify));
+    object->SetProperty("formConfigAbility", CreateJsValue(engine, formInfo.formConfigAbility));
+    object->SetProperty("updateDuration", CreateJsValue(engine, formInfo.updateDuration));
+    object->SetProperty("scheduledUpdateTime", CreateJsValue(engine, formInfo.scheduledUpdateTime));
+    object->SetProperty("defaultDimension", CreateJsValue(engine, formInfo.defaultDimension));
+    object->SetProperty("relatedBundleName", CreateJsValue(engine, formInfo.relatedBundleName));
+    object->SetProperty("supportDimensions", CreateNativeArray(engine, formInfo.supportDimensions));
+    object->SetProperty("customizeData", CreateFormCustomizeDatas(engine, formInfo.customizeDatas));
+
+    return objContext;
+}
+
+NativeValue *CreateFormCustomizeDatas(NativeEngine &engine, const std::vector<FormCustomizeData> &customizeDatas)
+{
+    auto objContext = engine.CreateObject();
+    if (objContext == nullptr) {
+        HILOG_ERROR("CreateObject failed");
+        return engine.CreateUndefined();
+    }
+
+    auto object = ConvertNativeValueTo<NativeObject>(objContext);
+    if (object == nullptr) {
+        HILOG_ERROR("ConvertNativeValueTo object failed");
+        return engine.CreateUndefined();
+    }
+
+    for (const auto& data : customizeDatas) {
+        object->SetProperty(data.name.c_str(), CreateJsValue(engine, data.value));
+    }
+
+    return objContext;
+}
 }  // namespace AbilityRuntime
 }  // namespace OHOS
