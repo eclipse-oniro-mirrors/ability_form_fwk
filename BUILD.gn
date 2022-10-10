@@ -105,6 +105,7 @@ ohos_shared_library("libfms") {
     "device_usage_statistics:usagestatsinner",
     "eventhandler:libeventhandler",
     "form_fwk:form_manager",
+    "hicollie_native:libhicollie",
     "hisysevent_native:libhisysevent",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
