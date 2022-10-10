@@ -279,6 +279,16 @@ public:
     int NotifyFormsVisible(const std::vector<int64_t> &formIds, bool isVisible, const sptr<IRemoteObject> &callerToken);
 
     /**
+     * @brief Notify the form is privacy protected or not.
+     * @param formIds Indicates the ID of the forms.
+     * @param isProtected isProtected or not.
+     * @param callerToken Host client.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int NotifyFormsPrivacyProtected(const std::vector<int64_t> &formIds, bool isProtected,
+                                    const sptr<IRemoteObject> &callerToken);
+
+    /**
      * @brief Notify the form is enable to be updated or not.
      * @param formIds Indicates the ID of the forms.
      * @param isEnableUpdate enable update or not.

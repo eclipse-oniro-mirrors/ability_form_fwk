@@ -50,6 +50,8 @@ public:
 
     MOCK_METHOD3(NotifyFormsVisible, int(const std::vector<int64_t> &formIds, bool isVisible,
         const sptr<IRemoteObject> &callerToken));
+    MOCK_METHOD3(NotifyFormsPrivacyProtected, int(const std::vector<int64_t> &formIds, bool isProtected,
+        const sptr<IRemoteObject> &callerToken));
     MOCK_METHOD3(NotifyFormsEnableUpdate, int(const std::vector<int64_t> &formIds, bool isEnableUpdate,
         const sptr<IRemoteObject> &callerToken));
     MOCK_METHOD1(GetAllFormsInfo, int(std::vector<FormInfo> &formInfos));

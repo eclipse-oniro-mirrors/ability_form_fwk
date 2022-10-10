@@ -46,6 +46,8 @@ static NativeValue* JsFormHostInit(NativeEngine* engine, NativeValue* exports)
 
     const char *moduleName = "JsFormHost";
     OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "shareForm", moduleName, JsFormHost::ShareForm);
+    OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "notifyFormsPrivacyProtected",
+        moduleName, JsFormHost::NotifyFormsPrivacyProtected);
 
     return exports;
 }
