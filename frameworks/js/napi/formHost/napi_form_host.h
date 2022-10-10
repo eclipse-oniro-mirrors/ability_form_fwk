@@ -113,7 +113,6 @@ public:
     static NativeValue* EnableFormsUpdate(NativeEngine *engine, NativeCallbackInfo *info);
     static NativeValue* NotifyFormsPrivacyProtected(NativeEngine *engine, NativeCallbackInfo *info);
 private:
-    NativeValue* OnShareForm(NativeEngine &engine, NativeCallbackInfo &info);
     NativeValue* OnDisableFormsUpdate(NativeEngine &engine, NativeCallbackInfo &info);
     NativeValue* OnIsSystemReady(NativeEngine &engine, NativeCallbackInfo &info);
     NativeValue* OnDeleteForm(NativeEngine &engine, NativeCallbackInfo &info);
