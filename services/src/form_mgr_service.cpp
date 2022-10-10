@@ -36,6 +36,7 @@
 #include "system_ability_definition.h"
 #include "event_report.h"
 #include "hisysevent.h"
+#include "xcollie/watchdog.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -435,6 +436,11 @@ ErrCode FormMgrService::Init()
     if (!ret) {
         HILOG_ERROR("%{public}s fail, FormMgrService::Init Publish failed!", __func__);
         return ERR_INVALID_OPERATION;
+    }
+
+    std::string threadName = NAME_FORM_MGR_SERVICE + "(" + std::to_string(runner_->GetThreadId()) + ")";
+    if (HiviewDFX::Watchdog::GetInstance().AddThread(threadName, handler_) != 0) {
+        HILOG_ERROR("HiviewDFX::Watchdog::GetInstance AddThread Fail");
     }
 
     if (formSysEventReceiver_ == nullptr) {
