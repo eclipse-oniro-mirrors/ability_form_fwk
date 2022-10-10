@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,13 +36,16 @@ static NativeValue* JsProviderInit(NativeEngine* engine, NativeValue* exports)
         return nullptr;
     }
 
-    std::unique_ptr<JsFormProvider> jsFormPorivder = std::make_unique<JsFormProvider>();
-    object->SetNativePointer(jsFormPorivder.release(), JsFormProvider::Finalizer, nullptr);
+    std::unique_ptr<JsFormProvider> jsFormProvider = std::make_unique<JsFormProvider>();
+    object->SetNativePointer(jsFormProvider.release(), JsFormProvider::Finalizer, nullptr);
 
     const char *moduleName = "JsFormProvider";
     BindNativeFunction(*engine, *object, "getFormsInfo", moduleName, JsFormProvider::GetFormsInfo);
     BindNativeFunction(*engine, *object, "setFormNextRefreshTime", moduleName, JsFormProvider::SetFormNextRefreshTime);
     BindNativeFunction(*engine, *object, "updateForm", moduleName, JsFormProvider::UpdateForm);
+    BindNativeFunction(*engine, *object, "requestPublishForm", moduleName, JsFormProvider::RequestPublishForm);
+    BindNativeFunction(*engine, *object, "isRequestPublishFormSupported", moduleName,
+        JsFormProvider::IsRequestPublishFormSupported);
     return exports;
 }
 
@@ -56,13 +59,6 @@ static NativeValue* JsProviderInit(NativeEngine* engine, NativeValue* exports)
  */
 static napi_value Init(napi_env env, napi_value exports)
 {
-    HILOG_INFO("napi_module Init start...");
-    napi_property_descriptor properties[] = {
-        DECLARE_NAPI_FUNCTION("requestPublishForm", NAPI_RequestPublishForm),
-        DECLARE_NAPI_FUNCTION("isRequestPublishFormSupported", NAPI_IsRequestPublishFormSupported),
-    };
-    NAPI_CALL(env, napi_define_properties(env, exports, sizeof(properties) / sizeof(properties[0]), properties));
-    HILOG_INFO("napi_module Init end...");
     return reinterpret_cast<napi_value>(JsProviderInit(reinterpret_cast<NativeEngine*>(env),
         reinterpret_cast<NativeValue*>(exports)));
 }
@@ -75,9 +71,9 @@ static napi_module _module = {
     .nm_flags = 0,
     .nm_filename = nullptr,
     .nm_register_func = Init,
-    .nm_modname = "application.formProvider",
+    .nm_modname = "app.form.formProvider",
     .nm_priv = nullptr,
-    .reserved = {nullptr}
+    .reserved = { nullptr }
 };
 
 // Registers a Node-API module.

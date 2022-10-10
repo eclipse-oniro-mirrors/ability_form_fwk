@@ -178,9 +178,8 @@ int32_t QueryExternalErrorCode(int32_t internalErrorCode)
     auto iter = ERROR_CODE_MAP_EXTERNAL.find(internalErrorCode);
     if (iter != ERROR_CODE_MAP_EXTERNAL.end()) {
         return iter->second;
-    } else {
-        return ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR;
     }
+    return ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR;
 }
 
 std::string QueryExternalErrorMessage(int32_t internalErrorCode, int32_t externalErrorCode)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,16 +27,10 @@
 
 namespace OHOS {
 namespace AbilityRuntime {
-struct AsyncRequestPublishFormCallbackInfo {
-    napi_env env = nullptr;
-    napi_async_work asyncWork = nullptr;
-    napi_deferred deferred = nullptr;
-    napi_ref callback = nullptr;
+struct RequestPublishFormCallbackInfo {
     Want want {};
     bool withFormBindingData = false;
     std::unique_ptr<OHOS::AppExecFwk::FormProviderData> formProviderData = nullptr;
-    int32_t result = OHOS::ERR_OK;
-    int64_t formId = 0;
 };
 
 struct AsyncIsRequestPublishFormSupportedCallbackInfo : AsyncCallbackInfoBase {
@@ -68,10 +62,14 @@ public:
     static NativeValue* GetFormsInfo(NativeEngine* engine, NativeCallbackInfo* info);
     static NativeValue* SetFormNextRefreshTime(NativeEngine *engine, NativeCallbackInfo *info);
     static NativeValue* UpdateForm(NativeEngine *engine, NativeCallbackInfo *info);
+    static NativeValue* IsRequestPublishFormSupported(NativeEngine *engine, NativeCallbackInfo *info);
+    static NativeValue* RequestPublishForm(NativeEngine *engine, NativeCallbackInfo *info);
 private:
     NativeValue* OnGetFormsInfo(NativeEngine &engine, NativeCallbackInfo &info);
     NativeValue* OnSetFormNextRefreshTime(NativeEngine &engine, NativeCallbackInfo &info);
     NativeValue* OnUpdateForm(NativeEngine &engine, NativeCallbackInfo &info);
+    NativeValue* OnIsRequestPublishFormSupported(NativeEngine &engine, NativeCallbackInfo &info);
+    NativeValue* OnRequestPublishForm(NativeEngine &engine, NativeCallbackInfo &info);
 };
 }  // namespace AbilityRuntime
 }  // namespace OHOS
