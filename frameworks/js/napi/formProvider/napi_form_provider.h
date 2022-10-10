@@ -27,26 +27,6 @@
 
 namespace OHOS {
 namespace AbilityRuntime {
-struct AsyncNextRefreshTimeFormCallbackInfo {
-    napi_env env;
-    napi_async_work asyncWork;
-    napi_deferred deferred;
-    napi_ref callback;
-    int64_t formId;
-    int32_t time;
-    int32_t result;
-};
-
-struct AsyncUpdateFormCallbackInfo {
-    napi_env env;
-    napi_async_work asyncWork;
-    napi_deferred deferred;
-    napi_ref callback;
-    int64_t formId;
-    std::shared_ptr<OHOS::AppExecFwk::FormProviderData> formProviderData;
-    int32_t result;
-};
-
 struct AsyncRequestPublishFormCallbackInfo {
     napi_env env = nullptr;
     napi_async_work asyncWork = nullptr;
@@ -66,8 +46,6 @@ struct AsyncIsRequestPublishFormSupportedCallbackInfo : AsyncCallbackInfoBase {
     ~AsyncIsRequestPublishFormSupportedCallbackInfo() override = default;
 };
 
-napi_value NAPI_SetFormNextRefreshTime(napi_env env, napi_callback_info info);
-napi_value NAPI_UpdateForm(napi_env env, napi_callback_info info);
 napi_value NAPI_RequestPublishForm(napi_env env, napi_callback_info info);
 
 /**
@@ -88,8 +66,12 @@ public:
 
     static void Finalizer(NativeEngine* engine, void* data, void* hint);
     static NativeValue* GetFormsInfo(NativeEngine* engine, NativeCallbackInfo* info);
+    static NativeValue* SetFormNextRefreshTime(NativeEngine *engine, NativeCallbackInfo *info);
+    static NativeValue* UpdateForm(NativeEngine *engine, NativeCallbackInfo *info);
 private:
     NativeValue* OnGetFormsInfo(NativeEngine &engine, NativeCallbackInfo &info);
+    NativeValue* OnSetFormNextRefreshTime(NativeEngine &engine, NativeCallbackInfo &info);
+    NativeValue* OnUpdateForm(NativeEngine &engine, NativeCallbackInfo &info);
 };
 }  // namespace AbilityRuntime
 }  // namespace OHOS

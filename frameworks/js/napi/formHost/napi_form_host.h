@@ -25,42 +25,6 @@
 
 namespace OHOS {
 namespace AbilityRuntime {
-struct AsyncDelFormCallbackInfo {
-    napi_env env;
-    napi_async_work asyncWork;
-    napi_deferred deferred;
-    napi_ref callback;
-    int64_t formId;
-    int result;
-};
-
-struct AsyncReleaseFormCallbackInfo {
-    napi_env env;
-    napi_async_work asyncWork;
-    napi_deferred deferred;
-    napi_ref callback;
-    int64_t formId;
-    bool isReleaseCache;
-    int result;
-};
-
-struct AsyncRequestFormCallbackInfo {
-    napi_env env;
-    napi_async_work asyncWork;
-    napi_deferred deferred;
-    napi_ref callback;
-    int64_t formId;
-    int result;
-};
-
-struct AsyncCastTempFormCallbackInfo {
-    napi_env env;
-    napi_async_work asyncWork;
-    napi_deferred deferred;
-    napi_ref callback;
-    int64_t formId;
-    int result;
-};
 
 struct AsyncNotifyVisibleFormsCallbackInfo {
     napi_env env;
@@ -78,32 +42,6 @@ struct AsyncNotifyInvisibleFormsCallbackInfo {
     napi_ref callback;
     std::vector<int64_t> formIds;
     int result;
-};
-
-struct AsyncEnableUpdateFormCallbackInfo {
-    napi_env env;
-    napi_async_work asyncWork;
-    napi_deferred deferred;
-    napi_ref callback;
-    std::vector<int64_t> formIds;
-    int result;
-};
-
-struct AsyncDisableUpdateFormCallbackInfo {
-    napi_env env;
-    napi_async_work asyncWork;
-    napi_deferred deferred;
-    napi_ref callback;
-    std::vector<int64_t> formIds;
-    int result;
-};
-
-struct AsyncCheckFMSReadyCallbackInfo {
-    napi_env env;
-    napi_async_work asyncWork;
-    napi_deferred deferred;
-    napi_ref callback;
-    bool isFMSReady;
 };
 
 struct AsyncDeleteInvalidFormsCallbackInfo {
@@ -147,34 +85,14 @@ struct AsyncNotifyFormsEnableUpdateCallbackInfo {
     int result;
 };
 
-struct AsyncGetFormsInfoCallbackInfo {
-    napi_env env;
-    napi_async_work asyncWork;
-    napi_deferred deferred;
-    napi_ref callback;
-    std::vector<OHOS::AppExecFwk::FormInfo> formInfos;
-    std::string bundleName;
-    std::string moduleName;
-    int result;
-};
-
-napi_value NAPI_DeleteForm(napi_env env, napi_callback_info info);
-napi_value NAPI_ReleaseForm(napi_env env, napi_callback_info info);
-napi_value NAPI_RequestForm(napi_env env, napi_callback_info info);
-napi_value NAPI_CastTempForm(napi_env env, napi_callback_info info);
 napi_value NAPI_NotifyVisibleForms(napi_env env, napi_callback_info info);
 napi_value NAPI_NotifyInvisibleForms(napi_env env, napi_callback_info info);
-napi_value NAPI_EnableFormsUpdate(napi_env env, napi_callback_info info);
-napi_value NAPI_DisableFormsUpdate(napi_env env, napi_callback_info info);
-napi_value NAPI_CheckFMSReady(napi_env env, napi_callback_info info);
 napi_value NAPI_DeleteInvalidForms(napi_env env, napi_callback_info info);
 napi_value NAPI_AcquireFormState(napi_env env, napi_callback_info info);
 napi_value NAPI_RegisterFormUninstallObserver(napi_env env, napi_callback_info info);
 napi_value NAPI_UnregisterFormUninstallObserver(napi_env env, napi_callback_info info);
 napi_value NAPI_NotifyFormsVisible(napi_env env, napi_callback_info info);
 napi_value NAPI_NotifyFormsEnableUpdate(napi_env env, napi_callback_info info);
-napi_value NAPI_GetAllFormsInfo(napi_env env, napi_callback_info info);
-napi_value NAPI_GetFormsInfo(napi_env env, napi_callback_info info);
 
 using ShareFormTask = std::function<void(int32_t)>;
 class JsFormHost {
@@ -184,12 +102,32 @@ public:
 
     static void Finalizer(NativeEngine* engine, void* data, void* hint);
     static NativeValue* ShareForm(NativeEngine* engine, NativeCallbackInfo* info);
+    static NativeValue* DisableFormsUpdate(NativeEngine *engine, NativeCallbackInfo *info);
+    static NativeValue* IsSystemReady(NativeEngine *engine, NativeCallbackInfo *info);
+    static NativeValue* DeleteForm(NativeEngine *engine, NativeCallbackInfo *info);
+    static NativeValue* ReleaseForm(NativeEngine *engine, NativeCallbackInfo *info);
+    static NativeValue* RequestForm(NativeEngine *engine, NativeCallbackInfo *info);
+    static NativeValue* CastTempForm(NativeEngine *engine, NativeCallbackInfo *info);
+    static NativeValue* GetAllFormsInfo(NativeEngine *engine, NativeCallbackInfo *info);
+    static NativeValue* GetFormsInfo(NativeEngine *engine, NativeCallbackInfo *info);
+    static NativeValue* EnableFormsUpdate(NativeEngine *engine, NativeCallbackInfo *info);
     static NativeValue* NotifyFormsPrivacyProtected(NativeEngine *engine, NativeCallbackInfo *info);
 private:
+    NativeValue* OnDisableFormsUpdate(NativeEngine &engine, NativeCallbackInfo &info);
+    NativeValue* OnIsSystemReady(NativeEngine &engine, NativeCallbackInfo &info);
+    NativeValue* OnDeleteForm(NativeEngine &engine, NativeCallbackInfo &info);
+    NativeValue* OnReleaseForm(NativeEngine &engine, NativeCallbackInfo &info);
+    NativeValue* OnRequestForm(NativeEngine &engine, NativeCallbackInfo &info);
+    NativeValue* OnCastTempForm(NativeEngine &engine, NativeCallbackInfo &info);
+    NativeValue* OnGetAllFormsInfo(NativeEngine &engine, NativeCallbackInfo &info);
+    NativeValue* OnGetFormsInfo(NativeEngine &engine, NativeCallbackInfo &info);
+    NativeValue* OnEnableFormsUpdate(NativeEngine &engine, NativeCallbackInfo &info);
     NativeValue* OnShareForm(NativeEngine &engine, NativeCallbackInfo &info);
     NativeValue* OnNotifyFormsPrivacyProtected(NativeEngine &engine, NativeCallbackInfo &info);
     void InnerShareForm(NativeEngine &engine, const std::shared_ptr<OHOS::AbilityRuntime::AsyncTask> &asyncTask,
         ShareFormTask &&task, int64_t formId, const std::string &remoteDeviceId);
+    bool GetStringsValue(NativeEngine &engine, NativeValue *object, std::vector<std::string> &strList);
+    bool UnwrapGetFormsInfoParams(NativeEngine &engine, NativeCallbackInfo &info, std::string &moduleName, bool &bParam);
 };
 }  // namespace AbilityRuntime
 }  // namespace OHOS

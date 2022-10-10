@@ -41,7 +41,8 @@ static NativeValue* JsProviderInit(NativeEngine* engine, NativeValue* exports)
 
     const char *moduleName = "JsFormProvider";
     BindNativeFunction(*engine, *object, "getFormsInfo", moduleName, JsFormProvider::GetFormsInfo);
-
+    BindNativeFunction(*engine, *object, "setFormNextRefreshTime", moduleName, JsFormProvider::SetFormNextRefreshTime);
+    BindNativeFunction(*engine, *object, "updateForm", moduleName, JsFormProvider::UpdateForm);
     return exports;
 }
 
@@ -57,8 +58,6 @@ static napi_value Init(napi_env env, napi_value exports)
 {
     HILOG_INFO("napi_module Init start...");
     napi_property_descriptor properties[] = {
-        DECLARE_NAPI_FUNCTION("setFormNextRefreshTime", NAPI_SetFormNextRefreshTime),
-        DECLARE_NAPI_FUNCTION("updateForm", NAPI_UpdateForm),
         DECLARE_NAPI_FUNCTION("requestPublishForm", NAPI_RequestPublishForm),
         DECLARE_NAPI_FUNCTION("isRequestPublishFormSupported", NAPI_IsRequestPublishFormSupported),
     };
