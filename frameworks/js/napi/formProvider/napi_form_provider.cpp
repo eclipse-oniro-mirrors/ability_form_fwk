@@ -601,7 +601,7 @@ NativeValue* JsFormProvider::OnUpdateForm(NativeEngine &engine, NativeCallbackIn
     }
     int64_t formId = 0;
     std::string strFormId;
-    bool confirm = ConvertFromJ sValue(engine, info.argv[PARAM0], strFormId);
+    bool confirm = ConvertFromJsValue(engine, info.argv[PARAM0], strFormId);
     if (!confirm) {
         HILOG_ERROR("ConvertFromJsValue failed.");
         errCode = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR;
