@@ -95,10 +95,10 @@ napi_value NAPI_NotifyFormsVisible(napi_env env, napi_callback_info info);
 napi_value NAPI_NotifyFormsEnableUpdate(napi_env env, napi_callback_info info);
 
 using ShareFormTask = std::function<void(int32_t)>;
-class JsFormHost {
+class NapiFormHost {
 public:
-    JsFormHost() = default;
-    ~JsFormHost() = default;
+    NapiFormHost() = default;
+    ~NapiFormHost() = default;
 
     static void Finalizer(NativeEngine* engine, void* data, void* hint);
     static NativeValue* ShareForm(NativeEngine* engine, NativeCallbackInfo* info);

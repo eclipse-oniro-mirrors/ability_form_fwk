@@ -1576,73 +1576,73 @@ private:
     std::shared_ptr<AppExecFwk::EventHandler> handler_;
 };
 
-void JsFormHost::Finalizer(NativeEngine *engine, void *data, void *hint)
+void NapiFormHost::Finalizer(NativeEngine *engine, void *data, void *hint)
 {
-    HILOG_DEBUG("JsFormHost::Finalizer is called");
-    std::unique_ptr<JsFormHost>(static_cast<JsFormHost*>(data));
+    HILOG_DEBUG("NapiFormHost::Finalizer is called");
+    std::unique_ptr<NapiFormHost>(static_cast<NapiFormHost*>(data));
 }
 
-NativeValue* JsFormHost::ShareForm(NativeEngine *engine, NativeCallbackInfo *info)
+NativeValue* NapiFormHost::ShareForm(NativeEngine *engine, NativeCallbackInfo *info)
 {
-    JsFormHost *me = OHOS::AbilityRuntime::CheckParamsAndGetThis<JsFormHost>(engine, info);
+    NapiFormHost *me = OHOS::AbilityRuntime::CheckParamsAndGetThis<NapiFormHost>(engine, info);
     return (me != nullptr) ? me->OnShareForm(*engine, *info) : nullptr;
 }
 
-NativeValue* JsFormHost::DisableFormsUpdate(NativeEngine *engine, NativeCallbackInfo *info)
+NativeValue* NapiFormHost::DisableFormsUpdate(NativeEngine *engine, NativeCallbackInfo *info)
 {
-    JsFormHost *me = OHOS::AbilityRuntime::CheckParamsAndGetThis<JsFormHost>(engine, info);
+    NapiFormHost *me = OHOS::AbilityRuntime::CheckParamsAndGetThis<NapiFormHost>(engine, info);
     return (me != nullptr) ? me->OnDisableFormsUpdate(*engine, *info) : nullptr;
 }
 
-NativeValue* JsFormHost::IsSystemReady(NativeEngine *engine, NativeCallbackInfo *info)
+NativeValue* NapiFormHost::IsSystemReady(NativeEngine *engine, NativeCallbackInfo *info)
 {
-    JsFormHost *me = OHOS::AbilityRuntime::CheckParamsAndGetThis<JsFormHost>(engine, info);
+    NapiFormHost *me = OHOS::AbilityRuntime::CheckParamsAndGetThis<NapiFormHost>(engine, info);
     return (me != nullptr) ? me->OnIsSystemReady(*engine, *info) : nullptr;
 }
 
-NativeValue* JsFormHost::GetAllFormsInfo(NativeEngine *engine, NativeCallbackInfo *info)
+NativeValue* NapiFormHost::GetAllFormsInfo(NativeEngine *engine, NativeCallbackInfo *info)
 {
-    JsFormHost *me = OHOS::AbilityRuntime::CheckParamsAndGetThis<JsFormHost>(engine, info);
+    NapiFormHost *me = OHOS::AbilityRuntime::CheckParamsAndGetThis<NapiFormHost>(engine, info);
     return (me != nullptr) ? me->OnGetAllFormsInfo(*engine, *info) : nullptr;
 }
 
-NativeValue* JsFormHost::GetFormsInfo(NativeEngine *engine, NativeCallbackInfo *info)
+NativeValue* NapiFormHost::GetFormsInfo(NativeEngine *engine, NativeCallbackInfo *info)
 {
-    JsFormHost *me = OHOS::AbilityRuntime::CheckParamsAndGetThis<JsFormHost>(engine, info);
+    NapiFormHost *me = OHOS::AbilityRuntime::CheckParamsAndGetThis<NapiFormHost>(engine, info);
     return (me != nullptr) ? me->OnGetFormsInfo(*engine, *info) : nullptr;
 }
 
-NativeValue* JsFormHost::DeleteForm(NativeEngine *engine, NativeCallbackInfo *info)
+NativeValue* NapiFormHost::DeleteForm(NativeEngine *engine, NativeCallbackInfo *info)
 {
-    JsFormHost *me = OHOS::AbilityRuntime::CheckParamsAndGetThis<JsFormHost>(engine, info);
+    NapiFormHost *me = OHOS::AbilityRuntime::CheckParamsAndGetThis<NapiFormHost>(engine, info);
     return (me != nullptr) ? me->OnDeleteForm(*engine, *info) : nullptr;
 }
 
-NativeValue* JsFormHost::ReleaseForm(NativeEngine *engine, NativeCallbackInfo *info)
+NativeValue* NapiFormHost::ReleaseForm(NativeEngine *engine, NativeCallbackInfo *info)
 {
-    JsFormHost *me = OHOS::AbilityRuntime::CheckParamsAndGetThis<JsFormHost>(engine, info);
+    NapiFormHost *me = OHOS::AbilityRuntime::CheckParamsAndGetThis<NapiFormHost>(engine, info);
     return (me != nullptr) ? me->OnReleaseForm(*engine, *info) : nullptr;
 }
 
-NativeValue* JsFormHost::RequestForm(NativeEngine *engine, NativeCallbackInfo *info)
+NativeValue* NapiFormHost::RequestForm(NativeEngine *engine, NativeCallbackInfo *info)
 {
-    JsFormHost *me = OHOS::AbilityRuntime::CheckParamsAndGetThis<JsFormHost>(engine, info);
+    NapiFormHost *me = OHOS::AbilityRuntime::CheckParamsAndGetThis<NapiFormHost>(engine, info);
     return (me != nullptr) ? me->OnRequestForm(*engine, *info) : nullptr;
 }
 
-NativeValue* JsFormHost::CastTempForm(NativeEngine *engine, NativeCallbackInfo *info)
+NativeValue* NapiFormHost::CastTempForm(NativeEngine *engine, NativeCallbackInfo *info)
 {
-    JsFormHost *me = OHOS::AbilityRuntime::CheckParamsAndGetThis<JsFormHost>(engine, info);
+    NapiFormHost *me = OHOS::AbilityRuntime::CheckParamsAndGetThis<NapiFormHost>(engine, info);
     return (me != nullptr) ? me->OnCastTempForm(*engine, *info) : nullptr;
 }
 
-NativeValue* JsFormHost::EnableFormsUpdate(NativeEngine *engine, NativeCallbackInfo *info)
+NativeValue* NapiFormHost::EnableFormsUpdate(NativeEngine *engine, NativeCallbackInfo *info)
 {
-    JsFormHost *me = OHOS::AbilityRuntime::CheckParamsAndGetThis<JsFormHost>(engine, info);
+    NapiFormHost *me = OHOS::AbilityRuntime::CheckParamsAndGetThis<NapiFormHost>(engine, info);
     return (me != nullptr) ? me->OnEnableFormsUpdate(*engine, *info) : nullptr;
 }
 
-NativeValue* JsFormHost::OnShareForm(NativeEngine &engine, NativeCallbackInfo &info)
+NativeValue* NapiFormHost::OnShareForm(NativeEngine &engine, NativeCallbackInfo &info)
 {
     HILOG_DEBUG("%{public}s is called", __FUNCTION__);
     int32_t errCode = ERR_OK;
@@ -1694,7 +1694,7 @@ NativeValue* JsFormHost::OnShareForm(NativeEngine &engine, NativeCallbackInfo &i
     return result;
 }
 
-NativeValue* JsFormHost::OnDisableFormsUpdate(NativeEngine &engine, NativeCallbackInfo &info)
+NativeValue* NapiFormHost::OnDisableFormsUpdate(NativeEngine &engine, NativeCallbackInfo &info)
 {
     HILOG_DEBUG("%{public}s is called", __FUNCTION__);
     int32_t errCode = ERR_OK;
@@ -1744,12 +1744,12 @@ NativeValue* JsFormHost::OnDisableFormsUpdate(NativeEngine &engine, NativeCallba
 
     auto callback = (info.argc == ARGS_ONE) ? nullptr : info.argv[PARAM1];
     NativeValue *result = nullptr;
-    AsyncTask::Schedule("JsFormHost::OnDisableFormsUpdate",
+    AsyncTask::Schedule("NapiFormHost::OnDisableFormsUpdate",
         engine, CreateAsyncTaskWithLastParam(engine, callback, nullptr, std::move(complete), &result));
     return result;
 }
 
-NativeValue* JsFormHost::OnIsSystemReady(NativeEngine &engine, NativeCallbackInfo &info)
+NativeValue* NapiFormHost::OnIsSystemReady(NativeEngine &engine, NativeCallbackInfo &info)
 {
     HILOG_DEBUG("%{public}s is called", __FUNCTION__);
     if (info.argc > ARGS_ONE || info.argc < ARGS_ZERO) {
@@ -1771,12 +1771,12 @@ NativeValue* JsFormHost::OnIsSystemReady(NativeEngine &engine, NativeCallbackInf
 
     auto callback = (info.argc == ARGS_ZERO) ? nullptr : info.argv[PARAM0];
     NativeValue *result = nullptr;
-    AsyncTask::Schedule("JsFormHost::OnIsSystemReady",
+    AsyncTask::Schedule("NapiFormHost::OnIsSystemReady",
         engine, CreateAsyncTaskWithLastParam(engine, callback, nullptr, std::move(complete), &result));
     return result;
 }
 
-NativeValue* JsFormHost::OnGetAllFormsInfo(NativeEngine &engine, NativeCallbackInfo &info)
+NativeValue* NapiFormHost::OnGetAllFormsInfo(NativeEngine &engine, NativeCallbackInfo &info)
 {
     HILOG_DEBUG("%{public}s is called", __FUNCTION__);
     if (info.argc > ARGS_ONE || info.argc < ARGS_ZERO) {
@@ -1797,12 +1797,12 @@ NativeValue* JsFormHost::OnGetAllFormsInfo(NativeEngine &engine, NativeCallbackI
 
     auto callback = (info.argc == ARGS_ZERO) ? nullptr : info.argv[PARAM0];
     NativeValue *result = nullptr;
-    AsyncTask::Schedule("JsFormHost::OnGetAllFormsInfo",
+    AsyncTask::Schedule("NapiFormHost::OnGetAllFormsInfo",
         engine, CreateAsyncTaskWithLastParam(engine, callback, nullptr, std::move(complete), &result));
     return result;
 }
 
-NativeValue* JsFormHost::OnGetFormsInfo(NativeEngine &engine, NativeCallbackInfo &info)
+NativeValue* NapiFormHost::OnGetFormsInfo(NativeEngine &engine, NativeCallbackInfo &info)
 {
     HILOG_DEBUG("%{public}s is called", __FUNCTION__);
     int32_t errCode = ERR_OK;
@@ -1846,12 +1846,12 @@ NativeValue* JsFormHost::OnGetFormsInfo(NativeEngine &engine, NativeCallbackInfo
 
     NativeValue *result = nullptr;
     auto callback = flagCall ? ((info.argc == ARGS_TWO) ? info.argv[PARAM1] : info.argv[PARAM2]) : nullptr;
-    AsyncTask::Schedule("JsFormHost::OnGetFormsInfo",
+    AsyncTask::Schedule("NapiFormHost::OnGetFormsInfo",
         engine, CreateAsyncTaskWithLastParam(engine, callback, nullptr, std::move(complete), &result));
     return result;
 }
 
-NativeValue* JsFormHost::OnDeleteForm(NativeEngine &engine, NativeCallbackInfo &info)
+NativeValue* NapiFormHost::OnDeleteForm(NativeEngine &engine, NativeCallbackInfo &info)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
 
@@ -1893,12 +1893,12 @@ NativeValue* JsFormHost::OnDeleteForm(NativeEngine &engine, NativeCallbackInfo &
 
     NativeValue* lastParam = (info.argc == ARGS_ONE) ? nullptr : info.argv[PARAM1];
     NativeValue* result = nullptr;
-    AsyncTask::Schedule("JsFormHost::OnDeleteForm",
+    AsyncTask::Schedule("NapiFormHost::OnDeleteForm",
         engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
     return result;
 }
 
-NativeValue* JsFormHost::OnReleaseForm(NativeEngine &engine, NativeCallbackInfo &info)
+NativeValue* NapiFormHost::OnReleaseForm(NativeEngine &engine, NativeCallbackInfo &info)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
 
@@ -1935,7 +1935,7 @@ NativeValue* JsFormHost::OnReleaseForm(NativeEngine &engine, NativeCallbackInfo 
         }
     }
 
-    AsyncTask::CompleteCallback complete = [formId, errCode, isReleaseCache] 
+    AsyncTask::CompleteCallback complete = [formId, errCode, isReleaseCache]
         (NativeEngine &engine, AsyncTask &task, int32_t status) {
             auto ret = ERR_COMMON;
             if (errCode != ERR_OK) {
@@ -1958,12 +1958,12 @@ NativeValue* JsFormHost::OnReleaseForm(NativeEngine &engine, NativeCallbackInfo 
         (info.argc == ARGS_TWO && info.argv[PARAM1]->TypeOf() != NATIVE_FUNCTION) ? nullptr :
         (info.argc == ARGS_THREE) ? info.argv[PARAM2] : info.argv[PARAM1];
     NativeValue* result = nullptr;
-    AsyncTask::Schedule("JsFormHost::OnReleaseForm",
+    AsyncTask::Schedule("NapiFormHost::OnReleaseForm",
         engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
     return result;
 }
 
-NativeValue* JsFormHost::OnRequestForm(NativeEngine &engine, NativeCallbackInfo &info)
+NativeValue* NapiFormHost::OnRequestForm(NativeEngine &engine, NativeCallbackInfo &info)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
 
@@ -2006,12 +2006,12 @@ NativeValue* JsFormHost::OnRequestForm(NativeEngine &engine, NativeCallbackInfo 
 
     NativeValue* lastParam = (info.argc == ARGS_ONE) ? nullptr : info.argv[PARAM1];
     NativeValue* result = nullptr;
-    AsyncTask::Schedule("JsFormHost::OnRequestForm",
+    AsyncTask::Schedule("NapiFormHost::OnRequestForm",
         engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
     return result;
 }
 
-NativeValue* JsFormHost::OnCastTempForm(NativeEngine &engine, NativeCallbackInfo &info)
+NativeValue* NapiFormHost::OnCastTempForm(NativeEngine &engine, NativeCallbackInfo &info)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
 
@@ -2053,12 +2053,12 @@ NativeValue* JsFormHost::OnCastTempForm(NativeEngine &engine, NativeCallbackInfo
 
     NativeValue* lastParam = (info.argc == ARGS_ONE) ? nullptr : info.argv[PARAM1];
     NativeValue* result = nullptr;
-    AsyncTask::Schedule("JsFormHost::OnCastTempForm",
+    AsyncTask::Schedule("NapiFormHost::OnCastTempForm",
         engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
     return result;
 }
 
-NativeValue* JsFormHost::OnEnableFormsUpdate(NativeEngine &engine, NativeCallbackInfo &info)
+NativeValue* NapiFormHost::OnEnableFormsUpdate(NativeEngine &engine, NativeCallbackInfo &info)
 {
     HILOG_DEBUG("%{public}s is called", __FUNCTION__);
 
@@ -2105,12 +2105,12 @@ NativeValue* JsFormHost::OnEnableFormsUpdate(NativeEngine &engine, NativeCallbac
 
     auto callback = (info.argc == ARGS_ONE) ? nullptr : info.argv[PARAM1];
     NativeValue *result = nullptr;
-    AsyncTask::Schedule("JsFormHost::OnEnableFormsUpdate",
+    AsyncTask::Schedule("NapiFormHost::OnEnableFormsUpdate",
         engine, CreateAsyncTaskWithLastParam(engine, callback, nullptr, std::move(complete), &result));
     return result;
 }
 
-bool JsFormHost::GetStringsValue(NativeEngine &engine, NativeValue *object, std::vector<std::string> &strList)
+bool NapiFormHost::GetStringsValue(NativeEngine &engine, NativeValue *object, std::vector<std::string> &strList)
 {
     auto array = ConvertNativeValueTo<NativeArray>(object);
     if (array == nullptr) {
@@ -2134,7 +2134,7 @@ bool JsFormHost::GetStringsValue(NativeEngine &engine, NativeValue *object, std:
     return true;
 }
 
-bool JsFormHost::UnwrapGetFormsInfoParams(
+bool NapiFormHost::UnwrapGetFormsInfoParams(
     NativeEngine &engine, NativeCallbackInfo &info, std::string &moduleName, bool &bParam)
 {
     bool flagCall = true;
@@ -2159,7 +2159,7 @@ bool JsFormHost::UnwrapGetFormsInfoParams(
     return flagCall;
 }
 
-void JsFormHost::InnerShareForm(
+void NapiFormHost::InnerShareForm(
     NativeEngine &engine,
     const std::shared_ptr<AbilityRuntime::AsyncTask> &asyncTask,
     ShareFormTask &&task,
@@ -2181,13 +2181,13 @@ void JsFormHost::InnerShareForm(
     }
 }
 
-NativeValue* JsFormHost::NotifyFormsPrivacyProtected(NativeEngine *engine, NativeCallbackInfo *info)
+NativeValue* NapiFormHost::NotifyFormsPrivacyProtected(NativeEngine *engine, NativeCallbackInfo *info)
 {
-    JsFormHost* me = OHOS::AbilityRuntime::CheckParamsAndGetThis<JsFormHost>(engine, info);
+    NapiFormHost* me = OHOS::AbilityRuntime::CheckParamsAndGetThis<NapiFormHost>(engine, info);
     return (me != nullptr) ? me->OnNotifyFormsPrivacyProtected(*engine, *info) : nullptr;
 }
 
-NativeValue* JsFormHost::OnNotifyFormsPrivacyProtected(NativeEngine &engine, NativeCallbackInfo &info)
+NativeValue* NapiFormHost::OnNotifyFormsPrivacyProtected(NativeEngine &engine, NativeCallbackInfo &info)
 {
     HILOG_INFO("%{public}s is called", __func__);
     if (info.argc > ARGS_SIZE_THREE || info.argc < ARGS_SIZE_TWO) {
@@ -2203,7 +2203,7 @@ NativeValue* JsFormHost::OnNotifyFormsPrivacyProtected(NativeEngine &engine, Nat
         HILOG_ERROR("get formIds faild, code is %{public}d", errCode);
         return nullptr;
     }
-    
+
     // The promise form has only two parameters
     decltype(info.argc) unwrapArgc = 2;
     bool isProtected = false;
@@ -2234,7 +2234,7 @@ NativeValue* JsFormHost::OnNotifyFormsPrivacyProtected(NativeEngine &engine, Nat
 
     NativeValue *lastParam = (info.argc <= unwrapArgc) ? nullptr : info.argv[unwrapArgc];
     NativeValue *result = nullptr;
-    AsyncTask::Schedule("JsFormHost::OnNotifyFormsPrivacyProtected",
+    AsyncTask::Schedule("NapiFormHost::OnNotifyFormsPrivacyProtected",
         engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
     return result;
 }
