@@ -131,6 +131,9 @@ int FormSupplyCallback::OnAcquireStateResult(FormState state,
 void FormSupplyCallback::AddConnection(sptr<FormAbilityConnection> connection)
 {
     HILOG_INFO("%{public}s called.", __func__);
+    if (connection == nullptr) {
+        return;
+    }
     int32_t connectKey = static_cast<int32_t>(FormUtil::GetCurrentMillisecond());
     std::lock_guard<std::mutex> lock(conMutex_);
     while (connections_.find(connectKey) != connections_.end()) {
@@ -175,6 +178,10 @@ void FormSupplyCallback::RemoveConnection(int32_t connectId)
  */
 bool FormSupplyCallback::CanDisconnect(sptr<FormAbilityConnection> &connection)
 {
+    if (connection == nullptr) {
+        HILOG_ERROR("connection is nullptr");
+        return false;
+    }
     HILOG_INFO("%{public}s called.", __func__);
     int count = 0;
     std::lock_guard<std::mutex> lock(conMutex_);

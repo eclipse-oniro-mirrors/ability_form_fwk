@@ -58,6 +58,9 @@ static NativeValue* JsFormHostInit(NativeEngine *engine, NativeValue *exports)
     OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "getFormsInfo", moduleName, JsFormHost::GetFormsInfo);
     OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "enableFormsUpdate", moduleName,
         JsFormHost::EnableFormsUpdate);
+    OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "notifyFormsPrivacyProtected",
+        moduleName, JsFormHost::NotifyFormsPrivacyProtected);
+
     return exports;
 }
 

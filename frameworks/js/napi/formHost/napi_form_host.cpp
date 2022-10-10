@@ -2180,5 +2180,63 @@ void JsFormHost::InnerShareForm(
         FormHostClient::GetInstance()->RemoveShareFormCallback(requestCode);
     }
 }
+
+NativeValue* JsFormHost::NotifyFormsPrivacyProtected(NativeEngine *engine, NativeCallbackInfo *info)
+{
+    JsFormHost* me = OHOS::AbilityRuntime::CheckParamsAndGetThis<JsFormHost>(engine, info);
+    return (me != nullptr) ? me->OnNotifyFormsPrivacyProtected(*engine, *info) : nullptr;
+}
+
+NativeValue* JsFormHost::OnNotifyFormsPrivacyProtected(NativeEngine &engine, NativeCallbackInfo &info)
+{
+    HILOG_INFO("%{public}s is called", __func__);
+    if (info.argc > ARGS_SIZE_THREE || info.argc < ARGS_SIZE_TWO) {
+        HILOG_ERROR("%{public}s, wrong number of arguments.", __func__);
+        return nullptr;
+    }
+
+    ErrCode errCode = ERR_OK;
+    std::vector<int64_t> formIds {};
+    GetFormIds(reinterpret_cast<napi_env>(&engine), reinterpret_cast<napi_value>(info.argv[0]),
+        errCode, formIds);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("get formIds faild, code is %{public}d", errCode);
+        return nullptr;
+    }
+    
+    // The promise form has only two parameters
+    decltype(info.argc) unwrapArgc = 2;
+    bool isProtected = false;
+
+    if (!ConvertFromJsValue(engine, info.argv[1], isProtected)) {
+        HILOG_ERROR("convert from Js value failed!");
+        return nullptr;
+    }
+
+    AsyncTask::CompleteCallback complete =
+        [formIds, isProtected, errCode](NativeEngine &engine, AsyncTask &task, int32_t status) {
+            if (errCode != ERR_OK) {
+                HILOG_ERROR("task reject, code is %{public}d", errCode);
+                task.Reject(engine, CreateJsError(engine, errCode, QueryRetMsg(errCode)));
+                return;
+            }
+
+            auto ret = FormMgr::GetInstance().NotifyFormsPrivacyProtected(formIds,
+                isProtected, FormHostClient::GetInstance());
+            if (ret == ERR_OK) {
+                task.Resolve(engine, engine.CreateUndefined());
+            } else {
+                HILOG_ERROR("task reject, result code is %{public}d", ret);
+                auto retCode = QueryRetCode(ret);
+                task.Reject(engine, CreateJsError(engine, retCode, QueryRetMsg(retCode)));
+            }
+        };
+
+    NativeValue *lastParam = (info.argc <= unwrapArgc) ? nullptr : info.argv[unwrapArgc];
+    NativeValue *result = nullptr;
+    AsyncTask::Schedule("JsFormHost::OnNotifyFormsPrivacyProtected",
+        engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
+    return result;
+}
 }  // namespace AbilityRuntime
 }  // namespace OHOS
