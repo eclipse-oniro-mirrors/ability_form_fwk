@@ -17,6 +17,7 @@
 #define OHOS_FORM_FWK_NAPI_FORM_UTIL_H
 
 #include "ability.h"
+#include "js_runtime_utils.h"
 #include "napi/native_api.h"
 #include "napi/native_common.h"
 #include "napi/native_node_api.h"
@@ -48,6 +49,14 @@ const int32_t ERR_FORM_DUPLICATE_ADDED = 31;
 const int32_t ERR_IN_RECOVERY = 36;
 const int32_t ERR_DISTRIBUTED_SCHEDULE_FAILED = 37;
 
+enum {
+    ERR_FORM_EXTERNAL_PERMISSION_DENIED = 201,
+    ERR_FORM_EXTERNAL_PARAM_INVALID = 401,
+    ERR_FORM_EXTERNAL_SYSTEMCAP_ERROR = 801,
+    ERR_FORM_EXTERNAL_KERNEL_ERROR = 16500001,
+    ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR = 16501000,
+};
+
 const int32_t CALLBACK_RETURN_MSG_SIZE = 2;
 
 struct AsyncCallbackInfoBase {
@@ -68,6 +77,24 @@ struct AsyncErrMsgCallbackInfo {
     napi_value callbackValue;
     int code;
     int type;
+};
+
+class NapiFormUtil {
+public:
+    static bool Throw(NativeEngine &engine, int32_t errCode, const std::string &errMessage);
+
+    static bool ThrowByInternalErrorCode(NativeEngine &engine, int32_t internalErrorCode);
+
+    static NativeValue *CreateErrorByInternalErrorCode(NativeEngine &engine, int32_t internalErrorCode);
+
+    static bool ThrowParamTypeError(NativeEngine &engine, const std::string &paramName, const std::string &type);
+
+    static bool ThrowParamNumError(NativeEngine &engine, const std::string &gotNum, const std::string &expectedNum);
+
+    static bool ThrowParamError(NativeEngine &engine, const std::string &extraMessage);
+
+private:
+    static std::string CreateParamTypeErrorMessage(const std::string &paramName, const std::string &type);
 };
 
 std::string QueryRetMsg(int32_t errorCode);

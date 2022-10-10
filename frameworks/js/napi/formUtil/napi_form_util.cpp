@@ -32,6 +32,7 @@ using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
 namespace AbilityRuntime {
+namespace {
 constexpr size_t ARGS_SIZE_TWO = 2;
 constexpr int INT_64_LENGTH = 19;
 constexpr int ZERO_VALUE = 0;
@@ -110,6 +111,151 @@ const std::map<int32_t, std::string> CODE_MSG_MAP = {
     { ERR_DISTRIBUTED_SCHEDULE_FAILED, "failed to distributed schedule" },
     { ERR_IN_RECOVERY, "the form is being restored" }
 };
+
+const std::map<int32_t, int32_t> ERROR_CODE_MAP_EXTERNAL = {
+    { ERR_OK,                                          ERR_OK },
+    { ERR_APPEXECFWK_FORM_COMMON_CODE,                 ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR },
+    { ERR_APPEXECFWK_FORM_PERMISSION_DENY,             ERR_FORM_EXTERNAL_PERMISSION_DENIED },
+    { ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE,      ERR_FORM_EXTERNAL_PERMISSION_DENIED },
+    { ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS,         ERR_FORM_EXTERNAL_PERMISSION_DENIED },
+    { ERR_APPEXECFWK_FORM_GET_INFO_FAILED,             ERR_GET_INFO_FAILED },
+    { ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED,           ERR_GET_BUNDLE_FAILED },
+    { ERR_APPEXECFWK_FORM_INVALID_PARAM,               ERR_FORM_EXTERNAL_PARAM_INVALID },
+    { ERR_APPEXECFWK_FORM_INVALID_FORM_ID,             ERR_FORM_EXTERNAL_PARAM_INVALID },
+    { ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR,             ERR_FORM_EXTERNAL_PARAM_INVALID },
+    { ERR_APPEXECFWK_FORM_FORM_ARRAY_ERR,              ERR_FORM_EXTERNAL_PARAM_INVALID },
+    { ERR_APPEXECFWK_FORM_RELEASE_FLG_ERR,             ERR_COMMON },
+    { ERR_APPEXECFWK_FORM_REFRESH_TIME_NUM_ERR,        ERR_COMMON },
+    { ERR_APPEXECFWK_FORM_INVALID_BUNDLENAME,          ERR_FORM_EXTERNAL_PARAM_INVALID },
+    { ERR_APPEXECFWK_FORM_INVALID_MODULENAME,          ERR_FORM_EXTERNAL_PARAM_INVALID },
+    { ERR_APPEXECFWK_FORM_INVALID_PROVIDER_DATA,       ERR_FORM_EXTERNAL_PARAM_INVALID },
+    { ERR_APPEXECFWK_FORM_INVALID_REFRESH_TIME,        ERR_FORM_EXTERNAL_PARAM_INVALID },
+    { ERR_APPEXECFWK_FORM_FORM_ID_ARRAY_ERR,           ERR_FORM_EXTERNAL_PARAM_INVALID },
+    { ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR,           ERR_COMMON },
+    { ERR_APPEXECFWK_FORM_CFG_NOT_MATCH_ID,            ERR_CFG_NOT_MATCH_ID },
+    { ERR_APPEXECFWK_FORM_NOT_EXIST_ID,                ERR_NOT_EXIST_ID },
+    { ERR_APPEXECFWK_FORM_PROVIDER_DATA_EMPTY,         ERR_FORM_EXTERNAL_PARAM_INVALID },
+    { ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED,        ERR_BIND_PROVIDER_FAILED },
+    { ERR_APPEXECFWK_FORM_MAX_SYSTEM_FORMS,            ERR_MAX_SYSTEM_FORMS },
+    { ERR_APPEXECFWK_FORM_EXCEED_INSTANCES_PER_FORM,   ERR_MAX_INSTANCES_PER_FORM },
+    { ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF,          ERR_OPERATION_FORM_NOT_SELF },
+    { ERR_APPEXECFWK_FORM_PROVIDER_DEL_FAIL,           ERR_PROVIDER_DEL_FAIL },
+    { ERR_APPEXECFWK_FORM_MAX_FORMS_PER_CLIENT,        ERR_MAX_FORMS_PER_CLIENT },
+    { ERR_APPEXECFWK_FORM_MAX_SYSTEM_TEMP_FORMS,       ERR_MAX_SYSTEM_TEMP_FORMS },
+    { ERR_APPEXECFWK_FORM_NO_SUCH_MODULE,              ERR_FORM_NO_SUCH_MODULE },
+    { ERR_APPEXECFWK_FORM_NO_SUCH_ABILITY,             ERR_FORM_NO_SUCH_ABILITY },
+    { ERR_APPEXECFWK_FORM_NO_SUCH_DIMENSION,           ERR_FORM_NO_SUCH_DIMENSION },
+    { ERR_APPEXECFWK_FORM_FA_NOT_INSTALLED,            ERR_FORM_FA_NOT_INSTALLED },
+    { ERR_APPEXECFWK_FORM_MAX_REQUEST,                 ERR_MAX_SYSTEM_FORMS },
+    { ERR_APPEXECFWK_FORM_MAX_REFRESH,                 ERR_MAX_SYSTEM_FORMS },
+    { ERR_APPEXECFWK_FORM_GET_BMS_FAILED,              ERR_COMMON },
+    { ERR_APPEXECFWK_FORM_GET_HOST_FAILED,             ERR_COMMON },
+    { ERR_APPEXECFWK_FORM_GET_FMS_FAILED,              ERR_COMMON },
+    { ERR_APPEXECFWK_FORM_SEND_FMS_MSG,                ERR_COMMON },
+    { ERR_APPEXECFWK_FORM_FORM_DUPLICATE_ADDED,        ERR_FORM_DUPLICATE_ADDED },
+    { ERR_APPEXECFWK_FORM_IN_RECOVER,                  ERR_IN_RECOVERY },
+    { ERR_APPEXECFWK_FORM_DISTRIBUTED_SCHEDULE_FAILED, ERR_DISTRIBUTED_SCHEDULE_FAILED },
+    { ERR_APPEXECFWK_FORM_GET_SYSMGR_FAILED,           ERR_SYSTEM_RESPONSES_FAILED }
+};
+
+const std::map<int32_t, std::string> ERR_MSG_MAP_EXTERNAL = {
+    { ERR_OK,                              "success" },
+    { ERR_FORM_EXTERNAL_PERMISSION_DENIED, "Permissions denied." },
+    { ERR_FORM_EXTERNAL_PARAM_INVALID,     "Parameter error." },
+    { ERR_FORM_EXTERNAL_SYSTEMCAP_ERROR,   "The specified SystemCapability names was not found." },
+    { ERR_FORM_EXTERNAL_KERNEL_ERROR,      "A generic kernel error occurred." },
+    { ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR,  "An internal functional error occurred." },
+};
+
+const std::map<int32_t, std::string> ERR_MSG_MAP_INTERNAL = {
+    { ERR_COMMON,                          "" },
+    { ERR_APPEXECFWK_FORM_INVALID_PARAM,   "" },
+    { ERR_APPEXECFWK_FORM_INVALID_FORM_ID, "The formId is invalid." },
+};
+
+int32_t QueryExternalErrorCode(int32_t internalErrorCode)
+{
+    auto iter = ERROR_CODE_MAP_EXTERNAL.find(internalErrorCode);
+    if (iter != ERROR_CODE_MAP_EXTERNAL.end()) {
+        return iter->second;
+    } else {
+        return ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR;
+    }
+}
+
+std::string QueryExternalErrorMessage(int32_t internalErrorCode, int32_t externalErrorCode)
+{
+    auto iter = ERR_MSG_MAP_EXTERNAL.find(externalErrorCode);
+    std::string errorMessage;
+    if (iter != ERR_MSG_MAP_EXTERNAL.end()) {
+        errorMessage = iter->second;
+    } else {
+        errorMessage = ERR_MSG_MAP_EXTERNAL.at(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR);
+    }
+
+    auto iterInternal = ERR_MSG_MAP_INTERNAL.find(internalErrorCode);
+    if (iterInternal == ERR_MSG_MAP_INTERNAL.end() || iterInternal->second.empty()) {
+        return errorMessage;
+    }
+    errorMessage += " " + iterInternal->second;
+    return errorMessage;
+}
+}
+
+bool NapiFormUtil::Throw(NativeEngine &engine, int32_t errCode, const std::string &errMessage)
+{
+    NativeValue *error = engine.CreateError(CreateJsValue(engine, errCode), CreateJsValue(engine, errMessage));
+    return engine.Throw(error);
+}
+
+bool NapiFormUtil::ThrowByInternalErrorCode(NativeEngine &engine, int32_t internalErrorCode)
+{
+    int32_t externalErrorCode = QueryExternalErrorCode(internalErrorCode);
+    std::string externalErrorMessage = QueryExternalErrorMessage(internalErrorCode, externalErrorCode);
+    return Throw(engine, externalErrorCode, externalErrorMessage);
+}
+
+NativeValue *NapiFormUtil::CreateErrorByInternalErrorCode(NativeEngine &engine, int32_t internalErrorCode)
+{
+    int32_t externalErrorCode = QueryExternalErrorCode(internalErrorCode);
+    std::string externalErrorMessage = QueryExternalErrorMessage(internalErrorCode, externalErrorCode);
+    return CreateJsError(engine, externalErrorCode, externalErrorMessage);
+}
+
+bool NapiFormUtil::ThrowParamTypeError(NativeEngine &engine, const std::string &paramName, const std::string &type)
+{
+    return Throw(engine, ERR_FORM_EXTERNAL_PARAM_INVALID, CreateParamTypeErrorMessage(paramName, type));
+}
+
+bool NapiFormUtil::ThrowParamNumError(NativeEngine &engine, const std::string &gotNum, const std::string &expectedNum)
+{
+    std::string errorMessage = "Parameter error. Got " + gotNum + ", expected " + expectedNum;
+    return Throw(engine, ERR_FORM_EXTERNAL_PARAM_INVALID, errorMessage);
+}
+
+bool NapiFormUtil::ThrowParamError(NativeEngine &engine, const std::string &extraMessage)
+{
+    std::string errorMessage = "Parameter error. " + extraMessage;
+    return Throw(engine, ERR_FORM_EXTERNAL_PARAM_INVALID, errorMessage);
+}
+
+std::string NapiFormUtil::CreateParamTypeErrorMessage(const std::string &paramName, const std::string &type)
+{
+    std::string errorMessage = "Parameter error.";
+    if (paramName.empty()) {
+        // Parameter error.
+        return errorMessage;
+    }
+    errorMessage += " The type of \"" + paramName + "\"";
+    if (type.empty()) {
+        errorMessage += " is invalid.";
+        // Parameter error. The type of "paramName" is invalid.
+        return errorMessage;
+    }
+    errorMessage += " must be " + type + ".";
+    // Parameter error. The type of "${paramName}" must be ${type}.
+    return errorMessage;
+}
 
 /**
  * @brief query the error message by error code
