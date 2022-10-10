@@ -1228,6 +1228,12 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
                 itemInfo.SetFormSrc("");
             }
         }
+        auto hapPath = abilityInfo.hapPath;
+        if (hapPath.find(Constants::ABS_CODE_PATH) != std::string::npos) {
+            hapPath = std::regex_replace(hapPath, std::regex(Constants::ABS_CODE_PATH), Constants::LOCAL_BUNDLES);
+        }
+        itemInfo.AddModuleInfo(abilityInfo.moduleName, hapPath);
+        HILOG_DEBUG("%{public}s hap path is %{public}s", abilityInfo.moduleName.c_str(), hapPath.c_str());
     }
 
     HILOG_INFO("%{public}s moduleInfos size: %{public}zu", __func__, bundleInfo.applicationInfo.moduleInfos.size());
@@ -1237,9 +1243,6 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
         if (formInfo.moduleName == item.moduleName) {
             itemInfo.AddHapSourceDirs(item.moduleSourceDir);
         }
-        auto moduleSourceDir = std::regex_replace(item.moduleSourceDir, std::regex(Constants::ABS_CODE_PATH),
-            Constants::LOCAL_BUNDLES);
-        itemInfo.AddModuleInfo(item.moduleName, moduleSourceDir);
     }
     return ERR_OK;
 }
