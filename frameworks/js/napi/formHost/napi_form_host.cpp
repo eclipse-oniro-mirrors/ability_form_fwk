@@ -1861,7 +1861,6 @@ NativeValue* JsFormHost::OnDeleteForm(NativeEngine &engine, NativeCallbackInfo &
         HILOG_ERROR("OnDeleteForm wrong number of arguments.");
         return engine.CreateUndefined();
     }
-    HILOG_ERROR("info.argv[PARAM0]->TypeOf() %{public}d", info.argv[PARAM0]->TypeOf());
     if (info.argv[PARAM0]->TypeOf() != NATIVE_STRING) {
         HILOG_ERROR("input params is not string!");
         errCode = ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
@@ -1936,7 +1935,7 @@ NativeValue* JsFormHost::OnReleaseForm(NativeEngine &engine, NativeCallbackInfo 
         }
     }
 
-    AsyncTask::CompleteCallback complete = [formId, errCode, info, isReleaseCache]
+    AsyncTask::CompleteCallback complete = [formId, errCode, isReleaseCache] 
         (NativeEngine &engine, AsyncTask &task, int32_t status) {
             auto ret = ERR_COMMON;
             if (errCode != ERR_OK) {
