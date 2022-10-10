@@ -194,4 +194,160 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0004, TestSize.Level1) {
     EXPECT_EQ(result, 0);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0004 ends";
 }
+
+/**
+ * @tc.name: FormMgrStubTest_0005
+ * @tc.desc: Verify HandleNotifyFormsPrivacyProtected
+ * @tc.type: FUNC
+ * @tc.require: #I5ST27
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0005, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0005 starts";
+    // initialize input parameters.
+    MessageParcel data;
+    MessageParcel reply;
+    int64_t formId1 = 1;
+    std::vector<int64_t> formIds;
+    formIds.push_back(formId1);
+
+    bool isProtected = false;
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+
+    // write in formIds
+    data.WriteInt64Vector(formIds);
+    // write in isProtected
+    data.WriteBool(isProtected);
+    // write in token
+    data.WriteRemoteObject(token);
+    EXPECT_CALL(*mockFormMgrService, NotifyFormsPrivacyProtected(_, _, _))
+        .Times(1)
+        .WillOnce(Return(0));
+    // test.
+    int32_t errCode = mockFormMgrService->HandleNotifyFormsPrivacyProtected(data, reply);
+    // check errorcode
+    EXPECT_EQ(0, errCode);
+    // check resulting infos.
+    int32_t result;
+    reply.ReadInt32(result);
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0005 ends";
+}
+
+/**
+ * @tc.name: FormMgrStubTest_0006
+ * @tc.desc: Verify HandleNotifyFormsPrivacyProtected
+ * @tc.type: FUNC
+ * @tc.require: #I5ST27
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0006, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0006 starts";
+    // initialize input parameters.
+    MessageParcel data;
+    MessageParcel reply;
+    int64_t formId1 = 2;
+    std::vector<int64_t> formIds;
+    formIds.push_back(formId1);
+
+    bool isProtected = true;
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+
+    // write in formIds
+    data.WriteInt64Vector(formIds);
+    // write in isProtected
+    data.WriteBool(isProtected);
+    // write in token
+    data.WriteRemoteObject(token);
+    EXPECT_CALL(*mockFormMgrService, NotifyFormsPrivacyProtected(_, _, _))
+        .Times(1)
+        .WillOnce(Return(0));
+    // test.
+    int32_t errCode = mockFormMgrService->HandleNotifyFormsPrivacyProtected(data, reply);
+    // check errorcode
+    EXPECT_EQ(0, errCode);
+    // check resulting infos.
+    int32_t result;
+    reply.ReadInt32(result);
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0006 ends";
+}
+
+/**
+ * @tc.name: FormMgrStubTest_0007
+ * @tc.desc: Verify HandleNotifyFormsPrivacyProtected
+ * @tc.type: FUNC
+ * @tc.require: #I5ST27
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0007, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0007 starts";
+    // initialize input parameters.
+    MessageParcel data;
+    MessageParcel reply;
+    int64_t formId1 = 3;
+    int64_t formId2 = 4;
+    std::vector<int64_t> formIds;
+    formIds.push_back(formId1);
+    formIds.push_back(formId2);
+
+    bool isProtected = false;
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+
+    // write in formIds
+    data.WriteInt64Vector(formIds);
+    // write in isProtected
+    data.WriteBool(isProtected);
+    // write in token
+    data.WriteRemoteObject(token);
+    EXPECT_CALL(*mockFormMgrService, NotifyFormsPrivacyProtected(_, _, _))
+        .Times(1)
+        .WillOnce(Return(0));
+    // test.
+    int32_t errCode = mockFormMgrService->HandleNotifyFormsPrivacyProtected(data, reply);
+    // check errorcode
+    EXPECT_EQ(0, errCode);
+    // check resulting infos.
+    int32_t result;
+    reply.ReadInt32(result);
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0007 ends";
+}
+
+/**
+ * @tc.name: FormMgrStubTest_0008
+ * @tc.desc: Verify HandleNotifyFormsPrivacyProtected
+ * @tc.type: FUNC
+ * @tc.require: #I5ST27
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0008, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0008 starts";
+    // initialize input parameters.
+    MessageParcel data;
+    MessageParcel reply;
+    int64_t formId1 = 5;
+    int64_t formId2 = 6;
+    std::vector<int64_t> formIds;
+    formIds.push_back(formId1);
+    formIds.push_back(formId2);
+
+    bool isProtected = true;
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+
+    // write in formIds
+    data.WriteInt64Vector(formIds);
+    // write in isProtected
+    data.WriteBool(isProtected);
+    // write in token
+    data.WriteRemoteObject(token);
+    EXPECT_CALL(*mockFormMgrService, NotifyFormsPrivacyProtected(_, _, _))
+        .Times(1)
+        .WillOnce(Return(0));
+    // test.
+    int32_t errCode = mockFormMgrService->HandleNotifyFormsPrivacyProtected(data, reply);
+    // check errorcode
+    EXPECT_EQ(0, errCode);
+    // check resulting infos.
+    int32_t result;
+    reply.ReadInt32(result);
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0008 ends";
+}
 }
