@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,25 +17,26 @@
 #include "form_provider_data.h"
 #include "hilog_wrapper.h"
 #include "js_runtime_utils.h"
+#include "napi_form_util.h"
 
 namespace OHOS {
 namespace AbilityRuntime {
 namespace {
-class FormBindingData {
+class JsFormBindingData {
 public:
-    explicit FormBindingData(const std::shared_ptr<AppExecFwk::FormProviderData>& formProviderData)
+    explicit JsFormBindingData(const std::shared_ptr<AppExecFwk::FormProviderData>& formProviderData)
         : formProviderData_(formProviderData) {}
-    ~FormBindingData() = default;
+    ~JsFormBindingData() = default;
 
     static void Finalizer(NativeEngine* engine, void* data, void* hint)
     {
-        HILOG_INFO("FormBindingData::Finalizer is called");
-        std::unique_ptr<FormBindingData>(static_cast<FormBindingData*>(data));
+        HILOG_INFO("JsFormBindingData::Finalizer is called");
+        std::unique_ptr<JsFormBindingData>(static_cast<JsFormBindingData*>(data));
     }
 
     static NativeValue* CreateFormBindingData(NativeEngine* engine, NativeCallbackInfo* info)
     {
-        FormBindingData* me = CheckParamsAndGetThis<FormBindingData>(engine, info);
+        JsFormBindingData* me = CheckParamsAndGetThis<JsFormBindingData>(engine, info);
         return (me != nullptr) ? me->OnCreateFormBindingData(*engine, *info) : nullptr;
     }
 private:
@@ -43,7 +44,7 @@ private:
     std::shared_ptr<AppExecFwk::FormProviderData> formProviderData_;
 };
 
-NativeValue* FormBindingData::OnCreateFormBindingData(NativeEngine& engine, NativeCallbackInfo& info)
+NativeValue* JsFormBindingData::OnCreateFormBindingData(NativeEngine& engine, NativeCallbackInfo& info)
 {
     HILOG_INFO("%{public}s called.", __func__);
     std::string formDataStr;
@@ -68,11 +69,13 @@ NativeValue* FormBindingData::OnCreateFormBindingData(NativeEngine& engine, Nati
             nativeValue = reinterpret_cast<NativeValue*>(transValue);
         } else {
             HILOG_ERROR("%{public}s, param type not string or object", __func__);
+            NapiFormUtil::ThrowParamTypeError(engine, "obj", "string or object");
             return engine.CreateUndefined();
         }
 
         if (!ConvertFromJsValue(engine, nativeValue, formDataStr)) {
             HILOG_ERROR("%{public}s, Parse formDataStr failed", __func__);
+            NapiFormUtil::ThrowParamError(engine, "Failed to convert.");
             return engine.CreateUndefined();
         }
     }
@@ -100,11 +103,11 @@ NativeValue* JsFormBindingDataInit(NativeEngine* engine, NativeValue* exportObj)
     }
 
     auto formProviderData = std::make_shared<AppExecFwk::FormProviderData>();
-    auto formBindingData = std::make_unique<FormBindingData>(formProviderData);
-    object->SetNativePointer(formBindingData.release(), FormBindingData::Finalizer, nullptr);
+    auto formBindingData = std::make_unique<JsFormBindingData>(formProviderData);
+    object->SetNativePointer(formBindingData.release(), JsFormBindingData::Finalizer, nullptr);
 
-    const char *moduleName = "FormBindingData";
-    BindNativeFunction(*engine, *object, "createFormBindingData", moduleName, FormBindingData::CreateFormBindingData);
+    const char *moduleName = "JsFormBindingData";
+    BindNativeFunction(*engine, *object, "createFormBindingData", moduleName, JsFormBindingData::CreateFormBindingData);
 
     HILOG_INFO("%{public}s called end.", __func__);
     return exportObj;

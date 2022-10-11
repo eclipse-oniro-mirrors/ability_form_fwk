@@ -54,7 +54,10 @@ ohos_shared_library("formbindingdata") {
 
   configs = [ ":fmskit_config" ]
 
+  deps = [ ":formutil_napi" ]
+
   external_deps = [
+    "ability_runtime:abilitykit_native",
     "ability_runtime:runtime",
     "c_utils:utils",
     "form_fwk:form_manager",
