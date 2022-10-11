@@ -44,6 +44,33 @@ ohos_shared_library("formbindingdata_napi") {
   part_name = "form_fwk"
 }
 
+ohos_shared_library("formbindingdata") {
+  include_dirs = [ "${ipc_core_path}/include" ]
+
+  sources = [
+    "form_binding_data/js_form_binding_data.cpp",
+    "form_binding_data/js_form_binding_data_module.cpp",
+  ]
+
+  configs = [ ":fmskit_config" ]
+
+  deps = [ ":formutil_napi" ]
+
+  external_deps = [
+    "ability_runtime:abilitykit_native",
+    "ability_runtime:runtime",
+    "c_utils:utils",
+    "form_fwk:form_manager",
+    "hiviewdfx_hilog_native:libhilog",
+    "napi:ace_napi",
+  ]
+
+  relative_install_dir = "module/app/form"
+
+  subsystem_name = "ability"
+  part_name = "form_fwk"
+}
+
 ################################### gen_form_extension_abc ########################################
 es2abc_gen_abc("gen_form_extension_abc") {
   src_js = rebase_path("form_extension/form_extension.js")
