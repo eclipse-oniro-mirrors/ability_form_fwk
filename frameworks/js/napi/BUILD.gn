@@ -210,6 +210,42 @@ ohos_shared_library("formhost_napi") {
   part_name = "form_fwk"
 }
 
+################################### formhost ########################################
+ohos_shared_library("formhost") {
+  include_dirs = [
+    "//foundation/ability/ability_runtime/interfaces/inner_api/runtime/include",
+  ]
+
+  sources = [
+    "form_host/js_form_host.cpp",
+    "form_host/native_module.cpp",
+  ]
+
+  configs = [ ":fmskit_config" ]
+
+  deps = [
+    ":formutil_napi",
+    "${ability_runtime_napi_path}/inner/napi_common:napi_common",
+    "${form_fwk_path}:fmskit_native",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_runtime:abilitykit_native",
+    "ability_runtime:runtime",
+    "bundle_framework:appexecfwk_base",
+    "c_utils:utils",
+    "form_fwk:fmskit_native",
+    "hiviewdfx_hilog_native:libhilog",
+    "napi:ace_napi",
+  ]
+
+  relative_install_dir = "module/app/form"
+
+  subsystem_name = "ability"
+  part_name = "form_fwk"
+}
+
 ################################### formprovider_napi ########################################
 ohos_shared_library("formprovider_napi") {
   include_dirs = [

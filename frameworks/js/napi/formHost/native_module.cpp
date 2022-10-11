@@ -27,9 +27,9 @@
 EXTERN_C_START
 using namespace OHOS::AbilityRuntime;
 
-static NativeValue* JsFormHostInit(NativeEngine *engine, NativeValue *exports)
+static NativeValue* NapiFormHostInit(NativeEngine *engine, NativeValue *exports)
 {
-    HILOG_DEBUG("JsFormHostInit is called");
+    HILOG_DEBUG("NapiFormHostInit is called");
     if (engine == nullptr || exports == nullptr) {
         HILOG_ERROR("Invalid input parameters");
         return nullptr;
@@ -41,25 +41,25 @@ static NativeValue* JsFormHostInit(NativeEngine *engine, NativeValue *exports)
         return nullptr;
     }
 
-    std::unique_ptr<JsFormHost> jsFormHost = std::make_unique<JsFormHost>();
-    object->SetNativePointer(jsFormHost.release(), JsFormHost::Finalizer, nullptr);
+    std::unique_ptr<NapiFormHost> napiFormHost = std::make_unique<NapiFormHost>();
+    object->SetNativePointer(napiFormHost.release(), NapiFormHost::Finalizer, nullptr);
 
-    const char *moduleName = "JsFormHost";
-    OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "shareForm", moduleName, JsFormHost::ShareForm);
+    const char *moduleName = "NapiFormHost";
+    OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "shareForm", moduleName, NapiFormHost::ShareForm);
     OHOS::AbilityRuntime::BindNativeFunction(
-        *engine, *object, "disableFormsUpdate", moduleName, JsFormHost::DisableFormsUpdate);
-    OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "isSystemReady", moduleName, JsFormHost::IsSystemReady);
-    OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "deleteForm", moduleName, JsFormHost::DeleteForm);
-    OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "releaseForm", moduleName, JsFormHost::ReleaseForm);
-    OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "requestForm", moduleName, JsFormHost::RequestForm);
-    OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "castTempForm", moduleName, JsFormHost::CastTempForm);
+        *engine, *object, "disableFormsUpdate", moduleName, NapiFormHost::DisableFormsUpdate);
+    OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "isSystemReady", moduleName, NapiFormHost::IsSystemReady);
+    OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "deleteForm", moduleName, NapiFormHost::DeleteForm);
+    OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "releaseForm", moduleName, NapiFormHost::ReleaseForm);
+    OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "requestForm", moduleName, NapiFormHost::RequestForm);
+    OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "castTempForm", moduleName, NapiFormHost::CastTempForm);
     OHOS::AbilityRuntime::BindNativeFunction(
-        *engine, *object, "getAllFormsInfo", moduleName, JsFormHost::GetAllFormsInfo);
-    OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "getFormsInfo", moduleName, JsFormHost::GetFormsInfo);
+        *engine, *object, "getAllFormsInfo", moduleName, NapiFormHost::GetAllFormsInfo);
+    OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "getFormsInfo", moduleName, NapiFormHost::GetFormsInfo);
     OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "enableFormsUpdate", moduleName,
-        JsFormHost::EnableFormsUpdate);
+        NapiFormHost::EnableFormsUpdate);
     OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "notifyFormsPrivacyProtected",
-        moduleName, JsFormHost::NotifyFormsPrivacyProtected);
+        moduleName, NapiFormHost::NotifyFormsPrivacyProtected);
 
     return exports;
 }
@@ -88,7 +88,7 @@ static napi_value Init(napi_env env, napi_value exports)
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(properties) / sizeof(properties[0]), properties));
     HILOG_INFO("napi_module Init end...");
 
-    return reinterpret_cast<napi_value>(JsFormHostInit(reinterpret_cast<NativeEngine*>(env),
+    return reinterpret_cast<napi_value>(NapiFormHostInit(reinterpret_cast<NativeEngine*>(env),
         reinterpret_cast<NativeValue*>(exports)));
 }
 
