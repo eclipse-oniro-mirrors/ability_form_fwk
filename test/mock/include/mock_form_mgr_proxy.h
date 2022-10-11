@@ -31,6 +31,8 @@ public:
     MOCK_METHOD2(UpdateForm, int32_t(int64_t formId, const FormProviderData &formBindingData));
     MOCK_METHOD3(RequestForm, int32_t(int64_t formId, const sptr<IRemoteObject> &callerToken, const Want &want));
     MOCK_METHOD3(MessageEvent, int32_t(int64_t formId, const Want &want, const sptr<IRemoteObject> &callerToken));
+    MOCK_METHOD3(NotifyFormsPrivacyProtected, int(const std::vector<int64_t> &formIds, bool isProtected,
+        const sptr<IRemoteObject> &callerToken));
 };
 }
 }

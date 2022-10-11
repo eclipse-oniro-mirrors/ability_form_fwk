@@ -133,7 +133,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0002, TestSize.Level1) {
  * @tc.type: FUNC
  * @tc.require: #I58Y0A
  */
-HWTEST_F(FormMgrTest, FormMgrTest_003, TestSize.Level1) {
+HWTEST_F(FormMgrTest, FormMgrTest_0003, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0003 starts";
     EXPECT_CALL(*mockProxy, IsRequestPublishFormSupported())
         .Times(1)
@@ -227,5 +227,101 @@ HWTEST_F(FormMgrTest, FormMgrTest_0007, TestSize.Level1) {
     int32_t result = FormMgr::GetInstance().MessageEvent(formJsInfo.formId, want, token);
     EXPECT_EQ(result, 0);
     GTEST_LOG_(INFO) << "FormMgrTest_0007 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0005
+ * @tc.desc: Verify NotifyFormsPrivacyProtected
+ * @tc.type: FUNC
+ * @tc.require: I5ST27
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0008, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0008 starts";
+    EXPECT_CALL(*mockProxy, NotifyFormsPrivacyProtected(_, _, _))
+        .Times(1)
+        .WillOnce(Return(0));
+    // initialize input parameters.
+    int64_t formId = 1;
+    std::vector<int64_t> formIds;
+    formIds.push_back(formId);
+    bool isProtected = false;
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    int32_t result = FormMgr::GetInstance().NotifyFormsPrivacyProtected(formIds, isProtected, token);
+    // expect result.
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrTest_0008 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0006
+ * @tc.desc: Verify NotifyFormsPrivacyProtected
+ * @tc.type: FUNC
+ * @tc.require: I5ST27
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0009, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0009 starts";
+    EXPECT_CALL(*mockProxy, NotifyFormsPrivacyProtected(_, _, _))
+        .Times(1)
+        .WillOnce(Return(0));
+    // initialize input parameters.
+    int64_t formId = 2;
+    std::vector<int64_t> formIds;
+    formIds.push_back(formId);
+    bool isProtected = true;
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    int32_t result = FormMgr::GetInstance().NotifyFormsPrivacyProtected(formIds, isProtected, token);
+    // expect result.
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrTest_0009 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0007
+ * @tc.desc: Verify NotifyFormsPrivacyProtected
+ * @tc.type: FUNC
+ * @tc.require: I5ST27
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0010, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0010 starts";
+    EXPECT_CALL(*mockProxy, NotifyFormsPrivacyProtected(_, _, _))
+        .Times(1)
+        .WillOnce(Return(0));
+    // initialize input parameters.
+    int64_t formId1 = 3;
+    int64_t formId2 = 4;
+    std::vector<int64_t> formIds;
+    formIds.push_back(formId1);
+    formIds.push_back(formId2);
+    bool isProtected = false;
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    int32_t result = FormMgr::GetInstance().NotifyFormsPrivacyProtected(formIds, isProtected, token);
+    // expect result.
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrTest_0010 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0011
+ * @tc.desc: Verify NotifyFormsPrivacyProtected
+ * @tc.type: FUNC
+ * @tc.require: I5ST27
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0011, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0008 starts";
+    EXPECT_CALL(*mockProxy, NotifyFormsPrivacyProtected(_, _, _))
+        .Times(1)
+        .WillOnce(Return(0));
+    // initialize input parameters.
+    int64_t formId1 = 5;
+    int64_t formId2 = 6;
+    std::vector<int64_t> formIds;
+    formIds.push_back(formId1);
+    formIds.push_back(formId2);
+    bool isProtected = true;
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    int32_t result = FormMgr::GetInstance().NotifyFormsPrivacyProtected(formIds, isProtected, token);
+    // expect result.
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrTest_0011 test ends";
 }
 } // namespace
