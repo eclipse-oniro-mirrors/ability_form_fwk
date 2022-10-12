@@ -413,7 +413,7 @@ private:
         AsyncTask::CompleteCallback complete = [formId](NativeEngine &engine, AsyncTask &task, int32_t status) {
             auto ret = FormMgr::GetInstance().DeleteForm(formId, FormHostClient::GetInstance());
             if (ret == ERR_OK) {
-                task.Resolve(engine, engine.CreateUndefined());
+                task.ResolveWithNoError(engine, engine.CreateUndefined());
             } else {
                 task.Reject(engine, NapiFormUtil::CreateErrorByInternalErrorCode(engine, ret));
             }
@@ -465,7 +465,7 @@ private:
             (NativeEngine &engine, AsyncTask &task, int32_t status) {
             auto ret = FormMgr::GetInstance().ReleaseForm(formId, FormHostClient::GetInstance(), isReleaseCache);
             if (ret == ERR_OK) {
-                task.Resolve(engine, engine.CreateUndefined());
+                task.ResolveWithNoError(engine, engine.CreateUndefined());
             } else {
                 task.Reject(engine, NapiFormUtil::CreateErrorByInternalErrorCode(engine, ret));
             }
@@ -501,7 +501,7 @@ private:
             Want want;
             auto ret = FormMgr::GetInstance().RequestForm(formId, FormHostClient::GetInstance(), want);
             if (ret == ERR_OK) {
-                task.Resolve(engine, engine.CreateUndefined());
+                task.ResolveWithNoError(engine, engine.CreateUndefined());
             } else {
                 task.Reject(engine, NapiFormUtil::CreateErrorByInternalErrorCode(engine, ret));
             }
@@ -536,7 +536,7 @@ private:
         AsyncTask::CompleteCallback complete = [formId](NativeEngine &engine, AsyncTask &task, int32_t status) {
             auto ret = FormMgr::GetInstance().CastTempForm(formId, FormHostClient::GetInstance());
             if (ret == ERR_OK) {
-                task.Resolve(engine, engine.CreateUndefined());
+                task.ResolveWithNoError(engine, engine.CreateUndefined());
             } else {
                 task.Reject(engine, NapiFormUtil::CreateErrorByInternalErrorCode(engine, ret));
             }
@@ -572,7 +572,7 @@ private:
             auto ret = FormMgr::GetInstance().NotifyWhetherVisibleForms(formIds, FormHostClient::GetInstance(),
                 Constants::FORM_VISIBLE);
             if (ret == ERR_OK) {
-                task.Resolve(engine, engine.CreateUndefined());
+                task.ResolveWithNoError(engine, engine.CreateUndefined());
             } else {
                 task.Reject(engine, NapiFormUtil::CreateErrorByInternalErrorCode(engine, ret));
             }
@@ -608,7 +608,7 @@ private:
             auto ret = FormMgr::GetInstance().NotifyWhetherVisibleForms(formIds, FormHostClient::GetInstance(),
                 Constants::FORM_INVISIBLE);
             if (ret == ERR_OK) {
-                task.Resolve(engine, engine.CreateUndefined());
+                task.ResolveWithNoError(engine, engine.CreateUndefined());
             } else {
                 task.Reject(engine, NapiFormUtil::CreateErrorByInternalErrorCode(engine, ret));
             }
@@ -643,7 +643,7 @@ private:
         auto complete = [formIds](NativeEngine &engine, AsyncTask &task, int32_t status) {
             auto ret = FormMgr::GetInstance().LifecycleUpdate(formIds, FormHostClient::GetInstance(), true);
             if (ret == ERR_OK) {
-                task.Resolve(engine, engine.CreateUndefined());
+                task.ResolveWithNoError(engine, engine.CreateUndefined());
             } else {
                 task.Reject(engine, NapiFormUtil::CreateErrorByInternalErrorCode(engine, ret));
             }
@@ -681,7 +681,7 @@ private:
                 task.Reject(engine, NapiFormUtil::CreateErrorByInternalErrorCode(engine, ret));
                 return;
             }
-            task.Resolve(engine, engine.CreateUndefined());
+            task.ResolveWithNoError(engine, engine.CreateUndefined());
         };
 
         NativeValue* lastParam = (info.argc <= convertArgc) ? nullptr : info.argv[convertArgc];
@@ -705,7 +705,7 @@ private:
             // Use the error code to return whether the function executed successfully.
             auto ret = FormMgr::GetInstance().CheckFMSReady() ? 0 : 1;
             if( ret == ERR_OK ) {
-                task.Resolve(engine, engine.CreateUndefined());
+                task.ResolveWithNoError(engine, engine.CreateUndefined());
             } else {
                 task.Reject(engine, NapiFormUtil::CreateErrorByInternalErrorCode(engine, ret));
             }
@@ -741,7 +741,7 @@ private:
             int32_t num;
             auto ret = FormMgr::GetInstance().DeleteInvalidForms(formIds, FormHostClient::GetInstance(), num);
             if (ret == ERR_OK) {
-                task.Resolve(engine, CreateJsValue(engine, num));
+                task.ResolveWithNoError(engine, CreateJsValue(engine, num));
             } else {
                 task.Reject(engine, NapiFormUtil::CreateErrorByInternalErrorCode(engine, ret));
             }
@@ -877,7 +877,7 @@ private:
             auto ret = FormMgr::GetInstance().NotifyFormsVisible(formIds, isVisible,
                 FormHostClient::GetInstance());
             if (ret == ERR_OK) {
-                task.Resolve(engine, engine.CreateUndefined());
+                task.ResolveWithNoError(engine, engine.CreateUndefined());
             } else {
                 task.Reject(engine, NapiFormUtil::CreateErrorByInternalErrorCode(engine, ret));
             }
@@ -926,7 +926,7 @@ private:
             auto ret = FormMgr::GetInstance().NotifyFormsEnableUpdate(formIds, isEnableUpdate,
                 FormHostClient::GetInstance());
             if (ret == ERR_OK) {
-                task.Resolve(engine, engine.CreateUndefined());
+                task.ResolveWithNoError(engine, engine.CreateUndefined());
             } else {
                 task.Reject(engine, NapiFormUtil::CreateErrorByInternalErrorCode(engine, ret));
             }
@@ -955,7 +955,7 @@ private:
                 task.Reject(engine, NapiFormUtil::CreateErrorByInternalErrorCode(engine, ret));
                 return;
             }
-            task.Resolve(engine, CreateFormInfos(engine, formInfos));
+            task.ResolveWithNoError(engine, CreateFormInfos(engine, formInfos));
         };
 
         auto callback = (info.argc == ARGS_ZERO) ? nullptr : info.argv[PARAM0];
@@ -1020,7 +1020,7 @@ private:
                 task.Reject(engine, NapiFormUtil::CreateErrorByInternalErrorCode(engine, ret));
                 return;
             }
-            task.Resolve(engine, CreateFormInfos(engine, formInfos));
+            task.ResolveWithNoError(engine, CreateFormInfos(engine, formInfos));
         };
 
         NativeValue *result = nullptr;
@@ -1083,7 +1083,7 @@ private:
         ShareFormCallBackClient::ShareFormTask task = [&engine, asyncTask](int32_t code) {
             HILOG_DEBUG("task complete code: %{public}d", code);
             if (code == ERR_OK) {
-                asyncTask->Resolve(engine, engine.CreateUndefined());
+                asyncTask->ResolveWithNoError(engine, engine.CreateUndefined());
             } else {
                 asyncTask->Reject(engine, NapiFormUtil::CreateErrorByInternalErrorCode(engine, code));
             }
