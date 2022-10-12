@@ -141,7 +141,7 @@ NativeValue *JsFormProvider::OnGetFormsInfo(NativeEngine &engine, NativeCallback
                 task.Reject(engine, NapiFormUtil::CreateErrorByInternalErrorCode(engine, ret));
                 return;
             }
-            task.Resolve(engine, CreateJsFormInfoArray(engine, formInfos));
+            task.ResolveWithNoError(engine, CreateJsFormInfoArray(engine, formInfos));
         };
 
     NativeValue *lastParam = (info.argc <= convertArgc) ? nullptr : info.argv[convertArgc];
@@ -200,7 +200,7 @@ NativeValue *JsFormProvider::OnSetFormNextRefreshTime(NativeEngine &engine, Nati
             task.Reject(engine, NapiFormUtil::CreateErrorByInternalErrorCode(engine, ret));
             return;
         }
-        task.Resolve(engine, engine.CreateUndefined());
+        task.ResolveWithNoError(engine, engine.CreateUndefined());
     };
     NativeValue *lastParam = (info.argc == ARGS_SIZE_THREE) ? info.argv[PARAM2] : nullptr;
     NativeValue *result = nullptr;
@@ -259,7 +259,7 @@ NativeValue *JsFormProvider::OnUpdateForm(NativeEngine &engine, NativeCallbackIn
                 task.Reject(engine, NapiFormUtil::CreateErrorByInternalErrorCode(engine, ret));
                 return;
             }
-            task.Resolve(engine, engine.CreateUndefined());
+            task.ResolveWithNoError(engine, engine.CreateUndefined());
         };
     NativeValue *lastParam = (info.argc == ARGS_SIZE_THREE) ? info.argv[PARAM2] : nullptr;
     NativeValue *result = nullptr;
@@ -285,7 +285,7 @@ NativeValue *JsFormProvider::OnIsRequestPublishFormSupported(NativeEngine &engin
 
     AsyncTask::CompleteCallback complete = [](NativeEngine &engine, AsyncTask &task, int32_t status) {
         bool value = FormMgr::GetInstance().IsRequestPublishFormSupported();
-        task.Resolve(engine, engine.CreateBoolean(value));
+        task.ResolveWithNoError(engine, engine.CreateBoolean(value));
     };
     NativeValue *lastParam = (info.argc == ARGS_SIZE_ONE) ? info.argv[PARAM0] : nullptr;
     NativeValue *result = nullptr;
@@ -349,7 +349,7 @@ NativeValue *JsFormProvider::OnRequestPublishForm(NativeEngine &engine, NativeCa
             return;
         }
         std::string formIdStr = std::to_string(formId);
-        task.Resolve(engine, engine.CreateString(formIdStr.c_str(), formIdStr.size()));
+        task.ResolveWithNoError(engine, engine.CreateString(formIdStr.c_str(), formIdStr.size()));
     };
     NativeValue *lastParam = (info.argc <= convertArgc) ? nullptr : info.argv[convertArgc];
     NativeValue *result = nullptr;
