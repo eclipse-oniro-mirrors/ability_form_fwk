@@ -193,6 +193,7 @@ void FormDataMgr::CreateFormJsInfo(const int64_t formId, const FormRecord &recor
     formInfo.bundleName = record.bundleName;
     formInfo.abilityName = record.abilityName;
     formInfo.formName = record.formName;
+    formInfo.moduleName = record.moduleName;
     formInfo.formTempFlag = record.formTempFlag;
     formInfo.jsFormCodePath = record.jsFormCodePath;
     formInfo.formSrc = record.formSrc;

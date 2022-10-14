@@ -25,6 +25,7 @@ bool FormJsInfo::ReadFromParcel(Parcel &parcel)
     formName = Str16ToStr8(parcel.ReadString16());
     bundleName = Str16ToStr8(parcel.ReadString16());
     abilityName = Str16ToStr8(parcel.ReadString16());
+    moduleName = Str16ToStr8(parcel.ReadString16());
 
     formTempFlag = parcel.ReadBool();
     jsFormCodePath = Str16ToStr8(parcel.ReadString16());
@@ -75,6 +76,11 @@ bool FormJsInfo::Marshalling(Parcel &parcel) const
     }
     // write abilityName
     if (!parcel.WriteString16(Str8ToStr16(abilityName))) {
+        return false;
+    }
+
+    // write moduleName
+    if (!parcel.WriteString16(Str8ToStr16(moduleName))) {
         return false;
     }
 
