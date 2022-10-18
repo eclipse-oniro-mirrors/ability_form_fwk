@@ -26,6 +26,7 @@
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "napi_common_util.h"
+#include "napi_common_want.h"
 #include "runtime.h"
 
 namespace OHOS {
@@ -115,6 +116,36 @@ public:
 private:
     napi_ref callbackRef_ {};
     napi_env env_;
+};
+
+class JsFormStateCallbackClient : public FormStateCallbackInterface,
+                                  public std::enable_shared_from_this<JsFormStateCallbackClient> {
+public:
+    using AcquireFormStateTask = std::function<void(int32_t, Want)>;
+    explicit JsFormStateCallbackClient(AcquireFormStateTask &&task) : task_(std::move(task))
+    {
+        handler_ = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
+    }
+
+    virtual ~JsFormStateCallbackClient() = default;
+
+    void ProcessAcquireState(FormState state) override
+    {
+        if (handler_) {
+            handler_->PostSyncTask([client = shared_from_this(), state] () {
+                client->task_(static_cast<int32_t>(state), client->want_);
+            });
+        }
+    }
+
+    void SetWant(const Want want)
+    {
+        want_ = want;
+    }
+private:
+    Want want_;
+    AcquireFormStateTask task_;
+    std::shared_ptr<AppExecFwk::EventHandler> handler_ = nullptr;
 };
 
 std::map<napi_ref, std::shared_ptr<FormUninstallCallbackClient>> formUninstallCallbackMap {};
@@ -294,6 +325,12 @@ public:
     {
         JsFormHost* me = CheckParamsAndGetThis<JsFormHost>(engine, info);
         return (me != nullptr) ? me->OnShareForm(*engine, *info) : nullptr;
+    }
+
+    static NativeValue* NotifyFormsPrivacyProtected(NativeEngine* engine, NativeCallbackInfo* info)
+    {
+        JsFormHost* me = CheckParamsAndGetThis<JsFormHost>(engine, info);
+        return (me != nullptr) ? me->OnNotifyFormsPrivacyProtected(*engine, *info) : nullptr;
     }
 private:
     bool ConvertFromId(NativeEngine& engine, NativeValue* jsValue, int64_t &formId)
@@ -754,9 +791,59 @@ private:
         return result;
     }
 
+    void InnerAcquireFormState(
+        NativeEngine &engine,
+        const std::shared_ptr<AsyncTask> &asyncTask,
+        JsFormStateCallbackClient::AcquireFormStateTask &&task,
+        const Want &want)
+    {
+        auto formStateCallback = std::make_shared<JsFormStateCallbackClient>(std::move(task));
+        FormHostClient::GetInstance()->AddFormState(formStateCallback, want);
+        FormStateInfo stateInfo;
+        auto result = FormMgr::GetInstance().AcquireFormState(want, FormHostClient::GetInstance(), stateInfo);
+        formStateCallback->SetWant(stateInfo.want);
+        if (result != ERR_OK) {
+            HILOG_DEBUG("AcquireFormState failed.");
+            asyncTask->Reject(engine, NapiFormUtil::CreateErrorByInternalErrorCode(engine, result));
+            FormHostClient::GetInstance()->RemoveFormState(want);
+        }
+    }
+
     NativeValue* OnAcquireFormState(NativeEngine &engine, NativeCallbackInfo &info)
     {
-        return engine.CreateUndefined();
+        HILOG_DEBUG("%{public}s is called", __FUNCTION__);
+        if (info.argc > ARGS_TWO || info.argc < ARGS_ONE) {
+            NapiFormUtil::ThrowParamNumError(engine, std::to_string(info.argc), "1 or 2");
+            return engine.CreateUndefined();
+        }
+
+        Want want;
+        auto env = reinterpret_cast<napi_env>(&engine);
+        auto argWant = reinterpret_cast<napi_value>(info.argv[PARAM0]);
+        if (!UnwrapWant(env, argWant, want)) {
+            HILOG_ERROR("want is invalid.");
+            NapiFormUtil::ThrowParamTypeError(engine, "want", "Want");
+            return engine.CreateUndefined();
+        }
+
+        NativeValue *lastParam = (info.argc == ARGS_ONE) ? nullptr : info.argv[PARAM1];
+        NativeValue *result = nullptr;
+
+        std::unique_ptr<AbilityRuntime::AsyncTask> uasyncTask =
+            AbilityRuntime::CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, nullptr, &result);
+        std::shared_ptr<AbilityRuntime::AsyncTask> asyncTask = std::move(uasyncTask);
+
+        JsFormStateCallbackClient::AcquireFormStateTask task = [&engine, asyncTask](int32_t state, Want want) {
+            HILOG_DEBUG("task complete state: %{public}d", state);
+            NativeValue *objValue = engine.CreateObject();
+            NativeObject *object = ConvertNativeValueTo<NativeObject>(objValue);
+            object->SetProperty("want", CreateJsWant(engine, want));
+            object->SetProperty("formState", CreateJsValue(engine, state));
+            asyncTask->ResolveWithNoError(engine, objValue);
+        };
+
+        InnerAcquireFormState(engine, asyncTask, std::move(task), want);
+        return result;
     }
 
     NativeValue* OnRegisterFormUninstallObserver(NativeEngine &engine, NativeCallbackInfo &info)
@@ -1093,6 +1180,55 @@ private:
 
         return result;
     }
+
+    NativeValue* OnNotifyFormsPrivacyProtected(NativeEngine &engine, NativeCallbackInfo &info)
+    {
+        HILOG_INFO("%{public}s is called", __func__);
+        if (info.argc > ARGS_THREE || info.argc < ARGS_TWO) {
+            HILOG_ERROR("wrong number of arguments.");
+            NapiFormUtil::ThrowParamNumError(engine, std::to_string(info.argc), "2 or 3");
+            return engine.CreateUndefined();
+        }
+
+        decltype(info.argc) convertArgc = 0;
+        std::vector<int64_t> formIds;
+        if (!ConvertFromIds(engine, info.argv[PARAM0], formIds)) {
+            HILOG_ERROR("form id list is invalid.");
+            NapiFormUtil::ThrowParamTypeError(engine, "formIds", "Array<string>");
+            return engine.CreateUndefined();
+        }
+        convertArgc++;
+
+        bool isProtected = false;
+        if (info.argv[PARAM1]->TypeOf() != NATIVE_BOOLEAN) {
+            HILOG_ERROR("promise second param type is illegal");
+            NapiFormUtil::ThrowParamTypeError(engine, "isProtected", "boolean");
+            return engine.CreateUndefined();
+        }
+        if (!ConvertFromJsValue(engine, info.argv[PARAM1], isProtected)) {
+            HILOG_ERROR("convert isProtected failed!");
+            NapiFormUtil::ThrowParamTypeError(engine, "isProtected", "boolean");
+            return engine.CreateUndefined();
+        }
+        convertArgc++;
+
+        AsyncTask::CompleteCallback complete =
+            [formIds, isProtected](NativeEngine &engine, AsyncTask &task, int32_t status) {
+                auto ret = FormMgr::GetInstance().NotifyFormsPrivacyProtected(formIds,
+                    isProtected, FormHostClient::GetInstance());
+                if (ret == ERR_OK) {
+                    task.ResolveWithNoError(engine, engine.CreateUndefined());
+                } else {
+                    task.Reject(engine, NapiFormUtil::CreateErrorByInternalErrorCode(engine, ret));
+                }
+            };
+
+        NativeValue *lastParam = (info.argc <= convertArgc) ? nullptr : info.argv[convertArgc];
+        NativeValue *result = nullptr;
+        AsyncTask::Schedule("NapiFormHost::OnNotifyFormsPrivacyProtected",
+            engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
+        return result;
+    }
 };
 
 NativeValue* JsFormHostInit(NativeEngine* engine, NativeValue* exportObj)
@@ -1131,6 +1267,8 @@ NativeValue* JsFormHostInit(NativeEngine* engine, NativeValue* exportObj)
     BindNativeFunction(*engine, *object, "getAllFormsInfo", moduleName, JsFormHost::GetAllFormsInfo);
     BindNativeFunction(*engine, *object, "getFormsInfo", moduleName, JsFormHost::GetFormsInfo);
     BindNativeFunction(*engine, *object, "shareForm", moduleName, JsFormHost::ShareForm);
+    BindNativeFunction(*engine, *object, "notifyFormsPrivacyProtected", moduleName,
+        JsFormHost::NotifyFormsPrivacyProtected);
     return engine->CreateUndefined();
 }
 } // namespace AbilityRuntime

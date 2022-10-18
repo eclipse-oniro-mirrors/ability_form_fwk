@@ -76,7 +76,14 @@ public:
      * @param want the want of acquiring form state.
      * @return Returns true if contains form; returns false otherwise.
      */
-    bool AddFormState(std::shared_ptr<FormStateCallbackInterface> &formStateCallback, const AAFwk::Want &want);
+    bool AddFormState(const std::shared_ptr<FormStateCallbackInterface> &formStateCallback, const AAFwk::Want &want);
+
+    /**
+     * @brief Remove form state.
+     *
+     * @param want the want of acquiring form state.
+     */
+    void RemoveFormState(const AAFwk::Want &want);
 
     using UninstallCallback = void (*)(const std::vector<int64_t> &formIds);
     /**
