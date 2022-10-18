@@ -125,7 +125,7 @@ bool FormHostClient::ContainsForm(int64_t formId)
  * @param want the want of acquiring form state.
  * @return Returns true if contains form; returns false otherwise.
  */
-bool FormHostClient::AddFormState(std::shared_ptr<FormStateCallbackInterface> &formStateCallback,
+bool FormHostClient::AddFormState(const std::shared_ptr<FormStateCallbackInterface> &formStateCallback,
                                   const AAFwk::Want &want)
 {
     HILOG_INFO("%{public}s called.", __func__);
@@ -148,6 +148,25 @@ bool FormHostClient::AddFormState(std::shared_ptr<FormStateCallbackInterface> &f
     }
     HILOG_INFO("%{public}s done.", __func__);
     return true;
+}
+
+void FormHostClient::RemoveFormState(const AAFwk::Want &want)
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    std::string bundleName = want.GetElement().GetBundleName();
+    std::string abilityName = want.GetElement().GetAbilityName();
+    const std::string doubleColon = "::";
+    std::string key;
+    key.append(bundleName).append(doubleColon).append(abilityName).append(doubleColon)
+        .append(want.GetStringParam(AppExecFwk::Constants::PARAM_MODULE_NAME_KEY)).append(doubleColon)
+        .append(want.GetStringParam(AppExecFwk::Constants::PARAM_FORM_NAME_KEY)).append(doubleColon)
+        .append(std::to_string(want.GetIntParam(AppExecFwk::Constants::PARAM_FORM_DIMENSION_KEY, 1)));
+    std::lock_guard<std::mutex> lock(formStateCallbackMutex_);
+    auto iter = formStateCallbackMap_.find(key);
+    if (iter != formStateCallbackMap_.end()) {
+        formStateCallbackMap_.erase(key);
+    }
+    HILOG_INFO("%{public}s end.", __func__);
 }
 
 bool FormHostClient::RegisterUninstallCallback(UninstallCallback callback)
