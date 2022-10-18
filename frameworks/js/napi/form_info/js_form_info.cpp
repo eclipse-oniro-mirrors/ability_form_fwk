@@ -28,6 +28,8 @@ NativeValue* CreateJsFormType(NativeEngine &engine)
     NativeValue* objValue = engine.CreateObject();
     NativeObject* object = ConvertNativeValueTo<NativeObject>(objValue);
     object->SetProperty("JS", CreateJsValue(engine, AppExecFwk::FormType::JS));
+    object->SetProperty("eTS", CreateJsValue(engine, AppExecFwk::FormType::ETS));
+    object->SetProperty("arkTS", CreateJsValue(engine, AppExecFwk::FormType::ETS));
     return objValue;
 }
 

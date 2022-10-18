@@ -1117,6 +1117,7 @@ NativeValue* JsFormHostInit(NativeEngine* engine, NativeValue* exportObj)
     BindNativeFunction(*engine, *object, "releaseForm", moduleName, JsFormHost::ReleaseForm);
     BindNativeFunction(*engine, *object, "requestForm", moduleName, JsFormHost::RequestForm);
     BindNativeFunction(*engine, *object, "castTempForm", moduleName, JsFormHost::CastTempForm);
+    BindNativeFunction(*engine, *object, "castToNormalForm", moduleName, JsFormHost::CastTempForm);
     BindNativeFunction(*engine, *object, "notifyVisibleForms", moduleName, JsFormHost::NotifyVisibleForms);
     BindNativeFunction(*engine, *object, "notifyInvisibleForms", moduleName, JsFormHost::NotifyInvisibleForms);
     BindNativeFunction(*engine, *object, "enableFormsUpdate", moduleName, JsFormHost::EnableFormsUpdate);
