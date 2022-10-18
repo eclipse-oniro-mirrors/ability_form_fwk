@@ -16,6 +16,19 @@
 #include "js_form_info.h"
 #include "module_manager/native_module_manager.h"
 
+#ifdef ENABLE_ERRCODE
+extern "C" __attribute__((constructor)) void NAPI_app_form_formInfo_AutoRegister()
+{
+    auto moduleManager = NativeModuleManager::GetInstance();
+    NativeModule newModuleInfo = {
+        .name = "app.form.formInfo",
+        .fileName = "app/form/libforminfo_napi.so/formInfo.js",
+        .registerCallback = OHOS::AbilityRuntime::FormInfoInit,
+    };
+
+    moduleManager->Register(&newModuleInfo);
+}
+#else
 extern "C" __attribute__((constructor)) void NAPI_application_formInfo_AutoRegister()
 {
     auto moduleManager = NativeModuleManager::GetInstance();
@@ -27,3 +40,4 @@ extern "C" __attribute__((constructor)) void NAPI_application_formInfo_AutoRegis
 
     moduleManager->Register(&newModuleInfo);
 }
+#endif
