@@ -630,6 +630,7 @@ FormJsInfo FormTaskMgr::CreateFormJsInfo(const int64_t formId, const FormRecord 
     form.bundleName = record.bundleName;
     form.abilityName = record.abilityName;
     form.formName = record.formName;
+    form.moduleName = record.moduleName;
     form.formTempFlag = record.formTempFlag;
     form.jsFormCodePath = record.jsFormCodePath;
     form.formData = record.formProviderInfo.GetFormDataString();

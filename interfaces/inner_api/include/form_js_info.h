@@ -34,6 +34,7 @@ struct FormJsInfo : public Parcelable {
     std::string formName;
     std::string bundleName;
     std::string abilityName;
+    std::string moduleName;
     bool formTempFlag = false;
     std::string jsFormCodePath;
     std::string formData;
