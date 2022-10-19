@@ -247,6 +247,7 @@ group("form_napi_packages") {
       "${form_fwk_napi_path}:formextensioncontext_napi",
       "${form_fwk_napi_path}:formhost",
       "${form_fwk_napi_path}:formhost_napi",
+      "${form_fwk_napi_path}:forminfo",
       "${form_fwk_napi_path}:forminfo_napi",
       "${form_fwk_napi_path}:formprovider",
       "${form_fwk_napi_path}:formprovider_napi",

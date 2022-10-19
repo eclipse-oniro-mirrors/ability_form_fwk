@@ -212,6 +212,34 @@ ohos_shared_library("forminfo_napi") {
   part_name = "form_fwk"
 }
 
+ohos_shared_library("forminfo") {
+  include_dirs = [ "${form_fwk_path}/interfaces/inner_api/include" ]
+
+  sources = [
+    "form_info/form_info_module.cpp",
+    "form_info/js_form_info.cpp",
+  ]
+
+  configs = [ ":fmskit_config" ]
+
+  deps = []
+
+  external_deps = [
+    "ability_runtime:runtime",
+    "bundle_framework:appexecfwk_base",
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "napi:ace_napi",
+  ]
+
+  defines = [ "ENABLE_ERRCODE" ]
+
+  relative_install_dir = "module/app/form"
+
+  subsystem_name = "ability"
+  part_name = "form_fwk"
+}
+
 ################################### formhost_napi ########################################
 ohos_shared_library("formhost_napi") {
   include_dirs = [
