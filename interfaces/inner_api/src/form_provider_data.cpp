@@ -30,7 +30,7 @@ namespace OHOS {
 namespace AppExecFwk {
 const std::string JSON_EMPTY_STRING = "{}";
 const std::string JSON_IMAGES_STRING = "formImages";
-
+constexpr int32_t READ_PARCEL_MAX_IMAGE_DATA_NUM_SIZE = 1000;
 /**
  * @brief Constructor.
  */
@@ -262,7 +262,7 @@ void FormProviderData::SetImageDataMap(std::map<std::string, std::pair<sptr<Form
 /**
  * Read this {@code FormProviderData} object from a Parcel.
  * @param parcel the parcel
- * eturn Returns {@code true} if the marshalling is successful; returns {@code false} otherwise.
+ * @return Returns {@code true} if the marshalling is successful; returns {@code false} otherwise.
  */
 bool FormProviderData::ReadFromParcel(Parcel &parcel)
 {
@@ -279,6 +279,10 @@ bool FormProviderData::ReadFromParcel(Parcel &parcel)
     switch (imageDataState_) {
         case IMAGE_DATA_STATE_ADDED: {
             int32_t imageDataNum = parcel.ReadInt32();
+            if (imageDataNum > READ_PARCEL_MAX_IMAGE_DATA_NUM_SIZE) {
+                return false;
+            }
+            HILOG_INFO("%{public}s imageDataNum is %{public}d", __func__, imageDataNum);
             for (int32_t i = 0; i < imageDataNum; i++) {
                 sptr<FormAshmem> formAshmem = parcel.ReadParcelable<FormAshmem>();
                 if (formAshmem == nullptr) {
