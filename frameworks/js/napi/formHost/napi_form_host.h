@@ -26,24 +26,6 @@
 namespace OHOS {
 namespace AbilityRuntime {
 
-struct AsyncNotifyVisibleFormsCallbackInfo {
-    napi_env env;
-    napi_async_work asyncWork;
-    napi_deferred deferred;
-    napi_ref callback;
-    std::vector<int64_t> formIds;
-    int result;
-};
-
-struct AsyncNotifyInvisibleFormsCallbackInfo {
-    napi_env env;
-    napi_async_work asyncWork;
-    napi_deferred deferred;
-    napi_ref callback;
-    std::vector<int64_t> formIds;
-    int result;
-};
-
 struct AsyncDeleteInvalidFormsCallbackInfo {
     napi_env env;
     napi_async_work asyncWork = nullptr;
@@ -85,8 +67,6 @@ struct AsyncNotifyFormsEnableUpdateCallbackInfo {
     int result;
 };
 
-napi_value NAPI_NotifyVisibleForms(napi_env env, napi_callback_info info);
-napi_value NAPI_NotifyInvisibleForms(napi_env env, napi_callback_info info);
 napi_value NAPI_DeleteInvalidForms(napi_env env, napi_callback_info info);
 napi_value NAPI_AcquireFormState(napi_env env, napi_callback_info info);
 napi_value NAPI_RegisterFormUninstallObserver(napi_env env, napi_callback_info info);
@@ -112,6 +92,8 @@ public:
     static NativeValue* GetFormsInfo(NativeEngine *engine, NativeCallbackInfo *info);
     static NativeValue* EnableFormsUpdate(NativeEngine *engine, NativeCallbackInfo *info);
     static NativeValue* NotifyFormsPrivacyProtected(NativeEngine *engine, NativeCallbackInfo *info);
+    static NativeValue* NotifyVisibleForms(NativeEngine *engine, NativeCallbackInfo *info);
+    static NativeValue* NotifyInVisibleForms(NativeEngine *engine, NativeCallbackInfo *info);
 private:
     NativeValue* OnDisableFormsUpdate(NativeEngine &engine, NativeCallbackInfo &info);
     NativeValue* OnIsSystemReady(NativeEngine &engine, NativeCallbackInfo &info);
@@ -124,6 +106,8 @@ private:
     NativeValue* OnEnableFormsUpdate(NativeEngine &engine, NativeCallbackInfo &info);
     NativeValue* OnShareForm(NativeEngine &engine, NativeCallbackInfo &info);
     NativeValue* OnNotifyFormsPrivacyProtected(NativeEngine &engine, NativeCallbackInfo &info);
+    NativeValue* OnNotifyVisibleForms(NativeEngine &engine, NativeCallbackInfo &info);
+    NativeValue* OnNotifyInVisibleForms(NativeEngine &engine, NativeCallbackInfo &info);
     void InnerShareForm(NativeEngine &engine, const std::shared_ptr<OHOS::AbilityRuntime::AsyncTask> &asyncTask,
         ShareFormTask &&task, int64_t formId, const std::string &remoteDeviceId);
     bool GetStringsValue(NativeEngine &engine, NativeValue *object, std::vector<std::string> &strList);
