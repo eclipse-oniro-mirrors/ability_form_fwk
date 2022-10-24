@@ -1811,7 +1811,7 @@ NativeValue* NapiFormHost::OnNotifyVisibleForms(NativeEngine &engine, NativeCall
             Constants::FORM_VISIBLE);
         if (ret == ERR_OK) {
             auto result = QueryRetCode(ret);
-            task.Resolve(engine, CreateJsValue(engine, result));
+            task.ResolveForForm(engine, CreateJsError(engine, result, QueryRetMsg(result)));
         } else {
             auto retCode = QueryRetCode(ret);
             task.Reject(engine, CreateJsError(engine, retCode, QueryRetMsg(retCode)));
@@ -1868,7 +1868,7 @@ NativeValue* NapiFormHost::OnNotifyInVisibleForms(NativeEngine &engine, NativeCa
             FormHostClient::GetInstance(), Constants::FORM_INVISIBLE);
         if (ret == ERR_OK) {
             auto resultCode = QueryRetCode(ret);
-            task.Resolve(engine, CreateJsValue(engine, resultCode));
+            task.ResolveForForm(engine, CreateJsError(engine, resultCode, QueryRetMsg(resultCode)));
         } else {
             auto retCode = QueryRetCode(ret);
             task.Reject(engine, CreateJsError(engine, retCode, QueryRetMsg(retCode)));
