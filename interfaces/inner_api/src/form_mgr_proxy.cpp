@@ -633,7 +633,7 @@ int FormMgrProxy::GetStringInfo(IFormMgr::Message code, MessageParcel &data, std
         HILOG_INFO("%{public}s, No string info", __func__);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    for (auto &info : stringInfoList) {
+    for (const auto &info : stringInfoList) {
         stringInfo += info;
     }
     HILOG_DEBUG("get string info success");

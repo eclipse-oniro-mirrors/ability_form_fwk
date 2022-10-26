@@ -39,7 +39,7 @@ void FormDumpMgr::DumpStorageFormInfos(const std::vector<FormDBInfo> &storageInf
         formInfos += "    moduleName [" + info.moduleName + "]\n";
         formInfos += "    abilityName [" + info.abilityName + "]\n";
         formInfos += "    formUserUids [";
-        for (auto &uId : info.formUserUids) {
+        for (const auto &uId : info.formUserUids) {
             formInfos += " Uid[" + std::to_string(uId) + "] ";
         }
         formInfos += "]\n" + LINE_SEPARATOR;
@@ -75,7 +75,7 @@ void FormDumpMgr::DumpFormInfos(const std::vector<FormRecord> &formRecordInfos, 
 
         if (!info.hapSourceDirs.empty()) {
             formInfos += "    hapSourceDirs [";
-            for (auto &hapDir : info.hapSourceDirs) {
+            for (const auto &hapDir : info.hapSourceDirs) {
                 formInfos += " hapSourceDir[" + hapDir + "]";
             }
             formInfos += "]\n";
@@ -83,7 +83,7 @@ void FormDumpMgr::DumpFormInfos(const std::vector<FormRecord> &formRecordInfos, 
 
         if (!info.formUserUids.empty()) {
             formInfos += "    formUserUids [";
-            for (auto &uId : info.formUserUids) {
+            for (const auto &uId : info.formUserUids) {
                 formInfos += " Uid[" + std::to_string(uId) + "] ";
             }
             formInfos += "]\n";
@@ -149,7 +149,7 @@ void FormDumpMgr::DumpFormInfo(const FormRecord &formRecordInfo, std::string &fo
 
     if (!formRecordInfo.hapSourceDirs.empty()) {
         formInfo += "    hapSourceDirs [";
-        for (auto &hapDir : formRecordInfo.hapSourceDirs) {
+        for (const auto &hapDir : formRecordInfo.hapSourceDirs) {
             formInfo += " hapSourceDir[" + hapDir + "] ";
         }
         formInfo += "]\n";
@@ -157,7 +157,7 @@ void FormDumpMgr::DumpFormInfo(const FormRecord &formRecordInfo, std::string &fo
 
     if (!formRecordInfo.formUserUids.empty()) {
         formInfo += "    formUserUids [";
-        for (auto &uId : formRecordInfo.formUserUids) {
+        for (const auto &uId : formRecordInfo.formUserUids) {
             formInfo += " Uid[" + std::to_string(uId) + "] ";
         }
         formInfo += "]\n";
