@@ -267,6 +267,7 @@ napi_value NAPI_NotifyVisibleForms(napi_env env, napi_callback_info info)
             .formIds = formIds,
             .result = 1,
         };
+    std::unique_ptr<AsyncNotifyVisibleFormsCallbackInfo> callbackPtr {asyncCallbackInfo};
 
     if (argc == ARGS_SIZE_TWO) {
         HILOG_INFO("%{public}s, asyncCallback.", __func__);
@@ -316,6 +317,7 @@ napi_value NAPI_NotifyVisibleForms(napi_env env, napi_callback_info info)
             (void *)asyncCallbackInfo,
             &asyncCallbackInfo->asyncWork);
         NAPI_CALL(env, napi_queue_async_work(env, asyncCallbackInfo->asyncWork));
+        callbackPtr.release();
         return NapiGetResult(env, 1);
     } else {
         HILOG_INFO("%{public}s, promise.", __func__);
@@ -357,6 +359,7 @@ napi_value NAPI_NotifyVisibleForms(napi_env env, napi_callback_info info)
             (void *)asyncCallbackInfo,
             &asyncCallbackInfo->asyncWork);
         napi_queue_async_work(env, asyncCallbackInfo->asyncWork);
+        callbackPtr.release();
         return promise;
     }
 }
@@ -506,6 +509,7 @@ napi_value NAPI_NotifyInvisibleForms(napi_env env, napi_callback_info info)
             .formIds = formIds,
             .result = 1,
         };
+    std::unique_ptr<AsyncNotifyInvisibleFormsCallbackInfo> callbackPtr {asyncCallbackInfo};
 
     if (argc == ARGS_SIZE_TWO) {
         HILOG_INFO("%{public}s, asyncCallback.", __func__);
@@ -555,6 +559,7 @@ napi_value NAPI_NotifyInvisibleForms(napi_env env, napi_callback_info info)
             (void *)asyncCallbackInfo,
             &asyncCallbackInfo->asyncWork);
         NAPI_CALL(env, napi_queue_async_work(env, asyncCallbackInfo->asyncWork));
+        callbackPtr.release();
         return NapiGetResult(env, 1);
     } else {
         HILOG_INFO("%{public}s, promise.", __func__);
@@ -596,6 +601,7 @@ napi_value NAPI_NotifyInvisibleForms(napi_env env, napi_callback_info info)
             (void *)asyncCallbackInfo,
             &asyncCallbackInfo->asyncWork);
         napi_queue_async_work(env, asyncCallbackInfo->asyncWork);
+        callbackPtr.release();
         return promise;
     }
 }
@@ -751,17 +757,21 @@ napi_value NAPI_DeleteInvalidForms(napi_env env, napi_callback_info info)
         HILOG_ERROR("asyncCallbackInfo == nullptr.");
         return RetErrMsg(InitErrMsg(env, ERR_APPEXECFWK_FORM_COMMON_CODE, callbackType, argv[1]));
     }
+    std::unique_ptr<AsyncDeleteInvalidFormsCallbackInfo> callbackPtr {asyncCallbackInfo};
 
+    napi_value result;
     if (argc == ARGS_SIZE_TWO) {
         // Check the value type of the arguments
         napi_valuetype valueType = napi_undefined;
         NAPI_CALL(env, napi_typeof(env, argv[1], &valueType));
         NAPI_ASSERT(env, valueType == napi_function, "The type of args[1] is incorrect, expected type is function.");
         napi_create_reference(env, argv[1], REF_COUNT, &asyncCallbackInfo->callback);
-        return DeleteInvalidFormsCallback(env, asyncCallbackInfo);
+        result = DeleteInvalidFormsCallback(env, asyncCallbackInfo);
     } else {
-        return DeleteInvalidFormsPromise(env, asyncCallbackInfo);
+        result = DeleteInvalidFormsPromise(env, asyncCallbackInfo);
     }
+    callbackPtr.release();
+    return result;
 }
 
 napi_value ParseFormStateInfo(napi_env env, FormStateInfo &stateInfo)
@@ -1120,14 +1130,15 @@ napi_value NAPI_AcquireFormState(napi_env env, napi_callback_info info)
         HILOG_ERROR("asyncCallbackInfo == nullptr.");
         return RetErrMsg(InitErrMsg(env, ERR_APPEXECFWK_FORM_COMMON_CODE, callbackType, argv[1]));
     }
+    std::unique_ptr<AsyncAcquireFormStateCallbackInfo> callbackPtr {asyncCallbackInfo};
 
     bool parseResult = UnwrapWant(env, argv[0], asyncCallbackInfo->want);
     if (!parseResult) {
         HILOG_ERROR("%{public}s, failed to parse want.", __func__);
-        delete asyncCallbackInfo;
         return RetErrMsg(InitErrMsg(env, ERR_APPEXECFWK_FORM_INVALID_PARAM, callbackType, argv[1]));
     }
 
+    napi_value result;
     if (argc == ARGS_SIZE_TWO) {
         // Check the value type of the arguments
         valueType = napi_undefined;
@@ -1135,10 +1146,12 @@ napi_value NAPI_AcquireFormState(napi_env env, napi_callback_info info)
         NAPI_ASSERT(env, valueType == napi_function,
             "The arguments[1] type of acquireFormState is incorrect, expected type is function.");
         napi_create_reference(env, argv[1], REF_COUNT, &asyncCallbackInfo->callback);
-        return AcquireFormStateCallback(env, asyncCallbackInfo);
+        result = AcquireFormStateCallback(env, asyncCallbackInfo);
     } else {
-        return AcquireFormStatePromise(env, asyncCallbackInfo);
+        result = AcquireFormStatePromise(env, asyncCallbackInfo);
     }
+    callbackPtr.release();
+    return result;
 }
 
 /**
@@ -1378,19 +1391,24 @@ napi_value NAPI_NotifyFormsVisible(napi_env env, napi_callback_info info)
         HILOG_ERROR("asyncCallbackInfo == nullptr.");
         return RetErrMsg(InitErrMsg(env, ERR_APPEXECFWK_FORM_COMMON_CODE, callbackType, argv[1]));
     }
+    std::unique_ptr<AsyncNotifyFormsVisibleCallbackInfo> callbackPtr {asyncCallbackInfo};
 
     napi_get_value_bool(env, argv[1], &asyncCallbackInfo->isVisible);
 
+    napi_value result;
     if (argc == ARGS_SIZE_THREE) {
         // Check the value type of the arguments
         valueType = napi_undefined;
         NAPI_CALL(env, napi_typeof(env, argv[ARGS_SIZE_TWO], &valueType));
         NAPI_ASSERT(env, valueType == napi_function, "The type of arg 2 is incorrect, expected type is function.");
         napi_create_reference(env, argv[ARGS_SIZE_TWO], REF_COUNT, &asyncCallbackInfo->callback);
-        return NotifyFormsVisibleCallback(env, asyncCallbackInfo);
+        result = NotifyFormsVisibleCallback(env, asyncCallbackInfo);
     } else {
-        return NotifyFormsVisiblePromise(env, asyncCallbackInfo);
+        result = NotifyFormsVisiblePromise(env, asyncCallbackInfo);
     }
+
+    callbackPtr.release();
+    return result;
 }
 
 static void InnerNotifyFormsEnableUpdate(napi_env env,
@@ -1528,19 +1546,23 @@ napi_value NAPI_NotifyFormsEnableUpdate(napi_env env, napi_callback_info info)
         HILOG_ERROR("asyncCallbackInfo == nullptr.");
         return RetErrMsg(InitErrMsg(env, ERR_APPEXECFWK_FORM_COMMON_CODE, callbackType, argv[1]));
     }
+    std::unique_ptr<AsyncNotifyFormsEnableUpdateCallbackInfo> callbackPtr {asyncCallbackInfo};
 
     napi_get_value_bool(env, argv[1], &asyncCallbackInfo->isEnableUpdate);
 
+    napi_value result;
     if (argc == ARGS_SIZE_THREE) {
         // Check the value type of the arguments
         valueType = napi_undefined;
         NAPI_CALL(env, napi_typeof(env, argv[ARGS_SIZE_TWO], &valueType));
         NAPI_ASSERT(env, valueType == napi_function, "The type of arg 2 is incorrect, expected type is function.");
         napi_create_reference(env, argv[ARGS_SIZE_TWO], REF_COUNT, &asyncCallbackInfo->callback);
-        return NotifyFormsEnableUpdateCallback(env, asyncCallbackInfo);
+        result = NotifyFormsEnableUpdateCallback(env, asyncCallbackInfo);
     } else {
-        return NotifyFormsEnableUpdatePromise(env, asyncCallbackInfo);
+        result = NotifyFormsEnableUpdatePromise(env, asyncCallbackInfo);
     }
+    callbackPtr.release();
+    return result;
 }
 
 int64_t SystemTimeMillis() noexcept
