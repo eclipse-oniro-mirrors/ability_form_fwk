@@ -78,12 +78,7 @@ private:
 
 class FormUninstallCallbackClient {
 public:
-    explicit FormUninstallCallbackClient(napi_env env, napi_ref callbackRef)
-    {
-        env_ = env;
-        callbackRef_ = callbackRef;
-    }
-
+    explicit FormUninstallCallbackClient(napi_env env, napi_ref callbackRef) : callbackRef_(callbackRef), env_(env) {}
     virtual ~FormUninstallCallbackClient()
     {
         napi_delete_reference(env_, callbackRef_);
@@ -426,7 +421,7 @@ private:
         return result;
     }
 
-    NativeValue* OnReleaseForm(NativeEngine &engine, NativeCallbackInfo &info)
+    NativeValue* OnReleaseForm(NativeEngine &engine, const NativeCallbackInfo &info)
     {
         HILOG_DEBUG("%{public}s called.", __func__);
 
@@ -478,7 +473,7 @@ private:
         return result;
     }
 
-    NativeValue* OnRequestForm(NativeEngine &engine, NativeCallbackInfo &info)
+    NativeValue* OnRequestForm(NativeEngine &engine, const NativeCallbackInfo &info)
     {
         HILOG_DEBUG("%{public}s called.", __func__);
 
@@ -514,7 +509,7 @@ private:
         return result;
     }
 
-    NativeValue* OnCastTempForm(NativeEngine &engine, NativeCallbackInfo &info)
+    NativeValue* OnCastTempForm(NativeEngine &engine, const NativeCallbackInfo &info)
     {
         HILOG_DEBUG("%{public}s called.", __func__);
 
@@ -549,7 +544,7 @@ private:
         return result;
     }
 
-    NativeValue* OnNotifyVisibleForms(NativeEngine &engine, NativeCallbackInfo &info)
+    NativeValue* OnNotifyVisibleForms(NativeEngine &engine, const NativeCallbackInfo &info)
     {
         HILOG_DEBUG("%{public}s is called", __FUNCTION__);
 
@@ -585,7 +580,7 @@ private:
         return result;
     }
 
-    NativeValue* OnNotifyInvisibleForms(NativeEngine &engine, NativeCallbackInfo &info)
+    NativeValue* OnNotifyInvisibleForms(NativeEngine &engine, const NativeCallbackInfo &info)
     {
         HILOG_DEBUG("%{public}s is called", __FUNCTION__);
 
@@ -621,7 +616,7 @@ private:
         return result;
     }
 
-    NativeValue* OnEnableFormsUpdate(NativeEngine &engine, NativeCallbackInfo &info)
+    NativeValue* OnEnableFormsUpdate(NativeEngine &engine, const NativeCallbackInfo &info)
     {
         HILOG_DEBUG("%{public}s is called", __FUNCTION__);
 
@@ -656,7 +651,7 @@ private:
         return result;
     }
 
-    NativeValue* OnDisableFormsUpdate(NativeEngine &engine, NativeCallbackInfo &info)
+    NativeValue* OnDisableFormsUpdate(NativeEngine &engine, const NativeCallbackInfo &info)
     {
         HILOG_DEBUG("%{public}s is called", __FUNCTION__);
 
@@ -841,7 +836,7 @@ private:
         return engine.CreateUndefined();
     }
 
-    NativeValue* OnNotifyFormsVisible(NativeEngine &engine, NativeCallbackInfo &info)
+    NativeValue* OnNotifyFormsVisible(NativeEngine &engine, const NativeCallbackInfo &info)
     {
         HILOG_DEBUG("%{public}s is called", __FUNCTION__);
 
@@ -974,7 +969,7 @@ private:
             return engine.CreateUndefined();
         }
 
-        if (info.argv[PARAM0]->TypeOf() != NATIVE_STRING) {
+        if (info.argv[PARAM0] && info.argv[PARAM0]->TypeOf() != NATIVE_STRING) {
             HILOG_ERROR("input params is not string.");
             NapiFormUtil::ThrowParamTypeError(engine, "bundleName", "string");
             return engine.CreateUndefined();

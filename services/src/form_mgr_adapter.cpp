@@ -656,7 +656,7 @@ int FormMgrAdapter::DumpStorageFormInfos(std::string &formInfos) const
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
     std::sort(formDBInfos.begin(), formDBInfos.end(),
-        [] (FormDBInfo &formDBInfoA, FormDBInfo &formDBInfoB) -> bool {
+        [] (const FormDBInfo &formDBInfoA, const FormDBInfo &formDBInfoB) -> bool {
         return formDBInfoA.formId < formDBInfoB.formId;
     });
     FormDumpMgr::GetInstance().DumpStorageFormInfos(formDBInfos, formInfos);

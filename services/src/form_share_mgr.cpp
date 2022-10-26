@@ -495,7 +495,7 @@ int32_t FormShareMgr::GetLocalDeviceInfo(
     auto &deviceManager = OHOS::DistributedHardware::DeviceManager::GetInstance();
 
     std::shared_ptr<DeviceInitCallback> deviceInitCallback_ = std::make_shared<DeviceInitCallback>();
-    if (deviceInitCallback_ == nullptr) {
+    if (!deviceInitCallback_) {
         HILOG_ERROR("DeviceInitCallback make_shared failed!");
         return ERR_INVALID_VALUE;
     }
