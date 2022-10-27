@@ -399,7 +399,7 @@ ErrCode FormInfoMgr::Remove(const std::string &bundleName, int32_t userId)
         errCode = bundleFormInfoIter->second->Remove(userId);
     }
 
-    if (bundleFormInfoIter->second->Empty()) {
+    if (bundleFormInfoIter->second && bundleFormInfoIter->second->Empty()) {
         bundleFormInfoMap_.erase(bundleFormInfoIter);
     }
     HILOG_INFO("remove forms info success, bundleName=%{public}s.", bundleName.c_str());
