@@ -296,7 +296,7 @@ public:
         return (me != nullptr) ? me->OnShareForm(*engine, *info) : nullptr;
     }
 private:
-    bool ConvertFromId(NativeEngine& engine, NativeValue* jsValue, int64_t &formId)
+    static bool ConvertFromId(NativeEngine& engine, NativeValue* jsValue, int64_t &formId)
     {
         if (jsValue->TypeOf() != NATIVE_STRING) {
             HILOG_ERROR("input params is not string.");
