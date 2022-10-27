@@ -1761,7 +1761,7 @@ NativeValue* NapiFormHost::OnIsSystemReady(NativeEngine &engine, NativeCallbackI
         // Use original logic.
         // Use the error code to return whether the function executed successfully.
         auto ret = FormMgr::GetInstance().CheckFMSReady() ? 0 : 1;
-        if( ret == ERR_OK ) {
+        if (ret == ERR_OK) {
             task.Resolve(engine, engine.CreateUndefined());
         } else {
             auto retCode = QueryRetCode(ret);
@@ -2073,11 +2073,11 @@ NativeValue* NapiFormHost::OnEnableFormsUpdate(NativeEngine &engine, NativeCallb
         errCode = ERR_APPEXECFWK_FORM_FORM_ARRAY_ERR;
     } else {
         std::vector<string> strFormIdList;
-        if(!GetStringsValue(engine, info.argv[PARAM0], strFormIdList)) {
+        if (!GetStringsValue(engine, info.argv[PARAM0], strFormIdList)) {
             HILOG_ERROR("conversion string failed!");
             errCode = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR;
         }
-        for(size_t i = 0; i < strFormIdList.size(); i++) {
+        for (size_t i = 0; i < strFormIdList.size(); i++) {
             int64_t formIdValue;
             if (!ConvertStringToInt64(strFormIdList[i], formIdValue)) {
                 HILOG_ERROR("conversion int failed!");
