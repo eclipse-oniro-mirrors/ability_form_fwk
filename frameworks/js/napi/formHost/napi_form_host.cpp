@@ -1496,6 +1496,12 @@ NativeValue* NapiFormHost::EnableFormsUpdate(NativeEngine *engine, NativeCallbac
     return (me != nullptr) ? me->OnEnableFormsUpdate(*engine, *info) : nullptr;
 }
 
+NativeValue* NapiFormHost::DeleteInvalidForms(NativeEngine *engine, NativeCallbackInfo *info)
+{
+    NapiFormHost *me = OHOS::AbilityRuntime::CheckParamsAndGetThis<NapiFormHost>(engine, info);
+    return (me != nullptr) ? me->OnDeleteInvalidForms(*engine, *info) : nullptr;
+}
+
 NativeValue* NapiFormHost::OnShareForm(NativeEngine &engine, NativeCallbackInfo &info)
 {
     HILOG_DEBUG("%{public}s is called", __FUNCTION__);
