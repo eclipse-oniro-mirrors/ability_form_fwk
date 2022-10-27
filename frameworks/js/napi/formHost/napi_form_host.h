@@ -112,6 +112,7 @@ public:
     static NativeValue* GetFormsInfo(NativeEngine *engine, NativeCallbackInfo *info);
     static NativeValue* EnableFormsUpdate(NativeEngine *engine, NativeCallbackInfo *info);
     static NativeValue* NotifyFormsPrivacyProtected(NativeEngine *engine, NativeCallbackInfo *info);
+    static NativeValue* DeleteInvalidForms(NativeEngine *engine, NativeCallbackInfo *info);
 private:
     NativeValue* OnDisableFormsUpdate(NativeEngine &engine, NativeCallbackInfo &info);
     NativeValue* OnIsSystemReady(NativeEngine &engine, const NativeCallbackInfo &info);
@@ -124,6 +125,7 @@ private:
     NativeValue* OnEnableFormsUpdate(NativeEngine &engine, NativeCallbackInfo &info);
     NativeValue* OnShareForm(NativeEngine &engine, NativeCallbackInfo &info);
     NativeValue* OnNotifyFormsPrivacyProtected(NativeEngine &engine, NativeCallbackInfo &info);
+    NativeValue* OnDeleteInvalidForms(NativeEngine &engine, NativeCallbackInfo &info);
     void InnerShareForm(NativeEngine &engine, const std::shared_ptr<OHOS::AbilityRuntime::AsyncTask> &asyncTask,
         ShareFormTask &&task, int64_t formId, const std::string &remoteDeviceId);
     bool GetStringsValue(NativeEngine &engine, NativeValue *object, std::vector<std::string> &strList);

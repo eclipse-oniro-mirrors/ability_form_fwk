@@ -68,10 +68,12 @@ public:
     static NativeValue* GetFormsInfo(NativeEngine* engine, NativeCallbackInfo* info);
     static NativeValue* SetFormNextRefreshTime(NativeEngine *engine, NativeCallbackInfo *info);
     static NativeValue* UpdateForm(NativeEngine *engine, NativeCallbackInfo *info);
+    static NativeValue* IsRequestPublishFormSupported(NativeEngine *engine, NativeCallbackInfo *info);
 private:
     NativeValue* OnGetFormsInfo(NativeEngine &engine, NativeCallbackInfo &info);
     NativeValue* OnSetFormNextRefreshTime(NativeEngine &engine, NativeCallbackInfo &info);
     NativeValue* OnUpdateForm(NativeEngine &engine, NativeCallbackInfo &info);
+    NativeValue* OnIsRequestPublishFormSupported(NativeEngine &engine, NativeCallbackInfo &info);
 };
 }  // namespace AbilityRuntime
 }  // namespace OHOS
