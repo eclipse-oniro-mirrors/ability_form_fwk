@@ -267,7 +267,7 @@ int FormDbCache::GetMatchCount(const std::string &bundleName, const std::string 
     int32_t matchCount = 0;
     std::vector<FormDBInfo> formDBInfos;
     std::lock_guard<std::mutex> lock(formDBInfosMutex_);
-    for (FormDBInfo &dbInfo : formDBInfos_) {
+    for (const FormDBInfo &dbInfo : formDBInfos_) {
         if (dbInfo.bundleName == bundleName && dbInfo.moduleName == moduleName) {
             ++matchCount;
         }

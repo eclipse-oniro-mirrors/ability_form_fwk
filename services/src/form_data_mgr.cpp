@@ -229,14 +229,14 @@ int FormDataMgr::CheckEnoughForm(const int callingUid, const int32_t currentUser
     int formsInSystem = 0;
     int callingUidFormCounts = 0;
     std::lock_guard<std::recursive_mutex> lock(formRecordMutex_);
-    for (auto &recordPair : formRecords_) {
+    for (const auto &recordPair : formRecords_) {
         FormRecord record = recordPair.second;
         if ((record.userId == currentUserId) && !record.formTempFlag) {
             if (++formsInSystem >= Constants::MAX_FORMS) {
                 HILOG_WARN("%{public}s, already exist %{public}d forms in system", __func__, Constants::MAX_FORMS);
                 return ERR_APPEXECFWK_FORM_MAX_SYSTEM_FORMS;
             }
-            for (auto &userUid : record.formUserUids) {
+            for (const auto &userUid : record.formUserUids) {
                 if (userUid != callingUid) {
                     continue;
                 }

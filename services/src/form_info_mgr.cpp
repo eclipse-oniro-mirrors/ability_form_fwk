@@ -200,7 +200,7 @@ ErrCode BundleFormInfo::AddDynamicFormInfo(const FormInfo &formInfo, int32_t use
             continue;
         }
         bool isSame = false;
-        for (auto &item : formInfoStorage.formInfos) {
+        for (const auto &item : formInfoStorage.formInfos) {
             if (item.name == formInfo.name && item.moduleName == formInfo.moduleName) {
                 isSame = true;
                 break;

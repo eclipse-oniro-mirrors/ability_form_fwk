@@ -1771,7 +1771,7 @@ NativeValue* NapiFormHost::OnDisableFormsUpdate(NativeEngine &engine, NativeCall
     return result;
 }
 
-NativeValue* NapiFormHost::OnIsSystemReady(NativeEngine &engine, NativeCallbackInfo &info)
+NativeValue* NapiFormHost::OnIsSystemReady(NativeEngine &engine, const NativeCallbackInfo &info)
 {
     HILOG_DEBUG("%{public}s is called", __FUNCTION__);
     if (info.argc > ARGS_ONE || info.argc < ARGS_ZERO) {
@@ -1798,7 +1798,7 @@ NativeValue* NapiFormHost::OnIsSystemReady(NativeEngine &engine, NativeCallbackI
     return result;
 }
 
-NativeValue* NapiFormHost::OnGetAllFormsInfo(NativeEngine &engine, NativeCallbackInfo &info)
+NativeValue* NapiFormHost::OnGetAllFormsInfo(NativeEngine &engine, const NativeCallbackInfo &info)
 {
     HILOG_DEBUG("%{public}s is called", __FUNCTION__);
     if (info.argc > ARGS_ONE || info.argc < ARGS_ZERO) {

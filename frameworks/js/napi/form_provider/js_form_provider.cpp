@@ -274,7 +274,7 @@ NativeValue *JsFormProvider::IsRequestPublishFormSupported(NativeEngine *engine,
     return (me != nullptr) ? me->OnIsRequestPublishFormSupported(*engine, *info) : nullptr;
 }
 
-NativeValue *JsFormProvider::OnIsRequestPublishFormSupported(NativeEngine &engine, NativeCallbackInfo &info)
+NativeValue *JsFormProvider::OnIsRequestPublishFormSupported(NativeEngine &engine, const NativeCallbackInfo &info)
 {
     HILOG_DEBUG("%{public}s is called", __FUNCTION__);
     if (info.argc > ARGS_SIZE_ONE) {

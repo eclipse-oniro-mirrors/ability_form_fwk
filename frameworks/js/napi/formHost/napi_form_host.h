@@ -114,12 +114,12 @@ public:
     static NativeValue* NotifyFormsPrivacyProtected(NativeEngine *engine, NativeCallbackInfo *info);
 private:
     NativeValue* OnDisableFormsUpdate(NativeEngine &engine, NativeCallbackInfo &info);
-    NativeValue* OnIsSystemReady(NativeEngine &engine, NativeCallbackInfo &info);
+    NativeValue* OnIsSystemReady(NativeEngine &engine, const NativeCallbackInfo &info);
     NativeValue* OnDeleteForm(NativeEngine &engine, NativeCallbackInfo &info);
     NativeValue* OnReleaseForm(NativeEngine &engine, NativeCallbackInfo &info);
     NativeValue* OnRequestForm(NativeEngine &engine, NativeCallbackInfo &info);
     NativeValue* OnCastTempForm(NativeEngine &engine, NativeCallbackInfo &info);
-    NativeValue* OnGetAllFormsInfo(NativeEngine &engine, NativeCallbackInfo &info);
+    NativeValue* OnGetAllFormsInfo(NativeEngine &engine, const NativeCallbackInfo &info);
     NativeValue* OnGetFormsInfo(NativeEngine &engine, NativeCallbackInfo &info);
     NativeValue* OnEnableFormsUpdate(NativeEngine &engine, NativeCallbackInfo &info);
     NativeValue* OnShareForm(NativeEngine &engine, NativeCallbackInfo &info);
