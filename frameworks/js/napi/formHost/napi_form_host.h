@@ -127,7 +127,7 @@ private:
     void InnerShareForm(NativeEngine &engine, const std::shared_ptr<OHOS::AbilityRuntime::AsyncTask> &asyncTask,
         ShareFormTask &&task, int64_t formId, const std::string &remoteDeviceId);
     bool GetStringsValue(NativeEngine &engine, NativeValue *object, std::vector<std::string> &strList);
-    bool UnwrapGetFormsInfoParams(NativeEngine &engine, NativeCallbackInfo &info, std::string &moduleName,
+    static bool UnwrapGetFormsInfoParams(NativeEngine &engine, NativeCallbackInfo &info, std::string &moduleName,
         bool &bParam);
 };
 }  // namespace AbilityRuntime
