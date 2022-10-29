@@ -723,7 +723,7 @@ private:
         return result;
     }
 
-    NativeValue* OnIsSystemReady(NativeEngine &engine, NativeCallbackInfo &info)
+    NativeValue* OnIsSystemReady(NativeEngine &engine, const NativeCallbackInfo &info)
     {
         HILOG_DEBUG("%{public}s is called", __FUNCTION__);
         if (info.argc > ARGS_ONE || info.argc < ARGS_ZERO) {
@@ -750,7 +750,7 @@ private:
         return result;
     }
 
-    NativeValue* OnDeleteInvalidForms(NativeEngine &engine, NativeCallbackInfo &info)
+    NativeValue* OnDeleteInvalidForms(NativeEngine &engine, const NativeCallbackInfo &info)
     {
         HILOG_DEBUG("%{public}s is called", __FUNCTION__);
 
@@ -1021,7 +1021,7 @@ private:
         return result;
     }
 
-    NativeValue* OnGetAllFormsInfo(NativeEngine &engine, NativeCallbackInfo &info)
+    NativeValue* OnGetAllFormsInfo(NativeEngine &engine, const NativeCallbackInfo &info)
     {
         HILOG_DEBUG("%{public}s is called", __FUNCTION__);
         if (info.argc > ARGS_ONE || info.argc < ARGS_ZERO) {
