@@ -808,7 +808,7 @@ HWTEST_F(FmsFormMgrAddFormTest, AddForm_010, TestSize.Level0)
 }
 
 /**
- * @tc.name: AddForm_010
+ * @tc.name: AddForm_011
  * @tc.desc: Add form with unzipped app
  * @tc.type: FUNC
  * @tc.require: issueI5MVKZ
