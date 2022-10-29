@@ -47,6 +47,10 @@ using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::AppExecFwk;
 using namespace OHOS::Security;
+using ::testing::SetArgReferee;
+using ::testing::_;
+using ::testing::Return;
+using ::testing::DoAll;
 
 namespace {
 const std::string PERMISSION_NAME_REQUIRE_FORM = "ohos.permission.REQUIRE_FORM";
@@ -131,6 +135,48 @@ void FmsFormMgrAddFormTest::CreateProviderData()
 
     FormInfoMgr::GetInstance().bundleFormInfoMap_ = bundleFormInfoMap;
 }
+
+class FmsFormMgrAddFormTestExt : public FmsFormMgrAddFormTest {
+public:
+    static void SetUpTestCase()
+    {
+        RemoteNativeToken::SetNativeToken();
+        mockBundleMgrService = new MockBundleMgrService();
+        FormBmsHelper::GetInstance().SetBundleManager(mockBundleMgrService);
+        FormAmsHelper::GetInstance().SetAbilityManager(new MockAbilityMgrService());
+    }
+
+    void FillBundleInfo(const std::string &bundleName, BundleInfo &bundleInfo);
+    static sptr<MockBundleMgrService> mockBundleMgrService;
+};
+
+sptr<MockBundleMgrService> FmsFormMgrAddFormTestExt::mockBundleMgrService = nullptr;
+
+void FmsFormMgrAddFormTestExt::FillBundleInfo(const std::string &bundleName, BundleInfo &bundleInfo)
+{
+    std::vector<AbilityInfo> abilityInfos;
+    ApplicationInfo applicationInfo;
+    ModuleInfo moduleInfo;
+
+    moduleInfo.moduleSourceDir = FORM_PROVIDER_MODULE_SOURCE_DIR;
+    moduleInfo.moduleName = PARAM_PROVIDER_MODULE_NAME;
+    bundleInfo.name = bundleName;
+    applicationInfo.bundleName = bundleName;
+    applicationInfo.moduleInfos.emplace_back(moduleInfo);
+    bundleInfo.applicationInfo = applicationInfo;
+
+    bundleInfo.moduleNames.emplace_back(PARAM_PROVIDER_MODULE_NAME);
+
+    AbilityInfo abilityInfo;
+    abilityInfo.name = FORM_PROVIDER_ABILITY_NAME;
+    abilityInfo.package = PARAM_PROVIDER_PACKAGE_NAME;
+    abilityInfo.bundleName = bundleName;
+    abilityInfo.moduleName = PARAM_PROVIDER_MODULE_NAME;
+    abilityInfo.deviceId = DEVICE_ID;
+    abilityInfo.hapPath = Constants::ABS_CODE_PATH;
+    bundleInfo.abilityInfos.emplace_back(abilityInfo);
+}
+
 /**
  * @tc.name: AddForm_001
  * @tc.desc: Add 2_1 form
@@ -759,5 +805,68 @@ HWTEST_F(FmsFormMgrAddFormTest, AddForm_010, TestSize.Level0)
     FormDbCache::GetInstance().DeleteFormInfo(formId);
     FormDataMgr::GetInstance().DeleteHostRecord(token_, formId);
     GTEST_LOG_(INFO) << "fms_form_mgr_add_form_test_010 end";
+}
+
+/**
+ * @tc.name: AddForm_011
+ * @tc.desc: Add form with unzipped app
+ * @tc.type: FUNC
+ * @tc.require: issueI5MVKZ
+ */
+HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_011, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "fms_form_mgr_add_form_test_011 start";
+
+    CreateProviderData();
+    // No cache
+    FormJsInfo formJsInfo;
+    Want want;
+    want.SetParam(Constants::PARAM_FORM_HOST_BUNDLENAME_KEY, FORM_PROVIDER_BUNDLE_NAME);
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, PARAM_PROVIDER_MODULE_NAME);
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, PARAM_FORM_NAME);
+    want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, PARAM_FORM_DIMENSION_VALUE);
+    want.SetElementName(DEVICE_ID, FORM_PROVIDER_BUNDLE_NAME, FORM_PROVIDER_ABILITY_NAME);
+    want.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
+    want.SetParam(Constants::ACQUIRE_TYPE, Constants::ACQUIRE_TYPE_CREATE_FORM);
+    // clear old data
+    FormDataMgr::GetInstance().ClearFormRecords();
+    std::vector<FormDBInfo> oldFormDBInfos;
+    FormDbCache::GetInstance().GetAllFormInfo(oldFormDBInfos);
+    FormDbCache::GetInstance().DeleteFormInfoByBundleName(FORM_PROVIDER_BUNDLE_NAME, userId_, oldFormDBInfos);
+
+    BundleInfo bundleInfo;
+    FillBundleInfo(FORM_PROVIDER_BUNDLE_NAME, bundleInfo);
+    EXPECT_CALL(*mockBundleMgrService, GetBundleInfo(_, _, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(bundleInfo), Return(true)));
+
+    // add form
+    EXPECT_EQ(ERR_OK, FormMgr::GetInstance().AddForm(0L, want, token_, formJsInfo));
+    token_->Wait();
+
+    size_t dataCnt {1};
+    int64_t formId = formJsInfo.formId;
+    // Form record alloted.
+    FormRecord formInfo;
+    bool ret = FormDataMgr::GetInstance().GetFormRecord(formId, formInfo);
+    EXPECT_TRUE(ret);
+    EXPECT_EQ(dataCnt, formInfo.formUserUids.size());
+    // Database info alloted.
+    std::vector<FormDBInfo> formDBInfos;
+    FormDbCache::GetInstance().GetAllFormInfo(formDBInfos);
+    EXPECT_EQ(dataCnt, formDBInfos.size());
+    FormDBInfo dbInfo {formDBInfos[0]};
+    EXPECT_EQ(formId, dbInfo.formId);
+    EXPECT_EQ(dataCnt, dbInfo.formUserUids.size());
+    // Form host record alloted.
+    std::vector<FormHostRecord> hostRecords;
+    FormDataMgr::GetInstance().GetFormHostRecord(formId, hostRecords);
+    EXPECT_FALSE(hostRecords.empty());
+
+    FormSupplyCallback::GetInstance()->RemoveConnection(formId, token_);
+    FormDataMgr::GetInstance().DeleteFormRecord(formId);
+    FormDbCache::GetInstance().DeleteFormInfo(formId);
+    FormDataMgr::GetInstance().DeleteHostRecord(token_, formId);
+    testing::Mock::AllowLeak(mockBundleMgrService);
+    GTEST_LOG_(INFO) << "fms_form_mgr_add_form_test_011 end";
 }
 }
