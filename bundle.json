@@ -94,7 +94,8 @@
           ],
           "test": [
               "//foundation/ability/form_fwk/test:benchmarktest",
-              "//foundation/ability/form_fwk/test:unittest"
+              "//foundation/ability/form_fwk/test:unittest",
+              "//foundation/ability/form_fwk/test/fuzztest:fuzztest"
           ]
         }
     }
