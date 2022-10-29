@@ -17,7 +17,14 @@ import("//foundation/ability/form_fwk/form_fwk.gni")
 group("fuzztest") {
   testonly = true
 
-  deps = [ "geterrormsg_fuzzer:fuzztest" ]
+  deps = [
+    "formhoststub_fuzzer:fuzztest",
+    "formmgrstub_fuzzer:fuzztest",
+    "formproviderstub_fuzzer:fuzztest",
+    "formsupplystub_fuzzer:fuzztest",
+    "geterrormsg_fuzzer:fuzztest",
+    "providerconnectstub_fuzzer:fuzztest",
+  ]
 
   if (ability_runtime_graphics) {
     deps += [ "formmanager_fuzzer:fuzztest" ]
