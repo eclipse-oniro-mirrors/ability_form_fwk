@@ -118,5 +118,5 @@ bool BundleMgrService::GetFormsInfoByModule(const std::string &bundleName, const
     formInfo.emplace_back(form);
     return true;
 }
-}  // namespace AppExecFwk
-}  // namespace OHOS
+} // namespace AppExecFwk
+} // namespace OHOS
