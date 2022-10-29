@@ -39,6 +39,7 @@ group("unittest") {
     "unittest/fms_form_data_mgr_test:unittest",
     "unittest/fms_form_db_record_test:unittest",
     "unittest/fms_form_distributed_client_test:unittest",
+    "unittest/fms_form_host_client_test:unittest",
     "unittest/fms_form_host_record_test:unittest",
     "unittest/fms_form_info_mgr_test:unittest",
     "unittest/fms_form_js_info_test:unittest",
@@ -49,6 +50,7 @@ group("unittest") {
     "unittest/fms_form_mgr_dump_test:unittest",
     "unittest/fms_form_mgr_lifecycle_update_test:unittest",
     "unittest/fms_form_mgr_message_event_test:unittest",
+    "unittest/fms_form_mgr_notify_forms_privacy_protected_test:unittest",
     "unittest/fms_form_mgr_notify_invisible_forms_test:unittest",
     "unittest/fms_form_mgr_notify_visible_forms_test:unittest",
     "unittest/fms_form_mgr_publish_form_test:unittest",
@@ -66,6 +68,7 @@ group("unittest") {
     "unittest/form_mgr_proxy_test:unittest",
     "unittest/form_mgr_stub_test:unittest",
     "unittest/form_mgr_test:unittest",
+    "unittest/form_napi_util_test:unittest",
     "unittest/form_provider_caller_test:unittest",
   ]
 }

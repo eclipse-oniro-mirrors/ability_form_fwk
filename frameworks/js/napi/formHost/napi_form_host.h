@@ -96,12 +96,12 @@ public:
     static NativeValue* NotifyInVisibleForms(NativeEngine *engine, NativeCallbackInfo *info);
 private:
     NativeValue* OnDisableFormsUpdate(NativeEngine &engine, NativeCallbackInfo &info);
-    NativeValue* OnIsSystemReady(NativeEngine &engine, NativeCallbackInfo &info);
+    NativeValue* OnIsSystemReady(NativeEngine &engine, const NativeCallbackInfo &info);
     NativeValue* OnDeleteForm(NativeEngine &engine, NativeCallbackInfo &info);
     NativeValue* OnReleaseForm(NativeEngine &engine, NativeCallbackInfo &info);
     NativeValue* OnRequestForm(NativeEngine &engine, NativeCallbackInfo &info);
     NativeValue* OnCastTempForm(NativeEngine &engine, NativeCallbackInfo &info);
-    NativeValue* OnGetAllFormsInfo(NativeEngine &engine, NativeCallbackInfo &info);
+    NativeValue* OnGetAllFormsInfo(NativeEngine &engine, const NativeCallbackInfo &info);
     NativeValue* OnGetFormsInfo(NativeEngine &engine, NativeCallbackInfo &info);
     NativeValue* OnEnableFormsUpdate(NativeEngine &engine, NativeCallbackInfo &info);
     NativeValue* OnShareForm(NativeEngine &engine, NativeCallbackInfo &info);
@@ -111,7 +111,8 @@ private:
     void InnerShareForm(NativeEngine &engine, const std::shared_ptr<OHOS::AbilityRuntime::AsyncTask> &asyncTask,
         ShareFormTask &&task, int64_t formId, const std::string &remoteDeviceId);
     bool GetStringsValue(NativeEngine &engine, NativeValue *object, std::vector<std::string> &strList);
-    bool UnwrapGetFormsInfoParams(NativeEngine &engine, NativeCallbackInfo &info, std::string &moduleName, bool &bParam);
+    static bool UnwrapGetFormsInfoParams(NativeEngine &engine, NativeCallbackInfo &info, std::string &moduleName,
+        bool &bParam);
 };
 }  // namespace AbilityRuntime
 }  // namespace OHOS
