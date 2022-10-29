@@ -19,10 +19,10 @@ import("//foundation/ability/form_fwk/form_fwk.gni")
 module_output_path = "form_fwk/formmgr"
 
 ##############################fuzztest##########################################
-ohos_fuzztest("FormManagerFuzzTest") {
+ohos_fuzztest("GetErrorMsgFuzzTest") {
   module_out_path = module_output_path
 
-  fuzz_config_file = "${form_fwk_path}/test/fuzztest/formmanager_fuzzer"
+  fuzz_config_file = "${form_fwk_path}/test/fuzztest/geterrormsg_fuzzer"
 
   include_dirs = [ "${form_fwk_path}/services/include" ]
   cflags = [
@@ -31,7 +31,7 @@ ohos_fuzztest("FormManagerFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [ "formmanager_fuzzer.cpp" ]
+  sources = [ "geterrormsg_fuzzer.cpp" ]
 
   configs = [ "${ability_runtime_path}/interfaces/inner_api/ability_manager:ability_manager_public_config" ]
 
@@ -39,12 +39,12 @@ ohos_fuzztest("FormManagerFuzzTest") {
     "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
     "${ability_runtime_path}/interfaces/inner_api/app_manager:app_manager",
     "${form_fwk_path}:fms_target",
+    "${form_fwk_path}:fmskit_native",
   ]
 
   external_deps = [
     "ability_base:base",
     "ability_base:want",
-    "c_utils:utils",
     "common_event_service:cesfwk_core",
     "common_event_service:cesfwk_innerkits",
     "ipc:ipc_core",
@@ -59,7 +59,7 @@ group("fuzztest") {
   deps = []
   deps += [
     # deps file
-    ":FormManagerFuzzTest",
+    ":GetErrorMsgFuzzTest",
   ]
 }
 ###############################################################################
