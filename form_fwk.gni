@@ -23,6 +23,7 @@ distributeddatamgr_path = "//foundation/distributeddatamgr"
 systemabilitymgr_path = "//foundation/systemabilitymgr"
 form_fwk_path = "//foundation/ability/form_fwk"
 form_fwk_napi_path = "${form_fwk_path}/frameworks/js/napi"
+form_fwk_inner_api_path = "${form_fwk_path}/interfaces/inner_api"
 global_path = "//base/global"
 ipc_core_path = "//foundation/communication/ipc/interfaces/innerkits/ipc_core"
 
