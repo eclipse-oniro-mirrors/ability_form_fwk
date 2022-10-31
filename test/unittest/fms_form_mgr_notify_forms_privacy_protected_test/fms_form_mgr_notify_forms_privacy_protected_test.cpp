@@ -96,7 +96,8 @@ HWTEST_F(FmsFormMgrNotifyFormsPrivacyProtectedTest, NotifyFormsPrivacyProtected_
 {
     GTEST_LOG_(INFO) << "FmsFormMgrNotifyFormsPrivacyProtectedTest_NotifyFormsPrivacyProtected_001 start";
     std::vector<int64_t> formIds;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, FormMgr::GetInstance().NotifyFormsPrivacyProtected(formIds, false, nullptr));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE,
+        FormMgr::GetInstance().NotifyFormsPrivacyProtected(formIds, false, nullptr));
     GTEST_LOG_(INFO) << "FmsFormMgrNotifyFormsPrivacyProtectedTest_NotifyFormsPrivacyProtected_001 end";
 }
 }
