@@ -43,7 +43,7 @@ public:
     {
         return true;
     }
-    
+
     std::string GetAppType(const std::string &bundleName) override
     {
         return "system";
@@ -114,7 +114,13 @@ public:
         return true;
     }
 };
-}  // namespace AppExecFwk
-}  // namespace OHOS
 
-#endif  // OHOS_FORM_FWK_MOCK_BUNDLE_MANAGER_H
+class MockBundleMgrService : public BundleMgrService {
+public:
+    MOCK_METHOD(bool, GetBundleInfo,
+        (const std::string &bundleName, const BundleFlag flag, BundleInfo &bundleInfo, int32_t userId), (override));
+};
+} // namespace AppExecFwk
+} // namespace OHOS
+
+#endif // OHOS_FORM_FWK_MOCK_BUNDLE_MANAGER_H
