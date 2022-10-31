@@ -18,8 +18,12 @@ group("fuzztest") {
   testonly = true
 
   deps = [
+    "formcallermgr_fuzzer:fuzztest",
+    "formerrors_fuzzer:fuzztest",
+    "formhostclient_fuzzer:fuzztest",
     "formhoststub_fuzzer:fuzztest",
     "formmgrstub_fuzzer:fuzztest",
+    "formprovidercaller_fuzzer:fuzztest",
     "formproviderstub_fuzzer:fuzztest",
     "formsupplystub_fuzzer:fuzztest",
     "geterrormsg_fuzzer:fuzztest",
