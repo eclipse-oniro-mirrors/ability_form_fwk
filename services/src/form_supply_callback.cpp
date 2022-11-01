@@ -25,6 +25,7 @@
 #include "form_task_mgr.h"
 #include "form_util.h"
 #include "hilog_wrapper.h"
+#include "hitrace_meter.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -53,6 +54,7 @@ sptr<FormSupplyCallback> FormSupplyCallback::GetInstance()
  */
 int FormSupplyCallback::OnAcquire(const FormProviderInfo &formProviderInfo, const Want &want)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     HILOG_INFO("%{public}s called.", __func__);
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     int errCode = want.GetIntParam(Constants::PROVIDER_FLAG, ERR_OK);
@@ -95,6 +97,7 @@ int FormSupplyCallback::OnAcquire(const FormProviderInfo &formProviderInfo, cons
  */
 int FormSupplyCallback::OnEventHandle(const Want &want)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     HILOG_INFO("%{public}s called.", __func__);
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     std::string supplyInfo = want.GetStringParam(Constants::FORM_SUPPLY_INFO);
