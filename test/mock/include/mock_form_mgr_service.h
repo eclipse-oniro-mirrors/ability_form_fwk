@@ -42,7 +42,7 @@ public:
     MOCK_METHOD2(DumpFormInfoByFormId, int(const std::int64_t formId, std::string &formInfo));
     MOCK_METHOD2(DumpFormTimerByFormId, int(const std::int64_t formId, std::string &isTimingService));
     MOCK_METHOD3(MessageEvent, int(const int64_t formId, const Want &want, const sptr<IRemoteObject> &callerToken));
-    MOCK_METHOD2(RouterEvent, int(const int64_t formId, Want &want));
+    MOCK_METHOD3(RouterEvent, int(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken));
     MOCK_METHOD3(DeleteInvalidForms, int(const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &callerToken,
         int32_t &numFormsDeleted));
     MOCK_METHOD3(AcquireFormState, int(const Want &want, const sptr<IRemoteObject> &callerToken,

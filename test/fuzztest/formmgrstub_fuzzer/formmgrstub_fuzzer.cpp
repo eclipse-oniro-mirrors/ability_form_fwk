@@ -96,7 +96,7 @@ public:
     {
         return 0;
     }
-    int RouterEvent(const int64_t formId, Want &want) override
+    int RouterEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken) override
     {
         return 0;
     }
