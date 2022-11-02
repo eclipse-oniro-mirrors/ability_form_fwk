@@ -481,8 +481,13 @@ int32_t FormMgrStub::HandleRouterEvent(MessageParcel &data, MessageParcel &reply
         HILOG_ERROR("%{public}s, failed to ReadParcelable<Want>", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
+    sptr<IRemoteObject> client = data.ReadRemoteObject();
+    if (client == nullptr) {
+        HILOG_ERROR("%{public}s, failed to get remote object.", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
 
-    int32_t result = RouterEvent(formId, *want);
+    int32_t result = RouterEvent(formId, *want, client);
     reply.WriteInt32(result);
     return result;
 }
