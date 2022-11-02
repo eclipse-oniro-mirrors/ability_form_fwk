@@ -558,9 +558,10 @@ int FormMgrProxy::MessageEvent(const int64_t formId, const Want &want, const spt
  * @brief Process js router event.
  * @param formId Indicates the unique id of form.
  * @param want the want of the ability to start.
+ * @param callerToken Caller ability token.
  * @return Returns true if execute success, false otherwise.
  */
-int FormMgrProxy::RouterEvent(const int64_t formId, Want &want)
+int FormMgrProxy::RouterEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken)
 {
     MessageParcel data;
     if (!WriteInterfaceToken(data)) {
@@ -573,6 +574,11 @@ int FormMgrProxy::RouterEvent(const int64_t formId, Want &want)
     }
     if (!data.WriteParcelable(&want)) {
         HILOG_ERROR("%{public}s, failed to write want", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteRemoteObject(callerToken)) {
+        HILOG_ERROR("%{public}s, failed to write callerToken", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
