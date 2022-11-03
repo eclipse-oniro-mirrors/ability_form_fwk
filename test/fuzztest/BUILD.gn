@@ -29,10 +29,14 @@ group("fuzztest") {
     "formmgrproxy_fuzzer:fuzztest",
     "formmgrstub_fuzzer:fuzztest",
     "formprovidercaller_fuzzer:fuzztest",
+    "formproviderdata_fuzzer:fuzztest",
     "formproviderinfo_fuzzer:fuzztest",
+    "formproviderproxy_fuzzer:fuzztest",
     "formproviderstub_fuzzer:fuzztest",
+    "formsupplyproxy_fuzzer:fuzztest",
     "formsupplystub_fuzzer:fuzztest",
     "geterrormsg_fuzzer:fuzztest",
+    "providerconnectproxy_fuzzer:fuzztest",
     "providerconnectstub_fuzzer:fuzztest",
   ]
 
