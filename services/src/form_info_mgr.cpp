@@ -399,7 +399,7 @@ ErrCode FormInfoMgr::Remove(const std::string &bundleName, int32_t userId)
         errCode = bundleFormInfoIter->second->Remove(userId);
     }
 
-    if (bundleFormInfoIter->second->Empty()) {
+    if (bundleFormInfoIter->second && bundleFormInfoIter->second->Empty()) {
         bundleFormInfoMap_.erase(bundleFormInfoIter);
     }
     HILOG_INFO("remove forms info success, bundleName=%{public}s.", bundleName.c_str());
@@ -410,20 +410,13 @@ ErrCode FormInfoMgr::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
 {
     bool hasPermission = CheckBundlePermission();
     std::shared_lock<std::shared_timed_mutex> guard(bundleFormInfoMapMutex_);
-    if (hasPermission) {
-        for (const auto &bundleFormInfo : bundleFormInfoMap_) {
-            if (bundleFormInfo.second != nullptr) {
-                bundleFormInfo.second->GetAllFormsInfo(formInfos);
-            }
-        }
-    } else {
-        for (const auto &bundleFormInfo : bundleFormInfoMap_) {
-            if (IsCaller(bundleFormInfo.first)) {
-                if (bundleFormInfo.second != nullptr) {
-                    bundleFormInfo.second->GetAllFormsInfo(formInfos);
-                }
-                return ERR_OK;
-            }
+    if (!hasPermission) {
+        HILOG_ERROR("CheckBundlePermission is failed.");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
+    }
+    for (const auto &bundleFormInfo : bundleFormInfoMap_) {
+        if (bundleFormInfo.second != nullptr) {
+            bundleFormInfo.second->GetAllFormsInfo(formInfos);
         }
     }
     return ERR_OK;

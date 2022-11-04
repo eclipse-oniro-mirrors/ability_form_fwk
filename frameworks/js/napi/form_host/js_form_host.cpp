@@ -328,7 +328,7 @@ public:
         return (me != nullptr) ? me->OnNotifyFormsPrivacyProtected(*engine, *info) : nullptr;
     }
 private:
-    bool ConvertFromId(NativeEngine& engine, NativeValue* jsValue, int64_t &formId)
+    static bool ConvertFromId(NativeEngine& engine, NativeValue* jsValue, int64_t &formId)
     {
         if (jsValue->TypeOf() != NATIVE_STRING) {
             HILOG_ERROR("input params is not string.");
@@ -723,7 +723,7 @@ private:
         return result;
     }
 
-    NativeValue* OnIsSystemReady(NativeEngine &engine, NativeCallbackInfo &info)
+    NativeValue* OnIsSystemReady(NativeEngine &engine, const NativeCallbackInfo &info)
     {
         HILOG_DEBUG("%{public}s is called", __FUNCTION__);
         if (info.argc > ARGS_ONE || info.argc < ARGS_ZERO) {
@@ -750,7 +750,7 @@ private:
         return result;
     }
 
-    NativeValue* OnDeleteInvalidForms(NativeEngine &engine, NativeCallbackInfo &info)
+    NativeValue* OnDeleteInvalidForms(NativeEngine &engine, const NativeCallbackInfo &info)
     {
         HILOG_DEBUG("%{public}s is called", __FUNCTION__);
 
@@ -1021,7 +1021,7 @@ private:
         return result;
     }
 
-    NativeValue* OnGetAllFormsInfo(NativeEngine &engine, NativeCallbackInfo &info)
+    NativeValue* OnGetAllFormsInfo(NativeEngine &engine, const NativeCallbackInfo &info)
     {
         HILOG_DEBUG("%{public}s is called", __FUNCTION__);
         if (info.argc > ARGS_ONE || info.argc < ARGS_ZERO) {

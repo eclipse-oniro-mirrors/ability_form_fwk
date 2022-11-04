@@ -22,9 +22,9 @@ module_output_path = "form_fwk/formmgr"
 ohos_fuzztest("FormManagerFuzzTest") {
   module_out_path = module_output_path
 
-  fuzz_config_file = "${ability_runtime_path}/test/fuzztest/formmanager_fuzzer"
+  fuzz_config_file = "${form_fwk_path}/test/fuzztest/formmanager_fuzzer"
 
-  include_dirs = [ "${ability_runtime_path}/form_fwk/services/include" ]
+  include_dirs = [ "${form_fwk_path}/services/include" ]
   cflags = [
     "-g",
     "-O0",
@@ -44,6 +44,7 @@ ohos_fuzztest("FormManagerFuzzTest") {
   external_deps = [
     "ability_base:base",
     "ability_base:want",
+    "c_utils:utils",
     "common_event_service:cesfwk_core",
     "common_event_service:cesfwk_innerkits",
     "ipc:ipc_core",
