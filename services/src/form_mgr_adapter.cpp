@@ -44,6 +44,7 @@
 #include "form_timer_mgr.h"
 #include "form_util.h"
 #include "hilog_wrapper.h"
+#include "hitrace_meter.h"
 #include "if_system_ability_manager.h"
 #include "in_process_call_wrapper.h"
 #include "ipc_skeleton.h"
@@ -73,6 +74,7 @@ FormMgrAdapter::~FormMgrAdapter()
 int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
     const sptr<IRemoteObject> &callerToken, FormJsInfo &formInfo)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     if (formId < 0 || callerToken == nullptr) {
         HILOG_ERROR("%{public}s fail, callerToken can not be NULL", __func__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -140,6 +142,7 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
  */
 int FormMgrAdapter::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &callerToken)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     if (formId <= 0 || callerToken == nullptr) {
         HILOG_ERROR("%{public}s, deleteForm invalid param", __func__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -164,6 +167,7 @@ int FormMgrAdapter::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
  */
 int FormMgrAdapter::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> &callerToken, const bool delCache)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     HILOG_INFO("%{public}s called.", __func__);
     if (formId <= 0 || callerToken == nullptr) {
         HILOG_ERROR("%{public}s, releaseForm invalid param", __func__);
@@ -406,6 +410,7 @@ ErrCode FormMgrAdapter::HandleDeleteFormCache(FormRecord &dbRecord, const int ui
 int FormMgrAdapter::UpdateForm(const int64_t formId,
     const std::string &bundleName, const FormProviderData &formProviderData)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     HILOG_INFO("%{public}s start.", __func__);
 
     // check formId and bundleName
@@ -458,6 +463,7 @@ int FormMgrAdapter::UpdateForm(const int64_t formId,
  */
 int FormMgrAdapter::RequestForm(const int64_t formId, const sptr<IRemoteObject> &callerToken, const Want &want)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     HILOG_INFO("%{public}s called.", __func__);
     if (formId <= 0 || callerToken == nullptr) {
         HILOG_ERROR("%{public}s fail, invalid formId or callerToken.", __func__);
@@ -500,6 +506,7 @@ int FormMgrAdapter::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
 ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &formIds,
     const sptr<IRemoteObject> &callerToken, const int32_t formVisibleType)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     HILOG_INFO("%{public}s called.", __func__);
     if (callerToken == nullptr) {
         HILOG_ERROR("%{public}s fail, callerToken can not be NULL.", __func__);
@@ -554,6 +561,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
  */
 int FormMgrAdapter::CastTempForm(const int64_t formId, const sptr<IRemoteObject> &callerToken)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     if (formId <= 0 || callerToken == nullptr) {
         HILOG_ERROR("%{public}s, invalid formId or callerToken", __func__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -2150,6 +2158,7 @@ int FormMgrAdapter::NotifyFormsEnableUpdate(const std::vector<int64_t> &formIds,
  */
 int FormMgrAdapter::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     return FormInfoMgr::GetInstance().GetAllFormsInfo(formInfos);
 }
 
@@ -2161,6 +2170,7 @@ int FormMgrAdapter::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
  */
 int FormMgrAdapter::GetFormsInfoByApp(const std::string &bundleName, std::vector<FormInfo> &formInfos)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     return FormInfoMgr::GetInstance().GetFormsInfoByBundle(bundleName, formInfos);
 }
 
@@ -2174,6 +2184,7 @@ int FormMgrAdapter::GetFormsInfoByApp(const std::string &bundleName, std::vector
 int FormMgrAdapter::GetFormsInfoByModule(const std::string &bundleName,
     const std::string &moduleName, std::vector<FormInfo> &formInfos)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     return FormInfoMgr::GetInstance().GetFormsInfoByModule(bundleName, moduleName, formInfos);
 }
 

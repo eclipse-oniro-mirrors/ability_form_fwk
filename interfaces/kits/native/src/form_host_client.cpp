@@ -20,6 +20,7 @@
 #include "hilog_wrapper.h"
 #include "form_constants.h"
 #include "form_caller_mgr.h"
+#include "hitrace_meter.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -178,6 +179,7 @@ bool FormHostClient::RegisterUninstallCallback(UninstallCallback callback)
 
 void FormHostClient::OnAcquired(const FormJsInfo &formJsInfo, const sptr<IRemoteObject> &token)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     HILOG_DEBUG("%{public}s called.",  __func__);
     if (token != nullptr) {
         HILOG_DEBUG("save token to form remote mgr.");
@@ -194,6 +196,7 @@ void FormHostClient::OnAcquired(const FormJsInfo &formJsInfo, const sptr<IRemote
  */
 void FormHostClient::OnUpdate(const FormJsInfo &formJsInfo)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     HILOG_DEBUG("%{public}s called.",  __func__);
     UpdateForm(formJsInfo);
 }
@@ -206,6 +209,7 @@ void FormHostClient::OnUpdate(const FormJsInfo &formJsInfo)
  */
 void FormHostClient::OnUninstall(const std::vector<int64_t> &formIds)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     HILOG_INFO("%{public}s called.", __func__);
     if (formIds.empty()) {
         HILOG_ERROR("%{public}s error, formIds is empty.", __func__);
@@ -242,6 +246,7 @@ void FormHostClient::OnUninstall(const std::vector<int64_t> &formIds)
  */
 void FormHostClient::OnAcquireState(FormState state, const AAFwk::Want &want)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     HILOG_INFO("%{public}s state:%{public}d.", __func__, state);
     std::string bundleName = want.GetElement().GetBundleName();
     std::string abilityName = want.GetElement().GetAbilityName();
@@ -269,6 +274,7 @@ void FormHostClient::OnAcquireState(FormState state, const AAFwk::Want &want)
 bool FormHostClient::AddShareFormCallback(const std::shared_ptr<ShareFormCallBack> &shareFormCallback,
     int64_t requestCode)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     HILOG_DEBUG("%{public}s called.", __func__);
     std::lock_guard<std::mutex> lock(shareFormCallbackMutex_);
     auto iter = shareFormCallbackMap_.find(requestCode);
@@ -281,6 +287,7 @@ bool FormHostClient::AddShareFormCallback(const std::shared_ptr<ShareFormCallBac
 
 void FormHostClient::OnShareFormResponse(int64_t requestCode, int32_t result)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     HILOG_DEBUG("%{public}s result:%{public}d.", __func__, result);
     std::lock_guard<std::mutex> lock(shareFormCallbackMutex_);
     auto iter = shareFormCallbackMap_.find(requestCode);
