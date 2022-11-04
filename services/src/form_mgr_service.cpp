@@ -78,6 +78,14 @@ FormMgrService::~FormMgrService()
     if (formSysEventReceiver_ != nullptr) {
         EventFwk::CommonEventManager::UnSubscribeCommonEvent(formSysEventReceiver_);
         formSysEventReceiver_ = nullptr;
+        sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
+        if (iBundleMgr == nullptr) {
+            return;
+        }
+        if (!iBundleMgr->UnregisterBundleEventCallback(formBundleEventCallback_)) {
+            HILOG_ERROR("%{public}s fail, UnregisterBundleEventCallback failed", __func__);
+        }
+        formBundleEventCallback_ = nullptr;
     }
 }
 
@@ -457,6 +465,22 @@ ErrCode FormMgrService::Init()
         EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
         formSysEventReceiver_ = std::make_shared<FormSysEventReceiver>(subscribeInfo);
         formSysEventReceiver_->SetEventHandler(handler_);
+        // Register formbundleEventCallback to receive hap updates
+        formBundleEventCallback_ = new (std::nothrow) FormBundleEventCallback(handler_);
+        if (formBundleEventCallback_ == nullptr) {
+            HILOG_ERROR("%{public}s fail, allocate formBundleEventCallback_ failed!", __func__);
+            return ERR_APPEXECFWK_FORM_COMMON_CODE;
+        }
+        sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
+        if (iBundleMgr == nullptr) {
+            return ERR_APPEXECFWK_FORM_COMMON_CODE;
+        }
+        bool re = iBundleMgr->RegisterBundleEventCallback(formBundleEventCallback_);
+        if (!re) {
+            HILOG_ERROR("%{public}s fail, RegisterBundleEventCallback failed!", __func__);
+            return ERR_APPEXECFWK_FORM_COMMON_CODE;
+        }
+
         EventFwk::CommonEventManager::SubscribeCommonEvent(formSysEventReceiver_);
     }
     FormInfoMgr::GetInstance().Start();
