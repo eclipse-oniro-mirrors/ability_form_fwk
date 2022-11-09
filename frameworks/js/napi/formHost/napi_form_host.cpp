@@ -1632,9 +1632,14 @@ NativeValue* NapiFormHost::OnDeleteInvalidForms(NativeEngine &engine, NativeCall
     int32_t errCode = ERR_OK;
     if (info.argc > ARGS_TWO || info.argc < ARGS_ONE) {
         HILOG_ERROR("wrong number of arguments.");
-        return engine.CreateUndefined();
+        return engine.CreateNull();
     }
-
+    struct OnDeleteInvalidForms {
+        int result;
+        int32_t numFormsDeleted = 0;
+        std::vector<int64_t> iFormIds;
+    };
+    std::shared_ptr<OnDeleteInvalidForms> onDeleteInvalidForms = std::make_shared<OnDeleteInvalidForms>();
     if (!(info.argv[PARAM0]->IsArray())){
         HILOG_ERROR("input params is not array!");
         errCode = ERR_APPEXECFWK_FORM_FORM_ARRAY_ERR;
@@ -1648,38 +1653,46 @@ NativeValue* NapiFormHost::OnDeleteInvalidForms(NativeEngine &engine, NativeCall
         HILOG_ERROR("formId list is empty!");
         errCode = ERR_APPEXECFWK_FORM_FORM_ID_ARRAY_ERR;
     }
-    std::vector<int64_t> iFormIds;
     for (size_t i = 0; i < strFormIdList.size(); i++){
         int64_t formIdValue;
         if (!ConvertStringToInt64(strFormIdList[i], formIdValue)){
             HILOG_ERROR("conversion int failed!");
             errCode = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR;
         } else {
-            iFormIds.push_back(formIdValue);
+            onDeleteInvalidForms->iFormIds.push_back(formIdValue);
         }
     }
-
-    auto complete = [formIds = iFormIds, errCode](NativeEngine &engine, AsyncTask &task, int32_t status) {
-        if (errCode != ERR_OK) {
-            auto code = QueryRetCode(errCode);
-            task.Reject(engine, CreateJsError(engine, code, QueryRetMsg(code)));
+    auto execute = [data = onDeleteInvalidForms] {
+        if (data == nullptr) {
+            HILOG_ERROR("onDeleteInvalidForms is nullptr.");
             return;
         }
-        int32_t numFormsDeleted = 0;
-        auto ret = FormMgr::GetInstance().DeleteInvalidForms(formIds, FormHostClient::GetInstance(), numFormsDeleted);
-        if (ret == ERR_OK) {
-            task.ResolveWithErrObject(engine, CreateJsError(engine, ERR_OK, QueryRetMsg(ERR_OK)),
-            CreateJsValue(engine, numFormsDeleted));
+        data->result = FormMgr::GetInstance().DeleteInvalidForms(
+            data->iFormIds, FormHostClient::GetInstance(), data->numFormsDeleted);
+    };
+    auto complete = [data = onDeleteInvalidForms, errCode](NativeEngine &engine, AsyncTask &task, int32_t status) {
+        if (errCode != ERR_OK) {
+            auto retCode = QueryRetCode(errCode);
+            auto retMsg = QueryRetMsg(retCode);
+            task.Reject(engine, CreateJsError(engine, retCode, retMsg));
+            return;
+        }
+        if (data->result == ERR_OK) {
+            auto retCode = QueryRetCode(data->result);
+            auto retMsg = QueryRetMsg(retCode);
+            task.ResolveWithCustomize(engine, CreateJsError(engine, retCode, retMsg),
+            CreateJsValue(engine, data->numFormsDeleted));
         } else {
-            auto retCode = QueryRetCode(ret);
-            task.Reject(engine, CreateJsError(engine, retCode, QueryRetMsg(retCode)));
+            auto retCode = QueryRetCode(data->result);
+            auto retMsg = QueryRetMsg(retCode);
+            task.Reject(engine, CreateJsError(engine, retCode, retMsg));
         }
     };
 
     auto callback = (info.argc == ARGS_ONE) ? nullptr : info.argv[PARAM1];
     NativeValue *result = nullptr;
     AsyncTask::Schedule("NapiFormHost::OnDeleteInvalidForms",
-        engine, CreateAsyncTaskWithLastParam(engine, callback, nullptr, std::move(complete), &result));
+        engine, CreateAsyncTaskWithLastParam(engine, callback, std::move(execute), std::move(complete), &result));
     return result;
 }
 
