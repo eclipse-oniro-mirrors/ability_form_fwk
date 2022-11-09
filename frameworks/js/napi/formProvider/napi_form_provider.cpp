@@ -511,24 +511,33 @@ NativeValue* JsFormProvider::IsRequestPublishFormSupported(NativeEngine *engine,
 NativeValue* JsFormProvider::OnIsRequestPublishFormSupported(NativeEngine &engine, NativeCallbackInfo &info)
 {
     HILOG_DEBUG("%{public}s is called", __FUNCTION__);
-    int32_t errCode = ERR_OK;
     if (info.argc > ARGS_SIZE_ONE) {
         HILOG_ERROR("wrong number of arguments.");
         return engine.CreateNull();
     }
-    AsyncTask::CompleteCallback complete = [errCode](NativeEngine &engine, AsyncTask &task, int32_t status) {
-        if (errCode != ERR_OK) {
-            task.Reject(engine, CreateJsError(engine, errCode, "OnIsRequestPublishFormSupported Error"));
+    struct OnIsRequestPublishFormSupported {
+        bool result;
+    };
+    std::shared_ptr<OnIsRequestPublishFormSupported> onIsRequestPublishFormSupported =
+        std::make_shared<OnIsRequestPublishFormSupported>();
+    auto execute = [data = onIsRequestPublishFormSupported] () {
+        if (data == nullptr) {
+            HILOG_ERROR("onIsRequestPublishFormSupported is nullptr.");
             return;
         }
-        bool ret = FormMgr::GetInstance().IsRequestPublishFormSupported();
-        task.ResolveWithErrObject(engine, CreateJsError(engine, ERR_OK, QueryRetMsg(ERR_OK)),
-            CreateJsValue(engine, ret));
+        data->result = FormMgr::GetInstance().IsRequestPublishFormSupported();
+    };
+    AsyncTask::CompleteCallback complete = [data = onIsRequestPublishFormSupported](
+            NativeEngine &engine, AsyncTask &task, int32_t status) {
+        auto retCode = QueryRetCode(data->result);
+        auto retMsg = QueryRetMsg(retCode);
+        task.ResolveWithCustomize(engine, CreateJsError(engine, retCode, retMsg),
+            CreateJsValue(engine, data->result));
     };
     NativeValue *lastParam = (info.argc <= ARGS_SIZE_ZERO) ? nullptr : info.argv[PARAM0];
     NativeValue *result = nullptr;
     AsyncTask::Schedule("JsFormProvider::OnIsRequestPublishFormSupported",
-        engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
+        engine, CreateAsyncTaskWithLastParam(engine, lastParam, std::move(execute), std::move(complete), &result));
     return result;
 }
 }  // namespace AbilityRuntime
