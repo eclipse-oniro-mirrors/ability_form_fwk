@@ -31,6 +31,7 @@ using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
 constexpr size_t FOO_MAX_LEN = 1024;
+constexpr size_t U32_AT_SIZE = 4;
 constexpr uint8_t ENABLE = 2;
 uint32_t GetU32Data(const char* ptr)
 {
@@ -89,6 +90,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
     if (data == nullptr) {
+        return 0;
+    }
+
+    if (size < OHOS::U32_AT_SIZE) {
         return 0;
     }
 
