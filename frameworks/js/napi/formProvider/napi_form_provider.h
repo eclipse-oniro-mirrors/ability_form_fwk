@@ -73,7 +73,7 @@ private:
     NativeValue* OnGetFormsInfo(NativeEngine &engine, NativeCallbackInfo &info);
     NativeValue* OnSetFormNextRefreshTime(NativeEngine &engine, NativeCallbackInfo &info);
     NativeValue* OnUpdateForm(NativeEngine &engine, NativeCallbackInfo &info);
-    NativeValue* OnIsRequestPublishFormSupported(NativeEngine &engine, NativeCallbackInfo &info);
+    NativeValue* OnIsRequestPublishFormSupported(NativeEngine &engine,  const NativeCallbackInfo &info);
 };
 }  // namespace AbilityRuntime
 }  // namespace OHOS

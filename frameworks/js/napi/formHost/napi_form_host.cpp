@@ -1626,7 +1626,7 @@ NativeValue* NapiFormHost::OnNotifyFormsPrivacyProtected(NativeEngine &engine, N
     return result;
 }
 
-NativeValue* NapiFormHost::OnDeleteInvalidForms(NativeEngine &engine, NativeCallbackInfo &info)
+NativeValue* NapiFormHost::OnDeleteInvalidForms(NativeEngine &engine, const NativeCallbackInfo &info)
 {
     HILOG_DEBUG("%{public}s is called", __FUNCTION__);
     int32_t errCode = ERR_OK;
