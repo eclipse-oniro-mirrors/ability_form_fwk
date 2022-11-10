@@ -1732,9 +1732,10 @@ int FormMgrAdapter::MessageEvent(const int64_t formId, const Want &want, const s
  * @brief Process js router event.
  * @param formId Indicates the unique id of form.
  * @param want the want of the ability to start.
+ * @param callerToken Caller ability token.
  * @return Returns true if execute success, false otherwise.
  */
-int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want)
+int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken)
 {
     HILOG_INFO("%{public}s called.", __func__);
     if (formId <= 0) {
@@ -1763,7 +1764,7 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want)
         }
     }
 
-    int32_t result = FormAmsHelper::GetInstance().GetAbilityManager()->StartAbility(want);
+    int32_t result = FormAmsHelper::GetInstance().GetAbilityManager()->StartAbility(want, callerToken);
     if (result != ERR_OK && result != START_ABILITY_WAITING) {
         HILOG_ERROR("Failed to StartAbility, result: %{public}d.", result);
         return result;
