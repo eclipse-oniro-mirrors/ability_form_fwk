@@ -529,9 +529,8 @@ NativeValue* JsFormProvider::OnIsRequestPublishFormSupported(NativeEngine &engin
     };
     AsyncTask::CompleteCallback complete = [data = onIsRequestPublishFormSupported](
             NativeEngine &engine, AsyncTask &task, int32_t status) {
-        auto retCode = QueryRetCode(data->result);
-        auto retMsg = QueryRetMsg(retCode);
-        task.ResolveWithCustomize(engine, CreateJsError(engine, retCode, retMsg),
+        auto retMsg = QueryRetMsg(ERR_OK);
+        task.ResolveWithCustomize(engine, CreateJsError(engine, ERR_OK, retMsg),
             CreateJsValue(engine, data->result));
     };
     NativeValue *lastParam = (info.argc <= ARGS_SIZE_ZERO) ? nullptr : info.argv[PARAM0];
