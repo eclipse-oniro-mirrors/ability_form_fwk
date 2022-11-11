@@ -1271,7 +1271,8 @@ int FormMgrAdapter::SetNextRefreshTime(const int64_t formId, const int64_t nextT
     }
     
     std::string bundleName;
-    if (!FormBmsHelper::GetInstance().GetCallerBundleName(bundleName)) {
+    auto ret = FormBmsHelper::GetInstance().GetCallerBundleName(bundleName);
+    if (ret != ERR_OK) {
         HILOG_ERROR("%{public}s failed to get BundleName", __func__);
         return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
     }
