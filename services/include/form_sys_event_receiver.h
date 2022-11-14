@@ -16,14 +16,10 @@
 #ifndef OHOS_FORM_FWK_FORM_SYS_EVENT_RECEIVER_H
 #define OHOS_FORM_FWK_FORM_SYS_EVENT_RECEIVER_H
 
-#include "bundle_pack_info.h"
 #include "common_event_subscriber.h"
 #include "common_event_subscribe_info.h"
 #include "form_event_handler.h"
-#include "form_id_key.h"
-#include "form_info.h"
-#include "form_record.h"
-#include "form_timer.h"
+#include "form_event_util.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -31,7 +27,8 @@ namespace AppExecFwk {
  * @class FormSysEventReceiver
  * Receive system common event.
  */
-class FormSysEventReceiver : public EventFwk::CommonEventSubscriber {
+class FormSysEventReceiver : public EventFwk::CommonEventSubscriber,
+    public std::enable_shared_from_this<FormSysEventReceiver> {
 public:
     FormSysEventReceiver() = default;
     FormSysEventReceiver(const EventFwk::CommonEventSubscribeInfo &subscriberInfo);
@@ -51,36 +48,11 @@ public:
         eventHandler_ = handler;
     }
 private:
-    void HandleProviderUpdated(const std::string &bundleName, const int userId);
-    bool ProviderFormUpdated(const int64_t formId, const FormRecord &formRecord,
-        const std::vector<FormInfo> &targetForms);
-    bool ProviderFormUpdated(int64_t formId, const FormRecord &formRecord,
-        const BundlePackInfo &bundlePackInfo);
-    void HandleBundleFormInfoChanged(const std::string &bundleName, int32_t userId);
-    void HandleBundleFormInfoRemoved(const std::string &bundleName, int32_t userId);
-    void HandleProviderRemoved(const std::string &bundleName, const int32_t userId);
-    void HandleBundleDataCleared(const std::string &bundleName, int32_t userId);
-    void HandleFormHostDataCleared(const int uid);
-    void ClearFormDBRecordData(const int uid, std::map<int64_t, bool> &removedFormsMap);
-    void ClearTempFormRecordData(const int uid, std::map<int64_t, bool> &removedFormsMap);
-    void BatchDeleteNoHostDBForms(const int uid, std::map<FormIdKey, std::set<int64_t>> &noHostFormDbMap,
-        std::map<int64_t, bool> &removedFormsMap);
     void HandleUserIdRemoved(const int32_t userId); // multiuser
-    /**
-     * @brief Delete no host temp forms.
-     * @param uid The caller uid.
-     * @param noHostTempFormsMap no host temp forms.
-     * @param foundFormsMap Form Id list.
-     */
-    void BatchDeleteNoHostTempForms(const int uid, std::map<FormIdKey, std::set<int64_t>> &noHostTempFormsMap,
-        std::map<int64_t, bool> &foundFormsMap);
-    void ReCreateForm(const int64_t formId);
     bool IsSameForm(const FormRecord &record, const FormInfo &formInfo);
-    void GetTimerCfg(const bool updateEnabled, const int updateDuration, const std::string &configUpdateAt,
-        FormTimerCfg &cfg);
-    void HandleTimerUpdate(const int64_t formId, const FormRecord &record, const FormTimerCfg &timerCfg);
     void HandleBundleScanFinished(int32_t userId);
 private:
+    FormEventUtil formEventHelper_;
     std::shared_ptr<FormEventHandler> eventHandler_ = nullptr;
 };
 }  // namespace AppExecFwk
