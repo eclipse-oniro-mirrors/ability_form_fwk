@@ -184,9 +184,10 @@ public:
      * @brief Process js router event.
      * @param formId Indicates the unique id of form.
      * @param want the want of the ability to start.
+     * @param callerToken Caller ability token.
      * @return Returns true if execute success, false otherwise.
      */
-    int RouterEvent(const int64_t formId, Want &want) override;
+    int RouterEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken) override;
 
     /**
      * @brief Check whether if the form manager service is ready.

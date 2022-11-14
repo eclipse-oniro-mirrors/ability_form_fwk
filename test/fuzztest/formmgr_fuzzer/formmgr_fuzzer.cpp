@@ -65,7 +65,7 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formMgr.DumpFormInfoByFormId(formId, stringData);
     formMgr.DumpFormTimerByFormId(formId, stringData);
     formMgr.MessageEvent(formId, want, callerToken);
-    formMgr.RouterEvent(formId, want);
+    formMgr.RouterEvent(formId, want, callerToken);
     int64_t nextTime = static_cast<int64_t>(GetU32Data(data));
     formMgr.SetNextRefreshTime(formId, nextTime);
     std::unique_ptr<FormProviderData> formBindingDatas = nullptr;

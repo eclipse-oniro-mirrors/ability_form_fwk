@@ -356,9 +356,10 @@ int FormMgrService::MessageEvent(const int64_t formId, const Want &want, const s
  * @brief Process js router event.
  * @param formId Indicates the unique id of form.
  * @param want the want of the ability to start.
+ * @param callerToken Caller ability token.
  * @return Returns true if execute success, false otherwise.
  */
-int FormMgrService::RouterEvent(const int64_t formId, Want &want)
+int FormMgrService::RouterEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken)
 {
     HILOG_INFO("%{public}s called.", __func__);
     ErrCode ret = CheckFormPermission();
@@ -372,7 +373,7 @@ int FormMgrService::RouterEvent(const int64_t formId, Want &want)
     eventInfo.moduleName = want.GetStringParam(AppExecFwk::Constants::PARAM_MODULE_NAME_KEY);
     eventInfo.abilityName = want.GetElement().GetAbilityName();
     AAFWK::EventReport::SendFormEvent(AAFWK::ROUTE_EVENT_FORM, HiSysEventType::BEHAVIOR, eventInfo);
-    return FormMgrAdapter::GetInstance().RouterEvent(formId, want);
+    return FormMgrAdapter::GetInstance().RouterEvent(formId, want, callerToken);
 }
 
 /**
