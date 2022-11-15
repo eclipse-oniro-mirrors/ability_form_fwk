@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "formdatamgrtwo_fuzzer.h"
+#include "formdatamgrfour_fuzzer.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -39,42 +39,41 @@ uint32_t GetU32Data(const char* ptr)
 bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
 {
     FormDataMgr formDataMgr;
-    FormHostRecord record;
-    int64_t formId = static_cast<int64_t>(GetU32Data(data));
-    std::vector<int64_t> recordTempForms;
-    recordTempForms.emplace_back(formId);
-    formDataMgr.HandleHostDiedForTempForms(record, recordTempForms);
-    formDataMgr.PaddingUdidHash(formId);
-    formDataMgr.GenerateFormId();
-    formDataMgr.GenerateUdidHash();
-    formDataMgr.GetUdidHash();
-    int64_t udidHash = static_cast<int64_t>(GetU32Data(data));
-    formDataMgr.SetUdidHash(udidHash);
-    sptr<IRemoteObject> callerToken = nullptr;
-    formDataMgr.GetMatchedHostClient(callerToken, record);
-    bool needRefresh = *data % ENABLE;
-    formDataMgr.SetNeedRefresh(formId, needRefresh);
-    bool countTimerRefresh = *data % ENABLE;
-    formDataMgr.SetCountTimerRefresh(formId, countTimerRefresh);
-    FormRecord records;
-    std::vector<FormInfo> targetForms;
-    FormInfo updatedForm;
-    targetForms.emplace_back(updatedForm);
-    formDataMgr.GetUpdatedForm(records, targetForms, updatedForm);
-    bool enableUpdate = *data % ENABLE;
-    formDataMgr.SetEnableUpdate(formId, enableUpdate);
-    long updateDuration = static_cast<long>(GetU32Data(data));
-    int updateAtHour = static_cast<int>(GetU32Data(data));
-    int updateAtMin = static_cast<int>(GetU32Data(data));
-    formDataMgr.SetUpdateInfo(formId, enableUpdate, updateDuration, updateAtHour, updateAtMin);
-    formDataMgr.IsSameForm(records, updatedForm);
-    std::string bundleName(data, size);
-    std::set<int64_t> removedForms;
-    removedForms.insert(formId);
-    formDataMgr.CleanRemovedFormRecords(bundleName, removedForms);
     int32_t userId = static_cast<int32_t>(GetU32Data(data));
-    formDataMgr.CleanRemovedTempFormRecords(bundleName, userId, removedForms);
-    formDataMgr.GetReCreateFormRecordsByBundleName(bundleName, removedForms);
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    std::vector<int64_t> removedFormIds;
+    removedFormIds.emplace_back(formId);
+    formDataMgr.DeleteFormsByUserId(userId, removedFormIds);
+    formDataMgr.ClearFormRecords();
+    int32_t callingUid = static_cast<int32_t>(GetU32Data(data));
+    std::set<int64_t> matchedFormIds;
+    matchedFormIds.insert(formId);
+    std::string bundleName(data, size);
+    std::string abilityName(data, size);
+    FormIdKey formIdKey(bundleName, abilityName);
+    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    noHostTempFormsMap.emplace(formIdKey, matchedFormIds);
+    std::map<int64_t, bool> foundFormsMap;
+    bool flag = *data % ENABLE;
+    foundFormsMap.emplace(formId, flag);
+    formDataMgr.GetNoHostInvalidTempForms(userId, callingUid, matchedFormIds, noHostTempFormsMap, foundFormsMap);
+    formDataMgr.BatchDeleteNoHostTempForms(callingUid, noHostTempFormsMap, foundFormsMap);
+    formDataMgr.DeleteInvalidTempForms(userId, callingUid, matchedFormIds, foundFormsMap);
+    formDataMgr.DeleteInvalidPublishForms(userId, bundleName, matchedFormIds);
+    formDataMgr.ClearHostDataByInvalidForms(callingUid, foundFormsMap);
+    Want want;
+    std::unique_ptr<FormProviderData> formProviderData = nullptr;
+    formDataMgr.AddRequestPublishFormInfo(formId, want, formProviderData);
+    formDataMgr.RemoveRequestPublishFormInfo(formId);
+    formDataMgr.IsRequestPublishForm(formId);
+    formDataMgr.GetRequestPublishFormInfo(formId, want, formProviderData);
+    FormRecord record;
+    BundlePackInfo bundlePackInfo;
+    AbilityFormInfo abilityFormInfo;
+    formDataMgr.GetPackageForm(record, bundlePackInfo, abilityFormInfo);
+    formDataMgr.IsSameForm(record, abilityFormInfo);
+    bool isNeedFreeInstall = *data % ENABLE;
+    formDataMgr.SetRecordNeedFreeInstall(formId, isNeedFreeInstall);
     return true;
 }
 }
