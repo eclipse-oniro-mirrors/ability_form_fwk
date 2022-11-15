@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "formdatamgrtwo_fuzzer.h"
+#include "formdatamgrthree_fuzzer.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -39,42 +39,47 @@ uint32_t GetU32Data(const char* ptr)
 bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
 {
     FormDataMgr formDataMgr;
-    FormHostRecord record;
     int64_t formId = static_cast<int64_t>(GetU32Data(data));
-    std::vector<int64_t> recordTempForms;
-    recordTempForms.emplace_back(formId);
-    formDataMgr.HandleHostDiedForTempForms(record, recordTempForms);
-    formDataMgr.PaddingUdidHash(formId);
-    formDataMgr.GenerateFormId();
-    formDataMgr.GenerateUdidHash();
-    formDataMgr.GetUdidHash();
-    int64_t udidHash = static_cast<int64_t>(GetU32Data(data));
-    formDataMgr.SetUdidHash(udidHash);
+    bool versionUpgrade = *data % ENABLE;
+    formDataMgr.SetVersionUpgrade(formId, versionUpgrade);
+    FormRecord formRecord;
+    formDataMgr.UpdateHostForm(formId, formRecord);
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+    bool flag = *data % ENABLE;
+    bool isOnlyEnableUpdate = *data % ENABLE;
+    FormHostRecord formHostRecord;
+    std::vector<int64_t> refreshForms;
+    refreshForms.emplace_back(formId);
+    formDataMgr.HandleUpdateHostFormFlag(formIds, flag, isOnlyEnableUpdate, formHostRecord, refreshForms);
     sptr<IRemoteObject> callerToken = nullptr;
-    formDataMgr.GetMatchedHostClient(callerToken, record);
-    bool needRefresh = *data % ENABLE;
-    formDataMgr.SetNeedRefresh(formId, needRefresh);
-    bool countTimerRefresh = *data % ENABLE;
-    formDataMgr.SetCountTimerRefresh(formId, countTimerRefresh);
-    FormRecord records;
-    std::vector<FormInfo> targetForms;
-    FormInfo updatedForm;
-    targetForms.emplace_back(updatedForm);
-    formDataMgr.GetUpdatedForm(records, targetForms, updatedForm);
-    bool enableUpdate = *data % ENABLE;
-    formDataMgr.SetEnableUpdate(formId, enableUpdate);
-    long updateDuration = static_cast<long>(GetU32Data(data));
-    int updateAtHour = static_cast<int>(GetU32Data(data));
-    int updateAtMin = static_cast<int>(GetU32Data(data));
-    formDataMgr.SetUpdateInfo(formId, enableUpdate, updateDuration, updateAtHour, updateAtMin);
-    formDataMgr.IsSameForm(records, updatedForm);
+    formDataMgr.UpdateHostFormFlag(formIds, callerToken, flag, isOnlyEnableUpdate, refreshForms);
+    formDataMgr.FindMatchedFormId(formId);
+    int uId = static_cast<int>(GetU32Data(data));
+    formDataMgr.ClearHostDataByUId(uId);
+    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
     std::string bundleName(data, size);
-    std::set<int64_t> removedForms;
-    removedForms.insert(formId);
-    formDataMgr.CleanRemovedFormRecords(bundleName, removedForms);
-    int32_t userId = static_cast<int32_t>(GetU32Data(data));
-    formDataMgr.CleanRemovedTempFormRecords(bundleName, userId, removedForms);
-    formDataMgr.GetReCreateFormRecordsByBundleName(bundleName, removedForms);
+    std::string abilityName(data, size);
+    FormIdKey formIdKey(bundleName, abilityName);
+    std::set<int64_t> aa;
+    aa.insert(formId);
+    noHostTempFormsMap.emplace(formIdKey, aa);
+    std::map<int64_t, bool> foundFormsMap;
+    foundFormsMap.emplace(formId, flag);
+    formDataMgr.GetNoHostTempForms(uId, noHostTempFormsMap, foundFormsMap);
+    FormItemInfo info;
+    formDataMgr.ParseUpdateConfig(formRecord, info);
+    int configDuration = static_cast<int>(GetU32Data(data));
+    formDataMgr.ParseIntervalConfig(formRecord, configDuration);
+    formDataMgr.ParseAtTimerConfig(formRecord, info);
+    formDataMgr.IsFormCached(formRecord);
+    std::string provider(data, size);
+    int callingUid = static_cast<int>(GetU32Data(data));
+    formDataMgr.CreateFormStateRecord(provider, info, callerToken, callingUid);
+    bool isVisible = *data % ENABLE;
+    formDataMgr.NotifyFormsVisible(formIds, isVisible, callerToken);
+    int64_t matchedFormId = static_cast<int64_t>(GetU32Data(data));
+    formDataMgr.SetRecordVisible(matchedFormId, isVisible);
     return true;
 }
 }

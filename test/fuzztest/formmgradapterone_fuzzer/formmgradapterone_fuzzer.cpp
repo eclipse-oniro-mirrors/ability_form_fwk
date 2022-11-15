@@ -13,14 +13,14 @@
  * limitations under the License.
  */
 
-#include "formdatamgrtwo_fuzzer.h"
+#include "formmgradapterone_fuzzer.h"
 
 #include <cstddef>
 #include <cstdint>
 
 #define private public
 #define protected public
-#include "form_data_mgr.h"
+#include "form_mgr_adapter.h"
 #undef private
 #undef protected
 #include "securec.h"
@@ -30,7 +30,7 @@ using namespace OHOS::AppExecFwk;
 namespace OHOS {
 constexpr size_t FOO_MAX_LEN = 1024;
 constexpr size_t U32_AT_SIZE = 4;
-constexpr uint8_t ENABLE = 2;
+// constexpr uint8_t ENABLE = 2;
 uint32_t GetU32Data(const char* ptr)
 {
     // convert fuzz input data to an integer
@@ -38,43 +38,36 @@ uint32_t GetU32Data(const char* ptr)
 }
 bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
 {
-    FormDataMgr formDataMgr;
-    FormHostRecord record;
-    int64_t formId = static_cast<int64_t>(GetU32Data(data));
-    std::vector<int64_t> recordTempForms;
-    recordTempForms.emplace_back(formId);
-    formDataMgr.HandleHostDiedForTempForms(record, recordTempForms);
-    formDataMgr.PaddingUdidHash(formId);
-    formDataMgr.GenerateFormId();
-    formDataMgr.GenerateUdidHash();
-    formDataMgr.GetUdidHash();
-    int64_t udidHash = static_cast<int64_t>(GetU32Data(data));
-    formDataMgr.SetUdidHash(udidHash);
+    FormMgrAdapter formMgrAdapter;
+    FormItemInfo info;
     sptr<IRemoteObject> callerToken = nullptr;
-    formDataMgr.GetMatchedHostClient(callerToken, record);
-    bool needRefresh = *data % ENABLE;
-    formDataMgr.SetNeedRefresh(formId, needRefresh);
-    bool countTimerRefresh = *data % ENABLE;
-    formDataMgr.SetCountTimerRefresh(formId, countTimerRefresh);
-    FormRecord records;
-    std::vector<FormInfo> targetForms;
-    FormInfo updatedForm;
-    targetForms.emplace_back(updatedForm);
-    formDataMgr.GetUpdatedForm(records, targetForms, updatedForm);
-    bool enableUpdate = *data % ENABLE;
-    formDataMgr.SetEnableUpdate(formId, enableUpdate);
-    long updateDuration = static_cast<long>(GetU32Data(data));
-    int updateAtHour = static_cast<int>(GetU32Data(data));
-    int updateAtMin = static_cast<int>(GetU32Data(data));
-    formDataMgr.SetUpdateInfo(formId, enableUpdate, updateDuration, updateAtHour, updateAtMin);
-    formDataMgr.IsSameForm(records, updatedForm);
-    std::string bundleName(data, size);
-    std::set<int64_t> removedForms;
-    removedForms.insert(formId);
-    formDataMgr.CleanRemovedFormRecords(bundleName, removedForms);
-    int32_t userId = static_cast<int32_t>(GetU32Data(data));
-    formDataMgr.CleanRemovedTempFormRecords(bundleName, userId, removedForms);
-    formDataMgr.GetReCreateFormRecordsByBundleName(bundleName, removedForms);
+    FormRecord record;
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    WantParams wantParams;
+    FormJsInfo formInfo;
+    formMgrAdapter.AddExistFormRecord(info, callerToken, record, formId, wantParams, formInfo);
+    formMgrAdapter.AllotFormByInfo(info, callerToken, wantParams, formInfo);
+    formMgrAdapter.AddNewFormRecord(info, formId, callerToken, wantParams, formInfo);
+    formMgrAdapter.AddFormTimer(record);
+    std::string providerKey(data, size);
+    std::vector<int64_t> formIdsByProvider;
+    formIdsByProvider.emplace_back(formId);
+    int32_t formVisibleType = static_cast<int32_t>(GetU32Data(data));
+    formMgrAdapter.HandleEventNotify(providerKey, formIdsByProvider, formVisibleType);
+    formMgrAdapter.AcquireProviderFormInfoAsync(formId, info, wantParams);
+    AAFwk::Want want;
+    BundleInfo bundleInfo;
+    std::string packageName(data, size);
+    formMgrAdapter.GetBundleInfo(want, bundleInfo, packageName);
+    FormInfo formInfos;
+    formMgrAdapter.GetFormInfo(want, formInfos);
+    formMgrAdapter.GetFormItemInfo(want, bundleInfo, formInfos, info);
+    int dimensionId = static_cast<int>(GetU32Data(data));
+    formMgrAdapter.IsDimensionValid(formInfos, dimensionId);
+    formMgrAdapter.CreateFormItemInfo(bundleInfo, formInfos, info);
+    Want wants;
+    formMgrAdapter.CheckPublishForm(wants);
+    formMgrAdapter.QueryPublishFormToHost(wants);
     return true;
 }
 }

@@ -13,14 +13,14 @@
  * limitations under the License.
  */
 
-#include "formdatamgrtwo_fuzzer.h"
+#include "formmgradapter_fuzzer.h"
 
 #include <cstddef>
 #include <cstdint>
 
 #define private public
 #define protected public
-#include "form_data_mgr.h"
+#include "form_mgr_adapter.h"
 #undef private
 #undef protected
 #include "securec.h"
@@ -38,43 +38,35 @@ uint32_t GetU32Data(const char* ptr)
 }
 bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
 {
-    FormDataMgr formDataMgr;
-    FormHostRecord record;
+    FormMgrAdapter formMgrAdapter;
     int64_t formId = static_cast<int64_t>(GetU32Data(data));
-    std::vector<int64_t> recordTempForms;
-    recordTempForms.emplace_back(formId);
-    formDataMgr.HandleHostDiedForTempForms(record, recordTempForms);
-    formDataMgr.PaddingUdidHash(formId);
-    formDataMgr.GenerateFormId();
-    formDataMgr.GenerateUdidHash();
-    formDataMgr.GetUdidHash();
-    int64_t udidHash = static_cast<int64_t>(GetU32Data(data));
-    formDataMgr.SetUdidHash(udidHash);
+    Want want;
     sptr<IRemoteObject> callerToken = nullptr;
-    formDataMgr.GetMatchedHostClient(callerToken, record);
-    bool needRefresh = *data % ENABLE;
-    formDataMgr.SetNeedRefresh(formId, needRefresh);
-    bool countTimerRefresh = *data % ENABLE;
-    formDataMgr.SetCountTimerRefresh(formId, countTimerRefresh);
-    FormRecord records;
-    std::vector<FormInfo> targetForms;
-    FormInfo updatedForm;
-    targetForms.emplace_back(updatedForm);
-    formDataMgr.GetUpdatedForm(records, targetForms, updatedForm);
-    bool enableUpdate = *data % ENABLE;
-    formDataMgr.SetEnableUpdate(formId, enableUpdate);
-    long updateDuration = static_cast<long>(GetU32Data(data));
-    int updateAtHour = static_cast<int>(GetU32Data(data));
-    int updateAtMin = static_cast<int>(GetU32Data(data));
-    formDataMgr.SetUpdateInfo(formId, enableUpdate, updateDuration, updateAtHour, updateAtMin);
-    formDataMgr.IsSameForm(records, updatedForm);
+    FormJsInfo formInfo;
+    formMgrAdapter.AddForm(formId, want, callerToken, formInfo);
+    formMgrAdapter.DeleteForm(formId, callerToken);
+    bool delCache = *data % ENABLE;
+    formMgrAdapter.ReleaseForm(formId, callerToken, delCache);
+    formMgrAdapter.HandleReleaseForm(formId, callerToken);
+    formMgrAdapter.HandleDeleteForm(formId, callerToken);
+    formMgrAdapter.HandleDeleteTempForm(formId, callerToken);
+    FormRecord dbRecord;
+    int uid = static_cast<int>(GetU32Data(data));
+    formMgrAdapter.HandleDeleteFormCache(dbRecord, uid, formId);
     std::string bundleName(data, size);
-    std::set<int64_t> removedForms;
-    removedForms.insert(formId);
-    formDataMgr.CleanRemovedFormRecords(bundleName, removedForms);
-    int32_t userId = static_cast<int32_t>(GetU32Data(data));
-    formDataMgr.CleanRemovedTempFormRecords(bundleName, userId, removedForms);
-    formDataMgr.GetReCreateFormRecordsByBundleName(bundleName, removedForms);
+    FormProviderData formProviderData;
+    formMgrAdapter.UpdateForm(formId, bundleName, formProviderData);
+    formMgrAdapter.RequestForm(formId, callerToken, want);
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+    int32_t formVisibleType = static_cast<int32_t>(GetU32Data(data));
+    formMgrAdapter.NotifyWhetherVisibleForms(formIds, callerToken, formVisibleType);
+    formMgrAdapter.CastTempForm(formId, callerToken);
+    formMgrAdapter.HandleCastTempForm(formId, dbRecord);
+    FormItemInfo formConfigInfo;
+    formMgrAdapter.GetFormConfigInfo(want, formConfigInfo);
+    WantParams wantParams;
+    formMgrAdapter.AllotFormById(formConfigInfo, callerToken, wantParams, formInfo);
     return true;
 }
 }
