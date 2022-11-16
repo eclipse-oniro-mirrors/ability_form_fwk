@@ -13,14 +13,14 @@
  * limitations under the License.
  */
 
-#include "formmgradapterone_fuzzer.h"
+#include "formsharemgr_fuzzer.h"
 
 #include <cstddef>
 #include <cstdint>
 
 #define private public
 #define protected public
-#include "form_mgr_adapter.h"
+#include "form_share_mgr.h"
 #undef private
 #undef protected
 #include "securec.h"
@@ -37,36 +37,38 @@ uint32_t GetU32Data(const char* ptr)
 }
 bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
 {
-    FormMgrAdapter formMgrAdapter;
-    FormItemInfo info;
-    sptr<IRemoteObject> callerToken = nullptr;
-    FormRecord record;
+    FormShareMgr formShareMgr;
     int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    std::string deviceId(data, size);
+    sptr<IRemoteObject> callerToken = nullptr;
+    int64_t requestCode = static_cast<int64_t>(GetU32Data(data));
+    formShareMgr.ShareForm(formId, deviceId, callerToken, requestCode);
+    FormShareInfo info;
+    formShareMgr.HandleRecvFormShareInfoFromRemoteTask(info);
+    formShareMgr.CheckFormShareInfo(info);
+    formShareMgr.MakeFormShareInfoKey(info);
+    Want want;
+    formShareMgr.MakeFormShareInfoKey(want);
+    formShareMgr.StartFormUser(info);
+    std::string bundleName(data, size);
+    std::string moduleName(data, size);
+    formShareMgr.IsExistFormPackage(bundleName, moduleName);
+    std::string formShareInfoKey(data, size);
+    formShareMgr.RemoveFormShareInfo(formShareInfoKey);
+    std::shared_ptr<FormFreeInstallOperator> freeInstallOperator = nullptr;
+    formShareMgr.FinishFreeInstallTask(freeInstallOperator);
+    int32_t resultCode = static_cast<int32_t>(GetU32Data(data));
+    formShareMgr.OnInstallFinished(freeInstallOperator, resultCode, formShareInfoKey);
+    int64_t eventId = static_cast<int64_t>(GetU32Data(data));
+    formShareMgr.HandleFormShareInfoTimeout(eventId);
+    formShareMgr.HandleFreeInstallTimeout(eventId);
     WantParams wantParams;
-    FormJsInfo formInfo;
-    formMgrAdapter.AddExistFormRecord(info, callerToken, record, formId, wantParams, formInfo);
-    formMgrAdapter.AllotFormByInfo(info, callerToken, wantParams, formInfo);
-    formMgrAdapter.AddNewFormRecord(info, formId, callerToken, wantParams, formInfo);
-    formMgrAdapter.AddFormTimer(record);
-    std::string providerKey(data, size);
-    std::vector<int64_t> formIdsByProvider;
-    formIdsByProvider.emplace_back(formId);
-    int32_t formVisibleType = static_cast<int32_t>(GetU32Data(data));
-    formMgrAdapter.HandleEventNotify(providerKey, formIdsByProvider, formVisibleType);
-    formMgrAdapter.AcquireProviderFormInfoAsync(formId, info, wantParams);
-    AAFwk::Want want;
-    BundleInfo bundleInfo;
-    std::string packageName(data, size);
-    formMgrAdapter.GetBundleInfo(want, bundleInfo, packageName);
-    FormInfo formInfos;
-    formMgrAdapter.GetFormInfo(want, formInfos);
-    formMgrAdapter.GetFormItemInfo(want, bundleInfo, formInfos, info);
-    int dimensionId = static_cast<int>(GetU32Data(data));
-    formMgrAdapter.IsDimensionValid(formInfos, dimensionId);
-    formMgrAdapter.CreateFormItemInfo(bundleInfo, formInfos, info);
-    Want wants;
-    formMgrAdapter.CheckPublishForm(wants);
-    formMgrAdapter.QueryPublishFormToHost(wants);
+    formShareMgr.AddProviderData(want, wantParams);
+    DistributedHardware::DmDeviceInfo deviceInfo;
+    formShareMgr.GetLocalDeviceInfo(bundleName, deviceInfo);
+    formShareMgr.IsShareForm(want);
+    int64_t msg = static_cast<int64_t>(GetU32Data(data));
+    formShareMgr.OnEventTimeoutResponse(msg, eventId);
     return true;
 }
 }

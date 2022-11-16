@@ -13,14 +13,14 @@
  * limitations under the License.
  */
 
-#include "formmgradapterone_fuzzer.h"
+#include "formbmshelper_fuzzer.h"
 
 #include <cstddef>
 #include <cstdint>
 
 #define private public
 #define protected public
-#include "form_mgr_adapter.h"
+#include "form_bms_helper.h"
 #undef private
 #undef protected
 #include "securec.h"
@@ -37,36 +37,18 @@ uint32_t GetU32Data(const char* ptr)
 }
 bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
 {
-    FormMgrAdapter formMgrAdapter;
-    FormItemInfo info;
-    sptr<IRemoteObject> callerToken = nullptr;
-    FormRecord record;
-    int64_t formId = static_cast<int64_t>(GetU32Data(data));
-    WantParams wantParams;
-    FormJsInfo formInfo;
-    formMgrAdapter.AddExistFormRecord(info, callerToken, record, formId, wantParams, formInfo);
-    formMgrAdapter.AllotFormByInfo(info, callerToken, wantParams, formInfo);
-    formMgrAdapter.AddNewFormRecord(info, formId, callerToken, wantParams, formInfo);
-    formMgrAdapter.AddFormTimer(record);
-    std::string providerKey(data, size);
-    std::vector<int64_t> formIdsByProvider;
-    formIdsByProvider.emplace_back(formId);
-    int32_t formVisibleType = static_cast<int32_t>(GetU32Data(data));
-    formMgrAdapter.HandleEventNotify(providerKey, formIdsByProvider, formVisibleType);
-    formMgrAdapter.AcquireProviderFormInfoAsync(formId, info, wantParams);
-    AAFwk::Want want;
+    FormBmsHelper formBmsHelper;
+    sptr<IBundleMgr> bundleManager = nullptr;
+    formBmsHelper.SetBundleManager(bundleManager);
+    std::string bundleName(data, size);
+    std::string moduleName(data, size);
+    formBmsHelper.NotifyModuleRemovable(bundleName, moduleName);
+    formBmsHelper.NotifyModuleNotRemovable(bundleName, moduleName);
+    formBmsHelper.GenerateModuleKey(bundleName, moduleName);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
     BundleInfo bundleInfo;
-    std::string packageName(data, size);
-    formMgrAdapter.GetBundleInfo(want, bundleInfo, packageName);
-    FormInfo formInfos;
-    formMgrAdapter.GetFormInfo(want, formInfos);
-    formMgrAdapter.GetFormItemInfo(want, bundleInfo, formInfos, info);
-    int dimensionId = static_cast<int>(GetU32Data(data));
-    formMgrAdapter.IsDimensionValid(formInfos, dimensionId);
-    formMgrAdapter.CreateFormItemInfo(bundleInfo, formInfos, info);
-    Want wants;
-    formMgrAdapter.CheckPublishForm(wants);
-    formMgrAdapter.QueryPublishFormToHost(wants);
+    formBmsHelper.GetBundleInfo(bundleName, userId, bundleInfo);
+    formBmsHelper.GetUidByBundleName(bundleName, userId);
     return true;
 }
 }

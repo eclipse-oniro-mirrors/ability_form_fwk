@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "formmgradapterone_fuzzer.h"
+#include "formmgradaptertwo_fuzzer.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -30,6 +30,7 @@ using namespace OHOS::AppExecFwk;
 namespace OHOS {
 constexpr size_t FOO_MAX_LEN = 1024;
 constexpr size_t U32_AT_SIZE = 4;
+constexpr uint8_t ENABLE = 2;
 uint32_t GetU32Data(const char* ptr)
 {
     // convert fuzz input data to an integer
@@ -38,35 +39,33 @@ uint32_t GetU32Data(const char* ptr)
 bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
 {
     FormMgrAdapter formMgrAdapter;
-    FormItemInfo info;
-    sptr<IRemoteObject> callerToken = nullptr;
-    FormRecord record;
+    Want want;
+    formMgrAdapter.RequestPublishFormToHost(want);
+    bool withFormBindingData = *data % ENABLE;
+    std::unique_ptr<FormProviderData> formBindingData = nullptr;
     int64_t formId = static_cast<int64_t>(GetU32Data(data));
-    WantParams wantParams;
-    FormJsInfo formInfo;
-    formMgrAdapter.AddExistFormRecord(info, callerToken, record, formId, wantParams, formInfo);
-    formMgrAdapter.AllotFormByInfo(info, callerToken, wantParams, formInfo);
-    formMgrAdapter.AddNewFormRecord(info, formId, callerToken, wantParams, formInfo);
-    formMgrAdapter.AddFormTimer(record);
-    std::string providerKey(data, size);
-    std::vector<int64_t> formIdsByProvider;
-    formIdsByProvider.emplace_back(formId);
-    int32_t formVisibleType = static_cast<int32_t>(GetU32Data(data));
-    formMgrAdapter.HandleEventNotify(providerKey, formIdsByProvider, formVisibleType);
-    formMgrAdapter.AcquireProviderFormInfoAsync(formId, info, wantParams);
-    AAFwk::Want want;
-    BundleInfo bundleInfo;
-    std::string packageName(data, size);
-    formMgrAdapter.GetBundleInfo(want, bundleInfo, packageName);
-    FormInfo formInfos;
-    formMgrAdapter.GetFormInfo(want, formInfos);
-    formMgrAdapter.GetFormItemInfo(want, bundleInfo, formInfos, info);
-    int dimensionId = static_cast<int>(GetU32Data(data));
-    formMgrAdapter.IsDimensionValid(formInfos, dimensionId);
-    formMgrAdapter.CreateFormItemInfo(bundleInfo, formInfos, info);
-    Want wants;
-    formMgrAdapter.CheckPublishForm(wants);
-    formMgrAdapter.QueryPublishFormToHost(wants);
+    formMgrAdapter.RequestPublishForm(want, withFormBindingData, formBindingData, formId);
+    Want formProviderWant;
+    formMgrAdapter.CheckAddRequestPublishForm(want, formProviderWant);
+    FormItemInfo formItemInfo;
+    sptr<IRemoteObject> callerToken = nullptr;
+    FormJsInfo formJsInfo;
+    formMgrAdapter.AddRequestPublishForm(formItemInfo, want, callerToken, formJsInfo);
+    int64_t nextTime = static_cast<int64_t>(GetU32Data(data));
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    formMgrAdapter.SetNextRefreshTimeLocked(formId, nextTime, userId);
+    std::string bundleName(data, size);
+    formMgrAdapter.IsUpdateValid(formId, bundleName);
+    std::vector<int64_t> formIDs;
+    formIDs.emplace_back(formId);
+    formMgrAdapter.EnableUpdateForm(formIDs, callerToken);
+    formMgrAdapter.DisableUpdateForm(formIDs, callerToken);
+    formMgrAdapter.MessageEvent(formId, want, callerToken);
+    bool flag = *data % ENABLE;
+    bool isOnlyEnableUpdate = *data % ENABLE;
+    formMgrAdapter.HandleUpdateFormFlag(formIDs, callerToken, flag, isOnlyEnableUpdate);
+    FormRecord record;
+    formMgrAdapter.IsFormCached(record);
     return true;
 }
 }
