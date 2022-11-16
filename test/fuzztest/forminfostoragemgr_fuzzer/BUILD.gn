@@ -61,6 +61,7 @@ ohos_fuzztest("FormInfoStorageMgrFuzzTest") {
     "form_fwk:form_manager",
     "ipc:ipc_core",
     "kv_store:distributeddata_inner",
+    "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]

@@ -23,7 +23,7 @@
 
 #include "form_id_key.h"
 #include "form_record.h"
-#include "form_info_storage_mgr.h"
+#include "form_info_rdb_storage_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {
