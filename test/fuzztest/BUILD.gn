@@ -32,6 +32,7 @@ group("fuzztest") {
     "formdbcacheannex_fuzzer:fuzztest",
     "formerrors_fuzzer:fuzztest",
     "formfreeinstalloperator_fuzzer:fuzztest",
+    "formhostcaller_fuzzer:fuzztest",
     "formhostclient_fuzzer:fuzztest",
     "formhostrecord_fuzzer:fuzztest",
     "formhoststub_fuzzer:fuzztest",
