@@ -13,12 +13,16 @@
  * limitations under the License.
  */
 
-#include "formproviderinfo_fuzzer.h"
+#include "formmgrproxyannex_fuzzer.h"
 
 #include <cstddef>
 #include <cstdint>
 
-#include "form_provider_info.h"
+#define private public
+#define protected public
+#include "form_mgr_proxy.h"
+#undef private
+#undef protected                                                
 #include "securec.h"
 
 using namespace OHOS::AppExecFwk;
@@ -26,24 +30,24 @@ using namespace OHOS::AppExecFwk;
 namespace OHOS {
 constexpr size_t FOO_MAX_LEN = 1024;
 constexpr size_t U32_AT_SIZE = 4;
+constexpr uint8_t ENABLE = 2;
 uint32_t GetU32Data(const char* ptr)
 {
     // convert fuzz input data to an integer
     return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | ptr[3];
 }
+
 bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
 {
-    FormProviderInfo formProviderInfo;
-    std::string dataString(data);
-    formProviderInfo.SetFormDataString(dataString);
-    std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
-    formProviderInfo.SetImageDataMap(imageDataMap);
-    formProviderInfo.GetImageDataMap();
-    nlohmann::json addJsonData;
-    formProviderInfo.MergeData(addJsonData);
-    formProviderInfo.NeedCache();
-    Parcel parcel;
-    return formProviderInfo.Marshalling(parcel);
+    sptr<IRemoteObject> impl = nullptr;
+    FormMgrProxy formMgrProxy(impl);
+    std::vector<int64_t> formIds;
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    formIds.emplace_back(formId);
+    bool isProtected = *data % ENABLE;
+    sptr<IRemoteObject> callerToken = nullptr;
+    formMgrProxy.NotifyFormsPrivacyProtected(formIds, isProtected, callerToken);
+    return true;
 }
 }
 
