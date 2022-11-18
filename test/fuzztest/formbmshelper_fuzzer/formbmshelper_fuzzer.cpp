@@ -66,11 +66,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     }
 
     /* Validate the length of size */
-    if (size == 0 || size > OHOS::FOO_MAX_LEN) {
+    if (size > OHOS::FOO_MAX_LEN) {
         return 0;
     }
 
-    char* ch = (char *)malloc(size + 1);
+    char* ch = reinterpret_cast<char *>(malloc(size + 1));
     if (ch == nullptr) {
         return 0;
     }
