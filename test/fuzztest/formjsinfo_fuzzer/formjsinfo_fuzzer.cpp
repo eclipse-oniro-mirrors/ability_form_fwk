@@ -35,7 +35,10 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
 {
     FormJsInfo formJsInfo;
     Parcel parcel;
+    formJsInfo.Marshalling(parcel);
     formJsInfo.Unmarshalling(parcel);
+    formJsInfo.ReadImageData(parcel);
+    formJsInfo.ConvertRawImageData();
     return formJsInfo.WriteImageData(parcel);
 }
 }
