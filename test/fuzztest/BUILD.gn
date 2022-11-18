@@ -47,6 +47,7 @@ group("fuzztest") {
     "formmgradaptertwo_fuzzer:fuzztest",
     "formmgrannex_fuzzer:fuzztest",
     "formmgrproxy_fuzzer:fuzztest",
+    "formmgrproxyannex_fuzzer:fuzztest",
     "formmgrservice_fuzzer:fuzztest",
     "formmgrstub_fuzzer:fuzztest",
     "formprovidercaller_fuzzer:fuzztest",
