@@ -16,6 +16,9 @@
 #include <gtest/gtest.h>
 
 #include "accesstoken_kit.h"
+#define private public
+#include "form_acquire_state_connection.h"
+#undef private
 #include "form_ams_helper.h"
 #include "form_bms_helper.h"
 #define private public
@@ -30,6 +33,10 @@
 #undef private
 #include "form_mgr_errors.h"
 #include "form_mgr_service.h"
+#define private public
+#include "form_msg_event_connection.h"
+#include "form_task_mgr.h"
+#undef private
 #include "if_system_ability_manager.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
@@ -63,6 +70,7 @@ const int32_t PARAM_FORM_DIMENSION_VALUE = 1;
 
 const std::string DEVICE_ID = "ohos-phone1";
 const std::string DEF_LABEL1 = "PermissionFormRequireGrant";
+const std::string FORM_MESSAGE_EVENT_VALUE_1 = "event message1";
 const int32_t USER_ID = 100;
 
 class FmsFormMgrPublishFormTest : public testing::Test {
@@ -197,5 +205,130 @@ HWTEST_F(FmsFormMgrPublishFormTest, publishForm_002, TestSize.Level0)
     EXPECT_EQ(ERR_OK,
         formyMgrServ_->RequestPublishForm(want, false, formBindingData, formId));
     GTEST_LOG_(INFO) << "fms_form_mgr_publish_form_test_002 end";
+}
+
+/**
+ * @tc.name: FormMsgEventConnection_0001
+ * @tc.desc: test OnAbilityConnectDone function and resultCode != ERR_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrPublishFormTest, FormMsgEventConnection_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMsgEventConnection_0001 start";
+    int64_t formId = 1;
+    Want want;
+    std::string bundleName = "aa";
+    std::string abilityName = "bb";
+    FormMsgEventConnection formMsgEventConnection(formId, want, bundleName, abilityName);
+    // test OnAbilityConnectDone
+    AppExecFwk::ElementName element;
+    sptr<IRemoteObject> remoteObject = nullptr;
+    int resultCode = 22;
+    formMsgEventConnection.OnAbilityConnectDone(element, remoteObject, resultCode);
+    GTEST_LOG_(INFO) << "FormMsgEventConnection_0001 end";
+}
+
+/**
+ * @tc.name: FormMsgEventConnection_0002
+ * @tc.desc: test OnAbilityConnectDone function and resultCode == ERR_OK
+ * HasParameter is not Constants::PARAM_MESSAGE_KEY
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrPublishFormTest, FormMsgEventConnection_0002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMsgEventConnection_0002 start";
+    int64_t formId = 1;
+    Want want;
+    std::string bundleName = "aa";
+    std::string abilityName = "bb";
+    FormMsgEventConnection formMsgEventConnection(formId, want, bundleName, abilityName);
+    // test OnAbilityConnectDone
+    AppExecFwk::ElementName element;
+    sptr<IRemoteObject> remoteObject = nullptr;
+    int resultCode = ERR_OK;
+    formMsgEventConnection.OnAbilityConnectDone(element, remoteObject, resultCode);
+    GTEST_LOG_(INFO) << "FormMsgEventConnection_0002 end";
+}
+
+/**
+ * @tc.name: FormMsgEventConnection_0003
+ * @tc.desc: test OnAbilityConnectDone function and resultCode == ERR_OK
+ * HasParameter is Constants::PARAM_MESSAGE_KEY
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrPublishFormTest, FormMsgEventConnection_0003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMsgEventConnection_0003 start";
+    int64_t formId = 1;
+    Want want;
+    want.SetParam(Constants::PARAM_MESSAGE_KEY, FORM_MESSAGE_EVENT_VALUE_1);
+    std::string bundleName = "aa";
+    std::string abilityName = "bb";
+    FormMsgEventConnection formMsgEventConnection(formId, want, bundleName, abilityName);
+    // test OnAbilityConnectDone
+    AppExecFwk::ElementName element;
+    sptr<IRemoteObject> remoteObject = nullptr;
+    int resultCode = ERR_OK;
+    formMsgEventConnection.OnAbilityConnectDone(element, remoteObject, resultCode);
+    GTEST_LOG_(INFO) << "FormMsgEventConnection_0003 end";
+}
+
+/**
+ * @tc.name: FormAcquireStateConnection_0001
+ * @tc.desc: test OnAbilityConnectDone function and resultCode != ERR_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrPublishFormTest, FormAcquireStateConnection_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormAcquireStateConnection_0001 start";
+    std::string bundleName = "aa";
+    std::string abilityName = "bb";
+    Want want;
+    std::string provider = "cc";
+    FormAcquireStateConnection formAcquireStateConnection(bundleName, abilityName, want, provider);
+    // test OnAbilityConnectDone function
+    AppExecFwk::ElementName element;
+    sptr<IRemoteObject> remoteObject = nullptr;
+    int resultCode = 55;
+    formAcquireStateConnection.OnAbilityConnectDone(element, remoteObject, resultCode);
+    GTEST_LOG_(INFO) << "FormAcquireStateConnection_0001 end";
+}
+
+/**
+ * @tc.name: FormAcquireStateConnection_0002
+ * @tc.desc: test OnAbilityConnectDone function and resultCode == ERR_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrPublishFormTest, FormAcquireStateConnection_0002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormAcquireStateConnection_0002 start";
+    std::string bundleName = "aa";
+    std::string abilityName = "bb";
+    Want want;
+    std::string provider = "cc";
+    FormAcquireStateConnection formAcquireStateConnection(bundleName, abilityName, want, provider);
+    // test OnAbilityConnectDone function
+    AppExecFwk::ElementName element;
+    sptr<IRemoteObject> remoteObject = nullptr;
+    int resultCode = ERR_OK;
+    formAcquireStateConnection.OnAbilityConnectDone(element, remoteObject, resultCode);
+    GTEST_LOG_(INFO) << "FormAcquireStateConnection_0002 end";
+}
+
+/**
+ * @tc.name: FormTaskMgr_0001
+ * @tc.desc: test PostShareAcquireTask function and eventHandler_ is nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrPublishFormTest, FormTaskMgr_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormTaskMgr_0001 start";
+    FormTaskMgr formTaskMgr;
+    int64_t formId = 1;
+    std::string remoteDeviceId = "aa";
+    Want want;
+    sptr<IRemoteObject> remoteObject = nullptr;
+    formTaskMgr.PostShareAcquireTask(formId, remoteDeviceId, want, remoteObject);
+    GTEST_LOG_(INFO) << "FormTaskMgr_0001 end";
 }
 }
