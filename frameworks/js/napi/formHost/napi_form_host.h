@@ -67,7 +67,6 @@ struct AsyncNotifyFormsEnableUpdateCallbackInfo {
     int result;
 };
 
-napi_value NAPI_DeleteInvalidForms(napi_env env, napi_callback_info info);
 napi_value NAPI_AcquireFormState(napi_env env, napi_callback_info info);
 napi_value NAPI_RegisterFormUninstallObserver(napi_env env, napi_callback_info info);
 napi_value NAPI_UnregisterFormUninstallObserver(napi_env env, napi_callback_info info);
@@ -94,6 +93,7 @@ public:
     static NativeValue* NotifyFormsPrivacyProtected(NativeEngine *engine, NativeCallbackInfo *info);
     static NativeValue* NotifyVisibleForms(NativeEngine *engine, NativeCallbackInfo *info);
     static NativeValue* NotifyInVisibleForms(NativeEngine *engine, NativeCallbackInfo *info);
+    static NativeValue* DeleteInvalidForms(NativeEngine *engine, NativeCallbackInfo *info);
 private:
     NativeValue* OnDisableFormsUpdate(NativeEngine &engine, NativeCallbackInfo &info);
     NativeValue* OnIsSystemReady(NativeEngine &engine, const NativeCallbackInfo &info);
@@ -108,6 +108,7 @@ private:
     NativeValue* OnNotifyFormsPrivacyProtected(NativeEngine &engine, NativeCallbackInfo &info);
     NativeValue* OnNotifyVisibleForms(NativeEngine &engine, NativeCallbackInfo &info);
     NativeValue* OnNotifyInVisibleForms(NativeEngine &engine, NativeCallbackInfo &info);
+    NativeValue* OnDeleteInvalidForms(NativeEngine &engine, const NativeCallbackInfo &info);
     void InnerShareForm(NativeEngine &engine, const std::shared_ptr<OHOS::AbilityRuntime::AsyncTask> &asyncTask,
         ShareFormTask &&task, int64_t formId, const std::string &remoteDeviceId);
     bool GetStringsValue(NativeEngine &engine, NativeValue *object, std::vector<std::string> &strList);
