@@ -205,4 +205,133 @@ HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_006, TestSize.Level0) 
     EXPECT_EQ(true, formProviderData.WriteImageDataToParcel(parcel, picName, data, 1));
     GTEST_LOG_(INFO) << "FmsFormProviderDataTest_006 end";
 }
+/**
+ * @tc.name: FmsFormProviderDataTest_007
+ * @tc.desc: Verify the UpdateData and GetData function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_007, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_007 start";
+    EXPECT_EQ(true, InitJsonData());
+    FormProviderData formProviderData(jsonData_);
+    formProviderData.UpdateData(jsonData_);
+    auto result = formProviderData.GetData();
+
+    EXPECT_EQ(jsonData_, result);
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_007 end";
+
+}
+
+/**
+ * @tc.name: FmsFormProviderDataTest_008
+ * @tc.desc: Verify the RemoveImageData and AddImageData function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_008, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_008 start";
+    EXPECT_EQ(true, InitJsonData());
+    FormProviderData formProviderData(jsonData_);
+    std::string picName = "abc";
+    int32_t size = 1;
+    std::shared_ptr<char> data;
+    formProviderData.AddImageData(picName, data, size);
+    formProviderData.RemoveImageData(picName);
+
+    EXPECT_TRUE(formProviderData.rawImageBytesMap_.empty());
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_008 end";
+
+}
+
+/**
+ * @tc.name: FmsFormProviderDataTest_009
+ * @tc.desc: Verify the SetDataString and GetDataString function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_009, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_009 start";
+    EXPECT_EQ(true, InitJsonData());
+    FormProviderData formProviderData(jsonData_);
+    std::string jsonDataString = "abc";
+    formProviderData.SetDataString(jsonDataString);
+    auto result = formProviderData.GetDataString();
+
+    EXPECT_FALSE(result.empty());
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_009 end";
+
+}
+
+/**
+ * @tc.name: FmsFormProviderDataTest_0010
+ * @tc.desc: Verify the ReadFromParcel function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0010, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0010 start";
+    EXPECT_EQ(true, InitJsonData());
+    FormProviderData formProviderData(jsonData_);
+    Parcel parcel;
+    auto result = formProviderData.ReadFromParcel(parcel);
+
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0010 end";
+
+}
+
+/**
+ * @tc.name: FmsFormProviderDataTest_0011
+ * @tc.desc: Verify the Marshalling function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0011, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0011 start";
+    EXPECT_EQ(true, InitJsonData());
+    FormProviderData formProviderData(jsonData_);
+    Parcel parcel;
+    auto result = formProviderData.Marshalling(parcel);
+
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0011 end";
+
+}
+
+/**
+ * @tc.name: FmsFormProviderDataTest_0012
+ * @tc.desc: Verify the Unmarshalling function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0012, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0012 start";
+    EXPECT_EQ(true, InitJsonData());
+    FormProviderData formProviderData(jsonData_);
+    Parcel parcel;
+    auto result = formProviderData.Unmarshalling(parcel);
+
+    EXPECT_TRUE(result == nullptr);
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0012 end";
+
+}
+
+/**
+ * @tc.name: FmsFormProviderDataTest_0013
+ * @tc.desc: Verify the ClearData function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0013, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0013 start";
+    EXPECT_EQ(true, InitJsonData());
+    FormProviderData formProviderData(jsonData_);
+    formProviderData.UpdateData(jsonData_);
+    formProviderData.ClearData();
+
+    EXPECT_TRUE(formProviderData.jsonFormProviderData_.empty());
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0013 end";
+
+}
 }
