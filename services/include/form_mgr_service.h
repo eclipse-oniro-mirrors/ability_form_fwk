@@ -19,12 +19,12 @@
 #include <singleton.h>
 #include <system_ability.h>
 
+#include "form_bundle_event_callback.h"
 #include "form_event_handler.h"
 #include "form_mgr_stub.h"
 #include "form_provider_data.h"
 #include "form_sys_event_receiver.h"
 #include "iremote_object.h"
-
 namespace OHOS {
 namespace AppExecFwk {
 enum class ServiceRunningState {
@@ -350,6 +350,7 @@ private:
     std::shared_ptr<EventRunner> runner_ = nullptr;
     std::shared_ptr<FormEventHandler> handler_ = nullptr;
     std::shared_ptr<FormSysEventReceiver> formSysEventReceiver_ = nullptr;
+    sptr<FormBundleEventCallback> formBundleEventCallback_ = nullptr;
     mutable std::mutex instanceMutex_;
     DISALLOW_COPY_AND_MOVE(FormMgrService);
 };
