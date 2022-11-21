@@ -15,7 +15,24 @@
 
 #include "form_provider_data.h"
 
+using Parcel = OHOS::Parcel;
+
 namespace OHOS {
+
+int32_t Parcel::ReadInt32()
+{
+    return 1;
+}
+
+bool Parcel::WriteInt32(int32_t value)
+{
+    if(value) {
+        return false;
+    } else{
+        return true;
+    }
+}
+
 namespace AppExecFwk {
 namespace {
 bool g_mockConvertRawImageDataRet = true;
