@@ -34,11 +34,13 @@ group("unittest") {
   testonly = true
 
   deps = [
+    "unittest/fms_form_batch_delete_connection_test:unittest",
     "unittest/fms_form_cache_mgr_test:unittest",
     "unittest/fms_form_caller_mgr_test:unittest",
     "unittest/fms_form_data_mgr_test:unittest",
     "unittest/fms_form_db_record_test:unittest",
     "unittest/fms_form_distributed_client_test:unittest",
+    "unittest/fms_form_host_callback_test:unittest",
     "unittest/fms_form_host_client_test:unittest",
     "unittest/fms_form_host_record_test:unittest",
     "unittest/fms_form_info_mgr_test:unittest",
