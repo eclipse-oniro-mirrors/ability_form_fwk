@@ -15,11 +15,18 @@
 #include <gtest/gtest.h>
 #include <memory>
 #include "form_caller_mgr.h"
+#define private public
+#define protected public
 #include "form_mgr.h"
+#include "form_errors.h"
+#undef private
+#undef protected
+#include "form_mgr_errors.h"
 #include "mock_form_provider_client.h"
 #include "gmock/gmock.h"
 #include "mock_form_mgr_proxy.h"
 #include "mock_form_token.h"
+
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -324,4 +331,328 @@ HWTEST_F(FormMgrTest, FormMgrTest_0011, TestSize.Level1) {
     EXPECT_EQ(result, 0);
     GTEST_LOG_(INFO) << "FormMgrTest_0011 test ends";
 }
+
+/**
+ * @tc.name: FormMgrTest_0012
+ * @tc.desc: Verify GetErrorMsg
+ * @tc.type: FUNC
+ * @tc.require: I5ST27
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0012, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0012 starts";
+    int errorCode = 0;
+    auto result = FormMgr::GetInstance().GetErrorMsg(errorCode);
+
+    EXPECT_EQ(result, "unknown error");
+    GTEST_LOG_(INFO) << "FormMgrTest_0012 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0013
+ * @tc.desc: Verify DumpStorageFormInfos
+ * @tc.type: FUNC
+ * @tc.require: I5ST27
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0013, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0013 starts";
+    EXPECT_CALL(*mockProxy, DumpStorageFormInfos(_))
+    .Times(1)
+    .WillOnce(Return(0));
+    std::string formInfos = "a";
+    auto result = FormMgr::GetInstance().DumpStorageFormInfos(formInfos);
+
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrTest_0013 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0014
+ * @tc.desc: Verify DumpFormInfoByFormId
+ * @tc.type: FUNC
+ * @tc.require: I5ST27
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0014, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0014 starts";
+    EXPECT_CALL(*mockProxy, DumpFormInfoByFormId(_, _))
+    .Times(1)
+    .WillOnce(Return(0));
+    std::string formInfos = "a";
+    std::int64_t formId = 3;
+    auto result = FormMgr::GetInstance().DumpFormInfoByFormId(formId, formInfos);
+
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrTest_0014 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0015
+ * @tc.desc: Verify DumpFormTimerByFormId
+ * @tc.type: FUNC
+ * @tc.require: I5ST27
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0015, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0015 starts";
+    EXPECT_CALL(*mockProxy, DumpFormTimerByFormId(_, _))
+    .Times(1)
+    .WillOnce(Return(0));
+    std::string isTimingService = "b";
+    std::int64_t formId = 3;
+    auto result = FormMgr::GetInstance().DumpFormTimerByFormId(formId, isTimingService);
+
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrTest_0015 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0016
+ * @tc.desc: Verify RouterEvent
+ * @tc.type: FUNC
+ * @tc.require: I5ST27
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0016, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0016 starts";
+    EXPECT_CALL(*mockProxy, RouterEvent(_, _, _))
+        .Times(1)
+        .WillOnce(Return(0));
+    Want want;
+    want = want.SetElementName("", "com.example.FormAbility", "MainAbility");
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    FormJsInfo formJsInfo;
+    sptr<IRemoteObject> providerToken = new (std::nothrow) MockFormProviderClient();
+    FormCallerMgr::GetInstance().AddFormHostCaller(formJsInfo, providerToken);
+    int32_t result = FormMgr::GetInstance().RouterEvent(formJsInfo.formId, want, token);
+
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrTest_0016 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0017
+ * @tc.desc: Verify SetNextRefreshTime
+ * @tc.type: FUNC
+ * @tc.require: I5ST27
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0017, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0017 starts";
+    int64_t formId = 1;
+    int64_t nextTime = 2;
+    auto result = FormMgr::GetInstance().SetNextRefreshTime(formId, nextTime);
+
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_REFRESH_TIME);
+    GTEST_LOG_(INFO) << "FormMgrTest_0017 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0018
+ * @tc.desc: Verify GetErrorMessage
+ * @tc.type: FUNC
+ * @tc.require: I5ST27
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0018, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0018 starts";
+    FormErrors::GetInstance().InitErrorMessageMap();
+    int errCode = ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    auto result = FormMgr::GetInstance().GetErrorMessage(errCode);
+
+    EXPECT_EQ(result, "check permission deny, need to request ohos.permission.REQUIRE_FORM.");
+    GTEST_LOG_(INFO) << "FormMgrTest_0018 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0019
+ * @tc.desc: Verify DeleteInvalidForms
+ * @tc.type: FUNC
+ * @tc.require: I5ST27
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0019, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0019 starts";
+    EXPECT_CALL(*mockProxy, DeleteInvalidForms(_, _, _))
+    .Times(1)
+    .WillOnce(Return(0));
+    std::vector<int64_t> formInfos;
+    formInfos.push_back(1);
+    formInfos.push_back(2);
+    FormJsInfo formJsInfo;
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    int32_t numFormsDeleted = 2;
+    auto result = FormMgr::GetInstance().DeleteInvalidForms(formInfos, token, numFormsDeleted);
+
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrTest_0019 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0020
+ * @tc.desc: Verify DumpStorageFormInfos
+ * @tc.type: FUNC
+ * @tc.require: I5ST27
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0020, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0020 starts";
+    EXPECT_CALL(*mockProxy, NotifyFormsVisible(_, _, _))
+        .Times(1)
+        .WillOnce(Return(0));
+    int64_t formId1 = 5;
+    int64_t formId2 = 6;
+    std::vector<int64_t> formIds;
+    formIds.push_back(formId1);
+    formIds.push_back(formId2);
+    bool isProtected = true;
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    int32_t result = FormMgr::GetInstance().NotifyFormsVisible(formIds, isProtected, token);
+
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrTest_0020 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0021
+ * @tc.desc: Verify NotifyFormsEnableUpdate
+ * @tc.type: FUNC
+ * @tc.require: I5ST27
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0021, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0021 starts";
+    EXPECT_CALL(*mockProxy, NotifyFormsEnableUpdate(_, _, _))
+        .Times(1)
+        .WillOnce(Return(0));
+    int64_t formId1 = 3;
+    int64_t formId2 = 4;
+    std::vector<int64_t> formIds;
+    formIds.push_back(formId1);
+    formIds.push_back(formId2);
+    bool isProtected = true;
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    int32_t result = FormMgr::GetInstance().NotifyFormsEnableUpdate(formIds, isProtected, token);
+
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrTest_0021 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0022
+ * @tc.desc: Verify  GetAllFormsInfo
+ * @tc.type: FUNC
+ * @tc.require: I5ST27
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0022, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0022 starts";
+    EXPECT_CALL(*mockProxy, GetAllFormsInfo(_))
+    .Times(1)
+    .WillOnce(Return(0));
+    std::vector<FormInfo> formInfos;
+    std::vector<FormInfo> expectFormInfos;
+    FormInfo formInfo = {};
+    formInfo.bundleName = "ohos.samples.FormApplication";
+    formInfo.moduleName = "entry";
+    expectFormInfos.push_back(formInfo);
+    auto result = FormMgr::GetInstance().GetAllFormsInfo(formInfos);
+
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrTest_0022 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0023
+ * @tc.desc: Verify GetFormsInfoByApp
+ * @tc.type: FUNC
+ * @tc.require: I5ST27
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0023, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0023 starts";
+    EXPECT_CALL(*mockProxy, GetFormsInfoByApp(_, _))
+    .Times(1)
+    .WillOnce(Return(0));
+    std::vector<FormInfo> formInfos;
+    std::vector<FormInfo> expectFormInfos;
+    FormInfo formInfo = {};
+    formInfo.bundleName = "ohos.samples.FormApplication";
+    formInfo.moduleName = "entry";
+    expectFormInfos.push_back(formInfo);
+    std::string bundleName = "a";
+    auto result = FormMgr::GetInstance().GetFormsInfoByApp(bundleName, formInfos);
+
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrTest_0023 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0024
+ * @tc.desc: Verify GetFormsInfoByModule
+ * @tc.type: FUNC
+ * @tc.require: I5ST27
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0024, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0024 starts";
+    EXPECT_CALL(*mockProxy, GetFormsInfoByModule(_, _, _))
+    .Times(1)
+    .WillOnce(Return(0));
+    std::vector<FormInfo> formInfos;
+    std::vector<FormInfo> expectFormInfos;
+    FormInfo formInfo = {};
+    formInfo.bundleName = "ohos.samples.FormApplication";
+    formInfo.moduleName = "entry";
+    expectFormInfos.push_back(formInfo);
+    std::string bundleName = "a";
+    std::string moduleName = "A";
+    auto result = FormMgr::GetInstance().GetFormsInfoByModule(bundleName, moduleName, formInfos);
+
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrTest_0024 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0025
+ * @tc.desc: Verify CheckFMSReady
+ * @tc.type: FUNC
+ * @tc.require: I5ST27
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0025, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0025 starts";
+    auto result = FormMgr::GetInstance().CheckFMSReady();
+
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "FormMgrTest_0025 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0026
+ * @tc.desc: Verify DumpFormInfoByBundleName
+ * @tc.type: FUNC
+ * @tc.require: I5ST27
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0026, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0026 starts";
+    EXPECT_CALL(*mockProxy, DumpFormInfoByBundleName(_, _))
+    .Times(1)
+    .WillOnce(Return(0));
+    std::string bundleName = "b";
+    std::string formInfos = "a";
+    auto result = FormMgr::GetInstance().DumpFormInfoByBundleName(bundleName, formInfos);
+
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrTest_0026 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0027
+ * @tc.desc: Verify AcquireFormState
+ * @tc.type: FUNC
+ * @tc.require: I5ST27
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0027, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0027 starts";
+    EXPECT_CALL(*mockProxy, AcquireFormState(_, _, _))
+    .Times(1)
+    .WillOnce(Return(0));
+    Want want;
+    want = want.SetElementName("", "com.example.FormAbility", "MainAbility");
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    FormStateInfo stateInfo;
+    auto result = FormMgr::GetInstance().AcquireFormState(want, token, stateInfo);
+    
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrTest_0027 test ends";
+}
+
 } // namespace
