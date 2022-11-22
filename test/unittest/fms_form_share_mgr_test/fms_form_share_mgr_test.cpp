@@ -19,7 +19,9 @@
 #include "accesstoken_kit.h"
 #include "dm_constants.h"
 #include "dm_device_info.h"
+#define private public
 #include "form_ams_helper.h"
+#undef private
 #include "form_bms_helper.h"
 #include "form_db_cache.h"
 #include "form_mgr_errors.h"
@@ -940,4 +942,779 @@ HWTEST_F(FmsFormShareMgrTest, AddProviderData_002, TestSize.Level0)
     EXPECT_EQ(result, nullptr);
 
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest AddProviderData_002 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_001
+ * @tc.desc: test LoadFormConfigInfoByBundleName function.
+ * @tc.type: FormInfoHelper
+ */
+HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_001 start";
+
+    FormInfoHelper formInfoHelper;
+    std::string bundleName = "";
+    std::vector<FormInfo> formInfos;
+    int32_t userId = 2;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
+        formInfoHelper.LoadFormConfigInfoByBundleName(bundleName, formInfos, userId));
+
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_001 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_002
+ * @tc.desc: test UpdateStaticFormInfos function.
+ * @tc.type: FormInfoHelper
+ */
+HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_002 start";
+
+    std::string bundleName = "";
+    int32_t userId = 2;
+    BundleFormInfo bundleFormInfo(bundleName);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, bundleFormInfo.UpdateStaticFormInfos(userId));
+
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_002 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_003
+ * @tc.desc: test UpdateStaticFormInfos function and item->userId != userId.
+ * @tc.type: FormInfoHelper
+ */
+HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_003 start";
+
+    std::string bundleName = "aaa";
+    int32_t userId = 2;
+    BundleFormInfo bundleFormInfo(bundleName);
+    std::vector<AAFwk::FormInfoStorage> formInfoStorages_;
+    FormInfo formInfo;
+    formInfo.bundleName = FORM_PROVIDER_BUNDLE_NAME;
+    formInfo.abilityName = FORM_PROVIDER_ABILITY_NAME;
+    formInfo.moduleName = PARAM_PROVIDER_MODULE_NAME;
+    formInfo.name = PARAM_FORM_NAME;
+    formInfo.updateEnabled = true;
+    formInfo.updateDuration = 1;
+    formInfo.scheduledUpdateTime = "06:06";
+    formInfo.jsComponentName = FORM_JS_COMPONENT_NAME;
+    formInfo.formVisibleNotify = true;
+    formInfo.supportDimensions = {1, 2};
+    formInfo.defaultDimension = 1;
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    formInfoStorage.formInfos.push_back(formInfo);
+    bundleFormInfo.formInfoStorages_.emplace_back(formInfoStorage);
+
+    bundleFormInfo.UpdateStaticFormInfos(userId);
+
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_003 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_004
+ * @tc.desc: test Remove function formInfoStorages_ is nullptr.
+ * @tc.type: FormInfoHelper
+ */
+HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_004, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_004 start";
+    std::string bundleName = "";
+    int32_t userId = 2;
+    BundleFormInfo bundleFormInfo(bundleName);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, bundleFormInfo.Remove(userId));
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_004 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_005
+ * @tc.desc: test Remove function formInfoStorages_ is not nullptr.
+ * @tc.type: FormInfoHelper
+ */
+HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_005, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_005 start";
+    std::string bundleName = "";
+    int32_t userId = 2;
+    BundleFormInfo bundleFormInfo(bundleName);
+    std::vector<AAFwk::FormInfoStorage> formInfoStorages_;
+    FormInfo formInfo;
+    formInfo.bundleName = FORM_PROVIDER_BUNDLE_NAME;
+    formInfo.abilityName = FORM_PROVIDER_ABILITY_NAME;
+    formInfo.moduleName = PARAM_PROVIDER_MODULE_NAME;
+    formInfo.name = PARAM_FORM_NAME;
+    formInfo.updateEnabled = true;
+    formInfo.updateDuration = 1;
+    formInfo.scheduledUpdateTime = "06:06";
+    formInfo.jsComponentName = FORM_JS_COMPONENT_NAME;
+    formInfo.formVisibleNotify = true;
+    formInfo.supportDimensions = {1, 2};
+    formInfo.defaultDimension = 1;
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    formInfoStorage.formInfos.push_back(formInfo);
+    bundleFormInfo.formInfoStorages_.emplace_back(formInfoStorage);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, bundleFormInfo.Remove(userId));
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_005 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_006
+ * @tc.desc: test Remove function and userId is 100.
+ * @tc.type: FormInfoHelper
+ */
+HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_006, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_006 start";
+    std::string bundleName = "";
+    int32_t userId = 100;
+    BundleFormInfo bundleFormInfo(bundleName);
+    std::vector<AAFwk::FormInfoStorage> formInfoStorages_;
+    FormInfo formInfo;
+    formInfo.bundleName = FORM_PROVIDER_BUNDLE_NAME;
+    formInfo.abilityName = FORM_PROVIDER_ABILITY_NAME;
+    formInfo.moduleName = PARAM_PROVIDER_MODULE_NAME;
+    formInfo.name = PARAM_FORM_NAME;
+    formInfo.updateEnabled = true;
+    formInfo.updateDuration = 1;
+    formInfo.scheduledUpdateTime = "06:06";
+    formInfo.jsComponentName = FORM_JS_COMPONENT_NAME;
+    formInfo.formVisibleNotify = true;
+    formInfo.supportDimensions = {1, 2};
+    formInfo.defaultDimension = 1;
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    formInfoStorage.formInfos.push_back(formInfo);
+    bundleFormInfo.formInfoStorages_.emplace_back(formInfoStorage);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, bundleFormInfo.Remove(userId));
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_006 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_007
+ * @tc.desc: test AddDynamicFormInfo function formInfoStorages_ is nullptr.
+ * @tc.type: FormInfoHelper
+ */
+HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_007, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_007 start";
+    std::string bundleName = "";
+    int32_t userId = 2;
+    FormInfo formInfo;
+    BundleFormInfo bundleFormInfo(bundleName);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, bundleFormInfo.AddDynamicFormInfo(formInfo, userId));
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_007 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_008
+ * @tc.desc: test AddDynamicFormInfo function.
+ * @tc.type: FormInfoHelper
+ */
+HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_008, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_008 start";
+    std::string bundleName = "";
+    int32_t userId = 2;
+    BundleFormInfo bundleFormInfo(bundleName);
+    FormInfo formInfo;
+    formInfo.bundleName = FORM_PROVIDER_BUNDLE_NAME;
+    formInfo.abilityName = FORM_PROVIDER_ABILITY_NAME;
+    formInfo.moduleName = PARAM_PROVIDER_MODULE_NAME;
+    formInfo.name = PARAM_FORM_NAME;
+    formInfo.updateEnabled = true;
+    formInfo.updateDuration = 1;
+    formInfo.scheduledUpdateTime = "06:06";
+    formInfo.jsComponentName = FORM_JS_COMPONENT_NAME;
+    formInfo.formVisibleNotify = true;
+    formInfo.supportDimensions = {1, 2};
+    formInfo.defaultDimension = 1;
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    formInfoStorage.formInfos.push_back(formInfo);
+    bundleFormInfo.formInfoStorages_.emplace_back(formInfoStorage);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, bundleFormInfo.AddDynamicFormInfo(formInfo, userId));
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_008 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_009
+ * @tc.desc: test AddDynamicFormInfo function.
+ * @tc.type: FormInfoHelper
+ */
+HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_009, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_009 start";
+    std::string bundleName = "";
+    int32_t userId = 100;
+    BundleFormInfo bundleFormInfo(bundleName);
+    FormInfo formInfo;
+    formInfo.bundleName = FORM_PROVIDER_BUNDLE_NAME;
+    formInfo.abilityName = FORM_PROVIDER_ABILITY_NAME;
+    formInfo.moduleName = PARAM_PROVIDER_MODULE_NAME;
+    formInfo.name = PARAM_FORM_NAME;
+    formInfo.updateEnabled = true;
+    formInfo.updateDuration = 1;
+    formInfo.scheduledUpdateTime = "06:06";
+    formInfo.jsComponentName = FORM_JS_COMPONENT_NAME;
+    formInfo.formVisibleNotify = true;
+    formInfo.supportDimensions = {1, 2};
+    formInfo.defaultDimension = 1;
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    formInfoStorage.formInfos.push_back(formInfo);
+    bundleFormInfo.formInfoStorages_.emplace_back(formInfoStorage);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, bundleFormInfo.AddDynamicFormInfo(formInfo, userId));
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_009 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_010
+ * @tc.desc: test AddDynamicFormInfo function.
+ * @tc.type: FormInfoHelper
+ */
+HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_010, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_010 start";
+    std::string bundleName = "";
+    int32_t userId = 100;
+    BundleFormInfo bundleFormInfo(bundleName);
+    FormInfo formInfo;
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    bundleFormInfo.formInfoStorages_.emplace_back(formInfoStorage);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, bundleFormInfo.AddDynamicFormInfo(formInfo, userId));
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_010 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_011
+ * @tc.desc: test AddDynamicFormInfo function.
+ * @tc.type: FormInfoHelper
+ */
+HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_011, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_011 start";
+    std::string bundleName = "";
+    int32_t userId = 100;
+    BundleFormInfo bundleFormInfo(bundleName);
+    FormInfo formInfo;
+    formInfo.bundleName = FORM_PROVIDER_BUNDLE_NAME;
+    formInfo.abilityName = FORM_PROVIDER_ABILITY_NAME;
+    formInfo.moduleName = PARAM_PROVIDER_MODULE_NAME;
+    formInfo.name = PARAM_FORM_NAME;
+    formInfo.updateEnabled = true;
+    formInfo.updateDuration = 1;
+    formInfo.scheduledUpdateTime = "06:06";
+    formInfo.jsComponentName = FORM_JS_COMPONENT_NAME;
+    formInfo.formVisibleNotify = true;
+    formInfo.supportDimensions = {1, 2};
+    formInfo.defaultDimension = 1;
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    formInfoStorage.formInfos.push_back(formInfo);
+    bundleFormInfo.formInfoStorages_.emplace_back(formInfoStorage);
+    FormInfo formInfoll;
+    formInfoll.name = "aaaa";
+    formInfoll.moduleName = "bbbbb";
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, bundleFormInfo.AddDynamicFormInfo(formInfoll, userId));
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_011 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_012
+ * @tc.desc: test AddDynamicFormInfo function.
+ * @tc.type: FormInfoHelper
+ */
+HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_012, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_012 start";
+    std::string bundleName = "";
+    int32_t userId = 100;
+    BundleFormInfo bundleFormInfo(bundleName);
+    FormInfo formInfo;
+    formInfo.bundleName = FORM_PROVIDER_BUNDLE_NAME;
+    formInfo.abilityName = FORM_PROVIDER_ABILITY_NAME;
+    formInfo.moduleName = PARAM_PROVIDER_MODULE_NAME;
+    formInfo.name = PARAM_FORM_NAME;
+    formInfo.updateEnabled = true;
+    formInfo.updateDuration = 1;
+    formInfo.scheduledUpdateTime = "06:06";
+    formInfo.jsComponentName = FORM_JS_COMPONENT_NAME;
+    formInfo.formVisibleNotify = true;
+    formInfo.supportDimensions = {1, 2};
+    formInfo.defaultDimension = 1;
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    formInfoStorage.formInfos.push_back(formInfo);
+    bundleFormInfo.formInfoStorages_.emplace_back(formInfoStorage);
+    FormInfo formInfoll;
+    formInfoll.name = PARAM_FORM_NAME;
+    formInfoll.moduleName = "bbbbb";
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, bundleFormInfo.AddDynamicFormInfo(formInfoll, userId));
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_012 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_013
+ * @tc.desc: test AddDynamicFormInfo function.
+ * @tc.type: FormInfoHelper
+ */
+HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_013, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_013 start";
+    std::string bundleName = "";
+    int32_t userId = 100;
+    BundleFormInfo bundleFormInfo(bundleName);
+    FormInfo formInfo;
+    formInfo.bundleName = FORM_PROVIDER_BUNDLE_NAME;
+    formInfo.abilityName = FORM_PROVIDER_ABILITY_NAME;
+    formInfo.moduleName = PARAM_PROVIDER_MODULE_NAME;
+    formInfo.name = PARAM_FORM_NAME;
+    formInfo.updateEnabled = true;
+    formInfo.updateDuration = 1;
+    formInfo.scheduledUpdateTime = "06:06";
+    formInfo.jsComponentName = FORM_JS_COMPONENT_NAME;
+    formInfo.formVisibleNotify = true;
+    formInfo.supportDimensions = {1, 2};
+    formInfo.defaultDimension = 1;
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    formInfoStorage.formInfos.push_back(formInfo);
+    bundleFormInfo.formInfoStorages_.emplace_back(formInfoStorage);
+    FormInfoStorage formInfoStorageOne;
+    bundleFormInfo.formInfoStorages_.emplace_back(formInfoStorageOne);
+    FormInfoStorage formInfoStorageTwo;
+    bundleFormInfo.formInfoStorages_.emplace_back(formInfoStorageTwo);
+    FormInfo formInfoll;
+    formInfoll.name = "aaaa";
+    formInfoll.moduleName = PARAM_PROVIDER_MODULE_NAME;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, bundleFormInfo.AddDynamicFormInfo(formInfoll, userId));
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_013 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_014
+ * @tc.desc: test RemoveDynamicFormInfo function.
+ * @tc.type: FormInfoHelper
+ */
+HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_014, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_014 start";
+    std::string bundleName = "";
+    std::string moduleName = "";
+    std::string formName = "";
+    int32_t userId = 2;
+    BundleFormInfo bundleFormInfo(bundleName);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, bundleFormInfo.RemoveDynamicFormInfo(moduleName, formName, userId));
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_014 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_015
+ * @tc.desc: test RemoveDynamicFormInfo function.
+ * @tc.type: FormInfoHelper
+ */
+HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_015, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_015 start";
+    std::string bundleName = "";
+    std::string moduleName = "";
+    std::string formName = "";
+    int32_t userId = 2;
+    FormInfo formInfo;
+    formInfo.bundleName = FORM_PROVIDER_BUNDLE_NAME;
+    formInfo.abilityName = FORM_PROVIDER_ABILITY_NAME;
+    formInfo.moduleName = PARAM_PROVIDER_MODULE_NAME;
+    formInfo.name = PARAM_FORM_NAME;
+    formInfo.updateEnabled = true;
+    formInfo.updateDuration = 1;
+    formInfo.scheduledUpdateTime = "06:06";
+    formInfo.jsComponentName = FORM_JS_COMPONENT_NAME;
+    formInfo.formVisibleNotify = true;
+    formInfo.supportDimensions = {1, 2};
+    formInfo.defaultDimension = 1;
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    formInfoStorage.formInfos.push_back(formInfo);
+    BundleFormInfo bundleFormInfo(bundleName);
+    bundleFormInfo.formInfoStorages_.emplace_back(formInfoStorage);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, bundleFormInfo.RemoveDynamicFormInfo(moduleName, formName, userId));
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_015 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_016
+ * @tc.desc: test RemoveDynamicFormInfo function.
+ * @tc.type: FormInfoHelper
+ */
+HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_016, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_016 start";
+    std::string bundleName = "";
+    std::string moduleName = "";
+    std::string formName = "";
+    int32_t userId = 100;
+    BundleFormInfo bundleFormInfo(bundleName);
+    FormInfo formInfo;
+    formInfo.bundleName = FORM_PROVIDER_BUNDLE_NAME;
+    formInfo.abilityName = FORM_PROVIDER_ABILITY_NAME;
+    formInfo.moduleName = PARAM_PROVIDER_MODULE_NAME;
+    formInfo.name = PARAM_FORM_NAME;
+    formInfo.updateEnabled = true;
+    formInfo.updateDuration = 1;
+    formInfo.scheduledUpdateTime = "06:06";
+    formInfo.jsComponentName = FORM_JS_COMPONENT_NAME;
+    formInfo.formVisibleNotify = true;
+    formInfo.supportDimensions = {1, 2};
+    formInfo.defaultDimension = 1;
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    formInfoStorage.formInfos.push_back(formInfo);
+    bundleFormInfo.formInfoStorages_.emplace_back(formInfoStorage);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, bundleFormInfo.RemoveDynamicFormInfo(moduleName, formName, userId));
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_016 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_017
+ * @tc.desc: test RemoveDynamicFormInfo function.
+ * @tc.type: FormInfoHelper
+ */
+HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_017, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_017 start";
+    std::string bundleName = "";
+    std::string moduleName = "";
+    std::string formName = "";
+    int32_t userId = 100;
+    BundleFormInfo bundleFormInfo(bundleName);
+    FormInfo formInfo;
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    bundleFormInfo.formInfoStorages_.emplace_back(formInfoStorage);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, bundleFormInfo.RemoveDynamicFormInfo(moduleName, formName, userId));
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_017 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_018
+ * @tc.desc: test RemoveDynamicFormInfo function.
+ * @tc.type: FormInfoHelper
+ */
+HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_018, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_018 start";
+    std::string bundleName = "";
+    std::string moduleName = PARAM_PROVIDER_MODULE_NAME;
+    std::string formName = PARAM_FORM_NAME;
+    int32_t userId = 100;
+    BundleFormInfo bundleFormInfo(bundleName);
+    FormInfo formInfo;
+    formInfo.bundleName = FORM_PROVIDER_BUNDLE_NAME;
+    formInfo.abilityName = FORM_PROVIDER_ABILITY_NAME;
+    formInfo.moduleName = PARAM_PROVIDER_MODULE_NAME;
+    formInfo.name = PARAM_FORM_NAME;
+    formInfo.updateEnabled = true;
+    formInfo.updateDuration = 1;
+    formInfo.scheduledUpdateTime = "06:06";
+    formInfo.jsComponentName = FORM_JS_COMPONENT_NAME;
+    formInfo.formVisibleNotify = true;
+    formInfo.supportDimensions = {1, 2};
+    formInfo.defaultDimension = 1;
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    formInfoStorage.formInfos.push_back(formInfo);
+    bundleFormInfo.formInfoStorages_.emplace_back(formInfoStorage);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, bundleFormInfo.RemoveDynamicFormInfo(moduleName, formName, userId));
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_018 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_019
+ * @tc.desc: test RemoveDynamicFormInfo function.
+ * @tc.type: FormInfoHelper
+ */
+HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_019, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_019 start";
+    std::string bundleName = "";
+    std::string moduleName = PARAM_PROVIDER_MODULE_NAME;
+    std::string formName = "";
+    int32_t userId = 100;
+    BundleFormInfo bundleFormInfo(bundleName);
+    FormInfo formInfo;
+    formInfo.bundleName = FORM_PROVIDER_BUNDLE_NAME;
+    formInfo.abilityName = FORM_PROVIDER_ABILITY_NAME;
+    formInfo.moduleName = PARAM_PROVIDER_MODULE_NAME;
+    formInfo.name = PARAM_FORM_NAME;
+    formInfo.updateEnabled = true;
+    formInfo.updateDuration = 1;
+    formInfo.scheduledUpdateTime = "06:06";
+    formInfo.jsComponentName = FORM_JS_COMPONENT_NAME;
+    formInfo.formVisibleNotify = true;
+    formInfo.supportDimensions = {1, 2};
+    formInfo.defaultDimension = 1;
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    formInfoStorage.formInfos.push_back(formInfo);
+    bundleFormInfo.formInfoStorages_.emplace_back(formInfoStorage);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, bundleFormInfo.RemoveDynamicFormInfo(moduleName, formName, userId));
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_019 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_020
+ * @tc.desc: test RemoveDynamicFormInfo function.
+ * @tc.type: FormInfoHelper
+ */
+HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_020, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_020 start";
+    std::string bundleName = "";
+    std::string moduleName = "";
+    std::string formName = PARAM_FORM_NAME;
+    int32_t userId = 100;
+    BundleFormInfo bundleFormInfo(bundleName);
+    FormInfo formInfo;
+    formInfo.bundleName = FORM_PROVIDER_BUNDLE_NAME;
+    formInfo.abilityName = FORM_PROVIDER_ABILITY_NAME;
+    formInfo.moduleName = PARAM_PROVIDER_MODULE_NAME;
+    formInfo.name = PARAM_FORM_NAME;
+    formInfo.updateEnabled = true;
+    formInfo.updateDuration = 1;
+    formInfo.scheduledUpdateTime = "06:06";
+    formInfo.jsComponentName = FORM_JS_COMPONENT_NAME;
+    formInfo.formVisibleNotify = true;
+    formInfo.supportDimensions = {1, 2};
+    formInfo.defaultDimension = 1;
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    formInfoStorage.formInfos.push_back(formInfo);
+    bundleFormInfo.formInfoStorages_.emplace_back(formInfoStorage);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, bundleFormInfo.RemoveDynamicFormInfo(moduleName, formName, userId));
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_020 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_021
+ * @tc.desc: test RemoveDynamicFormInfo function.
+ * @tc.type: FormInfoHelper
+ */
+HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_021, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_021 start";
+    std::string bundleName = "";
+    std::string moduleName = "";
+    std::string formName = PARAM_FORM_NAME;
+    int32_t userId = 100;
+    BundleFormInfo bundleFormInfo(bundleName);
+    FormInfo formInfo;
+    formInfo.bundleName = FORM_PROVIDER_BUNDLE_NAME;
+    formInfo.abilityName = FORM_PROVIDER_ABILITY_NAME;
+    formInfo.moduleName = PARAM_PROVIDER_MODULE_NAME;
+    formInfo.name = PARAM_FORM_NAME;
+    formInfo.updateEnabled = true;
+    formInfo.updateDuration = 1;
+    formInfo.scheduledUpdateTime = "06:06";
+    formInfo.jsComponentName = FORM_JS_COMPONENT_NAME;
+    formInfo.formVisibleNotify = true;
+    formInfo.supportDimensions = {1, 2};
+    formInfo.defaultDimension = 1;
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    formInfoStorage.formInfos.push_back(formInfo);
+    bundleFormInfo.formInfoStorages_.emplace_back(formInfoStorage);
+    FormInfoStorage formInfoStorageOne;
+    bundleFormInfo.formInfoStorages_.emplace_back(formInfoStorageOne);
+    FormInfoStorage formInfoStorageTwo;
+    bundleFormInfo.formInfoStorages_.emplace_back(formInfoStorageTwo);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, bundleFormInfo.RemoveDynamicFormInfo(moduleName, formName, userId));
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_021 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_022
+ * @tc.desc: test RemoveDynamicFormInfo function.
+ * @tc.type: FormInfoHelper
+ */
+HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_022, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_022 start";
+    std::string bundleName = "";
+    std::string moduleName = "";
+    std::string formName = PARAM_FORM_NAME;
+    int32_t userId = 100;
+    BundleFormInfo bundleFormInfo(bundleName);
+    FormInfo formInfo;
+    formInfo.bundleName = FORM_PROVIDER_BUNDLE_NAME;
+    formInfo.abilityName = FORM_PROVIDER_ABILITY_NAME;
+    formInfo.moduleName = PARAM_PROVIDER_MODULE_NAME;
+    formInfo.name = PARAM_FORM_NAME;
+    formInfo.updateEnabled = true;
+    formInfo.updateDuration = 1;
+    formInfo.scheduledUpdateTime = "06:06";
+    formInfo.jsComponentName = FORM_JS_COMPONENT_NAME;
+    formInfo.formVisibleNotify = true;
+    formInfo.supportDimensions = {1, 2};
+    formInfo.defaultDimension = 1;
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    formInfoStorage.formInfos.push_back(formInfo);
+    FormInfo formInfoOne;
+    formInfoStorage.formInfos.push_back(formInfoOne);
+    FormInfo formInfoTwo;
+    formInfoStorage.formInfos.push_back(formInfoTwo);
+    bundleFormInfo.formInfoStorages_.emplace_back(formInfoStorage);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, bundleFormInfo.RemoveDynamicFormInfo(moduleName, formName, userId));
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_022 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_023
+ * @tc.desc: test RemoveAllDynamicFormsInfo function.
+ * @tc.type: FormInfoHelper
+ */
+HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_023, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_023 start";
+    std::string bundleName = "";
+    int32_t userId = 2;
+    BundleFormInfo bundleFormInfo(bundleName);
+    EXPECT_EQ(ERR_OK, bundleFormInfo.RemoveAllDynamicFormsInfo(userId));
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_023 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_024
+ * @tc.desc: test RemoveAllDynamicFormsInfo function.
+ * @tc.type: FormInfoHelper
+ */
+HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_024, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_024 start";
+    std::string bundleName = "";
+    int32_t userId = 2;
+    FormInfo formInfo;
+    formInfo.bundleName = FORM_PROVIDER_BUNDLE_NAME;
+    formInfo.abilityName = FORM_PROVIDER_ABILITY_NAME;
+    formInfo.moduleName = PARAM_PROVIDER_MODULE_NAME;
+    formInfo.name = PARAM_FORM_NAME;
+    formInfo.updateEnabled = true;
+    formInfo.updateDuration = 1;
+    formInfo.scheduledUpdateTime = "06:06";
+    formInfo.jsComponentName = FORM_JS_COMPONENT_NAME;
+    formInfo.formVisibleNotify = true;
+    formInfo.supportDimensions = {1, 2};
+    formInfo.defaultDimension = 1;
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    formInfoStorage.formInfos.push_back(formInfo);
+    BundleFormInfo bundleFormInfo(bundleName);
+    bundleFormInfo.formInfoStorages_.emplace_back(formInfoStorage);
+    EXPECT_EQ(ERR_OK, bundleFormInfo.RemoveAllDynamicFormsInfo(userId));
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_024 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_025
+ * @tc.desc: test RemoveAllDynamicFormsInfo function.
+ * @tc.type: FormInfoHelper
+ */
+HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_025, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_025 start";
+    std::string bundleName = "";
+    int32_t userId = 100;
+    FormInfo formInfo;
+    formInfo.bundleName = FORM_PROVIDER_BUNDLE_NAME;
+    formInfo.abilityName = FORM_PROVIDER_ABILITY_NAME;
+    formInfo.moduleName = PARAM_PROVIDER_MODULE_NAME;
+    formInfo.name = PARAM_FORM_NAME;
+    formInfo.updateEnabled = true;
+    formInfo.updateDuration = 1;
+    formInfo.scheduledUpdateTime = "06:06";
+    formInfo.jsComponentName = FORM_JS_COMPONENT_NAME;
+    formInfo.formVisibleNotify = true;
+    formInfo.supportDimensions = {1, 2};
+    formInfo.defaultDimension = 1;
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    formInfoStorage.formInfos.push_back(formInfo);
+    BundleFormInfo bundleFormInfo(bundleName);
+    bundleFormInfo.formInfoStorages_.emplace_back(formInfoStorage);
+    EXPECT_EQ(ERR_OK, bundleFormInfo.RemoveAllDynamicFormsInfo(userId));
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_025 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_026
+ * @tc.desc: test RemoveAllDynamicFormsInfo function.
+ * @tc.type: FormInfoHelper
+ */
+HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_026, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_026 start";
+    std::string bundleName = "";
+    int32_t userId = 100;
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    BundleFormInfo bundleFormInfo(bundleName);
+    bundleFormInfo.formInfoStorages_.emplace_back(formInfoStorage);
+    bundleFormInfo.RemoveAllDynamicFormsInfo(userId);
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_026 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_027
+ * @tc.desc: test RemoveAllDynamicFormsInfo function.
+ * @tc.type: FormInfoHelper
+ */
+HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_027, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_027 start";
+    std::string bundleName = "";
+    int32_t userId = 100;
+    FormInfoStorage formInfoStorage;
+    FormInfo formInfo;
+    formInfoStorage.userId = USER_ID;
+    formInfoStorage.formInfos.push_back(formInfo);
+    BundleFormInfo bundleFormInfo(bundleName);
+    bundleFormInfo.formInfoStorages_.emplace_back(formInfoStorage);
+    EXPECT_EQ(ERR_OK, bundleFormInfo.RemoveAllDynamicFormsInfo(userId));
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_027 end";
+}
+
+/**
+ * @tc.name: FormInfoHelper_028
+ * @tc.desc: test UpdateFormInfoStorageLocked function.
+ * @tc.type: FormInfoHelper
+ */
+HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_028, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_028 start";
+    std::string bundleName = "";
+    FormInfo formInfo;
+    formInfo.bundleName = FORM_PROVIDER_BUNDLE_NAME;
+    formInfo.abilityName = FORM_PROVIDER_ABILITY_NAME;
+    formInfo.moduleName = PARAM_PROVIDER_MODULE_NAME;
+    formInfo.name = PARAM_FORM_NAME;
+    formInfo.updateEnabled = true;
+    formInfo.updateDuration = 1;
+    formInfo.scheduledUpdateTime = "06:06";
+    formInfo.jsComponentName = FORM_JS_COMPONENT_NAME;
+    formInfo.formVisibleNotify = true;
+    formInfo.supportDimensions = {1, 2};
+    formInfo.defaultDimension = 1;
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    formInfoStorage.formInfos.push_back(formInfo);
+    BundleFormInfo bundleFormInfo(bundleName);
+    bundleFormInfo.formInfoStorages_.emplace_back(formInfoStorage);
+    bundleFormInfo.UpdateFormInfoStorageLocked();
+    GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_028 end";
 }
