@@ -1269,7 +1269,7 @@ int FormMgrAdapter::SetNextRefreshTime(const int64_t formId, const int64_t nextT
         HILOG_ERROR("%{public}s formId is invalid", __func__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
-    
+
     std::string bundleName;
     auto ret = FormBmsHelper::GetInstance().GetCallerBundleName(bundleName);
     if (ret != ERR_OK) {

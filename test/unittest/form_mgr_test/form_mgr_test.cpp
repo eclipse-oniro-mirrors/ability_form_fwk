@@ -650,7 +650,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0027, TestSize.Level1) {
     sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
     FormStateInfo stateInfo;
     auto result = FormMgr::GetInstance().AcquireFormState(want, token, stateInfo);
-    
+
     EXPECT_EQ(result, 0);
     GTEST_LOG_(INFO) << "FormMgrTest_0027 test ends";
 }
