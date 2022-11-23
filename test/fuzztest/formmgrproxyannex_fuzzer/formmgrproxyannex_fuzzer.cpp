@@ -22,7 +22,7 @@
 #define protected public
 #include "form_mgr_proxy.h"
 #undef private
-#undef protected                                                
+#undef protected
 #include "securec.h"
 
 using namespace OHOS::AppExecFwk;

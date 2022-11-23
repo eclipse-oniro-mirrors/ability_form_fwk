@@ -33,13 +33,13 @@
 foundation/ability/form_fwk
 ├── frameworks
 │   └── js
-│       └── napi					# form_fwk的napi代码实现
+│       └── napi                    # form_fwk的napi代码实现
 ├── interfaces
-│   ├── inner_api 				    # form_fwk的系统内部件间接口 
+│   ├── inner_api                     # form_fwk的系统内部件间接口 
 │   └── kits
-│       └── native				    # form_fwk的对外接口  
+│       └── native                    # form_fwk的对外接口  
 ├── services                        # form管理服务框架代码
-└── test							# 测试目录
+└── test                            # 测试目录
 ```
 
 ## 使用说明
