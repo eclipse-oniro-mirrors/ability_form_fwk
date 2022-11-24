@@ -18,7 +18,6 @@
 #include <cstddef>
 #include <cstdint>
 
-#include "form_event_notify_connection.h"
 #include "form_host_record.h"
 #include "securec.h"
 
@@ -77,16 +76,6 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formHostRecord.GetHostBundleName();
     std::string hostBundleName(data, size);
     formHostRecord.SetHostBundleName(hostBundleName);
-    std::vector<int64_t> formEvents;
-    formEvents.emplace_back(formId);
-    int32_t formVisibleType = static_cast<int>(GetU32Data(data));
-    std::string bundleName(data, size);
-    std::string abilityName(data, size);
-    FormEventNotifyConnection formEventNotifyConnection(formEvents, formVisibleType, bundleName, abilityName);
-    AppExecFwk::ElementName element;
-    sptr<IRemoteObject> remoteObject = nullptr;
-    int resultCode = static_cast<int>(GetU32Data(data));
-    formEventNotifyConnection.OnAbilityConnectDone(element, remoteObject, resultCode);
     return formHostRecord.IsEmpty();
 }
 }
