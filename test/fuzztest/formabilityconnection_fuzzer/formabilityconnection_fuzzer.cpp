@@ -19,7 +19,6 @@
 #include <cstdint>
 
 #include "form_ability_connection.h"
-#include "form_acquire_connection.h"
 #define private public
 #define protected public
 #include "form_ams_helper.h"
@@ -45,9 +44,6 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     sptr<IRemoteObject> remoteObjects = nullptr;
     int resultCode = static_cast<int>(GetU32Data(data));
     formAbilityConnection.OnAbilityConnectDone(element, remoteObjects, resultCode);
-    formAbilityConnection.OnAbilityDisconnectDone(element, resultCode);
-    wptr<IRemoteObject> remoteObject = nullptr;
-    formAbilityConnection.OnConnectDied(remoteObject);
     formAbilityConnection.GetProviderKey();
     std::string bundleName(data, size);
     std::string abilityName(data, size);
@@ -65,10 +61,6 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formAbilityConnection.GetProviderToken();
     int32_t connectId = static_cast<int32_t>(GetU32Data(data));
     formAbilityConnection.SetConnectId(connectId);
-    FormItemInfo info;
-    WantParams wantParams;
-    FormAcquireConnection formAcquireConnection(formId, info, wantParams, hostToken);
-    formAcquireConnection.OnAbilityConnectDone(element, remoteObjects, resultCode);
     FormAmsHelper formAmsHelper;
     formAmsHelper.GetAbilityManager();
     Want want;
