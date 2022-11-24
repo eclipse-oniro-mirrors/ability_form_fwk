@@ -18,7 +18,6 @@
 #include <cstddef>
 #include <cstdint>
 
-#include "form_share_connection.h"
 #include "form_util.h"
 #define private public
 #define protected public
@@ -66,16 +65,6 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formUtil.GetCurrentNanosecond();
     formUtil.GetCurrentMillisecond();
     formUtil.GetCurrentAccountId();
-    int64_t formIds = static_cast<int64_t>(GetU32Data(data));
-    std::string bundleName(data, size);
-    std::string abilityName(data, size);
-    std::string deviceId(data, size);
-    int64_t formShareRequestCode = static_cast<int64_t>(GetU32Data(data));
-    FormShareConnection formShareConnection(formIds, bundleName, abilityName, deviceId, formShareRequestCode);
-    AppExecFwk::ElementName element;
-    sptr<IRemoteObject> remoteObject = nullptr;
-    int32_t resultCode = static_cast<int32_t>(GetU32Data(data));
-    formShareConnection.OnAbilityConnectDone(element, remoteObject, resultCode);
     sptr<IRemoteObject> impl = nullptr;
     FreeInstallStatusCallBackProxy freeInstallStatusCallBackProxy(impl);
     FreeInstallStatusCallBackStubFuzzTest freeInstallStatusCallBackStubFuzzTest;
