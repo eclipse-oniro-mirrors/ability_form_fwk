@@ -18,15 +18,12 @@
 #include <cstddef>
 #include <cstdint>
 
-#include "form_batch_delete_connection.h"
 #define private public
 #define protected public
 #include "form_cache_mgr.h"
 #include "form_event_handler.h"
 #undef private
 #undef protected
-#include "form_cast_temp_connection.h"
-#include "form_delete_connection.h"
 #include "securec.h"
 
 using namespace OHOS::AppExecFwk;
@@ -48,19 +45,6 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formCacheMgr.AddData(formId, datas);
     formCacheMgr.DeleteData(formId);
     formCacheMgr.UpdateData(formId, datas);
-    std::set<int64_t> formIds;
-    formIds.insert(formId);
-    std::string bundleName(data, size);
-    std::string abilityName(data, size);
-    FormBatchDeleteConnection formBatchDeleteConnection(formIds, bundleName, abilityName);
-    AppExecFwk::ElementName element;
-    sptr<IRemoteObject> remoteObject = nullptr;
-    int resultCode = static_cast<int>(GetU32Data(data));
-    formBatchDeleteConnection.OnAbilityConnectDone(element, remoteObject, resultCode);
-    FormCastTempConnection formCastTempConnection(formId, bundleName, abilityName);
-    formCastTempConnection.OnAbilityConnectDone(element, remoteObject, resultCode);
-    FormDeleteConnection formDeleteConnection(formId, bundleName, abilityName);
-    formDeleteConnection.OnAbilityConnectDone(element, remoteObject, resultCode);
     std::shared_ptr<AppExecFwk::EventRunner> runner = nullptr;
     FormEventHandler formEventHandler(runner);
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get();
