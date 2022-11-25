@@ -21,6 +21,8 @@
 #include "dm_device_info.h"
 #define private public
 #include "form_ams_helper.h"
+#include "form_cache_mgr.h"
+#include "form_dump_mgr.h"
 #undef private
 #include "form_bms_helper.h"
 #include "form_db_cache.h"
@@ -35,7 +37,9 @@
 #include "form_mgr.h"
 #include "form_share_mgr.h"
 #undef private
+#include "form_event_util.h"
 #include "iremote_proxy.h"
+#include "ipc_skeleton.h"
 #include "mock_ability_manager.h"
 #include "mock_bundle_manager.h"
 #include "mock_distributed_sched.h"
@@ -2114,4 +2118,436 @@ HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_049, TestSize.Level0)
     FormInfoMgr formInfoMgr;
     formInfoMgr.ReloadFormInfos(userId);
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_049 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_0001
+ * @tc.desc: test HandleProviderUpdated function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormEventUtil_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_0001 start";
+    FormEventUtil formEventUtil;
+    std::string bundleName = "aa";
+    int userId = 1;
+    formEventUtil.HandleProviderUpdated(bundleName, userId);
+    GTEST_LOG_(INFO) << "FormEventUtil_0001 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_0002
+ * @tc.desc: test HandleProviderUpdated function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormEventUtil_0002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_0002 start";
+    std::string paraFormName = "com.form.name.test";
+    int64_t formIds = 2;
+    FormEventUtil formEventUtil;
+    FormRecord formInfo;
+    formInfo.formName = "aaaaaa";
+    formInfo.bundleName = paraFormName;
+    formInfo.formId = formIds;
+    FormDataMgr::GetInstance().formRecords_.emplace(formIds, formInfo);
+    std::string bundleName = paraFormName;
+    int userId = 1;
+    formEventUtil.HandleProviderUpdated(bundleName, userId);
+    GTEST_LOG_(INFO) << "FormEventUtil_0002 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_0003
+ * @tc.desc: test HandleProviderRemoved function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormEventUtil_0003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_0003 start";
+    std::string bundleName = "com.form.name.test";
+    int32_t userId = 1;
+    FormEventUtil formEventUtil;
+    formEventUtil.HandleProviderRemoved(bundleName, userId);
+    GTEST_LOG_(INFO) << "FormEventUtil_0003 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_0004
+ * @tc.desc: test HandleBundleDataCleared function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormEventUtil_0004, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_0004 start";
+    std::string bundleName = FORM_NULL_BUNDLE_NAME;
+    int32_t userId = 1;
+    FormEventUtil formEventUtil;
+    formEventUtil.HandleBundleDataCleared(bundleName, userId);
+    GTEST_LOG_(INFO) << "FormEventUtil_0004 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_0005
+ * @tc.desc: test HandleBundleDataCleared function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormEventUtil_0005, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_0005 start";
+    FormJsInfo formJsInfo;
+    FormRecord formInfo;
+    formInfo.formName = PARAM_FORM_NAME;
+    formInfo.formId = formJsInfo.formId;
+    formInfo.bundleName = FORM_NULL_BUNDLE_NAME;
+    FormRecord formInfo1;
+    FormDataMgr::GetInstance().formRecords_.emplace(formJsInfo.formId, formInfo);
+    std::string bundleName = FORM_NULL_BUNDLE_NAME;
+    int32_t userId = 1;
+    FormEventUtil formEventUtil;
+    formEventUtil.HandleBundleDataCleared(bundleName, userId);
+    GTEST_LOG_(INFO) << "FormEventUtil_0005 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_0006
+ * @tc.desc: test HandleFormHostDataCleared function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormEventUtil_0006, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_0006 start";
+    int uid = 1;
+    FormEventUtil formEventUtil;
+    formEventUtil.HandleFormHostDataCleared(uid);
+    GTEST_LOG_(INFO) << "FormEventUtil_0006 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_0007
+ * @tc.desc: test ProviderFormUpdated function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormEventUtil_0007, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_0007 start";
+    int64_t formId = 1;
+    FormRecord formRecord;
+    std::vector<FormInfo> targetForms;
+    FormEventUtil formEventUtil;
+    EXPECT_EQ(false, formEventUtil.ProviderFormUpdated(formId, formRecord, targetForms));
+    GTEST_LOG_(INFO) << "FormEventUtil_0007 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_0008
+ * @tc.desc: test ProviderFormUpdated function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormEventUtil_0008, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_0008 start";
+    int64_t formId = 1;
+    FormRecord formRecord;
+    FormInfo info;
+    info.name = "com.ohos.contactsdataability";
+    info.moduleName = "entry";
+    info.description = "dataability_description";
+    info.bundleName = "com.ohos.contactsdataability";
+    std::vector<FormInfo> targetForms;
+    targetForms.emplace_back(info);
+    FormEventUtil formEventUtil;
+    EXPECT_EQ(false, formEventUtil.ProviderFormUpdated(formId, formRecord, targetForms));
+    GTEST_LOG_(INFO) << "FormEventUtil_0008 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_0009
+ * @tc.desc: test ProviderFormUpdated function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormEventUtil_0009, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_0009 start";
+    int64_t formId = 1;
+    FormRecord formRecord;
+    BundlePackInfo bundlePackInfo;
+    FormEventUtil formEventUtil;
+    formEventUtil.ProviderFormUpdated(formId, formRecord, bundlePackInfo);
+    GTEST_LOG_(INFO) << "FormEventUtil_0009 end";
+}
+
+/**
+ * @tc.name: FormAmsHelper_0001
+ * @tc.desc: test GetAbilityManager function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormAmsHelper_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormAmsHelper_0001 start";
+    FormAmsHelper formAmsHelper;
+    formAmsHelper.GetAbilityManager();
+    GTEST_LOG_(INFO) << "FormAmsHelper_0001 end";
+}
+
+/**
+ * @tc.name: FormAmsHelper_0002
+ * @tc.desc: test DisconnectServiceAbilityDelay function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormAmsHelper_0002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormAmsHelper_0002 start";
+    FormAmsHelper formAmsHelper;
+    sptr<AAFwk::IAbilityConnection> connect = nullptr;
+    EXPECT_EQ(ERR_INVALID_OPERATION, formAmsHelper.DisconnectServiceAbilityDelay(connect));
+    GTEST_LOG_(INFO) << "FormAmsHelper_0002 end";
+}
+
+/**
+ * @tc.name: FormAmsHelper_0003
+ * @tc.desc: test DisconnectServiceAbilityDelay function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormAmsHelper_0003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormAmsHelper_0003 start";
+    FormAmsHelper formAmsHelper;
+    auto runner = EventRunner::Create("FormMgrService");
+    auto handler = std::make_shared<FormEventHandler>(runner); 
+    formAmsHelper.SetEventHandler(handler);
+    sptr<AAFwk::IAbilityConnection> connect = nullptr;
+    formAmsHelper.DisconnectServiceAbilityDelay(connect);
+    GTEST_LOG_(INFO) << "FormAmsHelper_0003 end";
+}
+
+/**
+ * @tc.name: FormAmsHelper_0004
+ * @tc.desc: test DisconnectAbilityTask function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormAmsHelper_0004, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormAmsHelper_0004 start";
+    FormAmsHelper formAmsHelper;
+    sptr<AAFwk::IAbilityConnection> connect = nullptr;
+    formAmsHelper.DisconnectAbilityTask(connect);
+    GTEST_LOG_(INFO) << "FormAmsHelper_0004 end";
+}
+
+/**
+ * @tc.name: FormDumpMgr_0001
+ * @tc.desc: test DisconnectAbilityTask function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDumpMgr_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDumpMgr_0001 start";
+    std::vector<FormDBInfo> storageInfos;
+    std::string formInfos = "aa";
+    FormDumpMgr formDumpMgr;
+    formDumpMgr.DumpStorageFormInfos(storageInfos, formInfos);
+    GTEST_LOG_(INFO) << "FormDumpMgr_0001 end";
+}
+
+/**
+ * @tc.name: FormDumpMgr_0002
+ * @tc.desc: test DisconnectAbilityTask function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDumpMgr_0002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDumpMgr_0002 start";
+    FormDBInfo formDBInfo;
+    formDBInfo.formName = "com.form.start";
+    formDBInfo.formUserUids.emplace_back(1);
+    std::vector<FormDBInfo> storageInfos;
+    storageInfos.emplace_back(formDBInfo);
+    std::string formInfos = "aa";
+    FormDumpMgr formDumpMgr;
+    formDumpMgr.DumpStorageFormInfos(storageInfos, formInfos);
+    GTEST_LOG_(INFO) << "FormDumpMgr_0002 end";
+}
+
+/**
+ * @tc.name: FormDumpMgr_0003
+ * @tc.desc: test DisconnectAbilityTask function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDumpMgr_0003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDumpMgr_0003 start";
+    FormDBInfo formDBInfo;
+    formDBInfo.formName = "com.form.start";
+    std::vector<FormDBInfo> storageInfos;
+    storageInfos.emplace_back(formDBInfo);
+    std::string formInfos = "aa";
+    FormDumpMgr formDumpMgr;
+    formDumpMgr.DumpStorageFormInfos(storageInfos, formInfos);
+    GTEST_LOG_(INFO) << "FormDumpMgr_0003 end";
+}
+
+/**
+ * @tc.name: FormDumpMgr_0004
+ * @tc.desc: test DumpFormInfos function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDumpMgr_0004, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDumpMgr_0004 start";
+    std::vector<FormRecord> formRecordInfos;
+    std::string formInfos = "com.form.info";
+    FormDumpMgr formDumpMgr;
+    formDumpMgr.DumpFormInfos(formRecordInfos, formInfos);
+    GTEST_LOG_(INFO) << "FormDumpMgr_0004 end";
+}
+
+/**
+ * @tc.name: FormDumpMgr_0005
+ * @tc.desc: test DumpFormInfos function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDumpMgr_0005, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDumpMgr_0005 start";
+    FormRecord formInfo;
+    formInfo.formName = PARAM_FORM_NAME;
+    std::vector<FormRecord> formRecordInfos;
+    formRecordInfos.emplace_back(formInfo);
+    std::string formInfos = "com.form.info";
+    FormDumpMgr formDumpMgr;
+    formDumpMgr.DumpFormInfos(formRecordInfos, formInfos);
+    GTEST_LOG_(INFO) << "FormDumpMgr_0005 end";
+}
+
+/**
+ * @tc.name: FormDumpMgr_0006
+ * @tc.desc: test DumpFormInfos function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDumpMgr_0006, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDumpMgr_0006 start";
+    FormRecord formInfo;
+    formInfo.formId = UNKNOWN_FORM_ID;
+    formInfo.formName = PARAM_FORM_NAME;
+    formInfo.hapSourceDirs.emplace_back("aaa");
+    formInfo.formUserUids.emplace_back(1);
+    std::vector<FormRecord> formRecordInfos;
+    formRecordInfos.emplace_back(formInfo);
+    std::string formInfos = "com.form.info";
+    FormDumpMgr formDumpMgr;
+    formDumpMgr.DumpFormInfos(formRecordInfos, formInfos);
+    GTEST_LOG_(INFO) << "FormDumpMgr_0006 end";
+}
+
+/**
+ * @tc.name: FormDumpMgr_0007
+ * @tc.desc: test DumpFormInfo function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDumpMgr_0007, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDumpMgr_0007 start";
+    FormRecord formRecordInfo;
+    std::string formInfo = "com.form.info";
+    FormDumpMgr formDumpMgr;
+    formDumpMgr.DumpFormInfo(formRecordInfo, formInfo);
+    GTEST_LOG_(INFO) << "FormDumpMgr_0007 end";
+}
+
+/**
+ * @tc.name: FormDumpMgr_0008
+ * @tc.desc: test DumpFormInfo function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDumpMgr_0008, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDumpMgr_0008 start";
+    FormRecord formRecordInfo;
+    formRecordInfo.hapSourceDirs.emplace_back("aaa");
+    formRecordInfo.formUserUids.emplace_back(1);
+    std::string formInfo = "com.form.info";
+    FormDumpMgr formDumpMgr;
+    formDumpMgr.DumpFormInfo(formRecordInfo, formInfo);
+    GTEST_LOG_(INFO) << "FormDumpMgr_0008 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0001
+ * @tc.desc: test IsCallingUidValid function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0001 start";
+    std::vector<int> formUserUids;
+    FormDataMgr formDataMgr;
+    EXPECT_EQ(false, formDataMgr.IsCallingUidValid(formUserUids));
+    GTEST_LOG_(INFO) << "FormDataMgr_0001 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0002
+ * @tc.desc: test IsCallingUidValid function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0002 start";
+    std::vector<int> formUserUids;
+    formUserUids.emplace_back(1);
+    formUserUids.emplace_back(2);
+    formUserUids.emplace_back(3);
+    formUserUids.emplace_back(4);
+    FormDataMgr formDataMgr;
+    EXPECT_EQ(false, formDataMgr.IsCallingUidValid(formUserUids));
+    GTEST_LOG_(INFO) << "FormDataMgr_0002 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0003
+ * @tc.desc: test IsCallingUidValid function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0003 start";
+    std::vector<int> formUserUids;
+    formUserUids.emplace_back(IPCSkeleton::GetCallingUid());
+    FormDataMgr formDataMgr;
+    EXPECT_EQ(true, formDataMgr.IsCallingUidValid(formUserUids));
+    GTEST_LOG_(INFO) << "FormDataMgr_0003 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0004
+ * @tc.desc: test IsEnableUpdate function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0004, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0004 start";
+    int64_t formId = 1;
+    FormDataMgr formDataMgr;
+    EXPECT_EQ(false, formDataMgr.IsEnableUpdate(formId));
+    GTEST_LOG_(INFO) << "FormDataMgr_0004 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0005
+ * @tc.desc: test IsEnableUpdate function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0005, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0005 start";
+    int64_t formId = 1;
+    FormDataMgr formDataMgr;
+    FormHostRecord formHostRecord;
+    formHostRecord.AddForm(formId);
+    formHostRecord.SetNeedRefresh(formId, true);
+    formDataMgr.clientRecords_.push_back(formHostRecord);
+    EXPECT_EQ(false, formDataMgr.IsEnableUpdate(formId));
+    GTEST_LOG_(INFO) << "FormDataMgr_0005 end";
 }
