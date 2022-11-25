@@ -19,7 +19,7 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-    static constexpr int32_t maxAllowedSize = 128;
+    static constexpr int32_t MAX_ALLOW_SIZE = 8 * 1024;
 }
 int FormProviderProxy::AcquireProviderFormInfo(
     const FormJsInfo &formJsInfo,
@@ -398,7 +398,7 @@ template<typename T>
 int  FormProviderProxy::GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos)
 {
     int32_t infoSize = reply.ReadInt32();
-    if (infoSize < 0 || infoSize > maxAllowedSize) {
+    if (infoSize < 0 || infoSize > MAX_ALLOW_SIZE) {
         HILOG_ERROR("%{public}s invalid size: %{public}d", __func__, infoSize);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
