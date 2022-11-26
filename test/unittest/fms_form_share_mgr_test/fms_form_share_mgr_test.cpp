@@ -2314,7 +2314,7 @@ HWTEST_F(FmsFormShareMgrTest, FormAmsHelper_0003, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormAmsHelper_0003 start";
     FormAmsHelper formAmsHelper;
     auto runner = EventRunner::Create("FormMgrService");
-    auto handler = std::make_shared<FormEventHandler>(runner); 
+    auto handler = std::make_shared<FormEventHandler>(runner);
     formAmsHelper.SetEventHandler(handler);
     sptr<AAFwk::IAbilityConnection> connect = nullptr;
     formAmsHelper.DisconnectServiceAbilityDelay(connect);

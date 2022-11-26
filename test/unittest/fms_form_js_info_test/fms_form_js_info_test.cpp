@@ -137,7 +137,7 @@ HWTEST_F(FmsFormJsInfoTest, FmsFormJsInfoTest_005, TestSize.Level0)
     FormJsInfo formJsInfo;
     Parcel parcel;
     auto result = formJsInfo.Marshalling(parcel);
-    
+
     EXPECT_FALSE(result);
     GTEST_LOG_(INFO) << "FmsFormJsInfoTest_005 end";
 }
@@ -154,7 +154,7 @@ HWTEST_F(FmsFormJsInfoTest, FmsFormJsInfoTest_006, TestSize.Level0)
     FormJsInfo formJsInfo;
     Parcel parcel;
     auto result = formJsInfo.Unmarshalling(parcel);
-    
+
     EXPECT_TRUE(result == nullptr);
     GTEST_LOG_(INFO) << "FmsFormJsInfoTest_006 end";
 }
@@ -171,7 +171,7 @@ HWTEST_F(FmsFormJsInfoTest, FmsFormJsInfoTest_007, TestSize.Level0)
     FormJsInfo formJsInfo;
     Parcel parcel;
     auto result = formJsInfo.WriteImageData(parcel);
-    
+
     EXPECT_TRUE(result);
     GTEST_LOG_(INFO) << "FmsFormJsInfoTest_007 end";
 }
@@ -193,7 +193,7 @@ HWTEST_F(FmsFormJsInfoTest, FmsFormJsInfoTest_008, TestSize.Level0)
     forProviderData.SetImageDataState(imageDataState);
     forProviderData.SetImageDataMap(imageDataMap);
     auto result = formJsInfo.WriteImageData(parcel);
-    
+
     EXPECT_TRUE(result);
     GTEST_LOG_(INFO) << "FmsFormJsInfoTest_008 end";
 }
@@ -211,7 +211,7 @@ HWTEST_F(FmsFormJsInfoTest, FmsFormJsInfoTest_009, TestSize.Level0)
     Parcel parcel;
     EXPECT_TRUE(formJsInfo.imageDataMap.empty());
     formJsInfo.ReadImageData(parcel);
-    
+
     EXPECT_FALSE(formJsInfo.imageDataMap.empty());
     GTEST_LOG_(INFO) << "FmsFormJsInfoTest_009 end";
 }
