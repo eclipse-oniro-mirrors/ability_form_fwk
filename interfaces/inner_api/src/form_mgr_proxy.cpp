@@ -22,6 +22,9 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+namespace {
+    static constexpr int32_t MAX_ALLOW_SIZE = 8 * 1024;
+}
 FormMgrProxy::FormMgrProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IFormMgr>(impl)
 {}
 /**
@@ -597,6 +600,10 @@ template<typename T>
 int  FormMgrProxy::GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos)
 {
     int32_t infoSize = reply.ReadInt32();
+    if (infoSize < 0 || infoSize > MAX_ALLOW_SIZE) {
+        HILOG_ERROR("%{public}s invalid size: %{public}d", __func__, infoSize);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     for (int32_t i = 0; i < infoSize; i++) {
         std::unique_ptr<T> info(reply.ReadParcelable<T>());
         if (!info) {

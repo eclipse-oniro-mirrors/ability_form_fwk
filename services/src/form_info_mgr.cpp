@@ -63,7 +63,6 @@ ErrCode FormInfoHelper::LoadFormConfigInfoByBundleName(const std::string &bundle
     if (LoadStageFormConfigInfo(bundleInfo, formInfos) != ERR_OK) {
         HILOG_INFO("No stage form config info found for %{public}s.", bundleName.c_str());
     }
-
     return ERR_OK;
 }
 
