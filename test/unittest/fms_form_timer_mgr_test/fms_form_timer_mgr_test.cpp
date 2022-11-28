@@ -19,8 +19,10 @@
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "form_constants.h"
+#define private public
 #include "form_refresh_limiter.h"
 #include "form_timer_mgr.h"
+#undef private
 #include "remote_native_token.h"
 
 using namespace testing::ext;
@@ -544,5 +546,819 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0027, Function | MediumTest | Lev
     bool isAddOk4 = FormTimerMgr::GetInstance().AddFormTimer(PARAM_FORM_ID_VALUE_6,  10, 30, 0);
     EXPECT_EQ(isAddOk4, true);
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0027 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0028
+ * @tc.name: UpdateFormTimer.
+ * @tc.desc: test UpdateFormTimer function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0028, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0028 start";
+    FormTimerMgr formTimerMgr;
+    int64_t formId = 1;
+    UpdateType type = UpdateType::TYPE_ATTIME_TO_INTERVAL;
+    FormTimerCfg timerCfg;
+    EXPECT_EQ(false, formTimerMgr.UpdateFormTimer(formId, type, timerCfg));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0028 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0029
+ * @tc.name: UpdateFormTimer.
+ * @tc.desc: Update form timer(TYPE_INTERVAL_ONCE).
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0029, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0029 start";
+    FormTimerMgr formTimerMgr;
+    int64_t formId = 1;
+    UpdateType type = UpdateType::TYPE_INTERVAL_ONCE;
+    FormTimerCfg timerCfg;
+    timerCfg.enableUpdate = true;
+    EXPECT_EQ(false, formTimerMgr.UpdateFormTimer(formId, type, timerCfg));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0029 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0030
+ * @tc.name: UpdateIntervalValue.
+ * @tc.desc: test UpdateIntervalValue function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0030, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0030 start";
+    FormTimerMgr formTimerMgr;
+    int64_t formId = 1;
+    FormTimerCfg timerCfg;
+    timerCfg.updateDuration = 2 * Constants::MIN_PERIOD;
+    EXPECT_EQ(false, formTimerMgr.UpdateIntervalValue(formId, timerCfg));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0030 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0031
+ * @tc.name: UpdateIntervalValue.
+ * @tc.desc: test UpdateIntervalValue function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0031, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0031 start";
+    FormTimerMgr formTimerMgr;
+    int64_t formId = 1;
+    FormTimerCfg timerCfg;
+    timerCfg.updateDuration = Constants::MIN_PERIOD - 1;
+    EXPECT_EQ(false, formTimerMgr.UpdateIntervalValue(formId, timerCfg));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0031 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0032
+ * @tc.name: UpdateIntervalValue.
+ * @tc.desc: test UpdateIntervalValue function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0032, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0032 start";
+    FormTimerMgr formTimerMgr;
+    int64_t formId = 1;
+    FormTimerCfg timerCfg;
+    timerCfg.updateDuration = Constants::MAX_PERIOD + 1;
+    EXPECT_EQ(false, formTimerMgr.UpdateIntervalValue(formId, timerCfg));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0032 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0033
+ * @tc.name: UpdateAtTimerValue.
+ * @tc.desc: test UpdateAtTimerValue function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0033, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0033 start";
+    FormTimerMgr formTimerMgr;
+    int64_t formId = 1;
+    FormTimerCfg timerCfg;
+    timerCfg.updateAtHour = Constants::MIN_TIME - 1;
+    EXPECT_EQ(false, formTimerMgr.UpdateAtTimerValue(formId, timerCfg));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0033 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0034
+ * @tc.name: UpdateAtTimerValue.
+ * @tc.desc: test UpdateAtTimerValue function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0034, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0034 start";
+    FormTimerMgr formTimerMgr;
+    int64_t formId = 1;
+    FormTimerCfg timerCfg;
+    timerCfg.updateAtHour = Constants::MAX_HOUR + 1;
+    EXPECT_EQ(false, formTimerMgr.UpdateAtTimerValue(formId, timerCfg));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0034 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0035
+ * @tc.name: UpdateAtTimerValue.
+ * @tc.desc: test UpdateAtTimerValue function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0035, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0035 start";
+    FormTimerMgr formTimerMgr;
+    int64_t formId = 1;
+    FormTimerCfg timerCfg;
+    timerCfg.updateAtMin = Constants::MAX_MINUTE + 1;
+    EXPECT_EQ(false, formTimerMgr.UpdateAtTimerValue(formId, timerCfg));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0035 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0036
+ * @tc.name: UpdateAtTimerValue.
+ * @tc.desc: test UpdateAtTimerValue function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0036, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0036 start";
+    FormTimerMgr formTimerMgr;
+    int64_t formId = 1;
+    FormTimerCfg timerCfg;
+    timerCfg.updateAtMin = Constants::MIN_TIME - 1;
+    EXPECT_EQ(false, formTimerMgr.UpdateAtTimerValue(formId, timerCfg));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0036 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0037
+ * @tc.name: UpdateAtTimerValue.
+ * @tc.desc: test UpdateAtTimerValue function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0037, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0037 start";
+    FormTimerMgr formTimerMgr;
+    int64_t formId = 1;
+    FormTimerCfg timerCfg;
+    timerCfg.updateAtHour = Constants::MIN_TIME + 1;
+    timerCfg.updateAtMin = Constants::MIN_TIME + 1;
+    EXPECT_EQ(true, formTimerMgr.UpdateAtTimerValue(formId, timerCfg));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0037 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0038
+ * @tc.name: UpdateAtTimerValue.
+ * @tc.desc: test UpdateAtTimerValue function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0038, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0038 start";
+    FormTimerMgr formTimerMgr;
+    int64_t formId = 1;
+    FormTimerCfg timerCfg;
+    timerCfg.updateAtHour = Constants::MIN_TIME + 1;
+    timerCfg.updateAtMin = Constants::MIN_TIME + 1;
+    UpdateAtItem updateAtItem;
+    updateAtItem.refreshTask.formId = 0;
+    formTimerMgr.updateAtTimerTasks_.emplace_back(updateAtItem);
+    EXPECT_EQ(true, formTimerMgr.UpdateAtTimerValue(formId, timerCfg));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0038 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0039
+ * @tc.name: UpdateAtTimerValue.
+ * @tc.desc: test UpdateAtTimerValue function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0039, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0039 start";
+    FormTimerMgr formTimerMgr;
+    int64_t formId = 0;
+    FormTimerCfg timerCfg;
+    timerCfg.updateAtHour = Constants::MIN_TIME + 1;
+    timerCfg.updateAtMin = Constants::MIN_TIME + 1;
+    UpdateAtItem updateAtItem;
+    updateAtItem.refreshTask.formId = 0;
+    formTimerMgr.updateAtTimerTasks_.emplace_back(updateAtItem);
+    EXPECT_EQ(false, formTimerMgr.UpdateAtTimerValue(formId, timerCfg));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0039 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0040
+ * @tc.name: IntervalToAtTimer.
+ * @tc.desc: test IntervalToAtTimer function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0040, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0040 start";
+    FormTimerMgr formTimerMgr;
+    int64_t formId = 1;
+    FormTimerCfg timerCfg;
+    timerCfg.updateAtHour = Constants::MAX_HOUR + 1;
+    EXPECT_EQ(false, formTimerMgr.IntervalToAtTimer(formId, timerCfg));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0040 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0041
+ * @tc.name: IntervalToAtTimer.
+ * @tc.desc: test IntervalToAtTimer function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0041, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0041 start";
+    FormTimerMgr formTimerMgr;
+    int64_t formId = 1;
+    FormTimerCfg timerCfg;
+    timerCfg.updateAtMin = Constants::MAX_MINUTE + 1;
+    EXPECT_EQ(false, formTimerMgr.IntervalToAtTimer(formId, timerCfg));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0041 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0042
+ * @tc.name: IntervalToAtTimer.
+ * @tc.desc: test IntervalToAtTimer function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0042, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0042 start";
+    FormTimerMgr formTimerMgr;
+    int64_t formId = 1;
+    FormTimerCfg timerCfg;
+    timerCfg.updateAtMin = Constants::MIN_TIME - 1;
+    EXPECT_EQ(false, formTimerMgr.IntervalToAtTimer(formId, timerCfg));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0042 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0043
+ * @tc.name: IntervalToAtTimer.
+ * @tc.desc: test IntervalToAtTimer function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0043, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0043 start";
+    FormTimerMgr formTimerMgr;
+    int64_t formId = 1;
+    FormTimerCfg timerCfg;
+    timerCfg.updateAtHour = Constants::MIN_TIME + 1;
+    timerCfg.updateAtMin = Constants::MIN_TIME + 1;
+    EXPECT_EQ(false, formTimerMgr.IntervalToAtTimer(formId, timerCfg));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0043 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0044
+ * @tc.name: UpdateAtTimerValue.
+ * @tc.desc: test UpdateAtTimerValue function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0044, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0044 start";
+    FormTimerMgr formTimerMgr;
+    int64_t formId = 1;
+    FormTimerCfg timerCfg;
+    timerCfg.updateAtHour = Constants::MIN_TIME + 1;
+    timerCfg.updateAtMin = Constants::MIN_TIME + 1;
+    EXPECT_EQ(true, formTimerMgr.UpdateAtTimerValue(formId, timerCfg));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0044 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0045
+ * @tc.name: AtTimerToIntervalTimer.
+ * @tc.desc: test AtTimerToIntervalTimer function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0045, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0045 start";
+    FormTimerMgr formTimerMgr;
+    int64_t formId = 1;
+    FormTimerCfg timerCfg;
+    timerCfg.updateDuration = Constants::MIN_PERIOD - 1;
+    EXPECT_EQ(false, formTimerMgr.AtTimerToIntervalTimer(formId, timerCfg));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0045 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0046
+ * @tc.name: AtTimerToIntervalTimer.
+ * @tc.desc: test AtTimerToIntervalTimer function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0046, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0046 start";
+    FormTimerMgr formTimerMgr;
+    int64_t formId = 1;
+    FormTimerCfg timerCfg;
+    timerCfg.updateDuration = Constants::MAX_PERIOD + 1;
+    EXPECT_EQ(false, formTimerMgr.AtTimerToIntervalTimer(formId, timerCfg));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0046 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0047
+ * @tc.name: AtTimerToIntervalTimer.
+ * @tc.desc: test AtTimerToIntervalTimer function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0047, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0047 start";
+    FormTimerMgr formTimerMgr;
+    int64_t formId = 1;
+    FormTimerCfg timerCfg;
+    timerCfg.updateDuration = 2 * Constants::MIN_PERIOD;
+    EXPECT_EQ(true, formTimerMgr.AtTimerToIntervalTimer(formId, timerCfg));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0047 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0048
+ * @tc.name: AtTimerToIntervalTimer.
+ * @tc.desc: test AtTimerToIntervalTimer function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0048, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0048 start";
+    FormTimerMgr formTimerMgr;
+    int64_t formId = 0;
+    FormTimerCfg timerCfg;
+    timerCfg.updateDuration = 2 * Constants::MIN_PERIOD;
+    UpdateAtItem updateAtItem;
+    updateAtItem.refreshTask.formId = 0;
+    formTimerMgr.updateAtTimerTasks_.emplace_back(updateAtItem);
+    EXPECT_EQ(false, formTimerMgr.AtTimerToIntervalTimer(formId, timerCfg));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0048 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0049
+ * @tc.name: SetNextRefreshTime.
+ * @tc.desc: test SetNextRefreshTime function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0049, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0049 start";
+    FormTimerMgr formTimerMgr;
+    int64_t formId = 1;
+    long nextGapTime = Constants::MIN_NEXT_TIME - 1;
+    int32_t userId = 2;
+    EXPECT_EQ(false, formTimerMgr.SetNextRefreshTime(formId, nextGapTime, userId));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0049 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0050
+ * @tc.name: SetNextRefreshTime.
+ * @tc.desc: test SetNextRefreshTime function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0050, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0050 start";
+    FormTimerMgr formTimerMgr;
+    int64_t formId = 1;
+    long nextGapTime = Constants::MIN_NEXT_TIME + 1;
+    int32_t userId = 2;
+    EXPECT_EQ(true, formTimerMgr.SetNextRefreshTime(formId, nextGapTime, userId));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0050 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0051
+ * @tc.name: SetNextRefreshTime.
+ * @tc.desc: test SetNextRefreshTime function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0051, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0051 start";
+    FormTimerMgr formTimerMgr;
+    int64_t formId = 1;
+    long nextGapTime = Constants::MIN_NEXT_TIME + 1;
+    int32_t userId = 2;
+    DynamicRefreshItem dynamicRefreshItem;
+    dynamicRefreshItem.formId = 1;
+    dynamicRefreshItem.userId = 2;
+    formTimerMgr.dynamicRefreshTasks_.emplace_back(dynamicRefreshItem);
+    EXPECT_EQ(true, formTimerMgr.SetNextRefreshTime(formId, nextGapTime, userId));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0051 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0052
+ * @tc.name: SetNextRefreshTime.
+ * @tc.desc: test SetNextRefreshTime function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0052, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0052 start";
+    FormTimerMgr formTimerMgr;
+    int64_t formId = 1;
+    long nextGapTime = Constants::MIN_NEXT_TIME + 1;
+    int32_t userId = 2;
+    DynamicRefreshItem dynamicRefreshItem;
+    dynamicRefreshItem.formId = 1;
+    dynamicRefreshItem.userId = 3;
+    formTimerMgr.dynamicRefreshTasks_.emplace_back(dynamicRefreshItem);
+    EXPECT_EQ(true, formTimerMgr.SetNextRefreshTime(formId, nextGapTime, userId));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0052 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0053
+ * @tc.name: SetNextRefreshTime.
+ * @tc.desc: test SetNextRefreshTime function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0053, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0053 start";
+    FormTimerMgr formTimerMgr;
+    int64_t formId = 1;
+    long nextGapTime = Constants::MIN_NEXT_TIME + 1;
+    int32_t userId = 2;
+    DynamicRefreshItem dynamicRefreshItem;
+    dynamicRefreshItem.formId = 2;
+    dynamicRefreshItem.userId = 2;
+    formTimerMgr.dynamicRefreshTasks_.emplace_back(dynamicRefreshItem);
+    EXPECT_EQ(true, formTimerMgr.SetNextRefreshTime(formId, nextGapTime, userId));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0053 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0054
+ * @tc.name: SetNextRefreshTime.
+ * @tc.desc: test SetNextRefreshTime function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0054, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0054 start";
+    FormTimerMgr formTimerMgr;
+    int64_t formId = 1;
+    long nextGapTime = Constants::MIN_NEXT_TIME + 1;
+    int32_t userId = 2;
+    DynamicRefreshItem dynamicRefreshItem;
+    dynamicRefreshItem.formId = 2;
+    dynamicRefreshItem.userId = 3;
+    formTimerMgr.dynamicRefreshTasks_.emplace_back(dynamicRefreshItem);
+    EXPECT_EQ(true, formTimerMgr.SetNextRefreshTime(formId, nextGapTime, userId));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0054 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0055
+ * @tc.name: SetEnableFlag.
+ * @tc.desc: test SetEnableFlag function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0055, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0055 start";
+    FormTimerMgr formTimerMgr;
+    int64_t formId = 1;
+    bool flag = true;
+    formTimerMgr.SetEnableFlag(formId, flag);
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0055 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0056
+ * @tc.name: SetEnableFlag.
+ * @tc.desc: test SetEnableFlag function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0056, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0056 start";
+    FormTimerMgr formTimerMgr;
+    int64_t formId = 1;
+    bool flag = true;
+    FormTimer formTimer;
+    formTimerMgr.intervalTimerTasks_.emplace(formId, formTimer);
+    formTimerMgr.SetEnableFlag(formId, flag);
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0056 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0057
+ * @tc.name: OnUpdateAtTrigger.
+ * @tc.desc: test OnUpdateAtTrigger function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0057, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0057 start";
+    FormTimerMgr formTimerMgr;
+    long updateTime = Constants::MIN_PERIOD;
+    UpdateAtItem updateAtItem;
+    updateAtItem.updateAtTime = Constants::MIN_PERIOD;
+    updateAtItem.refreshTask.isEnable = true;
+    formTimerMgr.updateAtTimerTasks_.emplace_back(updateAtItem);
+    EXPECT_EQ(true, formTimerMgr.OnUpdateAtTrigger(updateTime));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0057 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0058
+ * @tc.name: OnUpdateAtTrigger.
+ * @tc.desc: test OnUpdateAtTrigger function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0058, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0058 start";
+    FormTimerMgr formTimerMgr;
+    long updateTime = Constants::MIN_PERIOD;
+    UpdateAtItem updateAtItem;
+    updateAtItem.updateAtTime = Constants::MIN_PERIOD;
+    updateAtItem.refreshTask.isEnable = false;
+    formTimerMgr.updateAtTimerTasks_.emplace_back(updateAtItem);
+    EXPECT_EQ(true, formTimerMgr.OnUpdateAtTrigger(updateTime));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0058 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0059
+ * @tc.name: OnUpdateAtTrigger.
+ * @tc.desc: test OnUpdateAtTrigger function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0059, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0059 start";
+    FormTimerMgr formTimerMgr;
+    long updateTime = Constants::MIN_PERIOD;
+    UpdateAtItem updateAtItem;
+    updateAtItem.updateAtTime = Constants::MIN_PERIOD + 1;
+    updateAtItem.refreshTask.isEnable = false;
+    formTimerMgr.updateAtTimerTasks_.emplace_back(updateAtItem);
+    EXPECT_EQ(true, formTimerMgr.OnUpdateAtTrigger(updateTime));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0059 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0060
+ * @tc.name: OnUpdateAtTrigger.
+ * @tc.desc: test OnUpdateAtTrigger function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0060, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0060 start";
+    FormTimerMgr formTimerMgr;
+    long updateTime = Constants::MIN_PERIOD;
+    UpdateAtItem updateAtItem;
+    updateAtItem.updateAtTime = Constants::MIN_PERIOD + 1;
+    updateAtItem.refreshTask.isEnable = true;
+    formTimerMgr.updateAtTimerTasks_.emplace_back(updateAtItem);
+    EXPECT_EQ(true, formTimerMgr.OnUpdateAtTrigger(updateTime));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0060 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0061
+ * @tc.name: OnDynamicTimeTrigger.
+ * @tc.desc: test OnDynamicTimeTrigger function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0061, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0061 start";
+    FormTimerMgr formTimerMgr;
+    int64_t updateTime = 40;
+    DynamicRefreshItem dynamicRefreshItem;
+    dynamicRefreshItem.settedTime = 1;
+    formTimerMgr.dynamicRefreshTasks_.emplace_back(dynamicRefreshItem);
+    EXPECT_EQ(true, formTimerMgr.OnDynamicTimeTrigger(updateTime));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0061 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0062
+ * @tc.name: OnDynamicTimeTrigger.
+ * @tc.desc: test OnDynamicTimeTrigger function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0062, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0062 start";
+    FormTimerMgr formTimerMgr;
+    int64_t updateTime = 40;
+    DynamicRefreshItem dynamicRefreshItem;
+    dynamicRefreshItem.settedTime = 41;
+    formTimerMgr.dynamicRefreshTasks_.emplace_back(dynamicRefreshItem);
+    EXPECT_EQ(true, formTimerMgr.OnDynamicTimeTrigger(updateTime));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0062 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0063
+ * @tc.name: SetIntervalEnableFlag.
+ * @tc.desc: test SetIntervalEnableFlag function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0063, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0063 start";
+    FormTimerMgr formTimerMgr;
+    int64_t formId = 1;
+    bool flag = true;
+    formTimerMgr.SetIntervalEnableFlag(formId, flag);
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0063 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0064
+ * @tc.name: SetIntervalEnableFlag.
+ * @tc.desc: test SetIntervalEnableFlag function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0064, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0064 start";
+    FormTimerMgr formTimerMgr;
+    int64_t formId = 1;
+    bool flag = true;
+    FormTimer formTimer;
+    formTimerMgr.intervalTimerTasks_.emplace(formId, formTimer);
+    formTimerMgr.SetIntervalEnableFlag(formId, flag);
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0064 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0065
+ * @tc.name: GetIntervalTimer.
+ * @tc.desc: test GetIntervalTimer function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0065, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0065 start";
+    FormTimerMgr formTimerMgr;
+    int64_t formId = 1;
+    FormTimer formTimer;
+    EXPECT_EQ(false, formTimerMgr.GetIntervalTimer(formId, formTimer));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0065 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0066
+ * @tc.name: GetIntervalTimer.
+ * @tc.desc: test GetIntervalTimer function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0066, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0066 start";
+    FormTimerMgr formTimerMgr;
+    int64_t formId = 1;
+    FormTimer formTimer;
+    formTimerMgr.intervalTimerTasks_.emplace(formId, formTimer);
+    EXPECT_EQ(true, formTimerMgr.GetIntervalTimer(formId, formTimer));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0066 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0067
+ * @tc.name: GetUpdateAtTimer.
+ * @tc.desc: test GetUpdateAtTimer function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0067, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0067 start";
+    FormTimerMgr formTimerMgr;
+    int64_t formId = 1;
+    UpdateAtItem updateAtItem;
+    EXPECT_EQ(false, formTimerMgr.GetUpdateAtTimer(formId, updateAtItem));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0067 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0068
+ * @tc.name: GetUpdateAtTimer.
+ * @tc.desc: test GetUpdateAtTimer function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0068, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0068 start";
+    FormTimerMgr formTimerMgr;
+    int64_t formId = 1;
+    UpdateAtItem updateAtItem;
+    updateAtItem.refreshTask.formId = 0;
+    formTimerMgr.updateAtTimerTasks_.emplace_back(updateAtItem);
+    EXPECT_EQ(false, formTimerMgr.GetUpdateAtTimer(formId, updateAtItem));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0068 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0069
+ * @tc.name: GetUpdateAtTimer.
+ * @tc.desc: test GetUpdateAtTimer function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0069, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0069 start";
+    FormTimerMgr formTimerMgr;
+    int64_t formId = 1;
+    UpdateAtItem updateAtItem;
+    updateAtItem.refreshTask.formId = 1;
+    formTimerMgr.updateAtTimerTasks_.emplace_back(updateAtItem);
+    EXPECT_EQ(true, formTimerMgr.GetUpdateAtTimer(formId, updateAtItem));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0069 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0073
+ * @tc.name: DeleteDynamicItem.
+ * @tc.desc: test DeleteDynamicItem function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0073, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0073 start";
+    FormTimerMgr formTimerMgr;
+    int64_t formId = 1;
+    DynamicRefreshItem dynamicRefreshItem;
+    dynamicRefreshItem.formId = 2;
+    formTimerMgr.dynamicRefreshTasks_.emplace_back(dynamicRefreshItem);
+    EXPECT_EQ(true, formTimerMgr.DeleteDynamicItem(formId));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0073 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0074
+ * @tc.name: DeleteDynamicItem.
+ * @tc.desc: test DeleteDynamicItem function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0074, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0074 start";
+    FormTimerMgr formTimerMgr;
+    int64_t formId = 1;
+    DynamicRefreshItem dynamicRefreshItem;
+    dynamicRefreshItem.formId = 1;
+    formTimerMgr.dynamicRefreshTasks_.emplace_back(dynamicRefreshItem);
+    EXPECT_EQ(true, formTimerMgr.DeleteDynamicItem(formId));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0074 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0075
+ * @tc.name: DeleteDynamicItem.
+ * @tc.desc: test DeleteDynamicItem function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0075, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0075 start";
+    FormTimerMgr formTimerMgr;
+    int64_t formId = 1;
+    DynamicRefreshItem dynamicRefreshItem;
+    dynamicRefreshItem.formId = 1;
+    formTimerMgr.dynamicRefreshTasks_.emplace_back(dynamicRefreshItem);
+    DynamicRefreshItem dynamicRefreshItems;
+    dynamicRefreshItems.formId = 2;
+    formTimerMgr.dynamicRefreshTasks_.emplace_back(dynamicRefreshItems);
+    EXPECT_EQ(true, formTimerMgr.DeleteDynamicItem(formId));
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0075 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0076
+ * @tc.name: OnIntervalTimeOut.
+ * @tc.desc: test OnIntervalTimeOut function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0076, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0076 start";
+    FormTimerMgr formTimerMgr;
+    formTimerMgr.OnIntervalTimeOut();
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0076 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0077
+ * @tc.name: OnIntervalTimeOut.
+ * @tc.desc: test OnIntervalTimeOut function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0077, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0077 start";
+    FormTimerMgr formTimerMgr;
+    int64_t formId = 1;
+    FormTimer formTimer;
+    formTimer.refreshTime = INT64_MAX;
+    formTimerMgr.intervalTimerTasks_.emplace(formId, formTimer);
+    formTimerMgr.OnIntervalTimeOut();
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0077 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0078
+ * @tc.name: OnIntervalTimeOut.
+ * @tc.desc: test OnIntervalTimeOut function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0078, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0078 start";
+    FormTimerMgr formTimerMgr;
+    int64_t formId = 1;
+    FormTimer formTimer;
+    formTimer.refreshTime = INT64_MAX - 1;
+    formTimerMgr.intervalTimerTasks_.emplace(formId, formTimer);
+    formTimerMgr.OnIntervalTimeOut();
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0078 end";
 }
 }
