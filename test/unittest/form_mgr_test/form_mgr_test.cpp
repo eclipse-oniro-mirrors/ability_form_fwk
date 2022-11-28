@@ -336,7 +336,6 @@ HWTEST_F(FormMgrTest, FormMgrTest_0011, TestSize.Level1) {
  * @tc.name: FormMgrTest_0012
  * @tc.desc: Verify GetErrorMsg
  * @tc.type: FUNC
- * @tc.require: I5ST27
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0012, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0012 starts";
@@ -351,7 +350,6 @@ HWTEST_F(FormMgrTest, FormMgrTest_0012, TestSize.Level1) {
  * @tc.name: FormMgrTest_0013
  * @tc.desc: Verify DumpStorageFormInfos
  * @tc.type: FUNC
- * @tc.require: I5ST27
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0013, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0013 starts";
@@ -369,7 +367,6 @@ HWTEST_F(FormMgrTest, FormMgrTest_0013, TestSize.Level1) {
  * @tc.name: FormMgrTest_0014
  * @tc.desc: Verify DumpFormInfoByFormId
  * @tc.type: FUNC
- * @tc.require: I5ST27
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0014, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0014 starts";
@@ -388,7 +385,6 @@ HWTEST_F(FormMgrTest, FormMgrTest_0014, TestSize.Level1) {
  * @tc.name: FormMgrTest_0015
  * @tc.desc: Verify DumpFormTimerByFormId
  * @tc.type: FUNC
- * @tc.require: I5ST27
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0015, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0015 starts";
@@ -407,7 +403,6 @@ HWTEST_F(FormMgrTest, FormMgrTest_0015, TestSize.Level1) {
  * @tc.name: FormMgrTest_0016
  * @tc.desc: Verify RouterEvent
  * @tc.type: FUNC
- * @tc.require: I5ST27
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0016, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0016 starts";
@@ -430,7 +425,6 @@ HWTEST_F(FormMgrTest, FormMgrTest_0016, TestSize.Level1) {
  * @tc.name: FormMgrTest_0017
  * @tc.desc: Verify SetNextRefreshTime
  * @tc.type: FUNC
- * @tc.require: I5ST27
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0017, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0017 starts";
@@ -446,7 +440,6 @@ HWTEST_F(FormMgrTest, FormMgrTest_0017, TestSize.Level1) {
  * @tc.name: FormMgrTest_0018
  * @tc.desc: Verify GetErrorMessage
  * @tc.type: FUNC
- * @tc.require: I5ST27
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0018, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0018 starts";
@@ -462,7 +455,6 @@ HWTEST_F(FormMgrTest, FormMgrTest_0018, TestSize.Level1) {
  * @tc.name: FormMgrTest_0019
  * @tc.desc: Verify DeleteInvalidForms
  * @tc.type: FUNC
- * @tc.require: I5ST27
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0019, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0019 starts";
@@ -485,7 +477,6 @@ HWTEST_F(FormMgrTest, FormMgrTest_0019, TestSize.Level1) {
  * @tc.name: FormMgrTest_0020
  * @tc.desc: Verify DumpStorageFormInfos
  * @tc.type: FUNC
- * @tc.require: I5ST27
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0020, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0020 starts";
@@ -509,7 +500,6 @@ HWTEST_F(FormMgrTest, FormMgrTest_0020, TestSize.Level1) {
  * @tc.name: FormMgrTest_0021
  * @tc.desc: Verify NotifyFormsEnableUpdate
  * @tc.type: FUNC
- * @tc.require: I5ST27
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0021, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0021 starts";
@@ -533,7 +523,6 @@ HWTEST_F(FormMgrTest, FormMgrTest_0021, TestSize.Level1) {
  * @tc.name: FormMgrTest_0022
  * @tc.desc: Verify  GetAllFormsInfo
  * @tc.type: FUNC
- * @tc.require: I5ST27
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0022, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0022 starts";
@@ -556,7 +545,6 @@ HWTEST_F(FormMgrTest, FormMgrTest_0022, TestSize.Level1) {
  * @tc.name: FormMgrTest_0023
  * @tc.desc: Verify GetFormsInfoByApp
  * @tc.type: FUNC
- * @tc.require: I5ST27
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0023, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0023 starts";
@@ -580,7 +568,6 @@ HWTEST_F(FormMgrTest, FormMgrTest_0023, TestSize.Level1) {
  * @tc.name: FormMgrTest_0024
  * @tc.desc: Verify GetFormsInfoByModule
  * @tc.type: FUNC
- * @tc.require: I5ST27
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0024, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0024 starts";
@@ -605,10 +592,12 @@ HWTEST_F(FormMgrTest, FormMgrTest_0024, TestSize.Level1) {
  * @tc.name: FormMgrTest_0025
  * @tc.desc: Verify CheckFMSReady
  * @tc.type: FUNC
- * @tc.require: I5ST27
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0025, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0025 starts";
+    EXPECT_CALL(*mockProxy, CheckFMSReady())
+        .Times(1)
+        .WillOnce(Return(true));
     auto result = FormMgr::GetInstance().CheckFMSReady();
 
     EXPECT_TRUE(result);
@@ -619,7 +608,6 @@ HWTEST_F(FormMgrTest, FormMgrTest_0025, TestSize.Level1) {
  * @tc.name: FormMgrTest_0026
  * @tc.desc: Verify DumpFormInfoByBundleName
  * @tc.type: FUNC
- * @tc.require: I5ST27
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0026, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0026 starts";
@@ -638,7 +626,6 @@ HWTEST_F(FormMgrTest, FormMgrTest_0026, TestSize.Level1) {
  * @tc.name: FormMgrTest_0027
  * @tc.desc: Verify AcquireFormState
  * @tc.type: FUNC
- * @tc.require: I5ST27
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0027, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0027 starts";

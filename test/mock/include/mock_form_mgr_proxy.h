@@ -48,6 +48,7 @@ public:
     MOCK_METHOD3(GetFormsInfoByModule, int(std::string &bundleName, std::string &moduleName, std::vector<FormInfo> &formInfos));
     MOCK_METHOD2(DumpFormInfoByBundleName, int(const std::string &bundleName, std::string &formInfos));
     MOCK_METHOD3(AcquireFormState, int(const Want &want, const sptr<IRemoteObject> &callerToken, FormStateInfo &stateInfo));
+    MOCK_METHOD0(CheckFMSReady, bool());
 };
 }
 }
