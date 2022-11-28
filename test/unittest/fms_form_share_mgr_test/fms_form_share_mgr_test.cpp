@@ -2551,3 +2551,1111 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0005, TestSize.Level0)
     EXPECT_EQ(false, formDataMgr.IsEnableUpdate(formId));
     GTEST_LOG_(INFO) << "FormDataMgr_0005 end";
 }
+
+/**
+ * @tc.name: FormDataMgr_0006
+ * @tc.desc: test HandleUpdateHostFormFlag function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0006, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0006 start";
+    int64_t formId = 0;
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+    bool flag = true;
+    bool isOnlyEnableUpdate = true;
+    FormHostRecord formHostRecord;
+    std::vector<int64_t> refreshForms;
+    FormDataMgr formDataMgr;
+    formDataMgr.HandleUpdateHostFormFlag(formIds, flag, isOnlyEnableUpdate, formHostRecord, refreshForms);
+    GTEST_LOG_(INFO) << "FormDataMgr_0006 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0007
+ * @tc.desc: test GetNoHostTempForms function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0007, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0007 start";
+    int uid = 1;
+    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    std::map<int64_t, bool> foundFormsMap;
+    FormDataMgr formDataMgr;
+    int64_t formIds = 2;
+    FormRecord formInfo;
+    formInfo.formName = "aaaaaa";
+    formInfo.bundleName = "com.form.start";
+    formInfo.formId = formIds;
+    formInfo.formTempFlag = true;
+    FormDataMgr::GetInstance().formRecords_.emplace(formIds, formInfo);
+    formDataMgr.GetNoHostTempForms(uid, noHostTempFormsMap, foundFormsMap);
+    GTEST_LOG_(INFO) << "FormDataMgr_0007 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0008
+ * @tc.desc: test GetNoHostTempForms function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0008, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0008 start";
+    int uid = 1;
+    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    std::map<int64_t, bool> foundFormsMap;
+    FormDataMgr formDataMgr;
+    int64_t formIds = 2;
+    FormRecord formInfo;
+    formInfo.formName = "aaaaaa";
+    formInfo.bundleName = "com.form.start";
+    formInfo.formId = formIds;
+    formInfo.formTempFlag = false;
+    FormDataMgr::GetInstance().formRecords_.emplace(formIds, formInfo);
+    formDataMgr.GetNoHostTempForms(uid, noHostTempFormsMap, foundFormsMap);
+    GTEST_LOG_(INFO) << "FormDataMgr_0008 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0009
+ * @tc.desc: test GetNoHostTempForms function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0009, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0009 start";
+    int uid = 1;
+    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    std::map<int64_t, bool> foundFormsMap;
+    FormDataMgr formDataMgr;
+    formDataMgr.GetNoHostTempForms(uid, noHostTempFormsMap, foundFormsMap);
+    GTEST_LOG_(INFO) << "FormDataMgr_0009 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0010
+ * @tc.desc: test CreateFormStateRecord function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0010, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0010 start";
+    std::string provider = "aaaaa";
+    FormItemInfo info;
+    sptr<IRemoteObject> callerToken = nullptr;
+    int callingUid = 1;
+    FormDataMgr formDataMgr;
+    formDataMgr.CreateFormStateRecord(provider, info, callerToken, callingUid);
+    GTEST_LOG_(INFO) << "FormDataMgr_0010 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0011
+ * @tc.desc: test CreateFormStateRecord function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0011, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0011 start";
+    std::string provider = "aaaaa";
+    FormItemInfo info;
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    int callingUid = 1;
+    FormDataMgr formDataMgr;
+    formDataMgr.CreateFormStateRecord(provider, info, callerToken, callingUid);
+    GTEST_LOG_(INFO) << "FormDataMgr_0011 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0012
+ * @tc.desc: test CreateFormStateRecord function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0012, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0012 start";
+    std::string provider = "aaaaa";
+    FormItemInfo info;
+    sptr<IRemoteObject> callerToken = nullptr;
+    int callingUid = 1;
+    FormDataMgr formDataMgr;
+    FormHostRecord formHostRecord;
+    formDataMgr.formStateRecord_.emplace(provider, formHostRecord);
+    formDataMgr.CreateFormStateRecord(provider, info, callerToken, callingUid);
+    GTEST_LOG_(INFO) << "FormDataMgr_0012 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0013
+ * @tc.desc: test CreateFormStateRecord function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0013, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0013 start";
+    std::string provider = "aaaaa";
+    FormItemInfo info;
+    sptr<IRemoteObject> callerToken = nullptr;
+    int callingUid = 1;
+    FormDataMgr formDataMgr;
+    FormHostRecord formHostRecord;
+    formHostRecord.SetFormHostClient(callerToken);
+    formDataMgr.formStateRecord_.emplace(provider, formHostRecord);
+    formDataMgr.CreateFormStateRecord(provider, info, callerToken, callingUid);
+    GTEST_LOG_(INFO) << "FormDataMgr_0013 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0014
+ * @tc.desc: test AcquireFormStateBack function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0014, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0014 start";
+    AppExecFwk::FormState state = AppExecFwk::FormState::UNKNOWN;;
+    std::string provider = "aaaa";
+    Want want;
+    FormDataMgr formDataMgr;
+    formDataMgr.AcquireFormStateBack(state, provider, want);
+    GTEST_LOG_(INFO) << "FormDataMgr_0014 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0015
+ * @tc.desc: test AcquireFormStateBack function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0015, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0015 start";
+    AppExecFwk::FormState state = AppExecFwk::FormState::UNKNOWN;;
+    std::string provider = "aaaa";
+    Want want;
+    FormDataMgr formDataMgr;
+    FormHostRecord formHostRecord;
+    formDataMgr.formStateRecord_.emplace(provider, formHostRecord);
+    formDataMgr.AcquireFormStateBack(state, provider, want);
+    GTEST_LOG_(INFO) << "FormDataMgr_0015 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0016
+ * @tc.desc: test NotifyFormsVisible function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0016, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0016 start";
+    std::vector<int64_t> formIds;
+    bool isVisible = true;
+    sptr<IRemoteObject> callerToken = nullptr;
+    FormDataMgr formDataMgr;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formDataMgr.NotifyFormsVisible(formIds, isVisible, callerToken));
+    GTEST_LOG_(INFO) << "FormDataMgr_0016 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0017
+ * @tc.desc: test NotifyFormsVisible function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0017, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0017 start";
+    std::vector<int64_t> formIds;
+    bool isVisible = true;
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    FormDataMgr formDataMgr;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formDataMgr.NotifyFormsVisible(formIds, isVisible, callerToken));
+    GTEST_LOG_(INFO) << "FormDataMgr_0017 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0018
+ * @tc.desc: test NotifyFormsVisible function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0018, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0018 start";
+    int64_t formId = 1;
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+    bool isVisible = true;
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    FormDataMgr formDataMgr;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, formDataMgr.NotifyFormsVisible(formIds, isVisible, callerToken));
+    GTEST_LOG_(INFO) << "FormDataMgr_0018 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0019
+ * @tc.desc: test NotifyFormsVisible function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0019, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0019 start";
+    int64_t formId = 1;
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+    bool isVisible = true;
+    sptr<IRemoteObject> callerToken = nullptr;
+    FormDataMgr formDataMgr;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formDataMgr.NotifyFormsVisible(formIds, isVisible, callerToken));
+    GTEST_LOG_(INFO) << "FormDataMgr_0019 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0020
+ * @tc.desc: test NotifyFormsVisible function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0020, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0020 start";
+    int64_t formId = 1;
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+    bool isVisible = true;
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    FormDataMgr formDataMgr;
+    FormHostRecord formHostRecord;
+    formHostRecord.SetFormHostClient(nullptr);
+    formDataMgr.clientRecords_.emplace_back(formHostRecord);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, formDataMgr.NotifyFormsVisible(formIds, isVisible, callerToken));
+    GTEST_LOG_(INFO) << "FormDataMgr_0020 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0021
+ * @tc.desc: test NotifyFormsVisible function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0021, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0021 start";
+    int64_t formId = 1;
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+    bool isVisible = true;
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    FormDataMgr formDataMgr;
+    FormHostRecord formHostRecord;
+    formHostRecord.SetFormHostClient(callerToken);
+    formDataMgr.clientRecords_.emplace_back(formHostRecord);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, formDataMgr.NotifyFormsVisible(formIds, isVisible, callerToken));
+    GTEST_LOG_(INFO) << "FormDataMgr_0021 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0022
+ * @tc.desc: test SetRecordVisible function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0022, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0022 start";
+    int64_t matchedFormId = 1;
+    bool isVisible = true;
+    FormDataMgr formDataMgr;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_FORM_ID, formDataMgr.SetRecordVisible(matchedFormId, isVisible));
+    GTEST_LOG_(INFO) << "FormDataMgr_0022 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0023
+ * @tc.desc: test SetRecordVisible function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0023, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0023 start";
+    int64_t matchedFormId = 1;
+    int64_t matchedFormIds = 2;
+    bool isVisible = true;
+    FormDataMgr formDataMgr;
+    FormRecord formInfo;
+    formDataMgr.formRecords_.emplace(matchedFormId, formInfo);
+    formDataMgr.formRecords_.emplace(matchedFormIds, formInfo);
+    EXPECT_EQ(ERR_OK, formDataMgr.SetRecordVisible(matchedFormId, isVisible));
+    GTEST_LOG_(INFO) << "FormDataMgr_0023 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0024
+ * @tc.desc: test DeleteFormsByUserId function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0024, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0024 start";
+    int32_t userId = 1;
+    std::vector<int64_t> removedFormIds;
+    FormDataMgr formDataMgr;
+    formDataMgr.DeleteFormsByUserId(userId, removedFormIds);
+    GTEST_LOG_(INFO) << "FormDataMgr_0024 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0025
+ * @tc.desc: test DeleteFormsByUserId function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0025, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0025 start";
+    int32_t userId = 1;
+    std::vector<int64_t> removedFormIds;
+    FormDataMgr formDataMgr;
+    int64_t formIds = 1;
+    FormRecord formInfo;
+    formInfo.formName = "aaaaaa";
+    formInfo.bundleName = "com.form.start";
+    formInfo.userId = formIds;
+    formInfo.formTempFlag = true;
+    formDataMgr.formRecords_.emplace(formIds, formInfo);
+    formDataMgr.DeleteFormsByUserId(userId, removedFormIds);
+    GTEST_LOG_(INFO) << "FormDataMgr_0025 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0026
+ * @tc.desc: test DeleteFormsByUserId function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0026, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0026 start";
+    int32_t userId = 1;
+    std::vector<int64_t> removedFormIds;
+    FormDataMgr formDataMgr;
+    int64_t formIds = 1;
+    FormRecord formInfo;
+    formInfo.formName = "aaaaaa";
+    formInfo.bundleName = "com.form.start";
+    formInfo.userId = formIds;
+    formInfo.formTempFlag = false;
+    formDataMgr.formRecords_.emplace(formIds, formInfo);
+    formDataMgr.DeleteFormsByUserId(userId, removedFormIds);
+    GTEST_LOG_(INFO) << "FormDataMgr_0026 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0027
+ * @tc.desc: test DeleteFormsByUserId function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0027, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0027 start";
+    int32_t userId = 1;
+    std::vector<int64_t> removedFormIds;
+    FormDataMgr formDataMgr;
+    int64_t formIds = 2;
+    FormRecord formInfo;
+    formInfo.formName = "aaaaaa";
+    formInfo.bundleName = "com.form.start";
+    formInfo.userId = formIds;
+    formInfo.formTempFlag = false;
+    formDataMgr.formRecords_.emplace(formIds, formInfo);
+    formDataMgr.DeleteFormsByUserId(userId, removedFormIds);
+    GTEST_LOG_(INFO) << "FormDataMgr_0027 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0028
+ * @tc.desc: test DeleteFormsByUserId function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0028, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0028 start";
+    int32_t userId = 1;
+    std::vector<int64_t> removedFormIds;
+    FormDataMgr formDataMgr;
+    int64_t formIds = 1;
+    FormRecord formInfo;
+    formInfo.formName = "aaaaaa";
+    formInfo.bundleName = "com.form.start";
+    formInfo.userId = formIds;
+    formInfo.formTempFlag = true;
+    formDataMgr.formRecords_.emplace(formIds, formInfo);
+    formDataMgr.tempForms_.emplace_back(formIds);
+    formDataMgr.DeleteFormsByUserId(userId, removedFormIds);
+    GTEST_LOG_(INFO) << "FormDataMgr_0028 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0029
+ * @tc.desc: test GetNoHostInvalidTempForms function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0029, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0029 start";
+    int32_t userId = 1;
+    int32_t callingUid = 2;
+    std::set<int64_t> matchedFormIds;
+    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    std::map<int64_t, bool> foundFormsMap;
+    FormDataMgr formDataMgr;
+    formDataMgr.GetNoHostInvalidTempForms(userId, callingUid, matchedFormIds, noHostTempFormsMap, foundFormsMap);
+    GTEST_LOG_(INFO) << "FormDataMgr_0029 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0030
+ * @tc.desc: test GetNoHostInvalidTempForms function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0030, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0030 start";
+    int32_t userId = 1;
+    int32_t callingUid = 2;
+    std::set<int64_t> matchedFormIds;
+    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    std::map<int64_t, bool> foundFormsMap;
+    FormDataMgr formDataMgr;
+    int64_t formIds = 2;
+    FormRecord formInfo;
+    formInfo.formName = "aaaaaa";
+    formInfo.bundleName = "com.form.start";
+    formInfo.userId = formIds;
+    formInfo.formTempFlag = true;
+    formDataMgr.formRecords_.emplace(formIds, formInfo);
+    formDataMgr.GetNoHostInvalidTempForms(userId, callingUid, matchedFormIds, noHostTempFormsMap, foundFormsMap);
+    GTEST_LOG_(INFO) << "FormDataMgr_0030 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0031
+ * @tc.desc: test GetNoHostInvalidTempForms function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0031, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0031 start";
+    int32_t userId = 1;
+    int32_t callingUid = 2;
+    std::set<int64_t> matchedFormIds;
+    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    std::map<int64_t, bool> foundFormsMap;
+    FormDataMgr formDataMgr;
+    int64_t formIds = 2;
+    FormRecord formInfo;
+    formInfo.formName = "aaaaaa";
+    formInfo.bundleName = "com.form.start";
+    formInfo.userId = formIds;
+    formInfo.formTempFlag = false;
+    formDataMgr.formRecords_.emplace(formIds, formInfo);
+    formDataMgr.GetNoHostInvalidTempForms(userId, callingUid, matchedFormIds, noHostTempFormsMap, foundFormsMap);
+    GTEST_LOG_(INFO) << "FormDataMgr_0031 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0032
+ * @tc.desc: test GetNoHostInvalidTempForms function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0032, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0032 start";
+    int32_t userId = 1;
+    int32_t callingUid = 2;
+    std::set<int64_t> matchedFormIds;
+    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    std::map<int64_t, bool> foundFormsMap;
+    FormDataMgr formDataMgr;
+    int64_t formIds = 1;
+    FormRecord formInfo;
+    formInfo.formName = "aaaaaa";
+    formInfo.bundleName = "com.form.start";
+    formInfo.userId = formIds;
+    formInfo.formTempFlag = false;
+    formDataMgr.formRecords_.emplace(formIds, formInfo);
+    formDataMgr.GetNoHostInvalidTempForms(userId, callingUid, matchedFormIds, noHostTempFormsMap, foundFormsMap);
+    GTEST_LOG_(INFO) << "FormDataMgr_0032 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0033
+ * @tc.desc: test GetNoHostInvalidTempForms function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0033, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0033 start";
+    int32_t userId = 1;
+    int32_t callingUid = 2;
+    std::set<int64_t> matchedFormIds;
+    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    std::map<int64_t, bool> foundFormsMap;
+    FormDataMgr formDataMgr;
+    int64_t formIds = 1;
+    FormRecord formInfo;
+    formInfo.formName = "aaaaaa";
+    formInfo.bundleName = "com.form.start";
+    formInfo.userId = formIds;
+    formInfo.formTempFlag = true;
+    formDataMgr.formRecords_.emplace(formIds, formInfo);
+    formDataMgr.GetNoHostInvalidTempForms(userId, callingUid, matchedFormIds, noHostTempFormsMap, foundFormsMap);
+    GTEST_LOG_(INFO) << "FormDataMgr_0033 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0034
+ * @tc.desc: test GetNoHostInvalidTempForms function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0034, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0034 start";
+    int32_t userId = 1;
+    int32_t callingUid = 2;
+    std::set<int64_t> matchedFormIds;
+    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    std::map<int64_t, bool> foundFormsMap;
+    FormDataMgr formDataMgr;
+    int64_t formIds = 1;
+    FormRecord formInfo;
+    formInfo.formName = "aaaaaa";
+    formInfo.bundleName = "com.form.start";
+    formInfo.userId = formIds;
+    formInfo.formUserUids.emplace_back(2);
+    formInfo.formTempFlag = true;
+    formDataMgr.formRecords_.emplace(formIds, formInfo);
+    formDataMgr.GetNoHostInvalidTempForms(userId, callingUid, matchedFormIds, noHostTempFormsMap, foundFormsMap);
+    GTEST_LOG_(INFO) << "FormDataMgr_0034 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0035
+ * @tc.desc: test GetNoHostInvalidTempForms function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0035, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0035 start";
+    int32_t userId = 1;
+    int32_t callingUid = 2;
+    int64_t formIds = 1;
+    std::set<int64_t> matchedFormIds;
+    matchedFormIds.insert(formIds);
+    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    std::map<int64_t, bool> foundFormsMap;
+    FormDataMgr formDataMgr;
+    FormRecord formInfo;
+    formInfo.formName = "aaaaaa";
+    formInfo.bundleName = "com.form.start";
+    formInfo.userId = formIds;
+    formInfo.formUserUids.emplace_back(2);
+    formInfo.formTempFlag = true;
+    formDataMgr.formRecords_.emplace(formIds, formInfo);
+    formDataMgr.GetNoHostInvalidTempForms(userId, callingUid, matchedFormIds, noHostTempFormsMap, foundFormsMap);
+    GTEST_LOG_(INFO) << "FormDataMgr_0035 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0036
+ * @tc.desc: test GetNoHostInvalidTempForms function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0036, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0036 start";
+    int32_t userId = 1;
+    int32_t callingUid = 2;
+    std::set<int64_t> matchedFormIds;
+    std::map<int64_t, bool> foundFormsMap;
+    FormDataMgr formDataMgr;
+    int64_t formIds = 1;
+    FormRecord formInfo;
+    formInfo.formName = "aaaaaa";
+    formInfo.bundleName = "com.form.start";
+    formInfo.abilityName = "bbbbbb";
+    formInfo.userId = formIds;
+    formInfo.formUserUids.emplace_back(2);
+    formInfo.formTempFlag = true;
+    formDataMgr.formRecords_.emplace(formIds, formInfo);
+    // set noHostTempFormsMap
+    FormIdKey formIdKey(formInfo.bundleName, formInfo.abilityName);
+    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    noHostTempFormsMap.emplace(formIdKey, matchedFormIds);
+    formDataMgr.GetNoHostInvalidTempForms(userId, callingUid, matchedFormIds, noHostTempFormsMap, foundFormsMap);
+    GTEST_LOG_(INFO) << "FormDataMgr_0036 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0037
+ * @tc.desc: test BatchDeleteNoHostTempForms function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0037, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0037 start";
+    int32_t callingUid = 1;
+    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    std::map<int64_t, bool> foundFormsMap;
+    FormDataMgr formDataMgr;
+    formDataMgr.BatchDeleteNoHostTempForms(callingUid, noHostTempFormsMap, foundFormsMap);
+    GTEST_LOG_(INFO) << "FormDataMgr_0037 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0038
+ * @tc.desc: test BatchDeleteNoHostTempForms function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0038, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0038 start";
+    int32_t callingUid = 1;
+    std::map<int64_t, bool> foundFormsMap;
+    FormDataMgr formDataMgr;
+    // set noHostTempFormsMap
+    FormRecord formInfo;
+    formInfo.bundleName = "com.form.start";
+    formInfo.abilityName = "bbbbbb";
+    FormIdKey formIdKey(formInfo.bundleName, formInfo.abilityName);
+    std::set<int64_t> matchedFormIds;
+    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    noHostTempFormsMap.emplace(formIdKey, matchedFormIds);
+    formDataMgr.BatchDeleteNoHostTempForms(callingUid, noHostTempFormsMap, foundFormsMap);
+    GTEST_LOG_(INFO) << "FormDataMgr_0038 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0039
+ * @tc.desc: test BatchDeleteNoHostTempForms function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0039, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0039 start";
+    int32_t callingUid = 1;
+    std::map<int64_t, bool> foundFormsMap;
+    FormDataMgr formDataMgr;
+    // set noHostTempFormsMap
+    FormRecord formInfo;
+    formInfo.bundleName = "com.form.start";
+    formInfo.abilityName = "bbbbbb";
+    FormIdKey formIdKey(formInfo.bundleName, formInfo.abilityName);
+    int64_t formIds = 1;
+    std::set<int64_t> matchedFormIds;
+    matchedFormIds.insert(formIds);
+    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    noHostTempFormsMap.emplace(formIdKey, matchedFormIds);
+    formDataMgr.BatchDeleteNoHostTempForms(callingUid, noHostTempFormsMap, foundFormsMap);
+    GTEST_LOG_(INFO) << "FormDataMgr_0039 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0040
+ * @tc.desc: test DeleteInvalidTempForms function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0040, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0040 start";
+    int32_t userId = 1;
+    int32_t callingUid = 2;
+    std::set<int64_t> matchedFormIds;
+    std::map<int64_t, bool> removedFormsMap;
+    FormDataMgr formDataMgr;
+    EXPECT_EQ(ERR_OK, formDataMgr.DeleteInvalidTempForms(userId, callingUid, matchedFormIds, removedFormsMap));
+    GTEST_LOG_(INFO) << "FormDataMgr_0040 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0041
+ * @tc.desc: test DeleteInvalidPublishForms function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0041, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0041 start";
+    int32_t userId = 1;
+    std::string bundleName = "aaaaa";
+    std::set<int64_t> validFormIds;
+    FormDataMgr formDataMgr;
+    formDataMgr.DeleteInvalidPublishForms(userId, bundleName, validFormIds);
+    GTEST_LOG_(INFO) << "FormDataMgr_0041 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0042
+ * @tc.desc: test ClearHostDataByInvalidForms function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0042, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0042 start";
+    int32_t callingUid = 1;
+    std::map<int64_t, bool> removedFormsMap;
+    FormDataMgr formDataMgr;
+    EXPECT_EQ(ERR_OK, formDataMgr.ClearHostDataByInvalidForms(callingUid, removedFormsMap));
+    GTEST_LOG_(INFO) << "FormDataMgr_0042 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0043
+ * @tc.desc: test ClearHostDataByInvalidForms function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0043, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0043 start";
+    int32_t callingUid = 1;
+    std::map<int64_t, bool> removedFormsMap;
+    FormDataMgr formDataMgr;
+    FormHostRecord formHostRecord;
+    int callerUid = 2;
+    formHostRecord.SetCallerUid(callerUid);
+    formDataMgr.clientRecords_.emplace_back(formHostRecord);
+    EXPECT_EQ(ERR_OK, formDataMgr.ClearHostDataByInvalidForms(callingUid, removedFormsMap));
+    GTEST_LOG_(INFO) << "FormDataMgr_0043 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0044
+ * @tc.desc: test ClearHostDataByInvalidForms function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0044, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0044 start";
+    int32_t callingUid = 1;
+    std::map<int64_t, bool> removedFormsMap;
+    FormDataMgr formDataMgr;
+    FormHostRecord formHostRecord;
+    int callerUid = 1;
+    formHostRecord.SetCallerUid(callerUid);
+    formDataMgr.clientRecords_.emplace_back(formHostRecord);
+    EXPECT_EQ(ERR_OK, formDataMgr.ClearHostDataByInvalidForms(callingUid, removedFormsMap));
+    GTEST_LOG_(INFO) << "FormDataMgr_0044 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0045
+ * @tc.desc: test ClearHostDataByInvalidForms function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0045, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0045 start";
+    int32_t callingUid = 1;
+    int64_t formId = 1;
+    bool remove = true;
+    std::map<int64_t, bool> removedFormsMap;
+    removedFormsMap.emplace(formId, remove);
+    FormDataMgr formDataMgr;
+    FormHostRecord formHostRecord;
+    int callerUid = 1;
+    formHostRecord.SetCallerUid(callerUid);
+    formHostRecord.forms_.emplace(formId, remove);
+    formDataMgr.clientRecords_.emplace_back(formHostRecord);
+    EXPECT_EQ(ERR_OK, formDataMgr.ClearHostDataByInvalidForms(callingUid, removedFormsMap));
+    GTEST_LOG_(INFO) << "FormDataMgr_0045 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0046
+ * @tc.desc: test ClearHostDataByInvalidForms function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0046, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0046 start";
+    int32_t callingUid = 1;
+    int64_t formId = 1;
+    bool remove = true;
+    std::map<int64_t, bool> removedFormsMap;
+    removedFormsMap.emplace(formId, remove);
+    FormDataMgr formDataMgr;
+    FormHostRecord formHostRecord;
+    int callerUid = 1;
+    formHostRecord.SetCallerUid(callerUid);
+    formDataMgr.clientRecords_.emplace_back(formHostRecord);
+    EXPECT_EQ(ERR_OK, formDataMgr.ClearHostDataByInvalidForms(callingUid, removedFormsMap));
+    GTEST_LOG_(INFO) << "FormDataMgr_0046 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0047
+ * @tc.desc: test GetRequestPublishFormInfo function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0047, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0047 start";
+    FormDataMgr formDataMgr;
+    int64_t formId = 1;
+    Want want;
+    std::unique_ptr<FormProviderData> formProviderData;
+    EXPECT_EQ(
+        ERR_APPEXECFWK_FORM_INVALID_FORM_ID, formDataMgr.GetRequestPublishFormInfo(formId, want, formProviderData));
+    GTEST_LOG_(INFO) << "FormDataMgr_0047 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0048
+ * @tc.desc: test GetRequestPublishFormInfo function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0048, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0048 start";
+    FormDataMgr formDataMgr;
+    int64_t formId = 1;
+    Want want;
+    std::unique_ptr<FormProviderData> formProviderData;
+    formDataMgr.formRequestPublishForms_.insert(
+        std::make_pair(formId, std::make_pair(want, std::move(formProviderData))));
+    EXPECT_EQ(ERR_OK, formDataMgr.GetRequestPublishFormInfo(formId, want, formProviderData));
+    GTEST_LOG_(INFO) << "FormDataMgr_0048 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0049
+ * @tc.desc: test GetPackageForm function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0049, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0049 start";
+    FormRecord record;
+    BundlePackInfo bundlePackInfo;
+    AbilityFormInfo abilityFormInfo;
+    FormDataMgr formDataMgr;
+    EXPECT_EQ(false, formDataMgr.GetPackageForm(record, bundlePackInfo, abilityFormInfo));
+    GTEST_LOG_(INFO) << "FormDataMgr_0049 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0050
+ * @tc.desc: test GetPackageForm function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0050, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0050 start";
+    FormRecord record;
+    record.moduleName = "aa";
+    BundlePackInfo bundlePackInfo;
+    PackageModule packageModule;
+    packageModule.distro.moduleName = "bb";
+    bundlePackInfo.summary.modules.emplace_back(packageModule);
+    AbilityFormInfo abilityFormInfo;
+    FormDataMgr formDataMgr;
+    EXPECT_EQ(false, formDataMgr.GetPackageForm(record, bundlePackInfo, abilityFormInfo));
+    GTEST_LOG_(INFO) << "FormDataMgr_0050 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0051
+ * @tc.desc: test GetPackageForm function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0051, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0051 start";
+    FormRecord record;
+    record.moduleName = "aa";
+    BundlePackInfo bundlePackInfo;
+    PackageModule packageModule;
+    packageModule.distro.moduleName = "aa";
+    bundlePackInfo.summary.modules.emplace_back(packageModule);
+    AbilityFormInfo abilityFormInfo;
+    FormDataMgr formDataMgr;
+    EXPECT_EQ(false, formDataMgr.GetPackageForm(record, bundlePackInfo, abilityFormInfo));
+    GTEST_LOG_(INFO) << "FormDataMgr_0051 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0052
+ * @tc.desc: test IsSameForm function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0052, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0052 start";
+    FormRecord record;
+    AbilityFormInfo abilityFormInfo;
+    FormDataMgr formDataMgr;
+    EXPECT_EQ(false, formDataMgr.IsSameForm(record, abilityFormInfo));
+    GTEST_LOG_(INFO) << "FormDataMgr_0052 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0053
+ * @tc.desc: test IsSameForm function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0053, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0053 start";
+    FormRecord record;
+    record.specification = static_cast<int32_t>(OHOS::AppExecFwk::Constants::Dimension::DIMENSION_1_2);
+    AbilityFormInfo abilityFormInfo;
+    FormDataMgr formDataMgr;
+    EXPECT_EQ(false, formDataMgr.IsSameForm(record, abilityFormInfo));
+    GTEST_LOG_(INFO) << "FormDataMgr_0053 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0054
+ * @tc.desc: test IsSameForm function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0054, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0054 start";
+    FormRecord record;
+    record.formName = "aa";
+    record.specification = static_cast<int32_t>(OHOS::AppExecFwk::Constants::Dimension::DIMENSION_1_2);
+    AbilityFormInfo abilityFormInfo;
+    abilityFormInfo.name = "aa";
+    FormDataMgr formDataMgr;
+    EXPECT_EQ(false, formDataMgr.IsSameForm(record, abilityFormInfo));
+    GTEST_LOG_(INFO) << "FormDataMgr_0054 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0055
+ * @tc.desc: test IsSameForm function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0055, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0055 start";
+    FormRecord record;
+    record.formName = "aa";
+    record.specification = static_cast<int32_t>(OHOS::AppExecFwk::Constants::Dimension::DIMENSION_1_2);
+    AbilityFormInfo abilityFormInfo;
+    abilityFormInfo.name = "aa";
+    std::string aaaa = "1*2";
+    abilityFormInfo.supportDimensions.emplace_back(aaaa);
+    FormDataMgr formDataMgr;
+    EXPECT_EQ(true, formDataMgr.IsSameForm(record, abilityFormInfo));
+    GTEST_LOG_(INFO) << "FormDataMgr_0055 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0056
+ * @tc.desc: test IsSameForm function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0056, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0056 start";
+    FormRecord record;
+    record.formName = "bb";
+    record.specification = static_cast<int32_t>(OHOS::AppExecFwk::Constants::Dimension::DIMENSION_1_2);
+    AbilityFormInfo abilityFormInfo;
+    abilityFormInfo.name = "aa";
+    FormDataMgr formDataMgr;
+    EXPECT_EQ(false, formDataMgr.IsSameForm(record, abilityFormInfo));
+    GTEST_LOG_(INFO) << "FormDataMgr_0056 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0057
+ * @tc.desc: test IsSameForm function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0057, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0057 start";
+    FormRecord record;
+    record.formName = "bb";
+    record.specification = static_cast<int32_t>(OHOS::AppExecFwk::Constants::Dimension::DIMENSION_1_2);
+    AbilityFormInfo abilityFormInfo;
+    abilityFormInfo.name = "aa";
+    std::string aaaa = "1*2";
+    abilityFormInfo.supportDimensions.emplace_back(aaaa);
+    FormDataMgr formDataMgr;
+    EXPECT_EQ(false, formDataMgr.IsSameForm(record, abilityFormInfo));
+    GTEST_LOG_(INFO) << "FormDataMgr_0057 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0058
+ * @tc.desc: test SetRecordNeedFreeInstall function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0058, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0058 start";
+    int64_t formId = 1;
+    bool isNeedFreeInstall = true;
+    FormDataMgr formDataMgr;
+    EXPECT_EQ(false, formDataMgr.SetRecordNeedFreeInstall(formId, isNeedFreeInstall));
+    GTEST_LOG_(INFO) << "FormDataMgr_0058 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0059
+ * @tc.desc: test SetRecordNeedFreeInstall function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0059, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0059 start";
+    int64_t formId = 1;
+    bool isNeedFreeInstall = true;
+    FormDataMgr formDataMgr;
+    FormRecord formInfo;
+    formDataMgr.formRecords_.emplace(formId, formInfo);
+    EXPECT_EQ(true, formDataMgr.SetRecordNeedFreeInstall(formId, isNeedFreeInstall));
+    GTEST_LOG_(INFO) << "FormDataMgr_0059 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0060
+ * @tc.desc: test DeleteInvalidPublishForms function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0060, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0060 start";
+    int32_t userId = 1;
+    int64_t formId = 1;
+    std::string bundleName = "aaaaa";
+    std::set<int64_t> validFormIds;
+    validFormIds.insert(formId);
+    FormDataMgr formDataMgr;
+    Want want;
+    std::unique_ptr<FormProviderData> formProviderData;
+    formDataMgr.formRequestPublishForms_.insert(
+        std::make_pair(formId, std::make_pair(want, std::move(formProviderData))));
+    formDataMgr.DeleteInvalidPublishForms(userId, bundleName, validFormIds);
+    GTEST_LOG_(INFO) << "FormDataMgr_0060 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0061
+ * @tc.desc: test DeleteInvalidPublishForms function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0061, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0061 start";
+    int32_t userId = 1;
+    int64_t formId = 1;
+    int64_t formIds = 2;
+    std::string bundleName = "aaaaa";
+    std::set<int64_t> validFormIds;
+    validFormIds.insert(formIds);
+    FormDataMgr formDataMgr;
+    Want want;
+    std::unique_ptr<FormProviderData> formProviderData;
+    formDataMgr.formRequestPublishForms_.insert(
+        std::make_pair(formId, std::make_pair(want, std::move(formProviderData))));
+    formDataMgr.DeleteInvalidPublishForms(userId, bundleName, validFormIds);
+    GTEST_LOG_(INFO) << "FormDataMgr_0061 end";
+}
