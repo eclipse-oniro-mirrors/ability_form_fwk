@@ -167,7 +167,7 @@ namespace Constants {
     // rdb
     constexpr const char* FORM_RDB_NAME = "/formdb.db";
     constexpr const char* FORM_RDB_TABLE_NAME = "form_table";
-    constexpr const char* FORM_MANAGER_SERVICE_PATH = "/data/service/el1/public/database/form_rdb_storage";
+    constexpr const char* FORM_MANAGER_SERVICE_PATH = "/data/service/el1/public/database/form_storage";
     constexpr const char* FORM_JOURNAL_MODE = "DELETE";
     constexpr const char* FORM_SYNC_MODE = "MODE_OFF";
     constexpr int32_t FORM_RDB_VERSION = 1;

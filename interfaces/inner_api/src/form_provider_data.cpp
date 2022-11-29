@@ -31,6 +31,7 @@ namespace AppExecFwk {
 const std::string JSON_EMPTY_STRING = "{}";
 const std::string JSON_IMAGES_STRING = "formImages";
 constexpr int32_t READ_PARCEL_MAX_IMAGE_DATA_NUM_SIZE = 1000;
+constexpr int32_t MAX_IMAGE_BYTE_SIZE = 50 * 1024 * 1024;
 /**
  * @brief Constructor.
  */
@@ -136,6 +137,10 @@ void FormProviderData::AddImageData(const std::string &picName, int fd)
     }
     HILOG_INFO("File size is %{public}d", size);
     if (lseek(fd, 0L, SEEK_SET) == -1) {
+        return;
+    }
+    if (size > MAX_IMAGE_BYTE_SIZE) {
+        HILOG_ERROR("File is too large");
         return;
     }
     char* bytes = new (std::nothrow) char[size];

@@ -64,6 +64,8 @@ static NativeValue* NapiFormHostInit(NativeEngine *engine, NativeValue *exports)
         moduleName, NapiFormHost::NotifyVisibleForms);
     OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "notifyInvisibleForms",
         moduleName, NapiFormHost::NotifyInVisibleForms);
+    OHOS::AbilityRuntime::BindNativeFunction(
+        *engine, *object, "deleteInvalidForms", moduleName, NapiFormHost::DeleteInvalidForms);
 
     return exports;
 }
@@ -80,7 +82,6 @@ static napi_value Init(napi_env env, napi_value exports)
 {
     HILOG_INFO("napi_module Init start...");
     napi_property_descriptor properties[] = {
-        DECLARE_NAPI_FUNCTION("deleteInvalidForms", NAPI_DeleteInvalidForms),
         DECLARE_NAPI_FUNCTION("acquireFormState", NAPI_AcquireFormState),
         DECLARE_NAPI_FUNCTION("on", NAPI_RegisterFormUninstallObserver),
         DECLARE_NAPI_FUNCTION("off", NAPI_UnregisterFormUninstallObserver),

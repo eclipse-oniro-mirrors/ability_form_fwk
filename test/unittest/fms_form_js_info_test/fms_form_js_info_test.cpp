@@ -20,9 +20,13 @@
 #include <string>
 #include <thread>
 
+#define private public
+#define protected public
 #include "form_js_info.h"
 #include "hilog_wrapper.h"
 #include "nlohmann/json.hpp"
+#undef private
+#undef protected
 
 using namespace testing::ext;
 
@@ -103,5 +107,114 @@ HWTEST_F(FmsFormJsInfoTest, FmsFormJsInfoTest_003, TestSize.Level0)
     EXPECT_EQ(true, formJsInfo.ConvertRawImageData());
     GTEST_LOG_(INFO) << "FmsFormJsInfoTest_003 end";
 }
+
+/**
+ * @tc.name: FmsFormJsInfoTest_004
+ * @tc.desc: text the FormJsInfo::ReadFromParcel
+ * @tc.type: FUNC
+ * @tc.require: #I5SNG1
+ */
+HWTEST_F(FmsFormJsInfoTest, FmsFormJsInfoTest_004, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormJsInfoTest_004 start";
+    FormJsInfo formJsInfo;
+    Parcel parcel;
+    auto result = formJsInfo.ReadFromParcel(parcel);
+
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "FmsFormJsInfoTest_004 end";
+}
+
+/**
+ * @tc.name: FmsFormJsInfoTest_005
+ * @tc.desc: text the FormJsInfo::Marshalling
+ * @tc.type: FUNC
+ * @tc.require: #I5SNG1
+ */
+HWTEST_F(FmsFormJsInfoTest, FmsFormJsInfoTest_005, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormJsInfoTest_005 start";
+    FormJsInfo formJsInfo;
+    Parcel parcel;
+    auto result = formJsInfo.Marshalling(parcel);
+
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "FmsFormJsInfoTest_005 end";
+}
+
+/**
+ * @tc.name: FmsFormJsInfoTest_006
+ * @tc.desc: text the FormJsInfo::Unmarshalling
+ * @tc.type: FUNC
+ * @tc.require: #I5SNG1
+ */
+HWTEST_F(FmsFormJsInfoTest, FmsFormJsInfoTest_006, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormJsInfoTest_006 start";
+    FormJsInfo formJsInfo;
+    Parcel parcel;
+    auto result = formJsInfo.Unmarshalling(parcel);
+
+    EXPECT_TRUE(result == nullptr);
+    GTEST_LOG_(INFO) << "FmsFormJsInfoTest_006 end";
+}
+
+/**
+ * @tc.name: FmsFormJsInfoTest_007
+ * @tc.desc: text the FormJsInfo::WriteImageData
+ * @tc.type: FUNC
+ * @tc.require: #I5SNG1
+ */
+HWTEST_F(FmsFormJsInfoTest, FmsFormJsInfoTest_007, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormJsInfoTest_007 start";
+    FormJsInfo formJsInfo;
+    Parcel parcel;
+    auto result = formJsInfo.WriteImageData(parcel);
+
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "FmsFormJsInfoTest_007 end";
+}
+
+/**
+ * @tc.name: FmsFormJsInfoTest_008
+ * @tc.desc: text the FormJsInfo::WriteImageData
+ * @tc.type: FUNC
+ * @tc.require: #I5SNG1
+ */
+HWTEST_F(FmsFormJsInfoTest, FmsFormJsInfoTest_008, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormJsInfoTest_008 start";
+    FormJsInfo formJsInfo;
+    Parcel parcel;
+    FormProviderData forProviderData;
+    int32_t imageDataState = 1;
+    std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
+    forProviderData.SetImageDataState(imageDataState);
+    forProviderData.SetImageDataMap(imageDataMap);
+    auto result = formJsInfo.WriteImageData(parcel);
+
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "FmsFormJsInfoTest_008 end";
+}
+
+/**
+ * @tc.name: FmsFormJsInfoTest_009
+ * @tc.desc: text the FormJsInfo::ReadImageData
+ * @tc.type: FUNC
+ * @tc.require: #I5SNG1
+ */
+HWTEST_F(FmsFormJsInfoTest, FmsFormJsInfoTest_009, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormJsInfoTest_009 start";
+    FormJsInfo formJsInfo;
+    Parcel parcel;
+    EXPECT_TRUE(formJsInfo.imageDataMap.empty());
+    formJsInfo.ReadImageData(parcel);
+
+    EXPECT_FALSE(formJsInfo.imageDataMap.empty());
+    GTEST_LOG_(INFO) << "FmsFormJsInfoTest_009 end";
+}
+
 } // namespace AppExecFwk
 } // namespace OHOS

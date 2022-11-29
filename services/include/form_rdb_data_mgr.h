@@ -47,8 +47,15 @@ public:
     int32_t OnCreate(NativeRdb::RdbStore &rdbStore) override;
 
     int32_t OnUpgrade(NativeRdb::RdbStore &rdbStore, int32_t oldVersion, int32_t newVersion) override;
+
+    int32_t OnDowngrade(NativeRdb::RdbStore &rdbStore, int currentVersion, int targetVersion) override;
+
+    int32_t OnOpen(NativeRdb::RdbStore &rdbStore) override;
+
+    int32_t onCorruption(std::string databaseFile) override;
 private:
     FormRdbConfig formRdbConfig_;
+    bool hasTableInit_ = false;
 };
 
 /**

@@ -36,6 +36,8 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     FormProviderInfo formProviderInfo;
     std::string dataString(data);
     formProviderInfo.SetFormDataString(dataString);
+    std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
+    formProviderInfo.SetImageDataMap(imageDataMap);
     formProviderInfo.GetImageDataMap();
     nlohmann::json addJsonData;
     formProviderInfo.MergeData(addJsonData);

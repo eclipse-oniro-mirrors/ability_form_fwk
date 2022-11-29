@@ -60,7 +60,7 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formMgrService.LifecycleUpdate(formIds, callerToken, updateType);
     std::string bundleName(data, size);
     std::string formInfos(data, size);
-    formMgrService.DumpFormInfoByBundleName(bundleName, formInfos); 
+    formMgrService.DumpFormInfoByBundleName(bundleName, formInfos);
     formMgrService.DumpFormInfoByFormId(formId, formInfos);
     std::string isTimingService(data, size);
     formMgrService.DumpFormTimerByFormId(formId, isTimingService);

@@ -43,16 +43,45 @@ RdbStoreDataCallBackFormInfoStorage::~RdbStoreDataCallBackFormInfoStorage()
     HILOG_INFO("destroy rdb store callback instance");
 }
 
-int32_t RdbStoreDataCallBackFormInfoStorage::OnCreate(NativeRdb::RdbStore &store)
+int32_t RdbStoreDataCallBackFormInfoStorage::OnCreate(NativeRdb::RdbStore &rdbStore)
 {
-    HILOG_INFO("Create table.");
-    std::string CREATE_TABLE_SQL = "CREATE TABLE IF NOT EXISTS " + formRdbConfig_.tableName
-        + " (KEY TEXT NOT NULL PRIMARY KEY, VALUE TEXT NOT NULL);";
-    return store.ExecuteSql(CREATE_TABLE_SQL);
+    HILOG_INFO("OnCreate");
+    return NativeRdb::E_OK;
 }
 
 int32_t RdbStoreDataCallBackFormInfoStorage::OnUpgrade(
-    NativeRdb::RdbStore &store, int32_t oldVersion, int32_t newVersion)
+    NativeRdb::RdbStore &rdbStore, int currentVersion, int targetVersion)
+{
+    HILOG_INFO("OnUpgrade currentVersion: %{plubic}d, targetVersion: %{plubic}d",
+        currentVersion, targetVersion);
+    return NativeRdb::E_OK;
+}
+
+int32_t RdbStoreDataCallBackFormInfoStorage::OnDowngrade(
+    NativeRdb::RdbStore &rdbStore, int currentVersion, int targetVersion)
+{
+    HILOG_INFO("OnDowngrade  currentVersion: %{plubic}d, targetVersion: %{plubic}d",
+        currentVersion, targetVersion);
+    return NativeRdb::E_OK;
+}
+
+int32_t RdbStoreDataCallBackFormInfoStorage::OnOpen(NativeRdb::RdbStore &rdbStore)
+{
+    HILOG_INFO("OnOpen");
+    int ret = NativeRdb::E_OK;
+    if (hasTableInit_) {
+        return ret;
+    }
+    std::string createTableSql = "CREATE TABLE IF NOT EXISTS " + formRdbConfig_.tableName
+        + " (KEY TEXT NOT NULL PRIMARY KEY, VALUE TEXT NOT NULL);";
+    ret = rdbStore.ExecuteSql(createTableSql);
+    if (ret == NativeRdb::E_OK) {
+        hasTableInit_ = true;
+    }
+    return ret;
+}
+
+int32_t RdbStoreDataCallBackFormInfoStorage::onCorruption(std::string databaseFile)
 {
     return NativeRdb::E_OK;
 }
@@ -66,7 +95,6 @@ FormRdbDataMgr::FormRdbDataMgr(const FormRdbConfig &formRdbConfig)
 ErrCode FormRdbDataMgr::Init()
 {
     HILOG_INFO("Create rdbStore");
-    int32_t errCode(NativeRdb::E_OK);
 
     if (rdbStore_ != nullptr) {
         HILOG_INFO("FormInfoRdbStore has existed");
@@ -80,6 +108,7 @@ ErrCode FormRdbDataMgr::Init()
             std::vector<uint8_t>(),
             formRdbConfig_.journalMode,
             formRdbConfig_.syncMode);
+    int32_t errCode = NativeRdb::E_OK;
     RdbStoreDataCallBackFormInfoStorage rdbDataCallBack_(formRdbConfig_);
     rdbStore_ = NativeRdb::RdbHelper::GetRdbStore(rdbStoreConfig, formRdbConfig_.version, rdbDataCallBack_, errCode);
     if (rdbStore_ == nullptr) {
@@ -145,7 +174,7 @@ ErrCode FormRdbDataMgr::DeleteData(const std::string &key)
     NativeRdb::AbsRdbPredicates absRdbPredicates(formRdbConfig_.tableName);
     absRdbPredicates.EqualTo(FORM_KEY, key);
     auto ret = rdbStore_->Delete(rowId, absRdbPredicates);
-    if ((ret != NativeRdb::E_OK) || (rowId <= 0)) {
+    if (ret != NativeRdb::E_OK) {
         HILOG_ERROR("Delete operation failed, result: %{public}d, key=%{public}s.",
             ret, key.c_str());
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
