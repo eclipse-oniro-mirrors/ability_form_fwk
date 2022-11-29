@@ -16,7 +16,9 @@
 
 #include "accesstoken_kit.h"
 #include "form_ams_helper.h"
+#define private public
 #include "form_bms_helper.h"
+#undef private
 #include "form_data_mgr.h"
 #include "form_db_cache.h"
 #include "form_host_interface.h"
@@ -132,5 +134,175 @@ HWTEST_F(FmsFormHostRecordTest, OnRemoteDied_001, TestSize.Level0)
     FormDataMgr::GetInstance().ClearHostDataByUId(callingUid);
 
     GTEST_LOG_(INFO) << "fms_form_host_record_test_001 end";
+}
+
+/**
+ * @tc.name: FormDbCache_001
+ * @tc.desc: test GetBundleMgr function.
+ * @tc.type: GetBundleMgr
+ */
+HWTEST_F(FmsFormHostRecordTest, FormDbCache_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_001 start";
+    FormBmsHelper formBmsHelper;
+    bool formBms = true;
+    if (nullptr != formBmsHelper.GetBundleMgr()) {
+        formBms = false;
+    }
+    EXPECT_EQ(false, formBms);
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_001 end";
+}
+
+/**
+ * @tc.name: FormDbCache_002
+ * @tc.desc: test NotifyModuleRemovable function.
+ * @tc.type: NotifyModuleRemovable
+ */
+HWTEST_F(FmsFormHostRecordTest, FormDbCache_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_002 start";
+    FormBmsHelper formBmsHelper;
+    std::string bundleName = "";
+    std::string moduleName = "";
+    formBmsHelper.NotifyModuleRemovable(bundleName, moduleName);
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_002 end";
+}
+
+/**
+ * @tc.name: FormDbCache_003
+ * @tc.desc: test NotifyModuleRemovable function.
+ * @tc.type: NotifyModuleRemovable
+ */
+HWTEST_F(FmsFormHostRecordTest, FormDbCache_003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_003 start";
+    FormBmsHelper formBmsHelper;
+    std::string bundleName = "";
+    std::string moduleName = "aa";
+    formBmsHelper.NotifyModuleRemovable(bundleName, moduleName);
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_003 end";
+}
+
+/**
+ * @tc.name: FormDbCache_004
+ * @tc.desc: test NotifyModuleRemovable function.
+ * @tc.type: NotifyModuleRemovable
+ */
+HWTEST_F(FmsFormHostRecordTest, FormDbCache_004, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_004 start";
+    FormBmsHelper formBmsHelper;
+    std::string bundleName = "bb";
+    std::string moduleName = "";
+    formBmsHelper.NotifyModuleRemovable(bundleName, moduleName);
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_004 end";
+}
+
+/**
+ * @tc.name: FormDbCache_005
+ * @tc.desc: test NotifyModuleRemovable function.
+ * @tc.type: NotifyModuleRemovable
+ */
+HWTEST_F(FmsFormHostRecordTest, FormDbCache_005, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_005 start";
+    FormBmsHelper formBmsHelper;
+    std::string bundleName = "bb";
+    std::string moduleName = "aa";
+    formBmsHelper.NotifyModuleRemovable(bundleName, moduleName);
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_005 end";
+}
+
+/**
+ * @tc.name: FormDbCache_006
+ * @tc.desc: test NotifyModuleNotRemovable function.
+ * @tc.type: NotifyModuleNotRemovable
+ */
+HWTEST_F(FmsFormHostRecordTest, FormDbCache_006, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_006 start";
+    FormBmsHelper formBmsHelper;
+    std::string bundleName = "";
+    std::string moduleName = "";
+    formBmsHelper.NotifyModuleNotRemovable(bundleName, moduleName);
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_006 end";
+}
+
+/**
+ * @tc.name: FormDbCache_007
+ * @tc.desc: test NotifyModuleNotRemovable function.
+ * @tc.type: NotifyModuleNotRemovable
+ */
+HWTEST_F(FmsFormHostRecordTest, FormDbCache_007, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_007 start";
+    FormBmsHelper formBmsHelper;
+    std::string bundleName = "";
+    std::string moduleName = "aa";
+    formBmsHelper.NotifyModuleNotRemovable(bundleName, moduleName);
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_007 end";
+}
+
+/**
+ * @tc.name: FormDbCache_008
+ * @tc.desc: test NotifyModuleNotRemovable function.
+ * @tc.type: NotifyModuleNotRemovable
+ */
+HWTEST_F(FmsFormHostRecordTest, FormDbCache_008, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_008 start";
+    FormBmsHelper formBmsHelper;
+    std::string bundleName = "bb";
+    std::string moduleName = "";
+    formBmsHelper.NotifyModuleNotRemovable(bundleName, moduleName);
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_008 end";
+}
+
+/**
+ * @tc.name: FormDbCache_009
+ * @tc.desc: test NotifyModuleNotRemovable function.
+ * @tc.type: NotifyModuleNotRemovable
+ */
+HWTEST_F(FmsFormHostRecordTest, FormDbCache_009, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_009 start";
+    FormBmsHelper formBmsHelper;
+    std::string bundleName = "bb";
+    std::string moduleName = "aa";
+    formBmsHelper.NotifyModuleNotRemovable(bundleName, moduleName);
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_009 end";
+}
+
+/**
+ * @tc.name: FormDbCache_010
+ * @tc.desc: test GetBundlePackInfo function.
+ * @tc.type: GetBundlePackInfo
+ */
+HWTEST_F(FmsFormHostRecordTest, FormDbCache_010, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_010 start";
+    FormBmsHelper formBmsHelper;
+    std::string bundleName = "aa";
+    int32_t userId = 1;
+    BundlePackInfo bundlePackInfo;
+    EXPECT_EQ(false, formBmsHelper.GetBundlePackInfo(bundleName, userId, bundlePackInfo));
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_010 end";
+}
+
+/**
+ * @tc.name: FormDbCache_011
+ * @tc.desc: test GetAbilityInfoByAction function.
+ * @tc.type: GetAbilityInfoByAction
+ */
+HWTEST_F(FmsFormHostRecordTest, FormDbCache_011, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_011 start";
+    FormBmsHelper formBmsHelper;
+    std::string action = "";
+    int32_t userId = 1;
+    AbilityInfo abilityInfo;
+    ExtensionAbilityInfo extensionAbilityInfo;
+    EXPECT_EQ(false, formBmsHelper.GetAbilityInfoByAction(action, userId, abilityInfo, extensionAbilityInfo));
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_011 end";
 }
 }
