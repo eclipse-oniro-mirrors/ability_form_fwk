@@ -20,6 +20,7 @@
 #include "gmock/gmock.h"
 #include "mock_form_mgr_service.h"
 #include "mock_form_token.h"
+#include "form_provider_proxy.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -56,10 +57,12 @@ public:
     {
         mockFormMgrService = new MockFormMgrService();
         formMgrProxy = new FormMgrProxy(mockFormMgrService);
+        formProviderProxy = new FormProviderProxy(mockFormMgrService);
     }
     // TearDown() is unnecessary.
     sptr<MockFormMgrService> mockFormMgrService;
     sptr<FormMgrProxy> formMgrProxy;
+    sptr<FormProviderProxy> formProviderProxy;
 };
 /**
  * @tc.name: FormMgrProxyTest_0001
@@ -266,5 +269,326 @@ HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0009, TestSize.Level1) {
     // expect result.
     EXPECT_EQ(result, 0);
     GTEST_LOG_(INFO) << "FormMgrProxyTest_0009 test ends";
+}
+
+/**
+ * @tc.name: FormProviderProxyTest_0001
+ * @tc.desc: text AcquireProviderFormInfo function.
+ * @tc.type: FUNC
+ * @tc.require: issueI639Z3
+ */
+HWTEST_F(FormMgrProxyTest, FormProviderProxyTest_0001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormProviderProxyTest_0001 starts";
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = 1001L;
+    Want want;
+    want = want.SetElementName("", "com.example.FormAbility", "MainAbility");
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    int result = formProviderProxy ->AcquireProviderFormInfo(formJsInfo, want, token);
+    int retcode = 2293767;
+    EXPECT_EQ(result, retcode);
+    GTEST_LOG_(INFO) << "FormProviderProxyTest_0001 test ends";
+}
+
+/**
+ * @tc.name: FormProviderProxyTest_0002
+ * @tc.desc: text AcquireProviderFormInfo function.
+ * @tc.type: FUNC
+ * @tc.require: issueI639Z3
+ */
+HWTEST_F(FormMgrProxyTest, FormProviderProxyTest_0002, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormProviderProxyTest_0002 starts";
+    FormJsInfo formJsInfo;
+    Want want;
+    want = want.SetElementName("", "com.example.FormAbility", "MainAbility");
+    int result = formProviderProxy ->AcquireProviderFormInfo(formJsInfo, want, nullptr);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+    GTEST_LOG_(INFO) << "FormProviderProxyTest_0002 test ends";
+}
+
+/**
+ * @tc.name: FormProviderProxyTest_0003
+ * @tc.desc: text NotifyFormDelete function.
+ * @tc.type: FUNC
+ * @tc.require: issueI639Z3
+ */
+HWTEST_F(FormMgrProxyTest, FormProviderProxyTest_0003, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormProviderProxyTest_0003 starts";
+    int64_t formId = 1;
+    Want want;
+    want = want.SetElementName("", "com.example.FormAbility", "MainAbility");
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    int result = formProviderProxy ->NotifyFormDelete(formId, want, token);
+    int retcode = 2293767;
+    EXPECT_EQ(result, retcode);
+    GTEST_LOG_(INFO) << "FormProviderProxyTest_0003 test ends";
+}
+
+/**
+ * @tc.name: FormProviderProxyTest_0004
+ * @tc.desc: text NotifyFormDelete function.
+ * @tc.type: FUNC
+ * @tc.require: issueI639Z3
+ */
+HWTEST_F(FormMgrProxyTest, FormProviderProxyTest_0004, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormProviderProxyTest_0004 starts";
+    int64_t formId = 1;
+    Want want;
+    want = want.SetElementName("", "com.example.FormAbility", "MainAbility");
+    int result = formProviderProxy ->NotifyFormDelete(formId, want, nullptr);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+    GTEST_LOG_(INFO) << "FormProviderProxyTest_0004 test ends";
+}
+
+/**
+ * @tc.name: FormProviderProxyTest_0005
+ * @tc.desc: text NotifyFormsDelete function.
+ * @tc.type: FUNC
+ * @tc.require: issueI639Z3
+ */
+HWTEST_F(FormMgrProxyTest, FormProviderProxyTest_0005, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormProviderProxyTest_0005 starts";
+    std::vector<int64_t> formIds;
+    int64_t formId = 1;
+    formIds.emplace_back(formId);
+    Want want;
+    want = want.SetElementName("", "com.example.FormAbility", "MainAbility");
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    int result = formProviderProxy ->NotifyFormsDelete(formIds, want, token);
+    int retcode = 2293767;
+    EXPECT_EQ(result, retcode);
+    GTEST_LOG_(INFO) << "FormProviderProxyTest_0005 test ends";
+}
+
+/**
+ * @tc.name: FormProviderProxyTest_0006
+ * @tc.desc: text NotifyFormsDelete function.
+ * @tc.type: FUNC
+ * @tc.require: issueI639Z3
+ */
+HWTEST_F(FormMgrProxyTest, FormProviderProxyTest_0006, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormProviderProxyTest_0006 starts";
+    std::vector<int64_t> formIds;
+    int64_t formId = 1;
+    formIds.emplace_back(formId);
+    Want want;
+    want = want.SetElementName("", "com.example.FormAbility", "MainAbility");
+    int result = formProviderProxy ->NotifyFormsDelete(formIds, want, nullptr);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+    GTEST_LOG_(INFO) << "FormProviderProxyTest_0006 test ends";
+}
+
+/**
+ * @tc.name: FormProviderProxyTest_0007
+ * @tc.desc: text NotifyFormUpdate function.
+ * @tc.type: FUNC
+ * @tc.require: issueI639Z3
+ */
+HWTEST_F(FormMgrProxyTest, FormProviderProxyTest_0007, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormProviderProxyTest_0007 starts";
+    int64_t formId = 1;
+    Want want;
+    want = want.SetElementName("", "com.example.FormAbility", "MainAbility");
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    int result = formProviderProxy ->NotifyFormUpdate(formId, want, token);
+    int retcode = 2293767;
+    EXPECT_EQ(result, retcode);
+    GTEST_LOG_(INFO) << "FormProviderProxyTest_0007 test ends";
+}
+
+/**
+ * @tc.name: FormProviderProxyTest_0008
+ * @tc.desc: text NotifyFormUpdate function.
+ * @tc.type: FUNC
+ * @tc.require: issueI639Z3
+ */
+HWTEST_F(FormMgrProxyTest, FormProviderProxyTest_0008, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormProviderProxyTest_0008 starts";
+    int64_t formId = 1;
+    Want want;
+    want = want.SetElementName("", "com.example.FormAbility", "MainAbility");
+    int result = formProviderProxy ->NotifyFormUpdate(formId, want, nullptr);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+    GTEST_LOG_(INFO) << "FormProviderProxyTest_0008 test ends";
+}
+
+/**
+ * @tc.name: FormProviderProxyTest_0009
+ * @tc.desc: text EventNotify function.
+ * @tc.type: FUNC
+ * @tc.require: issueI639Z3
+ */
+HWTEST_F(FormMgrProxyTest, FormProviderProxyTest_0009, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormProviderProxyTest_0009 starts";
+    std::vector<int64_t> formIds;
+    int64_t formId = 1;
+    formIds.emplace_back(formId);
+    int32_t formVisibleType = 2;
+    Want want;
+    want = want.SetElementName("", "com.example.FormAbility", "MainAbility");
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    int result = formProviderProxy ->EventNotify(formIds, formVisibleType, want, token);
+    int retcode = 2293767;
+    EXPECT_EQ(result, retcode);
+    GTEST_LOG_(INFO) << "FormProviderProxyTest_0009 test ends";
+}
+
+/**
+ * @tc.name: FormProviderProxyTest_0010
+ * @tc.desc: text EventNotify function.
+ * @tc.type: FUNC
+ * @tc.require: issueI639Z3
+ */
+HWTEST_F(FormMgrProxyTest, FormProviderProxyTest_0010, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormProviderProxyTest_0010 starts";
+    std::vector<int64_t> formIds;
+    int64_t formId = 1;
+    formIds.emplace_back(formId);
+    int32_t formVisibleType = 2;
+    Want want;
+    want = want.SetElementName("", "com.example.FormAbility", "MainAbility");
+    int result = formProviderProxy ->EventNotify(formIds, formVisibleType, want, nullptr);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+    GTEST_LOG_(INFO) << "FormProviderProxyTest_0010 test ends";
+}
+
+/**
+ * @tc.name: FormProviderProxyTest_0011
+ * @tc.desc: text NotifyFormCastTempForm function.
+ * @tc.type: FUNC
+ * @tc.require: issueI639Z3
+ */
+HWTEST_F(FormMgrProxyTest, FormProviderProxyTest_0011, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormProviderProxyTest_0011 starts";
+    int64_t formId = 1;
+    Want want;
+    want = want.SetElementName("", "com.example.FormAbility", "MainAbility");
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    int result = formProviderProxy ->NotifyFormCastTempForm(formId, want, token);
+    int retcode = 2293767;
+    EXPECT_EQ(result, retcode);
+    GTEST_LOG_(INFO) << "FormProviderProxyTest_0011 test ends";
+}
+
+/**
+ * @tc.name: FormProviderProxyTest_0012
+ * @tc.desc: text NotifyFormCastTempForm function.
+ * @tc.type: FUNC
+ * @tc.require: issueI639Z3
+ */
+HWTEST_F(FormMgrProxyTest, FormProviderProxyTest_0012, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormProviderProxyTest_0012 starts";
+    int64_t formId = 1;
+    Want want;
+    want = want.SetElementName("", "com.example.FormAbility", "MainAbility");
+    int result = formProviderProxy ->NotifyFormCastTempForm(formId, want, nullptr);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+    GTEST_LOG_(INFO) << "FormProviderProxyTest_0012 test ends";
+}
+
+/**
+ * @tc.name: FormProviderProxyTest_0013
+ * @tc.desc: text FireFormEvent function.
+ * @tc.type: FUNC
+ * @tc.require: issueI639Z3
+ */
+HWTEST_F(FormMgrProxyTest, FormProviderProxyTest_0013, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormProviderProxyTest_0013 starts";
+    int64_t formId = 1;
+    std::string message = "this is message";
+    Want want;
+    want = want.SetElementName("", "com.example.FormAbility", "MainAbility");
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    int result = formProviderProxy ->FireFormEvent(formId, message, want, token);
+    int retcode = 2293767;
+    EXPECT_EQ(result, retcode);
+    GTEST_LOG_(INFO) << "FormProviderProxyTest_0013 test ends";
+}
+
+/**
+ * @tc.name: FormProviderProxyTest_0014
+ * @tc.desc: text FireFormEvent function.
+ * @tc.type: FUNC
+ * @tc.require: issueI639Z3
+ */
+HWTEST_F(FormMgrProxyTest, FormProviderProxyTest_0014, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormProviderProxyTest_0014 starts";
+    int64_t formId = 1;
+    std::string message = "this is message";
+    Want want;
+    want = want.SetElementName("", "com.example.FormAbility", "MainAbility");
+    int result = formProviderProxy ->FireFormEvent(formId, message, want, nullptr);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+    GTEST_LOG_(INFO) << "FormProviderProxyTest_0014 test ends";
+}
+
+/**
+ * @tc.name: FormProviderProxyTest_0015
+ * @tc.desc: text AcquireState function.
+ * @tc.type: FUNC
+ * @tc.require: issueI639Z3
+ */
+HWTEST_F(FormMgrProxyTest, FormProviderProxyTest_0015, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormProviderProxyTest_0015 starts";
+    Want wantArg;
+    std::string provider = "this is provider";
+    Want want;
+    want = want.SetElementName("", "com.example.FormAbility", "MainAbility");
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    int result = formProviderProxy ->AcquireState(wantArg, provider, want, token);
+    int retcode = 2293767;
+    EXPECT_EQ(result, retcode);
+    GTEST_LOG_(INFO) << "FormProviderProxyTest_0015 test ends";
+}
+
+/**
+ * @tc.name: FormProviderProxyTest_0016
+ * @tc.desc: text AcquireState function.
+ * @tc.type: FUNC
+ * @tc.require: issueI639Z3
+ */
+HWTEST_F(FormMgrProxyTest, FormProviderProxyTest_0016, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormProviderProxyTest_0016 starts";
+    Want wantArg;
+    std::string provider = "this is provider";
+    Want want;
+    want = want.SetElementName("", "com.example.FormAbility", "MainAbility");
+    int result = formProviderProxy ->AcquireState(wantArg, provider, want, nullptr);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+    GTEST_LOG_(INFO) << "FormProviderProxyTest_0016 test ends";
+}
+
+/**
+ * @tc.name: FormProviderProxyTest_0017
+ * @tc.desc: text AcquireShareFormData function.
+ * @tc.type: FUNC
+ * @tc.require: issueI639Z3
+ */
+HWTEST_F(FormMgrProxyTest, FormProviderProxyTest_0017, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormProviderProxyTest_0017 starts";
+    int64_t formId = 2;
+    std::string remoteDeviceId = "this is remoteDeviceId";
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    int64_t requestCode = 1;
+    int result = formProviderProxy ->AcquireShareFormData(formId, remoteDeviceId, token, requestCode);
+    int retcode = 2293767;
+    EXPECT_EQ(result, retcode);
+    GTEST_LOG_(INFO) << "FormProviderProxyTest_0017 test ends";
+}
+
+/**
+ * @tc.name: FormProviderProxyTest_0018
+ * @tc.desc: text AcquireShareFormData function.
+ * @tc.type: FUNC
+ * @tc.require: issueI639Z3
+ */
+HWTEST_F(FormMgrProxyTest, FormProviderProxyTest_0018, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormProviderProxyTest_0018 starts";
+    int64_t formId = 2;
+    std::string remoteDeviceId = "this is remoteDeviceId";
+    int64_t requestCode = 1;
+    int result = formProviderProxy ->AcquireShareFormData(formId, remoteDeviceId, nullptr, requestCode);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+    GTEST_LOG_(INFO) << "FormProviderProxyTest_0018 test ends";
 }
 }
