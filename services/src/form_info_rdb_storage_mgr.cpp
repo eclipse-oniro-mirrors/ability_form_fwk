@@ -116,14 +116,8 @@ ErrCode FormInfoRdbStorageMgr::UpdateBundleFormInfos(const std::string &bundleNa
     std::string key = std::string().append(FORM_INFO_PREFIX).append(bundleName);
     ErrCode result;
     std::lock_guard<std::mutex> lock(rdbStorePtrMutex_);
-    result = rdbDataManager_->DeleteData(key);
-    if (result != ERR_OK) {
-        HILOG_ERROR("update formInfoStorages to rdbStore error");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
-
     std::string value = formInfoStorages;
-    result = rdbDataManager_->InsertData(key, value);
+    result = rdbDataManager_->UpdateData(key, value);
     if (result != ERR_OK) {
         HILOG_ERROR("update formInfoStorages to rdbStore error");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -152,22 +146,9 @@ void FormInfoRdbStorageMgr::SaveEntries(
     for (const auto &item : value) {
         InnerFormInfo innerFormInfo;
         nlohmann::json jsonObject = nlohmann::json::parse(item.second, nullptr, false);
-        if (jsonObject.is_discarded()) {
+        if (jsonObject.is_discarded() || innerFormInfo.FromJson(jsonObject) != true) {
             HILOG_ERROR("error key: %{private}s", item.first.c_str());
             // it's an bad json, delete it
-            {
-                std::lock_guard<std::mutex> lock(rdbStorePtrMutex_);
-                if (!CheckRdbStore()) {
-                    HILOG_ERROR("RdbStore is nullptr");
-                    return;
-                }
-                rdbDataManager_->DeleteData(item.first);
-            }
-            continue;
-        }
-        if (innerFormInfo.FromJson(jsonObject) != true) {
-            HILOG_ERROR("error key: %{private}s", item.first.c_str());
-            // it's an error value, delete it
             {
                 std::lock_guard<std::mutex> lock(rdbStorePtrMutex_);
                 if (!CheckRdbStore()) {

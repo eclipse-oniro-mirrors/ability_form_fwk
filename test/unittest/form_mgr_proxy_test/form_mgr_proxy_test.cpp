@@ -21,6 +21,7 @@
 #include "mock_form_mgr_service.h"
 #include "mock_form_token.h"
 #include "form_provider_proxy.h"
+#include "form_mgr_errors.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -285,8 +286,7 @@ HWTEST_F(FormMgrProxyTest, FormProviderProxyTest_0001, TestSize.Level1) {
     want = want.SetElementName("", "com.example.FormAbility", "MainAbility");
     sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
     int result = formProviderProxy ->AcquireProviderFormInfo(formJsInfo, want, token);
-    int retcode = 2293767;
-    EXPECT_EQ(result, retcode);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
     GTEST_LOG_(INFO) << "FormProviderProxyTest_0001 test ends";
 }
 
@@ -319,8 +319,7 @@ HWTEST_F(FormMgrProxyTest, FormProviderProxyTest_0003, TestSize.Level1) {
     want = want.SetElementName("", "com.example.FormAbility", "MainAbility");
     sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
     int result = formProviderProxy ->NotifyFormDelete(formId, want, token);
-    int retcode = 2293767;
-    EXPECT_EQ(result, retcode);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
     GTEST_LOG_(INFO) << "FormProviderProxyTest_0003 test ends";
 }
 
@@ -355,8 +354,7 @@ HWTEST_F(FormMgrProxyTest, FormProviderProxyTest_0005, TestSize.Level1) {
     want = want.SetElementName("", "com.example.FormAbility", "MainAbility");
     sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
     int result = formProviderProxy ->NotifyFormsDelete(formIds, want, token);
-    int retcode = 2293767;
-    EXPECT_EQ(result, retcode);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
     GTEST_LOG_(INFO) << "FormProviderProxyTest_0005 test ends";
 }
 
@@ -391,8 +389,7 @@ HWTEST_F(FormMgrProxyTest, FormProviderProxyTest_0007, TestSize.Level1) {
     want = want.SetElementName("", "com.example.FormAbility", "MainAbility");
     sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
     int result = formProviderProxy ->NotifyFormUpdate(formId, want, token);
-    int retcode = 2293767;
-    EXPECT_EQ(result, retcode);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
     GTEST_LOG_(INFO) << "FormProviderProxyTest_0007 test ends";
 }
 
@@ -428,8 +425,7 @@ HWTEST_F(FormMgrProxyTest, FormProviderProxyTest_0009, TestSize.Level1) {
     want = want.SetElementName("", "com.example.FormAbility", "MainAbility");
     sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
     int result = formProviderProxy ->EventNotify(formIds, formVisibleType, want, token);
-    int retcode = 2293767;
-    EXPECT_EQ(result, retcode);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
     GTEST_LOG_(INFO) << "FormProviderProxyTest_0009 test ends";
 }
 
@@ -465,8 +461,7 @@ HWTEST_F(FormMgrProxyTest, FormProviderProxyTest_0011, TestSize.Level1) {
     want = want.SetElementName("", "com.example.FormAbility", "MainAbility");
     sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
     int result = formProviderProxy ->NotifyFormCastTempForm(formId, want, token);
-    int retcode = 2293767;
-    EXPECT_EQ(result, retcode);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
     GTEST_LOG_(INFO) << "FormProviderProxyTest_0011 test ends";
 }
 
@@ -500,8 +495,7 @@ HWTEST_F(FormMgrProxyTest, FormProviderProxyTest_0013, TestSize.Level1) {
     want = want.SetElementName("", "com.example.FormAbility", "MainAbility");
     sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
     int result = formProviderProxy ->FireFormEvent(formId, message, want, token);
-    int retcode = 2293767;
-    EXPECT_EQ(result, retcode);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
     GTEST_LOG_(INFO) << "FormProviderProxyTest_0013 test ends";
 }
 
@@ -536,8 +530,7 @@ HWTEST_F(FormMgrProxyTest, FormProviderProxyTest_0015, TestSize.Level1) {
     want = want.SetElementName("", "com.example.FormAbility", "MainAbility");
     sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
     int result = formProviderProxy ->AcquireState(wantArg, provider, want, token);
-    int retcode = 2293767;
-    EXPECT_EQ(result, retcode);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
     GTEST_LOG_(INFO) << "FormProviderProxyTest_0015 test ends";
 }
 
@@ -571,8 +564,7 @@ HWTEST_F(FormMgrProxyTest, FormProviderProxyTest_0017, TestSize.Level1) {
     sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
     int64_t requestCode = 1;
     int result = formProviderProxy ->AcquireShareFormData(formId, remoteDeviceId, token, requestCode);
-    int retcode = 2293767;
-    EXPECT_EQ(result, retcode);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
     GTEST_LOG_(INFO) << "FormProviderProxyTest_0017 test ends";
 }
 
