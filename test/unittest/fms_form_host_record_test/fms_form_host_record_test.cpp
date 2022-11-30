@@ -24,8 +24,9 @@
 #include "form_host_interface.h"
 #define private public
 #include "form_mgr.h"
-#undef private
+#include "form_mgr_errors.h"
 #include "form_mgr_service.h"
+#undef private
 #include "if_system_ability_manager.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
@@ -33,6 +34,7 @@
 #include "mock_ability_manager.h"
 #include "mock_bundle_manager.h"
 #include "mock_form_host_client.h"
+#include "mock_form_provider_client.h"
 #include "running_process_info.h"
 #include "system_ability_definition.h"
 
@@ -48,6 +50,8 @@ const std::string FORM_PROVIDER_BUNDLE_NAME = "com.form.provider.service";
 const std::string PARAM_PROVIDER_MODULE_NAME = "com.form.provider.app.test.ability";
 const std::string FORM_PROVIDER_ABILITY_NAME = "com.form.provider.app.test.ability";
 const std::string PARAM_FORM_NAME = "com.form.name.test";
+
+const std::string NAME_FORM_MGR_SERVICE = "FormMgrService";
 
 const std::string FORM_JS_COMPONENT_NAME = "jsComponentName";
 const std::string FORM_PROVIDER_MODULE_SOURCE_DIR = "";
@@ -304,5 +308,519 @@ HWTEST_F(FmsFormHostRecordTest, FormDbCache_011, TestSize.Level0)
     ExtensionAbilityInfo extensionAbilityInfo;
     EXPECT_EQ(false, formBmsHelper.GetAbilityInfoByAction(action, userId, abilityInfo, extensionAbilityInfo));
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_011 end";
+}
+
+/**
+ * @tc.name: FormMgrService_0001
+ * @tc.desc: test IsReady function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0001 start";
+    FormMgrService formMgrService;
+    formMgrService.state_ = ServiceRunningState::STATE_NOT_START;
+    EXPECT_EQ(false, formMgrService.IsReady());
+    GTEST_LOG_(INFO) << "FormMgrService_0001 end";
+}
+
+/**
+ * @tc.name: FormMgrService_0002
+ * @tc.desc: test IsReady function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_0002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0002 start";
+    FormMgrService formMgrService;
+    formMgrService.state_ = ServiceRunningState::STATE_RUNNING;
+    formMgrService.handler_ = nullptr;
+    EXPECT_EQ(false, formMgrService.IsReady());
+    GTEST_LOG_(INFO) << "FormMgrService_0002 end";
+}
+
+/**
+ * @tc.name: FormMgrService_0003
+ * @tc.desc: test IsReady function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_0003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0003 start";
+    FormMgrService formMgrService;
+    formMgrService.state_ = ServiceRunningState::STATE_RUNNING;
+    formMgrService.runner_ = EventRunner::Create(NAME_FORM_MGR_SERVICE);
+    formMgrService.handler_ = std::make_shared<FormEventHandler>(formMgrService.runner_);
+    EXPECT_EQ(true, formMgrService.IsReady());
+    GTEST_LOG_(INFO) << "FormMgrService_0003 end";
+}
+
+/**
+ * @tc.name: FormMgrService_0004
+ * @tc.desc: test LifecycleUpdate function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_0004, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0004 start";
+    FormMgrService formMgrService;
+    std::vector<int64_t> formIds;
+    sptr<IRemoteObject> callerToken = nullptr;
+    bool updateType = false;
+    EXPECT_EQ(
+        ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, formMgrService.LifecycleUpdate(formIds, callerToken, updateType));
+    GTEST_LOG_(INFO) << "FormMgrService_0004 end";
+}
+
+/**
+ * @tc.name: FormMgrService_0005
+ * @tc.desc: test AddForm function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_0005, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0005 start";
+    FormMgrService formMgrService;
+    int64_t formId = 1;
+    Want want;
+    sptr<IRemoteObject> callerToken = nullptr;
+    FormJsInfo formInfo;
+    EXPECT_EQ(
+        ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, formMgrService.AddForm(formId, want, callerToken, formInfo));
+    GTEST_LOG_(INFO) << "FormMgrService_0005 end";
+}
+
+/**
+ * @tc.name: FormMgrService_0006
+ * @tc.desc: test DeleteForm function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_0006, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0006 start";
+    FormMgrService formMgrService;
+    int64_t formId = 1;
+    sptr<IRemoteObject> callerToken = nullptr;
+    EXPECT_EQ(
+        ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, formMgrService.DeleteForm(formId, callerToken));
+    GTEST_LOG_(INFO) << "FormMgrService_0006 end";
+}
+
+/**
+ * @tc.name: FormMgrService_0007
+ * @tc.desc: test ReleaseForm function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_0007, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0007 start";
+    FormMgrService formMgrService;
+    int64_t formId = 1;
+    sptr<IRemoteObject> callerToken = nullptr;
+    bool delCache = false;
+    EXPECT_EQ(
+        ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, formMgrService.ReleaseForm(formId, callerToken, delCache));
+    GTEST_LOG_(INFO) << "FormMgrService_0007 end";
+}
+
+/**
+ * @tc.name: FormMgrService_0009
+ * @tc.desc: test RequestForm function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_0009, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0009 start";
+    FormMgrService formMgrService;
+    int64_t formId = 1;
+    sptr<IRemoteObject> callerToken = nullptr;
+    Want want;
+    EXPECT_EQ(
+        ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, formMgrService.RequestForm(formId, callerToken, want));
+    GTEST_LOG_(INFO) << "FormMgrService_0009 end";
+}
+
+/**
+ * @tc.name: FormMgrService_0010
+ * @tc.desc: test NotifyWhetherVisibleForms function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_0010, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0010 start";
+    FormMgrService formMgrService;
+    std::vector<int64_t> formIds;
+    sptr<IRemoteObject> callerToken = nullptr;
+    int32_t formVisibleType = 1;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS,
+        formMgrService.NotifyWhetherVisibleForms(formIds, callerToken, formVisibleType));
+    GTEST_LOG_(INFO) << "FormMgrService_0010 end";
+}
+
+/**
+ * @tc.name: FormMgrService_0011
+ * @tc.desc: test CastTempForm function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_0011, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0011 start";
+    FormMgrService formMgrService;
+    int64_t formId = 1;
+    sptr<IRemoteObject> callerToken = nullptr;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS,
+        formMgrService.CastTempForm(formId, callerToken));
+    GTEST_LOG_(INFO) << "FormMgrService_0011 end";
+}
+
+/**
+ * @tc.name: FormMgrService_0012
+ * @tc.desc: test MessageEvent function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_0012, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0012 start";
+    FormMgrService formMgrService;
+    int64_t formId = 1;
+    Want want;
+    sptr<IRemoteObject> callerToken = nullptr;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS,
+        formMgrService.MessageEvent(formId, want, callerToken));
+    GTEST_LOG_(INFO) << "FormMgrService_0012 end";
+}
+
+/**
+ * @tc.name: FormMgrService_0013
+ * @tc.desc: test RouterEvent function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_0013, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0013 start";
+    FormMgrService formMgrService;
+    int64_t formId = 1;
+    Want want;
+    sptr<IRemoteObject> callerToken = nullptr;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS,
+        formMgrService.RouterEvent(formId, want, callerToken));
+    GTEST_LOG_(INFO) << "FormMgrService_0013 end";
+}
+
+/**
+ * @tc.name: FormMgrService_0014
+ * @tc.desc: test OnStart function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_0014, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0014 start";
+    FormMgrService formMgrService;
+    formMgrService.state_ = ServiceRunningState::STATE_RUNNING;
+    formMgrService.OnStart();
+    GTEST_LOG_(INFO) << "FormMgrService_0014 end";
+}
+
+/**
+ * @tc.name: FormMgrService_0015
+ * @tc.desc: test OnStop function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_0015, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0015 start";
+    FormMgrService formMgrService;
+    formMgrService.handler_ = nullptr;
+    formMgrService.runner_ = nullptr;
+    formMgrService.OnStop();
+    GTEST_LOG_(INFO) << "FormMgrService_0015 end";
+}
+
+/**
+ * @tc.name: FormMgrService_0016
+ * @tc.desc: test Init function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_0016, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0016 start";
+    FormMgrService formMgrService;
+    EXPECT_EQ(ERR_INVALID_OPERATION, formMgrService.Init());
+    GTEST_LOG_(INFO) << "FormMgrService_0016 end";
+}
+
+/**
+ * @tc.name: FormMgrService_0017
+ * @tc.desc: test DeleteInvalidForms function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_0017, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0017 start";
+    FormMgrService formMgrService;
+    std::vector<int64_t> formIds;
+    sptr<IRemoteObject> callerToken = nullptr;
+    int32_t numFormsDeleted = 1;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS,
+        formMgrService.DeleteInvalidForms(formIds, callerToken, numFormsDeleted));
+    GTEST_LOG_(INFO) << "FormMgrService_0017 end";
+}
+
+/**
+ * @tc.name: FormMgrService_0018
+ * @tc.desc: test AcquireFormState function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_0018, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0018 start";
+    FormMgrService formMgrService;
+    Want want;
+    sptr<IRemoteObject> callerToken = nullptr;
+    FormStateInfo stateInfo;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS,
+        formMgrService.AcquireFormState(want, callerToken, stateInfo));
+    GTEST_LOG_(INFO) << "FormMgrService_0018 end";
+}
+
+/**
+ * @tc.name: FormMgrService_0019
+ * @tc.desc: test NotifyFormsVisible function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_0019, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0019 start";
+    FormMgrService formMgrService;
+    std::vector<int64_t> formIds;
+    bool isVisible = false;
+    sptr<IRemoteObject> callerToken = nullptr;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS,
+        formMgrService.NotifyFormsVisible(formIds, isVisible, callerToken));
+    GTEST_LOG_(INFO) << "FormMgrService_0019 end";
+}
+
+/**
+ * @tc.name: FormMgrService_0020
+ * @tc.desc: test NotifyFormsPrivacyProtected function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_0020, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0020 start";
+    FormMgrService formMgrService;
+    std::vector<int64_t> formIds;
+    bool isProtected = false;
+    sptr<IRemoteObject> callerToken = nullptr;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS,
+        formMgrService.NotifyFormsPrivacyProtected(formIds, isProtected, callerToken));
+    GTEST_LOG_(INFO) << "FormMgrService_0020 end";
+}
+
+/**
+ * @tc.name: FormMgrService_0021
+ * @tc.desc: test NotifyFormsEnableUpdate function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_0021, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0021 start";
+    FormMgrService formMgrService;
+    std::vector<int64_t> formIds;
+    bool isEnableUpdate = false;
+    sptr<IRemoteObject> callerToken = nullptr;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS,
+        formMgrService.NotifyFormsEnableUpdate(formIds, isEnableUpdate, callerToken));
+    GTEST_LOG_(INFO) << "FormMgrService_0021 end";
+}
+
+/**
+ * @tc.name: FormMgrService_0022
+ * @tc.desc: test GetFormsInfo function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_0022, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0022 start";
+    FormMgrService formMgrService;
+    FormInfoFilter filter;
+    std::vector<FormInfo> formInfos;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, formMgrService.GetFormsInfo(filter, formInfos));
+    GTEST_LOG_(INFO) << "FormMgrService_0022 end";
+}
+
+/**
+ * @tc.name: FormMgrService_0023
+ * @tc.desc: test GetFormsInfo function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_0023, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0023 start";
+    FormMgrService formMgrService;
+    FormInfoFilter filter;
+    filter.moduleName = "aa";
+    std::vector<FormInfo> formInfos;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, formMgrService.GetFormsInfo(filter, formInfos));
+    GTEST_LOG_(INFO) << "FormMgrService_0023 end";
+}
+
+/**
+ * @tc.name: FormMgrService_0024
+ * @tc.desc: test IsRequestPublishFormSupported function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_0024, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0024 start";
+    FormMgrService formMgrService;
+    EXPECT_EQ(false, formMgrService.IsRequestPublishFormSupported());
+    GTEST_LOG_(INFO) << "FormMgrService_0024 end";
+}
+
+/**
+ * @tc.name: FormMgrService_0025
+ * @tc.desc: test StartAbility function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_0025, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0025 start";
+    FormMgrService formMgrService;
+    Want want;
+    sptr<IRemoteObject> callerToken = nullptr;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY, formMgrService.StartAbility(want, callerToken));
+    GTEST_LOG_(INFO) << "FormMgrService_0025 end";
+}
+
+/**
+ * @tc.name: FormMgrService_0026
+ * @tc.desc: test ShareForm function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_0026, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0026 start";
+    FormMgrService formMgrService;
+    int64_t formId = 0;
+    std::string deviceId = "aa";
+    sptr<IRemoteObject> callerToken = nullptr;
+    int64_t requestCode = 1;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrService.ShareForm(formId, deviceId, callerToken, requestCode));
+    GTEST_LOG_(INFO) << "FormMgrService_0026 end";
+}
+
+/**
+ * @tc.name: FormMgrService_0027
+ * @tc.desc: test ShareForm function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_0027, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0027 start";
+    FormMgrService formMgrService;
+    int64_t formId = 2;
+    std::string deviceId = "";
+    sptr<IRemoteObject> callerToken = nullptr;
+    int64_t requestCode = 1;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrService.ShareForm(formId, deviceId, callerToken, requestCode));
+    GTEST_LOG_(INFO) << "FormMgrService_0027 end";
+}
+
+/**
+ * @tc.name: FormMgrService_0028
+ * @tc.desc: test ShareForm function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_0028, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0028 start";
+    FormMgrService formMgrService;
+    int64_t formId = 2;
+    std::string deviceId = "aa";
+    sptr<IRemoteObject> callerToken = nullptr;
+    int64_t requestCode = 1;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrService.ShareForm(formId, deviceId, callerToken, requestCode));
+    GTEST_LOG_(INFO) << "FormMgrService_0028 end";
+}
+
+/**
+ * @tc.name: FormMgrService_0029
+ * @tc.desc: test ShareForm function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_0029, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0029 start";
+    FormMgrService formMgrService;
+    int64_t formId = 2;
+    std::string deviceId = "aa";
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    int64_t requestCode = 0;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrService.ShareForm(formId, deviceId, callerToken, requestCode));
+    GTEST_LOG_(INFO) << "FormMgrService_0029 end";
+}
+
+/**
+ * @tc.name: FormMgrService_0030
+ * @tc.desc: test ShareForm function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_0030, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0030 start";
+    FormMgrService formMgrService;
+    int64_t formId = 2;
+    std::string deviceId = "aa";
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    int64_t requestCode = 2;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS,
+        formMgrService.ShareForm(formId, deviceId, callerToken, requestCode));
+    GTEST_LOG_(INFO) << "FormMgrService_0030 end";
+}
+
+/**
+ * @tc.name: FormMgrService_0031
+ * @tc.desc: test Dump function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_0031, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0031 start";
+    FormMgrService formMgrService;
+    int fd = 1;
+    std::vector<std::u16string> args;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrService.Dump(fd, args));
+    GTEST_LOG_(INFO) << "FormMgrService_0031 end";
+}
+
+/**
+ * @tc.name: FormMgrService_0032
+ * @tc.desc: test HiDumpFormInfoByBundleName function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_0032, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0032 start";
+    FormMgrService formMgrService;
+    std::string args = "aa";
+    std::string result = "bb";
+    formMgrService.HiDumpFormInfoByBundleName(args, result);
+    GTEST_LOG_(INFO) << "FormMgrService_0032 end";
+}
+
+/**
+ * @tc.name: FormMgrService_0033
+ * @tc.desc: test HiDumpFormInfoByFormId function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_0033, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0033 start";
+    FormMgrService formMgrService;
+    std::string args = "aa";
+    std::string result = "bb";
+    formMgrService.HiDumpFormInfoByFormId(args, result);
+    GTEST_LOG_(INFO) << "FormMgrService_0033 end";
 }
 }
