@@ -1076,4 +1076,20 @@ HWTEST_F(FormMgrTest, FormMgrTest_0052, TestSize.Level1) {
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR);
     GTEST_LOG_(INFO) << "FormMgrTest_0052 test ends";
 }
+
+/**
+ * @tc.name: FormMgrTest_0053
+ * @tc.desc: Verify GetErrorMessage
+ * @tc.type: FUNC
+ * @tc.require: issueI63Y7Y
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0053, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0053 starts";
+    FormErrors::GetInstance().InitErrorMessageMap();
+    int errCode = ERR_APPEXECFWK_FORM_COMMON_CODE;
+    auto result = FormMgr::GetInstance().GetErrorMessage(errCode);
+
+    EXPECT_EQ(result, "some internal server error occurs.");
+    GTEST_LOG_(INFO) << "FormMgrTest_0053 test ends";
+}
 } // namespace
