@@ -227,7 +227,7 @@ ErrCode FormRdbDataMgr::QueryAllData(std::map<std::string, std::string> &datas)
     HILOG_INFO("QueryAllData start");
     if (rdbStore_ == nullptr) {
         HILOG_ERROR("FormInfoRdbStore is null");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+        return ERR_OK;
     }
 
     NativeRdb::AbsRdbPredicates absRdbPredicates(formRdbConfig_.tableName);
@@ -246,13 +246,13 @@ ErrCode FormRdbDataMgr::QueryAllData(std::map<std::string, std::string> &datas)
         std::string key;
         if (absSharedResultSet->GetString(FORM_KEY_INDEX, key) != NativeRdb::E_OK) {
             HILOG_INFO("GetString key failed");
-            return false;
+            return ERR_APPEXECFWK_FORM_COMMON_CODE;
         }
 
         std::string value;
         if (absSharedResultSet->GetString(FORM_VALUE_INDEX, value) != NativeRdb::E_OK) {
             HILOG_INFO("GetString value failed");
-            return false;
+            return ERR_APPEXECFWK_FORM_COMMON_CODE;
         }
 
         datas.emplace(key, value);
