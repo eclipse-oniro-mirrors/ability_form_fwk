@@ -15,6 +15,7 @@
 
 #include <gtest/gtest.h>
 #include "form_host_client.h"
+#include "mock_form_token.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -132,5 +133,75 @@ HWTEST_F(FmsFormHostClientTest, AddFormState_0300, TestSize.Level0)
     FormState state = formStateCallback->GetFormState();
     EXPECT_EQ(state, FormState::UNKNOWN);
     GTEST_LOG_(INFO) << "FmsFormHostClientTest AddFormState_0300 end";
+}
+
+/**
+ * @tc.name: RegisterUninstallCallback_0100
+ * @tc.desc: test RegisterUninstallCallback function.
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FmsFormHostClientTest, RegisterUninstallCallback_0100, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest RegisterUninstallCallback_0100 start";
+    sptr<FormHostClient> formHostClient = FormHostClient::GetInstance();
+    FormHostClient::UninstallCallback callback = nullptr;
+    bool result = formHostClient->RegisterUninstallCallback(callback);
+    EXPECT_EQ(result, true);
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest RegisterUninstallCallback_0100 end";
+}
+
+/**
+ * @tc.name: OnAcquired_0100
+ * @tc.desc: test OnAcquired function.
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FmsFormHostClientTest, OnAcquired_0100, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest OnAcquired_0100 start";
+    sptr<FormHostClient> formHostClient = FormHostClient::GetInstance();
+    FormJsInfo formJsInfo;
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    formHostClient->OnAcquired(formJsInfo, token);
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest OnAcquired_0100 end";
+}
+
+/**
+ * @tc.name: OnUninstall_0100
+ * @tc.desc: test OnUninstall function.
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FmsFormHostClientTest, OnUninstall_0100, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest OnUninstall_0100 start";
+    sptr<FormHostClient> formHostClient = FormHostClient::GetInstance();
+    std::vector<int64_t> formIds;
+    formHostClient->OnUninstall(formIds);
+    int64_t formId = -1;
+    formIds.emplace_back(formId);
+    formHostClient->OnUninstall(formIds);
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest OnUninstall_0100 end";
+}
+
+/**
+ * @tc.name: AddShareFormCallback_0100
+ * @tc.desc: test AddShareFormCallback function.
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FmsFormHostClientTest, AddShareFormCallback_0100, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest AddShareFormCallback_0100 start";
+    std::shared_ptr<ShareFormCallBack> shareFormCallback = nullptr;
+    int64_t requestCode = 1;
+    sptr<FormHostClient> formHostClient = FormHostClient::GetInstance();
+    bool result = formHostClient->AddShareFormCallback(shareFormCallback, requestCode);
+    EXPECT_EQ(result, true);
+    int32_t result1 = 2;
+    formHostClient->OnShareFormResponse(requestCode, result1);
+    formHostClient->RemoveShareFormCallback(requestCode);
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest AddShareFormCallback_0100 end";
 }
 }

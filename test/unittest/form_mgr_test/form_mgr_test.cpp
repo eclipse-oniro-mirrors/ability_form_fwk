@@ -26,6 +26,7 @@
 #include "gmock/gmock.h"
 #include "mock_form_mgr_proxy.h"
 #include "mock_form_token.h"
+#include "if_system_ability_manager.h"
 
 
 using namespace testing::ext;
@@ -642,4 +643,437 @@ HWTEST_F(FormMgrTest, FormMgrTest_0027, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0027 test ends";
 }
 
+/**
+ * @tc.name: FormMgrTest_0028
+ * @tc.desc: Verify DeleteForm
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0028, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0028 starts";
+    int64_t formId = 1;
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
+    int result = FormMgr::GetInstance().DeleteForm(formId, token);
+
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR);
+    GTEST_LOG_(INFO) << "FormMgrTest_0028 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0029
+ * @tc.desc: Verify ReleaseForm
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0029, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0029 starts";
+    int64_t formId = 1;
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    bool delCache = true;
+    FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
+    int result = FormMgr::GetInstance().ReleaseForm(formId, token, delCache);
+
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR);
+    GTEST_LOG_(INFO) << "FormMgrTest_0029 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0030
+ * @tc.desc: Verify ReleaseForm
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0030, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0030 starts";
+    int64_t formId = -1;
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    bool delCache = true;
+    FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
+    int result = FormMgr::GetInstance().ReleaseForm(formId, token, delCache);
+
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_FORM_ID);
+    GTEST_LOG_(INFO) << "FormMgrTest_0030 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0031
+ * @tc.desc: Verify UpdateForm
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0031, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0031 starts";
+    int64_t formId = 1;
+    FormProviderData formBindingData;
+    FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
+    int result = FormMgr::GetInstance().UpdateForm(formId, formBindingData);
+
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR);
+    GTEST_LOG_(INFO) << "FormMgrTest_0031 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0032
+ * @tc.desc: Verify UpdateForm
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0032, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0032 starts";
+    int64_t formId = -1;
+    FormProviderData formBindingData;
+    FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
+    int result = FormMgr::GetInstance().UpdateForm(formId, formBindingData);
+
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_FORM_ID);
+    GTEST_LOG_(INFO) << "FormMgrTest_0032 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0033
+ * @tc.desc: Verify UpdateForm
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0033, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0033 starts";
+    int64_t formId = 1;
+    FormProviderData formBindingData;
+    FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
+    int result = FormMgr::GetInstance().UpdateForm(formId, formBindingData);
+
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_PROVIDER_DATA_EMPTY);
+    GTEST_LOG_(INFO) << "FormMgrTest_0033 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0034
+ * @tc.desc: Verify RequestForm
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0034, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0034 starts";
+    int64_t formId = 1;
+    Want want;
+    want = want.SetElementName("", "com.example.FormAbility", "MainAbility");
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
+    int result = FormMgr::GetInstance().RequestForm(formId, token, want);
+
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR);
+    GTEST_LOG_(INFO) << "FormMgrTest_0034 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0035
+ * @tc.desc: Verify RequestForm
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0035, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0035 starts";
+    int64_t formId = -1;
+    Want want;
+    want = want.SetElementName("", "com.example.FormAbility", "MainAbility");
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
+    int result = FormMgr::GetInstance().RequestForm(formId, token, want);
+
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_FORM_ID);
+    GTEST_LOG_(INFO) << "FormMgrTest_0035 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0036
+ * @tc.desc: Verify NotifyWhetherVisibleForms
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0036, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0036 starts";
+    std::vector<int64_t> formIds;
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    int32_t formVisibleType = 1;
+    FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
+    int result = FormMgr::GetInstance().NotifyWhetherVisibleForms(formIds, token, formVisibleType);
+
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_FORM_ID);
+    GTEST_LOG_(INFO) << "FormMgrTest_0036 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0037
+ * @tc.desc: Verify NotifyWhetherVisibleForms
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0037, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0037 starts";
+    std::vector<int64_t> formIds;
+    int64_t formId = 1;
+    formIds.emplace_back(formId);
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    int32_t formVisibleType = 1;
+    FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
+    int result = FormMgr::GetInstance().NotifyWhetherVisibleForms(formIds, token, formVisibleType);
+
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR);
+    GTEST_LOG_(INFO) << "FormMgrTest_0037 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0038
+ * @tc.desc: Verify SetNextRefreshTime
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0038, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0038 starts";
+    int64_t formId = 10;
+    int64_t nextTime = 50;
+    FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
+    int result = FormMgr::GetInstance().SetNextRefreshTime(formId, nextTime);
+
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR);
+    GTEST_LOG_(INFO) << "FormMgrTest_0038 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0039
+ * @tc.desc: Verify LifecycleUpdate
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0039, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0039 starts";
+    std::vector<int64_t> formIds;
+    int64_t formId = 1;
+    formIds.emplace_back(formId);
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    bool updateType = true;
+    FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
+    int result = FormMgr::GetInstance().LifecycleUpdate(formIds, token, updateType);
+
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR);
+    GTEST_LOG_(INFO) << "FormMgrTest_0039 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0040
+ * @tc.desc: Verify RegisterDeathCallback
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0040, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0040 starts";
+    FormMgr::GetInstance().RegisterDeathCallback(nullptr);
+    FormMgr::GetInstance().UnRegisterDeathCallback(nullptr);
+    FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
+    GTEST_LOG_(INFO) << "FormMgrTest_0040 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0041
+ * @tc.desc: Verify DeleteInvalidForms
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0041, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0041 starts";
+    std::vector<int64_t> formIds;
+    int64_t formId = 1;
+    formIds.emplace_back(formId);
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    int32_t numFormsDeleted = 2;
+    FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
+    int result = FormMgr::GetInstance().DeleteInvalidForms(formIds, token, numFormsDeleted);
+
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR);
+    GTEST_LOG_(INFO) << "FormMgrTest_0041 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0042
+ * @tc.desc: Verify AcquireFormState
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0042, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0042 starts";
+    Want want;
+    want = want.SetElementName("", "com.example.FormAbility", "MainAbility");
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    FormStateInfo stateInfo;
+    FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
+    int result = FormMgr::GetInstance().AcquireFormState(want, token, stateInfo);
+
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR);
+    GTEST_LOG_(INFO) << "FormMgrTest_0042 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0043
+ * @tc.desc: Verify NotifyFormsVisible
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0043, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0043 starts";
+    std::vector<int64_t> formIds;
+    int64_t formId = 1;
+    formIds.emplace_back(formId);
+    bool isVisible = true;
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
+    int result = FormMgr::GetInstance().NotifyFormsVisible(formIds, isVisible, token);
+
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR);
+    GTEST_LOG_(INFO) << "FormMgrTest_0043 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0044
+ * @tc.desc: Verify NotifyFormsPrivacyProtected
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0044, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0044 starts";
+    std::vector<int64_t> formIds;
+    int64_t formId = 1;
+    formIds.emplace_back(formId);
+    bool isProtected = true;
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
+    int result = FormMgr::GetInstance().NotifyFormsPrivacyProtected(formIds, isProtected, token);
+
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR);
+    GTEST_LOG_(INFO) << "FormMgrTest_0044 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0045
+ * @tc.desc: Verify NotifyFormsEnableUpdate
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0045, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0045 starts";
+    std::vector<int64_t> formIds;
+    int64_t formId = 1;
+    formIds.emplace_back(formId);
+    bool isEnableUpdate = true;
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
+    int result = FormMgr::GetInstance().NotifyFormsEnableUpdate(formIds, isEnableUpdate, token);
+
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR);
+    GTEST_LOG_(INFO) << "FormMgrTest_0045 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0046
+ * @tc.desc: Verify GetAllFormsInfo
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0046, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0046 starts";
+    std::vector<FormInfo> formInfos;
+    FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
+    int result = FormMgr::GetInstance().GetAllFormsInfo(formInfos);
+
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR);
+    GTEST_LOG_(INFO) << "FormMgrTest_0046 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0047
+ * @tc.desc: Verify GetFormsInfoByApp
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0047, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0047 starts";
+    std::string bundleName = "this is bundleName";
+    std::vector<FormInfo> formInfos;
+    FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
+    int result = FormMgr::GetInstance().GetFormsInfoByApp(bundleName, formInfos);
+
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR);
+    GTEST_LOG_(INFO) << "FormMgrTest_0047 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0048
+ * @tc.desc: Verify GetFormsInfoByApp
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0048, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0048 starts";
+    std::string bundleName = "";
+    std::vector<FormInfo> formInfos;
+    FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
+    int result = FormMgr::GetInstance().GetFormsInfoByApp(bundleName, formInfos);
+
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_BUNDLENAME);
+    GTEST_LOG_(INFO) << "FormMgrTest_0048 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0050
+ * @tc.desc: Verify GetFormsInfoByModule
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0050, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0050 starts";
+    std::string bundleName = "";
+    std::string moduleName = "this is moduleName";
+    std::vector<FormInfo> formInfos;
+    FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
+    int result = FormMgr::GetInstance().GetFormsInfoByModule(bundleName, moduleName, formInfos);
+
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_BUNDLENAME);
+    GTEST_LOG_(INFO) << "FormMgrTest_0050 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0051
+ * @tc.desc: Verify GetFormsInfoByModule
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0051, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0051 starts";
+    std::string bundleName = "this is bundleName";
+    std::string moduleName = "";
+    std::vector<FormInfo> formInfos;
+    FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
+    int result = FormMgr::GetInstance().GetFormsInfoByModule(bundleName, moduleName, formInfos);
+
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_MODULENAME);
+    GTEST_LOG_(INFO) << "FormMgrTest_0051 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0052
+ * @tc.desc: Verify GetFormsInfoByModule
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0052, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0052 starts";
+    std::string bundleName = "this is bundleName";
+    std::string moduleName = "this is moduleName";
+    std::vector<FormInfo> formInfos;
+    FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
+    int result = FormMgr::GetInstance().GetFormsInfoByModule(bundleName, moduleName, formInfos);
+
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR);
+    GTEST_LOG_(INFO) << "FormMgrTest_0052 test ends";
+}
 } // namespace
