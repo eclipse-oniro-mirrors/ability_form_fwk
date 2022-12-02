@@ -21,11 +21,16 @@
 #undef private
 #include "form_data_mgr.h"
 #include "form_db_cache.h"
+#define private public
+#include "form_db_info.h"
+#include "form_free_install_operator.h"
+#undef private
 #include "form_host_interface.h"
 #define private public
 #include "form_mgr.h"
 #include "form_mgr_errors.h"
 #include "form_mgr_service.h"
+#include "form_share_mgr.h"
 #undef private
 #include "if_system_ability_manager.h"
 #include "ipc_skeleton.h"
@@ -822,5 +827,134 @@ HWTEST_F(FmsFormHostRecordTest, FormMgrService_0033, TestSize.Level0)
     std::string result = "bb";
     formMgrService.HiDumpFormInfoByFormId(args, result);
     GTEST_LOG_(INFO) << "FormMgrService_0033 end";
+}
+
+/**
+ * @tc.name: InnerFormInfo_0001
+ * @tc.desc: test AddUserUid function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, InnerFormInfo_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "InnerFormInfo_0001 start";
+    InnerFormInfo innerFormInfo;
+    int callingUid = 1;
+    innerFormInfo.AddUserUid(callingUid);
+    GTEST_LOG_(INFO) << "InnerFormInfo_0001 end";
+}
+
+/**
+ * @tc.name: InnerFormInfo_0002
+ * @tc.desc: test AddUserUid function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, InnerFormInfo_0002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "InnerFormInfo_0002 start";
+    InnerFormInfo innerFormInfo;
+    int callingUid = 1;
+    std::vector<int> formUserUids;
+    formUserUids.emplace_back(callingUid);
+    innerFormInfo.SetUserUids(formUserUids);
+    innerFormInfo.AddUserUid(callingUid);
+    GTEST_LOG_(INFO) << "InnerFormInfo_0002 end";
+}
+
+/**
+ * @tc.name: InnerFormInfo_0003
+ * @tc.desc: test DeleteUserUid function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, InnerFormInfo_0003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "InnerFormInfo_0003 start";
+    InnerFormInfo innerFormInfo;
+    int callingUid = 1;
+    EXPECT_EQ(false, innerFormInfo.DeleteUserUid(callingUid));
+    GTEST_LOG_(INFO) << "InnerFormInfo_0003 end";
+}
+
+/**
+ * @tc.name: InnerFormInfo_0004
+ * @tc.desc: test DeleteUserUid function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, InnerFormInfo_0004, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "InnerFormInfo_0004 start";
+    InnerFormInfo innerFormInfo;
+    int callingUid = 1;
+    std::vector<int> formUserUids;
+    formUserUids.emplace_back(callingUid);
+    innerFormInfo.SetUserUids(formUserUids);
+    EXPECT_EQ(true, innerFormInfo.DeleteUserUid(callingUid));
+    GTEST_LOG_(INFO) << "InnerFormInfo_0004 end";
+}
+
+/**
+ * @tc.name: FormFreeInstallOperator_0001
+ * @tc.desc: test OnInstallFinished function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, FormFreeInstallOperator_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormFreeInstallOperator_0001 start";
+    std::string formShareInfoKey = "aa";
+    FormFreeInstallOperator formFreeInstallOperator(formShareInfoKey, nullptr);
+    int32_t resultCode = 1;
+    formFreeInstallOperator.OnInstallFinished(resultCode);
+    GTEST_LOG_(INFO) << "FormFreeInstallOperator_0001 end";
+}
+
+/**
+ * @tc.name: FreeInstallStatusCallBack_0001
+ * @tc.desc: test OnInstallFinished function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, FreeInstallStatusCallBack_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FreeInstallStatusCallBack_0001 start";
+    std::shared_ptr<FormFreeInstallOperator> freeInstallOperators = nullptr;
+    std::weak_ptr<FormFreeInstallOperator> freeInstallOperator = freeInstallOperators;
+    FreeInstallStatusCallBack freeInstallStatusCallBack(freeInstallOperator);
+    int32_t resultCode = 1;
+    Want want;
+    int32_t userId = 1;
+    freeInstallStatusCallBack.OnInstallFinished(resultCode, want, userId);
+    GTEST_LOG_(INFO) << "FreeInstallStatusCallBack_0001 end";
+}
+
+/**
+ * @tc.name: FreeInstallStatusCallBack_0002
+ * @tc.desc: test OnInstallFinished function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, FreeInstallStatusCallBack_0002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FreeInstallStatusCallBack_0002 start";
+    std::string formShareInfoKey = "aa";
+    std::shared_ptr<FormFreeInstallOperator> freeInstallOperators =
+        std::make_shared<FormFreeInstallOperator>(formShareInfoKey, nullptr);
+    std::weak_ptr<FormFreeInstallOperator> freeInstallOperator = freeInstallOperators;
+    FreeInstallStatusCallBack freeInstallStatusCallBack(freeInstallOperator);
+    int32_t resultCode = 1;
+    Want want;
+    int32_t userId = 1;
+    freeInstallStatusCallBack.OnInstallFinished(resultCode, want, userId);
+    GTEST_LOG_(INFO) << "FreeInstallStatusCallBack_0002 end";
+}
+
+/**
+ * @tc.name: FormShareMgr_0001
+ * @tc.desc: test RecvFormShareInfoFromRemote function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, FormShareMgr_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormShareMgr_0001 start";
+    FormShareMgr formShareMgr;
+    FormShareInfo info;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formShareMgr.RecvFormShareInfoFromRemote(info));
+    GTEST_LOG_(INFO) << "FormShareMgr_0001 end";
 }
 }
