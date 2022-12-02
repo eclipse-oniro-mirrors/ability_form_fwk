@@ -17,11 +17,17 @@
 
 namespace {
     bool g_mockGetFormRecordRet = true;
+    bool g_mockIsEnableRefreshRet = true;
 }
 
 void MockGetFormRecord(bool mockRet)
 {
     g_mockGetFormRecordRet = mockRet;
+}
+
+void MockIsEnableRefresh(bool mockRet)
+{
+    g_mockIsEnableRefreshRet = mockRet;
 }
 
 namespace OHOS {
@@ -35,6 +41,11 @@ FormDataMgr::~FormDataMgr()
 bool FormDataMgr::GetFormRecord(const int64_t formId, FormRecord &formRecord) const
 {
     return g_mockGetFormRecordRet;
+}
+
+bool FormDataMgr::IsEnableRefresh(int64_t formId)
+{
+    return g_mockIsEnableRefreshRet;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -39,6 +39,7 @@ extern void MockGetAbilityInfoByAction(bool mockRet);
 extern void MockGetFormRecord(bool mockRet);
 extern void MockIsLimiterEnableRefresh(bool mockRet);
 extern void MockConnectServiceAbility(bool mockRet);
+extern void MockIsEnableRefresh(bool mockRet);
 
 namespace {
 const int32_t AGE = 10;
@@ -604,5 +605,237 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_004, TestSize.Level0)
     MockConnectServiceAbility(true);
     formProviderMgr.ConnectAmsForRefresh(formId, record, want, isTimerRefresh);
     GTEST_LOG_(INFO) << "FormProviderMgr_004 end";
+}
+
+/**
+ * @tc.name: FormProviderMgr_005
+ * @tc.desc: test NotifyProviderFormsBatchDelete function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_005, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormProviderMgr_005 start";
+    FormProviderMgr formProviderMgr;
+    std::string bundleName = "";
+    std::string abilityName = "";
+    std::set<int64_t> formIds;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
+        formProviderMgr.NotifyProviderFormsBatchDelete(bundleName, abilityName, formIds));
+    GTEST_LOG_(INFO) << "FormProviderMgr_005 end";
+}
+
+/**
+ * @tc.name: FormProviderMgr_006
+ * @tc.desc: test NotifyProviderFormsBatchDelete function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_006, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormProviderMgr_006 start";
+    FormProviderMgr formProviderMgr;
+    std::string bundleName = "";
+    std::string abilityName = "aa";
+    std::set<int64_t> formIds;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
+        formProviderMgr.NotifyProviderFormsBatchDelete(bundleName, abilityName, formIds));
+    GTEST_LOG_(INFO) << "FormProviderMgr_006 end";
+}
+
+/**
+ * @tc.name: FormProviderMgr_007
+ * @tc.desc: test NotifyProviderFormsBatchDelete function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_007, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormProviderMgr_007 start";
+    FormProviderMgr formProviderMgr;
+    std::string bundleName = "bb";
+    std::string abilityName = "aa";
+    std::set<int64_t> formIds;
+    MockConnectServiceAbility(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED,
+        formProviderMgr.NotifyProviderFormsBatchDelete(bundleName, abilityName, formIds));
+    GTEST_LOG_(INFO) << "FormProviderMgr_007 end";
+}
+
+/**
+ * @tc.name: FormProviderMgr_008
+ * @tc.desc: test UpdateForm function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_008, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormProviderMgr_008 start";
+    FormProviderMgr formProviderMgr;
+    int64_t formId = 1;
+    FormProviderInfo formProviderInfo;
+    MockGetFormRecord(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_NOT_EXIST_ID, formProviderMgr.UpdateForm(formId, formProviderInfo));
+    GTEST_LOG_(INFO) << "FormProviderMgr_008 end";
+}
+
+/**
+ * @tc.name: FormProviderMgr_009
+ * @tc.desc: test UpdateForm function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_009, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormProviderMgr_009 start";
+    FormProviderMgr formProviderMgr;
+    int64_t formId = 1;
+    FormProviderInfo formProviderInfo;
+    MockGetFormRecord(true);
+    formProviderMgr.UpdateForm(formId, formProviderInfo);
+    GTEST_LOG_(INFO) << "FormProviderMgr_009 end";
+}
+
+/**
+ * @tc.name: FormProviderMgr_010
+ * @tc.desc: test UpdateForm function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_010, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormProviderMgr_010 start";
+    FormProviderMgr formProviderMgr;
+    int64_t formId = 1;
+    FormRecord formRecord;
+    formRecord.versionUpgrade = true;
+    FormProviderData formProviderData;
+    EXPECT_EQ(ERR_OK, formProviderMgr.UpdateForm(formId, formRecord, formProviderData));
+    GTEST_LOG_(INFO) << "FormProviderMgr_010 end";
+}
+
+/**
+ * @tc.name: FormProviderMgr_011
+ * @tc.desc: test IncreaseTimerRefreshCount function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_011, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormProviderMgr_011 start";
+    FormProviderMgr formProviderMgr;
+    int64_t formId = 1;
+    MockGetFormRecord(false);
+    formProviderMgr.IncreaseTimerRefreshCount(formId);
+    GTEST_LOG_(INFO) << "FormProviderMgr_011 end";
+}
+
+/**
+ * @tc.name: FormProviderMgr_012
+ * @tc.desc: test IncreaseTimerRefreshCount function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_012, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormProviderMgr_012 start";
+    FormProviderMgr formProviderMgr;
+    int64_t formId = 1;
+    MockGetFormRecord(true);
+    formProviderMgr.IncreaseTimerRefreshCount(formId);
+    GTEST_LOG_(INFO) << "FormProviderMgr_012 end";
+}
+
+/**
+ * @tc.name: FormProviderMgr_013
+ * @tc.desc: test IsNeedToFresh function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_013, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormProviderMgr_013 start";
+    FormProviderMgr formProviderMgr;
+    FormRecord record;
+    int64_t formId = 1;
+    bool isVisibleToFresh = true;
+    MockIsEnableRefresh(true);
+    EXPECT_EQ(true, formProviderMgr.IsNeedToFresh(record, formId, isVisibleToFresh));
+    GTEST_LOG_(INFO) << "FormProviderMgr_013 end";
+}
+
+/**
+ * @tc.name: FormProviderMgr_014
+ * @tc.desc: test IsNeedToFresh function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_014, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormProviderMgr_014 start";
+    FormProviderMgr formProviderMgr;
+    FormRecord record;
+    int64_t formId = 1;
+    bool isVisibleToFresh = true;
+    MockIsEnableRefresh(false);
+    EXPECT_EQ(false, formProviderMgr.IsNeedToFresh(record, formId, isVisibleToFresh));
+    GTEST_LOG_(INFO) << "FormProviderMgr_014 end";
+}
+
+/**
+ * @tc.name: FormProviderMgr_015
+ * @tc.desc: test IsNeedToFresh function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_015, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormProviderMgr_015 start";
+    FormProviderMgr formProviderMgr;
+    FormRecord record;
+    int64_t formId = 1;
+    bool isVisibleToFresh = false;
+    MockIsEnableRefresh(false);
+    EXPECT_EQ(false, formProviderMgr.IsNeedToFresh(record, formId, isVisibleToFresh));
+    GTEST_LOG_(INFO) << "FormProviderMgr_015 end";
+}
+
+/**
+ * @tc.name: FormProviderMgr_016
+ * @tc.desc: test IsFormCached function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_016, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormProviderMgr_016 start";
+    FormProviderMgr formProviderMgr;
+    FormRecord record;
+    record.versionUpgrade = true;
+    EXPECT_EQ(false, formProviderMgr.IsFormCached(record));
+    GTEST_LOG_(INFO) << "FormProviderMgr_016 end";
+}
+
+/**
+ * @tc.name: FormProviderMgr_017
+ * @tc.desc: test RebindByFreeInstall function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_017, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormProviderMgr_017 start";
+    FormProviderMgr formProviderMgr;
+    FormRecord record;
+    Want want;
+    sptr<AAFwk::IAbilityConnection> formRefreshConnection = nullptr;
+    MockConnectServiceAbility(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED,
+        formProviderMgr.RebindByFreeInstall(record, want, formRefreshConnection));
+    GTEST_LOG_(INFO) << "FormProviderMgr_017 end";
+}
+
+/**
+ * @tc.name: FormProviderMgr_018
+ * @tc.desc: test RebindByFreeInstall function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_018, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormProviderMgr_018 start";
+    FormProviderMgr formProviderMgr;
+    FormRecord record;
+    Want want;
+    sptr<AAFwk::IAbilityConnection> formRefreshConnection = nullptr;
+    MockConnectServiceAbility(true);
+    EXPECT_EQ(ERR_OK, formProviderMgr.RebindByFreeInstall(record, want, formRefreshConnection));
+    GTEST_LOG_(INFO) << "FormProviderMgr_018 end";
 }
 }
