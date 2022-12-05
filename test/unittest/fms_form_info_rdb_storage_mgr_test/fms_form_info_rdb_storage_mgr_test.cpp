@@ -45,49 +45,23 @@ void FmsFormInfoRdbStorageMgrTest::TearDown()
 
 /**
  * @tc.name: FmsFormInfoRdbStorageMgrTest_001
- * @tc.desc: Test LoadFormInfos
+ * @tc.desc: Test UpdateBundleFormInfos
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_001, TestSize.Level0)
 {
     std::string bundleName = "testKey";
-    std::string formInfo = "formInfo";
-    FormInfoRdbStorageMgr::GetInstance().UpdateBundleFormInfos(bundleName, formInfo);
-    std::vector<std::pair<std::string, std::string>> formInfoStorages;
-    auto result = FormInfoRdbStorageMgr::GetInstance().LoadFormInfos(formInfoStorages);
+    std::string formInfoStorages = "formInfo";
+    auto result = FormInfoRdbStorageMgr::GetInstance().UpdateBundleFormInfos(bundleName, formInfoStorages);
     EXPECT_EQ(result, ERR_OK);
 }
 
 /**
  * @tc.name: FmsFormInfoRdbStorageMgrTest_002
- * @tc.desc: Test RemoveBundleFormInfos fail
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_002, TestSize.Level0)
-{
-    std::string bundleName = "";
-    auto result = FormInfoRdbStorageMgr::GetInstance().RemoveBundleFormInfos(bundleName);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
-}
-
-/**
- * @tc.name: FmsFormInfoRdbStorageMgrTest_003
- * @tc.desc: Test RemoveBundleFormInfos
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_003, TestSize.Level0)
-{
-    std::string bundleName = "testKey";
-    auto result = FormInfoRdbStorageMgr::GetInstance().RemoveBundleFormInfos(bundleName);
-    EXPECT_EQ(result, ERR_OK);
-}
-
-/**
- * @tc.name: FmsFormInfoRdbStorageMgrTest_004
  * @tc.desc: Test UpdateBundleFormInfos
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_004, TestSize.Level0)
+HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_002, TestSize.Level0)
 {
     std::string bundleName = "";
     std::string formInfoStorages = "";
@@ -96,15 +70,38 @@ HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_004, TestSiz
 }
 
 /**
+ * @tc.name: FmsFormInfoRdbStorageMgrTest_003
+ * @tc.desc: Test LoadFormInfos
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_003, TestSize.Level0)
+{
+    std::vector<std::pair<std::string, std::string>> formInfoStorages;
+    auto result = FormInfoRdbStorageMgr::GetInstance().LoadFormInfos(formInfoStorages);
+    EXPECT_EQ(result, ERR_OK);
+}
+
+/**
+ * @tc.name: FmsFormInfoRdbStorageMgrTest_004
+ * @tc.desc: Test RemoveBundleFormInfos fail
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_004, TestSize.Level0)
+{
+    std::string bundleName = "";
+    auto result = FormInfoRdbStorageMgr::GetInstance().RemoveBundleFormInfos(bundleName);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+}
+
+/**
  * @tc.name: FmsFormInfoRdbStorageMgrTest_005
- * @tc.desc: Test UpdateBundleFormInfos
+ * @tc.desc: Test RemoveBundleFormInfos
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_005, TestSize.Level0)
 {
     std::string bundleName = "testKey";
-    std::string formInfoStorages = "formInfoStorages";
-    auto result = FormInfoRdbStorageMgr::GetInstance().UpdateBundleFormInfos(bundleName, formInfoStorages);
+    auto result = FormInfoRdbStorageMgr::GetInstance().RemoveBundleFormInfos(bundleName);
     EXPECT_EQ(result, ERR_OK);
 }
 
@@ -135,6 +132,18 @@ HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_007, TestSiz
     InnerFormInfo innerFormInfo;
     innerFormInfo.SetFormId(formId);
     auto result = FormInfoRdbStorageMgr::GetInstance().ModifyStorageFormInfo(innerFormInfo);
+    EXPECT_EQ(result, ERR_OK);
+}
+
+/**
+ * @tc.name: FmsFormInfoRdbStorageMgrTest_008
+ * @tc.desc: Test DeleteStorageFormInfo
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_008, TestSize.Level0)
+{
+    std::string formId = "formId_1";
+    auto result = FormInfoRdbStorageMgr::GetInstance().DeleteStorageFormInfo(formId);
     EXPECT_EQ(result, ERR_OK);
 }
 }

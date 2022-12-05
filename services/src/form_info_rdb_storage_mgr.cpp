@@ -117,7 +117,7 @@ ErrCode FormInfoRdbStorageMgr::UpdateBundleFormInfos(const std::string &bundleNa
     ErrCode result;
     std::lock_guard<std::mutex> lock(rdbStorePtrMutex_);
     std::string value = formInfoStorages;
-    result = rdbDataManager_->UpdateData(key, value);
+    result = rdbDataManager_->InsertData(key, value);
     if (result != ERR_OK) {
         HILOG_ERROR("update formInfoStorages to rdbStore error");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -188,45 +188,6 @@ ErrCode FormInfoRdbStorageMgr::LoadFormData(std::vector<InnerFormInfo> &innerFor
     
     HILOG_INFO("%{public}s end", __func__);
     return ERR_OK;
-}
-
-ErrCode FormInfoRdbStorageMgr::GetStorageFormInfoById(const std::string &formId, InnerFormInfo &innerFormInfo)
-{
-    HILOG_INFO("%{public}s called, formId[%{public}s]", __func__, formId.c_str());
-    {
-        std::lock_guard<std::mutex> lock(rdbStorePtrMutex_);
-        if (!CheckRdbStore()) {
-            HILOG_ERROR("RdbStore is nullptr");
-            return ERR_APPEXECFWK_FORM_COMMON_CODE;
-        }
-    }
-
-    ErrCode result;
-    std::map<std::string, std::string> value;
-    std::string key = std::string().append(FORM_ID_PREFIX).append(formId);
-    result = rdbDataManager_->QueryData(key, value);
-
-    ErrCode ret = ERR_OK;
-    if (result != ERR_OK) {
-        HILOG_ERROR("get entries error");
-        ret = ERR_APPEXECFWK_FORM_COMMON_CODE;
-    } else {
-        if (value.empty()) {
-            HILOG_ERROR("%{public}s not match any FormInfo", formId.c_str());
-            ret = ERR_APPEXECFWK_FORM_COMMON_CODE;
-        } else {
-            nlohmann::json jsonObject = nlohmann::json::parse(value.begin()->second, nullptr, false);
-            if (jsonObject.is_discarded()) {
-                HILOG_ERROR("error key: %{private}s", value.begin()->first.c_str());
-                ret = ERR_APPEXECFWK_FORM_COMMON_CODE;
-            }
-            if (!innerFormInfo.FromJson(jsonObject)) {
-                HILOG_ERROR("error key: %{private}s", value.begin()->first.c_str());
-                ret = ERR_APPEXECFWK_FORM_COMMON_CODE;
-            }
-        }
-    }
-    return ret;
 }
 
 ErrCode FormInfoRdbStorageMgr::SaveStorageFormInfo(const InnerFormInfo &innerFormInfo)

@@ -139,29 +139,6 @@ ErrCode FormRdbDataMgr::InsertData(const std::string &key, const std::string &va
     return ERR_OK;
 }
 
-ErrCode FormRdbDataMgr::UpdateData(const std::string &key, const std::string &value)
-{
-    HILOG_INFO("UpdateData start");
-    if (rdbStore_ == nullptr) {
-        HILOG_ERROR("FormInfoRdbStore is null");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
-
-    int32_t rowId = -1;
-    NativeRdb::AbsRdbPredicates absRdbPredicates(formRdbConfig_.tableName);
-    absRdbPredicates.EqualTo(FORM_KEY, key);
-    NativeRdb::ValuesBucket valuesBucket;
-    valuesBucket.PutString(FORM_KEY, key);
-    valuesBucket.PutString(FORM_VALUE, value);
-    auto ret = rdbStore_->Update(rowId, valuesBucket, absRdbPredicates);
-    if (ret != NativeRdb::E_OK) {
-        HILOG_ERROR("Update operation failed, result: %{public}d, updated rows: %{public}d, key=%{public}s.",
-            ret, rowId, key.c_str());
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
-    return ERR_OK;
-}
-
 ErrCode FormRdbDataMgr::DeleteData(const std::string &key)
 {
     HILOG_INFO("DeleteData start");

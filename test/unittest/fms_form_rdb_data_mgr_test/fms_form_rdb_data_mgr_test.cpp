@@ -75,56 +75,38 @@ HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_002, Function | SmallTest 
 
 /**
  * @tc.name: FmsFormRdbDataMgrTest_003
- * @tc.desc: Test UpdateData
+ * @tc.desc: Test QueryData
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_003, Function | SmallTest | Level1)
 {
     std::string key = "testKey";
-    std::string value = "values";
-    auto result = rdbDataManager_->UpdateData(key, value);
-    EXPECT_EQ(result, ERR_OK);
-}
-
-/**
- * @tc.name: FmsFormRdbDataMgrTest_004
- * @tc.desc: Test DeleteData
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_004, Function | SmallTest | Level1)
-{
-    std::string key = "testKey";
-    auto result = rdbDataManager_->DeleteData(key);
-    EXPECT_EQ(result, ERR_OK);
-}
-
-/**
- * @tc.name: FmsFormRdbDataMgrTest_005
- * @tc.desc: Test QueryData
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_005, Function | SmallTest | Level1)
-{
-    std::string key = "testKey";
-    std::string value = "values";
-    rdbDataManager_->InsertData(key, value);
     std::map<std::string, std::string> datas;
     auto result = rdbDataManager_->QueryData(key, datas);
     EXPECT_EQ(result, ERR_OK);
 }
 
 /**
- * @tc.name: FmsFormRdbDataMgrTest_006
+ * @tc.name: FmsFormRdbDataMgrTest_004
  * @tc.desc: Test QueryAllData
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_006, Function | SmallTest | Level1)
+HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_004, Function | SmallTest | Level1)
 {
-    std::string key = "testKey";
-    std::string value = "values";
-    rdbDataManager_->InsertData(key, value);
     std::map<std::string, std::string> datas;
     auto result = rdbDataManager_->QueryAllData(datas);
+    EXPECT_EQ(result, ERR_OK);
+}
+
+/**
+ * @tc.name: FmsFormRdbDataMgrTest_005
+ * @tc.desc: Test DeleteData
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_005, Function | SmallTest | Level1)
+{
+    std::string key = "testKey";
+    auto result = rdbDataManager_->DeleteData(key);
     EXPECT_EQ(result, ERR_OK);
 }
 }

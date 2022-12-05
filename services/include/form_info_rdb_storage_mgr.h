@@ -25,7 +25,7 @@ namespace OHOS {
 namespace AppExecFwk {
 
 /**
- * @class FormInfoStorageMgr
+ * @class FormInfoRdbStorageMgr
  * Form info storage.
  */
 class FormInfoRdbStorageMgr final : public DelayedRefSingleton<FormInfoRdbStorageMgr> {
@@ -39,22 +39,12 @@ public:
 
     ErrCode UpdateBundleFormInfos(const std::string &bundleName, const std::string &formInfoStorages);
 
-    bool ResetRdbStore();
-
     /**
      * @brief Load all form data from DB to innerFormInfos.
      * @param innerFormInfos Storage all form data.
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode LoadFormData(std::vector<InnerFormInfo> &innerFormInfos);
-
-    /**
-     * @brief Get form data from DB to innerFormInfo with formId.
-     * @param formId Indicates the form ID.
-     * @param innerFormInfo Storage form data.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    ErrCode GetStorageFormInfoById(const std::string &formId, InnerFormInfo &innerFormInfo);
 
     /**
      * @brief Save or update the form data in DB.

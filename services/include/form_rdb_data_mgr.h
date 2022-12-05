@@ -77,12 +77,6 @@ public:
     ErrCode InsertData(const std::string &key, const std::string &value);
 
     /**
-     * @brief Update the form data in DB.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    ErrCode UpdateData(const std::string &key, const std::string &value);
-
-    /**
      * @brief Delete the form data in DB.
      * @param key The data Key.
      * @return Returns ERR_OK on success, others on failure.
