@@ -16,16 +16,26 @@ import("//foundation/ability/form_fwk/form_fwk.gni")
 
 module_output_path = "form_fwk/formmgrservice"
 
-ohos_unittest("FmsFormRefreshConnectionTest") {
+ohos_unittest("FmsFormMgrAdapterTest") {
   module_out_path = module_output_path
 
-  sources = [ "${form_fwk_path}/test/unittest/fms_form_refresh_connection_test/fms_form_refresh_connection_test.cpp" ]
+  sources = [
+    "${form_fwk_path}/test/mock/src/mock_form_provider_client.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/fms_form_mgr_adapter_test.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_cache_mgr.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_data_mgr.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_db_cache.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_provider_mgr.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_timer_mgr.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_want.cpp",
+  ]
 
   include_dirs = [
     "//third_party/json/include",
     "${ability_runtime_path}/services/formmgr/include",
     "${systemabilitymgr_path}/samgr/interfaces/innerkits/samgr_proxy/include",
     "${form_fwk_path}/interfaces/inner_api/include",
+    "${form_fwk_path}/test/mock/include",
   ]
 
   configs = []
@@ -60,6 +70,7 @@ ohos_unittest("FmsFormRefreshConnectionTest") {
     "form_fwk:form_manager",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "kv_store:distributeddata_inner",
   ]
 }
 
@@ -67,6 +78,6 @@ ohos_unittest("FmsFormRefreshConnectionTest") {
 group("unittest") {
   testonly = true
 
-  deps = [ ":FmsFormRefreshConnectionTest" ]
+  deps = [ ":FmsFormMgrAdapterTest" ]
 }
 ###############################################################################
