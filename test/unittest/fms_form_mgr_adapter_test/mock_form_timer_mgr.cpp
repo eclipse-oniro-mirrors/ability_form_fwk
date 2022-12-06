@@ -17,6 +17,9 @@
 
 namespace {
     bool g_mockRemoveFormTimerRet = true;
+    bool g_mockGetIntervalTimerRet = true;
+    bool g_mockGetUpdateAtTimerRet = true;
+    bool g_mockGetDynamicItemRet = true;
 }
 
 void MockRemoveFormTimer(bool mockRet)
@@ -24,11 +27,41 @@ void MockRemoveFormTimer(bool mockRet)
     g_mockRemoveFormTimerRet = mockRet;
 }
 
+void MockGetIntervalTimer(bool mockRet)
+{
+    g_mockGetIntervalTimerRet = mockRet;
+}
+
+void MockGetUpdateAtTimer(bool mockRet)
+{
+    g_mockGetUpdateAtTimerRet = mockRet;
+}
+
+void MockGetDynamicItem(bool mockRet)
+{
+    g_mockGetDynamicItemRet = mockRet;
+}
+
 namespace OHOS {
 namespace AppExecFwk {
 bool FormTimerMgr::RemoveFormTimer(int64_t formId)
 {
     return g_mockRemoveFormTimerRet;
+}
+
+bool FormTimerMgr::GetIntervalTimer(int64_t formId, FormTimer &formTimer)
+{
+    return g_mockGetIntervalTimerRet;
+}
+
+bool FormTimerMgr::GetUpdateAtTimer(int64_t formId, UpdateAtItem &updateAtItem)
+{
+    return g_mockGetUpdateAtTimerRet;
+}
+
+bool FormTimerMgr::GetDynamicItem(int64_t formId, DynamicRefreshItem &dynamicItem)
+{
+    return g_mockGetDynamicItemRet;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

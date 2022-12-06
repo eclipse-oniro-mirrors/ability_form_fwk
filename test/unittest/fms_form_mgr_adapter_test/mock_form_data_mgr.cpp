@@ -21,6 +21,8 @@ namespace {
     bool g_mockGetMatchedHostClientRet = true;
     bool g_mockGetFormRecordRet = true;
     bool g_mockDeleteFormRecordRet = true;
+    bool g_mockAllotFormHostRecordRet = true;
+    bool g_mockGenerateFormIdRet = true;
 }
 
 void MockExistTempForm(bool mockRet)
@@ -46,6 +48,16 @@ void MockGetFormRecord(bool mockRet)
 void MockDeleteFormRecord(bool mockRet)
 {
     g_mockDeleteFormRecordRet = mockRet;
+}
+
+void MockAllotFormHostRecord(bool mockRet)
+{
+    g_mockAllotFormHostRecordRet = mockRet;
+}
+
+void MockGenerateFormId(bool mockRet)
+{
+    g_mockGenerateFormIdRet = mockRet;
 }
 
 namespace OHOS {
@@ -79,6 +91,21 @@ bool FormDataMgr::GetFormRecord(const int64_t formId, FormRecord &formRecord) co
 bool FormDataMgr::DeleteFormRecord(const int64_t formId)
 {
     return g_mockDeleteFormRecordRet;
+}
+
+bool FormDataMgr::AllotFormHostRecord(const FormItemInfo &info, const sptr<IRemoteObject> &callerToken,
+    const int64_t formId, const int callingUid)
+{
+    return g_mockAllotFormHostRecordRet;
+}
+
+int64_t FormDataMgr::GenerateFormId()
+{
+    if (true == g_mockGenerateFormIdRet) {
+        return -1;
+    }
+    return 1;
+    
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
