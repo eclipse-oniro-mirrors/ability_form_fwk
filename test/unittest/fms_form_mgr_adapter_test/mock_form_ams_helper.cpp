@@ -13,48 +13,34 @@
  * limitations under the License.
  */
 
-#include "form_cache_mgr.h"
+#include "form_ams_helper.h"
+
+#include "form_mgr_errors.h"
 
 namespace {
-    bool g_mockDeleteDataRet = true;
-    bool g_mockIsExistRet = true;
-    bool g_mockGetDataRet = true;
+    bool g_mockConnectServiceAbilityRet = true;
 }
 
-void MockDeleteData(bool mockRet)
+void MockConnectServiceAbility(bool mockRet)
 {
-    g_mockDeleteDataRet = mockRet;
+    g_mockConnectServiceAbilityRet = mockRet;
 }
 
-void MockIsExist(bool mockRet)
-{
-    g_mockIsExistRet = mockRet;
-}
-
-void MockGetData(bool mockRet)
-{
-    g_mockGetDataRet = mockRet;
-}
 namespace OHOS {
 namespace AppExecFwk {
-FormCacheMgr::FormCacheMgr()
-{}
-FormCacheMgr::~FormCacheMgr()
+FormAmsHelper::FormAmsHelper()
 {}
 
-bool FormCacheMgr::DeleteData(const int64_t formId)
-{
-    return g_mockDeleteDataRet;
-}
+FormAmsHelper::~FormAmsHelper()
+{}
 
-bool FormCacheMgr::IsExist(const int64_t formId) const
+ErrCode FormAmsHelper::ConnectServiceAbility(
+    const Want &want, const sptr<AAFwk::IAbilityConnection> &connect)
 {
-    return g_mockIsExistRet;
-}
-
-bool FormCacheMgr::GetData(const int64_t formId, std::string &data) const
-{
-    return g_mockGetDataRet;
+    if (true == g_mockConnectServiceAbilityRet) {
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+    }
+    return ERR_OK;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
