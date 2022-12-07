@@ -14,6 +14,7 @@
  */
 
 #include "form_data_mgr.h"
+#include "form_mgr_errors.h"
 
 namespace {
     bool g_mockExistTempFormRet = true;
@@ -23,6 +24,7 @@ namespace {
     bool g_mockDeleteFormRecordRet = true;
     bool g_mockAllotFormHostRecordRet = true;
     bool g_mockGenerateFormIdRet = true;
+    bool g_mockGetRequestPublishFormInfoRet = true;
 }
 
 void MockExistTempForm(bool mockRet)
@@ -58,6 +60,11 @@ void MockAllotFormHostRecord(bool mockRet)
 void MockGenerateFormId(bool mockRet)
 {
     g_mockGenerateFormIdRet = mockRet;
+}
+
+void MockGetRequestPublishFormInfo(bool mockRet)
+{
+    g_mockGetRequestPublishFormInfoRet = mockRet;
 }
 
 namespace OHOS {
@@ -106,6 +113,15 @@ int64_t FormDataMgr::GenerateFormId()
     }
     return 1;
     
+}
+
+ErrCode FormDataMgr::GetRequestPublishFormInfo(int64_t formId, Want &want,
+                                               std::unique_ptr<FormProviderData> &formProviderData)
+{
+    if (true == g_mockGetRequestPublishFormInfoRet) {
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+    }
+    return ERR_OK;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

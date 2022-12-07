@@ -21,6 +21,7 @@
 namespace {
     bool g_mockGetCallerBundleNameRet = true;
     bool g_mockGetUidByBundleNameRet = true;
+    bool g_mockGetAbilityInfoByActionRet = true;
 }
 
 void MockGetCallerBundleName(bool mockRet)
@@ -31,6 +32,11 @@ void MockGetCallerBundleName(bool mockRet)
 void MockGetUidByBundleName(bool mockRet)
 {
     g_mockGetUidByBundleNameRet = mockRet;
+}
+
+void MockGetAbilityInfoByAction(bool mockRet)
+{
+    g_mockGetAbilityInfoByActionRet = mockRet;
 }
 
 namespace OHOS {
@@ -55,6 +61,12 @@ int32_t FormBmsHelper::GetUidByBundleName(const std::string &bundleName, const i
         return INVALID_UID;
     }
     return IPCSkeleton::GetCallingUid();   
+}
+
+bool FormBmsHelper::GetAbilityInfoByAction(const std::string &action, int32_t userId,
+    AbilityInfo &abilityInfo, ExtensionAbilityInfo &extensionAbilityInfo)
+{
+    return g_mockGetAbilityInfoByActionRet;
 }
 } // namespace AppExecFwk
 } // namespace OHOS
