@@ -17,11 +17,17 @@
 
 namespace {
     bool g_mockGetBoolParamRet = true;
+    bool g_mockGetStringParamRet = true;
 }
 
 void MockGetBoolParam(bool mockRet)
 {
     g_mockGetBoolParamRet = mockRet;
+}
+
+void MockGetStringParam(bool mockRet)
+{
+    g_mockGetStringParamRet = mockRet;
 }
 
 namespace OHOS {
@@ -52,6 +58,14 @@ Want::~Want()
 bool Want::GetBoolParam(const std::string &key, bool defaultValue) const
 {
     return g_mockGetBoolParamRet;
+}
+
+std::string Want::GetStringParam(const std::string &key) const
+{
+    if (true == g_mockGetStringParamRet) {
+        return "aa";
+    }
+    return std::string();
 }
 }  // namespace AAFwk
 }  // namespace OHOS
