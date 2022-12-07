@@ -15,11 +15,15 @@
 
 #include "form_timer_mgr.h"
 
+#include "form_constants.h"
+
 namespace {
     bool g_mockRemoveFormTimerRet = true;
     bool g_mockGetIntervalTimerRet = true;
     bool g_mockGetUpdateAtTimerRet = true;
     bool g_mockGetDynamicItemRet = true;
+    bool g_mockGetRefreshCountRet = true;
+    bool g_mockSetNextRefreshTimeRet = true;
 }
 
 void MockRemoveFormTimer(bool mockRet)
@@ -42,6 +46,16 @@ void MockGetDynamicItem(bool mockRet)
     g_mockGetDynamicItemRet = mockRet;
 }
 
+void MockGetRefreshCount(bool mockRet)
+{
+    g_mockGetRefreshCountRet = mockRet;
+}
+
+void MockSetNextRefreshTime(bool mockRet)
+{
+    g_mockSetNextRefreshTimeRet = mockRet;
+}
+
 namespace OHOS {
 namespace AppExecFwk {
 bool FormTimerMgr::RemoveFormTimer(int64_t formId)
@@ -62,6 +76,19 @@ bool FormTimerMgr::GetUpdateAtTimer(int64_t formId, UpdateAtItem &updateAtItem)
 bool FormTimerMgr::GetDynamicItem(int64_t formId, DynamicRefreshItem &dynamicItem)
 {
     return g_mockGetDynamicItemRet;
+}
+
+int FormTimerMgr::GetRefreshCount(int64_t formId) const
+{
+    if (true == g_mockGetRefreshCountRet) {
+        return Constants::LIMIT_COUNT;
+    }
+    return Constants::LIMIT_COUNT - 1;
+}
+
+bool FormTimerMgr::SetNextRefreshTime(int64_t formId, long nextGapTime, int32_t userId)
+{
+    return g_mockSetNextRefreshTimeRet;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
