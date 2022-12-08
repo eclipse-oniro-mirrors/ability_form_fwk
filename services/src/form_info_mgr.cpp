@@ -53,12 +53,10 @@ ErrCode FormInfoHelper::LoadFormConfigInfoByBundleName(const std::string &bundle
         HILOG_ERROR("failed to get bundle info.");
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
-
     // Check if current bundle contains FA forms.
     if (LoadAbilityFormConfigInfo(bundleInfo, formInfos) != ERR_OK) {
         HILOG_INFO("No fa form config info found for %{public}s.", bundleName.c_str());
     }
-
     // Check if current bundle contains Stage forms.
     if (LoadStageFormConfigInfo(bundleInfo, formInfos) != ERR_OK) {
         HILOG_INFO("No stage form config info found for %{public}s.", bundleName.c_str());
@@ -147,8 +145,7 @@ std::shared_ptr<Global::Resource::ResourceManager> FormInfoHelper::GetResourceMa
         return nullptr;
     }
     for (auto hapModuleInfo : bundleInfo.hapModuleInfos) {
-        std::string moduleResPath;
-        moduleResPath = hapModuleInfo.hapPath.empty() ? hapModuleInfo.resourcePath : hapModuleInfo.hapPath;
+        std::string moduleResPath = hapModuleInfo.resourcePath;
         if (!moduleResPath.empty()) {
             HILOG_INFO("DistributedBms::InitResourceManager, moduleResPath: %{private}s", moduleResPath.c_str());
             if (!resourceManager->AddResource(moduleResPath.c_str())) {
