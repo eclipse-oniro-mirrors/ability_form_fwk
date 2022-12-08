@@ -54,9 +54,9 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     innerFormInfos.emplace_back(innerFormInfo);
     formInfoStorageMgr.LoadFormData(innerFormInfos);
     std::string formId(data, size);
-    formInfoStorageMgr.SaveStorageFormInfo(innerFormInfo);
-    formInfoStorageMgr.ModifyStorageFormInfo(innerFormInfo);
-    formInfoStorageMgr.DeleteStorageFormInfo(formId);
+    formInfoStorageMgr.SaveStorageFormData(innerFormInfo);
+    formInfoStorageMgr.ModifyStorageFormData(innerFormInfo);
+    formInfoStorageMgr.DeleteStorageFormData(formId);
     return true;
 }
 }

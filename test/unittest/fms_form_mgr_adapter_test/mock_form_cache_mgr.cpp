@@ -13,39 +13,48 @@
  * limitations under the License.
  */
 
-#include "form_data_mgr.h"
+#include "form_cache_mgr.h"
 
 namespace {
-    bool g_mockGetFormRecordRet = true;
-    bool g_mockIsEnableRefreshRet = true;
+    bool g_mockDeleteDataRet = true;
+    bool g_mockIsExistRet = true;
+    bool g_mockGetDataRet = true;
 }
 
-void MockGetFormRecord(bool mockRet)
+void MockDeleteData(bool mockRet)
 {
-    g_mockGetFormRecordRet = mockRet;
+    g_mockDeleteDataRet = mockRet;
 }
 
-void MockIsEnableRefresh(bool mockRet)
+void MockIsExist(bool mockRet)
 {
-    g_mockIsEnableRefreshRet = mockRet;
+    g_mockIsExistRet = mockRet;
 }
 
+void MockGetData(bool mockRet)
+{
+    g_mockGetDataRet = mockRet;
+}
 namespace OHOS {
 namespace AppExecFwk {
-FormDataMgr::FormDataMgr()
+FormCacheMgr::FormCacheMgr()
+{}
+FormCacheMgr::~FormCacheMgr()
 {}
 
-FormDataMgr::~FormDataMgr()
-{}
-
-bool FormDataMgr::GetFormRecord(const int64_t formId, FormRecord &formRecord) const
+bool FormCacheMgr::DeleteData(const int64_t formId)
 {
-    return g_mockGetFormRecordRet;
+    return g_mockDeleteDataRet;
 }
 
-bool FormDataMgr::IsEnableRefresh(int64_t formId)
+bool FormCacheMgr::IsExist(const int64_t formId) const
 {
-    return g_mockIsEnableRefreshRet;
+    return g_mockIsExistRet;
+}
+
+bool FormCacheMgr::GetData(const int64_t formId, std::string &data) const
+{
+    return g_mockGetDataRet;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

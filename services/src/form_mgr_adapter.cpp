@@ -418,16 +418,6 @@ int FormMgrAdapter::UpdateForm(const int64_t formId,
         HILOG_ERROR("%{public}s error, invalid formId or bundleName.", __func__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
-    // check bundle uid for permission
-    int32_t callingUid = IPCSkeleton::GetCallingUid();
-    int32_t userId = GetCurrentUserId(callingUid);
-
-    // get uid
-    int32_t bundleUid = FormBmsHelper::GetInstance().GetUidByBundleName(bundleName, userId);
-    if (bundleUid != callingUid) {
-        HILOG_ERROR("%{public}s error, permission denied, the updated form is not your own.", __func__);
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
-    }
 
     // find matched formId
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
@@ -439,6 +429,9 @@ int FormMgrAdapter::UpdateForm(const int64_t formId,
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
+    // check bundle uid for permission
+    int32_t callingUid = IPCSkeleton::GetCallingUid();
+    int32_t userId = GetCurrentUserId(callingUid);
     if (userId != formRecord.userId) {
         HILOG_ERROR("%{public}s error, not under current user, formId:%{public}" PRId64 ".", __func__, matchedFormId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;

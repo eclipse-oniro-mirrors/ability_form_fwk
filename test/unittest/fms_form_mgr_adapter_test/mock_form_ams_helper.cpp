@@ -13,39 +13,34 @@
  * limitations under the License.
  */
 
-#include "form_data_mgr.h"
+#include "form_ams_helper.h"
+
+#include "form_mgr_errors.h"
 
 namespace {
-    bool g_mockGetFormRecordRet = true;
-    bool g_mockIsEnableRefreshRet = true;
+    bool g_mockConnectServiceAbilityRet = true;
 }
 
-void MockGetFormRecord(bool mockRet)
+void MockConnectServiceAbility(bool mockRet)
 {
-    g_mockGetFormRecordRet = mockRet;
-}
-
-void MockIsEnableRefresh(bool mockRet)
-{
-    g_mockIsEnableRefreshRet = mockRet;
+    g_mockConnectServiceAbilityRet = mockRet;
 }
 
 namespace OHOS {
 namespace AppExecFwk {
-FormDataMgr::FormDataMgr()
+FormAmsHelper::FormAmsHelper()
 {}
 
-FormDataMgr::~FormDataMgr()
+FormAmsHelper::~FormAmsHelper()
 {}
 
-bool FormDataMgr::GetFormRecord(const int64_t formId, FormRecord &formRecord) const
+ErrCode FormAmsHelper::ConnectServiceAbility(
+    const Want &want, const sptr<AAFwk::IAbilityConnection> &connect)
 {
-    return g_mockGetFormRecordRet;
-}
-
-bool FormDataMgr::IsEnableRefresh(int64_t formId)
-{
-    return g_mockIsEnableRefreshRet;
+    if (true == g_mockConnectServiceAbilityRet) {
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+    }
+    return ERR_OK;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

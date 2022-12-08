@@ -316,6 +316,7 @@ void FormHostClient::RemoveShareFormCallback(int64_t requestCode)
 
 void FormHostClient::UpdateForm(const FormJsInfo &formJsInfo)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     HILOG_DEBUG("%{public}s called, image number is %{public}zu.",  __func__, formJsInfo.imageDataMap.size());
     int64_t formId = formJsInfo.formId;
     if (formId < 0) {

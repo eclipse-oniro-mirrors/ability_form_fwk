@@ -107,7 +107,7 @@ HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_005, TestSiz
 
 /**
  * @tc.name: FmsFormInfoRdbStorageMgrTest_006
- * @tc.desc: Test LoadFormData
+ * @tc.desc: Test ModifyStorageFormData
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_006, TestSize.Level0)
@@ -115,35 +115,31 @@ HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_006, TestSiz
     const int64_t formId = 1;
     InnerFormInfo innerFormInfo;
     innerFormInfo.SetFormId(formId);
-    FormInfoRdbStorageMgr::GetInstance().ModifyStorageFormInfo(innerFormInfo);
+    auto result = FormInfoRdbStorageMgr::GetInstance().ModifyStorageFormData(innerFormInfo);
+    EXPECT_EQ(result, ERR_OK);
+}
+
+/**
+ * @tc.name: FmsFormInfoRdbStorageMgrTest_007
+ * @tc.desc: Test LoadFormData
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_007, TestSize.Level0)
+{
     std::vector<InnerFormInfo> innerFormInfos;
     auto result = FormInfoRdbStorageMgr::GetInstance().LoadFormData(innerFormInfos);
     EXPECT_EQ(result, ERR_OK);
 }
 
 /**
- * @tc.name: FmsFormInfoRdbStorageMgrTest_007
- * @tc.desc: Test ModifyStorageFormInfo
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_007, TestSize.Level0)
-{
-    const int64_t formId = 1;
-    InnerFormInfo innerFormInfo;
-    innerFormInfo.SetFormId(formId);
-    auto result = FormInfoRdbStorageMgr::GetInstance().ModifyStorageFormInfo(innerFormInfo);
-    EXPECT_EQ(result, ERR_OK);
-}
-
-/**
  * @tc.name: FmsFormInfoRdbStorageMgrTest_008
- * @tc.desc: Test DeleteStorageFormInfo
+ * @tc.desc: Test DeleteStorageFormData
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_008, TestSize.Level0)
 {
     std::string formId = "formId_1";
-    auto result = FormInfoRdbStorageMgr::GetInstance().DeleteStorageFormInfo(formId);
+    auto result = FormInfoRdbStorageMgr::GetInstance().DeleteStorageFormData(formId);
     EXPECT_EQ(result, ERR_OK);
 }
 }

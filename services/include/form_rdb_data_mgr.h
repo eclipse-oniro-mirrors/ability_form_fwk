@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,7 +24,6 @@
 #include "rdb_helper.h"
 #include "rdb_open_callback.h"
 #include "rdb_store_config.h"
-#include "hilog_wrapper.h"
 #include "form_mgr_errors.h"
 
 namespace OHOS {
@@ -65,7 +64,7 @@ private:
 class FormRdbDataMgr {
 public:
 
-    FormRdbDataMgr(const FormRdbConfig &formRdbConfig);
+    explicit FormRdbDataMgr(const FormRdbConfig &formRdbConfig);
 
     ErrCode Init();
 
@@ -99,7 +98,7 @@ private:
     FormRdbConfig formRdbConfig_;
     std::shared_ptr<NativeRdb::RdbStore> rdbStore_;
 };
-}  // namespace AppExecFwk
-}  // namespace OHOS
+} // namespace AppExecFwk
+} // namespace OHOS
 
 #endif // OHOS_FORM_FWK_FORM_RDB_DATA_MGR_H

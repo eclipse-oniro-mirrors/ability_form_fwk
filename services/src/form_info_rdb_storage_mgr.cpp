@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License")_;
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,6 +19,7 @@
 #include <thread>
 #include <unistd.h>
 #include "form_constants.h"
+#include "hilog_wrapper.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -148,7 +149,6 @@ void FormInfoRdbStorageMgr::SaveEntries(
         nlohmann::json jsonObject = nlohmann::json::parse(item.second, nullptr, false);
         if (jsonObject.is_discarded() || innerFormInfo.FromJson(jsonObject) != true) {
             HILOG_ERROR("error key: %{private}s", item.first.c_str());
-            // it's an bad json, delete it
             {
                 std::lock_guard<std::mutex> lock(rdbStorePtrMutex_);
                 if (!CheckRdbStore()) {
@@ -179,7 +179,10 @@ ErrCode FormInfoRdbStorageMgr::LoadFormData(std::vector<InnerFormInfo> &innerFor
     }
     ErrCode result;
     std::map<std::string, std::string> value;
-    result = rdbDataManager_->QueryData(FORM_ID_PREFIX, value);
+    {
+        std::lock_guard<std::mutex> lock(rdbStorePtrMutex_);
+        result = rdbDataManager_->QueryData(FORM_ID_PREFIX, value);
+    }
     if (result != ERR_OK) {
         HILOG_ERROR("get entries error");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -190,7 +193,7 @@ ErrCode FormInfoRdbStorageMgr::LoadFormData(std::vector<InnerFormInfo> &innerFor
     return ERR_OK;
 }
 
-ErrCode FormInfoRdbStorageMgr::SaveStorageFormInfo(const InnerFormInfo &innerFormInfo)
+ErrCode FormInfoRdbStorageMgr::SaveStorageFormData(const InnerFormInfo &innerFormInfo)
 {
     HILOG_INFO("%{public}s called, formId[%{public}" PRId64 "]", __func__, innerFormInfo.GetFormId());
     {
@@ -216,19 +219,19 @@ ErrCode FormInfoRdbStorageMgr::SaveStorageFormInfo(const InnerFormInfo &innerFor
     return ERR_OK;
 }
 
-ErrCode FormInfoRdbStorageMgr::ModifyStorageFormInfo(const InnerFormInfo &innerFormInfo)
+ErrCode FormInfoRdbStorageMgr::ModifyStorageFormData(const InnerFormInfo &innerFormInfo)
 {
     HILOG_INFO("%{public}s called, formId[%{public}" PRId64 "]", __func__, innerFormInfo.GetFormId());
     std::string formId = std::to_string(innerFormInfo.GetFormId());
-    ErrCode ret = DeleteStorageFormInfo(formId);
+    ErrCode ret = DeleteStorageFormData(formId);
     if (ret == ERR_OK) {
-        SaveStorageFormInfo(innerFormInfo);
+        SaveStorageFormData(innerFormInfo);
     }
 
     return ret;
 }
 
-ErrCode FormInfoRdbStorageMgr::DeleteStorageFormInfo(const std::string &formId)
+ErrCode FormInfoRdbStorageMgr::DeleteStorageFormData(const std::string &formId)
 {
     HILOG_INFO("%{public}s called, formId[%{public}s]", __func__, formId.c_str());
     {
@@ -252,6 +255,5 @@ ErrCode FormInfoRdbStorageMgr::DeleteStorageFormInfo(const std::string &formId)
     HILOG_INFO("delete value to RdbStore success");
     return ERR_OK;
 }
-
-}  // namespace AppExecFwk
-}  // namespace OHOS
+} // namespace AppExecFwk
+} // namespace OHOS

@@ -102,12 +102,12 @@ ErrCode FormRdbDataMgr::Init()
     }
 
     NativeRdb::RdbStoreConfig rdbStoreConfig(
-            formRdbConfig_.dbPath + formRdbConfig_.dbName,
-            NativeRdb::StorageMode::MODE_DISK,
-            false,
-            std::vector<uint8_t>(),
-            formRdbConfig_.journalMode,
-            formRdbConfig_.syncMode);
+        formRdbConfig_.dbPath + formRdbConfig_.dbName,
+        NativeRdb::StorageMode::MODE_DISK,
+        false,
+        std::vector<uint8_t>(),
+        formRdbConfig_.journalMode,
+        formRdbConfig_.syncMode);
     int32_t errCode = NativeRdb::E_OK;
     RdbStoreDataCallBackFormInfoStorage rdbDataCallBack_(formRdbConfig_);
     rdbStore_ = NativeRdb::RdbHelper::GetRdbStore(rdbStoreConfig, formRdbConfig_.version, rdbDataCallBack_, errCode);
@@ -204,7 +204,7 @@ ErrCode FormRdbDataMgr::QueryAllData(std::map<std::string, std::string> &datas)
     HILOG_INFO("QueryAllData start");
     if (rdbStore_ == nullptr) {
         HILOG_ERROR("FormInfoRdbStore is null");
-        return ERR_OK;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
     NativeRdb::AbsRdbPredicates absRdbPredicates(formRdbConfig_.tableName);
@@ -222,13 +222,13 @@ ErrCode FormRdbDataMgr::QueryAllData(std::map<std::string, std::string> &datas)
     do {
         std::string key;
         if (absSharedResultSet->GetString(FORM_KEY_INDEX, key) != NativeRdb::E_OK) {
-            HILOG_INFO("GetString key failed");
+            HILOG_ERROR("GetString key failed");
             return ERR_APPEXECFWK_FORM_COMMON_CODE;
         }
 
         std::string value;
         if (absSharedResultSet->GetString(FORM_VALUE_INDEX, value) != NativeRdb::E_OK) {
-            HILOG_INFO("GetString value failed");
+            HILOG_ERROR("GetString value failed");
             return ERR_APPEXECFWK_FORM_COMMON_CODE;
         }
 
@@ -236,5 +236,5 @@ ErrCode FormRdbDataMgr::QueryAllData(std::map<std::string, std::string> &datas)
     } while (absSharedResultSet->GoToNextRow() == NativeRdb::E_OK);
     return ERR_OK;
 }
-}
-}
+} // namespace AppExecFwk
+} // namespace OHOS

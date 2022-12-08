@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,39 +13,30 @@
  * limitations under the License.
  */
 
-#include "form_data_mgr.h"
+#include "form_provider_mgr.h"
+
+#include "form_mgr_errors.h"
 
 namespace {
-    bool g_mockGetFormRecordRet = true;
-    bool g_mockIsEnableRefreshRet = true;
+    bool g_mockNotifyProviderFormDeleteRet = true;
 }
 
-void MockGetFormRecord(bool mockRet)
+void MockNotifyProviderFormDelete(bool mockRet)
 {
-    g_mockGetFormRecordRet = mockRet;
-}
-
-void MockIsEnableRefresh(bool mockRet)
-{
-    g_mockIsEnableRefreshRet = mockRet;
+    g_mockNotifyProviderFormDeleteRet = mockRet;
 }
 
 namespace OHOS {
 namespace AppExecFwk {
-FormDataMgr::FormDataMgr()
-{}
+FormProviderMgr::FormProviderMgr() {}
+FormProviderMgr::~FormProviderMgr() {}
 
-FormDataMgr::~FormDataMgr()
-{}
-
-bool FormDataMgr::GetFormRecord(const int64_t formId, FormRecord &formRecord) const
+ErrCode FormProviderMgr::NotifyProviderFormDelete(const int64_t formId, const FormRecord &formRecord)
 {
-    return g_mockGetFormRecordRet;
-}
-
-bool FormDataMgr::IsEnableRefresh(int64_t formId)
-{
-    return g_mockIsEnableRefreshRet;
+    if (true == g_mockNotifyProviderFormDeleteRet) {
+        return ERR_OK;
+    }
+    return ERR_APPEXECFWK_FORM_INVALID_PARAM;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,10 +33,25 @@ DECLARE_DELAYED_REF_SINGLETON(FormInfoRdbStorageMgr)
 public:
     DISALLOW_COPY_AND_MOVE(FormInfoRdbStorageMgr);
 
+    /**
+     * @brief Load all form info from DB to formInfoStorages.
+     * @param formInfoStorages Storage all form info.
+     * @return Returns ERR_OK on success, others on failure.
+     */
     ErrCode LoadFormInfos(std::vector<std::pair<std::string, std::string>> &formInfoStorages);
 
+    /**
+     * @brief Delete the form info in DB.
+     * @param bundleName The form info bundleName.
+     * @return Returns ERR_OK on success, others on failure.
+     */
     ErrCode RemoveBundleFormInfos(const std::string &bundleName);
 
+    /**
+     * @brief Save or update the form info in DB.
+     * @param bundleName The form info bundleName @param formInfoStorages The form info.
+     * @return Returns ERR_OK on success, others on failure.
+     */
     ErrCode UpdateBundleFormInfos(const std::string &bundleName, const std::string &formInfoStorages);
 
     /**
@@ -51,21 +66,21 @@ public:
      * @param innerFormInfo Indicates the InnerFormInfo object to be save.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode SaveStorageFormInfo(const InnerFormInfo &innerFormInfo);
+    ErrCode SaveStorageFormData(const InnerFormInfo &innerFormInfo);
 
     /**
      * @brief Modify the form data in DB.
      * @param innerFormInfo Indicates the InnerFormInfo object to be Modify.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode ModifyStorageFormInfo(const InnerFormInfo &innerFormInfo);
+    ErrCode ModifyStorageFormData(const InnerFormInfo &innerFormInfo);
 
     /**
      * @brief Delete the form data in DB.
      * @param formId The form data Id.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode DeleteStorageFormInfo(const std::string &formId);
+    ErrCode DeleteStorageFormData(const std::string &formId);
 
 private:
     void SaveEntries(const std::map<std::string, std::string> &value, std::vector<InnerFormInfo> &innerFormInfos);
