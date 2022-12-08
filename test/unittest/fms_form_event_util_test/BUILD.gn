@@ -1,0 +1,80 @@
+# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/test.gni")
+import("//foundation/ability/form_fwk/form_fwk.gni")
+
+module_output_path = "form_fwk/formmgrservice"
+
+ohos_unittest("FmsFormEventUtilTest") {
+  module_out_path = module_output_path
+
+  sources = [
+    "${form_fwk_path}/test/unittest/fms_form_event_util_test/fms_form_event_util_test.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_event_util_test/mock_form_bms_helper.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_event_util_test/mock_form_data_mgr.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_event_util_test/mock_form_db_cache.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_event_util_test/mock_form_info_mgr.cpp",
+  ]
+
+  include_dirs = [
+    "//third_party/json/include",
+    "${ability_runtime_path}/services/formmgr/include",
+    "${systemabilitymgr_path}/samgr/interfaces/innerkits/samgr_proxy/include",
+    "${form_fwk_path}/interfaces/inner_api/include",
+    "${form_fwk_path}/test/mock/include",
+  ]
+
+  configs = []
+  cflags = []
+  if (target_cpu == "arm") {
+    cflags += [ "-DBINDER_IPC_32BIT" ]
+  }
+  deps = [
+    "${ability_runtime_path}/interfaces/inner_api/app_manager:app_manager",
+    "${ability_runtime_path}/services/abilitymgr:abilityms_target",
+    "${form_fwk_path}:fms_target",
+    "${form_fwk_path}:fmskit_native",
+    "${systemabilitymgr_path}/safwk/interfaces/innerkits/safwk:system_ability_fwk",
+    "${systemabilitymgr_path}/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
+    "//third_party/googletest:gmock_main",
+  ]
+
+  external_deps = [
+    "ability_base:base",
+    "ability_base:configuration",
+    "ability_base:want",
+    "ability_runtime:wantagent_innerkits",
+    "access_token:libaccesstoken_sdk",
+    "appspawn:appspawn_socket_client",
+    "bundle_framework:appexecfwk_base",
+    "bundle_framework:appexecfwk_core",
+    "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
+    "device_manager:devicemanagersdk",
+    "device_usage_statistics:usagestatsinner",
+    "eventhandler:libeventhandler",
+    "form_fwk:form_manager",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "kv_store:distributeddata_inner",
+  ]
+}
+
+###############################################################################
+group("unittest") {
+  testonly = true
+
+  deps = [ ":FmsFormEventUtilTest" ]
+}
+###############################################################################
