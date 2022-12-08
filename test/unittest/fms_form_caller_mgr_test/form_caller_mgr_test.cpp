@@ -307,6 +307,20 @@ HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0016, TestSize.Level1) {
 }
 
 /**
+ * @tc.name: FormCallerMgrTest_0017
+ * @tc.desc: test HandleHostCallBackDiedTask function and remote is not nullptr
+ * @tc.type: FUNC
+ * @tc.require: issueI63Y7Y
+ */
+HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0017, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormCallerMgrTest_0017 starts";
+    sptr<IRemoteObject> providerToken = new (std::nothrow) MockFormProviderClient();
+    FormCallerMgr::GetInstance().HandleHostCallBackDiedTask(providerToken);
+    FormCallerMgr::GetInstance().HandleProviderCallBackDiedTask(providerToken);
+    GTEST_LOG_(INFO) << "FormCallerMgrTest_0017 test ends";
+}
+
+/**
  * @tc.name: FormProviderCallerTest_0001
  * @tc.desc: test UpdateForm function and callerToken is not nullptr
  * @tc.type: FUNC

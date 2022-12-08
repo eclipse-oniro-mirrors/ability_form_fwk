@@ -23,6 +23,7 @@
 #include "form_mgr.h"
 #include "form_mgr_errors.h"
 #include "gmock/gmock.h"
+#include "mock_form_token.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -233,5 +234,35 @@ HWTEST_F(FormProviderCallerTest, FormHostCallerTest_0004, TestSize.Level1) {
     FormHostCaller formHostCaller(formJsInfo, nullptr);
     formHostCaller.MessageEvent(formId, want, nullptr);
     GTEST_LOG_(INFO) << "FormHostCallerTest_0004 test ends";
+}
+
+/**
+ * @tc.name: FormProviderCallerTest_0008
+ * @tc.desc: text OnAcquire function.
+ * @tc.type: FUNC
+ * @tc.require: issueI63Y7Y
+ */
+HWTEST_F(FormProviderCallerTest, FormProviderCallerTest_0008, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormProviderCallerTest_0008 starts";
+    Want want;
+    FormProviderInfo formProviderInfo;
+    FormProviderCaller formProviderCaller(nullptr);
+    FormProviderData formProviderData;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formProviderCaller.OnAcquire(formProviderInfo, want, nullptr));
+    GTEST_LOG_(INFO) << "FormProviderCallerTest_0008 test ends";
+}
+
+/**
+ * @tc.name: FormProviderCallerTest_0009
+ * @tc.desc: text OnAcquire function token is nullptr.
+ * @tc.type: FUNC
+ * @tc.require: issueI63Y7Y
+ */
+HWTEST_F(FormProviderCallerTest, FormProviderCallerTest_0009, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormProviderCallerTest_0009 starts";
+    FormJsInfo formJsInfo;
+    FormProviderCaller formProviderCaller(nullptr);
+    EXPECT_EQ(formProviderCaller.OnAcquire(formJsInfo, nullptr), ERR_APPEXECFWK_FORM_COMMON_CODE);
+    GTEST_LOG_(INFO) << "FormProviderCallerTest_0009 test ends";
 }
 } // namespace
