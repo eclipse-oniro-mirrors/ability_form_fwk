@@ -64,8 +64,6 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formShareMgr.HandleFreeInstallTimeout(eventId);
     WantParams wantParams;
     formShareMgr.AddProviderData(want, wantParams);
-    DistributedHardware::DmDeviceInfo deviceInfo;
-    formShareMgr.GetLocalDeviceInfo(bundleName, deviceInfo);
     formShareMgr.IsShareForm(want);
     int64_t msg = static_cast<int64_t>(GetU32Data(data));
     formShareMgr.OnEventTimeoutResponse(msg, eventId);
