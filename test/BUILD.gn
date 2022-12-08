@@ -40,6 +40,7 @@ group("unittest") {
     "unittest/fms_form_data_mgr_test:unittest",
     "unittest/fms_form_db_record_test:unittest",
     "unittest/fms_form_distributed_client_test:unittest",
+    "unittest/fms_form_event_util_test:unittest",
     "unittest/fms_form_host_callback_test:unittest",
     "unittest/fms_form_host_client_test:unittest",
     "unittest/fms_form_host_proxy_test:unittest",
