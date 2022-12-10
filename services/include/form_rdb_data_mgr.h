@@ -17,6 +17,7 @@
 #define OHOS_FORM_FWK_FORM_RDB_DATA_MGR_H
 
 #include <vector>
+#include <unordered_map>
 #include <singleton.h>
 #include <string>
 #include "form_constants.h"
@@ -38,7 +39,6 @@ struct FormRdbConfig {
 };
 class RdbStoreDataCallBackFormInfoStorage : public NativeRdb::RdbOpenCallback {
 public:
-
     RdbStoreDataCallBackFormInfoStorage(const FormRdbConfig &formRdbConfig);
 
     virtual ~RdbStoreDataCallBackFormInfoStorage();
@@ -86,13 +86,13 @@ public:
      * @brief Query the form data in DB.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode QueryData(const std::string &key, std::map<std::string, std::string> &values);
+    ErrCode QueryData(const std::string &key, std::unordered_map<std::string, std::string> &values);
 
     /**
      * @brief Query all the form data in DB.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode QueryAllData(std::map<std::string, std::string> &values);
+    ErrCode QueryAllData(std::unordered_map<std::string, std::string> &values);
 
 private:
     FormRdbConfig formRdbConfig_;

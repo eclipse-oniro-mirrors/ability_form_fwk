@@ -35,24 +35,24 @@ const int32_t FORM_VALUE_INDEX = 1;
 RdbStoreDataCallBackFormInfoStorage::RdbStoreDataCallBackFormInfoStorage(const FormRdbConfig &formRdbConfig)
     : formRdbConfig_(formRdbConfig)
 {
-    HILOG_INFO("create rdb store callback instance");
+    HILOG_DEBUG("create rdb store callback instance");
 }
 
 RdbStoreDataCallBackFormInfoStorage::~RdbStoreDataCallBackFormInfoStorage()
 {
-    HILOG_INFO("destroy rdb store callback instance");
+    HILOG_DEBUG("destroy rdb store callback instance");
 }
 
 int32_t RdbStoreDataCallBackFormInfoStorage::OnCreate(NativeRdb::RdbStore &rdbStore)
 {
-    HILOG_INFO("OnCreate");
+    HILOG_DEBUG("OnCreate");
     return NativeRdb::E_OK;
 }
 
 int32_t RdbStoreDataCallBackFormInfoStorage::OnUpgrade(
     NativeRdb::RdbStore &rdbStore, int currentVersion, int targetVersion)
 {
-    HILOG_INFO("OnUpgrade currentVersion: %{plubic}d, targetVersion: %{plubic}d",
+    HILOG_DEBUG("OnUpgrade currentVersion: %{plubic}d, targetVersion: %{plubic}d",
         currentVersion, targetVersion);
     return NativeRdb::E_OK;
 }
@@ -60,14 +60,14 @@ int32_t RdbStoreDataCallBackFormInfoStorage::OnUpgrade(
 int32_t RdbStoreDataCallBackFormInfoStorage::OnDowngrade(
     NativeRdb::RdbStore &rdbStore, int currentVersion, int targetVersion)
 {
-    HILOG_INFO("OnDowngrade  currentVersion: %{plubic}d, targetVersion: %{plubic}d",
+    HILOG_DEBUG("OnDowngrade  currentVersion: %{plubic}d, targetVersion: %{plubic}d",
         currentVersion, targetVersion);
     return NativeRdb::E_OK;
 }
 
 int32_t RdbStoreDataCallBackFormInfoStorage::OnOpen(NativeRdb::RdbStore &rdbStore)
 {
-    HILOG_INFO("OnOpen");
+    HILOG_DEBUG("OnOpen");
     int ret = NativeRdb::E_OK;
     if (hasTableInit_) {
         return ret;
@@ -89,15 +89,15 @@ int32_t RdbStoreDataCallBackFormInfoStorage::onCorruption(std::string databaseFi
 FormRdbDataMgr::FormRdbDataMgr(const FormRdbConfig &formRdbConfig)
     : formRdbConfig_(formRdbConfig) 
 {
-    HILOG_INFO("create form rdb data manager");
+    HILOG_DEBUG("create form rdb data manager");
 }
 
 ErrCode FormRdbDataMgr::Init()
 {
-    HILOG_INFO("Create rdbStore");
+    HILOG_DEBUG("Create rdbStore");
 
     if (rdbStore_ != nullptr) {
-        HILOG_INFO("FormInfoRdbStore has existed");
+        HILOG_DEBUG("FormInfoRdbStore has existed");
         return ERR_OK;
     }
 
@@ -120,7 +120,7 @@ ErrCode FormRdbDataMgr::Init()
 
 ErrCode FormRdbDataMgr::InsertData(const std::string &key, const std::string &value)
 {
-    HILOG_INFO("InsertData start");
+    HILOG_DEBUG("InsertData start");
     if (rdbStore_ == nullptr) {
         HILOG_ERROR("FormInfoRdbStore is null");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -141,7 +141,7 @@ ErrCode FormRdbDataMgr::InsertData(const std::string &key, const std::string &va
 
 ErrCode FormRdbDataMgr::DeleteData(const std::string &key)
 {
-    HILOG_INFO("DeleteData start");
+    HILOG_DEBUG("DeleteData start");
     if (rdbStore_ == nullptr) {
         HILOG_ERROR("FormInfoRdbStore is null");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -159,9 +159,9 @@ ErrCode FormRdbDataMgr::DeleteData(const std::string &key)
     return ERR_OK;
 }
 
-ErrCode FormRdbDataMgr::QueryData(const std::string &key, std::map<std::string, std::string> &values)
+ErrCode FormRdbDataMgr::QueryData(const std::string &key, std::unordered_map<std::string, std::string> &values)
 {
-    HILOG_INFO("QueryData start");
+    HILOG_DEBUG("QueryData start");
     if (rdbStore_ == nullptr) {
         HILOG_ERROR("FormInfoRdbStore is null");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -181,27 +181,27 @@ ErrCode FormRdbDataMgr::QueryData(const std::string &key, std::map<std::string, 
     }
 
     do {
-        std::string key;
-        if (absSharedResultSet->GetString(FORM_KEY_INDEX, key) != NativeRdb::E_OK) {
+        std::string resultKey;
+        if (absSharedResultSet->GetString(FORM_KEY_INDEX, resultKey) != NativeRdb::E_OK) {
             HILOG_ERROR("GetString key failed");
             return ERR_APPEXECFWK_FORM_COMMON_CODE;
         }
 
-        std::string value;
-        if (absSharedResultSet->GetString(FORM_VALUE_INDEX, value) != NativeRdb::E_OK) {
+        std::string resultValue;
+        if (absSharedResultSet->GetString(FORM_VALUE_INDEX, resultValue) != NativeRdb::E_OK) {
             HILOG_ERROR("GetString value failed");
             return ERR_APPEXECFWK_FORM_COMMON_CODE;
         }
 
-        values.emplace(key, value);
+        values.emplace(resultKey, resultValue);
     } while (absSharedResultSet->GoToNextRow() == NativeRdb::E_OK);
 
     return ERR_OK;
 }
 
-ErrCode FormRdbDataMgr::QueryAllData(std::map<std::string, std::string> &datas)
+ErrCode FormRdbDataMgr::QueryAllData(std::unordered_map<std::string, std::string> &datas)
 {
-    HILOG_INFO("QueryAllData start");
+    HILOG_DEBUG("QueryAllData start");
     if (rdbStore_ == nullptr) {
         HILOG_ERROR("FormInfoRdbStore is null");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -220,19 +220,19 @@ ErrCode FormRdbDataMgr::QueryAllData(std::map<std::string, std::string> &datas)
     }
 
     do {
-        std::string key;
-        if (absSharedResultSet->GetString(FORM_KEY_INDEX, key) != NativeRdb::E_OK) {
+        std::string resultKey;
+        if (absSharedResultSet->GetString(FORM_KEY_INDEX, resultKey) != NativeRdb::E_OK) {
             HILOG_ERROR("GetString key failed");
             return ERR_APPEXECFWK_FORM_COMMON_CODE;
         }
 
-        std::string value;
-        if (absSharedResultSet->GetString(FORM_VALUE_INDEX, value) != NativeRdb::E_OK) {
+        std::string resultValue;
+        if (absSharedResultSet->GetString(FORM_VALUE_INDEX, resultValue) != NativeRdb::E_OK) {
             HILOG_ERROR("GetString value failed");
             return ERR_APPEXECFWK_FORM_COMMON_CODE;
         }
 
-        datas.emplace(key, value);
+        datas.emplace(resultKey, resultValue);
     } while (absSharedResultSet->GoToNextRow() == NativeRdb::E_OK);
     return ERR_OK;
 }

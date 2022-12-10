@@ -81,7 +81,7 @@ HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_002, Function | SmallTest 
 HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_003, Function | SmallTest | Level1)
 {
     std::string key = "testKey";
-    std::map<std::string, std::string> datas;
+    std::unordered_map<std::string, std::string> datas;
     auto result = rdbDataManager_->QueryData(key, datas);
     EXPECT_EQ(result, ERR_OK);
 }
@@ -93,7 +93,7 @@ HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_003, Function | SmallTest 
  */
 HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_004, Function | SmallTest | Level1)
 {
-    std::map<std::string, std::string> datas;
+    std::unordered_map<std::string, std::string> datas;
     auto result = rdbDataManager_->QueryAllData(datas);
     EXPECT_EQ(result, ERR_OK);
 }

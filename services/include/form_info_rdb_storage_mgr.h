@@ -83,7 +83,7 @@ public:
     ErrCode DeleteStorageFormData(const std::string &formId);
 
 private:
-    void SaveEntries(const std::map<std::string, std::string> &value, std::vector<InnerFormInfo> &innerFormInfos);
+    void SaveEntries(const std::unordered_map<std::string, std::string> &value, std::vector<InnerFormInfo> &innerFormInfos);
     bool CheckRdbStore();
     std::shared_ptr<FormRdbDataMgr> rdbDataManager_;
     mutable std::mutex rdbStorePtrMutex_;
