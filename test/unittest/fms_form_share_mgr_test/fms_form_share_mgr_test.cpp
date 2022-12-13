@@ -819,62 +819,6 @@ HWTEST_F(FmsFormShareMgrTest, ShareForm_002, TestSize.Level0)
 }
 
 /**
- * @tc.name: GetLocalDeviceInfo_001
- * @tc.desc: Verify that the local device is successfully obtained.
- * @tc.type: GetLocalDeviceInfo
- * @tc.require: issueI581YL
- */
-HWTEST_F(FmsFormShareMgrTest, GetLocalDeviceInfo_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FmsFormShareMgrTest GetLocalDeviceInfo_001 start";
-    FormJsInfo formJsInfo;
-    CreateProviderData();
-    CreateForm(formJsInfo);
-
-    FormRecord formInfo;
-    formInfo.formName = PARAM_FORM_NAME;
-    formInfo.formId = formJsInfo.formId;
-    FormRecord formInfo1;
-    FormDataMgr::GetInstance().formRecords_.emplace(formJsInfo.formId, formInfo);
-    bool ret = FormDataMgr::GetInstance().GetFormRecord(formJsInfo.formId, formInfo1);
-    EXPECT_TRUE(ret);
-    OHOS::DistributedHardware::DmDeviceInfo deviceInfo = {{0}, {0}, 0, {0}};
-    auto result =
-        DelayedSingleton<FormShareMgr>::GetInstance()->GetLocalDeviceInfo(FORM_PROVIDER_BUNDLE_NAME, deviceInfo);
-    EXPECT_EQ(result, ERR_OK);
-    std::string deviceId(deviceInfo.deviceId);
-    EXPECT_FALSE(deviceId.empty());
-
-    GTEST_LOG_(INFO) << "FmsFormShareMgrTest GetLocalDeviceInfo_001 end";
-}
-
-/**
- * @tc.name: GetLocalDeviceInfo_002
- * @tc.desc: BundleName is empty, get local device info failed.
- * @tc.type: GetLocalDeviceInfo
- * @tc.require: issueI581YL
- */
-HWTEST_F(FmsFormShareMgrTest, GetLocalDeviceInfo_002, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FmsFormShareMgrTest GetLocalDeviceInfo_002 start";
-    FormJsInfo formJsInfo;
-    CreateProviderData();
-    CreateForm(formJsInfo);
-
-    FormRecord formInfo;
-    formInfo.formName = PARAM_FORM_NAME;
-    formInfo.formId = formJsInfo.formId;
-    FormRecord formInfo1;
-    FormDataMgr::GetInstance().formRecords_.emplace(formJsInfo.formId, formInfo);
-    bool ret = FormDataMgr::GetInstance().GetFormRecord(formJsInfo.formId, formInfo1);
-    EXPECT_TRUE(ret);
-    OHOS::DistributedHardware::DmDeviceInfo deviceInfo;
-    auto result = DelayedSingleton<FormShareMgr>::GetInstance()->GetLocalDeviceInfo(FORM_NULL_BUNDLE_NAME, deviceInfo);
-    EXPECT_EQ(result, DistributedHardware::ERR_DM_IPC_SEND_REQUEST_FAILED);
-    GTEST_LOG_(INFO) << "FmsFormShareMgrTest GetLocalDeviceInfo_002 end";
-}
-
-/**
  * @tc.name: AddProviderData_001
  * @tc.desc: Add provider data success.
  * @tc.type: AddProviderData

@@ -457,14 +457,6 @@ void FormShareMgr::HandleProviderShareData(int64_t formId, const std::string &re
         return;
     }
 
-    DistributedHardware::DmDeviceInfo deviceInfo;
-    auto ret = GetLocalDeviceInfo(formRecord.bundleName, deviceInfo);
-    if (ret != ERR_OK) {
-        HILOG_ERROR("failed to get local device info.");
-        SendResponse(requestCode, ERR_APPEXECFWK_FORM_COMMON_CODE);
-        return;
-    }
-
     FormShareInfo formShareInfo;
     formShareInfo.formId = formRecord.formId;
     formShareInfo.formName = formRecord.formName;
@@ -474,7 +466,6 @@ void FormShareMgr::HandleProviderShareData(int64_t formId, const std::string &re
     formShareInfo.formTempFlag = formRecord.formTempFlag;
     formShareInfo.dimensionId = formRecord.specification;
     formShareInfo.providerShareData = wantParams;
-    formShareInfo.deviceId = deviceInfo.deviceId;
 
     if (formDmsClient_ == nullptr) {
         formDmsClient_ = std::make_shared<FormDistributedClient>();
@@ -486,29 +477,6 @@ void FormShareMgr::HandleProviderShareData(int64_t formId, const std::string &re
         return;
     }
     SendResponse(requestCode, ERR_OK);
-}
-
-int32_t FormShareMgr::GetLocalDeviceInfo(
-    const std::string &bundleName, DistributedHardware::DmDeviceInfo &deviceInfo)
-{
-    HILOG_DEBUG("%{public}s called.", __func__);
-    auto &deviceManager = OHOS::DistributedHardware::DeviceManager::GetInstance();
-
-    std::shared_ptr<DeviceInitCallback> deviceInitCallback_ = std::make_shared<DeviceInitCallback>();
-    if (!deviceInitCallback_) {
-        HILOG_ERROR("DeviceInitCallback make_shared failed!");
-        return ERR_INVALID_VALUE;
-    }
-    deviceManager.InitDeviceManager(bundleName, deviceInitCallback_);
-
-    auto ret = deviceManager.GetLocalDeviceInfo(bundleName, deviceInfo);
-    if (ret != ERR_OK) {
-        HILOG_ERROR("failed to get local device info.");
-        return ret;
-    }
-    deviceManager.UnInitDeviceManager(bundleName);
-
-    return ERR_OK;
 }
 
 void FormShareMgr::SendResponse(int64_t requestCode, int32_t result)
