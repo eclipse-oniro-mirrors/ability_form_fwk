@@ -145,7 +145,7 @@ std::shared_ptr<Global::Resource::ResourceManager> FormInfoHelper::GetResourceMa
         return nullptr;
     }
     for (auto hapModuleInfo : bundleInfo.hapModuleInfos) {
-        std::string moduleResPath = hapModuleInfo.resourcePath;
+        std::string moduleResPath = hapModuleInfo.hapPath.empty() ? hapModuleInfo.resourcePath : hapModuleInfo.hapPath;
         if (!moduleResPath.empty()) {
             HILOG_INFO("DistributedBms::InitResourceManager, moduleResPath: %{private}s", moduleResPath.c_str());
             if (!resourceManager->AddResource(moduleResPath.c_str())) {
