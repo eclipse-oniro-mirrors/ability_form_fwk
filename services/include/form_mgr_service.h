@@ -341,6 +341,7 @@ private:
     void HiDumpStorageFormInfos([[maybe_unused]] const std::string &args, std::string &result);
     void HiDumpFormInfoByBundleName(const std::string &args, std::string &result);
     void HiDumpFormInfoByFormId(const std::string &args, std::string &result);
+    bool CheckCallerIsSystemApp() const;
 private:
     static const int32_t ENABLE_FORM_UPDATE = 5;
     const static std::map<std::string, DumpKey> dumpKeyMap_;
