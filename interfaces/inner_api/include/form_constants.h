@@ -163,6 +163,14 @@ namespace Constants {
         {Dimension::DIMENSION_4_4, "4*4"},
         {Dimension::DIMENSION_2_1, "2*1"}
     };
+
+    // rdb
+    constexpr const char* FORM_RDB_NAME = "/formdb.db";
+    constexpr const char* FORM_RDB_TABLE_NAME = "form_table";
+    constexpr const char* FORM_MANAGER_SERVICE_PATH = "/data/service/el1/public/database/form_storage";
+    constexpr const char* FORM_JOURNAL_MODE = "WAL";
+    constexpr const char* FORM_SYNC_MODE = "MODE_OFF";
+    constexpr int32_t FORM_RDB_VERSION = 1;
 }  // namespace Constants
 }  // namespace AppExecFwk
 }  // namespace OHOS
