@@ -130,7 +130,6 @@ public:
      */
     bool IsShareForm(const Want &want);
 private:
-    int32_t GetLocalDeviceInfo(const std::string &bundleName, DistributedHardware::DmDeviceInfo &deviceInfo);
     std::string MakeFormShareInfoKey(const FormShareInfo &info);
     std::string MakeFormShareInfoKey(const Want &want);
     void RemoveFormShareInfo(const std::string &formShareInfoKey);
@@ -159,12 +158,6 @@ private:
     mutable std::shared_mutex requestMapMutex_ {};
 };
 
-class DeviceInitCallback final : public DistributedHardware::DmInitCallback {
-    void OnRemoteDied() override
-    {
-        HILOG_DEBUG("on remote died.");
-    }
-};
 } // namespace AppExecFwk
 } // namespace OHOS
 #endif // FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_SHARE_MGR_H
