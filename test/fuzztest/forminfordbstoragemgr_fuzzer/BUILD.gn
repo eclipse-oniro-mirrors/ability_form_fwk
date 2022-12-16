@@ -19,10 +19,11 @@ import("//foundation/ability/form_fwk/form_fwk.gni")
 module_output_path = "form_fwk/formmgr"
 
 ##############################fuzztest##########################################
-ohos_fuzztest("FormInfoStorageMgrFuzzTest") {
+ohos_fuzztest("FormInfoRdbStorageMgrFuzzTest") {
   module_out_path = module_output_path
 
-  fuzz_config_file = "${form_fwk_path}/test/fuzztest/forminfostoragemgr_fuzzer"
+  fuzz_config_file =
+      "${form_fwk_path}/test/fuzztest/forminfordbstoragemgr_fuzzer"
 
   include_dirs = [
     "${form_fwk_path}/interfaces/kits/native/include",
@@ -34,7 +35,7 @@ ohos_fuzztest("FormInfoStorageMgrFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [ "forminfostoragemgr_fuzzer.cpp" ]
+  sources = [ "forminfordbstoragemgr_fuzzer.cpp" ]
 
   configs = [ "${ability_runtime_path}/interfaces/inner_api/ability_manager:ability_manager_public_config" ]
 
@@ -73,7 +74,7 @@ group("fuzztest") {
   deps = []
   deps += [
     # deps file
-    ":FormInfoStorageMgrFuzzTest",
+    ":FormInfoRdbStorageMgrFuzzTest",
   ]
 }
 ###############################################################################

@@ -19,7 +19,7 @@
 #include "extension_form_profile.h"
 #include "form_bms_helper.h"
 #include "form_info_storage.h"
-#include "form_info_storage_mgr.h"
+#include "form_info_rdb_storage_mgr.h"
 #include "form_mgr_errors.h"
 #include "form_util.h"
 #include "hilog_wrapper.h"
@@ -349,7 +349,7 @@ ErrCode BundleFormInfo::UpdateFormInfoStorageLocked()
 {
     ErrCode errCode;
     if (formInfoStorages_.empty()) {
-        errCode = FormInfoStorageMgr::GetInstance().RemoveBundleFormInfos(bundleName_);
+        errCode = FormInfoRdbStorageMgr::GetInstance().RemoveBundleFormInfos(bundleName_);
     } else {
         nlohmann::json jsonObject = formInfoStorages_;
         if (jsonObject.is_discarded()) {
@@ -357,7 +357,7 @@ ErrCode BundleFormInfo::UpdateFormInfoStorageLocked()
             return ERR_APPEXECFWK_PARSE_BAD_PROFILE;
         }
         std::string formInfoStoragesStr = jsonObject.dump(Constants::DUMP_INDENT);
-        errCode = FormInfoStorageMgr::GetInstance().UpdateBundleFormInfos(bundleName_, formInfoStoragesStr);
+        errCode = FormInfoRdbStorageMgr::GetInstance().UpdateBundleFormInfos(bundleName_, formInfoStoragesStr);
     }
     return errCode;
 }
@@ -372,7 +372,7 @@ FormInfoMgr::~FormInfoMgr() = default;
 ErrCode FormInfoMgr::Start()
 {
     std::vector<std::pair<std::string, std::string>> formInfoStorages;
-    ErrCode errCode = FormInfoStorageMgr::GetInstance().LoadFormInfos(formInfoStorages);
+    ErrCode errCode = FormInfoRdbStorageMgr::GetInstance().LoadFormInfos(formInfoStorages);
     if (errCode != ERR_OK) {
         HILOG_ERROR("LoadFormInfos failed.");
         return errCode;
