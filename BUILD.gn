@@ -131,6 +131,10 @@ ohos_shared_library("libfms") {
     defines += [ "DEVICE_USAGE_STATISTICS_ENABLE" ]
   }
 
+  if (build_variant == "root") {
+    defines += [ "FORM_EVENT_FOR_TEST" ]
+  }
+
   subsystem_name = "ability"
   part_name = "form_fwk"
 }
