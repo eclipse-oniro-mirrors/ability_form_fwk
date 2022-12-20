@@ -1256,8 +1256,9 @@ void FormTimerMgr::Init()
     matchingSkills.AddEvent(Constants::ACTION_UPDATEATTIMER);
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_TIME_CHANGED);
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_TIMEZONE_CHANGED);
+#ifdef FORM_EVENT_FOR_TEST
     matchingSkills.AddEvent(FMS_TIME_SPEED);
-
+#endif
     EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
     timerReceiver_ = std::make_shared<TimerReceiver>(subscribeInfo);
     EventFwk::CommonEventManager::SubscribeCommonEvent(timerReceiver_);
