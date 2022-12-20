@@ -317,9 +317,11 @@ private:
      * @param bundleInfo Bundle info.
      * @param formInfo Form info.
      * @param itemInfo Form configure info.
+     * @param want The want of the request.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode CreateFormItemInfo(const BundleInfo& bundleInfo, const FormInfo& formInfo, FormItemInfo& itemInfo);
+    ErrCode CreateFormItemInfo(const BundleInfo& bundleInfo, const FormInfo& formInfo, FormItemInfo& itemInfo,
+        const AAFwk::Want &want);
     /**
      * @brief Allocate form by formId.
      * @param info Form configure info.
@@ -568,6 +570,12 @@ private:
      */
     ErrCode AcquireFormStateCheck(const std::string &bundleName, const std::string &abilityName, const Want &want,
                                   std::string &provider);
+    /**
+     * @brief check if the form host is system app
+     * @param formRecord Form storage information
+     * @return Returns true if the form host is system app, false if not.
+     */
+    bool checkFormHostHasSaUid(const FormRecord &formRecord);
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

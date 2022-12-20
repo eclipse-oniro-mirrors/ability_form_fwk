@@ -55,6 +55,7 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace {
 constexpr int32_t CALLING_UID_TRANSFORM_DIVISOR = 200000;
+constexpr int32_t SYSTEM_UID = 1000;
 } // namespace
 
 FormMgrAdapter::FormMgrAdapter()
@@ -432,7 +433,7 @@ int FormMgrAdapter::UpdateForm(const int64_t formId,
     // check bundle uid for permission
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     int32_t userId = GetCurrentUserId(callingUid);
-    if (userId != formRecord.userId) {
+    if (userId != formRecord.userId && !checkFormHostHasSaUid(formRecord)) {
         HILOG_ERROR("%{public}s error, not under current user, formId:%{public}" PRId64 ".", __func__, matchedFormId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
@@ -1156,7 +1157,7 @@ ErrCode FormMgrAdapter::GetFormItemInfo(const AAFwk::Want &want, const BundleInf
         return ERR_APPEXECFWK_FORM_NO_SUCH_DIMENSION;
     }
 
-    ErrCode ret = CreateFormItemInfo(bundleInfo, formInfo, formItemInfo);
+    ErrCode ret = CreateFormItemInfo(bundleInfo, formInfo, formItemInfo, want);
     if (ret != ERR_OK) {
         HILOG_ERROR("GetFormItemInfo failed, CreateFormItemInfo failed.");
         return ret;
@@ -1196,7 +1197,7 @@ bool FormMgrAdapter::IsDimensionValid(const FormInfo &formInfo, int dimensionId)
  * @return Returns ERR_OK on success, others on failure.
  */
 ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
-    const FormInfo &formInfo, FormItemInfo &itemInfo)
+    const FormInfo &formInfo, FormItemInfo &itemInfo, const AAFwk::Want &want)
 {
     itemInfo.SetProviderBundleName(bundleInfo.name);
     itemInfo.SetVersionCode(bundleInfo.versionCode);
@@ -1204,7 +1205,15 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
     itemInfo.SetCompatibleVersion(bundleInfo.compatibleVersion);
 
     std::string hostBundleName;
-    auto ret = FormBmsHelper::GetInstance().GetCallerBundleName(hostBundleName);
+    bool isSaUid = IPCSkeleton::GetCallingUid() == SYSTEM_UID;
+    ErrCode ret = ERR_APPEXECFWK_FORM_COMMON_CODE;
+    if (isSaUid) {
+        hostBundleName = want.GetStringParam(AppExecFwk::Constants::PARAM_FORM_HOST_BUNDLENAME_KEY);
+        HILOG_INFO("sa uid call CreateFormItemInfo, hostBundleName is %{public}s", hostBundleName.c_str());
+        ret = ERR_OK;
+    } else {
+        ret = FormBmsHelper::GetInstance().GetCallerBundleName(hostBundleName);
+    }
     if (ret != ERR_OK) {
         HILOG_ERROR("GetFormsInfoByModule, failed to get form config info.");
         return ret;
@@ -1287,7 +1296,7 @@ int FormMgrAdapter::SetNextRefreshTime(const int64_t formId, const int64_t nextT
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
-    bool isSelfFormId = (userId == formRecord.userId);
+    bool isSelfFormId = (userId == formRecord.userId) || checkFormHostHasSaUid(formRecord);
     if (!isSelfFormId) {
         HILOG_ERROR("%{public}s, not self form:%{public}" PRId64 "", __func__, formId);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
@@ -2201,6 +2210,17 @@ bool FormMgrAdapter::IsRequestPublishFormSupported()
         return false;
     }
     return true;
+}
+
+/**
+ * @brief check if the form host is system app
+ * @param formRecord Form storage information
+ * @return Returns true if the form host is system app, false if not.
+ */
+bool FormMgrAdapter::checkFormHostHasSaUid(const FormRecord &formRecord)
+{
+    return std::find(formRecord.formUserUids.begin(), formRecord.formUserUids.end(),
+        SYSTEM_UID) != formRecord.formUserUids.end();
 }
 } // namespace AppExecFwk
 } // namespace OHOS
