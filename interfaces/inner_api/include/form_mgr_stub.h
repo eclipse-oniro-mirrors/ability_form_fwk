@@ -256,6 +256,13 @@ private:
      */
     int32_t HandleStartAbility(MessageParcel &data, MessageParcel &reply);
 
+    /**
+     * @brief Check form manager service ready
+     * @param data input param
+     * @param reply output param
+     * @return Return ERR_OK on success, others on failure
+    */
+    int32_t HandleCheckFMSReady(MessageParcel &data, MessageParcel &reply);
 private:
     using FormMgrFunc = int32_t (FormMgrStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, FormMgrFunc> memberFuncMap_;
