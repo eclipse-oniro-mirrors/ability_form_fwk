@@ -94,7 +94,11 @@ public:
 
     static bool ThrowByInternalErrorCode(NativeEngine &engine, int32_t internalErrorCode);
 
+    static bool ThrowByExternalErrorCode(NativeEngine &engine, int32_t externalErrorCode);
+
     static NativeValue *CreateErrorByInternalErrorCode(NativeEngine &engine, int32_t internalErrorCode);
+
+    static NativeValue *CreateErrorByExternalErrorCode(NativeEngine &engine, int32_t externalErrorCode);
 
     static bool ThrowParamTypeError(NativeEngine &engine, const std::string &paramName, const std::string &type);
 
