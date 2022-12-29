@@ -22,14 +22,12 @@
 #include "form_mgr.h"
 #include "form_mgr_errors.h"
 #include "hilog_wrapper.h"
-#include "ipc_skeleton.h"
 #include "napi_form_util.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "napi_common_util.h"
 #include "napi_common_want.h"
 #include "runtime.h"
-#include "tokenid_kit.h"
 
 namespace OHOS {
 namespace AbilityRuntime {
@@ -330,12 +328,6 @@ public:
         return (me != nullptr) ? me->OnNotifyFormsPrivacyProtected(*engine, *info) : nullptr;
     }
 private:
-    bool CheckCallerIsSystemApp()
-    {
-        auto selfToken = IPCSkeleton::GetSelfTokenID();
-        return Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(selfToken);
-    }
-
     static bool ConvertFromId(NativeEngine& engine, NativeValue* jsValue, int64_t &formId)
     {
         if (jsValue->TypeOf() != NATIVE_STRING) {
@@ -734,13 +726,6 @@ private:
     NativeValue* OnIsSystemReady(NativeEngine &engine, const NativeCallbackInfo &info)
     {
         HILOG_DEBUG("%{public}s is called", __FUNCTION__);
-
-        if (!CheckCallerIsSystemApp()) {
-            HILOG_ERROR("This application is not system-app, can not use system-api");
-            NapiFormUtil::ThrowByExternalErrorCode(engine, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
-            return engine.CreateUndefined();
-        }
-
         if (info.argc > ARGS_ONE || info.argc < ARGS_ZERO) {
             HILOG_ERROR("wrong number of arguments.");
             NapiFormUtil::ThrowParamNumError(engine, std::to_string(info.argc), "0 or 1");
@@ -860,12 +845,6 @@ private:
     {
         HILOG_DEBUG("%{public}s called.", __func__);
 
-        if (!CheckCallerIsSystemApp()) {
-            HILOG_ERROR("This application is not system-app, can not use system-api");
-            NapiFormUtil::ThrowByExternalErrorCode(engine, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
-            return engine.CreateUndefined();
-        }
-
         if (info.argc != ARGS_TWO) {
             HILOG_ERROR("wrong number of arguments.");
             NapiFormUtil::ThrowParamNumError(engine, std::to_string(info.argc), "2");
@@ -904,12 +883,6 @@ private:
     NativeValue* OnUnregisterFormUninstallObserver(NativeEngine &engine, NativeCallbackInfo &info)
     {
         HILOG_DEBUG("%{public}s called.", __func__);
-
-        if (!CheckCallerIsSystemApp()) {
-            HILOG_ERROR("This application is not system-app, can not use system-api");
-            NapiFormUtil::ThrowByExternalErrorCode(engine, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
-            return engine.CreateUndefined();
-        }
 
         if (info.argc > ARGS_TWO|| info.argc < ARGS_ONE) {
             HILOG_ERROR("wrong number of arguments.");

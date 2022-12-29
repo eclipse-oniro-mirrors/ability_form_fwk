@@ -34,7 +34,6 @@
 #include "iservice_registry.h"
 #include "permission_verification.h"
 #include "system_ability_definition.h"
-#include "tokenid_kit.h"
 #include "event_report.h"
 #include "hisysevent.h"
 #include "xcollie/watchdog.h"
@@ -235,9 +234,7 @@ ErrCode FormMgrService::RequestPublishForm(Want &want, bool withFormBindingData,
     std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId)
 {
     HILOG_INFO("%{public}s called.", __func__);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
+
     return FormMgrAdapter::GetInstance().RequestPublishForm(want, withFormBindingData, formBindingData, formId);
 }
 
@@ -500,10 +497,16 @@ ErrCode FormMgrService::CheckFormPermission()
         return ERR_OK;
     }
 
+    // get IBundleMgr
+    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
+    if (iBundleMgr == nullptr) {
+        HILOG_ERROR("%{public}s error, failed to get IBundleMgr.", __func__);
+        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
+    }
+
     // check if system app
-    auto callerToken = IPCSkeleton::GetCallingFullTokenID();
-    if (!Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(callerToken)) {
-        HILOG_ERROR("The caller is not system-app, can not use system-api");
+    auto isSystemApp = iBundleMgr->CheckIsSystemAppByUid(IPCSkeleton::GetCallingUid());
+    if (!isSystemApp) {
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
     }
 
@@ -512,7 +515,7 @@ ErrCode FormMgrService::CheckFormPermission()
     if (!isCallingPerm) {
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
-    HILOG_DEBUG("Permission verification ok!");
+    HILOG_ERROR("Permission verification ok!");
     return ERR_OK;
 }
 
@@ -619,9 +622,6 @@ int FormMgrService::NotifyFormsEnableUpdate(const std::vector<int64_t> &formIds,
 int FormMgrService::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
 {
     HILOG_INFO("%{public}s called.", __func__);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
     return FormMgrAdapter::GetInstance().GetAllFormsInfo(formInfos);
 }
 
@@ -634,9 +634,6 @@ int FormMgrService::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
 int FormMgrService::GetFormsInfoByApp(std::string &bundleName, std::vector<FormInfo> &formInfos)
 {
     HILOG_INFO("%{public}s called.", __func__);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
     return FormMgrAdapter::GetInstance().GetFormsInfoByApp(bundleName, formInfos);
 }
 
@@ -651,9 +648,6 @@ int FormMgrService::GetFormsInfoByModule(std::string &bundleName, std::string &m
                                          std::vector<FormInfo> &formInfos)
 {
     HILOG_INFO("%{public}s called.", __func__);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
     return FormMgrAdapter::GetInstance().GetFormsInfoByModule(bundleName, moduleName, formInfos);
 }
 
@@ -680,7 +674,15 @@ int32_t FormMgrService::GetFormsInfo(const FormInfoFilter &filter, std::vector<F
 bool FormMgrService::IsRequestPublishFormSupported()
 {
     HILOG_INFO("%{public}s called.", __func__);
-    if (!CheckCallerIsSystemApp()) {
+    // get IBundleMgr
+    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
+    if (iBundleMgr == nullptr) {
+        HILOG_ERROR("%{public}s error, failed to get IBundleMgr.", __func__);
+        return false;
+    }
+    // check if system app
+    auto isSystemApp = iBundleMgr->CheckIsSystemAppByUid(IPCSkeleton::GetCallingUid());
+    if (!isSystemApp) {
         return false;
     }
     return FormMgrAdapter::GetInstance().IsRequestPublishFormSupported();
@@ -694,12 +696,16 @@ int32_t FormMgrService::StartAbility(const Want &want, const sptr<IRemoteObject>
         HILOG_ERROR("%{public}s error, failed to get bundleMgr.", __func__);
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    // check if system app
+    auto callingUid = IPCSkeleton::GetCallingUid();
+    auto isSystemApp = bundleMgr->CheckIsSystemAppByUid(callingUid);
+    if (!isSystemApp) {
+        HILOG_ERROR("%{public}s error, permission denied.", __func__);
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
     // retrieve bundleName of the calling ability.
     std::string callerBundleName;
-    if (!IN_PROCESS_CALL(bundleMgr->GetBundleNameForUid(IPCSkeleton::GetCallingUid(), callerBundleName))) {
+    if (!IN_PROCESS_CALL(bundleMgr->GetBundleNameForUid(callingUid, callerBundleName))) {
         HILOG_ERROR("StartAbility, failed to get form config info.");
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
@@ -874,17 +880,6 @@ void FormMgrService::HiDumpFormInfoByFormId(const std::string &args, std::string
         return;
     }
     DumpFormInfoByFormId(formId, result);
-}
-
-bool FormMgrService::CheckCallerIsSystemApp() const
-{
-    auto callerTokenID = IPCSkeleton::GetCallingFullTokenID();
-    if (!AAFwk::PermissionVerification::GetInstance()->IsSACall() &&
-        !Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(callerTokenID)) {
-        HILOG_ERROR("The caller is not system-app, can not use system-api");
-        return false;
-    }
-    return true;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

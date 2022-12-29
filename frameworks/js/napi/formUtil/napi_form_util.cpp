@@ -222,34 +222,10 @@ bool NapiFormUtil::ThrowByInternalErrorCode(NativeEngine &engine, int32_t intern
     return Throw(engine, externalErrorCode, externalErrorMessage);
 }
 
-bool NapiFormUtil::ThrowByExternalErrorCode(NativeEngine &engine, int32_t externalErrorCode)
-{
-    std::string externalErrorMessage;
-    auto iter = ERR_MSG_MAP_EXTERNAL.find(externalErrorCode);
-    if (iter != ERR_MSG_MAP_EXTERNAL.end()) {
-        externalErrorMessage = iter->second;
-    } else {
-        externalErrorMessage = ERR_MSG_MAP_EXTERNAL.at(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR);
-    }
-    return Throw(engine, externalErrorCode, externalErrorMessage);
-}
-
 NativeValue *NapiFormUtil::CreateErrorByInternalErrorCode(NativeEngine &engine, int32_t internalErrorCode)
 {
     int32_t externalErrorCode = QueryExternalErrorCode(internalErrorCode);
     std::string externalErrorMessage = QueryExternalErrorMessage(internalErrorCode, externalErrorCode);
-    return CreateJsError(engine, externalErrorCode, externalErrorMessage);
-}
-
-NativeValue *NapiFormUtil::CreateErrorByExternalErrorCode(NativeEngine &engine, int32_t externalErrorCode)
-{
-    std::string externalErrorMessage;
-    auto iter = ERR_MSG_MAP_EXTERNAL.find(externalErrorCode);
-    if (iter != ERR_MSG_MAP_EXTERNAL.end()) {
-        externalErrorMessage = iter->second;
-    } else {
-        externalErrorMessage = ERR_MSG_MAP_EXTERNAL.at(ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR);
-    }
     return CreateJsError(engine, externalErrorCode, externalErrorMessage);
 }
 
