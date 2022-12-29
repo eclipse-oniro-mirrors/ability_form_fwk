@@ -694,12 +694,16 @@ int32_t FormMgrService::StartAbility(const Want &want, const sptr<IRemoteObject>
         HILOG_ERROR("%{public}s error, failed to get bundleMgr.", __func__);
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    // check if system app
+    auto callingUid = IPCSkeleton::GetCallingUid();
+    auto isSystemApp = bundleMgr->CheckIsSystemAppByUid(callingUid);
+    if (!isSystemApp) {
+        HILOG_ERROR("%{public}s error, permission denied.", __func__);
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
     // retrieve bundleName of the calling ability.
     std::string callerBundleName;
-    if (!IN_PROCESS_CALL(bundleMgr->GetBundleNameForUid(IPCSkeleton::GetCallingUid(), callerBundleName))) {
+    if (!IN_PROCESS_CALL(bundleMgr->GetBundleNameForUid(callingUid, callerBundleName))) {
         HILOG_ERROR("StartAbility, failed to get form config info.");
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
