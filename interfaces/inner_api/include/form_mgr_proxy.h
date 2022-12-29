@@ -285,6 +285,12 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t RecvFormShareInfoFromRemote(const FormShareInfo &info) override;
+   
+    /**
+    * @brief Check form manager service ready.
+    * @return Return true if form manager service Ready; return false otherwise.
+    */
+    bool CheckFMSReady() override;
 private:
     template<typename T>
     int GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos);

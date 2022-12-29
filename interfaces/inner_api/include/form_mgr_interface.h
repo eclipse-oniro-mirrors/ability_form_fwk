@@ -294,6 +294,12 @@ public:
      */
     virtual int32_t RecvFormShareInfoFromRemote(const FormShareInfo &info) = 0;
 
+    /**
+    * @brief Check form manager service ready.
+    * @return Return true if form manager service Ready; return false otherwise.
+    */
+    virtual bool CheckFMSReady() = 0;
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -339,6 +345,7 @@ public:
         FORM_MGR_RECV_FORM_SHARE_INFO_FROM_REMOTE,
         FORM_MGR_START_ABILITY,
         FORM_MGR_NOTIFY_FORMS_PRIVACY_PROTECTED,
+        FORM_MGR_CHECK_FMS_READY,
     };
 };
 }  // namespace AppExecFwk
