@@ -161,6 +161,10 @@ public:
     {
         return 0;
     }
+    bool CheckFMSReady() override
+    {
+        return false;
+    }
 };
 
 uint32_t GetU32Data(const char* ptr)
