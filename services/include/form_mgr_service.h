@@ -318,6 +318,12 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     int Dump(int fd, const std::vector<std::u16string> &args) override;
+
+    /**
+    * @brief Check form manager service ready.
+    * @return Return true if form manager service Ready; return false otherwise.
+    */
+    bool CheckFMSReady() override;
 private:
     enum class DumpKey {
         KEY_DUMP_HELP = 0,

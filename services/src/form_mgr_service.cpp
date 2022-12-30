@@ -28,6 +28,7 @@
 #include "form_share_mgr.h"
 #include "form_task_mgr.h"
 #include "form_timer_mgr.h"
+#include "form_util.h"
 #include "hilog_wrapper.h"
 #include "in_process_call_wrapper.h"
 #include "ipc_skeleton.h"
@@ -102,8 +103,22 @@ bool FormMgrService::IsReady() const
         HILOG_ERROR("%{public}s fail, handler is null", __func__);
         return false;
     }
-
+    int32_t userId = FormUtil::GetCurrentAccountId();
+    if (userId == Constants::ANY_USERID) {
+        HILOG_ERROR("%{public}s fail, account is empty", __func__);
+        return false;
+    }
     return true;
+}
+
+/**
+* @brief Check form manager service ready.
+* @return Return true if form manager service Ready; return false otherwise.
+*/
+
+bool FormMgrService::CheckFMSReady()
+{
+    return IsReady();
 }
 
 /**

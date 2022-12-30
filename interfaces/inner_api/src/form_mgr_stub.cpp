@@ -100,6 +100,8 @@ FormMgrStub::FormMgrStub()
         &FormMgrStub::HandleIsRequestPublishFormSupported;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_START_ABILITY)] =
         &FormMgrStub::HandleStartAbility;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_CHECK_FMS_READY)] =
+        &FormMgrStub::HandleCheckFMSReady;
 }
 
 FormMgrStub::~FormMgrStub()
@@ -793,6 +795,17 @@ int32_t FormMgrStub::HandleStartAbility(MessageParcel &data, MessageParcel &repl
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
+}
+
+int32_t FormMgrStub::HandleCheckFMSReady(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    bool result = CheckFMSReady();
+    if (!reply.WriteBool(result)) {
+        HILOG_ERROR("%{public}s, failed to write action", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
 }
 
 /**
