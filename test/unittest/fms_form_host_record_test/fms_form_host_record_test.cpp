@@ -694,7 +694,7 @@ HWTEST_F(FmsFormHostRecordTest, FormMgrService_0025, TestSize.Level0)
     FormMgrService formMgrService;
     Want want;
     sptr<IRemoteObject> callerToken = nullptr;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY, formMgrService.StartAbility(want, callerToken));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, formMgrService.StartAbility(want, callerToken));
     GTEST_LOG_(INFO) << "FormMgrService_0025 end";
 }
 
