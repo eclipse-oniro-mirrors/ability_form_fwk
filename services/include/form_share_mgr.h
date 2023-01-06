@@ -20,7 +20,6 @@
 #include <shared_mutex>
 #include <singleton.h>
 #include "ability_info.h"
-#include "device_manager.h"
 #include "form_distributed_client.h"
 #include "form_event_handler.h"
 #include "form_free_install_operator.h"
