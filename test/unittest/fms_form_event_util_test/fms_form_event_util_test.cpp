@@ -51,6 +51,7 @@ extern void MockGetNoHostDBFormsOne(bool mockRet);
 extern void MockGetNoHostDBFormsTwo(bool mockRet);
 extern void MockGetNoHostTempFormsOne(bool mockRet);
 extern void MockGetNoHostTempFormsTwo(bool mockRet);
+extern void MockNotifyProviderFormsBatchDelete(bool mockRet);
 
 namespace {
 class FmsFormEventUtilTest : public testing::Test {
@@ -348,5 +349,771 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_016, TestSize.Level0)
     MockGetNoHostTempFormsTwo(true);
     formEventUtil.ClearTempFormRecordData(uid, removedFormsMap);
     GTEST_LOG_(INFO) << "FormEventUtil_016 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_017
+ * @tc.desc: test HandleProviderUpdated function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_017, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_017 start";
+    FormEventUtil formEventUtil;
+    std::string bundleName = FORM_HOST_BUNDLE_NAME;
+    int32_t userId = 1;
+    MockGetFormRecord(false);
+    formEventUtil.HandleProviderUpdated(bundleName, userId);
+    GTEST_LOG_(INFO) << "FormEventUtil_017 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_018
+ * @tc.desc: test HandleProviderUpdated function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_018, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_018 start";
+    FormEventUtil formEventUtil;
+    std::string bundleName = FORM_HOST_BUNDLE_NAME;
+    int32_t userId = 1;
+    MockGetFormRecord(true);
+    MockGetFormsInfoByBundle(false);
+    formEventUtil.HandleProviderUpdated(bundleName, userId);
+    GTEST_LOG_(INFO) << "FormEventUtil_018 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_019
+ * @tc.desc: test HandleProviderUpdated function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_019, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_019 start";
+    FormEventUtil formEventUtil;
+    std::string bundleName = FORM_HOST_BUNDLE_NAME;
+    int32_t userId = 1;
+    MockGetFormRecord(true);
+    MockGetFormsInfoByBundle(true);
+    MockGetBundlePackInfo(true);
+    MockGetUpdatedForm(true);
+    formEventUtil.HandleProviderUpdated(bundleName, userId);
+    GTEST_LOG_(INFO) << "FormEventUtil_019 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_020
+ * @tc.desc: test HandleProviderUpdated function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_020, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_020 start";
+    FormEventUtil formEventUtil;
+    std::string bundleName = FORM_HOST_BUNDLE_NAME;
+    int32_t userId = 1;
+    MockGetFormRecord(true);
+    MockGetFormsInfoByBundle(true);
+    MockGetBundlePackInfo(true);
+    MockGetUpdatedForm(false);
+    MockGetPackageForm(true);
+    formEventUtil.HandleProviderUpdated(bundleName, userId);
+    GTEST_LOG_(INFO) << "FormEventUtil_020 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_021
+ * @tc.desc: test HandleProviderUpdated function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_021, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_021 start";
+    FormEventUtil formEventUtil;
+    std::string bundleName = FORM_HOST_BUNDLE_NAME;
+    int32_t userId = 1;
+    MockGetFormRecord(true);
+    MockGetFormsInfoByBundle(true);
+    MockGetBundlePackInfo(true);
+    MockGetUpdatedForm(false);
+    MockGetPackageForm(false);
+    MockSetFormTempFlag(true);
+    formEventUtil.HandleProviderUpdated(bundleName, userId);
+    GTEST_LOG_(INFO) << "FormEventUtil_021 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_022
+ * @tc.desc: test HandleProviderUpdated function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_022, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_022 start";
+    FormEventUtil formEventUtil;
+    std::string bundleName = FORM_HOST_BUNDLE_NAME;
+    int32_t userId = 1;
+    MockGetFormRecord(true);
+    MockGetFormsInfoByBundle(true);
+    MockGetBundlePackInfo(false);
+    MockGetUpdatedForm(false);
+    MockGetPackageForm(true);
+    MockSetFormTempFlag(false);
+    formEventUtil.HandleProviderUpdated(bundleName, userId);
+    GTEST_LOG_(INFO) << "FormEventUtil_022 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_023
+ * @tc.desc: test HandleProviderUpdated function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_023, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_023 start";
+    FormEventUtil formEventUtil;
+    std::string bundleName = FORM_HOST_BUNDLE_NAME;
+    int32_t userId = 1;
+    MockGetFormRecord(true);
+    MockGetFormsInfoByBundle(true);
+    MockGetBundlePackInfo(true);
+    MockGetUpdatedForm(true);
+    formEventUtil.HandleProviderUpdated(bundleName, userId);
+    GTEST_LOG_(INFO) << "FormEventUtil_023 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_024
+ * @tc.desc: test HandleBundleFormInfoChanged function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_024, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_024 start";
+    FormEventUtil formEventUtil;
+    std::string bundleName = FORM_HOST_BUNDLE_NAME;
+    int32_t userId = 1;
+    formEventUtil.HandleBundleFormInfoChanged(bundleName, userId);
+    GTEST_LOG_(INFO) << "FormEventUtil_024 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_025
+ * @tc.desc: test HandleBundleFormInfoRemoved function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_025, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_025 start";
+    FormEventUtil formEventUtil;
+    std::string bundleName = FORM_HOST_BUNDLE_NAME;
+    int32_t userId = 1;
+    formEventUtil.HandleBundleFormInfoRemoved(bundleName, userId);
+    GTEST_LOG_(INFO) << "FormEventUtil_025 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_026
+ * @tc.desc: test HandleFormHostDataCleared function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_026, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_026 start";
+    FormEventUtil formEventUtil;
+    int32_t userId = 1;
+    MockGetNoHostDBFormsTwo(true);
+    MockGetNoHostDBFormsOne(true);
+    MockGetNoHostTempFormsOne(true);
+    MockGetNoHostTempFormsTwo(true);
+    formEventUtil.HandleFormHostDataCleared(userId);
+    GTEST_LOG_(INFO) << "FormEventUtil_026 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_027
+ * @tc.desc: test BatchDeleteNoHostTempForms function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_027, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_027 start";
+    FormEventUtil formEventUtil;
+    int32_t userId = 1;
+    std::map<int64_t, bool> foundFormsMap;
+    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    int64_t formIds[2] = { 1, 2 };
+    std::string bundleName[2] = { "com.form.start", "com.form.start2" };
+    std::string abilityName[2] = { "bbbbbb", "bbbbbb2" };
+    for (int32_t i = 0; i < 2; ++i) {
+        FormIdKey formIdKey(bundleName[i], abilityName[i]);
+        std::set<int64_t> formIdsSet;
+        bool flag = (i == 1);
+        foundFormsMap.emplace(formIds[i], flag);
+        formIdsSet.emplace(formIds[i]);
+        noHostTempFormsMap.emplace(formIdKey, formIdsSet);
+    }
+    MockNotifyProviderFormsBatchDelete(true);
+    formEventUtil.BatchDeleteNoHostTempForms(userId, noHostTempFormsMap, foundFormsMap);
+    GTEST_LOG_(INFO) << "FormEventUtil_027 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_028
+ * @tc.desc: test BatchDeleteNoHostTempForms function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_028, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_028 start";
+    FormEventUtil formEventUtil;
+    const bool updateEnabled = false;
+    int32_t updateDuration = 1;
+    const std::string configUpdataAt = "";
+    FormTimerCfg cfg = {};
+    formEventUtil.GetTimerCfg(updateEnabled, updateDuration, configUpdataAt, cfg);
+    GTEST_LOG_(INFO) << "FormEventUtil_028 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_029
+ * @tc.desc: test GetTimerCfg function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_029, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_029 start";
+    FormEventUtil formEventUtil;
+    const bool updateEnabled = true;
+    int32_t updateDuration = static_cast<int32_t>(Constants::MIN_CONFIG_DURATION);
+    const std::string configUpdataAt = "";
+    FormTimerCfg cfg = {};
+    formEventUtil.GetTimerCfg(updateEnabled, updateDuration, configUpdataAt, cfg);
+    GTEST_LOG_(INFO) << "FormEventUtil_029 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_030
+ * @tc.desc: test GetTimerCfg function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_030, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_030 start";
+    FormEventUtil formEventUtil;
+    const bool updateEnabled = true;
+    int32_t updateDuration = static_cast<int32_t>(Constants::MAX_CONFIG_DURATION);
+    const std::string configUpdataAt = "";
+    FormTimerCfg cfg = {};
+    formEventUtil.GetTimerCfg(updateEnabled, updateDuration, configUpdataAt, cfg);
+    GTEST_LOG_(INFO) << "FormEventUtil_030 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_031
+ * @tc.desc: test GetTimerCfg function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_031, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_031 start";
+    FormEventUtil formEventUtil;
+    const bool updateEnabled = true;
+    int32_t updateDuration = static_cast<int32_t>(Constants::MIN_CONFIG_DURATION) + 1;
+    const std::string configUpdataAt = "";
+    FormTimerCfg cfg = {};
+    formEventUtil.GetTimerCfg(updateEnabled, updateDuration, configUpdataAt, cfg);
+    GTEST_LOG_(INFO) << "FormEventUtil_031 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_032
+ * @tc.desc: test GetTimerCfg function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_032, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_032 start";
+    FormEventUtil formEventUtil;
+    const bool updateEnabled = true;
+    int32_t updateDuration = -1;
+    const std::string configUpdataAt = "";
+    FormTimerCfg cfg = {};
+    formEventUtil.GetTimerCfg(updateEnabled, updateDuration, configUpdataAt, cfg);
+    GTEST_LOG_(INFO) << "FormEventUtil_032 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_033
+ * @tc.desc: test GetTimerCfg function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_033, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_033 start";
+    FormEventUtil formEventUtil;
+    const bool updateEnabled = true;
+    int32_t updateDuration = -1;
+    const std::string configUpdataAt = "17:41:41";
+    FormTimerCfg cfg = {};
+    formEventUtil.GetTimerCfg(updateEnabled, updateDuration, configUpdataAt, cfg);
+    GTEST_LOG_(INFO) << "FormEventUtil_033 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_034
+ * @tc.desc: test GetTimerCfg function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_034, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_034 start";
+    FormEventUtil formEventUtil;
+    const bool updateEnabled = true;
+    int32_t updateDuration = -1;
+    const std::string configUpdataAt = "17:41";
+    FormTimerCfg cfg = {};
+    formEventUtil.GetTimerCfg(updateEnabled, updateDuration, configUpdataAt, cfg);
+    GTEST_LOG_(INFO) << "FormEventUtil_034 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_035
+ * @tc.desc: test GetTimerCfg function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_035, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_035 start";
+    FormEventUtil formEventUtil;
+    const bool updateEnabled = true;
+    int32_t updateDuration = -1;
+    const std::string configUpdataAt = "-1:41";
+    FormTimerCfg cfg = {};
+    formEventUtil.GetTimerCfg(updateEnabled, updateDuration, configUpdataAt, cfg);
+    GTEST_LOG_(INFO) << "FormEventUtil_035 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_036
+ * @tc.desc: test GetTimerCfg function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_036, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_036 start";
+    FormEventUtil formEventUtil;
+    const bool updateEnabled = true;
+    int32_t updateDuration = -1;
+    const std::string configUpdataAt = "25:41";
+    FormTimerCfg cfg = {};
+    formEventUtil.GetTimerCfg(updateEnabled, updateDuration, configUpdataAt, cfg);
+    GTEST_LOG_(INFO) << "FormEventUtil_036 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_037
+ * @tc.desc: test GetTimerCfg function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_037, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_037 start";
+    FormEventUtil formEventUtil;
+    const bool updateEnabled = true;
+    int32_t updateDuration = -1;
+    const std::string configUpdataAt = "18:-1";
+    FormTimerCfg cfg = {};
+    formEventUtil.GetTimerCfg(updateEnabled, updateDuration, configUpdataAt, cfg);
+    GTEST_LOG_(INFO) << "FormEventUtil_037 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_038
+ * @tc.desc: test GetTimerCfg function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_038, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_038 start";
+    FormEventUtil formEventUtil;
+    const bool updateEnabled = true;
+    int32_t updateDuration = -1;
+    const std::string configUpdataAt = "18:61";
+    FormTimerCfg cfg = {};
+    formEventUtil.GetTimerCfg(updateEnabled, updateDuration, configUpdataAt, cfg);
+    GTEST_LOG_(INFO) << "FormEventUtil_038 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_039
+ * @tc.desc: test HandleTimerUpdate function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_039, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_039 start";
+    FormEventUtil formEventUtil;
+    const int64_t formId = 1;
+    FormRecord record = {};
+    FormTimerCfg timerCfg = {};
+    record.isEnableUpdate = false;
+    timerCfg.enableUpdate = false;
+    formEventUtil.HandleTimerUpdate(formId, record, timerCfg);
+    GTEST_LOG_(INFO) << "FormEventUtil_039 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_040
+ * @tc.desc: test HandleTimerUpdate function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_040, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_040 start";
+    FormEventUtil formEventUtil;
+    const int64_t formId = 1;
+    FormRecord record = {};
+    FormTimerCfg timerCfg = {};
+    record.isEnableUpdate = true;
+    timerCfg.enableUpdate = false;
+    formEventUtil.HandleTimerUpdate(formId, record, timerCfg);
+    GTEST_LOG_(INFO) << "FormEventUtil_040 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_041
+ * @tc.desc: test HandleTimerUpdate function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_041, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_041 start";
+    FormEventUtil formEventUtil;
+    const int64_t formId = 1;
+    FormRecord record = {};
+    FormTimerCfg timerCfg = {};
+    record.isEnableUpdate = false;
+    timerCfg.enableUpdate = true;
+    timerCfg.updateDuration = 1;
+    formEventUtil.HandleTimerUpdate(formId, record, timerCfg);
+    GTEST_LOG_(INFO) << "FormEventUtil_041 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_042
+ * @tc.desc: test HandleTimerUpdate function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_042, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_042 start";
+    FormEventUtil formEventUtil;
+    const int64_t formId = 1;
+    FormRecord record = {};
+    FormTimerCfg timerCfg = {};
+    record.isEnableUpdate = false;
+    timerCfg.enableUpdate = true;
+    timerCfg.updateDuration = 0;
+    formEventUtil.HandleTimerUpdate(formId, record, timerCfg);
+    GTEST_LOG_(INFO) << "FormEventUtil_042 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_043
+ * @tc.desc: test HandleTimerUpdate function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_043, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_043 start";
+    FormEventUtil formEventUtil;
+    const int64_t formId = 1;
+    FormRecord record = {};
+    FormTimerCfg timerCfg = {};
+    record.isEnableUpdate = true;
+    timerCfg.enableUpdate = true;
+    record.updateDuration = 1;
+    timerCfg.updateDuration = 1;
+    formEventUtil.HandleTimerUpdate(formId, record, timerCfg);
+    GTEST_LOG_(INFO) << "FormEventUtil_043 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_044
+ * @tc.desc: test HandleTimerUpdate function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_044, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_044 start";
+    FormEventUtil formEventUtil;
+    const int64_t formId = 1;
+    FormRecord record = {};
+    FormTimerCfg timerCfg = {};
+    record.isEnableUpdate = true;
+    timerCfg.enableUpdate = true;
+    record.updateDuration = 1;
+    timerCfg.updateDuration = 2;
+    formEventUtil.HandleTimerUpdate(formId, record, timerCfg);
+    GTEST_LOG_(INFO) << "FormEventUtil_044 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_045
+ * @tc.desc: test HandleTimerUpdate function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_045, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_045 start";
+    FormEventUtil formEventUtil;
+    const int64_t formId = 1;
+    FormRecord record = {};
+    FormTimerCfg timerCfg = {};
+    record.isEnableUpdate = true;
+    timerCfg.enableUpdate = true;
+    record.updateDuration = 1;
+    timerCfg.updateDuration = 0;
+    formEventUtil.HandleTimerUpdate(formId, record, timerCfg);
+    GTEST_LOG_(INFO) << "FormEventUtil_045 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_046
+ * @tc.desc: test HandleTimerUpdate function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_046, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_046 start";
+    FormEventUtil formEventUtil;
+    const int64_t formId = 1;
+    FormRecord record = {};
+    FormTimerCfg timerCfg = {};
+    record.isEnableUpdate = true;
+    timerCfg.enableUpdate = true;
+    record.updateDuration = 0;
+    timerCfg.updateDuration = 0;
+    record.updateAtHour = 0;
+    timerCfg.updateAtHour = 0;
+    record.updateAtMin = 0;
+    timerCfg.updateAtMin = 0;
+    formEventUtil.HandleTimerUpdate(formId, record, timerCfg);
+    GTEST_LOG_(INFO) << "FormEventUtil_046 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_047
+ * @tc.desc: test HandleTimerUpdate function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_047, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_047 start";
+    FormEventUtil formEventUtil;
+    const int64_t formId = 1;
+    FormRecord record = {};
+    FormTimerCfg timerCfg = {};
+    record.isEnableUpdate = true;
+    timerCfg.enableUpdate = true;
+    record.updateDuration = 0;
+    timerCfg.updateDuration = 0;
+    record.updateAtHour = 1;
+    timerCfg.updateAtHour = 0;
+    record.updateAtMin = 0;
+    timerCfg.updateAtMin = 0;
+    formEventUtil.HandleTimerUpdate(formId, record, timerCfg);
+    GTEST_LOG_(INFO) << "FormEventUtil_047 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_048
+ * @tc.desc: test HandleTimerUpdate function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_048, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_048 start";
+    FormEventUtil formEventUtil;
+    const int64_t formId = 1;
+    FormRecord record = {};
+    FormTimerCfg timerCfg = {};
+    record.isEnableUpdate = true;
+    timerCfg.enableUpdate = true;
+    record.updateDuration = 0;
+    timerCfg.updateDuration = 0;
+    record.updateAtHour = 0;
+    timerCfg.updateAtHour = 0;
+    record.updateAtMin = 1;
+    timerCfg.updateAtMin = 0;
+    formEventUtil.HandleTimerUpdate(formId, record, timerCfg);
+    GTEST_LOG_(INFO) << "FormEventUtil_048 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_049
+ * @tc.desc: test HandleTimerUpdate function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_049, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_049 start";
+    FormEventUtil formEventUtil;
+    const int64_t formId = 1;
+    FormRecord record = {};
+    FormTimerCfg timerCfg = {};
+    record.isEnableUpdate = true;
+    timerCfg.enableUpdate = true;
+    record.updateDuration = 0;
+    timerCfg.updateDuration = 1;
+    formEventUtil.HandleTimerUpdate(formId, record, timerCfg);
+    GTEST_LOG_(INFO) << "FormEventUtil_049 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_050
+ * @tc.desc: test ReCreateForm function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_050, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_050 start";
+    FormEventUtil formEventUtil;
+    const int64_t formId = 1;
+    MockGetFormRecord(false);
+    formEventUtil.ReCreateForm(formId);
+    GTEST_LOG_(INFO) << "FormEventUtil_050 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_051
+ * @tc.desc: test ReCreateForm function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_051, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_051 start";
+    FormEventUtil formEventUtil;
+    const int64_t formId = 1;
+    MockGetFormRecord(true);
+    formEventUtil.ReCreateForm(formId);
+    GTEST_LOG_(INFO) << "FormEventUtil_051 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_052
+ * @tc.desc: test BatchDeleteNoHostDBForms function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_052, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_052 start";
+    FormEventUtil formEventUtil;
+    int32_t userId = 1;
+    std::map<FormIdKey, std::set<int64_t>> noHostFormDbMap;
+    std::map<int64_t, bool> removedFormsMap;
+    int64_t formIds[2] = { 1, 2 };
+    std::string bundleName[2] = { "com.form.start", "com.form.start2" };
+    std::string moduleName[2] = { "bbbbbb", "bbbbbb2" };
+    for (int32_t i = 0; i < 2; ++i) {
+        FormIdKey formIdKey(bundleName[i], moduleName[i]);
+        std::set<int64_t> formIdsSet;
+        bool flag = (i == 1);
+        removedFormsMap.emplace(formIds[i], flag);
+        formIdsSet.emplace(formIds[i]);
+        noHostFormDbMap.emplace(formIdKey, formIdsSet);
+    }
+    MockNotifyProviderFormsBatchDelete(false);
+    formEventUtil.BatchDeleteNoHostDBForms(userId, noHostFormDbMap, removedFormsMap);
+    GTEST_LOG_(INFO) << "FormEventUtil_052 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_053
+ * @tc.desc: test BatchDeleteNoHostDBForms function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_053, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_053 start";
+    FormEventUtil formEventUtil;
+    int32_t userId = 1;
+    std::map<FormIdKey, std::set<int64_t>> noHostFormDbMap;
+    std::map<int64_t, bool> removedFormsMap;
+    int64_t formIds[2] = { 1, 2 };
+    std::string bundleName[2] = { "com.form.start", "com.form.start2" };
+    std::string moduleName[2] = { "bbbbbb", "bbbbbb2" };
+    for (int32_t i = 0; i < 2; ++i) {
+        FormIdKey formIdKey(bundleName[i], moduleName[i]);
+        std::set<int64_t> formIdsSet;
+        bool flag = (i == 1);
+        removedFormsMap.emplace(formIds[i], flag);
+        formIdsSet.emplace(formIds[i]);
+        noHostFormDbMap.emplace(formIdKey, formIdsSet);
+    }
+    MockNotifyProviderFormsBatchDelete(true);
+    MockGetMatchCount(false);
+    formEventUtil.BatchDeleteNoHostDBForms(userId, noHostFormDbMap, removedFormsMap);
+    GTEST_LOG_(INFO) << "FormEventUtil_053 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_054
+ * @tc.desc: test BatchDeleteNoHostDBForms function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_054, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_054 start";
+    FormEventUtil formEventUtil;
+    int32_t userId = 1;
+    std::map<FormIdKey, std::set<int64_t>> noHostFormDbMap;
+    std::map<int64_t, bool> removedFormsMap;
+    int64_t formIds[2] = { 1, 2 };
+    std::string bundleName[2] = { "com.form.start", "com.form.start2" };
+    std::string moduleName[2] = { "bbbbbb", "bbbbbb2" };
+    for (int32_t i = 0; i < 2; ++i) {
+        FormIdKey formIdKey(bundleName[i], moduleName[i]);
+        std::set<int64_t> formIdsSet;
+        bool flag = (i == 1);
+        removedFormsMap.emplace(formIds[i], flag);
+        formIdsSet.emplace(formIds[i]);
+        noHostFormDbMap.emplace(formIdKey, formIdsSet);
+    }
+    MockNotifyProviderFormsBatchDelete(true);
+    MockGetMatchCount(true);
+    formEventUtil.BatchDeleteNoHostDBForms(userId, noHostFormDbMap, removedFormsMap);
+    GTEST_LOG_(INFO) << "FormEventUtil_054 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_055
+ * @tc.desc: test BatchDeleteNoHostTempForms function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_055, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_055 start";
+    FormEventUtil formEventUtil;
+    int32_t userId = 1;
+    std::map<int64_t, bool> foundFormsMap;
+    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    int64_t formIds[2] = { 1, 2 };
+    std::string bundleName[2] = { "com.form.start", "com.form.start2" };
+    std::string abilityName[2] = { "bbbbbb", "bbbbbb2" };
+    for (int32_t i = 0; i < 2; ++i) {
+        FormIdKey formIdKey(bundleName[i], abilityName[i]);
+        std::set<int64_t> formIdsSet;
+        bool flag = (i == 1);
+        foundFormsMap.emplace(formIds[i], flag);
+        formIdsSet.emplace(formIds[i]);
+        noHostTempFormsMap.emplace(formIdKey, formIdsSet);
+    }
+    MockNotifyProviderFormsBatchDelete(false);
+    formEventUtil.BatchDeleteNoHostTempForms(userId, noHostTempFormsMap, foundFormsMap);
+    GTEST_LOG_(INFO) << "FormEventUtil_055 end";
 }
 }
