@@ -17,12 +17,18 @@
 
 namespace {
     bool g_mockGetFormRecordRet = true;
+    bool g_mockGetFormRecordParams = false;
     bool g_mockIsEnableRefreshRet = true;
 }
 
 void MockGetFormRecord(bool mockRet)
 {
     g_mockGetFormRecordRet = mockRet;
+}
+
+void MockGetFormRecordParams(bool mockRet)
+{
+    g_mockGetFormRecordParams = mockRet;
 }
 
 void MockIsEnableRefresh(bool mockRet)
@@ -40,6 +46,10 @@ FormDataMgr::~FormDataMgr()
 
 bool FormDataMgr::GetFormRecord(const int64_t formId, FormRecord &formRecord) const
 {
+    if (g_mockGetFormRecordParams) {
+        formRecord.isCountTimerRefresh = true;
+    }
+
     return g_mockGetFormRecordRet;
 }
 
