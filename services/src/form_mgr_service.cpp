@@ -132,12 +132,12 @@ int FormMgrService::AddForm(const int64_t formId, const Want &want,
     const sptr<IRemoteObject> &callerToken, FormJsInfo &formInfo)
 {
     ErrCode ret = CheckFormPermission();
-    AAFWK::EventInfo eventInfo;
+    AAFwk::EventInfo eventInfo;
     eventInfo.userId = formId;
     eventInfo.bundleName = want.GetElement().GetBundleName();
     eventInfo.moduleName = want.GetStringParam(AppExecFwk::Constants::PARAM_MODULE_NAME_KEY);
     eventInfo.abilityName = want.GetElement().GetAbilityName();
-    AAFWK::EventReport::SendFormEvent(AAFWK::ADD_FORM, HiSysEventType::BEHAVIOR, eventInfo);
+    AAFwk::EventReport::SendFormEvent(AAFwk::EventName::ADD_FORM, HiSysEventType::BEHAVIOR, eventInfo);
     if (ret != ERR_OK) {
         HILOG_ERROR("%{public}s fail, add form permission denied", __func__);
         return ret;
@@ -158,9 +158,9 @@ int FormMgrService::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
         HILOG_ERROR("%{public}s fail, delete form permission denied", __func__);
         return ret;
     }
-    AAFWK::EventInfo eventInfo;
+    AAFwk::EventInfo eventInfo;
     eventInfo.userId = formId;
-    AAFWK::EventReport::SendFormEvent(AAFWK::DELETE_FORM, HiSysEventType::BEHAVIOR, eventInfo);
+    AAFwk::EventReport::SendFormEvent(AAFwk::EventName::DELETE_FORM, HiSysEventType::BEHAVIOR, eventInfo);
 
     return FormMgrAdapter::GetInstance().DeleteForm(formId, callerToken);
 }
@@ -179,9 +179,9 @@ int FormMgrService::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> 
         HILOG_ERROR("%{public}s fail, release form permission denied", __func__);
         return ret;
     }
-    AAFWK::EventInfo eventInfo;
+    AAFwk::EventInfo eventInfo;
     eventInfo.userId = formId;
-    AAFWK::EventReport::SendFormEvent(AAFWK::RELEASE_FORM, HiSysEventType::BEHAVIOR, eventInfo);
+    AAFwk::EventReport::SendFormEvent(AAFwk::EventName::RELEASE_FORM, HiSysEventType::BEHAVIOR, eventInfo);
 
     return FormMgrAdapter::GetInstance().ReleaseForm(formId, callerToken, delCache);
 }
@@ -219,12 +219,12 @@ int FormMgrService::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
         HILOG_ERROR("%{public}s fail, request form permission denied", __func__);
         return ret;
     }
-    AAFWK::EventInfo eventInfo;
+    AAFwk::EventInfo eventInfo;
     eventInfo.userId = formId;
     eventInfo.bundleName = want.GetElement().GetBundleName();
     eventInfo.moduleName = want.GetStringParam(AppExecFwk::Constants::PARAM_MODULE_NAME_KEY);
     eventInfo.abilityName = want.GetElement().GetAbilityName();
-    AAFWK::EventReport::SendFormEvent(AAFWK::REQUEST_FORM, HiSysEventType::BEHAVIOR, eventInfo);
+    AAFwk::EventReport::SendFormEvent(AAFwk::EventName::REQUEST_FORM, HiSysEventType::BEHAVIOR, eventInfo);
 
     return FormMgrAdapter::GetInstance().RequestForm(formId, callerToken, want);
 }
@@ -238,9 +238,10 @@ int FormMgrService::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
 int FormMgrService::SetNextRefreshTime(const int64_t formId, const int64_t nextTime)
 {
     HILOG_INFO("%{public}s called.", __func__);
-    AAFWK::EventInfo eventInfo;
+    AAFwk::EventInfo eventInfo;
     eventInfo.userId = formId;
-    AAFWK::EventReport::SendFormEvent(AAFWK::SET_NEXT_REFRESH_TIME_FORM, HiSysEventType::BEHAVIOR, eventInfo);
+    AAFwk::EventReport::SendFormEvent(
+        AAFwk::EventName::SET_NEXT_REFRESH_TIME_FORM, HiSysEventType::BEHAVIOR, eventInfo);
 
     return FormMgrAdapter::GetInstance().SetNextRefreshTime(formId, nextTime);
 }
@@ -285,9 +286,9 @@ int FormMgrService::CastTempForm(const int64_t formId, const sptr<IRemoteObject>
         HILOG_ERROR("%{public}s fail, cast temp form permission denied", __func__);
         return ret;
     }
-    AAFWK::EventInfo eventInfo;
+    AAFwk::EventInfo eventInfo;
     eventInfo.userId = formId;
-    AAFWK::EventReport::SendFormEvent(AAFWK::CASTTEMP_FORM, HiSysEventType::BEHAVIOR, eventInfo);
+    AAFwk::EventReport::SendFormEvent(AAFwk::EventName::CASTTEMP_FORM, HiSysEventType::BEHAVIOR, eventInfo);
 
     return FormMgrAdapter::GetInstance().CastTempForm(formId, callerToken);
 }
@@ -370,11 +371,11 @@ int FormMgrService::MessageEvent(const int64_t formId, const Want &want, const s
         HILOG_ERROR("%{public}s fail, request form permission denied", __func__);
         return ret;
     }
-    AAFWK::EventInfo eventInfo;
+    AAFwk::EventInfo eventInfo;
     eventInfo.bundleName = want.GetElement().GetBundleName();
     eventInfo.moduleName = want.GetStringParam(AppExecFwk::Constants::PARAM_MODULE_NAME_KEY);
     eventInfo.abilityName = want.GetElement().GetAbilityName();
-    AAFWK::EventReport::SendFormEvent(AAFWK::MESSAGE_EVENT_FORM, HiSysEventType::BEHAVIOR, eventInfo);
+    AAFwk::EventReport::SendFormEvent(AAFwk::EventName::MESSAGE_EVENT_FORM, HiSysEventType::BEHAVIOR, eventInfo);
     return FormMgrAdapter::GetInstance().MessageEvent(formId, want, callerToken);
 }
 
@@ -393,12 +394,12 @@ int FormMgrService::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
         HILOG_ERROR("%{public}s fail, request form permission denied", __func__);
         return ret;
     }
-    AAFWK::EventInfo eventInfo;
+    AAFwk::EventInfo eventInfo;
     eventInfo.userId = formId;
     eventInfo.bundleName = want.GetElement().GetBundleName();
     eventInfo.moduleName = want.GetStringParam(AppExecFwk::Constants::PARAM_MODULE_NAME_KEY);
     eventInfo.abilityName = want.GetElement().GetAbilityName();
-    AAFWK::EventReport::SendFormEvent(AAFWK::ROUTE_EVENT_FORM, HiSysEventType::BEHAVIOR, eventInfo);
+    AAFwk::EventReport::SendFormEvent(AAFwk::EventName::ROUTE_EVENT_FORM, HiSysEventType::BEHAVIOR, eventInfo);
     return FormMgrAdapter::GetInstance().RouterEvent(formId, want, callerToken);
 }
 
@@ -550,8 +551,8 @@ int FormMgrService::DeleteInvalidForms(const std::vector<int64_t> &formIds,
         HILOG_ERROR("%{public}s fail, delete form permission denied", __func__);
         return ret;
     }
-    AAFWK::EventInfo eventInfo;
-    AAFWK::EventReport::SendFormEvent(AAFWK::DELETE_INVALID_FORM, HiSysEventType::BEHAVIOR, eventInfo);
+    AAFwk::EventInfo eventInfo;
+    AAFwk::EventReport::SendFormEvent(AAFwk::EventName::DELETE_INVALID_FORM, HiSysEventType::BEHAVIOR, eventInfo);
     return FormMgrAdapter::GetInstance().DeleteInvalidForms(formIds, callerToken, numFormsDeleted);
 }
 
@@ -571,11 +572,11 @@ int FormMgrService::AcquireFormState(const Want &want,
         HILOG_ERROR("%{public}s fail, acquire form state permission denied", __func__);
         return ret;
     }
-    AAFWK::EventInfo eventInfo;
+    AAFwk::EventInfo eventInfo;
     eventInfo.bundleName = want.GetElement().GetBundleName();
     eventInfo.moduleName = want.GetStringParam(AppExecFwk::Constants::PARAM_MODULE_NAME_KEY);
     eventInfo.abilityName = want.GetElement().GetAbilityName();
-    AAFWK::EventReport::SendFormEvent(AAFWK::ACQUIREFORMSTATE_FORM, HiSysEventType::BEHAVIOR, eventInfo);
+    AAFwk::EventReport::SendFormEvent(AAFwk::EventName::ACQUIREFORMSTATE_FORM, HiSysEventType::BEHAVIOR, eventInfo);
     return FormMgrAdapter::GetInstance().AcquireFormState(want, callerToken, stateInfo);
 }
 
