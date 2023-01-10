@@ -55,12 +55,16 @@ ohos_unittest("FmsFormRefreshConnectionTest") {
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "device_manager:devicemanagersdk",
-    "device_usage_statistics:usagestatsinner",
     "eventhandler:libeventhandler",
     "form_fwk:form_manager",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
   ]
+
+  if (device_usage_statistics) {
+    external_deps += [ "device_usage_statistics:usagestatsinner" ]
+    defines = [ "DEVICE_USAGE_STATISTICS_ENABLE" ]
+  }
 }
 
 ###############################################################################
