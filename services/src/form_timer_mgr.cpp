@@ -878,8 +878,10 @@ bool FormTimerMgr::UpdateAtTimerAlarm()
     }
 
     auto timerOption = std::make_shared<FormTimerOption>();
-    timerOption->SetType(((unsigned int)(timerOption->TIMER_TYPE_REALTIME))
-      | ((unsigned int)(timerOption->TIMER_TYPE_WAKEUP)));
+    int32_t flag = ((unsigned int)(timerOption->TIMER_TYPE_REALTIME))
+      | ((unsigned int)(timerOption->TIMER_TYPE_WAKEUP)) | ((unsigned int)(timerOption->TIMER_TYPE_EXACT));
+    HILOG_DEBUG("timerOption type is %{public}d", flag);
+    timerOption->SetType(flag);
     timerOption->SetRepeat(false);
     timerOption->SetInterval(0);
     int32_t userId = foundItem.refreshTask.userId;
@@ -896,6 +898,7 @@ bool FormTimerMgr::UpdateAtTimerAlarm()
     }
     auto timeSinceEpoch = std::chrono::steady_clock::now().time_since_epoch();
     int64_t timeInSec = std::chrono::duration_cast<std::chrono::milliseconds>(timeSinceEpoch).count();
+    HILOG_DEBUG("timeInSec: %{public}" PRId64 ".", timeInSec);
     int64_t nextTime = timeInSec + (selectTime - currentTime);
     HILOG_INFO("%{public}s, nextTime: %{public}" PRId64 ".", __func__, nextTime);
 
