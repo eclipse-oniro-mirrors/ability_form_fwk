@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -75,7 +75,7 @@ ErrCode OsAccountManagerWrapper::QueryActiveOsAccountIds(std::vector<int32_t>& i
  * @tc.desc: Verify CreateFormWant
  * @tc.type: FUNC
  */
-HWTEST_F(FormUtilTest, FormUtilTest_001, TestSize.Level0)
+HWTEST_F(FormUtilTest, FormUtilTest_001, TestSize.Level1)
 {
     AAFwk::Want want = {};
     const std::string formName = "formName";
@@ -98,7 +98,7 @@ HWTEST_F(FormUtilTest, FormUtilTest_001, TestSize.Level0)
  * @tc.desc: Verify CreateDefaultFormWant
  * @tc.type: FUNC
  */
-HWTEST_F(FormUtilTest, FormUtilTest_002, TestSize.Level0)
+HWTEST_F(FormUtilTest, FormUtilTest_002, TestSize.Level1)
 {
     AAFwk::Want want = {};
     const std::string uri = "uri";
@@ -118,7 +118,7 @@ HWTEST_F(FormUtilTest, FormUtilTest_002, TestSize.Level0)
  * @tc.desc: Verify GenerateUdid
  * @tc.type: FUNC
  */
-HWTEST_F(FormUtilTest, FormUtilTest_003, TestSize.Level0)
+HWTEST_F(FormUtilTest, FormUtilTest_003, TestSize.Level1)
 {
     const std::string udid = FormUtil::GenerateUdid();
 
@@ -130,7 +130,7 @@ HWTEST_F(FormUtilTest, FormUtilTest_003, TestSize.Level0)
  * @tc.desc: Verify GenerateFormId
  * @tc.type: FUNC
  */
-HWTEST_F(FormUtilTest, FormUtilTest_004, TestSize.Level0)
+HWTEST_F(FormUtilTest, FormUtilTest_004, TestSize.Level1)
 {
     constexpr int64_t udidHash = 0x1111111100000000L;
     const int64_t result = FormUtil::GenerateFormId(udidHash);
@@ -143,7 +143,7 @@ HWTEST_F(FormUtilTest, FormUtilTest_004, TestSize.Level0)
  * @tc.desc: Verify PaddingUdidHash
  * @tc.type: FUNC
  */
-HWTEST_F(FormUtilTest, FormUtilTest_005, TestSize.Level0)
+HWTEST_F(FormUtilTest, FormUtilTest_005, TestSize.Level1)
 {
     constexpr uint64_t formId = 0x1111111100000000L;
     constexpr uint64_t udidHash = 0x0000000011111111L;
@@ -157,7 +157,7 @@ HWTEST_F(FormUtilTest, FormUtilTest_005, TestSize.Level0)
  * @tc.desc: Verify PaddingUdidHash
  * @tc.type: FUNC
  */
-HWTEST_F(FormUtilTest, FormUtilTest_006, TestSize.Level0)
+HWTEST_F(FormUtilTest, FormUtilTest_006, TestSize.Level1)
 {
     constexpr uint64_t formId = 0x0000000011111111L;
     constexpr uint64_t udidHash = 0x1111111100000000L;
@@ -171,7 +171,7 @@ HWTEST_F(FormUtilTest, FormUtilTest_006, TestSize.Level0)
  * @tc.desc: Verify GenerateUdidHash
  * @tc.type: FUNC
  */
-HWTEST_F(FormUtilTest, FormUtilTest_007, TestSize.Level0)
+HWTEST_F(FormUtilTest, FormUtilTest_007, TestSize.Level1)
 {
     int64_t udidHash = 0x1111111100000000L;
     auto result = FormUtil::GenerateUdidHash(udidHash);
@@ -184,7 +184,7 @@ HWTEST_F(FormUtilTest, FormUtilTest_007, TestSize.Level0)
  * @tc.desc: Verify GenerateUdidHash
  * @tc.type: FUNC
  */
-HWTEST_F(FormUtilTest, FormUtilTest_008, TestSize.Level0)
+HWTEST_F(FormUtilTest, FormUtilTest_008, TestSize.Level1)
 {
     int64_t udidHash = 0;
     auto result = FormUtil::GenerateUdidHash(udidHash);
@@ -197,7 +197,7 @@ HWTEST_F(FormUtilTest, FormUtilTest_008, TestSize.Level0)
  * @tc.desc: Verify GetCurrentNanosecond
  * @tc.type: FUNC
  */
-HWTEST_F(FormUtilTest, FormUtilTest_009, TestSize.Level0)
+HWTEST_F(FormUtilTest, FormUtilTest_009, TestSize.Level1)
 {
     auto result1 = FormUtil::GetCurrentNanosecond();
     auto result2 = FormUtil::GetCurrentNanosecond();
@@ -210,7 +210,7 @@ HWTEST_F(FormUtilTest, FormUtilTest_009, TestSize.Level0)
  * @tc.desc: Verify GetCurrentMillisecond
  * @tc.type: FUNC
  */
-HWTEST_F(FormUtilTest, FormUtilTest_010, TestSize.Level0)
+HWTEST_F(FormUtilTest, FormUtilTest_010, TestSize.Level1)
 {
     auto result1 = FormUtil::GetCurrentMillisecond();
     auto result2 = FormUtil::GetCurrentMillisecond();
@@ -223,7 +223,7 @@ HWTEST_F(FormUtilTest, FormUtilTest_010, TestSize.Level0)
  * @tc.desc: Verify GetMillisecondFromTm
  * @tc.type: FUNC
  */
-HWTEST_F(FormUtilTest, FormUtilTest_011, TestSize.Level0)
+HWTEST_F(FormUtilTest, FormUtilTest_011, TestSize.Level1)
 {
     constexpr int64_t value = -1;
     time_t rawtime;
@@ -241,7 +241,7 @@ HWTEST_F(FormUtilTest, FormUtilTest_011, TestSize.Level0)
  * @tc.desc: Verify GetCurrentAccountId
  * @tc.type: FUNC
  */
-HWTEST_F(FormUtilTest, FormUtilTest_012, TestSize.Level0)
+HWTEST_F(FormUtilTest, FormUtilTest_012, TestSize.Level1)
 {
     constexpr size_t accountId = 99;
     MockQueryActiveOsAccountIdsRetVal(false);
@@ -257,7 +257,7 @@ HWTEST_F(FormUtilTest, FormUtilTest_012, TestSize.Level0)
  * @tc.desc: Verify StringSplit
  * @tc.type: FUNC
  */
-HWTEST_F(FormUtilTest, FormUtilTest_013, TestSize.Level0)
+HWTEST_F(FormUtilTest, FormUtilTest_013, TestSize.Level1)
 {
     constexpr size_t count = 3;
     const std::string str = "10:35:27";
@@ -271,7 +271,7 @@ HWTEST_F(FormUtilTest, FormUtilTest_013, TestSize.Level0)
  * @tc.desc: Verify GetCurrentAccountId
  * @tc.type: FUNC
  */
-HWTEST_F(FormUtilTest, FormUtilTest_014, TestSize.Level0)
+HWTEST_F(FormUtilTest, FormUtilTest_014, TestSize.Level1)
 {
     constexpr size_t accountId = 99;
     MockQueryActiveOsAccountIdsRetVal(true);
@@ -287,7 +287,7 @@ HWTEST_F(FormUtilTest, FormUtilTest_014, TestSize.Level0)
  * @tc.desc: Verify GetCurrentAccountId
  * @tc.type: FUNC
  */
-HWTEST_F(FormUtilTest, FormUtilTest_015, TestSize.Level0)
+HWTEST_F(FormUtilTest, FormUtilTest_015, TestSize.Level1)
 {
     constexpr size_t accountId = 99;
     MockQueryActiveOsAccountIdsRetVal(true);

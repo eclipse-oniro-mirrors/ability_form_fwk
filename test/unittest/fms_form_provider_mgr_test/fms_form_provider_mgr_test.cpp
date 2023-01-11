@@ -237,7 +237,7 @@ HWTEST_F(FmsFormProviderMgrTest, RefreshForm_002, TestSize.Level0)
  * EnvConditions: Mobile that can run ohos test framework
  * CaseDescription: Verify if  RefreshForm works without form host record.
  */
-HWTEST_F(FmsFormProviderMgrTest, RefreshForm_003, TestSize.Level0)
+HWTEST_F(FmsFormProviderMgrTest, RefreshForm_003, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "fms_form_mgr_provider_test_006 start";
     int64_t formId = 0x114514aa00000000;

@@ -845,7 +845,7 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_018, TestSize.Level0)
  * @tc.desc: test ConnectAmsForRefresh function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_019, TestSize.Level0)
+HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_019, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormProviderMgr_019 start";
     FormProviderMgr formProviderMgr;
@@ -866,7 +866,7 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_019, TestSize.Level0)
  * @tc.desc: test NotifyProviderFormsBatchDelete function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_020, TestSize.Level0)
+HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_020, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormProviderMgr_020 start";
     FormProviderMgr formProviderMgr;
@@ -883,7 +883,7 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_020, TestSize.Level0)
  * @tc.desc: test IncreaseTimerRefreshCount function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_021, TestSize.Level0)
+HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_021, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormProviderMgr_021 start";
     FormProviderMgr formProviderMgr;
@@ -900,7 +900,7 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_021, TestSize.Level0)
  * @tc.desc: test AcquireFormStateBack function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_022, TestSize.Level0)
+HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_022, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormProviderMgr_022 start";
     FormProviderMgr formProviderMgr;

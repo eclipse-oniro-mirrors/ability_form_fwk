@@ -125,7 +125,7 @@ HWTEST_F(FormHostStubTest, FormHostStubTest_004, TestSize.Level0)
  * @tc.desc: Verify OnRemoteRequest and HandleAcquired
  * @tc.type: FUNC
  */
-HWTEST_F(FormHostStubTest, FormHostStubTest_005, TestSize.Level0)
+HWTEST_F(FormHostStubTest, FormHostStubTest_005, TestSize.Level1)
 {
     MockFormHostClient callback;
     FormJsInfo formInfo = {};
@@ -148,7 +148,7 @@ HWTEST_F(FormHostStubTest, FormHostStubTest_005, TestSize.Level0)
  * @tc.desc: Verify OnRemoteRequest and HandleAcquired
  * @tc.type: FUNC
  */
-HWTEST_F(FormHostStubTest, FormHostStubTest_006, TestSize.Level0)
+HWTEST_F(FormHostStubTest, FormHostStubTest_006, TestSize.Level1)
 {
     MockFormHostClient callback;
     FormJsInfo formInfo = {};
@@ -169,7 +169,7 @@ HWTEST_F(FormHostStubTest, FormHostStubTest_006, TestSize.Level0)
  * @tc.desc: Verify OnRemoteRequest and HandleOnUpdate
  * @tc.type: FUNC
  */
-HWTEST_F(FormHostStubTest, FormHostStubTest_007, TestSize.Level0)
+HWTEST_F(FormHostStubTest, FormHostStubTest_007, TestSize.Level1)
 {
     MockFormHostClient callback;
     FormJsInfo formInfo = {};
@@ -189,7 +189,7 @@ HWTEST_F(FormHostStubTest, FormHostStubTest_007, TestSize.Level0)
  * @tc.desc: Verify OnRemoteRequest and HandleOnUpdate
  * @tc.type: FUNC
  */
-HWTEST_F(FormHostStubTest, FormHostStubTest_008, TestSize.Level0)
+HWTEST_F(FormHostStubTest, FormHostStubTest_008, TestSize.Level1)
 {
     MockFormHostClient callback;
     constexpr uint32_t code = static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_UPDATE);
@@ -206,7 +206,7 @@ HWTEST_F(FormHostStubTest, FormHostStubTest_008, TestSize.Level0)
  * @tc.desc: Verify OnRemoteRequest and HandleOnUninstall
  * @tc.type: FUNC
  */
-HWTEST_F(FormHostStubTest, FormHostStubTest_009, TestSize.Level0)
+HWTEST_F(FormHostStubTest, FormHostStubTest_009, TestSize.Level1)
 {
     MockFormHostClient callback;
     constexpr uint32_t code = static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_UNINSTALL);
@@ -225,7 +225,7 @@ HWTEST_F(FormHostStubTest, FormHostStubTest_009, TestSize.Level0)
  * @tc.desc: Verify OnRemoteRequest and HandleOnUninstall
  * @tc.type: FUNC
  */
-HWTEST_F(FormHostStubTest, FormHostStubTest_010, TestSize.Level0)
+HWTEST_F(FormHostStubTest, FormHostStubTest_010, TestSize.Level1)
 {
     MockFormHostClient callback;
     constexpr uint32_t code = static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_UNINSTALL);
@@ -243,7 +243,7 @@ HWTEST_F(FormHostStubTest, FormHostStubTest_010, TestSize.Level0)
  * @tc.desc: Verify OnRemoteRequest and HandleOnAcquireState
  * @tc.type: FUNC
  */
-HWTEST_F(FormHostStubTest, FormHostStubTest_011, TestSize.Level0)
+HWTEST_F(FormHostStubTest, FormHostStubTest_011, TestSize.Level1)
 {
     MockFormHostClient callback;
     constexpr uint32_t code = static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_ACQUIRE_FORM_STATE);
@@ -264,7 +264,7 @@ HWTEST_F(FormHostStubTest, FormHostStubTest_011, TestSize.Level0)
  * @tc.desc: Verify OnRemoteRequest and HandleOnAcquireState
  * @tc.type: FUNC
  */
-HWTEST_F(FormHostStubTest, FormHostStubTest_012, TestSize.Level0)
+HWTEST_F(FormHostStubTest, FormHostStubTest_012, TestSize.Level1)
 {
     MockFormHostClient callback;
     constexpr uint32_t code = static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_ACQUIRE_FORM_STATE);
@@ -283,7 +283,7 @@ HWTEST_F(FormHostStubTest, FormHostStubTest_012, TestSize.Level0)
  * @tc.desc: Verify OnRemoteRequest and HandleOnAcquireState
  * @tc.type: FUNC
  */
-HWTEST_F(FormHostStubTest, FormHostStubTest_013, TestSize.Level0)
+HWTEST_F(FormHostStubTest, FormHostStubTest_013, TestSize.Level1)
 {
     MockFormHostClient callback;
     constexpr uint32_t code = static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_SHARE_FORM_RESPONSE);
@@ -304,7 +304,7 @@ HWTEST_F(FormHostStubTest, FormHostStubTest_013, TestSize.Level0)
  * @tc.desc: Verify OnRemoteRequest
  * @tc.type: FUNC
  */
-HWTEST_F(FormHostStubTest, FormHostStubTest_014, TestSize.Level0)
+HWTEST_F(FormHostStubTest, FormHostStubTest_014, TestSize.Level1)
 {
     MockFormHostClient callback;
     constexpr uint32_t code = static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_SHARE_FORM_RESPONSE) + 100;
@@ -321,7 +321,7 @@ HWTEST_F(FormHostStubTest, FormHostStubTest_014, TestSize.Level0)
  * @tc.desc: Verify OnRemoteRequest
  * @tc.type: FUNC
  */
-HWTEST_F(FormHostStubTest, FormHostStubTest_015, TestSize.Level0)
+HWTEST_F(FormHostStubTest, FormHostStubTest_015, TestSize.Level1)
 {
     MockFormHostClient callback;
     constexpr uint32_t code = static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_SHARE_FORM_RESPONSE) + 100;
