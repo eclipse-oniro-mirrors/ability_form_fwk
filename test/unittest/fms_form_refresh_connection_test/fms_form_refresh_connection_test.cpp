@@ -191,7 +191,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshConnection_001, TestSize.Level
  * @tc.desc: test IsExist function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshConnection_002, TestSize.Level0)
+HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshConnection_002, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormRefreshConnection_002 start";
     int64_t formId = 1;
@@ -215,7 +215,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshConnection_002, TestSize.Level
  * @tc.desc: test IsExist function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshConnection_003, TestSize.Level0)
+HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshConnection_003, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormRefreshConnection_003 start";
     int64_t formId = 1;
@@ -239,7 +239,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshConnection_003, TestSize.Level
  * @tc.desc: test IsExist function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshConnection_004, TestSize.Level0)
+HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshConnection_004, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormRefreshConnection_004 start";
     int64_t formId = 1;

@@ -356,7 +356,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_016, TestSize.Level0)
  * @tc.desc: test HandleProviderUpdated function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_017, TestSize.Level0)
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_017, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_017 start";
     FormEventUtil formEventUtil;
@@ -372,7 +372,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_017, TestSize.Level0)
  * @tc.desc: test HandleProviderUpdated function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_018, TestSize.Level0)
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_018, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_018 start";
     FormEventUtil formEventUtil;
@@ -389,7 +389,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_018, TestSize.Level0)
  * @tc.desc: test HandleProviderUpdated function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_019, TestSize.Level0)
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_019, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_019 start";
     FormEventUtil formEventUtil;
@@ -408,7 +408,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_019, TestSize.Level0)
  * @tc.desc: test HandleProviderUpdated function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_020, TestSize.Level0)
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_020, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_020 start";
     FormEventUtil formEventUtil;
@@ -428,7 +428,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_020, TestSize.Level0)
  * @tc.desc: test HandleProviderUpdated function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_021, TestSize.Level0)
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_021, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_021 start";
     FormEventUtil formEventUtil;
@@ -449,7 +449,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_021, TestSize.Level0)
  * @tc.desc: test HandleProviderUpdated function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_022, TestSize.Level0)
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_022, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_022 start";
     FormEventUtil formEventUtil;
@@ -470,7 +470,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_022, TestSize.Level0)
  * @tc.desc: test HandleProviderUpdated function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_023, TestSize.Level0)
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_023, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_023 start";
     FormEventUtil formEventUtil;
@@ -489,7 +489,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_023, TestSize.Level0)
  * @tc.desc: test HandleBundleFormInfoChanged function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_024, TestSize.Level0)
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_024, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_024 start";
     FormEventUtil formEventUtil;
@@ -504,7 +504,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_024, TestSize.Level0)
  * @tc.desc: test HandleBundleFormInfoRemoved function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_025, TestSize.Level0)
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_025, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_025 start";
     FormEventUtil formEventUtil;
@@ -519,7 +519,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_025, TestSize.Level0)
  * @tc.desc: test HandleFormHostDataCleared function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_026, TestSize.Level0)
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_026, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_026 start";
     FormEventUtil formEventUtil;
@@ -537,7 +537,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_026, TestSize.Level0)
  * @tc.desc: test BatchDeleteNoHostTempForms function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_027, TestSize.Level0)
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_027, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_027 start";
     FormEventUtil formEventUtil;
@@ -565,7 +565,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_027, TestSize.Level0)
  * @tc.desc: test BatchDeleteNoHostTempForms function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_028, TestSize.Level0)
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_028, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_028 start";
     FormEventUtil formEventUtil;
@@ -582,7 +582,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_028, TestSize.Level0)
  * @tc.desc: test GetTimerCfg function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_029, TestSize.Level0)
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_029, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_029 start";
     FormEventUtil formEventUtil;
@@ -599,7 +599,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_029, TestSize.Level0)
  * @tc.desc: test GetTimerCfg function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_030, TestSize.Level0)
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_030, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_030 start";
     FormEventUtil formEventUtil;
@@ -616,7 +616,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_030, TestSize.Level0)
  * @tc.desc: test GetTimerCfg function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_031, TestSize.Level0)
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_031, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_031 start";
     FormEventUtil formEventUtil;
@@ -633,7 +633,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_031, TestSize.Level0)
  * @tc.desc: test GetTimerCfg function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_032, TestSize.Level0)
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_032, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_032 start";
     FormEventUtil formEventUtil;
@@ -650,7 +650,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_032, TestSize.Level0)
  * @tc.desc: test GetTimerCfg function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_033, TestSize.Level0)
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_033, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_033 start";
     FormEventUtil formEventUtil;
@@ -667,7 +667,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_033, TestSize.Level0)
  * @tc.desc: test GetTimerCfg function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_034, TestSize.Level0)
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_034, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_034 start";
     FormEventUtil formEventUtil;
@@ -684,7 +684,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_034, TestSize.Level0)
  * @tc.desc: test GetTimerCfg function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_035, TestSize.Level0)
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_035, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_035 start";
     FormEventUtil formEventUtil;
@@ -701,7 +701,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_035, TestSize.Level0)
  * @tc.desc: test GetTimerCfg function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_036, TestSize.Level0)
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_036, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_036 start";
     FormEventUtil formEventUtil;
@@ -718,7 +718,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_036, TestSize.Level0)
  * @tc.desc: test GetTimerCfg function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_037, TestSize.Level0)
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_037, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_037 start";
     FormEventUtil formEventUtil;
@@ -735,7 +735,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_037, TestSize.Level0)
  * @tc.desc: test GetTimerCfg function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_038, TestSize.Level0)
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_038, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_038 start";
     FormEventUtil formEventUtil;
@@ -752,7 +752,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_038, TestSize.Level0)
  * @tc.desc: test HandleTimerUpdate function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_039, TestSize.Level0)
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_039, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_039 start";
     FormEventUtil formEventUtil;
@@ -770,7 +770,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_039, TestSize.Level0)
  * @tc.desc: test HandleTimerUpdate function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_040, TestSize.Level0)
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_040, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_040 start";
     FormEventUtil formEventUtil;
@@ -788,7 +788,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_040, TestSize.Level0)
  * @tc.desc: test HandleTimerUpdate function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_041, TestSize.Level0)
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_041, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_041 start";
     FormEventUtil formEventUtil;
@@ -807,7 +807,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_041, TestSize.Level0)
  * @tc.desc: test HandleTimerUpdate function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_042, TestSize.Level0)
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_042, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_042 start";
     FormEventUtil formEventUtil;
@@ -826,7 +826,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_042, TestSize.Level0)
  * @tc.desc: test HandleTimerUpdate function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_043, TestSize.Level0)
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_043, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_043 start";
     FormEventUtil formEventUtil;
@@ -846,7 +846,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_043, TestSize.Level0)
  * @tc.desc: test HandleTimerUpdate function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_044, TestSize.Level0)
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_044, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_044 start";
     FormEventUtil formEventUtil;
@@ -866,7 +866,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_044, TestSize.Level0)
  * @tc.desc: test HandleTimerUpdate function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_045, TestSize.Level0)
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_045, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_045 start";
     FormEventUtil formEventUtil;
@@ -886,7 +886,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_045, TestSize.Level0)
  * @tc.desc: test HandleTimerUpdate function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_046, TestSize.Level0)
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_046, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_046 start";
     FormEventUtil formEventUtil;
@@ -910,7 +910,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_046, TestSize.Level0)
  * @tc.desc: test HandleTimerUpdate function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_047, TestSize.Level0)
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_047, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_047 start";
     FormEventUtil formEventUtil;
@@ -934,7 +934,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_047, TestSize.Level0)
  * @tc.desc: test HandleTimerUpdate function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_048, TestSize.Level0)
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_048, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_048 start";
     FormEventUtil formEventUtil;
@@ -958,7 +958,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_048, TestSize.Level0)
  * @tc.desc: test HandleTimerUpdate function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_049, TestSize.Level0)
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_049, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_049 start";
     FormEventUtil formEventUtil;
@@ -978,7 +978,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_049, TestSize.Level0)
  * @tc.desc: test ReCreateForm function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_050, TestSize.Level0)
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_050, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_050 start";
     FormEventUtil formEventUtil;
@@ -993,7 +993,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_050, TestSize.Level0)
  * @tc.desc: test ReCreateForm function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_051, TestSize.Level0)
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_051, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_051 start";
     FormEventUtil formEventUtil;
@@ -1008,7 +1008,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_051, TestSize.Level0)
  * @tc.desc: test BatchDeleteNoHostDBForms function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_052, TestSize.Level0)
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_052, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_052 start";
     FormEventUtil formEventUtil;
@@ -1036,7 +1036,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_052, TestSize.Level0)
  * @tc.desc: test BatchDeleteNoHostDBForms function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_053, TestSize.Level0)
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_053, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_053 start";
     FormEventUtil formEventUtil;
@@ -1065,7 +1065,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_053, TestSize.Level0)
  * @tc.desc: test BatchDeleteNoHostDBForms function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_054, TestSize.Level0)
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_054, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_054 start";
     FormEventUtil formEventUtil;
@@ -1094,7 +1094,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_054, TestSize.Level0)
  * @tc.desc: test BatchDeleteNoHostTempForms function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_055, TestSize.Level0)
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_055, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_055 start";
     FormEventUtil formEventUtil;
