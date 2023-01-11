@@ -562,7 +562,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_027, TestSize.Level1)
 
 /**
  * @tc.name: FormEventUtil_028
- * @tc.desc: test BatchDeleteNoHostTempForms function.
+ * @tc.desc: test GetTimerCfg function.
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_028, TestSize.Level1)
