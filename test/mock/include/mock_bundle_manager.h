@@ -113,6 +113,8 @@ public:
         extensionInfo.bundleName = "com.ohos.launcher";
         return true;
     }
+
+    MOCK_METHOD3(SetModuleRemovable, bool(const std::string &bundleName, const std::string &moduleName, bool isEnable));
 };
 
 class MockBundleMgrService : public BundleMgrService {
