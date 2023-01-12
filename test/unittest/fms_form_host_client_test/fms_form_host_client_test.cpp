@@ -13,13 +13,17 @@
  * limitations under the License.
  */
 
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#define private public
 #include "form_host_client.h"
+#undef private
 #include "mock_form_token.h"
 
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::AppExecFwk;
+using testing::_;
 
 namespace {
 const std::string FORM_PROVIDER_BUNDLE_NAME = "ohos.samples.ut.form";
@@ -68,6 +72,24 @@ public:
 
 private:
     FormState state_ = FormState::UNKNOWN;
+};
+
+class FormCallback : public FormCallbackInterface {
+public:
+    FormCallback() = default;
+    virtual ~FormCallback() = default;
+
+    MOCK_METHOD1(ProcessFormUpdate, void(const FormJsInfo &formJsInfo));
+    MOCK_METHOD1(ProcessFormUninstall, void(const int64_t formId));
+    MOCK_METHOD0(OnDeathReceived, void());
+};
+
+class ShareFormCallBackMock : public ShareFormCallBack {
+public:
+    ShareFormCallBackMock() = default;
+    virtual ~ShareFormCallBackMock() = default;
+
+    MOCK_METHOD1(ProcessShareFormResponse, void(int32_t result));
 };
 
 /**
@@ -203,5 +225,320 @@ HWTEST_F(FmsFormHostClientTest, AddShareFormCallback_0100, TestSize.Level0)
     formHostClient->OnShareFormResponse(requestCode, result1);
     formHostClient->RemoveShareFormCallback(requestCode);
     GTEST_LOG_(INFO) << "FmsFormHostClientTest AddShareFormCallback_0100 end";
+}
+
+/**
+ * @tc.number: AddFormState_0400
+ * @tc.name: AddFormState
+ * @tc.desc: Verify AddFormState succeeded.
+ */
+HWTEST_F(FmsFormHostClientTest, AddFormState_0400, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest AddFormState_0400 start";
+    auto formStateCallback = std::make_shared<FormStateCallbackTest>();
+    AAFwk::Want want;
+    want.SetElementName(FORM_PROVIDER_BUNDLE_NAME, FORM_PROVIDER_ABILITY_NAME);
+    sptr<FormHostClient> formHostClient = FormHostClient::GetInstance();
+    auto result = formHostClient->AddFormState(formStateCallback, want);
+    EXPECT_TRUE(result);
+
+    auto callback = std::make_shared<FormStateCallbackTest>();
+    result = formHostClient->AddFormState(callback, want);
+    EXPECT_TRUE(result);
+    auto size = static_cast<int32_t>(formHostClient->formStateCallbackMap_.size());
+    EXPECT_EQ(size , 1);
+    formHostClient->formStateCallbackMap_.clear();
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest AddFormState_0400 end";
+}
+
+/**
+ * @tc.number: RemoveForm_0100
+ * @tc.name: RemoveForm
+ * @tc.desc: callback is nullptr, verify RemoveForm failed.
+ */
+HWTEST_F(FmsFormHostClientTest, RemoveForm_0100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest RemoveForm_0100 start";
+    sptr<FormHostClient> formHostClient = FormHostClient::GetInstance();
+    int64_t formId = 1;
+    auto callback = std::make_shared<FormCallback>();
+    std::set<std::shared_ptr<FormCallbackInterface>> callbackSet;
+    callbackSet.emplace(callback);
+    formHostClient->formCallbackMap_.emplace(formId, callbackSet);
+
+    std::shared_ptr<FormCallbackInterface> formCallback = nullptr;
+    formHostClient->RemoveForm(formCallback, formId);
+    auto size = static_cast<int32_t>(formHostClient->formCallbackMap_.size());
+    EXPECT_EQ(size , 1);
+    formHostClient->formCallbackMap_.clear();
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest RemoveForm_0100 end";
+}
+
+/**
+ * @tc.number: RemoveForm_0200
+ * @tc.name: RemoveForm
+ * @tc.desc: Form id is less than 0, verify RemoveForm failed.
+ */
+HWTEST_F(FmsFormHostClientTest, RemoveForm_0200, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest RemoveForm_0200 start";
+    sptr<FormHostClient> formHostClient = FormHostClient::GetInstance();
+    int64_t formId = 1;
+    auto callback = std::make_shared<FormCallback>();
+    std::set<std::shared_ptr<FormCallbackInterface>> callbackSet;
+    callbackSet.emplace(callback);
+    formHostClient->formCallbackMap_.emplace(formId, callbackSet);
+
+    formId = -1;
+    formHostClient->RemoveForm(callback, formId);
+    auto size = static_cast<int32_t>(formHostClient->formCallbackMap_.size());
+    EXPECT_EQ(size , 1);
+    formHostClient->formCallbackMap_.clear();
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest RemoveForm_0200 end";
+}
+
+/**
+ * @tc.number: RemoveForm_0300
+ * @tc.name: RemoveForm
+ * @tc.desc: Form id is not exist, verify RemoveForm failed.
+ */
+HWTEST_F(FmsFormHostClientTest, RemoveForm_0300, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest RemoveForm_0300 start";
+    sptr<FormHostClient> formHostClient = FormHostClient::GetInstance();
+    int64_t formId = 1;
+    auto callback = std::make_shared<FormCallback>();
+    std::set<std::shared_ptr<FormCallbackInterface>> callbackSet;
+    callbackSet.emplace(callback);
+    formHostClient->formCallbackMap_.emplace(formId, callbackSet);
+
+    formId = 10;
+    formHostClient->RemoveForm(callback, formId);
+    auto size = static_cast<int32_t>(formHostClient->formCallbackMap_.size());
+    EXPECT_EQ(size , 1);
+    formHostClient->formCallbackMap_.clear();
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest RemoveForm_0300 end";
+}
+
+/**
+ * @tc.number: RemoveForm_0400
+ * @tc.name: RemoveForm
+ * @tc.desc: Verify RemoveForm succeeded.
+ */
+HWTEST_F(FmsFormHostClientTest, RemoveForm_0400RemoveForm_0400, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest RemoveForm_0400 start";
+    sptr<FormHostClient> formHostClient = FormHostClient::GetInstance();
+    int64_t formId = 1;
+    auto callback = std::make_shared<FormCallback>();
+    std::set<std::shared_ptr<FormCallbackInterface>> callbackSet;
+    callbackSet.emplace(callback);
+    formHostClient->formCallbackMap_.emplace(formId, callbackSet);
+
+    formHostClient->RemoveForm(callback, formId);
+    auto size = static_cast<int32_t>(formHostClient->formCallbackMap_.size());
+    EXPECT_EQ(size , 0);
+    formHostClient->formCallbackMap_.clear();
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest RemoveForm_0400 end";
+}
+
+/**
+ * @tc.number: ContainsForm_0100
+ * @tc.name: ContainsForm
+ * @tc.desc: Verify ContainsForm succeeded.
+ */
+HWTEST_F(FmsFormHostClientTest, ContainsForm_0100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest ContainsForm_0100 start";
+    sptr<FormHostClient> formHostClient = FormHostClient::GetInstance();
+    int64_t formId = 1;
+    auto callback = std::make_shared<FormCallback>();
+    std::set<std::shared_ptr<FormCallbackInterface>> callbackSet;
+    callbackSet.emplace(callback);
+    formHostClient->formCallbackMap_.emplace(formId, callbackSet);
+
+    auto result = formHostClient->ContainsForm(formId);
+    EXPECT_TRUE(result);
+    formHostClient->formCallbackMap_.clear();
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest ContainsForm_0100 end";
+}
+
+/**
+ * @tc.number: ContainsForm_0200
+ * @tc.name: ContainsForm
+ * @tc.desc: form id is not exist, verify ContainsForm failed.
+ */
+HWTEST_F(FmsFormHostClientTest, ContainsForm_0200, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest ContainsForm_0200 start";
+    sptr<FormHostClient> formHostClient = FormHostClient::GetInstance();
+    int64_t formId = 1;
+    auto result = formHostClient->ContainsForm(formId);
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest ContainsForm_0200 end";
+}
+
+/**
+ * @tc.number: UpdateForm_0100
+ * @tc.name: UpdateForm
+ * @tc.desc: Verify UpdateForm succeeded.
+ */
+HWTEST_F(FmsFormHostClientTest, UpdateForm_0100, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest UpdateForm_0100 start";
+    sptr<FormHostClient> formHostClient = FormHostClient::GetInstance();
+    int64_t formId = 1;
+    auto callback = std::make_shared<FormCallback>();
+    std::set<std::shared_ptr<FormCallbackInterface>> callbackSet;
+    callbackSet.emplace(callback);
+    formHostClient->formCallbackMap_.emplace(formId, callbackSet);
+
+    EXPECT_CALL(*callback, ProcessFormUpdate(_)).Times(1);
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = formId;
+    formHostClient->UpdateForm(formJsInfo);
+    testing::Mock::AllowLeak(callback.get());
+    formHostClient->formCallbackMap_.clear();
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest UpdateForm_0100 end";
+}
+
+/**
+ * @tc.number: UpdateForm_0200
+ * @tc.name: UpdateForm
+ * @tc.desc: Form id is not exist, verify UpdateForm failed.
+ */
+HWTEST_F(FmsFormHostClientTest, UpdateForm_0200, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest UpdateForm_0200 start";
+    sptr<FormHostClient> formHostClient = FormHostClient::GetInstance();
+    int64_t formId = 1;
+    auto callback = std::make_shared<FormCallback>();
+    std::set<std::shared_ptr<FormCallbackInterface>> callbackSet;
+    callbackSet.emplace(callback);
+    formHostClient->formCallbackMap_.emplace(formId, callbackSet);
+
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = 2;
+    formHostClient->UpdateForm(formJsInfo);
+    formHostClient->formCallbackMap_.clear();
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest UpdateForm_0200 end";
+}
+
+/**
+ * @tc.number: UpdateForm_0300
+ * @tc.name: UpdateForm
+ * @tc.desc: Form id is less than 0, verify UpdateForm failed.
+ */
+HWTEST_F(FmsFormHostClientTest, UpdateForm_0300, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest UpdateForm_0300 start";
+    sptr<FormHostClient> formHostClient = FormHostClient::GetInstance();
+    int64_t formId = 1;
+    auto callback = std::make_shared<FormCallback>();
+    std::set<std::shared_ptr<FormCallbackInterface>> callbackSet;
+    callbackSet.emplace(callback);
+    formHostClient->formCallbackMap_.emplace(formId, callbackSet);
+
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = -1;
+    formHostClient->UpdateForm(formJsInfo);
+    formHostClient->formCallbackMap_.clear();
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest UpdateForm_0300 end";
+}
+
+/**
+ * @tc.number: OnAcquired_0200
+ * @tc.name: OnAcquired
+ * @tc.desc: token is nullptr, Verify OnAcquired succeeded.
+ */
+HWTEST_F(FmsFormHostClientTest, OnAcquired_0200, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest OnAcquired_0200 start";
+    sptr<FormHostClient> formHostClient = FormHostClient::GetInstance();
+    int64_t formId = 1;
+    auto callback = std::make_shared<FormCallback>();
+    std::set<std::shared_ptr<FormCallbackInterface>> callbackSet;
+    callbackSet.emplace(callback);
+    formHostClient->formCallbackMap_.emplace(formId, callbackSet);
+
+    EXPECT_CALL(*callback, ProcessFormUpdate(_)).Times(1);
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = formId;
+    sptr<MockFormToken> token = nullptr;
+    formHostClient->OnAcquired(formJsInfo, token);
+    testing::Mock::AllowLeak(callback.get());
+    formHostClient->formCallbackMap_.clear();
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest OnAcquired_0200 end";
+}
+
+/**
+ * @tc.number: OnUpdate_0100
+ * @tc.name: OnUpdate
+ * @tc.desc: token is nullptr, Verify OnUpdate succeeded.
+ */
+HWTEST_F(FmsFormHostClientTest, OnUpdate_0100, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest OnUpdate_0100 start";
+    sptr<FormHostClient> formHostClient = FormHostClient::GetInstance();
+    int64_t formId = 1;
+    auto callback = std::make_shared<FormCallback>();
+    std::set<std::shared_ptr<FormCallbackInterface>> callbackSet;
+    callbackSet.emplace(callback);
+    formHostClient->formCallbackMap_.emplace(formId, callbackSet);
+
+    EXPECT_CALL(*callback, ProcessFormUpdate(_)).Times(1);
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = formId;
+    formHostClient->OnUpdate(formJsInfo);
+    testing::Mock::AllowLeak(callback.get());
+    formHostClient->formCallbackMap_.clear();
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest OnUpdate_0100 end";
+}
+
+/**
+ * @tc.number: OnUninstall_0200
+ * @tc.name: OnUninstall
+ * @tc.desc: token is nullptr, Verify OnUninstall succeeded.
+ */
+HWTEST_F(FmsFormHostClientTest, OnUninstall_0200, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest OnUninstall_0200 start";
+    sptr<FormHostClient> formHostClient = FormHostClient::GetInstance();
+    auto callback = std::make_shared<FormCallback>();
+    std::set<std::shared_ptr<FormCallbackInterface>> callbackSet;
+    callbackSet.emplace(callback);
+    int64_t formId = 10;
+    formHostClient->formCallbackMap_.emplace(formId, callbackSet);
+
+    EXPECT_CALL(*callback, ProcessFormUninstall(_)).Times(1);
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(-1);
+    formIds.emplace_back(formId);
+    formHostClient->OnUninstall(formIds);
+    testing::Mock::AllowLeak(callback.get());
+    formHostClient->formCallbackMap_.clear();
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest OnUninstall_0200 end";
+}
+
+/**
+ * @tc.number: OnShareFormResponse_0100
+ * @tc.name: OnShareFormResponse
+ * @tc.desc: Verify OnShareFormResponse succeeded.
+ */
+HWTEST_F(FmsFormHostClientTest, OnShareFormResponse_0100, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest OnShareFormResponse_0100 start";
+    sptr<FormHostClient> formHostClient = FormHostClient::GetInstance();
+    int64_t requestCode = 1;
+    auto callback = std::make_shared<ShareFormCallBackMock>();
+    formHostClient->shareFormCallbackMap_.emplace(requestCode, callback);
+
+    EXPECT_CALL(*callback, ProcessShareFormResponse(_)).Times(1);
+    int32_t result = 0;
+    formHostClient->OnShareFormResponse(2, result);
+    formHostClient->OnShareFormResponse(requestCode, result);
+    testing::Mock::AllowLeak(callback.get());
+    formHostClient->shareFormCallbackMap_.clear();
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest OnShareFormResponse_0100 end";
 }
 }
