@@ -3622,7 +3622,7 @@ HWTEST_F(FmsFormShareMgrTest, RecvFormShareInfoFromRemote_002, TestSize.Level1)
 /**
  * @tc.number: SetEventHandler_001
  * @tc.name: SetEventHandler
- * @tc.desc: verify RecvFormShareInfoFromRemote succeeded.
+ * @tc.desc: verify SetEventHandler succeeded.
  */
 HWTEST_F(FmsFormShareMgrTest, SetEventHandler_001, TestSize.Level1)
 {
@@ -3657,7 +3657,6 @@ HWTEST_F(FmsFormShareMgrTest, AcquireShareFormData_003, TestSize.Level1)
     want.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
     want.SetParam(Constants::ACQUIRE_TYPE, Constants::ACQUIRE_TYPE_CREATE_FORM);
     want.SetParam(Constants::FORM_SHARE_REQUEST_CODE, formShareRequestCode);
-    
 
     bool testFlag = false;
     auto hostCallback = [&testFlag](const int64_t requestCode, const int32_t result) { 
