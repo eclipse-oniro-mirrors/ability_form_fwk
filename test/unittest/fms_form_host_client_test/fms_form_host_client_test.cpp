@@ -325,7 +325,7 @@ HWTEST_F(FmsFormHostClientTest, RemoveForm_0300, TestSize.Level1)
  * @tc.name: RemoveForm
  * @tc.desc: Verify RemoveForm succeeded.
  */
-HWTEST_F(FmsFormHostClientTest, RemoveForm_0400RemoveForm_0400, TestSize.Level1)
+HWTEST_F(FmsFormHostClientTest, RemoveForm_0400, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormHostClientTest RemoveForm_0400 start";
     sptr<FormHostClient> formHostClient = FormHostClient::GetInstance();
@@ -498,7 +498,7 @@ HWTEST_F(FmsFormHostClientTest, OnUpdate_0100, TestSize.Level0)
 /**
  * @tc.number: OnUninstall_0200
  * @tc.name: OnUninstall
- * @tc.desc: token is nullptr, Verify OnUninstall succeeded.
+ * @tc.desc: Verify OnUninstall succeeded.
  */
 HWTEST_F(FmsFormHostClientTest, OnUninstall_0200, TestSize.Level0)
 {
