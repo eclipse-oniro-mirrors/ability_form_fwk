@@ -1147,7 +1147,7 @@ private:
         convertArgc++;
 
         std::string devicedId;
-        if (!ConvertDeviceId(engine, info.argv[PARAM0], devicedId)) {
+        if (!ConvertDeviceId(engine, info.argv[PARAM1], devicedId)) {
             HILOG_ERROR("deviced id is invalid.");
             NapiFormUtil::ThrowParamTypeError(engine, "devicedId", "string");
             return engine.CreateUndefined();
