@@ -76,6 +76,7 @@ group("unittest") {
     "unittest/fms_form_set_next_refresh_test:unittest",
     "unittest/fms_form_share_mgr_test:unittest",
     "unittest/fms_form_supply_callback_test:unittest",
+    "unittest/fms_form_supply_proxy_test:unittest",
     "unittest/fms_form_supply_stub_test:unittest",
     "unittest/fms_form_sys_event_receiver_test:unittest",
     "unittest/fms_form_timer_mgr_test:unittest",
