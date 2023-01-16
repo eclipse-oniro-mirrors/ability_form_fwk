@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -172,7 +172,8 @@ HWTEST_F(FormProviderStubTest, FormProviderStubTest_004, TestSize.Level0)
 
 /**
  * @tc.name: FormProviderStubTest_005
- * @tc.desc: Verify OnRemoteRequest
+ * @tc.desc: 1.Verify that the OnRemoteRequest interface executes as expected.
+ *           2.The interface return value IPC_STUB_UNKNOW_TRANS_ERR.
  * @tc.type: FUNC
  */
 HWTEST_F(FormProviderStubTest, FormProviderStubTest_005, TestSize.Level1)
@@ -189,7 +190,8 @@ HWTEST_F(FormProviderStubTest, FormProviderStubTest_005, TestSize.Level1)
 
 /**
  * @tc.name: FormProviderStubTest_006
- * @tc.desc: Verify OnRemoteRequest
+ * @tc.desc: 1.Verify that the OnRemoteRequest interface executes as expected.
+ *           2.The interface return value IPC_STUB_UNKNOW_TRANS_ERR.
  * @tc.type: FUNC
  */
 HWTEST_F(FormProviderStubTest, FormProviderStubTest_006, TestSize.Level1)
@@ -207,7 +209,8 @@ HWTEST_F(FormProviderStubTest, FormProviderStubTest_006, TestSize.Level1)
 
 /**
  * @tc.name: FormProviderStubTest_007
- * @tc.desc: Verify OnRemoteRequest and HandleAcquireProviderFormInfo
+ * @tc.desc: Verify OnRemoteRequest and HandleAcquireProviderFormInfo interface executes as expected.
+ *           2.The interface return value ERR_OK.
  * @tc.type: FUNC
  */
 HWTEST_F(FormProviderStubTest, FormProviderStubTest_007, TestSize.Level1)
@@ -232,7 +235,8 @@ HWTEST_F(FormProviderStubTest, FormProviderStubTest_007, TestSize.Level1)
 
 /**
  * @tc.name: FormProviderStubTest_008
- * @tc.desc: Verify OnRemoteRequest and HandleAcquireProviderFormInfo
+ * @tc.desc: Verify OnRemoteRequest and HandleAcquireProviderFormInfo interface executes as expected.
+ *           2.The interface return value ERR_APPEXECFWK_PARCEL_ERROR.
  * @tc.type: FUNC
  */
 HWTEST_F(FormProviderStubTest, FormProviderStubTest_008, TestSize.Level1)
@@ -255,7 +259,8 @@ HWTEST_F(FormProviderStubTest, FormProviderStubTest_008, TestSize.Level1)
 
 /**
  * @tc.name: FormProviderStubTest_009
- * @tc.desc: Verify OnRemoteRequest and HandleAcquireProviderFormInfo
+ * @tc.desc: Verify OnRemoteRequest and HandleAcquireProviderFormInfo interface executes as expected.
+ *           2.The interface return value ERR_APPEXECFWK_PARCEL_ERROR.
  * @tc.type: FUNC
  */
 HWTEST_F(FormProviderStubTest, FormProviderStubTest_009, TestSize.Level1)
@@ -277,7 +282,8 @@ HWTEST_F(FormProviderStubTest, FormProviderStubTest_009, TestSize.Level1)
 
 /**
  * @tc.name: FormProviderStubTest_010
- * @tc.desc: Verify OnRemoteRequest and HandleAcquireProviderFormInfo
+ * @tc.desc: Verify OnRemoteRequest and HandleAcquireProviderFormInfo interface executes as expected.
+ *           2.The interface return value ERR_APPEXECFWK_PARCEL_ERROR.
  * @tc.type: FUNC
  */
 HWTEST_F(FormProviderStubTest, FormProviderStubTest_010, TestSize.Level1)
@@ -301,7 +307,8 @@ HWTEST_F(FormProviderStubTest, FormProviderStubTest_010, TestSize.Level1)
 
 /**
  * @tc.name: FormProviderStubTest_011
- * @tc.desc: Verify OnRemoteRequest and HandleNotifyFormDelete
+ * @tc.desc: Verify OnRemoteRequest and HandleNotifyFormDelete interface executes as expected.
+ *           2.The interface return value ERR_OK.
  * @tc.type: FUNC
  */
 HWTEST_F(FormProviderStubTest, FormProviderStubTest_011, TestSize.Level1)
@@ -326,7 +333,8 @@ HWTEST_F(FormProviderStubTest, FormProviderStubTest_011, TestSize.Level1)
 
 /**
  * @tc.name: FormProviderStubTest_012
- * @tc.desc: Verify OnRemoteRequest and HandleNotifyFormDelete
+ * @tc.desc: Verify OnRemoteRequest and HandleNotifyFormDelete interface executes as expected.
+ *           2.The interface return value ERR_APPEXECFWK_PARCEL_ERROR.
  * @tc.type: FUNC
  */
 HWTEST_F(FormProviderStubTest, FormProviderStubTest_012, TestSize.Level1)
@@ -349,7 +357,8 @@ HWTEST_F(FormProviderStubTest, FormProviderStubTest_012, TestSize.Level1)
 
 /**
  * @tc.name: FormProviderStubTest_013
- * @tc.desc: Verify OnRemoteRequest and HandleNotifyFormDelete
+ * @tc.desc: Verify OnRemoteRequest and HandleNotifyFormDelete interface executes as expected.
+ *           2.The interface return value ERR_APPEXECFWK_PARCEL_ERROR.
  * @tc.type: FUNC
  */
 HWTEST_F(FormProviderStubTest, FormProviderStubTest_013, TestSize.Level1)
@@ -371,7 +380,8 @@ HWTEST_F(FormProviderStubTest, FormProviderStubTest_013, TestSize.Level1)
 
 /**
  * @tc.name: FormProviderStubTest_014
- * @tc.desc: Verify OnRemoteRequest and HandleNotifyFormsDelete
+ * @tc.desc: Verify OnRemoteRequest and HandleNotifyFormsDelete interface executes as expected.
+ *           2.The interface return value ERR_OK.
  * @tc.type: FUNC
  */
 HWTEST_F(FormProviderStubTest, FormProviderStubTest_014, TestSize.Level1)
@@ -396,7 +406,8 @@ HWTEST_F(FormProviderStubTest, FormProviderStubTest_014, TestSize.Level1)
 
 /**
  * @tc.name: FormProviderStubTest_015
- * @tc.desc: Verify OnRemoteRequest and HandleNotifyFormsDelete
+ * @tc.desc: Verify OnRemoteRequest and HandleNotifyFormsDelete interface executes as expected.
+ *           2.The interface return value ERR_APPEXECFWK_PARCEL_ERROR.
  * @tc.type: FUNC
  */
 HWTEST_F(FormProviderStubTest, FormProviderStubTest_015, TestSize.Level1)
@@ -417,7 +428,8 @@ HWTEST_F(FormProviderStubTest, FormProviderStubTest_015, TestSize.Level1)
 
 /**
  * @tc.name: FormProviderStubTest_016
- * @tc.desc: Verify OnRemoteRequest and HandleNotifyFormsDelete
+ * @tc.desc: Verify OnRemoteRequest and HandleNotifyFormsDelete interface executes as expected.
+ *           2.The interface return value ERR_APPEXECFWK_PARCEL_ERROR.
  * @tc.type: FUNC
  */
 HWTEST_F(FormProviderStubTest, FormProviderStubTest_016, TestSize.Level1)
@@ -440,7 +452,8 @@ HWTEST_F(FormProviderStubTest, FormProviderStubTest_016, TestSize.Level1)
 
 /**
  * @tc.name: FormProviderStubTest_017
- * @tc.desc: Verify OnRemoteRequest and HandleNotifyFormsDelete
+ * @tc.desc: Verify OnRemoteRequest and HandleNotifyFormsDelete interface executes as expected.
+ *           2.The interface return value ERR_INVALID_DATA.
  * @tc.type: FUNC
  */
 HWTEST_F(FormProviderStubTest, FormProviderStubTest_017, TestSize.Level1)
@@ -461,7 +474,8 @@ HWTEST_F(FormProviderStubTest, FormProviderStubTest_017, TestSize.Level1)
 
 /**
  * @tc.name: FormProviderStubTest_018
- * @tc.desc: Verify OnRemoteRequest and HandleNotifyFormUpdate
+ * @tc.desc: Verify OnRemoteRequest and HandleNotifyFormUpdate interface executes as expected.
+ *           2.The interface return value ERR_OK.
  * @tc.type: FUNC
  */
 HWTEST_F(FormProviderStubTest, FormProviderStubTest_018, TestSize.Level1)
@@ -486,7 +500,8 @@ HWTEST_F(FormProviderStubTest, FormProviderStubTest_018, TestSize.Level1)
 
 /**
  * @tc.name: FormProviderStubTest_019
- * @tc.desc: Verify OnRemoteRequest and HandleNotifyFormUpdate
+ * @tc.desc: Verify OnRemoteRequest and HandleNotifyFormUpdate interface executes as expected.
+ *           2.The interface return value ERR_APPEXECFWK_PARCEL_ERROR.
  * @tc.type: FUNC
  */
 HWTEST_F(FormProviderStubTest, FormProviderStubTest_019, TestSize.Level1)
@@ -509,7 +524,8 @@ HWTEST_F(FormProviderStubTest, FormProviderStubTest_019, TestSize.Level1)
 
 /**
  * @tc.name: FormProviderStubTest_020
- * @tc.desc: Verify OnRemoteRequest and HandleNotifyFormUpdate
+ * @tc.desc: Verify OnRemoteRequest and HandleNotifyFormUpdate interface executes as expected.
+ *           2.The interface return value ERR_APPEXECFWK_PARCEL_ERROR.
  * @tc.type: FUNC
  */
 HWTEST_F(FormProviderStubTest, FormProviderStubTest_020, TestSize.Level1)
@@ -531,7 +547,8 @@ HWTEST_F(FormProviderStubTest, FormProviderStubTest_020, TestSize.Level1)
 
 /**
  * @tc.name: FormProviderStubTest_021
- * @tc.desc: Verify OnRemoteRequest and HandleEventNotify
+ * @tc.desc: Verify OnRemoteRequest and HandleEventNotify interface executes as expected.
+ *           2.The interface return value ERR_OK.
  * @tc.type: FUNC
  */
 HWTEST_F(FormProviderStubTest, FormProviderStubTest_021, TestSize.Level1)
@@ -558,7 +575,8 @@ HWTEST_F(FormProviderStubTest, FormProviderStubTest_021, TestSize.Level1)
 
 /**
  * @tc.name: FormProviderStubTest_022
- * @tc.desc: Verify OnRemoteRequest and HandleEventNotify
+ * @tc.desc: Verify OnRemoteRequest and HandleEventNotify interface executes as expected.
+ *           2.The interface return value ERR_APPEXECFWK_PARCEL_ERROR.
  * @tc.type: FUNC
  */
 HWTEST_F(FormProviderStubTest, FormProviderStubTest_022, TestSize.Level1)
@@ -583,7 +601,8 @@ HWTEST_F(FormProviderStubTest, FormProviderStubTest_022, TestSize.Level1)
 
 /**
  * @tc.name: FormProviderStubTest_023
- * @tc.desc: Verify OnRemoteRequest and HandleEventNotify
+ * @tc.desc: Verify OnRemoteRequest and HandleEventNotify interface executes as expected.
+ *           2.The interface return value ERR_APPEXECFWK_PARCEL_ERROR.
  * @tc.type: FUNC
  */
 HWTEST_F(FormProviderStubTest, FormProviderStubTest_023, TestSize.Level1)
@@ -606,7 +625,8 @@ HWTEST_F(FormProviderStubTest, FormProviderStubTest_023, TestSize.Level1)
 
 /**
  * @tc.name: FormProviderStubTest_024
- * @tc.desc: Verify OnRemoteRequest and HandleEventNotify
+ * @tc.desc: Verify OnRemoteRequest and HandleEventNotify interface executes as expected.
+ *           2.The interface return value ERR_INVALID_DATA.
  * @tc.type: FUNC
  */
 HWTEST_F(FormProviderStubTest, FormProviderStubTest_024, TestSize.Level1)
@@ -635,7 +655,8 @@ HWTEST_F(FormProviderStubTest, FormProviderStubTest_024, TestSize.Level1)
 
 /**
  * @tc.name: FormProviderStubTest_025
- * @tc.desc: Verify OnRemoteRequest and HandleNotifyFormCastTempForm
+ * @tc.desc: Verify OnRemoteRequest and HandleNotifyFormCastTempForm interface executes as expected.
+ *           2.The interface return value ERR_OK.
  * @tc.type: FUNC
  */
 HWTEST_F(FormProviderStubTest, FormProviderStubTest_025, TestSize.Level1)
@@ -660,7 +681,8 @@ HWTEST_F(FormProviderStubTest, FormProviderStubTest_025, TestSize.Level1)
 
 /**
  * @tc.name: FormProviderStubTest_026
- * @tc.desc: Verify OnRemoteRequest and HandleNotifyFormCastTempForm
+ * @tc.desc: Verify OnRemoteRequest and HandleNotifyFormCastTempForm interface executes as expected.
+ *           2.The interface return value ERR_APPEXECFWK_PARCEL_ERROR.
  * @tc.type: FUNC
  */
 HWTEST_F(FormProviderStubTest, FormProviderStubTest_026, TestSize.Level1)
@@ -683,7 +705,8 @@ HWTEST_F(FormProviderStubTest, FormProviderStubTest_026, TestSize.Level1)
 
 /**
  * @tc.name: FormProviderStubTest_027
- * @tc.desc: Verify OnRemoteRequest and HandleNotifyFormCastTempForm
+ * @tc.desc: Verify OnRemoteRequest and HandleNotifyFormCastTempForm interface executes as expected.
+ *           2.The interface return value ERR_APPEXECFWK_PARCEL_ERROR.
  * @tc.type: FUNC
  */
 HWTEST_F(FormProviderStubTest, FormProviderStubTest_027, TestSize.Level1)
@@ -704,7 +727,8 @@ HWTEST_F(FormProviderStubTest, FormProviderStubTest_027, TestSize.Level1)
 
 /**
  * @tc.name: FormProviderStubTest_028
- * @tc.desc: Verify OnRemoteRequest and HandleFireFormEvent
+ * @tc.desc: Verify OnRemoteRequest and HandleFireFormEvent interface executes as expected.
+ *           2.The interface return value ERR_OK.
  * @tc.type: FUNC
  */
 HWTEST_F(FormProviderStubTest, FormProviderStubTest_028, TestSize.Level1)
@@ -731,7 +755,8 @@ HWTEST_F(FormProviderStubTest, FormProviderStubTest_028, TestSize.Level1)
 
 /**
  * @tc.name: FormProviderStubTest_029
- * @tc.desc: Verify OnRemoteRequest and HandleFireFormEvent
+ * @tc.desc: Verify OnRemoteRequest and HandleFireFormEvent interface executes as expected.
+ *           2.The interface return value ERR_APPEXECFWK_PARCEL_ERROR.
  * @tc.type: FUNC
  */
 HWTEST_F(FormProviderStubTest, FormProviderStubTest_029, TestSize.Level1)
@@ -754,7 +779,8 @@ HWTEST_F(FormProviderStubTest, FormProviderStubTest_029, TestSize.Level1)
 
 /**
  * @tc.name: FormProviderStubTest_030
- * @tc.desc: Verify OnRemoteRequest and HandleFireFormEvent
+ * @tc.desc: Verify OnRemoteRequest and HandleFireFormEvent interface executes as expected.
+ *           2.The interface return value ERR_APPEXECFWK_PARCEL_ERROR.
  * @tc.type: FUNC
  */
 HWTEST_F(FormProviderStubTest, FormProviderStubTest_030, TestSize.Level1)
@@ -779,7 +805,8 @@ HWTEST_F(FormProviderStubTest, FormProviderStubTest_030, TestSize.Level1)
 
 /**
  * @tc.name: FormProviderStubTest_031
- * @tc.desc: Verify OnRemoteRequest and HandleAcquireState
+ * @tc.desc: Verify OnRemoteRequest and HandleAcquireState interface executes as expected.
+ *           2.The interface return value ERR_OK.
  * @tc.type: FUNC
  */
 HWTEST_F(FormProviderStubTest, FormProviderStubTest_031, TestSize.Level1)
@@ -805,7 +832,8 @@ HWTEST_F(FormProviderStubTest, FormProviderStubTest_031, TestSize.Level1)
 
 /**
  * @tc.name: FormProviderStubTest_032
- * @tc.desc: Verify OnRemoteRequest and HandleAcquireState
+ * @tc.desc: Verify OnRemoteRequest and HandleAcquireState interface executes as expected.
+ *           2.The interface return value ERR_APPEXECFWK_PARCEL_ERROR.
  * @tc.type: FUNC
  */
 HWTEST_F(FormProviderStubTest, FormProviderStubTest_032, TestSize.Level1)
@@ -824,7 +852,8 @@ HWTEST_F(FormProviderStubTest, FormProviderStubTest_032, TestSize.Level1)
 
 /**
  * @tc.name: FormProviderStubTest_033
- * @tc.desc: Verify OnRemoteRequest and HandleAcquireState
+ * @tc.desc: Verify OnRemoteRequest and HandleAcquireState interface executes as expected.
+ *           2.The interface return value ERR_APPEXECFWK_PARCEL_ERROR.
  * @tc.type: FUNC
  */
 HWTEST_F(FormProviderStubTest, FormProviderStubTest_033, TestSize.Level1)
@@ -847,7 +876,8 @@ HWTEST_F(FormProviderStubTest, FormProviderStubTest_033, TestSize.Level1)
 
 /**
  * @tc.name: FormProviderStubTest_034
- * @tc.desc: Verify OnRemoteRequest and HandleAcquireState
+ * @tc.desc: Verify OnRemoteRequest and HandleAcquireState interface executes as expected.
+ *           2.The interface return value ERR_APPEXECFWK_PARCEL_ERROR.
  * @tc.type: FUNC
  */
 HWTEST_F(FormProviderStubTest, FormProviderStubTest_034, TestSize.Level1)
@@ -871,7 +901,8 @@ HWTEST_F(FormProviderStubTest, FormProviderStubTest_034, TestSize.Level1)
 
 /**
  * @tc.name: FormProviderStubTest_035
- * @tc.desc: Verify OnRemoteRequest and HandleAcquireShareFormData
+ * @tc.desc: Verify OnRemoteRequest and HandleAcquireShareFormData interface executes as expected.
+ *           2.The interface return value ERR_OK.
  * @tc.type: FUNC
  */
 HWTEST_F(FormProviderStubTest, FormProviderStubTest_035, TestSize.Level1)
@@ -897,7 +928,8 @@ HWTEST_F(FormProviderStubTest, FormProviderStubTest_035, TestSize.Level1)
 
 /**
  * @tc.name: FormProviderStubTest_036
- * @tc.desc: Verify OnRemoteRequest and HandleAcquireShareFormData
+ * @tc.desc: Verify OnRemoteRequest and HandleAcquireShareFormData interface executes as expected.
+ *           2.The interface return value ERR_APPEXECFWK_PARCEL_ERROR.
  * @tc.type: FUNC
  */
 HWTEST_F(FormProviderStubTest, FormProviderStubTest_036, TestSize.Level1)
