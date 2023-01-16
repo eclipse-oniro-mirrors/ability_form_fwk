@@ -105,7 +105,6 @@ ohos_shared_library("libfms") {
     "c_utils:utils",
     "common_event_service:cesfwk_core",
     "common_event_service:cesfwk_innerkits",
-    "device_usage_statistics:usagestatsinner",
     "eventhandler:libeventhandler",
     "form_fwk:form_manager",
     "hicollie_native:libhicollie",
