@@ -37,6 +37,9 @@ public:
     };
     sptr<IRemoteObject> GetSystemAbility(int32_t systemAbilityId) override
     {
+        if (weakGetSystemAbility_.lock() != nullptr) {
+            return nullptr;
+        }
         return this;
     };
     sptr<IRemoteObject> CheckSystemAbility(int32_t systemAbilityId) override
@@ -90,6 +93,22 @@ public:
     {
         return {};
     };
+
+    std::weak_ptr<bool> weakGetSystemAbility_;
+};
+
+class FormInterfaceCallbackTest : public AppExecFwk::FormCallbackInterface {
+public:
+    FormInterfaceCallbackTest()
+    {}
+    virtual ~FormInterfaceCallbackTest()
+    {}
+    void ProcessFormUpdate(const AppExecFwk::FormJsInfo& formJsInfo)override
+    {}
+    void ProcessFormUninstall(const int64_t formId) override
+    {}
+    void OnDeathReceived() override
+    {}
 };
 }   // namespace OHOS
 #endif  // MOCK_SYSTEM_ABILITY_MANAGER_H_
