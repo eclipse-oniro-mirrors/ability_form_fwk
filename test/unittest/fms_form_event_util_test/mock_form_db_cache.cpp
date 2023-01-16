@@ -71,19 +71,38 @@ int FormDbCache::GetMatchCount(const std::string &bundleName, const std::string 
 ErrCode FormDbCache::GetNoHostDBForms(const int uid, std::map<FormIdKey,
     std::set<int64_t>> &noHostFormDBList, std::map<int64_t, bool> &foundFormsMap)
 {
-    int64_t formId = 1;
-    std::string bundleName = "com.form.start";
-    std::string abilityName = "bbbbbb";
-    if (false == g_mockGetNoHostDBFormsOne) {
-        FormIdKey formIdKey(bundleName, abilityName);
-        std::set<int64_t> formIdsSet;
-        formIdsSet.emplace(formId);
-        noHostFormDBList.emplace(formIdKey, formIdsSet);
+    int64_t formIds[2] = { 1, 2 };
+    std::string bundleName[2] = { "com.form.start", "com.form.start2" };
+    std::string abilityName[2] = { "bbbbbb", "bbbbbb2" };
+
+    for (int32_t i = 0; i < 2; ++i) {
+        if (false == g_mockGetNoHostDBFormsOne) {
+            FormIdKey formIdKey(bundleName[i], abilityName[i]);
+            std::set<int64_t> formIdsSet;
+            formIdsSet.emplace(formIds[i]);
+            noHostFormDBList.emplace(formIdKey, formIdsSet);
+        }
+        if (false == g_mockGetNoHostDBFormsTwo) {
+            foundFormsMap.emplace(formIds[i], (i == 1));
+        }
     }
-    if (false == g_mockGetNoHostDBFormsTwo) {
-        foundFormsMap.emplace(formId, false);
-    }                    
     return ERR_OK;
+}
+
+ErrCode FormDbCache::GetDBRecord(const int64_t formId, FormDBInfo &record) const
+{
+    int64_t formIds[2] = { 1, 2 };
+    std::string bundleName[2] = { "com.form.start", "com.form.start2" };
+    std::string moduleName[2] = { "bbbbbb", "bbbbbb2" };
+    for (int32_t i = 1; i < 2; ++i) {
+        if (formId == formIds[i]) {
+            record.bundleName = bundleName[i];
+            record.moduleName = moduleName[i];
+            return ERR_OK;
+        }
+    }
+
+    return ERR_APPEXECFWK_FORM_INVALID_PARAM;
 }
 } // namespace AppExecFwk
 } // namespace OHOS

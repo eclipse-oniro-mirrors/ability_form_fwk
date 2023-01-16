@@ -25,6 +25,7 @@ ohos_unittest("FmsFormEventUtilTest") {
     "${form_fwk_path}/test/unittest/fms_form_event_util_test/mock_form_data_mgr.cpp",
     "${form_fwk_path}/test/unittest/fms_form_event_util_test/mock_form_db_cache.cpp",
     "${form_fwk_path}/test/unittest/fms_form_event_util_test/mock_form_info_mgr.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_event_util_test/mock_form_provider_mgr.cpp",
   ]
 
   include_dirs = [
