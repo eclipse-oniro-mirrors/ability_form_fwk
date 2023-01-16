@@ -21,7 +21,7 @@
 #include "message_parcel.h"
 #include "appexecfwk_errors.h"
 #include "element_name.h"
-#include "${form_fwk_path}/interfaces/inner_api/include/form_info_filter.h"
+#include "form_info_filter.h"
 
 using namespace testing::ext;
 
