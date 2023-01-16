@@ -20,6 +20,7 @@ ohos_unittest("FmsFormInfoStorageTest") {
   module_out_path = module_output_path
 
   sources = [
+    "${form_fwk_path}/test/mock/src/mock_bundle_manager.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_host_client.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_provider_client.cpp",
   ]
@@ -27,6 +28,7 @@ ohos_unittest("FmsFormInfoStorageTest") {
 
   include_dirs = [
     "${ability_runtime_path}/services/formmgr/include",
+    "${distributeddatamgr_path}/kv_store/interfaces/innerkits/distributeddata/include",
     "${systemabilitymgr_path}/samgr/adapter/interfaces/innerkits/include",
     "${systemabilitymgr_path}/samgr/interfaces/innerkits/samgr_proxy/include",
     "${form_fwk_path}/interfaces/inner_api/include",
