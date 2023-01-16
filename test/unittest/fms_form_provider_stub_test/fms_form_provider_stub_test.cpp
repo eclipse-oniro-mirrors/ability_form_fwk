@@ -90,7 +90,7 @@ public:
         return number_;
     };
     int OnAcquireStateResult(FormState state, const std::string &provider, const Want &wantArg,
-                                     const Want &want) override
+        const Want &want) override
     {
         return number_;
     };
