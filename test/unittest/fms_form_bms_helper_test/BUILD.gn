@@ -20,8 +20,8 @@ ohos_unittest("fms_form_bms_helper_test") {
   module_out_path = module_output_path
 
   sources = [
-    "${form_fwk_path}/test/unittest/fms_form_bms_helper_test/fms_form_bms_helper_test.cpp",
     "${form_fwk_path}/services/src/form_bms_helper.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_bms_helper_test/fms_form_bms_helper_test.cpp",
   ]
 
   include_dirs = [
@@ -39,31 +39,31 @@ ohos_unittest("fms_form_bms_helper_test") {
   }
   deps = [
     "${ability_runtime_path}/interfaces/inner_api/app_manager:app_manager",
-    "${form_fwk_path}:fms_target",
-    "//third_party/googletest:gmock_main",
     "${ability_runtime_path}/services/abilitymgr:abilityms_target",
+    "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
     "${systemabilitymgr_path}/safwk/interfaces/innerkits/safwk:system_ability_fwk",
     "${systemabilitymgr_path}/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
+    "//third_party/googletest:gmock_main",
   ]
 
   external_deps = [
+    "ability_base:want",
+    "appspawn:appspawn_socket_client",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
+    "eventhandler:libeventhandler",
     "form_fwk:form_manager",
-    "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_core",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
     "hitrace_native:libhitracechain",
+    "hiviewdfx_hilog_native:libhilog",
     "huks:libhukssdk",
-    "samgr:samgr_proxy",
-    "ability_base:want",
-    "appspawn:appspawn_socket_client",
-    "eventhandler:libeventhandler",
+    "ipc:ipc_core",
     "relational_store:native_rdb",
+    "samgr:samgr_proxy",
   ]
 }
 

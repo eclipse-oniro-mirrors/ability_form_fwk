@@ -90,7 +90,7 @@ public:
 
     virtual bool GetBundleNameForUid(const int uid, std::string &bundleName) override
     {
-        bundleName = "com.form.provider.service";
+        bundleName = "com.form.service";
         return GetBundleNameForUid_;
     }
 
