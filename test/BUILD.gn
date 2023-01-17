@@ -48,6 +48,7 @@ group("unittest") {
     "unittest/fms_form_host_stub_test:unittest",
     "unittest/fms_form_info_mgr_test:unittest",
     "unittest/fms_form_info_rdb_storage_mgr_test:unittest",
+    "unittest/fms_form_info_storage_mgr_test:unittest",
     "unittest/fms_form_js_info_test:unittest",
     "unittest/fms_form_mgr_adapter_test:unittest",
     "unittest/fms_form_mgr_add_form_test:unittest",
