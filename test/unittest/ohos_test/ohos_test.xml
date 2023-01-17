@@ -16,7 +16,7 @@
 <configuration ver="2.0">
     <target name="FormInfoMgrTest">
         <preparer>
-            <option name="push" value="formTestWidget1.hap -> /data/test/" src="res"/>
+            <option name="push" value="../../../../benchmark/form_fwk/interfaces/resource/form_test_bundle/formTestWidget1.hap -> /data/test/" src="res"/>
             <option name="shell" value="bm install -r -p /data/test/formTestWidget1.hap"/>
         </preparer>
     </target>

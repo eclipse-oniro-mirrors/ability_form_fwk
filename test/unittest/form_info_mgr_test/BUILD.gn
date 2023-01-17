@@ -28,7 +28,7 @@ ohos_unittest("FormInfoMgrTest") {
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}:form_manager",
-    "${form_fwk_path}/test/resource/benchmark/form_test_bundle:formTestWidget2",
+    "${form_fwk_path}/test/resource/benchmark/form_test_bundle:formTestWidget1",
     "${form_fwk_path}/test/unittest/ohos_test:copy_ohos_test",
     "${systemabilitymgr_path}/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
     "//third_party/googletest:gmock_main",
