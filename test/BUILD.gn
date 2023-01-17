@@ -77,12 +77,15 @@ group("unittest") {
     "unittest/fms_form_supply_stub_test:unittest",
     "unittest/fms_form_sys_event_receiver_test:unittest",
     "unittest/fms_form_timer_mgr_test:unittest",
+    "unittest/fms_provider_connect_proxy_test:unittest",
     "unittest/fms_provider_connect_stub_test:unittest",
+    "unittest/form_errors_test:unittest",
     "unittest/form_mgr_proxy_test:unittest",
     "unittest/form_mgr_stub_test:unittest",
     "unittest/form_mgr_test:unittest",
     "unittest/form_napi_util_test:unittest",
     "unittest/form_provider_caller_test:unittest",
+    "unittest/form_provider_info_test:unittest",
   ]
 }
 
