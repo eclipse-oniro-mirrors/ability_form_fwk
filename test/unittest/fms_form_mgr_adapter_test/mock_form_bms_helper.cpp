@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,6 +22,8 @@ namespace {
     bool g_mockGetCallerBundleNameRet = true;
     bool g_mockGetUidByBundleNameRet = true;
     bool g_mockGetAbilityInfoByActionRet = true;
+    bool g_mockGetAbilityInfoByActionRetParamsAbilityInfo = false;
+    bool g_mockGetAbilityInfoByActionRetParamsExtensionInfo = false;
 }
 
 void MockGetCallerBundleName(bool mockRet)
@@ -37,6 +39,16 @@ void MockGetUidByBundleName(bool mockRet)
 void MockGetAbilityInfoByAction(bool mockRet)
 {
     g_mockGetAbilityInfoByActionRet = mockRet;
+}
+
+void MockGetAbilityInfoByActionAbilityInfo(bool mockRet)
+{
+    g_mockGetAbilityInfoByActionRetParamsAbilityInfo = mockRet;
+}
+
+void MockGetAbilityInfoByActionExtensionInfo(bool mockRet)
+{
+    g_mockGetAbilityInfoByActionRetParamsExtensionInfo = mockRet;
 }
 
 namespace OHOS {
@@ -60,12 +72,18 @@ int32_t FormBmsHelper::GetUidByBundleName(const std::string &bundleName, const i
     if (true == g_mockGetUidByBundleNameRet) {
         return INVALID_UID;
     }
-    return IPCSkeleton::GetCallingUid();   
+    return IPCSkeleton::GetCallingUid();
 }
 
 bool FormBmsHelper::GetAbilityInfoByAction(const std::string &action, int32_t userId,
     AbilityInfo &abilityInfo, ExtensionAbilityInfo &extensionAbilityInfo)
 {
+    if (g_mockGetAbilityInfoByActionRet && g_mockGetAbilityInfoByActionRetParamsAbilityInfo) {
+        abilityInfo.name = "name";
+    }
+    if (g_mockGetAbilityInfoByActionRet && g_mockGetAbilityInfoByActionRetParamsExtensionInfo) {
+        extensionAbilityInfo.name = "name";
+    }
     return g_mockGetAbilityInfoByActionRet;
 }
 } // namespace AppExecFwk
