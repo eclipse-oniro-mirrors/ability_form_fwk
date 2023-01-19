@@ -28,6 +28,7 @@
 #include "form_info_mgr.h"
 #include "form_info_storage.h"
 #include "form_mgr.h"
+#include "form_sys_event_receiver.h"
 #undef private
 #include "form_mgr_errors.h"
 #include "form_mgr_service.h"
@@ -617,5 +618,205 @@ HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_0010, TestSize.Level0)
     ClearFormRecord(formId);
 
     GTEST_LOG_(INFO) << "fms_form_sys_event_receiver_test_0010 end";
+}
+
+/**
+ * @tc.number: OnReceiveEvent_0011
+ * @tc.name: OnReceiveEvent
+ * @tc.desc: When the bundleName is null, and the action is neither COMMON_EVENT_USER_REMOVED nor
+ *           COMMON_EVENT_BUNDLE_SCAN_FINISHED, the program executes normally as expected
+ */
+HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_0011, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "OnReceiveEvent_0011 start";
+    std::shared_ptr<FormSysEventReceiver> testCase = std::make_shared<FormSysEventReceiver>();
+    EXPECT_TRUE(testCase != nullptr);
+    EventFwk::CommonEventData eventData;
+    AAFwk::Want want = eventData.GetWant();
+    std::string action = "abc";
+    std::string bundleName = "";
+    std::string abilityName = "abc";
+    want.SetAction(action);
+    want.SetElementName(bundleName, abilityName);
+    eventData.SetWant(want);
+    testCase->OnReceiveEvent(eventData);
+    EXPECT_FALSE(want.GetAction().empty());
+    EXPECT_TRUE(want.GetElement().GetBundleName().empty() &&
+    action != EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED &&
+    action != EventFwk::CommonEventSupport::COMMON_EVENT_BUNDLE_SCAN_FINISHED);
+    GTEST_LOG_(INFO) << "OnReceiveEvent_0011 end";
+}
+
+/**
+ * @tc.number: OnReceiveEvent_0012
+ * @tc.name: OnReceiveEvent
+ * @tc.desc: When the eventHandler_ is nullptr, the program executes normally as expected
+ */
+HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_0012, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "OnReceiveEvent_0012 start";
+    std::shared_ptr<FormSysEventReceiver> testCase = std::make_shared<FormSysEventReceiver>();
+    std::shared_ptr<FormEventHandler> handler = nullptr;
+    EXPECT_TRUE(testCase != nullptr);
+    EventFwk::CommonEventData eventData;
+    AAFwk::Want want = eventData.GetWant();
+    std::string action = "abc";
+    std::string bundleName = EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED;
+    std::string abilityName = "abc";
+    want.SetAction(action);
+    want.SetElementName(bundleName, abilityName);
+    eventData.SetWant(want);
+    testCase->OnReceiveEvent(eventData);
+    EXPECT_TRUE(testCase->eventHandler_ == nullptr);
+    GTEST_LOG_(INFO) << "OnReceiveEvent_0012 end";
+}
+
+/**
+ * @tc.number: OnReceiveEvent_0013
+ * @tc.name: OnReceiveEvent
+ * @tc.desc: When the action is COMMON_EVENT_USER_REMOVED and userId is -1, the program executes normally as expected
+ */
+HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_0013, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "OnReceiveEvent_0013 start";
+    std::shared_ptr<FormEventHandler> handler = std::make_shared<FormEventHandler>(EventRunner::Create());
+    std::shared_ptr<FormSysEventReceiver> testCase = std::make_shared<FormSysEventReceiver>();
+    testCase->eventHandler_ = handler;
+    EXPECT_TRUE(testCase != nullptr);
+    EXPECT_TRUE(testCase->eventHandler_ != nullptr);
+    const int32_t code = -1;
+    EventFwk::CommonEventData eventData;
+    AAFwk::Want want = eventData.GetWant();
+    std::string action = EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED;
+    std::string bundleName = EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED;
+    std::string abilityName = "abc";
+    want.SetAction(action);
+    want.SetElementName(bundleName, abilityName);
+    eventData.SetWant(want);
+    eventData.SetCode(code);
+    testCase->OnReceiveEvent(eventData);
+    EXPECT_TRUE(action == EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED);
+    GTEST_LOG_(INFO) << "OnReceiveEvent_0013 end";
+}
+
+/**
+ * @tc.number: OnReceiveEvent_0014
+ * @tc.name: OnReceiveEvent
+ * @tc.desc: When the action is COMMON_EVENT_USER_REMOVED and userId is 1, the program executes normally as expected
+ */
+HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_0014, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "OnReceiveEvent_0014 start";
+    std::shared_ptr<FormEventHandler> handler = std::make_shared<FormEventHandler>(EventRunner::Create());
+    std::shared_ptr<FormSysEventReceiver> testCase = std::make_shared<FormSysEventReceiver>();
+    testCase->eventHandler_ = handler;
+    EXPECT_TRUE(testCase != nullptr);
+    EXPECT_TRUE(testCase->eventHandler_ != nullptr);
+    const int32_t code = 1;
+    EventFwk::CommonEventData eventData;
+    AAFwk::Want want = eventData.GetWant();
+    std::string action = EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED;
+    std::string bundleName = EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED;
+    std::string abilityName = "abc";
+    want.SetAction(action);
+    want.SetElementName(bundleName, abilityName);
+    eventData.SetWant(want);
+    eventData.SetCode(code);
+    testCase->OnReceiveEvent(eventData);
+    EXPECT_TRUE(action == EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED);
+    GTEST_LOG_(INFO) << "OnReceiveEvent_0014 end";
+}
+
+/**
+ * @tc.number: OnReceiveEvent_0015
+ * @tc.name: OnReceiveEvent
+ * @tc.desc: When the action is COMMON_EVENT_BUNDLE_SCAN_FINISHED, the program executes normally as expected
+ */
+HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_0015, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "OnReceiveEvent_0015 start";
+    std::shared_ptr<FormEventHandler> handler = std::make_shared<FormEventHandler>(EventRunner::Create());
+    std::shared_ptr<FormSysEventReceiver> testCase = std::make_shared<FormSysEventReceiver>();
+    testCase->eventHandler_ = handler;
+    EXPECT_TRUE(testCase != nullptr);
+    EXPECT_TRUE(testCase->eventHandler_ != nullptr);
+    EventFwk::CommonEventData eventData;
+    AAFwk::Want want = eventData.GetWant();
+    std::string action = EventFwk::CommonEventSupport::COMMON_EVENT_BUNDLE_SCAN_FINISHED;
+    std::string bundleName = EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED;
+    std::string abilityName = "abc";
+    want.SetAction(action);
+    want.SetElementName(bundleName, abilityName);
+    eventData.SetWant(want);
+    testCase->OnReceiveEvent(eventData);
+    EXPECT_TRUE(action == EventFwk::CommonEventSupport::COMMON_EVENT_BUNDLE_SCAN_FINISHED);
+    GTEST_LOG_(INFO) << "OnReceiveEvent_0015 end";
+}
+
+/**
+ * @tc.number: OnReceiveEvent_0016
+ * @tc.name: OnReceiveEvent
+ * @tc.desc: When the action is COMMON_EVENT_PACKAGE_REPLACED, the program executes normally as expected
+ */
+HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_0016, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "OnReceiveEvent_0016 start";
+    std::shared_ptr<FormEventHandler> handler = std::make_shared<FormEventHandler>(EventRunner::Create());
+    std::shared_ptr<FormSysEventReceiver> testCase = std::make_shared<FormSysEventReceiver>();
+    testCase->eventHandler_ = handler;
+    EXPECT_TRUE(testCase != nullptr);
+    EXPECT_TRUE(testCase->eventHandler_ != nullptr);
+    EventFwk::CommonEventData eventData;
+    AAFwk::Want want = eventData.GetWant();
+    std::string action = EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REPLACED;
+    std::string bundleName = EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED;
+    std::string abilityName = "abc";
+    want.SetAction(action);
+    want.SetElementName(bundleName, abilityName);
+    eventData.SetWant(want);
+    testCase->OnReceiveEvent(eventData);
+    EXPECT_TRUE(action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REPLACED);
+    GTEST_LOG_(INFO) << "OnReceiveEvent_0016 end";
+}
+
+/**
+ * @tc.number: HandleUserIdRemoved_0001
+ * @tc.name: HandleUserIdRemoved
+ * @tc.desc: Verify whether the HandleUserIdRemoved interface is called normally
+ */
+HWTEST_F(FmsFormSysEventReceiverTest, HandleUserIdRemoved_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "HandleUserIdRemoved_0001 start";
+    std::shared_ptr<FormSysEventReceiver> testCase = std::make_shared<FormSysEventReceiver>();
+    const int32_t userId = 0;
+    testCase->HandleUserIdRemoved(userId);
+    GTEST_LOG_(INFO) << "HandleUserIdRemoved_0001 end";
+}
+
+/**
+ * @tc.number: HandleBundleScanFinished_0001
+ * @tc.name: HandleBundleScanFinished
+ * @tc.desc: Verify whether the HandleBundleScanFinished interface is called normally
+ */
+HWTEST_F(FmsFormSysEventReceiverTest, HandleBundleScanFinished_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "HandleBundleScanFinished_0001 start";
+    std::shared_ptr<FormSysEventReceiver> testCase = std::make_shared<FormSysEventReceiver>();
+    const int32_t userId = 0;
+    testCase->HandleBundleScanFinished(userId);
+    GTEST_LOG_(INFO) << "HandleBundleScanFinished_0001 end";
+}
+
+/**
+ * @tc.number: FormSysEventReceiver_0001
+ * @tc.name: FormSysEventReceiver
+ * @tc.desc: Verify whether the FormSysEventReceiver interface is called normally
+ */
+HWTEST_F(FmsFormSysEventReceiverTest, FormSysEventReceiver_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormSysEventReceiver_0001 start";
+    EventFwk::CommonEventSubscribeInfo subscriberInfo;
+    std::shared_ptr<FormSysEventReceiver> testCase = std::make_shared<FormSysEventReceiver>(subscriberInfo);
+    GTEST_LOG_(INFO) << "FormSysEventReceiver_0001 end";
 }
 }

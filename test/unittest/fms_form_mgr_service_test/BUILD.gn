@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Copyright (c) 2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -16,12 +16,18 @@ import("//foundation/ability/form_fwk/form_fwk.gni")
 
 module_output_path = "form_fwk/formmgrservice"
 
-ohos_unittest("fms_form_host_stub_test") {
+ohos_unittest("fms_form_mgr_service_test") {
   module_out_path = module_output_path
 
   sources = [
-    "${form_fwk_path}/test/mock/src/mock_form_host_client.cpp",
-    "${form_fwk_path}/test/unittest/fms_form_host_stub_test/fms_form_host_stub_test.cpp",
+    "${form_fwk_path}/test/mock/src/mock_form_provider_client.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_mgr_service_test/fms_form_mgr_service_test.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_mgr_service_test/mock_form_bms_helper.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_mgr_service_test/mock_form_mgr_adapter.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_mgr_service_test/mock_form_share_mgr.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_mgr_service_test/mock_form_util.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_mgr_service_test/mock_permission_verification.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_mgr_service_test/mock_tokenid_kit.cpp",
   ]
 
   include_dirs = [
@@ -39,18 +45,35 @@ ohos_unittest("fms_form_host_stub_test") {
   }
   deps = [
     "${ability_runtime_path}/interfaces/inner_api/app_manager:app_manager",
+    "${ability_runtime_path}/services/abilitymgr:abilityms_target",
     "${form_fwk_path}:fms_target",
+    "${form_fwk_path}:fmskit_native",
+    "${systemabilitymgr_path}/safwk/interfaces/innerkits/safwk:system_ability_fwk",
+    "${systemabilitymgr_path}/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
+    "//third_party/googletest:gmock_main",
   ]
 
   external_deps = [
+    "ability_base:base",
+    "ability_base:configuration",
     "ability_base:want",
+    "ability_runtime:wantagent_innerkits",
+    "access_token:libaccesstoken_sdk",
+
+    #"access_token:libtokenid_sdk",
+    "appspawn:appspawn_socket_client",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
+    "device_manager:devicemanagersdk",
+    "device_usage_statistics:usagestatsinner",
+    "eventhandler:libeventhandler",
     "form_fwk:form_manager",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "kv_store:distributeddata_inner",
+    "relational_store:native_rdb",
   ]
 }
 
@@ -58,6 +81,6 @@ ohos_unittest("fms_form_host_stub_test") {
 group("unittest") {
   testonly = true
 
-  deps = [ ":fms_form_host_stub_test" ]
+  deps = [ ":fms_form_mgr_service_test" ]
 }
 ###############################################################################

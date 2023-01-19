@@ -20,8 +20,8 @@
 #undef private
 #include "form_ams_helper.h"
 #include "form_bms_helper.h"
-#include "form_data_mgr.h"
 #define private public
+#include "form_data_mgr.h"
 #include "form_db_cache.h"
 #undef private
 #include "form_host_interface.h"
@@ -914,5 +914,115 @@ HWTEST_F(FmsFormMgrMessageEventTest, FormAbilityConnection_011, TestSize.Level0)
     formAbilityConnection.abilityName_ = "aa";
     EXPECT_EQ("bb::aa", formAbilityConnection.GetProviderKey());
     GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_011 end";
+}
+
+/**
+ * @tc.number: FormAbilityConnection_012
+ * @tc.name: SetFormId
+ * @tc.desc: Verify whether the SetFormId interface is called normally
+ */
+HWTEST_F(FmsFormMgrMessageEventTest, FormAbilityConnection_012, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_012 start";
+    FormAbilityConnection formAbilityConnection;
+    int64_t formId = 0;
+    formAbilityConnection.SetFormId(formId);
+    GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_012 end";
+}
+
+/**
+ * @tc.number: FormAbilityConnection_013
+ * @tc.name: GetFormId
+ * @tc.desc: Verify whether the GetFormId interface is called normally
+ */
+HWTEST_F(FmsFormMgrMessageEventTest, FormAbilityConnection_013, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_013 start";
+    FormAbilityConnection formAbilityConnection;
+    formAbilityConnection.GetFormId();
+    GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_013 end";
+}
+
+/**
+ * @tc.number: FormAbilityConnection_014
+ * @tc.name: SetHostToken
+ * @tc.desc: Verify whether the SetHostToken interface is called normally
+ */
+HWTEST_F(FmsFormMgrMessageEventTest, FormAbilityConnection_014, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_014 start";
+    FormAbilityConnection formAbilityConnection;
+    sptr<IRemoteObject> hostToken = nullptr;
+    formAbilityConnection.SetHostToken(hostToken);
+    GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_014 end";
+}
+
+/**
+ * @tc.number: FormAbilityConnection_015
+ * @tc.name: GetHostToken
+ * @tc.desc: Verify whether the GetHostToken interface is called normally
+ */
+HWTEST_F(FmsFormMgrMessageEventTest, FormAbilityConnection_015, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_015 start";
+    FormAbilityConnection formAbilityConnection;
+    formAbilityConnection.GetHostToken();
+    GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_015 end";
+}
+
+/**
+ * @tc.number: FormAbilityConnection_016
+ * @tc.name: SetProviderToken
+ * @tc.desc: Verify whether the SetProviderToken interface is called normally
+ */
+HWTEST_F(FmsFormMgrMessageEventTest, FormAbilityConnection_016, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_016 start";
+    FormAbilityConnection formAbilityConnection;
+    sptr<IRemoteObject> providerToken;
+    formAbilityConnection.SetProviderToken(providerToken);
+    GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_016 end";
+}
+
+/**
+ * @tc.number: FormAbilityConnection_017
+ * @tc.name: GetProviderToken
+ * @tc.desc: Verify whether the GetProviderToken interface is called normally
+ */
+HWTEST_F(FmsFormMgrMessageEventTest, FormAbilityConnection_017, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_017 start";
+    FormAbilityConnection formAbilityConnection;
+    formAbilityConnection.GetProviderToken();
+    GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_017 end";
+}
+
+/**
+ * @tc.number: FormAbilityConnection_018
+ * @tc.name: OnAbilityConnectDone
+ * @tc.desc: Verify whether the OnAbilityConnectDone interface is called normally
+ */
+HWTEST_F(FmsFormMgrMessageEventTest, FormAbilityConnection_018, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_018 start";
+    std::unordered_map<std::string, std::shared_ptr<BundleFormInfo>> bundleFormInfoMap;
+    std::shared_ptr<BundleFormInfo> bundleFormInfo = std::make_shared<BundleFormInfo>("bundlename");
+    FormAbilityConnection formAbilityConnection;
+    AppExecFwk::ElementName element;
+    sptr<IRemoteObject> remoteObject = nullptr;
+    int resultCode = ERR_OK;
+    formAbilityConnection.isFreeInstall_ = true;
+    formAbilityConnection.bundleName_ = "bundlename";
+    int32_t userId_ = 100;
+    FormInfo formInfo;
+    formInfo.bundleName = "bundlename";
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = userId_;
+    formInfoStorage.formInfos.push_back(formInfo);
+    bundleFormInfo->formInfoStorages_.emplace_back(formInfoStorage);
+    bundleFormInfoMap.emplace("bundlename", bundleFormInfo);
+    FormInfoMgr::GetInstance().bundleFormInfoMap_ = bundleFormInfoMap;
+    formAbilityConnection.OnAbilityConnectDone(element, remoteObject, resultCode);
+    GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_018 end";
 }
 }

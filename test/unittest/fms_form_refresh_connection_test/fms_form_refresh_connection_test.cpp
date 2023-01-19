@@ -932,4 +932,156 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormBundleEventCallback_002, TestSize.Lev
     formBundleEventCallback.OnReceiveEvent(eventData);
     GTEST_LOG_(INFO) << "FormBundleEventCallback_002 end";
 }
+
+/**
+ * @tc.name: FormBundleEventCallback_003
+ * @tc.desc: test OnReceiveEvent function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, FormBundleEventCallback_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormBundleEventCallback_003 start";
+    std::shared_ptr<FormEventHandler> eventHandler = std::make_shared<FormEventHandler>(EventRunner::Create());
+    sptr<FormBundleEventCallback> formBundleEventCallback = new (std::nothrow) FormBundleEventCallback(eventHandler);
+    EXPECT_TRUE(formBundleEventCallback != nullptr);
+    EXPECT_TRUE(formBundleEventCallback->eventHandler_ != nullptr);
+    EventFwk::CommonEventData eventData;
+    AAFwk::Want want = eventData.GetWant();
+    std::string action = EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_ADDED;
+    want.SetAction(action);
+    std::string bundleName = "com.example.abc";
+    std::string abilityName = "abc";
+    want.SetElementName(bundleName, abilityName);
+    eventData.SetWant(want);
+    formBundleEventCallback->OnReceiveEvent(eventData);
+    EXPECT_TRUE(want.GetAction() == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_ADDED);
+    GTEST_LOG_(INFO) << "FormBundleEventCallback_003 end";
+}
+
+/**
+ * @tc.name: FormBundleEventCallback_004
+ * @tc.desc: test OnReceiveEvent function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, FormBundleEventCallback_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormBundleEventCallback_004 start";
+    std::shared_ptr<FormEventHandler> eventHandler = std::make_shared<FormEventHandler>(EventRunner::Create());
+    sptr<FormBundleEventCallback> formBundleEventCallback = new (std::nothrow) FormBundleEventCallback(eventHandler);
+    EXPECT_TRUE(formBundleEventCallback != nullptr);
+    EXPECT_TRUE(formBundleEventCallback->eventHandler_ != nullptr);
+    EventFwk::CommonEventData eventData;
+    AAFwk::Want want = eventData.GetWant();
+    std::string action = EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_CHANGED;
+    want.SetAction(action);
+    OHOS::AppExecFwk::ElementName element;
+    std::string bundleName = "com.example.abc";
+    std::string abilityName = "abc";
+    want.SetElementName(bundleName, abilityName);
+    eventData.SetWant(want);
+    formBundleEventCallback->OnReceiveEvent(eventData);
+    EXPECT_TRUE(want.GetAction() == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_CHANGED);
+    GTEST_LOG_(INFO) << "FormBundleEventCallback_004 end";
+}
+
+/**
+ * @tc.name: FormBundleEventCallback_005
+ * @tc.desc: test OnReceiveEvent function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, FormBundleEventCallback_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormBundleEventCallback_005 start";
+    std::shared_ptr<FormEventHandler> eventHandler = std::make_shared<FormEventHandler>(EventRunner::Create());
+    sptr<FormBundleEventCallback> formBundleEventCallback = new (std::nothrow) FormBundleEventCallback(eventHandler);
+    EXPECT_TRUE(formBundleEventCallback != nullptr);
+    EXPECT_TRUE(formBundleEventCallback->eventHandler_ != nullptr);
+    EventFwk::CommonEventData eventData;
+    AAFwk::Want want = eventData.GetWant();
+    std::string action = EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED;
+    want.SetAction(action);
+    std::string bundleName = "com.example.abc";
+    std::string abilityName = "abc";
+    want.SetElementName(bundleName, abilityName);
+    eventData.SetWant(want);
+    formBundleEventCallback->OnReceiveEvent(eventData);
+    EXPECT_TRUE(want.GetAction() == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED);
+    GTEST_LOG_(INFO) << "FormBundleEventCallback_005 end";
+}
+
+/**
+ * @tc.name: FormBundleEventCallback_006
+ * @tc.desc: test OnReceiveEvent function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, FormBundleEventCallback_006, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormBundleEventCallback_006 start";
+    std::shared_ptr<FormEventHandler> eventHandler = std::make_shared<FormEventHandler>(EventRunner::Create());
+    sptr<FormBundleEventCallback> formBundleEventCallback = new (std::nothrow) FormBundleEventCallback(eventHandler);
+    EXPECT_TRUE(formBundleEventCallback != nullptr);
+    EXPECT_TRUE(formBundleEventCallback->eventHandler_ != nullptr);
+    EventFwk::CommonEventData eventData;
+    AAFwk::Want want = eventData.GetWant();
+    std::string action = EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_DATA_CLEARED;
+    want.SetAction(action);
+    std::string bundleName = "com.example.abc";
+    std::string abilityName = "abc";
+    want.SetElementName(bundleName, abilityName);
+    eventData.SetWant(want);
+    formBundleEventCallback->OnReceiveEvent(eventData);
+    EXPECT_TRUE(want.GetAction() == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_DATA_CLEARED);
+    GTEST_LOG_(INFO) << "FormBundleEventCallback_006 end";
+}
+
+/**
+ * @tc.name: FormBundleEventCallback_007
+ * @tc.desc: test OnReceiveEvent function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, FormBundleEventCallback_007, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormBundleEventCallback_007 start";
+    std::shared_ptr<FormEventHandler> eventHandler = std::make_shared<FormEventHandler>(EventRunner::Create());
+    sptr<FormBundleEventCallback> formBundleEventCallback = new (std::nothrow) FormBundleEventCallback(eventHandler);
+    EXPECT_TRUE(formBundleEventCallback != nullptr);
+    EXPECT_TRUE(formBundleEventCallback->eventHandler_ != nullptr);
+    EventFwk::CommonEventData eventData;
+    AAFwk::Want want = eventData.GetWant();
+    std::string action = "abcd";
+    want.SetAction(action);
+    std::string bundleName = "com.example.abc";
+    std::string abilityName = "abc";
+    want.SetElementName(bundleName, abilityName);
+    eventData.SetWant(want);
+    formBundleEventCallback->OnReceiveEvent(eventData);
+    EXPECT_TRUE(want.GetAction() == "abcd");
+    GTEST_LOG_(INFO) << "FormBundleEventCallback_007 end";
+}
+
+/**
+ * @tc.name: FormBundleEventCallback_008
+ * @tc.desc: test OnReceiveEvent function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, FormBundleEventCallback_008, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormBundleEventCallback_008 start";
+    std::shared_ptr<FormEventHandler> eventHandler = std::make_shared<FormEventHandler>(EventRunner::Create());
+    sptr<FormBundleEventCallback> formBundleEventCallback = new (std::nothrow) FormBundleEventCallback(eventHandler);
+    EXPECT_TRUE(formBundleEventCallback != nullptr);
+    EXPECT_TRUE(formBundleEventCallback->eventHandler_ != nullptr);
+    EventFwk::CommonEventData eventData;
+    AAFwk::Want want = eventData.GetWant();
+    std::string action = "abc";
+    want.SetAction(action);
+    std::string bundleName = "";
+    std::string abilityName = "abc";
+    want.SetElementName(bundleName, abilityName);
+    eventData.SetWant(want);
+    formBundleEventCallback->OnReceiveEvent(eventData);
+    EXPECT_FALSE(want.GetAction().empty());
+    EXPECT_TRUE(want.GetElement().GetBundleName().empty());
+    GTEST_LOG_(INFO) << "FormBundleEventCallback_008 end";
+}
 }
