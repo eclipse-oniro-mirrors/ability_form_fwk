@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+# Copyright (c) 2021-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -49,6 +49,7 @@ group("unittest") {
     "unittest/fms_form_info_mgr_test:unittest",
     "unittest/fms_form_info_rdb_storage_mgr_test:unittest",
     "unittest/fms_form_info_storage_mgr_test:unittest",
+    "unittest/fms_form_js_info_base_test:unittest",
     "unittest/fms_form_js_info_test:unittest",
     "unittest/fms_form_mgr_adapter_test:unittest",
     "unittest/fms_form_mgr_add_form_test:unittest",
@@ -65,6 +66,7 @@ group("unittest") {
     "unittest/fms_form_mgr_publish_form_test:unittest",
     "unittest/fms_form_mgr_release_form_test:unittest",
     "unittest/fms_form_mgr_request_form_test:unittest",
+    "unittest/fms_form_mgr_service_test:unittest",
     "unittest/fms_form_mgr_update_form_test:unittest",
     "unittest/fms_form_provider_data_new_leg_test:unittest",
     "unittest/fms_form_provider_data_test:unittest",
@@ -78,6 +80,7 @@ group("unittest") {
     "unittest/fms_form_supply_stub_test:unittest",
     "unittest/fms_form_sys_event_receiver_test:unittest",
     "unittest/fms_form_timer_mgr_test:unittest",
+    "unittest/fms_form_util_test:unittest",
     "unittest/fms_provider_connect_stub_test:unittest",
     "unittest/form_mgr_proxy_test:unittest",
     "unittest/form_mgr_stub_test:unittest",

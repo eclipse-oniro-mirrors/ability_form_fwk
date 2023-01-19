@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,6 +23,7 @@
 #define private public
 #include "form_provider_data.h"
 #undef private
+#include "string_ex.h"
 #include "hilog_wrapper.h"
 #include "nlohmann/json.hpp"
 
@@ -333,5 +334,394 @@ HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0013, TestSize.Level0)
     EXPECT_TRUE(formProviderData.jsonFormProviderData_.empty());
     GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0013 end";
 
+}
+
+/**
+ * @tc.number: FmsFormProviderDataTest_0014
+ * @tc.name: Verify the MergeData function.
+ * @tc.desc: When sonFormProviderData_ is not nullptr, the interface calls normally.
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0014, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0014 start";
+    EXPECT_EQ(true, InitJsonData());
+    FormProviderData formProviderData(jsonData_);
+    EXPECT_EQ(true, InitJsonData2());
+    formProviderData.MergeData(jsonData_);
+    EXPECT_FALSE(formProviderData.jsonFormProviderData_.empty());
+    formProviderData.MergeData(jsonData_);
+    EXPECT_EQ(true, CreateMergeJsonFileByJsonData3(formProviderData.jsonFormProviderData_));
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0014 end";
+}
+
+/**
+ * @tc.number: FmsFormProviderDataTest_0015
+ * @tc.name: Verify the AddImageData function.
+ * @tc.desc: When data is nullptr, the interface calls normally.
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0015, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0015 start";
+    EXPECT_EQ(true, InitJsonData());
+    FormProviderData formProviderData(jsonData_);
+    std::string picName = "imageTest";
+    std::shared_ptr<char> data = nullptr;
+    formProviderData.AddImageData(picName, data, 1);
+    EXPECT_TRUE(formProviderData.rawImageBytesMap_.find(picName) == formProviderData.rawImageBytesMap_.end());
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0015 end";
+}
+
+/**
+ * @tc.number: FmsFormProviderDataTest_0016
+ * @tc.name: Verify the AddImageData function.
+ * @tc.desc: When picName is "", the interface calls normally.
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0016, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0016 start";
+    EXPECT_EQ(true, InitJsonData());
+    FormProviderData formProviderData(jsonData_);
+    std::string picName = "";
+    std::shared_ptr<char> data = nullptr;
+    formProviderData.AddImageData(picName, data, 1);
+    EXPECT_TRUE(formProviderData.rawImageBytesMap_.find(picName) == formProviderData.rawImageBytesMap_.end());
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0016 end";
+}
+
+/**
+ * @tc.number: FmsFormProviderDataTest_0017
+ * @tc.name: Verify the AddImageData function.
+ * @tc.desc: When fd is -1, the interface calls normally.
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0017, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0017 start";
+    EXPECT_EQ(true, InitJsonData());
+    FormProviderData formProviderData(jsonData_);
+    std::string picName = "imageTest";
+    int fd = -1;
+    formProviderData.AddImageData(picName, fd);
+    EXPECT_TRUE(formProviderData.rawImageBytesMap_.find(picName) == formProviderData.rawImageBytesMap_.end());
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0017 end";
+}
+
+/**
+ * @tc.number: FmsFormProviderDataTest_0018
+ * @tc.name: Verify the SetDataString and GetDataString function.
+ * @tc.desc: Verify the SetDataString and GetDataString interface calls normally.
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0018, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0018 start";
+    EXPECT_EQ(true, InitJsonData());
+    FormProviderData formProviderData(jsonData_);
+    std::string jsonDataString = "";
+    formProviderData.SetDataString(jsonDataString);
+    auto result = formProviderData.GetDataString();
+    EXPECT_TRUE(result != jsonDataString);
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0018 end";
+}
+
+/**
+ * @tc.number: FmsFormProviderDataTest_0019
+ * @tc.name: Verify the ReadFromParcel function.
+ * @tc.desc: When the parameter parcel is IMAGE_DATA_STATE_NO_OPERATION, the interface return value is true.
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0019, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0019 start";
+    EXPECT_EQ(true, InitJsonData());
+    FormProviderData formProviderData(jsonData_);
+    Parcel parcel;
+    parcel.WriteString16(Str8ToStr16(jsonData_.dump()));
+    parcel.WriteInt32(FormProviderData::IMAGE_DATA_STATE_NO_OPERATION);
+    auto result = formProviderData.ReadFromParcel(parcel);
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0019 end";
+}
+
+/**
+ * @tc.number: FmsFormProviderDataTest_0020
+ * @tc.name: Verify the ReadFromParcel function.
+ * @tc.desc: When the parameter parcel is IMAGE_DATA_STATE_REMOVED, the interface return value is true.
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0020, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0020 start";
+    EXPECT_EQ(true, InitJsonData());
+    FormProviderData formProviderData(jsonData_);
+    Parcel parcel;
+    parcel.WriteString16(Str8ToStr16(jsonData_.dump()));
+    parcel.WriteInt32(FormProviderData::IMAGE_DATA_STATE_REMOVED);
+    auto result = formProviderData.ReadFromParcel(parcel);
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0020 end";
+}
+
+/**
+ * @tc.number: FmsFormProviderDataTest_0021
+ * @tc.name: Verify the ReadFromParcel function.
+ * @tc.desc: When the parameter parcel is 100, the interface return value is true.
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0021, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0021 start";
+    EXPECT_EQ(true, InitJsonData());
+    constexpr int32_t defaultValue = 100;
+    FormProviderData formProviderData(jsonData_);
+    Parcel parcel;
+    parcel.WriteString16(Str8ToStr16(jsonData_.dump()));
+    parcel.WriteInt32(defaultValue);
+    auto result = formProviderData.ReadFromParcel(parcel);
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0021 end";
+}
+
+/**
+ * @tc.number: FmsFormProviderDataTest_0022
+ * @tc.name: Verify the ReadFromParcel function.
+ * @tc.desc: When the parameter parcel is IMAGE_DATA_STATE_ADDED, the interface return value is true.
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0022, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0022 start";
+    EXPECT_EQ(true, InitJsonData());
+    FormProviderData formProviderData(jsonData_);
+    Parcel parcel;
+    parcel.WriteString16(Str8ToStr16(jsonData_.dump()));
+    parcel.WriteInt32(FormProviderData::IMAGE_DATA_STATE_ADDED);
+    auto result = formProviderData.ReadFromParcel(parcel);
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0022 end";
+}
+
+/**
+ * @tc.number: FmsFormProviderDataTest_0023
+ * @tc.name: Verify the ReadFromParcel function.
+ * @tc.desc: When the parameter parcel is IMAGE_DATA_STATE_ADDED and imageDataNum is exception value, the
+ *           interface return value is false.
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0023, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0023 start";
+    EXPECT_EQ(true, InitJsonData());
+    constexpr int32_t READ_PARCEL_MAX_IMAGE_DATA_NUM_SIZE = 1000;
+    constexpr int32_t imageDataNum = READ_PARCEL_MAX_IMAGE_DATA_NUM_SIZE + 1;
+    FormProviderData formProviderData(jsonData_);
+    Parcel parcel;
+    parcel.WriteString16(Str8ToStr16(jsonData_.dump()));
+    parcel.WriteInt32(FormProviderData::IMAGE_DATA_STATE_ADDED);
+    parcel.WriteInt32(imageDataNum);
+    auto result = formProviderData.ReadFromParcel(parcel);
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0023 end";
+}
+
+/**
+ * @tc.number: FmsFormProviderDataTest_0024
+ * @tc.name: Verify the ReadFromParcel function.
+ * @tc.desc: When the parameter parcel is IMAGE_DATA_STATE_ADDED and imageDataNum is normal value, the
+ *           interface return value is false.
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0024, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0024 start";
+    EXPECT_EQ(true, InitJsonData());
+    constexpr int32_t imageDataNum = 1;
+    constexpr int32_t len = 0;
+    FormAshmem formAshmem;
+    char data = 'A';
+    constexpr int32_t size = 1;
+    FormProviderData formProviderData(jsonData_);
+    Parcel parcel;
+    parcel.WriteString16(Str8ToStr16(jsonData_.dump()));
+    parcel.WriteInt32(FormProviderData::IMAGE_DATA_STATE_ADDED);
+    parcel.WriteInt32(imageDataNum);
+    formAshmem.WriteToAshmem("ReadFromParcelTest", &data, size);
+    parcel.WriteInt32(len);
+    auto result = formProviderData.ReadFromParcel(parcel);
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0024 end";
+}
+
+/**
+ * @tc.number: FmsFormProviderDataTest_0025
+ * @tc.name: Verify the ReadFromParcel function.
+ * @tc.desc: When the parameter parcel is IMAGE_DATA_STATE_ADDED and imageDataNum is normal value, the
+ *           interface return value is false.
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0025, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0025 start";
+    EXPECT_EQ(true, InitJsonData());
+    constexpr int32_t imageDataNum = 1;
+    FormProviderData formProviderData(jsonData_);
+    Parcel parcel;
+    parcel.WriteString16(Str8ToStr16(jsonData_.dump()));
+    parcel.WriteInt32(FormProviderData::IMAGE_DATA_STATE_ADDED);
+    parcel.WriteInt32(imageDataNum);
+    auto result = formProviderData.ReadFromParcel(parcel);
+    EXPECT_FALSE(result);
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0025 end";
+}
+
+/**
+ * @tc.number: FmsFormProviderDataTest_0026
+ * @tc.name: Verify the Marshalling function.
+ * @tc.desc: When the parameter imageDataState_ is IMAGE_DATA_STATE_NO_OPERATION, the interface return value is true.
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0026, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0026 start";
+    EXPECT_EQ(true, InitJsonData());
+    FormProviderData formProviderData(jsonData_);
+    formProviderData.imageDataState_ = FormProviderData::IMAGE_DATA_STATE_NO_OPERATION;
+    Parcel parcel;
+    auto result = formProviderData.Marshalling(parcel);
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0026 end";
+}
+
+/**
+ * @tc.number: FmsFormProviderDataTest_0027
+ * @tc.name: Verify the Marshalling function.
+ * @tc.desc: When the parameter imageDataState_ is IMAGE_DATA_STATE_REMOVED, the interface return value is true.
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0027, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0027 start";
+    EXPECT_EQ(true, InitJsonData());
+    FormProviderData formProviderData(jsonData_);
+    formProviderData.imageDataState_ = FormProviderData::IMAGE_DATA_STATE_REMOVED;
+    Parcel parcel;
+    auto result = formProviderData.Marshalling(parcel);
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0027 end";
+}
+
+/**
+ * @tc.number: FmsFormProviderDataTest_0028
+ * @tc.name: Verify the Marshalling function.
+ * @tc.desc: When the parameter imageDataState_ is IMAGE_DATA_STATE_ADDED, the interface return value is true.
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0028, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0028 start";
+    EXPECT_EQ(true, InitJsonData());
+    FormProviderData formProviderData(jsonData_);
+    formProviderData.imageDataState_ = FormProviderData::IMAGE_DATA_STATE_ADDED;
+    Parcel parcel;
+    auto result = formProviderData.Marshalling(parcel);
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0028 end";
+}
+
+/**
+ * @tc.number: FmsFormProviderDataTest_0029
+ * @tc.name: Verify the Marshalling function.
+ * @tc.desc: When the parameter imageDataState_ is 100, the interface return value is true.
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0029, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0029 start";
+    EXPECT_EQ(true, InitJsonData());
+    constexpr int32_t defaultValue = 100;
+    FormProviderData formProviderData(jsonData_);
+    formProviderData.imageDataState_ = defaultValue;
+    Parcel parcel;
+    auto result = formProviderData.Marshalling(parcel);
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0029 end";
+}
+
+/**
+ * @tc.number: FmsFormProviderDataTest_0030
+ * @tc.name: Verify the Marshalling function.
+ * @tc.desc: When the parameter imageDataState_ is null, the interface return value is true.
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0030, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0030 start";
+    EXPECT_EQ(true, InitJsonData());
+    FormProviderData formProviderData("");
+    formProviderData.jsonFormProviderData_.clear();
+    Parcel parcel;
+    auto result = formProviderData.Marshalling(parcel);
+    EXPECT_TRUE(result);
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0030 end";
+}
+
+/**
+ * @tc.number: FmsFormProviderDataTest_0031
+ * @tc.name: Verify the ParseImagesData function.
+ * @tc.desc: Verify whether the ParseImagesData interface calls normally.
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0031, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0031 start";
+    EXPECT_EQ(true, InitJsonData());
+    FormProviderData formProviderData(jsonData_);
+    formProviderData.ParseImagesData();
+    EXPECT_TRUE(formProviderData.jsonFormProviderData_ != nullptr);
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0031 end";
+}
+
+/**
+ * @tc.number: FmsFormProviderDataTest_0032
+ * @tc.name: Verify the ParseImagesData function.
+ * @tc.desc: When the jsonFormProviderData_ is nullptr, the ParseImagesData interface calls normally.
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0032, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0032 start";
+    FormProviderData formProviderData("");
+    formProviderData.jsonFormProviderData_ = nullptr;
+    formProviderData.ParseImagesData();
+    EXPECT_TRUE(formProviderData.jsonFormProviderData_ == nullptr);
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0032 end";
+}
+
+/**
+ * @tc.number: FmsFormProviderDataTest_0033
+ * @tc.name: Verify the NeedCache function.
+ * @tc.desc: When the jsonFormProviderData_ is nullptr, the NeedCache interface calls normally.
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0033, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0033 start";
+    FormProviderData formProviderData("");
+    formProviderData.jsonFormProviderData_.clear();
+    EXPECT_TRUE(formProviderData.NeedCache());
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0033 end";
+}
+
+/**
+ * @tc.number: FmsFormProviderDataTest_0034
+ * @tc.name: Verify the SetImageDataState function.
+ * @tc.desc: Verify whether the NeedCache interface calls normally.
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0034, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0034 start";
+    FormProviderData formProviderData("");
+    constexpr int32_t imageStage = 1000;
+    EXPECT_NE(imageStage, formProviderData.imageDataState_);
+    formProviderData.SetImageDataState(imageStage);
+    EXPECT_EQ(imageStage, formProviderData.imageDataState_);
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0034 end";
+}
+
+/**
+ * @tc.number: FmsFormProviderDataTest_0035
+ * @tc.name: Verify the GetImageDataState function.
+ * @tc.desc: Verify whether the GetImageDataState interface calls normally.
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0035, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0035 start";
+    FormProviderData formProviderData("");
+    formProviderData.jsonFormProviderData_.clear();
+    EXPECT_EQ(formProviderData.imageDataState_, formProviderData.GetImageDataState());
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0035 end";
 }
 }
