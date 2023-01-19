@@ -37,6 +37,7 @@ using namespace OHOS::AppExecFwk;
 extern void MockGetBundleInfo(bool mockRet);
 extern void MockGetAbilityInfoByAction(bool mockRet);
 extern void MockGetFormRecord(bool mockRet);
+extern void MockGetFormRecordParams(bool mockRet);
 extern void MockIsLimiterEnableRefresh(bool mockRet);
 extern void MockConnectServiceAbility(bool mockRet);
 extern void MockIsEnableRefresh(bool mockRet);
@@ -837,5 +838,76 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_018, TestSize.Level0)
     MockConnectServiceAbility(true);
     EXPECT_EQ(ERR_OK, formProviderMgr.RebindByFreeInstall(record, want, formRefreshConnection));
     GTEST_LOG_(INFO) << "FormProviderMgr_018 end";
+}
+
+/**
+ * @tc.name: FormProviderMgr_019
+ * @tc.desc: test ConnectAmsForRefresh function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_019, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormProviderMgr_019 start";
+    FormProviderMgr formProviderMgr;
+    int64_t formId = 1;
+    FormRecord record;
+    record.needFreeInstall = false;
+    record.isCountTimerRefresh = false;
+    Want want;
+    bool isTimerRefresh = false;
+    MockIsLimiterEnableRefresh(true);
+    MockConnectServiceAbility(true);
+    formProviderMgr.ConnectAmsForRefresh(formId, record, want, isTimerRefresh);
+    GTEST_LOG_(INFO) << "FormProviderMgr_019 end";
+}
+
+/**
+ * @tc.name: FormProviderMgr_020
+ * @tc.desc: test NotifyProviderFormsBatchDelete function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_020, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormProviderMgr_020 start";
+    FormProviderMgr formProviderMgr;
+    std::string bundleName = "bb";
+    std::string abilityName = "aa";
+    std::set<int64_t> formIds;
+    MockConnectServiceAbility(true);
+    EXPECT_EQ(ERR_OK, formProviderMgr.NotifyProviderFormsBatchDelete(bundleName, abilityName, formIds));
+    GTEST_LOG_(INFO) << "FormProviderMgr_020 end";
+}
+
+/**
+ * @tc.name: FormProviderMgr_021
+ * @tc.desc: test IncreaseTimerRefreshCount function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_021, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormProviderMgr_021 start";
+    FormProviderMgr formProviderMgr;
+    int64_t formId = 1;
+    MockGetFormRecord(true);
+    MockGetFormRecordParams(true);
+    formProviderMgr.IncreaseTimerRefreshCount(formId);
+    MockGetFormRecordParams(false);
+    GTEST_LOG_(INFO) << "FormProviderMgr_021 end";
+}
+
+/**
+ * @tc.name: FormProviderMgr_022
+ * @tc.desc: test AcquireFormStateBack function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_022, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormProviderMgr_022 start";
+    FormProviderMgr formProviderMgr;
+    FormState state = FormState::DEFAULT;
+    const std::string provider = "provider";
+    const Want wantArg = {};
+    EXPECT_EQ(ERR_OK, formProviderMgr.AcquireFormStateBack(state, provider, wantArg));
+    GTEST_LOG_(INFO) << "FormProviderMgr_022 end";
 }
 }

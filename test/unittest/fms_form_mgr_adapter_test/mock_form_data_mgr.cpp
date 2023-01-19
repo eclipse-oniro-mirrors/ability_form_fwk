@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,18 +13,42 @@
  * limitations under the License.
  */
 
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
+#define private public
 #include "form_data_mgr.h"
 #include "form_mgr_errors.h"
+#undef private
+#include "ipc_skeleton.h"
 
 namespace {
     bool g_mockExistTempFormRet = true;
     bool g_mockExistFormRecordRet = true;
     bool g_mockGetMatchedHostClientRet = true;
+    bool g_mockGetMatchedHostClientParams = false;
+    int64_t g_mockGetMatchedHostClientParamsMatchedId = 0;
     bool g_mockGetFormRecordRet = true;
+    bool g_mockGetFormRecordParams = false;
+    bool g_mockGetFormRecordParamsUid = true;
+    bool g_mockGetFormRecordParamsSysUid = true;
+    bool g_mockGetFormRecordParamsTemp = true;
     bool g_mockDeleteFormRecordRet = true;
     bool g_mockAllotFormHostRecordRet = true;
     bool g_mockGenerateFormIdRet = true;
     bool g_mockGetRequestPublishFormInfoRet = true;
+    bool g_mockCheckTempEnoughFormRet = true;
+    bool g_mockDeleteFormUserUidRet = true;
+    bool g_mockIsRequestPublishForm = true;
+    bool g_mockDeleteHostRecord = true;
+    bool g_mockHasFormUserUids = true;
+    bool g_mockUpdateFormRecord = true;
+    bool g_mockUpdateFormRecordParams = false;
+    bool g_mockCheckEnoughForm = true;
+    bool g_mockDeleteTempForm = true;
+    bool g_mockModifyFormTempFlag = true;
+    bool g_mockAddFormUserUid = true;
+    bool g_mockGetFormHostRecord = false;
+    OHOS::AAFwk::Want g_mockGetRequestPublishFormInfoWant = {};
 }
 
 void MockExistTempForm(bool mockRet)
@@ -42,9 +66,39 @@ void MockGetMatchedHostClient(bool mockRet)
     g_mockGetMatchedHostClientRet = mockRet;
 }
 
+void MockGetMatchedHostClientParams(bool mockRet)
+{
+    g_mockGetMatchedHostClientParams = mockRet;
+}
+
+void MockGetMatchedHostClientParamsMatchedId(int64_t mockRet)
+{
+    g_mockGetMatchedHostClientParamsMatchedId = mockRet;
+}
+
 void MockGetFormRecord(bool mockRet)
 {
     g_mockGetFormRecordRet = mockRet;
+}
+
+void MockGetFormRecordParams(bool mockRet)
+{
+    g_mockGetFormRecordParams = mockRet;
+}
+
+void MockGetFormRecordParamsUid(bool mockRet)
+{
+    g_mockGetFormRecordParamsUid = mockRet;
+}
+
+void MockGetFormRecordParamsSysUid(bool mockRet)
+{
+    g_mockGetFormRecordParamsSysUid = mockRet;
+}
+
+void MockGetFormRecordParamsTemp(bool mockRet)
+{
+    g_mockGetFormRecordParamsTemp = mockRet;
 }
 
 void MockDeleteFormRecord(bool mockRet)
@@ -67,6 +121,71 @@ void MockGetRequestPublishFormInfo(bool mockRet)
     g_mockGetRequestPublishFormInfoRet = mockRet;
 }
 
+void MockGetRequestPublishFormInfoWant(OHOS::AAFwk::Want mockWant)
+{
+    g_mockGetRequestPublishFormInfoWant = mockWant;
+}
+
+void MockCheckTempEnoughForm(bool mockRet)
+{
+    g_mockCheckTempEnoughFormRet = mockRet;
+}
+
+void MockDeleteFormUserUid(bool mockRet)
+{
+    g_mockDeleteFormUserUidRet = mockRet;
+}
+
+void MockIsRequestPublishForm(bool mockRet)
+{
+    g_mockIsRequestPublishForm = mockRet;
+}
+
+void MockDeleteHostRecord(bool mockRet)
+{
+    g_mockDeleteHostRecord = mockRet;
+}
+
+void MockHasFormUserUids(bool mockRet)
+{
+    g_mockHasFormUserUids = mockRet;
+}
+
+void MockUpdateFormRecord(bool mockRet)
+{
+    g_mockUpdateFormRecord = mockRet;
+}
+
+void MockUpdateFormRecordParams(bool mockRet)
+{
+    g_mockUpdateFormRecordParams = mockRet;
+}
+
+void MockCheckEnoughForm(bool mockRet)
+{
+    g_mockCheckEnoughForm = mockRet;
+}
+
+void MockDeleteTempForm(bool mockRet)
+{
+    g_mockDeleteTempForm = mockRet;
+}
+
+void MockModifyFormTempFlag(bool mockRet)
+{
+    g_mockModifyFormTempFlag = mockRet;
+}
+
+void MockAddFormUserUid(bool mockRet)
+{
+    g_mockAddFormUserUid = mockRet;
+}
+
+void MockGetFormHostRecord(bool mockRet)
+{
+    g_mockGetFormHostRecord = mockRet;
+}
+
 namespace OHOS {
 namespace AppExecFwk {
 FormDataMgr::FormDataMgr()
@@ -87,11 +206,39 @@ bool FormDataMgr::ExistFormRecord(const int64_t formId) const
 
 bool FormDataMgr::GetMatchedHostClient(const sptr<IRemoteObject> &callerToken, FormHostRecord &formHostRecord) const
 {
+    if (g_mockGetMatchedHostClientRet && g_mockGetMatchedHostClientParams) {
+        int64_t formId = 0x000000007FFFFFFFL;
+        if (g_mockGetMatchedHostClientParamsMatchedId > 0) {
+            formId = FormDataMgr::GetInstance().FindMatchedFormId(g_mockGetMatchedHostClientParamsMatchedId);
+        }
+        formHostRecord.forms_[formId] = true;
+    }
     return g_mockGetMatchedHostClientRet;
 }
 
 bool FormDataMgr::GetFormRecord(const int64_t formId, FormRecord &formRecord) const
 {
+    if (g_mockGetFormRecordRet && g_mockGetFormRecordParams) {
+        int32_t callingUid = IPCSkeleton::GetCallingUid();
+        constexpr int32_t CALLING_UID_TRANSFORM_DIVISOR = 200000;
+        constexpr int32_t SYSTEM_UID = 1000;
+        if (g_mockGetFormRecordParamsUid) {
+            formRecord.userId = callingUid / CALLING_UID_TRANSFORM_DIVISOR;
+        } else {
+            formRecord.userId = 0;
+        }
+        formRecord.formUserUids.push_back(callingUid);
+        if (g_mockGetFormRecordParamsSysUid) {
+            formRecord.formUserUids.push_back(SYSTEM_UID);
+        }
+        formRecord.formTempFlag = g_mockGetFormRecordParamsTemp;
+        formRecord.bundleName = "bundleName";
+        formRecord.moduleName = "moduleName";
+        formRecord.abilityName = "abilityName";
+        formRecord.formName = "formName";
+        formRecord.specification = 0;
+        formRecord.formVisibleNotify = true;
+    }
     return g_mockGetFormRecordRet;
 }
 
@@ -121,7 +268,76 @@ ErrCode FormDataMgr::GetRequestPublishFormInfo(int64_t formId, Want &want,
     if (true == g_mockGetRequestPublishFormInfoRet) {
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
+
+    want = g_mockGetRequestPublishFormInfoWant;
     return ERR_OK;
+}
+
+int FormDataMgr::CheckTempEnoughForm() const
+{
+    if (true == g_mockCheckTempEnoughFormRet) {
+        return ERR_APPEXECFWK_FORM_MAX_SYSTEM_TEMP_FORMS;
+    }
+    return ERR_OK;
+}
+
+bool FormDataMgr::DeleteFormUserUid(const int64_t formId, const int uid)
+{
+    if (true == g_mockDeleteFormUserUidRet) {
+        return false;
+    }
+    return true;
+}
+
+bool FormDataMgr::IsRequestPublishForm(int64_t formId)
+{
+    return g_mockIsRequestPublishForm;
+}
+
+bool FormDataMgr::DeleteHostRecord(const sptr<IRemoteObject> &callerToken, const int64_t formId)
+{
+    return g_mockDeleteHostRecord;
+}
+
+bool FormDataMgr::HasFormUserUids(const int64_t formId) const
+{
+    return g_mockHasFormUserUids;
+}
+
+bool FormDataMgr::UpdateFormRecord(const int64_t formId, const FormRecord &formRecord)
+{
+    return g_mockUpdateFormRecord;
+}
+
+int FormDataMgr::CheckEnoughForm(const int callingUid, const int32_t currentUserId) const
+{
+    if (!g_mockCheckEnoughForm) {
+        return ERR_APPEXECFWK_FORM_MAX_SYSTEM_TEMP_FORMS;
+    }
+    return ERR_OK;
+}
+
+bool FormDataMgr::DeleteTempForm(const int64_t formId)
+{
+    return g_mockDeleteTempForm;
+}
+
+bool FormDataMgr::ModifyFormTempFlag(const int64_t formId, const bool formTempFlag)
+{
+    return g_mockModifyFormTempFlag;
+}
+
+bool FormDataMgr::AddFormUserUid(const int64_t formId, const int formUserUid)
+{
+    return g_mockAddFormUserUid;
+}
+
+void FormDataMgr::GetFormHostRecord(const int64_t formId, std::vector<FormHostRecord> &formHostRecords) const
+{
+    if (g_mockGetFormHostRecord) {
+        FormHostRecord formRecord = {};
+        formHostRecords.push_back(formRecord);
+    }
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
