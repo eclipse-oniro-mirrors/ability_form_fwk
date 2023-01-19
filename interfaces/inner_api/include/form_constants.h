@@ -169,7 +169,7 @@ namespace Constants {
     constexpr const char* FORM_RDB_TABLE_NAME = "form_table";
     constexpr const char* FORM_MANAGER_SERVICE_PATH = "/data/service/el1/public/database/form_storage";
     constexpr const char* FORM_JOURNAL_MODE = "WAL";
-    constexpr const char* FORM_SYNC_MODE = "MODE_OFF";
+    constexpr const char* FORM_SYNC_MODE = "FULL";
     constexpr int32_t FORM_RDB_VERSION = 1;
 }  // namespace Constants
 }  // namespace AppExecFwk
