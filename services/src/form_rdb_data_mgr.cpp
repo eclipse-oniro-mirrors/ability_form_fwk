@@ -46,7 +46,17 @@ RdbStoreDataCallBackFormInfoStorage::~RdbStoreDataCallBackFormInfoStorage()
 int32_t RdbStoreDataCallBackFormInfoStorage::OnCreate(NativeRdb::RdbStore &rdbStore)
 {
     HILOG_DEBUG("OnCreate");
-    return NativeRdb::E_OK;
+    int ret = NativeRdb::E_OK;
+    if (hasTableInit_) {
+        return ret;
+    }
+    std::string createTableSql = "CREATE TABLE IF NOT EXISTS " + formRdbConfig_.tableName
+        + " (KEY TEXT NOT NULL PRIMARY KEY, VALUE TEXT NOT NULL);";
+    ret = rdbStore.ExecuteSql(createTableSql);
+    if (ret == NativeRdb::E_OK) {
+        hasTableInit_ = true;
+    }
+    return ret;
 }
 
 int32_t RdbStoreDataCallBackFormInfoStorage::OnUpgrade(
@@ -68,17 +78,7 @@ int32_t RdbStoreDataCallBackFormInfoStorage::OnDowngrade(
 int32_t RdbStoreDataCallBackFormInfoStorage::OnOpen(NativeRdb::RdbStore &rdbStore)
 {
     HILOG_DEBUG("OnOpen");
-    int ret = NativeRdb::E_OK;
-    if (hasTableInit_) {
-        return ret;
-    }
-    std::string createTableSql = "CREATE TABLE IF NOT EXISTS " + formRdbConfig_.tableName
-        + " (KEY TEXT NOT NULL PRIMARY KEY, VALUE TEXT NOT NULL);";
-    ret = rdbStore.ExecuteSql(createTableSql);
-    if (ret == NativeRdb::E_OK) {
-        hasTableInit_ = true;
-    }
-    return ret;
+    return NativeRdb::E_OK;
 }
 
 int32_t RdbStoreDataCallBackFormInfoStorage::onCorruption(std::string databaseFile)
@@ -195,7 +195,7 @@ ErrCode FormRdbDataMgr::QueryData(const std::string &key, std::unordered_map<std
 
         values.emplace(resultKey, resultValue);
     } while (absSharedResultSet->GoToNextRow() == NativeRdb::E_OK);
-
+    absSharedResultSet->Close();
     return ERR_OK;
 }
 
@@ -234,6 +234,7 @@ ErrCode FormRdbDataMgr::QueryAllData(std::unordered_map<std::string, std::string
 
         datas.emplace(resultKey, resultValue);
     } while (absSharedResultSet->GoToNextRow() == NativeRdb::E_OK);
+    absSharedResultSet->Close();
     return ERR_OK;
 }
 } // namespace AppExecFwk
