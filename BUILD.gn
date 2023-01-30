@@ -28,6 +28,7 @@ config("formmgr_config") {
 }
 
 ohos_shared_library("libfms") {
+  shlib_type = "sa"
   version_script = "libfms.map"
   cflags_cc = []
   include_dirs = [
