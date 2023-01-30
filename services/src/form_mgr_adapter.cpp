@@ -1230,6 +1230,7 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
     itemInfo.SetFormSrc(formInfo.src);
     itemInfo.SetFormWindow(formInfo.window);
     itemInfo.SetType(formInfo.type);
+    itemInfo.SetUiSyntax(formInfo.uiSyntax);
 
     for (const auto &abilityInfo : bundleInfo.abilityInfos) {
         if (abilityInfo.name == formInfo.abilityName) {

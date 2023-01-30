@@ -40,6 +40,7 @@ bool FormJsInfo::ReadFromParcel(Parcel &parcel)
     compatibleVersion = parcel.ReadUint32();
     int32_t typeData = parcel.ReadInt32();
     type = static_cast<FormType>(typeData);
+    uiSyntax = static_cast<FormType>(parcel.ReadInt32());
 
     std::unique_ptr<FormProviderData> bindingData(parcel.ReadParcelable<FormProviderData>());
     if (bindingData == nullptr) {
@@ -123,6 +124,9 @@ bool FormJsInfo::Marshalling(Parcel &parcel) const
         return false;
     }
     if (!parcel.WriteInt32(static_cast<int32_t>(type))) {
+        return false;
+    }
+    if (!parcel.WriteInt32(static_cast<int32_t>(uiSyntax))) {
         return false;
     }
     // write formProviderData
