@@ -408,14 +408,13 @@ private:
             return false;
         }
 
-        std::string strDeviceId;
-        if (!ConvertFromJsValue(engine, jsValue, strDeviceId)) {
-            HILOG_ERROR("convert strDeviceId failed.");
+        if (!ConvertFromJsValue(engine, jsValue, deviceId)) {
+            HILOG_ERROR("convert deviceId failed.");
             return false;
         }
 
-        if (strDeviceId.empty()) {
-            HILOG_ERROR("strDeviceId is empty.");
+        if (deviceId.empty()) {
+            HILOG_ERROR("deviceId is empty.");
             return false;
         }
 
@@ -1147,8 +1146,8 @@ private:
         }
         convertArgc++;
 
-        std::string devicedId = 0;
-        if (!ConvertDeviceId(engine, info.argv[PARAM0], devicedId)) {
+        std::string devicedId;
+        if (!ConvertDeviceId(engine, info.argv[PARAM1], devicedId)) {
             HILOG_ERROR("deviced id is invalid.");
             NapiFormUtil::ThrowParamTypeError(engine, "devicedId", "string");
             return engine.CreateUndefined();
