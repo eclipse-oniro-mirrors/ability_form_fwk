@@ -28,6 +28,7 @@ config("formmgr_config") {
 }
 
 ohos_shared_library("libfms") {
+  version_script = "libfms.map"
   cflags_cc = []
   include_dirs = [
     "${ability_runtime_path}/services/common/include",
