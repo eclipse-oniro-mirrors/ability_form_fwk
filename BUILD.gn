@@ -218,6 +218,8 @@ ohos_shared_library("form_manager") {
     "interfaces/inner_api/src/form_provider_info.cpp",
     "interfaces/inner_api/src/form_provider_proxy.cpp",
     "interfaces/inner_api/src/form_provider_stub.cpp",
+    "interfaces/inner_api/src/form_render_proxy.cpp",
+    "interfaces/inner_api/src/form_render_stub.cpp",
     "interfaces/inner_api/src/form_share_info.cpp",
     "interfaces/inner_api/src/form_supply_proxy.cpp",
     "interfaces/inner_api/src/form_supply_stub.cpp",
