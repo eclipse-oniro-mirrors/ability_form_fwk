@@ -55,8 +55,7 @@ public:
      */
     void SetRuntime(AbilityRuntime::Runtime& runtime);
 
-    int32_t DeleteRenderForm(const int64_t &formId, const Want &want,
-        const sptr<IRemoteObject> &callerToken) override;
+    int32_t StopRenderingForm(int64_t formId, const Want &want, const sptr<IRemoteObject> &callerToken) override;
 
 private:
     int32_t AddForm(const FormJsInfo &formJsInfo, const Want &want);

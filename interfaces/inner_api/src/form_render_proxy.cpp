@@ -62,7 +62,7 @@ int32_t FormRenderProxy::RenderForm(const FormJsInfo &formJsInfo, const Want &wa
     return ERR_OK;
 }
 
-int32_t FormRenderProxy::DeleteRenderForm(const int64_t &formId, const Want &want,
+int32_t FormRenderProxy::StopRenderingForm(int64_t formId, const Want &want,
     const sptr<IRemoteObject> &callerToken)
 {
     MessageParcel data;
@@ -93,7 +93,7 @@ int32_t FormRenderProxy::DeleteRenderForm(const int64_t &formId, const Want &wan
     }
 
     int error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_DELETE_RENDER_FORM),
+        static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_STOP_RENDERING_FORM),
         data,
         reply,
         option);
@@ -104,7 +104,7 @@ int32_t FormRenderProxy::DeleteRenderForm(const int64_t &formId, const Want &wan
     return ERR_OK;
 }
 
-bool  FormRenderProxy::WriteInterfaceToken(MessageParcel &data)
+bool FormRenderProxy::WriteInterfaceToken(MessageParcel &data)
 {
     if (!data.WriteInterfaceToken(FormRenderProxy::GetDescriptor())) {
         HILOG_ERROR("%{public}s, failed to write interface token", __func__);

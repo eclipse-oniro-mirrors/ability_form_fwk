@@ -30,7 +30,7 @@ using OHOS::AAFwk::Want;
  * @class IFormProvider
  * IFormProvider interface is used to access form render service.
  */
-class IFormRender : public OHOS::IRemoteBroker {
+class IFormRender : public IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.appexecfwk.FormRender");
 
@@ -44,12 +44,27 @@ public:
     virtual int32_t RenderForm(const FormJsInfo &formJsInfo, const Want &want,
         const sptr<IRemoteObject> &callerToken) = 0;
 
-    virtual int32_t DeleteRenderForm(const int64_t &formId, const Want &want,
-        const sptr<IRemoteObject> &callerToken) = 0;
+    /**
+     * @brief Stop rendering form. This is sync API.
+     * @param formId Indicates The Id of the form to stop rendering.
+     * @param want Indicates the {@link Want} structure containing form info.
+     * @param callerToken Caller ability token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int32_t StopRenderingForm(int64_t formId, const Want &want, const sptr<IRemoteObject> &callerToken) = 0;
 
     enum class Message {
+        // ipc id 1-1000 for kit
+        // ipc id 1001-2000 for DMS
+        // ipc id 2001-3000 for tools
+        // ipc id for form mgr (3001)
+        // ipc id for form provider (3051)
+        // ipc id for form render (3101)
+        // ipc id for form supply (3201)
+        // ipc id for form host (3681)
+
         FORM_RENDER_RENDER_FORM = 3101,
-        FORM_RENDER_DELETE_RENDER_FORM = 3102,
+        FORM_RENDER_STOP_RENDERING_FORM = 3102,
     };
 };
 } // namespace AppExecFwk

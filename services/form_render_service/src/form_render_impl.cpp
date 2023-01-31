@@ -65,8 +65,7 @@ int32_t FormRenderImpl::AddForm(const FormJsInfo &formJsInfo, const Want &want)
     return ERR_OK;
 }
 
-int32_t FormRenderImpl::DeleteRenderForm(
-    const int64_t &formId, const Want &want, const sptr<IRemoteObject> &callerToken)
+int32_t FormRenderImpl::StopRenderingForm(int64_t formId, const Want &want, const sptr<IRemoteObject> &callerToken)
 {
     HILOG_INFO("%{public}s called.", __func__);
     return ERR_OK;

@@ -39,6 +39,8 @@
 #include "form_provider_info.h"
 #include "form_provider_interface.h"
 #include "form_provider_mgr.h"
+#include "form_render_connection.h"
+#include "form_render_mgr.h"
 #include "form_share_mgr.h"
 #include "form_supply_callback.h"
 #include "form_timer_mgr.h"
@@ -123,6 +125,7 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
         HILOG_DEBUG("form in application");
         newWant.SetParam(Constants::PARAM_FORM_HOST_TOKEN, callerToken);
     }
+
     WantParams wantParams = newWant.GetParams();
     // share form
     if (formId == 0 && DelayedSingleton<FormShareMgr>::GetInstance()->IsShareForm(newWant)) {
@@ -260,7 +263,7 @@ ErrCode FormMgrAdapter::HandleDeleteForm(const int64_t formId, const sptr<IRemot
         HILOG_ERROR("%{public}s, not exist such db form:%{public}" PRId64 "", __func__, formId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
-
+    FormRenderMgr::GetInstance().StopRenderingForm(formId, dbRecord);
     FormRecord record;
     FormDataMgr::GetInstance().GetFormRecord(formId, record);
 #ifdef DEVICE_USAGE_STATISTICS_ENABLE
@@ -315,7 +318,7 @@ ErrCode FormMgrAdapter::HandleDeleteTempForm(const int64_t formId, const sptr<IR
         HILOG_ERROR("%{public}s, not self form:%{public}" PRId64 "", __func__, formId);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
-
+    FormRenderMgr::GetInstance().StopRenderingForm(formId, record);
     FormDataMgr::GetInstance().DeleteFormUserUid(formId, uid);
     if (!FormDataMgr::GetInstance().HasFormUserUids(formId)) {
         int result = FormProviderMgr::GetInstance().NotifyProviderFormDelete(formId, record);
@@ -444,8 +447,15 @@ int FormMgrAdapter::UpdateForm(const int64_t formId,
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    // update Form
-    return FormProviderMgr::GetInstance().UpdateForm(matchedFormId, formRecord, formProviderData);
+    if (formRecord.uiSyntax == FormType::ETS) {
+        nlohmann::json addJsonData = formProviderData.GetData();
+        formRecord.formProviderInfo.MergeData(addJsonData);
+        WantParams wantParams;
+        return FormRenderMgr::GetInstance().RenderForm(formRecord, wantParams);
+    } else {
+        // update Form
+       return FormProviderMgr::GetInstance().UpdateForm(matchedFormId, formRecord, formProviderData);
+    }
 }
 
 /**
@@ -921,6 +931,8 @@ ErrCode FormMgrAdapter::AddNewFormRecord(const FormItemInfo &info, const int64_t
     int32_t currentUserId = GetCurrentUserId(callingUid);
     // allot form record
     FormRecord formRecord = FormDataMgr::GetInstance().AllotFormRecord(newInfo, callingUid, currentUserId);
+
+    FormRenderMgr::GetInstance().RenderForm(formRecord, wantParams);
 
     // acquire formInfo from provider
     ErrCode errorCode = AcquireProviderFormInfoAsync(formId, newInfo, wantParams);
