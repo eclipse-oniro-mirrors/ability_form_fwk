@@ -34,6 +34,7 @@ group("unittest") {
   testonly = true
 
   deps = [
+    "unittest/fms_form_ashmem_test:unittest",
     "unittest/fms_form_batch_delete_connection_test:unittest",
     "unittest/fms_form_cache_mgr_test:unittest",
     "unittest/fms_form_caller_mgr_test:unittest",
@@ -49,6 +50,7 @@ group("unittest") {
     "unittest/fms_form_info_mgr_test:unittest",
     "unittest/fms_form_info_rdb_storage_mgr_test:unittest",
     "unittest/fms_form_info_storage_mgr_test:unittest",
+    "unittest/fms_form_info_storage_test:unittest",
     "unittest/fms_form_js_info_base_test:unittest",
     "unittest/fms_form_js_info_test:unittest",
     "unittest/fms_form_mgr_adapter_test:unittest",
@@ -77,6 +79,7 @@ group("unittest") {
     "unittest/fms_form_set_next_refresh_test:unittest",
     "unittest/fms_form_share_mgr_test:unittest",
     "unittest/fms_form_supply_callback_test:unittest",
+    "unittest/fms_form_supply_proxy_test:unittest",
     "unittest/fms_form_supply_stub_test:unittest",
     "unittest/fms_form_sys_event_receiver_test:unittest",
     "unittest/fms_form_timer_mgr_test:unittest",
