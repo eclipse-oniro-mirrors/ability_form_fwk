@@ -169,6 +169,7 @@ FormRecord FormDataMgr::CreateFormRecord(const FormItemInfo &formInfo, const int
     newRecord.compatibleVersion = formInfo.GetCompatibleVersion();
     newRecord.formVisibleNotifyState = 0;
     newRecord.type = formInfo.GetType();
+    newRecord.uiSyntax = formInfo.GetUiSyntax();
     if (newRecord.isEnableUpdate) {
         ParseUpdateConfig(newRecord, formInfo);
     }
