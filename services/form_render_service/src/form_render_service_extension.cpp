@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,7 +28,7 @@ using namespace OHOS::AppExecFwk::FormRender;
 
 FormRenderServiceExtension* FormRenderServiceExtension::Create(const std::unique_ptr<Runtime>& runtime)
 {
-    return new FormRenderServiceExtension(static_cast<Runtime&>(*runtime));
+    return new (std::nothrow) FormRenderServiceExtension(static_cast<Runtime&>(*runtime));
 }
 
 FormRenderServiceExtension::FormRenderServiceExtension(Runtime& runtime) : runtime_(runtime) {}

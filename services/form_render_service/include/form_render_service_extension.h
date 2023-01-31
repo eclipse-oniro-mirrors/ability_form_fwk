@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_ABILITY_RUNTIME_FORM_RENDER_SERVICE_EXTENSION_H
-#define OHOS_ABILITY_RUNTIME_FORM_RENDER_SERVICE_EXTENSION_H
+#ifndef OHOS_ABILITY_FORM_FWK_FORM_RENDER_SERVICE_EXTENSION_H
+#define OHOS_ABILITY_FORM_FWK_FORM_RENDER_SERVICE_EXTENSION_H
 
 #include "configuration.h"
 #include "service_extension.h"
@@ -28,8 +28,8 @@ namespace AbilityRuntime {
 class FormRenderServiceExtension : public ServiceExtension,
                                    public std::enable_shared_from_this<FormRenderServiceExtension> {
 public:
-    explicit FormRenderServiceExtension(Runtime& runtime);
-    virtual ~FormRenderServiceExtension() override;
+    explicit FormRenderServiceExtension(Runtime &runtime);
+    ~FormRenderServiceExtension() override;
 
     /**
      * @brief Create FormRenderServiceExtension.
@@ -37,7 +37,7 @@ public:
      * @param runtime The runtime.
      * @return The FormRenderServiceExtension instance.
      */
-    static FormRenderServiceExtension* Create(const std::unique_ptr<Runtime>& runtime);
+    static FormRenderServiceExtension* Create(const std::unique_ptr<Runtime> &runtime);
 
     /**
      * @brief Init the extension.
@@ -47,7 +47,7 @@ public:
      * @param handler the extension handler.
      * @param token the remote token.
      */
-    virtual void Init(const std::shared_ptr<AppExecFwk::AbilityLocalRecord> &record,
+    void Init(const std::shared_ptr<AppExecFwk::AbilityLocalRecord> &record,
         const std::shared_ptr<AppExecFwk::OHOSApplication> &application,
         std::shared_ptr<AppExecFwk::AbilityHandler> &handler,
         const sptr<IRemoteObject> &token) override;
@@ -59,7 +59,7 @@ public:
      * This function can be called only once in the entire lifecycle of an extension.
      * @param Want Indicates the {@link Want} structure containing startup information about the extension.
      */
-    virtual void OnStart(const AAFwk::Want &want) override;
+    void OnStart(const AAFwk::Want &want) override;
 
     /**
      * @brief Called when this Service extension is connected for the first time.
@@ -69,7 +69,7 @@ public:
      * @param want Indicates the {@link Want} structure containing connection information about the Service extension.
      * @return Returns a pointer to the <b>sid</b> of the connected Service extension.
      */
-    virtual sptr<IRemoteObject> OnConnect(const AAFwk::Want &want) override;
+    sptr<IRemoteObject> OnConnect(const AAFwk::Want &want) override;
 
     /**
      * @brief Called when this Service extension is connected for the first time.
@@ -81,7 +81,7 @@ public:
      * @param isAsyncCallback Indicates whether it is an asynchronous lifecycle callback
      * @return Returns a pointer to the <b>sid</b> of the connected Service extension.
      */
-    virtual sptr<IRemoteObject> OnConnect(const AAFwk::Want &want,
+    sptr<IRemoteObject> OnConnect(const AAFwk::Want &want,
         AppExecFwk::AbilityTransactionCallbackInfo<sptr<IRemoteObject>> *callbackInfo, bool &isAsyncCallback) override;
 
     /**
@@ -90,7 +90,7 @@ public:
      * You can override this function to implement your own processing logic.
      *
      */
-    virtual void OnDisconnect(const AAFwk::Want &want) override;
+    void OnDisconnect(const AAFwk::Want &want) override;
 
     /**
      * @brief Called when all abilities connected to this Service extension are disconnected.
@@ -115,7 +115,7 @@ public:
      * by 1 every time the extension is started. For example, if the extension has been started for six times, the
      * value of startId is 6.
      */
-    virtual void OnCommand(const AAFwk::Want &want, bool restart, int startId) override;
+    void OnCommand(const AAFwk::Want &want, bool restart, int startId) override;
 
     /**
      * @brief Called when this extension enters the <b>STATE_STOP</b> state.
@@ -123,7 +123,7 @@ public:
      * The extension in the <b>STATE_STOP</b> is being destroyed.
      * You can override this function to implement your own processing logic.
      */
-    virtual void OnStop() override;
+    void OnStop() override;
 
     /**
      * @brief Called when the system configuration is updated.
@@ -139,4 +139,4 @@ private:
 };
 }  // namespace AbilityRuntime
 }  // namespace OHOS
-#endif  // OHOS_ABILITY_RUNTIME_FORM_RENDER_SERVICE_EXTENSION_H
+#endif  // OHOS_ABILITY_FORM_FWK_FORM_RENDER_SERVICE_EXTENSION_H

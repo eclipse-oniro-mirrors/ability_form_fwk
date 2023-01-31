@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,13 +36,7 @@ FormRenderStub::~FormRenderStub()
 {
     memberFuncMap_.clear();
 }
-/**
- * @brief handle remote request.
- * @param data input param.
- * @param reply output param.
- * @param option message option.
- * @return Returns ERR_OK on success, others on failure.
- */
+
 int FormRenderStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     HILOG_INFO("FormRenderStub::OnReceived, code = %{public}u, flags= %{public}d.", code, option.GetFlags());

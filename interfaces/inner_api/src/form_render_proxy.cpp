@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,7 +23,6 @@ namespace AppExecFwk {
 int32_t FormRenderProxy::RenderForm(const FormJsInfo &formJsInfo, const Want &want,
     const sptr<IRemoteObject> &callerToken)
 {
-    int error;
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -46,7 +45,12 @@ int32_t FormRenderProxy::RenderForm(const FormJsInfo &formJsInfo, const Want &wa
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    error = Remote()->SendRequest(
+    if (!Remote()) {
+        HILOG_ERROR("Remote obj is nullptr");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    int error = Remote()->SendRequest(
         static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_RENDER_FORM),
         data,
         reply,
@@ -61,7 +65,6 @@ int32_t FormRenderProxy::RenderForm(const FormJsInfo &formJsInfo, const Want &wa
 int32_t FormRenderProxy::DeleteRenderForm(const int64_t &formId, const Want &want,
     const sptr<IRemoteObject> &callerToken)
 {
-    int error;
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -84,7 +87,12 @@ int32_t FormRenderProxy::DeleteRenderForm(const int64_t &formId, const Want &wan
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    error = Remote()->SendRequest(
+    if (!Remote()) {
+        HILOG_ERROR("Remote obj is nullptr");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    int error = Remote()->SendRequest(
         static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_DELETE_RENDER_FORM),
         data,
         reply,
