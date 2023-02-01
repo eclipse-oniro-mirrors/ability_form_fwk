@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,19 +14,20 @@
  * limitations under the License.
  */
 
-#include "form_delete_connection.h"
+#include "form_stop_rendering_connection.h"
 
 #include <cinttypes>
 
 #include "form_constants.h"
 #include "form_supply_callback.h"
+#include "form_render_mgr.h"
 #include "form_task_mgr.h"
 #include "hilog_wrapper.h"
 #include "want.h"
 
 namespace OHOS {
 namespace AppExecFwk {
-FormDeleteConnection::FormDeleteConnection(const int64_t formId, const std::string &bundleName,
+FormStopRenderingConnection::FormStopRenderingConnection(const int64_t formId, const std::string &bundleName,
     const std::string &abilityName) : formId_(formId)
 {
     SetProviderKey(bundleName, abilityName);
@@ -36,7 +38,7 @@ FormDeleteConnection::FormDeleteConnection(const int64_t formId, const std::stri
  * @param remoteObject the session proxy of service ability.
  * @param resultCode ERR_OK on success, others on failure.
  */
-void FormDeleteConnection::OnAbilityConnectDone(
+void FormStopRenderingConnection::OnAbilityConnectDone(
     const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode)
 {
     HILOG_INFO("%{public}s called.", __func__);
@@ -45,12 +47,11 @@ void FormDeleteConnection::OnAbilityConnectDone(
            __func__, element.GetAbilityName().c_str(), formId_, resultCode);
         return;
     }
-    FormSupplyCallback::GetInstance()->AddConnection(this);
-
+    FormRenderMgr::GetInstance().AddConnection(this);
     Want want;
     want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
     HILOG_DEBUG("%{public}s, connectId:%{public}d", __func__, this->GetConnectId());
-    FormTaskMgr::GetInstance().PostDeleteTask(formId_, want, remoteObject);
+    FormTaskMgr::GetInstance().PostStopRenderingForm(formId_, want, remoteObject);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

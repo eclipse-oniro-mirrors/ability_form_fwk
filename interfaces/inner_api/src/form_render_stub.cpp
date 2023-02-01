@@ -28,8 +28,8 @@ FormRenderStub::FormRenderStub()
 {
     memberFuncMap_[static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_RENDER_FORM)] =
         &FormRenderStub::HandleRenderForm;
-    memberFuncMap_[static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_DELETE_RENDER_FORM)] =
-        &FormRenderStub::HandleDeleteRenderForm;
+    memberFuncMap_[static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_STOP_RENDERING_FORM)] =
+        &FormRenderStub::HandleStopRenderingForm;
 }
 
 FormRenderStub::~FormRenderStub()
@@ -82,7 +82,7 @@ int FormRenderStub::HandleRenderForm(MessageParcel &data, MessageParcel &reply)
     return result;
 }
 
-int FormRenderStub::HandleDeleteRenderForm(MessageParcel &data, MessageParcel &reply)
+int FormRenderStub::HandleStopRenderingForm(MessageParcel &data, MessageParcel &reply)
 {
     int64_t formId = data.ReadInt64();
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
@@ -97,7 +97,7 @@ int FormRenderStub::HandleDeleteRenderForm(MessageParcel &data, MessageParcel &r
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    int32_t result = DeleteRenderForm(formId, *want, client);
+    int32_t result = StopRenderingForm(formId, *want, client);
     reply.WriteInt32(result);
     return result;
 }

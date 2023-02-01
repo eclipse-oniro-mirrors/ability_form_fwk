@@ -23,6 +23,7 @@
 #include "form_mgr_adapter.h"
 #include "form_mgr_errors.h"
 #include "form_provider_interface.h"
+#include "form_render_interface.h"
 #include "form_share_mgr.h"
 #include "form_supply_callback.h"
 #include "hilog_wrapper.h"
@@ -647,6 +648,81 @@ FormJsInfo FormTaskMgr::CreateFormJsInfo(const int64_t formId, const FormRecord 
 void FormTaskMgr::FormShareSendResponse(int64_t formShareRequestCode, int32_t result)
 {
     DelayedSingleton<FormShareMgr>::GetInstance()->SendResponse(formShareRequestCode, result);
+}
+
+void FormTaskMgr::PostRenderForm(const FormRecord &formRecord, const Want &want,
+    const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_INFO("%{public}s start", __func__);
+    if (eventHandler_ == nullptr) {
+        HILOG_ERROR("eventHandler_ is nullptr.");
+        return;
+    }
+
+    auto renderForm = [formRecord, want, remoteObject]() {
+        FormTaskMgr::GetInstance().RenderForm(formRecord, want, remoteObject);
+    };
+    eventHandler_->PostTask(renderForm, FORM_TASK_DELAY_TIME);
+    HILOG_INFO("%{public}s end", __func__);
+}
+
+void FormTaskMgr::RenderForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_INFO("%{public}s begin", __func__);
+    auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
+    sptr<IFormRender> remoteFormRender = iface_cast<IFormRender>(remoteObject);
+    if (remoteFormRender == nullptr) {
+        FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
+        HILOG_ERROR("%{public}s fail, Failed to get form render proxy.", __func__);
+        return;
+    }
+
+    FormJsInfo formJsInfo = CreateFormJsInfo(formRecord.formId, formRecord);
+    HILOG_INFO("raul %{public}s begin, data = %{public}s", __func__, formJsInfo.formData.c_str());
+    int32_t error = remoteFormRender->RenderForm(formJsInfo, want, FormSupplyCallback::GetInstance());
+    if (error != ERR_OK) {
+        FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
+        HILOG_ERROR("%{public}s fail, Failed to add form renderer", __func__);
+        return;
+    }
+
+    HILOG_INFO("%{public}s end", __func__);
+}
+
+void FormTaskMgr::PostStopRenderingForm(int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_INFO("%{public}s start", __func__);
+    if (eventHandler_ == nullptr) {
+        HILOG_ERROR("eventHandler_ is nullptr.");
+        return;
+    }
+
+    auto deleterenderForm = [formId, want, remoteObject]() {
+        FormTaskMgr::GetInstance().StopRenderingForm(formId, want, remoteObject);
+    };
+    eventHandler_->PostTask(deleterenderForm, FORM_TASK_DELAY_TIME);
+    HILOG_INFO("%{public}s end", __func__);
+}
+
+void FormTaskMgr::StopRenderingForm(int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_INFO("%{public}s begin", __func__);
+    auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
+    sptr<IFormRender> remoteFormDeleteRender = iface_cast<IFormRender>(remoteObject);
+    if (remoteFormDeleteRender == nullptr) {
+        FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
+        HILOG_ERROR("%{public}s fail, Failed to get form render proxy.", __func__);
+        return;
+    }
+
+    int32_t error = remoteFormDeleteRender->StopRenderingForm(formId, want, FormSupplyCallback::GetInstance());
+    if (error != ERR_OK) {
+        FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
+        HILOG_ERROR("%{public}s fail, Failed to add form renderer", __func__);
+        return;
+    }
+
+    HILOG_INFO("%{public}s end", __func__);
 }
 } // namespace AppExecFwk
 } // namespace OHOS

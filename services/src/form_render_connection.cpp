@@ -13,44 +13,41 @@
  * limitations under the License.
  */
 
-#include "form_delete_connection.h"
+#include "form_render_connection.h"
 
 #include <cinttypes>
 
 #include "form_constants.h"
 #include "form_supply_callback.h"
+#include "form_render_mgr.h"
 #include "form_task_mgr.h"
+#include "form_util.h"
 #include "hilog_wrapper.h"
 #include "want.h"
 
 namespace OHOS {
 namespace AppExecFwk {
-FormDeleteConnection::FormDeleteConnection(const int64_t formId, const std::string &bundleName,
-    const std::string &abilityName) : formId_(formId)
+FormRenderConnection::FormRenderConnection(const FormRecord &formRecord,
+    const WantParams &wantParams) : formRecord_(formRecord), wantParams_(wantParams)
 {
-    SetProviderKey(bundleName, abilityName);
+    SetFormId(formRecord.formId);
+    SetProviderKey(formRecord.bundleName, formRecord.abilityName);
 }
-/**
- * @brief OnAbilityConnectDone, AbilityMs notify caller ability the result of connect.
- * @param element service ability's ElementName.
- * @param remoteObject the session proxy of service ability.
- * @param resultCode ERR_OK on success, others on failure.
- */
-void FormDeleteConnection::OnAbilityConnectDone(
-    const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode)
+
+void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &element,
+    const sptr<IRemoteObject> &remoteObject, int resultCode)
 {
     HILOG_INFO("%{public}s called.", __func__);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("%{public}s, abilityName:%{public}s, formId:%{public}" PRId64 ", resultCode:%{public}d",
-           __func__, element.GetAbilityName().c_str(), formId_, resultCode);
+           __func__, element.GetAbilityName().c_str(), GetFormId(), resultCode);
         return;
     }
-    FormSupplyCallback::GetInstance()->AddConnection(this);
-
+    FormRenderMgr::GetInstance().AddConnection(this);
     Want want;
+    want.SetParams(wantParams_);
     want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
-    HILOG_DEBUG("%{public}s, connectId:%{public}d", __func__, this->GetConnectId());
-    FormTaskMgr::GetInstance().PostDeleteTask(formId_, want, remoteObject);
+    FormTaskMgr::GetInstance().PostRenderForm(formRecord_, want, remoteObject);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
