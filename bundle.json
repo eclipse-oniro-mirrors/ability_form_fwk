@@ -71,6 +71,7 @@
                     "form_provider_data.h",
                     "form_provider_interface.h",
                     "form_provider_stub.h",
+                    "form_render_stub.h",
                     "form_supply_interface.h",
                     "form_supply_stub.h",
                     "provider_connect_stub.h",
