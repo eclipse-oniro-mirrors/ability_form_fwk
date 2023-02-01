@@ -482,5 +482,15 @@ void FormItemInfo::SetType(const FormType &type)
 {
     type_ = type;
 }
+
+FormType FormItemInfo::GetUiSyntax() const
+{
+    return uiSyntax_;
+}
+
+void FormItemInfo::SetUiSyntax(const FormType &uiSyntax)
+{
+    uiSyntax_ = uiSyntax;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

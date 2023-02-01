@@ -295,6 +295,16 @@ public:
      * @param type.
      */
     void SetType(const FormType &type);
+    /**
+     * @brief Get uiSyntax.
+     * @return uiSyntax.
+     */
+    FormType GetUiSyntax() const;
+    /**
+     * @brief Set value of uiSyntax.
+     * @param uiSyntax.
+     */
+    void SetUiSyntax(const FormType &uiSyntax);
 private:
     /**
      * @brief Equal or not.
@@ -325,6 +335,7 @@ private:
     std::string versionName_ = "";
     uint32_t compatibleVersion_ = 0;
     FormType type_ = FormType::JS;
+    FormType uiSyntax_ = FormType::JS;
     std::string icon_ = "";
 
     std::string jsComponentName_ = "";

@@ -2256,4 +2256,1454 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0117, TestSize.Level0)
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.HandleDeleteFormCache(dbRecord, uid, formId));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0117 end";
 }
+
+/**
+ * @tc.name: FormMgrAdapter_0118
+ * @tc.desc: test UpdateForm function and the return value is ERR_APPEXECFWK_FORM_INVALID_PARAM.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0118, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0118 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    std::string bundleName = "";
+    FormProviderData formProviderData;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.UpdateForm(formId, bundleName, formProviderData));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0118 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0119
+ * @tc.desc: test UpdateForm function and the return value is ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0119, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0119 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    std::string bundleName = "bundleName";
+    FormProviderData formProviderData;
+    MockGetFormRecord(true);
+    MockGetFormRecordParams(true);
+    MockGetFormRecordParamsUid(true);
+    EXPECT_EQ(ERR_OK, formMgrAdapter.UpdateForm(formId, bundleName, formProviderData));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0119 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0120
+ * @tc.desc: test RequestForm function and the return value is ERR_APPEXECFWK_FORM_INVALID_PARAM.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0120, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0120 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    sptr<IRemoteObject> callerToken = nullptr;
+    Want want;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.RequestForm(formId, callerToken, want));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0120 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0121
+ * @tc.desc: test RequestForm function and the return value is ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0121, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0121 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    Want want;
+    MockExistFormRecord(true);
+    MockGetMatchedHostClient(true);
+    MockGetMatchedHostClientParams(true);
+    MockGetMatchedHostClientParamsMatchedId(formId);
+    EXPECT_EQ(ERR_OK, formMgrAdapter.RequestForm(formId, callerToken, want));
+    MockGetMatchedHostClientParamsMatchedId(0);
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0121 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0122
+ * @tc.desc: test FormMgrAdapter_0122 function and the return value is ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0122, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0122 start";
+    sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
+    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
+    FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
+    auto bmsTaskGetBundleInfo =
+        [] (const std::string &bundleName, const BundleFlag flag, BundleInfo &bundleInfo, int32_t userId) {
+        GTEST_LOG_(INFO) << "FormMgrAdapter_0122 bmsTaskGetBundleInfo called";
+        return true;
+    };
+    EXPECT_CALL(*bmsProxy, GetBundleInfo(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleInfo));
+    auto bmsTaskCheckIsSystemAppByUid = [] (const int uid) {
+        GTEST_LOG_(INFO) << "FormMgrAdapter_0122 bmsTaskCheckIsSystemAppByUid called";
+        return true;
+    };
+    EXPECT_CALL(*bmsProxy, CheckIsSystemAppByUid(_)).Times(1).WillOnce(Invoke(bmsTaskCheckIsSystemAppByUid));
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId1 = 1;
+    int64_t formId2 = 2;
+    int64_t formId3 = 3;
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId1);
+    formIds.emplace_back(formId2);
+    formIds.emplace_back(formId3);
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    int32_t formVisibleType = 2;
+    MockGetFormRecord(true);
+    MockGetMatchedHostClient(true);
+    MockGetMatchedHostClientParams(true);
+    MockGetMatchedHostClientParamsMatchedId(formId2);
+    MockUpdateFormRecord(true);
+    MockUpdateFormRecordParams(true);
+    EXPECT_EQ(ERR_OK, formMgrAdapter.NotifyWhetherVisibleForms(formIds, callerToken, formVisibleType));
+    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
+    MockGetMatchedHostClientParamsMatchedId(0);
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0122 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0123
+ * @tc.desc: test CastTempForm function and the return value is ERR_APPEXECFWK_FORM_INVALID_PARAM.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0123, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0123 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    sptr<IRemoteObject> callerToken = nullptr;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.CastTempForm(formId, callerToken));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0123 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0124
+ * @tc.desc: test CastTempForm function and the return value is ERR_APPEXECFWK_FORM_NOT_EXIST_ID.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0124, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0124 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    MockExistFormRecord(true);
+    MockExistTempForm(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_NOT_EXIST_ID, formMgrAdapter.CastTempForm(formId, callerToken));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0124 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0125
+ * @tc.desc: test CastTempForm function and the return value is ERR_APPEXECFWK_FORM_MAX_SYSTEM_TEMP_FORMS.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0125, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0125 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    MockExistFormRecord(true);
+    MockExistTempForm(true);
+    MockGetMatchedHostClient(true);
+    MockGetMatchedHostClientParams(true);
+    MockGetMatchedHostClientParamsMatchedId(formId);
+    MockCheckEnoughForm(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_MAX_SYSTEM_TEMP_FORMS, formMgrAdapter.CastTempForm(formId, callerToken));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0125 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0126
+ * @tc.desc: test CastTempForm function and the return value is ERR_APPEXECFWK_FORM_NOT_EXIST_ID.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0126, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0126 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    MockExistFormRecord(true);
+    MockExistTempForm(true);
+    MockGetMatchedHostClient(true);
+    MockGetMatchedHostClientParams(true);
+    MockGetMatchedHostClientParamsMatchedId(formId);
+    MockCheckEnoughForm(true);
+    MockGetFormRecord(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_NOT_EXIST_ID, formMgrAdapter.CastTempForm(formId, callerToken));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0126 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0127
+ * @tc.desc: test CastTempForm function and the return value is ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0127, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0127 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    MockExistFormRecord(true);
+    MockExistTempForm(true);
+    MockGetMatchedHostClient(true);
+    MockGetMatchedHostClientParams(true);
+    MockGetMatchedHostClientParamsMatchedId(formId);
+    MockCheckEnoughForm(true);
+    MockGetFormRecord(true);
+    MockConnectServiceAbility(true);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED, formMgrAdapter.CastTempForm(formId, callerToken));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0127 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0128
+ * @tc.desc: test CastTempForm function and the return value is ERR_APPEXECFWK_FORM_NOT_EXIST_ID.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0128, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0128 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    MockExistFormRecord(true);
+    MockExistTempForm(true);
+    MockGetMatchedHostClient(true);
+    MockGetMatchedHostClientParams(true);
+    MockGetMatchedHostClientParamsMatchedId(formId);
+    MockCheckEnoughForm(true);
+    MockGetFormRecord(true);
+    MockConnectServiceAbility(false);
+    MockDeleteTempForm(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_NOT_EXIST_ID, formMgrAdapter.CastTempForm(formId, callerToken));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0128 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0129
+ * @tc.desc: test CastTempForm function and the return value is ERR_APPEXECFWK_FORM_NOT_EXIST_ID.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0129, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0129 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    MockExistFormRecord(true);
+    MockExistTempForm(true);
+    MockGetMatchedHostClient(true);
+    MockGetMatchedHostClientParams(true);
+    MockGetMatchedHostClientParamsMatchedId(formId);
+    MockCheckEnoughForm(true);
+    MockGetFormRecord(true);
+    MockConnectServiceAbility(false);
+    MockDeleteTempForm(true);
+    MockModifyFormTempFlag(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_NOT_EXIST_ID, formMgrAdapter.CastTempForm(formId, callerToken));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0129 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0130
+ * @tc.desc: test CastTempForm function and the return value is ERR_APPEXECFWK_FORM_NOT_EXIST_ID.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0130, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0130 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    MockExistFormRecord(true);
+    MockExistTempForm(true);
+    MockGetMatchedHostClient(true);
+    MockGetMatchedHostClientParams(true);
+    MockGetMatchedHostClientParamsMatchedId(formId);
+    MockCheckEnoughForm(true);
+    MockGetFormRecord(true);
+    MockConnectServiceAbility(false);
+    MockDeleteTempForm(true);
+    MockModifyFormTempFlag(true);
+    MockAddFormUserUid(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_NOT_EXIST_ID, formMgrAdapter.CastTempForm(formId, callerToken));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0130 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0131
+ * @tc.desc: test CastTempForm function and the return value is ERR_APPEXECFWK_FORM_COMMON_CODE.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0131, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0131 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    MockExistFormRecord(true);
+    MockExistTempForm(true);
+    MockGetMatchedHostClient(true);
+    MockGetMatchedHostClientParams(true);
+    MockGetMatchedHostClientParamsMatchedId(formId);
+    MockCheckEnoughForm(true);
+    MockGetFormRecord(true);
+    MockConnectServiceAbility(false);
+    MockDeleteTempForm(true);
+    MockModifyFormTempFlag(true);
+    MockAddFormUserUid(true);
+    MockUpdateDBRecord(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrAdapter.CastTempForm(formId, callerToken));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0131 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0132
+ * @tc.desc: test CastTempForm function and the return value is ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0132, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0132 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    MockExistFormRecord(true);
+    MockExistTempForm(true);
+    MockGetMatchedHostClient(true);
+    MockGetMatchedHostClientParams(true);
+    MockGetMatchedHostClientParamsMatchedId(formId);
+    MockCheckEnoughForm(true);
+    MockGetFormRecord(true);
+    MockConnectServiceAbility(false);
+    MockDeleteTempForm(true);
+    MockModifyFormTempFlag(true);
+    MockAddFormUserUid(true);
+    MockUpdateDBRecord(true);
+    EXPECT_EQ(ERR_OK, formMgrAdapter.CastTempForm(formId, callerToken));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0132 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0133
+ * @tc.desc: test DumpStorageFormInfos function and the return value is ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0133, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0133 start";
+    FormMgrAdapter formMgrAdapter;
+    std::string formInfos;
+    MockGetAllFormInfo(true);
+    EXPECT_EQ(ERR_OK, formMgrAdapter.DumpStorageFormInfos(formInfos));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0133 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0134
+ * @tc.desc: test DumpFormInfoByFormId function and the return value is ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0134, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0134 start";
+    FormMgrAdapter formMgrAdapter;
+    std::int64_t formId = 1;
+    std::string formInfo = "aa";
+    MockGetFormRecord(true);
+    MockGetFormHostRecord(true);
+    EXPECT_EQ(ERR_OK, formMgrAdapter.DumpFormInfoByFormId(formId, formInfo));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0134 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0135
+ * @tc.desc: test DumpFormTimerByFormId function and the return value is ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0135, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0135 start";
+    FormMgrAdapter formMgrAdapter;
+    std::int64_t formId = 1;
+    std::string isTimingService = "aa";
+    MockGetIntervalTimer(false);
+    MockGetUpdateAtTimer(false);
+    MockGetDynamicItem(true);
+    EXPECT_EQ(ERR_OK, formMgrAdapter.DumpFormTimerByFormId(formId, isTimingService));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0135 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0136
+ * @tc.desc: test DumpFormTimerByFormId function and the return value is ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0136, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0136 start";
+    FormMgrAdapter formMgrAdapter;
+    std::int64_t formId = 1;
+    std::string isTimingService = "aa";
+    MockGetIntervalTimer(false);
+    MockGetUpdateAtTimer(true);
+    MockGetDynamicItem(true);
+    EXPECT_EQ(ERR_OK, formMgrAdapter.DumpFormTimerByFormId(formId, isTimingService));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0136 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0137
+ * @tc.desc: test ReleaseForm function and the return value is ERR_APPEXECFWK_FORM_NOT_EXIST_ID.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0137, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0137 start";
+    FormMgrAdapter formMgrAdapter;
+    constexpr int64_t formId = 1;
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    constexpr bool delCache = true;
+    MockExistTempForm(false);
+    MockGetDBRecord(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_NOT_EXIST_ID, formMgrAdapter.ReleaseForm(formId, callerToken, delCache));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0137 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0138
+ * @tc.desc: test UpdateForm function and the return value is ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0138, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0138 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    std::string bundleName = "bundleName";
+    FormProviderData formProviderData;
+    MockGetFormRecord(true);
+    MockGetFormRecordParams(true);
+    MockGetFormRecordParamsUid(false);
+    EXPECT_EQ(ERR_OK, formMgrAdapter.UpdateForm(formId, bundleName, formProviderData));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0138 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0139
+ * @tc.desc: test AllotFormById function and the return value is ERR_APPEXECFWK_FORM_COMMON_CODE.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0139, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0139 start";
+    FormMgrAdapter formMgrAdapter;
+    FormItemInfo info;
+    sptr<IRemoteObject> callerToken = nullptr;
+    WantParams wantParams;
+    FormJsInfo formInfo;
+    MockGetFormRecord(true);
+    MockGetFormRecordParams(true);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrAdapter.AllotFormById(info, callerToken, wantParams, formInfo));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0139 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0140
+ * @tc.desc: test AllotFormById function and the return value is ERR_APPEXECFWK_FORM_CFG_NOT_MATCH_ID.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0140, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0140 start";
+    FormMgrAdapter formMgrAdapter;
+    FormItemInfo info;
+    sptr<IRemoteObject> callerToken = nullptr;
+    WantParams wantParams;
+    FormJsInfo formInfo;
+    MockGetFormRecord(true);
+    MockGetFormRecordParams(true);
+    MockGetFormRecordParamsTemp(false);
+    EXPECT_EQ(
+        ERR_APPEXECFWK_FORM_CFG_NOT_MATCH_ID, formMgrAdapter.AllotFormById(info, callerToken, wantParams, formInfo));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0140 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0141
+ * @tc.desc: test AddNewFormRecord function and the return value is ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0141, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0141 start";
+    FormMgrAdapter formMgrAdapter;
+    FormItemInfo info;
+    info.SetProviderBundleName("bundle");
+    info.SetHostBundleName("host");
+    int64_t formId = 1;
+    sptr<IRemoteObject> callerToken = nullptr;
+    WantParams wantParams;
+    FormJsInfo formInfo;
+    MockAllotFormHostRecord(true);
+    MockConnectServiceAbility(false);
+    MockUpdateDBRecord(true);
+    EXPECT_EQ(ERR_OK, formMgrAdapter.AddNewFormRecord(info, formId, callerToken, wantParams, formInfo));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0141 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0142
+ * @tc.desc: test AddFormTimer function and the return value is ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0142, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0142 start";
+    FormMgrAdapter formMgrAdapter;
+    FormRecord formRecord;
+    formRecord.isEnableUpdate = true;
+    formRecord.formTempFlag = true;
+    EXPECT_EQ(ERR_OK, formMgrAdapter.AddFormTimer(formRecord));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0142 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0143
+ * @tc.desc: test GetBundleInfo function and the return value is ERR_APPEXECFWK_FORM_GET_INFO_FAILED.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0143, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0143 start";
+    FormMgrAdapter formMgrAdapter;
+    Want want = {};
+    want.SetElementName("bundleName", "abilityName");
+    BundleInfo bundleInfo = {};
+    std::string packageName = "";
+    sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
+    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
+    FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
+    auto bmsTask = [] (const std::string &bundleName, const BundleFlag flag, BundleInfo &bundleInfo, int32_t userId) {
+        GTEST_LOG_(INFO) << "FormMgrAdapter_0143 bmsTask called";
+        return false;
+    };
+    EXPECT_CALL(*bmsProxy, GetBundleInfo(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
+    EXPECT_EQ(formMgrAdapter.GetBundleInfo(want, bundleInfo, packageName), ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
+    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0143 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0144
+ * @tc.desc: test GetBundleInfo function and the return value is ERR_APPEXECFWK_FORM_NO_SUCH_MODULE.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0144, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0144 start";
+    FormMgrAdapter formMgrAdapter;
+    Want want = {};
+    want.SetElementName("bundleName", "abilityName");
+    BundleInfo bundleInfo = {};
+    std::string packageName = "";
+    sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
+    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
+    FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
+    auto bmsTask = [] (const std::string &bundleName, const BundleFlag flag, BundleInfo &bundleInfo, int32_t userId) {
+        std::string moduleName = "moduleName";
+        bundleInfo.moduleNames.push_back(moduleName);
+        bundleInfo.name = "name";
+        GTEST_LOG_(INFO) << "FormMgrAdapter_0144 bmsTask called";
+        return true;
+    };
+    EXPECT_CALL(*bmsProxy, GetBundleInfo(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
+    EXPECT_EQ(formMgrAdapter.GetBundleInfo(want, bundleInfo, packageName), ERR_APPEXECFWK_FORM_NO_SUCH_MODULE);
+    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0144 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0145
+ * @tc.desc: test GetFormInfo function and the return value is ERR_APPEXECFWK_FORM_INVALID_PARAM.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0145, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0145 start";
+    FormMgrAdapter formMgrAdapter;
+    Want want = {};
+    FormInfo formInfo = {};
+    want.SetElementName("", "abilityName");
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.GetFormInfo(want, formInfo));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0145 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0146
+ * @tc.desc: test GetFormInfo function and the return value is ERR_APPEXECFWK_FORM_INVALID_PARAM.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0146, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0146 start";
+    FormMgrAdapter formMgrAdapter;
+    Want want = {};
+    FormInfo formInfo = {};
+    want.SetElementName("bundleName", "");
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.GetFormInfo(want, formInfo));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0146 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0147
+ * @tc.desc: test GetFormInfo function and the return value is ERR_APPEXECFWK_FORM_INVALID_PARAM.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0147, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0147 start";
+    FormMgrAdapter formMgrAdapter;
+    Want want = {};
+    FormInfo formInfo = {};
+    want.SetElementName("bundleName", "abilityName");
+    MockGetStringParam(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.GetFormInfo(want, formInfo));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0147 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0148
+ * @tc.desc: test GetFormInfo function and the return value is ERR_APPEXECFWK_FORM_GET_INFO_FAILED.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0148, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0148 start";
+    FormMgrAdapter formMgrAdapter;
+    Want want = {};
+    FormInfo formInfo = {};
+    want.SetElementName("bundleName", "abilityName");
+    MockGetFormsInfoByModule(true);
+    MockGetFormsInfoByModuleParam(false);
+    MockGetStringParam(true);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_INFO_FAILED, formMgrAdapter.GetFormInfo(want, formInfo));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0148 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0149
+ * @tc.desc: test GetFormItemInfo function and the return value is ERR_APPEXECFWK_FORM_GET_INFO_FAILED.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0149, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0149 start";
+    FormMgrAdapter formMgrAdapter;
+    constexpr int32_t dimensionId = 2;
+    AAFwk::Want want;
+    want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, dimensionId);
+    BundleInfo bundleInfo;
+    FormInfo formInfo;
+    formInfo.supportDimensions.push_back(dimensionId);
+    formInfo.defaultDimension = dimensionId;
+    FormItemInfo formItemInfo;
+    MockGetCallerBundleName(true);
+    EXPECT_EQ(
+        ERR_APPEXECFWK_FORM_GET_INFO_FAILED, formMgrAdapter.GetFormItemInfo(want, bundleInfo, formInfo, formItemInfo));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0149 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0150
+ * @tc.desc: test IsDimensionValid function and the return value is false.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0150, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0150 start";
+    FormMgrAdapter formMgrAdapter;
+    FormInfo formInfo;
+    formInfo.supportDimensions.push_back(1);
+    int32_t dimensionId = -1;
+    MockGetCallerBundleName(true);
+    EXPECT_FALSE(formMgrAdapter.IsDimensionValid(formInfo, dimensionId));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0150 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0151
+ * @tc.desc: test GetFormInfo function and the return value is ERR_APPEXECFWK_FORM_GET_INFO_FAILED.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0151, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0151 start";
+    FormMgrAdapter formMgrAdapter;
+    Want want = {};
+    FormInfo formInfo = {};
+    want.SetElementName("bundleName", "abilityName");
+    MockGetFormsInfoByModule(false);
+    MockGetFormsInfoByModuleParam(false);
+    MockGetStringParam(true);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_INFO_FAILED, formMgrAdapter.GetFormInfo(want, formInfo));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0151 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0152
+ * @tc.desc: test CreateFormItemInfo function and the return value is ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0152, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0152 start";
+    FormMgrAdapter formMgrAdapter;
+    ModuleInfo moduleInfo1 = {};
+    moduleInfo1.moduleName = "moduleName1";
+    ModuleInfo moduleInfo2 = {};
+    moduleInfo2.moduleName = "moduleName2";
+    AbilityInfo info1 = {};
+    info1.name = "abilityName1";
+    info1.isModuleJson = false;
+    info1.hapPath = std::string(Constants::ABS_CODE_PATH) + "/res";
+    AbilityInfo info2 = {};
+    info2.name = "abilityName1";
+    info2.isModuleJson = true;
+    info2.hapPath = std::string(Constants::ABS_CODE_PATH) + "/img";
+    AbilityInfo info3 = {};
+    info3.name = "abilityName2";
+    info3.hapPath = "";
+    BundleInfo bundleInfo = {};
+    bundleInfo.abilityInfos.push_back(info1);
+    bundleInfo.abilityInfos.push_back(info2);
+    bundleInfo.abilityInfos.push_back(info3);
+    bundleInfo.applicationInfo.moduleInfos.push_back(moduleInfo1);
+    bundleInfo.applicationInfo.moduleInfos.push_back(moduleInfo2);
+    FormInfo formInfo = {};
+    formInfo.abilityName = "abilityName1";
+    formInfo.moduleName = "moduleName1";
+    FormItemInfo itemInfo = {};
+    Want want = {};
+    MockGetCallerBundleName(false);
+    EXPECT_EQ(ERR_OK, formMgrAdapter.CreateFormItemInfo(bundleInfo, formInfo, itemInfo, want));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0152 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0153
+ * @tc.desc: test CheckPublishForm function and the return value is ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0153, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0153 start";
+    sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
+    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
+    FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
+    auto bmsTaskCheckIsSystemAppByUid = [] (const int uid) {
+        GTEST_LOG_(INFO) << "FormMgrAdapter_0153 bmsTaskCheckIsSystemAppByUid called";
+        return false;
+    };
+    EXPECT_CALL(*bmsProxy, CheckIsSystemAppByUid(_)).Times(1).WillOnce(Invoke(bmsTaskCheckIsSystemAppByUid));
+    FormMgrAdapter formMgrAdapter;
+    Want want = {};
+
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, formMgrAdapter.CheckPublishForm(want));
+    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0153 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0154
+ * @tc.desc: test CheckPublishForm function and the return value is ERR_APPEXECFWK_FORM_PERMISSION_DENY.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0154, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0154 start";
+    sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
+    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
+    FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
+    int32_t times = 0;
+    constexpr int32_t counts = 2;
+    auto bmsTaskCheckIsSystemAppByUid = [&times, counts] (const int uid) {
+        GTEST_LOG_(INFO) << "FormMgrAdapter_0154 bmsTaskCheckIsSystemAppByUid called";
+        return !(++times == counts);
+    };
+    EXPECT_CALL(*bmsProxy, CheckIsSystemAppByUid(_)).Times(counts).WillOnce(Invoke(bmsTaskCheckIsSystemAppByUid));
+    auto bmsTaskGetBundleNameForUid = [] (const int uid, std::string &name) {
+        name = "name";
+        GTEST_LOG_(INFO) << "FormMgrAdapter_0154 bmsTaskGetBundleNameForUid called";
+        return true;
+    };
+    EXPECT_CALL(*bmsProxy, GetBundleNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
+    auto bmsTaskGetBundleInfo =
+        [] (const std::string &bundleName, const BundleFlag flag, BundleInfo &bundleInfo, int32_t userId) {
+        GTEST_LOG_(INFO) << "FormMgrAdapter_0154 bmsTask called";
+        return true;
+    };
+    EXPECT_CALL(*bmsProxy, GetBundleInfo(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleInfo));
+    FormMgrAdapter formMgrAdapter;
+    Want want = {};
+
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY, formMgrAdapter.CheckPublishForm(want));
+    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0154 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0155
+ * @tc.desc: test QueryPublishFormToHost function and the return value is ERR_APPEXECFWK_FORM_GET_HOST_FAILED.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0155, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0155 start";
+    FormMgrAdapter formMgrAdapter;
+    Want want = {};
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_HOST_FAILED, formMgrAdapter.QueryPublishFormToHost(want));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0155 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0156
+ * @tc.desc: test RequestPublishFormToHost function and the return value is ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0156, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0156 start";
+    FormMgrAdapter formMgrAdapter;
+    Want want = {};
+    MockConnectServiceAbility(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED, formMgrAdapter.RequestPublishFormToHost(want));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0156 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0157
+ * @tc.desc: test CheckAddRequestPublishForm function and the return value is ERR_APPEXECFWK_FORM_INVALID_PARAM.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0157, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0157 start";
+    FormMgrAdapter formMgrAdapter;
+    Want want = {};
+    want.SetElementName("bundle1", "ability1");
+    Want formWant = {};
+    formWant.SetElementName("bundle2", "ability2");
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
+        formMgrAdapter.CheckAddRequestPublishForm(want, formWant));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0157 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0158
+ * @tc.desc: test MessageEvent function and the return value is ERR_APPEXECFWK_FORM_INVALID_PARAM.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0158, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0158 start";
+    FormMgrAdapter formMgrAdapter;
+    constexpr int64_t formId = 0;
+    const Want want = {};
+    const sptr<IRemoteObject> &callerToken = nullptr;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.MessageEvent(formId, want, callerToken));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0158 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0159
+ * @tc.desc: test HandleUpdateFormFlag function and the return value is ERR_APPEXECFWK_FORM_INVALID_PARAM.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0159, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0159 start";
+    FormMgrAdapter formMgrAdapter;
+    std::vector<int64_t> formIds;
+    const sptr<IRemoteObject> &callerToken = nullptr;
+    bool flag = false;
+    bool isOnlyEnableUpdate = false;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
+        formMgrAdapter.HandleUpdateFormFlag(formIds, callerToken, flag, isOnlyEnableUpdate));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0159 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0160
+ * @tc.desc: test AcquireProviderFormInfo function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0160, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0160 start";
+    FormMgrAdapter formMgrAdapter;
+    const sptr<IRemoteObject> &callerToken = nullptr;
+    const Want want = {};
+    constexpr int64_t formId = 0;
+    formMgrAdapter.AcquireProviderFormInfo(formId, want, callerToken);
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0160 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0161
+ * @tc.desc: test NotifyFormDelete function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0161, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0161 start";
+    FormMgrAdapter formMgrAdapter;
+    const sptr<IRemoteObject> &callerToken = nullptr;
+    const Want want = {};
+    constexpr int64_t formId = 0;
+    formMgrAdapter.NotifyFormDelete(formId, want, callerToken);
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0161 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0162
+ * @tc.desc: test NotifyFormsVisible function and the return value is ERR_APPEXECFWK_FORM_INVALID_PARAM.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0162, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0162 start";
+    FormMgrAdapter formMgrAdapter;
+    std::vector<int64_t> formIds;
+    bool isVisible = false;
+    const sptr<IRemoteObject> &callerToken = nullptr;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.NotifyFormsVisible(formIds, isVisible, callerToken));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0162 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0163
+ * @tc.desc: test NotifyFormsEnableUpdate function and the return value is ERR_APPEXECFWK_FORM_INVALID_PARAM.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0163, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0163 start";
+    FormMgrAdapter formMgrAdapter;
+    std::vector<int64_t> formIds;
+    bool isEnableUpdate = false;
+    const sptr<IRemoteObject> &callerToken = nullptr;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
+        formMgrAdapter.NotifyFormsEnableUpdate(formIds, isEnableUpdate, callerToken));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0163 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0164
+ * @tc.desc: test GetAllFormsInfo function and the return value is ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0164, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0164 start";
+    FormMgrAdapter formMgrAdapter;
+    std::vector<FormInfo> formInfos;
+    EXPECT_EQ(ERR_OK, formMgrAdapter.GetAllFormsInfo(formInfos));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0164 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0165
+ * @tc.desc: test GetFormsInfoByApp function and the return value is ERR_APPEXECFWK_FORM_INVALID_PARAM.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0165, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0165 start";
+    FormMgrAdapter formMgrAdapter;
+    std::vector<FormInfo> formInfos;
+    const std::string bundleName = "";
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.GetFormsInfoByApp(bundleName, formInfos));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0165 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0166
+ * @tc.desc: test GetFormsInfoByModule function and the return value is ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0166, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0166 start";
+    FormMgrAdapter formMgrAdapter;
+    std::vector<FormInfo> formInfos;
+    const std::string moudleName = "";
+    const std::string bundleName = "";
+    EXPECT_EQ(ERR_OK, formMgrAdapter.GetFormsInfoByModule(bundleName, moudleName, formInfos));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0166 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0167
+ * @tc.desc: test MessageEvent function and the return value is ERR_APPEXECFWK_FORM_INVALID_PARAM.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0167, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0167 start";
+    FormMgrAdapter formMgrAdapter;
+    constexpr int64_t formId = 0;
+    const Want want = {};
+    const sptr<IRemoteObject> &callerToken = nullptr;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.MessageEvent(formId, want, callerToken));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0167 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0168
+ * @tc.desc: test checkFormHostHasSaUid function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0168, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0168 start";
+    FormMgrAdapter formMgrAdapter;
+    FormRecord formRecord = {};
+    EXPECT_FALSE(formMgrAdapter.checkFormHostHasSaUid(formRecord));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0168 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0169
+ * @tc.desc: test checkFormHostHasSaUid function and the return value is true.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0169, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0169 start";
+    FormMgrAdapter formMgrAdapter;
+    FormRecord formRecord = {};
+    constexpr int32_t SYSTEM_UID = 1000;
+    formRecord.formUserUids.push_back(SYSTEM_UID);
+    EXPECT_TRUE(formMgrAdapter.checkFormHostHasSaUid(formRecord));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0169 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0170
+ * @tc.desc: test SetNextRefreshTime function and the return value is ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0170, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0170 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    int64_t nextTime = 1;
+    MockGetCallerBundleName(false);
+    MockGetFormRecord(true);
+    MockGetFormRecordParams(true);
+    MockGetFormRecordParamsUid(false);
+    MockGetFormRecordParamsSysUid(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, formMgrAdapter.SetNextRefreshTime(formId, nextTime));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0170 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0171
+ * @tc.desc: test SetNextRefreshTime function and the return value is ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0171, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0171 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    int64_t nextTime = 1;
+    MockGetCallerBundleName(false);
+    MockGetFormRecord(true);
+    MockGetFormRecordParams(true);
+    MockGetFormRecordParamsUid(true);
+    MockGetFormRecordParamsSysUid(true);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, formMgrAdapter.SetNextRefreshTime(formId, nextTime));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0171 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0172
+ * @tc.desc: test QueryPublishFormToHost function and the return value is ERR_APPEXECFWK_FORM_GET_HOST_FAILED.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0172, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0172 start";
+    FormMgrAdapter formMgrAdapter;
+    Want want = {};
+    MockGetAbilityInfoByAction(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_HOST_FAILED, formMgrAdapter.QueryPublishFormToHost(want));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0172 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0173
+ * @tc.desc: test QueryPublishFormToHost function and the return value is ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0173, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0173 start";
+    FormMgrAdapter formMgrAdapter;
+    Want want = {};
+    MockGetAbilityInfoByAction(true);
+    MockGetAbilityInfoByActionAbilityInfo(false);
+    MockGetAbilityInfoByActionExtensionInfo(true);
+    EXPECT_EQ(ERR_OK, formMgrAdapter.QueryPublishFormToHost(want));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0173 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0174
+ * @tc.desc: test QueryPublishFormToHost function and the return value is ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0174, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0174 start";
+    FormMgrAdapter formMgrAdapter;
+    Want want = {};
+    MockGetAbilityInfoByAction(true);
+    MockGetAbilityInfoByActionAbilityInfo(true);
+    MockGetAbilityInfoByActionExtensionInfo(false);
+    EXPECT_EQ(ERR_OK, formMgrAdapter.QueryPublishFormToHost(want));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0174 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0175
+ * @tc.desc: test CheckAddRequestPublishForm function and the return value is ERR_APPEXECFWK_FORM_INVALID_PARAM.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0175, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0175 start";
+    FormMgrAdapter formMgrAdapter;
+    Want want = {};
+    want.SetElementName("bundle", "ability");
+    want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, 2);
+    Want formWant = {};
+    formWant.SetElementName("bundle", "ability");
+    formWant.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, 1);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.CheckAddRequestPublishForm(want, formWant));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0175 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0176
+ * @tc.desc: test CheckAddRequestPublishForm function and the return value is ERR_APPEXECFWK_FORM_MAX_SYSTEM_TEMP_FORMS.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0176, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0176 start";
+    FormMgrAdapter formMgrAdapter;
+    Want want = {};
+    want.SetElementName("bundle", "ability");
+    want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, 2);
+    Want formWant = {};
+    formWant.SetElementName("bundle", "ability");
+    formWant.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, 2);
+    MockGetBoolParam(true);
+    MockCheckTempEnoughForm(true);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_MAX_SYSTEM_TEMP_FORMS, formMgrAdapter.CheckAddRequestPublishForm(want, formWant));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0176 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0177
+ * @tc.desc: test AddRequestPublishForm function and the return value is ERR_APPEXECFWK_FORM_COMMON_CODE.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0177, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0177 start";
+    FormMgrAdapter formMgrAdapter;
+    FormItemInfo formItemInfo;
+    Want want = {};
+    want.SetElementName("bundle", "ability");
+    sptr<IRemoteObject> callerToken = nullptr;
+    FormJsInfo formJsInfo;
+    MockGetRequestPublishFormInfo(false);
+    MockGetRequestPublishFormInfoWant(want);
+    MockCheckTempEnoughForm(false);
+    MockAllotFormHostRecord(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE,
+        formMgrAdapter.AddRequestPublishForm(formItemInfo, want, callerToken, formJsInfo));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0177 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0178
+ * @tc.desc: test EnableUpdateForm function and the return value is ERR_APPEXECFWK_FORM_INVALID_PARAM.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0178, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0178 start";
+    FormMgrAdapter formMgrAdapter;
+    std::vector<int64_t> formIDs;
+    sptr<IRemoteObject> callerToken = nullptr;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.EnableUpdateForm(formIDs, callerToken));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0178 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0179
+ * @tc.desc: test DisableUpdateForm function and the return value is ERR_APPEXECFWK_FORM_INVALID_PARAM.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0179, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0179 start";
+    FormMgrAdapter formMgrAdapter;
+    std::vector<int64_t> formIDs;
+    sptr<IRemoteObject> callerToken = nullptr;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.DisableUpdateForm(formIDs, callerToken));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0179 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0180
+ * @tc.desc: test MessageEvent function and the return value is ERR_APPEXECFWK_FORM_INVALID_PARAM.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0180, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0180 start";
+    FormMgrAdapter formMgrAdapter;
+    constexpr int64_t formId = 1;
+    const Want want = {};
+    const sptr<IRemoteObject> &callerToken = nullptr;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.MessageEvent(formId, want, callerToken));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0180 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0181
+ * @tc.desc: test MessageEvent function and the return value is ERR_APPEXECFWK_FORM_INVALID_PARAM.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0181, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0181 start";
+    FormMgrAdapter formMgrAdapter;
+    constexpr int64_t formId = 1;
+    const Want want = {};
+    const sptr<IRemoteObject> &callerToken = new (std::nothrow) MockFormProviderClient();
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.MessageEvent(formId, want, callerToken));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0181 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0182
+ * @tc.desc: test MessageEvent function and the return value is ERR_APPEXECFWK_FORM_NOT_EXIST_ID.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0182, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0182 start";
+    FormMgrAdapter formMgrAdapter;
+    constexpr int64_t formId = 1;
+    Want want = {};
+    const sptr<IRemoteObject> &callerToken = new (std::nothrow) MockFormProviderClient();
+    const std::string keyValue = "true";
+    want.SetParam(Constants::PARAM_MESSAGE_KEY, keyValue);
+    MockGetFormRecord(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_NOT_EXIST_ID, formMgrAdapter.MessageEvent(formId, want, callerToken));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0182 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0183
+ * @tc.desc: test MessageEvent function and the return value is ERR_APPEXECFWK_FORM_COMMON_CODE.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0183, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0183 start";
+    FormMgrAdapter formMgrAdapter;
+    constexpr int64_t formId = 1;
+    Want want = {};
+    const sptr<IRemoteObject> &callerToken = new (std::nothrow) MockFormProviderClient();
+    const std::string keyValue = "true";
+    want.SetParam(Constants::PARAM_MESSAGE_KEY, keyValue);
+    MockGetFormRecord(true);
+    MockGetMatchedHostClient(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrAdapter.MessageEvent(formId, want, callerToken));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0183 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0184
+ * @tc.desc: test MessageEvent function and the return value is ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0184, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0184 start";
+    FormMgrAdapter formMgrAdapter;
+    constexpr int64_t formId = 1;
+    constexpr int64_t invalidFormId = 0;
+    Want want = {};
+    const sptr<IRemoteObject> &callerToken = new (std::nothrow) MockFormProviderClient();
+    const std::string keyValue = "true";
+    want.SetParam(Constants::PARAM_MESSAGE_KEY, keyValue);
+    MockGetFormRecord(true);
+    MockGetMatchedHostClient(true);
+    MockGetMatchedHostClientParams(true);
+    MockGetMatchedHostClientParamsMatchedId(invalidFormId);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, formMgrAdapter.MessageEvent(formId, want, callerToken));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0184 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0185
+ * @tc.desc: test AcquireFormStateCheck function and the return value is ERR_APPEXECFWK_FORM_INVALID_PARAM.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0185, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0185 start";
+    FormMgrAdapter formMgrAdapter;
+    std::string bundleName = "aa";
+    std::string abilityName = "aa";
+    Want want;
+    std::string provider = "";
+    MockGetStringParam(true);
+    MockGetFormsInfoByModule(false);
+    MockGetFormsInfoByModuleParam(true);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
+        formMgrAdapter.AcquireFormStateCheck(bundleName, abilityName, want, provider));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0185 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0186
+ * @tc.desc: test RouterEvent function and the return value is ERR_INVALID_VALUE.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0186, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0186 start";
+    auto amsHelperBackup = FormAmsHelper::GetInstance().GetAbilityManager();
+    auto mockAmsMgr = new (std::nothrow) MockAbilityMgrService();
+    mockAmsMgr->startAbility_ = ERR_INVALID_VALUE;
+    FormAmsHelper::GetInstance().abilityManager_ = mockAmsMgr;
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    Want want;
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    MockGetFormRecord(true);
+    EXPECT_EQ(ERR_INVALID_VALUE, formMgrAdapter.RouterEvent(formId, want, callerToken));
+    FormAmsHelper::GetInstance().abilityManager_ = amsHelperBackup;
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0186 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0187
+ * @tc.desc: test RouterEvent function and the return value is ERR_INVALID_VALUE.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0187, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0187 start";
+    auto amsHelperBackup = FormAmsHelper::GetInstance().GetAbilityManager();
+    auto mockAmsMgr = new (std::nothrow) MockAbilityMgrService();
+    mockAmsMgr->startAbility_ = ERR_INVALID_VALUE;
+    FormAmsHelper::GetInstance().abilityManager_ = mockAmsMgr;
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    Want want;
+    want.SetBundle("bundle");
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    MockGetFormRecord(true);
+    EXPECT_EQ(ERR_INVALID_VALUE, formMgrAdapter.RouterEvent(formId, want, callerToken));
+    FormAmsHelper::GetInstance().abilityManager_ = amsHelperBackup;
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0187 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0188
+ * @tc.desc: test RouterEvent function and the return value is ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0188, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0188 start";
+    auto amsHelperBackup = FormAmsHelper::GetInstance().GetAbilityManager();
+    auto mockAmsMgr = new (std::nothrow) MockAbilityMgrService();
+    mockAmsMgr->startAbility_ = ERR_OK;
+    FormAmsHelper::GetInstance().abilityManager_ = mockAmsMgr;
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    Want want;
+    want.SetBundle("bundle");
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    MockGetFormRecord(true);
+    MockConnectServiceAbility(false);
+    EXPECT_EQ(ERR_OK, formMgrAdapter.RouterEvent(formId, want, callerToken));
+    FormAmsHelper::GetInstance().abilityManager_ = amsHelperBackup;
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0188 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0189
+ * @tc.desc: test NotifyFormDelete function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0189, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0189 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    Want want;
+    want.SetBundle("bundle");
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    formMgrAdapter.NotifyFormDelete(formId, want, callerToken);
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0189 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_0190
+ * @tc.desc: test DeleteInvalidForms function and the return value is ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0190, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0190 start";
+    FormMgrAdapter formMgrAdapter;
+    std::vector<int64_t> formIds;
+    formIds.push_back(1);
+    formIds.push_back(2);
+    formIds.push_back(3);
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    int32_t numFormsDeleted = 1;
+    EXPECT_EQ(ERR_OK, formMgrAdapter.DeleteInvalidForms(formIds, callerToken, numFormsDeleted));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0190 end";
+}
 }

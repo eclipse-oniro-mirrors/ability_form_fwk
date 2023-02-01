@@ -1230,6 +1230,7 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
     itemInfo.SetFormSrc(formInfo.src);
     itemInfo.SetFormWindow(formInfo.window);
     itemInfo.SetType(formInfo.type);
+    itemInfo.SetUiSyntax(formInfo.uiSyntax);
 
     for (const auto &abilityInfo : bundleInfo.abilityInfos) {
         if (abilityInfo.name == formInfo.abilityName) {
@@ -1767,6 +1768,7 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
         }
     }
 
+    want.SetParam(Constants::PARAM_FORM_ID, formId);
     int32_t result = FormAmsHelper::GetInstance().GetAbilityManager()->StartAbility(want, callerToken);
     if (result != ERR_OK && result != START_ABILITY_WAITING) {
         HILOG_ERROR("Failed to StartAbility, result: %{public}d.", result);

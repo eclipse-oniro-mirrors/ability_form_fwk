@@ -56,6 +56,7 @@ namespace Constants {
     constexpr const char* FORM_PUBLISH_ACTION = "action.form.publish";
     constexpr const char* PARAM_DEVICE_ID_KEY = "ohos.extra.param.key.device_id";
     constexpr const char* PARAM_FORM_HOST_TOKEN = "ohos.extra.param.form.host.token";
+    constexpr const char* PARAM_FORM_ID = "formID";
     constexpr int32_t TYPE_RESET_LIMIT = 1;
     constexpr int32_t TYPE_STATIC_UPDATE = 2;
     constexpr int32_t TYPE_DYNAMIC_UPDATE = 3;
@@ -169,7 +170,7 @@ namespace Constants {
     constexpr const char* FORM_RDB_TABLE_NAME = "form_table";
     constexpr const char* FORM_MANAGER_SERVICE_PATH = "/data/service/el1/public/database/form_storage";
     constexpr const char* FORM_JOURNAL_MODE = "WAL";
-    constexpr const char* FORM_SYNC_MODE = "MODE_OFF";
+    constexpr const char* FORM_SYNC_MODE = "FULL";
     constexpr int32_t FORM_RDB_VERSION = 1;
 }  // namespace Constants
 }  // namespace AppExecFwk
