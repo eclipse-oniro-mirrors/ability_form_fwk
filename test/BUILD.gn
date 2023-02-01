@@ -86,7 +86,6 @@ group("unittest") {
     "unittest/fms_form_timer_mgr_test:unittest",
     "unittest/fms_form_util_test:unittest",
     "unittest/fms_free_install_status_callback_proxy_test:unittest",
-    "unittest/fms_provider_connect_stub_test:unittest",
     "unittest/fms_provider_connect_proxy_test:unittest",
     "unittest/fms_provider_connect_stub_test:unittest",
     "unittest/form_errors_test:unittest",
