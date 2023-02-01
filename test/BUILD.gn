@@ -50,6 +50,7 @@ group("unittest") {
     "unittest/fms_form_host_stub_test:unittest",
     "unittest/fms_form_info_mgr_test:unittest",
     "unittest/fms_form_info_rdb_storage_mgr_test:unittest",
+    "unittest/fms_form_info_storage_mgr_test:unittest",
     "unittest/fms_form_info_storage_test:unittest",
     "unittest/fms_form_js_info_base_test:unittest",
     "unittest/fms_form_js_info_test:unittest",
