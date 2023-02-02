@@ -334,7 +334,7 @@ NativeValue *JsFormProvider::OnRequestPublishForm(NativeEngine &engine, NativeCa
     }
     convertArgc++;
 
-    if (info.argc > ARGS_SIZE_ONE && info.argv[PARAM1]->TypeOf() == NATIVE_OBJECT) {
+    if (info.argc > ARGS_SIZE_ONE) {
         asyncCallbackInfo->withFormBindingData = true;
         if (info.argv[PARAM1]->TypeOf() != NATIVE_OBJECT) {
             HILOG_ERROR("formBindingData is not napi_object.");
