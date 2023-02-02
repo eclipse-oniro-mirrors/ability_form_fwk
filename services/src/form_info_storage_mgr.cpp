@@ -186,8 +186,8 @@ DistributedKv::Status FormInfoStorageMgr::GetKvStore()
         .encrypt = false,
         .autoSync = true,
         .kvStoreType = DistributedKv::KvStoreType::SINGLE_VERSION,
-        .baseDir = FORM_STORAGE_DIR,
-        .area = DistributedKv::EL1
+        .area = DistributedKv::EL1,
+        .baseDir = FORM_STORAGE_DIR
     };
 
     DistributedKv::Status status = dataManager_.GetSingleKvStore(options, appId_, storeId_, kvStorePtr_);
