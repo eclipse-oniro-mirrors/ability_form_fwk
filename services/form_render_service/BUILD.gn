@@ -36,8 +36,8 @@ ohos_hap("formrender_service_hap") {
   shared_libraries = [ ":formrender" ]
   certificate_profile = "${form_render_service_path}/signature/formrender.p7b"
   hap_name = "Form_Render_Service"
-  part_name = "prebuilt_hap"
-  subsystem_name = "applications"
+  part_name = "form_fwk"
+  subsystem_name = "ability"
   module_install_dir = "app/com.ohos.formrenderservice"
 }
 

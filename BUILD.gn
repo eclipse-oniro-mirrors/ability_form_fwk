@@ -280,7 +280,10 @@ group("fms_innerkits_target") {
 }
 
 group("fms_target") {
-  deps = [ ":libfms" ]
+  deps = [
+    ":libfms",
+    "services/form_render_service:formrender_service_hap",
+  ]
 }
 
 group("fms_services_target") {
