@@ -93,6 +93,10 @@ public:
     {
         return {};
     };
+    int32_t UnloadSystemAbility(int32_t systemAbilityId)
+    {
+        return {};
+    };
 
     std::weak_ptr<bool> weakGetSystemAbility_;
 };
