@@ -28,22 +28,37 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace FormRender {
-
 class FormRenderRecord : public std::enable_shared_from_this<FormRenderRecord> {
 public:
-    static std::shared_ptr<FormRenderRecord> Create(const FormJsInfo &formJsInfo, const int32_t uid);
+    /**
+     * @brief Create a FormRenderRecord.
+     * @param bundleName The bundelName of form bundle.
+     * @param uid The uid of form bundle.
+     * @return Returns FormRenderRecord instance.
+     */
+    static std::shared_ptr<FormRenderRecord> Create(const std::string &bundleName, int32_t uid);
 
-    FormRenderRecord(const FormJsInfo &formJsInfo, const int32_t uid);
+    FormRenderRecord(const std::string &bundleName, int32_t uid);
 
     /**
-     * @brief When the host exits, clean up related resources
+     * @brief When the host exits, clean up related resources.
      * @param hostRemoteObj host token.
      * @return Returns TRUE: FormRenderRecord is empty, FALSE: FormRenderRecord is not empty.
      */
-    bool HandleHostDied(sptr<IRemoteObject> hostRemoteObj);
+    bool HandleHostDied(const sptr<IRemoteObject> hostRemoteObj);
 
-    bool UpdateRenderRecord(const FormJsInfo &formJsInfo, sptr<IRemoteObject> hostRemoteObj);
+    /**
+     * @brief When add a new form, the corresponding FormRenderRecord needs to be updated.
+     * @param formJsInfo formJsInfo.
+     * @param hostRemoteObj host token.
+     * @return Returns TRUE: update succeed, FALSE: update failed.
+     */
+    bool UpdateRenderRecord(const FormJsInfo &formJsInfo, const sptr<IRemoteObject> hostRemoteObj);
 
+    /**
+     * @brief Get the uid of bundle.
+     * @return Returns the uid.
+     */
     int32_t GetUid() const;
 
 private:
@@ -55,7 +70,7 @@ private:
         }
     };
 
-    bool CreateEventHandler(const FormJsInfo &formJsInfo);
+    bool CreateEventHandler(const std::string &bundleName);
 
     bool CreateRuntime(const FormJsInfo &formJsInfo);
 
@@ -64,13 +79,15 @@ private:
     void HandleUpdateInJsThread(const FormJsInfo &formJsInfo);
 
     std::string bundleName_;
-    int32_t uid_;
+    int32_t uid_ = Constants::INVALID_UID;
     std::shared_ptr<EventRunner> eventRunner_;
     std::shared_ptr<EventHandler> eventHandler_;
     std::shared_ptr<AbilityRuntime::Runtime> runtime_;
     // <formId, hostRemoteObj>
+    std::mutex hostsMapMutex_;
     std::unordered_map<int64_t, std::unordered_set<sptr<IRemoteObject>, RemoteObjHash>> hostsMapForFormId_;
     // <moduleName, Context>
+    std::mutex contextsMapMutex_;
     std::unordered_map<std::string, std::shared_ptr<AbilityRuntime::Context>> contextsMapForModuleName_;
 };
 }  // namespace FormRender

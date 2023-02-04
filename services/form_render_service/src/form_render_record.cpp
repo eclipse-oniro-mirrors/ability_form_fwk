@@ -23,25 +23,26 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace FormRender {
 
-std::shared_ptr<FormRenderRecord> FormRenderRecord::Create(const FormJsInfo &formJsInfo, const int32_t uid)
+std::shared_ptr<FormRenderRecord> FormRenderRecord::Create(const std::string &bundleName, int32_t uid)
 {
-    std::shared_ptr<FormRenderRecord> renderRecord = std::make_shared<FormRenderRecord>(formJsInfo, uid);
+    std::shared_ptr<FormRenderRecord> renderRecord = std::make_shared<FormRenderRecord>(bundleName, uid);
     if (!renderRecord) {
         HILOG_ERROR("Create FormRenderRecord failed.");
         return nullptr;
     }
     
-    if (!renderRecord->CreateEventHandler(formJsInfo)) {
+    if (!renderRecord->CreateEventHandler(bundleName)) {
         return nullptr;
     }
     return renderRecord;
 }
 
 FormRenderRecord::FormRenderRecord(
-    const FormJsInfo &formJsInfo, const int32_t uid) : bundleName_(formJsInfo.bundleName), uid_(uid) {}
+    const std::string &bundleName, int32_t uid) : bundleName_(bundleName), uid_(uid) {}
 
-bool FormRenderRecord::HandleHostDied(sptr<IRemoteObject> hostRemoteObj)
+bool FormRenderRecord::HandleHostDied(const sptr<IRemoteObject> hostRemoteObj)
 {
+    std::lock_guard<std::mutex> lock(hostsMapMutex_);
     for (auto item = hostsMapForFormId_.begin(); item != hostsMapForFormId_.end();) {
         std::unordered_set<sptr<IRemoteObject>, RemoteObjHash> &hosts = item->second;
         hosts.erase(hostRemoteObj);
@@ -54,7 +55,7 @@ bool FormRenderRecord::HandleHostDied(sptr<IRemoteObject> hostRemoteObj)
     return (hostsMapForFormId_.size() == 0);
 }
 
-bool FormRenderRecord::CreateEventHandler(const FormJsInfo &formJsInfo)
+bool FormRenderRecord::CreateEventHandler(const std::string &bundleName)
 {
     if (eventHandler_) {
         return true;
@@ -62,7 +63,7 @@ bool FormRenderRecord::CreateEventHandler(const FormJsInfo &formJsInfo)
 
     // Create event runner
     if (eventRunner_ == nullptr) {
-        eventRunner_ = EventRunner::Create(formJsInfo.bundleName);
+        eventRunner_ = EventRunner::Create(bundleName);
         if (eventRunner_ == nullptr) {
             HILOG_ERROR("Create event runner Failed.");
             return false;
@@ -77,10 +78,10 @@ bool FormRenderRecord::CreateEventHandler(const FormJsInfo &formJsInfo)
     return true;
 }
 
-bool FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, sptr<IRemoteObject> hostRemoteObj)
+bool FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const sptr<IRemoteObject> hostRemoteObj)
 {
     // Some resources need to be initialized in a JS thread
-    auto task = [renderRecord = shared_from_this(), &formJsInfo]() {
+    auto task = [renderRecord = shared_from_this(), formJsInfo]() {
         if (renderRecord == nullptr) {
             HILOG_ERROR("renderRecord is nullptr.");
             return;
@@ -95,6 +96,7 @@ bool FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, sptr<IRe
     eventHandler_->PostTask(task);
 
     ObtainContext(formJsInfo);
+    std::lock_guard<std::mutex> lock(hostsMapMutex_);
     auto item = hostsMapForFormId_.find(formJsInfo.formId);
     if (item == hostsMapForFormId_.end()) {
         hostsMapForFormId_.emplace(formJsInfo.formId, std::unordered_set<sptr<IRemoteObject>, RemoteObjHash>());
@@ -137,9 +139,12 @@ bool FormRenderRecord::CreateRuntime(const FormJsInfo &formJsInfo)
 
 std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::ObtainContext(const FormJsInfo &formJsInfo)
 {
-    auto item = contextsMapForModuleName_.find(formJsInfo.moduleName);
-    if (item != contextsMapForModuleName_.end()) {
-        return item->second;
+    {
+        std::lock_guard<std::mutex> lock(contextsMapMutex_);
+        auto item = contextsMapForModuleName_.find(formJsInfo.moduleName);
+        if (item != contextsMapForModuleName_.end()) {
+            return item->second;
+        }
     }
 
     auto context = std::make_shared<AbilityRuntime::ContextImpl>();
@@ -156,7 +161,11 @@ std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::ObtainContext(const F
     context->SetApplicationInfo(applicationInfo);
     HILOG_DEBUG("bundleName is %{public}s, moduleName is %{public}s",
         formJsInfo.bundleName.c_str(), formJsInfo.moduleName.c_str());
-    contextsMapForModuleName_.emplace(formJsInfo.moduleName, context);
+    
+    {
+        std::lock_guard<std::mutex> lock(contextsMapMutex_);
+        contextsMapForModuleName_.emplace(formJsInfo.moduleName, context);
+    }
     return context;
 }
 
