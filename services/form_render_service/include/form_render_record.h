@@ -74,7 +74,9 @@ private:
 
     bool CreateRuntime(const FormJsInfo &formJsInfo);
 
-    std::shared_ptr<AbilityRuntime::Context> ObtainContext(const FormJsInfo &formJsInfo);
+    std::shared_ptr<AbilityRuntime::Context> GetContext(const FormJsInfo &formJsInfo);
+
+    std::shared_ptr<AbilityRuntime::Context> CreateContext(const FormJsInfo &formJsInfo);
 
     void HandleUpdateInJsThread(const FormJsInfo &formJsInfo);
 

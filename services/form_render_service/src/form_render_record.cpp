@@ -95,7 +95,7 @@ bool FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const sp
     }
     eventHandler_->PostTask(task);
 
-    ObtainContext(formJsInfo);
+    CreateContext(formJsInfo);
     std::lock_guard<std::mutex> lock(hostsMapMutex_);
     auto item = hostsMapForFormId_.find(formJsInfo.formId);
     if (item == hostsMapForFormId_.end()) {
@@ -118,6 +118,7 @@ bool FormRenderRecord::CreateRuntime(const FormJsInfo &formJsInfo)
     }
 
     if (eventRunner_ == nullptr) {
+        HILOG_ERROR("eventRunner_ is nullptr");
         return false;
     }
     AbilityRuntime::Runtime::Options options;
@@ -137,7 +138,7 @@ bool FormRenderRecord::CreateRuntime(const FormJsInfo &formJsInfo)
     return true;
 }
 
-std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::ObtainContext(const FormJsInfo &formJsInfo)
+std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::GetContext(const FormJsInfo &formJsInfo)
 {
     {
         std::lock_guard<std::mutex> lock(contextsMapMutex_);
@@ -147,6 +148,11 @@ std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::ObtainContext(const F
         }
     }
 
+    return CreateContext(formJsInfo);
+}
+
+std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::CreateContext(const FormJsInfo &formJsInfo)
+{
     auto context = std::make_shared<AbilityRuntime::ContextImpl>();
     if (context == nullptr) {
         HILOG_ERROR("Create context failed!");
@@ -162,10 +168,8 @@ std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::ObtainContext(const F
     HILOG_DEBUG("bundleName is %{public}s, moduleName is %{public}s",
         formJsInfo.bundleName.c_str(), formJsInfo.moduleName.c_str());
     
-    {
-        std::lock_guard<std::mutex> lock(contextsMapMutex_);
-        contextsMapForModuleName_.emplace(formJsInfo.moduleName, context);
-    }
+    std::lock_guard<std::mutex> lock(contextsMapMutex_);
+    contextsMapForModuleName_.emplace(formJsInfo.moduleName, context);
     return context;
 }
 
