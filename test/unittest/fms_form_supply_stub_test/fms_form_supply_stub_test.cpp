@@ -87,6 +87,16 @@ public:
         const AAFwk::WantParams &wantParams, int64_t requestCode, const bool &result) override
     {};
 
+    int32_t OnRenderTaskDone(int64_t formId, const Want &want) override
+    {
+        return ERR_OK;
+    }
+
+    int32_t OnStopRenderingTaskDone(int64_t formId, const Want &want) override
+    {
+        return ERR_OK;
+    }
+
     bool asObject_ = true;
 };
 

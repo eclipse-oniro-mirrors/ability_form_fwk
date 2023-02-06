@@ -100,6 +100,14 @@ public:
     {
         return nullptr;
     };
+    int32_t OnRenderTaskDone(int64_t formId, const Want &want) override
+    {
+        return ERR_OK;
+    }
+    int32_t OnStopRenderingTaskDone(int64_t formId, const Want &want) override
+    {
+        return ERR_OK;
+    }
     const int number_ = 1;
 };
 /**

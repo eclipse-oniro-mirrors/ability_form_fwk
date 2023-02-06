@@ -203,6 +203,7 @@ void FormDataMgr::CreateFormJsInfo(const int64_t formId, const FormRecord &recor
     formInfo.versionName = record.versionName;
     formInfo.compatibleVersion = record.compatibleVersion;
     formInfo.type = record.type;
+    formInfo.uiSyntax = record.uiSyntax;
 }
 /**
  * @brief Check temp form count is max.
