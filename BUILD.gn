@@ -40,6 +40,7 @@ ohos_shared_library("libfms") {
     "services/src/form_acquire_connection.cpp",
     "services/src/form_acquire_state_connection.cpp",
     "services/src/form_ams_helper.cpp",
+    "services/src/form_background_connection.cpp",
     "services/src/form_batch_delete_connection.cpp",
     "services/src/form_bms_helper.cpp",
     "services/src/form_bundle_event_callback.cpp",

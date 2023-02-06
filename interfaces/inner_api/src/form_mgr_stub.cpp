@@ -90,6 +90,8 @@ FormMgrStub::FormMgrStub()
         &FormMgrStub::HandleGetFormsInfo;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_ROUTER_EVENT)] =
         &FormMgrStub::HandleRouterEvent;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_BACKGROUND_EVENT)] =
+        &FormMgrStub::HandleBackgroundEvent;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_FORM)] =
         &FormMgrStub::HandleRequestPublishForm;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_SHARE_FORM)] =
@@ -490,6 +492,32 @@ int32_t FormMgrStub::HandleRouterEvent(MessageParcel &data, MessageParcel &reply
     }
 
     int32_t result = RouterEvent(formId, *want, client);
+    reply.WriteInt32(result);
+    return result;
+}
+
+/**
+ * @brief Handle Background message.
+ * @param data input param.
+ * @param reply output param.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int32_t FormMgrStub::HandleBackgroundEvent(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    int64_t formId = data.ReadInt64();
+    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
+    if (!want) {
+        HILOG_ERROR("%{public}s, failed to ReadParcelable<Want>", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    sptr<IRemoteObject> client = data.ReadRemoteObject();
+    if (client == nullptr) {
+        HILOG_ERROR("%{public}s, failed to get remote object.", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    int32_t result = BackgroundEvent(formId, *want, client);
     reply.WriteInt32(result);
     return result;
 }

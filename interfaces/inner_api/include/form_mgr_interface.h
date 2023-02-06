@@ -170,6 +170,15 @@ public:
     virtual int MessageEvent(const int64_t formId, const Want &want, const sptr<IRemoteObject> &callerToken) = 0;
 
     /**
+     * @brief Process Background event.
+     * @param formId Indicates the unique id of form.
+     * @param want the want of the ability to start.
+     * @param callerToken Caller ability token.
+     * @return Returns true if execute success, false otherwise.
+     */
+    virtual int BackgroundEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken) = 0;
+
+    /**
      * @brief Process js router event.
      * @param formId Indicates the unique id of form.
      * @param want the want of the ability to start.
@@ -336,6 +345,7 @@ public:
         FORM_MGR_GET_FORMS_INFO_BY_MODULE,
         FORM_MGR_GET_FORMS_INFO,
         FORM_MGR_ROUTER_EVENT,
+        FORM_MGR_BACKGROUND_EVENT,
         FORM_MGR_UPDATE_ROUTER_ACTION,
         FORM_MGR_ADD_FORM_INFO,
         FORM_MGR_REMOVE_FORM_INFO,

@@ -165,6 +165,16 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     int RouterEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken);
+
+    /**
+     * @brief Process Background event.
+     * @param formId Indicates the unique id of form.
+     * @param want the want of the ability to start.
+     * @param callerToken Caller ability token.
+     * @return Returns true if execute success, false otherwise.
+     */
+    int BackgroundEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken);
+
     /**
      * @brief Get fms recoverStatus.
      *
