@@ -32,7 +32,7 @@ class FormRenderRecord : public std::enable_shared_from_this<FormRenderRecord> {
 public:
     /**
      * @brief Create a FormRenderRecord.
-     * @param bundleName The bundelName of form bundle.
+     * @param bundleName The bundleName of form bundle.
      * @param uid The uid of form bundle.
      * @return Returns FormRenderRecord instance.
      */

@@ -15,7 +15,6 @@
 
 #include "form_render_record.h"
 
-#include "constants.h"
 #include "form_constants.h"
 #include "hilog_wrapper.h"
 
@@ -32,6 +31,7 @@ std::shared_ptr<FormRenderRecord> FormRenderRecord::Create(const std::string &bu
     }
     
     if (!renderRecord->CreateEventHandler(bundleName)) {
+        HILOG_ERROR("CreateEventHandler failed.");
         return nullptr;
     }
     return renderRecord;
@@ -46,13 +46,13 @@ bool FormRenderRecord::HandleHostDied(const sptr<IRemoteObject> hostRemoteObj)
     for (auto item = hostsMapForFormId_.begin(); item != hostsMapForFormId_.end();) {
         std::unordered_set<sptr<IRemoteObject>, RemoteObjHash> &hosts = item->second;
         hosts.erase(hostRemoteObj);
-        if (hosts.size() == 0) {
+        if (hosts.empty()) {
             item = hostsMapForFormId_.erase(item);
         } else {
             ++item;
         }
     }
-    return (hostsMapForFormId_.size() == 0);
+    return hostsMapForFormId_.empty();
 }
 
 bool FormRenderRecord::CreateEventHandler(const std::string &bundleName)
@@ -175,7 +175,7 @@ std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::CreateContext(const F
 
 void FormRenderRecord::HandleUpdateInJsThread(const FormJsInfo &formJsInfo)
 {
-    if (runtime_ == nullptr && CreateRuntime(formJsInfo)) {
+    if (runtime_ == nullptr && !CreateRuntime(formJsInfo)) {
         HILOG_ERROR("Create runtime failed.");
         return;
     }
