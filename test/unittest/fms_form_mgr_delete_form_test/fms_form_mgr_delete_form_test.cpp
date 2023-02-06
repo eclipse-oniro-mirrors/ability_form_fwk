@@ -110,7 +110,9 @@ HWTEST_F(FmsFormMgrDeleteFormTest, DeleteForm_001, TestSize.Level0)
     FormDataMgr::GetInstance().ClearFormRecords();
     std::vector<FormDBInfo> oldFormDBInfos;
     FormDbCache::GetInstance().GetAllFormInfo(oldFormDBInfos);
-    FormDbCache::GetInstance().DeleteFormInfoByBundleName(FORM_PROVIDER_BUNDLE_NAME, 0, oldFormDBInfos);
+    for (auto oldFormDBInfo: oldFormDBInfos) {
+        FormDbCache::GetInstance().DeleteFormInfo(oldFormDBInfo.formId);
+    }
 
     int64_t formId {12001};
     int callingUid = IPCSkeleton::GetCallingUid();
@@ -406,7 +408,9 @@ HWTEST_F(FmsFormMgrDeleteFormTest, DeleteForm_009, TestSize.Level0)
     FormDataMgr::GetInstance().ClearFormRecords();
     std::vector<FormDBInfo> oldFormDBInfos;
     FormDbCache::GetInstance().GetAllFormInfo(oldFormDBInfos);
-    FormDbCache::GetInstance().DeleteFormInfoByBundleName(FORM_PROVIDER_BUNDLE_NAME, 0, oldFormDBInfos);
+    for (auto oldFormDBInfo: oldFormDBInfos) {
+        FormDbCache::GetInstance().DeleteFormInfo(oldFormDBInfo.formId);
+    }
 
     int64_t formId {12001};
     int callingUid = IPCSkeleton::GetCallingUid();

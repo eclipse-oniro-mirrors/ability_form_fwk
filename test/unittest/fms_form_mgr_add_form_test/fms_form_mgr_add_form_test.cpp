@@ -201,7 +201,9 @@ HWTEST_F(FmsFormMgrAddFormTest, AddForm_001, TestSize.Level0)
     FormDataMgr::GetInstance().ClearFormRecords();
     std::vector<FormDBInfo> oldFormDBInfos;
     FormDbCache::GetInstance().GetAllFormInfo(oldFormDBInfos);
-    FormDbCache::GetInstance().DeleteFormInfoByBundleName(FORM_PROVIDER_BUNDLE_NAME, userId_, oldFormDBInfos);
+    for (auto oldFormDBInfo: oldFormDBInfos) {
+        FormDbCache::GetInstance().DeleteFormInfo(oldFormDBInfo.formId);
+    }
 
     // add form
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().AddForm(0L, want, token_, formJsInfo));
@@ -570,7 +572,9 @@ HWTEST_F(FmsFormMgrAddFormTest, AddForm_008, TestSize.Level0)
     FormDataMgr::GetInstance().tempForms_.clear();
     std::vector<FormDBInfo> oldFormDBInfos;
     FormDbCache::GetInstance().GetAllFormInfo(oldFormDBInfos);
-    FormDbCache::GetInstance().DeleteFormInfoByBundleName(FORM_PROVIDER_BUNDLE_NAME, userId_, oldFormDBInfos);
+    for (auto oldFormDBInfo: oldFormDBInfos) {
+        FormDbCache::GetInstance().DeleteFormInfo(oldFormDBInfo.formId);
+    }
 
     int64_t formId = 0x0ab5bc5f00000000;
     int callingUid {0}, tempCount = 0;
@@ -775,7 +779,9 @@ HWTEST_F(FmsFormMgrAddFormTest, AddForm_010, TestSize.Level0)
     FormDataMgr::GetInstance().ClearFormRecords();
     std::vector<FormDBInfo> oldFormDBInfos;
     FormDbCache::GetInstance().GetAllFormInfo(oldFormDBInfos);
-    FormDbCache::GetInstance().DeleteFormInfoByBundleName(FORM_PROVIDER_BUNDLE_NAME, userId_, oldFormDBInfos);
+    for (auto oldFormDBInfo: oldFormDBInfos) {
+        FormDbCache::GetInstance().DeleteFormInfo(oldFormDBInfo.formId);
+    }
 
     // add form
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().AddForm(0L, want, token_, formJsInfo));
@@ -832,7 +838,9 @@ HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_011, TestSize.Level0)
     FormDataMgr::GetInstance().ClearFormRecords();
     std::vector<FormDBInfo> oldFormDBInfos;
     FormDbCache::GetInstance().GetAllFormInfo(oldFormDBInfos);
-    FormDbCache::GetInstance().DeleteFormInfoByBundleName(FORM_PROVIDER_BUNDLE_NAME, userId_, oldFormDBInfos);
+    for (auto oldFormDBInfo: oldFormDBInfos) {
+        FormDbCache::GetInstance().DeleteFormInfo(oldFormDBInfo.formId);
+    }
 
     BundleInfo bundleInfo;
     FillBundleInfo(FORM_PROVIDER_BUNDLE_NAME, bundleInfo);
