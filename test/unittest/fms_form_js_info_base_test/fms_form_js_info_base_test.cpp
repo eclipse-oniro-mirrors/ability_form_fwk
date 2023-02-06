@@ -90,6 +90,7 @@ HWTEST_F(FmsFormJsInfoBaseTest, FmsFormJsInfoBaseTest_0100, TestSize.Level0)
     parcel.WriteString16(Str8ToStr16(versionName));
     parcel.WriteUint32(10);
     parcel.WriteInt32(10);
+    parcel.WriteInt32(10);
     std::string jsonData = "{ \"abc\" : \"def\"}";
     auto formProviderData = new FormProviderData(jsonData);
     EXPECT_TRUE(parcel.WriteParcelable(formProviderData));
@@ -135,6 +136,7 @@ HWTEST_F(FmsFormJsInfoBaseTest, FmsFormJsInfoBaseTest_0200, TestSize.Level0)
     parcel.WriteString16(Str8ToStr16(versionName));
     parcel.WriteUint32(10);
     parcel.WriteInt32(10);
+    parcel.WriteInt32(10);
     auto result = formJsInfo.ReadFromParcel(parcel);
     EXPECT_FALSE(result);
     GTEST_LOG_(INFO) << "FmsFormJsInfoBaseTest_0200 end";
@@ -174,6 +176,7 @@ HWTEST_F(FmsFormJsInfoBaseTest, FmsFormJsInfoBaseTest_0300, TestSize.Level0)
     std::string versionName = "versionName";
     parcel.WriteString16(Str8ToStr16(versionName));
     parcel.WriteUint32(10);
+    parcel.WriteInt32(10);
     parcel.WriteInt32(10);
     std::string jsonData = "{ \"abc\" : \"def\"}";
     auto formProviderData = new FormProviderData(jsonData);
@@ -217,6 +220,7 @@ HWTEST_F(FmsFormJsInfoBaseTest, FmsFormJsInfoBaseTest_0400, TestSize.Level0)
     std::string versionName = "versionName";
     parcel.WriteString16(Str8ToStr16(versionName));
     parcel.WriteUint32(10);
+    parcel.WriteInt32(10);
     parcel.WriteInt32(10);
     auto result = formJsInfo.Unmarshalling(parcel);
     EXPECT_EQ(result, nullptr);
