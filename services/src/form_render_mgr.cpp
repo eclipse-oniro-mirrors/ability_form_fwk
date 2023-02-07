@@ -113,7 +113,7 @@ ErrCode FormRenderMgr::StopRenderingForm(int64_t formId, const FormRecord &formR
     return ERR_OK;
 }
 
-ErrCode FormRenderMgr::RenderFormCallback(int64_t &formId, const Want &want)
+ErrCode FormRenderMgr::RenderFormCallback(int64_t formId, const Want &want)
 {
     HILOG_INFO("%{public}s called.", __func__);
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
@@ -129,7 +129,7 @@ ErrCode FormRenderMgr::RenderFormCallback(int64_t &formId, const Want &want)
     return ERR_OK;
 }
 
-ErrCode FormRenderMgr::StopRenderingFormCallback(int64_t &formId, const Want &want)
+ErrCode FormRenderMgr::StopRenderingFormCallback(int64_t formId, const Want &want)
 {
     HILOG_INFO("%{public}s called.", __func__);
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);

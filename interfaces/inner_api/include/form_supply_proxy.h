@@ -71,6 +71,21 @@ public:
     void OnShareAcquire(int64_t formId, const std::string &remoteDeviceId,
         const AAFwk::WantParams &wantParams, int64_t requestCode, const bool &result) override;
 
+    /**
+     * @brief Accept form render task done from render service.
+     * @param formId The Id of the form.
+     * @param want input data.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t OnRenderTaskDone(int64_t formId, const Want &want) override;
+
+    /**
+     * @brief Accept form stop rendering task done from render service.
+     * @param formId The Id of the form.
+     * @param want input data.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t OnStopRenderingTaskDone(int64_t formId, const Want &want) override;
 private:
     template<typename T>
     int GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos);

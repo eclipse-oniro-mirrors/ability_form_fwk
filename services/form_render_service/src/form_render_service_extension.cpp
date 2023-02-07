@@ -76,7 +76,6 @@ sptr<IRemoteObject> FormRenderServiceExtension::OnConnect(const AAFwk::Want &wan
     AppExecFwk::AbilityTransactionCallbackInfo<sptr<IRemoteObject>> *callbackInfo, bool &isAsyncCallback)
 {
     HILOG_INFO("%{public}s begin multiParams.", __func__);
-    OHOS::DelayedSingleton<FormRenderImpl>::GetInstance()->SetRuntime(runtime_);
     return OHOS::DelayedSingleton<FormRenderImpl>::GetInstance()->AsObject();
 }
 

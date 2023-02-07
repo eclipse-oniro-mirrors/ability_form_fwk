@@ -42,9 +42,9 @@ public:
 
     ErrCode StopRenderingForm(int64_t formId, const FormRecord &formRecord);
 
-    ErrCode RenderFormCallback(int64_t &formId, const Want &want);
+    ErrCode RenderFormCallback(int64_t formId, const Want &want);
 
-    ErrCode StopRenderingFormCallback(int64_t &formId, const Want &want);
+    ErrCode StopRenderingFormCallback(int64_t formId, const Want &want);
 
     ErrCode AddConnection(sptr<FormAbilityConnection> connection);
 

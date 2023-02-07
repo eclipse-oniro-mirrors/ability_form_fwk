@@ -36,6 +36,10 @@ FormSupplyStub::FormSupplyStub()
         &FormSupplyStub::HandleOnAcquireStateResult;
     memberFuncMap_[static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_SHARE_ACQUIRED)] =
         &FormSupplyStub::HandleOnShareAcquire;
+    memberFuncMap_[static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_RENDER_TASK_DONE)] =
+        &FormSupplyStub::HandleOnRenderTaskDone;
+    memberFuncMap_[static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_STOP_RENDERING_TASK_DONE)] =
+        &FormSupplyStub::HandleOnStopRenderingTaskDone;
 }
 
 FormSupplyStub::~FormSupplyStub()
@@ -186,6 +190,46 @@ int32_t FormSupplyStub::HandleOnShareAcquire(MessageParcel &data, MessageParcel 
     auto result = data.ReadBool();
     OnShareAcquire(formId, remoteDeviceId, *wantParams, requestCode, result);
     return ERR_OK;
+}
+
+int32_t FormSupplyStub::HandleOnRenderTaskDone(MessageParcel &data, MessageParcel &reply)
+{
+    auto formId = data.ReadInt64();
+    if (formId <= 0) {
+        HILOG_ERROR("failed to ReadInt64<formId>");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
+    if (!want) {
+        HILOG_ERROR("%{public}s, failed to ReadParcelable<Want>", __func__);
+        reply.WriteInt32(ERR_APPEXECFWK_PARCEL_ERROR);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    int32_t result = OnRenderTaskDone(formId, *want);
+    reply.WriteInt32(result);
+    return result;
+}
+
+int32_t FormSupplyStub::HandleOnStopRenderingTaskDone(MessageParcel &data, MessageParcel &reply)
+{
+    auto formId = data.ReadInt64();
+    if (formId <= 0) {
+        HILOG_ERROR("failed to ReadInt64<formId>");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
+    if (!want) {
+        HILOG_ERROR("%{public}s, failed to ReadParcelable<Want>", __func__);
+        reply.WriteInt32(ERR_APPEXECFWK_PARCEL_ERROR);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    int32_t result = OnStopRenderingTaskDone(formId, *want);
+    reply.WriteInt32(result);
+    return result;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

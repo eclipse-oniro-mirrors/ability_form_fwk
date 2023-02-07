@@ -282,5 +282,19 @@ void FormSupplyCallback::HandleHostDied(const sptr<IRemoteObject> &hostToken)
         RemoveConnection(connectId);
     }
 }
+
+int32_t FormSupplyCallback::OnRenderTaskDone(int64_t formId, const Want &want)
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    FormRenderMgr::GetInstance().RenderFormCallback(formId, want);
+    return ERR_OK;
+}
+
+int32_t FormSupplyCallback::OnStopRenderingTaskDone(int64_t formId, const Want &want)
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    FormRenderMgr::GetInstance().StopRenderingFormCallback(formId, want);
+    return ERR_OK;
+}
 } // namespace AppExecFwk
 } // namespace OHOS
