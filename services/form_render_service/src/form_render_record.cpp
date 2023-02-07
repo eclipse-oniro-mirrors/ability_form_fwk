@@ -81,7 +81,9 @@ bool FormRenderRecord::CreateEventHandler(const std::string &bundleName)
 int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const Want &want, const sptr<IRemoteObject> hostRemoteObj)
 {
     // Some resources need to be initialized in a JS thread
-    auto task = [renderRecord = shared_from_this(), formJsInfo, want]() {
+    std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
+    auto task = [thisWeakPtr, formJsInfo, want]() {
+        auto renderRecord = thisWeakPtr.lock();
         if (renderRecord == nullptr) {
             HILOG_ERROR("renderRecord is nullptr.");
             return;

@@ -41,13 +41,33 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
     if (resultCode != ERR_OK) {
         HILOG_ERROR("%{public}s, abilityName:%{public}s, formId:%{public}" PRId64 ", resultCode:%{public}d",
            __func__, element.GetAbilityName().c_str(), GetFormId(), resultCode);
+        if (needReconnect_) {
+            FormRenderMgr::GetInstance().ReconnectRenderService();
+        }
+        return;
+    }
+    if (needReconnect_) {
+        FormRenderMgr::GetInstance().RerenderAll();
         return;
     }
     FormRenderMgr::GetInstance().AddConnection(GetFormId(), this);
+    FormRenderMgr::GetInstance().AddRenderDeathRecipient(remoteObject);
     Want want;
     want.SetParams(wantParams_);
     want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
     FormTaskMgr::GetInstance().PostRenderForm(formRecord_, want, remoteObject);
+}
+
+void FormRenderConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
+{
+    if (needReconnect_ && resultCode) {
+        FormRenderMgr::GetInstance().ReconnectRenderService();
+    }
+}
+
+void FormRenderConnection::SetReconnectFlag()
+{
+    needReconnect_ = true;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

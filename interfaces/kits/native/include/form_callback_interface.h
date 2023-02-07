@@ -41,6 +41,14 @@ public:
      *
      */
     virtual void OnDeathReceived() = 0;
+
+    /**
+     * @brief Return error.
+     *
+     * @param errorCode Indicates error-code of the form.
+     * @param errorMsg Indicates error-message of the form.
+     */
+    virtual void OnError(const int32_t errorCode, const std::string &errorMsg) = 0;
 };
 
 class FormStateCallbackInterface {

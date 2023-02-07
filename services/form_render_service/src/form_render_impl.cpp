@@ -30,6 +30,10 @@
 #include "system_ability_definition.h"
 #include "os_account_manager_wrapper.h"
 
+
+
+#include "iservice_registry.h"
+
 namespace OHOS {
 namespace AppExecFwk {
 namespace FormRender {
@@ -63,15 +67,15 @@ int32_t FormRenderImpl::RenderForm(const FormJsInfo &formJsInfo, const Want &wan
 
     sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
     if (formSupplyClient == nullptr) {
-        HILOG_WARN("%{public}s warn, IFormSupply is nullptr", __func__);
+        HILOG_ERROR("%{public}s warn, IFormSupply is nullptr", __func__);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     HILOG_DEBUG("%{public}s come, connectId: %{public}d.", __func__,
         want.GetIntParam(Constants::FORM_CONNECT_ID, 0L));
 
-    int32_t uid = 0;
-    if (!GetUid(formJsInfo.bundleName, uid)) {
-        HILOG_WARN("%{public}s warn, getUid failed", __func__);
+    int32_t uid = want.GetIntParam(Constants::FORM_SUPPLY_UID, 0);
+    if (!uid) {
+        HILOG_ERROR("GetUid failed");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     int32_t result = ERR_OK;
@@ -94,13 +98,13 @@ int32_t FormRenderImpl::StopRenderingForm(const FormJsInfo &formJsInfo, const Wa
     HILOG_INFO("%{public}s called.", __func__);
     sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
     if (formSupplyClient == nullptr) {
-        HILOG_WARN("%{public}s warn, IFormSupply is nullptr", __func__);
+        HILOG_ERROR("%{public}s warn, IFormSupply is nullptr", __func__);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     
-    int32_t uid = 0;
-    if (!GetUid(formJsInfo.bundleName, uid)) {
-        HILOG_WARN("%{public}s warn, getUid failed", __func__);
+    int32_t uid = want.GetIntParam(Constants::FORM_SUPPLY_UID, 0);
+    if (!uid) {
+        HILOG_ERROR("GetUid failed");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     {
@@ -154,7 +158,7 @@ bool FormRenderImpl::GetUid(std::string bundleName, int &uid)
     }
 
     BundleInfo bundleInfo;
-    if (!bundleMgrProxy->GetBundleInfo(bundleName, BundleFlag::GET_BUNDLE_WITH_ABILITIES, activeList.front(), bundleInfo)) {
+    if (!bundleMgrProxy->GetBundleInfo(bundleName, BundleFlag::GET_BUNDLE_WITH_ABILITIES, bundleInfo)) {
         HILOG_ERROR("Get uid failed");
         return false;
     }

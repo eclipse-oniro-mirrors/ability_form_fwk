@@ -178,9 +178,9 @@ public:
     */
     void PostFormShareSendResponse(int64_t formShareRequestCode, int32_t result);
 
-    void PostRenderForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject);
+    void PostRenderForm(const FormRecord &formRecord, Want &want, const sptr<IRemoteObject> &remoteObject);
 
-    void PostStopRenderingForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject);
+    void PostStopRenderingForm(const FormRecord &formRecord, Want &want, const sptr<IRemoteObject> &remoteObject);
 private:
     /**
      * @brief Acquire form data from form provider.
@@ -321,9 +321,9 @@ private:
     * @param formShareRequestCode The request code for this share.
     * @param result The error code of this share.
     */
-    void RenderForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject);
+    void RenderForm(const FormRecord &formRecord, Want &want, const sptr<IRemoteObject> &remoteObject);
 
-    void StopRenderingForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject);
+    void StopRenderingForm(const FormRecord &formRecord, Want &want, const sptr<IRemoteObject> &remoteObject);
 private:
     std::shared_ptr<FormEventHandler> eventHandler_ = nullptr;
 };

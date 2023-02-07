@@ -82,6 +82,7 @@ public:
     MOCK_METHOD1(ProcessFormUpdate, void(const FormJsInfo &formJsInfo));
     MOCK_METHOD1(ProcessFormUninstall, void(const int64_t formId));
     MOCK_METHOD0(OnDeathReceived, void());
+    MOCK_METHOD0(OnError, void(const int32_t errorCode, const std::string &errorMsg));
 };
 
 class ShareFormCallBackMock : public ShareFormCallBack {
