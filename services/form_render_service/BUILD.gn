@@ -1,0 +1,94 @@
+# Copyright (c) 2023 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+import("//foundation/ability/ability_runtime/ability_runtime.gni")
+import("//foundation/ability/form_fwk/form_fwk.gni")
+
+config("formrender_config") {
+  visibility = [ ":*" ]
+  include_dirs = [
+    "//foundation/arkui/ace_engine/frameworks/core/components/form/resource/",
+    "include",
+  ]
+  cflags = []
+  if (target_cpu == "arm") {
+    cflags += [ "-DBINDER_IPC_32BIT" ]
+  }
+}
+
+ohos_hap("formrender_service_hap") {
+  hap_profile = "FormRenderService/entry/src/main/module.json"
+  deps = [
+    ":FormRender_js_assets",
+    ":FormRender_resources",
+  ]
+  shared_libraries = [ ":formrender" ]
+  certificate_profile = "${form_render_service_path}/signature/formrender.p7b"
+  hap_name = "Form_Render_Service"
+  part_name = "form_fwk"
+  subsystem_name = "ability"
+  module_install_dir = "app/com.ohos.formrenderservice"
+}
+
+ohos_js_assets("FormRender_js_assets") {
+  hap_profile = "FormRenderService/entry/src/main/module.json"
+  ets2abc = true
+  source_dir = "FormRenderService/entry/src/main/ets"
+}
+
+ohos_app_scope("FormRender_app_profile") {
+  app_profile = "FormRenderService/AppScope/app.json"
+  sources = [ "FormRenderService/AppScope/resources" ]
+}
+
+ohos_resources("FormRender_resources") {
+  sources = [ "FormRenderService/entry/src/main/resources" ]
+  deps = [ ":FormRender_app_profile" ]
+  hap_profile = "FormRenderService/entry/src/main/module.json"
+}
+
+ohos_shared_library("formrender") {
+  install_enable = true
+
+  configs = [ ":formrender_config" ]
+
+  sources = [
+    "src/form_render_impl.cpp",
+    "src/form_render_record.cpp",
+    "src/form_render_service_extension.cpp",
+  ]
+
+  defines = [ "AMS_LOG_TAG = \"FormRenderService\"" ]
+
+  deps = [ "${form_fwk_path}:form_manager" ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_runtime:ability_manager",
+    "ability_runtime:abilitykit_native",
+    "ability_runtime:app_context",
+    "ability_runtime:runtime",
+    "ability_runtime:service_extension",
+    "ace_engine:ace_form_render",
+    "bundle_framework:appexecfwk_base",
+    "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "hitrace_native:hitrace_meter",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+  ]
+
+  subsystem_name = "ability"
+  part_name = "form_fwk"
+}

@@ -169,6 +169,7 @@ FormRecord FormDataMgr::CreateFormRecord(const FormItemInfo &formInfo, const int
     newRecord.compatibleVersion = formInfo.GetCompatibleVersion();
     newRecord.formVisibleNotifyState = 0;
     newRecord.type = formInfo.GetType();
+    newRecord.uiSyntax = formInfo.GetUiSyntax();
     if (newRecord.isEnableUpdate) {
         ParseUpdateConfig(newRecord, formInfo);
     }
@@ -202,6 +203,7 @@ void FormDataMgr::CreateFormJsInfo(const int64_t formId, const FormRecord &recor
     formInfo.versionName = record.versionName;
     formInfo.compatibleVersion = record.compatibleVersion;
     formInfo.type = record.type;
+    formInfo.uiSyntax = record.uiSyntax;
 }
 /**
  * @brief Check temp form count is max.

@@ -75,6 +75,22 @@ public:
     virtual void OnShareAcquire(int64_t formId, const std::string &remoteDeviceId,
         const AAFwk::WantParams &wantParams, int64_t requestCode, const bool &result) = 0;
 
+    /**
+     * @brief Accept form render task done from render service.
+     * @param formId The Id of the form.
+     * @param want input data.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int32_t OnRenderTaskDone(int64_t formId, const Want &want) = 0;
+
+    /**
+     * @brief Accept form stop rendering task done from render service.
+     * @param formId The Id of the form.
+     * @param want input data.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int32_t OnStopRenderingTaskDone(int64_t formId, const Want &want) = 0;
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -84,6 +100,8 @@ public:
         TRANSACTION_EVENT_HANDLE,
         TRANSACTION_FORM_STATE_ACQUIRED,
         TRANSACTION_FORM_SHARE_ACQUIRED,
+        TRANSACTION_FORM_RENDER_TASK_DONE,
+        TRANSACTION_FORM_STOP_RENDERING_TASK_DONE,
     };
 };
 }  // namespace AppExecFwk

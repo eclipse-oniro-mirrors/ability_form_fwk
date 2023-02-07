@@ -21,6 +21,7 @@
 #include "form_constants.h"
 #include "form_mgr_errors.h"
 #include "form_provider_mgr.h"
+#include "form_render_mgr.h"
 #include "form_share_mgr.h"
 #include "form_task_mgr.h"
 #include "form_util.h"
@@ -68,14 +69,17 @@ int FormSupplyCallback::OnAcquire(const FormProviderInfo &formProviderInfo, cons
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     int64_t formId = std::stoll(strFormId);
-    int type = want.GetIntParam(Constants::ACQUIRE_TYPE, 0);
-    HILOG_DEBUG("%{public}s come: %{public}" PRId64 ", %{public}d, %{public}d",
-        __func__, formId, connectId, type);
-
     if (IsRemoveConnection(formId, want.GetRemoteObject(Constants::PARAM_FORM_HOST_TOKEN))) {
         RemoveConnection(connectId);
     }
 
+    if (FormRenderMgr::GetInstance().IsNeedRender(formId)) {
+        return FormRenderMgr::GetInstance().RenderForm(formId, formProviderInfo, want.GetParams());
+    }
+
+    int type = want.GetIntParam(Constants::ACQUIRE_TYPE, 0);
+    HILOG_DEBUG("%{public}s come: %{public}" PRId64 ", %{public}d, %{public}d",
+        __func__, formId, connectId, type);
     switch (type) {
         case Constants::ACQUIRE_TYPE_CREATE_FORM:
             return FormProviderMgr::GetInstance().AcquireForm(formId, formProviderInfo);
@@ -274,6 +278,20 @@ void FormSupplyCallback::HandleHostDied(const sptr<IRemoteObject> &hostToken)
     for (const auto &connectId : connectIds) {
         RemoveConnection(connectId);
     }
+}
+
+int32_t FormSupplyCallback::OnRenderTaskDone(int64_t formId, const Want &want)
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    FormRenderMgr::GetInstance().RenderFormCallback(formId, want);
+    return ERR_OK;
+}
+
+int32_t FormSupplyCallback::OnStopRenderingTaskDone(int64_t formId, const Want &want)
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    FormRenderMgr::GetInstance().StopRenderingFormCallback(formId, want);
+    return ERR_OK;
 }
 } // namespace AppExecFwk
 } // namespace OHOS
