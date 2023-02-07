@@ -23,11 +23,15 @@
 #include "context_impl.h"
 #include "event_handler.h"
 #include "form_js_info.h"
+#include "form_mgr_errors.h"
+#include "form_renderer_group.h"
 #include "js_runtime.h"
+#include "want.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 namespace FormRender {
+using Want = AAFwk::Want;
 class FormRenderRecord : public std::enable_shared_from_this<FormRenderRecord> {
 public:
     /**
@@ -50,10 +54,20 @@ public:
     /**
      * @brief When add a new form, the corresponding FormRenderRecord needs to be updated.
      * @param formJsInfo formJsInfo.
+     * @param want want.
      * @param hostRemoteObj host token.
-     * @return Returns TRUE: update succeed, FALSE: update failed.
+     * @return Returns ERR_OK on success, others on failure.
      */
-    bool UpdateRenderRecord(const FormJsInfo &formJsInfo, const sptr<IRemoteObject> hostRemoteObj);
+    int32_t UpdateRenderRecord(const FormJsInfo &formJsInfo, const Want &want, const sptr<IRemoteObject> hostRemoteObj);
+
+    /**
+     * @brief When add a new form, the corresponding FormRenderRecord needs to be updated.
+     * @param formId formId.
+     * @param want want.
+     * @param hostRemoteObj host token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t DeleteRenderRecord(int64_t formId, const Want &want, const sptr<IRemoteObject> hostRemoteObj);
 
     /**
      * @brief Get the uid of bundle.
@@ -78,7 +92,15 @@ private:
 
     std::shared_ptr<AbilityRuntime::Context> CreateContext(const FormJsInfo &formJsInfo);
 
-    void HandleUpdateInJsThread(const FormJsInfo &formJsInfo);
+    std::shared_ptr<Ace::FormRendererGroup> GetFormRendererGroup(const FormJsInfo &formJsInfo,
+    const std::shared_ptr<AbilityRuntime::Context> &context, const std::shared_ptr<AbilityRuntime::Runtime> &runtime);
+
+    std::shared_ptr<Ace::FormRendererGroup> CreateFormRendererGroupLock(const FormJsInfo &formJsInfo,
+    const std::shared_ptr<AbilityRuntime::Context> &context, const std::shared_ptr<AbilityRuntime::Runtime> &runtime);
+
+    void HandleUpdateInJsThread(const FormJsInfo &formJsInfo, const Want &want);
+
+    void HandleDeleteInJsThread(int64_t formId, const Want &want);
 
     std::string bundleName_;
     int32_t uid_ = Constants::INVALID_UID;
@@ -91,6 +113,9 @@ private:
     // <moduleName, Context>
     std::mutex contextsMapMutex_;
     std::unordered_map<std::string, std::shared_ptr<AbilityRuntime::Context>> contextsMapForModuleName_;
+    // <formId, formRendererGroup>
+    std::mutex formRendererGroupMutex_;
+    std::map<int64_t, std::shared_ptr<Ace::FormRendererGroup>> formRendererGroupMap_; 
 };
 }  // namespace FormRender
 }  // namespace AppExecFwk

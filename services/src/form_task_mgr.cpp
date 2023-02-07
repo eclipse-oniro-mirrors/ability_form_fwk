@@ -689,7 +689,7 @@ void FormTaskMgr::RenderForm(const FormRecord &formRecord, const Want &want, con
     HILOG_INFO("%{public}s end", __func__);
 }
 
-void FormTaskMgr::PostStopRenderingForm(int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject)
+void FormTaskMgr::PostStopRenderingForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_INFO("%{public}s start", __func__);
     if (eventHandler_ == nullptr) {
@@ -697,14 +697,14 @@ void FormTaskMgr::PostStopRenderingForm(int64_t formId, const Want &want, const 
         return;
     }
 
-    auto deleterenderForm = [formId, want, remoteObject]() {
-        FormTaskMgr::GetInstance().StopRenderingForm(formId, want, remoteObject);
+    auto deleterenderForm = [formRecord, want, remoteObject]() {
+        FormTaskMgr::GetInstance().StopRenderingForm(formRecord, want, remoteObject);
     };
     eventHandler_->PostTask(deleterenderForm, FORM_TASK_DELAY_TIME);
     HILOG_INFO("%{public}s end", __func__);
 }
 
-void FormTaskMgr::StopRenderingForm(int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject)
+void FormTaskMgr::StopRenderingForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_INFO("%{public}s begin", __func__);
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
@@ -715,7 +715,8 @@ void FormTaskMgr::StopRenderingForm(int64_t formId, const Want &want, const sptr
         return;
     }
 
-    int32_t error = remoteFormDeleteRender->StopRenderingForm(formId, want, FormSupplyCallback::GetInstance());
+    FormJsInfo formJsInfo = CreateFormJsInfo(formRecord.formId, formRecord);
+    int32_t error = remoteFormDeleteRender->StopRenderingForm(formJsInfo, want, FormSupplyCallback::GetInstance());
     if (error != ERR_OK) {
         FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
         HILOG_ERROR("%{public}s fail, Failed to add form renderer", __func__);

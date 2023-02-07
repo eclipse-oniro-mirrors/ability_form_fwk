@@ -17,6 +17,7 @@
 #define OHOS_FORM_FWK_FORM_RENDER_MGR_H
 
 #include <singleton.h>
+#include <unordered_set>
 
 #include "form_record.h"
 #include "form_ability_connection.h"
@@ -46,16 +47,22 @@ public:
 
     ErrCode StopRenderingFormCallback(int64_t formId, const Want &want);
 
-    ErrCode AddConnection(sptr<FormAbilityConnection> connection);
+    ErrCode AddConnection(int64_t formId, sptr<FormAbilityConnection> connection);
 
-    void HandleHostDied(int64_t formId);
+    ErrCode RemoveConnection(int64_t formId);
 
     bool IsNeedRender(int64_t formId);
 private:
-    bool IsRemoveConnection(int64_t formId);
-private:
+    class FormAbilityConHash {
+    public:
+        size_t operator() (const sptr<FormAbilityConnection> remoteObj) const
+        {
+            return reinterpret_cast<size_t>(remoteObj.GetRefPtr());
+        }
+    };
+    int32_t maxConnectKey = 0;
     mutable std::mutex conMutex_;
-    std::map<int32_t, sptr<FormAbilityConnection>> renderFormConnections_;
+    std::map<int64_t, std::unordered_set<sptr<FormAbilityConnection>, FormAbilityConHash>> renderFormConnections_;
 };
 } // namespace AppExecFwk
 } // namespace OHOS

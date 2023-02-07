@@ -43,7 +43,7 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
            __func__, element.GetAbilityName().c_str(), GetFormId(), resultCode);
         return;
     }
-    FormRenderMgr::GetInstance().AddConnection(this);
+    FormRenderMgr::GetInstance().AddConnection(GetFormId(), this);
     Want want;
     want.SetParams(wantParams_);
     want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());

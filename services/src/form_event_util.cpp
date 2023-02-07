@@ -20,6 +20,7 @@
 #include "form_data_mgr.h"
 #include "form_db_cache.h"
 #include "form_info_mgr.h"
+#include "form_render_mgr.h"
 #include "form_timer_mgr.h"
 #include "form_util.h"
 #include "form_provider_mgr.h"
@@ -82,6 +83,7 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
         FormDataMgr::GetInstance().CleanHostRemovedForms(removedForms);
         for (const int64_t id : removedForms) {
             FormTimerMgr::GetInstance().RemoveFormTimer(id);
+            FormRenderMgr::GetInstance().RemoveConnection(id);
         }
     }
 
@@ -125,6 +127,7 @@ void FormEventUtil::HandleProviderRemoved(const std::string &bundleName, const i
     // clean removed form timers
     for (auto &formId : removedForms) {
         FormTimerMgr::GetInstance().RemoveFormTimer(formId);
+        FormRenderMgr::GetInstance().RemoveConnection(formId);
     }
 }
 

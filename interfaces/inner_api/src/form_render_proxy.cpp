@@ -62,7 +62,7 @@ int32_t FormRenderProxy::RenderForm(const FormJsInfo &formJsInfo, const Want &wa
     return ERR_OK;
 }
 
-int32_t FormRenderProxy::StopRenderingForm(int64_t formId, const Want &want,
+int32_t FormRenderProxy::StopRenderingForm(const FormJsInfo &formJsInfo, const Want &want,
     const sptr<IRemoteObject> &callerToken)
 {
     MessageParcel data;
@@ -73,8 +73,8 @@ int32_t FormRenderProxy::StopRenderingForm(int64_t formId, const Want &want,
         HILOG_ERROR("%{public}s, failed to write interface token", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (!data.WriteInt64(formId)) {
-        HILOG_ERROR("%{public}s fail, write formId error", __func__);
+    if (!data.WriteParcelable(&formJsInfo)) {
+        HILOG_ERROR("%{public}s fail, write formJsInfo error", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.WriteParcelable(&want)) {

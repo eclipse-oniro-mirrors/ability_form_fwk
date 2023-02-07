@@ -24,7 +24,6 @@
 #include "form_record.h"
 #include "form_state_info.h"
 #include "iremote_object.h"
-#include "form_record.h"
 #include "want.h"
 
 namespace OHOS {
@@ -181,7 +180,7 @@ public:
 
     void PostRenderForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject);
 
-    void PostStopRenderingForm(int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject);
+    void PostStopRenderingForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject);
 private:
     /**
      * @brief Acquire form data from form provider.
@@ -324,7 +323,7 @@ private:
     */
     void RenderForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject);
 
-    void StopRenderingForm(int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject);
+    void StopRenderingForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject);
 private:
     std::shared_ptr<FormEventHandler> eventHandler_ = nullptr;
 };

@@ -84,7 +84,11 @@ int FormRenderStub::HandleRenderForm(MessageParcel &data, MessageParcel &reply)
 
 int FormRenderStub::HandleStopRenderingForm(MessageParcel &data, MessageParcel &reply)
 {
-    int64_t formId = data.ReadInt64();
+    std::unique_ptr<FormJsInfo> formJsInfo(data.ReadParcelable<FormJsInfo>());
+    if (!formJsInfo) {
+        HILOG_ERROR("%{public}s, failed to ReadParcelable<formJsInfo>", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
         HILOG_ERROR("%{public}s, failed to ReadParcelable<Want>", __func__);
@@ -97,7 +101,7 @@ int FormRenderStub::HandleStopRenderingForm(MessageParcel &data, MessageParcel &
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    int32_t result = StopRenderingForm(formId, *want, client);
+    int32_t result = StopRenderingForm(*formJsInfo, *want, client);
     reply.WriteInt32(result);
     return result;
 }

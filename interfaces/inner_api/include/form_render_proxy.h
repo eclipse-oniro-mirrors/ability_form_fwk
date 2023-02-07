@@ -41,7 +41,7 @@ public:
      */
     int32_t RenderForm(const FormJsInfo &formJsInfo, const Want &want, const sptr<IRemoteObject> &callerToken) override;
 
-    int32_t StopRenderingForm(int64_t formId, const Want &want, const sptr<IRemoteObject> &callerToken) override;
+    int32_t StopRenderingForm(const FormJsInfo &formJsInfo, const Want &want, const sptr<IRemoteObject> &callerToken) override;
 private:
     template<typename T>
     int32_t GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos);

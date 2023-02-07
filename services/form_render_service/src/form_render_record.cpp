@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace FormRender {
-
+constexpr int32_t RENDER_FORM_FAILED = -1;
 std::shared_ptr<FormRenderRecord> FormRenderRecord::Create(const std::string &bundleName, int32_t uid)
 {
     std::shared_ptr<FormRenderRecord> renderRecord = std::make_shared<FormRenderRecord>(bundleName, uid);
@@ -78,24 +78,23 @@ bool FormRenderRecord::CreateEventHandler(const std::string &bundleName)
     return true;
 }
 
-bool FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const sptr<IRemoteObject> hostRemoteObj)
+int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const Want &want, const sptr<IRemoteObject> hostRemoteObj)
 {
     // Some resources need to be initialized in a JS thread
-    auto task = [renderRecord = shared_from_this(), formJsInfo]() {
+    auto task = [renderRecord = shared_from_this(), formJsInfo, want]() {
         if (renderRecord == nullptr) {
             HILOG_ERROR("renderRecord is nullptr.");
             return;
         }
-        renderRecord->HandleUpdateInJsThread(formJsInfo);
+        renderRecord->HandleUpdateInJsThread(formJsInfo, want);
     };
     
     if (eventHandler_ == nullptr) {
         HILOG_ERROR("eventHandler_ is nullptr");
-        return false;
+        return RENDER_FORM_FAILED;
     }
     eventHandler_->PostTask(task);
 
-    CreateContext(formJsInfo);
     std::lock_guard<std::mutex> lock(hostsMapMutex_);
     auto item = hostsMapForFormId_.find(formJsInfo.formId);
     if (item == hostsMapForFormId_.end()) {
@@ -103,7 +102,32 @@ bool FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const sp
         item = hostsMapForFormId_.begin();
     }
     item->second.emplace(hostRemoteObj);
-    return true;
+    return ERR_OK;
+}
+
+int32_t FormRenderRecord::DeleteRenderRecord(int64_t formId, const Want &want, const sptr<IRemoteObject> hostRemoteObj)
+{
+    // Some resources need to be initialized in a JS thread
+    auto task = [renderRecord = shared_from_this(), formId, want]() {
+        if (renderRecord == nullptr) {
+            HILOG_ERROR("renderRecord is nullptr.");
+            return;
+        }
+        renderRecord->HandleDeleteInJsThread(formId, want);
+    };
+    
+    if (eventHandler_ == nullptr) {
+        HILOG_ERROR("eventHandler_ is nullptr");
+        return RENDER_FORM_FAILED;
+    }
+    eventHandler_->PostTask(task);
+
+    std::lock_guard<std::mutex> lock(hostsMapMutex_);
+    hostsMapForFormId_.erase(formId);
+    if (hostsMapForFormId_.size() == 0) {
+        return RENDER_FORM_FAILED;
+    }
+    return ERR_OK;
 }
 
 int32_t FormRenderRecord::GetUid() const
@@ -173,12 +197,77 @@ std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::CreateContext(const F
     return context;
 }
 
-void FormRenderRecord::HandleUpdateInJsThread(const FormJsInfo &formJsInfo)
+std::shared_ptr<Ace::FormRendererGroup> FormRenderRecord::GetFormRendererGroup(const FormJsInfo &formJsInfo,
+    const std::shared_ptr<AbilityRuntime::Context> &context, const std::shared_ptr<AbilityRuntime::Runtime> &runtime)
+{
+    std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
+    auto key = formJsInfo.formId;
+    auto formRendererGroup = CreateFormRendererGroupLock(formJsInfo, context, runtime);
+    if (formRendererGroup != nullptr) {
+        formRendererGroupMap_.emplace(key, formRendererGroup);
+    }
+    return formRendererGroup;
+}
+
+std::shared_ptr<Ace::FormRendererGroup> FormRenderRecord::CreateFormRendererGroupLock(const FormJsInfo &formJsInfo,
+    const std::shared_ptr<AbilityRuntime::Context> &context, const std::shared_ptr<AbilityRuntime::Runtime> &runtime)
+{
+    auto& nativeEngine = (static_cast<AbilityRuntime::JsRuntime&>(*runtime.get())).GetNativeEngine();
+    HILOG_ERROR("Ace formRendererGroup create context_ = %{public}p nativeEngine = %{public}p",
+        context.get(), &nativeEngine);
+    auto formRendererGroup = Ace::FormRendererGroup::Create(context, runtime);
+    if (formRendererGroup == nullptr) {
+        HILOG_ERROR("Create formRendererGroup failed");
+        return nullptr;
+    }
+    return formRendererGroup;
+}
+
+void FormRenderRecord::HandleUpdateInJsThread(const FormJsInfo &formJsInfo, const Want &want)
 {
     if (runtime_ == nullptr && !CreateRuntime(formJsInfo)) {
         HILOG_ERROR("Create runtime failed.");
         return;
     }
+    auto context = GetContext(formJsInfo);
+    if (context == nullptr) {
+        HILOG_ERROR("Create Context failed.");
+        return;
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
+        if (auto search = this->formRendererGroupMap_.find(formJsInfo.formId);
+            search != this->formRendererGroupMap_.end()) {
+            auto group = search->second;
+            group->UpdateForm(formJsInfo);
+            return;
+        }
+    }
+
+    auto formRendererGroup = this->GetFormRendererGroup(formJsInfo, context, runtime_);
+    if (formRendererGroup == nullptr) {
+        HILOG_ERROR("Create formRendererGroup failed.");
+        return;
+    }
+    formRendererGroup->AddForm(want, formJsInfo);
+    return;
+}
+
+void FormRenderRecord::HandleDeleteInJsThread(int64_t formId, const Want &want)
+{
+    {
+        auto compId = want.GetStringParam("ohos.extra.param.key.form_comp_id");
+        std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
+        if (auto search = this->formRendererGroupMap_.find(formId);
+            search != this->formRendererGroupMap_.end()) {
+            auto group = search->second;
+            group->DeleteForm(compId);
+            return;
+        }
+    }
+    HILOG_ERROR("HandleDeleteInJsThread failed. FormRendererGroup was not found.");
+    return;
 }
 } // namespace FormRender
 } // namespace AppExecFwk

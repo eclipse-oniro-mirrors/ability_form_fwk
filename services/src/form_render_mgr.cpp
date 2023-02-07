@@ -47,7 +47,15 @@ ErrCode FormRenderMgr::RenderForm(const FormRecord &formRecord, const WantParams
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    sptr<IAbilityConnection> formRenderConnection = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
+    sptr<IAbilityConnection> formRenderConnection;
+    auto conIterator = renderFormConnections_.find(formRecord.formId);
+    if (conIterator != renderFormConnections_.end()) {
+        auto connection = conIterator->second.begin();
+        formRenderConnection = *connection;
+    } else {
+        formRenderConnection = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
+    }
+    
     if (formRenderConnection == nullptr) {
         HILOG_ERROR("formRenderConnection is null.");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
@@ -95,7 +103,7 @@ ErrCode FormRenderMgr::StopRenderingForm(int64_t formId, const FormRecord &formR
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    sptr<IAbilityConnection> formStopRenderingConnection = new (std::nothrow) FormStopRenderingConnection(formId,
+    sptr<IAbilityConnection> formStopRenderingConnection = new (std::nothrow) FormStopRenderingConnection(formRecord,
             formRecord.bundleName, formRecord.abilityName);
     if (formStopRenderingConnection == nullptr) {
         HILOG_ERROR("formStopRenderingConnection is null.");
@@ -116,16 +124,6 @@ ErrCode FormRenderMgr::StopRenderingForm(int64_t formId, const FormRecord &formR
 ErrCode FormRenderMgr::RenderFormCallback(int64_t formId, const Want &want)
 {
     HILOG_INFO("%{public}s called.", __func__);
-    auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
-    {
-        std::lock_guard<std::mutex> lock(conMutex_);
-        sptr<FormAbilityConnection> formAbilityConnection;
-        auto conIterator = renderFormConnections_.find(connectId);
-        if (IsRemoveConnection(formId)) {
-            FormAmsHelper::GetInstance().DisconnectServiceAbility(conIterator->second);
-            renderFormConnections_.erase(connectId);
-        }
-    }
     return ERR_OK;
 }
 
@@ -133,16 +131,14 @@ ErrCode FormRenderMgr::StopRenderingFormCallback(int64_t formId, const Want &wan
 {
     HILOG_INFO("%{public}s called.", __func__);
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
-    sptr<FormAbilityConnection> connection = nullptr;
     {
         std::lock_guard<std::mutex> lock(conMutex_);
-        auto conIterator = renderFormConnections_.find(connectId);
-        FormAmsHelper::GetInstance().DisconnectServiceAbility(conIterator->second);
-        renderFormConnections_.erase(connectId);
-        for (auto &conn : renderFormConnections_) {
-            if (conn.second->GetFormId() == formId) {
-                FormAmsHelper::GetInstance().DisconnectServiceAbility(conn.second);
-                renderFormConnections_.erase(conn.first);
+        auto conIterator = renderFormConnections_.find(formId);
+        for (auto &conn : conIterator->second) {
+            if (conn->GetConnectId() == connectId) {
+                FormAmsHelper::GetInstance().DisconnectServiceAbility(conn);
+                std::unordered_set<sptr<FormAbilityConnection>, FormAbilityConHash> &connection = conIterator->second;
+                connection.erase(conn);
                 break;
             }
         }
@@ -150,7 +146,7 @@ ErrCode FormRenderMgr::StopRenderingFormCallback(int64_t formId, const Want &wan
     return ERR_OK;
 }
 
-ErrCode FormRenderMgr::AddConnection(sptr<FormAbilityConnection> connection)
+ErrCode FormRenderMgr::AddConnection(int64_t formId, sptr<FormAbilityConnection> connection)
 {
     HILOG_INFO("%{public}s called.", __func__);
     if (connection == nullptr) {
@@ -159,48 +155,34 @@ ErrCode FormRenderMgr::AddConnection(sptr<FormAbilityConnection> connection)
     {
         int32_t connectKey = static_cast<int32_t>(FormUtil::GetCurrentMillisecond());
         std::lock_guard<std::mutex> lock(conMutex_);
-        while (renderFormConnections_.find(connectKey) != renderFormConnections_.end()) {
-            connectKey++;
+        if (connectKey <= maxConnectKey) {
+            connectKey = maxConnectKey + 1;
         }
         connection->SetConnectId(connectKey);
-        renderFormConnections_.emplace(connectKey, connection);
+        auto conIterator = renderFormConnections_.find(formId);
+        if (conIterator == renderFormConnections_.end()) {
+            renderFormConnections_.emplace(formId, std::unordered_set<sptr<FormAbilityConnection>, FormAbilityConHash>());
+            conIterator = renderFormConnections_.begin();
+        }
+        conIterator->second.emplace(connection);
     }
     HILOG_INFO("%{public}s end.", __func__);
     return ERR_OK;
 }
 
-void FormRenderMgr::HandleHostDied(int64_t formId)
+ErrCode FormRenderMgr::RemoveConnection(int64_t formId)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
     {
         std::lock_guard<std::mutex> lock(conMutex_);
-        for (const auto &conn : renderFormConnections_) {
-            if (conn.second->GetFormId() == formId) {
-                FormAmsHelper::GetInstance().DisconnectServiceAbility(conn.second);
-                renderFormConnections_.erase(conn.first);
-                HILOG_DEBUG("remove the connection, connect id is %{public}d", conn.first);
-                break;
-            }
+        auto conIterator = renderFormConnections_.find(formId);
+        for (auto &conn : conIterator->second) {
+            FormAmsHelper::GetInstance().DisconnectServiceAbility(conn);
         }
+        renderFormConnections_.erase(formId);
     }
-}
-
-bool FormRenderMgr::IsRemoveConnection(int64_t formId)
-{
-    HILOG_DEBUG("%{public}s called. formId is %{public}" PRId64, __func__, formId);
-    // keep one connection for each in application form in the same host
-    int32_t count = 0;
-    for (const auto &conn : renderFormConnections_) {
-        if (formId == conn.second->GetFormId()) {
-            count++;
-        }
-    }
-    HILOG_DEBUG("%{public}s called. count is %{public}d", __func__, count);
-    if (count == 1) {
-        HILOG_DEBUG("keep the connection");
-        return false;
-    }
-    return true;
+    HILOG_INFO("%{public}s end.", __func__);
+    return ERR_OK;
 }
 
 bool FormRenderMgr::IsNeedRender(int64_t formId)
