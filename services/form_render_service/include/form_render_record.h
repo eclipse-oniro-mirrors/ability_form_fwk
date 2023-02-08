@@ -88,9 +88,9 @@ private:
 
     bool CreateRuntime(const FormJsInfo &formJsInfo);
 
-    std::shared_ptr<AbilityRuntime::Context> GetContext(const FormJsInfo &formJsInfo);
+    std::shared_ptr<AbilityRuntime::Context> GetContext(const FormJsInfo &formJsInfo, const Want &want);
 
-    std::shared_ptr<AbilityRuntime::Context> CreateContext(const FormJsInfo &formJsInfo);
+    std::shared_ptr<AbilityRuntime::Context> CreateContext(const FormJsInfo &formJsInfo, const Want &want);
 
     std::shared_ptr<Ace::FormRendererGroup> GetFormRendererGroup(const FormJsInfo &formJsInfo,
     const std::shared_ptr<AbilityRuntime::Context> &context, const std::shared_ptr<AbilityRuntime::Runtime> &runtime);
@@ -115,7 +115,7 @@ private:
     std::unordered_map<std::string, std::shared_ptr<AbilityRuntime::Context>> contextsMapForModuleName_;
     // <formId, formRendererGroup>
     std::mutex formRendererGroupMutex_;
-    std::map<int64_t, std::shared_ptr<Ace::FormRendererGroup>> formRendererGroupMap_; 
+    std::map<int64_t, std::shared_ptr<Ace::FormRendererGroup>> formRendererGroupMap_;
 };
 }  // namespace FormRender
 }  // namespace AppExecFwk

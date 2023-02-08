@@ -103,6 +103,9 @@ public:
      */
     int32_t GetUidByBundleName(const std::string &bundleName, int32_t userId);
 
+    bool GetCompileMode(const std::string &bundleName, const std::string &moduleName,
+        int32_t userId, int32_t &compileMode);
+
     static constexpr int64_t INVALID_UID = -1;
 private:
     /**

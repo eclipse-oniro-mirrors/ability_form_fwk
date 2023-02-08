@@ -166,7 +166,7 @@ namespace Constants {
         {Dimension::DIMENSION_4_4, "4*4"},
         {Dimension::DIMENSION_2_1, "2*1"}
     };
-    
+
     // rdb
     constexpr const char* FORM_RDB_NAME = "/formdb.db";
     constexpr const char* FORM_RDB_TABLE_NAME = "form_table";
@@ -174,6 +174,10 @@ namespace Constants {
     constexpr const char* FORM_JOURNAL_MODE = "WAL";
     constexpr const char* FORM_SYNC_MODE = "FULL";
     constexpr int32_t FORM_RDB_VERSION = 1;
+    constexpr const char* FORM_RENDER_TYPE_KEY = "form_render_type";
+    constexpr int32_t RENDER_FORM = 0; // default value
+    constexpr int32_t UPDATE_RENDERING_FORM = 1;
+    constexpr const char* FORM_COMPILE_MODE_KEY = "form_compile_mode";
 }  // namespace Constants
 }  // namespace AppExecFwk
 }  // namespace OHOS
