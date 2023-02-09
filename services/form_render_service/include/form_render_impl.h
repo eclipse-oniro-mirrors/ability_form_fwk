@@ -23,8 +23,8 @@
 
 #include "bundle_mgr_interface.h"
 #include "context_impl.h"
-#include "form_render_record.h"
 #include "event_handler.h"
+#include "form_render_record.h"
 #include "js_runtime.h"
 #include "runtime.h"
 #include "want.h"
@@ -56,12 +56,12 @@ public:
      * @param callerToken Caller ability token.
      * @return Returns ERR_OK on success, others on failure.
      */
-    int32_t StopRenderingForm(const FormJsInfo &formJsInfo, const Want &want, const sptr<IRemoteObject> &callerToken) override;
-private:
-    bool GetUid(std::string bundleName, int &uid);
+    int32_t StopRenderingForm(
+        const FormJsInfo &formJsInfo, const Want &want, const sptr<IRemoteObject> &callerToken) override;
+
 private:
     std::mutex renderRecordMutex_;
-    std::map<int32_t, std::shared_ptr<FormRenderRecord>> renderRecordMap_; // <userId, renderRecord>
+    std::unordered_map<int32_t, std::shared_ptr<FormRenderRecord>> renderRecordMap_; // <userId, renderRecord>
 };
 } // namespace FormRender
 } // namespace AppExecFwk

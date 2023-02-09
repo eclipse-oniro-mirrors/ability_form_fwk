@@ -37,7 +37,7 @@ FormRenderConnection::FormRenderConnection(const FormRecord &formRecord,
 void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &element,
     const sptr<IRemoteObject> &remoteObject, int resultCode)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("ConnectDone, needReconnectFlag: %{public}d", needReconnect_);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("%{public}s, abilityName:%{public}s, formId:%{public}" PRId64 ", resultCode:%{public}d",
            __func__, element.GetAbilityName().c_str(), GetFormId(), resultCode);
@@ -60,6 +60,7 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
 
 void FormRenderConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
 {
+    HILOG_INFO("DisconnectDone, needReconnectFlag: %{public}d", needReconnect_);
     if (needReconnect_ && resultCode) {
         FormRenderMgr::GetInstance().ReconnectRenderService();
     }

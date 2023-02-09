@@ -53,16 +53,19 @@ ErrCode FormRenderMgr::RenderForm(const FormRecord &formRecord, const WantParams
     }
 
     sptr<IAbilityConnection> formRenderConnection;
-    auto conIterator = renderFormConnections_.find(formRecord.formId);
-    if (conIterator != renderFormConnections_.end()) {
-        auto connection = conIterator->second.first;
-        if (connection == nullptr) {
-            HILOG_ERROR("connection is null.");
-            return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    {
+        std::lock_guard<std::mutex> lock(conMutex_);
+        auto conIterator = renderFormConnections_.find(formRecord.formId);
+        if (conIterator != renderFormConnections_.end()) {
+            auto connection = conIterator->second.first;
+            if (connection == nullptr) {
+                HILOG_ERROR("connection is null.");
+                return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+            }
+            formRenderConnection = connection;
+        } else {
+            formRenderConnection = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
         }
-        formRenderConnection = connection;
-    } else {
-        formRenderConnection = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
     }
     
     AddHostToken(formRecord.formId);
@@ -111,8 +114,8 @@ ErrCode FormRenderMgr::StopRenderingForm(int64_t formId, const FormRecord &formR
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    sptr<IAbilityConnection> formStopRenderingConnection = new (std::nothrow) FormStopRenderingConnection(formRecord,
-            formRecord.bundleName, formRecord.abilityName);
+    sptr<IAbilityConnection> formStopRenderingConnection =
+        new (std::nothrow) FormStopRenderingConnection(formRecord, formRecord.bundleName, formRecord.abilityName);
     if (formStopRenderingConnection == nullptr) {
         HILOG_ERROR("formStopRenderingConnection is null.");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
@@ -226,7 +229,7 @@ void FormRenderMgr::RerenderAll()
     reconnectCount_ = 0;
     std::lock_guard<std::mutex> lock(conMutex_);
     for (const auto &item : renderFormConnections_) {
-        auto renderConnection = item.second.second;
+        auto renderConnection = item.second.first;
         ConnectRenderService(renderConnection);
     }
     FormAmsHelper::GetInstance().DisconnectServiceAbility(reconnectRenderConnection_);

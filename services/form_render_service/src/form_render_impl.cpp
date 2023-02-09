@@ -22,17 +22,11 @@
 #include "form_bms_helper.h"
 #include "form_constants.h"
 #include "form_render_service_extension.h"
-#include "form_util.h"
 #include "form_supply_proxy.h"
+#include "form_util.h"
 #include "hilog_wrapper.h"
 #include "js_runtime.h"
 #include "service_extension.h"
-#include "system_ability_definition.h"
-#include "os_account_manager_wrapper.h"
-
-
-
-#include "iservice_registry.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -124,46 +118,6 @@ int32_t FormRenderImpl::StopRenderingForm(const FormJsInfo &formJsInfo, const Wa
 
     formSupplyClient->OnStopRenderingTaskDone(formJsInfo.formId, want);
     return ERR_OK;
-}
-
-bool FormRenderImpl::GetUid(std::string bundleName, int &uid)
-{
-    auto systemAbilityMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (systemAbilityMgr == nullptr) {
-        HILOG_ERROR("Failed to get SystemAbilityManager.");
-        return false;
-    }
-
-    auto bundleObj = systemAbilityMgr->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
-    if (bundleObj == nullptr) {
-        HILOG_ERROR("Failed to get bundle manager service");
-        return false;
-    }
-
-    sptr<OHOS::AppExecFwk::IBundleMgr> bundleMgrProxy = iface_cast<OHOS::AppExecFwk::IBundleMgr>(bundleObj);
-    if (bundleMgrProxy == nullptr) {
-        HILOG_ERROR("Bundle mgr proxy is nullptr");
-        return false;
-    }
-
-    std::vector<int32_t> activeList;
-    ErrCode errCode = DelayedSingleton<OsAccountManagerWrapper>::GetInstance()->QueryActiveOsAccountIds(activeList);
-    if (errCode != ERR_OK) {
-        HILOG_ERROR("QueryActiveOsAccountIds failed.");
-        return false;
-    }
-    if (activeList.empty()) {
-        HILOG_ERROR("QueryActiveOsAccountIds is empty, no accounts.");
-        return false;
-    }
-
-    BundleInfo bundleInfo;
-    if (!bundleMgrProxy->GetBundleInfo(bundleName, BundleFlag::GET_BUNDLE_WITH_ABILITIES, bundleInfo)) {
-        HILOG_ERROR("Get uid failed");
-        return false;
-    }
-    uid = bundleInfo.uid;
-    return true;
 }
 } // namespace FormRender
 } // namespace AppExecFwk

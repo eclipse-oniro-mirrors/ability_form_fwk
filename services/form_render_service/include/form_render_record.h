@@ -61,7 +61,7 @@ public:
     int32_t UpdateRenderRecord(const FormJsInfo &formJsInfo, const Want &want, const sptr<IRemoteObject> hostRemoteObj);
 
     /**
-     * @brief When add a new form, the corresponding FormRenderRecord needs to be updated.
+     * @brief When all forms of an bundle are deleted, the corresponding FormRenderRecord-record needs to be removed
      * @param formId formId.
      * @param want want.
      * @param hostRemoteObj host token.

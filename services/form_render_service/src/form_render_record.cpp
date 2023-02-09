@@ -110,7 +110,9 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
 int32_t FormRenderRecord::DeleteRenderRecord(int64_t formId, const Want &want, const sptr<IRemoteObject> hostRemoteObj)
 {
     // Some resources need to be initialized in a JS thread
-    auto task = [renderRecord = shared_from_this(), formId, want]() {
+    std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
+    auto task = [thisWeakPtr, formId, want]() {
+        auto renderRecord = thisWeakPtr.lock();
         if (renderRecord == nullptr) {
             HILOG_ERROR("renderRecord is nullptr.");
             return;
@@ -126,7 +128,7 @@ int32_t FormRenderRecord::DeleteRenderRecord(int64_t formId, const Want &want, c
 
     std::lock_guard<std::mutex> lock(hostsMapMutex_);
     hostsMapForFormId_.erase(formId);
-    if (hostsMapForFormId_.size() == 0) {
+    if (hostsMapForFormId_.empty()) {
         return RENDER_FORM_FAILED;
     }
     return ERR_OK;
@@ -215,7 +217,7 @@ std::shared_ptr<Ace::FormRendererGroup> FormRenderRecord::CreateFormRendererGrou
     const std::shared_ptr<AbilityRuntime::Context> &context, const std::shared_ptr<AbilityRuntime::Runtime> &runtime)
 {
     auto& nativeEngine = (static_cast<AbilityRuntime::JsRuntime&>(*runtime.get())).GetNativeEngine();
-    HILOG_ERROR("Ace formRendererGroup create context_ = %{public}p nativeEngine = %{public}p",
+    HILOG_INFO("Ace formRendererGroup create context_ = %{public}p nativeEngine = %{public}p",
         context.get(), &nativeEngine);
     auto formRendererGroup = Ace::FormRendererGroup::Create(context, runtime);
     if (formRendererGroup == nullptr) {
