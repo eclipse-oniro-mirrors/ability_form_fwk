@@ -209,6 +209,10 @@ int32_t FormMgrStub::HandleUpdateForm(MessageParcel &data, MessageParcel &reply)
 {
     int64_t formId = data.ReadInt64();
     std::unique_ptr<FormProviderData> formBindingData(data.ReadParcelable<FormProviderData>());
+    if (formBindingData == nullptr) {
+        HILOG_ERROR("%{public}s, failed to get formBindingData.", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     int32_t result = UpdateForm(formId, *formBindingData);
     reply.WriteInt32(result);
     return result;
@@ -246,6 +250,10 @@ ErrCode FormMgrStub::HandleRequestPublishForm(MessageParcel &data, MessageParcel
     std::unique_ptr<FormProviderData> formProviderData = nullptr;
     if (withFormBindingData) {
         formProviderData.reset(data.ReadParcelable<FormProviderData>());
+    }
+    if (formProviderData == nullptr) {
+        HILOG_ERROR("%{public}s, failed to get formProviderData.", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     int64_t formId = 0;
@@ -722,6 +730,10 @@ int32_t FormMgrStub::HandleGetFormsInfo(MessageParcel &data, MessageParcel &repl
     HILOG_INFO("%{public}s called.", __func__);
     // read filter from data.
     std::unique_ptr<FormInfoFilter> filter(data.ReadParcelable<FormInfoFilter>());
+    if (filter == nullptr) {
+        HILOG_ERROR("%{public}s, failed to get filter.", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     // write result of calling FMS into reply.
     std::vector<FormInfo> infos;
     // call FormMgrService to get formInfos into infos.
@@ -743,6 +755,10 @@ int32_t FormMgrStub::HandleShareForm(MessageParcel &data, MessageParcel &reply)
     int64_t formId = data.ReadInt64();
     std::string deviceId = data.ReadString();
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
+    if (callerToken == nullptr) {
+        HILOG_ERROR("%{public}s, failed to get remote object.", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
     int64_t requestCode = data.ReadInt64();
 
     auto result = ShareForm(formId, deviceId, callerToken, requestCode);
