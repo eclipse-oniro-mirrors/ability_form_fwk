@@ -71,5 +71,11 @@ void MockFormHostClient::OnShareFormResponse(int64_t requestCode, int32_t result
     HILOG_DEBUG("MockFormHostClient OnShareFormResponse");
     PostVoid();
 }
+
+void MockFormHostClient::OnError(int32_t errorCode, const std::string &errorMsg)
+{
+    HILOG_DEBUG("MockFormHostClient OnError");
+    PostVoid();
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

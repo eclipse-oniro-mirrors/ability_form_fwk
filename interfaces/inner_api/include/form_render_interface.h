@@ -51,7 +51,7 @@ public:
      * @param callerToken Caller ability token.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual int32_t StopRenderingForm(int64_t formId, const Want &want, const sptr<IRemoteObject> &callerToken) = 0;
+    virtual int32_t StopRenderingForm(const FormJsInfo &formJsInfo, const Want &want, const sptr<IRemoteObject> &callerToken) = 0;
 
     enum class Message {
         // ipc id 1-1000 for kit

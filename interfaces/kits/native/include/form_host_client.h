@@ -21,6 +21,7 @@
 #include <mutex>
 #include <vector>
 #include <set>
+#include <unordered_set>
 #include "form_callback_interface.h"
 #include "form_host_stub.h"
 #include "form_state_info.h"
@@ -47,10 +48,10 @@ public:
      * @brief Add form.
      *
      * @param formCallback the host's form callback.
-     * @param formId The Id of the form.
+     * @param formJsInfo The info of the form.
      * @return none.
      */
-    void AddForm(std::shared_ptr<FormCallbackInterface> formCallback, const int64_t formId);
+    void AddForm(std::shared_ptr<FormCallbackInterface> formCallback, const FormJsInfo &formJsInfo);
 
     /**
      * @brief Remove form.
@@ -101,7 +102,7 @@ public:
      * @param token Provider client token.
      * @return none.
      */
-    virtual void OnAcquired(const FormJsInfo &formJsInfo, const sptr<IRemoteObject> &token);
+    void OnAcquired(const FormJsInfo &formJsInfo, const sptr<IRemoteObject> &token) override;
 
      /**
      * @brief Update form.
@@ -109,7 +110,7 @@ public:
      * @param formJsInfo Form js info.
      * @return none.
      */
-    virtual void OnUpdate(const FormJsInfo &formJsInfo);
+    void OnUpdate(const FormJsInfo &formJsInfo) override;
 
     /**
      * @brief UnInstall the forms.
@@ -117,13 +118,13 @@ public:
      * @param formIds The Id of the forms.
      * @return none.
      */
-    virtual void OnUninstall(const std::vector<int64_t> &formIds);
+    void OnUninstall(const std::vector<int64_t> &formIds) override;
 
     /**
      * @brief Acquire the form state
      * @param state The form state.
      */
-    virtual void OnAcquireState(FormState state, const AAFwk::Want &want);
+    void OnAcquireState(FormState state, const AAFwk::Want &want) override;
 
     /**
      * @brief Add shareForm callback.
@@ -139,7 +140,15 @@ public:
      * @param requestCode The request code of this share form.
      * @param result Share form result.
      */
-    void OnShareFormResponse(int64_t requestCode, int32_t result);
+    void OnShareFormResponse(int64_t requestCode, int32_t result) override;
+
+    /**
+     * @brief Return error to host.
+     *
+     * @param errorCode Indicates error-code of the form.
+     * @param errorMsg Indicates error-message of the form.
+     */
+    void OnError(int32_t errorCode, const std::string &errorMsg) override;
 
     /**
      * @brief Remove shareForm callback.
@@ -163,6 +172,7 @@ private:
     std::map<int64_t, std::shared_ptr<ShareFormCallBack>> shareFormCallbackMap_;
     std::map<std::string, std::set<std::shared_ptr<FormStateCallbackInterface>>> formStateCallbackMap_;
     UninstallCallback uninstallCallback_ = nullptr;
+    std::unordered_set<int64_t> etsFormIds_;
 
     DISALLOW_COPY_AND_MOVE(FormHostClient);
 };

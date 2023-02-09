@@ -66,6 +66,15 @@ public:
      * @param result Share form result.
      */
     void OnShareFormResponse(int64_t requestCode, int32_t result) override;
+
+    /**
+     * @brief Return error to host.
+     *
+     * @param errorCode Indicates error-code of the form.
+     * @param errorMsg Indicates error-message of the form.
+     */
+    void OnError(int32_t errorCode, const std::string &errorMsg) override;
+
 private:
     template <typename T>
     int GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos);

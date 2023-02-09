@@ -40,12 +40,12 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     FormHostClient formHostClient;
     std::shared_ptr<FormCallbackInterface> formCallback = nullptr;
     int64_t formId = 1;
-    formHostClient.AddForm(formCallback, formId);
+    FormJsInfo formJsInfo;
+    formHostClient.AddForm(formCallback, formJsInfo);
     formHostClient.RemoveForm(formCallback, formId);
     formHostClient.ContainsForm(formId);
     FormHostClient::UninstallCallback callback = nullptr;
     formHostClient.RegisterUninstallCallback(callback);
-    FormJsInfo formJsInfo;
     sptr<IRemoteObject> token = nullptr;
     formHostClient.OnAcquired(formJsInfo, token);
     formHostClient.OnUpdate(formJsInfo);

@@ -167,6 +167,12 @@ public:
      */
     void GetFormHostRecord(const int64_t formId, std::vector<FormHostRecord> &formHostRecords) const;
     /**
+     * @brief Get form host remote object.
+     * @param formId The id of the form.
+     * @param formHostObjs The form host remote object.
+     */
+    void GetFormHostRemoteObj(const int64_t formId, std::vector<sptr<IRemoteObject>> &formHostObjs) const;
+    /**
      * @brief Delete form host record.
      * @param callerToken The client stub of the form host record.
      * @param formId The id of the form.

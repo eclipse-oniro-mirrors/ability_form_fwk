@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,9 +26,10 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-FormStopRenderingConnection::FormStopRenderingConnection(const int64_t formId, const std::string &bundleName,
-    const std::string &abilityName) : formId_(formId)
+FormStopRenderingConnection::FormStopRenderingConnection(const FormRecord &formRecord, const std::string &bundleName,
+    const std::string &abilityName) : formRecord_(formRecord)
 {
+    SetFormId(formRecord.formId);
     SetProviderKey(bundleName, abilityName);
 }
 /**
@@ -44,14 +44,14 @@ void FormStopRenderingConnection::OnAbilityConnectDone(
     HILOG_INFO("%{public}s called.", __func__);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("%{public}s, abilityName:%{public}s, formId:%{public}" PRId64 ", resultCode:%{public}d",
-           __func__, element.GetAbilityName().c_str(), formId_, resultCode);
+           __func__, element.GetAbilityName().c_str(), GetFormId(), resultCode);
         return;
     }
-    FormRenderMgr::GetInstance().AddConnection(this);
+    FormRenderMgr::GetInstance().AddConnection(GetFormId(), this);
     Want want;
     want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
     HILOG_DEBUG("%{public}s, connectId:%{public}d", __func__, this->GetConnectId());
-    FormTaskMgr::GetInstance().PostStopRenderingForm(formId_, want, remoteObject);
+    FormTaskMgr::GetInstance().PostStopRenderingForm(formRecord_, want, remoteObject);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

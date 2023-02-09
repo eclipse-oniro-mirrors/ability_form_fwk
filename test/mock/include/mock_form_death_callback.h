@@ -68,6 +68,17 @@ public:
     {
         HILOG_INFO("%{public}s called.", __func__);
     }
+
+    /**
+     * @brief Return error.
+     *
+     * @param errorCode Indicates error-code of the form.
+     * @param errorMsg Indicates error-message of the form.
+     */
+    void OnError(const int32_t errorCode, const std::string &errorMsg)
+    {
+        HILOG_INFO("%{public}s called.", __func__);
+    }
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

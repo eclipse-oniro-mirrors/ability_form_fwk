@@ -17,9 +17,12 @@
 #define OHOS_FORM_FWK_FORM_RENDER_MGR_H
 
 #include <singleton.h>
+#include <unordered_map>
+#include <unordered_set>
 
 #include "form_record.h"
-#include "form_ability_connection.h"
+#include "form_render_connection.h"
+#include "form_render_interface.h"
 #include "want.h"
 
 namespace OHOS {
@@ -30,7 +33,7 @@ using WantParams = OHOS::AAFwk::WantParams;
  * @class FormRenderService
  * FormRenderService provides a facility for managing form render life cycle.
  */
-class FormRenderMgr final : public DelayedRefSingleton<FormRenderMgr> {
+class FormRenderMgr : public DelayedRefSingleton<FormRenderMgr> {
 DECLARE_DELAYED_REF_SINGLETON(FormRenderMgr)
 public:
     DISALLOW_COPY_AND_MOVE(FormRenderMgr);
@@ -46,16 +49,67 @@ public:
 
     ErrCode StopRenderingFormCallback(int64_t formId, const Want &want);
 
-    ErrCode AddConnection(sptr<FormAbilityConnection> connection);
+    ErrCode AddConnection(int64_t formId, sptr<FormAbilityConnection> connection);
 
-    void HandleHostDied(int64_t formId);
+    ErrCode RemoveConnection(int64_t formId);
+
+    void AddRenderDeathRecipient(const sptr<IRemoteObject> &renderRemoteObj);
 
     bool IsNeedRender(int64_t formId);
+
+    void ReconnectRenderService();
+
+    void RerenderAll();
+
 private:
     bool IsRemoveConnection(int64_t formId);
+
+    ErrCode ConnectRenderService(const sptr<AAFwk::IAbilityConnection> &connection) const;
+
+    void AddHostToken(int64_t formId);
+
+    void RemoveHostToken(const sptr<IRemoteObject> &host);
+
+    void NotifyHostConnectRenderFailed() const;
+
 private:
+    // <FormRenderConnection, FormStopRenderingConnection>
+    using RenderConnectionPair = std::pair<sptr<FormAbilityConnection>, sptr<FormAbilityConnection>>;
+    class RemoteObjHash {
+    public:
+        size_t operator() (const sptr<IRemoteObject> remoteObj) const
+        {
+            return reinterpret_cast<size_t>(remoteObj.GetRefPtr());
+        }
+    };
+
+    int32_t maxConnectKey = 0;
     mutable std::mutex conMutex_;
-    std::map<int32_t, sptr<FormAbilityConnection>> renderFormConnections_;
+    std::unordered_map<int64_t, RenderConnectionPair> renderFormConnections_;
+    sptr<IFormRender> renderRemoteObj_;
+    sptr<FormRenderConnection> reconnectRenderConnection_;
+    sptr<IRemoteObject::DeathRecipient> renderDeathRecipient_;
+    mutable std::mutex hostsMutex_;
+    std::unordered_set<sptr<IRemoteObject>, RemoteObjHash> etsHosts_;
+    int32_t reconnectCount_ = 0;
+};
+
+/**
+ * @class FormRenderRecipient
+ * FormRenderRecipient notices IRemoteBroker died.
+ */
+class FormRenderRecipient : public IRemoteObject::DeathRecipient {
+public:
+    using RemoteDiedHandler = std::function<void()>;
+
+    explicit FormRenderRecipient(RemoteDiedHandler handler);
+
+    virtual ~FormRenderRecipient();
+
+    void OnRemoteDied(const wptr<IRemoteObject> &remote) override;
+
+private:
+    RemoteDiedHandler handler_;
 };
 } // namespace AppExecFwk
 } // namespace OHOS
