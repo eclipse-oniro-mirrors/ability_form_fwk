@@ -17,15 +17,20 @@
 
 #include <cinttypes>
 
+#include "form_bms_helper.h"
 #include "form_constants.h"
 #include "form_supply_callback.h"
 #include "form_render_mgr.h"
 #include "form_task_mgr.h"
 #include "hilog_wrapper.h"
+#include "ipc_skeleton.h"
 #include "want.h"
 
 namespace OHOS {
 namespace AppExecFwk {
+namespace {
+    constexpr int32_t CALLING_UID_TRANSFORM_DIVISOR = 200000;
+}
 FormStopRenderingConnection::FormStopRenderingConnection(const FormRecord &formRecord, const std::string &bundleName,
     const std::string &abilityName) : formRecord_(formRecord)
 {
@@ -48,7 +53,11 @@ void FormStopRenderingConnection::OnAbilityConnectDone(
         return;
     }
     FormRenderMgr::GetInstance().AddConnection(GetFormId(), this);
+    int32_t callingUid = IPCSkeleton::GetCallingUid();
+    int32_t userId = callingUid / CALLING_UID_TRANSFORM_DIVISOR;
+    int32_t bundleUid = FormBmsHelper::GetInstance().GetUidByBundleName(formRecord_.bundleName, userId);
     Want want;
+    want.SetParam(Constants::FORM_SUPPLY_UID, bundleUid);
     want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
     HILOG_DEBUG("%{public}s, connectId:%{public}d", __func__, this->GetConnectId());
     FormTaskMgr::GetInstance().PostStopRenderingForm(formRecord_, want, remoteObject);
