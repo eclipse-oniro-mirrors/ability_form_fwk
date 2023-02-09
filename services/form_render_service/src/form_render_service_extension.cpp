@@ -39,19 +39,6 @@ void FormRenderServiceExtension::Init(const std::shared_ptr<AbilityLocalRecord> 
     const sptr<IRemoteObject> &token)
 {
     ServiceExtension::Init(record, application, handler, token);
-    std::string srcPath = "";
-    GetSrcPath(srcPath);
-    if (srcPath.empty()) {
-        HILOG_ERROR("Failed to get srcPath");
-        return;
-    }
-
-    std::string moduleName(Extension::abilityInfo_->moduleName);
-    moduleName.append("::").append(abilityInfo_->name);
-    HILOG_DEBUG("JsStaticSubscriberExtension::Init moduleName:%{public}s,srcPath:%{public}s.",
-        moduleName.c_str(), srcPath.c_str());
-
-    HILOG_DEBUG("%{public}s runtime language  %{public}d", __func__, runtime_.GetLanguage());
 }
 
 void FormRenderServiceExtension::OnStart(const AAFwk::Want &want)
@@ -107,27 +94,6 @@ void FormRenderServiceExtension::OnConfigurationUpdated(const AppExecFwk::Config
 {
     Extension::OnConfigurationUpdated(configuration);
     HILOG_INFO("%{public}s called.", __func__);
-}
-
-void FormRenderServiceExtension::GetSrcPath(std::string &srcPath)
-{
-    if (!Extension::abilityInfo_->isModuleJson) {
-        /* temporary compatibility api8 + config.json */
-        srcPath.append(Extension::abilityInfo_->package);
-        srcPath.append("/assets/js/");
-        if (!Extension::abilityInfo_->srcPath.empty()) {
-            srcPath.append(Extension::abilityInfo_->srcPath);
-        }
-        srcPath.append("/").append(Extension::abilityInfo_->name).append(".abc");
-        return;
-    }
-
-    if (!Extension::abilityInfo_->srcEntrance.empty()) {
-        srcPath.append(Extension::abilityInfo_->moduleName + "/");
-        srcPath.append(Extension::abilityInfo_->srcEntrance);
-        srcPath.erase(srcPath.rfind('.'));
-        srcPath.append(".abc");
-    }
 }
 }
 }

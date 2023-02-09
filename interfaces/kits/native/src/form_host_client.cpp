@@ -18,6 +18,7 @@
 #include <cinttypes>
 
 #include "hilog_wrapper.h"
+#include "hitrace_meter.h"
 #include "form_constants.h"
 #include "form_caller_mgr.h"
 
@@ -60,9 +61,10 @@ sptr<FormHostClient> FormHostClient::GetInstance()
  * @param formId The Id of the form.
  * @return none.
  */
-void FormHostClient::AddForm(std::shared_ptr<FormCallbackInterface> formCallback, const int64_t formId)
+void FormHostClient::AddForm(std::shared_ptr<FormCallbackInterface> formCallback, const FormJsInfo &formJsInfo)
 {
     HILOG_INFO("%{public}s called.", __func__);
+    auto formId = formJsInfo.formId;
     if (formId <= 0 || formCallback == nullptr) {
         HILOG_ERROR("%{public}s error, invalid formId or formCallback.", __func__);
         return;
@@ -75,6 +77,10 @@ void FormHostClient::AddForm(std::shared_ptr<FormCallbackInterface> formCallback
         formCallbackMap_.emplace(formId, callbacks);
     } else {
         iter->second.emplace(formCallback);
+    }
+
+    if (formJsInfo.type == FormType::ETS) {
+        etsFormIds_.emplace(formId);
     }
 }
 
@@ -101,6 +107,10 @@ void FormHostClient::RemoveForm(std::shared_ptr<FormCallbackInterface> formCallb
     iter->second.erase(formCallback);
     if (iter->second.empty()) {
         formCallbackMap_.erase(iter);
+    }
+
+    if (etsFormIds_.find(formId) != etsFormIds_.end()) {
+        etsFormIds_.erase(formId);
     }
     HILOG_INFO("%{public}s end.", __func__);
 }
@@ -294,6 +304,26 @@ void FormHostClient::OnShareFormResponse(int64_t requestCode, int32_t result)
     }
     shareFormCallbackMap_.erase(requestCode);
     HILOG_DEBUG("%{public}s done", __func__);
+}
+
+void FormHostClient::OnError(int32_t errorCode, const std::string &errorMsg)
+{
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    HILOG_ERROR("Receive error form FMS, errorCode: %{public}d, errorMsg: %{public}s.", errorCode, errorMsg.c_str());
+    std::lock_guard<std::mutex> lock(callbackMutex_);
+    for (auto formId : etsFormIds_) {
+        auto iter = formCallbackMap_.find(formId);
+        if (iter == formCallbackMap_.end()) {
+            continue;
+        }
+        for (const auto &callback : iter->second) {
+            if (callback == nullptr) {
+                HILOG_ERROR("FormCallback is nullptr.");
+                continue;
+            }
+            callback->OnError(errorCode, errorMsg);
+        }
+    }
 }
 
 void FormHostClient::RemoveShareFormCallback(int64_t requestCode)

@@ -42,6 +42,8 @@ public:
     {}
     void OnShareFormResponse(int64_t requestCode, int32_t result) override
     {}
+    void OnError(int32_t errorCode, const std::string &errorMsg) override
+    {}
 };
 
 uint32_t GetU32Data(const char* ptr)

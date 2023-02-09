@@ -17,6 +17,7 @@
 #define OHOS_FORM_FWK_FORM_DELETE_RENDER_CONNECTION_H
 
 #include "form_ability_connection.h"
+#include "form_item_info.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -26,7 +27,7 @@ namespace AppExecFwk {
  */
 class FormStopRenderingConnection : public FormAbilityConnection {
 public:
-    FormStopRenderingConnection(const int64_t formId, const std::string &bundleName, const std::string &abilityName);
+    FormStopRenderingConnection(const FormRecord &formRecord, const std::string &bundleName, const std::string &abilityName);
     virtual ~FormStopRenderingConnection() = default;
 
     /**
@@ -39,7 +40,7 @@ public:
         const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode) override;
 
 private:
-    int64_t formId_ = -1;
+    FormRecord formRecord_;
     DISALLOW_COPY_AND_MOVE(FormStopRenderingConnection);
 };
 }  // namespace AppExecFwk

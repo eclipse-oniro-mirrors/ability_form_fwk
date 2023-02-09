@@ -179,6 +179,7 @@ ohos_shared_library("fmskit_native") {
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "form_fwk:form_manager",
+    "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "samgr:samgr_proxy",

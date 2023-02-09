@@ -443,7 +443,6 @@ bool FormDataMgr::HasFormUserUids(const int64_t formId) const
  * @brief Get form host record.
  * @param formId The id of the form.
  * @param formHostRecord The form host record.
- * @return Returns true if this function is successfully called; returns false otherwise.
  */
 void FormDataMgr::GetFormHostRecord(const int64_t formId, std::vector<FormHostRecord> &formHostRecords) const
 {
@@ -454,6 +453,16 @@ void FormDataMgr::GetFormHostRecord(const int64_t formId, std::vector<FormHostRe
         }
     }
     HILOG_DEBUG("%{public}s, get form host record by formId, size is %{public}zu", __func__, formHostRecords.size());
+}
+void FormDataMgr::GetFormHostRemoteObj(const int64_t formId, std::vector<sptr<IRemoteObject>> &formHostObjs) const
+{
+    std::lock_guard<std::recursive_mutex> lock(formHostRecordMutex_);
+    for (auto &record : clientRecords_) {
+        if (record.Contains(formId)) {
+            formHostObjs.emplace_back(record.GetFormHostClient());
+        }
+    }
+    HILOG_DEBUG("Get form host remote object by formId, size is %{public}zu", formHostObjs.size());
 }
 /**
  * @brief Delete form host record.

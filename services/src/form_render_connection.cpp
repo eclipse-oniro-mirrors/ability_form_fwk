@@ -37,17 +37,38 @@ FormRenderConnection::FormRenderConnection(const FormRecord &formRecord,
 void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &element,
     const sptr<IRemoteObject> &remoteObject, int resultCode)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("ConnectDone, needReconnectFlag: %{public}d", needReconnect_);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("%{public}s, abilityName:%{public}s, formId:%{public}" PRId64 ", resultCode:%{public}d",
            __func__, element.GetAbilityName().c_str(), GetFormId(), resultCode);
+        if (needReconnect_) {
+            FormRenderMgr::GetInstance().ReconnectRenderService();
+        }
         return;
     }
-    FormRenderMgr::GetInstance().AddConnection(this);
+    if (needReconnect_) {
+        FormRenderMgr::GetInstance().RerenderAll();
+        return;
+    }
+    FormRenderMgr::GetInstance().AddConnection(GetFormId(), this);
+    FormRenderMgr::GetInstance().AddRenderDeathRecipient(remoteObject);
     Want want;
     want.SetParams(wantParams_);
     want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
     FormTaskMgr::GetInstance().PostRenderForm(formRecord_, want, remoteObject);
+}
+
+void FormRenderConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
+{
+    HILOG_INFO("DisconnectDone, needReconnectFlag: %{public}d", needReconnect_);
+    if (needReconnect_ && resultCode) {
+        FormRenderMgr::GetInstance().ReconnectRenderService();
+    }
+}
+
+void FormRenderConnection::SetReconnectFlag()
+{
+    needReconnect_ = true;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

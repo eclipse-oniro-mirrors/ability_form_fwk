@@ -21,12 +21,13 @@
 #include <memory>
 #include <singleton.h>
 
+#include "bundle_mgr_interface.h"
 #include "context_impl.h"
 #include "event_handler.h"
+#include "form_render_record.h"
 #include "js_runtime.h"
 #include "runtime.h"
 #include "want.h"
-#include "form_renderer_group.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -50,50 +51,17 @@ public:
 
     /**
      * @brief Stop rendering form. This is sync API.
-     * @param formId Indicates The Id of the form to stop rendering.
+     * @param formJsInfo The form js info.
      * @param want Indicates the {@link Want} structure containing form info.
      * @param callerToken Caller ability token.
      * @return Returns ERR_OK on success, others on failure.
      */
-    int32_t StopRenderingForm(int64_t formId, const Want &want, const sptr<IRemoteObject> &callerToken) override;
-private:
-    int32_t AddForm(const FormJsInfo &formJsInfo, const Want &want);
-    void OnActionEvent(const std::string& action) const;
-
-    /**
-     * @brief Update form. This is sync API
-     *
-     * @param formJsInfo The form js info
-     * @param want The want parameter
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    int32_t UpdateForm(const FormJsInfo &formJsInfo, const Want &want);
-
-    std::shared_ptr<Runtime> ObtainRuntime(const FormJsInfo &formJsInfo, const std::shared_ptr<EventRunner> runner);
-    std::shared_ptr<Runtime> CreateRuntimeLock(const FormJsInfo &formJsInfo, const std::shared_ptr<EventRunner> runner);
-
-    std::shared_ptr<Context> ObtainContext(const FormJsInfo &formJsInfo, const std::shared_ptr<Runtime> &runtime);
-    std::shared_ptr<Context> CreateContextLock(const FormJsInfo &formJsInfo, const std::shared_ptr<Runtime> &runtime);
-
-    std::shared_ptr<EventRunner> ObtainEventRunner(const FormJsInfo &formJsInfo);
-    std::shared_ptr<EventRunner> CreateEventRunnerLock(const FormJsInfo &formJsInfo);
-
-    std::shared_ptr<Ace::FormRendererGroup> ObtainFormRendererGroup(
-        const FormJsInfo &formJsInfo, const std::shared_ptr<Context> &context, const std::shared_ptr<Runtime> &runtime);
-    std::shared_ptr<Ace::FormRendererGroup> CreateFormRendererGroupLock(const FormJsInfo &formJsInfo,
-        const std::shared_ptr<Context> &context, const std::shared_ptr<Runtime> &runtime);
+    int32_t StopRenderingForm(
+        const FormJsInfo &formJsInfo, const Want &want, const sptr<IRemoteObject> &callerToken) override;
 
 private:
-    std::mutex formRendererGroupMutex_;
-    std::map<int64_t, std::shared_ptr<Ace::FormRendererGroup>> formRendererGroupMap_; // <formId, formRendererGroup>
-    std::mutex contextMutex_;
-    std::map<std::string, std::shared_ptr<Context>> contextMap_; // <bundleName + moduleName, context>
-    std::map<std::string, std::shared_ptr<NativeReference>> shellContextRefMap_; // <bundleName, eventHandler>
-    std::mutex runTimeMutex_;
-    std::map<std::string, std::shared_ptr<Runtime>> runTimeMap_; // <bundleName, context>
-    std::mutex eventRunnerMutex_;
-    std::map<std::string, std::shared_ptr<EventHandler>> eventHandlerMap_; // <bundleName, eventHandler>
-    std::map<std::string, std::shared_ptr<EventRunner>> eventRunnerMap_; // <bundleName, eventHandler>
+    std::mutex renderRecordMutex_;
+    std::unordered_map<int32_t, std::shared_ptr<FormRenderRecord>> renderRecordMap_; // <userId, renderRecord>
 };
 } // namespace FormRender
 } // namespace AppExecFwk

@@ -65,6 +65,15 @@ public:
      * @param result Share form result.
      */
     virtual void OnShareFormResponse(int64_t requestCode, int32_t result) = 0;
+
+    /**
+     * @brief Return error to host.
+     *
+     * @param errorCode Indicates error-code of the form.
+     * @param errorMsg Indicates error-message of the form.
+     */
+    virtual void OnError(int32_t errorCode, const std::string &errorMsg) = 0;
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -83,6 +92,9 @@ public:
 
         // ipc id for share form response(3685)
         FORM_HOST_ON_SHARE_FORM_RESPONSE,
+
+        // ipc id for return form error to host(3686)
+        FORM_HOST_ON_ERROR,
     };
 };
 }  // namespace AppExecFwk
