@@ -32,9 +32,6 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-    constexpr int32_t MAX_RECONNECT_COUNT = 3;
-    constexpr int32_t ERROR_CODE_CONNECT_RENDER = -1;
-    const char *ERROR_MSG_CONNECT_RENDER = "Connect RenderService failed";
     constexpr int32_t CALLING_UID_TRANSFORM_DIVISOR = 200000;
 }
 using Want = OHOS::AAFwk::Want;
@@ -44,9 +41,10 @@ FormRenderMgr::FormRenderMgr()
 FormRenderMgr::~FormRenderMgr()
 {
 }
-ErrCode FormRenderMgr::RenderForm(const FormRecord &formRecord, const WantParams &wantParams)
+ErrCode FormRenderMgr::RenderForm(
+    const FormRecord &formRecord, const WantParams &wantParams, const sptr<IRemoteObject> &hostToken)
 {
-    HILOG_DEBUG("%{public}s called.", __func__);
+    HILOG_INFO("RenderForm formId: %{public}" PRId64 "", formRecord.formId);
     if (formRecord.uiSyntax != FormType::ETS) {
         return ERR_OK;
     }
@@ -56,8 +54,17 @@ ErrCode FormRenderMgr::RenderForm(const FormRecord &formRecord, const WantParams
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
+    Want newWant;
+    newWant.SetParams(wantParams);
+    if (hostToken) {
+        HILOG_DEBUG("Add host token");
+        AddHostToken(hostToken);
+        newWant.SetParam(Constants::PARAM_FORM_HOST_TOKEN, hostToken);
+    }
+
     {
         std::lock_guard<std::mutex> lock(conMutex_);
+        HILOG_DEBUG("renderFormConnections_ size: %{public}zu.", renderFormConnections_.size());
         auto conIterator = renderFormConnections_.find(formRecord.formId);
         if (conIterator != renderFormConnections_.end()) {
             auto connection = conIterator->second.first;
@@ -80,9 +87,6 @@ ErrCode FormRenderMgr::RenderForm(const FormRecord &formRecord, const WantParams
     }
     auto formRenderConnection = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
     
-
-    AddHostToken(formRecord.formId);
-
     if (formRenderConnection == nullptr) {
         HILOG_ERROR("formRenderConnection is null.");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
@@ -113,6 +117,7 @@ void FormRenderMgr::SecondFormRenderConnect(const FormRecord &formRecord, const 
 ErrCode FormRenderMgr::UpdateRenderingForm(int64_t formId, const FormProviderData &formProviderData,
     const WantParams &wantParams, bool mergeData)
 {
+    HILOG_DEBUG("RenderForm with formId.");
     FormRecord formRecord;
     bool isGetFormRecord = FormDataMgr::GetInstance().GetFormRecord(formId, formRecord);
     if (!isGetFormRecord) {
@@ -178,6 +183,7 @@ ErrCode FormRenderMgr::StopRenderingFormCallback(int64_t formId, const Want &wan
 {
     HILOG_INFO("%{public}s called.", __func__);
     std::lock_guard<std::mutex> lock(conMutex_);
+    HILOG_DEBUG("renderFormConnections_ size: %{public}zu.", renderFormConnections_.size());
     auto conIterator = renderFormConnections_.find(formId);
     if (conIterator == renderFormConnections_.end()) {
         HILOG_ERROR("Can not find formId in map.");
@@ -194,11 +200,12 @@ ErrCode FormRenderMgr::StopRenderingFormCallback(int64_t formId, const Want &wan
     return ERR_OK;
 }
 
-ErrCode FormRenderMgr::AddConnection(int64_t formId, sptr<FormAbilityConnection> connection)
+ErrCode FormRenderMgr::AddConnection(int64_t formId, sptr<FormAbilityConnection> connection, bool isRenderConnection)
 {
     HILOG_INFO("%{public}s called.", __func__);
     if (connection == nullptr) {
-        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+        HILOG_ERROR("Input FormRenderConnection is nullptr.");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     {
         int32_t connectKey = static_cast<int32_t>(FormUtil::GetCurrentMillisecond());
@@ -213,9 +220,14 @@ ErrCode FormRenderMgr::AddConnection(int64_t formId, sptr<FormAbilityConnection>
             renderFormConnections_.emplace(formId, RenderConnectionPair());
             conIterator = renderFormConnections_.begin();
         }
-        renderFormConnections_[formId].first = connection;
+
+        if (isRenderConnection) {
+            renderFormConnections_[formId].first = connection;
+        } else {
+            renderFormConnections_[formId].second = connection;
+        }
+        HILOG_DEBUG("renderFormConnections size: %{public}zu.", renderFormConnections_.size());
     }
-    HILOG_DEBUG("%{public}s end.", __func__);
     return ERR_OK;
 }
 
@@ -230,74 +242,57 @@ ErrCode FormRenderMgr::RemoveConnection(int64_t formId)
     }
     renderFormConnections_.erase(formId);
 
-    HILOG_DEBUG("%{public}s end.", __func__);
+    HILOG_DEBUG("renderFormConnections size: %{public}zu.", renderFormConnections_.size());
     return ERR_OK;
 }
 
-void FormRenderMgr::ReconnectRenderService()
+void FormRenderMgr::RerenderAllForms()
 {
-    HILOG_INFO("Render is died, reconnect.");
+    HILOG_INFO("Render is dead.");
     renderDeathRecipient_ = nullptr;
     renderRemoteObj_ = nullptr;
-    if (++reconnectCount_ > MAX_RECONNECT_COUNT) {
-        HILOG_ERROR("Reconnect count is reach MAX, NotifyHostConnectRenderFailed");
-        NotifyHostConnectRenderFailed();
-        return;
-    }
-    if (reconnectRenderConnection_ == nullptr) {
-        FormRecord formRecord;
-        WantParams wantParams;
-        reconnectRenderConnection_ = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
-        if (reconnectRenderConnection_ == nullptr) {
-            HILOG_ERROR("Create reconnectRenderConnection failed.");
+    
+    {
+        std::lock_guard<std::mutex> lock(conMutex_);
+        if (etsHosts_.empty() || renderFormConnections_.empty()) {
+            HILOG_INFO("All hosts died or all connections erased, no need to rerender.");
             return;
         }
-        reconnectRenderConnection_->SetReconnectFlag();
     }
-    auto ret = ConnectRenderService(reconnectRenderConnection_);
-    // If ret != 0, no need to wait callback, just reconnect again.
-    if (ret) {
-        ReconnectRenderService();
-        return;
-    }
+
+    NotifyHostRenderIsDead();
 }
 
-void FormRenderMgr::RerenderAll()
+void FormRenderMgr::HandleHostDied(const sptr<IRemoteObject> &host)
 {
-    HILOG_INFO("Reconnect render success, rerender all forms.");
-    reconnectCount_ = 0;
-    std::lock_guard<std::mutex> lock(conMutex_);
-    for (const auto &item : renderFormConnections_) {
-        auto renderConnection = item.second.first;
-        ConnectRenderService(renderConnection);
+    HILOG_INFO("Host is died, notify FormRenderService and remove host.");
+    if (renderRemoteObj_ == nullptr) {
+        HILOG_WARN("renderRemoteObj is nullptr, render service may exit already.");
+        return;
     }
-    FormAmsHelper::GetInstance().DisconnectServiceAbility(reconnectRenderConnection_);
+    renderRemoteObj_->CleanFormHost(host);
+    RemoveHostToken(host);
 }
 
 void FormRenderMgr::AddRenderDeathRecipient(const sptr<IRemoteObject> &remoteObject)
 {
     if (renderDeathRecipient_) {
+        HILOG_INFO("renderDeathRecipient is exist, no need to add again.");
         return;
     }
+
     HILOG_INFO("Get renderRemoteObj, add death recipient.");
     auto renderRemoteObj = iface_cast<IFormRender>(remoteObject);
     if (renderRemoteObj == nullptr) {
         HILOG_ERROR("renderRemoteObj is nullptr.");
         return;
     }
-    if (renderRemoteObj_ == nullptr) {
-        renderRemoteObj_ = renderRemoteObj;
-    }
+    renderRemoteObj_ = renderRemoteObj;
 
     renderDeathRecipient_ = new FormRenderRecipient([]() {
-        FormRenderMgr::GetInstance().ReconnectRenderService();
+        FormRenderMgr::GetInstance().RerenderAllForms();
     });
-    auto renderService = renderRemoteObj_->AsObject();
-    if (renderService == nullptr) {
-        HILOG_ERROR("renderService is nullptr, can not get obj from renderRemoteObj.");
-        return;
-    }
-    renderService->AddDeathRecipient(renderDeathRecipient_);
+    remoteObject->AddDeathRecipient(renderDeathRecipient_);
 }
 
 inline ErrCode FormRenderMgr::ConnectRenderService(const sptr<AAFwk::IAbilityConnection> &connection) const
@@ -323,36 +318,41 @@ bool FormRenderMgr::IsNeedRender(int64_t formId)
     return true;
 }
 
-inline void FormRenderMgr::AddHostToken(int64_t formId)
+inline void FormRenderMgr::AddHostToken(const sptr<IRemoteObject> &host)
 {
-    std::vector<sptr<IRemoteObject>> formHostObjs;
-    FormDataMgr::GetInstance().GetFormHostRemoteObj(formId, formHostObjs);
-
+    HILOG_DEBUG("Add host, etsHosts.size: %{public}zu.", etsHosts_.size());
     {
         std::lock_guard<std::mutex> lock(hostsMutex_);
-        for (const auto &host : formHostObjs) {
-            etsHosts_.emplace(host);
-        }
+        etsHosts_.emplace(host);
     }
 }
 
 inline void FormRenderMgr::RemoveHostToken(const sptr<IRemoteObject> &host)
 {
+    HILOG_DEBUG("Remove host, etsHosts.size: %{public}zu.", etsHosts_.size());
     {
         std::lock_guard<std::mutex> lock(hostsMutex_);
         etsHosts_.erase(host);
+        if (etsHosts_.empty()) {
+            HILOG_DEBUG("etsHosts is empty, disconnect all connections.");
+            std::lock_guard<std::mutex> lock(conMutex_);
+            for (const auto &item : renderFormConnections_) {
+                FormAmsHelper::GetInstance().DisconnectServiceAbility(item.second.first);
+            }
+        }
     }
 }
 
-void FormRenderMgr::NotifyHostConnectRenderFailed() const
+void FormRenderMgr::NotifyHostRenderIsDead() const
 {
+    HILOG_INFO("Notify hosts the render is dead, hosts.size: %{public}zu.", etsHosts_.size());
     for (const auto &host : etsHosts_) {
         auto hostClient = iface_cast<IFormHost>(host);
         if (hostClient == nullptr) {
             HILOG_ERROR("hostClient is nullptr");
             continue;
         }
-        hostClient->OnError(ERROR_CODE_CONNECT_RENDER, ERROR_MSG_CONNECT_RENDER);
+        hostClient->OnError(ERR_APPEXECFWK_FORM_CONNECT_FORM_RENDER_FAILED, "Connect FormRenderService failed");
     }
 }
 

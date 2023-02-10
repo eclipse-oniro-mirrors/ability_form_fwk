@@ -42,17 +42,10 @@ FormRenderConnection::FormRenderConnection(const FormRecord &formRecord,
 void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &element,
     const sptr<IRemoteObject> &remoteObject, int resultCode)
 {
-    HILOG_INFO("ConnectDone, needReconnectFlag: %{public}d", needReconnect_);
+    HILOG_INFO("ConnectDone");
     if (resultCode != ERR_OK) {
         HILOG_ERROR("%{public}s, abilityName:%{public}s, formId:%{public}" PRId64 ", resultCode:%{public}d",
            __func__, element.GetAbilityName().c_str(), GetFormId(), resultCode);
-        if (needReconnect_) {
-            FormRenderMgr::GetInstance().ReconnectRenderService();
-        }
-        return;
-    }
-    if (needReconnect_) {
-        FormRenderMgr::GetInstance().RerenderAll();
         return;
     }
 
@@ -63,7 +56,7 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
         return;
     }
 
-    FormRenderMgr::GetInstance().AddConnection(GetFormId(), this);
+    FormRenderMgr::GetInstance().AddConnection(GetFormId(), this, true);
     FormRenderMgr::GetInstance().AddRenderDeathRecipient(remoteObject);
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     int32_t userId = callingUid / CALLING_UID_TRANSFORM_DIVISOR;
@@ -77,16 +70,6 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
 }
 
 void FormRenderConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
-{
-    HILOG_INFO("DisconnectDone, needReconnectFlag: %{public}d", needReconnect_);
-    if (needReconnect_ && resultCode) {
-        FormRenderMgr::GetInstance().ReconnectRenderService();
-    }
-}
-
-void FormRenderConnection::SetReconnectFlag()
-{
-    needReconnect_ = true;
-}
+{ }
 }  // namespace AppExecFwk
 }  // namespace OHOS

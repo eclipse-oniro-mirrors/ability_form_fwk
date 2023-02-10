@@ -932,7 +932,7 @@ ErrCode FormMgrAdapter::AddNewFormRecord(const FormItemInfo &info, const int64_t
     // allot form record
     FormRecord formRecord = FormDataMgr::GetInstance().AllotFormRecord(newInfo, callingUid, currentUserId);
 
-    FormRenderMgr::GetInstance().RenderForm(formRecord, wantParams);
+    FormRenderMgr::GetInstance().RenderForm(formRecord, wantParams, callerToken);
 
     // acquire formInfo from provider
     ErrCode errorCode = AcquireProviderFormInfoAsync(formId, newInfo, wantParams);

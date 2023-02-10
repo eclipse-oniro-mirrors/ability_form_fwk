@@ -52,7 +52,7 @@ void FormStopRenderingConnection::OnAbilityConnectDone(
            __func__, element.GetAbilityName().c_str(), GetFormId(), resultCode);
         return;
     }
-    FormRenderMgr::GetInstance().AddConnection(GetFormId(), this);
+    FormRenderMgr::GetInstance().AddConnection(GetFormId(), this, false);
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     int32_t userId = callingUid / CALLING_UID_TRANSFORM_DIVISOR;
     int32_t bundleUid = FormBmsHelper::GetInstance().GetUidByBundleName(formRecord_.bundleName, userId);

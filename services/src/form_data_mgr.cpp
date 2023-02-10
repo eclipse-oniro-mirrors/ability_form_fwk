@@ -22,6 +22,7 @@
 #include "form_constants.h"
 #include "form_mgr_errors.h"
 #include "form_provider_mgr.h"
+#include "form_render_mgr.h"
 #include "form_util.h"
 #include "hilog_wrapper.h"
 #include "ipc_skeleton.h"
@@ -519,6 +520,7 @@ void FormDataMgr::CleanHostRemovedForms(const std::vector<int64_t> &removedFormI
  */
 void FormDataMgr::HandleHostDied(const sptr<IRemoteObject> &remoteHost)
 {
+    FormRenderMgr::GetInstance().HandleHostDied(remoteHost);
     std::vector<int64_t> recordTempForms;
     {
         std::lock_guard<std::recursive_mutex> lock(formHostRecordMutex_);

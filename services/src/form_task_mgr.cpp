@@ -690,7 +690,8 @@ void FormTaskMgr::RenderForm(const FormRecord &formRecord, const Want &want, con
     HILOG_INFO("%{public}s end", __func__);
 }
 
-void FormTaskMgr::PostStopRenderingForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject)
+void FormTaskMgr::PostStopRenderingForm(
+    const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_INFO("%{public}s start", __func__);
     if (eventHandler_ == nullptr) {
@@ -705,7 +706,8 @@ void FormTaskMgr::PostStopRenderingForm(const FormRecord &formRecord, const Want
     HILOG_INFO("%{public}s end", __func__);
 }
 
-void FormTaskMgr::StopRenderingForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject)
+void FormTaskMgr::StopRenderingForm(
+    const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_INFO("%{public}s begin", __func__);
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
