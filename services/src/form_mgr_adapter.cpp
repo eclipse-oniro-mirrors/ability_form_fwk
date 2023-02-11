@@ -88,7 +88,7 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
     bool tempFormFlag = want.GetBoolParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
     int callingUid = IPCSkeleton::GetCallingUid();
     int checkCode = 0;
-    if (tempFormFlag) {
+    if (tempFormFlag && !FormRenderMgr::GetInstance().IsRerenderForRenderDied(formId)) {
         if (formId > 0) {
             HILOG_ERROR("%{public}s fail, temp form id is invalid, formId:%{public}" PRId64 "", __func__, formId);
             return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -798,7 +798,7 @@ ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
     int64_t formId = FormDataMgr::GetInstance().PaddingUdidHash(info.GetFormId());
     FormRecord record;
     bool hasRecord = FormDataMgr::GetInstance().GetFormRecord(formId, record);
-    if (hasRecord && record.formTempFlag) {
+    if (hasRecord && record.formTempFlag && !FormRenderMgr::GetInstance().IsRerenderForRenderDied(formId)) {
         HILOG_ERROR("%{public}s, addForm can not acquire temp form when select form id", __func__);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }

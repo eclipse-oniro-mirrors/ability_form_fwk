@@ -54,6 +54,12 @@ ErrCode FormRenderMgr::RenderForm(
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
+    if (atomicRerenderCount_ > 0) {
+        --atomicRerenderCount_;
+    } else {
+        atomicRerenderCount_ = 0;
+    }
+
     Want newWant;
     newWant.SetParams(wantParams);
     if (hostToken) {
@@ -73,19 +79,20 @@ ErrCode FormRenderMgr::RenderForm(
                 return ERR_APPEXECFWK_FORM_INVALID_PARAM;
             }
             if (renderRemoteObj_ == nullptr) {
-                HILOG_ERROR("%{public}s, renderRemoteObj_ is nullptr", __func__);
-                return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+                ErrCode ret = ConnectRenderService(connection);
+                HILOG_INFO("renderRemoteObj is nullptr, render may exit, need reconnect, ret: %{public}d.", ret);
+                return ret;
             }
             auto remoteObject = renderRemoteObj_->AsObject();
             if (remoteObject == nullptr) {
                 HILOG_ERROR("remoteObject is nullptr, can not get obj from renderRemoteObj.");
                 return ERR_APPEXECFWK_FORM_INVALID_PARAM;
             }
-            SecondFormRenderConnect(formRecord, wantParams, remoteObject, connection->GetConnectId());
+            SecondFormRenderConnect(formRecord, newWant.GetParams(), remoteObject, connection->GetConnectId());
             return ERR_OK;
         }
     }
-    auto formRenderConnection = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
+    auto formRenderConnection = new (std::nothrow) FormRenderConnection(formRecord, newWant.GetParams());
     
     if (formRenderConnection == nullptr) {
         HILOG_ERROR("formRenderConnection is null.");
@@ -254,6 +261,8 @@ void FormRenderMgr::RerenderAllForms()
     
     {
         std::lock_guard<std::mutex> lock(conMutex_);
+        atomicRerenderCount_ = renderFormConnections_.size();
+        HILOG_INFO("The forms need to rerender count: %{public}zu.", renderFormConnections_.size());
         if (etsHosts_.empty() || renderFormConnections_.empty()) {
             HILOG_INFO("All hosts died or all connections erased, no need to rerender.");
             return;
@@ -266,12 +275,12 @@ void FormRenderMgr::RerenderAllForms()
 void FormRenderMgr::HandleHostDied(const sptr<IRemoteObject> &host)
 {
     HILOG_INFO("Host is died, notify FormRenderService and remove host.");
+    RemoveHostToken(host);
     if (renderRemoteObj_ == nullptr) {
         HILOG_WARN("renderRemoteObj is nullptr, render service may exit already.");
         return;
     }
     renderRemoteObj_->CleanFormHost(host);
-    RemoveHostToken(host);
 }
 
 void FormRenderMgr::AddRenderDeathRecipient(const sptr<IRemoteObject> &remoteObject)
@@ -320,7 +329,7 @@ bool FormRenderMgr::IsNeedRender(int64_t formId)
 
 inline void FormRenderMgr::AddHostToken(const sptr<IRemoteObject> &host)
 {
-    HILOG_DEBUG("Add host, etsHosts.size: %{public}zu.", etsHosts_.size());
+    HILOG_DEBUG("Add host, current etsHosts.size: %{public}zu.", etsHosts_.size());
     {
         std::lock_guard<std::mutex> lock(hostsMutex_);
         etsHosts_.emplace(host);
@@ -329,7 +338,7 @@ inline void FormRenderMgr::AddHostToken(const sptr<IRemoteObject> &host)
 
 inline void FormRenderMgr::RemoveHostToken(const sptr<IRemoteObject> &host)
 {
-    HILOG_DEBUG("Remove host, etsHosts.size: %{public}zu.", etsHosts_.size());
+    HILOG_DEBUG("Remove host, current etsHosts.size: %{public}zu.", etsHosts_.size());
     {
         std::lock_guard<std::mutex> lock(hostsMutex_);
         etsHosts_.erase(host);
@@ -356,10 +365,17 @@ void FormRenderMgr::NotifyHostRenderIsDead() const
     }
 }
 
+bool FormRenderMgr::IsRerenderForRenderDied(int64_t formId)
+{
+    bool ret = IsNeedRender(formId) && (atomicRerenderCount_ > 0);
+    HILOG_DEBUG("Is need to rerender: %{public}d.", ret);
+    return ret;
+}
+
 void FormRenderRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
     HILOG_ERROR("Recv FormRenderService death notice");
-
+    
     if (handler_) {
         handler_();
     }

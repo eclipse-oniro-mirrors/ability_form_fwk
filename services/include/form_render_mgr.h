@@ -16,6 +16,7 @@
 #ifndef OHOS_FORM_FWK_FORM_RENDER_MGR_H
 #define OHOS_FORM_FWK_FORM_RENDER_MGR_H
 
+#include <atomic>
 #include <singleton.h>
 #include <unordered_map>
 #include <unordered_set>
@@ -63,6 +64,8 @@ public:
 
     void HandleHostDied(const sptr<IRemoteObject> &host);
 
+    bool IsRerenderForRenderDied(int64_t formId);
+
 private:
     bool IsRemoveConnection(int64_t formId);
 
@@ -95,6 +98,7 @@ private:
     sptr<IRemoteObject::DeathRecipient> renderDeathRecipient_ = nullptr;
     mutable std::mutex hostsMutex_;
     std::unordered_set<sptr<IRemoteObject>, RemoteObjHash> etsHosts_;
+    std::atomic<int32_t> atomicRerenderCount_ = 0;
 };
 
 /**

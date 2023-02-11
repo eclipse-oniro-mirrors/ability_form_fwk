@@ -122,7 +122,7 @@ bool NapiFormUtil::Throw(NativeEngine &engine, int32_t errCode, const std::strin
 
 bool NapiFormUtil::ThrowByInternalErrorCode(NativeEngine &engine, int32_t internalErrorCode)
 {
-    int32_t externalErrorCode;
+    int32_t externalErrorCode = 0;
     std::string externalErrorMessage;
     FormMgr::GetInstance().GetExternalError(internalErrorCode, externalErrorCode, externalErrorMessage);
     return Throw(engine, externalErrorCode, externalErrorMessage);
@@ -136,7 +136,7 @@ bool NapiFormUtil::ThrowByExternalErrorCode(NativeEngine &engine, int32_t extern
 
 NativeValue *NapiFormUtil::CreateErrorByInternalErrorCode(NativeEngine &engine, int32_t internalErrorCode)
 {
-    int32_t externalErrorCode;
+    int32_t externalErrorCode = 0;
     std::string externalErrorMessage;
     FormMgr::GetInstance().GetExternalError(internalErrorCode, externalErrorCode, externalErrorMessage);
     return CreateJsError(engine, externalErrorCode, externalErrorMessage);
