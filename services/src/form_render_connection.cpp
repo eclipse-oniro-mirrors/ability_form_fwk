@@ -55,6 +55,14 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
         FormRenderMgr::GetInstance().RerenderAll();
         return;
     }
+
+    int32_t compileMode = 0;
+    if (!FormBmsHelper::GetInstance().GetCompileMode(formRecord_.bundleName, formRecord_.moduleName,
+        FormUtil::GetCurrentAccountId(), compileMode)) {
+        HILOG_INFO("get compile mode failed.");
+        return;
+    }
+
     FormRenderMgr::GetInstance().AddConnection(GetFormId(), this);
     FormRenderMgr::GetInstance().AddRenderDeathRecipient(remoteObject);
     int32_t callingUid = IPCSkeleton::GetCallingUid();
@@ -64,6 +72,7 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
     want.SetParams(wantParams_);
     want.SetParam(Constants::FORM_SUPPLY_UID, bundleUid);
     want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
+    want.SetParam(Constants::FORM_COMPILE_MODE_KEY, compileMode);
     FormTaskMgr::GetInstance().PostRenderForm(formRecord_, want, remoteObject);
 }
 
