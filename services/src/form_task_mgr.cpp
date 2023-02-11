@@ -17,7 +17,6 @@
 
 #include <cinttypes>
 
-#include "form_bms_helper.h"
 #include "form_constants.h"
 #include "form_data_mgr.h"
 #include "form_host_interface.h"
@@ -28,13 +27,11 @@
 #include "form_share_mgr.h"
 #include "form_supply_callback.h"
 #include "hilog_wrapper.h"
-#include "ipc_skeleton.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
 constexpr int32_t FORM_TASK_DELAY_TIME = 20; // ms
-constexpr int32_t CALLING_UID_TRANSFORM_DIVISOR = 200000;
 } // namespace
 FormTaskMgr::FormTaskMgr() {}
 FormTaskMgr::~FormTaskMgr() {}
@@ -653,7 +650,7 @@ void FormTaskMgr::FormShareSendResponse(int64_t formShareRequestCode, int32_t re
     DelayedSingleton<FormShareMgr>::GetInstance()->SendResponse(formShareRequestCode, result);
 }
 
-void FormTaskMgr::PostRenderForm(const FormRecord &formRecord, Want &want,
+void FormTaskMgr::PostRenderForm(const FormRecord &formRecord, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_INFO("%{public}s start", __func__);
@@ -662,14 +659,14 @@ void FormTaskMgr::PostRenderForm(const FormRecord &formRecord, Want &want,
         return;
     }
 
-    auto renderForm = [formRecord, want, remoteObject]() mutable {
+    auto renderForm = [formRecord, want, remoteObject]() {
         FormTaskMgr::GetInstance().RenderForm(formRecord, want, remoteObject);
     };
     eventHandler_->PostTask(renderForm, FORM_TASK_DELAY_TIME);
     HILOG_INFO("%{public}s end", __func__);
 }
 
-void FormTaskMgr::RenderForm(const FormRecord &formRecord, Want &want, const sptr<IRemoteObject> &remoteObject)
+void FormTaskMgr::RenderForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_INFO("%{public}s begin", __func__);
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
@@ -683,11 +680,6 @@ void FormTaskMgr::RenderForm(const FormRecord &formRecord, Want &want, const spt
     FormJsInfo formJsInfo = CreateFormJsInfo(formRecord.formId, formRecord);
     HILOG_INFO("data = %{public}s", formJsInfo.formData.c_str());
 
-    int32_t callingUid = IPCSkeleton::GetCallingUid();
-    int32_t userId = callingUid / CALLING_UID_TRANSFORM_DIVISOR;
-    int32_t bundleUid = FormBmsHelper::GetInstance().GetUidByBundleName(formRecord.bundleName, userId);
-    want.SetParam(Constants::FORM_SUPPLY_UID, bundleUid);
-
     int32_t error = remoteFormRender->RenderForm(formJsInfo, want, FormSupplyCallback::GetInstance());
     if (error != ERR_OK) {
         FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
@@ -698,7 +690,7 @@ void FormTaskMgr::RenderForm(const FormRecord &formRecord, Want &want, const spt
     HILOG_INFO("%{public}s end", __func__);
 }
 
-void FormTaskMgr::PostStopRenderingForm(const FormRecord &formRecord, Want &want, const sptr<IRemoteObject> &remoteObject)
+void FormTaskMgr::PostStopRenderingForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_INFO("%{public}s start", __func__);
     if (eventHandler_ == nullptr) {
@@ -706,14 +698,14 @@ void FormTaskMgr::PostStopRenderingForm(const FormRecord &formRecord, Want &want
         return;
     }
 
-    auto deleterenderForm = [formRecord, want, remoteObject]() mutable {
+    auto deleterenderForm = [formRecord, want, remoteObject]() {
         FormTaskMgr::GetInstance().StopRenderingForm(formRecord, want, remoteObject);
     };
     eventHandler_->PostTask(deleterenderForm, FORM_TASK_DELAY_TIME);
     HILOG_INFO("%{public}s end", __func__);
 }
 
-void FormTaskMgr::StopRenderingForm(const FormRecord &formRecord, Want &want, const sptr<IRemoteObject> &remoteObject)
+void FormTaskMgr::StopRenderingForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_INFO("%{public}s begin", __func__);
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
@@ -723,11 +715,6 @@ void FormTaskMgr::StopRenderingForm(const FormRecord &formRecord, Want &want, co
         HILOG_ERROR("%{public}s fail, Failed to get form render proxy.", __func__);
         return;
     }
-
-    int32_t callingUid = IPCSkeleton::GetCallingUid();
-    int32_t userId = callingUid / CALLING_UID_TRANSFORM_DIVISOR;
-    int32_t bundleUid = FormBmsHelper::GetInstance().GetUidByBundleName(formRecord.bundleName, userId);
-    want.SetParam(Constants::FORM_SUPPLY_UID, bundleUid);
 
     FormJsInfo formJsInfo = CreateFormJsInfo(formRecord.formId, formRecord);
     int32_t error = remoteFormDeleteRender->StopRenderingForm(formJsInfo, want, FormSupplyCallback::GetInstance());
