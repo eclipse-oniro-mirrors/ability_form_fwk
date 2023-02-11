@@ -277,12 +277,14 @@ void FormRenderRecord::HandleUpdateInJsThread(const FormJsInfo &formJsInfo, cons
             HILOG_ERROR("Create formRendererGroup failed.");
             return;
         }
+        HILOG_ERROR("wangkailong AddForm");
         formRendererGroup->AddForm(want, formJsInfo);
     } else {
         std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
         if (auto search = this->formRendererGroupMap_.find(formJsInfo.formId);
             search != this->formRendererGroupMap_.end()) {
             auto group = search->second;
+            HILOG_ERROR("wangkailong UpdateForm");
             group->UpdateForm(formJsInfo);
         }
     }
