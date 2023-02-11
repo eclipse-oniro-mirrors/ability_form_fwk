@@ -40,8 +40,8 @@ public:
 
     ErrCode RenderForm(const FormRecord &formRecord, const WantParams &wantParams);
 
-    ErrCode RenderForm(int64_t formId, const FormProviderInfo &formProviderInfo,
-        const WantParams &wantParams);
+    ErrCode UpdateRenderingForm(int64_t formId, const FormProviderData &formProviderData,
+        const WantParams &wantParams, bool mergeData);
 
     ErrCode StopRenderingForm(int64_t formId, const FormRecord &formRecord);
 
@@ -60,7 +60,6 @@ public:
     void ReconnectRenderService();
 
     void RerenderAll();
-
 private:
     bool IsRemoveConnection(int64_t formId);
 
