@@ -24,7 +24,6 @@
 #include "form_record.h"
 #include "form_render_connection.h"
 #include "form_render_interface.h"
-#include "form_stop_rendering_connection.h"
 #include "want.h"
 
 namespace OHOS {
@@ -65,9 +64,7 @@ public:
     void HandleHostDied(const sptr<IRemoteObject> &host);
 
     bool IsRerenderForRenderDied(int64_t formId);
-
 private:
-    bool IsRemoveConnection(int64_t formId);
 
     ErrCode ConnectRenderService(const sptr<AAFwk::IAbilityConnection> &connection) const;
 
@@ -77,12 +74,7 @@ private:
 
     void NotifyHostRenderIsDead() const;
 
-    void SecondFormRenderConnect(const FormRecord &formRecord, const WantParams &wantParams,
-        const sptr<IRemoteObject> &remoteObject, int32_t connectId);
-
 private:
-    // <FormRenderConnection, FormStopRenderingConnection>
-    using RenderConnectionPair = std::pair<sptr<FormAbilityConnection>, sptr<FormAbilityConnection>>;
     class RemoteObjHash {
     public:
         size_t operator() (const sptr<IRemoteObject> remoteObj) const
@@ -93,7 +85,7 @@ private:
 
     int32_t maxConnectKey = 0;
     mutable std::mutex conMutex_;
-    std::unordered_map<int64_t, RenderConnectionPair> renderFormConnections_;
+    std::unordered_map<int64_t, sptr<FormAbilityConnection>> renderFormConnections_;
     sptr<IFormRender> renderRemoteObj_ = nullptr;
     sptr<IRemoteObject::DeathRecipient> renderDeathRecipient_ = nullptr;
     mutable std::mutex hostsMutex_;

@@ -29,9 +29,6 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-namespace {
-    constexpr int32_t CALLING_UID_TRANSFORM_DIVISOR = 200000;
-}
 FormRenderConnection::FormRenderConnection(const FormRecord &formRecord,
     const WantParams &wantParams) : formRecord_(formRecord), wantParams_(wantParams)
 {
@@ -58,12 +55,8 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
 
     FormRenderMgr::GetInstance().AddConnection(GetFormId(), this, true);
     FormRenderMgr::GetInstance().AddRenderDeathRecipient(remoteObject);
-    int32_t callingUid = IPCSkeleton::GetCallingUid();
-    int32_t userId = callingUid / CALLING_UID_TRANSFORM_DIVISOR;
-    int32_t bundleUid = FormBmsHelper::GetInstance().GetUidByBundleName(formRecord_.bundleName, userId);
     Want want;
     want.SetParams(wantParams_);
-    want.SetParam(Constants::FORM_SUPPLY_UID, bundleUid);
     want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
     want.SetParam(Constants::FORM_COMPILE_MODE_KEY, compileMode);
     FormTaskMgr::GetInstance().PostRenderForm(formRecord_, want, remoteObject);

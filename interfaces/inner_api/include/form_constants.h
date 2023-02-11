@@ -178,6 +178,7 @@ namespace Constants {
     constexpr int32_t RENDER_FORM = 0; // default value
     constexpr int32_t UPDATE_RENDERING_FORM = 1;
     constexpr const char* FORM_COMPILE_MODE_KEY = "form_compile_mode";
+    constexpr const char* FORM_COMP_ID = "ohos.extra.param.key.form_comp_id";
 }  // namespace Constants
 }  // namespace AppExecFwk
 }  // namespace OHOS

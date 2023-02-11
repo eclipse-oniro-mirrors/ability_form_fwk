@@ -102,7 +102,7 @@ private:
 
     void HandleUpdateInJsThread(const FormJsInfo &formJsInfo, const Want &want);
 
-    void HandleDeleteInJsThread(int64_t formId, const Want &want);
+    void HandleDeleteInJsThread(int64_t formId, const std::vector<std::string> &compIds, const Want &want);
 
     void HandleDestroyInJsThread();
 
@@ -122,6 +122,9 @@ private:
     // <formId, formRendererGroup>
     std::mutex formRendererGroupMutex_;
     std::unordered_map<int64_t, std::shared_ptr<Ace::FormRendererGroup>> formRendererGroupMap_; 
+    // <formId, compId>
+    std::mutex compIdMutex_;
+    std::unordered_map<int64_t, std::vector<std::string>> compIdMap_;
 };
 }  // namespace FormRender
 }  // namespace AppExecFwk
