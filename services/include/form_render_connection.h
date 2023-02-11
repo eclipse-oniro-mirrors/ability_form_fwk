@@ -54,7 +54,6 @@ private:
     FormRecord formRecord_;
     WantParams wantParams_;
     bool needReconnect_ = false;
-
     DISALLOW_COPY_AND_MOVE(FormRenderConnection);
 };
 } // namespace AppExecFwk

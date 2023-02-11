@@ -71,6 +71,9 @@ private:
 
     void NotifyHostConnectRenderFailed() const;
 
+    void SecondFormRenderConnect(const FormRecord &formRecord, const WantParams &wantParams,
+        const sptr<IRemoteObject> &remoteObject, int32_t connectId);
+
 private:
     // <FormRenderConnection, FormStopRenderingConnection>
     using RenderConnectionPair = std::pair<sptr<FormAbilityConnection>, sptr<FormAbilityConnection>>;

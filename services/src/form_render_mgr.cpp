@@ -16,14 +16,17 @@
 #include "form_render_mgr.h"
 
 #include "form_ams_helper.h"
+#include "form_bms_helper.h"
 #include "form_constants.h"
 #include "form_data_mgr.h"
 #include "form_host_interface.h"
 #include "form_mgr_errors.h"
 #include "form_stop_rendering_connection.h"
 #include "form_supply_callback.h"
+#include "form_task_mgr.h"
 #include "form_util.h"
 #include "hilog_wrapper.h"
+#include "ipc_skeleton.h"
 #include "want.h"
 
 namespace OHOS {
@@ -32,6 +35,7 @@ namespace {
     constexpr int32_t MAX_RECONNECT_COUNT = 3;
     constexpr int32_t ERROR_CODE_CONNECT_RENDER = -1;
     const char *ERROR_MSG_CONNECT_RENDER = "Connect RenderService failed";
+    constexpr int32_t CALLING_UID_TRANSFORM_DIVISOR = 200000;
 }
 using Want = OHOS::AAFwk::Want;
 FormRenderMgr::FormRenderMgr()
@@ -52,7 +56,6 @@ ErrCode FormRenderMgr::RenderForm(const FormRecord &formRecord, const WantParams
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    sptr<IAbilityConnection> formRenderConnection;
     {
         std::lock_guard<std::mutex> lock(conMutex_);
         auto conIterator = renderFormConnections_.find(formRecord.formId);
@@ -62,11 +65,21 @@ ErrCode FormRenderMgr::RenderForm(const FormRecord &formRecord, const WantParams
                 HILOG_ERROR("connection is null.");
                 return ERR_APPEXECFWK_FORM_INVALID_PARAM;
             }
-            formRenderConnection = connection;
-        } else {
-            formRenderConnection = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
+            if (renderRemoteObj_ == nullptr) {
+                HILOG_ERROR("%{public}s, renderRemoteObj_ is nullptr", __func__);
+                return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+            }
+            auto remoteObject = renderRemoteObj_->AsObject();
+            if (remoteObject == nullptr) {
+                HILOG_ERROR("remoteObject is nullptr, can not get obj from renderRemoteObj.");
+                return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+            }
+            SecondFormRenderConnect(formRecord, wantParams, remoteObject, connection->GetConnectId());
+            return ERR_OK;
         }
     }
+    auto formRenderConnection = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
+    
 
     AddHostToken(formRecord.formId);
 
@@ -81,6 +94,20 @@ ErrCode FormRenderMgr::RenderForm(const FormRecord &formRecord, const WantParams
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     return ERR_OK;
+}
+
+void FormRenderMgr::SecondFormRenderConnect(const FormRecord &formRecord, const WantParams &wantParams,
+    const sptr<IRemoteObject> &remoteObject, int32_t connectId)
+{
+    HILOG_DEBUG("%{public}s called.", __func__);
+    int32_t callingUid = IPCSkeleton::GetCallingUid();
+    int32_t userId = callingUid / CALLING_UID_TRANSFORM_DIVISOR;
+    int32_t bundleUid = FormBmsHelper::GetInstance().GetUidByBundleName(formRecord.bundleName, userId);
+    Want want;
+    want.SetParams(wantParams);
+    want.SetParam(Constants::FORM_SUPPLY_UID, bundleUid);
+    want.SetParam(Constants::FORM_CONNECT_ID, connectId);
+    FormTaskMgr::GetInstance().PostRenderForm(formRecord, want, remoteObject);
 }
 
 ErrCode FormRenderMgr::UpdateRenderingForm(int64_t formId, const FormProviderData &formProviderData,
