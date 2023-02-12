@@ -145,15 +145,5 @@ ErrCode FormAmsHelper::StartAbility(const Want &want, int32_t userId)
     }
     return IN_PROCESS_CALL(ams->StartAbility(want, userId));
 }
-
-ErrCode FormAmsHelper::StopExtensionAbility(const Want &want)
-{
-    sptr<AAFwk::IAbilityManager> ams = GetAbilityManager();
-    if (ams == nullptr) {
-        HILOG_ERROR("%{public}s, ability service not connect", __func__);
-        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
-    }
-    return IN_PROCESS_CALL(ams->StopExtensionAbility(want, nullptr));
-}
 }  // namespace AppExecFwk
 }  // namespace OHOS

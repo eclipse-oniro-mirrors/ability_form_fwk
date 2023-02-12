@@ -262,11 +262,11 @@ void FormRenderMgr::RerenderAllForms()
     {
         std::lock_guard<std::mutex> lock(conMutex_);
         atomicRerenderCount_ = renderFormConnections_.size();
-        HILOG_INFO("The forms need to rerender count: %{public}zu.", renderFormConnections_.size());
         if (etsHosts_.empty() || renderFormConnections_.empty()) {
             HILOG_INFO("All hosts died or all connections erased, no need to rerender.");
             return;
         }
+        HILOG_INFO("The forms need to rerender count: %{public}zu.", renderFormConnections_.size());
     }
 
     NotifyHostRenderIsDead();
