@@ -50,7 +50,6 @@ public:
     void OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode) override;
 
     void SetReconnectFlag();
-
 private:
     FormRecord formRecord_;
     WantParams wantParams_;

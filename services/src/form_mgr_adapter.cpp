@@ -452,10 +452,8 @@ int FormMgrAdapter::UpdateForm(const int64_t formId,
     }
 
     if (formRecord.uiSyntax == FormType::ETS) {
-        nlohmann::json addJsonData = formProviderData.GetData();
-        formRecord.formProviderInfo.MergeData(addJsonData);
         WantParams wantParams;
-        return FormRenderMgr::GetInstance().RenderForm(formRecord, wantParams);
+        return FormRenderMgr::GetInstance().UpdateRenderingForm(formId, formProviderData, wantParams, true);
     } else {
         // update Form
        return FormProviderMgr::GetInstance().UpdateForm(matchedFormId, formRecord, formProviderData);
@@ -1240,7 +1238,11 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
     itemInfo.SetScheduledUpdateTime(formInfo.scheduledUpdateTime);
     itemInfo.SetJsComponentName(formInfo.jsComponentName);
     itemInfo.SetFormVisibleNotify(formInfo.formVisibleNotify);
-    itemInfo.SetFormSrc(formInfo.src);
+    auto formSrc = formInfo.src;
+    if (formSrc.rfind(POINT_ETS) == formSrc.size() - POINT_ETS.size()) {
+        formSrc.erase(formSrc.end() - POINT_ETS.size(), formSrc.end());
+    }
+    itemInfo.SetFormSrc(formSrc);
     itemInfo.SetFormWindow(formInfo.window);
     itemInfo.SetType(formInfo.type);
     itemInfo.SetUiSyntax(formInfo.uiSyntax);
@@ -1568,6 +1570,8 @@ ErrCode FormMgrAdapter::AddRequestPublishForm(const FormItemInfo &formItemInfo, 
     int32_t currentUserId = GetCurrentUserId(callingUid);
     // allot form record
     FormRecord formRecord = FormDataMgr::GetInstance().AllotFormRecord(formItemInfo, callingUid, currentUserId);
+    formRecord.formProviderInfo.SetFormData(*formProviderData);
+    FormRenderMgr::GetInstance().RenderForm(formRecord, want.GetParams()); // render for arkTs form
 
     // create form info for js
     FormDataMgr::GetInstance().CreateFormJsInfo(formId, formRecord, formJsInfo);

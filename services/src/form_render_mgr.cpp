@@ -48,7 +48,7 @@ ErrCode FormRenderMgr::RenderForm(const FormRecord &formRecord, const WantParams
     }
 
     if (formRecord.formId <= 0) {
-        HILOG_ERROR("%{public}s fail, formId should be greater than 0", __func__);
+        HILOG_ERROR("%{public}s fail, formId should be greater than 0.", __func__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
@@ -67,7 +67,7 @@ ErrCode FormRenderMgr::RenderForm(const FormRecord &formRecord, const WantParams
             formRenderConnection = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
         }
     }
-    
+
     AddHostToken(formRecord.formId);
 
     if (formRenderConnection == nullptr) {
@@ -83,8 +83,8 @@ ErrCode FormRenderMgr::RenderForm(const FormRecord &formRecord, const WantParams
     return ERR_OK;
 }
 
-ErrCode FormRenderMgr::RenderForm(int64_t formId, const FormProviderInfo &formProviderInfo,
-    const WantParams &wantParams)
+ErrCode FormRenderMgr::UpdateRenderingForm(int64_t formId, const FormProviderData &formProviderData,
+    const WantParams &wantParams, bool mergeData)
 {
     FormRecord formRecord;
     bool isGetFormRecord = FormDataMgr::GetInstance().GetFormRecord(formId, formRecord);
@@ -92,9 +92,21 @@ ErrCode FormRenderMgr::RenderForm(int64_t formId, const FormProviderInfo &formPr
         HILOG_ERROR("%{public}s fail, not exist such form, formId:%{public}" PRId64 "", __func__, formId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
-    formRecord.formProviderInfo = formProviderInfo;
+    if (mergeData) {
+        nlohmann::json jsonData = formProviderData.GetData();
+        formRecord.formProviderInfo.MergeData(jsonData);
+        auto providerData = formRecord.formProviderInfo.GetFormData();
+        providerData.SetImageDataState(formProviderData.GetImageDataState());
+        providerData.SetImageDataMap(formProviderData.GetImageDataMap());
+        formRecord.formProviderInfo.SetFormData(providerData);
+    } else {
+        formRecord.formProviderInfo.SetFormData(formProviderData);
+    }
 
-    return RenderForm(formRecord, wantParams);
+    Want want;
+    want.SetParams(wantParams);
+    want.SetParam(Constants::FORM_RENDER_TYPE_KEY, Constants::UPDATE_RENDERING_FORM);
+    return RenderForm(formRecord, want.GetParams());
 }
 
 ErrCode FormRenderMgr::StopRenderingForm(int64_t formId, const FormRecord &formRecord)

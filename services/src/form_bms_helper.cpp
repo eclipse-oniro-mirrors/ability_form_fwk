@@ -201,5 +201,33 @@ int32_t FormBmsHelper::GetUidByBundleName(const std::string &bundleName, const i
     }
     return IN_PROCESS_CALL(iBundleMgr->GetUidByBundleName(bundleName, userId));
 }
+
+bool FormBmsHelper::GetCompileMode(const std::string &bundleName, const std::string &moduleName,
+    int32_t userId, int32_t &compileMode)
+{
+    HILOG_DEBUG("%{public}s called.", __func__);
+    sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
+    if (iBundleMgr == nullptr) {
+        HILOG_ERROR("iBundleMgr is nullptr");
+        return false;
+    }
+    int32_t flags = BundleFlag::GET_BUNDLE_DEFAULT;
+    BundleInfo bundleInfo;
+    if (!IN_PROCESS_CALL(iBundleMgr->GetBundleInfo(bundleName, flags, bundleInfo, userId))) {
+        HILOG_ERROR("Get bundle info failed.");
+        return false;
+    }
+
+    for (auto hapModuleInfo : bundleInfo.hapModuleInfos) {
+        if (!moduleName.empty() && hapModuleInfo.moduleName != moduleName) {
+            continue;
+        }
+        compileMode = static_cast<int32_t>(hapModuleInfo.compileMode);
+        return true;
+    }
+
+    HILOG_ERROR("Get compile mode failed.");
+    return false;
+}
 } // namespace AppExecFwk
 } // namespace OHOS

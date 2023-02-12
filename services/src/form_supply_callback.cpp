@@ -74,7 +74,8 @@ int FormSupplyCallback::OnAcquire(const FormProviderInfo &formProviderInfo, cons
     }
 
     if (FormRenderMgr::GetInstance().IsNeedRender(formId)) {
-        return FormRenderMgr::GetInstance().RenderForm(formId, formProviderInfo, want.GetParams());
+        return FormRenderMgr::GetInstance().UpdateRenderingForm(formId, formProviderInfo.GetFormData(),
+            want.GetParams(), false);
     }
 
     int type = want.GetIntParam(Constants::ACQUIRE_TYPE, 0);

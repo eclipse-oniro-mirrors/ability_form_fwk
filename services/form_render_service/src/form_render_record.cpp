@@ -29,7 +29,7 @@ std::shared_ptr<FormRenderRecord> FormRenderRecord::Create(const std::string &bu
         HILOG_ERROR("Create FormRenderRecord failed.");
         return nullptr;
     }
-    
+
     if (!renderRecord->CreateEventHandler(bundleName)) {
         HILOG_ERROR("CreateEventHandler failed.");
         return nullptr;
@@ -90,7 +90,7 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
         }
         renderRecord->HandleUpdateInJsThread(formJsInfo, want);
     };
-    
+
     if (eventHandler_ == nullptr) {
         HILOG_ERROR("eventHandler_ is nullptr");
         return RENDER_FORM_FAILED;
@@ -119,7 +119,7 @@ int32_t FormRenderRecord::DeleteRenderRecord(int64_t formId, const Want &want, c
         }
         renderRecord->HandleDeleteInJsThread(formId, want);
     };
-    
+
     if (eventHandler_ == nullptr) {
         HILOG_ERROR("eventHandler_ is nullptr");
         return RENDER_FORM_FAILED;
@@ -166,7 +166,7 @@ bool FormRenderRecord::CreateRuntime(const FormJsInfo &formJsInfo)
     return true;
 }
 
-std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::GetContext(const FormJsInfo &formJsInfo)
+std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::GetContext(const FormJsInfo &formJsInfo, const Want &want)
 {
     {
         std::lock_guard<std::mutex> lock(contextsMapMutex_);
@@ -176,10 +176,10 @@ std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::GetContext(const Form
         }
     }
 
-    return CreateContext(formJsInfo);
+    return CreateContext(formJsInfo, want);
 }
 
-std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::CreateContext(const FormJsInfo &formJsInfo)
+std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::CreateContext(const FormJsInfo &formJsInfo, const Want &want)
 {
     auto context = std::make_shared<AbilityRuntime::ContextImpl>();
     if (context == nullptr) {
@@ -189,13 +189,15 @@ std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::CreateContext(const F
     AppExecFwk::HapModuleInfo hapModuleInfo;
     hapModuleInfo.name = formJsInfo.moduleName;
     hapModuleInfo.hapPath = formJsInfo.jsFormCodePath;
+    hapModuleInfo.compileMode = static_cast<CompileMode>(want.GetIntParam(Constants::FORM_COMPILE_MODE_KEY,
+        static_cast<int32_t>(CompileMode::ES_MODULE)));
     context->InitHapModuleInfo(hapModuleInfo);
     auto applicationInfo = std::make_shared<AppExecFwk::ApplicationInfo>();
     applicationInfo->bundleName = formJsInfo.bundleName;
     context->SetApplicationInfo(applicationInfo);
     HILOG_DEBUG("bundleName is %{public}s, moduleName is %{public}s",
         formJsInfo.bundleName.c_str(), formJsInfo.moduleName.c_str());
-    
+
     std::lock_guard<std::mutex> lock(contextsMapMutex_);
     contextsMapForModuleName_.emplace(formJsInfo.moduleName, context);
     return context;
@@ -233,28 +235,29 @@ void FormRenderRecord::HandleUpdateInJsThread(const FormJsInfo &formJsInfo, cons
         HILOG_ERROR("Create runtime failed.");
         return;
     }
-    auto context = GetContext(formJsInfo);
+    auto context = GetContext(formJsInfo, want);
     if (context == nullptr) {
         HILOG_ERROR("Create Context failed.");
         return;
     }
 
-    {
+    auto renderType = want.GetIntParam(Constants::FORM_RENDER_TYPE_KEY, Constants::RENDER_FORM);
+    HILOG_INFO("renderType is %{public}d.", renderType);
+    if (renderType == Constants::RENDER_FORM) {
+        auto formRendererGroup = this->GetFormRendererGroup(formJsInfo, context, runtime_);
+        if (formRendererGroup == nullptr) {
+            HILOG_ERROR("Create formRendererGroup failed.");
+            return;
+        }
+        formRendererGroup->AddForm(want, formJsInfo);
+    } else {
         std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
         if (auto search = this->formRendererGroupMap_.find(formJsInfo.formId);
             search != this->formRendererGroupMap_.end()) {
             auto group = search->second;
             group->UpdateForm(formJsInfo);
-            return;
         }
     }
-
-    auto formRendererGroup = this->GetFormRendererGroup(formJsInfo, context, runtime_);
-    if (formRendererGroup == nullptr) {
-        HILOG_ERROR("Create formRendererGroup failed.");
-        return;
-    }
-    formRendererGroup->AddForm(want, formJsInfo);
     return;
 }
 

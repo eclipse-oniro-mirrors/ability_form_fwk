@@ -95,7 +95,7 @@ int32_t FormRenderImpl::StopRenderingForm(const FormJsInfo &formJsInfo, const Wa
         HILOG_ERROR("%{public}s warn, IFormSupply is nullptr", __func__);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
-    
+
     int32_t uid = want.GetIntParam(Constants::FORM_SUPPLY_UID, 0);
     if (!uid) {
         HILOG_ERROR("GetUid failed");
