@@ -104,6 +104,39 @@ int32_t FormRenderProxy::StopRenderingForm(const FormJsInfo &formJsInfo, const W
     return ERR_OK;
 }
 
+int32_t FormRenderProxy::CleanFormHost(const sptr<IRemoteObject> &hostToken)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_ASYNC);;
+
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("%{public}s, failed to write interface token", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteRemoteObject(hostToken)) {
+        HILOG_ERROR("%{public}s, failed to write hostToken", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!Remote()) {
+        HILOG_ERROR("Remote obj is nullptr");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    int error = Remote()->SendRequest(
+        static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_FORM_HOST_DIED),
+        data,
+        reply,
+        option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d", __func__, error);
+        return error;
+    }
+    return ERR_OK;
+}
+
 bool FormRenderProxy::WriteInterfaceToken(MessageParcel &data)
 {
     if (!data.WriteInterfaceToken(FormRenderProxy::GetDescriptor())) {

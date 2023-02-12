@@ -16,6 +16,7 @@
 #ifndef OHOS_FORM_FWK_FORM_RENDER_MGR_H
 #define OHOS_FORM_FWK_FORM_RENDER_MGR_H
 
+#include <atomic>
 #include <singleton.h>
 #include <unordered_map>
 #include <unordered_set>
@@ -23,6 +24,7 @@
 #include "form_record.h"
 #include "form_render_connection.h"
 #include "form_render_interface.h"
+#include "form_stop_rendering_connection.h"
 #include "want.h"
 
 namespace OHOS {
@@ -38,7 +40,8 @@ DECLARE_DELAYED_REF_SINGLETON(FormRenderMgr)
 public:
     DISALLOW_COPY_AND_MOVE(FormRenderMgr);
 
-    ErrCode RenderForm(const FormRecord &formRecord, const WantParams &wantParams);
+    ErrCode RenderForm(
+        const FormRecord &formRecord, const WantParams &wantParams, const sptr<IRemoteObject> &hostToken = nullptr);
 
     ErrCode UpdateRenderingForm(int64_t formId, const FormProviderData &formProviderData,
         const WantParams &wantParams, bool mergeData);
@@ -49,7 +52,7 @@ public:
 
     ErrCode StopRenderingFormCallback(int64_t formId, const Want &want);
 
-    ErrCode AddConnection(int64_t formId, sptr<FormAbilityConnection> connection);
+    ErrCode AddConnection(int64_t formId, sptr<FormAbilityConnection> connection, bool isRenderConnection);
 
     ErrCode RemoveConnection(int64_t formId);
 
@@ -57,19 +60,22 @@ public:
 
     bool IsNeedRender(int64_t formId);
 
-    void ReconnectRenderService();
+    void RerenderAllForms();
 
-    void RerenderAll();
+    void HandleHostDied(const sptr<IRemoteObject> &host);
+
+    bool IsRerenderForRenderDied(int64_t formId);
+
 private:
     bool IsRemoveConnection(int64_t formId);
 
     ErrCode ConnectRenderService(const sptr<AAFwk::IAbilityConnection> &connection) const;
 
-    void AddHostToken(int64_t formId);
+    void AddHostToken(const sptr<IRemoteObject> &host);
 
     void RemoveHostToken(const sptr<IRemoteObject> &host);
 
-    void NotifyHostConnectRenderFailed() const;
+    void NotifyHostRenderIsDead() const;
 
     void SecondFormRenderConnect(const FormRecord &formRecord, const WantParams &wantParams,
         const sptr<IRemoteObject> &remoteObject, int32_t connectId);
@@ -88,12 +94,11 @@ private:
     int32_t maxConnectKey = 0;
     mutable std::mutex conMutex_;
     std::unordered_map<int64_t, RenderConnectionPair> renderFormConnections_;
-    sptr<IFormRender> renderRemoteObj_;
-    sptr<FormRenderConnection> reconnectRenderConnection_;
-    sptr<IRemoteObject::DeathRecipient> renderDeathRecipient_;
+    sptr<IFormRender> renderRemoteObj_ = nullptr;
+    sptr<IRemoteObject::DeathRecipient> renderDeathRecipient_ = nullptr;
     mutable std::mutex hostsMutex_;
     std::unordered_set<sptr<IRemoteObject>, RemoteObjHash> etsHosts_;
-    int32_t reconnectCount_ = 0;
+    std::atomic<int32_t> atomicRerenderCount_ = 0;
 };
 
 /**

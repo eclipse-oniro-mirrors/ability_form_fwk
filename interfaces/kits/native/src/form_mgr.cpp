@@ -958,5 +958,18 @@ bool FormMgr::CheckFMSReady()
 
     return true;
 }
+
+void FormMgr::GetExternalError(int32_t innerErrorCode, int32_t &externalErrorCode, std::string &errorMsg)
+{
+    externalErrorCode = FormErrors::GetInstance().QueryExternalErrorCode(innerErrorCode);
+    errorMsg = FormErrors::GetInstance().QueryExternalErrorMessage(innerErrorCode, externalErrorCode);
+    HILOG_DEBUG("innerErrorCode: %{public}d, externalErrorCode: %{public}d, errorMsg: %{public}s",
+        innerErrorCode, externalErrorCode, errorMsg.c_str());
+}
+
+std::string FormMgr::GetErrorMsgByExternalErrorCode(int32_t externalErrorCode)
+{
+    return FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(externalErrorCode);
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

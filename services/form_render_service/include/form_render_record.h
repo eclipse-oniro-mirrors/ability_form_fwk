@@ -44,6 +44,8 @@ public:
 
     FormRenderRecord(const std::string &bundleName, int32_t uid);
 
+    ~FormRenderRecord();
+
     /**
      * @brief When the host exits, clean up related resources.
      * @param hostRemoteObj host token.
@@ -102,6 +104,10 @@ private:
 
     void HandleDeleteInJsThread(int64_t formId, const Want &want);
 
+    void HandleDestroyInJsThread();
+
+    std::string GenerateContextKey(const FormJsInfo &formJsInfo);
+
     std::string bundleName_;
     int32_t uid_ = Constants::INVALID_UID;
     std::shared_ptr<EventRunner> eventRunner_;
@@ -115,7 +121,7 @@ private:
     std::unordered_map<std::string, std::shared_ptr<AbilityRuntime::Context>> contextsMapForModuleName_;
     // <formId, formRendererGroup>
     std::mutex formRendererGroupMutex_;
-    std::map<int64_t, std::shared_ptr<Ace::FormRendererGroup>> formRendererGroupMap_;
+    std::unordered_map<int64_t, std::shared_ptr<Ace::FormRendererGroup>> formRendererGroupMap_; 
 };
 }  // namespace FormRender
 }  // namespace AppExecFwk

@@ -19,7 +19,6 @@
 #include <memory>
 
 #include "event_handler.h"
-#include "form_bms_helper.h"
 #include "form_constants.h"
 #include "form_render_service_extension.h"
 #include "form_supply_proxy.h"
@@ -73,13 +72,14 @@ int32_t FormRenderImpl::RenderForm(const FormJsInfo &formJsInfo, const Want &wan
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     int32_t result = ERR_OK;
+    sptr<IRemoteObject> hostToken = want.GetRemoteObject(Constants::PARAM_FORM_HOST_TOKEN);
     {
         std::lock_guard<std::mutex> lock(renderRecordMutex_);
         if (auto search = renderRecordMap_.find(uid); search != renderRecordMap_.end()) {
-            result = search->second->UpdateRenderRecord(formJsInfo, want, callerToken);
+            result = search->second->UpdateRenderRecord(formJsInfo, want, hostToken);
         } else {
             auto record = FormRenderRecord::Create(formJsInfo.bundleName, uid);
-            result = record->UpdateRenderRecord(formJsInfo, want, callerToken);
+            result = record->UpdateRenderRecord(formJsInfo, want, hostToken);
             renderRecordMap_.emplace(uid, record);
         }
     }
@@ -117,6 +117,25 @@ int32_t FormRenderImpl::StopRenderingForm(const FormJsInfo &formJsInfo, const Wa
         want.GetIntParam(Constants::FORM_CONNECT_ID, 0L));
 
     formSupplyClient->OnStopRenderingTaskDone(formJsInfo.formId, want);
+    return ERR_OK;
+}
+
+int32_t FormRenderImpl::CleanFormHost(const sptr<IRemoteObject> &hostToken)
+{
+    HILOG_INFO("Form host is died, clean renderRecord.");
+    std::lock_guard<std::mutex> lock(renderRecordMutex_);
+    for (auto iter = renderRecordMap_.begin(); iter != renderRecordMap_.end();) {
+        auto renderRecord = iter->second;
+        if (renderRecord && renderRecord->HandleHostDied(hostToken)) {
+            HILOG_DEBUG("renderRecord is empty, remove.");
+            iter = renderRecordMap_.erase(iter);
+        } else {
+            ++iter;
+        }
+    }
+    if (renderRecordMap_.empty()) {
+        HILOG_INFO("renderRecordMap_ is empty, FormRenderService will exit later.");
+    }
     return ERR_OK;
 }
 } // namespace FormRender

@@ -25,6 +25,24 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+enum {
+    ERR_FORM_EXTERNAL_PERMISSION_DENIED = 201,
+    ERR_FORM_EXTERNAL_PARAM_INVALID = 401,
+    ERR_FORM_EXTERNAL_SYSTEMCAP_ERROR = 801,
+    ERR_FORM_EXTERNAL_KERNEL_ERROR = 16500001,
+    ERR_FORM_EXTERNAL_KERNEL_MALLOC_ERROR = 16500002,
+    ERR_FORM_EXTERNAL_IPC_ERROR = 16500050,
+    ERR_FORM_EXTERNAL_SERVICE_CONNECTION_ERROR = 16500060,
+    ERR_FORM_EXTERNAL_GET_INFO_FAILED = 16500100,
+    ERR_FORM_EXTERNAL_NOT_SYSTEM_APP = 16500101,
+    ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR = 16501000,
+    ERR_FORM_EXTERNAL_FORM_ID_NOT_EXIST = 16501001,
+    ERR_FORM_EXTERNAL_FORM_NUM_EXCEEDS_UPPER_BOUND = 16501002,
+    ERR_FORM_EXTERNAL_OPERATION_FORM_NOT_SELF = 16501003,
+    ERR_FORM_EXTERNAL_ABILITY_NOT_INSTALLED = 16501004,
+    ERR_FORM_EXTERNAL_CONNECT_RENDER_FAILED = 16501005,
+};
+
 /**
  * @class FormErrors
  * FormErrors is used to access form error message.
@@ -41,6 +59,31 @@ public:
      * @return Message content.
      */
     std::string GetErrorMessage(int errCode);
+
+    /**
+     * @brief Get external error code by internal error code.
+     *
+     * @param internalErrorCode Internal error code.
+     * @return External error code.
+     */
+    int32_t QueryExternalErrorCode(int32_t internalErrorCode);
+
+    /**
+     * @brief Get external error message by error code.
+     *
+     * @param internalErrorCode Internal error code.
+     * @param externalErrorCode External error code.
+     * @return External error message.
+     */
+    std::string QueryExternalErrorMessage(int32_t internalErrorCode, int32_t externalErrorCode);
+
+    /**
+     * @brief Get external error message by external error code.
+     *
+     * @param externalErrorCode External error code.
+     * @return External error message.
+     */
+    std::string GetErrorMsgByExternalErrorCode(int32_t externalErrorCode);
 
 private:
     /**

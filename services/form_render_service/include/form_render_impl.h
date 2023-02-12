@@ -59,6 +59,13 @@ public:
     int32_t StopRenderingForm(
         const FormJsInfo &formJsInfo, const Want &want, const sptr<IRemoteObject> &callerToken) override;
 
+    /**
+     * @brief When host is died, clean resources. This is async API.
+     * @param hostToken Caller ability token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t CleanFormHost(const sptr<IRemoteObject> &hostToken) override;
+
 private:
     std::mutex renderRecordMutex_;
     std::unordered_map<int32_t, std::shared_ptr<FormRenderRecord>> renderRecordMap_; // <userId, renderRecord>

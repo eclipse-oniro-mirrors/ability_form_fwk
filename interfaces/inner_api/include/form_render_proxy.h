@@ -41,7 +41,23 @@ public:
      */
     int32_t RenderForm(const FormJsInfo &formJsInfo, const Want &want, const sptr<IRemoteObject> &callerToken) override;
 
-    int32_t StopRenderingForm(const FormJsInfo &formJsInfo, const Want &want, const sptr<IRemoteObject> &callerToken) override;
+    /**
+     * @brief Stop rendering form. This is sync API.
+     * @param formJsInfo The form js info.
+     * @param want Indicates the {@link Want} structure containing form info.
+     * @param callerToken Caller ability token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t StopRenderingForm(
+        const FormJsInfo &formJsInfo, const Want &want, const sptr<IRemoteObject> &callerToken) override;
+
+    /**
+     * @brief When host is died, clean resources. This is async API.
+     * @param hostToken Caller ability token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t CleanFormHost(const sptr<IRemoteObject> &hostToken) override;
+
 private:
     template<typename T>
     int32_t GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos);
