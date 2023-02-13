@@ -44,9 +44,7 @@ FormRenderRecord::FormRenderRecord(
 FormRenderRecord::~FormRenderRecord()
 {
     // Some resources need to be deleted in a JS thread
-    std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
-    auto syncTask = [thisWeakPtr]() {
-        auto renderRecord = thisWeakPtr.lock();
+    auto syncTask = [renderRecord = this]() {
         if (renderRecord == nullptr) {
             HILOG_ERROR("renderRecord is nullptr.");
             return;
