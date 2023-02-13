@@ -73,7 +73,6 @@ ohos_shared_library("libfms") {
     "services/src/form_render_mgr.cpp",
     "services/src/form_share_connection.cpp",
     "services/src/form_share_mgr.cpp",
-    "services/src/form_stop_rendering_connection.cpp",
     "services/src/form_supply_callback.cpp",
     "services/src/form_sys_event_receiver.cpp",
     "services/src/form_task_mgr.cpp",

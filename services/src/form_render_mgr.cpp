@@ -21,7 +21,6 @@
 #include "form_data_mgr.h"
 #include "form_host_interface.h"
 #include "form_mgr_errors.h"
-#include "form_stop_rendering_connection.h"
 #include "form_supply_callback.h"
 #include "form_task_mgr.h"
 #include "form_util.h"
@@ -54,18 +53,21 @@ ErrCode FormRenderMgr::RenderForm(
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
+    int32_t callingUid = IPCSkeleton::GetCallingUid();
+    int32_t userId = callingUid / CALLING_UID_TRANSFORM_DIVISOR;
+    int32_t bundleUid = FormBmsHelper::GetInstance().GetUidByBundleName(formRecord.bundleName, userId);
+    Want want;
+    want.SetParams(wantParams);
+    want.SetParam(Constants::FORM_SUPPLY_UID, bundleUid);
     if (atomicRerenderCount_ > 0) {
         --atomicRerenderCount_;
     } else {
         atomicRerenderCount_ = 0;
     }
-
-    Want newWant;
-    newWant.SetParams(wantParams);
     if (hostToken) {
         HILOG_DEBUG("Add host token");
         AddHostToken(hostToken);
-        newWant.SetParam(Constants::PARAM_FORM_HOST_TOKEN, hostToken);
+        want.SetParam(Constants::PARAM_FORM_HOST_TOKEN, hostToken);
     }
 
     {
@@ -73,7 +75,7 @@ ErrCode FormRenderMgr::RenderForm(
         HILOG_DEBUG("renderFormConnections_ size: %{public}zu.", renderFormConnections_.size());
         auto conIterator = renderFormConnections_.find(formRecord.formId);
         if (conIterator != renderFormConnections_.end()) {
-            auto connection = conIterator->second.first;
+            auto connection = conIterator->second;
             if (connection == nullptr) {
                 HILOG_ERROR("connection is null.");
                 return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -88,12 +90,13 @@ ErrCode FormRenderMgr::RenderForm(
                 HILOG_ERROR("remoteObject is nullptr, can not get obj from renderRemoteObj.");
                 return ERR_APPEXECFWK_FORM_INVALID_PARAM;
             }
-            SecondFormRenderConnect(formRecord, newWant.GetParams(), remoteObject, connection->GetConnectId());
+            want.SetParam(Constants::FORM_CONNECT_ID, connection->GetConnectId());
+            FormTaskMgr::GetInstance().PostRenderForm(formRecord, want, remoteObject);
             return ERR_OK;
         }
     }
-    auto formRenderConnection = new (std::nothrow) FormRenderConnection(formRecord, newWant.GetParams());
-    
+    auto formRenderConnection = new (std::nothrow) FormRenderConnection(formRecord, want.GetParams());
+
     if (formRenderConnection == nullptr) {
         HILOG_ERROR("formRenderConnection is null.");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
@@ -105,20 +108,6 @@ ErrCode FormRenderMgr::RenderForm(
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     return ERR_OK;
-}
-
-void FormRenderMgr::SecondFormRenderConnect(const FormRecord &formRecord, const WantParams &wantParams,
-    const sptr<IRemoteObject> &remoteObject, int32_t connectId)
-{
-    HILOG_DEBUG("%{public}s called.", __func__);
-    int32_t callingUid = IPCSkeleton::GetCallingUid();
-    int32_t userId = callingUid / CALLING_UID_TRANSFORM_DIVISOR;
-    int32_t bundleUid = FormBmsHelper::GetInstance().GetUidByBundleName(formRecord.bundleName, userId);
-    Want want;
-    want.SetParams(wantParams);
-    want.SetParam(Constants::FORM_SUPPLY_UID, bundleUid);
-    want.SetParam(Constants::FORM_CONNECT_ID, connectId);
-    FormTaskMgr::GetInstance().PostRenderForm(formRecord, want, remoteObject);
 }
 
 ErrCode FormRenderMgr::UpdateRenderingForm(int64_t formId, const FormProviderData &formProviderData,
@@ -145,7 +134,34 @@ ErrCode FormRenderMgr::UpdateRenderingForm(int64_t formId, const FormProviderDat
     Want want;
     want.SetParams(wantParams);
     want.SetParam(Constants::FORM_RENDER_TYPE_KEY, Constants::UPDATE_RENDERING_FORM);
-    return RenderForm(formRecord, want.GetParams());
+    int32_t callingUid = IPCSkeleton::GetCallingUid();
+    int32_t userId = callingUid / CALLING_UID_TRANSFORM_DIVISOR;
+    int32_t bundleUid = FormBmsHelper::GetInstance().GetUidByBundleName(formRecord.bundleName, userId);
+    want.SetParam(Constants::FORM_SUPPLY_UID, bundleUid);
+    {
+        std::lock_guard<std::mutex> lock(conMutex_);
+        auto conIterator = renderFormConnections_.find(formRecord.formId);
+        if (conIterator != renderFormConnections_.end()) {
+            auto connection = conIterator->second;
+            if (connection == nullptr) {
+                HILOG_ERROR("connection is null.");
+                return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+            }
+            if (renderRemoteObj_ == nullptr) {
+                HILOG_ERROR("%{public}s, renderRemoteObj_ is nullptr", __func__);
+                return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+            }
+            auto remoteObject = renderRemoteObj_->AsObject();
+            if (remoteObject == nullptr) {
+                HILOG_ERROR("remoteObject is nullptr, can not get obj from renderRemoteObj.");
+                return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+            }
+            want.SetParam(Constants::FORM_CONNECT_ID, connection->GetConnectId());
+            FormTaskMgr::GetInstance().PostRenderForm(formRecord, want, remoteObject);
+            return ERR_OK;
+        }
+    }
+    return ERR_APPEXECFWK_FORM_INVALID_PARAM;
 }
 
 ErrCode FormRenderMgr::StopRenderingForm(int64_t formId, const FormRecord &formRecord)
@@ -165,19 +181,35 @@ ErrCode FormRenderMgr::StopRenderingForm(int64_t formId, const FormRecord &formR
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    sptr<IAbilityConnection> formStopRenderingConnection =
-        new (std::nothrow) FormStopRenderingConnection(formRecord, formRecord.bundleName, formRecord.abilityName);
-    if (formStopRenderingConnection == nullptr) {
-        HILOG_ERROR("formStopRenderingConnection is null.");
-        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+    Want want;
+    int32_t callingUid = IPCSkeleton::GetCallingUid();
+    int32_t userId = callingUid / CALLING_UID_TRANSFORM_DIVISOR;
+    int32_t bundleUid = FormBmsHelper::GetInstance().GetUidByBundleName(formRecord.bundleName, userId);
+    want.SetParam(Constants::FORM_SUPPLY_UID, bundleUid);
+    {
+        std::lock_guard<std::mutex> lock(conMutex_);
+        auto conIterator = renderFormConnections_.find(formRecord.formId);
+        if (conIterator != renderFormConnections_.end()) {
+            auto connection = conIterator->second;
+            if (connection == nullptr) {
+                HILOG_ERROR("connection is null.");
+                return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+            }
+            if (renderRemoteObj_ == nullptr) {
+                HILOG_ERROR("%{public}s, renderRemoteObj_ is nullptr", __func__);
+                return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+            }
+            auto remoteObject = renderRemoteObj_->AsObject();
+            if (remoteObject == nullptr) {
+                HILOG_ERROR("remoteObject is nullptr, can not get obj from renderRemoteObj.");
+                return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+            }
+            want.SetParam(Constants::FORM_CONNECT_ID, connection->GetConnectId());
+            FormTaskMgr::GetInstance().PostStopRenderingForm(formRecord, want, remoteObject);
+            return ERR_OK;
+        }
     }
-
-    ErrCode errorCode = ConnectRenderService(formStopRenderingConnection);
-    if (errorCode != ERR_OK) {
-        HILOG_ERROR("%{public}s fail, ConnectServiceAbility failed.", __func__);
-        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
-    }
-    return ERR_OK;
+    return ERR_APPEXECFWK_FORM_INVALID_PARAM;
 }
 
 ErrCode FormRenderMgr::RenderFormCallback(int64_t formId, const Want &want)
@@ -196,14 +228,13 @@ ErrCode FormRenderMgr::StopRenderingFormCallback(int64_t formId, const Want &wan
         HILOG_ERROR("Can not find formId in map.");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
-    sptr<FormAbilityConnection> stopConnection = conIterator->second.second;
+    sptr<FormAbilityConnection> stopConnection = conIterator->second;
     if (stopConnection == nullptr) {
         HILOG_ERROR("Can not find stopConnection in map.");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     FormAmsHelper::GetInstance().DisconnectServiceAbility(stopConnection);
-    conIterator->second.second = nullptr;
-
+    renderFormConnections_.erase(formId);
     return ERR_OK;
 }
 
@@ -224,14 +255,12 @@ ErrCode FormRenderMgr::AddConnection(int64_t formId, sptr<FormAbilityConnection>
         connection->SetConnectId(connectKey);
         auto conIterator = renderFormConnections_.find(formId);
         if (conIterator == renderFormConnections_.end()) {
-            renderFormConnections_.emplace(formId, RenderConnectionPair());
+            renderFormConnections_.emplace(formId, connection);
             conIterator = renderFormConnections_.begin();
         }
 
         if (isRenderConnection) {
-            renderFormConnections_[formId].first = connection;
-        } else {
-            renderFormConnections_[formId].second = connection;
+            renderFormConnections_[formId] = connection;
         }
         HILOG_DEBUG("renderFormConnections size: %{public}zu.", renderFormConnections_.size());
     }
@@ -244,8 +273,7 @@ ErrCode FormRenderMgr::RemoveConnection(int64_t formId)
     std::lock_guard<std::mutex> lock(conMutex_);
     auto conIterator = renderFormConnections_.find(formId);
     if (conIterator != renderFormConnections_.end()) {
-        FormAmsHelper::GetInstance().DisconnectServiceAbility(conIterator->second.first);
-        FormAmsHelper::GetInstance().DisconnectServiceAbility(conIterator->second.second);
+        FormAmsHelper::GetInstance().DisconnectServiceAbility(conIterator->second);
     }
     renderFormConnections_.erase(formId);
 
@@ -346,7 +374,7 @@ inline void FormRenderMgr::RemoveHostToken(const sptr<IRemoteObject> &host)
             HILOG_DEBUG("etsHosts is empty, disconnect all connections.");
             std::lock_guard<std::mutex> lock(conMutex_);
             for (const auto &item : renderFormConnections_) {
-                FormAmsHelper::GetInstance().DisconnectServiceAbility(item.second.first);
+                FormAmsHelper::GetInstance().DisconnectServiceAbility(item.second);
             }
         }
     }
