@@ -835,6 +835,7 @@ void FormDataMgr::CleanRemovedFormRecords(const std::string &bundleName, std::se
     for (itFormRecord = formRecords_.begin(); itFormRecord != formRecords_.end();) {
         auto itForm = std::find(removedForms.begin(), removedForms.end(), itFormRecord->first);
         if (itForm != removedForms.end()) {
+            FormRenderMgr::GetInstance().StopRenderingForm(itFormRecord->first, itFormRecord->second);
             itFormRecord = formRecords_.erase(itFormRecord);
         } else {
             itFormRecord++;
@@ -858,6 +859,7 @@ void FormDataMgr::CleanRemovedTempFormRecords(const std::string &bundleName, con
             if ((itFormRecord->second.formTempFlag) && (bundleName == itFormRecord->second.bundleName)
                 && (userId == itFormRecord->second.userId)) {
                 removedTempForms.emplace(itFormRecord->second.formId);
+                FormRenderMgr::GetInstance().StopRenderingForm(itFormRecord->first, itFormRecord->second);
                 itFormRecord = formRecords_.erase(itFormRecord);
             } else {
                 itFormRecord++;

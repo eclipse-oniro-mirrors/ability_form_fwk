@@ -105,6 +105,7 @@ int32_t FormRenderImpl::StopRenderingForm(const FormJsInfo &formJsInfo, const Wa
         std::lock_guard<std::mutex> lock(renderRecordMutex_);
         if (auto search = renderRecordMap_.find(uid); search != renderRecordMap_.end()) {
             if (search->second->DeleteRenderRecord(formJsInfo.formId, want, callerToken) == ERR_OK) {
+                renderRecordMap_.erase(search);
                 HILOG_INFO("DeleteRenderRecord success");
             }
         } else {
