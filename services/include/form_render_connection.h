@@ -49,12 +49,9 @@ public:
      */
     void OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode) override;
 
-    void SetReconnectFlag();
 private:
     FormRecord formRecord_;
     WantParams wantParams_;
-    bool needReconnect_ = false;
-
     DISALLOW_COPY_AND_MOVE(FormRenderConnection);
 };
 } // namespace AppExecFwk

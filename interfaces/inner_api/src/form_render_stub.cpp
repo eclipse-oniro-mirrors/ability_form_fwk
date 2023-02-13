@@ -30,6 +30,8 @@ FormRenderStub::FormRenderStub()
         &FormRenderStub::HandleRenderForm;
     memberFuncMap_[static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_STOP_RENDERING_FORM)] =
         &FormRenderStub::HandleStopRenderingForm;
+    memberFuncMap_[static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_FORM_HOST_DIED)] =
+        &FormRenderStub::HandleCleanFormHost;
 }
 
 FormRenderStub::~FormRenderStub()
@@ -102,6 +104,19 @@ int FormRenderStub::HandleStopRenderingForm(MessageParcel &data, MessageParcel &
     }
 
     int32_t result = StopRenderingForm(*formJsInfo, *want, client);
+    reply.WriteInt32(result);
+    return result;
+}
+
+int FormRenderStub::HandleCleanFormHost(MessageParcel &data, MessageParcel &reply)
+{
+    sptr<IRemoteObject> hostToken = data.ReadRemoteObject();
+    if (hostToken == nullptr) {
+        HILOG_ERROR("hostToken is nullptr.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    int32_t result = CleanFormHost(hostToken);
     reply.WriteInt32(result);
     return result;
 }

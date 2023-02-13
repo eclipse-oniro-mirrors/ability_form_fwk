@@ -22,6 +22,7 @@
 
 #include "form_callback_interface.h"
 #include "form_constants.h"
+#include "form_errors.h"
 #include "form_death_callback.h"
 #include "form_info.h"
 #include "form_js_info.h"
@@ -362,6 +363,22 @@ public:
      * @return Return true if form manager service ready; returns false otherwise.
      */
     bool CheckFMSReady();
+
+    /**
+     * @brief Get external error from innerErrorCode.
+     * @param innerErrorCode innerErrorCode, get from FMS.
+     * @param externalErrorCode output externalErrorCode.
+     * @param errorMsg output errorMsg.
+     */
+    void GetExternalError(int32_t innerErrorCode, int32_t &externalErrorCode, std::string &errorMsg);
+
+    /**
+     * @brief Get external error message by external error code.
+     *
+     * @param externalErrorCode External error code.
+     * @return External error message.
+     */
+    std::string GetErrorMsgByExternalErrorCode(int32_t externalErrorCode);
 
 private:
     /**

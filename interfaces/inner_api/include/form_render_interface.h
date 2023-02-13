@@ -53,6 +53,13 @@ public:
      */
     virtual int32_t StopRenderingForm(const FormJsInfo &formJsInfo, const Want &want, const sptr<IRemoteObject> &callerToken) = 0;
 
+    /**
+     * @brief When host is died, clean resources. This is async API.
+     * @param hostToken Caller ability token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int32_t CleanFormHost(const sptr<IRemoteObject> &hostToken) = 0;
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -65,6 +72,7 @@ public:
 
         FORM_RENDER_RENDER_FORM = 3101,
         FORM_RENDER_STOP_RENDERING_FORM = 3102,
+        FORM_RENDER_FORM_HOST_DIED = 3103,
     };
 };
 } // namespace AppExecFwk
