@@ -1837,11 +1837,10 @@ int FormMgrAdapter::BackgroundEvent(const int64_t formId, Want &want, const sptr
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
 
-    if (record.bundleName != want.GetBundle()) {
-        if (!CheckIsSystemAppByBundleName(iBundleMgr, record.bundleName)) {
-            HILOG_WARN("Only system apps can launch the ability of the other apps.");
-            want.SetBundle(record.bundleName);
-        }
+    want.SetBundle(record.bundleName);
+    if (!CheckKeepBackgroundRunningPermission(iBundleMgr, record.bundleName)) {
+        HILOG_ERROR("The app does not have permission for keeping background running.");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
 
     sptr<IAbilityConnection> formBackgroundConnection = new (std::nothrow) FormBackgroundConnection(formId,
@@ -2039,6 +2038,29 @@ bool FormMgrAdapter::CheckIsSystemAppByBundleName(const sptr<IBundleMgr> &iBundl
     return true;
 }
 
+/**
+ * @brief if the ability have permission for keeping background running is true,
+ * @param iBundleMgr BundleManagerProxy
+ * @param bundleName BundleName
+ * @return Returns true if the ability have permission for keeping background running, false if not.
+ */
+bool FormMgrAdapter::CheckKeepBackgroundRunningPermission(const sptr<IBundleMgr> &iBundleMgr, const std::string &bundleName)
+{
+    BundleInfo bundleInfo;
+    if (FormBmsHelper::GetInstance().GetBundleInfoWithPermission(bundleName,
+        FormUtil::GetCurrentAccountId(), bundleInfo)) {
+        HILOG_DEBUG("%{public}s, get bundleInfo success", __func__);
+        auto item = find(bundleInfo.reqPermissions.begin(), bundleInfo.reqPermissions.end(), Constants::PERMISSION_KEEP_BACKGROUND_RUNNING);
+        if(item == bundleInfo.reqPermissions.end()) {
+            return false;
+        }
+    } else {
+        HILOG_WARN("%{public}s fail, can not get bundleInfo's uid", __func__);
+        return false;
+    }
+
+    return true;
+}
 /**
  * @brief Get current user ID.
  * @param callingUid calling Uid.
