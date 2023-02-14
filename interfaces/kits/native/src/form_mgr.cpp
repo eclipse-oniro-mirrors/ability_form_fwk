@@ -381,6 +381,24 @@ int FormMgr::RouterEvent(const int64_t formId, Want &want, const sptr<IRemoteObj
 }
 
 /**
+ * @brief Process Background event.
+ * @param formId Indicates the unique id of form.
+ * @param want the want of the ability to start.
+ * @param callerToken Caller ability token.
+ * @return Returns true if execute success, false otherwise.
+ */
+int FormMgr::BackgroundEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    int errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
+        return errCode;
+    }
+    return remoteProxy_->BackgroundEvent(formId, want, callerToken);
+}
+
+/**
  * @brief Set next refresh time.
  * @param formId The id of the form.
  * @param nextTime Next refresh time.

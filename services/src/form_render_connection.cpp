@@ -53,7 +53,7 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
         return;
     }
 
-    FormRenderMgr::GetInstance().AddConnection(GetFormId(), this, true);
+    FormRenderMgr::GetInstance().AddConnection(GetFormId(), this);
     FormRenderMgr::GetInstance().AddRenderDeathRecipient(remoteObject);
     Want want;
     want.SetParams(wantParams_);
@@ -62,7 +62,9 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
     FormTaskMgr::GetInstance().PostRenderForm(formRecord_, want, remoteObject);
 }
 
-void FormRenderConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
-{ }
+void FormRenderConnection::UpdateWantParams(const WantParams &wantParams)
+{
+    wantParams_ = wantParams;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

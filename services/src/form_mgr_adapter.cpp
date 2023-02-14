@@ -25,6 +25,7 @@
 #include "form_acquire_connection.h"
 #include "form_acquire_state_connection.h"
 #include "form_ams_helper.h"
+#include "form_background_connection.h"
 #include "form_bms_helper.h"
 #include "form_cache_mgr.h"
 #include "form_cast_temp_connection.h"
@@ -849,7 +850,7 @@ ErrCode FormMgrAdapter::AddExistFormRecord(const FormItemInfo &info, const sptr<
     if (newRecord.needRefresh || !FormCacheMgr::GetInstance().IsExist(newRecord.formId)) {
         newRecord.isInited = false;
         FormDataMgr::GetInstance().SetFormCacheInited(formId, false);
-        FormRenderMgr::GetInstance().RenderForm(newRecord, wantParams);
+        FormRenderMgr::GetInstance().RenderForm(newRecord, wantParams, callerToken);
 
         // acquire formInfo from provider
         ErrCode errorCode = AcquireProviderFormInfoAsync(formId, info, wantParams);
@@ -1806,6 +1807,58 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
     return ERR_OK;
 }
 
+/**
+ * @brief Process background router event.
+ * @param formId Indicates the unique id of form.
+ * @param want the want of the ability to start.
+ * @param callerToken Caller ability token.
+ * @return Returns true if execute success, false otherwise.
+ */
+int FormMgrAdapter::BackgroundEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    if (formId <= 0) {
+        HILOG_ERROR("%{public}s form formId or bundleName is invalid", __func__);
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+    FormRecord record;
+    bool bGetRecord = FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record);
+    if (!bGetRecord) {
+        HILOG_ERROR("%{public}s fail, not exist such form:%{public}" PRId64 "", __func__, matchedFormId);
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    }
+
+    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
+    if (iBundleMgr == nullptr) {
+        HILOG_ERROR("%{public}s fail, failed to get IBundleMgr.", __func__);
+        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
+    }
+
+    want.SetBundle(record.bundleName);
+    if (!CheckKeepBackgroundRunningPermission(iBundleMgr, record.bundleName)) {
+        HILOG_ERROR("The app does not have permission for keeping background running.");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    }
+
+    sptr<IAbilityConnection> formBackgroundConnection = new (std::nothrow) FormBackgroundConnection(formId,
+         record.bundleName, record.abilityName);
+    if (formBackgroundConnection == nullptr) {
+        HILOG_ERROR("formBackgroundConnection is null.");
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+    }
+
+    want.SetParam(Constants::PARAM_FORM_ID, formId);
+    int32_t result = IN_PROCESS_CALL(FormAmsHelper::GetInstance().GetAbilityManager()->StartAbilityByCall(want,
+        formBackgroundConnection, callerToken));
+    if (result != ERR_OK) {
+        HILOG_ERROR("Failed to StartAbilityByCall, result: %{public}d.", result);
+        return result;
+    }
+    return ERR_OK;
+}
+
 ErrCode FormMgrAdapter::HandleUpdateFormFlag(const std::vector<int64_t> &formIds,
     const sptr<IRemoteObject> &callerToken, bool flag, bool isOnlyEnableUpdate)
 {
@@ -1984,6 +2037,29 @@ bool FormMgrAdapter::CheckIsSystemAppByBundleName(const sptr<IBundleMgr> &iBundl
     return true;
 }
 
+/**
+ * @brief if the ability have permission for keeping background running is true,
+ * @param iBundleMgr BundleManagerProxy
+ * @param bundleName BundleName
+ * @return Returns true if the ability have permission for keeping background running, false if not.
+ */
+bool FormMgrAdapter::CheckKeepBackgroundRunningPermission(const sptr<IBundleMgr> &iBundleMgr, const std::string &bundleName)
+{
+    BundleInfo bundleInfo;
+    if (FormBmsHelper::GetInstance().GetBundleInfoWithPermission(bundleName,
+        FormUtil::GetCurrentAccountId(), bundleInfo)) {
+        HILOG_DEBUG("%{public}s, get bundleInfo success", __func__);
+        auto item = find(bundleInfo.reqPermissions.begin(), bundleInfo.reqPermissions.end(), Constants::PERMISSION_KEEP_BACKGROUND_RUNNING);
+        if(item == bundleInfo.reqPermissions.end()) {
+            return false;
+        }
+    } else {
+        HILOG_WARN("%{public}s fail, can not get bundleInfo's uid", __func__);
+        return false;
+    }
+
+    return true;
+}
 /**
  * @brief Get current user ID.
  * @param callingUid calling Uid.

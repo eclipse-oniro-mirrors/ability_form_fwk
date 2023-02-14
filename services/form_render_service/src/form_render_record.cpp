@@ -22,7 +22,7 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace FormRender {
 constexpr int32_t RENDER_FORM_FAILED = -1;
-std::shared_ptr<FormRenderRecord> FormRenderRecord::Create(const std::string &bundleName, int32_t uid)
+std::shared_ptr<FormRenderRecord> FormRenderRecord::Create(const std::string &bundleName, const std::string &uid)
 {
     HILOG_INFO("%{public}s called.", __func__);
     std::shared_ptr<FormRenderRecord> renderRecord = std::make_shared<FormRenderRecord>(bundleName, uid);
@@ -39,14 +39,12 @@ std::shared_ptr<FormRenderRecord> FormRenderRecord::Create(const std::string &bu
 }
 
 FormRenderRecord::FormRenderRecord(
-    const std::string &bundleName, int32_t uid) : bundleName_(bundleName), uid_(uid) {}
+    const std::string &bundleName, const std::string &uid) : bundleName_(bundleName), uid_(uid) {}
 
 FormRenderRecord::~FormRenderRecord()
 {
     // Some resources need to be deleted in a JS thread
-    std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
-    auto syncTask = [thisWeakPtr]() {
-        auto renderRecord = thisWeakPtr.lock();
+    auto syncTask = [renderRecord = this]() {
         if (renderRecord == nullptr) {
             HILOG_ERROR("renderRecord is nullptr.");
             return;
@@ -164,7 +162,7 @@ int32_t FormRenderRecord::DeleteRenderRecord(int64_t formId, const Want &want, c
     return RENDER_FORM_FAILED;
 }
 
-int32_t FormRenderRecord::GetUid() const
+std::string FormRenderRecord::GetUid() const
 {
     return uid_;
 }
@@ -243,6 +241,11 @@ std::shared_ptr<Ace::FormRendererGroup> FormRenderRecord::GetFormRendererGroup(c
     HILOG_INFO("Get formRendererGroup.");
     std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
     auto key = formJsInfo.formId;
+    auto iter = formRendererGroupMap_.find(key);
+    if (iter != formRendererGroupMap_.end()) {
+        return iter->second;
+    }
+
     auto formRendererGroup = CreateFormRendererGroupLock(formJsInfo, context, runtime);
     if (formRendererGroup != nullptr) {
         HILOG_INFO("%{public}s , formRendererGroupMap_ emplace, formId:%{public}" PRId64 "", __func__, key);

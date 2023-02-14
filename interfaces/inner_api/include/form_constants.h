@@ -23,6 +23,7 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace Constants {
     constexpr const char* PERMISSION_REQUIRE_FORM = "ohos.permission.REQUIRE_FORM";
+    constexpr const char* PERMISSION_KEEP_BACKGROUND_RUNNING = "ohos.permission.KEEP_BACKGROUND_RUNNING";
     constexpr const char* PARAM_FORM_IDENTITY_KEY = "ohos.extra.param.key.form_identity";
     constexpr const char* PARAM_FORM_CALLING_IDENTITY_KEY = "ohos.extra.param.key.form_calling_identity";
     constexpr const char* PARAM_MODULE_NAME_KEY = "ohos.extra.param.key.module_name";

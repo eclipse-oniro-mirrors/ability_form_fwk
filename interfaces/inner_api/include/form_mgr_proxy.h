@@ -171,6 +171,15 @@ public:
     virtual int RouterEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken) override;
 
     /**
+     * @brief Process Background event.
+     * @param formId Indicates the unique id of form.
+     * @param want the want of the ability to start.
+     * @param callerToken Caller ability token.
+     * @return Returns true if execute success, false otherwise.
+     */
+    virtual int BackgroundEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken) override;
+
+    /**
      * @brief Delete the invalid forms.
      * @param formIds Indicates the ID of the valid forms.
      * @param callerToken Caller ability token.

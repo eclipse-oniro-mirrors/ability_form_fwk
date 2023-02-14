@@ -66,8 +66,8 @@ int32_t FormRenderImpl::RenderForm(const FormJsInfo &formJsInfo, const Want &wan
     HILOG_DEBUG("%{public}s come, connectId: %{public}d.", __func__,
         want.GetIntParam(Constants::FORM_CONNECT_ID, 0L));
 
-    int32_t uid = want.GetIntParam(Constants::FORM_SUPPLY_UID, 0);
-    if (!uid) {
+    std::string uid = want.GetStringParam(Constants::FORM_SUPPLY_UID);
+    if (uid.empty()) {
         HILOG_ERROR("GetUid failed");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
@@ -96,8 +96,8 @@ int32_t FormRenderImpl::StopRenderingForm(const FormJsInfo &formJsInfo, const Wa
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
 
-    int32_t uid = want.GetIntParam(Constants::FORM_SUPPLY_UID, 0);
-    if (!uid) {
+    std::string uid = want.GetStringParam(Constants::FORM_SUPPLY_UID);
+    if (uid.empty()) {
         HILOG_ERROR("GetUid failed");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
@@ -105,6 +105,7 @@ int32_t FormRenderImpl::StopRenderingForm(const FormJsInfo &formJsInfo, const Wa
         std::lock_guard<std::mutex> lock(renderRecordMutex_);
         if (auto search = renderRecordMap_.find(uid); search != renderRecordMap_.end()) {
             if (search->second->DeleteRenderRecord(formJsInfo.formId, want, callerToken) == ERR_OK) {
+                renderRecordMap_.erase(search);
                 HILOG_INFO("DeleteRenderRecord success");
             }
         } else {

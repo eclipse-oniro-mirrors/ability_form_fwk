@@ -37,12 +37,12 @@ public:
     /**
      * @brief Create a FormRenderRecord.
      * @param bundleName The bundleName of form bundle.
-     * @param uid The uid of form bundle.
+     * @param uid The uid of form bundle.(userId + bundleName)
      * @return Returns FormRenderRecord instance.
      */
-    static std::shared_ptr<FormRenderRecord> Create(const std::string &bundleName, int32_t uid);
+    static std::shared_ptr<FormRenderRecord> Create(const std::string &bundleName, const std::string &uid);
 
-    FormRenderRecord(const std::string &bundleName, int32_t uid);
+    FormRenderRecord(const std::string &bundleName, const std::string &uid);
 
     ~FormRenderRecord();
 
@@ -75,7 +75,7 @@ public:
      * @brief Get the uid of bundle.
      * @return Returns the uid.
      */
-    int32_t GetUid() const;
+    std::string GetUid() const;
 
 private:
     class RemoteObjHash {
@@ -109,7 +109,7 @@ private:
     std::string GenerateContextKey(const FormJsInfo &formJsInfo);
 
     std::string bundleName_;
-    int32_t uid_ = Constants::INVALID_UID;
+    std::string uid_;
     std::shared_ptr<EventRunner> eventRunner_;
     std::shared_ptr<EventHandler> eventHandler_;
     std::shared_ptr<AbilityRuntime::Runtime> runtime_;

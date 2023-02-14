@@ -76,6 +76,7 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
         }
         removedForms.emplace_back(formId);
         FormDataMgr::GetInstance().DeleteFormRecord(formId);
+        FormRenderMgr::GetInstance().StopRenderingForm(formId, formRecord);
     }
 
     if (!removedForms.empty()) {
@@ -83,7 +84,6 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
         FormDataMgr::GetInstance().CleanHostRemovedForms(removedForms);
         for (const int64_t id : removedForms) {
             FormTimerMgr::GetInstance().RemoveFormTimer(id);
-            FormRenderMgr::GetInstance().RemoveConnection(id);
         }
     }
 
@@ -127,7 +127,6 @@ void FormEventUtil::HandleProviderRemoved(const std::string &bundleName, const i
     // clean removed form timers
     for (auto &formId : removedForms) {
         FormTimerMgr::GetInstance().RemoveFormTimer(formId);
-        FormRenderMgr::GetInstance().RemoveConnection(formId);
     }
 }
 

@@ -190,6 +190,15 @@ public:
     int RouterEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken) override;
 
     /**
+     * @brief Process Background event.
+     * @param formId Indicates the unique id of form.
+     * @param want the want of the ability to start.
+     * @param callerToken Caller ability token.
+     * @return Returns true if execute success, false otherwise.
+     */
+    int BackgroundEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken) override;
+
+    /**
      * @brief Check whether if the form manager service is ready.
      * @return Returns true if the form manager service is ready; returns false otherwise.
      */

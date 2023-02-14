@@ -195,6 +195,15 @@ public:
     int RouterEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken);
 
     /**
+     * @brief Process background router event.
+     * @param formId Indicates the unique id of form.
+     * @param want the want of the ability to start.
+     * @param callerToken Caller ability token.
+     * @return Returns true if execute success, false otherwise.
+     */
+    int BackgroundEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken);
+
+    /**
      * @brief Acquire form data from form provider.
      * @param formId The Id of the from.
      * @param want The want of the request.
@@ -544,6 +553,14 @@ private:
      * @return Returns true if the form provider is system app, false if not.
      */
     bool CheckIsSystemAppByBundleName(const sptr<IBundleMgr> &iBundleMgr, const std::string &bundleName);
+
+    /**
+     * @brief if the ability have permission for keeping background running is true,
+     * @param iBundleMgr BundleManagerProxy
+     * @param bundleName BundleName
+     * @return Returns true if the ability have permission for keeping background running, false if not.
+     */
+    bool CheckKeepBackgroundRunningPermission(const sptr<IBundleMgr> &iBundleMgr, const std::string &bundleName);
     /**
      * @brief Create eventMaps for event notify.
      *
