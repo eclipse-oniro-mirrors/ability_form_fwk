@@ -89,6 +89,15 @@ public:
     bool GetBundleInfo(const std::string &bundleName, int32_t userId, BundleInfo &bundleInfo);
 
     /**
+     * @brief Obtains the BundleInfo with Permission based on a given bundle name.
+     * @param bundleName Indicates the application bundle name to be queried.
+     * @param userId Indicates the user ID.
+     * @param bundleInfo Indicates the obtained BundleInfo object.
+     * @return Returns true if the BundleInfo is successfully obtained; returns false otherwise.
+     */
+    bool GetBundleInfoWithPermission(const std::string &bundleName, int32_t userId, BundleInfo &bundleInfo);
+
+    /**
      * @brief Get caller bundle name.
      * @param callerBundleName Indicates the caller bundle name.
      * @return Returns ERR_OK on success, others on failure.

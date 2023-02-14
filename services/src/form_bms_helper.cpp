@@ -177,6 +177,18 @@ bool FormBmsHelper::GetBundleInfo(const std::string &bundleName, int32_t userId,
     return (IN_PROCESS_CALL(iBundleMgr->GetBundleInfo(bundleName, flags, bundleInfo, userId)));
 }
 
+bool FormBmsHelper::GetBundleInfoWithPermission(const std::string &bundleName, int32_t userId, BundleInfo &bundleInfo)
+{
+    sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
+    if (iBundleMgr == nullptr) {
+        HILOG_ERROR("iBundleMgr is nullptr");
+        return false;
+    }
+
+    int32_t flags = BundleFlag::GET_BUNDLE_WITH_REQUESTED_PERMISSION;
+    return (IN_PROCESS_CALL(iBundleMgr->GetBundleInfo(bundleName, flags, bundleInfo, userId)));
+}
+
 int32_t FormBmsHelper::GetCallerBundleName(std::string &callerBundleName)
 {
     sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
