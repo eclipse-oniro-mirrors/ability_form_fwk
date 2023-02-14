@@ -241,6 +241,11 @@ std::shared_ptr<Ace::FormRendererGroup> FormRenderRecord::GetFormRendererGroup(c
     HILOG_INFO("Get formRendererGroup.");
     std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
     auto key = formJsInfo.formId;
+    auto iter = formRendererGroupMap_.find(key);
+    if (iter != formRendererGroupMap_.end()) {
+        return iter->second;
+    }
+
     auto formRendererGroup = CreateFormRendererGroupLock(formJsInfo, context, runtime);
     if (formRendererGroup != nullptr) {
         HILOG_INFO("%{public}s , formRendererGroupMap_ emplace, formId:%{public}" PRId64 "", __func__, key);
