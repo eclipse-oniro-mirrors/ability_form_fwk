@@ -407,6 +407,30 @@ int FormMgrService::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
 }
 
 /**
+ * @brief Process Background event.
+ * @param formId Indicates the unique id of form.
+ * @param want the want of the ability to start.
+ * @param callerToken Caller ability token.
+ * @return Returns true if execute success, false otherwise.
+ */
+int FormMgrService::BackgroundEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    ErrCode ret = CheckFormPermission();
+    if (ret != ERR_OK) {
+        HILOG_ERROR("%{public}s fail, request form permission denied", __func__);
+        return ret;
+    }
+    AAFwk::EventInfo eventInfo;
+    eventInfo.userId = formId;
+    eventInfo.bundleName = want.GetElement().GetBundleName();
+    eventInfo.moduleName = want.GetStringParam(AppExecFwk::Constants::PARAM_MODULE_NAME_KEY);
+    eventInfo.abilityName = want.GetElement().GetAbilityName();
+    AAFwk::EventReport::SendFormEvent(AAFwk::EventName::BACKGROUND_EVENT_FORM, HiSysEventType::BEHAVIOR, eventInfo);
+    return FormMgrAdapter::GetInstance().BackgroundEvent(formId, want, callerToken);
+}
+
+/**
  * @brief Start event for the form manager service.
  */
 void FormMgrService::OnStart()

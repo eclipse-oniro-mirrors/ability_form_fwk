@@ -25,6 +25,7 @@
 #include "form_acquire_connection.h"
 #include "form_acquire_state_connection.h"
 #include "form_ams_helper.h"
+#include "form_background_connection.h"
 #include "form_bms_helper.h"
 #include "form_cache_mgr.h"
 #include "form_cast_temp_connection.h"
@@ -1804,6 +1805,59 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
         DeviceUsageStats::BundleActiveClient::GetInstance().ReportEvent(event, userId);
     }
 #endif
+    return ERR_OK;
+}
+
+/**
+ * @brief Process background router event.
+ * @param formId Indicates the unique id of form.
+ * @param want the want of the ability to start.
+ * @param callerToken Caller ability token.
+ * @return Returns true if execute success, false otherwise.
+ */
+int FormMgrAdapter::BackgroundEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    if (formId <= 0) {
+        HILOG_ERROR("%{public}s form formId or bundleName is invalid", __func__);
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+    FormRecord record;
+    bool bGetRecord = FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record);
+    if (!bGetRecord) {
+        HILOG_ERROR("%{public}s fail, not exist such form:%{public}" PRId64 "", __func__, matchedFormId);
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    }
+
+    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
+    if (iBundleMgr == nullptr) {
+        HILOG_ERROR("%{public}s fail, failed to get IBundleMgr.", __func__);
+        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
+    }
+
+    if (record.bundleName != want.GetBundle()) {
+        if (!CheckIsSystemAppByBundleName(iBundleMgr, record.bundleName)) {
+            HILOG_WARN("Only system apps can launch the ability of the other apps.");
+            want.SetBundle(record.bundleName);
+        }
+    }
+
+    sptr<IAbilityConnection> formBackgroundConnection = new (std::nothrow) FormBackgroundConnection(formId,
+         record.bundleName, record.abilityName);
+    if (formBackgroundConnection == nullptr) {
+        HILOG_ERROR("formBackgroundConnection is null.");
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+    }
+
+    want.SetParam(Constants::PARAM_FORM_ID, formId);
+    int32_t result = IN_PROCESS_CALL(FormAmsHelper::GetInstance().GetAbilityManager()->StartAbilityByCall(want,
+        formBackgroundConnection, callerToken));
+    if (result != ERR_OK) {
+        HILOG_ERROR("Failed to StartAbilityByCall, result: %{public}d.", result);
+        return result;
+    }
     return ERR_OK;
 }
 
