@@ -22,7 +22,7 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace FormRender {
 constexpr int32_t RENDER_FORM_FAILED = -1;
-std::shared_ptr<FormRenderRecord> FormRenderRecord::Create(const std::string &bundleName, int32_t uid)
+std::shared_ptr<FormRenderRecord> FormRenderRecord::Create(const std::string &bundleName, const std::string &uid)
 {
     HILOG_INFO("%{public}s called.", __func__);
     std::shared_ptr<FormRenderRecord> renderRecord = std::make_shared<FormRenderRecord>(bundleName, uid);
@@ -39,7 +39,7 @@ std::shared_ptr<FormRenderRecord> FormRenderRecord::Create(const std::string &bu
 }
 
 FormRenderRecord::FormRenderRecord(
-    const std::string &bundleName, int32_t uid) : bundleName_(bundleName), uid_(uid) {}
+    const std::string &bundleName, const std::string &uid) : bundleName_(bundleName), uid_(uid) {}
 
 FormRenderRecord::~FormRenderRecord()
 {
@@ -162,7 +162,7 @@ int32_t FormRenderRecord::DeleteRenderRecord(int64_t formId, const Want &want, c
     return RENDER_FORM_FAILED;
 }
 
-int32_t FormRenderRecord::GetUid() const
+std::string FormRenderRecord::GetUid() const
 {
     return uid_;
 }

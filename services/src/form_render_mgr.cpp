@@ -30,9 +30,6 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-namespace {
-    constexpr int32_t CALLING_UID_TRANSFORM_DIVISOR = 200000;
-}
 using Want = OHOS::AAFwk::Want;
 FormRenderMgr::FormRenderMgr()
 {
@@ -53,12 +50,10 @@ ErrCode FormRenderMgr::RenderForm(
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    int32_t callingUid = IPCSkeleton::GetCallingUid();
-    int32_t userId = callingUid / CALLING_UID_TRANSFORM_DIVISOR;
-    int32_t bundleUid = FormBmsHelper::GetInstance().GetUidByBundleName(formRecord.bundleName, userId);
+    int32_t userId = FormUtil::GetCurrentAccountId();
     Want want;
     want.SetParams(wantParams);
-    want.SetParam(Constants::FORM_SUPPLY_UID, bundleUid);
+    want.SetParam(Constants::FORM_SUPPLY_UID, std::to_string(userId) + formRecord.bundleName);
     if (atomicRerenderCount_ > 0) {
         --atomicRerenderCount_;
     } else {
@@ -135,10 +130,8 @@ ErrCode FormRenderMgr::UpdateRenderingForm(int64_t formId, const FormProviderDat
     Want want;
     want.SetParams(wantParams);
     want.SetParam(Constants::FORM_RENDER_TYPE_KEY, Constants::UPDATE_RENDERING_FORM);
-    int32_t callingUid = IPCSkeleton::GetCallingUid();
-    int32_t userId = callingUid / CALLING_UID_TRANSFORM_DIVISOR;
-    int32_t bundleUid = FormBmsHelper::GetInstance().GetUidByBundleName(formRecord.bundleName, userId);
-    want.SetParam(Constants::FORM_SUPPLY_UID, bundleUid);
+    int32_t userId = FormUtil::GetCurrentAccountId();
+    want.SetParam(Constants::FORM_SUPPLY_UID, std::to_string(userId) + formRecord.bundleName);
     {
         std::lock_guard<std::mutex> lock(conMutex_);
         auto conIterator = renderFormConnections_.find(formRecord.formId);
@@ -183,10 +176,8 @@ ErrCode FormRenderMgr::StopRenderingForm(int64_t formId, const FormRecord &formR
     }
 
     Want want;
-    int32_t callingUid = IPCSkeleton::GetCallingUid();
-    int32_t userId = callingUid / CALLING_UID_TRANSFORM_DIVISOR;
-    int32_t bundleUid = FormBmsHelper::GetInstance().GetUidByBundleName(formRecord.bundleName, userId);
-    want.SetParam(Constants::FORM_SUPPLY_UID, bundleUid);
+    int32_t userId = FormUtil::GetCurrentAccountId();
+    want.SetParam(Constants::FORM_SUPPLY_UID, std::to_string(userId) + formRecord.bundleName);
     {
         std::lock_guard<std::mutex> lock(conMutex_);
         auto conIterator = renderFormConnections_.find(formRecord.formId);
