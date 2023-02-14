@@ -81,6 +81,7 @@ ErrCode FormRenderMgr::RenderForm(
                 return ERR_APPEXECFWK_FORM_INVALID_PARAM;
             }
             if (renderRemoteObj_ == nullptr) {
+                connection->UpdateWantParams(want.GetParams());
                 ErrCode ret = ConnectRenderService(connection);
                 HILOG_INFO("renderRemoteObj is nullptr, render may exit, need reconnect, ret: %{public}d.", ret);
                 return ret;
@@ -238,7 +239,7 @@ ErrCode FormRenderMgr::StopRenderingFormCallback(int64_t formId, const Want &wan
     return ERR_OK;
 }
 
-ErrCode FormRenderMgr::AddConnection(int64_t formId, sptr<FormAbilityConnection> connection, bool isRenderConnection)
+ErrCode FormRenderMgr::AddConnection(int64_t formId, sptr<FormRenderConnection> connection)
 {
     HILOG_INFO("%{public}s called.", __func__);
     if (connection == nullptr) {
@@ -259,9 +260,7 @@ ErrCode FormRenderMgr::AddConnection(int64_t formId, sptr<FormAbilityConnection>
             conIterator = renderFormConnections_.begin();
         }
 
-        if (isRenderConnection) {
-            renderFormConnections_[formId] = connection;
-        }
+        renderFormConnections_[formId] = connection;
         HILOG_DEBUG("renderFormConnections size: %{public}zu.", renderFormConnections_.size());
     }
     return ERR_OK;

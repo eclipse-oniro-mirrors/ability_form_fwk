@@ -42,12 +42,7 @@ public:
     void OnAbilityConnectDone(const AppExecFwk::ElementName &element,
         const sptr<IRemoteObject> &remoteObject, int resultCode) override;
 
-    /**
-     * @brief OnAbilityDisconnectDone, AbilityMs notify caller ability the result of disconnect.
-     * @param element service ability's ElementName.
-     * @param resultCode ERR_OK on success, others on failure.
-     */
-    void OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode) override;
+    void UpdateWantParams(const WantParams &wantParams);
 
 private:
     FormRecord formRecord_;

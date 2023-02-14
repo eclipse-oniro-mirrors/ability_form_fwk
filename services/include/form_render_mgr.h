@@ -51,7 +51,7 @@ public:
 
     ErrCode StopRenderingFormCallback(int64_t formId, const Want &want);
 
-    ErrCode AddConnection(int64_t formId, sptr<FormAbilityConnection> connection, bool isRenderConnection);
+    ErrCode AddConnection(int64_t formId, sptr<FormRenderConnection> connection);
 
     ErrCode RemoveConnection(int64_t formId);
 
@@ -85,7 +85,7 @@ private:
 
     int32_t maxConnectKey = 0;
     mutable std::mutex conMutex_;
-    std::unordered_map<int64_t, sptr<FormAbilityConnection>> renderFormConnections_;
+    std::unordered_map<int64_t, sptr<FormRenderConnection>> renderFormConnections_;
     sptr<IFormRender> renderRemoteObj_ = nullptr;
     sptr<IRemoteObject::DeathRecipient> renderDeathRecipient_ = nullptr;
     mutable std::mutex hostsMutex_;
