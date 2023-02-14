@@ -68,7 +68,7 @@ public:
 
 private:
     std::mutex renderRecordMutex_;
-    std::unordered_map<int32_t, std::shared_ptr<FormRenderRecord>> renderRecordMap_; // <userId, renderRecord>
+    std::unordered_map<std::string, std::shared_ptr<FormRenderRecord>> renderRecordMap_; // <uid(userId + bundleName), renderRecord>
 };
 } // namespace FormRender
 } // namespace AppExecFwk
