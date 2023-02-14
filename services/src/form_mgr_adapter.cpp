@@ -850,7 +850,7 @@ ErrCode FormMgrAdapter::AddExistFormRecord(const FormItemInfo &info, const sptr<
     if (newRecord.needRefresh || !FormCacheMgr::GetInstance().IsExist(newRecord.formId)) {
         newRecord.isInited = false;
         FormDataMgr::GetInstance().SetFormCacheInited(formId, false);
-        FormRenderMgr::GetInstance().RenderForm(newRecord, wantParams);
+        FormRenderMgr::GetInstance().RenderForm(newRecord, wantParams, callerToken);
 
         // acquire formInfo from provider
         ErrCode errorCode = AcquireProviderFormInfoAsync(formId, info, wantParams);
