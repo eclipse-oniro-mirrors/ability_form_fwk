@@ -186,12 +186,14 @@ int FormMgrAdapter::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> 
         // delete temp form if receive release form call
         return HandleDeleteTempForm(matchedFormId, callerToken);
     }
+    FormRecord record;
+    FormDataMgr::GetInstance().GetFormRecord(formId, record);
+    FormRenderMgr::GetInstance().StopRenderingForm(formId, record);
     FormRecord dbRecord;
     if (FormDbCache::GetInstance().GetDBRecord(matchedFormId, dbRecord) != ERR_OK) {
         HILOG_ERROR("%{public}s, not exist such db form:%{public}" PRId64 "", __func__, formId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
-    FormRenderMgr::GetInstance().StopRenderingForm(formId, dbRecord);
     int callingUid = IPCSkeleton::GetCallingUid();
     int32_t userId = GetCurrentUserId(callingUid);
     bool isSelfDbFormId = (userId == dbRecord.userId) && ((std::find(dbRecord.formUserUids.begin(),
@@ -266,9 +268,9 @@ ErrCode FormMgrAdapter::HandleDeleteForm(const int64_t formId, const sptr<IRemot
         HILOG_ERROR("%{public}s, not exist such db form:%{public}" PRId64 "", __func__, formId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
-    FormRenderMgr::GetInstance().StopRenderingForm(formId, dbRecord);
     FormRecord record;
     FormDataMgr::GetInstance().GetFormRecord(formId, record);
+    FormRenderMgr::GetInstance().StopRenderingForm(formId, record);
 #ifdef DEVICE_USAGE_STATISTICS_ENABLE
     DeviceUsageStats::BundleActiveEvent event(record.bundleName, record.moduleName, record.formName,
         record.specification, record.formId, DeviceUsageStats::BundleActiveEvent::FORM_IS_REMOVED);
