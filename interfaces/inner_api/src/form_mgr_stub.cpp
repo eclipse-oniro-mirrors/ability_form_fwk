@@ -252,10 +252,10 @@ ErrCode FormMgrStub::HandleRequestPublishForm(MessageParcel &data, MessageParcel
     std::unique_ptr<FormProviderData> formProviderData = nullptr;
     if (withFormBindingData) {
         formProviderData.reset(data.ReadParcelable<FormProviderData>());
-    }
-    if (formProviderData == nullptr) {
-        HILOG_ERROR("%{public}s, failed to get formProviderData.", __func__);
-        return ERR_APPEXECFWK_PARCEL_ERROR;
+        if (formProviderData == nullptr) {
+            HILOG_ERROR("%{public}s, failed to get formProviderData.", __func__);
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
     }
 
     int64_t formId = 0;

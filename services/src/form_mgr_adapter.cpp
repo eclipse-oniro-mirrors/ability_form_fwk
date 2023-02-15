@@ -1576,7 +1576,9 @@ ErrCode FormMgrAdapter::AddRequestPublishForm(const FormItemInfo &formItemInfo, 
     int32_t currentUserId = GetCurrentUserId(callingUid);
     // allot form record
     FormRecord formRecord = FormDataMgr::GetInstance().AllotFormRecord(formItemInfo, callingUid, currentUserId);
-    formRecord.formProviderInfo.SetFormData(*formProviderData);
+    if (formProviderData != nullptr) {
+        formRecord.formProviderInfo.SetFormData(*formProviderData);
+    }
     FormRenderMgr::GetInstance().RenderForm(formRecord, want.GetParams()); // render for arkTs form
 
     // create form info for js
