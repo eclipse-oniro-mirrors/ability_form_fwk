@@ -248,7 +248,7 @@ std::shared_ptr<Ace::FormRendererGroup> FormRenderRecord::GetFormRendererGroup(c
 
     auto formRendererGroup = CreateFormRendererGroupLock(formJsInfo, context, runtime);
     if (formRendererGroup != nullptr) {
-        HILOG_INFO("%{public}s , formRendererGroupMap_ emplace, formId:%{public}" PRId64 "", __func__, key);
+        HILOG_INFO("formRendererGroupMap emplace formId:%{public}s", std::to_string(key).c_str());
         formRendererGroupMap_.emplace(key, formRendererGroup);
     }
     return formRendererGroup;
@@ -299,7 +299,7 @@ void FormRenderRecord::HandleUpdateInJsThread(const FormJsInfo &formJsInfo, cons
             item->second.emplace_back(compId);
             HILOG_INFO("HandleUpdateInJsThread AddForm compId = %{public}s", compId.c_str());
         }
-        HILOG_INFO("%{public}s, AddForm formId:%{public}" PRId64 "", __func__, formJsInfo.formId);
+        HILOG_INFO("AddForm formId:%{public}s", std::to_string(formJsInfo.formId).c_str());
     } else {
         std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
         if (auto search = this->formRendererGroupMap_.find(formJsInfo.formId);
@@ -307,7 +307,7 @@ void FormRenderRecord::HandleUpdateInJsThread(const FormJsInfo &formJsInfo, cons
             auto group = search->second;
             group->UpdateForm(formJsInfo);
         }
-        HILOG_INFO("%{public}s, UpdateForm formId:%{public}" PRId64 "", __func__, formJsInfo.formId);
+        HILOG_INFO("UpdateForm formId:%{public}s", std::to_string(formJsInfo.formId).c_str());
     }
     return;
 }

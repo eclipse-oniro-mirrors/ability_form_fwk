@@ -164,17 +164,14 @@ ErrCode FormRenderMgr::StopRenderingForm(int64_t formId, const FormRecord &formR
     if (formRecord.uiSyntax != FormType::ETS) {
         return ERR_OK;
     }
-
     if (formRecord.abilityName.empty()) {
         HILOG_ERROR("%{public}s, formRecord.abilityName is empty.", __func__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
-
     if (formRecord.bundleName.empty()) {
         HILOG_ERROR("%{public}s, formRecord.bundleName is empty.", __func__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
-
     Want want;
     int32_t userId = FormUtil::GetCurrentAccountId();
     want.SetParam(Constants::FORM_SUPPLY_UID, std::to_string(userId) + formRecord.bundleName);
@@ -254,20 +251,6 @@ ErrCode FormRenderMgr::AddConnection(int64_t formId, sptr<FormRenderConnection> 
         renderFormConnections_[formId] = connection;
         HILOG_DEBUG("renderFormConnections size: %{public}zu.", renderFormConnections_.size());
     }
-    return ERR_OK;
-}
-
-ErrCode FormRenderMgr::RemoveConnection(int64_t formId)
-{
-    HILOG_INFO("%{public}s called.", __func__);
-    std::lock_guard<std::mutex> lock(conMutex_);
-    auto conIterator = renderFormConnections_.find(formId);
-    if (conIterator != renderFormConnections_.end()) {
-        FormAmsHelper::GetInstance().DisconnectServiceAbility(conIterator->second);
-    }
-    renderFormConnections_.erase(formId);
-
-    HILOG_DEBUG("renderFormConnections size: %{public}zu.", renderFormConnections_.size());
     return ERR_OK;
 }
 
