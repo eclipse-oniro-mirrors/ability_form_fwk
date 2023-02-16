@@ -19,7 +19,6 @@
 #include <atomic>
 #include <singleton.h>
 #include <unordered_map>
-#include <unordered_set>
 
 #include "form_record.h"
 #include "form_render_connection.h"
@@ -59,16 +58,18 @@ public:
 
     void RerenderAllForms();
 
-    void HandleHostDied(const sptr<IRemoteObject> &host);
+    void CleanFormHost(const sptr<IRemoteObject> &host);
 
     void HandleConnectFailed(int64_t formId, int32_t errorCode) const;
 
-    bool IsRerenderForRenderDied(int64_t formId);
-private:
+    bool IsRerenderForRenderServiceDied(int64_t formId);
 
+private:
     ErrCode ConnectRenderService(const sptr<AAFwk::IAbilityConnection> &connection) const;
 
-    void AddHostToken(const sptr<IRemoteObject> &host);
+    void DisconnectRenderService(const sptr<AAFwk::IAbilityConnection> connection, size_t size) const;
+
+    void AddHostToken(const sptr<IRemoteObject> &host, int64_t formId);
 
     void RemoveHostToken(const sptr<IRemoteObject> &host);
 
@@ -77,19 +78,20 @@ private:
 private:
     class RemoteObjHash {
     public:
-        size_t operator() (const sptr<IRemoteObject> remoteObj) const
+        size_t operator() (const sptr<IRemoteObject> &remoteObj) const
         {
             return reinterpret_cast<size_t>(remoteObj.GetRefPtr());
         }
     };
 
     int32_t maxConnectKey = 0;
-    mutable std::mutex conMutex_;
+    mutable std::mutex resourceMutex_;
+    // <formId, connectionToRenderService>
     std::unordered_map<int64_t, sptr<FormRenderConnection>> renderFormConnections_;
+    // <hostToken, formIds>
+    std::unordered_map<sptr<IRemoteObject>, std::unordered_set<int64_t>, RemoteObjHash> etsHosts_;
     sptr<IFormRender> renderRemoteObj_ = nullptr;
     sptr<IRemoteObject::DeathRecipient> renderDeathRecipient_ = nullptr;
-    mutable std::mutex hostsMutex_;
-    std::unordered_set<sptr<IRemoteObject>, RemoteObjHash> etsHosts_;
     std::atomic<int32_t> atomicRerenderCount_ = 0;
 };
 

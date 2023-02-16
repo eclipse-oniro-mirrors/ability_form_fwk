@@ -16,6 +16,8 @@
 #ifndef OHOS_FORM_FWK_FORM_RENDER_CONNECTION_H
 #define OHOS_FORM_FWK_FORM_RENDER_CONNECTION_H
 
+#include <unordered_set>
+
 #include "form_ability_connection.h"
 #include "form_item_info.h"
 #include "want.h"
@@ -49,11 +51,17 @@ public:
      */
     virtual void OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode) override;
 
+    /**
+     * @brief Set renderDeadFlag to TRUE.
+     */
+    void SetRenderDeadFlag();
+
     void UpdateWantParams(const WantParams &wantParams);
 
 private:
     FormRecord formRecord_;
     WantParams wantParams_;
+    bool renderDeadFlag_ = false;
     DISALLOW_COPY_AND_MOVE(FormRenderConnection);
 };
 } // namespace AppExecFwk
