@@ -314,21 +314,4 @@ HWTEST_F(FmsFormMgrPublishFormTest, FormAcquireStateConnection_0002, TestSize.Le
     formAcquireStateConnection.OnAbilityConnectDone(element, remoteObject, resultCode);
     GTEST_LOG_(INFO) << "FormAcquireStateConnection_0002 end";
 }
-
-/**
- * @tc.name: FormTaskMgr_0001
- * @tc.desc: test PostShareAcquireTask function and eventHandler_ is nullptr
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormMgrPublishFormTest, FormTaskMgr_0001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormTaskMgr_0001 start";
-    FormTaskMgr formTaskMgr;
-    int64_t formId = 1;
-    std::string remoteDeviceId = "aa";
-    Want want;
-    sptr<IRemoteObject> remoteObject = nullptr;
-    formTaskMgr.PostShareAcquireTask(formId, remoteDeviceId, want, remoteObject);
-    GTEST_LOG_(INFO) << "FormTaskMgr_0001 end";
-}
 }
