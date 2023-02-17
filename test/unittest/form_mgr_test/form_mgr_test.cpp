@@ -19,6 +19,7 @@
 #define protected public
 #include "form_mgr.h"
 #include "form_errors.h"
+#include "iservice_registry.h"
 #undef private
 #undef protected
 #include "form_mgr_errors.h"
@@ -27,6 +28,7 @@
 #include "mock_form_mgr_proxy.h"
 #include "mock_form_token.h"
 #include "if_system_ability_manager.h"
+#include "mock_system_ability_manager.h"
 
 
 using namespace testing::ext;
@@ -596,9 +598,10 @@ HWTEST_F(FormMgrTest, FormMgrTest_0024, TestSize.Level1) {
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0025, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0025 starts";
-    EXPECT_CALL(*mockProxy, CheckFMSReady())
-        .Times(1)
-        .WillOnce(Return(true));
+    sptr<MockSystemAbilityManager> mockSamgr = new (std::nothrow) MockSystemAbilityManager();
+    sptr<ISystemAbilityManager> backupSamgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    SystemAbilityManagerClient::GetInstance().systemAbilityManager_ = mockSamgr;
+
     auto result = FormMgr::GetInstance().CheckFMSReady();
 
     EXPECT_TRUE(result);
