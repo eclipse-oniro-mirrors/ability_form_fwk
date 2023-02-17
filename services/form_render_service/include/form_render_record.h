@@ -108,6 +108,8 @@ private:
 
     std::string GenerateContextKey(const FormJsInfo &formJsInfo);
 
+    void ReleaseHapFileHandle();
+
     std::string bundleName_;
     std::string uid_;
     std::shared_ptr<EventRunner> eventRunner_;
@@ -125,6 +127,8 @@ private:
     // <formId, compId>
     std::mutex compIdMutex_;
     std::unordered_map<int64_t, std::vector<std::string>> compIdMap_;
+
+    std::string hapPath_;
 };
 }  // namespace FormRender
 }  // namespace AppExecFwk

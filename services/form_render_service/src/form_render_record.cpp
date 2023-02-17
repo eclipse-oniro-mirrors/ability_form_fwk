@@ -15,6 +15,7 @@
 
 #include "form_render_record.h"
 
+#include "extractor.h"
 #include "form_constants.h"
 #include "hilog_wrapper.h"
 
@@ -179,6 +180,7 @@ bool FormRenderRecord::CreateRuntime(const FormJsInfo &formJsInfo)
         HILOG_ERROR("eventRunner_ is nullptr");
         return false;
     }
+
     AbilityRuntime::Runtime::Options options;
     options.bundleName = formJsInfo.bundleName;
     options.codePath = Constants::LOCAL_CODE_PATH;
@@ -193,6 +195,8 @@ bool FormRenderRecord::CreateRuntime(const FormJsInfo &formJsInfo)
         HILOG_ERROR("Create runtime Failed!");
         return false;
     }
+
+    hapPath_ = formJsInfo.jsFormCodePath;
     return true;
 }
 
@@ -336,6 +340,18 @@ void FormRenderRecord::HandleDestroyInJsThread()
     std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
     formRendererGroupMap_.clear();
     runtime_.reset();
+    ReleaseHapFileHandle();
+}
+
+void FormRenderRecord::ReleaseHapFileHandle()
+{
+    HILOG_INFO("ReleaseHapFileHandle: %{public}s", hapPath_.c_str());
+    if (hapPath_.empty()) {
+        return;
+    }
+
+    std::string loadFilePath = AbilityBase::ExtractorUtil::GetLoadFilePath(hapPath_);
+    AbilityBase::ExtractorUtil::DeleteExtractor(loadFilePath);
 }
 
 inline std::string FormRenderRecord::GenerateContextKey(const FormJsInfo &formJsInfo)
