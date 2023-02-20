@@ -79,6 +79,9 @@ ErrCode FormRenderMgr::RenderForm(
                 connection->UpdateWantParams(want.GetParams());
                 ErrCode ret = ConnectRenderService(connection);
                 HILOG_INFO("renderRemoteObj is nullptr, render may exit, need reconnect, ret: %{public}d.", ret);
+                if (ret) {
+                    HandleConnectFailed(formRecord.formId, ret);
+                }
                 return ret;
             }
             auto remoteObject = renderRemoteObj_->AsObject();
@@ -101,6 +104,7 @@ ErrCode FormRenderMgr::RenderForm(
     ErrCode errorCode = ConnectRenderService(formRenderConnection);
     if (errorCode != ERR_OK) {
         HILOG_ERROR("%{public}s fail, ConnectServiceAbility failed.", __func__);
+        HandleConnectFailed(formRecord.formId, errorCode);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     return ERR_OK;
@@ -257,9 +261,8 @@ ErrCode FormRenderMgr::AddConnection(int64_t formId, sptr<FormRenderConnection> 
 void FormRenderMgr::RerenderAllForms()
 {
     HILOG_INFO("Render is dead.");
-    renderDeathRecipient_ = nullptr;
     renderRemoteObj_ = nullptr;
-    
+
     {
         std::lock_guard<std::mutex> lock(conMutex_);
         atomicRerenderCount_ = renderFormConnections_.size();
@@ -270,7 +273,7 @@ void FormRenderMgr::RerenderAllForms()
         HILOG_INFO("The forms need to rerender count: %{public}zu.", renderFormConnections_.size());
     }
 
-    NotifyHostRenderIsDead();
+    NotifyHostRenderServiceIsDead();
 }
 
 void FormRenderMgr::HandleHostDied(const sptr<IRemoteObject> &host)
@@ -286,7 +289,7 @@ void FormRenderMgr::HandleHostDied(const sptr<IRemoteObject> &host)
 
 void FormRenderMgr::AddRenderDeathRecipient(const sptr<IRemoteObject> &remoteObject)
 {
-    if (renderDeathRecipient_) {
+    if (renderRemoteObj_) {
         HILOG_INFO("renderDeathRecipient is exist, no need to add again.");
         return;
     }
@@ -299,9 +302,11 @@ void FormRenderMgr::AddRenderDeathRecipient(const sptr<IRemoteObject> &remoteObj
     }
     renderRemoteObj_ = renderRemoteObj;
 
-    renderDeathRecipient_ = new FormRenderRecipient([]() {
-        FormRenderMgr::GetInstance().RerenderAllForms();
-    });
+    if (renderDeathRecipient_ == nullptr) {
+        renderDeathRecipient_ = new FormRenderRecipient([]() {
+            FormRenderMgr::GetInstance().RerenderAllForms();
+        });
+    }
     remoteObject->AddDeathRecipient(renderDeathRecipient_);
 }
 
@@ -353,7 +358,7 @@ inline void FormRenderMgr::RemoveHostToken(const sptr<IRemoteObject> &host)
     }
 }
 
-void FormRenderMgr::NotifyHostRenderIsDead() const
+void FormRenderMgr::NotifyHostRenderServiceIsDead() const
 {
     HILOG_INFO("Notify hosts the render is dead, hosts.size: %{public}zu.", etsHosts_.size());
     for (const auto &host : etsHosts_) {
@@ -362,7 +367,27 @@ void FormRenderMgr::NotifyHostRenderIsDead() const
             HILOG_ERROR("hostClient is nullptr");
             continue;
         }
-        hostClient->OnError(ERR_APPEXECFWK_FORM_CONNECT_FORM_RENDER_FAILED, "Connect FormRenderService failed");
+        hostClient->OnError(ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED, "FormRenderService is dead.");
+    }
+}
+
+void FormRenderMgr::HandleConnectFailed(int64_t formId, int32_t errorCode) const
+{
+    if (atomicRerenderCount_) {
+        HILOG_DEBUG("This is render service dead condition, not connect failed.");
+        return;
+    }
+    HILOG_ERROR("Connect render service failed, formId: %{public}" PRId64 "errorCode: %{public}d",
+        formId, errorCode);
+    std::vector<sptr<IRemoteObject>> formHostObjs;
+    FormDataMgr::GetInstance().GetFormHostRemoteObj(formId, formHostObjs);
+    for (const auto &host : formHostObjs) {
+        auto hostClient = iface_cast<IFormHost>(host);
+        if (hostClient == nullptr) {
+            HILOG_ERROR("hostClient is nullptr");
+            continue;
+        }
+        hostClient->OnError(errorCode, "Connect FormRenderService failed");
     }
 }
 

@@ -19,6 +19,7 @@
 
 #include "form_bms_helper.h"
 #include "form_constants.h"
+#include "form_mgr_errors.h"
 #include "form_supply_callback.h"
 #include "form_render_mgr.h"
 #include "form_task_mgr.h"
@@ -60,6 +61,16 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
     want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
     want.SetParam(Constants::FORM_COMPILE_MODE_KEY, compileMode);
     FormTaskMgr::GetInstance().PostRenderForm(formRecord_, want, remoteObject);
+}
+
+void FormRenderConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
+{
+    HILOG_DEBUG("%{public}s, element:%{public}s, resultCode:%{public}d",
+        __func__, element.GetURI().c_str(), resultCode);
+    if (resultCode) {
+        FormRenderMgr::GetInstance().HandleConnectFailed(
+            formRecord_.formId, ERR_APPEXECFWK_FORM_CONNECT_FORM_RENDER_FAILED);
+    }
 }
 
 void FormRenderConnection::UpdateWantParams(const WantParams &wantParams)

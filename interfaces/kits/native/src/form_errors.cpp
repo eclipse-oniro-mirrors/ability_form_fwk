@@ -65,6 +65,7 @@ const std::map<int32_t, int32_t> ERROR_CODE_MAP_EXTERNAL = {
     { ERR_APPEXECFWK_FORM_DISTRIBUTED_SCHEDULE_FAILED, ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR },
     { ERR_APPEXECFWK_FORM_GET_SYSMGR_FAILED,           ERR_FORM_EXTERNAL_IPC_ERROR },
     { ERR_APPEXECFWK_FORM_CONNECT_FORM_RENDER_FAILED,  ERR_FORM_EXTERNAL_CONNECT_RENDER_FAILED },
+    { ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED,         ERR_FORM_EXTERNAL_RENDER_DIED },
 };
 
 const std::map<int32_t, std::string> ERR_MSG_MAP_EXTERNAL = {
@@ -84,6 +85,7 @@ const std::map<int32_t, std::string> ERR_MSG_MAP_EXTERNAL = {
     { ERR_FORM_EXTERNAL_OPERATION_FORM_NOT_SELF,      "The form can not be operated by the current application" },
     { ERR_FORM_EXTERNAL_ABILITY_NOT_INSTALLED,        "The ability is not installed" },
     { ERR_FORM_EXTERNAL_CONNECT_RENDER_FAILED,        "Connect FormRenderService failed, please try again later." },
+    { ERR_FORM_EXTERNAL_RENDER_DIED,                  "FormRenderService is dead, please reconnect." },
 };
 
 const std::map<int32_t, std::string> ERR_MSG_MAP_INTERNAL = {
@@ -280,6 +282,9 @@ void FormErrors::InitErrorMessageMap()
         },
         {
             ERR_APPEXECFWK_FORM_CONNECT_FORM_RENDER_FAILED, "Connect FormRenderService failed.",
+        },
+        {
+            ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED, "FormRenderService is dead.",
         },
     };
 }

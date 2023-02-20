@@ -61,6 +61,8 @@ public:
 
     void HandleHostDied(const sptr<IRemoteObject> &host);
 
+    void HandleConnectFailed(int64_t formId, int32_t errorCode) const;
+
     bool IsRerenderForRenderDied(int64_t formId);
 private:
 
@@ -70,7 +72,7 @@ private:
 
     void RemoveHostToken(const sptr<IRemoteObject> &host);
 
-    void NotifyHostRenderIsDead() const;
+    void NotifyHostRenderServiceIsDead() const;
 
 private:
     class RemoteObjHash {
