@@ -141,6 +141,7 @@ ErrCode FormDbCache::DeleteFormInfo(int64_t formId)
 ErrCode FormDbCache::DeleteFormInfoByBundleName(const std::string &bundleName, const int32_t userId,
     std::vector<FormDBInfo> &removedDBForms)
 {
+    HILOG_DEBUG("called.");
     std::lock_guard<std::mutex> lock(formDBInfosMutex_);
     std::vector<FormDBInfo>::iterator itRecord;
     for (itRecord = formDBInfos_.begin(); itRecord != formDBInfos_.end();) {
@@ -313,11 +314,6 @@ void FormDbCache::GetNoHostInvalidDBForms(int32_t userId, int32_t callingUid, st
     std::lock_guard<std::mutex> lock(formDBInfosMutex_);
     for (auto &formRecord: formDBInfos_) {
         int64_t formId = formRecord.formId;
-
-        // check userID
-        if (userId != formRecord.userId) {
-            continue;
-        }
         // check UID
         auto iter = std::find(formRecord.formUserUids.begin(), formRecord.formUserUids.end(), callingUid);
         if (iter == formRecord.formUserUids.end()) {

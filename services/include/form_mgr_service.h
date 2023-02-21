@@ -205,6 +205,25 @@ public:
     bool IsReady() const;
 
     /**
+     * @brief Check if the caller ability is SA.
+     * @return Returns true if is SA call; returns false otherwise.
+     */
+    bool IsSACall() const;
+
+    /**
+     * @brief Get the token id of the caller ability.
+     * @return Returns the caller ability token.
+     */
+    unsigned int GetCallingTokenID() const;
+
+    /**
+     * @brief Checks whether the caller has a certain permission.
+     * @param permissionName The name of the permission.
+     * @return Returns true if the caller has certain permissions; returns false otherwise.
+     */
+    bool VerifyCallingPermission(const std::string &permissionName) const;
+
+    /**
      * @brief Delete the invalid forms.
      * @param formIds Indicates the ID of the valid forms.
      * @param callerToken Caller ability token.

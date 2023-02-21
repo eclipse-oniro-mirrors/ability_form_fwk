@@ -53,6 +53,7 @@ public:
     bool formVisibleNotify = false;
     int formVisibleNotifyState = 0;
     int32_t userId = 0;
+    int32_t providerUserId = -1;
     std::string formSrc = "";
     FormWindow formWindow;
     uint32_t versionCode = 0;

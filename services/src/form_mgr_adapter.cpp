@@ -80,6 +80,7 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
     const sptr<IRemoteObject> &callerToken, FormJsInfo &formInfo)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    HILOG_DEBUG("called.");
     if (formId < 0 || callerToken == nullptr) {
         HILOG_ERROR("%{public}s fail, callerToken can not be NULL", __func__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -195,9 +196,8 @@ int FormMgrAdapter::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> 
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
     int callingUid = IPCSkeleton::GetCallingUid();
-    int32_t userId = GetCurrentUserId(callingUid);
-    bool isSelfDbFormId = (userId == dbRecord.userId) && ((std::find(dbRecord.formUserUids.begin(),
-        dbRecord.formUserUids.end(), callingUid) != dbRecord.formUserUids.end()) ? true : false);
+    bool isSelfDbFormId = ((std::find(dbRecord.formUserUids.begin(), dbRecord.formUserUids.end(),
+        callingUid) != dbRecord.formUserUids.end()) ? true : false);
     if (!isSelfDbFormId) {
         HILOG_ERROR("%{public}s, not self form:%{public}" PRId64 "", __func__, formId);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
@@ -263,6 +263,7 @@ ErrCode FormMgrAdapter::HandleReleaseForm(const int64_t formId, const sptr<IRemo
  */
 ErrCode FormMgrAdapter::HandleDeleteForm(const int64_t formId, const sptr<IRemoteObject> &callerToken)
 {
+    HILOG_DEBUG("called.");
     FormRecord dbRecord;
     if (FormDbCache::GetInstance().GetDBRecord(formId, dbRecord) != ERR_OK) {
         HILOG_ERROR("%{public}s, not exist such db form:%{public}" PRId64 "", __func__, formId);
@@ -277,7 +278,7 @@ ErrCode FormMgrAdapter::HandleDeleteForm(const int64_t formId, const sptr<IRemot
 #endif
     int callingUid = IPCSkeleton::GetCallingUid();
     int32_t userId = GetCurrentUserId(callingUid);
-    bool isSelfDbFormId = (userId == dbRecord.userId) && ((std::find(dbRecord.formUserUids.begin(),
+    bool isSelfDbFormId = ((std::find(dbRecord.formUserUids.begin(),
         dbRecord.formUserUids.end(), callingUid) != dbRecord.formUserUids.end()) ? true : false);
     if (!isSelfDbFormId) {
         HILOG_ERROR("%{public}s, not self form:%{public}" PRId64 ", callingUid:%{public}d",
@@ -315,8 +316,7 @@ ErrCode FormMgrAdapter::HandleDeleteTempForm(const int64_t formId, const sptr<IR
     bool isFormRecExist = FormDataMgr::GetInstance().GetFormRecord(formId, record);
     bool isSelfTempFormId = false;
     if (isFormRecExist && record.formTempFlag) {
-        int32_t userId = GetCurrentUserId(uid);
-        isSelfTempFormId = (userId == record.userId) && ((std::find(record.formUserUids.begin(),
+        isSelfTempFormId = ((std::find(record.formUserUids.begin(),
             record.formUserUids.end(), uid) != record.formUserUids.end()) ? true : false);
     }
     if (!isSelfTempFormId) {
@@ -438,14 +438,6 @@ int FormMgrAdapter::UpdateForm(const int64_t formId,
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
-    // check bundle uid for permission
-    int32_t callingUid = IPCSkeleton::GetCallingUid();
-    int32_t userId = GetCurrentUserId(callingUid);
-    if (userId != formRecord.userId && !checkFormHostHasSaUid(formRecord)) {
-        HILOG_ERROR("%{public}s error, not under current user, formId:%{public}" PRId64 ".", __func__, matchedFormId);
-        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
-    }
-
     // check bundleName match
     if (formRecord.bundleName.compare(bundleName) != 0) {
         HILOG_ERROR("%{public}s error, not match bundleName:%{public}s.", __func__, bundleName.c_str());
@@ -497,9 +489,8 @@ int FormMgrAdapter::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
 
     HILOG_INFO("%{public}s, find target client.", __func__);
     Want reqWant(want);
-    int callingUid = IPCSkeleton::GetCallingUid();
-    int32_t userId = GetCurrentUserId(callingUid);
-    reqWant.SetParam(Constants::PARAM_FORM_USER_ID, userId);
+    int32_t currentActiveUserId = FormUtil::GetCurrentAccountId();
+    reqWant.SetParam(Constants::PARAM_FORM_USER_ID, currentActiveUserId);
     return FormProviderMgr::GetInstance().RefreshForm(matchedFormId, reqWant, true);
 }
 
@@ -798,6 +789,7 @@ ErrCode FormMgrAdapter::GetFormConfigInfo(const Want &want, FormItemInfo &formCo
 ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
     const sptr<IRemoteObject> &callerToken, const WantParams &wantParams, FormJsInfo &formInfo)
 {
+    HILOG_INFO("called.");
     int64_t formId = FormDataMgr::GetInstance().PaddingUdidHash(info.GetFormId());
     FormRecord record;
     bool hasRecord = FormDataMgr::GetInstance().GetFormRecord(formId, record);
@@ -805,12 +797,7 @@ ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
         HILOG_ERROR("%{public}s, addForm can not acquire temp form when select form id", __func__);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-
-    // get current userId
-    int callingUid = IPCSkeleton::GetCallingUid();
-    int32_t currentUserId = GetCurrentUserId(callingUid);
-    if (hasRecord && (record.userId == currentUserId
-        || FormDataMgr::GetInstance().IsCallingUidValid(record.formUserUids))) {
+    if (hasRecord) {
         if (!info.IsMatch(record)) {
             HILOG_ERROR("%{public}s, formId and item info not match:%{public}" PRId64 "", __func__, formId);
             return ERR_APPEXECFWK_FORM_CFG_NOT_MATCH_ID;
@@ -821,8 +808,7 @@ ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
     // find in db but not in cache
     FormRecord dbRecord;
     ErrCode getDbRet = FormDbCache::GetInstance().GetDBRecord(formId, dbRecord);
-    if (getDbRet == ERR_OK && (dbRecord.userId == currentUserId
-        || FormDataMgr::GetInstance().IsCallingUidValid(dbRecord.formUserUids))) {
+    if (getDbRet == ERR_OK) {
         return AddNewFormRecord(info, formId, callerToken, wantParams, formInfo);
     }
 
@@ -1318,7 +1304,7 @@ int FormMgrAdapter::SetNextRefreshTime(const int64_t formId, const int64_t nextT
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
-    bool isSelfFormId = (userId == formRecord.userId) || checkFormHostHasSaUid(formRecord);
+    bool isSelfFormId = (userId == formRecord.providerUserId) || checkFormHostHasSaUid(formRecord);
     if (!isSelfFormId) {
         HILOG_ERROR("%{public}s, not self form:%{public}" PRId64 "", __func__, formId);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
