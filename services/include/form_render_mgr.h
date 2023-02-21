@@ -47,6 +47,8 @@ public:
 
     ErrCode StopRenderingForm(int64_t formId, const FormRecord &formRecord);
 
+    ErrCode ReloadForm(std::vector<int64_t> &&formIds, const std::string &bundleName, int32_t userId);
+
     ErrCode RenderFormCallback(int64_t formId, const Want &want);
 
     ErrCode StopRenderingFormCallback(int64_t formId, const Want &want);

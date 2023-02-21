@@ -67,6 +67,8 @@ private:
      */
     int32_t HandleCleanFormHost(MessageParcel &data, MessageParcel &reply);
 
+    int32_t HandleReloadForm(MessageParcel &data, MessageParcel &reply);
+
 private:
     using FormRenderFunc = int32_t (FormRenderStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, FormRenderFunc> memberFuncMap_;

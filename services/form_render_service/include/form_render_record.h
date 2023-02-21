@@ -71,6 +71,10 @@ public:
      */
     int32_t DeleteRenderRecord(int64_t formId, const Want &want, const sptr<IRemoteObject> hostRemoteObj);
 
+    int32_t ReloadFormRecord(const std::vector<int64_t> &&formIds, const Want &want);
+
+    int32_t HandleReloadFormRecord(const std::vector<int64_t> &&formIds, const Want &want);
+
     /**
      * @brief Get the uid of bundle.
      * @return Returns the uid.
@@ -115,6 +119,7 @@ private:
     std::shared_ptr<EventRunner> eventRunner_;
     std::shared_ptr<EventHandler> eventHandler_;
     std::shared_ptr<AbilityRuntime::Runtime> runtime_;
+
     // <formId, hostRemoteObj>
     std::mutex hostsMapMutex_;
     std::unordered_map<int64_t, std::unordered_set<sptr<IRemoteObject>, RemoteObjHash>> hostsMapForFormId_;
@@ -127,7 +132,6 @@ private:
     // <formId, compId>
     std::mutex compIdMutex_;
     std::unordered_map<int64_t, std::vector<std::string>> compIdMap_;
-
     std::string hapPath_;
 };
 }  // namespace FormRender
