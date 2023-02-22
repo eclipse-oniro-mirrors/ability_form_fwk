@@ -2007,11 +2007,20 @@ bool FormMgrAdapter::UpdateProviderInfoToHost(const int64_t matchedFormId, const
 
     // If the form need refresh flag is true and form visibleType is FORM_VISIBLE, refresh the form host.
     if (formRecord.needRefresh && formVisibleType == Constants::FORM_VISIBLE) {
-        std::string cacheData;
-        // If the form has business cache, refresh the form host.
-        if (FormCacheMgr::GetInstance().GetData(matchedFormId, cacheData)) {
-            formRecord.formProviderInfo.SetFormDataString(cacheData);
-            formHostRecord.OnUpdate(matchedFormId, formRecord);
+        if (formRecord.isTimerRefresh) {
+            Want want;
+            int32_t userId = FormUtil::GetCurrentAccountId();
+            want.SetParam(Constants::KEY_IS_TIMER, true);
+            want.SetParam(Constants::KEY_TIMER_REFRESH, true);
+            want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
+            FormProviderMgr::GetInstance().RefreshForm(formRecord.formId, want, false);
+        } else {
+            std::string cacheData;
+            // If the form has business cache, refresh the form host.
+            if (FormCacheMgr::GetInstance().GetData(matchedFormId, cacheData)) {
+                formRecord.formProviderInfo.SetFormDataString(cacheData);
+                formHostRecord.OnUpdate(matchedFormId, formRecord);
+            }
         }
     }
     return true;

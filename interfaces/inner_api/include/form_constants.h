@@ -43,7 +43,8 @@ namespace Constants {
     constexpr int32_t ORIENTATION_LANDSCAPE = 2;
     constexpr const char* PARAM_FORM_ABILITY_NAME_KEY = "abilityName";
     constexpr const char* PARAM_FORM_USER_ID = "ohos.extra.param.key.form_user_id";
-    constexpr const char* KEY_IS_TIMER = "isTimerRefresh";
+    constexpr const char* KEY_IS_TIMER = "isCountTimerRefresh";
+    constexpr const char* KEY_TIMER_REFRESH = "isTimerRefresh";
     constexpr const char* SYSTEM_PARAM_FORM_UPDATE_TIME = "persist.sys.fms.form.update.time";
     constexpr const char* SYSTEM_PARAM_FORM_REFRESH_MIN_TIME = "persist.sys.fms.form.refresh.min.time";
     constexpr const char* ACTION_UPDATEATTIMER = "form_update_at_timer";
