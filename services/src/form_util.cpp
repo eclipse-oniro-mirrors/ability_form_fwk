@@ -140,7 +140,7 @@ int64_t FormUtil::GetCurrentNanosecond()
     struct timespec ts;
     ts.tv_sec = 0;
     ts.tv_nsec = 0;
-    clock_gettime(CLOCK_REALTIME, &ts);
+    clock_gettime(CLOCK_MONOTONIC, &ts);
     return (ts.tv_sec * SEC_TO_NANOSEC + ts.tv_nsec);
 }
 /**

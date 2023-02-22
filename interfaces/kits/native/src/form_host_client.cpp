@@ -79,7 +79,7 @@ void FormHostClient::AddForm(std::shared_ptr<FormCallbackInterface> formCallback
         iter->second.emplace(formCallback);
     }
 
-    if (formJsInfo.type == FormType::ETS) {
+    if (formJsInfo.uiSyntax == FormType::ETS) {
         etsFormIds_.emplace(formId);
     }
 }

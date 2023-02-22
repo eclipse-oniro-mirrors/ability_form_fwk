@@ -19,6 +19,7 @@
 
 #include "form_bms_helper.h"
 #include "form_constants.h"
+#include "form_mgr_errors.h"
 #include "form_supply_callback.h"
 #include "form_render_mgr.h"
 #include "form_task_mgr.h"
@@ -29,8 +30,8 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-FormRenderConnection::FormRenderConnection(const FormRecord &formRecord,
-    const WantParams &wantParams) : formRecord_(formRecord), wantParams_(wantParams)
+FormRenderConnection::FormRenderConnection(
+    const FormRecord &formRecord, const WantParams &wantParams) : formRecord_(formRecord), wantParams_(wantParams)
 {
     SetFormId(formRecord.formId);
     SetProviderKey(formRecord.bundleName, formRecord.abilityName);
@@ -46,6 +47,7 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
         return;
     }
 
+    connectState_ = ConnectState::CONNECTED;
     int32_t compileMode = 0;
     if (!FormBmsHelper::GetInstance().GetCompileMode(formRecord_.bundleName, formRecord_.moduleName,
         FormUtil::GetCurrentAccountId(), compileMode)) {
@@ -60,6 +62,28 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
     want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
     want.SetParam(Constants::FORM_COMPILE_MODE_KEY, compileMode);
     FormTaskMgr::GetInstance().PostRenderForm(formRecord_, want, remoteObject);
+}
+
+void FormRenderConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
+{
+    HILOG_DEBUG("element:%{public}s, resultCode:%{public}d, connectState: %{public}d",
+        element.GetURI().c_str(), resultCode, connectState_);
+    // If connectState_ is CONNECTING, it means connect failed, need to notify host 
+    if (resultCode && connectState_ == ConnectState::CONNECTING) {
+        FormRenderMgr::GetInstance().HandleConnectFailed(
+            formRecord_.formId, ERR_APPEXECFWK_FORM_CONNECT_FORM_RENDER_FAILED);
+    }
+    connectState_ = ConnectState::DISCONNECTED;
+}
+
+void FormRenderConnection::SetStateConnecting()
+{
+    connectState_ = ConnectState::CONNECTING;
+}
+
+void FormRenderConnection::SetStateDisconnected()
+{
+    connectState_ = ConnectState::DISCONNECTED;
 }
 
 void FormRenderConnection::UpdateWantParams(const WantParams &wantParams)

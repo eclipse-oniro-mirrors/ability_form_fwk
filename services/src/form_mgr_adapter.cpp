@@ -87,7 +87,7 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
     bool tempFormFlag = want.GetBoolParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
     int callingUid = IPCSkeleton::GetCallingUid();
     int checkCode = 0;
-    if (tempFormFlag && !FormRenderMgr::GetInstance().IsRerenderForRenderDied(formId)) {
+    if (tempFormFlag && !FormRenderMgr::GetInstance().IsRerenderForRenderServiceDied(formId)) {
         if (formId > 0) {
             HILOG_ERROR("%{public}s fail, temp form id is invalid, formId:%{public}" PRId64 "", __func__, formId);
             return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -800,7 +800,7 @@ ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
     int64_t formId = FormDataMgr::GetInstance().PaddingUdidHash(info.GetFormId());
     FormRecord record;
     bool hasRecord = FormDataMgr::GetInstance().GetFormRecord(formId, record);
-    if (hasRecord && record.formTempFlag && !FormRenderMgr::GetInstance().IsRerenderForRenderDied(formId)) {
+    if (hasRecord && record.formTempFlag && !FormRenderMgr::GetInstance().IsRerenderForRenderServiceDied(formId)) {
         HILOG_ERROR("%{public}s, addForm can not acquire temp form when select form id", __func__);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
@@ -1135,7 +1135,7 @@ ErrCode FormMgrAdapter::GetFormInfo(const AAFwk::Want &want, FormInfo &formInfo)
     std::string formName = want.GetStringParam(Constants::PARAM_FORM_NAME_KEY);
     if (formName.empty()) {
         for (const auto &form : formInfos) {
-            if (form.defaultFlag) {
+            if (form.defaultFlag && form.abilityName == abilityName) {
                 formInfo = form;
                 formInfo.moduleName = moduleName;
                 HILOG_DEBUG("GetFormInfo end.");
@@ -1144,7 +1144,7 @@ ErrCode FormMgrAdapter::GetFormInfo(const AAFwk::Want &want, FormInfo &formInfo)
         }
     } else  {
         for (const auto &form : formInfos) {
-            if (form.name == formName) {
+            if (form.name == formName && form.abilityName == abilityName) {
                 formInfo = form;
                 formInfo.moduleName = moduleName;
                 HILOG_DEBUG("GetFormInfo end.");
@@ -1152,7 +1152,8 @@ ErrCode FormMgrAdapter::GetFormInfo(const AAFwk::Want &want, FormInfo &formInfo)
             }
         }
     }
-    HILOG_ERROR("failed to get form info failed.");
+    HILOG_ERROR("failed to get form info failed. ability name is %{public}s, form name is %{public}s",
+        abilityName.c_str(), formName.c_str());
     return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
 }
 /**

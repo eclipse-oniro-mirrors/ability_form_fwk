@@ -16,6 +16,8 @@
 #ifndef OHOS_FORM_FWK_FORM_RENDER_CONNECTION_H
 #define OHOS_FORM_FWK_FORM_RENDER_CONNECTION_H
 
+#include <unordered_set>
+
 #include "form_ability_connection.h"
 #include "form_item_info.h"
 #include "want.h"
@@ -42,11 +44,35 @@ public:
     void OnAbilityConnectDone(const AppExecFwk::ElementName &element,
         const sptr<IRemoteObject> &remoteObject, int resultCode) override;
 
+    /**
+     * @brief OnAbilityDisconnectDone, AbilityMs notify caller ability the result of disconnect.
+     * @param element service ability's ElementName.
+     * @param resultCode ERR_OK on success, others on failure.
+     */
+    virtual void OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode) override;
+
+    /**
+     * @brief Set connectState to CONNECTING.
+     */
+    void SetStateConnecting();
+
+    /**
+     * @brief Set connectState to DISCONNECTED.
+     */
+    void SetStateDisconnected();
+
     void UpdateWantParams(const WantParams &wantParams);
 
 private:
+    enum class ConnectState {
+        DISCONNECTED,
+        CONNECTING,
+        CONNECTED,
+    };
+
     FormRecord formRecord_;
     WantParams wantParams_;
+    ConnectState connectState_ = ConnectState::DISCONNECTED;
     DISALLOW_COPY_AND_MOVE(FormRenderConnection);
 };
 } // namespace AppExecFwk

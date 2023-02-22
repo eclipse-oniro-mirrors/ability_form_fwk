@@ -486,6 +486,7 @@ bool FormDataMgr::DeleteHostRecord(const sptr<IRemoteObject> &callerToken, const
             break;
         }
     }
+    FormRenderMgr::GetInstance().CleanFormHost(callerToken);
     HILOG_INFO("%{public}s end", __func__);
     return true;
 }
@@ -520,7 +521,6 @@ void FormDataMgr::CleanHostRemovedForms(const std::vector<int64_t> &removedFormI
  */
 void FormDataMgr::HandleHostDied(const sptr<IRemoteObject> &remoteHost)
 {
-    FormRenderMgr::GetInstance().HandleHostDied(remoteHost);
     std::vector<int64_t> recordTempForms;
     {
         std::lock_guard<std::recursive_mutex> lock(formHostRecordMutex_);
@@ -566,6 +566,7 @@ void FormDataMgr::HandleHostDied(const sptr<IRemoteObject> &remoteHost)
             }
         }
     }
+    FormRenderMgr::GetInstance().CleanFormHost(remoteHost);
 }
 
 /**
