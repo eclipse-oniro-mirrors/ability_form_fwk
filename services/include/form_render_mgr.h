@@ -65,9 +65,9 @@ public:
     bool IsRerenderForRenderServiceDied(int64_t formId);
 
 private:
-    ErrCode ConnectRenderService(const sptr<AAFwk::IAbilityConnection> &connection) const;
+    ErrCode ConnectRenderService(const sptr<FormRenderConnection> &connection) const;
 
-    void DisconnectRenderService(const sptr<AAFwk::IAbilityConnection> connection, size_t size) const;
+    void DisconnectRenderService(const sptr<FormRenderConnection> connection, size_t size) const;
 
     void AddHostToken(const sptr<IRemoteObject> &host, int64_t formId);
 

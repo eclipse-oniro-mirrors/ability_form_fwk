@@ -47,7 +47,7 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
         return;
     }
 
-    renderDeadFlag_ = false;
+    connectState_ = ConnectState::CONNECTED;
     int32_t compileMode = 0;
     if (!FormBmsHelper::GetInstance().GetCompileMode(formRecord_.bundleName, formRecord_.moduleName,
         FormUtil::GetCurrentAccountId(), compileMode)) {
@@ -66,18 +66,24 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
 
 void FormRenderConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
 {
-    HILOG_DEBUG("element:%{public}s, resultCode:%{public}d, renderDeadFlag: %{public}d",
-        element.GetURI().c_str(), resultCode, renderDeadFlag_);
-    // If renderDeadFlag_ is FALSE, it means connect failed, need to notify host 
-    if (resultCode && !renderDeadFlag_) {
+    HILOG_DEBUG("element:%{public}s, resultCode:%{public}d, connectState: %{public}d",
+        element.GetURI().c_str(), resultCode, connectState_);
+    // If connectState_ is CONNECTING, it means connect failed, need to notify host 
+    if (resultCode && connectState_ == ConnectState::CONNECTING) {
         FormRenderMgr::GetInstance().HandleConnectFailed(
             formRecord_.formId, ERR_APPEXECFWK_FORM_CONNECT_FORM_RENDER_FAILED);
     }
+    connectState_ = ConnectState::DISCONNECTED;
 }
 
-void FormRenderConnection::SetRenderDeadFlag()
+void FormRenderConnection::SetStateConnecting()
 {
-    renderDeadFlag_ = true;
+    connectState_ = ConnectState::CONNECTING;
+}
+
+void FormRenderConnection::SetStateDisconnected()
+{
+    connectState_ = ConnectState::DISCONNECTED;
 }
 
 void FormRenderConnection::UpdateWantParams(const WantParams &wantParams)

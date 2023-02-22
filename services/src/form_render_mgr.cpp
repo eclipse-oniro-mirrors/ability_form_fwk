@@ -224,7 +224,7 @@ ErrCode FormRenderMgr::StopRenderingFormCallback(int64_t formId, const Want &wan
         HILOG_ERROR("Can not find formId in map.");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
-    sptr<FormAbilityConnection> stopConnection = conIterator->second;
+    sptr<FormRenderConnection> stopConnection = conIterator->second;
     if (stopConnection == nullptr) {
         HILOG_ERROR("Can not find stopConnection in map.");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -285,7 +285,11 @@ void FormRenderMgr::RerenderAllForms()
         }
         HILOG_INFO("The forms need to rerender count: %{public}zu.", renderFormConnections_.size());
         for (auto &item : renderFormConnections_) {
-            item.second->SetRenderDeadFlag();
+            if (item.second == nullptr) {
+                HILOG_ERROR("Connection is nullptr.");
+                continue;
+            }
+            item.second->SetStateDisconnected();
         }
     }
 
@@ -326,15 +330,20 @@ void FormRenderMgr::AddRenderDeathRecipient(const sptr<IRemoteObject> &remoteObj
     remoteObject->AddDeathRecipient(renderDeathRecipient_);
 }
 
-inline ErrCode FormRenderMgr::ConnectRenderService(const sptr<AAFwk::IAbilityConnection> &connection) const
+inline ErrCode FormRenderMgr::ConnectRenderService(const sptr<FormRenderConnection> &connection) const
 {
+    if (connection == nullptr) {
+        HILOG_INFO("connection is nullptr.");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
     Want want;
     want.SetElementName("com.ohos.formrenderservice", "ServiceExtension");
     want.AddFlags(Want::FLAG_ABILITY_FORM_ENABLED);
+    connection->SetStateConnecting();
     return FormAmsHelper::GetInstance().ConnectServiceAbility(want, connection);
 }
 
-void FormRenderMgr::DisconnectRenderService(const sptr<AAFwk::IAbilityConnection> connection, size_t size) const
+void FormRenderMgr::DisconnectRenderService(const sptr<FormRenderConnection> connection, size_t size) const
 {
     if (size == LAST_CONNECTION) {
         HILOG_INFO("This is the last connection, disconnect render service delay");
@@ -401,10 +410,10 @@ void FormRenderMgr::RemoveHostToken(const sptr<IRemoteObject> &host)
     if (etsHosts_.empty()) {
         HILOG_DEBUG("etsHosts is empty, disconnect all connections, current connection.size: %{public}zu.",
             renderFormConnections_.size());
-        for (const auto &item : renderFormConnections_) {
-            DisconnectRenderService(item.second, renderFormConnections_.size());
+        for (auto iter = renderFormConnections_.begin(); iter != renderFormConnections_.end();) {
+            DisconnectRenderService(iter->second, renderFormConnections_.size());
+            iter = renderFormConnections_.erase(iter);
         }
-        renderFormConnections_.clear();
     }
 }
 
