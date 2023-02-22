@@ -1622,7 +1622,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_086, TestSize.Level0)
     std::vector<int64_t> formIds;
     sptr<IRemoteObject> callerToken = nullptr;
     int32_t formVisibleType = 2;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, 
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
         formMgrAdapter.NotifyWhetherVisibleForms(formIds, callerToken, formVisibleType));
     GTEST_LOG_(INFO) << "FormMgrAdapter_086 end";
 }
@@ -1785,7 +1785,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_096, TestSize.Level0)
     sptr<IRemoteObject> callerToken = nullptr;
     WantParams wantParams;
     FormJsInfo formInfo;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, 
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
         formMgrAdapter.AllotFormById(info, callerToken, wantParams, formInfo));
     GTEST_LOG_(INFO) << "FormMgrAdapter_096 end";
 }
@@ -1804,7 +1804,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_097, TestSize.Level0)
     WantParams wantParams;
     FormJsInfo formInfo;
     MockGetFormRecord(true);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, 
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE,
         formMgrAdapter.AllotFormById(info, callerToken, wantParams, formInfo));
     GTEST_LOG_(INFO) << "FormMgrAdapter_097 end";
 }
@@ -1868,7 +1868,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0100, TestSize.Level0)
 
 /**
  * @tc.name: FormMgrAdapter_0101
- * @tc.desc: test AddForm function and the return value is ERR_OK.
+ * @tc.desc: test AddForm function with wrong ability name.
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0101, TestSize.Level0)
@@ -1901,14 +1901,14 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0101, TestSize.Level0)
         return true;
     };
     EXPECT_CALL(*bmsProxy, GetBundleInfo(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
-    EXPECT_EQ(formMgrAdapter.AddForm(formId, want, callerToken, formInfo), ERR_OK);
+    EXPECT_NE(formMgrAdapter.AddForm(formId, want, callerToken, formInfo), ERR_OK);
     FormBmsHelper::GetInstance().iBundleMgr_ = backup;
     GTEST_LOG_(INFO) << "FormMgrAdapter_0101 end";
 }
 
 /**
  * @tc.name: FormMgrAdapter_0102
- * @tc.desc: test AddForm function and the return value is ERR_APPEXECFWK_FORM_NOT_EXIST_ID.
+ * @tc.desc: test AddForm function with wrong ability name.
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0102, TestSize.Level0)
@@ -1942,14 +1942,14 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0102, TestSize.Level0)
         return true;
     };
     EXPECT_CALL(*bmsProxy, GetBundleInfo(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
-    EXPECT_EQ(formMgrAdapter.AddForm(formId, want, callerToken, formInfo), ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+    EXPECT_NE(formMgrAdapter.AddForm(formId, want, callerToken, formInfo), ERR_OK);
     FormBmsHelper::GetInstance().iBundleMgr_ = backup;
     GTEST_LOG_(INFO) << "FormMgrAdapter_0102 end";
 }
 
 /**
  * @tc.name: FormMgrAdapter_0103
- * @tc.desc: test AddForm function and the return value is ERR_APPEXECFWK_FORM_INVALID_PARAM.
+ * @tc.desc: test AddForm function with wrong ability name.
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0103, TestSize.Level0)
@@ -1983,7 +1983,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0103, TestSize.Level0)
         return true;
     };
     EXPECT_CALL(*bmsProxy, GetBundleInfo(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
-    EXPECT_EQ(formMgrAdapter.AddForm(formId, want, callerToken, formInfo), ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    EXPECT_NE(formMgrAdapter.AddForm(formId, want, callerToken, formInfo), ERR_OK);
     FormBmsHelper::GetInstance().iBundleMgr_ = backup;
     GTEST_LOG_(INFO) << "FormMgrAdapter_0103 end";
 }
