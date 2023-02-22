@@ -401,10 +401,10 @@ void FormRenderMgr::RemoveHostToken(const sptr<IRemoteObject> &host)
     if (etsHosts_.empty()) {
         HILOG_DEBUG("etsHosts is empty, disconnect all connections, current connection.size: %{public}zu.",
             renderFormConnections_.size());
-        for (const auto &item : renderFormConnections_) {
-            DisconnectRenderService(item.second, renderFormConnections_.size());
+        for (auto iter = renderFormConnections_.begin(); iter != renderFormConnections_.end();) {
+            DisconnectRenderService(iter->second, renderFormConnections_.size());
+            iter = renderFormConnections_.erase(iter);
         }
-        renderFormConnections_.clear();
     }
 }
 
