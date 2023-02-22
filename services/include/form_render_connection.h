@@ -52,16 +52,27 @@ public:
     virtual void OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode) override;
 
     /**
-     * @brief Set renderDeadFlag to TRUE.
+     * @brief Set connectState to CONNECTING.
      */
-    void SetRenderDeadFlag();
+    void SetStateConnecting();
+
+    /**
+     * @brief Set connectState to DISCONNECTED.
+     */
+    void SetStateDisconnected();
 
     void UpdateWantParams(const WantParams &wantParams);
 
 private:
+    enum class ConnectState {
+        DISCONNECTED,
+        CONNECTING,
+        CONNECTED,
+    };
+
     FormRecord formRecord_;
     WantParams wantParams_;
-    bool renderDeadFlag_ = false;
+    ConnectState connectState_ = ConnectState::DISCONNECTED;
     DISALLOW_COPY_AND_MOVE(FormRenderConnection);
 };
 } // namespace AppExecFwk
