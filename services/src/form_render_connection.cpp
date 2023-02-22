@@ -19,6 +19,7 @@
 
 #include "form_bms_helper.h"
 #include "form_constants.h"
+#include "form_mgr_errors.h"
 #include "form_supply_callback.h"
 #include "form_render_mgr.h"
 #include "form_task_mgr.h"
@@ -29,8 +30,8 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-FormRenderConnection::FormRenderConnection(const FormRecord &formRecord,
-    const WantParams &wantParams) : formRecord_(formRecord), wantParams_(wantParams)
+FormRenderConnection::FormRenderConnection(
+    const FormRecord &formRecord, const WantParams &wantParams) : formRecord_(formRecord), wantParams_(wantParams)
 {
     SetFormId(formRecord.formId);
     SetProviderKey(formRecord.bundleName, formRecord.abilityName);
@@ -46,6 +47,7 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
         return;
     }
 
+    renderDeadFlag_ = false;
     int32_t compileMode = 0;
     if (!FormBmsHelper::GetInstance().GetCompileMode(formRecord_.bundleName, formRecord_.moduleName,
         FormUtil::GetCurrentAccountId(), compileMode)) {
@@ -60,6 +62,22 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
     want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
     want.SetParam(Constants::FORM_COMPILE_MODE_KEY, compileMode);
     FormTaskMgr::GetInstance().PostRenderForm(formRecord_, want, remoteObject);
+}
+
+void FormRenderConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
+{
+    HILOG_DEBUG("element:%{public}s, resultCode:%{public}d, renderDeadFlag: %{public}d",
+        element.GetURI().c_str(), resultCode, renderDeadFlag_);
+    // If renderDeadFlag_ is FALSE, it means connect failed, need to notify host 
+    if (resultCode && !renderDeadFlag_) {
+        FormRenderMgr::GetInstance().HandleConnectFailed(
+            formRecord_.formId, ERR_APPEXECFWK_FORM_CONNECT_FORM_RENDER_FAILED);
+    }
+}
+
+void FormRenderConnection::SetRenderDeadFlag()
+{
+    renderDeadFlag_ = true;
 }
 
 void FormRenderConnection::UpdateWantParams(const WantParams &wantParams)
