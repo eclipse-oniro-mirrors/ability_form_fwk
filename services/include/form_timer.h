@@ -71,7 +71,7 @@ public:
         type = UpdateType::TYPE_INTERVAL_CHANGE;
     }
 
-    FormTimer(int64_t id, long repeatTime, int32_t uId = 0)
+    FormTimer(int64_t id, long repeatTime, int64_t currentTime, int32_t uId = 0)
     {
         formId = id;
         userId = uId;
@@ -80,7 +80,7 @@ public:
         min = -1;
         isUpdateAt = false;
         isCountTimer = true;
-        refreshTime = INT64_MAX;
+        refreshTime = currentTime;
         type = UpdateType::TYPE_INTERVAL_CHANGE;
     }
 

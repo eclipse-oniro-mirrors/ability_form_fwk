@@ -88,7 +88,7 @@ bool FormTimerMgr::AddFormTimer(int64_t formId, long updateDuration, int32_t use
     auto duration = updateDuration / timeSpeed_;
     HILOG_INFO("%{public}s formId:%{public}s duration:%{public}s", __func__,
         std::to_string(formId).c_str(), std::to_string(duration).c_str());
-    FormTimer timerTask(formId, duration, userId);
+    FormTimer timerTask(formId, duration, FormUtil::GetCurrentNanosecond() / Constants::TIME_1000000, userId);
     return AddFormTimer(timerTask);
 }
 /**
@@ -300,7 +300,7 @@ bool FormTimerMgr::AtTimerToIntervalTimer(int64_t formId, const FormTimerCfg &ti
     }
     targetItem.refreshTask.isUpdateAt = false;
     targetItem.refreshTask.period = timerCfg.updateDuration;
-    targetItem.refreshTask.refreshTime = INT64_MAX;
+    targetItem.refreshTask.refreshTime = FormUtil::GetCurrentNanosecond() / Constants::TIME_1000000;
     if (!AddIntervalTimer(targetItem.refreshTask)) {
         HILOG_ERROR("%{public}s, failed to add interval timer", __func__);
         return false;
@@ -811,7 +811,9 @@ void FormTimerMgr::OnIntervalTimeOut()
     int64_t currentTime = FormUtil::GetCurrentNanosecond() / Constants::TIME_1000000;
     for (auto &intervalPair : intervalTimerTasks_) {
         FormTimer &intervalTask = intervalPair.second;
-        if ((intervalTask.refreshTime == INT64_MAX || (currentTime - intervalTask.refreshTime) >= intervalTask.period ||
+        HILOG_INFO("intervalTask form id is %{public}" PRId64 ", period is %{public}" PRId64 "",
+            intervalTask.formId, intervalTask.period);
+        if (((currentTime - intervalTask.refreshTime) >= intervalTask.period ||
             std::abs((currentTime - intervalTask.refreshTime) - intervalTask.period) < Constants::ABS_TIME) &&
             intervalTask.isEnable && refreshLimiter_.IsEnableRefresh(intervalTask.formId)) {
             intervalTask.refreshTime = currentTime;
