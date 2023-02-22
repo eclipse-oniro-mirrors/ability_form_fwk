@@ -88,7 +88,7 @@ bool FormTimerMgr::AddFormTimer(int64_t formId, long updateDuration, int32_t use
     auto duration = updateDuration / timeSpeed_;
     HILOG_INFO("%{public}s formId:%{public}s duration:%{public}s", __func__,
         std::to_string(formId).c_str(), std::to_string(duration).c_str());
-    FormTimer timerTask(formId, duration, FormUtil::GetCurrentNanosecond() / Constants::TIME_1000000, userId);
+    FormTimer timerTask(formId, duration, userId);
     return AddFormTimer(timerTask);
 }
 /**
