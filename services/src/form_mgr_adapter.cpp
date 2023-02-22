@@ -1136,7 +1136,7 @@ ErrCode FormMgrAdapter::GetFormInfo(const AAFwk::Want &want, FormInfo &formInfo)
     std::string formName = want.GetStringParam(Constants::PARAM_FORM_NAME_KEY);
     if (formName.empty()) {
         for (const auto &form : formInfos) {
-            if (form.defaultFlag) {
+            if (form.defaultFlag && form.abilityName == abilityName) {
                 formInfo = form;
                 formInfo.moduleName = moduleName;
                 HILOG_DEBUG("GetFormInfo end.");
@@ -1145,7 +1145,7 @@ ErrCode FormMgrAdapter::GetFormInfo(const AAFwk::Want &want, FormInfo &formInfo)
         }
     } else  {
         for (const auto &form : formInfos) {
-            if (form.name == formName) {
+            if (form.name == formName && form.abilityName == abilityName) {
                 formInfo = form;
                 formInfo.moduleName = moduleName;
                 HILOG_DEBUG("GetFormInfo end.");
@@ -1153,7 +1153,8 @@ ErrCode FormMgrAdapter::GetFormInfo(const AAFwk::Want &want, FormInfo &formInfo)
             }
         }
     }
-    HILOG_ERROR("failed to get form info failed.");
+    HILOG_ERROR("failed to get form info failed. ability name is %{public}s, form name is %{public}s",
+        abilityName.c_str(), formName.c_str());
     return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
 }
 /**
