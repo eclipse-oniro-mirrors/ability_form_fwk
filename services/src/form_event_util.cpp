@@ -86,13 +86,13 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
             FormTimerMgr::GetInstance().RemoveFormTimer(id);
         }
     }
-
     HILOG_INFO("%{public}s, refresh form", __func__);
     Want want;
     want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
     for (const int64_t id : updatedForms) {
         FormProviderMgr::GetInstance().RefreshForm(id, want, true);
     }
+    FormRenderMgr::GetInstance().ReloadForm(std::move(updatedForms), bundleName, userId);
 }
 
 void FormEventUtil::HandleBundleFormInfoRemoved(const std::string &bundleName, int32_t userId)

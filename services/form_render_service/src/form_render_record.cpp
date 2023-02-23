@@ -15,6 +15,8 @@
 
 #include "form_render_record.h"
 
+#include <utility>
+
 #include "form_constants.h"
 #include "hilog_wrapper.h"
 
@@ -22,6 +24,8 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace FormRender {
 constexpr int32_t RENDER_FORM_FAILED = -1;
+constexpr int32_t RELOAD_FORM_FAILED = -1;
+
 std::shared_ptr<FormRenderRecord> FormRenderRecord::Create(const std::string &bundleName, const std::string &uid)
 {
     HILOG_INFO("%{public}s called.", __func__);
@@ -98,6 +102,7 @@ bool FormRenderRecord::CreateEventHandler(const std::string &bundleName)
 int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const Want &want, const sptr<IRemoteObject> hostRemoteObj)
 {
     HILOG_INFO("Updated record.");
+
     // Some resources need to be initialized in a JS thread
     std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
     auto task = [thisWeakPtr, formJsInfo, want]() {
@@ -130,36 +135,31 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
     return ERR_OK;
 }
 
-int32_t FormRenderRecord::DeleteRenderRecord(int64_t formId, const Want &want, const sptr<IRemoteObject> hostRemoteObj)
+void FormRenderRecord::DeleteRenderRecord(int64_t formId, const std::string &compId, bool &isRenderGroupEmpty)
 {
     // Some resources need to be deleted in a JS thread
-    HILOG_INFO("Delete some resources.");
-    std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
-    std::vector<std::string> compIds = compIdMap_.find(formId)->second;
-    auto task = [thisWeakPtr, formId, compIds, want]() {
-        HILOG_DEBUG("HandleDeleteInJsThread begin.");
-        auto renderRecord = thisWeakPtr.lock();
+    HILOG_INFO("Delete some resources formId: %{public}" PRId64 ", %{public}s", formId, compId.c_str());
+    if (eventHandler_ == nullptr) {
+        HILOG_ERROR("eventHandler_ is nullptr");
+        return;
+    }
+
+    auto task = [weak = weak_from_this(), formId, compId, &isRenderGroupEmpty]() {
+        auto renderRecord = weak.lock();
         if (renderRecord == nullptr) {
             HILOG_ERROR("renderRecord is nullptr.");
             return;
         }
-        renderRecord->HandleDeleteInJsThread(formId, compIds, want);
+
+        isRenderGroupEmpty = renderRecord->HandleDeleteInJsThread(formId, compId);
     };
-
-    if (eventHandler_ == nullptr) {
-        HILOG_ERROR("eventHandler_ is nullptr");
-        return RENDER_FORM_FAILED;
-    }
     eventHandler_->PostSyncTask(task);
+}
 
-    {
-        std::lock_guard<std::mutex> lock(hostsMapMutex_);
-        hostsMapForFormId_.erase(formId);
-        if (hostsMapForFormId_.empty()) {
-            return ERR_OK;
-        }
-    }
-    return RENDER_FORM_FAILED;
+bool FormRenderRecord::IsEmpty()
+{
+    std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
+    return formRendererGroupMap_.empty();
 }
 
 std::string FormRenderRecord::GetUid() const
@@ -278,7 +278,6 @@ void FormRenderRecord::HandleUpdateInJsThread(const FormJsInfo &formJsInfo, cons
         HILOG_ERROR("Create Context failed.");
         return;
     }
-
     auto renderType = want.GetIntParam(Constants::FORM_RENDER_TYPE_KEY, Constants::RENDER_FORM);
     HILOG_INFO("renderType is %{public}d.", renderType);
     if (renderType == Constants::RENDER_FORM) {
@@ -288,17 +287,6 @@ void FormRenderRecord::HandleUpdateInJsThread(const FormJsInfo &formJsInfo, cons
             return;
         }
         formRendererGroup->AddForm(want, formJsInfo);
-        {
-            std::lock_guard<std::mutex> lock(compIdMutex_);
-            auto item = compIdMap_.find(formJsInfo.formId);
-            if (item == compIdMap_.end()) {
-                compIdMap_.emplace(formJsInfo.formId, std::vector<std::string>());
-                item = compIdMap_.begin();
-            }
-            auto compId = want.GetStringParam(Constants::FORM_COMP_ID);
-            item->second.emplace_back(compId);
-            HILOG_INFO("HandleUpdateInJsThread AddForm compId = %{public}s", compId.c_str());
-        }
         HILOG_INFO("AddForm formId:%{public}s", std::to_string(formJsInfo.formId).c_str());
     } else {
         std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
@@ -312,22 +300,34 @@ void FormRenderRecord::HandleUpdateInJsThread(const FormJsInfo &formJsInfo, cons
     return;
 }
 
-void FormRenderRecord::HandleDeleteInJsThread(int64_t formId, const std::vector<std::string> &compIds, const Want &want)
+bool FormRenderRecord::HandleDeleteInJsThread(int64_t formId, const std::string &compId)
 {
     HILOG_INFO("Delete some resources in js thread.");
-    {
-        std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
-        if (auto search = this->formRendererGroupMap_.find(formId);
-            search != this->formRendererGroupMap_.end()) {
-            auto group = search->second;
-            for (auto compId : compIds) {
-                group->DeleteForm(compId);
-            }
-            return;
-        }
+    std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
+    auto search = formRendererGroupMap_.find(formId);
+    if (search == formRendererGroupMap_.end()) {
+        HILOG_INFO("HandleDeleteInJsThread failed. FormRendererGroup was not founded.");
+        return false;
     }
-    HILOG_ERROR("HandleDeleteInJsThread failed. FormRendererGroup was not found.");
-    return;
+
+    if (!search->second) {
+        HILOG_INFO("HandleDeleteInJsThread failed. FormRendererGroup was founded but is null.");
+        return false;
+    }
+
+    if (compId.empty()) {
+        search->second->DeleteForm();
+    } else {
+        search->second->DeleteForm(compId);
+    }
+
+    bool isGroupEmpty = search->second->IsEmpty();
+    if (isGroupEmpty) {
+        formRendererGroupMap_.erase(formId);
+        hostsMapForFormId_.erase(formId);
+    }
+    
+    return isGroupEmpty;
 }
 
 void FormRenderRecord::HandleDestroyInJsThread()
@@ -341,6 +341,47 @@ void FormRenderRecord::HandleDestroyInJsThread()
 inline std::string FormRenderRecord::GenerateContextKey(const FormJsInfo &formJsInfo)
 {
     return formJsInfo.bundleName + ":" +  formJsInfo.moduleName;
+}
+
+int32_t FormRenderRecord::ReloadFormRecord(const std::vector<int64_t> &&formIds, const Want &want)
+{
+    HILOG_INFO("Reload form record");
+    std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
+    auto task = [thisWeakPtr, ids = std::forward<decltype(formIds)>(formIds), want]() {
+        HILOG_DEBUG("HandleReloadFormRecord begin.");
+        auto renderRecord = thisWeakPtr.lock();
+        if (renderRecord == nullptr) {
+            HILOG_ERROR("renderRecord is nullptr.");
+            return;
+        }
+        renderRecord->HandleReloadFormRecord(std::move(ids), want);
+    };
+    if (eventHandler_ == nullptr) {
+        HILOG_ERROR("eventHandler_ is nullptr");
+        return RELOAD_FORM_FAILED;
+    }
+    eventHandler_->PostTask(task);
+    return ERR_OK;
+}
+
+int32_t FormRenderRecord::HandleReloadFormRecord(const std::vector<int64_t> &&formIds, const Want &want)
+{
+    HILOG_INFO("Reload record in js thread.");
+    std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
+    for (auto formId : formIds) {
+        auto search = formRendererGroupMap_.find(formId);
+        if (search == formRendererGroupMap_.end()) {
+            HILOG_ERROR("HandleReloadFormRecord failed. FormRendererGroup was not found.");
+            continue;
+        }
+        auto group = search->second;
+        if (!group) {
+            HILOG_ERROR("HandleReloadFormRecord failed. FormRendererGroup is null.");
+            continue;
+        }
+        group->ReloadForm();
+    }
+    return ERR_OK;
 }
 } // namespace FormRender
 } // namespace AppExecFwk

@@ -166,6 +166,25 @@ int FormMgrService::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
 }
 
 /**
+ * @brief Stop rendering form.
+ * @param formId The Id of the forms to delete.
+ * @param compId The compId of the forms to delete.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormMgrService::StopRenderingForm(const int64_t formId, const std::string &compId)
+{
+    ErrCode ret = CheckFormPermission();
+    if (ret != ERR_OK) {
+        HILOG_ERROR("%{public}s fail, delete form permission denied", __func__);
+        return ret;
+    }
+
+    return FormMgrAdapter::GetInstance().StopRenderingForm(formId, compId);
+}
+
+
+
+/**
  * @brief Release forms with formIds, send formIds to form manager service.
  * @param formId The Id of the forms to release.
  * @param callerToken Caller ability token.

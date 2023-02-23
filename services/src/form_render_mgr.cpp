@@ -165,7 +165,24 @@ ErrCode FormRenderMgr::UpdateRenderingForm(int64_t formId, const FormProviderDat
     return ERR_APPEXECFWK_FORM_INVALID_PARAM;
 }
 
-ErrCode FormRenderMgr::StopRenderingForm(int64_t formId, const FormRecord &formRecord)
+ErrCode FormRenderMgr::ReloadForm(std::vector<int64_t> &&formIds, const std::string &bundleName, int32_t userId)
+{
+    if (renderRemoteObj_ == nullptr) {
+        HILOG_ERROR("%{public}s, renderRemoteObj_ is nullptr", __func__);
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    auto remoteObject = renderRemoteObj_->AsObject();
+    if (remoteObject == nullptr) {
+        HILOG_ERROR("remoteObject is nullptr, can not get obj from renderRemoteObj.");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    Want want;
+    want.SetParam(Constants::FORM_SUPPLY_UID, std::to_string(userId) + bundleName);
+    FormTaskMgr::GetInstance().PostReloadForm(std::forward<decltype(formIds)>(formIds), want, remoteObject);
+    return ERR_OK;
+}
+
+ErrCode FormRenderMgr::StopRenderingForm(int64_t formId, const FormRecord &formRecord, const std::string &compId)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
     if (formRecord.uiSyntax != FormType::ETS) {
@@ -182,6 +199,10 @@ ErrCode FormRenderMgr::StopRenderingForm(int64_t formId, const FormRecord &formR
     Want want;
     int32_t userId = FormUtil::GetCurrentAccountId();
     want.SetParam(Constants::FORM_SUPPLY_UID, std::to_string(userId) + formRecord.bundleName);
+    if (!compId.empty()) {
+        want.SetParam(Constants::FORM_RENDER_COMP_ID, compId);
+    }
+
     {
         std::lock_guard<std::mutex> lock(resourceMutex_);
         auto conIterator = renderFormConnections_.find(formRecord.formId);

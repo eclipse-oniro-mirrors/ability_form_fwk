@@ -60,6 +60,14 @@ public:
     int DeleteForm(const int64_t formId, const sptr<IRemoteObject> &callerToken);
 
     /**
+     * @brief Stop rendering form.
+     * @param formId The Id of the forms to delete.
+     * @param compId The compId of the forms to delete.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int StopRenderingForm(const int64_t formId, const std::string &compId);
+
+    /**
      * @brief Release forms with formIds, send formIds to form Mgr service.
      * @param formId The Id of the forms to release.
      * @param callerToken Caller ability token.

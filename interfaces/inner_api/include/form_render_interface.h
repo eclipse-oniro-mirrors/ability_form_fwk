@@ -60,6 +60,8 @@ public:
      */
     virtual int32_t CleanFormHost(const sptr<IRemoteObject> &hostToken) = 0;
 
+    virtual int32_t ReloadForm(const std::vector<int64_t> &&formIds, const Want &want) { return ERR_OK; }
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -73,6 +75,7 @@ public:
         FORM_RENDER_RENDER_FORM = 3101,
         FORM_RENDER_STOP_RENDERING_FORM = 3102,
         FORM_RENDER_FORM_HOST_DIED = 3103,
+        FORM_RENDER_RELOAD_FORM = 3104,
     };
 };
 } // namespace AppExecFwk

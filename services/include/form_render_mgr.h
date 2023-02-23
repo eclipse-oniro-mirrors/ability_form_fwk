@@ -44,7 +44,9 @@ public:
     ErrCode UpdateRenderingForm(int64_t formId, const FormProviderData &formProviderData,
         const WantParams &wantParams, bool mergeData);
 
-    ErrCode StopRenderingForm(int64_t formId, const FormRecord &formRecord);
+    ErrCode StopRenderingForm(int64_t formId, const FormRecord &formRecord, const std::string &compId = "");
+
+    ErrCode ReloadForm(std::vector<int64_t> &&formIds, const std::string &bundleName, int32_t userId);
 
     ErrCode RenderFormCallback(int64_t formId, const Want &want);
 

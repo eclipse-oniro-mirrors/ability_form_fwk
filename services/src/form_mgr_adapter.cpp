@@ -47,6 +47,7 @@
 #include "form_timer_mgr.h"
 #include "form_util.h"
 #include "hilog_wrapper.h"
+#include "hitrace_meter.h"
 #include "if_system_ability_manager.h"
 #include "in_process_call_wrapper.h"
 #include "ipc_skeleton.h"
@@ -160,6 +161,27 @@ int FormMgrAdapter::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
     }
     return HandleDeleteForm(matchedFormId, callerToken);
 }
+
+/**
+ * @brief Stop rendering form.
+ * @param formId The Id of the forms to delete.
+ * @param compId The compId of the forms to delete.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormMgrAdapter::StopRenderingForm(const int64_t formId, const std::string &compId)
+{
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    if (formId <= 0 || compId.empty()) {
+        HILOG_ERROR("%{public}s, deleteForm invalid param", __func__);
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    FormRecord record;
+    FormDataMgr::GetInstance().GetFormRecord(formId, record);
+    FormRenderMgr::GetInstance().StopRenderingForm(formId, record, compId);
+    return ERR_OK;
+}
+
 
 /**
  * @brief Release forms with formIds, send formIds to form Mgr service.

@@ -123,6 +123,7 @@ namespace Constants {
     constexpr const char* PARAM_FORM_ADD_COUNT = "form.add.count";
 
     constexpr const char* FORM_SUPPLY_UID = "form_supply_uid";
+    constexpr const char* FORM_RENDER_COMP_ID = "form_render_comp_id";
 
     const size_t MAX_LAYOUT = 8;
     constexpr int32_t MAX_FORMS = 512;

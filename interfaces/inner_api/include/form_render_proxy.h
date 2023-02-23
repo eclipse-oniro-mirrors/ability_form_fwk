@@ -46,6 +46,7 @@ public:
      * @param formJsInfo The form js info.
      * @param want Indicates the {@link Want} structure containing form info.
      * @param callerToken Caller ability token.
+     * 
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t StopRenderingForm(
@@ -57,6 +58,8 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t CleanFormHost(const sptr<IRemoteObject> &hostToken) override;
+
+    int32_t ReloadForm(const std::vector<int64_t> &&formIds, const Want &want) override;
 
 private:
     template<typename T>

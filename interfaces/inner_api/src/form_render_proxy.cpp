@@ -14,6 +14,8 @@
  */
 #include "form_render_proxy.h"
 
+#include <utility>
+
 #include "appexecfwk_errors.h"
 #include "hilog_wrapper.h"
 #include "string_ex.h"
@@ -144,6 +146,44 @@ bool FormRenderProxy::WriteInterfaceToken(MessageParcel &data)
         return false;
     }
     return true;
+}
+
+int32_t FormRenderProxy::ReloadForm(const std::vector<int64_t> &&formIds, const Want &want)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("%{public}s, failed to write interface token", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt32(static_cast<int32_t>(formIds.size()))) {
+        HILOG_ERROR("%{public}s, failed to write formIds size", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt64Vector(formIds)) {
+        HILOG_ERROR("%{public}s fail, write formIds error", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteParcelable(&want)) {
+        HILOG_ERROR("%{public}s, failed to write want", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!Remote()) {
+        HILOG_ERROR("Remote obj is nullptr");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int error = Remote()->SendRequest(
+        static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_RELOAD_FORM),
+        data,
+        reply,
+        option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d", __func__, error);
+        return error;
+    }
+    return ERR_OK;
 }
 } // namespace AppExecFwk
 } // namespace OHOS

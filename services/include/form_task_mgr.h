@@ -181,6 +181,9 @@ public:
     void PostRenderForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject);
 
     void PostStopRenderingForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject);
+
+    void PostReloadForm(const std::vector<int64_t> &&formIds, const Want &want,
+        const sptr<IRemoteObject> &remoteObject);
 private:
     /**
      * @brief Acquire form data from form provider.
@@ -324,6 +327,8 @@ private:
     void RenderForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject);
 
     void StopRenderingForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject);
+
+    void ReloadForm(const std::vector<int64_t> &&formIds, const Want &want, const sptr<IRemoteObject> &remoteObject);
 private:
     std::shared_ptr<FormEventHandler> eventHandler_ = nullptr;
 };

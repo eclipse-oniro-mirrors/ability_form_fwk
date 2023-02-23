@@ -65,17 +65,22 @@ public:
     /**
      * @brief When all forms of an bundle are deleted, the corresponding FormRenderRecord-record needs to be removed
      * @param formId formId.
-     * @param want want.
      * @param hostRemoteObj host token.
      * @return Returns ERR_OK on success, others on failure.
      */
-    int32_t DeleteRenderRecord(int64_t formId, const Want &want, const sptr<IRemoteObject> hostRemoteObj);
+    void DeleteRenderRecord(int64_t formId, const std::string &compId, bool &isRenderGroupEmpty);
+
+    int32_t ReloadFormRecord(const std::vector<int64_t> &&formIds, const Want &want);
+
+    int32_t HandleReloadFormRecord(const std::vector<int64_t> &&formIds, const Want &want);
 
     /**
      * @brief Get the uid of bundle.
      * @return Returns the uid.
      */
     std::string GetUid() const;
+
+    bool IsEmpty();
 
 private:
     class RemoteObjHash {
@@ -102,7 +107,7 @@ private:
 
     void HandleUpdateInJsThread(const FormJsInfo &formJsInfo, const Want &want);
 
-    void HandleDeleteInJsThread(int64_t formId, const std::vector<std::string> &compIds, const Want &want);
+    bool HandleDeleteInJsThread(int64_t formId, const std::string &compId);
 
     void HandleDestroyInJsThread();
 
@@ -113,6 +118,7 @@ private:
     std::shared_ptr<EventRunner> eventRunner_;
     std::shared_ptr<EventHandler> eventHandler_;
     std::shared_ptr<AbilityRuntime::Runtime> runtime_;
+
     // <formId, hostRemoteObj>
     std::mutex hostsMapMutex_;
     std::unordered_map<int64_t, std::unordered_set<sptr<IRemoteObject>, RemoteObjHash>> hostsMapForFormId_;
@@ -122,9 +128,6 @@ private:
     // <formId, formRendererGroup>
     std::mutex formRendererGroupMutex_;
     std::unordered_map<int64_t, std::shared_ptr<Ace::FormRendererGroup>> formRendererGroupMap_; 
-    // <formId, compId>
-    std::mutex compIdMutex_;
-    std::unordered_map<int64_t, std::vector<std::string>> compIdMap_;
 };
 }  // namespace FormRender
 }  // namespace AppExecFwk

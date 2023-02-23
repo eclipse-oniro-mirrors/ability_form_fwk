@@ -32,6 +32,7 @@ namespace AppExecFwk {
 namespace FormRender {
 namespace {
 constexpr int32_t RENDER_FORM_FAILED = -1;
+constexpr int32_t RELOAD_FORM_FAILED = -1;
 }
 using namespace AbilityRuntime;
 
@@ -101,23 +102,35 @@ int32_t FormRenderImpl::StopRenderingForm(const FormJsInfo &formJsInfo, const Wa
         HILOG_ERROR("GetUid failed");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
+
+    bool isRenderGroupEmpty = false;
     {
         std::lock_guard<std::mutex> lock(renderRecordMutex_);
-        if (auto search = renderRecordMap_.find(uid); search != renderRecordMap_.end()) {
-            if (search->second->DeleteRenderRecord(formJsInfo.formId, want, callerToken) == ERR_OK) {
-                renderRecordMap_.erase(search);
-                HILOG_INFO("DeleteRenderRecord success");
-            }
-        } else {
+        auto search = renderRecordMap_.find(uid);
+        if (search == renderRecordMap_.end()) {
             HILOG_ERROR("%{public}s failed", __func__ );
             return RENDER_FORM_FAILED;
         }
+
+        if (!search->second) {
+            HILOG_ERROR("%{public}s failed", __func__ );
+            return RENDER_FORM_FAILED;
+        }
+
+        std::string compId = want.GetStringParam(Constants::FORM_RENDER_COMP_ID);
+        search->second->DeleteRenderRecord(formJsInfo.formId, compId, isRenderGroupEmpty);
+        if (search->second->IsEmpty()) {
+            renderRecordMap_.erase(search);
+            HILOG_INFO("DeleteRenderRecord success, uid: %{public}s", uid.c_str());
+        }
     }
 
-    HILOG_DEBUG("%{public}s come, connectId: %{public}d.", __func__,
+    HILOG_INFO("%{public}s come, connectId: %{public}d.", __func__,
         want.GetIntParam(Constants::FORM_CONNECT_ID, 0L));
+    if (isRenderGroupEmpty) {
+        formSupplyClient->OnStopRenderingTaskDone(formJsInfo.formId, want);
+    }
 
-    formSupplyClient->OnStopRenderingTaskDone(formJsInfo.formId, want);
     return ERR_OK;
 }
 
@@ -136,6 +149,26 @@ int32_t FormRenderImpl::CleanFormHost(const sptr<IRemoteObject> &hostToken)
     }
     if (renderRecordMap_.empty()) {
         HILOG_INFO("renderRecordMap_ is empty, FormRenderService will exit later.");
+    }
+    return ERR_OK;
+}
+
+int32_t FormRenderImpl::ReloadForm(const std::vector<int64_t> &&formIds, const Want &want)
+{
+    HILOG_INFO("ReloadForm start");
+    std::lock_guard<std::mutex> lock(renderRecordMutex_);
+    std::string uid = want.GetStringParam(Constants::FORM_SUPPLY_UID);
+    if (uid.empty()) {
+        HILOG_ERROR("Get uid failed");
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+    }
+    auto search = renderRecordMap_.find(uid);
+    if (search == renderRecordMap_.end()) {
+        HILOG_ERROR("RenderRecord not find");
+        return RELOAD_FORM_FAILED;
+    }
+    if (search->second) {
+        search->second->ReloadFormRecord(std::forward<decltype(formIds)>(formIds), want);
     }
     return ERR_OK;
 }

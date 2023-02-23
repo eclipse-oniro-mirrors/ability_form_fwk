@@ -102,6 +102,35 @@ int FormMgr::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &callerT
 }
 
 /**
+ * @brief Stop rendering form.
+ * @param formId The Id of the forms to delete.
+ * @param compId The compId of the forms to delete.
+ * @return Returns ERR_OK on success, others on failure.
+*/
+int FormMgr::StopRenderingForm(const int64_t formId, const std::string &compId)
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    // check fms recover status
+    if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
+        HILOG_ERROR("%{public}s error, form is in recover status, can't do action on form.", __func__);
+        return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
+    }
+    // check formId
+    if (formId <= 0 || compId.empty()) {
+        HILOG_ERROR("%{public}s error, the formId is invalid or compId is empty.", __func__);
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+    }
+
+    int errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
+        return errCode;
+    }
+
+    return remoteProxy_->StopRenderingForm(formId, compId);
+}
+
+/**
  * @brief Release forms with formIds, send formIds to form manager service.
  * @param formId The Id of the forms to release.
  * @param callerToken Caller ability token.

@@ -51,6 +51,14 @@ public:
      */
     virtual int DeleteForm(const int64_t formId, const sptr<IRemoteObject> &callerToken) override;
 
+    /**
+     * @brief Stop rendering form.
+     * @param formId The Id of the forms to delete.
+     * @param compId The compId of the forms to delete.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int StopRenderingForm(const int64_t formId, const std::string &compId) override;
+
      /**
      * @brief Release forms with formIds, send formIds to form manager service.
      * @param formId The Id of the forms to release.
