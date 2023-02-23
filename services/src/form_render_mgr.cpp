@@ -182,7 +182,7 @@ ErrCode FormRenderMgr::ReloadForm(std::vector<int64_t> &&formIds, const std::str
     return ERR_OK;
 }
 
-ErrCode FormRenderMgr::StopRenderingForm(int64_t formId, const FormRecord &formRecord)
+ErrCode FormRenderMgr::StopRenderingForm(int64_t formId, const FormRecord &formRecord, const std::string &compId)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
     if (formRecord.uiSyntax != FormType::ETS) {
@@ -199,6 +199,10 @@ ErrCode FormRenderMgr::StopRenderingForm(int64_t formId, const FormRecord &formR
     Want want;
     int32_t userId = FormUtil::GetCurrentAccountId();
     want.SetParam(Constants::FORM_SUPPLY_UID, std::to_string(userId) + formRecord.bundleName);
+    if (!compId.empty()) {
+        want.SetParam(Constants::FORM_RENDER_COMP_ID, compId);
+    }
+
     {
         std::lock_guard<std::mutex> lock(resourceMutex_);
         auto conIterator = renderFormConnections_.find(formRecord.formId);
