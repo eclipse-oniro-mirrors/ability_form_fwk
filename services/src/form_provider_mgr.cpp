@@ -122,12 +122,19 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
 
-    bool isTimerRefresh = want.GetBoolParam(Constants::KEY_IS_TIMER, false);
+    bool isCountTimerRefresh = want.GetBoolParam(Constants::KEY_IS_TIMER, false);
     Want newWant(want);
     newWant.RemoveParam(Constants::KEY_IS_TIMER);
 
-    if (isTimerRefresh) {
+    if (isCountTimerRefresh) {
         FormDataMgr::GetInstance().SetCountTimerRefresh(formId, true);
+    }
+
+    bool isTimerRefresh = want.GetBoolParam(Constants::KEY_TIMER_REFRESH, false);
+    newWant.RemoveParam(Constants::KEY_TIMER_REFRESH);
+
+    if (isTimerRefresh) {
+        FormDataMgr::GetInstance().SetTimerRefresh(formId, true);
     }
 
 #ifdef SUPPORT_POWER
@@ -147,8 +154,9 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
     }
 
     FormRecord refreshRecord = GetFormAbilityInfo(record);
-    refreshRecord.isCountTimerRefresh = isTimerRefresh;
-    return ConnectAmsForRefresh(formId, refreshRecord, newWant, isTimerRefresh);
+    refreshRecord.isCountTimerRefresh = isCountTimerRefresh;
+    refreshRecord.isTimerRefresh = isTimerRefresh;
+    return ConnectAmsForRefresh(formId, refreshRecord, newWant, isCountTimerRefresh);
 }
 
 /**
@@ -161,7 +169,7 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
  * @return Returns ERR_OK on success, others on failure.
  */
 ErrCode FormProviderMgr::ConnectAmsForRefresh(const int64_t formId,
-    const FormRecord &record, const Want &want, const bool isTimerRefresh)
+    const FormRecord &record, const Want &want, const bool isCountTimerRefresh)
 {
     HILOG_DEBUG("%{public}s called, bundleName:%{public}s, abilityName:%{public}s, needFreeInstall:%{public}d.",
         __func__, record.bundleName.c_str(), record.abilityName.c_str(), record.needFreeInstall);
@@ -180,7 +188,7 @@ ErrCode FormProviderMgr::ConnectAmsForRefresh(const int64_t formId,
         return RebindByFreeInstall(record, connectWant, formRefreshConnection);
     }
 
-    if (isTimerRefresh) {
+    if (isCountTimerRefresh) {
         if (!FormTimerMgr::GetInstance().IsLimiterEnableRefresh(formId)) {
             HILOG_ERROR("%{public}s, timer refresh, already limit.", __func__);
             return ERR_APPEXECFWK_FORM_PROVIDER_DEL_FAIL;
@@ -195,6 +203,10 @@ ErrCode FormProviderMgr::ConnectAmsForRefresh(const int64_t formId,
 
     if (record.isCountTimerRefresh) {
         IncreaseTimerRefreshCount(formId);
+    }
+
+    if (record.isTimerRefresh) {
+        FormDataMgr::GetInstance().SetTimerRefresh(formId, false);
     }
 
     return ERR_OK;

@@ -250,6 +250,14 @@ public:
      * @param countTimerRefresh true or false.
      */
     void SetCountTimerRefresh(const int64_t formId, const bool countTimerRefresh);
+
+    /**
+     * @brief Set timerRefresh for FormRecord.
+     * @param formId The Id of the form.
+     * @param timerRefresh true or false.
+     */
+    void SetTimerRefresh(const int64_t formId, const bool timerRefresh);
+
     /**
      * @brief Get updated form info.
      * @param record FormRecord.
