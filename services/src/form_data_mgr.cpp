@@ -482,11 +482,11 @@ bool FormDataMgr::DeleteHostRecord(const sptr<IRemoteObject> &callerToken, const
             if (iter->IsEmpty()) {
                 iter->CleanResource();
                 iter = clientRecords_.erase(iter);
+                FormRenderMgr::GetInstance().CleanFormHost(callerToken);
             }
             break;
         }
     }
-    FormRenderMgr::GetInstance().CleanFormHost(callerToken);
     HILOG_INFO("%{public}s end", __func__);
     return true;
 }
