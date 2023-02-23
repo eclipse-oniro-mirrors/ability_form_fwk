@@ -24,6 +24,10 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+namespace {
+    constexpr int32_t MAX_ALLOW_SIZE = 8 * 1024;
+}
+
 FormRenderStub::FormRenderStub()
 {
     memberFuncMap_[static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_RENDER_FORM)] =
@@ -32,6 +36,8 @@ FormRenderStub::FormRenderStub()
         &FormRenderStub::HandleStopRenderingForm;
     memberFuncMap_[static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_FORM_HOST_DIED)] =
         &FormRenderStub::HandleCleanFormHost;
+    memberFuncMap_[static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_RELOAD_FORM)] =
+        &FormRenderStub::HandleReloadForm;
 }
 
 FormRenderStub::~FormRenderStub()
@@ -117,6 +123,25 @@ int FormRenderStub::HandleCleanFormHost(MessageParcel &data, MessageParcel &repl
     }
 
     int32_t result = CleanFormHost(hostToken);
+    reply.WriteInt32(result);
+    return result;
+}
+
+int FormRenderStub::HandleReloadForm(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t size = data.ReadInt32();
+    if (size < 0 || size >= MAX_ALLOW_SIZE) {
+        HILOG_ERROR("%{public}s, invalid size: %{public}d", __func__, size);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    std::vector<int64_t> formIds;
+    data.ReadInt64Vector(&formIds);
+    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
+    if (!want) {
+        HILOG_ERROR("%{public}s, failed to ReadParcelable<Want>", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int32_t result = ReloadForm(std::move(formIds), *want);
     reply.WriteInt32(result);
     return result;
 }

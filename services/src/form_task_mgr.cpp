@@ -16,6 +16,7 @@
 #include "form_task_mgr.h"
 
 #include <cinttypes>
+#include <utility>
 
 #include "form_constants.h"
 #include "form_data_mgr.h"
@@ -726,6 +727,38 @@ void FormTaskMgr::StopRenderingForm(
         return;
     }
 
+    HILOG_INFO("%{public}s end", __func__);
+}
+
+void FormTaskMgr::ReloadForm(const std::vector<int64_t> &&formIds, const Want &want,
+    const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_INFO("%{public}s begin", __func__);
+    sptr<IFormRender> remoteFormRender = iface_cast<IFormRender>(remoteObject);
+    if (remoteFormRender == nullptr) {
+        HILOG_ERROR("%{public}s fail, Failed to get form render proxy.", __func__);
+        return;
+    }
+    int32_t error = remoteFormRender->ReloadForm(std::forward<decltype(formIds)>(formIds), want);
+    if (error != ERR_OK) {
+        HILOG_ERROR("%{public}s fail, Failed to reload form.", __func__);
+        return;
+    }
+    HILOG_INFO("%{public}s end", __func__);
+}
+
+void FormTaskMgr::PostReloadForm(const std::vector<int64_t> &&formIds, const Want &want,
+    const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_INFO("%{public}s begin", __func__);
+    if (eventHandler_ == nullptr) {
+        HILOG_ERROR("eventHandler_ is nullptr.");
+        return;
+    }
+    auto reloadForm = [ids = std::forward<decltype(formIds)>(formIds), want, remoteObject]() {
+        FormTaskMgr::GetInstance().ReloadForm(std::move(ids), want, remoteObject);
+    };
+    eventHandler_->PostTask(reloadForm, FORM_TASK_DELAY_TIME);
     HILOG_INFO("%{public}s end", __func__);
 }
 } // namespace AppExecFwk

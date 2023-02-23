@@ -65,6 +65,14 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t CleanFormHost(const sptr<IRemoteObject> &hostToken) override;
+    
+    /**
+     * @brief Reload form When app updated. This is sync API.
+     * @param formIds the form id need to update.
+     * @param want Indicates the {@link Want} structure containing form info.
+     * @return int32_t Returns ERR_OK on success, others on failure.
+     */
+    int32_t ReloadForm(const std::vector<int64_t> &&formIds, const Want &want) override;
 
 private:
     std::mutex renderRecordMutex_;

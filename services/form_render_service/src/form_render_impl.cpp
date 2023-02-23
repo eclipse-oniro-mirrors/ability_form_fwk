@@ -32,6 +32,7 @@ namespace AppExecFwk {
 namespace FormRender {
 namespace {
 constexpr int32_t RENDER_FORM_FAILED = -1;
+constexpr int32_t RELOAD_FORM_FAILED = -1;
 }
 using namespace AbilityRuntime;
 
@@ -136,6 +137,26 @@ int32_t FormRenderImpl::CleanFormHost(const sptr<IRemoteObject> &hostToken)
     }
     if (renderRecordMap_.empty()) {
         HILOG_INFO("renderRecordMap_ is empty, FormRenderService will exit later.");
+    }
+    return ERR_OK;
+}
+
+int32_t FormRenderImpl::ReloadForm(const std::vector<int64_t> &&formIds, const Want &want)
+{
+    HILOG_INFO("ReloadForm start");
+    std::lock_guard<std::mutex> lock(renderRecordMutex_);
+    std::string uid = want.GetStringParam(Constants::FORM_SUPPLY_UID);
+    if (uid.empty()) {
+        HILOG_ERROR("Get uid failed");
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+    }
+    auto search = renderRecordMap_.find(uid);
+    if (search == renderRecordMap_.end()) {
+        HILOG_ERROR("RenderRecord not find");
+        return RELOAD_FORM_FAILED;
+    }
+    if (search->second) {
+        search->second->ReloadFormRecord(std::forward<decltype(formIds)>(formIds), want);
     }
     return ERR_OK;
 }

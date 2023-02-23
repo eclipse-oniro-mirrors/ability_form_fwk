@@ -15,6 +15,8 @@
 
 #include "form_render_record.h"
 
+#include <utility>
+
 #include "extractor.h"
 #include "form_constants.h"
 #include "hilog_wrapper.h"
@@ -23,6 +25,8 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace FormRender {
 constexpr int32_t RENDER_FORM_FAILED = -1;
+constexpr int32_t RELOAD_FORM_FAILED = -1;
+
 std::shared_ptr<FormRenderRecord> FormRenderRecord::Create(const std::string &bundleName, const std::string &uid)
 {
     HILOG_INFO("%{public}s called.", __func__);
@@ -99,6 +103,7 @@ bool FormRenderRecord::CreateEventHandler(const std::string &bundleName)
 int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const Want &want, const sptr<IRemoteObject> hostRemoteObj)
 {
     HILOG_INFO("Updated record.");
+
     // Some resources need to be initialized in a JS thread
     std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
     auto task = [thisWeakPtr, formJsInfo, want]() {
@@ -195,7 +200,6 @@ bool FormRenderRecord::CreateRuntime(const FormJsInfo &formJsInfo)
         HILOG_ERROR("Create runtime Failed!");
         return false;
     }
-
     hapPath_ = formJsInfo.jsFormCodePath;
     return true;
 }
@@ -282,7 +286,6 @@ void FormRenderRecord::HandleUpdateInJsThread(const FormJsInfo &formJsInfo, cons
         HILOG_ERROR("Create Context failed.");
         return;
     }
-
     auto renderType = want.GetIntParam(Constants::FORM_RENDER_TYPE_KEY, Constants::RENDER_FORM);
     HILOG_INFO("renderType is %{public}d.", renderType);
     if (renderType == Constants::RENDER_FORM) {
@@ -357,6 +360,47 @@ void FormRenderRecord::ReleaseHapFileHandle()
 inline std::string FormRenderRecord::GenerateContextKey(const FormJsInfo &formJsInfo)
 {
     return formJsInfo.bundleName + ":" +  formJsInfo.moduleName;
+}
+
+int32_t FormRenderRecord::ReloadFormRecord(const std::vector<int64_t> &&formIds, const Want &want)
+{
+    HILOG_INFO("Reload form record");
+    std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
+    auto task = [thisWeakPtr, ids = std::forward<decltype(formIds)>(formIds), want]() {
+        HILOG_DEBUG("HandleReloadFormRecord begin.");
+        auto renderRecord = thisWeakPtr.lock();
+        if (renderRecord == nullptr) {
+            HILOG_ERROR("renderRecord is nullptr.");
+            return;
+        }
+        renderRecord->HandleReloadFormRecord(std::move(ids), want);
+    };
+    if (eventHandler_ == nullptr) {
+        HILOG_ERROR("eventHandler_ is nullptr");
+        return RELOAD_FORM_FAILED;
+    }
+    eventHandler_->PostTask(task);
+    return ERR_OK;
+}
+
+int32_t FormRenderRecord::HandleReloadFormRecord(const std::vector<int64_t> &&formIds, const Want &want)
+{
+    HILOG_INFO("Reload record in js thread.");
+    std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
+    for (auto formId : formIds) {
+        auto search = formRendererGroupMap_.find(formId);
+        if (search == formRendererGroupMap_.end()) {
+            HILOG_ERROR("HandleReloadFormRecord failed. FormRendererGroup was not found.");
+            continue;
+        }
+        auto group = search->second;
+        if (!group) {
+            HILOG_ERROR("HandleReloadFormRecord failed. FormRendererGroup is null.");
+            continue;
+        }
+        group->ReloadForm();
+    }
+    return ERR_OK;
 }
 } // namespace FormRender
 } // namespace AppExecFwk
