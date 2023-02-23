@@ -104,6 +104,8 @@ FormMgrStub::FormMgrStub()
         &FormMgrStub::HandleStartAbility;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_CHECK_FMS_READY)] =
         &FormMgrStub::HandleCheckFMSReady;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_STOP_RENDERING_FORM)] =
+        &FormMgrStub::HandleStopRenderingForm;
 }
 
 FormMgrStub::~FormMgrStub()
@@ -179,6 +181,20 @@ int32_t FormMgrStub::HandleDeleteForm(MessageParcel &data, MessageParcel &reply)
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t result = DeleteForm(formId, client);
+    reply.WriteInt32(result);
+    return result;
+}
+/**
+ * @brief handle DeleteFormByCompId message.
+ * @param data input param.
+ * @param reply output param.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int32_t FormMgrStub::HandleStopRenderingForm(MessageParcel &data, MessageParcel &reply)
+{
+    int64_t formId = data.ReadInt64();
+    std::string compId = data.ReadString();
+    int32_t result = StopRenderingForm(formId, compId);
     reply.WriteInt32(result);
     return result;
 }

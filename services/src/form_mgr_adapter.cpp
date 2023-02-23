@@ -165,6 +165,27 @@ int FormMgrAdapter::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
 }
 
 /**
+ * @brief Stop rendering form.
+ * @param formId The Id of the forms to delete.
+ * @param compId The compId of the forms to delete.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormMgrAdapter::StopRenderingForm(const int64_t formId, const std::string &compId)
+{
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    if (formId <= 0 || compId.empty()) {
+        HILOG_ERROR("%{public}s, deleteForm invalid param", __func__);
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    FormRecord record;
+    FormDataMgr::GetInstance().GetFormRecord(formId, record);
+    FormRenderMgr::GetInstance().StopRenderingForm(formId, record, compId);
+    return ERR_OK;
+}
+
+
+/**
  * @brief Release forms with formIds, send formIds to form Mgr service.
  * @param formId The Id of the forms to release.
  * @param callerToken Caller ability token.
