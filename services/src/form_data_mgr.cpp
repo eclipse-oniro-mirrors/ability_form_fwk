@@ -740,6 +740,22 @@ void FormDataMgr::SetCountTimerRefresh(const int64_t formId, const bool countTim
 }
 
 /**
+ * @brief Set isTimerRefresh for FormRecord.
+ * @param formId The Id of the form.
+ * @param timerRefresh true or false.
+ */
+void FormDataMgr::SetTimerRefresh(const int64_t formId, const bool timerRefresh)
+{
+    std::lock_guard<std::recursive_mutex> lock(formRecordMutex_);
+    auto itFormRecord = formRecords_.find(formId);
+    if (itFormRecord == formRecords_.end()) {
+        HILOG_ERROR("%{public}s, form info not find", __func__);
+        return;
+    }
+    itFormRecord->second.isTimerRefresh = timerRefresh;
+}
+
+/**
  * @brief Get updated form.
  * @param record FormRecord.
  * @param targetForms Target forms.

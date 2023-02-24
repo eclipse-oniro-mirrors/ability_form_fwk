@@ -60,6 +60,7 @@ public:
     uint32_t compatibleVersion = 0;
     FormType type = FormType::JS;
     FormType uiSyntax = FormType::JS;
+    bool isTimerRefresh = false;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

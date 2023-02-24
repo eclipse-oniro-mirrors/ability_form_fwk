@@ -1236,6 +1236,9 @@ void FormTimerMgr::ExecTimerTask(const FormTimer &timerTask)
         if (timerTask.isCountTimer) {
             want.SetParam(Constants::KEY_IS_TIMER, true);
         }
+        if (timerTask.isCountTimer || timerTask.isUpdateAt) {
+            want.SetParam(Constants::KEY_TIMER_REFRESH, true);
+        }
         // multi user
         if (IsActiveUser(timerTask.userId)) {
             HILOG_INFO("timerTask.userId is current user");
