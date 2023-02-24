@@ -213,5 +213,81 @@ HWTEST_F(FormSupplyProxyTest, FormSupplyProxyTest_008, TestSize.Level1)
     proxy->OnShareAcquire(formId, remoteDeviceId, wantParams, requestCode, result);
     GTEST_LOG_(INFO)<< "FmsFormHostProxyTest, FormSupplyProxyTest_008, TestSize.Level1";
 }
+
+/*
+* @tc.name: FormSupplyProxyTest_009
+* @tc.name: OnRenderTaskDone
+* @tc.desc: Verify function OnRenderTaskDone return value is ERROR_NUM
+*/
+HWTEST_F(FormSupplyProxyTest, FormSupplyProxyTest_009, TestSize.Level1)
+{
+    GTEST_LOG_(INFO)<< "FmsFormHostProxyTest, FormSupplyProxyTest_009, TestSize.Level1";
+    int64_t formId = 1;
+    Want want;
+    sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
+    ASSERT_NE(nullptr, iremoteObject);
+    EXPECT_CALL(*iremoteObject, SendRequest(_, _, _, _)).Times(1).WillRepeatedly(DoAll(Return(ERROR_NUM)));
+    std::shared_ptr<FormSupplyProxy> proxy = std::make_shared<FormSupplyProxy>(iremoteObject);
+    ASSERT_NE(nullptr, proxy);
+    EXPECT_EQ(ERROR_NUM, proxy->OnRenderTaskDone(formId, want));
+    GTEST_LOG_(INFO)<< "FmsFormHostProxyTest, FormSupplyProxyTest_009, TestSize.Level1";
+}
+
+/*
+* @tc.name: FormSupplyProxyTest_010
+* @tc.name: OnRenderTaskDone
+* @tc.desc: Verify function OnRenderTaskDone return value is ERR_OK
+*/
+HWTEST_F(FormSupplyProxyTest, FormSupplyProxyTest_010, TestSize.Level1)
+{
+    GTEST_LOG_(INFO)<< "FmsFormHostProxyTest, FormSupplyProxyTest_010, TestSize.Level1";
+    int64_t formId = 1;
+    Want want;
+    sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
+    ASSERT_NE(nullptr, iremoteObject);
+    EXPECT_CALL(*iremoteObject, SendRequest(_, _, _, _)).Times(1).WillRepeatedly(DoAll(Return(ERR_OK)));
+    std::shared_ptr<FormSupplyProxy> proxy = std::make_shared<FormSupplyProxy>(iremoteObject);
+    ASSERT_NE(nullptr, proxy);
+    EXPECT_EQ(ERR_OK, proxy->OnRenderTaskDone(formId, want));
+    GTEST_LOG_(INFO)<< "FmsFormHostProxyTest, FormSupplyProxyTest_010, TestSize.Level1";
+}
+
+/*
+* @tc.name: FormSupplyProxyTest_011
+* @tc.name: OnStopRenderingTaskDone
+* @tc.desc: Verify function OnStopRenderingTaskDone return value is ERROR_NUM
+*/
+HWTEST_F(FormSupplyProxyTest, FormSupplyProxyTest_011, TestSize.Level1)
+{
+    GTEST_LOG_(INFO)<< "FmsFormHostProxyTest, FormSupplyProxyTest_011, TestSize.Level1";
+    int64_t formId = 1;
+    Want want;
+    sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
+    ASSERT_NE(nullptr, iremoteObject);
+    EXPECT_CALL(*iremoteObject, SendRequest(_, _, _, _)).Times(1).WillRepeatedly(DoAll(Return(ERROR_NUM)));
+    std::shared_ptr<FormSupplyProxy> proxy = std::make_shared<FormSupplyProxy>(iremoteObject);
+    ASSERT_NE(nullptr, proxy);
+    EXPECT_EQ(ERROR_NUM, proxy->OnStopRenderingTaskDone(formId, want));
+    GTEST_LOG_(INFO)<< "FmsFormHostProxyTest, FormSupplyProxyTest_011, TestSize.Level1";
+}
+
+/*
+* @tc.name: FormSupplyProxyTest_012
+* @tc.name: OnStopRenderingTaskDone
+* @tc.desc: Verify function OnStopRenderingTaskDone return value is ERR_OK
+*/
+HWTEST_F(FormSupplyProxyTest, FormSupplyProxyTest_012, TestSize.Level1)
+{
+    GTEST_LOG_(INFO)<< "FmsFormHostProxyTest, FormSupplyProxyTest_012, TestSize.Level1";
+    int64_t formId = 1;
+    Want want;
+    sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
+    ASSERT_NE(nullptr, iremoteObject);
+    EXPECT_CALL(*iremoteObject, SendRequest(_, _, _, _)).Times(1).WillRepeatedly(DoAll(Return(ERR_OK)));
+    std::shared_ptr<FormSupplyProxy> proxy = std::make_shared<FormSupplyProxy>(iremoteObject);
+    ASSERT_NE(nullptr, proxy);
+    EXPECT_EQ(ERR_OK, proxy->OnStopRenderingTaskDone(formId, want));
+    GTEST_LOG_(INFO)<< "FmsFormHostProxyTest, FormSupplyProxyTest_012, TestSize.Level1";
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS
