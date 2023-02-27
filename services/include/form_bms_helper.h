@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,6 +19,8 @@
 #include <singleton.h>
 #include "ability_manager_interface.h"
 #include "bundle_mgr_interface.h"
+#include "erms_mgr_interface.h"
+#include "want.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -60,6 +62,18 @@ public:
     void SetBundleManager(const sptr<IBundleMgr> &bundleManager);
 
     /**
+     * @brief Acquire an ecological rule manager, if it not existed,
+     * @return returns the ecological rule manager ipc object, or nullptr for failed.
+     */
+    sptr<IEcologicalRuleManager> GetEcologicalRuleMgr();
+
+    /**
+     * @brief Add the ecological rule manager instance for debug.
+     * @param ecologicalRuleManager the ecological rule manager ipc object.
+     */
+    void SetEcologicalRuleMgr(const sptr<IEcologicalRuleManager> &ecologicalRuleManager);
+
+    /**
      * @brief Get bundle package info.
      * @param bundleName Indicates the bundle name.
      * @param userId Indicates the user ID.
@@ -67,6 +81,17 @@ public:
      * @return Returns true on success, false on failure.
      */
     bool GetBundlePackInfo(const std::string &bundleName, int32_t userId, BundlePackInfo &bundlePackInfo);
+
+    /**
+     * @brief Get ability info
+     * @param want The desired action to look for.
+     * @param userId Indicates the user ID.
+     * @param abilityInfo Indicates the obtained AbilityInfo object.
+     * @param extensionInfo Indicates the obtained extension.
+     * @return Returns true on success, false on failure.
+     */
+    bool GetAbilityInfo(const Want &want, int32_t userId, AbilityInfo &abilityInfo,
+        ExtensionAbilityInfo &extensionInfo);
 
     /**
      * @brief Get ability info by action
@@ -127,6 +152,10 @@ private:
 
 private:
     sptr<IBundleMgr> iBundleMgr_ = nullptr;
+    sptr<IEcologicalRuleManager> iErMgr_ = nullptr;
+
+    // should be removed when erms online
+    const int32_t ECOLOGICAL_RULE_SA_ID = 9999;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

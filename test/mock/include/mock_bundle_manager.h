@@ -121,6 +121,10 @@ class MockBundleMgrService : public BundleMgrService {
 public:
     MOCK_METHOD(bool, GetBundleInfo,
         (const std::string &bundleName, const BundleFlag flag, BundleInfo &bundleInfo, int32_t userId), (override));
+
+    MOCK_METHOD2(GetBundleNameForUid, bool(const int, std::string &));
+
+    MOCK_METHOD1(CheckIsSystemAppByUid, bool(const int));
 };
 } // namespace AppExecFwk
 } // namespace OHOS

@@ -36,6 +36,7 @@ ohos_shared_library("libfms") {
     "${ability_runtime_native_path}/appkit/ability_runtime",
   ]
   sources = [
+    "services/src/erms_mgr_interface.cpp",
     "services/src/form_ability_connection.cpp",
     "services/src/form_acquire_connection.cpp",
     "services/src/form_acquire_state_connection.cpp",
