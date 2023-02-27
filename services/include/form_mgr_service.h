@@ -211,12 +211,6 @@ public:
     bool IsSACall() const;
 
     /**
-     * @brief Get the token id of the caller ability.
-     * @return Returns the caller ability token.
-     */
-    unsigned int GetCallingTokenID() const;
-
-    /**
      * @brief Checks whether the caller has a certain permission.
      * @param permissionName The name of the permission.
      * @return Returns true if the caller has certain permissions; returns false otherwise.

@@ -1639,13 +1639,12 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CleanRemovedTempFormRecords_001,
     InitFormItemInfo(formId, formItemInfo);
     formItemInfo.SetProviderBundleName(bundleName);
     FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
-    int providerUserId = FormUtil::GetCurrentAccountId();
     formDataMgr_.formRecords_.emplace(formId, record);
 
     // create tempForms_
     formDataMgr_.tempForms_.emplace_back(formId);
 
-    formDataMgr_.CleanRemovedTempFormRecords(bundleName, providerUserId, removedForms);
+    formDataMgr_.CleanRemovedTempFormRecords(bundleName, FormUtil::GetCurrentAccountId(), removedForms);
     EXPECT_EQ(true, formDataMgr_.formRecords_.empty());
     EXPECT_EQ(true, formDataMgr_.tempForms_.empty());
 

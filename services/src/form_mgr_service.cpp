@@ -34,8 +34,8 @@
 #include "in_process_call_wrapper.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
-#include "permission_verification.h"
 #include "permission_constants.h"
+#include "permission_verification.h"
 #include "system_ability_definition.h"
 #include "tokenid_kit.h"
 #include "event_report.h"
@@ -127,13 +127,9 @@ bool FormMgrService::CheckFMSReady()
     return IsReady();
 }
 
-/**
-* @brief Checks if the caller is an SA.
-* @return Return true if is SA call; return false otherwise.
-*/
 bool FormMgrService::IsSACall() const
 {
-    HILOG_DEBUG("%{public}s: is called.", __func__);
+    HILOG_DEBUG("called.");
     auto callerToken = IPCSkeleton::GetCallingTokenID();
     HILOG_DEBUG("callerToken : %{private}u", callerToken);
     auto tokenType = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken);
@@ -141,8 +137,7 @@ bool FormMgrService::IsSACall() const
         HILOG_DEBUG("caller tokenType is native, verify success");
         return true;
     }
-    int callingUid = IPCSkeleton::GetCallingUid();
-    if (callingUid == SYSTEM_UID) {
+    if (IPCSkeleton::GetCallingUid() == SYSTEM_UID) {
         HILOG_DEBUG("callingUid is native, verify success");
         return true;
     }
@@ -150,27 +145,11 @@ bool FormMgrService::IsSACall() const
     return false;
 }
 
-/**
-* @brief Get the caller's token id.
-* @return Return the caller's token id.
-*/
-unsigned int FormMgrService::GetCallingTokenID() const
-{
-    auto callerToken = IPCSkeleton::GetCallingTokenID();
-    HILOG_DEBUG("callerToken : %{private}u", callerToken);
-    return callerToken;
-}
-
-/**
-* @brief Checks whether the caller has the specified permission.
-* @param formId The name of the permission to check.
-* @return Returns true if permission validation was successful; return false otherwise.
-*/
 bool FormMgrService::VerifyCallingPermission(const std::string &permissionName) const
 {
     HILOG_DEBUG("called. permission name is:%{public}s", permissionName.c_str());
-    auto callerToken = GetCallingTokenID();
-    int32_t ret = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
+    int32_t ret = Security::AccessToken::AccessTokenKit::VerifyAccessToken(IPCSkeleton::GetCallingTokenID(),
+        permissionName);
     if (ret == Security::AccessToken::PermissionState::PERMISSION_DENIED) {
         HILOG_ERROR("permission %{public}s: PERMISSION_DENIED", permissionName.c_str());
         return false;
@@ -606,8 +585,7 @@ ErrCode FormMgrService::CheckFormPermission()
 {
     HILOG_DEBUG("called.");
 
-    auto isSaCall = IsSACall();
-    if (isSaCall) {
+    if (IsSACall()) {
         return ERR_OK;
     }
 
@@ -629,15 +607,14 @@ ErrCode FormMgrService::CheckFormPermission()
     int32_t currentActiveUserId = FormUtil::GetCurrentAccountId();
     bool isCallingPermAccount =
         VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_INTERACT_ACROSS_LOCAL_ACCOUNTS);
-    HILOG_DEBUG("%{public}s, currentActiveUserId: %{public}d, userId: %{public}d", __func__,
-        currentActiveUserId, userId);
+    HILOG_DEBUG("currentActiveUserId: %{public}d, userId: %{public}d", currentActiveUserId, userId);
 
     if ((userId != currentActiveUserId) && !isCallingPermAccount) {
-        HILOG_DEBUG("%{public}s, The caller is not the currently active user", __func__);
+        HILOG_DEBUG("The caller is not the currently active user");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
 
-    HILOG_DEBUG("%{public}s, Permission verification ok!", __func__);
+    HILOG_DEBUG("Permission verification ok!");
     return ERR_OK;
 }
 
@@ -747,7 +724,7 @@ int FormMgrService::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
 
     ErrCode ret = CheckFormPermission();
     if (ret != ERR_OK) {
-        HILOG_ERROR("%{public}s fail, get all formsInfo permission denied", __func__);
+        HILOG_ERROR("fail, get all formsInfo permission denied");
         return ret;
     }
     if (!CheckCallerIsSystemApp()) {
@@ -768,7 +745,7 @@ int FormMgrService::GetFormsInfoByApp(std::string &bundleName, std::vector<FormI
 
     ErrCode ret = CheckFormPermission();
     if (ret != ERR_OK) {
-        HILOG_ERROR("%{public}s fail, get formsInfo by app permission denied", __func__);
+        HILOG_ERROR("fail, get formsInfo by app permission denied");
         return ret;
     }
     if (!CheckCallerIsSystemApp()) {
@@ -791,7 +768,7 @@ int FormMgrService::GetFormsInfoByModule(std::string &bundleName, std::string &m
 
     ErrCode ret = CheckFormPermission();
     if (ret != ERR_OK) {
-        HILOG_ERROR("%{public}s fail, check form permission failed", __func__);
+        HILOG_ERROR("fail, check form permission failed");
         return ret;
     }
     if (!CheckCallerIsSystemApp()) {

@@ -235,9 +235,8 @@ int FormDataMgr::CheckEnoughForm(const int callingUid, const int32_t currentUser
     std::lock_guard<std::recursive_mutex> lock(formRecordMutex_);
     for (const auto &recordPair : formRecords_) {
         FormRecord record = recordPair.second;
-        int currentActiveUserId = FormUtil::GetCurrentAccountId();
-        if ((record.providerUserId == currentActiveUserId) && !record.formTempFlag) {
-            HILOG_DEBUG("%{public}s, Is called by the current active user", __func__);
+        if ((record.providerUserId == FormUtil::GetCurrentAccountId()) && !record.formTempFlag) {
+            HILOG_DEBUG("Is called by the current active user");
             if (++formsInSystem >= Constants::MAX_FORMS) {
                 HILOG_WARN("%{public}s, already exist %{public}d forms in system", __func__, Constants::MAX_FORMS);
                 return ERR_APPEXECFWK_FORM_MAX_SYSTEM_FORMS;
@@ -290,7 +289,7 @@ bool FormDataMgr::ExistTempForm(const int64_t formId) const
 bool FormDataMgr::IsCallingUidValid(const std::vector<int> &formUserUids) const
 {
     if (formUserUids.empty()) {
-        HILOG_ERROR("%{public}s, formUserUids is empty!",  __func__);
+        HILOG_ERROR("formUserUids is empty!");
         return false;
     }
     for (const auto &userUid : formUserUids) {
@@ -298,7 +297,7 @@ bool FormDataMgr::IsCallingUidValid(const std::vector<int> &formUserUids) const
             return true;
         }
     }
-    HILOG_ERROR("%{public}s, can not find the valid uid",  __func__);
+    HILOG_ERROR("Can not find the valid uid");
     return false;
 }
 /**
@@ -1354,7 +1353,6 @@ void FormDataMgr::DeleteFormsByUserId(const int32_t userId, std::vector<int64_t>
         auto itFormRecord = formRecords_.begin();
         while (itFormRecord != formRecords_.end()) {
             if (userId == itFormRecord->second.providerUserId) {
-                HILOG_DEBUG("%{public}s, find the current user's form", __func__);
                 if (itFormRecord->second.formTempFlag) {
                     removedTempForms.emplace_back(itFormRecord->second.formId);
                 }

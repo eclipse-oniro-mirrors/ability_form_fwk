@@ -17,6 +17,7 @@
 #define OHOS_FORM_FWK_FORM_RECORD_H
 
 #include <vector>
+#include "form_constants.h"
 #include "form_info_base.h"
 #include "form_provider_info.h"
 
@@ -53,7 +54,7 @@ public:
     bool formVisibleNotify = false;
     int formVisibleNotifyState = 0;
     int32_t userId = 0;
-    int32_t providerUserId = -1;
+    int32_t providerUserId = Constants::DEFAULT_PROVIDER_USER_ID;
     std::string formSrc = "";
     FormWindow formWindow;
     uint32_t versionCode = 0;

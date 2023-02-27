@@ -20,8 +20,8 @@
 #include "hilog_wrapper.h"
 
 namespace {
-    bool g_isSACall = true;
-    bool g_verifyCallingPermission = true;
+bool g_isSACall = true;
+bool g_verifyCallingPermission = true;
 }
 
 void MockFMSIsSACall(bool mockRet)
