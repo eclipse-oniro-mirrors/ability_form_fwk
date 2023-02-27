@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,6 +16,7 @@
 #include "form_bms_helper.h"
 
 #include "ability_manager_interface.h"
+#include "erms_mgr_interface.h"
 #include "form_mgr_errors.h"
 #include "hilog_wrapper.h"
 #include "if_system_ability_manager.h"
@@ -32,10 +33,6 @@ FormBmsHelper::FormBmsHelper()
 FormBmsHelper::~FormBmsHelper()
 {}
 
-/**
- * @brief Acquire a bundle manager, if it not existed.
- * @return returns the bundle manager ipc object, or nullptr for failed.
- */
 sptr<IBundleMgr> FormBmsHelper::GetBundleMgr()
 {
     HILOG_INFO("%{public}s called.", __func__);
@@ -58,15 +55,54 @@ sptr<IBundleMgr> FormBmsHelper::GetBundleMgr()
     return iBundleMgr_;
 }
 
-/**
- * @brief Add the bundle manager instance for debug.
- * @param bundleManager the bundle manager ipc object.
- */
 void FormBmsHelper::SetBundleManager(const sptr<IBundleMgr> &bundleManager)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_DEBUG("%{public}s called.", __func__);
     iBundleMgr_ = bundleManager;
 }
+
+/**
+ * @brief Acquire an ecological rule manager, if it not existed,
+ * @return returns the ecological rule manager ipc object, or nullptr for failed.
+ */
+sptr<IEcologicalRuleManager> FormBmsHelper::GetEcologicalRuleMgr()
+{
+    HILOG_INFO("%{public}s called.", __func__);
+
+    if (iErMgr_ != nullptr) {
+        HILOG_DEBUG("ecological rule mgr already get.");
+        return iErMgr_;
+    }
+    sptr<ISystemAbilityManager> systemAbilityManager =
+            SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (systemAbilityManager == nullptr) {
+        HILOG_ERROR("fail to get systemAbilityManager.");
+        return nullptr;
+    }
+    auto remoteObject = systemAbilityManager->GetSystemAbility(ECOLOGICAL_RULE_SA_ID);
+    if (remoteObject == nullptr) {
+        HILOG_ERROR("failed to get ecological rule manager service.");
+        return nullptr;
+    }
+
+    iErMgr_ = iface_cast<IEcologicalRuleManager>(remoteObject);
+    if (iErMgr_ == nullptr) {
+        HILOG_ERROR("failed to cast ecological rule manager service.");
+        return nullptr;
+    }
+    return iErMgr_;
+}
+
+/**
+ * @brief Add the ecological rule manager instance for debug.
+ * @param ecologicalRuleManager the ecological rule manager ipc object.
+ */
+void FormBmsHelper::SetEcologicalRuleMgr(const sptr<IEcologicalRuleManager> &ecologicalRuleManager)
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    iErMgr_ = ecologicalRuleManager;
+}
+
 /**
  * @brief Notify module removable.
  * @param bundleName Provider ability bundleName.
@@ -141,6 +177,43 @@ bool FormBmsHelper::GetBundlePackInfo(const std::string &bundleName, const int32
     }
 
     HILOG_INFO("%{public}s, get bundle pack info success", __func__);
+    return true;
+}
+
+bool FormBmsHelper::GetAbilityInfo(const AAFwk::Want &want, int32_t userId, AbilityInfo &abilityInfo,
+    ExtensionAbilityInfo &extensionInfo)
+{
+    HILOG_DEBUG("%{public}s called.", __func__);
+    ElementName element = want.GetElement();
+    std::string bundleName = element.GetBundleName();
+    std::string abilityName = element.GetAbilityName();
+    if (bundleName.empty() || abilityName.empty()) {
+        HILOG_ERROR("invalid want in explicit query ability info");
+        return false;
+    }
+
+    sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
+    if (iBundleMgr == nullptr) {
+        HILOG_ERROR("iBundleMgr is nullptr");
+        return false;
+    }
+    IN_PROCESS_CALL(iBundleMgr->QueryAbilityInfo(want, AbilityInfoFlag::GET_ABILITY_INFO_DEFAULT,
+        userId, abilityInfo));
+    if (abilityInfo.name.empty() || abilityInfo.bundleName.empty()) {
+        HILOG_INFO("get ability info empty, try to get extension info.");
+        std::vector<AppExecFwk::ExtensionAbilityInfo> extensionInfos;
+        IN_PROCESS_CALL(iBundleMgr->QueryExtensionAbilityInfos(want, AbilityInfoFlag::GET_ABILITY_INFO_DEFAULT,
+            userId, extensionInfos));
+        if (extensionInfos.empty()) {
+            HILOG_ERROR("get extension info failed.");
+            return false;
+        }
+        extensionInfo = extensionInfos.front();
+        if (extensionInfo.bundleName.empty() || extensionInfo.name.empty()) {
+            HILOG_ERROR("get extension info empty.");
+            return false;
+        }
+    }
     return true;
 }
 

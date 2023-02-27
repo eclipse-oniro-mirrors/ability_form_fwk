@@ -21,6 +21,7 @@
 #include <string>
 #include <thread>
 
+#include "erms_mgr_interface.h"
 #include "form_constants.h"
 #include "form_mgr_errors.h"
 #define private public
@@ -33,14 +34,17 @@
 #undef private
 #include "mock_ability_manager.h"
 #include "mock_bundle_mgr.h"
+#include "mock_ecological_rule_manager.h"
 #include "mock_form_provider_client.h"
 
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::AppExecFwk;
-using testing::_;
-using testing::Invoke;
-using testing::Return;
+using ::testing::_;
+using ::testing::Invoke;
+using ::testing::DoAll;
+using ::testing::Return;
+using ::testing::SetArgReferee;
 
 extern void MockGetBoolParam(bool mockRet);
 extern void MockExistTempForm(bool mockRet);
@@ -72,6 +76,7 @@ extern void MockGetCallerBundleName(bool mockRet);
 extern void MockGetUidByBundleName(bool mockRet);
 extern void MockGetRequestPublishFormInfo(bool mockRet);
 extern void MockGetRequestPublishFormInfoWant(OHOS::AAFwk::Want mockWant);
+extern void MockGetAbilityInfo(bool mockRet);
 extern void MockGetAbilityInfoByAction(bool mockRet);
 extern void MockGetStringParam(bool mockRet);
 extern void MockGetFormsInfoByModule(bool mockRet);
@@ -1045,7 +1050,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_054, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormMgrAdapter_054 start";
     FormMgrAdapter formMgrAdapter;
-    MockGetAbilityInfoByAction(false);
+    MockGetAbilityInfoByAction(true);
     EXPECT_EQ(false, formMgrAdapter.IsRequestPublishFormSupported());
     GTEST_LOG_(INFO) << "FormMgrAdapter_054 end";
 }
@@ -1058,9 +1063,18 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_054, TestSize.Level0)
 HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_055, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormMgrAdapter_055 start";
+    sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
+    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
+    FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
     FormMgrAdapter formMgrAdapter;
+    MockGetAbilityInfo(false);
     MockGetAbilityInfoByAction(true);
+    EXPECT_CALL(*bmsProxy, CheckIsSystemAppByUid(_)).Times(1).WillRepeatedly(Return(true));
+    std::string bundleName = "com.ohos.launcher";
+    EXPECT_CALL(*bmsProxy, GetBundleNameForUid(_, _)).Times(1)
+        .WillRepeatedly(DoAll(SetArgReferee<1>(bundleName), Return(true)));
     EXPECT_EQ(false, formMgrAdapter.IsRequestPublishFormSupported());
+    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
     GTEST_LOG_(INFO) << "FormMgrAdapter_055 end";
 }
 
@@ -3078,6 +3092,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0155, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormMgrAdapter_0155 start";
     FormMgrAdapter formMgrAdapter;
     Want want = {};
+    MockGetAbilityInfo(false);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_HOST_FAILED, formMgrAdapter.QueryPublishFormToHost(want));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0155 end";
 }
@@ -3093,6 +3108,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0156, TestSize.Level0)
     FormMgrAdapter formMgrAdapter;
     Want want = {};
     MockConnectServiceAbility(false);
+    MockGetAbilityInfo(true);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED, formMgrAdapter.RequestPublishFormToHost(want));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0156 end";
 }
@@ -3355,7 +3371,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0172, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormMgrAdapter_0172 start";
     FormMgrAdapter formMgrAdapter;
     Want want = {};
-    MockGetAbilityInfoByAction(false);
+    MockGetAbilityInfo(false);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_HOST_FAILED, formMgrAdapter.QueryPublishFormToHost(want));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0172 end";
 }
@@ -3370,6 +3386,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0173, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormMgrAdapter_0173 start";
     FormMgrAdapter formMgrAdapter;
     Want want = {};
+    MockGetAbilityInfo(true);
     MockGetAbilityInfoByAction(true);
     MockGetAbilityInfoByActionAbilityInfo(false);
     MockGetAbilityInfoByActionExtensionInfo(true);
@@ -3387,6 +3404,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0174, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormMgrAdapter_0174 start";
     FormMgrAdapter formMgrAdapter;
     Want want = {};
+    MockGetAbilityInfo(true);
     MockGetAbilityInfoByAction(true);
     MockGetAbilityInfoByActionAbilityInfo(true);
     MockGetAbilityInfoByActionExtensionInfo(false);

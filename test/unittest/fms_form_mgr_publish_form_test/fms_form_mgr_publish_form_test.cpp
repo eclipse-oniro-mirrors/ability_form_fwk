@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 
 #include "accesstoken_kit.h"
+#include "erms_mgr_interface.h"
 #define private public
 #include "form_acquire_state_connection.h"
 #undef private
@@ -53,6 +54,15 @@ using namespace OHOS;
 using namespace OHOS::AppExecFwk;
 using namespace OHOS::Security;
 
+using ::testing::_;
+using ::testing::DoAll;
+using ::testing::Invoke;
+using ::testing::Return;
+using ::testing::SetArgReferee;
+
+extern void MockGetAbilityInfo(bool mockRet);
+extern void MockGetAbilityInfoByAction(bool mockRet);
+
 namespace {
 const std::string PERMISSION_NAME_REQUIRE_FORM = "ohos.permission.REQUIRE_FORM";
 const std::string PARAM_PROVIDER_PACKAGE_NAME = "com.form.provider.app.test.ability";
@@ -89,7 +99,6 @@ protected:
 void FmsFormMgrPublishFormTest::SetUpTestCase()
 {
     RemoteNativeToken::SetNativeToken();
-    FormBmsHelper::GetInstance().SetBundleManager(new BundleMgrService());
     FormAmsHelper::GetInstance().SetAbilityManager(new MockAbilityMgrService());
 }
 
@@ -199,11 +208,21 @@ HWTEST_F(FmsFormMgrPublishFormTest, publishForm_002, TestSize.Level0)
     FormDbCache::GetInstance().DeleteFormInfoByBundleName(FORM_PROVIDER_BUNDLE_NAME, USER_ID, oldFormDBInfos);
 
     // publish form
-    BundleMgrService::IsSystemApp = true;
+    sptr<MockBundleMgrService> mockBms_ = new MockBundleMgrService();
+    FormBmsHelper::GetInstance().SetBundleManager(mockBms_);
     std::unique_ptr<FormProviderData> formBindingData;
     int64_t formId;
+    std::string bundleName = "com.ohos.launcher";
+    MockGetAbilityInfo(true);
+    MockGetAbilityInfoByAction(true);
+    EXPECT_CALL(*mockBms_, GetBundleInfo(_, _, _, _)).Times(1).WillRepeatedly(Return(true));
+    EXPECT_CALL(*mockBms_, CheckIsSystemAppByUid(_)).Times(2).WillRepeatedly(Return(true));
+    EXPECT_CALL(*mockBms_, GetBundleNameForUid(_, _)).Times(1)
+    .WillRepeatedly(DoAll(SetArgReferee<1>(bundleName), Return(true)));
     EXPECT_EQ(ERR_OK,
         formyMgrServ_->RequestPublishForm(want, false, formBindingData, formId));
+    mockBms_.clear();
+    FormBmsHelper::GetInstance().SetBundleManager(nullptr);
     GTEST_LOG_(INFO) << "fms_form_mgr_publish_form_test_002 end";
 }
 
