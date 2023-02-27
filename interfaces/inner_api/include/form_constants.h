@@ -22,6 +22,7 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace Constants {
+    constexpr const char* PERMISSION_INTERACT_ACROSS_LOCAL_ACCOUNTS = "ohos.permission.INTERACT_ACROSS_LOCAL_ACCOUNTS";
     constexpr const char* PERMISSION_REQUIRE_FORM = "ohos.permission.REQUIRE_FORM";
     constexpr const char* PERMISSION_KEEP_BACKGROUND_RUNNING = "ohos.permission.KEEP_BACKGROUND_RUNNING";
     constexpr const char* PARAM_FORM_IDENTITY_KEY = "ohos.extra.param.key.form_identity";
@@ -72,6 +73,9 @@ namespace Constants {
 
     // The default user id
     constexpr int32_t DEFAULT_USER_ID = 0;
+
+    // The default provider user id
+    constexpr int32_t DEFAULT_PROVIDER_USER_ID = -1;
 
     // The max uid of system app.
     constexpr int32_t MAX_SYSTEM_APP_UID = 10000;
