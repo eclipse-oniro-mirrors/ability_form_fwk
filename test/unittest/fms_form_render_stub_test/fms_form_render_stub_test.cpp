@@ -75,6 +75,11 @@ public:
     {
         return ERR_OK;
     };
+
+    int32_t ReloadForm(const std::vector<int64_t> &&formIds, const Want &want) override
+    {
+        return ERR_OK;
+    };
 };
 
 class MockFormSupplyStub : public FormSupplyStub {
@@ -405,6 +410,71 @@ HWTEST_F(FormRenderStubTest, FormRenderStubTest_013, TestSize.Level0)
     MessageOption option{MessageOption::TF_ASYNC};
     data.WriteInterfaceToken(u"ohos.appexecfwk.FormRender");
     data.WriteRemoteObject(callerToken);
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+}
+
+/**
+ * @tc.name: FormRenderStubTest_014
+ * @tc.desc: 1.Verify OnRemoteRequest and HandleReloadForm interface executes as expected.
+ *           2.Size < 0
+ *           3.The interface return value ERR_APPEXECFWK_PARCEL_ERROR.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderStubTest, FormRenderStubTest_014, TestSize.Level0)
+{
+    int32_t size = -1;
+    sptr<MockFormRenderImpl> callback = new (std::nothrow) MockFormRenderImpl();
+    uint32_t code = static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_RELOAD_FORM);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(u"ohos.appexecfwk.FormRender");
+    data.WriteInt32(size);
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+}
+
+/**
+ * @tc.name: FormRenderStubTest_015
+ * @tc.desc: 1.Verify OnRemoteRequest and HandleReloadForm interface executes as expected.
+ *           2.Want is nullptr
+ *           3.The interface return value ERR_APPEXECFWK_PARCEL_ERROR.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderStubTest, FormRenderStubTest_015, TestSize.Level0)
+{
+    int32_t size = 1;
+    Want want = {};
+    sptr<MockFormRenderImpl> callback = new (std::nothrow) MockFormRenderImpl();
+    uint32_t code = static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_RELOAD_FORM);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(u"ohos.appexecfwk.FormRender");
+    data.WriteInt32(size);
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+}
+
+/**
+ * @tc.name: FormRenderStubTest_016
+ * @tc.desc: 1.Verify OnRemoteRequest and HandleReloadForm interface executes as expected.
+ *           2.The interface return value ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderStubTest, FormRenderStubTest_016, TestSize.Level0)
+{
+    int32_t size = 1;
+    Want want = {};
+    sptr<MockFormRenderImpl> callback = new (std::nothrow) MockFormRenderImpl();
+    uint32_t code = static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_RELOAD_FORM);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(u"ohos.appexecfwk.FormRender");
+    data.WriteInt32(size);
+    data.WriteParcelable(&want);
     auto result = callback->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
 }
