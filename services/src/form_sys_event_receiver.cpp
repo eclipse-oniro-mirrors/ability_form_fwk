@@ -91,6 +91,15 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
             }
         };
         eventHandler_->PostTask(task);
+    } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_DATA_CLEARED) {
+        int userId = want.GetIntParam(KEY_USER_ID, Constants::DEFAULT_USERID);
+        auto task = [weakThis, bundleName, userId]() {
+            std::shared_ptr<FormSysEventReceiver> sharedThis = weakThis.lock();
+            if (sharedThis) {
+                sharedThis->formEventHelper_.HandleBundleDataCleared(bundleName, userId);
+            }
+        };
+        eventHandler_->PostTask(task);
     } else {
         HILOG_WARN("%{public}s warnning, invalid action.", __func__);
     }
