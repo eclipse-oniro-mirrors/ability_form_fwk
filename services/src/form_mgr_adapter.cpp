@@ -1389,7 +1389,8 @@ ErrCode FormMgrAdapter::CheckPublishForm(Want &want)
     std::string abilityName = want.GetElement().GetAbilityName();
     std::string formName = want.GetStringParam(AppExecFwk::Constants::PARAM_FORM_NAME_KEY);
     std::vector<FormInfo> formInfos {};
-    ErrCode errCode = FormInfoMgr::GetInstance().GetFormsInfoByModule(bundleName, moduleName, formInfos);
+    ErrCode errCode = FormInfoMgr::GetInstance()
+        .GetFormsInfoByModule(want.GetElement().GetBundleName(), moduleName, formInfos);
     if (errCode != ERR_OK) {
         HILOG_ERROR("%{public}s error, failed to get forms info.", __func__);
         return errCode;
