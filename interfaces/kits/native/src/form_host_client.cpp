@@ -324,7 +324,7 @@ void FormHostClient::OnError(int32_t errorCode, const std::string &errorMsg)
         }
         ++formIdIter;
 
-        std::set<std::shared_ptr<FormCallbackInterface>> &callbackSet = callbackMapIter->second;
+        const std::set<std::shared_ptr<FormCallbackInterface>> &callbackSet = callbackMapIter->second;
         HILOG_DEBUG("callbackSet.size: %{public}zu", callbackSet.size());
         for (const auto &callback : callbackSet) {
             if (callback == nullptr) {
