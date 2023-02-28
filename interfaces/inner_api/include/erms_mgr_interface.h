@@ -41,7 +41,7 @@ struct ExperienceRule : public Parcelable {
 
     bool ReadFromParcel(Parcel &parcel);
 
-    virtual bool Marshalling(Parcel &parcel) const override;
+    bool Marshalling(Parcel &parcel) const override;
 
     static ExperienceRule *Unmarshalling(Parcel &parcel);
 };
@@ -53,7 +53,7 @@ struct CallerInfo : public Parcelable {
 
     bool ReadFromParcel(Parcel &parcel);
 
-    virtual bool Marshalling(Parcel &parcel) const override;
+    bool Marshalling(Parcel &parcel) const override;
 
     static CallerInfo *Unmarshalling(Parcel &parcel);
 };

@@ -57,17 +57,13 @@ sptr<IBundleMgr> FormBmsHelper::GetBundleMgr()
 
 void FormBmsHelper::SetBundleManager(const sptr<IBundleMgr> &bundleManager)
 {
-    HILOG_DEBUG("%{public}s called.", __func__);
+    HILOG_DEBUG("SetBundleManager called.");
     iBundleMgr_ = bundleManager;
 }
 
-/**
- * @brief Acquire an ecological rule manager, if it not existed,
- * @return returns the ecological rule manager ipc object, or nullptr for failed.
- */
 sptr<IEcologicalRuleManager> FormBmsHelper::GetEcologicalRuleMgr()
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("GetEcologicalRuleMgr called.");
 
     if (iErMgr_ != nullptr) {
         HILOG_DEBUG("ecological rule mgr already get.");
@@ -93,13 +89,9 @@ sptr<IEcologicalRuleManager> FormBmsHelper::GetEcologicalRuleMgr()
     return iErMgr_;
 }
 
-/**
- * @brief Add the ecological rule manager instance for debug.
- * @param ecologicalRuleManager the ecological rule manager ipc object.
- */
 void FormBmsHelper::SetEcologicalRuleMgr(const sptr<IEcologicalRuleManager> &ecologicalRuleManager)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("SetEcologicalRuleMgr called.");
     iErMgr_ = ecologicalRuleManager;
 }
 
@@ -183,7 +175,7 @@ bool FormBmsHelper::GetBundlePackInfo(const std::string &bundleName, const int32
 bool FormBmsHelper::GetAbilityInfo(const AAFwk::Want &want, int32_t userId, AbilityInfo &abilityInfo,
     ExtensionAbilityInfo &extensionInfo)
 {
-    HILOG_DEBUG("%{public}s called.", __func__);
+    HILOG_DEBUG("GetAbilityInfo called.");
     ElementName element = want.GetElement();
     std::string bundleName = element.GetBundleName();
     std::string abilityName = element.GetAbilityName();
