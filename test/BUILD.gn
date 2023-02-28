@@ -70,6 +70,7 @@ group("unittest") {
     "unittest/fms_form_mgr_release_form_test:unittest",
     "unittest/fms_form_mgr_request_form_test:unittest",
     "unittest/fms_form_mgr_service_test:unittest",
+    "unittest/fms_form_mgr_service_permission_verify_test:unittest",
     "unittest/fms_form_mgr_update_form_test:unittest",
     "unittest/fms_form_provider_data_new_leg_test:unittest",
     "unittest/fms_form_provider_data_test:unittest",

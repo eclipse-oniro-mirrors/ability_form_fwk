@@ -15,26 +15,22 @@
 
 #include <gtest/gtest.h>
 
-#include "tokenid_kit.h"
+#include "ipc_skeleton.h"
 #include "hilog_wrapper.h"
 
 namespace {
-bool isSystemAppByFullTokenID = true;
+int32_t g_GetCallingUid = 0;
 }
 
-void MockIsSystemAppByFullTokenID(bool mockRet)
+void MockGetCallingUid(int32_t mockRet)
 {
-    isSystemAppByFullTokenID = mockRet;
+    g_GetCallingUid = mockRet;
 }
 
 namespace OHOS {
-namespace Security {
-namespace AccessToken {
-bool TokenIdKit::IsSystemAppByFullTokenID(uint64_t tokenId)
+uint32_t IPCSkeleton::GetCallingTokenID()
 {
-    GTEST_LOG_(INFO) << "IsSystemAppByFullTokenID called " << isSystemAppByFullTokenID;
-    return isSystemAppByFullTokenID;
+    GTEST_LOG_(INFO) << "GetCallingUid called " << g_GetCallingUid;
+    return g_GetCallingUid;
 }
-} // namespace AccessToken
-} // namespace Security
 } // namespace OHOS

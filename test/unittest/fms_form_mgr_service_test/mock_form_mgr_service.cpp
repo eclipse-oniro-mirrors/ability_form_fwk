@@ -22,6 +22,7 @@
 namespace {
 bool g_isSACall = true;
 bool g_verifyCallingPermission = true;
+bool g_checkAcrossLocalAccountsPermission = true;
 }
 
 void MockFMSIsSACall(bool mockRet)
@@ -32,6 +33,11 @@ void MockFMSIsSACall(bool mockRet)
 void MockFMSVerifyCallingPermission(bool mockRet)
 {
     g_verifyCallingPermission = mockRet;
+}
+
+void MockCheckAcrossLocalAccountsPermission(bool mockRet)
+{
+    g_checkAcrossLocalAccountsPermission = mockRet;
 }
 namespace OHOS {
 namespace AppExecFwk {
@@ -45,6 +51,12 @@ bool FormMgrService::VerifyCallingPermission(const std::string &permissionName) 
 {
     GTEST_LOG_(INFO) << "VerifyCallingPermission called " << g_verifyCallingPermission;
     return g_verifyCallingPermission;
+}
+
+bool FormMgrService::CheckAcrossLocalAccountsPermission() const
+{
+    GTEST_LOG_(INFO) << "CheckAcrossLocalAccountsPermission called " << g_checkAcrossLocalAccountsPermission;
+    return g_checkAcrossLocalAccountsPermission;
 }
 
 } // namespace AAFwk
