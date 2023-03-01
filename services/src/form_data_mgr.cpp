@@ -1473,13 +1473,22 @@ void FormDataMgr::BatchDeleteNoHostTempForms(int32_t callingUid, std::map<FormId
         FormProviderMgr::GetInstance().NotifyProviderFormsBatchDelete(bundleName, abilityName, formIdsSet);
         for (int64_t formId: formIdsSet) {
             foundFormsMap.emplace(formId, true);
-            FormRecord formrecord;
-            GetFormRecord(formId, formrecord);
-            FormRenderMgr::GetInstance().StopRenderingForm(formId, formrecord);
+            StopRenderingForm(formId);
             DeleteFormRecord(formId);
             DeleteTempForm(formId);
         }
     }
+}
+
+/**
+ * @brief StopRenderingForm.
+ * @param formId The form id.
+ */
+void FormDataMgr::StopRenderingForm(int32_t formId)
+{
+    FormRecord formrecord;
+    GetFormRecord(formId, formrecord);
+    FormRenderMgr::GetInstance().StopRenderingForm(formId, formrecord);
 }
 
 /**
