@@ -97,6 +97,10 @@ public:
     {
         return {};
     };
+    int32_t CancelUnloadSystemAbility(int32_t systemAbilityId)
+    {
+        return {};
+    }
 
     std::weak_ptr<bool> weakGetSystemAbility_;
 };
