@@ -530,6 +530,14 @@ void ParseFormInfoIntoNapi(napi_env env, const FormInfo &formInfo, napi_value &r
     napi_set_named_property(env, result, "customizeData", customizeData);
 }
 
+inline FormType GetFormType(const FormInfo &formInfo)
+{
+    if (formInfo.uiSyntax == FormType::ETS) {
+        return FormType::ETS;
+    }
+    return formInfo.type;
+}
+
 NativeValue* CreateFormInfos(NativeEngine &engine, const std::vector<FormInfo> &formInfos)
 {
     NativeValue* arrayValue = engine.CreateArray(formInfos.size());
@@ -563,7 +571,7 @@ NativeValue* CreateFormInfo(NativeEngine &engine, const FormInfo &formInfo)
     object->SetProperty("name", CreateJsValue(engine, formInfo.name));
     object->SetProperty("description", CreateJsValue(engine, formInfo.description));
     object->SetProperty("descriptionId", CreateJsValue(engine, formInfo.descriptionId));
-    object->SetProperty("type", CreateJsValue(engine, formInfo.type));
+    object->SetProperty("type", CreateJsValue(engine, GetFormType(formInfo)));
     object->SetProperty("jsComponentName", CreateJsValue(engine, formInfo.jsComponentName));
     object->SetProperty("colorMode", CreateJsValue(engine, formInfo.colorMode));
     object->SetProperty("isDefault", engine.CreateBoolean(formInfo.defaultFlag));
