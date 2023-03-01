@@ -36,7 +36,6 @@ ohos_shared_library("libfms") {
     "${ability_runtime_native_path}/appkit/ability_runtime",
   ]
   sources = [
-    "services/src/erms_mgr_interface.cpp",
     "services/src/form_ability_connection.cpp",
     "services/src/form_acquire_connection.cpp",
     "services/src/form_acquire_state_connection.cpp",
@@ -213,6 +212,7 @@ config("formmgr_sdk_config") {
 
 ohos_shared_library("form_manager") {
   sources = [
+    "interfaces/inner_api/src/erms_mgr_param.cpp",
     "interfaces/inner_api/src/form_ashmem.cpp",
     "interfaces/inner_api/src/form_host_proxy.cpp",
     "interfaces/inner_api/src/form_host_stub.cpp",
