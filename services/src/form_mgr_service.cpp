@@ -621,15 +621,8 @@ ErrCode FormMgrService::CheckFormPermission()
     }
 
     // checks whether the current user is inactive
-    int callingUid = IPCSkeleton::GetCallingUid();
-    int32_t userId = callingUid / GET_CALLING_UID_TRANSFORM_DIVISOR;
-    int32_t currentActiveUserId = FormUtil::GetCurrentAccountId();
-    bool isCallingPermAccount =
-        VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_INTERACT_ACROSS_LOCAL_ACCOUNTS);
-    HILOG_DEBUG("currentActiveUserId: %{public}d, userId: %{public}d", currentActiveUserId, userId);
-
-    if ((userId != currentActiveUserId) && !isCallingPermAccount) {
-        HILOG_DEBUG("The caller is not the currently active user");
+    if (!CheckAcrossLocalAccountsPermission()) {
+        HILOG_ERROR("Across local accounts permission failed.");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
 
@@ -740,14 +733,12 @@ int FormMgrService::NotifyFormsEnableUpdate(const std::vector<int64_t> &formIds,
 int FormMgrService::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
 {
     HILOG_INFO("%{public}s called.", __func__);
-
-    ErrCode ret = CheckFormPermission();
-    if (ret != ERR_OK) {
-        HILOG_ERROR("fail, get all formsInfo permission denied");
-        return ret;
-    }
     if (!CheckCallerIsSystemApp()) {
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+    if (!CheckAcrossLocalAccountsPermission()) {
+        HILOG_ERROR("Across local accounts permission failed.");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
     return FormMgrAdapter::GetInstance().GetAllFormsInfo(formInfos);
 }
@@ -761,14 +752,12 @@ int FormMgrService::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
 int FormMgrService::GetFormsInfoByApp(std::string &bundleName, std::vector<FormInfo> &formInfos)
 {
     HILOG_INFO("%{public}s called.", __func__);
-
-    ErrCode ret = CheckFormPermission();
-    if (ret != ERR_OK) {
-        HILOG_ERROR("fail, get formsInfo by app permission denied");
-        return ret;
-    }
     if (!CheckCallerIsSystemApp()) {
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+    if (!CheckAcrossLocalAccountsPermission()) {
+        HILOG_ERROR("Across local accounts permission failed.");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
     return FormMgrAdapter::GetInstance().GetFormsInfoByApp(bundleName, formInfos);
 }
@@ -784,14 +773,12 @@ int FormMgrService::GetFormsInfoByModule(std::string &bundleName, std::string &m
                                          std::vector<FormInfo> &formInfos)
 {
     HILOG_INFO("%{public}s called.", __func__);
-
-    ErrCode ret = CheckFormPermission();
-    if (ret != ERR_OK) {
-        HILOG_ERROR("fail, check form permission failed");
-        return ret;
-    }
     if (!CheckCallerIsSystemApp()) {
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+    if (!CheckAcrossLocalAccountsPermission()) {
+        HILOG_ERROR("Across local accounts permission failed.");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
     return FormMgrAdapter::GetInstance().GetFormsInfoByModule(bundleName, moduleName, formInfos);
 }
@@ -1023,6 +1010,24 @@ bool FormMgrService::CheckCallerIsSystemApp() const
         !Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(callerTokenID)) {
         HILOG_ERROR("The caller is not system-app, can not use system-api");
         return false;
+    }
+    return true;
+}
+
+bool FormMgrService::CheckAcrossLocalAccountsPermission() const
+{
+    // checks whether the current user is inactive
+    int callingUid = IPCSkeleton::GetCallingUid();
+    int32_t userId = callingUid / GET_CALLING_UID_TRANSFORM_DIVISOR;
+    int32_t currentActiveUserId = FormUtil::GetCurrentAccountId();
+    if (userId != currentActiveUserId) {
+        HILOG_DEBUG("currentActiveUserId: %{public}d, userId: %{public}d", currentActiveUserId, userId);
+        bool isCallingPermAccount =
+            VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_INTERACT_ACROSS_LOCAL_ACCOUNTS);
+        if (!isCallingPermAccount) {
+            HILOG_ERROR("Across local accounts permission failed.");
+            return false;
+        }
     }
     return true;
 }

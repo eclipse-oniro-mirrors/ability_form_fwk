@@ -368,6 +368,8 @@ private:
 
     ErrCode CheckFormPermission();
 
+    bool CheckAcrossLocalAccountsPermission() const;
+
     void InitFormShareMgrEventHandler();
 
     void DumpInit();
