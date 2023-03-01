@@ -369,6 +369,7 @@ void FormDbCache::BatchDeleteNoHostDBForms(int32_t callingUid, std::map<FormIdKe
                 removableModuleSet.emplace(removableModuleFormIdKey);
                 DeleteFormInfo(formId);
             }
+            FormDataMgr::GetInstance().StopRenderingForm(formId);
             FormDataMgr::GetInstance().DeleteFormRecord(formId);
         }
     }
