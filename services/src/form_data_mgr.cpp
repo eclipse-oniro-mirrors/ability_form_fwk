@@ -153,6 +153,7 @@ FormRecord FormDataMgr::CreateFormRecord(const FormItemInfo &formInfo, const int
     FormRecord newRecord;
     newRecord.formId = formInfo.GetFormId();
     newRecord.userId = userId;
+    newRecord.providerUserId = FormUtil::GetCurrentAccountId();
     newRecord.packageName = formInfo.GetPackageName();
     newRecord.bundleName = formInfo.GetProviderBundleName();
     newRecord.moduleName = formInfo.GetModuleName();
@@ -234,7 +235,8 @@ int FormDataMgr::CheckEnoughForm(const int callingUid, const int32_t currentUser
     std::lock_guard<std::recursive_mutex> lock(formRecordMutex_);
     for (const auto &recordPair : formRecords_) {
         FormRecord record = recordPair.second;
-        if ((record.userId == currentUserId) && !record.formTempFlag) {
+        if ((record.providerUserId == FormUtil::GetCurrentAccountId()) && !record.formTempFlag) {
+            HILOG_DEBUG("Is called by the current active user");
             if (++formsInSystem >= Constants::MAX_FORMS) {
                 HILOG_WARN("%{public}s, already exist %{public}d forms in system", __func__, Constants::MAX_FORMS);
                 return ERR_APPEXECFWK_FORM_MAX_SYSTEM_FORMS;
@@ -287,6 +289,7 @@ bool FormDataMgr::ExistTempForm(const int64_t formId) const
 bool FormDataMgr::IsCallingUidValid(const std::vector<int> &formUserUids) const
 {
     if (formUserUids.empty()) {
+        HILOG_ERROR("formUserUids is empty!");
         return false;
     }
     for (const auto &userUid : formUserUids) {
@@ -294,6 +297,7 @@ bool FormDataMgr::IsCallingUidValid(const std::vector<int> &formUserUids) const
             return true;
         }
     }
+    HILOG_ERROR("Can not find the valid uid");
     return false;
 }
 /**
@@ -874,7 +878,7 @@ void FormDataMgr::CleanRemovedTempFormRecords(const std::string &bundleName, con
         std::map<int64_t, FormRecord>::iterator itFormRecord;
         for (itFormRecord = formRecords_.begin(); itFormRecord != formRecords_.end();) {
             if ((itFormRecord->second.formTempFlag) && (bundleName == itFormRecord->second.bundleName)
-                && (userId == itFormRecord->second.userId)) {
+                && (userId == itFormRecord->second.providerUserId)) {
                 removedTempForms.emplace(itFormRecord->second.formId);
                 FormRenderMgr::GetInstance().StopRenderingForm(itFormRecord->first, itFormRecord->second);
                 itFormRecord = formRecords_.erase(itFormRecord);
@@ -1365,7 +1369,7 @@ void FormDataMgr::DeleteFormsByUserId(const int32_t userId, std::vector<int64_t>
         std::lock_guard<std::recursive_mutex> lock(formRecordMutex_);
         auto itFormRecord = formRecords_.begin();
         while (itFormRecord != formRecords_.end()) {
-            if (userId == itFormRecord->second.userId) {
+            if (userId == itFormRecord->second.providerUserId) {
                 if (itFormRecord->second.formTempFlag) {
                     removedTempForms.emplace_back(itFormRecord->second.formId);
                 }
@@ -1422,8 +1426,7 @@ void FormDataMgr::GetNoHostInvalidTempForms(int32_t userId, int32_t callingUid, 
         int64_t formId = formRecordInfo.first;
         FormRecord &formRecord = formRecordInfo.second;
 
-        // check userID and temp flag
-        if (userId != formRecord.userId || !formRecord.formTempFlag) {
+        if (!formRecord.formTempFlag) {
             continue;
         }
         // check UID
@@ -1473,10 +1476,22 @@ void FormDataMgr::BatchDeleteNoHostTempForms(int32_t callingUid, std::map<FormId
         FormProviderMgr::GetInstance().NotifyProviderFormsBatchDelete(bundleName, abilityName, formIdsSet);
         for (int64_t formId: formIdsSet) {
             foundFormsMap.emplace(formId, true);
+            StopRenderingForm(formId);
             DeleteFormRecord(formId);
             DeleteTempForm(formId);
         }
     }
+}
+
+/**
+ * @brief StopRenderingForm.
+ * @param formId The form id.
+ */
+void FormDataMgr::StopRenderingForm(int32_t formId)
+{
+    FormRecord formrecord;
+    GetFormRecord(formId, formrecord);
+    FormRenderMgr::GetInstance().StopRenderingForm(formId, formrecord);
 }
 
 /**

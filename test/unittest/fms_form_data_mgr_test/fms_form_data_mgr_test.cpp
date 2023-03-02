@@ -24,6 +24,7 @@
 #include "form_constants.h"
 #include "form_mgr_errors.h"
 #include "form_record.h"
+#include "form_util.h"
 #include "hilog_wrapper.h"
 #include "mock_form_host_client.h"
 
@@ -1643,7 +1644,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CleanRemovedTempFormRecords_001,
     // create tempForms_
     formDataMgr_.tempForms_.emplace_back(formId);
 
-    formDataMgr_.CleanRemovedTempFormRecords(bundleName, Constants::DEFAULT_USER_ID, removedForms);
+    formDataMgr_.CleanRemovedTempFormRecords(bundleName, FormUtil::GetCurrentAccountId(), removedForms);
     EXPECT_EQ(true, formDataMgr_.formRecords_.empty());
     EXPECT_EQ(true, formDataMgr_.tempForms_.empty());
 

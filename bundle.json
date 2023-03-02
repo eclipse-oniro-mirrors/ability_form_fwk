@@ -62,6 +62,8 @@
                 "header": {
                   "header_base": "//foundation/ability/form_fwk/interfaces/inner_api/include",
                   "header_files": [
+                    "erms_mgr_param.h",
+                    "erms_mgr_interface.h",
                     "form_death_callback.h",
                     "form_host_interface.h",
                     "form_host_stub.h",

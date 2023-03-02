@@ -128,4 +128,18 @@ HWTEST_F(FormRenderProxyTest, FormRenderProxyTest_0006, TestSize.Level1) {
     EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
     GTEST_LOG_(INFO) << "FormRenderProxyTest_0006 test ends";
 }
+
+/**
+ * @tc.name: FormRenderProxyTest_0007
+ * @tc.desc: test ReloadForm function and formIds is empty.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderProxyTest, FormRenderProxyTest_0007, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormRenderProxyTest_0007 starts";
+    std::vector<int64_t> formIds;
+    Want want;
+    int result = formRenderProxy->ReloadForm(std::move(formIds), want);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FormRenderProxyTest_0007 test ends";
+}
 }

@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+# Copyright (c) 2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -16,16 +16,18 @@ import("//foundation/ability/form_fwk/form_fwk.gni")
 
 module_output_path = "form_fwk/formmgrservice"
 
-ohos_unittest("FmsFormDbRecordTest") {
+ohos_unittest("FmsFormRenderConnectionTest") {
   module_out_path = module_output_path
 
-  sources = [ "${form_fwk_path}/test/unittest/fms_form_db_record_test/fms_form_db_record_test.cpp" ]
+  sources = [
+    "${form_fwk_path}/test/unittest/fms_form_render_connection_test/fms_form_render_connection_test.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_render_connection_test/mock_form_bms_helper.cpp",
+  ]
 
   include_dirs = [
     "//third_party/json/include",
     "${ability_runtime_path}/services/formmgr/include",
-    "${distributeddatamgr_path}/kv_store/interfaces/innerkits/distributeddata/include",
-    "${systemabilitymgr_path}/samgr/interfaces/innerkits/samgr_proxy/include/",
+    "${systemabilitymgr_path}/samgr/interfaces/innerkits/samgr_proxy/include",
     "${form_fwk_path}/interfaces/inner_api/include",
   ]
 
@@ -36,27 +38,42 @@ ohos_unittest("FmsFormDbRecordTest") {
   }
   deps = [
     "${ability_runtime_path}/interfaces/inner_api/app_manager:app_manager",
+    "${ability_runtime_path}/services/abilitymgr:abilityms_target",
     "${form_fwk_path}:fms_target",
+    "${form_fwk_path}:fmskit_native",
+    "${systemabilitymgr_path}/safwk/interfaces/innerkits/safwk:system_ability_fwk",
+    "${systemabilitymgr_path}/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
+    "//third_party/googletest:gmock_main",
   ]
 
   external_deps = [
     "ability_base:base",
+    "ability_base:configuration",
     "ability_base:want",
-    "ability_base:zuri",
+    "ability_runtime:wantagent_innerkits",
+    "access_token:libaccesstoken_sdk",
+    "appspawn:appspawn_socket_client",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
+    "device_manager:devicemanagersdk",
+    "eventhandler:libeventhandler",
     "form_fwk:form_manager",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
-    "relational_store:native_rdb",
   ]
+
+  if (device_usage_statistics) {
+    external_deps += [ "device_usage_statistics:usagestatsinner" ]
+    defines = [ "DEVICE_USAGE_STATISTICS_ENABLE" ]
+  }
 }
 
 ###############################################################################
 group("unittest") {
   testonly = true
 
-  deps = [ ":FmsFormDbRecordTest" ]
+  deps = [ ":FmsFormRenderConnectionTest" ]
 }
 ###############################################################################

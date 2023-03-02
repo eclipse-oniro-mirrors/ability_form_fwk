@@ -15,6 +15,7 @@
 
 #include "form_mgr_service.h"
 
+#include "accesstoken_kit.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "form_ams_helper.h"
@@ -33,6 +34,7 @@
 #include "in_process_call_wrapper.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
+#include "permission_constants.h"
 #include "permission_verification.h"
 #include "system_ability_definition.h"
 #include "tokenid_kit.h"
@@ -44,6 +46,10 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace {
 const int32_t MAIN_USER_ID = 100;
+
+constexpr int32_t SYSTEM_UID = 1000;
+
+constexpr int32_t GET_CALLING_UID_TRANSFORM_DIVISOR = 200000;
 }
 using namespace std::chrono;
 
@@ -121,6 +127,37 @@ bool FormMgrService::CheckFMSReady()
     return IsReady();
 }
 
+bool FormMgrService::IsSACall() const
+{
+    HILOG_DEBUG("called.");
+    auto callerToken = IPCSkeleton::GetCallingTokenID();
+    HILOG_DEBUG("callerToken : %{private}u", callerToken);
+    auto tokenType = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken);
+    if (tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE) {
+        HILOG_DEBUG("caller tokenType is native, verify success");
+        return true;
+    }
+    if (IPCSkeleton::GetCallingUid() == SYSTEM_UID) {
+        HILOG_DEBUG("callingUid is native, verify success");
+        return true;
+    }
+    HILOG_DEBUG("Not SA called.");
+    return false;
+}
+
+bool FormMgrService::VerifyCallingPermission(const std::string &permissionName) const
+{
+    HILOG_DEBUG("called. permission name is:%{public}s", permissionName.c_str());
+    int32_t ret = Security::AccessToken::AccessTokenKit::VerifyAccessToken(IPCSkeleton::GetCallingTokenID(),
+        permissionName);
+    if (ret == Security::AccessToken::PermissionState::PERMISSION_DENIED) {
+        HILOG_ERROR("permission %{public}s: PERMISSION_DENIED", permissionName.c_str());
+        return false;
+    }
+    HILOG_DEBUG("Verify calling permission success");
+    return true;
+}
+
 /**
  * @brief Add form with want, send want to form manager service.
  * @param formId The Id of the forms to add.
@@ -132,6 +169,8 @@ bool FormMgrService::CheckFMSReady()
 int FormMgrService::AddForm(const int64_t formId, const Want &want,
     const sptr<IRemoteObject> &callerToken, FormJsInfo &formInfo)
 {
+    HILOG_DEBUG("called.");
+
     ErrCode ret = CheckFormPermission();
     AAFwk::EventInfo eventInfo;
     eventInfo.userId = formId;
@@ -154,6 +193,8 @@ int FormMgrService::AddForm(const int64_t formId, const Want &want,
  */
 int FormMgrService::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &callerToken)
 {
+    HILOG_DEBUG("called.");
+
     ErrCode ret = CheckFormPermission();
     if (ret != ERR_OK) {
         HILOG_ERROR("%{public}s fail, delete form permission denied", __func__);
@@ -194,6 +235,8 @@ int FormMgrService::StopRenderingForm(const int64_t formId, const std::string &c
  */
 int FormMgrService::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> &callerToken, const bool delCache)
 {
+    HILOG_DEBUG("called.");
+
     ErrCode ret = CheckFormPermission();
     if (ret != ERR_OK) {
         HILOG_ERROR("%{public}s fail, release form permission denied", __func__);
@@ -214,6 +257,7 @@ int FormMgrService::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> 
  */
 int FormMgrService::UpdateForm(const int64_t formId, const FormProviderData &formBindingData)
 {
+    HILOG_DEBUG("called.");
     std::string callerBundleName;
     auto ret = FormBmsHelper::GetInstance().GetCallerBundleName(callerBundleName);
     if (ret != ERR_OK) {
@@ -286,6 +330,8 @@ ErrCode FormMgrService::RequestPublishForm(Want &want, bool withFormBindingData,
 int FormMgrService::NotifyWhetherVisibleForms(const std::vector<int64_t> &formIds,
     const sptr<IRemoteObject> &callerToken, const int32_t formVisibleType)
 {
+    HILOG_DEBUG("called.");
+
     ErrCode ret = CheckFormPermission();
     if (ret != ERR_OK) {
         HILOG_ERROR("%{public}s fail, event notify visible permission denied", __func__);
@@ -303,6 +349,8 @@ int FormMgrService::NotifyWhetherVisibleForms(const std::vector<int64_t> &formId
  */
 int FormMgrService::CastTempForm(const int64_t formId, const sptr<IRemoteObject> &callerToken)
 {
+    HILOG_DEBUG("called.");
+
     ErrCode ret = CheckFormPermission();
     if (ret != ERR_OK) {
         HILOG_ERROR("%{public}s fail, cast temp form permission denied", __func__);
@@ -554,8 +602,9 @@ ErrCode FormMgrService::Init()
 
 ErrCode FormMgrService::CheckFormPermission()
 {
-    auto isSaCall = AAFwk::PermissionVerification::GetInstance()->IsSACall();
-    if (isSaCall) {
+    HILOG_DEBUG("called.");
+
+    if (IsSACall()) {
         return ERR_OK;
     }
 
@@ -566,11 +615,17 @@ ErrCode FormMgrService::CheckFormPermission()
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
     }
 
-    auto isCallingPerm = AAFwk::PermissionVerification::GetInstance()->VerifyCallingPermission(
-        AppExecFwk::Constants::PERMISSION_REQUIRE_FORM);
+    auto isCallingPerm = VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_REQUIRE_FORM);
     if (!isCallingPerm) {
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
+
+    // checks whether the current user is inactive
+    if (!CheckAcrossLocalAccountsPermission()) {
+        HILOG_ERROR("Across local accounts permission failed.");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    }
+
     HILOG_DEBUG("Permission verification ok!");
     return ERR_OK;
 }
@@ -681,6 +736,10 @@ int FormMgrService::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
     if (!CheckCallerIsSystemApp()) {
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
     }
+    if (!CheckAcrossLocalAccountsPermission()) {
+        HILOG_ERROR("Across local accounts permission failed.");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    }
     return FormMgrAdapter::GetInstance().GetAllFormsInfo(formInfos);
 }
 
@@ -695,6 +754,10 @@ int FormMgrService::GetFormsInfoByApp(std::string &bundleName, std::vector<FormI
     HILOG_INFO("%{public}s called.", __func__);
     if (!CheckCallerIsSystemApp()) {
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+    if (!CheckAcrossLocalAccountsPermission()) {
+        HILOG_ERROR("Across local accounts permission failed.");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
     return FormMgrAdapter::GetInstance().GetFormsInfoByApp(bundleName, formInfos);
 }
@@ -712,6 +775,10 @@ int FormMgrService::GetFormsInfoByModule(std::string &bundleName, std::string &m
     HILOG_INFO("%{public}s called.", __func__);
     if (!CheckCallerIsSystemApp()) {
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+    if (!CheckAcrossLocalAccountsPermission()) {
+        HILOG_ERROR("Across local accounts permission failed.");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
     return FormMgrAdapter::GetInstance().GetFormsInfoByModule(bundleName, moduleName, formInfos);
 }
@@ -943,6 +1010,24 @@ bool FormMgrService::CheckCallerIsSystemApp() const
         !Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(callerTokenID)) {
         HILOG_ERROR("The caller is not system-app, can not use system-api");
         return false;
+    }
+    return true;
+}
+
+bool FormMgrService::CheckAcrossLocalAccountsPermission() const
+{
+    // checks whether the current user is inactive
+    int callingUid = IPCSkeleton::GetCallingUid();
+    int32_t userId = callingUid / GET_CALLING_UID_TRANSFORM_DIVISOR;
+    int32_t currentActiveUserId = FormUtil::GetCurrentAccountId();
+    if (userId != currentActiveUserId) {
+        HILOG_DEBUG("currentActiveUserId: %{public}d, userId: %{public}d", currentActiveUserId, userId);
+        bool isCallingPermAccount =
+            VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_INTERACT_ACROSS_LOCAL_ACCOUNTS);
+        if (!isCallingPermAccount) {
+            HILOG_ERROR("Across local accounts permission failed.");
+            return false;
+        }
     }
     return true;
 }

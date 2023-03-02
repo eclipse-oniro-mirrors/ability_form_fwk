@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -601,6 +601,23 @@ private:
      * @return Returns true if the form host is system app, false if not.
      */
     bool checkFormHostHasSaUid(const FormRecord &formRecord);
+
+    /**
+     * @brief Check whether the caller for publish form is in the whitelist.
+     * @param iBundleMgr BundleManagerProxy
+     * @param bundleName BundleName of caller
+     * @param want want of target form
+     * @return Returns true if the caller is in the whitelist, false if not.
+     */
+    bool IsValidPublishEvent(const sptr<IBundleMgr> &iBundleMgr, const std::string &bundleName, const Want &want);
+};
+
+enum class HostId : int8_t {
+    HOST_ID_LAUNCHER = 1
+};
+
+const std::map<HostId, AppExecFwk::ElementName> HOST_MAP = {
+    {HostId::HOST_ID_LAUNCHER, AppExecFwk::ElementName("", "com.ohos.launcher", "com.ohos.launcher.MainAbility")}
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

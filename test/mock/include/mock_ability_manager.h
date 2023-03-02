@@ -299,6 +299,10 @@ public:
     {
         return 0;
     }
+    int32_t IsValidMissionIds(const std::vector<int32_t>& missionIds, std::vector<MissionVaildResult>& results)
+    {
+        return 0;
+    }
 };
 
 class MockAbilityMgrStub : public IRemoteStub<AAFwk::IAbilityManager> {
@@ -736,6 +740,10 @@ public:
         return 0;
     }
     #endif
+    int32_t IsValidMissionIds(const std::vector<int32_t>& missionIds, std::vector<MissionVaildResult>& results)
+    {
+        return 0;
+    }
 
     int32_t startAbility_ = 0;
 private:

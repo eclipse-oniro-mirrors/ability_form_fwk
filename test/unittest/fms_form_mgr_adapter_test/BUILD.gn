@@ -51,6 +51,7 @@ ohos_unittest("FmsFormMgrAdapterTest") {
     "${ability_runtime_path}/services/abilitymgr:abilityms_target",
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
+    "${form_fwk_path}:form_manager",
     "${systemabilitymgr_path}/safwk/interfaces/innerkits/safwk:system_ability_fwk",
     "${systemabilitymgr_path}/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
     "//third_party/googletest:gmock_main",

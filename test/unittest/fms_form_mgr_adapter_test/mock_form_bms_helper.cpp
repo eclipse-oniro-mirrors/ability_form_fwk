@@ -21,6 +21,7 @@
 namespace {
     bool g_mockGetCallerBundleNameRet = true;
     bool g_mockGetUidByBundleNameRet = true;
+    bool g_mockGetAbilityInfoRet = true;
     bool g_mockGetAbilityInfoByActionRet = true;
     bool g_mockGetAbilityInfoByActionRetParamsAbilityInfo = false;
     bool g_mockGetAbilityInfoByActionRetParamsExtensionInfo = false;
@@ -34,6 +35,11 @@ void MockGetCallerBundleName(bool mockRet)
 void MockGetUidByBundleName(bool mockRet)
 {
     g_mockGetUidByBundleNameRet = mockRet;
+}
+
+void MockGetAbilityInfo(bool mockRet)
+{
+    g_mockGetAbilityInfoRet = mockRet;
 }
 
 void MockGetAbilityInfoByAction(bool mockRet)
@@ -85,6 +91,15 @@ bool FormBmsHelper::GetAbilityInfoByAction(const std::string &action, int32_t us
         extensionAbilityInfo.name = "name";
     }
     return g_mockGetAbilityInfoByActionRet;
+}
+
+bool FormBmsHelper::GetAbilityInfo(const AAFwk::Want &want, int32_t userId, AbilityInfo &abilityInfo,
+    ExtensionAbilityInfo &extensionInfo)
+{
+    if (g_mockGetAbilityInfoRet) {
+        abilityInfo.name = "name";
+    }
+    return g_mockGetAbilityInfoRet;
 }
 } // namespace AppExecFwk
 } // namespace OHOS

@@ -505,6 +505,12 @@ public:
      * @return Returns true on success, false on failure.
      */
     bool SetRecordNeedFreeInstall(int64_t formId, bool isNeedFreeInstall);
+
+    /**
+     * @brief StopRenderingForm.
+     * @param formId The form id.
+     */
+    void StopRenderingForm(int32_t formId);
 private:
     /**
      * @brief Create form record.

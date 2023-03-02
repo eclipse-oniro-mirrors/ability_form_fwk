@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,11 +17,13 @@
 
 #include <cinttypes>
 #include <regex>
+#include <unordered_set>
 
 #include "ability_manager_errors.h"
 #ifdef DEVICE_USAGE_STATISTICS_ENABLE
 #include "bundle_active_client.h"
 #endif
+#include "erms_mgr_interface.h"
 #include "form_acquire_connection.h"
 #include "form_acquire_state_connection.h"
 #include "form_ams_helper.h"
@@ -56,10 +58,19 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+using ErmsCallerInfo = OHOS::AppExecFwk::ErmsParams::CallerInfo;
+using ExperienceRule = OHOS::AppExecFwk::ErmsParams::ExperienceRule;
+
 namespace {
 constexpr int32_t CALLING_UID_TRANSFORM_DIVISOR = 200000;
 constexpr int32_t SYSTEM_UID = 1000;
 const std::string POINT_ETS = ".ets";
+
+// Apps bundles that are allowed to publish form, should replace by the AG API in the future.
+const std::string BUNDLE_NAME_LAUNCHER = "com.ohos.launcher";
+const std::string BUNDLE_NAME_SERVICE_CENTER = "com.ohos.hag.famanager";
+const std::unordered_set<std::string> PUBLISH_FORM_ALLOWED_SET = {BUNDLE_NAME_LAUNCHER,
+    BUNDLE_NAME_SERVICE_CENTER};
 } // namespace
 
 FormMgrAdapter::FormMgrAdapter()
@@ -80,6 +91,7 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
     const sptr<IRemoteObject> &callerToken, FormJsInfo &formInfo)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    HILOG_DEBUG("called.");
     if (formId < 0 || callerToken == nullptr) {
         HILOG_ERROR("%{public}s fail, callerToken can not be NULL", __func__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -216,9 +228,8 @@ int FormMgrAdapter::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> 
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
     int callingUid = IPCSkeleton::GetCallingUid();
-    int32_t userId = GetCurrentUserId(callingUid);
-    bool isSelfDbFormId = (userId == dbRecord.userId) && ((std::find(dbRecord.formUserUids.begin(),
-        dbRecord.formUserUids.end(), callingUid) != dbRecord.formUserUids.end()) ? true : false);
+    bool isSelfDbFormId = ((std::find(dbRecord.formUserUids.begin(), dbRecord.formUserUids.end(),
+        callingUid) != dbRecord.formUserUids.end()) ? true : false);
     if (!isSelfDbFormId) {
         HILOG_ERROR("%{public}s, not self form:%{public}" PRId64 "", __func__, formId);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
@@ -284,6 +295,7 @@ ErrCode FormMgrAdapter::HandleReleaseForm(const int64_t formId, const sptr<IRemo
  */
 ErrCode FormMgrAdapter::HandleDeleteForm(const int64_t formId, const sptr<IRemoteObject> &callerToken)
 {
+    HILOG_DEBUG("called.");
     FormRecord dbRecord;
     if (FormDbCache::GetInstance().GetDBRecord(formId, dbRecord) != ERR_OK) {
         HILOG_ERROR("%{public}s, not exist such db form:%{public}" PRId64 "", __func__, formId);
@@ -298,7 +310,7 @@ ErrCode FormMgrAdapter::HandleDeleteForm(const int64_t formId, const sptr<IRemot
 #endif
     int callingUid = IPCSkeleton::GetCallingUid();
     int32_t userId = GetCurrentUserId(callingUid);
-    bool isSelfDbFormId = (userId == dbRecord.userId) && ((std::find(dbRecord.formUserUids.begin(),
+    bool isSelfDbFormId = ((std::find(dbRecord.formUserUids.begin(),
         dbRecord.formUserUids.end(), callingUid) != dbRecord.formUserUids.end()) ? true : false);
     if (!isSelfDbFormId) {
         HILOG_ERROR("%{public}s, not self form:%{public}" PRId64 ", callingUid:%{public}d",
@@ -336,8 +348,7 @@ ErrCode FormMgrAdapter::HandleDeleteTempForm(const int64_t formId, const sptr<IR
     bool isFormRecExist = FormDataMgr::GetInstance().GetFormRecord(formId, record);
     bool isSelfTempFormId = false;
     if (isFormRecExist && record.formTempFlag) {
-        int32_t userId = GetCurrentUserId(uid);
-        isSelfTempFormId = (userId == record.userId) && ((std::find(record.formUserUids.begin(),
+        isSelfTempFormId = ((std::find(record.formUserUids.begin(),
             record.formUserUids.end(), uid) != record.formUserUids.end()) ? true : false);
     }
     if (!isSelfTempFormId) {
@@ -459,14 +470,6 @@ int FormMgrAdapter::UpdateForm(const int64_t formId,
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
-    // check bundle uid for permission
-    int32_t callingUid = IPCSkeleton::GetCallingUid();
-    int32_t userId = GetCurrentUserId(callingUid);
-    if (userId != formRecord.userId && !checkFormHostHasSaUid(formRecord)) {
-        HILOG_ERROR("%{public}s error, not under current user, formId:%{public}" PRId64 ".", __func__, matchedFormId);
-        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
-    }
-
     // check bundleName match
     if (formRecord.bundleName.compare(bundleName) != 0) {
         HILOG_ERROR("%{public}s error, not match bundleName:%{public}s.", __func__, bundleName.c_str());
@@ -518,9 +521,8 @@ int FormMgrAdapter::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
 
     HILOG_INFO("%{public}s, find target client.", __func__);
     Want reqWant(want);
-    int callingUid = IPCSkeleton::GetCallingUid();
-    int32_t userId = GetCurrentUserId(callingUid);
-    reqWant.SetParam(Constants::PARAM_FORM_USER_ID, userId);
+    int32_t currentActiveUserId = FormUtil::GetCurrentAccountId();
+    reqWant.SetParam(Constants::PARAM_FORM_USER_ID, currentActiveUserId);
     return FormProviderMgr::GetInstance().RefreshForm(matchedFormId, reqWant, true);
 }
 
@@ -819,6 +821,7 @@ ErrCode FormMgrAdapter::GetFormConfigInfo(const Want &want, FormItemInfo &formCo
 ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
     const sptr<IRemoteObject> &callerToken, const WantParams &wantParams, FormJsInfo &formInfo)
 {
+    HILOG_INFO("called.");
     int64_t formId = FormDataMgr::GetInstance().PaddingUdidHash(info.GetFormId());
     FormRecord record;
     bool hasRecord = FormDataMgr::GetInstance().GetFormRecord(formId, record);
@@ -826,12 +829,7 @@ ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
         HILOG_ERROR("%{public}s, addForm can not acquire temp form when select form id", __func__);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-
-    // get current userId
-    int callingUid = IPCSkeleton::GetCallingUid();
-    int32_t currentUserId = GetCurrentUserId(callingUid);
-    if (hasRecord && (record.userId == currentUserId
-        || FormDataMgr::GetInstance().IsCallingUidValid(record.formUserUids))) {
+    if (hasRecord) {
         if (!info.IsMatch(record)) {
             HILOG_ERROR("%{public}s, formId and item info not match:%{public}" PRId64 "", __func__, formId);
             return ERR_APPEXECFWK_FORM_CFG_NOT_MATCH_ID;
@@ -842,8 +840,7 @@ ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
     // find in db but not in cache
     FormRecord dbRecord;
     ErrCode getDbRet = FormDbCache::GetInstance().GetDBRecord(formId, dbRecord);
-    if (getDbRet == ERR_OK && (dbRecord.userId == currentUserId
-        || FormDataMgr::GetInstance().IsCallingUidValid(dbRecord.formUserUids))) {
+    if (getDbRet == ERR_OK) {
         return AddNewFormRecord(info, formId, callerToken, wantParams, formInfo);
     }
 
@@ -1340,7 +1337,7 @@ int FormMgrAdapter::SetNextRefreshTime(const int64_t formId, const int64_t nextT
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
-    bool isSelfFormId = (userId == formRecord.userId) || checkFormHostHasSaUid(formRecord);
+    bool isSelfFormId = (userId == formRecord.providerUserId) || checkFormHostHasSaUid(formRecord);
     if (!isSelfFormId) {
         HILOG_ERROR("%{public}s, not self form:%{public}" PRId64 "", __func__, formId);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
@@ -1367,13 +1364,13 @@ ErrCode FormMgrAdapter::CheckPublishForm(Want &want)
         HILOG_ERROR("%{public}s fail, failed to get IBundleMgr.", __func__);
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
-    if (!CheckIsSystemAppByBundleName(iBundleMgr, bundleName)) {
-        HILOG_ERROR("Only system app can request publish form.");
+    if (!IsValidPublishEvent(iBundleMgr, bundleName, want)) {
+        HILOG_ERROR("Invalid publish form event.");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
 
-    if (bundleName != want.GetElement().GetBundleName()) {
-        HILOG_WARN("The bundleName in want does not match the bundleName of current calling user.");
+    if (want.GetElement().GetBundleName().empty()) {
+        HILOG_WARN("The bundleName is empty, set to current calling bundle.");
         want.SetBundle(bundleName);
     }
 
@@ -1392,7 +1389,8 @@ ErrCode FormMgrAdapter::CheckPublishForm(Want &want)
     std::string abilityName = want.GetElement().GetAbilityName();
     std::string formName = want.GetStringParam(AppExecFwk::Constants::PARAM_FORM_NAME_KEY);
     std::vector<FormInfo> formInfos {};
-    ErrCode errCode = FormInfoMgr::GetInstance().GetFormsInfoByModule(bundleName, moduleName, formInfos);
+    ErrCode errCode = FormInfoMgr::GetInstance()
+        .GetFormsInfoByModule(want.GetElement().GetBundleName(), moduleName, formInfos);
     if (errCode != ERR_OK) {
         HILOG_ERROR("%{public}s error, failed to get forms info.", __func__);
         return errCode;
@@ -1411,37 +1409,28 @@ ErrCode FormMgrAdapter::CheckPublishForm(Want &want)
 
 ErrCode FormMgrAdapter::QueryPublishFormToHost(Want &want)
 {
-    /* Query the highest priority ability or extension ability for publishing form */
+    int8_t hostId = want.GetIntParam(Constants::PARAM_FORM_HOST_ID,
+        static_cast<int8_t>(HostId::HOST_ID_LAUNCHER));
+    auto hostIter = HOST_MAP.find(static_cast<HostId>(hostId));
+    if (hostIter == HOST_MAP.end()) {
+        HILOG_ERROR("%{public}s, host id : %{public}d is invalid", __func__, hostId);
+        return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
+    }
+    auto element = hostIter->second;
+    want.SetElement(element);
+
     AppExecFwk::AbilityInfo abilityInfo;
-    AppExecFwk::ExtensionAbilityInfo extensionAbilityInfo;
+    AppExecFwk::ExtensionAbilityInfo extensionInfo;
     int callingUid = IPCSkeleton::GetCallingUid();
     int32_t userId = GetCurrentUserId(callingUid);
-    if (!FormBmsHelper::GetInstance().GetAbilityInfoByAction(
-        Constants::FORM_PUBLISH_ACTION, userId, abilityInfo, extensionAbilityInfo)) {
-        HILOG_ERROR("Failed to ImplicitQueryInfoByPriority for publishing form");
+    if (!FormBmsHelper::GetInstance().GetAbilityInfo(want, userId, abilityInfo, extensionInfo)) {
+        HILOG_ERROR("Failed to GetAbilityInfo for publishing form");
         return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
     }
-
-    if (abilityInfo.name.empty() && extensionAbilityInfo.name.empty()) {
-        HILOG_ERROR("Query highest priority ability failed, no form host ability found.");
+    if (abilityInfo.name.empty() && extensionInfo.name.empty()) {
+        HILOG_ERROR("Query ability failed, no form host ability found.");
         return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
     }
-
-    if (!abilityInfo.name.empty()) {
-        /* highest priority ability */
-        HILOG_INFO("Query highest priority ability success. bundleName: %{public}s, ability:%{public}s",
-            abilityInfo.bundleName.c_str(), abilityInfo.name.c_str());
-        want.SetParam(Constants::PARAM_BUNDLE_NAME_KEY, abilityInfo.bundleName);
-        want.SetParam(Constants::PARAM_ABILITY_NAME_KEY, abilityInfo.name);
-    } else {
-        /* highest priority extension ability */
-        HILOG_INFO("Query highest priority extension ability success. bundleName: %{public}s, ability:%{public}s",
-            extensionAbilityInfo.bundleName.c_str(), extensionAbilityInfo.name.c_str());
-        want.SetParam(Constants::PARAM_BUNDLE_NAME_KEY, extensionAbilityInfo.bundleName);
-        want.SetParam(Constants::PARAM_ABILITY_NAME_KEY, extensionAbilityInfo.name);
-    }
-    want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
-    want.SetAction(Constants::FORM_PUBLISH_ACTION);
     return ERR_OK;
 }
 
@@ -1461,13 +1450,14 @@ ErrCode FormMgrAdapter::RequestPublishFormToHost(Want &want)
     wantToHost.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, dimensionId);
     bool tempFormFlag = want.GetBoolParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
     wantToHost.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, tempFormFlag);
-    std::string bundleName = want.GetStringParam(Constants::PARAM_BUNDLE_NAME_KEY);
-    std::string abilityName = want.GetStringParam(Constants::PARAM_ABILITY_NAME_KEY);
-    wantToHost.SetElementName(bundleName, abilityName);
     int32_t userId = want.GetIntParam(Constants::PARAM_FORM_USER_ID, -1);
     wantToHost.SetAction(Constants::FORM_PUBLISH_ACTION);
 
-    return FormAmsHelper::GetInstance().StartAbility(wantToHost, userId);
+    ErrCode errCode = QueryPublishFormToHost(wantToHost);
+    if (errCode == ERR_OK) {
+        return FormAmsHelper::GetInstance().StartAbility(wantToHost, userId);
+    }
+    return errCode;
 }
 
 ErrCode FormMgrAdapter::RequestPublishForm(Want &want, bool withFormBindingData,
@@ -1479,10 +1469,10 @@ ErrCode FormMgrAdapter::RequestPublishForm(Want &want, bool withFormBindingData,
         return errCode;
     }
 
-    errCode = QueryPublishFormToHost(want);
-    if (errCode != ERR_OK) {
-        return errCode;
-    }
+    int callingUid = IPCSkeleton::GetCallingUid();
+    int32_t userId = GetCurrentUserId(callingUid);
+    want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
+    want.SetAction(Constants::FORM_PUBLISH_ACTION);
 
     // generate formId
     formId = FormDataMgr::GetInstance().GenerateFormId();
@@ -1501,6 +1491,7 @@ ErrCode FormMgrAdapter::RequestPublishForm(Want &want, bool withFormBindingData,
         errCode = FormDataMgr::GetInstance().AddRequestPublishFormInfo(formId, want, noFormBindingData);
     }
     if (errCode != ERR_OK) {
+        HILOG_ERROR("%{public}s fail, add form info error", __func__);
         return errCode;
     }
 
@@ -2074,6 +2065,38 @@ bool FormMgrAdapter::CheckIsSystemAppByBundleName(const sptr<IBundleMgr> &iBundl
 }
 
 /**
+ * @brief Check whether the caller for publish form is in the whitelist.
+ * @param iBundleMgr BundleManagerProxy
+ * @param bundleName BundleName of caller
+ * @param want want of target form
+ * @return Returns true if the caller is in the whitelist, false if not.
+ */
+bool FormMgrAdapter::IsValidPublishEvent(const sptr<IBundleMgr> &iBundleMgr,
+    const std::string &bundleName, const Want &want)
+{
+    if (!CheckIsSystemAppByBundleName(iBundleMgr, bundleName)) {
+        HILOG_ERROR("Only system app can request publish form.");
+        return false;
+    }
+    sptr<IEcologicalRuleManager> iErMgr = FormBmsHelper::GetInstance().GetEcologicalRuleMgr();
+    if (iErMgr != nullptr) {
+        // should update when AG supply the API
+        ExperienceRule rule;
+        ErmsCallerInfo callerInfo;
+        auto ret = iErMgr->IsSupportPublishForm(want, callerInfo, rule);
+        if (ret == ERR_OK) {
+            HILOG_DEBUG("%{public}s, check success from the erms", __func__);
+            return rule.isAllow;
+        } else {
+            HILOG_WARN("%{public}s, check failed from the erms", __func__);
+        }
+    }
+
+    // when AG supply the function "IsSupportPublishForm", the following code should remove.
+    return PUBLISH_FORM_ALLOWED_SET.find(bundleName) != PUBLISH_FORM_ALLOWED_SET.end();
+}
+
+/**
  * @brief if the ability have permission for keeping background running is true,
  * @param iBundleMgr BundleManagerProxy
  * @param bundleName BundleName
@@ -2222,7 +2245,7 @@ ErrCode FormMgrAdapter::AcquireFormStateCheck(const std::string &bundleName,
  * @return Returns ERR_OK on success, others on failure.
  */
 int FormMgrAdapter::AcquireFormState(const Want &want, const sptr<IRemoteObject> &callerToken,
-                                     FormStateInfo &stateInfo)
+    FormStateInfo &stateInfo)
 {
     if (callerToken == nullptr) {
         HILOG_ERROR("%{public}s, callerToken is nullptr", __func__);
@@ -2328,6 +2351,16 @@ int FormMgrAdapter::GetFormsInfoByModule(const std::string &bundleName,
 bool FormMgrAdapter::IsRequestPublishFormSupported()
 {
     /* Query the highest priority ability or extension ability for publishing form */
+    // when AG supply the function "IsSupportPublishForm", the following code should remove.
+    std::string bundleName;
+    if (!GetBundleName(bundleName)) {
+        HILOG_ERROR("%{public}s failed to get BundleName", __func__);
+        return false;
+    }
+    if (PUBLISH_FORM_ALLOWED_SET.find(bundleName) == PUBLISH_FORM_ALLOWED_SET.end()) {
+        HILOG_WARN("%{public}s, the caller not in the whitelist", __func__);
+        return false;
+    }
     AppExecFwk::AbilityInfo abilityInfo;
     AppExecFwk::ExtensionAbilityInfo extensionAbilityInfo;
     int callingUid = IPCSkeleton::GetCallingUid();
