@@ -78,6 +78,7 @@ group("unittest") {
     "unittest/fms_form_rdb_data_mgr_test:unittest",
     "unittest/fms_form_refresh_connection_test:unittest",
     "unittest/fms_form_render_connection_test:unittest",
+    "unittest/fms_form_render_mgr_test:unittest",
     "unittest/fms_form_render_proxy_test:unittest",
     "unittest/fms_form_render_stub_test:unittest",
     "unittest/fms_form_set_next_refresh_test:unittest",
