@@ -400,6 +400,8 @@ ohos_shared_library("formutil_napi") {
 
   configs = [ ":fmskit_config" ]
 
+  deps = [ "${form_fwk_path}:fmskit_native" ]
+
   external_deps = [
     "ability_runtime:abilitykit_native",
     "ability_runtime:runtime",

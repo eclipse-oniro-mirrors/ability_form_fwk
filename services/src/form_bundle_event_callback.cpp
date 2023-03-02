@@ -64,15 +64,6 @@ void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eve
             }
         };
         eventHandler_->PostTask(task);
-    } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_DATA_CLEARED) {
-        // bundle data cleared
-        auto task = [weakThis, bundleName, userId]() {
-            sptr<FormBundleEventCallback> sharedThis = weakThis.promote();
-            if (sharedThis) {
-                sharedThis->formEventHelper_.HandleBundleDataCleared(bundleName, userId);
-            }
-        };
-        eventHandler_->PostTask(task);
     }
 }
 

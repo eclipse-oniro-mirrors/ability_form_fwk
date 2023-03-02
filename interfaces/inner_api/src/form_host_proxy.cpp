@@ -211,5 +211,39 @@ void FormHostProxy::OnShareFormResponse(int64_t requestCode, int32_t result)
         HILOG_ERROR("failed to SendRequest: %{public}d", error);
     }
 }
+
+void FormHostProxy::OnError(int32_t errorCode, const std::string &errorMsg)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_ASYNC);
+
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("failed to write interface token.");
+        return;
+    }
+
+    if (!data.WriteInt32(errorCode)) {
+        HILOG_ERROR("failed to write errorCode.");
+        return;
+    }
+
+    if (!data.WriteString16(Str8ToStr16(errorMsg))) {
+        HILOG_ERROR("failed to write errorMsg.");
+        return;
+    }
+
+    auto remote = Remote();
+    if (remote == nullptr) {
+        HILOG_ERROR("remote is nullptr.");
+        return;
+    }
+    int error = remote->SendRequest(
+        static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_ERROR), 
+        data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("failed to SendRequest: %{public}d", error);
+    }
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

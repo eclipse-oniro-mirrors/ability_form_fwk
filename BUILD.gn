@@ -39,6 +39,7 @@ ohos_shared_library("libfms") {
     "services/src/form_acquire_connection.cpp",
     "services/src/form_acquire_state_connection.cpp",
     "services/src/form_ams_helper.cpp",
+    "services/src/form_background_connection.cpp",
     "services/src/form_batch_delete_connection.cpp",
     "services/src/form_bms_helper.cpp",
     "services/src/form_bundle_event_callback.cpp",
@@ -68,6 +69,8 @@ ohos_shared_library("libfms") {
     "services/src/form_rdb_data_mgr.cpp",
     "services/src/form_refresh_connection.cpp",
     "services/src/form_refresh_limiter.cpp",
+    "services/src/form_render_connection.cpp",
+    "services/src/form_render_mgr.cpp",
     "services/src/form_share_connection.cpp",
     "services/src/form_share_mgr.cpp",
     "services/src/form_supply_callback.cpp",
@@ -110,6 +113,7 @@ ohos_shared_library("libfms") {
     "form_fwk:form_manager",
     "hicollie_native:libhicollie",
     "hisysevent_native:libhisysevent",
+    "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "kv_store:distributeddata_inner",
@@ -169,13 +173,13 @@ ohos_shared_library("fmskit_native") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
 
-  deps = []
+  deps = [ ":form_manager" ]
 
   external_deps = [
     "ability_base:want",
     "c_utils:utils",
     "eventhandler:libeventhandler",
-    "form_fwk:form_manager",
+    "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
@@ -216,6 +220,8 @@ ohos_shared_library("form_manager") {
     "interfaces/inner_api/src/form_provider_info.cpp",
     "interfaces/inner_api/src/form_provider_proxy.cpp",
     "interfaces/inner_api/src/form_provider_stub.cpp",
+    "interfaces/inner_api/src/form_render_proxy.cpp",
+    "interfaces/inner_api/src/form_render_stub.cpp",
     "interfaces/inner_api/src/form_share_info.cpp",
     "interfaces/inner_api/src/form_supply_proxy.cpp",
     "interfaces/inner_api/src/form_supply_stub.cpp",
@@ -271,7 +277,10 @@ group("fms_innerkits_target") {
 }
 
 group("fms_target") {
-  deps = [ ":libfms" ]
+  deps = [
+    ":libfms",
+    "services/form_render_service:formrender_service_hap",
+  ]
 }
 
 group("fms_services_target") {

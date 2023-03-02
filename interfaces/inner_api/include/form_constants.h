@@ -23,6 +23,7 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace Constants {
     constexpr const char* PERMISSION_REQUIRE_FORM = "ohos.permission.REQUIRE_FORM";
+    constexpr const char* PERMISSION_KEEP_BACKGROUND_RUNNING = "ohos.permission.KEEP_BACKGROUND_RUNNING";
     constexpr const char* PARAM_FORM_IDENTITY_KEY = "ohos.extra.param.key.form_identity";
     constexpr const char* PARAM_FORM_CALLING_IDENTITY_KEY = "ohos.extra.param.key.form_calling_identity";
     constexpr const char* PARAM_MODULE_NAME_KEY = "ohos.extra.param.key.module_name";
@@ -42,7 +43,8 @@ namespace Constants {
     constexpr int32_t ORIENTATION_LANDSCAPE = 2;
     constexpr const char* PARAM_FORM_ABILITY_NAME_KEY = "abilityName";
     constexpr const char* PARAM_FORM_USER_ID = "ohos.extra.param.key.form_user_id";
-    constexpr const char* KEY_IS_TIMER = "isTimerRefresh";
+    constexpr const char* KEY_IS_TIMER = "isCountTimerRefresh";
+    constexpr const char* KEY_TIMER_REFRESH = "isTimerRefresh";
     constexpr const char* SYSTEM_PARAM_FORM_UPDATE_TIME = "persist.sys.fms.form.update.time";
     constexpr const char* SYSTEM_PARAM_FORM_REFRESH_MIN_TIME = "persist.sys.fms.form.refresh.min.time";
     constexpr const char* ACTION_UPDATEATTIMER = "form_update_at_timer";
@@ -121,6 +123,9 @@ namespace Constants {
 
     constexpr const char* PARAM_FORM_ADD_COUNT = "form.add.count";
 
+    constexpr const char* FORM_SUPPLY_UID = "form_supply_uid";
+    constexpr const char* FORM_RENDER_COMP_ID = "form_render_comp_id";
+
     const size_t MAX_LAYOUT = 8;
     constexpr int32_t MAX_FORMS = 512;
     constexpr int32_t MAX_RECORD_PER_APP = 256;
@@ -172,6 +177,11 @@ namespace Constants {
     constexpr const char* FORM_JOURNAL_MODE = "WAL";
     constexpr const char* FORM_SYNC_MODE = "FULL";
     constexpr int32_t FORM_RDB_VERSION = 1;
+    constexpr const char* FORM_RENDER_TYPE_KEY = "form_render_type";
+    constexpr int32_t RENDER_FORM = 0; // default value
+    constexpr int32_t UPDATE_RENDERING_FORM = 1;
+    constexpr const char* FORM_COMPILE_MODE_KEY = "form_compile_mode";
+    constexpr const char* FORM_COMP_ID = "ohos.extra.param.key.form_comp_id";
 }  // namespace Constants
 }  // namespace AppExecFwk
 }  // namespace OHOS

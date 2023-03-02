@@ -300,7 +300,7 @@ bool FormTimerMgr::AtTimerToIntervalTimer(int64_t formId, const FormTimerCfg &ti
     }
     targetItem.refreshTask.isUpdateAt = false;
     targetItem.refreshTask.period = timerCfg.updateDuration;
-    targetItem.refreshTask.refreshTime = INT64_MAX;
+    targetItem.refreshTask.refreshTime = FormUtil::GetCurrentNanosecond() / Constants::TIME_1000000;
     if (!AddIntervalTimer(targetItem.refreshTask)) {
         HILOG_ERROR("%{public}s, failed to add interval timer", __func__);
         return false;
@@ -811,7 +811,9 @@ void FormTimerMgr::OnIntervalTimeOut()
     int64_t currentTime = FormUtil::GetCurrentNanosecond() / Constants::TIME_1000000;
     for (auto &intervalPair : intervalTimerTasks_) {
         FormTimer &intervalTask = intervalPair.second;
-        if ((intervalTask.refreshTime == INT64_MAX || (currentTime - intervalTask.refreshTime) >= intervalTask.period ||
+        HILOG_INFO("intervalTask form id is %{public}" PRId64 ", period is %{public}" PRId64 "",
+            intervalTask.formId, intervalTask.period);
+        if (((currentTime - intervalTask.refreshTime) >= intervalTask.period ||
             std::abs((currentTime - intervalTask.refreshTime) - intervalTask.period) < Constants::ABS_TIME) &&
             intervalTask.isEnable && refreshLimiter_.IsEnableRefresh(intervalTask.formId)) {
             intervalTask.refreshTime = currentTime;
@@ -1233,6 +1235,9 @@ void FormTimerMgr::ExecTimerTask(const FormTimer &timerTask)
         AAFwk::Want want;
         if (timerTask.isCountTimer) {
             want.SetParam(Constants::KEY_IS_TIMER, true);
+        }
+        if (timerTask.isCountTimer || timerTask.isUpdateAt) {
+            want.SetParam(Constants::KEY_TIMER_REFRESH, true);
         }
         // multi user
         if (IsActiveUser(timerTask.userId)) {

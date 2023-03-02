@@ -25,6 +25,7 @@
 #include "form_acquire_connection.h"
 #include "form_acquire_state_connection.h"
 #include "form_ams_helper.h"
+#include "form_background_connection.h"
 #include "form_bms_helper.h"
 #include "form_cache_mgr.h"
 #include "form_cast_temp_connection.h"
@@ -39,11 +40,14 @@
 #include "form_provider_info.h"
 #include "form_provider_interface.h"
 #include "form_provider_mgr.h"
+#include "form_render_connection.h"
+#include "form_render_mgr.h"
 #include "form_share_mgr.h"
 #include "form_supply_callback.h"
 #include "form_timer_mgr.h"
 #include "form_util.h"
 #include "hilog_wrapper.h"
+#include "hitrace_meter.h"
 #include "if_system_ability_manager.h"
 #include "in_process_call_wrapper.h"
 #include "ipc_skeleton.h"
@@ -55,6 +59,7 @@ namespace AppExecFwk {
 namespace {
 constexpr int32_t CALLING_UID_TRANSFORM_DIVISOR = 200000;
 constexpr int32_t SYSTEM_UID = 1000;
+const std::string POINT_ETS = ".ets";
 } // namespace
 
 FormMgrAdapter::FormMgrAdapter()
@@ -83,7 +88,7 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
     bool tempFormFlag = want.GetBoolParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
     int callingUid = IPCSkeleton::GetCallingUid();
     int checkCode = 0;
-    if (tempFormFlag) {
+    if (tempFormFlag && !FormRenderMgr::GetInstance().IsRerenderForRenderServiceDied(formId)) {
         if (formId > 0) {
             HILOG_ERROR("%{public}s fail, temp form id is invalid, formId:%{public}" PRId64 "", __func__, formId);
             return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -121,6 +126,7 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
         HILOG_DEBUG("form in application");
         newWant.SetParam(Constants::PARAM_FORM_HOST_TOKEN, callerToken);
     }
+
     WantParams wantParams = newWant.GetParams();
     // share form
     if (formId == 0 && DelayedSingleton<FormShareMgr>::GetInstance()->IsShareForm(newWant)) {
@@ -157,6 +163,27 @@ int FormMgrAdapter::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
 }
 
 /**
+ * @brief Stop rendering form.
+ * @param formId The Id of the forms to delete.
+ * @param compId The compId of the forms to delete.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormMgrAdapter::StopRenderingForm(const int64_t formId, const std::string &compId)
+{
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    if (formId <= 0 || compId.empty()) {
+        HILOG_ERROR("%{public}s, deleteForm invalid param", __func__);
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    FormRecord record;
+    FormDataMgr::GetInstance().GetFormRecord(formId, record);
+    FormRenderMgr::GetInstance().StopRenderingForm(formId, record, compId);
+    return ERR_OK;
+}
+
+
+/**
  * @brief Release forms with formIds, send formIds to form Mgr service.
  * @param formId The Id of the forms to release.
  * @param callerToken Caller ability token.
@@ -177,6 +204,9 @@ int FormMgrAdapter::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> 
         // delete temp form if receive release form call
         return HandleDeleteTempForm(matchedFormId, callerToken);
     }
+    FormRecord record;
+    FormDataMgr::GetInstance().GetFormRecord(formId, record);
+    FormRenderMgr::GetInstance().StopRenderingForm(formId, record);
     FormRecord dbRecord;
     if (FormDbCache::GetInstance().GetDBRecord(matchedFormId, dbRecord) != ERR_OK) {
         HILOG_ERROR("%{public}s, not exist such db form:%{public}" PRId64 "", __func__, formId);
@@ -256,9 +286,9 @@ ErrCode FormMgrAdapter::HandleDeleteForm(const int64_t formId, const sptr<IRemot
         HILOG_ERROR("%{public}s, not exist such db form:%{public}" PRId64 "", __func__, formId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
-
     FormRecord record;
     FormDataMgr::GetInstance().GetFormRecord(formId, record);
+    FormRenderMgr::GetInstance().StopRenderingForm(formId, record);
 #ifdef DEVICE_USAGE_STATISTICS_ENABLE
     DeviceUsageStats::BundleActiveEvent event(record.bundleName, record.moduleName, record.formName,
         record.specification, record.formId, DeviceUsageStats::BundleActiveEvent::FORM_IS_REMOVED);
@@ -311,7 +341,7 @@ ErrCode FormMgrAdapter::HandleDeleteTempForm(const int64_t formId, const sptr<IR
         HILOG_ERROR("%{public}s, not self form:%{public}" PRId64 "", __func__, formId);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
-
+    FormRenderMgr::GetInstance().StopRenderingForm(formId, record);
     FormDataMgr::GetInstance().DeleteFormUserUid(formId, uid);
     if (!FormDataMgr::GetInstance().HasFormUserUids(formId)) {
         int result = FormProviderMgr::GetInstance().NotifyProviderFormDelete(formId, record);
@@ -446,8 +476,13 @@ int FormMgrAdapter::UpdateForm(const int64_t formId,
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    // update Form
-    return FormProviderMgr::GetInstance().UpdateForm(matchedFormId, formRecord, formProviderData);
+    if (formRecord.uiSyntax == FormType::ETS) {
+        WantParams wantParams;
+        return FormRenderMgr::GetInstance().UpdateRenderingForm(formId, formProviderData, wantParams, true);
+    } else {
+        // update Form
+       return FormProviderMgr::GetInstance().UpdateForm(matchedFormId, formRecord, formProviderData);
+    }
 }
 
 /**
@@ -787,7 +822,7 @@ ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
     int64_t formId = FormDataMgr::GetInstance().PaddingUdidHash(info.GetFormId());
     FormRecord record;
     bool hasRecord = FormDataMgr::GetInstance().GetFormRecord(formId, record);
-    if (hasRecord && record.formTempFlag) {
+    if (hasRecord && record.formTempFlag && !FormRenderMgr::GetInstance().IsRerenderForRenderServiceDied(formId)) {
         HILOG_ERROR("%{public}s, addForm can not acquire temp form when select form id", __func__);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
@@ -836,9 +871,15 @@ ErrCode FormMgrAdapter::AddExistFormRecord(const FormItemInfo &info, const sptr<
     }
 
     FormRecord newRecord(record);
+    std::string cacheData;
+    if (FormCacheMgr::GetInstance().GetData(formId, cacheData)) {
+        newRecord.formProviderInfo.SetFormDataString(cacheData);
+    }
+    FormRenderMgr::GetInstance().RenderForm(newRecord, wantParams, callerToken);
     if (newRecord.needRefresh || !FormCacheMgr::GetInstance().IsExist(newRecord.formId)) {
         newRecord.isInited = false;
         FormDataMgr::GetInstance().SetFormCacheInited(formId, false);
+
         // acquire formInfo from provider
         ErrCode errorCode = AcquireProviderFormInfoAsync(formId, info, wantParams);
         if (errorCode != ERR_OK) {
@@ -855,7 +896,6 @@ ErrCode FormMgrAdapter::AddExistFormRecord(const FormItemInfo &info, const sptr<
     }
 
     // create form info for js
-    std::string cacheData;
     if (FormCacheMgr::GetInstance().GetData(formId, cacheData)) {
         formInfo.formData = cacheData;
     }
@@ -920,6 +960,8 @@ ErrCode FormMgrAdapter::AddNewFormRecord(const FormItemInfo &info, const int64_t
     int32_t currentUserId = GetCurrentUserId(callingUid);
     // allot form record
     FormRecord formRecord = FormDataMgr::GetInstance().AllotFormRecord(newInfo, callingUid, currentUserId);
+
+    FormRenderMgr::GetInstance().RenderForm(formRecord, wantParams, callerToken);
 
     // acquire formInfo from provider
     ErrCode errorCode = AcquireProviderFormInfoAsync(formId, newInfo, wantParams);
@@ -1118,7 +1160,7 @@ ErrCode FormMgrAdapter::GetFormInfo(const AAFwk::Want &want, FormInfo &formInfo)
     std::string formName = want.GetStringParam(Constants::PARAM_FORM_NAME_KEY);
     if (formName.empty()) {
         for (const auto &form : formInfos) {
-            if (form.defaultFlag) {
+            if (form.defaultFlag && form.abilityName == abilityName) {
                 formInfo = form;
                 formInfo.moduleName = moduleName;
                 HILOG_DEBUG("GetFormInfo end.");
@@ -1127,7 +1169,7 @@ ErrCode FormMgrAdapter::GetFormInfo(const AAFwk::Want &want, FormInfo &formInfo)
         }
     } else  {
         for (const auto &form : formInfos) {
-            if (form.name == formName) {
+            if (form.name == formName && form.abilityName == abilityName) {
                 formInfo = form;
                 formInfo.moduleName = moduleName;
                 HILOG_DEBUG("GetFormInfo end.");
@@ -1135,7 +1177,8 @@ ErrCode FormMgrAdapter::GetFormInfo(const AAFwk::Want &want, FormInfo &formInfo)
             }
         }
     }
-    HILOG_ERROR("failed to get form info failed.");
+    HILOG_ERROR("failed to get form info failed. ability name is %{public}s, form name is %{public}s",
+        abilityName.c_str(), formName.c_str());
     return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
 }
 /**
@@ -1226,9 +1269,14 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
     itemInfo.SetScheduledUpdateTime(formInfo.scheduledUpdateTime);
     itemInfo.SetJsComponentName(formInfo.jsComponentName);
     itemInfo.SetFormVisibleNotify(formInfo.formVisibleNotify);
-    itemInfo.SetFormSrc(formInfo.src);
+    auto formSrc = formInfo.src;
+    if (formSrc.rfind(POINT_ETS) == formSrc.size() - POINT_ETS.size()) {
+        formSrc.erase(formSrc.end() - POINT_ETS.size(), formSrc.end());
+    }
+    itemInfo.SetFormSrc(formSrc);
     itemInfo.SetFormWindow(formInfo.window);
     itemInfo.SetType(formInfo.type);
+    itemInfo.SetUiSyntax(formInfo.uiSyntax);
 
     for (const auto &abilityInfo : bundleInfo.abilityInfos) {
         if (abilityInfo.name == formInfo.abilityName) {
@@ -1553,6 +1601,10 @@ ErrCode FormMgrAdapter::AddRequestPublishForm(const FormItemInfo &formItemInfo, 
     int32_t currentUserId = GetCurrentUserId(callingUid);
     // allot form record
     FormRecord formRecord = FormDataMgr::GetInstance().AllotFormRecord(formItemInfo, callingUid, currentUserId);
+    if (formProviderData != nullptr) {
+        formRecord.formProviderInfo.SetFormData(*formProviderData);
+    }
+    FormRenderMgr::GetInstance().RenderForm(formRecord, want.GetParams()); // render for arkTs form
 
     // create form info for js
     FormDataMgr::GetInstance().CreateFormJsInfo(formId, formRecord, formJsInfo);
@@ -1785,6 +1837,58 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
     return ERR_OK;
 }
 
+/**
+ * @brief Process background router event.
+ * @param formId Indicates the unique id of form.
+ * @param want the want of the ability to start.
+ * @param callerToken Caller ability token.
+ * @return Returns true if execute success, false otherwise.
+ */
+int FormMgrAdapter::BackgroundEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    if (formId <= 0) {
+        HILOG_ERROR("%{public}s form formId or bundleName is invalid", __func__);
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+    FormRecord record;
+    bool bGetRecord = FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record);
+    if (!bGetRecord) {
+        HILOG_ERROR("%{public}s fail, not exist such form:%{public}" PRId64 "", __func__, matchedFormId);
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    }
+
+    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
+    if (iBundleMgr == nullptr) {
+        HILOG_ERROR("%{public}s fail, failed to get IBundleMgr.", __func__);
+        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
+    }
+
+    want.SetBundle(record.bundleName);
+    if (!CheckKeepBackgroundRunningPermission(iBundleMgr, record.bundleName)) {
+        HILOG_ERROR("The app does not have permission for keeping background running.");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    }
+
+    sptr<IAbilityConnection> formBackgroundConnection = new (std::nothrow) FormBackgroundConnection(formId,
+         record.bundleName, record.abilityName);
+    if (formBackgroundConnection == nullptr) {
+        HILOG_ERROR("formBackgroundConnection is null.");
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+    }
+
+    want.SetParam(Constants::PARAM_FORM_ID, formId);
+    int32_t result = IN_PROCESS_CALL(FormAmsHelper::GetInstance().GetAbilityManager()->StartAbilityByCall(want,
+        formBackgroundConnection, callerToken));
+    if (result != ERR_OK) {
+        HILOG_ERROR("Failed to StartAbilityByCall, result: %{public}d.", result);
+        return result;
+    }
+    return ERR_OK;
+}
+
 ErrCode FormMgrAdapter::HandleUpdateFormFlag(const std::vector<int64_t> &formIds,
     const sptr<IRemoteObject> &callerToken, bool flag, bool isOnlyEnableUpdate)
 {
@@ -1928,11 +2032,20 @@ bool FormMgrAdapter::UpdateProviderInfoToHost(const int64_t matchedFormId, const
 
     // If the form need refresh flag is true and form visibleType is FORM_VISIBLE, refresh the form host.
     if (formRecord.needRefresh && formVisibleType == Constants::FORM_VISIBLE) {
-        std::string cacheData;
-        // If the form has business cache, refresh the form host.
-        if (FormCacheMgr::GetInstance().GetData(matchedFormId, cacheData)) {
-            formRecord.formProviderInfo.SetFormDataString(cacheData);
-            formHostRecord.OnUpdate(matchedFormId, formRecord);
+        if (formRecord.isTimerRefresh) {
+            Want want;
+            int32_t userId = FormUtil::GetCurrentAccountId();
+            want.SetParam(Constants::KEY_IS_TIMER, true);
+            want.SetParam(Constants::KEY_TIMER_REFRESH, true);
+            want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
+            FormProviderMgr::GetInstance().RefreshForm(formRecord.formId, want, false);
+        } else {
+            std::string cacheData;
+            // If the form has business cache, refresh the form host.
+            if (FormCacheMgr::GetInstance().GetData(matchedFormId, cacheData)) {
+                formRecord.formProviderInfo.SetFormDataString(cacheData);
+                formHostRecord.OnUpdate(matchedFormId, formRecord);
+            }
         }
     }
     return true;
@@ -1963,6 +2076,29 @@ bool FormMgrAdapter::CheckIsSystemAppByBundleName(const sptr<IBundleMgr> &iBundl
     return true;
 }
 
+/**
+ * @brief if the ability have permission for keeping background running is true,
+ * @param iBundleMgr BundleManagerProxy
+ * @param bundleName BundleName
+ * @return Returns true if the ability have permission for keeping background running, false if not.
+ */
+bool FormMgrAdapter::CheckKeepBackgroundRunningPermission(const sptr<IBundleMgr> &iBundleMgr, const std::string &bundleName)
+{
+    BundleInfo bundleInfo;
+    if (FormBmsHelper::GetInstance().GetBundleInfoWithPermission(bundleName,
+        FormUtil::GetCurrentAccountId(), bundleInfo)) {
+        HILOG_DEBUG("%{public}s, get bundleInfo success", __func__);
+        auto item = find(bundleInfo.reqPermissions.begin(), bundleInfo.reqPermissions.end(), Constants::PERMISSION_KEEP_BACKGROUND_RUNNING);
+        if(item == bundleInfo.reqPermissions.end()) {
+            return false;
+        }
+    } else {
+        HILOG_WARN("%{public}s fail, can not get bundleInfo's uid", __func__);
+        return false;
+    }
+
+    return true;
+}
 /**
  * @brief Get current user ID.
  * @param callingUid calling Uid.

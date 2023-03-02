@@ -70,6 +70,14 @@ public:
     int DeleteForm(const int64_t formId, const sptr<IRemoteObject> &callerToken) override;
 
     /**
+     * @brief Stop rendering form.
+     * @param formId The Id of the forms to delete.
+     * @param compId The compId of the forms to delete.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int StopRenderingForm(const int64_t formId, const std::string &compId) override;
+
+    /**
      * @brief Release forms with formIds, send formIds to form manager service.
      * @param formId The Id of the forms to release.
      * @param callerToken Caller ability token.
@@ -188,6 +196,15 @@ public:
      * @return Returns true if execute success, false otherwise.
      */
     int RouterEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken) override;
+
+    /**
+     * @brief Process Background event.
+     * @param formId Indicates the unique id of form.
+     * @param want the want of the ability to start.
+     * @param callerToken Caller ability token.
+     * @return Returns true if execute success, false otherwise.
+     */
+    int BackgroundEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken) override;
 
     /**
      * @brief Check whether if the form manager service is ready.

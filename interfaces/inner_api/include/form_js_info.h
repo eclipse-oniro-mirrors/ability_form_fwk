@@ -46,6 +46,7 @@ struct FormJsInfo : public Parcelable {
     std::string versionName;
     uint32_t compatibleVersion = 0;
     FormType type = FormType::JS;
+    FormType uiSyntax = FormType::JS;
 
     bool ReadFromParcel(Parcel &parcel);
     virtual bool Marshalling(Parcel &parcel) const override;

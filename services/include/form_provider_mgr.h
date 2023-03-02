@@ -71,11 +71,11 @@ public:
      * @param formId The form id.
      * @param record Form data.
      * @param want The want of the form.
-     * @param isTimerRefresh The flag of timer refresh.
+     * @param isCountTimerRefresh The flag of timer refresh.
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode ConnectAmsForRefresh(const int64_t formId, const FormRecord &record, const Want &want,
-        const bool isTimerRefresh);
+        const bool isCountTimerRefresh);
     /**
      * @brief Notify provider form delete.
      * @param formId The form id.

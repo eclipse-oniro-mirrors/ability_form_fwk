@@ -167,6 +167,12 @@ public:
      */
     void GetFormHostRecord(const int64_t formId, std::vector<FormHostRecord> &formHostRecords) const;
     /**
+     * @brief Get form host remote object.
+     * @param formId The id of the form.
+     * @param formHostObjs The form host remote object.
+     */
+    void GetFormHostRemoteObj(const int64_t formId, std::vector<sptr<IRemoteObject>> &formHostObjs) const;
+    /**
      * @brief Delete form host record.
      * @param callerToken The client stub of the form host record.
      * @param formId The id of the form.
@@ -244,6 +250,14 @@ public:
      * @param countTimerRefresh true or false.
      */
     void SetCountTimerRefresh(const int64_t formId, const bool countTimerRefresh);
+
+    /**
+     * @brief Set timerRefresh for FormRecord.
+     * @param formId The Id of the form.
+     * @param timerRefresh true or false.
+     */
+    void SetTimerRefresh(const int64_t formId, const bool timerRefresh);
+
     /**
      * @brief Get updated form info.
      * @param record FormRecord.
@@ -491,6 +505,12 @@ public:
      * @return Returns true on success, false on failure.
      */
     bool SetRecordNeedFreeInstall(int64_t formId, bool isNeedFreeInstall);
+
+    /**
+     * @brief StopRenderingForm.
+     * @param formId The form id.
+     */
+    void StopRenderingForm(int32_t formId);
 private:
     /**
      * @brief Create form record.

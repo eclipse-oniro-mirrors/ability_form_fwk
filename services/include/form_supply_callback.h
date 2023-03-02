@@ -82,6 +82,22 @@ public:
      * @param hostToken Form host proxy object.
      */
     void HandleHostDied(const sptr<IRemoteObject> &hostToken);
+
+    /**
+     * @brief Accept form render task done from render service.
+     * @param formId The Id of the form.
+     * @param want input data.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t OnRenderTaskDone(int64_t formId, const Want &want) override;
+
+    /**
+     * @brief Accept form stop rendering task done from render service.
+     * @param formId The Id of the form.
+     * @param want input data.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t OnStopRenderingTaskDone(int64_t formId, const Want &want) override;
 private:
     /**
      * @brief check if disconnect ability or not.

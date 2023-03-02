@@ -22,6 +22,7 @@
 
 #include "form_callback_interface.h"
 #include "form_constants.h"
+#include "form_errors.h"
 #include "form_death_callback.h"
 #include "form_info.h"
 #include "form_js_info.h"
@@ -73,6 +74,14 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     int DeleteForm(const int64_t formId, const sptr<IRemoteObject> &callerToken);
+
+    /**
+     * @brief Stop rendering form.
+     * @param formId The Id of the forms to delete.
+     * @param compId The compId of the forms to delete.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int StopRenderingForm(const int64_t formId, const std::string &compId);
 
     /**
      * @brief Release forms with formIds, send formIds to form manager service.
@@ -165,6 +174,16 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     int RouterEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken);
+
+    /**
+     * @brief Process Background event.
+     * @param formId Indicates the unique id of form.
+     * @param want the want of the ability to start.
+     * @param callerToken Caller ability token.
+     * @return Returns true if execute success, false otherwise.
+     */
+    int BackgroundEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken);
+
     /**
      * @brief Get fms recoverStatus.
      *
@@ -362,6 +381,22 @@ public:
      * @return Return true if form manager service ready; returns false otherwise.
      */
     bool CheckFMSReady();
+
+    /**
+     * @brief Get external error from innerErrorCode.
+     * @param innerErrorCode innerErrorCode, get from FMS.
+     * @param externalErrorCode output externalErrorCode.
+     * @param errorMsg output errorMsg.
+     */
+    void GetExternalError(int32_t innerErrorCode, int32_t &externalErrorCode, std::string &errorMsg);
+
+    /**
+     * @brief Get external error message by external error code.
+     *
+     * @param externalErrorCode External error code.
+     * @return External error message.
+     */
+    std::string GetErrorMsgByExternalErrorCode(int32_t externalErrorCode);
 
 private:
     /**

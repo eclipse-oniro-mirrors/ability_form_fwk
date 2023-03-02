@@ -24,7 +24,6 @@
 #include "form_record.h"
 #include "form_state_info.h"
 #include "iremote_object.h"
-#include "form_record.h"
 #include "want.h"
 
 namespace OHOS {
@@ -178,6 +177,13 @@ public:
     * @param result The error code of this share.
     */
     void PostFormShareSendResponse(int64_t formShareRequestCode, int32_t result);
+
+    void PostRenderForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject);
+
+    void PostStopRenderingForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject);
+
+    void PostReloadForm(const std::vector<int64_t> &&formIds, const Want &want,
+        const sptr<IRemoteObject> &remoteObject);
 private:
     /**
      * @brief Acquire form data from form provider.
@@ -312,6 +318,17 @@ private:
     * @param result The error code of this share.
     */
     void FormShareSendResponse(int64_t formShareRequestCode, int32_t result);
+
+    /**
+    * @brief Post form share error code to form host(task).
+    * @param formShareRequestCode The request code for this share.
+    * @param result The error code of this share.
+    */
+    void RenderForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject);
+
+    void StopRenderingForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject);
+
+    void ReloadForm(const std::vector<int64_t> &&formIds, const Want &want, const sptr<IRemoteObject> &remoteObject);
 private:
     std::shared_ptr<FormEventHandler> eventHandler_ = nullptr;
 };

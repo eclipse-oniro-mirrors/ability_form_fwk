@@ -15,6 +15,9 @@
 #ifndef OHOS_FORM_FWK_FORM_TIMER_H
 #define OHOS_FORM_FWK_FORM_TIMER_H
 
+#include "form_constants.h"
+#include "form_util.h"
+
 namespace OHOS {
 namespace AppExecFwk {
 /**
@@ -54,7 +57,7 @@ public:
         min = -1;
         isUpdateAt = false;
         isCountTimer = false;
-        refreshTime = INT64_MAX;
+        refreshTime = FormUtil::GetCurrentNanosecond() / Constants::TIME_1000000;
         type = UpdateType::TYPE_INTERVAL_CHANGE;
     }
 
@@ -67,7 +70,7 @@ public:
         min = -1;
         isUpdateAt = false;
         isCountTimer = countTimer;
-        refreshTime = INT64_MAX;
+        refreshTime = FormUtil::GetCurrentNanosecond() / Constants::TIME_1000000;
         type = UpdateType::TYPE_INTERVAL_CHANGE;
     }
 
@@ -80,7 +83,7 @@ public:
         min = -1;
         isUpdateAt = false;
         isCountTimer = true;
-        refreshTime = INT64_MAX;
+        refreshTime = FormUtil::GetCurrentNanosecond() / Constants::TIME_1000000;
         type = UpdateType::TYPE_INTERVAL_CHANGE;
     }
 
@@ -93,7 +96,7 @@ public:
         period = -1;
         isUpdateAt = true;
         isCountTimer = false;
-        refreshTime = INT64_MAX;
+        refreshTime = FormUtil::GetCurrentNanosecond() / Constants::TIME_1000000;
         type = UpdateType::TYPE_INTERVAL_CHANGE;
     }
 

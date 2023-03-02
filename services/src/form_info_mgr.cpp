@@ -200,23 +200,18 @@ ErrCode BundleFormInfo::UpdateStaticFormInfos(int32_t userId)
         return errCode;
     }
 
-    for (auto item = formInfoStorages_.begin(); item != formInfoStorages_.end();) {
-        if (item->userId != userId) {
-            ++item;
-            continue;
-        }
-        for (auto &formInfo : item->formInfos) {
-            if (formInfo.isStatic) {
-                continue;
-            }
-            // add dynamic form info
-            formInfos.push_back(formInfo);
-        }
-        item = formInfoStorages_.erase(item);
-    }
-
     if (!formInfos.empty()) {
-        formInfoStorages_.emplace_back(userId, formInfos);
+        bool findUser = false;
+        for (auto item = formInfoStorages_.begin(); item != formInfoStorages_.end(); ++item) {
+            // Update all user's formInfos
+            HILOG_DEBUG("Update formInfos, user: %{public}d", item->userId);
+            item->formInfos = formInfos;
+            findUser |= (item->userId == userId);
+        }
+        if (!findUser) {
+            HILOG_DEBUG("Add new userId, user: %{public}d", userId);
+            formInfoStorages_.emplace_back(userId, formInfos);
+        }
     }
 
     return UpdateFormInfoStorageLocked();

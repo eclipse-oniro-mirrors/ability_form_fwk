@@ -111,6 +111,7 @@ public:
     MOCK_METHOD1(OnUninstall, void(const std::vector<int64_t> &formIds));
     MOCK_METHOD2(OnAcquireState, void(AppExecFwk::FormState state, const AAFwk::Want &want));
     MOCK_METHOD2(OnShareFormResponse, void(const int64_t requestCode, const int32_t result));
+    MOCK_METHOD2(OnError, void(int32_t errorCode, const std::string &errorMsg));
 };
 
 static sptr<BundleMgrService> bundleMgr_ = nullptr;

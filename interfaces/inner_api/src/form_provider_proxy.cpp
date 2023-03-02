@@ -29,7 +29,7 @@ int FormProviderProxy::AcquireProviderFormInfo(
     int error;
     MessageParcel data;
     MessageParcel reply;
-    MessageOption option;
+    MessageOption option(MessageOption::TF_ASYNC);
 
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("%{public}s, failed to write interface token", __func__);
@@ -73,7 +73,7 @@ int FormProviderProxy::NotifyFormDelete(const int64_t formId, const Want &want, 
     int error;
     MessageParcel data;
     MessageParcel reply;
-    MessageOption option;
+    MessageOption option(MessageOption::TF_ASYNC);
 
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("%{public}s, failed to write interface token", __func__);
@@ -118,7 +118,7 @@ int FormProviderProxy::NotifyFormsDelete(
     int error;
     MessageParcel data;
     MessageParcel reply;
-    MessageOption option;
+    MessageOption option(MessageOption::TF_ASYNC);
 
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("%{public}s, failed to write interface token", __func__);
@@ -161,7 +161,7 @@ int FormProviderProxy::NotifyFormUpdate(const int64_t formId, const Want &want, 
     int error;
     MessageParcel data;
     MessageParcel reply;
-    MessageOption option;
+    MessageOption option(MessageOption::TF_ASYNC);
 
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("%{public}s, failed to write interface token.", __func__);
@@ -209,7 +209,7 @@ int FormProviderProxy::EventNotify(const std::vector<int64_t> &formIds, const in
     int error;
     MessageParcel data;
     MessageParcel reply;
-    MessageOption option;
+    MessageOption option(MessageOption::TF_ASYNC);
 
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("%{public}s, failed to write interface token.", __func__);
@@ -263,7 +263,7 @@ int FormProviderProxy::NotifyFormCastTempForm(
     int error;
     MessageParcel data;
     MessageParcel reply;
-    MessageOption option;
+    MessageOption option(MessageOption::TF_ASYNC);
 
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("%{public}s, failed to write interface token", __func__);
@@ -331,7 +331,7 @@ int FormProviderProxy::FireFormEvent(
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     MessageParcel reply;
-    MessageOption option;
+    MessageOption option(MessageOption::TF_ASYNC);
     int error = Remote()->SendRequest(
         static_cast<uint32_t>(IFormProvider::Message::FORM_PROVIDER_EVENT_MESSAGE),
         data,
@@ -358,7 +358,7 @@ int FormProviderProxy::AcquireState(const Want &wantArg, const std::string &prov
     int error;
     MessageParcel data;
     MessageParcel reply;
-    MessageOption option;
+    MessageOption option(MessageOption::TF_ASYNC);
 
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("%{public}s, failed to write interface token", __func__);
@@ -428,7 +428,7 @@ int32_t FormProviderProxy::AcquireShareFormData(int64_t formId, const std::strin
 {
     MessageParcel data;
     MessageParcel reply;
-    MessageOption option;
+    MessageOption option(MessageOption::TF_ASYNC);
 
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("failed to write interface token.");

@@ -57,6 +57,14 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t HandleDeleteForm(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle StopRenderingForm message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t HandleStopRenderingForm(MessageParcel &data, MessageParcel &reply);
     /**
      * @brief Handle ReleaseForm message.
      * @param data input param.
@@ -159,6 +167,14 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t HandleRouterEvent(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle Background message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t HandleBackgroundEvent(MessageParcel &data, MessageParcel &reply);
 
     /**
      * @brief Handle DeleteInvalidForms message.

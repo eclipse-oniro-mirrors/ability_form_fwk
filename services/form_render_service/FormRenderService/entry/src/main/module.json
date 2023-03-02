@@ -1,0 +1,28 @@
+{
+  "module": {
+    "name": "entry",
+    "type": "entry",
+    "srcEntrance": "./ets/Application/MyAbilityStage.ts",
+    "description": "$string:entry_desc",
+    "deviceTypes": [
+      "default",
+      "tablet"
+    ],
+    "deliveryWithInstall": true,
+    "installationFree": false,
+    "pages": "$profile:main_pages",
+    "uiSyntax": "ets",
+    "abilities": [],
+    "extensionAbilities": [
+      {
+        "name": "ServiceExtension",
+        "icon": "$media:icon",
+        "description": "service",
+        "type": "service",
+        "visible": true,
+        "srcEntrance": "./ets/ServiceExtension/ServiceExtension.ts",
+        "uri": "ServiceExtension://com.ohos.formrenderservice.ServiceExtension"
+      }
+    ]
+  }
+}

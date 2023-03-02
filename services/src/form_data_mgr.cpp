@@ -22,6 +22,7 @@
 #include "form_constants.h"
 #include "form_mgr_errors.h"
 #include "form_provider_mgr.h"
+#include "form_render_mgr.h"
 #include "form_util.h"
 #include "hilog_wrapper.h"
 #include "ipc_skeleton.h"
@@ -169,6 +170,7 @@ FormRecord FormDataMgr::CreateFormRecord(const FormItemInfo &formInfo, const int
     newRecord.compatibleVersion = formInfo.GetCompatibleVersion();
     newRecord.formVisibleNotifyState = 0;
     newRecord.type = formInfo.GetType();
+    newRecord.uiSyntax = formInfo.GetUiSyntax();
     if (newRecord.isEnableUpdate) {
         ParseUpdateConfig(newRecord, formInfo);
     }
@@ -202,6 +204,7 @@ void FormDataMgr::CreateFormJsInfo(const int64_t formId, const FormRecord &recor
     formInfo.versionName = record.versionName;
     formInfo.compatibleVersion = record.compatibleVersion;
     formInfo.type = record.type;
+    formInfo.uiSyntax = record.uiSyntax;
 }
 /**
  * @brief Check temp form count is max.
@@ -441,7 +444,6 @@ bool FormDataMgr::HasFormUserUids(const int64_t formId) const
  * @brief Get form host record.
  * @param formId The id of the form.
  * @param formHostRecord The form host record.
- * @return Returns true if this function is successfully called; returns false otherwise.
  */
 void FormDataMgr::GetFormHostRecord(const int64_t formId, std::vector<FormHostRecord> &formHostRecords) const
 {
@@ -452,6 +454,16 @@ void FormDataMgr::GetFormHostRecord(const int64_t formId, std::vector<FormHostRe
         }
     }
     HILOG_DEBUG("%{public}s, get form host record by formId, size is %{public}zu", __func__, formHostRecords.size());
+}
+void FormDataMgr::GetFormHostRemoteObj(const int64_t formId, std::vector<sptr<IRemoteObject>> &formHostObjs) const
+{
+    std::lock_guard<std::recursive_mutex> lock(formHostRecordMutex_);
+    for (auto &record : clientRecords_) {
+        if (record.Contains(formId)) {
+            formHostObjs.emplace_back(record.GetFormHostClient());
+        }
+    }
+    HILOG_DEBUG("Get form host remote object by formId, size is %{public}zu", formHostObjs.size());
 }
 /**
  * @brief Delete form host record.
@@ -470,6 +482,7 @@ bool FormDataMgr::DeleteHostRecord(const sptr<IRemoteObject> &callerToken, const
             if (iter->IsEmpty()) {
                 iter->CleanResource();
                 iter = clientRecords_.erase(iter);
+                FormRenderMgr::GetInstance().CleanFormHost(callerToken);
             }
             break;
         }
@@ -553,6 +566,7 @@ void FormDataMgr::HandleHostDied(const sptr<IRemoteObject> &remoteHost)
             }
         }
     }
+    FormRenderMgr::GetInstance().CleanFormHost(remoteHost);
 }
 
 /**
@@ -726,6 +740,22 @@ void FormDataMgr::SetCountTimerRefresh(const int64_t formId, const bool countTim
 }
 
 /**
+ * @brief Set isTimerRefresh for FormRecord.
+ * @param formId The Id of the form.
+ * @param timerRefresh true or false.
+ */
+void FormDataMgr::SetTimerRefresh(const int64_t formId, const bool timerRefresh)
+{
+    std::lock_guard<std::recursive_mutex> lock(formRecordMutex_);
+    auto itFormRecord = formRecords_.find(formId);
+    if (itFormRecord == formRecords_.end()) {
+        HILOG_ERROR("%{public}s, form info not find", __func__);
+        return;
+    }
+    itFormRecord->second.isTimerRefresh = timerRefresh;
+}
+
+/**
  * @brief Get updated form.
  * @param record FormRecord.
  * @param targetForms Target forms.
@@ -822,6 +852,7 @@ void FormDataMgr::CleanRemovedFormRecords(const std::string &bundleName, std::se
     for (itFormRecord = formRecords_.begin(); itFormRecord != formRecords_.end();) {
         auto itForm = std::find(removedForms.begin(), removedForms.end(), itFormRecord->first);
         if (itForm != removedForms.end()) {
+            FormRenderMgr::GetInstance().StopRenderingForm(itFormRecord->first, itFormRecord->second);
             itFormRecord = formRecords_.erase(itFormRecord);
         } else {
             itFormRecord++;
@@ -845,6 +876,7 @@ void FormDataMgr::CleanRemovedTempFormRecords(const std::string &bundleName, con
             if ((itFormRecord->second.formTempFlag) && (bundleName == itFormRecord->second.bundleName)
                 && (userId == itFormRecord->second.userId)) {
                 removedTempForms.emplace(itFormRecord->second.formId);
+                FormRenderMgr::GetInstance().StopRenderingForm(itFormRecord->first, itFormRecord->second);
                 itFormRecord = formRecords_.erase(itFormRecord);
             } else {
                 itFormRecord++;
@@ -1441,10 +1473,22 @@ void FormDataMgr::BatchDeleteNoHostTempForms(int32_t callingUid, std::map<FormId
         FormProviderMgr::GetInstance().NotifyProviderFormsBatchDelete(bundleName, abilityName, formIdsSet);
         for (int64_t formId: formIdsSet) {
             foundFormsMap.emplace(formId, true);
+            StopRenderingForm(formId);
             DeleteFormRecord(formId);
             DeleteTempForm(formId);
         }
     }
+}
+
+/**
+ * @brief StopRenderingForm.
+ * @param formId The form id.
+ */
+void FormDataMgr::StopRenderingForm(int32_t formId)
+{
+    FormRecord formrecord;
+    GetFormRecord(formId, formrecord);
+    FormRenderMgr::GetInstance().StopRenderingForm(formId, formrecord);
 }
 
 /**

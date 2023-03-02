@@ -166,6 +166,25 @@ int FormMgrService::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
 }
 
 /**
+ * @brief Stop rendering form.
+ * @param formId The Id of the forms to delete.
+ * @param compId The compId of the forms to delete.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormMgrService::StopRenderingForm(const int64_t formId, const std::string &compId)
+{
+    ErrCode ret = CheckFormPermission();
+    if (ret != ERR_OK) {
+        HILOG_ERROR("%{public}s fail, delete form permission denied", __func__);
+        return ret;
+    }
+
+    return FormMgrAdapter::GetInstance().StopRenderingForm(formId, compId);
+}
+
+
+
+/**
  * @brief Release forms with formIds, send formIds to form manager service.
  * @param formId The Id of the forms to release.
  * @param callerToken Caller ability token.
@@ -401,6 +420,30 @@ int FormMgrService::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
     eventInfo.abilityName = want.GetElement().GetAbilityName();
     AAFwk::EventReport::SendFormEvent(AAFwk::EventName::ROUTE_EVENT_FORM, HiSysEventType::BEHAVIOR, eventInfo);
     return FormMgrAdapter::GetInstance().RouterEvent(formId, want, callerToken);
+}
+
+/**
+ * @brief Process Background event.
+ * @param formId Indicates the unique id of form.
+ * @param want the want of the ability to start.
+ * @param callerToken Caller ability token.
+ * @return Returns true if execute success, false otherwise.
+ */
+int FormMgrService::BackgroundEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    ErrCode ret = CheckFormPermission();
+    if (ret != ERR_OK) {
+        HILOG_ERROR("%{public}s fail, request form permission denied", __func__);
+        return ret;
+    }
+    AAFwk::EventInfo eventInfo;
+    eventInfo.userId = formId;
+    eventInfo.bundleName = want.GetElement().GetBundleName();
+    eventInfo.moduleName = want.GetStringParam(AppExecFwk::Constants::PARAM_MODULE_NAME_KEY);
+    eventInfo.abilityName = want.GetElement().GetAbilityName();
+    AAFwk::EventReport::SendFormEvent(AAFwk::EventName::BACKGROUND_EVENT_FORM, HiSysEventType::BEHAVIOR, eventInfo);
+    return FormMgrAdapter::GetInstance().BackgroundEvent(formId, want, callerToken);
 }
 
 /**

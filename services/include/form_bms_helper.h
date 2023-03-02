@@ -89,6 +89,15 @@ public:
     bool GetBundleInfo(const std::string &bundleName, int32_t userId, BundleInfo &bundleInfo);
 
     /**
+     * @brief Obtains the BundleInfo with Permission based on a given bundle name.
+     * @param bundleName Indicates the application bundle name to be queried.
+     * @param userId Indicates the user ID.
+     * @param bundleInfo Indicates the obtained BundleInfo object.
+     * @return Returns true if the BundleInfo is successfully obtained; returns false otherwise.
+     */
+    bool GetBundleInfoWithPermission(const std::string &bundleName, int32_t userId, BundleInfo &bundleInfo);
+
+    /**
      * @brief Get caller bundle name.
      * @param callerBundleName Indicates the caller bundle name.
      * @return Returns ERR_OK on success, others on failure.
@@ -102,6 +111,9 @@ public:
      * @return Returns the uid if successfully obtained; returns -1 otherwise.
      */
     int32_t GetUidByBundleName(const std::string &bundleName, int32_t userId);
+
+    bool GetCompileMode(const std::string &bundleName, const std::string &moduleName,
+        int32_t userId, int32_t &compileMode);
 
     static constexpr int64_t INVALID_UID = -1;
 private:

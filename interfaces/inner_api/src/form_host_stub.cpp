@@ -38,6 +38,8 @@ FormHostStub::FormHostStub()
         &FormHostStub::HandleOnAcquireState;
     memberFuncMap_[static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_SHARE_FORM_RESPONSE)] =
         &FormHostStub::HandleOnShareFormResponse;
+    memberFuncMap_[static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_ERROR)] =
+        &FormHostStub::HandleOnError;
 }
 
 FormHostStub::~FormHostStub()
@@ -158,6 +160,16 @@ int32_t FormHostStub::HandleOnShareFormResponse(MessageParcel &data, MessageParc
     auto result = data.ReadInt32();
 
     OnShareFormResponse(requestCode, result);
+    reply.WriteInt32(ERR_OK);
+    return ERR_OK;
+}
+
+int32_t FormHostStub::HandleOnError(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t errorCode = data.ReadInt32();
+    std::string errorMsg = Str16ToStr8(data.ReadString16());
+
+    OnError(errorCode, errorMsg);
     reply.WriteInt32(ERR_OK);
     return ERR_OK;
 }

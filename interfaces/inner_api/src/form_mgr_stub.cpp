@@ -90,6 +90,8 @@ FormMgrStub::FormMgrStub()
         &FormMgrStub::HandleGetFormsInfo;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_ROUTER_EVENT)] =
         &FormMgrStub::HandleRouterEvent;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_BACKGROUND_EVENT)] =
+        &FormMgrStub::HandleBackgroundEvent;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_FORM)] =
         &FormMgrStub::HandleRequestPublishForm;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_SHARE_FORM)] =
@@ -102,6 +104,8 @@ FormMgrStub::FormMgrStub()
         &FormMgrStub::HandleStartAbility;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_CHECK_FMS_READY)] =
         &FormMgrStub::HandleCheckFMSReady;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_STOP_RENDERING_FORM)] =
+        &FormMgrStub::HandleStopRenderingForm;
 }
 
 FormMgrStub::~FormMgrStub()
@@ -177,6 +181,20 @@ int32_t FormMgrStub::HandleDeleteForm(MessageParcel &data, MessageParcel &reply)
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t result = DeleteForm(formId, client);
+    reply.WriteInt32(result);
+    return result;
+}
+/**
+ * @brief handle DeleteFormByCompId message.
+ * @param data input param.
+ * @param reply output param.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int32_t FormMgrStub::HandleStopRenderingForm(MessageParcel &data, MessageParcel &reply)
+{
+    int64_t formId = data.ReadInt64();
+    std::string compId = data.ReadString();
+    int32_t result = StopRenderingForm(formId, compId);
     reply.WriteInt32(result);
     return result;
 }
@@ -498,6 +516,32 @@ int32_t FormMgrStub::HandleRouterEvent(MessageParcel &data, MessageParcel &reply
     }
 
     int32_t result = RouterEvent(formId, *want, client);
+    reply.WriteInt32(result);
+    return result;
+}
+
+/**
+ * @brief Handle Background message.
+ * @param data input param.
+ * @param reply output param.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int32_t FormMgrStub::HandleBackgroundEvent(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    int64_t formId = data.ReadInt64();
+    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
+    if (!want) {
+        HILOG_ERROR("%{public}s, failed to ReadParcelable<Want>", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    sptr<IRemoteObject> client = data.ReadRemoteObject();
+    if (client == nullptr) {
+        HILOG_ERROR("%{public}s, failed to get remote object.", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    int32_t result = BackgroundEvent(formId, *want, client);
     reply.WriteInt32(result);
     return result;
 }
