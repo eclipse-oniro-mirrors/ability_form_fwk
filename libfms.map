@@ -52,6 +52,8 @@
         *OHOS::AppExecFwk::FormRdbDataMgr*;
         *OHOS::AppExecFwk::FormRefreshConnection*;
         *OHOS::AppExecFwk::FormRefreshLimiter*;
+        *OHOS::AppExecFwk::FormRenderConnection*;
+        *OHOS::AppExecFwk::FormRenderMgr*;
         *OHOS::AppExecFwk::FormShareConnection*;
         *OHOS::AppExecFwk::FormShareMgr*;
         *OHOS::AppExecFwk::FormSupplyCallback*;
