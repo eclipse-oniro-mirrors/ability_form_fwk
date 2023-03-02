@@ -17,6 +17,7 @@
 
 #include "ability_manager_interface.h"
 #include "erms_mgr_interface.h"
+#include "erms_mgr_param.h"
 #include "form_mgr_errors.h"
 #include "hilog_wrapper.h"
 #include "if_system_ability_manager.h"

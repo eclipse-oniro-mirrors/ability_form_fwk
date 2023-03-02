@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "erms_mgr_interface.h"
+#include "erms_mgr_param.h"
 
 #include <string>
 #include <vector>

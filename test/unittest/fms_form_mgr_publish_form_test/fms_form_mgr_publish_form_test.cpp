@@ -143,7 +143,6 @@ void FmsFormMgrPublishFormTest::CreateProviderData()
     formInfoStorage.formInfos.push_back(formInfo);
     bundleFormInfo->formInfoStorages_.emplace_back(formInfoStorage);
     bundleFormInfoMap.emplace(FORM_PROVIDER_BUNDLE_NAME, bundleFormInfo);
-    bundleFormInfoMap.emplace(LAUNCHER_BUNDLE_NAME, bundleFormInfo);
 
     FormInfoMgr::GetInstance().bundleFormInfoMap_ = bundleFormInfoMap;
 }
@@ -213,13 +212,12 @@ HWTEST_F(FmsFormMgrPublishFormTest, publishForm_002, TestSize.Level0)
     FormBmsHelper::GetInstance().SetBundleManager(mockBms_);
     std::unique_ptr<FormProviderData> formBindingData;
     int64_t formId;
-    std::string bundleName = "com.ohos.launcher";
     MockGetAbilityInfo(true);
     MockGetAbilityInfoByAction(true);
     EXPECT_CALL(*mockBms_, GetBundleInfo(_, _, _, _)).Times(1).WillRepeatedly(Return(true));
     EXPECT_CALL(*mockBms_, CheckIsSystemAppByUid(_)).Times(2).WillRepeatedly(Return(true));
     EXPECT_CALL(*mockBms_, GetBundleNameForUid(_, _)).Times(1)
-    .WillRepeatedly(DoAll(SetArgReferee<1>(bundleName), Return(true)));
+        .WillRepeatedly(DoAll(SetArgReferee<1>(LAUNCHER_BUNDLE_NAME), Return(true)));
     EXPECT_EQ(ERR_OK,
         formyMgrServ_->RequestPublishForm(want, false, formBindingData, formId));
     mockBms_.clear();
