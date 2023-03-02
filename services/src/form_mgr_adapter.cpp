@@ -871,10 +871,14 @@ ErrCode FormMgrAdapter::AddExistFormRecord(const FormItemInfo &info, const sptr<
     }
 
     FormRecord newRecord(record);
+    std::string cacheData;
+    if (FormCacheMgr::GetInstance().GetData(formId, cacheData)) {
+        newRecord.formProviderInfo.SetFormDataString(cacheData);
+    }
+    FormRenderMgr::GetInstance().RenderForm(newRecord, wantParams, callerToken);
     if (newRecord.needRefresh || !FormCacheMgr::GetInstance().IsExist(newRecord.formId)) {
         newRecord.isInited = false;
         FormDataMgr::GetInstance().SetFormCacheInited(formId, false);
-        FormRenderMgr::GetInstance().RenderForm(newRecord, wantParams, callerToken);
 
         // acquire formInfo from provider
         ErrCode errorCode = AcquireProviderFormInfoAsync(formId, info, wantParams);
@@ -892,7 +896,6 @@ ErrCode FormMgrAdapter::AddExistFormRecord(const FormItemInfo &info, const sptr<
     }
 
     // create form info for js
-    std::string cacheData;
     if (FormCacheMgr::GetInstance().GetData(formId, cacheData)) {
         formInfo.formData = cacheData;
     }
