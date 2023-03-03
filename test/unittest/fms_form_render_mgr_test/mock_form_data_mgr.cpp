@@ -33,5 +33,10 @@ bool FormDataMgr::GetFormRecord(const int64_t formId, FormRecord &formRecord) co
     formRecord = formRecord_;
     return g_mockGetFormRecordRet;
 }
+
+void FormDataMgr::GetFormHostRemoteObj(const int64_t formId, std::vector<sptr<IRemoteObject>> &formHostObjs) const
+{
+    formHostObjs.emplace_back(nullptr);
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS
