@@ -21,15 +21,15 @@
 #include "form_mgr_service.h"
 #include "tokenid_kit.h"
 #undef private
-#include "mock_form_provider_client.h"
 #include "hilog_wrapper.h"
+#include "mock_form_provider_client.h"
 
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::AppExecFwk;
 
-extern void MockGetTokenTypeFlag(int32_t mockRet);
 extern void MockGetCallingUid(int32_t mockRet);
+extern void MockGetTokenTypeFlag(int32_t mockRet);
 extern void MockVerifyAccessToken(int32_t mockRet);
 
 namespace {
@@ -102,7 +102,8 @@ HWTEST_F(FmsFormMgrServicePermissionVerifyTest, FmsFormMgrServicePermissionVerif
 /**
  * @tc.number: FmsFormMgrServicePermissionVerifyTest_0004
  * @tc.name: test VerifyCallingPermission function.
- * @tc.desc: Verify that the VerifyCallingPermission interface is called without permission and the return value is false.
+ * @tc.desc: Verify that the VerifyCallingPermission interface is called
+ *           without permission and the return value is false.
  */
 HWTEST_F(FmsFormMgrServicePermissionVerifyTest, FmsFormMgrServicePermissionVerifyTest_0004, TestSize.Level1)
 {

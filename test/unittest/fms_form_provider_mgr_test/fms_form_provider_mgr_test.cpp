@@ -288,7 +288,6 @@ HWTEST_F(FmsFormProviderMgrTest, RefreshForm_004, TestSize.Level1)
 #ifdef SUPPORT_POWER
     EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, FormProviderMgr::GetInstance().RefreshForm(formId, want, true));
 #endif
-
     GTEST_LOG_(INFO) << "fms_form_mgr_provider_test_007 end";
 }
 }

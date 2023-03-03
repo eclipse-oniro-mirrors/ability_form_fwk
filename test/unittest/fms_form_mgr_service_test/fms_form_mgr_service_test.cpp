@@ -684,7 +684,8 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0036, TestSize.Level1)
     std::vector<FormInfo> formInfos;
     MockIsSACall(false);
     MockIsSystemAppByFullTokenID(false);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, formMgrService.GetFormsInfoByModule(bundleName, moduleName, formInfos));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, formMgrService.GetFormsInfoByModule(bundleName,
+        moduleName, formInfos));
     GTEST_LOG_(INFO) << "FormMgrService_0036 end";
 }
 

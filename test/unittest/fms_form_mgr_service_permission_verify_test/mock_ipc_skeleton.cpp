@@ -15,8 +15,8 @@
 
 #include <gtest/gtest.h>
 
-#include "ipc_skeleton.h"
 #include "hilog_wrapper.h"
+#include "ipc_skeleton.h"
 
 namespace {
 int32_t g_GetCallingUid = 0;
