@@ -34,7 +34,6 @@
 #include "in_process_call_wrapper.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
-#include "os_account_manager.h"
 #include "permission_constants.h"
 #include "permission_verification.h"
 #include "system_ability_definition.h"
@@ -49,6 +48,8 @@ namespace {
 const int32_t MAIN_USER_ID = 100;
 
 constexpr int32_t SYSTEM_UID = 1000;
+
+constexpr int32_t GET_CALLING_UID_TRANSFORM_DIVISOR = 200000;
 }
 using namespace std::chrono;
 
@@ -1017,21 +1018,19 @@ bool FormMgrService::CheckAcrossLocalAccountsPermission() const
 {
     // checks whether the current user is inactive
     int callingUid = IPCSkeleton::GetCallingUid();
-    int32_t userId = -1;
-    if (AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(callingUid, userId) != ERR_OK) {
-        HILOG_ERROR("Get account local id from uid failed");
-        return false;
-    }
+    int32_t userId = callingUid / GET_CALLING_UID_TRANSFORM_DIVISOR;
     int32_t currentActiveUserId = FormUtil::GetCurrentAccountId();
     if (userId == currentActiveUserId) {
         return true;
     }
-    HILOG_DEBUG("currentActiveUserId: %{public}d, userId: %{public}d", currentActiveUserId, userId);
-    bool isCallingPermAccount =
-        VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_INTERACT_ACROSS_LOCAL_ACCOUNTS);
-    if (!isCallingPermAccount) {
-        HILOG_ERROR("Across local accounts permission failed.");
-        return false;
+    if (userId != currentActiveUserId) {
+        HILOG_DEBUG("currentActiveUserId: %{public}d, userId: %{public}d", currentActiveUserId, userId);
+        bool isCallingPermAccount =
+            VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_INTERACT_ACROSS_LOCAL_ACCOUNTS);
+        if (!isCallingPermAccount) {
+            HILOG_ERROR("Across local accounts permission failed.");
+            return false;
+        }
     }
     return true;
 }

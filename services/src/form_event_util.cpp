@@ -351,12 +351,12 @@ void FormEventUtil::HandleTimerUpdate(const int64_t formId,
             timerCfg.updateDuration, timerCfg.updateAtHour, timerCfg.updateAtMin);
         if (timerCfg.updateDuration > 0) {
             HILOG_INFO("%{public}s, add interval timer:%{public}" PRId64 "", __func__, timerCfg.updateDuration);
-            FormTimerMgr::GetInstance().AddFormTimer(formId, timerCfg.updateDuration, record.userId);
+            FormTimerMgr::GetInstance().AddFormTimer(formId, timerCfg.updateDuration, record.providerUserId);
         } else {
             HILOG_INFO("%{public}s, add at timer:%{public}d, %{public}d", __func__,
                 timerCfg.updateAtHour, timerCfg.updateAtMin);
             FormTimerMgr::GetInstance().AddFormTimer(formId, timerCfg.updateAtHour,
-                timerCfg.updateAtMin, record.userId);
+                timerCfg.updateAtMin, record.providerUserId);
         }
         return;
     }
