@@ -1020,9 +1020,6 @@ bool FormMgrService::CheckAcrossLocalAccountsPermission() const
     int callingUid = IPCSkeleton::GetCallingUid();
     int32_t userId = callingUid / GET_CALLING_UID_TRANSFORM_DIVISOR;
     int32_t currentActiveUserId = FormUtil::GetCurrentAccountId();
-    if (userId == currentActiveUserId) {
-        return true;
-    }
     if (userId != currentActiveUserId) {
         HILOG_DEBUG("currentActiveUserId: %{public}d, userId: %{public}d", currentActiveUserId, userId);
         bool isCallingPermAccount =
