@@ -97,6 +97,18 @@ public:
     {
         return {};
     };
+    int32_t GetRunningSystemProcess(std::list<SystemProcessInfo>& systemProcessInfos) override
+    {
+        return {};
+    };
+    int32_t SubscribeSystemProcess(const sptr<ISystemProcessStatusChange>& listener) override
+    {
+        return {};
+    };
+    int32_t UnSubscribeSystemProcess(const sptr<ISystemProcessStatusChange>& listener) override
+    {
+        return {};
+    };
     int32_t CancelUnloadSystemAbility(int32_t systemAbilityId)
     {
         return {};
