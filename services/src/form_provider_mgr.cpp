@@ -117,7 +117,7 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
     int32_t currentActiveUserId = want.GetIntParam(Constants::PARAM_FORM_USER_ID, Constants::DEFAULT_PROVIDER_USER_ID);
     if (currentActiveUserId != record.providerUserId) {
         FormDataMgr::GetInstance().SetNeedRefresh(formId, true);
-        HILOG_ERROR("%{public}s, not current user, just set refresh flag, userId:%{public}d", 
+        HILOG_ERROR("%{public}s, not current user, just set refresh flag, userId:%{public}d",
             __func__, record.providerUserId);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
