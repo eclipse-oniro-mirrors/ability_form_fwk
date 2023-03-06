@@ -138,7 +138,7 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
 void FormRenderRecord::DeleteRenderRecord(int64_t formId, const std::string &compId, bool &isRenderGroupEmpty)
 {
     // Some resources need to be deleted in a JS thread
-    HILOG_INFO("Delete some resources formId: %{public}" PRId64 ", %{public}s", formId, compId.c_str());
+    HILOG_INFO("Delete some resources formId:%{public}s %{public}s", std::to_string(formId).c_str(), compId.c_str());
     if (eventHandler_ == nullptr) {
         HILOG_ERROR("eventHandler_ is nullptr");
         return;
