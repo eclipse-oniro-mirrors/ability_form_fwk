@@ -1002,12 +1002,12 @@ ErrCode FormMgrAdapter::AddFormTimer(const FormRecord &formRecord)
     }
     if (formRecord.updateDuration > 0) {
         bool ret = FormTimerMgr::GetInstance().AddFormTimer(formRecord.formId,
-            formRecord.updateDuration, formRecord.userId);
+            formRecord.updateDuration, formRecord.providerUserId);
         return ret ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     if (formRecord.updateAtHour >= 0 && formRecord.updateAtMin >= 0) {
         bool ret = FormTimerMgr::GetInstance().AddFormTimer(formRecord.formId,
-            formRecord.updateAtHour, formRecord.updateAtMin, formRecord.userId);
+            formRecord.updateAtHour, formRecord.updateAtMin, formRecord.providerUserId);
         return ret ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     HILOG_INFO("%{public}s no need add form timer.", __func__);
@@ -1895,9 +1895,7 @@ ErrCode FormMgrAdapter::HandleUpdateFormFlag(const std::vector<int64_t> &formIds
         for (const int64_t id : refreshForms) {
             HILOG_INFO("%{public}s, formRecord need refresh: %{public}" PRId64 "", __func__, id);
             Want want;
-            int callingUid = IPCSkeleton::GetCallingUid();
-            int32_t userId = GetCurrentUserId(callingUid);
-            want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
+            want.SetParam(Constants::PARAM_FORM_USER_ID, FormUtil::GetCurrentAccountId());
             FormProviderMgr::GetInstance().RefreshForm(id, want, false);
         }
     }
