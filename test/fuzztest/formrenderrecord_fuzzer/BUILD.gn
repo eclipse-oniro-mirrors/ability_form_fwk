@@ -1,0 +1,78 @@
+# Copyright (c) 2023 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+#####################hydra-fuzz###################
+import("//build/config/features.gni")
+import("//build/ohos.gni")
+import("//build/test.gni")
+import("//foundation/ability/form_fwk/form_fwk.gni")
+module_output_path = "form_fwk/formmgr"
+
+##############################fuzztest##########################################
+ohos_fuzztest("FormRenderRecordFuzzTest") {
+  module_out_path = module_output_path
+
+  fuzz_config_file = "${form_fwk_path}/test/fuzztest/formrenderrecord_fuzzer"
+
+  include_dirs = [
+    "${form_fwk_path}/interfaces/kits/native/include",
+    "${form_fwk_path}/services/form_render_service/include",
+    "${form_fwk_path}/services/include",
+  ]
+  cflags = [
+    "-g",
+    "-O0",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
+  sources = [ "formrenderrecord_fuzzer.cpp" ]
+
+  configs = [ "${ability_runtime_path}/interfaces/inner_api/ability_manager:ability_manager_public_config" ]
+
+  deps = [
+    "${ability_runtime_path}/interfaces/inner_api/app_manager:app_manager",
+    "${ability_runtime_path}/services/abilitymgr:abilityms_target",
+    "${form_fwk_path}:fms_target",
+    "${form_fwk_path}:fmskit_native",
+    "${form_fwk_path}/services/form_render_service:formrender",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_runtime:ability_deps_wrapper",
+    "ability_runtime:ability_manager",
+    "ability_runtime:abilitykit_native",
+    "ability_runtime:app_context",
+    "ability_runtime:service_extension",
+    "ability_runtime:wantagent_innerkits",
+    "ace_engine:ace_form_render",
+    "bundle_framework:appexecfwk_base",
+    "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "form_fwk:form_manager",
+    "hitrace_native:hitrace_meter",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+  ]
+}
+
+###############################################################################
+group("fuzztest") {
+  testonly = true
+  deps = []
+  deps += [
+    # deps file
+    ":FormRenderRecordFuzzTest",
+  ]
+}
+###############################################################################
