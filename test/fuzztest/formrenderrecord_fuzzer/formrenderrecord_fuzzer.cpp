@@ -66,7 +66,6 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formRenderRecord->CreateFormRendererGroupLock(formJsInfo, context, runtime);
     formRenderRecord->HandleDeleteInJsThread(formId, compId);
     formRenderRecord->HandleDestroyInJsThread();
-    formRenderRecord->ReleaseHapFileHandle();
     std::vector<int64_t> formIds;
     formIds.emplace_back(formId);
     formRenderRecord->ReloadFormRecord(std::move(formIds), want);
