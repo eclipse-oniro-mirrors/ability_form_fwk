@@ -158,7 +158,7 @@ ErrCode FormRenderMgr::UpdateRenderingForm(int64_t formId, const FormProviderDat
                 return ERR_APPEXECFWK_FORM_INVALID_PARAM;
             }
             want.SetParam(Constants::FORM_CONNECT_ID, connection->GetConnectId());
-            FormTaskMgr::GetInstance().PostRenderForm(formRecord, want, remoteObject);
+            FormTaskMgr::GetInstance().PostRenderForm(formRecord, std::move(want), remoteObject);
             return ERR_OK;
         }
     }
@@ -222,7 +222,7 @@ ErrCode FormRenderMgr::StopRenderingForm(int64_t formId, const FormRecord &formR
                 return ERR_APPEXECFWK_FORM_INVALID_PARAM;
             }
             want.SetParam(Constants::FORM_CONNECT_ID, connection->GetConnectId());
-            FormTaskMgr::GetInstance().PostStopRenderingForm(formRecord, want, remoteObject);
+            FormTaskMgr::GetInstance().PostStopRenderingForm(formRecord, std::move(want), remoteObject);
             return ERR_OK;
         }
     }
@@ -477,7 +477,7 @@ bool FormRenderMgr::IsRerenderForRenderServiceDied(int64_t formId)
 void FormRenderRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
     HILOG_ERROR("Recv FormRenderService death notice");
-    
+
     if (handler_) {
         handler_();
     }

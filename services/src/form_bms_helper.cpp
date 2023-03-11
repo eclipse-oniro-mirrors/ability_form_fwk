@@ -296,7 +296,7 @@ bool FormBmsHelper::GetCompileMode(const std::string &bundleName, const std::str
         return false;
     }
 
-    for (auto hapModuleInfo : bundleInfo.hapModuleInfos) {
+    for (const auto &hapModuleInfo : bundleInfo.hapModuleInfos) {
         if (!moduleName.empty() && hapModuleInfo.moduleName != moduleName) {
             continue;
         }

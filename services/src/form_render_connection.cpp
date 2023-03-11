@@ -61,7 +61,7 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
     want.SetParams(wantParams_);
     want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
     want.SetParam(Constants::FORM_COMPILE_MODE_KEY, compileMode);
-    FormTaskMgr::GetInstance().PostRenderForm(formRecord_, want, remoteObject);
+    FormTaskMgr::GetInstance().PostRenderForm(formRecord_, std::move(want), remoteObject);
 }
 
 void FormRenderConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
