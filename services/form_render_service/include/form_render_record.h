@@ -90,6 +90,7 @@ private:
             return reinterpret_cast<size_t>(remoteObj.GetRefPtr());
         }
     };
+    using IRemoteObjectSet = std::unordered_set<sptr<IRemoteObject>, RemoteObjHash>;
 
     bool CreateEventHandler(const std::string &bundleName);
 
@@ -121,7 +122,7 @@ private:
 
     // <formId, hostRemoteObj>
     std::mutex hostsMapMutex_;
-    std::unordered_map<int64_t, std::unordered_set<sptr<IRemoteObject>, RemoteObjHash>> hostsMapForFormId_;
+    std::unordered_map<int64_t, IRemoteObjectSet> hostsMapForFormId_;
     // <moduleName, Context>
     std::mutex contextsMapMutex_;
     std::unordered_map<std::string, std::shared_ptr<AbilityRuntime::Context>> contextsMapForModuleName_;

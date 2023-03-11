@@ -2,7 +2,6 @@
   "module": {
     "name": "entry",
     "type": "entry",
-    "srcEntrance": "./ets/Application/MyAbilityStage.ts",
     "description": "$string:entry_desc",
     "deviceTypes": [
       "default",
@@ -10,14 +9,14 @@
     ],
     "deliveryWithInstall": true,
     "installationFree": false,
-    "pages": "$profile:main_pages",
+    "pages": "",
     "uiSyntax": "ets",
     "abilities": [],
     "extensionAbilities": [
       {
         "name": "ServiceExtension",
-        "icon": "$media:icon",
         "description": "service",
+        "icon": "",
         "type": "service",
         "visible": true,
         "srcEntrance": "./ets/ServiceExtension/ServiceExtension.ts",
