@@ -679,8 +679,6 @@ void FormTaskMgr::RenderForm(const FormRecord &formRecord, const Want &want, con
     }
 
     FormJsInfo formJsInfo = CreateFormJsInfo(formRecord.formId, formRecord);
-    HILOG_INFO("data = %{public}s", formJsInfo.formData.c_str());
-
     int32_t error = remoteFormRender->RenderForm(formJsInfo, want, FormSupplyCallback::GetInstance());
     if (error != ERR_OK) {
         FormSupplyCallback::GetInstance()->RemoveConnection(connectId);

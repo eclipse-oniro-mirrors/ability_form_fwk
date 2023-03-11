@@ -129,8 +129,8 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
     std::lock_guard<std::mutex> lock(hostsMapMutex_);
     auto iter = hostsMapForFormId_.find(formJsInfo.formId);
     if (iter == hostsMapForFormId_.end()) {
-        hostsMapForFormId_.emplace(formJsInfo.formId, std::unordered_set<sptr<IRemoteObject>, RemoteObjHash>());
-        iter = hostsMapForFormId_.begin();
+        hostsMapForFormId_.emplace(formJsInfo.formId, IRemoteObjectSet({ hostRemoteObj }));
+        return ERR_OK;
     }
     iter->second.emplace(hostRemoteObj);
     return ERR_OK;
@@ -284,7 +284,7 @@ void FormRenderRecord::HandleUpdateInJsThread(const FormJsInfo &formJsInfo, cons
     auto renderType = want.GetIntParam(Constants::FORM_RENDER_TYPE_KEY, Constants::RENDER_FORM);
     HILOG_INFO("renderType is %{public}d.", renderType);
     if (renderType == Constants::RENDER_FORM) {
-        auto formRendererGroup = this->GetFormRendererGroup(formJsInfo, context, runtime_);
+        auto formRendererGroup = GetFormRendererGroup(formJsInfo, context, runtime_);
         if (formRendererGroup == nullptr) {
             HILOG_ERROR("Create formRendererGroup failed.");
             return;
@@ -293,8 +293,8 @@ void FormRenderRecord::HandleUpdateInJsThread(const FormJsInfo &formJsInfo, cons
         HILOG_INFO("AddForm formId:%{public}s", std::to_string(formJsInfo.formId).c_str());
     } else {
         std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
-        if (auto search = this->formRendererGroupMap_.find(formJsInfo.formId);
-            search != this->formRendererGroupMap_.end()) {
+        if (auto search = formRendererGroupMap_.find(formJsInfo.formId);
+            search != formRendererGroupMap_.end()) {
             auto group = search->second;
             group->UpdateForm(formJsInfo);
         }

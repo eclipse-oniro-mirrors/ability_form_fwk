@@ -239,7 +239,7 @@ void FormHostProxy::OnError(int32_t errorCode, const std::string &errorMsg)
         return;
     }
     int error = remote->SendRequest(
-        static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_ERROR), 
+        static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_ERROR),
         data, reply, option);
     if (error != ERR_OK) {
         HILOG_ERROR("failed to SendRequest: %{public}d", error);
