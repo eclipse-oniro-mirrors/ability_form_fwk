@@ -641,7 +641,7 @@ FormJsInfo FormTaskMgr::CreateFormJsInfo(const int64_t formId, const FormRecord 
     form.formWindow = record.formWindow;
     form.type = record.type;
     form.uiSyntax = record.uiSyntax;
-    HILOG_INFO("%{public}s end, jsPath: %{public}s, data: %{public}s", __func__,
+    HILOG_DEBUG("%{public}s end, jsPath: %{private}s, data: %{public}s", __func__,
         form.jsFormCodePath.c_str(), form.formData.c_str());
     return form;
 }
