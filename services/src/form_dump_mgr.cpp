@@ -98,7 +98,7 @@ void FormDumpMgr::DumpFormInfos(const std::vector<FormRecord> &formRecordInfos, 
         }
     }
 
-    HILOG_INFO("%{public}s success. Form infos:%{public}s", __func__, formInfos.c_str());
+    HILOG_DEBUG("%{public}s success. Form infos:%{private}s", __func__, formInfos.c_str());
 }
 /**
  * @brief Dump form infos.
@@ -111,7 +111,7 @@ void FormDumpMgr::DumpFormHostInfo(const FormHostRecord &formHostRecord, std::st
     formInfo += "  ================FormHostRecord=================\n";
     formInfo += "  callerUid [" + std::to_string(formHostRecord.GetCallerUid()) + "]\n";
     formInfo += "  hostBundleName [" + formHostRecord.GetHostBundleName() + "]\n";
-    HILOG_INFO("%{public}s success. Host Form infos:%{public}s", __func__, formInfo.c_str());
+    HILOG_DEBUG("%{public}s success. Host Form infos:%{private}s", __func__, formInfo.c_str());
 }
 
 /**
@@ -171,7 +171,7 @@ void FormDumpMgr::DumpFormInfo(const FormRecord &formRecordInfo, std::string &fo
         formInfo += "]\n" + LINE_SEPARATOR;
     }
 
-    HILOG_INFO("%{public}s success. Form infos:%{public}s", __func__, formInfo.c_str());
+    HILOG_DEBUG("%{public}s success. Form infos:%{private}s", __func__, formInfo.c_str());
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
