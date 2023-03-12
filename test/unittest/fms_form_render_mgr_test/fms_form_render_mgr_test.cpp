@@ -35,6 +35,7 @@ using namespace OHOS;
 using namespace OHOS::AppExecFwk;
 
 extern void MockGetFormRecord(bool mockRet);
+extern void MockConnectServiceAbility(bool mockRet);
 
 namespace {
 class FormRenderMgrTest : public testing::Test {
@@ -124,6 +125,7 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_003, TestSize.Level0)
     formRecord.formId = 1;
     WantParams wantParams;
     sptr<IRemoteObject> hostToken = nullptr;
+    MockConnectServiceAbility(true);
     EXPECT_EQ(
         ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED, formRenderMgr.RenderForm(formRecord, wantParams, hostToken));
     GTEST_LOG_(INFO) << "FormRenderMgrTest_003 end";
@@ -145,6 +147,7 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_004, TestSize.Level0)
     formRecord.formId = 1;
     WantParams wantParams;
     sptr<IRemoteObject> hostToken = nullptr;
+    MockConnectServiceAbility(true);
     EXPECT_EQ(
         ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED, formRenderMgr.RenderForm(formRecord, wantParams, hostToken));
     GTEST_LOG_(INFO) << "FormRenderMgrTest_004 end";
@@ -166,6 +169,7 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_005, TestSize.Level0)
     formRecord.formId = 1;
     WantParams wantParams;
     sptr<IRemoteObject> hostToken = new (std::nothrow) MockFormProviderClient();
+    MockConnectServiceAbility(true);
     EXPECT_EQ(
         ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED, formRenderMgr.RenderForm(formRecord, wantParams, hostToken));
     GTEST_LOG_(INFO) << "FormRenderMgrTest_005 end";
@@ -214,6 +218,7 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_007, TestSize.Level0)
     formRecord.uiSyntax = FormType::ETS;
     formRecord.formId = 1;
     sptr<IRemoteObject> hostToken = new (std::nothrow) MockFormProviderClient();
+    MockConnectServiceAbility(true);
     EXPECT_EQ(
         ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED, formRenderMgr.RenderForm(formRecord, wantParams, hostToken));
     GTEST_LOG_(INFO) << "FormRenderMgrTest_007 end";
