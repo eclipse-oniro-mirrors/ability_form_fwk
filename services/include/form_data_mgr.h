@@ -511,6 +511,12 @@ public:
      * @param formId The form id.
      */
     void StopRenderingForm(int32_t formId);
+
+    /**
+     * @brief update host forms
+     * @param updateFormIds
+     */
+    void UpdateHostForms(const std::vector<int64_t> &updateFormIds);
 private:
     /**
      * @brief Create form record.
@@ -601,6 +607,7 @@ private:
     template<typename T>
     bool GetAbilityFormInfo(const FormRecord &record, const std::vector<T> &abilities,
         AbilityFormInfo &abilityFormInfo);
+
 private:
     mutable std::recursive_mutex formRecordMutex_;
     mutable std::recursive_mutex formHostRecordMutex_;
