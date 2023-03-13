@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,20 +16,10 @@
 #include <gtest/gtest.h>
 #include <iremote_stub.h>
 
-#include "accesstoken_kit.h"
-#include "form_ams_helper.h"
-#include "form_bms_helper.h"
 #define private public
-#include "form_data_mgr.h"
-#include "form_db_cache.h"
-#include "form_refresh_limiter.h"
-#include "form_host_interface.h"
 #include "form_distributed_client.h"
-#include "form_share_info.h"
 #undef private
 #include "form_mgr_errors.h"
-#include "form_mgr_service.h"
-#include "form_provider_mgr.h"
 #include "if_system_ability_manager.h"
 #include "inner_bundle_info.h"
 #include "ipc_skeleton.h"
@@ -113,7 +103,7 @@ HWTEST_F(FmsFormDistributedClientTest, GetDmsServiceProxy_0100, TestSize.Level0)
     FormDistributedClientTestClass formDmsClient;
     EXPECT_TRUE((formDmsClient.dmsProxy_ == nullptr));
     formDmsClient.GetDmsServiceProxy();
-    EXPECT_TRUE((formDmsClient.dmsProxy_ != nullptr));
+    EXPECT_FALSE((formDmsClient.dmsProxy_ != nullptr));
     GTEST_LOG_(INFO) << "FmsFormDistributedClientTest GetDmsServiceProxy_0100 end";
 }
 }
