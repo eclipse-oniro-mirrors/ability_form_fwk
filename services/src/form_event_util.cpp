@@ -56,7 +56,7 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
     bool hasPackInfo = FormBmsHelper::GetInstance().GetBundlePackInfo(bundleName, userId, bundlePackInfo);
     std::vector<int64_t> removedForms;
     std::vector<int64_t> updatedForms;
-    for (const FormRecord& formRecord : formInfos) {
+    for (FormRecord& formRecord : formInfos) {
         HILOG_INFO("%{public}s, provider update, formName:%{public}s", __func__, formRecord.formName.c_str());
         int64_t formId = formRecord.formId;
         if (ProviderFormUpdated(formId, formRecord, targetForms)) {
@@ -175,8 +175,8 @@ void FormEventUtil::HandleFormHostDataCleared(const int uid)
     }
 }
 
-bool FormEventUtil::ProviderFormUpdated(const int64_t formId,
-    const FormRecord &formRecord, const std::vector<FormInfo> &targetForms)
+bool FormEventUtil::ProviderFormUpdated(const int64_t formId, FormRecord &formRecord,
+    const std::vector<FormInfo> &targetForms)
 {
     HILOG_INFO("%{public}s start", __func__);
     if (targetForms.empty()) {
@@ -190,9 +190,10 @@ bool FormEventUtil::ProviderFormUpdated(const int64_t formId,
         HILOG_INFO("%{public}s, no updated form.", __func__);
         return false;
     }
-
     HILOG_INFO("%{public}s, form is still exist,form:%{public}s", __func__, formRecord.formName.c_str());
+
     // update resource
+    UpateFormRecord(updatedForm, formRecord);
     FormDataMgr::GetInstance().SetNeedRefresh(formId, true);
     FormCacheMgr::GetInstance().DeleteData(formId);
     FormBmsHelper::GetInstance().NotifyModuleNotRemovable(formRecord.bundleName, formRecord.moduleName);
@@ -203,7 +204,7 @@ bool FormEventUtil::ProviderFormUpdated(const int64_t formId,
     return true;
 }
 
-bool FormEventUtil::ProviderFormUpdated(const int64_t formId, const FormRecord &formRecord,
+bool FormEventUtil::ProviderFormUpdated(const int64_t formId, FormRecord &formRecord,
     const BundlePackInfo &bundlePackInfo)
 {
     HILOG_INFO("%{public}s start", __func__);
@@ -214,6 +215,7 @@ bool FormEventUtil::ProviderFormUpdated(const int64_t formId, const FormRecord &
     }
 
     HILOG_INFO("%{public}s, form is still in package info, form:%{public}s", __func__, formRecord.formName.c_str());
+    UpateFormRecord(packForm, formRecord);
     FormDataMgr::GetInstance().SetRecordNeedFreeInstall(formId, true);
     FormTimerCfg timerCfg;
     GetTimerCfg(packForm.updateEnabled, packForm.updateDuration, packForm.scheduledUpdateTime, timerCfg);
@@ -462,5 +464,33 @@ void FormEventUtil::BatchDeleteNoHostDBForms(const int uid, std::map<FormIdKey, 
     }
 }
 
+void FormEventUtil::UpateFormRecord(const FormInfo &formInfo, FormRecord &formRecord)
+{
+    formRecord.formSrc = formInfo.src;
+    formRecord.uiSyntax = formInfo.uiSyntax;
+    formRecord.isEnableUpdate = formInfo.updateEnabled;
+    formRecord.updateDuration = formInfo.updateDuration;
+    std::vector<std::string> time = FormUtil::StringSplit(formInfo.scheduledUpdateTime, Constants::TIME_DELIMETER);
+    if (time.size() == Constants::UPDATE_AT_CONFIG_COUNT) {
+        formRecord.updateAtHour = std::stoi(time[0]);
+        formRecord.updateAtMin = std::stoi(time[1]);
+    }
+    HILOG_INFO("%{public}s formId:%{public}lld", __func__, formRecord.formId);
+    FormDataMgr::GetInstance().UpdateFormRecord(formRecord.formId, formRecord);
+}
+
+void FormEventUtil::UpateFormRecord(const AbilityFormInfo &formInfo, FormRecord &formRecord)
+{
+    formRecord.uiSyntax = (formInfo.type.compare("arkts") == 0 ? FormType::ETS : FormType::JS);
+    formRecord.isEnableUpdate = formInfo.updateEnabled;
+    formRecord.updateDuration = formInfo.updateDuration;
+    std::vector<std::string> time = FormUtil::StringSplit(formInfo.scheduledUpdateTime, Constants::TIME_DELIMETER);
+    if (time.size() == Constants::UPDATE_AT_CONFIG_COUNT) {
+        formRecord.updateAtHour = std::stoi(time[0]);
+        formRecord.updateAtMin = std::stoi(time[1]);
+    }
+    HILOG_INFO("%{public}s formId:%{public}lld", __func__, formRecord.formId);
+    FormDataMgr::GetInstance().UpdateFormRecord(formRecord.formId, formRecord);
+}
 } // namespace AppExecFwk
 } // namespace OHOS
