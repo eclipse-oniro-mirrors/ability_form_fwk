@@ -20,6 +20,7 @@
 #include <string>
 #include <thread>
 
+#include "access_token.h"
 #include "form_constants.h"
 #include "form_mgr_errors.h"
 #define private public
@@ -36,6 +37,7 @@ using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::AppExecFwk;
 
+extern void MockCheckAcrossLocalAccountsPermission(bool mockRet);
 extern void MockIsSACall(bool mockRet);
 extern void MockFMSIsSACall(bool mockRet);
 extern void MockFMSVerifyCallingPermission(bool mockRet);
@@ -43,6 +45,7 @@ extern void MockIsSystemAppByFullTokenID(bool mockRet);
 extern void MockVerifyCallingPermission(bool mockRet);
 extern void MockGetCurrentAccountIdRet(int32_t userId);
 extern void MockGetCallerBundleName(int32_t mockRet);
+extern void MockGetTokenTypeFlag(uint32_t mockRet);
 
 namespace {
 const std::string NAME_FORM_MGR_SERVICE = "FormMgrService";
@@ -668,25 +671,29 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0035, TestSize.Level1)
 
 /**
  * @tc.number: FormMgrService_0036
- * @tc.name: test GetFormsInfoByApp function.
- * @tc.desc: Verify that the GetFormsInfoByApp interface is called normally and the return value
- *           is ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS.
+ * @tc.name: test GetFormsInfoByModule function.
+ * @tc.desc: Verify that the GetFormsInfoByModule interface if the caller is not a system app
+ *           and the return value is ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS.
  */
 HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0036, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormMgrService_0036 start";
     FormMgrService formMgrService;
     std::string bundleName;
+    std::string moduleName;
     std::vector<FormInfo> formInfos;
     MockIsSACall(false);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, formMgrService.GetFormsInfoByApp(bundleName, formInfos));
+    MockIsSystemAppByFullTokenID(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, formMgrService.GetFormsInfoByModule(bundleName,
+        moduleName, formInfos));
     GTEST_LOG_(INFO) << "FormMgrService_0036 end";
 }
 
 /**
  * @tc.number: FormMgrService_0037
  * @tc.name: test GetFormsInfoByApp function.
- * @tc.desc: Verify that the GetFormsInfoByApp interface is called normally and the return value is ERR_OK.
+ * @tc.desc: Verify that the GetFormsInfoByApp interface if the caller do not have the across local
+ *           accounts permission and the return value is ERR_APPEXECFWK_FORM_PERMISSION_DENY.
  */
 HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0037, TestSize.Level1)
 {
@@ -694,87 +701,96 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0037, TestSize.Level1)
     FormMgrService formMgrService;
     std::string bundleName;
     std::vector<FormInfo> formInfos;
-    MockIsSACall(true);
-    EXPECT_EQ(ERR_OK, formMgrService.GetFormsInfoByApp(bundleName, formInfos));
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(true);
+    MockCheckAcrossLocalAccountsPermission(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY, formMgrService.GetFormsInfoByApp(bundleName, formInfos));
     GTEST_LOG_(INFO) << "FormMgrService_0037 end";
 }
 
 /**
  * @tc.number: FormMgrService_0038
- * @tc.name: test GetAllFormsInfo function.
- * @tc.desc: Verify that the GetAllFormsInfo interface is called normally and the return value
- *           is ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS.
+ * @tc.name: test GetFormsInfoByApp function.
+ * @tc.desc: Verify that the GetFormsInfoByApp interface is called normally and the return value is ERR_OK.
  */
 HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0038, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormMgrService_0038 start";
     FormMgrService formMgrService;
+    std::string bundleName;
     std::vector<FormInfo> formInfos;
-    MockIsSACall(false);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, formMgrService.GetAllFormsInfo(formInfos));
+    MockIsSACall(true);
+    MockFMSIsSACall(true);
+    MockCheckAcrossLocalAccountsPermission(true);
+    EXPECT_EQ(ERR_OK, formMgrService.GetFormsInfoByApp(bundleName, formInfos));
     GTEST_LOG_(INFO) << "FormMgrService_0038 end";
 }
 
 /**
  * @tc.number: FormMgrService_0039
  * @tc.name: test GetAllFormsInfo function.
- * @tc.desc: Verify that the GetAllFormsInfo interface is called normally and the return value is ERR_OK.
+ * @tc.desc: Verify that the GetFormsInfoByApp interface if the caller is not a system app
+ *           and the return value is ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS.
  */
 HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0039, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormMgrService_0039 start";
     FormMgrService formMgrService;
+    std::string bundleName;
     std::vector<FormInfo> formInfos;
-    MockIsSACall(true);
-    EXPECT_EQ(ERR_OK, formMgrService.GetAllFormsInfo(formInfos));
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, formMgrService.GetFormsInfoByApp(bundleName, formInfos));
     GTEST_LOG_(INFO) << "FormMgrService_0039 end";
 }
 
 /**
  * @tc.number: FormMgrService_0040
- * @tc.name: test CheckFormPermission function.
- * @tc.desc: Verify that the CheckFormPermission interface is called normally and the return value is ERR_OK.
+ * @tc.name: test GetAllFormsInfo function.
+ * @tc.desc: Verify that the GetAllFormsInfo interface if the caller do not have the across local
+ *           accounts permission and the return value is ERR_APPEXECFWK_FORM_PERMISSION_DENY.
  */
 HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0040, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormMgrService_0040 start";
     FormMgrService formMgrService;
+    std::vector<FormInfo> formInfos;
     MockIsSACall(true);
-    EXPECT_EQ(ERR_OK, formMgrService.CheckFormPermission());
+    MockCheckAcrossLocalAccountsPermission(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY, formMgrService.GetAllFormsInfo(formInfos));
     GTEST_LOG_(INFO) << "FormMgrService_0040 end";
 }
 
 /**
  * @tc.number: FormMgrService_0041
- * @tc.name: test CheckFormPermission function.
- * @tc.desc: Verify that the CheckFormPermission interface is called normally and the return value
- *           is ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS.
+ * @tc.name: test GetAllFormsInfo function.
+ * @tc.desc: Verify that the GetAllFormsInfo interface is called normally and the return value is ERR_OK.
  */
 HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0041, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormMgrService_0041 start";
     FormMgrService formMgrService;
-    MockFMSIsSACall(false);
-    MockIsSystemAppByFullTokenID(false);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, formMgrService.CheckFormPermission());
+    std::vector<FormInfo> formInfos;
+    MockIsSACall(true);
+    MockCheckAcrossLocalAccountsPermission(true);
+    EXPECT_EQ(ERR_OK, formMgrService.GetAllFormsInfo(formInfos));
     GTEST_LOG_(INFO) << "FormMgrService_0041 end";
 }
 
 /**
  * @tc.number: FormMgrService_0042
- * @tc.name: test CheckFormPermission function.
- * @tc.desc: Verify that the CheckFormPermission interface is called normally and the return value
- *           is ERR_APPEXECFWK_FORM_PERMISSION_DENY.
+ * @tc.name: test GetAllFormsInfo function.
+ * @tc.desc: Verify that the GetAllFormsInfo interface if the caller is not a system app
+ *           and the return value is ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS.
  */
 HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0042, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormMgrService_0042 start";
     FormMgrService formMgrService;
-
-    MockFMSIsSACall(false);
-    MockIsSystemAppByFullTokenID(true);
-    MockFMSVerifyCallingPermission(false);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY, formMgrService.CheckFormPermission());
+    std::vector<FormInfo> formInfos;
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, formMgrService.GetAllFormsInfo(formInfos));
     GTEST_LOG_(INFO) << "FormMgrService_0042 end";
 }
 
@@ -787,43 +803,128 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0043, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormMgrService_0043 start";
     FormMgrService formMgrService;
-    MockFMSIsSACall(false);
-    MockIsSystemAppByFullTokenID(true);
-    MockFMSVerifyCallingPermission(true);
+    MockIsSACall(true);
     EXPECT_EQ(ERR_OK, formMgrService.CheckFormPermission());
     GTEST_LOG_(INFO) << "FormMgrService_0043 end";
 }
 
 /**
  * @tc.number: FormMgrService_0044
- * @tc.name: test UpdateForm function.
- * @tc.desc: Verify that the UpdateForm interface is called normally and the return value
- *           is ERR_APPEXECFWK_FORM_COMMON_CODE.
+ * @tc.name: test CheckFormPermission function.
+ * @tc.desc: Verify that the CheckFormPermission interface if the caller is not a system app
+ *           and the return value is ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS.
  */
 HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0044, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormMgrService_0044 start";
     FormMgrService formMgrService;
-    constexpr int64_t formId = 1;
-    const FormProviderData formProviderData = {};
-    MockGetCallerBundleName(ERR_APPEXECFWK_FORM_COMMON_CODE);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrService.UpdateForm(formId, formProviderData));
+    MockFMSIsSACall(false);
+    MockIsSystemAppByFullTokenID(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, formMgrService.CheckFormPermission());
     GTEST_LOG_(INFO) << "FormMgrService_0044 end";
 }
 
 /**
  * @tc.number: FormMgrService_0045
- * @tc.name: test UpdateForm function.
- * @tc.desc: Verify that the UpdateForm interface is called normally and the return value is ERR_OK.
+ * @tc.name: test CheckFormPermission function.
+ * @tc.desc: Verify that the CheckFormPermission interface is called but does not have the calling
+ *           permission and the return value is ERR_APPEXECFWK_FORM_PERMISSION_DENY.
  */
 HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0045, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormMgrService_0045 start";
     FormMgrService formMgrService;
+
+    MockFMSIsSACall(false);
+    MockIsSystemAppByFullTokenID(true);
+    MockFMSVerifyCallingPermission(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY, formMgrService.CheckFormPermission());
+    GTEST_LOG_(INFO) << "FormMgrService_0045 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0046
+ * @tc.name: test CheckFormPermission function.
+ * @tc.desc: Verify that the CheckFormPermission interface is called normally and the return value is ERR_OK.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0046, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0046 start";
+    FormMgrService formMgrService;
+    MockFMSIsSACall(false);
+    MockIsSystemAppByFullTokenID(true);
+    MockFMSVerifyCallingPermission(true);
+    MockCheckAcrossLocalAccountsPermission(true);
+    EXPECT_EQ(ERR_OK, formMgrService.CheckFormPermission());
+    GTEST_LOG_(INFO) << "FormMgrService_0046 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0047
+ * @tc.name: test CheckFormPermission function.
+ * @tc.desc: Verify that the CheckFormPermission interface if the caller do not have the across local accounts
+ *           permission and the return value is ERR_APPEXECFWK_FORM_PERMISSION_DENY.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0047, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0047 start";
+    FormMgrService formMgrService;
+    MockFMSIsSACall(false);
+    MockVerifyCallingPermission(true);
+    MockIsSystemAppByFullTokenID(true);
+    MockCheckAcrossLocalAccountsPermission(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY, formMgrService.CheckFormPermission());
+    GTEST_LOG_(INFO) << "FormMgrService_0047 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0048
+ * @tc.name: test UpdateForm function.
+ * @tc.desc: Verify that the UpdateForm interface is called normally and the return value
+ *           is ERR_APPEXECFWK_FORM_COMMON_CODE.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0048, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0048 start";
+    FormMgrService formMgrService;
+    constexpr int64_t formId = 1;
+    const FormProviderData formProviderData = {};
+    MockGetCallerBundleName(ERR_APPEXECFWK_FORM_COMMON_CODE);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrService.UpdateForm(formId, formProviderData));
+    GTEST_LOG_(INFO) << "FormMgrService_0048 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0049
+ * @tc.name: test UpdateForm function.
+ * @tc.desc: Verify that the UpdateForm interface is called normally and the return value is ERR_OK.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0049, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0049 start";
+    FormMgrService formMgrService;
     constexpr int64_t formId = 1;
     const FormProviderData formProviderData = {};
     MockGetCallerBundleName(ERR_OK);
     EXPECT_EQ(ERR_OK, formMgrService.UpdateForm(formId, formProviderData));
-    GTEST_LOG_(INFO) << "FormMgrService_0045 end";
+    GTEST_LOG_(INFO) << "FormMgrService_0049 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0050
+ * @tc.name: test CheckFormPermission function.
+ * @tc.desc: Verify that the CheckFormPermission interface if the caller do not have the across local
+ *           accounts permission and the return value is ERR_APPEXECFWK_FORM_PERMISSION_DENY.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0050, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0050 start";
+    FormMgrService formMgrService;
+    MockFMSIsSACall(false);
+    MockIsSystemAppByFullTokenID(true);
+    MockVerifyCallingPermission(true);
+    MockCheckAcrossLocalAccountsPermission(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY, formMgrService.CheckFormPermission());
+    GTEST_LOG_(INFO) << "FormMgrService_0050 end";
 }
 }

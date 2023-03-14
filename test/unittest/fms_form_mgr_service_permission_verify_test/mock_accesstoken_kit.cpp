@@ -15,26 +15,39 @@
 
 #include <gtest/gtest.h>
 
-#include "tokenid_kit.h"
+#include "accesstoken_kit.h"
 #include "hilog_wrapper.h"
 
 namespace {
-bool isSystemAppByFullTokenID = true;
+int32_t g_GetTokenTypeFlag = 0;
+int32_t g_VerifyAccessToken = 0;
 }
 
-void MockIsSystemAppByFullTokenID(bool mockRet)
+void MockGetTokenTypeFlag(int32_t mockRet)
 {
-    isSystemAppByFullTokenID = mockRet;
+    g_GetTokenTypeFlag = mockRet;
+}
+
+void MockVerifyAccessToken(int32_t mockRet)
+{
+    g_VerifyAccessToken = mockRet;
 }
 
 namespace OHOS {
 namespace Security {
 namespace AccessToken {
-bool TokenIdKit::IsSystemAppByFullTokenID(uint64_t tokenId)
+ATokenTypeEnum AccessTokenKit::GetTokenTypeFlag(AccessTokenID mockRet)
 {
-    GTEST_LOG_(INFO) << "IsSystemAppByFullTokenID called " << isSystemAppByFullTokenID;
-    return isSystemAppByFullTokenID;
+    GTEST_LOG_(INFO) << "GetTokenTypeFlag called " << g_GetTokenTypeFlag;
+    return static_cast<OHOS::Security::AccessToken::ATokenTypeEnum>(g_GetTokenTypeFlag);
 }
+
+int AccessTokenKit::VerifyAccessToken(AccessTokenID tokenID, const std::string& permissionName)
+{
+    GTEST_LOG_(INFO) << "VerifyAccessToken called " << g_VerifyAccessToken;
+    return g_VerifyAccessToken;
+}
+
 } // namespace AccessToken
 } // namespace Security
 } // namespace OHOS

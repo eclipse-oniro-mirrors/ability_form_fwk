@@ -262,4 +262,32 @@ HWTEST_F(FmsFormProviderMgrTest, RefreshForm_003, TestSize.Level1)
 
     GTEST_LOG_(INFO) << "fms_form_mgr_provider_test_006 end";
 }
+
+/*
+ * Feature: FmsFormProviderMgr
+ * Function: FormMgr
+ * SubFunction: RefreshForm Function
+ * FunctionPoints: FormMgr RefreshForm interface
+ * EnvConditions: Mobile that can run ohos test framework
+ * CaseDescription: Check that the caller of RefreshForm is the currently inactive user.
+ */
+HWTEST_F(FmsFormProviderMgrTest, RefreshForm_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "fms_form_mgr_provider_test_007 start";
+    int64_t formId = 0x114514aa00000000;
+    Want want;
+    want.SetParam(Constants::KEY_IS_TIMER, false);
+    int callingUid {0};
+    FormItemInfo record;
+    record.SetFormId(formId);
+    record.SetModuleName(PARAM_FORM_NAME);
+    record.SetAbilityName(FORM_PROVIDER_ABILITY_NAME);
+    FormRecord realFormRecord = FormDataMgr::GetInstance().AllotFormRecord(record, callingUid);
+    FormItemInfo info;
+    FormDataMgr::GetInstance().AllotFormHostRecord(info, token_, formId, callingUid);
+#ifdef SUPPORT_POWER
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, FormProviderMgr::GetInstance().RefreshForm(formId, want, true));
+#endif
+    GTEST_LOG_(INFO) << "fms_form_mgr_provider_test_007 end";
+}
 }
