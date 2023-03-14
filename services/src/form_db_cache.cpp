@@ -145,7 +145,7 @@ ErrCode FormDbCache::DeleteFormInfoByBundleName(const std::string &bundleName, c
     std::lock_guard<std::mutex> lock(formDBInfosMutex_);
     std::vector<FormDBInfo>::iterator itRecord;
     for (itRecord = formDBInfos_.begin(); itRecord != formDBInfos_.end();) {
-        if ((bundleName == itRecord->bundleName) && (userId == itRecord->userId)) {
+        if ((bundleName == itRecord->bundleName) && (userId == itRecord->providerUserId)) {
             int64_t formId = itRecord->formId;
             if (FormInfoRdbStorageMgr::GetInstance().DeleteStorageFormData(std::to_string(formId)) == ERR_OK) {
                 removedDBForms.emplace_back(*itRecord);
@@ -184,6 +184,7 @@ ErrCode FormDbCache::GetDBRecord(const int64_t formId, FormRecord &record) const
     for (const FormDBInfo &dbInfo : formDBInfos_) {
         if (dbInfo.formId == formId) {
             record.userId = dbInfo.userId;
+            record.providerUserId= dbInfo.providerUserId;
             record.formName = dbInfo.formName;
             record.bundleName = dbInfo.bundleName;
             record.moduleName = dbInfo.moduleName;
@@ -285,7 +286,7 @@ void FormDbCache::DeleteDBFormsByUserId(const int32_t userId)
     std::lock_guard<std::mutex> lock(formDBInfosMutex_);
     std::vector<FormDBInfo>::iterator itRecord;
     for (itRecord = formDBInfos_.begin(); itRecord != formDBInfos_.end();) {
-        if (userId == itRecord->userId) {
+        if (userId == itRecord->providerUserId) {
             int64_t formId = itRecord->formId;
             if (FormInfoRdbStorageMgr::GetInstance().DeleteStorageFormData(std::to_string(formId)) == ERR_OK) {
                 itRecord = formDBInfos_.erase(itRecord);
