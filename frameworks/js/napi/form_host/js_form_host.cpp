@@ -79,9 +79,15 @@ private:
     std::shared_ptr<AppExecFwk::EventHandler> handler_;
 };
 
-class FormUninstallCallbackClient {
+class FormUninstallCallbackClient : public std::enable_shared_from_this<FormUninstallCallbackClient>
+{
 public:
-    explicit FormUninstallCallbackClient(napi_env env, napi_ref callbackRef) : callbackRef_(callbackRef), env_(env) {}
+    using UninstallTask = std::function<void(int32_t formId)>;
+    explicit FormUninstallCallbackClient(napi_env env, napi_ref callbackRef) : callbackRef_(callbackRef), env_(env)
+    {
+        handler_ = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
+    }
+
     virtual ~FormUninstallCallbackClient()
     {
         napi_delete_reference(env_, callbackRef_);
@@ -89,14 +95,22 @@ public:
 
     void ProcessFormUninstall(const int64_t formId)
     {
-        std::string formIdString = std::to_string(formId);
-        napi_value callbackValues;
-        napi_create_string_utf8(env_, formIdString.c_str(), NAPI_AUTO_LENGTH, &callbackValues);
-        napi_value callResult;
-        napi_value myCallback = nullptr;
-        napi_get_reference_value(env_, callbackRef_, &myCallback);
-        if (myCallback != nullptr) {
-            napi_call_function(env_, nullptr, myCallback, ARGS_ONE, &callbackValues, &callResult);
+        task_ = [env = env_, callbackRef = callbackRef_](int32_t formId) {
+            HILOG_DEBUG("task complete formId: %{public}d", formId);
+            std::string formIdString = std::to_string(formId);
+            napi_value callbackValues;
+            napi_create_string_utf8(env, formIdString.c_str(), NAPI_AUTO_LENGTH, &callbackValues);
+            napi_value callResult;
+            napi_value myCallback = nullptr;
+            napi_get_reference_value(env, callbackRef, &myCallback);
+            if (myCallback != nullptr) {
+                napi_call_function(env, nullptr, myCallback, ARGS_ONE, &callbackValues, &callResult);
+            }
+        };
+        if (handler_) {
+            handler_->PostSyncTask([client = shared_from_this(), formId] () {
+                client->task_(static_cast<int32_t>(formId));
+            });
         }
     }
 
@@ -111,6 +125,8 @@ public:
     }
 
 private:
+    UninstallTask task_;
+    std::shared_ptr<AppExecFwk::EventHandler> handler_ = nullptr;
     napi_ref callbackRef_ {};
     napi_env env_;
 };
