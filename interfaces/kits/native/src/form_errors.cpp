@@ -161,7 +161,8 @@ void FormErrors::InitErrorMessageMap()
         },
         {
             ERR_APPEXECFWK_FORM_PERMISSION_DENY,
-            "check permission deny, need to request ohos.permission.REQUIRE_FORM.",
+            "check permission deny, need to request ohos.permission.REQUIRE_FORM"
+                " or ohos.permission.INTERACT_ACROSS_LOCAL_ACCOUNTS.",
         },
         {
             ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE,
