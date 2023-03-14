@@ -26,6 +26,7 @@ namespace AppExecFwk {
 struct FormDBInfo {
     int64_t formId = -1;
     int32_t userId = 0;
+    int32_t providerUserId = -1;
     std::string formName;
     std::string bundleName;
     std::string moduleName;
@@ -46,6 +47,7 @@ struct FormDBInfo {
     {
         formId = formIdTmp;
         userId = formRecord.userId;
+        providerUserId = formRecord.providerUserId;
         formName = formRecord.formName;
         bundleName = formRecord.bundleName;
         moduleName = formRecord.moduleName;
@@ -120,6 +122,7 @@ public:
     {
         formDBInfo_.formId = formDBInfo.formId;
         formDBInfo_.userId = formDBInfo.userId;
+        formDBInfo_.providerUserId = formDBInfo.providerUserId;
         formDBInfo_.formName = formDBInfo.formName;
         formDBInfo_.bundleName = formDBInfo.bundleName;
         formDBInfo_.moduleName = formDBInfo.moduleName;
@@ -134,6 +137,7 @@ public:
     {
         formDBInfo_.formId = innerFormInfo.formDBInfo_.formId;
         formDBInfo_.userId = innerFormInfo.formDBInfo_.userId;
+        formDBInfo_.providerUserId = innerFormInfo.formDBInfo_.providerUserId;
         formDBInfo_.formName = innerFormInfo.formDBInfo_.formName;
         formDBInfo_.bundleName = innerFormInfo.formDBInfo_.bundleName;
         formDBInfo_.moduleName = innerFormInfo.formDBInfo_.moduleName;
@@ -148,6 +152,7 @@ public:
     {
         formDBInfo_.formId = formId;
         formDBInfo_.userId = formRecord.userId;
+        formDBInfo_.providerUserId = formRecord.providerUserId;
         formDBInfo_.formName = formRecord.formName;
         formDBInfo_.bundleName = formRecord.bundleName;
         formDBInfo_.moduleName = formRecord.moduleName;
@@ -159,6 +164,7 @@ public:
         nlohmann::json obj;
         obj["formId"] = formDBInfo_.formId;
         obj["userId"] = formDBInfo_.userId;
+        obj["providerUserId"] = formDBInfo_.providerUserId;
         obj["formName"] = formDBInfo_.formName;
         obj["bundleName"] = formDBInfo_.bundleName;
         obj["moduleName"] = formDBInfo_.moduleName;
@@ -294,7 +300,7 @@ public:
 
     /**
      * @brief Set application formName.
-     * @param userId Indicates the formName to be set.
+     * @param formName Indicates the formName to be set.
      */
     void SetFormName(std::string formName)
     {
