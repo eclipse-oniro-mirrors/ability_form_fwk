@@ -1639,8 +1639,8 @@ bool FormMgrAdapter::GetBundleName(std::string &bundleName)
         return false;
     }
 
-    bool result = IN_PROCESS_CALL(iBundleMgr->GetBundleNameForUid(uid, bundleName));
-    if (!result || bundleName.empty()) {
+    int32_t result = IN_PROCESS_CALL(iBundleMgr->GetNameForUid(uid, bundleName));
+    if (result != ERR_OK || bundleName.empty()) {
         HILOG_ERROR("%{public}s failed, cannot get bundle name by uid:%{public}d", __func__, uid);
         return false;
     }
