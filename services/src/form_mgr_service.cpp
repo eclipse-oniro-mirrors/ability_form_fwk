@@ -826,7 +826,7 @@ int32_t FormMgrService::StartAbility(const Want &want, const sptr<IRemoteObject>
     // retrieve bundleName of the calling ability.
     std::string callerBundleName;
     auto callUid = IPCSkeleton::GetCallingUid();
-    if (!IN_PROCESS_CALL(bundleMgr->GetBundleNameForUid(callUid, callerBundleName))) {
+    if (IN_PROCESS_CALL(bundleMgr->GetNameForUid(callUid, callerBundleName)) != ERR_OK) {
         HILOG_ERROR("StartAbility, failed to get form config info.");
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
