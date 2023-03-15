@@ -79,8 +79,7 @@ private:
     std::shared_ptr<AppExecFwk::EventHandler> handler_;
 };
 
-// class FormUninstallCallbackClient : public std::enable_shared_from_this<FormUninstallCallbackClient>
-class FormUninstallCallbackClient
+class FormUninstallCallbackClient : public std::enable_shared_from_this<FormUninstallCallbackClient>
 {
 public:
     FormUninstallCallbackClient(napi_env env, napi_ref callbackRef) : callbackRef_(callbackRef), env_(env)
@@ -99,25 +98,23 @@ public:
             HILOG_INFO("handler is nullptr");
             return;
         }
-        std::weak_ptr<FormUninstallCallbackClient> thisWeakPtr = shared_from_this();
-        auto task = [thisWeakPtr; env = env_, callbackRef = callbackRef_](int32_t formId) {
-            std::shared_ptr<FormUninstallCallbackClient> sharedThis = thisWeakPtr.lock();
+        handler_->PostSyncTask([thisWeakPtr = weak_from_this(), formId]() {
+            auto sharedThis = thisWeakPtr.lock();
             if (sharedThis == nullptr) {
                 HILOG_ERROR("sharedThis is nullptr.");
                 return;
             }
-            HILOG_DEBUG("task complete formId: %{public}d", formId);
+            HILOG_DEBUG("task complete formId: %lld", formId);
             std::string formIdString = std::to_string(formId);
             napi_value callbackValues;
-            napi_create_string_utf8(env, formIdString.c_str(), NAPI_AUTO_LENGTH, &callbackValues);
+            napi_create_string_utf8(sharedThis->env_, formIdString.c_str(), NAPI_AUTO_LENGTH, &callbackValues);
             napi_value callResult;
             napi_value myCallback = nullptr;
-            napi_get_reference_value(env, callbackRef, &myCallback);
+            napi_get_reference_value(sharedThis->env_, sharedThis->callbackRef_, &myCallback);
             if (myCallback != nullptr) {
-                napi_call_function(env, nullptr, myCallback, ARGS_ONE, &callbackValues, &callResult);
+                napi_call_function(sharedThis->env_, nullptr, myCallback, ARGS_ONE, &callbackValues, &callResult);
             }
-        };
-        handler_->PostSyncTask(task);
+        });
     }
 
     bool IsStrictEqual(napi_value callback)
