@@ -54,7 +54,6 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formCallerMgr.RemoveFormProviderCaller(callerToken);
     formCallerMgr.OnProviderCallBackDied(remote);
     formCallerMgr.HandleProviderCallBackDiedTask(remotes);
-    formCallerMgr.GetEventHandler();
     return formCallerMgr.GetFormHostCaller(formId) == nullptr;
 }
 }
