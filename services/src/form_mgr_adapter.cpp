@@ -1262,7 +1262,7 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
     }
     itemInfo.SetHostBundleName(hostBundleName);
     itemInfo.SetAbilityName(formInfo.abilityName);
-    itemInfo.SetModuleName(formInfo.moduleName); // formInfo.moduleName: bundleMagr do not set
+    itemInfo.SetModuleName(formInfo.moduleName); // formInfo.moduleName: bundleMgr do not set
     itemInfo.SetFormName(formInfo.name);
     itemInfo.SetEnableUpdateFlag(formInfo.updateEnabled);
     itemInfo.SetUpdateDuration(formInfo.updateDuration);
@@ -2089,7 +2089,7 @@ bool FormMgrAdapter::CheckKeepBackgroundRunningPermission(const sptr<IBundleMgr>
         FormUtil::GetCurrentAccountId(), bundleInfo)) {
         HILOG_DEBUG("%{public}s, get bundleInfo success", __func__);
         auto item = find(bundleInfo.reqPermissions.begin(), bundleInfo.reqPermissions.end(), Constants::PERMISSION_KEEP_BACKGROUND_RUNNING);
-        if(item == bundleInfo.reqPermissions.end()) {
+        if (item == bundleInfo.reqPermissions.end()) {
             return false;
         }
     } else {

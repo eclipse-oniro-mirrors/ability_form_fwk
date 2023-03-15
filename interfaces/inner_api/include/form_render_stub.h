@@ -16,7 +16,7 @@
 #ifndef OHOS_FORM_FWK_FORM_RENDER_STUB_H
 #define OHOS_FORM_FWK_FORM_RENDER_STUB_H
 
-#include <map>
+#include <unordered_map>
 
 #include "form_render_interface.h"
 #include "iremote_object.h"
@@ -71,7 +71,7 @@ private:
 
 private:
     using FormRenderFunc = int32_t (FormRenderStub::*)(MessageParcel &data, MessageParcel &reply);
-    std::map<uint32_t, FormRenderFunc> memberFuncMap_;
+    std::unordered_map<uint32_t, FormRenderFunc> memberFuncMap_;
 
     DISALLOW_COPY_AND_MOVE(FormRenderStub);
 };

@@ -2,15 +2,7 @@
   "string": [
     {
       "name": "entry_desc",
-      "value": "description"
-    },
-    {
-      "name": "MainAbility_desc",
-      "value": "description"
-    },
-    {
-      "name": "MainAbility_label",
-      "value": "label"
+      "value": "For ArkTs Card"
     }
   ]
 }
