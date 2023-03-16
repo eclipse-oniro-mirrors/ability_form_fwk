@@ -68,42 +68,46 @@ ErrCode FormRenderMgr::RenderForm(
         want.SetParam(Constants::PARAM_FORM_HOST_TOKEN, hostToken);
     }
 
+    bool connectionExisted = false;
+    sptr<FormRenderConnection> connection = nullptr;
     {
         std::lock_guard<std::mutex> lock(resourceMutex_);
         HILOG_DEBUG("renderFormConnections_ size: %{public}zu.", renderFormConnections_.size());
         auto conIterator = renderFormConnections_.find(formRecord.formId);
         if (conIterator != renderFormConnections_.end()) {
-            auto connection = conIterator->second;
-            if (connection == nullptr) {
-                HILOG_ERROR("connection is null.");
-                return ERR_APPEXECFWK_FORM_INVALID_PARAM;
-            }
-            if (renderRemoteObj_ == nullptr) {
-                connection->UpdateWantParams(want.GetParams());
-                ErrCode ret = ConnectRenderService(connection);
-                HILOG_INFO("renderRemoteObj is nullptr, render may exit, need reconnect, ret: %{public}d.", ret);
-                if (ret) {
-                    HandleConnectFailed(formRecord.formId, ret);
-                }
-                return ret;
-            }
-            auto remoteObject = renderRemoteObj_->AsObject();
-            if (remoteObject == nullptr) {
-                HILOG_ERROR("remoteObject is nullptr, can not get obj from renderRemoteObj.");
-                return ERR_APPEXECFWK_FORM_INVALID_PARAM;
-            }
-            want.SetParam(Constants::FORM_CONNECT_ID, connection->GetConnectId());
-            FormTaskMgr::GetInstance().PostRenderForm(formRecord, want, remoteObject);
-            return ERR_OK;
+            connectionExisted = true;
+            connection = conIterator->second;
         }
     }
-    auto formRenderConnection = new (std::nothrow) FormRenderConnection(formRecord, want.GetParams());
+    if (connectionExisted) {
+        if (connection == nullptr) {
+            HILOG_ERROR("connection is null.");
+            return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+        }
+        if (renderRemoteObj_ == nullptr) {
+            connection->UpdateWantParams(want.GetParams());
+            ErrCode ret = ConnectRenderService(connection);
+            HILOG_INFO("renderRemoteObj is nullptr, render may exit, need reconnect, ret: %{public}d.", ret);
+            if (ret) {
+                HandleConnectFailed(formRecord.formId, ret);
+            }
+            return ret;
+        }
+        auto remoteObject = renderRemoteObj_->AsObject();
+        if (remoteObject == nullptr) {
+            HILOG_ERROR("remoteObject is nullptr, can not get obj from renderRemoteObj.");
+            return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+        }
+        want.SetParam(Constants::FORM_CONNECT_ID, connection->GetConnectId());
+        FormTaskMgr::GetInstance().PostRenderForm(formRecord, want, remoteObject);
+        return ERR_OK;
+    }
 
+    auto formRenderConnection = new (std::nothrow) FormRenderConnection(formRecord, want.GetParams());
     if (formRenderConnection == nullptr) {
         HILOG_ERROR("formRenderConnection is null.");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
-
     ErrCode errorCode = ConnectRenderService(formRenderConnection);
     if (errorCode != ERR_OK) {
         HILOG_ERROR("%{public}s fail, ConnectServiceAbility failed.", __func__);
@@ -238,14 +242,17 @@ ErrCode FormRenderMgr::RenderFormCallback(int64_t formId, const Want &want)
 ErrCode FormRenderMgr::StopRenderingFormCallback(int64_t formId, const Want &want)
 {
     HILOG_INFO("%{public}s called.", __func__);
+    sptr<FormRenderConnection> stopConnection = nullptr;
     std::lock_guard<std::mutex> lock(resourceMutex_);
-    HILOG_DEBUG("renderFormConnections_ size: %{public}zu.", renderFormConnections_.size());
-    auto conIterator = renderFormConnections_.find(formId);
-    if (conIterator == renderFormConnections_.end()) {
-        HILOG_ERROR("Can not find formId in map.");
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    {
+        HILOG_DEBUG("renderFormConnections_ size: %{public}zu.", renderFormConnections_.size());
+        auto conIterator = renderFormConnections_.find(formId);
+        if (conIterator == renderFormConnections_.end()) {
+            HILOG_ERROR("Can not find formId in map.");
+            return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+        }
+        stopConnection = conIterator->second;
     }
-    sptr<FormRenderConnection> stopConnection = conIterator->second;
     if (stopConnection == nullptr) {
         HILOG_ERROR("Can not find stopConnection in map.");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
