@@ -21,6 +21,7 @@
 #include "form_ams_helper.h"
 #include "form_bms_helper.h"
 #include "form_constants.h"
+#include "form_data_mgr.h"
 #include "form_db_cache.h"
 #include "form_event_handler.h"
 #include "form_info_mgr.h"
@@ -196,11 +197,13 @@ int FormMgrService::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
     HILOG_DEBUG("called.");
 
     ErrCode ret = CheckFormPermission();
+    // 跨用户且有权限--放行
     if (ret != ERR_OK) {
         HILOG_ERROR("%{public}s fail, delete form permission denied", __func__);
         return ret;
     }
     AAFwk::EventInfo eventInfo;
+    // TODO 这个玩意为啥是userid = formid
     eventInfo.userId = formId;
     AAFwk::EventReport::SendFormEvent(AAFwk::EventName::DELETE_FORM, HiSysEventType::BEHAVIOR, eventInfo);
 
@@ -258,6 +261,10 @@ int FormMgrService::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> 
 int FormMgrService::UpdateForm(const int64_t formId, const FormProviderData &formBindingData)
 {
     HILOG_DEBUG("called.");
+    if (!CheckAcrossAccountsOperation(formId)) {
+        HILOG_ERROR("The formid corresponds to a card that is not for the currently active user.");
+        return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
+    }
     std::string callerBundleName;
     auto ret = FormBmsHelper::GetInstance().GetCallerBundleName(callerBundleName);
     if (ret != ERR_OK) {
@@ -626,6 +633,13 @@ ErrCode FormMgrService::CheckFormPermission()
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
 
+    // 是不是可以把check跨用户操作的步骤放在这，然后其他另外需要的接口就单独加调用
+    // checks whether the current user is inactive
+    if (!CheckAcrossAccountsOperation(formId)) {
+        HILOG_ERROR("The formid corresponds to a card that is not for the currently active user.");
+        return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
+    }
+
     HILOG_DEBUG("Permission verification ok!");
     return ERR_OK;
 }
@@ -740,6 +754,10 @@ int FormMgrService::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
         HILOG_ERROR("Across local accounts permission failed.");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
+    if (!CheckAcrossAccountsOperation(formId)) {
+        HILOG_ERROR("The formid corresponds to a card that is not for the currently active user.");
+        return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
+    }
     return FormMgrAdapter::GetInstance().GetAllFormsInfo(formInfos);
 }
 
@@ -758,6 +776,10 @@ int FormMgrService::GetFormsInfoByApp(std::string &bundleName, std::vector<FormI
     if (!CheckAcrossLocalAccountsPermission()) {
         HILOG_ERROR("Across local accounts permission failed.");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    }
+    if (!CheckAcrossAccountsOperation(formId)) {
+        HILOG_ERROR("The formid corresponds to a card that is not for the currently active user.");
+        return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
     return FormMgrAdapter::GetInstance().GetFormsInfoByApp(bundleName, formInfos);
 }
@@ -779,6 +801,10 @@ int FormMgrService::GetFormsInfoByModule(std::string &bundleName, std::string &m
     if (!CheckAcrossLocalAccountsPermission()) {
         HILOG_ERROR("Across local accounts permission failed.");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    }
+    if (!CheckAcrossAccountsOperation(formId)) {
+        HILOG_ERROR("The formid corresponds to a card that is not for the currently active user.");
+        return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
     return FormMgrAdapter::GetInstance().GetFormsInfoByModule(bundleName, moduleName, formInfos);
 }
@@ -1028,6 +1054,17 @@ bool FormMgrService::CheckAcrossLocalAccountsPermission() const
             HILOG_ERROR("Across local accounts permission failed.");
             return false;
         }
+    }
+    return true;
+}
+
+bool FormMgrService::CheckAcrossAccountsOperation(const int64_t formId) const
+{
+    // gets the corresponding userId by formId
+    FormRecord record;
+    FormDataMgr::GetInstance().GetFormRecord(formId, record);
+    if (record.providerUserId != FormUtil::GetCurrentAccountId()) {
+        return false;
     }
     return true;
 }
