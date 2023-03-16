@@ -71,6 +71,7 @@ const std::string KEY_USER_ID = "userId";
 const std::string KEY_BUNDLE_NAME = "bundleName";
 const std::string DEVICE_ID = "ohos-phone1";
 const std::string DEF_LABEL1 = "PermissionFormRequireGrant";
+const std::string COMMON_EVENT_BUNDLE_SCAN_FINISHED = "usual.event.BUNDLE_SCAN_FINISHED";
 
 template<typename F>
 static void WaitUntilTaskCalled(const F &f, const std::shared_ptr<EventHandler> &handler, std::atomic<bool> &taskCalled)
@@ -643,7 +644,7 @@ HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_0011, TestSize.Level0)
     EXPECT_FALSE(want.GetAction().empty());
     EXPECT_TRUE(want.GetElement().GetBundleName().empty() &&
     action != EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED &&
-    action != EventFwk::CommonEventSupport::COMMON_EVENT_BUNDLE_SCAN_FINISHED);
+    action != COMMON_EVENT_BUNDLE_SCAN_FINISHED);
     GTEST_LOG_(INFO) << "OnReceiveEvent_0011 end";
 }
 
@@ -742,14 +743,14 @@ HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_0015, TestSize.Level0)
     EXPECT_TRUE(testCase->eventHandler_ != nullptr);
     EventFwk::CommonEventData eventData;
     AAFwk::Want want = eventData.GetWant();
-    std::string action = EventFwk::CommonEventSupport::COMMON_EVENT_BUNDLE_SCAN_FINISHED;
+    std::string action = COMMON_EVENT_BUNDLE_SCAN_FINISHED;
     std::string bundleName = EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED;
     std::string abilityName = "abc";
     want.SetAction(action);
     want.SetElementName(bundleName, abilityName);
     eventData.SetWant(want);
     testCase->OnReceiveEvent(eventData);
-    EXPECT_TRUE(action == EventFwk::CommonEventSupport::COMMON_EVENT_BUNDLE_SCAN_FINISHED);
+    EXPECT_TRUE(action == COMMON_EVENT_BUNDLE_SCAN_FINISHED);
     GTEST_LOG_(INFO) << "OnReceiveEvent_0015 end";
 }
 
