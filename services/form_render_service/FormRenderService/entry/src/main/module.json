@@ -12,6 +12,11 @@
     "pages": "",
     "uiSyntax": "ets",
     "abilities": [],
+    "requestPermissions": [
+      {
+        "name": "ohos.permission.ACCESS_BUNDLE_DIR"
+      }
+    ],
     "extensionAbilities": [
       {
         "name": "ServiceExtension",
