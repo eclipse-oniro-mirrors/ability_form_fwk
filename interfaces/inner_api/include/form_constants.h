@@ -186,7 +186,12 @@ namespace Constants {
     constexpr int32_t RENDER_FORM = 0; // default value
     constexpr int32_t UPDATE_RENDERING_FORM = 1;
     constexpr const char* FORM_COMPILE_MODE_KEY = "form_compile_mode";
+
+    //ArkTs card
     constexpr const char* FORM_COMP_ID = "ohos.extra.param.key.form_comp_id";
+    constexpr const char* FORM_DENSITY = "ohos.extra.param.key.form_density";
+    constexpr const char* FORM_PROCESS_ON_ADD_SURFACE = "ohos.extra.param.key.process_on_add_surface";
+    constexpr const char* FORM_ALLOW_UPDATE = "allowUpdate";
 }  // namespace Constants
 }  // namespace AppExecFwk
 }  // namespace OHOS
