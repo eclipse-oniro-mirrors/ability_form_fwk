@@ -29,6 +29,9 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+namespace {
+const std::string COMMON_EVENT_BUNDLE_SCAN_FINISHED = "usual.event.BUNDLE_SCAN_FINISHED";
+} // namespace
 /**
  * @brief Receiver Constructor.
  * @param subscriberInfo Subscriber info.
@@ -50,7 +53,7 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
         return;
     }
     if (bundleName.empty() && action != EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED &&
-        action != EventFwk::CommonEventSupport::COMMON_EVENT_BUNDLE_SCAN_FINISHED) {
+        action != COMMON_EVENT_BUNDLE_SCAN_FINISHED) {
         HILOG_ERROR("%{public}s failed, invalid param, action: %{public}s, bundleName: %{public}s",
             __func__, action.c_str(), bundleName.c_str());
         return;
@@ -82,7 +85,7 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
         if (userId != -1) {
             eventHandler_->PostTask(task);
         }
-    } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_BUNDLE_SCAN_FINISHED) {
+    } else if (action == COMMON_EVENT_BUNDLE_SCAN_FINISHED) {
         auto task = [weakThis, want]() {
             std::shared_ptr<FormSysEventReceiver> sharedThis = weakThis.lock();
             if (sharedThis) {

@@ -16,6 +16,7 @@
 #include "form_mgr_service.h"
 
 #include "accesstoken_kit.h"
+#include "bundle_common_event.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "form_ams_helper.h"
@@ -570,7 +571,7 @@ ErrCode FormMgrService::Init()
         matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_ABILITY_UPDATED);
         matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_DATA_CLEARED);
         matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED);
-        matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_BUNDLE_SCAN_FINISHED);
+        matchingSkills.AddEvent(COMMON_EVENT_BUNDLE_SCAN_FINISHED);
         // init TimerReceiver
         EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
         formSysEventReceiver_ = std::make_shared<FormSysEventReceiver>(subscribeInfo);
