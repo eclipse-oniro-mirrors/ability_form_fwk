@@ -83,7 +83,7 @@ NativeValue* JsFormBindingData::OnCreateFormBindingData(NativeEngine& engine, Na
     NativeObject* object = ConvertNativeValueTo<NativeObject>(objValue);
     formProviderData_->SetDataString(formDataStr);
     object->SetProperty("data", CreateJsValue(engine, formDataStr));
-    HILOG_INFO("%{public}s called:%{public}s", __func__, formDataStr.c_str());
+    HILOG_DEBUG("%{public}s called:%{private}s", __func__, formDataStr.c_str());
     return objValue;
 }
 }

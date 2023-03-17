@@ -356,7 +356,7 @@ void FormHostClient::UpdateForm(const FormJsInfo &formJsInfo)
         return;
     }
     for (const auto &callback : iter->second) {
-        HILOG_INFO("%{public}s, formId: %{public}" PRId64 ", jspath: %{public}s, data: %{public}s",
+        HILOG_DEBUG("%{public}s, formId: %{public}" PRId64 ", jspath: %{public}s, data: %{private}s",
             __func__, formId, formJsInfo.jsFormCodePath.c_str(), formJsInfo.formData.c_str());
         callback->ProcessFormUpdate(formJsInfo);
     }
