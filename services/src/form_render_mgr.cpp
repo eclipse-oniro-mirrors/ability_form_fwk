@@ -242,9 +242,10 @@ ErrCode FormRenderMgr::RenderFormCallback(int64_t formId, const Want &want)
 ErrCode FormRenderMgr::StopRenderingFormCallback(int64_t formId, const Want &want)
 {
     HILOG_INFO("%{public}s called.", __func__);
+    int32_t renderFormConnectionSize = 0;
     sptr<FormRenderConnection> stopConnection = nullptr;
-    std::lock_guard<std::mutex> lock(resourceMutex_);
     {
+        std::lock_guard<std::mutex> lock(resourceMutex_);
         HILOG_DEBUG("renderFormConnections_ size: %{public}zu.", renderFormConnections_.size());
         auto conIterator = renderFormConnections_.find(formId);
         if (conIterator == renderFormConnections_.end()) {
@@ -252,23 +253,23 @@ ErrCode FormRenderMgr::StopRenderingFormCallback(int64_t formId, const Want &wan
             return ERR_APPEXECFWK_FORM_INVALID_PARAM;
         }
         stopConnection = conIterator->second;
+        renderFormConnectionSize = renderFormConnections_.size();
+        for (auto iter = etsHosts_.begin(); iter != etsHosts_.end();) {
+            iter->second.erase(formId);
+            if (iter->second.empty()) {
+                HILOG_INFO("All forms of the host have been removed, remove the host.");
+                iter = etsHosts_.erase(iter);
+            } else {
+                ++iter;
+            }
+        }
+        renderFormConnections_.erase(formId);
     }
     if (stopConnection == nullptr) {
         HILOG_ERROR("Can not find stopConnection in map.");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
-    DisconnectRenderService(stopConnection, renderFormConnections_.size());
-
-    for (auto iter = etsHosts_.begin(); iter != etsHosts_.end();) {
-        iter->second.erase(formId);
-        if (iter->second.empty()) {
-            HILOG_INFO("All forms of the host have been removed, remove the host.");
-            iter = etsHosts_.erase(iter);
-        } else {
-            ++iter;
-        }
-    }
-    renderFormConnections_.erase(formId);
+    DisconnectRenderService(stopConnection, renderFormConnectionSize);
     return ERR_OK;
 }
 
@@ -399,56 +400,63 @@ bool FormRenderMgr::IsNeedRender(int64_t formId)
 
 inline void FormRenderMgr::AddHostToken(const sptr<IRemoteObject> &host, int64_t formId)
 {
-    {
-        std::lock_guard<std::mutex> lock(resourceMutex_);
-        auto iter = etsHosts_.find(host);
-        if (iter == etsHosts_.end()) {
-            HILOG_DEBUG("Add host, current etsHosts.size: %{public}zu.", etsHosts_.size());
-            std::unordered_set<int64_t> formIdSet;
-            formIdSet.emplace(formId);
-            etsHosts_.emplace(host, formIdSet);
-        } else {
-            HILOG_DEBUG("Add formId to host, current etsHosts.size: %{public}zu.", etsHosts_.size());
-            iter->second.emplace(formId);
-        }
+    std::lock_guard<std::mutex> lock(resourceMutex_);
+    auto iter = etsHosts_.find(host);
+    if (iter == etsHosts_.end()) {
+        HILOG_DEBUG("Add host, current etsHosts.size: %{public}zu.", etsHosts_.size());
+        std::unordered_set<int64_t> formIdSet;
+        formIdSet.emplace(formId);
+        etsHosts_.emplace(host, formIdSet);
+    } else {
+        HILOG_DEBUG("Add formId to host, current etsHosts.size: %{public}zu.", etsHosts_.size());
+        iter->second.emplace(formId);
     }
 }
 
 void FormRenderMgr::RemoveHostToken(const sptr<IRemoteObject> &host)
 {
-    HILOG_DEBUG("Remove host, current etsHosts.size: %{public}zu.", etsHosts_.size());
-
-    std::lock_guard<std::mutex> lock(resourceMutex_);
-    auto iter = etsHosts_.find(host);
-    if (iter == etsHosts_.end()) {
-        HILOG_ERROR("Can not find host in etsHosts.");
-        return;
-    }
-    auto formIdSet = iter->second;
-    for (const int64_t formId : formIdSet) {
-        auto connection = renderFormConnections_[formId];
-        FormRecord formRecord;
-        if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
-            // hosts of this formId is empty, remove formId
-            DisconnectRenderService(connection, renderFormConnections_.size());
-            renderFormConnections_.erase(formId);
+    int32_t left = 0;
+    std::unordered_map<int64_t, sptr<FormRenderConnection>> connections;
+    {
+        std::lock_guard<std::mutex> lock(resourceMutex_);
+        auto iter = etsHosts_.find(host);
+        if (iter == etsHosts_.end()) {
+            HILOG_ERROR("Can not find host in etsHosts.");
+            return;
         }
-    }
-    etsHosts_.erase(host);
-    if (etsHosts_.empty()) {
-        HILOG_DEBUG("etsHosts is empty, disconnect all connections, current connection.size: %{public}zu.",
-            renderFormConnections_.size());
-        for (auto iterConnection = renderFormConnections_.begin(); iterConnection != renderFormConnections_.end();) {
-            DisconnectRenderService(iterConnection->second, renderFormConnections_.size());
-            iterConnection = renderFormConnections_.erase(iterConnection);
+        auto formIdSet = iter->second;
+        etsHosts_.erase(host);
+        if (etsHosts_.empty()) {
+            HILOG_DEBUG("etsHosts is empty, disconnect all connections size: %{public}zu.",
+                renderFormConnections_.size());
+            connections.swap(renderFormConnections_);
+        } else {
+            for (const int64_t formId : formIdSet) {
+                FormRecord formRecord;
+                if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
+                    connections.emplace(formId, renderFormConnections_[formId]);
+                    renderFormConnections_.erase(formId);
+                }
+            }
         }
+        left = renderFormConnections_.size();
+    }
+    for (auto iter = connections.begin(); iter != connections.end();) {
+        DisconnectRenderService(iter->second, connections.size() > left ? connections.size() : left);
+        iter = connections.erase(iter);
     }
 }
 
 void FormRenderMgr::NotifyHostRenderServiceIsDead() const
 {
-    HILOG_INFO("Notify hosts the render is dead, hosts.size: %{public}zu.", etsHosts_.size());
-    for (const auto &item : etsHosts_) {
+    std::unordered_map<sptr<IRemoteObject>, std::unordered_set<int64_t>, RemoteObjHash> hostsForNotify;
+    {
+        std::lock_guard<std::mutex> lock(resourceMutex_);
+        HILOG_INFO("Notify hosts the render is dead, hosts.size: %{public}zu.", etsHosts_.size());
+        auto tmpMap(etsHosts_);
+        hostsForNotify.swap(tmpMap);
+    }
+    for (const auto &item : hostsForNotify) {
         auto hostClient = iface_cast<IFormHost>(item.first);
         if (hostClient == nullptr) {
             HILOG_ERROR("hostClient is nullptr");
