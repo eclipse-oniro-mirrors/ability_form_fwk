@@ -68,7 +68,7 @@ public:
      * @param hostRemoteObj host token.
      * @return Returns ERR_OK on success, others on failure.
      */
-    void DeleteRenderRecord(int64_t formId, const std::string &compId, bool &isRenderGroupEmpty);
+    void DeleteRenderRecord(int64_t formId, const std::string &compId, const sptr<IRemoteObject> hostRemoteObj, bool &isRenderGroupEmpty);
 
     int32_t ReloadFormRecord(const std::vector<int64_t> &&formIds, const Want &want);
 
