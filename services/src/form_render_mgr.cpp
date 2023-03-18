@@ -186,7 +186,7 @@ ErrCode FormRenderMgr::ReloadForm(std::vector<int64_t> &&formIds, const std::str
     return ERR_OK;
 }
 
-ErrCode FormRenderMgr::StopRenderingForm(int64_t formId, const FormRecord &formRecord, const std::string &compId)
+ErrCode FormRenderMgr::StopRenderingForm(int64_t formId, const FormRecord &formRecord, const std::string &compId, const sptr<IRemoteObject> &hostToken)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
     if (formRecord.uiSyntax != FormType::ETS) {
@@ -205,6 +205,10 @@ ErrCode FormRenderMgr::StopRenderingForm(int64_t formId, const FormRecord &formR
     want.SetParam(Constants::FORM_SUPPLY_UID, std::to_string(userId) + formRecord.bundleName);
     if (!compId.empty()) {
         want.SetParam(Constants::FORM_RENDER_COMP_ID, compId);
+    }
+    if (hostToken) {
+        HILOG_DEBUG("StopRenderingForm Add host token");
+        want.SetParam(Constants::PARAM_FORM_HOST_TOKEN, hostToken);
     }
 
     {

@@ -221,7 +221,7 @@ int FormMgrAdapter::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> 
     }
     FormRecord record;
     FormDataMgr::GetInstance().GetFormRecord(formId, record);
-    FormRenderMgr::GetInstance().StopRenderingForm(formId, record);
+    FormRenderMgr::GetInstance().StopRenderingForm(formId, record, "", callerToken);
     FormRecord dbRecord;
     if (FormDbCache::GetInstance().GetDBRecord(matchedFormId, dbRecord) != ERR_OK) {
         HILOG_ERROR("%{public}s, not exist such db form:%{public}" PRId64 "", __func__, formId);
@@ -303,7 +303,7 @@ ErrCode FormMgrAdapter::HandleDeleteForm(const int64_t formId, const sptr<IRemot
     }
     FormRecord record;
     FormDataMgr::GetInstance().GetFormRecord(formId, record);
-    FormRenderMgr::GetInstance().StopRenderingForm(formId, record);
+    FormRenderMgr::GetInstance().StopRenderingForm(formId, record, "", callerToken);
 #ifdef DEVICE_USAGE_STATISTICS_ENABLE
     DeviceUsageStats::BundleActiveEvent event(record.bundleName, record.moduleName, record.formName,
         record.specification, record.formId, DeviceUsageStats::BundleActiveEvent::FORM_IS_REMOVED);
@@ -355,7 +355,7 @@ ErrCode FormMgrAdapter::HandleDeleteTempForm(const int64_t formId, const sptr<IR
         HILOG_ERROR("%{public}s, not self form:%{public}" PRId64 "", __func__, formId);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
-    FormRenderMgr::GetInstance().StopRenderingForm(formId, record);
+    FormRenderMgr::GetInstance().StopRenderingForm(formId, record, "", callerToken);
     FormDataMgr::GetInstance().DeleteFormUserUid(formId, uid);
     if (!FormDataMgr::GetInstance().HasFormUserUids(formId)) {
         int result = FormProviderMgr::GetInstance().NotifyProviderFormDelete(formId, record);

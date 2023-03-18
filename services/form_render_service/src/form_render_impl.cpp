@@ -104,6 +104,7 @@ int32_t FormRenderImpl::StopRenderingForm(const FormJsInfo &formJsInfo, const Wa
     }
 
     bool isRenderGroupEmpty = false;
+    sptr<IRemoteObject> hostToken = want.GetRemoteObject(Constants::PARAM_FORM_HOST_TOKEN);
     {
         std::lock_guard<std::mutex> lock(renderRecordMutex_);
         auto search = renderRecordMap_.find(uid);
@@ -118,7 +119,7 @@ int32_t FormRenderImpl::StopRenderingForm(const FormJsInfo &formJsInfo, const Wa
         }
 
         std::string compId = want.GetStringParam(Constants::FORM_RENDER_COMP_ID);
-        search->second->DeleteRenderRecord(formJsInfo.formId, compId, isRenderGroupEmpty);
+        search->second->DeleteRenderRecord(formJsInfo.formId, compId, hostToken, isRenderGroupEmpty);
         if (search->second->IsEmpty()) {
             renderRecordMap_.erase(search);
             HILOG_INFO("DeleteRenderRecord success, uid: %{public}s", uid.c_str());
