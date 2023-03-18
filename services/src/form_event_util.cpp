@@ -475,7 +475,7 @@ void FormEventUtil::UpateFormRecord(const FormInfo &formInfo, FormRecord &formRe
         formRecord.updateAtHour = std::stoi(time[0]);
         formRecord.updateAtMin = std::stoi(time[1]);
     }
-    HILOG_INFO("%{public}s formId:%{public}lld", __func__, formRecord.formId);
+    HILOG_INFO("%{public}s formId:%{public}" PRId64 "", __func__, formRecord.formId);
     FormDataMgr::GetInstance().UpdateFormRecord(formRecord.formId, formRecord);
 }
 
@@ -489,7 +489,7 @@ void FormEventUtil::UpateFormRecord(const AbilityFormInfo &formInfo, FormRecord 
         formRecord.updateAtHour = std::stoi(time[0]);
         formRecord.updateAtMin = std::stoi(time[1]);
     }
-    HILOG_INFO("%{public}s formId:%{public}lld", __func__, formRecord.formId);
+    HILOG_INFO("%{public}s formId:%{public}" PRId64 "", __func__, formRecord.formId);
     FormDataMgr::GetInstance().UpdateFormRecord(formRecord.formId, formRecord);
 }
 } // namespace AppExecFwk
