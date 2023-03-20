@@ -62,9 +62,9 @@ void FormBmsHelper::SetBundleManager(const sptr<IBundleMgr> &bundleManager)
     iBundleMgr_ = bundleManager;
 }
 
-sptr<IEcologicalRuleManager> FormBmsHelper::GetEcologicalRuleMgr()
+sptr<IEcologicalRuleManager> FormBmsHelper::CheckEcologicalRuleMgr()
 {
-    HILOG_INFO("GetEcologicalRuleMgr called.");
+    HILOG_INFO("CheckEcologicalRuleMgr called.");
 
     if (iErMgr_ != nullptr) {
         HILOG_DEBUG("ecological rule mgr already get.");
@@ -76,7 +76,7 @@ sptr<IEcologicalRuleManager> FormBmsHelper::GetEcologicalRuleMgr()
         HILOG_ERROR("fail to get systemAbilityManager.");
         return nullptr;
     }
-    auto remoteObject = systemAbilityManager->GetSystemAbility(ECOLOGICAL_RULE_SA_ID);
+    auto remoteObject = systemAbilityManager->CheckSystemAbility(ECOLOGICAL_RULE_SA_ID);
     if (remoteObject == nullptr) {
         HILOG_ERROR("failed to get ecological rule manager service.");
         return nullptr;

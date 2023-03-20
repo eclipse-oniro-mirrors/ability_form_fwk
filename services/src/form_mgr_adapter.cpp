@@ -2079,7 +2079,7 @@ bool FormMgrAdapter::IsValidPublishEvent(const sptr<IBundleMgr> &iBundleMgr,
         HILOG_ERROR("Only system app can request publish form.");
         return false;
     }
-    sptr<IEcologicalRuleManager> iErMgr = FormBmsHelper::GetInstance().GetEcologicalRuleMgr();
+    sptr<IEcologicalRuleManager> iErMgr = FormBmsHelper::GetInstance().CheckEcologicalRuleMgr();
     if (iErMgr != nullptr) {
         // should update when AG supply the API
         ExperienceRule rule;

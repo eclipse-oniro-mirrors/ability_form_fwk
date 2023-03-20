@@ -65,7 +65,7 @@ public:
      * @brief Acquire an ecological rule manager, if it not existed,
      * @return returns the ecological rule manager ipc object, or nullptr for failed.
      */
-    sptr<IEcologicalRuleManager> GetEcologicalRuleMgr();
+    sptr<IEcologicalRuleManager> CheckEcologicalRuleMgr();
 
     /**
      * @brief Add the ecological rule manager instance for debug.
