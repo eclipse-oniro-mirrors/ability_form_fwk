@@ -52,7 +52,7 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     int64_t formId = static_cast<int64_t>(GetU32Data(data));
     std::string compId(data, size);
     bool isRenderGroupEmpty = *data % ENABLE;
-    formRenderRecord->DeleteRenderRecord(formId, compId, isRenderGroupEmpty);
+    formRenderRecord->DeleteRenderRecord(formId, compId, nullptr, isRenderGroupEmpty);
     formRenderRecord->IsEmpty();
     formRenderRecord->GetUid();
     FormJsInfo formJsInfo;

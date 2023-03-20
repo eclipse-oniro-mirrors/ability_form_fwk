@@ -114,7 +114,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_004, TestSize.Level0)
     int64_t formId = 1;
     std::string compId = "compId";
     bool isRenderGroupEmpty = true;
-    formRenderRecord->DeleteRenderRecord(formId, compId, isRenderGroupEmpty);
+    formRenderRecord->DeleteRenderRecord(formId, compId, nullptr, isRenderGroupEmpty);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_004 end";
 }
 
