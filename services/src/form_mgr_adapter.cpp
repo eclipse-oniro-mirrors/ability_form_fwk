@@ -228,8 +228,9 @@ int FormMgrAdapter::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> 
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
     int callingUid = IPCSkeleton::GetCallingUid();
-    bool isSelfDbFormId = ((std::find(dbRecord.formUserUids.begin(), dbRecord.formUserUids.end(),
-        callingUid) != dbRecord.formUserUids.end()) ? true : false);
+    bool isSelfDbFormId = (FormUtil::GetCurrentAccountId() == dbRecord.providerUserId) &&
+        ((std::find(dbRecord.formUserUids.begin(), dbRecord.formUserUids.end(), callingUid)
+        != dbRecord.formUserUids.end()) ? true : false);
     if (!isSelfDbFormId) {
         HILOG_ERROR("%{public}s, not self form:%{public}" PRId64 "", __func__, formId);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
@@ -309,8 +310,8 @@ ErrCode FormMgrAdapter::HandleDeleteForm(const int64_t formId, const sptr<IRemot
         record.specification, record.formId, DeviceUsageStats::BundleActiveEvent::FORM_IS_REMOVED);
 #endif
     int callingUid = IPCSkeleton::GetCallingUid();
-    int32_t userId = GetCurrentUserId(callingUid);
-    bool isSelfDbFormId = ((std::find(dbRecord.formUserUids.begin(),
+    int32_t userId = FormUtil::GetCurrentAccountId();
+    bool isSelfDbFormId = (userId == dbRecord.providerUserId) && ((std::find(dbRecord.formUserUids.begin(),
         dbRecord.formUserUids.end(), callingUid) != dbRecord.formUserUids.end()) ? true : false);
     if (!isSelfDbFormId) {
         HILOG_ERROR("%{public}s, not self form:%{public}" PRId64 ", callingUid:%{public}d",
@@ -348,8 +349,9 @@ ErrCode FormMgrAdapter::HandleDeleteTempForm(const int64_t formId, const sptr<IR
     bool isFormRecExist = FormDataMgr::GetInstance().GetFormRecord(formId, record);
     bool isSelfTempFormId = false;
     if (isFormRecExist && record.formTempFlag) {
-        isSelfTempFormId = ((std::find(record.formUserUids.begin(),
-            record.formUserUids.end(), uid) != record.formUserUids.end()) ? true : false);
+        isSelfTempFormId = (FormUtil::GetCurrentAccountId() == record.providerUserId) &&
+            ((std::find(record.formUserUids.begin(), record.formUserUids.end(), uid) !=
+            record.formUserUids.end()) ? true : false);
     }
     if (!isSelfTempFormId) {
         HILOG_ERROR("%{public}s, not self form:%{public}" PRId64 "", __func__, formId);
@@ -470,6 +472,12 @@ int FormMgrAdapter::UpdateForm(const int64_t formId,
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
+    // Checks if the form provider is the currently active user.
+    if (FormUtil::GetCurrentAccountId() != formRecord.providerUserId) {
+        HILOG_ERROR("fail, not under current user.");
+        return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
+    }
+
     // check bundleName match
     if (formRecord.bundleName.compare(bundleName) != 0) {
         HILOG_ERROR("%{public}s error, not match bundleName:%{public}s.", __func__, bundleName.c_str());
@@ -558,6 +566,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
         }
         matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
         FormRecord formRecord;
+
         // Update provider info to host
         if (!UpdateProviderInfoToHost(matchedFormId, callerToken, formVisibleType, formRecord)) {
             continue;
@@ -829,7 +838,9 @@ ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
         HILOG_ERROR("%{public}s, addForm can not acquire temp form when select form id", __func__);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    if (hasRecord) {
+    int32_t currentUserId = FormUtil::GetCurrentAccountId();
+    if (hasRecord && (record.providerUserId == currentUserId
+        || FormDataMgr::GetInstance().IsCallingUidValid(record.formUserUids))) {
         if (!info.IsMatch(record)) {
             HILOG_ERROR("%{public}s, formId and item info not match:%{public}" PRId64 "", __func__, formId);
             return ERR_APPEXECFWK_FORM_CFG_NOT_MATCH_ID;
@@ -840,7 +851,8 @@ ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
     // find in db but not in cache
     FormRecord dbRecord;
     ErrCode getDbRet = FormDbCache::GetInstance().GetDBRecord(formId, dbRecord);
-    if (getDbRet == ERR_OK) {
+    if (getDbRet == ERR_OK && (dbRecord.providerUserId == currentUserId
+        || FormDataMgr::GetInstance().IsCallingUidValid(dbRecord.formUserUids))) {
         return AddNewFormRecord(info, formId, callerToken, wantParams, formInfo);
     }
 
@@ -1340,8 +1352,7 @@ int FormMgrAdapter::SetNextRefreshTime(const int64_t formId, const int64_t nextT
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
-    bool isSelfFormId = (userId == formRecord.providerUserId) || checkFormHostHasSaUid(formRecord);
-    if (!isSelfFormId) {
+    if (userId != formRecord.providerUserId) {
         HILOG_ERROR("%{public}s, not self form:%{public}" PRId64 "", __func__, formId);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
@@ -2005,6 +2016,10 @@ bool FormMgrAdapter::UpdateProviderInfoToHost(const int64_t matchedFormId, const
         return false;
     }
 
+    if (formRecord.providerUserId != FormUtil::GetCurrentAccountId()) {
+        HILOG_WARN("fail, not self form, formId:%{public}" PRId64 ".", matchedFormId);
+        return false;
+    }
     FormHostRecord formHostRecord;
     bool hasFormHostRecord = FormDataMgr::GetInstance().GetMatchedHostClient(callerToken, formHostRecord);
     if (!(hasFormHostRecord && formHostRecord.Contains(matchedFormId))) {
@@ -2154,9 +2169,9 @@ int FormMgrAdapter::DeleteInvalidForms(const std::vector<int64_t> &formIds,
         matchedFormIds.emplace(matchedFormId);
         HILOG_DEBUG("valid formId, matchedFormIds: %{public}" PRId64 "", formId);
     }
-    int32_t callingUid = IPCSkeleton::GetCallingUid();
     std::map<int64_t, bool> removedFormsMap {};
-    int32_t userId = GetCurrentUserId(callingUid);
+    int32_t callingUid = IPCSkeleton::GetCallingUid();
+    int32_t userId = FormUtil::GetCurrentAccountId();
 
     // delete invalid DB form record
     FormDbCache::GetInstance().DeleteInvalidDBForms(userId, callingUid, matchedFormIds, removedFormsMap);

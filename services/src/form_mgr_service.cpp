@@ -197,13 +197,11 @@ int FormMgrService::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
     HILOG_DEBUG("called.");
 
     ErrCode ret = CheckFormPermission();
-    // 跨用户且有权限--放行
     if (ret != ERR_OK) {
         HILOG_ERROR("%{public}s fail, delete form permission denied", __func__);
         return ret;
     }
     AAFwk::EventInfo eventInfo;
-    // TODO 这个玩意为啥是userid = formid
     eventInfo.userId = formId;
     AAFwk::EventReport::SendFormEvent(AAFwk::EventName::DELETE_FORM, HiSysEventType::BEHAVIOR, eventInfo);
 
@@ -224,6 +222,11 @@ int FormMgrService::StopRenderingForm(const int64_t formId, const std::string &c
         return ret;
     }
 
+    ret = FormDataMgr::GetInstance().CheckInvalidForm(formId);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("fail, the form id is invalid or not under the current active user.");
+        return ret;
+    }
     return FormMgrAdapter::GetInstance().StopRenderingForm(formId, compId);
 }
 
@@ -261,10 +264,6 @@ int FormMgrService::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> 
 int FormMgrService::UpdateForm(const int64_t formId, const FormProviderData &formBindingData)
 {
     HILOG_DEBUG("called.");
-    if (!CheckAcrossAccountsOperation(formId)) {
-        HILOG_ERROR("The formid corresponds to a card that is not for the currently active user.");
-        return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
-    }
     std::string callerBundleName;
     auto ret = FormBmsHelper::GetInstance().GetCallerBundleName(callerBundleName);
     if (ret != ERR_OK) {
@@ -344,7 +343,6 @@ int FormMgrService::NotifyWhetherVisibleForms(const std::vector<int64_t> &formId
         HILOG_ERROR("%{public}s fail, event notify visible permission denied", __func__);
         return ret;
     }
-
     return FormMgrAdapter::GetInstance().NotifyWhetherVisibleForms(formIds, callerToken, formVisibleType);
 }
 
@@ -361,6 +359,11 @@ int FormMgrService::CastTempForm(const int64_t formId, const sptr<IRemoteObject>
     ErrCode ret = CheckFormPermission();
     if (ret != ERR_OK) {
         HILOG_ERROR("%{public}s fail, cast temp form permission denied", __func__);
+        return ret;
+    }
+    ret = FormDataMgr::GetInstance().CheckInvalidForm(formId);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("fail, the form id is invalid or not under the current active user.");
         return ret;
     }
     AAFwk::EventInfo eventInfo;
@@ -448,6 +451,11 @@ int FormMgrService::MessageEvent(const int64_t formId, const Want &want, const s
         HILOG_ERROR("%{public}s fail, request form permission denied", __func__);
         return ret;
     }
+    ret = FormDataMgr::GetInstance().CheckInvalidForm(formId);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("fail, the form id is invalid or not under the current active user.");
+        return ret;
+    }
     AAFwk::EventInfo eventInfo;
     eventInfo.bundleName = want.GetElement().GetBundleName();
     eventInfo.moduleName = want.GetStringParam(AppExecFwk::Constants::PARAM_MODULE_NAME_KEY);
@@ -469,6 +477,11 @@ int FormMgrService::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
     ErrCode ret = CheckFormPermission();
     if (ret != ERR_OK) {
         HILOG_ERROR("%{public}s fail, request form permission denied", __func__);
+        return ret;
+    }
+    ret = FormDataMgr::GetInstance().CheckInvalidForm(formId);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("fail, the form id is invalid or not under the current active user.");
         return ret;
     }
     AAFwk::EventInfo eventInfo;
@@ -493,6 +506,11 @@ int FormMgrService::BackgroundEvent(const int64_t formId, Want &want, const sptr
     ErrCode ret = CheckFormPermission();
     if (ret != ERR_OK) {
         HILOG_ERROR("%{public}s fail, request form permission denied", __func__);
+        return ret;
+    }
+    ret = FormDataMgr::GetInstance().CheckInvalidForm(formId);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("fail, the form id is invalid or not under the current active user.");
         return ret;
     }
     AAFwk::EventInfo eventInfo;
@@ -633,13 +651,6 @@ ErrCode FormMgrService::CheckFormPermission()
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
 
-    // 是不是可以把check跨用户操作的步骤放在这，然后其他另外需要的接口就单独加调用
-    // checks whether the current user is inactive
-    if (!CheckAcrossAccountsOperation(formId)) {
-        HILOG_ERROR("The formid corresponds to a card that is not for the currently active user.");
-        return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
-    }
-
     HILOG_DEBUG("Permission verification ok!");
     return ERR_OK;
 }
@@ -754,10 +765,6 @@ int FormMgrService::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
         HILOG_ERROR("Across local accounts permission failed.");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
-    if (!CheckAcrossAccountsOperation(formId)) {
-        HILOG_ERROR("The formid corresponds to a card that is not for the currently active user.");
-        return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
-    }
     return FormMgrAdapter::GetInstance().GetAllFormsInfo(formInfos);
 }
 
@@ -776,10 +783,6 @@ int FormMgrService::GetFormsInfoByApp(std::string &bundleName, std::vector<FormI
     if (!CheckAcrossLocalAccountsPermission()) {
         HILOG_ERROR("Across local accounts permission failed.");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
-    }
-    if (!CheckAcrossAccountsOperation(formId)) {
-        HILOG_ERROR("The formid corresponds to a card that is not for the currently active user.");
-        return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
     return FormMgrAdapter::GetInstance().GetFormsInfoByApp(bundleName, formInfos);
 }
@@ -801,10 +804,6 @@ int FormMgrService::GetFormsInfoByModule(std::string &bundleName, std::string &m
     if (!CheckAcrossLocalAccountsPermission()) {
         HILOG_ERROR("Across local accounts permission failed.");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
-    }
-    if (!CheckAcrossAccountsOperation(formId)) {
-        HILOG_ERROR("The formid corresponds to a card that is not for the currently active user.");
-        return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
     return FormMgrAdapter::GetInstance().GetFormsInfoByModule(bundleName, moduleName, formInfos);
 }
@@ -906,6 +905,12 @@ int32_t FormMgrService::ShareForm(int64_t formId, const std::string &deviceId, c
     auto ret = CheckFormPermission();
     if (ret != ERR_OK) {
         HILOG_ERROR("share form permission denied.");
+        return ret;
+    }
+
+    ret = FormDataMgr::GetInstance().CheckInvalidForm(formId);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("fail, the form id is invalid or not under the current active user.");
         return ret;
     }
 
@@ -1054,17 +1059,6 @@ bool FormMgrService::CheckAcrossLocalAccountsPermission() const
             HILOG_ERROR("Across local accounts permission failed.");
             return false;
         }
-    }
-    return true;
-}
-
-bool FormMgrService::CheckAcrossAccountsOperation(const int64_t formId) const
-{
-    // gets the corresponding userId by formId
-    FormRecord record;
-    FormDataMgr::GetInstance().GetFormRecord(formId, record);
-    if (record.providerUserId != FormUtil::GetCurrentAccountId()) {
-        return false;
     }
     return true;
 }
