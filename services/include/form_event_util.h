@@ -39,10 +39,8 @@ public:
     void HandleProviderRemoved(const std::string &bundleName, const int32_t userId);
     void HandleBundleDataCleared(const std::string &bundleName, int32_t userId);
     void HandleFormHostDataCleared(const int uid);
-    bool ProviderFormUpdated(const int64_t formId, const FormRecord &formRecord,
-        const std::vector<FormInfo> &targetForms);
-    bool ProviderFormUpdated(int64_t formId, const FormRecord &formRecord,
-        const BundlePackInfo &bundlePackInfo);
+    bool ProviderFormUpdated(const int64_t formId, FormRecord &formRecord, const std::vector<FormInfo> &targetForms);
+    bool ProviderFormUpdated(int64_t formId, FormRecord &formRecord, const BundlePackInfo &bundlePackInfo);
     void ClearFormDBRecordData(const int uid, std::map<int64_t, bool> &removedFormsMap);
     void ClearTempFormRecordData(const int uid, std::map<int64_t, bool> &removedFormsMap);
     void BatchDeleteNoHostTempForms(const int uid, std::map<FormIdKey, std::set<int64_t>> &noHostTempFormsMap,
@@ -53,6 +51,10 @@ public:
     void ReCreateForm(const int64_t formId);
     void BatchDeleteNoHostDBForms(const int uid, std::map<FormIdKey, std::set<int64_t>> &noHostFormDbMap,
         std::map<int64_t, bool> &removedFormsMap);
+
+private:
+    void UpateFormRecord(const FormInfo &formInfo, FormRecord &formRecord);
+    void UpateFormRecord(const AbilityFormInfo &formInfo, FormRecord &formRecord);
 };
 } // namespace AppExecFwk
 } // namespace OHOS

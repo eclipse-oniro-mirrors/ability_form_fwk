@@ -515,6 +515,27 @@ void FormDataMgr::CleanHostRemovedForms(const std::vector<int64_t> &removedFormI
 
     HILOG_INFO("%{public}s end", __func__);
 }
+
+void FormDataMgr::UpdateHostForms(const std::vector<int64_t> &updateFormIds)
+{
+    HILOG_INFO("%{public}s start, update form host record by formId list", __func__);
+    std::vector<int64_t> matchedIds;
+    std::lock_guard<std::recursive_mutex> lock(formHostRecordMutex_);
+    for (FormHostRecord &record : clientRecords_) {
+        for (const int64_t &formId : updateFormIds) {
+            if (record.Contains(formId)) {
+                matchedIds.emplace_back(formId);
+            }
+        }
+        if (!matchedIds.empty()) {
+            HILOG_INFO("%{public}s, OnFormUninstalled called", __func__);
+            record.OnFormUninstalled(matchedIds);
+            matchedIds.clear();
+        }
+    }
+    HILOG_INFO("%{public}s end", __func__);
+}
+
 /**
  * @brief Handle form host died.
  * @param remoteHost Form host proxy object.
