@@ -517,6 +517,13 @@ public:
      * @param updateFormIds
      */
     void UpdateHostForms(const std::vector<int64_t> &updateFormIds);
+
+    /**
+     * @brief Checks that the form is valid.
+     * @param formId Indicates the form ID.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode CheckInvalidForm(const int64_t formId);
 private:
     /**
      * @brief Create form record.

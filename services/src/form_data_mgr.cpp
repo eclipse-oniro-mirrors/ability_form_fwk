@@ -1330,8 +1330,11 @@ ErrCode FormDataMgr::NotifyFormsVisible(const std::vector<int64_t> &formIds, boo
             if (callerToken != record.GetFormHostClient()) {
                 continue;
             }
-            for (int64_t formId : formIds) {
+            for (const int64_t formId : formIds) {
                 int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+                if (CheckInvalidForm(formId) != ERR_OK) {
+                    continue;
+                }
                 if (!record.Contains(matchedFormId)) {
                     HILOG_ERROR("%{public}s fail, form is not self-owned, form:%{public}" PRId64 ".", __func__,
                         matchedFormId);
@@ -1447,7 +1450,8 @@ void FormDataMgr::GetNoHostInvalidTempForms(int32_t userId, int32_t callingUid, 
         int64_t formId = formRecordInfo.first;
         FormRecord &formRecord = formRecordInfo.second;
 
-        if (!formRecord.formTempFlag) {
+        // Checks the user id and the temp flag.
+        if (!formRecord.formTempFlag || (userId != formRecord.providerUserId)) {
             continue;
         }
         // check UID
@@ -1734,6 +1738,30 @@ bool FormDataMgr::SetRecordNeedFreeInstall(int64_t formId, bool isNeedFreeInstal
     item->second.needFreeInstall = isNeedFreeInstall;
     HILOG_INFO("%{public}s, set form record need free install flag successfully", __func__);
     return true;
+}
+
+ErrCode FormDataMgr::CheckInvalidForm(const int64_t formId)
+{
+    // Checks if the formid is valid.
+    if (formId <= 0) {
+        HILOG_ERROR("Invalid form id.");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    // Gets the corresponding userId by formId.
+    FormRecord formRecord;
+    int64_t matchedFormId = FindMatchedFormId(formId);
+    if (!GetFormRecord(matchedFormId, formRecord)) {
+        HILOG_ERROR("No matching formRecord was found for the form id.");
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    }
+
+    // Checks for cross-user operations.
+    if (formRecord.providerUserId != FormUtil::GetCurrentAccountId()) {
+        HILOG_ERROR("The form id corresponds to a card that is not for the currently active user.");
+        return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
+    }
+    return ERR_OK;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -22,6 +22,7 @@
 #include "form_ams_helper.h"
 #include "form_bms_helper.h"
 #include "form_constants.h"
+#include "form_data_mgr.h"
 #include "form_db_cache.h"
 #include "form_event_handler.h"
 #include "form_info_mgr.h"
@@ -222,6 +223,11 @@ int FormMgrService::StopRenderingForm(const int64_t formId, const std::string &c
         return ret;
     }
 
+    ret = FormDataMgr::GetInstance().CheckInvalidForm(formId);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("fail, the form id is invalid or not under the current active user.");
+        return ret;
+    }
     return FormMgrAdapter::GetInstance().StopRenderingForm(formId, compId);
 }
 
@@ -338,7 +344,6 @@ int FormMgrService::NotifyWhetherVisibleForms(const std::vector<int64_t> &formId
         HILOG_ERROR("%{public}s fail, event notify visible permission denied", __func__);
         return ret;
     }
-
     return FormMgrAdapter::GetInstance().NotifyWhetherVisibleForms(formIds, callerToken, formVisibleType);
 }
 
@@ -355,6 +360,11 @@ int FormMgrService::CastTempForm(const int64_t formId, const sptr<IRemoteObject>
     ErrCode ret = CheckFormPermission();
     if (ret != ERR_OK) {
         HILOG_ERROR("%{public}s fail, cast temp form permission denied", __func__);
+        return ret;
+    }
+    ret = FormDataMgr::GetInstance().CheckInvalidForm(formId);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("fail, the form id is invalid or not under the current active user.");
         return ret;
     }
     AAFwk::EventInfo eventInfo;
@@ -442,6 +452,11 @@ int FormMgrService::MessageEvent(const int64_t formId, const Want &want, const s
         HILOG_ERROR("%{public}s fail, request form permission denied", __func__);
         return ret;
     }
+    ret = FormDataMgr::GetInstance().CheckInvalidForm(formId);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("fail, the form id is invalid or not under the current active user.");
+        return ret;
+    }
     AAFwk::EventInfo eventInfo;
     eventInfo.bundleName = want.GetElement().GetBundleName();
     eventInfo.moduleName = want.GetStringParam(AppExecFwk::Constants::PARAM_MODULE_NAME_KEY);
@@ -463,6 +478,11 @@ int FormMgrService::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
     ErrCode ret = CheckFormPermission();
     if (ret != ERR_OK) {
         HILOG_ERROR("%{public}s fail, request form permission denied", __func__);
+        return ret;
+    }
+    ret = FormDataMgr::GetInstance().CheckInvalidForm(formId);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("fail, the form id is invalid or not under the current active user.");
         return ret;
     }
     AAFwk::EventInfo eventInfo;
@@ -487,6 +507,11 @@ int FormMgrService::BackgroundEvent(const int64_t formId, Want &want, const sptr
     ErrCode ret = CheckFormPermission();
     if (ret != ERR_OK) {
         HILOG_ERROR("%{public}s fail, request form permission denied", __func__);
+        return ret;
+    }
+    ret = FormDataMgr::GetInstance().CheckInvalidForm(formId);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("fail, the form id is invalid or not under the current active user.");
         return ret;
     }
     AAFwk::EventInfo eventInfo;
@@ -881,6 +906,12 @@ int32_t FormMgrService::ShareForm(int64_t formId, const std::string &deviceId, c
     auto ret = CheckFormPermission();
     if (ret != ERR_OK) {
         HILOG_ERROR("share form permission denied.");
+        return ret;
+    }
+
+    ret = FormDataMgr::GetInstance().CheckInvalidForm(formId);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("fail, the form id is invalid or not under the current active user.");
         return ret;
     }
 

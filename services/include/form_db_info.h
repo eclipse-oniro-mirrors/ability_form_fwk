@@ -85,6 +85,9 @@ struct FormDBInfo {
         if (userId != formDBInfo.userId) {
             return false;
         }
+        if (providerUserId != formDBInfo.providerUserId) {
+            return false;
+        }
         if (formName != formDBInfo.formName) {
             return false;
         }

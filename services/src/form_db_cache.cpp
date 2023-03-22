@@ -324,6 +324,10 @@ void FormDbCache::GetNoHostInvalidDBForms(int32_t userId, int32_t callingUid, st
         if (matchedFormIds.find(formId) != matchedFormIds.end()) {
             continue;
         }
+        // checks if the form provider is the currently active user.
+        if (formRecord.providerUserId != userId) {
+            continue;
+        }
 
         HILOG_DEBUG("found invalid form: %{public}" PRId64 "", formId);
         formRecord.formUserUids.erase(iter);
