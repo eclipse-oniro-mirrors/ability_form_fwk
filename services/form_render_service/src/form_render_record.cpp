@@ -312,28 +312,30 @@ void FormRenderRecord::HandleUpdateInJsThread(const FormJsInfo &formJsInfo, cons
 bool FormRenderRecord::HandleDeleteInJsThread(int64_t formId, const std::string &compId)
 {
     HILOG_INFO("Delete some resources in js thread.");
-    std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
-    auto search = formRendererGroupMap_.find(formId);
-    if (search == formRendererGroupMap_.end()) {
-        HILOG_INFO("HandleDeleteInJsThread failed. FormRendererGroup was not founded.");
-        return false;
+    bool isGroupEmpty = false;
+    {
+        std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
+        auto search = formRendererGroupMap_.find(formId);
+        if (search == formRendererGroupMap_.end()) {
+            HILOG_INFO("HandleDeleteInJsThread failed. FormRendererGroup was not founded.");
+            return false;
+        }
+        if (!search->second) {
+            HILOG_INFO("HandleDeleteInJsThread failed. FormRendererGroup was founded but is null.");
+            return false;
+        }
+        if (!compId.empty()) {
+            search->second->DeleteForm(compId);
+        }
+        isGroupEmpty = search->second->IsEmpty();
+        if (isGroupEmpty) {
+            formRendererGroupMap_.erase(formId);
+        }
     }
-
-    if (!search->second) {
-        HILOG_INFO("HandleDeleteInJsThread failed. FormRendererGroup was founded but is null.");
-        return false;
-    }
-
-    if (!compId.empty()) {
-        search->second->DeleteForm(compId);
-    }
-
-    bool isGroupEmpty = search->second->IsEmpty();
     if (isGroupEmpty) {
-        formRendererGroupMap_.erase(formId);
+        std::lock_guard<std::mutex> lock(hostsMapMutex_);
         hostsMapForFormId_.erase(formId);
     }
-    
     return isGroupEmpty;
 }
 
