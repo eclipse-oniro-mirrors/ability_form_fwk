@@ -135,7 +135,7 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
     return ERR_OK;
 }
 
-void FormRenderRecord::DeleteRenderRecord(int64_t formId, const std::string &compId, bool &isRenderGroupEmpty)
+void FormRenderRecord::DeleteRenderRecord(int64_t formId, const std::string &compId, const sptr<IRemoteObject> hostRemoteObj, bool &isRenderGroupEmpty)
 {
     // Some resources need to be deleted in a JS thread
     HILOG_INFO("Delete some resources formId:%{public}s %{public}s", std::to_string(formId).c_str(), compId.c_str());
@@ -153,6 +153,15 @@ void FormRenderRecord::DeleteRenderRecord(int64_t formId, const std::string &com
 
         isRenderGroupEmpty = renderRecord->HandleDeleteInJsThread(formId, compId);
     };
+
+    if (hostRemoteObj != nullptr) {
+        std::lock_guard<std::mutex> lock(hostsMapMutex_);
+        auto iter = hostsMapForFormId_.find(formId);
+        if (iter != hostsMapForFormId_.end()) {
+            std::unordered_set<sptr<IRemoteObject>, RemoteObjHash> &hosts = iter->second;
+            hosts.erase(hostRemoteObj);
+        }
+    }
     eventHandler_->PostSyncTask(task);
 }
 
@@ -315,9 +324,7 @@ bool FormRenderRecord::HandleDeleteInJsThread(int64_t formId, const std::string 
             HILOG_INFO("HandleDeleteInJsThread failed. FormRendererGroup was founded but is null.");
             return false;
         }
-        if (compId.empty()) {
-            search->second->DeleteForm();
-        } else {
+        if (!compId.empty()) {
             search->second->DeleteForm(compId);
         }
         isGroupEmpty = search->second->IsEmpty();
