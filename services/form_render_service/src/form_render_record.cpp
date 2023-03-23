@@ -158,7 +158,7 @@ void FormRenderRecord::DeleteRenderRecord(int64_t formId, const std::string &com
     if (hostRemoteObj != nullptr) {
         std::lock_guard<std::mutex> lock(hostsMapMutex_);
         auto iter = hostsMapForFormId_.find(formId);
-        if (iter == hostsMapForFormId_.end()) {
+        if (iter != hostsMapForFormId_.end()) {
             std::unordered_set<sptr<IRemoteObject>, RemoteObjHash> &hosts = iter->second;
             hosts.erase(hostRemoteObj);
         }
