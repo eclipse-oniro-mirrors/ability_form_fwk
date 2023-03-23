@@ -839,8 +839,7 @@ ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     int32_t currentUserId = FormUtil::GetCurrentAccountId();
-    if (hasRecord && (record.providerUserId == currentUserId
-        || FormDataMgr::GetInstance().IsCallingUidValid(record.formUserUids))) {
+    if (hasRecord && (record.providerUserId == currentUserId)) {
         if (!info.IsMatch(record)) {
             HILOG_ERROR("%{public}s, formId and item info not match:%{public}" PRId64 "", __func__, formId);
             return ERR_APPEXECFWK_FORM_CFG_NOT_MATCH_ID;
@@ -851,8 +850,7 @@ ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
     // find in db but not in cache
     FormRecord dbRecord;
     ErrCode getDbRet = FormDbCache::GetInstance().GetDBRecord(formId, dbRecord);
-    if (getDbRet == ERR_OK && (dbRecord.providerUserId == currentUserId
-        || FormDataMgr::GetInstance().IsCallingUidValid(dbRecord.formUserUids))) {
+    if (getDbRet == ERR_OK && (dbRecord.providerUserId == currentUserId)) {
         return AddNewFormRecord(info, formId, callerToken, wantParams, formInfo);
     }
 
