@@ -125,6 +125,8 @@ public:
     MOCK_METHOD2(GetBundleNameForUid, bool(const int, std::string &));
 
     MOCK_METHOD1(CheckIsSystemAppByUid, bool(const int));
+
+    MOCK_METHOD2(GetNameForUid, int32_t(const int, std::string &));
 };
 } // namespace AppExecFwk
 } // namespace OHOS
