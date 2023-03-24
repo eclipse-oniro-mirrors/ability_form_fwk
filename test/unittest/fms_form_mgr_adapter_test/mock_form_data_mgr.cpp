@@ -18,6 +18,7 @@
 #define private public
 #include "form_data_mgr.h"
 #include "form_mgr_errors.h"
+#include "form_util.h"
 #undef private
 #include "ipc_skeleton.h"
 
@@ -231,6 +232,7 @@ bool FormDataMgr::GetFormRecord(const int64_t formId, FormRecord &formRecord) co
         if (g_mockGetFormRecordParamsSysUid) {
             formRecord.formUserUids.push_back(SYSTEM_UID);
         }
+        formRecord.providerUserId = FormUtil::GetCurrentAccountId();
         formRecord.formTempFlag = g_mockGetFormRecordParamsTemp;
         formRecord.bundleName = "bundleName";
         formRecord.moduleName = "moduleName";
