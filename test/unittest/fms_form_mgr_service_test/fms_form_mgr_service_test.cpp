@@ -39,6 +39,7 @@ using namespace OHOS::AppExecFwk;
 
 extern void MockCheckAcrossLocalAccountsPermission(bool mockRet);
 extern void MockIsSACall(bool mockRet);
+extern void MockCheckInvalidForm(int32_t mockRet);
 extern void MockFMSIsSACall(bool mockRet);
 extern void MockFMSVerifyCallingPermission(bool mockRet);
 extern void MockIsSystemAppByFullTokenID(bool mockRet);
@@ -218,6 +219,7 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0009, TestSize.Level1)
     constexpr int64_t formId = 1;
     const sptr<IRemoteObject> callerToken = nullptr;
     MockIsSACall(true);
+    MockCheckInvalidForm(ERR_OK);
     EXPECT_EQ(ERR_OK, formMgrService.CastTempForm(formId, callerToken));
     GTEST_LOG_(INFO) << "FormMgrService_0009 end";
 }
@@ -235,6 +237,7 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0010, TestSize.Level1)
     const Want want = {};
     const sptr<IRemoteObject> callerToken = nullptr;
     MockIsSACall(true);
+    MockCheckInvalidForm(ERR_OK);
     EXPECT_EQ(ERR_OK, formMgrService.MessageEvent(formId, want, callerToken));
     GTEST_LOG_(INFO) << "FormMgrService_0010 end";
 }
@@ -252,6 +255,7 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0011, TestSize.Level1)
     Want want = {};
     const sptr<IRemoteObject> callerToken = nullptr;
     MockIsSACall(true);
+    MockCheckInvalidForm(ERR_OK);
     EXPECT_EQ(ERR_OK, formMgrService.RouterEvent(formId, want, callerToken));
     GTEST_LOG_(INFO) << "FormMgrService_0011 end";
 }
@@ -411,6 +415,7 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0020, TestSize.Level1)
     const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
     int64_t requestCode = 2;
     MockIsSACall(true);
+    MockCheckInvalidForm(ERR_OK);
     EXPECT_EQ(ERR_OK, formMgrService.ShareForm(formId, deviceId, callerToken, requestCode));
     GTEST_LOG_(INFO) << "FormMgrService_0020 end";
 }
