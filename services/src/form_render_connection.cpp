@@ -51,7 +51,14 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
     int32_t compileMode = 0;
     if (!FormBmsHelper::GetInstance().GetCompileMode(formRecord_.bundleName, formRecord_.moduleName,
         FormUtil::GetCurrentAccountId(), compileMode)) {
-        HILOG_INFO("get compile mode failed.");
+        HILOG_ERROR("get compile mode failed.");
+        return;
+    }
+
+    int32_t compatibleVersionCode = 0;
+    if (!FormBmsHelper::GetInstance().GetCompatibleVersionCode(
+            formRecord_.bundleName, FormUtil::GetCurrentAccountId(), compatibleVersionCode)) {
+        HILOG_ERROR("get compatible version code failed.");
         return;
     }
 
@@ -61,6 +68,7 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
     want.SetParams(wantParams_);
     want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
     want.SetParam(Constants::FORM_COMPILE_MODE_KEY, compileMode);
+    want.SetParam(Constants::FORM_COMPATIBLE_VERSION_CODE_KEY, compatibleVersionCode);
     FormTaskMgr::GetInstance().PostRenderForm(formRecord_, std::move(want), remoteObject);
 }
 
