@@ -241,5 +241,25 @@ bool FormBmsHelper::GetCompileMode(const std::string &bundleName, const std::str
     HILOG_ERROR("Get compile mode failed.");
     return false;
 }
+
+bool FormBmsHelper::GetCompatibleVersionCode(
+    const std::string& bundleName, int32_t userId, int32_t& minCompatibleVersionCode)
+{
+    HILOG_DEBUG("%{public}s called.", __func__);
+    sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
+    if (iBundleMgr == nullptr) {
+        HILOG_ERROR("iBundleMgr is nullptr");
+        return false;
+    }
+    int32_t flags = BundleFlag::GET_BUNDLE_DEFAULT;
+    BundleInfo bundleInfo;
+    if (!IN_PROCESS_CALL(iBundleMgr->GetBundleInfo(bundleName, flags, bundleInfo, userId))) {
+        HILOG_ERROR("Get bundle info failed.");
+        return false;
+    }
+
+    minCompatibleVersionCode = bundleInfo.minCompatibleVersionCode;
+    return true;
+}
 } // namespace AppExecFwk
 } // namespace OHOS
