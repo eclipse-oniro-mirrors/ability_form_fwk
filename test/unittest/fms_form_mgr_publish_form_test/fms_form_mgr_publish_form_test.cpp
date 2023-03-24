@@ -216,8 +216,8 @@ HWTEST_F(FmsFormMgrPublishFormTest, publishForm_002, TestSize.Level0)
     MockGetAbilityInfoByAction(true);
     EXPECT_CALL(*mockBms_, GetBundleInfo(_, _, _, _)).Times(1).WillRepeatedly(Return(true));
     EXPECT_CALL(*mockBms_, CheckIsSystemAppByUid(_)).Times(2).WillRepeatedly(Return(true));
-    EXPECT_CALL(*mockBms_, GetBundleNameForUid(_, _)).Times(1)
-        .WillRepeatedly(DoAll(SetArgReferee<1>(LAUNCHER_BUNDLE_NAME), Return(true)));
+    EXPECT_CALL(*mockBms_, GetNameForUid(_, _)).Times(1)
+        .WillRepeatedly(DoAll(SetArgReferee<1>(LAUNCHER_BUNDLE_NAME), Return(ERR_OK)));
     EXPECT_EQ(ERR_OK,
         formyMgrServ_->RequestPublishForm(want, false, formBindingData, formId));
     mockBms_.clear();
@@ -260,8 +260,8 @@ HWTEST_F(FmsFormMgrPublishFormTest, publishForm_003, TestSize.Level0)
     MockGetAbilityInfoByAction(true);
     EXPECT_CALL(*mockBms_, GetBundleInfo(_, _, _, _)).Times(1).WillRepeatedly(Return(true));
     EXPECT_CALL(*mockBms_, CheckIsSystemAppByUid(_)).Times(2).WillRepeatedly(Return(true));
-    EXPECT_CALL(*mockBms_, GetBundleNameForUid(_, _)).Times(1)
-    .WillRepeatedly(DoAll(SetArgReferee<1>(bundleName), Return(true)));
+    EXPECT_CALL(*mockBms_, GetNameForUid(_, _)).Times(1)
+    .WillRepeatedly(DoAll(SetArgReferee<1>(bundleName), Return(ERR_OK)));
     EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY,
         formyMgrServ_->RequestPublishForm(want, false, formBindingData, formId));
     mockBms_.clear();

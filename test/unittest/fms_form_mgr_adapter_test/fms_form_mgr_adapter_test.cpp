@@ -1074,7 +1074,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_055, TestSize.Level0)
     MockGetAbilityInfoByAction(true);
     EXPECT_CALL(*bmsProxy, CheckIsSystemAppByUid(_)).Times(1).WillRepeatedly(Return(true));
     std::string bundleName = "com.ohos.launcher";
-    EXPECT_CALL(*bmsProxy, GetBundleNameForUid(_, _)).Times(1)
+    EXPECT_CALL(*bmsProxy, GetNameForUid(_, _)).Times(1)
         .WillRepeatedly(DoAll(SetArgReferee<1>(bundleName), Return(true)));
     EXPECT_EQ(false, formMgrAdapter.IsRequestPublishFormSupported());
     FormBmsHelper::GetInstance().iBundleMgr_ = backup;
@@ -3068,9 +3068,9 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0154, TestSize.Level0)
     auto bmsTaskGetBundleNameForUid = [] (const int uid, std::string &name) {
         name = "name";
         GTEST_LOG_(INFO) << "FormMgrAdapter_0154 bmsTaskGetBundleNameForUid called";
-        return true;
+        return ERR_OK;
     };
-    EXPECT_CALL(*bmsProxy, GetBundleNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
+    EXPECT_CALL(*bmsProxy, GetNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
     auto bmsTaskGetBundleInfo =
         [] (const std::string &bundleName, const BundleFlag flag, BundleInfo &bundleInfo, int32_t userId) {
         GTEST_LOG_(INFO) << "FormMgrAdapter_0154 bmsTask called";
