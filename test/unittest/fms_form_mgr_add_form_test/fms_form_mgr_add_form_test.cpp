@@ -130,7 +130,6 @@ void FmsFormMgrAddFormTest::CreateProviderData()
     formInfo.defaultDimension = 1;
     FormInfoStorage formInfoStorage;
     formInfoStorage.userId = userId_;
-    formInfoStorage.providerUserId = providerUserId_;
     formInfoStorage.formInfos.push_back(formInfo);
     bundleFormInfo->formInfoStorages_.emplace_back(formInfoStorage);
     bundleFormInfoMap.emplace(FORM_PROVIDER_BUNDLE_NAME, bundleFormInfo);
@@ -663,7 +662,6 @@ HWTEST_F(FmsFormMgrAddFormTest, AddForm_009, TestSize.Level0)
     formInfo1.supportDimensions.push_back(PARAM_FORM_DIMENSION_VALUE);
     FormInfoStorage formInfoStor;
     formInfoStor.userId = userId_;
-    formInfoStor.providerUserId = providerUserId_;
     formInfoStor.formInfos.push_back(formInfo1);
     FormInfoMgr::GetInstance().bundleFormInfoMap_[FORM_PROVIDER_BUNDLE_NAME]->formInfoStorages_.push_back(formInfoStor);
 
