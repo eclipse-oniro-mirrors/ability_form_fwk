@@ -454,7 +454,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0018, TestSize.Level1) {
     int errCode = ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     auto result = FormMgr::GetInstance().GetErrorMessage(errCode);
 
-    EXPECT_EQ(result, "check permission deny, need to request ohos.permission.REQUIRE_FORM.");
+    EXPECT_EQ(result, "check permission deny, need to request ohos.permission.REQUIRE_FORM or ohos.permission.INTERACT_ACROSS_LOCAL_ACCOUNTS.");
     GTEST_LOG_(INFO) << "FormMgrTest_0018 test ends";
 }
 
@@ -1218,7 +1218,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0059, TestSize.Level1) {
 
 /**
  * @tc.name: FormMgrTest_0060
- * @tc.desc: Verify NotifyWhetherVisibleForms (Parameters are normal£¬The return value of mock function is 0)
+ * @tc.desc: Verify NotifyWhetherVisibleForms (Parameters are normal, the return value of mock function is 0)
  * @tc.type: FUNC
  * @tc.require: issueI63Y7Y
  */
@@ -1240,7 +1240,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0060, TestSize.Level1) {
 
 /**
  * @tc.name: FormMgrTest_0061
- * @tc.desc: Verify NotifyWhetherVisibleForms (Parameters are normal£¬The return value of mock function is not 0)
+ * @tc.desc: Verify NotifyWhetherVisibleForms (Parameters are normal, the return value of mock function is not 0)
  * @tc.type: FUNC
  * @tc.require: issueI63Y7Y
  */
@@ -1262,7 +1262,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0061, TestSize.Level1) {
 
 /**
  * @tc.name: FormMgrTest_0062
- * @tc.desc: Verify CastTempForm (Parameters are normal£¬The return value of mock function is 0)
+ * @tc.desc: Verify CastTempForm (Parameters are normal, the return value of mock function is 0)
  * @tc.type: FUNC
  * @tc.require: issueI63Y7Y
  */
@@ -1280,7 +1280,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0062, TestSize.Level1) {
 
 /**
  * @tc.name: FormMgrTest_0063
- * @tc.desc: Verify CastTempForm (Parameters are normal£¬The return value of mock function is not 0)
+ * @tc.desc: Verify CastTempForm (Parameters are normal, the return value of mock function is not 0)
  * @tc.type: FUNC
  * @tc.require: issueI63Y7Y
  */
