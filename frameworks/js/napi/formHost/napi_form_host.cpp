@@ -904,12 +904,12 @@ private:
     AsyncAcquireFormStateCallbackInfo *asyncCallbackInfo_ = nullptr;
 };
 
-class FormUninstallCallbackClient {
+class FormUninstallCallbackClient : public std::enable_shared_from_this<FormUninstallCallbackClient>
+{
 public:
-    explicit FormUninstallCallbackClient(napi_env env, napi_ref callbackRef)
+    FormUninstallCallbackClient(napi_env env, napi_ref callbackRef) : callbackRef_(callbackRef), env_(env)
     {
-        env_ = env;
-        callbackRef_ = callbackRef;
+        handler_ = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
     }
 
     virtual ~FormUninstallCallbackClient()
@@ -919,15 +919,27 @@ public:
 
     void ProcessFormUninstall(const int64_t formId)
     {
-        std::string formIdString = std::to_string(formId);
-        napi_value callbackValues;
-        napi_create_string_utf8(env_, formIdString.c_str(), NAPI_AUTO_LENGTH, &callbackValues);
-        napi_value callResult;
-        napi_value myCallback = nullptr;
-        napi_get_reference_value(env_, callbackRef_, &myCallback);
-        if (myCallback != nullptr) {
-            napi_call_function(env_, nullptr, myCallback, ARGS_SIZE_ONE, &callbackValues, &callResult);
+        if (handler_ == nullptr) {
+            HILOG_INFO("handler is nullptr");
+            return;
         }
+        handler_->PostSyncTask([thisWeakPtr = weak_from_this(), formId]() {
+            auto sharedThis = thisWeakPtr.lock();
+            if (sharedThis == nullptr) {
+                HILOG_ERROR("sharedThis is nullptr.");
+                return;
+            }
+            HILOG_DEBUG("task complete formId: form: %{public}" PRId64 ".", formId);
+            std::string formIdString = std::to_string(formId);
+            napi_value callbackValues;
+            napi_create_string_utf8(sharedThis->env_, formIdString.c_str(), NAPI_AUTO_LENGTH, &callbackValues);
+            napi_value callResult;
+            napi_value myCallback = nullptr;
+            napi_get_reference_value(sharedThis->env_, sharedThis->callbackRef_, &myCallback);
+            if (myCallback != nullptr) {
+                napi_call_function(sharedThis->env_, nullptr, myCallback, ARGS_SIZE_ONE, &callbackValues, &callResult);
+            }
+        });
     }
 
     bool IsStrictEqual(napi_value callback)
@@ -941,6 +953,7 @@ public:
     }
 
 private:
+    std::shared_ptr<AppExecFwk::EventHandler> handler_ = nullptr;
     napi_ref callbackRef_ {};
     napi_env env_;
 };
