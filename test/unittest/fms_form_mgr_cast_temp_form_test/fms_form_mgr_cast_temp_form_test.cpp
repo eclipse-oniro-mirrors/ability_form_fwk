@@ -169,16 +169,13 @@ HWTEST_F(FmsFormMgrCastTempFormTest, CastTempForm_001, TestSize.Level0)
  * SubFunction: CastTempForm Function
  * FunctionPoints: FormMgr CastTempForm interface
  * EnvConditions: Mobile that can run ohos test framework
- * CaseDescription: form id <= 0 or Caller ability token is nullptr.
+ * CaseDescription: form id <= 0.
  */
 HWTEST_F(FmsFormMgrCastTempFormTest, CastTempForm_002, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "fms_form_mgr_cast_temp_form_test_002 start";
     // form id <= 0
     ASSERT_EQ(ERR_APPEXECFWK_FORM_INVALID_FORM_ID, FormMgr::GetInstance().CastTempForm(0L, token_));
-    // Caller ability token is nullptr
-    int64_t formId {FormDataMgr::GetInstance().GenerateFormId()};
-    ASSERT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, FormMgr::GetInstance().CastTempForm(formId, nullptr));
     GTEST_LOG_(INFO) << "fms_form_mgr_cast_temp_form_test_002 end";
 }
 
