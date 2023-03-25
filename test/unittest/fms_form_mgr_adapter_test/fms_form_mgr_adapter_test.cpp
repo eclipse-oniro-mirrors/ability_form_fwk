@@ -47,6 +47,7 @@ using ::testing::DoAll;
 using ::testing::Return;
 using ::testing::SetArgReferee;
 
+extern void MockCheckInvalidForm(int32_t mockRet);
 extern void MockGetBoolParam(bool mockRet);
 extern void MockExistTempForm(bool mockRet);
 extern void MockGetDBRecord(bool mockRet);
@@ -409,6 +410,9 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_017, TestSize.Level0)
     int64_t formId = 1;
     std::string bundleName = "aa";
     FormProviderData formProviderData;
+    MockGetFormRecord(true);
+    MockGetFormRecordParams(true);
+    MockCheckInvalidForm(ERR_OK);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.UpdateForm(formId, bundleName, formProviderData));
     GTEST_LOG_(INFO) << "FormMgrAdapter_017 end";
 }
@@ -1821,6 +1825,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_097, TestSize.Level0)
     WantParams wantParams;
     FormJsInfo formInfo;
     MockGetFormRecord(true);
+    MockGetFormRecordParams(true);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE,
         formMgrAdapter.AllotFormById(info, callerToken, wantParams, formInfo));
     GTEST_LOG_(INFO) << "FormMgrAdapter_097 end";

@@ -16,6 +16,7 @@
 #include "form_db_cache.h"
 
 #include "form_mgr_errors.h"
+#include "form_util.h"
 #include "ipc_skeleton.h"
 
 namespace {
@@ -73,6 +74,7 @@ ErrCode FormDbCache::GetDBRecord(const int64_t formId, FormRecord &record) const
             constexpr int32_t CALLING_UID_TRANSFORM_DIVISOR = 200000;
             record.userId = callingUid / CALLING_UID_TRANSFORM_DIVISOR;
             record.formUserUids.push_back(callingUid);
+            record.providerUserId = FormUtil::GetCurrentAccountId();
         }
         return ERR_OK;
     }

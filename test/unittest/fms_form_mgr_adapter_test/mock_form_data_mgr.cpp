@@ -18,6 +18,7 @@
 #define private public
 #include "form_data_mgr.h"
 #include "form_mgr_errors.h"
+#include "form_util.h"
 #undef private
 #include "ipc_skeleton.h"
 
@@ -26,6 +27,7 @@ namespace {
     bool g_mockExistFormRecordRet = true;
     bool g_mockGetMatchedHostClientRet = true;
     bool g_mockGetMatchedHostClientParams = false;
+    int32_t g_mockCheckInvalidFormRet = OHOS::ERR_OK;
     int64_t g_mockGetMatchedHostClientParamsMatchedId = 0;
     bool g_mockGetFormRecordRet = true;
     bool g_mockGetFormRecordParams = false;
@@ -186,6 +188,11 @@ void MockGetFormHostRecord(bool mockRet)
     g_mockGetFormHostRecord = mockRet;
 }
 
+void MockCheckInvalidForm(int32_t mockRet)
+{
+    g_mockCheckInvalidFormRet = mockRet;
+}
+
 namespace OHOS {
 namespace AppExecFwk {
 FormDataMgr::FormDataMgr()
@@ -231,6 +238,7 @@ bool FormDataMgr::GetFormRecord(const int64_t formId, FormRecord &formRecord) co
         if (g_mockGetFormRecordParamsSysUid) {
             formRecord.formUserUids.push_back(SYSTEM_UID);
         }
+        formRecord.providerUserId = FormUtil::GetCurrentAccountId();
         formRecord.formTempFlag = g_mockGetFormRecordParamsTemp;
         formRecord.bundleName = "bundleName";
         formRecord.moduleName = "moduleName";
@@ -338,6 +346,11 @@ void FormDataMgr::GetFormHostRecord(const int64_t formId, std::vector<FormHostRe
         FormHostRecord formRecord = {};
         formHostRecords.push_back(formRecord);
     }
+}
+
+ErrCode FormDataMgr::CheckInvalidForm(const int64_t formId)
+{
+    return g_mockCheckInvalidFormRet;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

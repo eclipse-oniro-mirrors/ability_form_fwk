@@ -83,6 +83,7 @@ protected:
     sptr<MockFormHostClient> token_;
     std::shared_ptr<FormMgrService> formyMgrServ_ = DelayedSingleton<FormMgrService>::GetInstance();
     int32_t userId_ = FormUtil::GetCurrentAccountId();
+    int32_t providerUserId_ = FormUtil::GetCurrentAccountId();
 };
 
 void FmsFormMgrAddFormTest::SetUpTestCase()
