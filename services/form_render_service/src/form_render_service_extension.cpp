@@ -94,6 +94,8 @@ void FormRenderServiceExtension::OnConfigurationUpdated(const AppExecFwk::Config
 {
     Extension::OnConfigurationUpdated(configuration);
     HILOG_INFO("%{public}s called.", __func__);
+    auto config = std::make_shared<AppExecFwk::Configuration>(configuration);
+    OHOS::DelayedSingleton<FormRenderImpl>::GetInstance()->OnConfigurationUpdated(config);
 }
 }
 }

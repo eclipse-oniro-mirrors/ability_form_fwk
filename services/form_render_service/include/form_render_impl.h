@@ -74,6 +74,12 @@ public:
      */
     int32_t ReloadForm(const std::vector<int64_t> &&formIds, const Want &want) override;
 
+    /**
+     * @brief Called when the system configuration is updated.
+     * @param configuration Indicates the updated configuration information.
+     */
+    void OnConfigurationUpdated(const std::shared_ptr<OHOS::AppExecFwk::Configuration>& configuration);
+
 private:
     std::mutex renderRecordMutex_;
     std::unordered_map<std::string, std::shared_ptr<FormRenderRecord>> renderRecordMap_; // <uid(userId + bundleName), renderRecord>
