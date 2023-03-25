@@ -45,7 +45,8 @@ using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::AppExecFwk;
 using namespace OHOS::Security;
-
+using ::testing::Invoke;
+using ::testing::_;
 namespace {
 const std::string PERMISSION_NAME_REQUIRE_FORM = "ohos.permission.REQUIRE_FORM";
 const std::string PARAM_PROVIDER_PACKAGE_NAME = "com.form.provider.app.test.ability";
@@ -76,14 +77,18 @@ protected:
     sptr<MockFormHostClient> token_;
     std::shared_ptr<FormMgrService> formyMgrServ_ = DelayedSingleton<FormMgrService>::GetInstance();
     int32_t userId_ = FormUtil::GetCurrentAccountId();
+    static sptr<BundleMgrService> mockBundleMgrService;
 };
 
 void FmsFormMgrDeathCallbackTest::SetUpTestCase()
 {
     RemoteNativeToken::SetNativeToken();
-    FormBmsHelper::GetInstance().SetBundleManager(new BundleMgrService());
+    mockBundleMgrService = new BundleMgrService();
+    FormBmsHelper::GetInstance().SetBundleManager(mockBundleMgrService);
     FormAmsHelper::GetInstance().SetAbilityManager(new MockAbilityMgrService());
 }
+
+sptr<BundleMgrService> FmsFormMgrDeathCallbackTest::mockBundleMgrService = nullptr;
 
 void FmsFormMgrDeathCallbackTest::TearDownTestCase()
 {}
@@ -151,6 +156,12 @@ HWTEST_F(FmsFormMgrDeathCallbackTest, OnRemoteDied_001, TestSize.Level0)
         .SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, false)
         .SetParam(Constants::ACQUIRE_TYPE, Constants::ACQUIRE_TYPE_CREATE_FORM);
 
+    auto bmsTaskGetBundleNameForUid = [] (const int uid, std::string &name) {
+        name = FORM_PROVIDER_BUNDLE_NAME;
+        GTEST_LOG_(INFO) << "AddForm_002 bmsTaskGetBundleNameForUid called";
+        return ERR_OK;
+    };
+    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().AddForm(0L, want, token_, formJsInfo));
     token_->Wait();
 
@@ -198,6 +209,12 @@ HWTEST_F(FmsFormMgrDeathCallbackTest, OnRemoteDied_002, TestSize.Level0)
         .SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, false)
         .SetParam(Constants::ACQUIRE_TYPE, Constants::ACQUIRE_TYPE_CREATE_FORM);
 
+    auto bmsTaskGetBundleNameForUid = [] (const int uid, std::string &name) {
+        name = FORM_PROVIDER_BUNDLE_NAME;
+        GTEST_LOG_(INFO) << "AddForm_002 bmsTaskGetBundleNameForUid called";
+        return ERR_OK;
+    };
+    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().AddForm(0L, want, token_, formJsInfo));
     token_->Wait();
 
