@@ -251,8 +251,7 @@ private:
     AsyncAcquireFormStateCallbackInfo *asyncCallbackInfo_ = nullptr;
 };
 
-class FormUninstallCallbackClient : public std::enable_shared_from_this<FormUninstallCallbackClient>
-{
+class FormUninstallCallbackClient : public std::enable_shared_from_this<FormUninstallCallbackClient> {
 public:
     FormUninstallCallbackClient(napi_env env, napi_ref callbackRef) : callbackRef_(callbackRef), env_(env)
     {
