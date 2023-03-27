@@ -454,7 +454,8 @@ HWTEST_F(FormMgrTest, FormMgrTest_0018, TestSize.Level1) {
     int errCode = ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     auto result = FormMgr::GetInstance().GetErrorMessage(errCode);
 
-    EXPECT_EQ(result, "check permission deny, need to request ohos.permission.REQUIRE_FORM or ohos.permission.INTERACT_ACROSS_LOCAL_ACCOUNTS.");
+    EXPECT_EQ(result, "check permission deny, need to request ohos.permission.REQUIRE_FORM "
+        "or ohos.permission.INTERACT_ACROSS_LOCAL_ACCOUNTS.");
     GTEST_LOG_(INFO) << "FormMgrTest_0018 test ends";
 }
 
