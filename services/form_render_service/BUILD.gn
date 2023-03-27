@@ -74,6 +74,7 @@ ohos_shared_library("formrender") {
   deps = [ "${form_fwk_path}:form_manager" ]
 
   external_deps = [
+    "ability_base:configuration",
     "ability_base:want",
     "ability_runtime:ability_deps_wrapper",
     "ability_runtime:ability_manager",
