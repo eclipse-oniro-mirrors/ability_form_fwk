@@ -173,6 +173,18 @@ int32_t FormRenderImpl::ReloadForm(const std::vector<int64_t> &&formIds, const W
     }
     return ERR_OK;
 }
+
+void FormRenderImpl::OnConfigurationUpdated(
+    const std::shared_ptr<OHOS::AppExecFwk::Configuration>& configuration)
+{
+    HILOG_INFO("OnConfigurationUpdated start");
+    std::lock_guard<std::mutex> lock(renderRecordMutex_);
+    for (auto iter = renderRecordMap_.begin(); iter != renderRecordMap_.end(); ++iter) {
+        if (iter->second) {
+            iter->second->UpdateConfiguration(configuration);
+        }
+    }
+}
 } // namespace FormRender
 } // namespace AppExecFwk
 } // namespace OHOS

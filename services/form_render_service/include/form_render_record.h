@@ -20,6 +20,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#include "configuration.h"
 #include "context_impl.h"
 #include "event_handler.h"
 #include "form_js_info.h"
@@ -82,6 +83,8 @@ public:
 
     bool IsEmpty();
 
+    void UpdateConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration>& config);
+
 private:
     class RemoteObjHash {
     public:
@@ -113,6 +116,8 @@ private:
     void HandleDestroyInJsThread();
 
     std::string GenerateContextKey(const FormJsInfo &formJsInfo);
+
+    void HandleUpdateConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration>& config);
 
     std::string bundleName_;
     std::string uid_;

@@ -392,6 +392,43 @@ int32_t FormRenderRecord::HandleReloadFormRecord(const std::vector<int64_t> &&fo
     }
     return ERR_OK;
 }
+
+void FormRenderRecord::UpdateConfiguration(
+    const std::shared_ptr<OHOS::AppExecFwk::Configuration>& config)
+{
+    HILOG_INFO("UpdateConfiguration begin");
+    if (!config) {
+        HILOG_ERROR("UpdateConfiguration failed due to config is nullptr");
+        return;
+    }
+
+    std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
+    auto task = [thisWeakPtr, config]() {
+        auto renderRecord = thisWeakPtr.lock();
+        if (renderRecord == nullptr) {
+            HILOG_ERROR("renderRecord is nullptr.");
+            return;
+        }
+        renderRecord->HandleUpdateConfiguration(config);
+    };
+    if (eventHandler_ == nullptr) {
+        HILOG_ERROR("eventHandler_ is nullptr");
+        return;
+    }
+    eventHandler_->PostTask(task);
+}
+
+void FormRenderRecord::HandleUpdateConfiguration(
+    const std::shared_ptr<OHOS::AppExecFwk::Configuration>& config)
+{
+    HILOG_INFO("HandleUpdateConfiguration begin.");
+    std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
+    for (auto iter = formRendererGroupMap_.begin(); iter != formRendererGroupMap_.end(); ++iter) {
+        if (iter->second) {
+            iter->second->UpdateConfiguration(config);
+        }
+    }
+}
 } // namespace FormRender
 } // namespace AppExecFwk
 } // namespace OHOS
