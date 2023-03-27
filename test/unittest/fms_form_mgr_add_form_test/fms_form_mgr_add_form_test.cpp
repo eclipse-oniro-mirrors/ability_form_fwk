@@ -44,6 +44,7 @@
 #include "system_ability_definition.h"
 
 using namespace testing::ext;
+using ::testing::Invoke;
 using namespace OHOS;
 using namespace OHOS::AppExecFwk;
 using namespace OHOS::Security;
@@ -184,7 +185,7 @@ void FmsFormMgrAddFormTestExt::FillBundleInfo(const std::string &bundleName, Bun
  * @tc.type: FUNC
  * @tc.require: issueI5G2SH
  */
-HWTEST_F(FmsFormMgrAddFormTest, AddForm_001, TestSize.Level0)
+HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "fms_form_mgr_add_form_test_001 start";
     CreateProviderData();
@@ -205,7 +206,17 @@ HWTEST_F(FmsFormMgrAddFormTest, AddForm_001, TestSize.Level0)
     for (auto oldFormDBInfo: oldFormDBInfos) {
         FormDbCache::GetInstance().DeleteFormInfo(oldFormDBInfo.formId);
     }
+    auto bmsTaskGetBundleNameForUid = [] (const int uid, std::string &name) {
+        name = FORM_PROVIDER_BUNDLE_NAME;
+        GTEST_LOG_(INFO) << "AddForm_001 bmsTaskGetBundleNameForUid called";
+        return ERR_OK;
+    };
 
+    BundleInfo bundleInfo;
+    FillBundleInfo(FORM_PROVIDER_BUNDLE_NAME, bundleInfo);
+    EXPECT_CALL(*mockBundleMgrService, GetBundleInfo(_, _, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(bundleInfo), Return(true)));
+    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
     // add form
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().AddForm(0L, want, token_, formJsInfo));
     token_->Wait();
@@ -243,7 +254,7 @@ HWTEST_F(FmsFormMgrAddFormTest, AddForm_001, TestSize.Level0)
  * EnvConditions: Mobile that can run ohos test framework
  * CaseDescription: Add form with cache info.
  */
-HWTEST_F(FmsFormMgrAddFormTest, AddForm_002, TestSize.Level0)
+HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_002, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "fms_form_mgr_add_form_test_002 start";
     CreateProviderData();
@@ -280,6 +291,18 @@ HWTEST_F(FmsFormMgrAddFormTest, AddForm_002, TestSize.Level0)
     want.SetParam(Constants::ACQUIRE_TYPE, Constants::ACQUIRE_TYPE_CREATE_FORM);
 
     GTEST_LOG_(INFO) << "formId :"<<formId;
+
+    auto bmsTaskGetBundleNameForUid = [] (const int uid, std::string &name) {
+        name = FORM_PROVIDER_BUNDLE_NAME;
+        GTEST_LOG_(INFO) << "AddForm_002 bmsTaskGetBundleNameForUid called";
+        return ERR_OK;
+    };
+
+    BundleInfo bundleInfo;
+    FillBundleInfo(FORM_PROVIDER_BUNDLE_NAME, bundleInfo);
+    EXPECT_CALL(*mockBundleMgrService, GetBundleInfo(_, _, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(bundleInfo), Return(true)));
+    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().AddForm(formId, want, token_, formJsInfo));
     token_->Wait();
 
@@ -316,7 +339,7 @@ HWTEST_F(FmsFormMgrAddFormTest, AddForm_002, TestSize.Level0)
  * EnvConditions: Mobile that can run ohos test framework
  * CaseDescription: Add form with database info but without cache.
  */
-HWTEST_F(FmsFormMgrAddFormTest, AddForm_003, TestSize.Level0)
+HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_003, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "fms_form_mgr_add_form_test_003 start";
     CreateProviderData();
@@ -325,14 +348,14 @@ HWTEST_F(FmsFormMgrAddFormTest, AddForm_003, TestSize.Level0)
     int callingUid {0};
     // Set database info
     FormRecord record1;
-    record1.formId = formId;
     record1.bundleName = FORM_PROVIDER_BUNDLE_NAME;
-    record1.moduleName = PARAM_FORM_NAME;
+    record1.moduleName = PARAM_PROVIDER_MODULE_NAME;
     record1.abilityName = FORM_PROVIDER_ABILITY_NAME;
     record1.formName = PARAM_FORM_NAME;
     record1.specification = PARAM_FORM_DIMENSION_VALUE;
     record1.formUserUids.emplace_back(callingUid);
     record1.formTempFlag = false;
+    record1.providerUserId = FormUtil::GetCurrentAccountId();
     FormDBInfo formDBInfo(formId, record1);
     FormDbCache::GetInstance().SaveFormInfo(formDBInfo);
     // Set form host record
@@ -348,6 +371,17 @@ HWTEST_F(FmsFormMgrAddFormTest, AddForm_003, TestSize.Level0)
     want.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
     want.SetParam(Constants::ACQUIRE_TYPE, Constants::ACQUIRE_TYPE_CREATE_FORM);
 
+    auto bmsTaskGetBundleNameForUid = [] (const int uid, std::string &name) {
+        name = FORM_PROVIDER_BUNDLE_NAME;
+        GTEST_LOG_(INFO) << "AddForm_003 bmsTaskGetBundleNameForUid called";
+        return ERR_OK;
+    };
+
+    BundleInfo bundleInfo;
+    FillBundleInfo(FORM_PROVIDER_BUNDLE_NAME, bundleInfo);
+    EXPECT_CALL(*mockBundleMgrService, GetBundleInfo(_, _, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(bundleInfo), Return(true)));
+    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
     GTEST_LOG_(INFO) << "formId :"<<formId;
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().AddForm(formId, want, token_, formJsInfo));
     token_->Wait();
@@ -386,7 +420,7 @@ HWTEST_F(FmsFormMgrAddFormTest, AddForm_003, TestSize.Level0)
  * EnvConditions: Mobile that can run ohos test framework
  * CaseDescription: Invalid case when callertoken is nullptr.
  */
-HWTEST_F(FmsFormMgrAddFormTest, AddForm_004, TestSize.Level0)
+HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_004, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "fms_form_mgr_add_form_test_004 start";
     CreateProviderData();
@@ -416,7 +450,7 @@ HWTEST_F(FmsFormMgrAddFormTest, AddForm_004, TestSize.Level0)
  * EnvConditions: Mobile that can run ohos test framework
  * CaseDescription: BundleName,AbilityName,moduleName in Want is null separately.
  */
-HWTEST_F(FmsFormMgrAddFormTest, AddForm_005, TestSize.Level0)
+HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_005, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "fms_form_mgr_add_form_test_005 start";
     CreateProviderData();
@@ -452,7 +486,7 @@ HWTEST_F(FmsFormMgrAddFormTest, AddForm_005, TestSize.Level0)
  * EnvConditions: Mobile that can run ohos test framework
  * CaseDescription: Case when cache info is not matched with form.
  */
-HWTEST_F(FmsFormMgrAddFormTest, AddForm_006, TestSize.Level0)
+HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_006, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "fms_form_mgr_add_form_test_006 start";
     CreateProviderData();
@@ -487,6 +521,17 @@ HWTEST_F(FmsFormMgrAddFormTest, AddForm_006, TestSize.Level0)
     want.SetParam(Constants::ACQUIRE_TYPE, Constants::ACQUIRE_TYPE_CREATE_FORM);
 
     GTEST_LOG_(INFO) << "formId :"<<formId;
+    auto bmsTaskGetBundleNameForUid = [] (const int uid, std::string &name) {
+        name = FORM_PROVIDER_BUNDLE_NAME;
+        GTEST_LOG_(INFO) << "AddForm_006 bmsTaskGetBundleNameForUid called";
+        return ERR_OK;
+    };
+
+    BundleInfo bundleInfo;
+    FillBundleInfo(FORM_PROVIDER_BUNDLE_NAME, bundleInfo);
+    EXPECT_CALL(*mockBundleMgrService, GetBundleInfo(_, _, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(bundleInfo), Return(true)));
+    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
     EXPECT_EQ(ERR_APPEXECFWK_FORM_CFG_NOT_MATCH_ID, FormMgr::GetInstance().AddForm(formId, want, token_, formJsInfo));
     token_->Wait();
 
@@ -504,7 +549,7 @@ HWTEST_F(FmsFormMgrAddFormTest, AddForm_006, TestSize.Level0)
  * EnvConditions: Mobile that can run ohos test framework
  * CaseDescription: Case when temp form is out of limit.
  */
-HWTEST_F(FmsFormMgrAddFormTest, AddForm_007, TestSize.Level0)
+HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_007, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "fms_form_mgr_add_form_test_007 start";
     CreateProviderData();
@@ -564,7 +609,7 @@ HWTEST_F(FmsFormMgrAddFormTest, AddForm_007, TestSize.Level0)
  * EnvConditions: Mobile that can run ohos test framework
  * CaseDescription: Case when normal form is out of limit.
  */
-HWTEST_F(FmsFormMgrAddFormTest, AddForm_008, TestSize.Level0)
+HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_008, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "fms_form_mgr_add_form_test_008 start";
     CreateProviderData();
@@ -632,7 +677,7 @@ HWTEST_F(FmsFormMgrAddFormTest, AddForm_008, TestSize.Level0)
  * EnvConditions: Mobile that can run ohos test framework
  * CaseDescription: Add form with cache info.
  */
-HWTEST_F(FmsFormMgrAddFormTest, AddForm_009, TestSize.Level0)
+HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_009, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "fms_form_mgr_add_form_test_009 start";
     CreateProviderData();
@@ -686,6 +731,17 @@ HWTEST_F(FmsFormMgrAddFormTest, AddForm_009, TestSize.Level0)
     want.SetParam(Constants::ACQUIRE_TYPE, Constants::ACQUIRE_TYPE_CREATE_FORM);
 
     GTEST_LOG_(INFO) << "formId :"<<formId;
+    auto bmsTaskGetBundleNameForUid = [] (const int uid, std::string &name) {
+        name = FORM_PROVIDER_BUNDLE_NAME;
+        GTEST_LOG_(INFO) << "AddForm_009 bmsTaskGetBundleNameForUid called";
+        return ERR_OK;
+    };
+
+    BundleInfo bundleInfo;
+    FillBundleInfo(FORM_PROVIDER_BUNDLE_NAME, bundleInfo);
+    EXPECT_CALL(*mockBundleMgrService, GetBundleInfo(_, _, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(bundleInfo), Return(true)));
+    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().AddForm(formId, want, token_, formJsInfo));
     token_->Wait();
 
@@ -730,6 +786,9 @@ HWTEST_F(FmsFormMgrAddFormTest, AddForm_009, TestSize.Level0)
     }
     EXPECT_TRUE(formExist);
 
+    EXPECT_CALL(*mockBundleMgrService, GetBundleInfo(_, _, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(bundleInfo), Return(true)));
+    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().AddForm(formId, want, token_, formJsInfo));
     token_->Wait();
     FormRecord formInfo3;
@@ -762,7 +821,7 @@ HWTEST_F(FmsFormMgrAddFormTest, AddForm_009, TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: issueI5MVKZ
  */
-HWTEST_F(FmsFormMgrAddFormTest, AddForm_010, TestSize.Level0)
+HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_010, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "fms_form_mgr_add_form_test_010 start";
     CreateProviderData();
@@ -784,6 +843,17 @@ HWTEST_F(FmsFormMgrAddFormTest, AddForm_010, TestSize.Level0)
         FormDbCache::GetInstance().DeleteFormInfo(oldFormDBInfo.formId);
     }
 
+    auto bmsTaskGetBundleNameForUid = [] (const int uid, std::string &name) {
+        name = FORM_PROVIDER_BUNDLE_NAME;
+        GTEST_LOG_(INFO) << "AddForm_010 bmsTaskGetBundleNameForUid called";
+        return ERR_OK;
+    };
+
+    BundleInfo bundleInfo;
+    FillBundleInfo(FORM_PROVIDER_BUNDLE_NAME, bundleInfo);
+    EXPECT_CALL(*mockBundleMgrService, GetBundleInfo(_, _, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(bundleInfo), Return(true)));
+    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
     // add form
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().AddForm(0L, want, token_, formJsInfo));
     token_->Wait();
@@ -843,10 +913,17 @@ HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_011, TestSize.Level0)
         FormDbCache::GetInstance().DeleteFormInfo(oldFormDBInfo.formId);
     }
 
+    auto bmsTaskGetBundleNameForUid = [] (const int uid, std::string &name) {
+        name = FORM_PROVIDER_BUNDLE_NAME;
+        GTEST_LOG_(INFO) << "AddForm_011 bmsTaskGetBundleNameForUid called";
+        return ERR_OK;
+    };
+
     BundleInfo bundleInfo;
     FillBundleInfo(FORM_PROVIDER_BUNDLE_NAME, bundleInfo);
     EXPECT_CALL(*mockBundleMgrService, GetBundleInfo(_, _, _, _))
         .WillOnce(DoAll(SetArgReferee<2>(bundleInfo), Return(true)));
+    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
 
     // add form
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().AddForm(0L, want, token_, formJsInfo));

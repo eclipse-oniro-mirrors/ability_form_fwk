@@ -115,6 +115,8 @@ public:
     }
 
     MOCK_METHOD3(SetModuleRemovable, bool(const std::string &bundleName, const std::string &moduleName, bool isEnable));
+
+    MOCK_METHOD2(GetNameForUid, int32_t(const int, std::string &));
 };
 
 class MockBundleMgrService : public BundleMgrService {

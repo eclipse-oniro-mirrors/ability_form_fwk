@@ -24,6 +24,7 @@
 #include "form_mgr_errors.h"
 #define private public
 #include "form_acquire_connection.h"
+#include "form_acquire_state_connection.h"
 #include "form_bundle_event_callback.h"
 #include "form_cache_mgr.h"
 #include "form_cast_temp_connection.h"
@@ -31,6 +32,7 @@
 #include "form_event_handler.h"
 #include "form_host_record.h"
 #include "form_item_info.h"
+#include "form_msg_event_connection.h"
 #include "form_refresh_connection.h"
 #include "form_refresh_limiter.h"
 #include "form_share_connection.h"
@@ -46,6 +48,8 @@ using namespace OHOS;
 using namespace OHOS::AppExecFwk;
 
 namespace {
+
+const std::string FORM_MESSAGE_EVENT_VALUE_1 = "event message1";
 class FmsFormRefreshConnectionTest : public testing::Test {
 public:
     void SetUp();
@@ -1083,5 +1087,113 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormBundleEventCallback_008, TestSize.Lev
     EXPECT_FALSE(want.GetAction().empty());
     EXPECT_TRUE(want.GetElement().GetBundleName().empty());
     GTEST_LOG_(INFO) << "FormBundleEventCallback_008 end";
+}
+
+/**
+ * @tc.name: FormMsgEventConnection_0001
+ * @tc.desc: test OnAbilityConnectDone function and resultCode != ERR_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, FormMsgEventConnection_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMsgEventConnection_0001 start";
+    int64_t formId = 1;
+    Want want;
+    std::string bundleName = "aa";
+    std::string abilityName = "bb";
+    FormMsgEventConnection formMsgEventConnection(formId, want, bundleName, abilityName);
+    // test OnAbilityConnectDone
+    AppExecFwk::ElementName element;
+    sptr<IRemoteObject> remoteObject = nullptr;
+    int resultCode = 22;
+    formMsgEventConnection.OnAbilityConnectDone(element, remoteObject, resultCode);
+    GTEST_LOG_(INFO) << "FormMsgEventConnection_0001 end";
+}
+
+/**
+ * @tc.name: FormMsgEventConnection_0002
+ * @tc.desc: test OnAbilityConnectDone function and resultCode == ERR_OK
+ * HasParameter is not Constants::PARAM_MESSAGE_KEY
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, FormMsgEventConnection_0002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMsgEventConnection_0002 start";
+    int64_t formId = 1;
+    Want want;
+    std::string bundleName = "aa";
+    std::string abilityName = "bb";
+    FormMsgEventConnection formMsgEventConnection(formId, want, bundleName, abilityName);
+    // test OnAbilityConnectDone
+    AppExecFwk::ElementName element;
+    sptr<IRemoteObject> remoteObject = nullptr;
+    int resultCode = ERR_OK;
+    formMsgEventConnection.OnAbilityConnectDone(element, remoteObject, resultCode);
+    GTEST_LOG_(INFO) << "FormMsgEventConnection_0002 end";
+}
+
+/**
+ * @tc.name: FormMsgEventConnection_0003
+ * @tc.desc: test OnAbilityConnectDone function and resultCode == ERR_OK
+ * HasParameter is Constants::PARAM_MESSAGE_KEY
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, FormMsgEventConnection_0003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMsgEventConnection_0003 start";
+    int64_t formId = 1;
+    Want want;
+    want.SetParam(Constants::PARAM_MESSAGE_KEY, FORM_MESSAGE_EVENT_VALUE_1);
+    std::string bundleName = "aa";
+    std::string abilityName = "bb";
+    FormMsgEventConnection formMsgEventConnection(formId, want, bundleName, abilityName);
+    // test OnAbilityConnectDone
+    AppExecFwk::ElementName element;
+    sptr<IRemoteObject> remoteObject = nullptr;
+    int resultCode = ERR_OK;
+    formMsgEventConnection.OnAbilityConnectDone(element, remoteObject, resultCode);
+    GTEST_LOG_(INFO) << "FormMsgEventConnection_0003 end";
+}
+
+/**
+ * @tc.name: FormAcquireStateConnection_0001
+ * @tc.desc: test OnAbilityConnectDone function and resultCode != ERR_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, FormAcquireStateConnection_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormAcquireStateConnection_0001 start";
+    std::string bundleName = "aa";
+    std::string abilityName = "bb";
+    Want want;
+    std::string provider = "cc";
+    FormAcquireStateConnection formAcquireStateConnection(bundleName, abilityName, want, provider);
+    // test OnAbilityConnectDone function
+    AppExecFwk::ElementName element;
+    sptr<IRemoteObject> remoteObject = nullptr;
+    int resultCode = 55;
+    formAcquireStateConnection.OnAbilityConnectDone(element, remoteObject, resultCode);
+    GTEST_LOG_(INFO) << "FormAcquireStateConnection_0001 end";
+}
+
+/**
+ * @tc.name: FormAcquireStateConnection_0002
+ * @tc.desc: test OnAbilityConnectDone function and resultCode == ERR_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, FormAcquireStateConnection_0002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormAcquireStateConnection_0002 start";
+    std::string bundleName = "aa";
+    std::string abilityName = "bb";
+    Want want;
+    std::string provider = "cc";
+    FormAcquireStateConnection formAcquireStateConnection(bundleName, abilityName, want, provider);
+    // test OnAbilityConnectDone function
+    AppExecFwk::ElementName element;
+    sptr<IRemoteObject> remoteObject = nullptr;
+    int resultCode = ERR_OK;
+    formAcquireStateConnection.OnAbilityConnectDone(element, remoteObject, resultCode);
+    GTEST_LOG_(INFO) << "FormAcquireStateConnection_0002 end";
 }
 }
