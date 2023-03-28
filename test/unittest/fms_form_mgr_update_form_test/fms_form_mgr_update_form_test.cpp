@@ -41,6 +41,8 @@ using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::AppExecFwk;
 using namespace OHOS::Security;
+using ::testing::Invoke;
+using ::testing::_;
 
 namespace {
 const std::string PERMISSION_NAME_REQUIRE_FORM = "ohos.permission.REQUIRE_FORM";
@@ -65,12 +67,14 @@ public:
 protected:
     sptr<MockFormHostClient> token_;
     std::shared_ptr<FormMgrService> formyMgrServ_ = DelayedSingleton<FormMgrService>::GetInstance();
+    static sptr<BundleMgrService> mockBundleMgrService;
 };
 
 void FmsFormMgrUpdateFormTest::SetUpTestCase()
 {
     RemoteNativeToken::SetNativeToken();
-    FormBmsHelper::GetInstance().SetBundleManager(new BundleMgrService());
+    mockBundleMgrService = new BundleMgrService();
+    FormBmsHelper::GetInstance().SetBundleManager(mockBundleMgrService);
     FormAmsHelper::GetInstance().SetAbilityManager(new MockAbilityMgrService());
 }
 
@@ -92,6 +96,8 @@ void FmsFormMgrUpdateFormTest::SetUp()
 
 void FmsFormMgrUpdateFormTest::TearDown()
 {}
+
+sptr<BundleMgrService> FmsFormMgrUpdateFormTest::mockBundleMgrService = nullptr;
 
 /*
  * Feature: FormMgrService
@@ -129,6 +135,13 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_001, TestSize.Level0)
     // add formHostRecord
     FormItemInfo itemInfo;
     FormDataMgr::GetInstance().AllotFormHostRecord(itemInfo, token_, formId, callingUid);
+
+    auto bmsTaskGetBundleNameForUid = [] (const int uid, std::string &name) {
+        name = FORM_PROVIDER_BUNDLE_NAME;
+        GTEST_LOG_(INFO) << "AddForm_002 bmsTaskGetBundleNameForUid called";
+        return ERR_OK;
+    };
+    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
 
     // test exec
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().UpdateForm(formId, formProviderData));
@@ -205,6 +218,13 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_004, TestSize.Level0)
     FormItemInfo itemInfo;
     FormDataMgr::GetInstance().AllotFormHostRecord(itemInfo, token_, formId, callingUid);
 
+    auto bmsTaskGetBundleNameForUid = [] (const int uid, std::string &name) {
+        name = FORM_PROVIDER_BUNDLE_NAME;
+        GTEST_LOG_(INFO) << "AddForm_002 bmsTaskGetBundleNameForUid called";
+        return ERR_OK;
+    };
+    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
+
     // test exec
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, FormMgr::GetInstance().UpdateForm(formId, formProviderData));
 
@@ -241,6 +261,13 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_005, TestSize.Level0)
     FormItemInfo itemInfo;
     FormDataMgr::GetInstance().AllotFormHostRecord(itemInfo, token_, formId, callingUid);
 
+    auto bmsTaskGetBundleNameForUid = [] (const int uid, std::string &name) {
+        name = FORM_PROVIDER_BUNDLE_NAME;
+        GTEST_LOG_(INFO) << "AddForm_002 bmsTaskGetBundleNameForUid called";
+        return ERR_OK;
+    };
+    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
+
     // test exec
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, FormMgr::GetInstance().UpdateForm(formId, formProviderData));
 
@@ -276,6 +303,13 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_006, TestSize.Level0)
     // add formHostRecord
     FormItemInfo itemInfo;
     FormDataMgr::GetInstance().AllotFormHostRecord(itemInfo, token_, formId, callingUid);
+
+    auto bmsTaskGetBundleNameForUid = [] (const int uid, std::string &name) {
+        name = FORM_PROVIDER_BUNDLE_NAME;
+        GTEST_LOG_(INFO) << "AddForm_002 bmsTaskGetBundleNameForUid called";
+        return ERR_OK;
+    };
+    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
 
     // test exec
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, FormMgr::GetInstance().UpdateForm(formId, formProviderData));
@@ -329,6 +363,13 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_007, TestSize.Level0)
     FormItemInfo itemInfo;
     FormDataMgr::GetInstance().AllotFormHostRecord(itemInfo, token_, formId, callingUid);
 
+    auto bmsTaskGetBundleNameForUid = [] (const int uid, std::string &name) {
+        name = FORM_PROVIDER_BUNDLE_NAME;
+        GTEST_LOG_(INFO) << "AddForm_002 bmsTaskGetBundleNameForUid called";
+        return ERR_OK;
+    };
+    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
+
     // test exec
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().UpdateForm(formId, formProviderData));
 
@@ -365,6 +406,13 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_008, TestSize.Level1) {
     FormItemInfo itemInfo1;
     itemInfo1.SetHostBundleName(FORM_PROVIDER_BUNDLE_NAME);
     FormDataMgr::GetInstance().AllotFormHostRecord(itemInfo, token_, formId, callingUid);
+
+    auto bmsTaskGetBundleNameForUid = [] (const int uid, std::string &name) {
+        name = FORM_PROVIDER_BUNDLE_NAME;
+        GTEST_LOG_(INFO) << "AddForm_002 bmsTaskGetBundleNameForUid called";
+        return ERR_OK;
+    };
+    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
 
     // test exec
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().UpdateForm(formId, formProviderData));

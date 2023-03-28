@@ -91,8 +91,14 @@ public:
     virtual bool GetBundleNameForUid(const int uid, std::string &bundleName) override
     {
         bundleName = "com.form.service";
-        return GetBundleNameForUid_;
+        return true;
     }
+
+    virtual int32_t GetNameForUid(const int uid, std::string &bundleName) override
+    {
+        bundleName = "com.form.provider.service";
+        return GetNameForUid_;
+    };
 
     virtual bool GetFormsInfoByApp(const std::string &bundleName, std::vector<FormInfo> &formInfo) override 
     {
@@ -126,7 +132,7 @@ public:
 
     ErrCode GetBundlePackInfo_ = ERR_APPEXECFWK_SERVICE_INTERNAL_ERROR;
     bool SetModuleRemovable_ = false;
-    bool GetBundleNameForUid_ = false;
+    int32_t GetNameForUid_ = ERR_OK + 1;
 };
 
 /**
@@ -461,7 +467,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_018, TestSize.Level1)
     FormBmsHelper formBmsHelper;
     const sptr<IRemoteObject> impl;
     const sptr<MockBundleMgrProxy> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
-    bundleManager->GetBundleNameForUid_ = true;
+    bundleManager->GetNameForUid_ = ERR_OK;
     formBmsHelper.SetBundleManager(bundleManager);
     std::string callerBundleName = "";
     EXPECT_EQ(formBmsHelper.GetCallerBundleName(callerBundleName), ERR_OK);

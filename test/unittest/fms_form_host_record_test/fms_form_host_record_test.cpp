@@ -47,6 +47,8 @@ using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::AppExecFwk;
 using namespace OHOS::Security;
+using ::testing::Invoke;
+using ::testing::_;
 
 namespace {
 const std::string PERMISSION_NAME_REQUIRE_FORM = "ohos.permission.REQUIRE_FORM";
@@ -76,13 +78,17 @@ public:
 protected:
     sptr<MockFormHostClient> token_;
     std::shared_ptr<FormMgrService> formyMgrServ_ = DelayedSingleton<FormMgrService>::GetInstance();
+    static sptr<BundleMgrService> mockBundleMgrService;
 };
 
 void FmsFormHostRecordTest::SetUpTestCase()
 {
-    FormBmsHelper::GetInstance().SetBundleManager(new BundleMgrService());
+    mockBundleMgrService = new BundleMgrService();
+    FormBmsHelper::GetInstance().SetBundleManager(mockBundleMgrService);
     FormAmsHelper::GetInstance().SetAbilityManager(new MockAbilityMgrService());
 }
+
+sptr<BundleMgrService> FmsFormHostRecordTest::mockBundleMgrService = nullptr;
 
 void FmsFormHostRecordTest::TearDownTestCase()
 {}
@@ -650,6 +656,12 @@ HWTEST_F(FmsFormHostRecordTest, FormMgrService_0022, TestSize.Level0)
     FormMgrService formMgrService;
     FormInfoFilter filter;
     std::vector<FormInfo> formInfos;
+    auto bmsTaskGetBundleNameForUid = [] (const int uid, std::string &name) {
+        name = FORM_PROVIDER_BUNDLE_NAME;
+        GTEST_LOG_(INFO) << "AddForm_002 bmsTaskGetBundleNameForUid called";
+        return ERR_OK;
+    };
+    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
     EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, formMgrService.GetFormsInfo(filter, formInfos));
     GTEST_LOG_(INFO) << "FormMgrService_0022 end";
 }
@@ -666,6 +678,12 @@ HWTEST_F(FmsFormHostRecordTest, FormMgrService_0023, TestSize.Level0)
     FormInfoFilter filter;
     filter.moduleName = "aa";
     std::vector<FormInfo> formInfos;
+    auto bmsTaskGetBundleNameForUid = [] (const int uid, std::string &name) {
+        name = FORM_PROVIDER_BUNDLE_NAME;
+        GTEST_LOG_(INFO) << "AddForm_002 bmsTaskGetBundleNameForUid called";
+        return ERR_OK;
+    };
+    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
     EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, formMgrService.GetFormsInfo(filter, formInfos));
     GTEST_LOG_(INFO) << "FormMgrService_0023 end";
 }
