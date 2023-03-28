@@ -115,6 +115,8 @@ public:
     bool GetCompileMode(const std::string &bundleName, const std::string &moduleName,
         int32_t userId, int32_t &compileMode);
 
+    bool GetCompatibleVersionCode(const std::string& bundleName, int32_t userId, int32_t& minCompatibleVersionCode);
+
     static constexpr int64_t INVALID_UID = -1;
 private:
     /**
