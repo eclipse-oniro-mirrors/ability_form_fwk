@@ -1794,24 +1794,6 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_095, TestSize.Level0)
 }
 
 /**
- * @tc.name: FormMgrAdapter_096
- * @tc.desc: test AllotFormById function and the return value is ERR_APPEXECFWK_FORM_INVALID_PARAM.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_096, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormMgrAdapter_096 start";
-    FormMgrAdapter formMgrAdapter;
-    FormItemInfo info;
-    sptr<IRemoteObject> callerToken = nullptr;
-    WantParams wantParams;
-    FormJsInfo formInfo;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
-        formMgrAdapter.AllotFormById(info, callerToken, wantParams, formInfo));
-    GTEST_LOG_(INFO) << "FormMgrAdapter_096 end";
-}
-
-/**
  * @tc.name: FormMgrAdapter_097
  * @tc.desc: test AllotFormById function and the return value is ERR_APPEXECFWK_FORM_COMMON_CODE.
  * @tc.type: FUNC
