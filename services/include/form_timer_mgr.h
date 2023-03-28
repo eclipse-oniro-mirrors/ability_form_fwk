@@ -350,6 +350,8 @@ private:
         }
     } CompareDynamicRefreshItem;
 
+    std::chrono::steady_clock::time_point GetBootTimeNs();
+
     mutable std::recursive_mutex intervalMutex_;
     mutable std::recursive_mutex updateAtMutex_;
     mutable std::recursive_mutex dynamicMutex_;

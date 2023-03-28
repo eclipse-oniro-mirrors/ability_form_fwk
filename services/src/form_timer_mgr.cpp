@@ -37,6 +37,7 @@ const int REQUEST_UPDATE_AT_CODE = 1;
 const int REQUEST_LIMITER_CODE = 2;
 const int REQUEST_DYNAMIC_CODE = 3;
 const int SHIFT_BIT_LENGTH = 32;
+const int NANO_TO_SECOND =  1000000000;
 const std::string FMS_TIME_SPEED = "fms.time_speed";
 } // namespace
 
@@ -898,7 +899,7 @@ bool FormTimerMgr::UpdateAtTimerAlarm()
     if (currentUpdateAtWantAgent_ != nullptr) {
         ClearUpdateAtTimerResource();
     }
-    auto timeSinceEpoch = std::chrono::steady_clock::now().time_since_epoch();
+    auto timeSinceEpoch = GetBootTimeNs().time_since_epoch();
     int64_t timeInSec = std::chrono::duration_cast<std::chrono::milliseconds>(timeSinceEpoch).count();
     HILOG_DEBUG("timeInSec: %{public}" PRId64 ".", timeInSec);
     int64_t nextTime = timeInSec + (selectTime - currentTime);
@@ -915,6 +916,19 @@ bool FormTimerMgr::UpdateAtTimerAlarm()
 
     HILOG_INFO("%{public}s end", __func__);
     return true;
+}
+
+std::chrono::steady_clock::time_point FormTimerMgr::GetBootTimeNs()
+{
+    int64_t timeNow = -1;
+    struct timespec tv {};
+    if (clock_gettime(CLOCK_BOOTTIME, &tv) < 0) {
+        HILOG_WARN("Get bootTime by clock_gettime failed, use std::chrono::steady_clock");
+        return std::chrono::steady_clock::now();
+    }
+    timeNow = tv.tv_sec * NANO_TO_SECOND + tv.tv_nsec;
+    std::chrono::steady_clock::time_point tp_epoch ((std::chrono::nanoseconds(timeNow)));
+    return tp_epoch;
 }
 
 /**
