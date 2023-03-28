@@ -193,13 +193,13 @@ bool FormEventUtil::ProviderFormUpdated(const int64_t formId, FormRecord &formRe
     HILOG_INFO("%{public}s, form is still exist,form:%{public}s", __func__, formRecord.formName.c_str());
 
     // update resource
-    UpateFormRecord(updatedForm, formRecord);
     FormDataMgr::GetInstance().SetNeedRefresh(formId, true);
     FormCacheMgr::GetInstance().DeleteData(formId);
     FormBmsHelper::GetInstance().NotifyModuleNotRemovable(formRecord.bundleName, formRecord.moduleName);
     FormTimerCfg timerCfg;
     GetTimerCfg(updatedForm.updateEnabled, updatedForm.updateDuration, updatedForm.scheduledUpdateTime, timerCfg);
     HandleTimerUpdate(formId, formRecord, timerCfg);
+    UpateFormRecord(updatedForm, formRecord);
     FormDataMgr::GetInstance().SetVersionUpgrade(formId, true);
     return true;
 }
@@ -215,11 +215,11 @@ bool FormEventUtil::ProviderFormUpdated(const int64_t formId, FormRecord &formRe
     }
 
     HILOG_INFO("%{public}s, form is still in package info, form:%{public}s", __func__, formRecord.formName.c_str());
-    UpateFormRecord(packForm, formRecord);
     FormDataMgr::GetInstance().SetRecordNeedFreeInstall(formId, true);
     FormTimerCfg timerCfg;
     GetTimerCfg(packForm.updateEnabled, packForm.updateDuration, packForm.scheduledUpdateTime, timerCfg);
     HandleTimerUpdate(formId, formRecord, timerCfg);
+    UpateFormRecord(packForm, formRecord);
     FormDataMgr::GetInstance().SetVersionUpgrade(formId, true);
     return true;
 }
