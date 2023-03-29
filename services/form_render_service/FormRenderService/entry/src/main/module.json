@@ -23,7 +23,7 @@
         "description": "service",
         "icon": "",
         "type": "service",
-        "visible": true,
+        "visible": false,
         "srcEntrance": "./ets/ServiceExtension/ServiceExtension.ts",
         "uri": "ServiceExtension://com.ohos.formrenderservice.ServiceExtension"
       }
