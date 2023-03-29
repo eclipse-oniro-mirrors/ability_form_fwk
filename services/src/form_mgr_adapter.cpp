@@ -1336,13 +1336,6 @@ int FormMgrAdapter::SetNextRefreshTime(const int64_t formId, const int64_t nextT
     int32_t userId = GetCurrentUserId(callingUid);
     HILOG_INFO("%{public}s, userId:%{public}d, callingUid:%{public}d.", __func__, userId, callingUid);
 
-    // get IBundleMgr
-    int32_t bundleUid = FormBmsHelper::GetInstance().GetUidByBundleName(bundleName, userId);
-    if (bundleUid != callingUid) {
-        HILOG_ERROR("%{public}s error, permission denied, the form is not your own.", __func__);
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
-    }
-
     FormRecord formRecord;
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
     if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, formRecord)) {
