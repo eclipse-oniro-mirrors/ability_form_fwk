@@ -291,6 +291,37 @@ bool FormHostClient::AddShareFormCallback(const std::shared_ptr<ShareFormCallBac
     return true;
 }
 
+bool FormHostClient::AddAcqiureFormDataCallback(const std::shared_ptr<FormDataCallbackInterface> &acquireFormDataTask,
+    int64_t requestCode)
+{
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    HILOG_DEBUG("called.");
+    std::lock_guard<std::mutex> lock(AcquireDataCallbackMutex_);
+    auto iter = acquireDataCallbackMap_.find(requestCode);
+    if (iter == acquireDataCallbackMap_.end()) {
+        acquireDataCallbackMap_.emplace(requestCode, acquireFormDataTask);
+    }
+    HILOG_DEBUG("done.");
+    return true;
+}
+
+void FormHostClient::OnAcquireDataResponse(const AAFwk::WantParams &wantParams, int64_t requestCode)
+{
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    std::lock_guard<std::mutex> lock(AcquireDataCallbackMutex_);
+    auto iter = acquireDataCallbackMap_.find(requestCode);
+    if (iter == acquireDataCallbackMap_.end()) {
+        HILOG_DEBUG("acquire form data callback not found");
+        return;
+    }
+
+    if (iter->second) {
+        iter->second->ProcessAcquireFormData(wantParams);
+    }
+    acquireDataCallbackMap_.erase(requestCode);
+    HILOG_DEBUG("done");
+}
+
 void FormHostClient::OnShareFormResponse(int64_t requestCode, int32_t result)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
@@ -345,6 +376,17 @@ void FormHostClient::RemoveShareFormCallback(int64_t requestCode)
         shareFormCallbackMap_.erase(requestCode);
     }
     HILOG_INFO("%{public}s end.", __func__);
+}
+
+void FormHostClient::RemoveAcquireDataCallback(int64_t requestCode)
+{
+    HILOG_DEBUG("RemoveAcquireDataCallback called");
+    std::lock_guard<std::mutex> lock(AcquireDataCallbackMutex_);
+    auto iter = acquireDataCallbackMap_.find(requestCode);
+    if (iter != acquireDataCallbackMap_.end()) {
+        acquireDataCallbackMap_.erase(requestCode);
+    }
+    HILOG_INFO("RemoveAcquireDataCallback end.");
 }
 
 void FormHostClient::UpdateForm(const FormJsInfo &formJsInfo)

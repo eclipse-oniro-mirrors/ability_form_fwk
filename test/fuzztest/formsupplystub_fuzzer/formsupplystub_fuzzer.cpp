@@ -57,6 +57,10 @@ public:
     {
         return ERR_OK;
     }
+    int OnAcquireDataResult(const AAFwk::WantParams &wantParams, int64_t requestCode) override
+    {
+        return ERR_OK;
+    }
 };
 
 uint32_t Convert2Uint32(const char* ptr)

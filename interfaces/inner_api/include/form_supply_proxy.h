@@ -72,6 +72,14 @@ public:
         const AAFwk::WantParams &wantParams, int64_t requestCode, const bool &result) override;
 
     /**
+     * @brief Accept form data from form provider.
+     * @param wantParams Indicates the data information acquired by the form.
+     * @param requestCode Indicates the requested id.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int OnAcquireDataResult(const AAFwk::WantParams &wantParams, int64_t requestCode) override;
+
+    /**
      * @brief Accept form render task done from render service.
      * @param formId The Id of the form.
      * @param want input data.

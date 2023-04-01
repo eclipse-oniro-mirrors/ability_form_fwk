@@ -112,6 +112,7 @@ public:
     MOCK_METHOD2(OnAcquireState, void(AppExecFwk::FormState state, const AAFwk::Want &want));
     MOCK_METHOD2(OnShareFormResponse, void(const int64_t requestCode, const int32_t result));
     MOCK_METHOD2(OnError, void(int32_t errorCode, const std::string &errorMsg));
+    MOCK_METHOD2(OnAcquireDataResponse, void(const AAFwk::WantParams &wantParams, int64_t requestCode));
 };
 
 static sptr<BundleMgrService> bundleMgr_ = nullptr;

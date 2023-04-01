@@ -120,6 +120,16 @@ private:
 
     int32_t AcquireShareFormData(int64_t formId, const std::string &remoteDeviceId,
         const sptr<IRemoteObject> &formSupplyCallback, int64_t requestCode) override;
+
+    /**
+     * @brief Acquire to form data.
+     * @param formId The Id of the from.
+     * @param formSupplyCallback Indicates lifecycle callbacks.
+     * @param requestCode Indicates the request code.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int32_t AcquireFormData(int64_t formId, const sptr<IRemoteObject> &formSupplyCallback,
+        int64_t requestCode) override;
 private:
     DISALLOW_COPY_AND_MOVE(MockFormProviderClient);
 };

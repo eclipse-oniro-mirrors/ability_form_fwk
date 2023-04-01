@@ -991,6 +991,18 @@ int32_t FormMgr::ShareForm(int64_t formId, const std::string &remoteDeviceId, co
     return remoteProxy_->ShareForm(formId, remoteDeviceId, callerToken, requestCode);
 }
 
+int32_t FormMgr::AcquireFormData(int64_t formId, int64_t requestCode, const sptr<IRemoteObject> &callerToken,
+    AAFwk::WantParams &formData)
+{
+    HILOG_DEBUG("called.");
+    int32_t errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("acquire form data failed, errCode:%{public}d.", errCode);
+        return errCode;
+    }
+    return remoteProxy_->AcquireFormData(formId, requestCode, callerToken, formData);
+}
+
 bool FormMgr::CheckFMSReady()
 {
     HILOG_INFO("%{public}s called.", __func__);

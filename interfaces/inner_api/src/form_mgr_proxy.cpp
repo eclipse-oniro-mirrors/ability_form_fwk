@@ -1216,6 +1216,51 @@ int32_t FormMgrProxy::ShareForm(int64_t formId, const std::string &deviceId, con
     return reply.ReadInt32();
 }
 
+int32_t FormMgrProxy::AcquireFormData(int64_t formId, int64_t requestCode, const sptr<IRemoteObject> &callerToken,
+    AAFwk::WantParams &formData)
+{
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("failed to write interface token.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteInt64(formId)) {
+        HILOG_ERROR("failed to write formId.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteInt64(requestCode)) {
+        HILOG_ERROR("failed to write requestCode.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteRemoteObject(callerToken)) {
+        HILOG_ERROR("failed to write callerToken.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    
+    int error;
+    MessageParcel reply;
+    error = SendTransactCmd(IFormMgr::Message::FORM_MGR_ACQUIRE_DATA, data, reply);
+    if (error != ERR_OK) {
+        return error;
+    }
+
+    error = reply.ReadInt32();
+    if (error != ERR_OK) {
+        HILOG_ERROR("failed to read reply result");
+        return error;
+    }
+    std::shared_ptr<AAFwk::WantParams> wantParams(reply.ReadParcelable<AAFwk::WantParams>());
+    if (wantParams == nullptr) {
+        HILOG_ERROR("failed to ReadParcelable<wantParams>");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    formData = *wantParams;
+    return ERR_OK;
+}
+
 int32_t FormMgrProxy::RecvFormShareInfoFromRemote(const FormShareInfo &info)
 {
     MessageParcel data;

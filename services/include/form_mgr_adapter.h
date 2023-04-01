@@ -247,6 +247,17 @@ public:
     int AcquireFormState(const Want &want, const sptr<IRemoteObject> &callerToken, FormStateInfo &stateInfo);
 
     /**
+     * @brief Acquire form data by formId.
+     * @param formId The Id of the form to acquire data.
+     * @param callerToken Indicates the host client.
+     * @param requestCode The request code of this acquire form.
+     * @param formData Return the forms' information of customization
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int AcquireFormData(int64_t formId, int64_t requestCode, const sptr<IRemoteObject> &callerToken,
+         AAFwk::WantParams &formData);
+
+    /**
      * @brief Notify the form is visible or not.
      * @param formIds Indicates the ID of the forms.
      * @param isVisible Visible or not.

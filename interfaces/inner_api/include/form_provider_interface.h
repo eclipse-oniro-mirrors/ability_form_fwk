@@ -125,6 +125,16 @@ public:
      */
     virtual int32_t AcquireShareFormData(int64_t formId, const std::string &remoteDeviceId,
         const sptr<IRemoteObject> &formSupplyCallback, int64_t requestCode) = 0;
+    
+    /**
+     * @brief Acquire to form data.
+     * @param formId The Id of the from.
+     * @param formSupplyCallback Indicates lifecycle callbacks.
+     * @param requestCode Indicates the request code.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int32_t AcquireFormData(int64_t formId, const sptr<IRemoteObject> &formSupplyCallback,
+        int64_t requestCode) = 0;
 
     enum class Message {
         // ipc id 1-1000 for kit
@@ -156,6 +166,9 @@ public:
 
         // ipc id for Acquire provider share form info (3059)
         FORM_ACQUIRE_PROVIDER_SHARE_FOMR_INFO,
+
+        // ipc id for Acquire provider form data (3060)
+        FORM_ACQUIRE_PROVIDER_FOMR_DATA,
     };
 };
 }  // namespace AppExecFwk

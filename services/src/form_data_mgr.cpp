@@ -1285,6 +1285,42 @@ bool FormDataMgr::CreateFormStateRecord(std::string &provider, const FormItemInf
     return false;
 }
 
+bool FormDataMgr::CreateFormAcquireDataRecord(int64_t requestCode, const FormItemInfo &info,
+                                              const sptr<IRemoteObject> &callerToken, int callingUid)
+{
+    std::lock_guard<std::recursive_mutex> lock(formAcquireDataRecordMutex_);
+    auto iter = formAcquireDataRecord_.find(requestCode);
+    if (iter != formAcquireDataRecord_.end()) {
+        if (iter->second.GetFormHostClient() != callerToken) {
+            iter->second.SetFormHostClient(callerToken);
+        }
+        return true;
+    }
+
+    FormHostRecord hostRecord;
+    bool isCreated = CreateHostRecord(info, callerToken, callingUid, hostRecord);
+    if (isCreated) {
+        formAcquireDataRecord_.emplace(requestCode, hostRecord);
+        return true;
+    }
+
+    return false;
+}
+
+ErrCode FormDataMgr::AcquireFormDataBack(const AAFwk::WantParams &wantParams, int64_t requestCode)
+{
+    std::lock_guard<std::recursive_mutex> lock(formAcquireDataRecordMutex_);
+    auto iter = formAcquireDataRecord_.find(requestCode);
+    if (iter == formAcquireDataRecord_.end()) {
+        HILOG_ERROR("filed to get form state host record");
+        return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
+    }
+    iter->second.OnAcquireFormData(wantParams, requestCode);
+    iter->second.CleanResource();
+    formAcquireDataRecord_.erase(iter);
+    return ERR_OK;
+}
+
 /**
  * @brief acquire form state callback.
  * @param state form state.

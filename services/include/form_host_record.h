@@ -129,6 +129,14 @@ public:
     void OnAcquireState(AppExecFwk::FormState state, const AAFwk::Want &want);
 
     /**
+     * Send form data to form host.
+     *
+     * @param wantParams Indicates the data information acquired by the form.
+     * @param requestCode Indicates the requested id.
+     */
+    void OnAcquireFormData(const AAFwk::WantParams &wantParams, int64_t requestCode);
+
+    /**
      * @brief Release resource.
      */
     void CleanResource();

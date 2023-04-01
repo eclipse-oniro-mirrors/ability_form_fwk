@@ -308,6 +308,17 @@ public:
         int64_t requestCode) = 0;
 
     /**
+     * @brief Acquire form data by formId.
+     * @param formId The Id of the form to acquire data.
+     * @param requestCode The request code of this form.
+     * @param callerToken Indicates the host client.
+     * @param formData Return the forms' information of customization
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int32_t AcquireFormData(int64_t formId, int64_t requestCode, const sptr<IRemoteObject> &callerToken,
+         AAFwk::WantParams &formData) = 0;
+
+    /**
      * @brief Receive form sharing information from remote.
      * @param info Indicates form sharing information.
      * @return Returns ERR_OK on success, others on failure.
@@ -368,6 +379,7 @@ public:
         FORM_MGR_CHECK_FMS_READY,
         FORM_MGR_BACKGROUND_EVENT,
         FORM_MGR_STOP_RENDERING_FORM,
+        FORM_MGR_ACQUIRE_DATA,
     };
 };
 }  // namespace AppExecFwk

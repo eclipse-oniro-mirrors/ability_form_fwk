@@ -44,6 +44,8 @@ FormProviderStub::FormProviderStub()
         &FormProviderStub::HandleAcquireState;
     memberFuncMap_[static_cast<uint32_t>(IFormProvider::Message::FORM_ACQUIRE_PROVIDER_SHARE_FOMR_INFO)] =
         &FormProviderStub::HandleAcquireShareFormData;
+    memberFuncMap_[static_cast<uint32_t>(IFormProvider::Message::FORM_ACQUIRE_PROVIDER_FOMR_DATA)] =
+        &FormProviderStub::HandleAcquireFormData;
 }
 
 FormProviderStub::~FormProviderStub()
@@ -309,6 +311,25 @@ int32_t FormProviderStub::HandleAcquireShareFormData(MessageParcel &data, Messag
 
     auto requestCode = data.ReadInt64();
     auto result = AcquireShareFormData(formId, remoteDeviceId, remoteObj, requestCode);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("failed to Write result.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    return ERR_OK;
+}
+
+int32_t FormProviderStub::HandleAcquireFormData(MessageParcel &data, MessageParcel &reply)
+{
+    auto formId = data.ReadInt64();
+    auto remoteObj = data.ReadRemoteObject();
+    if (remoteObj == nullptr) {
+        HILOG_ERROR("failed to get remote object.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    auto requestCode = data.ReadInt64();
+    auto result = AcquireFormData(formId, remoteObj, requestCode);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("failed to Write result.");
         return ERR_APPEXECFWK_PARCEL_ERROR;

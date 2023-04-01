@@ -148,6 +148,19 @@ void FormTaskMgr::PostAcquireTaskToHost(const int64_t formId, const FormRecord &
     eventHandler_->PostTask(acquireTaskToHostFunc, FORM_TASK_DELAY_TIME);
 }
 
+void FormTaskMgr::PostAcquireDataTaskToHost(const AAFwk::WantParams &wantParams,
+    int64_t requestCode, const sptr<IRemoteObject> &remoteObject)
+{
+    if (eventHandler_ == nullptr) {
+        HILOG_ERROR("failed, event handler invalidate");
+        return;
+    }
+    auto acquireTaskToHostFunc = [wantParams, requestCode, remoteObject]() {
+        FormTaskMgr::GetInstance().AcquireFormDataBack(wantParams, requestCode, remoteObject);
+    };
+    eventHandler_->PostTask(acquireTaskToHostFunc, FORM_TASK_DELAY_TIME);
+}
+
 /**
  * @brief Post form data to form host(task) when update form.
  * @param formId The Id of the form.
@@ -273,6 +286,25 @@ void FormTaskMgr::PostAcquireStateTask(const Want &wantArg, const std::string &p
         FormTaskMgr::GetInstance().AcquireState(wantArg, provider, want, remoteObject);
     };
     eventHandler_->PostTask(acquireStateFunc, FORM_TASK_DELAY_TIME);
+}
+
+/**
+* @brief Post acquire data to form provider.
+* @param formId The Id of the from.
+* @param want The want of the request.
+* @param remoteObject Form provider proxy object.
+*/
+void FormTaskMgr::PostAcquireDataTask(const int64_t formId, const Want &want,
+                                      const sptr<IRemoteObject> &remoteObject)
+{
+    if (eventHandler_ == nullptr) {
+        HILOG_ERROR("fail, event handler invalidate.");
+        return;
+    }
+    auto acquireDataFunc = [formId, want, remoteObject]() {
+        FormTaskMgr::GetInstance().AcquireFormData(formId, want, remoteObject);
+    };
+    eventHandler_->PostTask(acquireDataFunc, FORM_TASK_DELAY_TIME);
 }
 
 /**
@@ -578,6 +610,33 @@ void FormTaskMgr::AcquireState(const Want &wantArg, const std::string &provider,
 }
 
 /**
+ * @brief Acquire form data to form provider.
+ * @param formId The Id of the form.
+ * @param want The want of the request.
+ * @param remoteObject Form provider proxy object.
+ */
+void FormTaskMgr::AcquireFormData(const int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_INFO("start");
+    auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
+    int64_t requestCode = static_cast<int64_t>(want.GetLongParam(Constants::FORM_ACQUIRE_DATA_REQUEST_CODE, 0));
+    sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
+    if (formProviderProxy == nullptr) {
+        FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
+        HILOG_ERROR("Failed to get formProviderProxy");
+        return;
+    }
+
+    int error = formProviderProxy->AcquireFormData(formId, FormSupplyCallback::GetInstance(), requestCode);
+    if (error != ERR_OK) {
+        FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
+        HILOG_ERROR("Failed to acquire form state to form provider");
+    }
+    FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
+    HILOG_INFO("end");
+}
+
+/**
  * @brief Handle uninstall message.
  * @param formIds The Id list of the forms.
  * @param remoteObject Form provider proxy object.
@@ -616,6 +675,27 @@ void FormTaskMgr::AcquireStateBack(AppExecFwk::FormState state, const AAFwk::Wan
     remoteFormHost->OnAcquireState(state, want);
 
     HILOG_INFO("%{public}s end", __func__);
+}
+
+/**
+ * @brief Handle acquire data.
+* @param wantParams Indicates the data information acquired by the form.
+* @param requestCode Indicates the requested id.
+* @param remoteObject Form provider proxy object.
+*/
+void FormTaskMgr::AcquireFormDataBack(const AAFwk::WantParams &wantParams,
+    int64_t requestCode, const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_INFO("start");
+    sptr<IFormHost> remoteFormHost = iface_cast<IFormHost>(remoteObject);
+    if (remoteFormHost == nullptr) {
+        HILOG_ERROR("fail, Failed to get form host proxy.");
+        return;
+    }
+
+    remoteFormHost->OnAcquireDataResponse(wantParams, requestCode);
+
+    HILOG_INFO("end");
 }
 
 /**
