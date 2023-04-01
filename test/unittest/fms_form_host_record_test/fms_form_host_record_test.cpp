@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -176,10 +176,11 @@ HWTEST_F(FmsFormHostRecordTest, FormDbCache_001, TestSize.Level0)
 HWTEST_F(FmsFormHostRecordTest, FormDbCache_002, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_002 start";
-    FormBmsHelper formBmsHelper;
+    std::shared_ptr<FormBmsHelper> formBmsHelper = std::make_shared<FormBmsHelper>();
+    ASSERT_NE(nullptr, formBmsHelper);
     std::string bundleName = "";
     std::string moduleName = "";
-    formBmsHelper.NotifyModuleRemovable(bundleName, moduleName);
+    formBmsHelper->NotifyModuleRemovable(bundleName, moduleName);
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_002 end";
 }
 
@@ -191,10 +192,11 @@ HWTEST_F(FmsFormHostRecordTest, FormDbCache_002, TestSize.Level0)
 HWTEST_F(FmsFormHostRecordTest, FormDbCache_003, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_003 start";
-    FormBmsHelper formBmsHelper;
+    std::shared_ptr<FormBmsHelper> formBmsHelper = std::make_shared<FormBmsHelper>();
+    ASSERT_NE(nullptr, formBmsHelper);
     std::string bundleName = "";
     std::string moduleName = "aa";
-    formBmsHelper.NotifyModuleRemovable(bundleName, moduleName);
+    formBmsHelper->NotifyModuleRemovable(bundleName, moduleName);
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_003 end";
 }
 
@@ -206,10 +208,11 @@ HWTEST_F(FmsFormHostRecordTest, FormDbCache_003, TestSize.Level0)
 HWTEST_F(FmsFormHostRecordTest, FormDbCache_004, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_004 start";
-    FormBmsHelper formBmsHelper;
+    std::shared_ptr<FormBmsHelper> formBmsHelper = std::make_shared<FormBmsHelper>();
+    ASSERT_NE(nullptr, formBmsHelper);
     std::string bundleName = "bb";
     std::string moduleName = "";
-    formBmsHelper.NotifyModuleRemovable(bundleName, moduleName);
+    formBmsHelper->NotifyModuleRemovable(bundleName, moduleName);
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_004 end";
 }
 
@@ -221,10 +224,11 @@ HWTEST_F(FmsFormHostRecordTest, FormDbCache_004, TestSize.Level0)
 HWTEST_F(FmsFormHostRecordTest, FormDbCache_005, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_005 start";
-    FormBmsHelper formBmsHelper;
+    std::shared_ptr<FormBmsHelper> formBmsHelper = std::make_shared<FormBmsHelper>();
+    ASSERT_NE(nullptr, formBmsHelper);
     std::string bundleName = "bb";
     std::string moduleName = "aa";
-    formBmsHelper.NotifyModuleRemovable(bundleName, moduleName);
+    formBmsHelper->NotifyModuleRemovable(bundleName, moduleName);
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_005 end";
 }
 
@@ -236,10 +240,11 @@ HWTEST_F(FmsFormHostRecordTest, FormDbCache_005, TestSize.Level0)
 HWTEST_F(FmsFormHostRecordTest, FormDbCache_006, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_006 start";
-    FormBmsHelper formBmsHelper;
+    std::shared_ptr<FormBmsHelper> formBmsHelper = std::make_shared<FormBmsHelper>();
+    ASSERT_NE(nullptr, formBmsHelper);
     std::string bundleName = "";
     std::string moduleName = "";
-    formBmsHelper.NotifyModuleNotRemovable(bundleName, moduleName);
+    formBmsHelper->NotifyModuleNotRemovable(bundleName, moduleName);
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_006 end";
 }
 
@@ -251,10 +256,11 @@ HWTEST_F(FmsFormHostRecordTest, FormDbCache_006, TestSize.Level0)
 HWTEST_F(FmsFormHostRecordTest, FormDbCache_007, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_007 start";
-    FormBmsHelper formBmsHelper;
+    std::shared_ptr<FormBmsHelper> formBmsHelper = std::make_shared<FormBmsHelper>();
+    ASSERT_NE(nullptr, formBmsHelper);
     std::string bundleName = "";
     std::string moduleName = "aa";
-    formBmsHelper.NotifyModuleNotRemovable(bundleName, moduleName);
+    formBmsHelper->NotifyModuleNotRemovable(bundleName, moduleName);
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_007 end";
 }
 
@@ -266,10 +272,11 @@ HWTEST_F(FmsFormHostRecordTest, FormDbCache_007, TestSize.Level0)
 HWTEST_F(FmsFormHostRecordTest, FormDbCache_008, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_008 start";
-    FormBmsHelper formBmsHelper;
+    std::shared_ptr<FormBmsHelper> formBmsHelper = std::make_shared<FormBmsHelper>();
+    ASSERT_NE(nullptr, formBmsHelper);
     std::string bundleName = "bb";
     std::string moduleName = "";
-    formBmsHelper.NotifyModuleNotRemovable(bundleName, moduleName);
+    formBmsHelper->NotifyModuleNotRemovable(bundleName, moduleName);
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_008 end";
 }
 
@@ -281,10 +288,11 @@ HWTEST_F(FmsFormHostRecordTest, FormDbCache_008, TestSize.Level0)
 HWTEST_F(FmsFormHostRecordTest, FormDbCache_009, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_009 start";
-    FormBmsHelper formBmsHelper;
+    std::shared_ptr<FormBmsHelper> formBmsHelper = std::make_shared<FormBmsHelper>();
+    ASSERT_NE(nullptr, formBmsHelper);
     std::string bundleName = "bb";
     std::string moduleName = "aa";
-    formBmsHelper.NotifyModuleNotRemovable(bundleName, moduleName);
+    formBmsHelper->NotifyModuleNotRemovable(bundleName, moduleName);
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FormDbCache_009 end";
 }
 
@@ -825,10 +833,11 @@ HWTEST_F(FmsFormHostRecordTest, FormMgrService_0031, TestSize.Level0)
 HWTEST_F(FmsFormHostRecordTest, FormMgrService_0032, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormMgrService_0032 start";
-    FormMgrService formMgrService;
+    std::shared_ptr<FormMgrService> formMgrService = std::make_shared<FormMgrService>();
+    ASSERT_NE(nullptr, formMgrService);
     std::string args = "aa";
     std::string result = "bb";
-    formMgrService.HiDumpFormInfoByBundleName(args, result);
+    formMgrService->HiDumpFormInfoByBundleName(args, result);
     GTEST_LOG_(INFO) << "FormMgrService_0032 end";
 }
 
@@ -840,10 +849,11 @@ HWTEST_F(FmsFormHostRecordTest, FormMgrService_0032, TestSize.Level0)
 HWTEST_F(FmsFormHostRecordTest, FormMgrService_0033, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormMgrService_0033 start";
-    FormMgrService formMgrService;
+    std::shared_ptr<FormMgrService> formMgrService = std::make_shared<FormMgrService>();
+    ASSERT_NE(nullptr, formMgrService);
     std::string args = "aa";
     std::string result = "bb";
-    formMgrService.HiDumpFormInfoByFormId(args, result);
+    formMgrService->HiDumpFormInfoByFormId(args, result);
     GTEST_LOG_(INFO) << "FormMgrService_0033 end";
 }
 
@@ -855,9 +865,10 @@ HWTEST_F(FmsFormHostRecordTest, FormMgrService_0033, TestSize.Level0)
 HWTEST_F(FmsFormHostRecordTest, InnerFormInfo_0001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "InnerFormInfo_0001 start";
-    InnerFormInfo innerFormInfo;
+    std::shared_ptr<InnerFormInfo> innerFormInfo = std::make_shared<InnerFormInfo>();
+    ASSERT_NE(nullptr, innerFormInfo);
     int callingUid = 1;
-    innerFormInfo.AddUserUid(callingUid);
+    innerFormInfo->AddUserUid(callingUid);
     GTEST_LOG_(INFO) << "InnerFormInfo_0001 end";
 }
 
@@ -869,12 +880,13 @@ HWTEST_F(FmsFormHostRecordTest, InnerFormInfo_0001, TestSize.Level0)
 HWTEST_F(FmsFormHostRecordTest, InnerFormInfo_0002, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "InnerFormInfo_0002 start";
-    InnerFormInfo innerFormInfo;
+    std::shared_ptr<InnerFormInfo> innerFormInfo = std::make_shared<InnerFormInfo>();
+    ASSERT_NE(nullptr, innerFormInfo);
     int callingUid = 1;
     std::vector<int> formUserUids;
     formUserUids.emplace_back(callingUid);
-    innerFormInfo.SetUserUids(formUserUids);
-    innerFormInfo.AddUserUid(callingUid);
+    innerFormInfo->SetUserUids(formUserUids);
+    innerFormInfo->AddUserUid(callingUid);
     GTEST_LOG_(INFO) << "InnerFormInfo_0002 end";
 }
 

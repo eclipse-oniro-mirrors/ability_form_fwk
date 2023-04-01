@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -56,12 +56,14 @@ sptr<MockFormMgrProxy> FormCallerMgrTest::mockProxy = nullptr;
  */
 HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0001, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormCallerMgrTest_0001 starts";
+    std::shared_ptr<FormCallerMgr> formCallerMgr = std::make_shared<FormCallerMgr>();
+    ASSERT_NE(nullptr, formCallerMgr);
     FormJsInfo formJsInfo;
     formJsInfo.formId = 1;
     formJsInfo.formName = "aa";
     sptr<IRemoteObject> providerToken = new (std::nothrow) MockFormProviderClient();
-    FormCallerMgr::GetInstance().AddFormHostCaller(formJsInfo, providerToken);
-    FormCallerMgr::GetInstance().RemoveFormHostCaller(providerToken);
+    formCallerMgr->AddFormHostCaller(formJsInfo, providerToken);
+    formCallerMgr->GetInstance().RemoveFormHostCaller(providerToken);
     GTEST_LOG_(INFO) << "FormCallerMgrTest_0001 test ends";
 }
 
@@ -72,7 +74,9 @@ HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0001, TestSize.Level1) {
  */
 HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0002, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormCallerMgrTest_0002 starts";
-    FormCallerMgr::GetInstance().OnHostCallBackDied(nullptr);
+    std::shared_ptr<FormCallerMgr> formCallerMgr = std::make_shared<FormCallerMgr>();
+    ASSERT_NE(nullptr, formCallerMgr);
+    formCallerMgr->OnHostCallBackDied(nullptr);
     GTEST_LOG_(INFO) << "FormCallerMgrTest_0002 test ends";
 }
 
@@ -84,7 +88,9 @@ HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0002, TestSize.Level1) {
 HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0003, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormCallerMgrTest_0003 starts";
     sptr<IRemoteObject> providerToken = new (std::nothrow) MockFormProviderClient();
-    FormCallerMgr::GetInstance().OnHostCallBackDied(providerToken);
+    std::shared_ptr<FormCallerMgr> formCallerMgr = std::make_shared<FormCallerMgr>();
+    ASSERT_NE(nullptr, formCallerMgr);
+    formCallerMgr->OnHostCallBackDied(providerToken);
     GTEST_LOG_(INFO) << "FormCallerMgrTest_0003 test ends";
 }
 
@@ -95,14 +101,16 @@ HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0003, TestSize.Level1) {
  */
 HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0004, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormCallerMgrTest_0004 starts";
+    std::shared_ptr<FormCallerMgr> formCallerMgr = std::make_shared<FormCallerMgr>();
+    ASSERT_NE(nullptr, formCallerMgr);
     FormJsInfo formJsInfo;
     formJsInfo.formId = 1;
     formJsInfo.formName = "aa";
     sptr<IRemoteObject> providerToken = new (std::nothrow) MockFormProviderClient();
     // add formProviderCaller
-    FormCallerMgr::GetInstance().AddFormProviderCaller(formJsInfo, providerToken);
+    formCallerMgr->AddFormProviderCaller(formJsInfo, providerToken);
     // test IsSameToken is true
-    FormCallerMgr::GetInstance().AddFormProviderCaller(formJsInfo, providerToken);
+    formCallerMgr->AddFormProviderCaller(formJsInfo, providerToken);
     GTEST_LOG_(INFO) << "FormCallerMgrTest_0004 test ends";
 }
 
@@ -113,8 +121,10 @@ HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0004, TestSize.Level1) {
  */
 HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0005, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormCallerMgrTest_0005 starts";
+    std::shared_ptr<FormCallerMgr> formCallerMgr = std::make_shared<FormCallerMgr>();
+    ASSERT_NE(nullptr, formCallerMgr);
     sptr<IRemoteObject> providerToken = new (std::nothrow) MockFormProviderClient();
-    FormCallerMgr::GetInstance().RemoveFormHostCaller(providerToken);
+    formCallerMgr->RemoveFormHostCaller(providerToken);
     GTEST_LOG_(INFO) << "FormCallerMgrTest_0005 test ends";
 }
 
@@ -125,10 +135,12 @@ HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0005, TestSize.Level1) {
  */
 HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0006, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormCallerMgrTest_0006 starts";
+    std::shared_ptr<FormCallerMgr> formCallerMgr = std::make_shared<FormCallerMgr>();
+    ASSERT_NE(nullptr, formCallerMgr);
     FormJsInfo formJsInfo;
     sptr<IRemoteObject> providerToken = new (std::nothrow) MockFormProviderClient();
-    FormCallerMgr::GetInstance().AddFormHostCaller(formJsInfo, providerToken);
-    FormCallerMgr::GetInstance().RemoveFormHostCaller(nullptr);
+    formCallerMgr->AddFormHostCaller(formJsInfo, providerToken);
+    formCallerMgr->RemoveFormHostCaller(nullptr);
     GTEST_LOG_(INFO) << "FormCallerMgrTest_0006 test ends";
 }
 
@@ -139,16 +151,18 @@ HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0006, TestSize.Level1) {
  */
 HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0007, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormCallerMgrTest_0007 starts";
+    std::shared_ptr<FormCallerMgr> formCallerMgr = std::make_shared<FormCallerMgr>();
+    ASSERT_NE(nullptr, formCallerMgr);
     FormJsInfo formJsInfo;
     formJsInfo.formId = 1;
     formJsInfo.formName = "aa";
     int64_t formId = 1;
     sptr<IRemoteObject> providerToken = new (std::nothrow) MockFormProviderClient();
     // add formProviderCaller
-    FormCallerMgr::GetInstance().AddFormProviderCaller(formJsInfo, providerToken);
+    formCallerMgr->AddFormProviderCaller(formJsInfo, providerToken);
     // test GetFormProviderCaller
     std::vector<std::shared_ptr<FormProviderCaller>> formProviderCallers;
-    FormCallerMgr::GetInstance().GetFormProviderCaller(formId, formProviderCallers);
+    formCallerMgr->GetFormProviderCaller(formId, formProviderCallers);
     GTEST_LOG_(INFO) << "FormCallerMgrTest_0007 test ends";
 }
 
@@ -159,16 +173,18 @@ HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0007, TestSize.Level1) {
  */
 HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0008, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormCallerMgrTest_0008 starts";
+    std::shared_ptr<FormCallerMgr> formCallerMgr = std::make_shared<FormCallerMgr>();
+    ASSERT_NE(nullptr, formCallerMgr);
     FormJsInfo formJsInfo;
     formJsInfo.formId = 1;
     formJsInfo.formName = "aa";
     int64_t formId = 11;
     sptr<IRemoteObject> providerToken = new (std::nothrow) MockFormProviderClient();
     // add formProviderCaller
-    FormCallerMgr::GetInstance().AddFormProviderCaller(formJsInfo, providerToken);
+    formCallerMgr->AddFormProviderCaller(formJsInfo, providerToken);
     // test GetFormProviderCaller
     std::vector<std::shared_ptr<FormProviderCaller>> formProviderCallers;
-    FormCallerMgr::GetInstance().GetFormProviderCaller(formId, formProviderCallers);
+    formCallerMgr->GetFormProviderCaller(formId, formProviderCallers);
     GTEST_LOG_(INFO) << "FormCallerMgrTest_0008 test ends";
 }
 
@@ -179,15 +195,17 @@ HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0008, TestSize.Level1) {
  */
 HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0009, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormCallerMgrTest_0009 starts";
+    std::shared_ptr<FormCallerMgr> formCallerMgr = std::make_shared<FormCallerMgr>();
+    ASSERT_NE(nullptr, formCallerMgr);
     FormJsInfo formJsInfo;
     formJsInfo.formId = 1;
     formJsInfo.formName = "aa";
     int64_t formId = 1;
     sptr<IRemoteObject> providerToken = new (std::nothrow) MockFormProviderClient();
     // add formProviderCaller
-    FormCallerMgr::GetInstance().AddFormProviderCaller(formJsInfo, providerToken);
+    formCallerMgr->AddFormProviderCaller(formJsInfo, providerToken);
     // test RemoveFormProviderCaller
-    FormCallerMgr::GetInstance().RemoveFormProviderCaller(formId, providerToken);
+    formCallerMgr->RemoveFormProviderCaller(formId, providerToken);
     GTEST_LOG_(INFO) << "FormCallerMgrTest_0009 test ends";
 }
 
@@ -198,15 +216,17 @@ HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0009, TestSize.Level1) {
  */
 HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0010, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormCallerMgrTest_0010 starts";
+    std::shared_ptr<FormCallerMgr> formCallerMgr = std::make_shared<FormCallerMgr>();
+    ASSERT_NE(nullptr, formCallerMgr);
     FormJsInfo formJsInfo;
     formJsInfo.formId = 1;
     formJsInfo.formName = "aa";
     int64_t formId = 1;
     sptr<IRemoteObject> providerToken = new (std::nothrow) MockFormProviderClient();
     // add formProviderCaller
-    FormCallerMgr::GetInstance().AddFormProviderCaller(formJsInfo, providerToken);
+    formCallerMgr->AddFormProviderCaller(formJsInfo, providerToken);
     // test RemoveFormProviderCaller
-    FormCallerMgr::GetInstance().RemoveFormProviderCaller(formId, nullptr);
+    formCallerMgr->RemoveFormProviderCaller(formId, nullptr);
     GTEST_LOG_(INFO) << "FormCallerMgrTest_0010 test ends";
 }
 
@@ -217,14 +237,16 @@ HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0010, TestSize.Level1) {
  */
 HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0011, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormCallerMgrTest_0011 starts";
+    std::shared_ptr<FormCallerMgr> formCallerMgr = std::make_shared<FormCallerMgr>();
+    ASSERT_NE(nullptr, formCallerMgr);
     FormJsInfo formJsInfo;
     formJsInfo.formId = 1;
     formJsInfo.formName = "aa";
     sptr<IRemoteObject> providerToken = new (std::nothrow) MockFormProviderClient();
     // add formProviderCaller
-    FormCallerMgr::GetInstance().AddFormProviderCaller(formJsInfo, providerToken);
+    formCallerMgr->AddFormProviderCaller(formJsInfo, providerToken);
     // test RemoveFormProviderCaller
-    FormCallerMgr::GetInstance().RemoveFormProviderCaller(nullptr);
+    formCallerMgr->RemoveFormProviderCaller(nullptr);
     GTEST_LOG_(INFO) << "FormCallerMgrTest_0011 test ends";
 }
 
@@ -235,14 +257,16 @@ HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0011, TestSize.Level1) {
  */
 HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0012, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormCallerMgrTest_0012 starts";
+    std::shared_ptr<FormCallerMgr> formCallerMgr = std::make_shared<FormCallerMgr>();
+    ASSERT_NE(nullptr, formCallerMgr);
     FormJsInfo formJsInfo;
     formJsInfo.formId = 1;
     formJsInfo.formName = "aa";
     sptr<IRemoteObject> providerToken = new (std::nothrow) MockFormProviderClient();
     // add formProviderCaller
-    FormCallerMgr::GetInstance().AddFormProviderCaller(formJsInfo, providerToken);
+    formCallerMgr->AddFormProviderCaller(formJsInfo, providerToken);
     // test RemoveFormProviderCaller
-    FormCallerMgr::GetInstance().RemoveFormProviderCaller(providerToken);
+    formCallerMgr->RemoveFormProviderCaller(providerToken);
     GTEST_LOG_(INFO) << "FormCallerMgrTest_0012 test ends";
 }
 
@@ -253,8 +277,10 @@ HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0012, TestSize.Level1) {
  */
 HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0013, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormCallerMgrTest_0013 starts";
+    std::shared_ptr<FormCallerMgr> formCallerMgr = std::make_shared<FormCallerMgr>();
+    ASSERT_NE(nullptr, formCallerMgr);
     // test OnProviderCallBackDied
-    FormCallerMgr::GetInstance().OnProviderCallBackDied(nullptr);
+    formCallerMgr->OnProviderCallBackDied(nullptr);
     GTEST_LOG_(INFO) << "FormCallerMgrTest_0013 test ends";
 }
 
@@ -299,10 +325,12 @@ HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0015, TestSize.Level1) {
  */
 HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0016, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormCallerMgrTest_0016 starts";
+    std::shared_ptr<FormCallerMgr> formCallerMgr = std::make_shared<FormCallerMgr>();
+    ASSERT_NE(nullptr, formCallerMgr);
     sptr<IRemoteObject> providerToken = new (std::nothrow) MockFormProviderClient();
     wptr<IRemoteObject> app = providerToken;
     // test OnProviderCallBackDied
-    FormCallerMgr::GetInstance().OnProviderCallBackDied(app);
+    formCallerMgr->OnProviderCallBackDied(app);
     GTEST_LOG_(INFO) << "FormCallerMgrTest_0016 test ends";
 }
 
@@ -314,9 +342,11 @@ HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0016, TestSize.Level1) {
  */
 HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0017, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormCallerMgrTest_0017 starts";
+    std::shared_ptr<FormCallerMgr> formCallerMgr = std::make_shared<FormCallerMgr>();
+    ASSERT_NE(nullptr, formCallerMgr);
     sptr<IRemoteObject> providerToken = new (std::nothrow) MockFormProviderClient();
-    FormCallerMgr::GetInstance().HandleHostCallBackDiedTask(providerToken);
-    FormCallerMgr::GetInstance().HandleProviderCallBackDiedTask(providerToken);
+    formCallerMgr->HandleHostCallBackDiedTask(providerToken);
+    formCallerMgr->HandleProviderCallBackDiedTask(providerToken);
     GTEST_LOG_(INFO) << "FormCallerMgrTest_0017 test ends";
 }
 
@@ -330,8 +360,9 @@ HWTEST_F(FormCallerMgrTest, FormProviderCallerTest_0001, TestSize.Level1) {
     FormJsInfo formJsInfo;
     sptr<IRemoteObject> providerToken = new (std::nothrow) MockFormProviderClient();
     // test UpdateForm
-    FormProviderCaller formProviderCaller(providerToken);
-    formProviderCaller.UpdateForm(formJsInfo);
+    std::shared_ptr<FormProviderCaller> formProviderCaller = std::make_shared<FormProviderCaller>(providerToken);
+    ASSERT_NE(nullptr, formProviderCaller);
+    formProviderCaller->UpdateForm(formJsInfo);
     GTEST_LOG_(INFO) << "FormProviderCallerTest_0001 test ends";
 }
 
@@ -342,11 +373,13 @@ HWTEST_F(FormCallerMgrTest, FormProviderCallerTest_0001, TestSize.Level1) {
  */
 HWTEST_F(FormCallerMgrTest, FormProviderCallerTest_0002, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormProviderCallerTest_0002 starts";
-    FormProviderCallerRecipient formProviderCallerRecipient(nullptr);
+    std::shared_ptr<FormProviderCallerRecipient> formProviderCallerRecipient =
+        std::make_shared<FormProviderCallerRecipient>(nullptr);
+    ASSERT_NE(nullptr, formProviderCallerRecipient);
     sptr<IRemoteObject> providerToken = new (std::nothrow) MockFormProviderClient();
     wptr<IRemoteObject> app = providerToken;
     // test OnRemoteDied
-    formProviderCallerRecipient.OnRemoteDied(app);
+    formProviderCallerRecipient->OnRemoteDied(app);
     GTEST_LOG_(INFO) << "FormProviderCallerTest_0002 test ends";
 }
 
@@ -358,6 +391,7 @@ HWTEST_F(FormCallerMgrTest, FormProviderCallerTest_0002, TestSize.Level1) {
 HWTEST_F(FormCallerMgrTest, FormProviderCallerTest_0003, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormProviderCallerTest_0003 starts";
     sptr<IRemoteObject> providerToken = new (std::nothrow) MockFormProviderClient();
+    ASSERT_NE(nullptr, providerToken);
     wptr<IRemoteObject> app = providerToken;
     auto func = [](const wptr<IRemoteObject> &remote) {
         FormCallerMgr::GetInstance().OnProviderCallBackDied(remote);
@@ -377,6 +411,7 @@ HWTEST_F(FormCallerMgrTest, FormHostCallerTest_0001, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormHostCallerTest_0001 starts";
     FormHostCallerRecipient formHostCallerRecipient(nullptr);
     sptr<IRemoteObject> providerToken = new (std::nothrow) MockFormProviderClient();
+    ASSERT_NE(nullptr, providerToken);
     wptr<IRemoteObject> app = providerToken;
     // test OnRemoteDied
     formHostCallerRecipient.OnRemoteDied(app);
@@ -391,6 +426,7 @@ HWTEST_F(FormCallerMgrTest, FormHostCallerTest_0001, TestSize.Level1) {
 HWTEST_F(FormCallerMgrTest, FormHostCallerTest_0002, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormHostCallerTest_0002 starts";
     sptr<IRemoteObject> providerToken = new (std::nothrow) MockFormProviderClient();
+    ASSERT_NE(nullptr, providerToken);
     wptr<IRemoteObject> app = providerToken;
     auto func = [](const wptr<IRemoteObject> &remote) {
         FormCallerMgr::GetInstance().OnProviderCallBackDied(remote);

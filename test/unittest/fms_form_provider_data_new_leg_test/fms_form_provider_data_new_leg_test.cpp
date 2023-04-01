@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -227,11 +227,12 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormShareMgr_007, TestSize.Level0)
 HWTEST_F(FmsFormProviderDataNewLegTest, FormShareMgr_008, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormShareMgr_008 start";
-    FormShareMgr formShareMgr;
+    std::shared_ptr<FormShareMgr> formShareMgr = std::make_shared<FormShareMgr>();
+    ASSERT_NE(nullptr, formShareMgr);
     int64_t formId = 1;
     std::string formShareInfoKey = "aa";
-    formShareMgr.eventMap_.emplace(formId, formShareInfoKey);
-    formShareMgr.RemoveFormShareInfo(formShareInfoKey);
+    formShareMgr->eventMap_.emplace(formId, formShareInfoKey);
+    formShareMgr->RemoveFormShareInfo(formShareInfoKey);
     GTEST_LOG_(INFO) << "FormShareMgr_008 end";
 }
 
@@ -243,12 +244,13 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormShareMgr_008, TestSize.Level0)
 HWTEST_F(FmsFormProviderDataNewLegTest, FormShareMgr_009, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormShareMgr_009 start";
-    FormShareMgr formShareMgr;
+    std::shared_ptr<FormShareMgr> formShareMgr = std::make_shared<FormShareMgr>();
+    ASSERT_NE(nullptr, formShareMgr);
     int64_t formId = 1;
     std::string formShareInfoKey = "aa";
     std::string stringData = "bb";
-    formShareMgr.eventMap_.emplace(formId, stringData);
-    formShareMgr.RemoveFormShareInfo(formShareInfoKey);
+    formShareMgr->eventMap_.emplace(formId, stringData);
+    formShareMgr->RemoveFormShareInfo(formShareInfoKey);
     GTEST_LOG_(INFO) << "FormShareMgr_009 end";
 }
 
@@ -260,9 +262,10 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormShareMgr_009, TestSize.Level0)
 HWTEST_F(FmsFormProviderDataNewLegTest, FormShareMgr_010, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormShareMgr_010 start";
-    FormShareMgr formShareMgr;
+    std::shared_ptr<FormShareMgr> formShareMgr = std::make_shared<FormShareMgr>();
+    ASSERT_NE(nullptr, formShareMgr);
     std::shared_ptr<FormFreeInstallOperator> freeInstallOperator = nullptr;
-    formShareMgr.FinishFreeInstallTask(freeInstallOperator);
+    formShareMgr->FinishFreeInstallTask(freeInstallOperator);
     GTEST_LOG_(INFO) << "FormShareMgr_010 end";
 }
 
@@ -274,11 +277,12 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormShareMgr_010, TestSize.Level0)
 HWTEST_F(FmsFormProviderDataNewLegTest, FormShareMgr_011, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormShareMgr_011 start";
-    FormShareMgr formShareMgr;
+    std::shared_ptr<FormShareMgr> formShareMgr = std::make_shared<FormShareMgr>();
+    ASSERT_NE(nullptr, formShareMgr);
     int64_t formId = 1;
     std::shared_ptr<FormFreeInstallOperator> freeInstallOperator = nullptr;
-    formShareMgr.freeInstallOperatorMap_.emplace(formId, freeInstallOperator);
-    formShareMgr.FinishFreeInstallTask(freeInstallOperator);
+    formShareMgr->freeInstallOperatorMap_.emplace(formId, freeInstallOperator);
+    formShareMgr->FinishFreeInstallTask(freeInstallOperator);
     GTEST_LOG_(INFO) << "FormShareMgr_011 end";
 }
 
@@ -290,15 +294,16 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormShareMgr_011, TestSize.Level0)
 HWTEST_F(FmsFormProviderDataNewLegTest, FormShareMgr_012, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormShareMgr_012 start";
-    FormShareMgr formShareMgr;
+    std::shared_ptr<FormShareMgr> formShareMgr = std::make_shared<FormShareMgr>();
+    ASSERT_NE(nullptr, formShareMgr);
     int64_t formId = 1;
     std::string formShareInfoKey = "aa";
     std::shared_ptr<FormEventHandler> handler = nullptr;
     std::shared_ptr<FormFreeInstallOperator> freeInstallOperators =
         std::make_shared<FormFreeInstallOperator>(formShareInfoKey, handler);
     std::shared_ptr<FormFreeInstallOperator> freeInstallOperator = nullptr;
-    formShareMgr.freeInstallOperatorMap_.emplace(formId, freeInstallOperator);
-    formShareMgr.FinishFreeInstallTask(freeInstallOperator);
+    formShareMgr->freeInstallOperatorMap_.emplace(formId, freeInstallOperator);
+    formShareMgr->FinishFreeInstallTask(freeInstallOperator);
     GTEST_LOG_(INFO) << "FormShareMgr_012 end";
 }
 
@@ -360,9 +365,10 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormShareMgr_015, TestSize.Level0)
 HWTEST_F(FmsFormProviderDataNewLegTest, FormShareMgr_016, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormShareMgr_016 start";
-    FormShareMgr formShareMgr;
+    std::shared_ptr<FormShareMgr> formShareMgr = std::make_shared<FormShareMgr>();
+    ASSERT_NE(nullptr, formShareMgr);
     int64_t eventId = 1;
-    formShareMgr.HandleFormShareInfoTimeout(eventId);
+    formShareMgr->HandleFormShareInfoTimeout(eventId);
     GTEST_LOG_(INFO) << "FormShareMgr_016 end";
 }
 
@@ -374,11 +380,12 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormShareMgr_016, TestSize.Level0)
 HWTEST_F(FmsFormProviderDataNewLegTest, FormShareMgr_017, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormShareMgr_017 start";
-    FormShareMgr formShareMgr;
+    std::shared_ptr<FormShareMgr> formShareMgr = std::make_shared<FormShareMgr>();
+    ASSERT_NE(nullptr, formShareMgr);
     int64_t eventId = 1;
     std::string stringData = "aa";
-    formShareMgr.eventMap_.emplace(eventId, stringData);
-    formShareMgr.HandleFormShareInfoTimeout(eventId);
+    formShareMgr->eventMap_.emplace(eventId, stringData);
+    formShareMgr->HandleFormShareInfoTimeout(eventId);
     GTEST_LOG_(INFO) << "FormShareMgr_017 end";
 }
 
@@ -491,10 +498,11 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormShareMgr_023, TestSize.Level0)
 HWTEST_F(FmsFormProviderDataNewLegTest, FormShareMgr_024, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormShareMgr_024 start";
-    FormShareMgr formShareMgr;
+    std::shared_ptr<FormShareMgr> formShareMgr = std::make_shared<FormShareMgr>();
+    ASSERT_NE(nullptr, formShareMgr);
     int64_t msg = MSG::FORM_SHARE_INFO_DELAY_MSG;
     int64_t eventId = 1;
-    formShareMgr.OnEventTimeoutResponse(msg, eventId);
+    formShareMgr->OnEventTimeoutResponse(msg, eventId);
     GTEST_LOG_(INFO) << "FormShareMgr_024 end";
 }
 
@@ -506,10 +514,11 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormShareMgr_024, TestSize.Level0)
 HWTEST_F(FmsFormProviderDataNewLegTest, FormShareMgr_025, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormShareMgr_025 start";
-    FormShareMgr formShareMgr;
+    std::shared_ptr<FormShareMgr> formShareMgr = std::make_shared<FormShareMgr>();
+    ASSERT_NE(nullptr, formShareMgr);
     int64_t msg = MSG::FORM_PACKAGE_FREE_INSTALL_DELAY_MSG;
     int64_t eventId = 1;
-    formShareMgr.OnEventTimeoutResponse(msg, eventId);
+    formShareMgr->OnEventTimeoutResponse(msg, eventId);
     GTEST_LOG_(INFO) << "FormShareMgr_025 end";
 }
 
@@ -521,10 +530,11 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormShareMgr_025, TestSize.Level0)
 HWTEST_F(FmsFormProviderDataNewLegTest, FormShareMgr_026, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormShareMgr_026 start";
-    FormShareMgr formShareMgr;
+    std::shared_ptr<FormShareMgr> formShareMgr = std::make_shared<FormShareMgr>();
+    ASSERT_NE(nullptr, formShareMgr);
     int64_t msg = 100;
     int64_t eventId = 1;
-    formShareMgr.OnEventTimeoutResponse(msg, eventId);
+    formShareMgr->OnEventTimeoutResponse(msg, eventId);
     GTEST_LOG_(INFO) << "FormShareMgr_026 end";
 }
 
@@ -717,10 +727,11 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_010, TestSize.Level0)
 HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_011, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormProviderMgr_011 start";
-    FormProviderMgr formProviderMgr;
+    std::shared_ptr<FormProviderMgr> formProviderMgr = std::make_shared<FormProviderMgr>();
+    ASSERT_NE(nullptr, formProviderMgr);
     int64_t formId = 1;
     MockGetFormRecord(false);
-    formProviderMgr.IncreaseTimerRefreshCount(formId);
+    formProviderMgr->IncreaseTimerRefreshCount(formId);
     GTEST_LOG_(INFO) << "FormProviderMgr_011 end";
 }
 
@@ -732,10 +743,11 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_011, TestSize.Level0)
 HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_012, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormProviderMgr_012 start";
-    FormProviderMgr formProviderMgr;
+    std::shared_ptr<FormProviderMgr> formProviderMgr = std::make_shared<FormProviderMgr>();
+    ASSERT_NE(nullptr, formProviderMgr);
     int64_t formId = 1;
     MockGetFormRecord(true);
-    formProviderMgr.IncreaseTimerRefreshCount(formId);
+    formProviderMgr->IncreaseTimerRefreshCount(formId);
     GTEST_LOG_(INFO) << "FormProviderMgr_012 end";
 }
 
@@ -848,7 +860,8 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_018, TestSize.Level0)
 HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_019, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormProviderMgr_019 start";
-    FormProviderMgr formProviderMgr;
+    std::shared_ptr<FormProviderMgr> formProviderMgr = std::make_shared<FormProviderMgr>();
+    ASSERT_NE(nullptr, formProviderMgr);
     int64_t formId = 1;
     FormRecord record;
     record.needFreeInstall = false;
@@ -857,7 +870,7 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_019, TestSize.Level1)
     bool isTimerRefresh = false;
     MockIsLimiterEnableRefresh(true);
     MockConnectServiceAbility(true);
-    formProviderMgr.ConnectAmsForRefresh(formId, record, want, isTimerRefresh);
+    formProviderMgr->ConnectAmsForRefresh(formId, record, want, isTimerRefresh);
     GTEST_LOG_(INFO) << "FormProviderMgr_019 end";
 }
 
@@ -886,11 +899,12 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_020, TestSize.Level1)
 HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_021, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormProviderMgr_021 start";
-    FormProviderMgr formProviderMgr;
+    std::shared_ptr<FormProviderMgr> formProviderMgr = std::make_shared<FormProviderMgr>();
+    ASSERT_NE(nullptr, formProviderMgr);
     int64_t formId = 1;
     MockGetFormRecord(true);
     MockGetFormRecordParams(true);
-    formProviderMgr.IncreaseTimerRefreshCount(formId);
+    formProviderMgr->IncreaseTimerRefreshCount(formId);
     MockGetFormRecordParams(false);
     GTEST_LOG_(INFO) << "FormProviderMgr_021 end";
 }

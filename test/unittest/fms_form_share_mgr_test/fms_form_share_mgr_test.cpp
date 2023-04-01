@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1612,9 +1612,10 @@ HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_026, TestSize.Level0)
     int32_t userId = 100;
     FormInfoStorage formInfoStorage;
     formInfoStorage.userId = USER_ID;
-    BundleFormInfo bundleFormInfo(bundleName);
-    bundleFormInfo.formInfoStorages_.emplace_back(formInfoStorage);
-    bundleFormInfo.RemoveAllDynamicFormsInfo(userId);
+    std::shared_ptr<BundleFormInfo> bundleFormInfo = std::make_shared<BundleFormInfo>(bundleName);
+    ASSERT_NE(nullptr, bundleFormInfo);
+    bundleFormInfo->formInfoStorages_.emplace_back(formInfoStorage);
+    bundleFormInfo->RemoveAllDynamicFormsInfo(userId);
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_026 end";
 }
 
@@ -1967,7 +1968,8 @@ HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_043, TestSize.Level0)
 HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_044, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_044 start";
-    FormInfoMgr formInfoMgr;
+    std::shared_ptr<FormInfoMgr> formInfoMgr = std::make_shared<FormInfoMgr>();
+    ASSERT_NE(nullptr, formInfoMgr);
     FormInfo formInfo;
     formInfo.moduleName = "";
     HapModuleInfo info;
@@ -1983,7 +1985,7 @@ HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_044, TestSize.Level0)
     bundleInfo.hapModuleInfos.push_back(infos);
     HapModuleInfo infoed;
     bundleInfo.hapModuleInfos.push_back(infoed);
-    formInfoMgr.CheckDynamicFormInfo(formInfo, bundleInfo);
+    formInfoMgr->CheckDynamicFormInfo(formInfo, bundleInfo);
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_044 end";
 }
 
@@ -2010,12 +2012,13 @@ HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_045, TestSize.Level0)
 HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_046, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_046 start";
-    FormInfoMgr formInfoMgr;
+    std::shared_ptr<FormInfoMgr> formInfoMgr = std::make_shared<FormInfoMgr>();
+    ASSERT_NE(nullptr, formInfoMgr);
     std::string bundleName = "";
     std::string moduleName = "";
     std::string formName = "";
     int32_t userId = 1;
-    formInfoMgr.RemoveDynamicFormInfo(bundleName, moduleName, formName, userId);
+    formInfoMgr->RemoveDynamicFormInfo(bundleName, moduleName, formName, userId);
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_046 end";
 }
 
@@ -2031,9 +2034,10 @@ HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_047, TestSize.Level0)
     std::unordered_map<std::string, std::shared_ptr<BundleFormInfo>> bundleFormInfoMap;
     std::shared_ptr<BundleFormInfo> bundleFormInfo = nullptr;
     bundleFormInfoMap.emplace(FORM_PROVIDER_BUNDLE_NAME, bundleFormInfo);
-    FormInfoMgr formInfoMgr;
-    formInfoMgr.bundleFormInfoMap_ = bundleFormInfoMap;
-    formInfoMgr.GetOrCreateBundleFromInfo(bundleName);
+    std::shared_ptr<FormInfoMgr> formInfoMgr = std::make_shared<FormInfoMgr>();
+    ASSERT_NE(nullptr, formInfoMgr);
+    formInfoMgr->bundleFormInfoMap_ = bundleFormInfoMap;
+    formInfoMgr->GetOrCreateBundleFromInfo(bundleName);
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_047 end";
 }
 
@@ -2127,8 +2131,9 @@ HWTEST_F(FmsFormShareMgrTest, FormEventUtil_0004, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormEventUtil_0004 start";
     std::string bundleName = FORM_NULL_BUNDLE_NAME;
     int32_t userId = 1;
-    FormEventUtil formEventUtil;
-    formEventUtil.HandleBundleDataCleared(bundleName, userId);
+    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
+    ASSERT_NE(nullptr, formEventUtil);
+    formEventUtil->HandleBundleDataCleared(bundleName, userId);
     GTEST_LOG_(INFO) << "FormEventUtil_0004 end";
 }
 
@@ -2149,8 +2154,9 @@ HWTEST_F(FmsFormShareMgrTest, FormEventUtil_0005, TestSize.Level0)
     FormDataMgr::GetInstance().formRecords_.emplace(formJsInfo.formId, formInfo);
     std::string bundleName = FORM_NULL_BUNDLE_NAME;
     int32_t userId = 1;
-    FormEventUtil formEventUtil;
-    formEventUtil.HandleBundleDataCleared(bundleName, userId);
+    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
+    ASSERT_NE(nullptr, formEventUtil);
+    formEventUtil->HandleBundleDataCleared(bundleName, userId);
     GTEST_LOG_(INFO) << "FormEventUtil_0005 end";
 }
 
@@ -2163,8 +2169,9 @@ HWTEST_F(FmsFormShareMgrTest, FormEventUtil_0006, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_0006 start";
     int uid = 1;
-    FormEventUtil formEventUtil;
-    formEventUtil.HandleFormHostDataCleared(uid);
+    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
+    ASSERT_NE(nullptr, formEventUtil);
+    formEventUtil->HandleFormHostDataCleared(uid);
     GTEST_LOG_(INFO) << "FormEventUtil_0006 end";
 }
 
@@ -2230,8 +2237,9 @@ HWTEST_F(FmsFormShareMgrTest, FormEventUtil_0009, TestSize.Level0)
 HWTEST_F(FmsFormShareMgrTest, FormAmsHelper_0001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormAmsHelper_0001 start";
-    FormAmsHelper formAmsHelper;
-    formAmsHelper.GetAbilityManager();
+    std::shared_ptr<FormAmsHelper> formAmsHelper = std::make_shared<FormAmsHelper>();
+    ASSERT_NE(nullptr, formAmsHelper);
+    formAmsHelper->GetAbilityManager();
     GTEST_LOG_(INFO) << "FormAmsHelper_0001 end";
 }
 
@@ -2290,8 +2298,9 @@ HWTEST_F(FmsFormShareMgrTest, FormDumpMgr_0001, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormDumpMgr_0001 start";
     std::vector<FormDBInfo> storageInfos;
     std::string formInfos = "aa";
-    FormDumpMgr formDumpMgr;
-    formDumpMgr.DumpStorageFormInfos(storageInfos, formInfos);
+    std::shared_ptr<FormDumpMgr> formDumpMgr = std::make_shared<FormDumpMgr>();
+    ASSERT_NE(nullptr, formDumpMgr);
+    formDumpMgr->DumpStorageFormInfos(storageInfos, formInfos);
     GTEST_LOG_(INFO) << "FormDumpMgr_0001 end";
 }
 
@@ -2309,8 +2318,9 @@ HWTEST_F(FmsFormShareMgrTest, FormDumpMgr_0002, TestSize.Level0)
     std::vector<FormDBInfo> storageInfos;
     storageInfos.emplace_back(formDBInfo);
     std::string formInfos = "aa";
-    FormDumpMgr formDumpMgr;
-    formDumpMgr.DumpStorageFormInfos(storageInfos, formInfos);
+    std::shared_ptr<FormDumpMgr> formDumpMgr = std::make_shared<FormDumpMgr>();
+    ASSERT_NE(nullptr, formDumpMgr);
+    formDumpMgr->DumpStorageFormInfos(storageInfos, formInfos);
     GTEST_LOG_(INFO) << "FormDumpMgr_0002 end";
 }
 
@@ -2327,8 +2337,9 @@ HWTEST_F(FmsFormShareMgrTest, FormDumpMgr_0003, TestSize.Level0)
     std::vector<FormDBInfo> storageInfos;
     storageInfos.emplace_back(formDBInfo);
     std::string formInfos = "aa";
-    FormDumpMgr formDumpMgr;
-    formDumpMgr.DumpStorageFormInfos(storageInfos, formInfos);
+    std::shared_ptr<FormDumpMgr> formDumpMgr = std::make_shared<FormDumpMgr>();
+    ASSERT_NE(nullptr, formDumpMgr);
+    formDumpMgr->DumpStorageFormInfos(storageInfos, formInfos);
     GTEST_LOG_(INFO) << "FormDumpMgr_0003 end";
 }
 
@@ -2342,8 +2353,9 @@ HWTEST_F(FmsFormShareMgrTest, FormDumpMgr_0004, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormDumpMgr_0004 start";
     std::vector<FormRecord> formRecordInfos;
     std::string formInfos = "com.form.info";
-    FormDumpMgr formDumpMgr;
-    formDumpMgr.DumpFormInfos(formRecordInfos, formInfos);
+    std::shared_ptr<FormDumpMgr> formDumpMgr = std::make_shared<FormDumpMgr>();
+    ASSERT_NE(nullptr, formDumpMgr);
+    formDumpMgr->DumpFormInfos(formRecordInfos, formInfos);
     GTEST_LOG_(INFO) << "FormDumpMgr_0004 end";
 }
 
@@ -2360,8 +2372,9 @@ HWTEST_F(FmsFormShareMgrTest, FormDumpMgr_0005, TestSize.Level0)
     std::vector<FormRecord> formRecordInfos;
     formRecordInfos.emplace_back(formInfo);
     std::string formInfos = "com.form.info";
-    FormDumpMgr formDumpMgr;
-    formDumpMgr.DumpFormInfos(formRecordInfos, formInfos);
+    std::shared_ptr<FormDumpMgr> formDumpMgr = std::make_shared<FormDumpMgr>();
+    ASSERT_NE(nullptr, formDumpMgr);
+    formDumpMgr->DumpFormInfos(formRecordInfos, formInfos);
     GTEST_LOG_(INFO) << "FormDumpMgr_0005 end";
 }
 
@@ -2381,8 +2394,9 @@ HWTEST_F(FmsFormShareMgrTest, FormDumpMgr_0006, TestSize.Level0)
     std::vector<FormRecord> formRecordInfos;
     formRecordInfos.emplace_back(formInfo);
     std::string formInfos = "com.form.info";
-    FormDumpMgr formDumpMgr;
-    formDumpMgr.DumpFormInfos(formRecordInfos, formInfos);
+    std::shared_ptr<FormDumpMgr> formDumpMgr = std::make_shared<FormDumpMgr>();
+    ASSERT_NE(nullptr, formDumpMgr);
+    formDumpMgr->DumpFormInfos(formRecordInfos, formInfos);
     GTEST_LOG_(INFO) << "FormDumpMgr_0006 end";
 }
 
@@ -2396,8 +2410,9 @@ HWTEST_F(FmsFormShareMgrTest, FormDumpMgr_0007, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormDumpMgr_0007 start";
     FormRecord formRecordInfo;
     std::string formInfo = "com.form.info";
-    FormDumpMgr formDumpMgr;
-    formDumpMgr.DumpFormInfo(formRecordInfo, formInfo);
+    std::shared_ptr<FormDumpMgr> formDumpMgr = std::make_shared<FormDumpMgr>();
+    ASSERT_NE(nullptr, formDumpMgr);
+    formDumpMgr->DumpFormInfo(formRecordInfo, formInfo);
     GTEST_LOG_(INFO) << "FormDumpMgr_0007 end";
 }
 
@@ -2413,8 +2428,9 @@ HWTEST_F(FmsFormShareMgrTest, FormDumpMgr_0008, TestSize.Level0)
     formRecordInfo.hapSourceDirs.emplace_back("aaa");
     formRecordInfo.formUserUids.emplace_back(1);
     std::string formInfo = "com.form.info";
-    FormDumpMgr formDumpMgr;
-    formDumpMgr.DumpFormInfo(formRecordInfo, formInfo);
+    std::shared_ptr<FormDumpMgr> formDumpMgr = std::make_shared<FormDumpMgr>();
+    ASSERT_NE(nullptr, formDumpMgr);
+    formDumpMgr->DumpFormInfo(formRecordInfo, formInfo);
     GTEST_LOG_(INFO) << "FormDumpMgr_0008 end";
 }
 
@@ -2528,7 +2544,8 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0007, TestSize.Level0)
     int uid = 1;
     std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
     std::map<int64_t, bool> foundFormsMap;
-    FormDataMgr formDataMgr;
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    ASSERT_NE(nullptr, formDataMgr);
     int64_t formIds = 2;
     FormRecord formInfo;
     formInfo.formName = "aaaaaa";
@@ -2536,7 +2553,7 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0007, TestSize.Level0)
     formInfo.formId = formIds;
     formInfo.formTempFlag = true;
     FormDataMgr::GetInstance().formRecords_.emplace(formIds, formInfo);
-    formDataMgr.GetNoHostTempForms(uid, noHostTempFormsMap, foundFormsMap);
+    formDataMgr->GetNoHostTempForms(uid, noHostTempFormsMap, foundFormsMap);
     GTEST_LOG_(INFO) << "FormDataMgr_0007 end";
 }
 
@@ -2551,7 +2568,8 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0008, TestSize.Level0)
     int uid = 1;
     std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
     std::map<int64_t, bool> foundFormsMap;
-    FormDataMgr formDataMgr;
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    ASSERT_NE(nullptr, formDataMgr);
     int64_t formIds = 2;
     FormRecord formInfo;
     formInfo.formName = "aaaaaa";
@@ -2559,7 +2577,7 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0008, TestSize.Level0)
     formInfo.formId = formIds;
     formInfo.formTempFlag = false;
     FormDataMgr::GetInstance().formRecords_.emplace(formIds, formInfo);
-    formDataMgr.GetNoHostTempForms(uid, noHostTempFormsMap, foundFormsMap);
+    formDataMgr->GetNoHostTempForms(uid, noHostTempFormsMap, foundFormsMap);
     GTEST_LOG_(INFO) << "FormDataMgr_0008 end";
 }
 
@@ -2574,8 +2592,9 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0009, TestSize.Level0)
     int uid = 1;
     std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
     std::map<int64_t, bool> foundFormsMap;
-    FormDataMgr formDataMgr;
-    formDataMgr.GetNoHostTempForms(uid, noHostTempFormsMap, foundFormsMap);
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    ASSERT_NE(nullptr, formDataMgr);
+    formDataMgr->GetNoHostTempForms(uid, noHostTempFormsMap, foundFormsMap);
     GTEST_LOG_(INFO) << "FormDataMgr_0009 end";
 }
 
@@ -2587,12 +2606,13 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0009, TestSize.Level0)
 HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0010, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormDataMgr_0010 start";
-    std::string provider = "aaaaa";
+    std::string record = "aaaaa";
     FormItemInfo info;
     sptr<IRemoteObject> callerToken = nullptr;
     int callingUid = 1;
-    FormDataMgr formDataMgr;
-    formDataMgr.CreateFormStateRecord(provider, info, callerToken, callingUid);
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    ASSERT_NE(nullptr, formDataMgr);
+    formDataMgr->CreateFormStateRecord(record, info, callerToken, callingUid);
     GTEST_LOG_(INFO) << "FormDataMgr_0010 end";
 }
 
@@ -2604,12 +2624,13 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0010, TestSize.Level0)
 HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0011, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormDataMgr_0011 start";
-    std::string provider = "aaaaa";
+    std::string record = "aaaaa";
     FormItemInfo info;
     sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
     int callingUid = 1;
-    FormDataMgr formDataMgr;
-    formDataMgr.CreateFormStateRecord(provider, info, callerToken, callingUid);
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    ASSERT_NE(nullptr, formDataMgr);
+    formDataMgr->CreateFormStateRecord(record, info, callerToken, callingUid);
     GTEST_LOG_(INFO) << "FormDataMgr_0011 end";
 }
 
@@ -2640,15 +2661,16 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0012, TestSize.Level0)
 HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0013, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormDataMgr_0013 start";
-    std::string provider = "aaaaa";
+    std::string record = "aaaaa";
     FormItemInfo info;
     sptr<IRemoteObject> callerToken = nullptr;
     int callingUid = 1;
-    FormDataMgr formDataMgr;
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    ASSERT_NE(nullptr, formDataMgr);
     FormHostRecord formHostRecord;
     formHostRecord.SetFormHostClient(callerToken);
-    formDataMgr.formStateRecord_.emplace(provider, formHostRecord);
-    formDataMgr.CreateFormStateRecord(provider, info, callerToken, callingUid);
+    formDataMgr->formStateRecord_.emplace(record, formHostRecord);
+    formDataMgr->CreateFormStateRecord(record, info, callerToken, callingUid);
     GTEST_LOG_(INFO) << "FormDataMgr_0013 end";
 }
 
@@ -2840,8 +2862,9 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0024, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormDataMgr_0024 start";
     int32_t userId = 1;
     std::vector<int64_t> removedFormIds;
-    FormDataMgr formDataMgr;
-    formDataMgr.DeleteFormsByUserId(userId, removedFormIds);
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    ASSERT_NE(nullptr, formDataMgr);
+    formDataMgr->DeleteFormsByUserId(userId, removedFormIds);
     GTEST_LOG_(INFO) << "FormDataMgr_0024 end";
 }
 
@@ -2855,15 +2878,16 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0025, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormDataMgr_0025 start";
     int32_t userId = 1;
     std::vector<int64_t> removedFormIds;
-    FormDataMgr formDataMgr;
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    ASSERT_NE(nullptr, formDataMgr);
     int64_t formIds = 1;
     FormRecord formInfo;
     formInfo.formName = "aaaaaa";
     formInfo.bundleName = "com.form.start";
     formInfo.userId = formIds;
     formInfo.formTempFlag = true;
-    formDataMgr.formRecords_.emplace(formIds, formInfo);
-    formDataMgr.DeleteFormsByUserId(userId, removedFormIds);
+    formDataMgr->formRecords_.emplace(formIds, formInfo);
+    formDataMgr->DeleteFormsByUserId(userId, removedFormIds);
     GTEST_LOG_(INFO) << "FormDataMgr_0025 end";
 }
 
@@ -2877,15 +2901,16 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0026, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormDataMgr_0026 start";
     int32_t userId = 1;
     std::vector<int64_t> removedFormIds;
-    FormDataMgr formDataMgr;
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    ASSERT_NE(nullptr, formDataMgr);
     int64_t formIds = 1;
     FormRecord formInfo;
     formInfo.formName = "aaaaaa";
     formInfo.bundleName = "com.form.start";
     formInfo.userId = formIds;
     formInfo.formTempFlag = false;
-    formDataMgr.formRecords_.emplace(formIds, formInfo);
-    formDataMgr.DeleteFormsByUserId(userId, removedFormIds);
+    formDataMgr->formRecords_.emplace(formIds, formInfo);
+    formDataMgr->DeleteFormsByUserId(userId, removedFormIds);
     GTEST_LOG_(INFO) << "FormDataMgr_0026 end";
 }
 
@@ -2899,15 +2924,16 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0027, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormDataMgr_0027 start";
     int32_t userId = 1;
     std::vector<int64_t> removedFormIds;
-    FormDataMgr formDataMgr;
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    ASSERT_NE(nullptr, formDataMgr);
     int64_t formIds = 2;
     FormRecord formInfo;
     formInfo.formName = "aaaaaa";
     formInfo.bundleName = "com.form.start";
     formInfo.userId = formIds;
     formInfo.formTempFlag = false;
-    formDataMgr.formRecords_.emplace(formIds, formInfo);
-    formDataMgr.DeleteFormsByUserId(userId, removedFormIds);
+    formDataMgr->formRecords_.emplace(formIds, formInfo);
+    formDataMgr->DeleteFormsByUserId(userId, removedFormIds);
     GTEST_LOG_(INFO) << "FormDataMgr_0027 end";
 }
 
@@ -2921,16 +2947,17 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0028, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormDataMgr_0028 start";
     int32_t userId = 1;
     std::vector<int64_t> removedFormIds;
-    FormDataMgr formDataMgr;
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    ASSERT_NE(nullptr, formDataMgr);
     int64_t formIds = 1;
     FormRecord formInfo;
     formInfo.formName = "aaaaaa";
     formInfo.bundleName = "com.form.start";
     formInfo.userId = formIds;
     formInfo.formTempFlag = true;
-    formDataMgr.formRecords_.emplace(formIds, formInfo);
-    formDataMgr.tempForms_.emplace_back(formIds);
-    formDataMgr.DeleteFormsByUserId(userId, removedFormIds);
+    formDataMgr->formRecords_.emplace(formIds, formInfo);
+    formDataMgr->tempForms_.emplace_back(formIds);
+    formDataMgr->DeleteFormsByUserId(userId, removedFormIds);
     GTEST_LOG_(INFO) << "FormDataMgr_0028 end";
 }
 
@@ -2947,8 +2974,9 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0029, TestSize.Level0)
     std::set<int64_t> matchedFormIds;
     std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
     std::map<int64_t, bool> foundFormsMap;
-    FormDataMgr formDataMgr;
-    formDataMgr.GetNoHostInvalidTempForms(userId, callingUid, matchedFormIds, noHostTempFormsMap, foundFormsMap);
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    ASSERT_NE(nullptr, formDataMgr);
+    formDataMgr->GetNoHostInvalidTempForms(userId, callingUid, matchedFormIds, noHostTempFormsMap, foundFormsMap);
     GTEST_LOG_(INFO) << "FormDataMgr_0029 end";
 }
 
@@ -2965,15 +2993,16 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0030, TestSize.Level0)
     std::set<int64_t> matchedFormIds;
     std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
     std::map<int64_t, bool> foundFormsMap;
-    FormDataMgr formDataMgr;
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    ASSERT_NE(nullptr, formDataMgr);
     int64_t formIds = 2;
     FormRecord formInfo;
     formInfo.formName = "aaaaaa";
     formInfo.bundleName = "com.form.start";
     formInfo.userId = formIds;
     formInfo.formTempFlag = true;
-    formDataMgr.formRecords_.emplace(formIds, formInfo);
-    formDataMgr.GetNoHostInvalidTempForms(userId, callingUid, matchedFormIds, noHostTempFormsMap, foundFormsMap);
+    formDataMgr->formRecords_.emplace(formIds, formInfo);
+    formDataMgr->GetNoHostInvalidTempForms(userId, callingUid, matchedFormIds, noHostTempFormsMap, foundFormsMap);
     GTEST_LOG_(INFO) << "FormDataMgr_0030 end";
 }
 
@@ -2990,15 +3019,16 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0031, TestSize.Level0)
     std::set<int64_t> matchedFormIds;
     std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
     std::map<int64_t, bool> foundFormsMap;
-    FormDataMgr formDataMgr;
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    ASSERT_NE(nullptr, formDataMgr);
     int64_t formIds = 2;
     FormRecord formInfo;
     formInfo.formName = "aaaaaa";
     formInfo.bundleName = "com.form.start";
     formInfo.userId = formIds;
     formInfo.formTempFlag = false;
-    formDataMgr.formRecords_.emplace(formIds, formInfo);
-    formDataMgr.GetNoHostInvalidTempForms(userId, callingUid, matchedFormIds, noHostTempFormsMap, foundFormsMap);
+    formDataMgr->formRecords_.emplace(formIds, formInfo);
+    formDataMgr->GetNoHostInvalidTempForms(userId, callingUid, matchedFormIds, noHostTempFormsMap, foundFormsMap);
     GTEST_LOG_(INFO) << "FormDataMgr_0031 end";
 }
 
@@ -3015,15 +3045,16 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0032, TestSize.Level0)
     std::set<int64_t> matchedFormIds;
     std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
     std::map<int64_t, bool> foundFormsMap;
-    FormDataMgr formDataMgr;
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    ASSERT_NE(nullptr, formDataMgr);
     int64_t formIds = 1;
     FormRecord formInfo;
     formInfo.formName = "aaaaaa";
     formInfo.bundleName = "com.form.start";
     formInfo.userId = formIds;
     formInfo.formTempFlag = false;
-    formDataMgr.formRecords_.emplace(formIds, formInfo);
-    formDataMgr.GetNoHostInvalidTempForms(userId, callingUid, matchedFormIds, noHostTempFormsMap, foundFormsMap);
+    formDataMgr->formRecords_.emplace(formIds, formInfo);
+    formDataMgr->GetNoHostInvalidTempForms(userId, callingUid, matchedFormIds, noHostTempFormsMap, foundFormsMap);
     GTEST_LOG_(INFO) << "FormDataMgr_0032 end";
 }
 
@@ -3040,15 +3071,16 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0033, TestSize.Level0)
     std::set<int64_t> matchedFormIds;
     std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
     std::map<int64_t, bool> foundFormsMap;
-    FormDataMgr formDataMgr;
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    ASSERT_NE(nullptr, formDataMgr);
     int64_t formIds = 1;
     FormRecord formInfo;
     formInfo.formName = "aaaaaa";
     formInfo.bundleName = "com.form.start";
     formInfo.userId = formIds;
     formInfo.formTempFlag = true;
-    formDataMgr.formRecords_.emplace(formIds, formInfo);
-    formDataMgr.GetNoHostInvalidTempForms(userId, callingUid, matchedFormIds, noHostTempFormsMap, foundFormsMap);
+    formDataMgr->formRecords_.emplace(formIds, formInfo);
+    formDataMgr->GetNoHostInvalidTempForms(userId, callingUid, matchedFormIds, noHostTempFormsMap, foundFormsMap);
     GTEST_LOG_(INFO) << "FormDataMgr_0033 end";
 }
 
@@ -3065,7 +3097,8 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0034, TestSize.Level0)
     std::set<int64_t> matchedFormIds;
     std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
     std::map<int64_t, bool> foundFormsMap;
-    FormDataMgr formDataMgr;
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    ASSERT_NE(nullptr, formDataMgr);
     int64_t formIds = 1;
     FormRecord formInfo;
     formInfo.formName = "aaaaaa";
@@ -3073,8 +3106,8 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0034, TestSize.Level0)
     formInfo.userId = formIds;
     formInfo.formUserUids.emplace_back(2);
     formInfo.formTempFlag = true;
-    formDataMgr.formRecords_.emplace(formIds, formInfo);
-    formDataMgr.GetNoHostInvalidTempForms(userId, callingUid, matchedFormIds, noHostTempFormsMap, foundFormsMap);
+    formDataMgr->formRecords_.emplace(formIds, formInfo);
+    formDataMgr->GetNoHostInvalidTempForms(userId, callingUid, matchedFormIds, noHostTempFormsMap, foundFormsMap);
     GTEST_LOG_(INFO) << "FormDataMgr_0034 end";
 }
 
@@ -3093,15 +3126,16 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0035, TestSize.Level0)
     matchedFormIds.insert(formIds);
     std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
     std::map<int64_t, bool> foundFormsMap;
-    FormDataMgr formDataMgr;
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    ASSERT_NE(nullptr, formDataMgr);
     FormRecord formInfo;
     formInfo.formName = "aaaaaa";
     formInfo.bundleName = "com.form.start";
     formInfo.userId = formIds;
     formInfo.formUserUids.emplace_back(2);
     formInfo.formTempFlag = true;
-    formDataMgr.formRecords_.emplace(formIds, formInfo);
-    formDataMgr.GetNoHostInvalidTempForms(userId, callingUid, matchedFormIds, noHostTempFormsMap, foundFormsMap);
+    formDataMgr->formRecords_.emplace(formIds, formInfo);
+    formDataMgr->GetNoHostInvalidTempForms(userId, callingUid, matchedFormIds, noHostTempFormsMap, foundFormsMap);
     GTEST_LOG_(INFO) << "FormDataMgr_0035 end";
 }
 
@@ -3117,7 +3151,8 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0036, TestSize.Level0)
     int32_t callingUid = 2;
     std::set<int64_t> matchedFormIds;
     std::map<int64_t, bool> foundFormsMap;
-    FormDataMgr formDataMgr;
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    ASSERT_NE(nullptr, formDataMgr);
     int64_t formIds = 1;
     FormRecord formInfo;
     formInfo.formName = "aaaaaa";
@@ -3126,12 +3161,12 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0036, TestSize.Level0)
     formInfo.userId = formIds;
     formInfo.formUserUids.emplace_back(2);
     formInfo.formTempFlag = true;
-    formDataMgr.formRecords_.emplace(formIds, formInfo);
+    formDataMgr->formRecords_.emplace(formIds, formInfo);
     // set noHostTempFormsMap
     FormIdKey formIdKey(formInfo.bundleName, formInfo.abilityName);
     std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
     noHostTempFormsMap.emplace(formIdKey, matchedFormIds);
-    formDataMgr.GetNoHostInvalidTempForms(userId, callingUid, matchedFormIds, noHostTempFormsMap, foundFormsMap);
+    formDataMgr->GetNoHostInvalidTempForms(userId, callingUid, matchedFormIds, noHostTempFormsMap, foundFormsMap);
     GTEST_LOG_(INFO) << "FormDataMgr_0036 end";
 }
 
@@ -3227,8 +3262,9 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0041, TestSize.Level0)
     int32_t userId = 1;
     std::string bundleName = "aaaaa";
     std::set<int64_t> validFormIds;
-    FormDataMgr formDataMgr;
-    formDataMgr.DeleteInvalidPublishForms(userId, bundleName, validFormIds);
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    ASSERT_NE(nullptr, formDataMgr);
+    formDataMgr->DeleteInvalidPublishForms(userId, bundleName, validFormIds);
     GTEST_LOG_(INFO) << "FormDataMgr_0041 end";
 }
 
@@ -3573,12 +3609,13 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0060, TestSize.Level0)
     std::string bundleName = "aaaaa";
     std::set<int64_t> validFormIds;
     validFormIds.insert(formId);
-    FormDataMgr formDataMgr;
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    ASSERT_NE(nullptr, formDataMgr);
     Want want;
     std::unique_ptr<FormProviderData> formProviderData;
-    formDataMgr.formRequestPublishForms_.insert(
+    formDataMgr->formRequestPublishForms_.insert(
         std::make_pair(formId, std::make_pair(want, std::move(formProviderData))));
-    formDataMgr.DeleteInvalidPublishForms(userId, bundleName, validFormIds);
+    formDataMgr->DeleteInvalidPublishForms(userId, bundleName, validFormIds);
     GTEST_LOG_(INFO) << "FormDataMgr_0060 end";
 }
 
@@ -3596,12 +3633,13 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0061, TestSize.Level0)
     std::string bundleName = "aaaaa";
     std::set<int64_t> validFormIds;
     validFormIds.insert(formIds);
-    FormDataMgr formDataMgr;
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    ASSERT_NE(nullptr, formDataMgr);
     Want want;
     std::unique_ptr<FormProviderData> formProviderData;
-    formDataMgr.formRequestPublishForms_.insert(
+    formDataMgr->formRequestPublishForms_.insert(
         std::make_pair(formId, std::make_pair(want, std::move(formProviderData))));
-    formDataMgr.DeleteInvalidPublishForms(userId, bundleName, validFormIds);
+    formDataMgr->DeleteInvalidPublishForms(userId, bundleName, validFormIds);
     GTEST_LOG_(INFO) << "FormDataMgr_0061 end";
 }
 
