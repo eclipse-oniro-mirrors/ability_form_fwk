@@ -838,6 +838,15 @@ ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
         HILOG_ERROR("%{public}s, addForm can not acquire temp form when select form id", __func__);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
+
+    // ark ts form can only exist with one form host
+    if (info.GetUiSyntax() == FormType::ETS &&
+        !FormDbCache::GetInstance().IsHostOwner(formId, IPCSkeleton::GetCallingUid())) {
+        HILOG_ERROR("the specified form id does not exist in caller. formId: %{public}s.",
+            std::to_string(formId).c_str());
+        return ERR_APPEXECFWK_FORM_CFG_NOT_MATCH_ID;
+    }
+
     int32_t currentUserId = FormUtil::GetCurrentAccountId();
     if (hasRecord && (record.providerUserId == currentUserId)) {
         if (!info.IsMatch(record)) {

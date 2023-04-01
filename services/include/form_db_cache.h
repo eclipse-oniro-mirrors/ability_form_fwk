@@ -146,6 +146,8 @@ public:
      */
     ErrCode DeleteInvalidDBForms(int32_t userId, int32_t callingUid, std::set<int64_t> &matchedFormIds,
                                  std::map<int64_t, bool> &removedFormsMap);
+
+    bool IsHostOwner(int64_t formId, int32_t hostUid);
 private:
     /**
      * @brief Save or update form data to DbCache and DB.

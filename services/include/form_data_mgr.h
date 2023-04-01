@@ -614,7 +614,6 @@ private:
     template<typename T>
     bool GetAbilityFormInfo(const FormRecord &record, const std::vector<T> &abilities,
         AbilityFormInfo &abilityFormInfo);
-
 private:
     mutable std::recursive_mutex formRecordMutex_;
     mutable std::recursive_mutex formHostRecordMutex_;
