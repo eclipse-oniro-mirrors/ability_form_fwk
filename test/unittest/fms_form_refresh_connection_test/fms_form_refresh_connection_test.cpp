@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -183,6 +183,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshConnection_001, TestSize.Level
     bool isFreeInstall = false;
     sptr<FormRefreshConnection> formRefreshConnection =
         new (std::nothrow) FormRefreshConnection(formId, want, bundleName, abilityName, isFreeInstall);
+    ASSERT_NE(nullptr, formRefreshConnection);
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;
     int resultCode = 100;
@@ -205,6 +206,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshConnection_002, TestSize.Level
     bool isFreeInstall = false;
     sptr<FormRefreshConnection> formRefreshConnection =
         new (std::nothrow) FormRefreshConnection(formId, want, bundleName, abilityName, isFreeInstall);
+    ASSERT_NE(nullptr, formRefreshConnection);
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;
     int resultCode = ERR_OK;
@@ -229,6 +231,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshConnection_003, TestSize.Level
     bool isFreeInstall = false;
     sptr<FormRefreshConnection> formRefreshConnection =
         new (std::nothrow) FormRefreshConnection(formId, want, bundleName, abilityName, isFreeInstall);
+    ASSERT_NE(nullptr, formRefreshConnection);
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;
     int resultCode = ERR_OK;
@@ -253,6 +256,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshConnection_004, TestSize.Level
     bool isFreeInstall = false;
     sptr<FormRefreshConnection> formRefreshConnection =
         new (std::nothrow) FormRefreshConnection(formId, want, bundleName, abilityName, isFreeInstall);
+    ASSERT_NE(nullptr, formRefreshConnection);
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;
     int resultCode = ERR_OK;
@@ -268,10 +272,11 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshConnection_004, TestSize.Level
 HWTEST_F(FmsFormRefreshConnectionTest, FormUtil_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormUtil_001 start";
-    FormUtil formUtil;
+    std::shared_ptr<FormUtil> formUtil = std::make_shared<FormUtil>();
+    ASSERT_NE(nullptr, formUtil);
     uint64_t formId = 0;
     uint64_t udidHash = 3;
-    EXPECT_EQ(3, formUtil.PaddingUdidHash(formId, udidHash));
+    EXPECT_EQ(3, formUtil->PaddingUdidHash(formId, udidHash));
     GTEST_LOG_(INFO) << "FormUtil_001 end";
 }
 
@@ -283,9 +288,10 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormUtil_001, TestSize.Level0)
 HWTEST_F(FmsFormRefreshConnectionTest, FormUtil_002, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormUtil_002 start";
-    FormUtil formUtil;
+    std::shared_ptr<FormUtil> formUtil = std::make_shared<FormUtil>();
+    ASSERT_NE(nullptr, formUtil);
     int64_t udidHash = 100;
-    EXPECT_EQ(true, formUtil.GenerateUdidHash(udidHash));
+    EXPECT_EQ(true, formUtil->GenerateUdidHash(udidHash));
     GTEST_LOG_(INFO) << "FormUtil_002 end";
 }
 
@@ -297,9 +303,10 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormUtil_002, TestSize.Level0)
 HWTEST_F(FmsFormRefreshConnectionTest, FormSupplyCallback_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormSupplyCallback_001 start";
-    FormSupplyCallback formSupplyCallback;
+    std::shared_ptr<FormSupplyCallback> formSupplyCallback = std::make_shared<FormSupplyCallback>();
+    ASSERT_NE(nullptr, formSupplyCallback);
     sptr<FormAbilityConnection> connection = nullptr;
-    formSupplyCallback.AddConnection(connection);
+    formSupplyCallback->AddConnection(connection);
     GTEST_LOG_(INFO) << "FormSupplyCallback_001 end";
 }
 
@@ -346,6 +353,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormShareConnection_001, TestSize.Level0)
     int64_t formShareRequestCode = 2;
     sptr<FormShareConnection> formShareConnection =
         new (std::nothrow) FormShareConnection(formId, bundleName, abilityName, deviceId, formShareRequestCode);
+    ASSERT_NE(nullptr, formShareConnection);
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;
     int32_t resultCode = 3;
@@ -361,10 +369,11 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormShareConnection_001, TestSize.Level0)
 HWTEST_F(FmsFormRefreshConnectionTest, FormHostRecord_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormHostRecord_001 start";
-    FormHostRecord formHostRecord;
+    std::shared_ptr<FormHostRecord> formHostRecord = std::make_shared<FormHostRecord>();
+    ASSERT_NE(nullptr, formHostRecord);
     int64_t formId = 1;
     bool flag = true;
-    formHostRecord.SetEnableRefresh(formId, flag);
+    formHostRecord->SetEnableRefresh(formId, flag);
     GTEST_LOG_(INFO) << "FormHostRecord_001 end";
 }
 
@@ -376,9 +385,10 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormHostRecord_001, TestSize.Level0)
 HWTEST_F(FmsFormRefreshConnectionTest, FormHostRecord_002, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormHostRecord_002 start";
-    FormHostRecord formHostRecord;
+    std::shared_ptr<FormHostRecord> formHostRecord = std::make_shared<FormHostRecord>();
+    ASSERT_NE(nullptr, formHostRecord);
     int64_t formId = 1;
-    EXPECT_EQ(false, formHostRecord.IsEnableRefresh(formId));
+    EXPECT_EQ(false, formHostRecord->IsEnableRefresh(formId));
     GTEST_LOG_(INFO) << "FormHostRecord_002 end";
 }
 
@@ -390,10 +400,11 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormHostRecord_002, TestSize.Level0)
 HWTEST_F(FmsFormRefreshConnectionTest, FormHostRecord_003, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormHostRecord_003 start";
-    FormHostRecord formHostRecord;
+    std::shared_ptr<FormHostRecord> formHostRecord = std::make_shared<FormHostRecord>();
+    ASSERT_NE(nullptr, formHostRecord);
     int64_t formId = 1;
     bool enable = true;
-    formHostRecord.SetEnableUpdate(formId, enable);
+    formHostRecord->SetEnableUpdate(formId, enable);
     GTEST_LOG_(INFO) << "FormHostRecord_003 end";
 }
 
@@ -405,11 +416,12 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormHostRecord_003, TestSize.Level0)
 HWTEST_F(FmsFormRefreshConnectionTest, FormHostRecord_004, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormHostRecord_004 start";
-    FormHostRecord formHostRecord;
+    std::shared_ptr<FormHostRecord> formHostRecord = std::make_shared<FormHostRecord>();
+    ASSERT_NE(nullptr, formHostRecord);
     int64_t formId = 1;
     bool enable = true;
-    formHostRecord.forms_.emplace(formId, enable);
-    formHostRecord.SetEnableUpdate(formId, enable);
+    formHostRecord->forms_.emplace(formId, enable);
+    formHostRecord->SetEnableUpdate(formId, enable);
     GTEST_LOG_(INFO) << "FormHostRecord_004 end";
 }
 
@@ -451,10 +463,11 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormHostRecord_006, TestSize.Level0)
 HWTEST_F(FmsFormRefreshConnectionTest, FormHostRecord_007, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormHostRecord_007 start";
-    FormHostRecord formHostRecord;
+    std::shared_ptr<FormHostRecord> formHostRecord = std::make_shared<FormHostRecord>();
+    ASSERT_NE(nullptr, formHostRecord);
     int64_t formId = 1;
     FormRecord record;
-    formHostRecord.OnAcquire(formId, record);
+    formHostRecord->OnAcquire(formId, record);
     GTEST_LOG_(INFO) << "FormHostRecord_007 end";
 }
 
@@ -466,11 +479,12 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormHostRecord_007, TestSize.Level0)
 HWTEST_F(FmsFormRefreshConnectionTest, FormHostRecord_008, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormHostRecord_008 start";
-    FormHostRecord formHostRecord;
+    std::shared_ptr<FormHostRecord> formHostRecord = std::make_shared<FormHostRecord>();
+    ASSERT_NE(nullptr, formHostRecord);
     int64_t formId = 1;
     FormRecord record;
-    formHostRecord.formHostCallback_ = std::make_shared<FormHostCallback>();
-    formHostRecord.OnUpdate(formId, record);
+    formHostRecord->formHostCallback_ = std::make_shared<FormHostCallback>();
+    formHostRecord->OnUpdate(formId, record);
     GTEST_LOG_(INFO) << "FormHostRecord_008 end";
 }
 
@@ -482,10 +496,11 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormHostRecord_008, TestSize.Level0)
 HWTEST_F(FmsFormRefreshConnectionTest, FormHostRecord_009, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormHostRecord_009 start";
-    FormHostRecord formHostRecord;
+    std::shared_ptr<FormHostRecord> formHostRecord = std::make_shared<FormHostRecord>();
+    ASSERT_NE(nullptr, formHostRecord);
     std::vector<int64_t> formIds;
-    formHostRecord.formHostCallback_ = std::make_shared<FormHostCallback>();
-    formHostRecord.OnFormUninstalled(formIds);
+    formHostRecord->formHostCallback_ = std::make_shared<FormHostCallback>();
+    formHostRecord->OnFormUninstalled(formIds);
     GTEST_LOG_(INFO) << "FormHostRecord_009 end";
 }
 
@@ -497,11 +512,12 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormHostRecord_009, TestSize.Level0)
 HWTEST_F(FmsFormRefreshConnectionTest, FormHostRecord_010, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormHostRecord_010 start";
-    FormHostRecord formHostRecord;
+    std::shared_ptr<FormHostRecord> formHostRecord = std::make_shared<FormHostRecord>();
+    ASSERT_NE(nullptr, formHostRecord);
     AppExecFwk::FormState state = AppExecFwk::FormState::UNKNOWN;
     AAFwk::Want want;
-    formHostRecord.formHostCallback_ = std::make_shared<FormHostCallback>();
-    formHostRecord.OnAcquireState(state, want);
+    formHostRecord->formHostCallback_ = std::make_shared<FormHostCallback>();
+    formHostRecord->OnAcquireState(state, want);
     GTEST_LOG_(INFO) << "FormHostRecord_010 end";
 }
 
@@ -513,9 +529,10 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormHostRecord_010, TestSize.Level0)
 HWTEST_F(FmsFormRefreshConnectionTest, FormHostRecord_011, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormHostRecord_011 start";
-    FormHostRecord formHostRecord;
+    std::shared_ptr<FormHostRecord> formHostRecord = std::make_shared<FormHostRecord>();
+    ASSERT_NE(nullptr, formHostRecord);
     sptr<IRemoteObject::DeathRecipient> deathRecipient = nullptr;
-    formHostRecord.AddDeathRecipient(deathRecipient);
+    formHostRecord->AddDeathRecipient(deathRecipient);
     GTEST_LOG_(INFO) << "FormHostRecord_011 end";
 }
 
@@ -533,6 +550,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormAcquireConnection_001, TestSize.Level
     sptr<IRemoteObject> hostToken = nullptr;
     sptr<FormAcquireConnection> formAcquireConnection =
         new (std::nothrow) FormAcquireConnection(formId, info, wantParams, hostToken);
+    ASSERT_NE(nullptr, formAcquireConnection);
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;
     int resultCode = 100;
@@ -553,6 +571,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormCastTempConnection_001, TestSize.Leve
     std::string abilityName = "bb";
     sptr<FormCastTempConnection> formCastTempConnection =
         new (std::nothrow) FormCastTempConnection(formId, bundleName, abilityName);
+    ASSERT_NE(nullptr, formCastTempConnection);
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;
     int resultCode = 100;
@@ -573,6 +592,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormDeleteConnection_001, TestSize.Level0
     std::string abilityName = "bb";
     sptr<FormDeleteConnection> formDeleteConnection =
         new (std::nothrow) FormDeleteConnection(formId, bundleName, abilityName);
+    ASSERT_NE(nullptr, formDeleteConnection);
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;
     int resultCode = 100;
@@ -589,9 +609,10 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormEventHandler_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormEventHandler_001 start";
     std::shared_ptr<AppExecFwk::EventRunner> runner = nullptr;
-    FormEventHandler formEventHandler(runner);
+    std::shared_ptr<FormEventHandler> formEventHandler = std::make_shared<FormEventHandler>(runner);
+    ASSERT_NE(nullptr, formEventHandler);
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
-    formEventHandler.ProcessEvent(event);
+    formEventHandler->ProcessEvent(event);
     GTEST_LOG_(INFO) << "FormEventHandler_001 end";
 }
 
@@ -604,10 +625,11 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormEventHandler_002, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormEventHandler_002 start";
     std::shared_ptr<AppExecFwk::EventRunner> runner = nullptr;
-    FormEventHandler formEventHandler(runner);
+    std::shared_ptr<FormEventHandler> formEventHandler = std::make_shared<FormEventHandler>(runner);
+    ASSERT_NE(nullptr, formEventHandler);
     std::shared_ptr<FormEventTimeoutObserver> observer = nullptr;
-    formEventHandler.observers_.insert(observer);
-    formEventHandler.UnregisterEventTimeoutObserver(observer);
+    formEventHandler->observers_.insert(observer);
+    formEventHandler->UnregisterEventTimeoutObserver(observer);
     GTEST_LOG_(INFO) << "FormEventHandler_002 end";
 }
 
@@ -761,9 +783,10 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshLimiter_005, TestSize.Level0)
 HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshLimiter_006, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRefreshLimiter_006 start";
-    FormRefreshLimiter formRefreshLimiter;
+    std::shared_ptr<FormRefreshLimiter> formRefreshLimiter = std::make_shared<FormRefreshLimiter>();
+    ASSERT_NE(nullptr, formRefreshLimiter);
     int64_t formId = 1;
-    formRefreshLimiter.Increase(formId);
+    formRefreshLimiter->Increase(formId);
     GTEST_LOG_(INFO) << "FormRefreshLimiter_006 end";
 }
 
@@ -775,9 +798,10 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshLimiter_006, TestSize.Level0)
 HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshLimiter_007, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRefreshLimiter_007 start";
-    FormRefreshLimiter formRefreshLimiter;
+    std::shared_ptr<FormRefreshLimiter> formRefreshLimiter = std::make_shared<FormRefreshLimiter>();
+    ASSERT_NE(nullptr, formRefreshLimiter);
     int64_t formId = 1;
-    formRefreshLimiter.MarkRemind(formId);
+    formRefreshLimiter->MarkRemind(formId);
     GTEST_LOG_(INFO) << "FormRefreshLimiter_007 end";
 }
 
@@ -789,12 +813,13 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshLimiter_007, TestSize.Level0)
 HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshLimiter_008, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRefreshLimiter_008 start";
-    FormRefreshLimiter formRefreshLimiter;
+    std::shared_ptr<FormRefreshLimiter> formRefreshLimiter = std::make_shared<FormRefreshLimiter>();
+    ASSERT_NE(nullptr, formRefreshLimiter);
     int64_t formId = 1;
     LimitInfo limitInfo;
     limitInfo.refreshCount = Constants::LIMIT_COUNT - 1;
-    formRefreshLimiter.limiterMap_.emplace(formId, limitInfo);
-    formRefreshLimiter.MarkRemind(formId);
+    formRefreshLimiter->limiterMap_.emplace(formId, limitInfo);
+    formRefreshLimiter->MarkRemind(formId);
     GTEST_LOG_(INFO) << "FormRefreshLimiter_008 end";
 }
 
@@ -806,12 +831,13 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshLimiter_008, TestSize.Level0)
 HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshLimiter_009, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRefreshLimiter_009 start";
-    FormRefreshLimiter formRefreshLimiter;
+    std::shared_ptr<FormRefreshLimiter> formRefreshLimiter = std::make_shared<FormRefreshLimiter>();
+    ASSERT_NE(nullptr, formRefreshLimiter);
     int64_t formId = 1;
     LimitInfo limitInfo;
     limitInfo.remindFlag = false;
-    formRefreshLimiter.limiterMap_.emplace(formId, limitInfo);
-    formRefreshLimiter.GetRemindList();
+    formRefreshLimiter->limiterMap_.emplace(formId, limitInfo);
+    formRefreshLimiter->GetRemindList();
     GTEST_LOG_(INFO) << "FormRefreshLimiter_009 end";
 }
 
@@ -823,12 +849,13 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshLimiter_009, TestSize.Level0)
 HWTEST_F(FmsFormRefreshConnectionTest, FormRefreshLimiter_010, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRefreshLimiter_010 start";
-    FormRefreshLimiter formRefreshLimiter;
+    std::shared_ptr<FormRefreshLimiter> formRefreshLimiter = std::make_shared<FormRefreshLimiter>();
+    ASSERT_NE(nullptr, formRefreshLimiter);
     int64_t formId = 1;
     LimitInfo limitInfo;
     limitInfo.remindFlag = true;
-    formRefreshLimiter.limiterMap_.emplace(formId, limitInfo);
-    formRefreshLimiter.GetRemindListAndResetLimit();
+    formRefreshLimiter->limiterMap_.emplace(formId, limitInfo);
+    formRefreshLimiter->GetRemindListAndResetLimit();
     GTEST_LOG_(INFO) << "FormRefreshLimiter_010 end";
 }
 
@@ -872,14 +899,16 @@ HWTEST_F(FmsFormRefreshConnectionTest, FreeInstallStatusCallBackStub_002, TestSi
 HWTEST_F(FmsFormRefreshConnectionTest, FreeInstallStatusCallBackStub_003, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FreeInstallStatusCallBackStub_003 start";
-    MockFreeInstallStatusCallBackStub mockFreeInstallStatusCallBackStub;
+    std::shared_ptr<MockFreeInstallStatusCallBackStub> mockFreeInstallStatusCallBackStub =
+        std::make_shared<MockFreeInstallStatusCallBackStub>();
+    ASSERT_NE(nullptr, mockFreeInstallStatusCallBackStub);
     uint32_t code = 1;
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
     std::u16string remoteDescriptor = u"ohos.aafwk.IAtomicServiceStatusCallback";
     data.WriteInterfaceToken(remoteDescriptor);
-    mockFreeInstallStatusCallBackStub.OnRemoteRequest(code, data, reply, option);
+    mockFreeInstallStatusCallBackStub->OnRemoteRequest(code, data, reply, option);
     GTEST_LOG_(INFO) << "FreeInstallStatusCallBackStub_003 end";
 }
 
@@ -891,14 +920,16 @@ HWTEST_F(FmsFormRefreshConnectionTest, FreeInstallStatusCallBackStub_003, TestSi
 HWTEST_F(FmsFormRefreshConnectionTest, FreeInstallStatusCallBackStub_004, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FreeInstallStatusCallBackStub_004 start";
-    MockFreeInstallStatusCallBackStub mockFreeInstallStatusCallBackStub;
+    std::shared_ptr<MockFreeInstallStatusCallBackStub> mockFreeInstallStatusCallBackStub =
+        std::make_shared<MockFreeInstallStatusCallBackStub>();
+    ASSERT_NE(nullptr, mockFreeInstallStatusCallBackStub);
     uint32_t code = 0;
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
     std::u16string remoteDescriptor = u"ohos.aafwk.IAtomicServiceStatusCallback";
     data.WriteInterfaceToken(remoteDescriptor);
-    mockFreeInstallStatusCallBackStub.OnRemoteRequest(code, data, reply, option);
+    mockFreeInstallStatusCallBackStub->OnRemoteRequest(code, data, reply, option);
     GTEST_LOG_(INFO) << "FreeInstallStatusCallBackStub_004 end";
 }
 
@@ -911,9 +942,11 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormBundleEventCallback_001, TestSize.Lev
 {
     GTEST_LOG_(INFO) << "FormBundleEventCallback_001 start";
     std::shared_ptr<FormEventHandler> eventHandler = nullptr;
-    FormBundleEventCallback formBundleEventCallback(eventHandler);
+    std::shared_ptr<FormBundleEventCallback> formBundleEventCallback =
+        std::make_shared<FormBundleEventCallback>(eventHandler);
+    ASSERT_NE(nullptr, formBundleEventCallback);
     EventFwk::CommonEventData eventData;
-    formBundleEventCallback.OnReceiveEvent(eventData);
+    formBundleEventCallback->OnReceiveEvent(eventData);
     GTEST_LOG_(INFO) << "FormBundleEventCallback_001 end";
 }
 
@@ -926,6 +959,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormBundleEventCallback_002, TestSize.Lev
 {
     GTEST_LOG_(INFO) << "FormBundleEventCallback_002 start";
     std::shared_ptr<FormEventHandler> eventHandler = std::make_shared<FormEventHandler>(EventRunner::Create());
+    ASSERT_NE(nullptr, eventHandler);
     FormBundleEventCallback formBundleEventCallback(eventHandler);
     EventFwk::CommonEventData eventData;
     AAFwk::Want want = eventData.GetWant();
@@ -1101,12 +1135,14 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormMsgEventConnection_0001, TestSize.Lev
     Want want;
     std::string bundleName = "aa";
     std::string abilityName = "bb";
-    FormMsgEventConnection formMsgEventConnection(formId, want, bundleName, abilityName);
+    std::shared_ptr<FormMsgEventConnection> formMsgEventConnection =
+        std::make_shared<FormMsgEventConnection>(formId, want, bundleName, abilityName);
+    ASSERT_NE(nullptr, formMsgEventConnection);
     // test OnAbilityConnectDone
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;
     int resultCode = 22;
-    formMsgEventConnection.OnAbilityConnectDone(element, remoteObject, resultCode);
+    formMsgEventConnection->OnAbilityConnectDone(element, remoteObject, resultCode);
     GTEST_LOG_(INFO) << "FormMsgEventConnection_0001 end";
 }
 
@@ -1123,12 +1159,14 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormMsgEventConnection_0002, TestSize.Lev
     Want want;
     std::string bundleName = "aa";
     std::string abilityName = "bb";
-    FormMsgEventConnection formMsgEventConnection(formId, want, bundleName, abilityName);
+    std::shared_ptr<FormMsgEventConnection> formMsgEventConnection =
+        std::make_shared<FormMsgEventConnection>(formId, want, bundleName, abilityName);
+    ASSERT_NE(nullptr, formMsgEventConnection);
     // test OnAbilityConnectDone
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;
     int resultCode = ERR_OK;
-    formMsgEventConnection.OnAbilityConnectDone(element, remoteObject, resultCode);
+    formMsgEventConnection->OnAbilityConnectDone(element, remoteObject, resultCode);
     GTEST_LOG_(INFO) << "FormMsgEventConnection_0002 end";
 }
 
@@ -1146,12 +1184,14 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormMsgEventConnection_0003, TestSize.Lev
     want.SetParam(Constants::PARAM_MESSAGE_KEY, FORM_MESSAGE_EVENT_VALUE_1);
     std::string bundleName = "aa";
     std::string abilityName = "bb";
-    FormMsgEventConnection formMsgEventConnection(formId, want, bundleName, abilityName);
+    std::shared_ptr<FormMsgEventConnection> formMsgEventConnection =
+        std::make_shared<FormMsgEventConnection>(formId, want, bundleName, abilityName);
+    ASSERT_NE(nullptr, formMsgEventConnection);
     // test OnAbilityConnectDone
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;
     int resultCode = ERR_OK;
-    formMsgEventConnection.OnAbilityConnectDone(element, remoteObject, resultCode);
+    formMsgEventConnection->OnAbilityConnectDone(element, remoteObject, resultCode);
     GTEST_LOG_(INFO) << "FormMsgEventConnection_0003 end";
 }
 
@@ -1166,13 +1206,15 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormAcquireStateConnection_0001, TestSize
     std::string bundleName = "aa";
     std::string abilityName = "bb";
     Want want;
-    std::string provider = "cc";
-    FormAcquireStateConnection formAcquireStateConnection(bundleName, abilityName, want, provider);
+    std::string state = "cc";
+    std::shared_ptr<FormAcquireStateConnection> formAcquireStateConnection =
+        std::make_shared<FormAcquireStateConnection>(bundleName, abilityName, want, state);
+    ASSERT_NE(nullptr, formAcquireStateConnection);
     // test OnAbilityConnectDone function
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;
     int resultCode = 55;
-    formAcquireStateConnection.OnAbilityConnectDone(element, remoteObject, resultCode);
+    formAcquireStateConnection->OnAbilityConnectDone(element, remoteObject, resultCode);
     GTEST_LOG_(INFO) << "FormAcquireStateConnection_0001 end";
 }
 
@@ -1187,13 +1229,15 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormAcquireStateConnection_0002, TestSize
     std::string bundleName = "aa";
     std::string abilityName = "bb";
     Want want;
-    std::string provider = "cc";
-    FormAcquireStateConnection formAcquireStateConnection(bundleName, abilityName, want, provider);
+    std::string state = "cc";
+    std::shared_ptr<FormAcquireStateConnection> formAcquireStateConnection =
+        std::make_shared<FormAcquireStateConnection>(bundleName, abilityName, want, state);
+    ASSERT_NE(nullptr, formAcquireStateConnection);
     // test OnAbilityConnectDone function
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;
     int resultCode = ERR_OK;
-    formAcquireStateConnection.OnAbilityConnectDone(element, remoteObject, resultCode);
+    formAcquireStateConnection->OnAbilityConnectDone(element, remoteObject, resultCode);
     GTEST_LOG_(INFO) << "FormAcquireStateConnection_0002 end";
 }
 }

@@ -708,8 +708,9 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_030, TestSize.Level0)
 HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_031, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRenderMgrTest_031 start";
-    FormRenderMgr formRenderMgr;
-    formRenderMgr.RerenderAllForms();
+    std::shared_ptr<FormRenderMgr> formRenderMgr = std::make_shared<FormRenderMgr>();
+    ASSERT_NE(nullptr, formRenderMgr);
+    formRenderMgr->RerenderAllForms();
     GTEST_LOG_(INFO) << "FormRenderMgrTest_031 end";
 }
 
@@ -723,11 +724,12 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_031, TestSize.Level0)
 HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_032, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRenderMgrTest_032 start";
-    FormRenderMgr formRenderMgr;
+    std::shared_ptr<FormRenderMgr> formRenderMgr = std::make_shared<FormRenderMgr>();
+    ASSERT_NE(nullptr, formRenderMgr);
     int64_t formIds = 1;
     sptr<FormRenderConnection> formRenderConnections = nullptr;
-    formRenderMgr.renderFormConnections_.emplace(formIds, formRenderConnections);
-    formRenderMgr.RerenderAllForms();
+    formRenderMgr->renderFormConnections_.emplace(formIds, formRenderConnections);
+    formRenderMgr->RerenderAllForms();
     GTEST_LOG_(INFO) << "FormRenderMgrTest_032 end";
 }
 
@@ -741,15 +743,16 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_032, TestSize.Level0)
 HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_033, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRenderMgrTest_033 start";
-    FormRenderMgr formRenderMgr;
+    std::shared_ptr<FormRenderMgr> formRenderMgr = std::make_shared<FormRenderMgr>();
+    ASSERT_NE(nullptr, formRenderMgr);
     int64_t formIds = 1;
     sptr<FormRenderConnection> formRenderConnections = nullptr;
-    formRenderMgr.renderFormConnections_.emplace(formIds, formRenderConnections);
+    formRenderMgr->renderFormConnections_.emplace(formIds, formRenderConnections);
     sptr<IRemoteObject> remote = nullptr;
     std::unordered_set<int64_t> form;
     form.insert(formIds);
-    formRenderMgr.etsHosts_.emplace(remote, form);
-    formRenderMgr.RerenderAllForms();
+    formRenderMgr->etsHosts_.emplace(remote, form);
+    formRenderMgr->RerenderAllForms();
     GTEST_LOG_(INFO) << "FormRenderMgrTest_033 end";
 }
 
@@ -763,17 +766,18 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_033, TestSize.Level0)
 HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_034, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRenderMgrTest_034 start";
-    FormRenderMgr formRenderMgr;
+    std::shared_ptr<FormRenderMgr> formRenderMgr = std::make_shared<FormRenderMgr>();
+    ASSERT_NE(nullptr, formRenderMgr);
     int64_t formIds = 1;
     FormRecord formRecord;
     WantParams wantParams;
     sptr<FormRenderConnection> formRenderConnections = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
-    formRenderMgr.renderFormConnections_.emplace(formIds, formRenderConnections);
+    formRenderMgr->renderFormConnections_.emplace(formIds, formRenderConnections);
     sptr<IRemoteObject> remote = nullptr;
     std::unordered_set<int64_t> form;
     form.insert(formIds);
-    formRenderMgr.etsHosts_.emplace(remote, form);
-    formRenderMgr.RerenderAllForms();
+    formRenderMgr->etsHosts_.emplace(remote, form);
+    formRenderMgr->RerenderAllForms();
     GTEST_LOG_(INFO) << "FormRenderMgrTest_034 end";
 }
 
@@ -814,10 +818,11 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_036, TestSize.Level0)
 HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_037, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRenderMgrTest_037 start";
-    FormRenderMgr formRenderMgr;
-    formRenderMgr.renderRemoteObj_ = new (std::nothrow) MockIFormRender();
+    std::shared_ptr<FormRenderMgr> formRenderMgr = std::make_shared<FormRenderMgr>();
+    ASSERT_NE(nullptr, formRenderMgr);
+    formRenderMgr->renderRemoteObj_ = new (std::nothrow) MockIFormRender();
     sptr<IRemoteObject> remoteObject = nullptr;
-    formRenderMgr.AddRenderDeathRecipient(remoteObject);
+    formRenderMgr->AddRenderDeathRecipient(remoteObject);
     GTEST_LOG_(INFO) << "FormRenderMgrTest_037 end";
 }
 
@@ -829,10 +834,11 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_037, TestSize.Level0)
 HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_038, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRenderMgrTest_038 start";
-    FormRenderMgr formRenderMgr;
-    formRenderMgr.renderRemoteObj_ = nullptr;
+    std::shared_ptr<FormRenderMgr> formRenderMgr = std::make_shared<FormRenderMgr>();
+    ASSERT_NE(nullptr, formRenderMgr);
+    formRenderMgr->renderRemoteObj_ = nullptr;
     sptr<IRemoteObject> remoteObject = nullptr;
-    formRenderMgr.AddRenderDeathRecipient(remoteObject);
+    formRenderMgr->AddRenderDeathRecipient(remoteObject);
     GTEST_LOG_(INFO) << "FormRenderMgrTest_038 end";
 }
 
@@ -845,11 +851,12 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_038, TestSize.Level0)
 HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_039, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRenderMgrTest_039 start";
-    FormRenderMgr formRenderMgr;
-    formRenderMgr.renderRemoteObj_ = nullptr;
-    formRenderMgr.renderDeathRecipient_ = nullptr;
+    std::shared_ptr<FormRenderMgr> formRenderMgr = std::make_shared<FormRenderMgr>();
+    ASSERT_NE(nullptr, formRenderMgr);
+    formRenderMgr->renderRemoteObj_ = nullptr;
+    formRenderMgr->renderDeathRecipient_ = nullptr;
     sptr<IRemoteObject> remoteObject = new (std::nothrow) MockFormProviderClient();
-    formRenderMgr.AddRenderDeathRecipient(remoteObject);
+    formRenderMgr->AddRenderDeathRecipient(remoteObject);
     GTEST_LOG_(INFO) << "FormRenderMgrTest_039 end";
 }
 
@@ -862,14 +869,15 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_039, TestSize.Level0)
 HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_040, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRenderMgrTest_040 start";
-    FormRenderMgr formRenderMgr;
-    formRenderMgr.renderRemoteObj_ = nullptr;
-    formRenderMgr.renderDeathRecipient_ = nullptr;
+    std::shared_ptr<FormRenderMgr> formRenderMgr = std::make_shared<FormRenderMgr>();
+    ASSERT_NE(nullptr, formRenderMgr);
+    formRenderMgr->renderRemoteObj_ = nullptr;
+    formRenderMgr->renderDeathRecipient_ = nullptr;
     sptr<IRemoteObject> remoteObject = new (std::nothrow) MockFormProviderClient();
     // set renderDeathRecipient_ is not nullptr
-    formRenderMgr.AddRenderDeathRecipient(remoteObject);
+    formRenderMgr->AddRenderDeathRecipient(remoteObject);
     // test AddRenderDeathRecipient function
-    formRenderMgr.AddRenderDeathRecipient(remoteObject);
+    formRenderMgr->AddRenderDeathRecipient(remoteObject);
     GTEST_LOG_(INFO) << "FormRenderMgrTest_040 end";
 }
 

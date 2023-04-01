@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -876,9 +876,11 @@ HWTEST_F(FormMgrTest, FormMgrTest_0039, TestSize.Level1) {
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0040, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0040 starts";
-    FormMgr::GetInstance().RegisterDeathCallback(nullptr);
-    FormMgr::GetInstance().UnRegisterDeathCallback(nullptr);
-    FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
+    std::shared_ptr<FormMgr> formMgr = std::make_shared<FormMgr>();
+    ASSERT_NE(nullptr, formMgr);
+    formMgr->RegisterDeathCallback(nullptr);
+    formMgr->UnRegisterDeathCallback(nullptr);
+    formMgr->SetRecoverStatus(Constants::IN_RECOVERING);
     GTEST_LOG_(INFO) << "FormMgrTest_0040 test ends";
 }
 
@@ -1323,11 +1325,13 @@ HWTEST_F(FormMgrTest, FormMgrTest_0064, TestSize.Level1) {
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0065, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0065 starts";
+    std::shared_ptr<FormMgr> formMgr = std::make_shared<FormMgr>();
+    ASSERT_NE(nullptr, formMgr);
     std::shared_ptr<FormInterfaceCallbackTest> callback = std::make_shared<FormInterfaceCallbackTest>();
     std::shared_ptr<FormInterfaceCallbackTest> callback_first = std::make_shared<FormInterfaceCallbackTest>();
-    FormMgr::GetInstance().formDeathCallbacks_.emplace_back(callback);
-    FormMgr::GetInstance().formDeathCallbacks_.emplace_back(callback_first);
-    FormMgr::GetInstance().RegisterDeathCallback(callback);
+    formMgr->formDeathCallbacks_.emplace_back(callback);
+    formMgr->formDeathCallbacks_.emplace_back(callback_first);
+    formMgr->RegisterDeathCallback(callback);
     GTEST_LOG_(INFO) << "FormMgrTest_0065 test ends";
 }
 
@@ -1339,11 +1343,13 @@ HWTEST_F(FormMgrTest, FormMgrTest_0065, TestSize.Level1) {
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0066, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0066 starts";
+    std::shared_ptr<FormMgr> formMgr = std::make_shared<FormMgr>();
+    ASSERT_NE(nullptr, formMgr);
     std::shared_ptr<FormInterfaceCallbackTest> callback = std::make_shared<FormInterfaceCallbackTest>();
     std::shared_ptr<FormInterfaceCallbackTest> callback_first = std::make_shared<FormInterfaceCallbackTest>();
-    FormMgr::GetInstance().formDeathCallbacks_.emplace_back(callback);
-    FormMgr::GetInstance().formDeathCallbacks_.emplace_back(callback_first);
-    FormMgr::GetInstance().UnRegisterDeathCallback(callback);
+    formMgr->formDeathCallbacks_.emplace_back(callback);
+    formMgr->formDeathCallbacks_.emplace_back(callback_first);
+    formMgr->UnRegisterDeathCallback(callback);
     GTEST_LOG_(INFO) << "FormMgrTest_0066 test ends";
 }
 
@@ -1462,8 +1468,10 @@ HWTEST_F(FormMgrTest, FormMgrTest_0073, TestSize.Level1) {
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0074, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0074 starts";
-    FormMgr::GetInstance().ResetProxy(nullptr);
-    FormMgr::GetInstance().SetFormMgrService(mockProxy);
+    std::shared_ptr<FormMgr> formMgr = std::make_shared<FormMgr>();
+    ASSERT_NE(nullptr, formMgr);
+    formMgr->ResetProxy(nullptr);
+    formMgr->SetFormMgrService(mockProxy);
     GTEST_LOG_(INFO) << "FormMgrTest_0074 test ends";
 }
 

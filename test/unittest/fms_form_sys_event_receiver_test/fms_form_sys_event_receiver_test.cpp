@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -789,6 +789,7 @@ HWTEST_F(FmsFormSysEventReceiverTest, HandleUserIdRemoved_0001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "HandleUserIdRemoved_0001 start";
     std::shared_ptr<FormSysEventReceiver> testCase = std::make_shared<FormSysEventReceiver>();
+    ASSERT_NE(nullptr, testCase);
     const int32_t userId = 0;
     testCase->HandleUserIdRemoved(userId);
     GTEST_LOG_(INFO) << "HandleUserIdRemoved_0001 end";
@@ -803,6 +804,7 @@ HWTEST_F(FmsFormSysEventReceiverTest, HandleBundleScanFinished_0001, TestSize.Le
 {
     GTEST_LOG_(INFO) << "HandleBundleScanFinished_0001 start";
     std::shared_ptr<FormSysEventReceiver> testCase = std::make_shared<FormSysEventReceiver>();
+    ASSERT_NE(nullptr, testCase);
     const int32_t userId = 0;
     testCase->HandleBundleScanFinished(userId);
     GTEST_LOG_(INFO) << "HandleBundleScanFinished_0001 end";
@@ -818,6 +820,7 @@ HWTEST_F(FmsFormSysEventReceiverTest, FormSysEventReceiver_0001, TestSize.Level0
     GTEST_LOG_(INFO) << "FormSysEventReceiver_0001 start";
     EventFwk::CommonEventSubscribeInfo subscriberInfo;
     std::shared_ptr<FormSysEventReceiver> testCase = std::make_shared<FormSysEventReceiver>(subscriberInfo);
+    ASSERT_NE(nullptr, testCase);
     GTEST_LOG_(INFO) << "FormSysEventReceiver_0001 end";
 }
 }
