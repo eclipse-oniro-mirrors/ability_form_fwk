@@ -17,6 +17,7 @@
 
 #include "form_ams_helper.h"
 #include "form_bms_helper.h"
+#include "form_cache_mgr.h"
 #include "form_constants.h"
 #include "form_data_mgr.h"
 #include "form_host_interface.h"
@@ -137,6 +138,13 @@ ErrCode FormRenderMgr::UpdateRenderingForm(int64_t formId, const FormProviderDat
     } else {
         formRecord.formProviderInfo.SetFormData(formProviderData);
     }
+
+    if (formRecord.formProviderInfo.NeedCache()) {
+        std::string jsonData = formRecord.formProviderInfo.GetFormDataString();
+        HILOG_DEBUG("%{public}s, jsonData is %{private}s.", __func__, jsonData.c_str());
+        FormCacheMgr::GetInstance().AddData(formId, jsonData);
+    }
+    FormDataMgr::GetInstance().SetFormCacheInited(formId, true);
 
     Want want;
     want.SetParams(wantParams);
