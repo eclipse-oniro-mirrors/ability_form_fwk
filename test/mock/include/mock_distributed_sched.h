@@ -195,6 +195,11 @@ public:
     {
         return 0;
     }
+    int32_t NotifyStateChangedFromRemote(int32_t abilityState, int32_t missionId,
+        const AppExecFwk::ElementName& element) override
+    {
+        return 0;
+    }
     #ifdef SUPPORT_DISTRIBUTED_FORM_SHARE
     int32_t StartShareFormFromRemote(
         const std::string &remoteDeviceId, const FormShareInfo &formShareInfo) override
