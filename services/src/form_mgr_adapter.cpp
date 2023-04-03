@@ -827,6 +827,14 @@ ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
+    // ark ts form can only exist with one form host
+    if (info.GetUiSyntax() == FormType::ETS &&
+        !FormDbCache::GetInstance().IsHostOwner(formId, IPCSkeleton::GetCallingUid())) {
+        HILOG_ERROR("the specified form id does not exist in caller. formId: %{public}s.",
+            std::to_string(formId).c_str());
+        return ERR_APPEXECFWK_FORM_CFG_NOT_MATCH_ID;
+    }
+
     // get current userId
     int callingUid = IPCSkeleton::GetCallingUid();
     int32_t currentUserId = GetCurrentUserId(callingUid);
