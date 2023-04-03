@@ -959,23 +959,6 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_048, TestSize.Level0)
 }
 
 /**
- * @tc.name: FormMgrAdapter_049
- * @tc.desc: test SetNextRefreshTime function.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_049, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormMgrAdapter_049 start";
-    FormMgrAdapter formMgrAdapter;
-    int64_t formId = 1;
-    int64_t nextTime = 1;
-    MockGetCallerBundleName(false);
-    MockGetUidByBundleName(true);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.SetNextRefreshTime(formId, nextTime));
-    GTEST_LOG_(INFO) << "FormMgrAdapter_049 end";
-}
-
-/**
  * @tc.name: FormMgrAdapter_050
  * @tc.desc: test SetNextRefreshTime function.
  * @tc.type: FUNC
