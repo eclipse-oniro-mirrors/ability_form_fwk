@@ -313,7 +313,6 @@ void FormRenderRecord::HandleUpdateInJsThread(const FormJsInfo &formJsInfo, cons
 bool FormRenderRecord::HandleDeleteInJsThread(int64_t formId, const std::string &compId)
 {
     HILOG_INFO("Delete some resources in js thread.");
-    bool isGroupEmpty = false;
     {
         std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
         auto search = formRendererGroupMap_.find(formId);
@@ -327,17 +326,15 @@ bool FormRenderRecord::HandleDeleteInJsThread(int64_t formId, const std::string 
         }
         if (!compId.empty()) {
             search->second->DeleteForm(compId);
+            HILOG_INFO("HandleDeleteInJsThread compid is %{public}s", compId.c_str());
+            return false;
         }
-        isGroupEmpty = search->second->IsEmpty();
-        if (isGroupEmpty) {
-            formRendererGroupMap_.erase(formId);
-        }
+        search->second->DeleteForm();
+        formRendererGroupMap_.erase(formId);
     }
-    if (isGroupEmpty) {
-        std::lock_guard<std::mutex> lock(hostsMapMutex_);
-        hostsMapForFormId_.erase(formId);
-    }
-    return isGroupEmpty;
+    std::lock_guard<std::mutex> lock(hostsMapMutex_);
+    hostsMapForFormId_.erase(formId);
+    return true;
 }
 
 void FormRenderRecord::HandleDestroyInJsThread()
