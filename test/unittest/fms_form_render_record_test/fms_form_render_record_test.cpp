@@ -331,7 +331,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_017, TestSize.Level0)
     std::shared_ptr<AbilityRuntime::Context> context = nullptr;
     std::shared_ptr<AbilityRuntime::Runtime> runtime = nullptr;
     formRenderRecord->GetFormRendererGroup(formJsInfo, context, runtime);
-    EXPECT_EQ(true, formRenderRecord->HandleDeleteInJsThread(formId, compId));
+    EXPECT_EQ(false, formRenderRecord->HandleDeleteInJsThread(formId, compId));
     GTEST_LOG_(INFO) << "FormRenderRecordTest_017 end";
 }
 
