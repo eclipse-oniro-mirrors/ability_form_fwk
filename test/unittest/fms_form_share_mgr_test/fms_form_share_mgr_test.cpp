@@ -2642,14 +2642,15 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0011, TestSize.Level0)
 HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0012, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormDataMgr_0012 start";
-    std::string provider = "aaaaa";
+    std::string record = "aaaaa";
     FormItemInfo info;
     sptr<IRemoteObject> callerToken = nullptr;
     int callingUid = 1;
-    FormDataMgr formDataMgr;
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    ASSERT_NE(nullptr, formDataMgr);
     FormHostRecord formHostRecord;
-    formDataMgr.formStateRecord_.emplace(provider, formHostRecord);
-    formDataMgr.CreateFormStateRecord(provider, info, callerToken, callingUid);
+    formDataMgr->formStateRecord_.emplace(record, formHostRecord);
+    formDataMgr->CreateFormStateRecord(record, info, callerToken, callingUid);
     GTEST_LOG_(INFO) << "FormDataMgr_0012 end";
 }
 
