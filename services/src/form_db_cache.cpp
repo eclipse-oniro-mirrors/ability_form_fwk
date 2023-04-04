@@ -420,5 +420,21 @@ ErrCode FormDbCache::DeleteInvalidDBForms(int32_t userId, int32_t callingUid, st
     HILOG_INFO("DeleteInvalidDBForms done");
     return ERR_OK;
 }
+
+bool FormDbCache::IsHostOwner(int64_t formId, int32_t hostUid)
+{
+    FormDBInfo dbInfo;
+    if (GetDBRecord(formId, dbInfo) != ERR_OK) {
+        HILOG_ERROR("get db record failed. formId: %{public}s", std::to_string(formId).c_str());
+        return false;
+    }
+
+    auto iter = std::find(dbInfo.formUserUids.begin(), dbInfo.formUserUids.end(), hostUid);
+    if (iter != dbInfo.formUserUids.end()) {
+        return true;
+    }
+
+    return false;
+}
 } // namespace AppExecFwk
 } // namespace OHOS
