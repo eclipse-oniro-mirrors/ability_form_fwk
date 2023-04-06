@@ -112,7 +112,21 @@ public:
     int32_t CancelUnloadSystemAbility(int32_t systemAbilityId)
     {
         return {};
-    }
+    };
+    int32_t GetOnDemandReasonExtraData(int64_t extraDataId, MessageParcel& extraDataParcel)
+    {
+        return {};
+    };
+    int32_t GetOnDemandPolicy(int32_t systemAbilityId, OnDemandPolicyType type,
+        std::vector<SystemAbilityOnDemandEvent>& abilityOnDemandEvents)
+    {
+        return {};
+    };
+    int32_t UpdateOnDemandPolicy(int32_t systemAbilityId, OnDemandPolicyType type,
+        const std::vector<SystemAbilityOnDemandEvent>& sabilityOnDemandEvents)
+    {
+        return {};
+    };
 
     std::weak_ptr<bool> weakGetSystemAbility_;
 };
