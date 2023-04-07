@@ -86,6 +86,7 @@ ohos_shared_library("formrender") {
     "ace_engine:ace_form_render",
     "bundle_framework:appexecfwk_base",
     "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
     "eventhandler:libeventhandler",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
