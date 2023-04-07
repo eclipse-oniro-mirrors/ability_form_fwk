@@ -80,6 +80,10 @@ int32_t FormRenderImpl::RenderForm(const FormJsInfo &formJsInfo, const Want &wan
             result = search->second->UpdateRenderRecord(formJsInfo, want, hostToken);
         } else {
             auto record = FormRenderRecord::Create(formJsInfo.bundleName, uid);
+            if (record == nullptr) {
+                HILOG_ERROR("record is nullptr");
+                return RENDER_FORM_FAILED;
+            }
             result = record->UpdateRenderRecord(formJsInfo, want, hostToken);
             renderRecordMap_.emplace(uid, record);
         }
