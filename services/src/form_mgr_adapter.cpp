@@ -1827,6 +1827,7 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
     }
 
     want.SetParam(Constants::PARAM_FORM_ID, formId);
+    want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, formId);
     int32_t result = FormAmsHelper::GetInstance().GetAbilityManager()->StartAbility(want, callerToken);
     if (result != ERR_OK && result != START_ABILITY_WAITING) {
         HILOG_ERROR("Failed to StartAbility, result: %{public}d.", result);
@@ -1888,6 +1889,7 @@ int FormMgrAdapter::BackgroundEvent(const int64_t formId, Want &want, const sptr
     }
 
     want.SetParam(Constants::PARAM_FORM_ID, formId);
+    want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, formId);
     int32_t result = IN_PROCESS_CALL(FormAmsHelper::GetInstance().GetAbilityManager()->StartAbilityByCall(want,
         formBackgroundConnection, callerToken));
     if (result != ERR_OK) {
