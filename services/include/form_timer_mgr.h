@@ -350,7 +350,9 @@ private:
         }
     } CompareDynamicRefreshItem;
 
-    std::chrono::steady_clock::time_point GetBootTimeNs();
+    int64_t GetBootTimeMs();
+
+    bool IsNeedUpdate();
 
     mutable std::recursive_mutex intervalMutex_;
     mutable std::recursive_mutex updateAtMutex_;
@@ -358,7 +360,7 @@ private:
     FormRefreshLimiter refreshLimiter_;
     std::map<int64_t, FormTimer> intervalTimerTasks_;
     std::list<UpdateAtItem> updateAtTimerTasks_;
-    std::vector<DynamicRefreshItem> dynamicRefreshTasks_;
+    std::list<DynamicRefreshItem> dynamicRefreshTasks_;
     std::shared_ptr<TimerReceiver> timerReceiver_ = nullptr;
     std::unique_ptr<ThreadPool> taskExecutor_ = nullptr;
     int32_t timeSpeed_ = 1;
