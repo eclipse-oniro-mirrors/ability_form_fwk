@@ -52,6 +52,7 @@
 #include "in_process_call_wrapper.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
+#include "nlohmann/json.hpp"
 #include "system_ability_definition.h"
 
 namespace OHOS {
@@ -1866,19 +1867,31 @@ int FormMgrAdapter::BackgroundEvent(const int64_t formId, Want &want, const sptr
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
 
-    want.SetBundle(record.bundleName);
+    if(want.GetBundle().empty()) {
+        want.SetBundle(record.bundleName);
+    }
     if (!CheckKeepBackgroundRunningPermission(iBundleMgr, record.bundleName)) {
         HILOG_ERROR("The app does not have permission for keeping background running.");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
 
-    sptr<IAbilityConnection> formBackgroundConnection = new (std::nothrow) FormBackgroundConnection(formId,
-         record.bundleName, record.abilityName);
+    std::string params = want.GetStringParam(Constants::FORM_CALL_EVENT_PARAMS);
+    nlohmann::json jsonObject = nlohmann::json::parse(params, nullptr, false);
+    if (jsonObject.is_discarded()) {
+        HILOG_ERROR("failed to parse jsonDataString: %{public}s.", params.c_str());
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    if (!jsonObject.contains(Constants::PARAM_FORM_CALL_EVENT_METHOD_KEY) ||
+        !jsonObject.at(Constants::PARAM_FORM_CALL_EVENT_METHOD_KEY).is_string()) {
+        HILOG_ERROR("failed to get method from params");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    sptr<IAbilityConnection> formBackgroundConnection = new (std::nothrow) FormBackgroundConnection(formId, want.GetBundle(),
+        want.GetElement().GetAbilityName(), jsonObject[Constants::PARAM_FORM_CALL_EVENT_METHOD_KEY].get<std::string>(), params);
     if (formBackgroundConnection == nullptr) {
         HILOG_ERROR("formBackgroundConnection is null.");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
-
     want.SetParam(Constants::PARAM_FORM_ID, formId);
     int32_t result = IN_PROCESS_CALL(FormAmsHelper::GetInstance().GetAbilityManager()->StartAbilityByCall(want,
         formBackgroundConnection, callerToken));
