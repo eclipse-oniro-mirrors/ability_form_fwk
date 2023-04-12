@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,6 +16,7 @@
 #include "form_background_connection.h"
 
 #include "form_constants.h"
+#include "form_mgr_proxy.h"
 #include "form_supply_callback.h"
 #include "form_task_mgr.h"
 #include "hilog_wrapper.h"
@@ -25,7 +25,8 @@
 namespace OHOS {
 namespace AppExecFwk {
 FormBackgroundConnection::FormBackgroundConnection(const int64_t formId, const std::string &bundleName,
-    const std::string &abilityName) : formId_(formId)
+    const std::string &abilityName, const std::string &funcName, const std::string &params)
+     : formId_(formId), funcName_(funcName), params_(params)
 {
     SetProviderKey(bundleName, abilityName);
 }
@@ -38,16 +39,21 @@ FormBackgroundConnection::FormBackgroundConnection(const int64_t formId, const s
 void FormBackgroundConnection::OnAbilityConnectDone(
     const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_DEBUG("called.");
     if (resultCode != ERR_OK) {
         HILOG_ERROR("%{public}s, abilityName:%{public}s, resultCode:%{public}d",
             __func__, element.GetAbilityName().c_str(), resultCode);
         return;
     }
-    FormSupplyCallback::GetInstance()->AddConnection(this);
-    Want want;
-    want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
-    HILOG_INFO("%{public}lld formId.", (long long)formId_);
+    HILOG_DEBUG("%{public}lld formId.", (long long)formId_);
+    sptr<IFormMgr> formMgrProxy = iface_cast<IFormMgr>(remoteObject);
+    if (formMgrProxy == nullptr) {
+        HILOG_ERROR("Failed to get formMgrProxy");
+        return;
+    }
+    formMgrProxy->SetBackgroundFunction(funcName_, params_);
+    FormSupplyCallback::GetInstance()->RemoveConnection(this->GetConnectId());
+    HILOG_DEBUG("end.");
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

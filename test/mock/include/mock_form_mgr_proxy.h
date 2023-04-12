@@ -57,6 +57,7 @@ public:
     int64_t requestCode));
     MOCK_METHOD2(DeleteForm, int(const int64_t formId, const sptr<IRemoteObject> &callerToken));
     MOCK_METHOD3(ReleaseForm, int(const int64_t formId, const sptr<IRemoteObject> &callerToken, const bool delCache));
+    MOCK_METHOD2(SetBackgroundFunction, int32_t(const std::string funcName, const std::string params));
 };
 }
 }

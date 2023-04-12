@@ -169,6 +169,10 @@ public:
     {
         return false;
     }
+    int32_t SetBackgroundFunction(const std::string funcName, const std::string params) override
+    {
+        return 0;
+    }
 };
 
 uint32_t GetU32Data(const char* ptr)

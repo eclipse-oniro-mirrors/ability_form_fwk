@@ -193,6 +193,11 @@ namespace Constants {
     constexpr const char* FORM_DENSITY = "ohos.extra.param.key.form_density";
     constexpr const char* FORM_PROCESS_ON_ADD_SURFACE = "ohos.extra.param.key.process_on_add_surface";
     constexpr const char* FORM_ALLOW_UPDATE = "allowUpdate";
+
+    //CallEvent
+    constexpr const char* FORM_CALL_EVENT_PARAMS = "params";
+    constexpr const char* PARAM_FORM_CALL_EVENT_METHOD_KEY = "method";
+    constexpr int32_t EVENT_CALL_NOTIFY = 1;
 }  // namespace Constants
 }  // namespace AppExecFwk
 }  // namespace OHOS

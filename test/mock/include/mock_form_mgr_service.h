@@ -66,6 +66,7 @@ public:
     MOCK_METHOD1(RecvFormShareInfoFromRemote, int32_t(const FormShareInfo&));
     MOCK_METHOD0(CheckFMSReady, bool());
     MOCK_METHOD2(StopRenderingForm, int32_t(const int64_t formId, const std::string &compId));
+    MOCK_METHOD2(SetBackgroundFunction, int32_t(const std::string funcName, const std::string params));
 };
 }
 }
