@@ -906,7 +906,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FreeInstallStatusCallBackStub_003, TestSi
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    std::u16string remoteDescriptor = u"ohos.aafwk.IAtomicServiceStatusCallback";
+    std::u16string remoteDescriptor = u"ohos.IAtomicServiceStatusCallback";
     data.WriteInterfaceToken(remoteDescriptor);
     mockFreeInstallStatusCallBackStub->OnRemoteRequest(code, data, reply, option);
     GTEST_LOG_(INFO) << "FreeInstallStatusCallBackStub_003 end";
@@ -927,7 +927,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FreeInstallStatusCallBackStub_004, TestSi
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    std::u16string remoteDescriptor = u"ohos.aafwk.IAtomicServiceStatusCallback";
+    std::u16string remoteDescriptor = u"ohos.IAtomicServiceStatusCallback";
     data.WriteInterfaceToken(remoteDescriptor);
     mockFreeInstallStatusCallBackStub->OnRemoteRequest(code, data, reply, option);
     GTEST_LOG_(INFO) << "FreeInstallStatusCallBackStub_004 end";
