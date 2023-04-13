@@ -1261,5 +1261,55 @@ bool FormMgrProxy::CheckFMSReady()
     // retrieve and return result;
     return reply.ReadBool();
 }
+
+int32_t FormMgrProxy::GetFormsCount(bool isTempFormFlag, int32_t &formCount)
+{
+    HILOG_INFO("%{public}s start.", __func__);
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("failed to write interface token.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteBool(isTempFormFlag)) {
+        HILOG_ERROR("%{public}s, failed to write bool isEnableUpdate", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    int error = Remote()->SendRequest(
+        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORMS_COUNT), data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d", __func__, error);
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+    int32_t result = reply.ReadInt32();
+    formCount = reply.ReadInt32();
+    return result;
+}
+
+int32_t FormMgrProxy::GetHostFormsCount(std::string &bundleName, int32_t &formCount)
+{
+    HILOG_INFO("%{public}s start.", __func__);
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("failed to write interface token.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteString(bundleName)) {
+        HILOG_ERROR("%{public}s, failed to write bundleName", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    int error = Remote()->SendRequest(
+       static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_HOST_FORMS_COUNT), data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d", __func__, error);
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+    int32_t result = reply.ReadInt32();
+    formCount = reply.ReadInt32();
+    return result;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -66,6 +66,8 @@ public:
     MOCK_METHOD1(RecvFormShareInfoFromRemote, int32_t(const FormShareInfo&));
     MOCK_METHOD0(CheckFMSReady, bool());
     MOCK_METHOD2(StopRenderingForm, int32_t(const int64_t formId, const std::string &compId));
+    MOCK_METHOD2(GetFormsCount, int32_t(bool isTempFormFlag, int32_t &formCount));
+    MOCK_METHOD2(GetHostFormsCount, int32_t(std::string &bundleName, int32_t &formCount));
 };
 }
 }

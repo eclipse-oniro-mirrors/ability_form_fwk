@@ -1763,5 +1763,44 @@ ErrCode FormDataMgr::CheckInvalidForm(const int64_t formId)
     }
     return ERR_OK;
 }
+
+int32_t FormDataMgr::GetTempFormsCount(int32_t &formCount)
+{
+    std::lock_guard<std::recursive_mutex> lock(formTempMutex_);
+    if (!tempForms_.empty()) {
+        formCount = tempForms_.size();
+    }
+	HILOG_DEBUG("%{public}s, current exist %{public}d temp forms in system", __func__, formCount);
+    return ERR_OK;
+}
+
+int32_t FormDataMgr::GetCastFormsCount(int32_t &formCount)
+{
+    std::lock_guard<std::recursive_mutex> lock(formRecordMutex_);
+    for (const auto &recordPair : formRecords_) {
+        FormRecord record = recordPair.second;
+        if (!record.formTempFlag) {
+            formCount++;
+        }
+    }
+    HILOG_DEBUG("%{public}s, current exist %{public}d cast forms in system", __func__, formCount);
+    return ERR_OK;
+}
+
+int32_t FormDataMgr::GetHostFormsCount(const std::string &bundleName, int32_t &formCount)
+{
+    if (bundleName.empty()) {
+        return ERR_OK;
+    }
+    std::lock_guard<std::recursive_mutex> lock(formHostRecordMutex_);
+    for (auto &record : clientRecords_) {
+        if (record.GetHostBundleName() == bundleName) {
+            formCount = record.GetFormsCount();
+            break;
+        }
+    }
+    HILOG_DEBUG("%{public}s, current exist %{public}d cast forms in host", __func__, formCount);
+    return ERR_OK;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

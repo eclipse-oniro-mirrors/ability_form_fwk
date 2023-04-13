@@ -185,6 +185,12 @@ public:
      * @param hostBundleName Host bundle name.
      */
     void SetHostBundleName(const std::string &hostBundleName);
+
+    /**
+     * @brief get forms count.
+     * @return the number of host form.
+     */
+    int32_t GetFormsCount() const;
 private:
     int callerUid_ = 0;
     sptr<IRemoteObject> formHostClient_ = nullptr;
