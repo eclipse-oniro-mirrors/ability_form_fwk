@@ -1767,9 +1767,7 @@ ErrCode FormDataMgr::CheckInvalidForm(const int64_t formId)
 int32_t FormDataMgr::GetTempFormsCount(int32_t &formCount)
 {
     std::lock_guard<std::recursive_mutex> lock(formTempMutex_);
-    if (!tempForms_.empty()) {
-        formCount = tempForms_.size();
-    }
+    formCount = tempForms_.size();
 	HILOG_DEBUG("%{public}s, current exist %{public}d temp forms in system", __func__, formCount);
     return ERR_OK;
 }
