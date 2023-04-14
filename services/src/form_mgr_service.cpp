@@ -1064,12 +1064,14 @@ bool FormMgrService::CheckAcrossLocalAccountsPermission() const
     return true;
 }
 
-int32_t FormMgrService::GetFormsCount(bool isTempFormFlag, int32_t &formCount) {
+int32_t FormMgrService::GetFormsCount(bool isTempFormFlag, int32_t &formCount)
+{
     HILOG_INFO("%{public}s called.", __func__);
     return FormMgrAdapter::GetInstance().GetFormsCount(isTempFormFlag, formCount);
 }
 
-int32_t FormMgrService::GetHostFormsCount(std::string &bundleName, int32_t &formCount) {
+int32_t FormMgrService::GetHostFormsCount(std::string &bundleName, int32_t &formCount)
+{
     HILOG_INFO("%{public}s called.", __func__);
     return FormMgrAdapter::GetInstance().GetHostFormsCount(bundleName, formCount);
 }
