@@ -3050,7 +3050,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0154, TestSize.Level0)
     FormMgrAdapter formMgrAdapter;
     Want want = {};
 
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY, formMgrAdapter.CheckPublishForm(want));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, formMgrAdapter.CheckPublishForm(want));
     FormBmsHelper::GetInstance().iBundleMgr_ = backup;
     GTEST_LOG_(INFO) << "FormMgrAdapter_0154 end";
 }
