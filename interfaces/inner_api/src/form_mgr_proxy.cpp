@@ -1302,7 +1302,7 @@ int32_t FormMgrProxy::GetHostFormsCount(std::string &bundleName, int32_t &formCo
     MessageParcel reply;
     MessageOption option;
     int error = Remote()->SendRequest(
-       static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_HOST_FORMS_COUNT), data, reply, option);
+        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_HOST_FORMS_COUNT), data, reply, option);
     if (error != ERR_OK) {
         HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d", __func__, error);
         return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
