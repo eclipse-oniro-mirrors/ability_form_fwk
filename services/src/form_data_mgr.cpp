@@ -1768,7 +1768,7 @@ int32_t FormDataMgr::GetTempFormsCount(int32_t &formCount)
 {
     std::lock_guard<std::recursive_mutex> lock(formTempMutex_);
     formCount = tempForms_.size();
-	HILOG_DEBUG("%{public}s, current exist %{public}d temp forms in system", __func__, formCount);
+    HILOG_DEBUG("%{public}s, current exist %{public}d temp forms in system", __func__, formCount);
     return ERR_OK;
 }
 
