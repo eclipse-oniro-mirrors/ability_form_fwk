@@ -23,6 +23,8 @@
 #include "ipc_types.h"
 #include "iremote_broker.h"
 
+#include "want.h"
+
 namespace OHOS {
 namespace AppExecFwk {
 /**
@@ -74,6 +76,13 @@ public:
      */
     virtual void OnError(int32_t errorCode, const std::string &errorMsg) = 0;
 
+    /**
+     * @brief Called when form provider acquired data
+     * @param wantParams Indicates the data information acquired by the form.
+     * @param requestCode Indicates the requested id.
+     */
+    virtual void OnAcquireDataResponse(const AAFwk::WantParams &wantParams, int64_t requestCode) = 0;
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -95,6 +104,9 @@ public:
 
         // ipc id for return form error to host(3686)
         FORM_HOST_ON_ERROR,
+
+        // ipc id for acquire form data response (3687)
+        FORM_HOST_ON_ACQUIRE_FORM_DATA,
     };
 };
 }  // namespace AppExecFwk

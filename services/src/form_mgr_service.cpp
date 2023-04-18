@@ -829,6 +829,33 @@ int32_t FormMgrService::GetFormsInfo(const FormInfoFilter &filter, std::vector<F
     return FormMgrAdapter::GetInstance().GetFormsInfoByModule(callerBundleName, moduleName, formInfos);
 }
 
+int32_t FormMgrService::AcquireFormData(int64_t formId, int64_t requestCode, const sptr<IRemoteObject> &callerToken,
+    AAFwk::WantParams &formData)
+{
+    HILOG_INFO("called.");
+    if (formId <= 0) {
+        HILOG_ERROR("form formId  is invalid.");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
+    if (callerToken == nullptr) {
+        HILOG_ERROR("callerToken is nullptr.");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
+    if (requestCode <= 0) {
+        HILOG_ERROR("form requestCode is invalid.");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
+    ErrCode ret = CheckFormPermission();
+    if (ret != ERR_OK) {
+        HILOG_ERROR("fail, request form permission denied");
+        return ret;
+    }
+    return FormMgrAdapter::GetInstance().AcquireFormData(formId, requestCode, callerToken, formData);
+}
+
 bool FormMgrService::IsRequestPublishFormSupported()
 {
     HILOG_INFO("%{public}s called.", __func__);

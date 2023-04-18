@@ -40,6 +40,8 @@ FormSupplyStub::FormSupplyStub()
         &FormSupplyStub::HandleOnRenderTaskDone;
     memberFuncMap_[static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_STOP_RENDERING_TASK_DONE)] =
         &FormSupplyStub::HandleOnStopRenderingTaskDone;
+    memberFuncMap_[static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_ACQUIRED_DATA)] =
+        &FormSupplyStub::HandleOnAcquireDataResult;
 }
 
 FormSupplyStub::~FormSupplyStub()
@@ -189,6 +191,24 @@ int32_t FormSupplyStub::HandleOnShareAcquire(MessageParcel &data, MessageParcel 
 
     auto result = data.ReadBool();
     OnShareAcquire(formId, remoteDeviceId, *wantParams, requestCode, result);
+    return ERR_OK;
+}
+
+int32_t FormSupplyStub::HandleOnAcquireDataResult(MessageParcel &data, MessageParcel &reply)
+{
+    std::shared_ptr<AAFwk::WantParams> wantParams(data.ReadParcelable<AAFwk::WantParams>());
+    if (wantParams == nullptr) {
+        HILOG_ERROR("failed to ReadParcelable<wantParams>");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    auto requestCode = data.ReadInt64();
+    if (requestCode <= 0) {
+        HILOG_ERROR("failed to ReadInt64<requestCode>");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    OnAcquireDataResult(*wantParams, requestCode);
     return ERR_OK;
 }
 

@@ -310,6 +310,17 @@ public:
     int32_t GetFormsInfo(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos) override;
 
     /**
+     * @brief Acquire form data by formId.
+     * @param formId The Id of the form to acquire data.
+     * @param callerToken Indicates the host client.
+     * @param requestCode The request code of this acquire form.
+     * @param formData Return the forms' information of customization
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t AcquireFormData(int64_t formId, int64_t requestCode, const sptr<IRemoteObject> &callerToken,
+        AAFwk::WantParams &formData) override;
+
+    /**
      * @brief Check if the request of publishing a form is supported by the host.
      * @return Returns true if the request is supported and false otherwise.
      */

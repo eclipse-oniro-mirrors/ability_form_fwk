@@ -68,6 +68,14 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     void OnAcquireState(AppExecFwk::FormState state, const AAFwk::Want &want, const sptr<IRemoteObject> &callerToken);
+
+    /**
+     * @brief Send form data to form host.
+     * @param wantParams Indicates the data information acquired by the form.
+     * @param requestCode Indicates the requested id.
+     */
+    void OnAcquireFormData(const AAFwk::WantParams &wantParams, int64_t requestCode,
+                            const sptr<IRemoteObject> &callerToken);
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

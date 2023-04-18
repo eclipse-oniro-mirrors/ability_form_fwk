@@ -418,6 +418,17 @@ public:
     void DeleteInvalidPublishForms(int32_t userId, std::string bundleName, std::set<int64_t> &validFormIds);
 
     /**
+     * @brief Create form acquire data host record.
+     * @param requestCode The request code of this acquire form.
+     * @param info The form item info.
+     * @param callerToken  Caller ability token.
+     * @param callingUid The UID of the proxy.
+     * @return Returns true if this function is successfully called; returns false otherwise.
+     */
+    bool CreateFormAcquireDataRecord(int64_t requestCode, const FormItemInfo &info,
+                                     const sptr<IRemoteObject> &callerToken, int callingUid);
+
+    /**
      * @brief Create form state host record.
      * @param provider The provider of the form state
      * @param info The form item info.
@@ -436,6 +447,14 @@ public:
      * @return Returns true if this function is successfully called; returns false otherwise.
      */
     ErrCode AcquireFormStateBack(AppExecFwk::FormState state, const std::string &provider, const Want &want);
+
+    /**
+     * @brief acquire form data callback.
+     * @param wantParams Indicates the data information acquired by the form.
+     * @param requestCode Indicates the requested id.
+     * @return Returns true if this function is successfully called; returns false otherwise.
+     */
+    ErrCode AcquireFormDataBack(const AAFwk::WantParams &wantParams, int64_t requestCode);
 
     /**
      * @brief Notify the form is visible or not.
@@ -642,10 +661,12 @@ private:
     mutable std::recursive_mutex formTempMutex_;
     mutable std::recursive_mutex formStateRecordMutex_;
     mutable std::recursive_mutex formRequestPublishFormsMutex_;
+    mutable std::recursive_mutex formAcquireDataRecordMutex_;
     std::map<int64_t, FormRecord> formRecords_;
     std::vector<FormHostRecord> clientRecords_;
     std::vector<int64_t> tempForms_;
     std::map<std::string, FormHostRecord> formStateRecord_;
+    std::map<int32_t, FormHostRecord> formAcquireDataRecord_;
     using FormRequestPublishFormInfo = std::pair<Want, std::unique_ptr<FormProviderData>>;
     std::map<int64_t, FormRequestPublishFormInfo> formRequestPublishForms_;
     int64_t udidHash_ = 0;

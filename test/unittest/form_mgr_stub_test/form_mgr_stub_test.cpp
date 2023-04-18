@@ -2066,14 +2066,41 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0082, TestSize.Level1) {
 
 /**
  * @tc.number: FormMgrStubTest_0083
- * @tc.name: Verify OnRemoteRequest
- * @tc.desc: When the parameter code is FORM_MGR_STOP_RENDERING_FORM + 1, the interface return value is
- *           IPC_STUB_UNKNOW_TRANS_ERR.
+ * @tc.name: Verify OnRemoteRequest and HandleStopRenderingForm
+ * @tc.desc: When the parameter code is FORM_MGR_ACQUIRE_DATA, the interface return value is ERR_OK.
  */
 HWTEST_F(FormMgrStubTest, FormMgrStubTest_0083, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrStubTest_0083 starts";
     EXPECT_TRUE(mockFormMgrService != nullptr);
-    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_STOP_RENDERING_FORM) + 1;
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_ACQUIRE_DATA);
+    const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormToken();
+    constexpr int64_t formId = 1;
+    constexpr int64_t requestCode = 1;
+    MessageParcel data;
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    data.WriteInt64(formId);
+    data.WriteInt64(requestCode);
+    data.WriteRemoteObject(callerToken);
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    EXPECT_CALL(*mockFormMgrService, AcquireFormData(_, _, _, _))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0083 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_0084
+ * @tc.name: Verify OnRemoteRequest
+ * @tc.desc: When the parameter code is FORM_MGR_ACQUIRE_DATA + 1, the interface return value is
+ *           IPC_STUB_UNKNOW_TRANS_ERR.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0084, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0084 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_ACQUIRE_DATA) + 1;
     mockFormMgrService->memberFuncMap_[code] = nullptr;
     MessageParcel data;
     MessageParcel reply;
@@ -2081,6 +2108,6 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0083, TestSize.Level1) {
     data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, IPC_STUB_UNKNOW_TRANS_ERR);
-    GTEST_LOG_(INFO) << "FormMgrStubTest_0083 ends";
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0084 ends";
 }
 }

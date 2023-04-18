@@ -106,6 +106,8 @@ FormMgrStub::FormMgrStub()
         &FormMgrStub::HandleCheckFMSReady;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_STOP_RENDERING_FORM)] =
         &FormMgrStub::HandleStopRenderingForm;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_ACQUIRE_DATA)] =
+        &FormMgrStub::HandleAcquireFormData;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORMS_COUNT)] =
         &FormMgrStub::HandleGetFormsCount;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_HOST_FORMS_COUNT)] =
@@ -811,6 +813,25 @@ int32_t FormMgrStub::HandleShareForm(MessageParcel &data, MessageParcel &reply)
 
     auto result = ShareForm(formId, deviceId, callerToken, requestCode);
     reply.WriteInt32(result);
+    return result;
+}
+
+int32_t FormMgrStub::HandleAcquireFormData(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("called.");
+    int64_t formId = data.ReadInt64();
+    int64_t requestCode = data.ReadInt64();
+    sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
+    if (callerToken == nullptr) {
+        HILOG_ERROR("failed to get remote object.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    // write result of calling FMS into reply.
+    AAFwk::WantParams customizeData;
+    // call FormMgrService to get formData into data.
+    int32_t result = AcquireFormData(formId, requestCode, callerToken, customizeData);
+    reply.WriteBool(result);
+    reply.WriteParcelable(&customizeData);
     return result;
 }
 

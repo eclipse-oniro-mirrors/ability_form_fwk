@@ -44,6 +44,8 @@ public:
     {}
     void OnError(int32_t errorCode, const std::string &errorMsg) override
     {}
+    void OnAcquireDataResponse(const AAFwk::WantParams &wantParams, int64_t requestCode) override
+    {}
 };
 
 uint32_t GetU32Data(const char* ptr)

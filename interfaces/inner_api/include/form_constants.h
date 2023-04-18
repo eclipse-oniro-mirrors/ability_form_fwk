@@ -123,6 +123,7 @@ namespace Constants {
     constexpr const char* FORM_CONNECT_ID = "form_connect_id";
     constexpr const char* FORM_SUPPLY_INFO = "form_supply_info";
     constexpr const char* FORM_SHARE_REQUEST_CODE = "form_share_request_code";
+    constexpr const char* FORM_ACQUIRE_DATA_REQUEST_CODE = "form_acquire_data_request_code";
     // the delimiter between bundleName and abilityName
     constexpr const char* NAME_DELIMITER = "::";
 
@@ -193,6 +194,13 @@ namespace Constants {
     constexpr const char* FORM_DENSITY = "ohos.extra.param.key.form_density";
     constexpr const char* FORM_PROCESS_ON_ADD_SURFACE = "ohos.extra.param.key.process_on_add_surface";
     constexpr const char* FORM_ALLOW_UPDATE = "allowUpdate";
+
+    //arquireFormData
+    constexpr const char* LAUNCH_REASON_KEY = "ohos.extra.param.key.form_launch_reason";
+    // The form launch reason which means that the form is default.
+    constexpr int32_t FORM_DEFAULT = 1;
+    // The form launch reason which means that the form is share.
+    constexpr int32_t FORM_SHARE = 2;
 }  // namespace Constants
 }  // namespace AppExecFwk
 }  // namespace OHOS

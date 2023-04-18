@@ -76,6 +76,11 @@ public:
     {
         return 0;
     }
+    int32_t AcquireFormData(int64_t formId, const sptr<IRemoteObject> &formSupplyCallback,
+        int64_t requestCode) override
+    {
+        return 0;
+    }
 };
 
 uint32_t GetU32Data(const char* ptr)
