@@ -1018,5 +1018,52 @@ std::string FormMgr::GetErrorMsgByExternalErrorCode(int32_t externalErrorCode)
 {
     return FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(externalErrorCode);
 }
+
+int32_t FormMgr::GetFormsCount(bool isTempFormFlag, int32_t &formCount)
+{
+    HILOG_INFO("%{public}s start.", __func__);
+
+    if (GetRecoverStatus() == Constants::IN_RECOVERING) {
+        HILOG_ERROR("%{public}s error, form is in recover status, can't do action on form.", __func__);
+        return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
+    }
+
+    int32_t errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("%{public}s failed, errCode: %{public}d.", __func__, errCode);
+        return errCode;
+    }
+    int32_t resultCode = remoteProxy_->GetFormsCount(isTempFormFlag, formCount);
+    if (resultCode != ERR_OK) {
+        HILOG_ERROR("%{public}s error, failed to GetFormsCount, error code is %{public}d.", __func__, resultCode);
+    }
+    return resultCode;
+}
+
+int32_t FormMgr::GetHostFormsCount(std::string &bundleName, int32_t &formCount)
+{
+    HILOG_INFO("%{public}s start.", __func__);
+
+    if (GetRecoverStatus() == Constants::IN_RECOVERING) {
+        HILOG_ERROR("%{public}s error, form is in recover status, can't do action on form.", __func__);
+        return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
+    }
+
+    if (bundleName.empty()) {
+        HILOG_WARN("Failed to Get host forms count, because empty bundleName");
+        return ERR_APPEXECFWK_FORM_INVALID_BUNDLENAME;
+    }
+
+    int32_t errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("%{public}s failed, errCode: %{public}d.", __func__, errCode);
+        return errCode;
+    }
+    int32_t resultCode = remoteProxy_->GetHostFormsCount(bundleName, formCount);
+    if (resultCode != ERR_OK) {
+        HILOG_ERROR("%{public}s error, failed to GetFormsCount, error code is %{public}d.", __func__, resultCode);
+    }
+    return resultCode;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

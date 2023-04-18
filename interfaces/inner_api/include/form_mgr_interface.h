@@ -320,6 +320,22 @@ public:
     */
     virtual bool CheckFMSReady() = 0;
 
+    /**
+    * @brief get forms count.
+    * @param isTempFormFlag Indicates temp form or not.
+    * @param formCount Returns the number of the cast or temp form.
+    * @return Returns ERR_OK on success, others on failure.
+    */
+    virtual int32_t GetFormsCount(bool isTempFormFlag, int32_t &formCount) = 0;
+
+    /**
+    * @brief get host forms count.
+    * @param bundleName Indicates form host bundleName.
+    * @param formCount Returns the number of the host form.
+    * @return Returns ERR_OK on success, others on failure.
+    */
+    virtual int32_t GetHostFormsCount(std::string &bundleName, int32_t &formCount) = 0;
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -368,6 +384,8 @@ public:
         FORM_MGR_CHECK_FMS_READY,
         FORM_MGR_BACKGROUND_EVENT,
         FORM_MGR_STOP_RENDERING_FORM,
+        FORM_MGR_GET_FORMS_COUNT,
+        FORM_MGR_GET_HOST_FORMS_COUNT,
     };
 };
 }  // namespace AppExecFwk

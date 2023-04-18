@@ -2406,5 +2406,20 @@ bool FormMgrAdapter::checkFormHostHasSaUid(const FormRecord &formRecord)
     return std::find(formRecord.formUserUids.begin(), formRecord.formUserUids.end(),
         SYSTEM_UID) != formRecord.formUserUids.end();
 }
+
+int32_t FormMgrAdapter::GetFormsCount(bool isTempFormFlag, int32_t &formCount)
+{
+    HILOG_DEBUG("%{public}s, isTempFormFlag: %{public}d.", __func__, isTempFormFlag);
+    if (isTempFormFlag) {
+        return FormDataMgr::GetInstance().GetTempFormsCount(formCount);
+    }
+    return FormDataMgr::GetInstance().GetCastFormsCount(formCount);
+}
+
+int32_t FormMgrAdapter::GetHostFormsCount(std::string &bundleName, int32_t &formCount)
+{
+    HILOG_DEBUG("%{public}s, bundleName: %{public}s.", __func__, bundleName.c_str());
+    return FormDataMgr::GetInstance().GetHostFormsCount(bundleName, formCount);
+}
 } // namespace AppExecFwk
 } // namespace OHOS

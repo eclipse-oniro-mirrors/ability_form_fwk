@@ -2044,13 +2044,13 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0081, TestSize.Level1) {
 /**
  * @tc.number: FormMgrStubTest_0082
  * @tc.name: Verify OnRemoteRequest
- * @tc.desc: When the parameter code is FORM_MGR_STOP_RENDERING_FORM + 1, the interface return value is
+ * @tc.desc: When the parameter code is UINT32_MAX, the interface return value is
  *           IPC_STUB_UNKNOW_TRANS_ERR.
  */
 HWTEST_F(FormMgrStubTest, FormMgrStubTest_0082, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrStubTest_0082 starts";
     EXPECT_TRUE(mockFormMgrService != nullptr);
-    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_STOP_RENDERING_FORM) + 1;
+    constexpr uint32_t code = UINT32_MAX;
     constexpr int64_t formId = 1;
     const std::string compId = "ABC";
     MessageParcel data;

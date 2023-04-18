@@ -106,6 +106,10 @@ FormMgrStub::FormMgrStub()
         &FormMgrStub::HandleCheckFMSReady;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_STOP_RENDERING_FORM)] =
         &FormMgrStub::HandleStopRenderingForm;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORMS_COUNT)] =
+        &FormMgrStub::HandleGetFormsCount;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_HOST_FORMS_COUNT)] =
+        &FormMgrStub::HandleGetHostFormsCount;
 }
 
 FormMgrStub::~FormMgrStub()
@@ -866,6 +870,46 @@ int32_t FormMgrStub::HandleCheckFMSReady(MessageParcel &data, MessageParcel &rep
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
+}
+
+int32_t FormMgrStub::HandleGetFormsCount(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    bool isTempFormFlag = false;
+    if (!data.ReadBool(isTempFormFlag)) {
+        HILOG_ERROR("%{public}s, failed to read temp flag", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    int32_t formCount = 0;
+    int32_t result = GetFormsCount(isTempFormFlag, formCount);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!reply.WriteInt32(formCount)) {
+        HILOG_ERROR("write formCount failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return result;
+}
+
+int32_t FormMgrStub::HandleGetHostFormsCount(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    std::string bundleName = data.ReadString();
+
+    int32_t formCount = 0;
+    int32_t result = GetHostFormsCount(bundleName, formCount);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!reply.WriteInt32(formCount)) {
+        HILOG_ERROR("write formCount failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return result;
 }
 
 /**

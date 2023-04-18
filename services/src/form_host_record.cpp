@@ -310,5 +310,10 @@ void FormHostRecord::SetHostBundleName(const std::string &hostBundleName)
 {
     hostBundleName_ = hostBundleName;
 }
+
+int32_t FormHostRecord::GetFormsCount() const
+{
+    return static_cast<int32_t>(forms_.size());
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -524,6 +524,28 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode CheckInvalidForm(const int64_t formId);
+
+    /**
+    * @brief get cast forms count.
+    * @param formCount Returns the number of the cast form.
+    * @return Return the cast forms number.
+    */
+    int32_t GetCastFormsCount(int32_t &formCount);
+
+    /**
+    * @brief get temp forms count.
+    * @param formCount Returns the number of the temp form.
+    * @return Return the temp forms number.
+    */
+    int32_t GetTempFormsCount(int32_t &formCount);
+
+    /**
+    * @brief get host forms count.
+    * @param bundleName Indicates form host bundleName.
+    * @param formCount Returns the number of the host form.
+    * @return Return the host forms number.
+    */
+    int32_t GetHostFormsCount(const std::string &bundleName, int32_t &formCount);
 private:
     /**
      * @brief Create form record.
