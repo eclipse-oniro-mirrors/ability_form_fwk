@@ -839,6 +839,15 @@ ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
         HILOG_ERROR("%{public}s, addForm can not acquire temp form when select form id", __func__);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
+
+    // ark ts form can only exist with one form host
+    if (info.GetUiSyntax() == FormType::ETS &&
+        !FormDbCache::GetInstance().IsHostOwner(formId, IPCSkeleton::GetCallingUid())) {
+        HILOG_ERROR("the specified form id does not exist in caller. formId: %{public}s.",
+            std::to_string(formId).c_str());
+        return ERR_APPEXECFWK_FORM_CFG_NOT_MATCH_ID;
+    }
+
     int32_t currentUserId = FormUtil::GetCurrentAccountId();
     if (hasRecord && (record.providerUserId == currentUserId)) {
         if (!info.IsMatch(record)) {
@@ -1813,6 +1822,7 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
     }
 
     want.SetParam(Constants::PARAM_FORM_ID, formId);
+    want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, formId);
     int32_t result = FormAmsHelper::GetInstance().GetAbilityManager()->StartAbility(want, callerToken);
     if (result != ERR_OK && result != START_ABILITY_WAITING) {
         HILOG_ERROR("Failed to StartAbility, result: %{public}d.", result);
@@ -1874,6 +1884,7 @@ int FormMgrAdapter::BackgroundEvent(const int64_t formId, Want &want, const sptr
     }
 
     want.SetParam(Constants::PARAM_FORM_ID, formId);
+    want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, formId);
     int32_t result = IN_PROCESS_CALL(FormAmsHelper::GetInstance().GetAbilityManager()->StartAbilityByCall(want,
         formBackgroundConnection, callerToken));
     if (result != ERR_OK) {
@@ -2428,6 +2439,21 @@ bool FormMgrAdapter::checkFormHostHasSaUid(const FormRecord &formRecord)
 {
     return std::find(formRecord.formUserUids.begin(), formRecord.formUserUids.end(),
         SYSTEM_UID) != formRecord.formUserUids.end();
+}
+
+int32_t FormMgrAdapter::GetFormsCount(bool isTempFormFlag, int32_t &formCount)
+{
+    HILOG_DEBUG("%{public}s, isTempFormFlag: %{public}d.", __func__, isTempFormFlag);
+    if (isTempFormFlag) {
+        return FormDataMgr::GetInstance().GetTempFormsCount(formCount);
+    }
+    return FormDataMgr::GetInstance().GetCastFormsCount(formCount);
+}
+
+int32_t FormMgrAdapter::GetHostFormsCount(std::string &bundleName, int32_t &formCount)
+{
+    HILOG_DEBUG("%{public}s, bundleName: %{public}s.", __func__, bundleName.c_str());
+    return FormDataMgr::GetInstance().GetHostFormsCount(bundleName, formCount);
 }
 } // namespace AppExecFwk
 } // namespace OHOS

@@ -338,8 +338,7 @@ bool FormTimerMgr::SetNextRefreshTime(int64_t formId, long nextGapTime, int32_t 
         HILOG_ERROR("%{public}s failed, nextGapTime is invalid, nextGapTime:%{public}ld", __func__, nextGapTime);
         return false;
     }
-    auto timeSinceEpoch = std::chrono::steady_clock::now().time_since_epoch();
-    int64_t timeInSec = std::chrono::duration_cast<std::chrono::milliseconds>(timeSinceEpoch).count();
+    int64_t timeInSec = GetBootTimeMs();
     int64_t refreshTime = timeInSec + nextGapTime * Constants::MS_PER_SECOND / timeSpeed_;
     HILOG_INFO("%{public}s currentTime:%{public}s refreshTime:%{public}s", __func__,
         std::to_string(timeInSec).c_str(), std::to_string(refreshTime).c_str());
@@ -359,7 +358,7 @@ bool FormTimerMgr::SetNextRefreshTime(int64_t formId, long nextGapTime, int32_t 
         theItem.userId = userId;
         dynamicRefreshTasks_.emplace_back(theItem);
     }
-    std::sort(dynamicRefreshTasks_.begin(), dynamicRefreshTasks_.end(), CompareDynamicRefreshItem);
+    dynamicRefreshTasks_.sort(CompareDynamicRefreshItem);
     if (!UpdateDynamicAlarm()) {
         HILOG_ERROR("%{public}s, failed to UpdateDynamicAlarm", __func__);
         return false;
@@ -574,10 +573,9 @@ bool FormTimerMgr::OnDynamicTimeTrigger(int64_t updateTime)
     std::vector<FormTimer> updateList;
     {
         std::lock_guard<std::recursive_mutex> lock(dynamicMutex_);
-        auto timeSinceEpoch = std::chrono::steady_clock::now().time_since_epoch();
-        auto timeInSec = std::chrono::duration_cast<std::chrono::milliseconds>(timeSinceEpoch).count();
+        auto timeInSec = GetBootTimeMs();
         int64_t markedTime = timeInSec + Constants::ABS_REFRESH_MS;
-        std::vector<DynamicRefreshItem>::iterator itItem;
+        std::list<DynamicRefreshItem>::iterator itItem;
         for (itItem = dynamicRefreshTasks_.begin(); itItem != dynamicRefreshTasks_.end();) {
             if (itItem->settedTime <= updateTime || itItem->settedTime <= markedTime) {
                 if (refreshLimiter_.IsEnableRefresh(itItem->formId)) {
@@ -590,7 +588,7 @@ bool FormTimerMgr::OnDynamicTimeTrigger(int64_t updateTime)
                 itItem++;
             }
         }
-        std::sort(dynamicRefreshTasks_.begin(), dynamicRefreshTasks_.end(),  CompareDynamicRefreshItem);
+        dynamicRefreshTasks_.sort(CompareDynamicRefreshItem);
     }
 
     if (!UpdateDynamicAlarm()) {
@@ -701,7 +699,7 @@ bool FormTimerMgr::GetDynamicItem(int64_t formId, DynamicRefreshItem &dynamicIte
 {
     HILOG_INFO("%{public}s start", __func__);
     std::lock_guard<std::recursive_mutex> lock(dynamicMutex_);
-    std::vector<DynamicRefreshItem>::iterator itItem;
+    std::list<DynamicRefreshItem>::iterator itItem;
     for (itItem = dynamicRefreshTasks_.begin(); itItem != dynamicRefreshTasks_.end();) {
         if (itItem->formId == formId) {
             dynamicItem.formId = itItem->formId;
@@ -781,7 +779,7 @@ bool FormTimerMgr::DeleteDynamicItem(int64_t formId)
 {
     HILOG_INFO("%{public}s start", __func__);
     std::lock_guard<std::recursive_mutex> lock(dynamicMutex_);
-    std::vector<DynamicRefreshItem>::iterator itItem;
+    std::list<DynamicRefreshItem>::iterator itItem;
     for (itItem = dynamicRefreshTasks_.begin(); itItem != dynamicRefreshTasks_.end();) {
         if (itItem->formId == formId) {
             itItem = dynamicRefreshTasks_.erase(itItem);
@@ -792,7 +790,7 @@ bool FormTimerMgr::DeleteDynamicItem(int64_t formId)
         }
         ++itItem;
     }
-    std::sort(dynamicRefreshTasks_.begin(), dynamicRefreshTasks_.end(),  CompareDynamicRefreshItem);
+    dynamicRefreshTasks_.sort(CompareDynamicRefreshItem);
 
     if (!UpdateDynamicAlarm()) {
         HILOG_ERROR("%{public}s, failed to UpdateDynamicAlarm", __func__);
@@ -899,8 +897,7 @@ bool FormTimerMgr::UpdateAtTimerAlarm()
     if (currentUpdateAtWantAgent_ != nullptr) {
         ClearUpdateAtTimerResource();
     }
-    auto timeSinceEpoch = GetBootTimeNs().time_since_epoch();
-    int64_t timeInSec = std::chrono::duration_cast<std::chrono::milliseconds>(timeSinceEpoch).count();
+    int64_t timeInSec = GetBootTimeMs();
     HILOG_DEBUG("timeInSec: %{public}" PRId64 ".", timeInSec);
     int64_t nextTime = timeInSec + (selectTime - currentTime);
     HILOG_INFO("%{public}s, nextTime: %{public}" PRId64 ".", __func__, nextTime);
@@ -918,17 +915,19 @@ bool FormTimerMgr::UpdateAtTimerAlarm()
     return true;
 }
 
-std::chrono::steady_clock::time_point FormTimerMgr::GetBootTimeNs()
+int64_t FormTimerMgr::GetBootTimeMs()
 {
     int64_t timeNow = -1;
     struct timespec tv {};
     if (clock_gettime(CLOCK_BOOTTIME, &tv) < 0) {
         HILOG_WARN("Get bootTime by clock_gettime failed, use std::chrono::steady_clock");
-        return std::chrono::steady_clock::now();
+        auto timeSinceEpoch = std::chrono::steady_clock::now().time_since_epoch();
+        return std::chrono::duration_cast<std::chrono::milliseconds>(timeSinceEpoch).count();
     }
     timeNow = tv.tv_sec * NANO_TO_SECOND + tv.tv_nsec;
     std::chrono::steady_clock::time_point tp_epoch ((std::chrono::nanoseconds(timeNow)));
-    return tp_epoch;
+    auto timeSinceEpoch = tp_epoch.time_since_epoch();
+    return std::chrono::duration_cast<std::chrono::milliseconds>(timeSinceEpoch).count();
 }
 
 /**
@@ -1079,24 +1078,18 @@ bool FormTimerMgr::UpdateDynamicAlarm()
         return true;
     }
 
-    bool needUpdate = false;
-    DynamicRefreshItem firstTask = dynamicRefreshTasks_.at(0);
-    if (dynamicWakeUpTime_ != firstTask.settedTime) {
-        dynamicWakeUpTime_ = firstTask.settedTime;
-        needUpdate = true;
-    }
-
-    if (!needUpdate) {
+    if (!IsNeedUpdate()) {
         HILOG_ERROR("%{public}s failed, no need to  UpdateDynamicAlarm.", __func__);
         return true;
     }
 
+    auto firstTask = dynamicRefreshTasks_.begin();
     auto timerOption = std::make_shared<FormTimerOption>();
     timerOption->SetType(((unsigned int)(timerOption->TIMER_TYPE_REALTIME))
      | ((unsigned int)(timerOption->TIMER_TYPE_WAKEUP)));
     timerOption->SetRepeat(false);
     timerOption->SetInterval(0);
-    std::shared_ptr<WantAgent> wantAgent = GetDynamicWantAgent(dynamicWakeUpTime_, firstTask.userId);
+    std::shared_ptr<WantAgent> wantAgent = GetDynamicWantAgent(dynamicWakeUpTime_, firstTask->userId);
     if (!wantAgent) {
         HILOG_ERROR("%{public}s, failed to create wantAgent.", __func__);
         return false;
@@ -1117,6 +1110,27 @@ bool FormTimerMgr::UpdateDynamicAlarm()
     HILOG_INFO("%{public}s end, dynamicWakeUpTime_ : %{public}" PRId64 ".", __func__, dynamicWakeUpTime_);
     return true;
 }
+
+bool FormTimerMgr::IsNeedUpdate()
+{
+    auto firstTask = dynamicRefreshTasks_.begin();
+    if (dynamicWakeUpTime_ != firstTask->settedTime) {
+        dynamicWakeUpTime_ = firstTask->settedTime;
+        return true;
+    }
+    if (dynamicWakeUpTime_ == firstTask->settedTime &&
+        GetBootTimeMs() - Constants::ABS_REFRESH_MS > dynamicWakeUpTime_) {
+        HILOG_WARN("The dynamicWakeUpTime_ is invalid, dynamicWakeUpTime_ is less than currentTime, remove it.");
+        firstTask = dynamicRefreshTasks_.erase(dynamicRefreshTasks_.begin());
+        if (firstTask == dynamicRefreshTasks_.end()) {
+            return false;
+        }
+        dynamicWakeUpTime_ = firstTask->settedTime;
+        return true;
+    }
+    return false;
+}
+
 /**
  * @brief Get WantAgent.
  * @param nextTime The next update time.

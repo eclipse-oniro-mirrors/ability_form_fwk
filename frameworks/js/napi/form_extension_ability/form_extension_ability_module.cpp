@@ -25,8 +25,8 @@ void NAPI_app_form_FormExtensionAbility_AutoRegister()
 {
     auto moduleManager = NativeModuleManager::GetInstance();
     NativeModule newModuleInfo = {
-        .name = "app.ability.FormExtensionAbility",
-        .fileName = "app/ability/libformextensionability_napi.so/FormExtension.js",
+        .name = "app.form.FormExtensionAbility",
+        .fileName = "app/form/libformextensionability_napi.so/FormExtension.js",
     };
 
     moduleManager->Register(&newModuleInfo);

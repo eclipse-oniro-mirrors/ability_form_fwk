@@ -111,6 +111,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_004, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRenderRecordTest_004 start";
     auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    ASSERT_NE(nullptr, formRenderRecord);
     int64_t formId = 1;
     std::string compId = "compId";
     bool isRenderGroupEmpty = true;
@@ -330,7 +331,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_017, TestSize.Level0)
     std::shared_ptr<AbilityRuntime::Context> context = nullptr;
     std::shared_ptr<AbilityRuntime::Runtime> runtime = nullptr;
     formRenderRecord->GetFormRendererGroup(formJsInfo, context, runtime);
-    EXPECT_EQ(true, formRenderRecord->HandleDeleteInJsThread(formId, compId));
+    EXPECT_EQ(false, formRenderRecord->HandleDeleteInJsThread(formId, compId));
     GTEST_LOG_(INFO) << "FormRenderRecordTest_017 end";
 }
 
@@ -366,6 +367,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_019, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRenderRecordTest_019 start";
     auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    ASSERT_NE(nullptr, formRenderRecord);
     formRenderRecord->hapPath_ = "";
     formRenderRecord->ReleaseHapFileHandle();
     GTEST_LOG_(INFO) << "FormRenderRecordTest_019 end";
@@ -380,6 +382,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_020, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRenderRecordTest_020 start";
     auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    ASSERT_NE(nullptr, formRenderRecord);
     formRenderRecord->hapPath_ = "hapPath";
     formRenderRecord->ReleaseHapFileHandle();
     GTEST_LOG_(INFO) << "FormRenderRecordTest_020 end";
@@ -471,6 +474,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_025, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRenderRecordTest_025 start";
     auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    ASSERT_NE(nullptr, formRenderRecord);
     FormJsInfo formJsInfo;
     formJsInfo.formId = 1;
     Want want;

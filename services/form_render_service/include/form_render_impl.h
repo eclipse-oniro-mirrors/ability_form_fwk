@@ -80,9 +80,12 @@ public:
      */
     void OnConfigurationUpdated(const std::shared_ptr<OHOS::AppExecFwk::Configuration>& configuration);
 
+    void SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration>& config);
+
 private:
     std::mutex renderRecordMutex_;
     std::unordered_map<std::string, std::shared_ptr<FormRenderRecord>> renderRecordMap_; // <uid(userId + bundleName), renderRecord>
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration_;
 };
 } // namespace FormRender
 } // namespace AppExecFwk

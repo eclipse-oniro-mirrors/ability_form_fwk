@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -146,11 +146,12 @@ HWTEST_F(FormBatchDeleteConnectionTest, FormEventNotifyConnection_0002, TestSize
 HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0003, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormTaskMgr_0003 start";
-    FormTaskMgr formTaskMgr;
+    std::shared_ptr<FormTaskMgr> formTaskMgr = std::make_shared<FormTaskMgr>();
+    ASSERT_NE(nullptr, formTaskMgr);
     int64_t formId = 2;
     FormRecord record;
     sptr<IRemoteObject> remoteObject = nullptr;
-    formTaskMgr.PostAcquireTaskToHost(formId, record, remoteObject);
+    formTaskMgr->PostAcquireTaskToHost(formId, record, remoteObject);
     GTEST_LOG_(INFO) << "FormTaskMgr_0003 end";
 }
 
@@ -162,11 +163,12 @@ HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0003, TestSize.Level0)
 HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0004, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormTaskMgr_0004 start";
-    FormTaskMgr formTaskMgr;
+    std::shared_ptr<FormTaskMgr> formTaskMgr = std::make_shared<FormTaskMgr>();
+    ASSERT_NE(nullptr, formTaskMgr);
     int64_t formId = 2;
     FormRecord record;
     sptr<IRemoteObject> remoteObject = nullptr;
-    formTaskMgr.PostUpdateTaskToHost(formId, record, remoteObject);
+    formTaskMgr->PostUpdateTaskToHost(formId, record, remoteObject);
     GTEST_LOG_(INFO) << "FormTaskMgr_0004 end";
 }
 
@@ -178,13 +180,14 @@ HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0004, TestSize.Level0)
 HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0005, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormTaskMgr_0005 start";
-    FormTaskMgr formTaskMgr;
+    std::shared_ptr<FormTaskMgr> formTaskMgr = std::make_shared<FormTaskMgr>();
+    ASSERT_NE(nullptr, formTaskMgr);
     std::shared_ptr<FormEventHandler> handler = std::make_shared<FormEventHandler>(EventRunner::Create());
-    formTaskMgr.SetEventHandler(handler);
+    formTaskMgr->SetEventHandler(handler);
     int64_t formId = 2;
     FormRecord record;
     sptr<IRemoteObject> remoteObject = nullptr;
-    formTaskMgr.PostUpdateTaskToHost(formId, record, remoteObject);
+    formTaskMgr->PostUpdateTaskToHost(formId, record, remoteObject);
     GTEST_LOG_(INFO) << "FormTaskMgr_0005 end";
 }
 
@@ -196,11 +199,12 @@ HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0005, TestSize.Level0)
 HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0006, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormTaskMgr_0006 start";
-    FormTaskMgr formTaskMgr;
+    std::shared_ptr<FormTaskMgr> formTaskMgr = std::make_shared<FormTaskMgr>();
+    ASSERT_NE(nullptr, formTaskMgr);
     int64_t formId = 2;
     Want want;
     sptr<IRemoteObject> remoteObject = nullptr;
-    formTaskMgr.PostDeleteTask(formId, want, remoteObject);
+    formTaskMgr->PostDeleteTask(formId, want, remoteObject);
     GTEST_LOG_(INFO) << "FormTaskMgr_0006 end";
 }
 
@@ -212,11 +216,12 @@ HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0006, TestSize.Level0)
 HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0007, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormTaskMgr_0007 start";
-    FormTaskMgr formTaskMgr;
+    std::shared_ptr<FormTaskMgr> formTaskMgr = std::make_shared<FormTaskMgr>();
+    ASSERT_NE(nullptr, formTaskMgr);
     int64_t formId = 2;
     Want want;
     sptr<IRemoteObject> remoteObject = nullptr;
-    formTaskMgr.PostRefreshTask(formId, want, remoteObject);
+    formTaskMgr->PostRefreshTask(formId, want, remoteObject);
     GTEST_LOG_(INFO) << "FormTaskMgr_0007 end";
 }
 
@@ -228,13 +233,14 @@ HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0007, TestSize.Level0)
 HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0008, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormTaskMgr_0008 start";
-    FormTaskMgr formTaskMgr;
+    std::shared_ptr<FormTaskMgr> formTaskMgr = std::make_shared<FormTaskMgr>();
+    ASSERT_NE(nullptr, formTaskMgr);
     std::shared_ptr<FormEventHandler> handler = std::make_shared<FormEventHandler>(EventRunner::Create());
-    formTaskMgr.SetEventHandler(handler);
+    formTaskMgr->SetEventHandler(handler);
     int64_t formId = 2;
     Want want;
     sptr<IRemoteObject> remoteObject = nullptr;
-    formTaskMgr.PostRefreshTask(formId, want, remoteObject);
+    formTaskMgr->PostRefreshTask(formId, want, remoteObject);
     GTEST_LOG_(INFO) << "FormTaskMgr_0008 end";
 }
 
@@ -246,9 +252,10 @@ HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0008, TestSize.Level0)
 HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0009, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormTaskMgr_0009 start";
-    FormTaskMgr formTaskMgr;
+    std::shared_ptr<FormTaskMgr> formTaskMgr = std::make_shared<FormTaskMgr>();
+    ASSERT_NE(nullptr, formTaskMgr);
     sptr<IRemoteObject> remoteObject = nullptr;
-    formTaskMgr.PostHostDiedTask(remoteObject);
+    formTaskMgr->PostHostDiedTask(remoteObject);
     GTEST_LOG_(INFO) << "FormTaskMgr_0009 end";
 }
 
@@ -260,14 +267,15 @@ HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0009, TestSize.Level0)
 HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0010, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormTaskMgr_0010 start";
-    FormTaskMgr formTaskMgr;
+    std::shared_ptr<FormTaskMgr> formTaskMgr = std::make_shared<FormTaskMgr>();
+    ASSERT_NE(nullptr, formTaskMgr);
     int64_t formId = 2;
     std::vector<int64_t> formEvent;
     formEvent.emplace_back(formId);
     int32_t formVisibleType = 1;
     Want want;
     sptr<IRemoteObject> remoteObject = nullptr;
-    formTaskMgr.PostEventNotifyTask(formEvent, formVisibleType, want, remoteObject);
+    formTaskMgr->PostEventNotifyTask(formEvent, formVisibleType, want, remoteObject);
     GTEST_LOG_(INFO) << "FormTaskMgr_0010 end";
 }
 
@@ -279,16 +287,17 @@ HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0010, TestSize.Level0)
 HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0011, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormTaskMgr_0011 start";
-    FormTaskMgr formTaskMgr;
+    std::shared_ptr<FormTaskMgr> formTaskMgr = std::make_shared<FormTaskMgr>();
+    ASSERT_NE(nullptr, formTaskMgr);
     std::shared_ptr<FormEventHandler> handler = std::make_shared<FormEventHandler>(EventRunner::Create());
-    formTaskMgr.SetEventHandler(handler);
+    formTaskMgr->SetEventHandler(handler);
     int64_t formId = 2;
     std::vector<int64_t> formEvent;
     formEvent.emplace_back(formId);
     int32_t formVisibleType = 1;
     Want want;
     sptr<IRemoteObject> remoteObject = nullptr;
-    formTaskMgr.PostEventNotifyTask(formEvent, formVisibleType, want, remoteObject);
+    formTaskMgr->PostEventNotifyTask(formEvent, formVisibleType, want, remoteObject);
     GTEST_LOG_(INFO) << "FormTaskMgr_0011 end";
 }
 
@@ -300,13 +309,14 @@ HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0011, TestSize.Level0)
 HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0012, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormTaskMgr_0012 start";
-    FormTaskMgr formTaskMgr;
+    std::shared_ptr<FormTaskMgr> formTaskMgr = std::make_shared<FormTaskMgr>();
+    ASSERT_NE(nullptr, formTaskMgr);
     int64_t formId = 2;
     std::set<int64_t> formIds;
     formIds.insert(formId);
     Want want;
     sptr<IRemoteObject> remoteObject = nullptr;
-    formTaskMgr.PostProviderBatchDeleteTask(formIds, want, remoteObject);
+    formTaskMgr->PostProviderBatchDeleteTask(formIds, want, remoteObject);
     GTEST_LOG_(INFO) << "FormTaskMgr_0012 end";
 }
 
@@ -320,6 +330,7 @@ HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0013, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormTaskMgr_0013 start";
     FormTaskMgr formTaskMgr;
     std::shared_ptr<FormEventHandler> handler = std::make_shared<FormEventHandler>(EventRunner::Create());
+    ASSERT_NE(nullptr, handler);
     formTaskMgr.SetEventHandler(handler);
     int64_t formId = 2;
     std::set<int64_t> formIds;
@@ -338,12 +349,13 @@ HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0013, TestSize.Level0)
 HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0014, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormTaskMgr_0014 start";
-    FormTaskMgr formTaskMgr;
+    std::shared_ptr<FormTaskMgr> formTaskMgr = std::make_shared<FormTaskMgr>();
+    ASSERT_NE(nullptr, formTaskMgr);
     int64_t formId = 2;
     std::string message = "aa";
     Want want;
     sptr<IRemoteObject> remoteObject = nullptr;
-    formTaskMgr.PostFormEventTask(formId, message, want, remoteObject);
+    formTaskMgr->PostFormEventTask(formId, message, want, remoteObject);
     GTEST_LOG_(INFO) << "FormTaskMgr_0014 end";
 }
 
@@ -355,14 +367,15 @@ HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0014, TestSize.Level0)
 HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0015, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormTaskMgr_0015 start";
-    FormTaskMgr formTaskMgr;
+    std::shared_ptr<FormTaskMgr> formTaskMgr = std::make_shared<FormTaskMgr>();
+    ASSERT_NE(nullptr, formTaskMgr);
     std::shared_ptr<FormEventHandler> handler = std::make_shared<FormEventHandler>(EventRunner::Create());
-    formTaskMgr.SetEventHandler(handler);
+    formTaskMgr->SetEventHandler(handler);
     int64_t formId = 2;
     std::string message = "aa";
     Want want;
     sptr<IRemoteObject> remoteObject = nullptr;
-    formTaskMgr.PostFormEventTask(formId, message, want, remoteObject);
+    formTaskMgr->PostFormEventTask(formId, message, want, remoteObject);
     GTEST_LOG_(INFO) << "FormTaskMgr_0015 end";
 }
 
@@ -374,12 +387,13 @@ HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0015, TestSize.Level0)
 HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0016, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormTaskMgr_0016 start";
-    FormTaskMgr formTaskMgr;
+    std::shared_ptr<FormTaskMgr> formTaskMgr = std::make_shared<FormTaskMgr>();
+    ASSERT_NE(nullptr, formTaskMgr);
     Want wantArg;
-    std::string provider = "aa";
+    std::string state = "aa";
     Want want;
     sptr<IRemoteObject> remoteObject = nullptr;
-    formTaskMgr.PostAcquireStateTask(wantArg, provider, want, remoteObject);
+    formTaskMgr->PostAcquireStateTask(wantArg, state, want, remoteObject);
     GTEST_LOG_(INFO) << "FormTaskMgr_0016 end";
 }
 
@@ -391,14 +405,15 @@ HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0016, TestSize.Level0)
 HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0017, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormTaskMgr_0017 start";
-    FormTaskMgr formTaskMgr;
+    std::shared_ptr<FormTaskMgr> formTaskMgr = std::make_shared<FormTaskMgr>();
+    ASSERT_NE(nullptr, formTaskMgr);
     std::shared_ptr<FormEventHandler> handler = std::make_shared<FormEventHandler>(EventRunner::Create());
-    formTaskMgr.SetEventHandler(handler);
+    formTaskMgr->SetEventHandler(handler);
     Want wantArg;
-    std::string provider = "aa";
+    std::string state = "aa";
     Want want;
     sptr<IRemoteObject> remoteObject = nullptr;
-    formTaskMgr.PostAcquireStateTask(wantArg, provider, want, remoteObject);
+    formTaskMgr->PostAcquireStateTask(wantArg, state, want, remoteObject);
     GTEST_LOG_(INFO) << "FormTaskMgr_0017 end";
 }
 
@@ -410,12 +425,13 @@ HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0017, TestSize.Level0)
 HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0018, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormTaskMgr_0018 start";
-    FormTaskMgr formTaskMgr;
+    std::shared_ptr<FormTaskMgr> formTaskMgr = std::make_shared<FormTaskMgr>();
+    ASSERT_NE(nullptr, formTaskMgr);
     int64_t formId = 3;
     std::vector<int64_t> formIds;
     formIds.emplace_back(formId);
     sptr<IRemoteObject> remoteObject = nullptr;
-    formTaskMgr.PostUninstallTaskToHost(formIds, remoteObject);
+    formTaskMgr->PostUninstallTaskToHost(formIds, remoteObject);
     GTEST_LOG_(INFO) << "FormTaskMgr_0018 end";
 }
 
@@ -427,11 +443,12 @@ HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0018, TestSize.Level0)
 HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0019, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormTaskMgr_0019 start";
-    FormTaskMgr formTaskMgr;
+    std::shared_ptr<FormTaskMgr> formTaskMgr = std::make_shared<FormTaskMgr>();
+    ASSERT_NE(nullptr, formTaskMgr);
     AppExecFwk::FormState state = AppExecFwk::FormState::UNKNOWN;
     AAFwk::Want want;
     sptr<IRemoteObject> remoteObject;
-    formTaskMgr.PostAcquireStateTaskToHost(state, want, remoteObject);
+    formTaskMgr->PostAcquireStateTaskToHost(state, want, remoteObject);
     GTEST_LOG_(INFO) << "FormTaskMgr_0019 end";
 }
 
@@ -443,13 +460,14 @@ HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0019, TestSize.Level0)
 HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0020, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormTaskMgr_0020 start";
-    FormTaskMgr formTaskMgr;
+    std::shared_ptr<FormTaskMgr> formTaskMgr = std::make_shared<FormTaskMgr>();
+    ASSERT_NE(nullptr, formTaskMgr);
     std::shared_ptr<FormEventHandler> handler = std::make_shared<FormEventHandler>(EventRunner::Create());
-    formTaskMgr.SetEventHandler(handler);
+    formTaskMgr->SetEventHandler(handler);
     AppExecFwk::FormState state = AppExecFwk::FormState::UNKNOWN;
     AAFwk::Want want;
     sptr<IRemoteObject> remoteObject;
-    formTaskMgr.PostAcquireStateTaskToHost(state, want, remoteObject);
+    formTaskMgr->PostAcquireStateTaskToHost(state, want, remoteObject);
     GTEST_LOG_(INFO) << "FormTaskMgr_0020 end";
 }
 
@@ -461,10 +479,11 @@ HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0020, TestSize.Level0)
 HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0021, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormTaskMgr_0021 start";
-    FormTaskMgr formTaskMgr;
+    std::shared_ptr<FormTaskMgr> formTaskMgr = std::make_shared<FormTaskMgr>();
+    ASSERT_NE(nullptr, formTaskMgr);
     int64_t formShareRequestCode = 1;
     int32_t result = 2;
-    formTaskMgr.PostFormShareSendResponse(formShareRequestCode, result);
+    formTaskMgr->PostFormShareSendResponse(formShareRequestCode, result);
     GTEST_LOG_(INFO) << "FormTaskMgr_0021 end";
 }
 
@@ -476,12 +495,13 @@ HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0021, TestSize.Level0)
 HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0022, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormTaskMgr_0022 start";
-    FormTaskMgr formTaskMgr;
+    std::shared_ptr<FormTaskMgr> formTaskMgr = std::make_shared<FormTaskMgr>();
+    ASSERT_NE(nullptr, formTaskMgr);
     std::shared_ptr<FormEventHandler> handler = std::make_shared<FormEventHandler>(EventRunner::Create());
-    formTaskMgr.SetEventHandler(handler);
+    formTaskMgr->SetEventHandler(handler);
     int64_t formShareRequestCode = 1;
     int32_t result = 2;
-    formTaskMgr.PostFormShareSendResponse(formShareRequestCode, result);
+    formTaskMgr->PostFormShareSendResponse(formShareRequestCode, result);
     GTEST_LOG_(INFO) << "FormTaskMgr_0022 end";
 }
 
@@ -493,11 +513,12 @@ HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0022, TestSize.Level0)
 HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0023, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormTaskMgr_0023 start";
-    FormTaskMgr formTaskMgr;
+    std::shared_ptr<FormTaskMgr> formTaskMgr = std::make_shared<FormTaskMgr>();
+    ASSERT_NE(nullptr, formTaskMgr);
     int64_t formId = 1;
     Want want;
     sptr<IRemoteObject> remoteObject = nullptr;
-    formTaskMgr.NotifyFormUpdate(formId, want, remoteObject);
+    formTaskMgr->NotifyFormUpdate(formId, want, remoteObject);
     GTEST_LOG_(INFO) << "FormTaskMgr_0023 end";
 }
 
@@ -509,11 +530,12 @@ HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0023, TestSize.Level0)
 HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0024, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormTaskMgr_0024 start";
-    FormTaskMgr formTaskMgr;
+    std::shared_ptr<FormTaskMgr> formTaskMgr = std::make_shared<FormTaskMgr>();
+    ASSERT_NE(nullptr, formTaskMgr);
     int64_t formId = 1;
     Want want;
     sptr<IRemoteObject> remoteObject = new (std::nothrow) MockFormProviderClient();
-    formTaskMgr.NotifyFormUpdate(formId, want, remoteObject);
+    formTaskMgr->NotifyFormUpdate(formId, want, remoteObject);
     GTEST_LOG_(INFO) << "FormTaskMgr_0024 end";
 }
 

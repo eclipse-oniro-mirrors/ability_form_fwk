@@ -58,6 +58,7 @@ HWTEST_F(FmsFormRenderConnectionTest, FormRenderConnection_001, TestSize.Level0)
     FormRecord formRecord;
     WantParams wantParams;
     auto formRenderConnection = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
+    ASSERT_NE(nullptr, formRenderConnection);
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;
     int resultCode = 100;
@@ -76,6 +77,7 @@ HWTEST_F(FmsFormRenderConnectionTest, FormRenderConnection_002, TestSize.Level0)
     FormRecord formRecord;
     WantParams wantParams;
     auto formRenderConnection = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
+    ASSERT_NE(nullptr, formRenderConnection);
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;
     int resultCode = ERR_OK;
@@ -95,6 +97,7 @@ HWTEST_F(FmsFormRenderConnectionTest, FormRenderConnection_003, TestSize.Level0)
     FormRecord formRecord;
     WantParams wantParams;
     auto formRenderConnection = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
+    ASSERT_NE(nullptr, formRenderConnection);
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;
     int resultCode = ERR_OK;
@@ -114,6 +117,7 @@ HWTEST_F(FmsFormRenderConnectionTest, FormRenderConnection_004, TestSize.Level0)
     FormRecord formRecord;
     WantParams wantParams;
     auto formRenderConnection = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
+    ASSERT_NE(nullptr, formRenderConnection);
     // set connectState_ is ConnectState::CONNECTING
     formRenderConnection->SetStateConnecting();
     AppExecFwk::ElementName element;
@@ -133,6 +137,7 @@ HWTEST_F(FmsFormRenderConnectionTest, FormRenderConnection_005, TestSize.Level0)
     FormRecord formRecord;
     WantParams wantParams;
     auto formRenderConnection = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
+    ASSERT_NE(nullptr, formRenderConnection);
     // set connectState_ is ConnectState::DISCONNECTED
     formRenderConnection->SetStateDisconnected();
     AppExecFwk::ElementName element;
@@ -152,6 +157,7 @@ HWTEST_F(FmsFormRenderConnectionTest, FormRenderConnection_006, TestSize.Level0)
     FormRecord formRecord;
     WantParams wantParams;
     auto formRenderConnection = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
+    ASSERT_NE(nullptr, formRenderConnection);
     // set connectState_ is ConnectState::DISCONNECTED
     formRenderConnection->SetStateDisconnected();
     AppExecFwk::ElementName element;
@@ -171,6 +177,7 @@ HWTEST_F(FmsFormRenderConnectionTest, FormRenderConnection_007, TestSize.Level0)
     FormRecord formRecord;
     WantParams wantParams;
     auto formRenderConnection = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
+    ASSERT_NE(nullptr, formRenderConnection);
     // set connectState_ is ConnectState::CONNECTING
     formRenderConnection->SetStateConnecting();
     AppExecFwk::ElementName element;
@@ -190,6 +197,7 @@ HWTEST_F(FmsFormRenderConnectionTest, FormRenderConnection_008, TestSize.Level0)
     FormRecord formRecord;
     WantParams wantParams;
     auto formRenderConnection = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
+    ASSERT_NE(nullptr, formRenderConnection);
     formRenderConnection->UpdateWantParams(wantParams);
     GTEST_LOG_(INFO) << "FormRenderConnection_008 end";
 }

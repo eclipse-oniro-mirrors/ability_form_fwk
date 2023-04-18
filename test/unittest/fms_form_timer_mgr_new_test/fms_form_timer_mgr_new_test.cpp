@@ -56,9 +56,10 @@ void FmsFormTimerMgrTest::TearDown() {}
 HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0091, Function | MediumTest | Level1)
 {
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0091 start";
-    FormTimerMgr formTimerMgr;
+    std::shared_ptr<FormTimerMgr> formTimerMgr = std::make_shared<FormTimerMgr>();
+    ASSERT_NE(nullptr, formTimerMgr);
     int64_t formId = 0;
-    formTimerMgr.IsLimiterEnableRefresh(formId);
+    formTimerMgr->IsLimiterEnableRefresh(formId);
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0091 end";
 }
 
@@ -76,6 +77,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0092, Function | MediumTest | Lev
     want.SetAction(action);
     eventData.SetWant(want);
     std::shared_ptr<FormTimerMgr::TimerReceiver> timeReceiver = std::make_shared<FormTimerMgr::TimerReceiver>();
+    ASSERT_NE(nullptr, timeReceiver);
     timeReceiver->OnReceiveEvent(eventData);
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0092 end";
 }
@@ -94,6 +96,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0093, Function | MediumTest | Lev
     want.SetAction(action);
     eventData.SetWant(want);
     std::shared_ptr<FormTimerMgr::TimerReceiver> timeReceiver = std::make_shared<FormTimerMgr::TimerReceiver>();
+    ASSERT_NE(nullptr, timeReceiver);
     timeReceiver->OnReceiveEvent(eventData);
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0093 end";
 }
@@ -112,6 +115,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0094, Function | MediumTest | Lev
     want.SetAction(action);
     eventData.SetWant(want);
     std::shared_ptr<FormTimerMgr::TimerReceiver> timeReceiver = std::make_shared<FormTimerMgr::TimerReceiver>();
+    ASSERT_NE(nullptr, timeReceiver);
     timeReceiver->OnReceiveEvent(eventData);
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0094 end";
 }
@@ -130,6 +134,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0095, Function | MediumTest | Lev
     want.SetAction(action);
     eventData.SetWant(want);
     std::shared_ptr<FormTimerMgr::TimerReceiver> timeReceiver = std::make_shared<FormTimerMgr::TimerReceiver>();
+    ASSERT_NE(nullptr, timeReceiver);
     timeReceiver->OnReceiveEvent(eventData);
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0095 end";
 }
@@ -148,6 +153,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0096, Function | MediumTest | Lev
     want.SetAction(action);
     eventData.SetWant(want);
     std::shared_ptr<FormTimerMgr::TimerReceiver> timeReceiver = std::make_shared<FormTimerMgr::TimerReceiver>();
+    ASSERT_NE(nullptr, timeReceiver);
     timeReceiver->OnReceiveEvent(eventData);
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0096 end";
 }
@@ -167,6 +173,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0097, Function | MediumTest | Lev
     want.SetAction(action);
     eventData.SetWant(want);
     std::shared_ptr<FormTimerMgr::TimerReceiver> timeReceiver = std::make_shared<FormTimerMgr::TimerReceiver>();
+    ASSERT_NE(nullptr, timeReceiver);
     timeReceiver->OnReceiveEvent(eventData);
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0097 end";
 }
@@ -186,6 +193,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0098, Function | MediumTest | Lev
     want.SetAction(action);
     eventData.SetWant(want);
     std::shared_ptr<FormTimerMgr::TimerReceiver> timeReceiver = std::make_shared<FormTimerMgr::TimerReceiver>();
+    ASSERT_NE(nullptr, timeReceiver);
     timeReceiver->OnReceiveEvent(eventData);
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0098 end";
 }
@@ -206,6 +214,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0099, Function | MediumTest | Lev
     want.SetAction(action);
     eventData.SetWant(want);
     std::shared_ptr<FormTimerMgr::TimerReceiver> timeReceiver = std::make_shared<FormTimerMgr::TimerReceiver>();
+    ASSERT_NE(nullptr, timeReceiver);
     timeReceiver->OnReceiveEvent(eventData);
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0099 end";
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -751,11 +751,12 @@ HWTEST_F(FmsFormMgrMessageEventTest, FormDbCache_020, TestSize.Level0)
 HWTEST_F(FmsFormMgrMessageEventTest, FormAbilityConnection_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_001 start";
-    FormAbilityConnection formAbilityConnection;
+    std::shared_ptr<FormAbilityConnection> formAbilityConnection = std::make_shared<FormAbilityConnection>();
+    ASSERT_NE(nullptr, formAbilityConnection);
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;
     int resultCode = 2;
-    formAbilityConnection.OnAbilityConnectDone(element, remoteObject, resultCode);
+    formAbilityConnection->OnAbilityConnectDone(element, remoteObject, resultCode);
     GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_001 end";
 }
 
@@ -767,12 +768,13 @@ HWTEST_F(FmsFormMgrMessageEventTest, FormAbilityConnection_001, TestSize.Level0)
 HWTEST_F(FmsFormMgrMessageEventTest, FormAbilityConnection_002, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_002 start";
-    FormAbilityConnection formAbilityConnection;
+    std::shared_ptr<FormAbilityConnection> formAbilityConnection = std::make_shared<FormAbilityConnection>();
+    ASSERT_NE(nullptr, formAbilityConnection);
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;
     int resultCode = ERR_OK;
-    formAbilityConnection.isFreeInstall_ = false;
-    formAbilityConnection.OnAbilityConnectDone(element, remoteObject, resultCode);
+    formAbilityConnection->isFreeInstall_ = false;
+    formAbilityConnection->OnAbilityConnectDone(element, remoteObject, resultCode);
     GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_002 end";
 }
 
@@ -784,13 +786,14 @@ HWTEST_F(FmsFormMgrMessageEventTest, FormAbilityConnection_002, TestSize.Level0)
 HWTEST_F(FmsFormMgrMessageEventTest, FormAbilityConnection_003, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_003 start";
-    FormAbilityConnection formAbilityConnection;
+    std::shared_ptr<FormAbilityConnection> formAbilityConnection = std::make_shared<FormAbilityConnection>();
+    ASSERT_NE(nullptr, formAbilityConnection);
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;
     int resultCode = ERR_OK;
-    formAbilityConnection.isFreeInstall_ = true;
-    formAbilityConnection.bundleName_ = "";
-    formAbilityConnection.OnAbilityConnectDone(element, remoteObject, resultCode);
+    formAbilityConnection->isFreeInstall_ = true;
+    formAbilityConnection->bundleName_ = "";
+    formAbilityConnection->OnAbilityConnectDone(element, remoteObject, resultCode);
     GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_003 end";
 }
 
@@ -802,11 +805,12 @@ HWTEST_F(FmsFormMgrMessageEventTest, FormAbilityConnection_003, TestSize.Level0)
 HWTEST_F(FmsFormMgrMessageEventTest, FormAbilityConnection_004, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_004 start";
-    FormAbilityConnection formAbilityConnection;
+    std::shared_ptr<FormAbilityConnection> formAbilityConnection = std::make_shared<FormAbilityConnection>();
+    ASSERT_NE(nullptr, formAbilityConnection);
     AppExecFwk::ElementName element;
     int resultCode = 1;
-    formAbilityConnection.connectId_ = 0;
-    formAbilityConnection.OnAbilityDisconnectDone(element, resultCode);
+    formAbilityConnection->connectId_ = 0;
+    formAbilityConnection->OnAbilityDisconnectDone(element, resultCode);
     GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_004 end";
 }
 
@@ -818,11 +822,12 @@ HWTEST_F(FmsFormMgrMessageEventTest, FormAbilityConnection_004, TestSize.Level0)
 HWTEST_F(FmsFormMgrMessageEventTest, FormAbilityConnection_005, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_005 start";
-    FormAbilityConnection formAbilityConnection;
+    std::shared_ptr<FormAbilityConnection> formAbilityConnection = std::make_shared<FormAbilityConnection>();
+    ASSERT_NE(nullptr, formAbilityConnection);
     AppExecFwk::ElementName element;
     int resultCode = 1;
-    formAbilityConnection.connectId_ = 1;
-    formAbilityConnection.OnAbilityDisconnectDone(element, resultCode);
+    formAbilityConnection->connectId_ = 1;
+    formAbilityConnection->OnAbilityDisconnectDone(element, resultCode);
     GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_005 end";
 }
 
@@ -834,10 +839,11 @@ HWTEST_F(FmsFormMgrMessageEventTest, FormAbilityConnection_005, TestSize.Level0)
 HWTEST_F(FmsFormMgrMessageEventTest, FormAbilityConnection_006, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_006 start";
-    FormAbilityConnection formAbilityConnection;
+    std::shared_ptr<FormAbilityConnection> formAbilityConnection = std::make_shared<FormAbilityConnection>();
+    ASSERT_NE(nullptr, formAbilityConnection);
     wptr<IRemoteObject> remoteObject = nullptr;
-    formAbilityConnection.connectId_ = 0;
-    formAbilityConnection.OnConnectDied(remoteObject);
+    formAbilityConnection->connectId_ = 0;
+    formAbilityConnection->OnConnectDied(remoteObject);
     GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_006 end";
 }
 
@@ -849,10 +855,11 @@ HWTEST_F(FmsFormMgrMessageEventTest, FormAbilityConnection_006, TestSize.Level0)
 HWTEST_F(FmsFormMgrMessageEventTest, FormAbilityConnection_007, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_007 start";
-    FormAbilityConnection formAbilityConnection;
+    std::shared_ptr<FormAbilityConnection> formAbilityConnection = std::make_shared<FormAbilityConnection>();
+    ASSERT_NE(nullptr, formAbilityConnection);
     wptr<IRemoteObject> remoteObject = nullptr;
-    formAbilityConnection.connectId_ = 1;
-    formAbilityConnection.OnConnectDied(remoteObject);
+    formAbilityConnection->connectId_ = 1;
+    formAbilityConnection->OnConnectDied(remoteObject);
     GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_007 end";
 }
 
@@ -924,9 +931,10 @@ HWTEST_F(FmsFormMgrMessageEventTest, FormAbilityConnection_011, TestSize.Level0)
 HWTEST_F(FmsFormMgrMessageEventTest, FormAbilityConnection_012, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_012 start";
-    FormAbilityConnection formAbilityConnection;
+    std::shared_ptr<FormAbilityConnection> formAbilityConnection = std::make_shared<FormAbilityConnection>();
+    ASSERT_NE(nullptr, formAbilityConnection);
     int64_t formId = 0;
-    formAbilityConnection.SetFormId(formId);
+    formAbilityConnection->SetFormId(formId);
     GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_012 end";
 }
 
@@ -938,8 +946,9 @@ HWTEST_F(FmsFormMgrMessageEventTest, FormAbilityConnection_012, TestSize.Level1)
 HWTEST_F(FmsFormMgrMessageEventTest, FormAbilityConnection_013, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_013 start";
-    FormAbilityConnection formAbilityConnection;
-    formAbilityConnection.GetFormId();
+    std::shared_ptr<FormAbilityConnection> formAbilityConnection = std::make_shared<FormAbilityConnection>();
+    ASSERT_NE(nullptr, formAbilityConnection);
+    formAbilityConnection->GetFormId();
     GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_013 end";
 }
 
@@ -951,9 +960,10 @@ HWTEST_F(FmsFormMgrMessageEventTest, FormAbilityConnection_013, TestSize.Level1)
 HWTEST_F(FmsFormMgrMessageEventTest, FormAbilityConnection_014, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_014 start";
-    FormAbilityConnection formAbilityConnection;
+    std::shared_ptr<FormAbilityConnection> formAbilityConnection = std::make_shared<FormAbilityConnection>();
+    ASSERT_NE(nullptr, formAbilityConnection);
     sptr<IRemoteObject> hostToken = nullptr;
-    formAbilityConnection.SetHostToken(hostToken);
+    formAbilityConnection->SetHostToken(hostToken);
     GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_014 end";
 }
 
@@ -965,8 +975,9 @@ HWTEST_F(FmsFormMgrMessageEventTest, FormAbilityConnection_014, TestSize.Level1)
 HWTEST_F(FmsFormMgrMessageEventTest, FormAbilityConnection_015, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_015 start";
-    FormAbilityConnection formAbilityConnection;
-    formAbilityConnection.GetHostToken();
+    std::shared_ptr<FormAbilityConnection> formAbilityConnection = std::make_shared<FormAbilityConnection>();
+    ASSERT_NE(nullptr, formAbilityConnection);
+    formAbilityConnection->GetHostToken();
     GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_015 end";
 }
 
@@ -978,9 +989,10 @@ HWTEST_F(FmsFormMgrMessageEventTest, FormAbilityConnection_015, TestSize.Level1)
 HWTEST_F(FmsFormMgrMessageEventTest, FormAbilityConnection_016, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_016 start";
-    FormAbilityConnection formAbilityConnection;
+    std::shared_ptr<FormAbilityConnection> formAbilityConnection = std::make_shared<FormAbilityConnection>();
+    ASSERT_NE(nullptr, formAbilityConnection);
     sptr<IRemoteObject> providerToken;
-    formAbilityConnection.SetProviderToken(providerToken);
+    formAbilityConnection->SetProviderToken(providerToken);
     GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_016 end";
 }
 
@@ -992,8 +1004,9 @@ HWTEST_F(FmsFormMgrMessageEventTest, FormAbilityConnection_016, TestSize.Level1)
 HWTEST_F(FmsFormMgrMessageEventTest, FormAbilityConnection_017, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_017 start";
-    FormAbilityConnection formAbilityConnection;
-    formAbilityConnection.GetProviderToken();
+    std::shared_ptr<FormAbilityConnection> formAbilityConnection = std::make_shared<FormAbilityConnection>();
+    ASSERT_NE(nullptr, formAbilityConnection);
+    formAbilityConnection->GetProviderToken();
     GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_017 end";
 }
 
@@ -1007,6 +1020,7 @@ HWTEST_F(FmsFormMgrMessageEventTest, FormAbilityConnection_018, TestSize.Level1)
     GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_018 start";
     std::unordered_map<std::string, std::shared_ptr<BundleFormInfo>> bundleFormInfoMap;
     std::shared_ptr<BundleFormInfo> bundleFormInfo = std::make_shared<BundleFormInfo>("bundlename");
+    ASSERT_NE(nullptr, bundleFormInfo);
     FormAbilityConnection formAbilityConnection;
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;

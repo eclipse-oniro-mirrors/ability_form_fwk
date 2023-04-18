@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -436,8 +436,9 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CreateFormInfo_001, TestSize.Lev
     record.formTempFlag = true;
 
     FormJsInfo formInfo;
-
-    formDataMgr_.CreateFormJsInfo(formId, record, formInfo);
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    ASSERT_NE(nullptr, formDataMgr);
+    formDataMgr->CreateFormJsInfo(formId, record, formInfo);
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CreateFormInfo_001 output=>bundleName:"<<formInfo.bundleName
     <<"abilityName:"<<formInfo.abilityName<<"formName:"<<formInfo.formName<<"formTempFlag:"<<formInfo.formTempFlag;
@@ -1271,8 +1272,9 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetNeedRefresh_001, TestSize.Lev
 
     int64_t formId = 1;
     bool needRefresh = true;
-
-    formDataMgr_.SetNeedRefresh(formId, needRefresh);
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    ASSERT_NE(nullptr, formDataMgr);
+    formDataMgr->SetNeedRefresh(formId, needRefresh);
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetNeedRefresh_001 end";
 }
@@ -1317,8 +1319,9 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetCountTimerRefresh_001, TestSi
 
     int64_t formId = 1;
     bool countTimerRefresh = true;
-
-    formDataMgr_.SetCountTimerRefresh(formId, countTimerRefresh);
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    ASSERT_NE(nullptr, formDataMgr);
+    formDataMgr->SetCountTimerRefresh(formId, countTimerRefresh);
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetCountTimerRefresh_001 end";
 }
@@ -1463,7 +1466,9 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetEnableUpdate_001, TestSize.Le
     int64_t formId = 1;
     bool enableUpdate = true;
 
-    formDataMgr_.SetEnableUpdate(formId, enableUpdate);
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    ASSERT_NE(nullptr, formDataMgr);
+    formDataMgr->SetEnableUpdate(formId, enableUpdate);
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetEnableUpdate_001 end";
 }
@@ -1512,7 +1517,9 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetUpdateInfo_001, TestSize.Leve
     int updateAtHour = 24;
     int updateAtMin = 59;
 
-    formDataMgr_.SetUpdateInfo(formId, enableUpdate, updateDuration, updateAtHour, updateAtMin);
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    ASSERT_NE(nullptr, formDataMgr);
+    formDataMgr->SetUpdateInfo(formId, enableUpdate, updateDuration, updateAtHour, updateAtMin);
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetUpdateInfo_001 end";
 }
@@ -1733,8 +1740,9 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetFormCacheInited_001, TestSize
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetFormCacheInited_001 start";
 
     int64_t formId = 1;
-
-    formDataMgr_.SetFormCacheInited(formId, true);
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    ASSERT_NE(nullptr, formDataMgr);
+    formDataMgr->SetFormCacheInited(formId, true);
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetFormCacheInited_001 end";
 }
@@ -1779,8 +1787,9 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetVersionUpgrade_001, TestSize.
 
     int64_t formId = 1;
     bool version = true;
-
-    formDataMgr_.SetVersionUpgrade(formId, version);
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    ASSERT_NE(nullptr, formDataMgr);
+    formDataMgr->SetVersionUpgrade(formId, version);
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetVersionUpgrade_001 end";
 }

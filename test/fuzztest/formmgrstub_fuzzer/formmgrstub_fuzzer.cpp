@@ -174,6 +174,14 @@ public:
     {
         return false;
     }
+    int32_t GetFormsCount(bool isTempFormFlag, int32_t &formCount) override
+    {
+        return 0;
+    }
+    int32_t GetHostFormsCount(std::string &bundleName, int32_t &formCount) override
+    {
+        return 0;
+    }
 };
 
 uint32_t GetU32Data(const char* ptr)

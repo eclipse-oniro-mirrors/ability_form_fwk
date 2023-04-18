@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -141,11 +141,12 @@ HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0005, TestSize.Lev
     int64_t formId = 1;
     sptr<IRemoteObject> hostToken = new (std::nothrow) MockFormProviderClient();
     sptr<FormAbilityConnection> providerToken = new (std::nothrow) FormAbilityConnection();
-    FormSupplyCallback formSupplyCallback;
+    std::shared_ptr<FormSupplyCallback> formSupplyCallback = std::make_shared<FormSupplyCallback>();
+    ASSERT_NE(nullptr, formSupplyCallback);
     // add connection
-    formSupplyCallback.AddConnection(providerToken);
+    formSupplyCallback->AddConnection(providerToken);
     // test IsRemoveConnection function
-    formSupplyCallback.IsRemoveConnection(formId, hostToken);
+    formSupplyCallback->IsRemoveConnection(formId, hostToken);
     GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0005 end";
 }
 
@@ -228,11 +229,12 @@ HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0009, TestSize.Lev
 HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0010, TestSize.Level0)
 {
     HILOG_INFO("FormAcquireConnectionTest_0010 start");
-    FormEventHandler formEventHandler(nullptr);
+    std::shared_ptr<FormEventHandler> formEventHandler = std::make_shared<FormEventHandler>(nullptr);
+    ASSERT_NE(nullptr, formEventHandler);
     // emplace observer
-    formEventHandler.RegisterEventTimeoutObserver(nullptr);
+    formEventHandler->RegisterEventTimeoutObserver(nullptr);
     // text RegisterEventTimeoutObserver
-    formEventHandler.RegisterEventTimeoutObserver(nullptr);
+    formEventHandler->RegisterEventTimeoutObserver(nullptr);
 
     GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0010 end";
 }
@@ -245,9 +247,10 @@ HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0010, TestSize.Lev
 HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0011, TestSize.Level0)
 {
     HILOG_INFO("FormAcquireConnectionTest_0011 start");
-    FormEventHandler formEventHandler(nullptr);
+    std::shared_ptr<FormEventHandler> formEventHandler = std::make_shared<FormEventHandler>(nullptr);
+    ASSERT_NE(nullptr, formEventHandler);
     // text UnregisterEventTimeoutObserver
-    formEventHandler.UnregisterEventTimeoutObserver(nullptr);
+    formEventHandler->UnregisterEventTimeoutObserver(nullptr);
 
     GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0011 end";
 }
@@ -260,11 +263,12 @@ HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0011, TestSize.Lev
 HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0012, TestSize.Level0)
 {
     HILOG_INFO("FormAcquireConnectionTest_0012 start");
-    FormEventHandler formEventHandler(nullptr);
+    std::shared_ptr<FormEventHandler> formEventHandler = std::make_shared<FormEventHandler>(nullptr);
+    ASSERT_NE(nullptr, formEventHandler);
     // erase iter
-    formEventHandler.UnregisterEventTimeoutObserver(nullptr);
+    formEventHandler->UnregisterEventTimeoutObserver(nullptr);
     // text UnregisterEventTimeoutObserver
-    formEventHandler.UnregisterEventTimeoutObserver(nullptr);
+    formEventHandler->UnregisterEventTimeoutObserver(nullptr);
 
     GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0012 end";
 }
@@ -279,6 +283,7 @@ HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0013, TestSize.Lev
     GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0013 start";
     FormShareMgr* aa = new FormShareMgr();
     std::shared_ptr<FormEventHandler> handler = std::make_shared<FormEventHandler>(EventRunner::Create());
+    ASSERT_NE(nullptr, handler);
     DelayedSingleton<FormShareMgr>::GetInstance()->SetEventHandler(handler);
     delete aa;
     GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0013 start end";

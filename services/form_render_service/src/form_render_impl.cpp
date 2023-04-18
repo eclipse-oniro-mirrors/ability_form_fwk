@@ -80,6 +80,12 @@ int32_t FormRenderImpl::RenderForm(const FormJsInfo &formJsInfo, const Want &wan
             result = search->second->UpdateRenderRecord(formJsInfo, want, hostToken);
         } else {
             auto record = FormRenderRecord::Create(formJsInfo.bundleName, uid);
+            if (record == nullptr) {
+                HILOG_ERROR("record is nullptr");
+                return RENDER_FORM_FAILED;
+            }
+
+            record->SetConfiguration(configuration_);
             result = record->UpdateRenderRecord(formJsInfo, want, hostToken);
             renderRecordMap_.emplace(uid, record);
         }
@@ -179,11 +185,22 @@ void FormRenderImpl::OnConfigurationUpdated(
 {
     HILOG_INFO("OnConfigurationUpdated start");
     std::lock_guard<std::mutex> lock(renderRecordMutex_);
+    if (!configuration) {
+        HILOG_ERROR("configuration is nullptr");
+        return;
+    }
+
+    SetConfiguration(configuration);
     for (auto iter = renderRecordMap_.begin(); iter != renderRecordMap_.end(); ++iter) {
         if (iter->second) {
             iter->second->UpdateConfiguration(configuration);
         }
     }
+}
+
+void FormRenderImpl::SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration>& config)
+{
+    configuration_ = config;
 }
 } // namespace FormRender
 } // namespace AppExecFwk

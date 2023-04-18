@@ -259,6 +259,7 @@ HWTEST_F(FmsFormInfoStorageMgrTest, FmsFormInfoStorageMgrTest_012, TestSize.Leve
     MockGetSingleKvStore(true);
     FormInfoStorageMgr formInfoStorageMgr;
     std::shared_ptr<DistributedKv::SingleKvStore> kvStorePtr = std::make_shared<MockSingleKvStore>();
+    ASSERT_NE(nullptr, kvStorePtr);
     formInfoStorageMgr.kvStorePtr_ = kvStorePtr;
     auto func = [](){ return DistributedKv::Status::IPC_ERROR; };
     std::function<DistributedKv::Status()> f = func;
@@ -277,6 +278,7 @@ HWTEST_F(FmsFormInfoStorageMgrTest, FmsFormInfoStorageMgrTest_013, TestSize.Leve
     MockGetSingleKvStore(true);
     FormInfoStorageMgr formInfoStorageMgr;
     std::shared_ptr<DistributedKv::SingleKvStore> kvStorePtr = std::make_shared<MockSingleKvStore>();
+    ASSERT_NE(nullptr, kvStorePtr);
     formInfoStorageMgr.kvStorePtr_ = kvStorePtr;
     auto func = [](){ return DistributedKv::Status::SUCCESS; };
     std::function<DistributedKv::Status()> f = func;

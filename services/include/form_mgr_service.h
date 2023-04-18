@@ -365,6 +365,22 @@ public:
     * @return Return true if form manager service Ready; return false otherwise.
     */
     bool CheckFMSReady() override;
+
+    /**
+    * @brief get forms count.
+    * @param isTempFormFlag Indicates temp form or not.
+    * @param formCount Returns the number of the cast or temp form.
+    * @return Returns ERR_OK on success, others on failure.
+    */
+    int32_t GetFormsCount(bool isTempFormFlag, int32_t &formCount) override;
+
+    /**
+    * @brief get host forms count.
+    * @param bundleName Indicates form host bundleName.
+    * @param formCount Returns the number of the host form.
+    * @return Returns ERR_OK on success, others on failure.
+    */
+    int32_t GetHostFormsCount(std::string &bundleName, int32_t &formCount) override;
 private:
     enum class DumpKey {
         KEY_DUMP_HELP = 0,

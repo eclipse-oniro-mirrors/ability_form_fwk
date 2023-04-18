@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -876,9 +876,11 @@ HWTEST_F(FormMgrTest, FormMgrTest_0039, TestSize.Level1) {
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0040, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0040 starts";
-    FormMgr::GetInstance().RegisterDeathCallback(nullptr);
-    FormMgr::GetInstance().UnRegisterDeathCallback(nullptr);
-    FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
+    std::shared_ptr<FormMgr> formMgr = std::make_shared<FormMgr>();
+    ASSERT_NE(nullptr, formMgr);
+    formMgr->RegisterDeathCallback(nullptr);
+    formMgr->UnRegisterDeathCallback(nullptr);
+    formMgr->SetRecoverStatus(Constants::IN_RECOVERING);
     GTEST_LOG_(INFO) << "FormMgrTest_0040 test ends";
 }
 
@@ -1192,7 +1194,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0058, TestSize.Level1) {
     formJsInfo.formId = 0x00000008fffffffL;
     FormProviderData formProviderData = FormProviderData(std::string("{\"city\": \"beijing001\"}"));
     int32_t result = FormMgr::GetInstance().UpdateForm(formJsInfo.formId, formProviderData);
-    EXPECT_EQ(result, NEGATIVE_NUM); 
+    EXPECT_EQ(result, NEGATIVE_NUM);
     GTEST_LOG_(INFO) << "FormMgrTest_0058 test ends";
 }
 
@@ -1323,11 +1325,13 @@ HWTEST_F(FormMgrTest, FormMgrTest_0064, TestSize.Level1) {
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0065, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0065 starts";
+    std::shared_ptr<FormMgr> formMgr = std::make_shared<FormMgr>();
+    ASSERT_NE(nullptr, formMgr);
     std::shared_ptr<FormInterfaceCallbackTest> callback = std::make_shared<FormInterfaceCallbackTest>();
     std::shared_ptr<FormInterfaceCallbackTest> callback_first = std::make_shared<FormInterfaceCallbackTest>();
-    FormMgr::GetInstance().formDeathCallbacks_.emplace_back(callback);
-    FormMgr::GetInstance().formDeathCallbacks_.emplace_back(callback_first);
-    FormMgr::GetInstance().RegisterDeathCallback(callback);
+    formMgr->formDeathCallbacks_.emplace_back(callback);
+    formMgr->formDeathCallbacks_.emplace_back(callback_first);
+    formMgr->RegisterDeathCallback(callback);
     GTEST_LOG_(INFO) << "FormMgrTest_0065 test ends";
 }
 
@@ -1339,11 +1343,13 @@ HWTEST_F(FormMgrTest, FormMgrTest_0065, TestSize.Level1) {
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0066, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0066 starts";
+    std::shared_ptr<FormMgr> formMgr = std::make_shared<FormMgr>();
+    ASSERT_NE(nullptr, formMgr);
     std::shared_ptr<FormInterfaceCallbackTest> callback = std::make_shared<FormInterfaceCallbackTest>();
     std::shared_ptr<FormInterfaceCallbackTest> callback_first = std::make_shared<FormInterfaceCallbackTest>();
-    FormMgr::GetInstance().formDeathCallbacks_.emplace_back(callback);
-    FormMgr::GetInstance().formDeathCallbacks_.emplace_back(callback_first);
-    FormMgr::GetInstance().UnRegisterDeathCallback(callback);
+    formMgr->formDeathCallbacks_.emplace_back(callback);
+    formMgr->formDeathCallbacks_.emplace_back(callback_first);
+    formMgr->UnRegisterDeathCallback(callback);
     GTEST_LOG_(INFO) << "FormMgrTest_0066 test ends";
 }
 
@@ -1386,7 +1392,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0069, TestSize.Level1) {
     std::shared_ptr<FormInterfaceCallbackTest> callback_first = std::make_shared<FormInterfaceCallbackTest>();
     std::shared_ptr<FormInterfaceCallbackTest> callback_second = std::make_shared<FormInterfaceCallbackTest>();
     bool result = FormMgr::GetInstance().CheckIsDeathCallbackRegistered(callback_first);
-    EXPECT_TRUE(result == false);    
+    EXPECT_TRUE(result == false);
     FormMgr::GetInstance().formDeathCallbacks_.emplace_back(callback_first);
     FormMgr::GetInstance().formDeathCallbacks_.emplace_back(callback_second);
     bool data = FormMgr::GetInstance().CheckIsDeathCallbackRegistered(callback_first);
@@ -1405,7 +1411,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0070, TestSize.Level1) {
     std::shared_ptr<FormInterfaceCallbackTest> callback = std::make_shared<FormInterfaceCallbackTest>();
     std::shared_ptr<FormInterfaceCallbackTest> callback_first = std::make_shared<FormInterfaceCallbackTest>();
     std::shared_ptr<FormInterfaceCallbackTest> callback_second = std::make_shared<FormInterfaceCallbackTest>();
-    FormMgr::GetInstance().formDeathCallbacks_.emplace_back(callback_first); 
+    FormMgr::GetInstance().formDeathCallbacks_.emplace_back(callback_first);
     FormMgr::GetInstance().formDeathCallbacks_.emplace_back(callback_second);
     bool data = FormMgr::GetInstance().CheckIsDeathCallbackRegistered(callback);
     EXPECT_TRUE(data == false);
@@ -1462,8 +1468,10 @@ HWTEST_F(FormMgrTest, FormMgrTest_0073, TestSize.Level1) {
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0074, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0074 starts";
-    FormMgr::GetInstance().ResetProxy(nullptr);
-    FormMgr::GetInstance().SetFormMgrService(mockProxy);
+    std::shared_ptr<FormMgr> formMgr = std::make_shared<FormMgr>();
+    ASSERT_NE(nullptr, formMgr);
+    formMgr->ResetProxy(nullptr);
+    formMgr->SetFormMgrService(mockProxy);
     GTEST_LOG_(INFO) << "FormMgrTest_0074 test ends";
 }
 
@@ -1696,5 +1704,90 @@ HWTEST_F(FormMgrTest, FormMgrTest_0085, TestSize.Level1) {
     auto result = FormMgr::GetInstance().ShareForm(formId, deviceId, Token, requestCode);
     EXPECT_EQ(result, OHOS::ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrTest_0085 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0086
+ * @tc.desc: Verify GetFormsCount
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0086, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0086 starts";
+    bool isTempFormFlag = true;
+    int32_t formCount = 0;
+    FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
+    int result = FormMgr::GetInstance().GetFormsCount(isTempFormFlag, formCount);
+
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR);
+    GTEST_LOG_(INFO) << "FormMgrTest_0086 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0087
+ * @tc.desc: Verify GetFormsCount
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0087, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0087 starts";
+    bool isTempFormFlag = true;
+    int32_t formCount = 0;
+    FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
+    int result = FormMgr::GetInstance().GetFormsCount(isTempFormFlag, formCount);
+
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrTest_0087 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0088
+ * @tc.desc: Verify GetHostFormsCount
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0088, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0088 starts";
+    std::string bundleName = "this is bundleName";
+    int32_t formCount = 0;
+    FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
+    int result = FormMgr::GetInstance().GetHostFormsCount(bundleName, formCount);
+
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR);
+    GTEST_LOG_(INFO) << "FormMgrTest_0088 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0089
+ * @tc.desc: Verify GetHostFormsCount
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0089, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0089 starts";
+    std::string bundleName = "";
+    int32_t formCount = 0;
+    FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
+    int result = FormMgr::GetInstance().GetHostFormsCount(bundleName, formCount);
+
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_BUNDLENAME);
+    GTEST_LOG_(INFO) << "FormMgrTest_0089 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0090
+ * @tc.desc: Verify GetHostFormsCount
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0090, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0090 starts";
+    std::string bundleName = "this is bundleName";
+    int32_t formCount = 0;
+    FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
+    int result = FormMgr::GetInstance().GetHostFormsCount(bundleName, formCount);
+
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrTest_0090 test ends";
 }
 } // namespace
