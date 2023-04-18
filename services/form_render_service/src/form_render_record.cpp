@@ -227,6 +227,8 @@ std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::CreateContext(const F
         HILOG_ERROR("Create context failed!");
         return nullptr;
     }
+
+    context->SetConfiguration(configuration_);
     AppExecFwk::HapModuleInfo hapModuleInfo;
     hapModuleInfo.name = formJsInfo.moduleName;
     hapModuleInfo.hapPath = formJsInfo.jsFormCodePath;
@@ -243,6 +245,11 @@ std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::CreateContext(const F
     std::lock_guard<std::mutex> lock(contextsMapMutex_);
     contextsMapForModuleName_.emplace(GenerateContextKey(formJsInfo), context);
     return context;
+}
+
+void FormRenderRecord::SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration>& config)
+{
+    configuration_ = config;
 }
 
 std::shared_ptr<Ace::FormRendererGroup> FormRenderRecord::GetFormRendererGroup(const FormJsInfo &formJsInfo,
