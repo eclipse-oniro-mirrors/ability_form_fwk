@@ -1380,7 +1380,7 @@ ErrCode FormMgrAdapter::CheckPublishForm(Want &want)
     }
     if (!CheckIsSystemAppByBundleName(iBundleMgr, bundleName)) {
         HILOG_ERROR("Only system app can request publish form.");
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
     }
 
     if (bundleName != want.GetElement().GetBundleName()) {
