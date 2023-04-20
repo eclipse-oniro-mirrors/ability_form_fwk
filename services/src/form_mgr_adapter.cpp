@@ -1381,7 +1381,7 @@ ErrCode FormMgrAdapter::CheckPublishForm(Want &want)
     }
     if (!IsValidPublishEvent(iBundleMgr, bundleName, want)) {
         HILOG_ERROR("Invalid publish form event.");
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
     }
 
     if (want.GetElement().GetBundleName().empty()) {
