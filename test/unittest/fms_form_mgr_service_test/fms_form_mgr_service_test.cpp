@@ -40,10 +40,8 @@ using namespace OHOS::AppExecFwk;
 extern void MockCheckAcrossLocalAccountsPermission(bool mockRet);
 extern void MockIsSACall(bool mockRet);
 extern void MockCheckInvalidForm(int32_t mockRet);
-extern void MockFMSIsSACall(bool mockRet);
-extern void MockFMSVerifyCallingPermission(bool mockRet);
-extern void MockIsSystemAppByFullTokenID(bool mockRet);
 extern void MockVerifyCallingPermission(bool mockRet);
+extern void MockIsSystemAppByFullTokenID(bool mockRet);
 extern void MockGetCurrentAccountIdRet(int32_t userId);
 extern void MockGetCallerBundleName(int32_t mockRet);
 extern void MockGetTokenTypeFlag(uint32_t mockRet);
@@ -101,7 +99,7 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0002, TestSize.Level1)
     const std::vector<int64_t> formIds;
     const sptr<IRemoteObject> callerToken = nullptr;
     bool updateType = false;
-    MockFMSIsSACall(true);
+    MockIsSACall(true);
     EXPECT_EQ(ERR_OK, formMgrService.LifecycleUpdate(formIds, callerToken, updateType));
     GTEST_LOG_(INFO) << "FormMgrService_0002 end";
 }
@@ -118,7 +116,7 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0003, TestSize.Level1)
     const std::vector<int64_t> formIds;
     const sptr<IRemoteObject> callerToken = nullptr;
     bool updateType = true;
-    MockFMSIsSACall(true);
+    MockIsSACall(true);
     EXPECT_EQ(ERR_OK, formMgrService.LifecycleUpdate(formIds, callerToken, updateType));
     GTEST_LOG_(INFO) << "FormMgrService_0003 end";
 }
@@ -136,7 +134,7 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0004, TestSize.Level1)
     const Want want = {};
     const sptr<IRemoteObject> callerToken = nullptr;
     FormJsInfo formInfo;
-    MockFMSIsSACall(true);
+    MockIsSACall(true);
     EXPECT_EQ(ERR_OK, formMgrService.AddForm(formId, want, callerToken, formInfo));
     GTEST_LOG_(INFO) << "FormMgrService_0004 end";
 }
@@ -725,7 +723,7 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0038, TestSize.Level1)
     std::string bundleName;
     std::vector<FormInfo> formInfos;
     MockIsSACall(true);
-    MockFMSIsSACall(true);
+    MockIsSACall(true);
     MockCheckAcrossLocalAccountsPermission(true);
     EXPECT_EQ(ERR_OK, formMgrService.GetFormsInfoByApp(bundleName, formInfos));
     GTEST_LOG_(INFO) << "FormMgrService_0038 end";
@@ -823,7 +821,7 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0044, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormMgrService_0044 start";
     FormMgrService formMgrService;
-    MockFMSIsSACall(false);
+    MockIsSACall(false);
     MockIsSystemAppByFullTokenID(false);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, formMgrService.CheckFormPermission());
     GTEST_LOG_(INFO) << "FormMgrService_0044 end";
@@ -840,9 +838,9 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0045, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormMgrService_0045 start";
     FormMgrService formMgrService;
 
-    MockFMSIsSACall(false);
+    MockIsSACall(false);
     MockIsSystemAppByFullTokenID(true);
-    MockFMSVerifyCallingPermission(false);
+    MockVerifyCallingPermission(false);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY, formMgrService.CheckFormPermission());
     GTEST_LOG_(INFO) << "FormMgrService_0045 end";
 }
@@ -856,9 +854,9 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0046, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormMgrService_0046 start";
     FormMgrService formMgrService;
-    MockFMSIsSACall(false);
+    MockIsSACall(false);
     MockIsSystemAppByFullTokenID(true);
-    MockFMSVerifyCallingPermission(true);
+    MockVerifyCallingPermission(true);
     MockCheckAcrossLocalAccountsPermission(true);
     EXPECT_EQ(ERR_OK, formMgrService.CheckFormPermission());
     GTEST_LOG_(INFO) << "FormMgrService_0046 end";
@@ -874,7 +872,7 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0047, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormMgrService_0047 start";
     FormMgrService formMgrService;
-    MockFMSIsSACall(false);
+    MockIsSACall(false);
     MockVerifyCallingPermission(true);
     MockIsSystemAppByFullTokenID(true);
     MockCheckAcrossLocalAccountsPermission(false);
@@ -925,7 +923,7 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0050, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormMgrService_0050 start";
     FormMgrService formMgrService;
-    MockFMSIsSACall(false);
+    MockIsSACall(false);
     MockIsSystemAppByFullTokenID(true);
     MockVerifyCallingPermission(true);
     MockCheckAcrossLocalAccountsPermission(false);

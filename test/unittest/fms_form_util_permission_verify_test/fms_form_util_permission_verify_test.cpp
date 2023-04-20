@@ -22,7 +22,6 @@
 #include "tokenid_kit.h"
 #undef private
 #include "hilog_wrapper.h"
-#include "mock_form_provider_client.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -33,9 +32,9 @@ extern void MockGetTokenTypeFlag(int32_t mockRet);
 extern void MockVerifyAccessToken(int32_t mockRet);
 
 namespace {
-const std::string NAME_FORM_MGR_SERVICE_PERMISSION_VERIFY = "FmsFormMgrServicePermissionVerifyTest";
+const std::string NAME_FORM_MGR_SERVICE_PERMISSION_VERIFY = "FmsFormUtilPermissionVerifyTest";
 
-class FmsFormMgrServicePermissionVerifyTest : public testing::Test {
+class FmsFormUtilPermissionVerifyTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
@@ -43,88 +42,83 @@ public:
     void TearDown();
 };
 
-void FmsFormMgrServicePermissionVerifyTest::SetUpTestCase()
+void FmsFormUtilPermissionVerifyTest::SetUpTestCase()
 {}
 
-void FmsFormMgrServicePermissionVerifyTest::TearDownTestCase()
+void FmsFormUtilPermissionVerifyTest::TearDownTestCase()
 {}
 
-void FmsFormMgrServicePermissionVerifyTest::SetUp()
+void FmsFormUtilPermissionVerifyTest::SetUp()
 {}
 
-void FmsFormMgrServicePermissionVerifyTest::TearDown()
+void FmsFormUtilPermissionVerifyTest::TearDown()
 {}
 
 /**
- * @tc.number: FmsFormMgrServicePermissionVerifyTest_0001
+ * @tc.number: FmsFormUtilPermissionVerifyTest_0001
  * @tc.name: test IsSACall function.
  * @tc.desc: Verify that the IsSACall interface is called normally and the return value is true.
  */
-HWTEST_F(FmsFormMgrServicePermissionVerifyTest, FmsFormMgrServicePermissionVerify_0001, TestSize.Level1)
+HWTEST_F(FmsFormUtilPermissionVerifyTest, FmsFormMgrServicePermissionVerify_0001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrServicePermissionVerify_0001 start";
-    FormMgrService formMgrService;
     MockGetTokenTypeFlag(Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE);
     MockGetCallingUid(0);
-    EXPECT_EQ(true, formMgrService.IsSACall());
+    EXPECT_EQ(true, FormUtil::IsSACall());
     GTEST_LOG_(INFO) << "FmsFormMgrServicePermissionVerify_0001 end";
 }
 
 /**
- * @tc.number: FmsFormMgrServicePermissionVerifyTest_0002
+ * @tc.number: FmsFormUtilPermissionVerifyTest_0002
  * @tc.name: test IsSACall function.
  * @tc.desc: Verify that the IsSACall interface is called normally and the return value is true.
  */
-HWTEST_F(FmsFormMgrServicePermissionVerifyTest, FmsFormMgrServicePermissionVerify_0002, TestSize.Level1)
+HWTEST_F(FmsFormUtilPermissionVerifyTest, FmsFormMgrServicePermissionVerify_0002, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMgrServicePermissionVerify_0002 start";
-    FormMgrService formMgrService;
     MockGetCallingUid(1000);
-    EXPECT_EQ(true, formMgrService.IsSACall());
+    EXPECT_EQ(true, FormUtil::IsSACall());
     GTEST_LOG_(INFO) << "FmsFormMgrServicePermissionVerify_0002 end";
 }
 
 /**
- * @tc.number: FmsFormMgrServicePermissionVerifyTest_0003
+ * @tc.number: FmsFormUtilPermissionVerifyTest_0003
  * @tc.name: test IsSACall function.
  * @tc.desc: Verify that the IsSACall interface is called without permission and the return value is false.
  */
-HWTEST_F(FmsFormMgrServicePermissionVerifyTest, FmsFormMgrServicePermissionVerifyTest_0003, TestSize.Level1)
+HWTEST_F(FmsFormUtilPermissionVerifyTest, FmsFormUtilPermissionVerifyTest_0003, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormMgrServicePermissionVerifyTest_0003 start";
-    FormMgrService formMgrService;
+    GTEST_LOG_(INFO) << "FmsFormUtilPermissionVerifyTest_0003 start";
     MockGetTokenTypeFlag(0);
     MockGetCallingUid(0);
-    EXPECT_EQ(false, formMgrService.IsSACall());
-    GTEST_LOG_(INFO) << "FmsFormMgrServicePermissionVerifyTest_0003 end";
+    EXPECT_EQ(false, FormUtil::IsSACall());
+    GTEST_LOG_(INFO) << "FmsFormUtilPermissionVerifyTest_0003 end";
 }
 
 /**
- * @tc.number: FmsFormMgrServicePermissionVerifyTest_0004
+ * @tc.number: FmsFormUtilPermissionVerifyTest_0004
  * @tc.name: test VerifyCallingPermission function.
  * @tc.desc: Verify that the VerifyCallingPermission interface is called
  *           without permission and the return value is false.
  */
-HWTEST_F(FmsFormMgrServicePermissionVerifyTest, FmsFormMgrServicePermissionVerifyTest_0004, TestSize.Level1)
+HWTEST_F(FmsFormUtilPermissionVerifyTest, FmsFormUtilPermissionVerifyTest_0004, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormMgrServicePermissionVerifyTest_0004 start";
-    FormMgrService formMgrService;
+    GTEST_LOG_(INFO) << "FmsFormUtilPermissionVerifyTest_0004 start";
     MockVerifyAccessToken(-1);
-    EXPECT_EQ(false, formMgrService.VerifyCallingPermission("ohos.permission.REQUIRE_FORM"));
-    GTEST_LOG_(INFO) << "FmsFormMgrServicePermissionVerifyTest_0004 end";
+    EXPECT_EQ(false, FormUtil::VerifyCallingPermission("ohos.permission.REQUIRE_FORM"));
+    GTEST_LOG_(INFO) << "FmsFormUtilPermissionVerifyTest_0004 end";
 }
 
 /**
- * @tc.number: FmsFormMgrServicePermissionVerifyTest_0005
+ * @tc.number: FmsFormUtilPermissionVerifyTest_0005
  * @tc.name: test VerifyCallingPermission function.
  * @tc.desc: Verify that the VerifyCallingPermission interface is called normally and the return value is true.
  */
-HWTEST_F(FmsFormMgrServicePermissionVerifyTest, FmsFormMgrServicePermissionVerifyTest_0005, TestSize.Level1)
+HWTEST_F(FmsFormUtilPermissionVerifyTest, FmsFormUtilPermissionVerifyTest_0005, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FmsFormMgrServicePermissionVerifyTest_0005 start";
-    FormMgrService formMgrService;
+    GTEST_LOG_(INFO) << "FmsFormUtilPermissionVerifyTest_0005 start";
     MockVerifyAccessToken(0);
-    EXPECT_EQ(true, formMgrService.VerifyCallingPermission("ohos.permission.REQUIRE_FORM"));
-    GTEST_LOG_(INFO) << "FmsFormMgrServicePermissionVerifyTest_0005 end";
+    EXPECT_EQ(true, FormUtil::VerifyCallingPermission("ohos.permission.REQUIRE_FORM"));
+    GTEST_LOG_(INFO) << "FmsFormUtilPermissionVerifyTest_0005 end";
 }
 }

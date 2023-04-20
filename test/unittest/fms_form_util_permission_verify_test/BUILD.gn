@@ -16,14 +16,14 @@ import("//foundation/ability/form_fwk/form_fwk.gni")
 
 module_output_path = "form_fwk/formmgrservice"
 
-ohos_unittest("FmsFormMgrServicePermissionVerifyTest") {
+ohos_unittest("FmsFormUtilPermissionVerifyTest") {
   module_out_path = module_output_path
 
   sources = [
     "${form_fwk_path}/test/mock/src/mock_form_provider_client.cpp",
-    "${form_fwk_path}/test/unittest/fms_form_mgr_service_permission_verify_test/fms_form_mgr_service_permission_verify_test.cpp",
-    "${form_fwk_path}/test/unittest/fms_form_mgr_service_permission_verify_test/mock_accesstoken_kit.cpp",
-    "${form_fwk_path}/test/unittest/fms_form_mgr_service_permission_verify_test/mock_ipc_skeleton.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_util_permission_verify_test/fms_form_util_permission_verify_test.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_util_permission_verify_test/mock_accesstoken_kit.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_util_permission_verify_test/mock_ipc_skeleton.cpp",
   ]
 
   include_dirs = [
@@ -63,6 +63,6 @@ ohos_unittest("FmsFormMgrServicePermissionVerifyTest") {
 group("unittest") {
   testonly = true
 
-  deps = [ ":FmsFormMgrServicePermissionVerifyTest" ]
+  deps = [ ":FmsFormUtilPermissionVerifyTest" ]
 }
 ###############################################################################

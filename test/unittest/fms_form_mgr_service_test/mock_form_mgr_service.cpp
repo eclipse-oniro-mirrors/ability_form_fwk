@@ -17,22 +17,11 @@
 
 #include "form_mgr_service.h"
 #include "form_mgr_errors.h"
+#include "form_util.h"
 #include "hilog_wrapper.h"
 
 namespace {
-bool g_isSACall = true;
-bool g_verifyCallingPermission = true;
 bool g_checkAcrossLocalAccountsPermission = true;
-}
-
-void MockFMSIsSACall(bool mockRet)
-{
-    g_isSACall = mockRet;
-}
-
-void MockFMSVerifyCallingPermission(bool mockRet)
-{
-    g_verifyCallingPermission = mockRet;
 }
 
 void MockCheckAcrossLocalAccountsPermission(bool mockRet)
@@ -41,18 +30,6 @@ void MockCheckAcrossLocalAccountsPermission(bool mockRet)
 }
 namespace OHOS {
 namespace AppExecFwk {
-bool FormMgrService::IsSACall() const
-{
-    GTEST_LOG_(INFO) << "IsSACall called " << g_isSACall;
-    return g_isSACall;
-}
-
-bool FormMgrService::VerifyCallingPermission(const std::string &permissionName) const
-{
-    GTEST_LOG_(INFO) << "VerifyCallingPermission called " << g_verifyCallingPermission;
-    return g_verifyCallingPermission;
-}
-
 bool FormMgrService::CheckAcrossLocalAccountsPermission() const
 {
     GTEST_LOG_(INFO) << "CheckAcrossLocalAccountsPermission called " << g_checkAcrossLocalAccountsPermission;

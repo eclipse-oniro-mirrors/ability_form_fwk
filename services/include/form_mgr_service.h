@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -211,19 +211,6 @@ public:
      * @return Returns true if the form manager service is ready; returns false otherwise.
      */
     bool IsReady() const;
-
-    /**
-     * @brief Check if the caller ability is SA.
-     * @return Returns true if is SA call; returns false otherwise.
-     */
-    bool IsSACall() const;
-
-    /**
-     * @brief Checks whether the caller has a certain permission.
-     * @param permissionName The name of the permission.
-     * @return Returns true if the caller has certain permissions; returns false otherwise.
-     */
-    bool VerifyCallingPermission(const std::string &permissionName) const;
 
     /**
      * @brief Delete the invalid forms.
