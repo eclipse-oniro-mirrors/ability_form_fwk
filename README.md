@@ -48,24 +48,24 @@ foundation/ability/form_fwk
 -   第二种形态为Stage模型。从API 9开始，Ability框架引入了Stage模型作为第二种应用框架形态，卡片使用FormExtensionAbility开发。
 
 **FA卡片开发**
-基于[FA模型](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/ability/fa-brief.md)的卡片提供方开发，主要涉及如下功能逻辑：
+基于[FA模型](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/application-models/fa-model-development-overview.md)的卡片提供方开发，主要涉及如下功能逻辑：
 
 -   开发卡片生命周期回调函数LifecycleForm。
 -   创建卡片数据FormBindingData对象。
 -   通过FormProvider更新卡片。
 -   开发卡片页面。
 
-开发步骤可参考[开发指南](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/ability/fa-formability.md#%E5%BC%80%E5%8F%91%E6%AD%A5%E9%AA%A4)
+开发步骤可参考[开发指南](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/application-models/widget-development-fa.md)
 
 **Stage卡片开发**
-基于[Stage模型](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/ability/stage-brief.md)的卡片提供方开发，主要涉及如下功能逻辑：
+基于[Stage模型](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/application-models/stage-model-development-overview.md)的卡片提供方开发，主要涉及如下功能逻辑：
 
 - 卡片生命周期回调函数FormExtension开发。
 - 创建卡片数据FormBindingData对象。
 - 通过FormProvider更新卡片。
 - 卡片页面开发。
 
-开发步骤可参考[开发指南](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/ability/stage-formextension.md#%E5%BC%80%E5%8F%91%E6%AD%A5%E9%AA%A4)
+开发步骤可参考[开发指南](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/application-models/service-widget-overview.md)
 
 ## 相关仓
 元能力子系统
