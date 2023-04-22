@@ -333,5 +333,67 @@ HWTEST_F(FormHostStubTest, FormHostStubTest_015, TestSize.Level1)
     auto result = callback.OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, IPC_STUB_UNKNOW_TRANS_ERR);
 }
+
+/**
+ * @tc.name: FormHostStubTest_016
+ * @tc.desc: Verify OnRemoteRequest and HandleOnAcquireState
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormHostStubTest, FormHostStubTest_016, TestSize.Level1)
+{
+    MockFormHostClient callback;
+    constexpr uint32_t code = static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_ACQUIRE_FORM_DATA);
+    constexpr int64_t requestCode = 0;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormHostClient::GetDescriptor());
+    data.WriteParcelable(nullptr);
+    data.WriteInt64(requestCode);
+    auto result = callback.OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+}
+
+/**
+ * @tc.name: FormHostStubTest_017
+ * @tc.desc: Verify OnRemoteRequest and HandleOnAcquireState
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormHostStubTest, FormHostStubTest_017, TestSize.Level1)
+{
+    MockFormHostClient callback;
+    constexpr uint32_t code = static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_ACQUIRE_FORM_DATA);
+    constexpr int64_t requestCode = 0;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormHostClient::GetDescriptor());
+    AAFwk::WantParams wantParams;
+    data.WriteParcelable(&wantParams);
+    data.WriteInt64(requestCode);
+    auto result = callback.OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+}
+
+/**
+ * @tc.name: FormHostStubTest_018
+ * @tc.desc: Verify OnRemoteRequest and HandleOnAcquireState
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormHostStubTest, FormHostStubTest_018, TestSize.Level1)
+{
+    MockFormHostClient callback;
+    constexpr uint32_t code = static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_ACQUIRE_FORM_DATA);
+    constexpr int64_t requestCode = 1;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormHostClient::GetDescriptor());
+    AAFwk::WantParams wantParams;
+    data.WriteParcelable(&wantParams);
+    data.WriteInt64(requestCode);
+    auto result = callback.OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

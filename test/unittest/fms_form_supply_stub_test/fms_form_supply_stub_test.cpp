@@ -489,5 +489,62 @@ HWTEST_F(FormSupplyStubTest, FormSupplyStubTest_020, TestSize.Level1)
     callback->memberFuncMap_[code] = nullptr;
     EXPECT_EQ(callback->OnRemoteRequest(code, data, reply, option), IPC_STUB_UNKNOW_TRANS_ERR);
 }
+
+/**
+ * @tc.name: FormSupplyStubTest_021
+ * @tc.desc: Verify function HandleOnAcquireDataResult the return value is ERR_APPEXECFWK_PARCEL_ERROR
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormSupplyStubTest, FormSupplyStubTest_021, TestSize.Level1)
+{
+    sptr<MockFormSupplyCallback> callback = new (std::nothrow) MockFormSupplyCallback();
+    constexpr uint32_t code = static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_ACQUIRED_DATA);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormSupplyCallback::GetDescriptor());
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+}
+
+/**
+ * @tc.name: FormSupplyStubTest_022
+ * @tc.desc: Verify function HandleOnAcquireDataResult the return value is ERR_APPEXECFWK_PARCEL_ERROR
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormSupplyStubTest, FormSupplyStubTest_022, TestSize.Level1)
+{
+    sptr<MockFormSupplyCallback> callback = new (std::nothrow) MockFormSupplyCallback();
+    constexpr uint32_t code = static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_ACQUIRED_DATA);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormSupplyCallback::GetDescriptor());
+    AAFwk::WantParams wantParams;
+    data.WriteParcelable(&wantParams);
+    data.WriteInt64(0);
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+}
+
+/**
+ * @tc.name: FormSupplyStubTest_023
+ * @tc.desc: Verify function HandleOnAcquireDataResult the return value is ERR_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormSupplyStubTest, FormSupplyStubTest_023, TestSize.Level1)
+{
+    sptr<MockFormSupplyCallback> callback = new (std::nothrow) MockFormSupplyCallback();
+    constexpr uint32_t code = static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_ACQUIRED_DATA);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormSupplyCallback::GetDescriptor());
+    AAFwk::WantParams wantParams;
+    data.WriteParcelable(&wantParams);
+    data.WriteInt64(1);
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

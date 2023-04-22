@@ -26,6 +26,7 @@ ohos_unittest("FmsFormRefreshConnectionTest") {
     "${ability_runtime_path}/services/formmgr/include",
     "${systemabilitymgr_path}/samgr/interfaces/innerkits/samgr_proxy/include",
     "${form_fwk_path}/interfaces/inner_api/include",
+    "${form_fwk_path}/services/include",
   ]
 
   configs = []

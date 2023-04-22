@@ -3796,4 +3796,21 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_194, TestSize.Level0)
     FormBmsHelper::GetInstance().iErMgr_ = nullptr;
     GTEST_LOG_(INFO) << "FormMgrAdapter_194 end";
 }
+
+/**
+ * @tc.name: FormMgrAdapter_0195
+ * @tc.desc: test AcquireFormData function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0195, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0195 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    int64_t requestCode = 1;
+    sptr<IRemoteObject> callerToken = nullptr;
+    AAFwk::WantParams formData;
+    EXPECT_EQ(ERR_OK, formMgrAdapter.AcquireFormData(formId, requestCode, callerToken, formData));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0195 end";
+}
 }

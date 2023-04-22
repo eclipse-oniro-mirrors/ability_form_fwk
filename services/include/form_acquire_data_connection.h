@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_ACQUIRE_DATA_CONNECTION_H
-#define FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_ACQUIRE_DATA_CONNECTION_H
+#ifndef OHOS_FORM_FWK_FORM_ACQUIRE_DATA_CONNECTION_H
+#define OHOS_FORM_FWK_FORM_ACQUIRE_DATA_CONNECTION_H
 
 #include "event_handler.h"
 #include "form_ability_connection.h"
@@ -43,7 +43,7 @@ public:
      * @param resultCode ERR_OK on success, others on failure.
      */
     void OnAbilityConnectDone(
-        const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int32_t resultCode) override;
+        const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode) override;
 
 private:
     int64_t formId_ {-1};
@@ -52,4 +52,4 @@ private:
 };
 } // namespace AppExecFwk
 } // namespace OHOS
-#endif // FOUNDATION_ABILITY_FORM_FWK_SERVICES_INCLUDE_FORM_ACQUIRE_DATA_CONNECTION_H
+#endif // OHOS_FORM_FWK_FORM_FORM_ACQUIRE_DATA_CONNECTION_H
