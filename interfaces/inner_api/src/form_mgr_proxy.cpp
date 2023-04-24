@@ -1307,6 +1307,31 @@ bool FormMgrProxy::CheckFMSReady()
     return reply.ReadBool();
 }
 
+int32_t FormMgrProxy::SetBackgroundFunction(const std::string funcName, const std::string params)
+{
+    HILOG_DEBUG("start");
+    MessageParcel data;
+    // write in token to help identify which stub to be called
+    if (!data.WriteString16(Str8ToStr16(funcName))) {
+        HILOG_ERROR("failed to write funcName");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteString16(Str8ToStr16(params))) {
+        HILOG_ERROR("failed to write params");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    // send request
+    MessageParcel reply;
+    MessageOption option;
+    int error = Remote()->SendRequest(Constants::EVENT_CALL_NOTIFY, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("failed to SendRequest: %{public}d", error);
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+    // retrieve and return result;
+    return reply.ReadInt32();
+}
+
 int32_t FormMgrProxy::GetFormsCount(bool isTempFormFlag, int32_t &formCount)
 {
     HILOG_INFO("%{public}s start.", __func__);

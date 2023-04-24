@@ -332,6 +332,13 @@ public:
     virtual bool CheckFMSReady() = 0;
 
     /**
+     * @brief The Call Event triggers the callee method.
+     * @param funcName function name which is used by callee.
+     * @param params parameter which is used by callee.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int32_t SetBackgroundFunction(const std::string funcName, const std::string params) = 0;
+    /**
     * @brief get forms count.
     * @param isTempFormFlag Indicates temp form or not.
     * @param formCount Returns the number of the cast or temp form.
