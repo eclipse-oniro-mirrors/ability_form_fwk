@@ -132,6 +132,14 @@ int FormSupplyCallback::OnAcquireStateResult(FormState state,
     return errCode;
 }
 
+int FormSupplyCallback::OnAcquireDataResult(const AAFwk::WantParams &wantParams, int64_t requestCode)
+{
+    HILOG_INFO("called.");
+    ErrCode errCode = FormProviderMgr::GetInstance().AcquireFormDataBack(wantParams, requestCode);
+    HILOG_INFO("end, errCode:%{public}d.", errCode);
+    return errCode;
+}
+
 /**
  * @brief Save ability Connection for the callback.
  * @param connection ability connection.

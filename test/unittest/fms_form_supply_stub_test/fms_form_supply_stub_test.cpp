@@ -97,6 +97,11 @@ public:
         return ERR_OK;
     }
 
+    int OnAcquireDataResult(const AAFwk::WantParams &wantParams, int64_t requestCode) override
+    {
+        return ERR_OK;
+    }
+
     bool asObject_ = true;
 };
 

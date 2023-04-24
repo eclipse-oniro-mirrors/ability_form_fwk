@@ -120,6 +120,10 @@ public:
     {
         return number_;
     };
+    int OnAcquireDataResult(const AAFwk::WantParams &wantParams, int64_t requestCode)
+    {
+        return ERR_OK;
+    };
     void OnShareAcquire(int64_t formId, const std::string &remoteDeviceId,
         const AAFwk::WantParams &wantParams, int64_t requestCode, const bool &result) override {};
     sptr<IRemoteObject> AsObject() override

@@ -85,6 +85,8 @@ public:
 
     void UpdateConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration>& config);
 
+    void SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration>& config);
+
 private:
     class RemoteObjHash {
     public:
@@ -136,6 +138,7 @@ private:
     // <formId, formRendererGroup>
     std::mutex formRendererGroupMutex_;
     std::unordered_map<int64_t, std::shared_ptr<Ace::FormRendererGroup>> formRendererGroupMap_;
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration_;
 
     std::string hapPath_;
 };

@@ -82,8 +82,19 @@ void FormHostCallback::OnUninstall(std::vector<int64_t> &formIds, const sptr<IRe
     FormTaskMgr::GetInstance().PostUninstallTaskToHost(formIds, callerToken);
 }
 
+void FormHostCallback::OnAcquireFormData(const AAFwk::WantParams &wantParams, int64_t requestCode,
+                                         const sptr<IRemoteObject> &callerToken)
+{
+    if (callerToken == nullptr) {
+        HILOG_ERROR("callerToken can not be NULL");
+        return;
+    }
+    // post updateTask to host
+    FormTaskMgr::GetInstance().PostAcquireDataTaskToHost(wantParams, requestCode, callerToken);
+}
+
 /**
- * @brief Form provider is uninstalled.
+ * @brief Send form state message to form host.
  * @param state The form state.
  * @param want The want of onAcquireFormState.
  * @param callerToken Caller ability token.

@@ -200,6 +200,16 @@ void FormHostRecord::OnAcquireState(AppExecFwk::FormState state, const AAFwk::Wa
     formHostCallback_->OnAcquireState(state, want, formHostClient_);
 }
 
+void FormHostRecord::OnAcquireFormData(const AAFwk::WantParams &wantParams, int64_t requestCode)
+{
+    HILOG_INFO("start.");
+    if (formHostCallback_ == nullptr) {
+        HILOG_ERROR("formHostCallback_ can not be null.");
+        return;
+    }
+    formHostCallback_->OnAcquireFormData(wantParams, requestCode, formHostClient_);
+}
+
 /**
  * @brief Release resource.
  * @param id The Id of the form.
@@ -309,6 +319,11 @@ std::string FormHostRecord::GetHostBundleName() const
 void FormHostRecord::SetHostBundleName(const std::string &hostBundleName)
 {
     hostBundleName_ = hostBundleName;
+}
+
+int32_t FormHostRecord::GetFormsCount() const
+{
+    return static_cast<int32_t>(forms_.size());
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -77,6 +77,14 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t HandleOnRenderTaskDone(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief handle OnShareAcquire message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t HandleOnAcquireDataResult(MessageParcel &data, MessageParcel &reply);
     /**
      * @brief handle OnStopRenderingTaskDone message.
      * @param data input param.

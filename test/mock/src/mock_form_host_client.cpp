@@ -77,5 +77,11 @@ void MockFormHostClient::OnError(int32_t errorCode, const std::string &errorMsg)
     HILOG_DEBUG("MockFormHostClient OnError");
     PostVoid();
 }
+
+void MockFormHostClient::OnAcquireDataResponse(const AAFwk::WantParams &wantParams, int64_t requestCode)
+{
+    HILOG_DEBUG("MockFormHostClient OnAcquireDataResponse");
+    PostVoid();
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

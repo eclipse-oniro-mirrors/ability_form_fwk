@@ -1893,4 +1893,127 @@ HWTEST_F(FmsFormMgrProxyTest, BackgroundEventTest_0300, Function | MediumTest | 
     int32_t result = proxy->BackgroundEvent(formId, want, nullptr);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_SEND_FMS_MSG, result);
 }
+
+/*
+ * @tc.name: GetFormsCountTest_0100
+ * @tc.desc: test GetFormsCount function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrProxyTest, GetFormsCountTest_0100, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO)
+        << "FmsFormMgrProxyTest, GetFormsCountTest_0100, TestSize.Level1";
+    MockWriteInterfaceToken(false);
+    sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
+    ASSERT_NE(nullptr, iremoteObject);
+    std::shared_ptr<FormMgrProxy> proxy = std::make_shared<FormMgrProxy>(iremoteObject);
+    ASSERT_NE(nullptr, proxy);
+    int32_t count;
+    int32_t result = proxy->GetFormsCount(true, count);
+    EXPECT_EQ(ERR_APPEXECFWK_PARCEL_ERROR, result);
+}
+
+/*
+ * @tc.name: GetFormsCountTest_0200
+ * @tc.desc: test GetFormsCount function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrProxyTest, GetFormsCountTest_0200, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO)
+        << "FmsFormMgrProxyTest, GetFormsCountTest_0200, TestSize.Level1";
+    sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
+    ASSERT_NE(nullptr, iremoteObject);
+    EXPECT_CALL(*iremoteObject, SendRequest(_, _, _, _))
+        .WillRepeatedly(DoAll(Invoke(std::bind(SendRequestReplace, _1, _2, _3, _4,
+        ERR_OK, true)), Return(NO_ERROR)));
+    std::shared_ptr<FormMgrProxy> proxy = std::make_shared<FormMgrProxy>(iremoteObject);
+    ASSERT_NE(nullptr, proxy);
+    int32_t count;
+    int32_t result = proxy->GetFormsCount(true, count);
+    EXPECT_EQ(ERR_OK, result);
+}
+
+/*
+ * @tc.name: GetFormsCountTest_0300
+ * @tc.desc: test GetFormsCount function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrProxyTest, GetFormsCountTest_0300, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO)
+        << "FmsFormMgrProxyTest, GetFormsCountTest_0300, TestSize.Level1";
+    sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
+    ASSERT_NE(nullptr, iremoteObject);
+    EXPECT_CALL(*iremoteObject, SendRequest(_, _, _, _)).Times(1)
+        .WillRepeatedly(DoAll(Return(-1)));
+    std::shared_ptr<FormMgrProxy> proxy = std::make_shared<FormMgrProxy>(iremoteObject);
+    ASSERT_NE(nullptr, proxy);
+    int32_t count;
+    int32_t result = proxy->GetFormsCount(true, count);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_SEND_FMS_MSG, result);
+}
+
+/*
+ * @tc.name: GetHostFormsCount_0100
+ * @tc.desc: test GetHostFormsCount function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrProxyTest, GetHostFormsCount_0100, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO)
+        << "FmsFormMgrProxyTest, GetHostFormsCount_0100, TestSize.Level1";
+    MockWriteInterfaceToken(false);
+    sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
+    ASSERT_NE(nullptr, iremoteObject);
+    std::shared_ptr<FormMgrProxy> proxy = std::make_shared<FormMgrProxy>(iremoteObject);
+    ASSERT_NE(nullptr, proxy);
+    std::string bundleName = "BundleName";
+    int count;
+    int32_t result = proxy->GetHostFormsCount(bundleName, count);
+    EXPECT_EQ(ERR_APPEXECFWK_PARCEL_ERROR, result);
+}
+
+/*
+ * @tc.name: GetHostFormsCount_0200
+ * @tc.desc: test GetHostFormsCount function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrProxyTest, GetHostFormsCount_0200, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO)
+        << "FmsFormMgrProxyTest, GetHostFormsCount_0200, TestSize.Level1";
+    sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
+    ASSERT_NE(nullptr, iremoteObject);
+    EXPECT_CALL(*iremoteObject, SendRequest(_, _, _, _))
+        .WillRepeatedly(DoAll(Invoke(std::bind(SendRequestReplace, _1, _2, _3, _4,
+        ERR_OK, true)), Return(NO_ERROR)));
+    std::shared_ptr<FormMgrProxy> proxy = std::make_shared<FormMgrProxy>(iremoteObject);
+    ASSERT_NE(nullptr, proxy);
+    std::string bundleName = "BundleName";
+    int32_t count;
+    int32_t result = proxy->GetHostFormsCount(bundleName, count);
+    EXPECT_EQ(ERR_OK, result);
+}
+
+/*
+ * @tc.name: GetHostFormsCount_0300
+ * @tc.desc: test GetHostFormsCount function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrProxyTest, GetHostFormsCount_0300, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO)
+        << "FmsFormMgrProxyTest, GetHostFormsCount_0300, TestSize.Level1";
+    sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
+    ASSERT_NE(nullptr, iremoteObject);
+    EXPECT_CALL(*iremoteObject, SendRequest(_, _, _, _)).Times(1)
+        .WillRepeatedly(DoAll(Return(-1)));
+    std::shared_ptr<FormMgrProxy> proxy = std::make_shared<FormMgrProxy>(iremoteObject);
+    ASSERT_NE(nullptr, proxy);
+    std::string bundleName = "BundleName";
+    int32_t count;
+    int32_t result = proxy->GetHostFormsCount(bundleName, count);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_SEND_FMS_MSG, result);
+}
 }

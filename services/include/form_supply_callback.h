@@ -56,6 +56,15 @@ public:
      */
     int OnAcquireStateResult(FormState state, const std::string &provider, const Want &wantArg,
                              const Want &want) override;
+    
+    /**
+     * @brief Accept form data from form provider.
+     * @param formId The Id of the from.
+     * @param wantParams Indicates the data information acquired by the form.
+     * @param requestCode Indicates the requested id.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int OnAcquireDataResult(const AAFwk::WantParams &wantParams, int64_t requestCode) override;
 
     /**
      * @brief Save ability Connection for the callback.

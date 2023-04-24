@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -175,7 +175,7 @@ int FormMgrService::AddForm(const int64_t formId, const Want &want,
 
     ErrCode ret = CheckFormPermission();
     AAFwk::EventInfo eventInfo;
-    eventInfo.userId = formId;
+    eventInfo.formId = formId;
     eventInfo.bundleName = want.GetElement().GetBundleName();
     eventInfo.moduleName = want.GetStringParam(AppExecFwk::Constants::PARAM_MODULE_NAME_KEY);
     eventInfo.abilityName = want.GetElement().GetAbilityName();
@@ -203,7 +203,7 @@ int FormMgrService::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
         return ret;
     }
     AAFwk::EventInfo eventInfo;
-    eventInfo.userId = formId;
+    eventInfo.formId = formId;
     AAFwk::EventReport::SendFormEvent(AAFwk::EventName::DELETE_FORM, HiSysEventType::BEHAVIOR, eventInfo);
 
     return FormMgrAdapter::GetInstance().DeleteForm(formId, callerToken);
@@ -250,7 +250,7 @@ int FormMgrService::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> 
         return ret;
     }
     AAFwk::EventInfo eventInfo;
-    eventInfo.userId = formId;
+    eventInfo.formId = formId;
     AAFwk::EventReport::SendFormEvent(AAFwk::EventName::RELEASE_FORM, HiSysEventType::BEHAVIOR, eventInfo);
 
     return FormMgrAdapter::GetInstance().ReleaseForm(formId, callerToken, delCache);
@@ -291,7 +291,7 @@ int FormMgrService::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
         return ret;
     }
     AAFwk::EventInfo eventInfo;
-    eventInfo.userId = formId;
+    eventInfo.formId = formId;
     eventInfo.bundleName = want.GetElement().GetBundleName();
     eventInfo.moduleName = want.GetStringParam(AppExecFwk::Constants::PARAM_MODULE_NAME_KEY);
     eventInfo.abilityName = want.GetElement().GetAbilityName();
@@ -310,7 +310,7 @@ int FormMgrService::SetNextRefreshTime(const int64_t formId, const int64_t nextT
 {
     HILOG_INFO("%{public}s called.", __func__);
     AAFwk::EventInfo eventInfo;
-    eventInfo.userId = formId;
+    eventInfo.formId = formId;
     AAFwk::EventReport::SendFormEvent(
         AAFwk::EventName::SET_NEXT_REFRESH_TIME_FORM, HiSysEventType::BEHAVIOR, eventInfo);
 
@@ -368,7 +368,7 @@ int FormMgrService::CastTempForm(const int64_t formId, const sptr<IRemoteObject>
         return ret;
     }
     AAFwk::EventInfo eventInfo;
-    eventInfo.userId = formId;
+    eventInfo.formId = formId;
     AAFwk::EventReport::SendFormEvent(AAFwk::EventName::CASTTEMP_FORM, HiSysEventType::BEHAVIOR, eventInfo);
 
     return FormMgrAdapter::GetInstance().CastTempForm(formId, callerToken);
@@ -486,7 +486,7 @@ int FormMgrService::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
         return ret;
     }
     AAFwk::EventInfo eventInfo;
-    eventInfo.userId = formId;
+    eventInfo.formId = formId;
     eventInfo.bundleName = want.GetElement().GetBundleName();
     eventInfo.moduleName = want.GetStringParam(AppExecFwk::Constants::PARAM_MODULE_NAME_KEY);
     eventInfo.abilityName = want.GetElement().GetAbilityName();
@@ -515,7 +515,7 @@ int FormMgrService::BackgroundEvent(const int64_t formId, Want &want, const sptr
         return ret;
     }
     AAFwk::EventInfo eventInfo;
-    eventInfo.userId = formId;
+    eventInfo.formId = formId;
     eventInfo.bundleName = want.GetElement().GetBundleName();
     eventInfo.moduleName = want.GetStringParam(AppExecFwk::Constants::PARAM_MODULE_NAME_KEY);
     eventInfo.abilityName = want.GetElement().GetAbilityName();
@@ -829,6 +829,33 @@ int32_t FormMgrService::GetFormsInfo(const FormInfoFilter &filter, std::vector<F
     return FormMgrAdapter::GetInstance().GetFormsInfoByModule(callerBundleName, moduleName, formInfos);
 }
 
+int32_t FormMgrService::AcquireFormData(int64_t formId, int64_t requestCode, const sptr<IRemoteObject> &callerToken,
+    AAFwk::WantParams &formData)
+{
+    HILOG_INFO("called.");
+    if (formId <= 0) {
+        HILOG_ERROR("form formId  is invalid.");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
+    if (callerToken == nullptr) {
+        HILOG_ERROR("callerToken is nullptr.");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
+    if (requestCode <= 0) {
+        HILOG_ERROR("form requestCode is invalid.");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
+    ErrCode ret = CheckFormPermission();
+    if (ret != ERR_OK) {
+        HILOG_ERROR("fail, request form permission denied");
+        return ret;
+    }
+    return FormMgrAdapter::GetInstance().AcquireFormData(formId, requestCode, callerToken, formData);
+}
+
 bool FormMgrService::IsRequestPublishFormSupported()
 {
     HILOG_INFO("%{public}s called.", __func__);
@@ -1062,6 +1089,18 @@ bool FormMgrService::CheckAcrossLocalAccountsPermission() const
         }
     }
     return true;
+}
+
+int32_t FormMgrService::GetFormsCount(bool isTempFormFlag, int32_t &formCount)
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    return FormMgrAdapter::GetInstance().GetFormsCount(isTempFormFlag, formCount);
+}
+
+int32_t FormMgrService::GetHostFormsCount(std::string &bundleName, int32_t &formCount)
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    return FormMgrAdapter::GetInstance().GetHostFormsCount(bundleName, formCount);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

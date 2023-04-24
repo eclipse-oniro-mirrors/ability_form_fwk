@@ -136,11 +136,27 @@ public:
     bool AddShareFormCallback(const std::shared_ptr<ShareFormCallBack> &shareFormCallback, int64_t requestCode);
 
     /**
+     * @brief Add Acquire form data callback.
+     *
+     * @param acquireFormDataTask The host's acquire form callback.
+     * @param requestCode The request code of this acquire form.
+     * @return Returns true if contains form; returns false otherwise.
+     */
+    bool AddAcqiureFormDataCallback(const std::shared_ptr<FormDataCallbackInterface> &acquireFormDataTask,
+        int64_t requestCode);
+
+    /**
      * @brief Responsive form sharing.
      * @param requestCode The request code of this share form.
      * @param result Share form result.
      */
     void OnShareFormResponse(int64_t requestCode, int32_t result) override;
+
+    /**
+     * @brief Responsive form acquiring form data.
+     * @param requestCode The request code of this acquire form.
+     */
+    void OnAcquireDataResponse(const AAFwk::WantParams &wantParams, int64_t requestCode) override;
 
     /**
      * @brief Return error to host.
@@ -157,6 +173,12 @@ public:
     void RemoveShareFormCallback(int64_t requestCode);
 
     /**
+     * @brief Remove AcquireData callback.
+     * @param requestCode The request code of this acquire form data.
+     */
+    void RemoveAcquireDataCallback(int64_t requestCode);
+
+    /**
      * @brief Update form.
      * @param formJsInfo Form js info.
      */
@@ -168,8 +190,10 @@ private:
     mutable std::mutex formStateCallbackMutex_;
     mutable std::mutex uninstallCallbackMutex_;
     mutable std::mutex shareFormCallbackMutex_;
+    mutable std::mutex AcquireDataCallbackMutex_;
     std::map<int64_t, std::set<std::shared_ptr<FormCallbackInterface>>> formCallbackMap_;
     std::map<int64_t, std::shared_ptr<ShareFormCallBack>> shareFormCallbackMap_;
+    std::map<int64_t, std::shared_ptr<FormDataCallbackInterface>> acquireDataCallbackMap_;
     std::map<std::string, std::set<std::shared_ptr<FormStateCallbackInterface>>> formStateCallbackMap_;
     UninstallCallback uninstallCallback_ = nullptr;
     std::unordered_set<int64_t> etsFormIds_;

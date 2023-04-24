@@ -1285,6 +1285,42 @@ bool FormDataMgr::CreateFormStateRecord(std::string &provider, const FormItemInf
     return false;
 }
 
+bool FormDataMgr::CreateFormAcquireDataRecord(int64_t requestCode, const FormItemInfo &info,
+                                              const sptr<IRemoteObject> &callerToken, int callingUid)
+{
+    std::lock_guard<std::recursive_mutex> lock(formAcquireDataRecordMutex_);
+    auto iter = formAcquireDataRecord_.find(requestCode);
+    if (iter != formAcquireDataRecord_.end()) {
+        if (iter->second.GetFormHostClient() != callerToken) {
+            iter->second.SetFormHostClient(callerToken);
+        }
+        return true;
+    }
+
+    FormHostRecord hostRecord;
+    bool isCreated = CreateHostRecord(info, callerToken, callingUid, hostRecord);
+    if (isCreated) {
+        formAcquireDataRecord_.emplace(requestCode, hostRecord);
+        return true;
+    }
+
+    return false;
+}
+
+ErrCode FormDataMgr::AcquireFormDataBack(const AAFwk::WantParams &wantParams, int64_t requestCode)
+{
+    std::lock_guard<std::recursive_mutex> lock(formAcquireDataRecordMutex_);
+    auto iter = formAcquireDataRecord_.find(requestCode);
+    if (iter == formAcquireDataRecord_.end()) {
+        HILOG_ERROR("filed to get form state host record");
+        return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
+    }
+    iter->second.OnAcquireFormData(wantParams, requestCode);
+    iter->second.CleanResource();
+    formAcquireDataRecord_.erase(iter);
+    return ERR_OK;
+}
+
 /**
  * @brief acquire form state callback.
  * @param state form state.
@@ -1761,6 +1797,43 @@ ErrCode FormDataMgr::CheckInvalidForm(const int64_t formId)
         HILOG_ERROR("The form id corresponds to a card that is not for the currently active user.");
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
+    return ERR_OK;
+}
+
+int32_t FormDataMgr::GetTempFormsCount(int32_t &formCount)
+{
+    std::lock_guard<std::recursive_mutex> lock(formTempMutex_);
+    formCount = tempForms_.size();
+    HILOG_DEBUG("%{public}s, current exist %{public}d temp forms in system", __func__, formCount);
+    return ERR_OK;
+}
+
+int32_t FormDataMgr::GetCastFormsCount(int32_t &formCount)
+{
+    std::lock_guard<std::recursive_mutex> lock(formRecordMutex_);
+    for (const auto &recordPair : formRecords_) {
+        FormRecord record = recordPair.second;
+        if (!record.formTempFlag) {
+            formCount++;
+        }
+    }
+    HILOG_DEBUG("%{public}s, current exist %{public}d cast forms in system", __func__, formCount);
+    return ERR_OK;
+}
+
+int32_t FormDataMgr::GetHostFormsCount(const std::string &bundleName, int32_t &formCount)
+{
+    if (bundleName.empty()) {
+        return ERR_OK;
+    }
+    std::lock_guard<std::recursive_mutex> lock(formHostRecordMutex_);
+    for (auto &record : clientRecords_) {
+        if (record.GetHostBundleName() == bundleName) {
+            formCount = record.GetFormsCount();
+            break;
+        }
+    }
+    HILOG_DEBUG("%{public}s, current exist %{public}d cast forms in host", __func__, formCount);
     return ERR_OK;
 }
 }  // namespace AppExecFwk

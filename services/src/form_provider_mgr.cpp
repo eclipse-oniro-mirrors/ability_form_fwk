@@ -431,6 +431,14 @@ ErrCode FormProviderMgr::AcquireFormStateBack(FormState state, const std::string
     return ERR_OK;
 }
 
+ErrCode FormProviderMgr::AcquireFormDataBack(const AAFwk::WantParams &wantParams,
+    int64_t requestCode)
+{
+    HILOG_DEBUG("start.");
+    FormDataMgr::GetInstance().AcquireFormDataBack(wantParams, requestCode);
+    return ERR_OK;
+}
+
 bool FormProviderMgr::IsNeedToFresh(FormRecord &record, int64_t formId, bool isVisibleToFresh)
 {
     bool isEnableRefresh = FormDataMgr::GetInstance().IsEnableRefresh(formId);

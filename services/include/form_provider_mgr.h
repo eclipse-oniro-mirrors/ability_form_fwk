@@ -100,6 +100,14 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode AcquireFormStateBack(FormState state, const std::string& provider, const Want &wantArg);
+
+    /**
+     * @brief Acquire form data.
+     * @param wantParams Indicates the data information acquired by the form.
+     * @param requestCode Indicates the requested id.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode AcquireFormDataBack(const AAFwk::WantParams &wantParams, int64_t requestCode);
     /**
      * @brief Process js message event.
      * @param formId Indicates the unique id of form.
