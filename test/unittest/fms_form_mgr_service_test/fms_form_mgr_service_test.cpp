@@ -930,4 +930,27 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0050, TestSize.Level1)
     EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY, formMgrService.CheckFormPermission());
     GTEST_LOG_(INFO) << "FormMgrService_0050 end";
 }
+
+/**
+ * @tc.number: FormMgrService_0051
+ * @tc.name: test HiDumpTemporaryFormInfos function.
+ * @tc.desc: Verify that the HiDumpTemporaryFormInfos interface is available.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0051, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0051 start";
+    // Add temp formRecords to FormDataMgr
+    FormDataMgr::GetInstance().formRecords_.clear();
+    FormRecord formRecord;
+    formRecord.formTempFlag = true;
+    FormDataMgr::GetInstance().formRecords_.emplace(0, formRecord);
+    // HiDumpTemporaryFormInfos
+    FormMgrService formMgrService;
+    std::string args;
+    std::string formInfo;
+    formMgrService.HiDumpTemporaryFormInfos(args, formInfo);
+    EXPECT_EQ(false, formInfo.empty());
+
+    GTEST_LOG_(INFO) << "FormMgrService_0051 end";
+}
 }

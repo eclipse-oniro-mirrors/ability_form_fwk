@@ -2162,4 +2162,57 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_UpdateHostFormFlag_008, TestSize
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_UpdateHostFormFlag_008 end";
 }
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetTempFormRecord_001
+ * @tc.name: GetTempFormRecord
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *       If temp form count is zero, return false.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetTempFormRecord_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetTempFormRecord_001 start";
+    // Clean all formRecords
+    formDataMgr_.formRecords_.clear();
+    // create formRecord
+    int64_t otherFormId = 800;
+    int callingUid = 0;
+    FormItemInfo formItemInfo;
+    formItemInfo.SetTemporaryFlag(false);
+    FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
+    formDataMgr_.formRecords_.emplace(otherFormId, record);
+
+    std::vector<FormRecord> formInfos;
+    EXPECT_EQ(false, formDataMgr_.GetTempFormRecord(formInfos));
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetTempFormRecord_001 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetTempFormRecord_002
+ * @tc.name: GetTempFormRecord
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *       If temp form count is greater than zero, return true, and the count is correct.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetTempFormRecord_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetTempFormRecord_002 start";
+    // Clean all formRecords
+    formDataMgr_.formRecords_.clear();
+    // create formRecord
+    int64_t otherFormId = 800;
+    int callingUid = 0;
+    FormItemInfo formItemInfo;
+    formItemInfo.SetTemporaryFlag(true);
+    FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
+    formDataMgr_.formRecords_.emplace(otherFormId, record);
+
+    std::vector<FormRecord> formInfos;
+    EXPECT_EQ(true, formDataMgr_.GetTempFormRecord(formInfos));
+    EXPECT_EQ(1, formInfos.size());
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetTempFormRecord_002 end";
+}
 }

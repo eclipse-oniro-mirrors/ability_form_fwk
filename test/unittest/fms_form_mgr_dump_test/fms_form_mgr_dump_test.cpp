@@ -18,6 +18,7 @@
 #include "form_ams_helper.h"
 #include "form_bms_helper.h"
 #define private public
+#include "form_dump_mgr.h"
 #include "form_mgr_service.h"
 #undef private
 #include "if_system_ability_manager.h"
@@ -165,5 +166,49 @@ HWTEST_F(FmsFormMgrDumpTest, Dump_005, TestSize.Level0)
     EXPECT_NE(result.find("error"), string::npos);
 
     GTEST_LOG_(INFO) << "fms_form_mgr_dump_test_005 end";
+}
+
+/*
+ * Feature: FormMgrService
+ * Function: FormMgr
+ * SubFunction: Dump Function
+ * FunctionPoints: FormMgr Dump interface
+ * EnvConditions: Mobile that can run ohos test framework
+ * CaseDescription: Verify if FormMgr invoke dump temp-form works.
+ */
+HWTEST_F(FmsFormMgrDumpTest, Dump_006, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "fms_form_mgr_dump_test_006 start";
+
+    std::vector<std::u16string> args = {u"-t"};
+    std::string result;
+    formyMgrServ_->Dump(args, result);
+    EXPECT_EQ(result.find("error"), string::npos);
+
+    args[0] = u"--temp";
+    formyMgrServ_->Dump(args, result);
+    EXPECT_EQ(result.find("error"), string::npos);
+
+    GTEST_LOG_(INFO) << "fms_form_mgr_dump_test_006 end";
+}
+
+/*
+ * Feature: FormMgrService
+ * Function: FormMgr
+ * SubFunction: AppendBundleFormInfo Function
+ * FunctionPoints: FormMgr AppendBundleFormInfo interface
+ * EnvConditions: Mobile that can run ohos test framework
+ * CaseDescription: Verify if FormMgr invoke AppendBundleFormInfo works.
+ */
+HWTEST_F(FmsFormMgrDumpTest, Dump_007, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "fms_form_mgr_dump_test_007 start";
+
+    FormRecord formRecord;
+    std::string formInfo;
+    FormDumpMgr::GetInstance().AppendBundleFormInfo(formRecord, formInfo);
+    EXPECT_EQ(false, formInfo.empty());
+
+    GTEST_LOG_(INFO) << "fms_form_mgr_dump_test_007 end";
 }
 }

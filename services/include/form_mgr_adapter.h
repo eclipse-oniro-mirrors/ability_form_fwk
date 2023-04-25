@@ -121,6 +121,12 @@ public:
      */
     int DumpStorageFormInfos(std::string &formInfos) const;
     /**
+     * @brief Dump all of temporary form infos.
+     * @param formInfos All of temporary form infos.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int DumpTemporaryFormInfos(std::string &formInfos) const;
+    /**
      * @brief Dump form info by a bundle name.
      * @param bundleName The bundle name of form provider.
      * @param formInfos Form infos.
