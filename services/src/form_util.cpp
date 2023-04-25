@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,9 +19,11 @@
 #include <cinttypes>
 #include <regex>
 
+#include "accesstoken_kit.h"
 #include "bundle_constants.h"
 #include "form_constants.h"
 #include "hilog_wrapper.h"
+#include "ipc_skeleton.h"
 #include "os_account_manager_wrapper.h"
 
 namespace OHOS {
@@ -31,6 +33,7 @@ constexpr int64_t SEC_TO_NANOSEC = 1000000000;
 constexpr int64_t SEC_TO_MILLISEC = 1000;
 constexpr int64_t MILLISEC_TO_NANOSEC = 1000000;
 constexpr int64_t INVALID_UDID_HASH = 0;
+constexpr int32_t SYSTEM_UID = 1000;
 } // namespace
 
 using namespace std;
@@ -204,5 +207,38 @@ int FormUtil::GetCurrentAccountId()
 
     return activeList.front();
 }
-}  // namespace AppExecFwk
-}  // namespace OHOS
+
+bool FormUtil::IsSACall()
+{
+    auto callerToken = IPCSkeleton::GetCallingTokenID();
+    HILOG_DEBUG("callerToken : %{private}u", callerToken);
+
+    auto tokenType = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken);
+    if (tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE) {
+        HILOG_DEBUG("caller tokenType is native, verify success");
+        return true;
+    }
+
+    if (IPCSkeleton::GetCallingUid() == SYSTEM_UID) {
+        HILOG_DEBUG("callingUid is native, verify success");
+        return true;
+    }
+
+    HILOG_DEBUG("Not SA called.");
+    return false;
+}
+
+bool FormUtil::VerifyCallingPermission(const std::string &permissionName)
+{
+    HILOG_DEBUG("called. permission name is:%{public}s", permissionName.c_str());
+    auto callerToken = IPCSkeleton::GetCallingTokenID();
+    int32_t ret = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
+    if (ret == Security::AccessToken::PermissionState::PERMISSION_DENIED) {
+        HILOG_ERROR("permission %{public}s: PERMISSION_DENIED", permissionName.c_str());
+        return false;
+    }
+    HILOG_DEBUG("Verify calling permission success");
+    return true;
+}
+} // namespace AppExecFwk
+} // namespace OHOS

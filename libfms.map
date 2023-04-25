@@ -34,6 +34,7 @@
         *OHOS::AppExecFwk::FormDumpMgr*;
         *OHOS::AppExecFwk::FormEventHandler*;
         *OHOS::AppExecFwk::FormEventNotifyConnection*;
+        *OHOS::AppExecFwk::FormEventReport*;
         *OHOS::AppExecFwk::FormEventUtil*;
         *OHOS::AppExecFwk::FormFreeInstallOperator*;
         *OHOS::AppExecFwk::FormHostCallback*;

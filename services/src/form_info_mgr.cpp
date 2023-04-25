@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License")_;
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -97,7 +97,7 @@ ErrCode FormInfoHelper::LoadStageFormConfigInfo(const BundleInfo &bundleInfo, st
                 continue;
             }
             for (const auto &extensionFormInfo: extensionFormInfos) {
-                FormInfo formInfo(extensionInfo, extensionFormInfo); 
+                FormInfo formInfo(extensionInfo, extensionFormInfo);
                 if (GetFormInfoDescription(resourceManager, formInfo) != ERR_OK) {
                     HILOG_INFO("Get FormInfo Description fail");
                 }
@@ -645,11 +645,11 @@ bool FormInfoMgr::IsCaller(const std::string& bundleName)
 
 bool FormInfoMgr::CheckBundlePermission()
 {
-    auto isSaCall = AAFwk::PermissionVerification::GetInstance()->IsSACall();
+    auto isSaCall = FormUtil::IsSACall();
     if (isSaCall) {
         return true;
     }
-    auto isCallingPerm = AAFwk::PermissionVerification::GetInstance()->VerifyCallingPermission(
+    auto isCallingPerm = FormUtil::VerifyCallingPermission(
         AppExecFwk::Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED);
     if (isCallingPerm) {
         return true;

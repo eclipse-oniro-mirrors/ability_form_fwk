@@ -28,7 +28,6 @@ ohos_unittest("fms_form_mgr_service_test") {
     "${form_fwk_path}/test/unittest/fms_form_mgr_service_test/mock_form_mgr_service.cpp",
     "${form_fwk_path}/test/unittest/fms_form_mgr_service_test/mock_form_share_mgr.cpp",
     "${form_fwk_path}/test/unittest/fms_form_mgr_service_test/mock_form_util.cpp",
-    "${form_fwk_path}/test/unittest/fms_form_mgr_service_test/mock_permission_verification.cpp",
     "${form_fwk_path}/test/unittest/fms_form_mgr_service_test/mock_tokenid_kit.cpp",
   ]
 
