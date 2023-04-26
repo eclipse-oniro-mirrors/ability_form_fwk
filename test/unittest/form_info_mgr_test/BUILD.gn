@@ -30,7 +30,6 @@ ohos_unittest("FormInfoMgrTest") {
     "${form_fwk_path}:form_manager",
     "${form_fwk_path}/test/resource/benchmark/form_test_bundle:formTestWidget1",
     "${form_fwk_path}/test/unittest/ohos_test:copy_ohos_test",
-    "${systemabilitymgr_path}/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
     "//third_party/googletest:gmock_main",
   ]
 
@@ -53,6 +52,7 @@ ohos_unittest("FormInfoMgrTest") {
     "multimedia_image_framework:image_native",
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
   ]
 }
 

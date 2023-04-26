@@ -39,8 +39,6 @@ ohos_unittest("FmsFormCacheMgrTest") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
   deps = [
-    "${ability_runtime_path}/interfaces/inner_api/app_manager:app_manager",
-    "${ability_runtime_path}/services/abilitymgr:abilityms_target",
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
   ]
@@ -49,6 +47,7 @@ ohos_unittest("FmsFormCacheMgrTest") {
     "ability_base:base",
     "ability_base:configuration",
     "ability_base:want",
+    "ability_runtime:app_manager",
     "appspawn:appspawn_socket_client",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",

@@ -39,8 +39,6 @@ ohos_unittest("FmsFormRenderImplTest") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
   deps = [
-    "${ability_runtime_path}/interfaces/inner_api/app_manager:app_manager",
-    "${ability_runtime_path}/services/abilitymgr:abilityms_target",
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}/services/form_render_service:formrender",
@@ -54,6 +52,7 @@ ohos_unittest("FmsFormRenderImplTest") {
     "ability_runtime:ability_manager",
     "ability_runtime:abilitykit_native",
     "ability_runtime:app_context",
+    "ability_runtime:app_manager",
     "ability_runtime:service_extension",
     "ability_runtime:wantagent_innerkits",
     "ace_engine:ace_form_render",

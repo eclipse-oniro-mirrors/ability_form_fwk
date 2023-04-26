@@ -36,19 +36,14 @@ ohos_fuzztest("FormCallerMgrFuzzTest") {
   configs = [ "${ability_runtime_path}/interfaces/inner_api/ability_manager:ability_manager_public_config" ]
 
   deps = [
-    "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
-    "${ability_runtime_path}/interfaces/inner_api/app_manager:app_manager",
-    "${ability_runtime_path}/services/abilitymgr:abilityms_target",
-    "${bundlefwk_inner_api_path}/appexecfwk_base:appexecfwk_base",
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
-    "${systemabilitymgr_path}/safwk/interfaces/innerkits/safwk:system_ability_fwk",
-    "${systemabilitymgr_path}/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
   ]
 
   external_deps = [
     "ability_base:base",
     "ability_base:want",
+    "ability_runtime:abilitykit_native",
     "ability_runtime:app_manager",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
