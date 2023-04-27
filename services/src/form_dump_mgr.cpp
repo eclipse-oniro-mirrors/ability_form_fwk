@@ -190,7 +190,9 @@ void FormDumpMgr::DumpFormInfo(const FormRecord &formRecordInfo, std::string &fo
 void FormDumpMgr::AppendBundleFormInfo(const FormRecord &formRecordInfo, std::string &formInfo) const
 {
     FormInfo bundleFormInfo;
-    FormInfoMgr::GetInstance().GetFormsInfoByRecord(formRecordInfo, bundleFormInfo);
+    if (FormInfoMgr::GetInstance().GetFormsInfoByRecord(formRecordInfo, bundleFormInfo) != ERR_OK) {
+        formInfo += "    ERROR! Can not get formInfo from BMS! \n";
+    }
     formInfo += "    colorMode [" + std::to_string(static_cast<int32_t>(bundleFormInfo.colorMode)) + "]\n";
     formInfo += "    defaultDimension [" + std::to_string(bundleFormInfo.defaultDimension) + "]\n";
     if (!bundleFormInfo.supportDimensions.empty()) {

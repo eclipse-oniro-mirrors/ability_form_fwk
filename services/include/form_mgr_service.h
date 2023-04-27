@@ -382,9 +382,9 @@ private:
     enum class DumpKey {
         KEY_DUMP_HELP = 0,
         KEY_DUMP_STORAGE,
-        KEY_DUMP_TEMPORARY,
         KEY_DUMP_BY_BUNDLE_NAME,
         KEY_DUMP_BY_FORM_ID,
+        KEY_DUMP_TEMPORARY,
     };
     /**
      * @brief initialization of form manager service.

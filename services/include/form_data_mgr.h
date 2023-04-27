@@ -150,10 +150,10 @@ public:
     bool GetFormRecord(const std::string &bundleName, std::vector<FormRecord> &formInfos);
     /**
      * @brief Get temporary form record.
-     * @param formInfos The form record.
+     * @param formTempRecords The temp form record.
      * @return Returns true if this function is successfully called; returns false otherwise.
      */
-    bool GetTempFormRecord(std::vector<FormRecord> &formInfos);
+    bool GetTempFormRecord(std::vector<FormRecord> &formTempRecords);
     /**
      * @brief Check form record is exist.
      * @param formId The Id of the form.

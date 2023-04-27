@@ -536,7 +536,7 @@ ErrCode FormInfoMgr::GetFormsInfoByRecord(const FormRecord &formRecord, FormInfo
             break;
         }
     }
-    return ERR_OK;
+    return formInfo.name.empty() ? ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED : ERR_OK;
 }
 
 ErrCode FormInfoMgr::CheckDynamicFormInfo(FormInfo &formInfo, const BundleInfo &bundleInfo)
