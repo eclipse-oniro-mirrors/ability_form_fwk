@@ -16,6 +16,7 @@
 #include "form_dump_mgr.h"
 
 #include "form_cache_mgr.h"
+#include "form_info_mgr.h"
 #include "hilog_wrapper.h"
 
 namespace OHOS {
@@ -32,6 +33,28 @@ FormDumpMgr::~FormDumpMgr() {}
 void FormDumpMgr::DumpStorageFormInfos(const std::vector<FormDBInfo> &storageInfos, std::string &formInfos) const
 {
     for (const auto &info : storageInfos) {
+        formInfos += "  FormId #" + std::to_string(info.formId) + "\n";
+        formInfos += "    formName [" + info.formName + "]\n";
+        formInfos += "    userId [" + std::to_string(info.userId) + "]\n";
+        formInfos += "    bundleName [" + info.bundleName + "]\n";
+        formInfos += "    moduleName [" + info.moduleName + "]\n";
+        formInfos += "    abilityName [" + info.abilityName + "]\n";
+        formInfos += "    formUserUids [";
+        for (const auto &uId : info.formUserUids) {
+            formInfos += " Uid[" + std::to_string(uId) + "] ";
+        }
+        formInfos += "]\n" + LINE_SEPARATOR;
+    }
+}
+/**
+ * @brief Dump all of temporary form infos.
+ * @param formRecordInfos Form record infos.
+ * @param formInfos Form dump infos.
+ */
+void FormDumpMgr::DumpTemporaryFormInfos(const std::vector<FormRecord> &formRecordInfos, std::string &formInfos) const
+{
+    formInfos += "  Total Temporary-Form count is " + std::to_string(formRecordInfos.size()) + "\n" + LINE_SEPARATOR;
+    for (const auto &info : formRecordInfos) {
         formInfos += "  FormId #" + std::to_string(info.formId) + "\n";
         formInfos += "    formName [" + info.formName + "]\n";
         formInfos += "    userId [" + std::to_string(info.userId) + "]\n";
@@ -89,13 +112,8 @@ void FormDumpMgr::DumpFormInfos(const std::vector<FormRecord> &formRecordInfos, 
             formInfos += "]\n";
         }
 
-        // formCacheData
-        std::string strCacheData;
-        if (FormCacheMgr::GetInstance().GetData(info.formId, strCacheData)) {
-            formInfos += "    formCacheData [";
-            formInfos += strCacheData;
-            formInfos += "]\n" + LINE_SEPARATOR;
-        }
+        AppendBundleFormInfo(info, formInfos);
+        formInfos += LINE_SEPARATOR;
     }
 
     HILOG_DEBUG("%{public}s success. Form infos:%{private}s", __func__, formInfos.c_str());
@@ -163,15 +181,27 @@ void FormDumpMgr::DumpFormInfo(const FormRecord &formRecordInfo, std::string &fo
         formInfo += "]\n";
     }
 
-    // formCacheData
-    std::string strCacheData;
-    if (FormCacheMgr::GetInstance().GetData(formRecordInfo.formId, strCacheData)) {
-        formInfo += "    formCacheData[";
-        formInfo += strCacheData;
-        formInfo += "]\n" + LINE_SEPARATOR;
-    }
+    AppendBundleFormInfo(formRecordInfo, formInfo);
+    formInfo += LINE_SEPARATOR;
 
     HILOG_DEBUG("%{public}s success. Form infos:%{private}s", __func__, formInfo.c_str());
+}
+
+void FormDumpMgr::AppendBundleFormInfo(const FormRecord &formRecordInfo, std::string &formInfo) const
+{
+    FormInfo bundleFormInfo;
+    if (FormInfoMgr::GetInstance().GetFormsInfoByRecord(formRecordInfo, bundleFormInfo) != ERR_OK) {
+        formInfo += "    ERROR! Can not get formInfo from BMS! \n";
+    }
+    formInfo += "    colorMode [" + std::to_string(static_cast<int32_t>(bundleFormInfo.colorMode)) + "]\n";
+    formInfo += "    defaultDimension [" + std::to_string(bundleFormInfo.defaultDimension) + "]\n";
+    if (!bundleFormInfo.supportDimensions.empty()) {
+        formInfo += "    supportDimensions [";
+        for (const auto &dimension : bundleFormInfo.supportDimensions) {
+            formInfo += " [" + std::to_string(dimension) + "] ";
+        }
+        formInfo += "]\n";
+    }
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

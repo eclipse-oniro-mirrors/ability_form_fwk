@@ -62,6 +62,7 @@ constexpr int32_t FORM_DUMP_ARGC_MAX = 2;
 const std::string FORM_DUMP_HELP = "options list:\n"
     "  -h, --help                               list available commands\n"
     "  -s, --storage                            query form storage info\n"
+    "  -t, --temp                               query temporary form info\n"
     "  -n  <bundle-name>                        query form info by a bundle name\n"
     "  -i  <form-id>                            query form info by a form ID\n";
 
@@ -70,6 +71,8 @@ const std::map<std::string, FormMgrService::DumpKey> FormMgrService::dumpKeyMap_
     {"--help", FormMgrService::DumpKey::KEY_DUMP_HELP},
     {"-s", FormMgrService::DumpKey::KEY_DUMP_STORAGE},
     {"--storage", FormMgrService::DumpKey::KEY_DUMP_STORAGE},
+    {"-t", FormMgrService::DumpKey::KEY_DUMP_TEMPORARY},
+    {"--temp", FormMgrService::DumpKey::KEY_DUMP_TEMPORARY},
     {"-n", FormMgrService::DumpKey::KEY_DUMP_BY_BUNDLE_NAME},
     {"-i", FormMgrService::DumpKey::KEY_DUMP_BY_FORM_ID},
 };
@@ -925,6 +928,7 @@ void FormMgrService::DumpInit()
 {
     dumpFuncMap_[DumpKey::KEY_DUMP_HELP] = &FormMgrService::HiDumpHelp;
     dumpFuncMap_[DumpKey::KEY_DUMP_STORAGE] = &FormMgrService::HiDumpStorageFormInfos;
+    dumpFuncMap_[DumpKey::KEY_DUMP_TEMPORARY] = &FormMgrService::HiDumpTemporaryFormInfos;
     dumpFuncMap_[DumpKey::KEY_DUMP_BY_BUNDLE_NAME] = &FormMgrService::HiDumpFormInfoByBundleName;
     dumpFuncMap_[DumpKey::KEY_DUMP_BY_FORM_ID] = &FormMgrService::HiDumpFormInfoByFormId;
 }
@@ -1003,6 +1007,11 @@ void FormMgrService::HiDumpHelp([[maybe_unused]] const std::string &args, std::s
 void FormMgrService::HiDumpStorageFormInfos([[maybe_unused]] const std::string &args, std::string &result)
 {
     DumpStorageFormInfos(result);
+}
+
+void FormMgrService::HiDumpTemporaryFormInfos([[maybe_unused]] const std::string &args, std::string &result)
+{
+    FormMgrAdapter::GetInstance().DumpTemporaryFormInfos(result);
 }
 
 void FormMgrService::HiDumpFormInfoByBundleName(const std::string &args, std::string &result)

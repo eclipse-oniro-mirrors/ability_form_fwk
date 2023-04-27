@@ -712,6 +712,21 @@ int FormMgrAdapter::DumpStorageFormInfos(std::string &formInfos) const
     return ERR_OK;
 }
 /**
+ * @brief Dump all of temporary form infos.
+ * @param formInfos All of temporary form infos.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormMgrAdapter::DumpTemporaryFormInfos(std::string &formInfos) const
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    std::vector<FormRecord> formRecordInfos;
+    if (!FormDataMgr::GetInstance().GetTempFormRecord(formRecordInfos)) {
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    }
+    FormDumpMgr::GetInstance().DumpTemporaryFormInfos(formRecordInfos, formInfos);
+    return ERR_OK;
+}
+/**
  * @brief Dump form info by a bundle name.
  * @param bundleName The bundle name of form provider.
  * @param formInfos Form infos.

@@ -512,6 +512,33 @@ ErrCode FormInfoMgr::GetFormsInfoByModule(const std::string &bundleName, const s
     return ERR_OK;
 }
 
+ErrCode FormInfoMgr::GetFormsInfoByRecord(const FormRecord &formRecord, FormInfo &formInfo)
+{
+    std::vector<FormInfo> formInfos;
+    {
+        std::shared_lock<std::shared_timed_mutex> guard(bundleFormInfoMapMutex_);
+        auto bundleFormInfoIter = bundleFormInfoMap_.find(formRecord.bundleName);
+        if (bundleFormInfoIter == bundleFormInfoMap_.end()) {
+            HILOG_ERROR("no forms found for %{public}s.", formRecord.bundleName.c_str());
+            return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+        }
+
+        if (bundleFormInfoIter->second == nullptr) {
+            HILOG_ERROR("BundleFormInfo is nullptr, GetFormsInfoByModule failed.");
+            return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+        }
+        
+        bundleFormInfoIter->second->GetFormsInfoByModule(formRecord.moduleName, formInfos);
+    }
+    for (const FormInfo &info : formInfos) {
+        if (info.name == formRecord.formName) {
+            formInfo = info;
+            break;
+        }
+    }
+    return formInfo.name.empty() ? ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED : ERR_OK;
+}
+
 ErrCode FormInfoMgr::CheckDynamicFormInfo(FormInfo &formInfo, const BundleInfo &bundleInfo)
 {
     for (auto &moduleInfo : bundleInfo.hapModuleInfos) {

@@ -384,6 +384,7 @@ private:
         KEY_DUMP_STORAGE,
         KEY_DUMP_BY_BUNDLE_NAME,
         KEY_DUMP_BY_FORM_ID,
+        KEY_DUMP_TEMPORARY,
     };
     /**
      * @brief initialization of form manager service.
@@ -401,6 +402,7 @@ private:
     bool ParseOption(const std::vector<std::u16string> &args, DumpKey &key, std::string &value, std::string &result);
     void HiDumpHelp([[maybe_unused]] const std::string &args, std::string &result);
     void HiDumpStorageFormInfos([[maybe_unused]] const std::string &args, std::string &result);
+    void HiDumpTemporaryFormInfos([[maybe_unused]] const std::string &args, std::string &result);
     void HiDumpFormInfoByBundleName(const std::string &args, std::string &result);
     void HiDumpFormInfoByFormId(const std::string &args, std::string &result);
     bool CheckCallerIsSystemApp() const;
