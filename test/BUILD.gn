@@ -21,11 +21,11 @@ config("formmgr_test_config") {
 
 public_configs = [
   ":formmgr_test_config",
-  "//commonlibrary/c_utils/base:utils_config",
+  "${c_utils_base_path}:utils_config",
 ]
 
 public_deps = [
-  "//commonlibrary/c_utils/base:utils",
+  "${c_utils_base_path}:utils",
   "//third_party/googletest:gmock_main",
   "//third_party/googletest:gtest_main",
 ]

@@ -46,13 +46,8 @@ ohos_unittest("FmsFormMgrPublishFormTest") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
   deps = [
-    "${ability_runtime_path}/interfaces/inner_api/app_manager:app_manager",
-    "${ability_runtime_path}/services/abilitymgr:abilityms_target",
-    "${distributeddatamgr_path}/kv_store/interfaces/innerkits/distributeddata:distributeddata_inner",
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
-    "${systemabilitymgr_path}/safwk/interfaces/innerkits/safwk:system_ability_fwk",
-    "${systemabilitymgr_path}/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
     "//third_party/googletest:gmock_main",
   ]
 
@@ -60,6 +55,7 @@ ohos_unittest("FmsFormMgrPublishFormTest") {
     "ability_base:base",
     "ability_base:configuration",
     "ability_base:want",
+    "ability_runtime:app_manager",
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
@@ -72,6 +68,9 @@ ohos_unittest("FmsFormMgrPublishFormTest") {
     "form_fwk:form_manager",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "kv_store:distributeddata_inner",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
   ]
 }
 
