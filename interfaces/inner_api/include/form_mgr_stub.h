@@ -320,7 +320,7 @@ private:
      * @param reply output param
      * @return Return ERR_OK on success, others on failure
      */
-    int32_t HandleGetFormInstancesById(MessageParcel &data, MessageParcel &reply);
+    int32_t HandleGetFormInstanceById(MessageParcel &data, MessageParcel &reply);
 private:
     using FormMgrFunc = int32_t (FormMgrStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, FormMgrFunc> memberFuncMap_;

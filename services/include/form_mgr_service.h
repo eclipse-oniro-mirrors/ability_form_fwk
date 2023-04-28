@@ -393,10 +393,11 @@ public:
     /**
      * @brief Get form instances by formId.
      * @param formId formId Indicates the unique id of form.
-     * @param formInstances return formInstances
+     * @param formInstance return formInstance
      * @return return ERR_OK on get info success,other on failture.
      */
-    int32_t GetFormInstancesById(const int64_t formId, std::vector<FormInstance> &formInstances) override;
+    int32_t GetFormInstanceById(const int64_t formId, FormInstance &formInstance) override;
+
 private:
     enum class DumpKey {
         KEY_DUMP_HELP = 0,

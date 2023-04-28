@@ -74,7 +74,7 @@ public:
     MOCK_METHOD2(GetHostFormsCount, int32_t(std::string &bundleName, int32_t &formCount));
     MOCK_METHOD2(GetFormInstancesByFilter, int32_t(const FormInstancesFilter &formInstancesFilter,
         std::vector<FormInstance> &formInstances));
-    MOCK_METHOD2(GetFormInstancesById, int32_t(const int64_t formId, std::vector<FormInstance> &formInstances));
+    MOCK_METHOD2(GetFormInstanceById, int32_t(const int64_t formId, FormInstance &formInstances));
 };
 }
 }

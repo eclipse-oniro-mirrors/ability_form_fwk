@@ -1405,22 +1405,23 @@ int32_t FormMgrProxy::GetFormInstancesByFilter(const FormInstancesFilter &formIn
     return error;
 }
 
-int32_t FormMgrProxy::GetFormInstancesById(const int64_t formId, std::vector<FormInstance> &formInstances)
+int32_t FormMgrProxy::GetFormInstanceById(const int64_t formId, FormInstance &formInstance)
 {
-    HILOG_INFO("GetFormInstancesById start.");
+    HILOG_INFO("GetFormInstanceById start.");
     MessageParcel data;
     // write in token to help identify which stub to be called.
     if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("GetFormInstancesById, failed to write interface token");
+        HILOG_ERROR("GetFormInstanceById, failed to write interface token");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.WriteInt64(formId)) {
-        HILOG_ERROR("GetFormInstancesById, failed to write formId");
+        HILOG_ERROR("GetFormInstanceById, failed to write formId");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    int32_t error = GetFormInstance(IFormMgr::Message::FORM_MGR_GET_FORM_INSTANCES_FROM_BY_ID, data, formInstances);
+    int error = GetParcelableInfo<FormInstance>(IFormMgr::Message::FORM_MGR_GET_FORM_INSTANCES_FROM_BY_ID,
+        data, formInstance);
     if (error != ERR_OK) {
-        HILOG_ERROR("GetFormInstancesById, failed to GetFormInstancesById: %{public}d", error);
+        HILOG_ERROR("GetFormInstanceById, failed to GetParcelableInfo.");
     }
 
     return error;

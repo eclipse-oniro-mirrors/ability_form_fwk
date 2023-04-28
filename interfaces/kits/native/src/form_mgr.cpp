@@ -1090,15 +1090,15 @@ int32_t FormMgr::GetFormInstancesByFilter(const FormInstancesFilter &formInstanc
     return remoteProxy_->GetFormInstancesByFilter(formInstancesFilter, formInstances);
 }
 
-int32_t FormMgr::GetFormInstancesById(const int64_t formId, std::vector<FormInstance> &formInstances)
+int32_t FormMgr::GetFormInstanceById(const int64_t formId, FormInstance &formInstance)
 {
-    HILOG_DEBUG("GetFormInstancesById called.");
+    HILOG_DEBUG("GetFormInstanceById called.");
     int32_t errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("get form Instance by formId failed, errCode:%{public}d.", errCode);
+        HILOG_ERROR("get form instance by formId failed, errCode:%{public}d.", errCode);
         return errCode;
     }
-    return remoteProxy_->GetFormInstancesById(formId, formInstances);
+    return remoteProxy_->GetFormInstanceById(formId, formInstance);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

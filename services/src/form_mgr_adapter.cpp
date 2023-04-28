@@ -2471,9 +2471,9 @@ int32_t FormMgrAdapter::GetFormInstancesByFilter(const FormInstancesFilter &form
     return FormDataMgr::GetInstance().GetFormInstancesByFilter(formInstancesFilter, formInstances);
 }
 
-int32_t FormMgrAdapter::GetFormInstancesById(const int64_t formId, std::vector<FormInstance> &formInstances)
+int32_t FormMgrAdapter::GetFormInstanceById(const int64_t formId, FormInstance &formInstance)
 {
-    return FormDataMgr::GetInstance().GetFormInstancesById(formId, formInstances);
+    return FormDataMgr::GetInstance().GetFormInstanceById(formId, formInstance);
 }
 } // namespace AppExecFwk
 } // namespace OHOS

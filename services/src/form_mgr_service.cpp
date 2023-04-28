@@ -1083,7 +1083,7 @@ int32_t FormMgrService::GetFormInstancesByFilter(const FormInstancesFilter &form
     return FormMgrAdapter::GetInstance().GetFormInstancesByFilter(formInstancesFilter, formInstances);
 }
 
-int32_t FormMgrService::GetFormInstancesById(const int64_t formId, std::vector<FormInstance> &formInstances)
+int32_t FormMgrService::GetFormInstanceById(const int64_t formId, FormInstance &formInstance)
 {
     if (!CheckCallerIsSystemApp()) {
         HILOG_ERROR("caller app is not system app!");
@@ -1094,7 +1094,7 @@ int32_t FormMgrService::GetFormInstancesById(const int64_t formId, std::vector<F
         HILOG_ERROR("verify calling permission failed!");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
-    return FormMgrAdapter::GetInstance().GetFormInstancesById(formId, formInstances);
+    return FormMgrAdapter::GetInstance().GetFormInstanceById(formId, formInstance);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

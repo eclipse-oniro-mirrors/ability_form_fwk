@@ -1879,12 +1879,12 @@ int32_t FormDataMgr::GetFormInstancesByFilter(const FormInstancesFilter &formIns
     return ERR_OK;
 }
 
-int32_t FormDataMgr::GetFormInstancesById(const int64_t formId, std::vector<FormInstance> &formInstances)
+int32_t FormDataMgr::GetFormInstanceById(const int64_t formId, FormInstance &formInstance)
 {
-    HILOG_INFO("GetFormInstancesById, get form record by formId");
+    HILOG_INFO("GetFormInstanceById, get form record by formId");
     std::lock_guard<std::recursive_mutex> lock(formRecordMutex_);
     if (formId <= 0) {
-        HILOG_ERROR("GetFormInstancesById, formId is invalid");
+        HILOG_ERROR("GetFormInstanceById, formId is invalid");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     auto info = formRecords_.find(formId);
@@ -1892,16 +1892,12 @@ int32_t FormDataMgr::GetFormInstancesById(const int64_t formId, std::vector<Form
         FormRecord formRecord = info->second;
         std::vector<FormHostRecord> formHostRecords;
         GetFormHostRecord(formId, formHostRecords);
-        FormInstance instance;
-        for (auto formHostRecord : formHostRecords) {
-            instance.formHostName = formHostRecord.GetHostBundleName();
-            instance.formId = formRecord.formId;
-            instance.specification = formRecord.specification;
-            instance.formVisiblity = formRecord.isVisible ? FormVisibilityType::VISIBLE : FormVisibilityType::INVISIBLE;
-            formInstances.emplace_back(instance);
-        }
+        formInstance.formHostName = formHostRecords.begin()->GetHostBundleName();
+        formInstance.formId = formRecord.formId;
+        formInstance.specification = formRecord.specification;
+        formInstance.formVisiblity = formRecord.isVisible ? FormVisibilityType::VISIBLE : FormVisibilityType::INVISIBLE;
     }
-    HILOG_INFO("GetFormInstancesById, get form record successfully");
+    HILOG_INFO("GetFormInstanceById, get form record successfully");
     return ERR_OK;
 }
 }  // namespace AppExecFwk

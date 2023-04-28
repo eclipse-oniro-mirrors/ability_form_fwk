@@ -115,7 +115,7 @@ FormMgrStub::FormMgrStub()
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORM_INSTANCES_FROM_BY_FILTER)] =
         &FormMgrStub::HandleGetFormInstancesByFilter;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORM_INSTANCES_FROM_BY_ID)] =
-        &FormMgrStub::HandleGetFormInstancesById;
+        &FormMgrStub::HandleGetFormInstanceById;
 }
 
 FormMgrStub::~FormMgrStub()
@@ -959,16 +959,15 @@ int32_t FormMgrStub::HandleGetFormInstancesByFilter(MessageParcel &data, Message
     return ERR_OK;
 }
 
-int32_t FormMgrStub::HandleGetFormInstancesById(MessageParcel &data, MessageParcel &reply)
+int32_t FormMgrStub::HandleGetFormInstanceById(MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("HandleGetFormInstancesById called.");
+    HILOG_INFO("HandleGetFormInstanceById called.");
     int64_t formId = data.ReadInt64();
-    std::vector<FormInstance> infos;
-    int32_t result = GetFormInstancesById(formId, infos);
-    HILOG_ERROR("HandleGetFormInstancesById, GetFormInstancesById info size %{public}d",infos.size());
+    FormInstance info;
+    int32_t result = GetFormInstanceById(formId, info);
     reply.WriteInt32(result);
     if (result == ERR_OK) {
-        if (!WriteParcelableVector(infos, reply)) {
+        if (!reply.WriteParcelable(&info)) {
             HILOG_ERROR("write failed");
             return ERR_APPEXECFWK_PARCEL_ERROR;
         }

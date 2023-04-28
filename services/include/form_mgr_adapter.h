@@ -329,12 +329,12 @@ public:
         std::vector<FormInstance> &formInstances);
 
     /**
-     * @brief Get form instances by formId.
+     * @brief Get form instance by formId.
      * @param formId formId Indicates the unique id of form.
-     * @param formInstances return formInstances
+     * @param formInstance return formInstance
      * @return return ERR_OK on get info success,other on failture.
      */
-    int32_t GetFormInstancesById(const int64_t formId, std::vector<FormInstance> &formInstances);
+    int32_t GetFormInstanceById(const int64_t formId, FormInstance &formInstance);
 private:
     /**
      * @brief Get form configure info.

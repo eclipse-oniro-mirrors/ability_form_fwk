@@ -356,12 +356,12 @@ public:
         std::vector<FormInstance> &formInstances) override;
 
    /**
-    * @brief Get form instances by formId.
+    * @brief Get form instance by formId.
     * @param formId formId Indicates the unique id of form.
-    * @param formInstances return formInstances
-    * @return return ERR_OK on get info success,other on failture.
+    * @param formInstance return formInstance
+    * @return return true on get info success,other on failture.
     */
-    virtual int32_t GetFormInstancesById(const int64_t formId, std::vector<FormInstance> &formInstances) override;
+    virtual int32_t GetFormInstanceById(const int64_t formId, FormInstance &formInstance) override;
 private:
     template<typename T>
     int GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos);
