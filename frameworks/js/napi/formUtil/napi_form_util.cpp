@@ -659,13 +659,13 @@ std::string GetStringFromNapi(napi_env env, napi_value value)
     size_t size = 0;
 
     if (napi_get_value_string_utf8(env, value, nullptr, 0, &size) != napi_ok) {
-        HILOG_ERROR("%{public}s, can not get string size", __func__);
+        HILOG_ERROR("GetStringFromNapi, can not get string size");
         return "";
     }
     result.reserve(size + 1);
     result.resize(size);
     if (napi_get_value_string_utf8(env, value, result.data(), (size + 1), &size) != napi_ok) {
-        HILOG_ERROR("%{public}s, can not get string value", __func__);
+        HILOG_ERROR("GetStringFromNapi, can not get string value");
         return "";
     }
     return result;

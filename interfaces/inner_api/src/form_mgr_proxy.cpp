@@ -1385,20 +1385,20 @@ int32_t FormMgrProxy::GetHostFormsCount(std::string &bundleName, int32_t &formCo
 int32_t FormMgrProxy::GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
         std::vector<FormInstance> &formInstances)
 {
-    HILOG_INFO("%{public}s start.", __func__);
+    HILOG_INFO("GetFormInstancesByFilter start.");
     MessageParcel data;
     // write in token to help identify which stub to be called.
     if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("%{public}s, failed to write interface token", __func__);
+        HILOG_ERROR("GetFormInstancesByFilter, failed to write interface token");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.WriteParcelable(&formInstancesFilter)) {
-        HILOG_ERROR("%{public}s, failed to write formInstancesFilter", __func__);
+        HILOG_ERROR("GetFormInstancesByFilter, failed to write formInstancesFilter");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t error = GetFormInstance(IFormMgr::Message::FORM_MGR_GET_FORM_INSTANCES_FROM_BY_FILTER, data, formInstances);
     if (error != ERR_OK) {
-        HILOG_ERROR("%{public}s, failed to GetFormInstancesByFilter: %{public}d", __func__, error);
+        HILOG_ERROR("GetFormInstancesByFilter, failed to GetFormInstancesByFilter: %{public}d", error);
 
     }
 
@@ -1407,20 +1407,20 @@ int32_t FormMgrProxy::GetFormInstancesByFilter(const FormInstancesFilter &formIn
 
 int32_t FormMgrProxy::GetFormInstancesById(const int64_t formId, std::vector<FormInstance> &formInstances)
 {
-    HILOG_INFO("%{public}s start.", __func__);
+    HILOG_INFO("GetFormInstancesById start.");
     MessageParcel data;
     // write in token to help identify which stub to be called.
     if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("%{public}s, failed to write interface token", __func__);
+        HILOG_ERROR("GetFormInstancesById, failed to write interface token");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.WriteInt64(formId)) {
-        HILOG_ERROR("%{public}s, failed to write formId", __func__);
+        HILOG_ERROR("GetFormInstancesById, failed to write formId");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t error = GetFormInstance(IFormMgr::Message::FORM_MGR_GET_FORM_INSTANCES_FROM_BY_ID, data, formInstances);
     if (error != ERR_OK) {
-        HILOG_ERROR("%{public}s, failed to GetFormInstancesById: %{public}d", __func__, error);
+        HILOG_ERROR("GetFormInstancesById, failed to GetFormInstancesById: %{public}d", error);
     }
 
     return error;
@@ -1437,7 +1437,7 @@ int32_t FormMgrProxy::GetFormInstance(IFormMgr::Message code, MessageParcel &dat
 
     error = reply.ReadInt32();
     if (error != ERR_OK) {
-        HILOG_ERROR("%{public}s, failed to read reply result", __func__);
+        HILOG_ERROR("GetFormInstance, failed to read reply result");
         return error;
     }
     auto ret = GetParcelableInfos<FormInstance>(reply, formInstances);

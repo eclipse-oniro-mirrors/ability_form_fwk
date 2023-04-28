@@ -939,18 +939,18 @@ int32_t FormMgrStub::HandleGetHostFormsCount(MessageParcel &data, MessageParcel 
 
 int32_t FormMgrStub::HandleGetFormInstancesByFilter(MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("HandleGetFormInstancesByFilter called.");
     std::unique_ptr<FormInstancesFilter> filter(data.ReadParcelable<FormInstancesFilter>());
     if (filter == nullptr) {
-        HILOG_ERROR("%{public}s, failed to get filter.", __func__);
+        HILOG_ERROR("HandleGetFormInstancesByFilter, failed to get filter.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     std::vector<FormInstance> infos;
     int32_t result = GetFormInstancesByFilter(*filter, infos);
-    HILOG_ERROR("%{public}s, info size %{public}d", __func__,infos.size());
+    HILOG_ERROR("HandleGetFormInstancesByFilter, info size %{public}d", infos.size());
     reply.WriteInt32(result);
     if (result == ERR_OK) {
-        HILOG_INFO("%{public}s result i true.", __func__);
+        HILOG_INFO("HandleGetFormInstancesByFilter result i true.");
         if (!WriteParcelableVector(infos, reply)) {
             HILOG_ERROR("write failed");
             return ERR_APPEXECFWK_PARCEL_ERROR;
@@ -961,11 +961,11 @@ int32_t FormMgrStub::HandleGetFormInstancesByFilter(MessageParcel &data, Message
 
 int32_t FormMgrStub::HandleGetFormInstancesById(MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("HandleGetFormInstancesById called.");
     int64_t formId = data.ReadInt64();
     std::vector<FormInstance> infos;
     int32_t result = GetFormInstancesById(formId, infos);
-    HILOG_ERROR("%{public}s, GetFormInstancesById info size %{public}d", __func__,infos.size());
+    HILOG_ERROR("HandleGetFormInstancesById, GetFormInstancesById info size %{public}d",infos.size());
     reply.WriteInt32(result);
     if (result == ERR_OK) {
         if (!WriteParcelableVector(infos, reply)) {

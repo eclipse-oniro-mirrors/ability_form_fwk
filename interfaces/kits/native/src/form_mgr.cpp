@@ -1081,7 +1081,7 @@ int32_t FormMgr::GetHostFormsCount(std::string &bundleName, int32_t &formCount)
 int32_t FormMgr::GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
         std::vector<FormInstance> &formInstances)
 {
-    HILOG_DEBUG("%{public}s called.", __func__);
+    HILOG_DEBUG("GetFormInstancesByFilter called.");
     int32_t errCode = Connect();
     if (errCode != ERR_OK) {
         HILOG_ERROR("get form instances by filter failed, errCode:%{public}d.", errCode);
@@ -1092,7 +1092,7 @@ int32_t FormMgr::GetFormInstancesByFilter(const FormInstancesFilter &formInstanc
 
 int32_t FormMgr::GetFormInstancesById(const int64_t formId, std::vector<FormInstance> &formInstances)
 {
-    HILOG_DEBUG("%{public}s called.", __func__);
+    HILOG_DEBUG("GetFormInstancesById called.");
     int32_t errCode = Connect();
     if (errCode != ERR_OK) {
         HILOG_ERROR("get form Instance by formId failed, errCode:%{public}d.", errCode);

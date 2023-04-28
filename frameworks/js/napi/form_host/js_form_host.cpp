@@ -1367,7 +1367,7 @@ private:
 
     NativeValue* OnGetFormInstancesByFilter(NativeEngine &engine, NativeCallbackInfo &info)
     {
-        HILOG_DEBUG("%{public}s is called", __FUNCTION__);
+        HILOG_DEBUG("OnGetFormInstancesByFilter is called");
         std::vector<int64_t> iFormIds;
         if (info.argc < ARGS_ONE || info.argc > ARGS_THREE) {
             NapiFormUtil::ThrowParamNumError(engine, std::to_string(info.argc), "1 or 2");
@@ -1420,7 +1420,7 @@ private:
 
     NativeValue* OnGetFormInstancesById(NativeEngine &engine, NativeCallbackInfo &info)
     {
-        HILOG_DEBUG("%{public}s is called", __FUNCTION__);
+        HILOG_DEBUG("OnGetFormInstancesById is called");
         std::vector<int64_t> iFormIds;
         if (info.argc < ARGS_ONE || info.argc > ARGS_THREE) {
             HILOG_ERROR("wrong number of arguments!");
