@@ -21,6 +21,8 @@
 
 #include "form_bundle_event_callback.h"
 #include "form_event_handler.h"
+#include "form_instance.h"
+#include "form_instances_filter.h"
 #include "form_mgr_stub.h"
 #include "form_provider_data.h"
 #include "form_sys_event_receiver.h"
@@ -378,6 +380,23 @@ public:
     * @return Returns ERR_OK on success, others on failure.
     */
     int32_t GetHostFormsCount(std::string &bundleName, int32_t &formCount) override;
+
+    /**
+     * @brief Get form instances by filter info.
+     * @param formInstancesFilter include bundleName, moduleName,formName,abilityName to get formInstances.
+     * @param formInstances return formInstances
+     * @return return ERR_OK on get info success,other on failture.
+     */
+    int32_t GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
+        std::vector<FormInstance> &formInstances) override;
+
+    /**
+     * @brief Get form instances by formId.
+     * @param formId formId Indicates the unique id of form.
+     * @param formInstances return formInstances
+     * @return return ERR_OK on get info success,other on failture.
+     */
+    int32_t GetFormInstancesById(const int64_t formId, std::vector<FormInstance> &formInstances) override;
 private:
     enum class DumpKey {
         KEY_DUMP_HELP = 0,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,6 +20,8 @@
 #include "form_info.h"
 #include "form_mgr_interface.h"
 #include "form_state_info.h"
+#include "form_instance.h"
+#include "form_instances_filter.h"
 #include "iremote_proxy.h"
 
 namespace OHOS {
@@ -343,6 +345,23 @@ public:
     * @return Returns ERR_OK on success, others on failure.
     */
     int32_t GetHostFormsCount(std::string &bundleName, int32_t &formCount) override;
+
+    /**
+     * @brief Get form instances by filter info.
+     * @param formInstancesFilter include bundleName, moduleName,formName,abilityName to get formInstances.
+     * @param formInstances return formInstances
+     * @return return ERR_OK on get info success,other on failture.
+     */
+    virtual int32_t GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
+        std::vector<FormInstance> &formInstances) override;
+
+   /**
+    * @brief Get form instances by formId.
+    * @param formId formId Indicates the unique id of form.
+    * @param formInstances return formInstances
+    * @return return ERR_OK on get info success,other on failture.
+    */
+    virtual int32_t GetFormInstancesById(const int64_t formId, std::vector<FormInstance> &formInstances) override;
 private:
     template<typename T>
     int GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos);
@@ -352,6 +371,7 @@ private:
     int SendTransactCmd(IFormMgr::Message code, MessageParcel &data, MessageParcel &reply);
     int GetStringInfo(IFormMgr::Message code, MessageParcel &data, std::string &stringInfo);
     int32_t GetFormsInfo(IFormMgr::Message code, MessageParcel &data, std::vector<FormInfo> &formInfos);
+    int32_t GetFormInstance(IFormMgr::Message code, MessageParcel &data, std::vector<FormInstance> &formInstances);
 private:
     static inline BrokerDelegator<FormMgrProxy> delegator_;
 };

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1380,6 +1380,72 @@ int32_t FormMgrProxy::GetHostFormsCount(std::string &bundleName, int32_t &formCo
     int32_t result = reply.ReadInt32();
     formCount = reply.ReadInt32();
     return result;
+}
+
+int32_t FormMgrProxy::GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
+        std::vector<FormInstance> &formInstances)
+{
+    HILOG_INFO("%{public}s start.", __func__);
+    MessageParcel data;
+    // write in token to help identify which stub to be called.
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("%{public}s, failed to write interface token", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteParcelable(&formInstancesFilter)) {
+        HILOG_ERROR("%{public}s, failed to write formInstancesFilter", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int32_t error = GetFormInstance(IFormMgr::Message::FORM_MGR_GET_FORM_INSTANCES_FROM_BY_FILTER, data, formInstances);
+    if (error != ERR_OK) {
+        HILOG_ERROR("%{public}s, failed to GetFormInstancesByFilter: %{public}d", __func__, error);
+
+    }
+
+    return error;
+}
+
+int32_t FormMgrProxy::GetFormInstancesById(const int64_t formId, std::vector<FormInstance> &formInstances)
+{
+    HILOG_INFO("%{public}s start.", __func__);
+    MessageParcel data;
+    // write in token to help identify which stub to be called.
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("%{public}s, failed to write interface token", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt64(formId)) {
+        HILOG_ERROR("%{public}s, failed to write formId", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int32_t error = GetFormInstance(IFormMgr::Message::FORM_MGR_GET_FORM_INSTANCES_FROM_BY_ID, data, formInstances);
+    if (error != ERR_OK) {
+        HILOG_ERROR("%{public}s, failed to GetFormInstancesById: %{public}d", __func__, error);
+    }
+
+    return error;
+}
+
+int32_t FormMgrProxy::GetFormInstance(IFormMgr::Message code, MessageParcel &data, std::vector<FormInstance> &formInstances)
+{
+    int error;
+    MessageParcel reply;
+    error = SendTransactCmd(code, data, reply);
+    if (error != ERR_OK) {
+        return error;
+    }
+
+    error = reply.ReadInt32();
+    if (error != ERR_OK) {
+        HILOG_ERROR("%{public}s, failed to read reply result", __func__);
+        return error;
+    }
+    auto ret = GetParcelableInfos<FormInstance>(reply, formInstances);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("failed to GetParcelableInfos.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ret;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

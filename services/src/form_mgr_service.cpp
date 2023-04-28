@@ -1067,5 +1067,34 @@ int32_t FormMgrService::GetHostFormsCount(std::string &bundleName, int32_t &form
     HILOG_INFO("%{public}s called.", __func__);
     return FormMgrAdapter::GetInstance().GetHostFormsCount(bundleName, formCount);
 }
+
+int32_t FormMgrService::GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
+    std::vector<FormInstance> &formInstances)
+{
+    if (!CheckCallerIsSystemApp()) {
+        HILOG_ERROR("caller app is not system app!");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+
+    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_REQUIRE_FORM)) {
+        HILOG_ERROR("verify calling permission failed!");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    }
+    return FormMgrAdapter::GetInstance().GetFormInstancesByFilter(formInstancesFilter, formInstances);
+}
+
+int32_t FormMgrService::GetFormInstancesById(const int64_t formId, std::vector<FormInstance> &formInstances)
+{
+    if (!CheckCallerIsSystemApp()) {
+        HILOG_ERROR("caller app is not system app!");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+
+    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_REQUIRE_FORM)) {
+        HILOG_ERROR("verify calling permission failed!");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    }
+    return FormMgrAdapter::GetInstance().GetFormInstancesById(formId, formInstances);
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

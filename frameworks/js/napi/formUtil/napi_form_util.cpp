@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -617,6 +617,91 @@ NativeValue *CreateFormCustomizeDatas(NativeEngine &engine, const std::vector<Fo
     for (const auto& data : customizeDatas) {
         object->SetProperty(data.name.c_str(), CreateJsValue(engine, data.value));
     }
+
+    return objContext;
+}
+
+bool ParseParam(napi_env env, napi_value args, FormInstancesFilter &filter)
+{
+    napi_valuetype valueType;
+    NAPI_CALL_BASE(env, napi_typeof(env, args, &valueType), false);
+    if (valueType != napi_object) {
+        HILOG_ERROR("args not object type");
+        return false;
+    }
+    napi_value prop = nullptr;
+    napi_get_named_property(env, args, "bundleName", &prop);
+    napi_typeof(env, prop, &valueType);
+    if (valueType != napi_string) {
+        HILOG_ERROR("bundleName input is not string");
+        return false;
+    }
+    filter.bundleName = GetStringFromNapi(env, prop);
+    if (filter.bundleName.empty()) {
+        HILOG_ERROR("bundleName input is empty");
+        return false;
+    }
+    prop = nullptr;
+    napi_get_named_property(env, args, "formName", &prop);
+    filter.formName = GetStringFromNapi(env, prop);
+    prop = nullptr;
+    napi_get_named_property(env, args, "moduleName", &prop);
+    filter.moduleName = GetStringFromNapi(env, prop);
+    prop = nullptr;
+    napi_get_named_property(env, args, "abilityName", &prop);
+    filter.abilityName = GetStringFromNapi(env, prop);
+    return true;
+}
+
+std::string GetStringFromNapi(napi_env env, napi_value value)
+{
+    std::string result;
+    size_t size = 0;
+
+    if (napi_get_value_string_utf8(env, value, nullptr, 0, &size) != napi_ok) {
+        HILOG_ERROR("%{public}s, can not get string size", __func__);
+        return "";
+    }
+    result.reserve(size + 1);
+    result.resize(size);
+    if (napi_get_value_string_utf8(env, value, result.data(), (size + 1), &size) != napi_ok) {
+        HILOG_ERROR("%{public}s, can not get string value", __func__);
+        return "";
+    }
+    return result;
+}
+
+NativeValue* CreateFormInstances(NativeEngine &engine, const std::vector<FormInstance> &formInstances)
+{
+    NativeValue* arrayValue = engine.CreateArray(formInstances.size());
+    NativeArray* array = ConvertNativeValueTo<NativeArray>(arrayValue);
+    uint32_t index = 0;
+    for (const auto &formInstance : formInstances) {
+        array->SetElement(index++, CreateFormInstance(engine, formInstance));
+    }
+    return arrayValue;
+}
+
+NativeValue* CreateFormInstance(NativeEngine &engine, const FormInstance &formInstance)
+{
+    HILOG_DEBUG("CreateFormInstance called");
+
+    auto objContext = engine.CreateObject();
+    if (objContext == nullptr) {
+        HILOG_ERROR("CreateObject failed");
+        return engine.CreateUndefined();
+    }
+
+    auto object = ConvertNativeValueTo<NativeObject>(objContext);
+    if (object == nullptr) {
+        HILOG_ERROR("ConvertNativeValueTo object failed");
+        return engine.CreateUndefined();
+    }
+    std::string formStr = std::to_string(formInstance.formId);
+    object->SetProperty("formId", CreateJsValue(engine, formStr));
+    object->SetProperty("formHostBundle", CreateJsValue(engine, formInstance.formHostName));
+    object->SetProperty("visibilityType", CreateJsValue(engine, formInstance.formVisiblity));
+    object->SetProperty("dimension", CreateJsValue(engine, formInstance.specification));
 
     return objContext;
 }

@@ -1,6 +1,6 @@
 
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,8 @@
 #include "js_form_host.h"
 
 #include "form_info.h"
+#include "form_instance.h"
+#include "form_instances_filter.h"
 #include "form_callback_interface.h"
 #include "form_host_client.h"
 #include "form_mgr.h"
@@ -376,6 +378,17 @@ public:
     {
         JsFormHost* me = CheckParamsAndGetThis<JsFormHost>(engine, info);
         return (me != nullptr) ? me->OnNotifyFormsPrivacyProtected(*engine, *info) : nullptr;
+    }
+    static NativeValue* GetFormInstancesByFilter(NativeEngine *engine, NativeCallbackInfo *info)
+    {
+        JsFormHost *me = CheckParamsAndGetThis<JsFormHost>(engine, info);
+        return (me != nullptr) ? me->OnGetFormInstancesByFilter(*engine, *info) : nullptr;
+    }
+
+    static NativeValue* GetFormInstancesById(NativeEngine *engine, NativeCallbackInfo *info)
+    {
+        JsFormHost *me = CheckParamsAndGetThis<JsFormHost>(engine, info);
+        return (me != nullptr) ? me->OnGetFormInstancesById(*engine, *info) : nullptr;
     }
 private:
     bool CheckCallerIsSystemApp()
@@ -1351,6 +1364,105 @@ private:
             engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
         return result;
     }
+
+    NativeValue* OnGetFormInstancesByFilter(NativeEngine &engine, NativeCallbackInfo &info)
+    {
+        HILOG_DEBUG("%{public}s is called", __FUNCTION__);
+        std::vector<int64_t> iFormIds;
+        if (info.argc < ARGS_ONE || info.argc > ARGS_THREE) {
+            NapiFormUtil::ThrowParamNumError(engine, std::to_string(info.argc), "1 or 2");
+            HILOG_ERROR("wrong number of arguments!");
+            return engine.CreateUndefined();
+        }
+
+        FormInstancesFilter filter;
+        if (info.argv[PARAM0]->TypeOf() != NATIVE_OBJECT) {
+            HILOG_ERROR("input params is not object!");
+            NapiFormUtil::ThrowParamTypeError(engine, "formInstancesFilter", "object");
+            return engine.CreateUndefined();
+        } 
+        auto arg = reinterpret_cast<napi_value>(info.argv[PARAM0]);
+        auto env = reinterpret_cast<napi_env>(&engine);
+        if (!ParseParam(env, arg, filter)) {
+            HILOG_ERROR("input params parse failed!");
+            NapiFormUtil::ThrowParamTypeError(engine, "formInstancesFilter", "object");
+            return engine.CreateUndefined();
+        }
+        if (info.argc == ARGS_TWO && info.argv[PARAM1]->TypeOf() != NATIVE_FUNCTION) {
+            HILOG_ERROR("param1 is invalid");
+            NapiFormUtil::ThrowParamTypeError(engine, "callback", "Callback<string>");
+            return engine.CreateUndefined();
+        }
+        std::shared_ptr<std::vector<FormInstance>> formInstances = std::make_shared<std::vector<FormInstance>>();
+        auto apiResult = std::make_shared<int32_t>();
+        auto execute = [filter, formInstances, ret = apiResult] () {
+            *ret = FormMgr::GetInstance().GetFormInstancesByFilter(filter, *formInstances);
+            if (*ret != ERR_OK) {
+                HILOG_ERROR("GetFormInstancesByFilter failed");
+                return;
+            }
+        };
+
+        auto complete =
+            [formInstances, ret = apiResult](NativeEngine &engine, AsyncTask &task, int32_t status) {
+                if (*ret != ERR_OK) {
+                    task.Reject(engine, NapiFormUtil::CreateErrorByInternalErrorCode(engine, *ret));
+                } else {
+                    task.ResolveWithNoError(engine, CreateFormInstances(engine, *formInstances));
+                }
+            };
+        NativeValue *lastParam = (info.argc == ARGS_ONE) ? nullptr : info.argv[PARAM1];
+        NativeValue *result = nullptr;
+        AsyncTask::Schedule("NapiFormHost::OnGetFormInstancesByFilter",
+            engine, CreateAsyncTaskWithLastParam(engine, lastParam, std::move(execute), std::move(complete), &result));
+        return result;
+    }
+
+    NativeValue* OnGetFormInstancesById(NativeEngine &engine, NativeCallbackInfo &info)
+    {
+        HILOG_DEBUG("%{public}s is called", __FUNCTION__);
+        std::vector<int64_t> iFormIds;
+        if (info.argc < ARGS_ONE || info.argc > ARGS_THREE) {
+            HILOG_ERROR("wrong number of arguments!");
+            NapiFormUtil::ThrowParamNumError(engine, std::to_string(info.argc), "1");
+            return engine.CreateUndefined();
+        }
+
+        int64_t formId;
+        if(!ConvertFromId(engine, info.argv[PARAM0], formId)) {
+            HILOG_ERROR("convert strFormIdList failed!");
+            NapiFormUtil::ThrowParamTypeError(engine, "formId", "string");
+            return engine.CreateUndefined();
+        }
+        if (info.argc == ARGS_TWO && info.argv[PARAM1]->TypeOf() != NATIVE_FUNCTION) {
+            HILOG_ERROR("param1 is invalid");
+            NapiFormUtil::ThrowParamTypeError(engine, "callback", "Callback<string>");
+            return engine.CreateUndefined();
+        }
+        std::shared_ptr<std::vector<FormInstance>> formInstances = std::make_shared<std::vector<FormInstance>>();
+        auto apiResult = std::make_shared<int32_t>();
+        auto execute = [formId, formInstances, ret = apiResult] () {
+            *ret = FormMgr::GetInstance().GetFormInstancesById(formId, *formInstances);
+            if (*ret != ERR_OK) {
+                HILOG_ERROR("OnGetFormInstancesById failed");
+                return;
+            }
+        };
+
+        auto complete =
+            [formInstances, ret = apiResult](NativeEngine &engine, AsyncTask &task, int32_t status) {
+                if (*ret != ERR_OK) {
+                    task.Reject(engine, NapiFormUtil::CreateErrorByInternalErrorCode(engine, *ret));
+                } else {
+                    task.ResolveWithNoError(engine, CreateFormInstances(engine, *formInstances));
+                }
+            };
+        NativeValue *lastParam = (info.argc == ARGS_ONE) ? nullptr : info.argv[PARAM1];
+        NativeValue *result = nullptr;
+        AsyncTask::Schedule("NapiFormHost::OnGetFormInstancesById",
+            engine, CreateAsyncTaskWithLastParam(engine, lastParam, std::move(execute), std::move(complete), &result));
+        return result;
+    }
 };
 
 NativeValue* JsFormHostInit(NativeEngine* engine, NativeValue* exportObj)
@@ -1393,6 +1505,8 @@ NativeValue* JsFormHostInit(NativeEngine* engine, NativeValue* exportObj)
     BindNativeFunction(*engine, *object, "notifyFormsPrivacyProtected", moduleName,
         JsFormHost::NotifyFormsPrivacyProtected);
     BindNativeFunction(*engine, *object, "acquireFormData", moduleName, JsFormHost::AcquireFormData);
+    BindNativeFunction(*engine, *object, "getFormInstancesByFilter", moduleName, JsFormHost::GetFormInstancesByFilter);
+    BindNativeFunction(*engine, *object, "getFormInstancesById", moduleName, JsFormHost::GetFormInstancesById);
     return engine->CreateUndefined();
 }
 } // namespace AbilityRuntime

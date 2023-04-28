@@ -2464,5 +2464,16 @@ int32_t FormMgrAdapter::GetHostFormsCount(std::string &bundleName, int32_t &form
     HILOG_DEBUG("%{public}s, bundleName: %{public}s.", __func__, bundleName.c_str());
     return FormDataMgr::GetInstance().GetHostFormsCount(bundleName, formCount);
 }
+
+int32_t FormMgrAdapter::GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
+    std::vector<FormInstance> &formInstances)
+{
+    return FormDataMgr::GetInstance().GetFormInstancesByFilter(formInstancesFilter, formInstances);
+}
+
+int32_t FormMgrAdapter::GetFormInstancesById(const int64_t formId, std::vector<FormInstance> &formInstances)
+{
+    return FormDataMgr::GetInstance().GetFormInstancesById(formId, formInstances);
+}
 } // namespace AppExecFwk
 } // namespace OHOS

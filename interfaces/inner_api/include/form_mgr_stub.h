@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,6 +19,8 @@
 #include <map>
 
 #include "form_mgr_interface.h"
+#include "form_instance.h"
+#include "form_instances_filter.h"
 #include "iremote_object.h"
 #include "iremote_stub.h"
 
@@ -303,6 +305,22 @@ private:
      * @return Return ERR_OK on success, others on failure.
     */
     int32_t HandleGetHostFormsCount(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Get form instances by filter info.
+     * @param data input param
+     * @param reply output param
+     * @return Return ERR_OK on success, others on failure
+     */
+    int32_t HandleGetFormInstancesByFilter(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Get form instances by filter info.
+     * @param data input param
+     * @param reply output param
+     * @return Return ERR_OK on success, others on failure
+     */
+    int32_t HandleGetFormInstancesById(MessageParcel &data, MessageParcel &reply);
 private:
     using FormMgrFunc = int32_t (FormMgrStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, FormMgrFunc> memberFuncMap_;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -112,6 +112,10 @@ FormMgrStub::FormMgrStub()
         &FormMgrStub::HandleGetFormsCount;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_HOST_FORMS_COUNT)] =
         &FormMgrStub::HandleGetHostFormsCount;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORM_INSTANCES_FROM_BY_FILTER)] =
+        &FormMgrStub::HandleGetFormInstancesByFilter;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORM_INSTANCES_FROM_BY_ID)] =
+        &FormMgrStub::HandleGetFormInstancesById;
 }
 
 FormMgrStub::~FormMgrStub()
@@ -931,6 +935,45 @@ int32_t FormMgrStub::HandleGetHostFormsCount(MessageParcel &data, MessageParcel 
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
+}
+
+int32_t FormMgrStub::HandleGetFormInstancesByFilter(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    std::unique_ptr<FormInstancesFilter> filter(data.ReadParcelable<FormInstancesFilter>());
+    if (filter == nullptr) {
+        HILOG_ERROR("%{public}s, failed to get filter.", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    std::vector<FormInstance> infos;
+    int32_t result = GetFormInstancesByFilter(*filter, infos);
+    HILOG_ERROR("%{public}s, info size %{public}d", __func__,infos.size());
+    reply.WriteInt32(result);
+    if (result == ERR_OK) {
+        HILOG_INFO("%{public}s result i true.", __func__);
+        if (!WriteParcelableVector(infos, reply)) {
+            HILOG_ERROR("write failed");
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+    }
+    return ERR_OK;
+}
+
+int32_t FormMgrStub::HandleGetFormInstancesById(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    int64_t formId = data.ReadInt64();
+    std::vector<FormInstance> infos;
+    int32_t result = GetFormInstancesById(formId, infos);
+    HILOG_ERROR("%{public}s, GetFormInstancesById info size %{public}d", __func__,infos.size());
+    reply.WriteInt32(result);
+    if (result == ERR_OK) {
+        if (!WriteParcelableVector(infos, reply)) {
+            HILOG_ERROR("write failed");
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+    }
+    return ERR_OK;
 }
 
 /**

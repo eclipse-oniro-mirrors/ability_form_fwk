@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1834,6 +1834,74 @@ int32_t FormDataMgr::GetHostFormsCount(const std::string &bundleName, int32_t &f
         }
     }
     HILOG_DEBUG("%{public}s, current exist %{public}d cast forms in host", __func__, formCount);
+    return ERR_OK;
+}
+
+int32_t FormDataMgr::GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
+        std::vector<FormInstance> &formInstances)
+{
+    HILOG_INFO("%{public}s, get form instances by filter", __func__);
+    std::lock_guard<std::recursive_mutex> lock(formRecordMutex_);
+    std::map<int64_t, FormRecord>::iterator itFormRecord;
+    if(formInstancesFilter.bundleName == "") {
+        HILOG_INFO("formInstancesFilter.bundleName is null");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    for (itFormRecord = formRecords_.begin(); itFormRecord != formRecords_.end(); itFormRecord++) {
+        if (formInstancesFilter.bundleName == itFormRecord->second.bundleName) {
+            bool Needgetformhostrecordflag = true;
+            if (!formInstancesFilter.moduleName.empty() &&
+                formInstancesFilter.moduleName != itFormRecord->second.moduleName) {
+                Needgetformhostrecordflag = false;
+            } else if (!formInstancesFilter.abilityName.empty() &&
+                formInstancesFilter.abilityName != itFormRecord->second.abilityName) {
+                Needgetformhostrecordflag = false;
+            } else if (!formInstancesFilter.formName.empty() &&
+                formInstancesFilter.formName != itFormRecord->second.formName) {
+                Needgetformhostrecordflag = false;
+            }
+            std::vector<FormHostRecord> formHostRecords;
+            GetFormHostRecord(itFormRecord->second.formId, formHostRecords);
+            if (Needgetformhostrecordflag) {
+                FormInstance instance;
+                for (auto formHostRecord : formHostRecords) {
+                    instance.formHostName = formHostRecord.GetHostBundleName();
+                    instance.formId = itFormRecord->second.formId;
+                    instance.specification = itFormRecord->second.specification;
+                    instance.formVisiblity = itFormRecord->second.isVisible ?
+                        FormVisibilityType::VISIBLE : FormVisibilityType::INVISIBLE;
+                    formInstances.emplace_back(instance);
+                }
+            }
+        }
+    }
+    return ERR_OK;
+}
+
+int32_t FormDataMgr::GetFormInstancesById(const int64_t formId, std::vector<FormInstance> &formInstances)
+{
+    HILOG_INFO("%{public}s, get form record by formId", __func__);
+    std::lock_guard<std::recursive_mutex> lock(formRecordMutex_);
+    if (formId <= 0) {
+        HILOG_ERROR("%{public}s, formId is invalid", __func__);
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    auto info = formRecords_.find(formId);
+    if (info != formRecords_.end()) {
+        FormRecord formRecord = info->second;
+        std::vector<FormHostRecord> formHostRecords;
+        GetFormHostRecord(formId, formHostRecords);
+        FormInstance instance;
+        for (auto formHostRecord : formHostRecords) {
+            instance.formHostName = formHostRecord.GetHostBundleName();
+            instance.formId = formRecord.formId;
+            instance.specification = formRecord.specification;
+            instance.formVisiblity = formRecord.isVisible ? FormVisibilityType::VISIBLE : FormVisibilityType::INVISIBLE;
+            formInstances.emplace_back(instance);
+        }
+    }
+    HILOG_INFO("%{public}s, get form record successfully", __func__);
     return ERR_OK;
 }
 }  // namespace AppExecFwk
