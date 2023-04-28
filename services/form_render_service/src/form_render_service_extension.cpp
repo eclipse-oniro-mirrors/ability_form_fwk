@@ -44,6 +44,11 @@ void FormRenderServiceExtension::Init(const std::shared_ptr<AbilityLocalRecord> 
 void FormRenderServiceExtension::OnStart(const AAFwk::Want &want)
 {
     Extension::OnStart(want);
+    auto context = GetContext();
+    if (context) {
+        OHOS::DelayedSingleton<FormRenderImpl>::GetInstance()->SetConfiguration(context->GetConfiguration());
+    }
+
     HILOG_INFO("FormRenderServiceExtension OnStart begin..");
 }
 

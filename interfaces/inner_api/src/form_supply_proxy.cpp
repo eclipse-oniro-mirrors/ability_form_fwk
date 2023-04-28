@@ -210,6 +210,35 @@ void FormSupplyProxy::OnShareAcquire(int64_t formId, const std::string &remoteDe
     }
 }
 
+int FormSupplyProxy::OnAcquireDataResult(const AAFwk::WantParams &wantParams, int64_t requestCode)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("failed to WriteInterfaceToken.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteParcelable(&wantParams)) {
+        HILOG_ERROR("failed to write form wantParams.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt64(requestCode)) {
+        HILOG_ERROR("failed to write form requestCode.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    auto error = Remote()->SendRequest(
+        static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_ACQUIRED_DATA),
+        data,
+        reply,
+        option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("failed to SendRequest: %{public}d", error);
+    }
+    return error;
+}
+
 int32_t FormSupplyProxy::OnRenderTaskDone(int64_t formId, const Want &want)
 {
     MessageParcel data;

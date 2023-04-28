@@ -68,6 +68,13 @@ public:
     void OnShareFormResponse(int64_t requestCode, int32_t result) override;
 
     /**
+     * @brief Form provider has acquired data
+     * @param wantParams Indicates the data information acquired by the form.
+     * @param requestCode Indicates the requested id.
+     */
+    void OnAcquireDataResponse(const AAFwk::WantParams &wantParams, int64_t requestCode) override;
+
+    /**
      * @brief Return error to host.
      *
      * @param errorCode Indicates error-code of the form.

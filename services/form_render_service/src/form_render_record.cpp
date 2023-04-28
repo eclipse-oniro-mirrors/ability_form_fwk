@@ -208,6 +208,11 @@ bool FormRenderRecord::CreateRuntime(const FormJsInfo &formJsInfo)
     return true;
 }
 
+void FormRenderRecord::SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration>& config)
+{
+    configuration_ = config;
+}
+
 std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::GetContext(const FormJsInfo &formJsInfo, const Want &want)
 {
     {
@@ -230,6 +235,8 @@ std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::CreateContext(const F
         HILOG_ERROR("Create context failed!");
         return nullptr;
     }
+
+    context->SetConfiguration(configuration_);
     AppExecFwk::HapModuleInfo hapModuleInfo;
     hapModuleInfo.name = formJsInfo.moduleName;
     hapModuleInfo.hapPath = formJsInfo.jsFormCodePath;
@@ -436,6 +443,12 @@ void FormRenderRecord::HandleUpdateConfiguration(
 {
     HILOG_INFO("HandleUpdateConfiguration begin.");
     std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
+    if (!config) {
+        HILOG_ERROR("configuration is nullptr");
+        return;
+    }
+
+    SetConfiguration(config);
     for (auto iter = formRendererGroupMap_.begin(); iter != formRendererGroupMap_.end(); ++iter) {
         if (iter->second) {
             iter->second->UpdateConfiguration(config);

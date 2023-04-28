@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -213,19 +213,6 @@ public:
     bool IsReady() const;
 
     /**
-     * @brief Check if the caller ability is SA.
-     * @return Returns true if is SA call; returns false otherwise.
-     */
-    bool IsSACall() const;
-
-    /**
-     * @brief Checks whether the caller has a certain permission.
-     * @param permissionName The name of the permission.
-     * @return Returns true if the caller has certain permissions; returns false otherwise.
-     */
-    bool VerifyCallingPermission(const std::string &permissionName) const;
-
-    /**
      * @brief Delete the invalid forms.
      * @param formIds Indicates the ID of the valid forms.
      * @param callerToken Caller ability token.
@@ -310,6 +297,17 @@ public:
     int32_t GetFormsInfo(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos) override;
 
     /**
+     * @brief Acquire form data by formId.
+     * @param formId The Id of the form to acquire data.
+     * @param callerToken Indicates the host client.
+     * @param requestCode The request code of this acquire form.
+     * @param formData Return the forms' information of customization
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t AcquireFormData(int64_t formId, int64_t requestCode, const sptr<IRemoteObject> &callerToken,
+        AAFwk::WantParams &formData) override;
+
+    /**
      * @brief Check if the request of publishing a form is supported by the host.
      * @return Returns true if the request is supported and false otherwise.
      */
@@ -365,12 +363,28 @@ public:
     {
         return ERR_OK;
     }
+    /**
+    * @brief get forms count.
+    * @param isTempFormFlag Indicates temp form or not.
+    * @param formCount Returns the number of the cast or temp form.
+    * @return Returns ERR_OK on success, others on failure.
+    */
+    int32_t GetFormsCount(bool isTempFormFlag, int32_t &formCount) override;
+
+    /**
+    * @brief get host forms count.
+    * @param bundleName Indicates form host bundleName.
+    * @param formCount Returns the number of the host form.
+    * @return Returns ERR_OK on success, others on failure.
+    */
+    int32_t GetHostFormsCount(std::string &bundleName, int32_t &formCount) override;
 private:
     enum class DumpKey {
         KEY_DUMP_HELP = 0,
         KEY_DUMP_STORAGE,
         KEY_DUMP_BY_BUNDLE_NAME,
         KEY_DUMP_BY_FORM_ID,
+        KEY_DUMP_TEMPORARY,
     };
     /**
      * @brief initialization of form manager service.
@@ -388,6 +402,7 @@ private:
     bool ParseOption(const std::vector<std::u16string> &args, DumpKey &key, std::string &value, std::string &result);
     void HiDumpHelp([[maybe_unused]] const std::string &args, std::string &result);
     void HiDumpStorageFormInfos([[maybe_unused]] const std::string &args, std::string &result);
+    void HiDumpTemporaryFormInfos([[maybe_unused]] const std::string &args, std::string &result);
     void HiDumpFormInfoByBundleName(const std::string &args, std::string &result);
     void HiDumpFormInfoByFormId(const std::string &args, std::string &result);
     bool CheckCallerIsSystemApp() const;

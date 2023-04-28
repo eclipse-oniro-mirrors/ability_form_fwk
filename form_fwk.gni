@@ -17,10 +17,21 @@ ability_runtime_kits_path = "${ability_runtime_path}/frameworks/kits"
 ability_runtime_native_path = "${ability_runtime_path}/frameworks/native"
 ability_runtime_services_path = "${ability_runtime_path}/services"
 ability_runtime_napi_path = "${ability_runtime_path}/frameworks/js/napi"
+ability_dmsfwk_path = "//foundation/ability/dmsfwk"
+
 bundlefwk_path = "//foundation/bundlemanager/bundle_framework"
 bundlefwk_inner_api_path = "${bundlefwk_path}/interfaces/inner_api"
 distributeddatamgr_path = "//foundation/distributeddatamgr"
 systemabilitymgr_path = "//foundation/systemabilitymgr"
+foundation_distributedschedule_path = "//foundation/distributedschedule"
+dtbschedmgr_path =
+    "${foundation_distributedschedule_path}/dmsfwk/services/dtbschedmgr"
+samgr_proxy_path = "${foundation_distributedschedule_path}/samgr/interfaces/innerkits/samgr_proxy"
+adapter_innerkits_path =
+    "${foundation_distributedschedule_path}/samgr/adapter/interfaces/innerkits"
+
+device_manager_path = "//foundation/distributedhardware/device_manager"
+
 form_fwk_path = "//foundation/ability/form_fwk"
 form_fwk_napi_path = "${form_fwk_path}/frameworks/js/napi"
 form_fwk_inner_api_path = "${form_fwk_path}/interfaces/inner_api"
@@ -28,6 +39,9 @@ form_render_service_path =
     "${form_fwk_path}/services/form_render_service/FormRenderService"
 global_path = "//base/global"
 ipc_core_path = "//foundation/communication/ipc/interfaces/innerkits/ipc_core"
+arkui_ace_engine_components_path =
+    "//foundation/arkui/ace_engine/frameworks/core/components"
+c_utils_base_path = "//commonlibrary/c_utils/base"
 
 declare_args() {
   device_usage_statistics = true

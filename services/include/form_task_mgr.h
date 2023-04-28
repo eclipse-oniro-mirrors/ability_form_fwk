@@ -155,6 +155,14 @@ public:
     void PostAcquireStateTask(const Want &wantArg, const std::string &provider, const Want &want,
                               const sptr <IRemoteObject> &remoteObject);
 
+    /**
+    * @brief Post acquire data to form provider.
+    * @param formId The Id of the from.
+    * @param want The want of the request.
+    * @param remoteObject Form provider proxy object.
+    */
+    void PostAcquireDataTask(const int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject);
+
      /**
      * @brief Post uninstall message to form host(task).
      * @param formIds The Id list of the forms.
@@ -169,6 +177,15 @@ public:
     * @param remoteObject Form provider proxy object.
     */
     void PostAcquireStateTaskToHost(AppExecFwk::FormState state, const AAFwk::Want &want,
+                                    const sptr<IRemoteObject> &remoteObject);
+    
+    /**
+    * @brief Post acquire form data message to form host(task).
+    * @param wantParams Indicates the data information acquired by the form.
+    * @param requestCode Indicates the requested id.
+    * @param remoteObject Form provider proxy object.
+    */
+    void PostAcquireDataTaskToHost(const AAFwk::WantParams &wantParams, int64_t requestCode,
                                     const sptr<IRemoteObject> &remoteObject);
 
     /**
@@ -287,6 +304,22 @@ private:
      */
     void AcquireState(const Want &wantArg, const std::string &provider, const Want &want,
                       const sptr <IRemoteObject> &remoteObject);
+    /**
+     * @brief Handle acquire data.
+     * @param wantParams Indicates the data information acquired by the form.
+     * @param requestCode Indicates the requested id.
+     * @param remoteObject Form provider proxy object.
+     */
+    void AcquireFormDataBack(const AAFwk::WantParams &wantParams, int64_t requestCode,
+                            const sptr<IRemoteObject> &remoteObject);
+    
+    /**
+     * @brief Acquire form data to form provider.
+     * @param formId The Id of the form.
+     * @param want The want of the request.
+     * @param remoteObject Form provider proxy object.
+     */
+    void AcquireFormData(const int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject);
 
     /**
      * @brief Handle uninstall message.

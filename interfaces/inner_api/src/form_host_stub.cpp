@@ -40,6 +40,8 @@ FormHostStub::FormHostStub()
         &FormHostStub::HandleOnShareFormResponse;
     memberFuncMap_[static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_ERROR)] =
         &FormHostStub::HandleOnError;
+    memberFuncMap_[static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_ACQUIRE_FORM_DATA)] =
+        &FormHostStub::HandleOnAcquireDataResponse;
 }
 
 FormHostStub::~FormHostStub()
@@ -170,6 +172,25 @@ int32_t FormHostStub::HandleOnError(MessageParcel &data, MessageParcel &reply)
     std::string errorMsg = Str16ToStr8(data.ReadString16());
 
     OnError(errorCode, errorMsg);
+    reply.WriteInt32(ERR_OK);
+    return ERR_OK;
+}
+
+int32_t FormHostStub::HandleOnAcquireDataResponse(MessageParcel &data, MessageParcel &reply)
+{
+    std::shared_ptr<AAFwk::WantParams> wantParams(data.ReadParcelable<AAFwk::WantParams>());
+    if (wantParams == nullptr) {
+        HILOG_ERROR("failed to ReadParcelable<wantParams>");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    auto requestCode = data.ReadInt64();
+    if (requestCode <= 0) {
+        HILOG_ERROR("failed to ReadInt64<requestCode>");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    OnAcquireDataResponse(*wantParams, requestCode);
     reply.WriteInt32(ERR_OK);
     return ERR_OK;
 }

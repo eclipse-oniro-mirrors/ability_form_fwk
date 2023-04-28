@@ -260,7 +260,7 @@ HWTEST_F(FmsFormMgrPublishFormTest, publishForm_003, TestSize.Level0)
     EXPECT_CALL(*mockBms_, CheckIsSystemAppByUid(_)).Times(2).WillRepeatedly(Return(true));
     EXPECT_CALL(*mockBms_, GetNameForUid(_, _)).Times(1)
     .WillRepeatedly(DoAll(SetArgReferee<1>(bundleName), Return(ERR_OK)));
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY,
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS,
         formyMgrServ_->RequestPublishForm(want, false, formBindingData, formId));
     mockBms_.clear();
     FormBmsHelper::GetInstance().SetBundleManager(nullptr);

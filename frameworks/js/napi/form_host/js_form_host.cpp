@@ -163,6 +163,30 @@ private:
     std::shared_ptr<AppExecFwk::EventHandler> handler_ = nullptr;
 };
 
+class JsFormDataCallbackClient : public FormDataCallbackInterface,
+                                 public std::enable_shared_from_this<JsFormDataCallbackClient> {
+public:
+    using AcquireFormDataTask = std::function<void(AAFwk::WantParams data)>;
+    explicit JsFormDataCallbackClient(AcquireFormDataTask &&task) : task_(std::move(task))
+    {
+        handler_ = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
+    }
+
+    virtual ~JsFormDataCallbackClient() = default;
+
+    void ProcessAcquireFormData(AAFwk::WantParams data) override
+    {
+        if (handler_) {
+            handler_->PostSyncTask([client = shared_from_this(), data] () {
+                client->task_(data);
+            });
+        }
+    }
+private:
+    AcquireFormDataTask task_;
+    std::shared_ptr<AppExecFwk::EventHandler> handler_ = nullptr;
+};
+
 std::map<napi_ref, std::shared_ptr<FormUninstallCallbackClient>> formUninstallCallbackMap {};
 std::mutex formUninstallCallbackMapMutex_;
 
@@ -340,6 +364,12 @@ public:
     {
         JsFormHost* me = CheckParamsAndGetThis<JsFormHost>(engine, info);
         return (me != nullptr) ? me->OnShareForm(*engine, *info) : nullptr;
+    }
+
+    static NativeValue* AcquireFormData(NativeEngine *engine, NativeCallbackInfo *info)
+    {
+        JsFormHost* me = CheckParamsAndGetThis<JsFormHost>(engine, info);
+        return (me != nullptr) ? me->OnAcquireFormData(*engine, *info) : nullptr;
     }
 
     static NativeValue* NotifyFormsPrivacyProtected(NativeEngine* engine, NativeCallbackInfo* info)
@@ -1172,6 +1202,22 @@ private:
         }
     }
 
+    void InnerAcquireFormData(NativeEngine &engine, const std::shared_ptr<AbilityRuntime::AsyncTask> &asyncTask,
+       JsFormDataCallbackClient::AcquireFormDataTask &&task, int64_t formId)
+    {
+        auto formDataCallbackClient = std::make_shared<JsFormDataCallbackClient>(std::move(task));
+        int64_t requestCode = SystemTimeMillis();
+        FormHostClient::GetInstance()->AddAcqiureFormDataCallback(formDataCallbackClient, requestCode);
+
+        AAFwk::WantParams formData;
+        auto ret = FormMgr::GetInstance().AcquireFormData(formId, requestCode, FormHostClient::GetInstance(), formData);
+        if (ret != ERR_OK) {
+            HILOG_ERROR("acquire form failed.");
+            asyncTask->Reject(engine, NapiFormUtil::CreateErrorByInternalErrorCode(engine, ret));
+            FormHostClient::GetInstance()->RemoveAcquireDataCallback(requestCode);
+        }
+    }
+
     NativeValue* OnShareForm(NativeEngine &engine, NativeCallbackInfo &info)
     {
         HILOG_DEBUG("%{public}s is called", __FUNCTION__);
@@ -1217,6 +1263,43 @@ private:
 
         InnerShareForm(engine, asyncTask, std::move(task), formId, devicedId);
 
+        return result;
+    }
+
+    NativeValue* OnAcquireFormData(NativeEngine &engine, NativeCallbackInfo &info)
+    {
+        HILOG_DEBUG("OnAcquireFormData is called");
+        if (info.argc > ARGS_TWO || info.argc < ARGS_ONE) {
+            HILOG_ERROR("wrong number of arguments.");
+            NapiFormUtil::ThrowParamNumError(engine, std::to_string(info.argc), "1 or 2");
+            return engine.CreateUndefined();
+        }
+        
+        // The promise form has only one parameters
+        decltype(info.argc) unwrapArgc = 1;
+        int64_t formId = 0;
+        if (!ConvertFromId(engine, info.argv[PARAM0], formId)) {
+            HILOG_ERROR("form id is invalid.");
+            NapiFormUtil::ThrowParamTypeError(engine, "formId", "string");
+            return engine.CreateUndefined();
+        }
+
+        NativeValue *lastParam = (info.argc <= unwrapArgc) ? nullptr : info.argv[unwrapArgc];
+        NativeValue *result = nullptr;
+
+        std::unique_ptr<AbilityRuntime::AsyncTask> uasyncTask =
+            AbilityRuntime::CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, nullptr, &result);
+        std::shared_ptr<AbilityRuntime::AsyncTask> asyncTask = std::move(uasyncTask);
+
+        JsFormDataCallbackClient::AcquireFormDataTask task = [&engine, asyncTask](AAFwk::WantParams data) {
+            HILOG_DEBUG("task complete form data");
+            NativeValue *objValue = engine.CreateObject();
+            NativeObject *object = ConvertNativeValueTo<NativeObject>(objValue);
+            object->SetProperty("formData", CreateJsWantParams(engine, data));
+            asyncTask->ResolveWithNoError(engine, objValue);
+        };
+
+        InnerAcquireFormData(engine, asyncTask, std::move(task), formId);
         return result;
     }
 
@@ -1309,6 +1392,7 @@ NativeValue* JsFormHostInit(NativeEngine* engine, NativeValue* exportObj)
     BindNativeFunction(*engine, *object, "shareForm", moduleName, JsFormHost::ShareForm);
     BindNativeFunction(*engine, *object, "notifyFormsPrivacyProtected", moduleName,
         JsFormHost::NotifyFormsPrivacyProtected);
+    BindNativeFunction(*engine, *object, "acquireFormData", moduleName, JsFormHost::AcquireFormData);
     return engine->CreateUndefined();
 }
 } // namespace AbilityRuntime

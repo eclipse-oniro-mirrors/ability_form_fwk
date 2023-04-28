@@ -40,6 +40,12 @@ public:
      */
     void DumpStorageFormInfos(const std::vector<FormDBInfo> &storageInfos, std::string &formInfos) const;
     /**
+     * @brief Dump all of temporary form infos.
+     * @param formRecordInfos Form record infos.
+     * @param formInfos Form dump infos.
+     */
+    void DumpTemporaryFormInfos(const std::vector<FormRecord> &formRecordInfos, std::string &formInfos) const;
+    /**
      * @brief Dump form infos.
      * @param formRecordInfos Form record infos.
      * @param formInfos Form dump infos.
@@ -57,6 +63,9 @@ public:
      * @param formInfo Form dump info.
      */
     void DumpFormInfo(const FormRecord &formRecordInfo, std::string &formInfo) const;
+
+private:
+    void AppendBundleFormInfo(const FormRecord &formRecordInfo, std::string &formInfo) const;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

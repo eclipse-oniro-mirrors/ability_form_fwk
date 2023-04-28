@@ -21,12 +21,24 @@
 #include "hilog_wrapper.h"
 
 namespace {
-    int32_t getCurrentAccountId = OHOS::AppExecFwk::Constants::ANY_USERID;
+int32_t getCurrentAccountId = OHOS::AppExecFwk::Constants::ANY_USERID;
+bool g_isSACall = true;
+bool g_verifyCallingPermission = true;
 }
 
 void MockGetCurrentAccountIdRet(int32_t userId)
 {
     getCurrentAccountId = userId;
+}
+
+void MockIsSACall(bool mockRet)
+{
+    g_isSACall = mockRet;
+}
+
+void MockVerifyCallingPermission(bool mockRet)
+{
+    g_verifyCallingPermission = mockRet;
 }
 
 namespace OHOS {
@@ -35,6 +47,18 @@ int FormUtil::GetCurrentAccountId()
 {
     GTEST_LOG_(INFO) << "GetCurrentAccountId called " << getCurrentAccountId;
     return getCurrentAccountId;
+}
+
+bool FormUtil::IsSACall()
+{
+    GTEST_LOG_(INFO) << "IsSACall called " << g_isSACall;
+    return g_isSACall;
+}
+
+bool FormUtil::VerifyCallingPermission(const std::string &permissionName)
+{
+    GTEST_LOG_(INFO) << "VerifyCallingPermission called " << g_verifyCallingPermission;
+    return g_verifyCallingPermission;
 }
 } // namespace AppExecFwk
 } // namespace OHOS

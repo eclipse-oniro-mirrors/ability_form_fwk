@@ -95,6 +95,13 @@ public:
      * @param errorMsg Indicates error-message of the form.
      */
     void OnError(int32_t errorCode, const std::string &errorMsg) override;
+
+    /**
+     * @brief Form provider is acquire data
+     * @param wantParams Indicates the data information acquired by the form.
+     * @param requestCode Indicates the requested id.
+     */
+    void OnAcquireDataResponse(const AAFwk::WantParams &wantParams, int64_t requestCode) override;
 private:
     Semaphore sem_;
     DISALLOW_COPY_AND_MOVE(MockFormHostClient);

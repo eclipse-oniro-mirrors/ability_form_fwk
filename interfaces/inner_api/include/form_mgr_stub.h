@@ -249,6 +249,14 @@ private:
     int32_t HandleShareForm(MessageParcel &data, MessageParcel &reply);
 
     /**
+     * @brief Handle acquire form data.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t HandleAcquireFormData(MessageParcel &data, MessageParcel &reply);
+
+    /**
      * @brief Receive form sharing information from remote.
      * @param data input param.
      * @param reply output param.
@@ -279,6 +287,22 @@ private:
      * @return Return ERR_OK on success, others on failure
     */
     int32_t HandleCheckFMSReady(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle get forms count message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Return ERR_OK on success, others on failure.
+    */
+    int32_t HandleGetFormsCount(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle get host forms count message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Return ERR_OK on success, others on failure.
+    */
+    int32_t HandleGetHostFormsCount(MessageParcel &data, MessageParcel &reply);
 private:
     using FormMgrFunc = int32_t (FormMgrStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, FormMgrFunc> memberFuncMap_;

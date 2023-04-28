@@ -394,6 +394,50 @@ int FormProviderProxy::AcquireState(const Want &wantArg, const std::string &prov
     return ERR_OK;
 }
 
+int32_t FormProviderProxy::AcquireFormData(int64_t formId, const sptr<IRemoteObject> &formSupplyCallback,
+                                           int64_t requestCode)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_ASYNC);
+
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("failed to write interface token.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteInt64(formId)) {
+        HILOG_ERROR("failed to write formId.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteRemoteObject(formSupplyCallback)) {
+        HILOG_ERROR("failed to write formSupplyCallback.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteInt64(requestCode)) {
+        HILOG_ERROR("failed to write requestCode.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int32_t result = Remote()->SendRequest(
+        static_cast<uint32_t>(IFormProvider::Message::FORM_ACQUIRE_PROVIDER_FOMR_DATA),
+        data,
+        reply,
+        option);
+    if (result != ERR_OK) {
+        HILOG_ERROR("failed to SendRequest: %{public}d", result);
+        return result;
+    }
+
+    auto retval = reply.ReadInt32();
+    if (retval != ERR_OK) {
+        HILOG_ERROR("failed to replyData: %{public}d", retval);
+    }
+
+    return retval;
+}
+
 template<typename T>
 int  FormProviderProxy::GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos)
 {

@@ -149,6 +149,12 @@ public:
      */
     bool GetFormRecord(const std::string &bundleName, std::vector<FormRecord> &formInfos);
     /**
+     * @brief Get temporary form record.
+     * @param formTempRecords The temp form record.
+     * @return Returns true if this function is successfully called; returns false otherwise.
+     */
+    bool GetTempFormRecord(std::vector<FormRecord> &formTempRecords);
+    /**
      * @brief Check form record is exist.
      * @param formId The Id of the form.
      * @return Returns true if the form record is exist; returns false is not exist.
@@ -418,6 +424,17 @@ public:
     void DeleteInvalidPublishForms(int32_t userId, std::string bundleName, std::set<int64_t> &validFormIds);
 
     /**
+     * @brief Create form acquire data host record.
+     * @param requestCode The request code of this acquire form.
+     * @param info The form item info.
+     * @param callerToken  Caller ability token.
+     * @param callingUid The UID of the proxy.
+     * @return Returns true if this function is successfully called; returns false otherwise.
+     */
+    bool CreateFormAcquireDataRecord(int64_t requestCode, const FormItemInfo &info,
+                                     const sptr<IRemoteObject> &callerToken, int callingUid);
+
+    /**
      * @brief Create form state host record.
      * @param provider The provider of the form state
      * @param info The form item info.
@@ -436,6 +453,14 @@ public:
      * @return Returns true if this function is successfully called; returns false otherwise.
      */
     ErrCode AcquireFormStateBack(AppExecFwk::FormState state, const std::string &provider, const Want &want);
+
+    /**
+     * @brief acquire form data callback.
+     * @param wantParams Indicates the data information acquired by the form.
+     * @param requestCode Indicates the requested id.
+     * @return Returns true if this function is successfully called; returns false otherwise.
+     */
+    ErrCode AcquireFormDataBack(const AAFwk::WantParams &wantParams, int64_t requestCode);
 
     /**
      * @brief Notify the form is visible or not.
@@ -524,6 +549,28 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode CheckInvalidForm(const int64_t formId);
+
+    /**
+    * @brief get cast forms count.
+    * @param formCount Returns the number of the cast form.
+    * @return Return the cast forms number.
+    */
+    int32_t GetCastFormsCount(int32_t &formCount);
+
+    /**
+    * @brief get temp forms count.
+    * @param formCount Returns the number of the temp form.
+    * @return Return the temp forms number.
+    */
+    int32_t GetTempFormsCount(int32_t &formCount);
+
+    /**
+    * @brief get host forms count.
+    * @param bundleName Indicates form host bundleName.
+    * @param formCount Returns the number of the host form.
+    * @return Return the host forms number.
+    */
+    int32_t GetHostFormsCount(const std::string &bundleName, int32_t &formCount);
 private:
     /**
      * @brief Create form record.
@@ -620,10 +667,12 @@ private:
     mutable std::recursive_mutex formTempMutex_;
     mutable std::recursive_mutex formStateRecordMutex_;
     mutable std::recursive_mutex formRequestPublishFormsMutex_;
+    mutable std::recursive_mutex formAcquireDataRecordMutex_;
     std::map<int64_t, FormRecord> formRecords_;
     std::vector<FormHostRecord> clientRecords_;
     std::vector<int64_t> tempForms_;
     std::map<std::string, FormHostRecord> formStateRecord_;
+    std::map<int32_t, FormHostRecord> formAcquireDataRecord_;
     using FormRequestPublishFormInfo = std::pair<Want, std::unique_ptr<FormProviderData>>;
     std::map<int64_t, FormRequestPublishFormInfo> formRequestPublishForms_;
     int64_t udidHash_ = 0;

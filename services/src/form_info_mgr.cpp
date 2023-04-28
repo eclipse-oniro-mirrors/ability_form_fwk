@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License")_;
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -97,7 +97,7 @@ ErrCode FormInfoHelper::LoadStageFormConfigInfo(const BundleInfo &bundleInfo, st
                 continue;
             }
             for (const auto &extensionFormInfo: extensionFormInfos) {
-                FormInfo formInfo(extensionInfo, extensionFormInfo); 
+                FormInfo formInfo(extensionInfo, extensionFormInfo);
                 if (GetFormInfoDescription(resourceManager, formInfo) != ERR_OK) {
                     HILOG_INFO("Get FormInfo Description fail");
                 }
@@ -512,6 +512,33 @@ ErrCode FormInfoMgr::GetFormsInfoByModule(const std::string &bundleName, const s
     return ERR_OK;
 }
 
+ErrCode FormInfoMgr::GetFormsInfoByRecord(const FormRecord &formRecord, FormInfo &formInfo)
+{
+    std::vector<FormInfo> formInfos;
+    {
+        std::shared_lock<std::shared_timed_mutex> guard(bundleFormInfoMapMutex_);
+        auto bundleFormInfoIter = bundleFormInfoMap_.find(formRecord.bundleName);
+        if (bundleFormInfoIter == bundleFormInfoMap_.end()) {
+            HILOG_ERROR("no forms found for %{public}s.", formRecord.bundleName.c_str());
+            return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+        }
+
+        if (bundleFormInfoIter->second == nullptr) {
+            HILOG_ERROR("BundleFormInfo is nullptr, GetFormsInfoByModule failed.");
+            return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+        }
+        
+        bundleFormInfoIter->second->GetFormsInfoByModule(formRecord.moduleName, formInfos);
+    }
+    for (const FormInfo &info : formInfos) {
+        if (info.name == formRecord.formName) {
+            formInfo = info;
+            break;
+        }
+    }
+    return formInfo.name.empty() ? ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED : ERR_OK;
+}
+
 ErrCode FormInfoMgr::CheckDynamicFormInfo(FormInfo &formInfo, const BundleInfo &bundleInfo)
 {
     for (auto &moduleInfo : bundleInfo.hapModuleInfos) {
@@ -645,11 +672,11 @@ bool FormInfoMgr::IsCaller(const std::string& bundleName)
 
 bool FormInfoMgr::CheckBundlePermission()
 {
-    auto isSaCall = AAFwk::PermissionVerification::GetInstance()->IsSACall();
+    auto isSaCall = FormUtil::IsSACall();
     if (isSaCall) {
         return true;
     }
-    auto isCallingPerm = AAFwk::PermissionVerification::GetInstance()->VerifyCallingPermission(
+    auto isCallingPerm = FormUtil::VerifyCallingPermission(
         AppExecFwk::Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED);
     if (isCallingPerm) {
         return true;

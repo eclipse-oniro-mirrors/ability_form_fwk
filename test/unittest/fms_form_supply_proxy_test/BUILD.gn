@@ -37,7 +37,6 @@ ohos_unittest("fms_form_supply_proxy_test") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
   deps = [
-    "${ability_runtime_path}/interfaces/inner_api/app_manager:app_manager",
     "${form_fwk_path}:fms_target",
     "//third_party/googletest:gmock_main",
   ]
@@ -46,6 +45,7 @@ ohos_unittest("fms_form_supply_proxy_test") {
     "ability_base:base",
     "ability_base:want",
     "ability_base:zuri",
+    "ability_runtime:app_manager",
     "ability_runtime:app_manager",
     "ability_runtime:wantagent_innerkits",
     "access_token:libnativetoken",

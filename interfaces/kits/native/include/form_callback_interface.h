@@ -61,6 +61,16 @@ public:
 virtual void ProcessAcquireState(FormState state) = 0;
 };
 
+class FormDataCallbackInterface {
+public:
+/**
+ * @brief acquire form data.
+ *
+ * @param state Indicates the form data.
+ */
+virtual void ProcessAcquireFormData(AAFwk::WantParams data) = 0;
+};
+
 class ShareFormCallBack {
 public:
     /**

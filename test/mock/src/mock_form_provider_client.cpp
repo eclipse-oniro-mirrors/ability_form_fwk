@@ -161,5 +161,12 @@ int32_t MockFormProviderClient::AcquireShareFormData(int64_t formId, const std::
     acquireShareFormState_ = true;
     return ERR_OK;
 }
+
+int32_t MockFormProviderClient::AcquireFormData(int64_t formId, const sptr<IRemoteObject> &formSupplyCallback,
+    int64_t requestCode)
+{
+    HILOG_DEBUG("MockFormProviderClient::AcquireFormData");
+    return ERR_OK;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

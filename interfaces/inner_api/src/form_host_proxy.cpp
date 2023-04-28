@@ -151,6 +151,37 @@ void FormHostProxy::OnAcquireState(FormState state, const AAFwk::Want &want)
     }
 }
 
+void FormHostProxy::OnAcquireDataResponse(const AAFwk::WantParams &wantParams, int64_t requestCode)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("failed to write interface token.");
+        return;
+    }
+
+    if (!data.WriteParcelable(&wantParams)) {
+        HILOG_ERROR("failed to write form wantParams.");
+        return;
+    }
+    if (!data.WriteInt64(requestCode)) {
+        HILOG_ERROR("failed to write form requestCode.");
+        return;
+    }
+    int error;
+
+    error = Remote()->SendRequest(
+        static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_ACQUIRE_FORM_DATA),
+        data,
+        reply,
+        option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("failed to SendRequest: %{public}d", error);
+    }
+}
+
 
 template<typename T>
 int  FormHostProxy::GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos)

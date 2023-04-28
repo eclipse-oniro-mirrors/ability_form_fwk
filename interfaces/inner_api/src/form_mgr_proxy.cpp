@@ -1216,6 +1216,51 @@ int32_t FormMgrProxy::ShareForm(int64_t formId, const std::string &deviceId, con
     return reply.ReadInt32();
 }
 
+int32_t FormMgrProxy::AcquireFormData(int64_t formId, int64_t requestCode, const sptr<IRemoteObject> &callerToken,
+    AAFwk::WantParams &formData)
+{
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("failed to write interface token.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteInt64(formId)) {
+        HILOG_ERROR("failed to write formId.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteInt64(requestCode)) {
+        HILOG_ERROR("failed to write requestCode.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteRemoteObject(callerToken)) {
+        HILOG_ERROR("failed to write callerToken.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    
+    int error;
+    MessageParcel reply;
+    error = SendTransactCmd(IFormMgr::Message::FORM_MGR_ACQUIRE_DATA, data, reply);
+    if (error != ERR_OK) {
+        return error;
+    }
+
+    error = reply.ReadInt32();
+    if (error != ERR_OK) {
+        HILOG_ERROR("failed to read reply result");
+        return error;
+    }
+    std::shared_ptr<AAFwk::WantParams> wantParams(reply.ReadParcelable<AAFwk::WantParams>());
+    if (wantParams == nullptr) {
+        HILOG_ERROR("failed to ReadParcelable<wantParams>");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    formData = *wantParams;
+    return ERR_OK;
+}
+
 int32_t FormMgrProxy::RecvFormShareInfoFromRemote(const FormShareInfo &info)
 {
     MessageParcel data;
@@ -1285,6 +1330,56 @@ int32_t FormMgrProxy::SetBackgroundFunction(const std::string funcName, const st
     }
     // retrieve and return result;
     return reply.ReadInt32();
+}
+
+int32_t FormMgrProxy::GetFormsCount(bool isTempFormFlag, int32_t &formCount)
+{
+    HILOG_INFO("%{public}s start.", __func__);
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("failed to write interface token.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteBool(isTempFormFlag)) {
+        HILOG_ERROR("%{public}s, failed to write bool isEnableUpdate", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    int error = Remote()->SendRequest(
+        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORMS_COUNT), data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d", __func__, error);
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+    int32_t result = reply.ReadInt32();
+    formCount = reply.ReadInt32();
+    return result;
+}
+
+int32_t FormMgrProxy::GetHostFormsCount(std::string &bundleName, int32_t &formCount)
+{
+    HILOG_INFO("%{public}s start.", __func__);
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("failed to write interface token.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteString(bundleName)) {
+        HILOG_ERROR("%{public}s, failed to write bundleName", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    int error = Remote()->SendRequest(
+        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_HOST_FORMS_COUNT), data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d", __func__, error);
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+    int32_t result = reply.ReadInt32();
+    formCount = reply.ReadInt32();
+    return result;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

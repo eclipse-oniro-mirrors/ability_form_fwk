@@ -25,6 +25,7 @@
 #endif
 #include "erms_mgr_interface.h"
 #include "form_acquire_connection.h"
+#include "form_acquire_data_connection.h"
 #include "form_acquire_state_connection.h"
 #include "form_ams_helper.h"
 #include "form_background_connection.h"
@@ -711,6 +712,21 @@ int FormMgrAdapter::DumpStorageFormInfos(std::string &formInfos) const
     return ERR_OK;
 }
 /**
+ * @brief Dump all of temporary form infos.
+ * @param formInfos All of temporary form infos.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormMgrAdapter::DumpTemporaryFormInfos(std::string &formInfos) const
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    std::vector<FormRecord> formRecordInfos;
+    if (!FormDataMgr::GetInstance().GetTempFormRecord(formRecordInfos)) {
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    }
+    FormDumpMgr::GetInstance().DumpTemporaryFormInfos(formRecordInfos, formInfos);
+    return ERR_OK;
+}
+/**
  * @brief Dump form info by a bundle name.
  * @param bundleName The bundle name of form provider.
  * @param formInfos Form infos.
@@ -1381,7 +1397,7 @@ ErrCode FormMgrAdapter::CheckPublishForm(Want &want)
     }
     if (!IsValidPublishEvent(iBundleMgr, bundleName, want)) {
         HILOG_ERROR("Invalid publish form event.");
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
     }
 
     if (want.GetElement().GetBundleName().empty()) {
@@ -2315,6 +2331,39 @@ int FormMgrAdapter::AcquireFormState(const Want &want, const sptr<IRemoteObject>
     return ERR_OK;
 }
 
+int FormMgrAdapter::AcquireFormData(int64_t formId, int64_t requestCode, const sptr<IRemoteObject> &callerToken,
+    AAFwk::WantParams &formData)
+{
+    FormRecord formRecord;
+    bool isFormRecExist = FormDataMgr::GetInstance().GetFormRecord(formId, formRecord);
+    if (!isFormRecExist) {
+        HILOG_ERROR("form info get formRecord failed.");
+        return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
+    }
+    std::string bundleName = formRecord.bundleName;
+    std::string abilityName = formRecord.abilityName;
+
+    HILOG_DEBUG("bundleName:%{public}s, abilityName:%{public}s", bundleName.c_str(), abilityName.c_str());
+    int32_t callingUid = IPCSkeleton::GetCallingUid();
+    FormItemInfo info;
+    FormDataMgr::GetInstance().CreateFormAcquireDataRecord(requestCode, info, callerToken, callingUid);
+    sptr<IAbilityConnection> connection =
+        new (std::nothrow) FormAcquireDataConnection(formId, bundleName, abilityName, requestCode);
+    if (connection == nullptr) {
+        HILOG_ERROR("failed to create FormAcquireDataConnection.");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    Want targetWant;
+    targetWant.AddFlags(Want::FLAG_ABILITY_FORM_ENABLED);
+    targetWant.SetElementName(bundleName, abilityName);
+    ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbility(targetWant, connection);
+    if (errorCode != ERR_OK) {
+        HILOG_ERROR("ConnectServiceAbility failed.");
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+    }
+    return ERR_OK;
+}
+
 /**
  * @brief Notify the form is visible or not.
  * @param formIds Indicates the ID of the forms.
@@ -2419,6 +2468,21 @@ bool FormMgrAdapter::checkFormHostHasSaUid(const FormRecord &formRecord)
 {
     return std::find(formRecord.formUserUids.begin(), formRecord.formUserUids.end(),
         SYSTEM_UID) != formRecord.formUserUids.end();
+}
+
+int32_t FormMgrAdapter::GetFormsCount(bool isTempFormFlag, int32_t &formCount)
+{
+    HILOG_DEBUG("%{public}s, isTempFormFlag: %{public}d.", __func__, isTempFormFlag);
+    if (isTempFormFlag) {
+        return FormDataMgr::GetInstance().GetTempFormsCount(formCount);
+    }
+    return FormDataMgr::GetInstance().GetCastFormsCount(formCount);
+}
+
+int32_t FormMgrAdapter::GetHostFormsCount(std::string &bundleName, int32_t &formCount)
+{
+    HILOG_DEBUG("%{public}s, bundleName: %{public}s.", __func__, bundleName.c_str());
+    return FormDataMgr::GetInstance().GetHostFormsCount(bundleName, formCount);
 }
 } // namespace AppExecFwk
 } // namespace OHOS

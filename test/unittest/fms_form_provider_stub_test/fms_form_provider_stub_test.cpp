@@ -107,7 +107,11 @@ public:
     int32_t OnStopRenderingTaskDone(int64_t formId, const Want &want) override
     {
         return ERR_OK;
-    }
+    };
+    int OnAcquireDataResult(const AAFwk::WantParams &wantParams, int64_t requestCode) override
+    {
+        return ERR_OK;
+    };
     const int number_ = 1;
 };
 /**

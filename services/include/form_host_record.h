@@ -129,6 +129,14 @@ public:
     void OnAcquireState(AppExecFwk::FormState state, const AAFwk::Want &want);
 
     /**
+     * Send form data to form host.
+     *
+     * @param wantParams Indicates the data information acquired by the form.
+     * @param requestCode Indicates the requested id.
+     */
+    void OnAcquireFormData(const AAFwk::WantParams &wantParams, int64_t requestCode);
+
+    /**
      * @brief Release resource.
      */
     void CleanResource();
@@ -185,6 +193,12 @@ public:
      * @param hostBundleName Host bundle name.
      */
     void SetHostBundleName(const std::string &hostBundleName);
+
+    /**
+     * @brief get forms count.
+     * @return the number of host form.
+     */
+    int32_t GetFormsCount() const;
 private:
     int callerUid_ = 0;
     sptr<IRemoteObject> formHostClient_ = nullptr;
