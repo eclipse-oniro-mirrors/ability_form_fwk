@@ -18,7 +18,7 @@ import("//foundation/ability/form_fwk/form_fwk.gni")
 config("formrender_config") {
   visibility = [ ":*" ]
   include_dirs = [
-    "//foundation/arkui/ace_engine/frameworks/core/components/form/resource/",
+    "${arkui_ace_engine_components_path}/form/resource/",
     "include",
   ]
   cflags = []
@@ -77,7 +77,6 @@ ohos_shared_library("formrender") {
     "ability_base:configuration",
     "ability_base:extractortool",
     "ability_base:want",
-    "ability_runtime:ability_deps_wrapper",
     "ability_runtime:ability_manager",
     "ability_runtime:abilitykit_native",
     "ability_runtime:app_context",

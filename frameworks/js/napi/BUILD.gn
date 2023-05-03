@@ -243,9 +243,7 @@ ohos_shared_library("forminfo") {
 
 ################################### formhost_napi ########################################
 ohos_shared_library("formhost_napi") {
-  include_dirs = [
-    "//foundation/ability/ability_runtime/interfaces/inner_api/runtime/include",
-  ]
+  include_dirs = [ "${ability_runtime_innerapi_path}/runtime/include" ]
 
   sources = [
     "formHost/napi_form_host.cpp",
@@ -280,9 +278,7 @@ ohos_shared_library("formhost_napi") {
 
 ################################### formhost ########################################
 ohos_shared_library("formhost") {
-  include_dirs = [
-    "//foundation/ability/ability_runtime/interfaces/inner_api/runtime/include",
-  ]
+  include_dirs = [ "${ability_runtime_innerapi_path}/runtime/include" ]
 
   sources = [
     "form_host/js_form_host.cpp",
@@ -293,13 +289,13 @@ ohos_shared_library("formhost") {
 
   deps = [
     ":formutil_napi",
-    "${ability_runtime_napi_path}/inner/napi_common:napi_common",
     "${form_fwk_path}:fmskit_native",
   ]
 
   external_deps = [
     "ability_base:want",
     "ability_runtime:abilitykit_native",
+    "ability_runtime:napi_common",
     "ability_runtime:runtime",
     "access_token:libtokenid_sdk",
     "bundle_framework:appexecfwk_base",
@@ -319,9 +315,7 @@ ohos_shared_library("formhost") {
 
 ################################### formprovider_napi ########################################
 ohos_shared_library("formprovider_napi") {
-  include_dirs = [
-    "//foundation/ability/ability_runtime/interfaces/inner_api/runtime/include",
-  ]
+  include_dirs = [ "${ability_runtime_innerapi_path}/runtime/include" ]
 
   sources = [
     "formProvider/napi_form_provider.cpp",
@@ -332,13 +326,13 @@ ohos_shared_library("formprovider_napi") {
 
   deps = [
     ":formutil_napi",
-    "${ability_runtime_napi_path}/inner/napi_common:napi_common",
     "${form_fwk_path}:fmskit_native",
   ]
 
   external_deps = [
     "ability_base:want",
     "ability_runtime:abilitykit_native",
+    "ability_runtime:napi_common",
     "ability_runtime:runtime",
     "bundle_framework:appexecfwk_base",
     "c_utils:utils",
@@ -355,9 +349,7 @@ ohos_shared_library("formprovider_napi") {
 }
 
 ohos_shared_library("formprovider") {
-  include_dirs = [
-    "//foundation/ability/ability_runtime/interfaces/inner_api/runtime/include",
-  ]
+  include_dirs = [ "${ability_runtime_innerapi_path}/runtime/include" ]
 
   sources = [
     "form_provider/js_form_provider.cpp",
@@ -368,13 +360,13 @@ ohos_shared_library("formprovider") {
 
   deps = [
     ":formutil_napi",
-    "${ability_runtime_napi_path}/inner/napi_common:napi_common",
     "${form_fwk_path}:fmskit_native",
   ]
 
   external_deps = [
     "ability_base:want",
     "ability_runtime:abilitykit_native",
+    "ability_runtime:napi_common",
     "ability_runtime:runtime",
     "access_token:libtokenid_sdk",
     "bundle_framework:appexecfwk_base",

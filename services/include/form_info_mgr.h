@@ -24,6 +24,7 @@
 #include "bundle_info.h"
 #include "form_info.h"
 #include "form_info_storage.h"
+#include "form_record.h"
 #include "resource_manager.h"
 
 namespace OHOS {
@@ -91,6 +92,8 @@ public:
 
     ErrCode GetFormsInfoByModule(const std::string &bundleName, const std::string &moduleName,
                                  std::vector<FormInfo> &formInfos);
+
+    ErrCode GetFormsInfoByRecord(const FormRecord &formRecord, FormInfo &formInfo);
 
     ErrCode AddDynamicFormInfo(FormInfo &formInfo, int32_t userId);
 

@@ -38,17 +38,14 @@ ohos_unittest("fms_form_bms_helper_test") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
   deps = [
-    "${ability_runtime_path}/interfaces/inner_api/app_manager:app_manager",
-    "${ability_runtime_path}/services/abilitymgr:abilityms_target",
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
-    "${systemabilitymgr_path}/safwk/interfaces/innerkits/safwk:system_ability_fwk",
-    "${systemabilitymgr_path}/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
     "//third_party/googletest:gmock_main",
   ]
 
   external_deps = [
     "ability_base:want",
+    "ability_runtime:app_manager",
     "appspawn:appspawn_socket_client",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
@@ -63,6 +60,7 @@ ohos_unittest("fms_form_bms_helper_test") {
     "huks:libhukssdk",
     "ipc:ipc_core",
     "relational_store:native_rdb",
+    "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
 }

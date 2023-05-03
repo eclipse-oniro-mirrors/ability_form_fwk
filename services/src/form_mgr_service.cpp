@@ -25,6 +25,7 @@
 #include "form_data_mgr.h"
 #include "form_db_cache.h"
 #include "form_event_handler.h"
+#include "form_event_report.h"
 #include "form_info_mgr.h"
 #include "form_mgr_adapter.h"
 #include "form_mgr_errors.h"
@@ -40,7 +41,6 @@
 #include "permission_verification.h"
 #include "system_ability_definition.h"
 #include "tokenid_kit.h"
-#include "event_report.h"
 #include "hisysevent.h"
 #include "xcollie/watchdog.h"
 
@@ -48,9 +48,6 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace {
 const int32_t MAIN_USER_ID = 100;
-
-constexpr int32_t SYSTEM_UID = 1000;
-
 constexpr int32_t GET_CALLING_UID_TRANSFORM_DIVISOR = 200000;
 }
 using namespace std::chrono;
@@ -65,6 +62,7 @@ constexpr int32_t FORM_DUMP_ARGC_MAX = 2;
 const std::string FORM_DUMP_HELP = "options list:\n"
     "  -h, --help                               list available commands\n"
     "  -s, --storage                            query form storage info\n"
+    "  -t, --temp                               query temporary form info\n"
     "  -n  <bundle-name>                        query form info by a bundle name\n"
     "  -i  <form-id>                            query form info by a form ID\n";
 
@@ -73,6 +71,8 @@ const std::map<std::string, FormMgrService::DumpKey> FormMgrService::dumpKeyMap_
     {"--help", FormMgrService::DumpKey::KEY_DUMP_HELP},
     {"-s", FormMgrService::DumpKey::KEY_DUMP_STORAGE},
     {"--storage", FormMgrService::DumpKey::KEY_DUMP_STORAGE},
+    {"-t", FormMgrService::DumpKey::KEY_DUMP_TEMPORARY},
+    {"--temp", FormMgrService::DumpKey::KEY_DUMP_TEMPORARY},
     {"-n", FormMgrService::DumpKey::KEY_DUMP_BY_BUNDLE_NAME},
     {"-i", FormMgrService::DumpKey::KEY_DUMP_BY_FORM_ID},
 };
@@ -129,37 +129,6 @@ bool FormMgrService::CheckFMSReady()
     return IsReady();
 }
 
-bool FormMgrService::IsSACall() const
-{
-    HILOG_DEBUG("called.");
-    auto callerToken = IPCSkeleton::GetCallingTokenID();
-    HILOG_DEBUG("callerToken : %{private}u", callerToken);
-    auto tokenType = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken);
-    if (tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE) {
-        HILOG_DEBUG("caller tokenType is native, verify success");
-        return true;
-    }
-    if (IPCSkeleton::GetCallingUid() == SYSTEM_UID) {
-        HILOG_DEBUG("callingUid is native, verify success");
-        return true;
-    }
-    HILOG_DEBUG("Not SA called.");
-    return false;
-}
-
-bool FormMgrService::VerifyCallingPermission(const std::string &permissionName) const
-{
-    HILOG_DEBUG("called. permission name is:%{public}s", permissionName.c_str());
-    int32_t ret = Security::AccessToken::AccessTokenKit::VerifyAccessToken(IPCSkeleton::GetCallingTokenID(),
-        permissionName);
-    if (ret == Security::AccessToken::PermissionState::PERMISSION_DENIED) {
-        HILOG_ERROR("permission %{public}s: PERMISSION_DENIED", permissionName.c_str());
-        return false;
-    }
-    HILOG_DEBUG("Verify calling permission success");
-    return true;
-}
-
 /**
  * @brief Add form with want, send want to form manager service.
  * @param formId The Id of the forms to add.
@@ -174,12 +143,12 @@ int FormMgrService::AddForm(const int64_t formId, const Want &want,
     HILOG_DEBUG("called.");
 
     ErrCode ret = CheckFormPermission();
-    AAFwk::EventInfo eventInfo;
+    FormEventInfo eventInfo;
     eventInfo.formId = formId;
     eventInfo.bundleName = want.GetElement().GetBundleName();
     eventInfo.moduleName = want.GetStringParam(AppExecFwk::Constants::PARAM_MODULE_NAME_KEY);
     eventInfo.abilityName = want.GetElement().GetAbilityName();
-    AAFwk::EventReport::SendFormEvent(AAFwk::EventName::ADD_FORM, HiSysEventType::BEHAVIOR, eventInfo);
+    FormEventReport::SendFormEvent(FormEventName::ADD_FORM, HiSysEventType::BEHAVIOR, eventInfo);
     if (ret != ERR_OK) {
         HILOG_ERROR("%{public}s fail, add form permission denied", __func__);
         return ret;
@@ -202,9 +171,9 @@ int FormMgrService::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
         HILOG_ERROR("%{public}s fail, delete form permission denied", __func__);
         return ret;
     }
-    AAFwk::EventInfo eventInfo;
+    FormEventInfo eventInfo;
     eventInfo.formId = formId;
-    AAFwk::EventReport::SendFormEvent(AAFwk::EventName::DELETE_FORM, HiSysEventType::BEHAVIOR, eventInfo);
+    FormEventReport::SendFormEvent(FormEventName::DELETE_FORM, HiSysEventType::BEHAVIOR, eventInfo);
 
     return FormMgrAdapter::GetInstance().DeleteForm(formId, callerToken);
 }
@@ -249,9 +218,9 @@ int FormMgrService::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> 
         HILOG_ERROR("%{public}s fail, release form permission denied", __func__);
         return ret;
     }
-    AAFwk::EventInfo eventInfo;
+    FormEventInfo eventInfo;
     eventInfo.formId = formId;
-    AAFwk::EventReport::SendFormEvent(AAFwk::EventName::RELEASE_FORM, HiSysEventType::BEHAVIOR, eventInfo);
+    FormEventReport::SendFormEvent(FormEventName::RELEASE_FORM, HiSysEventType::BEHAVIOR, eventInfo);
 
     return FormMgrAdapter::GetInstance().ReleaseForm(formId, callerToken, delCache);
 }
@@ -290,12 +259,12 @@ int FormMgrService::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
         HILOG_ERROR("%{public}s fail, request form permission denied", __func__);
         return ret;
     }
-    AAFwk::EventInfo eventInfo;
+    FormEventInfo eventInfo;
     eventInfo.formId = formId;
     eventInfo.bundleName = want.GetElement().GetBundleName();
     eventInfo.moduleName = want.GetStringParam(AppExecFwk::Constants::PARAM_MODULE_NAME_KEY);
     eventInfo.abilityName = want.GetElement().GetAbilityName();
-    AAFwk::EventReport::SendFormEvent(AAFwk::EventName::REQUEST_FORM, HiSysEventType::BEHAVIOR, eventInfo);
+    FormEventReport::SendFormEvent(FormEventName::REQUEST_FORM, HiSysEventType::BEHAVIOR, eventInfo);
 
     return FormMgrAdapter::GetInstance().RequestForm(formId, callerToken, want);
 }
@@ -309,10 +278,10 @@ int FormMgrService::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
 int FormMgrService::SetNextRefreshTime(const int64_t formId, const int64_t nextTime)
 {
     HILOG_INFO("%{public}s called.", __func__);
-    AAFwk::EventInfo eventInfo;
+    FormEventInfo eventInfo;
     eventInfo.formId = formId;
-    AAFwk::EventReport::SendFormEvent(
-        AAFwk::EventName::SET_NEXT_REFRESH_TIME_FORM, HiSysEventType::BEHAVIOR, eventInfo);
+    FormEventReport::SendFormEvent(
+        FormEventName::SET_NEXT_REFRESH_TIME_FORM, HiSysEventType::BEHAVIOR, eventInfo);
 
     return FormMgrAdapter::GetInstance().SetNextRefreshTime(formId, nextTime);
 }
@@ -367,9 +336,9 @@ int FormMgrService::CastTempForm(const int64_t formId, const sptr<IRemoteObject>
         HILOG_ERROR("fail, the form id is invalid or not under the current active user.");
         return ret;
     }
-    AAFwk::EventInfo eventInfo;
+    FormEventInfo eventInfo;
     eventInfo.formId = formId;
-    AAFwk::EventReport::SendFormEvent(AAFwk::EventName::CASTTEMP_FORM, HiSysEventType::BEHAVIOR, eventInfo);
+    FormEventReport::SendFormEvent(FormEventName::CASTTEMP_FORM, HiSysEventType::BEHAVIOR, eventInfo);
 
     return FormMgrAdapter::GetInstance().CastTempForm(formId, callerToken);
 }
@@ -457,11 +426,11 @@ int FormMgrService::MessageEvent(const int64_t formId, const Want &want, const s
         HILOG_ERROR("fail, the form id is invalid or not under the current active user.");
         return ret;
     }
-    AAFwk::EventInfo eventInfo;
+    FormEventInfo eventInfo;
     eventInfo.bundleName = want.GetElement().GetBundleName();
     eventInfo.moduleName = want.GetStringParam(AppExecFwk::Constants::PARAM_MODULE_NAME_KEY);
     eventInfo.abilityName = want.GetElement().GetAbilityName();
-    AAFwk::EventReport::SendFormEvent(AAFwk::EventName::MESSAGE_EVENT_FORM, HiSysEventType::BEHAVIOR, eventInfo);
+    FormEventReport::SendFormEvent(FormEventName::MESSAGE_EVENT_FORM, HiSysEventType::BEHAVIOR, eventInfo);
     return FormMgrAdapter::GetInstance().MessageEvent(formId, want, callerToken);
 }
 
@@ -485,12 +454,12 @@ int FormMgrService::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
         HILOG_ERROR("fail, the form id is invalid or not under the current active user.");
         return ret;
     }
-    AAFwk::EventInfo eventInfo;
+    FormEventInfo eventInfo;
     eventInfo.formId = formId;
     eventInfo.bundleName = want.GetElement().GetBundleName();
     eventInfo.moduleName = want.GetStringParam(AppExecFwk::Constants::PARAM_MODULE_NAME_KEY);
     eventInfo.abilityName = want.GetElement().GetAbilityName();
-    AAFwk::EventReport::SendFormEvent(AAFwk::EventName::ROUTE_EVENT_FORM, HiSysEventType::BEHAVIOR, eventInfo);
+    FormEventReport::SendFormEvent(FormEventName::ROUTE_EVENT_FORM, HiSysEventType::BEHAVIOR, eventInfo);
     return FormMgrAdapter::GetInstance().RouterEvent(formId, want, callerToken);
 }
 
@@ -514,12 +483,12 @@ int FormMgrService::BackgroundEvent(const int64_t formId, Want &want, const sptr
         HILOG_ERROR("fail, the form id is invalid or not under the current active user.");
         return ret;
     }
-    AAFwk::EventInfo eventInfo;
+    FormEventInfo eventInfo;
     eventInfo.formId = formId;
     eventInfo.bundleName = want.GetElement().GetBundleName();
     eventInfo.moduleName = want.GetStringParam(AppExecFwk::Constants::PARAM_MODULE_NAME_KEY);
     eventInfo.abilityName = want.GetElement().GetAbilityName();
-    AAFwk::EventReport::SendFormEvent(AAFwk::EventName::BACKGROUND_EVENT_FORM, HiSysEventType::BEHAVIOR, eventInfo);
+    FormEventReport::SendFormEvent(FormEventName::BACKGROUND_EVENT_FORM, HiSysEventType::BEHAVIOR, eventInfo);
     return FormMgrAdapter::GetInstance().BackgroundEvent(formId, want, callerToken);
 }
 
@@ -630,7 +599,7 @@ ErrCode FormMgrService::CheckFormPermission()
 {
     HILOG_DEBUG("called.");
 
-    if (IsSACall()) {
+    if (FormUtil::IsSACall()) {
         return ERR_OK;
     }
 
@@ -641,7 +610,7 @@ ErrCode FormMgrService::CheckFormPermission()
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
     }
 
-    auto isCallingPerm = VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_REQUIRE_FORM);
+    auto isCallingPerm = FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_REQUIRE_FORM);
     if (!isCallingPerm) {
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
@@ -672,8 +641,8 @@ int FormMgrService::DeleteInvalidForms(const std::vector<int64_t> &formIds,
         HILOG_ERROR("%{public}s fail, delete form permission denied", __func__);
         return ret;
     }
-    AAFwk::EventInfo eventInfo;
-    AAFwk::EventReport::SendFormEvent(AAFwk::EventName::DELETE_INVALID_FORM, HiSysEventType::BEHAVIOR, eventInfo);
+    FormEventInfo eventInfo;
+    FormEventReport::SendFormEvent(FormEventName::DELETE_INVALID_FORM, HiSysEventType::BEHAVIOR, eventInfo);
     return FormMgrAdapter::GetInstance().DeleteInvalidForms(formIds, callerToken, numFormsDeleted);
 }
 
@@ -693,11 +662,11 @@ int FormMgrService::AcquireFormState(const Want &want,
         HILOG_ERROR("%{public}s fail, acquire form state permission denied", __func__);
         return ret;
     }
-    AAFwk::EventInfo eventInfo;
+    FormEventInfo eventInfo;
     eventInfo.bundleName = want.GetElement().GetBundleName();
     eventInfo.moduleName = want.GetStringParam(AppExecFwk::Constants::PARAM_MODULE_NAME_KEY);
     eventInfo.abilityName = want.GetElement().GetAbilityName();
-    AAFwk::EventReport::SendFormEvent(AAFwk::EventName::ACQUIREFORMSTATE_FORM, HiSysEventType::BEHAVIOR, eventInfo);
+    FormEventReport::SendFormEvent(FormEventName::ACQUIREFORMSTATE_FORM, HiSysEventType::BEHAVIOR, eventInfo);
     return FormMgrAdapter::GetInstance().AcquireFormState(want, callerToken, stateInfo);
 }
 
@@ -959,6 +928,7 @@ void FormMgrService::DumpInit()
 {
     dumpFuncMap_[DumpKey::KEY_DUMP_HELP] = &FormMgrService::HiDumpHelp;
     dumpFuncMap_[DumpKey::KEY_DUMP_STORAGE] = &FormMgrService::HiDumpStorageFormInfos;
+    dumpFuncMap_[DumpKey::KEY_DUMP_TEMPORARY] = &FormMgrService::HiDumpTemporaryFormInfos;
     dumpFuncMap_[DumpKey::KEY_DUMP_BY_BUNDLE_NAME] = &FormMgrService::HiDumpFormInfoByBundleName;
     dumpFuncMap_[DumpKey::KEY_DUMP_BY_FORM_ID] = &FormMgrService::HiDumpFormInfoByFormId;
 }
@@ -1039,6 +1009,11 @@ void FormMgrService::HiDumpStorageFormInfos([[maybe_unused]] const std::string &
     DumpStorageFormInfos(result);
 }
 
+void FormMgrService::HiDumpTemporaryFormInfos([[maybe_unused]] const std::string &args, std::string &result)
+{
+    FormMgrAdapter::GetInstance().DumpTemporaryFormInfos(result);
+}
+
 void FormMgrService::HiDumpFormInfoByBundleName(const std::string &args, std::string &result)
 {
     if (args.empty()) {
@@ -1065,8 +1040,7 @@ void FormMgrService::HiDumpFormInfoByFormId(const std::string &args, std::string
 bool FormMgrService::CheckCallerIsSystemApp() const
 {
     auto callerTokenID = IPCSkeleton::GetCallingFullTokenID();
-    if (!AAFwk::PermissionVerification::GetInstance()->IsSACall() &&
-        !Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(callerTokenID)) {
+    if (!FormUtil::IsSACall() && !Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(callerTokenID)) {
         HILOG_ERROR("The caller is not system-app, can not use system-api");
         return false;
     }
@@ -1082,7 +1056,7 @@ bool FormMgrService::CheckAcrossLocalAccountsPermission() const
     if (userId != currentActiveUserId) {
         HILOG_DEBUG("currentActiveUserId: %{public}d, userId: %{public}d", currentActiveUserId, userId);
         bool isCallingPermAccount =
-            VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_INTERACT_ACROSS_LOCAL_ACCOUNTS);
+            FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_INTERACT_ACROSS_LOCAL_ACCOUNTS);
         if (!isCallingPermAccount) {
             HILOG_ERROR("Across local accounts permission failed.");
             return false;

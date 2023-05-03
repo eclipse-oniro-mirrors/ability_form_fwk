@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License")_;
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -101,7 +101,20 @@ public:
      * @return int current active account id.
      */
     static int GetCurrentAccountId();
+
+    /**
+     * @brief Check if the caller ability is SA.
+     * @return Returns true if is SA call; returns false otherwise.
+     */
+    static bool IsSACall();
+
+    /**
+     * @brief Checks whether the caller has a certain permission.
+     * @param permissionName The name of the permission.
+     * @return Returns true if the caller has certain permissions; returns false otherwise.
+     */
+    static bool VerifyCallingPermission(const std::string &permissionName);
 };
-}  // namespace AppExecFwk
-}  // namespace OHOS
-#endif  // OHOS_FORM_FWK_FORM_UTIL_H
+} // namespace AppExecFwk
+} // namespace OHOS
+#endif // OHOS_FORM_FWK_FORM_UTIL_H

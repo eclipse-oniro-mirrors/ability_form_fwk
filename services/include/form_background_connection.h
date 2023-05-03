@@ -26,7 +26,8 @@ namespace AppExecFwk {
  */
 class FormBackgroundConnection : public FormAbilityConnection {
 public:
-    FormBackgroundConnection(const int64_t formId, const std::string &bundleName, const std::string &abilityName);
+    FormBackgroundConnection(const int64_t formId, const std::string &bundleName, const std::string &abilityName,
+                             const std::string &funcName, const std::string &params);
     virtual ~FormBackgroundConnection() = default;
 
     /**
@@ -40,6 +41,8 @@ public:
 
 private:
     int64_t formId_ = -1;
+    std::string funcName_ = "";
+    std::string params_ = "";
     DISALLOW_COPY_AND_MOVE(FormBackgroundConnection);
 };
 }  // namespace AppExecFwk

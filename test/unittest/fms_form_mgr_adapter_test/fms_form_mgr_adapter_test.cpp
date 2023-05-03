@@ -32,6 +32,7 @@
 #include "ipc_skeleton.h"
 #include "form_ams_helper.h"
 #include "form_bms_helper.h"
+#include "form_data_mgr.h"
 #undef private
 #include "mock_ability_manager.h"
 #include "mock_bundle_mgr.h"
@@ -3812,5 +3813,44 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0195, TestSize.Level0)
     AAFwk::WantParams formData;
     EXPECT_EQ(ERR_OK, formMgrAdapter.AcquireFormData(formId, requestCode, callerToken, formData));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0195 end";
+}
+/**
+ * @tc.name: FormMgrAdapter_196
+ * @tc.desc: test DumpTemporaryFormInfos function and the return failed when temp form count is zero.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_196, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_196 start";
+    // Clear all formRecords in FormDataMgr
+    FormDataMgr::GetInstance().formRecords_.clear();
+    // DumpTemporaryFormInfos
+    FormMgrAdapter formMgrAdapter;
+    std::string formInfos;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_NOT_EXIST_ID, formMgrAdapter.DumpTemporaryFormInfos(formInfos));
+
+    GTEST_LOG_(INFO) << "FormMgrAdapter_196 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_197
+ * @tc.desc: test DumpTemporaryFormInfos function and the return OK when temp form count is not zero.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_197, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_197 start";
+    // Add temp formRecords to FormDataMgr
+    FormDataMgr::GetInstance().formRecords_.clear();
+    FormRecord formRecord;
+    formRecord.formTempFlag = true;
+    FormDataMgr::GetInstance().formRecords_.emplace(0, formRecord);
+    // DumpTemporaryFormInfos
+    FormMgrAdapter formMgrAdapter;
+    std::string formInfos;
+    EXPECT_EQ(ERR_OK, formMgrAdapter.DumpTemporaryFormInfos(formInfos));
+    EXPECT_EQ(false, formInfos.empty());
+
+    GTEST_LOG_(INFO) << "FormMgrAdapter_197 end";
 }
 }

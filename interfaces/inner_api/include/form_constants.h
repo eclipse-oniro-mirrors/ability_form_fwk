@@ -195,6 +195,10 @@ namespace Constants {
     constexpr const char* FORM_PROCESS_ON_ADD_SURFACE = "ohos.extra.param.key.process_on_add_surface";
     constexpr const char* FORM_ALLOW_UPDATE = "allowUpdate";
 
+    //CallEvent
+    constexpr const char* FORM_CALL_EVENT_PARAMS = "params";
+    constexpr const char* PARAM_FORM_CALL_EVENT_METHOD_KEY = "method";
+    constexpr int32_t EVENT_CALL_NOTIFY = 1;
     //arquireFormData
     constexpr const char* LAUNCH_REASON_KEY = "ohos.extra.param.key.form_launch_reason";
     // The form launch reason which means that the form is default.

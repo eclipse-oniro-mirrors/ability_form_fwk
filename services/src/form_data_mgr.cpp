@@ -420,6 +420,28 @@ bool FormDataMgr::GetFormRecord(const std::string &bundleName, std::vector<FormR
     }
 }
 /**
+ * @brief Get temporary form record.
+ * @param formTempRecords The temp form record.
+ * @return Returns true if this function is successfully called; returns false otherwise.
+ */
+bool FormDataMgr::GetTempFormRecord(std::vector<FormRecord> &formTempRecords)
+{
+    HILOG_INFO("Get temporary form record");
+    std::lock_guard<std::recursive_mutex> lock(formRecordMutex_);
+    std::map<int64_t, FormRecord>::iterator itFormRecord;
+    for (itFormRecord = formRecords_.begin(); itFormRecord != formRecords_.end(); itFormRecord++) {
+        if (itFormRecord->second.formTempFlag) {
+            formTempRecords.emplace_back(itFormRecord->second);
+        }
+    }
+    if (!formTempRecords.empty()) {
+        return true;
+    } else {
+        HILOG_INFO("The count of temporary form is zero");
+        return false;
+    }
+}
+/**
  * @brief Check form record is exist.
  * @param formId The Id of the form.
  * @return Returns true if the form record is exist; returns false is not exist.

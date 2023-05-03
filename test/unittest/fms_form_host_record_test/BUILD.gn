@@ -45,12 +45,8 @@ ohos_unittest("FmsFormHostRecordTest") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
   deps = [
-    "${ability_runtime_path}/interfaces/inner_api/app_manager:app_manager",
-    "${ability_runtime_path}/services/abilitymgr:abilityms_target",
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
-    "${systemabilitymgr_path}/safwk/interfaces/innerkits/safwk:system_ability_fwk",
-    "${systemabilitymgr_path}/samgr/interfaces/innerkits/samgr_proxy:samgr_proxy",
     "//third_party/googletest:gmock_main",
   ]
 
@@ -58,6 +54,7 @@ ohos_unittest("FmsFormHostRecordTest") {
     "ability_base:base",
     "ability_base:configuration",
     "ability_base:want",
+    "ability_runtime:app_manager",
     "access_token:libaccesstoken_sdk",
     "appspawn:appspawn_socket_client",
     "bundle_framework:appexecfwk_base",
@@ -70,6 +67,8 @@ ohos_unittest("FmsFormHostRecordTest") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "relational_store:native_rdb",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
   ]
 
   if (device_usage_statistics) {
