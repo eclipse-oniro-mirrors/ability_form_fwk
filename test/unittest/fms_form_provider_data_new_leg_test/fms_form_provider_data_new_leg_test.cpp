@@ -924,4 +924,19 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_022, TestSize.Level1)
     EXPECT_EQ(ERR_OK, formProviderMgr.AcquireFormStateBack(state, provider, wantArg));
     GTEST_LOG_(INFO) << "FormProviderMgr_022 end";
 }
+
+/**
+ * @tc.name: FormProviderMgr_023
+ * @tc.desc: test AcquireFormDataBack function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_023, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormProviderMgr_023 start";
+    FormProviderMgr formProviderMgr;
+    AAFwk::WantParams wantParams;
+    int64_t requestCode = 1;
+    EXPECT_EQ(ERR_OK, formProviderMgr.AcquireFormDataBack(wantParams, requestCode));
+    GTEST_LOG_(INFO) << "FormProviderMgr_023 end";
+}
 }

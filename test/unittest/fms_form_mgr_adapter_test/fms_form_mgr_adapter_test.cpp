@@ -3799,13 +3799,29 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_194, TestSize.Level0)
 }
 
 /**
- * @tc.name: FormMgrAdapter_195
+ * @tc.name: FormMgrAdapter_0195
+ * @tc.desc: test AcquireFormData function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0195, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0195 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    int64_t requestCode = 1;
+    sptr<IRemoteObject> callerToken = nullptr;
+    AAFwk::WantParams formData;
+    EXPECT_EQ(ERR_OK, formMgrAdapter.AcquireFormData(formId, requestCode, callerToken, formData));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0195 end";
+}
+/**
+ * @tc.name: FormMgrAdapter_196
  * @tc.desc: test DumpTemporaryFormInfos function and the return failed when temp form count is zero.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_195, TestSize.Level0)
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_196, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "FormMgrAdapter_195 start";
+    GTEST_LOG_(INFO) << "FormMgrAdapter_196 start";
     // Clear all formRecords in FormDataMgr
     FormDataMgr::GetInstance().formRecords_.clear();
     // DumpTemporaryFormInfos
@@ -3813,17 +3829,17 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_195, TestSize.Level0)
     std::string formInfos;
     EXPECT_EQ(ERR_APPEXECFWK_FORM_NOT_EXIST_ID, formMgrAdapter.DumpTemporaryFormInfos(formInfos));
 
-    GTEST_LOG_(INFO) << "FormMgrAdapter_195 end";
+    GTEST_LOG_(INFO) << "FormMgrAdapter_196 end";
 }
 
 /**
- * @tc.name: FormMgrAdapter_196
+ * @tc.name: FormMgrAdapter_197
  * @tc.desc: test DumpTemporaryFormInfos function and the return OK when temp form count is not zero.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_196, TestSize.Level0)
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_197, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "FormMgrAdapter_196 start";
+    GTEST_LOG_(INFO) << "FormMgrAdapter_197 start";
     // Add temp formRecords to FormDataMgr
     FormDataMgr::GetInstance().formRecords_.clear();
     FormRecord formRecord;
@@ -3835,6 +3851,6 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_196, TestSize.Level0)
     EXPECT_EQ(ERR_OK, formMgrAdapter.DumpTemporaryFormInfos(formInfos));
     EXPECT_EQ(false, formInfos.empty());
 
-    GTEST_LOG_(INFO) << "FormMgrAdapter_196 end";
+    GTEST_LOG_(INFO) << "FormMgrAdapter_197 end";
 }
 }

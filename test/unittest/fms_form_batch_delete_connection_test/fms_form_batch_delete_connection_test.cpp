@@ -824,4 +824,140 @@ HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0042, TestSize.Level0)
     formTaskMgr.AcquireStateBack(state, want, remoteObject);
     GTEST_LOG_(INFO) << "FormTaskMgr_0042 end";
 }
+
+/**
+ * @tc.name: FormTaskMgr_0043
+ * @tc.desc: test PostAcquireDataTask function and eventHandler_ is nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0043, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormTaskMgr_0043 start";
+    std::shared_ptr<FormTaskMgr> formTaskMgr = std::make_shared<FormTaskMgr>();
+    ASSERT_NE(nullptr, formTaskMgr);
+    int64_t formId = 1;
+    Want want;
+    sptr<IRemoteObject> remoteObject = nullptr;
+    formTaskMgr->PostAcquireDataTask(formId, want, remoteObject);
+    GTEST_LOG_(INFO) << "FormTaskMgr_0043 end";
+}
+
+/**
+ * @tc.name: FormTaskMgr_0044
+ * @tc.desc: test PostAcquireDataTask function and eventHandler_ is not nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0044, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormTaskMgr_0044 start";
+    std::shared_ptr<FormTaskMgr> formTaskMgr = std::make_shared<FormTaskMgr>();
+    ASSERT_NE(nullptr, formTaskMgr);
+    std::shared_ptr<FormEventHandler> handler = std::make_shared<FormEventHandler>(EventRunner::Create());
+    formTaskMgr->SetEventHandler(handler);
+    int64_t formId = 1;
+    Want want;
+    sptr<IRemoteObject> remoteObject = nullptr;
+    formTaskMgr->PostAcquireDataTask(formId, want, remoteObject);
+    GTEST_LOG_(INFO) << "FormTaskMgr_0044 end";
+}
+
+/**
+ * @tc.name: FormTaskMgr_0045
+ * @tc.desc: test AcquireFormData function and formProviderProxy is nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0045, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormTaskMgr_0045 start";
+    FormTaskMgr formTaskMgr;
+    int64_t formId = 1;
+    Want want;
+    sptr<IRemoteObject> remoteObject = nullptr;
+    formTaskMgr.AcquireFormData(formId, want, remoteObject);
+    GTEST_LOG_(INFO) << "FormTaskMgr_0045 end";
+}
+
+/**
+ * @tc.name: FormTaskMgr_0046
+ * @tc.desc: test AcquireFormData function and formProviderProxy is not nullptr and error == ERR_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0046, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormTaskMgr_0046 start";
+    FormTaskMgr formTaskMgr;
+    int64_t formId = 1;
+    Want want;
+    sptr<IRemoteObject> remoteObject = new (std::nothrow) MockFormProviderClient();
+    formTaskMgr.AcquireFormData(formId, want, remoteObject);
+    GTEST_LOG_(INFO) << "FormTaskMgr_0046 end";
+}
+
+/**
+ * @tc.name: FormTaskMgr_0047
+ * @tc.desc: test PostAcquireDataTaskToHost function and eventHandler_ is nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0047, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormTaskMgr_0047 start";
+    std::shared_ptr<FormTaskMgr> formTaskMgr = std::make_shared<FormTaskMgr>();
+    ASSERT_NE(nullptr, formTaskMgr);
+    AAFwk::WantParams wantParams;
+    int64_t requestCode = 1;
+    sptr<IRemoteObject> remoteObject = nullptr;
+    formTaskMgr->PostAcquireDataTaskToHost(wantParams, requestCode, remoteObject);
+    GTEST_LOG_(INFO) << "FormTaskMgr_0047 end";
+}
+
+/**
+ * @tc.name: FormTaskMgr_0048
+ * @tc.desc: test PostAcquireDataTaskToHost function and eventHandler_ is not nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0048, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormTaskMgr_0048 start";
+    std::shared_ptr<FormTaskMgr> formTaskMgr = std::make_shared<FormTaskMgr>();
+    ASSERT_NE(nullptr, formTaskMgr);
+    std::shared_ptr<FormEventHandler> handler = std::make_shared<FormEventHandler>(EventRunner::Create());
+    formTaskMgr->SetEventHandler(handler);
+    AAFwk::WantParams wantParams;
+    int64_t requestCode = 1;
+    sptr<IRemoteObject> remoteObject = nullptr;
+    formTaskMgr->PostAcquireDataTaskToHost(wantParams, requestCode, remoteObject);
+    GTEST_LOG_(INFO) << "FormTaskMgr_0048 end";
+}
+
+/**
+ * @tc.name: FormTaskMgr_0049
+ * @tc.desc: test AcquireFormDataBack function and formProviderProxy is nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0049, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormTaskMgr_0049 start";
+    FormTaskMgr formTaskMgr;
+    AAFwk::WantParams wantParams;
+    int64_t requestCode = 1;
+    sptr<IRemoteObject> remoteObject = nullptr;
+    formTaskMgr.AcquireFormDataBack(wantParams, requestCode, remoteObject);
+    GTEST_LOG_(INFO) << "FormTaskMgr_0049 end";
+}
+
+/**
+ * @tc.name: FormTaskMgr_0050
+ * @tc.desc: test AcquireFormDataBack function and formProviderProxy is not nullptr and error == ERR_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0050, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormTaskMgr_0050 start";
+    FormTaskMgr formTaskMgr;
+    AAFwk::WantParams wantParams;
+    int64_t requestCode = 1;
+    sptr<IRemoteObject> remoteObject = new (std::nothrow) MockFormProviderClient();
+    formTaskMgr.AcquireFormDataBack(wantParams, requestCode, remoteObject);
+    GTEST_LOG_(INFO) << "FormTaskMgr_0050 end";
+}
 }

@@ -583,4 +583,37 @@ HWTEST_F(FormMgrProxyTest, FormProviderProxyTest_0018, TestSize.Level1) {
     EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
     GTEST_LOG_(INFO) << "FormProviderProxyTest_0018 test ends";
 }
+
+/**
+ * @tc.name: FormProviderProxyTest_0019
+ * @tc.desc: text AcquireFormData function.
+ * @tc.type: FUNC
+ * @tc.require: issueI639Z3
+ */
+HWTEST_F(FormMgrProxyTest, FormProviderProxyTest_0019, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormProviderProxyTest_0019 starts";
+    int64_t formId = 2;
+    std::string remoteDeviceId = "this is remoteDeviceId";
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    int64_t requestCode = 1;
+    int result = formProviderProxy ->AcquireFormData(formId, token, requestCode);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FormProviderProxyTest_0019 test ends";
+}
+
+/**
+ * @tc.name: FormProviderProxyTest_0020
+ * @tc.desc: text AcquireFormData function.
+ * @tc.type: FUNC
+ * @tc.require: issueI639Z3
+ */
+HWTEST_F(FormMgrProxyTest, FormProviderProxyTest_0020, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormProviderProxyTest_0018 starts";
+    int64_t formId = 2;
+    std::string remoteDeviceId = "this is remoteDeviceId";
+    int64_t requestCode = 1;
+    int result = formProviderProxy ->AcquireFormData(formId, nullptr, requestCode);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+    GTEST_LOG_(INFO) << "FormProviderProxyTest_0020 test ends";
+}
 }

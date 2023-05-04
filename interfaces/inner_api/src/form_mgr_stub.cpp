@@ -830,7 +830,7 @@ int32_t FormMgrStub::HandleAcquireFormData(MessageParcel &data, MessageParcel &r
     AAFwk::WantParams customizeData;
     // call FormMgrService to get formData into data.
     int32_t result = AcquireFormData(formId, requestCode, callerToken, customizeData);
-    reply.WriteBool(result);
+    reply.WriteInt32(result);
     reply.WriteParcelable(&customizeData);
     return result;
 }

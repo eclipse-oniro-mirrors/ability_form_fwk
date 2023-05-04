@@ -537,6 +537,23 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormHostRecord_011, TestSize.Level0)
 }
 
 /**
+ * @tc.name: FormHostRecord_012
+ * @tc.desc: test OnAcquireFormData function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, FormHostRecord_012, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormHostRecord_012 start";
+    std::shared_ptr<FormHostRecord> formHostRecord = std::make_shared<FormHostRecord>();
+    ASSERT_NE(nullptr, formHostRecord);
+    AAFwk::WantParams wantParams;
+    int64_t requestCode = 1;
+    formHostRecord->formHostCallback_ = std::make_shared<FormHostCallback>();
+    formHostRecord->OnAcquireFormData(wantParams, requestCode);
+    GTEST_LOG_(INFO) << "FormHostRecord_012 end";
+}
+
+/**
  * @tc.name: FormAcquireConnection_001
  * @tc.desc: test OnAbilityConnectDone function.
  * @tc.type: FUNC

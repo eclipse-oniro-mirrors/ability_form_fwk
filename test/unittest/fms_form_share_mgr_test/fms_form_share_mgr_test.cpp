@@ -3646,6 +3646,115 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0061, TestSize.Level0)
 }
 
 /**
+ * @tc.name: FormDataMgr_0062
+ * @tc.desc: test CreateFormAcquireDataRecord function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0062, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0062 start";
+    const int64_t requestCode = 1;
+    FormItemInfo info;
+    sptr<IRemoteObject> callerToken = nullptr;
+    int callingUid = 1;
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    ASSERT_NE(nullptr, formDataMgr);
+    formDataMgr->CreateFormAcquireDataRecord(requestCode, info, callerToken, callingUid);
+    GTEST_LOG_(INFO) << "FormDataMgr_0062 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0063
+ * @tc.desc: test CreateFormAcquireDataRecord function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0063, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0063 start";
+    const int64_t requestCode = 1;
+    FormItemInfo info;
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    int callingUid = 1;
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    ASSERT_NE(nullptr, formDataMgr);
+    formDataMgr->CreateFormAcquireDataRecord(requestCode, info, callerToken, callingUid);
+    GTEST_LOG_(INFO) << "FormDataMgr_0063 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0064
+ * @tc.desc: test CreateFormAcquireDataRecord function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0064, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0064 start";
+    const int64_t requestCode = 1;
+    FormItemInfo info;
+    sptr<IRemoteObject> callerToken = nullptr;
+    int callingUid = 1;
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    ASSERT_NE(nullptr, formDataMgr);
+    FormHostRecord formHostRecord;
+    formDataMgr->formAcquireDataRecord_.emplace(requestCode, formHostRecord);
+    formDataMgr->CreateFormAcquireDataRecord(requestCode, info, callerToken, callingUid);
+    GTEST_LOG_(INFO) << "FormDataMgr_0064 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0065
+ * @tc.desc: test CreateFormAcquireDataRecord function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0065, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0065 start";
+    const int64_t requestCode = 1;
+    FormItemInfo info;
+    sptr<IRemoteObject> callerToken = nullptr;
+    int callingUid = 1;
+    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
+    ASSERT_NE(nullptr, formDataMgr);
+    FormHostRecord formHostRecord;
+    formHostRecord.SetFormHostClient(callerToken);
+    formDataMgr->formAcquireDataRecord_.emplace(requestCode, formHostRecord);
+    formDataMgr->CreateFormAcquireDataRecord(requestCode, info, callerToken, callingUid);
+    GTEST_LOG_(INFO) << "FormDataMgr_0065 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0066
+ * @tc.desc: test AcquireFormDataBack function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0066, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0066 start";
+    AAFwk::WantParams wantParams;
+    const int64_t requestCode = 1;
+    FormDataMgr formDataMgr;
+    formDataMgr.AcquireFormDataBack(wantParams, requestCode);
+    GTEST_LOG_(INFO) << "FormDataMgr_0066 end";
+}
+
+/**
+ * @tc.name: FormDataMgr_0067
+ * @tc.desc: test AcquireFormDataBack function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0067, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDataMgr_0067 start";
+    AAFwk::WantParams wantParams;
+    const int64_t requestCode = 1;
+    FormDataMgr formDataMgr;
+    FormHostRecord formHostRecord;
+    formDataMgr.formAcquireDataRecord_.emplace(requestCode, formHostRecord);
+    formDataMgr.AcquireFormDataBack(wantParams, requestCode);
+    GTEST_LOG_(INFO) << "FormDataMgr_0067 end";
+}
+
+/**
  * @tc.number: RecvFormShareInfoFromRemote_002
  * @tc.name: RecvFormShareInfoFromRemote
  * @tc.desc: EventHandler is nullptr, verify RecvFormShareInfoFromRemote failed.

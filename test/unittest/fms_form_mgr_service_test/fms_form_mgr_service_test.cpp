@@ -933,12 +933,29 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0050, TestSize.Level1)
 
 /**
  * @tc.number: FormMgrService_0051
- * @tc.name: test HiDumpTemporaryFormInfos function.
- * @tc.desc: Verify that the HiDumpTemporaryFormInfos interface is available.
+ * @tc.name: test AcquireFormData function.
+ * @tc.desc: Verify that the AcquireFormData interface is called normally and the return value is ERR_APPEXECFWK_FORM_GET_INFO_FAILED.
  */
 HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0051, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormMgrService_0051 start";
+    FormMgrService formMgrService;
+    int64_t formId = 1;
+    const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    int64_t requestCode = 1;
+    MockIsSACall(true);
+    MockCheckInvalidForm(ERR_OK);
+    AAFwk::WantParams formData;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_INFO_FAILED, formMgrService.AcquireFormData(formId, requestCode, callerToken, formData));
+    GTEST_LOG_(INFO) << "FormMgrService_0051 end";
+}
+/**
+ * @tc.number: FormMgrService_0052
+ * @tc.name: test HiDumpTemporaryFormInfos function.
+ * @tc.desc: Verify that the HiDumpTemporaryFormInfos interface is available.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0052, TestSize.Level1)
+{
     // Add temp formRecords to FormDataMgr
     FormDataMgr::GetInstance().formRecords_.clear();
     FormRecord formRecord;
@@ -951,6 +968,6 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0051, TestSize.Level1)
     formMgrService.HiDumpTemporaryFormInfos(args, formInfo);
     EXPECT_EQ(false, formInfo.empty());
 
-    GTEST_LOG_(INFO) << "FormMgrService_0051 end";
+    GTEST_LOG_(INFO) << "FormMgrService_0052 end";
 }
 }

@@ -1790,4 +1790,24 @@ HWTEST_F(FormMgrTest, FormMgrTest_0090, TestSize.Level1) {
     EXPECT_EQ(result, 0);
     GTEST_LOG_(INFO) << "FormMgrTest_0090 test ends";
 }
+
+/**
+ * @tc.name: FormMgrTest_0091
+ * @tc.desc: Verify AcquireFormData (The return value of mock function is 0)
+ * @tc.type: FUNC
+ * @tc.require: issueI63Y7Y
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0091, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0091 starts";
+    EXPECT_CALL(*mockProxy, AcquireFormData(_, _, _, _))
+        .Times(1)
+        .WillOnce(Return(OHOS::ERR_OK));
+    int64_t formId = 0;
+    int64_t requestCode = 1;
+    AAFwk::WantParams formData;
+    sptr<IRemoteObject> Token = new (std::nothrow) MockFormProviderClient();
+    auto result = FormMgr::GetInstance().AcquireFormData(formId, requestCode, Token, formData);
+    EXPECT_EQ(result, OHOS::ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrTest_0091 test ends";
+}
 } // namespace

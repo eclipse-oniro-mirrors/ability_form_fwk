@@ -229,6 +229,26 @@ HWTEST_F(FmsFormHostClientTest, AddShareFormCallback_0100, TestSize.Level0)
 }
 
 /**
+ * @tc.name: AddAcqiureFormDataCallback_0100
+ * @tc.desc: test AddAcqiureFormDataCallback function.
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FmsFormHostClientTest, AddAcqiureFormDataCallback_0100, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest AddAcqiureFormDataCallback_0100 start";
+    std::shared_ptr<FormDataCallbackInterface> formDataCallbackInterface = nullptr;
+    int64_t requestCode = 1;
+    sptr<FormHostClient> formHostClient = FormHostClient::GetInstance();
+    bool result = formHostClient->AddAcqiureFormDataCallback(formDataCallbackInterface, requestCode);
+    EXPECT_EQ(result, true);
+    AAFwk::WantParams wantParams;
+    formHostClient->OnAcquireDataResponse(wantParams, requestCode);
+    formHostClient->RemoveAcquireDataCallback(requestCode);
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest AddAcqiureFormDataCallback_0100 end";
+}
+
+/**
  * @tc.number: AddFormState_0400
  * @tc.name: AddFormState
  * @tc.desc: Verify AddFormState succeeded.
@@ -242,7 +262,6 @@ HWTEST_F(FmsFormHostClientTest, AddFormState_0400, TestSize.Level1)
     sptr<FormHostClient> formHostClient = FormHostClient::GetInstance();
     auto result = formHostClient->AddFormState(formStateCallback, want);
     EXPECT_TRUE(result);
-
     auto callback = std::make_shared<FormStateCallbackTest>();
     result = formHostClient->AddFormState(callback, want);
     EXPECT_TRUE(result);

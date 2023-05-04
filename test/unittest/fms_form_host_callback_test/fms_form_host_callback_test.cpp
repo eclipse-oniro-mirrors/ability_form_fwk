@@ -161,4 +161,36 @@ HWTEST_F(FormHostCallbackTest, FormHostCallbackTest_0007, TestSize.Level0)
     formHostCallback.OnAcquireState(state, want, callerToken);
     GTEST_LOG_(INFO) << "FormHostCallbackTest_0007 end";
 }
+
+/**
+ * @tc.name: FormHostCallbackTest_0008
+ * @tc.desc: test OnAcquireFormData function callerToken is nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormHostCallbackTest, FormHostCallbackTest_0008, TestSize.Level0)
+{
+    HILOG_INFO("FormHostCallbackTest_0008 start");
+    FormHostCallback formHostCallback;
+    AAFwk::WantParams wantParams;
+    int64_t requestCode = 1;
+    sptr<IRemoteObject> callerToken = nullptr;
+    formHostCallback.OnAcquireFormData(wantParams, requestCode, callerToken);
+    GTEST_LOG_(INFO) << "FormHostCallbackTest_0008 end";
+}
+
+/**
+ * @tc.name: FormHostCallbackTest_0009
+ * @tc.desc: test OnAcquireFormData function callerToken is not nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormHostCallbackTest, FormHostCallbackTest_0009, TestSize.Level0)
+{
+    HILOG_INFO("FormHostCallbackTest_0009 start");
+    FormHostCallback formHostCallback;
+    AAFwk::WantParams wantParams;
+    int64_t requestCode = 1;
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    formHostCallback.OnAcquireFormData(wantParams, requestCode, callerToken);
+    GTEST_LOG_(INFO) << "FormHostCallbackTest_0009 end";
+}
 }

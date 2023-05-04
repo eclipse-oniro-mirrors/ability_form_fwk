@@ -289,5 +289,43 @@ HWTEST_F(FormSupplyProxyTest, FormSupplyProxyTest_012, TestSize.Level1)
     EXPECT_EQ(ERR_OK, proxy->OnStopRenderingTaskDone(formId, want));
     GTEST_LOG_(INFO)<< "FmsFormHostProxyTest, FormSupplyProxyTest_012, TestSize.Level1";
 }
+
+/*
+* @tc.name: FormSupplyProxyTest_013
+* @tc.name: OnRenderTaskDone
+* @tc.desc: Verify function OnRenderTaskDone return value is ERROR_NUM
+*/
+HWTEST_F(FormSupplyProxyTest, FormSupplyProxyTest_013, TestSize.Level1)
+{
+    GTEST_LOG_(INFO)<< "FmsFormHostProxyTest, FormSupplyProxyTest_013, TestSize.Level1";
+    int64_t requestCode = 1;
+    AAFwk::WantParams wantParams;
+    sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
+    ASSERT_NE(nullptr, iremoteObject);
+    EXPECT_CALL(*iremoteObject, SendRequest(_, _, _, _)).Times(1).WillRepeatedly(DoAll(Return(ERROR_NUM)));
+    std::shared_ptr<FormSupplyProxy> proxy = std::make_shared<FormSupplyProxy>(iremoteObject);
+    ASSERT_NE(nullptr, proxy);
+    EXPECT_EQ(ERROR_NUM, proxy->OnAcquireDataResult(wantParams, requestCode));
+    GTEST_LOG_(INFO)<< "FmsFormHostProxyTest, FormSupplyProxyTest_013, TestSize.Level1";
+}
+
+/*
+* @tc.name: FormSupplyProxyTest_014
+* @tc.name: OnRenderTaskDone
+* @tc.desc: Verify function OnRenderTaskDone return value is ERR_OK
+*/
+HWTEST_F(FormSupplyProxyTest, FormSupplyProxyTest_014, TestSize.Level1)
+{
+    GTEST_LOG_(INFO)<< "FmsFormHostProxyTest, FormSupplyProxyTest_014, TestSize.Level1";
+    int64_t requestCode = 1;
+    AAFwk::WantParams wantParams;
+    sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
+    ASSERT_NE(nullptr, iremoteObject);
+    EXPECT_CALL(*iremoteObject, SendRequest(_, _, _, _)).Times(1).WillRepeatedly(DoAll(Return(ERR_OK)));
+    std::shared_ptr<FormSupplyProxy> proxy = std::make_shared<FormSupplyProxy>(iremoteObject);
+    ASSERT_NE(nullptr, proxy);
+    EXPECT_EQ(ERR_OK, proxy->OnAcquireDataResult(wantParams, requestCode));
+    GTEST_LOG_(INFO)<< "FmsFormHostProxyTest, FormSupplyProxyTest_014, TestSize.Level1";
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

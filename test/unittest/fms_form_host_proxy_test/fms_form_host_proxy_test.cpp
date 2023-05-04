@@ -314,4 +314,63 @@ HWTEST_F(FmsFormHostProxyTest, OnShareFormResponseTest_0300, Function | MediumTe
     proxy->OnShareFormResponse(0, 0);
     EXPECT_NE(proxy, nullptr);
 }
+
+/*
+ * @tc.name: OnAcquireDataResponseTest_0100
+ * @tc.desc: test OnAcquireDataResponse function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostProxyTest, OnAcquireDataResponseTest_0100, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO)
+        << "FmsFormHostProxyTest, OnAcquireDataResponseTest_0100, TestSize.Level1";
+    MockWriteInterfaceToken(false);
+    sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
+    ASSERT_NE(nullptr, iremoteObject);
+    std::shared_ptr<FormHostProxy> proxy = std::make_shared<FormHostProxy>(iremoteObject);
+    ASSERT_NE(nullptr, proxy);
+    AAFwk::WantParams wantParams;
+    proxy->OnAcquireDataResponse(wantParams, 0);
+    EXPECT_NE(proxy, nullptr);
+}
+
+/*
+ * @tc.name: OnAcquireDataResponseTest_0200
+ * @tc.desc: test OnAcquireDataResponse function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostProxyTest, OnAcquireDataResponseTest_0200, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO)
+        << "FmsFormHostProxyTest, OnAcquireDataResponseTest_0200, TestSize.Level1";
+    sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
+    ASSERT_NE(nullptr, iremoteObject);
+    EXPECT_CALL(*iremoteObject, SendRequest(_, _, _, _)).Times(1)
+        .WillRepeatedly(DoAll(Return(ERR_OK)));
+    std::shared_ptr<FormHostProxy> proxy = std::make_shared<FormHostProxy>(iremoteObject);
+    ASSERT_NE(nullptr, proxy);
+    AAFwk::WantParams wantParams;
+    proxy->OnAcquireDataResponse(wantParams, 0);
+    EXPECT_NE(proxy, nullptr);
+}
+
+/*
+ * @tc.name: OnAcquireDataResponseTest_0300
+ * @tc.desc: test OnAcquireDataResponse function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostProxyTest, OnAcquireDataResponseTest_0300, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO)
+        << "FmsFormHostProxyTest, OnAcquireDataResponseTest_0300, TestSize.Level1";
+    sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
+    ASSERT_NE(nullptr, iremoteObject);
+    EXPECT_CALL(*iremoteObject, SendRequest(_, _, _, _)).Times(1)
+        .WillRepeatedly(DoAll(Return(-1)));
+    std::shared_ptr<FormHostProxy> proxy = std::make_shared<FormHostProxy>(iremoteObject);
+    ASSERT_NE(nullptr, proxy);
+    AAFwk::WantParams wantParams;
+    proxy->OnAcquireDataResponse(wantParams, 0);
+    EXPECT_NE(proxy, nullptr);
+}
 }
