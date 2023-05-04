@@ -32,6 +32,10 @@ struct FormInstance : public Parcelable {
     std::string formHostName = "";
     FormVisibilityType formVisiblity = FormVisibilityType::UNKNOWN;
     int32_t specification = 0;
+    std::string bundleName = "";
+    std::string moduleName = "";
+    std::string abilityName = "";
+    std::string formName = "";
     bool ReadFromParcel(Parcel &parcel);
     bool Marshalling(Parcel &parcel) const override;
     static FormInstance *Unmarshalling(Parcel &parcel);

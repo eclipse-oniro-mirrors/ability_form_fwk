@@ -1871,6 +1871,10 @@ int32_t FormDataMgr::GetFormInstancesByFilter(const FormInstancesFilter &formIns
                     instance.specification = itFormRecord->second.specification;
                     instance.formVisiblity = itFormRecord->second.isVisible ?
                         FormVisibilityType::VISIBLE : FormVisibilityType::INVISIBLE;
+                    instance.bundleName = itFormRecord->second.bundleName;
+                    instance.moduleName = itFormRecord->second.moduleName;
+                    instance.abilityName = itFormRecord->second.abilityName;
+                    instance.formName = itFormRecord->second.formName;
                     formInstances.emplace_back(instance);
                 }
             }
@@ -1896,6 +1900,10 @@ int32_t FormDataMgr::GetFormInstanceById(const int64_t formId, FormInstance &for
         formInstance.formId = formRecord.formId;
         formInstance.specification = formRecord.specification;
         formInstance.formVisiblity = formRecord.isVisible ? FormVisibilityType::VISIBLE : FormVisibilityType::INVISIBLE;
+        formInstance.bundleName = formRecord.bundleName;
+        formInstance.moduleName = formRecord.moduleName;
+        formInstance.abilityName = formRecord.abilityName;
+        formInstance.formName = formRecord.formName;
     }
     HILOG_INFO("GetFormInstanceById, get form record successfully");
     return ERR_OK;

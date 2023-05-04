@@ -702,7 +702,10 @@ NativeValue* CreateFormInstance(NativeEngine &engine, const FormInstance &formIn
     object->SetProperty("formHostBundle", CreateJsValue(engine, formInstance.formHostName));
     object->SetProperty("visibilityType", CreateJsValue(engine, formInstance.formVisiblity));
     object->SetProperty("dimension", CreateJsValue(engine, formInstance.specification));
-
+    object->SetProperty("bundleName", CreateJsValue(engine, formInstance.bundleName));  
+    object->SetProperty("moduleName", CreateJsValue(engine, formInstance.moduleName));
+    object->SetProperty("abilityName", CreateJsValue(engine, formInstance.abilityName));
+    object->SetProperty("formName", CreateJsValue(engine, formInstance.formName));
     return objContext;
 }
 }  // namespace AbilityRuntime

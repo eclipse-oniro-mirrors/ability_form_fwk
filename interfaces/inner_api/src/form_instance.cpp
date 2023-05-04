@@ -26,7 +26,10 @@ bool FormInstance::ReadFromParcel(Parcel &parcel)
     formHostName = Str16ToStr8(parcel.ReadString16());
     formVisiblity = static_cast<FormVisibilityType>(parcel.ReadInt32());
     specification = parcel.ReadInt32();
-
+    bundleName = Str16ToStr8(parcel.ReadString16());
+    moduleName = Str16ToStr8(parcel.ReadString16());
+    abilityName = Str16ToStr8(parcel.ReadString16());
+    formName = Str16ToStr8(parcel.ReadString16());
     return true;
 }
 
@@ -53,6 +56,25 @@ bool FormInstance::Marshalling(Parcel &parcel) const
         return false;
     }
 
+    // write bundleName
+    if (!parcel.WriteString16(Str8ToStr16(bundleName))) {
+        return false;
+    }
+
+    // write moduleName
+    if (!parcel.WriteString16(Str8ToStr16(moduleName))) {
+        return false;
+    }
+
+    // write abilityName
+    if (!parcel.WriteString16(Str8ToStr16(abilityName))) {
+        return false;
+    }
+
+    // write formName
+    if (!parcel.WriteString16(Str8ToStr16(formName))) {
+        return false;
+    }
     return true;
 }
 
