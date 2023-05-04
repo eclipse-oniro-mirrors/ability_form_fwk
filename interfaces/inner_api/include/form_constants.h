@@ -65,7 +65,8 @@ namespace Constants {
     constexpr int32_t TYPE_STATIC_UPDATE = 2;
     constexpr int32_t TYPE_DYNAMIC_UPDATE = 3;
     const long ABS_REFRESH_MS = 2500;
-
+    
+    constexpr int32_t UNKNOWN = 0;
     // The form events type which means that the form becomes visible.
     constexpr int32_t FORM_VISIBLE = 1;
     // The form events type which means that the form becomes invisible.

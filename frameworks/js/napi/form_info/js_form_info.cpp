@@ -86,6 +86,7 @@ NativeValue* CreateJsFormVisibilityType(NativeEngine &engine)
 {
     NativeValue* objValue = engine.CreateObject();
     NativeObject* object = ConvertNativeValueTo<NativeObject>(objValue);
+    object->SetProperty("UNKNOWN", CreateJsValue(engine, AppExecFwk::Constants::UNKNOWN));
     object->SetProperty("FORM_VISIBLE", CreateJsValue(engine, AppExecFwk::Constants::FORM_VISIBLE));
     object->SetProperty("FORM_INVISIBLE", CreateJsValue(engine, AppExecFwk::Constants::FORM_INVISIBLE));
     return objValue;
