@@ -1900,7 +1900,8 @@ int FormMgrAdapter::BackgroundEvent(const int64_t formId, Want &want, const sptr
         HILOG_ERROR("failed to parse jsonDataString: %{public}s.", params.c_str());
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
-    if (!jsonObject.contains(Constants::PARAM_FORM_CALL_EVENT_METHOD_KEY)) {
+    if (!jsonObject.contains(Constants::PARAM_FORM_CALL_EVENT_METHOD_KEY) ||
+        !jsonObject.at(Constants::PARAM_FORM_CALL_EVENT_METHOD_KEY).is_string()) {
         HILOG_ERROR("failed to get method from params");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
