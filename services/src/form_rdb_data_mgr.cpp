@@ -107,7 +107,9 @@ ErrCode FormRdbDataMgr::Init()
         false,
         std::vector<uint8_t>(),
         formRdbConfig_.journalMode,
-        formRdbConfig_.syncMode);
+        formRdbConfig_.syncMode,
+        "",
+        NativeRdb::SecurityLevel::S1);
     int32_t errCode = NativeRdb::E_OK;
     RdbStoreDataCallBackFormInfoStorage rdbDataCallBack_(formRdbConfig_);
     rdbStore_ = NativeRdb::RdbHelper::GetRdbStore(rdbStoreConfig, formRdbConfig_.version, rdbDataCallBack_, errCode);
