@@ -633,12 +633,12 @@ bool ParseParam(napi_env env, napi_value args, FormInstancesFilter &filter)
     napi_get_named_property(env, args, "bundleName", &prop);
     napi_typeof(env, prop, &valueType);
     if (valueType != napi_string) {
-        HILOG_ERROR("bundleName input is not string");
+        HILOG_ERROR("The input bundleName is not a string.");
         return false;
     }
     filter.bundleName = GetStringFromNapi(env, prop);
     if (filter.bundleName.empty()) {
-        HILOG_ERROR("bundleName input is empty");
+        HILOG_ERROR("The input bundleName is empty");
         return false;
     }
     prop = nullptr;

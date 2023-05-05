@@ -1399,7 +1399,6 @@ int32_t FormMgrProxy::GetFormInstancesByFilter(const FormInstancesFilter &formIn
     int32_t error = GetFormInstance(IFormMgr::Message::FORM_MGR_GET_FORM_INSTANCES_FROM_BY_FILTER, data, formInstances);
     if (error != ERR_OK) {
         HILOG_ERROR("GetFormInstancesByFilter, failed to GetFormInstancesByFilter: %{public}d", error);
-
     }
 
     return error;
