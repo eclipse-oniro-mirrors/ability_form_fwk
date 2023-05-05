@@ -36,6 +36,7 @@ struct FormRdbConfig {
     std::string journalMode { Constants::FORM_JOURNAL_MODE };
     std::string syncMode { Constants::FORM_SYNC_MODE };
     int32_t version { Constants::FORM_RDB_VERSION };
+    std::string databaseFileType { Constants::FORM_RDB_FILE_TYPE };
 };
 class RdbStoreDataCallBackFormInfoStorage : public NativeRdb::RdbOpenCallback {
 public:
