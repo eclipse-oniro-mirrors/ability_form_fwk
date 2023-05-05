@@ -1505,8 +1505,8 @@ NativeValue* JsFormHostInit(NativeEngine* engine, NativeValue* exportObj)
     BindNativeFunction(*engine, *object, "notifyFormsPrivacyProtected", moduleName,
         JsFormHost::NotifyFormsPrivacyProtected);
     BindNativeFunction(*engine, *object, "acquireFormData", moduleName, JsFormHost::AcquireFormData);
-    BindNativeFunction(*engine, *object, "getFormInstancesByFilter", moduleName, JsFormHost::GetFormInstancesByFilter);
-    BindNativeFunction(*engine, *object, "getFormInstancesById", moduleName, JsFormHost::GetFormInstanceById);
+    BindNativeFunction(*engine, *object, "getRunningFormInfosByFilter", moduleName, JsFormHost::GetFormInstancesByFilter);
+    BindNativeFunction(*engine, *object, "getRunningFormInfoById", moduleName, JsFormHost::GetFormInstanceById);
     return engine->CreateUndefined();
 }
 } // namespace AbilityRuntime
