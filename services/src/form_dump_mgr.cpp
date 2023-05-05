@@ -16,7 +16,6 @@
 #include "form_dump_mgr.h"
 
 #include "form_cache_mgr.h"
-#include "form_info_mgr.h"
 #include "hilog_wrapper.h"
 
 namespace OHOS {
@@ -32,6 +31,7 @@ FormDumpMgr::~FormDumpMgr() {}
  */
 void FormDumpMgr::DumpStorageFormInfos(const std::vector<FormDBInfo> &storageInfos, std::string &formInfos) const
 {
+    formInfos += "  Total Storage-Form count is " + std::to_string(storageInfos.size()) + "\n" + LINE_SEPARATOR;
     for (const auto &info : storageInfos) {
         formInfos += "  FormId #" + std::to_string(info.formId) + "\n";
         formInfos += "    formName [" + info.formName + "]\n";
@@ -66,6 +66,17 @@ void FormDumpMgr::DumpTemporaryFormInfos(const std::vector<FormRecord> &formReco
             formInfos += " Uid[" + std::to_string(uId) + "] ";
         }
         formInfos += "]\n" + LINE_SEPARATOR;
+    }
+}
+
+void FormDumpMgr::DumpStaticBundleFormInfos(const std::vector<FormInfo> &bundleFormInfos, std::string &formInfos) const
+{
+    formInfos += "  These are static-form-infos, it means un-added form's info will also be dumped\n" + LINE_SEPARATOR;
+    for (const auto &info : bundleFormInfos) {
+        formInfos += "  bundleName #" + info.bundleName + "\n";
+        formInfos += "    moduleName [" + info.moduleName + "]\n";
+        formInfos += "    abilityName [" + info.abilityName + "]\n";
+        formInfos += "    formName [" + info.name + "]\n" + LINE_SEPARATOR;
     }
 }
 /**

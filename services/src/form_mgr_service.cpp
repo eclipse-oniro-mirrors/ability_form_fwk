@@ -60,15 +60,18 @@ const std::string NAME_FORM_MGR_SERVICE = "FormMgrService";
 constexpr int32_t FORM_DUMP_ARGC_MAX = 2;
 
 const std::string FORM_DUMP_HELP = "options list:\n"
-    "  -h, --help                               list available commands\n"
-    "  -s, --storage                            query form storage info\n"
-    "  -t, --temp                               query temporary form info\n"
-    "  -n  <bundle-name>                        query form info by a bundle name\n"
-    "  -i  <form-id>                            query form info by a form ID\n";
+    "  -h, --help                           list available commands\n"
+    "  -b, --bundle-form-info               query all form infos from bundle, Un-added form info will also be dumped\n"
+    "  -s, --storage                        query form storage info\n"
+    "  -t, --temp                           query temporary form info\n"
+    "  -n  <bundle-name>                    query form info by a bundle name\n"
+    "  -i  <form-id>                        query form info by a form ID\n";
 
 const std::map<std::string, FormMgrService::DumpKey> FormMgrService::dumpKeyMap_ = {
     {"-h", FormMgrService::DumpKey::KEY_DUMP_HELP},
     {"--help", FormMgrService::DumpKey::KEY_DUMP_HELP},
+    {"-b", FormMgrService::DumpKey::KEY_DUMP_STATIC},   // *****
+    {"--bundle-form-info", FormMgrService::DumpKey::KEY_DUMP_STATIC},
     {"-s", FormMgrService::DumpKey::KEY_DUMP_STORAGE},
     {"--storage", FormMgrService::DumpKey::KEY_DUMP_STORAGE},
     {"-t", FormMgrService::DumpKey::KEY_DUMP_TEMPORARY},
@@ -927,6 +930,7 @@ int32_t FormMgrService::RecvFormShareInfoFromRemote(const FormShareInfo &info)
 void FormMgrService::DumpInit()
 {
     dumpFuncMap_[DumpKey::KEY_DUMP_HELP] = &FormMgrService::HiDumpHelp;
+    dumpFuncMap_[DumpKey::KEY_DUMP_STATIC] = &FormMgrService::HiDumpStaticBundleFormInfos;
     dumpFuncMap_[DumpKey::KEY_DUMP_STORAGE] = &FormMgrService::HiDumpStorageFormInfos;
     dumpFuncMap_[DumpKey::KEY_DUMP_TEMPORARY] = &FormMgrService::HiDumpTemporaryFormInfos;
     dumpFuncMap_[DumpKey::KEY_DUMP_BY_BUNDLE_NAME] = &FormMgrService::HiDumpFormInfoByBundleName;
@@ -1012,6 +1016,11 @@ void FormMgrService::HiDumpStorageFormInfos([[maybe_unused]] const std::string &
 void FormMgrService::HiDumpTemporaryFormInfos([[maybe_unused]] const std::string &args, std::string &result)
 {
     FormMgrAdapter::GetInstance().DumpTemporaryFormInfos(result);
+}
+
+void FormMgrService::HiDumpStaticBundleFormInfos([[maybe_unused]] const std::string &args, std::string &result)
+{
+    FormMgrAdapter::GetInstance().DumpStaticBundleFormInfos(result);
 }
 
 void FormMgrService::HiDumpFormInfoByBundleName(const std::string &args, std::string &result)
