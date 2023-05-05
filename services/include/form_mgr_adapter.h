@@ -26,6 +26,7 @@
 #include "form_provider_data.h"
 #include "form_state_info.h"
 #include "iremote_object.h"
+#include "running_form_info.h"
 #include "want.h"
 
 namespace OHOS {
@@ -322,6 +323,22 @@ public:
     * @return Returns ERR_OK on success, others on failure.
     */
     int32_t GetHostFormsCount(std::string &bundleName, int32_t &formCount);
+
+    /**
+     * @brief Get all running form infos.
+     * @param runningFormInfos Return the running forms' infos currently.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode GetRunningFormInfos(std::vector<RunningFormInfo> &runningFormInfos);
+
+    /**
+     * @brief Get the running form infos by bundle name.
+     * @param bundleName Application name.
+     * @param runningFormInfos Return the running forms' infos of the specify application name.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode GetRunningFormInfosByBundleName(const std::string &bundleName,
+        std::vector<RunningFormInfo> &runningFormInfos);
 private:
     /**
      * @brief Get form configure info.

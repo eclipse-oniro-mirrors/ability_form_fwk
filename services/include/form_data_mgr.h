@@ -32,6 +32,7 @@
 #include "form_record.h"
 #include "form_state_info.h"
 #include "iremote_object.h"
+#include "running_form_info.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -571,6 +572,21 @@ public:
     * @return Return the host forms number.
     */
     int32_t GetHostFormsCount(const std::string &bundleName, int32_t &formCount);
+
+    /**
+     * @brief Get all running form infos.
+     * @param runningFormInfos Return the running forms' infos currently.
+     */
+    void GetRunningFormInfos(std::vector<RunningFormInfo> &runningFormInfos);
+
+    /**
+     * @brief Get the running form infos by bundle name.
+     * @param bundleName Application name.
+     * @param runningFormInfos Return the running forms' infos of the specify application name.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode GetRunningFormInfosByBundleName(const std::string &bundleName,
+        std::vector<RunningFormInfo> &runningFormInfos);
 private:
     /**
      * @brief Create form record.

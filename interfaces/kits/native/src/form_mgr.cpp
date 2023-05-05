@@ -1031,6 +1031,53 @@ std::string FormMgr::GetErrorMsgByExternalErrorCode(int32_t externalErrorCode)
     return FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(externalErrorCode);
 }
 
+ErrCode FormMgr::GetRunningFormInfos(std::vector<RunningFormInfo> &runningFormInfos)
+{
+    HILOG_DEBUG("start.");
+    if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
+        HILOG_ERROR("error, form is in recover status, can't do action on form.");
+        return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
+    }
+
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("failed errCode:%{public}d.", errCode);
+        return errCode;
+    }
+
+    ErrCode resultCode = remoteProxy_->GetRunningFormInfos(runningFormInfos);
+    if (resultCode != ERR_OK) {
+        HILOG_ERROR("error, failed to GetRunningFormInfos, error code is %{public}d.", resultCode);
+    }
+    return resultCode;
+}
+
+ErrCode FormMgr::GetRunningFormInfosByBundleName(const std::string &bundleName,
+    std::vector<RunningFormInfo> &runningFormInfos)
+{
+    HILOG_DEBUG("start.");
+    if (bundleName.empty()) {
+        HILOG_WARN("Failed to Get running form infos, because empty bundleName");
+        return ERR_APPEXECFWK_FORM_INVALID_BUNDLENAME;
+    }
+    if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
+        HILOG_ERROR("error, form is in recover status, can't do action on form.");
+        return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
+    }
+
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("failed errCode:%{public}d.", errCode);
+        return errCode;
+    }
+
+    ErrCode resultCode = remoteProxy_->GetRunningFormInfosByBundleName(bundleName, runningFormInfos);
+    if (resultCode != ERR_OK) {
+        HILOG_ERROR("error, failed to GetRunningFormInfosByBundleName, error code is %{public}d.", resultCode);
+    }
+    return resultCode;
+}
+
 int32_t FormMgr::GetFormsCount(bool isTempFormFlag, int32_t &formCount)
 {
     HILOG_INFO("%{public}s start.", __func__);

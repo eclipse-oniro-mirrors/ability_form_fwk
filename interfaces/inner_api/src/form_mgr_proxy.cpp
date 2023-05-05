@@ -683,7 +683,7 @@ int  FormMgrProxy::GetParcelableInfos(MessageParcel &reply, std::vector<T> &parc
     HILOG_INFO("get parcelable infos success");
     return ERR_OK;
 }
-bool  FormMgrProxy::WriteInterfaceToken(MessageParcel &data)
+bool FormMgrProxy::WriteInterfaceToken(MessageParcel &data)
 {
     if (!data.WriteInterfaceToken(IFormMgr::GetDescriptor())) {
         HILOG_ERROR("%{public}s, failed to write interface token", __func__);
@@ -737,6 +737,25 @@ int FormMgrProxy::GetFormsInfo(IFormMgr::Message code, MessageParcel &data, std:
 
     return GetParcelableInfos<FormInfo>(reply, formInfos);
 }
+
+ErrCode FormMgrProxy::GetRunningFormInfos(IFormMgr::Message code, MessageParcel &data,
+    std::vector<RunningFormInfo> &runningFormInfos)
+{
+    ErrCode error;
+    MessageParcel reply;
+    error = SendTransactCmd(code, data, reply);
+    if (error != ERR_OK) {
+        return error;
+    }
+
+    error = reply.ReadInt32();
+    if (error != ERR_OK) {
+        HILOG_ERROR("failed to read reply result");
+        return error;
+    }
+    return GetParcelableInfos<RunningFormInfo>(reply, runningFormInfos);
+}
+
 template<typename T>
 int FormMgrProxy::GetParcelableInfo(IFormMgr::Message code, MessageParcel &data, T &parcelableInfo)
 {
@@ -1089,6 +1108,43 @@ int FormMgrProxy::GetFormsInfoByModule(std::string &bundleName, std::string &mod
         HILOG_ERROR("%{public}s, failed to GetAllFormsInfo: %{public}d", __func__, error);
     }
 
+    return error;
+}
+
+ErrCode FormMgrProxy::GetRunningFormInfos(std::vector<RunningFormInfo> &runningFormInfos)
+{
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("failed to write interface token");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    ErrCode error = GetRunningFormInfos(IFormMgr::Message::FORM_MGR_GET_RUNNING_FORM_INFOS, data, runningFormInfos);
+    if (error != ERR_OK) {
+        HILOG_ERROR("failed to GetRunningFormInfos: %{public}d", error);
+    }
+    return error;
+}
+
+ErrCode FormMgrProxy::GetRunningFormInfosByBundleName(const std::string &bundleName,
+    std::vector<RunningFormInfo> &runningFormInfos)
+{
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("failed to write interface token");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteString(bundleName)) {
+        HILOG_ERROR("failed to write bundleName");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    ErrCode error = GetRunningFormInfos(IFormMgr::Message::FORM_MGR_GET_RUNNING_FORM_INFOS_BY_BUNDLE,
+        data, runningFormInfos);
+    if (error != ERR_OK) {
+        HILOG_ERROR("failed to GetRunningFormInfosByBundleName: %{public}d", error);
+    }
     return error;
 }
 

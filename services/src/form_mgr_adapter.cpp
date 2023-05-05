@@ -2484,5 +2484,18 @@ int32_t FormMgrAdapter::GetHostFormsCount(std::string &bundleName, int32_t &form
     HILOG_DEBUG("%{public}s, bundleName: %{public}s.", __func__, bundleName.c_str());
     return FormDataMgr::GetInstance().GetHostFormsCount(bundleName, formCount);
 }
+
+ErrCode FormMgrAdapter::GetRunningFormInfos(std::vector<RunningFormInfo> &runningFormInfos)
+{
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    FormDataMgr::GetInstance().GetRunningFormInfos(runningFormInfos);
+    return ERR_OK;
+}
+ErrCode FormMgrAdapter::GetRunningFormInfosByBundleName(const std::string &bundleName,
+    std::vector<RunningFormInfo> &runningFormInfos)
+{
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    return FormDataMgr::GetInstance().GetRunningFormInfosByBundleName(bundleName, runningFormInfos);
+}
 } // namespace AppExecFwk
 } // namespace OHOS

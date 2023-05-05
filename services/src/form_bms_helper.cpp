@@ -270,6 +270,21 @@ int32_t FormBmsHelper::GetCallerBundleName(std::string &callerBundleName)
     return ERR_OK;
 }
 
+int32_t FormBmsHelper::GetBundleNameByUid(const int32_t uid, std::string &bundleName)
+{
+    sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
+    if (iBundleMgr == nullptr) {
+        HILOG_ERROR("failed to get IBundleMgr.");
+        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
+    }
+
+    if (IN_PROCESS_CALL(iBundleMgr->GetNameForUid(uid, bundleName)) != ERR_OK) {
+        HILOG_ERROR("failed to get bundle name by uid.");
+        return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
+    }
+    return ERR_OK;
+}
+
 int32_t FormBmsHelper::GetUidByBundleName(const std::string &bundleName, const int32_t userId)
 {
     sptr<IBundleMgr> iBundleMgr = GetBundleMgr();

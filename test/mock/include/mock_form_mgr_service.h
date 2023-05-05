@@ -71,6 +71,9 @@ public:
         AAFwk::WantParams &formData));
     MOCK_METHOD2(GetFormsCount, int32_t(bool isTempFormFlag, int32_t &formCount));
     MOCK_METHOD2(GetHostFormsCount, int32_t(std::string &bundleName, int32_t &formCount));
+    MOCK_METHOD1(GetRunningFormInfos, ErrCode(std::vector<RunningFormInfo> &runningFormInfos));
+    MOCK_METHOD2(GetRunningFormInfosByBundleName, ErrCode(const std::string &bundleName,
+        std::vector<RunningFormInfo> &runningFormInfos));
 };
 }
 }

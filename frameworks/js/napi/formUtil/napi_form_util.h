@@ -22,6 +22,7 @@
 #include "napi/native_common.h"
 #include "napi/native_node_api.h"
 #include "nlohmann/json.hpp"
+#include "running_form_info.h"
 
 namespace OHOS {
 namespace AbilityRuntime {
@@ -104,6 +105,9 @@ void ParseFormInfoIntoNapi(napi_env env, const OHOS::AppExecFwk::FormInfo &formI
 AsyncErrMsgCallbackInfo *InitErrMsg(napi_env env, int32_t code, int32_t type, napi_value callbackValue);
 NativeValue* CreateFormInfos(NativeEngine &engine, const std::vector<OHOS::AppExecFwk::FormInfo> &formInfos);
 NativeValue* CreateFormInfo(NativeEngine &engine, const OHOS::AppExecFwk::FormInfo &formInfo);
+NativeValue* CreateRunningFormInfos(NativeEngine &engine,
+    const std::vector<AppExecFwk::RunningFormInfo> &runningFormInfos);
+NativeValue* CreateRunningFormInfo(NativeEngine &engine, const AppExecFwk::RunningFormInfo &runningFormInfo);
 NativeValue *CreateFormCustomizeDatas(
     NativeEngine &engine, const std::vector<OHOS::AppExecFwk::FormCustomizeData> &customizeDatas);
 }  // namespace AbilityRuntime

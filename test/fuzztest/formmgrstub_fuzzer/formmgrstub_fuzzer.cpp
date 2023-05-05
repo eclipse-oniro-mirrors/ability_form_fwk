@@ -186,6 +186,15 @@ public:
     {
         return 0;
     }
+    ErrCode GetRunningFormInfos(std::vector<RunningFormInfo> &runningFormInfos) override
+    {
+        return 0;
+    }
+    ErrCode GetRunningFormInfosByBundleName(const std::string &bundleName,
+        std::vector<RunningFormInfo> &runningFormInfos) override
+    {
+        return 0;
+    }
 };
 
 uint32_t GetU32Data(const char* ptr)
