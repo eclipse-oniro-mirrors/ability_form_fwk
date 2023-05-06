@@ -278,10 +278,14 @@ ohos_shared_library("formhost_napi") {
 
 ################################### formhost ########################################
 ohos_shared_library("formhost") {
-  include_dirs = [ "${ability_runtime_innerapi_path}/runtime/include" ]
+  include_dirs = [
+    "${ability_runtime_innerapi_path}/runtime/include",
+    "${form_fwk_path}/interfaces/inner_api/include",
+  ]
 
   sources = [
     "form_host/js_form_host.cpp",
+    "form_host/js_form_state_observer.cpp",
     "form_host/native_module.cpp",
   ]
 
@@ -290,6 +294,7 @@ ohos_shared_library("formhost") {
   deps = [
     ":formutil_napi",
     "${form_fwk_path}:fmskit_native",
+    "${form_fwk_path}:form_manager",
   ]
 
   external_deps = [

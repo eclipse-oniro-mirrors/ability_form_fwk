@@ -26,6 +26,7 @@
 #include "form_provider_data.h"
 #include "form_state_info.h"
 #include "iremote_object.h"
+#include "running_form_info.h"
 #include "want.h"
 
 namespace OHOS {
@@ -328,6 +329,35 @@ public:
     * @return Returns ERR_OK on success, others on failure.
     */
     int32_t GetHostFormsCount(std::string &bundleName, int32_t &formCount);
+
+    /**
+     * @brief Handle form add observer.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleFormAddObserver(const int64_t formId);
+
+    /**
+     * @brief Handle form add observer.
+     * @param runningFormInfo the running forms' infos of the specify application name.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleFormRemoveObserver(const RunningFormInfo runningFormInfo);
+
+    /**
+     * @brief Register form add observer by bundle.
+     * @param bundleName BundleName of the form host
+     * @param callerToken Caller ability token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RegisterFormAddObserverByBundle(const std::string bundleName, const sptr<IRemoteObject> &callerToken);
+
+    /**
+     * @brief Register form remove observer by bundle.
+     * @param bundleName BundleName of the form host
+     * @param callerToken Caller ability token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RegisterFormRemoveObserverByBundle(const std::string bundleName, const sptr<IRemoteObject> &callerToken);
 private:
     /**
      * @brief Get form configure info.

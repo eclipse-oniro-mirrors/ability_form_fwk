@@ -1074,6 +1074,32 @@ bool FormMgrService::CheckAcrossLocalAccountsPermission() const
     return true;
 }
 
+ErrCode FormMgrService::RegisterFormAddObserverByBundle(const std::string bundleName, const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_DEBUG("called.");
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+    if (!CheckAcrossLocalAccountsPermission()) {
+        HILOG_ERROR("Across local accounts permission failed.");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    }
+    return FormMgrAdapter::GetInstance().RegisterFormAddObserverByBundle(bundleName, callerToken);
+}
+
+ErrCode FormMgrService::RegisterFormRemoveObserverByBundle(const std::string bundleName, const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_DEBUG("called.");
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+    if (!CheckAcrossLocalAccountsPermission()) {
+        HILOG_ERROR("Across local accounts permission failed.");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    }
+    return FormMgrAdapter::GetInstance().RegisterFormRemoveObserverByBundle(bundleName, callerToken);
+}
+
 int32_t FormMgrService::GetFormsCount(bool isTempFormFlag, int32_t &formCount)
 {
     HILOG_INFO("%{public}s called.", __func__);

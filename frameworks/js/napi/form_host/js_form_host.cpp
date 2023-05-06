@@ -23,6 +23,7 @@
 #include "form_mgr_errors.h"
 #include "hilog_wrapper.h"
 #include "ipc_skeleton.h"
+#include "js_form_state_observer.h"
 #include "napi_form_util.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
@@ -324,16 +325,16 @@ public:
         return (me != nullptr) ? me->OnAcquireFormState(*engine, *info) : nullptr;
     }
 
-    static NativeValue* RegisterFormUninstallObserver(NativeEngine* engine, NativeCallbackInfo* info)
+    static NativeValue* RegisterFormObserver(NativeEngine* engine, NativeCallbackInfo* info)
     {
         JsFormHost* me = CheckParamsAndGetThis<JsFormHost>(engine, info);
-        return (me != nullptr) ? me->OnRegisterFormUninstallObserver(*engine, *info) : nullptr;
+        return (me != nullptr) ? me->OnRegisterFormObserver(*engine, *info) : nullptr;
     }
 
-    static NativeValue* UnregisterFormUninstallObserver(NativeEngine* engine, NativeCallbackInfo* info)
+    static NativeValue* UnregisterFormObserver(NativeEngine* engine, NativeCallbackInfo* info)
     {
         JsFormHost* me = CheckParamsAndGetThis<JsFormHost>(engine, info);
-        return (me != nullptr) ? me->OnUnregisterFormUninstallObserver(*engine, *info) : nullptr;
+        return (me != nullptr) ? me->OnUnregisterFormObserver(*engine, *info) : nullptr;
     }
 
     static NativeValue* NotifyFormsVisible(NativeEngine* engine, NativeCallbackInfo* info)
@@ -903,54 +904,137 @@ private:
         return result;
     }
 
-    NativeValue* OnRegisterFormUninstallObserver(NativeEngine &engine, NativeCallbackInfo &info)
+    NativeValue* OnRegisterFormAddObserver(NativeEngine &engine, NativeCallbackInfo &info)
     {
-        HILOG_DEBUG("%{public}s called.", __func__);
-
-        if (!CheckCallerIsSystemApp()) {
-            HILOG_ERROR("This application is not system-app, can not use system-api");
-            NapiFormUtil::ThrowByExternalErrorCode(engine, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
+        HILOG_DEBUG("called.");
+        decltype(info.argc) convertArgc = 1;
+        // Check the number of input parameters.
+        if (info.argc > ARGS_THREE|| info.argc < ARGS_TWO) {
+            HILOG_ERROR("wrong number of arguments.");
+            NapiFormUtil::ThrowParamNumError(engine, std::to_string(info.argc), "2 or 3");
             return engine.CreateUndefined();
         }
 
+        // Check the type of the PARAM1.
+        if (info.argv[PARAM1]->TypeOf() != NATIVE_FUNCTION) {
+            HILOG_ERROR("param1 is invalid");
+            NapiFormUtil::ThrowParamTypeError(engine, "callback", "Callback<formInfo.RunningFormInfo>");
+            return engine.CreateUndefined();
+        }
+
+        std::string bundleName("");
+        if (info.argc == ARGS_THREE) {
+            // Check the type of the PARAM2 and convert it to string.
+            if (info.argv[PARAM2]->TypeOf() != NATIVE_STRING) {
+                HILOG_ERROR("param2 is invalid");
+                NapiFormUtil::ThrowParamTypeError(engine, "bundleName", "string");
+                return engine.CreateUndefined();
+            }
+            if (!ConvertFromJsValue(engine, info.argv[PARAM2], bundleName)) {
+                HILOG_ERROR("convert type failed!");
+                NapiFormUtil::ThrowParamTypeError(engine, "bundleName", "string");
+                return engine.CreateUndefined();
+            }
+            convertArgc++;
+        }
+
+        // Check the size of the map.
+        if (!JsFormStateObserver::GetInstance()->CheckMapSize("formAdd", bundleName)) {
+            NapiFormUtil::ThrowParamError(engine,
+                "The number of bundleNames registered to listen has exceeded the limit");
+            return engine.CreateUndefined();
+        }
+
+        // if there is a full observer.
+        if (info.argc == ARGS_TWO) {
+            bundleName = "all";
+        }
+
+        if (!JsFormStateObserver::GetInstance()->RegisterFormAddCallback(reinterpret_cast<napi_env>(&engine),
+            bundleName, reinterpret_cast<napi_value>(info.argv[1]))) {
+            return engine.CreateUndefined();
+        }
+        FormMgr::GetInstance().RegisterFormAddObserverByBundle(bundleName, JsFormStateObserver::GetInstance());
+        return engine.CreateUndefined();
+    }
+
+    NativeValue* OnRegisterFormRemoveObserver(NativeEngine &engine, NativeCallbackInfo &info)
+    {
+        HILOG_DEBUG("called.");
+        decltype(info.argc) convertArgc = 1;
+        // Check the number of input parameters.
+        if (info.argc > ARGS_THREE|| info.argc < ARGS_TWO) {
+            HILOG_ERROR("wrong number of arguments.");
+            NapiFormUtil::ThrowParamNumError(engine, std::to_string(info.argc), "2 or 3");
+            return engine.CreateUndefined();
+        }
+
+        // Check the type of the PARAM1.
+        if (info.argv[PARAM1]->TypeOf() != NATIVE_FUNCTION) {
+            HILOG_ERROR("param1 is invalid");
+            NapiFormUtil::ThrowParamTypeError(engine, "callback", "Callback<formInfo.RunningFormInfo>");
+            return engine.CreateUndefined();
+        }
+
+        std::string bundleName("");
+        if (info.argc == ARGS_THREE) {
+            // Check the type of the PARAM2 and convert it to string.
+            if (info.argv[PARAM2]->TypeOf() != NATIVE_STRING) {
+                HILOG_ERROR("param2 is invalid");
+                NapiFormUtil::ThrowParamTypeError(engine, "bundleName", "string");
+                return engine.CreateUndefined();
+            }
+            if (!ConvertFromJsValue(engine, info.argv[PARAM2], bundleName)) {
+                HILOG_ERROR("convert type failed!");
+                NapiFormUtil::ThrowParamTypeError(engine, "bundleName", "string");
+                return engine.CreateUndefined();
+            }
+            convertArgc++;
+        }
+
+        // Check the size of the map.
+        if (!JsFormStateObserver::GetInstance()->CheckMapSize("formRemove", bundleName)) {
+            NapiFormUtil::ThrowParamError(engine,
+                "The number of bundleNames registered to listen has exceeded the limit");
+            return engine.CreateUndefined();
+        }
+
+        // if there is a full observer.
+        if (info.argc == ARGS_TWO) {
+            bundleName = "all";
+        }
+
+        if (!JsFormStateObserver::GetInstance()->RegisterFormRemoveCallback(reinterpret_cast<napi_env>(&engine),
+            bundleName, reinterpret_cast<napi_value>(info.argv[1]))) {
+            return engine.CreateUndefined();
+        }
+
+        FormMgr::GetInstance().RegisterFormRemoveObserverByBundle(bundleName, JsFormStateObserver::GetInstance());
+        return engine.CreateUndefined();
+    }
+    NativeValue* OnRegisterFormUninstallObserver(NativeEngine &engine, NativeCallbackInfo &info)
+    {
+        // Check the number of input parameters.
         if (info.argc != ARGS_TWO) {
             HILOG_ERROR("wrong number of arguments.");
             NapiFormUtil::ThrowParamNumError(engine, std::to_string(info.argc), "2");
             return engine.CreateUndefined();
         }
 
-        if (info.argv[PARAM0]->TypeOf() != NATIVE_STRING) {
-            HILOG_ERROR("param0 is invalid");
-            NapiFormUtil::ThrowParamTypeError(engine, "type", "formUninstall");
-            return engine.CreateUndefined();
-        }
-        std::string type;
-        if (!ConvertFromJsValue(engine, info.argv[PARAM0], type)) {
-            HILOG_ERROR("convert type failed!");
-            NapiFormUtil::ThrowParamTypeError(engine, "type", "formUninstall");
-            return engine.CreateUndefined();
-        }
-
-        if (type != "formUninstall") {
-            HILOG_ERROR("args[0] should be formUninstall.");
-            NapiFormUtil::ThrowParamTypeError(engine, "type", "formUninstall");
-            return engine.CreateUndefined();
-        }
-
+        // Check the type of the PARAM1.
         if (info.argv[PARAM1]->TypeOf() != NATIVE_FUNCTION) {
             HILOG_ERROR("param1 is invalid");
             NapiFormUtil::ThrowParamTypeError(engine, "callback", "Callback<string>");
             return engine.CreateUndefined();
         }
-
         FormHostClient::GetInstance()->RegisterUninstallCallback(FormUninstallCallback);
         AddFormUninstallCallback(reinterpret_cast<napi_env>(&engine), reinterpret_cast<napi_value>(info.argv[1]));
         return engine.CreateUndefined();
     }
 
-    NativeValue* OnUnregisterFormUninstallObserver(NativeEngine &engine, NativeCallbackInfo &info)
+    NativeValue* OnRegisterFormObserver(NativeEngine &engine, NativeCallbackInfo &info)
     {
-        HILOG_DEBUG("%{public}s called.", __func__);
+        HILOG_DEBUG("called.");
 
         if (!CheckCallerIsSystemApp()) {
             HILOG_ERROR("This application is not system-app, can not use system-api");
@@ -958,30 +1042,43 @@ private:
             return engine.CreateUndefined();
         }
 
+        // Check the type of the PARAM0 and convert it to string.
+        if (info.argv[PARAM0]->TypeOf() != NATIVE_STRING) {
+            HILOG_ERROR("param0 is invalid");
+            NapiFormUtil::ThrowParamTypeError(engine, "type", "formAdd, formRemove or formUninstall");
+            return engine.CreateUndefined();
+        }
+
+        std::string type;
+        if (!ConvertFromJsValue(engine, info.argv[PARAM0], type)) {
+            HILOG_ERROR("convert type failed!");
+            NapiFormUtil::ThrowParamTypeError(engine, "type", "formAdd, formRemove or formUninstall");
+            return engine.CreateUndefined();
+        }
+
+        if (type == "formAdd") {
+            return OnRegisterFormAddObserver(engine, info);
+        } else if (type == "formRemove") {
+            return OnRegisterFormRemoveObserver(engine, info);
+        } else if (type == "formUninstall") {
+            return OnRegisterFormUninstallObserver(engine, info);
+        } else {
+            HILOG_ERROR("args[0] should be formAdd, formRemove or formUninstall.");
+            NapiFormUtil::ThrowParamTypeError(engine, "type", "formAdd, formRemove or formUninstall");
+            return engine.CreateUndefined();
+        }
+    }
+
+    NativeValue* OnUnregisterFormUninstallObserver(NativeEngine &engine, NativeCallbackInfo &info)
+    {
+        // Check the number of input parameters.
         if (info.argc > ARGS_TWO|| info.argc < ARGS_ONE) {
             HILOG_ERROR("wrong number of arguments.");
             NapiFormUtil::ThrowParamNumError(engine, std::to_string(info.argc), "1 or 2");
             return engine.CreateUndefined();
         }
 
-        if (info.argv[PARAM0]->TypeOf() != NATIVE_STRING) {
-            HILOG_ERROR("param0 is invalid");
-            NapiFormUtil::ThrowParamTypeError(engine, "type", "formUninstall");
-            return engine.CreateUndefined();
-        }
-        std::string type;
-        if (!ConvertFromJsValue(engine, info.argv[PARAM0], type)) {
-            HILOG_ERROR("convert type failed!");
-            NapiFormUtil::ThrowParamTypeError(engine, "type", "formUninstall");
-            return engine.CreateUndefined();
-        }
-
-        if (type != "formUninstall") {
-            HILOG_ERROR("args[0] should be formUninstall.");
-            NapiFormUtil::ThrowParamTypeError(engine, "type", "formUninstall");
-            return engine.CreateUndefined();
-        }
-
+        // Check the type of the PARAM1.
         if (info.argc == ARGS_TWO && info.argv[PARAM1]->TypeOf() != NATIVE_FUNCTION) {
             HILOG_ERROR("param1 is invalid");
             NapiFormUtil::ThrowParamTypeError(engine, "callback", "Callback<string>");
@@ -995,6 +1092,162 @@ private:
 
         ClearFormUninstallCallback();
         return engine.CreateUndefined();
+    }
+
+    NativeValue* OnUnregisterFormRemoveObserver(NativeEngine &engine, NativeCallbackInfo &info)
+    {
+        // Check the number of input parameters.
+        if (info.argc > ARGS_THREE|| info.argc < ARGS_ONE) {
+            HILOG_ERROR("wrong number of arguments.");
+            NapiFormUtil::ThrowParamNumError(engine, std::to_string(info.argc), "1 or 2 or 3");
+            return engine.CreateUndefined();
+        }
+
+        // If there is only one argument, all listening will be cancelled.
+        if (info.argc == ARGS_ONE) {
+            JsFormStateObserver::GetInstance()->ClearFormRemoveCallbackByBundle("all");
+            return engine.CreateUndefined();
+        }
+
+        if (info.argc == ARGS_TWO) {
+            if (info.argv[PARAM1]->TypeOf() == NATIVE_FUNCTION) {
+                JsFormStateObserver::GetInstance()->DelFormRemoveCallbackByBundle(reinterpret_cast<napi_value>(info.argv[PARAM1]),
+                    "all");
+                return engine.CreateUndefined();
+            } else if (info.argv[PARAM1]->TypeOf() == NATIVE_STRING) {
+                std::string bundleName;
+                if (!ConvertFromJsValue(engine, info.argv[PARAM1], bundleName)) {
+                    HILOG_ERROR("convert bundleName failed!");
+                    NapiFormUtil::ThrowParamTypeError(engine, "bundleName", "string");
+                    return engine.CreateUndefined();
+                }
+                JsFormStateObserver::GetInstance()->ClearFormRemoveCallbackByBundle(bundleName);
+                return engine.CreateUndefined();
+            } else {
+                HILOG_ERROR("param1 is invalid");
+                NapiFormUtil::ThrowParamTypeError(engine, "callback or bundleName",
+                    "Callback<formInfo.RunningFormInfo> or string");
+                return engine.CreateUndefined();
+            }
+        }
+
+        if (info.argc == ARGS_THREE) {
+            if (info.argv[PARAM1]->TypeOf() != NATIVE_FUNCTION) {
+                HILOG_ERROR("param1 is invalid");
+                NapiFormUtil::ThrowParamTypeError(engine, "callback", "Callback<formInfo.RunningFormInfo>");
+                return engine.CreateUndefined();
+            }
+            if (info.argv[PARAM2]->TypeOf() != NATIVE_STRING) {
+                HILOG_ERROR("param2 is invalid");
+                NapiFormUtil::ThrowParamTypeError(engine, "bundleName", "string");
+                return engine.CreateUndefined();
+            }
+            std::string bundleName;
+            if (!ConvertFromJsValue(engine, info.argv[PARAM2], bundleName)) {
+                HILOG_ERROR("convert bundleName failed!");
+                NapiFormUtil::ThrowParamTypeError(engine, "bundleName", "string");
+                return engine.CreateUndefined();
+            }
+            JsFormStateObserver::GetInstance()->DelFormRemoveCallbackByBundle(reinterpret_cast<napi_value>(info.argv[PARAM1]), bundleName);
+            return engine.CreateUndefined();
+        }
+        return engine.CreateUndefined();
+    }
+
+    NativeValue* OnUnregisterFormAddObserver(NativeEngine &engine, NativeCallbackInfo &info)
+    {
+        // Check the number of input parameters.
+        if (info.argc > ARGS_THREE|| info.argc < ARGS_ONE) {
+            HILOG_ERROR("wrong number of arguments.");
+            NapiFormUtil::ThrowParamNumError(engine, std::to_string(info.argc), "1 or 2 or 3");
+            return engine.CreateUndefined();
+        }
+
+        // If there is only one argument, full listening will be cancelled.
+        if (info.argc == ARGS_ONE) {
+            JsFormStateObserver::GetInstance()->ClearFormAddCallbackByBundle("all");
+            return engine.CreateUndefined();
+        }
+
+        if (info.argc == ARGS_TWO) {
+            if (info.argv[PARAM1]->TypeOf() == NATIVE_FUNCTION) {
+                JsFormStateObserver::GetInstance()->DelFormAddCallbackByBundle(reinterpret_cast<napi_value>(info.argv[PARAM1]),
+                    "all");
+                return engine.CreateUndefined();
+            } else if (info.argv[PARAM1]->TypeOf() == NATIVE_STRING) {
+                std::string bundleName;
+                if (!ConvertFromJsValue(engine, info.argv[PARAM1], bundleName)) {
+                    HILOG_ERROR("convert bundleName failed!");
+                    NapiFormUtil::ThrowParamTypeError(engine, "bundleName", "string");
+                    return engine.CreateUndefined();
+                }
+                JsFormStateObserver::GetInstance()->ClearFormAddCallbackByBundle(bundleName);
+                return engine.CreateUndefined();
+            } else {
+                HILOG_ERROR("param1 is invalid");
+                NapiFormUtil::ThrowParamTypeError(engine, "callback or bundleName",
+                    "Callback<formInfo.RunningFormInfo> or string");
+                return engine.CreateUndefined();
+            }
+        }
+
+        if (info.argc == ARGS_THREE) {
+            if (info.argv[PARAM1]->TypeOf() != NATIVE_FUNCTION) {
+                HILOG_ERROR("param1 is invalid");
+                NapiFormUtil::ThrowParamTypeError(engine, "callback", "Callback<formInfo.RunningFormInfo>");
+                return engine.CreateUndefined();
+            }
+            if (info.argv[PARAM2]->TypeOf() != NATIVE_STRING) {
+                HILOG_ERROR("param2 is invalid");
+                NapiFormUtil::ThrowParamTypeError(engine, "bundleName", "string");
+                return engine.CreateUndefined();
+            }
+            std::string bundleName;
+            if (!ConvertFromJsValue(engine, info.argv[PARAM2], bundleName)) {
+                HILOG_ERROR("convert bundleName failed!");
+                NapiFormUtil::ThrowParamTypeError(engine, "bundleName", "string");
+                return engine.CreateUndefined();
+            }
+            JsFormStateObserver::GetInstance()->DelFormAddCallbackByBundle(reinterpret_cast<napi_value>(info.argv[PARAM1]), bundleName);
+            return engine.CreateUndefined();
+        }
+        return engine.CreateUndefined();
+    }
+
+    NativeValue* OnUnregisterFormObserver(NativeEngine &engine, NativeCallbackInfo &info)
+    {
+        HILOG_DEBUG("called.");
+
+        if (!CheckCallerIsSystemApp()) {
+            HILOG_ERROR("This application is not system-app, can not use system-api");
+            NapiFormUtil::ThrowByExternalErrorCode(engine, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
+            return engine.CreateUndefined();
+        }
+
+        // Check the type of the PARAM0 and convert it to string.
+        if (info.argv[PARAM0]->TypeOf() != NATIVE_STRING) {
+            HILOG_ERROR("param0 is invalid");
+            NapiFormUtil::ThrowParamTypeError(engine, "type", "formAdd, formRemove or formUninstall");
+            return engine.CreateUndefined();
+        }
+        std::string type;
+        if (!ConvertFromJsValue(engine, info.argv[PARAM0], type)) {
+            HILOG_ERROR("convert type failed!");
+            NapiFormUtil::ThrowParamTypeError(engine, "type", "formAdd, formRemove or formUninstall");
+            return engine.CreateUndefined();
+        }
+
+        if (type == "formAdd") {
+            return OnUnregisterFormAddObserver(engine, info);
+        } else if (type == "formRemove") {
+            return OnUnregisterFormRemoveObserver(engine, info);
+        } else if (type == "formUninstall") {
+            return OnUnregisterFormUninstallObserver(engine, info);
+        } else {
+            HILOG_ERROR("args[0] should be formAdd, formRemove or formUninstall.");
+            NapiFormUtil::ThrowParamTypeError(engine, "type", "formAdd, formRemove or formUninstall");
+            return engine.CreateUndefined();
+        }
     }
 
     NativeValue* OnNotifyFormsVisible(NativeEngine &engine, const NativeCallbackInfo &info)
@@ -1383,8 +1636,8 @@ NativeValue* JsFormHostInit(NativeEngine* engine, NativeValue* exportObj)
     BindNativeFunction(*engine, *object, "isSystemReady", moduleName, JsFormHost::IsSystemReady);
     BindNativeFunction(*engine, *object, "deleteInvalidForms", moduleName, JsFormHost::DeleteInvalidForms);
     BindNativeFunction(*engine, *object, "acquireFormState", moduleName, JsFormHost::AcquireFormState);
-    BindNativeFunction(*engine, *object, "on", moduleName, JsFormHost::RegisterFormUninstallObserver);
-    BindNativeFunction(*engine, *object, "off", moduleName, JsFormHost::UnregisterFormUninstallObserver);
+    BindNativeFunction(*engine, *object, "on", moduleName, JsFormHost::RegisterFormObserver);
+    BindNativeFunction(*engine, *object, "off", moduleName, JsFormHost::UnregisterFormObserver);
     BindNativeFunction(*engine, *object, "notifyFormsVisible", moduleName, JsFormHost::NotifyFormsVisible);
     BindNativeFunction(*engine, *object, "notifyFormsEnableUpdate", moduleName, JsFormHost::NotifyFormsEnableUpdate);
     BindNativeFunction(*engine, *object, "getAllFormsInfo", moduleName, JsFormHost::GetAllFormsInfo);

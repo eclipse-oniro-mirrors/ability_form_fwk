@@ -106,6 +106,10 @@ FormMgrStub::FormMgrStub()
         &FormMgrStub::HandleCheckFMSReady;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_STOP_RENDERING_FORM)] =
         &FormMgrStub::HandleStopRenderingForm;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_FORM_ADD_OBSERVER_BY_BUNDLE)] =
+        &FormMgrStub::HandleRegisterFormAddObserverByBundle;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_FORM_REMOVE_OBSERVER_BY_BUNDLE)] =
+        &FormMgrStub::HandleRegisterFormRemoveObserverByBundle;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_ACQUIRE_DATA)] =
         &FormMgrStub::HandleAcquireFormData;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORMS_COUNT)] =
@@ -891,6 +895,36 @@ int32_t FormMgrStub::HandleCheckFMSReady(MessageParcel &data, MessageParcel &rep
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
+}
+
+int32_t FormMgrStub::HandleRegisterFormAddObserverByBundle(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("called.");
+
+    std::string bundleName = data.ReadString();
+    sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
+    if (callerToken == nullptr) {
+        HILOG_ERROR("failed to get remote object.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    auto result = RegisterFormAddObserverByBundle(bundleName, callerToken);
+    reply.WriteInt32(result);
+    return result;
+}
+
+int32_t FormMgrStub::HandleRegisterFormRemoveObserverByBundle(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("called.");
+
+    std::string bundleName = data.ReadString();
+    sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
+    if (callerToken == nullptr) {
+        HILOG_ERROR("failed to get remote object.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    auto result = RegisterFormRemoveObserverByBundle(bundleName, callerToken);
+    reply.WriteInt32(result);
+    return result;
 }
 
 int32_t FormMgrStub::HandleGetFormsCount(MessageParcel &data, MessageParcel &reply)

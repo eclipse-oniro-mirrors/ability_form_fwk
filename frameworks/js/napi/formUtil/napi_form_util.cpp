@@ -25,6 +25,7 @@
 #include "hilog_wrapper.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
+#include "running_form_info.h"
 #include "runtime.h"
 
 using namespace OHOS;
@@ -507,7 +508,7 @@ void ParseFormInfoIntoNapi(napi_env env, const FormInfo &formInfo, napi_value &r
     FormType formType = formInfo.type;
     SetFormInfoPropertyInt32(env, (int32_t)formType, result, "type");
     SetFormInfoPropertyString(env, formInfo.jsComponentName.c_str(), result, "jsComponentName");
-    FormsColorMode  formsColorMode = formInfo.colorMode;
+    FormsColorMode formsColorMode = formInfo.colorMode;
     SetFormInfoPropertyInt32(env, (int32_t)formsColorMode, result, "colorMode");
     SetFormInfoPropertyBoolean(env, formInfo.defaultFlag, result, "isDefault");
     SetFormInfoPropertyBoolean(env, formInfo.updateEnabled, result, "updateEnabled");
@@ -540,6 +541,20 @@ void ParseFormInfoIntoNapi(napi_env env, const FormInfo &formInfo, napi_value &r
     }
     HILOG_DEBUG("%{public}s, customizeData size=%{public}zu.", __func__, formInfo.customizeDatas.size());
     napi_set_named_property(env, result, "customizeData", customizeData);
+}
+
+void ParseRunningFormInfoIntoNapi(napi_env env, const RunningFormInfo &runningFormInfo, napi_value &result)
+{
+    std::string formIdString = std::to_string(runningFormInfo.formId);
+    SetFormInfoPropertyString(env, formIdString.c_str(), result, "formId");
+    SetFormInfoPropertyString(env, runningFormInfo.bundleName.c_str(), result, "bundleName");
+    SetFormInfoPropertyString(env, runningFormInfo.hostBundleName.c_str(), result, "hostBundleName");
+    FormVisibilityType formVisiblity = runningFormInfo.formVisiblity;
+    SetFormInfoPropertyInt32(env, (int32_t)formVisiblity, result, "visibilityType");
+    SetFormInfoPropertyString(env, runningFormInfo.moduleName.c_str(), result, "moduleName");
+    SetFormInfoPropertyString(env, runningFormInfo.formName.c_str(), result, "formName");
+    SetFormInfoPropertyInt32(env, runningFormInfo.dimension, result, "dimension");
+    SetFormInfoPropertyString(env, runningFormInfo.abilityName.c_str(), result, "abilityName");
 }
 
 inline FormType GetFormType(const FormInfo &formInfo)

@@ -32,6 +32,7 @@
 #include "form_record.h"
 #include "form_state_info.h"
 #include "iremote_object.h"
+#include "running_form_info.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -571,6 +572,30 @@ public:
     * @return Return the host forms number.
     */
     int32_t GetHostFormsCount(const std::string &bundleName, int32_t &formCount);
+
+    /**
+    * @brief handle form add observer.
+    * @param hostBundleName the bundle name of form host.
+    * @param formId Indicates the form ID.
+    * @return Returns ERR_OK on success, others on failure.
+    */
+    ErrCode HandleFormAddObserver(const std::string hostBundleName, const int64_t formId);
+
+    /**
+    * @brief handle form add observer.
+    * @param hostBundleName the bundle name of form host.
+    * @param runningFormInfo the running forms' infos of the specify application name.
+    * @return Returns ERR_OK on success, others on failure.
+    */
+    ErrCode HandleFormRemoveObserver(const std::string hostBundleName, const RunningFormInfo runningFormInfo);
+
+    /**
+     * @brief Get the running form infos by form id.
+     * @param formId Indicates the form ID.
+     * @param runningFormInfos Return the running forms' infos of the specify application name.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode GetRunningFormInfosByFormId(const int64_t formId, RunningFormInfo &runningFormInfo);
 private:
     /**
      * @brief Create form record.
@@ -667,11 +692,13 @@ private:
     mutable std::recursive_mutex formTempMutex_;
     mutable std::recursive_mutex formStateRecordMutex_;
     mutable std::recursive_mutex formRequestPublishFormsMutex_;
+    mutable std::recursive_mutex formAddObserverMutex_;
     mutable std::recursive_mutex formAcquireDataRecordMutex_;
     std::map<int64_t, FormRecord> formRecords_;
     std::vector<FormHostRecord> clientRecords_;
     std::vector<int64_t> tempForms_;
     std::map<std::string, FormHostRecord> formStateRecord_;
+    std::map<std::string, std::vector<sptr<IRemoteObject>>> formAddObservers_;
     std::map<int32_t, FormHostRecord> formAcquireDataRecord_;
     using FormRequestPublishFormInfo = std::pair<Want, std::unique_ptr<FormProviderData>>;
     std::map<int64_t, FormRequestPublishFormInfo> formRequestPublishForms_;
