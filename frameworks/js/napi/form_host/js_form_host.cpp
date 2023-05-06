@@ -1367,7 +1367,7 @@ private:
 
     NativeValue* OnGetFormInstancesByFilter(NativeEngine &engine, NativeCallbackInfo &info)
     {
-        HILOG_DEBUG("OnGetFormInstancesByFilter is called");
+        HILOG_DEBUG("is called");
         std::vector<int64_t> iFormIds;
         if (info.argc < ARGS_ONE || info.argc > ARGS_THREE) {
             NapiFormUtil::ThrowParamNumError(engine, std::to_string(info.argc), "1 or 2");
@@ -1395,17 +1395,14 @@ private:
         }
         std::shared_ptr<std::vector<FormInstance>> formInstances = std::make_shared<std::vector<FormInstance>>();
         auto apiResult = std::make_shared<int32_t>();
-        auto execute = [filter, formInstances, ret = apiResult] () {
+        auto execute = [filter, formInstances, ret = apiResult]() {
             *ret = FormMgr::GetInstance().GetFormInstancesByFilter(filter, *formInstances);
-            if (*ret != ERR_OK) {
-                HILOG_ERROR("GetFormInstancesByFilter failed");
-                return;
-            }
         };
 
         auto complete =
             [formInstances, ret = apiResult](NativeEngine &engine, AsyncTask &task, int32_t status) {
                 if (*ret != ERR_OK) {
+                    HILOG_ERROR("failed");
                     task.Reject(engine, NapiFormUtil::CreateErrorByInternalErrorCode(engine, *ret));
                 } else {
                     task.ResolveWithNoError(engine, CreateFormInstances(engine, *formInstances));
@@ -1420,11 +1417,11 @@ private:
 
     NativeValue* OnGetFormInstanceById(NativeEngine &engine, NativeCallbackInfo &info)
     {
-        HILOG_DEBUG("OnGetFormInstanceById is called");
+        HILOG_DEBUG("called");
         std::vector<int64_t> iFormIds;
         if (info.argc < ARGS_ONE || info.argc > ARGS_THREE) {
             HILOG_ERROR("wrong number of arguments!");
-            NapiFormUtil::ThrowParamNumError(engine, std::to_string(info.argc), "1");
+            NapiFormUtil::ThrowParamNumError(engine, std::to_string(info.argc), "1 or 2");
             return engine.CreateUndefined();
         }
 
@@ -1441,17 +1438,14 @@ private:
         }
         std::shared_ptr<FormInstance> formInstance = std::make_shared<FormInstance>();
         auto apiResult = std::make_shared<int32_t>();
-        auto execute = [formId, formInstance, ret = apiResult] () {
+        auto execute = [formId, formInstance, ret = apiResult]() {
             *ret = FormMgr::GetInstance().GetFormInstanceById(formId, *formInstance);
-            if (*ret != ERR_OK) {
-                HILOG_ERROR("OnGetFormInstanceById failed");
-                return;
-            }
         };
 
         auto complete =
             [formInstance, ret = apiResult](NativeEngine &engine, AsyncTask &task, int32_t status) {
                 if (*ret != ERR_OK) {
+                    HILOG_ERROR("failed");
                     task.Reject(engine, NapiFormUtil::CreateErrorByInternalErrorCode(engine, *ret));
                 } else {
                     task.ResolveWithNoError(engine, CreateFormInstance(engine, *formInstance));

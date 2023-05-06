@@ -1840,11 +1840,11 @@ int32_t FormDataMgr::GetHostFormsCount(const std::string &bundleName, int32_t &f
 int32_t FormDataMgr::GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
         std::vector<FormInstance> &formInstances)
 {
-    HILOG_INFO("GetFormInstancesByFilter, get form instances by filter");
+    HILOG_DEBUG("get form instances by filter");
     std::lock_guard<std::recursive_mutex> lock(formRecordMutex_);
     std::map<int64_t, FormRecord>::iterator itFormRecord;
-    if(formInstancesFilter.bundleName == "") {
-        HILOG_INFO("formInstancesFilter.bundleName is null");
+    if(formInstancesFilter.bundleName.empty()) {
+        HILOG_ERROR("formInstancesFilter.bundleName is null");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
@@ -1885,10 +1885,10 @@ int32_t FormDataMgr::GetFormInstancesByFilter(const FormInstancesFilter &formIns
 
 int32_t FormDataMgr::GetFormInstanceById(const int64_t formId, FormInstance &formInstance)
 {
-    HILOG_INFO("GetFormInstanceById, get form record by formId");
+    HILOG_DEBUG("get form instance by formId");
     std::lock_guard<std::recursive_mutex> lock(formRecordMutex_);
     if (formId <= 0) {
-        HILOG_ERROR("GetFormInstanceById, formId is invalid");
+        HILOG_ERROR("formId is invalid");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     auto info = formRecords_.find(formId);
@@ -1905,7 +1905,7 @@ int32_t FormDataMgr::GetFormInstanceById(const int64_t formId, FormInstance &for
         formInstance.abilityName = formRecord.abilityName;
         formInstance.formName = formRecord.formName;
     }
-    HILOG_INFO("GetFormInstanceById, get form record successfully");
+    HILOG_DEBUG("get form instance successfully");
     return ERR_OK;
 }
 }  // namespace AppExecFwk

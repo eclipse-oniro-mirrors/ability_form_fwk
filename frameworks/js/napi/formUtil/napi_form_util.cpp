@@ -659,22 +659,25 @@ std::string GetStringFromNapi(napi_env env, napi_value value)
     size_t size = 0;
 
     if (napi_get_value_string_utf8(env, value, nullptr, 0, &size) != napi_ok) {
-        HILOG_ERROR("GetStringFromNapi, can not get string size");
+        HILOG_ERROR("can not get string size");
         return "";
     }
     result.reserve(size + 1);
     result.resize(size);
     if (napi_get_value_string_utf8(env, value, result.data(), (size + 1), &size) != napi_ok) {
-        HILOG_ERROR("GetStringFromNapi, can not get string value");
+        HILOG_ERROR("can not get string value");
         return "";
     }
     return result;
 }
 
-NativeValue* CreateFormInstances(NativeEngine &engine, const std::vector<FormInstance> &formInstances)
+NativeValue *CreateFormInstances(NativeEngine &engine, const std::vector<FormInstance> &formInstances)
 {
     NativeValue* arrayValue = engine.CreateArray(formInstances.size());
     NativeArray* array = ConvertNativeValueTo<NativeArray>(arrayValue);
+    if(array == nullptr) {
+        return engine.CreateUndefined();
+    }
     uint32_t index = 0;
     for (const auto &formInstance : formInstances) {
         array->SetElement(index++, CreateFormInstance(engine, formInstance));
@@ -682,19 +685,19 @@ NativeValue* CreateFormInstances(NativeEngine &engine, const std::vector<FormIns
     return arrayValue;
 }
 
-NativeValue* CreateFormInstance(NativeEngine &engine, const FormInstance &formInstance)
+NativeValue *CreateFormInstance(NativeEngine &engine, const FormInstance &formInstance)
 {
-    HILOG_DEBUG("CreateFormInstance called");
+    HILOG_DEBUG("called");
 
     auto objContext = engine.CreateObject();
     if (objContext == nullptr) {
-        HILOG_ERROR("CreateObject failed");
+        HILOG_ERROR("create object failed");
         return engine.CreateUndefined();
     }
 
     auto object = ConvertNativeValueTo<NativeObject>(objContext);
     if (object == nullptr) {
-        HILOG_ERROR("ConvertNativeValueTo object failed");
+        HILOG_ERROR("convert native value to object failed");
         return engine.CreateUndefined();
     }
     std::string formStr = std::to_string(formInstance.formId);
