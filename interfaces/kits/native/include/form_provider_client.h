@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_ABILITY_RUNTIME_FORM_PROVIDER_CLIENT_H
-#define OHOS_ABILITY_RUNTIME_FORM_PROVIDER_CLIENT_H
+#ifndef OHOS_FORM_FWK_FORM_PROVIDER_CLIENT_H
+#define OHOS_FORM_FWK_FORM_PROVIDER_CLIENT_H
 
 #include <iremote_object.h>
 #include <iremote_stub.h>
@@ -43,9 +43,7 @@ public:
      * @param callerToken Caller ability token.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual int AcquireProviderFormInfo(
-        const FormJsInfo &formJsInfo,
-        const Want &want,
+    int AcquireProviderFormInfo(const FormJsInfo &formJsInfo, const Want &want,
         const sptr<IRemoteObject> &callerToken) override;
 
     /**
@@ -56,10 +54,7 @@ public:
      * @param callerToken Caller ability token.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual int NotifyFormDelete(
-        const int64_t formId,
-        const Want &want,
-        const sptr<IRemoteObject> &callerToken) override;
+    int NotifyFormDelete(const int64_t formId, const Want &want, const sptr<IRemoteObject> &callerToken) override;
 
     /**
      * @brief Notify provider when the form was deleted.
@@ -69,9 +64,7 @@ public:
      * @param callerToken Caller ability token.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual int NotifyFormsDelete(
-        const std::vector<int64_t> &formIds,
-        const Want &want,
+    int NotifyFormsDelete(const std::vector<int64_t> &formIds, const Want &want,
         const sptr<IRemoteObject> &callerToken) override;
 
     /**
@@ -82,10 +75,7 @@ public:
      * @param callerToken Caller ability token.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual int NotifyFormUpdate(
-        const int64_t formId,
-        const Want &want,
-        const sptr<IRemoteObject> &callerToken) override;
+    int NotifyFormUpdate(const int64_t formId, const Want &want, const sptr<IRemoteObject> &callerToken) override;
 
     /**
      * @brief Event notify when change the form visible.
@@ -96,7 +86,7 @@ public:
      * @param callerToken Caller ability token.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual int EventNotify(const std::vector<int64_t> &formIds, const int32_t formVisibleType, const Want &want,
+    int EventNotify(const std::vector<int64_t> &formIds, const int32_t formVisibleType, const Want &want,
         const sptr<IRemoteObject> &callerToken) override;
 
     /**
@@ -107,10 +97,7 @@ public:
      * @param callerToken Caller ability token.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual int NotifyFormCastTempForm(
-        const int64_t formId,
-        const Want &want,
-        const sptr<IRemoteObject> &callerToken) override;
+    int NotifyFormCastTempForm(const int64_t formId, const Want &want, const sptr<IRemoteObject> &callerToken) override;
 
     /**
      * @brief Fire message event to form provider.
@@ -120,10 +107,7 @@ public:
      * @param callerToken Form provider proxy object.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual int FireFormEvent(
-        const int64_t formId,
-        const std::string &message,
-        const Want &want,
+    int FireFormEvent(const int64_t formId, const std::string &message, const Want &want,
         const sptr<IRemoteObject> &callerToken) override;
 
     /**
@@ -134,8 +118,8 @@ public:
      * @param callerToken Form provider proxy object.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual int AcquireState(const Want &wantArg, const std::string &provider, const Want &want,
-                             const sptr<IRemoteObject> &callerToken) override;
+    int AcquireState(const Want &wantArg, const std::string &provider, const Want &want,
+        const sptr<IRemoteObject> &callerToken) override;
 
     /**
      * @brief Acquire to share form information data. This is sync API.
@@ -145,7 +129,7 @@ public:
      * @param requestCode Indicates the request code of this share form.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual int32_t AcquireShareFormData(int64_t formId, const std::string &remoteDeviceId,
+    int32_t AcquireShareFormData(int64_t formId, const std::string &remoteDeviceId,
         const sptr<IRemoteObject> &formSupplyCallback, int64_t requestCode) override;
 
     /**
@@ -155,7 +139,7 @@ public:
      * @param requestCode Indicates the request code.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual int32_t AcquireFormData(int64_t formId, const sptr<IRemoteObject> &formSupplyCallback,
+    int32_t AcquireFormData(int64_t formId, const sptr<IRemoteObject> &formSupplyCallback,
         int64_t requestCode) override
     {
         return ERR_OK;
@@ -176,7 +160,7 @@ public:
      * @return none.
      */
     void ClearOwner(const std::shared_ptr<Ability> ability);
-    
+
 protected:
     bool CheckIsSystemApp() const;
     int HandleDisconnect(const Want &want, const sptr<IRemoteObject> &callerToken);
@@ -187,6 +171,7 @@ protected:
     void HandleRemoteAcquire(const FormJsInfo &formJsInfo, const FormProviderInfo &formProviderInfo,
         const Want &want, const sptr<IRemoteObject> &token);
     bool IsCallBySelfBundle();
+
 private:
     std::shared_ptr<Ability> GetOwner();
     /**
@@ -198,7 +183,8 @@ private:
      * @param callerToken callerToken
      * @return int32_t The error code (functional/HandleDisconnect).
      */
-    int32_t DCRtnHelper(const int &errCode, const Want &want, const sptr<IRemoteObject> &callerToken);
+    int DCRtnHelper(const int &errCode, const Want &want, const sptr<IRemoteObject> &callerToken);
+
 private:
     DISALLOW_COPY_AND_MOVE(FormProviderClient);
     mutable std::mutex abilityMutex_;
@@ -206,4 +192,4 @@ private:
 };
 } // namespace AppExecFwk
 } // namespace OHOS
-#endif // OHOS_ABILITY_RUNTIME_FORM_PROVIDER_CLIENT_H
+#endif // OHOS_FORM_FWK_FORM_PROVIDER_CLIENT_H
