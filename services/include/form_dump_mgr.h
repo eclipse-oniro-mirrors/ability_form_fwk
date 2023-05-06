@@ -19,8 +19,9 @@
 #include <singleton.h>
 
 #include "form_db_info.h"
-#include "form_host_record.h"
 #include "form_dump_mgr.h"
+#include "form_host_record.h"
+#include "form_info_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -45,6 +46,12 @@ public:
      * @param formInfos Form dump infos.
      */
     void DumpTemporaryFormInfos(const std::vector<FormRecord> &formRecordInfos, std::string &formInfos) const;
+    /**
+     * @brief Dump form infos of all bundles, this is static info.
+     * @param bundleFormInfos Form infos from bundle.
+     * @param formInfos Form dump infos.
+     */
+    void DumpStaticBundleFormInfos(const std::vector<FormInfo> &bundleFormInfos, std::string &formInfos) const;
     /**
      * @brief Dump form infos.
      * @param formRecordInfos Form record infos.

@@ -726,6 +726,18 @@ int FormMgrAdapter::DumpTemporaryFormInfos(std::string &formInfos) const
     FormDumpMgr::GetInstance().DumpTemporaryFormInfos(formRecordInfos, formInfos);
     return ERR_OK;
 }
+
+int FormMgrAdapter::DumpStaticBundleFormInfos(std::string &formInfos) const
+{
+    HILOG_INFO("call");
+    std::vector<FormInfo> bundleFormInfos;
+    if (FormInfoMgr::GetInstance().GetAllFormsInfo(bundleFormInfos) != ERR_OK) {
+        HILOG_ERROR("GetAllFormsInfo failed.");
+        return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
+    }
+    FormDumpMgr::GetInstance().DumpStaticBundleFormInfos(bundleFormInfos, formInfos);
+    return ERR_OK;
+}
 /**
  * @brief Dump form info by a bundle name.
  * @param bundleName The bundle name of form provider.
