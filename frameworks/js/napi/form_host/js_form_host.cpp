@@ -1378,14 +1378,14 @@ private:
         FormInstancesFilter filter;
         if (info.argv[PARAM0]->TypeOf() != NATIVE_OBJECT) {
             HILOG_ERROR("input params is not object!");
-            NapiFormUtil::ThrowParamTypeError(engine, "formInstancesFilter", "object");
+            NapiFormUtil::ThrowParamTypeError(engine, "formProviderFilter", "object");
             return engine.CreateUndefined();
         } 
         auto arg = reinterpret_cast<napi_value>(info.argv[PARAM0]);
         auto env = reinterpret_cast<napi_env>(&engine);
         if (!ParseParam(env, arg, filter)) {
             HILOG_ERROR("input params parse failed!");
-            NapiFormUtil::ThrowParamTypeError(engine, "formInstancesFilter", "object");
+            NapiFormUtil::ThrowParamTypeError(engine, "formProviderFilter", "object");
             return engine.CreateUndefined();
         }
         if (info.argc == ARGS_TWO && info.argv[PARAM1]->TypeOf() != NATIVE_FUNCTION) {
