@@ -78,6 +78,10 @@ public:
     MOCK_METHOD2(GetFormInstancesByFilter, int32_t(const FormInstancesFilter &formInstancesFilter,
         std::vector<FormInstance> &formInstances));
     MOCK_METHOD2(GetFormInstanceById, int32_t(const int64_t formId, FormInstance &formInstances));
+    MOCK_METHOD2(RegisterFormAddObserverByBundle, ErrCode(const std::string bundleName,
+        const sptr<IRemoteObject> &callerToken));
+    MOCK_METHOD2(RegisterFormRemoveObserverByBundle, ErrCode(const std::string bundleName,
+        const sptr<IRemoteObject> &callerToken));
 };
 }
 }
