@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,7 +18,8 @@
 #include <gtest/gtest.h>
 #include "gmock/gmock.h"
 #include "form_mgr_stub.h"
-
+#include "form_instance.h"
+#include "form_instances_filter.h"
 namespace OHOS {
 namespace AppExecFwk {
 class MockFormMgrService : public FormMgrStub {
@@ -71,6 +72,9 @@ public:
         AAFwk::WantParams &formData));
     MOCK_METHOD2(GetFormsCount, int32_t(bool isTempFormFlag, int32_t &formCount));
     MOCK_METHOD2(GetHostFormsCount, int32_t(std::string &bundleName, int32_t &formCount));
+    MOCK_METHOD2(GetFormInstancesByFilter, int32_t(const FormInstancesFilter &formInstancesFilter,
+        std::vector<FormInstance> &formInstances));
+    MOCK_METHOD2(GetFormInstanceById, int32_t(const int64_t formId, FormInstance &formInstances));
 };
 }
 }

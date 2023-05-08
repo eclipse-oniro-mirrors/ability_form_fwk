@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1856,6 +1856,78 @@ int32_t FormDataMgr::GetHostFormsCount(const std::string &bundleName, int32_t &f
         }
     }
     HILOG_DEBUG("%{public}s, current exist %{public}d cast forms in host", __func__, formCount);
+    return ERR_OK;
+}
+
+int32_t FormDataMgr::GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
+        std::vector<FormInstance> &formInstances)
+{
+    HILOG_DEBUG("get form instances by filter");
+    std::lock_guard<std::recursive_mutex> lock(formRecordMutex_);
+    std::map<int64_t, FormRecord>::iterator itFormRecord;
+    if(formInstancesFilter.bundleName.empty()) {
+        HILOG_ERROR("formInstancesFilter.bundleName is null");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    for (itFormRecord = formRecords_.begin(); itFormRecord != formRecords_.end(); itFormRecord++) {
+        if (formInstancesFilter.bundleName == itFormRecord->second.bundleName) {
+            bool Needgetformhostrecordflag = true;
+            if (!formInstancesFilter.moduleName.empty() &&
+                formInstancesFilter.moduleName != itFormRecord->second.moduleName) {
+                Needgetformhostrecordflag = false;
+            } else if (!formInstancesFilter.abilityName.empty() &&
+                formInstancesFilter.abilityName != itFormRecord->second.abilityName) {
+                Needgetformhostrecordflag = false;
+            } else if (!formInstancesFilter.formName.empty() &&
+                formInstancesFilter.formName != itFormRecord->second.formName) {
+                Needgetformhostrecordflag = false;
+            }
+            std::vector<FormHostRecord> formHostRecords;
+            GetFormHostRecord(itFormRecord->second.formId, formHostRecords);
+            if (Needgetformhostrecordflag) {
+                FormInstance instance;
+                for (auto formHostRecord : formHostRecords) {
+                    instance.formHostName = formHostRecord.GetHostBundleName();
+                    instance.formId = itFormRecord->second.formId;
+                    instance.specification = itFormRecord->second.specification;
+                    instance.formVisiblity = itFormRecord->second.isVisible ?
+                        FormVisibilityType::VISIBLE : FormVisibilityType::INVISIBLE;
+                    instance.bundleName = itFormRecord->second.bundleName;
+                    instance.moduleName = itFormRecord->second.moduleName;
+                    instance.abilityName = itFormRecord->second.abilityName;
+                    instance.formName = itFormRecord->second.formName;
+                    formInstances.emplace_back(instance);
+                }
+            }
+        }
+    }
+    return ERR_OK;
+}
+
+int32_t FormDataMgr::GetFormInstanceById(const int64_t formId, FormInstance &formInstance)
+{
+    HILOG_DEBUG("get form instance by formId");
+    std::lock_guard<std::recursive_mutex> lock(formRecordMutex_);
+    if (formId <= 0) {
+        HILOG_ERROR("formId is invalid");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    auto info = formRecords_.find(formId);
+    if (info != formRecords_.end()) {
+        FormRecord formRecord = info->second;
+        std::vector<FormHostRecord> formHostRecords;
+        GetFormHostRecord(formId, formHostRecords);
+        formInstance.formHostName = formHostRecords.begin()->GetHostBundleName();
+        formInstance.formId = formRecord.formId;
+        formInstance.specification = formRecord.specification;
+        formInstance.formVisiblity = formRecord.isVisible ? FormVisibilityType::VISIBLE : FormVisibilityType::INVISIBLE;
+        formInstance.bundleName = formRecord.bundleName;
+        formInstance.moduleName = formRecord.moduleName;
+        formInstance.abilityName = formRecord.abilityName;
+        formInstance.formName = formRecord.formName;
+    }
+    HILOG_DEBUG("get form instance successfully");
     return ERR_OK;
 }
 }  // namespace AppExecFwk
