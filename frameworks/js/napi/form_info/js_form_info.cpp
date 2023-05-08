@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -86,6 +86,7 @@ NativeValue* CreateJsFormVisibilityType(NativeEngine &engine)
 {
     NativeValue* objValue = engine.CreateObject();
     NativeObject* object = ConvertNativeValueTo<NativeObject>(objValue);
+    object->SetProperty("UNKNOWN", CreateJsValue(engine, AppExecFwk::Constants::UNKNOWN));
     object->SetProperty("FORM_VISIBLE", CreateJsValue(engine, AppExecFwk::Constants::FORM_VISIBLE));
     object->SetProperty("FORM_INVISIBLE", CreateJsValue(engine, AppExecFwk::Constants::FORM_INVISIBLE));
     return objValue;

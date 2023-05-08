@@ -211,4 +211,28 @@ HWTEST_F(FmsFormMgrDumpTest, Dump_007, TestSize.Level0)
 
     GTEST_LOG_(INFO) << "fms_form_mgr_dump_test_007 end";
 }
+
+/*
+ * Feature: FormMgrService
+ * Function: FormMgr
+ * SubFunction: Dump Function
+ * FunctionPoints: FormMgr Dump interface
+ * EnvConditions: Mobile that can run ohos test framework
+ * CaseDescription: Verify if FormMgr invoke dump static-form-info works.
+ */
+HWTEST_F(FmsFormMgrDumpTest, Dump_008, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "fms_form_mgr_dump_test_008 start";
+
+    std::vector<std::u16string> args = {u"-b"};
+    std::string result;
+    formyMgrServ_->Dump(args, result);
+    EXPECT_EQ(result.find("error"), string::npos);
+
+    args[0] = u"--bundle-form-info";
+    formyMgrServ_->Dump(args, result);
+    EXPECT_EQ(result.find("error"), string::npos);
+
+    GTEST_LOG_(INFO) << "fms_form_mgr_dump_test_008 end";
+}
 }

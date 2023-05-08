@@ -3853,4 +3853,20 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_197, TestSize.Level0)
 
     GTEST_LOG_(INFO) << "FormMgrAdapter_197 end";
 }
+
+/**
+ * @tc.name: FormMgrAdapter_198
+ * @tc.desc: test DumpStaticBundleFormInfos function and the return OK when temp form count is not zero.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_198, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_198 start";
+    FormMgrAdapter formMgrAdapter;
+    std::string formInfos;
+    EXPECT_EQ(ERR_OK, formMgrAdapter.DumpStaticBundleFormInfos(formInfos));
+    EXPECT_EQ(false, formInfos.empty());
+
+    GTEST_LOG_(INFO) << "FormMgrAdapter_198 end";
+}
 }

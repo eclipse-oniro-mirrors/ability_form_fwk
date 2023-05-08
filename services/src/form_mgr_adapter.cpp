@@ -726,6 +726,18 @@ int FormMgrAdapter::DumpTemporaryFormInfos(std::string &formInfos) const
     FormDumpMgr::GetInstance().DumpTemporaryFormInfos(formRecordInfos, formInfos);
     return ERR_OK;
 }
+
+int FormMgrAdapter::DumpStaticBundleFormInfos(std::string &formInfos) const
+{
+    HILOG_INFO("call");
+    std::vector<FormInfo> bundleFormInfos;
+    if (FormInfoMgr::GetInstance().GetAllFormsInfo(bundleFormInfos) != ERR_OK) {
+        HILOG_ERROR("GetAllFormsInfo failed.");
+        return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
+    }
+    FormDumpMgr::GetInstance().DumpStaticBundleFormInfos(bundleFormInfos, formInfos);
+    return ERR_OK;
+}
 /**
  * @brief Dump form info by a bundle name.
  * @param bundleName The bundle name of form provider.
@@ -2491,11 +2503,23 @@ ErrCode FormMgrAdapter::GetRunningFormInfos(std::vector<RunningFormInfo> &runnin
     FormDataMgr::GetInstance().GetRunningFormInfos(runningFormInfos);
     return ERR_OK;
 }
+
 ErrCode FormMgrAdapter::GetRunningFormInfosByBundleName(const std::string &bundleName,
     std::vector<RunningFormInfo> &runningFormInfos)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     return FormDataMgr::GetInstance().GetRunningFormInfosByBundleName(bundleName, runningFormInfos);
+}
+
+int32_t FormMgrAdapter::GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
+    std::vector<FormInstance> &formInstances)
+{
+    return FormDataMgr::GetInstance().GetFormInstancesByFilter(formInstancesFilter, formInstances);
+}
+
+int32_t FormMgrAdapter::GetFormInstanceById(const int64_t formId, FormInstance &formInstance)
+{
+    return FormDataMgr::GetInstance().GetFormInstanceById(formId, formInstance);
 }
 } // namespace AppExecFwk
 } // namespace OHOS

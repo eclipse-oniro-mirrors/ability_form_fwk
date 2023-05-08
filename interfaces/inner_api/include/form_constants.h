@@ -65,7 +65,8 @@ namespace Constants {
     constexpr int32_t TYPE_STATIC_UPDATE = 2;
     constexpr int32_t TYPE_DYNAMIC_UPDATE = 3;
     const long ABS_REFRESH_MS = 2500;
-
+    
+    constexpr int32_t UNKNOWN = 0;
     // The form events type which means that the form becomes visible.
     constexpr int32_t FORM_VISIBLE = 1;
     // The form events type which means that the form becomes invisible.
@@ -183,6 +184,7 @@ namespace Constants {
     constexpr const char* FORM_JOURNAL_MODE = "WAL";
     constexpr const char* FORM_SYNC_MODE = "FULL";
     constexpr int32_t FORM_RDB_VERSION = 1;
+    constexpr const char* FORM_RDB_FILE_TYPE = "";
     constexpr const char* FORM_RENDER_TYPE_KEY = "form_render_type";
     constexpr int32_t RENDER_FORM = 0; // default value
     constexpr int32_t UPDATE_RENDERING_FORM = 1;

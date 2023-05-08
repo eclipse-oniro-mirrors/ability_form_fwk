@@ -13,35 +13,33 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_FORM_FWK_RUNNING_FORM_INFO_H
-#define OHOS_FORM_FWK_RUNNING_FORM_INFO_H
+#ifndef FOUNDATION_APPEXECFWK_OHOS_FORM_INSTANCE_H
+#define FOUNDATION_APPEXECFWK_OHOS_FORM_INSTANCE_H
 
-#include <singleton.h>
 #include <string>
-
-#include "form_instance.h"
 #include "parcel.h"
 
 namespace OHOS {
 namespace AppExecFwk {
-/**
- * @struct RunningFormInfo
- * Defines running form info.
- */
-struct RunningFormInfo : public Parcelable {
-    int64_t formId;
-    std::string formName;
-    std::string bundleName;
-    std::string moduleName;
-    std::string abilityName;
-    int32_t dimension;
-    std::string hostBundleName;
-    FormVisibilityType formVisiblity = FormVisibilityType::UNKNOWN;
+enum class FormVisibilityType {
+    UNKNOWN = 0,
+    VISIBLE,
+    INVISIBLE,
+};
 
+struct FormInstance : public Parcelable {
+    int64_t formId = 0;
+    std::string formHostName = "";
+    FormVisibilityType formVisiblity = FormVisibilityType::UNKNOWN;
+    int32_t specification = 0;
+    std::string bundleName = "";
+    std::string moduleName = "";
+    std::string abilityName = "";
+    std::string formName = "";
     bool ReadFromParcel(Parcel &parcel);
     bool Marshalling(Parcel &parcel) const override;
-    static RunningFormInfo *Unmarshalling(Parcel &parcel);
+    static FormInstance *Unmarshalling(Parcel &parcel);
 };
 } // namespace AppExecFwk
 } // namespace OHOS
-#endif // OHOS_FORM_FWK_RUNNING_FORM_INFO_H
+#endif // FOUNDATION_APPEXECFWK_OHOS_FORM_INSTANCE_H

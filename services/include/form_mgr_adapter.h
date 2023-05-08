@@ -21,6 +21,8 @@
 #include "bundle_info.h"
 #include "bundle_mgr_interface.h"
 #include "form_info.h"
+#include "form_instance.h"
+#include "form_instances_filter.h"
 #include "form_item_info.h"
 #include "form_js_info.h"
 #include "form_provider_data.h"
@@ -127,6 +129,12 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     int DumpTemporaryFormInfos(std::string &formInfos) const;
+    /**
+     * @brief Dump form infos of all bundles, this is static info.
+     * @param formInfos All of static form infos.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int DumpStaticBundleFormInfos(std::string &formInfos) const;
     /**
      * @brief Dump form info by a bundle name.
      * @param bundleName The bundle name of form provider.
@@ -339,6 +347,23 @@ public:
      */
     ErrCode GetRunningFormInfosByBundleName(const std::string &bundleName,
         std::vector<RunningFormInfo> &runningFormInfos);
+
+    /**
+     * @brief Get form instances by filter info.
+     * @param formInstancesFilter includes bundleName, moduleName, formName, abilityName to get formInstances.
+     * @param formInstances return formInstances
+     * @return return ERR_OK on get info success,other on failure.
+     */
+    int32_t GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
+        std::vector<FormInstance> &formInstances);
+
+    /**
+     * @brief Get form instance by formId.
+     * @param formId formId Indicates the unique id of form.
+     * @param formInstance return formInstance
+     * @return return ERR_OK on get info success,other on failure.
+     */
+    int32_t GetFormInstanceById(const int64_t formId, FormInstance &formInstance);
 private:
     /**
      * @brief Get form configure info.

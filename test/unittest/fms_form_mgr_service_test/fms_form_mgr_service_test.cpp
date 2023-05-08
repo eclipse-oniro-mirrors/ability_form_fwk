@@ -970,4 +970,21 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0052, TestSize.Level1)
 
     GTEST_LOG_(INFO) << "FormMgrService_0052 end";
 }
+
+/**
+ * @tc.number: FormMgrService_0053
+ * @tc.name: test HiDumpStaticBundleFormInfos function.
+ * @tc.desc: Verify that the HiDumpStaticBundleFormInfos interface is available.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0053, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0053 start";
+    FormMgrService formMgrService;
+    std::string args;
+    std::string formInfo;
+    formMgrService.HiDumpStaticBundleFormInfos(args, formInfo);
+    EXPECT_EQ(false, formInfo.empty());
+
+    GTEST_LOG_(INFO) << "FormMgrService_0053 end";
+}
 }

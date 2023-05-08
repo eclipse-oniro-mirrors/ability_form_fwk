@@ -21,6 +21,8 @@
 
 #include "form_bundle_event_callback.h"
 #include "form_event_handler.h"
+#include "form_instance.h"
+#include "form_instances_filter.h"
 #include "form_mgr_stub.h"
 #include "form_provider_data.h"
 #include "form_sys_event_receiver.h"
@@ -394,6 +396,24 @@ public:
      */
     ErrCode GetRunningFormInfosByBundleName(const std::string &bundleName,
         std::vector<RunningFormInfo> &runningFormInfos) override;
+
+    /**
+     * @brief Get form instances by filter info.
+     * @param formInstancesFilter include bundleName, moduleName, formName, abilityName to get formInstances.
+     * @param formInstances return formInstances
+     * @return return ERR_OK on get info success,other on failure.
+     */
+    int32_t GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
+        std::vector<FormInstance> &formInstances) override;
+
+    /**
+     * @brief Get form instances by formId.
+     * @param formId formId Indicates the unique id of form.
+     * @param formInstance return formInstance
+     * @return return ERR_OK on get info success,other on failure.
+     */
+    int32_t GetFormInstanceById(const int64_t formId, FormInstance &formInstance) override;
+
 private:
     enum class DumpKey {
         KEY_DUMP_HELP = 0,
@@ -401,6 +421,7 @@ private:
         KEY_DUMP_BY_BUNDLE_NAME,
         KEY_DUMP_BY_FORM_ID,
         KEY_DUMP_TEMPORARY,
+        KEY_DUMP_STATIC,
     };
     /**
      * @brief initialization of form manager service.
@@ -419,6 +440,7 @@ private:
     void HiDumpHelp([[maybe_unused]] const std::string &args, std::string &result);
     void HiDumpStorageFormInfos([[maybe_unused]] const std::string &args, std::string &result);
     void HiDumpTemporaryFormInfos([[maybe_unused]] const std::string &args, std::string &result);
+    void HiDumpStaticBundleFormInfos([[maybe_unused]] const std::string &args, std::string &result);
     void HiDumpFormInfoByBundleName(const std::string &args, std::string &result);
     void HiDumpFormInfoByFormId(const std::string &args, std::string &result);
     bool CheckCallerIsSystemApp() const;

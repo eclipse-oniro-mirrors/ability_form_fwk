@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,6 +19,8 @@
 #include <vector>
 #include "form_info.h"
 #include "form_info_filter.h"
+#include "form_instance.h"
+#include "form_instances_filter.h"
 #include "form_js_info.h"
 #include "form_provider_data.h"
 #include "form_share_info.h"
@@ -371,6 +373,22 @@ public:
     virtual ErrCode GetRunningFormInfosByBundleName(const std::string &bundleName,
         std::vector<RunningFormInfo> &runningFormInfos) = 0;
 
+    /**
+    * @brief Get form instances by filter info.
+    * @param formInstancesFilter includes bundleName, moduleName, formName, abilityName to get formInstances.
+    * @param formInstances return formInstances
+    * @return return ERR_OK on get info success,other on failure.
+    */
+    virtual int32_t GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
+        std::vector<FormInstance> &formInstances) = 0;
+
+   /**
+    * @brief Get form instance by formId.
+    * @param formId formId Indicates the unique id of form.
+    * @param formInstance return formInstance
+    * @return return true on get info success,other on failure.
+    */
+    virtual int32_t GetFormInstanceById(const int64_t formId, FormInstance &formInstance) = 0;
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -424,6 +442,8 @@ public:
         FORM_MGR_GET_HOST_FORMS_COUNT,
         FORM_MGR_GET_RUNNING_FORM_INFOS,
         FORM_MGR_GET_RUNNING_FORM_INFOS_BY_BUNDLE,
+        FORM_MGR_GET_FORM_INSTANCES_FROM_BY_FILTER,
+        FORM_MGR_GET_FORM_INSTANCES_FROM_BY_ID,
     };
 };
 }  // namespace AppExecFwk
