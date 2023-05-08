@@ -24,6 +24,7 @@
 #include "form_record.h"
 #include "form_state_info.h"
 #include "iremote_object.h"
+#include "running_form_info.h"
 #include "want.h"
 
 namespace OHOS {
@@ -201,6 +202,12 @@ public:
 
     void PostReloadForm(const std::vector<int64_t> &&formIds, const Want &want,
         const sptr<IRemoteObject> &remoteObject);
+
+    void PostAddTaskToHost(const std::string bundleName, const sptr<IRemoteObject> &remoteObject,
+        const RunningFormInfo &runningFormInfo);
+
+    void PostRemoveTaskToHost(const std::string bundleName, const sptr<IRemoteObject> &remoteObject,
+        const RunningFormInfo &runningFormInfo);
 private:
     /**
      * @brief Acquire form data from form provider.
@@ -362,6 +369,12 @@ private:
     void StopRenderingForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject);
 
     void ReloadForm(const std::vector<int64_t> &&formIds, const Want &want, const sptr<IRemoteObject> &remoteObject);
+
+    void FormAdd(const std::string bundleName, const sptr<IRemoteObject> &remoteObject,
+        const RunningFormInfo &runningFormInfo);
+
+    void FormRemove(const std::string bundleName, const sptr<IRemoteObject> &remoteObject,
+        const RunningFormInfo &runningFormInfo);
 private:
     std::shared_ptr<FormEventHandler> eventHandler_ = nullptr;
 };

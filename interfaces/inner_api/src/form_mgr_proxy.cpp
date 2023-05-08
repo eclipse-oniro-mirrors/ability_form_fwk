@@ -1413,6 +1413,69 @@ int32_t FormMgrProxy::GetFormsCount(bool isTempFormFlag, int32_t &formCount)
     return result;
 }
 
+ErrCode FormMgrProxy::RegisterFormAddObserverByBundle(const std::string bundleName,
+    const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_DEBUG("start.");
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("failed to write interface token.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteString(bundleName)) {
+        HILOG_ERROR("failed to write bundleName.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteRemoteObject(callerToken)) {
+        HILOG_ERROR("failed to write callerToken.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_ASYNC);
+    auto error = Remote()->SendRequest(
+        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_FORM_ADD_OBSERVER_BY_BUNDLE), data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("failed to SendRequest: %{public}d", error);
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+    return reply.ReadInt32();
+}
+
+ErrCode FormMgrProxy::RegisterFormRemoveObserverByBundle(const std::string bundleName,
+    const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_DEBUG("start.");
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("failed to write interface token.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteString(bundleName)) {
+        HILOG_ERROR("failed to write bundleName.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteRemoteObject(callerToken)) {
+        HILOG_ERROR("failed to write callerToken.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_ASYNC);
+    auto error = Remote()->SendRequest(
+        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_FORM_REMOVE_OBSERVER_BY_BUNDLE),
+        data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("failed to SendRequest: %{public}d", error);
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+    return reply.ReadInt32();
+}
+
 int32_t FormMgrProxy::GetHostFormsCount(std::string &bundleName, int32_t &formCount)
 {
     HILOG_INFO("%{public}s start.", __func__);

@@ -65,6 +65,10 @@ public:
     MOCK_METHOD1(GetRunningFormInfos, ErrCode(std::vector<RunningFormInfo> &runningFormInfos));
     MOCK_METHOD2(GetRunningFormInfosByBundleName, ErrCode(const std::string &bundleName,
         std::vector<RunningFormInfo> &runningFormInfos));
+    MOCK_METHOD2(RegisterFormAddObserverByBundle, ErrCode(const std::string bundleName,
+        const sptr<IRemoteObject> &callerToken));
+    MOCK_METHOD2(RegisterFormRemoveObserverByBundle, ErrCode(const std::string bundleName,
+        const sptr<IRemoteObject> &callerToken));
 };
 }
 }

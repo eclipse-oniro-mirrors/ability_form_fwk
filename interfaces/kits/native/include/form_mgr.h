@@ -428,6 +428,22 @@ public:
     std::string GetErrorMsgByExternalErrorCode(int32_t externalErrorCode);
 
     /**
+     * @brief Register form add observer by bundle.
+     * @param bundleName BundleName of the form host
+     * @param callerToken Caller ability token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RegisterFormAddObserverByBundle(const std::string bundleName, const sptr<IRemoteObject> &callerToken);
+
+    /**
+     * @brief Register form remove observer by bundle.
+     * @param bundleName BundleName of the form host
+     * @param callerToken Caller ability token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RegisterFormRemoveObserverByBundle(const std::string bundleName, const sptr<IRemoteObject> &callerToken);
+
+    /**
     * @brief get forms count.
     * @param isTempFormFlag Indicates temp form or not.
     * @param formCount Returns the number of the cast or temp form.

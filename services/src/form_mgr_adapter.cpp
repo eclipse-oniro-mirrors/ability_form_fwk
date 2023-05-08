@@ -40,6 +40,7 @@
 #include "form_event_notify_connection.h"
 #include "form_info_mgr.h"
 #include "form_mgr_errors.h"
+#include "form_observer_record.h"
 #include "form_provider_info.h"
 #include "form_provider_interface.h"
 #include "form_provider_mgr.h"
@@ -103,6 +104,7 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
     bool tempFormFlag = want.GetBoolParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
     int callingUid = IPCSkeleton::GetCallingUid();
     int checkCode = 0;
+    auto ret = 0;
     if (tempFormFlag && !FormRenderMgr::GetInstance().IsRerenderForRenderServiceDied(formId)) {
         if (formId > 0) {
             HILOG_ERROR("%{public}s fail, temp form id is invalid, formId:%{public}" PRId64 "", __func__, formId);
@@ -132,7 +134,15 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
 
     // publish form
     if (formId > 0 && FormDataMgr::GetInstance().IsRequestPublishForm(formId)) {
-        return AddRequestPublishForm(formItemInfo, want, callerToken, formInfo);
+        ret = AddRequestPublishForm(formItemInfo, want, callerToken, formInfo);
+        if (ret != ERR_OK) {
+            HILOG_ERROR("failed, add request publish form failed.");
+            return ret;
+        }
+        if (!tempFormFlag && (ret == ERR_OK)) {
+            HILOG_DEBUG("Checks if there is a listener listening for adding form");
+            ret = HandleFormAddObserver(formInfo.formId);
+        }
     }
 
     Want newWant(want);
@@ -148,10 +158,49 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
         DelayedSingleton<FormShareMgr>::GetInstance()->AddProviderData(newWant, wantParams);
     }
     if (formId > 0) {
-        return AllotFormById(formItemInfo, callerToken, wantParams, formInfo);
+        ret = AllotFormById(formItemInfo, callerToken, wantParams, formInfo);
     } else {
-        return AllotFormByInfo(formItemInfo, callerToken, wantParams, formInfo);
+        ret = AllotFormByInfo(formItemInfo, callerToken, wantParams, formInfo);
+        if (!tempFormFlag && (ret == ERR_OK)) {
+            HILOG_DEBUG("Checks if there is a listener listening for adding form");
+            ret = HandleFormAddObserver(formInfo.formId);
+        }
     }
+
+    if (ret != ERR_OK) {
+        HILOG_ERROR("failed, allot form failed.");
+        return ret;
+    }
+
+    return ret;
+}
+
+ErrCode FormMgrAdapter::HandleFormAddObserver(const int64_t formId)
+{
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    std::string hostBundleName;
+    auto ret = FormBmsHelper::GetInstance().GetCallerBundleName(hostBundleName);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("failed to get BundleName");
+        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+    }
+
+    // Checks if there is a observer on the current host.
+    return FormDataMgr::GetInstance().HandleFormAddObserver(hostBundleName, formId);
+}
+
+ErrCode FormMgrAdapter::HandleFormRemoveObserver(const RunningFormInfo runningFormInfo)
+{
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    std::string hostBundleName;
+    auto ret = FormBmsHelper::GetInstance().GetCallerBundleName(hostBundleName);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("failed to get BundleName");
+        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+    }
+
+    // Checks if there is a observer on the current host.
+    return FormDataMgr::GetInstance().HandleFormRemoveObserver(hostBundleName, runningFormInfo);
 }
 
 /**
@@ -175,7 +224,16 @@ int FormMgrAdapter::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
         // delete temp form if receive delete form call
         return HandleDeleteTempForm(matchedFormId, callerToken);
     }
-    return HandleDeleteForm(matchedFormId, callerToken);
+    RunningFormInfo runningFormInfo;
+    auto ret = FormDataMgr::GetInstance().GetRunningFormInfosByFormId(matchedFormId, runningFormInfo);
+    ret = HandleDeleteForm(matchedFormId, callerToken);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("delete form failed.");
+        return ret;
+    }
+    HILOG_DEBUG("Checks if there is a listener listening for release form");
+    HandleFormRemoveObserver(runningFormInfo);
+    return ERR_OK;
 }
 
 /**
@@ -197,7 +255,6 @@ int FormMgrAdapter::StopRenderingForm(const int64_t formId, const std::string &c
     FormRenderMgr::GetInstance().StopRenderingForm(formId, record, compId);
     return ERR_OK;
 }
-
 
 /**
  * @brief Release forms with formIds, send formIds to form Mgr service.
@@ -951,7 +1008,6 @@ ErrCode FormMgrAdapter::AddExistFormRecord(const FormItemInfo &info, const sptr<
     if (errorCode != ERR_OK) {
         return errorCode;
     }
-
     if (!newRecord.formTempFlag) {
         return FormDbCache::GetInstance().UpdateDBRecord(formId, newRecord);
     }
@@ -1031,7 +1087,6 @@ ErrCode FormMgrAdapter::AddNewFormRecord(const FormItemInfo &info, const int64_t
     if (info.GetProviderBundleName() != info.GetHostBundleName()) {
         return AddFormTimer(formRecord);
     }
-
     return ERR_OK;
 }
 
@@ -2480,6 +2535,20 @@ bool FormMgrAdapter::checkFormHostHasSaUid(const FormRecord &formRecord)
 {
     return std::find(formRecord.formUserUids.begin(), formRecord.formUserUids.end(),
         SYSTEM_UID) != formRecord.formUserUids.end();
+}
+
+ErrCode FormMgrAdapter::RegisterFormAddObserverByBundle(const std::string bundleName,
+    const sptr<IRemoteObject> &callerToken)
+{
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    return FormObserverRecord::GetInstance().SetFormAddObserver(bundleName, callerToken);
+}
+
+ErrCode FormMgrAdapter::RegisterFormRemoveObserverByBundle(const std::string bundleName,
+    const sptr<IRemoteObject> &callerToken)
+{
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    return FormObserverRecord::GetInstance().SetFormRemoveObserver(bundleName, callerToken);
 }
 
 int32_t FormMgrAdapter::GetFormsCount(bool isTempFormFlag, int32_t &formCount)
