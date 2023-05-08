@@ -231,6 +231,7 @@ ohos_shared_library("form_manager") {
     "interfaces/inner_api/src/form_supply_stub.cpp",
     "interfaces/inner_api/src/provider_connect_proxy.cpp",
     "interfaces/inner_api/src/provider_connect_stub.cpp",
+    "interfaces/inner_api/src/running_form_info.cpp",
   ]
 
   configs = [ ":formmgr_log_config" ]
@@ -248,6 +249,7 @@ ohos_shared_library("form_manager") {
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "napi:ace_napi",
   ]
 
   subsystem_name = "ability"

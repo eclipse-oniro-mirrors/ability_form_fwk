@@ -1086,6 +1086,29 @@ int32_t FormMgrService::GetHostFormsCount(std::string &bundleName, int32_t &form
     return FormMgrAdapter::GetInstance().GetHostFormsCount(bundleName, formCount);
 }
 
+ErrCode FormMgrService::GetRunningFormInfos(std::vector<RunningFormInfo> &runningFormInfos)
+{
+    HILOG_DEBUG("called.");
+    ErrCode ret = CheckFormPermission();
+    if (ret != ERR_OK) {
+        HILOG_ERROR("fail, delete form permission denied");
+        return ret;
+    }
+    return FormMgrAdapter::GetInstance().GetRunningFormInfos(runningFormInfos);
+}
+
+ErrCode FormMgrService::GetRunningFormInfosByBundleName(const std::string &bundleName,
+    std::vector<RunningFormInfo> &runningFormInfos)
+{
+    HILOG_DEBUG("called.");
+    ErrCode ret = CheckFormPermission();
+    if (ret != ERR_OK) {
+        HILOG_ERROR("fail, delete form permission denied");
+        return ret;
+    }
+    return FormMgrAdapter::GetInstance().GetRunningFormInfosByBundleName(bundleName, runningFormInfos);
+}
+
 int32_t FormMgrService::GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
     std::vector<FormInstance> &formInstances)
 {

@@ -307,6 +307,22 @@ private:
     int32_t HandleGetHostFormsCount(MessageParcel &data, MessageParcel &reply);
 
     /**
+     * @brief Handle get Running forms infos message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Return ERR_OK on success, others on failure.
+    */
+    ErrCode HandleGetRunningFormInfos(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle get Running forms infos by bundleName message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Return ERR_OK on success, others on failure.
+    */
+    ErrCode HandleGetRunningFormInfosByBundleName(MessageParcel &data, MessageParcel &reply);
+
+    /**
      * @brief Get form instances by filter info.
      * @param data input param
      * @param reply output param

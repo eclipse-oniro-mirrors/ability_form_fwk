@@ -112,6 +112,10 @@ FormMgrStub::FormMgrStub()
         &FormMgrStub::HandleGetFormsCount;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_HOST_FORMS_COUNT)] =
         &FormMgrStub::HandleGetHostFormsCount;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_RUNNING_FORM_INFOS)] =
+        &FormMgrStub::HandleGetRunningFormInfos;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_RUNNING_FORM_INFOS_BY_BUNDLE)] =
+        &FormMgrStub::HandleGetRunningFormInfosByBundleName;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORM_INSTANCES_FROM_BY_FILTER)] =
         &FormMgrStub::HandleGetFormInstancesByFilter;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORM_INSTANCES_FROM_BY_ID)] =
@@ -919,24 +923,6 @@ int32_t FormMgrStub::HandleGetFormsCount(MessageParcel &data, MessageParcel &rep
     return result;
 }
 
-int32_t FormMgrStub::HandleGetHostFormsCount(MessageParcel &data, MessageParcel &reply)
-{
-    HILOG_INFO("%{public}s called.", __func__);
-    std::string bundleName = data.ReadString();
-
-    int32_t formCount = 0;
-    int32_t result = GetHostFormsCount(bundleName, formCount);
-    if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    if (!reply.WriteInt32(formCount)) {
-        HILOG_ERROR("write formCount failed");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    return result;
-}
-
 int32_t FormMgrStub::HandleGetFormInstancesByFilter(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_DEBUG("called.");
@@ -973,6 +959,55 @@ int32_t FormMgrStub::HandleGetFormInstanceById(MessageParcel &data, MessageParce
         }
     }
     return ERR_OK;
+}
+
+int32_t FormMgrStub::HandleGetHostFormsCount(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    std::string bundleName = data.ReadString();
+
+    int32_t formCount = 0;
+    int32_t result = GetHostFormsCount(bundleName, formCount);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!reply.WriteInt32(formCount)) {
+        HILOG_ERROR("write formCount failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return result;
+}
+
+ErrCode FormMgrStub::HandleGetRunningFormInfos(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("called.");
+    std::vector<RunningFormInfo> runningFormInfos;
+    ErrCode result = GetRunningFormInfos(runningFormInfos);
+    reply.WriteInt32(result);
+    if (result == ERR_OK) {
+        if (!WriteParcelableVector(runningFormInfos, reply)) {
+            HILOG_ERROR("write failed");
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+    }
+    return result;
+}
+
+ErrCode FormMgrStub::HandleGetRunningFormInfosByBundleName(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("called.");
+    std::string bundleName = data.ReadString();
+    std::vector<RunningFormInfo> runningFormInfos;
+    ErrCode result = GetRunningFormInfosByBundleName(bundleName, runningFormInfos);
+    reply.WriteInt32(result);
+    if (result == ERR_OK) {
+        if (!WriteParcelableVector(runningFormInfos, reply)) {
+            HILOG_ERROR("write failed");
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+    }
+    return result;
 }
 
 /**

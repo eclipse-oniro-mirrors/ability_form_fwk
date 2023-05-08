@@ -18,6 +18,7 @@
 #include <cinttypes>
 #include <type_traits>
 
+#include "form_bms_helper.h"
 #include "form_cache_mgr.h"
 #include "form_constants.h"
 #include "form_mgr_errors.h"
@@ -26,6 +27,7 @@
 #include "form_util.h"
 #include "hilog_wrapper.h"
 #include "ipc_skeleton.h"
+#include "running_form_info.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -1928,6 +1930,72 @@ int32_t FormDataMgr::GetFormInstanceById(const int64_t formId, FormInstance &for
         formInstance.formName = formRecord.formName;
     }
     HILOG_DEBUG("get form instance successfully");
+    return ERR_OK;
+}
+
+void FormDataMgr::GetRunningFormInfos(std::vector<RunningFormInfo> &runningFormInfos)
+{
+    HILOG_DEBUG("start");
+    std::lock_guard<std::recursive_mutex> lock(formRecordMutex_);
+    for (auto record : formRecords_) {
+        if ((!record.second.formTempFlag) &&
+            ((FormUtil::GetCurrentAccountId() == record.second.providerUserId) ||
+            (record.second.providerUserId == Constants::DEFAULT_USER_ID))) {
+            RunningFormInfo info;
+            info.formId = record.first;
+            info.formName = record.second.formName;
+            info.dimension = record.second.specification;
+            info.bundleName = record.second.bundleName;
+            info.moduleName = record.second.moduleName;
+            info.abilityName = record.second.abilityName;
+            info.formVisiblity = record.second.isVisible ? FormVisibilityType::VISIBLE : FormVisibilityType::INVISIBLE;
+            std::vector<FormHostRecord> formHostRecords;
+            GetFormHostRecord(record.first, formHostRecords);
+            info.hostBundleName = formHostRecords.begin()->GetHostBundleName();
+            runningFormInfos.emplace_back(info);
+        }
+    }
+}
+
+ErrCode FormDataMgr::GetRunningFormInfosByBundleName(const std::string &bundleName,
+    std::vector<RunningFormInfo> &runningFormInfos)
+{
+    HILOG_DEBUG("start");
+
+    if (bundleName.empty()) {
+        HILOG_ERROR("bundleName is empty.");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    std::lock_guard<std::recursive_mutex> lock(formRecordMutex_);
+    for (auto record : formRecords_) {
+        for (auto uid : record.second.formUserUids) {
+            std::string hostBundleName = "";
+            auto ret = FormBmsHelper::GetInstance().GetBundleNameByUid(uid, hostBundleName);
+            if (ret != ERR_OK) {
+                return ret;
+            }
+            bool flag = (!record.second.formTempFlag) &&
+                ((FormUtil::GetCurrentAccountId() == record.second.providerUserId) ||
+                (record.second.providerUserId == Constants::DEFAULT_USER_ID));
+            if (hostBundleName == bundleName && flag) {
+                RunningFormInfo info;
+                info.formId = record.first;
+                info.formName = record.second.formName;
+                info.dimension = record.second.specification;
+                info.bundleName = record.second.bundleName;
+                info.hostBundleName = bundleName;
+                info.moduleName = record.second.moduleName;
+                info.abilityName = record.second.abilityName;
+                info.formVisiblity = record.second.isVisible ?
+                    FormVisibilityType::VISIBLE : FormVisibilityType::INVISIBLE;
+                runningFormInfos.emplace_back(info);
+            }
+        }
+    }
+    if (runningFormInfos.size() == 0) {
+        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+    }
     return ERR_OK;
 }
 }  // namespace AppExecFwk

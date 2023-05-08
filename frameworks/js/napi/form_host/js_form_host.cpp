@@ -362,6 +362,12 @@ public:
         return (me != nullptr) ? me->OnGetFormsInfo(*engine, *info) : nullptr;
     }
 
+    static NativeValue* GetRunningFormInfos(NativeEngine* engine, NativeCallbackInfo* info)
+    {
+        JsFormHost* me = CheckParamsAndGetThis<JsFormHost>(engine, info);
+        return (me != nullptr) ? me->OnGetRunningFormInfos(*engine, *info) : nullptr;
+    }
+
     static NativeValue* ShareForm(NativeEngine* engine, NativeCallbackInfo* info)
     {
         JsFormHost* me = CheckParamsAndGetThis<JsFormHost>(engine, info);
@@ -1199,6 +1205,72 @@ private:
         return result;
     }
 
+    NativeValue* OnGetRunningFormInfos(NativeEngine &engine, NativeCallbackInfo &info)
+    {
+        HILOG_DEBUG("called");
+        if (info.argc > ARGS_TWO) {
+            HILOG_ERROR("wrong number of arguments.");
+            NapiFormUtil::ThrowParamNumError(engine, std::to_string(info.argc), "0 or 1 or 2");
+            return engine.CreateUndefined();
+        }
+
+        decltype(info.argc) convertArgc = 0;
+        std::string bundleName("");
+        if ((info.argc == ARGS_ONE) && (info.argv[PARAM0]->TypeOf() != NATIVE_FUNCTION)) {
+            if (info.argv[PARAM0]->TypeOf() != NATIVE_STRING) {
+                HILOG_ERROR("input params is not a string");
+                NapiFormUtil::ThrowParamTypeError(engine, "bundleName", "string");
+                return engine.CreateUndefined();
+            }
+            if (!ConvertFromJsValue(engine, info.argv[PARAM0], bundleName)) {
+                HILOG_ERROR("bundleName convert failed.");
+                NapiFormUtil::ThrowParamTypeError(engine, "bundleName", "string");
+                return engine.CreateUndefined();
+            }
+            convertArgc++;
+        }
+
+        if (info.argc == ARGS_TWO) {
+            if (info.argv[PARAM1]->TypeOf() != NATIVE_STRING) {
+                HILOG_ERROR("input params is not a string");
+                NapiFormUtil::ThrowParamTypeError(engine, "bundleName", "string");
+                return engine.CreateUndefined();
+            }
+            if (!ConvertFromJsValue(engine, info.argv[PARAM1], bundleName)) {
+                HILOG_ERROR("bundleName convert failed.");
+                NapiFormUtil::ThrowParamTypeError(engine, "bundleName", "string");
+                return engine.CreateUndefined();
+            }
+            convertArgc++;
+        }
+
+        auto complete = [bundleName, convertArgc](NativeEngine &engine, AsyncTask &task, int32_t status) {
+            std::string hostBundleName(bundleName);
+            std::vector<RunningFormInfo> runningFormInfos;
+            int32_t ret = ERR_OK;
+            if (convertArgc == ARGS_ZERO) {
+                ret = FormMgr::GetInstance().GetRunningFormInfos(runningFormInfos);
+            } else {
+                ret = FormMgr::GetInstance().GetRunningFormInfosByBundleName(hostBundleName, runningFormInfos);
+            }
+            if (ret != ERR_OK) {
+                task.Reject(engine, NapiFormUtil::CreateErrorByInternalErrorCode(engine, ret));
+                return;
+            }
+            task.ResolveWithNoError(engine, CreateRunningFormInfos(engine, runningFormInfos));
+        };
+        NativeValue *result = nullptr;
+        NativeValue *lastParam = nullptr;
+        if (info.argc == ARGS_TWO) {
+            lastParam = info.argv[ARGS_ZERO];
+        } else {
+            lastParam = (info.argc <= convertArgc) ? nullptr : info.argv[convertArgc];
+        }
+        AsyncTask::Schedule("JsFormHost::OnGetRunningFormInfos",
+            engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
+        return result;
+    }
+
     void InnerShareForm(NativeEngine &engine, const std::shared_ptr<AbilityRuntime::AsyncTask> &asyncTask,
         ShareFormCallBackClient::ShareFormTask &&task, int64_t formId, const std::string &remoteDeviceId)
     {
@@ -1498,6 +1570,7 @@ NativeValue* JsFormHostInit(NativeEngine* engine, NativeValue* exportObj)
     BindNativeFunction(*engine, *object, "shareForm", moduleName, JsFormHost::ShareForm);
     BindNativeFunction(*engine, *object, "notifyFormsPrivacyProtected", moduleName,
         JsFormHost::NotifyFormsPrivacyProtected);
+    BindNativeFunction(*engine, *object, "getRunningFormInfos", moduleName, JsFormHost::GetRunningFormInfos);
     BindNativeFunction(*engine, *object, "acquireFormData", moduleName, JsFormHost::AcquireFormData);
     BindNativeFunction(*engine, *object, "getRunningFormInfosByFilter", moduleName, JsFormHost::GetFormInstancesByFilter);
     BindNativeFunction(*engine, *object, "getRunningFormInfoById", moduleName, JsFormHost::GetFormInstanceById);

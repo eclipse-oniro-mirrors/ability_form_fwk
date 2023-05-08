@@ -27,6 +27,7 @@
 #include "form_state_info.h"
 #include "ipc_types.h"
 #include "iremote_broker.h"
+#include "running_form_info.h"
 
 #include "want.h"
 
@@ -357,6 +358,22 @@ public:
     virtual int32_t GetHostFormsCount(std::string &bundleName, int32_t &formCount) = 0;
 
     /**
+     * @brief Get the running form infos.
+     * @param runningFormInfos Return the running forms' infos currently.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode GetRunningFormInfos(std::vector<RunningFormInfo> &runningFormInfos) = 0;
+
+    /**
+     * @brief Get the running form infos by bundle name.
+     * @param bundleName Application name.
+     * @param runningFormInfos Return the running forms' infos of the specify application name.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode GetRunningFormInfosByBundleName(const std::string &bundleName,
+        std::vector<RunningFormInfo> &runningFormInfos) = 0;
+
+    /**
     * @brief Get form instances by filter info.
     * @param formInstancesFilter includes bundleName, moduleName, formName, abilityName to get formInstances.
     * @param formInstances return formInstances
@@ -423,6 +440,8 @@ public:
         FORM_MGR_ACQUIRE_DATA,
         FORM_MGR_GET_FORMS_COUNT,
         FORM_MGR_GET_HOST_FORMS_COUNT,
+        FORM_MGR_GET_RUNNING_FORM_INFOS,
+        FORM_MGR_GET_RUNNING_FORM_INFOS_BY_BUNDLE,
         FORM_MGR_GET_FORM_INSTANCES_FROM_BY_FILTER,
         FORM_MGR_GET_FORM_INSTANCES_FROM_BY_ID,
     };

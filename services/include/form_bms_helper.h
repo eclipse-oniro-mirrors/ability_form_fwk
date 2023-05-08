@@ -142,6 +142,8 @@ public:
 
     bool GetCompatibleVersionCode(const std::string& bundleName, int32_t userId, int32_t& minCompatibleVersionCode);
 
+    int32_t GetBundleNameByUid(const int32_t uid, std::string &bundleName);
+
     static constexpr int64_t INVALID_UID = -1;
 private:
     /**

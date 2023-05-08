@@ -25,6 +25,7 @@
 #include "hilog_wrapper.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
+#include "running_form_info.h"
 #include "runtime.h"
 
 using namespace OHOS;
@@ -507,7 +508,7 @@ void ParseFormInfoIntoNapi(napi_env env, const FormInfo &formInfo, napi_value &r
     FormType formType = formInfo.type;
     SetFormInfoPropertyInt32(env, (int32_t)formType, result, "type");
     SetFormInfoPropertyString(env, formInfo.jsComponentName.c_str(), result, "jsComponentName");
-    FormsColorMode  formsColorMode = formInfo.colorMode;
+    FormsColorMode formsColorMode = formInfo.colorMode;
     SetFormInfoPropertyInt32(env, (int32_t)formsColorMode, result, "colorMode");
     SetFormInfoPropertyBoolean(env, formInfo.defaultFlag, result, "isDefault");
     SetFormInfoPropertyBoolean(env, formInfo.updateEnabled, result, "updateEnabled");
@@ -596,6 +597,45 @@ NativeValue* CreateFormInfo(NativeEngine &engine, const FormInfo &formInfo)
     object->SetProperty("relatedBundleName", CreateJsValue(engine, formInfo.relatedBundleName));
     object->SetProperty("supportDimensions", CreateNativeArray(engine, formInfo.supportDimensions));
     object->SetProperty("customizeData", CreateFormCustomizeDatas(engine, formInfo.customizeDatas));
+
+    return objContext;
+}
+
+NativeValue *CreateRunningFormInfos(NativeEngine &engine, const std::vector<RunningFormInfo> &runningFormInfos)
+{
+    NativeValue *arrayValue = engine.CreateArray(runningFormInfos.size());
+    NativeArray *array = ConvertNativeValueTo<NativeArray>(arrayValue);
+    uint32_t index = 0;
+    for (const auto &runningFormInfo : runningFormInfos) {
+        array->SetElement(index++, CreateRunningFormInfo(engine, runningFormInfo));
+    }
+    return arrayValue;
+}
+
+NativeValue *CreateRunningFormInfo(NativeEngine &engine, const RunningFormInfo &runningFormInfo)
+{
+    HILOG_DEBUG("called");
+
+    auto objContext = engine.CreateObject();
+    if (objContext == nullptr) {
+        HILOG_ERROR("CreateObject failed");
+        return engine.CreateUndefined();
+    }
+
+    auto object = ConvertNativeValueTo<NativeObject>(objContext);
+    if (object == nullptr) {
+        HILOG_ERROR("ConvertNativeValueTo object failed");
+        return engine.CreateUndefined();
+    }
+
+    object->SetProperty("formId", CreateJsValue(engine, runningFormInfo.formId));
+    object->SetProperty("bundleName", CreateJsValue(engine, runningFormInfo.bundleName));
+    object->SetProperty("hostBundleName", CreateJsValue(engine, runningFormInfo.hostBundleName));
+    object->SetProperty("visibilityType", CreateJsValue(engine, runningFormInfo.formVisiblity));
+    object->SetProperty("moduleName", CreateJsValue(engine, runningFormInfo.moduleName));
+    object->SetProperty("abilityName", CreateJsValue(engine, runningFormInfo.abilityName));
+    object->SetProperty("formName", CreateJsValue(engine, runningFormInfo.formName));
+    object->SetProperty("dimension", CreateJsValue(engine, runningFormInfo.dimension));
 
     return objContext;
 }
