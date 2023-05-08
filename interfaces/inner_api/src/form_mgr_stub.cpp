@@ -933,7 +933,7 @@ int32_t FormMgrStub::HandleGetFormInstancesByFilter(MessageParcel &data, Message
     }
     std::vector<FormInstance> infos;
     int32_t result = GetFormInstancesByFilter(*filter, infos);
-    HILOG_DEBUG("info size %{public}d", infos.size());
+    HILOG_DEBUG("info size = %{public}zu", infos.size());
     reply.WriteInt32(result);
     if (result == ERR_OK) {
         HILOG_INFO("result i true.");
