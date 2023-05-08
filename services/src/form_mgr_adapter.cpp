@@ -139,7 +139,7 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
             HILOG_ERROR("failed, add request publish form failed.");
             return ret;
         }
-        if(!tempFormFlag && (ret == ERR_OK)) {
+        if (!tempFormFlag && (ret == ERR_OK)) {
             HILOG_DEBUG("Checks if there is a listener listening for adding form");
             ret = HandleFormAddObserver(formInfo.formId);
         }
@@ -161,7 +161,7 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
         ret = AllotFormById(formItemInfo, callerToken, wantParams, formInfo);
     } else {
         ret = AllotFormByInfo(formItemInfo, callerToken, wantParams, formInfo);
-        if(!tempFormFlag && (ret == ERR_OK)) {
+        if (!tempFormFlag && (ret == ERR_OK)) {
             HILOG_DEBUG("Checks if there is a listener listening for adding form");
             ret = HandleFormAddObserver(formInfo.formId);
         }
@@ -256,7 +256,6 @@ int FormMgrAdapter::StopRenderingForm(const int64_t formId, const std::string &c
     return ERR_OK;
 }
 
-
 /**
  * @brief Release forms with formIds, send formIds to form Mgr service.
  * @param formId The Id of the forms to release.
@@ -277,11 +276,7 @@ int FormMgrAdapter::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> 
     FormSupplyCallback::GetInstance()->RemoveConnection(matchedFormId, callerToken);
     if (FormDataMgr::GetInstance().ExistTempForm(matchedFormId)) {
         // delete temp form if receive release form call
-        ErrCode ret = HandleDeleteTempForm(matchedFormId, callerToken);
-        if (ret != ERR_OK) {
-            HILOG_ERROR("delete temp form failed.");
-            return ret;
-        }
+        return HandleDeleteTempForm(matchedFormId, callerToken);
     }
     FormRecord record;
     FormDataMgr::GetInstance().GetFormRecord(formId, record);
@@ -2542,13 +2537,15 @@ bool FormMgrAdapter::checkFormHostHasSaUid(const FormRecord &formRecord)
         SYSTEM_UID) != formRecord.formUserUids.end();
 }
 
-ErrCode FormMgrAdapter::RegisterFormAddObserverByBundle(const std::string bundleName, const sptr<IRemoteObject> &callerToken)
+ErrCode FormMgrAdapter::RegisterFormAddObserverByBundle(const std::string bundleName,
+    const sptr<IRemoteObject> &callerToken)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     return FormObserverRecord::GetInstance().SetFormAddObserver(bundleName, callerToken);
 }
 
-ErrCode FormMgrAdapter::RegisterFormRemoveObserverByBundle(const std::string bundleName, const sptr<IRemoteObject> &callerToken)
+ErrCode FormMgrAdapter::RegisterFormRemoveObserverByBundle(const std::string bundleName,
+    const sptr<IRemoteObject> &callerToken)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     return FormObserverRecord::GetInstance().SetFormRemoveObserver(bundleName, callerToken);
@@ -2567,6 +2564,17 @@ int32_t FormMgrAdapter::GetHostFormsCount(std::string &bundleName, int32_t &form
 {
     HILOG_DEBUG("%{public}s, bundleName: %{public}s.", __func__, bundleName.c_str());
     return FormDataMgr::GetInstance().GetHostFormsCount(bundleName, formCount);
+}
+
+int32_t FormMgrAdapter::GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
+    std::vector<FormInstance> &formInstances)
+{
+    return FormDataMgr::GetInstance().GetFormInstancesByFilter(formInstancesFilter, formInstances);
+}
+
+int32_t FormMgrAdapter::GetFormInstanceById(const int64_t formId, FormInstance &formInstance)
+{
+    return FormDataMgr::GetInstance().GetFormInstanceById(formId, formInstance);
 }
 } // namespace AppExecFwk
 } // namespace OHOS

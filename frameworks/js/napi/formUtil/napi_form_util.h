@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,8 @@
 #define OHOS_FORM_FWK_NAPI_FORM_UTIL_H
 
 #include "ability.h"
+#include "form_instance.h"
+#include "form_instances_filter.h"
 #include "js_runtime_utils.h"
 #include "napi/native_api.h"
 #include "napi/native_common.h"
@@ -111,6 +113,10 @@ NativeValue *CreateRunningFormInfo(NativeEngine &engine, const AppExecFwk::Runni
 NativeValue* CreateFormInfo(NativeEngine &engine, const OHOS::AppExecFwk::FormInfo &formInfo);
 NativeValue *CreateFormCustomizeDatas(
     NativeEngine &engine, const std::vector<OHOS::AppExecFwk::FormCustomizeData> &customizeDatas);
+bool ParseParam(napi_env env, napi_value args, AppExecFwk::FormInstancesFilter &filter);
+std::string GetStringFromNapi(napi_env env, napi_value value);
+NativeValue* CreateFormInstances(NativeEngine &engine, const std::vector<AppExecFwk::FormInstance> &formInstances);
+NativeValue* CreateFormInstance(NativeEngine &engine, const AppExecFwk::FormInstance &formInstance);
 }  // namespace AbilityRuntime
 }  // namespace OHOS
 #endif /* OHOS_FORM_FWK_NAPI_FORM_UTIL_H */

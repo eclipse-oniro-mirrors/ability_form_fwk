@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -116,6 +116,10 @@ FormMgrStub::FormMgrStub()
         &FormMgrStub::HandleGetFormsCount;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_HOST_FORMS_COUNT)] =
         &FormMgrStub::HandleGetHostFormsCount;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORM_INSTANCES_FROM_BY_FILTER)] =
+        &FormMgrStub::HandleGetFormInstancesByFilter;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORM_INSTANCES_FROM_BY_ID)] =
+        &FormMgrStub::HandleGetFormInstanceById;
 }
 
 FormMgrStub::~FormMgrStub()
@@ -965,6 +969,44 @@ int32_t FormMgrStub::HandleGetHostFormsCount(MessageParcel &data, MessageParcel 
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
+}
+
+int32_t FormMgrStub::HandleGetFormInstancesByFilter(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("called.");
+    std::unique_ptr<FormInstancesFilter> filter(data.ReadParcelable<FormInstancesFilter>());
+    if (filter == nullptr) {
+        HILOG_ERROR("failed to get filter.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    std::vector<FormInstance> infos;
+    int32_t result = GetFormInstancesByFilter(*filter, infos);
+    HILOG_DEBUG("info size %{public}d", infos.size());
+    reply.WriteInt32(result);
+    if (result == ERR_OK) {
+        HILOG_INFO("result i true.");
+        if (!WriteParcelableVector(infos, reply)) {
+            HILOG_ERROR("write failed");
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+    }
+    return ERR_OK;
+}
+
+int32_t FormMgrStub::HandleGetFormInstanceById(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("called.");
+    int64_t formId = data.ReadInt64();
+    FormInstance info;
+    int32_t result = GetFormInstanceById(formId, info);
+    reply.WriteInt32(result);
+    if (result == ERR_OK) {
+        if (!reply.WriteParcelable(&info)) {
+            HILOG_ERROR("write failed");
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+    }
+    return ERR_OK;
 }
 
 /**

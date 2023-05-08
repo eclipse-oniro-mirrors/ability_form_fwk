@@ -21,6 +21,8 @@
 #include "bundle_info.h"
 #include "bundle_mgr_interface.h"
 #include "form_info.h"
+#include "form_instance.h"
+#include "form_instances_filter.h"
 #include "form_item_info.h"
 #include "form_js_info.h"
 #include "form_provider_data.h"
@@ -358,6 +360,23 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode RegisterFormRemoveObserverByBundle(const std::string bundleName, const sptr<IRemoteObject> &callerToken);
+
+    /**
+     * @brief Get form instances by filter info.
+     * @param formInstancesFilter includes bundleName, moduleName, formName, abilityName to get formInstances.
+     * @param formInstances return formInstances
+     * @return return ERR_OK on get info success,other on failure.
+     */
+    int32_t GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
+        std::vector<FormInstance> &formInstances);
+
+    /**
+     * @brief Get form instance by formId.
+     * @param formId formId Indicates the unique id of form.
+     * @param formInstance return formInstance
+     * @return return ERR_OK on get info success,other on failure.
+     */
+    int32_t GetFormInstanceById(const int64_t formId, FormInstance &formInstance);
 private:
     /**
      * @brief Get form configure info.

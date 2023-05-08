@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1046,7 +1046,8 @@ ErrCode FormMgr::RegisterFormAddObserverByBundle(const std::string bundleName, c
     return remoteProxy_->RegisterFormAddObserverByBundle(bundleName, callerToken);
 }
 
-ErrCode FormMgr::RegisterFormRemoveObserverByBundle(const std::string bundleName, const sptr<IRemoteObject> &callerToken)
+ErrCode FormMgr::RegisterFormRemoveObserverByBundle(const std::string bundleName,
+    const sptr<IRemoteObject> &callerToken)
 {
     HILOG_DEBUG("starts.");
     if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
@@ -1106,6 +1107,29 @@ int32_t FormMgr::GetHostFormsCount(std::string &bundleName, int32_t &formCount)
         HILOG_ERROR("%{public}s error, failed to GetFormsCount, error code is %{public}d.", __func__, resultCode);
     }
     return resultCode;
+}
+
+int32_t FormMgr::GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
+        std::vector<FormInstance> &formInstances)
+{
+    HILOG_DEBUG("called.");
+    int32_t errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("get form instances by filter failed, errCode:%{public}d.", errCode);
+        return errCode;
+    }
+    return remoteProxy_->GetFormInstancesByFilter(formInstancesFilter, formInstances);
+}
+
+int32_t FormMgr::GetFormInstanceById(const int64_t formId, FormInstance &formInstance)
+{
+    HILOG_DEBUG("called.");
+    int32_t errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("get form instance by formId failed, errCode:%{public}d.", errCode);
+        return errCode;
+    }
+    return remoteProxy_->GetFormInstanceById(formId, formInstance);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

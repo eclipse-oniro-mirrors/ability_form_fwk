@@ -1074,7 +1074,8 @@ bool FormMgrService::CheckAcrossLocalAccountsPermission() const
     return true;
 }
 
-ErrCode FormMgrService::RegisterFormAddObserverByBundle(const std::string bundleName, const sptr<IRemoteObject> &callerToken)
+ErrCode FormMgrService::RegisterFormAddObserverByBundle(const std::string bundleName,
+    const sptr<IRemoteObject> &callerToken)
 {
     HILOG_DEBUG("called.");
     if (!CheckCallerIsSystemApp()) {
@@ -1087,7 +1088,8 @@ ErrCode FormMgrService::RegisterFormAddObserverByBundle(const std::string bundle
     return FormMgrAdapter::GetInstance().RegisterFormAddObserverByBundle(bundleName, callerToken);
 }
 
-ErrCode FormMgrService::RegisterFormRemoveObserverByBundle(const std::string bundleName, const sptr<IRemoteObject> &callerToken)
+ErrCode FormMgrService::RegisterFormRemoveObserverByBundle(const std::string bundleName,
+    const sptr<IRemoteObject> &callerToken)
 {
     HILOG_DEBUG("called.");
     if (!CheckCallerIsSystemApp()) {
@@ -1110,6 +1112,35 @@ int32_t FormMgrService::GetHostFormsCount(std::string &bundleName, int32_t &form
 {
     HILOG_INFO("%{public}s called.", __func__);
     return FormMgrAdapter::GetInstance().GetHostFormsCount(bundleName, formCount);
+}
+
+int32_t FormMgrService::GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
+    std::vector<FormInstance> &formInstances)
+{
+    if (!CheckCallerIsSystemApp()) {
+        HILOG_ERROR("caller app is not system app!");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+
+    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_REQUIRE_FORM)) {
+        HILOG_ERROR("verify calling permission failed!");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    }
+    return FormMgrAdapter::GetInstance().GetFormInstancesByFilter(formInstancesFilter, formInstances);
+}
+
+int32_t FormMgrService::GetFormInstanceById(const int64_t formId, FormInstance &formInstance)
+{
+    if (!CheckCallerIsSystemApp()) {
+        HILOG_ERROR("caller app is not system app!");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+
+    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_REQUIRE_FORM)) {
+        HILOG_ERROR("verify calling permission failed!");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    }
+    return FormMgrAdapter::GetInstance().GetFormInstanceById(formId, formInstance);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
