@@ -111,6 +111,9 @@ NativeValue *CreateRunningFormInfos(NativeEngine &engine,
     const std::vector<AppExecFwk::RunningFormInfo> &runningFormInfos);
 NativeValue *CreateRunningFormInfo(NativeEngine &engine, const AppExecFwk::RunningFormInfo &runningFormInfo);
 NativeValue* CreateFormInfo(NativeEngine &engine, const OHOS::AppExecFwk::FormInfo &formInfo);
+NativeValue* CreateRunningFormInfos(NativeEngine &engine,
+    const std::vector<AppExecFwk::RunningFormInfo> &runningFormInfos);
+NativeValue* CreateRunningFormInfo(NativeEngine &engine, const AppExecFwk::RunningFormInfo &runningFormInfo);
 NativeValue *CreateFormCustomizeDatas(
     NativeEngine &engine, const std::vector<OHOS::AppExecFwk::FormCustomizeData> &customizeDatas);
 bool ParseParam(napi_env env, napi_value args, AppExecFwk::FormInstancesFilter &filter);

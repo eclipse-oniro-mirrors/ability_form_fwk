@@ -353,6 +353,22 @@ public:
     int32_t GetFormsInfo(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos);
 
     /**
+     * @brief Get all running form infos.
+     * @param runningFormInfos Return the running forms' infos currently.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode GetRunningFormInfos(std::vector<RunningFormInfo> &runningFormInfos);
+
+    /**
+     * @brief Get the running form infos by bundle name.
+     * @param bundleName Application name.
+     * @param runningFormInfos Return the running forms' infos of the specify application name.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode GetRunningFormInfosByBundleName(const std::string &bundleName,
+        std::vector<RunningFormInfo> &runningFormInfos);
+
+    /**
      * @brief Check if the request of publishing a form is supported by the host.
      * @return Returns true if the request is supported and false otherwise.
      */

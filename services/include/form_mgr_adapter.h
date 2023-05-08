@@ -362,6 +362,22 @@ public:
     ErrCode RegisterFormRemoveObserverByBundle(const std::string bundleName, const sptr<IRemoteObject> &callerToken);
 
     /**
+     * @brief Get all running form infos.
+     * @param runningFormInfos Return the running forms' infos currently.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode GetRunningFormInfos(std::vector<RunningFormInfo> &runningFormInfos);
+
+    /**
+     * @brief Get the running form infos by bundle name.
+     * @param bundleName Application name.
+     * @param runningFormInfos Return the running forms' infos of the specify application name.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode GetRunningFormInfosByBundleName(const std::string &bundleName,
+        std::vector<RunningFormInfo> &runningFormInfos);
+
+    /**
      * @brief Get form instances by filter info.
      * @param formInstancesFilter includes bundleName, moduleName, formName, abilityName to get formInstances.
      * @param formInstances return formInstances

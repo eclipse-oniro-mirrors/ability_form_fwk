@@ -400,6 +400,22 @@ public:
     int32_t GetHostFormsCount(std::string &bundleName, int32_t &formCount) override;
 
     /**
+     * @brief Get all running form infos.
+     * @param runningFormInfos Return the running forms' infos currently.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode GetRunningFormInfos(std::vector<RunningFormInfo> &runningFormInfos) override;
+
+    /**
+     * @brief Get the running form infos by bundle name.
+     * @param bundleName Application name.
+     * @param runningFormInfos Return the running forms' infos of the specify application name.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode GetRunningFormInfosByBundleName(const std::string &bundleName,
+        std::vector<RunningFormInfo> &runningFormInfos) override;
+
+    /**
      * @brief Get form instances by filter info.
      * @param formInstancesFilter include bundleName, moduleName, formName, abilityName to get formInstances.
      * @param formInstances return formInstances
