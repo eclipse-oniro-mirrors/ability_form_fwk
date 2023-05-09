@@ -341,6 +341,17 @@ public:
     * @return Return true if form manager service Ready; return false otherwise.
     */
     bool CheckFMSReady() override;
+
+    /**
+     * @brief The Call Event triggers the callee method.
+     * @param funcName function name which is used by callee.
+     * @param params parameter which is used by callee.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t SetBackgroundFunction(const std::string funcName, const std::string params) override
+    {
+        return ERR_OK;
+    }
 private:
     enum class DumpKey {
         KEY_DUMP_HELP = 0,
