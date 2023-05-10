@@ -207,6 +207,8 @@ namespace Constants {
     constexpr int32_t FORM_DEFAULT = 1;
     // The form launch reason which means that the form is share.
     constexpr int32_t FORM_SHARE = 2;
+    // Specify the form Id
+    constexpr const char* PARAM_FORM_MIGRATE_FORM_KEY = "ohos.extra.param.key.migrate_form";
 }  // namespace Constants
 }  // namespace AppExecFwk
 }  // namespace OHOS
