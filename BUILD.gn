@@ -169,6 +169,7 @@ ohos_shared_library("fmskit_native") {
     "interfaces/kits/native/src/form_host_client.cpp",
     "interfaces/kits/native/src/form_mgr.cpp",
     "interfaces/kits/native/src/form_provider_caller.cpp",
+    "interfaces/kits/native/src/form_provider_client.cpp",
   ]
 
   cflags = []
@@ -180,6 +181,7 @@ ohos_shared_library("fmskit_native") {
 
   external_deps = [
     "ability_base:want",
+    "ability_runtime:abilitykit_native",
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "hitrace_native:hitrace_meter",
