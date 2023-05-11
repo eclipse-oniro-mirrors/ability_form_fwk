@@ -27,6 +27,7 @@ class MockBundleMgrStub : public IRemoteStub<IBundleMgr> {
 public:
     MockBundleMgrStub() {};
     virtual ~MockBundleMgrStub() = default;
+    MOCK_METHOD4(GetBundleInfo, bool(const std::string &, int32_t , BundleInfo &, int32_t));
     int OnRemoteRequest(
         uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& option) override
     {
