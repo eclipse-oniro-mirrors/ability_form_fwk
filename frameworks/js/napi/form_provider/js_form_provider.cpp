@@ -119,20 +119,20 @@ NativeValue *JsFormProvider::GetFormsInfo(NativeEngine *engine, NativeCallbackIn
 NativeValue *JsFormProvider::OnGetFormsInfo(NativeEngine &engine, NativeCallbackInfo &info)
 {
     HILOG_DEBUG("%{public}s is called", __FUNCTION__);
-    if (info.argc > ARGS_SIZE_TWO) {
-        HILOG_ERROR("%{public}s, wrong number of arguments.", __func__);
-        NapiFormUtil::ThrowParamNumError(engine, std::to_string(info.argc), "0, 1 or 2");
-        return engine.CreateUndefined();
-    }
 
     size_t convertArgc = 0;
+    bool isPromise = true;
     FormInfoFilter formInfoFilter;
     if (info.argc > 0 && info.argv[0]->TypeOf() != NATIVE_FUNCTION) {
-        if (!ConvertFormInfoFilterThrow(engine, info.argv[0], formInfoFilter)) {
-            HILOG_ERROR("%{public}s, convert form info filter failed.", __func__);
-            return engine.CreateUndefined();
+        if (ConvertFormInfoFilterThrow(engine, info.argv[0], formInfoFilter)) {
+            if (info.argv[1]->TypeOf() == NATIVE_FUNCTION) {
+                isPromise = false;
+                convertArgc = 1;
+            }
         }
-        convertArgc++;
+    }
+    if (info.argc > 0 && info.argv[0]->TypeOf() == NATIVE_FUNCTION) {
+        isPromise = false;
     }
 
     AsyncTask::CompleteCallback complete =
@@ -146,7 +146,7 @@ NativeValue *JsFormProvider::OnGetFormsInfo(NativeEngine &engine, NativeCallback
             task.ResolveWithNoError(engine, CreateJsFormInfoArray(engine, formInfos));
         };
 
-    NativeValue *lastParam = (info.argc <= convertArgc) ? nullptr : info.argv[convertArgc];
+    NativeValue *lastParam = isPromise ? nullptr : info.argv[convertArgc];
     NativeValue *result = nullptr;
     AsyncTask::Schedule("JsFormProvider::OnGetFormsInfo",
         engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));

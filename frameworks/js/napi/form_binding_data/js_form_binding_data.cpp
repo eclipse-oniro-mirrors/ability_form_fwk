@@ -67,17 +67,9 @@ NativeValue* JsFormBindingData::OnCreateFormBindingData(NativeEngine& engine, Na
             napi_value transValue = nullptr;
             napi_call_function(napiEnv, jsonValue, stringifyValue, 1, funcArgv, &transValue);
             nativeValue = reinterpret_cast<NativeValue*>(transValue);
-        } else {
-            HILOG_ERROR("%{public}s, param type not string or object", __func__);
-            NapiFormUtil::ThrowParamTypeError(engine, "obj", "string or object");
-            return engine.CreateUndefined();
         }
 
-        if (!ConvertFromJsValue(engine, nativeValue, formDataStr)) {
-            HILOG_ERROR("%{public}s, Parse formDataStr failed", __func__);
-            NapiFormUtil::ThrowParamError(engine, "Failed to convert.");
-            return engine.CreateUndefined();
-        }
+        ConvertFromJsValue(engine, nativeValue, formDataStr);
     }
     NativeValue* objValue = engine.CreateObject();
     NativeObject* object = ConvertNativeValueTo<NativeObject>(objValue);
