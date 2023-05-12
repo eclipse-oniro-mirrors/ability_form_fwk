@@ -19,6 +19,9 @@
         "adapted_system_type": [
             "standard"
         ],
+        "hisysevent_config": [
+          "//foundation/ability/form_fwk/hisysevent.yaml"
+        ],
         "rom": "",
         "ram": "",
         "deps": {
