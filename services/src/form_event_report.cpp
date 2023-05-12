@@ -53,12 +53,12 @@ void FormEventReport::SendFormEvent(const FormEventName &eventName, HiSysEventTy
 
     switch (eventName) {
         case FormEventName::DELETE_INVALID_FORM:
-            HiSysEventWrite(HiSysEvent::Domain::AAFWK, name, type);
+            HiSysEventWrite(HiSysEvent::Domain::FORM_MANAGER, name, type);
             break;
         case FormEventName::ACQUIREFORMSTATE_FORM:
         case FormEventName::MESSAGE_EVENT_FORM:
             HiSysEventWrite(
-                HiSysEvent::Domain::AAFWK,
+                HiSysEvent::Domain::FORM_MANAGER,
                 name,
                 type,
                 EVENT_KEY_BUNDLE_NAME, eventInfo.bundleName,
@@ -70,7 +70,7 @@ void FormEventReport::SendFormEvent(const FormEventName &eventName, HiSysEventTy
         case FormEventName::BACKGROUND_EVENT_FORM:
         case FormEventName::ROUTE_EVENT_FORM:
             HiSysEventWrite(
-                HiSysEvent::Domain::AAFWK,
+                HiSysEvent::Domain::FORM_MANAGER,
                 name,
                 type,
                 EVENT_KEY_FORM_ID, eventInfo.formId,
@@ -83,7 +83,7 @@ void FormEventReport::SendFormEvent(const FormEventName &eventName, HiSysEventTy
         case FormEventName::RELEASE_FORM:
         case FormEventName::SET_NEXT_REFRESH_TIME_FORM:
             HiSysEventWrite(
-                HiSysEvent::Domain::AAFWK, name, type, EVENT_KEY_FORM_ID, eventInfo.formId);
+                HiSysEvent::Domain::FORM_MANAGER, name, type, EVENT_KEY_FORM_ID, eventInfo.formId);
             break;
         default:
             break;
