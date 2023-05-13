@@ -34,6 +34,7 @@ ohos_shared_library("libfms") {
   include_dirs = [
     "${ability_runtime_path}/services/common/include",
     "${ability_runtime_native_path}/appkit/ability_runtime",
+    "${form_fwk_napi_path}/form_host/form_state_observer/include",
   ]
   sources = [
     "services/src/form_ability_connection.cpp",
@@ -68,6 +69,7 @@ ohos_shared_library("libfms") {
     "services/src/form_mgr_adapter.cpp",
     "services/src/form_mgr_service.cpp",
     "services/src/form_msg_event_connection.cpp",
+    "services/src/form_observer_record.cpp",
     "services/src/form_provider_mgr.cpp",
     "services/src/form_rdb_data_mgr.cpp",
     "services/src/form_refresh_connection.cpp",
@@ -167,6 +169,7 @@ ohos_shared_library("fmskit_native") {
     "interfaces/kits/native/src/form_host_client.cpp",
     "interfaces/kits/native/src/form_mgr.cpp",
     "interfaces/kits/native/src/form_provider_caller.cpp",
+    "interfaces/kits/native/src/form_provider_client.cpp",
   ]
 
   cflags = []
@@ -178,6 +181,7 @@ ohos_shared_library("fmskit_native") {
 
   external_deps = [
     "ability_base:want",
+    "ability_runtime:abilitykit_native",
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "hitrace_native:hitrace_meter",
@@ -209,6 +213,8 @@ config("formmgr_sdk_config") {
 }
 
 ohos_shared_library("form_manager") {
+  include_dirs = [ "${ability_runtime_innerapi_path}/runtime/include" ]
+
   sources = [
     "interfaces/inner_api/src/erms_mgr_param.cpp",
     "interfaces/inner_api/src/form_ashmem.cpp",
@@ -229,6 +235,8 @@ ohos_shared_library("form_manager") {
     "interfaces/inner_api/src/form_share_info.cpp",
     "interfaces/inner_api/src/form_supply_proxy.cpp",
     "interfaces/inner_api/src/form_supply_stub.cpp",
+    "interfaces/inner_api/src/js_form_state_observer_proxy.cpp",
+    "interfaces/inner_api/src/js_form_state_observer_stub.cpp",
     "interfaces/inner_api/src/provider_connect_proxy.cpp",
     "interfaces/inner_api/src/provider_connect_stub.cpp",
     "interfaces/inner_api/src/running_form_info.cpp",

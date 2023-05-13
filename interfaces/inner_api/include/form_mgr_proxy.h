@@ -323,6 +323,24 @@ public:
     bool CheckFMSReady() override;
 
     /**
+     * @brief Register form add observer by bundle.
+     * @param bundleName BundleName of the form host
+     * @param callerToken Caller ability token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RegisterFormAddObserverByBundle(const std::string bundleName,
+        const sptr<IRemoteObject> &callerToken) override;
+
+    /**
+     * @brief Register form remove observer by bundle.
+     * @param bundleName BundleName of the form host
+     * @param callerToken Caller ability token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RegisterFormRemoveObserverByBundle(const std::string bundleName,
+        const sptr<IRemoteObject> &callerToken) override;
+
+    /**
      * @brief The Call Event triggers the callee method.
      * @param funcName function name which is used by callee.
      * @param params parameter which is used by callee.

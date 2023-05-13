@@ -22,8 +22,10 @@
 #include "form_cache_mgr.h"
 #include "form_constants.h"
 #include "form_mgr_errors.h"
+#include "form_observer_record.h"
 #include "form_provider_mgr.h"
 #include "form_render_mgr.h"
+#include "form_task_mgr.h"
 #include "form_util.h"
 #include "hilog_wrapper.h"
 #include "ipc_skeleton.h"
@@ -1821,6 +1823,67 @@ ErrCode FormDataMgr::CheckInvalidForm(const int64_t formId)
         HILOG_ERROR("The form id corresponds to a card that is not for the currently active user.");
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
+    return ERR_OK;
+}
+
+ErrCode FormDataMgr::GetRunningFormInfosByFormId(const int64_t formId, RunningFormInfo &runningFormInfo)
+{
+    HILOG_DEBUG("start");
+
+    // Checks if the formid is valid.
+    if (formId <= 0) {
+        HILOG_ERROR("Invalid form id.");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    FormRecord formRecord;
+    int64_t matchedFormId = FindMatchedFormId(formId);
+    if (!GetFormRecord(matchedFormId, formRecord)) {
+        HILOG_ERROR("No matching formRecord was found for the form id.");
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    }
+
+    if (formRecord.providerUserId != FormUtil::GetCurrentAccountId()) {
+        HILOG_ERROR("The form id corresponds to a card that is not for the currently active user.");
+        return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
+    }
+
+    runningFormInfo.formId = formId;
+    runningFormInfo.formName = formRecord.formName;
+    runningFormInfo.dimension = formRecord.specification;
+    runningFormInfo.bundleName = formRecord.bundleName;
+    runningFormInfo.moduleName = formRecord.moduleName;
+    runningFormInfo.abilityName = formRecord.abilityName;
+    std::vector<FormHostRecord> formHostRecords;
+    GetFormHostRecord(formId, formHostRecords);
+
+    runningFormInfo.hostBundleName = formHostRecords.begin()->GetHostBundleName();
+    runningFormInfo.formVisiblity = formRecord.isVisible ? FormVisibilityType::VISIBLE : FormVisibilityType::INVISIBLE;
+    return ERR_OK;
+}
+
+ErrCode FormDataMgr::HandleFormAddObserver(const std::string hostBundleName, const int64_t formId)
+{
+    HILOG_DEBUG("start");
+    RunningFormInfo runningFormInfo;
+    ErrCode ret = GetRunningFormInfosByFormId(formId, runningFormInfo);
+    if (ret != ERR_OK) {
+        return ret;
+    }
+    // if there is a full observer.
+    FormObserverRecord::GetInstance().onFormAdd("all", runningFormInfo);
+    // If there is a listener for the current host.
+    FormObserverRecord::GetInstance().onFormAdd(hostBundleName, runningFormInfo);
+    return ERR_OK;
+}
+
+ErrCode FormDataMgr::HandleFormRemoveObserver(const std::string hostBundleName, const RunningFormInfo runningFormInfo)
+{
+    HILOG_DEBUG("start");
+    // if there is a full observer.
+    FormObserverRecord::GetInstance().onFormRemove("all", runningFormInfo);
+    // If there is a listener for the current host.
+    FormObserverRecord::GetInstance().onFormRemove(hostBundleName, runningFormInfo);
     return ERR_OK;
 }
 

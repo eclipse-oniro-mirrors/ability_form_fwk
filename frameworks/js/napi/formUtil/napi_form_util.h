@@ -104,8 +104,12 @@ void InnerCreateCallbackRetMsg(napi_env env, int32_t code, napi_value (&result)[
 void InnerCreatePromiseRetMsg(napi_env env, int32_t code, napi_value* result);
 napi_value RetErrMsg(AsyncErrMsgCallbackInfo* asyncCallbackInfo);
 void ParseFormInfoIntoNapi(napi_env env, const OHOS::AppExecFwk::FormInfo &formInfo, napi_value &result);
+void ParseRunningFormInfoIntoNapi(napi_env env, const AppExecFwk::RunningFormInfo &runningFormInfo, napi_value &result);
 AsyncErrMsgCallbackInfo *InitErrMsg(napi_env env, int32_t code, int32_t type, napi_value callbackValue);
 NativeValue* CreateFormInfos(NativeEngine &engine, const std::vector<OHOS::AppExecFwk::FormInfo> &formInfos);
+NativeValue *CreateRunningFormInfos(NativeEngine &engine,
+    const std::vector<AppExecFwk::RunningFormInfo> &runningFormInfos);
+NativeValue *CreateRunningFormInfo(NativeEngine &engine, const AppExecFwk::RunningFormInfo &runningFormInfo);
 NativeValue* CreateFormInfo(NativeEngine &engine, const OHOS::AppExecFwk::FormInfo &formInfo);
 NativeValue* CreateRunningFormInfos(NativeEngine &engine,
     const std::vector<AppExecFwk::RunningFormInfo> &runningFormInfos);

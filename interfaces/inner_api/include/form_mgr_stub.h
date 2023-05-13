@@ -291,6 +291,22 @@ private:
     int32_t HandleCheckFMSReady(MessageParcel &data, MessageParcel &reply);
 
     /**
+     * @brief Handle RegisterFormAddObserverByBundle message.
+     * @param data input param
+     * @param reply output param
+     * @return Return ERR_OK on success, others on failure
+    */
+    int32_t HandleRegisterFormAddObserverByBundle(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle RegisterFormRemoveObserverByBundle message.
+     * @param data input param
+     * @param reply output param
+     * @return Return ERR_OK on success, others on failure
+    */
+    int32_t HandleRegisterFormRemoveObserverByBundle(MessageParcel &data, MessageParcel &reply);
+
+    /**
      * @brief Handle get forms count message.
      * @param data input param.
      * @param reply output param.

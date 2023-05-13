@@ -1078,6 +1078,37 @@ ErrCode FormMgr::GetRunningFormInfosByBundleName(const std::string &bundleName,
     return resultCode;
 }
 
+ErrCode FormMgr::RegisterFormAddObserverByBundle(const std::string bundleName, const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_DEBUG("starts.");
+    if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
+        HILOG_ERROR("error, form is in recover status, can't do action on form.");
+        return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
+    }
+    int errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("failed, errCode:%{public}d.", errCode);
+        return errCode;
+    }
+    return remoteProxy_->RegisterFormAddObserverByBundle(bundleName, callerToken);
+}
+
+ErrCode FormMgr::RegisterFormRemoveObserverByBundle(const std::string bundleName,
+    const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_DEBUG("starts.");
+    if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
+        HILOG_ERROR("error, form is in recover status, can't do action on form.");
+        return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
+    }
+    int errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("failed, errCode:%{public}d.", errCode);
+        return errCode;
+    }
+    return remoteProxy_->RegisterFormRemoveObserverByBundle(bundleName, callerToken);
+}
+
 int32_t FormMgr::GetFormsCount(bool isTempFormFlag, int32_t &formCount)
 {
     HILOG_INFO("%{public}s start.", __func__);

@@ -51,7 +51,7 @@ int32_t JsFormStateObserverStub::OnRemoteRequest(uint32_t code, MessageParcel &d
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;
         if (memberFunc != nullptr) {
-            return memberFunc(data, reply);
+            return (this->*memberFunc)(data, reply);
         }
     }
 

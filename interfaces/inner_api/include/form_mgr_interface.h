@@ -335,6 +335,24 @@ public:
     virtual bool CheckFMSReady() = 0;
 
     /**
+     * @brief Register form add observer by bundle.
+     * @param bundleName BundleName of the form host
+     * @param callerToken Caller ability token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode RegisterFormAddObserverByBundle(const std::string bundleName,
+        const sptr<IRemoteObject> &callerToken) = 0;
+
+    /**
+     * @brief Register form remove observer by bundle.
+     * @param bundleName BundleName of the form host
+     * @param callerToken Caller ability token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode RegisterFormRemoveObserverByBundle(const std::string bundleName,
+        const sptr<IRemoteObject> &callerToken) = 0;
+
+    /**
      * @brief The Call Event triggers the callee method.
      * @param funcName function name which is used by callee.
      * @param params parameter which is used by callee.
@@ -437,6 +455,8 @@ public:
         FORM_MGR_CHECK_FMS_READY,
         FORM_MGR_BACKGROUND_EVENT,
         FORM_MGR_STOP_RENDERING_FORM,
+        FORM_MGR_REGISTER_FORM_ADD_OBSERVER_BY_BUNDLE,
+        FORM_MGR_REGISTER_FORM_REMOVE_OBSERVER_BY_BUNDLE,
         FORM_MGR_ACQUIRE_DATA,
         FORM_MGR_GET_FORMS_COUNT,
         FORM_MGR_GET_HOST_FORMS_COUNT,

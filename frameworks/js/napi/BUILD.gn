@@ -285,6 +285,7 @@ ohos_shared_library("formhost") {
 
   sources = [
     "form_host/js_form_host.cpp",
+    "form_host/js_form_state_observer.cpp",
     "form_host/native_module.cpp",
   ]
 

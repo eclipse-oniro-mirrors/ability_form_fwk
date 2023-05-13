@@ -28,6 +28,7 @@
 #include "form_share_mgr.h"
 #include "form_supply_callback.h"
 #include "hilog_wrapper.h"
+#include "js_form_state_observer_interface.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -360,6 +361,64 @@ void FormTaskMgr::PostFormShareSendResponse(int64_t formShareRequestCode, int32_
     };
     eventHandler_->PostTask(formShareSendResponseFunc, FORM_TASK_DELAY_TIME);
     HILOG_INFO("%{public}s end", __func__);
+}
+
+void FormTaskMgr::PostAddTaskToHost(const std::string bundleName,
+    const sptr<IRemoteObject> &remoteObject, const RunningFormInfo &runningFormInfo)
+{
+    HILOG_DEBUG("start");
+    if (eventHandler_ == nullptr) {
+        HILOG_ERROR("fail, event handler invalidate.");
+        return;
+    }
+    auto addFunc = [bundleName, remoteObject, runningFormInfo]() {
+        FormTaskMgr::GetInstance().FormAdd(bundleName, remoteObject, runningFormInfo);
+    };
+    eventHandler_->PostTask(addFunc, FORM_TASK_DELAY_TIME);
+    HILOG_DEBUG("end");
+}
+
+void FormTaskMgr::PostRemoveTaskToHost(const std::string bundleName,
+    const sptr<IRemoteObject> &remoteObject, const RunningFormInfo &runningFormInfo)
+{
+    HILOG_DEBUG("start");
+    if (eventHandler_ == nullptr) {
+        HILOG_ERROR("fail, event handler invalidate.");
+        return;
+    }
+    auto removeFunc = [bundleName, remoteObject, runningFormInfo]() {
+        FormTaskMgr::GetInstance().FormRemove(bundleName, remoteObject, runningFormInfo);
+    };
+    eventHandler_->PostTask(removeFunc, FORM_TASK_DELAY_TIME);
+    HILOG_DEBUG("end");
+}
+
+void FormTaskMgr::FormAdd(const std::string bundleName, const sptr<IRemoteObject> &remoteObject,
+    const RunningFormInfo &runningFormInfo)
+{
+    HILOG_DEBUG("start");
+    sptr<AbilityRuntime::IJsFormStateObserver> remoteJsFormStateObserver =
+        iface_cast<AbilityRuntime::IJsFormStateObserver>(remoteObject);
+    if (remoteJsFormStateObserver == nullptr) {
+        HILOG_ERROR("fail, Failed to get js form state observer proxy.");
+        return;
+    }
+    remoteJsFormStateObserver->OnAddForm(bundleName, runningFormInfo);
+    HILOG_DEBUG("end");
+}
+
+void FormTaskMgr::FormRemove(const std::string bundleName, const sptr<IRemoteObject> &remoteObject,
+    const RunningFormInfo &runningFormInfo)
+{
+    HILOG_DEBUG("start");
+    sptr<AbilityRuntime::IJsFormStateObserver> remoteJsFormStateObserver =
+        iface_cast<AbilityRuntime::IJsFormStateObserver>(remoteObject);
+    if (remoteJsFormStateObserver == nullptr) {
+        HILOG_ERROR("fail, Failed to get js form state observer proxy.");
+        return;
+    }
+    remoteJsFormStateObserver->OnRemoveForm(bundleName, runningFormInfo);
+    HILOG_DEBUG("end");
 }
 
 void FormTaskMgr::AcquireProviderFormInfo(const int64_t formId, const Want &want,

@@ -350,6 +350,24 @@ public:
     int Dump(int fd, const std::vector<std::u16string> &args) override;
 
     /**
+     * @brief Register form add observer by bundle.
+     * @param bundleName BundleName of the form host
+     * @param callerToken Caller ability token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RegisterFormAddObserverByBundle(const std::string bundleName,
+        const sptr<IRemoteObject> &callerToken) override;
+
+    /**
+     * @brief Register form remove observer by bundle.
+     * @param bundleName BundleName of the form host
+     * @param callerToken Caller ability token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RegisterFormRemoveObserverByBundle(const std::string bundleName,
+        const sptr<IRemoteObject> &callerToken) override;
+
+    /**
     * @brief Check form manager service ready.
     * @return Return true if form manager service Ready; return false otherwise.
     */
