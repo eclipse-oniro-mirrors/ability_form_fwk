@@ -141,7 +141,7 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
         }
         if (!tempFormFlag && (ret == ERR_OK)) {
             HILOG_DEBUG("Checks if there is a listener listening for adding form");
-            ret = HandleFormAddObserver(formInfo.formId);
+            HandleFormAddObserver(formInfo.formId);
         }
     }
 
@@ -157,13 +157,21 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
     if (formId == 0 && DelayedSingleton<FormShareMgr>::GetInstance()->IsShareForm(newWant)) {
         DelayedSingleton<FormShareMgr>::GetInstance()->AddProviderData(newWant, wantParams);
     }
-    if (formId > 0) {
+    //Specify the form Id
+    bool specificFormFlag = false;
+    if (want.HasParameter(Constants::PARAM_FORM_MIGRATE_FORM_KEY)) {
+        specificFormFlag = want.GetBoolParam(Constants::PARAM_FORM_MIGRATE_FORM_KEY, false);
+        wantParams.Remove(Constants::PARAM_FORM_MIGRATE_FORM_KEY);
+    }
+    if (formId > 0 && specificFormFlag) {
+        ret = AllotFormBySpecificId(formItemInfo, callerToken, wantParams, formInfo);
+    } else if (formId > 0) {
         ret = AllotFormById(formItemInfo, callerToken, wantParams, formInfo);
     } else {
         ret = AllotFormByInfo(formItemInfo, callerToken, wantParams, formInfo);
         if (!tempFormFlag && (ret == ERR_OK)) {
             HILOG_DEBUG("Checks if there is a listener listening for adding form");
-            ret = HandleFormAddObserver(formInfo.formId);
+            HandleFormAddObserver(formInfo.formId);
         }
     }
 
@@ -1012,6 +1020,24 @@ ErrCode FormMgrAdapter::AddExistFormRecord(const FormItemInfo &info, const sptr<
         return FormDbCache::GetInstance().UpdateDBRecord(formId, newRecord);
     }
     return ERR_OK;
+}
+
+ErrCode FormMgrAdapter::AllotFormBySpecificId(const FormItemInfo &info,
+    const sptr<IRemoteObject> &callerToken, const WantParams &wantParams, FormJsInfo &formInfo)
+{
+    HILOG_DEBUG("start");
+    int64_t formId = info.GetFormId();
+    FormRecord record;
+    bool hasRecord = FormDataMgr::GetInstance().GetFormRecord(formId, record);
+    // find in db but not in cache
+    FormRecord dbRecord;
+    ErrCode getDbRet = FormDbCache::GetInstance().GetDBRecord(formId, dbRecord);
+    if (getDbRet == ERR_OK || hasRecord) {
+        HILOG_DEBUG("The specified ID already exists in the cache or db");
+        return AllotFormByInfo(info, callerToken, wantParams, formInfo);
+    }
+    HILOG_DEBUG("Creates the form with the specified ID");
+    return AddNewFormRecord(info, formId, callerToken, wantParams, formInfo);
 }
 
 /**

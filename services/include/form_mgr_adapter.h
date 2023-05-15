@@ -714,6 +714,17 @@ private:
      * @return Returns true if the caller is in the whitelist, false if not.
      */
     bool IsValidPublishEvent(const sptr<IBundleMgr> &iBundleMgr, const std::string &bundleName, const Want &want);
+
+    /**
+     * @brief Allocate form by specific Id.
+     * @param info Form configure info.
+     * @param callerToken Caller ability token.
+     * @param wantParams WantParams of the request.
+     * @param formInfo Form info for form host.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode AllotFormBySpecificId(const FormItemInfo &info,
+        const sptr<IRemoteObject> &callerToken, const WantParams &wantParams, FormJsInfo &formInfo);
 };
 
 enum class HostId : int8_t {
