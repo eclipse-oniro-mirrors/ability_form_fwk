@@ -273,6 +273,93 @@ HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0009, TestSize.Level1) {
 }
 
 /**
+ * @tc.name: FormMgrProxyTest_0010
+ * @tc.desc: text GetRunningFormInfos function.
+ * @tc.type: FUNC
+ * @tc.require: issueI639Z3
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0010, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_0010 starts";
+    std::vector<RunningFormInfo> runningFormInfos;
+    int result = formMgrProxy ->GetRunningFormInfos(runningFormInfos);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_0010 test ends";
+}
+
+/**
+ * @tc.name: FormMgrProxyTest_0011
+ * @tc.desc: text GetRunningFormInfosByBundleName function.
+ * @tc.type: FUNC
+ * @tc.require: issueI639Z3
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0011, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_0011 starts";
+    std::vector<RunningFormInfo> runningFormInfos;
+    std::string bundleName = "ohos.samples.FormApplication";
+    int result = formMgrProxy ->GetRunningFormInfosByBundleName(bundleName, runningFormInfos);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_0011 test ends";
+}
+
+/**
+ * @tc.name: FormMgrProxyTest_0012
+ * @tc.desc: text RegisterFormAddObserverByBundle function.
+ * @tc.type: FUNC
+ * @tc.require: issueI639Z3
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0012, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_0012 starts";
+    std::string bundleName = "ohos.samples.FormApplication";
+    const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormToken();
+    int result = formMgrProxy ->RegisterFormAddObserverByBundle(bundleName, callerToken);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_0012 test ends";
+}
+
+/**
+ * @tc.name: FormMgrProxyTest_0013
+ * @tc.desc: text RegisterFormAddObserverByBundle function.
+ * @tc.type: FUNC
+ * @tc.require: issueI639Z3
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0013, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_0013 starts";
+    std::string bundleName = "ohos.samples.FormApplication";
+    int result = formMgrProxy ->RegisterFormAddObserverByBundle(bundleName, nullptr);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_0013 test ends";
+}
+
+/**
+ * @tc.name: FormMgrProxyTest_0014
+ * @tc.desc: text RegisterFormRemoveObserverByBundle function.
+ * @tc.type: FUNC
+ * @tc.require: issueI639Z3
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0014, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_0012 starts";
+    std::string bundleName = "ohos.samples.FormApplication";
+    const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormToken();
+    int result = formMgrProxy ->RegisterFormRemoveObserverByBundle(bundleName, callerToken);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_0014 test ends";
+}
+
+/**
+ * @tc.name: FormMgrProxyTest_0015
+ * @tc.desc: text RegisterFormRemoveObserverByBundle function.
+ * @tc.type: FUNC
+ * @tc.require: issueI639Z3
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0015, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_0015 starts";
+    std::string bundleName = "ohos.samples.FormApplication";
+    int result = formMgrProxy ->RegisterFormRemoveObserverByBundle(bundleName, nullptr);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_0015 test ends";
+}
+
+/**
  * @tc.name: FormProviderProxyTest_0001
  * @tc.desc: text AcquireProviderFormInfo function.
  * @tc.type: FUNC
