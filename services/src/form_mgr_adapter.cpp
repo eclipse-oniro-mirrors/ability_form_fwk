@@ -1979,9 +1979,11 @@ int FormMgrAdapter::BackgroundEvent(const int64_t formId, Want &want, const sptr
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
 
-    if(want.GetBundle().empty()) {
+    if (want.GetBundle().empty() || record.bundleName != want.GetBundle()) {
+        HILOG_DEBUG("The parameter contains the wrong bundleName or the empty bundleName");
         want.SetBundle(record.bundleName);
     }
+    
     if (!CheckKeepBackgroundRunningPermission(iBundleMgr, record.bundleName)) {
         HILOG_ERROR("The app does not have permission for keeping background running.");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
