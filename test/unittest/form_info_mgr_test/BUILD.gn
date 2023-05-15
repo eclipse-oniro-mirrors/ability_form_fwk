@@ -20,6 +20,7 @@ ohos_unittest("FormInfoMgrTest") {
   module_out_path = module_output_path
 
   sources = [ "form_info_mgr_test.cpp" ]
+  include_dirs = [ "${form_fwk_path}/test/mock/include" ]
   cflags = []
   if (target_cpu == "arm") {
     cflags += [ "-DBINDER_IPC_32BIT" ]

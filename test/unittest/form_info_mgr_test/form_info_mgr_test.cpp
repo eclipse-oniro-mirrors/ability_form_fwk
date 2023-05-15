@@ -17,7 +17,9 @@
 #include <gmock/gmock.h>
 
 #define private public
+#include "form_bms_helper.h"
 #include "form_info_mgr.h"
+#include "mock_bundle_mgr.h"
 #undef private
 #include "form_mgr_errors.h"
 using namespace testing;
@@ -26,9 +28,9 @@ using namespace OHOS;
 using namespace OHOS::AppExecFwk;
 using namespace OHOS::AAFwk;
 
-const std::string FORM_BUNDLE_NAME_TEST = "ohos.samples.FormApplication";
+const std::string FORM_BUNDLE_NAME_TEST = "ohos.samples.Test";
 const std::string PARAM_MODULE_NAME_TEST = "entry";
-const std::string FORM_ABILITY_NAME_TEST = "ohos.samples.FormApplication.MainAbility";
+const std::string FORM_ABILITY_NAME_TEST = "ohos.samples.Test.MainAbility";
 const std::string PARAM_FORM_NAME = "com.form.name.test";
 const std::string FORM_JS_COMPONENT_NAME = "jsComponentName";
 const int32_t USER_ID = 100;
@@ -99,8 +101,17 @@ HWTEST_F(FormInfoMgrTest, FormInfoHelper_LoadFormConfigInfoByBundleName_0100, Te
 HWTEST_F(FormInfoMgrTest, FormInfoHelper_LoadFormConfigInfoByBundleName_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormInfoHelper_LoadFormConfigInfoByBundleName_0200 start";
+    sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
+    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
+    FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
+    auto bmsTask = [] (const std::string &bundleName, const BundleFlag flag, BundleInfo &bundleInfo, int32_t userId) {
+        GTEST_LOG_(INFO) << "FormInfoHelper_LoadFormConfigInfoByBundleName_0200 bmsTask called";
+        return true;
+    };
+    EXPECT_CALL(*bmsProxy, GetBundleInfo(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
     std::vector<FormInfo> formInfos;
     EXPECT_EQ(ERR_OK, formInfoHelper_->LoadFormConfigInfoByBundleName(FORM_BUNDLE_NAME_TEST, formInfos, USER_ID));
+    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
     GTEST_LOG_(INFO) << "FormInfoHelper_LoadFormConfigInfoByBundleName_0200 end";
 }
 
@@ -194,9 +205,18 @@ HWTEST_F(FormInfoMgrTest, FormInfoHelper_GetFormInfoDescription_0200, TestSize.L
 HWTEST_F(FormInfoMgrTest, FormInfoHelper_GetFormInfoDescription_0300, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormInfoHelper_GetFormInfoDescription_0300 start";
+    sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
+    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
+    FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
+    auto bmsTask = [] (const std::string &bundleName, const BundleFlag flag, BundleInfo &bundleInfo, int32_t userId) {
+        GTEST_LOG_(INFO) << "FormInfoHelper_GetFormInfoDescription_0300 bmsTask called";
+        return true;
+    };
+    EXPECT_CALL(*bmsProxy, GetBundleInfo(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
     std::vector<FormInfo> formInfos;
     EXPECT_EQ(ERR_OK,
         formInfoHelper_->LoadFormConfigInfoByBundleName(FORM_BUNDLE_NAME_TEST, formInfos, USER_ID));
+    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
     GTEST_LOG_(INFO) << "FormInfoHelper_GetFormInfoDescription_0300 end";
 }
 
@@ -223,6 +243,14 @@ HWTEST_F(FormInfoMgrTest, BundleFormInfo_InitFromJson_0100, TestSize.Level1)
 HWTEST_F(FormInfoMgrTest, BundleFormInfo_UpdateStaticFormInfos_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "BundleFormInfo_UpdateStaticFormInfos_0100 start";
+    sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
+    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
+    FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
+    auto bmsTask = [] (const std::string &bundleName, const BundleFlag flag, BundleInfo &bundleInfo, int32_t userId) {
+        GTEST_LOG_(INFO) << "BundleFormInfo_UpdateStaticFormInfos_0100 bmsTask called";
+        return true;
+    };
+    EXPECT_CALL(*bmsProxy, GetBundleInfo(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
     BundleFormInfo bundleFormInfo(FORM_BUNDLE_NAME_TEST);
     FormInfo formInfo = GetTestFormInfo();
     FormInfoStorage formInfoStorage;
@@ -232,6 +260,7 @@ HWTEST_F(FormInfoMgrTest, BundleFormInfo_UpdateStaticFormInfos_0100, TestSize.Le
     formInfoStorage.formInfos.push_back(formInfo);
     bundleFormInfo.formInfoStorages_.emplace_back(formInfoStorage);
     EXPECT_EQ(ERR_OK, bundleFormInfo.UpdateStaticFormInfos(USER_ID));
+    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
     GTEST_LOG_(INFO) << "BundleFormInfo_UpdateStaticFormInfos_0100 end";
 }
 
@@ -243,12 +272,21 @@ HWTEST_F(FormInfoMgrTest, BundleFormInfo_UpdateStaticFormInfos_0100, TestSize.Le
 HWTEST_F(FormInfoMgrTest, BundleFormInfo_UpdateStaticFormInfos_0200, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "BundleFormInfo_UpdateStaticFormInfos_0200 start";
+    sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
+    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
+    FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
+    auto bmsTask = [] (const std::string &bundleName, const BundleFlag flag, BundleInfo &bundleInfo, int32_t userId) {
+        GTEST_LOG_(INFO) << "BundleFormInfo_UpdateStaticFormInfos_0200 bmsTask called";
+        return true;
+    };
+    EXPECT_CALL(*bmsProxy, GetBundleInfo(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
     BundleFormInfo bundleFormInfo(FORM_BUNDLE_NAME_TEST);
     FormInfoStorage formInfoStorage;
     formInfoStorage.userId = 101;
     formInfoStorage.formInfos.push_back(GetTestFormInfo());
     bundleFormInfo.formInfoStorages_.emplace_back(formInfoStorage);
     EXPECT_EQ(ERR_OK, bundleFormInfo.UpdateStaticFormInfos(USER_ID));
+    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
     GTEST_LOG_(INFO) << "BundleFormInfo_UpdateStaticFormInfos_0200 end";
 }
 
@@ -316,7 +354,16 @@ HWTEST_F(FormInfoMgrTest, BundleFormInfo_GetFormsInfoByModule_0100, TestSize.Lev
 HWTEST_F(FormInfoMgrTest, FormInfoMgr_UpdateStaticFormInfos_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormInfoMgr_UpdateStaticFormInfos_0100 start";
+    sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
+    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
+    FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
+    auto bmsTask = [] (const std::string &bundleName, const BundleFlag flag, BundleInfo &bundleInfo, int32_t userId) {
+        GTEST_LOG_(INFO) << "FormInfoMgr_UpdateStaticFormInfos_0100 bmsTask called";
+        return true;
+    };
+    EXPECT_CALL(*bmsProxy, GetBundleInfo(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
     EXPECT_EQ(ERR_OK, formInfoMgr_.UpdateStaticFormInfos(FORM_BUNDLE_NAME_TEST, USER_ID));
+    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
     GTEST_LOG_(INFO) << "FormInfoMgr_UpdateStaticFormInfos_0100 end";
 }
 
@@ -347,6 +394,8 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgr_Remove_0100, TestSize.Level1)
 HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetFormsInfoByBundle_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormInfoMgr_GetFormsInfoByBundle_0100 start";
+    auto bundleFormInfoPtr = std::make_shared<BundleFormInfo>(FORM_BUNDLE_NAME_TEST);
+    formInfoMgr_.bundleFormInfoMap_[FORM_BUNDLE_NAME_TEST] = bundleFormInfoPtr;
     std::vector<FormInfo> formInfos;
     EXPECT_EQ(ERR_OK, formInfoMgr_.GetFormsInfoByBundle(FORM_BUNDLE_NAME_TEST, formInfos));
     GTEST_LOG_(INFO) << "FormInfoMgr_GetFormsInfoByBundle_0100 end";
@@ -360,6 +409,8 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetFormsInfoByBundle_0100, TestSize.Level1
 HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetFormsInfoByModule_0100, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormInfoMgr_GetFormsInfoByModule_0100 start";
+    auto bundleFormInfoPtr = std::make_shared<BundleFormInfo>(FORM_BUNDLE_NAME_TEST);
+    formInfoMgr_.bundleFormInfoMap_[FORM_BUNDLE_NAME_TEST] = bundleFormInfoPtr;
     std::vector<FormInfo> formInfos;
     EXPECT_EQ(ERR_OK,
         formInfoMgr_.GetFormsInfoByModule(FORM_BUNDLE_NAME_TEST, PARAM_MODULE_NAME_TEST, formInfos));
@@ -377,9 +428,29 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgr_AddDynamicFormInfo_0100, TestSize.Level1)
     EXPECT_EQ(ERR_OK, formInfoMgr_.Remove(FORM_BUNDLE_NAME_TEST, USER_ID));
     FormInfo formInfo = GetTestFormInfo();
     formInfo.abilityName = "ohos.samples.FormApplication";
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_NO_SUCH_ABILITY, formInfoMgr_.AddDynamicFormInfo(formInfo, USER_ID));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_INFO_FAILED, formInfoMgr_.AddDynamicFormInfo(formInfo, USER_ID));
+
+    sptr<MockBundleMgrStub> bms = new (std::nothrow) MockBundleMgrStub();
+    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
+    FormBmsHelper::GetInstance().iBundleMgr_ = bms;
+    auto bmsTask = [] (const std::string &bundleName, int32_t flag, BundleInfo &bundleInfo, int32_t userId) {
+        std::vector<AbilityInfo> abilityInfos;
+        HapModuleInfo moduleInfo;
+        AbilityInfo abilityInfo;
+        moduleInfo.moduleName = PARAM_MODULE_NAME_TEST;
+        abilityInfo.name = FORM_ABILITY_NAME_TEST;
+        abilityInfo.package = FORM_BUNDLE_NAME_TEST;
+        abilityInfo.bundleName = bundleName;
+        abilityInfo.moduleName = PARAM_MODULE_NAME_TEST;
+        moduleInfo.abilityInfos.push_back(abilityInfo);
+        bundleInfo.hapModuleInfos.emplace_back(moduleInfo);
+        return true;
+    };
+    EXPECT_CALL(*bms, GetBundleInfo(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
+
     formInfo = GetTestFormInfo();
     EXPECT_EQ(ERR_OK, formInfoMgr_.AddDynamicFormInfo(formInfo, USER_ID));
+    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
     GTEST_LOG_(INFO) << "FormInfoMgr_AddDynamicFormInfo_0100 end";
 }
 
@@ -391,6 +462,24 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgr_AddDynamicFormInfo_0100, TestSize.Level1)
 HWTEST_F(FormInfoMgrTest, FormInfoMgr_AddDynamicFormInfo_0200, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormInfoMgr_AddDynamicFormInfo_0200 start";
+    sptr<MockBundleMgrStub> bms = new (std::nothrow) MockBundleMgrStub();
+    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
+    FormBmsHelper::GetInstance().iBundleMgr_ = bms;
+    auto bmsTask = [] (const std::string &bundleName, int32_t flag, BundleInfo &bundleInfo, int32_t userId) {
+        std::vector<AbilityInfo> abilityInfos;
+        HapModuleInfo moduleInfo;
+        AbilityInfo abilityInfo;
+        moduleInfo.moduleName = PARAM_MODULE_NAME_TEST;
+        abilityInfo.name = FORM_ABILITY_NAME_TEST;
+        abilityInfo.package = FORM_BUNDLE_NAME_TEST;
+        abilityInfo.bundleName = bundleName;
+        abilityInfo.moduleName = PARAM_MODULE_NAME_TEST;
+        moduleInfo.abilityInfos.push_back(abilityInfo);
+        bundleInfo.hapModuleInfos.emplace_back(moduleInfo);
+        return true;
+    };
+    EXPECT_CALL(*bms, GetBundleInfo(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
+
     FormInfo formInfo = GetTestFormInfo();
     auto bundleFormInfoIter = formInfoMgr_.bundleFormInfoMap_.find(FORM_BUNDLE_NAME_TEST);
     if (bundleFormInfoIter == formInfoMgr_.bundleFormInfoMap_.end()) {
@@ -399,6 +488,7 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgr_AddDynamicFormInfo_0200, TestSize.Level1)
         formInfoMgr_.bundleFormInfoMap_.erase(bundleFormInfoIter);
         EXPECT_EQ(ERR_OK, formInfoMgr_.AddDynamicFormInfo(formInfo, USER_ID));
     }
+    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
     GTEST_LOG_(INFO) << "FormInfoMgr_AddDynamicFormInfo_0200 end";
 }
 
@@ -427,6 +517,8 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgr_RemoveAllDynamicFormsInfo_0100, TestSize.L
 {
     GTEST_LOG_(INFO) << "FormInfoMgr_RemoveAllDynamicFormsInfo_0100 start";
     formInfoMgr_.Start();
+    auto bundleFormInfoPtr = std::make_shared<BundleFormInfo>(FORM_BUNDLE_NAME_TEST);
+    formInfoMgr_.bundleFormInfoMap_[FORM_BUNDLE_NAME_TEST] = bundleFormInfoPtr;
     EXPECT_EQ(ERR_OK, formInfoMgr_.RemoveAllDynamicFormsInfo(FORM_BUNDLE_NAME_TEST, USER_ID));
     auto bundleFormInfoIter = formInfoMgr_.bundleFormInfoMap_.find(FORM_BUNDLE_NAME_TEST);
     if (bundleFormInfoIter == formInfoMgr_.bundleFormInfoMap_.end()) {
