@@ -163,10 +163,12 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
         specificFormFlag = want.GetBoolParam(Constants::PARAM_FORM_MIGRATE_FORM_KEY, false);
         wantParams.Remove(Constants::PARAM_FORM_MIGRATE_FORM_KEY);
     }
-    if (formId > 0 && specificFormFlag) {
-        ret = AllotFormBySpecificId(formItemInfo, callerToken, wantParams, formInfo);
-    } else if (formId > 0) {
-        ret = AllotFormById(formItemInfo, callerToken, wantParams, formInfo);
+    if (formId > 0) {
+        if (specificFormFlag) {
+            ret = AllotFormBySpecificId(formItemInfo, callerToken, wantParams, formInfo);
+        } else {
+            ret = AllotFormById(formItemInfo, callerToken, wantParams, formInfo);
+        }
     } else {
         ret = AllotFormByInfo(formItemInfo, callerToken, wantParams, formInfo);
         if (!tempFormFlag && (ret == ERR_OK)) {
@@ -1978,12 +1980,10 @@ int FormMgrAdapter::BackgroundEvent(const int64_t formId, Want &want, const sptr
         HILOG_ERROR("%{public}s fail, failed to get IBundleMgr.", __func__);
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
-
     if (want.GetBundle().empty() || record.bundleName != want.GetBundle()) {
         HILOG_DEBUG("The parameter contains the wrong bundleName or the empty bundleName");
         want.SetBundle(record.bundleName);
     }
-    
     if (!CheckKeepBackgroundRunningPermission(iBundleMgr, record.bundleName)) {
         HILOG_ERROR("The app does not have permission for keeping background running.");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
