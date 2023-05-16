@@ -2110,4 +2110,134 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0084, TestSize.Level1) {
     EXPECT_EQ(result, IPC_STUB_UNKNOW_TRANS_ERR);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0084 ends";
 }
+
+/**
+ * @tc.number: FormMgrStubTest_0085
+ * @tc.name: Verify OnRemoteRequest
+ * @tc.desc: When the parameter code is UINT32_MAX, the interface return value is
+ *           IPC_STUB_UNKNOW_TRANS_ERR.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0085, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0085 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_FORM_ADD_OBSERVER_BY_BUNDLE);
+    const std::string bundleName = "ABC";
+    const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormToken();
+    MessageParcel data;
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    data.WriteString(bundleName);
+    data.WriteRemoteObject(callerToken);
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0085 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_0086
+ * @tc.name: Verify OnRemoteRequest
+ * @tc.desc: When the parameter code is UINT32_MAX, the interface return value is
+ *           IPC_STUB_UNKNOW_TRANS_ERR.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0086, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0086 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_FORM_ADD_OBSERVER_BY_BUNDLE);
+    const std::string bundleName = "ABC";
+    MessageParcel data;
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    data.WriteString(bundleName);
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0086 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_0087
+ * @tc.name: Verify OnRemoteRequest
+ * @tc.desc: When the parameter code is UINT32_MAX, the interface return value is
+ *           IPC_STUB_UNKNOW_TRANS_ERR.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0087, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0087 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code =
+        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_FORM_REMOVE_OBSERVER_BY_BUNDLE);
+    const std::string bundleName = "ABC";
+    const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormToken();
+    MessageParcel data;
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    data.WriteString(bundleName);
+    data.WriteRemoteObject(callerToken);
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0087 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_0088
+ * @tc.name: Verify OnRemoteRequest
+ * @tc.desc: When the parameter code is UINT32_MAX, the interface return value is
+ *           IPC_STUB_UNKNOW_TRANS_ERR.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0088, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0088 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code =
+        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_FORM_REMOVE_OBSERVER_BY_BUNDLE);
+    const std::string bundleName = "ABC";
+    MessageParcel data;
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    data.WriteString(bundleName);
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0088 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_0089
+ * @tc.name: Verify OnRemoteRequest
+ * @tc.desc: When the parameter code is UINT32_MAX, the interface return value is
+ *           IPC_STUB_UNKNOW_TRANS_ERR.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0089, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0089 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_RUNNING_FORM_INFOS);
+    MessageParcel data;
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0089 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_0090
+ * @tc.name: Verify OnRemoteRequest
+ * @tc.desc: When the parameter code is UINT32_MAX, the interface return value is
+ *           IPC_STUB_UNKNOW_TRANS_ERR.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0090, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0090 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_RUNNING_FORM_INFOS_BY_BUNDLE);
+    MessageParcel data;
+    const std::string bundleName = "ABC";
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    data.WriteString(bundleName);
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0090 ends";
+}
 }

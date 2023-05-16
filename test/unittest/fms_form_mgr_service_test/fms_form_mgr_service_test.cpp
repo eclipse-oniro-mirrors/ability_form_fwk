@@ -949,6 +949,7 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0051, TestSize.Level1)
     EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_INFO_FAILED, formMgrService.AcquireFormData(formId, requestCode, callerToken, formData));
     GTEST_LOG_(INFO) << "FormMgrService_0051 end";
 }
+
 /**
  * @tc.number: FormMgrService_0052
  * @tc.name: test HiDumpTemporaryFormInfos function.
@@ -986,5 +987,117 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0053, TestSize.Level1)
     EXPECT_EQ(false, formInfo.empty());
 
     GTEST_LOG_(INFO) << "FormMgrService_0053 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0054
+ * @tc.name: test RegisterFormAddObserverByBundle function.
+ * @tc.desc: Verify that the AcquireFormData interface is called normally and the return value is ERR_OK.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0054, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0054 start";
+    FormMgrService formMgrService;
+    const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    std::string bundleName = "A";
+    MockIsSACall(true);
+    MockCheckAcrossLocalAccountsPermission(true);
+    EXPECT_EQ(ERR_OK, formMgrService.RegisterFormAddObserverByBundle(bundleName, callerToken));
+    GTEST_LOG_(INFO) << "FormMgrService_0054 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0055
+ * @tc.name: test RegisterFormAddObserverByBundle function.
+ * @tc.desc: Verify that the RegisterFormAddObserverByBundle interface is called normally
+ * and the return value is ERR_APPEXECFWK_FORM_GET_INFO_FAILED.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0055, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0055 start";
+    FormMgrService formMgrService;
+    const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    std::string bundleName = "A";
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(false);
+    MockCheckAcrossLocalAccountsPermission(true);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS,
+        formMgrService.RegisterFormAddObserverByBundle(bundleName, callerToken));
+    GTEST_LOG_(INFO) << "FormMgrService_0055 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0056
+ * @tc.name: test RegisterFormAddObserverByBundle function.
+ * @tc.desc: Verify that the RegisterFormAddObserverByBundle interface is called normally
+ * and the return value is ERR_APPEXECFWK_FORM_PERMISSION_DENY.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0056, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0056 start";
+    FormMgrService formMgrService;
+    const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    std::string bundleName = "A";
+    MockIsSACall(true);
+    MockCheckAcrossLocalAccountsPermission(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY,
+        formMgrService.RegisterFormAddObserverByBundle(bundleName, callerToken));
+    GTEST_LOG_(INFO) << "FormMgrService_0056 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0057
+ * @tc.name: test RegisterFormAddObserverByBundle function.
+ * @tc.desc: Verify that the AcquireFormData interface is called normally and the return value is ERR_OK.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0057, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0057 start";
+    FormMgrService formMgrService;
+    const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    std::string bundleName = "A";
+    MockIsSACall(true);
+    MockCheckAcrossLocalAccountsPermission(true);
+    EXPECT_EQ(ERR_OK, formMgrService.RegisterFormRemoveObserverByBundle(bundleName, callerToken));
+    GTEST_LOG_(INFO) << "FormMgrService_0057 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0058
+ * @tc.name: test RegisterFormRemoveObserverByBundle function.
+ * @tc.desc: Verify that the RegisterFormRemoveObserverByBundle interface is called normally
+ * and the return value is ERR_APPEXECFWK_FORM_GET_INFO_FAILED.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0058, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0058 start";
+    FormMgrService formMgrService;
+    const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    std::string bundleName = "A";
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(false);
+    MockCheckAcrossLocalAccountsPermission(true);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS,
+        formMgrService.RegisterFormRemoveObserverByBundle(bundleName, callerToken));
+    GTEST_LOG_(INFO) << "FormMgrService_0058 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0059
+ * @tc.name: test RegisterFormRemoveObserverByBundle function.
+ * @tc.desc: Verify that the RegisterFormRemoveObserverByBundle interface is called normally
+ * and the return value is ERR_APPEXECFWK_FORM_PERMISSION_DENY.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0059, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0059 start";
+    FormMgrService formMgrService;
+    const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    std::string bundleName = "A";
+    MockIsSACall(true);
+    MockCheckAcrossLocalAccountsPermission(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY,
+        formMgrService.RegisterFormRemoveObserverByBundle(bundleName, callerToken));
+    GTEST_LOG_(INFO) << "FormMgrService_0059 end";
 }
 }

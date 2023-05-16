@@ -1810,4 +1810,283 @@ HWTEST_F(FormMgrTest, FormMgrTest_0091, TestSize.Level1) {
     EXPECT_EQ(result, OHOS::ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrTest_0091 test ends";
 }
+
+/**
+ * @tc.name: FormMgrTest_0092
+ * @tc.desc: Verify GetRunningFormInfos
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0092, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0092 starts";
+    EXPECT_CALL(*mockProxy, GetRunningFormInfos(_))
+        .Times(1)
+        .WillOnce(Return(OHOS::ERR_OK));
+    FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
+
+    std::vector<RunningFormInfo> runningFormInfos;
+    int result = FormMgr::GetInstance().GetRunningFormInfos(runningFormInfos);
+
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrTest_0092 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0093
+ * @tc.desc: Verify GetRunningFormInfos
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0093, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0093 starts";
+    EXPECT_CALL(*mockProxy, GetRunningFormInfos(_))
+        .Times(1)
+        .WillOnce(Return(OHOS::ERR_OK));
+    FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
+
+    std::vector<RunningFormInfo> runningFormInfos;
+    int result = FormMgr::GetInstance().GetRunningFormInfos(runningFormInfos);
+
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR);
+    GTEST_LOG_(INFO) << "FormMgrTest_0093 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0094
+ * @tc.desc: Verify GetRunningFormInfos
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0094, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0094 starts";
+    FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
+    EXPECT_CALL(*mockProxy, GetRunningFormInfos(_))
+        .Times(1)
+        .WillOnce(Return(ERROR_NUM));
+    std::vector<RunningFormInfo> runningFormInfos;
+    int result = FormMgr::GetInstance().GetRunningFormInfos(runningFormInfos);
+
+    EXPECT_EQ(result, ERROR_NUM);
+    GTEST_LOG_(INFO) << "FormMgrTest_0094 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0095
+ * @tc.desc: Verify GetRunningFormInfos
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0095, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0095 starts";
+    FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
+    EXPECT_CALL(*mockProxy, GetRunningFormInfos(_))
+        .Times(1)
+        .WillOnce(Return(NEGATIVE_NUM));
+    std::vector<RunningFormInfo> runningFormInfos;
+    int result = FormMgr::GetInstance().GetRunningFormInfos(runningFormInfos);
+
+    EXPECT_EQ(result, NEGATIVE_NUM);
+    GTEST_LOG_(INFO) << "FormMgrTest_0095 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0096
+ * @tc.desc: Verify GetRunningFormInfos
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0096, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0096 starts";
+    EXPECT_CALL(*mockProxy, GetRunningFormInfosByBundleName(_, _))
+        .Times(1)
+        .WillOnce(Return(OHOS::ERR_OK));
+    FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
+
+    std::string bundleName = "a";
+    std::vector<RunningFormInfo> runningFormInfos;
+    int result = FormMgr::GetInstance().GetRunningFormInfosByBundleName(bundleName, runningFormInfos);
+
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrTest_0096 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0097
+ * @tc.desc: Verify GetRunningFormInfosByBundleName
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0097, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0097 starts";
+    EXPECT_CALL(*mockProxy, GetRunningFormInfosByBundleName(_, _))
+        .Times(1)
+        .WillOnce(Return(OHOS::ERR_OK));
+    FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
+    std::string bundleName = "a";
+    std::vector<RunningFormInfo> runningFormInfos;
+    int result = FormMgr::GetInstance().GetRunningFormInfosByBundleName(bundleName, runningFormInfos);
+
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrTest_0097 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0098
+ * @tc.desc: Verify GetRunningFormInfosByBundleName
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0098, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0098 starts";
+    EXPECT_CALL(*mockProxy, GetRunningFormInfosByBundleName(_, _))
+        .Times(1)
+        .WillOnce(Return(OHOS::ERR_OK));
+    FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
+    std::string bundleName = "a";
+    std::vector<RunningFormInfo> runningFormInfos;
+    int result = FormMgr::GetInstance().GetRunningFormInfosByBundleName(bundleName, runningFormInfos);
+
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR);
+    GTEST_LOG_(INFO) << "FormMgrTest_0098 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0099
+ * @tc.desc: Verify GetRunningFormInfosByBundleName
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0099, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0099 starts";
+    FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
+    EXPECT_CALL(*mockProxy, GetRunningFormInfosByBundleName(_, _))
+        .Times(1)
+        .WillOnce(Return(ERROR_NUM));
+    std::string bundleName = "a";
+    std::vector<RunningFormInfo> runningFormInfos;
+    int result = FormMgr::GetInstance().GetRunningFormInfosByBundleName(bundleName, runningFormInfos);
+
+    EXPECT_EQ(result, ERROR_NUM);
+    GTEST_LOG_(INFO) << "FormMgrTest_0099 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0100
+ * @tc.desc: Verify RegisterFormAddObserverByBundle
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0100, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0100 starts";
+    EXPECT_CALL(*mockProxy, RegisterFormAddObserverByBundle(_, _))
+        .Times(1)
+        .WillOnce(Return(OHOS::ERR_OK));
+    FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
+    std::string bundleName = "a";
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    int result = FormMgr::GetInstance().RegisterFormAddObserverByBundle(bundleName, callerToken);
+
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrTest_0100 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0101
+ * @tc.desc: Verify RegisterFormAddObserverByBundle
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0101, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0101 starts";
+    EXPECT_CALL(*mockProxy, RegisterFormAddObserverByBundle(_, _))
+        .Times(1)
+        .WillOnce(Return(OHOS::ERR_OK));
+    FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
+    std::string bundleName = "a";
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    int result = FormMgr::GetInstance().RegisterFormAddObserverByBundle(bundleName, callerToken);
+
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR);
+    GTEST_LOG_(INFO) << "FormMgrTest_0101 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0102
+ * @tc.desc: Verify RegisterFormAddObserverByBundle
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0102, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0102 starts";
+    EXPECT_CALL(*mockProxy, RegisterFormAddObserverByBundle(_, _))
+        .Times(1)
+        .WillOnce(Return(ERROR_NUM));
+    FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
+    std::string bundleName = "a";
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    int result = FormMgr::GetInstance().RegisterFormAddObserverByBundle(bundleName, callerToken);
+
+    EXPECT_EQ(result, ERROR_NUM);
+    GTEST_LOG_(INFO) << "FormMgrTest_0102 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0103
+ * @tc.desc: Verify RegisterFormRemoveObserverByBundle
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0103, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0103 starts";
+    EXPECT_CALL(*mockProxy, RegisterFormRemoveObserverByBundle(_, _))
+        .Times(1)
+        .WillOnce(Return(OHOS::ERR_OK));
+    FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
+    std::string bundleName = "a";
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    int result = FormMgr::GetInstance().RegisterFormRemoveObserverByBundle(bundleName, callerToken);
+
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrTest_0103 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0104
+ * @tc.desc: Verify RegisterFormRemoveObserverByBundle
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0104, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0104 starts";
+    EXPECT_CALL(*mockProxy, RegisterFormRemoveObserverByBundle(_, _))
+        .Times(1)
+        .WillOnce(Return(OHOS::ERR_OK));
+    FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
+    std::string bundleName = "a";
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    int result = FormMgr::GetInstance().RegisterFormRemoveObserverByBundle(bundleName, callerToken);
+
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR);
+    GTEST_LOG_(INFO) << "FormMgrTest_0104 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0105
+ * @tc.desc: Verify RegisterFormRemoveObserverByBundle
+ * @tc.type: FUNC
+ * @tc.require: issueI63OQL
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0105, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0105 starts";
+    EXPECT_CALL(*mockProxy, RegisterFormRemoveObserverByBundle(_, _))
+        .Times(1)
+        .WillOnce(Return(ERROR_NUM));
+    FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
+    std::string bundleName = "a";
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    int result = FormMgr::GetInstance().RegisterFormRemoveObserverByBundle(bundleName, callerToken);
+
+    EXPECT_EQ(result, ERROR_NUM);
+    GTEST_LOG_(INFO) << "FormMgrTest_0105 test ends";
+}
 } // namespace
