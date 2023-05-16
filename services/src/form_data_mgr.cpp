@@ -1848,15 +1848,18 @@ ErrCode FormDataMgr::GetRunningFormInfosByFormId(const int64_t formId, RunningFo
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
 
-    runningFormInfo.formId = formId;
+    runningFormInfo.formId = matchedFormId;
     runningFormInfo.formName = formRecord.formName;
     runningFormInfo.dimension = formRecord.specification;
     runningFormInfo.bundleName = formRecord.bundleName;
     runningFormInfo.moduleName = formRecord.moduleName;
     runningFormInfo.abilityName = formRecord.abilityName;
     std::vector<FormHostRecord> formHostRecords;
-    GetFormHostRecord(formId, formHostRecords);
-
+    GetFormHostRecord(matchedFormId, formHostRecords);
+    if (formHostRecords.empty()) {
+        HILOG_ERROR("fail, clientHost is empty");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
     runningFormInfo.hostBundleName = formHostRecords.begin()->GetHostBundleName();
     runningFormInfo.formVisiblity = formRecord.isVisible ? FormVisibilityType::VISIBLE : FormVisibilityType::INVISIBLE;
     return ERR_OK;
@@ -1983,6 +1986,10 @@ int32_t FormDataMgr::GetFormInstanceById(const int64_t formId, FormInstance &for
         FormRecord formRecord = info->second;
         std::vector<FormHostRecord> formHostRecords;
         GetFormHostRecord(formId, formHostRecords);
+        if (formHostRecords.empty()) {
+            HILOG_ERROR("fail, clientHost is empty");
+            return ERR_APPEXECFWK_FORM_COMMON_CODE;
+        }
         formInstance.formHostName = formHostRecords.begin()->GetHostBundleName();
         formInstance.formId = formRecord.formId;
         formInstance.specification = formRecord.specification;
@@ -1996,7 +2003,7 @@ int32_t FormDataMgr::GetFormInstanceById(const int64_t formId, FormInstance &for
     return ERR_OK;
 }
 
-void FormDataMgr::GetRunningFormInfos(std::vector<RunningFormInfo> &runningFormInfos)
+ErrCode FormDataMgr::GetRunningFormInfos(std::vector<RunningFormInfo> &runningFormInfos)
 {
     HILOG_DEBUG("start");
     std::lock_guard<std::recursive_mutex> lock(formRecordMutex_);
@@ -2014,10 +2021,15 @@ void FormDataMgr::GetRunningFormInfos(std::vector<RunningFormInfo> &runningFormI
             info.formVisiblity = record.second.isVisible ? FormVisibilityType::VISIBLE : FormVisibilityType::INVISIBLE;
             std::vector<FormHostRecord> formHostRecords;
             GetFormHostRecord(record.first, formHostRecords);
+            if (formHostRecords.empty()) {
+                HILOG_ERROR("fail, clientHost is empty");
+                return ERR_APPEXECFWK_FORM_COMMON_CODE;
+            }
             info.hostBundleName = formHostRecords.begin()->GetHostBundleName();
             runningFormInfos.emplace_back(info);
         }
     }
+    return ERR_OK;
 }
 
 ErrCode FormDataMgr::GetRunningFormInfosByBundleName(const std::string &bundleName,

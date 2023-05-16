@@ -2597,8 +2597,7 @@ int32_t FormMgrAdapter::GetHostFormsCount(std::string &bundleName, int32_t &form
 ErrCode FormMgrAdapter::GetRunningFormInfos(std::vector<RunningFormInfo> &runningFormInfos)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    FormDataMgr::GetInstance().GetRunningFormInfos(runningFormInfos);
-    return ERR_OK;
+    return FormDataMgr::GetInstance().GetRunningFormInfos(runningFormInfos);
 }
 
 ErrCode FormMgrAdapter::GetRunningFormInfosByBundleName(const std::string &bundleName,

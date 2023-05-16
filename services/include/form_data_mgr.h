@@ -602,8 +602,9 @@ public:
     /**
      * @brief Get all running form infos.
      * @param runningFormInfos Return the running forms' infos currently.
+     * @return Returns ERR_OK on success, others on failure.
      */
-    void GetRunningFormInfos(std::vector<RunningFormInfo> &runningFormInfos);
+    ErrCode GetRunningFormInfos(std::vector<RunningFormInfo> &runningFormInfos);
 
     /**
      * @brief Get the running form infos by bundle name.
