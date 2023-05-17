@@ -19,13 +19,16 @@
 
 #include "extractor.h"
 #include "form_constants.h"
+#include "form_render_impl.h"
 #include "hilog_wrapper.h"
+#include "xcollie/watchdog.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 namespace FormRender {
 constexpr int32_t RENDER_FORM_FAILED = -1;
 constexpr int32_t RELOAD_FORM_FAILED = -1;
+constexpr int32_t TIMEOUT = 10 * 1000;
 
 std::shared_ptr<FormRenderRecord> FormRenderRecord::Create(const std::string &bundleName, const std::string &uid)
 {
@@ -97,7 +100,20 @@ bool FormRenderRecord::CreateEventHandler(const std::string &bundleName)
         HILOG_ERROR("Create event handler failed.");
         return false;
     }
+
+    AddWatchDogThreadMonitor();
     return true;
+}
+
+void FormRenderRecord::AddWatchDogThreadMonitor()
+{
+    auto timeOutCallback = [this](const std::string& name, int waitState) {
+        HILOG_ERROR("FRS is block when bundleName is %{public}s", bundleName_.c_str());
+        OHOS::DelayedSingleton<FormRenderImpl>::GetInstance()->OnRenderingBlock(bundleName_);
+    };
+    if (HiviewDFX::Watchdog::GetInstance().AddThread(bundleName_, eventHandler_, timeOutCallback, TIMEOUT) != 0) {
+        HILOG_ERROR("watchdog addThread failed");
+    }
 }
 
 int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const Want &want, const sptr<IRemoteObject> hostRemoteObj)

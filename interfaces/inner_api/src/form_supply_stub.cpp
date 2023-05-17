@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -42,6 +42,8 @@ FormSupplyStub::FormSupplyStub()
         &FormSupplyStub::HandleOnStopRenderingTaskDone;
     memberFuncMap_[static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_ACQUIRED_DATA)] =
         &FormSupplyStub::HandleOnAcquireDataResult;
+    memberFuncMap_[static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_RENDERING_BLOCK)] =
+        &FormSupplyStub::HandleOnRenderingBlock;
 }
 
 FormSupplyStub::~FormSupplyStub()
@@ -248,6 +250,19 @@ int32_t FormSupplyStub::HandleOnStopRenderingTaskDone(MessageParcel &data, Messa
     }
 
     int32_t result = OnStopRenderingTaskDone(formId, *want);
+    reply.WriteInt32(result);
+    return result;
+}
+
+int32_t FormSupplyStub::HandleOnRenderingBlock(MessageParcel &data, MessageParcel &reply)
+{
+    auto bundleName = data.ReadString();
+    if (bundleName.empty()) {
+        HILOG_ERROR("failed to ReadString<bundleName>");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    int32_t result = OnRenderingBlock(bundleName);
     reply.WriteInt32(result);
     return result;
 }

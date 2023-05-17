@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -66,6 +66,7 @@ const std::map<int32_t, int32_t> ERROR_CODE_MAP_EXTERNAL = {
     { ERR_APPEXECFWK_FORM_GET_SYSMGR_FAILED,           ERR_FORM_EXTERNAL_IPC_ERROR },
     { ERR_APPEXECFWK_FORM_CONNECT_FORM_RENDER_FAILED,  ERR_FORM_EXTERNAL_CONNECT_RENDER_FAILED },
     { ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED,         ERR_FORM_EXTERNAL_RENDER_DIED },
+    { ERR_APPEXECFWK_FORM_NOT_TRUST,                   ERR_FORM_EXTERNAL_FORM_NOT_TRUST },
 };
 
 const std::map<int32_t, std::string> ERR_MSG_MAP_EXTERNAL = {
@@ -86,6 +87,7 @@ const std::map<int32_t, std::string> ERR_MSG_MAP_EXTERNAL = {
     { ERR_FORM_EXTERNAL_ABILITY_NOT_INSTALLED,        "The ability is not installed" },
     { ERR_FORM_EXTERNAL_CONNECT_RENDER_FAILED,        "Connect FormRenderService failed, please try again later." },
     { ERR_FORM_EXTERNAL_RENDER_DIED,                  "FormRenderService is dead, please reconnect." },
+    { ERR_FORM_EXTERNAL_FORM_NOT_TRUST,               "Form is not trust." },
 };
 
 const std::map<int32_t, std::string> ERR_MSG_MAP_INTERNAL = {

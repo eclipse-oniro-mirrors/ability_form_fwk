@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -46,17 +46,7 @@ RdbStoreDataCallBackFormInfoStorage::~RdbStoreDataCallBackFormInfoStorage()
 int32_t RdbStoreDataCallBackFormInfoStorage::OnCreate(NativeRdb::RdbStore &rdbStore)
 {
     HILOG_DEBUG("OnCreate");
-    int ret = NativeRdb::E_OK;
-    if (hasTableInit_) {
-        return ret;
-    }
-    std::string createTableSql = "CREATE TABLE IF NOT EXISTS " + formRdbConfig_.tableName
-        + " (KEY TEXT NOT NULL PRIMARY KEY, VALUE TEXT NOT NULL);";
-    ret = rdbStore.ExecuteSql(createTableSql);
-    if (ret == NativeRdb::E_OK) {
-        hasTableInit_ = true;
-    }
-    return ret;
+    return NativeRdb::E_OK;
 }
 
 int32_t RdbStoreDataCallBackFormInfoStorage::OnUpgrade(
@@ -92,6 +82,29 @@ FormRdbDataMgr::FormRdbDataMgr(const FormRdbConfig &formRdbConfig)
     HILOG_DEBUG("create form rdb data manager");
 }
 
+ErrCode FormRdbDataMgr::CreateTable()
+{
+    if (rdbStore_ == nullptr) {
+        HILOG_ERROR("FormInfoRdbStore is null");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
+    std::string createTableSql;
+    if (formRdbConfig_.createTableSql.empty()) {
+        createTableSql = "CREATE TABLE IF NOT EXISTS " + formRdbConfig_.tableName
+            + " (KEY TEXT NOT NULL PRIMARY KEY, VALUE TEXT NOT NULL);";
+    } else {
+        createTableSql = formRdbConfig_.createTableSql;
+    }
+
+    int ret = rdbStore_->ExecuteSql(createTableSql);
+    if (ret != NativeRdb::E_OK) {
+        HILOG_ERROR("CreateTable failed, ret: %{public}d", ret);
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    return ERR_OK;
+}
+
 ErrCode FormRdbDataMgr::Init()
 {
     HILOG_DEBUG("Create rdbStore");
@@ -115,6 +128,27 @@ ErrCode FormRdbDataMgr::Init()
     rdbStore_ = NativeRdb::RdbHelper::GetRdbStore(rdbStoreConfig, formRdbConfig_.version, rdbDataCallBack_, errCode);
     if (rdbStore_ == nullptr) {
         HILOG_ERROR("FormInfoRdbStore init fail");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
+    return CreateTable();
+}
+
+ErrCode FormRdbDataMgr::InsertData(const std::string &key)
+{
+    HILOG_DEBUG("InsertData start");
+    if (rdbStore_ == nullptr) {
+        HILOG_ERROR("FormInfoRdbStore is null");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
+    int64_t rowId = -1;
+    NativeRdb::ValuesBucket valuesBucket;
+    valuesBucket.PutString(FORM_KEY, key);
+    auto ret = rdbStore_->InsertWithConflictResolution(
+        rowId, formRdbConfig_.tableName, valuesBucket, NativeRdb::ConflictResolution::ON_CONFLICT_REPLACE);
+    if (ret != NativeRdb::E_OK) {
+        HILOG_ERROR("Insert operation failed, result: %{public}d, key=%{public}s.", ret, key.c_str());
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return ERR_OK;
@@ -235,6 +269,39 @@ ErrCode FormRdbDataMgr::QueryAllData(std::unordered_map<std::string, std::string
         }
 
         datas.emplace(resultKey, resultValue);
+    } while (absSharedResultSet->GoToNextRow() == NativeRdb::E_OK);
+    absSharedResultSet->Close();
+    return ERR_OK;
+}
+
+ErrCode FormRdbDataMgr::QueryAllKeys(std::set<std::string> &datas)
+{
+    HILOG_DEBUG("QueryAllKeys start");
+    if (rdbStore_ == nullptr) {
+        HILOG_ERROR("FormInfoRdbStore is null");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
+    NativeRdb::AbsRdbPredicates absRdbPredicates(formRdbConfig_.tableName);
+    auto absSharedResultSet = rdbStore_->Query(absRdbPredicates, std::vector<std::string>());
+    if (absSharedResultSet == nullptr || !absSharedResultSet->HasBlock()) {
+        HILOG_ERROR("absSharedResultSet failed");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
+    if (absSharedResultSet->GoToFirstRow() != NativeRdb::E_OK) {
+        HILOG_ERROR("GoToFirstRow failed");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
+    do {
+        std::string resultKey;
+        if (absSharedResultSet->GetString(FORM_KEY_INDEX, resultKey) != NativeRdb::E_OK) {
+            HILOG_ERROR("GetString key failed");
+            return ERR_APPEXECFWK_FORM_COMMON_CODE;
+        }
+
+        datas.insert(resultKey);
     } while (absSharedResultSet->GoToNextRow() == NativeRdb::E_OK);
     absSharedResultSet->Close();
     return ERR_OK;

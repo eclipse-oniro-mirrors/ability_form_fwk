@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -80,6 +80,7 @@ enum {
     ERR_APPEXECFWK_FORM_FORM_USER_NOT_EXIST,
     ERR_APPEXECFWK_FORM_CONNECT_FORM_RENDER_FAILED,
     ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED,
+    ERR_APPEXECFWK_FORM_NOT_TRUST,
 };
 }  // namespace OHOS
 #endif  // OHOS_FORM_FWK_FORM_MGR_ERRORS_H

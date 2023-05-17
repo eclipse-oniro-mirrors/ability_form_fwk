@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,6 +37,7 @@ struct FormRdbConfig {
     std::string syncMode { Constants::FORM_SYNC_MODE };
     int32_t version { Constants::FORM_RDB_VERSION };
     std::string databaseFileType { Constants::FORM_RDB_FILE_TYPE };
+    std::string createTableSql;
 };
 class RdbStoreDataCallBackFormInfoStorage : public NativeRdb::RdbOpenCallback {
 public:
@@ -55,7 +56,6 @@ public:
     int32_t onCorruption(std::string databaseFile) override;
 private:
     FormRdbConfig formRdbConfig_;
-    bool hasTableInit_ = false;
 };
 
 /**
@@ -68,6 +68,13 @@ public:
     explicit FormRdbDataMgr(const FormRdbConfig &formRdbConfig);
 
     ErrCode Init();
+
+    /**
+     * @brief Insert the form data in DB.
+     * @param key The data Key.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode InsertData(const std::string &key);
 
     /**
      * @brief Insert the form data in DB.
@@ -95,7 +102,15 @@ public:
      */
     ErrCode QueryAllData(std::unordered_map<std::string, std::string> &values);
 
+    /**
+     * @brief Query all key in DB.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode QueryAllKeys(std::set<std::string> &datas);
+
 private:
+    ErrCode CreateTable();
+
     FormRdbConfig formRdbConfig_;
     std::shared_ptr<NativeRdb::RdbStore> rdbStore_;
 };

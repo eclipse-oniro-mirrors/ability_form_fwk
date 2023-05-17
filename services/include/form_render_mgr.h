@@ -66,6 +66,8 @@ public:
 
     bool IsRerenderForRenderServiceDied(int64_t formId);
 
+    void OnRenderingBlock(const std::string &bundleName);
+
 private:
     ErrCode ConnectRenderService(const sptr<FormRenderConnection> &connection) const;
 

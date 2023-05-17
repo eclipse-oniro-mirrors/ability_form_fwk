@@ -49,6 +49,7 @@
 #include "form_share_mgr.h"
 #include "form_supply_callback.h"
 #include "form_timer_mgr.h"
+#include "form_trust_mgr.h"
 #include "form_util.h"
 #include "hilog_wrapper.h"
 #include "hitrace_meter.h"
@@ -131,6 +132,11 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
         return errCode;
     }
     formItemInfo.SetFormId(formId);
+    if (!FormTrustMgr::GetInstance().IsTrust(formItemInfo.GetProviderBundleName())) {
+        HILOG_ERROR("%{public}s fail, %{public}s is unTrust",
+            __func__, formItemInfo.GetProviderBundleName().c_str());
+        return ERR_APPEXECFWK_FORM_NOT_TRUST;
+    }
 
     // publish form
     if (formId > 0 && FormDataMgr::GetInstance().IsRequestPublishForm(formId)) {
