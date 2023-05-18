@@ -35,7 +35,6 @@ bool FormInstance::ReadFromParcel(Parcel &parcel)
 
 bool FormInstance::Marshalling(Parcel &parcel) const
 {
-
     // write formId
     if (!parcel.WriteInt64(formId)) {
         return false;

@@ -1652,7 +1652,7 @@ NativeValue* NapiFormHost::OnDeleteInvalidForms(NativeEngine &engine, const Nati
         std::vector<int64_t> iFormIds;
     };
     std::shared_ptr<OnDeleteInvalidForms> onDeleteInvalidForms = std::make_shared<OnDeleteInvalidForms>();
-    if (!(info.argv[PARAM0]->IsArray())){
+    if (!(info.argv[PARAM0]->IsArray())) {
         HILOG_ERROR("input params is not array!");
         errCode = ERR_APPEXECFWK_FORM_FORM_ARRAY_ERR;
     }
@@ -1665,7 +1665,7 @@ NativeValue* NapiFormHost::OnDeleteInvalidForms(NativeEngine &engine, const Nati
         HILOG_ERROR("formId list is empty!");
         errCode = ERR_APPEXECFWK_FORM_FORM_ID_ARRAY_ERR;
     }
-    for (size_t i = 0; i < strFormIdList.size(); i++){
+    for (size_t i = 0; i < strFormIdList.size(); i++) {
         int64_t formIdValue;
         if (!ConvertStringToInt64(strFormIdList[i], formIdValue)){
             HILOG_ERROR("conversion int failed!");

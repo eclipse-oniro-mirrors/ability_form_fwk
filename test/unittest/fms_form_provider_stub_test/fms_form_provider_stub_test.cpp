@@ -55,8 +55,7 @@ void FormProviderStubTest::SetUp()
 void FormProviderStubTest::TearDown()
 {}
 
-class MockFormSupplyStub : public FormSupplyStub
-{
+class MockFormSupplyStub : public FormSupplyStub {
 public:
     MockFormSupplyStub() {};
     virtual ~MockFormSupplyStub() {};

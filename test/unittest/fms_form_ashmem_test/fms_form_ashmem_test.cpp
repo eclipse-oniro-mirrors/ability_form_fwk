@@ -44,18 +44,19 @@ public:
     void TearDown();
 
     sptr<FormAshmem> form_ashmem_;
-
 };
 
 void FmsFormAshmemTest::SetUpTestCase() {}
 
 void FmsFormAshmemTest::TearDownTestCase() {}
 
-void FmsFormAshmemTest::SetUp() {
+void FmsFormAshmemTest::SetUp()
+{
     form_ashmem_ = new (std::nothrow) FormAshmem();
 }
 
-void FmsFormAshmemTest::TearDown() {
+void FmsFormAshmemTest::TearDown()
+{
     form_ashmem_ = nullptr;
 }
 
