@@ -473,5 +473,61 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_018, TestSize.Level1)
     EXPECT_EQ(formBmsHelper.GetCallerBundleName(callerBundleName), ERR_OK);
     GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_018 end";
 }
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_019
+ * @tc.desc: Verify that the GetBundleNameByUid interface executes normally and exits without exception.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_019, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest_019 start";
+    FormBmsHelper formBmsHelper;
+    sptr<IRemoteObject> impl;
+    sptr<MockBundleMgrProxy> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
+    bundleManager->GetNameForUid_ = ERR_OK;
+    formBmsHelper.SetBundleManager(bundleManager);
+    std::string bundleName = "A";
+    std::int32_t uid = 0;
+    EXPECT_EQ(formBmsHelper.GetBundleNameByUid(uid, bundleName), ERR_OK);
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest_019 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_020
+ * @tc.desc: Verify that the GetBundleNameByUid interface fails to execute and returns an error code.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_020, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest_020 start";
+    FormBmsHelper formBmsHelper;
+    std::string bundleName = "A";
+    std::int32_t uid = 0;
+    formBmsHelper.SetBundleManager(nullptr);
+    EXPECT_EQ(formBmsHelper.GetBundleNameByUid(uid, bundleName), ERR_APPEXECFWK_FORM_GET_BMS_FAILED);
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest_020 end";
+}
+
+/**
+ * @tc.name: FmsFormBmsHelperTest_021
+ * @tc.desc: Verify that the GetBundleNameByUid interface fails to execute and returns an error code.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_021, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest_021 start";
+    FormBmsHelper formBmsHelper;
+    sptr<IRemoteObject> impl;
+    sptr<MockBundleMgrProxy> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
+    bundleManager->GetNameForUid_ = ERR_OK + 1;
+    formBmsHelper.SetBundleManager(bundleManager);
+    std::string bundleName = "A";
+    std::int32_t uid = 0;
+    EXPECT_EQ(formBmsHelper.GetBundleNameByUid(uid, bundleName), ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
+    GTEST_LOG_(INFO) << "FmsFormBmsHelperTest_021 end";
+}
+
+
 } // namespace AppExecFwk
 } // namespace OHOS

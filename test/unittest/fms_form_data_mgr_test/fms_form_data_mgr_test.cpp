@@ -26,6 +26,7 @@
 #include "form_record.h"
 #include "form_util.h"
 #include "hilog_wrapper.h"
+#include "ipc_skeleton.h"
 #include "mock_form_host_client.h"
 
 using namespace testing::ext;
@@ -35,6 +36,8 @@ static const std::string FORM_HOST_BUNDLE_NAME = "com.form.provider.service";
 static const std::string FORM_PROVIDER_ABILITY_NAME = "com.form.provider.app.test.ability";
 static const std::string PARAM_PROVIDER_MODULE_NAME = "com.form.provider.app.test.ability";
 static const std::string FORM_NAME = "formName";
+
+extern void MockGetBundleNameByUid(ErrCode mockRet);
 
 namespace {
 class FmsFormDataMgrTest : public testing::Test {
@@ -2214,5 +2217,197 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetTempFormRecord_002, TestSize.
     EXPECT_EQ(1, formInfos.size());
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetTempFormRecord_002 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetRunningFormInfos_001
+ * @tc.name: GetRunningFormInfos
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *       If temp form count is greater than zero, return true, and the count is correct.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetRunningFormInfos_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetRunningFormInfos_001 start";
+    // Clean all formRecords
+    formDataMgr_.formRecords_.clear();
+    // create formRecord
+    int64_t otherFormId = 800;
+    int callingUid = 20000;
+    FormItemInfo formItemInfo;
+    formItemInfo.SetTemporaryFlag(false);
+    std::string bundleName = "A";
+    formItemInfo.SetHostBundleName(bundleName);
+    FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
+    formDataMgr_.formRecords_.emplace(otherFormId, record);
+
+    // create clientRecords_
+    FormHostRecord formHostRecord;
+    formHostRecord.SetFormHostClient(token_);
+    formHostRecord.SetHostBundleName(bundleName);
+    formHostRecord.AddForm(otherFormId);
+    formDataMgr_.clientRecords_.push_back(formHostRecord);
+    std::vector<FormHostRecord> formHostRecords;
+    formDataMgr_.GetFormHostRecord(otherFormId, formHostRecords);
+    std::string hostBundleName = formHostRecords.begin()->GetHostBundleName();
+    EXPECT_EQ(bundleName, hostBundleName);
+    EXPECT_EQ(1, formHostRecords.size());
+
+    std::vector<RunningFormInfo> runningFormInfos;
+    EXPECT_EQ(1, formDataMgr_.clientRecords_.size());
+    EXPECT_EQ(ERR_OK, formDataMgr_.GetRunningFormInfos(runningFormInfos));
+    EXPECT_EQ(1, runningFormInfos.size());
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetRunningFormInfos_001 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetRunningFormInfos_002
+ * @tc.name: GetRunningFormInfos
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *       If temp form count is greater than zero, return true, and the count is correct.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetRunningFormInfos_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetRunningFormInfos_002 start";
+    // Clean all formRecords
+    formDataMgr_.formRecords_.clear();
+    // create formRecord
+    int64_t otherFormId = 800;
+    int callingUid = 20000;
+    FormItemInfo formItemInfo;
+    formItemInfo.SetTemporaryFlag(false);
+    std::string bundleName = "A";
+    formItemInfo.SetHostBundleName(bundleName);
+    FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
+    formDataMgr_.formRecords_.emplace(otherFormId, record);
+
+    std::vector<RunningFormInfo> runningFormInfos;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formDataMgr_.GetRunningFormInfos(runningFormInfos));
+    EXPECT_EQ(0, runningFormInfos.size());
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetRunningFormInfos_002 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetRunningFormInfosByBundleName_001
+ * @tc.name: GetRunningFormInfosByBundleName
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *       If temp form count is greater than zero, return true, and the count is correct.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetRunningFormInfosByBundleName_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetRunningFormInfosByBundleName_001 start";
+    // Clean all formRecords
+    formDataMgr_.formRecords_.clear();
+    // create formRecord
+    int64_t otherFormId = 800;
+    int callingUid = 20000;
+    FormItemInfo formItemInfo;
+    formItemInfo.SetTemporaryFlag(false);
+    std::string bundleName = "A";
+    formItemInfo.SetHostBundleName(bundleName);
+    FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
+    formDataMgr_.formRecords_.emplace(otherFormId, record);
+
+    std::vector<RunningFormInfo> runningFormInfos;
+    EXPECT_EQ(0, runningFormInfos.size());
+    EXPECT_EQ(ERR_OK, formDataMgr_.GetRunningFormInfosByBundleName(bundleName, runningFormInfos));
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetRunningFormInfosByBundleName_001 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetRunningFormInfosByBundleName_002
+ * @tc.name: GetRunningFormInfosByBundleName
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *       If temp form count is greater than zero, return true, and the count is correct.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetRunningFormInfosByBundleName_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetRunningFormInfosByBundleName_002 start";
+    // Clean all formRecords
+    formDataMgr_.formRecords_.clear();
+    // create formRecord
+    int64_t otherFormId = 800;
+    int callingUid = 20000;
+    MockGetBundleNameByUid(ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
+    FormItemInfo formItemInfo;
+    formItemInfo.SetTemporaryFlag(false);
+    std::string bundleName = "A";
+    formItemInfo.SetHostBundleName(bundleName);
+    FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
+    formDataMgr_.formRecords_.emplace(otherFormId, record);
+
+    std::vector<RunningFormInfo> runningFormInfos;
+    EXPECT_EQ(0, runningFormInfos.size());
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_INFO_FAILED,
+        formDataMgr_.GetRunningFormInfosByBundleName(bundleName, runningFormInfos));
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetRunningFormInfosByBundleName_002 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetRunningFormInfosByBundleName_003
+ * @tc.name: GetRunningFormInfosByBundleName
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *       If temp form count is greater than zero, return true, and the count is correct.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetRunningFormInfosByBundleName_003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetRunningFormInfosByBundleName_003 start";
+    // Clean all formRecords
+    formDataMgr_.formRecords_.clear();
+    // create formRecord
+    int64_t otherFormId = 800;
+    int callingUid = 20000;
+    MockGetBundleNameByUid(ERR_OK);
+    FormItemInfo formItemInfo;
+    formItemInfo.SetTemporaryFlag(false);
+    std::string bundleName = "";
+    formItemInfo.SetHostBundleName(bundleName);
+    FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
+    formDataMgr_.formRecords_.emplace(otherFormId, record);
+
+    std::vector<RunningFormInfo> runningFormInfos;
+    EXPECT_EQ(0, runningFormInfos.size());
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
+        formDataMgr_.GetRunningFormInfosByBundleName(bundleName, runningFormInfos));
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetRunningFormInfosByBundleName_003 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetRunningFormInfosByBundleName_004
+ * @tc.name: GetRunningFormInfosByBundleName
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *       If temp form count is greater than zero, return true, and the count is correct.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetRunningFormInfosByBundleName_004, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetRunningFormInfosByBundleName_004 start";
+    // Clean all formRecords
+    formDataMgr_.formRecords_.clear();
+    // create formRecord
+    int64_t otherFormId = 800;
+    int callingUid = 20000;
+    FormItemInfo formItemInfo;
+    formItemInfo.SetTemporaryFlag(false);
+    std::string bundleName = "A";
+    formItemInfo.SetHostBundleName(bundleName);
+    FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
+    GTEST_LOG_(INFO) << "providerUserId = " << record.providerUserId;
+    GTEST_LOG_(INFO) << "formTempFlag = " << record.formTempFlag;
+    formDataMgr_.formRecords_.emplace(otherFormId, record);
+
+    std::vector<RunningFormInfo> runningFormInfos;
+    EXPECT_EQ(ERR_OK, formDataMgr_.GetRunningFormInfosByBundleName(bundleName, runningFormInfos));
+
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetRunningFormInfosByBundleName_004 end";
 }
 }
