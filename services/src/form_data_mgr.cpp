@@ -1925,7 +1925,7 @@ int32_t FormDataMgr::GetHostFormsCount(const std::string &bundleName, int32_t &f
 }
 
 int32_t FormDataMgr::GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
-        std::vector<FormInstance> &formInstances)
+    std::vector<FormInstance> &formInstances)
 {
     HILOG_DEBUG("get form instances by filter");
     std::lock_guard<std::recursive_mutex> lock(formRecordMutex_);

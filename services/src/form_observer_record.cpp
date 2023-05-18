@@ -21,7 +21,8 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-void FormObserverRecord::SetDeathRecipient(const sptr<IRemoteObject> &callerToken, const sptr<IRemoteObject::DeathRecipient> &deathRecipient)
+void FormObserverRecord::SetDeathRecipient(const sptr<IRemoteObject> &callerToken,
+    const sptr<IRemoteObject::DeathRecipient> &deathRecipient)
 {
     HILOG_DEBUG("start");
     if (callerToken == nullptr || deathRecipient == nullptr) {

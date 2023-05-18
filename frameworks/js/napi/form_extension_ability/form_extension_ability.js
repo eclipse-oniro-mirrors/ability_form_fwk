@@ -14,40 +14,40 @@
  */
 
 class FormExtensionAbility {
-    onAddForm(want) {
-        console.log('FormExtension onAddForm, want:' + want.abilityName);
-        return {
-            data: ""
-        };
-    }
+  onAddForm(want) {
+    console.log('FormExtension onAddForm, want:' + want.abilityName);
+    return {
+        data: ""
+    };
+  }
 
-    onCastToNormalForm(formId) {
-        console.log('FormExtension onCastToNormalForm, formId:' + formId);
-    }
+  onCastToNormalForm(formId) {
+    console.log('FormExtension onCastToNormalForm, formId:' + formId);
+  }
 
-    onUpdateForm(formId) {
-        console.log('FormExtension onUpdateForm, formId:' + formId);
-    }
+  onUpdateForm(formId) {
+    console.log('FormExtension onUpdateForm, formId:' + formId);
+  }
 
-    onChangeFormVisibility(newStatus) {
-        console.log('FormExtension onChangeFormVisibility, newStatus:' + newStatus);
-    }
+  onChangeFormVisibility(newStatus) {
+    console.log('FormExtension onChangeFormVisibility, newStatus:' + newStatus);
+  }
 
-    onFormEvent(formId, message) {
-        console.log('FormExtension onFormEvent, formId:' + formId + ", message:" + message);
-    }
+  onFormEvent(formId, message) {
+    console.log('FormExtension onFormEvent, formId:' + formId + ', message:' + message);
+  }
 
-    onRemoveForm(formId) {
-        console.log('FormExtension onRemoveForm, formId:' + formId);
-    }
+  onRemoveForm(formId) {
+    console.log('FormExtension onRemoveForm, formId:' + formId);
+  }
 
-    onConfigurationUpdate(newConfig) {
-        console.log('FormExtension onConfigurationUpdate');
-    }
+  onConfigurationUpdate(newConfig) {
+    console.log('FormExtension onConfigurationUpdate');
+  }
 
-    onShareForm(formId) {
-        console.log('FormExtension onShareForm, formId:' + formId);
-    }
+  onShareForm(formId) {
+    console.log('FormExtension onShareForm, formId:' + formId);
+  }
 }
 
-export default FormExtensionAbility
+export default FormExtensionAbility;

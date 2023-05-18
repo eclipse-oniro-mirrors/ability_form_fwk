@@ -13,27 +13,27 @@
  * limitations under the License.
  */
 
-import ServiceExtensionAbility from '@ohos.app.ability.ServiceExtensionAbility'
+import ServiceExtensionAbility from '@ohos.app.ability.ServiceExtensionAbility';
 
 export default class ServiceExtension extends ServiceExtensionAbility {
-    onCreate(want) {
-        console.log("[FormRender] onCreate");
-    }
+  onCreate(want) {
+    console.log('[FormRender] onCreate');
+  }
 
-    onRequest(want, startId) {
-        console.log("[FormRender] onRequest");
-    }
+  onRequest(want, startId) {
+    console.log('[FormRender] onRequest');
+  }
 
-    onConnect(want) {
-        console.log("[FormRender] onConnect");
-        return undefined;
-    }
+  onConnect(want) {
+    console.log('[FormRender] onConnect');
+    return undefined;
+  }
 
-    onDisconnect(want) {
-        console.log("[FormRender] onDisconnect");
-    }
+  onDisconnect(want) {
+    console.log('[FormRender] onDisconnect');
+  }
 
-    onDestroy() {
-        console.log("[FormRender] onDestroy");
-    }
+  onDestroy() {
+    console.log('[FormRender] onDestroy');
+  }
 }
