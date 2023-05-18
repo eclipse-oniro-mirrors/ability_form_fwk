@@ -30,7 +30,6 @@
 #include "if_system_ability_manager.h"
 #include "mock_system_ability_manager.h"
 
-
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::AppExecFwk;

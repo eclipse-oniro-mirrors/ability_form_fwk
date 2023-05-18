@@ -34,6 +34,8 @@ group("unittest") {
   testonly = true
 
   deps = [
+    "unittest/erms_mgr_interface_test:unittest",
+    "unittest/erms_mgr_param_test:unittest",
     "unittest/fms_form_ashmem_test:unittest",
     "unittest/fms_form_batch_delete_connection_test:unittest",
     "unittest/fms_form_bms_helper_test:unittest",

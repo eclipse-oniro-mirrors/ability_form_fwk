@@ -559,6 +559,9 @@ HWTEST_F(FmsFormHostClientTest, OnShareFormResponse_0100, TestSize.Level0)
     formHostClient->OnShareFormResponse(requestCode, result);
     testing::Mock::AllowLeak(callback.get());
     formHostClient->shareFormCallbackMap_.clear();
+    int32_t errorCode = 1;
+    std::string errorMsg = "this is errorMsg";
+    formHostClient->OnError(errorCode, errorMsg);
     GTEST_LOG_(INFO) << "FmsFormHostClientTest OnShareFormResponse_0100 end";
 }
 }
