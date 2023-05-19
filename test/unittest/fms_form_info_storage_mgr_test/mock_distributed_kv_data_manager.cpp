@@ -41,12 +41,9 @@ namespace DistributedKv {
 Status DistributedKvDataManager::GetSingleKvStore(const Options &options, const AppId &appId, const StoreId &storeId,
     std::shared_ptr<SingleKvStore> &singleKvStore)
 {
-    if(g_MockSingleKvStore)
-    {
+    if(g_MockSingleKvStore) {
         singleKvStore= nullptr;
-    }
-    else
-    {
+    } else {
         std::shared_ptr<DistributedKv::SingleKvStore> kvStorePtr = std::make_shared<MockSingleKvStore>();
         singleKvStore = kvStorePtr;
     }

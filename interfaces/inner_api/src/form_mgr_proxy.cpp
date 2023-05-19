@@ -1502,7 +1502,7 @@ int32_t FormMgrProxy::GetHostFormsCount(std::string &bundleName, int32_t &formCo
 }
 
 int32_t FormMgrProxy::GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
-        std::vector<FormInstance> &formInstances)
+    std::vector<FormInstance> &formInstances)
 {
     HILOG_DEBUG("start.");
     MessageParcel data;
@@ -1545,7 +1545,8 @@ int32_t FormMgrProxy::GetFormInstanceById(const int64_t formId, FormInstance &fo
     return error;
 }
 
-int32_t FormMgrProxy::GetFormInstance(IFormMgr::Message code, MessageParcel &data, std::vector<FormInstance> &formInstances)
+int32_t FormMgrProxy::GetFormInstance(IFormMgr::Message code, MessageParcel &data,
+    std::vector<FormInstance> &formInstances)
 {
     int error;
     MessageParcel reply;

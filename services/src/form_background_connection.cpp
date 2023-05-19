@@ -26,7 +26,7 @@ namespace OHOS {
 namespace AppExecFwk {
 FormBackgroundConnection::FormBackgroundConnection(const int64_t formId, const std::string &bundleName,
     const std::string &abilityName, const std::string &funcName, const std::string &params)
-     : formId_(formId), funcName_(funcName), params_(params)
+    : formId_(formId), funcName_(funcName), params_(params)
 {
     SetProviderKey(bundleName, abilityName);
 }

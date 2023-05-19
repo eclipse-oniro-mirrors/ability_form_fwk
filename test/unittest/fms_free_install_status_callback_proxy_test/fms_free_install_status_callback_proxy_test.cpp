@@ -51,7 +51,7 @@ class MolFreeInstallStatusCallBackStub : public FreeInstallStatusCallBackStub {
 public:
     MolFreeInstallStatusCallBackStub() {};
     virtual ~MolFreeInstallStatusCallBackStub() = default;
-    virtual void OnInstallFinished(int32_t resultCode, const Want &want, int32_t userId) override {};
+    void OnInstallFinished(int32_t resultCode, const Want &want, int32_t userId) override {};
 
     int SendRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override
     {

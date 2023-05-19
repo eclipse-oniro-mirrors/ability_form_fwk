@@ -13,21 +13,21 @@
  * limitations under the License.
  */
 
-var ExtensionContext = requireNapi("application.ExtensionContext")
+let ExtensionContext = requireNapi('application.ExtensionContext');
 
 class FormExtensionContext extends ExtensionContext {
-    constructor(obj) {
-        super(obj);
-    }
+  constructor(obj) {
+    super(obj);
+  }
 
-    updateForm(formId, formBindingData, callback) {
-        console.log("FormExtensionContext updateForm");
-        return this.__context_impl__.updateForm(formId, formBindingData, callback);
-    }
+  updateForm(formId, formBindingData, callback) {
+    console.log('FormExtensionContext updateForm');
+    return this.__context_impl__.updateForm(formId, formBindingData, callback);
+  }
 
-    startAbility(want, callback) {
-        return this.__context_impl__.startAbility(want, callback);
-    }
+  startAbility(want, callback) {
+    return this.__context_impl__.startAbility(want, callback);
+  }
 }
 
-export default FormExtensionContext
+export default FormExtensionContext;

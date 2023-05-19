@@ -154,7 +154,7 @@ sptr<Ashmem> MessageParcel::ReadAshmem()
         int32_t size = -1;
         sptr<Ashmem> ashmem = new (std::nothrow) Ashmem(fd, size);
         return ashmem;
-    }else {
+    } else {
         return nullptr;
     }
 }

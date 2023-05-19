@@ -14,9 +14,9 @@
  */
 
 class FormBindingData {
-    createFormBindingData(obj) {
-        this.data = obj;
-    }
+  createFormBindingData(obj) {
+    this.data = obj;
+  }
 }
 
-export default FormBindingData
+export default FormBindingData;
