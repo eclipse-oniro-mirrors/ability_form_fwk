@@ -377,6 +377,9 @@ int FormMgrService::LifecycleUpdate(const std::vector<int64_t> &formIds,
  */
 int FormMgrService::DumpStorageFormInfos(std::string &formInfos)
 {
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
     return FormMgrAdapter::GetInstance().DumpStorageFormInfos(formInfos);
 }
 /**
@@ -387,6 +390,9 @@ int FormMgrService::DumpStorageFormInfos(std::string &formInfos)
  */
 int FormMgrService::DumpFormInfoByBundleName(const std::string &bundleName, std::string &formInfos)
 {
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
     return FormMgrAdapter::GetInstance().DumpFormInfoByBundleName(bundleName, formInfos);
 }
 /**
@@ -397,6 +403,9 @@ int FormMgrService::DumpFormInfoByBundleName(const std::string &bundleName, std:
  */
 int FormMgrService::DumpFormInfoByFormId(const std::int64_t formId, std::string &formInfo)
 {
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
     return FormMgrAdapter::GetInstance().DumpFormInfoByFormId(formId, formInfo);
 }
 /**
@@ -407,6 +416,9 @@ int FormMgrService::DumpFormInfoByFormId(const std::int64_t formId, std::string 
  */
 int FormMgrService::DumpFormTimerByFormId(const std::int64_t formId, std::string &isTimingService)
 {
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
     return FormMgrAdapter::GetInstance().DumpFormTimerByFormId(formId, isTimingService);
 }
 /**
@@ -1015,11 +1027,17 @@ void FormMgrService::HiDumpStorageFormInfos([[maybe_unused]] const std::string &
 
 void FormMgrService::HiDumpTemporaryFormInfos([[maybe_unused]] const std::string &args, std::string &result)
 {
+    if (!CheckCallerIsSystemApp()) {
+        return;
+    }
     FormMgrAdapter::GetInstance().DumpTemporaryFormInfos(result);
 }
 
 void FormMgrService::HiDumpStaticBundleFormInfos([[maybe_unused]] const std::string &args, std::string &result)
 {
+    if (!CheckCallerIsSystemApp()) {
+        return;
+    }
     FormMgrAdapter::GetInstance().DumpStaticBundleFormInfos(result);
 }
 
