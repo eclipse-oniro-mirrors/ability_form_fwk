@@ -107,9 +107,9 @@ bool FormRenderRecord::CreateEventHandler(const std::string &bundleName)
 
 void FormRenderRecord::AddWatchDogThreadMonitor()
 {
-    auto timeOutCallback = [this](const std::string& name, int waitState) {
-        HILOG_ERROR("FRS is block when bundleName is %{public}s", bundleName_.c_str());
-        OHOS::DelayedSingleton<FormRenderImpl>::GetInstance()->OnRenderingBlock(bundleName_);
+    auto timeOutCallback = [bundleName = bundleName_](const std::string& name, int waitState) {
+        HILOG_ERROR("FRS is block when bundleName is %{public}s", bundleName.c_str());
+        OHOS::DelayedSingleton<FormRenderImpl>::GetInstance()->OnRenderingBlock(bundleName);
     };
     if (HiviewDFX::Watchdog::GetInstance().AddThread(bundleName_, eventHandler_, timeOutCallback, TIMEOUT) != 0) {
         HILOG_ERROR("watchdog addThread failed");

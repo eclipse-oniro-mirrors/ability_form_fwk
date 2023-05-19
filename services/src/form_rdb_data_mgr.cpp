@@ -284,13 +284,14 @@ ErrCode FormRdbDataMgr::QueryAllKeys(std::set<std::string> &datas)
 
     NativeRdb::AbsRdbPredicates absRdbPredicates(formRdbConfig_.tableName);
     auto absSharedResultSet = rdbStore_->Query(absRdbPredicates, std::vector<std::string>());
-    if (absSharedResultSet == nullptr || !absSharedResultSet->HasBlock()) {
+    if (absSharedResultSet == nullptr) {
         HILOG_ERROR("absSharedResultSet failed");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
-    if (absSharedResultSet->GoToFirstRow() != NativeRdb::E_OK) {
-        HILOG_ERROR("GoToFirstRow failed");
+    if (!absSharedResultSet->HasBlock() || absSharedResultSet->GoToFirstRow() != NativeRdb::E_OK) {
+        HILOG_ERROR("HasBlock or GoToFirstRow failed");
+        absSharedResultSet->Close();
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -298,6 +299,7 @@ ErrCode FormRdbDataMgr::QueryAllKeys(std::set<std::string> &datas)
         std::string resultKey;
         if (absSharedResultSet->GetString(FORM_KEY_INDEX, resultKey) != NativeRdb::E_OK) {
             HILOG_ERROR("GetString key failed");
+            absSharedResultSet->Close();
             return ERR_APPEXECFWK_FORM_COMMON_CODE;
         }
 

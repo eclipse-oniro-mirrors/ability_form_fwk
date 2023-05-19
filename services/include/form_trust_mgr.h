@@ -16,8 +16,8 @@
 #ifndef OHOS_FORM_FWK_FORM_TRUST_MGR_H
 #define OHOS_FORM_FWK_FORM_TRUST_MGR_H
 
-#include <singleton.h>
 #include <set>
+#include <singleton.h>
 #include <string>
 
 #include "form_rdb_data_mgr.h"

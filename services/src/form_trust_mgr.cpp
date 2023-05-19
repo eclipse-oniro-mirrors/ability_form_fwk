@@ -54,6 +54,7 @@ bool FormTrustMgr::IsTrust(const std::string &bundleName)
 
 void FormTrustMgr::MarkTrustFlag(const std::string &bundleName, bool isTrust)
 {
+    std::lock_guard<std::mutex> lock(rdbStoreMutex_);
     auto iter = unTrustList_.find(bundleName);
     if (isTrust && iter != unTrustList_.end()) {
         auto ret = rdbDataManager_->DeleteData(bundleName);
