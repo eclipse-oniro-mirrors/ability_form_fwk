@@ -104,7 +104,7 @@ public:
      * @param bundleName The block of bundleName.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual int32_t OnRenderingBlock(const std::string &bundleName) { return ERR_OK; };
+    virtual int32_t OnRenderingBlock(const std::string &bundleName) { return ERR_OK; }
 
     enum class Message {
         // ipc id 1-1000 for kit

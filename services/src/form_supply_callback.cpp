@@ -308,7 +308,7 @@ int32_t FormSupplyCallback::OnStopRenderingTaskDone(int64_t formId, const Want &
 
 int32_t FormSupplyCallback::OnRenderingBlock(const std::string &bundleName)
 {
-    HILOG_INFO("%{public}s called, bundleName: %{public}s.", __func__, bundleName.c_str());
+    HILOG_INFO("OnRenderingBlock called, bundleName: %{public}s.", bundleName.c_str());
     FormRenderMgr::GetInstance().OnRenderingBlock(bundleName);
     return ERR_OK;
 }

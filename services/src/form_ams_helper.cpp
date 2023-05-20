@@ -119,10 +119,10 @@ ErrCode FormAmsHelper::DisconnectServiceAbilityDelay(const sptr<AAFwk::IAbilityC
  */
 ErrCode FormAmsHelper::StopExtensionAbility(const Want &want)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_DEBUG("StopExtensionAbility called.");
     sptr<AAFwk::IAbilityManager> ams = GetAbilityManager();
     if (ams == nullptr) {
-        HILOG_ERROR("%{public}s:ability service not connect", __func__);
+        HILOG_ERROR("StopExtensionAbility ability service not connect");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     return IN_PROCESS_CALL(ams->StopExtensionAbility(want, nullptr));

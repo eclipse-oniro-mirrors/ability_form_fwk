@@ -399,7 +399,7 @@ void FormRenderMgr::DisconnectRenderService(const sptr<FormRenderConnection> con
 
 void FormRenderMgr::OnRenderingBlock(const std::string &bundleName)
 {
-    HILOG_INFO("%{public}s called, bundleName: %{public}s.", __func__, bundleName.c_str());
+    HILOG_INFO("OnRenderingBlock called, bundleName: %{public}s.", bundleName.c_str());
     FormEventInfo eventInfo;
     eventInfo.bundleName = bundleName;
     FormEventReport::SendFormEvent(

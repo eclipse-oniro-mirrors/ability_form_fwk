@@ -133,8 +133,8 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
     }
     formItemInfo.SetFormId(formId);
     if (!FormTrustMgr::GetInstance().IsTrust(formItemInfo.GetProviderBundleName())) {
-        HILOG_ERROR("%{public}s fail, %{public}s is unTrust",
-            __func__, formItemInfo.GetProviderBundleName().c_str());
+        HILOG_ERROR("AddForm fail, %{public}s is unTrust",
+            formItemInfo.GetProviderBundleName().c_str());
         return ERR_APPEXECFWK_FORM_NOT_TRUST;
     }
 

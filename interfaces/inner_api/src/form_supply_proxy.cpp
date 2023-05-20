@@ -307,12 +307,12 @@ int32_t FormSupplyProxy::OnRenderingBlock(const std::string &bundleName)
 {
     MessageParcel data;
     if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("%{public}s, failed to write interface token", __func__);
+        HILOG_ERROR("OnRenderingBlock failed to write interface token");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     if (!data.WriteString(bundleName)) {
-        HILOG_ERROR("%{public}s, failed to write bundleName", __func__);
+        HILOG_ERROR("OnRenderingBlock failed to write bundleName");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -324,7 +324,7 @@ int32_t FormSupplyProxy::OnRenderingBlock(const std::string &bundleName)
         reply,
         option);
     if (error != ERR_OK) {
-        HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d", __func__, error);
+        HILOG_ERROR("OnRenderingBlock failed to SendRequest: %{public}d", error);
     }
     return error;
 }

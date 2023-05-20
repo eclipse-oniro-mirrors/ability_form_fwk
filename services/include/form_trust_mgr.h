@@ -61,5 +61,4 @@ private:
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
-
 #endif // OHOS_FORM_FWK_FORM_TRUST_MGR_H
