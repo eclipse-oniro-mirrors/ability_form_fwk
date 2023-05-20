@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -42,6 +42,7 @@ enum {
     ERR_FORM_EXTERNAL_ABILITY_NOT_INSTALLED = 16501004,
     ERR_FORM_EXTERNAL_CONNECT_RENDER_FAILED = 16501005,
     ERR_FORM_EXTERNAL_RENDER_DIED = 16501006,
+    ERR_FORM_EXTERNAL_FORM_NOT_TRUST = 16501007,
 };
 
 /**

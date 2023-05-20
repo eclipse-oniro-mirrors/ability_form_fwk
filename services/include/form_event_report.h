@@ -45,6 +45,7 @@ enum class FormEventName {
     RELEASE_FORM,
     DELETE_INVALID_FORM,
     SET_NEXT_REFRESH_TIME_FORM,
+    FORM_RENDER_BLOCK,
 };
 
 class FormEventReport {

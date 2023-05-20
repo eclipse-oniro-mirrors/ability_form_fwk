@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -111,6 +111,21 @@ ErrCode FormAmsHelper::DisconnectServiceAbilityDelay(const sptr<AAFwk::IAbilityC
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     return ERR_OK;
+}
+/**
+ * @brief StopExtensionAbility with want, send want to ability manager service.
+ * @param want The want of the ability to start.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+ErrCode FormAmsHelper::StopExtensionAbility(const Want &want)
+{
+    HILOG_DEBUG("StopExtensionAbility called.");
+    sptr<AAFwk::IAbilityManager> ams = GetAbilityManager();
+    if (ams == nullptr) {
+        HILOG_ERROR("StopExtensionAbility ability service not connect");
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+    }
+    return IN_PROCESS_CALL(ams->StopExtensionAbility(want, nullptr));
 }
 /**
  * @brief Add the ability manager instance for debug.

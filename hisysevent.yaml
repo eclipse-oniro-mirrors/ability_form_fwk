@@ -1,4 +1,4 @@
-#  Copyright (c) 2022 Huawei Device Co., Ltd.
+#  Copyright (c) 2022-2023 Huawei Device Co., Ltd.
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
 #  You may obtain a copy of the License at
@@ -66,3 +66,7 @@ DELETE_INVALID_FORM:
 SET_NEXT_REFRESH_TIME_FORM:
   __BASE: {type: BEHAVIOR, level: MINOR, tag: ability, desc: form manager}
   FORM_ID: {type: INT64, desc: formId}
+
+FORM_RENDER_BLOCK:
+  __BASE: {type: FAULT, level: MINOR, tag: ability, desc: form manager}
+  BUNDLE_NAME: {type: STRING, desc: bundle name}

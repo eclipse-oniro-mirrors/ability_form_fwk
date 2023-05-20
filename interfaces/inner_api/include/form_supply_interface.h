@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -99,6 +99,13 @@ public:
      */
     virtual int32_t OnStopRenderingTaskDone(int64_t formId, const Want &want) = 0;
 
+    /**
+     * @brief Accept rendering block from render service.
+     * @param bundleName The block of bundleName.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int32_t OnRenderingBlock(const std::string &bundleName) { return ERR_OK; }
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -111,6 +118,7 @@ public:
         TRANSACTION_FORM_RENDER_TASK_DONE,
         TRANSACTION_FORM_STOP_RENDERING_TASK_DONE,
         TRANSACTION_FORM_ACQUIRED_DATA,
+        TRANSACTION_FORM_RENDERING_BLOCK,
     };
 };
 }  // namespace AppExecFwk

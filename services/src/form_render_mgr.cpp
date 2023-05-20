@@ -20,10 +20,12 @@
 #include "form_cache_mgr.h"
 #include "form_constants.h"
 #include "form_data_mgr.h"
+#include "form_event_report.h"
 #include "form_host_interface.h"
 #include "form_mgr_errors.h"
 #include "form_supply_callback.h"
 #include "form_task_mgr.h"
+#include "form_trust_mgr.h"
 #include "form_util.h"
 #include "hilog_wrapper.h"
 #include "ipc_skeleton.h"
@@ -393,6 +395,22 @@ void FormRenderMgr::DisconnectRenderService(const sptr<FormRenderConnection> con
         HILOG_DEBUG("Disconnect render service ability");
         FormAmsHelper::GetInstance().DisconnectServiceAbility(connection);
     }
+}
+
+void FormRenderMgr::OnRenderingBlock(const std::string &bundleName)
+{
+    HILOG_INFO("OnRenderingBlock called, bundleName: %{public}s.", bundleName.c_str());
+    FormEventInfo eventInfo;
+    eventInfo.bundleName = bundleName;
+    FormEventReport::SendFormEvent(
+        FormEventName::FORM_RENDER_BLOCK, HiSysEventType::FAULT, eventInfo);
+
+    FormTrustMgr::GetInstance().MarkTrustFlag(bundleName, false);
+
+    Want want;
+    want.SetElementName("com.ohos.formrenderservice", "ServiceExtension");
+    want.AddFlags(Want::FLAG_ABILITY_FORM_ENABLED);
+    FormAmsHelper::GetInstance().StopExtensionAbility(want);
 }
 
 bool FormRenderMgr::IsNeedRender(int64_t formId)

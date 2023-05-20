@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,6 +22,7 @@
 #include "form_info_mgr.h"
 #include "form_render_mgr.h"
 #include "form_timer_mgr.h"
+#include "form_trust_mgr.h"
 #include "form_util.h"
 #include "form_provider_mgr.h"
 #include "hilog_wrapper.h"
@@ -33,6 +34,7 @@ namespace AppExecFwk {
 
 void FormEventUtil::HandleBundleFormInfoChanged(const std::string &bundleName, int32_t userId)
 {
+    FormTrustMgr::GetInstance().MarkTrustFlag(bundleName, true);
     FormInfoMgr::GetInstance().UpdateStaticFormInfos(bundleName, userId);
 }
 
@@ -97,6 +99,7 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
 
 void FormEventUtil::HandleBundleFormInfoRemoved(const std::string &bundleName, int32_t userId)
 {
+    FormTrustMgr::GetInstance().MarkTrustFlag(bundleName, true);
     FormInfoMgr::GetInstance().Remove(bundleName, userId);
 }
 

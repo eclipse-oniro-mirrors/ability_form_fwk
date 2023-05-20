@@ -82,6 +82,7 @@ ohos_shared_library("libfms") {
     "services/src/form_sys_event_receiver.cpp",
     "services/src/form_task_mgr.cpp",
     "services/src/form_timer_mgr.cpp",
+    "services/src/form_trust_mgr.cpp",
     "services/src/form_util.cpp",
     "services/src/free_install_status_callback_proxy.cpp",
     "services/src/free_install_status_callback_stub.cpp",

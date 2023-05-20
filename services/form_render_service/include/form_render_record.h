@@ -123,6 +123,8 @@ private:
 
     void HandleUpdateConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration>& config);
 
+    void AddWatchDogThreadMonitor();
+
     std::string bundleName_;
     std::string uid_;
     std::shared_ptr<EventRunner> eventRunner_;

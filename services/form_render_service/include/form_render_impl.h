@@ -25,6 +25,7 @@
 #include "context_impl.h"
 #include "event_handler.h"
 #include "form_render_record.h"
+#include "form_supply_proxy.h"
 #include "js_runtime.h"
 #include "runtime.h"
 #include "want.h"
@@ -82,10 +83,13 @@ public:
 
     void SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration>& config);
 
+    void OnRenderingBlock(const std::string &bundleName);
+
 private:
     std::mutex renderRecordMutex_;
     std::unordered_map<std::string, std::shared_ptr<FormRenderRecord>> renderRecordMap_; // <uid(userId + bundleName), renderRecord>
     std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration_;
+    sptr<IFormSupply> formSupplyClient_;
 };
 } // namespace FormRender
 } // namespace AppExecFwk

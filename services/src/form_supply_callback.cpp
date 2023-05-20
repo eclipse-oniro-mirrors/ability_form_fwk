@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -303,6 +303,13 @@ int32_t FormSupplyCallback::OnStopRenderingTaskDone(int64_t formId, const Want &
 {
     HILOG_INFO("%{public}s called.", __func__);
     FormRenderMgr::GetInstance().StopRenderingFormCallback(formId, want);
+    return ERR_OK;
+}
+
+int32_t FormSupplyCallback::OnRenderingBlock(const std::string &bundleName)
+{
+    HILOG_INFO("OnRenderingBlock called, bundleName: %{public}s.", bundleName.c_str());
+    FormRenderMgr::GetInstance().OnRenderingBlock(bundleName);
     return ERR_OK;
 }
 } // namespace AppExecFwk

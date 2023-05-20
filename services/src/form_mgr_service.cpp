@@ -32,6 +32,7 @@
 #include "form_share_mgr.h"
 #include "form_task_mgr.h"
 #include "form_timer_mgr.h"
+#include "form_trust_mgr.h"
 #include "form_util.h"
 #include "hilog_wrapper.h"
 #include "in_process_call_wrapper.h"
@@ -575,6 +576,8 @@ ErrCode FormMgrService::Init()
         formSysEventReceiver_->SetEventHandler(handler_);
         EventFwk::CommonEventManager::SubscribeCommonEvent(formSysEventReceiver_);
     }
+
+    FormTrustMgr::GetInstance().Start();
     FormInfoMgr::GetInstance().Start();
     FormInfoMgr::GetInstance().ReloadFormInfos(MAIN_USER_ID);
     FormDbCache::GetInstance().Start();
