@@ -114,6 +114,16 @@ public:
      * @return Returns true if the caller has certain permissions; returns false otherwise.
      */
     static bool VerifyCallingPermission(const std::string &permissionName);
+
+    /**
+     * @brief Convert string to int64_t
+     *
+     * @param[in] strInfo The string information
+     * @param[out] int64Value Convert string to int64_t
+     *
+     * @return Return the convert result
+     */
+    static bool ConvertStringToInt64(const std::string &strInfo, int64_t &int64Value);
 };
 } // namespace AppExecFwk
 } // namespace OHOS

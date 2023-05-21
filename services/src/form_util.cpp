@@ -34,6 +34,10 @@ constexpr int64_t SEC_TO_MILLISEC = 1000;
 constexpr int64_t MILLISEC_TO_NANOSEC = 1000000;
 constexpr int64_t INVALID_UDID_HASH = 0;
 constexpr int32_t SYSTEM_UID = 1000;
+constexpr int INT_64_LENGTH = 19;
+constexpr int ZERO_VALUE = 0;
+constexpr int BASE_NUMBER = 9;
+constexpr int DECIMAL_VALUE = 10;
 } // namespace
 
 using namespace std;
@@ -239,6 +243,58 @@ bool FormUtil::VerifyCallingPermission(const std::string &permissionName)
     }
     HILOG_DEBUG("Verify calling permission success");
     return true;
+}
+
+bool FormUtil::ConvertStringToInt64(const std::string &strInfo, int64_t &int64Value)
+{
+    size_t strLength = strInfo.size();
+    if (strLength == ZERO_VALUE) {
+        int64Value = ZERO_VALUE;
+        return true;
+    }
+    std::regex pattern("^0|-?[1-9][0-9]{0,18}$"); // "^-?[0-9]{1,19}$"
+    std::smatch match;
+    if (regex_match(strInfo, match, pattern)) {
+        HILOG_DEBUG("%{public}s, regex_match successed.", __func__);
+        if (strInfo.substr(ZERO_VALUE, ZERO_VALUE + 1) != "-") { // maximum: 9223372036854775807
+            if (strLength < INT_64_LENGTH) {
+                int64Value = std::stoll(strInfo);
+                return true;
+            }
+            int maxSubValue = std::stoi(strInfo.substr(ZERO_VALUE, ZERO_VALUE + 1));
+            if (strLength == INT_64_LENGTH && maxSubValue < BASE_NUMBER) {
+                int64Value = std::stoll(strInfo);
+                return true;
+            }
+            // Means 0x7FFFFFFFFFFFFFFF remove the first number:(2^63 - 1 - 9 * 10 ^ 19)
+            int subValue = std::stoll(strInfo.substr(ZERO_VALUE + 1, INT_64_LENGTH - 1));
+            if (strLength == INT_64_LENGTH && subValue <= INT64_MAX - BASE_NUMBER *
+                pow(DECIMAL_VALUE, INT_64_LENGTH - 1)) {
+                int64Value = std::stoll(strInfo);
+                return true;
+            }
+        }
+        if (strLength < INT_64_LENGTH + 1) { // The minimum value: -9223372036854775808
+            int64Value = std::stoll(strInfo);
+            return true;
+        }
+        if (strLength == INT_64_LENGTH + 1) {
+            int minSubValue = std::stoi(strInfo.substr(1, 1));
+            if (minSubValue < BASE_NUMBER) {
+                int64Value = std::stoll(strInfo);
+                return true;
+            }
+
+            // Means 0x8000000000000000 remove the first number:-(2^63 - 9 * 10 ^ 19)
+            if (std::stoll(strInfo.substr(ZERO_VALUE + 2, INT_64_LENGTH - 1)) <=
+                (INT64_MAX - BASE_NUMBER * pow(DECIMAL_VALUE, INT_64_LENGTH) + 1)) {
+                int64Value = std::stoll(strInfo);
+                return true;
+            }
+        }
+    }
+    HILOG_DEBUG("%{public}s, regex_match failed.", __func__);
+    return false;
 }
 } // namespace AppExecFwk
 } // namespace OHOS

@@ -63,6 +63,7 @@ public:
     FormType type = FormType::JS;
     FormType uiSyntax = FormType::JS;
     bool isTimerRefresh = false;
+    bool isDataProxy = false;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

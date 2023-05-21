@@ -144,6 +144,9 @@ public:
 
     int32_t GetBundleNameByUid(const int32_t uid, std::string &bundleName);
 
+    ErrCode GetProxyDataInfos(const std::string &bundleName, const std::string &moduleName,
+        int32_t userId, std::vector<ProxyData> &proxyData);
+
     static constexpr int64_t INVALID_UID = -1;
 private:
     /**

@@ -19,6 +19,7 @@
 
 #include "form_ams_helper.h"
 #include "form_constants.h"
+#include "form_data_proxy_mgr.h"
 #include "form_mgr_errors.h"
 #include "form_provider_mgr.h"
 #include "form_render_mgr.h"
@@ -74,6 +75,8 @@ int FormSupplyCallback::OnAcquire(const FormProviderInfo &formProviderInfo, cons
     if (IsRemoveConnection(formId, want.GetRemoteObject(Constants::PARAM_FORM_HOST_TOKEN))) {
         RemoveConnection(connectId);
     }
+
+    FormDataProxyMgr::GetInstance().SubscribeFormData(formId, formProviderInfo.GetFormProxies());
 
     if (FormRenderMgr::GetInstance().IsNeedRender(formId)) {
         return FormRenderMgr::GetInstance().UpdateRenderingForm(formId, formProviderInfo.GetFormData(),

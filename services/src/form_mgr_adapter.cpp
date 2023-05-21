@@ -34,6 +34,7 @@
 #include "form_cast_temp_connection.h"
 #include "form_constants.h"
 #include "form_data_mgr.h"
+#include "form_data_proxy_mgr.h"
 #include "form_db_cache.h"
 #include "form_db_info.h"
 #include "form_dump_mgr.h"
@@ -236,6 +237,7 @@ int FormMgrAdapter::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
     // remove connection for in application form
     FormSupplyCallback::GetInstance()->RemoveConnection(matchedFormId, callerToken);
+    FormDataProxyMgr::GetInstance().UnsubscribeFormData(matchedFormId);
     if (FormDataMgr::GetInstance().ExistTempForm(matchedFormId)) {
         // delete temp form if receive delete form call
         return HandleDeleteTempForm(matchedFormId, callerToken);
