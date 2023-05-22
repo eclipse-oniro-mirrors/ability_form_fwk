@@ -86,13 +86,13 @@ void FormEventReport::SendFormEvent(const FormEventName &eventName, HiSysEventTy
             HiSysEventWrite(
                 HiSysEvent::Domain::FORM_MANAGER, name, type, EVENT_KEY_FORM_ID, eventInfo.formId);
             break;
-        break;
-            case FormEventName::FORM_RENDER_BLOCK:
-                HiSysEventWrite(
-                    HiSysEvent::Domain::FORM_MANAGER,
-                    name,
-                    type,
-                    EVENT_KEY_BUNDLE_NAME, eventInfo.bundleName);
+        case FormEventName::FORM_RENDER_BLOCK:
+            HiSysEventWrite(
+                HiSysEvent::Domain::FORM_MANAGER,
+                name,
+                type,
+                EVENT_KEY_BUNDLE_NAME, eventInfo.bundleName);
+            break;
         default:
             break;
     }
