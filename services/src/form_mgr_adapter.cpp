@@ -652,6 +652,26 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
             continue;
         }
 
+        // Check the value of formVisibleNotify.
+        AppExecFwk::ApplicationInfo info;
+
+        sptr<IBundleMgr> bundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
+        if (bundleMgr == nullptr) {
+            HILOG_ERROR("failed to get IBundleMgr.");
+            return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
+        }
+
+        if (!IN_PROCESS_CALL(bundleMgr->GetApplicationInfo(formRecord.bundleName,
+            AppExecFwk::ApplicationFlag::GET_BASIC_APPLICATION_INFO, formRecord.providerUserId, info))) {
+            HILOG_ERROR("failed to get Application info.");
+            return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
+        }
+
+        if (!info.formVisibleNotify) {
+            HILOG_DEBUG("the value of formVisibleNotify is false.");
+            continue;
+        }
+
         // Create eventMaps
         if (!CreateHandleEventMap(matchedFormId, formRecord, eventMaps)) {
             continue;
@@ -663,7 +683,6 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
             HILOG_WARN("%{public}s fail, HandleEventNotify error, key is %{public}s.", __func__, iter->first.c_str());
         }
     }
-
     return ERR_OK;
 }
 
