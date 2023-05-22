@@ -2614,13 +2614,13 @@ ErrCode FormMgrAdapter::GetRunningFormInfosByBundleName(const std::string &bundl
     return FormDataMgr::GetInstance().GetRunningFormInfosByBundleName(bundleName, runningFormInfos);
 }
 
-int32_t FormMgrAdapter::GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
+ErrCode FormMgrAdapter::GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
     std::vector<FormInstance> &formInstances)
 {
     return FormDataMgr::GetInstance().GetFormInstancesByFilter(formInstancesFilter, formInstances);
 }
 
-int32_t FormMgrAdapter::GetFormInstanceById(const int64_t formId, FormInstance &formInstance)
+ErrCode FormMgrAdapter::GetFormInstanceById(const int64_t formId, FormInstance &formInstance)
 {
     return FormDataMgr::GetInstance().GetFormInstanceById(formId, formInstance);
 }

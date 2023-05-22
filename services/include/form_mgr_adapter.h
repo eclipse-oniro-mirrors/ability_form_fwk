@@ -383,7 +383,7 @@ public:
      * @param formInstances return formInstances
      * @return return ERR_OK on get info success,other on failure.
      */
-    int32_t GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
+    ErrCode GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
         std::vector<FormInstance> &formInstances);
 
     /**
@@ -392,7 +392,7 @@ public:
      * @param formInstance return formInstance
      * @return return ERR_OK on get info success,other on failure.
      */
-    int32_t GetFormInstanceById(const int64_t formId, FormInstance &formInstance);
+    ErrCode GetFormInstanceById(const int64_t formId, FormInstance &formInstance);
 private:
     /**
      * @brief Get form configure info.
