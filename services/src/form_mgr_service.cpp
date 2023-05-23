@@ -1158,7 +1158,7 @@ ErrCode FormMgrService::GetRunningFormInfosByBundleName(const std::string &bundl
     return FormMgrAdapter::GetInstance().GetRunningFormInfosByBundleName(bundleName, runningFormInfos);
 }
 
-int32_t FormMgrService::GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
+ErrCode FormMgrService::GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
     std::vector<FormInstance> &formInstances)
 {
     if (!CheckCallerIsSystemApp()) {
@@ -1173,7 +1173,7 @@ int32_t FormMgrService::GetFormInstancesByFilter(const FormInstancesFilter &form
     return FormMgrAdapter::GetInstance().GetFormInstancesByFilter(formInstancesFilter, formInstances);
 }
 
-int32_t FormMgrService::GetFormInstanceById(const int64_t formId, FormInstance &formInstance)
+ErrCode FormMgrService::GetFormInstanceById(const int64_t formId, FormInstance &formInstance)
 {
     if (!CheckCallerIsSystemApp()) {
         HILOG_ERROR("caller app is not system app!");

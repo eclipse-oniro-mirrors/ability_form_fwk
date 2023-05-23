@@ -966,7 +966,7 @@ int32_t FormMgrStub::HandleGetFormInstancesByFilter(MessageParcel &data, Message
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     std::vector<FormInstance> infos;
-    int32_t result = GetFormInstancesByFilter(*filter, infos);
+    auto result = GetFormInstancesByFilter(*filter, infos);
     HILOG_DEBUG("info size = %{public}zu", infos.size());
     reply.WriteInt32(result);
     if (result == ERR_OK) {
@@ -984,7 +984,7 @@ int32_t FormMgrStub::HandleGetFormInstanceById(MessageParcel &data, MessageParce
     HILOG_DEBUG("called.");
     int64_t formId = data.ReadInt64();
     FormInstance info;
-    int32_t result = GetFormInstanceById(formId, info);
+    auto result = GetFormInstanceById(formId, info);
     reply.WriteInt32(result);
     if (result == ERR_OK) {
         if (!reply.WriteParcelable(&info)) {

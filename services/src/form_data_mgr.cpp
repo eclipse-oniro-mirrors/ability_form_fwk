@@ -1927,7 +1927,7 @@ int32_t FormDataMgr::GetHostFormsCount(const std::string &bundleName, int32_t &f
     return ERR_OK;
 }
 
-int32_t FormDataMgr::GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
+ErrCode FormDataMgr::GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
     std::vector<FormInstance> &formInstances)
 {
     HILOG_DEBUG("get form instances by filter");
@@ -1970,10 +1970,13 @@ int32_t FormDataMgr::GetFormInstancesByFilter(const FormInstancesFilter &formIns
             }
         }
     }
+    if (formInstances.size() == 0) {
+        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+    }
     return ERR_OK;
 }
 
-int32_t FormDataMgr::GetFormInstanceById(const int64_t formId, FormInstance &formInstance)
+ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, FormInstance &formInstance)
 {
     HILOG_DEBUG("get form instance by formId");
     std::lock_guard<std::recursive_mutex> lock(formRecordMutex_);
@@ -1998,6 +2001,8 @@ int32_t FormDataMgr::GetFormInstanceById(const int64_t formId, FormInstance &for
         formInstance.moduleName = formRecord.moduleName;
         formInstance.abilityName = formRecord.abilityName;
         formInstance.formName = formRecord.formName;
+    } else {
+        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
     }
     HILOG_DEBUG("get form instance successfully");
     return ERR_OK;

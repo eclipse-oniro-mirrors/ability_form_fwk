@@ -386,7 +386,7 @@ public:
      * @param formInstances return formInstances
      * @return return ERR_OK on get info success,other on failure.
      */
-    int32_t GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
+    ErrCode GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
         std::vector<FormInstance> &formInstances) override;
 
    /**
@@ -395,7 +395,7 @@ public:
     * @param formInstance return formInstance
     * @return return true on get info success,other on failure.
     */
-    int32_t GetFormInstanceById(const int64_t formId, FormInstance &formInstance) override;
+    ErrCode GetFormInstanceById(const int64_t formId, FormInstance &formInstance) override;
 private:
     template<typename T>
     int GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos);
