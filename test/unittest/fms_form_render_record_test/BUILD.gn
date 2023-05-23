@@ -53,6 +53,7 @@ ohos_unittest("FmsFormRenderRecordTest") {
     "ability_runtime:abilitykit_native",
     "ability_runtime:app_context",
     "ability_runtime:app_manager",
+    "ability_runtime:runtime",
     "ability_runtime:service_extension",
     "ability_runtime:wantagent_innerkits",
     "ace_engine:ace_form_render",

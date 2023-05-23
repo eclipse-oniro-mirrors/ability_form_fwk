@@ -23,6 +23,7 @@
 #undef private
 #include "gmock/gmock.h"
 #include "hilog_wrapper.h"
+#include "js_runtime.h"
 #include "mock_form_provider_client.h"
 #include "want.h"
 
@@ -31,6 +32,9 @@ using namespace OHOS;
 using namespace OHOS::AppExecFwk;
 using namespace OHOS::AppExecFwk::FormRender;
 
+namespace {
+    constexpr int32_t RELOAD_FORM_FAILED = -1;
+}
 class FormRenderRecordTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -416,7 +420,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_022, TestSize.Level0)
     std::vector<int64_t> formIds;
     formIds.emplace_back(formId);
     Want want;
-    EXPECT_EQ(ERR_OK, formRenderRecord->HandleReloadFormRecord(std::move(formIds), want));
+    EXPECT_EQ(RELOAD_FORM_FAILED, formRenderRecord->HandleReloadFormRecord(std::move(formIds), want));
     GTEST_LOG_(INFO) << "FormRenderRecordTest_022 end";
 }
 
@@ -435,7 +439,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_023, TestSize.Level0)
     formIds.emplace_back(formId);
     Want want;
     formRenderRecord->formRendererGroupMap_.emplace(formId, nullptr);
-    EXPECT_EQ(ERR_OK, formRenderRecord->HandleReloadFormRecord(std::move(formIds), want));
+    EXPECT_EQ(RELOAD_FORM_FAILED, formRenderRecord->HandleReloadFormRecord(std::move(formIds), want));
     GTEST_LOG_(INFO) << "FormRenderRecordTest_023 end";
 }
 
@@ -459,6 +463,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_024, TestSize.Level0)
     std::shared_ptr<AbilityRuntime::Context> context = nullptr;
     std::shared_ptr<AbilityRuntime::Runtime> runtime = nullptr;
     formRenderRecord->GetFormRendererGroup(formJsInfo, context, runtime);
+    formRenderRecord->runtime_ = std::make_shared<AbilityRuntime::JsRuntime>();
     EXPECT_EQ(ERR_OK, formRenderRecord->HandleReloadFormRecord(std::move(formIds), want));
     GTEST_LOG_(INFO) << "FormRenderRecordTest_024 end";
 }
