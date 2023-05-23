@@ -2216,21 +2216,15 @@ bool FormMgrAdapter::UpdateProviderInfoToHost(const int64_t matchedFormId, const
  */
 bool FormMgrAdapter::CheckIsSystemAppByBundleName(const sptr<IBundleMgr> &iBundleMgr, const std::string &bundleName)
 {
-    BundleInfo bundleInfo;
-    if (IN_PROCESS_CALL(iBundleMgr->GetBundleInfo(bundleName, BundleFlag::GET_BUNDLE_DEFAULT,
-        bundleInfo, FormUtil::GetCurrentAccountId()))) {
-        HILOG_DEBUG("%{public}s, get bundle uid success", __func__);
-        if (!IN_PROCESS_CALL(iBundleMgr->CheckIsSystemAppByUid(bundleInfo.uid))) {
-            HILOG_WARN("%{public}s fail, form provider is not system app, bundleName: %{public}s",
-                __func__, bundleName.c_str());
-            return false;
-        }
-    } else {
-        HILOG_WARN("%{public}s fail, can not get bundleInfo's uid", __func__);
+    AppExecFwk::ApplicationInfo appInfo;
+    if (IN_PROCESS_CALL(iBundleMgr->GetApplicationInfoV9(bundleName, AppExecFwk::BundleFlag::GET_BUNDLE_DEFAULT,
+        FormUtil::GetCurrentAccountId(), appInfo)) != ERR_OK) {
+        HILOG_ERROR("%{public}s failed to get application info", __func__);
         return false;
     }
 
-    return true;
+    HILOG_DEBUG("bundle:%{public}s. isSystemApp=%{public}d", bundleName.c_str(), appInfo.isSystemApp);
+    return appInfo.isSystemApp;
 }
 
 /**
