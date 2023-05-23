@@ -101,6 +101,7 @@ group("unittest") {
     "unittest/fms_free_install_status_callback_proxy_test:unittest",
     "unittest/fms_provider_connect_proxy_test:unittest",
     "unittest/fms_provider_connect_stub_test:unittest",
+    "unittest/fms_running_form_info_test:unittest",
     "unittest/form_errors_test:unittest",
     "unittest/form_info_mgr_test:unittest",
     "unittest/form_mgr_proxy_test:unittest",
