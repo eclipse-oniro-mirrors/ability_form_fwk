@@ -50,6 +50,7 @@ namespace {
     bool g_mockModifyFormTempFlag = true;
     bool g_mockAddFormUserUid = true;
     bool g_mockGetFormHostRecord = false;
+    bool g_mockGetRunningFormInfosByFormIdRet = true;
     OHOS::AAFwk::Want g_mockGetRequestPublishFormInfoWant = {};
 }
 
@@ -191,6 +192,11 @@ void MockGetFormHostRecord(bool mockRet)
 void MockCheckInvalidForm(int32_t mockRet)
 {
     g_mockCheckInvalidFormRet = mockRet;
+}
+
+void MockGetRunningFormInfosByFormId(int32_t mockRet)
+{
+    g_mockGetRunningFormInfosByFormIdRet = mockRet;
 }
 
 namespace OHOS {
@@ -351,6 +357,11 @@ void FormDataMgr::GetFormHostRecord(const int64_t formId, std::vector<FormHostRe
 ErrCode FormDataMgr::CheckInvalidForm(const int64_t formId)
 {
     return g_mockCheckInvalidFormRet;
+}
+
+ErrCode FormDataMgr::GetRunningFormInfosByFormId(const int64_t formId, RunningFormInfo &runningFormInfo)
+{
+    return g_mockGetRunningFormInfosByFormIdRet;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

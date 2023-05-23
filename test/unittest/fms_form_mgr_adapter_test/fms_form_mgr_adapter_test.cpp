@@ -103,6 +103,7 @@ extern void MockGetFormHostRecord(bool mockRet);
 extern void MockGetFormRecordParamsTemp(bool mockRet);
 extern void MockGetAbilityInfoByActionAbilityInfo(bool mockRet);
 extern void MockGetAbilityInfoByActionExtensionInfo(bool mockRet);
+extern void MockGetRunningFormInfosByFormId(int32_t mockRet);
 
 namespace {
 class FmsFormMgrAdapterTest : public testing::Test {
@@ -3868,5 +3869,66 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_198, TestSize.Level0)
     EXPECT_EQ(false, formInfos.empty());
 
     GTEST_LOG_(INFO) << "FormMgrAdapter_198 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_199
+ * @tc.desc: test HandleFormAddObserver function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_199, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_199 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    MockGetCallerBundleName(true);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, formMgrAdapter.HandleFormAddObserver(formId));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_199 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_200
+ * @tc.desc: test HandleFormAddObserver function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_200, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_200 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    MockGetCallerBundleName(false);
+    MockGetRunningFormInfosByFormId(ERR_OK);
+    EXPECT_EQ(ERR_OK, formMgrAdapter.HandleFormAddObserver(formId));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_200 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_201
+ * @tc.desc: test HandleFormRemoveObserver function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_201, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_201 start";
+    FormMgrAdapter formMgrAdapter;
+    MockGetCallerBundleName(false);
+    RunningFormInfo runningFormInfo;
+    EXPECT_EQ(ERR_OK, formMgrAdapter.HandleFormRemoveObserver(runningFormInfo));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_201 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_202
+ * @tc.desc: test HandleFormRemoveObserver function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_202, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_202 start";
+    FormMgrAdapter formMgrAdapter;
+    MockGetCallerBundleName(true);
+    RunningFormInfo runningFormInfo;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, formMgrAdapter.HandleFormRemoveObserver(runningFormInfo));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_202 end";
 }
 }
