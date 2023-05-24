@@ -1827,7 +1827,8 @@ NativeValue* JsFormHostInit(NativeEngine* engine, NativeValue* exportObj)
         JsFormHost::NotifyFormsPrivacyProtected);
     BindNativeFunction(*engine, *object, "getRunningFormInfos", moduleName, JsFormHost::GetRunningFormInfos);
     BindNativeFunction(*engine, *object, "acquireFormData", moduleName, JsFormHost::AcquireFormData);
-    BindNativeFunction(*engine, *object, "getRunningFormInfosByFilter", moduleName, JsFormHost::GetFormInstancesByFilter);
+    BindNativeFunction(*engine, *object, "getRunningFormInfosByFilter", moduleName,
+        JsFormHost::GetFormInstancesByFilter);
     BindNativeFunction(*engine, *object, "getRunningFormInfoById", moduleName, JsFormHost::GetFormInstanceById);
     return engine->CreateUndefined();
 }

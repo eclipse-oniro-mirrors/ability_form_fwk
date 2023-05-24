@@ -80,7 +80,7 @@ public:
         return "system";
     }
 
-    virtual int GetUidByBundleName(const std::string &bundleName, const int userId) override
+    int GetUidByBundleName(const std::string &bundleName, const int userId) override
     {
         if (bundleName.compare("com.form.host.app600") == 0) {
             return APP_600;
@@ -88,29 +88,29 @@ public:
         return 0;
     }
 
-    virtual bool GetBundleNameForUid(const int uid, std::string &bundleName) override
+    bool GetBundleNameForUid(const int uid, std::string &bundleName) override
     {
         bundleName = "com.form.service";
         return true;
     }
 
-    virtual int32_t GetNameForUid(const int uid, std::string &bundleName) override
+    int32_t GetNameForUid(const int uid, std::string &bundleName) override
     {
         bundleName = "com.form.provider.service";
         return GetNameForUid_;
     };
 
-    virtual bool GetFormsInfoByApp(const std::string &bundleName, std::vector<FormInfo> &formInfo) override 
+    bool GetFormsInfoByApp(const std::string &bundleName, std::vector<FormInfo> &formInfo) override 
     {
         return false;
     };
-    virtual bool GetFormsInfoByModule(const std::string &bundleName, const std::string &moduleName,
+    bool GetFormsInfoByModule(const std::string &bundleName, const std::string &moduleName,
     std::vector<FormInfo> &formInfo) override
     {
         return false;
     };
 
-    virtual ErrCode GetBundlePackInfo(const std::string &bundleName, int32_t flags,
+    ErrCode GetBundlePackInfo(const std::string &bundleName, int32_t flags,
         BundlePackInfo &bundlePackInfo, int32_t userId = Constants::UNSPECIFIED_USERID) override
     {
         GTEST_LOG_(INFO) << "GetBundlePackInfo int32_t";
@@ -124,7 +124,7 @@ public:
         return GetBundlePackInfo_;
     }
 
-    virtual bool SetModuleRemovable(
+    bool SetModuleRemovable(
         const std::string &bundleName, const std::string &moduleName, bool isEnable) override
     {
         return SetModuleRemovable_;

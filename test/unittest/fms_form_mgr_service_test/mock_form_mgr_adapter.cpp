@@ -20,220 +20,220 @@
 #include "hilog_wrapper.h"
 
 namespace {
-    int enableUpdateForm = OHOS::ERR_OK;
-    int disableUpdateForm = OHOS::ERR_OK;
-    int addForm = OHOS::ERR_OK;
-    int deleteForm = OHOS::ERR_OK;
-    int releaseForm = OHOS::ERR_OK;
-    int requestForm = OHOS::ERR_OK;
-    int notifyWhetherVisibleForms = OHOS::ERR_OK;
-    int castTempForm = OHOS::ERR_OK;
-    int messageEvent = OHOS::ERR_OK;
-    int routerEvent = OHOS::ERR_OK;
-    int deleteInvalidForms = OHOS::ERR_OK;
-    int acquireFormState = OHOS::ERR_OK;
-    int notifyFormsVisible = OHOS::ERR_OK;
-    int notifyFormsEnableUpdate = OHOS::ERR_OK;
-    int getFormsInfoByApp = OHOS::ERR_OK;
-    int getFormsInfoByModule = OHOS::ERR_OK;
-    int updateForm = OHOS::ERR_OK;
-    bool isRequestPublishFormSupported = true;
+    int g_enableUpdateForm = OHOS::ERR_OK;
+    int g_disableUpdateForm = OHOS::ERR_OK;
+    int g_addForm = OHOS::ERR_OK;
+    int g_deleteForm = OHOS::ERR_OK;
+    int g_releaseForm = OHOS::ERR_OK;
+    int g_requestForm = OHOS::ERR_OK;
+    int g_notifyWhetherVisibleForms = OHOS::ERR_OK;
+    int g_castTempForm = OHOS::ERR_OK;
+    int g_messageEvent = OHOS::ERR_OK;
+    int g_routerEvent = OHOS::ERR_OK;
+    int g_deleteInvalidForms = OHOS::ERR_OK;
+    int g_acquireFormState = OHOS::ERR_OK;
+    int g_notifyFormsVisible = OHOS::ERR_OK;
+    int g_notifyFormsEnableUpdate = OHOS::ERR_OK;
+    int g_getFormsInfoByApp = OHOS::ERR_OK;
+    int g_getFormsInfoByModule = OHOS::ERR_OK;
+    int g_updateForm = OHOS::ERR_OK;
+    bool g_isRequestPublishFormSupported = true;
 }
 
 void MockEnableUpdateForm(int mockRet)
 {
-    enableUpdateForm = mockRet;
+    g_enableUpdateForm = mockRet;
 }
 
 void MockDisableUpdateForm(int mockRet)
 {
-    disableUpdateForm = mockRet;
+    g_disableUpdateForm = mockRet;
 }
 
 void MockAddForm(int mockRet)
 {
-    addForm = mockRet;
+    g_addForm = mockRet;
 }
 
 void MockDeleteForm(int mockRet)
 {
-    deleteForm = mockRet;
+    g_deleteForm = mockRet;
 }
 
 void MockReleaseForm(int mockRet)
 {
-    releaseForm = mockRet;
+    g_releaseForm = mockRet;
 }
 
 void MockRequestForm(int mockRet)
 {
-    requestForm = mockRet;
+    g_requestForm = mockRet;
 }
 
 void MockNotifyWhetherVisibleForms(int mockRet)
 {
-    notifyWhetherVisibleForms = mockRet;
+    g_notifyWhetherVisibleForms = mockRet;
 }
 
 void MockCastTempForm(int mockRet)
 {
-    castTempForm = mockRet;
+    g_castTempForm = mockRet;
 }
 
 void MockMessageEvent(int mockRet)
 {
-    messageEvent = mockRet;
+    g_messageEvent = mockRet;
 }
 
 void MockRouterEvent(int mockRet)
 {
-    routerEvent = mockRet;
+    g_routerEvent = mockRet;
 }
 
 void MockAcquireFormState(int mockRet)
 {
-    acquireFormState = mockRet;
+    g_acquireFormState = mockRet;
 }
 
 void MockNotifyFormsVisible(int mockRet)
 {
-    notifyFormsVisible = mockRet;
+    g_notifyFormsVisible = mockRet;
 }
 
 void MockNotifyFormsEnableUpdate(int mockRet)
 {
-    notifyFormsEnableUpdate = mockRet;
+    g_notifyFormsEnableUpdate = mockRet;
 }
 
 void MockGetFormsInfoByApp(int mockRet)
 {
-    getFormsInfoByApp = mockRet;
+    g_getFormsInfoByApp = mockRet;
 }
 
 void MockGetFormsInfoByModule(int mockRet)
 {
-    getFormsInfoByModule = mockRet;
+    g_getFormsInfoByModule = mockRet;
 }
 
 void MockIsRequestPublishFormSupported(bool mockRet)
 {
-    isRequestPublishFormSupported = mockRet;
+    g_isRequestPublishFormSupported = mockRet;
 }
 
 namespace OHOS {
 namespace AppExecFwk {
 int FormMgrAdapter::EnableUpdateForm(const std::vector<int64_t> formIDs, const sptr<IRemoteObject> &callerToken)
 {
-    GTEST_LOG_(INFO) << "EnableUpdateForm called " << enableUpdateForm;
-    return enableUpdateForm;
+    GTEST_LOG_(INFO) << "EnableUpdateForm called " << g_enableUpdateForm;
+    return g_enableUpdateForm;
 }
 
 int FormMgrAdapter::DisableUpdateForm(const std::vector<int64_t> formIDs, const sptr<IRemoteObject> &callerToken)
 {
-    GTEST_LOG_(INFO) << "DisableUpdateForm called " << disableUpdateForm;
-    return disableUpdateForm;
+    GTEST_LOG_(INFO) << "DisableUpdateForm called " << g_disableUpdateForm;
+    return g_disableUpdateForm;
 }
 
 int FormMgrAdapter::AddForm(
     const int64_t formId, const Want &want, const sptr<IRemoteObject> &callerToken, FormJsInfo &formInfo)
 {
-    GTEST_LOG_(INFO) << "AddForm called " << addForm;
-    return addForm;
+    GTEST_LOG_(INFO) << "AddForm called " << g_addForm;
+    return g_addForm;
 }
 
 int FormMgrAdapter::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &callerToken)
 {
-    GTEST_LOG_(INFO) << "DeleteForm called " << deleteForm;
-    return deleteForm;
+    GTEST_LOG_(INFO) << "DeleteForm called " << g_deleteForm;
+    return g_deleteForm;
 }
 
 int FormMgrAdapter::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> &callerToken, const bool delCache)
 {
-    GTEST_LOG_(INFO) << "ReleaseForm called " << releaseForm;
-    return releaseForm;
+    GTEST_LOG_(INFO) << "ReleaseForm called " << g_releaseForm;
+    return g_releaseForm;
 }
 
 int FormMgrAdapter::RequestForm(const int64_t formId, const sptr<IRemoteObject> &callerToken, const Want &want)
 {
-    GTEST_LOG_(INFO) << "RequestForm called " << requestForm;
-    return requestForm;
+    GTEST_LOG_(INFO) << "RequestForm called " << g_requestForm;
+    return g_requestForm;
 }
 
 ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(
     const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &callerToken, const int32_t formVisibleType)
 {
-    GTEST_LOG_(INFO) << "NotifyWhetherVisibleForms called " << notifyWhetherVisibleForms;
-    return notifyWhetherVisibleForms;
+    GTEST_LOG_(INFO) << "NotifyWhetherVisibleForms called " << g_notifyWhetherVisibleForms;
+    return g_notifyWhetherVisibleForms;
 }
 
 int FormMgrAdapter::CastTempForm(const int64_t formId, const sptr<IRemoteObject> &callerToken)
 {
-    GTEST_LOG_(INFO) << "CastTempForm called " << castTempForm;
-    return castTempForm;
+    GTEST_LOG_(INFO) << "CastTempForm called " << g_castTempForm;
+    return g_castTempForm;
 }
 
 int FormMgrAdapter::MessageEvent(const int64_t formId, const Want &want, const sptr<IRemoteObject> &callerToken)
 {
-    GTEST_LOG_(INFO) << "MessageEvent called " << messageEvent;
-    return messageEvent;
+    GTEST_LOG_(INFO) << "MessageEvent called " << g_messageEvent;
+    return g_messageEvent;
 }
 
 int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken)
 {
-    GTEST_LOG_(INFO) << "RouterEvent called " << routerEvent;
-    return routerEvent;
+    GTEST_LOG_(INFO) << "RouterEvent called " << g_routerEvent;
+    return g_routerEvent;
 }
 
 int FormMgrAdapter::DeleteInvalidForms(
     const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &callerToken, int32_t &numFormsDeleted)
 {
-    GTEST_LOG_(INFO) << "DeleteInvalidForms called " << deleteInvalidForms;
-    return deleteInvalidForms;
+    GTEST_LOG_(INFO) << "DeleteInvalidForms called " << g_deleteInvalidForms;
+    return g_deleteInvalidForms;
 }
 
 int FormMgrAdapter::AcquireFormState(
     const Want &want, const sptr<IRemoteObject> &callerToken, FormStateInfo &stateInfo)
 {
-    GTEST_LOG_(INFO) << "AcquireFormState called " << acquireFormState;
-    return acquireFormState;
+    GTEST_LOG_(INFO) << "AcquireFormState called " << g_acquireFormState;
+    return g_acquireFormState;
 }
 
 int FormMgrAdapter::NotifyFormsVisible(
     const std::vector<int64_t> &formIds, bool isVisible, const sptr<IRemoteObject> &callerToken)
 {
-    GTEST_LOG_(INFO) << "NotifyFormsVisible called " << notifyFormsVisible;
-    return notifyFormsVisible;
+    GTEST_LOG_(INFO) << "NotifyFormsVisible called " << g_notifyFormsVisible;
+    return g_notifyFormsVisible;
 }
 
 int FormMgrAdapter::NotifyFormsEnableUpdate(
     const std::vector<int64_t> &formIds, bool isEnableUpdate, const sptr<IRemoteObject> &callerToken)
 {
-    GTEST_LOG_(INFO) << "NotifyFormsEnableUpdate called " << notifyFormsEnableUpdate;
-    return notifyFormsEnableUpdate;
+    GTEST_LOG_(INFO) << "NotifyFormsEnableUpdate called " << g_notifyFormsEnableUpdate;
+    return g_notifyFormsEnableUpdate;
 }
 
 int FormMgrAdapter::GetFormsInfoByApp(const std::string &bundleName, std::vector<FormInfo> &formInfos)
 {
-    GTEST_LOG_(INFO) << "GetFormsInfoByApp called " << getFormsInfoByApp;
-    return getFormsInfoByApp;
+    GTEST_LOG_(INFO) << "GetFormsInfoByApp called " << g_getFormsInfoByApp;
+    return g_getFormsInfoByApp;
 }
 
 int FormMgrAdapter::GetFormsInfoByModule(
     const std::string &bundleName, const std::string &moduleName, std::vector<FormInfo> &formInfos)
 {
-    GTEST_LOG_(INFO) << "GetFormsInfoByModule called " << getFormsInfoByModule;
-    return getFormsInfoByModule;
+    GTEST_LOG_(INFO) << "GetFormsInfoByModule called " << g_getFormsInfoByModule;
+    return g_getFormsInfoByModule;
 }
 
 bool FormMgrAdapter::IsRequestPublishFormSupported()
 {
-    return isRequestPublishFormSupported;
+    return g_isRequestPublishFormSupported;
 }
 
 int FormMgrAdapter::UpdateForm(
     const int64_t formId, const std::string &bundleName, const FormProviderData &formProviderData)
 {
-    return updateForm;
+    return g_updateForm;
 }
 } // namespace AppExecFwk
 } // namespace OHOS

@@ -14,36 +14,36 @@
  */
 
 class FormExtension {
-    onCreate(want) {
-        console.log('FormExtension onCreate, want:' + want.abilityName);
-        return {
-            data: ""
-        };
-    }
+  onCreate(want) {
+    console.log('FormExtension onCreate, want:' + want.abilityName);
+    return {
+        data: ""
+    };
+  }
 
-    onCastToNormal(formId) {
-        console.log('FormExtension onCastToNormal, formId:' + formId);
-    }
+  onCastToNormal(formId) {
+    console.log('FormExtension onCastToNormal, formId:' + formId);
+  }
 
-    onUpdate(formId) {
-        console.log('FormExtension onUpdate, formId:' + formId);
-    }
+  onUpdate(formId) {
+    console.log('FormExtension onUpdate, formId:' + formId);
+  }
 
-    onVisibilityChange(newStatus) {
-        console.log('FormExtension onVisibilityChange, newStatus:' + newStatus);
-    }
+  onVisibilityChange(newStatus) {
+    console.log('FormExtension onVisibilityChange, newStatus:' + newStatus);
+  }
 
-    onEvent(formId, message) {
-        console.log('FormExtension onEvent, formId:' + formId + ", message:" + message);
-    }
+  onEvent(formId, message) {
+    console.log('FormExtension onEvent, formId:' + formId + ", message:" + message);
+  }
 
-    onDestroy(formId) {
-        console.log('FormExtension onDestroy, formId:' + formId);
-    }
+  onDestroy(formId) {
+    console.log('FormExtension onDestroy, formId:' + formId);
+  }
 
-    onShare(formId) {
-        console.log('FormExtension onShare, formId:' + formId);
-    }
+  onShare(formId) {
+    console.log('FormExtension onShare, formId:' + formId);
+  }
 }
 
-export default FormExtension
+export default FormExtension;
