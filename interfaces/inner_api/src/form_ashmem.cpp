@@ -25,6 +25,7 @@ FormAshmem::~FormAshmem()
     if (ashmem_ != nullptr) {
         ashmem_->CloseAshmem();
     }
+    HILOG_INFO("formAshmem has been destroyed");
 }
 
 bool FormAshmem::Marshalling(Parcel &parcel) const
