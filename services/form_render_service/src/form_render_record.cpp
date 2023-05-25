@@ -15,6 +15,7 @@
 
 #include "form_render_record.h"
 
+#include <chrono>
 #include <utility>
 
 #include "extractor.h"
@@ -28,7 +29,15 @@ namespace AppExecFwk {
 namespace FormRender {
 constexpr int32_t RENDER_FORM_FAILED = -1;
 constexpr int32_t RELOAD_FORM_FAILED = -1;
-constexpr int32_t TIMEOUT = 10 * 1000;
+constexpr int32_t TIMEOUT = 6 * 1000;
+
+namespace {
+uint64_t GetCurrentTickMillseconds()
+{
+    return std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::steady_clock::now().time_since_epoch()).count();
+}
+}
 
 std::shared_ptr<FormRenderRecord> FormRenderRecord::Create(const std::string &bundleName, const std::string &uid)
 {
@@ -107,13 +116,53 @@ bool FormRenderRecord::CreateEventHandler(const std::string &bundleName)
 
 void FormRenderRecord::AddWatchDogThreadMonitor()
 {
-    auto timeOutCallback = [bundleName = bundleName_](const std::string &name, int waitState) {
-        HILOG_ERROR("FRS is block when bundleName is %{public}s", bundleName.c_str());
-        OHOS::DelayedSingleton<FormRenderImpl>::GetInstance()->OnRenderingBlock(bundleName);
+    std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
+    auto watchdogTask = [thisWeakPtr]() {
+        auto renderRecord = thisWeakPtr.lock();
+        if (renderRecord) {
+            renderRecord->Timer();
+        }
     };
-    if (HiviewDFX::Watchdog::GetInstance().AddThread(bundleName_, eventHandler_, timeOutCallback, TIMEOUT) != 0) {
-        HILOG_ERROR("watchdog addThread failed");
+
+    std::string eventHandleName;
+    eventHandleName.append(bundleName_).append(std::to_string(GetCurrentTickMillseconds()));
+    OHOS::HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask(eventHandleName, watchdogTask, TIMEOUT);
+}
+
+void FormRenderRecord::Timer()
+{
+    std::unique_lock<std::mutex> lock(watchDogMutex_);
+    if (eventHandler_ == nullptr) {
+        HILOG_ERROR("eventHandler is null when bundleName is %{public}s", bundleName_.c_str());
+        return;
     }
+
+    if (!threadIsAlive_) {
+        HILOG_ERROR("FRS block happened when bundleName is %{public}s", bundleName_.c_str());
+        OHOS::DelayedSingleton<FormRenderImpl>::GetInstance()->OnRenderingBlock(bundleName_);
+        return;
+    }
+
+    threadIsAlive_.store(false);
+    std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
+    auto checkTask = [thisWeakPtr] () {
+        auto renderRecord = thisWeakPtr.lock();
+        if (renderRecord == nullptr) {
+            HILOG_ERROR("renderRecord is nullptr.");
+            return;
+        }
+
+        renderRecord->MarkThreadAlive();
+    };
+    if (!eventHandler_->PostTask(checkTask, "Watchdog Task", 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
+        HILOG_ERROR("Watchdog checkTask postTask false.");
+    }
+}
+
+void FormRenderRecord::MarkThreadAlive()
+{
+    std::unique_lock<std::mutex> lock(watchDogMutex_);
+    threadIsAlive_.store(true);
 }
 
 int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const Want &want, const sptr<IRemoteObject> hostRemoteObj)

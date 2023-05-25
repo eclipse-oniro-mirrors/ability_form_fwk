@@ -87,6 +87,8 @@ public:
 
     void SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration>& config);
 
+    void MarkThreadAlive();
+
 private:
     class RemoteObjHash {
     public:
@@ -125,6 +127,8 @@ private:
 
     void AddWatchDogThreadMonitor();
 
+    void Timer();
+
     std::string bundleName_;
     std::string uid_;
     std::shared_ptr<EventRunner> eventRunner_;
@@ -143,6 +147,8 @@ private:
     std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration_;
 
     std::string hapPath_;
+    std::mutex watchDogMutex_;
+    std::atomic_bool threadIsAlive_ = true;
 };
 }  // namespace FormRender
 }  // namespace AppExecFwk
