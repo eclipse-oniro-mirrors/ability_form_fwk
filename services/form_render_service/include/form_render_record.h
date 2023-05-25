@@ -149,6 +149,7 @@ private:
     std::string hapPath_;
     std::mutex watchDogMutex_;
     std::atomic_bool threadIsAlive_ = true;
+    std::atomic_bool halfBlock_ = false;
 };
 }  // namespace FormRender
 }  // namespace AppExecFwk

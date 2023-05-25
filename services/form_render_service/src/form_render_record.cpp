@@ -29,7 +29,7 @@ namespace AppExecFwk {
 namespace FormRender {
 constexpr int32_t RENDER_FORM_FAILED = -1;
 constexpr int32_t RELOAD_FORM_FAILED = -1;
-constexpr int32_t TIMEOUT = 6 * 1000;
+constexpr int32_t TIMEOUT = 3 * 1000;
 
 namespace {
 uint64_t GetCurrentTickMillseconds()
@@ -138,6 +138,12 @@ void FormRenderRecord::Timer()
     }
 
     if (!threadIsAlive_) {
+        if (!halfBlock_) {
+            HILOG_ERROR("FRS half-block happened when bundleName is %{public}s", bundleName_.c_str());
+            halfBlock_.store(true);
+            return;
+        }
+
         HILOG_ERROR("FRS block happened when bundleName is %{public}s", bundleName_.c_str());
         OHOS::DelayedSingleton<FormRenderImpl>::GetInstance()->OnRenderingBlock(bundleName_);
         return;
@@ -163,6 +169,7 @@ void FormRenderRecord::MarkThreadAlive()
 {
     std::unique_lock<std::mutex> lock(watchDogMutex_);
     threadIsAlive_.store(true);
+    halfBlock_.store(false);
 }
 
 int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const Want &want, const sptr<IRemoteObject> hostRemoteObj)
