@@ -197,6 +197,10 @@ void FormJsInfo::ReadImageData(Parcel &parcel)
             }
             for (auto i = 0; i < size; i++) {
                 sptr<FormAshmem> formAshmem = parcel.ReadParcelable<FormAshmem>();
+                if (formAshmem == nullptr) {
+                    HILOG_ERROR("failed, ashmem is nullptr");
+                    return;
+                }
                 auto picName = Str16ToStr8(parcel.ReadString16());
                 HILOG_INFO("picName: %{public}s", picName.c_str());
                 imageDataMap[picName] = formAshmem;
