@@ -30,7 +30,7 @@ using namespace OHOS;
 
 namespace OHOS {
 namespace AppExecFwk {
-const std::int32_t ERROR_NUM= -1;
+const std::int32_t ERROR_NUM = -1;
 class FormSupplyProxyTest : public testing::Test {
 public:
     static void SetUpTestCase();

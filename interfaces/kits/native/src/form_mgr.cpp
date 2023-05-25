@@ -1157,7 +1157,7 @@ int32_t FormMgr::GetHostFormsCount(std::string &bundleName, int32_t &formCount)
 }
 
 ErrCode FormMgr::GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
-        std::vector<FormInstance> &formInstances)
+    std::vector<FormInstance> &formInstances)
 {
     HILOG_DEBUG("called.");
     auto errCode = Connect();

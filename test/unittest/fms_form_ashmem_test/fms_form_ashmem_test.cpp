@@ -224,7 +224,7 @@ HWTEST_F(FmsFormAshmemTest, FmsFormAshmemTest_011, TestSize.Level1)
     std::string name = "abc";
     char data[] = "ab";
     int32_t size = 1;
-    int32_t fd = -1; 
+    int32_t fd = -1;
     form_ashmem_->ashmem_ = new (std::nothrow) Ashmem(fd, size);
     MockMapReadAndWriteAshmem(false);
     form_ashmem_->WriteToAshmem(name, data, size);

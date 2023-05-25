@@ -190,13 +190,13 @@ private:
     std::shared_ptr<AppExecFwk::EventHandler> handler_ = nullptr;
 };
 
-std::map<napi_ref, std::shared_ptr<FormUninstallCallbackClient>> formUninstallCallbackMap {};
-std::mutex formUninstallCallbackMapMutex_;
+std::map<napi_ref, std::shared_ptr<FormUninstallCallbackClient>> g_formUninstallCallbackMap {};
+std::mutex g_formUninstallCallbackMapMutex_;
 
 void FormUninstallCallback(const std::vector<int64_t> &formIds)
 {
-    std::lock_guard<std::mutex> lock(formUninstallCallbackMapMutex_);
-    for (auto &iter : formUninstallCallbackMap) {
+    std::lock_guard<std::mutex> lock(g_formUninstallCallbackMapMutex_);
+    for (auto &iter : g_formUninstallCallbackMap) {
         for (int64_t formId : formIds) {
             iter.second->ProcessFormUninstall(formId);
         }
@@ -205,8 +205,8 @@ void FormUninstallCallback(const std::vector<int64_t> &formIds)
 
 bool AddFormUninstallCallback(napi_env env, napi_value callback)
 {
-    std::lock_guard<std::mutex> lock(formUninstallCallbackMapMutex_);
-    for (auto &iter : formUninstallCallbackMap) {
+    std::lock_guard<std::mutex> lock(g_formUninstallCallbackMapMutex_);
+    for (auto &iter : g_formUninstallCallbackMap) {
         if (iter.second->IsStrictEqual(callback)) {
             HILOG_ERROR("found equal callback");
             return false;
@@ -218,7 +218,7 @@ bool AddFormUninstallCallback(napi_env env, napi_value callback)
     std::shared_ptr<FormUninstallCallbackClient> callbackClient = std::make_shared<FormUninstallCallbackClient>(env,
         callbackRef);
 
-    auto ret = formUninstallCallbackMap.emplace(callbackRef, callbackClient);
+    auto ret = g_formUninstallCallbackMap.emplace(callbackRef, callbackClient);
     if (!ret.second) {
         HILOG_ERROR("failed to emplace callback");
         return false;
@@ -229,11 +229,11 @@ bool AddFormUninstallCallback(napi_env env, napi_value callback)
 bool DelFormUninstallCallback(napi_value callback)
 {
     int32_t count = 0;
-    std::lock_guard<std::mutex> lock(formUninstallCallbackMapMutex_);
-    for (auto iter = formUninstallCallbackMap.begin(); iter != formUninstallCallbackMap.end();) {
+    std::lock_guard<std::mutex> lock(g_formUninstallCallbackMapMutex_);
+    for (auto iter = g_formUninstallCallbackMap.begin(); iter != g_formUninstallCallbackMap.end();) {
         if (iter->second->IsStrictEqual(callback)) {
             HILOG_INFO("found equal callback");
-            iter = formUninstallCallbackMap.erase(iter);
+            iter = g_formUninstallCallbackMap.erase(iter);
             count++;
         } else {
             iter++;
@@ -245,8 +245,8 @@ bool DelFormUninstallCallback(napi_value callback)
 
 bool ClearFormUninstallCallback()
 {
-    std::lock_guard<std::mutex> lock(formUninstallCallbackMapMutex_);
-    formUninstallCallbackMap.clear();
+    std::lock_guard<std::mutex> lock(g_formUninstallCallbackMapMutex_);
+    g_formUninstallCallbackMap.clear();
     return true;
 }
 
@@ -1707,7 +1707,7 @@ private:
             HILOG_ERROR("input params is not object!");
             NapiFormUtil::ThrowParamTypeError(engine, "formProviderFilter", "object");
             return engine.CreateUndefined();
-        } 
+        }
         auto arg = reinterpret_cast<napi_value>(info.argv[PARAM0]);
         auto env = reinterpret_cast<napi_env>(&engine);
         if (!ParseParam(env, arg, filter)) {
@@ -1753,7 +1753,7 @@ private:
         }
 
         int64_t formId;
-        if(!ConvertFromId(engine, info.argv[PARAM0], formId)) {
+        if (!ConvertFromId(engine, info.argv[PARAM0], formId)) {
             HILOG_ERROR("convert strFormIdList failed!");
             NapiFormUtil::ThrowParamTypeError(engine, "formId", "string");
             return engine.CreateUndefined();

@@ -60,7 +60,7 @@ public:
     }
 
     void OnAbilityConnectDone(
-        const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode) override 
+        const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode) override
         {
             GTEST_LOG_(INFO) << "MockProviderConnectStub::OnAbilityConnectDone called.";
             return;
@@ -96,7 +96,8 @@ public:
             return;
     }
 
-    void OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode) override {
+    void OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode) override
+    {
         GTEST_LOG_(INFO) << "MockProviderConnectStub::OnAbilityDisconnectDone called.";
         return;
     }
