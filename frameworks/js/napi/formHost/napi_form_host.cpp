@@ -1667,7 +1667,7 @@ NativeValue* NapiFormHost::OnDeleteInvalidForms(NativeEngine &engine, const Nati
     }
     for (size_t i = 0; i < strFormIdList.size(); i++) {
         int64_t formIdValue;
-        if (!ConvertStringToInt64(strFormIdList[i], formIdValue)){
+        if (!ConvertStringToInt64(strFormIdList[i], formIdValue)) {
             HILOG_ERROR("conversion int failed!");
             errCode = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR;
         } else {

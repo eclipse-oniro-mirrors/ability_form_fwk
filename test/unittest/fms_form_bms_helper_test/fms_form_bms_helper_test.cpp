@@ -100,7 +100,7 @@ public:
         return GetNameForUid_;
     };
 
-    bool GetFormsInfoByApp(const std::string &bundleName, std::vector<FormInfo> &formInfo) override 
+    bool GetFormsInfoByApp(const std::string &bundleName, std::vector<FormInfo> &formInfo) override
     {
         return false;
     };
@@ -127,11 +127,11 @@ public:
     bool SetModuleRemovable(
         const std::string &bundleName, const std::string &moduleName, bool isEnable) override
     {
-        return SetModuleRemovable_;
+        return setModuleRemovable_;
     }
 
     ErrCode GetBundlePackInfo_ = ERR_APPEXECFWK_SERVICE_INTERNAL_ERROR;
-    bool SetModuleRemovable_ = false;
+    bool setModuleRemovable_ = false;
     int32_t GetNameForUid_ = ERR_OK + 1;
 };
 
@@ -447,7 +447,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_017, TestSize.Level1)
     FormBmsHelper formBmsHelper;
     const sptr<IRemoteObject> impl;
     const sptr<MockBundleMgrProxy> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
-    bundleManager->SetModuleRemovable_ = true;
+    bundleManager->setModuleRemovable_ = true;
     formBmsHelper.SetBundleManager(bundleManager);
     const std::string bundleName = "bb";
     const std::string moduleName = "aa";

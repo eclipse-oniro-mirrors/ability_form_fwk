@@ -22,18 +22,18 @@
 #undef protected
 
 namespace {
-    bool g_MockGetSingleKvStoreRet = true;
-    bool g_MockSingleKvStore = true;
+    bool g_mockGetSingleKvStoreRet = true;
+    bool g_mockSingleKvStore = true;
 }
 
 void MockGetSingleKvStore(bool mockRet)
 {
-    g_MockGetSingleKvStoreRet = mockRet;
+    g_mockGetSingleKvStoreRet = mockRet;
 }
 
 void MockGetKvStore(bool mockRet)
 {
-    g_MockSingleKvStore = mockRet;
+    g_mockSingleKvStore = mockRet;
 }
 
 namespace OHOS {
@@ -41,13 +41,13 @@ namespace DistributedKv {
 Status DistributedKvDataManager::GetSingleKvStore(const Options &options, const AppId &appId, const StoreId &storeId,
     std::shared_ptr<SingleKvStore> &singleKvStore)
 {
-    if(g_MockSingleKvStore) {
+    if (g_mockSingleKvStore) {
         singleKvStore= nullptr;
     } else {
         std::shared_ptr<DistributedKv::SingleKvStore> kvStorePtr = std::make_shared<MockSingleKvStore>();
         singleKvStore = kvStorePtr;
     }
-    if (!g_MockGetSingleKvStoreRet) {
+    if (!g_mockGetSingleKvStoreRet) {
         Status status = Status::INVALID_ARGUMENT;
         return status;
     }
