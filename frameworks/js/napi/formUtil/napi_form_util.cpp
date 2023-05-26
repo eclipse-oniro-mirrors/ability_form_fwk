@@ -729,7 +729,7 @@ NativeValue *CreateFormInstances(NativeEngine &engine, const std::vector<FormIns
 {
     NativeValue* arrayValue = engine.CreateArray(formInstances.size());
     NativeArray* array = ConvertNativeValueTo<NativeArray>(arrayValue);
-    if(array == nullptr) {
+    if (array == nullptr) {
         return engine.CreateUndefined();
     }
     uint32_t index = 0;
@@ -759,7 +759,7 @@ NativeValue *CreateFormInstance(NativeEngine &engine, const FormInstance &formIn
     object->SetProperty("hostBundleName", CreateJsValue(engine, formInstance.formHostName));
     object->SetProperty("visibilityType", CreateJsValue(engine, formInstance.formVisiblity));
     object->SetProperty("dimension", CreateJsValue(engine, formInstance.specification));
-    object->SetProperty("bundleName", CreateJsValue(engine, formInstance.bundleName));  
+    object->SetProperty("bundleName", CreateJsValue(engine, formInstance.bundleName));
     object->SetProperty("moduleName", CreateJsValue(engine, formInstance.moduleName));
     object->SetProperty("abilityName", CreateJsValue(engine, formInstance.abilityName));
     object->SetProperty("formName", CreateJsValue(engine, formInstance.formName));

@@ -12,6 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef BASE_NOTIFICATION_MOCK_SINGLE_KV_STORE_H
+#define BASE_NOTIFICATION_MOCK_SINGLE_KV_STORE_H
+
 #define private public
 #define protected public
 #include "distributed_kv_data_manager.h"
@@ -210,3 +213,4 @@ public:
     DistributedKv::Status Put_ = DistributedKv::Status::SUCCESS;
 };
 }
+#endif
