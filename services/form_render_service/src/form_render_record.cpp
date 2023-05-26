@@ -131,25 +131,36 @@ void FormRenderRecord::AddWatchDogThreadMonitor()
 
 void FormRenderRecord::Timer()
 {
+    TaskState taskState = RunTask();
+    if (taskState == TaskState::HALF_BLOCK) {
+        HILOG_ERROR("FRS half-block happened when bundleName is %{public}s", bundleName_.c_str());
+        return;
+    }
+
+    if (taskState == TaskState::BLOCK) {
+        HILOG_ERROR("FRS block happened when bundleName is %{public}s", bundleName_.c_str());
+        OHOS::DelayedSingleton<FormRenderImpl>::GetInstance()->OnRenderingBlock(bundleName_);
+    }
+}
+
+TaskState FormRenderRecord::RunTask()
+{
     std::unique_lock<std::mutex> lock(watchDogMutex_);
     if (eventHandler_ == nullptr) {
         HILOG_ERROR("eventHandler is null when bundleName is %{public}s", bundleName_.c_str());
-        return;
+        return TaskState::NO_RUNNING;
     }
 
     if (!threadIsAlive_) {
         if (!halfBlock_) {
-            HILOG_ERROR("FRS half-block happened when bundleName is %{public}s", bundleName_.c_str());
-            halfBlock_.store(true);
-            return;
+            halfBlock_ = true;
+            return TaskState::HALF_BLOCK;
         }
 
-        HILOG_ERROR("FRS block happened when bundleName is %{public}s", bundleName_.c_str());
-        OHOS::DelayedSingleton<FormRenderImpl>::GetInstance()->OnRenderingBlock(bundleName_);
-        return;
+        return TaskState::BLOCK;
     }
 
-    threadIsAlive_.store(false);
+    threadIsAlive_ = false;
     std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
     auto checkTask = [thisWeakPtr] () {
         auto renderRecord = thisWeakPtr.lock();
@@ -163,13 +174,15 @@ void FormRenderRecord::Timer()
     if (!eventHandler_->PostTask(checkTask, "Watchdog Task", 0, AppExecFwk::EventQueue::Priority::IMMEDIATE)) {
         HILOG_ERROR("Watchdog checkTask postTask false.");
     }
+
+    return TaskState::RUNNING;
 }
 
 void FormRenderRecord::MarkThreadAlive()
 {
     std::unique_lock<std::mutex> lock(watchDogMutex_);
-    threadIsAlive_.store(true);
-    halfBlock_.store(false);
+    threadIsAlive_ = true;
+    halfBlock_ = false;
 }
 
 int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const Want &want, const sptr<IRemoteObject> hostRemoteObj)
