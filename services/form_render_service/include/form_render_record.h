@@ -33,6 +33,12 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace FormRender {
 using Want = AAFwk::Want;
+enum class TaskState {
+    NO_RUNNING = 0,
+    RUNNING = 0,
+    HALF_BLOCK,
+    BLOCK,
+};
 class FormRenderRecord : public std::enable_shared_from_this<FormRenderRecord> {
 public:
     /**
@@ -87,6 +93,8 @@ public:
 
     void SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration>& config);
 
+    void MarkThreadAlive();
+
 private:
     class RemoteObjHash {
     public:
@@ -125,6 +133,10 @@ private:
 
     void AddWatchDogThreadMonitor();
 
+    void Timer();
+
+    TaskState RunTask();
+
     std::string bundleName_;
     std::string uid_;
     std::shared_ptr<EventRunner> eventRunner_;
@@ -143,6 +155,9 @@ private:
     std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration_;
 
     std::string hapPath_;
+    std::mutex watchDogMutex_;
+    bool threadIsAlive_ = true;
+    bool halfBlock_ = false;
 };
 }  // namespace FormRender
 }  // namespace AppExecFwk
