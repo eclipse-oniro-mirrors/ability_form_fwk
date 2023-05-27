@@ -292,6 +292,8 @@ ErrCode FormRenderMgr::AddConnection(int64_t formId, sptr<FormRenderConnection> 
         HILOG_ERROR("Input FormRenderConnection is nullptr.");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
+    int32_t renderFormConnectionSize = 0;
+    sptr<FormRenderConnection> oldConnection = nullptr;
     {
         int32_t connectKey = static_cast<int32_t>(FormUtil::GetCurrentMillisecond());
         std::lock_guard<std::mutex> lock(resourceMutex_);
@@ -306,12 +308,15 @@ ErrCode FormRenderMgr::AddConnection(int64_t formId, sptr<FormRenderConnection> 
             conIterator = renderFormConnections_.begin();
         } else {
             HILOG_WARN("Duplicate connection of formId: %{public}" PRId64 ", delete old connection", formId);
-            auto oldConnection = renderFormConnections_[formId];
+            renderFormConnectionSize = renderFormConnections_.size();
+            oldConnection = renderFormConnections_[formId];
             renderFormConnections_[formId] = connection;
-            DisconnectRenderService(oldConnection, renderFormConnections_.size());
         }
 
         HILOG_DEBUG("renderFormConnections size: %{public}zu.", renderFormConnections_.size());
+    }
+    if (oldConnection) {
+        DisconnectRenderService(oldConnection, renderFormConnectionSize);
     }
     return ERR_OK;
 }
