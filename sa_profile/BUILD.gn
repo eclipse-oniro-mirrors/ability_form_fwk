@@ -14,7 +14,7 @@
 import("//build/ohos/sa_profile/sa_profile.gni")
 
 ohos_sa_profile("form_sa_profile") {
-  sources = [ "403.xml" ]
+  sources = [ "403.json" ]
 
   part_name = "form_fwk"
 }
