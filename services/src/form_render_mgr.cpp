@@ -306,9 +306,13 @@ ErrCode FormRenderMgr::AddConnection(int64_t formId, sptr<FormRenderConnection> 
         if (conIterator == renderFormConnections_.end()) {
             renderFormConnections_.emplace(formId, connection);
             conIterator = renderFormConnections_.begin();
+        } else {
+            HILOG_WARN("Duplicate connection of formId: %{public}" PRId64 ", delete old connection", formId);
+            auto oldConnection = renderFormConnections_[formId];
+            renderFormConnections_[formId] = connection;
+            DisconnectRenderService(oldConnection, renderFormConnections_.size());
         }
 
-        renderFormConnections_[formId] = connection;
         HILOG_DEBUG("renderFormConnections size: %{public}zu.", renderFormConnections_.size());
     }
     return ERR_OK;
