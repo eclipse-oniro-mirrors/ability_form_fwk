@@ -1515,9 +1515,10 @@ ErrCode FormMgrAdapter::CheckPublishForm(Want &want)
         HILOG_ERROR("%{public}s fail, failed to get IBundleMgr.", __func__);
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
-    if (!IsValidPublishEvent(iBundleMgr, bundleName, want)) {
-        HILOG_ERROR("Invalid publish form event.");
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    ErrCode errCode = CheckValidPublishEvent(iBundleMgr, bundleName, want);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("Check valid publish event failed.");
+        return errCode;
     }
 
     if (want.GetElement().GetBundleName().empty()) {
@@ -1540,7 +1541,7 @@ ErrCode FormMgrAdapter::CheckPublishForm(Want &want)
     std::string abilityName = want.GetElement().GetAbilityName();
     std::string formName = want.GetStringParam(AppExecFwk::Constants::PARAM_FORM_NAME_KEY);
     std::vector<FormInfo> formInfos {};
-    ErrCode errCode = FormInfoMgr::GetInstance()
+    errCode = FormInfoMgr::GetInstance()
         .GetFormsInfoByModule(want.GetElement().GetBundleName(), moduleName, formInfos);
     if (errCode != ERR_OK) {
         HILOG_ERROR("%{public}s error, failed to get forms info.", __func__);
@@ -2232,14 +2233,14 @@ bool FormMgrAdapter::CheckIsSystemAppByBundleName(const sptr<IBundleMgr> &iBundl
  * @param iBundleMgr BundleManagerProxy
  * @param bundleName BundleName of caller
  * @param want want of target form
- * @return Returns true if the caller is in the whitelist, false if not.
+ * @return Returns ERR_OK if the caller is in the whitelist.
  */
-bool FormMgrAdapter::IsValidPublishEvent(const sptr<IBundleMgr> &iBundleMgr,
+ErrCode FormMgrAdapter::CheckValidPublishEvent(const sptr<IBundleMgr> &iBundleMgr,
     const std::string &bundleName, const Want &want)
 {
     if (!CheckIsSystemAppByBundleName(iBundleMgr, bundleName)) {
         HILOG_ERROR("Only system app can request publish form.");
-        return false;
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
     }
     sptr<IEcologicalRuleManager> iErMgr = FormBmsHelper::GetInstance().CheckEcologicalRuleMgr();
     if (iErMgr != nullptr) {
@@ -2247,16 +2248,20 @@ bool FormMgrAdapter::IsValidPublishEvent(const sptr<IBundleMgr> &iBundleMgr,
         ExperienceRule rule;
         ErmsCallerInfo callerInfo;
         auto ret = iErMgr->IsSupportPublishForm(want, callerInfo, rule);
-        if (ret == ERR_OK) {
-            HILOG_DEBUG("%{public}s, check success from the erms", __func__);
-            return rule.isAllow;
-        } else {
-            HILOG_WARN("%{public}s, check failed from the erms", __func__);
+        if (ret == ERR_OK && rule.isAllow) {
+            HILOG_DEBUG("check success from the erms");
+            return ERR_OK;
         }
+        HILOG_WARN("check failed from the erms or the caller for publish form is not in the whitelist");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
     // when AG supply the function "IsSupportPublishForm", the following code should remove.
-    return PUBLISH_FORM_ALLOWED_SET.find(bundleName) != PUBLISH_FORM_ALLOWED_SET.end();
+    if (PUBLISH_FORM_ALLOWED_SET.find(bundleName) != PUBLISH_FORM_ALLOWED_SET.end()) {
+        return ERR_OK;
+    }
+    HILOG_WARN("the caller for publish form is not in the whitelist");
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
 
 /**
