@@ -275,7 +275,6 @@ std::shared_ptr<Ace::FormRendererGroup> FormRenderRecord::GetFormRendererGroup(c
     const std::shared_ptr<AbilityRuntime::Context> &context, const std::shared_ptr<AbilityRuntime::Runtime> &runtime)
 {
     HILOG_INFO("Get formRendererGroup.");
-    std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
     auto key = formJsInfo.formId;
     auto iter = formRendererGroupMap_.find(key);
     if (iter != formRendererGroupMap_.end()) {
@@ -317,6 +316,7 @@ void FormRenderRecord::HandleUpdateInJsThread(const FormJsInfo &formJsInfo, cons
     auto renderType = want.GetIntParam(Constants::FORM_RENDER_TYPE_KEY, Constants::RENDER_FORM);
     HILOG_INFO("renderType is %{public}d.", renderType);
     if (renderType == Constants::RENDER_FORM) {
+        std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
         auto formRendererGroup = GetFormRendererGroup(formJsInfo, context, runtime_);
         if (formRendererGroup == nullptr) {
             HILOG_ERROR("Create formRendererGroup failed.");
