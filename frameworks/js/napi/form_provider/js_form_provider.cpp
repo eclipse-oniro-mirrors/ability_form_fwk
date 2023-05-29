@@ -38,6 +38,7 @@ using namespace OHOS;
 using namespace OHOS::AAFwk;
 using namespace OHOS::AppExecFwk;
 namespace {
+constexpr size_t ARGS_SIZE_ZERO = 0;
 constexpr size_t ARGS_SIZE_ONE = 1;
 constexpr size_t ARGS_SIZE_TWO = 2;
 constexpr size_t ARGS_SIZE_THREE = 3;
@@ -121,18 +122,52 @@ NativeValue *JsFormProvider::OnGetFormsInfo(NativeEngine &engine, NativeCallback
     HILOG_DEBUG("%{public}s is called", __FUNCTION__);
 
     size_t convertArgc = 0;
-    bool isPromise = true;
+    bool isPromise = false;
     FormInfoFilter formInfoFilter;
-    if (info.argc > 0 && info.argv[0]->TypeOf() != NATIVE_FUNCTION) {
-        if (ConvertFormInfoFilterThrow(engine, info.argv[0], formInfoFilter)) {
-            if (info.argv[1]->TypeOf() == NATIVE_FUNCTION) {
+    // GetformsInfo()
+    if (info.argc == ARGS_SIZE_ZERO) {
+        isPromise = true;
+    }
+    if(info.argc == ARGS_SIZE_ONE) {
+        if (info.argv[0]->TypeOf() != NATIVE_UNDEFINED) {
+            // GetformsInfo(*)
+            if (info.argv[0]->TypeOf() == NATIVE_FUNCTION) {
+                // GetformsInfo(callback)
                 isPromise = false;
-                convertArgc = 1;
+            } else {
+                // GetformsInfo(*);GetformsInfo(fliter)
+                if (ConvertFormInfoFilterThrow(engine, info.argv[0], formInfoFilter)) {
+                    convertArgc++;
+                    isPromise = true;
+                } else {
+                    // no default value
+                    return engine.CreateUndefined();
+                }
             }
+        } else {
+            isPromise = true;
         }
     }
-    if (info.argc > 0 && info.argv[0]->TypeOf() == NATIVE_FUNCTION) {
-        isPromise = false;
+
+    if(info.argc >= ARGS_SIZE_TWO) {
+        if (info.argv[0]->TypeOf() != NATIVE_UNDEFINED) {
+            if (info.argv[0]->TypeOf() == NATIVE_FUNCTION) {
+                // GetformsInfo(callback, *)
+                isPromise = false;
+            } else {
+                // GetformsInfo(fliter, *) || GetformsInfo(fliter, callback)
+                if (ConvertFormInfoFilterThrow(engine, info.argv[0], formInfoFilter)) {
+                    convertArgc++;
+                    // GetformsInfo(fliter, callback)
+                    isPromise = info.argv[1]->TypeOf() != NATIVE_FUNCTION;
+                } else {
+                    HILOG_ERROR("convert form info filter failed.");
+                    return engine.CreateUndefined();
+                }
+            }
+        } else {
+            isPromise = true;
+        }
     }
 
     AsyncTask::CompleteCallback complete =
