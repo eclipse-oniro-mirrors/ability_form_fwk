@@ -1930,7 +1930,7 @@ int32_t FormDataMgr::GetFormInstancesByFilter(const FormInstancesFilter &formIns
     HILOG_DEBUG("get form instances by filter");
     std::lock_guard<std::recursive_mutex> lock(formRecordMutex_);
     std::map<int64_t, FormRecord>::iterator itFormRecord;
-    if(formInstancesFilter.bundleName.empty()) {
+    if (formInstancesFilter.bundleName.empty()) {
         HILOG_ERROR("formInstancesFilter.bundleName is null");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }

@@ -19,12 +19,12 @@
 #include "hilog_wrapper.h"
 
 namespace {
-bool isSystemAppByFullTokenID = true;
+bool g_isSystemAppByFullTokenID = true;
 }
 
 void MockIsSystemAppByFullTokenID(bool mockRet)
 {
-    isSystemAppByFullTokenID = mockRet;
+    g_isSystemAppByFullTokenID = mockRet;
 }
 
 namespace OHOS {
@@ -32,8 +32,8 @@ namespace Security {
 namespace AccessToken {
 bool TokenIdKit::IsSystemAppByFullTokenID(uint64_t tokenId)
 {
-    GTEST_LOG_(INFO) << "IsSystemAppByFullTokenID called " << isSystemAppByFullTokenID;
-    return isSystemAppByFullTokenID;
+    GTEST_LOG_(INFO) << "IsSystemAppByFullTokenID called " << g_isSystemAppByFullTokenID;
+    return g_isSystemAppByFullTokenID;
 }
 } // namespace AccessToken
 } // namespace Security

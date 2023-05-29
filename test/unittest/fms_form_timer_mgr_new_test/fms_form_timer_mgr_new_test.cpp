@@ -209,8 +209,8 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0099, Function | MediumTest | Lev
     EventFwk::CommonEventData eventData;
     std::string action = "form_update_at_timer";
     AAFwk::Want want;
-    constexpr int32_t type_static_update = Constants::TYPE_STATIC_UPDATE + 100;
-    want.SetParam(Constants::KEY_ACTION_TYPE, type_static_update);
+    constexpr int32_t typeStaticUpdate = Constants::TYPE_STATIC_UPDATE + 100;  // 100: static update
+    want.SetParam(Constants::KEY_ACTION_TYPE, typeStaticUpdate);
     want.SetAction(action);
     eventData.SetWant(want);
     std::shared_ptr<FormTimerMgr::TimerReceiver> timeReceiver = std::make_shared<FormTimerMgr::TimerReceiver>();

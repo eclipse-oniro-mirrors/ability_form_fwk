@@ -3288,8 +3288,8 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0169, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormMgrAdapter_0169 start";
     FormMgrAdapter formMgrAdapter;
     FormRecord formRecord = {};
-    constexpr int32_t SYSTEM_UID = 1000;
-    formRecord.formUserUids.push_back(SYSTEM_UID);
+    constexpr int32_t systemUid = 1000;   // 1000: system uid
+    formRecord.formUserUids.push_back(systemUid);
     EXPECT_TRUE(formMgrAdapter.checkFormHostHasSaUid(formRecord));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0169 end";
 }

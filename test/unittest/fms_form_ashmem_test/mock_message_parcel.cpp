@@ -150,7 +150,7 @@ bool MessageParcel::WriteAshmem(sptr<Ashmem> ashmem)
 sptr<Ashmem> MessageParcel::ReadAshmem()
 {
     if (ReadFileDescriptor()) {
-        int32_t fd = -1; 
+        int32_t fd = -1;
         int32_t size = -1;
         sptr<Ashmem> ashmem = new (std::nothrow) Ashmem(fd, size);
         return ashmem;

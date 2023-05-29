@@ -505,8 +505,7 @@ HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0023, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0023 start";
     EXPECT_EQ(true, InitJsonData());
-    constexpr int32_t READ_PARCEL_MAX_IMAGE_DATA_NUM_SIZE = 1000;
-    constexpr int32_t imageDataNum = READ_PARCEL_MAX_IMAGE_DATA_NUM_SIZE + 1;
+    constexpr int32_t imageDataNum = 1001;  // 1001: Eead parcel max image data num size.
     FormProviderData formProviderData(jsonData_);
     Parcel parcel;
     parcel.WriteString16(Str8ToStr16(jsonData_.dump()));
