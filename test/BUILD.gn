@@ -99,6 +99,7 @@ group("unittest") {
     "unittest/fms_form_util_permission_verify_test:unittest",
     "unittest/fms_form_util_test:unittest",
     "unittest/fms_free_install_status_callback_proxy_test:unittest",
+    "unittest/fms_observer_record_test:unittest",
     "unittest/fms_provider_connect_proxy_test:unittest",
     "unittest/fms_provider_connect_stub_test:unittest",
     "unittest/fms_running_form_info_test:unittest",
