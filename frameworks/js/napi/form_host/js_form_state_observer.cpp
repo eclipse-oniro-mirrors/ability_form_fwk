@@ -44,7 +44,7 @@ FormAddCallbackClient::~FormAddCallbackClient()
     napi_delete_reference(env_, callbackRef_);
 }
 
-void FormAddCallbackClient::ProcessFormAdd(const std::string bundleName,
+void FormAddCallbackClient::ProcessFormAdd(const std::string &bundleName,
     const AppExecFwk::RunningFormInfo &runningFormInfo)
 {
     if (handler_ == nullptr) {
@@ -91,7 +91,7 @@ FormRemoveCallbackClient::~FormRemoveCallbackClient()
     napi_delete_reference(env_, callbackRef_);
 }
 
-void FormRemoveCallbackClient::ProcessFormRemove(const std::string bundleName,
+void FormRemoveCallbackClient::ProcessFormRemove(const std::string &bundleName,
     const AppExecFwk::RunningFormInfo &runningFormInfo)
 {
     if (handler_ == nullptr) {
@@ -140,7 +140,7 @@ sptr<JsFormStateObserver> JsFormStateObserver::GetInstance()
     return instance_;
 }
 
-bool JsFormStateObserver::CheckMapSize(const std::string type, const std::string bundleName)
+bool JsFormStateObserver::CheckMapSize(const std::string &type, const std::string &bundleName)
 {
     HILOG_DEBUG("start");
     if (type == "formAdd") {
@@ -166,7 +166,7 @@ bool JsFormStateObserver::CheckMapSize(const std::string type, const std::string
 }
 
 bool JsFormStateObserver::RegisterFormAddCallback(const napi_env env,
-    const std::string bundleName, const napi_value callback)
+    const std::string &bundleName, const napi_value callback)
 {
     HILOG_DEBUG("start.");
     napi_ref callbackRef;
@@ -195,7 +195,7 @@ bool JsFormStateObserver::RegisterFormAddCallback(const napi_env env,
 }
 
 bool JsFormStateObserver::RegisterFormRemoveCallback(const napi_env env,
-    const std::string bundleName, const napi_value callback)
+    const std::string &bundleName, const napi_value callback)
 {
     HILOG_DEBUG("start.");
     napi_ref callbackRef;
@@ -223,7 +223,7 @@ bool JsFormStateObserver::RegisterFormRemoveCallback(const napi_env env,
     }
 }
 
-void JsFormStateObserver::ClearFormAddCallbackByBundle(const std::string bundleName)
+void JsFormStateObserver::ClearFormAddCallbackByBundle(const std::string &bundleName)
 {
     HILOG_DEBUG("start");
     std::lock_guard<std::mutex> lock(addFormCallbackMutex_);
@@ -237,7 +237,7 @@ void JsFormStateObserver::ClearFormAddCallbackByBundle(const std::string bundleN
     }
 }
 
-void JsFormStateObserver::DelFormAddCallbackByBundle(const napi_value callback, const std::string bundleName)
+void JsFormStateObserver::DelFormAddCallbackByBundle(const napi_value callback, const std::string &bundleName)
 {
     HILOG_DEBUG("start");
 
@@ -259,7 +259,8 @@ void JsFormStateObserver::DelFormAddCallbackByBundle(const napi_value callback, 
     }
 }
 
-int32_t JsFormStateObserver::OnAddForm(const std::string bundleName, const AppExecFwk::RunningFormInfo &runningFormInfo)
+int32_t JsFormStateObserver::OnAddForm(const std::string &bundleName,
+    const AppExecFwk::RunningFormInfo &runningFormInfo)
 {
     HILOG_DEBUG("called.");
 
@@ -273,7 +274,7 @@ int32_t JsFormStateObserver::OnAddForm(const std::string bundleName, const AppEx
     return ERR_OK;
 }
 
-void JsFormStateObserver::ClearFormRemoveCallbackByBundle(const std::string bundleName)
+void JsFormStateObserver::ClearFormRemoveCallbackByBundle(const std::string &bundleName)
 {
     HILOG_DEBUG("start");
     std::lock_guard<std::mutex> lock(removeFormCallbackMutex_);
@@ -287,7 +288,7 @@ void JsFormStateObserver::ClearFormRemoveCallbackByBundle(const std::string bund
     }
 }
 
-void JsFormStateObserver::DelFormRemoveCallbackByBundle(const napi_value callback, const std::string bundleName)
+void JsFormStateObserver::DelFormRemoveCallbackByBundle(const napi_value callback, const std::string &bundleName)
 {
     HILOG_DEBUG("start");
 
@@ -309,7 +310,7 @@ void JsFormStateObserver::DelFormRemoveCallbackByBundle(const napi_value callbac
     }
 }
 
-int32_t JsFormStateObserver::OnRemoveForm(const std::string bundleName,
+int32_t JsFormStateObserver::OnRemoveForm(const std::string &bundleName,
     const AppExecFwk::RunningFormInfo &runningFormInfo)
 {
     HILOG_DEBUG("called.");

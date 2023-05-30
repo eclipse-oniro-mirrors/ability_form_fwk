@@ -22,7 +22,7 @@
 
 namespace OHOS {
 namespace AbilityRuntime {
-int32_t JsFormStateObserverProxy::OnAddForm(const std::string bundleName,
+int32_t JsFormStateObserverProxy::OnAddForm(const std::string &bundleName,
     const AppExecFwk::RunningFormInfo &runningFormInfo)
 {
     MessageParcel data;
@@ -55,7 +55,7 @@ int32_t JsFormStateObserverProxy::OnAddForm(const std::string bundleName,
     return error;
 }
 
-int32_t JsFormStateObserverProxy::OnRemoveForm(const std::string bundleName,
+int32_t JsFormStateObserverProxy::OnRemoveForm(const std::string &bundleName,
     const AppExecFwk::RunningFormInfo &runningFormInfo)
 {
     MessageParcel data;

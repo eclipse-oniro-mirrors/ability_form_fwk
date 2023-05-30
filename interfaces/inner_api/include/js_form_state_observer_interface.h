@@ -30,13 +30,13 @@ public:
      * @brief The form added.
      * @param bundleName The bundle name of the form host.
      */
-    virtual int32_t OnAddForm(const std::string bundleName, const AppExecFwk::RunningFormInfo &runningFormInfo) = 0;
+    virtual int32_t OnAddForm(const std::string &bundleName, const AppExecFwk::RunningFormInfo &runningFormInfo) = 0;
 
     /**
      * @brief The form removed.
      * @param bundleName The bundle name of the form host.
      */
-    virtual int32_t OnRemoveForm(const std::string bundleName, const AppExecFwk::RunningFormInfo &runningFormInfo) = 0;
+    virtual int32_t OnRemoveForm(const std::string &bundleName, const AppExecFwk::RunningFormInfo &runningFormInfo) = 0;
 
     enum class Message {
         FORM_STATE_OBSERVER_ON_ADD_FORM = 4302,

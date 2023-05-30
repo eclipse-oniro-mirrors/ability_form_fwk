@@ -241,8 +241,8 @@ int FormMgrAdapter::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
         return HandleDeleteTempForm(matchedFormId, callerToken);
     }
     RunningFormInfo runningFormInfo;
-    auto ret = FormDataMgr::GetInstance().GetRunningFormInfosByFormId(matchedFormId, runningFormInfo);
-    ret = HandleDeleteForm(matchedFormId, callerToken);
+    FormDataMgr::GetInstance().GetRunningFormInfosByFormId(matchedFormId, runningFormInfo);
+    auto ret = HandleDeleteForm(matchedFormId, callerToken);
     if (ret != ERR_OK) {
         HILOG_ERROR("delete form failed.");
         return ret;

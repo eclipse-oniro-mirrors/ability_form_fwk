@@ -35,7 +35,7 @@ public:
 
     ~FormAddCallbackClient();
 
-    void ProcessFormAdd(const std::string bundleName, const AppExecFwk::RunningFormInfo &runningFormInfo);
+    void ProcessFormAdd(const std::string &bundleName, const AppExecFwk::RunningFormInfo &runningFormInfo);
 
     bool IsStrictEqual(napi_value callback);
 
@@ -51,7 +51,7 @@ public:
 
     ~FormRemoveCallbackClient();
 
-    void ProcessFormRemove(const std::string bundleName, const AppExecFwk::RunningFormInfo &runningFormInfo);
+    void ProcessFormRemove(const std::string &bundleName, const AppExecFwk::RunningFormInfo &runningFormInfo);
 
     bool IsStrictEqual(napi_value callback);
 
@@ -70,25 +70,25 @@ public:
 
     static sptr<JsFormStateObserver> GetInstance();
 
-    bool RegisterFormAddCallback(const napi_env env, const std::string bundleName, const napi_value callback);
+    bool RegisterFormAddCallback(const napi_env env, const std::string &bundleName, const napi_value callback);
 
-    bool RegisterFormRemoveCallback(const napi_env env, const std::string bundleName, const napi_value callback);
+    bool RegisterFormRemoveCallback(const napi_env env, const std::string &bundleName, const napi_value callback);
 
-    void ClearFormAddCallbackByBundle(const std::string bundleName);
+    void ClearFormAddCallbackByBundle(const std::string &bundleName);
 
-    void DelFormAddCallbackByBundle(const napi_value callback, const std::string bundleName);
+    void DelFormAddCallbackByBundle(const napi_value callback, const std::string &bundleName);
 
     void DelFormRemoveCallback(const napi_value callback);
 
-    void ClearFormRemoveCallbackByBundle(const std::string bundleName);
+    void ClearFormRemoveCallbackByBundle(const std::string &bundleName);
 
-    void DelFormRemoveCallbackByBundle(const napi_value callback, const std::string bundleName);
+    void DelFormRemoveCallbackByBundle(const napi_value callback, const std::string &bundleName);
 
-    int32_t OnAddForm(const std::string bundleName, const AppExecFwk::RunningFormInfo &runningFormInfo);
+    int32_t OnAddForm(const std::string &bundleName, const AppExecFwk::RunningFormInfo &runningFormInfo);
 
-    int32_t OnRemoveForm(const std::string bundleName, const AppExecFwk::RunningFormInfo &runningFormInfo);
+    int32_t OnRemoveForm(const std::string &bundleName, const AppExecFwk::RunningFormInfo &runningFormInfo);
 
-    bool CheckMapSize(const std::string type, const std::string bundleName);
+    bool CheckMapSize(const std::string &type, const std::string &bundleName);
 
 private:
     static std::mutex mutex_;
