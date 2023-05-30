@@ -711,9 +711,9 @@ private:
      * @param iBundleMgr BundleManagerProxy
      * @param bundleName BundleName of caller
      * @param want want of target form
-     * @return Returns true if the caller is in the whitelist, false if not.
+     * @return Returns ERR_OK if the caller is in the whitelist, others if not.
      */
-    bool IsValidPublishEvent(const sptr<IBundleMgr> &iBundleMgr, const std::string &bundleName, const Want &want);
+    ErrCode CheckValidPublishEvent(const sptr<IBundleMgr> &iBundleMgr, const std::string &bundleName, const Want &want);
 
     /**
      * @brief Allocate form by specific Id.
