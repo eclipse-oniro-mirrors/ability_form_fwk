@@ -88,7 +88,6 @@ private:
         }
     };
 
-    int32_t maxConnectKey = 0;
     mutable std::mutex resourceMutex_;
     // <formId, connectionToRenderService>
     std::unordered_map<int64_t, sptr<FormRenderConnection>> renderFormConnections_;
