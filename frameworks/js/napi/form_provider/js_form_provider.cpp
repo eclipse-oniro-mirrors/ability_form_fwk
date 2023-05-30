@@ -128,7 +128,7 @@ NativeValue *JsFormProvider::OnGetFormsInfo(NativeEngine &engine, NativeCallback
     if (info.argc == ARGS_SIZE_ZERO) {
         isPromise = true;
     }
-    if(info.argc == ARGS_SIZE_ONE) {
+    if (info.argc == ARGS_SIZE_ONE) {
         if (info.argv[0]->TypeOf() != NATIVE_UNDEFINED) {
             // GetformsInfo(*)
             if (info.argv[0]->TypeOf() == NATIVE_FUNCTION) {
@@ -149,7 +149,7 @@ NativeValue *JsFormProvider::OnGetFormsInfo(NativeEngine &engine, NativeCallback
         }
     }
 
-    if(info.argc >= ARGS_SIZE_TWO) {
+    if (info.argc >= ARGS_SIZE_TWO) {
         if (info.argv[0]->TypeOf() != NATIVE_UNDEFINED) {
             if (info.argv[0]->TypeOf() == NATIVE_FUNCTION) {
                 // GetformsInfo(callback, *)
