@@ -31,13 +31,13 @@ public:
      * @brief The form added.
      * @param bundleName The bundle name of the form host.
      */
-    virtual int32_t OnAddForm(const std::string bundleName, const AppExecFwk::RunningFormInfo &runningFormInfo);
+    virtual int32_t OnAddForm(const std::string &bundleName, const AppExecFwk::RunningFormInfo &runningFormInfo);
 
     /**
      * @brief The form removed.
      * @param bundleName The bundle name of the form host.
      */
-    virtual int32_t OnRemoveForm(const std::string bundleName, const AppExecFwk::RunningFormInfo &runningFormInfo);
+    virtual int32_t OnRemoveForm(const std::string &bundleName, const AppExecFwk::RunningFormInfo &runningFormInfo);
 
 private:
     static inline BrokerDelegator<JsFormStateObserverProxy> delegator_;
