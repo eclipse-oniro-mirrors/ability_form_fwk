@@ -29,6 +29,7 @@
 #include "form_util.h"
 #include "hilog_wrapper.h"
 #include "ipc_skeleton.h"
+#include "js_form_state_observer_interface.h"
 #include "running_form_info.h"
 
 namespace OHOS {
@@ -1413,8 +1414,21 @@ ErrCode FormDataMgr::NotifyFormsVisible(const std::vector<int64_t> &formIds, boo
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
 
-    for (auto matchedFormId : foundFormIds) {
+    std::vector<FormInstance> formInstances;
+    for (auto matchedFormId : formIds) {
         SetRecordVisible(matchedFormId, isVisible);
+        FormInstance formInstance;
+        GetFormInstanceById(matchedFormId, formInstance);
+        formInstances.emplace_back(formInstance);
+    }
+    for (auto formObserver : formObservers_) {
+        sptr<AbilityRuntime::IJsFormStateObserver> remoteJsFormStateObserver =
+            iface_cast<AbilityRuntime::IJsFormStateObserver>(formObserver);
+        if (isVisible) {
+            remoteJsFormStateObserver->NotifyWhetherFormsVisible(FormVisibilityType::VISIBLE, formInstances);
+        } else {
+            remoteJsFormStateObserver->NotifyWhetherFormsVisible(FormVisibilityType::INVISIBLE, formInstances);
+        }
     }
     return ERR_OK;
 }
@@ -2075,6 +2089,23 @@ ErrCode FormDataMgr::GetRunningFormInfosByBundleName(const std::string &bundleNa
     }
     if (runningFormInfos.size() == 0) {
         return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormDataMgr::RegisterAddObserver(const sptr<IRemoteObject> &callerToken)
+{
+    formObservers_.emplace_back(callerToken);
+    return ERR_OK;
+}
+
+ErrCode FormDataMgr::RegisterRemoveObserver(const sptr<IRemoteObject> &callerToken)
+{
+    if (!formObservers_.empty()) {
+        auto it = std::find(formObservers_.begin(), formObservers_.end(), callerToken);
+        if (it != formObservers_.end()) {
+            formObservers_.erase(it);
+        }
     }
     return ERR_OK;
 }

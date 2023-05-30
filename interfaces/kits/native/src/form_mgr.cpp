@@ -1178,5 +1178,35 @@ ErrCode FormMgr::GetFormInstanceById(const int64_t formId, FormInstance &formIns
     }
     return remoteProxy_->GetFormInstanceById(formId, formInstance);
 }
+
+ErrCode FormMgr::RegisterAddObserver(const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_DEBUG("starts.");
+    if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
+        HILOG_ERROR("error, form is in recover status, can't do action on form.");
+        return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
+    }
+    auto errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("failed, errCode:%{public}d.", errCode);
+        return errCode;
+    }
+    return remoteProxy_->RegisterAddObserver(callerToken);
+}
+
+ErrCode FormMgr::RegisterRemoveObserver(const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_DEBUG("starts.");
+    if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
+        HILOG_ERROR("error, form is in recover status, can't do action on form.");
+        return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
+    }
+    auto errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("failed, errCode:%{public}d.", errCode);
+        return errCode;
+    }
+    return remoteProxy_->RegisterRemoveObserver(callerToken);
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

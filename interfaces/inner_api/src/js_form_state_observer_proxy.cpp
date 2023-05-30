@@ -16,6 +16,7 @@
 #include "js_form_state_observer_proxy.h"
 
 #include "appexecfwk_errors.h"
+#include "form_mgr_errors.h"
 #include "hilog_wrapper.h"
 #include "ipc_types.h"
 #include "running_form_info.h"
@@ -86,6 +87,64 @@ int32_t JsFormStateObserverProxy::OnRemoveForm(const std::string bundleName,
         HILOG_ERROR("failed to SendRequest: %{public}d", error);
     }
     return error;
+}
+
+int32_t JsFormStateObserverProxy::NotifyWhetherFormsVisible(const AppExecFwk::FormVisibilityType formVisiblityType,
+    std::vector<AppExecFwk::FormInstance> &formInstances)
+{
+    HILOG_DEBUG("called.");
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_ASYNC);
+
+    if (!data.WriteInterfaceToken(AbilityRuntime::IJsFormStateObserver::GetDescriptor())) {
+        HILOG_ERROR("failed to write interface token");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    std::string formVisiblityTypeInt = (formVisiblityType == AppExecFwk::FormVisibilityType::VISIBLE) ?
+        "1" : (formVisiblityType == AppExecFwk::FormVisibilityType::INVISIBLE) ? "2" : "0";
+    if (!data.WriteString(formVisiblityTypeInt)) {
+        HILOG_ERROR("failed to write formVisiblityType");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    HILOG_DEBUG("NotifyWhetherFormsVisible formInstances size %{public}zu size", formInstances.size());
+    if (!data.WriteInt32(formInstances.size())) {
+        HILOG_ERROR("write ParcelableVector failed");
+        return false;
+    }
+    for (auto &parcelable: formInstances) {
+        if (!data.WriteParcelable(&parcelable)) {
+            HILOG_ERROR("write ParcelableVector failed");
+            return false;
+        }
+    }
+    int32_t error = Remote()->SendRequest(
+        static_cast<uint32_t>(IJsFormStateObserver::Message::FORM_STATE_OBSERVER_NOTIFY_WHETHER_FORMS_VISIBLE),
+        data,
+        reply,
+        option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("failed to get form instances by filter: %{public}d", error);
+    }
+
+    return error;
+}
+
+int JsFormStateObserverProxy::SendTransactCmd(IJsFormStateObserver::Message code, MessageParcel &data, MessageParcel &reply)
+{
+    MessageOption option(MessageOption::TF_SYNC);
+
+    sptr<IRemoteObject> remote = Remote();
+    if (!remote) {
+        HILOG_ERROR("%{public}s, failed to get remote object, cmd: %{public}d", __func__, code);
+        return ERR_APPEXECFWK_SERVICE_NOT_CONNECTED;
+    }
+    int32_t result = remote->SendRequest(static_cast<uint32_t>(code), data, reply, option);
+    if (result != ERR_OK) {
+        HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d, cmd: %{public}d", __func__, result, code);
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+    return ERR_OK;
 }
 } // namespace AbilityRuntime
 } // namespace OHOS

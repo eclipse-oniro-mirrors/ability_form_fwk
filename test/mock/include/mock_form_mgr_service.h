@@ -82,6 +82,8 @@ public:
         const sptr<IRemoteObject> &callerToken));
     MOCK_METHOD2(RegisterFormRemoveObserverByBundle, ErrCode(const std::string bundleName,
         const sptr<IRemoteObject> &callerToken));
+    MOCK_METHOD1(RegisterAddObserver, ErrCode(const sptr<IRemoteObject> &callerToken));
+    MOCK_METHOD1(RegisterRemoveObserver, ErrCode(const sptr<IRemoteObject> &callerToken));
 };
 }
 }

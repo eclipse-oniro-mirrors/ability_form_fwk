@@ -21,6 +21,9 @@
 #include "ipc_types.h"
 #include "iremote_object.h"
 
+namespace {
+    static constexpr int32_t MAX_ALLOW_SIZE = 8 * 1024;
+}
 namespace OHOS {
 namespace AbilityRuntime {
 JsFormStateObserverStub::JsFormStateObserverStub()
@@ -29,6 +32,10 @@ JsFormStateObserverStub::JsFormStateObserverStub()
         &JsFormStateObserverStub::HandleOnAddForm;
     memberFuncMap_[static_cast<uint32_t>(IJsFormStateObserver::Message::FORM_STATE_OBSERVER_ON_REMOVE_FORM)] =
         &JsFormStateObserverStub::HandleOnRemoveForm;
+    memberFuncMap_[
+        static_cast<uint32_t>(IJsFormStateObserver::Message::FORM_STATE_OBSERVER_NOTIFY_WHETHER_FORMS_VISIBLE)] =
+        &JsFormStateObserverStub::HandleNotifyWhetherFormsVisible;
+
 }
 
 JsFormStateObserverStub::~JsFormStateObserverStub()
@@ -84,6 +91,44 @@ int32_t JsFormStateObserverStub::HandleOnRemoveForm(MessageParcel &data, Message
     int32_t result = OnRemoveForm(bundleName, *runningFormInfo);
     reply.WriteInt32(result);
     return result;
+}
+
+int32_t JsFormStateObserverStub::HandleNotifyWhetherFormsVisible(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("called.");
+    std::string formVisiblityTypeInt = data.ReadString();
+    std::vector<AppExecFwk::FormInstance> infos;
+    if (GetParcelableInfos(data, infos) != ERR_OK) {
+        HILOG_ERROR("write failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    AppExecFwk::FormVisibilityType formVisiblityType = 
+        (formVisiblityTypeInt == "1") ? AppExecFwk::FormVisibilityType::VISIBLE : (formVisiblityTypeInt == "2") ?
+        AppExecFwk::FormVisibilityType::INVISIBLE : AppExecFwk::FormVisibilityType::UNKNOWN;
+    int32_t result = NotifyWhetherFormsVisible(formVisiblityType, infos);
+    reply.WriteInt32(result);
+    return result;
+}
+
+template<typename T>
+int32_t JsFormStateObserverStub::GetParcelableInfos(MessageParcel &data, std::vector<T> &parcelableInfos)
+{
+    HILOG_DEBUG("called.");
+    int32_t infoSize = data.ReadInt32();
+    if (infoSize < 0 || infoSize > MAX_ALLOW_SIZE) {
+        HILOG_ERROR("invalid size: %{public}d", infoSize);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    for (int32_t i = 0; i < infoSize; i++) {
+        std::unique_ptr<T> info(data.ReadParcelable<T>());
+        if (!info) {
+            HILOG_ERROR("failed to Read Parcelable infos");
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+        parcelableInfos.emplace_back(*info);
+    }
+    HILOG_DEBUG("get parcelable infos success");
+    return ERR_OK;
 }
 } // namespace AbilityRuntime
 } // namespace OHOS

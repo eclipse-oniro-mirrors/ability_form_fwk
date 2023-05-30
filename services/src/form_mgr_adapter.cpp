@@ -2637,5 +2637,15 @@ ErrCode FormMgrAdapter::GetFormInstanceById(const int64_t formId, FormInstance &
 {
     return FormDataMgr::GetInstance().GetFormInstanceById(formId, formInstance);
 }
+
+ErrCode FormMgrAdapter::RegisterAddObserver(const sptr<IRemoteObject> &callerToken)
+{
+    return FormDataMgr::GetInstance().RegisterAddObserver(callerToken);
+}
+
+ErrCode FormMgrAdapter::RegisterRemoveObserver(const sptr<IRemoteObject> &callerToken)
+{
+    return FormDataMgr::GetInstance().RegisterRemoveObserver(callerToken);
+}
 } // namespace AppExecFwk
 } // namespace OHOS

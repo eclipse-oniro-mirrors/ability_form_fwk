@@ -216,6 +216,16 @@ public:
     {
         return ERR_OK;
     }
+
+    ErrCode RegisterAddObserver(const sptr<IRemoteObject> &callerToken) override
+    {
+        return ERR_OK;
+    }
+
+    ErrCode RegisterRemoveObserver(const sptr<IRemoteObject> &callerToken) override
+    {
+        return ERR_OK;
+    }
 };
 
 uint32_t GetU32Data(const char* ptr)

@@ -432,6 +432,19 @@ public:
      */
     ErrCode GetFormInstanceById(const int64_t formId, FormInstance &formInstance) override;
 
+    /**
+     * @brief Register form add observer.
+     * @param callerToken Caller ability token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RegisterAddObserver(const sptr<IRemoteObject> &callerToken) override;
+
+    /**
+     * @brief Register form remove observer.
+     * @param callerToken Caller ability token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RegisterRemoveObserver(const sptr<IRemoteObject> &callerToken) override;
 private:
     enum class DumpKey {
         KEY_DUMP_HELP = 0,

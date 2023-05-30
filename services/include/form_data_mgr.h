@@ -631,6 +631,20 @@ public:
      * @return return ERR_OK on get info success,other on failure.
      */
     ErrCode GetFormInstanceById(const int64_t formId, FormInstance &formInstances);
+
+    /**
+     * @brief Register form add observer.
+     * @param callerToken Caller ability token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RegisterAddObserver(const sptr<IRemoteObject> &callerToken);
+
+    /**
+     * @brief Register form remove observer.
+     * @param callerToken Caller ability token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RegisterRemoveObserver(const sptr<IRemoteObject> &callerToken);
 private:
     /**
      * @brief Create form record.
@@ -738,6 +752,7 @@ private:
     using FormRequestPublishFormInfo = std::pair<Want, std::unique_ptr<FormProviderData>>;
     std::map<int64_t, FormRequestPublishFormInfo> formRequestPublishForms_;
     int64_t udidHash_ = 0;
+    std::vector<sptr<IRemoteObject>> formObservers_;
 };
 } // namespace AppExecFwk
 } // namespace OHOS

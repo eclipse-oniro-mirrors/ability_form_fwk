@@ -40,11 +40,15 @@ public:
 
     int32_t HandleOnRemoveForm(MessageParcel &data, MessageParcel &reply);
 
+    int32_t HandleNotifyWhetherFormsVisible(MessageParcel &data, MessageParcel &reply);
+
 private:
     using FormStateObserverFunc = int32_t (JsFormStateObserverStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, FormStateObserverFunc> memberFuncMap_;
 
     DISALLOW_COPY_AND_MOVE(JsFormStateObserverStub);
+template<typename T>
+    int32_t GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos);
 };
 }  // namespace AbilityRuntime
 }  // namespace OHOS
