@@ -2329,17 +2329,13 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0122, TestSize.Level0)
     sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
     sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
     FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
-    auto bmsTaskGetBundleInfo =
-        [] (const std::string &bundleName, const BundleFlag flag, BundleInfo &bundleInfo, int32_t userId) {
-        GTEST_LOG_(INFO) << "FormMgrAdapter_0122 bmsTaskGetBundleInfo called";
-        return true;
+    auto bmsTaskGetApplicationInfoV9 =
+        [] (const std::string &bundleName, int32_t flag, int32_t userId, ApplicationInfo &appInfo) {
+        GTEST_LOG_(INFO) << "FormMgrAdapter_0122 bmsTaskGetApplicationInfoV9 called";
+        return ERR_OK;
     };
-    EXPECT_CALL(*bmsProxy, GetBundleInfo(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleInfo));
-    auto bmsTaskCheckIsSystemAppByUid = [] (const int uid) {
-        GTEST_LOG_(INFO) << "FormMgrAdapter_0122 bmsTaskCheckIsSystemAppByUid called";
-        return true;
-    };
-    EXPECT_CALL(*bmsProxy, CheckIsSystemAppByUid(_)).Times(1).WillOnce(Invoke(bmsTaskCheckIsSystemAppByUid));
+    EXPECT_CALL(*bmsProxy, GetApplicationInfoV9(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTaskGetApplicationInfoV9));
+
     FormMgrAdapter formMgrAdapter;
     int64_t formId1 = 1;
     int64_t formId2 = 2;
@@ -3036,19 +3032,13 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0154, TestSize.Level0)
         GTEST_LOG_(INFO) << "FormMgrAdapter_0154 bmsTaskCheckIsSystemAppByUid called";
         return !(++times == counts);
     };
-    EXPECT_CALL(*bmsProxy, CheckIsSystemAppByUid(_)).Times(counts).WillOnce(Invoke(bmsTaskCheckIsSystemAppByUid));
+    EXPECT_CALL(*bmsProxy, CheckIsSystemAppByUid(_)).Times(1).WillOnce(Invoke(bmsTaskCheckIsSystemAppByUid));
     auto bmsTaskGetBundleNameForUid = [] (const int uid, std::string &name) {
         name = "name";
         GTEST_LOG_(INFO) << "FormMgrAdapter_0154 bmsTaskGetBundleNameForUid called";
         return ERR_OK;
     };
     EXPECT_CALL(*bmsProxy, GetNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
-    auto bmsTaskGetBundleInfo =
-        [] (const std::string &bundleName, const BundleFlag flag, BundleInfo &bundleInfo, int32_t userId) {
-        GTEST_LOG_(INFO) << "FormMgrAdapter_0154 bmsTask called";
-        return true;
-    };
-    EXPECT_CALL(*bmsProxy, GetBundleInfo(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleInfo));
     FormMgrAdapter formMgrAdapter;
     Want want = {};
 
@@ -3712,8 +3702,10 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_191, TestSize.Level0)
     sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
     sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
     FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
-    EXPECT_CALL(*bmsProxy, GetBundleInfo(_, _, _, _)).Times(1).WillRepeatedly(Return(true));
-    EXPECT_CALL(*bmsProxy, CheckIsSystemAppByUid(_)).Times(1).WillRepeatedly(Return(true));
+    AppExecFwk::ApplicationInfo appInfo;
+    appInfo.isSystemApp = true;
+    EXPECT_CALL(*bmsProxy, GetApplicationInfoV9(_, _, _, _)).Times(1)
+        .WillRepeatedly(DoAll(SetArgReferee<3>(appInfo), Return(ERR_OK)));
     std::string bundleName = "com.ohos.systemui";
     EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrAdapter.CheckValidPublishEvent(bmsProxy, bundleName, want));
     FormBmsHelper::GetInstance().iBundleMgr_ = backup;
@@ -3733,8 +3725,10 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_192, TestSize.Level0)
     sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
     sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
     FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
-    EXPECT_CALL(*bmsProxy, GetBundleInfo(_, _, _, _)).Times(1).WillRepeatedly(Return(true));
-    EXPECT_CALL(*bmsProxy, CheckIsSystemAppByUid(_)).Times(1).WillRepeatedly(Return(true));
+    AppExecFwk::ApplicationInfo appInfo;
+    appInfo.isSystemApp = true;
+    EXPECT_CALL(*bmsProxy, GetApplicationInfoV9(_, _, _, _)).Times(1)
+        .WillRepeatedly(DoAll(SetArgReferee<3>(appInfo), Return(ERR_OK)));
     std::string bundleName = "com.ohos.launcher";
     EXPECT_EQ(ERR_OK, formMgrAdapter.CheckValidPublishEvent(bmsProxy, bundleName, want));
     FormBmsHelper::GetInstance().iBundleMgr_ = backup;
@@ -3759,8 +3753,10 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_193, TestSize.Level0)
     FormBmsHelper::GetInstance().iErMgr_ = erMgrService;
     ExperienceRule rule;
     rule.isAllow = false;
-    EXPECT_CALL(*bmsProxy, GetBundleInfo(_, _, _, _)).Times(1).WillRepeatedly(Return(true));
-    EXPECT_CALL(*bmsProxy, CheckIsSystemAppByUid(_)).Times(1).WillRepeatedly(Return(true));
+    AppExecFwk::ApplicationInfo appInfo;
+    appInfo.isSystemApp = true;
+    EXPECT_CALL(*bmsProxy, GetApplicationInfoV9(_, _, _, _)).Times(1)
+        .WillRepeatedly(DoAll(SetArgReferee<3>(appInfo), Return(ERR_OK)));
     EXPECT_CALL(*erMgrService, IsSupportPublishForm(_, _, _)).Times(1)
         .WillRepeatedly(DoAll(SetArgReferee<2>(rule), Return(ERR_OK)));
     std::string bundleName = "com.ohos.launcher";
@@ -3788,8 +3784,10 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_194, TestSize.Level0)
     FormBmsHelper::GetInstance().iErMgr_ = erMgrService;
     ExperienceRule rule;
     rule.isAllow = true;
-    EXPECT_CALL(*bmsProxy, GetBundleInfo(_, _, _, _)).Times(1).WillRepeatedly(Return(true));
-    EXPECT_CALL(*bmsProxy, CheckIsSystemAppByUid(_)).Times(1).WillRepeatedly(Return(true));
+    AppExecFwk::ApplicationInfo appInfo;
+    appInfo.isSystemApp = true;
+    EXPECT_CALL(*bmsProxy, GetApplicationInfoV9(_, _, _, _)).Times(1)
+        .WillRepeatedly(DoAll(SetArgReferee<3>(appInfo), Return(ERR_OK)));
     EXPECT_CALL(*erMgrService, IsSupportPublishForm(_, _, _)).Times(1)
         .WillRepeatedly(DoAll(SetArgReferee<2>(rule), Return(ERR_OK)));
     std::string bundleName = "com.ohos.launcher";

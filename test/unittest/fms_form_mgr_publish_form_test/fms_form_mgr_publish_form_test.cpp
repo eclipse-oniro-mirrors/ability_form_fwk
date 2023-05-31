@@ -212,8 +212,11 @@ HWTEST_F(FmsFormMgrPublishFormTest, publishForm_002, TestSize.Level0)
     int64_t formId;
     MockGetAbilityInfo(true);
     MockGetAbilityInfoByAction(true);
-    EXPECT_CALL(*mockBms_, GetBundleInfo(_, _, _, _)).Times(1).WillRepeatedly(Return(true));
-    EXPECT_CALL(*mockBms_, CheckIsSystemAppByUid(_)).Times(2).WillRepeatedly(Return(true));
+    AppExecFwk::ApplicationInfo appInfo;
+    appInfo.isSystemApp = true;
+    EXPECT_CALL(*mockBms_, GetApplicationInfoV9(_, _, _, _)).Times(1)
+        .WillRepeatedly(DoAll(SetArgReferee<3>(appInfo), Return(ERR_OK)));
+    EXPECT_CALL(*mockBms_, CheckIsSystemAppByUid(_)).Times(1).WillRepeatedly(Return(true));
     EXPECT_CALL(*mockBms_, GetNameForUid(_, _)).Times(1)
         .WillRepeatedly(DoAll(SetArgReferee<1>(LAUNCHER_BUNDLE_NAME), Return(ERR_OK)));
     EXPECT_EQ(ERR_OK,
@@ -256,8 +259,8 @@ HWTEST_F(FmsFormMgrPublishFormTest, publishForm_003, TestSize.Level0)
     std::string bundleName = "com.ohos.test";
     MockGetAbilityInfo(true);
     MockGetAbilityInfoByAction(true);
-    EXPECT_CALL(*mockBms_, GetBundleInfo(_, _, _, _)).Times(1).WillRepeatedly(Return(true));
-    EXPECT_CALL(*mockBms_, CheckIsSystemAppByUid(_)).Times(2).WillRepeatedly(Return(true));
+    EXPECT_CALL(*mockBms_, GetApplicationInfoV9(_, _, _, _)).Times(1).WillRepeatedly(Return(ERR_OK));
+    EXPECT_CALL(*mockBms_, CheckIsSystemAppByUid(_)).Times(1).WillRepeatedly(Return(true));
     EXPECT_CALL(*mockBms_, GetNameForUid(_, _)).Times(1)
     .WillRepeatedly(DoAll(SetArgReferee<1>(bundleName), Return(ERR_OK)));
     EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS,
