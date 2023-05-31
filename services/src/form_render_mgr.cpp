@@ -295,24 +295,19 @@ ErrCode FormRenderMgr::AddConnection(int64_t formId, sptr<FormRenderConnection> 
     int32_t renderFormConnectionSize = 0;
     sptr<FormRenderConnection> oldConnection = nullptr;
     {
-        int32_t connectKey = static_cast<int32_t>(FormUtil::GetCurrentMillisecond());
         std::lock_guard<std::mutex> lock(resourceMutex_);
-        if (connectKey <= maxConnectKey) {
-            connectKey = maxConnectKey + 1;
-            maxConnectKey = connectKey;
-        }
-        connection->SetConnectId(connectKey);
+        int32_t connectKey = static_cast<int32_t>(FormUtil::GetCurrentMillisecond());
         auto conIterator = renderFormConnections_.find(formId);
         if (conIterator == renderFormConnections_.end()) {
+            connection->SetConnectId(connectKey);
             renderFormConnections_.emplace(formId, connection);
-            conIterator = renderFormConnections_.begin();
-        } else {
+        } else if (renderFormConnections_[formId]->GetConnectId() != connection->GetConnectId()) {
             HILOG_WARN("Duplicate connection of formId: %{public}" PRId64 ", delete old connection", formId);
             renderFormConnectionSize = renderFormConnections_.size();
             oldConnection = renderFormConnections_[formId];
             renderFormConnections_[formId] = connection;
+            connection->SetConnectId(connectKey);
         }
-
         HILOG_DEBUG("renderFormConnections size: %{public}zu.", renderFormConnections_.size());
     }
     if (oldConnection) {
