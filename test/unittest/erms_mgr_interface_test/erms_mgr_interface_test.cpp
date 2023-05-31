@@ -16,31 +16,24 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "erms_mgr_interface.h"
-using namespace testing;
+#include "erms_mgr_param.h"
+
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::AppExecFwk;
-using namespace OHOS::AAFwk;
 
 class IEcologicalRuleManagerTest : public testing::Test {
 public:
-    static void SetUpTestCase();
-    static void TearDownTestCase();
     void SetUp();
     void TearDown();
 };
-void IEcologicalRuleManagerTest::SetUpTestCase(void)
+void IEcologicalRuleManagerTest::SetUp()
 {}
 
-void IEcologicalRuleManagerTest::TearDownTestCase(void)
+void IEcologicalRuleManagerTest::TearDown()
 {}
 
-void IEcologicalRuleManagerTest::SetUp(void)
-{}
-
-void IEcologicalRuleManagerTest::TearDown(void)
-{}
+using ExperienceRule = OHOS::AppExecFwk::ErmsParams::ExperienceRule;
 
 /**
  * @tc.number: ExperienceRule_ReadFromParcel_0100
@@ -49,7 +42,7 @@ void IEcologicalRuleManagerTest::TearDown(void)
  */
 HWTEST_F(IEcologicalRuleManagerTest, ExperienceRule_ReadFromParcel_0100, TestSize.Level1)
 {
-    ErmsParams::ExperienceRule rule;
+    ExperienceRule rule;
     Parcel parcel;
     EXPECT_EQ(true, rule.ReadFromParcel(parcel));
 }
@@ -61,7 +54,7 @@ HWTEST_F(IEcologicalRuleManagerTest, ExperienceRule_ReadFromParcel_0100, TestSiz
  */
 HWTEST_F(IEcologicalRuleManagerTest, ExperienceRule_Marshalling_0100, TestSize.Level1)
 {
-    ErmsParams::ExperienceRule rule;
+    ExperienceRule rule;
     Parcel parcel;
     EXPECT_EQ(true, rule.Marshalling(parcel));
 }
@@ -73,7 +66,7 @@ HWTEST_F(IEcologicalRuleManagerTest, ExperienceRule_Marshalling_0100, TestSize.L
  */
 HWTEST_F(IEcologicalRuleManagerTest, ExperienceRule_Unmarshalling_0100, TestSize.Level1)
 {
-    ErmsParams::ExperienceRule rule;
+    ExperienceRule rule;
     Parcel parcel;
     EXPECT_NE(nullptr, rule.Unmarshalling(parcel));
 }
