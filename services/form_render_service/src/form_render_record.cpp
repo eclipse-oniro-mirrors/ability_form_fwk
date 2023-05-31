@@ -110,7 +110,6 @@ bool FormRenderRecord::CreateEventHandler(const std::string &bundleName)
         return false;
     }
 
-    AddWatchDogThreadMonitor();
     return true;
 }
 
