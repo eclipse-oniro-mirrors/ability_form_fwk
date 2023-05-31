@@ -217,7 +217,6 @@ ohos_shared_library("form_manager") {
   include_dirs = [ "${ability_runtime_innerapi_path}/runtime/include" ]
 
   sources = [
-    "interfaces/inner_api/src/erms_mgr_param.cpp",
     "interfaces/inner_api/src/form_ashmem.cpp",
     "interfaces/inner_api/src/form_host_proxy.cpp",
     "interfaces/inner_api/src/form_host_stub.cpp",
