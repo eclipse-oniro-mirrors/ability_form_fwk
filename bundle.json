@@ -94,6 +94,14 @@
                   ]
                 },
                 "name": "//foundation/ability/form_fwk:fmskit_native"
+              },
+              {
+                "header": {
+                  "header_base": "//foundation/ability/form_fwk/frameworks/js/napi/formUtil",
+                  "header_files": [
+                  ]
+                },
+                "name": "//foundation/ability/form_fwk/frameworks/js/napi:formutil_napi"
               }
           ],
           "test": [
