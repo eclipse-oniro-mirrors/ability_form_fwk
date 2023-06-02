@@ -418,6 +418,7 @@ ohos_shared_library("formutil_napi") {
   ]
 
   subsystem_name = "ability"
+  innerapi_tags = [ "platformsdk" ]
   part_name = "form_fwk"
 }
 
