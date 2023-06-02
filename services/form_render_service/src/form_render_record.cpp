@@ -480,6 +480,15 @@ int32_t FormRenderRecord::ReloadFormRecord(const std::vector<int64_t> &&formIds,
 int32_t FormRenderRecord::HandleReloadFormRecord(const std::vector<int64_t> &&formIds, const Want &want)
 {
     HILOG_INFO("Reload record in js thread.");
+    if (runtime_ == nullptr) {
+        HILOG_ERROR("runtime_ is null.");
+        return RELOAD_FORM_FAILED;
+    }
+    if (runtime_->GetLanguage() == AbilityRuntime::Runtime::Language::JS) {
+        // In the card upgrade condition, new components may be added and need to be reloaded
+        HILOG_DEBUG("ReloadFormComponent.");
+        (static_cast<AbilityRuntime::JsRuntime&>(*runtime_)).ReloadFormComponent();
+    }
     std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
     for (auto formId : formIds) {
         auto search = formRendererGroupMap_.find(formId);
