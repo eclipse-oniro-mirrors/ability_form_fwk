@@ -36,9 +36,22 @@ using Want = AAFwk::Want;
 enum class TaskState {
     NO_RUNNING = 0,
     RUNNING = 0,
-    HALF_BLOCK,
     BLOCK,
 };
+
+class ThreadState {
+public:
+    explicit ThreadState(int32_t maxState);
+    void ResetState();
+    void NextState();
+    int32_t GetCurrentState();
+    bool IsMaxState();
+
+private:
+    int32_t state_ = 0;
+    int32_t maxState_;
+};
+
 class FormRenderRecord : public std::enable_shared_from_this<FormRenderRecord> {
 public:
     /**
@@ -157,7 +170,7 @@ private:
     std::string hapPath_;
     std::mutex watchDogMutex_;
     bool threadIsAlive_ = true;
-    bool halfBlock_ = false;
+    std::shared_ptr<ThreadState> threadState_;
 };
 }  // namespace FormRender
 }  // namespace AppExecFwk

@@ -30,6 +30,7 @@ namespace FormRender {
 constexpr int32_t RENDER_FORM_FAILED = -1;
 constexpr int32_t RELOAD_FORM_FAILED = -1;
 constexpr int32_t TIMEOUT = 3 * 1000;
+constexpr int32_t CHECK_THREAD_TIME = 3;
 
 namespace {
 uint64_t GetCurrentTickMillseconds()
@@ -37,6 +38,28 @@ uint64_t GetCurrentTickMillseconds()
     return std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::steady_clock::now().time_since_epoch()).count();
 }
+}
+
+ThreadState::ThreadState(int32_t maxState) : maxState_(maxState) {}
+
+void ThreadState::ResetState()
+{
+    state_ = 0;
+}
+
+void ThreadState::NextState()
+{
+    state_++;
+}
+
+int32_t ThreadState::GetCurrentState()
+{
+    return state_;
+}
+
+bool ThreadState::IsMaxState()
+{
+    return state_ >= maxState_;
 }
 
 std::shared_ptr<FormRenderRecord> FormRenderRecord::Create(const std::string &bundleName, const std::string &uid)
@@ -56,7 +79,10 @@ std::shared_ptr<FormRenderRecord> FormRenderRecord::Create(const std::string &bu
 }
 
 FormRenderRecord::FormRenderRecord(
-    const std::string &bundleName, const std::string &uid) : bundleName_(bundleName), uid_(uid) {}
+    const std::string &bundleName, const std::string &uid) : bundleName_(bundleName), uid_(uid)
+{
+    threadState_ = std::make_shared<ThreadState>(CHECK_THREAD_TIME);
+}
 
 FormRenderRecord::~FormRenderRecord()
 {
@@ -110,6 +136,7 @@ bool FormRenderRecord::CreateEventHandler(const std::string &bundleName)
         return false;
     }
 
+    AddWatchDogThreadMonitor();
     return true;
 }
 
@@ -131,11 +158,6 @@ void FormRenderRecord::AddWatchDogThreadMonitor()
 void FormRenderRecord::Timer()
 {
     TaskState taskState = RunTask();
-    if (taskState == TaskState::HALF_BLOCK) {
-        HILOG_ERROR("FRS half-block happened when bundleName is %{public}s", bundleName_.c_str());
-        return;
-    }
-
     if (taskState == TaskState::BLOCK) {
         HILOG_ERROR("FRS block happened when bundleName is %{public}s", bundleName_.c_str());
         OHOS::DelayedSingleton<FormRenderImpl>::GetInstance()->OnRenderingBlock(bundleName_);
@@ -151,12 +173,10 @@ TaskState FormRenderRecord::RunTask()
     }
 
     if (!threadIsAlive_) {
-        if (!halfBlock_) {
-            halfBlock_ = true;
-            return TaskState::HALF_BLOCK;
-        }
-
-        return TaskState::BLOCK;
+        threadState_->NextState();
+        HILOG_INFO("FRS block happened with threadState is %{public}d when bundleName is %{public}s",
+            threadState_->GetCurrentState(), bundleName_.c_str());
+        return threadState_->IsMaxState() ? TaskState::BLOCK : TaskState::RUNNING;
     }
 
     threadIsAlive_ = false;
@@ -181,7 +201,7 @@ void FormRenderRecord::MarkThreadAlive()
 {
     std::unique_lock<std::mutex> lock(watchDogMutex_);
     threadIsAlive_ = true;
-    halfBlock_ = false;
+    threadState_->ResetState();
 }
 
 int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const Want &want, const sptr<IRemoteObject> hostRemoteObj)
@@ -372,6 +392,7 @@ std::shared_ptr<Ace::FormRendererGroup> FormRenderRecord::CreateFormRendererGrou
 void FormRenderRecord::HandleUpdateInJsThread(const FormJsInfo &formJsInfo, const Want &want)
 {
     HILOG_INFO("Update record in js thread.");
+    MarkThreadAlive();
     if (runtime_ == nullptr && !CreateRuntime(formJsInfo)) {
         HILOG_ERROR("Create runtime failed.");
         return;
@@ -407,6 +428,7 @@ void FormRenderRecord::HandleUpdateInJsThread(const FormJsInfo &formJsInfo, cons
 bool FormRenderRecord::HandleDeleteInJsThread(int64_t formId, const std::string &compId)
 {
     HILOG_INFO("Delete some resources in js thread.");
+    MarkThreadAlive();
     {
         std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
         auto search = formRendererGroupMap_.find(formId);
@@ -434,6 +456,7 @@ bool FormRenderRecord::HandleDeleteInJsThread(int64_t formId, const std::string 
 void FormRenderRecord::HandleDestroyInJsThread()
 {
     HILOG_INFO("FormRenderService is exiting, destroy some resources in js thread.");
+    MarkThreadAlive();
     std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
     formRendererGroupMap_.clear();
     runtime_.reset();
@@ -480,6 +503,7 @@ int32_t FormRenderRecord::ReloadFormRecord(const std::vector<int64_t> &&formIds,
 int32_t FormRenderRecord::HandleReloadFormRecord(const std::vector<int64_t> &&formIds, const Want &want)
 {
     HILOG_INFO("Reload record in js thread.");
+    MarkThreadAlive();
     if (runtime_ == nullptr) {
         HILOG_ERROR("runtime_ is null.");
         return RELOAD_FORM_FAILED;
@@ -535,6 +559,7 @@ void FormRenderRecord::HandleUpdateConfiguration(
     const std::shared_ptr<OHOS::AppExecFwk::Configuration>& config)
 {
     HILOG_INFO("HandleUpdateConfiguration begin.");
+    MarkThreadAlive();
     std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
     if (!config) {
         HILOG_ERROR("configuration is nullptr");
