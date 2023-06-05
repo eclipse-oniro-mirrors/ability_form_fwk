@@ -124,6 +124,9 @@ public:
     MOCK_METHOD(bool, GetBundleInfo,
         (const std::string &bundleName, const BundleFlag flag, BundleInfo &bundleInfo, int32_t userId), (override));
 
+    MOCK_METHOD(ErrCode, GetApplicationInfoV9,
+        (const std::string &, int32_t, int32_t, ApplicationInfo &), (override));
+
     MOCK_METHOD2(GetBundleNameForUid, bool(const int, std::string &));
 
     MOCK_METHOD1(CheckIsSystemAppByUid, bool(const int));
