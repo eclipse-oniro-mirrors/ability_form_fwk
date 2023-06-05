@@ -376,7 +376,7 @@ ErrCode JsFormStateObserver::ClearFormNotifyVisibleCallbackByBundle(const std::s
 }
 
 ErrCode JsFormStateObserver::DelFormNotifyVisibleCallbackByBundle(const std::string bundleName,
-    bool isVisibility, NativeValue* jsObserverObject)
+    bool isVisibility, NativeValue *jsObserverObject)
 {
     HILOG_DEBUG("called.");
     std::lock_guard<std::mutex> lock(formIsvisibleCallbackMutex_);
@@ -418,14 +418,14 @@ int32_t JsFormStateObserver::NotifyWhetherFormsVisible(const AppExecFwk::FormVis
     std::lock_guard<std::mutex> lock(formIsvisibleCallbackMutex_);
     if (visibleType == AppExecFwk::FormVisibilityType::VISIBLE) {
         for (auto &item : formVisibleCallbackMap_) {
-            NativeValue* value = (item.second)->Get();
-            NativeValue* argv[] = { CreateFormInstances(*engine_, formInstances)};
+            NativeValue *value = (item.second)->Get();
+            NativeValue *argv[] = { CreateFormInstances(*engine_, formInstances)};
             CallJsFunction(value, argv,  sizeof(argv) / sizeof(argv[0]));
         }
     } else {
         for (auto &item : formInvisibleCallbackMap_) {
-            NativeValue* value = (item.second)->Get();
-            NativeValue* argv[] = { CreateFormInstances(*engine_, formInstances)};
+            NativeValue *value = (item.second)->Get();
+            NativeValue *argv[] = { CreateFormInstances(*engine_, formInstances)};
             CallJsFunction(value, argv, sizeof(argv) / sizeof(argv[0]));
         }
     }
@@ -434,10 +434,10 @@ int32_t JsFormStateObserver::NotifyWhetherFormsVisible(const AppExecFwk::FormVis
 }
 
 void JsFormStateObserver::CallJsFunction(
-    NativeValue* value, NativeValue* const* argv, size_t argc)
+    NativeValue *value, NativeValue *const *argv, size_t argc)
 {
     HILOG_DEBUG("called.");
-    NativeObject* obj = ConvertNativeValueTo<NativeObject>(value);
+    NativeObject *obj = ConvertNativeValueTo<NativeObject>(value);
     if (obj == nullptr) {
         HILOG_ERROR("Failed to get object");
         return;

@@ -93,25 +93,25 @@ public:
 
     bool CheckMapSize(const std::string type, const std::string bundleName);
 
-    int RegisterFormInstanceCallback(NativeEngine &engine, NativeValue* jsObserverObject,
+    int RegisterFormInstanceCallback(NativeEngine &engine, NativeValue *jsObserverObject,
         bool isVisibility, std::string &bundleName);
 
     int32_t NotifyWhetherFormsVisible(const AppExecFwk::FormVisibilityType visibleType,
         std::vector<AppExecFwk::FormInstance> &runningFormInfos);
 
-    void CallJsFunction(NativeValue* value, NativeValue* const* argv, size_t argc);
+    void CallJsFunction(NativeValue *value, NativeValue *const *argv, size_t argc);
 
     ErrCode ClearFormNotifyVisibleCallbackByBundle(const std::string bundleNam, bool isVisibility);
 
     ErrCode DelFormNotifyVisibleCallbackByBundle(const std::string bundleName, bool isVisibility,
-        NativeValue* jsObserverObject);
+        NativeValue *jsObserverObject);
 private:
     static std::mutex mutex_;
     static sptr<JsFormStateObserver> instance_;
     mutable std::mutex addFormCallbackMutex_;
     mutable std::mutex removeFormCallbackMutex_;
     mutable std::mutex formIsvisibleCallbackMutex_;
-    
+
     std::map<std::string, std::vector<std::shared_ptr<FormAddCallbackClient>>> formAddCallbackMap_;
     std::map<std::string, std::vector<std::shared_ptr<FormRemoveCallbackClient>>> formRemoveCallbackMap_;
     std::map<std::string, std::shared_ptr<NativeReference>> formVisibleCallbackMap_;
