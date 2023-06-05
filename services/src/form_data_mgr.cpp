@@ -29,6 +29,7 @@
 #include "form_util.h"
 #include "hilog_wrapper.h"
 #include "ipc_skeleton.h"
+#include "js_form_state_observer_interface.h"
 #include "running_form_info.h"
 
 namespace OHOS {
@@ -1959,8 +1960,7 @@ ErrCode FormDataMgr::GetFormInstancesByFilter(const FormInstancesFilter &formIns
                     instance.formHostName = formHostRecord.GetHostBundleName();
                     instance.formId = itFormRecord->second.formId;
                     instance.specification = itFormRecord->second.specification;
-                    instance.formVisiblity = itFormRecord->second.isVisible ?
-                        FormVisibilityType::VISIBLE : FormVisibilityType::INVISIBLE;
+                    instance.formVisiblity = static_cast<FormVisibilityType>(itFormRecord->second.formVisibleNotifyState);
                     instance.bundleName = itFormRecord->second.bundleName;
                     instance.moduleName = itFormRecord->second.moduleName;
                     instance.abilityName = itFormRecord->second.abilityName;
@@ -1996,7 +1996,7 @@ ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, FormInstance &for
         formInstance.formHostName = formHostRecords.begin()->GetHostBundleName();
         formInstance.formId = formRecord.formId;
         formInstance.specification = formRecord.specification;
-        formInstance.formVisiblity = formRecord.isVisible ? FormVisibilityType::VISIBLE : FormVisibilityType::INVISIBLE;
+        formInstance.formVisiblity = static_cast<FormVisibilityType>(formRecord.formVisibleNotifyState);
         formInstance.bundleName = formRecord.bundleName;
         formInstance.moduleName = formRecord.moduleName;
         formInstance.abilityName = formRecord.abilityName;
@@ -2023,7 +2023,7 @@ ErrCode FormDataMgr::GetRunningFormInfos(std::vector<RunningFormInfo> &runningFo
             info.bundleName = record.second.bundleName;
             info.moduleName = record.second.moduleName;
             info.abilityName = record.second.abilityName;
-            info.formVisiblity = record.second.isVisible ? FormVisibilityType::VISIBLE : FormVisibilityType::INVISIBLE;
+            info.formVisiblity = static_cast<FormVisibilityType>(record.second.formVisibleNotifyState);
             std::vector<FormHostRecord> formHostRecords;
             GetFormHostRecord(record.first, formHostRecords);
             if (formHostRecords.empty()) {
@@ -2067,8 +2067,7 @@ ErrCode FormDataMgr::GetRunningFormInfosByBundleName(const std::string &bundleNa
                 info.hostBundleName = bundleName;
                 info.moduleName = record.second.moduleName;
                 info.abilityName = record.second.abilityName;
-                info.formVisiblity = record.second.isVisible ?
-                    FormVisibilityType::VISIBLE : FormVisibilityType::INVISIBLE;
+                info.formVisiblity = static_cast<FormVisibilityType>(record.second.formVisibleNotifyState);
                 runningFormInfos.emplace_back(info);
             }
         }

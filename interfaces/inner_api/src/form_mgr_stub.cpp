@@ -124,6 +124,10 @@ FormMgrStub::FormMgrStub()
         &FormMgrStub::HandleGetFormInstancesByFilter;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORM_INSTANCES_FROM_BY_ID)] =
         &FormMgrStub::HandleGetFormInstanceById;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_ADD_OBSERVER)] =
+        &FormMgrStub::HandleRegisterAddObserver;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_REMOVE_OBSERVER)] =
+        &FormMgrStub::HandleRegisterRemoveObserver;
 }
 
 FormMgrStub::~FormMgrStub()
@@ -1065,6 +1069,34 @@ bool FormMgrStub::WriteParcelableVector(std::vector<T> &parcelableVector, Parcel
         }
     }
     return true;
+}
+
+ErrCode FormMgrStub::HandleRegisterAddObserver(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("called.");
+    std::string bundleName = data.ReadString();
+    sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
+    if (callerToken == nullptr) {
+        HILOG_ERROR("failed to get remote object.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    auto result = RegisterAddObserver(bundleName, callerToken);
+    reply.WriteInt32(result);
+    return result;
+}
+
+ErrCode FormMgrStub::HandleRegisterRemoveObserver(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("called.");
+    std::string bundleName = data.ReadString();
+    sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
+    if (callerToken == nullptr) {
+        HILOG_ERROR("failed to get remote object.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    auto result = RegisterRemoveObserver(bundleName, callerToken);
+    reply.WriteInt32(result);
+    return result;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

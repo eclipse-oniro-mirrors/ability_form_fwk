@@ -738,6 +738,7 @@ private:
     using FormRequestPublishFormInfo = std::pair<Want, std::unique_ptr<FormProviderData>>;
     std::map<int64_t, FormRequestPublishFormInfo> formRequestPublishForms_;
     int64_t udidHash_ = 0;
+    std::vector<sptr<IRemoteObject>> formObservers_;
 };
 } // namespace AppExecFwk
 } // namespace OHOS

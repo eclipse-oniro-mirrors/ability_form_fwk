@@ -393,6 +393,22 @@ public:
      * @return return ERR_OK on get info success,other on failure.
      */
     ErrCode GetFormInstanceById(const int64_t formId, FormInstance &formInstance);
+
+    /**
+     * @brief Register form add observer.
+     * @param bundleName BundleName of the form host
+     * @param callerToken Caller ability token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RegisterAddObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken);
+
+    /**
+     * @brief Register form remove observer.
+     * @param bundleName BundleName of the form host
+     * @param callerToken Caller ability token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RegisterRemoveObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken);
 private:
     /**
      * @brief Get form configure info.
@@ -725,6 +741,7 @@ private:
      */
     ErrCode AllotFormBySpecificId(const FormItemInfo &info,
         const sptr<IRemoteObject> &callerToken, const WantParams &wantParams, FormJsInfo &formInfo);
+    std::map<std::string, sptr<IRemoteObject>> formObservers_;
 };
 
 enum class HostId : int8_t {

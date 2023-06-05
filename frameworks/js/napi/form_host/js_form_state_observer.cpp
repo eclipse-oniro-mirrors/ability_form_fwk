@@ -15,7 +15,9 @@
 
 #include "js_form_state_observer.h"
 
+#include "form_mgr_errors.h"
 #include "hilog_wrapper.h"
+#include "js_runtime_utils.h"
 #include "napi_common_util.h"
 #include "napi_form_util.h"
 #include "napi/native_api.h"
@@ -323,6 +325,136 @@ int32_t JsFormStateObserver::OnRemoveForm(const std::string &bundleName,
         }
     }
     return ERR_OK;
+}
+
+int JsFormStateObserver::RegisterFormInstanceCallback(NativeEngine &engine, NativeValue* jsObserverObject,
+    bool isVisibility, std::string &bundleName)
+{
+    HILOG_DEBUG("called.");
+    if (engine_ == nullptr) {
+        engine_ = &engine;
+    }
+    std::lock_guard<std::mutex> lock(formIsvisibleCallbackMutex_);
+    auto callback = formVisibleCallbackMap_.find(bundleName);
+    if (callback != formVisibleCallbackMap_.end()) {
+        HILOG_ERROR("bundleName is already in the map, bundleName id %{public}s", bundleName.c_str());
+        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+    }
+    if (isVisibility) {
+        formVisibleCallbackMap_.emplace(
+            bundleName, std::shared_ptr<NativeReference>(engine.CreateReference(jsObserverObject, 1)));
+    } else {
+        formInvisibleCallbackMap_.emplace(
+            bundleName, std::shared_ptr<NativeReference>(engine.CreateReference(jsObserverObject, 1)));
+    }
+    return ERR_OK;
+}
+
+ErrCode JsFormStateObserver::ClearFormNotifyVisibleCallbackByBundle(const std::string bundleName,
+    bool isVisibility)
+{
+    HILOG_DEBUG("called.");
+    std::lock_guard<std::mutex> lock(formIsvisibleCallbackMutex_);
+    if (isVisibility) {
+        auto visibleCallback = formVisibleCallbackMap_.find(bundleName);
+        if (visibleCallback != formVisibleCallbackMap_.end()) {
+            formVisibleCallbackMap_.erase(visibleCallback);
+            return ERR_OK;
+        } else {
+            HILOG_ERROR("There is no formVisibleCallbackMap_ has been register");
+            return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+        }
+    } else {
+        auto invisibleCallback = formInvisibleCallbackMap_.find(bundleName);
+        if (invisibleCallback != formInvisibleCallbackMap_.end()) {
+            formInvisibleCallbackMap_.erase(invisibleCallback);
+            return ERR_OK;
+        } else {
+            HILOG_ERROR("There is no formInvisibleCallbackMap_ has been register");
+            return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+        }
+    }
+}
+
+ErrCode JsFormStateObserver::DelFormNotifyVisibleCallbackByBundle(const std::string bundleName,
+    bool isVisibility, NativeValue *jsObserverObject)
+{
+    HILOG_DEBUG("called.");
+    std::lock_guard<std::mutex> lock(formIsvisibleCallbackMutex_);
+    if (isVisibility) {
+        auto visibleCallback = formVisibleCallbackMap_.find(bundleName);
+        if (visibleCallback != formVisibleCallbackMap_.end()) {
+            if (jsObserverObject->StrictEquals(visibleCallback->second->Get())) {
+                formVisibleCallbackMap_.erase(visibleCallback);
+                return ERR_OK;
+            } else {
+                HILOG_ERROR("There is no formVisibleCallbackMap_ has been register");
+                return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+            }
+        } else {
+            HILOG_ERROR("There is no formVisibleCallbackMap_ has been register");
+            return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+        }
+    } else {
+        auto inVisibleCallback = formInvisibleCallbackMap_.find(bundleName);
+        if (inVisibleCallback != formInvisibleCallbackMap_.end()) {
+            if (jsObserverObject->StrictEquals(inVisibleCallback->second->Get())) {
+                formInvisibleCallbackMap_.erase(inVisibleCallback);
+                return ERR_OK;
+            } else {
+                HILOG_ERROR("There is no formInvisibleCallbackMap_ has been register");
+                return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+            }
+        } else {
+            HILOG_ERROR("There is no formInvisibleCallbackMap_ has been register");
+            return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+        }
+    }
+}
+
+int32_t JsFormStateObserver::NotifyWhetherFormsVisible(const AppExecFwk::FormVisibilityType visibleType,
+    std::vector<AppExecFwk::FormInstance> &formInstances)
+{
+    handler_ = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
+    HILOG_DEBUG("called.");
+    std::lock_guard<std::mutex> lock(formIsvisibleCallbackMutex_);
+    if (handler_) {
+        wptr<JsFormStateObserver> weakObserver = this;
+        handler_->PostSyncTask([weakObserver, visibleType, formInstances]() {
+            auto sharedThis = weakObserver.promote();
+            if (sharedThis == nullptr) {
+                HILOG_ERROR("sharedThis is nullptr.");
+                return;
+            }
+            if (visibleType == AppExecFwk::FormVisibilityType::VISIBLE) {
+                for (auto &item : sharedThis->formVisibleCallbackMap_) {
+                    NativeValue *value = (item.second)->Get();
+                    NativeValue *argv[] = { CreateFormInstances(*sharedThis->engine_, formInstances)};
+                    sharedThis->CallJsFunction(value, argv,  sizeof(argv) / sizeof(argv[0]));
+                }
+            } else {
+                for (auto &item : sharedThis->formInvisibleCallbackMap_) {
+                    NativeValue *value = (item.second)->Get();
+                    NativeValue *argv[] = { CreateFormInstances(*sharedThis->engine_, formInstances)};
+                    sharedThis->CallJsFunction(value, argv, sizeof(argv) / sizeof(argv[0]));
+                }
+            }
+        });
+    }
+    return ERR_OK;
+}
+
+void JsFormStateObserver::CallJsFunction(
+    NativeValue *value, NativeValue *const *argv, size_t argc)
+{
+    HILOG_DEBUG("called.");
+    NativeObject *obj = ConvertNativeValueTo<NativeObject>(value);
+    if (obj == nullptr) {
+        HILOG_ERROR("Failed to get object");
+        return;
+    }
+    engine_->CallFunction(value, value, argv, argc);
+    HILOG_DEBUG("end.");
 }
 }  // namespace AbilityRuntime
 }  // namespace OHOS

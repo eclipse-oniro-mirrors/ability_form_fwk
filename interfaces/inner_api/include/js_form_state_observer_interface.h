@@ -17,6 +17,7 @@
 #define OHOS_FORM_FWK_JS_FORM_STATE_OBSERVER_INTERFACE_H
 
 #include <string>
+#include "form_instance.h"
 #include "iremote_broker.h"
 #include "running_form_info.h"
 
@@ -38,9 +39,13 @@ public:
      */
     virtual int32_t OnRemoveForm(const std::string &bundleName, const AppExecFwk::RunningFormInfo &runningFormInfo) = 0;
 
+    virtual int32_t NotifyWhetherFormsVisible(const AppExecFwk::FormVisibilityType visibleType,
+         std::vector<AppExecFwk::FormInstance> &runningFormInfos) = 0;
+
     enum class Message {
         FORM_STATE_OBSERVER_ON_ADD_FORM = 4302,
         FORM_STATE_OBSERVER_ON_REMOVE_FORM = 4303,
+        FORM_STATE_OBSERVER_NOTIFY_WHETHER_FORMS_VISIBLE = 4304
     };
 };
 } // namespace AbilityRuntime

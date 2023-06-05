@@ -407,6 +407,22 @@ public:
     * @return return true on get info success,other on failure.
     */
     virtual int32_t GetFormInstanceById(const int64_t formId, FormInstance &formInstance) = 0;
+
+    /**
+     * @brief Register form add observer.
+     * @param bundleName BundleName of the form host
+     * @param callerToken Caller ability token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode RegisterAddObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken) = 0;
+
+    /**
+     * @brief Register form remove observer.
+     * @param bundleName BundleName of the form host
+     * @param callerToken Caller ability token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode RegisterRemoveObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken) = 0;
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -464,6 +480,8 @@ public:
         FORM_MGR_GET_RUNNING_FORM_INFOS_BY_BUNDLE,
         FORM_MGR_GET_FORM_INSTANCES_FROM_BY_FILTER,
         FORM_MGR_GET_FORM_INSTANCES_FROM_BY_ID,
+        FORM_MGR_REGISTER_ADD_OBSERVER,
+        FORM_MGR_REGISTER_REMOVE_OBSERVER
     };
 };
 }  // namespace AppExecFwk

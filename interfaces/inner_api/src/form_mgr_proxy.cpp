@@ -1566,5 +1566,59 @@ ErrCode FormMgrProxy::GetFormInstance(IFormMgr::Message code, MessageParcel &dat
     }
     return ret;
 }
+
+ErrCode FormMgrProxy::RegisterAddObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_DEBUG("called.");
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("failed to write interface token.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteString(bundleName)) {
+        HILOG_ERROR("failed to write bundleName.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteRemoteObject(callerToken)) {
+        HILOG_ERROR("failed to write callerToken.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_ASYNC);
+    auto error = Remote()->SendRequest(
+        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_ADD_OBSERVER), data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("failed to SendRequest: %{public}d", error);
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+    return reply.ReadInt32();
+}
+
+ErrCode FormMgrProxy::RegisterRemoveObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_DEBUG("called.");
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("failed to write interface token.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteString(bundleName)) {
+        HILOG_ERROR("failed to write bundleName.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteRemoteObject(callerToken)) {
+        HILOG_ERROR("failed to write callerToken.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_ASYNC);
+    auto error = Remote()->SendRequest(
+        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_REMOVE_OBSERVER), data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("failed to SendRequest: %{public}d", error);
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+    return reply.ReadInt32();
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

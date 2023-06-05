@@ -21,7 +21,10 @@
 #include <vector>
 #include <singleton.h>
 #include "event_handler.h"
+#include "form_mgr_interface.h"
+#include "form_mgr.h"
 #include "js_form_state_observer_stub.h"
+#include "js_runtime_utils.h"
 #include "napi/native_api.h"
 #include "napi/native_common.h"
 #include "napi/native_node_api.h"
@@ -90,13 +93,32 @@ public:
 
     bool CheckMapSize(const std::string &type, const std::string &bundleName);
 
+    int RegisterFormInstanceCallback(NativeEngine &engine, NativeValue *jsObserverObject,
+        bool isVisibility, std::string &bundleName);
+
+    int32_t NotifyWhetherFormsVisible(const AppExecFwk::FormVisibilityType visibleType,
+        std::vector<AppExecFwk::FormInstance> &runningFormInfos);
+
+    void CallJsFunction(NativeValue *value, NativeValue *const *argv, size_t argc);
+
+    ErrCode ClearFormNotifyVisibleCallbackByBundle(const std::string bundleNam, bool isVisibility);
+
+    ErrCode DelFormNotifyVisibleCallbackByBundle(const std::string bundleName, bool isVisibility,
+        NativeValue *jsObserverObject);
 private:
     static std::mutex mutex_;
     static sptr<JsFormStateObserver> instance_;
     mutable std::mutex addFormCallbackMutex_;
     mutable std::mutex removeFormCallbackMutex_;
+    mutable std::mutex formIsvisibleCallbackMutex_;
+
     std::map<std::string, std::vector<std::shared_ptr<FormAddCallbackClient>>> formAddCallbackMap_;
     std::map<std::string, std::vector<std::shared_ptr<FormRemoveCallbackClient>>> formRemoveCallbackMap_;
+    std::map<std::string, std::shared_ptr<NativeReference>> formVisibleCallbackMap_;
+    std::map<std::string, std::shared_ptr<NativeReference>> formInvisibleCallbackMap_;
+    int64_t serialNumber_ = 0;
+    NativeEngine* engine_ = nullptr;
+    std::shared_ptr<AppExecFwk::EventHandler> handler_ = nullptr;
 };
 }  // namespace AbilityRuntime
 }  // namespace OHOS
