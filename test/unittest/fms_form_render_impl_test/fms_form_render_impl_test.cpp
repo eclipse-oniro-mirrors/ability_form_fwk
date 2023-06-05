@@ -21,6 +21,7 @@
 #define private public
 #include "form_render_impl.h"
 #undef private
+#include "form_supply_stub.h"
 #include "gmock/gmock.h"
 #include "hilog_wrapper.h"
 #include "mock_form_provider_client.h"
@@ -57,6 +58,65 @@ void FormRenderImplTest::SetUp()
 
 void FormRenderImplTest::TearDown()
 {}
+
+class MockFormSupplyStub : public FormSupplyStub {
+public:
+    MockFormSupplyStub() {};
+    virtual ~MockFormSupplyStub() {};
+    int OnRemoteRequest(
+        uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override
+    {
+        return number_;
+    };
+    int HandleOnAcquire(MessageParcel &data, MessageParcel &reply)
+    {
+        return number_;
+    };
+    int HandleOnEventHandle(MessageParcel &data, MessageParcel &reply)
+    {
+        return number_;
+    };
+    int HandleOnAcquireStateResult(MessageParcel &data, MessageParcel &reply)
+    {
+        return number_;
+    };
+    int32_t HandleOnShareAcquire(MessageParcel &data, MessageParcel &reply)
+    {
+        return number_;
+    };
+    int OnAcquire(const FormProviderInfo &formInfo, const Want &want) override
+    {
+        return number_;
+    };
+    int OnEventHandle(const Want &want) override
+    {
+        return number_;
+    };
+    int OnAcquireStateResult(FormState state, const std::string &pro, const Want &wantArg,
+        const Want &want) override
+    {
+        return number_;
+    };
+    int OnAcquireDataResult(const AAFwk::WantParams &wantParams, int64_t requestCode)
+    {
+        return ERR_OK;
+    };
+    void OnShareAcquire(int64_t formId, const std::string &remoteDeviceId,
+        const AAFwk::WantParams &wantParams, int64_t requestCode, const bool &result) override {};
+    sptr<IRemoteObject> AsObject() override
+    {
+        return nullptr;
+    };
+    int32_t OnRenderTaskDone(int64_t formId, const Want &want) override
+    {
+        return ERR_OK;
+    }
+    int32_t OnStopRenderingTaskDone(int64_t formId, const Want &want) override
+    {
+        return ERR_OK;
+    }
+    const int number_ = 1;
+};
 
 /**
  * @tc.name: FormRenderImplTest_001
@@ -110,7 +170,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_003, TestSize.Level0)
     Want want;
     std::string value = "UID";
     want.SetParam(Constants::FORM_SUPPLY_UID, value);
-    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormSupplyStub();
     auto ret = formRenderImpl.RenderForm(formJsInfo, want, callerToken);
     EXPECT_EQ(ret, RENDER_FORM_FAILED);
     GTEST_LOG_(INFO) << "FormRenderImplTest_003 end";
@@ -280,7 +340,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_012, TestSize.Level0)
     want.SetParam(Constants::FORM_SUPPLY_UID, value);
     auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
     formRenderImpl.renderRecordMap_.emplace(value, formRenderRecord);
-    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormSupplyStub();
     auto ret = formRenderImpl.StopRenderingForm(formJsInfo, want, callerToken);
     EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FormRenderImplTest_012 end";
