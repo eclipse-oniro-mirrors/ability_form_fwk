@@ -22,7 +22,7 @@
 #include "iremote_object.h"
 
 namespace {
-    static constexpr int32_t MAX_ALLOW_SIZE = 8 * 1024;
+static constexpr int32_t MAX_ALLOW_SIZE = 8 * 1024;
 }
 namespace OHOS {
 namespace AbilityRuntime {

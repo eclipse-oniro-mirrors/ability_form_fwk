@@ -111,7 +111,7 @@ private:
     mutable std::mutex addFormCallbackMutex_;
     mutable std::mutex removeFormCallbackMutex_;
     mutable std::mutex formIsvisibleCallbackMutex_;
-    mutable std::mutex formNotifyWhetherFormsVisibleMutex_;
+    
     std::map<std::string, std::vector<std::shared_ptr<FormAddCallbackClient>>> formAddCallbackMap_;
     std::map<std::string, std::vector<std::shared_ptr<FormRemoveCallbackClient>>> formRemoveCallbackMap_;
     std::map<std::string, std::shared_ptr<NativeReference>> formVisibleCallbackMap_;

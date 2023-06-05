@@ -650,7 +650,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
         }
 
         FormInstance formInstance;
-        GetFormInstanceById(matchedFormId, formInstance);
+        FormDataMgr::GetInstance().GetFormInstanceById(matchedFormId, formInstance);
         for (auto formObserver : formObservers_) {
             auto observer = formInstanceMaps.find(formObserver.first);
             if (observer == formInstanceMaps.end()) {
