@@ -1189,12 +1189,12 @@ private:
                     NapiFormUtil::ThrowParamTypeError(engine, "bundleName", "string");
                     return engine.CreateUndefined();
                 }
-            } else if(info.argv[PARAM1]->TypeOf() != NATIVE_FUNCTION) {
-                HILOG_ERROR("param1 is invalid");
-                NapiFormUtil::ThrowParamTypeError(engine, "callback", "Callback<Array<RunningFormInfo>>");
-                return engine.CreateUndefined();
-            }
-            else {
+                if(info.argv[PARAM1]->TypeOf() != NATIVE_FUNCTION) {
+                    HILOG_ERROR("param1 is invalid");
+                    NapiFormUtil::ThrowParamTypeError(engine, "callback", "Callback<Array<RunningFormInfo>>");
+                    return engine.CreateUndefined();
+                }
+            } else {
                 NapiFormUtil::ThrowParamTypeError(engine, "param 3", "type");
                 return engine.CreateUndefined();
             }

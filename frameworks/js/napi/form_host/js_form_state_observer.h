@@ -118,6 +118,7 @@ private:
     std::map<std::string, std::shared_ptr<NativeReference>> formInvisibleCallbackMap_;
     int64_t serialNumber_ = 0;
     NativeEngine* engine_ = nullptr;
+    std::shared_ptr<AppExecFwk::EventHandler> handler_ = nullptr;
 };
 }  // namespace AbilityRuntime
 }  // namespace OHOS

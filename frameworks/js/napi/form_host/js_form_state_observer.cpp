@@ -414,22 +414,32 @@ ErrCode JsFormStateObserver::DelFormNotifyVisibleCallbackByBundle(const std::str
 int32_t JsFormStateObserver::NotifyWhetherFormsVisible(const AppExecFwk::FormVisibilityType visibleType,
     std::vector<AppExecFwk::FormInstance> &formInstances)
 {
+    handler_ = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
     HILOG_DEBUG("called.");
     std::lock_guard<std::mutex> lock(formIsvisibleCallbackMutex_);
-    if (visibleType == AppExecFwk::FormVisibilityType::VISIBLE) {
-        for (auto &item : formVisibleCallbackMap_) {
-            NativeValue *value = (item.second)->Get();
-            NativeValue *argv[] = { CreateFormInstances(*engine_, formInstances)};
-            CallJsFunction(value, argv,  sizeof(argv) / sizeof(argv[0]));
-        }
-    } else {
-        for (auto &item : formInvisibleCallbackMap_) {
-            NativeValue *value = (item.second)->Get();
-            NativeValue *argv[] = { CreateFormInstances(*engine_, formInstances)};
-            CallJsFunction(value, argv, sizeof(argv) / sizeof(argv[0]));
-        }
+    if (handler_) {
+        wptr<JsFormStateObserver> weakObserver = this;
+        handler_->PostSyncTask([weakObserver, visibleType, formInstances]() {
+            auto sharedThis = weakObserver.promote();
+            if (sharedThis == nullptr) {
+                HILOG_ERROR("sharedThis is nullptr.");
+                return;
+            }
+            if (visibleType == AppExecFwk::FormVisibilityType::VISIBLE) {
+                for (auto &item : sharedThis->formVisibleCallbackMap_) {
+                    NativeValue *value = (item.second)->Get();
+                    NativeValue *argv[] = { CreateFormInstances(*sharedThis->engine_, formInstances)};
+                    sharedThis->CallJsFunction(value, argv,  sizeof(argv) / sizeof(argv[0]));
+                }
+            } else {
+                for (auto &item : sharedThis->formInvisibleCallbackMap_) {
+                    NativeValue *value = (item.second)->Get();
+                    NativeValue *argv[] = { CreateFormInstances(*sharedThis->engine_, formInstances)};
+                    sharedThis->CallJsFunction(value, argv, sizeof(argv) / sizeof(argv[0]));
+                }
+            }
+        });
     }
-
     return ERR_OK;
 }
 
