@@ -1135,8 +1135,8 @@ private:
         if (formObserver_ == nullptr) {
             HILOG_ERROR("formObserver_ is nullptr");
             formObserver_ = JsFormStateObserver::GetInstance();
-            FormMgr::GetInstance().RegisterAddObserver(bundleName, formObserver_);
         }
+        FormMgr::GetInstance().RegisterAddObserver(bundleName, formObserver_);
         JsFormStateObserver::GetInstance()->
             RegisterFormInstanceCallback(engine, info.argv[PARAM1], isVisibility, bundleName);
         return engine.CreateUndefined();
