@@ -1414,21 +1414,8 @@ ErrCode FormDataMgr::NotifyFormsVisible(const std::vector<int64_t> &formIds, boo
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
 
-    std::vector<FormInstance> formInstances;
-    for (auto matchedFormId : formIds) {
+    for (auto matchedFormId : foundFormIds) {
         SetRecordVisible(matchedFormId, isVisible);
-        FormInstance formInstance;
-        GetFormInstanceById(matchedFormId, formInstance);
-        formInstances.emplace_back(formInstance);
-    }
-    for (auto formObserver : formObservers_) {
-        sptr<AbilityRuntime::IJsFormStateObserver> remoteJsFormStateObserver =
-            iface_cast<AbilityRuntime::IJsFormStateObserver>(formObserver);
-        if (isVisible) {
-            remoteJsFormStateObserver->NotifyWhetherFormsVisible(FormVisibilityType::VISIBLE, formInstances);
-        } else {
-            remoteJsFormStateObserver->NotifyWhetherFormsVisible(FormVisibilityType::INVISIBLE, formInstances);
-        }
     }
     return ERR_OK;
 }
@@ -1973,8 +1960,7 @@ ErrCode FormDataMgr::GetFormInstancesByFilter(const FormInstancesFilter &formIns
                     instance.formHostName = formHostRecord.GetHostBundleName();
                     instance.formId = itFormRecord->second.formId;
                     instance.specification = itFormRecord->second.specification;
-                    instance.formVisiblity = itFormRecord->second.isVisible ?
-                        FormVisibilityType::VISIBLE : FormVisibilityType::INVISIBLE;
+                    instance.formVisiblity = static_cast<FormVisibilityType>(itFormRecord->second.formVisibleNotifyState);
                     instance.bundleName = itFormRecord->second.bundleName;
                     instance.moduleName = itFormRecord->second.moduleName;
                     instance.abilityName = itFormRecord->second.abilityName;
@@ -2010,7 +1996,7 @@ ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, FormInstance &for
         formInstance.formHostName = formHostRecords.begin()->GetHostBundleName();
         formInstance.formId = formRecord.formId;
         formInstance.specification = formRecord.specification;
-        formInstance.formVisiblity = formRecord.isVisible ? FormVisibilityType::VISIBLE : FormVisibilityType::INVISIBLE;
+        formInstance.formVisiblity = static_cast<FormVisibilityType>(formRecord.formVisibleNotifyState);
         formInstance.bundleName = formRecord.bundleName;
         formInstance.moduleName = formRecord.moduleName;
         formInstance.abilityName = formRecord.abilityName;
@@ -2037,7 +2023,7 @@ ErrCode FormDataMgr::GetRunningFormInfos(std::vector<RunningFormInfo> &runningFo
             info.bundleName = record.second.bundleName;
             info.moduleName = record.second.moduleName;
             info.abilityName = record.second.abilityName;
-            info.formVisiblity = record.second.isVisible ? FormVisibilityType::VISIBLE : FormVisibilityType::INVISIBLE;
+            info.formVisiblity = static_cast<FormVisibilityType>(record.second.formVisibleNotifyState);
             std::vector<FormHostRecord> formHostRecords;
             GetFormHostRecord(record.first, formHostRecords);
             if (formHostRecords.empty()) {
@@ -2081,31 +2067,13 @@ ErrCode FormDataMgr::GetRunningFormInfosByBundleName(const std::string &bundleNa
                 info.hostBundleName = bundleName;
                 info.moduleName = record.second.moduleName;
                 info.abilityName = record.second.abilityName;
-                info.formVisiblity = record.second.isVisible ?
-                    FormVisibilityType::VISIBLE : FormVisibilityType::INVISIBLE;
+                info.formVisiblity = static_cast<FormVisibilityType>(record.second.formVisibleNotifyState);
                 runningFormInfos.emplace_back(info);
             }
         }
     }
     if (runningFormInfos.size() == 0) {
         return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
-    }
-    return ERR_OK;
-}
-
-ErrCode FormDataMgr::RegisterAddObserver(const sptr<IRemoteObject> &callerToken)
-{
-    formObservers_.emplace_back(callerToken);
-    return ERR_OK;
-}
-
-ErrCode FormDataMgr::RegisterRemoveObserver(const sptr<IRemoteObject> &callerToken)
-{
-    if (!formObservers_.empty()) {
-        auto it = std::find(formObservers_.begin(), formObservers_.end(), callerToken);
-        if (it != formObservers_.end()) {
-            formObservers_.erase(it);
-        }
     }
     return ERR_OK;
 }

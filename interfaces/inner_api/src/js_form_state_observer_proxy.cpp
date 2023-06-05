@@ -101,20 +101,19 @@ int32_t JsFormStateObserverProxy::NotifyWhetherFormsVisible(const AppExecFwk::Fo
         HILOG_ERROR("failed to write interface token");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    std::string formVisiblityTypeInt = (formVisiblityType == AppExecFwk::FormVisibilityType::VISIBLE) ?
-        "1" : (formVisiblityType == AppExecFwk::FormVisibilityType::INVISIBLE) ? "2" : "0";
-    if (!data.WriteString(formVisiblityTypeInt)) {
+    int32_t formVisiblityTypeInt = static_cast<int32_t>(formVisiblityType);
+    if (!data.WriteInt32(formVisiblityTypeInt)) {
         HILOG_ERROR("failed to write formVisiblityType");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     HILOG_DEBUG("NotifyWhetherFormsVisible formInstances size %{public}zu size", formInstances.size());
     if (!data.WriteInt32(formInstances.size())) {
-        HILOG_ERROR("write ParcelableVector failed");
+        HILOG_ERROR("write int32 failed");
         return false;
     }
     for (auto &parcelable: formInstances) {
         if (!data.WriteParcelable(&parcelable)) {
-            HILOG_ERROR("write ParcelableVector failed");
+            HILOG_ERROR("write parcelable failed");
             return false;
         }
     }
@@ -130,7 +129,8 @@ int32_t JsFormStateObserverProxy::NotifyWhetherFormsVisible(const AppExecFwk::Fo
     return error;
 }
 
-int JsFormStateObserverProxy::SendTransactCmd(IJsFormStateObserver::Message code, MessageParcel &data, MessageParcel &reply)
+int JsFormStateObserverProxy::SendTransactCmd(IJsFormStateObserver::Message code,
+    MessageParcel &data, MessageParcel &reply)
 {
     MessageOption option(MessageOption::TF_SYNC);
 

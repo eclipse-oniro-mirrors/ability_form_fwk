@@ -410,17 +410,19 @@ public:
 
     /**
      * @brief Register form add observer.
+     * @param bundleName BundleName of the form host
      * @param callerToken Caller ability token.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual ErrCode RegisterAddObserver(const sptr<IRemoteObject> &callerToken) = 0;
+    virtual ErrCode RegisterAddObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken) = 0;
 
     /**
      * @brief Register form remove observer.
+     * @param bundleName BundleName of the form host
      * @param callerToken Caller ability token.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual ErrCode RegisterRemoveObserver(const sptr<IRemoteObject> &callerToken) = 0;
+    virtual ErrCode RegisterRemoveObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken) = 0;
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS

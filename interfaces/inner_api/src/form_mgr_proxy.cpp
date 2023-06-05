@@ -1567,12 +1567,16 @@ ErrCode FormMgrProxy::GetFormInstance(IFormMgr::Message code, MessageParcel &dat
     return ret;
 }
 
-ErrCode FormMgrProxy::RegisterAddObserver(const sptr<IRemoteObject> &callerToken)
+ErrCode FormMgrProxy::RegisterAddObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("start.");
+    HILOG_DEBUG("called.");
     MessageParcel data;
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("failed to write interface token.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteString(bundleName)) {
+        HILOG_ERROR("failed to write bundleName.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.WriteRemoteObject(callerToken)) {
@@ -1590,12 +1594,16 @@ ErrCode FormMgrProxy::RegisterAddObserver(const sptr<IRemoteObject> &callerToken
     return reply.ReadInt32();
 }
 
-ErrCode FormMgrProxy::RegisterRemoveObserver(const sptr<IRemoteObject> &callerToken)
+ErrCode FormMgrProxy::RegisterRemoveObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("start.");
+    HILOG_DEBUG("called.");
     MessageParcel data;
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("failed to write interface token.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteString(bundleName)) {
+        HILOG_ERROR("failed to write bundleName.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.WriteRemoteObject(callerToken)) {

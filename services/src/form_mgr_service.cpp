@@ -1187,24 +1187,24 @@ ErrCode FormMgrService::GetFormInstanceById(const int64_t formId, FormInstance &
     return FormMgrAdapter::GetInstance().GetFormInstanceById(formId, formInstance);
 }
 
-ErrCode FormMgrService::RegisterAddObserver(const sptr<IRemoteObject> &callerToken)
+ErrCode FormMgrService::RegisterAddObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken)
 {
     HILOG_DEBUG("called.");
     if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_REQUIRE_FORM)) {
-        HILOG_ERROR("Across local accounts permission failed.");
+        HILOG_ERROR("verify calling permission failed!");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
-    return FormMgrAdapter::GetInstance().RegisterAddObserver(callerToken);
+    return FormMgrAdapter::GetInstance().RegisterAddObserver(bundleName, callerToken);
 }
 
-ErrCode FormMgrService::RegisterRemoveObserver(const sptr<IRemoteObject> &callerToken)
+ErrCode FormMgrService::RegisterRemoveObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken)
 {
     HILOG_DEBUG("called.");
     if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_REQUIRE_FORM)) {
-        HILOG_ERROR("Across local accounts permission failed.");
+        HILOG_ERROR("verify calling permission failed!");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
-    return FormMgrAdapter::GetInstance().RegisterRemoveObserver(callerToken);
+    return FormMgrAdapter::GetInstance().RegisterRemoveObserver(bundleName, callerToken);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

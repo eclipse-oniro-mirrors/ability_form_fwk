@@ -35,7 +35,6 @@ JsFormStateObserverStub::JsFormStateObserverStub()
     memberFuncMap_[
         static_cast<uint32_t>(IJsFormStateObserver::Message::FORM_STATE_OBSERVER_NOTIFY_WHETHER_FORMS_VISIBLE)] =
         &JsFormStateObserverStub::HandleNotifyWhetherFormsVisible;
-
 }
 
 JsFormStateObserverStub::~JsFormStateObserverStub()
@@ -96,15 +95,14 @@ int32_t JsFormStateObserverStub::HandleOnRemoveForm(MessageParcel &data, Message
 int32_t JsFormStateObserverStub::HandleNotifyWhetherFormsVisible(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_DEBUG("called.");
-    std::string formVisiblityTypeInt = data.ReadString();
+    int32_t formVisiblityTypeInt = data.ReadInt32();
     std::vector<AppExecFwk::FormInstance> infos;
     if (GetParcelableInfos(data, infos) != ERR_OK) {
-        HILOG_ERROR("write failed");
+        HILOG_ERROR("get parcel infos failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    AppExecFwk::FormVisibilityType formVisiblityType = 
-        (formVisiblityTypeInt == "1") ? AppExecFwk::FormVisibilityType::VISIBLE : (formVisiblityTypeInt == "2") ?
-        AppExecFwk::FormVisibilityType::INVISIBLE : AppExecFwk::FormVisibilityType::UNKNOWN;
+    AppExecFwk::FormVisibilityType formVisiblityType =
+        static_cast<AppExecFwk::FormVisibilityType>(formVisiblityTypeInt);
     int32_t result = NotifyWhetherFormsVisible(formVisiblityType, infos);
     reply.WriteInt32(result);
     return result;
@@ -116,7 +114,7 @@ int32_t JsFormStateObserverStub::GetParcelableInfos(MessageParcel &data, std::ve
     HILOG_DEBUG("called.");
     int32_t infoSize = data.ReadInt32();
     if (infoSize < 0 || infoSize > MAX_ALLOW_SIZE) {
-        HILOG_ERROR("invalid size: %{public}d", infoSize);
+        HILOG_ERROR("invalid size: %{public}zu", infoSize);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     for (int32_t i = 0; i < infoSize; i++) {

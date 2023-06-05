@@ -478,17 +478,19 @@ public:
 
     /**
      * @brief Register form add observer.
+     * @param bundleName BundleName of the form host
      * @param callerToken Caller ability token.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode RegisterAddObserver(const sptr<IRemoteObject> &callerToken);
+    ErrCode RegisterAddObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken);
 
     /**
      * @brief Register form remove observer.
+     * @param bundleName BundleName of the form host
      * @param callerToken Caller ability token.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode RegisterRemoveObserver(const sptr<IRemoteObject> &callerToken);
+    ErrCode RegisterRemoveObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken);
 
 private:
     /**

@@ -57,6 +57,7 @@
 #include "in_process_call_wrapper.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
+#include "js_form_state_observer_interface.h"
 #include "nlohmann/json.hpp"
 #include "system_ability_definition.h"
 
@@ -634,6 +635,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
 
     int64_t matchedFormId = 0;
     std::map<std::string, std::vector<int64_t>> eventMaps;
+    std::map<std::string, std::vector<FormInstance>> formInstanceMaps;
     for (int64_t formId : formIds) {
         if (formId <= 0) {
             HILOG_WARN("%{public}s, formId %{public}" PRId64 " is less than 0", __func__, formId);
@@ -645,6 +647,19 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
         // Update provider info to host
         if (!UpdateProviderInfoToHost(matchedFormId, callerToken, formVisibleType, formRecord)) {
             continue;
+        }
+
+        FormInstance formInstance;
+        GetFormInstanceById(matchedFormId, formInstance);
+        for (auto formObserver : formObservers_) {
+            auto observer = formInstanceMaps.find(formObserver.first);
+            if (observer == formInstanceMaps.end()) {
+                std::vector<FormInstance> formInstances;
+                formInstances.emplace_back(formInstance);
+                formInstanceMaps.emplace(formObserver.first, formInstances);
+            } else {
+                observer->second.emplace_back(formInstance);
+            }
         }
 
         // Check if the form provider is system app
@@ -678,6 +693,19 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
         }
     }
 
+    for (auto formObserver : formObservers_) {
+        sptr<AbilityRuntime::IJsFormStateObserver> remoteJsFormStateObserver =
+            iface_cast<AbilityRuntime::IJsFormStateObserver>(formObserver.second);
+        auto observer = formInstanceMaps.find(formObserver.first);
+        if (observer != formInstanceMaps.end()) {
+            if (formVisibleType == static_cast<int32_t>(FormVisibilityType::VISIBLE)) {
+                remoteJsFormStateObserver->NotifyWhetherFormsVisible(FormVisibilityType::VISIBLE, observer->second);
+            } else if (formVisibleType == static_cast<int32_t>(FormVisibilityType::INVISIBLE)){
+                remoteJsFormStateObserver->NotifyWhetherFormsVisible(FormVisibilityType::INVISIBLE,
+                    observer->second);
+            }
+        }
+    }
     for (auto iter = eventMaps.begin(); iter != eventMaps.end(); iter++) {
         if (HandleEventNotify(iter->first, iter->second, formVisibleType) != ERR_OK) {
             HILOG_WARN("%{public}s fail, HandleEventNotify error, key is %{public}s.", __func__, iter->first.c_str());
@@ -2638,14 +2666,37 @@ ErrCode FormMgrAdapter::GetFormInstanceById(const int64_t formId, FormInstance &
     return FormDataMgr::GetInstance().GetFormInstanceById(formId, formInstance);
 }
 
-ErrCode FormMgrAdapter::RegisterAddObserver(const sptr<IRemoteObject> &callerToken)
+ErrCode FormMgrAdapter::RegisterAddObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken)
 {
-    return FormDataMgr::GetInstance().RegisterAddObserver(callerToken);
+    HILOG_DEBUG("called.");
+    auto formObserver = formObservers_.find(bundleName);
+    if (formObserver == formObservers_.end()) {
+        formObservers_.emplace(bundleName, callerToken);
+    } else {
+        HILOG_ERROR("callback is already exist");
+        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+    }
+    HILOG_DEBUG("success.");
+    return ERR_OK;
 }
 
-ErrCode FormMgrAdapter::RegisterRemoveObserver(const sptr<IRemoteObject> &callerToken)
+ErrCode FormMgrAdapter::RegisterRemoveObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken)
 {
-    return FormDataMgr::GetInstance().RegisterRemoveObserver(callerToken);
+    HILOG_DEBUG("called.");
+    auto formObserver = formObservers_.find(bundleName);
+    if (formObserver == formObservers_.end()) {
+        HILOG_ERROR("bundleName is not exist");
+        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+    } else {
+        if (formObserver->second == callerToken) {
+            formObservers_.erase(formObserver);
+        } else {
+            HILOG_ERROR("callback is not exist");
+            return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+        }
+    }
+    HILOG_DEBUG("success.");
+    return ERR_OK;
 }
 } // namespace AppExecFwk
 } // namespace OHOS
