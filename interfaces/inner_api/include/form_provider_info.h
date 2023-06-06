@@ -18,9 +18,11 @@
 
 #include <cstdint>
 #include <utility>
+#include <vector>
 
 #include "form_ashmem.h"
 #include "form_provider_data.h"
+#include "form_provider_data_proxy.h"
 #include "nlohmann/json_fwd.hpp"
 #include "parcel.h"
 #include "refbase.h"
@@ -109,12 +111,23 @@ public:
      */
     bool NeedCache() const;
 
+    void SetFormDataProxies(std::vector<FormDataProxy> &formDataProxies)
+    {
+        formDataProxies_ = formDataProxies;
+    }
+
+    std::vector<FormDataProxy> GetFormProxies() const
+    {
+        return formDataProxies_;
+    }
+
     bool ReadFromParcel(Parcel &parcel);
     virtual bool Marshalling(Parcel &parcel) const override;
     static FormProviderInfo *Unmarshalling(Parcel &parcel);
 private:
     FormProviderData jsBindingData_;
     bool upgradeFlg_;
+    std::vector<FormDataProxy> formDataProxies_;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -342,5 +342,18 @@ bool FormBmsHelper::GetCompatibleVersionCode(
     minCompatibleVersionCode = bundleInfo.minCompatibleVersionCode;
     return true;
 }
+
+ErrCode FormBmsHelper::GetProxyDataInfos(const std::string &bundleName, const std::string &moduleName,
+    int32_t userId, std::vector<ProxyData> &proxyData)
+{
+    HILOG_DEBUG("called.");
+    sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
+    if (iBundleMgr == nullptr) {
+        HILOG_ERROR("iBundleMgr is nullptr");
+        return false;
+    }
+
+    return IN_PROCESS_CALL(iBundleMgr->GetProxyDataInfos(bundleName, moduleName, proxyData, userId));
+}
 } // namespace AppExecFwk
 } // namespace OHOS
