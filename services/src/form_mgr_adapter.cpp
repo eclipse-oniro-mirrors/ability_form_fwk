@@ -652,13 +652,15 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
         FormInstance formInstance;
         FormDataMgr::GetInstance().GetFormInstanceById(matchedFormId, formInstance);
         for (auto formObserver : formObservers_) {
-            auto observer = formInstanceMaps.find(formObserver.first);
-            if (observer == formInstanceMaps.end()) {
-                std::vector<FormInstance> formInstances;
-                formInstances.emplace_back(formInstance);
-                formInstanceMaps.emplace(formObserver.first, formInstances);
-            } else {
-                observer->second.emplace_back(formInstance);
+            if (formObserver.first == formInstance.formHostName || formObserver.first == "#_all_#") {
+                auto observer = formInstanceMaps.find(formObserver.first);
+                if (observer == formInstanceMaps.end()) {
+                    std::vector<FormInstance> formInstances;
+                    formInstances.emplace_back(formInstance);
+                    formInstanceMaps.emplace(formObserver.first, formInstances);
+                } else {
+                    observer->second.emplace_back(formInstance);
+                }
             }
         }
 

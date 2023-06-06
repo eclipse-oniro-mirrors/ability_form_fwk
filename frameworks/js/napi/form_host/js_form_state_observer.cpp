@@ -335,15 +335,21 @@ int JsFormStateObserver::RegisterFormInstanceCallback(NativeEngine &engine, Nati
         engine_ = &engine;
     }
     std::lock_guard<std::mutex> lock(formIsvisibleCallbackMutex_);
-    auto callback = formVisibleCallbackMap_.find(bundleName);
-    if (callback != formVisibleCallbackMap_.end()) {
-        HILOG_ERROR("bundleName is already in the map, bundleName id %{public}s", bundleName.c_str());
-        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
-    }
+
     if (isVisibility) {
+        auto visibleCallback = formVisibleCallbackMap_.find(bundleName);
+        if (visibleCallback != formVisibleCallbackMap_.end()) {
+            HILOG_ERROR("bundleName is already in the map, bundleName id %{public}s", bundleName.c_str());
+            return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+        }
         formVisibleCallbackMap_.emplace(
             bundleName, std::shared_ptr<NativeReference>(engine.CreateReference(jsObserverObject, 1)));
     } else {
+        auto invisibleCallback = formInvisibleCallbackMap_.find(bundleName);
+        if (invisibleCallback != formInvisibleCallbackMap_.end()) {
+            HILOG_ERROR("bundleName is already in the map, bundleName id %{public}s", bundleName.c_str());
+            return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+        }
         formInvisibleCallbackMap_.emplace(
             bundleName, std::shared_ptr<NativeReference>(engine.CreateReference(jsObserverObject, 1)));
     }
@@ -351,12 +357,16 @@ int JsFormStateObserver::RegisterFormInstanceCallback(NativeEngine &engine, Nati
 }
 
 ErrCode JsFormStateObserver::ClearFormNotifyVisibleCallbackByBundle(const std::string bundleName,
-    bool isVisibility)
+    bool isVisibility, sptr<JsFormStateObserver> formObserver)
 {
     HILOG_DEBUG("called.");
     std::lock_guard<std::mutex> lock(formIsvisibleCallbackMutex_);
+    auto visibleCallback = formVisibleCallbackMap_.find(bundleName);
+    auto invisibleCallback = formInvisibleCallbackMap_.find(bundleName);
+    if (invisibleCallback == formInvisibleCallbackMap_.end() && visibleCallback == formVisibleCallbackMap_.end()) {
+        AppExecFwk::FormMgr::GetInstance().RegisterRemoveObserver(bundleName, formObserver);
+    }
     if (isVisibility) {
-        auto visibleCallback = formVisibleCallbackMap_.find(bundleName);
         if (visibleCallback != formVisibleCallbackMap_.end()) {
             formVisibleCallbackMap_.erase(visibleCallback);
             return ERR_OK;
@@ -365,7 +375,6 @@ ErrCode JsFormStateObserver::ClearFormNotifyVisibleCallbackByBundle(const std::s
             return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
         }
     } else {
-        auto invisibleCallback = formInvisibleCallbackMap_.find(bundleName);
         if (invisibleCallback != formInvisibleCallbackMap_.end()) {
             formInvisibleCallbackMap_.erase(invisibleCallback);
             return ERR_OK;
@@ -377,12 +386,16 @@ ErrCode JsFormStateObserver::ClearFormNotifyVisibleCallbackByBundle(const std::s
 }
 
 ErrCode JsFormStateObserver::DelFormNotifyVisibleCallbackByBundle(const std::string bundleName,
-    bool isVisibility, NativeValue *jsObserverObject)
+    bool isVisibility, NativeValue *jsObserverObject, sptr<JsFormStateObserver> formObserver)
 {
     HILOG_DEBUG("called.");
     std::lock_guard<std::mutex> lock(formIsvisibleCallbackMutex_);
+    auto visibleCallback = formVisibleCallbackMap_.find(bundleName);
+    auto invisibleCallback = formInvisibleCallbackMap_.find(bundleName);
+    if (invisibleCallback == formInvisibleCallbackMap_.end() && visibleCallback == formVisibleCallbackMap_.end()) {
+        AppExecFwk::FormMgr::GetInstance().RegisterRemoveObserver(bundleName, formObserver);
+    }
     if (isVisibility) {
-        auto visibleCallback = formVisibleCallbackMap_.find(bundleName);
         if (visibleCallback != formVisibleCallbackMap_.end()) {
             if (jsObserverObject->StrictEquals(visibleCallback->second->Get())) {
                 formVisibleCallbackMap_.erase(visibleCallback);
@@ -396,10 +409,9 @@ ErrCode JsFormStateObserver::DelFormNotifyVisibleCallbackByBundle(const std::str
             return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
         }
     } else {
-        auto inVisibleCallback = formInvisibleCallbackMap_.find(bundleName);
-        if (inVisibleCallback != formInvisibleCallbackMap_.end()) {
-            if (jsObserverObject->StrictEquals(inVisibleCallback->second->Get())) {
-                formInvisibleCallbackMap_.erase(inVisibleCallback);
+        if (invisibleCallback != formInvisibleCallbackMap_.end()) {
+            if (jsObserverObject->StrictEquals(invisibleCallback->second->Get())) {
+                formInvisibleCallbackMap_.erase(invisibleCallback);
                 return ERR_OK;
             } else {
                 HILOG_ERROR("There is no formInvisibleCallbackMap_ has been register");

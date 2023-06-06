@@ -101,10 +101,11 @@ public:
 
     void CallJsFunction(NativeValue *value, NativeValue *const *argv, size_t argc);
 
-    ErrCode ClearFormNotifyVisibleCallbackByBundle(const std::string bundleNam, bool isVisibility);
+    ErrCode ClearFormNotifyVisibleCallbackByBundle(const std::string bundleNam, bool isVisibility,
+        sptr<JsFormStateObserver> formObserver);
 
     ErrCode DelFormNotifyVisibleCallbackByBundle(const std::string bundleName, bool isVisibility,
-        NativeValue *jsObserverObject);
+        NativeValue *jsObserverObject, sptr<JsFormStateObserver> formObserver);
 private:
     static std::mutex mutex_;
     static sptr<JsFormStateObserver> instance_;
