@@ -114,7 +114,7 @@ int32_t JsFormStateObserverStub::GetParcelableInfos(MessageParcel &data, std::ve
     HILOG_DEBUG("called.");
     int32_t infoSize = data.ReadInt32();
     if (infoSize < 0 || infoSize > MAX_ALLOW_SIZE) {
-        HILOG_ERROR("invalid size: %{public}zu", infoSize);
+        HILOG_ERROR("invalid size: %{public}d", infoSize);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     for (int32_t i = 0; i < infoSize; i++) {
