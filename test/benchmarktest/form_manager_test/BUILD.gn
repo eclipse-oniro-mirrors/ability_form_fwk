@@ -19,6 +19,11 @@ module_output_path = "form_fwk/interfaces"
 ohos_benchmarktest("BenchmarkTestForFormManager") {
   module_out_path = module_output_path
   sources = [ "form_manager_test.cpp" ]
+  include_dirs = [
+    "${access_token_path}/interfaces/innerkits/token_setproc/include",
+    "${access_token_path}/interfaces/innerkits/nativetoken/include",
+    "${access_token_path}/interfaces/innerkits/accesstoken/include",
+  ]
 
   cflags = []
   if (target_cpu == "arm") {
@@ -36,6 +41,9 @@ ohos_benchmarktest("BenchmarkTestForFormManager") {
 
   external_deps = [
     "ability_base:want",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
     "bundle_framework:appexecfwk_base",
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",

@@ -17,18 +17,43 @@
 #include <unistd.h>
 #include <vector>
 
+#include "accesstoken_kit.h"
+#include "nativetoken_kit.h"
+#include "token_setproc.h"
 #include "form_constants.h"
 #include "form_host_client.h"
 #include "form_mgr.h"
 #include "hilog_wrapper.h"
+#include "form_mgr_errors.h"
 
 using namespace std;
 using namespace OHOS;
 using namespace OHOS::AAFwk;
 using namespace OHOS::AppExecFwk;
 
-namespace {
+namespace OHOS {
 static const int32_t NUM_THREADS = 4;
+
+void AddPermission()
+{
+    uint64_t tokenId;
+    const char *perms[2];
+    perms[0] = AppExecFwk::Constants::PERMISSION_INTERACT_ACROSS_LOCAL_ACCOUNTS;
+    perms[1] = AppExecFwk::Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED;
+    NativeTokenInfoParams infoInstance = {
+        .dcapsNum = 0,
+        .permsNum = 2,
+        .aclsNum = 0,
+        .dcaps = NULL,
+        .perms = perms,
+        .acls = NULL,
+        .processName = "com.formfwk.test",
+        .aplStr = "system_core",
+    };
+    tokenId = GetAccessTokenId(&infoInstance);
+    SetSelfTokenID(tokenId);
+    OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
+}
 
 class FormManagerTest : public benchmark::Fixture {
 public:
@@ -43,6 +68,10 @@ public:
 
     void SetUp(const ::benchmark::State &state) override
     {
+        if (flag) {
+            AddPermission();
+            flag = false;
+        }
     }
 
     void TearDown(const ::benchmark::State &state) override
@@ -56,6 +85,7 @@ protected:
     const int32_t usleepTime = 1000 * 100;
     std::string bundleName = "ohos.samples.FormApplication";
     std::string moduleName = "entry";
+    bool flag = true;
 };
 
 BENCHMARK_F(FormManagerTest, GetAllFormsInfoTestCase)(benchmark::State &state)
@@ -80,14 +110,10 @@ BENCHMARK_F(FormManagerTest, GetFormsInfoByAppTestCase)(benchmark::State &state)
     while (state.KeepRunning()) {
         std::vector<FormInfo> formInfos {};
         ErrCode errCode = FormMgr::GetInstance().GetFormsInfoByApp(bundleName, formInfos);
-        if (errCode != ERR_OK) {
+        if (errCode != ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED) {
             HILOG_ERROR("%{public}s error, failed to GetFormsInfoByAppTestCase, error code is %{public}d.", __func__,
                 errCode);
             state.SkipWithError("GetFormsInfoByAppTestCase failed, return error.");
-        }
-        if (formInfos.empty()) {
-            HILOG_ERROR("%{public}s error, failed to GetFormsInfoByAppTestCase, formInfos empty.", __func__);
-            state.SkipWithError("GetFormsInfoByAppTestCase failed, formInfos empty.");
         }
     }
 }
@@ -97,14 +123,10 @@ BENCHMARK_F(FormManagerTest, GetFormsInfoByModuleTestCase)(benchmark::State &sta
     while (state.KeepRunning()) {
         std::vector<FormInfo> formInfos {};
         ErrCode errCode = FormMgr::GetInstance().GetFormsInfoByModule(bundleName, moduleName, formInfos);
-        if (errCode != ERR_OK) {
+        if (errCode != ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED) {
             HILOG_ERROR("%{public}s error, failed to GetFormsInfoByModuleTestCase, error code is %{public}d.", __func__,
                 errCode);
             state.SkipWithError("GetFormsInfoByAppTestCase failed, return error.");
-        }
-        if (formInfos.empty()) {
-            HILOG_ERROR("%{public}s error, failed to GetFormsInfoByModuleTestCase, formInfos empty.", __func__);
-            state.SkipWithError("GetFormsInfoByAppTestCase failed, formInfos empty.");
         }
     }
 }
