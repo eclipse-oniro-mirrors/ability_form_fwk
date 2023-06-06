@@ -15,7 +15,9 @@
 
 #include "form_data_proxy_mgr.h"
 
+#include "form_bms_helper.h"
 #include "form_data_mgr.h"
+#include "form_util.h"
 #include "form_mgr_errors.h"
 #include "hilog_wrapper.h"
 
@@ -42,11 +44,6 @@ ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<Fo
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
-    if (!formRecord.isDataProxy) {
-        HILOG_DEBUG("not data proxy form, formId:%{public}" PRId64 ".", formId);
-        return ERR_OK;
-    }
-
     std::lock_guard<std::mutex> lock(formDataProxyRecordMutex_);
     auto search = formDataProxyRecordMap_.find(formId);
     if (search != formDataProxyRecordMap_.end()) {
@@ -59,8 +56,14 @@ ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<Fo
         }
     }
 
-    std::shared_ptr<FormDataProxyRecord> formDataProxyRecord =
-        std::make_shared<FormDataProxyRecord>(formId, formRecord.bundleName, formRecord.moduleName);
+    ApplicationInfo appInfo;
+    if (FormBmsHelper::GetInstance().GetApplicationInfo(formRecord.bundleName, FormUtil::GetCurrentAccountId(),
+        appInfo) != ERR_OK) {
+        HILOG_ERROR("get app info failed.");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    std::shared_ptr<FormDataProxyRecord> formDataProxyRecord = std::make_shared<FormDataProxyRecord>(formId,
+        formRecord.bundleName, formRecord.moduleName, appInfo.accessTokenId);
     auto ret = formDataProxyRecord->SubscribeFormData(formDataProxies);
     if (ret != ERR_OK) {
         HILOG_ERROR("SubscribeFormData failed.");
@@ -83,6 +86,65 @@ ErrCode FormDataProxyMgr::UnsubscribeFormData(int64_t formId)
     }
 
     return ERR_OK;
+}
+
+void FormDataProxyMgr::UpdateSubscribeFormData(int64_t formId, const std::vector<FormDataProxy> &formDataProxies)
+{
+    HILOG_DEBUG("update subscribe form data. formId: %{public}s", std::to_string(formId).c_str());
+    std::lock_guard<std::mutex> lock(formDataProxyRecordMutex_);
+    auto search = formDataProxyRecordMap_.find(formId);
+    if (search != formDataProxyRecordMap_.end()) {
+        if (search->second != nullptr) {
+            search->second->UpdateSubscribeFormData(formDataProxies);
+        }
+    }
+}
+
+void FormDataProxyMgr::ProduceFormDataProxies(int64_t formId, const std::vector<FormDataProxy> &formDataProxies)
+{
+    std::lock_guard<std::mutex> lock(formDataProxiesMutex_);
+    formDataProxiesMap_[formId] = formDataProxies;
+}
+
+bool FormDataProxyMgr::ConsumeFormDataProxies(int64_t formId, std::vector<FormDataProxy> &formDataProxies)
+{
+    std::lock_guard<std::mutex> lock(formDataProxiesMutex_);
+    auto search = formDataProxiesMap_.find(formId);
+    if (search == formDataProxiesMap_.end()) {
+        HILOG_DEBUG("no form data proxies, formId: %{public}s", std::to_string(formId).c_str());
+        return false;
+    }
+    formDataProxies = search->second;
+    formDataProxiesMap_.erase(search);
+    return true;
+}
+
+void FormDataProxyMgr::EnableSubscribeFormData(const std::vector<int64_t> &formIds)
+{
+    std::lock_guard<std::mutex> lock(formDataProxyRecordMutex_);
+    for (const auto &formId : formIds) {
+        auto search = formDataProxyRecordMap_.find(formId);
+        if (search != formDataProxyRecordMap_.end()) {
+            if (search->second != nullptr) {
+                search->second->EnableSubscribeFormData();
+                HILOG_DEBUG("enable subscribe form data. formId: %{public}s", std::to_string(formId).c_str());
+            }
+        }
+    }
+}
+
+void FormDataProxyMgr::DisableSubscribeFormData(const std::vector<int64_t> &formIds)
+{
+    std::lock_guard<std::mutex> lock(formDataProxyRecordMutex_);
+    for (const auto &formId : formIds) {
+        auto search = formDataProxyRecordMap_.find(formId);
+        if (search != formDataProxyRecordMap_.end()) {
+            if (search->second != nullptr) {
+                search->second->DisableSubscribeFormData();
+                HILOG_DEBUG("disable subscribe form data. formId: %{public}s", std::to_string(formId).c_str());
+            }
+        }
+    }
 }
 } // namespace AppExecFwk
 } // namespace OHOS
