@@ -209,11 +209,15 @@ HWTEST_F(FmsFormJsInfoTest, FmsFormJsInfoTest_009, TestSize.Level0)
     GTEST_LOG_(INFO) << "FmsFormJsInfoTest_009 start";
     FormJsInfo formJsInfo;
     Parcel parcel;
+    FormAshmem *formAshmem = new FormAshmem();
+    parcel.WriteParcelable(formAshmem);
     EXPECT_TRUE(formJsInfo.imageDataMap.empty());
     formJsInfo.ReadImageData(parcel);
 
     EXPECT_FALSE(formJsInfo.imageDataMap.empty());
     GTEST_LOG_(INFO) << "FmsFormJsInfoTest_009 end";
+    delete formAshmem;
+    formAshmem = nullptr;
 }
 
 } // namespace AppExecFwk
