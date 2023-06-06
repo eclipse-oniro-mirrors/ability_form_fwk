@@ -1136,9 +1136,8 @@ private:
             HILOG_ERROR("formObserver_ is nullptr");
             formObserver_ = JsFormStateObserver::GetInstance();
         }
-        FormMgr::GetInstance().RegisterAddObserver(bundleName, formObserver_);
         JsFormStateObserver::GetInstance()->
-            RegisterFormInstanceCallback(engine, info.argv[PARAM1], isVisibility, bundleName);
+            RegisterFormInstanceCallback(engine, info.argv[PARAM1], isVisibility, bundleName, formObserver_);
         return engine.CreateUndefined();
     }
 
@@ -1150,7 +1149,7 @@ private:
             NapiFormUtil::ThrowParamNumError(engine, std::to_string(info.argc), "1 or 2 or 3");
             return engine.CreateUndefined();
         }
-        std::string bundleName = "#_all_#";
+        std::string bundleName("#_all_#");
         bool callerflag = false;
         if (info.argc >= ARGS_TWO) {
             if (info.argv[PARAM1]->TypeOf() == NATIVE_FUNCTION) {

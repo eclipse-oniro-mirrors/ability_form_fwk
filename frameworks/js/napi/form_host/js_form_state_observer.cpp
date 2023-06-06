@@ -328,14 +328,14 @@ int32_t JsFormStateObserver::OnRemoveForm(const std::string &bundleName,
 }
 
 int JsFormStateObserver::RegisterFormInstanceCallback(NativeEngine &engine, NativeValue* jsObserverObject,
-    bool isVisibility, std::string &bundleName)
+    bool isVisibility, std::string &bundleName, sptr<JsFormStateObserver> &formObserver)
 {
     HILOG_DEBUG("called.");
     if (engine_ == nullptr) {
         engine_ = &engine;
     }
     std::lock_guard<std::mutex> lock(formIsvisibleCallbackMutex_);
-
+    AppExecFwk::FormMgr::GetInstance().RegisterAddObserver(bundleName + std::to_string(isVisibility), formObserver);
     if (isVisibility) {
         auto visibleCallback = formVisibleCallbackMap_.find(bundleName);
         if (visibleCallback != formVisibleCallbackMap_.end()) {
@@ -357,15 +357,13 @@ int JsFormStateObserver::RegisterFormInstanceCallback(NativeEngine &engine, Nati
 }
 
 ErrCode JsFormStateObserver::ClearFormNotifyVisibleCallbackByBundle(const std::string bundleName,
-    bool isVisibility, sptr<JsFormStateObserver> formObserver)
+    bool isVisibility, sptr<JsFormStateObserver> &formObserver)
 {
     HILOG_DEBUG("called.");
     std::lock_guard<std::mutex> lock(formIsvisibleCallbackMutex_);
     auto visibleCallback = formVisibleCallbackMap_.find(bundleName);
     auto invisibleCallback = formInvisibleCallbackMap_.find(bundleName);
-    if (invisibleCallback == formInvisibleCallbackMap_.end() && visibleCallback == formVisibleCallbackMap_.end()) {
-        AppExecFwk::FormMgr::GetInstance().RegisterRemoveObserver(bundleName, formObserver);
-    }
+    AppExecFwk::FormMgr::GetInstance().RegisterRemoveObserver(bundleName + std::to_string(isVisibility), formObserver);
     if (isVisibility) {
         if (visibleCallback != formVisibleCallbackMap_.end()) {
             formVisibleCallbackMap_.erase(visibleCallback);
@@ -386,15 +384,13 @@ ErrCode JsFormStateObserver::ClearFormNotifyVisibleCallbackByBundle(const std::s
 }
 
 ErrCode JsFormStateObserver::DelFormNotifyVisibleCallbackByBundle(const std::string bundleName,
-    bool isVisibility, NativeValue *jsObserverObject, sptr<JsFormStateObserver> formObserver)
+    bool isVisibility, NativeValue *jsObserverObject, sptr<JsFormStateObserver> &formObserver)
 {
     HILOG_DEBUG("called.");
     std::lock_guard<std::mutex> lock(formIsvisibleCallbackMutex_);
     auto visibleCallback = formVisibleCallbackMap_.find(bundleName);
     auto invisibleCallback = formInvisibleCallbackMap_.find(bundleName);
-    if (invisibleCallback == formInvisibleCallbackMap_.end() && visibleCallback == formVisibleCallbackMap_.end()) {
-        AppExecFwk::FormMgr::GetInstance().RegisterRemoveObserver(bundleName, formObserver);
-    }
+    AppExecFwk::FormMgr::GetInstance().RegisterRemoveObserver(bundleName, formObserver);
     if (isVisibility) {
         if (visibleCallback != formVisibleCallbackMap_.end()) {
             if (jsObserverObject->StrictEquals(visibleCallback->second->Get())) {
