@@ -390,7 +390,7 @@ ErrCode JsFormStateObserver::DelFormNotifyVisibleCallbackByBundle(const std::str
     std::lock_guard<std::mutex> lock(formIsvisibleCallbackMutex_);
     auto visibleCallback = formVisibleCallbackMap_.find(bundleName);
     auto invisibleCallback = formInvisibleCallbackMap_.find(bundleName);
-    AppExecFwk::FormMgr::GetInstance().RegisterRemoveObserver(bundleName, formObserver);
+    AppExecFwk::FormMgr::GetInstance().RegisterRemoveObserver(bundleName + std::to_string(isVisibility), formObserver);
     if (isVisibility) {
         if (visibleCallback != formVisibleCallbackMap_.end()) {
             if (jsObserverObject->StrictEquals(visibleCallback->second->Get())) {

@@ -653,7 +653,8 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
         FormDataMgr::GetInstance().GetFormInstanceById(matchedFormId, formInstance);
         std::string formHostName = formInstance.formHostName;
         for (auto formObserver : formObservers_) {
-            if (formObserver.first == formHostName + std::to_string(isVisibility) || formObserver.first == "#_all_#") {
+            if (formObserver.first == formHostName + std::to_string(isVisibility) ||
+                formObserver.first == "#_all_#" + std::to_string(isVisibility)) {
                 auto observer = formInstanceMaps.find(formObserver.first);
                 if (observer == formInstanceMaps.end()) {
                     std::vector<FormInstance> formInstances;
