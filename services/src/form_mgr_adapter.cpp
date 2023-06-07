@@ -652,9 +652,10 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
         FormInstance formInstance;
         FormDataMgr::GetInstance().GetFormInstanceById(matchedFormId, formInstance);
         std::string formHostName = formInstance.formHostName;
+        std::string formAllHostName = "#_all_#";
         for (auto formObserver : formObservers_) {
-            if (formObserver.first == formHostName + std::to_string(isVisibility) ||
-                formObserver.first == "#_all_#" + std::to_string(isVisibility)) {
+            if (formObserver.first == formHostName + "#" + std::to_string(isVisibility) ||
+                formObserver.first == formAllHostName + "#" + std::to_string(isVisibility)) {
                 auto observer = formInstanceMaps.find(formObserver.first);
                 if (observer == formInstanceMaps.end()) {
                     std::vector<FormInstance> formInstances;
@@ -703,10 +704,11 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
         auto observer = formInstanceMaps.find(formObserver.first);
         if (observer != formInstanceMaps.end()) {
             if (formVisibleType == static_cast<int32_t>(FormVisibilityType::VISIBLE)) {
-                remoteJsFormStateObserver->NotifyWhetherFormsVisible(FormVisibilityType::VISIBLE, observer->second);
+                remoteJsFormStateObserver->NotifyWhetherFormsVisible(FormVisibilityType::VISIBLE,
+                    formObserver.first, observer->second);
             } else if (formVisibleType == static_cast<int32_t>(FormVisibilityType::INVISIBLE)){
-                remoteJsFormStateObserver->NotifyWhetherFormsVisible(FormVisibilityType::INVISIBLE,
-                    observer->second);
+                remoteJsFormStateObserver->NotifyWhetherFormsVisible(FormVisibilityType::INVISIBLE, formObserver.first,
+                observer->second);
             }
         }
     }

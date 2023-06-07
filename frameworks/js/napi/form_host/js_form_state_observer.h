@@ -96,7 +96,7 @@ public:
     int RegisterFormInstanceCallback(NativeEngine &engine, NativeValue *jsObserverObject,
         bool isVisibility, std::string &bundleName, sptr<JsFormStateObserver> &formObserver);
 
-    int32_t NotifyWhetherFormsVisible(const AppExecFwk::FormVisibilityType visibleType,
+    int32_t NotifyWhetherFormsVisible(const AppExecFwk::FormVisibilityType visibleType, const std::string &bundleName,
         std::vector<AppExecFwk::FormInstance> &runningFormInfos);
 
     void CallJsFunction(NativeValue *value, NativeValue *const *argv, size_t argc);

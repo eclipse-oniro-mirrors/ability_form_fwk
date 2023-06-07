@@ -96,6 +96,7 @@ int32_t JsFormStateObserverStub::HandleNotifyWhetherFormsVisible(MessageParcel &
 {
     HILOG_DEBUG("called.");
     int32_t formVisiblityTypeInt = data.ReadInt32();
+    std::string bundleName = data.ReadString();
     std::vector<AppExecFwk::FormInstance> infos;
     if (GetParcelableInfos(data, infos) != ERR_OK) {
         HILOG_ERROR("get parcel infos failed");
@@ -103,7 +104,7 @@ int32_t JsFormStateObserverStub::HandleNotifyWhetherFormsVisible(MessageParcel &
     }
     AppExecFwk::FormVisibilityType formVisiblityType =
         static_cast<AppExecFwk::FormVisibilityType>(formVisiblityTypeInt);
-    int32_t result = NotifyWhetherFormsVisible(formVisiblityType, infos);
+    int32_t result = NotifyWhetherFormsVisible(formVisiblityType, bundleName, infos);
     reply.WriteInt32(result);
     return result;
 }
