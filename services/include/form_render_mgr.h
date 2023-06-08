@@ -54,6 +54,8 @@ public:
 
     ErrCode AddConnection(int64_t formId, sptr<FormRenderConnection> connection);
 
+    void RemoveConnection(int64_t formId);
+
     void AddRenderDeathRecipient(const sptr<IRemoteObject> &renderRemoteObj);
 
     bool IsNeedRender(int64_t formId);
