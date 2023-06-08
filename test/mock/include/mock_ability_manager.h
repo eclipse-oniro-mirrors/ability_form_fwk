@@ -145,6 +145,14 @@ public:
     {
         return 0;
     }
+    int ScheduleCommandAbilityWindowDone(
+        const sptr<IRemoteObject> &token,
+        const sptr<AAFwk::SessionInfo> &sessionInfo,
+        AAFwk::WindowCommand winCmd,
+        AAFwk::AbilityCommand abilityCmd) override
+    {
+        return 0;
+    }
     void DumpState(const std::string &args, std::vector<std::string> &state) override
     {
         return;
@@ -413,6 +421,14 @@ public:
         return 0;
     }
     int ScheduleCommandAbilityDone(const sptr<IRemoteObject> &token) override
+    {
+        return 0;
+    }
+    int ScheduleCommandAbilityWindowDone(
+        const sptr<IRemoteObject> &token,
+        const sptr<AAFwk::SessionInfo> &sessionInfo,
+        AAFwk::WindowCommand winCmd,
+        AAFwk::AbilityCommand abilityCmd) override
     {
         return 0;
     }
