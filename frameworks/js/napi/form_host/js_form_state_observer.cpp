@@ -364,11 +364,10 @@ ErrCode JsFormStateObserver::ClearFormNotifyVisibleCallbackByBundle(const std::s
 {
     HILOG_DEBUG("called.");
     std::lock_guard<std::mutex> lock(formIsvisibleCallbackMutex_);
-    auto visibleCallback = formVisibleCallbackMap_.find(bundleName);
-    auto invisibleCallback = formInvisibleCallbackMap_.find(bundleName);
     AppExecFwk::FormMgr::GetInstance().RegisterRemoveObserver(bundleName + "#" + std::to_string(isVisibility),
         formObserver);
     if (isVisibility) {
+        auto visibleCallback = formVisibleCallbackMap_.find(bundleName);
         if (visibleCallback != formVisibleCallbackMap_.end()) {
             formVisibleCallbackMap_.erase(visibleCallback);
             return ERR_OK;
@@ -377,6 +376,7 @@ ErrCode JsFormStateObserver::ClearFormNotifyVisibleCallbackByBundle(const std::s
             return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
         }
     } else {
+        auto invisibleCallback = formInvisibleCallbackMap_.find(bundleName);
         if (invisibleCallback != formInvisibleCallbackMap_.end()) {
             formInvisibleCallbackMap_.erase(invisibleCallback);
             return ERR_OK;
@@ -441,7 +441,7 @@ int32_t JsFormStateObserver::NotifyWhetherFormsVisible(const AppExecFwk::FormVis
                 return;
             }
             if (visibleType == AppExecFwk::FormVisibilityType::VISIBLE) {
-                if (bundleName.find(("#" + std::to_string(true))) != std::string::npos) {
+                if (bundleName.find((specialFlag + std::to_string(true))) != std::string::npos) {
                     std::string bundleNameNew =
                         std::regex_replace(bundleName, std::regex(specialFlag + std::to_string(true)), "");
                     auto visibleCallback = sharedThis->formVisibleCallbackMap_.find(bundleNameNew);
@@ -452,7 +452,7 @@ int32_t JsFormStateObserver::NotifyWhetherFormsVisible(const AppExecFwk::FormVis
                     }
                 }
             } else {
-                if (bundleName.find(("#" + std::to_string(true))) != std::string::npos) {
+                if (bundleName.find((specialFlag + std::to_string(false))) != std::string::npos) {
                     std::string bundleNameNew =
                         std::regex_replace(bundleName, std::regex(specialFlag + std::to_string(false)), "");
                     auto invisibleCallback = sharedThis->formInvisibleCallbackMap_.find(bundleNameNew);
