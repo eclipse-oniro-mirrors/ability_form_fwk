@@ -367,14 +367,17 @@ void FormRenderMgr::AddRenderDeathRecipient(const sptr<IRemoteObject> &remoteObj
         HILOG_ERROR("renderRemoteObj is nullptr.");
         return;
     }
-    renderRemoteObj_ = renderRemoteObj;
 
     if (renderDeathRecipient_ == nullptr) {
         renderDeathRecipient_ = new FormRenderRecipient([]() {
             FormRenderMgr::GetInstance().RerenderAllForms();
         });
     }
-    remoteObject->AddDeathRecipient(renderDeathRecipient_);
+    if (!remoteObject->AddDeathRecipient(renderDeathRecipient_)) {
+        HILOG_ERROR("AddDeathRecipient failed.");
+        return;
+    }
+    renderRemoteObj_ = renderRemoteObj;
 }
 
 inline ErrCode FormRenderMgr::ConnectRenderService(const sptr<FormRenderConnection> &connection) const
