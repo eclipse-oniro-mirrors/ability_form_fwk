@@ -336,8 +336,9 @@ int JsFormStateObserver::RegisterFormInstanceCallback(NativeEngine &engine, Nati
     if (engine_ == nullptr) {
         engine_ = &engine;
     }
+    std::string specialFlag = "#";
     std::lock_guard<std::mutex> lock(formIsvisibleCallbackMutex_);
-    AppExecFwk::FormMgr::GetInstance().RegisterAddObserver(bundleName + "#" + std::to_string(isVisibility),
+    AppExecFwk::FormMgr::GetInstance().RegisterAddObserver(bundleName + specialFlag + std::to_string(isVisibility),
         formObserver);
     if (isVisibility) {
         auto visibleCallback = formVisibleCallbackMap_.find(bundleName);
@@ -364,7 +365,8 @@ ErrCode JsFormStateObserver::ClearFormNotifyVisibleCallbackByBundle(const std::s
 {
     HILOG_DEBUG("called.");
     std::lock_guard<std::mutex> lock(formIsvisibleCallbackMutex_);
-    AppExecFwk::FormMgr::GetInstance().RegisterRemoveObserver(bundleName + "#" + std::to_string(isVisibility),
+    std::string specialFlag = "#";
+    AppExecFwk::FormMgr::GetInstance().RegisterRemoveObserver(bundleName + specialFlag + std::to_string(isVisibility),
         formObserver);
     if (isVisibility) {
         auto visibleCallback = formVisibleCallbackMap_.find(bundleName);
@@ -392,11 +394,11 @@ ErrCode JsFormStateObserver::DelFormNotifyVisibleCallbackByBundle(const std::str
 {
     HILOG_DEBUG("called.");
     std::lock_guard<std::mutex> lock(formIsvisibleCallbackMutex_);
-    auto visibleCallback = formVisibleCallbackMap_.find(bundleName);
-    auto invisibleCallback = formInvisibleCallbackMap_.find(bundleName);
-    AppExecFwk::FormMgr::GetInstance().RegisterRemoveObserver(bundleName + "#" + std::to_string(isVisibility),
+    std::string specialFlag = "#";
+    AppExecFwk::FormMgr::GetInstance().RegisterRemoveObserver(bundleName + specialFlag + std::to_string(isVisibility),
         formObserver);
     if (isVisibility) {
+        auto visibleCallback = formVisibleCallbackMap_.find(bundleName);
         if (visibleCallback != formVisibleCallbackMap_.end()) {
             if (jsObserverObject->StrictEquals(visibleCallback->second->Get())) {
                 formVisibleCallbackMap_.erase(visibleCallback);
@@ -410,6 +412,7 @@ ErrCode JsFormStateObserver::DelFormNotifyVisibleCallbackByBundle(const std::str
             return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
         }
     } else {
+        auto invisibleCallback = formInvisibleCallbackMap_.find(bundleName);
         if (invisibleCallback != formInvisibleCallbackMap_.end()) {
             if (jsObserverObject->StrictEquals(invisibleCallback->second->Get())) {
                 formInvisibleCallbackMap_.erase(invisibleCallback);
@@ -435,15 +438,17 @@ int32_t JsFormStateObserver::NotifyWhetherFormsVisible(const AppExecFwk::FormVis
         wptr<JsFormStateObserver> weakObserver = this;
         handler_->PostSyncTask([weakObserver, visibleType, formInstances, bundleName]() {
             std::string specialFlag = "#";
+            bool isVisibleTypeFlag = false; 
             auto sharedThis = weakObserver.promote();
             if (sharedThis == nullptr) {
                 HILOG_ERROR("sharedThis is nullptr.");
                 return;
             }
             if (visibleType == AppExecFwk::FormVisibilityType::VISIBLE) {
-                if (bundleName.find((specialFlag + std::to_string(true))) != std::string::npos) {
+                isVisibleTypeFlag = true;
+                if (bundleName.find((specialFlag + std::to_string(isVisibleTypeFlag))) != std::string::npos) {
                     std::string bundleNameNew =
-                        std::regex_replace(bundleName, std::regex(specialFlag + std::to_string(true)), "");
+                        std::regex_replace(bundleName, std::regex(specialFlag + std::to_string(isVisibleTypeFlag)), "");
                     auto visibleCallback = sharedThis->formVisibleCallbackMap_.find(bundleNameNew);
                     if (visibleCallback != sharedThis->formVisibleCallbackMap_.end()) {
                         NativeValue *value = visibleCallback->second->Get();
@@ -452,9 +457,10 @@ int32_t JsFormStateObserver::NotifyWhetherFormsVisible(const AppExecFwk::FormVis
                     }
                 }
             } else {
-                if (bundleName.find((specialFlag + std::to_string(false))) != std::string::npos) {
+                isVisibleTypeFlag = false;
+                if (bundleName.find((specialFlag + std::to_string(isVisibleTypeFlag))) != std::string::npos) {
                     std::string bundleNameNew =
-                        std::regex_replace(bundleName, std::regex(specialFlag + std::to_string(false)), "");
+                        std::regex_replace(bundleName, std::regex(specialFlag + std::to_string(isVisibleTypeFlag)), "");
                     auto invisibleCallback = sharedThis->formInvisibleCallbackMap_.find(bundleNameNew);
                     if (invisibleCallback != sharedThis->formInvisibleCallbackMap_.end()) {
                         NativeValue *value = invisibleCallback->second->Get();

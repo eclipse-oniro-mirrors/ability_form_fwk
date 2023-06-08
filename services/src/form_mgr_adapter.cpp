@@ -636,6 +636,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
     int64_t matchedFormId = 0;
     std::map<std::string, std::vector<int64_t>> eventMaps;
     std::map<std::string, std::vector<FormInstance>> formInstanceMaps;
+    std::string specialFlag = "#";
     for (int64_t formId : formIds) {
         if (formId <= 0) {
             HILOG_WARN("%{public}s, formId %{public}" PRId64 " is less than 0", __func__, formId);
@@ -652,10 +653,10 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
         FormInstance formInstance;
         FormDataMgr::GetInstance().GetFormInstanceById(matchedFormId, formInstance);
         std::string formHostName = formInstance.formHostName;
-        std::string formAllHostName = "#_all_#";
+        std::string formAllHostName = "all";
         for (auto formObserver : formObservers_) {
-            if (formObserver.first == formHostName + "#" + std::to_string(isVisibility) ||
-                formObserver.first == formAllHostName + "#" + std::to_string(isVisibility)) {
+            if (formObserver.first == formHostName + specialFlag + std::to_string(isVisibility) ||
+                formObserver.first == formAllHostName + specialFlag + std::to_string(isVisibility)) {
                 auto observer = formInstanceMaps.find(formObserver.first);
                 if (observer == formInstanceMaps.end()) {
                     std::vector<FormInstance> formInstances;

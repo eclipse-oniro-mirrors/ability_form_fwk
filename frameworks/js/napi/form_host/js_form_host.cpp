@@ -1110,7 +1110,7 @@ private:
             NapiFormUtil::ThrowParamTypeError(engine, "callback", "Callback<Array<RunningFormInfo>>");
             return engine.CreateUndefined();
         }
-        std::string bundleName("#_all_#");
+        std::string bundleName("all");
         if (info.argc >= ARGS_THREE) {
             HILOG_DEBUG("three or more params");
             if (info.argv[PARAM2]->TypeOf() == NATIVE_UNDEFINED || info.argv[PARAM2]->TypeOf() == NATIVE_NULL) {
@@ -1149,7 +1149,7 @@ private:
             NapiFormUtil::ThrowParamNumError(engine, std::to_string(info.argc), "1 or 2 or 3");
             return engine.CreateUndefined();
         }
-        std::string bundleName("#_all_#");
+        std::string bundleName("all");
         bool callerflag = false;
         if (info.argc >= ARGS_TWO) {
             if (info.argv[PARAM1]->TypeOf() == NATIVE_FUNCTION) {
