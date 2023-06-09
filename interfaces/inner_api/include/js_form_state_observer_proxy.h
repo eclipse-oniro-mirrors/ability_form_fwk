@@ -40,7 +40,7 @@ public:
     virtual int32_t OnRemoveForm(const std::string &bundleName, const AppExecFwk::RunningFormInfo &runningFormInfo);
 
     virtual int32_t NotifyWhetherFormsVisible(const AppExecFwk::FormVisibilityType visibleType,
-            std::vector<AppExecFwk::FormInstance> &runningFormInfos);
+        const std::string &bundleName, std::vector<AppExecFwk::FormInstance> &runningFormInfos);
 
 private:
     static inline BrokerDelegator<JsFormStateObserverProxy> delegator_;

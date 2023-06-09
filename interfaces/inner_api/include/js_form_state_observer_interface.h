@@ -40,7 +40,7 @@ public:
     virtual int32_t OnRemoveForm(const std::string &bundleName, const AppExecFwk::RunningFormInfo &runningFormInfo) = 0;
 
     virtual int32_t NotifyWhetherFormsVisible(const AppExecFwk::FormVisibilityType visibleType,
-         std::vector<AppExecFwk::FormInstance> &runningFormInfos) = 0;
+        const std::string &bundleName, std::vector<AppExecFwk::FormInstance> &runningFormInfos) = 0;
 
     enum class Message {
         FORM_STATE_OBSERVER_ON_ADD_FORM = 4302,

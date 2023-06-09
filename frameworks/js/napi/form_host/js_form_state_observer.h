@@ -94,17 +94,18 @@ public:
     bool CheckMapSize(const std::string &type, const std::string &bundleName);
 
     int RegisterFormInstanceCallback(NativeEngine &engine, NativeValue *jsObserverObject,
-        bool isVisibility, std::string &bundleName);
+        bool isVisibility, std::string &bundleName, sptr<JsFormStateObserver> &formObserver);
 
-    int32_t NotifyWhetherFormsVisible(const AppExecFwk::FormVisibilityType visibleType,
+    int32_t NotifyWhetherFormsVisible(const AppExecFwk::FormVisibilityType visibleType, const std::string &bundleName,
         std::vector<AppExecFwk::FormInstance> &runningFormInfos);
 
     void CallJsFunction(NativeValue *value, NativeValue *const *argv, size_t argc);
 
-    ErrCode ClearFormNotifyVisibleCallbackByBundle(const std::string bundleNam, bool isVisibility);
+    ErrCode ClearFormNotifyVisibleCallbackByBundle(const std::string bundleName, bool isVisibility,
+        sptr<JsFormStateObserver> &formObserver);
 
     ErrCode DelFormNotifyVisibleCallbackByBundle(const std::string bundleName, bool isVisibility,
-        NativeValue *jsObserverObject);
+        NativeValue *jsObserverObject, sptr<JsFormStateObserver> &formObserver);
 private:
     static std::mutex mutex_;
     static sptr<JsFormStateObserver> instance_;
