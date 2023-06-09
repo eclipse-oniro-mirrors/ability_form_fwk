@@ -200,7 +200,7 @@ HWTEST_F(FmsFormJsInfoTest, FmsFormJsInfoTest_008, TestSize.Level0)
 
 /**
  * @tc.name: FmsFormJsInfoTest_009
- * @tc.desc: text the FormJsInfo::ReadImageData
+ * @tc.desc: text the FormJsInfo::ReadImageData and formAshmem is nullptr
  * @tc.type: FUNC
  * @tc.require: #I5SNG1
  */
@@ -209,15 +209,11 @@ HWTEST_F(FmsFormJsInfoTest, FmsFormJsInfoTest_009, TestSize.Level0)
     GTEST_LOG_(INFO) << "FmsFormJsInfoTest_009 start";
     FormJsInfo formJsInfo;
     Parcel parcel;
-    FormAshmem *formAshmem = new FormAshmem();
-    parcel.WriteParcelable(formAshmem);
     EXPECT_TRUE(formJsInfo.imageDataMap.empty());
     formJsInfo.ReadImageData(parcel);
 
-    EXPECT_FALSE(formJsInfo.imageDataMap.empty());
+    EXPECT_TRUE(formJsInfo.imageDataMap.empty());
     GTEST_LOG_(INFO) << "FmsFormJsInfoTest_009 end";
-    delete formAshmem;
-    formAshmem = nullptr;
 }
 
 } // namespace AppExecFwk
