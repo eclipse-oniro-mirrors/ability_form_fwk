@@ -212,6 +212,9 @@ ErrCode BundleFormInfo::UpdateStaticFormInfos(int32_t userId)
             HILOG_DEBUG("Add new userId, user: %{public}d", userId);
             formInfoStorages_.emplace_back(userId, formInfos);
         }
+    } else {
+        HILOG_DEBUG("The new package of %{public}s does not contain a card, clear it", bundleName_.c_str());
+        formInfoStorages_.clear();
     }
 
     return UpdateFormInfoStorageLocked();
