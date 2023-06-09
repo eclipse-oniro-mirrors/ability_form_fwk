@@ -1458,6 +1458,7 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
     itemInfo.SetFormWindow(formInfo.window);
     itemInfo.SetType(formInfo.type);
     itemInfo.SetUiSyntax(formInfo.uiSyntax);
+    itemInfo.SetIsDynamic(formInfo.isDynamic);
 
     for (const auto &abilityInfo : bundleInfo.abilityInfos) {
         if (abilityInfo.name == formInfo.abilityName) {

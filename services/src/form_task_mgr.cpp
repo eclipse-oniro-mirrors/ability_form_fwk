@@ -780,6 +780,7 @@ FormJsInfo FormTaskMgr::CreateFormJsInfo(const int64_t formId, const FormRecord 
     form.formWindow = record.formWindow;
     form.type = record.type;
     form.uiSyntax = record.uiSyntax;
+    form.isDynamic = record.isDynamic;
     HILOG_DEBUG("%{public}s end, jsPath: %{private}s, data: %{public}s", __func__,
         form.jsFormCodePath.c_str(), form.formData.c_str());
     return form;

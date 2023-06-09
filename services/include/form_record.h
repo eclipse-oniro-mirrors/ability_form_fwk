@@ -62,6 +62,7 @@ public:
     uint32_t compatibleVersion = 0;
     FormType type = FormType::JS;
     FormType uiSyntax = FormType::JS;
+    bool isDynamic = true;
     bool isTimerRefresh = false;
 };
 }  // namespace AppExecFwk
