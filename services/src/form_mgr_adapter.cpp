@@ -293,6 +293,7 @@ int FormMgrAdapter::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> 
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
     // remove connection for in application form
     FormSupplyCallback::GetInstance()->RemoveConnection(matchedFormId, callerToken);
+    FormDataProxyMgr::GetInstance().UnsubscribeFormData(matchedFormId);
     if (FormDataMgr::GetInstance().ExistTempForm(matchedFormId)) {
         // delete temp form if receive release form call
         return HandleDeleteTempForm(matchedFormId, callerToken);
@@ -521,15 +522,8 @@ ErrCode FormMgrAdapter::HandleDeleteFormCache(FormRecord &dbRecord, const int ui
     return result;
 }
 
-/**
- * @brief Update form with formId, send formId to form manager service.
- * @param formId The Id of the form to update.
- * @param bundleName Provider ability bundleName.
- * @param formProviderData form provider data.
- * @return Returns ERR_OK on success, others on failure.
- */
-int FormMgrAdapter::UpdateForm(const int64_t formId,
-    const std::string &bundleName, const FormProviderData &formProviderData)
+int FormMgrAdapter::UpdateForm(const int64_t formId, const std::string &bundleName,
+    const FormProviderData &formProviderData, const std::vector<FormDataProxy> &formDataProxies)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     HILOG_INFO("%{public}s start.", __func__);
@@ -562,13 +556,19 @@ int FormMgrAdapter::UpdateForm(const int64_t formId,
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
+    int32_t ret = ERR_OK;
     if (formRecord.uiSyntax == FormType::ETS) {
         WantParams wantParams;
-        return FormRenderMgr::GetInstance().UpdateRenderingForm(formId, formProviderData, wantParams, true);
+        ret = FormRenderMgr::GetInstance().UpdateRenderingForm(formId, formProviderData, wantParams, true);
     } else {
         // update Form
-       return FormProviderMgr::GetInstance().UpdateForm(matchedFormId, formRecord, formProviderData);
+       ret = FormProviderMgr::GetInstance().UpdateForm(matchedFormId, formRecord, formProviderData);
     }
+
+    if (!formDataProxies.empty()) {
+        FormDataProxyMgr::GetInstance().UpdateSubscribeFormData(matchedFormId, formDataProxies);
+    }
+    return ret;
 }
 
 /**
@@ -713,6 +713,12 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
             HILOG_WARN("%{public}s fail, HandleEventNotify error, key is %{public}s.", __func__, iter->first.c_str());
         }
     }
+    if (formVisibleType == static_cast<int32_t>(FormVisibilityType::VISIBLE)) {
+        FormDataProxyMgr::GetInstance().EnableSubscribeFormData(formIds);
+    } else if (formVisibleType == static_cast<int32_t>(FormVisibilityType::INVISIBLE)) {
+        FormDataProxyMgr::GetInstance().DisableSubscribeFormData(formIds);
+    }
+
     return ERR_OK;
 }
 
@@ -1484,6 +1490,7 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
             itemInfo.AddHapSourceDirs(item.moduleSourceDir);
         }
     }
+    itemInfo.SetDataProxyFlag(formInfo.dataProxyEnabled);
     return ERR_OK;
 }
 
@@ -1643,7 +1650,8 @@ ErrCode FormMgrAdapter::RequestPublishFormToHost(Want &want)
 }
 
 ErrCode FormMgrAdapter::RequestPublishForm(Want &want, bool withFormBindingData,
-    std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId)
+    std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
+    const std::vector<FormDataProxy> &formDataProxies)
 {
     HILOG_INFO("%{public}s called.", __func__);
     ErrCode errCode = CheckPublishForm(want);
@@ -1680,6 +1688,9 @@ ErrCode FormMgrAdapter::RequestPublishForm(Want &want, bool withFormBindingData,
     errCode = RequestPublishFormToHost(want);
     if (errCode != ERR_OK) {
         FormDataMgr::GetInstance().RemoveRequestPublishFormInfo(formId);
+    }
+    if (!formDataProxies.empty()) {
+        FormDataProxyMgr::GetInstance().ProduceFormDataProxies(formId, formDataProxies);
     }
     return errCode;
 }
@@ -1794,7 +1805,10 @@ ErrCode FormMgrAdapter::AddRequestPublishForm(const FormItemInfo &formItemInfo, 
             return errorCode;
         }
     }
-
+    std::vector<FormDataProxy> formDataProxies;
+    if (FormDataProxyMgr::GetInstance().ConsumeFormDataProxies(formId, formDataProxies)) {
+        FormDataProxyMgr::GetInstance().UpdateSubscribeFormData(formId, formDataProxies);
+    }
     // start update timer
     return AddFormTimer(formRecord);
 }

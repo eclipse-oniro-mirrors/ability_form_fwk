@@ -80,13 +80,15 @@ public:
     int ReleaseForm(const int64_t formId, const sptr<IRemoteObject> &callerToken, const bool delCache);
 
     /**
-     * @brief Update form with formId, send formId to form manager service.
+     * @brief Update form with formId.
      * @param formId The Id of the form to update.
      * @param bundleName Provider ability bundleName.
      * @param formProviderData form provider data.
+     * @param std::vector<FormDataProxy> Form proxy vector.
      * @return Returns ERR_OK on success, others on failure.
      */
-    int UpdateForm(const int64_t formId, const std::string &bundleName, const FormProviderData &formProviderData);
+    int UpdateForm(const int64_t formId, const std::string &bundleName, const FormProviderData &formProviderData,
+        const std::vector<FormDataProxy> &formDataProxies = {});
 
     /**
      * @brief Request form with formId and want, send formId and want to form manager service.
@@ -175,7 +177,8 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode RequestPublishForm(Want &want, bool withFormBindingData,
-                               std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId);
+        std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
+        const std::vector<FormDataProxy> &formDataProxies = {});
 
     /**
      * @brief Check if the request of publishing a form is supported by the host.

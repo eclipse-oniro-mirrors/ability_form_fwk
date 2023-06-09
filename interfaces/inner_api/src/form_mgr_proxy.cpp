@@ -1295,7 +1295,7 @@ int32_t FormMgrProxy::AcquireFormData(int64_t formId, int64_t requestCode, const
         HILOG_ERROR("failed to write callerToken.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    
+
     int error;
     MessageParcel reply;
     error = SendTransactCmd(IFormMgr::Message::FORM_MGR_ACQUIRE_DATA, data, reply);
@@ -1619,6 +1619,98 @@ ErrCode FormMgrProxy::RegisterRemoveObserver(const std::string &bundleName, cons
         return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
     }
     return reply.ReadInt32();
+}
+
+ErrCode FormMgrProxy::UpdateProxyForm(int64_t formId, const FormProviderData &FormProviderData,
+    const std::vector<FormDataProxy> &formDataProxies)
+{
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("%{public}s, failed to write interface token", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt64(formId)) {
+        HILOG_ERROR("%{public}s, failed to write formId", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteParcelable(&FormProviderData)) {
+        HILOG_ERROR("%{public}s, failed to write formBindingData", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!WriteFormDataProxies(data, formDataProxies)) {
+        HILOG_ERROR("failed to write form data proxies.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    MessageParcel reply;
+    int32_t error = SendTransactCmd(IFormMgr::Message::FORM_MGR_UPDATE_PROXY_FORM, data, reply);
+    if (error != ERR_OK) {
+        HILOG_ERROR("failed to SendTransactCmd.");
+        return error;
+    }
+    return reply.ReadInt32();
+}
+
+ErrCode FormMgrProxy::RequestPublishProxyForm(Want &want, bool withFormBindingData,
+    std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
+    const std::vector<FormDataProxy> &formDataProxies)
+{
+    MessageParcel data;
+
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("%{public}s, failed to write interface token", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteParcelable(&want)) {
+        HILOG_ERROR("%{public}s, failed to write want", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteBool(withFormBindingData)) {
+        HILOG_ERROR("%{public}s, failed to write withFormBindingData", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (withFormBindingData) {
+        if (!data.WriteParcelable(formBindingData.get())) {
+            HILOG_ERROR("%{public}s, failed to write formBindingData", __func__);
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+    }
+    if (!WriteFormDataProxies(data, formDataProxies)) {
+        HILOG_ERROR("failed to write form data proxies.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    MessageParcel reply;
+    int32_t error = SendTransactCmd(IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_PROXY_FORM, data, reply);
+    if (error != ERR_OK) {
+        HILOG_ERROR("failed to SendTransactCmd.");
+        return error;
+    }
+    ErrCode errCode = reply.ReadInt32();
+    if (errCode == ERR_OK) {
+        formId = reply.ReadInt64();
+    }
+    return errCode;
+}
+
+bool FormMgrProxy::WriteFormDataProxies(MessageParcel &data, const std::vector<FormDataProxy> &formDataProxies)
+{
+    HILOG_DEBUG("proxies size: %{public}zu.", formDataProxies.size());
+    if (!data.WriteInt32(formDataProxies.size())) {
+        HILOG_ERROR("failed to marshalling form data proxies size.");
+        return false;
+    }
+    for (const auto &formDataProxy : formDataProxies) {
+        if (!data.WriteString16(Str8ToStr16(formDataProxy.key))) {
+            HILOG_ERROR("failed to marshalling form data proxies key: %{public}s.", formDataProxy.key.c_str());
+            return false;
+        }
+        if (!data.WriteString16(Str8ToStr16(formDataProxy.subscribeId))) {
+            HILOG_ERROR("failed to marshalling form data proxies subscribeId: %{public}s.",
+                formDataProxy.subscribeId.c_str());
+            return false;
+        }
+    }
+    return true;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

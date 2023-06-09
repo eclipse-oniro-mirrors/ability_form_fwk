@@ -289,9 +289,17 @@ NativeValue *JsFormProvider::OnUpdateForm(NativeEngine &engine, NativeCallbackIn
     std::string formDataStr = GetStringByProp(env, arg1, "data");
     formProviderData->SetDataString(formDataStr);
     formProviderData->ParseImagesData();
+
+    std::vector<AppExecFwk::FormDataProxy> formDataProxies;
+    NativeObject* nativeObject = ConvertNativeValueTo<NativeObject>(info.argv[PARAM1]);
+    NativeValue* nativeProxies = nativeObject->GetProperty("proxies");
+    if (nativeProxies != nullptr) {
+        ConvertFromDataProxies(engine, nativeProxies, formDataProxies);
+    }
+
     AsyncTask::CompleteCallback complete =
-        [formId, data = formProviderData](NativeEngine &engine, AsyncTask &task, int32_t status) {
-            int32_t ret = FormMgr::GetInstance().UpdateForm(formId, *data);
+        [formId, data = formProviderData, formDataProxies](NativeEngine &engine, AsyncTask &task, int32_t status) {
+            int32_t ret = FormMgr::GetInstance().UpdateForm(formId, *data, formDataProxies);
             if (ret != ERR_OK) {
                 task.Reject(engine, NapiFormUtil::CreateErrorByInternalErrorCode(engine, ret));
                 return;
@@ -382,13 +390,20 @@ NativeValue *JsFormProvider::OnRequestPublishForm(NativeEngine &engine, NativeCa
         formProviderData->SetDataString(formDataStr);
         formProviderData->ParseImagesData();
         asyncCallbackInfo->formProviderData = std::move(formProviderData);
+
+        NativeObject* nativeObject = ConvertNativeValueTo<NativeObject>(info.argv[PARAM1]);
+        NativeValue* nativeProxies = nativeObject->GetProperty("proxies");
+        if (nativeProxies != nullptr) {
+            ConvertFromDataProxies(engine, nativeProxies, asyncCallbackInfo->formDataProxies);
+        }
         convertArgc++;
     }
 
     AsyncTask::CompleteCallback complete = [asyncCallbackInfo](NativeEngine &engine, AsyncTask &task, int32_t status) {
         int64_t formId = 0;
         ErrCode ret = FormMgr::GetInstance().RequestPublishForm(asyncCallbackInfo->want,
-            asyncCallbackInfo->withFormBindingData, asyncCallbackInfo->formProviderData, formId);
+            asyncCallbackInfo->withFormBindingData, asyncCallbackInfo->formProviderData, formId,
+            asyncCallbackInfo->formDataProxies);
         if (ret != ERR_OK) {
             task.Reject(engine, NapiFormUtil::CreateErrorByInternalErrorCode(engine, ret));
             return;
@@ -401,6 +416,60 @@ NativeValue *JsFormProvider::OnRequestPublishForm(NativeEngine &engine, NativeCa
     AsyncTask::Schedule("JsFormProvider::OnRequestPublishForm",
         engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
     return result;
+}
+
+bool JsFormProvider::ConvertFromDataProxies(NativeEngine& engine, NativeValue* jsValue,
+    std::vector<AppExecFwk::FormDataProxy> &formDataProxies)
+{
+    if (jsValue == nullptr || !jsValue->IsArray()) {
+        HILOG_ERROR("%{public}s, jsValue is nullptr not array", __func__);
+        return false;
+    }
+
+    auto array = ConvertNativeValueTo<NativeArray>(jsValue);
+    if (array == nullptr) {
+        HILOG_ERROR("%{public}s, convert array failed", __func__);
+        return false;
+    }
+
+    for (uint32_t i = 0; i < array->GetLength(); i++) {
+        AppExecFwk::FormDataProxy formDataProxy("", "");
+        if (!ConvertFormDataProxy(engine, array->GetElement(i), formDataProxy)) {
+            HILOG_ERROR("GetElement from array [%{public}u] error", i);
+            return false;
+        }
+        formDataProxies.push_back(formDataProxy);
+    }
+    return true;
+}
+
+bool JsFormProvider::ConvertFormDataProxy(NativeEngine& engine, NativeValue* jsValue,
+    AppExecFwk::FormDataProxy &formDataProxy)
+{
+    if (jsValue == nullptr || jsValue->TypeOf() != NATIVE_OBJECT) {
+        HILOG_ERROR("%{public}s, jsValue is nullptr not object", __func__);
+        return false;
+    }
+
+    NativeObject *jsObject = ConvertNativeValueTo<NativeObject>(jsValue);
+    if (jsObject == nullptr) {
+        HILOG_ERROR("%{public}s called, jsObject is nullptr.", __func__);
+        return false;
+    }
+
+    NativeValue* key = jsObject->GetProperty("key");
+    if (!ConvertFromJsValue(engine, key, formDataProxy.key)) {
+        HILOG_ERROR("Parse key failed");
+        return false;
+    }
+    NativeValue* subscribeId = jsObject->GetProperty("subscriberId");
+    if (subscribeId != nullptr && !ConvertFromJsValue(engine, subscribeId, formDataProxy.subscribeId)) {
+        HILOG_WARN("Parse subscribeId failed, use empty as default value.");
+        formDataProxy.subscribeId = "";
+    }
+    HILOG_INFO("key is %{public}s, subscribeId is %{public}s", formDataProxy.key.c_str(),
+        formDataProxy.subscribeId.c_str());
+    return true;
 }
 }  // namespace AbilityRuntime
 }  // namespace OHOS

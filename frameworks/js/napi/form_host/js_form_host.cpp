@@ -1744,7 +1744,7 @@ private:
             NapiFormUtil::ThrowParamNumError(engine, std::to_string(info.argc), "1 or 2");
             return engine.CreateUndefined();
         }
-        
+
         // The promise form has only one parameters
         decltype(info.argc) unwrapArgc = 1;
         int64_t formId = 0;

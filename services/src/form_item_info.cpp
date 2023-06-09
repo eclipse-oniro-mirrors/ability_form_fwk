@@ -492,5 +492,15 @@ void FormItemInfo::SetUiSyntax(const FormType &uiSyntax)
 {
     uiSyntax_ = uiSyntax;
 }
+
+void FormItemInfo::SetDataProxyFlag(bool dataProxyEnabled)
+{
+    dataProxyEnabled_ = dataProxyEnabled;
+}
+
+bool FormItemInfo::GetDataProxyFlag() const
+{
+    return dataProxyEnabled_;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -369,6 +369,23 @@ private:
      */
     ErrCode HandleRegisterRemoveObserver(MessageParcel &data, MessageParcel &reply);
 
+    /**
+     * @brief update proxy form.
+     * @param data input param
+     * @param reply output param
+     * @return Return ERR_OK on success, others on failure
+     */
+    ErrCode HandleUpdateProxyForm(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief handle request publish form message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleRequestPublishProxyForm(MessageParcel &data, MessageParcel &reply);
+
+    bool ReadFormDataProxies(MessageParcel &data, std::vector<FormDataProxy> &formDataProxies);
 private:
     using FormMgrFunc = int32_t (FormMgrStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, FormMgrFunc> memberFuncMap_;

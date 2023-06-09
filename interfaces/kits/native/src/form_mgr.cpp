@@ -166,7 +166,8 @@ int FormMgr::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> &caller
  * @param formBindingData Form binding data.
  * @return Returns ERR_OK on success, others on failure.
  */
-int FormMgr::UpdateForm(const int64_t formId, const FormProviderData &formBindingData)
+int FormMgr::UpdateForm(const int64_t formId, const FormProviderData &formBindingData,
+    const std::vector<FormDataProxy> &formDataProxies)
 {
     HILOG_INFO("%{public}s called.", __func__);
 
@@ -181,7 +182,7 @@ int FormMgr::UpdateForm(const int64_t formId, const FormProviderData &formBindin
     }
 
     // check formBindingData
-    if (formBindingData.GetDataString().empty()) {
+    if (formBindingData.GetDataString().empty() && formDataProxies.empty()) {
         HILOG_ERROR("%{public}s error, the formProviderData is null.", __func__);
         return ERR_APPEXECFWK_FORM_PROVIDER_DATA_EMPTY;
     }
@@ -191,6 +192,7 @@ int FormMgr::UpdateForm(const int64_t formId, const FormProviderData &formBindin
         HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
         return errCode;
     }
+
     auto hostCaller = FormCallerMgr::GetInstance().GetFormHostCaller(formId);
     if (hostCaller != nullptr) {
         hostCaller->UpdateForm(formId, formBindingData);
@@ -201,7 +203,10 @@ int FormMgr::UpdateForm(const int64_t formId, const FormProviderData &formBindin
             formProviderCaller->UpdateForm(formId, formBindingData);
         }
     }
-    return remoteProxy_->UpdateForm(formId, formBindingData);
+    if (formDataProxies.empty()) {
+        return remoteProxy_->UpdateForm(formId, formBindingData);
+    }
+    return remoteProxy_->UpdateProxyForm(formId, formBindingData, formDataProxies);
 }
 
 /**
@@ -456,7 +461,8 @@ int FormMgr::SetNextRefreshTime(const int64_t formId, const int64_t nextTime)
 }
 
 ErrCode FormMgr::RequestPublishForm(Want &want, bool withFormBindingData,
-                                    std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId)
+    std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
+    const std::vector<FormDataProxy> &formDataProxies)
 {
     HILOG_INFO("%{public}s called.", __func__);
     ErrCode errCode = Connect();
@@ -464,7 +470,10 @@ ErrCode FormMgr::RequestPublishForm(Want &want, bool withFormBindingData,
         HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
         return errCode;
     }
-    return remoteProxy_->RequestPublishForm(want, withFormBindingData, formBindingData, formId);
+    if (formDataProxies.empty()) {
+        return remoteProxy_->RequestPublishForm(want, withFormBindingData, formBindingData, formId);
+    }
+    return remoteProxy_->RequestPublishProxyForm(want, withFormBindingData, formBindingData, formId, formDataProxies);
 }
 
 int FormMgr::LifecycleUpdate(

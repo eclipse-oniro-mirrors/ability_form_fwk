@@ -24,6 +24,7 @@
 #include "napi/native_node_api.h"
 #include "nlohmann/json.hpp"
 #include "want.h"
+#include <vector>
 
 namespace OHOS {
 namespace AbilityRuntime {
@@ -31,6 +32,7 @@ struct RequestPublishFormCallbackInfo {
     Want want {};
     bool withFormBindingData = false;
     std::unique_ptr<OHOS::AppExecFwk::FormProviderData> formProviderData = nullptr;
+    std::vector<AppExecFwk::FormDataProxy> formDataProxies;
 };
 
 struct AsyncIsRequestPublishFormSupportedCallbackInfo : AsyncCallbackInfoBase {
@@ -70,6 +72,9 @@ private:
     NativeValue* OnUpdateForm(NativeEngine &engine, NativeCallbackInfo &info);
     NativeValue* OnIsRequestPublishFormSupported(NativeEngine &engine, const NativeCallbackInfo &info);
     NativeValue* OnRequestPublishForm(NativeEngine &engine, NativeCallbackInfo &info);
+    bool ConvertFromDataProxies(NativeEngine& engine, NativeValue* jsValue,
+        std::vector<AppExecFwk::FormDataProxy> &formDataProxies);
+    bool ConvertFormDataProxy(NativeEngine& engine, NativeValue* jsValue, AppExecFwk::FormDataProxy &formDataProxy);
 };
 }  // namespace AbilityRuntime
 }  // namespace OHOS

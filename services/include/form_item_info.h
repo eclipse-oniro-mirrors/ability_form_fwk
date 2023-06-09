@@ -305,6 +305,9 @@ public:
      * @param uiSyntax.
      */
     void SetUiSyntax(const FormType &uiSyntax);
+
+    void SetDataProxyFlag(bool dataProxyEnabled);
+    bool GetDataProxyFlag() const;
 private:
     /**
      * @brief Equal or not.
@@ -342,6 +345,7 @@ private:
     std::string abilityModuleName_ = "";
     std::unordered_map<std::string, std::string> moduleInfoMap_;
     std::string deviceId_ = "";
+    bool dataProxyEnabled_ = false;
 };
 } // namespace AppExecFwk
 } // namespace OHOS

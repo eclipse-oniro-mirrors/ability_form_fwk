@@ -1206,5 +1206,30 @@ ErrCode FormMgrService::RegisterRemoveObserver(const std::string &bundleName, co
     }
     return FormMgrAdapter::GetInstance().RegisterRemoveObserver(bundleName, callerToken);
 }
+
+ErrCode FormMgrService::UpdateProxyForm(int64_t formId, const FormProviderData &formBindingData,
+    const std::vector<FormDataProxy> &formDataProxies)
+{
+    HILOG_DEBUG("called.");
+    std::string callerBundleName;
+    auto ret = FormBmsHelper::GetInstance().GetCallerBundleName(callerBundleName);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("%{public}s fail, get caller bundle name failed", __func__);
+        return ret;
+    }
+    return FormMgrAdapter::GetInstance().UpdateForm(formId, callerBundleName, formBindingData, formDataProxies);
+}
+
+ErrCode FormMgrService::RequestPublishProxyForm(Want &want, bool withFormBindingData,
+    std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
+    const std::vector<FormDataProxy> &formDataProxies)
+{
+    HILOG_DEBUG("called.");
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+    return FormMgrAdapter::GetInstance().RequestPublishForm(want, withFormBindingData, formBindingData, formId,
+        formDataProxies);
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

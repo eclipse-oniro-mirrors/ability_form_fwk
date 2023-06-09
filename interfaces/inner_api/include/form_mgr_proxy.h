@@ -347,7 +347,7 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t SetBackgroundFunction(const std::string funcName, const std::string params) override;
-    
+
     /**
     * @brief get forms count.
     * @param isTempFormFlag Indicates temp form or not.
@@ -413,6 +413,28 @@ public:
      */
     ErrCode RegisterRemoveObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken) override;
 
+    /**
+     * @brief Update proxy form with formId, send formId to form manager service.
+     * @param formId The Id of the form to update.
+     * @param FormProviderData Form binding data.
+     * @param std::vector<FormDataProxy> Form proxy vector.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UpdateProxyForm(int64_t formId, const FormProviderData &FormProviderData,
+        const std::vector<FormDataProxy> &formDataProxies) override;
+
+    /**
+     * @brief Request to publish a proxy form to the form host.
+     * @param want The want of the form to publish.
+     * @param withFormBindingData Indicates whether the formBindingData is carried with.
+     * @param formBindingData Indicates the form data.
+     * @param formId Return the form id to be published.
+     * @param std::vector<FormDataProxy> Form proxy vector.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode RequestPublishProxyForm(Want &want, bool withFormBindingData,
+        std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
+        const std::vector<FormDataProxy> &formDataProxies) override;
 private:
     template<typename T>
     int GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos);
@@ -425,6 +447,7 @@ private:
     ErrCode GetRunningFormInfos(IFormMgr::Message code, MessageParcel &data,
         std::vector<RunningFormInfo> &runningFormInfos);
     int32_t GetFormInstance(IFormMgr::Message code, MessageParcel &data, std::vector<FormInstance> &formInstances);
+    bool WriteFormDataProxies(MessageParcel &data, const std::vector<FormDataProxy> &formDataProxies);
 private:
     static inline BrokerDelegator<FormMgrProxy> delegator_;
 };
