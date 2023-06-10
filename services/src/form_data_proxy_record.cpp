@@ -354,12 +354,14 @@ void FormDataProxyRecord::UpdateSubscribeMap(const std::vector<FormDataProxy> &f
 
 void FormDataProxyRecord::EnableSubscribeFormData()
 {
+    HILOG_DEBUG("enable subscribe form, formId: %{public}s.", std::to_string(formId_).c_str());
     SetRdbSubsState(rdbSubscribeMap_, true);
     SetPublishSubsState(publishSubscribeMap_, true);
 }
 
 void FormDataProxyRecord::DisableSubscribeFormData()
 {
+    HILOG_DEBUG("disable subscribe form, formId: %{public}s.", std::to_string(formId_).c_str());
     SetRdbSubsState(rdbSubscribeMap_, false);
     SetPublishSubsState(publishSubscribeMap_, false);
 }

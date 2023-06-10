@@ -18,6 +18,7 @@
 #include "form_bms_helper.h"
 #include "form_cache_mgr.h"
 #include "form_data_mgr.h"
+#include "form_data_proxy_mgr.h"
 #include "form_db_cache.h"
 #include "form_info_mgr.h"
 #include "form_render_mgr.h"
@@ -79,6 +80,7 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
         removedForms.emplace_back(formId);
         FormDataMgr::GetInstance().DeleteFormRecord(formId);
         FormRenderMgr::GetInstance().StopRenderingForm(formId, formRecord);
+        FormDataProxyMgr::GetInstance().UnsubscribeFormData(formId);
     }
 
     if (!removedForms.empty()) {
@@ -130,6 +132,7 @@ void FormEventUtil::HandleProviderRemoved(const std::string &bundleName, const i
     // clean removed form timers
     for (auto &formId : removedForms) {
         FormTimerMgr::GetInstance().RemoveFormTimer(formId);
+        FormDataProxyMgr::GetInstance().UnsubscribeFormData(formId);
     }
 }
 
