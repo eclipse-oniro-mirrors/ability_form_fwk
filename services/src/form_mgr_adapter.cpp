@@ -1192,7 +1192,7 @@ ErrCode FormMgrAdapter::AddFormTimer(const FormRecord &formRecord)
             __func__, formRecord.isEnableUpdate, formRecord.formTempFlag);
         return ERR_OK;
     }
-    if (formRecord.updateDuration > 0) {
+    if (formRecord.updateDuration > 0 && !formRecord.isDataProxy) {
         bool ret = FormTimerMgr::GetInstance().AddFormTimer(formRecord.formId,
             formRecord.updateDuration, formRecord.providerUserId);
         return ret ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -1537,6 +1537,11 @@ int FormMgrAdapter::SetNextRefreshTime(const int64_t formId, const int64_t nextT
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
 
+    if (formRecord.isDataProxy) {
+        HILOG_ERROR("data proxy form not support set next refresh time.");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
     return SetNextRefreshTimeLocked(matchedFormId, nextTime, userId);
 }
 
@@ -1807,7 +1812,7 @@ ErrCode FormMgrAdapter::AddRequestPublishForm(const FormItemInfo &formItemInfo, 
     }
     std::vector<FormDataProxy> formDataProxies;
     if (FormDataProxyMgr::GetInstance().ConsumeFormDataProxies(formId, formDataProxies)) {
-        FormDataProxyMgr::GetInstance().UpdateSubscribeFormData(formId, formDataProxies);
+        FormDataProxyMgr::GetInstance().SubscribeFormData(formId, formDataProxies);
     }
     // start update timer
     return AddFormTimer(formRecord);

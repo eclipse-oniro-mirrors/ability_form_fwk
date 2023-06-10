@@ -44,6 +44,11 @@ ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<Fo
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
+    if (!formRecord.isDataProxy) {
+        HILOG_DEBUG("not data proxy form, formId:%{public}" PRId64 ".", formId);
+        return ERR_OK;
+    }
+
     std::lock_guard<std::mutex> lock(formDataProxyRecordMutex_);
     auto search = formDataProxyRecordMap_.find(formId);
     if (search != formDataProxyRecordMap_.end()) {
