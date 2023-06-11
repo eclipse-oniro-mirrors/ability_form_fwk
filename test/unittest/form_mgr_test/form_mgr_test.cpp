@@ -2088,4 +2088,48 @@ HWTEST_F(FormMgrTest, FormMgrTest_0105, TestSize.Level1) {
     EXPECT_EQ(result, ERROR_NUM);
     GTEST_LOG_(INFO) << "FormMgrTest_0105 test ends";
 }
+
+/**
+ * @tc.name: FormMgrTest_0106
+ * @tc.desc: Verify UpdateForm (include data proxies)
+ * @tc.type: FUNC
+ * @tc.require: issueI7CGTP
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0106, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0106 starts";
+    EXPECT_CALL(*mockProxy, UpdateProxyForm(_, _, _))
+        .Times(1)
+        .WillOnce(Return(NEGATIVE_NUM));
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = 0x00000008fffffffL;
+    FormProviderData formProviderData = FormProviderData(std::string("{\"city\": \"beijing001\"}"));
+    std::vector<FormDataProxy> formDataProxies;
+    FormDataProxy formDataProxy("city", "");
+    formDataProxies.push_back(formDataProxy);
+    int32_t result = FormMgr::GetInstance().UpdateForm(formJsInfo.formId, formProviderData, formDataProxies);
+    EXPECT_EQ(result, NEGATIVE_NUM);
+    GTEST_LOG_(INFO) << "FormMgrTest_0106 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0107
+ * @tc.desc: Verify RequestPublishForm (include data proxies)
+ * @tc.type: FUNC
+ * @tc.require: issueI7CGTP
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0107, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0107 starts";
+    EXPECT_CALL(*mockProxy, RequestPublishProxyForm(_, _, _, _, _))
+        .Times(1)
+        .WillOnce(Return(NEGATIVE_NUM));
+    Want want;
+    int64_t formId = 0x00000008fffffffL;
+    std::unique_ptr<FormProviderData> formProviderData;
+    std::vector<FormDataProxy> formDataProxies;
+    FormDataProxy formDataProxy("city", "");
+    formDataProxies.push_back(formDataProxy);
+    int32_t result = FormMgr::GetInstance().RequestPublishForm(want, true, formProviderData, formId, formDataProxies);
+    EXPECT_EQ(result, NEGATIVE_NUM);
+    GTEST_LOG_(INFO) << "FormMgrTest_0107 test ends";
+}
 } // namespace
