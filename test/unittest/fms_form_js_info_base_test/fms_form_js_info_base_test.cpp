@@ -378,7 +378,7 @@ HWTEST_F(FmsFormJsInfoBaseTest, FmsFormJsInfoBaseTest_1200, TestSize.Level0)
 
 /**
  * @tc.name: FmsFormJsInfoBaseTest_1300
- * @tc.desc: text the FormJsInfo::ReadImageData
+ * @tc.desc: text the FormJsInfo::ReadImageData and formAshmem is not nullptr
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormJsInfoBaseTest, FmsFormJsInfoBaseTest_1300, TestSize.Level0)
@@ -387,6 +387,8 @@ HWTEST_F(FmsFormJsInfoBaseTest, FmsFormJsInfoBaseTest_1300, TestSize.Level0)
     FormJsInfo formJsInfo;
     formJsInfo.formProviderData.imageDataState_ = FormProviderData::IMAGE_DATA_STATE_ADDED;
     FormAshmem *formAshmem = new FormAshmem();
+    char* data = new char[4];
+    formAshmem->WriteToAshmem("test", data, 4);
     Parcel parcel;
     parcel.WriteInt32(FormProviderData::IMAGE_DATA_STATE_ADDED);
     parcel.WriteInt32(127);
@@ -395,6 +397,8 @@ HWTEST_F(FmsFormJsInfoBaseTest, FmsFormJsInfoBaseTest_1300, TestSize.Level0)
     formJsInfo.ReadImageData(parcel);
     EXPECT_FALSE(formJsInfo.imageDataMap.empty());
     GTEST_LOG_(INFO) << "FmsFormJsInfoBaseTest_1300 end";
+    delete[] data;
+    data = nullptr;
     delete formAshmem;
     formAshmem = nullptr;
 }

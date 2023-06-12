@@ -23,6 +23,7 @@
 #include "form_instances_filter.h"
 #include "form_js_info.h"
 #include "form_provider_data.h"
+#include "form_provider_data_proxy.h"
 #include "form_share_info.h"
 #include "form_state_info.h"
 #include "ipc_types.h"
@@ -423,6 +424,29 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     virtual ErrCode RegisterRemoveObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken) = 0;
+
+    /**
+     * @brief Update proxy form with formId.
+     * @param formId The Id of the form to update.
+     * @param FormProviderData Form binding data.
+     * @param std::vector<FormDataProxy> Form proxy vector.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode UpdateProxyForm(int64_t formId, const FormProviderData &FormProviderData,
+        const std::vector<FormDataProxy> &formDataProxies) { return ERR_OK; }
+
+    /**
+     * @brief Request to publish a proxy form to the form host.
+     * @param want The want of the form to publish.
+     * @param withFormBindingData Indicates whether the formBindingData is carried with.
+     * @param formBindingData Indicates the form data.
+     * @param formId Return the form id to be published.
+     * @param std::vector<FormDataProxy> Form proxy vector.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode RequestPublishProxyForm(Want &want, bool withFormBindingData,
+        std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
+        const std::vector<FormDataProxy> &formDataProxies) { return ERR_OK; }
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -481,7 +505,9 @@ public:
         FORM_MGR_GET_FORM_INSTANCES_FROM_BY_FILTER,
         FORM_MGR_GET_FORM_INSTANCES_FROM_BY_ID,
         FORM_MGR_REGISTER_ADD_OBSERVER,
-        FORM_MGR_REGISTER_REMOVE_OBSERVER
+        FORM_MGR_REGISTER_REMOVE_OBSERVER,
+        FORM_MGR_UPDATE_PROXY_FORM,
+        FORM_MGR_REQUEST_PUBLISH_PROXY_FORM
     };
 };
 }  // namespace AppExecFwk

@@ -90,7 +90,7 @@ int32_t JsFormStateObserverProxy::OnRemoveForm(const std::string &bundleName,
 }
 
 int32_t JsFormStateObserverProxy::NotifyWhetherFormsVisible(const AppExecFwk::FormVisibilityType formVisiblityType,
-    std::vector<AppExecFwk::FormInstance> &formInstances)
+    const std::string &bundleName, std::vector<AppExecFwk::FormInstance> &formInstances)
 {
     HILOG_DEBUG("called.");
     MessageParcel data;
@@ -103,6 +103,10 @@ int32_t JsFormStateObserverProxy::NotifyWhetherFormsVisible(const AppExecFwk::Fo
     }
     int32_t formVisiblityTypeInt = static_cast<int32_t>(formVisiblityType);
     if (!data.WriteInt32(formVisiblityTypeInt)) {
+        HILOG_ERROR("failed to write formVisiblityType");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteString(bundleName)) {
         HILOG_ERROR("failed to write formVisiblityType");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }

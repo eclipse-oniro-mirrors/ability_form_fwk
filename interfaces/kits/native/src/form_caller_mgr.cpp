@@ -48,7 +48,7 @@ void FormCallerMgr::AddFormHostCaller(const FormJsInfo &formJsInfo, const sptr<I
 
 std::shared_ptr<FormHostCaller> FormCallerMgr::GetFormHostCaller(int64_t formId)
 {
-    HILOG_DEBUG("called");
+    HILOG_DEBUG("%{public}s called", __func__);
     std::lock_guard<std::recursive_mutex> lock(formHostCallerMutex_);
     auto iter = formHostCallers_.find(formId);
     if (iter == formHostCallers_.end()) {
@@ -128,7 +128,7 @@ void FormCallerMgr::AddFormProviderCaller(const FormJsInfo &formJsInfo, const sp
 void FormCallerMgr::GetFormProviderCaller(int64_t formId,
     std::vector<std::shared_ptr<FormProviderCaller>> &formProviderCallers)
 {
-    HILOG_DEBUG("called");
+    HILOG_DEBUG("%{public}s called", __func__);
     std::lock_guard<std::recursive_mutex> lock(formProviderCallerMutex_);
     for (const auto &formProviderCaller : formProviderCallers_) {
         if (formProviderCaller->HasForm(formId)) {

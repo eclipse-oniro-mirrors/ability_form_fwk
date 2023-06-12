@@ -22,6 +22,7 @@
 #include "ipc_skeleton.h"
 #include "ipc_types.h"
 #include "iremote_object.h"
+#include <vector>
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -128,6 +129,10 @@ FormMgrStub::FormMgrStub()
         &FormMgrStub::HandleRegisterAddObserver;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_REMOVE_OBSERVER)] =
         &FormMgrStub::HandleRegisterRemoveObserver;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UPDATE_PROXY_FORM)] =
+        &FormMgrStub::HandleUpdateProxyForm;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_PROXY_FORM)] =
+        &FormMgrStub::HandleRequestPublishProxyForm;
 }
 
 FormMgrStub::~FormMgrStub()
@@ -1097,6 +1102,72 @@ ErrCode FormMgrStub::HandleRegisterRemoveObserver(MessageParcel &data, MessagePa
     auto result = RegisterRemoveObserver(bundleName, callerToken);
     reply.WriteInt32(result);
     return result;
+}
+
+ErrCode FormMgrStub::HandleUpdateProxyForm(MessageParcel &data, MessageParcel &reply)
+{
+    int64_t formId = data.ReadInt64();
+    std::unique_ptr<FormProviderData> formProviderData(data.ReadParcelable<FormProviderData>());
+    if (formProviderData == nullptr) {
+        HILOG_ERROR("%{public}s, failed to get formProviderData.", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    std::vector<FormDataProxy> formDataProxies;
+    if (!ReadFormDataProxies(data, formDataProxies)) {
+        HILOG_ERROR("failed to get formDataProxies.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int32_t result = UpdateProxyForm(formId, *formProviderData, formDataProxies);
+    reply.WriteInt32(result);
+    return result;
+}
+
+ErrCode FormMgrStub::HandleRequestPublishProxyForm(MessageParcel &data, MessageParcel &reply)
+{
+    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
+    if (want == nullptr) {
+        HILOG_ERROR("%{public}s, failed to get want.", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    bool withFormBindingData = data.ReadBool();
+    std::unique_ptr<FormProviderData> formProviderData = nullptr;
+    if (withFormBindingData) {
+        formProviderData.reset(data.ReadParcelable<FormProviderData>());
+        if (formProviderData == nullptr) {
+            HILOG_ERROR("%{public}s, failed to get formProviderData.", __func__);
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+    }
+    std::vector<FormDataProxy> formDataProxies;
+    if (!ReadFormDataProxies(data, formDataProxies)) {
+        HILOG_ERROR("failed to get formDataProxies.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int64_t formId = 0;
+    ErrCode result = RequestPublishProxyForm(*want, withFormBindingData, formProviderData, formId, formDataProxies);
+    reply.WriteInt32(result);
+    if (result == ERR_OK) {
+        reply.WriteInt64(formId);
+    }
+    return result;
+}
+bool FormMgrStub::ReadFormDataProxies(MessageParcel &data, std::vector<FormDataProxy> &formDataProxies)
+{
+    auto number = data.ReadInt32();
+    HILOG_DEBUG("proxies number: %{public}d.", number);
+    if (number < 0 || number > INT16_MAX) {
+        HILOG_ERROR("proxies number over limit: %{public}d.", number);
+        return false;
+    }
+
+    for (auto i = 0; i < number; i++) {
+        FormDataProxy formDataProxy("", "");
+        formDataProxy.key = Str16ToStr8(data.ReadString16());
+        formDataProxy.subscribeId = Str16ToStr8(data.ReadString16());
+        formDataProxies.push_back(formDataProxy);
+    }
+    return true;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

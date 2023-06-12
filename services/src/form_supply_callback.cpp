@@ -76,26 +76,27 @@ int FormSupplyCallback::OnAcquire(const FormProviderInfo &formProviderInfo, cons
         RemoveConnection(connectId);
     }
 
-    FormDataProxyMgr::GetInstance().SubscribeFormData(formId, formProviderInfo.GetFormProxies());
-
     if (FormRenderMgr::GetInstance().IsNeedRender(formId)) {
         return FormRenderMgr::GetInstance().UpdateRenderingForm(formId, formProviderInfo.GetFormData(),
             want.GetParams(), false);
     }
 
+    int32_t ret = ERR_APPEXECFWK_FORM_INVALID_PARAM;
     int type = want.GetIntParam(Constants::ACQUIRE_TYPE, 0);
     HILOG_DEBUG("%{public}s come: %{public}" PRId64 ", %{public}d, %{public}d",
         __func__, formId, connectId, type);
     switch (type) {
         case Constants::ACQUIRE_TYPE_CREATE_FORM:
-            return FormProviderMgr::GetInstance().AcquireForm(formId, formProviderInfo);
+            ret = FormProviderMgr::GetInstance().AcquireForm(formId, formProviderInfo);
         case Constants::ACQUIRE_TYPE_RECREATE_FORM:
-            return FormProviderMgr::GetInstance().UpdateForm(formId, formProviderInfo);
+            ret = FormProviderMgr::GetInstance().UpdateForm(formId, formProviderInfo);
         default:
             HILOG_WARN("%{public}s warning, onAcquired type: %{public}d", __func__, type);
     }
+
+    FormDataProxyMgr::GetInstance().SubscribeFormData(formId, formProviderInfo.GetFormProxies());
     HILOG_INFO("%{public}s end.", __func__);
-    return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    return ret;
 }
 
 /**

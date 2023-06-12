@@ -60,12 +60,12 @@ int32_t FormRenderImpl::RenderForm(const FormJsInfo &formJsInfo, const Want &wan
 
     sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
     if (formSupplyClient == nullptr) {
-        HILOG_ERROR("warn, IFormSupply is nullptr");
+        HILOG_ERROR("%{public}s warn, IFormSupply is nullptr", __func__);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
 
     formSupplyClient_ = formSupplyClient;
-    HILOG_DEBUG("come, connectId: %{public}d.",
+    HILOG_DEBUG("%{public}s come, connectId: %{public}d.", __func__,
         want.GetIntParam(Constants::FORM_CONNECT_ID, 0L));
 
     std::string uid = want.GetStringParam(Constants::FORM_SUPPLY_UID);

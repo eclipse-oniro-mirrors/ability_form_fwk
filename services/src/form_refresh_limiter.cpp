@@ -53,7 +53,7 @@ void FormRefreshLimiter::DeleteItem(const int64_t formId)
     if (info != limiterMap_.end()) {
         limiterMap_.erase(formId);
     }
-    HILOG_INFO("end");
+    HILOG_INFO("%{public}s end", __func__);
 }
 /**
  * @brief Reset limit info.

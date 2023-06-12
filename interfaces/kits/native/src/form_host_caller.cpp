@@ -33,7 +33,7 @@ void FormHostCallerRecipient::OnRemoteDied(const wptr<IRemoteObject> &__attribut
 
 void FormHostCaller::UpdateForm(int64_t formId, const FormProviderData &formProviderData)
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("%{public}s called.", __func__);
     FormJsInfo formJsInfo = formJsInfo_;
     formJsInfo.formData = formProviderData.GetDataString();
     formJsInfo.formProviderData = formProviderData;

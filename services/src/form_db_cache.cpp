@@ -69,12 +69,12 @@ ErrCode FormDbCache::SaveFormInfo(const FormDBInfo &formDBInfo)
     auto iter = find(formDBInfos_.begin(), formDBInfos_.end(), formDBInfo);
     if (iter != formDBInfos_.end()) {
         if (iter->Compare(formDBInfo) == false) {
-            HILOG_WARN("need update, formId[%{public}" PRId64 "].", formDBInfo.formId);
+            HILOG_WARN("%{public}s, need update, formId[%{public}" PRId64 "].", __func__, formDBInfo.formId);
             *iter = formDBInfo;
             InnerFormInfo innerFormInfo(formDBInfo);
             return FormInfoRdbStorageMgr::GetInstance().ModifyStorageFormData(innerFormInfo);
         } else {
-            HILOG_WARN("already exist, formId[%{public}" PRId64 "].", formDBInfo.formId);
+            HILOG_WARN("%{public}s, already exist, formId[%{public}" PRId64 "].", __func__, formDBInfo.formId);
             return ERR_OK;
         }
     } else {

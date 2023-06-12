@@ -34,9 +34,16 @@ public:
 
     ErrCode SubscribeFormData(int64_t formId, const std::vector<FormDataProxy> &formDataProxies);
     ErrCode UnsubscribeFormData(int64_t formId);
+    void UpdateSubscribeFormData(int64_t formId, const std::vector<FormDataProxy> &formDataProxies);
+    void ProduceFormDataProxies(int64_t formId, const std::vector<FormDataProxy> &formDataProxies);
+    bool ConsumeFormDataProxies(int64_t formId, std::vector<FormDataProxy> &formDataProxies);
+    void EnableSubscribeFormData(const std::vector<int64_t> &formIds);
+    void DisableSubscribeFormData(const std::vector<int64_t> &formIds);
 private:
     std::mutex formDataProxyRecordMutex_;
     std::map<int64_t, std::shared_ptr<FormDataProxyRecord>> formDataProxyRecordMap_; // formId:FormDataProxyRecord
+    std::mutex formDataProxiesMutex_;
+    std::map<int64_t, std::vector<FormDataProxy>> formDataProxiesMap_; // formId:FormDataProxies
 };
 } // namespace AppExecFwk
 } // namespace OHOS

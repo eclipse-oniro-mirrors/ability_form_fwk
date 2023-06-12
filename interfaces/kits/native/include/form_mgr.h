@@ -30,6 +30,7 @@
 #include "form_js_info.h"
 #include "form_mgr_interface.h"
 #include "form_provider_data.h"
+#include "form_provider_data_proxy.h"
 #include "form_state_info.h"
 #include "iremote_object.h"
 #include "want.h"
@@ -98,9 +99,11 @@ public:
      * @brief Update form with formId, send formId to form manager service.
      * @param formId The Id of the form to update.
      * @param formBindingData Form binding data.
+     * @param std::vector<FormDataProxy> Form proxy vector.
      * @return Returns ERR_OK on success, others on failure.
      */
-    int UpdateForm(const int64_t formId, const FormProviderData &formBindingData);
+    int UpdateForm(const int64_t formId, const FormProviderData &formBindingData,
+        const std::vector<FormDataProxy> &formDataProxies = {});
 
     /**
      * @brief Notify the form service that the form user's lifecycle is updated.
@@ -226,7 +229,8 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode RequestPublishForm(Want &want, bool withFormBindingData,
-                               std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId);
+        std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
+        const std::vector<FormDataProxy> &formDataProxies = {});
 
     /**
      * @brief Lifecycle Update.

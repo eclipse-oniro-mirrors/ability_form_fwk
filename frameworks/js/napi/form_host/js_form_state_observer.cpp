@@ -15,6 +15,8 @@
 
 #include "js_form_state_observer.h"
 
+#include <regex>
+
 #include "form_mgr_errors.h"
 #include "hilog_wrapper.h"
 #include "js_runtime_utils.h"
@@ -328,22 +330,30 @@ int32_t JsFormStateObserver::OnRemoveForm(const std::string &bundleName,
 }
 
 int JsFormStateObserver::RegisterFormInstanceCallback(NativeEngine &engine, NativeValue* jsObserverObject,
-    bool isVisibility, std::string &bundleName)
+    bool isVisibility, std::string &bundleName, sptr<JsFormStateObserver> &formObserver)
 {
     HILOG_DEBUG("called.");
     if (engine_ == nullptr) {
         engine_ = &engine;
     }
+    std::string specialFlag = "#";
     std::lock_guard<std::mutex> lock(formIsvisibleCallbackMutex_);
-    auto callback = formVisibleCallbackMap_.find(bundleName);
-    if (callback != formVisibleCallbackMap_.end()) {
-        HILOG_ERROR("bundleName is already in the map, bundleName id %{public}s", bundleName.c_str());
-        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
-    }
+    AppExecFwk::FormMgr::GetInstance().RegisterAddObserver(bundleName + specialFlag + std::to_string(isVisibility),
+        formObserver);
     if (isVisibility) {
+        auto visibleCallback = formVisibleCallbackMap_.find(bundleName);
+        if (visibleCallback != formVisibleCallbackMap_.end()) {
+            HILOG_ERROR("bundleName is already in the map, bundleName id %{public}s", bundleName.c_str());
+            return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+        }
         formVisibleCallbackMap_.emplace(
             bundleName, std::shared_ptr<NativeReference>(engine.CreateReference(jsObserverObject, 1)));
     } else {
+        auto invisibleCallback = formInvisibleCallbackMap_.find(bundleName);
+        if (invisibleCallback != formInvisibleCallbackMap_.end()) {
+            HILOG_ERROR("bundleName is already in the map, bundleName id %{public}s", bundleName.c_str());
+            return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+        }
         formInvisibleCallbackMap_.emplace(
             bundleName, std::shared_ptr<NativeReference>(engine.CreateReference(jsObserverObject, 1)));
     }
@@ -351,10 +361,13 @@ int JsFormStateObserver::RegisterFormInstanceCallback(NativeEngine &engine, Nati
 }
 
 ErrCode JsFormStateObserver::ClearFormNotifyVisibleCallbackByBundle(const std::string bundleName,
-    bool isVisibility)
+    bool isVisibility, sptr<JsFormStateObserver> &formObserver)
 {
     HILOG_DEBUG("called.");
     std::lock_guard<std::mutex> lock(formIsvisibleCallbackMutex_);
+    std::string specialFlag = "#";
+    AppExecFwk::FormMgr::GetInstance().RegisterRemoveObserver(bundleName + specialFlag + std::to_string(isVisibility),
+        formObserver);
     if (isVisibility) {
         auto visibleCallback = formVisibleCallbackMap_.find(bundleName);
         if (visibleCallback != formVisibleCallbackMap_.end()) {
@@ -377,10 +390,13 @@ ErrCode JsFormStateObserver::ClearFormNotifyVisibleCallbackByBundle(const std::s
 }
 
 ErrCode JsFormStateObserver::DelFormNotifyVisibleCallbackByBundle(const std::string bundleName,
-    bool isVisibility, NativeValue *jsObserverObject)
+    bool isVisibility, NativeValue *jsObserverObject, sptr<JsFormStateObserver> &formObserver)
 {
     HILOG_DEBUG("called.");
     std::lock_guard<std::mutex> lock(formIsvisibleCallbackMutex_);
+    std::string specialFlag = "#";
+    AppExecFwk::FormMgr::GetInstance().RegisterRemoveObserver(bundleName + specialFlag + std::to_string(isVisibility),
+        formObserver);
     if (isVisibility) {
         auto visibleCallback = formVisibleCallbackMap_.find(bundleName);
         if (visibleCallback != formVisibleCallbackMap_.end()) {
@@ -396,10 +412,10 @@ ErrCode JsFormStateObserver::DelFormNotifyVisibleCallbackByBundle(const std::str
             return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
         }
     } else {
-        auto inVisibleCallback = formInvisibleCallbackMap_.find(bundleName);
-        if (inVisibleCallback != formInvisibleCallbackMap_.end()) {
-            if (jsObserverObject->StrictEquals(inVisibleCallback->second->Get())) {
-                formInvisibleCallbackMap_.erase(inVisibleCallback);
+        auto invisibleCallback = formInvisibleCallbackMap_.find(bundleName);
+        if (invisibleCallback != formInvisibleCallbackMap_.end()) {
+            if (jsObserverObject->StrictEquals(invisibleCallback->second->Get())) {
+                formInvisibleCallbackMap_.erase(invisibleCallback);
                 return ERR_OK;
             } else {
                 HILOG_ERROR("There is no formInvisibleCallbackMap_ has been register");
@@ -413,30 +429,44 @@ ErrCode JsFormStateObserver::DelFormNotifyVisibleCallbackByBundle(const std::str
 }
 
 int32_t JsFormStateObserver::NotifyWhetherFormsVisible(const AppExecFwk::FormVisibilityType visibleType,
-    std::vector<AppExecFwk::FormInstance> &formInstances)
+    const std::string &bundleName, std::vector<AppExecFwk::FormInstance> &formInstances)
 {
     handler_ = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
     HILOG_DEBUG("called.");
     std::lock_guard<std::mutex> lock(formIsvisibleCallbackMutex_);
     if (handler_) {
         wptr<JsFormStateObserver> weakObserver = this;
-        handler_->PostSyncTask([weakObserver, visibleType, formInstances]() {
+        handler_->PostSyncTask([weakObserver, visibleType, formInstances, bundleName]() {
+            std::string specialFlag = "#";
+            bool isVisibleTypeFlag = false; 
             auto sharedThis = weakObserver.promote();
             if (sharedThis == nullptr) {
                 HILOG_ERROR("sharedThis is nullptr.");
                 return;
             }
             if (visibleType == AppExecFwk::FormVisibilityType::VISIBLE) {
-                for (auto &item : sharedThis->formVisibleCallbackMap_) {
-                    NativeValue *value = (item.second)->Get();
-                    NativeValue *argv[] = { CreateFormInstances(*sharedThis->engine_, formInstances)};
-                    sharedThis->CallJsFunction(value, argv,  sizeof(argv) / sizeof(argv[0]));
+                isVisibleTypeFlag = true;
+                if (bundleName.find((specialFlag + std::to_string(isVisibleTypeFlag))) != std::string::npos) {
+                    std::string bundleNameNew =
+                        std::regex_replace(bundleName, std::regex(specialFlag + std::to_string(isVisibleTypeFlag)), "");
+                    auto visibleCallback = sharedThis->formVisibleCallbackMap_.find(bundleNameNew);
+                    if (visibleCallback != sharedThis->formVisibleCallbackMap_.end()) {
+                        NativeValue *value = visibleCallback->second->Get();
+                        NativeValue *argv[] = { CreateFormInstances(*sharedThis->engine_, formInstances)};
+                        sharedThis->CallJsFunction(value, argv,  sizeof(argv) / sizeof(argv[0]));
+                    }
                 }
             } else {
-                for (auto &item : sharedThis->formInvisibleCallbackMap_) {
-                    NativeValue *value = (item.second)->Get();
-                    NativeValue *argv[] = { CreateFormInstances(*sharedThis->engine_, formInstances)};
-                    sharedThis->CallJsFunction(value, argv, sizeof(argv) / sizeof(argv[0]));
+                isVisibleTypeFlag = false;
+                if (bundleName.find((specialFlag + std::to_string(isVisibleTypeFlag))) != std::string::npos) {
+                    std::string bundleNameNew =
+                        std::regex_replace(bundleName, std::regex(specialFlag + std::to_string(isVisibleTypeFlag)), "");
+                    auto invisibleCallback = sharedThis->formInvisibleCallbackMap_.find(bundleNameNew);
+                    if (invisibleCallback != sharedThis->formInvisibleCallbackMap_.end()) {
+                        NativeValue *value = invisibleCallback->second->Get();
+                        NativeValue *argv[] = { CreateFormInstances(*sharedThis->engine_, formInstances)};
+                        sharedThis->CallJsFunction(value, argv,  sizeof(argv) / sizeof(argv[0]));
+                    }
                 }
             }
         });

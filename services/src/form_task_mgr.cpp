@@ -803,7 +803,7 @@ void FormTaskMgr::PostRenderForm(const FormRecord &formRecord, const Want &want,
         FormTaskMgr::GetInstance().RenderForm(formRecord, want, remoteObject);
     };
     eventHandler_->PostTask(renderForm, FORM_TASK_DELAY_TIME);
-    HILOG_INFO("end");
+    HILOG_INFO("%{public}s end", __func__);
 }
 
 void FormTaskMgr::RenderForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject)
@@ -813,7 +813,7 @@ void FormTaskMgr::RenderForm(const FormRecord &formRecord, const Want &want, con
     sptr<IFormRender> remoteFormRender = iface_cast<IFormRender>(remoteObject);
     if (remoteFormRender == nullptr) {
         FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
-        HILOG_ERROR("fail, Failed to get form render proxy.");
+        HILOG_ERROR("%{public}s fail, Failed to get form render proxy.", __func__);
         return;
     }
 
@@ -821,11 +821,11 @@ void FormTaskMgr::RenderForm(const FormRecord &formRecord, const Want &want, con
     int32_t error = remoteFormRender->RenderForm(formJsInfo, want, FormSupplyCallback::GetInstance());
     if (error != ERR_OK) {
         FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
-        HILOG_ERROR("fail, Failed to add form renderer");
+        HILOG_ERROR("%{public}s fail, Failed to add form renderer", __func__);
         return;
     }
 
-    HILOG_INFO("end");
+    HILOG_INFO("%{public}s end", __func__);
 }
 
 void FormTaskMgr::PostStopRenderingForm(
@@ -841,18 +841,18 @@ void FormTaskMgr::PostStopRenderingForm(
         FormTaskMgr::GetInstance().StopRenderingForm(formRecord, want, remoteObject);
     };
     eventHandler_->PostTask(deleterenderForm, FORM_TASK_DELAY_TIME);
-    HILOG_INFO("end");
+    HILOG_INFO("%{public}s end", __func__);
 }
 
 void FormTaskMgr::StopRenderingForm(
     const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("begin");
+    HILOG_INFO("%{public}s begin", __func__);
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormRender> remoteFormDeleteRender = iface_cast<IFormRender>(remoteObject);
     if (remoteFormDeleteRender == nullptr) {
         FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
-        HILOG_ERROR("fail, Failed to get form render proxy.");
+        HILOG_ERROR("%{public}s fail, Failed to get form render proxy.", __func__);
         return;
     }
 
@@ -860,11 +860,11 @@ void FormTaskMgr::StopRenderingForm(
     int32_t error = remoteFormDeleteRender->StopRenderingForm(formJsInfo, want, FormSupplyCallback::GetInstance());
     if (error != ERR_OK) {
         FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
-        HILOG_ERROR("fail, Failed to add form renderer");
+        HILOG_ERROR("%{public}s fail, Failed to add form renderer", __func__);
         return;
     }
 
-    HILOG_INFO("end");
+    HILOG_INFO("%{public}s end", __func__);
 }
 
 void FormTaskMgr::ReloadForm(const std::vector<int64_t> &&formIds, const Want &want,

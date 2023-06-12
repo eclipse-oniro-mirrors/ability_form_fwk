@@ -56,14 +56,14 @@ FormTimerMgr::~FormTimerMgr()
  */
 bool FormTimerMgr::AddFormTimer(const FormTimer &task)
 {
-    HILOG_INFO("formId:%{public}s userId:%{public}d",
+    HILOG_INFO("%{public}s formId:%{public}s userId:%{public}d", __func__,
         std::to_string(task.formId).c_str(), task.userId);
     if (task.isUpdateAt) {
         if (task.hour >= Constants::MIN_TIME && task.hour <= Constants::MAX_HOUR &&
             task.min >= Constants::MIN_TIME && task.min <= Constants::MAX_MINUTE) {
             return AddUpdateAtTimer(task);
         } else {
-            HILOG_ERROR("failed, update at time is invalid");
+            HILOG_ERROR("%{public}s failed, update at time is invalid", __func__);
             return false;
         }
     } else {
@@ -72,7 +72,7 @@ bool FormTimerMgr::AddFormTimer(const FormTimer &task)
             task.period % (Constants::MIN_PERIOD / timeSpeed_) == 0) {
             return AddIntervalTimer(task);
         } else {
-            HILOG_ERROR("failed, interval time is invalid");
+            HILOG_ERROR("%{public}s failed, interval time is invalid", __func__);
             return false;
         }
     }
@@ -444,7 +444,7 @@ bool FormTimerMgr::AddUpdateAtTimer(const FormTimer &task)
  */
 bool FormTimerMgr::AddIntervalTimer(const FormTimer &task)
 {
-    HILOG_INFO("start");
+    HILOG_INFO("add interval timer");
     {
         std::lock_guard<std::recursive_mutex> lock(intervalMutex_);
         EnsureInitIntervalTimer();
@@ -455,7 +455,7 @@ bool FormTimerMgr::AddIntervalTimer(const FormTimer &task)
         intervalTimerTasks_.emplace(task.formId, task);
     }
     if (!UpdateLimiterAlarm()) {
-        HILOG_ERROR("failed to UpdateLimiterAlarm");
+        HILOG_ERROR("%{public}s, failed to UpdateLimiterAlarm", __func__);
         return false;
     }
     return refreshLimiter_.AddItem(task.formId);

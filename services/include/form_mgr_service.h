@@ -447,6 +447,29 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode RegisterRemoveObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken) override;
+
+    /**
+     * @brief Update proxy form with formId.
+     * @param formId The Id of the form to update.
+     * @param FormProviderData Form binding data.
+     * @param std::vector<FormDataProxy> Form proxy vector.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UpdateProxyForm(int64_t formId, const FormProviderData &FormProviderData,
+        const std::vector<FormDataProxy> &formDataProxies) override;
+
+    /**
+     * @brief Request to publish a proxy form to the form host.
+     * @param want The want of the form to publish.
+     * @param withFormBindingData Indicates whether the formBindingData is carried with.
+     * @param formBindingData Indicates the form data.
+     * @param formId Return the form id to be published.
+     * @param std::vector<FormDataProxy> Form proxy vector.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RequestPublishProxyForm(Want &want, bool withFormBindingData,
+        std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
+        const std::vector<FormDataProxy> &formDataProxies) override;
 private:
     enum class DumpKey {
         KEY_DUMP_HELP = 0,

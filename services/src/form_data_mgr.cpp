@@ -21,6 +21,7 @@
 #include "form_bms_helper.h"
 #include "form_cache_mgr.h"
 #include "form_constants.h"
+#include "form_data_proxy_mgr.h"
 #include "form_mgr_errors.h"
 #include "form_observer_record.h"
 #include "form_provider_mgr.h"
@@ -75,7 +76,7 @@ FormRecord FormDataMgr::AllotFormRecord(const FormItemInfo &formInfo, const int 
             }
         }
     }
-    HILOG_INFO("end");
+    HILOG_INFO("%{public}s end", __func__);
     return record;
 }
 /**
@@ -184,9 +185,10 @@ FormRecord FormDataMgr::CreateFormRecord(const FormItemInfo &formInfo, const int
         callingUid) == newRecord.formUserUids.end()) {
         newRecord.formUserUids.emplace_back(callingUid);
     }
+    newRecord.isDataProxy = formInfo.GetDataProxyFlag();
 
     formInfo.GetHapSourceDirs(newRecord.hapSourceDirs);
-    HILOG_INFO("end");
+    HILOG_INFO("%{public}s end", __func__);
     return newRecord;
 }
 /**
@@ -518,7 +520,7 @@ bool FormDataMgr::DeleteHostRecord(const sptr<IRemoteObject> &callerToken, const
             break;
         }
     }
-    HILOG_INFO("end");
+    HILOG_INFO("%{public}s end", __func__);
     return true;
 }
 /**
@@ -594,6 +596,7 @@ void FormDataMgr::HandleHostDied(const sptr<IRemoteObject> &remoteHost)
         std::map<int64_t, FormRecord>::iterator itFormRecord;
         for (itFormRecord = formRecords_.begin(); itFormRecord != formRecords_.end();) {
             int64_t formId = itFormRecord->first;
+            FormDataProxyMgr::GetInstance().UnsubscribeFormData(formId);
             // if temp form, remove it
             if (std::find(recordTempForms.begin(), recordTempForms.end(), formId) != recordTempForms.end()) {
                 FormRecord formRecord = itFormRecord->second;

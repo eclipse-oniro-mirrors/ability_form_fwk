@@ -96,7 +96,7 @@ std::string FormProviderData::GetDataString() const
 {
     HILOG_INFO("get data string");
     std::string dataStr = jsonFormProviderData_.empty() ? "" : jsonFormProviderData_.dump();
-    HILOG_DEBUG("data: %{private}s", dataStr.c_str());
+    HILOG_DEBUG("%{public}s, data: %{private}s", __func__, dataStr.c_str());
     return dataStr;
 }
 
