@@ -69,6 +69,22 @@ void GetParcelableInfos(MessageParcel &reply, std::vector<FormInfo> &parcelableI
     }
 }
 
+bool WriteFormDataProxies(MessageParcel &data, const std::vector<FormDataProxy> &formDataProxies)
+{
+    if (!data.WriteInt32(formDataProxies.size())) {
+        return false;
+    }
+    for (const auto &formDataProxy : formDataProxies) {
+        if (!data.WriteString16(Str8ToStr16(formDataProxy.key))) {
+            return false;
+        }
+        if (!data.WriteString16(Str8ToStr16(formDataProxy.subscribeId))) {
+            return false;
+        }
+    }
+    return true;
+}
+
 /**
  * @tc.name: FormMgrStubTest_0001
  * @tc.desc: Verify HandleGetFormsInfo
@@ -2239,5 +2255,65 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0090, TestSize.Level1) {
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0090 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_0091
+ * @tc.name: Verify OnRemoteRequest and HandleUpdateProxyForm
+ * @tc.desc: When the parameter code is FORM_MGR_UPDATE_PROXY_FORM, the interface return value is ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0091, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0091 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr int64_t formId = 1;
+    const FormProviderData formProviderData = {};
+    std::vector<FormDataProxy> formDataProxies;
+    FormDataProxy formDataProxy("test", "0091");
+    formDataProxies.push_back(formDataProxy);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UPDATE_PROXY_FORM);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    data.WriteInt64(formId);
+    data.WriteParcelable(&formProviderData);
+    WriteFormDataProxies(data, formDataProxies);
+    EXPECT_CALL(*mockFormMgrService, UpdateProxyForm(_, _, _))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0091 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_0092
+ * @tc.name: Verify OnRemoteRequest and HandleRequestPublishProxyForm
+ * @tc.desc: When the parameter code is FORM_MGR_REQUEST_PUBLISH_PROXY_FORM, the interface return value is ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0092, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0092 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    const Want want = {};
+    constexpr bool withFormBindingData = true;
+    const FormProviderData formProviderData = {};
+        std::vector<FormDataProxy> formDataProxies;
+    FormDataProxy formDataProxy("test", "0092");
+    formDataProxies.push_back(formDataProxy);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_PROXY_FORM);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    data.WriteParcelable(&want);
+    data.WriteBool(withFormBindingData);
+    data.WriteParcelable(&formProviderData);
+    WriteFormDataProxies(data, formDataProxies);
+    EXPECT_CALL(*mockFormMgrService, RequestPublishProxyForm(_, _, _, _, _))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0092 ends";
 }
 }
