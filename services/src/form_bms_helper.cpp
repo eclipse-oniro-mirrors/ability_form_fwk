@@ -103,17 +103,17 @@ void FormBmsHelper::SetEcologicalRuleMgr(const sptr<IEcologicalRuleManager> &eco
  */
 void FormBmsHelper::NotifyModuleRemovable(const std::string &bundleName, const std::string &moduleName)
 {
-    HILOG_INFO("%{public}s, bundleName:%{public}s, moduleName:%{public}s",
-        __func__, bundleName.c_str(), moduleName.c_str());
+    HILOG_INFO("notify module removable, bundleName:%{public}s, moduleName:%{public}s",
+        bundleName.c_str(), moduleName.c_str());
     if (bundleName.empty() || moduleName.empty()) {
         return;
     }
 
     std::string key = GenerateModuleKey(bundleName, moduleName);
-    HILOG_INFO("%{public}s, begin to notify %{public}s removable", __func__, key.c_str());
+    HILOG_INFO("begin to notify %{public}s removable", key.c_str());
     sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
     if (iBundleMgr == nullptr) {
-        HILOG_ERROR("%{public}s, failed to get IBundleMgr.", __func__);
+        HILOG_ERROR("failed to get IBundleMgr.");
         return;
     }
 

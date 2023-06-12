@@ -473,7 +473,7 @@ ErrCode FormMgrAdapter::HandleDeleteTempForm(const int64_t formId, const sptr<IR
  */
 ErrCode FormMgrAdapter::HandleDeleteFormCache(FormRecord &dbRecord, const int uid, const int64_t formId)
 {
-    HILOG_DEBUG("%{public}s, delete formDBRecords, formId: %{public}" PRId64 "", __func__, formId);
+    HILOG_DEBUG("delete formDBRecords, formId: %{public}" PRId64 "", formId);
     auto iter = std::find(dbRecord.formUserUids.begin(), dbRecord.formUserUids.end(), uid);
     if (iter != dbRecord.formUserUids.end()) {
         dbRecord.formUserUids.erase(iter);
@@ -491,7 +491,7 @@ ErrCode FormMgrAdapter::HandleDeleteFormCache(FormRecord &dbRecord, const int ui
             return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
         }
         if (result = FormDbCache::GetInstance().DeleteFormInfo(formId); result != ERR_OK) {
-            HILOG_ERROR("%{public}s, failed to remove db data", __func__);
+            HILOG_ERROR("failed to remove db data");
             return result;
         }
 
@@ -525,7 +525,7 @@ int FormMgrAdapter::UpdateForm(const int64_t formId, const std::string &bundleNa
     const FormProviderData &formProviderData, const std::vector<FormDataProxy> &formDataProxies)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_INFO("%{public}s start.", __func__);
+    HILOG_INFO("UpdateForm start.");
 
     // check formId and bundleName
     if (formId <= 0 || bundleName.empty()) {
@@ -993,7 +993,7 @@ ErrCode FormMgrAdapter::GetFormConfigInfo(const Want &want, FormItemInfo &formCo
 ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
     const sptr<IRemoteObject> &callerToken, const WantParams &wantParams, FormJsInfo &formInfo)
 {
-    HILOG_INFO("called.");
+    HILOG_INFO("allot form by id.");
     int64_t formId = FormDataMgr::GetInstance().PaddingUdidHash(info.GetFormId());
     FormRecord record;
     bool hasRecord = FormDataMgr::GetInstance().GetFormRecord(formId, record);
@@ -1040,7 +1040,7 @@ ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
 ErrCode FormMgrAdapter::AddExistFormRecord(const FormItemInfo &info, const sptr<IRemoteObject> &callerToken,
     const FormRecord &record, const int64_t formId, const WantParams &wantParams, FormJsInfo &formInfo)
 {
-    HILOG_INFO("%{public}s call, formId:%{public}" PRId64 "", __func__, formId);
+    HILOG_INFO("add exist formRecord, formId:%{public}" PRId64 "", formId);
     // allot form host record
     int callingUid = IPCSkeleton::GetCallingUid();
     bool isCreated = FormDataMgr::GetInstance().AllotFormHostRecord(info, callerToken, formId, callingUid);
@@ -1142,7 +1142,7 @@ ErrCode FormMgrAdapter::AllotFormByInfo(const FormItemInfo &info,
 ErrCode FormMgrAdapter::AddNewFormRecord(const FormItemInfo &info, const int64_t formId,
     const sptr<IRemoteObject> &callerToken, const WantParams &wantParams, FormJsInfo &formInfo)
 {
-    HILOG_INFO("%{public}s start", __func__);
+    HILOG_INFO("add new formRecord");
     FormItemInfo newInfo(info);
     newInfo.SetFormId(formId);
     // allot form host record
@@ -1192,7 +1192,7 @@ ErrCode FormMgrAdapter::AddNewFormRecord(const FormItemInfo &info, const int64_t
  */
 ErrCode FormMgrAdapter::AddFormTimer(const FormRecord &formRecord)
 {
-    HILOG_INFO("%{public}s start", __func__);
+    HILOG_INFO("add form timer start");
     if (!formRecord.isEnableUpdate || formRecord.formTempFlag) {
         HILOG_INFO("%{public}s isEnableUpdate:%{public}d formTempFlag:%{public}d.",
             __func__, formRecord.isEnableUpdate, formRecord.formTempFlag);

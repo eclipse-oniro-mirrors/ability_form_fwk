@@ -63,10 +63,10 @@ int FormMgr::AddForm(
     const sptr<IRemoteObject> &callerToken,
     FormJsInfo &formInfo)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("AddForm.");
     int errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
+        HILOG_ERROR("AddForm failed errCode:%{public}d.", errCode);
         return errCode;
     }
     return remoteProxy_->AddForm(formId, want, callerToken, formInfo);
@@ -80,21 +80,21 @@ int FormMgr::AddForm(
  */
 int FormMgr::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("delete form");
     // check fms recover status
     if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
-        HILOG_ERROR("%{public}s error, form is in recover status, can't do action on form.", __func__);
+        HILOG_ERROR("delete form failed, form is in recover status, can't do action on form.");
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
     }
     // check formId
     if (formId <= 0) {
-        HILOG_ERROR("%{public}s error, the passed in formId can't be negative or zero.", __func__);
+        HILOG_ERROR("delete form failed, the passed in formId can't be negative or zero.");
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
 
     int errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
+        HILOG_ERROR("delete form failed, errCode:%{public}d.", errCode);
         return errCode;
     }
     FormCallerMgr::GetInstance().RemoveFormHostCaller(formId);
@@ -169,27 +169,27 @@ int FormMgr::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> &caller
 int FormMgr::UpdateForm(const int64_t formId, const FormProviderData &formBindingData,
     const std::vector<FormDataProxy> &formDataProxies)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("UpdateForm called.");
 
     if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
-        HILOG_ERROR("%{public}s error, form is in recover status, can't do action on form.", __func__);
+        HILOG_ERROR("UpdateForm failed, form is in recover status, can't do action on form.");
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
     }
 
     if (formId <= 0) {
-        HILOG_ERROR("%{public}s error, the passed in formId can't be negative or zero.", __func__);
+        HILOG_ERROR(" UpdateForm failed, the passed in formId can't be negative or zero.");
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
 
     // check formBindingData
     if (formBindingData.GetDataString().empty() && formDataProxies.empty()) {
-        HILOG_ERROR("%{public}s error, the formProviderData is null.", __func__);
+        HILOG_ERROR("UpdateForm failed, the formProviderData is null.");
         return ERR_APPEXECFWK_FORM_PROVIDER_DATA_EMPTY;
     }
 
     int errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
+        HILOG_ERROR("UpdateForm failed errCode:%{public}d.", errCode);
         return errCode;
     }
 
@@ -502,7 +502,7 @@ int FormMgr::LifecycleUpdate(
  */
 int FormMgr::GetRecoverStatus()
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("get recover status");
     return recoverStatus_;
 }
 

@@ -765,7 +765,7 @@ void FormTaskMgr::AcquireFormDataBack(const AAFwk::WantParams &wantParams,
  */
 FormJsInfo FormTaskMgr::CreateFormJsInfo(const int64_t formId, const FormRecord &record)
 {
-    HILOG_INFO("%{public}s start", __func__);
+    HILOG_INFO("create formJsInfo");
     FormJsInfo form;
     form.formId = formId;
     form.bundleName = record.bundleName;
@@ -793,7 +793,7 @@ void FormTaskMgr::FormShareSendResponse(int64_t formShareRequestCode, int32_t re
 void FormTaskMgr::PostRenderForm(const FormRecord &formRecord, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("%{public}s start", __func__);
+    HILOG_INFO("PostRenderForm");
     if (eventHandler_ == nullptr) {
         HILOG_ERROR("eventHandler_ is nullptr.");
         return;
@@ -808,7 +808,7 @@ void FormTaskMgr::PostRenderForm(const FormRecord &formRecord, const Want &want,
 
 void FormTaskMgr::RenderForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("%{public}s begin", __func__);
+    HILOG_INFO("render form");
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormRender> remoteFormRender = iface_cast<IFormRender>(remoteObject);
     if (remoteFormRender == nullptr) {
@@ -831,7 +831,7 @@ void FormTaskMgr::RenderForm(const FormRecord &formRecord, const Want &want, con
 void FormTaskMgr::PostStopRenderingForm(
     const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("%{public}s start", __func__);
+    HILOG_INFO("PostStopRenderingForm");
     if (eventHandler_ == nullptr) {
         HILOG_ERROR("eventHandler_ is nullptr.");
         return;

@@ -114,7 +114,7 @@ bool FormTimerMgr::AddFormTimer(int64_t formId, long updateAtHour, long updateAt
  */
 bool FormTimerMgr::RemoveFormTimer(int64_t formId)
 {
-    HILOG_INFO("%{public}s, task: %{public}" PRId64 "", __func__, formId);
+    HILOG_INFO("remove form timer, task: %{public}" PRId64 "", formId);
 
     if (!DeleteIntervalTimer(formId)) {
         if (!DeleteUpdateAtTimer(formId)) {
@@ -444,7 +444,7 @@ bool FormTimerMgr::AddUpdateAtTimer(const FormTimer &task)
  */
 bool FormTimerMgr::AddIntervalTimer(const FormTimer &task)
 {
-    HILOG_INFO("%{public}s start", __func__);
+    HILOG_INFO("add interval timer");
     {
         std::lock_guard<std::recursive_mutex> lock(intervalMutex_);
         EnsureInitIntervalTimer();
