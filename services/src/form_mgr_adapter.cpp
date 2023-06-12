@@ -293,7 +293,6 @@ int FormMgrAdapter::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> 
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
     // remove connection for in application form
     FormSupplyCallback::GetInstance()->RemoveConnection(matchedFormId, callerToken);
-    FormDataProxyMgr::GetInstance().UnsubscribeFormData(matchedFormId);
     if (FormDataMgr::GetInstance().ExistTempForm(matchedFormId)) {
         // delete temp form if receive release form call
         return HandleDeleteTempForm(matchedFormId, callerToken);
