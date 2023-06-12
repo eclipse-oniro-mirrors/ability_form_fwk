@@ -765,7 +765,7 @@ void FormTaskMgr::AcquireFormDataBack(const AAFwk::WantParams &wantParams,
  */
 FormJsInfo FormTaskMgr::CreateFormJsInfo(const int64_t formId, const FormRecord &record)
 {
-    HILOG_INFO("%{public}s start", __func__);
+    HILOG_INFO("create formJsInfo");
     FormJsInfo form;
     form.formId = formId;
     form.bundleName = record.bundleName;
@@ -793,7 +793,7 @@ void FormTaskMgr::FormShareSendResponse(int64_t formShareRequestCode, int32_t re
 void FormTaskMgr::PostRenderForm(const FormRecord &formRecord, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("%{public}s start", __func__);
+    HILOG_INFO("PostRenderForm");
     if (eventHandler_ == nullptr) {
         HILOG_ERROR("eventHandler_ is nullptr.");
         return;
@@ -803,17 +803,17 @@ void FormTaskMgr::PostRenderForm(const FormRecord &formRecord, const Want &want,
         FormTaskMgr::GetInstance().RenderForm(formRecord, want, remoteObject);
     };
     eventHandler_->PostTask(renderForm, FORM_TASK_DELAY_TIME);
-    HILOG_INFO("%{public}s end", __func__);
+    HILOG_INFO("end");
 }
 
 void FormTaskMgr::RenderForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("%{public}s begin", __func__);
+    HILOG_INFO("render form");
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormRender> remoteFormRender = iface_cast<IFormRender>(remoteObject);
     if (remoteFormRender == nullptr) {
         FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
-        HILOG_ERROR("%{public}s fail, Failed to get form render proxy.", __func__);
+        HILOG_ERROR("fail, Failed to get form render proxy.");
         return;
     }
 
@@ -821,17 +821,17 @@ void FormTaskMgr::RenderForm(const FormRecord &formRecord, const Want &want, con
     int32_t error = remoteFormRender->RenderForm(formJsInfo, want, FormSupplyCallback::GetInstance());
     if (error != ERR_OK) {
         FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
-        HILOG_ERROR("%{public}s fail, Failed to add form renderer", __func__);
+        HILOG_ERROR("fail, Failed to add form renderer");
         return;
     }
 
-    HILOG_INFO("%{public}s end", __func__);
+    HILOG_INFO("end");
 }
 
 void FormTaskMgr::PostStopRenderingForm(
     const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("%{public}s start", __func__);
+    HILOG_INFO("PostStopRenderingForm");
     if (eventHandler_ == nullptr) {
         HILOG_ERROR("eventHandler_ is nullptr.");
         return;
@@ -841,18 +841,18 @@ void FormTaskMgr::PostStopRenderingForm(
         FormTaskMgr::GetInstance().StopRenderingForm(formRecord, want, remoteObject);
     };
     eventHandler_->PostTask(deleterenderForm, FORM_TASK_DELAY_TIME);
-    HILOG_INFO("%{public}s end", __func__);
+    HILOG_INFO("end");
 }
 
 void FormTaskMgr::StopRenderingForm(
     const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("%{public}s begin", __func__);
+    HILOG_INFO("begin");
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormRender> remoteFormDeleteRender = iface_cast<IFormRender>(remoteObject);
     if (remoteFormDeleteRender == nullptr) {
         FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
-        HILOG_ERROR("%{public}s fail, Failed to get form render proxy.", __func__);
+        HILOG_ERROR("fail, Failed to get form render proxy.");
         return;
     }
 
@@ -860,11 +860,11 @@ void FormTaskMgr::StopRenderingForm(
     int32_t error = remoteFormDeleteRender->StopRenderingForm(formJsInfo, want, FormSupplyCallback::GetInstance());
     if (error != ERR_OK) {
         FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
-        HILOG_ERROR("%{public}s fail, Failed to add form renderer", __func__);
+        HILOG_ERROR("fail, Failed to add form renderer");
         return;
     }
 
-    HILOG_INFO("%{public}s end", __func__);
+    HILOG_INFO("end");
 }
 
 void FormTaskMgr::ReloadForm(const std::vector<int64_t> &&formIds, const Want &want,

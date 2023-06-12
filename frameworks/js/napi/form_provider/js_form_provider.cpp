@@ -254,7 +254,7 @@ NativeValue *JsFormProvider::UpdateForm(NativeEngine *engine, NativeCallbackInfo
 
 NativeValue *JsFormProvider::OnUpdateForm(NativeEngine &engine, NativeCallbackInfo &info)
 {
-    HILOG_DEBUG("%{public}s is called", __FUNCTION__);
+    HILOG_DEBUG("called");
     auto env = reinterpret_cast<napi_env>(&engine);
     if (info.argc < ARGS_SIZE_TWO || info.argc > ARGS_SIZE_THREE) {
         HILOG_ERROR("wrong number of arguments.");

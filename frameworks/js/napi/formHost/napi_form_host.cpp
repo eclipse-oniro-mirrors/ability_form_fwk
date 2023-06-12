@@ -1252,7 +1252,7 @@ NativeValue* NapiFormHost::OnGetFormsInfo(NativeEngine &engine, NativeCallbackIn
 
 NativeValue* NapiFormHost::OnDeleteForm(NativeEngine &engine, NativeCallbackInfo &info)
 {
-    HILOG_DEBUG("%{public}s called.", __func__);
+    HILOG_DEBUG("called.");
 
     int32_t errCode = ERR_OK;
     int64_t formId = 0;

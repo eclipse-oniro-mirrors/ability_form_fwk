@@ -47,13 +47,13 @@ bool FormRefreshLimiter::AddItem(const int64_t formId)
  */
 void FormRefreshLimiter::DeleteItem(const int64_t formId)
 {
-    HILOG_INFO("%{public}s start", __func__);
+    HILOG_INFO("delete item");
     std::lock_guard<std::mutex> lock(limiterMutex_);
     auto info = limiterMap_.find(formId);
     if (info != limiterMap_.end()) {
         limiterMap_.erase(formId);
     }
-    HILOG_INFO("%{public}s end", __func__);
+    HILOG_INFO("end");
 }
 /**
  * @brief Reset limit info.

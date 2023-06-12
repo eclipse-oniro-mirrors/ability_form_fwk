@@ -172,7 +172,7 @@ int FormMgrService::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
 
     ErrCode ret = CheckFormPermission();
     if (ret != ERR_OK) {
-        HILOG_ERROR("%{public}s fail, delete form permission denied", __func__);
+        HILOG_ERROR("failed, delete form permission denied");
         return ret;
     }
     FormEventInfo eventInfo;
@@ -241,7 +241,7 @@ int FormMgrService::UpdateForm(const int64_t formId, const FormProviderData &for
     std::string callerBundleName;
     auto ret = FormBmsHelper::GetInstance().GetCallerBundleName(callerBundleName);
     if (ret != ERR_OK) {
-        HILOG_ERROR("%{public}s fail, get caller bundle name failed", __func__);
+        HILOG_ERROR("fail, get caller bundle name failed");
         return ret;
     }
     return FormMgrAdapter::GetInstance().UpdateForm(formId, callerBundleName, formBindingData);

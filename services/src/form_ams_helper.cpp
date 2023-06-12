@@ -67,10 +67,10 @@ sptr<AAFwk::IAbilityManager> FormAmsHelper::GetAbilityManager()
 ErrCode FormAmsHelper::ConnectServiceAbility(
     const Want &want, const sptr<AAFwk::IAbilityConnection> &connect)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("connect service ability");
     sptr<AAFwk::IAbilityManager> ams = GetAbilityManager();
     if (ams == nullptr) {
-        HILOG_ERROR("%{public}s:ability service not connect", __func__);
+        HILOG_ERROR("ability service not connect");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     return IN_PROCESS_CALL(ams->ConnectAbility(want, connect, nullptr));

@@ -64,17 +64,17 @@ void FormDbCache::Start()
  */
 ErrCode FormDbCache::SaveFormInfo(const FormDBInfo &formDBInfo)
 {
-    HILOG_INFO("%{public}s called, formId:%{public}" PRId64 "", __func__, formDBInfo.formId);
+    HILOG_INFO("save formInfo, formId:%{public}" PRId64 "", formDBInfo.formId);
     std::lock_guard<std::mutex> lock(formDBInfosMutex_);
     auto iter = find(formDBInfos_.begin(), formDBInfos_.end(), formDBInfo);
     if (iter != formDBInfos_.end()) {
         if (iter->Compare(formDBInfo) == false) {
-            HILOG_WARN("%{public}s, need update, formId[%{public}" PRId64 "].", __func__, formDBInfo.formId);
+            HILOG_WARN("need update, formId[%{public}" PRId64 "].", formDBInfo.formId);
             *iter = formDBInfo;
             InnerFormInfo innerFormInfo(formDBInfo);
             return FormInfoRdbStorageMgr::GetInstance().ModifyStorageFormData(innerFormInfo);
         } else {
-            HILOG_WARN("%{public}s, already exist, formId[%{public}" PRId64 "].", __func__, formDBInfo.formId);
+            HILOG_WARN("already exist, formId[%{public}" PRId64 "].", formDBInfo.formId);
             return ERR_OK;
         }
     } else {
@@ -117,6 +117,7 @@ ErrCode FormDbCache::SaveFormInfoNolock(const FormDBInfo &formDBInfo)
  */
 ErrCode FormDbCache::DeleteFormInfo(int64_t formId)
 {
+    HILOG_INFO("delete form info");
     std::lock_guard<std::mutex> lock(formDBInfosMutex_);
     FormDBInfo tmpForm;
     tmpForm.formId = formId;

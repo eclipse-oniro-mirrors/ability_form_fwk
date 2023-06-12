@@ -52,7 +52,7 @@ ErrCode FormRenderMgr::RenderForm(
     }
 
     if (formRecord.formId <= 0) {
-        HILOG_ERROR("%{public}s fail, formId should be greater than 0.", __func__);
+        HILOG_ERROR("fail, formId should be greater than 0.");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
@@ -113,7 +113,7 @@ ErrCode FormRenderMgr::RenderForm(
     }
     ErrCode errorCode = ConnectRenderService(formRenderConnection);
     if (errorCode != ERR_OK) {
-        HILOG_ERROR("%{public}s fail, ConnectServiceAbility failed.", __func__);
+        HILOG_ERROR("fail, ConnectServiceAbility failed.");
         HandleConnectFailed(formRecord.formId, errorCode);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
@@ -127,7 +127,7 @@ ErrCode FormRenderMgr::UpdateRenderingForm(int64_t formId, const FormProviderDat
     FormRecord formRecord;
     bool isGetFormRecord = FormDataMgr::GetInstance().GetFormRecord(formId, formRecord);
     if (!isGetFormRecord) {
-        HILOG_ERROR("%{public}s fail, not exist such form, formId:%{public}" PRId64 "", __func__, formId);
+        HILOG_ERROR("fail, not exist such form, formId:%{public}" PRId64 "", formId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
     if (mergeData) {
@@ -143,7 +143,7 @@ ErrCode FormRenderMgr::UpdateRenderingForm(int64_t formId, const FormProviderDat
 
     if (formRecord.formProviderInfo.NeedCache()) {
         std::string jsonData = formRecord.formProviderInfo.GetFormDataString();
-        HILOG_DEBUG("%{public}s, jsonData is %{private}s.", __func__, jsonData.c_str());
+        HILOG_DEBUG("jsonData is %{private}s.", jsonData.c_str());
         FormCacheMgr::GetInstance().AddData(formId, jsonData);
     }
     FormDataMgr::GetInstance().SetFormCacheInited(formId, true);
@@ -163,7 +163,7 @@ ErrCode FormRenderMgr::UpdateRenderingForm(int64_t formId, const FormProviderDat
                 return ERR_APPEXECFWK_FORM_INVALID_PARAM;
             }
             if (renderRemoteObj_ == nullptr) {
-                HILOG_ERROR("%{public}s, renderRemoteObj_ is nullptr", __func__);
+                HILOG_ERROR("renderRemoteObj_ is nullptr");
                 return ERR_APPEXECFWK_FORM_INVALID_PARAM;
             }
             auto remoteObject = renderRemoteObj_->AsObject();

@@ -56,14 +56,14 @@ FormTimerMgr::~FormTimerMgr()
  */
 bool FormTimerMgr::AddFormTimer(const FormTimer &task)
 {
-    HILOG_INFO("%{public}s formId:%{public}s userId:%{public}d", __func__,
+    HILOG_INFO("formId:%{public}s userId:%{public}d",
         std::to_string(task.formId).c_str(), task.userId);
     if (task.isUpdateAt) {
         if (task.hour >= Constants::MIN_TIME && task.hour <= Constants::MAX_HOUR &&
             task.min >= Constants::MIN_TIME && task.min <= Constants::MAX_MINUTE) {
             return AddUpdateAtTimer(task);
         } else {
-            HILOG_ERROR("%{public}s failed, update at time is invalid", __func__);
+            HILOG_ERROR("failed, update at time is invalid");
             return false;
         }
     } else {
@@ -72,7 +72,7 @@ bool FormTimerMgr::AddFormTimer(const FormTimer &task)
             task.period % (Constants::MIN_PERIOD / timeSpeed_) == 0) {
             return AddIntervalTimer(task);
         } else {
-            HILOG_ERROR("%{public}s failed, interval time is invalid", __func__);
+            HILOG_ERROR("failed, interval time is invalid");
             return false;
         }
     }
@@ -114,7 +114,7 @@ bool FormTimerMgr::AddFormTimer(int64_t formId, long updateAtHour, long updateAt
  */
 bool FormTimerMgr::RemoveFormTimer(int64_t formId)
 {
-    HILOG_INFO("%{public}s, task: %{public}" PRId64 "", __func__, formId);
+    HILOG_INFO("remove form timer, task: %{public}" PRId64 "", formId);
 
     if (!DeleteIntervalTimer(formId)) {
         if (!DeleteUpdateAtTimer(formId)) {
@@ -444,7 +444,7 @@ bool FormTimerMgr::AddUpdateAtTimer(const FormTimer &task)
  */
 bool FormTimerMgr::AddIntervalTimer(const FormTimer &task)
 {
-    HILOG_INFO("%{public}s start", __func__);
+    HILOG_INFO("start");
     {
         std::lock_guard<std::recursive_mutex> lock(intervalMutex_);
         EnsureInitIntervalTimer();
@@ -455,7 +455,7 @@ bool FormTimerMgr::AddIntervalTimer(const FormTimer &task)
         intervalTimerTasks_.emplace(task.formId, task);
     }
     if (!UpdateLimiterAlarm()) {
-        HILOG_ERROR("%{public}s, failed to UpdateLimiterAlarm", __func__);
+        HILOG_ERROR("failed to UpdateLimiterAlarm");
         return false;
     }
     return refreshLimiter_.AddItem(task.formId);
