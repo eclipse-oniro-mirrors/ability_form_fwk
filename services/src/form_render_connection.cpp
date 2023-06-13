@@ -78,6 +78,7 @@ void FormRenderConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName
         element.GetURI().c_str(), resultCode, connectState_);
     // If connectState_ is CONNECTING, it means connect failed, need to notify host 
     if (resultCode && connectState_ == ConnectState::CONNECTING) {
+        FormRenderMgr::GetInstance().RemoveConnection(GetFormId());
         FormRenderMgr::GetInstance().HandleConnectFailed(
             formRecord_.formId, ERR_APPEXECFWK_FORM_CONNECT_FORM_RENDER_FAILED);
     }

@@ -318,6 +318,16 @@ ErrCode FormRenderMgr::AddConnection(int64_t formId, sptr<FormRenderConnection> 
     return ERR_OK;
 }
 
+void FormRenderMgr::RemoveConnection(int64_t formId)
+{
+    HILOG_INFO("Call.");
+    std::lock_guard<std::mutex> lock(resourceMutex_);
+    if (renderFormConnections_.find(formId) != renderFormConnections_.end()) {
+        HILOG_DEBUG("Remove connection of formId: %{public}" PRId64 "", formId);
+        renderFormConnections_.erase(formId);
+    }
+}
+
 void FormRenderMgr::RerenderAllForms()
 {
     HILOG_INFO("Render is dead.");

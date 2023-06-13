@@ -1063,3 +1063,54 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_051, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormRenderMgrTest_051 end";
 }
 }
+
+/**
+ * @tc.name: FormRenderMgrTest_052
+ * @tc.desc: test RemoveConnection function and return ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_052, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_052 start";
+    FormRenderMgr formRenderMgr;
+    int64_t formId = 1;
+    formRenderMgr.renderFormConnections_.emplace(formId, nullptr);
+    EXPECT_EQ(1, formRenderMgr.renderFormConnections_.size());
+    formRenderMgr.RemoveConnection(formId);
+    EXPECT_EQ(0, formRenderMgr.renderFormConnections_.size());
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_052 end";
+}
+
+/**
+ * @tc.name: FormRenderMgrTest_053
+ * @tc.desc: test RemoveConnection function and return ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_053, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_053 start";
+    FormRenderMgr formRenderMgr;
+    int64_t formId = 1;
+    EXPECT_EQ(0, formRenderMgr.renderFormConnections_.size());
+    formRenderMgr.RemoveConnection(formId);
+    EXPECT_EQ(0, formRenderMgr.renderFormConnections_.size());
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_053 end";
+}
+
+/**
+ * @tc.name: FormRenderMgrTest_054
+ * @tc.desc: test RemoveConnection function and return ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_054, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_054 start";
+    FormRenderMgr formRenderMgr;
+    int64_t formId = 1;
+    int64_t formIdOther = 2;
+    formRenderMgr.renderFormConnections_.emplace(formId, nullptr);
+    EXPECT_EQ(1, formRenderMgr.renderFormConnections_.size());
+    formRenderMgr.RemoveConnection(formIdOther);
+    EXPECT_EQ(1, formRenderMgr.renderFormConnections_.size());
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_054 end";
+}
