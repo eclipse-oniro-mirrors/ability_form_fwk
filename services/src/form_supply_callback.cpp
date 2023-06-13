@@ -77,8 +77,10 @@ int FormSupplyCallback::OnAcquire(const FormProviderInfo &formProviderInfo, cons
     }
 
     if (FormRenderMgr::GetInstance().IsNeedRender(formId)) {
-        return FormRenderMgr::GetInstance().UpdateRenderingForm(formId, formProviderInfo.GetFormData(),
+        errCode = FormRenderMgr::GetInstance().UpdateRenderingForm(formId, formProviderInfo.GetFormData(),
             want.GetParams(), false);
+        FormDataProxyMgr::GetInstance().SubscribeFormData(formId, formProviderInfo.GetFormProxies());
+        return errCode;
     }
 
     int32_t ret = ERR_APPEXECFWK_FORM_INVALID_PARAM;
