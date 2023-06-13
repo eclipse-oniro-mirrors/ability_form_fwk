@@ -27,7 +27,7 @@
 #include "form_share_mgr.h"
 #undef private
 #include "form_ashmem.h"
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 #include "nlohmann/json.hpp"
 
 using namespace testing::ext;

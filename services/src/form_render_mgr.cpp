@@ -15,6 +15,7 @@
 
 #include "form_render_mgr.h"
 
+#include "fms_log_wrapper.h"
 #include "form_ams_helper.h"
 #include "form_bms_helper.h"
 #include "form_cache_mgr.h"
@@ -27,7 +28,6 @@
 #include "form_task_mgr.h"
 #include "form_trust_mgr.h"
 #include "form_util.h"
-#include "hilog_wrapper.h"
 #include "ipc_skeleton.h"
 #include "want.h"
 

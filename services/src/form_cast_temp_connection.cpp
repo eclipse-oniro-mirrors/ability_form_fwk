@@ -18,10 +18,10 @@
 
 #include <cinttypes>
 
+#include "fms_log_wrapper.h"
 #include "form_constants.h"
 #include "form_supply_callback.h"
 #include "form_task_mgr.h"
-#include "hilog_wrapper.h"
 
 namespace OHOS {
 namespace AppExecFwk {

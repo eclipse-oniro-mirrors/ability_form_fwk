@@ -18,7 +18,7 @@
 #define private public
 #include "form_cache_mgr.h"
 #undef private
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 
 using namespace testing::ext;
 using namespace OHOS;

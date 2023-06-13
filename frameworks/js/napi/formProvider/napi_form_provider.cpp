@@ -18,11 +18,11 @@
 #include <cinttypes>
 #include <vector>
 
+#include "fms_log_wrapper.h"
 #include "form_mgr_errors.h"
 #include "form_mgr.h"
 #include "js_form_info_util.h"
 #include "js_runtime_utils.h"
-#include "hilog_wrapper.h"
 #include "napi_common_util.h"
 #include "napi_common_want.h"
 #include "napi_form_util.h"

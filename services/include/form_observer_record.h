@@ -20,7 +20,7 @@
 #include <singleton.h>
 #include <vector>
 
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 #include "iremote_object.h"
 #include "running_form_info.h"
 

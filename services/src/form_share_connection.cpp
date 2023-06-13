@@ -15,11 +15,12 @@
  */
 
 #include "form_share_connection.h"
+
+#include "fms_log_wrapper.h"
 #include "form_constants.h"
 #include "form_mgr_errors.h"
 #include "form_supply_callback.h"
 #include "form_task_mgr.h"
-#include "hilog_wrapper.h"
 #include "want.h"
 
 namespace OHOS {

@@ -24,7 +24,7 @@
 #include "form_provider_data.h"
 #undef private
 #include "string_ex.h"
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 #include "nlohmann/json.hpp"
 
 using namespace testing::ext;

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 #include "form_item_info.h"
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 
 namespace OHOS {
 namespace AppExecFwk {

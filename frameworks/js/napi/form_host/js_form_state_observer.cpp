@@ -17,8 +17,8 @@
 
 #include <regex>
 
+#include "fms_log_wrapper.h"
 #include "form_mgr_errors.h"
-#include "hilog_wrapper.h"
 #include "js_runtime_utils.h"
 #include "napi_common_util.h"
 #include "napi_form_util.h"

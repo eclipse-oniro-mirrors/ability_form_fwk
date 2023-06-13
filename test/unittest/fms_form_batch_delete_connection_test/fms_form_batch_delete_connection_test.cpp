@@ -20,7 +20,7 @@
 #include "form_event_notify_connection.h"
 #include "form_task_mgr.h"
 #undef private
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 #include "mock_form_provider_client.h"
 #include "gmock/gmock.h"
 

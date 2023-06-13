@@ -15,7 +15,7 @@
  */
 
 #include "appexecfwk_errors.h"
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 #include "ipc_types.h"
 #include "message_parcel.h"
 #include "provider_connect_stub.h"

@@ -17,7 +17,7 @@
 
 #include "form_mgr_adapter.h"
 #include "form_mgr_errors.h"
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 
 namespace {
     int g_enableUpdateForm = OHOS::ERR_OK;

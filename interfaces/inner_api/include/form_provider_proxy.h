@@ -16,8 +16,8 @@
 #ifndef OHOS_FORM_FWK_FORM_PROVIDER_PROXY_H
 #define OHOS_FORM_FWK_FORM_PROVIDER_PROXY_H
 
+#include "fms_log_wrapper.h"
 #include "form_provider_interface.h"
-#include "hilog_wrapper.h"
 #include "iremote_proxy.h"
 
 namespace OHOS {

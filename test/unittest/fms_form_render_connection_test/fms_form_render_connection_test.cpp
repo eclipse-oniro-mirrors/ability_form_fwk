@@ -26,7 +26,7 @@
 #include "form_render_connection.h"
 #undef private
 #include "ipc_types.h"
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 
 using namespace testing::ext;
 using namespace OHOS;

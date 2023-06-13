@@ -16,7 +16,7 @@
 #include <gtest/gtest.h>
 #include "appexecfwk_errors.h"
 #include "errors.h"
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 #include "string_ex.h"
 
 namespace OHOS {

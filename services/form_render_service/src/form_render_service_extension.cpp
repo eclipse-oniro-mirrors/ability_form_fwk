@@ -17,9 +17,9 @@
 
 #include "ability_info.h"
 #include "context_impl.h"
+#include "fms_log_wrapper.h"
 #include "form_render_impl.h"
 #include "hitrace_meter.h"
-#include "hilog_wrapper.h"
 #include "service_extension_context.h"
 
 namespace OHOS {

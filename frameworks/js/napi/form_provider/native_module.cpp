@@ -14,7 +14,7 @@
  */
 #include "napi/native_api.h"
 
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 #include "js_runtime_utils.h"
 #include "napi/native_node_api.h"
 #include "js_form_provider.h"

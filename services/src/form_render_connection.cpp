@@ -17,6 +17,7 @@
 
 #include <cinttypes>
 
+#include "fms_log_wrapper.h"
 #include "form_bms_helper.h"
 #include "form_constants.h"
 #include "form_mgr_errors.h"
@@ -24,7 +25,6 @@
 #include "form_render_mgr.h"
 #include "form_task_mgr.h"
 #include "form_util.h"
-#include "hilog_wrapper.h"
 #include "ipc_skeleton.h"
 #include "want.h"
 

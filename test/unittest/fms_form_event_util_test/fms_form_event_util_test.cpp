@@ -28,7 +28,7 @@
 #undef private
 #include "mock_form_provider_client.h"
 #include "ipc_types.h"
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 
 using namespace testing::ext;
 using namespace OHOS;

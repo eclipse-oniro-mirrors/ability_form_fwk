@@ -22,7 +22,7 @@
 #include "form_render_record.h"
 #undef private
 #include "gmock/gmock.h"
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 #include "js_runtime.h"
 #include "mock_form_provider_client.h"
 #include "want.h"

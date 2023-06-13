@@ -15,8 +15,8 @@
 
 #include "form_dump_mgr.h"
 
+#include "fms_log_wrapper.h"
 #include "form_cache_mgr.h"
-#include "hilog_wrapper.h"
 
 namespace OHOS {
 namespace AppExecFwk {

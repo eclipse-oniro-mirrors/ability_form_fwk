@@ -25,7 +25,7 @@
 #include "form_acquire_connection.h"
 #include "form_host_caller.h"
 #include "form_mgr.h"
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 #include "mock_event_handler.h"
 #include "mock_form_provider_client.h"
 #include "gmock/gmock.h"

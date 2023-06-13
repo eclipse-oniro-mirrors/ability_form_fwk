@@ -20,9 +20,9 @@
 #include <sstream>
 #include <sys/stat.h>
 #include <unistd.h>
+#include "fms_log_wrapper.h"
 #include "form_constants.h"
 #include "form_mgr_errors.h"
-#include "hilog_wrapper.h"
 
 namespace OHOS {
 namespace AppExecFwk {

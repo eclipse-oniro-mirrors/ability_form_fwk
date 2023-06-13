@@ -17,7 +17,7 @@
 
 #include "string_ex.h"
 
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 
 namespace OHOS {
 namespace AppExecFwk {

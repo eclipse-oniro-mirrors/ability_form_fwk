@@ -25,7 +25,7 @@
 #include "form_mgr_service.h"
 #include "form_ams_helper.h"
 #include "form_bms_helper.h"
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 #include "if_system_ability_manager.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"

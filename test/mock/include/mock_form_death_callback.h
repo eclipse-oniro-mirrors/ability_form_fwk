@@ -23,7 +23,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 #include "event_handler.h"
 #include "form_constants.h"
 #include "form_callback_interface.h"

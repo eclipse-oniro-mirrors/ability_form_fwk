@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 #include "mock_form_supply_callback.h"
 
 namespace OHOS {

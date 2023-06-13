@@ -17,6 +17,7 @@
 
 #include <cinttypes>
 
+#include "fms_log_wrapper.h"
 #include "form_ams_helper.h"
 #include "form_constants.h"
 #include "form_data_proxy_mgr.h"
@@ -26,7 +27,6 @@
 #include "form_share_mgr.h"
 #include "form_task_mgr.h"
 #include "form_util.h"
-#include "hilog_wrapper.h"
 #include "hitrace_meter.h"
 
 namespace OHOS {

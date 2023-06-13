@@ -28,7 +28,7 @@
 #include "form_mgr_service.h"
 #include "form_mgr_adapter.h"
 #undef private
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 #include "mock_bundle_manager.h"
 #include "mock_form_host_client.h"
 #include "remote_native_token.h"

@@ -16,7 +16,7 @@
 #include <gtest/gtest.h>
 
 #include "tokenid_kit.h"
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 
 namespace {
 bool g_isSystemAppByFullTokenID = true;

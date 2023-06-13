@@ -15,7 +15,7 @@
 
 #include "form_ashmem.h"
 
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 #include "message_parcel.h"
 
 namespace OHOS {

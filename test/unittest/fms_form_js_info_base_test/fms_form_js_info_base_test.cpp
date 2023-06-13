@@ -25,7 +25,7 @@
 #define protected public
 #include "form_js_info.h"
 #include "form_provider_data.h"
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 #include "nlohmann/json.hpp"
 #undef private
 #undef protected

@@ -14,7 +14,9 @@
  */
 
 #include "form_supply_proxy.h"
+
 #include "appexecfwk_errors.h"
+#include "fms_log_wrapper.h"
 #include "form_constants.h"
 #include "string_ex.h"
 

@@ -69,7 +69,7 @@ ohos_shared_library("formrender") {
     "src/form_render_service_extension.cpp",
   ]
 
-  defines = [ "AMS_LOG_TAG = \"FormRenderService\"" ]
+  defines = [ "FMS_LOG_TAG = \"FormRenderService\"" ]
 
   deps = [ "${form_fwk_path}:form_manager" ]
 

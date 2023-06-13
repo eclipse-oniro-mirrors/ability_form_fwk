@@ -17,6 +17,7 @@
 
 #include <cinttypes>
 
+#include "fms_log_wrapper.h"
 #include "form_ams_helper.h"
 #include "form_batch_delete_connection.h"
 #include "form_cache_mgr.h"
@@ -28,7 +29,6 @@
 #include "form_record.h"
 #include "form_refresh_connection.h"
 #include "form_timer_mgr.h"
-#include "hilog_wrapper.h"
 #ifdef SUPPORT_POWER
 #include "power_mgr_client.h"
 #endif

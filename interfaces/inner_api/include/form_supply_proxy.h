@@ -17,7 +17,6 @@
 #define OHOS_FORM_FWK_FORM_SUPPLY_PROXY_H
 
 #include "form_supply_interface.h"
-#include "hilog_wrapper.h"
 #include "iremote_proxy.h"
 
 namespace OHOS {

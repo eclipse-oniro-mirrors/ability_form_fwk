@@ -16,7 +16,7 @@
 #include <gtest/gtest.h>
 
 #include "accesstoken_kit.h"
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 
 namespace {
 int32_t g_GetTokenTypeFlag = 0;

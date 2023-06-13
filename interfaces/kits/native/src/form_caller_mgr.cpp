@@ -15,8 +15,8 @@
 
 #include "form_caller_mgr.h"
 
+#include "fms_log_wrapper.h"
 #include "form_js_info.h"
-#include "hilog_wrapper.h"
 
 namespace OHOS {
 namespace AppExecFwk {

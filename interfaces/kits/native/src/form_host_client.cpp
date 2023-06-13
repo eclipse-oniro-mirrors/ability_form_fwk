@@ -17,7 +17,7 @@
 
 #include <cinttypes>
 
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 #include "form_constants.h"
 #include "form_caller_mgr.h"
 #include "hitrace_meter.h"

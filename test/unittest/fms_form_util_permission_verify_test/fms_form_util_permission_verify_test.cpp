@@ -21,7 +21,7 @@
 #include "form_mgr_service.h"
 #include "tokenid_kit.h"
 #undef private
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 
 using namespace testing::ext;
 using namespace OHOS;

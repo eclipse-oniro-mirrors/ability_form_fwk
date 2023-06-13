@@ -17,9 +17,9 @@
 
 #include "bundle_event_callback_host.h"
 #include "common_event_support.h"
+#include "fms_log_wrapper.h"
 #include "form_event_handler.h"
 #include "form_event_util.h"
-#include "hilog_wrapper.h"
 
 namespace OHOS {
 namespace AppExecFwk {

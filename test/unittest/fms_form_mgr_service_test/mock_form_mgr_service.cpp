@@ -18,7 +18,7 @@
 #include "form_mgr_service.h"
 #include "form_mgr_errors.h"
 #include "form_util.h"
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 
 namespace {
 bool g_checkAcrossLocalAccountsPermission = true;

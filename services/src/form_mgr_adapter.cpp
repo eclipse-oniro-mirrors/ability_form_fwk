@@ -24,6 +24,7 @@
 #include "bundle_active_client.h"
 #endif
 #include "erms_mgr_interface.h"
+#include "fms_log_wrapper.h"
 #include "form_acquire_connection.h"
 #include "form_acquire_data_connection.h"
 #include "form_acquire_state_connection.h"
@@ -52,7 +53,6 @@
 #include "form_timer_mgr.h"
 #include "form_trust_mgr.h"
 #include "form_util.h"
-#include "hilog_wrapper.h"
 #include "hitrace_meter.h"
 #include "if_system_ability_manager.h"
 #include "in_process_call_wrapper.h"
