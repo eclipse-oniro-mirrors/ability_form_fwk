@@ -100,6 +100,8 @@ ohos_shared_library("libfms") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
 
+  deps = [ "${form_fwk_path}:form_manager" ]
+
   external_deps = [
     "ability_base:base",
     "ability_base:want",
@@ -116,7 +118,6 @@ ohos_shared_library("libfms") {
     "common_event_service:cesfwk_innerkits",
     "data_share:datashare_consumer",
     "eventhandler:libeventhandler",
-    "form_fwk:form_manager",
     "hicollie_native:libhicollie",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
