@@ -296,6 +296,16 @@ public:
      */
     void SetType(const FormType &type);
     /**
+     * @brief Obtains the isDynamic.
+     * @return Returns isDynamic.
+     */
+    bool IsDynamic() const;
+    /**
+     * @brief Set value of isDynamic.
+     * @param isDynamic isDynamic flag.
+     */
+    void SetIsDynamic(bool isDynamic);
+    /**
      * @brief Get uiSyntax.
      * @return uiSyntax.
      */
@@ -340,6 +350,7 @@ private:
     FormType type_ = FormType::JS;
     FormType uiSyntax_ = FormType::JS;
     std::string icon_ = "";
+    bool isDynamic_ = true;
 
     std::string jsComponentName_ = "";
     std::string abilityModuleName_ = "";

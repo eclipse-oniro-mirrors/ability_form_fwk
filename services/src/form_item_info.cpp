@@ -483,6 +483,16 @@ void FormItemInfo::SetType(const FormType &type)
     type_ = type;
 }
 
+bool FormItemInfo::IsDynamic() const
+{
+    return isDynamic_;
+}
+
+void FormItemInfo::SetIsDynamic(bool isDynamic)
+{
+    isDynamic_ = isDynamic;
+}
+
 FormType FormItemInfo::GetUiSyntax() const
 {
     return uiSyntax_;

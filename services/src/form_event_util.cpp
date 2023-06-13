@@ -474,6 +474,7 @@ void FormEventUtil::UpateFormRecord(const FormInfo &formInfo, FormRecord &formRe
 {
     formRecord.formSrc = formInfo.src;
     formRecord.uiSyntax = formInfo.uiSyntax;
+    formRecord.isDynamic = formInfo.isDynamic;
     formRecord.isEnableUpdate = formInfo.updateEnabled;
     formRecord.updateDuration = formInfo.updateDuration;
     std::vector<std::string> time = FormUtil::StringSplit(formInfo.scheduledUpdateTime, Constants::TIME_DELIMETER);

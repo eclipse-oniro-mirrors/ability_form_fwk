@@ -47,6 +47,7 @@ struct FormJsInfo : public Parcelable {
     uint32_t compatibleVersion = 0;
     FormType type = FormType::JS;
     FormType uiSyntax = FormType::JS;
+    bool isDynamic = true;
 
     bool ReadFromParcel(Parcel &parcel);
     virtual bool Marshalling(Parcel &parcel) const override;
