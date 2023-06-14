@@ -16,7 +16,7 @@
 #include "form_data_mgr.h"
 
 #include "form_mgr_errors.h"
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 #include "ipc_skeleton.h"
 
 namespace {

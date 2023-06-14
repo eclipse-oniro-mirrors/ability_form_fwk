@@ -14,7 +14,7 @@
  */
 #include "js_form_error.h"
 
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 #include "js_runtime_utils.h"
 #include "napi_form_util.h"
 

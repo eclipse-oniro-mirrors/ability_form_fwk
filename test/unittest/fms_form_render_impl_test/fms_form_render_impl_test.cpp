@@ -23,7 +23,7 @@
 #undef private
 #include "form_supply_stub.h"
 #include "gmock/gmock.h"
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 #include "mock_form_provider_client.h"
 #include "want.h"
 

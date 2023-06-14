@@ -21,10 +21,10 @@
 #include <unistd.h>
 
 #include "appexecfwk_errors.h"
+#include "fms_log_wrapper.h"
 #include "form_mgr_errors.h"
 #include "form_caller_mgr.h"
 #include "form_supply_proxy.h"
-#include "hilog_wrapper.h"
 #include "ipc_skeleton.h"
 #include "string_ex.h"
 

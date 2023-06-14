@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 #include "form_info_filter.h"
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 // for string conversions
 #include "string_ex.h"
 

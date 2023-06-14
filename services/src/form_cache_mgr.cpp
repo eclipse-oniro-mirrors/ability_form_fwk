@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-#include "hilog_wrapper.h"
 #include "form_cache_mgr.h"
+
+#include "fms_log_wrapper.h"
 
 namespace OHOS {
 namespace AppExecFwk {

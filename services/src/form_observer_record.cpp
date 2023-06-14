@@ -15,8 +15,8 @@
 
 #include "form_observer_record.h"
 
+#include "fms_log_wrapper.h"
 #include "form_task_mgr.h"
-#include "hilog_wrapper.h"
 #include "running_form_info.h"
 
 namespace OHOS {

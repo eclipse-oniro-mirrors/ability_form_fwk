@@ -20,9 +20,9 @@
 #include <uv.h>
 #include <vector>
 
+#include "fms_log_wrapper.h"
 #include "form_mgr.h"
 #include "form_mgr_errors.h"
-#include "hilog_wrapper.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "running_form_info.h"

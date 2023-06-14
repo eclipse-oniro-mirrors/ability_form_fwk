@@ -14,11 +14,12 @@
  */
 
 #include "form_free_install_operator.h"
+
+#include "fms_log_wrapper.h"
 #include "form_bms_helper.h"
 #include "form_mgr_errors.h"
 #include "form_share_mgr.h"
 #include "form_util.h"
-#include "hilog_wrapper.h"
 
 namespace OHOS {
 namespace AppExecFwk {

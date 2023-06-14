@@ -20,7 +20,7 @@
 #include "form_host_callback.h"
 #undef private
 #include "form_mgr_errors.h"
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 #include "mock_form_provider_client.h"
 #include "gmock/gmock.h"
 

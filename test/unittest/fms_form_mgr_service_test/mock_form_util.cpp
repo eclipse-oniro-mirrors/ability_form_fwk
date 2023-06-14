@@ -18,7 +18,7 @@
 #include "form_util.h"
 #include "bundle_constants.h"
 #include "form_mgr_errors.h"
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 
 namespace {
 int32_t getCurrentAccountId = OHOS::AppExecFwk::Constants::ANY_USERID;

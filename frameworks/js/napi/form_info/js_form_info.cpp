@@ -14,13 +14,12 @@
  */
 #include "js_form_info.h"
 
+#include "fms_log_wrapper.h"
 #include "form_constants.h"
 #include "form_info.h"
 #include "form_info_base.h"
 #include "form_state_info.h"
-#include "hilog_wrapper.h"
 #include "js_runtime_utils.h"
-
 namespace OHOS {
 namespace AbilityRuntime {
 NativeValue* CreateJsFormType(NativeEngine &engine)

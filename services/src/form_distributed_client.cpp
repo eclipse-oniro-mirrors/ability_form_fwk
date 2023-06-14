@@ -14,8 +14,9 @@
  */
 
 #include "form_distributed_client.h"
+
+#include "fms_log_wrapper.h"
 #include "form_mgr_errors.h"
-#include "hilog_wrapper.h"
 #include "if_system_ability_manager.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"

@@ -21,8 +21,8 @@
 
 #include "accesstoken_kit.h"
 #include "bundle_constants.h"
+#include "fms_log_wrapper.h"
 #include "form_constants.h"
-#include "hilog_wrapper.h"
 #include "ipc_skeleton.h"
 #include "os_account_manager_wrapper.h"
 

@@ -15,8 +15,8 @@
 
 #include "form_trust_mgr.h"
 
+#include "fms_log_wrapper.h"
 #include "form_constants.h"
-#include "hilog_wrapper.h"
 
 namespace OHOS {
 namespace AppExecFwk {

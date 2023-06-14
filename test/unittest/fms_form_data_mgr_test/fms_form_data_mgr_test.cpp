@@ -25,7 +25,7 @@
 #include "form_mgr_errors.h"
 #include "form_record.h"
 #include "form_util.h"
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 #include "ipc_skeleton.h"
 #include "mock_form_host_client.h"
 

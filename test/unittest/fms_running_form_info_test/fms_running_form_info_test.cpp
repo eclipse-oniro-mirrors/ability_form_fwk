@@ -23,7 +23,7 @@
 #define private public
 #define protected public
 #include "running_form_info.h"
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 #include "nlohmann/json.hpp"
 #undef private
 #undef protected

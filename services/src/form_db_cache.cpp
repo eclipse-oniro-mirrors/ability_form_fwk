@@ -17,12 +17,12 @@
 
 #include <cinttypes>
 
+#include "fms_log_wrapper.h"
 #include "form_bms_helper.h"
 #include "form_data_mgr.h"
 #include "form_db_info.h"
 #include "form_mgr_errors.h"
 #include "form_provider_mgr.h"
-#include "hilog_wrapper.h"
 
 namespace OHOS {
 namespace AppExecFwk {

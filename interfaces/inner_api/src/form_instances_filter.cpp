@@ -14,7 +14,7 @@
  */
 
 #include "form_instances_filter.h"
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 #include "message_parcel.h"
 #include "string_ex.h"
 

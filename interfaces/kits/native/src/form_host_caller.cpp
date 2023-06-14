@@ -15,11 +15,11 @@
 
 #include "form_host_caller.h"
 
+#include "fms_log_wrapper.h"
 #include "form_constants.h"
 #include "form_host_client.h"
 #include "form_mgr_errors.h"
 #include "form_provider_interface.h"
-#include "hilog_wrapper.h"
 
 namespace OHOS {
 namespace AppExecFwk {

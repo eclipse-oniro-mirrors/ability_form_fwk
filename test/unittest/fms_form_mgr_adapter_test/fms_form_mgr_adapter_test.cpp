@@ -28,7 +28,7 @@
 #define private public
 #include "form_mgr_adapter.h"
 #include "ipc_types.h"
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 #include "ipc_skeleton.h"
 #include "form_ams_helper.h"
 #include "form_bms_helper.h"

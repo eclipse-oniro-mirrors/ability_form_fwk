@@ -15,6 +15,7 @@
 
 #include "form_event_util.h"
 
+#include "fms_log_wrapper.h"
 #include "form_bms_helper.h"
 #include "form_cache_mgr.h"
 #include "form_data_mgr.h"
@@ -26,7 +27,6 @@
 #include "form_trust_mgr.h"
 #include "form_util.h"
 #include "form_provider_mgr.h"
-#include "hilog_wrapper.h"
 #include "want.h"
 
 namespace OHOS {

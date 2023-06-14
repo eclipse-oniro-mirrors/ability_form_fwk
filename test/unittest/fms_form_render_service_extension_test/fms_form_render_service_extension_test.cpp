@@ -21,7 +21,7 @@
 #include "form_render_service_extension.h"
 #undef private
 #include "gmock/gmock.h"
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 #include "want.h"
 
 using namespace testing::ext;

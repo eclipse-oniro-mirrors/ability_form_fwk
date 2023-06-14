@@ -16,6 +16,7 @@
 
 #include "js_form_host.h"
 
+#include "fms_log_wrapper.h"
 #include "form_info.h"
 #include "form_instance.h"
 #include "form_instances_filter.h"
@@ -23,7 +24,6 @@
 #include "form_host_client.h"
 #include "form_mgr.h"
 #include "form_mgr_errors.h"
-#include "hilog_wrapper.h"
 #include "ipc_skeleton.h"
 #include "js_form_state_observer.h"
 #include "js_runtime.h"
