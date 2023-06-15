@@ -16,9 +16,9 @@
 #include "form_ams_helper.h"
 
 #include "ability_manager_interface.h"
+#include "fms_log_wrapper.h"
 #include "form_mgr_errors.h"
 #include "form_serial_queue.h"
-#include "hilog_wrapper.h"
 #include "if_system_ability_manager.h"
 #include "in_process_call_wrapper.h"
 #include "ipc_skeleton.h"

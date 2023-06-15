@@ -17,9 +17,9 @@
 
 #include <cinttypes>
 
+#include "fms_log_wrapper.h"
 #include "form_host_interface.h"
 #include "form_task_mgr.h"
-#include "hilog_wrapper.h"
 
 namespace OHOS {
 namespace AppExecFwk {

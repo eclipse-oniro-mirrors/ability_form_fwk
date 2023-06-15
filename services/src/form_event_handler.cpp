@@ -16,7 +16,8 @@
 #include "form_event_handler.h"
 
 #include <memory>
-#include "hilog_wrapper.h"
+
+#include "fms_log_wrapper.h"
 
 namespace OHOS {
 namespace AppExecFwk {

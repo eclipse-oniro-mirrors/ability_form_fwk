@@ -21,8 +21,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "fms_log_wrapper.h"
 #include "form_constants.h"
-#include "hilog_wrapper.h"
 #include "message_parcel.h"
 #include "string_ex.h"
 

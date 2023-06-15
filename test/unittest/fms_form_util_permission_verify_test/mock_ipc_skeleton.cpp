@@ -15,7 +15,7 @@
 
 #include <gtest/gtest.h>
 
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 #include "ipc_skeleton.h"
 
 namespace {

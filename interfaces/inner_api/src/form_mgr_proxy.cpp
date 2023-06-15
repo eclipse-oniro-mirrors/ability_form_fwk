@@ -16,8 +16,8 @@
 #include "form_mgr_proxy.h"
 
 #include "appexecfwk_errors.h"
+#include "fms_log_wrapper.h"
 #include "form_mgr_errors.h"
-#include "hilog_wrapper.h"
 #include "string_ex.h"
 
 namespace OHOS {

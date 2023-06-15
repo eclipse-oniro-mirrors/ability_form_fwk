@@ -15,7 +15,7 @@
 
 #include "form_info_storage.h"
 
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 #include "json_serializer.h"
 
 namespace OHOS {

@@ -16,7 +16,7 @@
 #include "form_db_cache.h"
 
 #include "form_mgr_errors.h"
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 
 namespace {
     bool g_mockGetMatchCountRet = true;

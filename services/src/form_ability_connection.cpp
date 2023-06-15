@@ -18,6 +18,7 @@
 
 #include <cinttypes>
 
+#include "fms_log_wrapper.h"
 #include "form_ams_helper.h"
 #include "form_bms_helper.h"
 #include "form_data_mgr.h"
@@ -26,7 +27,6 @@
 #include "form_info_mgr.h"
 #include "form_supply_callback.h"
 #include "form_timer_mgr.h"
-#include "hilog_wrapper.h"
 #include "want.h"
 
 namespace OHOS {

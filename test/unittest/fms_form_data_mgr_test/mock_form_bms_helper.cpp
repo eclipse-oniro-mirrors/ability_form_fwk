@@ -16,7 +16,7 @@
 #include "form_bms_helper.h"
 
 #include "form_mgr_errors.h"
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 
 namespace {
     OHOS::ErrCode g_mockGetBundleNameByUidRet = OHOS::ERR_OK;

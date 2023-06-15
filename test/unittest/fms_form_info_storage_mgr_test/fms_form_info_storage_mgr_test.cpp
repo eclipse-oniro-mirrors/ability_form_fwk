@@ -24,7 +24,7 @@
 #define protected public
 #include "form_info_storage_mgr.h"
 #include "distributed_kv_data_manager.h"
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 #include "nlohmann/json.hpp"
 #include "kvstore.h"
 #include "form_mgr_errors.h"

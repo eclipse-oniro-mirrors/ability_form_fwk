@@ -18,7 +18,7 @@
 #define private public
 #define protected public
 #include "form_ashmem.h"
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 #include "message_parcel.h"
 #undef public
 #undef protected

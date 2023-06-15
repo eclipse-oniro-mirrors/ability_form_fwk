@@ -18,13 +18,13 @@
 #include <cinttypes>
 
 #include "common_event_support.h"
+#include "fms_log_wrapper.h"
 #include "form_constants.h"
 #include "form_data_mgr.h"
 #include "form_db_cache.h"
 #include "form_info_mgr.h"
 #include "form_serial_queue.h"
 #include "form_timer_mgr.h"
-#include "hilog_wrapper.h"
 #include "in_process_call_wrapper.h"
 #include "want.h"
 

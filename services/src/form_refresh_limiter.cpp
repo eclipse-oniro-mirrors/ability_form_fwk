@@ -16,7 +16,7 @@
 #include <cinttypes>
 
 #include "form_constants.h"
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 #include "form_refresh_limiter.h"
 
 namespace OHOS {

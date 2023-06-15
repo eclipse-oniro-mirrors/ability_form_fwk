@@ -19,9 +19,9 @@
 #include <utility>
 
 #include "extractor.h"
+#include "fms_log_wrapper.h"
 #include "form_constants.h"
 #include "form_render_impl.h"
-#include "hilog_wrapper.h"
 #include "xcollie/watchdog.h"
 
 namespace OHOS {

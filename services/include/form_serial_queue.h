@@ -28,7 +28,7 @@ class FormSerialQueue final {
 public:
     explicit FormSerialQueue(const std::string &queueName);
     ~FormSerialQueue();
-    void ScheduleTask(uint64_t ms, std::function<void()> func);
+    bool ScheduleTask(uint64_t ms, std::function<void()> func);
     void ScheduleDelayTask(const std::pair<int64_t, int64_t> &eventMsg, uint32_t ms, std::function<void()> func);
     void CancelDelayTask(const std::pair<int64_t, int64_t> &eventMsg);
 private:

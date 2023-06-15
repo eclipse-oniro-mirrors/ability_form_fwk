@@ -15,7 +15,7 @@
 
 #include <gtest/gtest.h>
 
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 #define private public
 #include "form_event_report.h"
 #undef private

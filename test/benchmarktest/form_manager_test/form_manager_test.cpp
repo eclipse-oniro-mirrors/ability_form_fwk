@@ -23,7 +23,7 @@
 #include "form_constants.h"
 #include "form_host_client.h"
 #include "form_mgr.h"
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 #include "form_mgr_errors.h"
 
 using namespace std;

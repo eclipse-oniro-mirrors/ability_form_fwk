@@ -18,11 +18,11 @@
 
 #include <cinttypes>
 
+#include "fms_log_wrapper.h"
 #include "form_constants.h"
 #include "form_supply_callback.h"
 #include "form_task_mgr.h"
 #include "form_util.h"
-#include "hilog_wrapper.h"
 #include "want.h"
 
 namespace OHOS {

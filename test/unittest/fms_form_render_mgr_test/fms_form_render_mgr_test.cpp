@@ -27,7 +27,7 @@
 #include "form_render_mgr.h"
 #undef private
 #include "ipc_types.h"
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 #include "mock_form_provider_client.h"
 
 using namespace testing::ext;

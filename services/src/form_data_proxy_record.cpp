@@ -17,13 +17,13 @@
 
 #include <vector>
 
+#include "fms_log_wrapper.h"
 #include "form_ashmem.h"
 #include "form_bms_helper.h"
 #include "form_data_mgr.h"
 #include "form_mgr_adapter.h"
 #include "form_mgr_errors.h"
 #include "form_util.h"
-#include "hilog_wrapper.h"
 #include "nlohmann/json.hpp"
 #include "ipc_skeleton.h"
 

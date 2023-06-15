@@ -41,7 +41,7 @@
 #include "free_install_status_callback_stub.h"
 #undef private
 #include "ipc_types.h"
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 
 using namespace testing::ext;
 using namespace OHOS;

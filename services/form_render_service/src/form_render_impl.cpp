@@ -19,10 +19,10 @@
 #include <memory>
 
 #include "event_handler.h"
+#include "fms_log_wrapper.h"
 #include "form_constants.h"
 #include "form_render_service_extension.h"
 #include "form_util.h"
-#include "hilog_wrapper.h"
 #include "js_runtime.h"
 #include "service_extension.h"
 

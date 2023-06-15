@@ -14,8 +14,8 @@
  */
 #include "js_form_binding_data.h"
 
+#include "fms_log_wrapper.h"
 #include "form_provider_data.h"
-#include "hilog_wrapper.h"
 #include "js_runtime_utils.h"
 #include "napi_form_util.h"
 

@@ -36,13 +36,13 @@ void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eve
         action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_CHANGED) {
         // install or update
         HILOG_INFO("%{public}s, bundle changed, bundleName: %{public}s", __func__, bundleName.c_str());
-        sharedThis->formEventHelper_.HandleBundleFormInfoChanged(bundleName, userId);
-        sharedThis->formEventHelper_.HandleProviderUpdated(bundleName, userId);
+        formEventHelper_.HandleBundleFormInfoChanged(bundleName, userId);
+        formEventHelper_.HandleProviderUpdated(bundleName, userId);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED) {
         // uninstall module/bundle
         HILOG_INFO("%{public}s, bundle removed, bundleName: %{public}s", __func__, bundleName.c_str());
-        sharedThis->formEventHelper_.HandleBundleFormInfoRemoved(bundleName, userId);
-        sharedThis->formEventHelper_.HandleProviderRemoved(bundleName, userId);
+        formEventHelper_.HandleBundleFormInfoRemoved(bundleName, userId);
+        formEventHelper_.HandleProviderRemoved(bundleName, userId);
     }
 }
 

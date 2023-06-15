@@ -18,6 +18,7 @@
 #include <cinttypes>
 #include <utility>
 
+#include "fms_log_wrapper.h"
 #include "form_constants.h"
 #include "form_data_mgr.h"
 #include "form_host_interface.h"
@@ -28,7 +29,6 @@
 #include "form_serial_queue.h"
 #include "form_share_mgr.h"
 #include "form_supply_callback.h"
-#include "hilog_wrapper.h"
 #include "js_form_state_observer_interface.h"
 
 namespace OHOS {

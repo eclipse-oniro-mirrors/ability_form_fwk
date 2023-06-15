@@ -21,7 +21,7 @@
 #include "form_mgr_adapter.h"
 #undef private
 #include "form_record.h"
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 #include "want.h"
 
 using namespace testing::ext;

@@ -16,7 +16,7 @@ import("//build/ohos.gni")
 import("//foundation/ability/form_fwk/form_fwk.gni")
 
 config("fmskit_config") {
-  defines = [ "AMS_LOG_TAG = \"FmskitNative\"" ]
+  defines = [ "FMS_LOG_TAG = \"FmskitNative\"" ]
 }
 
 ################################### formbindingdata_napi ########################################
