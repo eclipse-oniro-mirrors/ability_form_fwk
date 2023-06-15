@@ -31,7 +31,7 @@ FormCallerMgr::~FormCallerMgr() {}
 void FormCallerMgr::AddFormHostCaller(const FormJsInfo &formJsInfo, const sptr<IRemoteObject> &callerToken)
 {
     HILOG_DEBUG("%{public}s called", __func__);
-    std::lock_guard<std::recursive_mutex> lock(formHostCallerMutex_);
+    std::lock_guard<std::mutex> lock(formHostCallerMutex_);
     std::shared_ptr<FormHostCaller> caller = std::make_shared<FormHostCaller>(formJsInfo, callerToken);
     formHostCallers_[formJsInfo.formId] = caller;
 
@@ -49,7 +49,7 @@ void FormCallerMgr::AddFormHostCaller(const FormJsInfo &formJsInfo, const sptr<I
 std::shared_ptr<FormHostCaller> FormCallerMgr::GetFormHostCaller(int64_t formId)
 {
     HILOG_DEBUG("%{public}s called", __func__);
-    std::lock_guard<std::recursive_mutex> lock(formHostCallerMutex_);
+    std::lock_guard<std::mutex> lock(formHostCallerMutex_);
     auto iter = formHostCallers_.find(formId);
     if (iter == formHostCallers_.end()) {
         return nullptr;
@@ -60,7 +60,7 @@ std::shared_ptr<FormHostCaller> FormCallerMgr::GetFormHostCaller(int64_t formId)
 void FormCallerMgr::RemoveFormHostCaller(int64_t formId)
 {
     HILOG_DEBUG("%{public}s called", __func__);
-    std::lock_guard<std::recursive_mutex> lock(formHostCallerMutex_);
+    std::lock_guard<std::mutex> lock(formHostCallerMutex_);
     formHostCallers_.erase(formId);
 }
 
@@ -68,7 +68,7 @@ void FormCallerMgr::RemoveFormHostCaller(int64_t formId)
 void FormCallerMgr::RemoveFormHostCaller(const sptr<IRemoteObject> &callerToken)
 {
     HILOG_DEBUG("%{public}s called", __func__);
-    std::lock_guard<std::recursive_mutex> lock(formHostCallerMutex_);
+    std::lock_guard<std::mutex> lock(formHostCallerMutex_);
     for (auto iter = formHostCallers_.begin(); iter != formHostCallers_.end();) {
         if (iter->second != nullptr && iter->second->IsSameToken(callerToken)) {
             iter = formHostCallers_.erase(iter);
@@ -102,7 +102,7 @@ void FormCallerMgr::HandleHostCallBackDiedTask(const sptr<IRemoteObject> &remote
 void FormCallerMgr::AddFormProviderCaller(const FormJsInfo &formJsInfo, const sptr<IRemoteObject> &callerToken)
 {
     HILOG_DEBUG("%{public}s called", __func__);
-    std::lock_guard<std::recursive_mutex> lock(formProviderCallerMutex_);
+    std::lock_guard<std::mutex> lock(formProviderCallerMutex_);
     for (const auto &formProviderCaller : formProviderCallers_) {
         if (formProviderCaller->IsSameToken(callerToken)) {
             formProviderCaller->AddForm(formJsInfo);
@@ -129,7 +129,7 @@ void FormCallerMgr::GetFormProviderCaller(int64_t formId,
     std::vector<std::shared_ptr<FormProviderCaller>> &formProviderCallers)
 {
     HILOG_DEBUG("%{public}s called", __func__);
-    std::lock_guard<std::recursive_mutex> lock(formProviderCallerMutex_);
+    std::lock_guard<std::mutex> lock(formProviderCallerMutex_);
     for (const auto &formProviderCaller : formProviderCallers_) {
         if (formProviderCaller->HasForm(formId)) {
             formProviderCallers.emplace_back(formProviderCaller);
@@ -140,7 +140,7 @@ void FormCallerMgr::GetFormProviderCaller(int64_t formId,
 void FormCallerMgr::RemoveFormProviderCaller(int64_t formId, const sptr<IRemoteObject> &callerToken)
 {
     HILOG_DEBUG("%{public}s called", __func__);
-    std::lock_guard<std::recursive_mutex> lock(formProviderCallerMutex_);
+    std::lock_guard<std::mutex> lock(formProviderCallerMutex_);
     for (auto iter = formProviderCallers_.begin(); iter != formProviderCallers_.end(); ++iter) {
         if ((*iter)->IsSameToken(callerToken)) {
             continue;
@@ -156,7 +156,7 @@ void FormCallerMgr::RemoveFormProviderCaller(int64_t formId, const sptr<IRemoteO
 void FormCallerMgr::RemoveFormProviderCaller(const sptr<IRemoteObject> &callerToken)
 {
     HILOG_DEBUG("%{public}s called", __func__);
-    std::lock_guard<std::recursive_mutex> lock(formProviderCallerMutex_);
+    std::lock_guard<std::mutex> lock(formProviderCallerMutex_);
     for (auto iter = formProviderCallers_.begin(); iter != formProviderCallers_.end();) {
         if ((*iter)->IsSameToken(callerToken)) {
             ++iter;

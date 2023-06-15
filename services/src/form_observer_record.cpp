@@ -29,7 +29,7 @@ void FormObserverRecord::SetDeathRecipient(const sptr<IRemoteObject> &callerToke
         HILOG_ERROR("The callerToken or the deathRecipient is empty");
         return;
     }
-    std::lock_guard<std::recursive_mutex> lock(deathRecipientsMutex_);
+    std::lock_guard<std::mutex> lock(deathRecipientsMutex_);
     auto iter = deathRecipients_.find(callerToken);
     if (iter == deathRecipients_.end()) {
         deathRecipients_.emplace(callerToken, deathRecipient);
@@ -42,7 +42,7 @@ void FormObserverRecord::SetDeathRecipient(const sptr<IRemoteObject> &callerToke
 ErrCode FormObserverRecord::SetFormAddObserver(const std::string bundleName, const sptr<IRemoteObject> &callerToken)
 {
     HILOG_DEBUG("start");
-    std::lock_guard<std::recursive_mutex> lock(formAddObserverMutex_);
+    std::lock_guard<std::mutex> lock(formAddObserverMutex_);
     auto iter = formAddObservers_.find(bundleName);
     if (iter == formAddObservers_.end()) {
         std::vector<sptr<IRemoteObject>> observers;
@@ -63,7 +63,7 @@ ErrCode FormObserverRecord::SetFormAddObserver(const std::string bundleName, con
 ErrCode FormObserverRecord::SetFormRemoveObserver(const std::string bundleName, const sptr<IRemoteObject> &callerToken)
 {
     HILOG_DEBUG("start");
-    std::lock_guard<std::recursive_mutex> lock(formRemoveObserverMutex_);
+    std::lock_guard<std::mutex> lock(formRemoveObserverMutex_);
     auto iter = formRemoveObservers_.find(bundleName);
     if (iter == formRemoveObservers_.end()) {
         std::vector<sptr<IRemoteObject>> observers;
@@ -88,7 +88,7 @@ void FormObserverRecord::onFormAdd(const std::string bundleName, RunningFormInfo
         HILOG_DEBUG("No observer has been added.");
         return;
     }
-    std::lock_guard<std::recursive_mutex> lock(formAddObserverMutex_);
+    std::lock_guard<std::mutex> lock(formAddObserverMutex_);
     auto iter = formAddObservers_.find(bundleName);
     if (iter != formAddObservers_.end()) {
         for (auto callerToken : iter->second) {
@@ -105,7 +105,7 @@ void FormObserverRecord::onFormRemove(const std::string bundleName, const Runnin
         return;
     }
 
-    std::lock_guard<std::recursive_mutex> lock(formRemoveObserverMutex_);
+    std::lock_guard<std::mutex> lock(formRemoveObserverMutex_);
     auto iter = formRemoveObservers_.find(bundleName);
     if (iter != formRemoveObservers_.end()) {
         for (auto callerToken : iter->second) {
@@ -124,7 +124,7 @@ void FormObserverRecord::CleanResource(const wptr<IRemoteObject> &remote)
         HILOG_ERROR("remote object is nullptr");
         return;
     }
-    std::lock_guard<std::recursive_mutex> lock(formAddObserverMutex_);
+    std::lock_guard<std::mutex> lock(formAddObserverMutex_);
     for (auto it = formAddObservers_.begin(); it != formAddObservers_.end();) {
         auto& observer = it->second;
         auto iter = std::find(observer.begin(), observer.end(), object);
@@ -139,7 +139,7 @@ void FormObserverRecord::CleanResource(const wptr<IRemoteObject> &remote)
     }
 
     // Clean the formRemoveObservers_.
-    std::lock_guard<std::recursive_mutex> observerLock(formRemoveObserverMutex_);
+    std::lock_guard<std::mutex> observerLock(formRemoveObserverMutex_);
     for (auto it = formRemoveObservers_.begin(); it != formRemoveObservers_.end();) {
         auto& observer = it->second;
         auto iter = std::find(observer.begin(), observer.end(), object);
@@ -153,7 +153,7 @@ void FormObserverRecord::CleanResource(const wptr<IRemoteObject> &remote)
         }
     }
 
-    std::lock_guard<std::recursive_mutex> deathLock(deathRecipientsMutex_);
+    std::lock_guard<std::mutex> deathLock(deathRecipientsMutex_);
     auto iter = deathRecipients_.find(object);
     if (iter != deathRecipients_.end()) {
         auto deathRecipient = iter->second;
