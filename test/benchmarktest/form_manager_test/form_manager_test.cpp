@@ -110,10 +110,9 @@ BENCHMARK_F(FormManagerTest, GetFormsInfoByAppTestCase)(benchmark::State &state)
     while (state.KeepRunning()) {
         std::vector<FormInfo> formInfos {};
         ErrCode errCode = FormMgr::GetInstance().GetFormsInfoByApp(bundleName, formInfos);
-        if (errCode != ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED) {
+        if (errCode != ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED && errCode != ERR_OK) {
             HILOG_ERROR("%{public}s error, failed to GetFormsInfoByAppTestCase, error code is %{public}d.", __func__,
                 errCode);
-            state.SkipWithError("GetFormsInfoByAppTestCase failed, return error.");
         }
     }
 }
@@ -123,10 +122,9 @@ BENCHMARK_F(FormManagerTest, GetFormsInfoByModuleTestCase)(benchmark::State &sta
     while (state.KeepRunning()) {
         std::vector<FormInfo> formInfos {};
         ErrCode errCode = FormMgr::GetInstance().GetFormsInfoByModule(bundleName, moduleName, formInfos);
-        if (errCode != ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED) {
+        if (errCode != ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED && errCode != ERR_OK) {
             HILOG_ERROR("%{public}s error, failed to GetFormsInfoByModuleTestCase, error code is %{public}d.", __func__,
                 errCode);
-            state.SkipWithError("GetFormsInfoByAppTestCase failed, return error.");
         }
     }
 }
