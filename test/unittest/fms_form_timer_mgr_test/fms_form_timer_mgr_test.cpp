@@ -1495,21 +1495,6 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0086, Function | MediumTest | Lev
 }
 
 /**
- * @tc.number: Fms_FormTimerMgr_0087
- * @tc.name: CreatTaskThreadExecutor.
- * @tc.desc: test CreatTaskThreadExecutor function.
- */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0087, Function | MediumTest | Level1)
-{
-    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0087 start";
-    std::shared_ptr<FormTimerMgr> formTimerMgr = std::make_shared<FormTimerMgr>();
-    ASSERT_NE(nullptr, formTimerMgr);
-    formTimerMgr->taskExecutor_ = std::make_unique<ThreadPool>("timer task thread");
-    formTimerMgr->CreatTaskThreadExecutor();
-    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0087 end";
-}
-
-/**
  * @tc.number: Fms_FormTimerMgr_0088
  * @tc.name: ExecTimerTask.
  * @tc.desc: test ExecTimerTask function.
@@ -1522,40 +1507,5 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0088, Function | MediumTest | Lev
     FormTimer timerTask;
     formTimerMgr->ExecTimerTask(timerTask);
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0088 end";
-}
-
-/**
- * @tc.number: Fms_FormTimerMgr_0089
- * @tc.name: ExecTimerTask.
- * @tc.desc: test ExecTimerTask function.
- */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0089, Function | MediumTest | Level1)
-{
-    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0089 start";
-    std::shared_ptr<FormTimerMgr> formTimerMgr = std::make_shared<FormTimerMgr>();
-    ASSERT_NE(nullptr, formTimerMgr);
-    FormTimer timerTask;
-    timerTask.isCountTimer = true;
-    formTimerMgr->taskExecutor_ = std::make_unique<ThreadPool>("timer task thread");
-    formTimerMgr->ExecTimerTask(timerTask);
-    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0089 end";
-}
-
-/**
- * @tc.number: Fms_FormTimerMgr_0090
- * @tc.name: ExecTimerTask.
- * @tc.desc: test ExecTimerTask function.
- */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0090, Function | MediumTest | Level1)
-{
-    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0090 start";
-    std::shared_ptr<FormTimerMgr> formTimerMgr = std::make_shared<FormTimerMgr>();
-    ASSERT_NE(nullptr, formTimerMgr);
-    FormTimer timerTask;
-    timerTask.userId = 1;
-    timerTask.isCountTimer = false;
-    formTimerMgr->taskExecutor_ = std::make_unique<ThreadPool>("timer task thread");
-    formTimerMgr->ExecTimerTask(timerTask);
-    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0090 end";
 }
 }

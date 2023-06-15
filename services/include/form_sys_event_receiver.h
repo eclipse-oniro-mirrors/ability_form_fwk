@@ -20,6 +20,7 @@
 #include "common_event_subscribe_info.h"
 #include "form_event_handler.h"
 #include "form_event_util.h"
+#include "form_serial_queue.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -40,12 +41,12 @@ public:
     virtual void OnReceiveEvent(const EventFwk::CommonEventData &eventData) override;
 
     /**
-     * @brief SetEventHandler.
-     * @param handler event handler
+     * @brief SetSerialQueue.
+     * @param serialQueue serial queue
      */
-    inline void SetEventHandler(const std::shared_ptr<FormEventHandler> &handler)
+    inline void SetSerialQueue(const std::shared_ptr<FormSerialQueue> &serialQueue)
     {
-        eventHandler_ = handler;
+        serialQueue_ = serialQueue;
     }
 private:
     void HandleUserIdRemoved(const int32_t userId); // multiuser
@@ -53,7 +54,7 @@ private:
     void HandleBundleScanFinished(int32_t userId);
 private:
     FormEventUtil formEventHelper_;
-    std::shared_ptr<FormEventHandler> eventHandler_ = nullptr;
+    std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

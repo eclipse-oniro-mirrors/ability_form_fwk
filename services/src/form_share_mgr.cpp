@@ -21,6 +21,7 @@
 #include "form_mgr_errors.h"
 #include "form_host_interface.h"
 #include "form_provider_interface.h"
+#include "form_serial_queue.h"
 #include "form_share_connection.h"
 #include "form_supply_callback.h"
 #include "form_util.h"
@@ -89,15 +90,15 @@ int32_t FormShareMgr::RecvFormShareInfoFromRemote(const FormShareInfo &info)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
 
-    if (eventHandler_ == nullptr) {
-        HILOG_ERROR("eventHandler_ is nullptr");
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("serialQueue_ is nullptr");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
     auto task = [info]() {
         DelayedSingleton<FormShareMgr>::GetInstance()->HandleRecvFormShareInfoFromRemoteTask(info);
     };
-    eventHandler_->PostTask(task);
+    serialQueue_->ScheduleTask(0, task);
 
     return ERR_OK;
 }
@@ -139,7 +140,7 @@ int32_t FormShareMgr::HandleRecvFormShareInfoFromRemoteTask(const FormShareInfo 
         auto eventId = FormEventHandler::GetEventId();
         eventMap_.emplace(eventId, formShareInfoKey);
         if (eventHandler_ != nullptr) {
-            eventHandler_->SendEvent(MSG::FORM_SHARE_INFO_DELAY_MSG, eventId, FORM_SHARE_INFO_DELAY_TIMER);
+            eventHandler_->ProcessEvent(MSG::FORM_SHARE_INFO_DELAY_MSG, eventId, FORM_SHARE_INFO_DELAY_TIMER);
         }
     }
     auto ret = CheckFormPackage(info, formShareInfoKey);
@@ -159,17 +160,22 @@ int32_t FormShareMgr::CheckFormPackage(const FormShareInfo &info, const std::str
         return ERR_OK;
     }
 
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("serialQueue_ is nullptr.");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
     if (eventHandler_ == nullptr) {
-        HILOG_ERROR("eventHandler_ is nullptr.");
+        HILOG_ERROR("serialQueue_ is nullptr.");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
     std::shared_ptr<FormFreeInstallOperator> freeInstallOperator =
-        std::make_shared<FormFreeInstallOperator>(formShareInfoKey, eventHandler_);
+        std::make_shared<FormFreeInstallOperator>(formShareInfoKey, serialQueue_);
     auto eventId = FormEventHandler::GetEventId();
     HILOG_DEBUG("free install operator send event, eventId:%{public}" PRId64 ", key: %{public}s",
         eventId, formShareInfoKey.c_str());
-    eventHandler_->SendEvent(
+    eventHandler_->ProcessEvent(
         MSG::FORM_PACKAGE_FREE_INSTALL_DELAY_MSG, eventId, FORM_PACKAGE_FREE_INSTALL_TIMER);
 
     {
@@ -283,8 +289,8 @@ void FormShareMgr::RemoveFormShareInfo(const std::string &formShareInfoKey)
 
         if (eventId != 0) {
             eventMap_.erase(eventId);
-            if (eventHandler_ != nullptr) {
-                eventHandler_->RemoveEvent(MSG::FORM_SHARE_INFO_DELAY_MSG, eventId);
+            if (serialQueue_ != nullptr) {
+                serialQueue_->CancelDelayTask(std::make_pair(MSG::FORM_SHARE_INFO_DELAY_MSG, eventId));
             }
         }
     }
@@ -310,8 +316,8 @@ void FormShareMgr::FinishFreeInstallTask(const std::shared_ptr<FormFreeInstallOp
 
     if (eventId != 0) {
         freeInstallOperatorMap_.erase(eventId);
-        if (eventHandler_ != nullptr) {
-            eventHandler_->RemoveEvent(MSG::FORM_PACKAGE_FREE_INSTALL_DELAY_MSG, eventId);
+        if (serialQueue_ != nullptr) {
+            serialQueue_->CancelDelayTask(std::make_pair(MSG::FORM_PACKAGE_FREE_INSTALL_DELAY_MSG, eventId));
         }
     }
 }

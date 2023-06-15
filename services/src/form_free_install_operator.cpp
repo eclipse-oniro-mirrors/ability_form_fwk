@@ -16,6 +16,7 @@
 #include "form_free_install_operator.h"
 #include "form_bms_helper.h"
 #include "form_mgr_errors.h"
+#include "form_serial_queue.h"
 #include "form_share_mgr.h"
 #include "form_util.h"
 #include "hilog_wrapper.h"
@@ -23,8 +24,8 @@
 namespace OHOS {
 namespace AppExecFwk {
 FormFreeInstallOperator::FormFreeInstallOperator(const std::string &formShareInfoKey,
-    const std::shared_ptr<FormEventHandler> &handler)
-    : formShareInfoKey_(formShareInfoKey), handler_(handler)
+    const std::shared_ptr<FormSerialQueue> &serialQueue)
+    : formShareInfoKey_(formShareInfoKey), serialQueue_(serialQueue)
 {
 }
 
@@ -67,14 +68,14 @@ int32_t FormFreeInstallOperator::StartFreeInstall(
 void FormFreeInstallOperator::OnInstallFinished(int32_t resultCode)
 {
     HILOG_DEBUG("%{public}s called, resultCode: %{public}d", __func__, resultCode);
-    if (handler_ == nullptr) {
+    if (serialQueue_ == nullptr) {
         return;
     }
     auto self = shared_from_this();
     auto task = [self, resultCode]() {
         DelayedSingleton<FormShareMgr>::GetInstance()->OnInstallFinished(self, resultCode, self->formShareInfoKey_);
     };
-    handler_->PostTask(task);
+    serialQueue_->ScheduleTask(0, task);
 }
 
 FreeInstallStatusCallBack::FreeInstallStatusCallBack(

@@ -24,9 +24,9 @@
 
 #include "common_event_subscriber.h"
 #include "common_event_subscribe_info.h"
+#include "ffrt.h"
 #include "form_refresh_limiter.h"
 #include "form_timer.h"
-#include "thread_pool.h"
 #include "timer.h"
 #include "want_agent.h"
 
@@ -293,10 +293,6 @@ private:
      */
     void ClearIntervalTimer();
     /**
-    * @brief Creat thread pool for timer task.
-    */
-    void CreatTaskThreadExecutor();
-    /**
      * @brief Set enable flag.
      * @param formId The Id of the form.
      * @param flag Enable flag.
@@ -362,7 +358,6 @@ private:
     std::list<UpdateAtItem> updateAtTimerTasks_;
     std::list<DynamicRefreshItem> dynamicRefreshTasks_;
     std::shared_ptr<TimerReceiver> timerReceiver_ = nullptr;
-    std::unique_ptr<ThreadPool> taskExecutor_ = nullptr;
     int32_t timeSpeed_ = 1;
 
     std::shared_ptr<Utils::Timer> intervalTimer_ = nullptr;

@@ -25,6 +25,7 @@
 #include "form_instances_filter.h"
 #include "form_mgr_stub.h"
 #include "form_provider_data.h"
+#include "form_serial_queue.h"
 #include "form_sys_event_receiver.h"
 #include "iremote_object.h"
 namespace OHOS {
@@ -488,7 +489,7 @@ private:
 
     bool CheckAcrossLocalAccountsPermission() const;
 
-    void InitFormShareMgrEventHandler();
+    void InitFormShareMgrSerialQueue();
 
     void DumpInit();
     void Dump(const std::vector<std::u16string> &args, std::string &result);
@@ -506,8 +507,8 @@ private:
     using DumpFuncType = void (FormMgrService::*)(const std::string &args, std::string &result);
     std::map<DumpKey, DumpFuncType> dumpFuncMap_;
     ServiceRunningState state_ = ServiceRunningState::STATE_NOT_START;
-    std::shared_ptr<EventRunner> runner_ = nullptr;
     std::shared_ptr<FormEventHandler> handler_ = nullptr;
+    std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;
     std::shared_ptr<FormSysEventReceiver> formSysEventReceiver_ = nullptr;
     sptr<FormBundleEventCallback> formBundleEventCallback_ = nullptr;
     mutable std::mutex instanceMutex_;

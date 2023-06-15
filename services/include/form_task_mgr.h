@@ -22,6 +22,7 @@
 #include "form_event_handler.h"
 #include "form_js_info.h"
 #include "form_record.h"
+#include "form_serial_queue.h"
 #include "form_state_info.h"
 #include "iremote_object.h"
 #include "running_form_info.h"
@@ -42,12 +43,12 @@ public:
     DISALLOW_COPY_AND_MOVE(FormTaskMgr);
 
     /**
-     * @brief SetEventHandler.
-     * @param handler event handler
+     * @brief SetSerialQueue.
+     * @param serialQueue serial queue
      */
-    inline void SetEventHandler(const std::shared_ptr<FormEventHandler> &handler)
+    inline void SetSerialQueue(const std::shared_ptr<FormSerialQueue> &serialQueue)
     {
-        eventHandler_ = handler;
+        serialQueue_ = serialQueue;
     }
 
     /**
@@ -376,7 +377,7 @@ private:
     void FormRemove(const std::string bundleName, const sptr<IRemoteObject> &remoteObject,
         const RunningFormInfo &runningFormInfo);
 private:
-    std::shared_ptr<FormEventHandler> eventHandler_ = nullptr;
+    std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -35,8 +35,7 @@ uint32_t GetU32Data(const char* ptr)
 bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
 {
     std::string formShareInfoKey(data, size);
-    std::shared_ptr<FormEventHandler> handler = nullptr;
-    FormFreeInstallOperator formFreeInstallOperator(formShareInfoKey, handler);
+    FormFreeInstallOperator formFreeInstallOperator(formShareInfoKey, nullptr);
     int32_t resultCode = static_cast<int32_t>(GetU32Data(data));
     formFreeInstallOperator.OnInstallFinished(resultCode);
     std::shared_ptr<FormFreeInstallOperator> freeInstallOperators = nullptr;

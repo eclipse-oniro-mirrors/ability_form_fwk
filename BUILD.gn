@@ -35,6 +35,7 @@ ohos_shared_library("libfms") {
     "${ability_runtime_path}/services/common/include",
     "${ability_runtime_native_path}/appkit/ability_runtime",
     "${form_fwk_napi_path}/form_host/form_state_observer/include",
+    "//foundation/resourceschedule/ffrt/interfaces/kits",
   ]
   sources = [
     "services/src/form_ability_connection.cpp",
@@ -78,6 +79,7 @@ ohos_shared_library("libfms") {
     "services/src/form_refresh_limiter.cpp",
     "services/src/form_render_connection.cpp",
     "services/src/form_render_mgr.cpp",
+    "services/src/form_serial_queue.cpp",
     "services/src/form_share_connection.cpp",
     "services/src/form_share_mgr.cpp",
     "services/src/form_supply_callback.cpp",
@@ -99,6 +101,8 @@ ohos_shared_library("libfms") {
   if (target_cpu == "arm") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
+
+  deps = [ "//foundation/resourceschedule/ffrt:libffrt" ]
 
   external_deps = [
     "ability_base:base",
