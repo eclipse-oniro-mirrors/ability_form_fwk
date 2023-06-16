@@ -118,7 +118,7 @@ ohos_shared_library("libfms") {
     "common_event_service:cesfwk_innerkits",
     "data_share:datashare_consumer",
     "eventhandler:libeventhandler",
-    "hicollie_native:libhicollie",
+    "hicollie:libhicollie",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
