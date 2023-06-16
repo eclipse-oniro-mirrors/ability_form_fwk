@@ -611,6 +611,7 @@ NativeValue* CreateFormInfo(NativeEngine &engine, const FormInfo &formInfo)
     object->SetProperty("relatedBundleName", CreateJsValue(engine, formInfo.relatedBundleName));
     object->SetProperty("supportDimensions", CreateNativeArray(engine, formInfo.supportDimensions));
     object->SetProperty("customizeData", CreateFormCustomizeDatas(engine, formInfo.customizeDatas));
+    object->SetProperty("isDynamic", engine.CreateBoolean(formInfo.isDynamic));
 
     return objContext;
 }
