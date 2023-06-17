@@ -2705,6 +2705,7 @@ ErrCode FormMgrAdapter::RegisterAddObserver(const std::string &bundleName, const
     auto formObserver = formObservers_.find(bundleName);
     if (formObserver == formObservers_.end()) {
         formObservers_.emplace(bundleName, callerToken);
+        SetDeathRecipient(callerToken, new (std::nothrow) FormMgrAdapter::ClientDeathRecipient());
     } else {
         HILOG_ERROR("callback is already exist");
         return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
@@ -2723,6 +2724,7 @@ ErrCode FormMgrAdapter::RegisterRemoveObserver(const std::string &bundleName, co
     } else {
         if (formObserver->second == callerToken) {
             formObservers_.erase(formObserver);
+            SetDeathRecipient(callerToken, new (std::nothrow) FormMgrAdapter::ClientDeathRecipient());
         } else {
             HILOG_ERROR("callback is not exist");
             return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
@@ -2730,6 +2732,59 @@ ErrCode FormMgrAdapter::RegisterRemoveObserver(const std::string &bundleName, co
     }
     HILOG_DEBUG("success.");
     return ERR_OK;
+}
+
+void FormMgrAdapter::SetDeathRecipient(const sptr<IRemoteObject> &callerToken,
+    const sptr<IRemoteObject::DeathRecipient> &deathRecipient)
+{
+    HILOG_DEBUG("start");
+    if (callerToken == nullptr || deathRecipient == nullptr) {
+        HILOG_ERROR("The callerToken or the deathRecipient is empty");
+        return;
+    }
+    std::lock_guard<std::recursive_mutex> lock(deathRecipientsMutex_);
+    auto iter = deathRecipients_.find(callerToken);
+    if (iter == deathRecipients_.end()) {
+        deathRecipients_.emplace(callerToken, deathRecipient);
+        callerToken->AddDeathRecipient(deathRecipient);
+    } else {
+        HILOG_DEBUG("The deathRecipient has been added.");
+    }
+}
+
+void FormMgrAdapter::CleanResource(const wptr<IRemoteObject> &remote)
+{
+    HILOG_DEBUG("start");
+
+    // Clean the formObservers_.
+    auto object = remote.promote();
+    if (object == nullptr) {
+        HILOG_ERROR("remote object is nullptr");
+        return;
+    }
+    std::lock_guard<std::recursive_mutex> lock(formObserversMutex_);
+    for (auto it = formObservers_.begin(); it != formObservers_.end();) {
+        auto& observer = it->second;
+        if (observer == object) {
+            it = formObservers_.erase(it);
+        } else {
+            ++it;
+        }
+    }
+
+    std::lock_guard<std::recursive_mutex> deathLock(deathRecipientsMutex_);
+    auto iter = deathRecipients_.find(object);
+    if (iter != deathRecipients_.end()) {
+        auto deathRecipient = iter->second;
+        deathRecipients_.erase(iter);
+        object->RemoveDeathRecipient(deathRecipient);
+    }
+}
+
+void FormMgrAdapter::ClientDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
+{
+    HILOG_DEBUG("remote died");
+    FormMgrAdapter::GetInstance().CleanResource(remote);
 }
 } // namespace AppExecFwk
 } // namespace OHOS
