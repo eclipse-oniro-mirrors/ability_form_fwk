@@ -66,6 +66,8 @@ NativeValue* CreateJsFormParam(NativeEngine &engine)
     object->SetProperty("BUNDLE_NAME_KEY", CreateJsValue(engine, AppExecFwk::Constants::PARAM_BUNDLE_NAME_KEY));
     object->SetProperty("ABILITY_NAME_KEY", CreateJsValue(engine, AppExecFwk::Constants::PARAM_ABILITY_NAME_KEY));
     object->SetProperty("DEVICE_ID_KEY", CreateJsValue(engine, AppExecFwk::Constants::PARAM_DEVICE_ID_KEY));
+    object->SetProperty("LAUNCH_REASON_KEY", CreateJsValue(engine, AppExecFwk::Constants::LAUNCH_REASON_KEY));
+    object->SetProperty("PARAM_FORM_CUSTOMIZE_KEY", CreateJsValue(engine, AppExecFwk::Constants::PARAM_FORM_CUSTOMIZE_KEY));
     return objValue;
 }
 
@@ -91,6 +93,15 @@ NativeValue* CreateJsFormVisibilityType(NativeEngine &engine)
     return objValue;
 }
 
+NativeValue* CreateJsFormLaunchReason(NativeEngine &engine)
+{
+    NativeValue* objValue = engine.CreateObject();
+    NativeObject* object = ConvertNativeValueTo<NativeObject>(objValue);
+    object->SetProperty("FORM_DEFAULT", CreateJsValue(engine, AppExecFwk::Constants::FORM_DEFAULT));
+    object->SetProperty("FORM_SHARE", CreateJsValue(engine, AppExecFwk::Constants::FORM_SHARE));
+    return objValue;
+}
+
 NativeValue* FormInfoInit(NativeEngine *engine, NativeValue *exportObj)
 {
     HILOG_INFO("%{public}s called.", __func__);
@@ -110,6 +121,7 @@ NativeValue* FormInfoInit(NativeEngine *engine, NativeValue *exportObj)
     object->SetProperty("FormParam", CreateJsFormParam(*engine));
     object->SetProperty("FormDimension", CreateJsFormDimension(*engine));
     object->SetProperty("VisibilityType", CreateJsFormVisibilityType(*engine));
+    object->SetProperty("LaunchReason", CreateJsFormLaunchReason(*engine));
     HILOG_INFO("%{public}s called end.", __func__);
     return exportObj;
 }
