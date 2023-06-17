@@ -2737,7 +2737,7 @@ ErrCode FormMgrAdapter::RegisterRemoveObserver(const std::string &bundleName, co
 void FormMgrAdapter::SetDeathRecipient(const sptr<IRemoteObject> &callerToken,
     const sptr<IRemoteObject::DeathRecipient> &deathRecipient)
 {
-    HILOG_DEBUG("start");
+    HILOG_DEBUG("called.");
     if (callerToken == nullptr || deathRecipient == nullptr) {
         HILOG_ERROR("The callerToken or the deathRecipient is empty");
         return;
@@ -2754,7 +2754,7 @@ void FormMgrAdapter::SetDeathRecipient(const sptr<IRemoteObject> &callerToken,
 
 void FormMgrAdapter::CleanResource(const wptr<IRemoteObject> &remote)
 {
-    HILOG_DEBUG("start");
+    HILOG_DEBUG("called.");
 
     // Clean the formObservers_.
     auto object = remote.promote();
