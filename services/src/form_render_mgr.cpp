@@ -287,6 +287,48 @@ ErrCode FormRenderMgr::StopRenderingFormCallback(int64_t formId, const Want &wan
     return ERR_OK;
 }
 
+ErrCode FormRenderMgr::ReleaseRenderer(int64_t formId, const FormRecord &formRecord, const std::string &compId)
+{
+    HILOG_DEBUG("%{public}s called.", __func__);
+    if (formRecord.uiSyntax != FormType::ETS) {
+        return ERR_OK;
+    }
+    if (formRecord.abilityName.empty()) {
+        HILOG_ERROR("%{public}s, formRecord.abilityName is empty.", __func__);
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    if (formRecord.bundleName.empty()) {
+        HILOG_ERROR("%{public}s, formRecord.bundleName is empty.", __func__);
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    int32_t userId = FormUtil::GetCurrentAccountId();
+    std::string uid = std::to_string(userId) + formRecord.bundleName;
+    {
+        std::lock_guard<std::mutex> lock(resourceMutex_);
+        auto conIterator = renderFormConnections_.find(formRecord.formId);
+        if (conIterator != renderFormConnections_.end()) {
+            auto connection = conIterator->second;
+            if (connection == nullptr) {
+                HILOG_ERROR("connection is null.");
+                return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+            }
+            if (renderRemoteObj_ == nullptr) {
+                HILOG_ERROR("%{public}s, renderRemoteObj_ is nullptr", __func__);
+                return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+            }
+            auto remoteObject = renderRemoteObj_->AsObject();
+            if (remoteObject == nullptr) {
+                HILOG_ERROR("remoteObject is nullptr, can not get obj from renderRemoteObj.");
+                return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+            }
+            FormTaskMgr::GetInstance().PostReleaseRenderer(formId, compId, uid, remoteObject);
+            return ERR_OK;
+        }
+    }
+    return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+}
+
 ErrCode FormRenderMgr::AddConnection(int64_t formId, sptr<FormRenderConnection> connection)
 {
     HILOG_INFO("%{public}s called.", __func__);

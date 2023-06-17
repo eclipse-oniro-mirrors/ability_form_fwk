@@ -38,6 +38,8 @@ FormRenderStub::FormRenderStub()
         &FormRenderStub::HandleCleanFormHost;
     memberFuncMap_[static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_RELOAD_FORM)] =
         &FormRenderStub::HandleReloadForm;
+    memberFuncMap_[static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_RELEASE_RENDERER)] =
+        &FormRenderStub::HandleReleaseRenderer;
 }
 
 FormRenderStub::~FormRenderStub()
@@ -123,6 +125,16 @@ int FormRenderStub::HandleCleanFormHost(MessageParcel &data, MessageParcel &repl
     }
 
     int32_t result = CleanFormHost(hostToken);
+    reply.WriteInt32(result);
+    return result;
+}
+
+int32_t FormRenderStub::HandleReleaseRenderer(MessageParcel &data, MessageParcel &reply)
+{
+    int64_t formId = data.ReadInt64();
+    std::string compId = data.ReadString();
+    std::string uid = data.ReadString();
+    int32_t result = ReleaseRenderer(formId, compId, uid);
     reply.WriteInt32(result);
     return result;
 }

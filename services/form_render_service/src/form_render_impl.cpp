@@ -80,7 +80,7 @@ int32_t FormRenderImpl::RenderForm(const FormJsInfo &formJsInfo, const Want &wan
         if (auto search = renderRecordMap_.find(uid); search != renderRecordMap_.end()) {
             result = search->second->UpdateRenderRecord(formJsInfo, want, hostToken);
         } else {
-            auto record = FormRenderRecord::Create(formJsInfo.bundleName, uid);
+            auto record = FormRenderRecord::Create(formJsInfo.bundleName, uid, formJsInfo.isDynamic);
             if (record == nullptr) {
                 HILOG_ERROR("record is nullptr");
                 return RENDER_FORM_FAILED;
@@ -137,6 +137,38 @@ int32_t FormRenderImpl::StopRenderingForm(const FormJsInfo &formJsInfo, const Wa
         want.GetIntParam(Constants::FORM_CONNECT_ID, 0L));
     if (isRenderGroupEmpty) {
         formSupplyClient->OnStopRenderingTaskDone(formJsInfo.formId, want);
+    }
+
+    return ERR_OK;
+}
+
+int32_t FormRenderImpl::ReleaseRenderer(int64_t formId, const std::string &compId, const std::string &uid)
+{
+    HILOG_INFO("%{public}s start.", __func__);
+    if (formId < 0 || compId.empty() || uid.empty()) {
+        HILOG_ERROR("param invalid");
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+    }
+
+    std::lock_guard<std::mutex> lock(renderRecordMutex_);
+    bool isRenderGroupEmpty = false;
+    auto search = renderRecordMap_.find(uid);
+    if (search == renderRecordMap_.end()) {
+        HILOG_ERROR("%{public}s failed", __func__ );
+        return RENDER_FORM_FAILED;
+    }
+
+    if (!search->second) {
+        HILOG_ERROR("%{public}s failed", __func__ );
+        return RENDER_FORM_FAILED;
+    }
+
+    search->second->ReleaseRenderer(formId, compId, isRenderGroupEmpty);
+    HILOG_INFO("%{public}s end, isRenderGroupEmpty: %{public}d",
+        __func__, isRenderGroupEmpty);
+    if (isRenderGroupEmpty) {
+        HILOG_INFO("Release runtime and eventHandler when no renderer");
+        search->second->Release();
     }
 
     return ERR_OK;

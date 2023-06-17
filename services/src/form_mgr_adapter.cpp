@@ -1552,6 +1552,20 @@ int FormMgrAdapter::SetNextRefreshTime(const int64_t formId, const int64_t nextT
     return SetNextRefreshTimeLocked(matchedFormId, nextTime, userId);
 }
 
+int FormMgrAdapter::ReleaseRenderer(int64_t formId, const std::string &compId)
+{
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    if (formId <= 0 || compId.empty()) {
+        HILOG_ERROR("%{public}s, Release invalid param", __func__);
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    FormRecord record;
+    FormDataMgr::GetInstance().GetFormRecord(formId, record);
+    FormRenderMgr::GetInstance().ReleaseRenderer(formId, record, compId);
+    return ERR_OK;
+}
+
 ErrCode FormMgrAdapter::CheckPublishForm(Want &want)
 {
     std::string bundleName;

@@ -290,6 +290,17 @@ int FormMgrService::SetNextRefreshTime(const int64_t formId, const int64_t nextT
     return FormMgrAdapter::GetInstance().SetNextRefreshTime(formId, nextTime);
 }
 
+int FormMgrService::ReleaseRenderer(int64_t formId, const std::string &compId)
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    ErrCode ret = CheckFormPermission();
+    if (ret != ERR_OK) {
+        HILOG_ERROR("%{public}s fail, request form permission denied", __func__);
+        return ret;
+    }
+    return FormMgrAdapter::GetInstance().ReleaseRenderer(formId, compId);
+}
+
 ErrCode FormMgrService::RequestPublishForm(Want &want, bool withFormBindingData,
     std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId)
 {

@@ -128,6 +128,14 @@ public:
     const int32_t formVisibleType);
 
     /**
+     * @brief Release renderer.
+     * @param formId The Id of the forms to release.
+     * @param compId The compId of the forms to release.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int ReleaseRenderer(const int64_t formId, const std::string &compId);
+
+    /**
      * @brief temp form to normal form.
      * @param formId The Id of the form.
      * @param callerToken Caller ability token.

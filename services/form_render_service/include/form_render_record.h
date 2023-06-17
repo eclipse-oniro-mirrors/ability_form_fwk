@@ -60,7 +60,8 @@ public:
      * @param uid The uid of form bundle.(userId + bundleName)
      * @return Returns FormRenderRecord instance.
      */
-    static std::shared_ptr<FormRenderRecord> Create(const std::string &bundleName, const std::string &uid);
+    static std::shared_ptr<FormRenderRecord> Create(
+        const std::string &bundleName, const std::string &uid, bool needMonitored = true);
 
     FormRenderRecord(const std::string &bundleName, const std::string &uid);
 
@@ -108,6 +109,10 @@ public:
 
     void MarkThreadAlive();
 
+    void ReleaseRenderer(int64_t formId, const std::string &compId, bool &isRenderGroupEmpty);
+
+    void Release();
+
 private:
     class RemoteObjHash {
     public:
@@ -118,7 +123,7 @@ private:
     };
     using IRemoteObjectSet = std::unordered_set<sptr<IRemoteObject>, RemoteObjHash>;
 
-    bool CreateEventHandler(const std::string &bundleName);
+    bool CreateEventHandler(const std::string &bundleName, bool needMonitored = true);
 
     bool CreateRuntime(const FormJsInfo &formJsInfo);
 
@@ -138,6 +143,8 @@ private:
 
     void HandleDestroyInJsThread();
 
+    bool HandleReleaseRendererInJsThread(int64_t formId, const std::string &compId, bool &isRenderGroupEmpty);
+
     std::string GenerateContextKey(const FormJsInfo &formJsInfo);
 
     void ReleaseHapFileHandle();
@@ -150,10 +157,24 @@ private:
 
     TaskState RunTask();
 
+    bool CheckEventHandler(bool createThead = true, bool needMonitored = false);
+
+    void AddStaticFormRequest(const FormJsInfo &formJsInfo, const Want &want);
+
+    void DeleteStaticFormRequest(int64_t formId, const std::string &compId);
+
+    void UpdateStaticFormRequestReleaseState(
+        int64_t formId, const std::string &compId, bool hasRelease);
+
+    void ReAddAllStaticForms();
+
+    void ReAddStaticForms(const std::vector<int64_t> &formIds);
+
     std::string bundleName_;
     std::string uid_;
     std::shared_ptr<EventRunner> eventRunner_;
     std::shared_ptr<EventHandler> eventHandler_;
+    std::mutex eventHandlerMutex_;
     std::shared_ptr<AbilityRuntime::Runtime> runtime_;
 
     // <formId, hostRemoteObj>
@@ -165,6 +186,8 @@ private:
     // <formId, formRendererGroup>
     std::mutex formRendererGroupMutex_;
     std::unordered_map<int64_t, std::shared_ptr<Ace::FormRendererGroup>> formRendererGroupMap_;
+    std::mutex staticFormRequestsMutex_;
+    std::unordered_map<int64_t, std::unordered_map<std::string, Ace::FormRequest>> staticFormRequests_;
     std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration_;
 
     std::string hapPath_;
