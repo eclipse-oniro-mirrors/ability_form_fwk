@@ -21,6 +21,7 @@
 #include "extractor.h"
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
+#include "form_module_checker.h"
 #include "form_render_impl.h"
 #include "xcollie/watchdog.h"
 
@@ -303,6 +304,7 @@ bool FormRenderRecord::CreateRuntime(const FormJsInfo &formJsInfo)
     options.loadAce = true;
     options.isBundle = true;
     options.isUnique = true;
+    options.moduleCheckerDelegate = std::make_shared<FormModuleChecker>();
     runtime_ = AbilityRuntime::Runtime::Create(options);
     if (runtime_ == nullptr) {
         HILOG_ERROR("Create runtime Failed!");
