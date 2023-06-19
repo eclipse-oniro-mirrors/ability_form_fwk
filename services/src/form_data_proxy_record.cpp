@@ -18,26 +18,24 @@
 #include <vector>
 
 #include "fms_log_wrapper.h"
-#include "form_ashmem.h"
 #include "form_bms_helper.h"
 #include "form_data_mgr.h"
 #include "form_mgr_adapter.h"
 #include "form_mgr_errors.h"
 #include "form_util.h"
-#include "nlohmann/json.hpp"
 #include "ipc_skeleton.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 void FormDataProxyRecord::OnRdbDataChange(const DataShare::RdbChangeNode &changeNode)
 {
-    HILOG_DEBUG("on rdb data change.");
+    HILOG_INFO("on rdb data change. data size is %{public}zu", changeNode.data_.size());
     UpdateRdbDataForm(changeNode.data_);
 }
 
 void FormDataProxyRecord::OnPublishedDataChange(const DataShare::PublishedDataChangeNode &changeNode)
 {
-    HILOG_DEBUG("on published data change.");
+    HILOG_INFO("on published data change. data size is %{public}zu", changeNode.datas_.size());
     UpdatePublishedDataForm(changeNode.datas_);
 }
 
@@ -257,24 +255,7 @@ void FormDataProxyRecord::UpdatePublishedDataForm(const std::vector<DataShare::P
             continue;
         }
         if (iter.IsAshmem()) {
-            auto node = std::get<DataShare::AshmemNode>(iter.value_);
-            if (node.ashmem == nullptr) {
-                HILOG_ERROR("ashmem form data share is nullptr.");
-                continue;
-            }
-
-            sptr<FormAshmem> formAshmem = new (std::nothrow) FormAshmem();
-            if (formAshmem == nullptr) {
-                HILOG_ERROR("alloc shmem failed");
-                continue;
-            }
-            auto size = node.ashmem->GetAshmemSize();
-            if (!formAshmem->WriteToAshmem(iter.key_, (char *)node.ashmem->ReadFromAshmem(size, 0), size)) {
-                HILOG_ERROR("write to shmem failed");
-                continue;
-            }
-            std::pair<sptr<FormAshmem>, int32_t> imageDataRecord = std::make_pair(formAshmem, sizeof(formAshmem));
-            imageDataMap[iter.key_] = imageDataRecord;
+            PrepareImageData(iter, object, imageDataMap);
         } else {
             auto value = std::get<std::string>(iter.value_);
             nlohmann::json dataObject = nlohmann::json::parse(value, nullptr, false);
@@ -286,7 +267,8 @@ void FormDataProxyRecord::UpdatePublishedDataForm(const std::vector<DataShare::P
         }
     }
     std::string formDataStr = object.empty() ? "" : object.dump();
-    HILOG_DEBUG("formDataStr: %{private}s.", formDataStr.c_str());
+    HILOG_INFO("update published data. formDataStr: %{private}s, imageDataMap size: %{publish}zu.",
+        formDataStr.c_str(), imageDataMap.size());
     FormProviderData formProviderData;
     formProviderData.SetDataString(formDataStr);
     if (!imageDataMap.empty()) {
@@ -300,6 +282,7 @@ void FormDataProxyRecord::UpdateRdbDataForm(const std::vector<std::string> &data
 {
     nlohmann::json object;
     for (const auto& iter : data) {
+        HILOG_DEBUG("iter: %{private}s.", iter.c_str());
         nlohmann::json dataObject = nlohmann::json::parse(iter, nullptr, false);
         if (dataObject.is_discarded()) {
             HILOG_ERROR("failed to parse data: %{public}s.", iter.c_str());
@@ -309,7 +292,7 @@ void FormDataProxyRecord::UpdateRdbDataForm(const std::vector<std::string> &data
     }
 
     std::string formDataStr = object.empty() ? "" : object.dump();
-    HILOG_DEBUG("formDataStr: %{private}s.", formDataStr.c_str());
+    HILOG_INFO("update rdb data. formDataStr: %{private}s.", formDataStr.c_str());
     FormProviderData formProviderData;
     formProviderData.SetDataString(formDataStr);
     FormMgrAdapter::GetInstance().UpdateForm(formId_, bundleName_, formProviderData);
@@ -440,6 +423,38 @@ ErrCode FormDataProxyRecord::SetPublishSubsState(std::map<std::string, std::stri
     }
 
     return ERR_OK;
+}
+
+bool FormDataProxyRecord::PrepareImageData(const DataShare::PublishedDataItem &data, nlohmann::json &jsonObj,
+    std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap)
+{
+    auto node = std::get<DataShare::AshmemNode>(data.value_);
+    if (node.ashmem == nullptr) {
+        HILOG_ERROR("ashmem form data share is nullptr.");
+        return false;
+    }
+    sptr<FormAshmem> formAshmem = new (std::nothrow) FormAshmem();
+    if (formAshmem == nullptr) {
+        HILOG_ERROR("alloc shmem failed");
+        return false;
+    }
+    auto size = node.ashmem->GetAshmemSize();
+    auto imageName = data.key_ + std::to_string(FormUtil::GetCurrentNanosecond());
+    if (!formAshmem->WriteToAshmem(imageName, (char *)node.ashmem->ReadFromAshmem(size, 0), size)) {
+        HILOG_ERROR("write to shmem failed");
+        return false;
+    }
+
+    nlohmann::json dataObject = nlohmann::json::parse(imageName, nullptr, false);
+    if (dataObject.is_discarded()) {
+        HILOG_ERROR("failed to parse imageName: %{public}s.", imageName.c_str());
+        return false;
+    }
+    jsonObj[data.key_] = dataObject;
+
+    std::pair<sptr<FormAshmem>, int32_t> imageDataRecord = std::make_pair(formAshmem, sizeof(formAshmem));
+    imageDataMap[imageName] = imageDataRecord;
+    return true;
 }
 } // namespace AppExecFwk
 } // namespace OHOS
