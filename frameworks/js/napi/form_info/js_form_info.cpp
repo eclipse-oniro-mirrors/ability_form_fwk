@@ -67,7 +67,8 @@ NativeValue* CreateJsFormParam(NativeEngine &engine)
     object->SetProperty("ABILITY_NAME_KEY", CreateJsValue(engine, AppExecFwk::Constants::PARAM_ABILITY_NAME_KEY));
     object->SetProperty("DEVICE_ID_KEY", CreateJsValue(engine, AppExecFwk::Constants::PARAM_DEVICE_ID_KEY));
     object->SetProperty("LAUNCH_REASON_KEY", CreateJsValue(engine, AppExecFwk::Constants::LAUNCH_REASON_KEY));
-    object->SetProperty("PARAM_FORM_CUSTOMIZE_KEY", CreateJsValue(engine, AppExecFwk::Constants::PARAM_FORM_CUSTOMIZE_KEY));
+    object->SetProperty("PARAM_FORM_CUSTOMIZE_KEY",
+        CreateJsValue(engine, AppExecFwk::Constants::PARAM_FORM_CUSTOMIZE_KEY));
     return objValue;
 }
 
