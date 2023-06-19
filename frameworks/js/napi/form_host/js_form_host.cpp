@@ -48,6 +48,9 @@ namespace {
     constexpr int64_t NANOSECONDS = 1000000000;
     // MICROSECONDS mean 10^6 millias second
     constexpr int64_t MICROSECONDS = 1000000;
+    //input parameters illegal
+    const std::string ILLEGAL_PARAMETERS = "#inllegal_param";
+    const std::string ALL_BUNDLE = "all";
 }
 
 int64_t SystemTimeMillis() noexcept
@@ -1110,7 +1113,7 @@ private:
             NapiFormUtil::ThrowParamTypeError(engine, "callback", "Callback<Array<RunningFormInfo>>");
             return engine.CreateUndefined();
         }
-        std::string bundleName("all");
+        std::string bundleName(ALL_BUNDLE);
         if (info.argc >= ARGS_THREE) {
             HILOG_DEBUG("three or more params");
             if (info.argv[PARAM2]->TypeOf() == NATIVE_UNDEFINED || info.argv[PARAM2]->TypeOf() == NATIVE_NULL) {
@@ -1136,6 +1139,9 @@ private:
             HILOG_ERROR("formObserver_ is nullptr");
             formObserver_ = JsFormStateObserver::GetInstance();
         }
+        if (bundleName == ALL_BUNDLE) {
+            bundleName = ALL_BUNDLE + ILLEGAL_PARAMETERS;
+        }
         JsFormStateObserver::GetInstance()->
             RegisterFormInstanceCallback(engine, info.argv[PARAM1], isVisibility, bundleName, formObserver_);
         return engine.CreateUndefined();
@@ -1149,7 +1155,7 @@ private:
             NapiFormUtil::ThrowParamNumError(engine, std::to_string(info.argc), "1 or 2 or 3");
             return engine.CreateUndefined();
         }
-        std::string bundleName("all");
+        std::string bundleName(ALL_BUNDLE);
         bool callerflag = false;
         if (info.argc >= ARGS_TWO) {
             if (info.argv[PARAM1]->TypeOf() == NATIVE_FUNCTION) {
@@ -1188,18 +1194,21 @@ private:
                     NapiFormUtil::ThrowParamTypeError(engine, "bundleName", "string");
                     return engine.CreateUndefined();
                 }
+                if (bundleName == ALL_BUNDLE) {
+                    bundleName = ALL_BUNDLE + ILLEGAL_PARAMETERS;
+                }
                 if(info.argv[PARAM1]->TypeOf() != NATIVE_FUNCTION && info.argv[PARAM1]->TypeOf() != NATIVE_UNDEFINED && 
                     info.argv[PARAM1]->TypeOf() != NATIVE_NULL) {
                     HILOG_ERROR("param1 is invalid");
                     NapiFormUtil::ThrowParamTypeError(engine, "callback", "Callback<Array<RunningFormInfo>>");
                     return engine.CreateUndefined();
                 }
-                
             } else {
                 NapiFormUtil::ThrowParamTypeError(engine, "param 3", "type");
                 return engine.CreateUndefined();
             }
         }
+
         if (callerflag) {
             JsFormStateObserver::GetInstance()->
                 DelFormNotifyVisibleCallbackByBundle(bundleName, isVisibility, info.argv[PARAM1], formObserver_);
