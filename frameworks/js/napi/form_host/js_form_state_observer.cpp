@@ -344,8 +344,6 @@ int JsFormStateObserver::RegisterFormInstanceCallback(NativeEngine &engine, Nati
             HILOG_ERROR("bundleName is already in the map, bundleName id %{public}s", bundleName.c_str());
             return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
         }
-        AppExecFwk::FormMgr::GetInstance().RegisterAddObserver(bundleName + specialFlag + std::to_string(isVisibility),
-            formObserver);
         formVisibleCallbackMap_.emplace(
             bundleName, std::shared_ptr<NativeReference>(engine.CreateReference(jsObserverObject, 1)));
     } else {
@@ -354,11 +352,11 @@ int JsFormStateObserver::RegisterFormInstanceCallback(NativeEngine &engine, Nati
             HILOG_ERROR("bundleName is already in the map, bundleName id %{public}s", bundleName.c_str());
             return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
         }
-        AppExecFwk::FormMgr::GetInstance().RegisterAddObserver(bundleName + specialFlag + std::to_string(isVisibility),
-            formObserver);
         formInvisibleCallbackMap_.emplace(
             bundleName, std::shared_ptr<NativeReference>(engine.CreateReference(jsObserverObject, 1)));
     }
+    AppExecFwk::FormMgr::GetInstance().RegisterAddObserver(bundleName + specialFlag + std::to_string(isVisibility),
+            formObserver);
     return ERR_OK;
 }
 
