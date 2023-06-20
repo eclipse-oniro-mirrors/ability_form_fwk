@@ -744,7 +744,41 @@ private:
      */
     ErrCode AllotFormBySpecificId(const FormItemInfo &info,
         const sptr<IRemoteObject> &callerToken, const WantParams &wantParams, FormJsInfo &formInfo);
+
+    /**
+     * @brief when form observer died clean the resource.
+     * @param remote remote object.
+     */
+    void CleanResource(const wptr<IRemoteObject> &remote);
+
+    /**
+     * @brief Set value of deathRecipient_.
+     * @param callerToken Caller ability token.
+     * @param deathRecipient DeathRecipient object.
+     */
+    void SetDeathRecipient(const sptr<IRemoteObject> &callerToken,
+        const sptr<IRemoteObject::DeathRecipient> &deathRecipient);
+    mutable std::recursive_mutex formObserversMutex_;
+    mutable std::recursive_mutex deathRecipientsMutex_;
     std::map<std::string, sptr<IRemoteObject>> formObservers_;
+    std::map<sptr<IRemoteObject>, sptr<IRemoteObject::DeathRecipient>> deathRecipients_;
+    /**
+     * @class ClientDeathRecipient
+     * notices IRemoteBroker died.
+     */
+    class ClientDeathRecipient : public IRemoteObject::DeathRecipient {
+    public:
+        /**
+         * @brief Constructor
+         */
+        ClientDeathRecipient() = default;
+        virtual ~ClientDeathRecipient() = default;
+        /**
+         * @brief handle remote object died event.
+         * @param remote remote object.
+         */
+        void OnRemoteDied(const wptr<IRemoteObject> &remote) override;
+    };
 };
 
 enum class HostId : int8_t {
