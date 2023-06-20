@@ -35,7 +35,7 @@ ohos_shared_library("libfms") {
     "${ability_runtime_path}/services/common/include",
     "${ability_runtime_native_path}/appkit/ability_runtime",
     "${form_fwk_napi_path}/form_host/form_state_observer/include",
-    "//foundation/resourceschedule/ffrt/interfaces/kits",
+    "${ffrt_path}/interfaces/kits",
   ]
   sources = [
     "services/src/form_ability_connection.cpp",
@@ -102,7 +102,7 @@ ohos_shared_library("libfms") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
 
-  deps = [ "//foundation/resourceschedule/ffrt:libffrt" ]
+  deps = [ "${form_fwk_path}:form_manager" ]
 
   external_deps = [
     "ability_base:base",
@@ -118,9 +118,10 @@ ohos_shared_library("libfms") {
     "c_utils:utils",
     "common_event_service:cesfwk_core",
     "common_event_service:cesfwk_innerkits",
+    "data_share:datashare_common",
     "data_share:datashare_consumer",
     "eventhandler:libeventhandler",
-    "form_fwk:form_manager",
+    "ffrt:libffrt",
     "hicollie_native:libhicollie",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",

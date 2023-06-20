@@ -28,6 +28,7 @@ ohos_fuzztest("FormFreeInstallOperatorFuzzTest") {
   include_dirs = [
     "${form_fwk_path}/interfaces/kits/native/include",
     "${form_fwk_path}/services/include",
+    "${ffrt_path}/interfaces/kits",
   ]
   cflags = [
     "-g",

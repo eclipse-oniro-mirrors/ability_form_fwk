@@ -25,6 +25,7 @@ ohos_fuzztest("FormMgrServiceFuzzTest") {
   fuzz_config_file = "${form_fwk_path}/test/fuzztest/formmgrservice_fuzzer"
 
   include_dirs = [
+    "${ffrt_path}/interfaces/kits",
     "${form_fwk_path}/interfaces/kits/native/include",
     "${form_fwk_path}/services/include",
   ]

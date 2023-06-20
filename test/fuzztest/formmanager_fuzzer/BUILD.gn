@@ -24,7 +24,10 @@ ohos_fuzztest("FormManagerFuzzTest") {
 
   fuzz_config_file = "${form_fwk_path}/test/fuzztest/formmanager_fuzzer"
 
-  include_dirs = [ "${form_fwk_path}/services/include" ]
+  include_dirs = [
+    "${form_fwk_path}/services/include",
+    "${ffrt_path}/interfaces/kits",
+  ]
   cflags = [
     "-g",
     "-O0",

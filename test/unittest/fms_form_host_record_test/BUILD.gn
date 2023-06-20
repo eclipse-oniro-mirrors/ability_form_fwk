@@ -33,6 +33,7 @@ ohos_unittest("FmsFormHostRecordTest") {
     "${distributeddatamgr_path}/kv_store/interfaces/innerkits/distributeddata/include",
     "${systemabilitymgr_path}/samgr/adapter/interfaces/innerkits/include",
     "${systemabilitymgr_path}/samgr/interfaces/innerkits/samgr_proxy/include",
+    "${ffrt_path}/interfaces/kits",
     "${form_fwk_path}/interfaces/inner_api/include",
   ]
 

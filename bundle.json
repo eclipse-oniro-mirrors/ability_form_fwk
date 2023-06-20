@@ -30,6 +30,7 @@
               "distributed_notification_service",
               "bundle_framework",
               "common_event_service",
+              "ffrt",
               "hiviewdfx_hilog_native",
               "ipc",
               "napi",
@@ -39,7 +40,19 @@
               "power_manager",
               "safwk",
               "samgr",
-              "c_utils"
+              "c_utils",
+              "ability_base",
+              "eventhandler",
+              "hitrace_native",
+              "access_token",
+              "data_share",
+              "hicollie_native",
+              "hisysevent_native",
+              "kv_store",
+              "resource_management",
+              "time_service",
+              "device_usage_statistics",
+              "ace_engine"
           ],
           "third_party": [
               "node",

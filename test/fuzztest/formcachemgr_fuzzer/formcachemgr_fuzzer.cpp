@@ -22,6 +22,7 @@
 #define protected public
 #include "form_cache_mgr.h"
 #include "form_event_handler.h"
+#include "form_serial_queue.h"
 #undef private
 #undef protected
 #include "securec.h"
@@ -45,10 +46,10 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formCacheMgr.AddData(formId, datas);
     formCacheMgr.DeleteData(formId);
     formCacheMgr.UpdateData(formId, datas);
-    std::shared_ptr<AppExecFwk::EventRunner> runner = nullptr;
-    FormEventHandler formEventHandler(runner);
+    std::make_shared<FormSerialQueue> serialQueue = nullptr;
+    FormEventHandler formEventHandler(serialQueue);
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get();
-    formEventHandler.ProcessEvent(event);
+    formEventHandler.ProcessEvent(1, 2, 0);
     formEventHandler.GetEventId();
     std::shared_ptr<FormEventTimeoutObserver> observer = nullptr;
     formEventHandler.RegisterEventTimeoutObserver(observer);

@@ -19,7 +19,9 @@
 #include <vector>
 
 #include "datashare_helper.h"
+#include "form_ashmem.h"
 #include "form_provider_data_proxy.h"
+#include "nlohmann/json.hpp"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -62,6 +64,9 @@ private:
 
     ErrCode SetRdbSubsState(std::map<std::string, std::string> &rdbSubscribeMap, bool subsState);
     ErrCode SetPublishSubsState(std::map<std::string, std::string> &publishSubscribeMap, bool subsState);
+
+    bool PrepareImageData(const DataShare::PublishedDataItem &data, nlohmann::json &jsonObj,
+        std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap);
 
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper_;
     int64_t formId_ = -1;
