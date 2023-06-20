@@ -154,12 +154,12 @@ int32_t FormRenderImpl::ReleaseRenderer(int64_t formId, const std::string &compI
     bool isRenderGroupEmpty = false;
     auto search = renderRecordMap_.find(uid);
     if (search == renderRecordMap_.end()) {
-        HILOG_ERROR("%{public}s failed", __func__ );
+        HILOG_ERROR("%{public}s failed", __func__);
         return RENDER_FORM_FAILED;
     }
 
     if (!search->second) {
-        HILOG_ERROR("%{public}s failed", __func__ );
+        HILOG_ERROR("%{public}s failed", __func__);
         return RENDER_FORM_FAILED;
     }
 
