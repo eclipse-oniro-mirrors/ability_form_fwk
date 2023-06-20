@@ -75,6 +75,7 @@ const std::string POINT_ETS = ".ets";
 // Apps bundles that are allowed to publish form, should replace by the AG API in the future.
 const std::string BUNDLE_NAME_LAUNCHER = "com.ohos.launcher";
 const std::string BUNDLE_NAME_SERVICE_CENTER = "com.ohos.hag.famanager";
+const std::string EMPTY_BUNDLE = "";
 const std::unordered_set<std::string> PUBLISH_FORM_ALLOWED_SET = {BUNDLE_NAME_LAUNCHER,
     BUNDLE_NAME_SERVICE_CENTER};
 } // namespace
@@ -654,7 +655,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
         FormInstance formInstance;
         FormDataMgr::GetInstance().GetFormInstanceById(matchedFormId, formInstance);
         std::string formHostName = formInstance.formHostName;
-        std::string formAllHostName = "all";
+        std::string formAllHostName = EMPTY_BUNDLE;
         for (auto formObserver : formObservers_) {
             if (formObserver.first == formHostName + specialFlag + std::to_string(isVisibility) ||
                 formObserver.first == formAllHostName + specialFlag + std::to_string(isVisibility)) {
