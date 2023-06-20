@@ -191,26 +191,21 @@ ErrCode FormDataProxyRecord::UnsubscribeFormData(std::map<std::string, std::stri
 void FormDataProxyRecord::ParseFormDataProxies(const std::vector<FormDataProxy> &formDataProxies)
 {
     std::vector<ProxyData> proxyData;
-    FormBmsHelper::GetInstance().GetProxyDataInfos(bundleName_, moduleName_, FormUtil::GetCurrentAccountId(),
-        proxyData);
+    FormBmsHelper::GetInstance().GetAllProxyDataInfos(FormUtil::GetCurrentAccountId(), proxyData);
 
     for (const auto& formDataProxy : formDataProxies) {
         auto subscribe = formDataProxy.subscribeId.empty() ? std::to_string(formId_) : formDataProxy.subscribeId;
-        bool isRdbSubscribe = false;
         for (const auto& iter : proxyData) {
             if (formDataProxy.key == iter.uri) {
                 rdbSubscribeMap_[formDataProxy.key] = subscribe;
-                isRdbSubscribe = true;
                 HILOG_DEBUG("subscribe rdb data. key: %{public}s, subscribeId: %{public}s",
                     formDataProxy.key.c_str(), subscribe.c_str());
                 break;
             }
         }
-        if (isRdbSubscribe == false) {
-            publishSubscribeMap_[formDataProxy.key] = subscribe;
-            HILOG_DEBUG("subscribe publish data. key: %{public}s, subscribeId: %{public}s",
-                formDataProxy.key.c_str(), subscribe.c_str());
-        }
+        publishSubscribeMap_[formDataProxy.key] = subscribe;
+        HILOG_DEBUG("subscribe publish data. key: %{public}s, subscribeId: %{public}s",
+            formDataProxy.key.c_str(), subscribe.c_str());
     }
 }
 

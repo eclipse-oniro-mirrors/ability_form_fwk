@@ -54,10 +54,7 @@ ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<Fo
     if (search != formDataProxyRecordMap_.end()) {
         if (search->second != nullptr) {
             HILOG_DEBUG("the form has already subscribed, formId: %{public}s.", std::to_string(formId).c_str());
-            return ERR_OK;
-        } else {
-            HILOG_WARN("formDataProxyRecord is nullptr.");
-            formDataProxyRecordMap_.erase(formId);
+            search->second->UnsubscribeFormData();
         }
     }
 
@@ -74,7 +71,7 @@ ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<Fo
         HILOG_ERROR("SubscribeFormData failed.");
         return ret;
     }
-    formDataProxyRecordMap_.emplace(formId, formDataProxyRecord);
+    formDataProxyRecordMap_[formId] = formDataProxyRecord;
     return ERR_OK;
 }
 

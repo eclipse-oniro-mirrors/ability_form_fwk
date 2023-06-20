@@ -147,6 +147,8 @@ public:
     ErrCode GetProxyDataInfos(const std::string &bundleName, const std::string &moduleName,
         int32_t userId, std::vector<ProxyData> &proxyData);
 
+    ErrCode GetAllProxyDataInfos(int32_t userId, std::vector<ProxyData> &proxyData);
+
     ErrCode GetApplicationInfo(const std::string &bundleName, int32_t userId, ApplicationInfo &appInfo);
     static constexpr int64_t INVALID_UID = -1;
 private:
