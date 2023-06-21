@@ -122,7 +122,7 @@ ohos_shared_library("libfms") {
     "data_share:datashare_consumer",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
-    "hicollie_native:libhicollie",
+    "hicollie:libhicollie",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
