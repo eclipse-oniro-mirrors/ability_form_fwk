@@ -34,7 +34,7 @@ void FormEventHandler::ProcessEvent(int64_t msg, int64_t eventId, int64_t delayT
         return;
     }
 
-    auto task = [thisWeakPtr = weak_from_this(), msg, eventId](){
+    auto task = [thisWeakPtr = weak_from_this(), msg, eventId]() {
         auto sharedThis = thisWeakPtr.lock();
         std::lock_guard<std::mutex> lock(sharedThis->observerMutex_);
         for (auto &observer : sharedThis->observers_) {

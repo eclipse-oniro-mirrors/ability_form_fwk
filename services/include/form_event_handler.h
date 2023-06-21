@@ -69,7 +69,7 @@ public:
      * @param eventId, The event Id.
      * @param delayTime, The delay time.
      */
-    void ProcessEvent(int64_t msg, int64_t eventId, int64_t delayTime = 0);    
+    void ProcessEvent(int64_t msg, int64_t eventId, int64_t delayTime = 0);
 
 private:
     static int64_t eventId_;

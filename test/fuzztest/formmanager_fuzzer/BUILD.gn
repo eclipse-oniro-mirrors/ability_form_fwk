@@ -24,10 +24,7 @@ ohos_fuzztest("FormManagerFuzzTest") {
 
   fuzz_config_file = "${form_fwk_path}/test/fuzztest/formmanager_fuzzer"
 
-  include_dirs = [
-    "${form_fwk_path}/services/include",
-    "${ffrt_path}/interfaces/kits",
-  ]
+  include_dirs = [ "${form_fwk_path}/services/include" ]
   cflags = [
     "-g",
     "-O0",
@@ -48,6 +45,7 @@ ohos_fuzztest("FormManagerFuzzTest") {
     "c_utils:utils",
     "common_event_service:cesfwk_core",
     "common_event_service:cesfwk_innerkits",
+    "ffrt:libffrt",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",

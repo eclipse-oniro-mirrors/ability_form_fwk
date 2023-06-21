@@ -79,7 +79,7 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formInfoes.emplace_back(aa);
     formMgrService.GetAllFormsInfo(formInfoes);
     formMgrService.StartAbility(want, callerToken);
-    formMgrService.InitFormShareMgrEventHandler();
+    formMgrService.InitFormShareMgrSerialQueue();
     FormShareInfo info;
     formMgrService.RecvFormShareInfoFromRemote(info);
     int fd = static_cast<int>(GetU32Data(data));

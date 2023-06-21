@@ -35,6 +35,7 @@
 #include "form_info.h"
 #include "form_info_mgr.h"
 #include "form_mgr.h"
+#include "form_serial_queue.h"
 #include "form_share_mgr.h"
 #undef private
 #include "form_event_util.h"
@@ -212,9 +213,9 @@ void FmsFormShareMgrTest::ClearFormShareMgrMapData()
 HWTEST_F(FmsFormShareMgrTest, RecvFormShareInfoFromRemote_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest RecvFormShareInfoFromRemote_001 start";
-    auto runner = EventRunner::Create("FormMgrService");
-    auto handler = std::make_shared<FormEventHandler>(runner);
-    DelayedSingleton<FormShareMgr>::GetInstance()->SetEventHandler(handler);
+    const std::string queueStr = "queue";
+    auto queue = std::make_shared<OHOS::AppExecFwk::FormSerialQueue>(queueStr);
+    DelayedSingleton<FormShareMgr>::GetInstance()->SetSerialQueue(queue);
     FormShareInfo info;
     auto result = DelayedSingleton<FormShareMgr>::GetInstance()->RecvFormShareInfoFromRemote(info);
     EXPECT_EQ(result, ERR_OK);
@@ -234,6 +235,11 @@ HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_001, TestSiz
 
     WantParams wantParams;
     wantParams.SetParam(Constants::PARAM_DEVICE_ID_KEY, AAFwk::String::Box("device"));
+    const std::string queueStr = "queue";
+    auto queue = std::make_shared<OHOS::AppExecFwk::FormSerialQueue>(queueStr);
+    DelayedSingleton<FormShareMgr>::GetInstance()->SetSerialQueue(queue);
+    auto handler = std::make_shared<FormEventHandler>(queue);
+    DelayedSingleton<FormShareMgr>::GetInstance()->SetEventHandler(handler);
     FormShareInfo info;
     info.formId = 1;
     info.formName = "";
@@ -328,7 +334,7 @@ HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_003, TestSiz
     FormShareInfo info;
     info.formId = 1;
     info.formName = "form";
-    info.bundleName = "form_bundle";
+    info.bundleName = "form_bundle1";
     info.moduleName = "form_module";
     info.abilityName = "form_ability";
     info.dimensionId = 1;
@@ -350,7 +356,11 @@ HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_003, TestSiz
     AbilityInfo abilityInfo;
     ExtensionAbilityInfo extensionInfo;
     bundleMgr_->ImplicitQueryInfoByPriority(want, flags, userId, abilityInfo, extensionInfo);
-
+    const std::string queueStr = "queue";
+    auto queue = std::make_shared<OHOS::AppExecFwk::FormSerialQueue>(queueStr);
+    DelayedSingleton<FormShareMgr>::GetInstance()->SetSerialQueue(queue);
+    auto handler = std::make_shared<FormEventHandler>(queue);
+    DelayedSingleton<FormShareMgr>::GetInstance()->SetEventHandler(handler);
     auto result = DelayedSingleton<FormShareMgr>::GetInstance()->HandleRecvFormShareInfoFromRemoteTask(info);
     EXPECT_EQ(result, ERR_OK);
 
@@ -2267,9 +2277,7 @@ HWTEST_F(FmsFormShareMgrTest, FormAmsHelper_0003, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormAmsHelper_0003 start";
     FormAmsHelper formAmsHelper;
-    auto runner = EventRunner::Create("FormMgrService");
-    auto handler = std::make_shared<FormEventHandler>(runner);
-    formAmsHelper.SetEventHandler(handler);
+    formAmsHelper.SetSerialQueue(nullptr);
     sptr<AAFwk::IAbilityConnection> connect = nullptr;
     formAmsHelper.DisconnectServiceAbilityDelay(connect);
     GTEST_LOG_(INFO) << "FormAmsHelper_0003 end";
@@ -3782,8 +3790,7 @@ HWTEST_F(FmsFormShareMgrTest, SetEventHandler_001, TestSize.Level1)
     DelayedSingleton<FormShareMgr>::GetInstance()->SetEventHandler(handler);
     EXPECT_TRUE(DelayedSingleton<FormShareMgr>::GetInstance()->eventHandler_ == nullptr);
 
-    auto runner = EventRunner::Create("FormMgrService");
-    handler = std::make_shared<FormEventHandler>(runner);
+    handler = std::make_shared<FormEventHandler>(nullptr);
     DelayedSingleton<FormShareMgr>::GetInstance()->SetEventHandler(handler);
     EXPECT_TRUE(DelayedSingleton<FormShareMgr>::GetInstance()->eventHandler_ != nullptr);
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest SetEventHandler_001 end";
@@ -4263,8 +4270,7 @@ HWTEST_F(FmsFormShareMgrTest, FinishFreeInstallTask_001, TestSize.Level1)
     DelayedSingleton<FormShareMgr>::GetInstance()->freeInstallOperatorMap_.clear();
 
     const std::string formShareInfoKey;
-    const std::shared_ptr<FormEventHandler> handler;
-    auto freeInstallOperator = std::make_shared<FormFreeInstallOperator>(formShareInfoKey, handler);
+    auto freeInstallOperator = std::make_shared<FormFreeInstallOperator>(formShareInfoKey, nullptr);
     int64_t eventId = 1;
     DelayedSingleton<FormShareMgr>::GetInstance()->freeInstallOperatorMap_.emplace(eventId, freeInstallOperator);
     DelayedSingleton<FormShareMgr>::GetInstance()->FinishFreeInstallTask(freeInstallOperator);

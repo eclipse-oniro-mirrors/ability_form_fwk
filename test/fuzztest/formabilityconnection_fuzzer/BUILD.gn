@@ -28,7 +28,6 @@ ohos_fuzztest("FormAbilityConnectionFuzzTest") {
   include_dirs = [
     "${form_fwk_path}/interfaces/kits/native/include",
     "${form_fwk_path}/services/include",
-    "${ffrt_path}/interfaces/kits",
   ]
   cflags = [
     "-g",
@@ -62,6 +61,7 @@ ohos_fuzztest("FormAbilityConnectionFuzzTest") {
     "c_utils:utils",
     "common_event_service:cesfwk_core",
     "common_event_service:cesfwk_innerkits",
+    "ffrt:libffrt",
     "form_fwk:form_manager",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",

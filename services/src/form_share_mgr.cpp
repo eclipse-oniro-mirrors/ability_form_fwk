@@ -166,7 +166,7 @@ int32_t FormShareMgr::CheckFormPackage(const FormShareInfo &info, const std::str
     }
 
     if (eventHandler_ == nullptr) {
-        HILOG_ERROR("serialQueue_ is nullptr.");
+        HILOG_ERROR("eventHandler_ is nullptr.");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 

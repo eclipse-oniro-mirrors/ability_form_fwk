@@ -543,8 +543,6 @@ void FormMgrService::OnStop()
     if (handler_) {
         handler_.reset();
     }
-
-
 }
 /**
  * @brief initialization of form manager service.

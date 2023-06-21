@@ -47,7 +47,6 @@ ohos_unittest("form_supply_callback_test") {
     "${device_manager_path}/common/include",
     "${device_manager_path}/interfaces/inner_kits/native_cpp/include/",
     "${ability_dmsfwk_path}/services/dtbschedmgr/include/",
-    "${ffrt_path}/interfaces/kits",
   ]
 
   configs = [
@@ -82,6 +81,7 @@ ohos_unittest("form_supply_callback_test") {
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "eventhandler:libeventhandler",
+    "ffrt:libffrt",
     "form_fwk:form_manager",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",

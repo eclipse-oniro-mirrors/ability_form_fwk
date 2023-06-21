@@ -35,7 +35,6 @@ ohos_shared_library("libfms") {
     "${ability_runtime_path}/services/common/include",
     "${ability_runtime_native_path}/appkit/ability_runtime",
     "${form_fwk_napi_path}/form_host/form_state_observer/include",
-    "${ffrt_path}/interfaces/kits",
   ]
   sources = [
     "services/src/form_ability_connection.cpp",

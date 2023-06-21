@@ -107,7 +107,6 @@ ErrCode FormAmsHelper::DisconnectServiceAbilityDelay(const sptr<AAFwk::IAbilityC
     auto disConnectAbilityFunc = [connect]() {
         FormAmsHelper::GetInstance().DisconnectAbilityTask(connect);
     };
-
     if (!serialQueue_->ScheduleTask(FORM_DISCONNECT_DELAY_TIME, disConnectAbilityFunc)) {
         HILOG_ERROR("%{public}s, failed to disconnect ability", __func__);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;

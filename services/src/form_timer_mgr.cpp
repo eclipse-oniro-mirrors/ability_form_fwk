@@ -1257,7 +1257,7 @@ void FormTimerMgr::ExecTimerTask(const FormTimer &timerTask)
         HILOG_INFO("timerTask.userId is current user");
         want.SetParam(Constants::PARAM_FORM_USER_ID, timerTask.userId);
     }
-    HILOG_INFO("%{public}s, userId:%{public}d", __func__, timerTask.userId);
+    HILOG_INFO("userId:%{public}d", timerTask.userId);
     auto task = [id = timerTask.formId, want]() {
         FormProviderMgr::GetInstance().RefreshForm(id, want, false);
     };

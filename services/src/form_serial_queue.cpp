@@ -16,19 +16,19 @@
 
 #include <limits>
 
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 using namespace ffrt;
 namespace {
-    constexpr uint32_t CONVERSION_FACTOR = 1000; // ms to us
+constexpr uint32_t CONVERSION_FACTOR = 1000; // ms to us
 }
 
 FormSerialQueue::FormSerialQueue(const std::string &queueName)
 {
     HILOG_DEBUG("create FormSerialQueue, queueName : %{public}s", queueName.c_str());
-    queue_ = std::make_shared<queue>(queueName.c_str());
+    queue queue_(queueName.c_str());
 }
 
 FormSerialQueue::~FormSerialQueue()
@@ -43,7 +43,7 @@ bool FormSerialQueue::ScheduleTask(uint64_t ms, std::function<void()> func)
         HILOG_ERROR("invalid ms, ScheduleTask failed");
         return false;
     }
-    // std::unique_lock<std::shared_mutex> lock(mutex_);
+    std::unique_lock<std::shared_mutex> lock(mutex_);
     task_handle task_handle = queue_->submit_h(func, task_attr().delay(ms * CONVERSION_FACTOR));
     if (task_handle == nullptr) {
         HILOG_ERROR("submit_h return null, ScheduleTask failed");
@@ -53,10 +53,11 @@ bool FormSerialQueue::ScheduleTask(uint64_t ms, std::function<void()> func)
     return true;
 }
 
-void FormSerialQueue::ScheduleDelayTask(const std::pair<int64_t, int64_t> &eventMsg, uint32_t ms, std::function<void()> func)
+void FormSerialQueue::ScheduleDelayTask(const std::pair<int64_t, int64_t> &eventMsg,
+    uint32_t ms, std::function<void()> func)
 {
     HILOG_DEBUG("begin to ScheduleDelayTask");
-    // std::unique_lock<std::shared_mutex> lock(mutex_);
+    std::unique_lock<std::shared_mutex> lock(mutex_);
     task_handle task_handle = queue_->submit_h(func, task_attr().delay(ms * CONVERSION_FACTOR));
     if (task_handle == nullptr) {
         HILOG_ERROR("submit_h return null, ScheduleDelayTask failed");
@@ -69,7 +70,7 @@ void FormSerialQueue::ScheduleDelayTask(const std::pair<int64_t, int64_t> &event
 void FormSerialQueue::CancelDelayTask(const std::pair<int64_t, int64_t> &eventMsg)
 {
     HILOG_DEBUG("begin to CancelDelayTask");
-    // std::unique_lock<std::shared_mutex> lock(mutex_);
+    std::unique_lock<std::shared_mutex> lock(mutex_);
     auto item = taskMap_.find(eventMsg);
     if (item == taskMap_.end()) {
         HILOG_ERROR("task not found, CancelDelayTask failed");

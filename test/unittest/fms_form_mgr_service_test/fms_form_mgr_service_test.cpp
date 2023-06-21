@@ -79,8 +79,6 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0001, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormMgrService_0001 start";
     FormMgrService formMgrService;
     formMgrService.state_ = ServiceRunningState::STATE_RUNNING;
-    formMgrService.runner_ = EventRunner::Create(NAME_FORM_MGR_SERVICE);
-    formMgrService.handler_ = std::make_shared<FormEventHandler>(formMgrService.runner_);
     constexpr int32_t userId = 0;
     MockGetCurrentAccountIdRet(userId);
     EXPECT_TRUE(formMgrService.IsReady());
@@ -270,8 +268,6 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0012, TestSize.Level1)
     const std::vector<std::u16string> args = { u"-h" };
     int fd = -1;
     formMgrService.state_ = ServiceRunningState::STATE_RUNNING;
-    formMgrService.runner_ = EventRunner::Create(NAME_FORM_MGR_SERVICE);
-    formMgrService.handler_ = std::make_shared<FormEventHandler>(formMgrService.runner_);
     constexpr int32_t userId = 0;
     MockGetCurrentAccountIdRet(userId);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrService.Dump(fd, args));

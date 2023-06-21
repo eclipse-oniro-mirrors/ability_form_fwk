@@ -51,11 +51,11 @@ public:
 
     void SetSerialQueue(const std::shared_ptr<FormSerialQueue> &serialQueue)
     {
-        if (serialQueue_ != nullptr || serialQueue == nullptr) {
+        if (serialQueue == nullptr) {
             return;
         }
         serialQueue_ = serialQueue;
-     }
+    }
 
     /**
      * @brief Share form by formID and deviceID.

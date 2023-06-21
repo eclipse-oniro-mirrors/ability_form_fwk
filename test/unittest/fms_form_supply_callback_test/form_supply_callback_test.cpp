@@ -282,7 +282,7 @@ HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0013, TestSize.Lev
 {
     GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0013 start";
     FormShareMgr* aa = new FormShareMgr();
-    std::shared_ptr<FormEventHandler> handler = std::make_shared<FormEventHandler>(EventRunner::Create());
+    std::shared_ptr<FormEventHandler> handler = std::make_shared<FormEventHandler>(nullptr);
     ASSERT_NE(nullptr, handler);
     DelayedSingleton<FormShareMgr>::GetInstance()->SetEventHandler(handler);
     delete aa;
@@ -298,11 +298,10 @@ HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0014, TestSize.Lev
 {
     HILOG_INFO("FormAcquireConnectionTest_0014 start");
     FormEventHandler formEventHandler(nullptr);
-    // init InnerEvent::Pointer
-    auto event = InnerEvent::Get();
+    constexpr int64_t EVENT_MSG = 1;
+    constexpr int64_t EVENT_ID = 2;
     // text ProcessEvent
-    formEventHandler.ProcessEvent(event);
-
+    formEventHandler.ProcessEvent(EVENT_MSG, EVENT_ID);
     GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0014 end";
 }
 
@@ -319,8 +318,10 @@ HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0015, TestSize.Lev
     auto event = InnerEvent::Get();
     // emplace observer
     formEventHandler.RegisterEventTimeoutObserver(nullptr);
+    constexpr int64_t EVENT_MSG = 1;
+    constexpr int64_t EVENT_ID = 2;
     // text ProcessEvent
-    formEventHandler.ProcessEvent(event);
+    formEventHandler.ProcessEvent(EVENT_MSG, EVENT_ID);
 
     GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0015 end";
 }
@@ -339,8 +340,10 @@ HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0016, TestSize.Lev
     auto event = InnerEvent::Get();
     // emplace observer
     formEventHandler.RegisterEventTimeoutObserver(observer);
+    constexpr int64_t EVENT_MSG = 1;
+    constexpr int64_t EVENT_ID = 2;
     // text ProcessEvent
-    formEventHandler.ProcessEvent(event);
+    formEventHandler.ProcessEvent(EVENT_MSG, EVENT_ID);
 
     GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0016 end";
 }
