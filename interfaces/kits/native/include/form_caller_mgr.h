@@ -62,11 +62,11 @@ private:
 
     std::shared_ptr<EventHandler> eventHandler_ = nullptr;
     // for host
-    mutable std::recursive_mutex formHostCallerMutex_;
+    mutable std::mutex formHostCallerMutex_;
     std::map<int64_t, std::shared_ptr<FormHostCaller>> formHostCallers_;
 
     // for provider
-    mutable std::recursive_mutex formProviderCallerMutex_;
+    mutable std::mutex formProviderCallerMutex_;
     std::vector<std::shared_ptr<FormProviderCaller>> formProviderCallers_;
 };
 } // namespace AppExecFwk

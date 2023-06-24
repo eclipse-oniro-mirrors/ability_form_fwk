@@ -97,7 +97,7 @@ private:
     int32_t OnAcquire(const FormJsInfo &formJsInfo, const sptr<IRemoteObject> &token);
     void UpdateForm(const FormJsInfo &formJsInfo);
 
-    mutable std::recursive_mutex formJsInfoMutex_;
+    mutable std::mutex formJsInfoMutex_;
     std::map<int64_t, FormJsInfo> formJsInfoMap_;
     std::vector<FormJsInfo> formJsInfos_;
     sptr<IRemoteObject> callerToken_ = nullptr;
