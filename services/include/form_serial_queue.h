@@ -34,7 +34,7 @@ public:
 private:
     std::shared_mutex mutex_;
     std::map<std::pair<int64_t, int64_t>, ffrt::task_handle> taskMap_;
-    std::shared_ptr<ffrt::queue> queue_;
+    ffrt::queue queue_;
 };
 }
 }

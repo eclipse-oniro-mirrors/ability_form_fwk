@@ -205,7 +205,7 @@ bool FormEventUtil::ProviderFormUpdated(const int64_t formId, FormRecord &formRe
     FormTimerCfg timerCfg;
     GetTimerCfg(updatedForm.updateEnabled, updatedForm.updateDuration, updatedForm.scheduledUpdateTime, timerCfg);
     HandleTimerUpdate(formId, formRecord, timerCfg);
-    UpateFormRecord(updatedForm, formRecord);
+    UpdateFormRecord(updatedForm, formRecord);
     FormDataMgr::GetInstance().SetVersionUpgrade(formId, true);
     return true;
 }
@@ -225,7 +225,7 @@ bool FormEventUtil::ProviderFormUpdated(const int64_t formId, FormRecord &formRe
     FormTimerCfg timerCfg;
     GetTimerCfg(packForm.updateEnabled, packForm.updateDuration, packForm.scheduledUpdateTime, timerCfg);
     HandleTimerUpdate(formId, formRecord, timerCfg);
-    UpateFormRecord(packForm, formRecord);
+    UpdateFormRecord(packForm, formRecord);
     FormDataMgr::GetInstance().SetVersionUpgrade(formId, true);
     return true;
 }
@@ -470,13 +470,13 @@ void FormEventUtil::BatchDeleteNoHostDBForms(const int uid, std::map<FormIdKey, 
     }
 }
 
-void FormEventUtil::UpateFormRecord(const FormInfo &formInfo, FormRecord &formRecord)
+void FormEventUtil::UpdateFormRecord(const FormInfo &formInfo, FormRecord &formRecord)
 {
     formRecord.formSrc = formInfo.src;
     formRecord.uiSyntax = formInfo.uiSyntax;
     formRecord.isDynamic = formInfo.isDynamic;
     formRecord.isEnableUpdate = formInfo.updateEnabled;
-    formRecord.updateDuration = formInfo.updateDuration;
+    formRecord.updateDuration = formInfo.updateDuration * Constants::TIME_CONVERSION;
     std::vector<std::string> time = FormUtil::StringSplit(formInfo.scheduledUpdateTime, Constants::TIME_DELIMETER);
     if (time.size() == Constants::UPDATE_AT_CONFIG_COUNT) {
         formRecord.updateAtHour = std::stoi(time[0]);
@@ -486,11 +486,11 @@ void FormEventUtil::UpateFormRecord(const FormInfo &formInfo, FormRecord &formRe
     FormDataMgr::GetInstance().UpdateFormRecord(formRecord.formId, formRecord);
 }
 
-void FormEventUtil::UpateFormRecord(const AbilityFormInfo &formInfo, FormRecord &formRecord)
+void FormEventUtil::UpdateFormRecord(const AbilityFormInfo &formInfo, FormRecord &formRecord)
 {
     formRecord.uiSyntax = (formInfo.type.compare("arkts") == 0 ? FormType::ETS : FormType::JS);
     formRecord.isEnableUpdate = formInfo.updateEnabled;
-    formRecord.updateDuration = formInfo.updateDuration;
+    formRecord.updateDuration = formInfo.updateDuration * Constants::TIME_CONVERSION;
     std::vector<std::string> time = FormUtil::StringSplit(formInfo.scheduledUpdateTime, Constants::TIME_DELIMETER);
     if (time.size() == Constants::UPDATE_AT_CONFIG_COUNT) {
         formRecord.updateAtHour = std::stoi(time[0]);

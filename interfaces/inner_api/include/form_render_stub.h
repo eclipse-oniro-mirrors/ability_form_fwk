@@ -67,6 +67,8 @@ private:
      */
     int32_t HandleCleanFormHost(MessageParcel &data, MessageParcel &reply);
 
+    int32_t HandleReleaseRenderer(MessageParcel &data, MessageParcel &reply);
+
     int32_t HandleReloadForm(MessageParcel &data, MessageParcel &reply);
 
 private:

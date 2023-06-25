@@ -133,6 +133,8 @@ FormMgrStub::FormMgrStub()
         &FormMgrStub::HandleUpdateProxyForm;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_PROXY_FORM)] =
         &FormMgrStub::HandleRequestPublishProxyForm;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_RELEASE_RENDERER)] =
+        &FormMgrStub::HandleReleaseRenderer;
 }
 
 FormMgrStub::~FormMgrStub()
@@ -273,6 +275,21 @@ int32_t FormMgrStub::HandleSetNextRefreshTime(MessageParcel &data, MessageParcel
     int64_t formId = data.ReadInt64();
     int64_t nextTime = data.ReadInt64();
     int32_t result = SetNextRefreshTime(formId, nextTime);
+    reply.WriteInt32(result);
+    return result;
+}
+
+/**
+ * @brief handle ReleaseRenderer message.
+ * @param data input param.
+ * @param reply output param.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int32_t FormMgrStub::HandleReleaseRenderer(MessageParcel &data, MessageParcel &reply)
+{
+    int64_t formId = data.ReadInt64();
+    std::string compId = data.ReadString();
+    int32_t result = ReleaseRenderer(formId, compId);
     reply.WriteInt32(result);
     return result;
 }

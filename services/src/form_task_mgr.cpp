@@ -869,6 +869,40 @@ void FormTaskMgr::StopRenderingForm(
     HILOG_INFO("%{public}s end", __func__);
 }
 
+void FormTaskMgr::PostReleaseRenderer(
+    int64_t formId, const std::string &compId, const std::string &uid, const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_INFO("%{public}s begin", __func__);
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("serialQueue_ is nullptr.");
+        return;
+    }
+
+    auto deleterenderForm = [formId, compId, uid, remoteObject]() {
+        FormTaskMgr::GetInstance().ReleaseRenderer(formId, compId, uid, remoteObject);
+    };
+    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, deleterenderForm);
+    HILOG_INFO("%{public}s end", __func__);
+}
+
+void FormTaskMgr::ReleaseRenderer(
+    int64_t formId, const std::string &compId, const std::string &uid, const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_INFO("%{public}s begin", __func__);
+    sptr<IFormRender> remoteFormDeleteRender = iface_cast<IFormRender>(remoteObject);
+    if (remoteFormDeleteRender == nullptr) {
+        HILOG_ERROR("%{public}s fail, Failed to get form render proxy.", __func__);
+        return;
+    }
+
+    int32_t error = remoteFormDeleteRender->ReleaseRenderer(formId, compId, uid);
+    if (error != ERR_OK) {
+        HILOG_ERROR("%{public}s fail, Failed to release form renderer", __func__);
+        return;
+    }
+    HILOG_INFO("%{public}s end", __func__);
+}
+
 void FormTaskMgr::ReloadForm(const std::vector<int64_t> &&formIds, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {

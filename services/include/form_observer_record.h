@@ -75,9 +75,9 @@ public:
     void CleanResource(const wptr<IRemoteObject> &remote);
 
 private:
-    mutable std::recursive_mutex formAddObserverMutex_;
-    mutable std::recursive_mutex formRemoveObserverMutex_;
-    mutable std::recursive_mutex deathRecipientsMutex_;
+    mutable std::mutex formAddObserverMutex_;
+    mutable std::mutex formRemoveObserverMutex_;
+    mutable std::mutex deathRecipientsMutex_;
     std::map<std::string, std::vector<sptr<IRemoteObject>>> formAddObservers_;
     std::map<std::string, std::vector<sptr<IRemoteObject>>> formRemoveObservers_;
     std::map<sptr<IRemoteObject>, sptr<IRemoteObject::DeathRecipient>> deathRecipients_;

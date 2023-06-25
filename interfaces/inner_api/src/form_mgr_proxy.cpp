@@ -246,6 +246,36 @@ int FormMgrProxy::SetNextRefreshTime(const int64_t formId, const int64_t nextTim
     return reply.ReadInt32();
 }
 
+int FormMgrProxy::ReleaseRenderer(int64_t formId, const std::string &compId)
+{
+    MessageParcel data;
+    MessageParcel reply;
+
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("%{public}s, failed to write interface token", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt64(formId)) {
+        HILOG_ERROR("%{public}s, failed to write formId", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteString(compId)) {
+        HILOG_ERROR("%{public}s, failed to write compId", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    MessageOption option;
+    int error = Remote()->SendRequest(
+        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_RELEASE_RENDERER),
+        data,
+        reply,
+        option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d", __func__, error);
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+    return reply.ReadInt32();
+}
+
 ErrCode FormMgrProxy::RequestPublishForm(Want &want, bool withFormBindingData,
                                          std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId)
 {

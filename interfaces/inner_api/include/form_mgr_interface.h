@@ -100,6 +100,14 @@ public:
     virtual int SetNextRefreshTime(const int64_t formId, const int64_t nextTime) = 0;
 
     /**
+     * @brief Release renderer.
+     * @param formId The Id of the forms to release.
+     * @param compId The compId of the forms to release.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int ReleaseRenderer(int64_t formId, const std::string &compId) { return ERR_OK; }
+
+    /**
      * @brief Request to publish a form to the form host.
      *
      * @param want The want of the form to publish.
@@ -507,7 +515,8 @@ public:
         FORM_MGR_REGISTER_ADD_OBSERVER,
         FORM_MGR_REGISTER_REMOVE_OBSERVER,
         FORM_MGR_UPDATE_PROXY_FORM,
-        FORM_MGR_REQUEST_PUBLISH_PROXY_FORM
+        FORM_MGR_REQUEST_PUBLISH_PROXY_FORM,
+        FORM_MGR_RELEASE_RENDERER
     };
 };
 }  // namespace AppExecFwk

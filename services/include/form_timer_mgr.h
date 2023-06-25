@@ -350,9 +350,9 @@ private:
 
     bool IsNeedUpdate();
 
-    mutable std::recursive_mutex intervalMutex_;
-    mutable std::recursive_mutex updateAtMutex_;
-    mutable std::recursive_mutex dynamicMutex_;
+    mutable std::mutex intervalMutex_;
+    mutable std::mutex updateAtMutex_;
+    mutable std::mutex dynamicMutex_;
     FormRefreshLimiter refreshLimiter_;
     std::map<int64_t, FormTimer> intervalTimerTasks_;
     std::list<UpdateAtItem> updateAtTimerTasks_;

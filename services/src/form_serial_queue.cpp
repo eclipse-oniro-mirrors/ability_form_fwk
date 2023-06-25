@@ -25,10 +25,9 @@ namespace {
 constexpr uint32_t CONVERSION_FACTOR = 1000; // ms to us
 }
 
-FormSerialQueue::FormSerialQueue(const std::string &queueName)
+FormSerialQueue::FormSerialQueue(const std::string &queueName): queue_(queueName.c_str())
 {
     HILOG_DEBUG("create FormSerialQueue, queueName : %{public}s", queueName.c_str());
-    queue queue_(queueName.c_str());
 }
 
 FormSerialQueue::~FormSerialQueue()
@@ -44,7 +43,7 @@ bool FormSerialQueue::ScheduleTask(uint64_t ms, std::function<void()> func)
         return false;
     }
     std::unique_lock<std::shared_mutex> lock(mutex_);
-    task_handle task_handle = queue_->submit_h(func, task_attr().delay(ms * CONVERSION_FACTOR));
+    task_handle task_handle = queue_.submit_h(func, task_attr().delay(ms * CONVERSION_FACTOR));
     if (task_handle == nullptr) {
         HILOG_ERROR("submit_h return null, ScheduleTask failed");
         return false;
@@ -58,7 +57,7 @@ void FormSerialQueue::ScheduleDelayTask(const std::pair<int64_t, int64_t> &event
 {
     HILOG_DEBUG("begin to ScheduleDelayTask");
     std::unique_lock<std::shared_mutex> lock(mutex_);
-    task_handle task_handle = queue_->submit_h(func, task_attr().delay(ms * CONVERSION_FACTOR));
+    task_handle task_handle = queue_.submit_h(func, task_attr().delay(ms * CONVERSION_FACTOR));
     if (task_handle == nullptr) {
         HILOG_ERROR("submit_h return null, ScheduleDelayTask failed");
         return;
@@ -77,7 +76,7 @@ void FormSerialQueue::CancelDelayTask(const std::pair<int64_t, int64_t> &eventMs
         return;
     }
     if (item->second != nullptr) {
-        int32_t ret = queue_->cancel(item->second);
+        int32_t ret = queue_.cancel(item->second);
         if (ret != 0) {
             HILOG_ERROR("CancelDelayTask failed, error code : %{public}d", ret);
         }
