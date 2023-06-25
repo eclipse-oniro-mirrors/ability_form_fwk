@@ -421,7 +421,7 @@ ErrCode FormDataProxyRecord::SetPublishSubsState(std::map<std::string, std::stri
 }
 
 bool FormDataProxyRecord::PrepareImageData(const DataShare::PublishedDataItem &data, nlohmann::json &jsonObj,
-    std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap)
+    std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> &imageDataMap)
 {
     auto node = std::get<DataShare::AshmemNode>(data.value_);
     if (node.ashmem == nullptr) {
@@ -440,12 +440,7 @@ bool FormDataProxyRecord::PrepareImageData(const DataShare::PublishedDataItem &d
         return false;
     }
 
-    nlohmann::json dataObject = nlohmann::json::parse(imageName, nullptr, false);
-    if (dataObject.is_discarded()) {
-        HILOG_ERROR("failed to parse imageName: %{public}s.", imageName.c_str());
-        return false;
-    }
-    jsonObj[data.key_] = dataObject;
+    jsonObj[data.key_] = imageName;
 
     std::pair<sptr<FormAshmem>, int32_t> imageDataRecord = std::make_pair(formAshmem, sizeof(formAshmem));
     imageDataMap[imageName] = imageDataRecord;
