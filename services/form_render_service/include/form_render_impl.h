@@ -85,6 +85,9 @@ public:
 
     void OnRenderingBlock(const std::string &bundleName);
 
+    int32_t ReleaseRenderer(
+        int64_t formId, const std::string &compId, const std::string &uid) override;
+
 private:
     std::mutex renderRecordMutex_;
     std::unordered_map<std::string, std::shared_ptr<FormRenderRecord>> renderRecordMap_; // <uid(userId + bundleName), renderRecord>

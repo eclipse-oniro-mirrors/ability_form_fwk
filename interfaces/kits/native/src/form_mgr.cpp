@@ -210,6 +210,35 @@ int FormMgr::UpdateForm(const int64_t formId, const FormProviderData &formBindin
 }
 
 /**
+ * @brief Release renderer.
+ * @param formId The Id of the forms to release.
+ * @param compId The compId of the forms to release.
+ * @return Returns ERR_OK on success, others on failure.
+*/
+int FormMgr::ReleaseRenderer(const int64_t formId, const std::string &compId)
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    // check fms recover status
+    if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
+        HILOG_ERROR("%{public}s error, form is in recover status, can't do action on form.", __func__);
+        return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
+    }
+    // check formId and compId
+    if (formId <= 0 || compId.empty()) {
+        HILOG_ERROR("%{public}s error, the formId is invalid or compId is empty.", __func__);
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+    }
+
+    int errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
+        return errCode;
+    }
+
+    return remoteProxy_->ReleaseRenderer(formId, compId);
+}
+
+/**
  * @brief Notify the form service that the form user's lifecycle is updated.
  *
  * This should be called when form user request form.
