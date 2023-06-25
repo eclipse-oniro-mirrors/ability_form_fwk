@@ -223,7 +223,7 @@ int FormMgr::ReleaseRenderer(const int64_t formId, const std::string &compId)
         HILOG_ERROR("%{public}s error, form is in recover status, can't do action on form.", __func__);
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
     }
-    // check formId
+    // check formId and compId
     if (formId <= 0 || compId.empty()) {
         HILOG_ERROR("%{public}s error, the formId is invalid or compId is empty.", __func__);
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;

@@ -88,8 +88,13 @@ FormRenderRecord::FormRenderRecord(
 
 FormRenderRecord::~FormRenderRecord()
 {
-    std::lock_guard<std::mutex> lock(eventHandlerMutex_);
-    if (eventHandler_ == nullptr) {
+    std::shared_ptr<EventHandler> eventHandler = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(eventHandlerMutex_);
+        eventHandler = eventHandler_;
+    }
+
+    if (eventHandler == nullptr) {
         return;
     }
 
@@ -101,7 +106,7 @@ FormRenderRecord::~FormRenderRecord()
         }
         renderRecord->HandleDestroyInJsThread();
     };
-    eventHandler_->PostSyncTask(syncTask);
+    eventHandler->PostSyncTask(syncTask);
 }
 
 bool FormRenderRecord::HandleHostDied(const sptr<IRemoteObject> hostRemoteObj)
@@ -267,6 +272,28 @@ void FormRenderRecord::DeleteRenderRecord(int64_t formId, const std::string &com
 {
     // Some resources need to be deleted in a JS thread
     HILOG_INFO("Delete some resources formId: %{public}" PRId64 ", %{public}s", formId, compId.c_str());
+    std::shared_ptr<EventHandler> eventHandler = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(eventHandlerMutex_);
+        eventHandler = eventHandler_;
+    }
+
+    if (eventHandler == nullptr) {
+        HILOG_ERROR("eventHandler is nullptr");
+        return;
+    }
+
+    auto task = [weak = weak_from_this(), formId, compId, &isRenderGroupEmpty]() {
+        auto renderRecord = weak.lock();
+        if (renderRecord == nullptr) {
+            HILOG_ERROR("renderRecord is nullptr.");
+            return;
+        }
+
+        isRenderGroupEmpty = renderRecord->HandleDeleteInJsThread(formId, compId);
+        renderRecord->DeleteStaticFormRequest(formId, compId);
+    };
+
     if (hostRemoteObj != nullptr) {
         std::lock_guard<std::mutex> lock(hostsMapMutex_);
         auto iter = hostsMapForFormId_.find(formId);
@@ -275,27 +302,7 @@ void FormRenderRecord::DeleteRenderRecord(int64_t formId, const std::string &com
             hosts.erase(hostRemoteObj);
         }
     }
-
-    {
-        std::lock_guard<std::mutex> lock(eventHandlerMutex_);
-        if (eventHandler_ == nullptr) {
-            HILOG_ERROR("eventHandler_ is nullptr");
-            isRenderGroupEmpty = true;
-            return;
-        }
-
-        auto task = [weak = weak_from_this(), formId, compId, &isRenderGroupEmpty]() {
-            auto renderRecord = weak.lock();
-            if (renderRecord == nullptr) {
-                HILOG_ERROR("renderRecord is nullptr.");
-                return;
-            }
-
-            isRenderGroupEmpty = renderRecord->HandleDeleteInJsThread(formId, compId);
-            renderRecord->DeleteStaticFormRequest(formId, compId);
-        };
-        eventHandler_->PostSyncTask(task);
-    }
+    eventHandler_->PostSyncTask(task);
 }
 
 bool FormRenderRecord::IsEmpty()
@@ -582,8 +589,13 @@ void FormRenderRecord::ReleaseRenderer(
 {
     HILOG_INFO("Release renderer which formId: %{public}s, compId: %{public}s start.",
         std::to_string(formId).c_str(), compId.c_str());
-    std::lock_guard<std::mutex> lock(eventHandlerMutex_);
-    if (eventHandler_ == nullptr) {
+    std::shared_ptr<EventHandler> eventHandler = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(eventHandlerMutex_);
+        eventHandler = eventHandler_;
+    }
+
+    if (eventHandler == nullptr) {
         HILOG_ERROR("eventHandler is nullptr");
         return;
     }
@@ -600,7 +612,7 @@ void FormRenderRecord::ReleaseRenderer(
             renderRecord->UpdateStaticFormRequestReleaseState(formId, compId, true);
         }
     };
-    eventHandler_->PostSyncTask(task);
+    eventHandler->PostSyncTask(task);
 }
 
 bool FormRenderRecord::HandleReleaseRendererInJsThread(
@@ -655,7 +667,7 @@ void FormRenderRecord::Release()
 
 void FormRenderRecord::ReAddAllStaticForms()
 {
-    HILOG_INFO("ReAdd all static forms start, size: %{public}zu.", staticFormRequests_.size());
+    HILOG_INFO("ReAdd all static forms start.");
     if (!CheckEventHandler(false)) {
         HILOG_ERROR("CheckEventHandler failed.");
         return;
@@ -668,12 +680,9 @@ void FormRenderRecord::ReAddAllStaticForms()
                 continue;
             }
 
-            HILOG_INFO("ReAdd static form with formId: %{public}s, compId: %{public}s.",
-                std::to_string(staticFormRequests.first).c_str(), staticFormRequest.first.c_str());
             std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
-            auto task = [thisWeakPtr,
-                    formJsInfo = staticFormRequest.second.formJsInfo,
-                    want = staticFormRequest.second.want]() {
+            auto task = [thisWeakPtr, formJsInfo = staticFormRequest.second.formJsInfo,
+                want = staticFormRequest.second.want]() {
                 auto renderRecord = thisWeakPtr.lock();
                 if (renderRecord) {
                     renderRecord->HandleUpdateInJsThread(formJsInfo, want);
@@ -688,8 +697,7 @@ void FormRenderRecord::ReAddAllStaticForms()
 
 void FormRenderRecord::ReAddStaticForms(const std::vector<int64_t> &formIds)
 {
-    HILOG_INFO("ReAdd static form start, size: %{public}zu, formIds size: %{public}zu.",
-        staticFormRequests_.size(), formIds.size());
+    HILOG_INFO("ReAdd static form start");
     if (!CheckEventHandler(false)) {
         HILOG_ERROR("CheckEventHandler failed.");
         return;
@@ -707,11 +715,8 @@ void FormRenderRecord::ReAddStaticForms(const std::vector<int64_t> &formIds)
                 continue;
             }
 
-            HILOG_INFO("ReAdd static form with formId: %{public}s, compId: %{public}s.",
-                std::to_string(formId).c_str(), staticFormRequest.first.c_str());
             std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
-            auto task = [thisWeakPtr,
-                    formJsInfo = staticFormRequest.second.formJsInfo,
+            auto task = [thisWeakPtr, formJsInfo = staticFormRequest.second.formJsInfo,
                     want = staticFormRequest.second.want]() {
                 auto renderRecord = thisWeakPtr.lock();
                 if (renderRecord) {

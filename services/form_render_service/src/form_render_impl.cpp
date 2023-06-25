@@ -145,7 +145,7 @@ int32_t FormRenderImpl::StopRenderingForm(const FormJsInfo &formJsInfo, const Wa
 int32_t FormRenderImpl::ReleaseRenderer(int64_t formId, const std::string &compId, const std::string &uid)
 {
     HILOG_INFO("%{public}s start.", __func__);
-    if (formId < 0 || compId.empty() || uid.empty()) {
+    if (formId <= 0 || compId.empty() || uid.empty()) {
         HILOG_ERROR("param invalid");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
@@ -167,7 +167,6 @@ int32_t FormRenderImpl::ReleaseRenderer(int64_t formId, const std::string &compI
     HILOG_INFO("%{public}s end, isRenderGroupEmpty: %{public}d",
         __func__, isRenderGroupEmpty);
     if (isRenderGroupEmpty) {
-        HILOG_INFO("Release runtime and eventHandler when no renderer");
         search->second->Release();
     }
 

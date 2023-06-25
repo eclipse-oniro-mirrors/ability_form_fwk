@@ -168,7 +168,7 @@ int32_t FormRenderProxy::ReleaseRenderer(
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.WriteString(uid)) {
-        HILOG_ERROR("%{public}s, failed to write compId", __func__);
+        HILOG_ERROR("%{public}s, failed to write uid", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!Remote()) {

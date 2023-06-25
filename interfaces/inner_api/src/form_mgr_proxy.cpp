@@ -260,7 +260,7 @@ int FormMgrProxy::ReleaseRenderer(int64_t formId, const std::string &compId)
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.WriteString(compId)) {
-        HILOG_ERROR("%{public}s, failed to write nextTime", __func__);
+        HILOG_ERROR("%{public}s, failed to write compId", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     MessageOption option;
