@@ -53,8 +53,8 @@ public:
         std::map<int64_t, bool> &removedFormsMap);
 
 private:
-    void UpateFormRecord(const FormInfo &formInfo, FormRecord &formRecord);
-    void UpateFormRecord(const AbilityFormInfo &formInfo, FormRecord &formRecord);
+    void UpdateFormRecord(const FormInfo &formInfo, FormRecord &formRecord);
+    void UpdateFormRecord(const AbilityFormInfo &formInfo, FormRecord &formRecord);
 };
 } // namespace AppExecFwk
 } // namespace OHOS
