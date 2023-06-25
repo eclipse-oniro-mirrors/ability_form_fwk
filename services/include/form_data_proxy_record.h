@@ -66,7 +66,7 @@ private:
     ErrCode SetPublishSubsState(std::map<std::string, std::string> &publishSubscribeMap, bool subsState);
 
     bool PrepareImageData(const DataShare::PublishedDataItem &data, nlohmann::json &jsonObj,
-        std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap);
+        std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> &imageDataMap);
 
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper_;
     int64_t formId_ = -1;
