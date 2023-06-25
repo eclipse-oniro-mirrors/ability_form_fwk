@@ -177,7 +177,7 @@ BundleFormInfo::BundleFormInfo(const std::string &bundleName) : bundleName_(bund
 ErrCode BundleFormInfo::InitFromJson(const std::string &formInfoStoragesJson)
 {
     nlohmann::json jsonObject = nlohmann::json::parse(formInfoStoragesJson, nullptr, false);
-    if (jsonObject.is_discarded()) {
+    if (jsonObject.is_discarded() || !jsonObject.is_array()) {
         HILOG_ERROR("bad profile");
         return ERR_APPEXECFWK_PARSE_BAD_PROFILE;
     }

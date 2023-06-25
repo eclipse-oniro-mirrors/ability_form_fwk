@@ -16,9 +16,14 @@
 #include "form_cache_mgr.h"
 
 #include "fms_log_wrapper.h"
+#include "nlohmann/json.hpp"
 
 namespace OHOS {
 namespace AppExecFwk {
+namespace {
+const std::string JSON_EMPTY_STRING = "{}";
+}
+
 FormCacheMgr::FormCacheMgr()
 {
     HILOG_INFO("create form cache manager instance");
@@ -68,7 +73,27 @@ bool FormCacheMgr::AddData(const int64_t formId, const std::string &data)
         }
     } else {
         HILOG_INFO("update cache data.");
-        formData->second = data;
+        auto cacheStr = formData->second;
+        if (cacheStr.empty()) {
+            cacheStr = JSON_EMPTY_STRING;
+        }
+        nlohmann::json cacheObj = nlohmann::json::parse(cacheStr, nullptr, false);
+        if (cacheObj.is_discarded()) {
+            HILOG_ERROR("failed to parse cache: %{public}s.", cacheStr.c_str());
+            return false;
+        }
+
+        nlohmann::json dataObj = nlohmann::json::parse(data, nullptr, false);
+        if (dataObj.is_discarded()) {
+            HILOG_ERROR("failed to parse data: %{public}s.", data.c_str());
+            return false;
+        }
+
+        for (auto && [key, value] : dataObj.items()) {
+            cacheObj[key] = value;
+        }
+
+        formData->second = cacheObj.empty() ? "" : cacheObj.dump();;
     }
     return true;
 }

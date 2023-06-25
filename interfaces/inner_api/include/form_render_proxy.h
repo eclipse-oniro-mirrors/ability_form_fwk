@@ -59,6 +59,8 @@ public:
      */
     int32_t CleanFormHost(const sptr<IRemoteObject> &hostToken) override;
 
+    int32_t ReleaseRenderer(int64_t formId, const std::string &compId, const std::string &uid) override;
+
     int32_t ReloadForm(const std::vector<int64_t> &&formIds, const Want &want) override;
 
 private:

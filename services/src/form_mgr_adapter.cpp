@@ -75,6 +75,7 @@ const std::string POINT_ETS = ".ets";
 // Apps bundles that are allowed to publish form, should replace by the AG API in the future.
 const std::string BUNDLE_NAME_LAUNCHER = "com.ohos.launcher";
 const std::string BUNDLE_NAME_SERVICE_CENTER = "com.ohos.hag.famanager";
+const std::string EMPTY_BUNDLE = "";
 const std::unordered_set<std::string> PUBLISH_FORM_ALLOWED_SET = {BUNDLE_NAME_LAUNCHER,
     BUNDLE_NAME_SERVICE_CENTER};
 } // namespace
@@ -654,7 +655,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
         FormInstance formInstance;
         FormDataMgr::GetInstance().GetFormInstanceById(matchedFormId, formInstance);
         std::string formHostName = formInstance.formHostName;
-        std::string formAllHostName = "all";
+        std::string formAllHostName = EMPTY_BUNDLE;
         for (auto formObserver : formObservers_) {
             if (formObserver.first == formHostName + specialFlag + std::to_string(isVisibility) ||
                 formObserver.first == formAllHostName + specialFlag + std::to_string(isVisibility)) {
@@ -1550,6 +1551,20 @@ int FormMgrAdapter::SetNextRefreshTime(const int64_t formId, const int64_t nextT
     }
 
     return SetNextRefreshTimeLocked(matchedFormId, nextTime, userId);
+}
+
+int FormMgrAdapter::ReleaseRenderer(int64_t formId, const std::string &compId)
+{
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    if (formId <= 0 || compId.empty()) {
+        HILOG_ERROR("%{public}s, Release invalid param", __func__);
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    FormRecord record;
+    FormDataMgr::GetInstance().GetFormRecord(formId, record);
+    FormRenderMgr::GetInstance().ReleaseRenderer(formId, record, compId);
+    return ERR_OK;
 }
 
 ErrCode FormMgrAdapter::CheckPublishForm(Want &want)
@@ -2705,6 +2720,7 @@ ErrCode FormMgrAdapter::RegisterAddObserver(const std::string &bundleName, const
     auto formObserver = formObservers_.find(bundleName);
     if (formObserver == formObservers_.end()) {
         formObservers_.emplace(bundleName, callerToken);
+        SetDeathRecipient(callerToken, new (std::nothrow) FormMgrAdapter::ClientDeathRecipient());
     } else {
         HILOG_ERROR("callback is already exist");
         return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
@@ -2723,6 +2739,7 @@ ErrCode FormMgrAdapter::RegisterRemoveObserver(const std::string &bundleName, co
     } else {
         if (formObserver->second == callerToken) {
             formObservers_.erase(formObserver);
+            SetDeathRecipient(callerToken, new (std::nothrow) FormMgrAdapter::ClientDeathRecipient());
         } else {
             HILOG_ERROR("callback is not exist");
             return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
@@ -2730,6 +2747,59 @@ ErrCode FormMgrAdapter::RegisterRemoveObserver(const std::string &bundleName, co
     }
     HILOG_DEBUG("success.");
     return ERR_OK;
+}
+
+void FormMgrAdapter::SetDeathRecipient(const sptr<IRemoteObject> &callerToken,
+    const sptr<IRemoteObject::DeathRecipient> &deathRecipient)
+{
+    HILOG_DEBUG("called.");
+    if (callerToken == nullptr || deathRecipient == nullptr) {
+        HILOG_ERROR("The callerToken or the deathRecipient is empty");
+        return;
+    }
+    std::lock_guard<std::recursive_mutex> lock(deathRecipientsMutex_);
+    auto iter = deathRecipients_.find(callerToken);
+    if (iter == deathRecipients_.end()) {
+        deathRecipients_.emplace(callerToken, deathRecipient);
+        callerToken->AddDeathRecipient(deathRecipient);
+    } else {
+        HILOG_DEBUG("The deathRecipient has been added.");
+    }
+}
+
+void FormMgrAdapter::CleanResource(const wptr<IRemoteObject> &remote)
+{
+    HILOG_DEBUG("called.");
+
+    // Clean the formObservers_.
+    auto object = remote.promote();
+    if (object == nullptr) {
+        HILOG_ERROR("remote object is nullptr");
+        return;
+    }
+    std::lock_guard<std::recursive_mutex> lock(formObserversMutex_);
+    for (auto it = formObservers_.begin(); it != formObservers_.end();) {
+        auto& observer = it->second;
+        if (observer == object) {
+            it = formObservers_.erase(it);
+        } else {
+            ++it;
+        }
+    }
+
+    std::lock_guard<std::recursive_mutex> deathLock(deathRecipientsMutex_);
+    auto iter = deathRecipients_.find(object);
+    if (iter != deathRecipients_.end()) {
+        auto deathRecipient = iter->second;
+        deathRecipients_.erase(iter);
+        object->RemoveDeathRecipient(deathRecipient);
+    }
+}
+
+void FormMgrAdapter::ClientDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
+{
+    HILOG_DEBUG("remote died");
+    FormMgrAdapter::GetInstance().CleanResource(remote);
 }
 } // namespace AppExecFwk
 } // namespace OHOS

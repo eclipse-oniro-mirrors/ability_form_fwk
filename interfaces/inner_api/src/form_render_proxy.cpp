@@ -148,6 +148,45 @@ bool FormRenderProxy::WriteInterfaceToken(MessageParcel &data)
     return true;
 }
 
+int32_t FormRenderProxy::ReleaseRenderer(
+    int64_t formId, const std::string &compId, const std::string &uid)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_ASYNC);
+
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("%{public}s, failed to write interface token", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt64(formId)) {
+        HILOG_ERROR("%{public}s, failed to write formId", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteString(compId)) {
+        HILOG_ERROR("%{public}s, failed to write compId", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteString(uid)) {
+        HILOG_ERROR("%{public}s, failed to write uid", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!Remote()) {
+        HILOG_ERROR("Remote obj is nullptr");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int error = Remote()->SendRequest(
+        static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_RELEASE_RENDERER),
+        data,
+        reply,
+        option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d", __func__, error);
+        return error;
+    }
+    return ERR_OK;
+}
+
 int32_t FormRenderProxy::ReloadForm(const std::vector<int64_t> &&formIds, const Want &want)
 {
     MessageParcel data;

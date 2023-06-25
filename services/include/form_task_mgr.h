@@ -208,6 +208,9 @@ public:
 
     void PostRemoveTaskToHost(const std::string bundleName, const sptr<IRemoteObject> &remoteObject,
         const RunningFormInfo &runningFormInfo);
+
+    void PostReleaseRenderer(
+        int64_t formId, const std::string &compId, const std::string &uid, const sptr<IRemoteObject> &remoteObject);
 private:
     /**
      * @brief Acquire form data from form provider.
@@ -375,6 +378,9 @@ private:
 
     void FormRemove(const std::string bundleName, const sptr<IRemoteObject> &remoteObject,
         const RunningFormInfo &runningFormInfo);
+
+    void ReleaseRenderer(
+        int64_t formId, const std::string &compId, const std::string &uid, const sptr<IRemoteObject> &remoteObject);
 private:
     std::shared_ptr<FormEventHandler> eventHandler_ = nullptr;
 };

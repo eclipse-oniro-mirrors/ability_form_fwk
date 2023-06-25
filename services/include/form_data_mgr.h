@@ -722,13 +722,12 @@ private:
     bool GetAbilityFormInfo(const FormRecord &record, const std::vector<T> &abilities,
         AbilityFormInfo &abilityFormInfo);
 private:
-    mutable std::recursive_mutex formRecordMutex_;
-    mutable std::recursive_mutex formHostRecordMutex_;
-    mutable std::recursive_mutex formTempMutex_;
-    mutable std::recursive_mutex formStateRecordMutex_;
-    mutable std::recursive_mutex formRequestPublishFormsMutex_;
-    mutable std::recursive_mutex formAddObserverMutex_;
-    mutable std::recursive_mutex formAcquireDataRecordMutex_;
+    mutable std::mutex formRecordMutex_;
+    mutable std::mutex formHostRecordMutex_;
+    mutable std::mutex formTempMutex_;
+    mutable std::mutex formStateRecordMutex_;
+    mutable std::mutex formRequestPublishFormsMutex_;
+    mutable std::mutex formAcquireDataRecordMutex_;
     std::map<int64_t, FormRecord> formRecords_;
     std::vector<FormHostRecord> clientRecords_;
     std::vector<int64_t> tempForms_;

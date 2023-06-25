@@ -70,6 +70,8 @@ public:
 
     void OnRenderingBlock(const std::string &bundleName);
 
+    ErrCode ReleaseRenderer(int64_t formId, const FormRecord &formRecord, const std::string &compId);
+
 private:
     ErrCode ConnectRenderService(const sptr<FormRenderConnection> &connection) const;
 

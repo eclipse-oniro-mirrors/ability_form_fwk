@@ -64,6 +64,7 @@ ohos_shared_library("formrender") {
   configs = [ ":formrender_config" ]
 
   sources = [
+    "src/form_module_checker.cpp",
     "src/form_render_impl.cpp",
     "src/form_render_record.cpp",
     "src/form_render_service_extension.cpp",
@@ -87,10 +88,11 @@ ohos_shared_library("formrender") {
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "eventhandler:libeventhandler",
-    "hicollie_native:libhicollie",
+    "hicollie:libhicollie",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "napi:ace_napi",
   ]
 
   subsystem_name = "ability"

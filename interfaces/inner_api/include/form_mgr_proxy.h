@@ -87,6 +87,14 @@ public:
     virtual int SetNextRefreshTime(const int64_t formId, const int64_t nextTime) override;
 
     /**
+     * @brief Release renderer.
+     * @param formId The Id of the forms to release.
+     * @param compId The compId of the forms to release.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int ReleaseRenderer(int64_t formId, const std::string &compId) override;
+
+    /**
      * @brief Request to publish a form to the form host.
      *
      * @param want The want of the form to publish.

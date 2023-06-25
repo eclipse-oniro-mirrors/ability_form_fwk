@@ -356,6 +356,18 @@ ErrCode FormBmsHelper::GetProxyDataInfos(const std::string &bundleName, const st
     return IN_PROCESS_CALL(iBundleMgr->GetProxyDataInfos(bundleName, moduleName, proxyData, userId));
 }
 
+ErrCode FormBmsHelper::GetAllProxyDataInfos(int32_t userId, std::vector<ProxyData> &proxyData)
+{
+    HILOG_DEBUG("called.");
+    sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
+    if (iBundleMgr == nullptr) {
+        HILOG_ERROR("iBundleMgr is nullptr");
+        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
+    }
+
+    return IN_PROCESS_CALL(iBundleMgr->GetAllProxyDataInfos(proxyData, userId));
+}
+
 ErrCode FormBmsHelper::GetApplicationInfo(const std::string &bundleName, int32_t userId, ApplicationInfo &appInfo)
 {
     HILOG_DEBUG("called.");
