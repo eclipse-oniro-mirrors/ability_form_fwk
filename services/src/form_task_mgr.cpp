@@ -26,6 +26,7 @@
 #include "form_mgr_errors.h"
 #include "form_provider_interface.h"
 #include "form_render_interface.h"
+#include "form_serial_queue.h"
 #include "form_share_mgr.h"
 #include "form_supply_callback.h"
 #include "js_form_state_observer_interface.h"
@@ -45,21 +46,21 @@ FormTaskMgr::~FormTaskMgr() {}
  */
 void FormTaskMgr::PostAcquireTask(const int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
-    if (eventHandler_ == nullptr) {
-        HILOG_ERROR("%{public}s fail, event handler invalidate", __func__);
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("%{public}s fail, serialQueue_ invalidate", __func__);
         return;
     }
     auto acquireProviderFormInfoFunc = [formId, want, remoteObject]() {
         FormTaskMgr::GetInstance().AcquireProviderFormInfo(formId, want, remoteObject);
     };
-    eventHandler_->PostTask(acquireProviderFormInfoFunc, FORM_TASK_DELAY_TIME);
+    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, acquireProviderFormInfoFunc);
 }
 
 void FormTaskMgr::PostShareAcquireTask(int64_t formId, const std::string &remoteDeviceId, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
-    if (eventHandler_ == nullptr) {
-        HILOG_ERROR("eventHandler_ is nullptr");
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("serialQueue_ is nullptr");
         int64_t requestCode = static_cast<int64_t>(want.GetLongParam(Constants::FORM_SHARE_REQUEST_CODE, 0));
         PostFormShareSendResponse(requestCode, ERR_APPEXECFWK_FORM_COMMON_CODE);
         return;
@@ -68,7 +69,7 @@ void FormTaskMgr::PostShareAcquireTask(int64_t formId, const std::string &remote
     auto acquireShareProviderFormInfoFunc = [formId, remoteDeviceId, want, remoteObject]() {
         FormTaskMgr::GetInstance().AcquireShareFormData(formId, remoteDeviceId, want, remoteObject);
     };
-    eventHandler_->PostTask(acquireShareProviderFormInfoFunc, FORM_TASK_DELAY_TIME);
+    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, acquireShareProviderFormInfoFunc);
 }
 /**
  * @brief Delete form data from form provider(task).
@@ -78,14 +79,14 @@ void FormTaskMgr::PostShareAcquireTask(int64_t formId, const std::string &remote
  */
 void FormTaskMgr::PostDeleteTask(const int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
-    if (eventHandler_ == nullptr) {
-        HILOG_ERROR("%{public}s fail, event handler invalidate", __func__);
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("%{public}s fail, serialQueue_ invalidate", __func__);
         return;
     }
     auto notifyFormDeleteFunc = [formId, want, remoteObject]() {
         FormTaskMgr::GetInstance().NotifyFormDelete(formId, want, remoteObject);
     };
-    eventHandler_->PostTask(notifyFormDeleteFunc, FORM_TASK_DELAY_TIME);
+    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, notifyFormDeleteFunc);
 }
 
 /**
@@ -98,14 +99,14 @@ void FormTaskMgr::PostDeleteTask(const int64_t formId, const Want &want, const s
  */
 void FormTaskMgr::PostRefreshTask(const int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
-    if (eventHandler_ == nullptr) {
-        HILOG_ERROR("%{public}s fail, event handler invalidate.", __func__);
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("%{public}s fail, serialQueue_ invalidate.", __func__);
         return;
     }
     auto notifyFormUpdateFunc = [formId, want, remoteObject]() {
         FormTaskMgr::GetInstance().NotifyFormUpdate(formId, want, remoteObject);
     };
-    eventHandler_->PostTask(notifyFormUpdateFunc, FORM_TASK_DELAY_TIME);
+    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, notifyFormUpdateFunc);
 }
 
 /**
@@ -118,14 +119,14 @@ void FormTaskMgr::PostRefreshTask(const int64_t formId, const Want &want, const 
  */
 void FormTaskMgr::PostCastTempTask(const int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
-    if (eventHandler_ == nullptr) {
-        HILOG_ERROR("%{public}s fail, event handler invalidate", __func__);
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("%{public}s fail, serialQueue_ invalidate", __func__);
         return;
     }
     auto notifyCastTempFunc = [formId, want, remoteObject]() {
         FormTaskMgr::GetInstance().NotifyCastTemp(formId, want, remoteObject);
     };
-    eventHandler_->PostTask(notifyCastTempFunc, FORM_TASK_DELAY_TIME);
+    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, notifyCastTempFunc);
 }
 
 /**
@@ -139,27 +140,27 @@ void FormTaskMgr::PostCastTempTask(const int64_t formId, const Want &want, const
 void FormTaskMgr::PostAcquireTaskToHost(const int64_t formId, const FormRecord &record,
     const sptr<IRemoteObject> &remoteObject)
 {
-    if (eventHandler_ == nullptr) {
-        HILOG_ERROR("%{public}s fail, event handler invalidate", __func__);
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("%{public}s fail, serialQueue_ invalidate", __func__);
         return;
     }
     auto acquireTaskToHostFunc = [formId, record, remoteObject]() {
         FormTaskMgr::GetInstance().AcquireTaskToHost(formId, record, remoteObject);
     };
-    eventHandler_->PostTask(acquireTaskToHostFunc, FORM_TASK_DELAY_TIME);
+    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, acquireTaskToHostFunc);
 }
 
 void FormTaskMgr::PostAcquireDataTaskToHost(const AAFwk::WantParams &wantParams,
     int64_t requestCode, const sptr<IRemoteObject> &remoteObject)
 {
-    if (eventHandler_ == nullptr) {
-        HILOG_ERROR("failed, event handler invalidate");
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("failed, serialQueue_ invalidate");
         return;
     }
     auto acquireTaskToHostFunc = [wantParams, requestCode, remoteObject]() {
         FormTaskMgr::GetInstance().AcquireFormDataBack(wantParams, requestCode, remoteObject);
     };
-    eventHandler_->PostTask(acquireTaskToHostFunc, FORM_TASK_DELAY_TIME);
+    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, acquireTaskToHostFunc);
 }
 
 /**
@@ -175,8 +176,8 @@ void FormTaskMgr::PostUpdateTaskToHost(const int64_t formId, const FormRecord &r
 {
     HILOG_INFO("%{public}s called.", __func__);
 
-    if (eventHandler_ == nullptr) {
-        HILOG_ERROR("%{public}s fail, event handler invalidate.", __func__);
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("%{public}s fail, serialQueue_ invalidate.", __func__);
         return;
     }
 
@@ -184,7 +185,7 @@ void FormTaskMgr::PostUpdateTaskToHost(const int64_t formId, const FormRecord &r
     auto updateTaskToHostFunc = [formId, record, remoteObject]() {
         FormTaskMgr::GetInstance().UpdateTaskToHost(formId, record, remoteObject);
     };
-    eventHandler_->PostTask(updateTaskToHostFunc, FORM_TASK_DELAY_TIME);
+    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, updateTaskToHostFunc);
 }
 
 /**
@@ -200,14 +201,14 @@ void FormTaskMgr::PostUpdateTaskToHost(const int64_t formId, const FormRecord &r
  */
 void FormTaskMgr::PostHostDiedTask(const sptr<IRemoteObject> &remoteHost)
 {
-    if (eventHandler_ == nullptr) {
-        HILOG_ERROR("%{public}s fail, event handler invalidate", __func__);
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("%{public}s fail, serialQueue_ invalidate", __func__);
         return;
     }
     auto postTaskFunc = [remoteHost]() {
         FormTaskMgr::GetInstance().HostDied(remoteHost);
     };
-    eventHandler_->PostTask(postTaskFunc, FORM_TASK_DELAY_TIME);
+    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, postTaskFunc);
 }
 
 /**
@@ -222,14 +223,14 @@ void FormTaskMgr::PostHostDiedTask(const sptr<IRemoteObject> &remoteHost)
 void FormTaskMgr::PostEventNotifyTask(const std::vector<int64_t> &formEvent, const int32_t formVisibleType,
     const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
-    if (eventHandler_ == nullptr) {
-        HILOG_ERROR("%{public}s fail, event handler invalidate.", __func__);
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("%{public}s fail, serialQueue_ invalidate.", __func__);
         return;
     }
     auto eventNotifyFunc = [formEvent, formVisibleType, want, remoteObject]() {
         FormTaskMgr::GetInstance().EventNotify(formEvent, formVisibleType, want, remoteObject);
     };
-    eventHandler_->PostTask(eventNotifyFunc, FORM_TASK_DELAY_TIME);
+    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, eventNotifyFunc);
 }
 /**
  * @brief Post provider batch delete.
@@ -240,14 +241,14 @@ void FormTaskMgr::PostEventNotifyTask(const std::vector<int64_t> &formEvent, con
 void FormTaskMgr::PostProviderBatchDeleteTask(std::set<int64_t> &formIds, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
-    if (eventHandler_ == nullptr) {
-        HILOG_ERROR("%{public}s fail, event handler invalidate.", __func__);
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("%{public}s fail, serialQueue_ invalidate.", __func__);
         return;
     }
     auto batchDeleteFunc = [&formIds, want, remoteObject]() {
         FormTaskMgr::GetInstance().ProviderBatchDelete(formIds, want, remoteObject);
     };
-    eventHandler_->PostTask(batchDeleteFunc, FORM_TASK_DELAY_TIME);
+    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, batchDeleteFunc);
 }
 /**
  * @brief Post message event to form provider.
@@ -259,14 +260,14 @@ void FormTaskMgr::PostProviderBatchDeleteTask(std::set<int64_t> &formIds, const 
 void FormTaskMgr::PostFormEventTask(const int64_t formId, const std::string &message,
     const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
-    if (eventHandler_ == nullptr) {
-        HILOG_ERROR("%{public}s fail, event handler invalidate.", __func__);
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("%{public}s fail, serialQueue_ invalidate.", __func__);
         return;
     }
     auto formEventFunc = [formId, message, want, remoteObject]() {
         FormTaskMgr::GetInstance().FireFormEvent(formId, message, want, remoteObject);
     };
-    eventHandler_->PostTask(formEventFunc, FORM_TASK_DELAY_TIME);
+    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, formEventFunc);
 }
 
 /**
@@ -279,14 +280,14 @@ void FormTaskMgr::PostFormEventTask(const int64_t formId, const std::string &mes
 void FormTaskMgr::PostAcquireStateTask(const Want &wantArg, const std::string &provider, const Want &want,
                                        const sptr<IRemoteObject> &remoteObject)
 {
-    if (eventHandler_ == nullptr) {
-        HILOG_ERROR("%{public}s fail, event handler invalidate.", __func__);
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("%{public}s fail, serialQueue_ invalidate.", __func__);
         return;
     }
     auto acquireStateFunc = [wantArg, provider, want, remoteObject]() {
         FormTaskMgr::GetInstance().AcquireState(wantArg, provider, want, remoteObject);
     };
-    eventHandler_->PostTask(acquireStateFunc, FORM_TASK_DELAY_TIME);
+    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, acquireStateFunc);
 }
 
 /**
@@ -298,14 +299,14 @@ void FormTaskMgr::PostAcquireStateTask(const Want &wantArg, const std::string &p
 void FormTaskMgr::PostAcquireDataTask(const int64_t formId, const Want &want,
                                       const sptr<IRemoteObject> &remoteObject)
 {
-    if (eventHandler_ == nullptr) {
-        HILOG_ERROR("fail, event handler invalidate.");
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("fail, serialQueue_ invalidate.");
         return;
     }
     auto acquireDataFunc = [formId, want, remoteObject]() {
         FormTaskMgr::GetInstance().AcquireFormData(formId, want, remoteObject);
     };
-    eventHandler_->PostTask(acquireDataFunc, FORM_TASK_DELAY_TIME);
+    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, acquireDataFunc);
 }
 
 /**
@@ -316,14 +317,14 @@ void FormTaskMgr::PostAcquireDataTask(const int64_t formId, const Want &want,
 void FormTaskMgr::PostUninstallTaskToHost(const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_INFO("%{public}s start", __func__);
-    if (eventHandler_ == nullptr) {
-        HILOG_ERROR("%{public}s fail, event handler invalidate.", __func__);
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("%{public}s fail, serialQueue_ invalidate.", __func__);
         return;
     }
     auto uninstallFunc = [formIds, remoteObject]() {
         FormTaskMgr::GetInstance().FormUninstall(formIds, remoteObject);
     };
-    eventHandler_->PostTask(uninstallFunc, FORM_TASK_DELAY_TIME);
+    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, uninstallFunc);
     HILOG_INFO("%{public}s end", __func__);
 }
 
@@ -337,29 +338,29 @@ void FormTaskMgr::PostAcquireStateTaskToHost(AppExecFwk::FormState state, const 
                                              const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_INFO("%{public}s start", __func__);
-    if (eventHandler_ == nullptr) {
-        HILOG_ERROR("%{public}s fail, event handler invalidate.", __func__);
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("%{public}s fail, serialQueue_ invalidate.", __func__);
         return;
     }
     auto acquireStateFunc = [state, want, remoteObject]() {
         FormTaskMgr::GetInstance().AcquireStateBack(state, want, remoteObject);
     };
-    eventHandler_->PostTask(acquireStateFunc, FORM_TASK_DELAY_TIME);
+    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, acquireStateFunc);
     HILOG_INFO("%{public}s end", __func__);
 }
 
 void FormTaskMgr::PostFormShareSendResponse(int64_t formShareRequestCode, int32_t result)
 {
     HILOG_INFO("%{public}s start", __func__);
-    if (eventHandler_ == nullptr) {
-        HILOG_ERROR("eventHandler_ is nullptr.");
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("serialQueue_ is nullptr.");
         return;
     }
 
     auto formShareSendResponseFunc = [formShareRequestCode, result]() {
         FormTaskMgr::GetInstance().FormShareSendResponse(formShareRequestCode, result);
     };
-    eventHandler_->PostTask(formShareSendResponseFunc, FORM_TASK_DELAY_TIME);
+    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, formShareSendResponseFunc);
     HILOG_INFO("%{public}s end", __func__);
 }
 
@@ -367,14 +368,14 @@ void FormTaskMgr::PostAddTaskToHost(const std::string bundleName,
     const sptr<IRemoteObject> &remoteObject, const RunningFormInfo &runningFormInfo)
 {
     HILOG_DEBUG("start");
-    if (eventHandler_ == nullptr) {
-        HILOG_ERROR("fail, event handler invalidate.");
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("fail, serialQueue_ invalidate.");
         return;
     }
     auto addFunc = [bundleName, remoteObject, runningFormInfo]() {
         FormTaskMgr::GetInstance().FormAdd(bundleName, remoteObject, runningFormInfo);
     };
-    eventHandler_->PostTask(addFunc, FORM_TASK_DELAY_TIME);
+    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, addFunc);
     HILOG_DEBUG("end");
 }
 
@@ -382,14 +383,14 @@ void FormTaskMgr::PostRemoveTaskToHost(const std::string bundleName,
     const sptr<IRemoteObject> &remoteObject, const RunningFormInfo &runningFormInfo)
 {
     HILOG_DEBUG("start");
-    if (eventHandler_ == nullptr) {
-        HILOG_ERROR("fail, event handler invalidate.");
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("fail, serialQueue_ invalidate.");
         return;
     }
     auto removeFunc = [bundleName, remoteObject, runningFormInfo]() {
         FormTaskMgr::GetInstance().FormRemove(bundleName, remoteObject, runningFormInfo);
     };
-    eventHandler_->PostTask(removeFunc, FORM_TASK_DELAY_TIME);
+    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, removeFunc);
     HILOG_DEBUG("end");
 }
 
@@ -795,15 +796,15 @@ void FormTaskMgr::PostRenderForm(const FormRecord &formRecord, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_INFO("PostRenderForm");
-    if (eventHandler_ == nullptr) {
-        HILOG_ERROR("eventHandler_ is nullptr.");
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("serialQueue_ is nullptr.");
         return;
     }
 
     auto renderForm = [formRecord, want, remoteObject]() {
         FormTaskMgr::GetInstance().RenderForm(formRecord, want, remoteObject);
     };
-    eventHandler_->PostTask(renderForm, FORM_TASK_DELAY_TIME);
+    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, renderForm);
     HILOG_INFO("%{public}s end", __func__);
 }
 
@@ -833,15 +834,15 @@ void FormTaskMgr::PostStopRenderingForm(
     const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_INFO("PostStopRenderingForm");
-    if (eventHandler_ == nullptr) {
-        HILOG_ERROR("eventHandler_ is nullptr.");
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("serialQueue_ is nullptr.");
         return;
     }
 
     auto deleterenderForm = [formRecord, want, remoteObject]() {
         FormTaskMgr::GetInstance().StopRenderingForm(formRecord, want, remoteObject);
     };
-    eventHandler_->PostTask(deleterenderForm, FORM_TASK_DELAY_TIME);
+    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, deleterenderForm);
     HILOG_INFO("%{public}s end", __func__);
 }
 
@@ -872,15 +873,15 @@ void FormTaskMgr::PostReleaseRenderer(
     int64_t formId, const std::string &compId, const std::string &uid, const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_INFO("%{public}s begin", __func__);
-    if (eventHandler_ == nullptr) {
-        HILOG_ERROR("eventHandler_ is nullptr.");
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("serialQueue_ is nullptr.");
         return;
     }
 
     auto deleterenderForm = [formId, compId, uid, remoteObject]() {
         FormTaskMgr::GetInstance().ReleaseRenderer(formId, compId, uid, remoteObject);
     };
-    eventHandler_->PostTask(deleterenderForm, FORM_TASK_DELAY_TIME);
+    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, deleterenderForm);
     HILOG_INFO("%{public}s end", __func__);
 }
 
@@ -923,14 +924,14 @@ void FormTaskMgr::PostReloadForm(const std::vector<int64_t> &&formIds, const Wan
     const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_INFO("%{public}s begin", __func__);
-    if (eventHandler_ == nullptr) {
-        HILOG_ERROR("eventHandler_ is nullptr.");
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("serialQueue_ is nullptr.");
         return;
     }
     auto reloadForm = [ids = std::forward<decltype(formIds)>(formIds), want, remoteObject]() {
         FormTaskMgr::GetInstance().ReloadForm(std::move(ids), want, remoteObject);
     };
-    eventHandler_->PostTask(reloadForm, FORM_TASK_DELAY_TIME);
+    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, reloadForm);
     HILOG_INFO("%{public}s end", __func__);
 }
 } // namespace AppExecFwk

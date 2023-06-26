@@ -32,7 +32,6 @@ adapter_innerkits_path =
     "${foundation_distributedschedule_path}/samgr/adapter/interfaces/innerkits"
 
 device_manager_path = "//foundation/distributedhardware/device_manager"
-
 form_fwk_path = "//foundation/ability/form_fwk"
 form_fwk_napi_path = "${form_fwk_path}/frameworks/js/napi"
 form_fwk_inner_api_path = "${form_fwk_path}/interfaces/inner_api"

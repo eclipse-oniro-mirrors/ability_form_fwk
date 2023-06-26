@@ -298,9 +298,8 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormShareMgr_012, TestSize.Level0)
     ASSERT_NE(nullptr, formShareMgr);
     int64_t formId = 1;
     std::string formShareInfoKey = "aa";
-    std::shared_ptr<FormEventHandler> handler = nullptr;
     std::shared_ptr<FormFreeInstallOperator> freeInstallOperators =
-        std::make_shared<FormFreeInstallOperator>(formShareInfoKey, handler);
+    std::make_shared<FormFreeInstallOperator>(formShareInfoKey, nullptr);
     std::shared_ptr<FormFreeInstallOperator> freeInstallOperator = nullptr;
     formShareMgr->freeInstallOperatorMap_.emplace(formId, freeInstallOperator);
     formShareMgr->FinishFreeInstallTask(freeInstallOperator);

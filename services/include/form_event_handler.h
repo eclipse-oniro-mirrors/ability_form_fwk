@@ -20,6 +20,7 @@
 #include <set>
 #include "event_handler.h"
 #include "event_runner.h"
+#include "form_serial_queue.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -40,9 +41,9 @@ public:
  * @class FormEventHandler
  * FormEventHandler handling the form event.
  */
-class FormEventHandler : public EventHandler {
+class FormEventHandler : public std::enable_shared_from_this<FormEventHandler> {
 public:
-    FormEventHandler(const std::shared_ptr<EventRunner> &runner);
+    FormEventHandler(const std::shared_ptr<FormSerialQueue> &serialQueue);
     virtual ~FormEventHandler() = default;
 
     static int64_t GetEventId();
@@ -61,16 +62,18 @@ public:
      */
     void UnregisterEventTimeoutObserver(const std::shared_ptr<FormEventTimeoutObserver> &observer);
 
-private:
     /**
      * ProcessEvent with request.
      *
-     * @param event, inner event loop.
+     * @param msg, The event message.
+     * @param eventId, The event Id.
+     * @param delayTime, The delay time.
      */
-    void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
+    void ProcessEvent(int64_t msg, int64_t eventId, int64_t delayTime = 0);
 
 private:
     static int64_t eventId_;
+    std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;
     std::set<std::shared_ptr<FormEventTimeoutObserver>> observers_;
     mutable std::mutex observerMutex_;
 };

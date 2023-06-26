@@ -30,12 +30,7 @@ namespace AppExecFwk {
  */
 class FormBundleEventCallback : public BundleEventCallbackHost {
 public:
-    FormBundleEventCallback() : eventHandler_(nullptr) {}
-
-    explicit FormBundleEventCallback(std::shared_ptr<FormEventHandler> eventHandler)
-    {
-        eventHandler_ = eventHandler;
-    }
+    FormBundleEventCallback() = default;
 
     ~FormBundleEventCallback() override = default;
 
@@ -49,7 +44,6 @@ public:
 private:
     DISALLOW_COPY_AND_MOVE(FormBundleEventCallback);
     FormEventUtil formEventHelper_;
-    std::shared_ptr<FormEventHandler> eventHandler_ = nullptr;
 };
 } // namespace OHOS
 } // namespace AppExecFwk

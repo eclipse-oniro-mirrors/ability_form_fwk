@@ -50,7 +50,6 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     UpdateAtItem updateAtItem;
     formTimerMgr.FindNextAtTimerItem(nowTime, updateAtItem);
     formTimerMgr.ClearIntervalTimer();
-    formTimerMgr.CreatTaskThreadExecutor();
     FormTimer timerTask;
     formTimerMgr.ExecTimerTask(timerTask);
     formTimerMgr.Init();

@@ -53,6 +53,7 @@ ohos_unittest("FmsFormRenderMgrTest") {
     "ability_runtime:wantagent_innerkits",
     "c_utils:utils",
     "eventhandler:libeventhandler",
+    "ffrt:libffrt",
     "form_fwk:form_manager",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",

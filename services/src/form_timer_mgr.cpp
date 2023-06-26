@@ -20,6 +20,7 @@
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "context/context.h"
+#include "ffrt.h"
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
 #include "form_provider_mgr.h"
@@ -1249,20 +1250,6 @@ void FormTimerMgr::ClearIntervalTimer()
     }
     HILOG_INFO("%{public}s end", __func__);
 }
-/**
- * @brief Creat thread pool for timer task.
- */
-
-void FormTimerMgr::CreatTaskThreadExecutor()
-{
-    HILOG_INFO("%{public}s start", __func__);
-    if (taskExecutor_ == nullptr) {
-        taskExecutor_ = std::make_unique<ThreadPool>("timer task thread");
-        taskExecutor_->Start(Constants::WORK_POOL_SIZE);
-    }
-    HILOG_INFO("%{public}s end", __func__);
-    return;
-}
 
 /**
  * @brief Execute Form timer task.
@@ -1271,27 +1258,24 @@ void FormTimerMgr::CreatTaskThreadExecutor()
 void FormTimerMgr::ExecTimerTask(const FormTimer &timerTask)
 {
     HILOG_INFO("%{public}s start", __func__);
-    CreatTaskThreadExecutor();
-    if (taskExecutor_ != nullptr) {
-        HILOG_INFO("%{public}s run", __func__);
-        AAFwk::Want want;
-        if (timerTask.isCountTimer) {
-            want.SetParam(Constants::KEY_IS_TIMER, true);
-        }
-        if (timerTask.isCountTimer || timerTask.isUpdateAt) {
-            want.SetParam(Constants::KEY_TIMER_REFRESH, true);
-        }
-        // multi user
-        if (IsActiveUser(timerTask.userId)) {
-            HILOG_INFO("timerTask.userId is current user");
-            want.SetParam(Constants::PARAM_FORM_USER_ID, timerTask.userId);
-        }
-        HILOG_INFO("%{public}s, userId:%{public}d", __func__, timerTask.userId);
-        auto task = [id = timerTask.formId, want]() {
-            FormProviderMgr::GetInstance().RefreshForm(id, want, false);
-        };
-        taskExecutor_->AddTask(task);
+    HILOG_INFO("%{public}s run", __func__);
+    AAFwk::Want want;
+    if (timerTask.isCountTimer) {
+        want.SetParam(Constants::KEY_IS_TIMER, true);
     }
+    if (timerTask.isCountTimer || timerTask.isUpdateAt) {
+        want.SetParam(Constants::KEY_TIMER_REFRESH, true);
+    }
+    // multi user
+    if (IsActiveUser(timerTask.userId)) {
+        HILOG_INFO("timerTask.userId is current user");
+        want.SetParam(Constants::PARAM_FORM_USER_ID, timerTask.userId);
+    }
+    HILOG_INFO("userId:%{public}d", timerTask.userId);
+    auto task = [id = timerTask.formId, want]() {
+        FormProviderMgr::GetInstance().RefreshForm(id, want, false);
+    };
+    ffrt::submit(task);
     HILOG_INFO("%{public}s end", __func__);
 }
 
@@ -1310,6 +1294,7 @@ void FormTimerMgr::Init()
     matchingSkills.AddEvent(FMS_TIME_SPEED);
 #endif
     EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
+    subscribeInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
     timerReceiver_ = std::make_shared<TimerReceiver>(subscribeInfo);
     EventFwk::CommonEventManager::SubscribeCommonEvent(timerReceiver_);
 
@@ -1317,7 +1302,6 @@ void FormTimerMgr::Init()
     updateAtTimerId_ = 0L;
     dynamicAlarmTimerId_ = 0L;
     limiterTimerId_ = 0L;
-    taskExecutor_ = nullptr;
 
     HILOG_INFO("%{public}s end", __func__);
 }

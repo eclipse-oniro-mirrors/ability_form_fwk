@@ -15,32 +15,37 @@
 
 #include "form_event_handler.h"
 
+#include <memory>
+
 #include "fms_log_wrapper.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 int64_t FormEventHandler::eventId_ = 0;
-FormEventHandler::FormEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner)
-    : AppExecFwk::EventHandler(runner)
+FormEventHandler::FormEventHandler(const std::shared_ptr<FormSerialQueue> &serialQueue)
+    : serialQueue_(serialQueue)
 {
 }
 
-void FormEventHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
+void FormEventHandler::ProcessEvent(int64_t msg, int64_t eventId, int64_t delayTime)
 {
-    if (!event) {
-        HILOG_ERROR("event is nullptr");
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("serialQueue_ is invalid");
         return;
     }
 
-    std::lock_guard<std::mutex> lock(observerMutex_);
-    for (auto &observer : observers_) {
-        if (observer == nullptr) {
-            HILOG_ERROR("observer is nullptr");
-            continue;
+    auto task = [thisWeakPtr = weak_from_this(), msg, eventId]() {
+        auto sharedThis = thisWeakPtr.lock();
+        std::lock_guard<std::mutex> lock(sharedThis->observerMutex_);
+        for (auto &observer : sharedThis->observers_) {
+            if (observer == nullptr) {
+                HILOG_ERROR("observer is nullptr");
+                continue;
+            }
+            observer->OnEventTimeoutResponse(msg, eventId);
         }
-
-        observer->OnEventTimeoutResponse(event->GetInnerEventId(), event->GetParam());
-    }
+    };
+    serialQueue_->ScheduleDelayTask(std::make_pair(msg, eventId), delayTime, task);
 }
 
 int64_t FormEventHandler::GetEventId()

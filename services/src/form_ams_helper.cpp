@@ -18,6 +18,7 @@
 #include "ability_manager_interface.h"
 #include "fms_log_wrapper.h"
 #include "form_mgr_errors.h"
+#include "form_serial_queue.h"
 #include "if_system_ability_manager.h"
 #include "in_process_call_wrapper.h"
 #include "ipc_skeleton.h"
@@ -99,14 +100,14 @@ ErrCode FormAmsHelper::DisconnectServiceAbility(const sptr<AAFwk::IAbilityConnec
  */
 ErrCode FormAmsHelper::DisconnectServiceAbilityDelay(const sptr<AAFwk::IAbilityConnection> &connect)
 {
-    if (eventHandler_ == nullptr) {
-        HILOG_ERROR("%{public}s fail, eventhandler invalidate", __func__);
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("%{public}s fail, serialQueue_ invalidate", __func__);
         return ERR_INVALID_OPERATION;
     }
     auto disConnectAbilityFunc = [connect]() {
         FormAmsHelper::GetInstance().DisconnectAbilityTask(connect);
     };
-    if (!eventHandler_->PostTask(disConnectAbilityFunc, FORM_DISCONNECT_DELAY_TIME)) {
+    if (!serialQueue_->ScheduleTask(FORM_DISCONNECT_DELAY_TIME, disConnectAbilityFunc)) {
         HILOG_ERROR("%{public}s, failed to disconnect ability", __func__);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }

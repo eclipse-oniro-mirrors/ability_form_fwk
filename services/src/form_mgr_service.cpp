@@ -30,6 +30,7 @@
 #include "form_info_mgr.h"
 #include "form_mgr_adapter.h"
 #include "form_mgr_errors.h"
+#include "form_serial_queue.h"
 #include "form_share_mgr.h"
 #include "form_task_mgr.h"
 #include "form_timer_mgr.h"
@@ -58,6 +59,8 @@ const bool REGISTER_RESULT =
 
 const std::string NAME_FORM_MGR_SERVICE = "FormMgrService";
 
+const std::string FORM_MGR_SERVICE_QUEUE = "FormMgrServiceQueue";
+
 constexpr int32_t FORM_DUMP_ARGC_MAX = 2;
 
 const std::string FORM_DUMP_HELP = "options list:\n"
@@ -84,8 +87,7 @@ const std::map<std::string, FormMgrService::DumpKey> FormMgrService::dumpKeyMap_
 FormMgrService::FormMgrService()
     : SystemAbility(FORM_MGR_SERVICE_ID, true),
       state_(ServiceRunningState::STATE_NOT_START),
-      runner_(nullptr),
-      handler_(nullptr)
+      serialQueue_(nullptr)
 {
     DumpInit();
 }
@@ -111,10 +113,7 @@ bool FormMgrService::IsReady() const
     if (state_ != ServiceRunningState::STATE_RUNNING) {
         return false;
     }
-    if (!handler_) {
-        HILOG_ERROR("%{public}s fail, handler is null", __func__);
-        return false;
-    }
+
     int32_t userId = FormUtil::GetCurrentAccountId();
     if (userId == Constants::ANY_USERID) {
         HILOG_ERROR("%{public}s fail, account is empty", __func__);
@@ -548,12 +547,12 @@ void FormMgrService::OnStop()
 
     state_ = ServiceRunningState::STATE_NOT_START;
 
-    if (handler_) {
-        handler_.reset();
+    if (serialQueue_) {
+        serialQueue_.reset();
     }
 
-    if (runner_) {
-        runner_.reset();
+    if (handler_) {
+        handler_.reset();
     }
 }
 /**
@@ -562,29 +561,25 @@ void FormMgrService::OnStop()
 ErrCode FormMgrService::Init()
 {
     HILOG_INFO("FormMgrService Init start");
-    runner_ = EventRunner::Create(NAME_FORM_MGR_SERVICE);
-    if (runner_ == nullptr) {
-        HILOG_ERROR("%{public}s fail, Failed to init due to create runner error", __func__);
+    serialQueue_ = std::make_shared<FormSerialQueue>(FORM_MGR_SERVICE_QUEUE.c_str());
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("Init fail, Failed to init due to create serialQueue_ error");
         return ERR_INVALID_OPERATION;
     }
-    handler_ = std::make_shared<FormEventHandler>(runner_);
+
+    handler_ = std::make_shared<FormEventHandler>(serialQueue_);
     if (handler_ == nullptr) {
         HILOG_ERROR("%{public}s fail, Failed to init due to create handler error", __func__);
         return ERR_INVALID_OPERATION;
     }
-    FormTaskMgr::GetInstance().SetEventHandler(handler_);
-    FormAmsHelper::GetInstance().SetEventHandler(handler_);
+    FormTaskMgr::GetInstance().SetSerialQueue(serialQueue_);
+    FormAmsHelper::GetInstance().SetSerialQueue(serialQueue_);
     /* Publish service maybe failed, so we need call this function at the last,
      * so it can't affect the TDD test program */
     bool ret = Publish(DelayedSingleton<FormMgrService>::GetInstance().get());
     if (!ret) {
         HILOG_ERROR("%{public}s fail, FormMgrService::Init Publish failed!", __func__);
         return ERR_INVALID_OPERATION;
-    }
-
-    std::string threadName = NAME_FORM_MGR_SERVICE + "(" + std::to_string(runner_->GetThreadId()) + ")";
-    if (HiviewDFX::Watchdog::GetInstance().AddThread(threadName, handler_) != 0) {
-        HILOG_ERROR("HiviewDFX::Watchdog::GetInstance AddThread Fail");
     }
 
     if (formSysEventReceiver_ == nullptr) {
@@ -595,8 +590,9 @@ ErrCode FormMgrService::Init()
         matchingSkills.AddEvent(COMMON_EVENT_BUNDLE_SCAN_FINISHED);
         // init TimerReceiver
         EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
+        subscribeInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
         formSysEventReceiver_ = std::make_shared<FormSysEventReceiver>(subscribeInfo);
-        formSysEventReceiver_->SetEventHandler(handler_);
+        formSysEventReceiver_->SetSerialQueue(serialQueue_);
         EventFwk::CommonEventManager::SubscribeCommonEvent(formSysEventReceiver_);
     }
 
@@ -606,7 +602,7 @@ ErrCode FormMgrService::Init()
     FormDbCache::GetInstance().Start();
     FormTimerMgr::GetInstance(); // Init FormTimerMgr
     // Register formbundleEventCallback to receive hap updates
-    formBundleEventCallback_ = new (std::nothrow) FormBundleEventCallback(handler_);
+    formBundleEventCallback_ = new (std::nothrow) FormBundleEventCallback();
     if (formBundleEventCallback_ == nullptr) {
         HILOG_ERROR("%{public}s fail, allocate formBundleEventCallback_ failed!", __func__);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -898,8 +894,9 @@ int32_t FormMgrService::StartAbility(const Want &want, const sptr<IRemoteObject>
     return ams->StartAbility(want, callerToken, -1, -1);
 }
 
-void FormMgrService::InitFormShareMgrEventHandler()
+void FormMgrService::InitFormShareMgrSerialQueue()
 {
+    DelayedSingleton<FormShareMgr>::GetInstance()->SetSerialQueue(serialQueue_);
     DelayedSingleton<FormShareMgr>::GetInstance()->SetEventHandler(handler_);
 }
 
@@ -940,7 +937,7 @@ int32_t FormMgrService::ShareForm(int64_t formId, const std::string &deviceId, c
         return ret;
     }
 
-    InitFormShareMgrEventHandler();
+    InitFormShareMgrSerialQueue();
 
     return DelayedSingleton<FormShareMgr>::GetInstance()->ShareForm(formId, deviceId, callerToken, requestCode);
 }
@@ -948,7 +945,7 @@ int32_t FormMgrService::ShareForm(int64_t formId, const std::string &deviceId, c
 int32_t FormMgrService::RecvFormShareInfoFromRemote(const FormShareInfo &info)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
-    InitFormShareMgrEventHandler();
+    InitFormShareMgrSerialQueue();
 
     return DelayedSingleton<FormShareMgr>::GetInstance()->RecvFormShareInfoFromRemote(info);
 }

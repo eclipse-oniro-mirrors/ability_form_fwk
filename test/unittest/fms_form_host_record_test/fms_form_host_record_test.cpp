@@ -368,8 +368,6 @@ HWTEST_F(FmsFormHostRecordTest, FormMgrService_0003, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormMgrService_0003 start";
     FormMgrService formMgrService;
     formMgrService.state_ = ServiceRunningState::STATE_RUNNING;
-    formMgrService.runner_ = EventRunner::Create(NAME_FORM_MGR_SERVICE);
-    formMgrService.handler_ = std::make_shared<FormEventHandler>(formMgrService.runner_);
     EXPECT_EQ(true, formMgrService.IsReady());
     GTEST_LOG_(INFO) << "FormMgrService_0003 end";
 }
@@ -550,7 +548,7 @@ HWTEST_F(FmsFormHostRecordTest, FormMgrService_0015, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormMgrService_0015 start";
     FormMgrService formMgrService;
     formMgrService.handler_ = nullptr;
-    formMgrService.runner_ = nullptr;
+    formMgrService.serialQueue_ = nullptr;
     formMgrService.OnStop();
     GTEST_LOG_(INFO) << "FormMgrService_0015 end";
 }

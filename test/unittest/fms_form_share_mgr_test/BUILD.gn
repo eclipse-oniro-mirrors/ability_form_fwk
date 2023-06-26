@@ -38,6 +38,7 @@ ohos_unittest("FmsFormShareMgrTest") {
     "${samgr_proxy_path}/include/",
     "${adapter_innerkits_path}/include/",
     "${form_fwk_path}/interfaces/inner_api/include",
+    "${form_fwk_path}/services/include",
     "${distributeddatamgr_path}/kv_store/interfaces/innerkits/distributeddata/include",
     "${device_manager_path}/common/include",
     "${device_manager_path}/interfaces/inner_kits/native_cpp/include/",
@@ -56,6 +57,7 @@ ohos_unittest("FmsFormShareMgrTest") {
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}:form_manager",
+    "${form_fwk_path}:libfms",
     "//third_party/googletest:gmock_main",
   ]
 
@@ -71,6 +73,7 @@ ohos_unittest("FmsFormShareMgrTest") {
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "eventhandler:libeventhandler",
+    "ffrt:libffrt",
     "form_fwk:form_manager",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",

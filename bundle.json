@@ -30,6 +30,7 @@
               "distributed_notification_service",
               "bundle_framework",
               "common_event_service",
+              "ffrt",
               "hiviewdfx_hilog_native",
               "ipc",
               "napi",

@@ -182,8 +182,7 @@ HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0005, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormTaskMgr_0005 start";
     std::shared_ptr<FormTaskMgr> formTaskMgr = std::make_shared<FormTaskMgr>();
     ASSERT_NE(nullptr, formTaskMgr);
-    std::shared_ptr<FormEventHandler> handler = std::make_shared<FormEventHandler>(EventRunner::Create());
-    formTaskMgr->SetEventHandler(handler);
+    formTaskMgr->SetSerialQueue(nullptr);
     int64_t formId = 2;
     FormRecord record;
     sptr<IRemoteObject> remoteObject = nullptr;
@@ -235,8 +234,7 @@ HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0008, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormTaskMgr_0008 start";
     std::shared_ptr<FormTaskMgr> formTaskMgr = std::make_shared<FormTaskMgr>();
     ASSERT_NE(nullptr, formTaskMgr);
-    std::shared_ptr<FormEventHandler> handler = std::make_shared<FormEventHandler>(EventRunner::Create());
-    formTaskMgr->SetEventHandler(handler);
+    formTaskMgr->SetSerialQueue(nullptr);
     int64_t formId = 2;
     Want want;
     sptr<IRemoteObject> remoteObject = nullptr;
@@ -289,8 +287,7 @@ HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0011, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormTaskMgr_0011 start";
     std::shared_ptr<FormTaskMgr> formTaskMgr = std::make_shared<FormTaskMgr>();
     ASSERT_NE(nullptr, formTaskMgr);
-    std::shared_ptr<FormEventHandler> handler = std::make_shared<FormEventHandler>(EventRunner::Create());
-    formTaskMgr->SetEventHandler(handler);
+    formTaskMgr->SetSerialQueue(nullptr);
     int64_t formId = 2;
     std::vector<int64_t> formEvent;
     formEvent.emplace_back(formId);
@@ -329,9 +326,7 @@ HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0013, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormTaskMgr_0013 start";
     FormTaskMgr formTaskMgr;
-    std::shared_ptr<FormEventHandler> handler = std::make_shared<FormEventHandler>(EventRunner::Create());
-    ASSERT_NE(nullptr, handler);
-    formTaskMgr.SetEventHandler(handler);
+    formTaskMgr.SetSerialQueue(nullptr);
     int64_t formId = 2;
     std::set<int64_t> formIds;
     formIds.insert(formId);
@@ -369,8 +364,7 @@ HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0015, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormTaskMgr_0015 start";
     std::shared_ptr<FormTaskMgr> formTaskMgr = std::make_shared<FormTaskMgr>();
     ASSERT_NE(nullptr, formTaskMgr);
-    std::shared_ptr<FormEventHandler> handler = std::make_shared<FormEventHandler>(EventRunner::Create());
-    formTaskMgr->SetEventHandler(handler);
+    formTaskMgr->SetSerialQueue(nullptr);
     int64_t formId = 2;
     std::string message = "aa";
     Want want;
@@ -407,8 +401,7 @@ HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0017, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormTaskMgr_0017 start";
     std::shared_ptr<FormTaskMgr> formTaskMgr = std::make_shared<FormTaskMgr>();
     ASSERT_NE(nullptr, formTaskMgr);
-    std::shared_ptr<FormEventHandler> handler = std::make_shared<FormEventHandler>(EventRunner::Create());
-    formTaskMgr->SetEventHandler(handler);
+    formTaskMgr->SetSerialQueue(nullptr);
     Want wantArg;
     std::string state = "aa";
     Want want;
@@ -462,8 +455,7 @@ HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0020, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormTaskMgr_0020 start";
     std::shared_ptr<FormTaskMgr> formTaskMgr = std::make_shared<FormTaskMgr>();
     ASSERT_NE(nullptr, formTaskMgr);
-    std::shared_ptr<FormEventHandler> handler = std::make_shared<FormEventHandler>(EventRunner::Create());
-    formTaskMgr->SetEventHandler(handler);
+    formTaskMgr->SetSerialQueue(nullptr);
     AppExecFwk::FormState state = AppExecFwk::FormState::UNKNOWN;
     AAFwk::Want want;
     sptr<IRemoteObject> remoteObject;
@@ -497,8 +489,7 @@ HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0022, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormTaskMgr_0022 start";
     std::shared_ptr<FormTaskMgr> formTaskMgr = std::make_shared<FormTaskMgr>();
     ASSERT_NE(nullptr, formTaskMgr);
-    std::shared_ptr<FormEventHandler> handler = std::make_shared<FormEventHandler>(EventRunner::Create());
-    formTaskMgr->SetEventHandler(handler);
+    formTaskMgr->SetSerialQueue(nullptr);
     int64_t formShareRequestCode = 1;
     int32_t result = 2;
     formTaskMgr->PostFormShareSendResponse(formShareRequestCode, result);
@@ -852,8 +843,7 @@ HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0044, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormTaskMgr_0044 start";
     std::shared_ptr<FormTaskMgr> formTaskMgr = std::make_shared<FormTaskMgr>();
     ASSERT_NE(nullptr, formTaskMgr);
-    std::shared_ptr<FormEventHandler> handler = std::make_shared<FormEventHandler>(EventRunner::Create());
-    formTaskMgr->SetEventHandler(handler);
+    formTaskMgr->SetSerialQueue(nullptr);
     int64_t formId = 1;
     Want want;
     sptr<IRemoteObject> remoteObject = nullptr;
@@ -920,8 +910,7 @@ HWTEST_F(FormBatchDeleteConnectionTest, FormTaskMgr_0048, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormTaskMgr_0048 start";
     std::shared_ptr<FormTaskMgr> formTaskMgr = std::make_shared<FormTaskMgr>();
     ASSERT_NE(nullptr, formTaskMgr);
-    std::shared_ptr<FormEventHandler> handler = std::make_shared<FormEventHandler>(EventRunner::Create());
-    formTaskMgr->SetEventHandler(handler);
+    formTaskMgr->SetSerialQueue(nullptr);
     AAFwk::WantParams wantParams;
     int64_t requestCode = 1;
     sptr<IRemoteObject> remoteObject = nullptr;

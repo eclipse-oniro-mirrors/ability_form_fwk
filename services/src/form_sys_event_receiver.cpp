@@ -23,6 +23,7 @@
 #include "form_data_mgr.h"
 #include "form_db_cache.h"
 #include "form_info_mgr.h"
+#include "form_serial_queue.h"
 #include "form_timer_mgr.h"
 #include "in_process_call_wrapper.h"
 #include "want.h"
@@ -58,8 +59,8 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
             __func__, action.c_str(), bundleName.c_str());
         return;
     }
-    if (eventHandler_ == nullptr) {
-        HILOG_ERROR("%{public}s fail, event handler invalidate.", __func__);
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("%{public}s fail, serialQueue_ invalidate.", __func__);
         return;
     }
     HILOG_INFO("%{public}s, action:%{public}s.", __func__, action.c_str());
@@ -73,7 +74,7 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
                 sharedThis->formEventHelper_.HandleProviderUpdated(bundleName, userId);
             }
         };
-        eventHandler_->PostTask(task);
+        serialQueue_->ScheduleTask(0, task);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED) {
         int32_t userId = eventData.GetCode();
         auto task = [weakThis, userId]() {
@@ -83,7 +84,7 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
             }
         };
         if (userId != -1) {
-            eventHandler_->PostTask(task);
+            serialQueue_->ScheduleTask(0, task);
         }
     } else if (action == COMMON_EVENT_BUNDLE_SCAN_FINISHED) {
         auto task = [weakThis, want]() {
@@ -93,7 +94,7 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
                 sharedThis->HandleBundleScanFinished(userId);
             }
         };
-        eventHandler_->PostTask(task);
+        serialQueue_->ScheduleTask(0, task);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_DATA_CLEARED) {
         int userId = want.GetIntParam(KEY_USER_ID, Constants::DEFAULT_USERID);
         auto task = [weakThis, bundleName, userId]() {
@@ -102,7 +103,7 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
                 sharedThis->formEventHelper_.HandleBundleDataCleared(bundleName, userId);
             }
         };
-        eventHandler_->PostTask(task);
+        serialQueue_->ScheduleTask(0, task);
     } else {
         HILOG_WARN("%{public}s warnning, invalid action.", __func__);
     }

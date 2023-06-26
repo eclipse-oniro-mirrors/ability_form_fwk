@@ -19,11 +19,6 @@ namespace OHOS {
 namespace AppExecFwk {
 void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eventData)
 {
-    // env check
-    if (eventHandler_ == nullptr) {
-        HILOG_ERROR("%{public}s failed, eventHandler_ is nullptr", __func__);
-        return;
-    }
     const AAFwk::Want& want = eventData.GetWant();
     // action contains the change type of haps.
     std::string action = want.GetAction();
@@ -34,36 +29,20 @@ void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eve
         HILOG_ERROR("%{public}s failed, empty action/bundleName", __func__);
         return;
     }
-    if (eventHandler_ == nullptr) {
-        HILOG_ERROR("%{public}s fail, invalid event handler.", __func__);
-        return;
-    }
     HILOG_INFO("%{public}s, action:%{public}s.", __func__, action.c_str());
 
     wptr<FormBundleEventCallback> weakThis = this;
     if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_ADDED ||
         action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_CHANGED) {
         // install or update
-        auto task = [weakThis, bundleName, userId]() {
-            HILOG_INFO("%{public}s, bundle changed, bundleName: %{public}s", __func__, bundleName.c_str());
-            sptr<FormBundleEventCallback> sharedThis = weakThis.promote();
-            if (sharedThis) {
-                sharedThis->formEventHelper_.HandleBundleFormInfoChanged(bundleName, userId);
-                sharedThis->formEventHelper_.HandleProviderUpdated(bundleName, userId);
-            }
-        };
-        eventHandler_->PostSyncTask(task);
+        HILOG_INFO("%{public}s, bundle changed, bundleName: %{public}s", __func__, bundleName.c_str());
+        formEventHelper_.HandleBundleFormInfoChanged(bundleName, userId);
+        formEventHelper_.HandleProviderUpdated(bundleName, userId);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED) {
         // uninstall module/bundle
-        auto task = [weakThis, bundleName, userId]() {
-            HILOG_INFO("%{public}s, bundle removed, bundleName: %{public}s", __func__, bundleName.c_str());
-            sptr<FormBundleEventCallback> sharedThis = weakThis.promote();
-            if (sharedThis) {
-                sharedThis->formEventHelper_.HandleBundleFormInfoRemoved(bundleName, userId);
-                sharedThis->formEventHelper_.HandleProviderRemoved(bundleName, userId);
-            }
-        };
-        eventHandler_->PostSyncTask(task);
+        HILOG_INFO("%{public}s, bundle removed, bundleName: %{public}s", __func__, bundleName.c_str());
+        formEventHelper_.HandleBundleFormInfoRemoved(bundleName, userId);
+        formEventHelper_.HandleProviderRemoved(bundleName, userId);
     }
 }
 

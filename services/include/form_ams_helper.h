@@ -21,6 +21,7 @@
 #include "ability_connect_callback_interface.h"
 #include "ability_manager_interface.h"
 #include "form_event_handler.h"
+#include "form_serial_queue.h"
 #include "uri.h"
 
 namespace OHOS {
@@ -39,9 +40,9 @@ public:
      * @brief SetEventHandler.
      * @param handler event handler
      */
-    inline void SetEventHandler(const std::shared_ptr<FormEventHandler> &handler)
+    inline void SetSerialQueue(const std::shared_ptr<FormSerialQueue> &serialQueue)
     {
-        eventHandler_ = handler;
+        serialQueue_ = serialQueue;
     }
     /**
      * @brief acquire a form ability manager if it not existed,
@@ -97,7 +98,7 @@ private:
     void DisconnectAbilityTask(const sptr<AAFwk::IAbilityConnection> &connect);
 private:
     sptr<AAFwk::IAbilityManager> abilityManager_ = nullptr;
-    std::shared_ptr<FormEventHandler> eventHandler_ = nullptr;
+    std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

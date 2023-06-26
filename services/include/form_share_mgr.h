@@ -25,6 +25,7 @@
 #include "form_event_handler.h"
 #include "form_free_install_operator.h"
 #include "form_item_info.h"
+#include "form_serial_queue.h"
 #include "form_share_info.h"
 
 namespace OHOS {
@@ -46,6 +47,14 @@ public:
         }
         eventHandler_ = handler;
         eventHandler_->RegisterEventTimeoutObserver(shared_from_this());
+    }
+
+    void SetSerialQueue(const std::shared_ptr<FormSerialQueue> &serialQueue)
+    {
+        if (serialQueue == nullptr) {
+            return;
+        }
+        serialQueue_ = serialQueue;
     }
 
     /**
@@ -155,6 +164,7 @@ private:
     mutable std::shared_mutex eventMapMutex_ {};
     mutable std::shared_mutex freeInstallMapMutex_ {};
     mutable std::shared_mutex requestMapMutex_ {};
+    std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;
 };
 
 } // namespace AppExecFwk

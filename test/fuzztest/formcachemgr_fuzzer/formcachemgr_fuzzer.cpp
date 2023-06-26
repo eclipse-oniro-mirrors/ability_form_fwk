@@ -22,6 +22,7 @@
 #define protected public
 #include "form_cache_mgr.h"
 #include "form_event_handler.h"
+#include "form_serial_queue.h"
 #undef private
 #undef protected
 #include "securec.h"
@@ -31,6 +32,8 @@ using namespace OHOS::AppExecFwk;
 namespace OHOS {
 constexpr size_t FOO_MAX_LEN = 1024;
 constexpr size_t U32_AT_SIZE = 4;
+constexpr int64_t EVENT_MSG = 1;
+constexpr int64_t EVENT_ID = 2;
 uint32_t GetU32Data(const char* ptr)
 {
     // convert fuzz input data to an integer
@@ -45,10 +48,9 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formCacheMgr.AddData(formId, datas);
     formCacheMgr.DeleteData(formId);
     formCacheMgr.UpdateData(formId, datas);
-    std::shared_ptr<AppExecFwk::EventRunner> runner = nullptr;
-    FormEventHandler formEventHandler(runner);
+    FormEventHandler formEventHandler(nullptr);
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get();
-    formEventHandler.ProcessEvent(event);
+    formEventHandler.ProcessEvent(EVENT_MSG, EVENT_ID);
     formEventHandler.GetEventId();
     std::shared_ptr<FormEventTimeoutObserver> observer = nullptr;
     formEventHandler.RegisterEventTimeoutObserver(observer);

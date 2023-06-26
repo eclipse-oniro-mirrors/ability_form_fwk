@@ -625,11 +625,12 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormDeleteConnection_001, TestSize.Level0
 HWTEST_F(FmsFormRefreshConnectionTest, FormEventHandler_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormEventHandler_001 start";
-    std::shared_ptr<AppExecFwk::EventRunner> runner = nullptr;
-    std::shared_ptr<FormEventHandler> formEventHandler = std::make_shared<FormEventHandler>(runner);
+    std::shared_ptr<FormEventHandler> formEventHandler = std::make_shared<FormEventHandler>(nullptr);
     ASSERT_NE(nullptr, formEventHandler);
-    AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Pointer(nullptr, nullptr);
-    formEventHandler->ProcessEvent(event);
+    constexpr int64_t EVENT_MSG = 1;
+    constexpr int64_t EVENT_ID = 2;
+    // text ProcessEvent
+    formEventHandler->ProcessEvent(EVENT_MSG, EVENT_ID);
     GTEST_LOG_(INFO) << "FormEventHandler_001 end";
 }
 
@@ -641,8 +642,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormEventHandler_001, TestSize.Level0)
 HWTEST_F(FmsFormRefreshConnectionTest, FormEventHandler_002, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormEventHandler_002 start";
-    std::shared_ptr<AppExecFwk::EventRunner> runner = nullptr;
-    std::shared_ptr<FormEventHandler> formEventHandler = std::make_shared<FormEventHandler>(runner);
+    std::shared_ptr<FormEventHandler> formEventHandler = std::make_shared<FormEventHandler>(nullptr);
     ASSERT_NE(nullptr, formEventHandler);
     std::shared_ptr<FormEventTimeoutObserver> observer = nullptr;
     formEventHandler->observers_.insert(observer);
@@ -958,9 +958,8 @@ HWTEST_F(FmsFormRefreshConnectionTest, FreeInstallStatusCallBackStub_004, TestSi
 HWTEST_F(FmsFormRefreshConnectionTest, FormBundleEventCallback_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormBundleEventCallback_001 start";
-    std::shared_ptr<FormEventHandler> eventHandler = nullptr;
     std::shared_ptr<FormBundleEventCallback> formBundleEventCallback =
-        std::make_shared<FormBundleEventCallback>(eventHandler);
+        std::make_shared<FormBundleEventCallback>();
     ASSERT_NE(nullptr, formBundleEventCallback);
     EventFwk::CommonEventData eventData;
     formBundleEventCallback->OnReceiveEvent(eventData);
@@ -975,9 +974,7 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormBundleEventCallback_001, TestSize.Lev
 HWTEST_F(FmsFormRefreshConnectionTest, FormBundleEventCallback_002, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormBundleEventCallback_002 start";
-    std::shared_ptr<FormEventHandler> eventHandler = std::make_shared<FormEventHandler>(EventRunner::Create());
-    ASSERT_NE(nullptr, eventHandler);
-    FormBundleEventCallback formBundleEventCallback(eventHandler);
+    FormBundleEventCallback formBundleEventCallback;
     EventFwk::CommonEventData eventData;
     AAFwk::Want want = eventData.GetWant();
     std::string action = "";
@@ -996,10 +993,8 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormBundleEventCallback_002, TestSize.Lev
 HWTEST_F(FmsFormRefreshConnectionTest, FormBundleEventCallback_003, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormBundleEventCallback_003 start";
-    std::shared_ptr<FormEventHandler> eventHandler = std::make_shared<FormEventHandler>(EventRunner::Create());
-    sptr<FormBundleEventCallback> formBundleEventCallback = new (std::nothrow) FormBundleEventCallback(eventHandler);
+    sptr<FormBundleEventCallback> formBundleEventCallback = new (std::nothrow) FormBundleEventCallback();
     EXPECT_TRUE(formBundleEventCallback != nullptr);
-    EXPECT_TRUE(formBundleEventCallback->eventHandler_ != nullptr);
     EventFwk::CommonEventData eventData;
     AAFwk::Want want = eventData.GetWant();
     std::string action = EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_ADDED;
@@ -1021,10 +1016,8 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormBundleEventCallback_003, TestSize.Lev
 HWTEST_F(FmsFormRefreshConnectionTest, FormBundleEventCallback_004, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormBundleEventCallback_004 start";
-    std::shared_ptr<FormEventHandler> eventHandler = std::make_shared<FormEventHandler>(EventRunner::Create());
-    sptr<FormBundleEventCallback> formBundleEventCallback = new (std::nothrow) FormBundleEventCallback(eventHandler);
+    sptr<FormBundleEventCallback> formBundleEventCallback = new (std::nothrow) FormBundleEventCallback();
     EXPECT_TRUE(formBundleEventCallback != nullptr);
-    EXPECT_TRUE(formBundleEventCallback->eventHandler_ != nullptr);
     EventFwk::CommonEventData eventData;
     AAFwk::Want want = eventData.GetWant();
     std::string action = EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_CHANGED;
@@ -1047,10 +1040,8 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormBundleEventCallback_004, TestSize.Lev
 HWTEST_F(FmsFormRefreshConnectionTest, FormBundleEventCallback_005, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormBundleEventCallback_005 start";
-    std::shared_ptr<FormEventHandler> eventHandler = std::make_shared<FormEventHandler>(EventRunner::Create());
-    sptr<FormBundleEventCallback> formBundleEventCallback = new (std::nothrow) FormBundleEventCallback(eventHandler);
+    sptr<FormBundleEventCallback> formBundleEventCallback = new (std::nothrow) FormBundleEventCallback();
     EXPECT_TRUE(formBundleEventCallback != nullptr);
-    EXPECT_TRUE(formBundleEventCallback->eventHandler_ != nullptr);
     EventFwk::CommonEventData eventData;
     AAFwk::Want want = eventData.GetWant();
     std::string action = EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED;
@@ -1072,10 +1063,8 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormBundleEventCallback_005, TestSize.Lev
 HWTEST_F(FmsFormRefreshConnectionTest, FormBundleEventCallback_006, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormBundleEventCallback_006 start";
-    std::shared_ptr<FormEventHandler> eventHandler = std::make_shared<FormEventHandler>(EventRunner::Create());
-    sptr<FormBundleEventCallback> formBundleEventCallback = new (std::nothrow) FormBundleEventCallback(eventHandler);
+    sptr<FormBundleEventCallback> formBundleEventCallback = new (std::nothrow) FormBundleEventCallback();
     EXPECT_TRUE(formBundleEventCallback != nullptr);
-    EXPECT_TRUE(formBundleEventCallback->eventHandler_ != nullptr);
     EventFwk::CommonEventData eventData;
     AAFwk::Want want = eventData.GetWant();
     std::string action = EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_DATA_CLEARED;
@@ -1097,10 +1086,8 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormBundleEventCallback_006, TestSize.Lev
 HWTEST_F(FmsFormRefreshConnectionTest, FormBundleEventCallback_007, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormBundleEventCallback_007 start";
-    std::shared_ptr<FormEventHandler> eventHandler = std::make_shared<FormEventHandler>(EventRunner::Create());
-    sptr<FormBundleEventCallback> formBundleEventCallback = new (std::nothrow) FormBundleEventCallback(eventHandler);
+    sptr<FormBundleEventCallback> formBundleEventCallback = new (std::nothrow) FormBundleEventCallback();
     EXPECT_TRUE(formBundleEventCallback != nullptr);
-    EXPECT_TRUE(formBundleEventCallback->eventHandler_ != nullptr);
     EventFwk::CommonEventData eventData;
     AAFwk::Want want = eventData.GetWant();
     std::string action = "abcd";
@@ -1122,10 +1109,8 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormBundleEventCallback_007, TestSize.Lev
 HWTEST_F(FmsFormRefreshConnectionTest, FormBundleEventCallback_008, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormBundleEventCallback_008 start";
-    std::shared_ptr<FormEventHandler> eventHandler = std::make_shared<FormEventHandler>(EventRunner::Create());
-    sptr<FormBundleEventCallback> formBundleEventCallback = new (std::nothrow) FormBundleEventCallback(eventHandler);
+    sptr<FormBundleEventCallback> formBundleEventCallback = new (std::nothrow) FormBundleEventCallback();
     EXPECT_TRUE(formBundleEventCallback != nullptr);
-    EXPECT_TRUE(formBundleEventCallback->eventHandler_ != nullptr);
     EventFwk::CommonEventData eventData;
     AAFwk::Want want = eventData.GetWant();
     std::string action = "abc";
