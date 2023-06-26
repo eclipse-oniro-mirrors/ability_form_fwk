@@ -124,6 +124,10 @@ public:
     {
         return;
     }
+    int32_t ReportDrawnCompleted(const sptr<IRemoteObject>& callerToken) override
+    {
+        return 0;
+    }
     void UnregisterCancelListener(
         const sptr<AAFwk::IWantSender> &sender, const sptr<AAFwk::IWantReceiver> &receiver) override
     {
@@ -483,6 +487,10 @@ public:
         return 0;
     }
     int GetPendingWantType(const sptr<AAFwk::IWantSender> &target) override
+    {
+        return 0;
+    }
+    int32_t ReportDrawnCompleted(const sptr<IRemoteObject>& callerToken) override
     {
         return 0;
     }
