@@ -63,8 +63,10 @@ int32_t FormRenderImpl::RenderForm(const FormJsInfo &formJsInfo, const Want &wan
         HILOG_ERROR("%{public}s warn, IFormSupply is nullptr", __func__);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
-
-    formSupplyClient_ = formSupplyClient;
+    {
+        std::lock_guard<std::mutex> lock(formSupplyMutex_);
+        formSupplyClient_ = formSupplyClient;
+    }
     HILOG_DEBUG("%{public}s come, connectId: %{public}d.", __func__,
         want.GetIntParam(Constants::FORM_CONNECT_ID, 0L));
 
@@ -237,12 +239,18 @@ void FormRenderImpl::SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Co
 
 void FormRenderImpl::OnRenderingBlock(const std::string &bundleName)
 {
-    if (formSupplyClient_ == nullptr) {
+    sptr<IFormSupply> formSupplyClient = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(formSupplyMutex_);
+        formSupplyClient = formSupplyClient_;
+    }
+
+    if (formSupplyClient == nullptr) {
         HILOG_ERROR("formSupplyClient_ is nullptr");
         return;
     }
 
-    formSupplyClient_->OnRenderingBlock(bundleName);
+    formSupplyClient->OnRenderingBlock(bundleName);
 }
 } // namespace FormRender
 } // namespace AppExecFwk
