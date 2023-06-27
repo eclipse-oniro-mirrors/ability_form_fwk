@@ -69,7 +69,8 @@
               ],
               "service_group": [
                 "//foundation/ability/form_fwk/sa_profile:form_sa_profile",
-                "//foundation/ability/form_fwk:fms_services_target"
+                "//foundation/ability/form_fwk:fms_services_target",
+                "//foundation/ability/form_fwk/services/etc:form_etc"
               ],
               "base_group": []
             },
