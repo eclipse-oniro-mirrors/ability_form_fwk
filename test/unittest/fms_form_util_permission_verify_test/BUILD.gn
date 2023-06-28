@@ -56,7 +56,7 @@ ohos_unittest("FmsFormUtilPermissionVerifyTest") {
     "c_utils:utils",
     "ffrt:libffrt",
     "form_fwk:form_manager",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
   ]

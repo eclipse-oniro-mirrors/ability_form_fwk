@@ -60,8 +60,8 @@ ohos_fuzztest("FormRenderImplFuzzTest") {
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "form_fwk:form_manager",
-    "hitrace_native:hitrace_meter",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
+    "hitrace:hitrace_meter",
     "ipc:ipc_core",
   ]
 }
