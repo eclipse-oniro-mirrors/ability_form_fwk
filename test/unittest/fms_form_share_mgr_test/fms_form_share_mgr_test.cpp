@@ -3770,7 +3770,7 @@ HWTEST_F(FmsFormShareMgrTest, FormDataMgr_0067, TestSize.Level0)
 HWTEST_F(FmsFormShareMgrTest, RecvFormShareInfoFromRemote_002, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest RecvFormShareInfoFromRemote_002 start";
-    DelayedSingleton<FormShareMgr>::GetInstance()->eventHandler_ = nullptr;
+    DelayedSingleton<FormShareMgr>::GetInstance()->serialQueue_ = nullptr;
     FormShareInfo info;
     auto result = DelayedSingleton<FormShareMgr>::GetInstance()->RecvFormShareInfoFromRemote(info);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);

@@ -344,21 +344,6 @@ HWTEST_F(FmsFormHostRecordTest, FormMgrService_0001, TestSize.Level0)
 }
 
 /**
- * @tc.name: FormMgrService_0002
- * @tc.desc: test IsReady function.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormHostRecordTest, FormMgrService_0002, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0002 start";
-    FormMgrService formMgrService;
-    formMgrService.state_ = ServiceRunningState::STATE_RUNNING;
-    formMgrService.handler_ = nullptr;
-    EXPECT_EQ(false, formMgrService.IsReady());
-    GTEST_LOG_(INFO) << "FormMgrService_0002 end";
-}
-
-/**
  * @tc.name: FormMgrService_0003
  * @tc.desc: test IsReady function.
  * @tc.type: FUNC
