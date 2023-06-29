@@ -356,7 +356,7 @@ int JsFormStateObserver::RegisterFormInstanceCallback(NativeEngine &engine, Nati
             bundleName, std::shared_ptr<NativeReference>(engine.CreateReference(jsObserverObject, 1)));
     }
     AppExecFwk::FormMgr::GetInstance().RegisterAddObserver(bundleName + specialFlag + std::to_string(isVisibility),
-            formObserver);
+        formObserver);
     return ERR_OK;
 }
 
@@ -442,7 +442,7 @@ int32_t JsFormStateObserver::NotifyWhetherFormsVisible(const AppExecFwk::FormVis
         wptr<JsFormStateObserver> weakObserver = this;
         handler_->PostSyncTask([weakObserver, visibleType, formInstances, bundleName]() {
             std::string specialFlag = "#";
-            bool isVisibleTypeFlag = false; 
+            bool isVisibleTypeFlag = false;
             auto sharedThis = weakObserver.promote();
             if (sharedThis == nullptr) {
                 HILOG_ERROR("sharedThis is nullptr.");

@@ -562,7 +562,7 @@ int FormMgrAdapter::UpdateForm(const int64_t formId, const std::string &bundleNa
         ret = FormRenderMgr::GetInstance().UpdateRenderingForm(formId, formProviderData, wantParams, true);
     } else {
         // update Form
-       ret = FormProviderMgr::GetInstance().UpdateForm(matchedFormId, formRecord, formProviderData);
+        ret = FormProviderMgr::GetInstance().UpdateForm(matchedFormId, formRecord, formProviderData);
     }
 
     if (!formDataProxies.empty()) {
@@ -711,7 +711,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
                     formObserver.first, observer->second);
             } else if (formVisibleType == static_cast<int32_t>(FormVisibilityType::INVISIBLE)){
                 remoteJsFormStateObserver->NotifyWhetherFormsVisible(FormVisibilityType::INVISIBLE, formObserver.first,
-                observer->second);
+                    observer->second);
             }
         }
     }
