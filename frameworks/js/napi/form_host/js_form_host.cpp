@@ -1190,7 +1190,7 @@ private:
                     NapiFormUtil::ThrowParamTypeError(engine, "bundleName", "string");
                     return engine.CreateUndefined();
                 }
-                if(info.argv[PARAM1]->TypeOf() != NATIVE_FUNCTION && info.argv[PARAM1]->TypeOf() != NATIVE_UNDEFINED && 
+                if (info.argv[PARAM1]->TypeOf() != NATIVE_FUNCTION && info.argv[PARAM1]->TypeOf() != NATIVE_UNDEFINED &&
                     info.argv[PARAM1]->TypeOf() != NATIVE_NULL) {
                     HILOG_ERROR("param1 is invalid");
                     NapiFormUtil::ThrowParamTypeError(engine, "callback", "Callback<Array<RunningFormInfo>>");
