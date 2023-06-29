@@ -19,6 +19,7 @@
 
 #include "fms_log_wrapper.h"
 #include "form_bms_helper.h"
+#include "form_cache_mgr.h"
 #include "form_constants.h"
 #include "form_mgr_errors.h"
 #include "form_supply_callback.h"
@@ -62,6 +63,12 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
         return;
     }
 
+    FormRecord newRecord(formRecord_);
+    std::string cacheData;
+    if (FormCacheMgr::GetInstance().GetData(formRecord_.formId, cacheData)) {
+        newRecord.formProviderInfo.SetFormDataString(cacheData);
+    }
+
     FormRenderMgr::GetInstance().AddConnection(GetFormId(), this);
     FormRenderMgr::GetInstance().AddRenderDeathRecipient(remoteObject);
     Want want;
@@ -69,7 +76,7 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
     want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
     want.SetParam(Constants::FORM_COMPILE_MODE_KEY, compileMode);
     want.SetParam(Constants::FORM_COMPATIBLE_VERSION_CODE_KEY, compatibleVersionCode);
-    FormTaskMgr::GetInstance().PostRenderForm(formRecord_, std::move(want), remoteObject);
+    FormTaskMgr::GetInstance().PostRenderForm(newRecord, std::move(want), remoteObject);
 }
 
 void FormRenderConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
