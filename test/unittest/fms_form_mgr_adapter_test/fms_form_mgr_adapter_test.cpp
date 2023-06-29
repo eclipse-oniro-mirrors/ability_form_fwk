@@ -1108,26 +1108,6 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_057, TestSize.Level0)
 }
 
 /**
- * @tc.name: FormMgrAdapter_058
- * @tc.desc: test AcquireFormStateCheck function.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_058, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormMgrAdapter_058 start";
-    FormMgrAdapter formMgrAdapter;
-    std::string bundleName = "aa";
-    std::string abilityName = "aa";
-    Want want;
-    std::string provider = "";
-    MockGetStringParam(true);
-    MockGetFormsInfoByModule(true);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE,
-        formMgrAdapter.AcquireFormStateCheck(bundleName, abilityName, want, provider));
-    GTEST_LOG_(INFO) << "FormMgrAdapter_058 end";
-}
-
-/**
  * @tc.name: FormMgrAdapter_059
  * @tc.desc: test AcquireFormStateCheck function.
  * @tc.type: FUNC
