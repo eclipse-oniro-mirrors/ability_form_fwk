@@ -187,33 +187,33 @@ int32_t FormRenderProxy::ReleaseRenderer(
     return ERR_OK;
 }
 
-int32_t FormRenderProxy::ReloadForm(const std::vector<int64_t> &&formIds, const Want &want)
+int32_t FormRenderProxy::ReloadForm(const std::vector<FormJsInfo> &&formJsInfos, const Want &want)
 {
     MessageParcel data;
     MessageParcel reply;
     MessageOption option(MessageOption::TF_ASYNC);
-
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("%{public}s, failed to write interface token", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (!data.WriteInt32(static_cast<int32_t>(formIds.size()))) {
-        HILOG_ERROR("%{public}s, failed to write formIds size", __func__);
+
+    int error = WriteParcelableVector<FormJsInfo>(formJsInfos, data);
+    if (error != ERR_OK) {
+        HILOG_ERROR("%{public}s, failed to WriteParcelableVector<FormJsInfo>", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (!data.WriteInt64Vector(formIds)) {
-        HILOG_ERROR("%{public}s fail, write formIds error", __func__);
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
+
     if (!data.WriteParcelable(&want)) {
         HILOG_ERROR("%{public}s, failed to write want", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
+
     if (!Remote()) {
         HILOG_ERROR("Remote obj is nullptr");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    int error = Remote()->SendRequest(
+
+    error = Remote()->SendRequest(
         static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_RELOAD_FORM),
         data,
         reply,
@@ -221,6 +221,24 @@ int32_t FormRenderProxy::ReloadForm(const std::vector<int64_t> &&formIds, const 
     if (error != ERR_OK) {
         HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d", __func__, error);
         return error;
+    }
+
+    return ERR_OK;
+}
+
+template<typename T>
+int32_t FormRenderProxy::WriteParcelableVector(const std::vector<T> &parcelableVector, MessageParcel &reply)
+{
+    if (!reply.WriteInt32(parcelableVector.size())) {
+        HILOG_ERROR("write ParcelableVector failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    for (auto &parcelable : parcelableVector) {
+        if (!reply.WriteParcelable(&parcelable)) {
+            HILOG_ERROR("write ParcelableVector failed");
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
     }
     return ERR_OK;
 }

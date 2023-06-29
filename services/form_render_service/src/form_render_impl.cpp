@@ -194,7 +194,7 @@ int32_t FormRenderImpl::CleanFormHost(const sptr<IRemoteObject> &hostToken)
     return ERR_OK;
 }
 
-int32_t FormRenderImpl::ReloadForm(const std::vector<int64_t> &&formIds, const Want &want)
+int32_t FormRenderImpl::ReloadForm(const std::vector<FormJsInfo> &&formJsInfos, const Want &want)
 {
     HILOG_INFO("ReloadForm start");
     std::lock_guard<std::mutex> lock(renderRecordMutex_);
@@ -209,7 +209,7 @@ int32_t FormRenderImpl::ReloadForm(const std::vector<int64_t> &&formIds, const W
         return RELOAD_FORM_FAILED;
     }
     if (search->second) {
-        search->second->ReloadFormRecord(std::forward<decltype(formIds)>(formIds), want);
+        search->second->ReloadFormRecord(std::forward<decltype(formJsInfos)>(formJsInfos), want);
     }
     return ERR_OK;
 }

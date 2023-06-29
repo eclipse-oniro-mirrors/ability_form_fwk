@@ -136,7 +136,7 @@ HWTEST_F(FormRenderProxyTest, FormRenderProxyTest_0006, TestSize.Level1) {
  */
 HWTEST_F(FormRenderProxyTest, FormRenderProxyTest_0007, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormRenderProxyTest_0007 starts";
-    std::vector<int64_t> formIds;
+    std::vector<FormJsInfo> formIds;
     Want want;
     int result = formRenderProxy->ReloadForm(std::move(formIds), want);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);

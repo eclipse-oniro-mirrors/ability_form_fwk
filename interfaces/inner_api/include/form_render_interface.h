@@ -60,7 +60,7 @@ public:
      */
     virtual int32_t CleanFormHost(const sptr<IRemoteObject> &hostToken) = 0;
 
-    virtual int32_t ReloadForm(const std::vector<int64_t> &&formIds, const Want &want) { return ERR_OK; }
+    virtual int32_t ReloadForm(const std::vector<FormJsInfo> &&formJsInfos, const Want &want) { return ERR_OK; }
 
     virtual int32_t ReleaseRenderer(
         int64_t formId, const std::string &compId, const std::string &uid) { return ERR_OK; }

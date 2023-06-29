@@ -61,12 +61,12 @@ public:
 
     int32_t ReleaseRenderer(int64_t formId, const std::string &compId, const std::string &uid) override;
 
-    int32_t ReloadForm(const std::vector<int64_t> &&formIds, const Want &want) override;
+    int32_t ReloadForm(const std::vector<FormJsInfo> &&formJsInfos, const Want &want) override;
 
 private:
-    template<typename T>
-    int32_t GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos);
     bool WriteInterfaceToken(MessageParcel &data);
+    template<typename T>
+    int32_t WriteParcelableVector(const std::vector<T> &parcelableVector, MessageParcel &reply);
 
 private:
     static inline BrokerDelegator<FormRenderProxy> delegator_;

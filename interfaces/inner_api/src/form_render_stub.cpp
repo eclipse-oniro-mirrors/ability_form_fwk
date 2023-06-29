@@ -141,21 +141,44 @@ int32_t FormRenderStub::HandleReleaseRenderer(MessageParcel &data, MessageParcel
 
 int FormRenderStub::HandleReloadForm(MessageParcel &data, MessageParcel &reply)
 {
-    int32_t size = data.ReadInt32();
-    if (size < 0 || size >= MAX_ALLOW_SIZE) {
-        HILOG_ERROR("%{public}s, invalid size: %{public}d", __func__, size);
-        return ERR_APPEXECFWK_PARCEL_ERROR;
+    std::vector<FormJsInfo> formJsInfos;
+    int32_t result = GetParcelableInfos(data, formJsInfos);
+    if (result != ERR_OK) {
+        HILOG_ERROR("%{public}s, failed to GetParcelableInfos<FormJsInfo>", __func__);
+        return result;
     }
-    std::vector<int64_t> formIds;
-    data.ReadInt64Vector(&formIds);
+
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
         HILOG_ERROR("%{public}s, failed to ReadParcelable<Want>", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    int32_t result = ReloadForm(std::move(formIds), *want);
+
+    result = ReloadForm(std::move(formJsInfos), *want);
     reply.WriteInt32(result);
     return result;
+}
+
+template<typename T>
+int  FormRenderStub::GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos)
+{
+    int32_t infoSize = reply.ReadInt32();
+    if (infoSize < 0 || infoSize > MAX_ALLOW_SIZE) {
+        HILOG_ERROR("%{public}s invalid size: %{public}d", __func__, infoSize);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    for (int32_t i = 0; i < infoSize; i++) {
+        std::unique_ptr<T> info(reply.ReadParcelable<T>());
+        if (!info) {
+            HILOG_ERROR("%{public}s, failed to Read Parcelable infos", __func__);
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+        parcelableInfos.emplace_back(*info);
+    }
+
+    HILOG_INFO("%{public}s, get parcelable infos success", __func__);
+    return ERR_OK;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
