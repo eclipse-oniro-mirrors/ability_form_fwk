@@ -2132,4 +2132,73 @@ HWTEST_F(FormMgrTest, FormMgrTest_0107, TestSize.Level1) {
     EXPECT_EQ(result, NEGATIVE_NUM);
     GTEST_LOG_(INFO) << "FormMgrTest_0107 test ends";
 }
+
+/**
+ * @tc.name: FormMgrTest_0108
+ * @tc.desc: Verify StopRenderingForm
+ * @tc.type: FUNC
+ * @tc.require: issueI7HGZ2
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0108, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0108 starts";
+    int64_t formId = 0;
+    std::string compId = "this is compId";
+    int result = FormMgr::GetInstance().StopRenderingForm(formId, compId);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_FORM_ID);
+    GTEST_LOG_(INFO) << "FormMgrTest_0108 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0109
+ * @tc.desc: Verify ReleaseRenderer
+ * @tc.type: FUNC
+ * @tc.require: issueI7HGZ2
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0109, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0109 starts";
+    int64_t formId = 0;
+    std::string compId = "this is compId";
+    int result = FormMgr::GetInstance().ReleaseRenderer(formId, compId);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_FORM_ID);
+    GTEST_LOG_(INFO) << "FormMgrTest_0109 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0111
+ * @tc.desc: Verify GetErrorMsgByExternalErrorCode
+ * @tc.type: FUNC
+ * @tc.require: issueI7HGZ2
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0111, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0111 starts";
+    int32_t innerErrorCode = 0;
+    int32_t externalErrorCode = 0;
+    std::string errorMsg = "this is errorMsg";
+    FormMgr::GetInstance().GetExternalError(innerErrorCode, externalErrorCode, errorMsg);
+
+    std::string result = FormMgr::GetInstance().GetErrorMsgByExternalErrorCode(externalErrorCode);
+    EXPECT_EQ(result, "success");
+    GTEST_LOG_(INFO) << "FormMgrTest_0111 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0112
+ * @tc.desc: Verify GetFormInstancesByFilter
+ * @tc.type: FUNC
+ * @tc.require: issueI7HGZ2
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0112, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0112 starts";
+    FormInstancesFilter filter;
+    std::vector<FormInstance> formInstances;
+    ErrCode result = FormMgr::GetInstance().GetFormInstancesByFilter(filter, formInstances);
+    int code = 8388610;
+    EXPECT_EQ(result, code);
+
+    int64_t formId = 1;
+    FormInstance formInstance;
+    ErrCode result1 = FormMgr::GetInstance().GetFormInstanceById(formId, formInstance);
+    EXPECT_EQ(result1, code);
+    GTEST_LOG_(INFO) << "FormMgrTest_0112 test ends";
+}
 } // namespace
