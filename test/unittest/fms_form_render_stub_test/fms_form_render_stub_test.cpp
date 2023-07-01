@@ -20,8 +20,10 @@
 #include "appexecfwk_errors.h"
 #include "element_name.h"
 #include "form_mgr_errors.h"
+#include "form_mgr_interface.h"
 #include "form_constants.h"
 #include "form_render_stub.h"
+#include "form_supply_interface.h"
 #include "form_supply_stub.h"
 #include "ipc_types.h"
 #include "iremote_broker.h"
@@ -135,6 +137,244 @@ public:
         return ERR_OK;
     }
     int32_t OnStopRenderingTaskDone(int64_t formId, const Want &want) override
+    {
+        return ERR_OK;
+    }
+    const int number_ = 1;
+};
+
+class IFormSupplyTest : public IFormSupply {
+public:
+    IFormSupplyTest() {};
+    virtual ~IFormSupplyTest() {};
+    sptr<IRemoteObject> AsObject() override
+    {
+        return nullptr;
+    }
+    int OnAcquire(const FormProviderInfo &formInfo, const Want &want) override
+    {
+        return number_;
+    }
+    int OnEventHandle(const Want &want) override
+    {
+        return number_;
+    }
+    int OnAcquireStateResult(FormState state, const std::string &provider, const Want &wantArg,
+        const Want &want) override
+    {
+        return number_;
+    }
+    void OnShareAcquire(int64_t formId, const std::string &remoteDeviceId,
+        const AAFwk::WantParams &wantParams, int64_t requestCode, const bool &result) override
+    {}
+    int OnAcquireDataResult(const AAFwk::WantParams &wantParams, int64_t requestCode) override
+    {
+        return number_;
+    }
+    int32_t OnRenderTaskDone(int64_t formId, const Want &want) override
+    {
+        return ERR_OK;
+    }
+    int32_t OnStopRenderingTaskDone(int64_t formId, const Want &want) override
+    {
+        return ERR_OK;
+    }
+    const int number_ = 1;
+};
+
+class IFormMgrTest : public IFormMgr {
+public:
+    IFormMgrTest() {};
+    virtual ~IFormMgrTest() {};
+    sptr<IRemoteObject> AsObject() override
+    {
+        return nullptr;
+    }
+    int AddForm(const int64_t formId, const Want &want, const sptr<IRemoteObject> &callerToken,
+    FormJsInfo &formInfo) override
+    {
+        return number_;
+    }
+    int DeleteForm(const int64_t formId, const sptr<IRemoteObject> &callerToken) override
+    {
+        return number_;
+    }
+    int ReleaseForm(const int64_t formId, const sptr<IRemoteObject> &callerToken, const bool delCache) override
+    {
+        return number_;
+    }
+    int UpdateForm(const int64_t formId, const FormProviderData &formProviderData) override
+    {
+        return number_;
+    }
+    int SetNextRefreshTime(const int64_t formId, const int64_t nextTime) override
+    {
+        return number_;
+    }
+    ErrCode RequestPublishForm(Want &want, bool withFormBindingData,
+        std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId) override
+    {
+        return ERR_OK;
+    }
+    int LifecycleUpdate(const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &callerToken,
+        bool updateType) override
+    {
+        return number_;
+    }
+    int RequestForm(const int64_t formId, const sptr<IRemoteObject> &callerToken, const Want &want) override
+    {
+        return number_;
+    }
+    int NotifyWhetherVisibleForms(const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &callerToken,
+        const int32_t formVisibleType) override
+    {
+        return number_;
+    }
+    int CastTempForm(const int64_t formId, const sptr<IRemoteObject> &callerToken) override
+    {
+        return number_;
+    }
+    int DumpStorageFormInfos(std::string &formInfos) override
+    {
+        return number_;
+    }
+    int DumpFormInfoByBundleName(const std::string &bundleName, std::string &formInfos) override
+    {
+        return number_;
+    }
+    int DumpFormInfoByFormId(const std::int64_t formId, std::string &formInfo) override
+    {
+        return number_;
+    }
+    int DumpFormTimerByFormId(const std::int64_t formId, std::string &isTimingService) override
+    {
+        return number_;
+    }
+    int MessageEvent(const int64_t formId, const Want &want, const sptr<IRemoteObject> &callerToken) override
+    {
+        return number_;
+    }
+    int BackgroundEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken) override
+    {
+        return number_;
+    }
+    int RouterEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken) override
+    {
+        return number_;
+    }
+    int DeleteInvalidForms(const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &callerToken,
+        int32_t &numFormsDeleted) override
+    {
+        return number_;
+    }
+    int AcquireFormState(const Want &want, const sptr<IRemoteObject> &callerToken,
+        FormStateInfo &stateInfo) override
+    {
+        return number_;
+    }
+    int NotifyFormsVisible(const std::vector<int64_t> &formIds, bool isVisible,
+        const sptr<IRemoteObject> &callerToken) override
+    {
+        return number_;
+    }
+    int NotifyFormsPrivacyProtected(const std::vector<int64_t> &formIds, bool isProtected,
+        const sptr<IRemoteObject> &callerToken) override
+    {
+        return number_;
+    }
+    int NotifyFormsEnableUpdate(const std::vector<int64_t> &formIds, bool isEnableUpdate,
+        const sptr<IRemoteObject> &callerToken) override
+    {
+        return number_;
+    }
+    int GetAllFormsInfo(std::vector<FormInfo> &formInfos) override
+    {
+        return number_;
+    }
+    int GetFormsInfoByApp(std::string &bundleName, std::vector<FormInfo> &formInfos) override
+    {
+        return number_;
+    }
+    int GetFormsInfoByModule(std::string &bundleName, std::string &moduleName,
+        std::vector<FormInfo> &formInfos) override
+    {
+        return number_;
+    }
+    int32_t GetFormsInfo(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos) override
+    {
+        return ERR_OK;
+    }
+    bool IsRequestPublishFormSupported() override
+    {
+        return true;
+    }
+    int32_t StartAbility(const Want &want, const sptr<IRemoteObject> &callerToken) override
+    {
+        return ERR_OK;
+    }
+    int32_t ShareForm(int64_t formId, const std::string &deviceId, const sptr<IRemoteObject> &callerToken,
+        int64_t requestCode) override
+    {
+        return ERR_OK;
+    }
+    int32_t AcquireFormData(int64_t formId, int64_t requestCode, const sptr<IRemoteObject> &callerToken,
+        AAFwk::WantParams &formData) override
+    {
+        return ERR_OK;
+    }
+    int32_t RecvFormShareInfoFromRemote(const FormShareInfo &info) override
+    {
+        return ERR_OK;
+    }
+    bool CheckFMSReady() override
+    {
+        return false;
+    }
+    ErrCode RegisterFormAddObserverByBundle(const std::string bundleName,
+        const sptr<IRemoteObject> &callerToken) override
+    {
+        return ERR_OK;
+    }
+    ErrCode RegisterFormRemoveObserverByBundle(const std::string bundleName,
+        const sptr<IRemoteObject> &callerToken) override
+    {
+        return ERR_OK;
+    }
+    int32_t SetBackgroundFunction(const std::string funcName, const std::string params) override
+    {
+        return ERR_OK;
+    }
+    int32_t GetFormsCount(bool isTempFormFlag, int32_t &formCount) override
+    {
+        return ERR_OK;
+    }
+    int32_t GetHostFormsCount(std::string &bundleName, int32_t &formCount) override
+    {
+        return ERR_OK;
+    }
+    ErrCode GetRunningFormInfos(std::vector<RunningFormInfo> &runningFormInfos) override
+    {
+        return ERR_OK;
+    }
+    ErrCode GetRunningFormInfosByBundleName(const std::string &bundleName,
+        std::vector<RunningFormInfo> &runningFormInfos) override
+    {
+        return ERR_OK;
+    }
+    int32_t GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
+        std::vector<FormInstance> &formInstances) override
+    {
+        return ERR_OK;
+    }
+    int32_t GetFormInstanceById(const int64_t formId, FormInstance &formInstance) override
+    {
+        return ERR_OK;
+    }
+    ErrCode RegisterAddObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken) override
+    {
+        return ERR_OK;
+    }
+    ErrCode RegisterRemoveObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken) override
     {
         return ERR_OK;
     }
@@ -481,6 +721,75 @@ HWTEST_F(FormRenderStubTest, FormRenderStubTest_016, TestSize.Level0)
     data.WriteParcelable(&want);
     auto result = callback->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
+}
+
+/**
+ * @tc.name: IFormSupplyTest_001
+ * @tc.desc: Test OnRenderingBlock function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderStubTest, IFormSupplyTest_001, TestSize.Level0)
+{
+    std::string bundleName = "<bundleName>";
+    IFormSupplyTest iFormSupplyTest;
+    EXPECT_EQ(iFormSupplyTest.OnRenderingBlock(bundleName), ERR_OK);
+}
+
+/**
+ * @tc.name: IFormMgrTest_001
+ * @tc.desc: Test StopRenderingForm function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderStubTest, IFormMgrTest_001, TestSize.Level0)
+{
+    int64_t formId = 1;
+    std::string compId = "<compId>";
+    IFormMgrTest iFormMgrTest;
+    EXPECT_EQ(iFormMgrTest.StopRenderingForm(formId, compId), ERR_OK);
+}
+
+/**
+ * @tc.name: IFormMgrTest_002
+ * @tc.desc: Test ReleaseRenderer function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderStubTest, IFormMgrTest_002, TestSize.Level0)
+{
+    int64_t formId = 1;
+    std::string compId = "<compId>";
+    IFormMgrTest iFormMgrTest;
+    EXPECT_EQ(iFormMgrTest.ReleaseRenderer(formId, compId), ERR_OK);
+}
+
+/**
+ * @tc.name: IFormMgrTest_003
+ * @tc.desc: Test RequestPublishProxyForm function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderStubTest, IFormMgrTest_003, TestSize.Level0)
+{
+    Want want;
+    bool withFormBindingData = true;
+    std::unique_ptr<FormProviderData> formBindingData;
+    int64_t formId = 1;
+    std::vector<FormDataProxy> formDataProxies;
+    IFormMgrTest iFormMgrTest;
+    EXPECT_EQ(iFormMgrTest.RequestPublishProxyForm(
+        want, withFormBindingData, formBindingData, formId, formDataProxies), ERR_OK);
+}
+
+/**
+ * @tc.name: IFormMgrTest_004
+ * @tc.desc: Test UpdateProxyForm function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderStubTest, IFormMgrTest_004, TestSize.Level0)
+{
+    int64_t formId = 1;
+    FormProviderData formProviderData;
+    std::vector<FormDataProxy> formDataProxies;
+    IFormMgrTest iFormMgrTest;
+    EXPECT_EQ(iFormMgrTest.UpdateProxyForm(formId, formProviderData, formDataProxies), ERR_OK);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
