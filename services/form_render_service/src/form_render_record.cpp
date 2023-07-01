@@ -551,7 +551,6 @@ void FormRenderRecord::AddStaticFormRequest(int64_t formId, const Ace::FormReque
 {
     HILOG_INFO("AddStaticFormRequest by FormRequest formId: %{public}s, compId: %{public}s.",
         std::to_string(formId).c_str(), formRequest.compId.c_str());
-
     std::lock_guard<std::mutex> lock(staticFormRequestsMutex_);
     auto iter = staticFormRequests_.find(formId);
     if (iter == staticFormRequests_.end()) {

@@ -370,11 +370,11 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_014, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormRenderMgrTest_014 start";
     FormRenderMgr formRenderMgr;
     formRenderMgr.renderRemoteObj_ = nullptr;
-    std::vector<int64_t> formIds;
+    std::vector<FormRecord> formRecords;
     std::string bundleName = "<bundleName>";
     int32_t userId = 1;
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
-        formRenderMgr.ReloadForm(std::move(formIds), bundleName, userId));
+        formRenderMgr.ReloadForm(std::move(formRecords), bundleName, userId));
     GTEST_LOG_(INFO) << "FormRenderMgrTest_014 end";
 }
 
@@ -388,11 +388,11 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_015, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormRenderMgrTest_015 start";
     FormRenderMgr formRenderMgr;
     formRenderMgr.renderRemoteObj_ = new (std::nothrow) MockIFormRender();
-    std::vector<int64_t> formIds;
+    std::vector<FormRecord> formRecords;
     std::string bundleName = "<bundleName>";
     int32_t userId = 1;
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
-        formRenderMgr.ReloadForm(std::move(formIds), bundleName, userId));
+        formRenderMgr.ReloadForm(std::move(formRecords), bundleName, userId));
     GTEST_LOG_(INFO) << "FormRenderMgrTest_015 end";
 }
 

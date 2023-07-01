@@ -913,7 +913,7 @@ void FormTaskMgr::ReloadForm(const std::vector<FormRecord> &&formRecords, const 
     }
 
     std::vector<FormJsInfo> formJsInfos;
-    for(const auto &formRecord : formRecords) {
+    for (const auto &formRecord : formRecords) {
         FormJsInfo formJsInfo = CreateFormJsInfo(formRecord.formId, formRecord);
         formJsInfos.emplace_back(formJsInfo);
     }

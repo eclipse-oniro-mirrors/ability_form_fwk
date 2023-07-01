@@ -160,7 +160,7 @@ int FormRenderStub::HandleReloadForm(MessageParcel &data, MessageParcel &reply)
 }
 
 template<typename T>
-int  FormRenderStub::GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos)
+int32_t  FormRenderStub::GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos)
 {
     int32_t infoSize = reply.ReadInt32();
     if (infoSize < 0 || infoSize > MAX_ALLOW_SIZE) {
@@ -176,8 +176,6 @@ int  FormRenderStub::GetParcelableInfos(MessageParcel &reply, std::vector<T> &pa
         }
         parcelableInfos.emplace_back(*info);
     }
-
-    HILOG_INFO("%{public}s, get parcelable infos success", __func__);
     return ERR_OK;
 }
 }  // namespace AppExecFwk

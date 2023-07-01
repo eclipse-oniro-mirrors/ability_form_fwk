@@ -401,9 +401,9 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_021, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRenderRecordTest_021 start";
     auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
-    std::vector<int64_t> formIds;
+    std::vector<FormJsInfo> formJsInfos;
     Want want;
-    EXPECT_EQ(ERR_OK, formRenderRecord->ReloadFormRecord(std::move(formIds), want));
+    EXPECT_EQ(ERR_OK, formRenderRecord->ReloadFormRecord(std::move(formJsInfos), want));
     GTEST_LOG_(INFO) << "FormRenderRecordTest_021 end";
 }
 
@@ -416,11 +416,12 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_022, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRenderRecordTest_022 start";
     auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
-    int64_t formId = 1;
-    std::vector<int64_t> formIds;
-    formIds.emplace_back(formId);
+    std::vector<FormJsInfo> formJsInfos;
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = 1;
+    formJsInfos.emplace_back(formJsInfo);
     Want want;
-    EXPECT_EQ(RELOAD_FORM_FAILED, formRenderRecord->HandleReloadFormRecord(std::move(formIds), want));
+    EXPECT_EQ(RELOAD_FORM_FAILED, formRenderRecord->HandleReloadFormRecord(std::move(formJsInfos), want));
     GTEST_LOG_(INFO) << "FormRenderRecordTest_022 end";
 }
 
@@ -434,12 +435,13 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_023, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRenderRecordTest_023 start";
     auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
-    int64_t formId = 1;
-    std::vector<int64_t> formIds;
-    formIds.emplace_back(formId);
+    std::vector<FormJsInfo> formJsInfos;
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = 1;
+    formJsInfos.emplace_back(formJsInfo);
     Want want;
-    formRenderRecord->formRendererGroupMap_.emplace(formId, nullptr);
-    EXPECT_EQ(RELOAD_FORM_FAILED, formRenderRecord->HandleReloadFormRecord(std::move(formIds), want));
+    formRenderRecord->formRendererGroupMap_.emplace(formJsInfo.formId, nullptr);
+    EXPECT_EQ(RELOAD_FORM_FAILED, formRenderRecord->HandleReloadFormRecord(std::move(formJsInfos), want));
     GTEST_LOG_(INFO) << "FormRenderRecordTest_023 end";
 }
 
@@ -453,18 +455,17 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_024, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRenderRecordTest_024 start";
     auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
-    int64_t formId = 1;
-    std::vector<int64_t> formIds;
-    formIds.emplace_back(formId);
+    std::vector<FormJsInfo> formJsInfos;
     Want want;
     // set formRendererGroupMap_
     FormJsInfo formJsInfo;
     formJsInfo.formId = 1;
+    formJsInfos.emplace_back(formJsInfo);
     std::shared_ptr<AbilityRuntime::Context> context = nullptr;
     std::shared_ptr<AbilityRuntime::Runtime> runtime = nullptr;
     formRenderRecord->GetFormRendererGroup(formJsInfo, context, runtime);
     formRenderRecord->runtime_ = std::make_shared<AbilityRuntime::JsRuntime>();
-    EXPECT_EQ(ERR_OK, formRenderRecord->HandleReloadFormRecord(std::move(formIds), want));
+    EXPECT_EQ(ERR_OK, formRenderRecord->HandleReloadFormRecord(std::move(formJsInfos), want));
     GTEST_LOG_(INFO) << "FormRenderRecordTest_024 end";
 }
 

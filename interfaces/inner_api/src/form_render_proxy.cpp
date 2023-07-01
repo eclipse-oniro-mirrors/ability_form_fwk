@@ -197,7 +197,7 @@ int32_t FormRenderProxy::ReloadForm(const std::vector<FormJsInfo> &&formJsInfos,
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    int error = WriteParcelableVector<FormJsInfo>(formJsInfos, data);
+    int32_t error = WriteParcelableVector<FormJsInfo>(formJsInfos, data);
     if (error != ERR_OK) {
         HILOG_ERROR("%{public}s, failed to WriteParcelableVector<FormJsInfo>", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
@@ -230,7 +230,7 @@ template<typename T>
 int32_t FormRenderProxy::WriteParcelableVector(const std::vector<T> &parcelableVector, MessageParcel &reply)
 {
     if (!reply.WriteInt32(parcelableVector.size())) {
-        HILOG_ERROR("write ParcelableVector failed");
+        HILOG_ERROR("write ParcelableVector size failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
