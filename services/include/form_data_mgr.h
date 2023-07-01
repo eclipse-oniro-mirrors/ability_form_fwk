@@ -34,6 +34,8 @@
 #include "form_record.h"
 #include "form_state_info.h"
 #include "iremote_object.h"
+#include "libxml/parser.h"
+#include "libxml/tree.h"
 #include "running_form_info.h"
 
 namespace OHOS {
@@ -631,6 +633,19 @@ public:
      * @return return ERR_OK on get info success,other on failure.
      */
     ErrCode GetFormInstanceById(const int64_t formId, FormInstance &formInstances);
+
+    /**
+     * @brief Set form config map.
+     * @param configMap form config map.
+     */
+    void SetConfigMap(const std::map<std::string, int32_t> &configMap);
+
+    /**
+     * @brief Get form config param form map.
+     * @param key the param's name.
+     * @param value the return value.
+     */
+    void GetConfigParamFormMap(const std::string &key, int32_t &value) const;
 private:
     /**
      * @brief Create form record.
@@ -728,6 +743,7 @@ private:
     mutable std::mutex formStateRecordMutex_;
     mutable std::mutex formRequestPublishFormsMutex_;
     mutable std::mutex formAcquireDataRecordMutex_;
+    mutable std::mutex formConfigMapMutex_;
     std::map<int64_t, FormRecord> formRecords_;
     std::vector<FormHostRecord> clientRecords_;
     std::vector<int64_t> tempForms_;
@@ -738,6 +754,7 @@ private:
     std::map<int64_t, FormRequestPublishFormInfo> formRequestPublishForms_;
     int64_t udidHash_ = 0;
     std::vector<sptr<IRemoteObject>> formObservers_;
+    std::map<std::string, int32_t> formConfigMap_;
 };
 } // namespace AppExecFwk
 } // namespace OHOS

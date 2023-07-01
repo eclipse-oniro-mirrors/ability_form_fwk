@@ -36,6 +36,7 @@
 #include "form_timer_mgr.h"
 #include "form_trust_mgr.h"
 #include "form_util.h"
+#include "form_xml_parser.h"
 #include "in_process_call_wrapper.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
@@ -555,6 +556,20 @@ void FormMgrService::OnStop()
         handler_.reset();
     }
 }
+
+ErrCode FormMgrService::ReadFormConfigXML()
+{
+    FormXMLParser parser;
+    int32_t ret = parser.Parse();
+    if (ret != ERR_OK) {
+        HILOG_ERROR("parse form config failed.");
+        return ret;
+    }
+    const std::map<std::string, int32_t> &configMap = parser.GetConfigMap();
+    FormDataMgr::GetInstance().SetConfigMap(configMap);
+    return ERR_OK;
+}
+
 /**
  * @brief initialization of form manager service.
  */
@@ -615,6 +630,13 @@ ErrCode FormMgrService::Init()
     if (!re) {
         HILOG_ERROR("%{public}s fail, RegisterBundleEventCallback failed!", __func__);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
+    // read param form form_config.xml.
+    int32_t result = ReadFormConfigXML();
+    if (result != ERR_OK) {
+        HILOG_ERROR("read param form config failed.");
+        return ret;
     }
     HILOG_INFO("init success");
     return ERR_OK;

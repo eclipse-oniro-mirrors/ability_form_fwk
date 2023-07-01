@@ -479,6 +479,12 @@ public:
     ErrCode RequestPublishProxyForm(Want &want, bool withFormBindingData,
         std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
         const std::vector<FormDataProxy> &formDataProxies) override;
+
+    /**
+     * @brief Read the form_config.xml.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode ReadFormConfigXML();
 private:
     enum class DumpKey {
         KEY_DUMP_HELP = 0,
