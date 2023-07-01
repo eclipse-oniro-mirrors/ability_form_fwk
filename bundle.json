@@ -35,7 +35,6 @@
               "ipc",
               "napi",
               "relational_store",
-              "time_native",
               "os_account",
               "power_manager",
               "safwk",
