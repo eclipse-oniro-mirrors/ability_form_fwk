@@ -160,7 +160,7 @@ int FormRenderStub::HandleReloadForm(MessageParcel &data, MessageParcel &reply)
 }
 
 template<typename T>
-int32_t  FormRenderStub::GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos)
+int32_t FormRenderStub::GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos)
 {
     int32_t infoSize = reply.ReadInt32();
     if (infoSize < 0 || infoSize > MAX_ALLOW_SIZE) {
