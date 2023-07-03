@@ -21,6 +21,7 @@
 #include "datashare_helper.h"
 #include "form_ashmem.h"
 #include "form_provider_data_proxy.h"
+#include "form_info_base.h"
 #include "nlohmann/json.hpp"
 
 namespace OHOS {
@@ -31,7 +32,7 @@ namespace AppExecFwk {
  */
 class FormDataProxyRecord : public std::enable_shared_from_this<FormDataProxyRecord> {
 public:
-    FormDataProxyRecord(int64_t formId, const std::string &bundleName, const std::string &moduleName, uint32_t tokenId);
+    FormDataProxyRecord(int64_t formId, const std::string &bundleName, FormType uiSyntax, uint32_t tokenId);
     ~FormDataProxyRecord();
 
     ErrCode SubscribeFormData(const std::vector<FormDataProxy> &formDataProxies);
@@ -71,7 +72,7 @@ private:
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper_;
     int64_t formId_ = -1;
     std::string bundleName_;
-    std::string moduleName_;
+    FormType uiSyntax_;
     int32_t tokenId_;
     std::map<std::string, std::string> rdbSubscribeMap_; // key: subscribeId
     std::map<std::string, std::string> publishSubscribeMap_; // key: subscribeId

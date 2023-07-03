@@ -39,8 +39,8 @@ void FormDataProxyRecord::OnPublishedDataChange(const DataShare::PublishedDataCh
     UpdatePublishedDataForm(changeNode.datas_);
 }
 
-FormDataProxyRecord::FormDataProxyRecord(int64_t formId, const std::string &bundleName, const std::string &moduleName,
-    uint32_t tokenId) : formId_(formId), bundleName_(bundleName), moduleName_(moduleName), tokenId_(tokenId)
+FormDataProxyRecord::FormDataProxyRecord(int64_t formId, const std::string &bundleName, FormType uiSyntax,
+    uint32_t tokenId) : formId_(formId), bundleName_(bundleName), uiSyntax_(uiSyntax), tokenId_(tokenId)
 {
     std::string uri = "datashareproxy://" + bundleName;
     DataShare::CreateOptions options;
@@ -420,6 +420,9 @@ ErrCode FormDataProxyRecord::SetPublishSubsState(std::map<std::string, std::stri
     return ERR_OK;
 }
 
+/*
+ * we need to automatically produce image names due to differences in usage between image publishing and rendering
+ */
 bool FormDataProxyRecord::PrepareImageData(const DataShare::PublishedDataItem &data, nlohmann::json &jsonObj,
     std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> &imageDataMap)
 {
@@ -441,6 +444,9 @@ bool FormDataProxyRecord::PrepareImageData(const DataShare::PublishedDataItem &d
     }
 
     jsonObj[data.key_] = imageName;
+    if (uiSyntax_ == FormType::JS) {
+        jsonObj[data.key_] = "memory://" + imageName; // adapt memory image uri for js card
+    }
 
     std::pair<sptr<FormAshmem>, int32_t> imageDataRecord = std::make_pair(formAshmem, sizeof(formAshmem));
     imageDataMap[imageName] = imageDataRecord;
