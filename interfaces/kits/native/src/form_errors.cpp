@@ -226,7 +226,7 @@ void FormErrors::InitErrorMessageMap()
             ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED, "fms bind provider failed.",
         },
         {
-            ERR_APPEXECFWK_FORM_MAX_SYSTEM_FORMS, "exceed max forms in system, current limit is 512.",
+            ERR_APPEXECFWK_FORM_MAX_SYSTEM_FORMS, "exceed max forms in system",
         },
         {
             ERR_APPEXECFWK_FORM_EXCEED_INSTANCES_PER_FORM, "exceed max instances per form, limit is 32.",
@@ -239,10 +239,10 @@ void FormErrors::InitErrorMessageMap()
             ERR_APPEXECFWK_FORM_PROVIDER_DEL_FAIL, "fms notify provider to delete failed.",
         },
         {
-            ERR_APPEXECFWK_FORM_MAX_FORMS_PER_CLIENT, "exceed max forms per client, limit is 256.",
+            ERR_APPEXECFWK_FORM_MAX_FORMS_PER_CLIENT, "exceed max forms per client",
         },
         {
-            ERR_APPEXECFWK_FORM_MAX_SYSTEM_TEMP_FORMS, "exceed max temp forms in system, limit is 256.",
+            ERR_APPEXECFWK_FORM_MAX_SYSTEM_TEMP_FORMS, "exceed max temp forms in system",
         },
         {
             ERR_APPEXECFWK_FORM_NO_SUCH_MODULE, "the module not exist in the bundle.",

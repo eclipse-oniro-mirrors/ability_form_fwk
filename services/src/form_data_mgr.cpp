@@ -285,9 +285,9 @@ int FormDataMgr::CheckEnoughForm(const int callingUid, const int32_t currentUser
         Constants::MAX_RECORD_PER_APP : maxRecordPerApp;
     HILOG_DEBUG("maxRecordPerApp:%{public}d", maxRecordPerApp);
 
-    if (maxFormsSize == 0 || maxRecordPerApp == 0) {
-        HILOG_ERROR("The maximum number of normal cards is 0");
-        return ERR_APPEXECFWK_FORM_MAX_SYSTEM_FORMS;
+    if (maxRecordPerApp == 0) {
+        HILOG_ERROR("The maximum number of normal cards in pre host is 0");
+        return ERR_APPEXECFWK_FORM_MAX_FORMS_PER_CLIENT;
     }
 
     std::lock_guard<std::mutex> lock(formRecordMutex_);
