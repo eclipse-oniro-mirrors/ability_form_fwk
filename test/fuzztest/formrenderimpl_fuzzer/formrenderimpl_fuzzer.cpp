@@ -48,9 +48,10 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     sptr<IRemoteObject> hostToken = nullptr;
     formRenderImpl.CleanFormHost(hostToken);
     int64_t formId = static_cast<int64_t>(GetU32Data(data));
-    std::vector<int64_t> formIds;
-    formIds.emplace_back(formId);
-    formRenderImpl.ReloadForm(std::move(formIds), want);
+    std::vector<FormJsInfo> formJsInfos;
+    formJsInfo.formId = formId;
+    formJsInfos.emplace_back(formJsInfo);
+    formRenderImpl.ReloadForm(std::move(formJsInfos), want);
     return true;
 }
 }
