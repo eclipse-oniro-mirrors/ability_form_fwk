@@ -50,7 +50,7 @@ public:
         return 0;
     }
 
-    int32_t ReloadForm(const std::vector<int64_t> &&formIds, const Want &want) override
+    int32_t ReloadForm(const std::vector<FormJsInfo> &&formJsInfos, const Want &want) override
     {
         return 0;
     }

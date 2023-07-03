@@ -91,9 +91,9 @@ public:
      */
     void DeleteRenderRecord(int64_t formId, const std::string &compId,  const sptr<IRemoteObject> hostRemoteObj, bool &isRenderGroupEmpty);
 
-    int32_t ReloadFormRecord(const std::vector<int64_t> &&formIds, const Want &want);
+    int32_t ReloadFormRecord(const std::vector<FormJsInfo> &&formJsInfos, const Want &want);
 
-    int32_t HandleReloadFormRecord(const std::vector<int64_t> &&formIds, const Want &want);
+    int32_t HandleReloadFormRecord(const std::vector<FormJsInfo> &&formJsInfos, const Want &want);
 
     /**
      * @brief Get the uid of bundle.
@@ -161,6 +161,8 @@ private:
 
     void AddStaticFormRequest(const FormJsInfo &formJsInfo, const Want &want);
 
+    void AddStaticFormRequest(int64_t formId, const Ace::FormRequest &formRequest);
+
     void DeleteStaticFormRequest(int64_t formId, const std::string &compId);
 
     void UpdateStaticFormRequestReleaseState(
@@ -168,7 +170,7 @@ private:
 
     void ReAddAllStaticForms();
 
-    void ReAddStaticForms(const std::vector<int64_t> &formIds);
+    void ReAddStaticForms(const std::vector<FormJsInfo> &formJsInfos);
 
     std::string bundleName_;
     std::string uid_;

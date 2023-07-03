@@ -78,7 +78,7 @@ public:
         return ERR_OK;
     };
 
-    int32_t ReloadForm(const std::vector<int64_t> &&formIds, const Want &want) override
+    int32_t ReloadForm(const std::vector<FormJsInfo> &&formJsInfos, const Want &want) override
     {
         return ERR_OK;
     };
@@ -710,6 +710,7 @@ HWTEST_F(FormRenderStubTest, FormRenderStubTest_015, TestSize.Level0)
 HWTEST_F(FormRenderStubTest, FormRenderStubTest_016, TestSize.Level0)
 {
     int32_t size = 1;
+    FormJsInfo formJsInfo;
     Want want = {};
     sptr<MockFormRenderImpl> callback = new (std::nothrow) MockFormRenderImpl();
     uint32_t code = static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_RELOAD_FORM);
@@ -718,6 +719,7 @@ HWTEST_F(FormRenderStubTest, FormRenderStubTest_016, TestSize.Level0)
     MessageOption option{MessageOption::TF_ASYNC};
     data.WriteInterfaceToken(u"ohos.appexecfwk.FormRender");
     data.WriteInt32(size);
+    data.WriteParcelable(&formJsInfo);
     data.WriteParcelable(&want);
     auto result = callback->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);

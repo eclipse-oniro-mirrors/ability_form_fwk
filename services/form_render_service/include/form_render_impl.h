@@ -73,7 +73,7 @@ public:
      * @param want Indicates the {@link Want} structure containing form info.
      * @return int32_t Returns ERR_OK on success, others on failure.
      */
-    int32_t ReloadForm(const std::vector<int64_t> &&formIds, const Want &want) override;
+    int32_t ReloadForm(const std::vector<FormJsInfo> &&formJsInfos, const Want &want) override;
 
     /**
      * @brief Called when the system configuration is updated.

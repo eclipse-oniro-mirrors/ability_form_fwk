@@ -903,7 +903,7 @@ void FormTaskMgr::ReleaseRenderer(
     HILOG_INFO("%{public}s end", __func__);
 }
 
-void FormTaskMgr::ReloadForm(const std::vector<int64_t> &&formIds, const Want &want,
+void FormTaskMgr::ReloadForm(const std::vector<FormRecord> &&formRecords, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_INFO("%{public}s begin", __func__);
@@ -912,7 +912,14 @@ void FormTaskMgr::ReloadForm(const std::vector<int64_t> &&formIds, const Want &w
         HILOG_ERROR("%{public}s fail, Failed to get form render proxy.", __func__);
         return;
     }
-    int32_t error = remoteFormRender->ReloadForm(std::forward<decltype(formIds)>(formIds), want);
+
+    std::vector<FormJsInfo> formJsInfos;
+    for (const auto &formRecord : formRecords) {
+        FormJsInfo formJsInfo = CreateFormJsInfo(formRecord.formId, formRecord);
+        formJsInfos.emplace_back(formJsInfo);
+    }
+
+    int32_t error = remoteFormRender->ReloadForm(std::move(formJsInfos), want);
     if (error != ERR_OK) {
         HILOG_ERROR("%{public}s fail, Failed to reload form.", __func__);
         return;
@@ -920,7 +927,7 @@ void FormTaskMgr::ReloadForm(const std::vector<int64_t> &&formIds, const Want &w
     HILOG_INFO("%{public}s end", __func__);
 }
 
-void FormTaskMgr::PostReloadForm(const std::vector<int64_t> &&formIds, const Want &want,
+void FormTaskMgr::PostReloadForm(const std::vector<FormRecord> &&formRecords, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_INFO("%{public}s begin", __func__);
@@ -928,8 +935,8 @@ void FormTaskMgr::PostReloadForm(const std::vector<int64_t> &&formIds, const Wan
         HILOG_ERROR("serialQueue_ is nullptr.");
         return;
     }
-    auto reloadForm = [ids = std::forward<decltype(formIds)>(formIds), want, remoteObject]() {
-        FormTaskMgr::GetInstance().ReloadForm(std::move(ids), want, remoteObject);
+    auto reloadForm = [forms = std::forward<decltype(formRecords)>(formRecords), want, remoteObject]() {
+        FormTaskMgr::GetInstance().ReloadForm(std::move(forms), want, remoteObject);
     };
     serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, reloadForm);
     HILOG_INFO("%{public}s end", __func__);

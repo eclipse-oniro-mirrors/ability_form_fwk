@@ -58,16 +58,16 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
     BundlePackInfo bundlePackInfo;
     bool hasPackInfo = FormBmsHelper::GetInstance().GetBundlePackInfo(bundleName, userId, bundlePackInfo);
     std::vector<int64_t> removedForms;
-    std::vector<int64_t> updatedForms;
+    std::vector<FormRecord> updatedForms;
     for (FormRecord& formRecord : formInfos) {
         HILOG_INFO("%{public}s, provider update, formName:%{public}s", __func__, formRecord.formName.c_str());
         int64_t formId = formRecord.formId;
         if (ProviderFormUpdated(formId, formRecord, targetForms)) {
-            updatedForms.emplace_back(formId);
+            updatedForms.emplace_back(formRecord);
             continue;
         }
         if (hasPackInfo && ProviderFormUpdated(formId, formRecord, bundlePackInfo)) {
-            updatedForms.emplace_back(formId);
+            updatedForms.emplace_back(formRecord);
             continue;
         }
 
@@ -93,8 +93,8 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
     HILOG_INFO("%{public}s, refresh form", __func__);
     Want want;
     want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
-    for (const int64_t id : updatedForms) {
-        FormProviderMgr::GetInstance().RefreshForm(id, want, true);
+    for (const auto &updatedForm : updatedForms) {
+        FormProviderMgr::GetInstance().RefreshForm(updatedForm.formId, want, true);
     }
     FormRenderMgr::GetInstance().ReloadForm(std::move(updatedForms), bundleName, userId);
 }
