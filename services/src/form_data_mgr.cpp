@@ -598,12 +598,12 @@ void FormDataMgr::HandleHostDied(const sptr<IRemoteObject> &remoteHost)
         std::map<int64_t, FormRecord>::iterator itFormRecord;
         for (itFormRecord = formRecords_.begin(); itFormRecord != formRecords_.end();) {
             int64_t formId = itFormRecord->first;
-            FormDataProxyMgr::GetInstance().UnsubscribeFormData(formId);
             // if temp form, remove it
             if (std::find(recordTempForms.begin(), recordTempForms.end(), formId) != recordTempForms.end()) {
                 FormRecord formRecord = itFormRecord->second;
                 itFormRecord = formRecords_.erase(itFormRecord);
                 FormProviderMgr::GetInstance().NotifyProviderFormDelete(formId, formRecord);
+                FormDataProxyMgr::GetInstance().UnsubscribeFormData(formId);
             } else {
                 itFormRecord++;
             }

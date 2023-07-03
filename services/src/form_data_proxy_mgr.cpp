@@ -65,7 +65,7 @@ ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<Fo
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     std::shared_ptr<FormDataProxyRecord> formDataProxyRecord = std::make_shared<FormDataProxyRecord>(formId,
-        formRecord.bundleName, formRecord.moduleName, appInfo.accessTokenId);
+        formRecord.bundleName, formRecord.uiSyntax, appInfo.accessTokenId);
     auto ret = formDataProxyRecord->SubscribeFormData(formDataProxies);
     if (ret != ERR_OK) {
         HILOG_ERROR("SubscribeFormData failed.");
