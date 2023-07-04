@@ -75,6 +75,9 @@ namespace Constants {
     // The default user id
     constexpr int32_t DEFAULT_USER_ID = 0;
 
+    // The invalid user id
+    constexpr int32_t INVALID_USER_ID = -1;
+
     // The default provider user id
     constexpr int32_t DEFAULT_PROVIDER_USER_ID = -1;
 

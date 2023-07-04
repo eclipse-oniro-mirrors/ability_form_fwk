@@ -322,11 +322,11 @@ bool BundleFormInfo::Empty() const
     return formInfoStorages_.empty();
 }
 
-ErrCode BundleFormInfo::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
+ErrCode BundleFormInfo::GetAllFormsInfo(std::vector<FormInfo> &formInfos, int32_t userId)
 {
     HILOG_INFO("%{public}s begin.",  __func__);
     std::shared_lock<std::shared_timed_mutex> guard(formInfosMutex_);
-    int32_t userId = FormUtil::GetCurrentAccountId();
+    userId = (userId == Constants::INVALID_USER_ID) ? FormUtil::GetCurrentAccountId() : userId;
     for (const auto &item : formInfoStorages_) {
         item.GetAllFormsInfo(userId, formInfos);
     }
@@ -465,7 +465,8 @@ ErrCode FormInfoMgr::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
     return ERR_OK;
 }
 
-ErrCode FormInfoMgr::GetFormsInfoByBundle(const std::string &bundleName, std::vector<FormInfo> &formInfos)
+ErrCode FormInfoMgr::GetFormsInfoByBundle(
+    const std::string &bundleName, std::vector<FormInfo> &formInfos, int32_t userId)
 {
     if (bundleName.empty()) {
         HILOG_ERROR("bundleName is empty.");
@@ -484,7 +485,7 @@ ErrCode FormInfoMgr::GetFormsInfoByBundle(const std::string &bundleName, std::ve
     }
 
     if (bundleFormInfoIter->second != nullptr) {
-        bundleFormInfoIter->second->GetAllFormsInfo(formInfos);
+        bundleFormInfoIter->second->GetAllFormsInfo(formInfos, userId);
     }
     return ERR_OK;
 }
