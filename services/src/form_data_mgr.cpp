@@ -29,6 +29,7 @@
 #include "form_render_mgr.h"
 #include "form_task_mgr.h"
 #include "form_util.h"
+#include "form_xml_parser.h"
 #include "ipc_skeleton.h"
 #include "js_form_state_observer_interface.h"
 #include "running_form_info.h"
@@ -216,15 +217,45 @@ void FormDataMgr::CreateFormJsInfo(const int64_t formId, const FormRecord &recor
     formInfo.uiSyntax = record.uiSyntax;
     formInfo.isDynamic = record.isDynamic;
 }
+
+void FormDataMgr::SetConfigMap(const std::map<std::string, int32_t> &configMap)
+{
+    std::lock_guard<std::mutex> lock(formConfigMapMutex_);
+    formConfigMap_ = configMap;
+}
+
+void FormDataMgr::GetConfigParamFormMap(const std::string &key, int32_t &value) const
+{
+    std::lock_guard<std::mutex> lock(formConfigMapMutex_);
+    if (formConfigMap_.empty()) {
+        HILOG_ERROR("the config map is empty.");
+        return;
+    }
+    auto iter = formConfigMap_.find(key);
+    if (iter == formConfigMap_.end()) {
+        HILOG_ERROR("no corresponding value found, use the default value.");
+        return;
+    }
+    value = iter->second;
+    HILOG_INFO("found config parameter, key: %{public}s, value:%{public}d.", key.c_str(), value);
+}
+
 /**
  * @brief Check temp form count is max.
  * @return Returns ERR_OK if the temp form not reached; returns ERR_MAX_SYSTEM_TEMP_FORMS is reached.
  */
 int FormDataMgr::CheckTempEnoughForm() const
 {
+    int32_t maxTempSize = Constants::MAX_TEMP_FORMS;
+    const std::string maxTempSizeKey = Constants::MAX_TEMP_FORM_SIZE;
+    GetConfigParamFormMap(maxTempSizeKey, maxTempSize);
+    maxTempSize = ((maxTempSize > Constants::MAX_TEMP_FORMS) || (maxTempSize < 0)) ?
+        Constants::MAX_TEMP_FORMS : maxTempSize;
+    HILOG_DEBUG("maxTempSize:%{public}d", maxTempSize);
+
     std::lock_guard<std::mutex> lock(formTempMutex_);
-    if (tempForms_.size() >= Constants::MAX_TEMP_FORMS) {
-        HILOG_WARN("%{public}s, already exist %{public}d temp forms in system", __func__, Constants::MAX_TEMP_FORMS);
+    if (tempForms_.size() >= maxTempSize) {
+        HILOG_WARN("already exist %{public}d temp forms in system", maxTempSize);
         return ERR_APPEXECFWK_FORM_MAX_SYSTEM_TEMP_FORMS;
     }
     return ERR_OK;
@@ -239,23 +270,42 @@ int FormDataMgr::CheckEnoughForm(const int callingUid, const int32_t currentUser
 {
     HILOG_INFO("Check enough form, callingUid: %{public}d, current userId: %{public}d", callingUid, currentUserId);
 
-    int formsInSystem = 0;
     int callingUidFormCounts = 0;
+    int32_t maxFormsSize = Constants::MAX_FORMS;
+    const std::string maxFormsSizeKey = Constants::MAX_NORMAL_FORM_SIZE;
+    GetConfigParamFormMap(maxFormsSizeKey, maxFormsSize);
+    maxFormsSize = ((maxFormsSize > Constants::MAX_FORMS) || (maxFormsSize < 0)) ?
+        Constants::MAX_FORMS : maxFormsSize;
+    HILOG_DEBUG("maxFormsSize:%{public}d", maxFormsSize);
+
+    int32_t maxRecordPerApp = Constants::MAX_RECORD_PER_APP;
+    const std::string maxRecordPerAppKey = Constants::HOST_MAX_FORM_SIZE;
+    GetConfigParamFormMap(maxRecordPerAppKey, maxRecordPerApp);
+    maxRecordPerApp = ((maxRecordPerApp > Constants::MAX_RECORD_PER_APP) || (maxRecordPerApp < 0)) ?
+        Constants::MAX_RECORD_PER_APP : maxRecordPerApp;
+    HILOG_DEBUG("maxRecordPerApp:%{public}d", maxRecordPerApp);
+
+    if (maxRecordPerApp == 0) {
+        HILOG_ERROR("The maximum number of normal cards in pre host is 0");
+        return ERR_APPEXECFWK_FORM_MAX_FORMS_PER_CLIENT;
+    }
+
     std::lock_guard<std::mutex> lock(formRecordMutex_);
+    if (formRecords_.size() >= maxFormsSize) {
+        HILOG_WARN("already use %{public}d forms, exceeds max form number", maxFormsSize);
+        return ERR_APPEXECFWK_FORM_MAX_SYSTEM_FORMS;
+    }
+
     for (const auto &recordPair : formRecords_) {
         FormRecord record = recordPair.second;
         if ((record.providerUserId == FormUtil::GetCurrentAccountId()) && !record.formTempFlag) {
             HILOG_DEBUG("Is called by the current active user");
-            if (++formsInSystem >= Constants::MAX_FORMS) {
-                HILOG_WARN("%{public}s, already exist %{public}d forms in system", __func__, Constants::MAX_FORMS);
-                return ERR_APPEXECFWK_FORM_MAX_SYSTEM_FORMS;
-            }
             for (const auto &userUid : record.formUserUids) {
                 if (userUid != callingUid) {
                     continue;
                 }
-                if (++callingUidFormCounts >= Constants::MAX_RECORD_PER_APP) {
-                    HILOG_WARN("%{public}s, already use %{public}d forms", __func__, Constants::MAX_RECORD_PER_APP);
+                if (++callingUidFormCounts >= maxRecordPerApp) {
+                    HILOG_WARN("already use %{public}d forms", maxRecordPerApp);
                     return ERR_APPEXECFWK_FORM_MAX_FORMS_PER_CLIENT;
                 }
                 break;
@@ -598,12 +648,12 @@ void FormDataMgr::HandleHostDied(const sptr<IRemoteObject> &remoteHost)
         std::map<int64_t, FormRecord>::iterator itFormRecord;
         for (itFormRecord = formRecords_.begin(); itFormRecord != formRecords_.end();) {
             int64_t formId = itFormRecord->first;
-            FormDataProxyMgr::GetInstance().UnsubscribeFormData(formId);
             // if temp form, remove it
             if (std::find(recordTempForms.begin(), recordTempForms.end(), formId) != recordTempForms.end()) {
                 FormRecord formRecord = itFormRecord->second;
                 itFormRecord = formRecords_.erase(itFormRecord);
                 FormProviderMgr::GetInstance().NotifyProviderFormDelete(formId, formRecord);
+                FormDataProxyMgr::GetInstance().UnsubscribeFormData(formId);
             } else {
                 itFormRecord++;
             }

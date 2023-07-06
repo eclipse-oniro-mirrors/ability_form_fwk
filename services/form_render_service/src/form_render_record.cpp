@@ -472,6 +472,9 @@ void FormRenderRecord::HandleUpdateInJsThread(const FormJsInfo &formJsInfo, cons
 
     if (!formJsInfo.isDynamic) {
         AddStaticFormRequest(formJsInfo, want);
+    } else {
+        auto compId = want.GetStringParam(FORM_RENDERER_COMP_ID);
+        DeleteStaticFormRequest(formJsInfo.formId, compId);
     }
     return;
 }
@@ -542,6 +545,26 @@ void FormRenderRecord::AddStaticFormRequest(const FormJsInfo &formJsInfo, const 
         iter->second.erase(innerIter);
     }
     iter->second.emplace(compId, formRequest);
+}
+
+void FormRenderRecord::AddStaticFormRequest(int64_t formId, const Ace::FormRequest &formRequest)
+{
+    HILOG_INFO("AddStaticFormRequest by FormRequest formId: %{public}s, compId: %{public}s.",
+        std::to_string(formId).c_str(), formRequest.compId.c_str());
+    std::lock_guard<std::mutex> lock(staticFormRequestsMutex_);
+    auto iter = staticFormRequests_.find(formId);
+    if (iter == staticFormRequests_.end()) {
+        std::unordered_map<std::string, Ace::FormRequest> formRequests;
+        formRequests.emplace(formRequest.compId, formRequest);
+        staticFormRequests_.emplace(formId, formRequests);
+        return;
+    }
+
+    auto innerIter = iter->second.find(formRequest.compId);
+    if (innerIter != iter->second.end()) {
+        iter->second.erase(innerIter);
+    }
+    iter->second.emplace(formRequest.compId, formRequest);
 }
 
 void FormRenderRecord::DeleteStaticFormRequest(int64_t formId, const std::string &compId)
@@ -697,7 +720,7 @@ void FormRenderRecord::ReAddAllStaticForms()
     HILOG_INFO("ReAdd all static forms end.");
 }
 
-void FormRenderRecord::ReAddStaticForms(const std::vector<int64_t> &formIds)
+void FormRenderRecord::ReAddStaticForms(const std::vector<FormJsInfo> &formJsInfos)
 {
     HILOG_INFO("ReAdd static form start");
     if (!CheckEventHandler(false)) {
@@ -706,23 +729,23 @@ void FormRenderRecord::ReAddStaticForms(const std::vector<int64_t> &formIds)
     }
 
     std::lock_guard<std::mutex> lock(staticFormRequestsMutex_);
-    for (const auto &formId : formIds) {
-        auto iter = staticFormRequests_.find(formId);
+    for (const auto &form : formJsInfos) {
+        auto iter = staticFormRequests_.find(form.formId);
         if (iter == staticFormRequests_.end()) {
             continue;
         }
 
         for (const auto& staticFormRequest : iter->second) {
-            if (staticFormRequest.second.isDynamic || !staticFormRequest.second.hasRelease) {
+            if (!staticFormRequest.second.hasRelease) {
                 continue;
             }
 
             std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
-            auto task = [thisWeakPtr, formJsInfo = staticFormRequest.second.formJsInfo,
+            auto task = [thisWeakPtr, form,
                     want = staticFormRequest.second.want]() {
                 auto renderRecord = thisWeakPtr.lock();
                 if (renderRecord) {
-                    renderRecord->HandleUpdateInJsThread(formJsInfo, want);
+                    renderRecord->HandleUpdateInJsThread(form, want);
                 }
             };
             eventHandler_->PostTask(task);
@@ -762,7 +785,7 @@ inline std::string FormRenderRecord::GenerateContextKey(const FormJsInfo &formJs
     return formJsInfo.bundleName + ":" +  formJsInfo.moduleName;
 }
 
-int32_t FormRenderRecord::ReloadFormRecord(const std::vector<int64_t> &&formIds, const Want &want)
+int32_t FormRenderRecord::ReloadFormRecord(const std::vector<FormJsInfo> &&formJsInfos, const Want &want)
 {
     HILOG_INFO("Reload form record");
     std::lock_guard<std::mutex> lock(eventHandlerMutex_);
@@ -772,12 +795,12 @@ int32_t FormRenderRecord::ReloadFormRecord(const std::vector<int64_t> &&formIds,
             return RELOAD_FORM_FAILED;
         }
 
-        ReAddStaticForms(formIds);
+        ReAddStaticForms(formJsInfos);
         return ERR_OK;
     }
 
     std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
-    auto task = [thisWeakPtr, ids = std::forward<decltype(formIds)>(formIds), want]() {
+    auto task = [thisWeakPtr, ids = std::forward<decltype(formJsInfos)>(formJsInfos), want]() {
         HILOG_DEBUG("HandleReloadFormRecord begin.");
         auto renderRecord = thisWeakPtr.lock();
         if (renderRecord == nullptr) {
@@ -787,11 +810,11 @@ int32_t FormRenderRecord::ReloadFormRecord(const std::vector<int64_t> &&formIds,
         renderRecord->HandleReloadFormRecord(std::move(ids), want);
     };
     eventHandler_->PostTask(task);
-    ReAddStaticForms(formIds);
+    ReAddStaticForms(formJsInfos);
     return ERR_OK;
 }
 
-int32_t FormRenderRecord::HandleReloadFormRecord(const std::vector<int64_t> &&formIds, const Want &want)
+int32_t FormRenderRecord::HandleReloadFormRecord(const std::vector<FormJsInfo> &&formJsInfos, const Want &want)
 {
     HILOG_INFO("Reload record in js thread.");
     MarkThreadAlive();
@@ -805,8 +828,8 @@ int32_t FormRenderRecord::HandleReloadFormRecord(const std::vector<int64_t> &&fo
         (static_cast<AbilityRuntime::JsRuntime&>(*runtime_)).ReloadFormComponent();
     }
     std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
-    for (auto formId : formIds) {
-        auto search = formRendererGroupMap_.find(formId);
+    for (auto form : formJsInfos) {
+        auto search = formRendererGroupMap_.find(form.formId);
         if (search == formRendererGroupMap_.end()) {
             HILOG_ERROR("HandleReloadFormRecord failed. FormRendererGroup was not found.");
             continue;
@@ -816,7 +839,14 @@ int32_t FormRenderRecord::HandleReloadFormRecord(const std::vector<int64_t> &&fo
             HILOG_ERROR("HandleReloadFormRecord failed. FormRendererGroup is null.");
             continue;
         }
-        group->ReloadForm();
+        if (!form.isDynamic) {
+            for (auto formRequest : group->GetAllRendererFormRequests()) {
+                formRequest.isDynamic = false;
+                formRequest.formJsInfo = form;
+                AddStaticFormRequest(form.formId, formRequest);
+            }
+        }
+        group->ReloadForm(form);
     }
     return ERR_OK;
 }

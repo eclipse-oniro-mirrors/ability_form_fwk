@@ -19,20 +19,19 @@
 #include "form_serial_queue.h"
 #include "fms_log_wrapper.h"
 
+using namespace testing;
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::AppExecFwk;
 namespace {
 class FmsFormSerialQueueTest : public testing::Test {
 public:
-
     static void SetUpTestCase();
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
 
 protected:
-    FormCacheMgr formCacheMgr_;
 };
 
 
@@ -56,49 +55,49 @@ void FmsFormSerialQueueTest::TearDown()
 HWTEST_F(FmsFormSerialQueueTest, FmsFormSerialQueueTest_ScheduleTask_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FmsFormSerialQueueTest_ScheduleTask_001 start";
-    std::string queueName = "queue";
-    FormSerialQueue serialQueue(queueName.c_str());
+    const std::string queueName = "queue";
+    std::shared_ptr<FormSerialQueue> queue = std::make_shared<FormSerialQueue>(queueName.c_str());
     auto task = [] () {
         GTEST_LOG_(INFO) << "FmsFormSerialQueueTest_ScheduleTask_001 Task called";
     };
-    EXPECT_EQ(true, serialQueue.ScheduleTask(0, task));
+    EXPECT_EQ(true, queue->ScheduleTask(0, task));
     GTEST_LOG_(INFO) << "FmsFormSerialQueueTest_ScheduleTask_001 end";
 }
 
 /**
  * @tc.number: FmsFormSerialQueueTest_ScheduleDelayTask_001
  * @tc.name: ScheduleDelayTask
- * @tc.desc: Verify ScheduleDelayTask 
+ * @tc.desc: Verify ScheduleDelayTask
  */
 HWTEST_F(FmsFormSerialQueueTest, FmsFormSerialQueueTest_ScheduleDelayTask_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FmsFormSerialQueueTest_ScheduleDelayTask_001 start";
-    std::string queueName = "queue1";
-    FormSerialQueue serialQueue(queueName.c_str());
-    EXCEPT_NQ(nullptr, serialQueue);
+    const std::string queueName = "queue1";
+    std::shared_ptr<FormSerialQueue> queue = std::make_shared<FormSerialQueue>(queueName.c_str());
+    EXPECT_NE(nullptr, queue);
     auto task = [] () {
         GTEST_LOG_(INFO) << "FmsFormSerialQueueTest_ScheduleDelayTask_001 Task called";
     };
     int64_t msg = 1;
     int64_t eventId = 2;
-    serialQueue.ScheduleDelayTask(std::make_pair(msg, eventId), 0, task);
+    queue->ScheduleDelayTask(std::make_pair(msg, eventId), 0, task);
     GTEST_LOG_(INFO) << "FmsFormSerialQueueTest_ScheduleDelayTask_001 end";
 }
 
 /**
  * @tc.number: FmsFormSerialQueueTest_CancelDelayTask_001
  * @tc.name: ScheduleDelayTask
- * @tc.desc: Verify ScheduleDelayTask 
+ * @tc.desc: Verify ScheduleDelayTask
  */
 HWTEST_F(FmsFormSerialQueueTest, FmsFormSerialQueueTest_CancelDelayTask_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FmsFormSerialQueueTest_CancelDelayTask_001 start";
-    std::string queueName = "queue1";
-    FormSerialQueue serialQueue(queueName.c_str());
-    EXCEPT_NQ(nullptr, serialQueue);
+    const std::string queueName = "queue1";
+    std::shared_ptr<FormSerialQueue> queue = std::make_shared<FormSerialQueue>(queueName.c_str());
+    EXPECT_NE(nullptr, queue);
     int64_t msg = 1;
     int64_t eventId = 2;
-    serialQueue.CancelDelayTask(std::make_pair(msg, eventId));
+    queue->CancelDelayTask(std::make_pair(msg, eventId));
     GTEST_LOG_(INFO) << "FmsFormSerialQueueTest_CancelDelayTask_001 end";
 }
 }

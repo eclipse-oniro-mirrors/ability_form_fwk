@@ -67,10 +67,10 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formRenderRecord->HandleDeleteInJsThread(formId, compId);
     formRenderRecord->HandleDestroyInJsThread();
     formRenderRecord->ReleaseHapFileHandle();
-    std::vector<int64_t> formIds;
-    formIds.emplace_back(formId);
-    formRenderRecord->ReloadFormRecord(std::move(formIds), want);
-    formRenderRecord->HandleReloadFormRecord(std::move(formIds), want);
+    std::vector<FormJsInfo> formJsInfos;
+    formJsInfos.emplace_back(formJsInfo);
+    formRenderRecord->ReloadFormRecord(std::move(formJsInfos), want);
+    formRenderRecord->HandleReloadFormRecord(std::move(formJsInfos), want);
     return true;
 }
 }

@@ -48,11 +48,11 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     FormProviderData formProviderData;
     bool mergeData = *data % ENABLE;
     formRenderMgr.UpdateRenderingForm(formId, formProviderData, wantParams, mergeData);
-    std::vector<int64_t> formIds;
-    formIds.emplace_back(formId);
+    std::vector<FormRecord> formRecords;
+    formRecords.emplace_back(formRecord);
     std::string bundleName(data, size);
     int32_t userId = static_cast<int32_t>(GetU32Data(data));
-    formRenderMgr.ReloadForm(std::move(formIds), bundleName, userId);
+    formRenderMgr.ReloadForm(std::move(formRecords), bundleName, userId);
     std::string compId(data, size);
     formRenderMgr.StopRenderingForm(formId, formRecord, compId);
     Want want;

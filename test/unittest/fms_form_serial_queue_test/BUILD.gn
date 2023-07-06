@@ -16,26 +16,24 @@ import("//foundation/ability/form_fwk/form_fwk.gni")
 
 module_output_path = "form_fwk/formmgrservice"
 
-ohos_unittest("FmsFormSerialQueueTest") {
+ohos_unittest("fms_form_serial_queue_test") {
   module_out_path = module_output_path
 
-  sources = [
-    "${form_fwk_path}/test/unittest/fms_form_serial_queue_test.cpp/fms_form_serial_queue_test.cpp.cpp",
-  ]
+  sources = [ "${form_fwk_path}/test/unittest/fms_form_serial_queue_test/fms_form_serial_queue_test.cpp" ]
 
   include_dirs = [
     "${form_fwk_path}/interfaces/inner_api/include",
+    "${form_fwk_path}/services/include",
   ]
 
-  configs = [
-    "${form_fwk_path}/test:formmgr_test_config",
-  ]
+  configs = [ "${form_fwk_path}/test:formmgr_test_config" ]
   cflags = []
   if (target_cpu == "arm") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
   deps = [
     "${form_fwk_path}:fmskit_native",
+    "${form_fwk_path}:libfms",
   ]
 
   external_deps = [
@@ -45,9 +43,7 @@ ohos_unittest("FmsFormSerialQueueTest") {
   ]
 }
 
-###############################################################################
 group("unittest") {
   testonly = true
-  # deps = [ ":FmsFormSetNextRefreshTest" ]
+  deps = [ ":fms_form_serial_queue_test" ]
 }
-###############################################################################

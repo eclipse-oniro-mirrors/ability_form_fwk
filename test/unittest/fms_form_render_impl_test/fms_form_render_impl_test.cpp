@@ -257,9 +257,9 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_008, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRenderImplTest_008 start";
     FormRenderImpl formRenderImpl;
-    std::vector<int64_t> formIds;
+    std::vector<FormJsInfo> formJsInfos;
     Want want;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED, formRenderImpl.ReloadForm(std::move(formIds), want));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED, formRenderImpl.ReloadForm(std::move(formJsInfos), want));
     GTEST_LOG_(INFO) << "FormRenderImplTest_008 end";
 }
 
@@ -274,11 +274,11 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_009, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRenderImplTest_009 start";
     FormRenderImpl formRenderImpl;
-    std::vector<int64_t> formIds;
+    std::vector<FormJsInfo> formJsInfos;
     Want want;
     std::string value = "UID";
     want.SetParam(Constants::FORM_SUPPLY_UID, value);
-    EXPECT_EQ(RELOAD_FORM_FAILED, formRenderImpl.ReloadForm(std::move(formIds), want));
+    EXPECT_EQ(RELOAD_FORM_FAILED, formRenderImpl.ReloadForm(std::move(formJsInfos), want));
     GTEST_LOG_(INFO) << "FormRenderImplTest_009 end";
 }
 
@@ -293,12 +293,12 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_010, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRenderImplTest_010 start";
     FormRenderImpl formRenderImpl;
-    std::vector<int64_t> formIds;
+    std::vector<FormJsInfo> formJsInfos;
     Want want;
     std::string value = "UID";
     want.SetParam(Constants::FORM_SUPPLY_UID, value);
     formRenderImpl.renderRecordMap_.emplace(value, nullptr);
-    EXPECT_EQ(ERR_OK, formRenderImpl.ReloadForm(std::move(formIds), want));
+    EXPECT_EQ(ERR_OK, formRenderImpl.ReloadForm(std::move(formJsInfos), want));
     GTEST_LOG_(INFO) << "FormRenderImplTest_010 end";
 }
 
@@ -313,13 +313,13 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_011, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRenderImplTest_011 start";
     FormRenderImpl formRenderImpl;
-    std::vector<int64_t> formIds;
+    std::vector<FormJsInfo> formJsInfos;
     Want want;
     std::string value = "UID";
     want.SetParam(Constants::FORM_SUPPLY_UID, value);
     auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
     formRenderImpl.renderRecordMap_.emplace(value, formRenderRecord);
-    EXPECT_EQ(ERR_OK, formRenderImpl.ReloadForm(std::move(formIds), want));
+    EXPECT_EQ(ERR_OK, formRenderImpl.ReloadForm(std::move(formJsInfos), want));
     GTEST_LOG_(INFO) << "FormRenderImplTest_011 end";
 }
 

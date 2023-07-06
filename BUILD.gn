@@ -22,6 +22,7 @@ config("formmgr_log_config") {
 
 config("formmgr_config") {
   include_dirs = [
+    "services/config",
     "services/include",
     "//third_party/json/include",
   ]
@@ -37,6 +38,7 @@ ohos_shared_library("libfms") {
     "${form_fwk_napi_path}/form_host/form_state_observer/include",
   ]
   sources = [
+    "services/config/form_xml_parser.cpp",
     "services/src/form_ability_connection.cpp",
     "services/src/form_acquire_connection.cpp",
     "services/src/form_acquire_data_connection.cpp",
@@ -101,7 +103,11 @@ ohos_shared_library("libfms") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
 
-  deps = [ "${form_fwk_path}:form_manager" ]
+  deps = [
+    "${form_fwk_path}:form_config",
+    "${form_fwk_path}:form_manager",
+    "//third_party/libxml2:libxml2",
+  ]
 
   external_deps = [
     "ability_base:base",
@@ -117,6 +123,7 @@ ohos_shared_library("libfms") {
     "c_utils:utils",
     "common_event_service:cesfwk_core",
     "common_event_service:cesfwk_innerkits",
+    "config_policy:configpolicy_util",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
     "eventhandler:libeventhandler",
@@ -271,6 +278,13 @@ ohos_shared_library("form_manager") {
   subsystem_name = "ability"
   innerapi_tags = [ "platformsdk" ]
   part_name = "form_fwk"
+}
+
+ohos_prebuilt_etc("form_config") {
+  source = "services/config/form_config.xml"
+  module_install_dir = "etc/form"
+  part_name = "form_fwk"
+  subsystem_name = "ability"
 }
 
 group("form_napi_packages") {

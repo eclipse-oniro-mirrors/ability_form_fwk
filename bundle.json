@@ -35,7 +35,6 @@
               "ipc",
               "napi",
               "relational_store",
-              "time_native",
               "os_account",
               "power_manager",
               "safwk",
@@ -57,7 +56,8 @@
           "third_party": [
               "node",
               "jsoncpp",
-              "json"
+              "json",
+              "libxml2"
           ]
         },
         "build": {
@@ -69,8 +69,7 @@
               ],
               "service_group": [
                 "//foundation/ability/form_fwk/sa_profile:form_sa_profile",
-                "//foundation/ability/form_fwk:fms_services_target",
-                "//foundation/ability/form_fwk/services/etc:form_etc"
+                "//foundation/ability/form_fwk:fms_services_target"
               ],
               "base_group": []
             },

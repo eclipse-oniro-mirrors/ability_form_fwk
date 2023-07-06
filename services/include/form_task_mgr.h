@@ -201,7 +201,7 @@ public:
 
     void PostStopRenderingForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject);
 
-    void PostReloadForm(const std::vector<int64_t> &&formIds, const Want &want,
+    void PostReloadForm(const std::vector<FormRecord> &&formRecords, const Want &want,
         const sptr<IRemoteObject> &remoteObject);
 
     void PostAddTaskToHost(const std::string bundleName, const sptr<IRemoteObject> &remoteObject,
@@ -372,7 +372,8 @@ private:
 
     void StopRenderingForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject);
 
-    void ReloadForm(const std::vector<int64_t> &&formIds, const Want &want, const sptr<IRemoteObject> &remoteObject);
+    void ReloadForm(const std::vector<FormRecord> &&formRecords, const Want &want,
+        const sptr<IRemoteObject> &remoteObject);
 
     void FormAdd(const std::string bundleName, const sptr<IRemoteObject> &remoteObject,
         const RunningFormInfo &runningFormInfo);

@@ -28,7 +28,8 @@ const std::u16string DMS_STUB_INTERFACE_TOKEN = u"ohos.distributedschedule.acces
 }
 DistributedSchedStub::DistributedSchedStub()
 {
-    localFuncsMap_[START_REMOTE_SHARE_FORM] = &DistributedSchedStub::StartRemoteShareFormInner;
+    localFuncsMap_[static_cast<uint32_t>(IDSchedInterfaceCode::START_REMOTE_SHARE_FORM)] =
+        &DistributedSchedStub::StartRemoteShareFormInner;
 }
 
 DistributedSchedStub::~DistributedSchedStub()

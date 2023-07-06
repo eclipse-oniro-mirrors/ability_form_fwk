@@ -46,7 +46,7 @@ public:
 
     ErrCode StopRenderingForm(int64_t formId, const FormRecord &formRecord, const std::string &compId = "", const sptr<IRemoteObject> &hostToken = nullptr);
 
-    ErrCode ReloadForm(std::vector<int64_t> &&formIds, const std::string &bundleName, int32_t userId);
+    ErrCode ReloadForm(const std::vector<FormRecord> &&formRecords, const std::string &bundleName, int32_t userId);
 
     ErrCode RenderFormCallback(int64_t formId, const Want &want);
 

@@ -179,7 +179,8 @@ ErrCode FormRenderMgr::UpdateRenderingForm(int64_t formId, const FormProviderDat
     return ERR_APPEXECFWK_FORM_INVALID_PARAM;
 }
 
-ErrCode FormRenderMgr::ReloadForm(std::vector<int64_t> &&formIds, const std::string &bundleName, int32_t userId)
+ErrCode FormRenderMgr::ReloadForm(
+    const std::vector<FormRecord> &&formRecords, const std::string &bundleName, int32_t userId)
 {
     if (renderRemoteObj_ == nullptr) {
         HILOG_ERROR("%{public}s, renderRemoteObj_ is nullptr", __func__);
@@ -192,7 +193,7 @@ ErrCode FormRenderMgr::ReloadForm(std::vector<int64_t> &&formIds, const std::str
     }
     Want want;
     want.SetParam(Constants::FORM_SUPPLY_UID, std::to_string(userId) + bundleName);
-    FormTaskMgr::GetInstance().PostReloadForm(std::forward<decltype(formIds)>(formIds), want, remoteObject);
+    FormTaskMgr::GetInstance().PostReloadForm(std::forward<decltype(formRecords)>(formRecords), want, remoteObject);
     return ERR_OK;
 }
 
