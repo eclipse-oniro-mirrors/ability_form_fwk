@@ -254,7 +254,7 @@ int FormDataMgr::CheckTempEnoughForm() const
     HILOG_DEBUG("maxTempSize:%{public}d", maxTempSize);
 
     std::lock_guard<std::mutex> lock(formTempMutex_);
-    if (tempForms_.size() >= maxTempSize) {
+    if (static_cast<int32_t>(tempForms_.size()) >= maxTempSize) {
         HILOG_WARN("already exist %{public}d temp forms in system", maxTempSize);
         return ERR_APPEXECFWK_FORM_MAX_SYSTEM_TEMP_FORMS;
     }
@@ -291,7 +291,7 @@ int FormDataMgr::CheckEnoughForm(const int callingUid, const int32_t currentUser
     }
 
     std::lock_guard<std::mutex> lock(formRecordMutex_);
-    if (formRecords_.size() >= maxFormsSize) {
+    if (static_cast<int32_t>(formRecords_.size()) >= maxFormsSize) {
         HILOG_WARN("already use %{public}d forms, exceeds max form number", maxFormsSize);
         return ERR_APPEXECFWK_FORM_MAX_SYSTEM_FORMS;
     }
@@ -461,13 +461,13 @@ bool FormDataMgr::GetFormRecord(const int64_t formId, FormRecord &formRecord) co
  * @param formInfos The form record.
  * @return Returns true if this function is successfully called; returns false otherwise.
  */
-bool FormDataMgr::GetFormRecord(const std::string &bundleName, std::vector<FormRecord> &formInfos)
+bool FormDataMgr::GetFormRecord(const std::string &bundleName, std::vector<FormRecord> &formInfos, int32_t userId) const
 {
     HILOG_INFO("get form record by bundleName");
     std::lock_guard<std::mutex> lock(formRecordMutex_);
-    std::map<int64_t, FormRecord>::iterator itFormRecord;
-    for (itFormRecord = formRecords_.begin(); itFormRecord != formRecords_.end(); itFormRecord++) {
-        if (bundleName == itFormRecord->second.bundleName) {
+    for (auto itFormRecord = formRecords_.begin(); itFormRecord != formRecords_.end(); itFormRecord++) {
+        if (bundleName == itFormRecord->second.bundleName &&
+            (userId == Constants::INVALID_USER_ID || userId == itFormRecord->second.userId)) {
             formInfos.emplace_back(itFormRecord->second);
         }
     }
@@ -478,6 +478,7 @@ bool FormDataMgr::GetFormRecord(const std::string &bundleName, std::vector<FormR
         return false;
     }
 }
+
 /**
  * @brief Get temporary form record.
  * @param formTempRecords The temp form record.

@@ -152,7 +152,8 @@ public:
      * @param formInfos The form record list.
      * @return Returns true if this function is successfully called; returns false otherwise.
      */
-    bool GetFormRecord(const std::string &bundleName, std::vector<FormRecord> &formInfos);
+    bool GetFormRecord(const std::string &bundleName, std::vector<FormRecord> &formInfos,
+        int32_t userId = Constants::INVALID_USER_ID) const;
     /**
      * @brief Get temporary form record.
      * @param formTempRecords The temp form record.

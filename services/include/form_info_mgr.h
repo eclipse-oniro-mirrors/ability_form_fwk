@@ -62,7 +62,7 @@ public:
 
     bool Empty() const;
 
-    ErrCode GetAllFormsInfo(std::vector<FormInfo> &formInfos);
+    ErrCode GetAllFormsInfo(std::vector<FormInfo> &formInfos, int32_t userId = Constants::INVALID_USER_ID);
 
     ErrCode GetFormsInfoByModule(const std::string &moduleName, std::vector<FormInfo> &formInfos);
 
@@ -88,7 +88,8 @@ public:
 
     ErrCode GetAllFormsInfo(std::vector<FormInfo> &formInfos);
 
-    ErrCode GetFormsInfoByBundle(const std::string &bundleName, std::vector<FormInfo> &formInfos);
+    ErrCode GetFormsInfoByBundle(
+        const std::string &bundleName, std::vector<FormInfo> &formInfos, int32_t userId = Constants::INVALID_USER_ID);
 
     ErrCode GetFormsInfoByModule(const std::string &bundleName, const std::string &moduleName,
                                  std::vector<FormInfo> &formInfos);

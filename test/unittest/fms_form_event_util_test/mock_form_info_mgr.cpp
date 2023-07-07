@@ -28,7 +28,8 @@ void MockGetFormsInfoByBundle(bool mockRet)
 
 namespace OHOS {
 namespace AppExecFwk {
-ErrCode FormInfoMgr::GetFormsInfoByBundle(const std::string &bundleName, std::vector<FormInfo> &formInfos)
+ErrCode FormInfoMgr::GetFormsInfoByBundle(
+    const std::string &bundleName, std::vector<FormInfo> &formInfos, int32_t userId)
 {
     if (true == g_mockGetFormsInfoByBundleRet) {
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;

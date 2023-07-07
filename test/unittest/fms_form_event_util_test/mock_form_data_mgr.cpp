@@ -75,7 +75,8 @@ FormDataMgr::~FormDataMgr()
     HILOG_INFO("destroy form data manager instance");
 }
 
-bool FormDataMgr::GetFormRecord(const std::string &bundleName, std::vector<FormRecord> &formInfos)
+bool FormDataMgr::GetFormRecord(
+    const std::string &bundleName, std::vector<FormRecord> &formInfos, int32_t userId) const
 {
     FormRecord formRecord;
     formRecord.bundleName = "com.form.provider.service";
