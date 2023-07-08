@@ -61,6 +61,7 @@ void FormDumpMgr::DumpTemporaryFormInfos(const std::vector<FormRecord> &formReco
         formInfos += "    bundleName [" + info.bundleName + "]\n";
         formInfos += "    moduleName [" + info.moduleName + "]\n";
         formInfos += "    abilityName [" + info.abilityName + "]\n";
+        formInfos += "    isDynamic [" + std::to_string(info.isDynamic) + "]\n";
         formInfos += "    formUserUids [";
         for (const auto &uId : info.formUserUids) {
             formInfos += " Uid[" + std::to_string(uId) + "] ";
@@ -76,7 +77,8 @@ void FormDumpMgr::DumpStaticBundleFormInfos(const std::vector<FormInfo> &bundleF
         formInfos += "  bundleName #" + info.bundleName + "\n";
         formInfos += "    moduleName [" + info.moduleName + "]\n";
         formInfos += "    abilityName [" + info.abilityName + "]\n";
-        formInfos += "    formName [" + info.name + "]\n" + LINE_SEPARATOR;
+        formInfos += "    formName [" + info.name + "]\n";
+        formInfos += "    isDynamic [" + std::to_string(info.isDynamic) + "]\n" + LINE_SEPARATOR;
     }
 }
 /**
@@ -106,6 +108,7 @@ void FormDumpMgr::DumpFormInfos(const std::vector<FormRecord> &formRecordInfos, 
         formInfos += "    formVisibleNotifyState [" + std::to_string(info.formVisibleNotifyState) + "]\n";
         formInfos += "    userId [" + std::to_string(info.userId) + "]\n";
         formInfos += "    type [" + std::to_string(static_cast<int32_t>(info.type)) + "]\n";
+        formInfos += "    isDynamic [" + std::to_string(info.isDynamic) + "]\n";
 
         if (!info.hapSourceDirs.empty()) {
             formInfos += "    hapSourceDirs [";
@@ -175,6 +178,7 @@ void FormDumpMgr::DumpFormInfo(const FormRecord &formRecordInfo, std::string &fo
     formInfo += "    versionName [" + formRecordInfo.versionName + "]\n";
     formInfo += "    compatibleVersion [" + std::to_string(formRecordInfo.compatibleVersion) + "]\n";
     formInfo += "    userId [" + std::to_string(formRecordInfo.userId) + "]\n";
+    formInfo += "    isDynamic [" + std::to_string(formRecordInfo.isDynamic) + "]\n";
 
     if (!formRecordInfo.hapSourceDirs.empty()) {
         formInfo += "    hapSourceDirs [";
