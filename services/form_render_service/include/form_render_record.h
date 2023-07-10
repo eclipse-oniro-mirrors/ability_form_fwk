@@ -155,6 +155,13 @@ private:
 
     void Timer();
 
+    void AddRenderer(const FormJsInfo &formJsInfo,
+        const Want &want, const std::shared_ptr<AbilityRuntime::Context> &context);
+
+    void UpdateRenderer(const FormJsInfo &formJsInfo);
+
+    bool NeedReAddRenderer(const FormJsInfo &formJsInfo);
+
     TaskState RunTask();
 
     bool CheckEventHandler(bool createThead = true, bool needMonitored = false);

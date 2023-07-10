@@ -452,22 +452,13 @@ void FormRenderRecord::HandleUpdateInJsThread(const FormJsInfo &formJsInfo, cons
     auto renderType = want.GetIntParam(Constants::FORM_RENDER_TYPE_KEY, Constants::RENDER_FORM);
     HILOG_INFO("renderType is %{public}d.", renderType);
     if (renderType == Constants::RENDER_FORM) {
-        std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
-        auto formRendererGroup = GetFormRendererGroup(formJsInfo, context, runtime_);
-        if (formRendererGroup == nullptr) {
-            HILOG_ERROR("Create formRendererGroup failed.");
-            return;
-        }
-        formRendererGroup->AddForm(want, formJsInfo);
-        HILOG_INFO("AddForm formId:%{public}s", std::to_string(formJsInfo.formId).c_str());
+        AddRenderer(formJsInfo, want, context);
     } else {
-        std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
-        if (auto search = formRendererGroupMap_.find(formJsInfo.formId);
-            search != formRendererGroupMap_.end()) {
-            auto group = search->second;
-            group->UpdateForm(formJsInfo);
+        if (NeedReAddRenderer(formJsInfo)) {
+            AddRenderer(formJsInfo, want, context);
         }
-        HILOG_INFO("UpdateForm formId:%{public}s", std::to_string(formJsInfo.formId).c_str());
+
+        UpdateRenderer(formJsInfo);
     }
 
     if (!formJsInfo.isDynamic) {
@@ -477,6 +468,40 @@ void FormRenderRecord::HandleUpdateInJsThread(const FormJsInfo &formJsInfo, cons
         DeleteStaticFormRequest(formJsInfo.formId, compId);
     }
     return;
+}
+
+void FormRenderRecord::AddRenderer(const FormJsInfo &formJsInfo,
+    const Want &want, const std::shared_ptr<AbilityRuntime::Context> &context)
+{
+    std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
+    auto formRendererGroup = GetFormRendererGroup(formJsInfo, context, runtime_);
+    if (formRendererGroup == nullptr) {
+        HILOG_ERROR("Create formRendererGroup failed.");
+        return;
+    }
+    formRendererGroup->AddForm(want, formJsInfo);
+    HILOG_INFO("AddForm formId:%{public}s", std::to_string(formJsInfo.formId).c_str());
+}
+
+void FormRenderRecord::UpdateRenderer(const FormJsInfo &formJsInfo)
+{
+    std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
+    if (auto search = formRendererGroupMap_.find(formJsInfo.formId);
+        search != formRendererGroupMap_.end()) {
+        auto group = search->second;
+        group->UpdateForm(formJsInfo);
+    }
+    HILOG_INFO("UpdateForm formId:%{public}s", std::to_string(formJsInfo.formId).c_str());
+}
+
+bool FormRenderRecord::NeedReAddRenderer(const FormJsInfo &formJsInfo)
+{
+    bool hasRenderer = false;
+    {
+        std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
+        hasRenderer = formRendererGroupMap_.find(formJsInfo.formId) != formRendererGroupMap_.end();
+    }
+    return !formJsInfo.isDynamic && !hasRenderer;
 }
 
 bool FormRenderRecord::HandleDeleteInJsThread(int64_t formId, const std::string &compId)
