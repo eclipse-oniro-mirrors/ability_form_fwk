@@ -155,9 +155,17 @@ private:
 
     void Timer();
 
-    Want GetRendererWant(const FormJsInfo &formJsInfo, const Want &want);
+    bool BeforeHandleUpdateForm(const FormJsInfo &formJsInfo);
 
-    bool NeedReAddRenderer(const FormJsInfo &formJsInfo, int32_t renderType);
+    void HandleUpdateForm(const FormJsInfo &formJsInfo, const Want &want);
+
+    void HandleUpdateDynamicForm(const FormJsInfo &formJsInfo, const Want &want);
+
+    void HandleUpdateStaticForm(const FormJsInfo &formJsInfo, const Want &want);
+
+    void AddRenderer(const FormJsInfo &formJsInfo, const Want &want);
+
+    void UpdateRenderer(const FormJsInfo &formJsInfo);
 
     TaskState RunTask();
 
