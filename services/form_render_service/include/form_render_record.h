@@ -155,12 +155,9 @@ private:
 
     void Timer();
 
-    void AddRenderer(const FormJsInfo &formJsInfo,
-        const Want &want, const std::shared_ptr<AbilityRuntime::Context> &context);
+    Want GetRendererWant(const FormJsInfo &formJsInfo, const Want &want);
 
-    void UpdateRenderer(const FormJsInfo &formJsInfo);
-
-    bool NeedReAddRenderer(const FormJsInfo &formJsInfo);
+    bool NeedReAddRenderer(const FormJsInfo &formJsInfo, int32_t renderType);
 
     TaskState RunTask();
 

@@ -234,6 +234,7 @@ void FormRenderRecord::MarkThreadAlive()
 int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const Want &want, const sptr<IRemoteObject> hostRemoteObj)
 {
     HILOG_INFO("Updated record.");
+    Want newWant = GetRendererWant(formJsInfo, want);
     {
         // Some resources need to be initialized in a JS thread
         std::lock_guard<std::mutex> lock(eventHandlerMutex_);
@@ -243,14 +244,14 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
         }
 
         std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
-        auto task = [thisWeakPtr, formJsInfo, want]() {
+        auto task = [thisWeakPtr, formJsInfo, newWant]() {
             HILOG_DEBUG("HandleUpdateInJsThread begin.");
             auto renderRecord = thisWeakPtr.lock();
             if (renderRecord == nullptr) {
                 HILOG_ERROR("renderRecord is nullptr.");
                 return;
             }
-            renderRecord->HandleUpdateInJsThread(formJsInfo, want);
+            renderRecord->HandleUpdateInJsThread(formJsInfo, newWant);
         };
         eventHandler_->PostTask(task);
     }
@@ -267,6 +268,42 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
     }
     iter->second.emplace(hostRemoteObj);
     return ERR_OK;
+}
+
+bool FormRenderRecord::NeedReAddRenderer(const FormJsInfo &formJsInfo, int32_t renderType)
+{
+    bool hasRenderer = false;
+    {
+        std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
+        hasRenderer = formRendererGroupMap_.find(formJsInfo.formId) != formRendererGroupMap_.end();
+    }
+
+    return !formJsInfo.isDynamic && !hasRenderer && renderType != Constants::RENDER_FORM;
+}
+
+Want FormRenderRecord::GetRendererWant(const FormJsInfo &formJsInfo, const Want &want)
+{
+    if (!NeedReAddRenderer(formJsInfo,
+        want.GetIntParam(Constants::FORM_RENDER_TYPE_KEY, Constants::RENDER_FORM))) {
+        return want;
+    }
+
+    std::lock_guard<std::mutex> lock(staticFormRequestsMutex_);
+    auto iter = staticFormRequests_.find(formJsInfo.formId);
+    if (iter == staticFormRequests_.end()) {
+        return want;
+    }
+
+    auto compId = want.GetStringParam(FORM_RENDERER_COMP_ID);
+    auto innerIter = iter->second.find(compId);
+    if (innerIter == iter->second.end()) {
+        return want;
+    }
+
+    Want newWant = innerIter->second.want;
+    newWant.SetParam(Constants::FORM_RENDER_TYPE_KEY, Constants::RENDER_FORM);
+    newWant.SetParams(want.GetParams());
+    return newWant;
 }
 
 void FormRenderRecord::DeleteRenderRecord(int64_t formId, const std::string &compId, const sptr<IRemoteObject> hostRemoteObj, bool &isRenderGroupEmpty)
@@ -452,13 +489,22 @@ void FormRenderRecord::HandleUpdateInJsThread(const FormJsInfo &formJsInfo, cons
     auto renderType = want.GetIntParam(Constants::FORM_RENDER_TYPE_KEY, Constants::RENDER_FORM);
     HILOG_INFO("renderType is %{public}d.", renderType);
     if (renderType == Constants::RENDER_FORM) {
-        AddRenderer(formJsInfo, want, context);
-    } else {
-        if (NeedReAddRenderer(formJsInfo)) {
-            AddRenderer(formJsInfo, want, context);
+        std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
+        auto formRendererGroup = GetFormRendererGroup(formJsInfo, context, runtime_);
+        if (formRendererGroup == nullptr) {
+            HILOG_ERROR("Create formRendererGroup failed.");
+            return;
         }
-
-        UpdateRenderer(formJsInfo);
+        formRendererGroup->AddForm(want, formJsInfo);
+        HILOG_INFO("AddForm formId:%{public}s", std::to_string(formJsInfo.formId).c_str());
+    } else {
+        std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
+        if (auto search = formRendererGroupMap_.find(formJsInfo.formId);
+            search != formRendererGroupMap_.end()) {
+            auto group = search->second;
+            group->UpdateForm(formJsInfo);
+        }
+        HILOG_INFO("UpdateForm formId:%{public}s", std::to_string(formJsInfo.formId).c_str());
     }
 
     if (!formJsInfo.isDynamic) {
@@ -468,40 +514,6 @@ void FormRenderRecord::HandleUpdateInJsThread(const FormJsInfo &formJsInfo, cons
         DeleteStaticFormRequest(formJsInfo.formId, compId);
     }
     return;
-}
-
-void FormRenderRecord::AddRenderer(const FormJsInfo &formJsInfo,
-    const Want &want, const std::shared_ptr<AbilityRuntime::Context> &context)
-{
-    std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
-    auto formRendererGroup = GetFormRendererGroup(formJsInfo, context, runtime_);
-    if (formRendererGroup == nullptr) {
-        HILOG_ERROR("Create formRendererGroup failed.");
-        return;
-    }
-    formRendererGroup->AddForm(want, formJsInfo);
-    HILOG_INFO("AddForm formId:%{public}s", std::to_string(formJsInfo.formId).c_str());
-}
-
-void FormRenderRecord::UpdateRenderer(const FormJsInfo &formJsInfo)
-{
-    std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
-    if (auto search = formRendererGroupMap_.find(formJsInfo.formId);
-        search != formRendererGroupMap_.end()) {
-        auto group = search->second;
-        group->UpdateForm(formJsInfo);
-    }
-    HILOG_INFO("UpdateForm formId:%{public}s", std::to_string(formJsInfo.formId).c_str());
-}
-
-bool FormRenderRecord::NeedReAddRenderer(const FormJsInfo &formJsInfo)
-{
-    bool hasRenderer = false;
-    {
-        std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
-        hasRenderer = formRendererGroupMap_.find(formJsInfo.formId) != formRendererGroupMap_.end();
-    }
-    return !formJsInfo.isDynamic && !hasRenderer;
 }
 
 bool FormRenderRecord::HandleDeleteInJsThread(int64_t formId, const std::string &compId)
@@ -567,6 +579,11 @@ void FormRenderRecord::AddStaticFormRequest(const FormJsInfo &formJsInfo, const 
 
     auto innerIter = iter->second.find(compId);
     if (innerIter != iter->second.end()) {
+        auto renderType = want.GetIntParam(Constants::FORM_RENDER_TYPE_KEY, Constants::RENDER_FORM);
+        if (renderType != Constants::RENDER_FORM) {
+            formRequest.want = innerIter->second.want;
+            formRequest.want.SetParams(want.GetParams());
+        }
         iter->second.erase(innerIter);
     }
     iter->second.emplace(compId, formRequest);
