@@ -155,6 +155,18 @@ private:
 
     void Timer();
 
+    bool BeforeHandleUpdateForm(const FormJsInfo &formJsInfo);
+
+    void HandleUpdateForm(const FormJsInfo &formJsInfo, const Want &want);
+
+    void HandleUpdateDynamicForm(const FormJsInfo &formJsInfo, const Want &want);
+
+    void HandleUpdateStaticForm(const FormJsInfo &formJsInfo, const Want &want);
+
+    void AddRenderer(const FormJsInfo &formJsInfo, const Want &want);
+
+    void UpdateRenderer(const FormJsInfo &formJsInfo);
+
     TaskState RunTask();
 
     bool CheckEventHandler(bool createThead = true, bool needMonitored = false);
