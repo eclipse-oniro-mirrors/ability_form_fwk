@@ -636,8 +636,8 @@ ErrCode FormMgrService::Init()
     int32_t result = ReadFormConfigXML();
     if (result != ERR_OK) {
         HILOG_ERROR("read param form config failed.");
-        return ret;
     }
+
     HILOG_INFO("init success");
     return ERR_OK;
 }
