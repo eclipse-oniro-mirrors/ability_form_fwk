@@ -161,10 +161,6 @@ public:
     {
         return;
     }
-    int TerminateAbilityResult(const sptr<IRemoteObject> &token, int startId) override
-    {
-        return 0;
-    }
     int StopServiceAbility(const AAFwk::Want &want, int32_t userId = DEFAULT_INVAL_VALUE,
         const sptr<IRemoteObject> &token = nullptr) override
     {
@@ -190,10 +186,6 @@ public:
         return 0;
     }
     int TerminateAbilityByRecordId(const int64_t recordId = -1)
-    {
-        return 0;
-    }
-    int TerminateAbilityByCaller(const sptr<IRemoteObject> &callerToken, int requestCode) override
     {
         return 0;
     }
@@ -447,10 +439,6 @@ public:
         return;
     }
 
-    int TerminateAbilityResult(const sptr<IRemoteObject> &token, int startId) override
-    {
-        return 0;
-    }
     int StopServiceAbility(const AAFwk::Want &want, int32_t userId = DEFAULT_INVAL_VALUE,
         const sptr<IRemoteObject> &token = nullptr) override
     {
@@ -528,10 +516,6 @@ public:
         return 0;
     }
     int TerminateAbilityByRecordId(const int64_t recordId = -1)
-    {
-        return 0;
-    }
-    int TerminateAbilityByCaller(const sptr<IRemoteObject> &callerToken, int requestCode) override
     {
         return 0;
     }
