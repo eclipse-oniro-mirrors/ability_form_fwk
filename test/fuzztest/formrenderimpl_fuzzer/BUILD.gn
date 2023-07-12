@@ -63,6 +63,7 @@ ohos_fuzztest("FormRenderImplFuzzTest") {
     "hilog:libhilog",
     "hitrace:hitrace_meter",
     "ipc:ipc_core",
+    "napi:ace_napi",
   ]
 }
 

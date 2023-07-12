@@ -55,6 +55,7 @@ ohos_fuzztest("FormHostCallerFuzzTest") {
     "common_event_service:cesfwk_innerkits",
     "form_fwk:form_manager",
     "ipc:ipc_core",
+    "napi:ace_napi",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
