@@ -1098,4 +1098,18 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0059, TestSize.Level1)
         formMgrService.RegisterFormRemoveObserverByBundle(bundleName, callerToken));
     GTEST_LOG_(INFO) << "FormMgrService_0059 end";
 }
+
+/**
+ * @tc.number: FormMgrService_0060
+ * @tc.name: test ReadFormConfigXML function.
+ * @tc.desc: Verify that the ReadFormConfigXML interface is called normally
+ * and the return value is ERR_OK.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0060, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0060 start";
+    FormMgrService formMgrService;
+    EXPECT_EQ(ERR_OK, formMgrService.ReadFormConfigXML());
+    GTEST_LOG_(INFO) << "FormMgrService_0060 end";
+}
 }

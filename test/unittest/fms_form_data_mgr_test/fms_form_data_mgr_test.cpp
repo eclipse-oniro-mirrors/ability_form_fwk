@@ -14,6 +14,7 @@
  */
 
 #include <gtest/gtest.h>
+#include <map>
 #include <string>
 #include <thread>
 
@@ -2409,5 +2410,68 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetRunningFormInfosByBundleName_
     EXPECT_EQ(ERR_OK, formDataMgr_.GetRunningFormInfosByBundleName(bundleName, runningFormInfos));
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetRunningFormInfosByBundleName_004 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetConfigParamFormMap_001
+ * @tc.name: GetConfigParamFormMap
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details: If formConfigMap_ is empty.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetConfigParamFormMap_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetConfigParamFormMap_001 start";
+    // create formRecord
+    std::map<std::string, int32_t> configMap;
+    formDataMgr_.SetConfigMap(configMap);
+    const std::string key = "a";
+    int32_t value = 0;
+    formDataMgr_.GetConfigParamFormMap(key, value);
+    EXPECT_EQ(value, 0);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetConfigParamFormMap_001 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetConfigParamFormMap_002
+ * @tc.name: GetConfigParamFormMap
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details: If the value corresponding to the key is not found in the map.
+
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetConfigParamFormMap_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetConfigParamFormMap_002 start";
+    // create formRecord
+    std::map<std::string, int32_t> configMap;
+    std::string key = "a";
+    std::string notFindkey = "b";
+    int32_t value = 0;
+    configMap.emplace(key, value);
+    formDataMgr_.SetConfigMap(configMap);
+    formDataMgr_.GetConfigParamFormMap(notFindkey, value);
+    EXPECT_EQ(value, 0);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetConfigParamFormMap_002 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetConfigParamFormMap_003
+ * @tc.name: GetConfigParamFormMap
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details: If the value corresponding to the key is found in the map.
+
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetConfigParamFormMap_003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetConfigParamFormMap_003 start";
+    // create formRecord
+    std::map<std::string, int32_t> configMap;
+    std::string key = "a";
+    int32_t value1 = 3;
+    int32_t value2 = 0;
+    configMap.emplace(key, value1);
+    formDataMgr_.SetConfigMap(configMap);
+    formDataMgr_.GetConfigParamFormMap(key, value2);
+    EXPECT_EQ(value1, 3);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetConfigParamFormMap_003 end";
 }
 }
