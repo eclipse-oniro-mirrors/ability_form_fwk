@@ -443,7 +443,7 @@ bool FormDataMgr::UpdateFormRecord(const int64_t formId, const FormRecord &formR
  */
 bool FormDataMgr::GetFormRecord(const int64_t formId, FormRecord &formRecord) const
 {
-    HILOG_INFO("get form record by formId");
+    HILOG_DEBUG("get form record by formId");
     std::lock_guard<std::mutex> lock(formRecordMutex_);
     auto info = formRecords_.find(formId);
     if (info == formRecords_.end()) {
@@ -451,8 +451,7 @@ bool FormDataMgr::GetFormRecord(const int64_t formId, FormRecord &formRecord) co
         return false;
     }
     formRecord = info->second;
-
-    HILOG_INFO("get form record successfully");
+    HILOG_DEBUG("get form record successfully");
     return true;
 }
 /**

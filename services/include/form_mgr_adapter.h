@@ -680,19 +680,19 @@ private:
      * @param formRecord Form storage information
      * @return Returns true on success, false on failure.
      */
-    bool UpdateProviderInfoToHost(const int64_t matchedFormId, const sptr<IRemoteObject> &callerToken,
-        const int32_t formVisibleType, FormRecord &formRecord);
+    bool UpdateProviderInfoToHost(const int64_t &matchedFormId, const int32_t &userId,
+        const sptr<IRemoteObject> &callerToken, const int32_t &formVisibleType, FormRecord &formRecord);
 
     /**
-     * @brief If the form provider is system app and the config item 'formVisibleNotify' is true,
-     *        notify the form provider that the current form is visible.
-     *
-     * @param iBundleMgr BundleManager
+     * @brief if the ability have permission for keeping background running is true,
+     * @param iBundleMgr BundleManagerProxy
      * @param bundleName BundleName
+     * @param userId UserId
      * @return Returns true if the form provider is system app, false if not.
      */
-    bool CheckIsSystemAppByBundleName(const sptr<IBundleMgr> &iBundleMgr, const std::string &bundleName);
-
+    bool CheckIsSystemAppByBundleName(const sptr<IBundleMgr> &iBundleMgr,
+        const int32_t &userId, const std::string &bundleName);
+    
     /**
      * @brief if the ability have permission for keeping background running is true,
      * @param iBundleMgr BundleManagerProxy

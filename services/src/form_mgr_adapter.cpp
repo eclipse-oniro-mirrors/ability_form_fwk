@@ -636,6 +636,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
     }
 
     int64_t matchedFormId = 0;
+    int32_t userId = FormUtil::GetCurrentAccountId();
     std::map<std::string, std::vector<int64_t>> eventMaps;
     std::map<std::string, std::vector<FormInstance>> formInstanceMaps;
     std::string specialFlag = "#";
@@ -648,7 +649,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
         FormRecord formRecord;
 
         // Update provider info to host
-        if (!UpdateProviderInfoToHost(matchedFormId, callerToken, formVisibleType, formRecord)) {
+        if (!UpdateProviderInfoToHost(matchedFormId, userId, callerToken, formVisibleType, formRecord)) {
             continue;
         }
         bool isVisibility = (formVisibleType == static_cast<int32_t>(FormVisibilityType::VISIBLE));
@@ -671,7 +672,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
         }
 
         // Check if the form provider is system app
-        if (!CheckIsSystemAppByBundleName(iBundleMgr, formRecord.bundleName)) {
+        if (!CheckIsSystemAppByBundleName(iBundleMgr, userId, formRecord.bundleName)) {
             continue;
         }
 
@@ -899,7 +900,6 @@ int FormMgrAdapter::DumpFormInfoByFormId(const std::int64_t formId, std::string 
 {
     HILOG_INFO("%{public}s called.", __func__);
     int reply = ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
-
     FormRecord formRecord;
     if (FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
         FormDumpMgr::GetInstance().DumpFormInfo(formRecord, formInfo);
@@ -2009,6 +2009,7 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
     }
 
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+    int32_t userId = FormUtil::GetCurrentAccountId();
     FormRecord record;
     bool bGetRecord = FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record);
     if (!bGetRecord) {
@@ -2023,7 +2024,7 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
     }
 
     if (record.bundleName != want.GetBundle()) {
-        if (!CheckIsSystemAppByBundleName(iBundleMgr, record.bundleName)) {
+        if (!CheckIsSystemAppByBundleName(iBundleMgr, userId, record.bundleName)) {
             HILOG_WARN("Only system apps can launch the ability of the other apps.");
             want.SetBundle(record.bundleName);
         }
@@ -2233,15 +2234,15 @@ bool FormMgrAdapter::CreateHandleEventMap(const int64_t matchedFormId, const For
  * @param formRecord Form storage information
  * @return Returns true on success, false on failure.
  */
-bool FormMgrAdapter::UpdateProviderInfoToHost(const int64_t matchedFormId, const sptr<IRemoteObject> &callerToken,
-    const int32_t formVisibleType, FormRecord &formRecord)
+bool FormMgrAdapter::UpdateProviderInfoToHost(const int64_t &matchedFormId, const int32_t &userId,
+    const sptr<IRemoteObject> &callerToken, const int32_t &formVisibleType, FormRecord &formRecord)
 {
     if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, formRecord)) {
         HILOG_WARN("%{public}s fail, not exist such form, formId:%{public}" PRId64 ".", __func__, matchedFormId);
         return false;
     }
 
-    if (formRecord.providerUserId != FormUtil::GetCurrentAccountId()) {
+    if (formRecord.providerUserId != userId) {
         HILOG_WARN("fail, not self form, formId:%{public}" PRId64 ".", matchedFormId);
         return false;
     }
@@ -2263,7 +2264,6 @@ bool FormMgrAdapter::UpdateProviderInfoToHost(const int64_t matchedFormId, const
     if (formRecord.needRefresh && formVisibleType == Constants::FORM_VISIBLE) {
         if (formRecord.isTimerRefresh) {
             Want want;
-            int32_t userId = FormUtil::GetCurrentAccountId();
             want.SetParam(Constants::KEY_IS_TIMER, true);
             want.SetParam(Constants::KEY_TIMER_REFRESH, true);
             want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
@@ -2284,13 +2284,15 @@ bool FormMgrAdapter::UpdateProviderInfoToHost(const int64_t matchedFormId, const
  *        notify the form provider that the current form is visible.
  * @param iBundleMgr BundleManagerProxy
  * @param bundleName BundleName
+ * @param userId UserId
  * @return Returns true if the form provider is system app, false if not.
  */
-bool FormMgrAdapter::CheckIsSystemAppByBundleName(const sptr<IBundleMgr> &iBundleMgr, const std::string &bundleName)
+bool FormMgrAdapter::CheckIsSystemAppByBundleName(const sptr<IBundleMgr> &iBundleMgr,
+    const int32_t &userId, const std::string &bundleName)
 {
     AppExecFwk::ApplicationInfo appInfo;
     if (IN_PROCESS_CALL(iBundleMgr->GetApplicationInfoV9(bundleName, AppExecFwk::BundleFlag::GET_BUNDLE_DEFAULT,
-        FormUtil::GetCurrentAccountId(), appInfo)) != ERR_OK) {
+        userId, appInfo)) != ERR_OK) {
         HILOG_ERROR("%{public}s failed to get application info", __func__);
         return false;
     }
@@ -2309,7 +2311,8 @@ bool FormMgrAdapter::CheckIsSystemAppByBundleName(const sptr<IBundleMgr> &iBundl
 ErrCode FormMgrAdapter::CheckValidPublishEvent(const sptr<IBundleMgr> &iBundleMgr,
     const std::string &bundleName, const Want &want)
 {
-    if (!CheckIsSystemAppByBundleName(iBundleMgr, bundleName)) {
+    int32_t userId = FormUtil::GetCurrentAccountId();
+    if (!CheckIsSystemAppByBundleName(iBundleMgr, userId, bundleName)) {
         HILOG_ERROR("Only system app can request publish form.");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
     }

@@ -24,8 +24,7 @@ namespace AbilityRuntime {
 namespace {
 class JsFormBindingData {
 public:
-    explicit JsFormBindingData(const std::shared_ptr<AppExecFwk::FormProviderData>& formProviderData)
-        : formProviderData_(formProviderData) {}
+    JsFormBindingData() = default;
     ~JsFormBindingData() = default;
 
     static void Finalizer(NativeEngine* engine, void* data, void* hint)
@@ -41,12 +40,11 @@ public:
     }
 private:
     NativeValue* OnCreateFormBindingData(NativeEngine& engine, NativeCallbackInfo& info);
-    std::shared_ptr<AppExecFwk::FormProviderData> formProviderData_;
 };
 
 NativeValue* JsFormBindingData::OnCreateFormBindingData(NativeEngine& engine, NativeCallbackInfo& info)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_DEBUG("%{public}s called.", __func__);
     std::string formDataStr;
     if (info.argc > 0) {
         NativeValue* nativeValue = nullptr;
@@ -73,7 +71,6 @@ NativeValue* JsFormBindingData::OnCreateFormBindingData(NativeEngine& engine, Na
     }
     NativeValue* objValue = engine.CreateObject();
     NativeObject* object = ConvertNativeValueTo<NativeObject>(objValue);
-    formProviderData_->SetDataString(formDataStr);
     object->SetProperty("data", CreateJsValue(engine, formDataStr));
     HILOG_DEBUG("%{public}s called:%{private}s", __func__, formDataStr.c_str());
     return objValue;
@@ -94,8 +91,7 @@ NativeValue* JsFormBindingDataInit(NativeEngine* engine, NativeValue* exportObj)
         return nullptr;
     }
 
-    auto formProviderData = std::make_shared<AppExecFwk::FormProviderData>();
-    auto formBindingData = std::make_unique<JsFormBindingData>(formProviderData);
+    auto formBindingData = std::make_unique<JsFormBindingData>();
     object->SetNativePointer(formBindingData.release(), JsFormBindingData::Finalizer, nullptr);
 
     const char *moduleName = "JsFormBindingData";
