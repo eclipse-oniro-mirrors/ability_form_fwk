@@ -41,6 +41,7 @@ ohos_unittest("form_napi_util_test") {
     "eventhandler:libeventhandler",
     "hilog:libhilog",
     "ipc:ipc_core",
+    "napi:ace_napi",
     "samgr:samgr_proxy",
   ]
 }

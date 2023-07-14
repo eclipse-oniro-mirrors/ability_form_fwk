@@ -201,6 +201,7 @@ ohos_shared_library("fmskit_native") {
     "hilog:libhilog",
     "hitrace:hitrace_meter",
     "ipc:ipc_core",
+    "napi:ace_napi",
     "samgr:samgr_proxy",
   ]
 

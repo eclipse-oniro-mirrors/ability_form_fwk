@@ -43,6 +43,7 @@ ohos_unittest("form_provider_client_test") {
     "form_fwk:form_manager",
     "hilog:libhilog",
     "ipc:ipc_core",
+    "napi:ace_napi",
   ]
 }
 
