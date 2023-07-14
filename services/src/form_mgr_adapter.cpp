@@ -645,6 +645,11 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
             continue;
         }
         matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+        FormInstance formInstance;
+        FormDataMgr::GetInstance().GetFormInstanceById(matchedFormId, formInstance);
+        if (formVisibleType == static_cast<int32_t>(formInstance.formVisiblity)) {
+            continue;
+        }
         FormRecord formRecord;
 
         // Update provider info to host
@@ -652,7 +657,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
             continue;
         }
         bool isVisibility = (formVisibleType == static_cast<int32_t>(FormVisibilityType::VISIBLE));
-        FormInstance formInstance;
+        // Get the updated card status
         FormDataMgr::GetInstance().GetFormInstanceById(matchedFormId, formInstance);
         std::string formHostName = formInstance.formHostName;
         std::string formAllHostName = EMPTY_BUNDLE;
