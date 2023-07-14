@@ -657,6 +657,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
             continue;
         }
         bool isVisibility = (formVisibleType == static_cast<int32_t>(FormVisibilityType::VISIBLE));
+        // Get the updated card status
         FormDataMgr::GetInstance().GetFormInstanceById(matchedFormId, formInstance);
         std::string formHostName = formInstance.formHostName;
         std::string formAllHostName = EMPTY_BUNDLE;
