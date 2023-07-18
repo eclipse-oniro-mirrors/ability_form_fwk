@@ -1056,6 +1056,28 @@ bool FormMgr::CheckFMSReady()
     return true;
 }
 
+int32_t FormMgr::RegisterPublishFormInterceptor(const sptr<IRemoteObject> &interceptorCallback)
+{
+    HILOG_DEBUG("called.");
+    int32_t errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("register publish form failed, errCode:%{public}d.", errCode);
+        return errCode;
+    }
+    return remoteProxy_->RegisterPublishFormInterceptor(interceptorCallback);
+}
+
+int32_t FormMgr::UnregisterPublishFormInterceptor(const sptr<IRemoteObject> &interceptorCallback)
+{
+    HILOG_DEBUG("called.");
+    int32_t errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("unregister publish form failed, errCode:%{public}d.", errCode);
+        return errCode;
+    }
+    return remoteProxy_->UnregisterPublishFormInterceptor(interceptorCallback);
+}
+
 void FormMgr::GetExternalError(int32_t innerErrorCode, int32_t &externalErrorCode, std::string &errorMsg)
 {
     externalErrorCode = FormErrors::GetInstance().QueryExternalErrorCode(innerErrorCode);

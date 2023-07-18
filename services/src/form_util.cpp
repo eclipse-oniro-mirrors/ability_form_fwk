@@ -160,6 +160,13 @@ int64_t FormUtil::GetCurrentMillisecond()
     clock_gettime(CLOCK_REALTIME, &ts);
     return (ts.tv_sec * SEC_TO_MILLISEC + ts.tv_nsec / MILLISEC_TO_NANOSEC);
 }
+
+int64_t FormUtil::GetCurrentMicrosecond()
+{
+    system_clock::time_point pointTime = system_clock::now();
+    auto timeMicroseconds = chrono::duration_cast<chrono::microseconds>(pointTime.time_since_epoch());
+    return timeMicroseconds.count();
+}
 /**
  * @brief Get millisecond from tm.
  * @param tmAtTime tm time.

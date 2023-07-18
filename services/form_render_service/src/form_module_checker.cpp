@@ -15,7 +15,7 @@
 
 #include "form_module_checker.h"
 
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 
 bool FormModuleChecker::CheckModuleLoadable(const char* moduleName)
 {

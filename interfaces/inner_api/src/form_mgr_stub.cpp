@@ -135,6 +135,10 @@ FormMgrStub::FormMgrStub()
         &FormMgrStub::HandleRequestPublishProxyForm;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_RELEASE_RENDERER)] =
         &FormMgrStub::HandleReleaseRenderer;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_PUBLISH_FORM_INTERCEPTOR)] =
+        &FormMgrStub::HandleRegisterPublishFormInterceptor;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_PUBLISH_FORM_INTERCEPTOR)] =
+        &FormMgrStub::HandleUnregisterPublishFormInterceptor;
 }
 
 FormMgrStub::~FormMgrStub()
@@ -1066,6 +1070,38 @@ ErrCode FormMgrStub::HandleGetRunningFormInfosByBundleName(MessageParcel &data, 
             HILOG_ERROR("write failed");
             return ERR_APPEXECFWK_PARCEL_ERROR;
         }
+    }
+    return result;
+}
+
+int32_t FormMgrStub::HandleRegisterPublishFormInterceptor(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("called.");
+    sptr<IRemoteObject> interceptor = data.ReadRemoteObject();
+    if (interceptor == nullptr) {
+        HILOG_ERROR("failed to get remote object.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int32_t result = RegisterPublishFormInterceptor(interceptor);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("failed to write result");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return result;
+}
+
+int32_t FormMgrStub::HandleUnregisterPublishFormInterceptor(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("called.");
+    sptr<IRemoteObject> interceptor = data.ReadRemoteObject();
+    if (interceptor == nullptr) {
+        HILOG_ERROR("failed to get remote object.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int32_t result = UnregisterPublishFormInterceptor(interceptor);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("failed to write result");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
 }

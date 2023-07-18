@@ -424,6 +424,22 @@ public:
     bool CheckFMSReady();
 
     /**
+     * @brief Registers the callback for publish form. The callback is used to process the publish form request
+     * when the system handler is not found.
+     * @param interceptorCallback The injected callback, should implementation IFormPublishInterceptor.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t RegisterPublishFormInterceptor(const sptr<IRemoteObject> &interceptorCallback);
+
+    /**
+     * @brief Unregisters the callback for publish form. The callback is used to process the publish form request
+     * when the system handler is not found.
+     * @param interceptorCallback The injected callback, should implementation IFormPublishInterceptor.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t UnregisterPublishFormInterceptor(const sptr<IRemoteObject> &interceptorCallback);
+
+    /**
      * @brief Get external error from innerErrorCode.
      * @param innerErrorCode innerErrorCode, get from FMS.
      * @param externalErrorCode output externalErrorCode.

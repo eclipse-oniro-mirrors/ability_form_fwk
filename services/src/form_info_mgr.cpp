@@ -503,6 +503,17 @@ ErrCode FormInfoMgr::GetFormsInfoByModule(const std::string &bundleName, const s
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
     }
 
+    return GetFormsInfoByModuleWithoutCheck(bundleName, moduleName, formInfos);
+}
+
+ErrCode FormInfoMgr::GetFormsInfoByModuleWithoutCheck(const std::string &bundleName, const std::string &moduleName,
+    std::vector<FormInfo> &formInfos)
+{
+    if (bundleName.empty()) {
+        HILOG_ERROR("bundleName is empty.");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
     std::shared_lock<std::shared_timed_mutex> guard(bundleFormInfoMapMutex_);
     auto bundleFormInfoIter = bundleFormInfoMap_.find(bundleName);
     if (bundleFormInfoIter == bundleFormInfoMap_.end()) {
