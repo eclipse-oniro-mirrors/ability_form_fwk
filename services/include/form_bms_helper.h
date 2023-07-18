@@ -19,7 +19,6 @@
 #include <singleton.h>
 #include "ability_manager_interface.h"
 #include "bundle_mgr_interface.h"
-#include "erms_mgr_interface.h"
 #include "want.h"
 
 namespace OHOS {
@@ -60,18 +59,6 @@ public:
      * @param bundleManager the bundle manager ipc object.
      */
     void SetBundleManager(const sptr<IBundleMgr> &bundleManager);
-
-    /**
-     * @brief Acquire an ecological rule manager, if it not existed,
-     * @return returns the ecological rule manager ipc object, or nullptr for failed.
-     */
-    sptr<IEcologicalRuleManager> CheckEcologicalRuleMgr();
-
-    /**
-     * @brief Add the ecological rule manager instance for debug.
-     * @param ecologicalRuleManager the ecological rule manager ipc object.
-     */
-    void SetEcologicalRuleMgr(const sptr<IEcologicalRuleManager> &ecologicalRuleManager);
 
     /**
      * @brief Get bundle package info.
@@ -162,10 +149,6 @@ private:
 
 private:
     sptr<IBundleMgr> iBundleMgr_ = nullptr;
-    sptr<IEcologicalRuleManager> iErMgr_ = nullptr;
-
-    // should be removed when erms online
-    const int32_t ECOLOGICAL_RULE_SA_ID = 9999;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

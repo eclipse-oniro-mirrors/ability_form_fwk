@@ -22,6 +22,7 @@ ability_dmsfwk_path = "//foundation/ability/dmsfwk"
 access_token_path = "//base/security/access_token"
 bundlefwk_path = "//foundation/bundlemanager/bundle_framework"
 bundlefwk_inner_api_path = "${bundlefwk_path}/interfaces/inner_api"
+bundle_mgr_path = "//foundation/bundlemanager"
 distributeddatamgr_path = "//foundation/distributeddatamgr"
 systemabilitymgr_path = "//foundation/systemabilitymgr"
 foundation_distributedschedule_path = "//foundation/distributedschedule"
@@ -42,11 +43,20 @@ ipc_core_path = "//foundation/communication/ipc/interfaces/innerkits/ipc_core"
 arkui_ace_engine_components_path =
     "//foundation/arkui/ace_engine/frameworks/core/components"
 c_utils_base_path = "//commonlibrary/c_utils/base"
+ecological_rule_mgr_path = "//foundation/bundlemanager/ecological_rule_mgr/interfaces/innerkits/include"
 
 declare_args() {
   device_usage_statistics = true
   if (defined(global_parts_info) &&
       !defined(global_parts_info.resourceschedule_device_usage_statistics)) {
     device_usage_statistics = false
+  }
+}
+
+declare_args() {
+  fms_ecologic_rule_mgr_enabled = false
+  if (!defined(global_parts_info) ||
+      defined(global_parts_info.bundlemanager_ecological_rule_mgr)) {
+    fms_ecologic_rule_mgr_enabled = true
   }
 }

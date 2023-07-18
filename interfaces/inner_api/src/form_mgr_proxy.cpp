@@ -1742,5 +1742,65 @@ bool FormMgrProxy::WriteFormDataProxies(MessageParcel &data, const std::vector<F
     }
     return true;
 }
+
+int32_t FormMgrProxy::RegisterPublishFormInterceptor(const sptr<IRemoteObject> &interceptorCallback)
+{
+    HILOG_DEBUG("start.");
+    MessageParcel data;
+    // write in token to help identify which stub to be called.
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("failed to write interface token");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    // write in interceptor
+    if (!data.WriteRemoteObject(interceptorCallback)) {
+        HILOG_ERROR("failed to write interceptor");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    // send request.
+    MessageParcel reply;
+    MessageOption option;
+    int error = Remote()->SendRequest(
+        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_PUBLISH_FORM_INTERCEPTOR),
+        data,
+        reply,
+        option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("failed to SendRequest: %{public}d", error);
+        return error;
+    }
+    // retrieve and return result.
+    return reply.ReadInt32();
+}
+
+int32_t FormMgrProxy::UnregisterPublishFormInterceptor(const sptr<IRemoteObject> &interceptorCallback)
+{
+    HILOG_DEBUG("start.");
+    MessageParcel data;
+    // write in token to help identify which stub to be called.
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("failed to write interface token");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    // write in interceptor
+    if (!data.WriteRemoteObject(interceptorCallback)) {
+        HILOG_ERROR("failed to write interceptor");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    // send request.
+    MessageParcel reply;
+    MessageOption option;
+    int error = Remote()->SendRequest(
+        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_PUBLISH_FORM_INTERCEPTOR),
+        data,
+        reply,
+        option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("failed to SendRequest: %{public}d", error);
+        return error;
+    }
+    // retrieve and return result.
+    return reply.ReadInt32();
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

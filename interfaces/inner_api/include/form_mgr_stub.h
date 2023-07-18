@@ -393,6 +393,22 @@ private:
      */
     ErrCode HandleRequestPublishProxyForm(MessageParcel &data, MessageParcel &reply);
 
+    /**
+     * @brief Register the callback to publish form. The callback is used to process the publish form request
+     * when the system handler is not found.
+     * @param interceptorCallback The injected callback, should implementation IFormPublishInterceptor.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t HandleRegisterPublishFormInterceptor(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Unregister the callback to publish form. The callback is used to process the publish form request
+     * when the system handler is not found.
+     * @param interceptorCallback The injected callback, should implementation IFormPublishInterceptor.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t HandleUnregisterPublishFormInterceptor(MessageParcel &data, MessageParcel &reply);
+
     bool ReadFormDataProxies(MessageParcel &data, std::vector<FormDataProxy> &formDataProxies);
 private:
     using FormMgrFunc = int32_t (FormMgrStub::*)(MessageParcel &data, MessageParcel &reply);

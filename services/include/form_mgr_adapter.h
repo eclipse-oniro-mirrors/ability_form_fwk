@@ -20,12 +20,16 @@
 
 #include "bundle_info.h"
 #include "bundle_mgr_interface.h"
+#ifdef SUPPORT_ERMS
+#include "ecological_rule_mgr_service_client.h"
+#endif
 #include "form_info.h"
 #include "form_instance.h"
 #include "form_instances_filter.h"
 #include "form_item_info.h"
 #include "form_js_info.h"
 #include "form_provider_data.h"
+#include "form_publish_interceptor_interface.h"
 #include "form_state_info.h"
 #include "iremote_object.h"
 #include "running_form_info.h"
@@ -33,6 +37,9 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+#ifdef SUPPORT_ERMS
+using ErmsCallerInfo = OHOS::EcologicalRuleMgrService::CallerInfo;
+#endif
 using Want = OHOS::AAFwk::Want;
 using WantParams = OHOS::AAFwk::WantParams;
 /**
@@ -420,6 +427,22 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode RegisterRemoveObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken);
+
+    /**
+     * @brief Registers the callback for publish form. The callback is used to process the publish form request
+     * when the system handler is not found.
+     * @param interceptorCallback The injected callback, should implementation IFormPublishInterceptor.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t RegisterPublishFormInterceptor(const sptr<IRemoteObject> &interceptorCallback);
+
+    /**
+     * @brief Unregisters the callback for publish form. The callback is used to process the publish form request
+     * when the system handler is not found.
+     * @param interceptorCallback The injected callback, should implementation IFormPublishInterceptor.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t UnregisterPublishFormInterceptor(const sptr<IRemoteObject> &interceptorCallback);
 private:
     /**
      * @brief Get form configure info.
@@ -738,9 +761,9 @@ private:
      * @param iBundleMgr BundleManagerProxy
      * @param bundleName BundleName of caller
      * @param want want of target form
-     * @return Returns ERR_OK if the caller is in the whitelist, others if not.
+     * @return Returns true if the caller is in the whitelist, others if not.
      */
-    ErrCode CheckValidPublishEvent(const sptr<IBundleMgr> &iBundleMgr, const std::string &bundleName, const Want &want);
+    bool IsValidPublishEvent(const sptr<IBundleMgr> &iBundleMgr, const std::string &bundleName, const Want &want);
 
     /**
      * @brief Allocate form by specific Id.
@@ -770,6 +793,20 @@ private:
     mutable std::recursive_mutex deathRecipientsMutex_;
     std::map<std::string, sptr<IRemoteObject>> formObservers_;
     std::map<sptr<IRemoteObject>, sptr<IRemoteObject::DeathRecipient>> deathRecipients_;
+
+    /**
+     * @brief Get caller type.
+     * @param bundleName the caller's bundle name.
+     */
+    int32_t GetCallerType(std::string bundleName);
+
+    /**
+     * @brief Check if the form is allow to publish.
+     * @param bundleName the caller's bundle name.
+     * @param wants Wants of the request.
+     */
+    bool IsErmsSupportPublishForm(std::string bundleName, std::vector<Want> wants);
+
     /**
      * @class ClientDeathRecipient
      * notices IRemoteBroker died.
@@ -787,14 +824,9 @@ private:
          */
         void OnRemoteDied(const wptr<IRemoteObject> &remote) override;
     };
-};
 
-enum class HostId : int8_t {
-    HOST_ID_LAUNCHER = 1
-};
-
-const std::map<HostId, AppExecFwk::ElementName> HOST_MAP = {
-    {HostId::HOST_ID_LAUNCHER, AppExecFwk::ElementName("", "com.ohos.launcher", "com.ohos.launcher.MainAbility")}
+private:
+    sptr<IFormPublishInterceptor> formPublishInterceptor_ = nullptr;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

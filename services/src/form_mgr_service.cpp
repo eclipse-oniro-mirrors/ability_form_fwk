@@ -1018,6 +1018,42 @@ void FormMgrService::Dump(const std::vector<std::u16string> &args, std::string &
     (this->*dumpFunc)(value, result);
 }
 
+int32_t FormMgrService::RegisterPublishFormInterceptor(const sptr<IRemoteObject> &interceptorCallback)
+{
+    HILOG_DEBUG("called.");
+    sptr<IBundleMgr> bundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
+    if (bundleMgr == nullptr) {
+        HILOG_ERROR("failed to get bundleMgr.");
+        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
+    }
+    // check if system app
+    auto callingUid = IPCSkeleton::GetCallingUid();
+    auto isSystemApp = bundleMgr->CheckIsSystemAppByUid(callingUid);
+    if (!isSystemApp) {
+        HILOG_ERROR("permission denied.");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    }
+    return FormMgrAdapter::GetInstance().RegisterPublishFormInterceptor(interceptorCallback);
+}
+
+int32_t FormMgrService::UnregisterPublishFormInterceptor(const sptr<IRemoteObject> &interceptorCallback)
+{
+    HILOG_DEBUG("called.");
+    sptr<IBundleMgr> bundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
+    if (bundleMgr == nullptr) {
+        HILOG_ERROR("failed to get bundleMgr.");
+        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
+    }
+    // check if system app
+    auto callingUid = IPCSkeleton::GetCallingUid();
+    auto isSystemApp = bundleMgr->CheckIsSystemAppByUid(callingUid);
+    if (!isSystemApp) {
+        HILOG_ERROR("permission denied.");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    }
+    return FormMgrAdapter::GetInstance().UnregisterPublishFormInterceptor(interceptorCallback);
+}
+
 bool FormMgrService::ParseOption(const std::vector<std::u16string> &args, DumpKey &key, std::string &value,
     std::string &result)
 {
