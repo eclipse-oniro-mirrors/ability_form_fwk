@@ -562,7 +562,7 @@ ErrCode FormMgrService::ReadFormConfigXML()
     FormXMLParser parser;
     int32_t ret = parser.Parse();
     if (ret != ERR_OK) {
-        HILOG_ERROR("parse form config failed.");
+        HILOG_WARN("parse form config failed, use the default vaule.");
         return ret;
     }
     const std::map<std::string, int32_t> &configMap = parser.GetConfigMap();
@@ -635,7 +635,7 @@ ErrCode FormMgrService::Init()
     // read param form form_config.xml.
     int32_t result = ReadFormConfigXML();
     if (result != ERR_OK) {
-        HILOG_ERROR("read param form config failed.");
+        HILOG_WARN("parse form config failed, use the default vaule.");
     }
 
     HILOG_INFO("init success");
