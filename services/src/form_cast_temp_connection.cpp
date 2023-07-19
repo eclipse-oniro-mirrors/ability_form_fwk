@@ -45,7 +45,8 @@ void FormCastTempConnection::OnAbilityConnectDone(
             __func__, element.GetAbilityName().c_str(), formId_, resultCode);
         return;
     }
-    FormSupplyCallback::GetInstance()->AddConnection(this);
+    sptr<FormCastTempConnection> connection(this);
+    FormSupplyCallback::GetInstance()->AddConnection(connection);
 
     Want want;
     want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());

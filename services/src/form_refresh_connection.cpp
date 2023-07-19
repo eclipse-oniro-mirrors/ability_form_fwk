@@ -51,7 +51,8 @@ void FormRefreshConnection::OnAbilityConnectDone(
             __func__, element.GetAbilityName().c_str(), GetFormId(), resultCode);
         return;
     }
-    FormSupplyCallback::GetInstance()->AddConnection(this);
+    sptr<FormRefreshConnection> connection(this);
+    FormSupplyCallback::GetInstance()->AddConnection(connection);
 
     if (want_.HasParameter(Constants::PARAM_MESSAGE_KEY)) {
         std::string message = want_.GetStringParam(Constants::PARAM_MESSAGE_KEY);

@@ -46,7 +46,8 @@ void FormAcquireStateConnection::OnAbilityConnectDone(
             __func__, element.GetAbilityName().c_str(), resultCode);
         return;
     }
-    FormSupplyCallback::GetInstance()->AddConnection(this);
+    sptr<FormAcquireStateConnection> connection(this);
+    FormSupplyCallback::GetInstance()->AddConnection(connection);
     Want want;
     want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
     FormTaskMgr::GetInstance().PostAcquireStateTask(want_, provider_, want, remoteObject);

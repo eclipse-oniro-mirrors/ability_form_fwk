@@ -48,7 +48,8 @@ void FormMsgEventConnection::OnAbilityConnectDone(
             __func__, element.GetAbilityName().c_str(), formId_, resultCode);
         return;
     }
-    FormSupplyCallback::GetInstance()->AddConnection(this);
+    sptr<FormMsgEventConnection> connection(this);
+    FormSupplyCallback::GetInstance()->AddConnection(connection);
     if (!want_.HasParameter(Constants::PARAM_MESSAGE_KEY)) {
         HILOG_ERROR("%{public}s error, message info is not exist", __func__);
         return;
