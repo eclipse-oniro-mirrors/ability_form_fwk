@@ -46,7 +46,8 @@ void FormEventNotifyConnection::OnAbilityConnectDone(
             __func__, element.GetAbilityName().c_str(), resultCode);
         return;
     }
-    FormSupplyCallback::GetInstance()->AddConnection(this);
+    sptr<FormEventNotifyConnection> connection(this);
+    FormSupplyCallback::GetInstance()->AddConnection(connection);
 
     Want want;
     want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
