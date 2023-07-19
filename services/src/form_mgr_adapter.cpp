@@ -2908,7 +2908,6 @@ bool FormMgrAdapter::IsErmsSupportPublishForm(std::string bundleName, std::vecto
     callerInfo.uid = IPCSkeleton::GetCallingUid();
     callerInfo.pid = IPCSkeleton::GetCallingPid();
     callerInfo.callerAppType = GetCallerType(bundleName);
-    bool isSupport = true;
 
     auto start = FormUtil::GetCurrentMicrosecond();
     int32_t ret = EcologicalRuleMgrServiceClient::GetInstance()->IsSupportPublishForm(wants, callerInfo, isSupport);
