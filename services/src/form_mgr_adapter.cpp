@@ -1914,7 +1914,7 @@ bool FormMgrAdapter::IsUpdateValid(const int64_t formId, const std::string &bund
  */
 int FormMgrAdapter::EnableUpdateForm(const std::vector<int64_t> formIDs, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("enableUpdateForm");
+    HILOG_DEBUG("enableUpdateForm");
     return HandleUpdateFormFlag(formIDs, callerToken, true, false);
 }
 
@@ -1926,7 +1926,7 @@ int FormMgrAdapter::EnableUpdateForm(const std::vector<int64_t> formIDs, const s
  */
 int FormMgrAdapter::DisableUpdateForm(const std::vector<int64_t> formIDs, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("disableUpdateForm");
+    HILOG_DEBUG("disableUpdateForm");
     return HandleUpdateFormFlag(formIDs, callerToken, false, false);
 }
 
@@ -2119,19 +2119,20 @@ int FormMgrAdapter::BackgroundEvent(const int64_t formId, Want &want, const sptr
 ErrCode FormMgrAdapter::HandleUpdateFormFlag(const std::vector<int64_t> &formIds,
     const sptr<IRemoteObject> &callerToken, bool flag, bool isOnlyEnableUpdate)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_DEBUG("called.");
     if (formIds.empty() || callerToken == nullptr) {
-        HILOG_ERROR("%{public}s, invalid param", __func__);
+        HILOG_ERROR("invalid param");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     std::vector<int64_t> refreshForms;
     int errCode = FormDataMgr::GetInstance().UpdateHostFormFlag(formIds, callerToken,
         flag, isOnlyEnableUpdate, refreshForms);
     if (errCode == ERR_OK && !refreshForms.empty()) {
+        int32_t userId = FormUtil::GetCurrentAccountId();
         for (const int64_t id : refreshForms) {
-            HILOG_INFO("%{public}s, formRecord need refresh: %{public}" PRId64 "", __func__, id);
+            HILOG_DEBUG("formRecord need refresh: %{public}" PRId64 "", id);
             Want want;
-            want.SetParam(Constants::PARAM_FORM_USER_ID, FormUtil::GetCurrentAccountId());
+            want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
             FormProviderMgr::GetInstance().RefreshForm(id, want, false);
         }
     }

@@ -426,7 +426,7 @@ bool FormDataMgr::DeleteFormUserUid(const int64_t formId, const int uid)
  */
 bool FormDataMgr::UpdateFormRecord(const int64_t formId, const FormRecord &formRecord)
 {
-    HILOG_INFO("%{public}s, get form record by formId", __func__);
+    HILOG_DEBUG("get form record by formId");
     std::lock_guard<std::mutex> lock(formRecordMutex_);
     auto info = formRecords_.find(formId);
     if (info != formRecords_.end()) {
@@ -443,7 +443,7 @@ bool FormDataMgr::UpdateFormRecord(const int64_t formId, const FormRecord &formR
  */
 bool FormDataMgr::GetFormRecord(const int64_t formId, FormRecord &formRecord) const
 {
-    HILOG_INFO("get form record by formId");
+    HILOG_DEBUG("get form record by formId");
     std::lock_guard<std::mutex> lock(formRecordMutex_);
     auto info = formRecords_.find(formId);
     if (info == formRecords_.end()) {
@@ -452,7 +452,7 @@ bool FormDataMgr::GetFormRecord(const int64_t formId, FormRecord &formRecord) co
     }
     formRecord = info->second;
 
-    HILOG_INFO("get form record successfully");
+    HILOG_DEBUG("get form record successfully");
     return true;
 }
 /**
@@ -463,7 +463,7 @@ bool FormDataMgr::GetFormRecord(const int64_t formId, FormRecord &formRecord) co
  */
 bool FormDataMgr::GetFormRecord(const std::string &bundleName, std::vector<FormRecord> &formInfos, int32_t userId) const
 {
-    HILOG_INFO("get form record by bundleName");
+    HILOG_DEBUG("get form record by bundleName");
     std::lock_guard<std::mutex> lock(formRecordMutex_);
     for (auto itFormRecord = formRecords_.begin(); itFormRecord != formRecords_.end(); itFormRecord++) {
         if (bundleName == itFormRecord->second.bundleName &&
@@ -474,7 +474,7 @@ bool FormDataMgr::GetFormRecord(const std::string &bundleName, std::vector<FormR
     if (formInfos.size() > 0) {
         return true;
     } else {
-        HILOG_INFO("%{public}s, form info not find", __func__);
+        HILOG_DEBUG("form info not find");
         return false;
     }
 }
@@ -802,7 +802,7 @@ void FormDataMgr::SetUdidHash(const int64_t udidHash)
  */
 bool FormDataMgr::GetMatchedHostClient(const sptr<IRemoteObject> &callerToken, FormHostRecord &formHostRecord) const
 {
-    HILOG_INFO("%{public}s, get the matched form host record by client stub.", __func__);
+    HILOG_DEBUG("get the matched form host record by client stub.");
     std::lock_guard<std::mutex> lock(formHostRecordMutex_);
     for (const FormHostRecord &record : clientRecords_) {
         if (callerToken == record.GetFormHostClient()) {
@@ -811,7 +811,7 @@ bool FormDataMgr::GetMatchedHostClient(const sptr<IRemoteObject> &callerToken, F
         }
     }
 
-    HILOG_ERROR("%{public}s, form host record not find.", __func__);
+    HILOG_ERROR("form host record not find.");
     return false;
 }
 
@@ -1119,33 +1119,33 @@ ErrCode FormDataMgr::HandleUpdateHostFormFlag(const std::vector<int64_t> &formId
 
         // set disable
         if (!flag) {
-            HILOG_INFO("%{public}s, flag is disable", __func__);
+            HILOG_DEBUG("flag is disable");
             continue;
         }
         FormRecord formRecord;
         if (GetFormRecord(matchedFormId, formRecord)) {
             if (formRecord.needRefresh) {
-                HILOG_INFO("%{public}s, formRecord need refresh", __func__);
+                HILOG_DEBUG("formRecord need refresh");
                 refreshForms.emplace_back(matchedFormId);
                 continue;
             }
         } else {
-            HILOG_WARN("%{public}s, not exist such form:%{public}" PRId64 "", __func__, matchedFormId);
+            HILOG_WARN("not exist such form:%{public}" PRId64 "", matchedFormId);
             continue;
         }
 
         // if set enable flag, should check whether to refresh form
         if (!formHostRecord.IsNeedRefresh(matchedFormId)) {
-            HILOG_INFO("%{public}s, host need not refresh", __func__);
+            HILOG_DEBUG("host need not refresh");
             continue;
         }
 
         if (IsFormCached(formRecord)) {
-            HILOG_INFO("%{public}s, form cached", __func__);
+            HILOG_DEBUG("form cached");
             formHostRecord.OnUpdate(matchedFormId, formRecord);
             formHostRecord.SetNeedRefresh(matchedFormId, false);
         } else {
-            HILOG_INFO("%{public}s, form no cache", __func__);
+            HILOG_DEBUG("form no cache");
             refreshForms.emplace_back(matchedFormId);
             continue;
         }
@@ -1165,17 +1165,17 @@ ErrCode FormDataMgr::HandleUpdateHostFormFlag(const std::vector<int64_t> &formId
 ErrCode FormDataMgr::UpdateHostFormFlag(const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &callerToken,
                                         bool flag, bool isOnlyEnableUpdate, std::vector<int64_t> &refreshForms)
 {
-    HILOG_INFO("%{public}s start, flag: %{public}d", __func__, flag);
+    HILOG_DEBUG(" start, flag: %{public}d", flag);
     std::lock_guard<std::mutex> lock(formHostRecordMutex_);
     std::vector<FormHostRecord>::iterator itHostRecord;
     for (itHostRecord = clientRecords_.begin(); itHostRecord != clientRecords_.end(); itHostRecord++) {
         if (callerToken == itHostRecord->GetFormHostClient()) {
             HandleUpdateHostFormFlag(formIds, flag, isOnlyEnableUpdate, *itHostRecord, refreshForms);
-            HILOG_INFO("%{public}s end.", __func__);
+            HILOG_DEBUG(" end.");
             return ERR_OK;
         }
     }
-    HILOG_ERROR("%{public}s, can't find target client", __func__);
+    HILOG_ERROR("can't find target client");
     return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
 }
 /**
