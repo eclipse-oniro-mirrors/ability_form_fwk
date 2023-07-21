@@ -36,6 +36,7 @@ using namespace OHOS::AppExecFwk;
 
 extern void MockGetFormRecord(bool mockRet);
 extern void MockConnectServiceAbility(bool mockRet);
+extern void MockDisconnectServiceAbility(bool mockRet);
 
 namespace {
 class FormRenderMgrTest : public testing::Test {
@@ -906,6 +907,7 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_042, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormRenderMgrTest_042 start";
     FormRenderMgr formRenderMgr;
     sptr<FormRenderConnection> connection = nullptr;
+    MockDisconnectServiceAbility(true);
     size_t size = 2;
     formRenderMgr.DisconnectRenderService(connection, size);
     GTEST_LOG_(INFO) << "FormRenderMgrTest_042 end";
@@ -1062,7 +1064,7 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_051, TestSize.Level0)
     EXPECT_EQ(false, formRenderMgr.IsRerenderForRenderServiceDied(formId));
     GTEST_LOG_(INFO) << "FormRenderMgrTest_051 end";
 }
-}
+
 
 /**
  * @tc.name: FormRenderMgrTest_052
@@ -1113,4 +1115,5 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_054, TestSize.Level0)
     formRenderMgr.RemoveConnection(formIdOther);
     EXPECT_EQ(1, formRenderMgr.renderFormConnections_.size());
     GTEST_LOG_(INFO) << "FormRenderMgrTest_054 end";
+}
 }
