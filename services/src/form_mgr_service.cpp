@@ -368,11 +368,11 @@ int FormMgrService::CastTempForm(const int64_t formId, const sptr<IRemoteObject>
 int FormMgrService::LifecycleUpdate(const std::vector<int64_t> &formIds,
     const sptr<IRemoteObject> &callerToken, bool updateType)
 {
-    HILOG_INFO("lifecycleUpdate.");
+    HILOG_INFO("lifecycleUpdate. %{public}d", updateType);
 
     ErrCode ret = CheckFormPermission();
     if (ret != ERR_OK) {
-        HILOG_ERROR("%{public}s fail, delete form permission denied", __func__);
+        HILOG_ERROR("fail, delete form permission denied");
         return ret;
     }
 
