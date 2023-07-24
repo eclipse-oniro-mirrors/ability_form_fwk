@@ -25,6 +25,7 @@
 #include "erms_mgr_interface.h"
 #include "form_constants.h"
 #include "form_mgr_errors.h"
+#include "form_util.h"
 #define private public
 #include "form_mgr_adapter.h"
 #include "ipc_types.h"
@@ -1644,7 +1645,9 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_088, TestSize.Level0)
     int64_t matchedFormId = 1;
     sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
     int32_t formVisibleType = 2;
-    EXPECT_EQ(false, formMgrAdapter.UpdateProviderInfoToHost(matchedFormId, callerToken, formVisibleType, formRecord));
+    int32_t userId = FormUtil::GetCurrentAccountId();
+    EXPECT_EQ(false, formMgrAdapter.UpdateProviderInfoToHost(matchedFormId, userId,
+        callerToken, formVisibleType, formRecord));
     GTEST_LOG_(INFO) << "FormMgrAdapter_088 end";
 }
 
@@ -1661,8 +1664,10 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_089, TestSize.Level0)
     int64_t matchedFormId = 1;
     sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
     int32_t formVisibleType = 2;
+    int32_t userId = FormUtil::GetCurrentAccountId();
     MockGetFormRecord(true);
-    EXPECT_EQ(false, formMgrAdapter.UpdateProviderInfoToHost(matchedFormId, callerToken, formVisibleType, formRecord));
+    EXPECT_EQ(false, formMgrAdapter.UpdateProviderInfoToHost(matchedFormId, userId,
+        callerToken, formVisibleType, formRecord));
     GTEST_LOG_(INFO) << "FormMgrAdapter_089 end";
 }
 
@@ -1677,7 +1682,8 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_090, TestSize.Level0)
     FormMgrAdapter formMgrAdapter;
     sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
     std::string bundleName = "aa";
-    EXPECT_EQ(false, formMgrAdapter.CheckIsSystemAppByBundleName(iBundleMgr, bundleName));
+    int32_t userId = FormUtil::GetCurrentAccountId();
+    EXPECT_EQ(false, formMgrAdapter.CheckIsSystemAppByBundleName(iBundleMgr, userId, bundleName));
     GTEST_LOG_(INFO) << "FormMgrAdapter_090 end";
 }
 

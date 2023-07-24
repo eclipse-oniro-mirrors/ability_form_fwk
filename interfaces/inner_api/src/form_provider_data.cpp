@@ -191,7 +191,6 @@ void FormProviderData::RemoveImageData(std::string picName)
  */
 void FormProviderData::SetDataString(std::string &jsonDataString)
 {
-    HILOG_INFO("%{public}s called", __func__);
     if (jsonDataString.empty()) {
         jsonDataString = JSON_EMPTY_STRING;
     }

@@ -21,6 +21,7 @@
 #define private public
 #define protected public
 #include "form_mgr_adapter.h"
+#include "form_util.h"
 #undef private
 #undef protected
 #include "securec.h"
@@ -49,7 +50,8 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formMgrAdapter.CreateHandleEventMap(matchedFormId, formRecord, eventMaps);
     sptr<IRemoteObject> callerToken = nullptr;
     int32_t formVisibleType = static_cast<int32_t>(GetU32Data(data));
-    formMgrAdapter.UpdateProviderInfoToHost(matchedFormId, callerToken, formVisibleType, formRecord);
+    int32_t userId = FormUtil::GetCurrentAccountId();
+    formMgrAdapter.UpdateProviderInfoToHost(matchedFormId, userId, callerToken, formVisibleType, formRecord);
     std::vector<int64_t> formIds;
     formIds.emplace_back(matchedFormId);
     int32_t numFormsDeleted = static_cast<int32_t>(GetU32Data(data));
