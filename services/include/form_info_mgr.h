@@ -96,6 +96,9 @@ public:
 
     ErrCode GetFormsInfoByRecord(const FormRecord &formRecord, FormInfo &formInfo);
 
+    ErrCode GetFormsInfoByModuleWithoutCheck(const std::string &bundleName, const std::string &moduleName,
+        std::vector<FormInfo> &formInfos);
+
     ErrCode AddDynamicFormInfo(FormInfo &formInfo, int32_t userId);
 
     ErrCode RemoveDynamicFormInfo(const std::string &bundleName, const std::string &moduleName,

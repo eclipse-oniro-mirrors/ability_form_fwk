@@ -3676,31 +3676,8 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0190, TestSize.Level0)
 }
 
 /**
- * @tc.name: FormMgrAdapter_191
- * @tc.desc: test CheckValidPublishEvent function and the return value is false.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_191, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormMgrAdapter_191 start";
-    FormMgrAdapter formMgrAdapter;
-    Want want;
-    sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
-    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
-    FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
-    AppExecFwk::ApplicationInfo appInfo;
-    appInfo.isSystemApp = true;
-    EXPECT_CALL(*bmsProxy, GetApplicationInfoV9(_, _, _, _)).Times(1)
-        .WillRepeatedly(DoAll(SetArgReferee<3>(appInfo), Return(ERR_OK)));
-    std::string bundleName = "com.ohos.systemui";
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrAdapter.CheckValidPublishEvent(bmsProxy, bundleName, want));
-    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
-    GTEST_LOG_(INFO) << "FormMgrAdapter_191 end";
-}
-
-/**
  * @tc.name: FormMgrAdapter_192
- * @tc.desc: test CheckValidPublishEvent function and the return value is true.
+ * @tc.desc: test IsValidPublishEvent function and the return value is true.
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_192, TestSize.Level0)
@@ -3716,14 +3693,14 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_192, TestSize.Level0)
     EXPECT_CALL(*bmsProxy, GetApplicationInfoV9(_, _, _, _)).Times(1)
         .WillRepeatedly(DoAll(SetArgReferee<3>(appInfo), Return(ERR_OK)));
     std::string bundleName = "com.ohos.launcher";
-    EXPECT_EQ(ERR_OK, formMgrAdapter.CheckValidPublishEvent(bmsProxy, bundleName, want));
+    EXPECT_EQ(true, formMgrAdapter.IsValidPublishEvent(bmsProxy, bundleName, want));
     FormBmsHelper::GetInstance().iBundleMgr_ = backup;
     GTEST_LOG_(INFO) << "FormMgrAdapter_192 end";
 }
 
 /**
  * @tc.name: FormMgrAdapter_193
- * @tc.desc: test CheckValidPublishEvent function and the return value is false when rule forbidding.
+ * @tc.desc: test IsValidPublishEvent function and the return value is true.
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_193, TestSize.Level0)
@@ -3736,25 +3713,21 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_193, TestSize.Level0)
 
     sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
     FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
-    FormBmsHelper::GetInstance().iErMgr_ = erMgrService;
     ExperienceRule rule;
     rule.isAllow = false;
     AppExecFwk::ApplicationInfo appInfo;
     appInfo.isSystemApp = true;
     EXPECT_CALL(*bmsProxy, GetApplicationInfoV9(_, _, _, _)).Times(1)
         .WillRepeatedly(DoAll(SetArgReferee<3>(appInfo), Return(ERR_OK)));
-    EXPECT_CALL(*erMgrService, IsSupportPublishForm(_, _, _)).Times(1)
-        .WillRepeatedly(DoAll(SetArgReferee<2>(rule), Return(ERR_OK)));
     std::string bundleName = "com.ohos.launcher";
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrAdapter.CheckValidPublishEvent(bmsProxy, bundleName, want));
+    EXPECT_EQ(true, formMgrAdapter.IsValidPublishEvent(bmsProxy, bundleName, want));
     FormBmsHelper::GetInstance().iBundleMgr_ = backup;
-    FormBmsHelper::GetInstance().iErMgr_ = nullptr;
     GTEST_LOG_(INFO) << "FormMgrAdapter_193 end";
 }
 
 /**
  * @tc.name: FormMgrAdapter_194
- * @tc.desc: test CheckValidPublishEvent function and the return value is false when rule allow.
+ * @tc.desc: test IsValidPublishEvent function and the return value is false when rule allow.
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_194, TestSize.Level0)
@@ -3767,19 +3740,15 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_194, TestSize.Level0)
 
     sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
     FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
-    FormBmsHelper::GetInstance().iErMgr_ = erMgrService;
     ExperienceRule rule;
     rule.isAllow = true;
     AppExecFwk::ApplicationInfo appInfo;
     appInfo.isSystemApp = true;
     EXPECT_CALL(*bmsProxy, GetApplicationInfoV9(_, _, _, _)).Times(1)
         .WillRepeatedly(DoAll(SetArgReferee<3>(appInfo), Return(ERR_OK)));
-    EXPECT_CALL(*erMgrService, IsSupportPublishForm(_, _, _)).Times(1)
-        .WillRepeatedly(DoAll(SetArgReferee<2>(rule), Return(ERR_OK)));
     std::string bundleName = "com.ohos.launcher";
-    EXPECT_EQ(ERR_OK, formMgrAdapter.CheckValidPublishEvent(bmsProxy, bundleName, want));
+    EXPECT_EQ(true, formMgrAdapter.IsValidPublishEvent(bmsProxy, bundleName, want));
     FormBmsHelper::GetInstance().iBundleMgr_ = backup;
-    FormBmsHelper::GetInstance().iErMgr_ = nullptr;
     GTEST_LOG_(INFO) << "FormMgrAdapter_194 end";
 }
 

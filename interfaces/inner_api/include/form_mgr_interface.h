@@ -455,6 +455,29 @@ public:
     virtual ErrCode RequestPublishProxyForm(Want &want, bool withFormBindingData,
         std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
         const std::vector<FormDataProxy> &formDataProxies) { return ERR_OK; }
+
+    /**
+     * @brief Registers the callback to publish form. The callback is used to process the publish form request
+     * when the system handler is not found.
+     * @param interceptorCallback The injected callback, should implementation IFormPublishInterceptor.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int32_t RegisterPublishFormInterceptor(const sptr<IRemoteObject> &interceptorCallback)
+    {
+        return 0;
+    }
+
+    /**
+     * @brief Unregisters the callback to publish form. The callback is used to process the publish form request
+     * when the system handler is not found.
+     * @param interceptorCallback The injected callback, should implementation IFormPublishInterceptor.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int32_t UnregisterPublishFormInterceptor(const sptr<IRemoteObject> &interceptorCallback)
+    {
+        return 0;
+    }
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -516,7 +539,9 @@ public:
         FORM_MGR_REGISTER_REMOVE_OBSERVER,
         FORM_MGR_UPDATE_PROXY_FORM,
         FORM_MGR_REQUEST_PUBLISH_PROXY_FORM,
-        FORM_MGR_RELEASE_RENDERER
+        FORM_MGR_RELEASE_RENDERER,
+        FORM_MGR_REGISTER_PUBLISH_FORM_INTERCEPTOR,
+        FORM_MGR_UNREGISTER_PUBLISH_FORM_INTERCEPTOR,
     };
 };
 }  // namespace AppExecFwk

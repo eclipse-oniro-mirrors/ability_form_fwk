@@ -19,11 +19,17 @@
 
 namespace {
     bool g_mockConnectServiceAbilityRet = true;
+    bool g_mockDisconnectServiceAbilityRet = true;
 }
 
 void MockConnectServiceAbility(bool mockRet)
 {
     g_mockConnectServiceAbilityRet = mockRet;
+}
+
+void MockDisconnectServiceAbility(bool mockRet)
+{
+    g_mockDisconnectServiceAbilityRet = mockRet;
 }
 
 namespace OHOS {
@@ -33,6 +39,14 @@ FormAmsHelper::FormAmsHelper()
 
 FormAmsHelper::~FormAmsHelper()
 {}
+
+ErrCode FormAmsHelper::DisconnectServiceAbility(const sptr<AAFwk::IAbilityConnection> &connect)
+{
+    if (!g_mockDisconnectServiceAbilityRet) {
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+    }
+    return ERR_OK;
+}
 
 ErrCode FormAmsHelper::ConnectServiceAbility(
     const Want &want, const sptr<AAFwk::IAbilityConnection> &connect)

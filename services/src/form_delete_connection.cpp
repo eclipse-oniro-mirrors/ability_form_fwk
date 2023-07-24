@@ -45,7 +45,8 @@ void FormDeleteConnection::OnAbilityConnectDone(
            __func__, element.GetAbilityName().c_str(), formId_, resultCode);
         return;
     }
-    FormSupplyCallback::GetInstance()->AddConnection(this);
+    sptr<FormDeleteConnection> connection(this);
+    FormSupplyCallback::GetInstance()->AddConnection(connection);
 
     Want want;
     want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());

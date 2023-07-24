@@ -37,6 +37,7 @@ ohos_shared_library("libfms") {
     "${ability_runtime_native_path}/appkit/ability_runtime",
     "${form_fwk_napi_path}/form_host/form_state_observer/include",
   ]
+
   sources = [
     "services/config/form_xml_parser.cpp",
     "services/src/form_ability_connection.cpp",
@@ -133,6 +134,7 @@ ohos_shared_library("libfms") {
     "hitrace:hitrace_meter",
     "ipc:ipc_core",
     "kv_store:distributeddata_inner",
+    "os_account:os_account_innerkits",
     "relational_store:native_rdb",
     "resource_management:global_resmgr",
     "safwk:system_ability_fwk",
@@ -144,6 +146,12 @@ ohos_shared_library("libfms") {
   if (ability_runtime_power) {
     defines = [ "SUPPORT_POWER" ]
     external_deps += [ "power_manager:powermgr_client" ]
+  }
+
+  if (fms_ecologic_rule_mgr_enabled) {
+    include_dirs += [ "${ecological_rule_mgr_path}" ]
+    defines += [ "SUPPORT_ERMS" ]
+    external_deps += [ "ecological_rule_mgr:erms_client" ]
   }
 
   if (device_usage_statistics) {
@@ -201,6 +209,7 @@ ohos_shared_library("fmskit_native") {
     "hilog:libhilog",
     "hitrace:hitrace_meter",
     "ipc:ipc_core",
+    "napi:ace_napi",
     "samgr:samgr_proxy",
   ]
 
@@ -244,6 +253,8 @@ ohos_shared_library("form_manager") {
     "interfaces/inner_api/src/form_provider_info.cpp",
     "interfaces/inner_api/src/form_provider_proxy.cpp",
     "interfaces/inner_api/src/form_provider_stub.cpp",
+    "interfaces/inner_api/src/form_publish_interceptor_proxy.cpp",
+    "interfaces/inner_api/src/form_publish_interceptor_stub.cpp",
     "interfaces/inner_api/src/form_render_proxy.cpp",
     "interfaces/inner_api/src/form_render_stub.cpp",
     "interfaces/inner_api/src/form_share_info.cpp",

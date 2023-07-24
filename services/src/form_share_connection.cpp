@@ -44,7 +44,8 @@ void FormShareConnection::OnAbilityConnectDone(
         return;
     }
 
-    FormSupplyCallback::GetInstance()->AddConnection(this);
+    sptr<FormShareConnection> connection(this);
+    FormSupplyCallback::GetInstance()->AddConnection(connection);
     Want want;
     want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
     want.SetParam(Constants::FORM_SHARE_REQUEST_CODE, formShareRequestCode_);

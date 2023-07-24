@@ -443,6 +443,23 @@ public:
     virtual ErrCode RequestPublishProxyForm(Want &want, bool withFormBindingData,
         std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
         const std::vector<FormDataProxy> &formDataProxies) override;
+
+    /**
+     * @brief Registers the callback to publish form. The callback is used to process the publish form request
+     * when the system handler is not found.
+     * @param interceptorCallback The injected callback, should implementation IFormPublishInterceptor.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t RegisterPublishFormInterceptor(const sptr<IRemoteObject> &interceptorCallback) override;
+
+    /**
+     * @brief Unregisters the callback to publish form. The callback is used to process the publish form request
+     * when the system handler is not found.
+     * @param interceptorCallback The injected callback, should implementation IFormPublishInterceptor.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t UnregisterPublishFormInterceptor(const sptr<IRemoteObject> &interceptorCallback) override;
+
 private:
     template<typename T>
     int GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos);

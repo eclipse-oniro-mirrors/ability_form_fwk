@@ -64,6 +64,7 @@ ohos_unittest("FmsFormRenderRecordTest") {
     "hilog:libhilog",
     "hitrace:hitrace_meter",
     "ipc:ipc_core",
+    "napi:ace_napi",
   ]
 
   if (device_usage_statistics) {

@@ -17,6 +17,9 @@
 
 #include <vector>
 
+#ifdef SUPPORT_ERMS
+#include "erms_mgr_param.h"
+#endif
 #include "fms_log_wrapper.h"
 #include "form_bms_helper.h"
 #include "form_data_mgr.h"

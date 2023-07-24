@@ -69,7 +69,8 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
         newRecord.formProviderInfo.SetFormDataString(cacheData);
     }
 
-    FormRenderMgr::GetInstance().AddConnection(GetFormId(), this);
+    sptr<FormRenderConnection> connection(this);
+    FormRenderMgr::GetInstance().AddConnection(GetFormId(), connection);
     FormRenderMgr::GetInstance().AddRenderDeathRecipient(remoteObject);
     Want want;
     want.SetParams(wantParams_);

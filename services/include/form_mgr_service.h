@@ -485,6 +485,22 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode ReadFormConfigXML();
+
+    /**
+     * @brief Registers the callback for publish form. The callback is used to process the publish form request
+     * when the system handler is not found.
+     * @param interceptorCallback The injected callback, should implementation IFormPublishInterceptor.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t RegisterPublishFormInterceptor(const sptr<IRemoteObject> &interceptorCallback) override;
+
+    /**
+     * @brief Unregisters the callback for publish form. The callback is used to process the publish form request
+     * when the system handler is not found.
+     * @param interceptorCallback The injected callback, should implementation IFormPublishInterceptor.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t UnregisterPublishFormInterceptor(const sptr<IRemoteObject> &interceptorCallback) override;
 private:
     enum class DumpKey {
         KEY_DUMP_HELP = 0,

@@ -81,6 +81,13 @@ public:
      * @return Current system millisecond.
      */
     static int64_t GetCurrentMillisecond();
+
+    /**
+     * @brief Get current system microsecond.
+     * @return Current system microsecond.
+     */
+    static int64_t GetCurrentMicrosecond();
+
     /**
      * @brief Get millisecond from tm.
      * @param tmAtTime tm time.

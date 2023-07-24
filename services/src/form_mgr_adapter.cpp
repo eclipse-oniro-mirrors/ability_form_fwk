@@ -23,7 +23,9 @@
 #ifdef DEVICE_USAGE_STATISTICS_ENABLE
 #include "bundle_active_client.h"
 #endif
+#ifdef SUPPORT_ERMS
 #include "erms_mgr_interface.h"
+#endif
 #include "fms_log_wrapper.h"
 #include "form_acquire_connection.h"
 #include "form_acquire_data_connection.h"
@@ -42,6 +44,7 @@
 #include "form_event_notify_connection.h"
 #include "form_info_mgr.h"
 #include "form_mgr_errors.h"
+#include "form_publish_interceptor_interface.h"
 #include "form_observer_record.h"
 #include "form_provider_info.h"
 #include "form_provider_interface.h"
@@ -60,24 +63,20 @@
 #include "iservice_registry.h"
 #include "js_form_state_observer_interface.h"
 #include "nlohmann/json.hpp"
+#include "os_account_manager.h"
 #include "system_ability_definition.h"
 
 namespace OHOS {
 namespace AppExecFwk {
-using ErmsCallerInfo = OHOS::AppExecFwk::ErmsParams::CallerInfo;
-using ExperienceRule = OHOS::AppExecFwk::ErmsParams::ExperienceRule;
-
+#ifdef SUPPORT_ERMS
+using namespace OHOS::EcologicalRuleMgrService;
+#endif
 namespace {
 constexpr int32_t CALLING_UID_TRANSFORM_DIVISOR = 200000;
 constexpr int32_t SYSTEM_UID = 1000;
 const std::string POINT_ETS = ".ets";
 
-// Apps bundles that are allowed to publish form, should replace by the AG API in the future.
-const std::string BUNDLE_NAME_LAUNCHER = "com.ohos.launcher";
-const std::string BUNDLE_NAME_SERVICE_CENTER = "com.ohos.hag.famanager";
 const std::string EMPTY_BUNDLE = "";
-const std::unordered_set<std::string> PUBLISH_FORM_ALLOWED_SET = {BUNDLE_NAME_LAUNCHER,
-    BUNDLE_NAME_SERVICE_CENTER};
 } // namespace
 
 FormMgrAdapter::FormMgrAdapter()
@@ -646,6 +645,11 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
             continue;
         }
         matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+        FormInstance formInstance;
+        FormDataMgr::GetInstance().GetFormInstanceById(matchedFormId, formInstance);
+        if (formVisibleType == static_cast<int32_t>(formInstance.formVisiblity)) {
+            continue;
+        }
         FormRecord formRecord;
 
         // Update provider info to host
@@ -653,7 +657,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
             continue;
         }
         bool isVisibility = (formVisibleType == static_cast<int32_t>(FormVisibilityType::VISIBLE));
-        FormInstance formInstance;
+        // Get the updated card status
         FormDataMgr::GetInstance().GetFormInstanceById(matchedFormId, formInstance);
         std::string formHostName = formInstance.formHostName;
         std::string formAllHostName = EMPTY_BUNDLE;
@@ -1579,10 +1583,10 @@ ErrCode FormMgrAdapter::CheckPublishForm(Want &want)
         HILOG_ERROR("%{public}s fail, failed to get IBundleMgr.", __func__);
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
-    ErrCode errCode = CheckValidPublishEvent(iBundleMgr, bundleName, want);
-    if (errCode != ERR_OK) {
+
+    if (!IsValidPublishEvent(iBundleMgr, bundleName, want)) {
         HILOG_ERROR("Check valid publish event failed.");
-        return errCode;
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
     }
 
     if (want.GetElement().GetBundleName().empty()) {
@@ -1605,8 +1609,8 @@ ErrCode FormMgrAdapter::CheckPublishForm(Want &want)
     std::string abilityName = want.GetElement().GetAbilityName();
     std::string formName = want.GetStringParam(AppExecFwk::Constants::PARAM_FORM_NAME_KEY);
     std::vector<FormInfo> formInfos {};
-    errCode = FormInfoMgr::GetInstance()
-        .GetFormsInfoByModule(want.GetElement().GetBundleName(), moduleName, formInfos);
+    ErrCode errCode = FormInfoMgr::GetInstance()
+        .GetFormsInfoByModuleWithoutCheck(want.GetElement().GetBundleName(), moduleName, formInfos);
     if (errCode != ERR_OK) {
         HILOG_ERROR("%{public}s error, failed to get forms info.", __func__);
         return errCode;
@@ -1623,29 +1627,48 @@ ErrCode FormMgrAdapter::CheckPublishForm(Want &want)
     return ERR_APPEXECFWK_FORM_INVALID_PARAM;
 }
 
-ErrCode FormMgrAdapter::QueryPublishFormToHost(Want &want)
+ErrCode FormMgrAdapter::QueryPublishFormToHost(Want &wantToHost)
 {
-    int8_t hostId = want.GetIntParam(Constants::PARAM_FORM_HOST_ID,
-        static_cast<int8_t>(HostId::HOST_ID_LAUNCHER));
-    auto hostIter = HOST_MAP.find(static_cast<HostId>(hostId));
-    if (hostIter == HOST_MAP.end()) {
-        HILOG_ERROR("%{public}s, host id : %{public}d is invalid", __func__, hostId);
-        return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
-    }
-    auto element = hostIter->second;
-    want.SetElement(element);
+    AppExecFwk::AbilityInfo formAbilityInfo;
+    AppExecFwk::ExtensionAbilityInfo formExtensionAbilityInfo;
 
-    AppExecFwk::AbilityInfo abilityInfo;
-    AppExecFwk::ExtensionAbilityInfo extensionInfo;
     int callingUid = IPCSkeleton::GetCallingUid();
     int32_t userId = GetCurrentUserId(callingUid);
-    if (!FormBmsHelper::GetInstance().GetAbilityInfo(want, userId, abilityInfo, extensionInfo)) {
-        HILOG_ERROR("Failed to GetAbilityInfo for publishing form");
+    // If the host of publishing form is specified, check whether the host exists.
+    if (!FormBmsHelper::GetInstance().GetAbilityInfo(wantToHost, userId, formAbilityInfo, formExtensionAbilityInfo)) {
+        HILOG_ERROR("Failed to GetAbilityInfo");
         return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
     }
-    if (abilityInfo.name.empty() && extensionInfo.name.empty()) {
+
+    if (formAbilityInfo.name.empty() && formExtensionAbilityInfo.name.empty()) {
         HILOG_ERROR("Query ability failed, no form host ability found.");
         return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
+    }
+
+    // Query the highest priority ability or extension ability for publishing form
+    AppExecFwk::AbilityInfo abilityInfo;
+    AppExecFwk::ExtensionAbilityInfo extensionAbilityInfo;
+    if (!FormBmsHelper::GetInstance().GetAbilityInfoByAction(
+        Constants::FORM_PUBLISH_ACTION, userId, abilityInfo, extensionAbilityInfo)) {
+        HILOG_ERROR("Failed to ImplicitQueryInfoByPriority for publishing form");
+        return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
+    }
+
+    if (abilityInfo.name.empty() && extensionAbilityInfo.name.empty()) {
+        HILOG_ERROR("Query highest priority ability failed, no form host ability found.");
+        return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
+    }
+
+    if (!abilityInfo.name.empty()) {
+        // highest priority ability
+        HILOG_DEBUG("Query highest priority ability success. bundleName: %{public}s, ability:%{public}s",
+            abilityInfo.bundleName.c_str(), abilityInfo.name.c_str());
+        wantToHost.SetElementName(abilityInfo.bundleName, abilityInfo.name);
+    } else {
+        // highest priority extension ability
+        HILOG_DEBUG("Query highest priority extension ability success. bundleName: %{public}s, ability:%{public}s",
+            extensionAbilityInfo.bundleName.c_str(), extensionAbilityInfo.name.c_str());
+        wantToHost.SetElementName(extensionAbilityInfo.bundleName, extensionAbilityInfo.name);
     }
     return ERR_OK;
 }
@@ -1667,13 +1690,28 @@ ErrCode FormMgrAdapter::RequestPublishFormToHost(Want &want)
     bool tempFormFlag = want.GetBoolParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
     wantToHost.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, tempFormFlag);
     int32_t userId = want.GetIntParam(Constants::PARAM_FORM_USER_ID, -1);
+    std::string bundleName = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_BUNDLE_KEY);
+    std::string abilityName = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_ABILITY_KEY);
+    wantToHost.SetElementName(bundleName, abilityName);
     wantToHost.SetAction(Constants::FORM_PUBLISH_ACTION);
 
     ErrCode errCode = QueryPublishFormToHost(wantToHost);
     if (errCode == ERR_OK) {
         return FormAmsHelper::GetInstance().StartAbility(wantToHost, userId);
     }
-    return errCode;
+
+    // Handle by interceptor callback when the system handler is not found.
+    if (formPublishInterceptor_ == nullptr) {
+        HILOG_DEBUG("query publish form failed, and have not publish interceptor. errCode:%{public}d.", errCode);
+        return errCode;
+    }
+    int ret = formPublishInterceptor_->ProcessPublishForm(wantToHost);
+    if (ret == ERR_OK) {
+        HILOG_DEBUG("success to ProcessPublishForm.");
+    } else {
+        HILOG_ERROR("failed to ProcessPublishForm.");
+    }
+    return ret;
 }
 
 ErrCode FormMgrAdapter::RequestPublishForm(Want &want, bool withFormBindingData,
@@ -1914,7 +1952,7 @@ bool FormMgrAdapter::IsUpdateValid(const int64_t formId, const std::string &bund
  */
 int FormMgrAdapter::EnableUpdateForm(const std::vector<int64_t> formIDs, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("enableUpdateForm");
+    HILOG_DEBUG("enableUpdateForm");
     return HandleUpdateFormFlag(formIDs, callerToken, true, false);
 }
 
@@ -1926,7 +1964,7 @@ int FormMgrAdapter::EnableUpdateForm(const std::vector<int64_t> formIDs, const s
  */
 int FormMgrAdapter::DisableUpdateForm(const std::vector<int64_t> formIDs, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("disableUpdateForm");
+    HILOG_DEBUG("disableUpdateForm");
     return HandleUpdateFormFlag(formIDs, callerToken, false, false);
 }
 
@@ -2120,19 +2158,20 @@ int FormMgrAdapter::BackgroundEvent(const int64_t formId, Want &want, const sptr
 ErrCode FormMgrAdapter::HandleUpdateFormFlag(const std::vector<int64_t> &formIds,
     const sptr<IRemoteObject> &callerToken, bool flag, bool isOnlyEnableUpdate)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_DEBUG("called.");
     if (formIds.empty() || callerToken == nullptr) {
-        HILOG_ERROR("%{public}s, invalid param", __func__);
+        HILOG_ERROR("invalid param");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     std::vector<int64_t> refreshForms;
     int errCode = FormDataMgr::GetInstance().UpdateHostFormFlag(formIds, callerToken,
         flag, isOnlyEnableUpdate, refreshForms);
     if (errCode == ERR_OK && !refreshForms.empty()) {
+        int32_t userId = FormUtil::GetCurrentAccountId();
         for (const int64_t id : refreshForms) {
-            HILOG_INFO("%{public}s, formRecord need refresh: %{public}" PRId64 "", __func__, id);
+            HILOG_DEBUG("formRecord need refresh: %{public}" PRId64 "", id);
             Want want;
-            want.SetParam(Constants::PARAM_FORM_USER_ID, FormUtil::GetCurrentAccountId());
+            want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
             FormProviderMgr::GetInstance().RefreshForm(id, want, false);
         }
     }
@@ -2308,34 +2347,16 @@ bool FormMgrAdapter::CheckIsSystemAppByBundleName(const sptr<IBundleMgr> &iBundl
  * @param want want of target form
  * @return Returns ERR_OK if the caller is in the whitelist.
  */
-ErrCode FormMgrAdapter::CheckValidPublishEvent(const sptr<IBundleMgr> &iBundleMgr,
+bool FormMgrAdapter::IsValidPublishEvent(const sptr<IBundleMgr> &iBundleMgr,
     const std::string &bundleName, const Want &want)
 {
     int32_t userId = FormUtil::GetCurrentAccountId();
     if (!CheckIsSystemAppByBundleName(iBundleMgr, userId, bundleName)) {
         HILOG_ERROR("Only system app can request publish form.");
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+        return false;
     }
-    sptr<IEcologicalRuleManager> iErMgr = FormBmsHelper::GetInstance().CheckEcologicalRuleMgr();
-    if (iErMgr != nullptr) {
-        // should update when AG supply the API
-        ExperienceRule rule;
-        ErmsCallerInfo callerInfo;
-        auto ret = iErMgr->IsSupportPublishForm(want, callerInfo, rule);
-        if (ret == ERR_OK && rule.isAllow) {
-            HILOG_DEBUG("check success from the erms");
-            return ERR_OK;
-        }
-        HILOG_WARN("check failed from the erms or the caller for publish form is not in the whitelist");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
-
-    // when AG supply the function "IsSupportPublishForm", the following code should remove.
-    if (PUBLISH_FORM_ALLOWED_SET.find(bundleName) != PUBLISH_FORM_ALLOWED_SET.end()) {
-        return ERR_OK;
-    }
-    HILOG_WARN("the caller for publish form is not in the whitelist");
-    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    std::vector<Want> wants{want};
+    return IsErmsSupportPublishForm(bundleName, wants);
 }
 
 /**
@@ -2370,6 +2391,7 @@ int32_t FormMgrAdapter::GetCurrentUserId(const int callingUid)
 {
     // get current userId
     int32_t userId = callingUid / CALLING_UID_TRANSFORM_DIVISOR;
+    AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(callingUid, userId);
     return userId;
 }
 
@@ -2451,7 +2473,8 @@ ErrCode FormMgrAdapter::AcquireFormStateCheck(const std::string &bundleName,
     }
 
     std::vector<FormInfo> formInfos {};
-    ErrCode errCode = FormInfoMgr::GetInstance().GetFormsInfoByModule(bundleName, moduleName, formInfos);
+    ErrCode errCode = FormInfoMgr::GetInstance()
+        .GetFormsInfoByModuleWithoutCheck(want.GetElement().GetBundleName(), moduleName, formInfos);
     if (errCode != ERR_OK) {
         HILOG_ERROR("%{public}s error, failed to get forms info.", __func__);
         return errCode;
@@ -2626,22 +2649,29 @@ int FormMgrAdapter::GetFormsInfoByModule(const std::string &bundleName,
 bool FormMgrAdapter::IsRequestPublishFormSupported()
 {
     /* Query the highest priority ability or extension ability for publishing form */
-    // when AG supply the function "IsSupportPublishForm", the following code should remove.
     std::string bundleName;
     if (!GetBundleName(bundleName)) {
         HILOG_ERROR("%{public}s failed to get BundleName", __func__);
         return false;
     }
-    if (PUBLISH_FORM_ALLOWED_SET.find(bundleName) == PUBLISH_FORM_ALLOWED_SET.end()) {
-        HILOG_WARN("%{public}s, the caller not in the whitelist", __func__);
+
+    std::vector<Want> wants;
+    bool isSupport = IsErmsSupportPublishForm(bundleName, wants);
+    if (!isSupport) {
+        HILOG_ERROR("Erms is not support to publish forms");
         return false;
     }
+
+    if (formPublishInterceptor_ != nullptr) {
+        HILOG_DEBUG("query publish form has publish interceptor, return true.");
+        return true;
+    }
+
+    auto action = Constants::FORM_PUBLISH_ACTION;
+    auto userId = GetCurrentUserId(IPCSkeleton::GetCallingUid());
     AppExecFwk::AbilityInfo abilityInfo;
     AppExecFwk::ExtensionAbilityInfo extensionAbilityInfo;
-    int callingUid = IPCSkeleton::GetCallingUid();
-    int32_t userId = GetCurrentUserId(callingUid);
-    if (!FormBmsHelper::GetInstance().GetAbilityInfoByAction(
-        Constants::FORM_PUBLISH_ACTION, userId, abilityInfo, extensionAbilityInfo)) {
+    if (!FormBmsHelper::GetInstance().GetAbilityInfoByAction(action, userId, abilityInfo, extensionAbilityInfo)) {
         HILOG_ERROR("Failed to ImplicitQueryInfoByPriority for publishing form");
         return false;
     }
@@ -2803,6 +2833,96 @@ void FormMgrAdapter::ClientDeathRecipient::OnRemoteDied(const wptr<IRemoteObject
 {
     HILOG_DEBUG("remote died");
     FormMgrAdapter::GetInstance().CleanResource(remote);
+}
+
+int32_t FormMgrAdapter::RegisterPublishFormInterceptor(const sptr<IRemoteObject> &interceptorCallback)
+{
+    HILOG_DEBUG("called.");
+    if (interceptorCallback == nullptr) {
+        HILOG_ERROR("interceptorCallback is null.");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    auto interceptor = iface_cast<AppExecFwk::IFormPublishInterceptor>(interceptorCallback);
+    if (interceptor == nullptr) {
+        HILOG_ERROR("RegisterPublishFormInterceptor failed.");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    formPublishInterceptor_ = interceptor;
+    return ERR_OK;
+}
+
+int32_t FormMgrAdapter::UnregisterPublishFormInterceptor(const sptr<IRemoteObject> &interceptorCallback)
+{
+    HILOG_DEBUG("called.");
+    if (interceptorCallback == nullptr) {
+        HILOG_ERROR("interceptorCallback is null.");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    auto interceptor = iface_cast<AppExecFwk::IFormPublishInterceptor>(interceptorCallback);
+    if (interceptor == nullptr) {
+        HILOG_ERROR("UnregisterPublishFormInterceptor failed.");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    if (formPublishInterceptor_ == interceptor) {
+        HILOG_DEBUG("UnregisterPublishFormInterceptor success.");
+        formPublishInterceptor_ = nullptr;
+        return ERR_OK;
+    }
+    HILOG_ERROR("the param not equal to the current interceptor.");
+    return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+}
+
+#ifdef SUPPORT_ERMS
+int32_t FormMgrAdapter::GetCallerType(std::string bundleName)
+{
+    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
+    if (iBundleMgr == nullptr) {
+        HILOG_ERROR("%{public}s fail, failed to get IBundleMgr.", __func__);
+        return ErmsCallerInfo::TYPE_INVALID;
+    }
+
+    AppExecFwk::ApplicationInfo callerAppInfo;
+    auto flag = AppExecFwk::ApplicationFlag::GET_BASIC_APPLICATION_INFO;
+    auto userId = GetCurrentUserId(IPCSkeleton::GetCallingUid());
+    bool getCallerResult = IN_PROCESS_CALL(iBundleMgr->GetApplicationInfo(bundleName, flag, userId, callerAppInfo));
+    if (!getCallerResult) {
+        HILOG_ERROR("Get callerAppInfo failed.");
+        return ErmsCallerInfo::TYPE_INVALID;
+    }
+
+    switch (callerAppInfo.bundleType) {
+        case AppExecFwk::BundleType::ATOMIC_SERVICE:
+            return ErmsCallerInfo::TYPE_ATOM_SERVICE;
+        case AppExecFwk::BundleType::APP:
+            return ErmsCallerInfo::TYPE_HARMONY_APP;
+        default:
+            HILOG_WARN("the caller type is not harmony app or atom service: %{public}d", callerAppInfo.bundleType);
+            break;
+    }
+    return ErmsCallerInfo::TYPE_INVALID;
+}
+#endif
+
+bool FormMgrAdapter::IsErmsSupportPublishForm(std::string bundleName, std::vector<Want> wants)
+{
+    bool isSupport = true;
+#ifdef SUPPORT_ERMS
+    ErmsCallerInfo callerInfo;
+    callerInfo.packageName = bundleName;
+    callerInfo.uid = IPCSkeleton::GetCallingUid();
+    callerInfo.pid = IPCSkeleton::GetCallingPid();
+    callerInfo.callerAppType = GetCallerType(bundleName);
+
+    auto start = FormUtil::GetCurrentMicrosecond();
+    int32_t ret = EcologicalRuleMgrServiceClient::GetInstance()->IsSupportPublishForm(wants, callerInfo, isSupport);
+    auto end = FormUtil::GetCurrentMicrosecond();
+    HILOG_INFO("[ERMS-DFX] IsSupportPublishForm cost %{public}" PRId64 " micro seconds", (end - start));
+    if (ret != ERR_OK) {
+        HILOG_ERROR("call IsSupportPublishForm failed: %{public}d, default is support.", ret);
+        return true;
+    }
+#endif
+    return isSupport;
 }
 } // namespace AppExecFwk
 } // namespace OHOS

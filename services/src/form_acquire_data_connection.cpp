@@ -42,7 +42,8 @@ void FormAcquireDataConnection::OnAbilityConnectDone(const AppExecFwk::ElementNa
         return;
     }
 
-    FormSupplyCallback::GetInstance()->AddConnection(this);
+    sptr<FormAcquireDataConnection> connection(this);
+    FormSupplyCallback::GetInstance()->AddConnection(connection);
     Want want;
     want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
     want.SetParam(Constants::FORM_ACQUIRE_DATA_REQUEST_CODE, formRequestCode_);

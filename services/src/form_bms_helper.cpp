@@ -16,8 +16,10 @@
 #include "form_bms_helper.h"
 
 #include "ability_manager_interface.h"
+#ifndef SUPPORT_ERMS
 #include "erms_mgr_interface.h"
 #include "erms_mgr_param.h"
+#endif
 #include "fms_log_wrapper.h"
 #include "form_mgr_errors.h"
 #include "if_system_ability_manager.h"
@@ -60,40 +62,6 @@ void FormBmsHelper::SetBundleManager(const sptr<IBundleMgr> &bundleManager)
 {
     HILOG_DEBUG("SetBundleManager called.");
     iBundleMgr_ = bundleManager;
-}
-
-sptr<IEcologicalRuleManager> FormBmsHelper::CheckEcologicalRuleMgr()
-{
-    HILOG_INFO("CheckEcologicalRuleMgr called.");
-
-    if (iErMgr_ != nullptr) {
-        HILOG_DEBUG("ecological rule mgr already get.");
-        return iErMgr_;
-    }
-    sptr<ISystemAbilityManager> systemAbilityManager =
-            SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (systemAbilityManager == nullptr) {
-        HILOG_ERROR("fail to get systemAbilityManager.");
-        return nullptr;
-    }
-    auto remoteObject = systemAbilityManager->CheckSystemAbility(ECOLOGICAL_RULE_SA_ID);
-    if (remoteObject == nullptr) {
-        HILOG_ERROR("failed to get ecological rule manager service.");
-        return nullptr;
-    }
-
-    iErMgr_ = iface_cast<IEcologicalRuleManager>(remoteObject);
-    if (iErMgr_ == nullptr) {
-        HILOG_ERROR("failed to cast ecological rule manager service.");
-        return nullptr;
-    }
-    return iErMgr_;
-}
-
-void FormBmsHelper::SetEcologicalRuleMgr(const sptr<IEcologicalRuleManager> &ecologicalRuleManager)
-{
-    HILOG_INFO("SetEcologicalRuleMgr called.");
-    iErMgr_ = ecologicalRuleManager;
 }
 
 /**
