@@ -62,6 +62,11 @@ bool FormCacheMgr::GetData(const int64_t formId, std::string &data) const
  */
 bool FormCacheMgr::AddData(const int64_t formId, const std::string &data)
 {
+    nlohmann::json dataObj = nlohmann::json::parse(data, nullptr, false);
+    if (dataObj.is_discarded()) {
+        HILOG_ERROR("failed to parse data: %{public}s.", data.c_str());
+        return false;
+    }
     std::lock_guard<std::mutex> lock(cacheMutex_);
     auto formData = cacheData_.find(formId);
     if (formData == cacheData_.end()) {
@@ -80,12 +85,6 @@ bool FormCacheMgr::AddData(const int64_t formId, const std::string &data)
         nlohmann::json cacheObj = nlohmann::json::parse(cacheStr, nullptr, false);
         if (cacheObj.is_discarded()) {
             HILOG_ERROR("failed to parse cache: %{public}s.", cacheStr.c_str());
-            return false;
-        }
-
-        nlohmann::json dataObj = nlohmann::json::parse(data, nullptr, false);
-        if (dataObj.is_discarded()) {
-            HILOG_ERROR("failed to parse data: %{public}s.", data.c_str());
             return false;
         }
 
