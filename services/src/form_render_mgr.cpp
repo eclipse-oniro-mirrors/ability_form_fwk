@@ -145,6 +145,9 @@ ErrCode FormRenderMgr::UpdateRenderingForm(int64_t formId, const FormProviderDat
         std::string jsonData = formRecord.formProviderInfo.GetFormDataString();
         HILOG_DEBUG("%{public}s, jsonData is %{private}s.", __func__, jsonData.c_str());
         FormCacheMgr::GetInstance().AddData(formId, jsonData);
+    } else {
+        HILOG_DEBUG("need to delete data.");
+        FormCacheMgr::GetInstance().DeleteData(formId);
     }
     FormDataMgr::GetInstance().SetFormCacheInited(formId, true);
 
