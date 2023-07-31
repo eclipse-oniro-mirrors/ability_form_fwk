@@ -19,6 +19,7 @@ namespace {
     bool g_mockDeleteDataRet = true;
     bool g_mockIsExistRet = true;
     bool g_mockGetDataRet = true;
+    bool g_mockAddDataRet = true;
 }
 
 void MockDeleteData(bool mockRet)
@@ -28,7 +29,7 @@ void MockDeleteData(bool mockRet)
 
 void MockIsExist(bool mockRet)
 {
-    g_mockIsExistRet = mockRet;
+    g_mockIsExistRet = !mockRet;
 }
 
 void MockGetData(bool mockRet)
@@ -37,22 +38,29 @@ void MockGetData(bool mockRet)
 }
 namespace OHOS {
 namespace AppExecFwk {
-FormCacheMgr::FormCacheMgr()
-{}
-FormCacheMgr::~FormCacheMgr()
-{}
+FormCacheMgr::FormCacheMgr() {}
+
+FormCacheMgr::~FormCacheMgr() {}
+
+void FormCacheMgr::Start() {}
 
 bool FormCacheMgr::DeleteData(const int64_t formId)
 {
     return g_mockDeleteDataRet;
 }
 
-bool FormCacheMgr::IsExist(const int64_t formId) const
+bool FormCacheMgr::NeedAcquireProviderData(const int64_t formId) const
 {
     return g_mockIsExistRet;
 }
 
-bool FormCacheMgr::GetData(const int64_t formId, std::string &data) const
+bool FormCacheMgr::AddData(int64_t formId, const FormProviderData &formProviderData)
+{
+    return g_mockAddDataRet;
+}
+
+bool FormCacheMgr::GetData(int64_t formId, std::string &data,
+        std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> &imageDataMap) const
 {
     return g_mockGetDataRet;
 }

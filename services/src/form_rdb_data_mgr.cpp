@@ -23,6 +23,7 @@
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
 #include "form_mgr_errors.h"
+#include "scope_guard.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -134,6 +135,21 @@ ErrCode FormRdbDataMgr::Init()
     return CreateTable();
 }
 
+ErrCode FormRdbDataMgr::ExecuteSql(const std::string &sql)
+{
+    if (rdbStore_ == nullptr) {
+        HILOG_ERROR("FormInfoRdbStore is null");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
+    int ret = rdbStore_->ExecuteSql(sql);
+    if (ret != NativeRdb::E_OK) {
+        HILOG_ERROR("ExecuteSql failed, ret: %{public}d", ret);
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    return ERR_OK;
+}
+
 ErrCode FormRdbDataMgr::InsertData(const std::string &key)
 {
     HILOG_DEBUG("InsertData start");
@@ -195,6 +211,41 @@ ErrCode FormRdbDataMgr::DeleteData(const std::string &key)
     return ERR_OK;
 }
 
+ErrCode FormRdbDataMgr::QueryData(const std::string &key, std::string &value)
+{
+    HILOG_DEBUG("QueryData start");
+    if (rdbStore_ == nullptr) {
+        HILOG_ERROR("FormInfoRdbStore is null");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
+    NativeRdb::AbsRdbPredicates absRdbPredicates(formRdbConfig_.tableName);
+    absRdbPredicates.EqualTo(FORM_KEY, key);
+    auto absSharedResultSet = rdbStore_->Query(absRdbPredicates, std::vector<std::string>());
+    if (absSharedResultSet == nullptr) {
+        HILOG_ERROR("absSharedResultSet failed");
+        return false;
+    }
+    ScopeGuard stateGuard([&] { absSharedResultSet->Close(); });
+    if (!absSharedResultSet->HasBlock()) {
+        HILOG_ERROR("absSharedResultSet has no block");
+        return false;
+    }
+    auto ret = absSharedResultSet->GoToFirstRow();
+    if (ret != NativeRdb::E_OK) {
+        HILOG_ERROR("GoToFirstRow failed, ret: %{public}d", ret);
+        return false;
+    }
+
+    ret = absSharedResultSet->GetString(FORM_VALUE_INDEX, value);
+    if (ret != NativeRdb::E_OK) {
+        HILOG_ERROR("QueryData failed, ret: %{public}d", ret);
+        return false;
+    }
+
+    return true;
+}
+
 ErrCode FormRdbDataMgr::QueryData(const std::string &key, std::unordered_map<std::string, std::string> &values)
 {
     HILOG_DEBUG("QueryData start");
@@ -206,8 +257,14 @@ ErrCode FormRdbDataMgr::QueryData(const std::string &key, std::unordered_map<std
     NativeRdb::AbsRdbPredicates absRdbPredicates(formRdbConfig_.tableName);
     absRdbPredicates.BeginsWith(FORM_KEY, key);
     auto absSharedResultSet = rdbStore_->Query(absRdbPredicates, std::vector<std::string>());
-    if (absSharedResultSet == nullptr || !absSharedResultSet->HasBlock()) {
+    if (absSharedResultSet == nullptr) {
         HILOG_ERROR("absSharedResultSet failed");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
+    ScopeGuard stateGuard([&] { absSharedResultSet->Close(); });
+    if (!absSharedResultSet->HasBlock()) {
+        HILOG_ERROR("absSharedResultSet has no block");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -245,8 +302,14 @@ ErrCode FormRdbDataMgr::QueryAllData(std::unordered_map<std::string, std::string
 
     NativeRdb::AbsRdbPredicates absRdbPredicates(formRdbConfig_.tableName);
     auto absSharedResultSet = rdbStore_->Query(absRdbPredicates, std::vector<std::string>());
-    if (absSharedResultSet == nullptr || !absSharedResultSet->HasBlock()) {
+    if (absSharedResultSet == nullptr) {
         HILOG_ERROR("absSharedResultSet failed");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
+    ScopeGuard stateGuard([&] { absSharedResultSet->Close(); });
+    if (!absSharedResultSet->HasBlock()) {
+        HILOG_ERROR("absSharedResultSet has no block");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -270,7 +333,6 @@ ErrCode FormRdbDataMgr::QueryAllData(std::unordered_map<std::string, std::string
 
         datas.emplace(resultKey, resultValue);
     } while (absSharedResultSet->GoToNextRow() == NativeRdb::E_OK);
-    absSharedResultSet->Close();
     return ERR_OK;
 }
 
@@ -289,9 +351,9 @@ ErrCode FormRdbDataMgr::QueryAllKeys(std::set<std::string> &datas)
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
+    ScopeGuard stateGuard([&] { absSharedResultSet->Close(); });
     if (!absSharedResultSet->HasBlock() || absSharedResultSet->GoToFirstRow() != NativeRdb::E_OK) {
         HILOG_ERROR("HasBlock or GoToFirstRow failed");
-        absSharedResultSet->Close();
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -299,14 +361,60 @@ ErrCode FormRdbDataMgr::QueryAllKeys(std::set<std::string> &datas)
         std::string resultKey;
         if (absSharedResultSet->GetString(FORM_KEY_INDEX, resultKey) != NativeRdb::E_OK) {
             HILOG_ERROR("GetString key failed");
-            absSharedResultSet->Close();
             return ERR_APPEXECFWK_FORM_COMMON_CODE;
         }
 
         datas.insert(resultKey);
     } while (absSharedResultSet->GoToNextRow() == NativeRdb::E_OK);
-    absSharedResultSet->Close();
     return ERR_OK;
+}
+
+std::shared_ptr<NativeRdb::AbsSharedResultSet> FormRdbDataMgr::QueryData(
+    const NativeRdb::AbsRdbPredicates &absRdbPredicates)
+{
+    HILOG_DEBUG("QueryData start");
+    if (rdbStore_ == nullptr) {
+        HILOG_ERROR("FormInfoRdbStore is null");
+        return nullptr;
+    }
+
+    return rdbStore_->Query(absRdbPredicates, std::vector<std::string>());
+}
+
+std::shared_ptr<NativeRdb::AbsSharedResultSet> FormRdbDataMgr::QuerySql(const std::string &sql)
+{
+    HILOG_DEBUG("QuerySql start");
+    if (rdbStore_ == nullptr) {
+        HILOG_ERROR("FormInfoRdbStore is null");
+        return nullptr;
+    }
+
+    return rdbStore_->QuerySql(sql, std::vector<std::string>());
+}
+
+bool FormRdbDataMgr::InsertData(
+    const std::string &tableName, const NativeRdb::ValuesBucket &valuesBucket, int64_t &rowId)
+{
+    HILOG_DEBUG("InsertData start");
+    if (rdbStore_ == nullptr) {
+        HILOG_ERROR("FormInfoRdbStore is null");
+        return false;
+    }
+
+    auto ret = rdbStore_->InsertWithConflictResolution(
+        rowId, tableName, valuesBucket, NativeRdb::ConflictResolution::ON_CONFLICT_REPLACE);
+    return ret == NativeRdb::E_OK;
+}
+
+bool FormRdbDataMgr::DeleteData(const NativeRdb::AbsRdbPredicates &absRdbPredicates)
+{
+    if (rdbStore_ == nullptr) {
+        HILOG_ERROR("FormInfoRdbStore is null");
+        return false;
+    }
+
+    int32_t rowId = -1;
+    return rdbStore_->Delete(rowId, absRdbPredicates) == NativeRdb::E_OK;
 }
 } // namespace AppExecFwk
 } // namespace OHOS
