@@ -980,7 +980,7 @@ void FormTimerMgr::ClearUpdateAtTimerResource()
         updateAtTimerId_ = 0L;
     }
     if (currentUpdateAtWantAgent_ != nullptr) {
-        WantAgentHelper::Cancel(currentUpdateAtWantAgent_);
+        IN_PROCESS_CALL(WantAgentHelper::Cancel(currentUpdateAtWantAgent_));
         currentUpdateAtWantAgent_ = nullptr;
     }
     HILOG_INFO("%{public}s end", __func__);
@@ -1054,7 +1054,7 @@ void FormTimerMgr::ClearLimiterTimerResource()
         limiterTimerId_ = 0L;
     }
     if (currentLimiterWantAgent_ != nullptr) {
-        WantAgentHelper::Cancel(currentLimiterWantAgent_);
+        IN_PROCESS_CALL(WantAgentHelper::Cancel(currentLimiterWantAgent_));
         currentLimiterWantAgent_ = nullptr;
     }
     HILOG_INFO("%{public}s end", __func__);
@@ -1185,7 +1185,7 @@ void FormTimerMgr::ClearDynamicResource()
     }
 
     if (currentDynamicWantAgent_ != nullptr) {
-        WantAgentHelper::Cancel(currentDynamicWantAgent_);
+        IN_PROCESS_CALL(WantAgentHelper::Cancel(currentDynamicWantAgent_));
         currentDynamicWantAgent_ = nullptr;
     }
     HILOG_INFO("%{public}s end", __func__);
