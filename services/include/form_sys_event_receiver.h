@@ -50,6 +50,7 @@ public:
     }
 private:
     void HandleUserIdRemoved(const int32_t userId); // multiuser
+    void HandleSetFormRenderState();
     bool IsSameForm(const FormRecord &record, const FormInfo &formInfo);
     void HandleBundleScanFinished(int32_t userId);
 private:

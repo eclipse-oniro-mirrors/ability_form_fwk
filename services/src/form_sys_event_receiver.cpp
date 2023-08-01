@@ -23,6 +23,7 @@
 #include "form_data_mgr.h"
 #include "form_db_cache.h"
 #include "form_info_mgr.h"
+#include "form_render_mgr.h"
 #include "form_serial_queue.h"
 #include "form_timer_mgr.h"
 #include "in_process_call_wrapper.h"
@@ -54,7 +55,8 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
         return;
     }
     if (bundleName.empty() && action != EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED &&
-        action != COMMON_EVENT_BUNDLE_SCAN_FINISHED) {
+        action != COMMON_EVENT_BUNDLE_SCAN_FINISHED &&
+        action != EventFwk::CommonEventSupport::COMMON_EVENT_USER_UNLOCKED) {
         HILOG_ERROR("%{public}s failed, invalid param, action: %{public}s, bundleName: %{public}s",
             __func__, action.c_str(), bundleName.c_str());
         return;
@@ -101,6 +103,14 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
             std::shared_ptr<FormSysEventReceiver> sharedThis = weakThis.lock();
             if (sharedThis) {
                 sharedThis->formEventHelper_.HandleBundleDataCleared(bundleName, userId);
+            }
+        };
+        serialQueue_->ScheduleTask(0, task);
+    } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_USER_UNLOCKED) {
+        auto task = [weakThis]() {
+            std::shared_ptr<FormSysEventReceiver> sharedThis = weakThis.lock();
+            if (sharedThis) {
+                sharedThis->formEventHelper_.HandleOnUnlock();
             }
         };
         serialQueue_->ScheduleTask(0, task);

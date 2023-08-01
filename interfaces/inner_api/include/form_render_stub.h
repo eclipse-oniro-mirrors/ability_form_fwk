@@ -71,6 +71,8 @@ private:
 
     int32_t HandleReloadForm(MessageParcel &data, MessageParcel &reply);
 
+    int32_t HandleOnUnlock(MessageParcel &data, MessageParcel &reply);
+
 private:
     template<typename T>
     int32_t GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos);

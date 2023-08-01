@@ -44,6 +44,8 @@ public:
     ErrCode UpdateRenderingForm(int64_t formId, const FormProviderData &formProviderData,
         const WantParams &wantParams, bool mergeData);
 
+    ErrCode OnUnlock();
+
     ErrCode StopRenderingForm(int64_t formId, const FormRecord &formRecord, const std::string &compId = "", const sptr<IRemoteObject> &hostToken = nullptr);
 
     ErrCode ReloadForm(const std::vector<FormRecord> &&formRecords, const std::string &bundleName, int32_t userId);
@@ -51,6 +53,8 @@ public:
     ErrCode RenderFormCallback(int64_t formId, const Want &want);
 
     ErrCode StopRenderingFormCallback(int64_t formId, const Want &want);
+
+    void GetFormRenderState();
 
     ErrCode AddConnection(int64_t formId, sptr<FormRenderConnection> connection);
 
@@ -71,6 +75,8 @@ public:
     void OnRenderingBlock(const std::string &bundleName);
 
     ErrCode ReleaseRenderer(int64_t formId, const FormRecord &formRecord, const std::string &compId);
+
+    void SetFormRenderState(bool isVerified);
 
 private:
     ErrCode ConnectRenderService(const sptr<FormRenderConnection> &connection) const;
@@ -93,6 +99,7 @@ private:
     };
 
     mutable std::mutex resourceMutex_;
+    mutable std::mutex isVerifiedMutex_;
     // <formId, connectionToRenderService>
     std::unordered_map<int64_t, sptr<FormRenderConnection>> renderFormConnections_;
     // <hostToken, formIds>
@@ -100,6 +107,7 @@ private:
     sptr<IFormRender> renderRemoteObj_ = nullptr;
     sptr<IRemoteObject::DeathRecipient> renderDeathRecipient_ = nullptr;
     std::atomic<int32_t> atomicRerenderCount_ = 0;
+    std::atomic<bool> isVerified_ = false;
 };
 
 /**

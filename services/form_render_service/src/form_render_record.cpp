@@ -882,6 +882,35 @@ int32_t FormRenderRecord::ReloadFormRecord(const std::vector<FormJsInfo> &&formJ
     return ERR_OK;
 }
 
+int32_t FormRenderRecord::OnUnlock()
+{
+    HILOG_DEBUG("OnUnlock called");
+    std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
+    auto task = [thisWeakPtr]() {
+        HILOG_DEBUG("HandleOnUnlock begin.");
+        auto renderRecord = thisWeakPtr.lock();
+        if (renderRecord == nullptr) {
+            HILOG_ERROR("renderRecord is nullptr.");
+            return;
+        }
+        renderRecord->HandleOnUnlock();
+    };
+    eventHandler_->PostTask(task);
+    return ERR_OK;
+}
+
+int32_t FormRenderRecord::HandleOnUnlock()
+{
+    HILOG_INFO("HandleOnUnlock called.");
+    std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
+    for (auto iter = formRendererGroupMap_.begin(); iter != formRendererGroupMap_.end(); ++iter) {
+        if (iter->second) {
+            iter->second->OnUnlock();
+        }
+    }
+    return ERR_OK;
+}
+
 int32_t FormRenderRecord::HandleReloadFormRecord(const std::vector<FormJsInfo> &&formJsInfos, const Want &want)
 {
     HILOG_INFO("Reload record in js thread.");

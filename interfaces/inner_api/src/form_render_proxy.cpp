@@ -226,6 +226,34 @@ int32_t FormRenderProxy::ReloadForm(const std::vector<FormJsInfo> &&formJsInfos,
     return ERR_OK;
 }
 
+int32_t FormRenderProxy::OnUnlock()
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_ASYNC);
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("%{public}s, failed to write interface token", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!Remote()) {
+        HILOG_ERROR("Remote obj is nullptr");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    int32_t error = Remote()->SendRequest(
+        static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_UNLOCKED),
+        data,
+        reply,
+        option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("failed to SendRequest: %{public}d", error);
+        return error;
+    }
+
+    return ERR_OK;
+}
+
 template<typename T>
 int32_t FormRenderProxy::WriteParcelableVector(const std::vector<T> &parcelableVector, MessageParcel &reply)
 {

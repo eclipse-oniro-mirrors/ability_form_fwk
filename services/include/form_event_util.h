@@ -51,6 +51,7 @@ public:
     void ReCreateForm(const int64_t formId);
     void BatchDeleteNoHostDBForms(const int uid, std::map<FormIdKey, std::set<int64_t>> &noHostFormDbMap,
         std::map<int64_t, bool> &removedFormsMap);
+    void HandleOnUnlock();
 
 private:
     void UpdateFormRecord(const FormInfo &formInfo, FormRecord &formRecord);

@@ -205,6 +205,9 @@ namespace Constants {
     constexpr const char* FORM_PROCESS_ON_ADD_SURFACE = "ohos.extra.param.key.process_on_add_surface";
     constexpr const char* FORM_ALLOW_UPDATE = "allowUpdate";
 
+    // The state of whether the ArkTs card can be rendered
+    constexpr const char FORM_RENDER_STATE[] = "ohos.extra.param.key.form_render_state";
+
     //CallEvent
     constexpr const char* FORM_CALL_EVENT_PARAMS = "params";
     constexpr const char* PARAM_FORM_CALL_EVENT_METHOD_KEY = "method";

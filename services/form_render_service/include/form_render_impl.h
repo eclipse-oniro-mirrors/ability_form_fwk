@@ -88,6 +88,8 @@ public:
     int32_t ReleaseRenderer(
         int64_t formId, const std::string &compId, const std::string &uid) override;
 
+    int32_t OnUnlock() override;
+
 private:
     std::mutex renderRecordMutex_;
     std::unordered_map<std::string, std::shared_ptr<FormRenderRecord>> renderRecordMap_; // <uid(userId + bundleName), renderRecord>
