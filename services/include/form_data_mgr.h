@@ -631,7 +631,7 @@ public:
      * @brief Get form instance by formId.
      * @param formId formId Indicates the unique id of form.
      * @param formInstance return formInstance
-     * @return return ERR_OK on get info success,other on failure.
+     * @return return ERR_OK on get info success, others on failure.
      */
     ErrCode GetFormInstanceById(const int64_t formId, FormInstance &formInstances);
 
@@ -640,7 +640,7 @@ public:
      * @param formId formId Indicates the unique id of form.
      * @param isIncludeUnused Indicates whether to include unused forms.
      * @param formInstance return formInstance
-     * @return return ERR_OK on get info success,other on failure.
+     * @return return ERR_OK on get info success, others on failure.
      */
     ErrCode GetFormInstanceById(const int64_t formId, bool isIncludeUnused, FormInstance &formInstances);
 

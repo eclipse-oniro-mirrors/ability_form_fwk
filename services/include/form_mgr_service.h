@@ -437,7 +437,7 @@ public:
      * @brief Get form instances by formId.
      * @param formId formId Indicates the unique id of form.
      * @param formInstance return formInstance
-     * @return return ERR_OK on get info success,other on failure.
+     * @return return ERR_OK on get info success, others on failure.
      */
     ErrCode GetFormInstanceById(const int64_t formId, FormInstance &formInstance) override;
 
@@ -446,7 +446,7 @@ public:
      * @param formId formId Indicates the unique id of form.
      * @param isIncludeUnused Indicates whether to include unused form instances.
      * @param formInstance return formInstance
-     * @return return ERR_OK on get info success,other on failure.
+     * @return return ERR_OK on get info success, others on failure.
      */
     ErrCode GetFormInstanceById(const int64_t formId, bool isIncludeUnused, FormInstance &formInstance) override;
 
@@ -523,6 +523,8 @@ private:
      * @brief initialization of form manager service.
      */
     ErrCode Init();
+
+    ErrCode CheckFormObserverPermission();
 
     ErrCode CheckFormPermission();
 

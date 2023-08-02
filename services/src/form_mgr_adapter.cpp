@@ -2754,6 +2754,7 @@ ErrCode FormMgrAdapter::GetFormInstanceById(const int64_t formId, bool isInclude
 ErrCode FormMgrAdapter::RegisterAddObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken)
 {
     HILOG_DEBUG("called.");
+    std::lock_guard<std::mutex> lock(formObserversMutex_);
     auto formObserver = formObservers_.find(bundleName);
     if (formObserver == formObservers_.end()) {
         formObservers_.emplace(bundleName, callerToken);
@@ -2769,6 +2770,7 @@ ErrCode FormMgrAdapter::RegisterAddObserver(const std::string &bundleName, const
 ErrCode FormMgrAdapter::RegisterRemoveObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken)
 {
     HILOG_DEBUG("called.");
+    std::lock_guard<std::mutex> lock(formObserversMutex_);
     auto formObserver = formObservers_.find(bundleName);
     if (formObserver == formObservers_.end()) {
         HILOG_ERROR("bundleName is not exist");
@@ -2794,7 +2796,7 @@ void FormMgrAdapter::SetDeathRecipient(const sptr<IRemoteObject> &callerToken,
         HILOG_ERROR("The callerToken or the deathRecipient is empty");
         return;
     }
-    std::lock_guard<std::recursive_mutex> lock(deathRecipientsMutex_);
+    std::lock_guard<std::mutex> lock(deathRecipientsMutex_);
     auto iter = deathRecipients_.find(callerToken);
     if (iter == deathRecipients_.end()) {
         deathRecipients_.emplace(callerToken, deathRecipient);
@@ -2814,17 +2816,18 @@ void FormMgrAdapter::CleanResource(const wptr<IRemoteObject> &remote)
         HILOG_ERROR("remote object is nullptr");
         return;
     }
-    std::lock_guard<std::recursive_mutex> lock(formObserversMutex_);
-    for (auto it = formObservers_.begin(); it != formObservers_.end();) {
-        auto& observer = it->second;
-        if (observer == object) {
-            it = formObservers_.erase(it);
-        } else {
-            ++it;
+    {
+        std::lock_guard<std::mutex> lock(formObserversMutex_);
+        for (auto it = formObservers_.begin(); it != formObservers_.end();) {
+            auto& observer = it->second;
+            if (observer == object) {
+                it = formObservers_.erase(it);
+            } else {
+                ++it;
+            }
         }
     }
-
-    std::lock_guard<std::recursive_mutex> deathLock(deathRecipientsMutex_);
+    std::lock_guard<std::mutex> deathLock(deathRecipientsMutex_);
     auto iter = deathRecipients_.find(object);
     if (iter != deathRecipients_.end()) {
         auto deathRecipient = iter->second;
