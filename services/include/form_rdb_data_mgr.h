@@ -108,6 +108,20 @@ public:
      */
     ErrCode QueryAllKeys(std::set<std::string> &datas);
 
+    ErrCode ExecuteSql(const std::string &sql);
+
+    ErrCode QueryData(const std::string &key, std::string &value);
+
+    std::shared_ptr<NativeRdb::AbsSharedResultSet> QueryData(
+        const NativeRdb::AbsRdbPredicates &absRdbPredicates);
+
+    std::shared_ptr<NativeRdb::AbsSharedResultSet> QuerySql(const std::string &sql);
+
+    bool InsertData(
+        const std::string &tableName, const NativeRdb::ValuesBucket &valuesBucket, int64_t &rowId);
+
+    bool DeleteData(const NativeRdb::AbsRdbPredicates &absRdbPredicates);
+
 private:
     ErrCode CreateTable();
 

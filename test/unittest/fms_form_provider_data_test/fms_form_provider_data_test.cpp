@@ -688,9 +688,9 @@ HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0032, TestSize.Level1)
 HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0033, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0033 start";
-    FormProviderData formProviderData("");
+    FormProviderData formProviderData("{'a':'1','b':'2'}");
     formProviderData.jsonFormProviderData_.clear();
-    EXPECT_TRUE(formProviderData.NeedCache());
+    EXPECT_FALSE(formProviderData.NeedCache());
     GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0033 end";
 }
 

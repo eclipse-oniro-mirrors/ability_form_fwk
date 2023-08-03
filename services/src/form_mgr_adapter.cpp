@@ -77,6 +77,15 @@ constexpr int32_t SYSTEM_UID = 1000;
 const std::string POINT_ETS = ".ets";
 
 const std::string EMPTY_BUNDLE = "";
+
+void ConvertRawImageData(
+    const std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> &imageDataMap,
+    FormJsInfo &formJsInfo)
+{
+    for (const auto &entry : imageDataMap) {
+        formJsInfo.imageDataMap[entry.first] = entry.second.first;
+    }
+}
 } // namespace
 
 FormMgrAdapter::FormMgrAdapter()
@@ -1052,11 +1061,14 @@ ErrCode FormMgrAdapter::AddExistFormRecord(const FormItemInfo &info, const sptr<
 
     FormRecord newRecord(record);
     std::string cacheData;
-    if (FormCacheMgr::GetInstance().GetData(formId, cacheData)) {
+    std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
+    bool hasCacheData = FormCacheMgr::GetInstance().GetData(formId, cacheData, imageDataMap);
+    if (hasCacheData) {
         newRecord.formProviderInfo.SetFormDataString(cacheData);
+        newRecord.formProviderInfo.SetImageDataMap(imageDataMap);
     }
     FormRenderMgr::GetInstance().RenderForm(newRecord, wantParams, callerToken);
-    if (newRecord.needRefresh || !FormCacheMgr::GetInstance().IsExist(newRecord.formId)) {
+    if (newRecord.needRefresh || FormCacheMgr::GetInstance().NeedAcquireProviderData(newRecord.formId)) {
         newRecord.isInited = false;
         FormDataMgr::GetInstance().SetFormCacheInited(formId, false);
 
@@ -1075,10 +1087,11 @@ ErrCode FormMgrAdapter::AddExistFormRecord(const FormItemInfo &info, const sptr<
         newRecord.formUserUids.emplace_back(callingUid);
     }
 
-    // create form info for js
-    if (FormCacheMgr::GetInstance().GetData(formId, cacheData)) {
+    if (hasCacheData) {
         formInfo.formData = cacheData;
+        ConvertRawImageData(imageDataMap, formInfo);
     }
+
     FormDataMgr::GetInstance().CreateFormJsInfo(formId, record, formInfo);
 
     // start update timer
@@ -1855,7 +1868,7 @@ ErrCode FormMgrAdapter::AddRequestPublishForm(const FormItemInfo &formItemInfo, 
         formJsInfo.formProviderData = *formProviderData;
         if (formProviderData->NeedCache()) {
             HILOG_INFO("%{public}s, data is less than 1k, cache data.", __func__);
-            FormCacheMgr::GetInstance().AddData(formId, formJsInfo.formData);
+            FormCacheMgr::GetInstance().AddData(formId, formJsInfo.formProviderData);
         }
     }
     // storage info
@@ -2305,9 +2318,11 @@ bool FormMgrAdapter::UpdateProviderInfoToHost(const int64_t &matchedFormId, cons
             FormProviderMgr::GetInstance().RefreshForm(formRecord.formId, want, false);
         } else {
             std::string cacheData;
+            std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
             // If the form has business cache, refresh the form host.
-            if (FormCacheMgr::GetInstance().GetData(matchedFormId, cacheData)) {
+            if (FormCacheMgr::GetInstance().GetData(matchedFormId, cacheData, imageDataMap)) {
                 formRecord.formProviderInfo.SetFormDataString(cacheData);
+                formRecord.formProviderInfo.SetImageDataMap(imageDataMap);
                 formHostRecord.OnUpdate(matchedFormId, formRecord);
             }
         }

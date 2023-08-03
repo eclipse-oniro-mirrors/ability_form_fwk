@@ -960,6 +960,7 @@ void FormDataMgr::CleanRemovedFormRecords(const std::string &bundleName, std::se
     for (itFormRecord = formRecords_.begin(); itFormRecord != formRecords_.end();) {
         auto itForm = std::find(removedForms.begin(), removedForms.end(), itFormRecord->first);
         if (itForm != removedForms.end()) {
+            FormCacheMgr::GetInstance().DeleteData(itFormRecord->first);
             FormRenderMgr::GetInstance().StopRenderingForm(itFormRecord->first, itFormRecord->second);
             itFormRecord = formRecords_.erase(itFormRecord);
         } else {
@@ -1335,7 +1336,7 @@ bool FormDataMgr::IsFormCached(const FormRecord record)
     if (record.versionUpgrade) {
         return false;
     }
-    return FormCacheMgr::GetInstance().IsExist(record.formId);
+    return FormCacheMgr::GetInstance().NeedAcquireProviderData(record.formId);
 }
 
 /**
