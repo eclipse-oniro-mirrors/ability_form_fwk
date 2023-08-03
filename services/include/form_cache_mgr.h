@@ -57,7 +57,7 @@ public:
 private:
     void CreateFormCacheTable();
     bool GetDataCacheFromDb(int64_t formId, FormCache &formCache) const;
-    bool SaveDataCacheToDb(int64_t formId, FormCache &formCache);
+    bool SaveDataCacheToDb(int64_t formId, const FormCache &formCache);
     bool DeleteDataCacheInDb(int64_t formId);
     bool GetImgCacheFromDb(int64_t rowId, std::vector<uint8_t> &blob, int32_t &size) const;
     bool SaveImgCacheToDb(const std::vector<uint8_t> &value, int32_t size, int64_t &rowId);
@@ -65,7 +65,7 @@ private:
 
     bool AddCacheData(const FormProviderData &formProviderData, FormCache &formCache);
     bool AddImgData(const FormProviderData &formProviderData, FormCache &formCache);
-    bool InnerAddImgData(
+    bool AddImgDataToDb(
         const FormProviderData &formProviderData, nlohmann::json &imgDataJson);
     bool GetImageDataFromAshmem(
         const std::string& picName, const sptr<Ashmem> &ashmem, int32_t len, std::vector<uint8_t> &value);

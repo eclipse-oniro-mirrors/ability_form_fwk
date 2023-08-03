@@ -223,10 +223,15 @@ ErrCode FormRdbDataMgr::QueryData(const std::string &key, std::string &value)
     absRdbPredicates.EqualTo(FORM_KEY, key);
     auto absSharedResultSet = rdbStore_->Query(absRdbPredicates, std::vector<std::string>());
     if (absSharedResultSet == nullptr) {
-        HILOG_ERROR("absSharedResultSet failed");
+        HILOG_ERROR("absSharedResultSet is nullptr");
         return false;
     }
-    ScopeGuard stateGuard([&] { absSharedResultSet->Close(); });
+
+    ScopeGuard stateGuard([absSharedResultSet] {
+        if (absSharedResultSet) {
+            absSharedResultSet->Close();
+        }
+    });
     if (!absSharedResultSet->HasBlock()) {
         HILOG_ERROR("absSharedResultSet has no block");
         return false;
@@ -258,11 +263,15 @@ ErrCode FormRdbDataMgr::QueryData(const std::string &key, std::unordered_map<std
     absRdbPredicates.BeginsWith(FORM_KEY, key);
     auto absSharedResultSet = rdbStore_->Query(absRdbPredicates, std::vector<std::string>());
     if (absSharedResultSet == nullptr) {
-        HILOG_ERROR("absSharedResultSet failed");
+        HILOG_ERROR("absSharedResultSet is nullptr");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
-    ScopeGuard stateGuard([&] { absSharedResultSet->Close(); });
+    ScopeGuard stateGuard([absSharedResultSet] {
+        if (absSharedResultSet) {
+            absSharedResultSet->Close();
+        }
+    });
     if (!absSharedResultSet->HasBlock()) {
         HILOG_ERROR("absSharedResultSet has no block");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -303,11 +312,15 @@ ErrCode FormRdbDataMgr::QueryAllData(std::unordered_map<std::string, std::string
     NativeRdb::AbsRdbPredicates absRdbPredicates(formRdbConfig_.tableName);
     auto absSharedResultSet = rdbStore_->Query(absRdbPredicates, std::vector<std::string>());
     if (absSharedResultSet == nullptr) {
-        HILOG_ERROR("absSharedResultSet failed");
+        HILOG_ERROR("absSharedResultSet is nullptr");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
-    ScopeGuard stateGuard([&] { absSharedResultSet->Close(); });
+    ScopeGuard stateGuard([absSharedResultSet] {
+        if (absSharedResultSet) {
+            absSharedResultSet->Close();
+        }
+    });
     if (!absSharedResultSet->HasBlock()) {
         HILOG_ERROR("absSharedResultSet has no block");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -347,11 +360,15 @@ ErrCode FormRdbDataMgr::QueryAllKeys(std::set<std::string> &datas)
     NativeRdb::AbsRdbPredicates absRdbPredicates(formRdbConfig_.tableName);
     auto absSharedResultSet = rdbStore_->Query(absRdbPredicates, std::vector<std::string>());
     if (absSharedResultSet == nullptr) {
-        HILOG_ERROR("absSharedResultSet failed");
+        HILOG_ERROR("absSharedResultSet is nullptr");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
-    ScopeGuard stateGuard([&] { absSharedResultSet->Close(); });
+    ScopeGuard stateGuard([absSharedResultSet] {
+        if (absSharedResultSet) {
+            absSharedResultSet->Close();
+        }
+    });
     if (!absSharedResultSet->HasBlock() || absSharedResultSet->GoToFirstRow() != NativeRdb::E_OK) {
         HILOG_ERROR("HasBlock or GoToFirstRow failed");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;

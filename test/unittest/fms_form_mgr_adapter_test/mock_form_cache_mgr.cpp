@@ -60,7 +60,7 @@ bool FormCacheMgr::AddData(int64_t formId, const FormProviderData &formProviderD
 }
 
 bool FormCacheMgr::GetData(int64_t formId, std::string &data,
-        std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> &imageDataMap) const
+    std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> &imageDataMap) const
 {
     return g_mockGetDataRet;
 }

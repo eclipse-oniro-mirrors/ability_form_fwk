@@ -22,13 +22,13 @@ namespace AppExecFwk {
 class ScopeGuard final {
 public:
     using Function = std::function<void()>;
-    explicit ScopeGuard(Function fn) : fn_(fn), dismissed_(false)
+    explicit ScopeGuard(Function func) : func_(func), dismissed_(false)
     {}
 
     ~ScopeGuard()
     {
         if (!dismissed_) {
-            fn_();
+            func_();
         }
     }
 
@@ -38,8 +38,8 @@ public:
     }
 
 private:
-    Function fn_;
-    bool dismissed_;
+    Function func_;
+    bool dismissed_ = false;
 };
 }
 }

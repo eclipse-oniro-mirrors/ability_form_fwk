@@ -46,7 +46,7 @@ const int32_t IMAGE_SIZE_INDEX = 2;
 
 const int32_t INVALID_INDEX = -1;
 
-bool HasContent(const std::string &str)
+inline bool HasContent(const std::string &str)
 {
     return !str.empty() && str != JSON_EMPTY_STRING && str != JSON_NULL_STRING;
 }
@@ -99,7 +99,7 @@ bool FormCacheMgr::GetData(const int64_t formId, std::string &data,
     if (HasContent(formCache.dataCache)) {
         nlohmann::json dataCacheObj = nlohmann::json::parse(formCache.dataCache, nullptr, false);
         if (dataCacheObj.is_discarded() || !dataCacheObj.is_object()) {
-            HILOG_ERROR("GetData failed due to dataCache is discarded: %{public}s.", formCache.dataCache.c_str());
+            HILOG_ERROR("GetData failed due to dataCache is discarded.");
             return false;
         }
 
@@ -110,7 +110,7 @@ bool FormCacheMgr::GetData(const int64_t formId, std::string &data,
     if (HasContent(formCache.imgCache)) {
         ret = InnerGetImageData(formCache, imageDataMap);
         if (!ret) {
-            HILOG_ERROR("InnerGetImageData failed: %{public}s.", formCache.imgCache.c_str());
+            HILOG_ERROR("InnerGetImageData failed.");
             return false;
         }
 
@@ -124,7 +124,7 @@ bool FormCacheMgr::InnerGetImageData(
     const FormCache &formCache,
     std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> &imageDataMap) const
 {
-    HILOG_DEBUG("InnerGetImageData start: %{public}s", formCache.imgCache.c_str());
+    HILOG_DEBUG("InnerGetImageData start");
     nlohmann::json imgCacheObj = nlohmann::json::parse(formCache.imgCache, nullptr, false);
     if (imgCacheObj.is_discarded() || !imgCacheObj.is_object()) {
         HILOG_ERROR("imgCacheObj is discarded.");
@@ -137,7 +137,7 @@ bool FormCacheMgr::InnerGetImageData(
         ss << value.dump();
         ss >> rowId;
         std::vector<uint8_t> blob;
-        int32_t size;
+        int32_t size = 0;
         if (!GetImgCacheFromDb(rowId, blob, size)) {
             HILOG_ERROR("GetImgCacheFromDb failed.");
             return false;
@@ -187,8 +187,8 @@ bool FormCacheMgr::AddImgData(
     const FormProviderData &formProviderData, FormCache &formCache)
 {
     nlohmann::json newImgDbData;
-    if (!InnerAddImgData(formProviderData, newImgDbData)) {
-        HILOG_ERROR("InnerAddImgData failed.");
+    if (!AddImgDataToDb(formProviderData, newImgDbData)) {
+        HILOG_ERROR("AddImgDataToDb failed.");
         return false;
     }
 
@@ -205,7 +205,7 @@ bool FormCacheMgr::AddImgData(
 
     nlohmann::json imgCacheObj = nlohmann::json::parse(formCache.imgCache, nullptr, false);
     if (imgCacheObj.is_discarded() || !imgCacheObj.is_object()) {
-        HILOG_ERROR("failed to parse data: %{public}s.", formCache.imgCache.c_str());
+        HILOG_ERROR("failed to parse data.");
         return false;
     }
 
@@ -230,7 +230,7 @@ bool FormCacheMgr::AddCacheData(
     if (HasContent(newDataStr)) {
         newDataObj = nlohmann::json::parse(newDataStr, nullptr, false);
         if (newDataObj.is_discarded() || !newDataObj.is_object()) {
-            HILOG_ERROR("failed to parse data: %{public}s.", newDataStr.c_str());
+            HILOG_ERROR("failed to parse data.");
             return false;
         }
 
@@ -250,7 +250,7 @@ bool FormCacheMgr::AddCacheData(
 
     nlohmann::json dataCacheObj = nlohmann::json::parse(formCache.dataCache, nullptr, false);
     if (dataCacheObj.is_discarded() || !dataCacheObj.is_object()) {
-        HILOG_ERROR("failed to parse data: %{public}s.", formCache.dataCache.c_str());
+        HILOG_ERROR("failed to parse data.");
         return false;
     }
 
@@ -262,12 +262,12 @@ bool FormCacheMgr::AddCacheData(
     return true;
 }
 
-bool FormCacheMgr::InnerAddImgData(
+bool FormCacheMgr::AddImgDataToDb(
     const FormProviderData &formProviderData, nlohmann::json &imgDataJson)
 {
     auto imgCache = formProviderData.GetImageDataMap();
-    HILOG_DEBUG("InnerAddImgData imgCache size: %{public}zu.", imgCache.size());
-    for (auto iter : imgCache) {
+    HILOG_DEBUG("AddImgDataToDb imgCache size: %{public}zu.", imgCache.size());
+    for (const auto &iter : imgCache) {
         int64_t rowId = INVALID_INDEX;
         std::vector<uint8_t> value;
         bool ret = GetImageDataFromAshmem(
@@ -305,7 +305,11 @@ bool FormCacheMgr::GetImageDataFromAshmem(
         return false;
     }
 
-    ScopeGuard stateGuard([&] { ashmem->UnmapAshmem(); });
+    ScopeGuard stateGuard([ashmem] {
+        if (ashmem) {
+            ashmem->UnmapAshmem();
+        }
+    });
     const uint8_t* imageData = reinterpret_cast<const uint8_t*>(ashmem->ReadFromAshmem(len, 0));
     if (imageData == nullptr) {
         HILOG_ERROR("ReadFromAshmem failed picName: %{public}s", picName.c_str());
@@ -333,7 +337,7 @@ bool FormCacheMgr::DeleteData(const int64_t formId)
 
 bool FormCacheMgr::NeedAcquireProviderData(const int64_t formId) const
 {
-    HILOG_DEBUG("AcquireProviderInfo");
+    HILOG_DEBUG("NeedAcquireProviderData");
     FormCache formCache;
     bool ret = GetDataCacheFromDb(formId, formCache);
     if (!ret) {
@@ -356,7 +360,11 @@ bool FormCacheMgr::GetDataCacheFromDb(int64_t formId, FormCache &formCache) cons
         return false;
     }
 
-    ScopeGuard stateGuard([&] { absSharedResultSet->Close(); });
+    ScopeGuard stateGuard([absSharedResultSet] {
+        if (absSharedResultSet) {
+            absSharedResultSet->Close();
+        }
+    });
     if (!absSharedResultSet->HasBlock()) {
         HILOG_ERROR("absSharedResultSet has no block");
         return false;
@@ -381,13 +389,13 @@ bool FormCacheMgr::GetDataCacheFromDb(int64_t formId, FormCache &formCache) cons
     int32_t cacheState;
     ret = absSharedResultSet->GetInt(CACHE_STATE_INDEX, cacheState);
     if (ret != NativeRdb::E_OK) {
-        HILOG_DEBUG("GetString cacheState failed, ret: %{public}d", ret);
+        HILOG_DEBUG("GetInt cacheState failed, ret: %{public}d", ret);
     }
     formCache.cacheState = static_cast<CacheState>(cacheState);
     return true;
 }
 
-bool FormCacheMgr::SaveDataCacheToDb(int64_t formId, FormCache &formCache)
+bool FormCacheMgr::SaveDataCacheToDb(int64_t formId, const FormCache &formCache)
 {
     NativeRdb::ValuesBucket valuesBucket;
     valuesBucket.PutString(FORM_ID, std::to_string(formId));
@@ -412,7 +420,7 @@ bool FormCacheMgr::InnerDeleteImageData(const FormCache &formCache)
 
     nlohmann::json imgCacheObj = nlohmann::json::parse(formCache.imgCache, nullptr, false);
     if (imgCacheObj.is_discarded() || !imgCacheObj.is_object()) {
-        HILOG_ERROR("failed to parse data: %{public}s.", formCache.imgCache.c_str());
+        HILOG_ERROR("failed to parse data.");
         return false;
     }
 
@@ -441,7 +449,11 @@ bool FormCacheMgr::GetImgCacheFromDb(
         return false;
     }
 
-    ScopeGuard stateGuard([&] { absSharedResultSet->Close(); });
+    ScopeGuard stateGuard([absSharedResultSet] {
+        if (absSharedResultSet) {
+            absSharedResultSet->Close();
+        }
+    });
     if (!absSharedResultSet->HasBlock()) {
         HILOG_ERROR("absSharedResultSet has no block");
         return false;
@@ -455,13 +467,13 @@ bool FormCacheMgr::GetImgCacheFromDb(
 
     ret = absSharedResultSet->GetBlob(IMAGE_BIT_INDEX, blob);
     if (ret != NativeRdb::E_OK) {
-        HILOG_ERROR("GoToFirstRow failed, ret: %{public}d", ret);
+        HILOG_ERROR("GetBlob failed, ret: %{public}d", ret);
         return false;
     }
 
     ret = absSharedResultSet->GetInt(IMAGE_SIZE_INDEX, size);
     if (ret != NativeRdb::E_OK) {
-        HILOG_ERROR("GetString size failed, ret: %{public}d", ret);
+        HILOG_ERROR("GetInt size failed, ret: %{public}d", ret);
         return false;
     }
 
@@ -475,7 +487,7 @@ bool FormCacheMgr::SaveImgCacheToDb(const std::vector<uint8_t> &value, int32_t s
     valuesBucket.PutInt(IMAGE_SIZE, size);
     bool ret = rdbDataManager_->InsertData(IMG_CACHE_TABLE, valuesBucket, rowId);
     if (!ret) {
-        HILOG_ERROR("SaveImgeCache failed.");
+        HILOG_ERROR("SaveImgCacheToDb failed.");
         return false;
     }
     return true;
