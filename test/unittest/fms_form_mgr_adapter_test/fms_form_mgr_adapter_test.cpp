@@ -2757,7 +2757,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0142, TestSize.Level0)
 
 /**
  * @tc.name: FormMgrAdapter_0143
- * @tc.desc: test GetBundleInfo function and the return value is ERR_APPEXECFWK_FORM_GET_INFO_FAILED.
+ * @tc.desc: test GetBundleInfo function and the return value is ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED.
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0143, TestSize.Level0)
@@ -2776,7 +2776,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0143, TestSize.Level0)
         return false;
     };
     EXPECT_CALL(*bmsProxy, GetBundleInfo(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
-    EXPECT_EQ(formMgrAdapter.GetBundleInfo(want, bundleInfo, packageName), ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
+    EXPECT_EQ(formMgrAdapter.GetBundleInfo(want, bundleInfo, packageName), ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED);
     FormBmsHelper::GetInstance().iBundleMgr_ = backup;
     GTEST_LOG_(INFO) << "FormMgrAdapter_0143 end";
 }
@@ -2861,7 +2861,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0147, TestSize.Level0)
 
 /**
  * @tc.name: FormMgrAdapter_0148
- * @tc.desc: test GetFormInfo function and the return value is ERR_APPEXECFWK_FORM_GET_INFO_FAILED.
+ * @tc.desc: test GetFormInfo function and the return value is ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE.
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0148, TestSize.Level0)
@@ -2874,7 +2874,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0148, TestSize.Level0)
     MockGetFormsInfoByModule(true);
     MockGetFormsInfoByModuleParam(false);
     MockGetStringParam(true);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_INFO_FAILED, formMgrAdapter.GetFormInfo(want, formInfo));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE, formMgrAdapter.GetFormInfo(want, formInfo));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0148 end";
 }
 
@@ -2920,7 +2920,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0150, TestSize.Level0)
 
 /**
  * @tc.name: FormMgrAdapter_0151
- * @tc.desc: test GetFormInfo function and the return value is ERR_APPEXECFWK_FORM_GET_INFO_FAILED.
+ * @tc.desc: test GetFormInfo function and the return value is ERR_APPEXECFWK_FORM_NO_SUCH_ABILITY.
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0151, TestSize.Level0)
@@ -2933,7 +2933,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0151, TestSize.Level0)
     MockGetFormsInfoByModule(false);
     MockGetFormsInfoByModuleParam(false);
     MockGetStringParam(true);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_INFO_FAILED, formMgrAdapter.GetFormInfo(want, formInfo));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_NO_SUCH_ABILITY, formMgrAdapter.GetFormInfo(want, formInfo));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0151 end";
 }
 
