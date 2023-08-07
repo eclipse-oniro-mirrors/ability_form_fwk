@@ -338,7 +338,7 @@ ErrCode FormRenderMgr::AddConnection(int64_t formId, sptr<FormRenderConnection> 
         HILOG_ERROR("Input FormRenderConnection is nullptr.");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
-    int32_t renderFormConnectionSize = 0;
+    size_t renderFormConnectionSize = 0;
     sptr<FormRenderConnection> oldConnection = nullptr;
     {
         std::lock_guard<std::mutex> lock(resourceMutex_);
