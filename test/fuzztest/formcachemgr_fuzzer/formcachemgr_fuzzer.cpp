@@ -44,14 +44,10 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     FormCacheMgr formCacheMgr;
     int64_t formId = static_cast<int64_t>(GetU32Data(data));
     std::string datas(data, size);
-    std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
-    formCacheMgr.GetData(formId, datas, imageDataMap);
-
-    FormProviderData formProviderData;
-    formProviderData.SetDataString(datas);
-    formCacheMgr.AddData(formId, formProviderData);
-
+    formCacheMgr.GetData(formId, datas);
+    formCacheMgr.AddData(formId, datas);
     formCacheMgr.DeleteData(formId);
+    formCacheMgr.UpdateData(formId, datas);
     FormEventHandler formEventHandler(nullptr);
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get();
     formEventHandler.ProcessEvent(EVENT_MSG, EVENT_ID);
@@ -59,7 +55,7 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     std::shared_ptr<FormEventTimeoutObserver> observer = nullptr;
     formEventHandler.RegisterEventTimeoutObserver(observer);
     formEventHandler.UnregisterEventTimeoutObserver(observer);
-    return formCacheMgr.NeedAcquireProviderData(formId);
+    return formCacheMgr.IsExist(formId);
 }
 }
 

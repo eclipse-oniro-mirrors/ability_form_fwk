@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,21 +20,8 @@
 #include <singleton.h>
 #include <string>
 
-#include "form_provider_data.h"
-#include "form_rdb_data_mgr.h"
-
 namespace OHOS {
 namespace AppExecFwk {
-enum class CacheState {
-    DEFAULT = 0,
-    REBOOT = 1,
-};
-struct FormCache {
-    std::string formId;
-    std::string dataCache;
-    std::string imgCache;
-    CacheState cacheState = CacheState::DEFAULT;
-};
 /**
  * @class FormCacheMgr
  * Form cache data manager.
@@ -44,38 +31,46 @@ DECLARE_DELAYED_REF_SINGLETON(FormCacheMgr)
 public:
     DISALLOW_COPY_AND_MOVE(FormCacheMgr);
 
-    void Start();
+    /**
+     * @brief Get form data.
+     * @param formId Form id.
+     * @param data Cache data.
+     * @return Returns true if this function is successfully called; returns false otherwise.
+     */
+    bool GetData(int64_t formId, std::string &data) const;
 
-    bool AddData(int64_t formId, const FormProviderData &formProviderData);
+    /**
+     * @brief Add form data.
+     * @param formId Form id.
+     * @param data Cache data.
+     * @return Returns true if this function is successfully called; returns false otherwise.
+     */
+    bool AddData(int64_t formId, const std::string &data);
 
+    /**
+     * @brief Delete form data.
+     * @param formId Form id.
+     * @return Returns true if this function is successfully called; returns false otherwise.
+     */
     bool DeleteData(int64_t formId);
 
-    bool GetData(int64_t formId, std::string &data,
-        std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> &imageDataMap) const;
+    /**
+     * @brief update form data.
+     * @param formId Form id.
+     * @param data Cache data.
+     * @return Returns true if this function is successfully called; returns false otherwise.
+     */
+    bool UpdateData(int64_t formId, const std::string &data);
 
-    bool NeedAcquireProviderData(int64_t formId) const;
+    /**
+     * @brief Check if form data is exist or not.
+     * @param formId, Form id.
+     * @return Returns true if this function is successfully called; returns false otherwise.
+     */
+    bool IsExist(int64_t formId) const;
 private:
-    void CreateFormCacheTable();
-    bool GetDataCacheFromDb(int64_t formId, FormCache &formCache) const;
-    bool SaveDataCacheToDb(int64_t formId, const FormCache &formCache);
-    bool DeleteDataCacheInDb(int64_t formId);
-    bool GetImgCacheFromDb(int64_t rowId, std::vector<uint8_t> &blob, int32_t &size) const;
-    bool SaveImgCacheToDb(const std::vector<uint8_t> &value, int32_t size, int64_t &rowId);
-    bool DeleteImgCacheInDb(const std::string &rowId);
-
-    bool AddCacheData(const FormProviderData &formProviderData, FormCache &formCache);
-    bool AddImgData(const FormProviderData &formProviderData, FormCache &formCache);
-    bool AddImgDataToDb(
-        const FormProviderData &formProviderData, nlohmann::json &imgDataJson);
-    bool GetImageDataFromAshmem(
-        const std::string& picName, const sptr<Ashmem> &ashmem, int32_t len, std::vector<uint8_t> &value);
-    bool InnerGetImageData(const FormCache &formCache,
-        std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> &imageDataMap) const;
-    bool InnerDeleteImageData(const FormCache &formCache);
-    void ResetCacheStateAfterReboot();
-
     mutable std::mutex cacheMutex_;
-    std::shared_ptr<FormRdbDataMgr> rdbDataManager_;
+    std::map<int64_t, std::string> cacheData_;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

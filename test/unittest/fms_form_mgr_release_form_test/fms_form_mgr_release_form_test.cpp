@@ -179,6 +179,9 @@ HWTEST_F(FmsFormMgrReleaseFormTest, ReleaseForm_002, TestSize.Level0)
     FormItemInfo itemInfo;
     FormDataMgr::GetInstance().AllotFormHostRecord(itemInfo, token_, formId1, 0);
 
+    FormCacheMgr::GetInstance().AddData(formId1, "test data 1");
+    FormCacheMgr::GetInstance().AddData(formId2, "test data 2");
+
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().ReleaseForm(formId1, token_, true));
 
     FormDataMgr::GetInstance().DeleteFormRecord(formId1);

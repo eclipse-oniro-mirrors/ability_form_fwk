@@ -88,7 +88,9 @@ ErrCode FormProviderMgr::AcquireForm(const int64_t formId, const FormProviderInf
 
     if (formProviderInfo.NeedCache()) {
         HILOG_WARN("%{public}s, acquire js card, cache the card", __func__);
-        FormCacheMgr::GetInstance().AddData(formId, formProviderInfo.GetFormData());
+        std::string jsonData = formProviderInfo.GetFormDataString();
+        HILOG_DEBUG("%{public}s, jsonData is %{public}s.", __func__, jsonData.c_str());
+        FormCacheMgr::GetInstance().AddData(formId, jsonData);
     }
     return ERR_OK;
 }
@@ -348,7 +350,9 @@ ErrCode FormProviderMgr::UpdateForm(const int64_t formId,
 
     if (formRecord.formProviderInfo.NeedCache()) {
         HILOG_INFO("%{public}s, updateJsForm, data is less than 1k, cache data.", __func__);
-        FormCacheMgr::GetInstance().AddData(formId, formRecord.formProviderInfo.GetFormData());
+        std::string jsonData = formRecord.formProviderInfo.GetFormDataString();
+        HILOG_DEBUG("%{public}s jsonData:%{public}s.", __func__, jsonData.c_str());
+        FormCacheMgr::GetInstance().AddData(formId, jsonData);
     } else {
         FormCacheMgr::GetInstance().DeleteData(formId);
     }
@@ -470,7 +474,7 @@ bool FormProviderMgr::IsFormCached(const FormRecord &record)
     if (record.versionUpgrade) {
         return false;
     }
-    return FormCacheMgr::GetInstance().NeedAcquireProviderData(record.formId);
+    return FormCacheMgr::GetInstance().IsExist(record.formId);
 }
 
 ErrCode FormProviderMgr::RebindByFreeInstall(const FormRecord &record, Want &want,

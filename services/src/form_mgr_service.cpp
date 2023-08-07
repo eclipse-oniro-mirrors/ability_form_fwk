@@ -22,7 +22,6 @@
 #include "fms_log_wrapper.h"
 #include "form_ams_helper.h"
 #include "form_bms_helper.h"
-#include "form_cache_mgr.h"
 #include "form_constants.h"
 #include "form_data_mgr.h"
 #include "form_db_cache.h"
@@ -617,7 +616,6 @@ ErrCode FormMgrService::Init()
     FormInfoMgr::GetInstance().ReloadFormInfos(MAIN_USER_ID);
     FormDbCache::GetInstance().Start();
     FormTimerMgr::GetInstance(); // Init FormTimerMgr
-    FormCacheMgr::GetInstance().Start();
     // Register formbundleEventCallback to receive hap updates
     formBundleEventCallback_ = new (std::nothrow) FormBundleEventCallback();
     if (formBundleEventCallback_ == nullptr) {

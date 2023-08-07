@@ -32,7 +32,6 @@ bool FormAshmem::Marshalling(Parcel &parcel) const
 {
     MessageParcel* messageParcel = (MessageParcel*)&parcel;
     if (!messageParcel->WriteAshmem(ashmem_)) {
-        HILOG_ERROR("WriteAshmem failed");
         return false;
     }
     return true;
@@ -86,11 +85,6 @@ bool FormAshmem::WriteToAshmem(std::string name, char *data, int32_t size)
 
     ashmem_->UnmapAshmem();
     return true;
-}
-
-sptr<Ashmem> FormAshmem::GetAshmem() const
-{
-    return ashmem_;
 }
 
 int32_t FormAshmem::GetAshmemSize()

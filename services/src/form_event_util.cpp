@@ -128,6 +128,7 @@ void FormEventUtil::HandleProviderRemoved(const std::string &bundleName, const i
     std::vector<int64_t> vRemovedForms;
     vRemovedForms.assign(removedForms.begin(), removedForms.end());
     FormDataMgr::GetInstance().CleanHostRemovedForms(vRemovedForms);
+
     // clean removed form timers
     for (auto &formId : removedForms) {
         FormTimerMgr::GetInstance().RemoveFormTimer(formId);

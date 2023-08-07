@@ -35,8 +35,6 @@ public:
 
     virtual bool Marshalling(Parcel &parcel) const override;
     static FormAshmem* Unmarshalling(Parcel &parcel);
-
-    sptr<Ashmem> GetAshmem() const;
 private:
     bool ReadFromParcel(Parcel &parcel);
 

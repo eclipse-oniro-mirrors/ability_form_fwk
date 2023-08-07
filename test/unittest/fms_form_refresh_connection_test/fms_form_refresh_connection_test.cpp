@@ -72,6 +72,103 @@ void FmsFormRefreshConnectionTest::TearDown()
 {}
 
 /**
+ * @tc.name: FormCacheMgr_001
+ * @tc.desc: test GetData function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, FormCacheMgr_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormCacheMgr_001 start";
+    FormCacheMgr formCacheMgr;
+    int64_t formId = 1;
+    std::string data = "aa";
+    formCacheMgr.cacheData_.emplace(formId, data);
+    EXPECT_EQ(true, formCacheMgr.GetData(formId, data));
+    GTEST_LOG_(INFO) << "FormCacheMgr_001 end";
+}
+
+/**
+ * @tc.name: FormCacheMgr_002
+ * @tc.desc: test GetData function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, FormCacheMgr_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormCacheMgr_002 start";
+    FormCacheMgr formCacheMgr;
+    int64_t formId = 1;
+    std::string data = "";
+    int64_t formIds = 2;
+    formCacheMgr.cacheData_.emplace(formIds, data);
+    EXPECT_EQ(false, formCacheMgr.GetData(formId, data));
+    GTEST_LOG_(INFO) << "FormCacheMgr_002 end";
+}
+
+/**
+ * @tc.name: FormCacheMgr_003
+ * @tc.desc: test DeleteData function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, FormCacheMgr_003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormCacheMgr_003 start";
+    FormCacheMgr formCacheMgr;
+    int64_t formId = 1;
+    std::string data = "aa";
+    formCacheMgr.cacheData_.emplace(formId, data);
+    EXPECT_EQ(true, formCacheMgr.DeleteData(formId));
+    GTEST_LOG_(INFO) << "FormCacheMgr_003 end";
+}
+
+/**
+ * @tc.name: FormCacheMgr_004
+ * @tc.desc: test UpdateData function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, FormCacheMgr_004, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormCacheMgr_004 start";
+    FormCacheMgr formCacheMgr;
+    int64_t formId = 1;
+    std::string data = "aa";
+    EXPECT_EQ(false, formCacheMgr.UpdateData(formId, data));
+    GTEST_LOG_(INFO) << "FormCacheMgr_004 end";
+}
+
+/**
+ * @tc.name: FormCacheMgr_005
+ * @tc.desc: test UpdateData function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, FormCacheMgr_005, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormCacheMgr_005 start";
+    FormCacheMgr formCacheMgr;
+    int64_t formId = 1;
+    std::string data = "aa";
+    formCacheMgr.cacheData_.emplace(formId, data);
+    EXPECT_EQ(true, formCacheMgr.UpdateData(formId, data));
+    GTEST_LOG_(INFO) << "FormCacheMgr_005 end";
+}
+
+/**
+ * @tc.name: FormCacheMgr_006
+ * @tc.desc: test IsExist function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, FormCacheMgr_006, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormCacheMgr_006 start";
+    FormCacheMgr formCacheMgr;
+    int64_t formId = 1;
+    int64_t formIds = 2;
+    std::string data = "aa";
+    formCacheMgr.cacheData_.emplace(formIds, data);
+    EXPECT_EQ(false, formCacheMgr.IsExist(formId));
+    GTEST_LOG_(INFO) << "FormCacheMgr_006 end";
+}
+
+/**
  * @tc.name: FormRefreshConnection_001
  * @tc.desc: test IsExist function.
  * @tc.type: FUNC

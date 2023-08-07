@@ -147,7 +147,7 @@ HWTEST_F(FormProviderInfoTest, FormProviderInfo_NeedCache_001, TestSize.Level1) 
     GTEST_LOG_(INFO) << "FormProviderInfo_NeedCache_001 starts";
     FormProviderInfo formProviderInfo;
     auto result = formProviderInfo.NeedCache();
-    EXPECT_FALSE(result);
+    EXPECT_TRUE(result);
     GTEST_LOG_(INFO) << "FormProviderInfo_NeedCache_001 ends";
 }
 } // namespace

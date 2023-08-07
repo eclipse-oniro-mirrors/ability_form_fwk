@@ -57,7 +57,6 @@ ohos_fuzztest("FormCacheMgrFuzzTest") {
     "ffrt:libffrt",
     "form_fwk:form_manager",
     "ipc:ipc_core",
-    "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]

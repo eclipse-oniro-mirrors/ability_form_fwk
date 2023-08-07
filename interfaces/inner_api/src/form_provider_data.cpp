@@ -372,7 +372,15 @@ void FormProviderData::ClearData()
 
 bool FormProviderData::NeedCache() const
 {
-    return !jsonFormProviderData_.empty() || !imageDataMap_.empty();
+    if (!imageDataMap_.empty()) {
+        return false;
+    }
+    std::string dataStr = jsonFormProviderData_.empty() ? "" : jsonFormProviderData_.dump();
+    // check if cache data size is less than 1k or not
+    if (dataStr.size() > Constants::MAX_FORM_DATA_SIZE) {
+        return false;
+    }
+    return true;
 }
 
 bool FormProviderData::WriteImageDataToParcel(Parcel &parcel, const std::string &picName,
