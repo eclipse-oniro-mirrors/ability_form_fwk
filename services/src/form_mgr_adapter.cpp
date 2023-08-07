@@ -77,15 +77,6 @@ constexpr int32_t SYSTEM_UID = 1000;
 const std::string POINT_ETS = ".ets";
 
 const std::string EMPTY_BUNDLE = "";
-
-void ConvertRawImageData(
-    const std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> &imageDataMap,
-    FormJsInfo &formJsInfo)
-{
-    for (const auto &entry : imageDataMap) {
-        formJsInfo.imageDataMap[entry.first] = entry.second.first;
-    }
-}
 } // namespace
 
 FormMgrAdapter::FormMgrAdapter()
@@ -1089,7 +1080,8 @@ ErrCode FormMgrAdapter::AddExistFormRecord(const FormItemInfo &info, const sptr<
 
     if (hasCacheData) {
         formInfo.formData = cacheData;
-        ConvertRawImageData(imageDataMap, formInfo);
+        formInfo.formProviderData.SetDataString(cacheData);
+        formInfo.formProviderData.SetImageDataMap(imageDataMap);
     }
 
     FormDataMgr::GetInstance().CreateFormJsInfo(formId, record, formInfo);
