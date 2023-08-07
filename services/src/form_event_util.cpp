@@ -44,7 +44,7 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
 {
     HILOG_INFO("%{public}s, bundleName:%{public}s, userId:%{public}d.", __func__, bundleName.c_str(), userId);
     std::vector<FormRecord> formInfos;
-    if (!FormDataMgr::GetInstance().GetFormRecord(bundleName, formInfos, userId)) {
+    if (!FormDataMgr::GetInstance().GetFormRecord(bundleName, formInfos)) {
         HILOG_INFO("%{public}s, no form info.", __func__);
         return;
     }
