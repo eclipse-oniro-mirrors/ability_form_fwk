@@ -65,6 +65,7 @@ public:
     bool isDynamic = true;
     bool isTimerRefresh = false;
     bool isDataProxy = false;
+    bool isSystemApp = false;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

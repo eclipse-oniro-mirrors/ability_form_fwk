@@ -315,7 +315,17 @@ public:
      * @param uiSyntax.
      */
     void SetUiSyntax(const FormType &uiSyntax);
-
+    /**
+     * @brief Set value of isSystemApp.
+     * @param isSystemApp systemAppFlag.
+     */
+    void SetSystemAppFlag(bool isSystemApp);
+    /**
+     * @brief Get systemAppFlag.
+     * @return systemAppFlag.
+     */
+    bool GetSystemAppFlag() const;
+    
     void SetDataProxyFlag(bool dataProxyEnabled);
     bool GetDataProxyFlag() const;
 private:
@@ -357,6 +367,7 @@ private:
     std::unordered_map<std::string, std::string> moduleInfoMap_;
     std::string deviceId_ = "";
     bool dataProxyEnabled_ = false;
+    bool isSystemApp_ = false;
 };
 } // namespace AppExecFwk
 } // namespace OHOS

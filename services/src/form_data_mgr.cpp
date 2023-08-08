@@ -180,6 +180,7 @@ FormRecord FormDataMgr::CreateFormRecord(const FormItemInfo &formInfo, const int
     newRecord.type = formInfo.GetType();
     newRecord.uiSyntax = formInfo.GetUiSyntax();
     newRecord.isDynamic = formInfo.IsDynamic();
+    newRecord.isSystemApp = formInfo.GetSystemAppFlag();
     if (newRecord.isEnableUpdate) {
         ParseUpdateConfig(newRecord, formInfo);
     }

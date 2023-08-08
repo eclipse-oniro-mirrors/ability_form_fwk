@@ -503,6 +503,15 @@ void FormItemInfo::SetUiSyntax(const FormType &uiSyntax)
     uiSyntax_ = uiSyntax;
 }
 
+void FormItemInfo::SetSystemAppFlag(bool isSystemApp)
+{
+    isSystemApp_ = isSystemApp;
+}
+
+bool FormItemInfo::GetSystemAppFlag() const
+{
+    return isSystemApp_;
+}
 void FormItemInfo::SetDataProxyFlag(bool dataProxyEnabled)
 {
     dataProxyEnabled_ = dataProxyEnabled;

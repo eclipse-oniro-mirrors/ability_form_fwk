@@ -38,8 +38,8 @@ FormFreeInstallOperator::~FormFreeInstallOperator()
 int32_t FormFreeInstallOperator::StartFreeInstall(
     const std::string &bundleName, const std::string &moduleName, const std::string &abilityName)
 {
-    HILOG_DEBUG("%{public}s called, bundleName: %{public}s, abilityName: %{public}s",
-        __func__, bundleName.c_str(), abilityName.c_str());
+    HILOG_DEBUG("called, bundleName: %{public}s, abilityName: %{public}s",
+        bundleName.c_str(), abilityName.c_str());
 
     freeInstallStatusCallBack_ = new (std::nothrow) FreeInstallStatusCallBack(weak_from_this());
     if (freeInstallStatusCallBack_ == nullptr) {

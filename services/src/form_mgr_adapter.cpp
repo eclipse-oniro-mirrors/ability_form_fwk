@@ -99,7 +99,7 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     HILOG_DEBUG("called.");
     if (formId < 0 || callerToken == nullptr) {
-        HILOG_ERROR("%{public}s fail, callerToken can not be NULL", __func__);
+        HILOG_ERROR("fail, callerToken can not be NULL");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
@@ -110,7 +110,7 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
     auto ret = 0;
     if (tempFormFlag && !FormRenderMgr::GetInstance().IsRerenderForRenderServiceDied(formId)) {
         if (formId > 0) {
-            HILOG_ERROR("%{public}s fail, temp form id is invalid, formId:%{public}" PRId64 "", __func__, formId);
+            HILOG_ERROR("fail, temp form id is invalid, formId:%{public}" PRId64 "", formId);
             return ERR_APPEXECFWK_FORM_INVALID_PARAM;
         }
         checkCode = FormDataMgr::GetInstance().CheckTempEnoughForm();
@@ -122,7 +122,7 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
         }
     }
     if (checkCode != 0) {
-        HILOG_ERROR("%{public}s fail, too much forms in system", __func__);
+        HILOG_ERROR("fail, too much forms in system");
         return checkCode;
     }
 
@@ -130,7 +130,7 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
     FormItemInfo formItemInfo;
     int32_t errCode = GetFormConfigInfo(want, formItemInfo);
     if (errCode != ERR_OK) {
-        HILOG_ERROR("%{public}s fail, get form config info failed.", __func__);
+        HILOG_ERROR("fail, get form config info failed.");
         return errCode;
     }
     formItemInfo.SetFormId(formId);
@@ -525,7 +525,7 @@ int FormMgrAdapter::UpdateForm(const int64_t formId, const std::string &bundleNa
     const FormProviderData &formProviderData, const std::vector<FormDataProxy> &formDataProxies)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_INFO("UpdateForm start.");
+    HILOG_DEBUG("UpdateForm start.");
 
     // check formId and bundleName
     if (formId <= 0 || bundleName.empty()) {
@@ -622,15 +622,15 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
     const sptr<IRemoteObject> &callerToken, const int32_t formVisibleType)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_DEBUG("called.");
     if (callerToken == nullptr) {
-        HILOG_ERROR("%{public}s fail, callerToken can not be NULL.", __func__);
+        HILOG_ERROR("fail, callerToken can not be NULL.");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
     sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
     if (iBundleMgr == nullptr) {
-        HILOG_ERROR("%{public}s fail, failed to get IBundleMgr.", __func__);
+        HILOG_ERROR("fail, failed to get IBundleMgr.");
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
 
@@ -641,7 +641,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
     std::string specialFlag = "#";
     for (int64_t formId : formIds) {
         if (formId <= 0) {
-            HILOG_WARN("%{public}s, formId %{public}" PRId64 " is less than 0", __func__, formId);
+            HILOG_WARN("formId %{public}" PRId64 " is less than 0", formId);
             continue;
         }
         matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
@@ -676,20 +676,14 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
         }
 
         // Check if the form provider is system app
-        if (!CheckIsSystemAppByBundleName(iBundleMgr, userId, formRecord.bundleName)) {
+        if (!formRecord.isSystemApp) {
             continue;
         }
 
         // Check the value of formVisibleNotify.
         AppExecFwk::ApplicationInfo info;
 
-        sptr<IBundleMgr> bundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
-        if (bundleMgr == nullptr) {
-            HILOG_ERROR("failed to get IBundleMgr.");
-            return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
-        }
-
-        if (!IN_PROCESS_CALL(bundleMgr->GetApplicationInfo(formRecord.bundleName,
+        if (!IN_PROCESS_CALL(iBundleMgr->GetApplicationInfo(formRecord.bundleName,
             AppExecFwk::ApplicationFlag::GET_BASIC_APPLICATION_INFO, formRecord.providerUserId, info))) {
             HILOG_ERROR("failed to get Application info.");
             return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
@@ -980,7 +974,7 @@ ErrCode FormMgrAdapter::GetFormConfigInfo(const Want &want, FormItemInfo &formCo
     formConfigInfo.SetDeviceId(want.GetElement().GetDeviceID());
 
     if (!formConfigInfo.IsValidItem()) {
-        HILOG_ERROR("%{public}s fail, input param itemInfo is invalid", __func__);
+        HILOG_ERROR("fail, input param itemInfo is invalid");
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
 
@@ -1128,7 +1122,7 @@ ErrCode FormMgrAdapter::AllotFormByInfo(const FormItemInfo &info,
     // generate formId
     int64_t newFormId = FormDataMgr::GetInstance().GenerateFormId();
     if (newFormId < 0) {
-        HILOG_ERROR("%{public}s fail, generateFormId no invalid formId", __func__);
+        HILOG_ERROR("fail, generateFormId no invalid formId");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     HILOG_DEBUG("newFormId:%{public}" PRId64 "", newFormId);
@@ -1153,7 +1147,7 @@ ErrCode FormMgrAdapter::AddNewFormRecord(const FormItemInfo &info, const int64_t
     // allot form host record
     int callingUid = IPCSkeleton::GetCallingUid();
     if (!FormDataMgr::GetInstance().AllotFormHostRecord(newInfo, callerToken, formId, callingUid)) {
-        HILOG_ERROR("%{public}s fail, AllotFormHostRecord failed when no matched formRecord", __func__);
+        HILOG_ERROR("fail, AllotFormHostRecord failed when no matched formRecord");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -1167,7 +1161,7 @@ ErrCode FormMgrAdapter::AddNewFormRecord(const FormItemInfo &info, const int64_t
     // acquire formInfo from provider
     ErrCode errorCode = AcquireProviderFormInfoAsync(formId, newInfo, wantParams);
     if (errorCode != ERR_OK) {
-        HILOG_ERROR("%{public}s fail, AcquireProviderFormInfoAsync failed", __func__);
+        HILOG_ERROR("fail, AcquireProviderFormInfoAsync failed");
         return errorCode;
     }
 
@@ -1178,7 +1172,7 @@ ErrCode FormMgrAdapter::AddNewFormRecord(const FormItemInfo &info, const int64_t
     if (!newInfo.IsTemporaryForm()) {
         errorCode = FormDbCache::GetInstance().UpdateDBRecord(formId, formRecord);
         if (errorCode != ERR_OK) {
-            HILOG_ERROR("%{public}s fail, UpdateDBRecord failed", __func__);
+            HILOG_ERROR("fail, UpdateDBRecord failed");
             return errorCode;
         }
     }
@@ -1445,6 +1439,7 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
     itemInfo.SetVersionCode(bundleInfo.versionCode);
     itemInfo.SetVersionName(bundleInfo.versionName);
     itemInfo.SetCompatibleVersion(bundleInfo.compatibleVersion);
+    itemInfo.SetSystemAppFlag(bundleInfo.applicationInfo.isSystemApp);
 
     std::string hostBundleName;
     bool isSaUid = IPCSkeleton::GetCallingUid() == SYSTEM_UID;
@@ -1561,7 +1556,7 @@ int FormMgrAdapter::ReleaseRenderer(int64_t formId, const std::string &compId)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     if (formId <= 0 || compId.empty()) {
-        HILOG_ERROR("%{public}s, Release invalid param", __func__);
+        HILOG_ERROR("Release invalid param");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
@@ -1575,12 +1570,12 @@ ErrCode FormMgrAdapter::CheckPublishForm(Want &want)
 {
     std::string bundleName;
     if (!GetBundleName(bundleName)) {
-        HILOG_ERROR("%{public}s failed to get BundleName", __func__);
+        HILOG_ERROR("failed to get BundleName");
         return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
     }
     sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
     if (iBundleMgr == nullptr) {
-        HILOG_ERROR("%{public}s fail, failed to get IBundleMgr.", __func__);
+        HILOG_ERROR("fail, failed to get IBundleMgr.");
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
 
@@ -1596,7 +1591,7 @@ ErrCode FormMgrAdapter::CheckPublishForm(Want &want)
 
     std::string moduleName = want.GetStringParam(Constants::PARAM_MODULE_NAME_KEY);
     if (moduleName.empty()) {
-        HILOG_ERROR("%{public}s error, moduleName is empty.", __func__);
+        HILOG_ERROR("error, moduleName is empty.");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
@@ -1612,7 +1607,7 @@ ErrCode FormMgrAdapter::CheckPublishForm(Want &want)
     ErrCode errCode = FormInfoMgr::GetInstance()
         .GetFormsInfoByModuleWithoutCheck(want.GetElement().GetBundleName(), moduleName, formInfos);
     if (errCode != ERR_OK) {
-        HILOG_ERROR("%{public}s error, failed to get forms info.", __func__);
+        HILOG_ERROR("error, failed to get forms info.");
         return errCode;
     }
     for (auto &formInfo: formInfos) {
@@ -1718,7 +1713,7 @@ ErrCode FormMgrAdapter::RequestPublishForm(Want &want, bool withFormBindingData,
     std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
     const std::vector<FormDataProxy> &formDataProxies)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("called.");
     ErrCode errCode = CheckPublishForm(want);
     if (errCode != ERR_OK) {
         return errCode;
@@ -1732,7 +1727,7 @@ ErrCode FormMgrAdapter::RequestPublishForm(Want &want, bool withFormBindingData,
     // generate formId
     formId = FormDataMgr::GetInstance().GenerateFormId();
     if (formId < 0) {
-        HILOG_ERROR("%{public}s fail, generateFormId no invalid formId", __func__);
+        HILOG_ERROR("fail, generateFormId no invalid formId");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     HILOG_DEBUG("formId:%{public}" PRId64 "", formId);
@@ -1746,7 +1741,7 @@ ErrCode FormMgrAdapter::RequestPublishForm(Want &want, bool withFormBindingData,
         errCode = FormDataMgr::GetInstance().AddRequestPublishFormInfo(formId, want, noFormBindingData);
     }
     if (errCode != ERR_OK) {
-        HILOG_ERROR("%{public}s fail, add form info error", __func__);
+        HILOG_ERROR("fail, add form info error");
         return errCode;
     }
 
@@ -1813,7 +1808,7 @@ ErrCode FormMgrAdapter::CheckAddRequestPublishForm(const Want &want, const Want 
         errCode = FormDataMgr::GetInstance().CheckEnoughForm(callingUid, currentUserId);
     }
     if (errCode != ERR_OK) {
-        HILOG_ERROR("%{public}s fail, too much forms in system", __func__);
+        HILOG_ERROR("fail, too much forms in system");
         return errCode;
     }
     return ERR_OK;
@@ -2040,9 +2035,9 @@ int FormMgrAdapter::MessageEvent(const int64_t formId, const Want &want, const s
  */
 int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("called.");
     if (formId <= 0) {
-        HILOG_ERROR("%{public}s form formId or bundleName is invalid", __func__);
+        HILOG_ERROR("form formId or bundleName is invalid");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
@@ -2051,18 +2046,18 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
     FormRecord record;
     bool bGetRecord = FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record);
     if (!bGetRecord) {
-        HILOG_ERROR("%{public}s fail, not exist such form:%{public}" PRId64 "", __func__, matchedFormId);
+        HILOG_ERROR("fail, not exist such form:%{public}" PRId64 "", matchedFormId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
     sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
     if (iBundleMgr == nullptr) {
-        HILOG_ERROR("%{public}s fail, failed to get IBundleMgr.", __func__);
+        HILOG_ERROR("fail, failed to get IBundleMgr.");
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
 
     if (record.bundleName != want.GetBundle()) {
-        if (!CheckIsSystemAppByBundleName(iBundleMgr, userId, record.bundleName)) {
+        if (!record.isSystemApp) {
             HILOG_WARN("Only system apps can launch the ability of the other apps.");
             want.SetBundle(record.bundleName);
         }
@@ -2097,9 +2092,9 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
  */
 int FormMgrAdapter::BackgroundEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("called.");
     if (formId <= 0) {
-        HILOG_ERROR("%{public}s form formId or bundleName is invalid", __func__);
+        HILOG_ERROR("form formId or bundleName is invalid");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
@@ -2107,13 +2102,13 @@ int FormMgrAdapter::BackgroundEvent(const int64_t formId, Want &want, const sptr
     FormRecord record;
     bool bGetRecord = FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record);
     if (!bGetRecord) {
-        HILOG_ERROR("%{public}s fail, not exist such form:%{public}" PRId64 "", __func__, matchedFormId);
+        HILOG_ERROR("fail, not exist such form:%{public}" PRId64 "", matchedFormId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
     sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
     if (iBundleMgr == nullptr) {
-        HILOG_ERROR("%{public}s fail, failed to get IBundleMgr.", __func__);
+        HILOG_ERROR("fail, failed to get IBundleMgr.");
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
     if (want.GetBundle().empty() || record.bundleName != want.GetBundle()) {
@@ -2277,7 +2272,7 @@ bool FormMgrAdapter::UpdateProviderInfoToHost(const int64_t &matchedFormId, cons
     const sptr<IRemoteObject> &callerToken, const int32_t &formVisibleType, FormRecord &formRecord)
 {
     if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, formRecord)) {
-        HILOG_WARN("%{public}s fail, not exist such form, formId:%{public}" PRId64 ".", __func__, matchedFormId);
+        HILOG_WARN("fail, not exist such form, formId:%{public}" PRId64 ".", matchedFormId);
         return false;
     }
 
@@ -2288,14 +2283,14 @@ bool FormMgrAdapter::UpdateProviderInfoToHost(const int64_t &matchedFormId, cons
     FormHostRecord formHostRecord;
     bool hasFormHostRecord = FormDataMgr::GetInstance().GetMatchedHostClient(callerToken, formHostRecord);
     if (!(hasFormHostRecord && formHostRecord.Contains(matchedFormId))) {
-        HILOG_WARN("%{public}s fail, form is not belong to self, formId:%{public}" PRId64 ".", __func__, matchedFormId);
+        HILOG_WARN("fail, form is not belong to self, formId:%{public}" PRId64 ".", matchedFormId);
         return false;
     }
 
     formRecord.formVisibleNotifyState = formVisibleType;
     if (!FormDataMgr::GetInstance().UpdateFormRecord(matchedFormId, formRecord)) {
-        HILOG_WARN("%{public}s fail, set formVisibleNotifyState error, formId:%{public}" PRId64 ".",
-        __func__, matchedFormId);
+        HILOG_WARN("fail, set formVisibleNotifyState error, formId:%{public}" PRId64 ".",
+            matchedFormId);
         return false;
     }
 
@@ -2332,7 +2327,7 @@ bool FormMgrAdapter::CheckIsSystemAppByBundleName(const sptr<IBundleMgr> &iBundl
     AppExecFwk::ApplicationInfo appInfo;
     if (IN_PROCESS_CALL(iBundleMgr->GetApplicationInfoV9(bundleName, AppExecFwk::BundleFlag::GET_BUNDLE_DEFAULT,
         userId, appInfo)) != ERR_OK) {
-        HILOG_ERROR("%{public}s failed to get application info", __func__);
+        HILOG_ERROR("failed to get application info");
         return false;
     }
 
@@ -2877,7 +2872,7 @@ int32_t FormMgrAdapter::GetCallerType(std::string bundleName)
 {
     sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
     if (iBundleMgr == nullptr) {
-        HILOG_ERROR("%{public}s fail, failed to get IBundleMgr.", __func__);
+        HILOG_ERROR("fail, failed to get IBundleMgr.");
         return ErmsCallerInfo::TYPE_INVALID;
     }
 

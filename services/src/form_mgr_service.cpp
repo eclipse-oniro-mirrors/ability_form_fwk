@@ -619,7 +619,7 @@ ErrCode FormMgrService::Init()
     // Register formbundleEventCallback to receive hap updates
     formBundleEventCallback_ = new (std::nothrow) FormBundleEventCallback();
     if (formBundleEventCallback_ == nullptr) {
-        HILOG_ERROR("%{public}s fail, allocate formBundleEventCallback_ failed!", __func__);
+        HILOG_ERROR("fail, allocate formBundleEventCallback_ failed!");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
@@ -628,7 +628,7 @@ ErrCode FormMgrService::Init()
     }
     bool re = iBundleMgr->RegisterBundleEventCallback(formBundleEventCallback_);
     if (!re) {
-        HILOG_ERROR("%{public}s fail, RegisterBundleEventCallback failed!", __func__);
+        HILOG_ERROR("fail, RegisterBundleEventCallback failed!");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -682,10 +682,10 @@ ErrCode FormMgrService::CheckFormPermission()
 int FormMgrService::DeleteInvalidForms(const std::vector<int64_t> &formIds,
     const sptr<IRemoteObject> &callerToken, int32_t &numFormsDeleted)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("called.");
     ErrCode ret = CheckFormPermission();
     if (ret != ERR_OK) {
-        HILOG_ERROR("%{public}s fail, delete form permission denied", __func__);
+        HILOG_ERROR("fail, delete form permission denied");
         return ret;
     }
     FormEventInfo eventInfo;
@@ -703,10 +703,10 @@ int FormMgrService::DeleteInvalidForms(const std::vector<int64_t> &formIds,
 int FormMgrService::AcquireFormState(const Want &want,
     const sptr<IRemoteObject> &callerToken, FormStateInfo &stateInfo)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("called.");
     ErrCode ret = CheckFormPermission();
     if (ret != ERR_OK) {
-        HILOG_ERROR("%{public}s fail, acquire form state permission denied", __func__);
+        HILOG_ERROR("fail, acquire form state permission denied");
         return ret;
     }
     FormEventInfo eventInfo;
@@ -727,10 +727,10 @@ int FormMgrService::AcquireFormState(const Want &want,
 int FormMgrService::NotifyFormsVisible(const std::vector<int64_t> &formIds,
     bool isVisible, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("called.");
     ErrCode ret = CheckFormPermission();
     if (ret != ERR_OK) {
-        HILOG_ERROR("%{public}s fail, notify form visible permission denied", __func__);
+        HILOG_ERROR("fail, notify form visible permission denied");
         return ret;
     }
     return FormMgrAdapter::GetInstance().NotifyFormsVisible(formIds, isVisible, callerToken);
@@ -739,10 +739,10 @@ int FormMgrService::NotifyFormsVisible(const std::vector<int64_t> &formIds,
 int FormMgrService::NotifyFormsPrivacyProtected(const std::vector<int64_t> &formIds, bool isProtected,
     const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("called.");
     ErrCode ret = CheckFormPermission();
     if (ret != ERR_OK) {
-        HILOG_ERROR("%{public}s fail, notify form is privacy protected permission denied", __func__);
+        HILOG_ERROR("fail, notify form is privacy protected permission denied");
         return ret;
     }
     return ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -758,10 +758,10 @@ int FormMgrService::NotifyFormsPrivacyProtected(const std::vector<int64_t> &form
 int FormMgrService::NotifyFormsEnableUpdate(const std::vector<int64_t> &formIds,
     bool isEnableUpdate, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("called.");
     ErrCode ret = CheckFormPermission();
     if (ret != ERR_OK) {
-        HILOG_ERROR("%{public}s fail, notify form enable update permission denied", __func__);
+        HILOG_ERROR("fail, notify form enable update permission denied");
         return ret;
     }
     return FormMgrAdapter::GetInstance().NotifyFormsEnableUpdate(formIds, isEnableUpdate, callerToken);
@@ -774,7 +774,7 @@ int FormMgrService::NotifyFormsEnableUpdate(const std::vector<int64_t> &formIds,
  */
 int FormMgrService::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("called.");
     if (!CheckCallerIsSystemApp()) {
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
     }
@@ -793,7 +793,7 @@ int FormMgrService::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
  */
 int FormMgrService::GetFormsInfoByApp(std::string &bundleName, std::vector<FormInfo> &formInfos)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("called.");
     if (!CheckCallerIsSystemApp()) {
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
     }
@@ -814,7 +814,7 @@ int FormMgrService::GetFormsInfoByApp(std::string &bundleName, std::vector<FormI
 int FormMgrService::GetFormsInfoByModule(std::string &bundleName, std::string &moduleName,
                                          std::vector<FormInfo> &formInfos)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("called.");
     if (!CheckCallerIsSystemApp()) {
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
     }
@@ -827,11 +827,11 @@ int FormMgrService::GetFormsInfoByModule(std::string &bundleName, std::string &m
 
 int32_t FormMgrService::GetFormsInfo(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("called.");
     std::string callerBundleName;
     auto ret = FormBmsHelper::GetInstance().GetCallerBundleName(callerBundleName);
     if (ret != ERR_OK) {
-        HILOG_ERROR("%{public}s fail, get host bundle name failed", __func__);
+        HILOG_ERROR("fail, get host bundle name failed");
         return ret;
     }
     // retrieve moduleName from filter.
