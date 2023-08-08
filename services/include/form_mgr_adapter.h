@@ -522,6 +522,9 @@ private:
      */
     ErrCode AcquireProviderFormInfoAsync(const int64_t formId, const FormItemInfo &info, const WantParams &wantParams);
 
+    ErrCode InnerAcquireProviderFormInfoAsync(const int64_t formId,
+        const FormItemInfo &info, const WantParams &wantParams);
+
     /**
      * @brief Handle release form.
      * @param formId The form id.

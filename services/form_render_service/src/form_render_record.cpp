@@ -895,6 +895,10 @@ int32_t FormRenderRecord::OnUnlock()
         }
         renderRecord->HandleOnUnlock();
     };
+    if (eventHandler_ == nullptr) {
+        HILOG_ERROR("eventHandler_ is nullptr.");
+        return RENDER_FORM_FAILED;
+    }
     eventHandler_->PostTask(task);
     return ERR_OK;
 }
@@ -903,9 +907,9 @@ int32_t FormRenderRecord::HandleOnUnlock()
 {
     HILOG_INFO("HandleOnUnlock called.");
     std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
-    for (auto iter = formRendererGroupMap_.begin(); iter != formRendererGroupMap_.end(); ++iter) {
-        if (iter->second) {
-            iter->second->OnUnlock();
+    for (const auto& iter : formRendererGroupMap_) {
+        if (iter.second) {
+            iter.second->OnUnlock();
         }
     }
     return ERR_OK;

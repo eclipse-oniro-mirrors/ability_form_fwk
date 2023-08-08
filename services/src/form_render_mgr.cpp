@@ -16,6 +16,7 @@
 #include "form_render_mgr.h"
 
 #include <mutex>
+
 #include "fms_log_wrapper.h"
 #include "form_ams_helper.h"
 #include "form_bms_helper.h"
@@ -55,6 +56,13 @@ void FormRenderMgr::GetFormRenderState()
     HILOG_INFO("isVerified: %{public}d", isVerified);
     std::lock_guard<std::mutex> lock(isVerifiedMutex_);
     isVerified_ = isVerified;
+}
+
+bool FormRenderMgr::GetIsVerified()
+{
+    HILOG_DEBUG("GetIsVerified.");
+    std::lock_guard<std::mutex> lock(isVerifiedMutex_);
+    return isVerified_;
 }
 
 ErrCode FormRenderMgr::RenderForm(
@@ -228,20 +236,45 @@ void FormRenderMgr::SetFormRenderState(bool isVerified)
     isVerified_ = isVerified;
 }
 
-ErrCode FormRenderMgr::OnUnlock()
+void FormRenderMgr::PostOnUnlockTask()
 {
+    HILOG_DEBUG("called");
     if (renderRemoteObj_ == nullptr) {
         HILOG_ERROR("renderRemoteObj_ is nullptr");
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+        return;
     }
     auto remoteObject = renderRemoteObj_->AsObject();
     if (remoteObject == nullptr) {
         HILOG_ERROR("remoteObject is nullptr, can not get obj from renderRemoteObj.");
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+        return;
     }
     FormTaskMgr::GetInstance().PostOnUnlock(remoteObject);
+}
+
+void FormRenderMgr::AddAcquireProviderFormInfoTask(std::function<void()> task)
+{
+    HILOG_DEBUG("called");
+    std::lock_guard<std::mutex> lock(taskQueueMutex_);
+    taskQueue_.push(task);
+}
+
+void FormRenderMgr::ExecAcquireProviderTask()
+{
+    HILOG_INFO("start to execute asynchronous tasks in the queue.");
+    std::lock_guard<std::mutex> lock(taskQueueMutex_);
+    if (!taskQueue_.empty()) {
+        auto task = taskQueue_.front();
+        task();
+        taskQueue_.pop();
+    }
+}
+
+void FormRenderMgr::OnUnlock()
+{
+    HILOG_DEBUG("called. The authentication status of the current user is true.");
     SetFormRenderState(true);
-    return ERR_OK;
+    PostOnUnlockTask();
+    ExecAcquireProviderTask();
 }
 
 ErrCode FormRenderMgr::StopRenderingForm(int64_t formId, const FormRecord &formRecord, const std::string &compId, const sptr<IRemoteObject> &hostToken)

@@ -960,7 +960,7 @@ void FormTaskMgr::OnUnlock(const sptr<IRemoteObject> &remoteObject)
 
 void FormTaskMgr::PostOnUnlock(const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_DEBUG("begin");
+    HILOG_DEBUG("called");
     if (serialQueue_ == nullptr) {
         HILOG_ERROR("serialQueue_ is nullptr.");
         return;

@@ -218,9 +218,9 @@ int32_t FormRenderImpl::OnUnlock()
 {
     HILOG_INFO("OnUnlock start");
     std::lock_guard<std::mutex> lock(renderRecordMutex_);
-    for (auto iter = renderRecordMap_.begin(); iter != renderRecordMap_.end(); ++iter) {
-        if (iter->second) {
-            iter->second->OnUnlock();
+    for (const auto& iter : renderRecordMap_) {
+        if (iter.second) {
+            iter.second->OnUnlock();
         }
     }
     return ERR_OK;

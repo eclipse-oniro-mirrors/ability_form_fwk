@@ -232,7 +232,7 @@ int32_t FormRenderProxy::OnUnlock()
     MessageParcel reply;
     MessageOption option(MessageOption::TF_ASYNC);
     if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("%{public}s, failed to write interface token", __func__);
+        HILOG_ERROR("failed to write interface token");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 

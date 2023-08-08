@@ -17,6 +17,7 @@
 #define OHOS_FORM_FWK_FORM_RENDER_MGR_H
 
 #include <atomic>
+#include <queue>
 #include <singleton.h>
 #include <unordered_map>
 
@@ -44,7 +45,7 @@ public:
     ErrCode UpdateRenderingForm(int64_t formId, const FormProviderData &formProviderData,
         const WantParams &wantParams, bool mergeData);
 
-    ErrCode OnUnlock();
+    void OnUnlock();
 
     ErrCode StopRenderingForm(int64_t formId, const FormRecord &formRecord, const std::string &compId = "", const sptr<IRemoteObject> &hostToken = nullptr);
 
@@ -55,6 +56,8 @@ public:
     ErrCode StopRenderingFormCallback(int64_t formId, const Want &want);
 
     void GetFormRenderState();
+
+    bool GetIsVerified();
 
     ErrCode AddConnection(int64_t formId, sptr<FormRenderConnection> connection);
 
@@ -78,6 +81,12 @@ public:
 
     void SetFormRenderState(bool isVerified);
 
+    void AddAcquireProviderFormInfoTask(std::function<void()> task);
+
+    void ExecAcquireProviderTask();
+
+    void PostOnUnlockTask();
+
 private:
     ErrCode ConnectRenderService(const sptr<FormRenderConnection> &connection) const;
 
@@ -100,6 +109,8 @@ private:
 
     mutable std::mutex resourceMutex_;
     mutable std::mutex isVerifiedMutex_;
+    std::mutex taskQueueMutex_;
+    std::queue<std::function<void()>> taskQueue_;
     // <formId, connectionToRenderService>
     std::unordered_map<int64_t, sptr<FormRenderConnection>> renderFormConnections_;
     // <hostToken, formIds>
