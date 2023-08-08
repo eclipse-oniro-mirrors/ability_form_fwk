@@ -1314,7 +1314,7 @@ ErrCode FormMgrAdapter::GetBundleInfo(const AAFwk::Want &want, BundleInfo &bundl
     if (!IN_PROCESS_CALL(iBundleMgr->GetBundleInfo(bundleName, AppExecFwk::BundleFlag::GET_BUNDLE_WITH_ABILITIES,
         bundleInfo, FormUtil::GetCurrentAccountId()))) {
         HILOG_ERROR("GetBundleInfo, failed to get bundle info.");
-        return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
+        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
     }
 
     bool moduleExist = false;
@@ -1355,32 +1355,28 @@ ErrCode FormMgrAdapter::GetFormInfo(const AAFwk::Want &want, FormInfo &formInfo)
     ErrCode errCode = FormInfoMgr::GetInstance().GetFormsInfoByModule(bundleName, moduleName, formInfos);
     if (errCode != ERR_OK) {
         HILOG_ERROR("GetFormsInfoByModule, failed to get form config info.");
-        return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
+        return errCode;
     }
 
     std::string formName = want.GetStringParam(Constants::PARAM_FORM_NAME_KEY);
-    if (formName.empty()) {
-        for (const auto &form : formInfos) {
-            if (form.defaultFlag && form.abilityName == abilityName) {
-                formInfo = form;
-                formInfo.moduleName = moduleName;
-                HILOG_DEBUG("GetFormInfo end.");
-                return ERR_OK;
-            }
+    bool abilityExisting = false;
+    for (const auto &form : formInfos) {
+        if (form.abilityName != abilityName) {
+            continue;
         }
-    } else  {
-        for (const auto &form : formInfos) {
-            if (form.name == formName && form.abilityName == abilityName) {
-                formInfo = form;
-                formInfo.moduleName = moduleName;
-                HILOG_DEBUG("GetFormInfo end.");
-                return ERR_OK;
-            }
+
+        abilityExisting = true;
+        if ((formName.empty() && form.defaultFlag) || form.name == formName) {
+            formInfo = form;
+            formInfo.moduleName = moduleName;
+            HILOG_DEBUG("GetFormInfo end.");
+            return ERR_OK;
         }
     }
+
     HILOG_ERROR("failed to get form info failed. ability name is %{public}s, form name is %{public}s",
         abilityName.c_str(), formName.c_str());
-    return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
+    return abilityExisting ? ERR_APPEXECFWK_FORM_GET_INFO_FAILED : ERR_APPEXECFWK_FORM_NO_SUCH_ABILITY;
 }
 /**
  * @brief Get form configure info.
