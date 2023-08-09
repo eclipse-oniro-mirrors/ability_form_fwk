@@ -1013,8 +1013,9 @@ int32_t FormMgrStub::HandleGetFormInstanceById(MessageParcel &data, MessageParce
 {
     HILOG_DEBUG("called.");
     int64_t formId = data.ReadInt64();
+    bool isIncludeUnused = data.ReadBool();
     FormInstance info;
-    auto result = GetFormInstanceById(formId, info);
+    auto result = GetFormInstanceById(formId, isIncludeUnused, info);
     reply.WriteInt32(result);
     if (result == ERR_OK) {
         if (!reply.WriteParcelable(&info)) {

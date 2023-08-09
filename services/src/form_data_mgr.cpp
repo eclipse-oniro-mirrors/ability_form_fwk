@@ -23,6 +23,7 @@
 #include "form_cache_mgr.h"
 #include "form_constants.h"
 #include "form_data_proxy_mgr.h"
+#include "form_db_cache.h"
 #include "form_mgr_errors.h"
 #include "form_observer_record.h"
 #include "form_provider_mgr.h"
@@ -2058,6 +2059,58 @@ ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, FormInstance &for
         formInstance.moduleName = formRecord.moduleName;
         formInstance.abilityName = formRecord.abilityName;
         formInstance.formName = formRecord.formName;
+    } else {
+        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+    }
+    HILOG_DEBUG("get form instance successfully");
+    return ERR_OK;
+}
+
+ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, bool isIncludeUnused, FormInstance &formInstance)
+{
+    HILOG_DEBUG("get form instance by formId");
+    if (formId <= 0) {
+        HILOG_ERROR("formId is invalid");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    FormRecord formRecord;
+    bool formRecordExist = false;
+    {
+        std::lock_guard<std::mutex> lock(formRecordMutex_);
+        auto info = formRecords_.find(formId);
+        if (info != formRecords_.end()) {
+            formRecord = info->second;
+            formRecordExist = true;
+        }
+    }
+    if (formRecordExist) {
+        std::vector<FormHostRecord> formHostRecords;
+        GetFormHostRecord(formId, formHostRecords);
+        if (formHostRecords.empty()) {
+            HILOG_ERROR("fail, clientHost is empty");
+            return ERR_APPEXECFWK_FORM_COMMON_CODE;
+        }
+        formInstance.formHostName = formHostRecords.begin()->GetHostBundleName();
+        formInstance.formId = formRecord.formId;
+        formInstance.specification = formRecord.specification;
+        formInstance.formVisiblity = static_cast<FormVisibilityType>(formRecord.formVisibleNotifyState);
+        formInstance.bundleName = formRecord.bundleName;
+        formInstance.moduleName = formRecord.moduleName;
+        formInstance.abilityName = formRecord.abilityName;
+        formInstance.formName = formRecord.formName;
+    } else if (isIncludeUnused == true) {
+        FormRecord dbRecord;
+        ErrCode getDbRet = FormDbCache::GetInstance().GetDBRecord(formId, dbRecord);
+        if (getDbRet == ERR_OK) {
+            formInstance.formHostName = "";
+            formInstance.formId = formId;
+            formInstance.specification = dbRecord.specification;
+            formInstance.formVisiblity = static_cast<FormVisibilityType>(dbRecord.formVisibleNotifyState);
+            formInstance.bundleName = dbRecord.bundleName;
+            formInstance.moduleName = dbRecord.moduleName;
+            formInstance.abilityName = dbRecord.abilityName;
+            formInstance.formName = dbRecord.formName;
+        }
     } else {
         return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
     }

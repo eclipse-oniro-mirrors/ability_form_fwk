@@ -654,7 +654,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
         bool isVisibility = (formVisibleType == static_cast<int32_t>(FormVisibilityType::VISIBLE));
         FormInstance formInstance;
         // Get the updated card status
-        FormDataMgr::GetInstance().GetFormInstanceById(matchedFormId, formInstance);
+        FormDataMgr::GetInstance().GetFormInstanceById(matchedFormId, false, formInstance);
         std::string formHostName = formInstance.formHostName;
         std::string formAllHostName = EMPTY_BUNDLE;
         for (auto formObserver : formObservers_) {
@@ -2744,6 +2744,11 @@ ErrCode FormMgrAdapter::GetFormInstancesByFilter(const FormInstancesFilter &form
 ErrCode FormMgrAdapter::GetFormInstanceById(const int64_t formId, FormInstance &formInstance)
 {
     return FormDataMgr::GetInstance().GetFormInstanceById(formId, formInstance);
+}
+
+ErrCode FormMgrAdapter::GetFormInstanceById(const int64_t formId, bool isIncludeUnused, FormInstance &formInstance)
+{
+    return FormDataMgr::GetInstance().GetFormInstanceById(formId, isIncludeUnused, formInstance);
 }
 
 ErrCode FormMgrAdapter::RegisterAddObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken)
