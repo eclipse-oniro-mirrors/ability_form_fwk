@@ -90,8 +90,10 @@ int FormSupplyCallback::OnAcquire(const FormProviderInfo &formProviderInfo, cons
     switch (type) {
         case Constants::ACQUIRE_TYPE_CREATE_FORM:
             ret = FormProviderMgr::GetInstance().AcquireForm(formId, formProviderInfo);
+            break;
         case Constants::ACQUIRE_TYPE_RECREATE_FORM:
             ret = FormProviderMgr::GetInstance().UpdateForm(formId, formProviderInfo);
+            break;
         default:
             HILOG_WARN("%{public}s warning, onAcquired type: %{public}d", __func__, type);
     }
