@@ -55,9 +55,9 @@ public:
 
     ErrCode StopRenderingFormCallback(int64_t formId, const Want &want);
 
-    void GetFormRenderState();
+    void GetFormRenderState() const;
 
-    bool GetIsVerified();
+    bool GetIsVerified() const;
 
     ErrCode AddConnection(int64_t formId, sptr<FormRenderConnection> connection);
 
@@ -118,7 +118,7 @@ private:
     sptr<IFormRender> renderRemoteObj_ = nullptr;
     sptr<IRemoteObject::DeathRecipient> renderDeathRecipient_ = nullptr;
     std::atomic<int32_t> atomicRerenderCount_ = 0;
-    std::atomic<bool> isVerified_ = false;
+    mutable bool isVerified_ = false;
 };
 
 /**

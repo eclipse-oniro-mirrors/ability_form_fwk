@@ -47,7 +47,7 @@ FormRenderMgr::~FormRenderMgr()
 {
 }
 
-void FormRenderMgr::GetFormRenderState()
+void FormRenderMgr::GetFormRenderState() const
 {
     HILOG_INFO("RenderForm for the first time");
     // Check whether the account is authenticated.
@@ -58,7 +58,7 @@ void FormRenderMgr::GetFormRenderState()
     isVerified_ = isVerified;
 }
 
-bool FormRenderMgr::GetIsVerified()
+bool FormRenderMgr::GetIsVerified() const
 {
     HILOG_DEBUG("GetIsVerified.");
     std::lock_guard<std::mutex> lock(isVerifiedMutex_);
@@ -72,7 +72,7 @@ ErrCode FormRenderMgr::RenderForm(
     std::once_flag flag;
     std::function<void()> func = std::bind(&FormRenderMgr::GetFormRenderState, this);
     std::call_once(flag, func);
-    HILOG_INFO("The authentication status of the current user is : %{public}d", isVerified_.load());
+    HILOG_INFO("The authentication status of the current user is : %{public}d", isVerified_);
     if (formRecord.uiSyntax != FormType::ETS) {
         return ERR_OK;
     }
@@ -262,7 +262,7 @@ void FormRenderMgr::ExecAcquireProviderTask()
 {
     HILOG_INFO("start to execute asynchronous tasks in the queue.");
     std::lock_guard<std::mutex> lock(taskQueueMutex_);
-    if (!taskQueue_.empty()) {
+    while (!taskQueue_.empty()) {
         auto task = taskQueue_.front();
         task();
         taskQueue_.pop();
