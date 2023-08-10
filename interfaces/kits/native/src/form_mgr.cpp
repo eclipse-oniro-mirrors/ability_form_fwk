@@ -1239,6 +1239,21 @@ ErrCode FormMgr::GetFormInstanceById(const int64_t formId, FormInstance &formIns
     return remoteProxy_->GetFormInstanceById(formId, formInstance);
 }
 
+ErrCode FormMgr::GetFormInstanceById(const int64_t formId, bool isIncludeUnused, FormInstance &formInstance)
+{
+    HILOG_DEBUG("called.");
+    auto errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("get form instance by formId failed, errCode:%{public}d.", errCode);
+        return errCode;
+    }
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("remoteProxy_ is nullptr.");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    return remoteProxy_->GetFormInstanceById(formId, isIncludeUnused, formInstance);
+}
+
 ErrCode FormMgr::RegisterAddObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken)
 {
     HILOG_DEBUG("called.");

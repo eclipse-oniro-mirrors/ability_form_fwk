@@ -1256,6 +1256,20 @@ ErrCode FormMgrService::GetFormInstanceById(const int64_t formId, FormInstance &
     return FormMgrAdapter::GetInstance().GetFormInstanceById(formId, formInstance);
 }
 
+ErrCode FormMgrService::GetFormInstanceById(const int64_t formId, bool isIncludeUnused, FormInstance &formInstance)
+{
+    if (!CheckCallerIsSystemApp()) {
+        HILOG_ERROR("caller app is not system app!");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+
+    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_REQUIRE_FORM)) {
+        HILOG_ERROR("verify calling permission failed!");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    }
+    return FormMgrAdapter::GetInstance().GetFormInstanceById(formId, isIncludeUnused, formInstance);
+}
+
 ErrCode FormMgrService::RegisterAddObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken)
 {
     HILOG_DEBUG("called.");

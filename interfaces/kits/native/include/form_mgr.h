@@ -505,6 +505,15 @@ public:
     ErrCode GetFormInstanceById(const int64_t formId, FormInstance &formInstance);
 
     /**
+     * @brief Get form instance by formId, include form store in DB.
+     * @param formId formId Indicates the unique id of form.
+     * @param isIncludeUnused Indicates whether to include unused form.
+     * @param formInstance return formInstance
+     * @return return ERR_OK on get info success,other on failure.
+     */
+    ErrCode GetFormInstanceById(const int64_t formId, bool isIncludeUnused, FormInstance &formInstance);
+
+    /**
      * @brief Register form add observer.
      * @param bundleName BundleName of the form host
      * @param callerToken Caller ability token.

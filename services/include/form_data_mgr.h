@@ -636,6 +636,15 @@ public:
     ErrCode GetFormInstanceById(const int64_t formId, FormInstance &formInstances);
 
     /**
+     * @brief Get form instance by formId, include form store in DB.
+     * @param formId formId Indicates the unique id of form.
+     * @param isIncludeUnused Indicates whether to include unused forms.
+     * @param formInstance return formInstance
+     * @return return ERR_OK on get info success,other on failure.
+     */
+    ErrCode GetFormInstanceById(const int64_t formId, bool isIncludeUnused, FormInstance &formInstances);
+
+    /**
      * @brief Set form config map.
      * @param configMap form config map.
      */

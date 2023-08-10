@@ -1858,25 +1858,40 @@ private:
         HILOG_DEBUG("called");
         if (info.argc < ARGS_ONE || info.argc > ARGS_THREE) {
             HILOG_ERROR("wrong number of arguments!");
-            NapiFormUtil::ThrowParamNumError(engine, std::to_string(info.argc), "1 or 2");
+            NapiFormUtil::ThrowParamNumError(engine, std::to_string(info.argc), "1 or 2 or 3");
             return engine.CreateUndefined();
         }
-
+        int32_t convertArgc = 0;
         int64_t formId;
         if (!ConvertFromId(engine, info.argv[PARAM0], formId)) {
             HILOG_ERROR("convert strFormIdList failed!");
             NapiFormUtil::ThrowParamTypeError(engine, "formId", "string");
             return engine.CreateUndefined();
         }
-        if (info.argc == ARGS_TWO && info.argv[PARAM1]->TypeOf() != NATIVE_FUNCTION) {
-            HILOG_ERROR("param1 is invalid");
+        convertArgc++;
+        bool isIncludeUnused = false;
+        if ((info.argc == ARGS_TWO || info.argc == ARGS_THREE) && info.argv[PARAM1]->TypeOf() != NATIVE_FUNCTION) {
+            if (info.argv[PARAM1]->TypeOf() != NATIVE_BOOLEAN) {
+                HILOG_ERROR("input params is not bool");
+                NapiFormUtil::ThrowParamTypeError(engine, "isIncludeUnused", "bool");
+                return engine.CreateUndefined();
+            }
+            if (!ConvertFromJsValue(engine, info.argv[PARAM1], isIncludeUnused)) {
+                HILOG_ERROR("convert isIncludeUnused failed.");
+                NapiFormUtil::ThrowParamTypeError(engine, "isIncludeUnused", "bool");
+                return engine.CreateUndefined();
+            }
+            convertArgc++;
+        }
+        if (info.argc == ARGS_THREE && info.argv[PARAM2]->TypeOf() != NATIVE_FUNCTION) {
+            HILOG_ERROR("param2 is invalid");
             NapiFormUtil::ThrowParamTypeError(engine, "callback", "Callback<string>");
             return engine.CreateUndefined();
         }
         std::shared_ptr<FormInstance> formInstance = std::make_shared<FormInstance>();
         auto apiResult = std::make_shared<int32_t>();
-        auto execute = [formId, formInstance, ret = apiResult]() {
-            *ret = FormMgr::GetInstance().GetFormInstanceById(formId, *formInstance);
+        auto execute = [formId, isIncludeUnused, formInstance, ret = apiResult]() {
+            *ret = FormMgr::GetInstance().GetFormInstanceById(formId, isIncludeUnused, *formInstance);
         };
 
         auto complete =
@@ -1888,7 +1903,7 @@ private:
                     task.ResolveWithNoError(engine, CreateFormInstance(engine, *formInstance));
                 }
             };
-        NativeValue *lastParam = (info.argc == ARGS_ONE) ? nullptr : info.argv[PARAM1];
+        NativeValue *lastParam = (info.argc == convertArgc) ? nullptr : info.argv[convertArgc];
         NativeValue *result = nullptr;
         AsyncTask::Schedule("NapiFormHost::OnGetFormInstanceById",
             engine, CreateAsyncTaskWithLastParam(engine, lastParam, std::move(execute), std::move(complete), &result));

@@ -1575,6 +1575,33 @@ ErrCode FormMgrProxy::GetFormInstanceById(const int64_t formId, FormInstance &fo
     return error;
 }
 
+ErrCode FormMgrProxy::GetFormInstanceById(const int64_t formId, bool isIncludeUnused, FormInstance &formInstance)
+{
+    HILOG_DEBUG("start.");
+    MessageParcel data;
+    // write in token to help identify which stub to be called.
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("failed to write interface token");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt64(formId)) {
+        HILOG_ERROR("failed to write formId");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteBool(isIncludeUnused)) {
+        HILOG_ERROR("failed to write isIncludeUnused");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    auto error = GetParcelableInfo<FormInstance>(IFormMgr::Message::FORM_MGR_GET_FORM_INSTANCES_FROM_BY_ID,
+        data, formInstance);
+    if (error != ERR_OK) {
+        HILOG_ERROR("failed to get parcelable info.");
+    }
+
+    return error;
+}
+
 ErrCode FormMgrProxy::GetFormInstance(IFormMgr::Message code, MessageParcel &data,
     std::vector<FormInstance> &formInstances)
 {
