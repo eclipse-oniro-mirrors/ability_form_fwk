@@ -212,6 +212,9 @@ public:
 
     void PostReleaseRenderer(
         int64_t formId, const std::string &compId, const std::string &uid, const sptr<IRemoteObject> &remoteObject);
+
+    void PostOnUnlock(const sptr<IRemoteObject> &remoteObject);
+
 private:
     /**
      * @brief Acquire form data from form provider.
@@ -383,6 +386,8 @@ private:
 
     void ReleaseRenderer(
         int64_t formId, const std::string &compId, const std::string &uid, const sptr<IRemoteObject> &remoteObject);
+
+    void OnUnlock(const sptr<IRemoteObject> &remoteObject);
 private:
     std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;
 };

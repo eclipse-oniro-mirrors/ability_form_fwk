@@ -40,6 +40,8 @@ FormRenderStub::FormRenderStub()
         &FormRenderStub::HandleReloadForm;
     memberFuncMap_[static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_RELEASE_RENDERER)] =
         &FormRenderStub::HandleReleaseRenderer;
+    memberFuncMap_[static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_UNLOCKED)] =
+        &FormRenderStub::HandleOnUnlock;
 }
 
 FormRenderStub::~FormRenderStub()
@@ -155,6 +157,13 @@ int FormRenderStub::HandleReloadForm(MessageParcel &data, MessageParcel &reply)
     }
 
     result = ReloadForm(std::move(formJsInfos), *want);
+    reply.WriteInt32(result);
+    return result;
+}
+
+int32_t FormRenderStub::HandleOnUnlock(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = OnUnlock();
     reply.WriteInt32(result);
     return result;
 }

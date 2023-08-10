@@ -941,5 +941,35 @@ void FormTaskMgr::PostReloadForm(const std::vector<FormRecord> &&formRecords, co
     serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, reloadForm);
     HILOG_INFO("%{public}s end", __func__);
 }
+
+void FormTaskMgr::OnUnlock(const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_INFO("begin");
+    sptr<IFormRender> remoteFormRender = iface_cast<IFormRender>(remoteObject);
+    if (remoteFormRender == nullptr) {
+        HILOG_ERROR("%{public}s fail, Failed to get form render proxy.", __func__);
+        return;
+    }
+    int32_t error = remoteFormRender->OnUnlock();
+    if (error != ERR_OK) {
+        HILOG_ERROR("%{public}s fail", __func__);
+        return;
+    }
+    HILOG_INFO("end");
+}
+
+void FormTaskMgr::PostOnUnlock(const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_DEBUG("called");
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("serialQueue_ is nullptr.");
+        return;
+    }
+    auto task = [remoteObject]() {
+        FormTaskMgr::GetInstance().OnUnlock(remoteObject);
+    };
+    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, task);
+    HILOG_INFO("end");
+}
 } // namespace AppExecFwk
 } // namespace OHOS

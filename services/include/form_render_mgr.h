@@ -17,6 +17,7 @@
 #define OHOS_FORM_FWK_FORM_RENDER_MGR_H
 
 #include <atomic>
+#include <queue>
 #include <singleton.h>
 #include <unordered_map>
 
@@ -44,6 +45,8 @@ public:
     ErrCode UpdateRenderingForm(int64_t formId, const FormProviderData &formProviderData,
         const WantParams &wantParams, bool mergeData);
 
+    void OnUnlock();
+
     ErrCode StopRenderingForm(int64_t formId, const FormRecord &formRecord, const std::string &compId = "", const sptr<IRemoteObject> &hostToken = nullptr);
 
     ErrCode ReloadForm(const std::vector<FormRecord> &&formRecords, const std::string &bundleName, int32_t userId);
@@ -51,6 +54,10 @@ public:
     ErrCode RenderFormCallback(int64_t formId, const Want &want);
 
     ErrCode StopRenderingFormCallback(int64_t formId, const Want &want);
+
+    void GetFormRenderState();
+
+    bool GetIsVerified();
 
     ErrCode AddConnection(int64_t formId, sptr<FormRenderConnection> connection);
 
@@ -71,6 +78,14 @@ public:
     void OnRenderingBlock(const std::string &bundleName);
 
     ErrCode ReleaseRenderer(int64_t formId, const FormRecord &formRecord, const std::string &compId);
+
+    void SetFormRenderState(bool isVerified);
+
+    void AddAcquireProviderFormInfoTask(std::function<void()> task);
+
+    void ExecAcquireProviderTask();
+
+    void PostOnUnlockTask();
 
 private:
     ErrCode ConnectRenderService(const sptr<FormRenderConnection> &connection) const;
@@ -93,6 +108,9 @@ private:
     };
 
     mutable std::mutex resourceMutex_;
+    mutable std::mutex isVerifiedMutex_;
+    std::mutex taskQueueMutex_;
+    std::queue<std::function<void()>> taskQueue_;
     // <formId, connectionToRenderService>
     std::unordered_map<int64_t, sptr<FormRenderConnection>> renderFormConnections_;
     // <hostToken, formIds>
@@ -100,6 +118,7 @@ private:
     sptr<IFormRender> renderRemoteObj_ = nullptr;
     sptr<IRemoteObject::DeathRecipient> renderDeathRecipient_ = nullptr;
     std::atomic<int32_t> atomicRerenderCount_ = 0;
+    std::atomic<bool> isVerified_ = false;
 };
 
 /**

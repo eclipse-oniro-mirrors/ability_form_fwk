@@ -63,6 +63,8 @@ public:
 
     int32_t ReloadForm(const std::vector<FormJsInfo> &&formJsInfos, const Want &want) override;
 
+    int32_t OnUnlock() override;
+
 private:
     bool WriteInterfaceToken(MessageParcel &data);
     template<typename T>

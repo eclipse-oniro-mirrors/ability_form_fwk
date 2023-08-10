@@ -99,6 +99,11 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
     FormRenderMgr::GetInstance().ReloadForm(std::move(updatedForms), bundleName, userId);
 }
 
+void FormEventUtil::HandleOnUnlock()
+{
+    FormRenderMgr::GetInstance().OnUnlock();
+}
+
 void FormEventUtil::HandleBundleFormInfoRemoved(const std::string &bundleName, int32_t userId)
 {
     FormTrustMgr::GetInstance().MarkTrustFlag(bundleName, true);

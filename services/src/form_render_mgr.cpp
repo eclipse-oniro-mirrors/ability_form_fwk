@@ -15,6 +15,8 @@
 
 #include "form_render_mgr.h"
 
+#include <mutex>
+
 #include "fms_log_wrapper.h"
 #include "form_ams_helper.h"
 #include "form_bms_helper.h"
@@ -29,6 +31,7 @@
 #include "form_trust_mgr.h"
 #include "form_util.h"
 #include "ipc_skeleton.h"
+#include "os_account_manager.h"
 #include "want.h"
 
 namespace OHOS {
@@ -43,14 +46,36 @@ FormRenderMgr::FormRenderMgr()
 FormRenderMgr::~FormRenderMgr()
 {
 }
+
+void FormRenderMgr::GetFormRenderState()
+{
+    HILOG_INFO("RenderForm for the first time");
+    // Check whether the account is authenticated.
+    bool isVerified = false;
+    AccountSA::OsAccountManager::IsOsAccountVerified(FormUtil::GetCurrentAccountId(), isVerified);
+    HILOG_INFO("isVerified: %{public}d", isVerified);
+    std::lock_guard<std::mutex> lock(isVerifiedMutex_);
+    isVerified_ = isVerified;
+}
+
+bool FormRenderMgr::GetIsVerified()
+{
+    HILOG_DEBUG("GetIsVerified.");
+    std::lock_guard<std::mutex> lock(isVerifiedMutex_);
+    return isVerified_;
+}
+
 ErrCode FormRenderMgr::RenderForm(
     const FormRecord &formRecord, const WantParams &wantParams, const sptr<IRemoteObject> &hostToken)
 {
     HILOG_INFO("RenderForm formId: %{public}" PRId64 "", formRecord.formId);
+    std::once_flag flag;
+    std::function<void()> func = std::bind(&FormRenderMgr::GetFormRenderState, this);
+    std::call_once(flag, func);
+    HILOG_INFO("The authentication status of the current user is : %{public}d", isVerified_.load());
     if (formRecord.uiSyntax != FormType::ETS) {
         return ERR_OK;
     }
-
     if (formRecord.formId <= 0) {
         HILOG_ERROR("%{public}s fail, formId should be greater than 0.", __func__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -60,6 +85,10 @@ ErrCode FormRenderMgr::RenderForm(
     Want want;
     want.SetParams(wantParams);
     want.SetParam(Constants::FORM_SUPPLY_UID, std::to_string(userId) + formRecord.bundleName);
+    {
+        std::lock_guard<std::mutex> lock(isVerifiedMutex_);
+        want.SetParam(Constants::FORM_RENDER_STATE, isVerified_);
+    }
     if (atomicRerenderCount_ > 0) {
         --atomicRerenderCount_;
     } else {
@@ -196,6 +225,54 @@ ErrCode FormRenderMgr::ReloadForm(
     want.SetParam(Constants::FORM_SUPPLY_UID, std::to_string(userId) + bundleName);
     FormTaskMgr::GetInstance().PostReloadForm(std::forward<decltype(formRecords)>(formRecords), want, remoteObject);
     return ERR_OK;
+}
+
+void FormRenderMgr::SetFormRenderState(bool isVerified)
+{
+    HILOG_DEBUG("start to set form render state.");
+    std::lock_guard<std::mutex> lock(isVerifiedMutex_);
+    isVerified_ = isVerified;
+}
+
+void FormRenderMgr::PostOnUnlockTask()
+{
+    HILOG_DEBUG("called");
+    if (renderRemoteObj_ == nullptr) {
+        HILOG_ERROR("renderRemoteObj_ is nullptr");
+        return;
+    }
+    auto remoteObject = renderRemoteObj_->AsObject();
+    if (remoteObject == nullptr) {
+        HILOG_ERROR("remoteObject is nullptr, can not get obj from renderRemoteObj.");
+        return;
+    }
+    FormTaskMgr::GetInstance().PostOnUnlock(remoteObject);
+}
+
+void FormRenderMgr::AddAcquireProviderFormInfoTask(std::function<void()> task)
+{
+    HILOG_DEBUG("called");
+    std::lock_guard<std::mutex> lock(taskQueueMutex_);
+    taskQueue_.push(task);
+}
+
+void FormRenderMgr::ExecAcquireProviderTask()
+{
+    HILOG_INFO("start to execute asynchronous tasks in the queue.");
+    std::lock_guard<std::mutex> lock(taskQueueMutex_);
+    if (!taskQueue_.empty()) {
+        auto task = taskQueue_.front();
+        task();
+        taskQueue_.pop();
+    }
+}
+
+void FormRenderMgr::OnUnlock()
+{
+    HILOG_DEBUG("called. The authentication status of the current user is true.");
+    SetFormRenderState(true);
+    PostOnUnlockTask();
+    ExecAcquireProviderTask();
 }
 
 ErrCode FormRenderMgr::StopRenderingForm(int64_t formId, const FormRecord &formRecord, const std::string &compId, const sptr<IRemoteObject> &hostToken)

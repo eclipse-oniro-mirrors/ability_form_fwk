@@ -41,6 +41,7 @@
 #include "in_process_call_wrapper.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
+#include "os_account_manager.h"
 #include "permission_constants.h"
 #include "permission_verification.h"
 #include "system_ability_definition.h"
@@ -603,6 +604,7 @@ ErrCode FormMgrService::Init()
         matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_ABILITY_UPDATED);
         matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_DATA_CLEARED);
         matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED);
+        matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_USER_UNLOCKED);
         matchingSkills.AddEvent(COMMON_EVENT_BUNDLE_SCAN_FINISHED);
         // init TimerReceiver
         EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
@@ -639,7 +641,6 @@ ErrCode FormMgrService::Init()
     if (result != ERR_OK) {
         HILOG_WARN("parse form config failed, use the default vaule.");
     }
-
     HILOG_INFO("init success");
     return ERR_OK;
 }

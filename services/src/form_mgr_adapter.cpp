@@ -1261,6 +1261,22 @@ ErrCode FormMgrAdapter::HandleEventNotify(const std::string &providerKey, const 
 ErrCode FormMgrAdapter::AcquireProviderFormInfoAsync(const int64_t formId,
     const FormItemInfo &info, const WantParams &wantParams)
 {
+    if (FormRenderMgr::GetInstance().GetIsVerified()) {
+        HILOG_INFO("The authentication status of the current user is true.");
+        return InnerAcquireProviderFormInfoAsync(formId, info, wantParams);
+    }
+
+    HILOG_INFO("The current user is not unlocked.");
+    auto task = [formId, newInfo = info, newWant = wantParams]() {
+        FormMgrAdapter::GetInstance().InnerAcquireProviderFormInfoAsync(formId, newInfo, newWant);
+    };
+    FormRenderMgr::GetInstance().AddAcquireProviderFormInfoTask(task);
+    return ERR_OK;
+}
+
+ErrCode FormMgrAdapter::InnerAcquireProviderFormInfoAsync(const int64_t formId,
+    const FormItemInfo &info, const WantParams &wantParams)
+{
     if (formId <= 0) {
         HILOG_ERROR("%{public}s fail, formId should be greater than 0", __func__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
