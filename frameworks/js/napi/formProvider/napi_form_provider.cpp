@@ -49,7 +49,7 @@ namespace {
 
 napi_value ExecuteAsyncCallbackWork(napi_env env, AsyncCallbackInfoBase* asyncCallbackInfo)
 {
-    if (napi_queue_async_work(env, asyncCallbackInfo->asyncWork) != napi_ok) {
+    if (napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default) != napi_ok) {
         napi_value callbackValues[ARGS_SIZE_TWO] = {nullptr, nullptr};
         // store return-message to callbackValues[0].
         InnerCreateCallbackRetMsg(env, ERR_APPEXECFWK_FORM_COMMON_CODE, callbackValues);
@@ -70,7 +70,7 @@ napi_value ExecuteAsyncCallbackWork(napi_env env, AsyncCallbackInfoBase* asyncCa
 
 void ExecuteAsyncPromiseWork(napi_env env, AsyncCallbackInfoBase* asyncCallbackInfo)
 {
-    if (napi_queue_async_work(env, asyncCallbackInfo->asyncWork) != napi_ok) {
+    if (napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default) != napi_ok) {
         napi_value error;
         InnerCreatePromiseRetMsg(env, ERR_APPEXECFWK_FORM_COMMON_CODE, &error);
         napi_reject_deferred(asyncCallbackInfo->env, asyncCallbackInfo->deferred, error);
@@ -227,7 +227,7 @@ static napi_value RequestPublishFormCallback(napi_env env, napi_value *argv, boo
         },
         (void *) asyncCallbackInfo,
         &asyncCallbackInfo->asyncWork);
-    NAPI_CALL(env, napi_queue_async_work(env, asyncCallbackInfo->asyncWork));
+    NAPI_CALL(env, napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default));
     return NapiGetResult(env, 1);
 }
 
@@ -286,7 +286,7 @@ static napi_value RequestPublishFormPromise(napi_env env, napi_value *argv, bool
         },
         (void *) asyncCallbackInfo,
         &asyncCallbackInfo->asyncWork);
-    napi_queue_async_work(env, asyncCallbackInfo->asyncWork);
+    napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
     return promise;
 }
 
@@ -380,7 +380,7 @@ NativeValue* JsFormProvider::OnGetFormsInfo(NativeEngine &engine, NativeCallback
 
     NativeValue* lastParam = (info.argc <= convertArgc) ? nullptr : info.argv[convertArgc];
     NativeValue* result = nullptr;
-    AsyncTask::Schedule("JsFormProvider::OnGetFormsInfo",
+    AsyncTask::ScheduleWithDefaultQos("JsFormProvider::OnGetFormsInfo",
         engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
     return result;
 }
@@ -439,7 +439,7 @@ NativeValue* JsFormProvider::OnSetFormNextRefreshTime(NativeEngine &engine, Nati
     };
     NativeValue *lastParam = (info.argc == ARGS_SIZE_THREE) ? info.argv[PARAM2] : nullptr;
     NativeValue *result = nullptr;
-    AsyncTask::Schedule("JsFormProvider::OnSetFormNextRefreshTime",
+    AsyncTask::ScheduleWithDefaultQos("JsFormProvider::OnSetFormNextRefreshTime",
         engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
     return result;
 }
@@ -500,7 +500,7 @@ NativeValue* JsFormProvider::OnUpdateForm(NativeEngine &engine, NativeCallbackIn
     };
     NativeValue *lastParam = (info.argc == ARGS_SIZE_THREE) ? info.argv[PARAM2] : nullptr;
     NativeValue *result = nullptr;
-    AsyncTask::Schedule("JsFormProvider::OnUpdateForm",
+    AsyncTask::ScheduleWithDefaultQos("JsFormProvider::OnUpdateForm",
         engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
     return result;
 }
@@ -538,7 +538,7 @@ NativeValue* JsFormProvider::OnIsRequestPublishFormSupported(NativeEngine &engin
     };
     NativeValue *lastParam = (info.argc <= ARGS_SIZE_ZERO) ? nullptr : info.argv[PARAM0];
     NativeValue *result = nullptr;
-    AsyncTask::Schedule("JsFormProvider::OnIsRequestPublishFormSupported",
+    AsyncTask::ScheduleWithDefaultQos("JsFormProvider::OnIsRequestPublishFormSupported",
         engine, CreateAsyncTaskWithLastParam(engine, lastParam, std::move(execute), std::move(complete), &result));
     return result;
 }

@@ -183,7 +183,7 @@ NativeValue *JsFormProvider::OnGetFormsInfo(NativeEngine &engine, NativeCallback
 
     NativeValue *lastParam = isPromise ? nullptr : info.argv[convertArgc];
     NativeValue *result = nullptr;
-    AsyncTask::Schedule("JsFormProvider::OnGetFormsInfo",
+    AsyncTask::ScheduleWithDefaultQos("JsFormProvider::OnGetFormsInfo",
         engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
     return result;
 }
@@ -241,7 +241,7 @@ NativeValue *JsFormProvider::OnSetFormNextRefreshTime(NativeEngine &engine, Nati
     };
     NativeValue *lastParam = (info.argc == ARGS_SIZE_THREE) ? info.argv[PARAM2] : nullptr;
     NativeValue *result = nullptr;
-    AsyncTask::Schedule("JsFormProvider::OnSetFormNextRefreshTime",
+    AsyncTask::ScheduleWithDefaultQos("JsFormProvider::OnSetFormNextRefreshTime",
         engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
     return result;
 }
@@ -308,7 +308,7 @@ NativeValue *JsFormProvider::OnUpdateForm(NativeEngine &engine, NativeCallbackIn
         };
     NativeValue *lastParam = (info.argc == ARGS_SIZE_THREE) ? info.argv[PARAM2] : nullptr;
     NativeValue *result = nullptr;
-    AsyncTask::Schedule("JsFormProvider::OnUpdateForm",
+    AsyncTask::ScheduleWithDefaultQos("JsFormProvider::OnUpdateForm",
         engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
     return result;
 }
@@ -342,7 +342,7 @@ NativeValue *JsFormProvider::OnIsRequestPublishFormSupported(NativeEngine &engin
     };
     NativeValue *lastParam = (info.argc == ARGS_SIZE_ONE) ? info.argv[PARAM0] : nullptr;
     NativeValue *result = nullptr;
-    AsyncTask::Schedule("JsFormProvider::OnIsRequestPublishFormSupported",
+    AsyncTask::ScheduleWithDefaultQos("JsFormProvider::OnIsRequestPublishFormSupported",
         engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
     return result;
 }
@@ -413,7 +413,7 @@ NativeValue *JsFormProvider::OnRequestPublishForm(NativeEngine &engine, NativeCa
     };
     NativeValue *lastParam = (info.argc <= convertArgc) ? nullptr : info.argv[convertArgc];
     NativeValue *result = nullptr;
-    AsyncTask::Schedule("JsFormProvider::OnRequestPublishForm",
+    AsyncTask::ScheduleWithDefaultQos("JsFormProvider::OnRequestPublishForm",
         engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
     return result;
 }

@@ -532,7 +532,7 @@ private:
 
         NativeValue* lastParam = (info.argc <= convertArgc) ? nullptr : info.argv[convertArgc];
         NativeValue* result = nullptr;
-        AsyncTask::Schedule("JsFormHost::OnDeleteForm",
+        AsyncTask::ScheduleWithDefaultQos("JsFormHost::OnDeleteForm",
             engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
         return result;
     }
@@ -584,7 +584,7 @@ private:
 
         NativeValue* lastParam = (info.argc <= convertArgc) ? nullptr : info.argv[convertArgc];
         NativeValue* result = nullptr;
-        AsyncTask::Schedule("JsFormHost::OnReleaseForm",
+        AsyncTask::ScheduleWithDefaultQos("JsFormHost::OnReleaseForm",
             engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
         return result;
     }
@@ -620,7 +620,7 @@ private:
 
         NativeValue* lastParam = (info.argc <= convertArgc) ? nullptr : info.argv[convertArgc];
         NativeValue* result = nullptr;
-        AsyncTask::Schedule("JsFormHost::OnRequestForm",
+        AsyncTask::ScheduleWithDefaultQos("JsFormHost::OnRequestForm",
             engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
         return result;
     }
@@ -655,7 +655,7 @@ private:
 
         NativeValue* lastParam = (info.argc <= convertArgc) ? nullptr : info.argv[convertArgc];
         NativeValue* result = nullptr;
-        AsyncTask::Schedule("JsFormHost::OnCastTempForm",
+        AsyncTask::ScheduleWithDefaultQos("JsFormHost::OnCastTempForm",
             engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
         return result;
     }
@@ -691,7 +691,7 @@ private:
 
         NativeValue* lastParam = (info.argc <= convertArgc) ? nullptr : info.argv[convertArgc];
         NativeValue *result = nullptr;
-        AsyncTask::Schedule("JsFormHost::OnEnableFormsUpdate",
+        AsyncTask::ScheduleWithDefaultQos("JsFormHost::OnEnableFormsUpdate",
             engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
         return result;
     }
@@ -727,7 +727,7 @@ private:
 
         NativeValue* lastParam = (info.argc <= convertArgc) ? nullptr : info.argv[convertArgc];
         NativeValue *result = nullptr;
-        AsyncTask::Schedule("JsFormHost::OnEnableFormsUpdate",
+        AsyncTask::ScheduleWithDefaultQos("JsFormHost::OnEnableFormsUpdate",
             engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
         return result;
     }
@@ -762,7 +762,7 @@ private:
 
         NativeValue* lastParam = (info.argc <= convertArgc) ? nullptr : info.argv[convertArgc];
         NativeValue *result = nullptr;
-        AsyncTask::Schedule("JsFormHost::OnEnableFormsUpdate",
+        AsyncTask::ScheduleWithDefaultQos("JsFormHost::OnEnableFormsUpdate",
             engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
         return result;
     }
@@ -797,7 +797,7 @@ private:
 
         NativeValue* lastParam = (info.argc <= convertArgc) ? nullptr : info.argv[convertArgc];
         NativeValue *result = nullptr;
-        AsyncTask::Schedule("JsFormHost::OnDisableFormsUpdate",
+        AsyncTask::ScheduleWithDefaultQos("JsFormHost::OnDisableFormsUpdate",
             engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
         return result;
     }
@@ -831,7 +831,7 @@ private:
 
         auto callback = (info.argc == ARGS_ZERO) ? nullptr : info.argv[PARAM0];
         NativeValue *result = nullptr;
-        AsyncTask::Schedule("JsFormHost::OnIsSystemReady",
+        AsyncTask::ScheduleWithDefaultQos("JsFormHost::OnIsSystemReady",
             engine, CreateAsyncTaskWithLastParam(engine, callback, nullptr, std::move(complete), &result));
         return result;
     }
@@ -867,7 +867,7 @@ private:
 
         NativeValue* lastParam = (info.argc <= convertArgc) ? nullptr : info.argv[convertArgc];
         NativeValue *result = nullptr;
-        AsyncTask::Schedule("JsFormHost::OnEnableFormsUpdate",
+        AsyncTask::ScheduleWithDefaultQos("JsFormHost::OnEnableFormsUpdate",
             engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
         return result;
     }
@@ -1427,7 +1427,7 @@ private:
 
         NativeValue* lastParam = (info.argc <= convertArgc) ? nullptr : info.argv[convertArgc];
         NativeValue *result = nullptr;
-        AsyncTask::Schedule("JsFormHost::OnNotifyFormsVisible",
+        AsyncTask::ScheduleWithDefaultQos("JsFormHost::OnNotifyFormsVisible",
             engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
         return result;
     }
@@ -1476,7 +1476,7 @@ private:
 
         NativeValue* lastParam = (info.argc <= convertArgc) ? nullptr : info.argv[convertArgc];
         NativeValue *result = nullptr;
-        AsyncTask::Schedule("JsFormHost::OnNotifyFormsVisible",
+        AsyncTask::ScheduleWithDefaultQos("JsFormHost::OnNotifyFormsVisible",
             engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
         return result;
     }
@@ -1502,7 +1502,7 @@ private:
 
         auto callback = (info.argc == ARGS_ZERO) ? nullptr : info.argv[PARAM0];
         NativeValue *result = nullptr;
-        AsyncTask::Schedule("JsFormHost::OnGetAllFormsInfo",
+        AsyncTask::ScheduleWithDefaultQos("JsFormHost::OnGetAllFormsInfo",
             engine, CreateAsyncTaskWithLastParam(engine, callback, nullptr, std::move(complete), &result));
         return result;
     }
@@ -1567,7 +1567,7 @@ private:
 
         NativeValue *result = nullptr;
         NativeValue* lastParam = (info.argc <= convertArgc) ? nullptr : info.argv[convertArgc];
-        AsyncTask::Schedule("JsFormHost::OnGetFormsInfo",
+        AsyncTask::ScheduleWithDefaultQos("JsFormHost::OnGetFormsInfo",
             engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
         return result;
     }
@@ -1633,7 +1633,7 @@ private:
         } else {
             lastParam = (info.argc <= convertArgc) ? nullptr : info.argv[convertArgc];
         }
-        AsyncTask::Schedule("JsFormHost::OnGetRunningFormInfos",
+        AsyncTask::ScheduleWithDefaultQos("JsFormHost::OnGetRunningFormInfos",
             engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
         return result;
     }
@@ -1799,7 +1799,7 @@ private:
 
         NativeValue *lastParam = (info.argc <= convertArgc) ? nullptr : info.argv[convertArgc];
         NativeValue *result = nullptr;
-        AsyncTask::Schedule("NapiFormHost::OnNotifyFormsPrivacyProtected",
+        AsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnNotifyFormsPrivacyProtected",
             engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
         return result;
     }
@@ -1848,7 +1848,7 @@ private:
             };
         NativeValue *lastParam = (info.argc == ARGS_ONE) ? nullptr : info.argv[PARAM1];
         NativeValue *result = nullptr;
-        AsyncTask::Schedule("NapiFormHost::OnGetFormInstancesByFilter",
+        AsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnGetFormInstancesByFilter",
             engine, CreateAsyncTaskWithLastParam(engine, lastParam, std::move(execute), std::move(complete), &result));
         return result;
     }
@@ -1905,7 +1905,7 @@ private:
             };
         NativeValue *lastParam = (info.argc == convertArgc) ? nullptr : info.argv[convertArgc];
         NativeValue *result = nullptr;
-        AsyncTask::Schedule("NapiFormHost::OnGetFormInstanceById",
+        AsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnGetFormInstanceById",
             engine, CreateAsyncTaskWithLastParam(engine, lastParam, std::move(execute), std::move(complete), &result));
         return result;
     }

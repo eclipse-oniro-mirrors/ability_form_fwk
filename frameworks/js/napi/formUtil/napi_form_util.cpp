@@ -418,7 +418,7 @@ napi_value RetErrMsg(AsyncErrMsgCallbackInfo* asyncCallbackInfo)
             },
             (void *)asyncCallbackInfo,
             &asyncCallbackInfo->asyncWork);
-        NAPI_CALL(env, napi_queue_async_work(env, asyncCallbackInfo->asyncWork));
+        NAPI_CALL(env, napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default));
         return NapiGetResult(env, 1);
     } else {
         HILOG_INFO("%{public}s, promise.", __func__);
@@ -445,7 +445,7 @@ napi_value RetErrMsg(AsyncErrMsgCallbackInfo* asyncCallbackInfo)
             },
             (void *)asyncCallbackInfo,
             &asyncCallbackInfo->asyncWork);
-        napi_queue_async_work(env, asyncCallbackInfo->asyncWork);
+        napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
         return promise;
     }
 }
