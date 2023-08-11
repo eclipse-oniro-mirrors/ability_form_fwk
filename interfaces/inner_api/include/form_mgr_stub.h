@@ -352,7 +352,7 @@ private:
      * @param reply output param
      * @return Return ERR_OK on success, others on failure
      */
-    int32_t HandleGetFormInstancesByFilter(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleGetFormInstancesByFilter(MessageParcel &data, MessageParcel &reply);
 
     /**
      * @brief Get form instances by filter info.
@@ -360,7 +360,7 @@ private:
      * @param reply output param
      * @return Return ERR_OK on success, others on failure
      */
-    int32_t HandleGetFormInstanceById(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleGetFormInstanceById(MessageParcel &data, MessageParcel &reply);
 
     /**
      * @brief Register form add observer.

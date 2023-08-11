@@ -399,7 +399,7 @@ public:
      * @brief Get form instances by filter info.
      * @param formInstancesFilter includes bundleName, moduleName, formName, abilityName to get formInstances.
      * @param formInstances return formInstances
-     * @return return ERR_OK on get info success,other on failure.
+     * @return return ERR_OK on get info success, others on failure.
      */
     ErrCode GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
         std::vector<FormInstance> &formInstances);
@@ -408,7 +408,7 @@ public:
      * @brief Get form instance by formId.
      * @param formId formId Indicates the unique id of form.
      * @param formInstance return formInstance
-     * @return return ERR_OK on get info success,other on failure.
+     * @return return ERR_OK on get info success, others on failure.
      */
     ErrCode GetFormInstanceById(const int64_t formId, FormInstance &formInstance);
 
@@ -417,7 +417,7 @@ public:
      * @param formId formId Indicates the unique id of form.
      * @param isIncludeUnused Indicates whether to include unused form.
      * @param formInstance return formInstance
-     * @return return ERR_OK on get info success,other on failure.
+     * @return return ERR_OK on get info success, others on failure.
      */
     ErrCode GetFormInstanceById(const int64_t formId, bool isIncludeUnused, FormInstance &formInstance);
 
@@ -801,8 +801,8 @@ private:
      */
     void SetDeathRecipient(const sptr<IRemoteObject> &callerToken,
         const sptr<IRemoteObject::DeathRecipient> &deathRecipient);
-    mutable std::recursive_mutex formObserversMutex_;
-    mutable std::recursive_mutex deathRecipientsMutex_;
+    mutable std::mutex formObserversMutex_;
+    mutable std::mutex deathRecipientsMutex_;
     std::map<std::string, sptr<IRemoteObject>> formObservers_;
     std::map<sptr<IRemoteObject>, sptr<IRemoteObject::DeathRecipient>> deathRecipients_;
 
