@@ -234,11 +234,13 @@ public:
 
         int32_t result = 0;
         if (asyncCallbackInfo_->callbackType == CALLBACK_FLG) {
-            result = uv_queue_work(loop, work, [](uv_work_t *work) {}, AcquireFormStateCallbackComplete);
+            result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {},
+                AcquireFormStateCallbackComplete, uv_qos_default);
         } else {
-            result = uv_queue_work(loop, work, [](uv_work_t *work) {}, AcquireFormStatePromiseComplete);
+            result = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {},
+                AcquireFormStatePromiseComplete, uv_qos_default);
         }
-        // When uv_queue_work returns 0, asyncCallbackInfo_ and work will be freed in the callback function.
+        // When uv_queue_work_with_qos returns 0, asyncCallbackInfo_ and work will be freed in the callback function.
         if (result != 0) {
             delete asyncCallbackInfo_;
             asyncCallbackInfo_ = nullptr;
@@ -405,7 +407,7 @@ napi_value AcquireFormStateCallback(napi_env env, AsyncAcquireFormStateCallbackI
         },
         (void *) asyncCallbackInfo,
         &asyncCallbackInfo->asyncWork);
-    NAPI_CALL(env, napi_queue_async_work(env, asyncCallbackInfo->asyncWork));
+    NAPI_CALL(env, napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default));
     return NapiGetResult(env, 1);
 }
 
@@ -442,7 +444,7 @@ napi_value AcquireFormStatePromise(napi_env env, AsyncAcquireFormStateCallbackIn
         },
         (void *) asyncCallbackInfo,
         &asyncCallbackInfo->asyncWork);
-    napi_queue_async_work(env, asyncCallbackInfo->asyncWork);
+    napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
     return promise;
 }
 
@@ -660,7 +662,7 @@ napi_value NotifyFormsVisibleCallback(napi_env env, AsyncNotifyFormsVisibleCallb
         },
         (void *) asyncCallbackInfo,
         &asyncCallbackInfo->asyncWork);
-    NAPI_CALL(env, napi_queue_async_work(env, asyncCallbackInfo->asyncWork));
+    NAPI_CALL(env, napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default));
     return NapiGetResult(env, 1);
 }
 
@@ -698,7 +700,7 @@ napi_value NotifyFormsVisiblePromise(napi_env env, AsyncNotifyFormsVisibleCallba
         },
         (void *) asyncCallbackInfo,
         &asyncCallbackInfo->asyncWork);
-    napi_queue_async_work(env, asyncCallbackInfo->asyncWork);
+    napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
     return promise;
 }
 
@@ -814,7 +816,7 @@ napi_value NotifyFormsEnableUpdateCallback(napi_env env,
         },
         (void *) asyncCallbackInfo,
         &asyncCallbackInfo->asyncWork);
-    NAPI_CALL(env, napi_queue_async_work(env, asyncCallbackInfo->asyncWork));
+    NAPI_CALL(env, napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default));
     return NapiGetResult(env, 1);
 }
 
@@ -853,7 +855,7 @@ napi_value NotifyFormsEnableUpdatePromise(napi_env env,
         },
         (void *) asyncCallbackInfo,
         &asyncCallbackInfo->asyncWork);
-    napi_queue_async_work(env, asyncCallbackInfo->asyncWork);
+    napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
     return promise;
 }
 
@@ -1143,7 +1145,7 @@ NativeValue* NapiFormHost::OnDisableFormsUpdate(NativeEngine &engine, NativeCall
 
     auto callback = (info.argc == ARGS_ONE) ? nullptr : info.argv[PARAM1];
     NativeValue *result = nullptr;
-    AsyncTask::Schedule("NapiFormHost::OnDisableFormsUpdate",
+    AsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnDisableFormsUpdate",
         engine, CreateAsyncTaskWithLastParam(engine, callback, nullptr, std::move(complete), &result));
     return result;
 }
@@ -1170,7 +1172,7 @@ NativeValue* NapiFormHost::OnIsSystemReady(NativeEngine &engine, const NativeCal
 
     auto callback = (info.argc == ARGS_ZERO) ? nullptr : info.argv[PARAM0];
     NativeValue *result = nullptr;
-    AsyncTask::Schedule("NapiFormHost::OnIsSystemReady",
+    AsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnIsSystemReady",
         engine, CreateAsyncTaskWithLastParam(engine, callback, nullptr, std::move(complete), &result));
     return result;
 }
@@ -1196,7 +1198,7 @@ NativeValue* NapiFormHost::OnGetAllFormsInfo(NativeEngine &engine, const NativeC
 
     auto callback = (info.argc == ARGS_ZERO) ? nullptr : info.argv[PARAM0];
     NativeValue *result = nullptr;
-    AsyncTask::Schedule("NapiFormHost::OnGetAllFormsInfo",
+    AsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnGetAllFormsInfo",
         engine, CreateAsyncTaskWithLastParam(engine, callback, nullptr, std::move(complete), &result));
     return result;
 }
@@ -1245,7 +1247,7 @@ NativeValue* NapiFormHost::OnGetFormsInfo(NativeEngine &engine, NativeCallbackIn
 
     NativeValue *result = nullptr;
     auto callback = flagCall ? ((info.argc == ARGS_TWO) ? info.argv[PARAM1] : info.argv[PARAM2]) : nullptr;
-    AsyncTask::Schedule("NapiFormHost::OnGetFormsInfo",
+    AsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnGetFormsInfo",
         engine, CreateAsyncTaskWithLastParam(engine, callback, nullptr, std::move(complete), &result));
     return result;
 }
@@ -1292,7 +1294,7 @@ NativeValue* NapiFormHost::OnDeleteForm(NativeEngine &engine, NativeCallbackInfo
 
     NativeValue* lastParam = (info.argc == ARGS_ONE) ? nullptr : info.argv[PARAM1];
     NativeValue* result = nullptr;
-    AsyncTask::Schedule("NapiFormHost::OnDeleteForm",
+    AsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnDeleteForm",
         engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
     return result;
 }
@@ -1357,7 +1359,7 @@ NativeValue* NapiFormHost::OnReleaseForm(NativeEngine &engine, NativeCallbackInf
         (info.argc == ARGS_TWO && info.argv[PARAM1]->TypeOf() != NATIVE_FUNCTION) ? nullptr :
         (info.argc == ARGS_THREE) ? info.argv[PARAM2] : info.argv[PARAM1];
     NativeValue* result = nullptr;
-    AsyncTask::Schedule("NapiFormHost::OnReleaseForm",
+    AsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnReleaseForm",
         engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
     return result;
 }
@@ -1405,7 +1407,7 @@ NativeValue* NapiFormHost::OnRequestForm(NativeEngine &engine, NativeCallbackInf
 
     NativeValue* lastParam = (info.argc == ARGS_ONE) ? nullptr : info.argv[PARAM1];
     NativeValue* result = nullptr;
-    AsyncTask::Schedule("NapiFormHost::OnRequestForm",
+    AsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnRequestForm",
         engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
     return result;
 }
@@ -1452,7 +1454,7 @@ NativeValue* NapiFormHost::OnCastTempForm(NativeEngine &engine, NativeCallbackIn
 
     NativeValue* lastParam = (info.argc == ARGS_ONE) ? nullptr : info.argv[PARAM1];
     NativeValue* result = nullptr;
-    AsyncTask::Schedule("NapiFormHost::OnCastTempForm",
+    AsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnCastTempForm",
         engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
     return result;
 }
@@ -1504,7 +1506,7 @@ NativeValue* NapiFormHost::OnEnableFormsUpdate(NativeEngine &engine, NativeCallb
 
     auto callback = (info.argc == ARGS_ONE) ? nullptr : info.argv[PARAM1];
     NativeValue *result = nullptr;
-    AsyncTask::Schedule("NapiFormHost::OnEnableFormsUpdate",
+    AsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnEnableFormsUpdate",
         engine, CreateAsyncTaskWithLastParam(engine, callback, nullptr, std::move(complete), &result));
     return result;
 }
@@ -1633,7 +1635,7 @@ NativeValue* NapiFormHost::OnNotifyFormsPrivacyProtected(NativeEngine &engine, N
 
     NativeValue *lastParam = (info.argc <= unwrapArgc) ? nullptr : info.argv[unwrapArgc];
     NativeValue *result = nullptr;
-    AsyncTask::Schedule("NapiFormHost::OnNotifyFormsPrivacyProtected",
+    AsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnNotifyFormsPrivacyProtected",
         engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
     return result;
 }
@@ -1703,7 +1705,7 @@ NativeValue* NapiFormHost::OnDeleteInvalidForms(NativeEngine &engine, const Nati
 
     auto callback = (info.argc == ARGS_ONE) ? nullptr : info.argv[PARAM1];
     NativeValue *result = nullptr;
-    AsyncTask::Schedule("NapiFormHost::OnDeleteInvalidForms",
+    AsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnDeleteInvalidForms",
         engine, CreateAsyncTaskWithLastParam(engine, callback, std::move(execute), std::move(complete), &result));
     return result;
 }
@@ -1756,7 +1758,7 @@ NativeValue* NapiFormHost::OnNotifyVisibleForms(NativeEngine &engine, NativeCall
     };
     auto callback = (info.argc == ARGS_ONE) ? nullptr : info.argv[PARAM1];
     NativeValue *result = nullptr;
-    AsyncTask::Schedule("NapiFormHost::OnNotifyVisibleForms",
+    AsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnNotifyVisibleForms",
         engine, CreateAsyncTaskWithLastParam(engine, callback, nullptr, std::move(complete), &result));
     return result;
 }
@@ -1815,7 +1817,7 @@ NativeValue* NapiFormHost::OnNotifyInVisibleForms(NativeEngine &engine, NativeCa
 
     auto callback = (info.argc == ARGS_ONE) ? nullptr : info.argv[PARAM1];
     NativeValue *result = nullptr;
-    AsyncTask::Schedule("NapiFormHost::OnNotifyInVisibleForms",
+    AsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnNotifyInVisibleForms",
         engine, CreateAsyncTaskWithLastParam(engine, callback, nullptr, std::move(complete), &result));
     return result;
 }
