@@ -1861,7 +1861,7 @@ private:
             NapiFormUtil::ThrowParamNumError(engine, std::to_string(info.argc), "1 or 2 or 3");
             return engine.CreateUndefined();
         }
-        int32_t convertArgc = 0;
+        decltype(info.argc) convertArgc = 0;
         int64_t formId;
         if (!ConvertFromId(engine, info.argv[PARAM0], formId)) {
             HILOG_ERROR("convert strFormIdList failed!");
