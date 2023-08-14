@@ -699,10 +699,6 @@ public:
     {
         return 0;
     }
-    void UpdateMissionSnapShot(const sptr<IRemoteObject>& token) override
-    {
-        return;
-    }
     int RegisterSnapshotHandler(const sptr<ISnapshotHandler>& handler) override
     {
         return 0;
