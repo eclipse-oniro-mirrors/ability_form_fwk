@@ -149,6 +149,7 @@ private:
 
 private:
     sptr<IBundleMgr> iBundleMgr_ = nullptr;
+    std::mutex ibundleMutex_;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -55,11 +55,11 @@ ErrCode FormInfoHelper::LoadFormConfigInfoByBundleName(const std::string &bundle
     }
     // Check if current bundle contains FA forms.
     if (LoadAbilityFormConfigInfo(bundleInfo, formInfos) != ERR_OK) {
-        HILOG_INFO("No fa form config info found for %{public}s.", bundleName.c_str());
+        HILOG_DEBUG("No fa form config info found for %{public}s.", bundleName.c_str());
     }
     // Check if current bundle contains Stage forms.
     if (LoadStageFormConfigInfo(bundleInfo, formInfos) != ERR_OK) {
-        HILOG_INFO("No stage form config info found for %{public}s.", bundleName.c_str());
+        HILOG_DEBUG("No stage form config info found for %{public}s.", bundleName.c_str());
     }
     return ERR_OK;
 }
@@ -726,12 +726,12 @@ ErrCode FormInfoMgr::ReloadFormInfos(const int32_t userId)
         auto setFindIter = bundleNameSet.find(bundleName);
         if (setFindIter == bundleNameSet.end()) {
             bundleFormInfoPair.second->Remove(userId);
-            HILOG_INFO("remove forms info success, bundleName=%{public}s", bundleName.c_str());
+            HILOG_DEBUG("remove forms info success, bundleName=%{public}s", bundleName.c_str());
             continue;
         }
         bundleNameSet.erase(setFindIter);
         bundleFormInfoPair.second->UpdateStaticFormInfos(userId);
-        HILOG_INFO("update forms info success, bundleName=%{public}s", bundleName.c_str());
+        HILOG_DEBUG("update forms info success, bundleName=%{public}s", bundleName.c_str());
     }
 
     for (auto const &bundleName : bundleNameSet) {
@@ -741,7 +741,7 @@ ErrCode FormInfoMgr::ReloadFormInfos(const int32_t userId)
             continue;
         }
         bundleFormInfoMap_[bundleName] = bundleFormInfoPtr;
-        HILOG_INFO("add forms info success, bundleName=%{public}s", bundleName.c_str());
+        HILOG_DEBUG("add forms info success, bundleName=%{public}s", bundleName.c_str());
     }
     return ERR_OK;
 }
