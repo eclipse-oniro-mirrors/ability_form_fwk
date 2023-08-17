@@ -43,7 +43,8 @@ void FormDataProxyRecord::OnPublishedDataChange(const DataShare::PublishedDataCh
 }
 
 FormDataProxyRecord::FormDataProxyRecord(int64_t formId, const std::string &bundleName, FormType uiSyntax,
-    uint32_t tokenId) : formId_(formId), bundleName_(bundleName), uiSyntax_(uiSyntax), tokenId_(tokenId)
+    uint32_t tokenId, int32_t uid) : formId_(formId), bundleName_(bundleName), uiSyntax_(uiSyntax),
+    tokenId_(tokenId), uid_(uid)
 {
     std::string uri = "datashareproxy://" + bundleName;
     DataShare::CreateOptions options;
@@ -273,7 +274,7 @@ void FormDataProxyRecord::UpdatePublishedDataForm(const std::vector<DataShare::P
         formProviderData.SetImageDataState(FormProviderData::IMAGE_DATA_STATE_ADDED);
         formProviderData.SetImageDataMap(imageDataMap);
     }
-    FormMgrAdapter::GetInstance().UpdateForm(formId_, bundleName_, formProviderData);
+    FormMgrAdapter::GetInstance().UpdateForm(formId_, uid_, formProviderData);
 }
 
 void FormDataProxyRecord::UpdateRdbDataForm(const std::vector<std::string> &data)
@@ -293,7 +294,7 @@ void FormDataProxyRecord::UpdateRdbDataForm(const std::vector<std::string> &data
     HILOG_INFO("update rdb data. formDataStr: %{private}s.", formDataStr.c_str());
     FormProviderData formProviderData;
     formProviderData.SetDataString(formDataStr);
-    FormMgrAdapter::GetInstance().UpdateForm(formId_, bundleName_, formProviderData);
+    FormMgrAdapter::GetInstance().UpdateForm(formId_, uid_, formProviderData);
 }
 
 void FormDataProxyRecord::UpdateSubscribeFormData(const std::vector<FormDataProxy> &formDataProxies)

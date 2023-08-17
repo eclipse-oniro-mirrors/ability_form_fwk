@@ -240,13 +240,8 @@ int FormMgrService::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> 
 int FormMgrService::UpdateForm(const int64_t formId, const FormProviderData &formBindingData)
 {
     HILOG_DEBUG("called.");
-    std::string callerBundleName;
-    auto ret = FormBmsHelper::GetInstance().GetCallerBundleName(callerBundleName);
-    if (ret != ERR_OK) {
-        HILOG_ERROR("%{public}s fail, get caller bundle name failed", __func__);
-        return ret;
-    }
-    return FormMgrAdapter::GetInstance().UpdateForm(formId, callerBundleName, formBindingData);
+    auto callingUid = IPCSkeleton::GetCallingUid();
+    return FormMgrAdapter::GetInstance().UpdateForm(formId, callingUid, formBindingData);
 }
 
 /**
@@ -1308,13 +1303,8 @@ ErrCode FormMgrService::UpdateProxyForm(int64_t formId, const FormProviderData &
     const std::vector<FormDataProxy> &formDataProxies)
 {
     HILOG_DEBUG("called.");
-    std::string callerBundleName;
-    auto ret = FormBmsHelper::GetInstance().GetCallerBundleName(callerBundleName);
-    if (ret != ERR_OK) {
-        HILOG_ERROR("%{public}s fail, get caller bundle name failed", __func__);
-        return ret;
-    }
-    return FormMgrAdapter::GetInstance().UpdateForm(formId, callerBundleName, formBindingData, formDataProxies);
+    auto callingUid = IPCSkeleton::GetCallingUid();
+    return FormMgrAdapter::GetInstance().UpdateForm(formId, callingUid, formBindingData, formDataProxies);
 }
 
 ErrCode FormMgrService::RequestPublishProxyForm(Want &want, bool withFormBindingData,

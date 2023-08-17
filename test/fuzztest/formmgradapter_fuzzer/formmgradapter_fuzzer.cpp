@@ -55,7 +55,7 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formMgrAdapter.HandleDeleteFormCache(dbRecord, uid, formId);
     std::string bundleName(data, size);
     FormProviderData formProviderData;
-    formMgrAdapter.UpdateForm(formId, bundleName, formProviderData);
+    formMgrAdapter.UpdateForm(formId, uid, formProviderData);
     formMgrAdapter.RequestForm(formId, callerToken, want);
     std::vector<int64_t> formIds;
     formIds.emplace_back(formId);

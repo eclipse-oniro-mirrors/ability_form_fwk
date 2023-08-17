@@ -190,9 +190,9 @@ FormRecord FormDataMgr::CreateFormRecord(const FormItemInfo &formInfo, const int
         newRecord.formUserUids.emplace_back(callingUid);
     }
     newRecord.isDataProxy = formInfo.GetDataProxyFlag();
-
+    newRecord.uid = formInfo.GetProviderUid();
     formInfo.GetHapSourceDirs(newRecord.hapSourceDirs);
-    HILOG_INFO("%{public}s end", __func__);
+    HILOG_INFO("end");
     return newRecord;
 }
 /**

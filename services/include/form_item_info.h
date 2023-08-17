@@ -328,6 +328,17 @@ public:
     
     void SetDataProxyFlag(bool dataProxyEnabled);
     bool GetDataProxyFlag() const;
+    
+    /**
+     * @brief save the uid of formProvider.
+     * @param uid the uid of formProvider.
+     */
+    void SetProviderUid(int32_t uid);
+    /**
+     * @brief Get the uid of formProvider.
+     * @return uid.
+     */
+    int32_t GetProviderUid() const;
 private:
     /**
      * @brief Equal or not.
@@ -361,13 +372,13 @@ private:
     FormType uiSyntax_ = FormType::JS;
     std::string icon_ = "";
     bool isDynamic_ = true;
-
     std::string jsComponentName_ = "";
     std::string abilityModuleName_ = "";
     std::unordered_map<std::string, std::string> moduleInfoMap_;
     std::string deviceId_ = "";
     bool dataProxyEnabled_ = false;
     bool isSystemApp_ = false;
+    int32_t uid_ = -1;
 };
 } // namespace AppExecFwk
 } // namespace OHOS

@@ -44,6 +44,7 @@ using namespace OHOS::Security;
 using ::testing::Invoke;
 using ::testing::_;
 
+extern void MockGetCallingUid(int32_t mockRet);
 namespace {
 const std::string PERMISSION_NAME_REQUIRE_FORM = "ohos.permission.REQUIRE_FORM";
 const std::string PARAM_PROVIDER_PACKAGE_NAME = "com.form.provider.app.test.ability";
@@ -144,6 +145,7 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_001, TestSize.Level0)
     EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
 
     // test exec
+    MockGetCallingUid(20000001);
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().UpdateForm(formId, formProviderData));
 
     token_->Wait();
@@ -166,7 +168,6 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_003, TestSize.Level0)
     // param editor
     int64_t formId {300L};
     int32_t callingUid {0};
-    std::string bandleName = "";
     FormProviderData formProviderData;
 
     // add formRecord
@@ -183,7 +184,7 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_003, TestSize.Level0)
 
     // test exec
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
-        FormMgrAdapter::GetInstance().UpdateForm(formId, bandleName, formProviderData));
+        FormMgrAdapter::GetInstance().UpdateForm(formId, callingUid, formProviderData));
 
     GTEST_LOG_(INFO) << "fms_form_mgr_client_updateForm_test_003 end";
 }
@@ -371,6 +372,7 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_007, TestSize.Level0)
     EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
 
     // test exec
+    MockGetCallingUid(0);
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().UpdateForm(formId, formProviderData));
 
     token_->Wait();
@@ -415,6 +417,7 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_008, TestSize.Level1) {
     EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
 
     // test exec
+    MockGetCallingUid(20000001);
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().UpdateForm(formId, formProviderData));
 
     token_->Wait();

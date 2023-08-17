@@ -315,7 +315,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_012, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormMgrAdapter_012 start";
     FormMgrAdapter formMgrAdapter;
     FormRecord dbRecord;
-    int uid = 1;
+    int32_t uid = 1;
     int64_t formId = 2;
     MockNotifyProviderFormDelete(true);
     MockDeleteFormRecord(false);
@@ -333,7 +333,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_013, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormMgrAdapter_013 start";
     FormMgrAdapter formMgrAdapter;
     FormRecord dbRecord;
-    int uid = 1;
+    int32_t uid = 1;
     int64_t formId = 2;
     MockNotifyProviderFormDelete(true);
     MockDeleteFormRecord(true);
@@ -352,7 +352,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_014, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormMgrAdapter_014 start";
     FormMgrAdapter formMgrAdapter;
     FormRecord dbRecord;
-    int uid = 1;
+    int32_t uid = 1;
     int64_t formId = 2;
     MockNotifyProviderFormDelete(true);
     MockDeleteFormRecord(true);
@@ -373,7 +373,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_015, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormMgrAdapter_015 start";
     FormMgrAdapter formMgrAdapter;
     FormRecord dbRecord;
-    int uid = 1;
+    int32_t uid = 1;
     int64_t formId = 2;
     MockNotifyProviderFormDelete(true);
     MockDeleteFormRecord(true);
@@ -395,9 +395,9 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_016, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormMgrAdapter_016 start";
     FormMgrAdapter formMgrAdapter;
     int64_t formId = -1;
-    std::string bundleName = "";
+    int32_t uid = 1;
     FormProviderData formProviderData;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.UpdateForm(formId, bundleName, formProviderData));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.UpdateForm(formId, uid, formProviderData));
     GTEST_LOG_(INFO) << "FormMgrAdapter_016 end";
 }
 
@@ -411,12 +411,12 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_017, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormMgrAdapter_017 start";
     FormMgrAdapter formMgrAdapter;
     int64_t formId = 1;
-    std::string bundleName = "aa";
+    int32_t uid = 1;
     FormProviderData formProviderData;
     MockGetFormRecord(true);
     MockGetFormRecordParams(true);
     MockCheckInvalidForm(ERR_OK);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.UpdateForm(formId, bundleName, formProviderData));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.UpdateForm(formId, uid, formProviderData));
     GTEST_LOG_(INFO) << "FormMgrAdapter_017 end";
 }
 
@@ -1493,7 +1493,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_080, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormMgrAdapter_080 start";
     FormMgrAdapter formMgrAdapter;
     FormRecord dbRecord;
-    int uid = 1;
+    int32_t uid = 1;
     int64_t formId = 2;
     MockNotifyProviderFormDelete(true);
     MockDeleteFormRecord(true);
@@ -1518,7 +1518,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_081, TestSize.Level0)
     dbRecord.formUserUids.emplace_back(1);
     dbRecord.formUserUids.emplace_back(1);
     dbRecord.formUserUids.emplace_back(1);
-    int uid = 1;
+    int32_t uid = 1;
     int64_t formId = 2;
     EXPECT_EQ(ERR_OK, formMgrAdapter.HandleDeleteFormCache(dbRecord, uid, formId));
     GTEST_LOG_(INFO) << "FormMgrAdapter_081 end";
@@ -1537,7 +1537,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_082, TestSize.Level0)
     dbRecord.formUserUids.emplace_back(1);
     dbRecord.formUserUids.emplace_back(1);
     dbRecord.formUserUids.emplace_back(1);
-    int uid = 1;
+    int32_t uid = 1;
     int64_t formId = 2;
     MockUpdateDBRecord(false);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrAdapter.HandleDeleteFormCache(dbRecord, uid, formId));
@@ -1554,10 +1554,10 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_083, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormMgrAdapter_083 start";
     FormMgrAdapter formMgrAdapter;
     int64_t formId = 1;
-    std::string bundleName = "aa";
+    int32_t uid = 1;
     FormProviderData formProviderData;
     MockGetFormRecord(false);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_NOT_EXIST_ID, formMgrAdapter.UpdateForm(formId, bundleName, formProviderData));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_NOT_EXIST_ID, formMgrAdapter.UpdateForm(formId, uid, formProviderData));
     GTEST_LOG_(INFO) << "FormMgrAdapter_083 end";
 }
 
@@ -2225,7 +2225,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0117, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormMgrAdapter_0117 start";
     FormMgrAdapter formMgrAdapter;
     FormRecord dbRecord;
-    int uid = 1;
+    int32_t uid = 1;
     int64_t formId = 2;
     MockNotifyProviderFormDelete(false);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.HandleDeleteFormCache(dbRecord, uid, formId));
@@ -2242,9 +2242,9 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0118, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormMgrAdapter_0118 start";
     FormMgrAdapter formMgrAdapter;
     int64_t formId = 1;
-    std::string bundleName = "";
+    int32_t uid = 1;
     FormProviderData formProviderData;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.UpdateForm(formId, bundleName, formProviderData));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.UpdateForm(formId, uid, formProviderData));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0118 end";
 }
 
@@ -2258,12 +2258,12 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0119, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormMgrAdapter_0119 start";
     FormMgrAdapter formMgrAdapter;
     int64_t formId = 1;
-    std::string bundleName = "bundleName";
+    int32_t uid = 0;
     FormProviderData formProviderData;
     MockGetFormRecord(true);
     MockGetFormRecordParams(true);
     MockGetFormRecordParamsUid(true);
-    EXPECT_EQ(ERR_OK, formMgrAdapter.UpdateForm(formId, bundleName, formProviderData));
+    EXPECT_EQ(ERR_OK, formMgrAdapter.UpdateForm(formId, uid, formProviderData));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0119 end";
 }
 
@@ -2667,12 +2667,12 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0138, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormMgrAdapter_0138 start";
     FormMgrAdapter formMgrAdapter;
     int64_t formId = 1;
-    std::string bundleName = "bundleName";
+    int32_t uid = 0;
     FormProviderData formProviderData;
     MockGetFormRecord(true);
     MockGetFormRecordParams(true);
     MockGetFormRecordParamsUid(false);
-    EXPECT_EQ(ERR_OK, formMgrAdapter.UpdateForm(formId, bundleName, formProviderData));
+    EXPECT_EQ(ERR_OK, formMgrAdapter.UpdateForm(formId, uid, formProviderData));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0138 end";
 }
 

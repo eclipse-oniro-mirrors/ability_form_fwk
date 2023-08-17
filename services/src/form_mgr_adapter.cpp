@@ -521,15 +521,15 @@ ErrCode FormMgrAdapter::HandleDeleteFormCache(FormRecord &dbRecord, const int ui
     return result;
 }
 
-int FormMgrAdapter::UpdateForm(const int64_t formId, const std::string &bundleName,
+int FormMgrAdapter::UpdateForm(const int64_t formId, const int32_t callingUid,
     const FormProviderData &formProviderData, const std::vector<FormDataProxy> &formDataProxies)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     HILOG_DEBUG("UpdateForm start.");
 
     // check formId and bundleName
-    if (formId <= 0 || bundleName.empty()) {
-        HILOG_ERROR("%{public}s error, invalid formId or bundleName.", __func__);
+    if (formId <= 0) {
+        HILOG_ERROR("error, invalid formId");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
@@ -539,7 +539,7 @@ int FormMgrAdapter::UpdateForm(const int64_t formId, const std::string &bundleNa
     // check exist and get the formRecord
     FormRecord formRecord;
     if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, formRecord)) {
-        HILOG_ERROR("%{public}s error, not exist such form:%{public}" PRId64 ".", __func__, matchedFormId);
+        HILOG_ERROR("error, not exist such form:%{public}" PRId64 ".", matchedFormId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
@@ -550,8 +550,8 @@ int FormMgrAdapter::UpdateForm(const int64_t formId, const std::string &bundleNa
     }
 
     // check bundleName match
-    if (formRecord.bundleName.compare(bundleName) != 0) {
-        HILOG_ERROR("%{public}s error, not match bundleName:%{public}s.", __func__, bundleName.c_str());
+    if (formRecord.uid != callingUid) {
+        HILOG_ERROR("error, not match providerUid: %{public}d and callingUid: %{public}d", formRecord.uid, callingUid);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
@@ -1453,6 +1453,7 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
     itemInfo.SetVersionName(bundleInfo.versionName);
     itemInfo.SetCompatibleVersion(bundleInfo.compatibleVersion);
     itemInfo.SetSystemAppFlag(bundleInfo.applicationInfo.isSystemApp);
+    itemInfo.SetProviderUid(bundleInfo.applicationInfo.uid);
 
     std::string hostBundleName;
     bool isSaUid = IPCSkeleton::GetCallingUid() == SYSTEM_UID;
