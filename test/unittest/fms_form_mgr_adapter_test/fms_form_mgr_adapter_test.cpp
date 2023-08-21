@@ -2315,13 +2315,6 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0122, TestSize.Level0)
     sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
     sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
     FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
-    auto bmsTaskGetApplicationInfoV9 =
-        [] (const std::string &bundleName, int32_t flag, int32_t userId, ApplicationInfo &appInfo) {
-        GTEST_LOG_(INFO) << "FormMgrAdapter_0122 bmsTaskGetApplicationInfoV9 called";
-        return ERR_OK;
-    };
-    EXPECT_CALL(*bmsProxy, GetApplicationInfoV9(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTaskGetApplicationInfoV9));
-
     FormMgrAdapter formMgrAdapter;
     int64_t formId1 = 1;
     int64_t formId2 = 2;

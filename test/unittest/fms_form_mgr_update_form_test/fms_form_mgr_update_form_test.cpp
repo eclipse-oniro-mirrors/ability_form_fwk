@@ -124,6 +124,7 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_001, TestSize.Level0)
     formItemInfo.SetProviderBundleName(FORM_PROVIDER_BUNDLE_NAME);
     formItemInfo.SetAbilityName(FORM_PROVIDER_ABILITY_NAME);
     formItemInfo.SetTemporaryFlag(false);
+    formItemInfo.SetProviderUid(callingUid);
     FormDataMgr::GetInstance().AllotFormRecord(formItemInfo, callingUid);
 
     FormItemInfo formItemInfo1;
@@ -131,6 +132,7 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_001, TestSize.Level0)
     formItemInfo1.SetProviderBundleName(FORM_PROVIDER_BUNDLE_NAME);
     formItemInfo1.SetAbilityName(FORM_PROVIDER_ABILITY_NAME);
     formItemInfo1.SetTemporaryFlag(true);
+    formItemInfo1.SetProviderUid(callingUid);
     FormDataMgr::GetInstance().AllotFormRecord(formItemInfo1, callingUid);
 
     // add formHostRecord
@@ -145,7 +147,7 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_001, TestSize.Level0)
     EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
 
     // test exec
-    MockGetCallingUid(20000001);
+    MockGetCallingUid(callingUid);
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().UpdateForm(formId, formProviderData));
 
     token_->Wait();
@@ -350,6 +352,7 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_007, TestSize.Level0)
     formItemInfo.SetProviderBundleName(FORM_PROVIDER_BUNDLE_NAME);
     formItemInfo.SetAbilityName(FORM_PROVIDER_ABILITY_NAME);
     formItemInfo.SetTemporaryFlag(false);
+    formItemInfo.SetProviderUid(callingUid);
     FormRecord formRecord = FormDataMgr::GetInstance().AllotFormRecord(formItemInfo, callingUid);
     formRecord.versionUpgrade = true;
 
@@ -358,6 +361,7 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_007, TestSize.Level0)
     formItemInfo1.SetProviderBundleName(FORM_HOST_BUNDLE_NAME);
     formItemInfo1.SetAbilityName(FORM_PROVIDER_ABILITY_NAME);
     formItemInfo1.SetTemporaryFlag(true);
+    formItemInfo1.SetProviderUid(callingUid);
     FormRecord formRecord1 = FormDataMgr::GetInstance().AllotFormRecord(formItemInfo1, callingUid);
 
     // add formHostRecord
@@ -372,7 +376,7 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_007, TestSize.Level0)
     EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
 
     // test exec
-    MockGetCallingUid(0);
+    MockGetCallingUid(callingUid);
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().UpdateForm(formId, formProviderData));
 
     token_->Wait();
@@ -399,6 +403,7 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_008, TestSize.Level1) {
     formItemInfo.SetProviderBundleName(FORM_PROVIDER_BUNDLE_NAME);
     formItemInfo.SetAbilityName(FORM_PROVIDER_ABILITY_NAME);
     formItemInfo.SetTemporaryFlag(false);
+    formItemInfo.SetProviderUid(callingUid);
     FormDataMgr::GetInstance().AllotFormRecord(formItemInfo, callingUid);
 
     // add formHostRecord
@@ -417,7 +422,7 @@ HWTEST_F(FmsFormMgrUpdateFormTest, UpdateForm_008, TestSize.Level1) {
     EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
 
     // test exec
-    MockGetCallingUid(20000001);
+    MockGetCallingUid(callingUid);
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().UpdateForm(formId, formProviderData));
 
     token_->Wait();

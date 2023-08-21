@@ -28,7 +28,7 @@ void MockGetCallingUid(int32_t mockRet)
 }
 
 namespace OHOS {
-uint32_t IPCSkeleton::GetCallingUid()
+pid_t IPCSkeleton::GetCallingUid()
 {
     GTEST_LOG_(INFO) << "GetCallingUid called " << g_GetCallingUid;
     return g_GetCallingUid;

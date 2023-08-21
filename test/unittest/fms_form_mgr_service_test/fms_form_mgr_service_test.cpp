@@ -1003,7 +1003,8 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0056, TestSize.Level1)
     FormMgrService formMgrService;
     const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
     std::string bundleName = "A";
-    MockIsSACall(true);
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(true);
     MockCheckAcrossLocalAccountsPermission(false);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY,
         formMgrService.RegisterFormAddObserverByBundle(bundleName, callerToken));
@@ -1059,7 +1060,8 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0059, TestSize.Level1)
     FormMgrService formMgrService;
     const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
     std::string bundleName = "A";
-    MockIsSACall(true);
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(true);
     MockCheckAcrossLocalAccountsPermission(false);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY,
         formMgrService.RegisterFormRemoveObserverByBundle(bundleName, callerToken));
