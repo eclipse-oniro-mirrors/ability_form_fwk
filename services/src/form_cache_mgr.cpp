@@ -143,7 +143,7 @@ bool FormCacheMgr::InnerGetImageData(
             return false;
         }
 
-	if (blob.size() <= 0) {
+	    if (blob.size() <= 0) {
             HILOG_ERROR("GetImgCacheFromDb failed due to blob is empty.");
             return false;
         }
@@ -154,8 +154,8 @@ bool FormCacheMgr::InnerGetImageData(
             return false;
         }
 
-        if (!formAshmem->WriteToAshmem(
-	    key, reinterpret_cast<char *>(blob.data()), static_cast<int32_t>(blob.size()))) {
+        if (!formAshmem->WriteToAshmem(key, reinterpret_cast<char *>(blob.data()),
+                        static_cast<int32_t>(blob.size()))) {
             HILOG_ERROR("Write to ashmem failed");
             return false;
         }
