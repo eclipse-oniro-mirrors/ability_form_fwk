@@ -71,16 +71,6 @@ void FormUtil::CreateDefaultFormWant(Want &want, const std::string &uri, const i
 }
 
 /**
- * @brief create udid for form.
- * @return udid.
- */
-std::string FormUtil::GenerateUdid()
-{
-    char buf[256] = {0};
-    return buf;
-}
-
-/**
  * @brief create form id for form.
  * @param udidHash udid hash
  * @return new form id.
