@@ -52,6 +52,15 @@ private:
     int32_t maxState_;
 };
 
+class HandlerDumper : public AppExecFwk::Dumper {
+public:
+    void Dump(const std::string &message) override;
+    std::string GetTag() override;
+    std::string GetDumpInfo();
+private:
+    std::string dumpInfo_;
+};
+
 class FormRenderRecord : public std::enable_shared_from_this<FormRenderRecord> {
 public:
     /**

@@ -64,6 +64,22 @@ bool ThreadState::IsMaxState()
     return state_ >= maxState_;
 }
 
+void HandlerDumper::Dump(const std::string &message)
+{
+    HILOG_INFO("message is %{public}s", message.c_str());
+    dumpInfo_ += message;
+}
+
+std::string HandlerDumper::GetTag()
+{
+    return "";
+}
+
+std::string HandlerDumper::GetDumpInfo()
+{
+    return dumpInfo_;
+}
+
 std::shared_ptr<FormRenderRecord> FormRenderRecord::Create(
     const std::string &bundleName, const std::string &uid, bool needMonitored)
 {
@@ -195,6 +211,11 @@ TaskState FormRenderRecord::RunTask()
         threadState_->NextState();
         HILOG_INFO("FRS block happened with threadState is %{public}d when bundleName is %{public}s",
             threadState_->GetCurrentState(), bundleName_.c_str());
+        {
+            std::lock_guard<std::mutex> lock(eventHandlerMutex_);
+            HandlerDumper handlerDumper;
+            eventHandler_->Dump(handlerDumper);
+        }
         return threadState_->IsMaxState() ? TaskState::BLOCK : TaskState::RUNNING;
     }
 
