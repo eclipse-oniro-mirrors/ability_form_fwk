@@ -56,7 +56,6 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     std::string uri(data, size);
     int32_t connectId = static_cast<int32_t>(GetU32Data(data));
     formUtil.CreateDefaultFormWant(want, uri, connectId);
-    formUtil.GenerateUdid();
     int64_t udidHash = static_cast<int64_t>(GetU32Data(data));
     formUtil.GenerateFormId(udidHash);
     uint64_t formId = static_cast<uint64_t>(GetU32Data(data));

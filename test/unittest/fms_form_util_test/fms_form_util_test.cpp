@@ -114,18 +114,6 @@ HWTEST_F(FormUtilTest, FormUtilTest_002, TestSize.Level1)
 }
 
 /**
- * @tc.name: FormUtilTest_003
- * @tc.desc: Verify GenerateUdid
- * @tc.type: FUNC
- */
-HWTEST_F(FormUtilTest, FormUtilTest_003, TestSize.Level1)
-{
-    const std::string udid = FormUtil::GenerateUdid();
-
-    EXPECT_TRUE(udid == std::string(""));
-}
-
-/**
  * @tc.name: FormUtilTest_004
  * @tc.desc: Verify GenerateFormId
  * @tc.type: FUNC

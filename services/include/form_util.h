@@ -45,12 +45,6 @@ public:
     static void CreateDefaultFormWant(Want &want, const std::string &uri, const int32_t userId);
 
     /**
-     * @brief create udid for form.
-     * @return udid.
-     */
-    static std::string GenerateUdid();
-
-    /**
      * @brief create form id for form.
      * @param udidHash udid hash
      * @return new form id.
