@@ -30,7 +30,7 @@ namespace AppExecFwk {
 namespace FormRender {
 constexpr int32_t RENDER_FORM_FAILED = -1;
 constexpr int32_t RELOAD_FORM_FAILED = -1;
-constexpr int32_t TIMEOUT = 3 * 1000;
+constexpr int32_t TIMEOUT = 5 * 1000;
 constexpr int32_t CHECK_THREAD_TIME = 3;
 constexpr char FORM_RENDERER_COMP_ID[] = "ohos.extra.param.key.form_comp_id";
 
