@@ -182,6 +182,8 @@ private:
 
     TaskState RunTask();
 
+    void DumpEventHandler();
+
     bool CheckEventHandler(bool createThead = true, bool needMonitored = false);
 
     void AddStaticFormRequest(const FormJsInfo &formJsInfo, const Want &want);
