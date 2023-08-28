@@ -66,6 +66,7 @@ public:
     bool isTimerRefresh = false;
     bool isDataProxy = false;
     bool isSystemApp = false;
+    int32_t uid = 0;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

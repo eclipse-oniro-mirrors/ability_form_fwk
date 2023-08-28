@@ -252,6 +252,7 @@ bool FormDataMgr::GetFormRecord(const int64_t formId, FormRecord &formRecord) co
         formRecord.formName = "formName";
         formRecord.specification = 0;
         formRecord.formVisibleNotify = true;
+        formRecord.uid = 0;
     }
     return g_mockGetFormRecordRet;
 }

@@ -877,39 +877,6 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0047, TestSize.Level1)
 }
 
 /**
- * @tc.number: FormMgrService_0048
- * @tc.name: test UpdateForm function.
- * @tc.desc: Verify that the UpdateForm interface is called normally and the return value
- *           is ERR_APPEXECFWK_FORM_COMMON_CODE.
- */
-HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0048, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0048 start";
-    FormMgrService formMgrService;
-    constexpr int64_t formId = 1;
-    const FormProviderData formProviderData = {};
-    MockGetCallerBundleName(ERR_APPEXECFWK_FORM_COMMON_CODE);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrService.UpdateForm(formId, formProviderData));
-    GTEST_LOG_(INFO) << "FormMgrService_0048 end";
-}
-
-/**
- * @tc.number: FormMgrService_0049
- * @tc.name: test UpdateForm function.
- * @tc.desc: Verify that the UpdateForm interface is called normally and the return value is ERR_OK.
- */
-HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0049, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0049 start";
-    FormMgrService formMgrService;
-    constexpr int64_t formId = 1;
-    const FormProviderData formProviderData = {};
-    MockGetCallerBundleName(ERR_OK);
-    EXPECT_EQ(ERR_OK, formMgrService.UpdateForm(formId, formProviderData));
-    GTEST_LOG_(INFO) << "FormMgrService_0049 end";
-}
-
-/**
  * @tc.number: FormMgrService_0050
  * @tc.name: test CheckFormPermission function.
  * @tc.desc: Verify that the CheckFormPermission interface if the caller do not have the across local
@@ -1036,7 +1003,8 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0056, TestSize.Level1)
     FormMgrService formMgrService;
     const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
     std::string bundleName = "A";
-    MockIsSACall(true);
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(true);
     MockCheckAcrossLocalAccountsPermission(false);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY,
         formMgrService.RegisterFormAddObserverByBundle(bundleName, callerToken));
@@ -1092,7 +1060,8 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0059, TestSize.Level1)
     FormMgrService formMgrService;
     const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
     std::string bundleName = "A";
-    MockIsSACall(true);
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(true);
     MockCheckAcrossLocalAccountsPermission(false);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY,
         formMgrService.RegisterFormRemoveObserverByBundle(bundleName, callerToken));

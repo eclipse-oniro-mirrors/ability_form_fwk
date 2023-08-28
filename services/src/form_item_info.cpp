@@ -512,6 +512,7 @@ bool FormItemInfo::GetSystemAppFlag() const
 {
     return isSystemApp_;
 }
+
 void FormItemInfo::SetDataProxyFlag(bool dataProxyEnabled)
 {
     dataProxyEnabled_ = dataProxyEnabled;
@@ -520,6 +521,16 @@ void FormItemInfo::SetDataProxyFlag(bool dataProxyEnabled)
 bool FormItemInfo::GetDataProxyFlag() const
 {
     return dataProxyEnabled_;
+}
+
+void FormItemInfo::SetProviderUid(int32_t uid)
+{
+    uid_ = uid;
+}
+
+int32_t FormItemInfo::GetProviderUid() const
+{
+    return uid_;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

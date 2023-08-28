@@ -230,7 +230,7 @@ bool FormMgrAdapter::IsRequestPublishFormSupported()
     return g_isRequestPublishFormSupported;
 }
 
-int FormMgrAdapter::UpdateForm(const int64_t formId, const std::string &bundleName,
+int FormMgrAdapter::UpdateForm(const int64_t formId, const int32_t uid,
     const FormProviderData &formProviderData, const std::vector<FormDataProxy> &formDataProxies)
 {
     return g_updateForm;

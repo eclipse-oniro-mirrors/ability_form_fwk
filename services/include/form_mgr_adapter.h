@@ -89,12 +89,12 @@ public:
     /**
      * @brief Update form with formId.
      * @param formId The Id of the form to update.
-     * @param bundleName Provider ability bundleName.
+     * @param callingUid Provider ability uid.
      * @param formProviderData form provider data.
      * @param std::vector<FormDataProxy> Form proxy vector.
      * @return Returns ERR_OK on success, others on failure.
      */
-    int UpdateForm(const int64_t formId, const std::string &bundleName, const FormProviderData &formProviderData,
+    int UpdateForm(const int64_t formId, const int32_t callingUid, const FormProviderData &formProviderData,
         const std::vector<FormDataProxy> &formDataProxies = {});
 
     /**
