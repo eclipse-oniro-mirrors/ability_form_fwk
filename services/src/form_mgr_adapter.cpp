@@ -2048,13 +2048,13 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
     want.SetParam(Constants::PARAM_FORM_ID, formId);
     want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, formId);
     if (!want.GetUriString().empty()) {
-      HILOG_INFO("Router by uri");
-      int32_t result = FormAmsHelper::GetInstance().GetAbilityManager()->StartAbility(want, callerToken);
-      if (result != ERR_OK && result != START_ABILITY_WAITING) {
-        HILOG_ERROR("Failed to StartAbility, result: %{public}d.", result);
-        return result;
-      }
-      return ERR_OK;
+        HILOG_INFO("Router by uri");
+        int32_t result = FormAmsHelper::GetInstance().GetAbilityManager()->StartAbility(want, callerToken);
+        if (result != ERR_OK && result != START_ABILITY_WAITING) {
+            HILOG_ERROR("Failed to StartAbility, result: %{public}d.", result);
+            return result;
+        }
+        return ERR_OK;
     }
 
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
