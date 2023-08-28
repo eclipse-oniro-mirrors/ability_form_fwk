@@ -1642,16 +1642,6 @@ ErrCode FormMgrAdapter::QueryPublishFormToHost(Want &wantToHost)
 
     int callingUid = IPCSkeleton::GetCallingUid();
     int32_t userId = GetCurrentUserId(callingUid);
-    // If the host of publishing form is specified, check whether the host exists.
-    if (!FormBmsHelper::GetInstance().GetAbilityInfo(wantToHost, userId, formAbilityInfo, formExtensionAbilityInfo)) {
-        HILOG_ERROR("Failed to GetAbilityInfo");
-        return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
-    }
-
-    if (formAbilityInfo.name.empty() && formExtensionAbilityInfo.name.empty()) {
-        HILOG_ERROR("Query ability failed, no form host ability found.");
-        return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
-    }
 
     // Query the highest priority ability or extension ability for publishing form
     AppExecFwk::AbilityInfo abilityInfo;
