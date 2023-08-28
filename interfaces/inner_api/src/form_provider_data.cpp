@@ -65,7 +65,7 @@ FormProviderData::FormProviderData(std::string jsonDataString)
     }
     nlohmann::json jsonObject = nlohmann::json::parse(jsonDataString, nullptr, false);
     if (jsonObject.is_discarded()) {
-        HILOG_ERROR("failed to parse jsonDataString: %{public}s.", jsonDataString.c_str());
+        HILOG_ERROR("failed to parse jsonDataString: %{private}s.", jsonDataString.c_str());
         return;
     }
     jsonFormProviderData_ = jsonObject;
@@ -196,7 +196,7 @@ void FormProviderData::SetDataString(std::string &jsonDataString)
     }
     nlohmann::json jsonObject = nlohmann::json::parse(jsonDataString, nullptr, false);
     if (jsonObject.is_discarded()) {
-        HILOG_ERROR("failed to parse jsonDataString: %{public}s.", jsonDataString.c_str());
+        HILOG_ERROR("failed to parse jsonDataString: %{private}s.", jsonDataString.c_str());
         return;
     }
     jsonFormProviderData_ = jsonObject;
@@ -273,7 +273,7 @@ bool FormProviderData::ReadFromParcel(Parcel &parcel)
     auto jsonDataString = Str16ToStr8(parcel.ReadString16());
     nlohmann::json jsonObject = nlohmann::json::parse(jsonDataString, nullptr, false);
     if (jsonObject.is_discarded()) {
-        HILOG_ERROR("failed to parse jsonDataString: %{public}s.", jsonDataString.c_str());
+        HILOG_ERROR("failed to parse jsonDataString: %{private}s.", jsonDataString.c_str());
         return false;
     }
     jsonFormProviderData_ = jsonObject;
@@ -317,7 +317,7 @@ bool FormProviderData::ReadFromParcel(Parcel &parcel)
  */
 bool FormProviderData::Marshalling(Parcel &parcel) const
 {
-    HILOG_INFO("%{public}s called, jsonFormProviderData_: %{public}s", __func__, jsonFormProviderData_.dump().c_str());
+    HILOG_INFO("%{public}s called, jsonFormProviderData_: %{private}s", __func__, jsonFormProviderData_.dump().c_str());
     if (!parcel.WriteString16(Str8ToStr16(jsonFormProviderData_.empty() ?
         JSON_EMPTY_STRING : jsonFormProviderData_.dump()))) {
         return false;

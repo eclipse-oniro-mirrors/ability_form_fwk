@@ -78,7 +78,7 @@ int FormProviderClient::AcquireProviderFormInfo(
         createWant.SetParam(Constants::PARAM_FORM_CUSTOMIZE_KEY, customizeData);
     }
     FormProviderInfo formProviderInfo = ownerAbility->OnCreate(createWant);
-    HILOG_DEBUG("formId: %{public}" PRId64 ", data: %{public}s", formJsInfo.formId,
+    HILOG_DEBUG("formId: %{public}" PRId64 ", data: %{private}s", formJsInfo.formId,
         formProviderInfo.GetFormDataString().c_str());
     if (newWant.HasParameter(Constants::PARAM_FORM_HOST_TOKEN)) {
         HandleRemoteAcquire(formJsInfo, formProviderInfo, newWant, AsObject());
