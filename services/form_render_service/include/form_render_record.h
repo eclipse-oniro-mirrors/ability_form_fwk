@@ -52,6 +52,15 @@ private:
     int32_t maxState_;
 };
 
+class HandlerDumper : public AppExecFwk::Dumper {
+public:
+    void Dump(const std::string &message) override;
+    std::string GetTag() override;
+    std::string GetDumpInfo();
+private:
+    std::string dumpInfo_;
+};
+
 class FormRenderRecord : public std::enable_shared_from_this<FormRenderRecord> {
 public:
     /**
@@ -172,6 +181,8 @@ private:
     void UpdateRenderer(const FormJsInfo &formJsInfo);
 
     TaskState RunTask();
+
+    void DumpEventHandler();
 
     bool CheckEventHandler(bool createThead = true, bool needMonitored = false);
 

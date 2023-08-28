@@ -64,6 +64,22 @@ bool ThreadState::IsMaxState()
     return state_ >= maxState_;
 }
 
+void HandlerDumper::Dump(const std::string &message)
+{
+    HILOG_INFO("Message: %{public}s", message.c_str());
+    dumpInfo_ += message;
+}
+
+std::string HandlerDumper::GetTag()
+{
+    return "";
+}
+
+std::string HandlerDumper::GetDumpInfo()
+{
+    return dumpInfo_;
+}
+
 std::shared_ptr<FormRenderRecord> FormRenderRecord::Create(
     const std::string &bundleName, const std::string &uid, bool needMonitored)
 {
@@ -107,7 +123,7 @@ FormRenderRecord::~FormRenderRecord()
         }
         renderRecord->HandleDestroyInJsThread();
     };
-    eventHandler->PostSyncTask(syncTask);
+    eventHandler->PostSyncTask(syncTask, "Destory FormRenderRecord");
 }
 
 bool FormRenderRecord::HandleHostDied(const sptr<IRemoteObject> hostRemoteObj)
@@ -195,6 +211,7 @@ TaskState FormRenderRecord::RunTask()
         threadState_->NextState();
         HILOG_INFO("FRS block happened with threadState is %{public}d when bundleName is %{public}s",
             threadState_->GetCurrentState(), bundleName_.c_str());
+        DumpEventHandler();
         return threadState_->IsMaxState() ? TaskState::BLOCK : TaskState::RUNNING;
     }
 
@@ -222,6 +239,17 @@ TaskState FormRenderRecord::RunTask()
     }
 
     return TaskState::RUNNING;
+}
+
+void FormRenderRecord::DumpEventHandler()
+{
+    std::lock_guard<std::mutex> lock(eventHandlerMutex_);
+    if (eventHandler_ == nullptr) {
+        return;
+    }
+
+    HandlerDumper handlerDumper;
+    eventHandler_->Dump(handlerDumper);
 }
 
 void FormRenderRecord::MarkThreadAlive()
@@ -252,7 +280,7 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
             }
             renderRecord->HandleUpdateInJsThread(formJsInfo, want);
         };
-        eventHandler_->PostTask(task);
+        eventHandler_->PostTask(task, "UpdateRenderRecord");
     }
 
     if (hostRemoteObj == nullptr) {
@@ -303,7 +331,7 @@ void FormRenderRecord::DeleteRenderRecord(int64_t formId, const std::string &com
             hosts.erase(hostRemoteObj);
         }
     }
-    eventHandler_->PostSyncTask(task);
+    eventHandler_->PostSyncTask(task, "DeleteRenderRecord");
 }
 
 bool FormRenderRecord::IsEmpty()
@@ -705,7 +733,7 @@ void FormRenderRecord::ReleaseRenderer(
             renderRecord->UpdateStaticFormRequestReleaseState(formId, compId, true);
         }
     };
-    eventHandler->PostSyncTask(task);
+    eventHandler->PostSyncTask(task, "ReleaseRenderer");
 }
 
 bool FormRenderRecord::HandleReleaseRendererInJsThread(
@@ -781,7 +809,7 @@ void FormRenderRecord::ReAddAllStaticForms()
                     renderRecord->HandleUpdateInJsThread(formJsInfo, want);
                 }
             };
-            eventHandler_->PostTask(task);
+            eventHandler_->PostTask(task, "ReAddAllStaticForms");
         }
     }
 
@@ -816,7 +844,7 @@ void FormRenderRecord::ReAddStaticForms(const std::vector<FormJsInfo> &formJsInf
                     renderRecord->HandleUpdateInJsThread(form, want);
                 }
             };
-            eventHandler_->PostTask(task);
+            eventHandler_->PostTask(task, "ReAddStaticForms");
         }
     }
 
@@ -877,7 +905,7 @@ int32_t FormRenderRecord::ReloadFormRecord(const std::vector<FormJsInfo> &&formJ
         }
         renderRecord->HandleReloadFormRecord(std::move(ids), want);
     };
-    eventHandler_->PostTask(task);
+    eventHandler_->PostTask(task, "ReloadFormRecord");
     ReAddStaticForms(formJsInfos);
     return ERR_OK;
 }
@@ -899,7 +927,7 @@ int32_t FormRenderRecord::OnUnlock()
         HILOG_ERROR("eventHandler_ is nullptr.");
         return RENDER_FORM_FAILED;
     }
-    eventHandler_->PostTask(task);
+    eventHandler_->PostTask(task, "OnUnlock");
     return ERR_OK;
 }
 
@@ -983,7 +1011,7 @@ void FormRenderRecord::UpdateConfiguration(
         renderRecord->HandleUpdateConfiguration(config);
     };
 
-    eventHandler_->PostTask(task);
+    eventHandler_->PostTask(task, "UpdateConfiguration");
     ReAddAllStaticForms();
 }
 
