@@ -962,7 +962,7 @@ std::shared_ptr<WantAgent> FormTimerMgr::GetUpdateAtWantAgent(long updateAtTime,
     std::vector<std::shared_ptr<AAFwk::Want>> wants;
     wants.emplace_back(want);
     WantAgentInfo wantAgentInfo(REQUEST_UPDATE_AT_CODE, WantAgentConstant::OperationType::SEND_COMMON_EVENT,
-        WantAgentConstant::Flags::UPDATE_PRESENT_FLAG, wants, nullptr);
+        WantAgentConstant::Flags::CANCEL_PRESENT_FLAG, wants, nullptr);
     return IN_PROCESS_CALL(WantAgentHelper::GetWantAgent(wantAgentInfo, userId));
 }
 
