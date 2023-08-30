@@ -29,6 +29,8 @@
 #include "mock_form_token.h"
 #include "if_system_ability_manager.h"
 #include "mock_system_ability_manager.h"
+#include "mock_i_remote_object.h"
+#include "fms_log_wrapper.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -2200,5 +2202,106 @@ HWTEST_F(FormMgrTest, FormMgrTest_0112, TestSize.Level1) {
     ErrCode result1 = FormMgr::GetInstance().GetFormInstanceById(formId, formInstance);
     EXPECT_EQ(result1, code);
     GTEST_LOG_(INFO) << "FormMgrTest_0112 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0113
+ * @tc.desc: Verify BackgroundEvent
+ * @tc.type: FUNC
+ * @tc.require: IssueI7X4L4
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0113, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0113 starts";
+    EXPECT_CALL(*mockProxy, BackgroundEvent(_, _, _))
+        .Times(1)
+        .WillOnce(Return(ERROR_NUM));
+    FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
+    Want want;
+    int64_t formId = 1; 
+    std::string bundleName = "a";
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    int result = FormMgr::GetInstance().BackgroundEvent(formId, want, callerToken);
+
+    EXPECT_EQ(result, ERROR_NUM);
+    GTEST_LOG_(INFO) << "FormMgrTest_0113 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0114
+ * @tc.desc: Verify RegisterPublishFormInterceptor
+ * @tc.type: FUNC
+ * @tc.require: IssueI7X4L4
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0114, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0114 starts";
+    EXPECT_CALL(*mockProxy, RegisterPublishFormInterceptor(_))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
+    sptr<IRemoteObject> interceptorCallback;
+
+    int32_t result = FormMgr::GetInstance().RegisterPublishFormInterceptor(interceptorCallback);
+
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrTest_0114 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0115
+ * @tc.desc: Verify UnregisterPublishFormInterceptor
+ * @tc.type: FUNC
+ * @tc.require: IssueI7X4L4
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0115, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0115 starts";
+    FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
+    EXPECT_CALL(*mockProxy, UnregisterPublishFormInterceptor(_))
+        .Times(1)
+        .WillOnce(Return(ERROR_NUMS));
+    sptr<IRemoteObject> interceptorCallback;
+
+    int32_t result = FormMgr::GetInstance().UnregisterPublishFormInterceptor(interceptorCallback);
+    EXPECT_EQ(result, 8388610);
+    GTEST_LOG_(INFO) << "FormMgrTest_0115 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0117
+ * @tc.desc: Verify RegisterAddObserver
+ * @tc.type: FUNC
+ * @tc.require: IssueI7X4L4
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0117, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0117 starts";
+    EXPECT_CALL(*mockProxy, RegisterAddObserver(_, _))
+        .Times(1)
+        .WillOnce(Return(ERROR_NUMS));
+    FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
+    std::string bundleName = "this is a bundleName";
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+
+    ErrCode result = FormMgr::GetInstance().RegisterAddObserver(bundleName, callerToken);
+    EXPECT_EQ(result, ERROR_NUM);
+    GTEST_LOG_(INFO) << "FormMgrTest_0117 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0118
+ * @tc.desc: Verify RegisterRemoveObserver
+ * @tc.type: FUNC
+ * @tc.require: IssueI7X4L4
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0118, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0118 starts";
+    EXPECT_CALL(*mockProxy, RegisterRemoveObserver(_, _))
+        .Times(1)
+        .WillOnce(Return(OHOS::ERR_OK));
+    FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
+    std::string bundleName = "a";
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+
+    ErrCode result = FormMgr::GetInstance().RegisterRemoveObserver(bundleName, callerToken);
+    EXPECT_EQ(result, ERROR_NUM);
+    GTEST_LOG_(INFO) << "FormMgrTest_0118 test ends";
 }
 } // namespace

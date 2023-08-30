@@ -34,6 +34,7 @@ using namespace OHOS::AppExecFwk::FormRender;
 
 namespace {
     constexpr int32_t RELOAD_FORM_FAILED = -1;
+    constexpr int32_t RENDER_FORM_FAILED = -1;
 }
 class FormRenderRecordTest : public testing::Test {
 public:
@@ -490,4 +491,247 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_025, TestSize.Level0)
     formRenderRecord->GetFormRendererGroup(formJsInfo, context, runtime);
     formRenderRecord->HandleUpdateInJsThread(formJsInfo, want);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_025 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_026
+ * @tc.desc: Verify UpdateRenderRecord
+ * @tc.type: FUNC
+ * @tc.require: IssueI7X4L4
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_026, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_026 start";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    FormJsInfo formJsInfo;
+    int64_t formId = 1;
+    Want want;
+    sptr<IRemoteObject> hostRemoteObj = new (std::nothrow) MockFormProviderClient();
+    formRenderRecord->hostsMapForFormId_.emplace(
+        formId, std::unordered_set<sptr<IRemoteObject>, FormRenderRecord::RemoteObjHash>());
+
+    EXPECT_EQ(ERR_OK, formRenderRecord->UpdateRenderRecord(formJsInfo, want, hostRemoteObj));
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_026 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_027
+ * @tc.desc: Verify UpdateRenderRecord
+ * @tc.type: FUNC
+ * @tc.require: IssueI7X4L4
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_027, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_027 start";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    ASSERT_NE(nullptr, formRenderRecord);
+    FormJsInfo formJsInfo;
+    int64_t formId = 1;
+    Want want;
+    formRenderRecord->hostsMapForFormId_.emplace(
+        formId, std::unordered_set<sptr<IRemoteObject>, FormRenderRecord::RemoteObjHash>());
+
+    EXPECT_EQ(RENDER_FORM_FAILED, formRenderRecord->UpdateRenderRecord(formJsInfo, want, nullptr));
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_027 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_028
+ * @tc.desc: Verify HandleUpdateStaticForm
+ * @tc.type: FUNC
+ * @tc.require: IssueI7X4L4
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_028, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_028 start";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = 1;
+    Want want;
+    formRenderRecord->HandleUpdateStaticForm(formJsInfo, want);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_028 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_029
+ * @tc.desc: Verify HandleUpdateStaticForm
+ * @tc.type: FUNC
+ * @tc.require: IssueI7X4L4
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_029, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_029 start";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = 1;
+    Want want;
+    formRenderRecord->HandleUpdateStaticForm(formJsInfo, want);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_029 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_030
+ * @tc.desc: Verify CheckEventHandler
+ * @tc.type: FUNC
+ * @tc.require: IssueI7X4L4
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_030, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_030 start";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    Want want;
+    formRenderRecord->eventHandler_ = nullptr;
+    formRenderRecord->CheckEventHandler(true, true);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_030 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_031
+ * @tc.desc: Verify CheckEventHandler
+ * @tc.type: FUNC
+ * @tc.require: IssueI7X4L4
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_031, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_031 start";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    std::string bundleName = "<bundleName>";
+    auto eventRunner = EventRunner::Create(bundleName);
+    formRenderRecord->eventHandler_ = std::make_shared<EventHandler>(eventRunner);
+    formRenderRecord->CheckEventHandler(true, true);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_031 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_032
+ * @tc.desc: Verify AddStaticFormRequest
+ * @tc.type: FUNC
+ * @tc.require: IssueI7X4L4
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_032, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_032 start";
+    FormJsInfo formJsInfo;
+    Want want;
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    formRenderRecord->AddStaticFormRequest(formJsInfo, want);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_032 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_033
+ * @tc.desc: Verify AddStaticFormRequest
+ * @tc.type: FUNC
+ * @tc.require: IssueI7X4L4
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_033, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_033 start";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    int64_t formId = 1;
+    Ace::FormRequest formRequest;
+    Want want;
+    formRenderRecord->AddStaticFormRequest(formId, formRequest);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_033 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_034
+ * @tc.desc: Verify UpdateStaticFormRequestReleaseState
+ * @tc.type: FUNC
+ * @tc.require: IssueI7X4L4
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_034, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_034 start";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    int64_t formId = 1;
+    std::string compId = "compId";
+    bool hasRelease = true;
+    Want want;
+    formRenderRecord->UpdateStaticFormRequestReleaseState(formId, compId, hasRelease);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_034 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_035
+ * @tc.desc: Verify ReleaseRenderer
+ * @tc.type: FUNC
+ * @tc.require: IssueI7X4L4
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_035, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_035 start";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    ASSERT_NE(nullptr, formRenderRecord);
+    int64_t formId = 1;
+    std::string compId = "compId";
+    bool isRenderGroupEmpty = true;
+    Want want;
+    formRenderRecord->ReleaseRenderer(formId, compId, isRenderGroupEmpty);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_035 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_036
+ * @tc.desc: Verify HandleReleaseRendererInJsThread
+ * @tc.type: FUNC
+ * @tc.require: IssueI7X4L4
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_036, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_036 start";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    int64_t formId = 1;
+    std::string compId = "compId";
+    bool isRenderGroupEmpty = true;
+    Want want;
+    formRenderRecord->hostsMapForFormId_.emplace(
+        formId, std::unordered_set<sptr<IRemoteObject>, FormRenderRecord::RemoteObjHash>());
+
+    EXPECT_EQ(false, formRenderRecord->HandleReleaseRendererInJsThread(formId, compId, isRenderGroupEmpty));
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_036 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_037
+ * @tc.desc: Verify Release
+ * @tc.type: FUNC
+ * @tc.require: IssueI7X4L4
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_037, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_037 start";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    formRenderRecord->Release();
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_037 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_038
+ * @tc.desc: Verify ReAddAllStaticForms
+ * @tc.type: FUNC
+ * @tc.require: IssueI7X4L4
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_038, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_038 start";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    formRenderRecord->ReAddAllStaticForms();
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_038 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_039
+ * @tc.desc: Verify HandleUpdateConfiguration
+ * @tc.type: FUNC
+ * @tc.require: IssueI7X4L4
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_039, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_039 start";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> config;
+    formRenderRecord->HandleUpdateConfiguration(config);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_039 end";
 }

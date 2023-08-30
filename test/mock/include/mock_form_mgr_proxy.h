@@ -74,6 +74,11 @@ public:
     MOCK_METHOD5(RequestPublishProxyForm, ErrCode(Want &want, bool withFormBindingData,
         std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
         const std::vector<FormDataProxy> &formDataProxies));
+    MOCK_METHOD3(BackgroundEvent, int(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken));
+    MOCK_METHOD1(RegisterPublishFormInterceptor, int32_t(const sptr<IRemoteObject> &interceptorCallback));
+    MOCK_METHOD1(UnregisterPublishFormInterceptor, int32_t(const sptr<IRemoteObject> &interceptorCallback));
+    MOCK_METHOD2(RegisterAddObserver, ErrCode(const std::string &bundleName, const sptr<IRemoteObject> &callerToken));
+    MOCK_METHOD2(RegisterRemoveObserver, ErrCode(const std::string &bundleName, const sptr<IRemoteObject> &callerToken));
 };
 }
 }
