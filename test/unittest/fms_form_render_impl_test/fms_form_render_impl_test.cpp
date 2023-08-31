@@ -122,6 +122,7 @@ public:
  * @tc.name: FormRenderImplTest_001
  * @tc.desc: 1.Verify RenderForm interface executes as expected.
  *           2.callerToken is nullptr.
+ *           3.formSupplyClient is nullptr.
  * @tc.type: FUNC
  */
 HWTEST_F(FormRenderImplTest, FormRenderImplTest_001, TestSize.Level0)
@@ -131,6 +132,8 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_001, TestSize.Level0)
     FormJsInfo formJsInfo;
     Want want;
     sptr<IRemoteObject> callerToken = nullptr;
+    sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
+    formSupplyClient = nullptr;
     auto ret = formRenderImpl.RenderForm(formJsInfo, want, callerToken);
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
     GTEST_LOG_(INFO) << "FormRenderImplTest_001 end";
@@ -344,4 +347,67 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_012, TestSize.Level0)
     auto ret = formRenderImpl.StopRenderingForm(formJsInfo, want, callerToken);
     EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FormRenderImplTest_012 end";
+}
+
+/**
+ * @tc.name: FormRenderImplTest_013
+ * @tc.desc: 1.Verify OnConfigurationUpdated interface executes as expected.
+ *           2.call OnConfigurationUpdated
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_013, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderImplTest_013 start";
+    FormRenderImpl formRenderImpl;
+    Want want;
+    std::string value = "UID";
+    want.SetParam(Constants::FORM_SUPPLY_UID, value);
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration;
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    formRenderImpl.renderRecordMap_.emplace(value, formRenderRecord);
+    formRenderImpl.OnConfigurationUpdated(configuration);
+    GTEST_LOG_(INFO) << "FormRenderImplTest_013 end";
+}
+
+/**
+ * @tc.name: FormRenderImplTest_014
+ * @tc.desc: 1.Verify SetConfiguration interface executes as expected.
+ *           2.call SetConfiguration
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_014, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderImplTest_014 start";
+    FormRenderImpl formRenderImpl;
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration;
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    Want want;
+    std::string value = "UID";
+    want.SetParam(Constants::FORM_SUPPLY_UID, value);
+    formRenderImpl.renderRecordMap_.emplace(value, formRenderRecord);
+    formRenderImpl.SetConfiguration(configuration);
+    GTEST_LOG_(INFO) << "FormRenderImplTest_014 end";
+}
+
+/**
+ * @tc.name: FormRenderImplTest_015
+ * @tc.desc: 1.Verify SetConfiguration interface executes as expected.
+ *           2.call SetConfiguration
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_015, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderImplTest_015 start";
+    FormRenderImpl formRenderImpl;
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration;
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    Want want;
+    std::string value = "UID";
+    want.SetParam(Constants::FORM_SUPPLY_UID, value);
+    formRenderImpl.renderRecordMap_.emplace(value, formRenderRecord);
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormSupplyStub();
+    sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
+    formSupplyClient = nullptr;
+    formRenderImpl.SetConfiguration(configuration);
+    GTEST_LOG_(INFO) << "FormRenderImplTest_015 end";
 }

@@ -114,5 +114,20 @@ HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_005, Function | Me
     formObserverRecord.onFormRemove(bundleName, runningFormInfo);
     GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_005 end";
 }
+
+/**
+ * @tc.number: FmsFormObserverRecordTest_006
+ * @tc.name: CleanResource.
+ * @tc.desc: Verify that the SetFormAddObserver interface executes normally and exits without exception.
+ */
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_006, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_006 start";
+    FormObserverRecord formObserverRecord;
+    RunningFormInfo runningFormInfo;
+    wptr<IRemoteObject> remote;
+    formObserverRecord.CleanResource(remote);
+    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_006 end";
+}
 }
 }
