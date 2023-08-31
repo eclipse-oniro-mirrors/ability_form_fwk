@@ -1081,4 +1081,414 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0060, TestSize.Level1)
     EXPECT_EQ(ERR_OK, formMgrService.ReadFormConfigXML());
     GTEST_LOG_(INFO) << "FormMgrService_0060 end";
 }
+
+/**
+ * @tc.number: FormMgrService_0061
+ * @tc.name: test StopRenderingForm function.
+ * @tc.desc: Verify that the StopRenderingForm interface is called normally
+ * and the return value is ERR_OK.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0061, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0061 start";
+    FormMgrService formMgrService;
+    int64_t formId = 1;
+    std::string compId = "comId";
+    int ret = formMgrService.StopRenderingForm(formId, compId);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY, ret);
+    GTEST_LOG_(INFO) << "FormMgrService_0061 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0063
+ * @tc.name: test SetNextRefreshTime function.
+ * @tc.desc: Verify that the SetNextRefreshTime interface is called normally
+ * and the return value is ERR_OK.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0063, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0063 start";
+    FormMgrService formMgrService;
+    int64_t formId = 1;
+    int64_t nextTime = 1;
+    int ret = formMgrService.SetNextRefreshTime(formId, nextTime);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_NOT_EXIST_ID, ret);
+    GTEST_LOG_(INFO) << "FormMgrService_0063 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0064
+ * @tc.name: test ReleaseRenderer function.
+ * @tc.desc: Verify that the ReleaseRenderer interface is called normally
+ * and the return value is ERR_OK.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0064, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0064 start";
+    FormMgrService formMgrService;
+    int64_t formId = 1;
+    std::string compId = "comId";
+    int ret = formMgrService.ReleaseRenderer(formId, compId);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY, ret);
+    GTEST_LOG_(INFO) << "FormMgrService_0064 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0065
+ * @tc.name: test RequestPublishForm function.
+ * @tc.desc: Verify that the RequestPublishForm interface is called normally
+ * and the return value is ERR_OK.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0065, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0065 start";
+    FormMgrService formMgrService;
+    Want want;
+    bool withFormBindingData = true;
+    std::unique_ptr<FormProviderData> formBindingData;
+    int64_t formId = 1;
+    ErrCode ret = formMgrService.RequestPublishForm(want, withFormBindingData, formBindingData, formId);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, ret);
+    GTEST_LOG_(INFO) << "FormMgrService_0065 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0066
+ * @tc.name: test DumpStorageFormInfos function.
+ * @tc.desc: Verify that the DumpStorageFormInfos interface is called normally
+ * and the return value is ERR_OK.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0066, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0066 start";
+    FormMgrService formMgrService;
+    std::string formInfos = "formInfos";
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(false);
+    int ret = formMgrService.DumpStorageFormInfos(formInfos);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, ret);
+    GTEST_LOG_(INFO) << "FormMgrService_0066 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0067
+ * @tc.name: test DumpFormInfoByBundleName function.
+ * @tc.desc: Verify that the DumpFormInfoByBundleName interface is called normally
+ * and the return value is ERR_OK.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0067, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0067 start";
+    FormMgrService formMgrService;
+    std::string formInfos = "formInfos";
+    std::string bundleName = "bundleName";
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(false);
+    int ret = formMgrService.DumpFormInfoByBundleName(bundleName, formInfos);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, ret);
+    GTEST_LOG_(INFO) << "FormMgrService_0067 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0068
+ * @tc.name: test DumpFormInfoByFormId function.
+ * @tc.desc: Verify that the DumpFormInfoByFormId interface is called normally
+ * and the return value is ERR_OK.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0068, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0068 start";
+    FormMgrService formMgrService;
+    std::string formInfos = "formInfos";
+    std::int64_t formId = 1;
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(false);
+    int ret = formMgrService.DumpFormInfoByFormId(formId, formInfos);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, ret);
+    GTEST_LOG_(INFO) << "FormMgrService_0068 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0069
+ * @tc.name: test OnStop function.
+ * @tc.desc: Verify that the OnStop interface is called normally
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0069, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0069 start";
+    FormMgrService formMgrService;
+    formMgrService.OnStop();
+    GTEST_LOG_(INFO) << "FormMgrService_0069 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0070
+ * @tc.name: test HiDumpHelp function.
+ * @tc.desc: Verify that the HiDumpHelp interface is called normally
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0070, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0070 start";
+    FormMgrService formMgrService;
+    std::string args = "args";
+    std::string result = "result";
+    formMgrService.HiDumpHelp(args, result);
+    GTEST_LOG_(INFO) << "FormMgrService_0070 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0071
+ * @tc.name: test HiDumpFormInfoByBundleName function.
+ * @tc.desc: Verify that the HiDumpFormInfoByBundleName interface is called normally
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0071, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0071 start";
+    FormMgrService formMgrService;
+    std::string args = "args";
+    std::string result = "result";
+    formMgrService.HiDumpFormInfoByBundleName(args, result);
+    GTEST_LOG_(INFO) << "FormMgrService_0071 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0072
+ * @tc.name: test CheckAcrossLocalAccountsPermission function.
+ * @tc.desc: Verify that the CheckAcrossLocalAccountsPermission interface is called normally
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0072, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0072 start";
+    FormMgrService formMgrService;
+    std::string args = "args";
+    std::string result = "result";
+    bool ret = formMgrService.CheckAcrossLocalAccountsPermission();
+    EXPECT_EQ(ret, false);
+    GTEST_LOG_(INFO) << "FormMgrService_0072 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0073
+ * @tc.name: test CheckAcrossLocalAccountsPermission function.
+ * @tc.desc: Verify that the CheckAcrossLocalAccountsPermission interface is called normally
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0073, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0073 start";
+    FormMgrService formMgrService;
+    std::string args = "args";
+    std::string result = "result";
+    bool ret = formMgrService.CheckAcrossLocalAccountsPermission();
+    EXPECT_EQ(ret, false);
+    GTEST_LOG_(INFO) << "FormMgrService_0073 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0074
+ * @tc.name: test GetRunningFormInfos function.
+ * @tc.desc: Verify that the GetRunningFormInfos interface is called normally
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0074, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0074 start";
+    FormMgrService formMgrService;
+    std::string args = "args";
+    std::string result = "result";
+    std::vector<RunningFormInfo> runningFormInfos;
+    ErrCode ret = formMgrService.GetRunningFormInfos(runningFormInfos);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, ret);
+    GTEST_LOG_(INFO) << "FormMgrService_0074 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0075
+ * @tc.name: test GetRunningFormInfosByBundleName function.
+ * @tc.desc: Verify that the GetRunningFormInfosByBundleName interface is called normally
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0075, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0075 start";
+    FormMgrService formMgrService;
+    std::string bundleName = "bundleName";
+    std::vector<RunningFormInfo> runningFormInfos;
+    ErrCode ret = formMgrService.GetRunningFormInfosByBundleName(bundleName, runningFormInfos);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, ret);
+    GTEST_LOG_(INFO) << "FormMgrService_0075 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0076
+ * @tc.name: test GetFormInstancesByFilter function.
+ * @tc.desc: Verify that the GetFormInstancesByFilter interface is called normally
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0076, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0076 start";
+    FormMgrService formMgrService;
+    const FormInstancesFilter formInstancesFilter;
+    std::vector<FormInstance> formInstances;
+    ErrCode ret = formMgrService.GetFormInstancesByFilter(formInstancesFilter, formInstances);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, ret);
+    GTEST_LOG_(INFO) << "FormMgrService_0076 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0077
+ * @tc.name: test GetFormInstanceById function.
+ * @tc.desc: Verify that the GetFormInstanceById interface is called normally
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0077, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0077 start";
+    FormMgrService formMgrService;
+    FormInstance formInstance;
+    int64_t formId = 1;
+    ErrCode ret = formMgrService.GetFormInstanceById(formId, formInstance);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, ret);
+    GTEST_LOG_(INFO) << "FormMgrService_0077 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0078
+ * @tc.name: test GetFormInstanceById function.
+ * @tc.desc: Verify that the GetFormInstanceById interface is called normally
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0078, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0078 start";
+    FormMgrService formMgrService;
+    int64_t formId = 1;
+    FormInstance formInstance;
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(false);
+    ErrCode ret = formMgrService.GetFormInstanceById(formId, formInstance);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, ret);
+    GTEST_LOG_(INFO) << "FormMgrService_0078 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0079
+ * @tc.name: test RegisterAddObserver function.
+ * @tc.desc: Verify that the RegisterAddObserver interface is called normally
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0079, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0079 start";
+    FormMgrService formMgrService;
+    int64_t formId = 1;
+    std::string bundleName = "bundleName";
+    const sptr<IRemoteObject> callerToken = nullptr;
+    ErrCode ret = formMgrService.RegisterAddObserver(bundleName, callerToken);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, ret);
+    GTEST_LOG_(INFO) << "FormMgrService_0079 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0080
+ * @tc.name: test RegisterRemoveObserver function.
+ * @tc.desc: Verify that the RegisterRemoveObserver interface is called normally
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0080, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0080 start";
+    FormMgrService formMgrService;
+    int64_t formId = 1;
+    std::string bundleName = "bundleName";
+    const sptr<IRemoteObject> callerToken = nullptr;
+    ErrCode ret = formMgrService.RegisterRemoveObserver(bundleName, callerToken);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, ret);
+    GTEST_LOG_(INFO) << "FormMgrService_0080 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0081
+ * @tc.name: test UpdateProxyForm function.
+ * @tc.desc: Verify that the UpdateProxyForm interface is called normally
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0081, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0081 start";
+    FormMgrService formMgrService;
+    int64_t formId = 1;
+    const FormProviderData formBindingData;
+    const std::vector<FormDataProxy> formDataProxies;
+    ErrCode ret = formMgrService.UpdateProxyForm(formId, formBindingData, formDataProxies);
+    EXPECT_EQ(ERR_OK, ret);
+    GTEST_LOG_(INFO) << "FormMgrService_0081 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0082
+ * @tc.name: test RegisterRemoveObserver function.
+ * @tc.desc: Verify that the RegisterRemoveObserver interface is called normally
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0082, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0082 start";
+    FormMgrService formMgrService;
+    std::string bundleName = "bundleName";
+    const sptr<IRemoteObject> callerToken = nullptr;
+    ErrCode ret = formMgrService.RegisterRemoveObserver(bundleName, callerToken);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, ret);
+    GTEST_LOG_(INFO) << "FormMgrService_0082 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0083
+ * @tc.name: test RegisterRemoveObserver function.
+ * @tc.desc: Verify that the RegisterRemoveObserver interface is called normally
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0083, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0083 start";
+    FormMgrService formMgrService;
+    Want want; 
+    bool withFormBindingData = true;
+    std::unique_ptr<FormProviderData> formBindingData;
+    int64_t formId = 1;
+    const std::vector<FormDataProxy> formDataProxies;
+    ErrCode ret = formMgrService.RequestPublishProxyForm(want, withFormBindingData, formBindingData, formId, formDataProxies);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, ret);
+    GTEST_LOG_(INFO) << "FormMgrService_0083 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0084
+ * @tc.name: test RegisterRemoveObserver function.
+ * @tc.desc: Verify that the RegisterRemoveObserver interface is called normally
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0084, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0084 start";
+    FormMgrService formMgrService;
+    Want want; 
+    bool withFormBindingData = true;
+    std::unique_ptr<FormProviderData> formBindingData;
+    int64_t formId = 1;
+    const std::vector<FormDataProxy> formDataProxies;
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(false);
+    ErrCode ret = formMgrService.RequestPublishProxyForm(want, withFormBindingData, formBindingData, formId, formDataProxies);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, ret);
+    GTEST_LOG_(INFO) << "FormMgrService_0084 end";
+}
+
+
+/**
+ * @tc.number: FormMgrService_0085
+ * @tc.name: test BackgroundEvent function.
+ * @tc.desc: Verify that the BackgroundEvent interface is called normally
+ * and the return value is ERR_OK.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0085, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0085 start";
+    FormMgrService formMgrService;
+    int64_t formId = 1;
+    Want want;
+    const sptr<IRemoteObject> callerToken = nullptr;
+    int ret = formMgrService.BackgroundEvent(formId, want, callerToken);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, ret);
+    GTEST_LOG_(INFO) << "FormMgrService_0085 end";
+}
 }
