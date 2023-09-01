@@ -3877,4 +3877,102 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_202, TestSize.Level0)
     EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, formMgrAdapter.HandleFormRemoveObserver(runningFormInfo));
     GTEST_LOG_(INFO) << "FormMgrAdapter_202 end";
 }
+
+/**
+ * @tc.name: FormMgrAdapter_203
+ * @tc.desc: test RegisterPublishFormInterceptor function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_203, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_203 start";
+    FormMgrAdapter formMgrAdapter;
+    sptr<IRemoteObject> interceptorCallback = nullptr;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.RegisterPublishFormInterceptor(interceptorCallback));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_203 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_204
+ * @tc.desc: test RegisterPublishFormInterceptor function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_204, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_204 start";
+    FormMgrAdapter formMgrAdapter;
+    sptr<IRemoteObject> interceptorCallback;
+    auto interceptor = nullptr;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.RegisterPublishFormInterceptor(interceptorCallback));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_204 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_205
+ * @tc.desc: test RegisterPublishFormInterceptor function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_205, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_205 start";
+    FormMgrAdapter formMgrAdapter;
+    sptr<IRemoteObject> interceptorCallback;
+    // auto interceptor = nullptr;
+    // auto interceptor = nullptr;
+    auto interceptor = iface_cast<AppExecFwk::IFormPublishInterceptor>(interceptorCallback);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.RegisterPublishFormInterceptor(interceptorCallback));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_205 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_206
+ * @tc.desc: test UnregisterPublishFormInterceptor function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_206, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_206 start";
+    FormMgrAdapter formMgrAdapter;
+    sptr<IRemoteObject> interceptorCallback;
+    // auto interceptor = nullptr;
+    // auto interceptor = nullptr;
+    auto interceptor = iface_cast<AppExecFwk::IFormPublishInterceptor>(interceptorCallback);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.UnregisterPublishFormInterceptor(interceptorCallback));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_206 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_207
+ * @tc.desc: test UnregisterPublishFormInterceptor function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_207, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_207 start";
+    FormMgrAdapter formMgrAdapter;
+    sptr<IRemoteObject> interceptorCallback;
+    // auto interceptor = nullptr;
+    // auto interceptor = nullptr;
+    auto interceptor = iface_cast<AppExecFwk::IFormPublishInterceptor>(interceptorCallback);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.UnregisterPublishFormInterceptor(interceptorCallback));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_207 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_208
+ * @tc.desc: test UnregisterPublishFormInterceptor function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_208, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_208 start";
+    FormMgrAdapter formMgrAdapter;
+    sptr<IRemoteObject> interceptorCallback;
+    // auto interceptor = nullptr;
+    // auto interceptor = nullptr;
+    auto interceptor = iface_cast<AppExecFwk::IFormPublishInterceptor>(interceptorCallback);
+    auto formPublishInterceptor_ = interceptor;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.UnregisterPublishFormInterceptor(interceptorCallback));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_208 end";
+}
 }

@@ -40,6 +40,7 @@ group("unittest") {
     "unittest/fms_form_cache_mgr_test:unittest",
     "unittest/fms_form_caller_mgr_test:unittest",
     "unittest/fms_form_data_mgr_test:unittest",
+    "unittest/fms_form_data_proxy_record_test:unittest",
     "unittest/fms_form_db_record_test:unittest",
     "unittest/fms_form_distributed_client_test:unittest",
     "unittest/fms_form_event_report_test:unittest",
