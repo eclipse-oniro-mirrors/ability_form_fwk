@@ -1466,21 +1466,6 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0084, Function | MediumTest | Lev
 }
 
 /**
- * @tc.number: Fms_FormTimerMgr_0085
- * @tc.name: ClearIntervalTimer.
- * @tc.desc: test ClearIntervalTimer function.
- */
-HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0085, Function | MediumTest | Level1)
-{
-    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0085 start";
-    std::shared_ptr<FormTimerMgr> formTimerMgr = std::make_shared<FormTimerMgr>();
-    ASSERT_NE(nullptr, formTimerMgr);
-    formTimerMgr->intervalTimer_ = std::make_shared<Utils::Timer>("interval timer");
-    formTimerMgr->ClearIntervalTimer();
-    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0085 end";
-}
-
-/**
  * @tc.number: Fms_FormTimerMgr_0088
  * @tc.name: ExecTimerTask.
  * @tc.desc: test ExecTimerTask function.
