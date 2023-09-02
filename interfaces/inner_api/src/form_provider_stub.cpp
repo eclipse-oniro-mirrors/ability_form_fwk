@@ -65,7 +65,7 @@ int FormProviderStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messag
     std::u16string descriptor = FormProviderStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
     if (descriptor != remoteDescriptor) {
-        HILOG_ERROR("%{public}s failed, local descriptor is not equal to remote", __func__);
+        HILOG_ERROR("%{public}s error, local describe is not equal to remote", __func__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 

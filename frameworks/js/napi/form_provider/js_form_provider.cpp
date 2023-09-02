@@ -72,34 +72,35 @@ bool ConvertFormInfoFilterThrow(NativeEngine &engine, NativeValue *jsValue, AppE
 
 static std::string GetStringByProp(napi_env env, napi_value value, const std::string &prop)
 {
+    HILOG_DEBUG("GetStringByProp start");
     std::string result;
     bool propExist = false;
     napi_value propValue = nullptr;
     napi_valuetype valueType = napi_undefined;
     napi_has_named_property(env, value, prop.c_str(), &propExist);
     if (!propExist) {
-        HILOG_ERROR("%{public}s, prop[%{public}s] not exist.", __func__, prop.c_str());
+        HILOG_ERROR("%{public}s, prop[%{public}s] absent.", __func__, prop.c_str());
         return result;
     }
     napi_get_named_property(env, value, prop.c_str(), &propValue);
     if (propValue == nullptr) {
-        HILOG_ERROR("%{public}s, prop[%{public}s] get failed.", __func__, prop.c_str());
+        HILOG_ERROR("%{public}s, prop[%{public}s] get error.", __func__, prop.c_str());
         return result;
     }
     napi_typeof(env, propValue, &valueType);
     if (valueType != napi_string) {
-        HILOG_ERROR("%{public}s, prop[%{public}s] is not napi_string.", __func__, prop.c_str());
+        HILOG_ERROR("%{public}s, prop[%{public}s] is not string.", __func__, prop.c_str());
         return result;
     }
     size_t size = 0;
     if (napi_get_value_string_utf8(env, propValue, nullptr, 0, &size) != napi_ok) {
-        HILOG_ERROR("%{public}s, prop[%{public}s] get size failed.", __func__, prop.c_str());
+        HILOG_ERROR("%{public}s, prop[%{public}s] get size error.", __func__, prop.c_str());
         return result;
     }
     result.reserve(size + 1);
     result.resize(size);
     if (napi_get_value_string_utf8(env, propValue, result.data(), (size + 1), &size) != napi_ok) {
-        HILOG_ERROR("%{public}s, prop[%{public}s] get value failed.", __func__, prop.c_str());
+        HILOG_ERROR("%{public}s, prop[%{public}s] get value error.", __func__, prop.c_str());
         return "";
     }
     return result;
@@ -422,13 +423,13 @@ bool JsFormProvider::ConvertFromDataProxies(NativeEngine& engine, NativeValue* j
     std::vector<AppExecFwk::FormDataProxy> &formDataProxies)
 {
     if (jsValue == nullptr || !jsValue->IsArray()) {
-        HILOG_ERROR("%{public}s, jsValue is nullptr not array", __func__);
+        HILOG_ERROR("%{public}s, jsValue is null not array", __func__);
         return false;
     }
 
     auto array = ConvertNativeValueTo<NativeArray>(jsValue);
     if (array == nullptr) {
-        HILOG_ERROR("%{public}s, convert array failed", __func__);
+        HILOG_ERROR("%{public}s, convert array error", __func__);
         return false;
     }
 
@@ -447,19 +448,19 @@ bool JsFormProvider::ConvertFormDataProxy(NativeEngine& engine, NativeValue* jsV
     AppExecFwk::FormDataProxy &formDataProxy)
 {
     if (jsValue == nullptr || jsValue->TypeOf() != NATIVE_OBJECT) {
-        HILOG_ERROR("%{public}s, jsValue is nullptr not object", __func__);
+        HILOG_ERROR("%{public}s, jsValue is null not object", __func__);
         return false;
     }
 
     NativeObject *jsObject = ConvertNativeValueTo<NativeObject>(jsValue);
     if (jsObject == nullptr) {
-        HILOG_ERROR("%{public}s called, jsObject is nullptr.", __func__);
+        HILOG_ERROR("%{public}s called, jsObject is null.", __func__);
         return false;
     }
 
     NativeValue* key = jsObject->GetProperty("key");
     if (!ConvertFromJsValue(engine, key, formDataProxy.key)) {
-        HILOG_ERROR("Parse key failed");
+        HILOG_ERROR("Parse key error");
         return false;
     }
     NativeValue* subscribeId = jsObject->GetProperty("subscriberId");

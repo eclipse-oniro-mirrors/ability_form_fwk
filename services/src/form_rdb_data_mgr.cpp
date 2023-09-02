@@ -312,7 +312,7 @@ ErrCode FormRdbDataMgr::QueryAllData(std::unordered_map<std::string, std::string
     NativeRdb::AbsRdbPredicates absRdbPredicates(formRdbConfig_.tableName);
     auto absSharedResultSet = rdbStore_->Query(absRdbPredicates, std::vector<std::string>());
     if (absSharedResultSet == nullptr) {
-        HILOG_ERROR("absSharedResultSet is nullptr");
+        HILOG_ERROR("absSharedResultSet is null");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -360,7 +360,7 @@ ErrCode FormRdbDataMgr::QueryAllKeys(std::set<std::string> &datas)
     NativeRdb::AbsRdbPredicates absRdbPredicates(formRdbConfig_.tableName);
     auto absSharedResultSet = rdbStore_->Query(absRdbPredicates, std::vector<std::string>());
     if (absSharedResultSet == nullptr) {
-        HILOG_ERROR("absSharedResultSet is nullptr");
+        HILOG_ERROR("absSharedResultSet is nullptr.");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 

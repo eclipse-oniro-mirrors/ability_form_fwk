@@ -2062,13 +2062,13 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
     FormRecord record;
     bool bGetRecord = FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record);
     if (!bGetRecord) {
-        HILOG_ERROR("fail, not exist such form:%{public}" PRId64 "", matchedFormId);
+        HILOG_ERROR("error, not exist such form:%{public}" PRId64 "", matchedFormId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
     sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
     if (iBundleMgr == nullptr) {
-        HILOG_ERROR("fail, failed to get IBundleMgr.");
+        HILOG_ERROR("error, failed to get IBundleMgr.");
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
 

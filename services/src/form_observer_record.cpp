@@ -50,7 +50,7 @@ ErrCode FormObserverRecord::SetFormAddObserver(const std::string bundleName, con
         formAddObservers_.emplace(bundleName, observers);
     } else {
         if (std::find(iter->second.begin(), iter->second.end(), callerToken) != iter->second.end()) {
-            HILOG_DEBUG("The observer has been added.");
+            HILOG_DEBUG("observer added.");
             return ERR_OK;
         } else {
             iter->second.emplace_back(callerToken);
@@ -160,6 +160,7 @@ void FormObserverRecord::CleanResource(const wptr<IRemoteObject> &remote)
         deathRecipients_.erase(iter);
         object->RemoveDeathRecipient(deathRecipient);
     }
+    HILOG_DEBUG("end");
 }
 
 void FormObserverRecord::ClientDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)

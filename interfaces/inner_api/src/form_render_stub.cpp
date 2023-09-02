@@ -74,18 +74,18 @@ int FormRenderStub::HandleRenderForm(MessageParcel &data, MessageParcel &reply)
 {
     std::unique_ptr<FormJsInfo> formJsInfo(data.ReadParcelable<FormJsInfo>());
     if (!formJsInfo) {
-        HILOG_ERROR("%{public}s, failed to ReadParcelable<formJsInfo>", __func__);
+        HILOG_ERROR("%{public}s, error to ReadParcelable<formJsInfo>", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
-        HILOG_ERROR("%{public}s, failed to ReadParcelable<Want>", __func__);
+        HILOG_ERROR("%{public}s, error to ReadParcelable<Want>", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     sptr<IRemoteObject> client = data.ReadRemoteObject();
     if (client == nullptr) {
-        HILOG_ERROR("%{public}s, failed to get remote object.", __func__);
+        HILOG_ERROR("%{public}s, error to get remote object.", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -98,12 +98,12 @@ int FormRenderStub::HandleStopRenderingForm(MessageParcel &data, MessageParcel &
 {
     std::unique_ptr<FormJsInfo> formJsInfo(data.ReadParcelable<FormJsInfo>());
     if (!formJsInfo) {
-        HILOG_ERROR("%{public}s, failed to ReadParcelable<formJsInfo>", __func__);
+        HILOG_ERROR("%{public}s, ReadParcelable<formJsInfo> fail", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
-        HILOG_ERROR("%{public}s, failed to ReadParcelable<Want>", __func__);
+        HILOG_ERROR("%{public}s, ReadParcelable<Want> fail", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -180,7 +180,7 @@ int32_t FormRenderStub::GetParcelableInfos(MessageParcel &reply, std::vector<T> 
     for (int32_t i = 0; i < infoSize; i++) {
         std::unique_ptr<T> info(reply.ReadParcelable<T>());
         if (!info) {
-            HILOG_ERROR("%{public}s, failed to Read Parcelable infos", __func__);
+            HILOG_ERROR("%{public}s, Read Parcelable infos error", __func__);
             return ERR_APPEXECFWK_PARCEL_ERROR;
         }
         parcelableInfos.emplace_back(*info);

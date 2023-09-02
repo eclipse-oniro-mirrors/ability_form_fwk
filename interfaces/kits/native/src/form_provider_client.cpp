@@ -101,13 +101,13 @@ int FormProviderClient::NotifyFormDelete(const int64_t formId, const Want &want,
 
         std::shared_ptr<Ability> ownerAbility = GetOwner();
         if (ownerAbility == nullptr) {
-            HILOG_ERROR("Owner is nullptr.");
+            HILOG_ERROR("Owner is null.");
             errorCode = ERR_APPEXECFWK_FORM_NO_SUCH_ABILITY;
             break;
         }
 
         if (!CheckIsSystemApp()) {
-            HILOG_WARN("Permission denied.");
+            HILOG_WARN("Permission denied");
             errorCode = ERR_APPEXECFWK_FORM_PERMISSION_DENY;
             break;
         }
@@ -131,12 +131,12 @@ int FormProviderClient::NotifyFormsDelete(
     do {
         std::shared_ptr<Ability> ownerAbility = GetOwner();
         if (ownerAbility == nullptr) {
-            HILOG_ERROR("Owner is nullptr.");
+            HILOG_ERROR("Owner is nullptr");
             errorCode = ERR_APPEXECFWK_FORM_NO_SUCH_ABILITY;
             break;
         }
         if (!CheckIsSystemApp()) {
-            HILOG_WARN("Permission denied.");
+            HILOG_WARN("Permission denied");
             errorCode = ERR_APPEXECFWK_FORM_PERMISSION_DENY;
             break;
         }
@@ -156,14 +156,14 @@ int FormProviderClient::NotifyFormUpdate(
     const Want &want,
     const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("NotifyFormUpdate start.");
 
     // The error code for business operation.
     int errorCode = ERR_OK;
     do {
         std::shared_ptr<Ability> ownerAbility = GetOwner();
         if (ownerAbility == nullptr) {
-            HILOG_ERROR("Owner is nullptr.");
+            HILOG_ERROR("Owner is null.");
             errorCode = ERR_APPEXECFWK_FORM_NO_SUCH_ABILITY;
             break;
         }
@@ -190,7 +190,7 @@ int FormProviderClient::EventNotify(
     const int32_t formVisibleType, const Want &want,
     const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("EventNotify start.");
 
     // The error code for business operation.
     int errorCode = ERR_OK;
@@ -225,7 +225,7 @@ int FormProviderClient::NotifyFormCastTempForm(
     const Want &want,
     const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("NotifyFormCastTempForm start.");
 
     // The error code for business operation.
     int errorCode = ERR_OK;
@@ -256,7 +256,7 @@ int FormProviderClient::FireFormEvent(
     const Want &want,
     const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("FireFormEvent start.");
 
     // The error code for business operation.
     int errorCode = ERR_OK;

@@ -470,12 +470,12 @@ int FormMgrService::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
     HILOG_INFO("%{public}s called.", __func__);
     ErrCode ret = CheckFormPermission();
     if (ret != ERR_OK) {
-        HILOG_ERROR("%{public}s fail, request form permission denied", __func__);
+        HILOG_ERROR("%{public}s error, request form permission denied", __func__);
         return ret;
     }
     ret = FormDataMgr::GetInstance().CheckInvalidForm(formId);
     if (ret != ERR_OK) {
-        HILOG_ERROR("fail, the form id is invalid or not under the current active user.");
+        HILOG_ERROR("error, the form id is invalid or not under the current active user.");
         return ret;
     }
     FormEventInfo eventInfo;
@@ -499,12 +499,12 @@ int FormMgrService::BackgroundEvent(const int64_t formId, Want &want, const sptr
     HILOG_INFO("%{public}s called.", __func__);
     ErrCode ret = CheckFormPermission();
     if (ret != ERR_OK) {
-        HILOG_ERROR("%{public}s fail, request form permission denied", __func__);
+        HILOG_ERROR("%{public}s fail, request form permission denied.", __func__);
         return ret;
     }
     ret = FormDataMgr::GetInstance().CheckInvalidForm(formId);
     if (ret != ERR_OK) {
-        HILOG_ERROR("fail, the form id is invalid or not under the current active user.");
+        HILOG_ERROR("fail, the form id is not under the current active user or invalid.");
         return ret;
     }
     FormEventInfo eventInfo;
@@ -878,12 +878,12 @@ int32_t FormMgrService::AcquireFormData(int64_t formId, int64_t requestCode, con
     }
 
     if (callerToken == nullptr) {
-        HILOG_ERROR("callerToken is nullptr.");
+        HILOG_ERROR("callerToken is nullptr");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
     if (requestCode <= 0) {
-        HILOG_ERROR("form requestCode is invalid.");
+        HILOG_ERROR("form requestCode is invalid");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -1046,14 +1046,14 @@ int32_t FormMgrService::RegisterPublishFormInterceptor(const sptr<IRemoteObject>
     HILOG_DEBUG("called.");
     sptr<IBundleMgr> bundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
     if (bundleMgr == nullptr) {
-        HILOG_ERROR("failed to get bundleMgr.");
+        HILOG_ERROR("error to get bundleMgr.");
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
     // check if system app
     auto callingUid = IPCSkeleton::GetCallingUid();
     auto isSystemApp = bundleMgr->CheckIsSystemAppByUid(callingUid);
     if (!isSystemApp) {
-        HILOG_ERROR("permission denied.");
+        HILOG_ERROR("no permission.");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
     return FormMgrAdapter::GetInstance().RegisterPublishFormInterceptor(interceptorCallback);

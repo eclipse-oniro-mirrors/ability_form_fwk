@@ -246,12 +246,12 @@ int32_t FormSupplyProxy::OnRenderTaskDone(int64_t formId, const Want &want)
     MessageParcel data;
 
     if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("%{public}s, failed to write interface token", __func__);
+        HILOG_ERROR("%{public}s, write interface token fail", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     if (!data.WriteInt64(formId)) {
-        HILOG_ERROR("%{public}s, failed to write formId", __func__);
+        HILOG_ERROR("%{public}s, write formId fail", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -278,12 +278,12 @@ int32_t FormSupplyProxy::OnStopRenderingTaskDone(int64_t formId, const Want &wan
     MessageParcel data;
 
     if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("%{public}s, failed to write interface token", __func__);
+        HILOG_ERROR("%{public}s, error to write interface token", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     if (!data.WriteInt64(formId)) {
-        HILOG_ERROR("%{public}s, failed to write formId", __func__);
+        HILOG_ERROR("%{public}s, error to write formId", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
