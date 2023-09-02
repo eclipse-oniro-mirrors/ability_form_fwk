@@ -751,9 +751,8 @@ bool FormTimerMgr::DeleteIntervalTimer(int64_t formId)
         isExist = true;
     }
 
-    if (intervalTimerTasks_.empty() && (intervalTimer_ != nullptr)) {
-        intervalTimer_->Shutdown();
-        intervalTimer_.reset();
+    if (intervalTimerTasks_.empty() && (intervalTimerId_ != 0L)) {
+        ClearIntervalTimer();
     }
     HILOG_INFO("%{public}s end", __func__);
     return isExist;
@@ -1226,17 +1225,39 @@ bool FormTimerMgr::FindNextAtTimerItem(long nowTime, UpdateAtItem &updateAtItem)
 void FormTimerMgr::EnsureInitIntervalTimer()
 {
     HILOG_INFO("%{public}s, init base timer task", __func__);
-    if (intervalTimer_ != nullptr) {
+    if (intervalTimerId_ != 0L) {
         return;
     }
 
-    intervalTimer_ = std::make_shared<Utils::Timer>("interval timer");
+    HILOG_INFO("Create intervalTimer start");
+    // 1. Create Timer Option
+    auto timerOption = std::make_shared<FormTimerOption>();
+    int32_t flag = ((unsigned int)(timerOption->TIMER_TYPE_REALTIME))
+      | ((unsigned int)(timerOption->TIMER_TYPE_WAKEUP)) | ((unsigned int)(timerOption->TIMER_TYPE_EXACT));
+    timerOption->SetType(flag);
+    timerOption->SetRepeat(true);
+    int64_t interval = Constants::MIN_PERIOD / timeSpeed_;
+    timerOption->SetInterval(interval);
     auto timeCallback = []() { FormTimerMgr::GetInstance().OnIntervalTimeOut(); };
-    intervalTimer_->Register(timeCallback, Constants::MIN_PERIOD / timeSpeed_);
-    intervalTimer_->Setup();
+    timerOption->SetCallbackInfo(timeCallback);
 
-    HILOG_INFO("%{public}s end", __func__);
+    // 2. Create Timer and get TimerId
+    intervalTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption);
+    int64_t timeInSec = GetBootTimeMs();
+    HILOG_INFO("TimerId: %{public}" PRId64 ", timeInSec: %{public}" PRId64 ", interval: %{public}" PRId64 ".",
+        intervalTimerId_, timeInSec, interval);
+
+    // 3. Start Timer
+    int64_t startTime = timeInSec + interval;
+    bool bRet = MiscServices::TimeServiceClient::GetInstance()->StartTimer(intervalTimerId_,
+        static_cast<uint64_t>(startTime));
+    if (!bRet) {
+        HILOG_ERROR("%{public}s failed, init intervalTimer task error", __func__);
+        ClearIntervalTimer();
+    }
+    HILOG_INFO("Create intervalTimer end");
 }
+
 /**
  * @brief Clear interval timer resource.
  */
@@ -1244,9 +1265,11 @@ void FormTimerMgr::ClearIntervalTimer()
 {
     HILOG_INFO("%{public}s start", __func__);
     std::lock_guard<std::mutex> lock(intervalMutex_);
-    if (intervalTimer_ != nullptr) {
-        intervalTimer_->Shutdown();
-        intervalTimer_.reset();
+    if (intervalTimerId_ != 0L) {
+        HILOG_INFO("Destroy intervalTimer");
+        MiscServices::TimeServiceClient::GetInstance()->StopTimer(intervalTimerId_);
+        MiscServices::TimeServiceClient::GetInstance()->DestroyTimer(intervalTimerId_);
+        intervalTimerId_ = 0L;
     }
     HILOG_INFO("%{public}s end", __func__);
 }
@@ -1298,7 +1321,7 @@ void FormTimerMgr::Init()
     timerReceiver_ = std::make_shared<TimerReceiver>(subscribeInfo);
     EventFwk::CommonEventManager::SubscribeCommonEvent(timerReceiver_);
 
-    intervalTimer_ = nullptr;
+    intervalTimerId_ = 0L;
     updateAtTimerId_ = 0L;
     dynamicAlarmTimerId_ = 0L;
     limiterTimerId_ = 0L;
