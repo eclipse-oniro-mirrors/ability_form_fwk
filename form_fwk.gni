@@ -56,7 +56,7 @@ declare_args() {
 declare_args() {
   fms_ecologic_rule_mgr_enabled = false
   if (!defined(global_parts_info) ||
-      defined(global_parts_info.bundlemanager_ecological_rule_mgr)) {
+      defined(global_parts_info.bundlemanager_ecological_rule_manager)) {
     fms_ecologic_rule_mgr_enabled = true
   }
 }
