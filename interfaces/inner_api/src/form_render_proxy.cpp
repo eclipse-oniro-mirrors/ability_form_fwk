@@ -38,12 +38,12 @@ int32_t FormRenderProxy::RenderForm(const FormJsInfo &formJsInfo, const Want &wa
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.WriteParcelable(&want)) {
-        HILOG_ERROR("%{public}s, failed to write want", __func__);
+        HILOG_ERROR("%{public}s, write want error", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     if (!data.WriteRemoteObject(callerToken)) {
-        HILOG_ERROR("%{public}s, failed to write callerToken", __func__);
+        HILOG_ERROR("%{public}s, write callerToken error", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -58,7 +58,7 @@ int32_t FormRenderProxy::RenderForm(const FormJsInfo &formJsInfo, const Want &wa
         reply,
         option);
     if (error != ERR_OK) {
-        HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d", __func__, error);
+        HILOG_ERROR("%{public}s, error to SendRequest: %{public}d", __func__, error);
         return error;
     }
     return ERR_OK;
@@ -156,7 +156,7 @@ int32_t FormRenderProxy::ReleaseRenderer(
     MessageOption option(MessageOption::TF_ASYNC);
 
     if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("%{public}s, failed to write interface token", __func__);
+        HILOG_ERROR("%{public}s, error to write interface token", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.WriteInt64(formId)) {

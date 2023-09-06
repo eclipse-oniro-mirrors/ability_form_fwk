@@ -63,7 +63,7 @@ int FormSupplyStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageP
     std::u16string descriptor = FormSupplyStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
     if (descriptor != remoteDescriptor) {
-        HILOG_ERROR("%{public}s failed, local descriptor is not equal to remote", __func__);
+        HILOG_ERROR("%{public}s error, local descriptor is not equal to remote", __func__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
@@ -181,13 +181,13 @@ int32_t FormSupplyStub::HandleOnShareAcquire(MessageParcel &data, MessageParcel 
 
     std::shared_ptr<AAFwk::WantParams> wantParams(data.ReadParcelable<AAFwk::WantParams>());
     if (wantParams == nullptr) {
-        HILOG_ERROR("failed to ReadParcelable<wantParams>");
+        HILOG_ERROR("error to ReadParcelable<wantParams>");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     auto requestCode = data.ReadInt64();
     if (requestCode <= 0) {
-        HILOG_ERROR("failed to ReadInt64<requestCode>");
+        HILOG_ERROR("error to ReadInt64<requestCode>");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 

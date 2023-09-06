@@ -201,6 +201,7 @@ DistributedKv::Status FormInfoStorageMgr::GetKvStore()
 
 bool FormInfoStorageMgr::CheckKvStore()
 {
+    HILOG_DEBUG("CheckKvStore start");
     if (kvStorePtr_ != nullptr) {
         return true;
     }
@@ -263,7 +264,7 @@ void FormInfoStorageMgr::SaveEntries(
             {
                 std::lock_guard<std::mutex> lock(kvStorePtrMutex_);
                 if (!CheckKvStore()) {
-                    HILOG_ERROR("kvStore is nullptr");
+                    HILOG_ERROR("kvStore is null");
                     return;
                 }
                 kvStorePtr_->Delete(item.key);

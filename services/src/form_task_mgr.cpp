@@ -599,7 +599,7 @@ void FormTaskMgr::HostDied(const sptr<IRemoteObject> &remoteHost)
 void FormTaskMgr::ProviderBatchDelete(std::set<int64_t> &formIds, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("%{public}s start.", __func__);
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
     if (formProviderProxy == nullptr) {

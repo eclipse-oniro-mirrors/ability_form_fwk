@@ -659,13 +659,13 @@ NativeValue *CreateFormCustomizeDatas(NativeEngine &engine, const std::vector<Fo
 {
     auto objContext = engine.CreateObject();
     if (objContext == nullptr) {
-        HILOG_ERROR("CreateObject failed");
+        HILOG_ERROR("CreateObject error");
         return engine.CreateUndefined();
     }
 
     auto object = ConvertNativeValueTo<NativeObject>(objContext);
     if (object == nullptr) {
-        HILOG_ERROR("ConvertNativeValueTo object failed");
+        HILOG_ERROR("ConvertNativeValueTo object error");
         return engine.CreateUndefined();
     }
 

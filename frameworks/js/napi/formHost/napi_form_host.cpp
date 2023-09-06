@@ -268,16 +268,16 @@ public:
     void ProcessFormUninstall(const int64_t formId)
     {
         if (handler_ == nullptr) {
-            HILOG_INFO("handler is nullptr");
+            HILOG_INFO("handler is null");
             return;
         }
         handler_->PostSyncTask([thisWeakPtr = weak_from_this(), formId]() {
             auto sharedThis = thisWeakPtr.lock();
             if (sharedThis == nullptr) {
-                HILOG_ERROR("sharedThis is nullptr.");
+                HILOG_ERROR("sharedThis is null.");
                 return;
             }
-            HILOG_DEBUG("task complete formId: form: %{public}" PRId64 ".", formId);
+            HILOG_DEBUG("task end formId: form: %{public}" PRId64 ".", formId);
             std::string formIdString = std::to_string(formId);
             napi_value callbackValues;
             napi_create_string_utf8(sharedThis->env_, formIdString.c_str(), NAPI_AUTO_LENGTH, &callbackValues);
@@ -631,7 +631,7 @@ static void InnerNotifyFormsVisible(napi_env env, AsyncNotifyFormsVisibleCallbac
 
 napi_value NotifyFormsVisibleCallback(napi_env env, AsyncNotifyFormsVisibleCallbackInfo *const asyncCallbackInfo)
 {
-    HILOG_INFO("%{public}s, asyncCallback.", __func__);
+    HILOG_INFO("NotifyFormsVisibleCallback start");
     napi_value resourceName;
     napi_create_string_latin1(env, __func__, NAPI_AUTO_LENGTH, &resourceName);
     napi_create_async_work(
@@ -668,7 +668,7 @@ napi_value NotifyFormsVisibleCallback(napi_env env, AsyncNotifyFormsVisibleCallb
 
 napi_value NotifyFormsVisiblePromise(napi_env env, AsyncNotifyFormsVisibleCallbackInfo *const asyncCallbackInfo)
 {
-    HILOG_INFO("%{public}s, promise.", __func__);
+    HILOG_INFO("NotifyFormsVisiblePromise start");
     napi_deferred deferred;
     napi_value promise;
     NAPI_CALL(env, napi_create_promise(env, &deferred, &promise));
@@ -785,7 +785,7 @@ static void InnerNotifyFormsEnableUpdate(napi_env env,
 napi_value NotifyFormsEnableUpdateCallback(napi_env env,
                                            AsyncNotifyFormsEnableUpdateCallbackInfo *const asyncCallbackInfo)
 {
-    HILOG_INFO("%{public}s, asyncCallback.", __func__);
+    HILOG_INFO("enter");
     napi_value resourceName;
     napi_create_string_latin1(env, __func__, NAPI_AUTO_LENGTH, &resourceName);
     napi_create_async_work(
@@ -823,7 +823,7 @@ napi_value NotifyFormsEnableUpdateCallback(napi_env env,
 napi_value NotifyFormsEnableUpdatePromise(napi_env env,
                                           AsyncNotifyFormsEnableUpdateCallbackInfo *const asyncCallbackInfo)
 {
-    HILOG_INFO("%{public}s, promise.", __func__);
+    HILOG_INFO("enter");
     napi_deferred deferred;
     napi_value promise;
     NAPI_CALL(env, napi_create_promise(env, &deferred, &promise));
@@ -1263,7 +1263,7 @@ NativeValue* NapiFormHost::OnDeleteForm(NativeEngine &engine, NativeCallbackInfo
         return engine.CreateUndefined();
     }
     if (info.argv[PARAM0]->TypeOf() != NATIVE_STRING) {
-        HILOG_ERROR("input params is not string!");
+        HILOG_ERROR("input arguments is not string!");
         errCode = ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     } else {
         std::string strFormId;
@@ -1316,7 +1316,7 @@ NativeValue* NapiFormHost::OnReleaseForm(NativeEngine &engine, NativeCallbackInf
     } else {
         std::string strFormId;
         if (!ConvertFromJsValue(engine, info.argv[PARAM0], strFormId)) {
-            HILOG_ERROR("conversion failed!");
+            HILOG_ERROR("conversion error!");
             return engine.CreateUndefined();
         }
         if (!ConvertStringToInt64(strFormId, formId)) {
@@ -1380,7 +1380,7 @@ NativeValue* NapiFormHost::OnRequestForm(NativeEngine &engine, NativeCallbackInf
     } else {
         std::string strFormId;
         if (!ConvertFromJsValue(engine, info.argv[PARAM0], strFormId)) {
-            HILOG_ERROR("conversion failed!");
+            HILOG_ERROR("transform failed!");
             return engine.CreateUndefined();
         }
         if (!ConvertStringToInt64(strFormId, formId)) {
@@ -1423,12 +1423,12 @@ NativeValue* NapiFormHost::OnCastTempForm(NativeEngine &engine, NativeCallbackIn
         return engine.CreateUndefined();
     }
     if (info.argv[PARAM0]->TypeOf() != NATIVE_STRING) {
-        HILOG_ERROR("input params is not string!");
+        HILOG_ERROR("input arguments is not string!");
         errCode = ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     } else {
         std::string strFormId;
         if (!ConvertFromJsValue(engine, info.argv[PARAM0], strFormId)) {
-            HILOG_ERROR("conversion failed!");
+            HILOG_ERROR("transform failed!");
             return engine.CreateUndefined();
         }
         if (!ConvertStringToInt64(strFormId, formId)) {
@@ -1732,7 +1732,7 @@ NativeValue* NapiFormHost::OnNotifyVisibleForms(NativeEngine &engine, NativeCall
         for (size_t i = 0; i < strFormIdList.size(); i++) {
             int64_t formIdValue;
             if (!ConvertStringToInt64(strFormIdList[i], formIdValue)) {
-                HILOG_ERROR("conversion int failed!");
+                HILOG_ERROR("conversion int error!");
                 errCode = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR;
             } else {
                 iFormIds.push_back(formIdValue);
@@ -1790,7 +1790,7 @@ NativeValue* NapiFormHost::OnNotifyInVisibleForms(NativeEngine &engine, NativeCa
         for (size_t i = 0; i < strFormIdList.size(); i++) {
             int64_t formIdValue;
             if (!ConvertStringToInt64(strFormIdList[i], formIdValue)) {
-                HILOG_ERROR("conversion int failed!");
+                HILOG_ERROR("transform  int failed!");
                 errCode = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR;
             } else {
                 iFormIds.push_back(formIdValue);

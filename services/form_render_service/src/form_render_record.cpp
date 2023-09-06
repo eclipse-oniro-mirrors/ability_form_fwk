@@ -66,7 +66,7 @@ bool ThreadState::IsMaxState()
 
 void HandlerDumper::Dump(const std::string &message)
 {
-    HILOG_INFO("Message: %{public}s", message.c_str());
+    HILOG_INFO("Message = %{public}s", message.c_str());
     dumpInfo_ += message;
 }
 
@@ -308,14 +308,14 @@ void FormRenderRecord::DeleteRenderRecord(int64_t formId, const std::string &com
     }
 
     if (eventHandler == nullptr) {
-        HILOG_ERROR("eventHandler is nullptr");
+        HILOG_ERROR("eventHandler is null");
         return;
     }
 
     auto task = [weak = weak_from_this(), formId, compId, &isRenderGroupEmpty]() {
         auto renderRecord = weak.lock();
         if (renderRecord == nullptr) {
-            HILOG_ERROR("renderRecord is nullptr.");
+            HILOG_ERROR("renderRecord is null.");
             return;
         }
 

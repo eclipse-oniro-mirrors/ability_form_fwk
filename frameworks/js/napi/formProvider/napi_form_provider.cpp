@@ -395,7 +395,7 @@ NativeValue* JsFormProvider::OnSetFormNextRefreshTime(NativeEngine &engine, Nati
     HILOG_DEBUG("%{public}s is called", __FUNCTION__);
     int32_t errCode = ERR_OK;
     if (info.argc < ARGS_SIZE_TWO || info.argc > ARGS_SIZE_THREE) {
-        HILOG_ERROR("wrong number of arguments.");
+        HILOG_ERROR("wrong number of parameter.");
         return engine.CreateNull();
     }
     if (info.argv[PARAM0]->TypeOf() != NATIVE_STRING) {
@@ -406,11 +406,11 @@ NativeValue* JsFormProvider::OnSetFormNextRefreshTime(NativeEngine &engine, Nati
     std::string strFormId;
     bool confirm = ConvertFromJsValue(engine, info.argv[PARAM0], strFormId);
     if (!confirm) {
-        HILOG_ERROR("ConvertFromJsValue failed.");
+        HILOG_ERROR("ConvertFromJsValue error.");
         errCode = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR;
     }
     if (!ConvertStringToInt64(strFormId, formId)) {
-        HILOG_ERROR("convert form string failed.");
+        HILOG_ERROR("convert form string error.");
         errCode = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR;
     }
     if (info.argv[PARAM1]->TypeOf() != NATIVE_NUMBER) {

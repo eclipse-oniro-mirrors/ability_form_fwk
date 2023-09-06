@@ -159,7 +159,7 @@ int FormMgrStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParc
     std::u16string descriptor = FormMgrStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
     if (descriptor != remoteDescriptor) {
-        HILOG_ERROR("%{public}s failed, local descriptor is not equal to remote", __func__);
+        HILOG_ERROR("%{public}s failed, remote is not equal to local descriptor", __func__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
@@ -1180,7 +1180,7 @@ ErrCode FormMgrStub::HandleRequestPublishProxyForm(MessageParcel &data, MessageP
 {
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (want == nullptr) {
-        HILOG_ERROR("%{public}s, failed to get want.", __func__);
+        HILOG_ERROR("%{public}s, error to get want.", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -1189,7 +1189,7 @@ ErrCode FormMgrStub::HandleRequestPublishProxyForm(MessageParcel &data, MessageP
     if (withFormBindingData) {
         formProviderData.reset(data.ReadParcelable<FormProviderData>());
         if (formProviderData == nullptr) {
-            HILOG_ERROR("%{public}s, failed to get formProviderData.", __func__);
+            HILOG_ERROR("%{public}s, error to get formProviderData.", __func__);
             return ERR_APPEXECFWK_PARCEL_ERROR;
         }
     }

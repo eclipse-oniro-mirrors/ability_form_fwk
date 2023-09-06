@@ -130,7 +130,7 @@ public:
         napi_value myCallback = nullptr;
         napi_get_reference_value(env_, callbackRef_, &myCallback);
         napi_strict_equals(env_, myCallback, callback, &isEqual);
-        HILOG_INFO("isStrictEqual: %{public}d", isEqual);
+        HILOG_INFO("isStrictEqual = %{public}d", isEqual);
         return isEqual;
     }
 
@@ -209,6 +209,7 @@ void FormUninstallCallback(const std::vector<int64_t> &formIds)
 
 bool AddFormUninstallCallback(napi_env env, napi_value callback)
 {
+    HILOG_DEBUG("AddFormUninstallCallback start");
     std::lock_guard<std::mutex> lock(g_formUninstallCallbackMapMutex_);
     for (auto &iter : g_formUninstallCallbackMap) {
         if (iter.second->IsStrictEqual(callback)) {
@@ -232,6 +233,7 @@ bool AddFormUninstallCallback(napi_env env, napi_value callback)
 
 bool DelFormUninstallCallback(napi_value callback)
 {
+    HILOG_DEBUG("DelFormUninstallCallback start");
     int32_t count = 0;
     std::lock_guard<std::mutex> lock(g_formUninstallCallbackMapMutex_);
     for (auto iter = g_formUninstallCallbackMap.begin(); iter != g_formUninstallCallbackMap.end();) {
@@ -243,7 +245,7 @@ bool DelFormUninstallCallback(napi_value callback)
             iter++;
         }
     }
-    HILOG_INFO("%{public}d form uninstall callback deleted.", count);
+    HILOG_INFO("%{public}d form uninstall callback canceled.", count);
     return true;
 }
 
@@ -694,6 +696,7 @@ private:
         AsyncTask::ScheduleWithDefaultQos("JsFormHost::OnEnableFormsUpdate",
             engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
         return result;
+        HILOG_DEBUG("OnNotifyVisibleForms end");
     }
 
     NativeValue* OnNotifyInvisibleForms(NativeEngine &engine, const NativeCallbackInfo &info)
@@ -730,6 +733,7 @@ private:
         AsyncTask::ScheduleWithDefaultQos("JsFormHost::OnEnableFormsUpdate",
             engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
         return result;
+        HILOG_DEBUG("OnNotifyInvisibleForms end");
     }
 
     NativeValue* OnEnableFormsUpdate(NativeEngine &engine, const NativeCallbackInfo &info)
@@ -765,6 +769,7 @@ private:
         AsyncTask::ScheduleWithDefaultQos("JsFormHost::OnEnableFormsUpdate",
             engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
         return result;
+        HILOG_DEBUG("OnEnableFormsUpdate end");
     }
 
     NativeValue* OnDisableFormsUpdate(NativeEngine &engine, const NativeCallbackInfo &info)
@@ -807,7 +812,7 @@ private:
         HILOG_DEBUG("%{public}s is called", __FUNCTION__);
 
         if (!CheckCallerIsSystemApp()) {
-            HILOG_ERROR("This application is not system-app, can not use system-api");
+            HILOG_ERROR("This app is not system-app, can not use system-api");
             NapiFormUtil::ThrowByExternalErrorCode(engine, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
             return engine.CreateUndefined();
         }
@@ -870,6 +875,7 @@ private:
         AsyncTask::ScheduleWithDefaultQos("JsFormHost::OnEnableFormsUpdate",
             engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
         return result;
+        HILOG_DEBUG("OnDeleteInvalidForms end");
     }
 
     void InnerAcquireFormState(
@@ -930,7 +936,7 @@ private:
     NativeValue* OnRegisterFormAddObserver(NativeEngine &engine, NativeCallbackInfo &info)
     {
         HILOG_DEBUG("called.");
-        // Check the number of input parameters.
+        // Check the number of input arguments.
         if (info.argc > ARGS_THREE|| info.argc < ARGS_TWO) {
             HILOG_ERROR("wrong number of arguments.");
             NapiFormUtil::ThrowParamNumError(engine, std::to_string(info.argc), "2 or 3");
@@ -939,7 +945,7 @@ private:
 
         std::string bundleName("");
         if (info.argc == ARGS_THREE) {
-            // Check the type of the PARAM1 and convert it to string.
+            // inspect the type of the PARAM1 and convert it to string.
             if (info.argv[PARAM1]->TypeOf() != NATIVE_STRING) {
                 HILOG_ERROR("param1 is invalid");
                 NapiFormUtil::ThrowParamTypeError(engine, "bundleName", "string");
@@ -1048,12 +1054,12 @@ private:
         HILOG_DEBUG("called.");
 
         if (!CheckCallerIsSystemApp()) {
-            HILOG_ERROR("This application is not system-app, can not use system-api");
+            HILOG_ERROR("This app is not system-app, can not use system-api");
             NapiFormUtil::ThrowByExternalErrorCode(engine, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
             return engine.CreateUndefined();
         }
 
-        // Check the type of the PARAM0 and convert it to string.
+        // Check the type of the PARAM0 and transform it to string.
         if (info.argv[PARAM0]->TypeOf() != NATIVE_STRING) {
             HILOG_ERROR("param0 is invalid");
             NapiFormUtil::ThrowParamTypeError(engine, "type",
@@ -1241,14 +1247,14 @@ private:
             } else if (info.argv[PARAM1]->TypeOf() == NATIVE_STRING) {
                 std::string bundleName;
                 if (!ConvertFromJsValue(engine, info.argv[PARAM1], bundleName)) {
-                    HILOG_ERROR("convert bundleName failed!");
+                    HILOG_ERROR("convert bundleName error!");
                     NapiFormUtil::ThrowParamTypeError(engine, "bundleName", "string");
                     return engine.CreateUndefined();
                 }
                 JsFormStateObserver::GetInstance()->ClearFormRemoveCallbackByBundle(bundleName);
                 return engine.CreateUndefined();
             } else {
-                HILOG_ERROR("param1 is invalid");
+                HILOG_ERROR("param1 is ineffective");
                 NapiFormUtil::ThrowParamTypeError(engine, "callback or bundleName",
                     "Callback<formInfo.RunningFormInfo> or string");
                 return engine.CreateUndefined();
@@ -1257,12 +1263,12 @@ private:
 
         if (info.argc == ARGS_THREE) {
             if (info.argv[PARAM1]->TypeOf() != NATIVE_STRING) {
-                HILOG_ERROR("param1 is invalid");
+                HILOG_ERROR("param1 is ineffective");
                 NapiFormUtil::ThrowParamTypeError(engine, "bundleName", "string");
                 return engine.CreateUndefined();
             }
             if (info.argv[PARAM2]->TypeOf() != NATIVE_FUNCTION) {
-                HILOG_ERROR("param2 is invalid");
+                HILOG_ERROR("param2 is ineffective");
                 NapiFormUtil::ThrowParamTypeError(engine, "callback", "Callback<formInfo.RunningFormInfo>");
                 return engine.CreateUndefined();
             }
@@ -1359,7 +1365,7 @@ private:
         }
         std::string type;
         if (!ConvertFromJsValue(engine, info.argv[PARAM0], type)) {
-            HILOG_ERROR("convert type failed!");
+            HILOG_ERROR("convert type error!");
             NapiFormUtil::ThrowParamTypeError(engine, "type",
                 "formAdd, formRemove, formUninstall, notifyVisible or notifyInvisible.");
             return engine.CreateUndefined();
@@ -1388,7 +1394,7 @@ private:
         HILOG_DEBUG("%{public}s is called", __FUNCTION__);
 
         if (info.argc > ARGS_THREE|| info.argc < ARGS_TWO) {
-            HILOG_ERROR("wrong number of arguments.");
+            HILOG_ERROR("wrong number of parameter.");
             NapiFormUtil::ThrowParamNumError(engine, std::to_string(info.argc), "2 or 3");
             return engine.CreateUndefined();
         }

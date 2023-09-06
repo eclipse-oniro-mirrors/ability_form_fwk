@@ -812,16 +812,16 @@ int FormMgr::AcquireFormState(const Want &want, const sptr<IRemoteObject> &calle
 int FormMgr::NotifyFormsVisible(const std::vector<int64_t> &formIds, bool isVisible,
                                 const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("%{public}s start.", __func__);
+    HILOG_INFO("%{public}s NotifyFormsVisible start.", __func__);
 
     if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
-        HILOG_ERROR("%{public}s error, form is in recover status, can't do action on form.", __func__);
+        HILOG_ERROR("%{public}s faild, form is in recover status, can't do action on form.", __func__);
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
     }
 
     int errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("%{public}s failed, errCode: %{public}d.", __func__, errCode);
+        HILOG_ERROR("%{public}s error, errCode: %{public}d.", __func__, errCode);
         return errCode;
     }
 
@@ -835,7 +835,7 @@ int FormMgr::NotifyFormsVisible(const std::vector<int64_t> &formIds, bool isVisi
 int FormMgr::NotifyFormsPrivacyProtected(const std::vector<int64_t> &formIds, bool isProtected,
                                          const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("%{public}s start.", __func__);
+    HILOG_INFO("%{public}s NotifyFormsPrivacyProtected start.", __func__);
 
     if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
         HILOG_ERROR("%{public}s error, form is in recover status, can't do action on form.", __func__);
@@ -866,7 +866,7 @@ int FormMgr::NotifyFormsPrivacyProtected(const std::vector<int64_t> &formIds, bo
 int FormMgr::NotifyFormsEnableUpdate(const std::vector<int64_t> &formIds, bool isEnableUpdate,
                                      const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("%{public}s start.", __func__);
+    HILOG_INFO("%{public}s NotifyFormsEnableUpdate start.", __func__);
 
     if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
         HILOG_ERROR("%{public}s error, form is in recover status, can't do action on form.", __func__);
@@ -875,7 +875,7 @@ int FormMgr::NotifyFormsEnableUpdate(const std::vector<int64_t> &formIds, bool i
 
     int errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("%{public}s failed, errCode: %{public}d.", __func__, errCode);
+        HILOG_ERROR("%{public}s error, errCode: %{public}d.", __func__, errCode);
         return errCode;
     }
 

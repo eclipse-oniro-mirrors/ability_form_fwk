@@ -43,20 +43,20 @@ int FormMgrProxy::AddForm(
 {
     MessageParcel data;
     if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("%{public}s, failed to write interface token", __func__);
+        HILOG_ERROR("%{public}s, write to interface token failed", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.WriteInt64(formId)) {
-        HILOG_ERROR("%{public}s, failed to write formId", __func__);
+        HILOG_ERROR("%{public}s, write to formId failed", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.WriteParcelable(&want)) {
-        HILOG_ERROR("%{public}s, failed to write want", __func__);
+        HILOG_ERROR("%{public}s, write to want failed", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     if (!data.WriteRemoteObject(callerToken)) {
-        HILOG_ERROR("%{public}s, failed to write callerToken", __func__);
+        HILOG_ERROR("%{public}s, write to callerTokenfailed", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -463,7 +463,7 @@ int FormMgrProxy::CastTempForm(const int64_t formId, const sptr<IRemoteObject> &
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.WriteRemoteObject(callerToken)) {
-        HILOG_ERROR("%{public}s, failed to write callerToken", __func__);
+        HILOG_ERROR("%{public}s, callerToken is write failed", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -596,12 +596,12 @@ int FormMgrProxy::MessageEvent(const int64_t formId, const Want &want, const spt
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.WriteParcelable(&want)) {
-        HILOG_ERROR("%{public}s, failed to write want", __func__);
+        HILOG_ERROR("%{public}s, error to write want", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     if (!data.WriteRemoteObject(callerToken)) {
-        HILOG_ERROR("%{public}s, failed to write callerToken", __func__);
+        HILOG_ERROR("%{public}s, error to write callerToken", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -627,20 +627,20 @@ int FormMgrProxy::BackgroundEvent(const int64_t formId, Want &want, const sptr<I
 {
     MessageParcel data;
     if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("%{public}s, failed to write interface token", __func__);
+        HILOG_ERROR("%{public}s, write failed to interface token", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.WriteInt64(formId)) {
-        HILOG_ERROR("%{public}s, failed to write formId", __func__);
+        HILOG_ERROR("%{public}s, write failed to formId", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.WriteParcelable(&want)) {
-        HILOG_ERROR("%{public}s, failed to write want", __func__);
+        HILOG_ERROR("%{public}s, write failed to want", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     if (!data.WriteRemoteObject(callerToken)) {
-        HILOG_ERROR("%{public}s, failed to write callerToken", __func__);
+        HILOG_ERROR("%{public}s, write failed to callerToken", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -666,20 +666,20 @@ int FormMgrProxy::RouterEvent(const int64_t formId, Want &want, const sptr<IRemo
 {
     MessageParcel data;
     if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("%{public}s, failed to write interface token", __func__);
+        HILOG_ERROR("%{public}s, write to interface token error", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.WriteInt64(formId)) {
-        HILOG_ERROR("%{public}s, failed to write formId", __func__);
+        HILOG_ERROR("%{public}s, write to formId error", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.WriteParcelable(&want)) {
-        HILOG_ERROR("%{public}s, failed to write want", __func__);
+        HILOG_ERROR("%{public}s, write to want error", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     if (!data.WriteRemoteObject(callerToken)) {
-        HILOG_ERROR("%{public}s, failed to write callerToken", __func__);
+        HILOG_ERROR("%{public}s, write to callerToken error", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -699,13 +699,13 @@ int  FormMgrProxy::GetParcelableInfos(MessageParcel &reply, std::vector<T> &parc
 {
     int32_t infoSize = reply.ReadInt32();
     if (infoSize < 0 || infoSize > MAX_ALLOW_SIZE) {
-        HILOG_ERROR("%{public}s invalid size: %{public}d", __func__, infoSize);
+        HILOG_ERROR("%{public}s invalid size = %{public}d", __func__, infoSize);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     for (int32_t i = 0; i < infoSize; i++) {
         std::unique_ptr<T> info(reply.ReadParcelable<T>());
         if (!info) {
-            HILOG_ERROR("%{public}s, failed to Read Parcelable infos", __func__);
+            HILOG_ERROR("%{public}s, error to Read Parcelable infos", __func__);
             return ERR_APPEXECFWK_PARCEL_ERROR;
         }
         parcelableInfos.emplace_back(*info);
@@ -723,6 +723,7 @@ bool FormMgrProxy::WriteInterfaceToken(MessageParcel &data)
 }
 int FormMgrProxy::GetStringInfo(IFormMgr::Message code, MessageParcel &data, std::string &stringInfo)
 {
+    HILOG_DEBUG("GetStringInfo start");
     int error;
     MessageParcel reply;
     error = SendTransactCmd(code, data, reply);
@@ -732,7 +733,7 @@ int FormMgrProxy::GetStringInfo(IFormMgr::Message code, MessageParcel &data, std
 
     error = reply.ReadInt32();
     if (error != ERR_OK) {
-        HILOG_ERROR("%{public}s, failed to read reply result", __func__);
+        HILOG_ERROR("%{public}s, error to read reply result", __func__);
         return error;
     }
     std::vector<std::string> stringInfoList;
@@ -752,6 +753,7 @@ int FormMgrProxy::GetStringInfo(IFormMgr::Message code, MessageParcel &data, std
 }
 int FormMgrProxy::GetFormsInfo(IFormMgr::Message code, MessageParcel &data, std::vector<FormInfo> &formInfos)
 {
+    HILOG_DEBUG("GetFormsInfo start");
     int error;
     MessageParcel reply;
     error = SendTransactCmd(code, data, reply);
@@ -761,7 +763,7 @@ int FormMgrProxy::GetFormsInfo(IFormMgr::Message code, MessageParcel &data, std:
 
     error = reply.ReadInt32();
     if (error != ERR_OK) {
-        HILOG_ERROR("%{public}s, failed to read reply result", __func__);
+        HILOG_ERROR("%{public}s, read reply result fail", __func__);
         return error;
     }
 
@@ -817,12 +819,12 @@ int FormMgrProxy::SendTransactCmd(IFormMgr::Message code, MessageParcel &data, M
 
     sptr<IRemoteObject> remote = Remote();
     if (!remote) {
-        HILOG_ERROR("%{public}s, failed to get remote object, cmd: %{public}d", __func__, code);
+        HILOG_ERROR("%{public}s, error to get remote object, cmd: %{public}d", __func__, code);
         return ERR_APPEXECFWK_SERVICE_NOT_CONNECTED;
     }
     int32_t result = remote->SendRequest(static_cast<uint32_t>(code), data, reply, option);
     if (result != ERR_OK) {
-        HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d, cmd: %{public}d", __func__, result, code);
+        HILOG_ERROR("%{public}s, error to SendRequest: %{public}d, cmd: %{public}d", __func__, result, code);
         return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
     }
     return ERR_OK;
@@ -848,7 +850,7 @@ int FormMgrProxy::DeleteInvalidForms(const std::vector<int64_t> &formIds, const 
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.WriteRemoteObject(callerToken)) {
-        HILOG_ERROR("%{public}s, failed to write callerToken", __func__);
+        HILOG_ERROR("%{public}s, error to write callerToken", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -893,7 +895,7 @@ int FormMgrProxy::AcquireFormState(const Want &want, const sptr<IRemoteObject> &
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.WriteRemoteObject(callerToken)) {
-        HILOG_ERROR("%{public}s, failed to write callerToken", __func__);
+        HILOG_ERROR("%{public}s, write fail to callerToken", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -932,11 +934,11 @@ int FormMgrProxy::NotifyFormsVisible(const std::vector<int64_t> &formIds, bool i
 {
     MessageParcel data;
     if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("%{public}s, failed to write interface token", __func__);
+        HILOG_ERROR("%{public}s, error to write interface token", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.WriteInt64Vector(formIds)) {
-        HILOG_ERROR("%{public}s, failed to write vector formIds", __func__);
+        HILOG_ERROR("%{public}s, error to write vector formIds", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.WriteBool(isVisible)) {
@@ -944,7 +946,7 @@ int FormMgrProxy::NotifyFormsVisible(const std::vector<int64_t> &formIds, bool i
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.WriteRemoteObject(callerToken)) {
-        HILOG_ERROR("%{public}s, failed to write callerToken", __func__);
+        HILOG_ERROR("%{public}s, write to callerToken failed ", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -986,7 +988,7 @@ int FormMgrProxy::NotifyFormsPrivacyProtected(const std::vector<int64_t> &formId
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.WriteRemoteObject(callerToken)) {
-        HILOG_ERROR("%{public}s, failed to write callerToken", __func__);
+        HILOG_ERROR("%{public}s, write callerToken error", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -1034,7 +1036,7 @@ int FormMgrProxy::NotifyFormsEnableUpdate(const std::vector<int64_t> &formIds, b
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.WriteRemoteObject(callerToken)) {
-        HILOG_ERROR("%{public}s, failed to write callerToken", __func__);
+        HILOG_ERROR("%{public}s, write error to callerToken", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -1207,7 +1209,7 @@ bool FormMgrProxy::IsRequestPublishFormSupported()
     MessageParcel data;
     // write in token to help identify which stub to be called.
     if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("%{public}s, failed to write interface token", __func__);
+        HILOG_ERROR("%{public}s, error to write interface token", __func__);
         return false;
     }
     // send request.
@@ -1267,12 +1269,12 @@ int32_t FormMgrProxy::ShareForm(int64_t formId, const std::string &deviceId, con
 {
     MessageParcel data;
     if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("failed to write interface token.");
+        HILOG_ERROR("error to write interface token.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     if (!data.WriteInt64(formId)) {
-        HILOG_ERROR("failed to write formId.");
+        HILOG_ERROR("error to write formId.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -1446,7 +1448,7 @@ int32_t FormMgrProxy::GetFormsCount(bool isTempFormFlag, int32_t &formCount)
 ErrCode FormMgrProxy::RegisterFormAddObserverByBundle(const std::string bundleName,
     const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("start.");
+    HILOG_DEBUG("RegisterFormAddObserverByBundle start.");
     MessageParcel data;
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("failed to write interface token.");
@@ -1454,7 +1456,7 @@ ErrCode FormMgrProxy::RegisterFormAddObserverByBundle(const std::string bundleNa
     }
 
     if (!data.WriteString(bundleName)) {
-        HILOG_ERROR("failed to write bundleName.");
+        HILOG_ERROR("error to write bundleName.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -1555,15 +1557,15 @@ int32_t FormMgrProxy::GetFormInstancesByFilter(const FormInstancesFilter &formIn
 
 ErrCode FormMgrProxy::GetFormInstanceById(const int64_t formId, FormInstance &formInstance)
 {
-    HILOG_DEBUG("start.");
+    HILOG_DEBUG("GetFormInstanceById start.");
     MessageParcel data;
     // write in token to help identify which stub to be called.
     if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("failed to write interface token");
+        HILOG_ERROR("error to write interface token");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.WriteInt64(formId)) {
-        HILOG_ERROR("failed to write formId");
+        HILOG_ERROR("error to write formId");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     auto error = GetParcelableInfo<FormInstance>(IFormMgr::Message::FORM_MGR_GET_FORM_INSTANCES_FROM_BY_ID,
@@ -1605,6 +1607,7 @@ ErrCode FormMgrProxy::GetFormInstanceById(const int64_t formId, bool isIncludeUn
 ErrCode FormMgrProxy::GetFormInstance(IFormMgr::Message code, MessageParcel &data,
     std::vector<FormInstance> &formInstances)
 {
+    HILOG_DEBUG("GetFormInstance start");
     int error;
     MessageParcel reply;
     error = SendTransactCmd(code, data, reply);
@@ -1626,18 +1629,18 @@ ErrCode FormMgrProxy::GetFormInstance(IFormMgr::Message code, MessageParcel &dat
 
 ErrCode FormMgrProxy::RegisterAddObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("start.");
     MessageParcel data;
     if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("failed to write interface token.");
+        HILOG_ERROR("error to write interface token.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.WriteString(bundleName)) {
-        HILOG_ERROR("failed to write bundleName.");
+        HILOG_ERROR("error to write bundleName.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.WriteRemoteObject(callerToken)) {
-        HILOG_ERROR("failed to write callerToken.");
+        HILOG_ERROR("error to write callerToken.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     MessageParcel reply;
@@ -1645,7 +1648,7 @@ ErrCode FormMgrProxy::RegisterAddObserver(const std::string &bundleName, const s
     auto error = Remote()->SendRequest(
         static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_ADD_OBSERVER), data, reply, option);
     if (error != ERR_OK) {
-        HILOG_ERROR("failed to SendRequest: %{public}d", error);
+        HILOG_ERROR("error to SendRequest: %{public}d", error);
         return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
     }
     return reply.ReadInt32();
@@ -1776,12 +1779,12 @@ int32_t FormMgrProxy::RegisterPublishFormInterceptor(const sptr<IRemoteObject> &
     MessageParcel data;
     // write in token to help identify which stub to be called.
     if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("failed to write interface token");
+        HILOG_ERROR("error to write interface token");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     // write in interceptor
     if (!data.WriteRemoteObject(interceptorCallback)) {
-        HILOG_ERROR("failed to write interceptor");
+        HILOG_ERROR("error to write interceptor");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     // send request.
