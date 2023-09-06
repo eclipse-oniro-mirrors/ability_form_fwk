@@ -151,7 +151,7 @@ ohos_shared_library("libfms") {
   if (fms_ecologic_rule_mgr_enabled) {
     include_dirs += [ "${ecological_rule_mgr_path}" ]
     defines += [ "SUPPORT_ERMS" ]
-    external_deps += [ "ecological_rule_mgr:erms_client" ]
+    external_deps += [ "ecological_rule_manager:erms_client" ]
   }
 
   if (device_usage_statistics) {
