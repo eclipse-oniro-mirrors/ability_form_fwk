@@ -1253,7 +1253,7 @@ void FormTimerMgr::EnsureInitIntervalTimer()
         static_cast<uint64_t>(startTime));
     if (!bRet) {
         HILOG_ERROR("%{public}s failed, init intervalTimer task error", __func__);
-        ClearIntervalTimer();
+        InnerClearIntervalTimer();
     }
     HILOG_INFO("Create intervalTimer end");
 }
