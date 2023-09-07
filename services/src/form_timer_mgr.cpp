@@ -752,7 +752,7 @@ bool FormTimerMgr::DeleteIntervalTimer(int64_t formId)
     }
 
     if (intervalTimerTasks_.empty() && (intervalTimerId_ != 0L)) {
-        ClearIntervalTimer();
+        InnerClearIntervalTimer();
     }
     HILOG_INFO("%{public}s end", __func__);
     return isExist;
@@ -1265,6 +1265,13 @@ void FormTimerMgr::ClearIntervalTimer()
 {
     HILOG_INFO("%{public}s start", __func__);
     std::lock_guard<std::mutex> lock(intervalMutex_);
+    InnerClearIntervalTimer();
+    HILOG_INFO("%{public}s end", __func__);
+}
+
+void FormTimerMgr::InnerClearIntervalTimer()
+{
+    HILOG_INFO("%{public}s start", __func__);
     if (intervalTimerId_ != 0L) {
         HILOG_INFO("Destroy intervalTimer");
         MiscServices::TimeServiceClient::GetInstance()->StopTimer(intervalTimerId_);
