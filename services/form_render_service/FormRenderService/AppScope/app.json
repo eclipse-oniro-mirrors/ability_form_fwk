@@ -8,6 +8,7 @@
     "targetAPIVersion": 9,
     "icon": "",
     "label": "$string:app_name",
+    "generateBuildHash": true,
     "distributedNotificationEnabled": true
   }
 }
