@@ -47,7 +47,6 @@ public:
     void TearDown();
 };
 
-
 void FormPublishInterceptorStubTest::SetUpTestCase()
 {}
 
@@ -60,7 +59,6 @@ void FormPublishInterceptorStubTest::SetUp()
 void FormPublishInterceptorStubTest::TearDown()
 {}
 
-
 /**
  * @tc.number: FormPublishInterceptorStubTest_001
  * @tc.name: SubscribeFormData
@@ -72,16 +70,13 @@ void FormPublishInterceptorStubTest::TearDown()
 HWTEST_F(FormPublishInterceptorStubTest, FormPublishInterceptorStubTest_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormPublishInterceptorStubTest_001 start";
-
     FormPublishInterceptorStub formPublishInterceptorStub;
     uint32_t code = 1;
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-
     int ret = formPublishInterceptorStub.OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
     GTEST_LOG_(INFO) << "FormPublishInterceptorStubTest_001 end";
-
 }
 }

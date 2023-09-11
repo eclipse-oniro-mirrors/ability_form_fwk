@@ -3917,8 +3917,6 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_205, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormMgrAdapter_205 start";
     FormMgrAdapter formMgrAdapter;
     sptr<IRemoteObject> interceptorCallback;
-    // auto interceptor = nullptr;
-    // auto interceptor = nullptr;
     auto interceptor = iface_cast<AppExecFwk::IFormPublishInterceptor>(interceptorCallback);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.RegisterPublishFormInterceptor(interceptorCallback));
     GTEST_LOG_(INFO) << "FormMgrAdapter_205 end";
@@ -3934,8 +3932,6 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_206, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormMgrAdapter_206 start";
     FormMgrAdapter formMgrAdapter;
     sptr<IRemoteObject> interceptorCallback;
-    // auto interceptor = nullptr;
-    // auto interceptor = nullptr;
     auto interceptor = iface_cast<AppExecFwk::IFormPublishInterceptor>(interceptorCallback);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.UnregisterPublishFormInterceptor(interceptorCallback));
     GTEST_LOG_(INFO) << "FormMgrAdapter_206 end";
@@ -3951,8 +3947,6 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_207, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormMgrAdapter_207 start";
     FormMgrAdapter formMgrAdapter;
     sptr<IRemoteObject> interceptorCallback;
-    // auto interceptor = nullptr;
-    // auto interceptor = nullptr;
     auto interceptor = iface_cast<AppExecFwk::IFormPublishInterceptor>(interceptorCallback);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.UnregisterPublishFormInterceptor(interceptorCallback));
     GTEST_LOG_(INFO) << "FormMgrAdapter_207 end";
@@ -3968,8 +3962,6 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_208, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormMgrAdapter_208 start";
     FormMgrAdapter formMgrAdapter;
     sptr<IRemoteObject> interceptorCallback;
-    // auto interceptor = nullptr;
-    // auto interceptor = nullptr;
     auto interceptor = iface_cast<AppExecFwk::IFormPublishInterceptor>(interceptorCallback);
     auto formPublishInterceptor_ = interceptor;
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.UnregisterPublishFormInterceptor(interceptorCallback));

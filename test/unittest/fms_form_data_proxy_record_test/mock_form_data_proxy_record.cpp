@@ -33,7 +33,7 @@ FormDataProxyRecord::~FormDataProxyRecord()
 {}
 
 ErrCode FormDataProxyRecord::SubscribeRdbFormData(std::map<std::string, std::string> &rdbSubscribeMap)
-{   
+{
     if (g_mockDataShareHelperRet == nullptr) {
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     } else {

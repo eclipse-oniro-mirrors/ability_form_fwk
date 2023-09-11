@@ -2217,7 +2217,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0113, TestSize.Level1) {
         .WillOnce(Return(ERROR_NUM));
     FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
     Want want;
-    int64_t formId = 1; 
+    int64_t formId = 1;
     std::string bundleName = "a";
     sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
     int result = FormMgr::GetInstance().BackgroundEvent(formId, want, callerToken);

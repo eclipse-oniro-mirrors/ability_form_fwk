@@ -1442,12 +1442,13 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0083, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormMgrService_0083 start";
     FormMgrService formMgrService;
-    Want want; 
+    Want want;
     bool withFormBindingData = true;
     std::unique_ptr<FormProviderData> formBindingData;
     int64_t formId = 1;
     const std::vector<FormDataProxy> formDataProxies;
-    ErrCode ret = formMgrService.RequestPublishProxyForm(want, withFormBindingData, formBindingData, formId, formDataProxies);
+    ErrCode ret = formMgrService.RequestPublishProxyForm(want, withFormBindingData, formBindingData,
+        formId, formDataProxies);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, ret);
     GTEST_LOG_(INFO) << "FormMgrService_0083 end";
 }
@@ -1461,14 +1462,15 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0084, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormMgrService_0084 start";
     FormMgrService formMgrService;
-    Want want; 
+    Want want;
     bool withFormBindingData = true;
     std::unique_ptr<FormProviderData> formBindingData;
     int64_t formId = 1;
     const std::vector<FormDataProxy> formDataProxies;
     MockIsSACall(false);
     MockIsSystemAppByFullTokenID(false);
-    ErrCode ret = formMgrService.RequestPublishProxyForm(want, withFormBindingData, formBindingData, formId, formDataProxies);
+    ErrCode ret = formMgrService.RequestPublishProxyForm(want, withFormBindingData, formBindingData,
+        formId, formDataProxies);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, ret);
     GTEST_LOG_(INFO) << "FormMgrService_0084 end";
 }
