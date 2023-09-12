@@ -78,7 +78,8 @@ public:
     MOCK_METHOD1(RegisterPublishFormInterceptor, int32_t(const sptr<IRemoteObject> &interceptorCallback));
     MOCK_METHOD1(UnregisterPublishFormInterceptor, int32_t(const sptr<IRemoteObject> &interceptorCallback));
     MOCK_METHOD2(RegisterAddObserver, ErrCode(const std::string &bundleName, const sptr<IRemoteObject> &callerToken));
-    MOCK_METHOD2(RegisterRemoveObserver, ErrCode(const std::string &bundleName, const sptr<IRemoteObject> &callerToken));
+    MOCK_METHOD2(RegisterRemoveObserver, ErrCode(const std::string &bundleName,
+        const sptr<IRemoteObject> &callerToken));
 };
 }
 }
