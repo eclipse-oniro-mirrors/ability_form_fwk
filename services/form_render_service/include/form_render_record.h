@@ -184,6 +184,8 @@ private:
 
     void DumpEventHandler();
 
+    void HandleReleaseInJsThread();
+
     bool CheckEventHandler(bool createThead = true, bool needMonitored = false);
 
     void AddStaticFormRequest(const FormJsInfo &formJsInfo, const Want &want);
