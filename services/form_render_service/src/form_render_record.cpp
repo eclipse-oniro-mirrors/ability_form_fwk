@@ -165,7 +165,8 @@ bool FormRenderRecord::CreateEventHandler(const std::string &bundleName, bool ne
         return false;
     }
 
-    if (needMonitored) {
+    if (needMonitored && !hasMonitor_) {
+        hasMonitor_.store(true);
         AddWatchDogThreadMonitor();
     }
 
