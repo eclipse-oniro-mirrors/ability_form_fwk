@@ -293,14 +293,16 @@ int FormDataMgr::CheckEnoughForm(const int callingUid, const int32_t currentUser
     }
 
     std::lock_guard<std::mutex> lock(formRecordMutex_);
-    if (static_cast<int32_t>(formRecords_.size()) >= maxFormsSize) {
+    std::vector<FormDBInfo> formDbInfos;
+    FormDbCache::GetInstance().GetAllFormInfo(formDbInfos);
+    HILOG_DEBUG("already use %{public}zu forms", formDbInfos.size());
+    if (static_cast<int32_t>(formDbInfos.size()) >= maxFormsSize) {
         HILOG_WARN("already use %{public}d forms, exceeds max form number", maxFormsSize);
         return ERR_APPEXECFWK_FORM_MAX_SYSTEM_FORMS;
     }
 
-    for (const auto &recordPair : formRecords_) {
-        FormRecord record = recordPair.second;
-        if ((record.providerUserId == FormUtil::GetCurrentAccountId()) && !record.formTempFlag) {
+    for (const auto &record : formDbInfos) {
+        if ((record.providerUserId == FormUtil::GetCurrentAccountId())) {
             HILOG_DEBUG("Is called by the current active user");
             for (const auto &userUid : record.formUserUids) {
                 if (userUid != callingUid) {
@@ -314,6 +316,7 @@ int FormDataMgr::CheckEnoughForm(const int callingUid, const int32_t currentUser
             }
         }
     }
+
     return ERR_OK;
 }
 /**
