@@ -350,6 +350,8 @@ private:
 
     bool IsNeedUpdate();
 
+    void InnerClearIntervalTimer();
+
     mutable std::mutex intervalMutex_;
     mutable std::mutex updateAtMutex_;
     mutable std::mutex dynamicMutex_;
