@@ -97,6 +97,10 @@ public:
     {
         return {};
     };
+    int32_t GetSystemProcessInfo(int32_t systemAbilityId, SystemProcessInfo& systemProcessInfo) override
+    {
+        return {};
+    };
     int32_t GetRunningSystemProcess(std::list<SystemProcessInfo>& systemProcessInfos) override
     {
         return {};
