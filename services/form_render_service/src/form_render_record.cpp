@@ -149,7 +149,8 @@ bool FormRenderRecord::CreateEventHandler(const std::string &bundleName, bool ne
         return false;
     }
 
-    if (needMonitored) {
+    if (needMonitored && !hasMonitor_) {
+        hasMonitor_.store(true);
         AddWatchDogThreadMonitor();
     }
 
@@ -743,19 +744,33 @@ void FormRenderRecord::Release()
 {
     HILOG_INFO("Release runtime and eventHandler.");
     std::lock_guard<std::mutex> lock(eventHandlerMutex_);
-    if (runtime_) {
-        runtime_.reset();
+    if (eventHandler_ == nullptr) {
+        HILOG_INFO("eventHandler is null.");
+        return;
     }
 
-    ReleaseHapFileHandle();
+    auto syncTask = [renderRecord = this]() {
+        if (renderRecord == nullptr) {
+            HILOG_ERROR("renderRecord is nullptr.");
+            return;
+        }
+        renderRecord->HandleReleaseInJsThread();
+    };
+    eventHandler_->PostSyncTask(syncTask, "HandleReleaseInJsThread");
     if (eventRunner_) {
         eventRunner_->Stop();
         eventRunner_.reset();
     }
 
-    if (eventHandler_) {
-        eventHandler_.reset();
+    eventHandler_.reset();
+}
+
+void FormRenderRecord::HandleReleaseInJsThread()
+{
+    if (runtime_) {
+        runtime_.reset();
     }
+    ReleaseHapFileHandle();
 }
 
 void FormRenderRecord::ReAddAllStaticForms()

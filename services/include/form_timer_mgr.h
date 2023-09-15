@@ -350,6 +350,8 @@ private:
 
     bool IsNeedUpdate();
 
+    void InnerClearIntervalTimer();
+
     mutable std::mutex intervalMutex_;
     mutable std::mutex updateAtMutex_;
     mutable std::mutex dynamicMutex_;
@@ -360,7 +362,7 @@ private:
     std::shared_ptr<TimerReceiver> timerReceiver_ = nullptr;
     int32_t timeSpeed_ = 1;
 
-    std::shared_ptr<Utils::Timer> intervalTimer_ = nullptr;
+    uint64_t intervalTimerId_ = 0L;
     uint64_t updateAtTimerId_ = 0L;
     uint64_t dynamicAlarmTimerId_ = 0L;
     uint64_t limiterTimerId_ = 0L;

@@ -173,6 +173,8 @@ private:
 
     TaskState RunTask();
 
+    void HandleReleaseInJsThread();
+
     bool CheckEventHandler(bool createThead = true, bool needMonitored = false);
 
     void AddStaticFormRequest(const FormJsInfo &formJsInfo, const Want &want);
@@ -211,6 +213,7 @@ private:
     std::string hapPath_;
     std::mutex watchDogMutex_;
     bool threadIsAlive_ = true;
+    std::atomic_bool hasMonitor_ = false;
     std::shared_ptr<ThreadState> threadState_;
 };
 }  // namespace FormRender
