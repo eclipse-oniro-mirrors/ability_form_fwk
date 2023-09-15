@@ -84,6 +84,10 @@ public:
     {
         return {};
     };
+    sptr<IRemoteObject> LoadSystemAbility(int32_t systemAbilityId, int32_t timeout)
+    {
+        return {};
+    }
     int32_t LoadSystemAbility(int32_t systemAbilityId, const sptr<ISystemAbilityLoadCallback>& callback) override
     {
         return {};
