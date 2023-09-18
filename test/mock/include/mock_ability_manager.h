@@ -761,6 +761,26 @@ public:
         return 0;
     }
 
+    int32_t RegisterAppDebugListener(const sptr<AppExecFwk::IAppDebugListener> &listener)
+    {
+        return 0;
+    }
+
+    int32_t UnregisterAppDebugListener(const sptr<AppExecFwk::IAppDebugListener> &listener)
+    {
+        return 0;
+    }
+
+    int32_t AttachAppDebug(const std::string &bundleName)
+    {
+        return 0;
+    }
+
+    int32_t DetachAppDebug(const std::string &bundleName)
+    {
+        return 0;
+    }
+
     int32_t startAbility_ = 0;
 private:
     Semaphore sem_;
