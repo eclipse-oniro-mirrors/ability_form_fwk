@@ -42,6 +42,7 @@ constexpr size_t ARGS_SIZE_ZERO = 0;
 constexpr size_t ARGS_SIZE_ONE = 1;
 constexpr size_t ARGS_SIZE_TWO = 2;
 constexpr size_t ARGS_SIZE_THREE = 3;
+const std::string IS_FORM_AGENT = "isFormAgent";
 
 bool ConvertFormInfoFilterThrow(NativeEngine &engine, NativeValue *jsValue, AppExecFwk::FormInfoFilter &formInfoFilter)
 {
@@ -402,6 +403,7 @@ NativeValue *JsFormProvider::OnRequestPublishForm(NativeEngine &engine, NativeCa
 
     AsyncTask::CompleteCallback complete = [asyncCallbackInfo](NativeEngine &engine, AsyncTask &task, int32_t status) {
         int64_t formId = 0;
+        asyncCallbackInfo->want.SetParam(IS_FORM_AGENT, false);
         ErrCode ret = FormMgr::GetInstance().RequestPublishForm(asyncCallbackInfo->want,
             asyncCallbackInfo->withFormBindingData, asyncCallbackInfo->formProviderData, formId,
             asyncCallbackInfo->formDataProxies);

@@ -24,6 +24,7 @@ namespace AppExecFwk {
 namespace Constants {
     constexpr const char* PERMISSION_INTERACT_ACROSS_LOCAL_ACCOUNTS = "ohos.permission.INTERACT_ACROSS_LOCAL_ACCOUNTS";
     constexpr const char* PERMISSION_REQUIRE_FORM = "ohos.permission.REQUIRE_FORM";
+    constexpr const char* PERMISSION_AGENT_REQUIRE_FORM = "ohos.permission.AGENT_REQUIRE_FORM";
     constexpr const char* PERMISSION_KEEP_BACKGROUND_RUNNING = "ohos.permission.KEEP_BACKGROUND_RUNNING";
     constexpr const char* PERMISSION_OBSERVE_FORM_RUNNING = "ohos.permission.OBSERVE_FORM_RUNNING";
     constexpr const char* PARAM_FORM_IDENTITY_KEY = "ohos.extra.param.key.form_identity";
@@ -64,6 +65,7 @@ namespace Constants {
     constexpr const char* PARAM_PUBLISH_FORM_HOST_MODULE_KEY = "ohos.extra.param.key.form_host_module_name";
     constexpr const char* PARAM_PUBLISH_FORM_HOST_ABILITY_KEY = "ohos.extra.param.key.form_host_ability_name";
     constexpr const char* PARAM_FORM_ID = "formID";
+    constexpr const char* IS_FORM_AGENT = "isFormAgent";
     constexpr int32_t TYPE_RESET_LIMIT = 1;
     constexpr int32_t TYPE_STATIC_UPDATE = 2;
     constexpr int32_t TYPE_DYNAMIC_UPDATE = 3;
