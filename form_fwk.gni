@@ -44,6 +44,7 @@ arkui_ace_engine_components_path =
     "//foundation/arkui/ace_engine/frameworks/core/components"
 c_utils_base_path = "//commonlibrary/c_utils/base"
 ecological_rule_mgr_path = "//foundation/bundlemanager/ecological_rule_mgr/interfaces/innerkits/include"
+form_fuzz_test_path = "form_fwk/form_fwk"
 
 declare_args() {
   device_usage_statistics = true
