@@ -16,8 +16,8 @@
 
 #include "fms_log_wrapper.h"
 #include "js_runtime_utils.h"
-#include "napi/native_node_api.h"
 #include "js_form_agent.h"
+#include "napi/native_node_api.h"
 
 EXTERN_C_START
 using namespace OHOS::AbilityRuntime;

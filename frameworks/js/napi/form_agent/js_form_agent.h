@@ -35,33 +35,12 @@ struct RequestPublishFormCallbackInfo {
     std::vector<AppExecFwk::FormDataProxy> formDataProxies;
 };
 
-struct AsyncIsRequestPublishFormSupportedCallbackInfo : AsyncCallbackInfoBase {
-    bool result = false;
-
-    explicit AsyncIsRequestPublishFormSupportedCallbackInfo(napi_env env) : AsyncCallbackInfoBase(env) {};
-    ~AsyncIsRequestPublishFormSupportedCallbackInfo() override = default;
-};
-
-napi_value NAPI_RequestPublishForm(napi_env env, napi_callback_info info);
-
-/**
- * @brief Check if the request to publish a form to the form host is supported.
- *
- * @param[in] env The environment that the Node-API call is invoked under
- * @param[in] info This is an opaque pointer that is used to represent a JavaScript value
- *
- * @return This is an opaque pointer that is used to represent a JavaScript value
- *         which is true if the request of publishing form is supported and false otherwise
- */
-napi_value NAPI_IsRequestPublishFormSupported(napi_env env, napi_callback_info info);
-
 class JsFormAgent {
 public:
     JsFormAgent() = default;
     ~JsFormAgent() = default;
 
     static void Finalizer(NativeEngine* engine, void* data, void* hint);
-
     static NativeValue* RequestPublishForm(NativeEngine *engine, NativeCallbackInfo *info);
 private:
     NativeValue* OnRequestPublishForm(NativeEngine &engine, NativeCallbackInfo &info);
