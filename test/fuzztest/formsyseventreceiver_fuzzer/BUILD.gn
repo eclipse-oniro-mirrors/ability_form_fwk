@@ -16,11 +16,10 @@ import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
 import("//foundation/ability/form_fwk/form_fwk.gni")
-module_output_path = "form_fwk/formmgr"
 
 ##############################fuzztest##########################################
 ohos_fuzztest("FormSyseventReceiverFuzzTest") {
-  module_out_path = module_output_path
+  module_out_path = form_fuzz_test_path
 
   fuzz_config_file =
       "${form_fwk_path}/test/fuzztest/formsyseventreceiver_fuzzer"
