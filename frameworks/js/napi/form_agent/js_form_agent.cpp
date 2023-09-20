@@ -30,7 +30,6 @@
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "runtime.h"
-#include "tokenid_kit.h"
 
 namespace OHOS {
 namespace AbilityRuntime {
@@ -61,7 +60,7 @@ NativeValue *JsFormAgent::OnRequestPublishForm(NativeEngine &engine, NativeCallb
     auto env = reinterpret_cast<napi_env>(&engine);
     if (env == nullptr || info.argc < ARGS_SIZE_ONE || info.argc > ARGS_SIZE_TWO) {
         HILOG_ERROR("wrong number of arguments.");
-        NapiFormUtil::ThrowParamNumError(engine, std::to_string(info.argc), "1, 2 or 3");
+        NapiFormUtil::ThrowParamNumError(engine, std::to_string(info.argc), "1 or 2");
         return engine.CreateUndefined();
     }
 
@@ -86,6 +85,7 @@ NativeValue *JsFormAgent::OnRequestPublishForm(NativeEngine &engine, NativeCallb
         ErrCode ret = FormMgr::GetInstance().RequestPublishForm(asyncCallbackInfo->want, false,
             asyncCallbackInfo->formProviderData, formId, asyncCallbackInfo->formDataProxies);
         if (ret != ERR_OK) {
+            HILOG_ERROR("Failed to RequestPublishForm.");
             task.Reject(engine, NapiFormUtil::CreateErrorByInternalErrorCode(engine, ret));
             return;
         }

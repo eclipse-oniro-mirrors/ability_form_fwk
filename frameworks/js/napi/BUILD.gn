@@ -459,7 +459,6 @@ ohos_shared_library("formagent") {
     "ability_runtime:abilitykit_native",
     "ability_runtime:napi_common",
     "ability_runtime:runtime",
-    "access_token:libtokenid_sdk",
     "bundle_framework:appexecfwk_base",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
