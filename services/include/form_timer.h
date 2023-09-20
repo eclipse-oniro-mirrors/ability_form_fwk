@@ -57,7 +57,7 @@ public:
         min = -1;
         isUpdateAt = false;
         isCountTimer = false;
-        refreshTime = FormUtil::GetCurrentNanosecond() / Constants::TIME_1000000;
+        refreshTime = FormUtil::GetCurrentMillisecond();
         type = UpdateType::TYPE_INTERVAL_CHANGE;
     }
 
@@ -70,7 +70,7 @@ public:
         min = -1;
         isUpdateAt = false;
         isCountTimer = countTimer;
-        refreshTime = FormUtil::GetCurrentNanosecond() / Constants::TIME_1000000;
+        refreshTime = FormUtil::GetCurrentMillisecond();
         type = UpdateType::TYPE_INTERVAL_CHANGE;
     }
 
@@ -83,7 +83,7 @@ public:
         min = -1;
         isUpdateAt = false;
         isCountTimer = true;
-        refreshTime = FormUtil::GetCurrentNanosecond() / Constants::TIME_1000000;
+        refreshTime = FormUtil::GetCurrentMillisecond();
         type = UpdateType::TYPE_INTERVAL_CHANGE;
     }
 
@@ -96,7 +96,7 @@ public:
         period = -1;
         isUpdateAt = true;
         isCountTimer = false;
-        refreshTime = FormUtil::GetCurrentNanosecond() / Constants::TIME_1000000;
+        refreshTime = FormUtil::GetCurrentMillisecond();
         type = UpdateType::TYPE_INTERVAL_CHANGE;
     }
 

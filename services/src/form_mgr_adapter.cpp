@@ -2308,6 +2308,9 @@ bool FormMgrAdapter::UpdateProviderInfoToHost(const int64_t &matchedFormId, cons
         return false;
     }
 
+    HILOG_INFO("formId:%{public}" PRId64 ", needRefresh: %{public}d, formVisibleType: %{public}d,"
+        "isTimerRefresh: %{public}d.", matchedFormId, formRecord.needRefresh,
+        static_cast<int32_t>(formVisibleType), formRecord.isTimerRefresh);
     // If the form need refresh flag is true and form visibleType is FORM_VISIBLE, refresh the form host.
     if (formRecord.needRefresh && formVisibleType == Constants::FORM_VISIBLE) {
         if (formRecord.isTimerRefresh) {
