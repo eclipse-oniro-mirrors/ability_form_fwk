@@ -301,9 +301,18 @@ int FormMgrService::ReleaseRenderer(int64_t formId, const std::string &compId)
 ErrCode FormMgrService::RequestPublishForm(Want &want, bool withFormBindingData,
     std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId)
 {
-    HILOG_INFO("%{public}s called.", __func__);
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    bool isFormAgent = want.GetBoolParam(Constants::IS_FORM_AGENT, false);
+    HILOG_INFO("RequestPublishForm called, isFormAgent: %{public}d", isFormAgent);
+    if (isFormAgent) {
+        ErrCode ret = CheckFormPermission(AppExecFwk::Constants::PERMISSION_AGENT_REQUIRE_FORM);
+        if (ret != ERR_OK) {
+            HILOG_ERROR("%{public}s fail, request form permission denied", __func__);
+            return ret;
+        }
+    } else {
+        if (!CheckCallerIsSystemApp()) {
+            return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+        }
     }
     return FormMgrAdapter::GetInstance().RequestPublishForm(want, withFormBindingData, formBindingData, formId);
 }
@@ -667,7 +676,7 @@ ErrCode FormMgrService::CheckFormObserverPermission()
     return ERR_OK;
 }
 
-ErrCode FormMgrService::CheckFormPermission()
+ErrCode FormMgrService::CheckFormPermission(const std::string &permission)
 {
     HILOG_DEBUG("called.");
 
@@ -680,7 +689,7 @@ ErrCode FormMgrService::CheckFormPermission()
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
     }
 
-    auto isCallingPerm = FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_REQUIRE_FORM);
+    auto isCallingPerm = FormUtil::VerifyCallingPermission(permission);
     if (!isCallingPerm) {
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }

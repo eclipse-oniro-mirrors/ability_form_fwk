@@ -45,6 +45,7 @@ namespace {
     constexpr int CALLBACK_FLG = 1;
     constexpr int PROMISE_FLG = 2;
     const std::string MODULE_NAME = "moduleName";
+    const std::string IS_FORM_AGENT = "isFormAgent";
 }
 
 napi_value ExecuteAsyncCallbackWork(napi_env env, AsyncCallbackInfoBase* asyncCallbackInfo)
@@ -124,6 +125,7 @@ static void InnerRequestPublishForm(napi_env env, AsyncRequestPublishFormCallbac
         return;
     }
 
+    asyncCallbackInfo->want.SetParam(IS_FORM_AGENT, false);
     ErrCode errCode = FormMgr::GetInstance().RequestPublishForm(asyncCallbackInfo->want,
         asyncCallbackInfo->withFormBindingData, asyncCallbackInfo->formProviderData, asyncCallbackInfo->formId);
     if (errCode != ERR_OK) {

@@ -437,6 +437,42 @@ ohos_shared_library("formprovider") {
   part_name = "form_fwk"
 }
 
+################################### formagent_napi ########################################
+ohos_shared_library("formagent") {
+  include_dirs = [ "${ability_runtime_innerapi_path}/runtime/include" ]
+
+  sources = [
+    "form_agent/js_form_agent.cpp",
+    "form_agent/native_module.cpp",
+  ]
+
+  configs = [ ":fmskit_config" ]
+
+  deps = [
+    ":formutil_napi",
+    "${form_fwk_path}:fmskit_native",
+    "${form_fwk_path}:form_manager",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_runtime:abilitykit_native",
+    "ability_runtime:napi_common",
+    "ability_runtime:runtime",
+    "bundle_framework:appexecfwk_base",
+    "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
+    "hilog:libhilog",
+    "ipc:ipc_single",
+    "napi:ace_napi",
+  ]
+
+  relative_install_dir = "module/app/form"
+
+  subsystem_name = "ability"
+  part_name = "form_fwk"
+}
+
 ################################### formutil_napi_public_config ########################################
 config("formutil_napi_public_config") {
   include_dirs = [ "formUtil/" ]

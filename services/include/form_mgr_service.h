@@ -526,7 +526,8 @@ private:
 
     ErrCode CheckFormObserverPermission();
 
-    ErrCode CheckFormPermission();
+    ErrCode CheckFormPermission(
+        const std::string &permission = AppExecFwk::Constants::PERMISSION_REQUIRE_FORM);
 
     bool CheckAcrossLocalAccountsPermission() const;
 
