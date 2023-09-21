@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,14 +16,14 @@
 #include "native_engine/native_engine.h"
 #include "js_form_error.h"
 
+static napi_module _module = {
+    .nm_version = 0,
+    .nm_modname = "application.formError",
+    .nm_filename = "application/libformerror_napi.so/formError.js",
+    .nm_register_func = OHOS::AbilityRuntime::FormErrorInit,
+};
+
 extern "C" __attribute__((constructor)) void NAPI_application_formError_AutoRegister()
 {
-    auto moduleManager = NativeModuleManager::GetInstance();
-    NativeModule newModuleInfo = {
-        .name = "application.formError",
-        .fileName = "application/libformerror_napi.so/formError.js",
-        .registerCallback = OHOS::AbilityRuntime::FormErrorInit,
-    };
-
-    moduleManager->Register(&newModuleInfo);
+    napi_module_register(&_module);
 }

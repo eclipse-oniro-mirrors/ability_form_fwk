@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,50 +20,46 @@
 
 namespace OHOS {
 namespace AbilityRuntime {
-NativeValue* CreateJsFormError(NativeEngine &engine)
+napi_value CreateJsFormError(napi_env env)
 {
-    NativeValue* objValue = engine.CreateObject();
-    NativeObject* object = ConvertNativeValueTo<NativeObject>(objValue);
-    object->SetProperty("ERR_COMMON", CreateJsValue(engine, ERR_COMMON));
-    object->SetProperty("ERR_PERMISSION_DENY", CreateJsValue(engine, ERR_PERMISSION_DENY));
-    object->SetProperty("ERR_GET_INFO_FAILED", CreateJsValue(engine, ERR_GET_INFO_FAILED));
-    object->SetProperty("ERR_GET_BUNDLE_FAILED", CreateJsValue(engine, ERR_GET_BUNDLE_FAILED));
-    object->SetProperty("ERR_GET_LAYOUT_FAILED", CreateJsValue(engine, ERR_GET_LAYOUT_FAILED));
-    object->SetProperty("ERR_ADD_INVALID_PARAM", CreateJsValue(engine, ERR_ADD_INVALID_PARAM));
-    object->SetProperty("ERR_CFG_NOT_MATCH_ID", CreateJsValue(engine, ERR_CFG_NOT_MATCH_ID));
-    object->SetProperty("ERR_NOT_EXIST_ID", CreateJsValue(engine, ERR_NOT_EXIST_ID));
-    object->SetProperty("ERR_BIND_PROVIDER_FAILED", CreateJsValue(engine, ERR_BIND_PROVIDER_FAILED));
-    object->SetProperty("ERR_MAX_SYSTEM_FORMS", CreateJsValue(engine, ERR_MAX_SYSTEM_FORMS));
-    object->SetProperty("ERR_MAX_INSTANCES_PER_FORM", CreateJsValue(engine, ERR_MAX_INSTANCES_PER_FORM));
-    object->SetProperty("ERR_OPERATION_FORM_NOT_SELF", CreateJsValue(engine, ERR_OPERATION_FORM_NOT_SELF));
-    object->SetProperty("ERR_PROVIDER_DEL_FAIL", CreateJsValue(engine, ERR_PROVIDER_DEL_FAIL));
-    object->SetProperty("ERR_MAX_FORMS_PER_CLIENT", CreateJsValue(engine, ERR_MAX_FORMS_PER_CLIENT));
-    object->SetProperty("ERR_MAX_SYSTEM_TEMP_FORMS", CreateJsValue(engine, ERR_MAX_SYSTEM_TEMP_FORMS));
-    object->SetProperty("ERR_FORM_NO_SUCH_MODULE", CreateJsValue(engine, ERR_FORM_NO_SUCH_MODULE));
-    object->SetProperty("ERR_FORM_NO_SUCH_ABILITY", CreateJsValue(engine, ERR_FORM_NO_SUCH_ABILITY));
-    object->SetProperty("ERR_FORM_NO_SUCH_DIMENSION", CreateJsValue(engine, ERR_FORM_NO_SUCH_DIMENSION));
-    object->SetProperty("ERR_FORM_FA_NOT_INSTALLED", CreateJsValue(engine, ERR_FORM_FA_NOT_INSTALLED));
-    object->SetProperty("ERR_SYSTEM_RESPONSES_FAILED", CreateJsValue(engine, ERR_SYSTEM_RESPONSES_FAILED));
-    object->SetProperty("ERR_FORM_DUPLICATE_ADDED", CreateJsValue(engine, ERR_FORM_DUPLICATE_ADDED));
-    object->SetProperty("ERR_DISTRIBUTED_SCHEDULE_FAILED", CreateJsValue(engine, ERR_DISTRIBUTED_SCHEDULE_FAILED));
-    object->SetProperty("ERR_IN_RECOVERY", CreateJsValue(engine, ERR_IN_RECOVERY));
+    napi_value objValue = nullptr;
+    napi_create_object(env, &objValue);
+    napi_set_named_property(env, objValue, "ERR_COMMON", CreateJsValue(env, ERR_COMMON));
+    napi_set_named_property(env, objValue, "ERR_PERMISSION_DENY", CreateJsValue(env, ERR_PERMISSION_DENY));
+    napi_set_named_property(env, objValue, "ERR_GET_INFO_FAILED", CreateJsValue(env, ERR_GET_INFO_FAILED));
+    napi_set_named_property(env, objValue, "ERR_GET_BUNDLE_FAILED", CreateJsValue(env, ERR_GET_BUNDLE_FAILED));
+    napi_set_named_property(env, objValue, "ERR_GET_LAYOUT_FAILED", CreateJsValue(env, ERR_GET_LAYOUT_FAILED));
+    napi_set_named_property(env, objValue, "ERR_ADD_INVALID_PARAM", CreateJsValue(env, ERR_ADD_INVALID_PARAM));
+    napi_set_named_property(env, objValue, "ERR_CFG_NOT_MATCH_ID", CreateJsValue(env, ERR_CFG_NOT_MATCH_ID));
+    napi_set_named_property(env, objValue, "ERR_NOT_EXIST_ID", CreateJsValue(env, ERR_NOT_EXIST_ID));
+    napi_set_named_property(env, objValue, "ERR_BIND_PROVIDER_FAILED", CreateJsValue(env, ERR_BIND_PROVIDER_FAILED));
+    napi_set_named_property(env, objValue, "ERR_MAX_SYSTEM_FORMS", CreateJsValue(env, ERR_MAX_SYSTEM_FORMS));
+    napi_set_named_property(
+        env, objValue, "ERR_MAX_INSTANCES_PER_FORM", CreateJsValue(env, ERR_MAX_INSTANCES_PER_FORM));
+    napi_set_named_property(
+        env, objValue, "ERR_OPERATION_FORM_NOT_SELF", CreateJsValue(env, ERR_OPERATION_FORM_NOT_SELF));
+    napi_set_named_property(env, objValue, "ERR_PROVIDER_DEL_FAIL", CreateJsValue(env, ERR_PROVIDER_DEL_FAIL));
+    napi_set_named_property(env, objValue, "ERR_MAX_FORMS_PER_CLIENT", CreateJsValue(env, ERR_MAX_FORMS_PER_CLIENT));
+    napi_set_named_property(env, objValue, "ERR_MAX_SYSTEM_TEMP_FORMS", CreateJsValue(env, ERR_MAX_SYSTEM_TEMP_FORMS));
+    napi_set_named_property(env, objValue, "ERR_FORM_NO_SUCH_MODULE", CreateJsValue(env, ERR_FORM_NO_SUCH_MODULE));
+    napi_set_named_property(env, objValue, "ERR_FORM_NO_SUCH_ABILITY", CreateJsValue(env, ERR_FORM_NO_SUCH_ABILITY));
+    napi_set_named_property(
+        env, objValue, "ERR_FORM_NO_SUCH_DIMENSION", CreateJsValue(env, ERR_FORM_NO_SUCH_DIMENSION));
+    napi_set_named_property(env, objValue, "ERR_FORM_FA_NOT_INSTALLED", CreateJsValue(env, ERR_FORM_FA_NOT_INSTALLED));
+    napi_set_named_property(
+        env, objValue, "ERR_SYSTEM_RESPONSES_FAILED", CreateJsValue(env, ERR_SYSTEM_RESPONSES_FAILED));
+    napi_set_named_property(env, objValue, "ERR_FORM_DUPLICATE_ADDED", CreateJsValue(env, ERR_FORM_DUPLICATE_ADDED));
+    napi_set_named_property(
+        env, objValue, "ERR_DISTRIBUTED_SCHEDULE_FAILED", CreateJsValue(env, ERR_DISTRIBUTED_SCHEDULE_FAILED));
+    napi_set_named_property(env, objValue, "ERR_IN_RECOVERY", CreateJsValue(env, ERR_IN_RECOVERY));
     return objValue;
 }
 
-NativeValue* FormErrorInit(NativeEngine *engine, NativeValue *exportObj)
+napi_value FormErrorInit(napi_env env, napi_value exportObj)
 {
     HILOG_INFO("%{public}s called.", __func__);
-    if (engine == nullptr || exportObj == nullptr) {
-        HILOG_ERROR("%{public}s engine or exportObj nullptr.", __func__);
-        return nullptr;
-    }
 
-    NativeObject* object = ConvertNativeValueTo<NativeObject>(exportObj);
-    if (object == nullptr) {
-        HILOG_ERROR("%{public}s convertNativeValueTo result is nullptr.", __func__);
-        return nullptr;
-    }
-    object->SetProperty("FormError", CreateJsFormError(*engine));
+    napi_set_named_property(env, exportObj, "FormError", CreateJsFormError(env));
 
     HILOG_INFO("%{public}s called end.", __func__);
     return exportObj;
