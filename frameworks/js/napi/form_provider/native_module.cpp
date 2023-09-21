@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,29 +22,19 @@
 EXTERN_C_START
 using namespace OHOS::AbilityRuntime;
 
-static NativeValue* JsProviderInit(NativeEngine* engine, NativeValue* exports)
+static napi_value JsProviderInit(napi_env env, napi_value exports)
 {
     HILOG_INFO("JsProviderInit is called");
-    if (engine == nullptr || exports == nullptr) {
-        HILOG_ERROR("Invalid input parameters");
-        return nullptr;
-    }
-
-    NativeObject* object = ConvertNativeValueTo<NativeObject>(exports);
-    if (object == nullptr) {
-        HILOG_ERROR("object is nullptr");
-        return nullptr;
-    }
 
     std::unique_ptr<JsFormProvider> jsFormProvider = std::make_unique<JsFormProvider>();
-    object->SetNativePointer(jsFormProvider.release(), JsFormProvider::Finalizer, nullptr);
+    napi_wrap(env, exports, jsFormProvider.release(), JsFormProvider::Finalizer, nullptr, nullptr);
 
     const char *moduleName = "JsFormProvider";
-    BindNativeFunction(*engine, *object, "getFormsInfo", moduleName, JsFormProvider::GetFormsInfo);
-    BindNativeFunction(*engine, *object, "setFormNextRefreshTime", moduleName, JsFormProvider::SetFormNextRefreshTime);
-    BindNativeFunction(*engine, *object, "updateForm", moduleName, JsFormProvider::UpdateForm);
-    BindNativeFunction(*engine, *object, "requestPublishForm", moduleName, JsFormProvider::RequestPublishForm);
-    BindNativeFunction(*engine, *object, "isRequestPublishFormSupported", moduleName,
+    BindNativeFunction(env, exports, "getFormsInfo", moduleName, JsFormProvider::GetFormsInfo);
+    BindNativeFunction(env, exports, "setFormNextRefreshTime", moduleName, JsFormProvider::SetFormNextRefreshTime);
+    BindNativeFunction(env, exports, "updateForm", moduleName, JsFormProvider::UpdateForm);
+    BindNativeFunction(env, exports, "requestPublishForm", moduleName, JsFormProvider::RequestPublishForm);
+    BindNativeFunction(env, exports, "isRequestPublishFormSupported", moduleName,
         JsFormProvider::IsRequestPublishFormSupported);
     return exports;
 }
@@ -59,8 +49,7 @@ static NativeValue* JsProviderInit(NativeEngine* engine, NativeValue* exports)
  */
 static napi_value Init(napi_env env, napi_value exports)
 {
-    return reinterpret_cast<napi_value>(JsProviderInit(reinterpret_cast<NativeEngine*>(env),
-        reinterpret_cast<NativeValue*>(exports)));
+    return JsProviderInit(env, exports);
 }
 
 EXTERN_C_END

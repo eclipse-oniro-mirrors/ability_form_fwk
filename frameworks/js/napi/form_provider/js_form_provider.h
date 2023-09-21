@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -60,21 +60,21 @@ public:
     JsFormProvider() = default;
     ~JsFormProvider() = default;
 
-    static void Finalizer(NativeEngine* engine, void* data, void* hint);
-    static NativeValue* GetFormsInfo(NativeEngine* engine, NativeCallbackInfo* info);
-    static NativeValue* SetFormNextRefreshTime(NativeEngine *engine, NativeCallbackInfo *info);
-    static NativeValue* UpdateForm(NativeEngine *engine, NativeCallbackInfo *info);
-    static NativeValue* IsRequestPublishFormSupported(NativeEngine *engine, NativeCallbackInfo *info);
-    static NativeValue* RequestPublishForm(NativeEngine *engine, NativeCallbackInfo *info);
+    static void Finalizer(napi_env env, void* data, void* hint);
+    static napi_value GetFormsInfo(napi_env env, napi_callback_info info);
+    static napi_value SetFormNextRefreshTime(napi_env env, napi_callback_info info);
+    static napi_value UpdateForm(napi_env env, napi_callback_info info);
+    static napi_value IsRequestPublishFormSupported(napi_env env, napi_callback_info info);
+    static napi_value RequestPublishForm(napi_env env, napi_callback_info info);
 private:
-    NativeValue* OnGetFormsInfo(NativeEngine &engine, NativeCallbackInfo &info);
-    NativeValue* OnSetFormNextRefreshTime(NativeEngine &engine, NativeCallbackInfo &info);
-    NativeValue* OnUpdateForm(NativeEngine &engine, NativeCallbackInfo &info);
-    NativeValue* OnIsRequestPublishFormSupported(NativeEngine &engine, const NativeCallbackInfo &info);
-    NativeValue* OnRequestPublishForm(NativeEngine &engine, NativeCallbackInfo &info);
-    bool ConvertFromDataProxies(NativeEngine& engine, NativeValue* jsValue,
+    napi_value OnGetFormsInfo(napi_env env, size_t argc, napi_value* argv);
+    napi_value OnSetFormNextRefreshTime(napi_env env, size_t argc, napi_value* argv);
+    napi_value OnUpdateForm(napi_env env, size_t argc, napi_value* argv);
+    napi_value OnIsRequestPublishFormSupported(napi_env env, size_t argc, napi_value* argv);
+    napi_value OnRequestPublishForm(napi_env env, size_t argc, napi_value* argv);
+    bool ConvertFromDataProxies(napi_env env, napi_value jsValue,
         std::vector<AppExecFwk::FormDataProxy> &formDataProxies);
-    bool ConvertFormDataProxy(NativeEngine& engine, NativeValue* jsValue, AppExecFwk::FormDataProxy &formDataProxy);
+    bool ConvertFormDataProxy(napi_env env, napi_value jsValue, AppExecFwk::FormDataProxy &formDataProxy);
 };
 }  // namespace AbilityRuntime
 }  // namespace OHOS

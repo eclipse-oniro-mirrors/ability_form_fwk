@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,21 +14,22 @@
  */
 
 #include "native_engine/native_engine.h"
+#include "napi/native_api.h"
 
 extern const char _binary_form_extension_context_js_start[];
 extern const char _binary_form_extension_context_js_end[];
 extern const char _binary_form_extension_context_abc_start[];
 extern const char _binary_form_extension_context_abc_end[];
 
+static napi_module _module = {
+    .nm_version = 0,
+    .nm_modname = "application.FormExtensionContext",
+    .nm_filename = "application/libformextensioncontext_napi.so/FormExtensionContext.js",
+};
+
 extern "C" __attribute__((constructor)) void NAPI_application_FormExtensionContext_AutoRegister()
 {
-    auto moduleManager = NativeModuleManager::GetInstance();
-    NativeModule newModuleInfo = {
-        .name = "application.FormExtensionContext",
-        .fileName = "application/libformextensioncontext_napi.so/FormExtensionContext.js",
-    };
-
-    moduleManager->Register(&newModuleInfo);
+    napi_module_register(&_module);
 }
 
 extern "C" __attribute__((visibility("default"))) void NAPI_application_FormExtensionContext_GetJSCode(

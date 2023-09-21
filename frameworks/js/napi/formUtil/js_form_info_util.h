@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,6 +18,7 @@
 
 #include "form_info.h"
 #include "form_info_filter.h"
+#include "napi/native_api.h"
 #include "native_engine/native_engine.h"
 #include "native_engine/native_value.h"
 
@@ -25,8 +26,8 @@ namespace OHOS {
 namespace AbilityRuntime {
 EXTERN_C_START
 
-bool ConvertFormInfoFilter(NativeEngine &engine, NativeValue *jsValue, AppExecFwk::FormInfoFilter &formInfoFilter);
-NativeValue* CreateJsFormInfoArray(NativeEngine &engine, const std::vector<AppExecFwk::FormInfo> &formInfos);
+bool ConvertFormInfoFilter(napi_env env, napi_value value, AppExecFwk::FormInfoFilter &formInfoFilter);
+napi_value CreateJsFormInfoArray(napi_env env, const std::vector<AppExecFwk::FormInfo> &formInfos);
 
 EXTERN_C_END
 } // namespace AppExecFwk
