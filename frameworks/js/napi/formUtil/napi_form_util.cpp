@@ -166,6 +166,60 @@ bool NapiFormUtil::ThrowParamError(NativeEngine &engine, const std::string &extr
     return Throw(engine, ERR_FORM_EXTERNAL_PARAM_INVALID, errorMessage);
 }
 
+// above to delete
+
+bool NapiFormUtil::Throw(napi_env env, int32_t errCode, const std::string &errMessage)
+{
+    napi_value error = CreateJsError(env, errCode, errMessage);
+    napi_throw(env, error);
+    return true;
+}
+
+bool NapiFormUtil::ThrowByInternalErrorCode(napi_env env, int32_t internalErrorCode)
+{
+    int32_t externalErrorCode = 0;
+    std::string externalErrorMessage;
+    FormMgr::GetInstance().GetExternalError(internalErrorCode, externalErrorCode, externalErrorMessage);
+    return Throw(env, externalErrorCode, externalErrorMessage);
+}
+
+bool NapiFormUtil::ThrowByExternalErrorCode(napi_env env, int32_t externalErrorCode)
+{
+    std::string externalErrorMessage = FormMgr::GetInstance().GetErrorMsgByExternalErrorCode(externalErrorCode);
+    return Throw(env, externalErrorCode, externalErrorMessage);
+}
+
+napi_value NapiFormUtil::CreateErrorByInternalErrorCode(napi_env env, int32_t internalErrorCode)
+{
+    int32_t externalErrorCode = 0;
+    std::string externalErrorMessage;
+    FormMgr::GetInstance().GetExternalError(internalErrorCode, externalErrorCode, externalErrorMessage);
+    return CreateJsError(env, externalErrorCode, externalErrorMessage);
+}
+
+napi_value NapiFormUtil::CreateErrorByExternalErrorCode(napi_env env, int32_t externalErrorCode)
+{
+    std::string externalErrorMessage = FormMgr::GetInstance().GetErrorMsgByExternalErrorCode(externalErrorCode);
+    return CreateJsError(env, externalErrorCode, externalErrorMessage);
+}
+
+bool NapiFormUtil::ThrowParamTypeError(napi_env env, const std::string &paramName, const std::string &type)
+{
+    return Throw(env, ERR_FORM_EXTERNAL_PARAM_INVALID, CreateParamTypeErrorMessage(paramName, type));
+}
+
+bool NapiFormUtil::ThrowParamNumError(napi_env env, const std::string &gotNum, const std::string &expectedNum)
+{
+    std::string errorMessage = "Parameter error. Got " + gotNum + ", expected " + expectedNum;
+    return Throw(env, ERR_FORM_EXTERNAL_PARAM_INVALID, errorMessage);
+}
+
+bool NapiFormUtil::ThrowParamError(napi_env env, const std::string &extraMessage)
+{
+    std::string errorMessage = "Parameter error. " + extraMessage;
+    return Throw(env, ERR_FORM_EXTERNAL_PARAM_INVALID, errorMessage);
+}
+
 std::string NapiFormUtil::CreateParamTypeErrorMessage(const std::string &paramName, const std::string &type)
 {
     std::string errorMessage = "Parameter error.";
