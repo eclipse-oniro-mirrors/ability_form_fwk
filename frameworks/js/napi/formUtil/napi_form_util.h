@@ -92,6 +92,25 @@ public:
 
     static bool ThrowParamError(NativeEngine &engine, const std::string &extraMessage);
 
+    // above to delete
+
+    static bool Throw(napi_env env, int32_t errCode, const std::string &errMessage);
+
+    static bool ThrowByInternalErrorCode(napi_env env, int32_t internalErrorCode);
+
+    static bool ThrowByExternalErrorCode(napi_env env, int32_t externalErrorCode);
+
+    static napi_value CreateErrorByInternalErrorCode(napi_env env, int32_t internalErrorCode);
+
+    static napi_value CreateErrorByExternalErrorCode(napi_env env, int32_t externalErrorCode);
+
+    static bool ThrowParamTypeError(napi_env env, const std::string &paramName, const std::string &type);
+
+    static bool ThrowParamNumError(napi_env env, const std::string &gotNum, const std::string &expectedNum);
+
+    static bool ThrowParamError(napi_env env, const std::string &extraMessage);
+
+    
 private:
     static std::string CreateParamTypeErrorMessage(const std::string &paramName, const std::string &type);
 };
