@@ -329,31 +329,34 @@ int32_t JsFormStateObserver::OnRemoveForm(const std::string &bundleName,
     return ERR_OK;
 }
 
-int JsFormStateObserver::RegisterFormInstanceCallback(NativeEngine &engine, NativeValue* jsObserverObject,
+int JsFormStateObserver::RegisterFormInstanceCallback(napi_env env, napi_value jsObserverObject,
     bool isVisibility, std::string &bundleName, sptr<JsFormStateObserver> &formObserver)
 {
     HILOG_DEBUG("called.");
-    if (engine_ == nullptr) {
-        engine_ = &engine;
+    if (env_ == nullptr) {
+        env_ = env;
     }
     std::string specialFlag = "#";
     std::lock_guard<std::mutex> lock(formIsvisibleCallbackMutex_);
+    napi_ref ref = nullptr;
     if (isVisibility) {
         auto visibleCallback = formVisibleCallbackMap_.find(bundleName);
         if (visibleCallback != formVisibleCallbackMap_.end()) {
             HILOG_ERROR("bundleName is already in the map, bundleName id %{public}s", bundleName.c_str());
             return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
         }
+        napi_create_reference(env, jsObserverObject, 1, &ref);
         formVisibleCallbackMap_.emplace(
-            bundleName, std::shared_ptr<NativeReference>(engine.CreateReference(jsObserverObject, 1)));
+            bundleName, std::shared_ptr<NativeReference>(reinterpret_cast<NativeReference *>(ref)));
     } else {
         auto invisibleCallback = formInvisibleCallbackMap_.find(bundleName);
         if (invisibleCallback != formInvisibleCallbackMap_.end()) {
             HILOG_ERROR("bundleName is already in the map, bundleName id %{public}s", bundleName.c_str());
             return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
         }
+        napi_create_reference(env, jsObserverObject, 1, &ref);
         formInvisibleCallbackMap_.emplace(
-            bundleName, std::shared_ptr<NativeReference>(engine.CreateReference(jsObserverObject, 1)));
+            bundleName, std::shared_ptr<NativeReference>(reinterpret_cast<NativeReference *>(ref)));
     }
     AppExecFwk::FormMgr::GetInstance().RegisterAddObserver(bundleName + specialFlag + std::to_string(isVisibility),
         formObserver);
@@ -392,7 +395,7 @@ ErrCode JsFormStateObserver::ClearFormNotifyVisibleCallbackByBundle(const std::s
 }
 
 ErrCode JsFormStateObserver::DelFormNotifyVisibleCallbackByBundle(const std::string bundleName,
-    bool isVisibility, NativeValue *jsObserverObject, sptr<JsFormStateObserver> &formObserver)
+    bool isVisibility, napi_value jsObserverObject, sptr<JsFormStateObserver> &formObserver)
 {
     HILOG_DEBUG("called.");
     std::lock_guard<std::mutex> lock(formIsvisibleCallbackMutex_);
@@ -400,7 +403,10 @@ ErrCode JsFormStateObserver::DelFormNotifyVisibleCallbackByBundle(const std::str
     if (isVisibility) {
         auto visibleCallback = formVisibleCallbackMap_.find(bundleName);
         if (visibleCallback != formVisibleCallbackMap_.end()) {
-            if (jsObserverObject->StrictEquals(visibleCallback->second->Get())) {
+            napi_value value = visibleCallback->second->GetNapiValue();
+            bool isEqual = false;
+            napi_strict_equals(env_, value, jsObserverObject, &isEqual);
+            if (isEqual) {
                 AppExecFwk::FormMgr::GetInstance().RegisterRemoveObserver(
                     bundleName + specialFlag + std::to_string(isVisibility), formObserver);
                 formVisibleCallbackMap_.erase(visibleCallback);
@@ -416,7 +422,10 @@ ErrCode JsFormStateObserver::DelFormNotifyVisibleCallbackByBundle(const std::str
     } else {
         auto invisibleCallback = formInvisibleCallbackMap_.find(bundleName);
         if (invisibleCallback != formInvisibleCallbackMap_.end()) {
-            if (jsObserverObject->StrictEquals(invisibleCallback->second->Get())) {
+            napi_value value = invisibleCallback->second->GetNapiValue();
+            bool isEqual = false;
+            napi_strict_equals(env_, value, jsObserverObject, &isEqual);
+            if (isEqual) {
                 AppExecFwk::FormMgr::GetInstance().RegisterRemoveObserver(
                     bundleName + specialFlag + std::to_string(isVisibility), formObserver);
                 formInvisibleCallbackMap_.erase(invisibleCallback);
@@ -455,9 +464,10 @@ int32_t JsFormStateObserver::NotifyWhetherFormsVisible(const AppExecFwk::FormVis
                         std::regex_replace(bundleName, std::regex(specialFlag + std::to_string(isVisibleTypeFlag)), "");
                     auto visibleCallback = sharedThis->formVisibleCallbackMap_.find(bundleNameNew);
                     if (visibleCallback != sharedThis->formVisibleCallbackMap_.end()) {
-                        NativeValue *value = visibleCallback->second->Get();
-                        NativeValue *argv[] = { CreateFormInstances(*sharedThis->engine_, formInstances)};
-                        sharedThis->CallJsFunction(value, argv,  sizeof(argv) / sizeof(argv[0]));
+                        napi_value value = visibleCallback->second->GetNapiValue();
+                        napi_value argv[] = { CreateFormInstances(sharedThis->env_, formInstances) };
+                        napi_call_function(sharedThis->env_,
+                            value, value, sizeof(argv) / sizeof(argv[0]), argv, nullptr);
                     }
                 }
             } else {
@@ -467,28 +477,16 @@ int32_t JsFormStateObserver::NotifyWhetherFormsVisible(const AppExecFwk::FormVis
                         std::regex_replace(bundleName, std::regex(specialFlag + std::to_string(isVisibleTypeFlag)), "");
                     auto invisibleCallback = sharedThis->formInvisibleCallbackMap_.find(bundleNameNew);
                     if (invisibleCallback != sharedThis->formInvisibleCallbackMap_.end()) {
-                        NativeValue *value = invisibleCallback->second->Get();
-                        NativeValue *argv[] = { CreateFormInstances(*sharedThis->engine_, formInstances)};
-                        sharedThis->CallJsFunction(value, argv,  sizeof(argv) / sizeof(argv[0]));
+                        napi_value value = invisibleCallback->second->GetNapiValue();
+                        napi_value argv[] = { CreateFormInstances(sharedThis->env_, formInstances) };
+                        napi_call_function(sharedThis->env_,
+                            value, value, sizeof(argv) / sizeof(argv[0]), argv, nullptr);
                     }
                 }
             }
         });
     }
     return ERR_OK;
-}
-
-void JsFormStateObserver::CallJsFunction(
-    NativeValue *value, NativeValue *const *argv, size_t argc)
-{
-    HILOG_DEBUG("called.");
-    NativeObject *obj = ConvertNativeValueTo<NativeObject>(value);
-    if (obj == nullptr) {
-        HILOG_ERROR("Failed to get object");
-        return;
-    }
-    engine_->CallFunction(value, value, argv, argc);
-    HILOG_DEBUG("end.");
 }
 }  // namespace AbilityRuntime
 }  // namespace OHOS

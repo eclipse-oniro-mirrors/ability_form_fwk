@@ -110,7 +110,6 @@ public:
 
     static bool ThrowParamError(napi_env env, const std::string &extraMessage);
 
-    
 private:
     static std::string CreateParamTypeErrorMessage(const std::string &paramName, const std::string &type);
 };
@@ -125,20 +124,20 @@ napi_value RetErrMsg(AsyncErrMsgCallbackInfo* asyncCallbackInfo);
 void ParseFormInfoIntoNapi(napi_env env, const OHOS::AppExecFwk::FormInfo &formInfo, napi_value &result);
 void ParseRunningFormInfoIntoNapi(napi_env env, const AppExecFwk::RunningFormInfo &runningFormInfo, napi_value &result);
 AsyncErrMsgCallbackInfo *InitErrMsg(napi_env env, int32_t code, int32_t type, napi_value callbackValue);
-NativeValue* CreateFormInfos(NativeEngine &engine, const std::vector<OHOS::AppExecFwk::FormInfo> &formInfos);
-NativeValue *CreateRunningFormInfos(NativeEngine &engine,
+napi_value CreateFormInfos(napi_env env, const std::vector<OHOS::AppExecFwk::FormInfo> &formInfos);
+napi_value CreateRunningFormInfos(napi_env env,
     const std::vector<AppExecFwk::RunningFormInfo> &runningFormInfos);
-NativeValue *CreateRunningFormInfo(NativeEngine &engine, const AppExecFwk::RunningFormInfo &runningFormInfo);
-NativeValue* CreateFormInfo(NativeEngine &engine, const OHOS::AppExecFwk::FormInfo &formInfo);
-NativeValue* CreateRunningFormInfos(NativeEngine &engine,
+napi_value CreateRunningFormInfo(napi_env env, const AppExecFwk::RunningFormInfo &runningFormInfo);
+napi_value CreateFormInfo(napi_env env, const OHOS::AppExecFwk::FormInfo &formInfo);
+napi_value CreateRunningFormInfos(napi_env env,
     const std::vector<AppExecFwk::RunningFormInfo> &runningFormInfos);
-NativeValue* CreateRunningFormInfo(NativeEngine &engine, const AppExecFwk::RunningFormInfo &runningFormInfo);
-NativeValue *CreateFormCustomizeDatas(
-    NativeEngine &engine, const std::vector<OHOS::AppExecFwk::FormCustomizeData> &customizeDatas);
+napi_value CreateRunningFormInfo(napi_env env, const AppExecFwk::RunningFormInfo &runningFormInfo);
+napi_value CreateFormCustomizeDatas(
+    napi_env env, const std::vector<OHOS::AppExecFwk::FormCustomizeData> &customizeDatas);
 bool ParseParam(napi_env env, napi_value args, AppExecFwk::FormInstancesFilter &filter);
 std::string GetStringFromNapi(napi_env env, napi_value value);
-NativeValue* CreateFormInstances(NativeEngine &engine, const std::vector<AppExecFwk::FormInstance> &formInstances);
-NativeValue* CreateFormInstance(NativeEngine &engine, const AppExecFwk::FormInstance &formInstance);
+napi_value CreateFormInstances(napi_env env, const std::vector<AppExecFwk::FormInstance> &formInstances);
+napi_value CreateFormInstance(napi_env env, const AppExecFwk::FormInstance &formInstance);
 }  // namespace AbilityRuntime
 }  // namespace OHOS
 #endif /* OHOS_FORM_FWK_NAPI_FORM_UTIL_H */

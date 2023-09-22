@@ -959,105 +959,92 @@ private:
     std::shared_ptr<AppExecFwk::EventHandler> handler_;
 };
 
-void NapiFormHost::Finalizer(NativeEngine *engine, void *data, void *hint)
+void NapiFormHost::Finalizer(napi_env env, void *data, void *hint)
 {
     HILOG_DEBUG("NapiFormHost::Finalizer is called");
     std::unique_ptr<NapiFormHost>(static_cast<NapiFormHost*>(data));
 }
 
-NativeValue* NapiFormHost::ShareForm(NativeEngine *engine, NativeCallbackInfo *info)
+napi_value NapiFormHost::ShareForm(napi_env env, napi_callback_info info)
 {
-    NapiFormHost *me = OHOS::AbilityRuntime::CheckParamsAndGetThis<NapiFormHost>(engine, info);
-    return (me != nullptr) ? me->OnShareForm(*engine, *info) : nullptr;
+    GET_CB_INFO_AND_CALL(env, info, NapiFormHost, OnShareForm);
 }
 
-NativeValue* NapiFormHost::DisableFormsUpdate(NativeEngine *engine, NativeCallbackInfo *info)
+napi_value NapiFormHost::DisableFormsUpdate(napi_env env, napi_callback_info info)
 {
-    NapiFormHost *me = OHOS::AbilityRuntime::CheckParamsAndGetThis<NapiFormHost>(engine, info);
-    return (me != nullptr) ? me->OnDisableFormsUpdate(*engine, *info) : nullptr;
+    GET_CB_INFO_AND_CALL(env, info, NapiFormHost, OnDisableFormsUpdate);
 }
 
-NativeValue* NapiFormHost::IsSystemReady(NativeEngine *engine, NativeCallbackInfo *info)
+napi_value NapiFormHost::IsSystemReady(napi_env env, napi_callback_info info)
 {
-    NapiFormHost *me = OHOS::AbilityRuntime::CheckParamsAndGetThis<NapiFormHost>(engine, info);
-    return (me != nullptr) ? me->OnIsSystemReady(*engine, *info) : nullptr;
+    GET_CB_INFO_AND_CALL(env, info, NapiFormHost, OnIsSystemReady);
 }
 
-NativeValue* NapiFormHost::GetAllFormsInfo(NativeEngine *engine, NativeCallbackInfo *info)
+napi_value NapiFormHost::GetAllFormsInfo(napi_env env, napi_callback_info info)
 {
-    NapiFormHost *me = OHOS::AbilityRuntime::CheckParamsAndGetThis<NapiFormHost>(engine, info);
-    return (me != nullptr) ? me->OnGetAllFormsInfo(*engine, *info) : nullptr;
+    GET_CB_INFO_AND_CALL(env, info, NapiFormHost, OnGetAllFormsInfo);
 }
 
-NativeValue* NapiFormHost::GetFormsInfo(NativeEngine *engine, NativeCallbackInfo *info)
+napi_value NapiFormHost::GetFormsInfo(napi_env env, napi_callback_info info)
 {
-    NapiFormHost *me = OHOS::AbilityRuntime::CheckParamsAndGetThis<NapiFormHost>(engine, info);
-    return (me != nullptr) ? me->OnGetFormsInfo(*engine, *info) : nullptr;
+    GET_CB_INFO_AND_CALL(env, info, NapiFormHost, OnGetFormsInfo);
 }
 
-NativeValue* NapiFormHost::DeleteForm(NativeEngine *engine, NativeCallbackInfo *info)
+napi_value NapiFormHost::DeleteForm(napi_env env, napi_callback_info info)
 {
-    NapiFormHost *me = OHOS::AbilityRuntime::CheckParamsAndGetThis<NapiFormHost>(engine, info);
-    return (me != nullptr) ? me->OnDeleteForm(*engine, *info) : nullptr;
+    GET_CB_INFO_AND_CALL(env, info, NapiFormHost, OnDeleteForm);
 }
 
-NativeValue* NapiFormHost::ReleaseForm(NativeEngine *engine, NativeCallbackInfo *info)
+napi_value NapiFormHost::ReleaseForm(napi_env env, napi_callback_info info)
 {
-    NapiFormHost *me = OHOS::AbilityRuntime::CheckParamsAndGetThis<NapiFormHost>(engine, info);
-    return (me != nullptr) ? me->OnReleaseForm(*engine, *info) : nullptr;
+    GET_CB_INFO_AND_CALL(env, info, NapiFormHost, OnReleaseForm);
 }
 
-NativeValue* NapiFormHost::RequestForm(NativeEngine *engine, NativeCallbackInfo *info)
+napi_value NapiFormHost::RequestForm(napi_env env, napi_callback_info info)
 {
-    NapiFormHost *me = OHOS::AbilityRuntime::CheckParamsAndGetThis<NapiFormHost>(engine, info);
-    return (me != nullptr) ? me->OnRequestForm(*engine, *info) : nullptr;
+    GET_CB_INFO_AND_CALL(env, info, NapiFormHost, OnRequestForm);
 }
 
-NativeValue* NapiFormHost::CastTempForm(NativeEngine *engine, NativeCallbackInfo *info)
+napi_value NapiFormHost::CastTempForm(napi_env env, napi_callback_info info)
 {
-    NapiFormHost *me = OHOS::AbilityRuntime::CheckParamsAndGetThis<NapiFormHost>(engine, info);
-    return (me != nullptr) ? me->OnCastTempForm(*engine, *info) : nullptr;
+    GET_CB_INFO_AND_CALL(env, info, NapiFormHost, OnCastTempForm);
 }
 
-NativeValue* NapiFormHost::EnableFormsUpdate(NativeEngine *engine, NativeCallbackInfo *info)
+napi_value NapiFormHost::EnableFormsUpdate(napi_env env, napi_callback_info info)
 {
-    NapiFormHost *me = OHOS::AbilityRuntime::CheckParamsAndGetThis<NapiFormHost>(engine, info);
-    return (me != nullptr) ? me->OnEnableFormsUpdate(*engine, *info) : nullptr;
+    GET_CB_INFO_AND_CALL(env, info, NapiFormHost, OnEnableFormsUpdate);
 }
 
-NativeValue* NapiFormHost::DeleteInvalidForms(NativeEngine *engine, NativeCallbackInfo *info)
+napi_value NapiFormHost::DeleteInvalidForms(napi_env env, napi_callback_info info)
 {
-    NapiFormHost *me = OHOS::AbilityRuntime::CheckParamsAndGetThis<NapiFormHost>(engine, info);
-    return (me != nullptr) ? me->OnDeleteInvalidForms(*engine, *info) : nullptr;
+    GET_CB_INFO_AND_CALL(env, info, NapiFormHost, OnDeleteInvalidForms);
 }
 
-NativeValue* NapiFormHost::NotifyVisibleForms(NativeEngine *engine, NativeCallbackInfo *info)
+napi_value NapiFormHost::NotifyVisibleForms(napi_env env, napi_callback_info info)
 {
-    NapiFormHost *me = OHOS::AbilityRuntime::CheckParamsAndGetThis<NapiFormHost>(engine, info);
-    return (me != nullptr) ? me->OnNotifyVisibleForms(*engine, *info) : nullptr;
+    GET_CB_INFO_AND_CALL(env, info, NapiFormHost, OnNotifyVisibleForms);
 }
 
-NativeValue* NapiFormHost::NotifyInVisibleForms(NativeEngine *engine, NativeCallbackInfo *info)
+napi_value NapiFormHost::NotifyInVisibleForms(napi_env env, napi_callback_info info)
 {
-    NapiFormHost *me = OHOS::AbilityRuntime::CheckParamsAndGetThis<NapiFormHost>(engine, info);
-    return (me != nullptr) ? me->OnNotifyInVisibleForms(*engine, *info) : nullptr;
+    GET_CB_INFO_AND_CALL(env, info, NapiFormHost, OnNotifyInVisibleForms);
 }
 
-NativeValue* NapiFormHost::OnShareForm(NativeEngine &engine, NativeCallbackInfo &info)
+napi_value NapiFormHost::OnShareForm(napi_env env, size_t argc, napi_value* argv)
 {
     HILOG_DEBUG("%{public}s is called", __FUNCTION__);
     int32_t errCode = ERR_OK;
-    if (info.argc > ARGS_SIZE_THREE || info.argc < ARGS_SIZE_TWO) {
+    if (argc > ARGS_SIZE_THREE || argc < ARGS_SIZE_TWO) {
         HILOG_ERROR("wrong number of arguments.");
         errCode = ERR_ADD_INVALID_PARAM;
     }
 
     std::string strFormId =
-        GetStringFromNAPI(reinterpret_cast<napi_env>(&engine), reinterpret_cast<napi_value>(info.argv[0]));
+        GetStringFromNAPI(env, argv[0]);
     std::string remoteDeviceId =
-        GetStringFromNAPI(reinterpret_cast<napi_env>(&engine), reinterpret_cast<napi_value>(info.argv[1]));
+        GetStringFromNAPI(env, argv[1]);
     // The promise form has only two parameters
-    decltype(info.argc) unwrapArgc = 2;
+    decltype(argc) unwrapArgc = 2;
 
     int64_t formId = 0;
     if (!ConvertStringToInt64(strFormId, formId)) {
@@ -1068,48 +1055,44 @@ NativeValue* NapiFormHost::OnShareForm(NativeEngine &engine, NativeCallbackInfo 
         errCode = ERR_COMMON;
     }
 
-    NativeValue *lastParam = (info.argc <= unwrapArgc) ? nullptr : info.argv[unwrapArgc];
-    NativeValue *result = nullptr;
+    napi_value lastParam = (argc <= unwrapArgc) ? nullptr : argv[unwrapArgc];
+    napi_value result = nullptr;
 
-    std::unique_ptr<AbilityRuntime::AsyncTask> uasyncTask =
-        AbilityRuntime::CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, nullptr, &result);
-    std::shared_ptr<AbilityRuntime::AsyncTask> asyncTask = std::move(uasyncTask);
+    std::unique_ptr<AbilityRuntime::NapiAsyncTask> uasyncTask =
+        AbilityRuntime::CreateAsyncTaskWithLastParam(env, lastParam, nullptr, nullptr, &result);
+    std::shared_ptr<AbilityRuntime::NapiAsyncTask> asyncTask = std::move(uasyncTask);
 
-    ShareFormTask task = [&engine, asyncTask](int32_t code) {
+    ShareFormTask task = [env, asyncTask](int32_t code) {
         HILOG_DEBUG("task complete code: %{public}d", code);
         if (code == ERR_OK) {
-            asyncTask->Resolve(engine, engine.CreateUndefined());
+            asyncTask->Resolve(env, CreateJsUndefined(env));
         } else {
             auto retCode = QueryRetCode(code);
             auto retMsg = QueryRetMsg(retCode);
-            asyncTask->Reject(engine, AbilityRuntime::CreateJsError(engine, retCode, retMsg));
+            asyncTask->Reject(env, AbilityRuntime::CreateJsError(env, retCode, retMsg));
         }
     };
 
     if (errCode != ERR_OK) {
-        asyncTask->Reject(engine, AbilityRuntime::CreateJsError(engine, errCode, "Invalidate params."));
+        asyncTask->Reject(env, AbilityRuntime::CreateJsError(env, errCode, "Invalidate params."));
     } else {
-        InnerShareForm(engine, asyncTask, std::move(task), formId, remoteDeviceId);
+        InnerShareForm(env, asyncTask, std::move(task), formId, remoteDeviceId);
     }
 
     return result;
 }
 
-NativeValue* NapiFormHost::OnDisableFormsUpdate(NativeEngine &engine, NativeCallbackInfo &info)
+napi_value NapiFormHost::OnDisableFormsUpdate(napi_env env, size_t argc, napi_value* argv)
 {
     HILOG_DEBUG("%{public}s is called", __FUNCTION__);
     int32_t errCode = ERR_OK;
-    if (info.argc > ARGS_TWO || info.argc < ARGS_ONE) {
+    if (argc > ARGS_TWO || argc < ARGS_ONE) {
         HILOG_ERROR("wrong number of arguments!");
-        return engine.CreateUndefined();
+        return CreateJsUndefined(env);
     }
 
-    if (!(info.argv[PARAM0]->IsArray())) {
-        HILOG_ERROR("input params is not array!");
-        errCode = ERR_APPEXECFWK_FORM_FORM_ARRAY_ERR;
-    }
     std::vector<string> strFormIdList;
-    if (!GetStringsValue(engine, info.argv[PARAM0], strFormIdList)) {
+    if (!GetStringsValue(env, argv[PARAM0], strFormIdList)) {
         HILOG_ERROR("conversion string failed!");
         errCode = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR;
     }
@@ -1128,106 +1111,106 @@ NativeValue* NapiFormHost::OnDisableFormsUpdate(NativeEngine &engine, NativeCall
         }
     }
 
-    auto complete = [formIds = iFormIds, errCode](NativeEngine &engine, AsyncTask &task, int32_t status) {
+    auto complete = [formIds = iFormIds, errCode](napi_env env, NapiAsyncTask &task, int32_t status) {
         if (errCode != ERR_OK) {
             auto code = QueryRetCode(errCode);
-            task.Reject(engine, CreateJsError(engine, code, QueryRetMsg(code)));
+            task.Reject(env, CreateJsError(env, code, QueryRetMsg(code)));
             return;
         }
         auto ret = FormMgr::GetInstance().LifecycleUpdate(formIds, FormHostClient::GetInstance(), false);
         if (ret != ERR_OK) {
             auto retCode = QueryRetCode(ret);
-            task.Reject(engine, CreateJsError(engine, retCode, QueryRetMsg(retCode)));
+            task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));
             return;
         }
-        task.Resolve(engine, CreateJsValue(engine, ret));
+        task.Resolve(env, CreateJsValue(env, ret));
     };
 
-    auto callback = (info.argc == ARGS_ONE) ? nullptr : info.argv[PARAM1];
-    NativeValue *result = nullptr;
-    AsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnDisableFormsUpdate",
-        engine, CreateAsyncTaskWithLastParam(engine, callback, nullptr, std::move(complete), &result));
+    auto callback = (argc == ARGS_ONE) ? nullptr : argv[PARAM1];
+    napi_value result = nullptr;
+    NapiAsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnDisableFormsUpdate",
+        env, CreateAsyncTaskWithLastParam(env, callback, nullptr, std::move(complete), &result));
     return result;
 }
 
-NativeValue* NapiFormHost::OnIsSystemReady(NativeEngine &engine, const NativeCallbackInfo &info)
+napi_value NapiFormHost::OnIsSystemReady(napi_env env, size_t argc, napi_value* argv)
 {
     HILOG_DEBUG("%{public}s is called", __FUNCTION__);
-    if (info.argc > ARGS_ONE || info.argc < ARGS_ZERO) {
+    if (argc > ARGS_ONE || argc < ARGS_ZERO) {
         HILOG_ERROR("wrong number of arguments.");
-        return engine.CreateUndefined();
+        return CreateJsUndefined(env);
     }
 
-    auto complete = [](NativeEngine &engine, AsyncTask &task, int32_t status) {
+    auto complete = [](napi_env env, NapiAsyncTask &task, int32_t status) {
         // Use original logic.
         // Use the error code to return whether the function executed successfully.
         auto ret = FormMgr::GetInstance().CheckFMSReady() ? 0 : 1;
         if (ret == ERR_OK) {
-            task.Resolve(engine, engine.CreateUndefined());
+            task.Resolve(env, CreateJsUndefined(env));
         } else {
             auto retCode = QueryRetCode(ret);
-            task.Reject(engine, CreateJsError(engine, retCode, QueryRetMsg(retCode)));
+            task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));
         }
     };
 
-    auto callback = (info.argc == ARGS_ZERO) ? nullptr : info.argv[PARAM0];
-    NativeValue *result = nullptr;
-    AsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnIsSystemReady",
-        engine, CreateAsyncTaskWithLastParam(engine, callback, nullptr, std::move(complete), &result));
+    auto callback = (argc == ARGS_ZERO) ? nullptr : argv[PARAM0];
+    napi_value result = nullptr;
+    NapiAsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnIsSystemReady",
+        env, CreateAsyncTaskWithLastParam(env, callback, nullptr, std::move(complete), &result));
     return result;
 }
 
-NativeValue* NapiFormHost::OnGetAllFormsInfo(NativeEngine &engine, const NativeCallbackInfo &info)
+napi_value NapiFormHost::OnGetAllFormsInfo(napi_env env, size_t argc, napi_value* argv)
 {
     HILOG_DEBUG("%{public}s is called", __FUNCTION__);
-    if (info.argc > ARGS_ONE || info.argc < ARGS_ZERO) {
+    if (argc > ARGS_ONE || argc < ARGS_ZERO) {
         HILOG_ERROR("wrong number of arguments!");
-        return engine.CreateUndefined();
+        return CreateJsUndefined(env);
     }
 
-    auto complete = [](NativeEngine &engine, AsyncTask &task, int32_t status) {
+    auto complete = [](napi_env env, NapiAsyncTask &task, int32_t status) {
         std::vector<FormInfo> formInfos;
         auto ret = FormMgr::GetInstance().GetAllFormsInfo(formInfos);
         if (ret != ERR_OK) {
             auto retCode = QueryRetCode(ret);
-            task.Reject(engine, CreateJsError(engine, retCode, QueryRetMsg(retCode)));
+            task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));
             return;
         }
-        task.Resolve(engine, CreateFormInfos(engine, formInfos));
+        task.Resolve(env, CreateFormInfos(env, formInfos));
     };
 
-    auto callback = (info.argc == ARGS_ZERO) ? nullptr : info.argv[PARAM0];
-    NativeValue *result = nullptr;
-    AsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnGetAllFormsInfo",
-        engine, CreateAsyncTaskWithLastParam(engine, callback, nullptr, std::move(complete), &result));
+    auto callback = (argc == ARGS_ZERO) ? nullptr : argv[PARAM0];
+    napi_value result = nullptr;
+    NapiAsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnGetAllFormsInfo",
+        env, CreateAsyncTaskWithLastParam(env, callback, nullptr, std::move(complete), &result));
     return result;
 }
 
-NativeValue* NapiFormHost::OnGetFormsInfo(NativeEngine &engine, NativeCallbackInfo &info)
+napi_value NapiFormHost::OnGetFormsInfo(napi_env env, size_t argc, napi_value* argv)
 {
     HILOG_DEBUG("%{public}s is called", __FUNCTION__);
     int32_t errCode = ERR_OK;
-    if (info.argc > ARGS_THREE || info.argc < ARGS_ONE) {
+    if (argc > ARGS_THREE || argc < ARGS_ONE) {
         HILOG_ERROR("wrong number of arguments!");
-        return engine.CreateUndefined();
+        return CreateJsUndefined(env);
     }
 
     std::string bName("");
-    if (!ConvertFromJsValue(engine, info.argv[PARAM0], bName)) {
+    if (!ConvertFromJsValue(env, argv[PARAM0], bName)) {
         HILOG_ERROR("conversion failed!");
         errCode = ERR_APPEXECFWK_FORM_INVALID_BUNDLENAME;
     }
 
     std::string mName("");
     bool bParam = false;
-    bool flagCall = UnwrapGetFormsInfoParams(engine, info, mName, bParam);
-    auto complete = [bName, mName, bParam, errCode](NativeEngine &engine, AsyncTask &task, int32_t status) {
+    bool flagCall = UnwrapGetFormsInfoParams(env, argc, argv, mName, bParam);
+    auto complete = [bName, mName, bParam, errCode](napi_env env, NapiAsyncTask &task, int32_t status) {
         std::string bundleName(bName);
         std::string moduleName(mName);
         std::vector<FormInfo> formInfos;
         if (errCode != ERR_OK) {
             auto retCode = QueryRetCode(errCode);
-            task.Reject(engine, CreateJsError(engine, retCode, QueryRetMsg(retCode)));
+            task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));
             return;
         }
         int ret = ERR_OK;
@@ -1239,95 +1222,96 @@ NativeValue* NapiFormHost::OnGetFormsInfo(NativeEngine &engine, NativeCallbackIn
 
         if (ret != ERR_OK) {
             auto retCode = QueryRetCode(ret);
-            task.Reject(engine, CreateJsError(engine, retCode, QueryRetMsg(retCode)));
+            task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));
             return;
         }
-        task.Resolve(engine, CreateFormInfos(engine, formInfos));
+        task.Resolve(env, CreateFormInfos(env, formInfos));
     };
 
-    NativeValue *result = nullptr;
-    auto callback = flagCall ? ((info.argc == ARGS_TWO) ? info.argv[PARAM1] : info.argv[PARAM2]) : nullptr;
-    AsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnGetFormsInfo",
-        engine, CreateAsyncTaskWithLastParam(engine, callback, nullptr, std::move(complete), &result));
+    napi_value result = nullptr;
+    auto callback = flagCall ? ((argc == ARGS_TWO) ? argv[PARAM1] : argv[PARAM2]) : nullptr;
+    NapiAsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnGetFormsInfo",
+        env, CreateAsyncTaskWithLastParam(env, callback, nullptr, std::move(complete), &result));
     return result;
 }
 
-NativeValue* NapiFormHost::OnDeleteForm(NativeEngine &engine, NativeCallbackInfo &info)
+napi_value NapiFormHost::OnDeleteForm(napi_env env, size_t argc, napi_value* argv)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
 
     int32_t errCode = ERR_OK;
     int64_t formId = 0;
-    if (info.argc > ARGS_TWO || info.argc < ARGS_ONE) {
+    if (argc > ARGS_TWO || argc < ARGS_ONE) {
         HILOG_ERROR("OnDeleteForm wrong number of arguments.");
-        return engine.CreateUndefined();
+        return CreateJsUndefined(env);
     }
-    if (info.argv[PARAM0]->TypeOf() != NATIVE_STRING) {
+    if (!IsTypeForNapiValue(env, argv[PARAM0], napi_string)) {
         HILOG_ERROR("input arguments is not string!");
         errCode = ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     } else {
         std::string strFormId;
-        if (!ConvertFromJsValue(engine, info.argv[PARAM0], strFormId)) {
+        if (!ConvertFromJsValue(env, argv[PARAM0], strFormId)) {
             HILOG_ERROR("conversion failed!");
-            return engine.CreateUndefined();
+            return CreateJsUndefined(env);
         }
         if (!ConvertStringToInt64(strFormId, formId)) {
             HILOG_ERROR("OnDeleteForm convert string formId to int64 failed.");
             errCode = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR;
         }
     }
-    AsyncTask::CompleteCallback complete = [formId, errCode](NativeEngine &engine, AsyncTask &task, int32_t status) {
+    NapiAsyncTask::CompleteCallback complete = [formId, errCode](napi_env env, NapiAsyncTask &task, int32_t status) {
         if (errCode != ERR_OK) {
             auto retCode = QueryRetCode(errCode);
-            task.Reject(engine, CreateJsError(engine, retCode, QueryRetMsg(retCode)));
+            task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));
             return;
         }
         auto ret = FormMgr::GetInstance().DeleteForm(formId, FormHostClient::GetInstance());
         if (ret == ERR_OK) {
             auto result = QueryRetCode(ret);
-            task.Resolve(engine, CreateJsValue(engine, result));
+            task.Resolve(env, CreateJsValue(env, result));
         } else {
             auto retCode = QueryRetCode(ret);
-            task.Reject(engine, CreateJsError(engine, retCode, QueryRetMsg(retCode)));
+            task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));
         }
     };
 
-    NativeValue* lastParam = (info.argc == ARGS_ONE) ? nullptr : info.argv[PARAM1];
-    NativeValue* result = nullptr;
-    AsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnDeleteForm",
-        engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
+    napi_value lastParam = (argc == ARGS_ONE) ? nullptr : argv[PARAM1];
+    napi_value result = nullptr;
+    NapiAsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnDeleteForm",
+        env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
     return result;
 }
 
-NativeValue* NapiFormHost::OnReleaseForm(NativeEngine &engine, NativeCallbackInfo &info)
+napi_value NapiFormHost::OnReleaseForm(napi_env env,
+    size_t argc, napi_value* argv)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
 
     int32_t errCode = ERR_OK;
     int64_t formId = 0;
     bool isReleaseCache = false;
-    if (info.argc > ARGS_THREE || info.argc < ARGS_ONE) {
+    if (argc > ARGS_THREE || argc < ARGS_ONE) {
         HILOG_ERROR("OnReleaseForm wrong number of arguments.");
-        return engine.CreateUndefined();
+        return CreateJsUndefined(env);
     }
-    if (info.argv[PARAM0]->TypeOf() != NATIVE_STRING) {
+    if (!IsTypeForNapiValue(env, argv[PARAM0], napi_string)) {
         HILOG_ERROR("input params is not string!");
         errCode = ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     } else {
         std::string strFormId;
-        if (!ConvertFromJsValue(engine, info.argv[PARAM0], strFormId)) {
+        if (!ConvertFromJsValue(env, argv[PARAM0], strFormId)) {
             HILOG_ERROR("conversion error!");
-            return engine.CreateUndefined();
+            return CreateJsUndefined(env);
         }
         if (!ConvertStringToInt64(strFormId, formId)) {
             HILOG_ERROR("OnReleaseForm convert string formId to int64 failed.");
             errCode = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR;
-        } else if ((info.argc == ARGS_TWO || info.argc == ARGS_THREE) &&
-            info.argv[PARAM1]->TypeOf() != NATIVE_FUNCTION) {
-            if (info.argv[PARAM1]->TypeOf() == NATIVE_BOOLEAN) {
-                if (!ConvertFromJsValue(engine, info.argv[PARAM1], isReleaseCache)) {
+        } else if ((argc == ARGS_TWO || argc == ARGS_THREE) &&
+            !IsTypeForNapiValue(env, argv[PARAM1], napi_function)) {
+            if (IsTypeForNapiValue(env, argv[PARAM1], napi_boolean)) {
+                if (!ConvertFromJsValue(env, argv[PARAM1], isReleaseCache)) {
                     HILOG_ERROR("conversion bool failed!");
-                    return engine.CreateUndefined();
+                    return CreateJsUndefined(env);
                 }
             } else {
                 HILOG_ERROR("promise second param type is illegal");
@@ -1336,196 +1320,186 @@ NativeValue* NapiFormHost::OnReleaseForm(NativeEngine &engine, NativeCallbackInf
         }
     }
 
-    AsyncTask::CompleteCallback complete = [formId, errCode, isReleaseCache]
-        (NativeEngine &engine, AsyncTask &task, int32_t status) {
+    NapiAsyncTask::CompleteCallback complete = [formId, errCode, isReleaseCache]
+        (napi_env env, NapiAsyncTask &task, int32_t status) {
             auto ret = ERR_COMMON;
             if (errCode != ERR_OK) {
                 auto retCode = QueryRetCode(errCode);
-                task.Reject(engine, CreateJsError(engine, retCode, QueryRetMsg(retCode)));
+                task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));
                 return ;
             }
             ret = FormMgr::GetInstance().ReleaseForm(formId, FormHostClient::GetInstance(), isReleaseCache);
             if (ret == ERR_OK) {
                 auto result = QueryRetCode(ret);
-                task.Resolve(engine, CreateJsValue(engine, result));
+                task.Resolve(env, CreateJsValue(env, result));
             } else {
                 auto retCode = QueryRetCode(ret);
-                task.Reject(engine, CreateJsError(engine, retCode, QueryRetMsg(retCode)));
+                task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));
                 return;
             }
     };
 
-    NativeValue* lastParam = (info.argc == ARGS_ONE) ? nullptr :
-        (info.argc == ARGS_TWO && info.argv[PARAM1]->TypeOf() != NATIVE_FUNCTION) ? nullptr :
-        (info.argc == ARGS_THREE) ? info.argv[PARAM2] : info.argv[PARAM1];
-    NativeValue* result = nullptr;
-    AsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnReleaseForm",
-        engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
+    napi_value lastParam = (argc == ARGS_ONE) ? nullptr :
+        (argc == ARGS_TWO && !IsTypeForNapiValue(env, argv[PARAM1], napi_function)) ? nullptr :
+        (argc == ARGS_THREE) ? argv[PARAM2] : argv[PARAM1];
+    napi_value result = nullptr;
+    NapiAsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnReleaseForm",
+        env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
     return result;
 }
 
-NativeValue* NapiFormHost::OnRequestForm(NativeEngine &engine, NativeCallbackInfo &info)
+napi_value NapiFormHost::OnRequestForm(napi_env env, size_t argc, napi_value* argv)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
 
     int32_t errCode = ERR_OK;
     int64_t formId = 0;
-    if (info.argc > ARGS_TWO || info.argc < ARGS_ONE) {
+    if (argc > ARGS_TWO || argc < ARGS_ONE) {
         HILOG_ERROR("%{public}s, wrong number of arguments.", __func__);
-        return engine.CreateUndefined();
+        return CreateJsUndefined(env);
     }
-    if (info.argv[PARAM0]->TypeOf() != NATIVE_STRING) {
+    if (!IsTypeForNapiValue(env, argv[PARAM0], napi_string)) {
         HILOG_ERROR("input params is not string!");
         errCode = ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     } else {
         std::string strFormId;
-        if (!ConvertFromJsValue(engine, info.argv[PARAM0], strFormId)) {
+        if (!ConvertFromJsValue(env, argv[PARAM0], strFormId)) {
             HILOG_ERROR("transform failed!");
-            return engine.CreateUndefined();
+            return CreateJsUndefined(env);
         }
         if (!ConvertStringToInt64(strFormId, formId)) {
             HILOG_ERROR("%{public}s, convert string formId to int64 failed.", __func__);
             errCode = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR;
         }
     }
-    AsyncTask::CompleteCallback complete = [formId, errCode](NativeEngine &engine, AsyncTask &task, int32_t status) {
+    NapiAsyncTask::CompleteCallback complete = [formId, errCode](napi_env env, NapiAsyncTask &task, int32_t status) {
         if (errCode != ERR_OK) {
             auto retCode = QueryRetCode(errCode);
-            task.Reject(engine, CreateJsError(engine, retCode, QueryRetMsg(retCode)));
+            task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));
             return;
         }
         Want want;
         auto ret = FormMgr::GetInstance().RequestForm(formId, FormHostClient::GetInstance(), want);
         if (ret == ERR_OK) {
             auto result = QueryRetCode(ret);
-            task.Resolve(engine, CreateJsValue(engine, result));
+            task.Resolve(env, CreateJsValue(env, result));
         } else {
             auto retCode = QueryRetCode(ret);
-            task.Reject(engine, CreateJsError(engine, retCode, QueryRetMsg(retCode)));
+            task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));
         }
     };
 
-    NativeValue* lastParam = (info.argc == ARGS_ONE) ? nullptr : info.argv[PARAM1];
-    NativeValue* result = nullptr;
-    AsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnRequestForm",
-        engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
+    napi_value lastParam = (argc == ARGS_ONE) ? nullptr : argv[PARAM1];
+    napi_value result = nullptr;
+    NapiAsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnRequestForm",
+        env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
     return result;
 }
 
-NativeValue* NapiFormHost::OnCastTempForm(NativeEngine &engine, NativeCallbackInfo &info)
+napi_value NapiFormHost::OnCastTempForm(napi_env env, size_t argc, napi_value* argv)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
 
     int32_t errCode = ERR_OK;
     int64_t formId = 0;
-    if (info.argc > ARGS_TWO || info.argc < ARGS_ONE) {
+    if (argc > ARGS_TWO || argc < ARGS_ONE) {
         HILOG_ERROR("%{public}s, wrong number of arguments.", __func__);
-        return engine.CreateUndefined();
+        return CreateJsUndefined(env);
     }
-    if (info.argv[PARAM0]->TypeOf() != NATIVE_STRING) {
+    if (!IsTypeForNapiValue(env, argv[PARAM0], napi_string)) {
         HILOG_ERROR("input arguments is not string!");
         errCode = ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     } else {
         std::string strFormId;
-        if (!ConvertFromJsValue(engine, info.argv[PARAM0], strFormId)) {
+        if (!ConvertFromJsValue(env, argv[PARAM0], strFormId)) {
             HILOG_ERROR("transform failed!");
-            return engine.CreateUndefined();
+            return CreateJsUndefined(env);
         }
         if (!ConvertStringToInt64(strFormId, formId)) {
             HILOG_ERROR("%{public}s, convert string formId to int64 failed.", __func__);
             errCode = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR;
         }
     }
-    AsyncTask::CompleteCallback complete = [formId, errCode](NativeEngine &engine, AsyncTask &task, int32_t status) {
+    NapiAsyncTask::CompleteCallback complete = [formId, errCode](napi_env env, NapiAsyncTask &task, int32_t status) {
         if (errCode != ERR_OK) {
             auto retCode = QueryRetCode(errCode);
-            task.Reject(engine, CreateJsError(engine, retCode, QueryRetMsg(retCode)));
+            task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));
             return;
         }
         auto ret = FormMgr::GetInstance().CastTempForm(formId, FormHostClient::GetInstance());
         if (ret == ERR_OK) {
             auto result = QueryRetCode(ret);
-            task.Resolve(engine, CreateJsValue(engine, result));
+            task.Resolve(env, CreateJsValue(env, result));
         } else {
             auto retCode = QueryRetCode(ret);
-            task.Reject(engine, CreateJsError(engine, retCode, QueryRetMsg(retCode)));
+            task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));
         }
     };
 
-    NativeValue* lastParam = (info.argc == ARGS_ONE) ? nullptr : info.argv[PARAM1];
-    NativeValue* result = nullptr;
-    AsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnCastTempForm",
-        engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
+    napi_value lastParam = (argc == ARGS_ONE) ? nullptr : argv[PARAM1];
+    napi_value result = nullptr;
+    NapiAsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnCastTempForm",
+        env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
     return result;
 }
 
-NativeValue* NapiFormHost::OnEnableFormsUpdate(NativeEngine &engine, NativeCallbackInfo &info)
+napi_value NapiFormHost::OnEnableFormsUpdate(napi_env env, size_t argc, napi_value* argv)
 {
     HILOG_DEBUG("%{public}s is called", __FUNCTION__);
 
     int32_t errCode = ERR_OK;
     std::vector<int64_t> iFormIds;
-    if (info.argc > ARGS_TWO|| info.argc < ARGS_ONE) {
+    if (argc > ARGS_TWO|| argc < ARGS_ONE) {
         HILOG_ERROR("wrong number of arguments!");
-        return engine.CreateUndefined();
+        return CreateJsUndefined(env);
     }
-    if (!(info.argv[PARAM0]->IsArray())) {
-        HILOG_ERROR("input params0 is not array!");
-        errCode = ERR_APPEXECFWK_FORM_FORM_ARRAY_ERR;
-    } else {
-        std::vector<string> strFormIdList;
-        if (!GetStringsValue(engine, info.argv[PARAM0], strFormIdList)) {
-            HILOG_ERROR("conversion string failed!");
+    std::vector<string> strFormIdList;
+    if (!GetStringsValue(env, argv[PARAM0], strFormIdList)) {
+        HILOG_ERROR("conversion string failed!");
+        errCode = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR;
+    }
+    for (size_t i = 0; i < strFormIdList.size(); i++) {
+        int64_t formIdValue;
+        if (!ConvertStringToInt64(strFormIdList[i], formIdValue)) {
+            HILOG_ERROR("conversion int failed!");
             errCode = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR;
-        }
-        for (size_t i = 0; i < strFormIdList.size(); i++) {
-            int64_t formIdValue;
-            if (!ConvertStringToInt64(strFormIdList[i], formIdValue)) {
-                HILOG_ERROR("conversion int failed!");
-                errCode = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR;
-            } else {
-                iFormIds.push_back(formIdValue);
-            }
+        } else {
+            iFormIds.push_back(formIdValue);
         }
     }
-    auto complete = [iFormIds, errCode](NativeEngine &engine, AsyncTask &task, int32_t status) {
+    auto complete = [iFormIds, errCode](napi_env env, NapiAsyncTask &task, int32_t status) {
         if (errCode != ERR_OK) {
             auto code = QueryRetCode(errCode);
-            task.Reject(engine, CreateJsError(engine, code, QueryRetMsg(code)));
+            task.Reject(env, CreateJsError(env, code, QueryRetMsg(code)));
             return;
         }
         auto ret = FormMgr::GetInstance().LifecycleUpdate(iFormIds, FormHostClient::GetInstance(), true);
         if (ret == ERR_OK) {
             auto result = QueryRetCode(ret);
-            task.Resolve(engine, CreateJsValue(engine, result));
+            task.Resolve(env, CreateJsValue(env, result));
         } else {
             auto retCode = QueryRetCode(ret);
-            task.Reject(engine, CreateJsError(engine, retCode, QueryRetMsg(retCode)));
+            task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));
         }
     };
 
-    auto callback = (info.argc == ARGS_ONE) ? nullptr : info.argv[PARAM1];
-    NativeValue *result = nullptr;
-    AsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnEnableFormsUpdate",
-        engine, CreateAsyncTaskWithLastParam(engine, callback, nullptr, std::move(complete), &result));
+    auto callback = (argc == ARGS_ONE) ? nullptr : argv[PARAM1];
+    napi_value result = nullptr;
+    NapiAsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnEnableFormsUpdate",
+        env, CreateAsyncTaskWithLastParam(env, callback, nullptr, std::move(complete), &result));
     return result;
 }
 
-bool NapiFormHost::GetStringsValue(NativeEngine &engine, NativeValue *object, std::vector<std::string> &strList)
+bool NapiFormHost::GetStringsValue(napi_env env, napi_value array, std::vector<std::string> &strList)
 {
-    auto array = ConvertNativeValueTo<NativeArray>(object);
-    if (array == nullptr) {
-        HILOG_ERROR("input params error");
-        return false;
-    }
+    uint32_t nativeArrayLen = 0;
+    napi_get_array_length(env, array, &nativeArrayLen);
+    napi_value element = nullptr;
 
-    for (uint32_t i = 0; i < array->GetLength(); i++) {
+    for (uint32_t i = 0; i < nativeArrayLen; i++) {
         std::string itemStr("");
-        if ((array->GetElement(i))->TypeOf() != NATIVE_STRING) {
-            HILOG_ERROR("GetElement is not string");
-            return false;
-        }
-        if (!ConvertFromJsValue(engine, array->GetElement(i), itemStr)) {
+        napi_get_element(env, array, i, &element);
+        if (!ConvertFromJsValue(env, element, itemStr)) {
             HILOG_ERROR("GetElement from to array [%{public}u] error", i);
             return false;
         }
@@ -1536,22 +1510,22 @@ bool NapiFormHost::GetStringsValue(NativeEngine &engine, NativeValue *object, st
 }
 
 bool NapiFormHost::UnwrapGetFormsInfoParams(
-    NativeEngine &engine, NativeCallbackInfo &info, std::string &moduleName, bool &bParam)
+    napi_env env, size_t argc, napi_value* argv, std::string &moduleName, bool &bParam)
 {
     bool flagCall = true;
-    if (info.argc == ARGS_ONE) {
+    if (argc == ARGS_ONE) {
         flagCall = false;
         bParam = false;
-    } else if (info.argc == ARGS_TWO && info.argv[PARAM1]->TypeOf() != NATIVE_FUNCTION) {
-        if (!ConvertFromJsValue(engine, info.argv[PARAM1], moduleName)) {
+    } else if (argc == ARGS_TWO && !IsTypeForNapiValue(env, argv[PARAM1], napi_function)) {
+        if (!ConvertFromJsValue(env, argv[PARAM1], moduleName)) {
             HILOG_WARN("input params string error");
         }
         flagCall = false;
         bParam = true;
-    } else if (info.argc == ARGS_TWO && info.argv[PARAM1]->TypeOf() == NATIVE_FUNCTION) {
+    } else if (argc == ARGS_TWO && IsTypeForNapiValue(env, argv[PARAM1], napi_function)) {
         bParam = false;
-    } else if (info.argc == ARGS_THREE) {
-        if (!ConvertFromJsValue(engine, info.argv[PARAM1], moduleName)) {
+    } else if (argc == ARGS_THREE) {
+        if (!ConvertFromJsValue(env, argv[PARAM1], moduleName)) {
             HILOG_WARN("input params string error");
         }
         bParam = true;
@@ -1561,8 +1535,8 @@ bool NapiFormHost::UnwrapGetFormsInfoParams(
 }
 
 void NapiFormHost::InnerShareForm(
-    NativeEngine &engine,
-    const std::shared_ptr<AbilityRuntime::AsyncTask> &asyncTask,
+    napi_env env,
+    const std::shared_ptr<AbilityRuntime::NapiAsyncTask> &asyncTask,
     ShareFormTask &&task,
     int64_t formId,
     const std::string &remoteDeviceId)
@@ -1577,76 +1551,74 @@ void NapiFormHost::InnerShareForm(
         HILOG_INFO("%{public}s, share form failed.", __func__);
         auto retCode = QueryRetCode(ret);
         auto retMsg = QueryRetMsg(retCode);
-        asyncTask->Reject(engine, AbilityRuntime::CreateJsError(engine, retCode, retMsg));
+        asyncTask->Reject(env, AbilityRuntime::CreateJsError(env, retCode, retMsg));
         FormHostClient::GetInstance()->RemoveShareFormCallback(requestCode);
     }
 }
 
-NativeValue* NapiFormHost::NotifyFormsPrivacyProtected(NativeEngine *engine, NativeCallbackInfo *info)
+napi_value NapiFormHost::NotifyFormsPrivacyProtected(napi_env env, napi_callback_info info)
 {
-    NapiFormHost* me = OHOS::AbilityRuntime::CheckParamsAndGetThis<NapiFormHost>(engine, info);
-    return (me != nullptr) ? me->OnNotifyFormsPrivacyProtected(*engine, *info) : nullptr;
+    GET_CB_INFO_AND_CALL(env, info, NapiFormHost, OnNotifyFormsPrivacyProtected);
 }
 
-NativeValue* NapiFormHost::OnNotifyFormsPrivacyProtected(NativeEngine &engine, NativeCallbackInfo &info)
+napi_value NapiFormHost::OnNotifyFormsPrivacyProtected(napi_env env, size_t argc, napi_value* argv)
 {
     HILOG_INFO("%{public}s is called", __func__);
-    if (info.argc > ARGS_SIZE_THREE || info.argc < ARGS_SIZE_TWO) {
+    if (argc > ARGS_SIZE_THREE || argc < ARGS_SIZE_TWO) {
         HILOG_ERROR("%{public}s, wrong number of arguments.", __func__);
         return nullptr;
     }
 
     ErrCode errCode = ERR_OK;
     std::vector<int64_t> formIds {};
-    GetFormIds(reinterpret_cast<napi_env>(&engine), reinterpret_cast<napi_value>(info.argv[0]),
-        errCode, formIds);
+    GetFormIds(env, argv[0], errCode, formIds);
     if (errCode != ERR_OK) {
         HILOG_ERROR("get formIds faild, code is %{public}d", errCode);
         return nullptr;
     }
 
     // The promise form has only two parameters
-    decltype(info.argc) unwrapArgc = 2;
+    decltype(argc) unwrapArgc = 2;
     bool isProtected = false;
 
-    if (!ConvertFromJsValue(engine, info.argv[1], isProtected)) {
+    if (!ConvertFromJsValue(env, argv[1], isProtected)) {
         HILOG_ERROR("convert from Js value failed!");
         return nullptr;
     }
 
-    AsyncTask::CompleteCallback complete =
-        [formIds, isProtected, errCode](NativeEngine &engine, AsyncTask &task, int32_t status) {
+    NapiAsyncTask::CompleteCallback complete =
+        [formIds, isProtected, errCode](napi_env env, NapiAsyncTask &task, int32_t status) {
             if (errCode != ERR_OK) {
                 HILOG_ERROR("task reject, code is %{public}d", errCode);
-                task.Reject(engine, CreateJsError(engine, errCode, QueryRetMsg(errCode)));
+                task.Reject(env, CreateJsError(env, errCode, QueryRetMsg(errCode)));
                 return;
             }
 
             auto ret = FormMgr::GetInstance().NotifyFormsPrivacyProtected(formIds,
                 isProtected, FormHostClient::GetInstance());
             if (ret == ERR_OK) {
-                task.Resolve(engine, engine.CreateUndefined());
+                task.Resolve(env, CreateJsUndefined(env));
             } else {
                 HILOG_ERROR("task reject, result code is %{public}d", ret);
                 auto retCode = QueryRetCode(ret);
-                task.Reject(engine, CreateJsError(engine, retCode, QueryRetMsg(retCode)));
+                task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));
             }
         };
 
-    NativeValue *lastParam = (info.argc <= unwrapArgc) ? nullptr : info.argv[unwrapArgc];
-    NativeValue *result = nullptr;
-    AsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnNotifyFormsPrivacyProtected",
-        engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
+    napi_value lastParam = (argc <= unwrapArgc) ? nullptr : argv[unwrapArgc];
+    napi_value result = nullptr;
+    NapiAsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnNotifyFormsPrivacyProtected",
+        env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
     return result;
 }
 
-NativeValue* NapiFormHost::OnDeleteInvalidForms(NativeEngine &engine, const NativeCallbackInfo &info)
+napi_value NapiFormHost::OnDeleteInvalidForms(napi_env env, size_t argc, napi_value* argv)
 {
     HILOG_DEBUG("%{public}s is called", __FUNCTION__);
     int32_t errCode = ERR_OK;
-    if (info.argc > ARGS_TWO || info.argc < ARGS_ONE) {
+    if (argc > ARGS_TWO || argc < ARGS_ONE) {
         HILOG_ERROR("wrong number of arguments.");
-        return engine.CreateNull();
+        return CreateJsNull(env);
     }
     struct OnDeleteInvalidForms {
         int result;
@@ -1654,12 +1626,8 @@ NativeValue* NapiFormHost::OnDeleteInvalidForms(NativeEngine &engine, const Nati
         std::vector<int64_t> iFormIds;
     };
     std::shared_ptr<OnDeleteInvalidForms> onDeleteInvalidForms = std::make_shared<OnDeleteInvalidForms>();
-    if (!(info.argv[PARAM0]->IsArray())) {
-        HILOG_ERROR("input params is not array!");
-        errCode = ERR_APPEXECFWK_FORM_FORM_ARRAY_ERR;
-    }
     std::vector<string> strFormIdList;
-    if (!GetStringsValue(engine, info.argv[PARAM0], strFormIdList)) {
+    if (!GetStringsValue(env, argv[PARAM0], strFormIdList)) {
         HILOG_ERROR("conversion string failed!");
         errCode = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR;
     }
@@ -1684,48 +1652,50 @@ NativeValue* NapiFormHost::OnDeleteInvalidForms(NativeEngine &engine, const Nati
         data->result = FormMgr::GetInstance().DeleteInvalidForms(
             data->iFormIds, FormHostClient::GetInstance(), data->numFormsDeleted);
     };
-    auto complete = [data = onDeleteInvalidForms, errCode](NativeEngine &engine, AsyncTask &task, int32_t status) {
+    auto complete = [data = onDeleteInvalidForms, errCode](napi_env env, NapiAsyncTask &task, int32_t status) {
         if (errCode != ERR_OK) {
             auto retCode = QueryRetCode(errCode);
             auto retMsg = QueryRetMsg(retCode);
-            task.Reject(engine, CreateJsError(engine, retCode, retMsg));
+            task.Reject(env, CreateJsError(env, retCode, retMsg));
             return;
         }
         if (data->result == ERR_OK) {
             auto retCode = QueryRetCode(data->result);
             auto retMsg = QueryRetMsg(retCode);
-            task.ResolveWithCustomize(engine, CreateJsError(engine, retCode, retMsg),
-            CreateJsValue(engine, data->numFormsDeleted));
+            task.ResolveWithCustomize(env, CreateJsError(env, retCode, retMsg),
+            CreateJsValue(env, data->numFormsDeleted));
         } else {
             auto retCode = QueryRetCode(data->result);
             auto retMsg = QueryRetMsg(retCode);
-            task.Reject(engine, CreateJsError(engine, retCode, retMsg));
+            task.Reject(env, CreateJsError(env, retCode, retMsg));
         }
     };
 
-    auto callback = (info.argc == ARGS_ONE) ? nullptr : info.argv[PARAM1];
-    NativeValue *result = nullptr;
-    AsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnDeleteInvalidForms",
-        engine, CreateAsyncTaskWithLastParam(engine, callback, std::move(execute), std::move(complete), &result));
+    auto callback = (argc == ARGS_ONE) ? nullptr : argv[PARAM1];
+    napi_value result = nullptr;
+    NapiAsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnDeleteInvalidForms",
+        env, CreateAsyncTaskWithLastParam(env, callback, std::move(execute), std::move(complete), &result));
     return result;
 }
 
-NativeValue* NapiFormHost::OnNotifyVisibleForms(NativeEngine &engine, NativeCallbackInfo &info)
+napi_value NapiFormHost::OnNotifyVisibleForms(napi_env env, size_t argc, napi_value* argv)
 {
     HILOG_DEBUG("%{public}s is called", __FUNCTION__);
 
     int32_t errCode = ERR_OK;
     std::vector<int64_t> iFormIds;
-    if (info.argc > ARGS_TWO|| info.argc < ARGS_ONE) {
+    if (argc > ARGS_TWO || argc < ARGS_ONE) {
         HILOG_ERROR("wrong number of arguments!");
-        return engine.CreateUndefined();
+        return CreateJsUndefined(env);
     }
-    if (!(info.argv[PARAM0]->IsArray())) {
+    bool isArray = false;
+    napi_is_array(env, argv[PARAM0], &isArray);
+    if (!isArray) {
         HILOG_ERROR("input params0 is not array!");
         errCode = ERR_APPEXECFWK_FORM_FORM_ARRAY_ERR;
     } else {
         std::vector<string> strFormIdList;
-        if (!GetStringsValue(engine, info.argv[PARAM0], strFormIdList)) {
+        if (!GetStringsValue(env, argv[PARAM0], strFormIdList)) {
             HILOG_ERROR("conversion string failed!");
             errCode = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR;
         }
@@ -1739,10 +1709,10 @@ NativeValue* NapiFormHost::OnNotifyVisibleForms(NativeEngine &engine, NativeCall
             }
         }
     }
-    auto complete = [iFormIds, errCode](NativeEngine &engine, AsyncTask &task, int32_t status) {
+    auto complete = [iFormIds, errCode](napi_env env, NapiAsyncTask &task, int32_t status) {
         if (errCode != ERR_OK) {
             auto code = QueryRetCode(errCode);
-            task.Reject(engine, CreateJsError(engine, code, QueryRetMsg(code)));
+            task.Reject(env, CreateJsError(env, code, QueryRetMsg(code)));
             return;
         }
         auto ret = FormMgr::GetInstance().NotifyWhetherVisibleForms(iFormIds, FormHostClient::GetInstance(),
@@ -1750,35 +1720,37 @@ NativeValue* NapiFormHost::OnNotifyVisibleForms(NativeEngine &engine, NativeCall
         if (ret == ERR_OK) {
             auto result = QueryRetCode(ret);
             task.ResolveWithCustomize(
-                engine, CreateJsError(engine, result, QueryRetMsg(result)), engine.CreateUndefined());
+                env, CreateJsError(env, result, QueryRetMsg(result)), CreateJsUndefined(env));
         } else {
             auto retCode = QueryRetCode(ret);
-            task.Reject(engine, CreateJsError(engine, retCode, QueryRetMsg(retCode)));
+            task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));
         }
     };
-    auto callback = (info.argc == ARGS_ONE) ? nullptr : info.argv[PARAM1];
-    NativeValue *result = nullptr;
-    AsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnNotifyVisibleForms",
-        engine, CreateAsyncTaskWithLastParam(engine, callback, nullptr, std::move(complete), &result));
+    auto callback = (argc == ARGS_ONE) ? nullptr : argv[PARAM1];
+    napi_value result = nullptr;
+    NapiAsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnNotifyVisibleForms",
+        env, CreateAsyncTaskWithLastParam(env, callback, nullptr, std::move(complete), &result));
     return result;
 }
 
-NativeValue* NapiFormHost::OnNotifyInVisibleForms(NativeEngine &engine, NativeCallbackInfo &info)
+napi_value NapiFormHost::OnNotifyInVisibleForms(napi_env env, size_t argc, napi_value* argv)
 {
     HILOG_DEBUG("%{public}s is called", __FUNCTION__);
 
     int32_t errCode = ERR_OK;
     std::vector<int64_t> iFormIds;
-    if (info.argc > ARGS_TWO || info.argc < ARGS_ONE) {
+    if (argc > ARGS_TWO || argc < ARGS_ONE) {
         HILOG_ERROR("wrong number of arguments!");
-        return engine.CreateUndefined();
+        return CreateJsUndefined(env);
     }
-    if (!(info.argv[PARAM0]->IsArray())) {
+    bool isArray = false;
+    napi_is_array(env, argv[PARAM0], &isArray);
+    if (!isArray) {
         HILOG_ERROR("input params is not array!");
         errCode = ERR_APPEXECFWK_FORM_FORM_ARRAY_ERR;
     } else {
         std::vector<string> strFormIdList;
-        if (!GetStringsValue(engine, info.argv[PARAM0], strFormIdList)) {
+        if (!GetStringsValue(env, argv[PARAM0], strFormIdList)) {
             HILOG_ERROR("conversion string failed!");
             errCode = ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
         } else {
@@ -1797,10 +1769,10 @@ NativeValue* NapiFormHost::OnNotifyInVisibleForms(NativeEngine &engine, NativeCa
             }
         }
     }
-    auto complete = [formIds = iFormIds, errCode](NativeEngine &engine, AsyncTask &task, int32_t status) {
+    auto complete = [formIds = iFormIds, errCode](napi_env env, NapiAsyncTask &task, int32_t status) {
         if (errCode != ERR_OK) {
             auto code = QueryRetCode(errCode);
-            task.Reject(engine, CreateJsError(engine, code, QueryRetMsg(code)));
+            task.Reject(env, CreateJsError(env, code, QueryRetMsg(code)));
             return;
         }
         auto ret = FormMgr::GetInstance().NotifyWhetherVisibleForms(formIds,
@@ -1808,17 +1780,17 @@ NativeValue* NapiFormHost::OnNotifyInVisibleForms(NativeEngine &engine, NativeCa
         if (ret == ERR_OK) {
             auto resultCode = QueryRetCode(ret);
             task.ResolveWithCustomize(
-                engine, CreateJsError(engine, resultCode, QueryRetMsg(resultCode)), engine.CreateUndefined());
+                env, CreateJsError(env, resultCode, QueryRetMsg(resultCode)), CreateJsUndefined(env));
         } else {
             auto retCode = QueryRetCode(ret);
-            task.Reject(engine, CreateJsError(engine, retCode, QueryRetMsg(retCode)));
+            task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));
         }
     };
 
-    auto callback = (info.argc == ARGS_ONE) ? nullptr : info.argv[PARAM1];
-    NativeValue *result = nullptr;
-    AsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnNotifyInVisibleForms",
-        engine, CreateAsyncTaskWithLastParam(engine, callback, nullptr, std::move(complete), &result));
+    auto callback = (argc == ARGS_ONE) ? nullptr : argv[PARAM1];
+    napi_value result = nullptr;
+    NapiAsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnNotifyInVisibleForms",
+        env, CreateAsyncTaskWithLastParam(env, callback, nullptr, std::move(complete), &result));
     return result;
 }
 }  // namespace AbilityRuntime

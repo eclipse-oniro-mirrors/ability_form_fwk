@@ -619,112 +619,85 @@ inline FormType GetFormType(const FormInfo &formInfo)
     return formInfo.type;
 }
 
-NativeValue* CreateFormInfos(NativeEngine &engine, const std::vector<FormInfo> &formInfos)
+napi_value CreateFormInfos(napi_env env, const std::vector<FormInfo> &formInfos)
 {
-    NativeValue* arrayValue = engine.CreateArray(formInfos.size());
-    NativeArray* array = ConvertNativeValueTo<NativeArray>(arrayValue);
+    napi_value arrayValue = nullptr;
+    napi_create_array_with_length(env, formInfos.size(), &arrayValue);
     uint32_t index = 0;
     for (const auto &formInfo : formInfos) {
-        array->SetElement(index++, CreateFormInfo(engine, formInfo));
+        napi_set_element(env, arrayValue, index++, CreateFormInfo(env, formInfo));
     }
     return arrayValue;
 }
 
-NativeValue* CreateFormInfo(NativeEngine &engine, const FormInfo &formInfo)
+napi_value CreateFormInfo(napi_env env, const FormInfo &formInfo)
 {
     HILOG_DEBUG("called");
 
-    auto objContext = engine.CreateObject();
-    if (objContext == nullptr) {
-        HILOG_ERROR("CreateObject failed");
-        return engine.CreateUndefined();
-    }
+    napi_value objContext = nullptr;
+    napi_create_object(env, &objContext);
 
-    auto object = ConvertNativeValueTo<NativeObject>(objContext);
-    if (object == nullptr) {
-        HILOG_ERROR("ConvertNativeValueTo object failed");
-        return engine.CreateUndefined();
-    }
-
-    object->SetProperty("bundleName", CreateJsValue(engine, formInfo.bundleName));
-    object->SetProperty("moduleName", CreateJsValue(engine, formInfo.moduleName));
-    object->SetProperty("abilityName", CreateJsValue(engine, formInfo.abilityName));
-    object->SetProperty("name", CreateJsValue(engine, formInfo.name));
-    object->SetProperty("description", CreateJsValue(engine, formInfo.description));
-    object->SetProperty("descriptionId", CreateJsValue(engine, formInfo.descriptionId));
-    object->SetProperty("type", CreateJsValue(engine, GetFormType(formInfo)));
-    object->SetProperty("jsComponentName", CreateJsValue(engine, formInfo.jsComponentName));
-    object->SetProperty("colorMode", CreateJsValue(engine, formInfo.colorMode));
-    object->SetProperty("isDefault", engine.CreateBoolean(formInfo.defaultFlag));
-    object->SetProperty("updateEnabled", engine.CreateBoolean(formInfo.updateEnabled));
-    object->SetProperty("formVisibleNotify", engine.CreateBoolean(formInfo.formVisibleNotify));
-    object->SetProperty("formConfigAbility", CreateJsValue(engine, formInfo.formConfigAbility));
-    object->SetProperty("updateDuration", CreateJsValue(engine, formInfo.updateDuration));
-    object->SetProperty("scheduledUpdateTime", CreateJsValue(engine, formInfo.scheduledUpdateTime));
-    object->SetProperty("defaultDimension", CreateJsValue(engine, formInfo.defaultDimension));
-    object->SetProperty("relatedBundleName", CreateJsValue(engine, formInfo.relatedBundleName));
-    object->SetProperty("supportDimensions", CreateNativeArray(engine, formInfo.supportDimensions));
-    object->SetProperty("customizeData", CreateFormCustomizeDatas(engine, formInfo.customizeDatas));
-    object->SetProperty("isDynamic", engine.CreateBoolean(formInfo.isDynamic));
+    napi_set_named_property(env, objContext, "bundleName", CreateJsValue(env, formInfo.bundleName));
+    napi_set_named_property(env, objContext, "moduleName", CreateJsValue(env, formInfo.moduleName));
+    napi_set_named_property(env, objContext, "abilityName", CreateJsValue(env, formInfo.abilityName));
+    napi_set_named_property(env, objContext, "name", CreateJsValue(env, formInfo.name));
+    napi_set_named_property(env, objContext, "description", CreateJsValue(env, formInfo.description));
+    napi_set_named_property(env, objContext, "descriptionId", CreateJsValue(env, formInfo.descriptionId));
+    napi_set_named_property(env, objContext, "type", CreateJsValue(env, GetFormType(formInfo)));
+    napi_set_named_property(env, objContext, "jsComponentName", CreateJsValue(env, formInfo.jsComponentName));
+    napi_set_named_property(env, objContext, "colorMode", CreateJsValue(env, formInfo.colorMode));
+    napi_set_named_property(env, objContext, "isDefault", CreateJsValue(env, formInfo.defaultFlag));
+    napi_set_named_property(env, objContext, "updateEnabled", CreateJsValue(env, formInfo.updateEnabled));
+    napi_set_named_property(env, objContext, "formVisibleNotify", CreateJsValue(env, formInfo.formVisibleNotify));
+    napi_set_named_property(env, objContext, "formConfigAbility", CreateJsValue(env, formInfo.formConfigAbility));
+    napi_set_named_property(env, objContext, "updateDuration", CreateJsValue(env, formInfo.updateDuration));
+    napi_set_named_property(env, objContext, "scheduledUpdateTime", CreateJsValue(env, formInfo.scheduledUpdateTime));
+    napi_set_named_property(env, objContext, "defaultDimension", CreateJsValue(env, formInfo.defaultDimension));
+    napi_set_named_property(env, objContext, "relatedBundleName", CreateJsValue(env, formInfo.relatedBundleName));
+    napi_set_named_property(env, objContext, "supportDimensions", CreateNativeArray(env, formInfo.supportDimensions));
+    napi_set_named_property(env, objContext, "customizeData", CreateFormCustomizeDatas(env, formInfo.customizeDatas));
+    napi_set_named_property(env, objContext, "isDynamic", CreateJsValue(env, formInfo.isDynamic));
 
     return objContext;
 }
 
-NativeValue *CreateRunningFormInfos(NativeEngine &engine, const std::vector<RunningFormInfo> &runningFormInfos)
+napi_value CreateRunningFormInfos(napi_env env, const std::vector<RunningFormInfo> &runningFormInfos)
 {
-    NativeValue *arrayValue = engine.CreateArray(runningFormInfos.size());
-    NativeArray *array = ConvertNativeValueTo<NativeArray>(arrayValue);
+    napi_value arrayValue = nullptr;
+    napi_create_array_with_length(env, runningFormInfos.size(), &arrayValue);
     uint32_t index = 0;
     for (const auto &runningFormInfo : runningFormInfos) {
-        array->SetElement(index++, CreateRunningFormInfo(engine, runningFormInfo));
+        napi_set_element(env, arrayValue, index++, CreateRunningFormInfo(env, runningFormInfo));
     }
     return arrayValue;
 }
 
-NativeValue *CreateRunningFormInfo(NativeEngine &engine, const RunningFormInfo &runningFormInfo)
+napi_value CreateRunningFormInfo(napi_env env, const RunningFormInfo &runningFormInfo)
 {
     HILOG_DEBUG("called");
 
-    auto objContext = engine.CreateObject();
-    if (objContext == nullptr) {
-        HILOG_ERROR("CreateObject failed");
-        return engine.CreateUndefined();
-    }
+    napi_value objContext = nullptr;
+    napi_create_object(env, &objContext);
 
-    auto object = ConvertNativeValueTo<NativeObject>(objContext);
-    if (object == nullptr) {
-        HILOG_ERROR("ConvertNativeValueTo object failed");
-        return engine.CreateUndefined();
-    }
-
-    object->SetProperty("formId", CreateJsValue(engine, runningFormInfo.formId));
-    object->SetProperty("bundleName", CreateJsValue(engine, runningFormInfo.bundleName));
-    object->SetProperty("hostBundleName", CreateJsValue(engine, runningFormInfo.hostBundleName));
-    object->SetProperty("visibilityType", CreateJsValue(engine, runningFormInfo.formVisiblity));
-    object->SetProperty("moduleName", CreateJsValue(engine, runningFormInfo.moduleName));
-    object->SetProperty("abilityName", CreateJsValue(engine, runningFormInfo.abilityName));
-    object->SetProperty("formName", CreateJsValue(engine, runningFormInfo.formName));
-    object->SetProperty("dimension", CreateJsValue(engine, runningFormInfo.dimension));
+    napi_set_named_property(env, objContext, "formId", CreateJsValue(env, runningFormInfo.formId));
+    napi_set_named_property(env, objContext, "bundleName", CreateJsValue(env, runningFormInfo.bundleName));
+    napi_set_named_property(env, objContext, "hostBundleName", CreateJsValue(env, runningFormInfo.hostBundleName));
+    napi_set_named_property(env, objContext, "visibilityType", CreateJsValue(env, runningFormInfo.formVisiblity));
+    napi_set_named_property(env, objContext, "moduleName", CreateJsValue(env, runningFormInfo.moduleName));
+    napi_set_named_property(env, objContext, "abilityName", CreateJsValue(env, runningFormInfo.abilityName));
+    napi_set_named_property(env, objContext, "formName", CreateJsValue(env, runningFormInfo.formName));
+    napi_set_named_property(env, objContext, "dimension", CreateJsValue(env, runningFormInfo.dimension));
 
     return objContext;
 }
 
-NativeValue *CreateFormCustomizeDatas(NativeEngine &engine, const std::vector<FormCustomizeData> &customizeDatas)
+napi_value CreateFormCustomizeDatas(napi_env env, const std::vector<FormCustomizeData> &customizeDatas)
 {
-    auto objContext = engine.CreateObject();
-    if (objContext == nullptr) {
-        HILOG_ERROR("CreateObject error");
-        return engine.CreateUndefined();
-    }
-
-    auto object = ConvertNativeValueTo<NativeObject>(objContext);
-    if (object == nullptr) {
-        HILOG_ERROR("ConvertNativeValueTo object error");
-        return engine.CreateUndefined();
-    }
+    napi_value objContext = nullptr;
+    napi_create_object(env, &objContext);
 
     for (const auto& data : customizeDatas) {
-        object->SetProperty(data.name.c_str(), CreateJsValue(engine, data.value));
+        napi_set_named_property(env, objContext, data.name.c_str(), CreateJsValue(env, data.value));
     }
 
     return objContext;
@@ -780,44 +753,33 @@ std::string GetStringFromNapi(napi_env env, napi_value value)
     return result;
 }
 
-NativeValue *CreateFormInstances(NativeEngine &engine, const std::vector<FormInstance> &formInstances)
+napi_value CreateFormInstances(napi_env env, const std::vector<FormInstance> &formInstances)
 {
-    NativeValue* arrayValue = engine.CreateArray(formInstances.size());
-    NativeArray* array = ConvertNativeValueTo<NativeArray>(arrayValue);
-    if (array == nullptr) {
-        return engine.CreateUndefined();
-    }
+    napi_value arrayValue = nullptr;
+    napi_create_array_with_length(env, formInstances.size(), &arrayValue);
     uint32_t index = 0;
     for (const auto &formInstance : formInstances) {
-        array->SetElement(index++, CreateFormInstance(engine, formInstance));
+        napi_set_element(env, arrayValue, index++, CreateFormInstance(env, formInstance));
     }
     return arrayValue;
 }
 
-NativeValue *CreateFormInstance(NativeEngine &engine, const FormInstance &formInstance)
+napi_value CreateFormInstance(napi_env env, const FormInstance &formInstance)
 {
     HILOG_DEBUG("called");
 
-    auto objContext = engine.CreateObject();
-    if (objContext == nullptr) {
-        HILOG_ERROR("create object failed");
-        return engine.CreateUndefined();
-    }
+    napi_value objContext = nullptr;
+    napi_create_object(env, &objContext);
 
-    auto object = ConvertNativeValueTo<NativeObject>(objContext);
-    if (object == nullptr) {
-        HILOG_ERROR("convert native value to object failed");
-        return engine.CreateUndefined();
-    }
     std::string formStr = std::to_string(formInstance.formId);
-    object->SetProperty("formId", CreateJsValue(engine, formStr));
-    object->SetProperty("hostBundleName", CreateJsValue(engine, formInstance.formHostName));
-    object->SetProperty("visibilityType", CreateJsValue(engine, formInstance.formVisiblity));
-    object->SetProperty("dimension", CreateJsValue(engine, formInstance.specification));
-    object->SetProperty("bundleName", CreateJsValue(engine, formInstance.bundleName));
-    object->SetProperty("moduleName", CreateJsValue(engine, formInstance.moduleName));
-    object->SetProperty("abilityName", CreateJsValue(engine, formInstance.abilityName));
-    object->SetProperty("formName", CreateJsValue(engine, formInstance.formName));
+    napi_set_named_property(env, objContext, "formId", CreateJsValue(env, formStr));
+    napi_set_named_property(env, objContext, "hostBundleName", CreateJsValue(env, formInstance.formHostName));
+    napi_set_named_property(env, objContext, "visibilityType", CreateJsValue(env, formInstance.formVisiblity));
+    napi_set_named_property(env, objContext, "dimension", CreateJsValue(env, formInstance.specification));
+    napi_set_named_property(env, objContext, "bundleName", CreateJsValue(env, formInstance.bundleName));
+    napi_set_named_property(env, objContext, "moduleName", CreateJsValue(env, formInstance.moduleName));
+    napi_set_named_property(env, objContext, "abilityName", CreateJsValue(env, formInstance.abilityName));
+    napi_set_named_property(env, objContext, "formName", CreateJsValue(env, formInstance.formName));
     return objContext;
 }
 }  // namespace AbilityRuntime
