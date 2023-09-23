@@ -52,8 +52,8 @@ int FormSupplyProxy::OnAcquire(const FormProviderInfo &formInfo, const Want& wan
 
     MessageParcel reply;
     MessageOption option;
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_ACQUIRED),
+    int error = SendTransactCmd(
+        IFormSupply::Message::TRANSACTION_FORM_ACQUIRED,
         data,
         reply,
         option);
@@ -85,8 +85,8 @@ int FormSupplyProxy::OnEventHandle(const Want& want)
 
     MessageParcel reply;
     MessageOption option;
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_EVENT_HANDLE),
+    int error = SendTransactCmd(
+        IFormSupply::Message::TRANSACTION_EVENT_HANDLE,
         data,
         reply,
         option);
@@ -131,8 +131,8 @@ int FormSupplyProxy::OnAcquireStateResult(FormState state, const std::string &pr
 
     MessageParcel reply;
     MessageOption option;
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_STATE_ACQUIRED),
+    int error = SendTransactCmd(
+        IFormSupply::Message::TRANSACTION_FORM_STATE_ACQUIRED,
         data,
         reply,
         option);
@@ -202,8 +202,8 @@ void FormSupplyProxy::OnShareAcquire(int64_t formId, const std::string &remoteDe
         HILOG_ERROR("failed to write form result.");
         return;
     }
-    auto error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_SHARE_ACQUIRED),
+    auto error = SendTransactCmd(
+        IFormSupply::Message::TRANSACTION_FORM_SHARE_ACQUIRED,
         data,
         reply,
         option);
@@ -230,8 +230,8 @@ int FormSupplyProxy::OnAcquireDataResult(const AAFwk::WantParams &wantParams, in
         HILOG_ERROR("failed to write form requestCode.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    auto error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_ACQUIRED_DATA),
+    auto error = SendTransactCmd(
+        IFormSupply::Message::TRANSACTION_FORM_ACQUIRED_DATA,
         data,
         reply,
         option);
@@ -262,8 +262,8 @@ int32_t FormSupplyProxy::OnRenderTaskDone(int64_t formId, const Want &want)
 
     MessageParcel reply;
     MessageOption option;
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_RENDER_TASK_DONE),
+    int error = SendTransactCmd(
+        IFormSupply::Message::TRANSACTION_FORM_RENDER_TASK_DONE,
         data,
         reply,
         option);
@@ -294,8 +294,8 @@ int32_t FormSupplyProxy::OnStopRenderingTaskDone(int64_t formId, const Want &wan
 
     MessageParcel reply;
     MessageOption option;
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_STOP_RENDERING_TASK_DONE),
+    int error = SendTransactCmd(
+        IFormSupply::Message::TRANSACTION_FORM_STOP_RENDERING_TASK_DONE,
         data,
         reply,
         option);
@@ -320,8 +320,8 @@ int32_t FormSupplyProxy::OnRenderingBlock(const std::string &bundleName)
 
     MessageParcel reply;
     MessageOption option;
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_RENDERING_BLOCK),
+    int error = SendTransactCmd(
+        IFormSupply::Message::TRANSACTION_FORM_RENDERING_BLOCK,
         data,
         reply,
         option);
@@ -329,6 +329,22 @@ int32_t FormSupplyProxy::OnRenderingBlock(const std::string &bundleName)
         HILOG_ERROR("OnRenderingBlock failed to SendRequest: %{public}d", error);
     }
     return error;
+}
+
+int FormSupplyProxy::SendTransactCmd(IFormSupply::Message code, MessageParcel &data,
+    MessageParcel &reply, MessageOption &option)
+{
+    sptr<IRemoteObject> remote = Remote();
+    if (!remote) {
+        HILOG_ERROR("failed to get remote object, cmd: %{public}d", code);
+        return ERR_APPEXECFWK_SERVICE_NOT_CONNECTED;
+    }
+    int32_t result = remote->SendRequest(static_cast<uint32_t>(code), data, reply, option);
+    if (result != ERR_OK) {
+        HILOG_ERROR("failed to SendRequest: %{public}d, cmd: %{public}d", result, code);
+        return result;
+    }
+    return ERR_OK;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

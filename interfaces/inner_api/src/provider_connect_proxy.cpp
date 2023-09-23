@@ -1,6 +1,5 @@
-
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,7 +31,6 @@ void ProviderConnectProxy::OnAbilityConnectDone(
 {
     HILOG_DEBUG("%{public}s, abilityName:%{public}s,resultCode:%{public}d",
         __func__, element.GetAbilityName().c_str(), resultCode);
-    int error;
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -64,9 +62,8 @@ void ProviderConnectProxy::OnAbilityConnectDone(
         return;
     }
 
-    error = Remote()->SendRequest(IAbilityConnection::ON_ABILITY_CONNECT_DONE, data, reply, option);
-    if (error != ERR_OK) {
-        HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d", __func__, error);
+    if (!SendTransactCmd(IAbilityConnection::ON_ABILITY_CONNECT_DONE, data, reply, option)) {
+        HILOG_ERROR("%{public}s, failed to SendRequest", __func__);
         return;
     }
 }
@@ -79,7 +76,6 @@ void ProviderConnectProxy::OnAbilityDisconnectDone(const AppExecFwk::ElementName
 {
     HILOG_DEBUG(
         "%{public}s, element:%{public}s, resultCode:%{public}d", __func__, element.GetURI().c_str(), resultCode);
-    int error;
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -97,9 +93,8 @@ void ProviderConnectProxy::OnAbilityDisconnectDone(const AppExecFwk::ElementName
         return;
     }
 
-    error = Remote()->SendRequest(IAbilityConnection::ON_ABILITY_DISCONNECT_DONE, data, reply, option);
-    if (error != ERR_OK) {
-        HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d", __func__, error);
+    if (!SendTransactCmd(IAbilityConnection::ON_ABILITY_DISCONNECT_DONE, data, reply, option)) {
+        HILOG_ERROR("%{public}s, failed to SendRequest", __func__);
         return;
     }
 }
@@ -108,6 +103,22 @@ bool ProviderConnectProxy::WriteInterfaceToken(MessageParcel &data)
 {
     if (!data.WriteInterfaceToken(ProviderConnectProxy::GetDescriptor())) {
         HILOG_ERROR("%{public}s, failed to write interface token", __func__);
+        return false;
+    }
+    return true;
+}
+
+bool ProviderConnectProxy::SendTransactCmd(uint32_t code, MessageParcel &data,
+    MessageParcel &reply, MessageOption &option)
+{
+    sptr<IRemoteObject> remote = Remote();
+    if (!remote) {
+        HILOG_ERROR("failed to get remote object, cmd: %{public}d", code);
+        return false;
+    }
+    int32_t result = remote->SendRequest(static_cast<uint32_t>(code), data, reply, option);
+    if (result != ERR_OK) {
+        HILOG_ERROR("failed to SendRequest: %{public}d, cmd: %{public}d", result, code);
         return false;
     }
     return true;

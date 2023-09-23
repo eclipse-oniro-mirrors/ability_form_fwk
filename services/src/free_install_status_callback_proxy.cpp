@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -51,7 +51,13 @@ void FreeInstallStatusCallBackProxy::OnInstallFinished(int32_t resultCode, const
         return;
     }
 
-    int32_t error = Remote()->SendRequest(IFreeInstallStatusCallBackCmd::ON_FREE_INSTALL_DONE, data,
+    sptr<IRemoteObject> remote = Remote();
+    if (remote == nullptr) {
+        HILOG_ERROR("Remote() is NULL");
+        return;
+    }
+
+    int32_t error = remote->SendRequest(IFreeInstallStatusCallBackCmd::ON_FREE_INSTALL_DONE, data,
         reply, option);
     if (error != NO_ERROR) {
         HILOG_ERROR("OnFinished fail, error: %{public}d", error);
