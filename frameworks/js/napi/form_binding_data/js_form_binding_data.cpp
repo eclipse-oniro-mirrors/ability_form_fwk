@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,81 +21,71 @@
 
 namespace OHOS {
 namespace AbilityRuntime {
+#define ARGS_MAX_COUNT 10
 namespace {
 class JsFormBindingData {
 public:
     JsFormBindingData() = default;
     ~JsFormBindingData() = default;
 
-    static void Finalizer(NativeEngine* engine, void* data, void* hint)
+    static void Finalizer(napi_env env, void* data, void* hint)
     {
         HILOG_INFO("JsFormBindingData::Finalizer is called");
         std::unique_ptr<JsFormBindingData>(static_cast<JsFormBindingData*>(data));
     }
 
-    static NativeValue* CreateFormBindingData(NativeEngine* engine, NativeCallbackInfo* info)
+    static napi_value CreateFormBindingData(napi_env env, napi_callback_info info)
     {
-        JsFormBindingData* me = CheckParamsAndGetThis<JsFormBindingData>(engine, info);
-        return (me != nullptr) ? me->OnCreateFormBindingData(*engine, *info) : nullptr;
+        GET_CB_INFO_AND_CALL(env, info, JsFormBindingData, OnCreateFormBindingData);
     }
 private:
-    NativeValue* OnCreateFormBindingData(NativeEngine& engine, NativeCallbackInfo& info);
+    napi_value OnCreateFormBindingData(napi_env env, size_t argc, napi_value* argv);
 };
 
-NativeValue* JsFormBindingData::OnCreateFormBindingData(NativeEngine& engine, NativeCallbackInfo& info)
+napi_value JsFormBindingData::OnCreateFormBindingData(napi_env env, size_t argc, napi_value* argv)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
     std::string formDataStr;
-    if (info.argc > 0) {
-        NativeValue* nativeValue = nullptr;
-        if ((info.argv[0])->TypeOf() == NATIVE_STRING) {
+    if (argc > 0) {
+        napi_value nativeValue = nullptr;
+        napi_valuetype type = napi_undefined;
+        napi_typeof(env, argv[0], &type);
+        if (type == napi_string) {
             HILOG_DEBUG("%{public}s called, param type is string.", __func__);
-            nativeValue = info.argv[0];
-        } else if ((info.argv[0])->TypeOf() == NATIVE_OBJECT) {
+            nativeValue = argv[0];
+        } else if (type == napi_object) {
             HILOG_DEBUG("%{public}s called, param type is object.", __func__);
-            napi_env napiEnv = reinterpret_cast<napi_env>(&engine);
             napi_value globalValue = nullptr;
-            napi_get_global(napiEnv, &globalValue);
+            napi_get_global(env, &globalValue);
             napi_value jsonValue;
-            napi_get_named_property(napiEnv, globalValue, "JSON", &jsonValue);
+            napi_get_named_property(env, globalValue, "JSON", &jsonValue);
 
             napi_value stringifyValue = nullptr;
-            napi_get_named_property(napiEnv, jsonValue, "stringify", &stringifyValue);
-            napi_value funcArgv[1] = { reinterpret_cast<napi_value>(info.argv[0]) };
+            napi_get_named_property(env, jsonValue, "stringify", &stringifyValue);
+            napi_value funcArgv[1] = { argv[0] };
             napi_value transValue = nullptr;
-            napi_call_function(napiEnv, jsonValue, stringifyValue, 1, funcArgv, &transValue);
-            nativeValue = reinterpret_cast<NativeValue*>(transValue);
+            napi_call_function(env, jsonValue, stringifyValue, 1, funcArgv, &transValue);
+            nativeValue = transValue;
         }
-
-        ConvertFromJsValue(engine, nativeValue, formDataStr);
+        ConvertFromJsValue(env, nativeValue, formDataStr);
     }
-    NativeValue* objValue = engine.CreateObject();
-    NativeObject* object = ConvertNativeValueTo<NativeObject>(objValue);
-    object->SetProperty("data", CreateJsValue(engine, formDataStr));
+    napi_value objValue = nullptr;
+    napi_create_object(env, &objValue);
+    napi_set_named_property(env, objValue, "data", CreateJsValue(env, formDataStr));
     HILOG_DEBUG("%{public}s called:%{private}s", __func__, formDataStr.c_str());
     return objValue;
 }
 }
 
-NativeValue* JsFormBindingDataInit(NativeEngine* engine, NativeValue* exportObj)
+napi_value JsFormBindingDataInit(napi_env env, napi_value exportObj)
 {
     HILOG_INFO("%{public}s called.", __func__);
-    if (engine == nullptr || exportObj == nullptr) {
-        HILOG_ERROR("%{public}s engine or exportObj nullptr.", __func__);
-        return nullptr;
-    }
-
-    NativeObject* object = ConvertNativeValueTo<NativeObject>(exportObj);
-    if (object == nullptr) {
-        HILOG_ERROR("%{public}s convertNativeValueTo result is nullptr.", __func__);
-        return nullptr;
-    }
 
     auto formBindingData = std::make_unique<JsFormBindingData>();
-    object->SetNativePointer(formBindingData.release(), JsFormBindingData::Finalizer, nullptr);
+    napi_wrap(env, exportObj, formBindingData.release(), JsFormBindingData::Finalizer, nullptr, nullptr);
 
     const char *moduleName = "JsFormBindingData";
-    BindNativeFunction(*engine, *object, "createFormBindingData", moduleName, JsFormBindingData::CreateFormBindingData);
+    BindNativeFunction(env, exportObj, "createFormBindingData", moduleName, JsFormBindingData::CreateFormBindingData);
 
     HILOG_INFO("%{public}s called end.", __func__);
     return exportObj;

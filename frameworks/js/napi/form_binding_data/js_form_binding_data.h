@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,12 +16,11 @@
 #ifndef OHOS_FORM_FWK_JS_FORM_BINDING_DATA_H
 #define OHOS_FORM_FWK_JS_FORM_BINDING_DATA_H
 
-class NativeEngine;
-class NativeValue;
+#include "napi/native_api.h"
 
 namespace OHOS {
 namespace AbilityRuntime {
-NativeValue* JsFormBindingDataInit(NativeEngine* engine, NativeValue* exportObj);
+napi_value JsFormBindingDataInit(napi_env env, napi_value exportObj);
 }  // namespace AbilityRuntime
 }  // namespace OHOS
 #endif // OHOS_FORM_FWK_JS_FORM_BINDING_DATA_H

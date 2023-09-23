@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,21 +23,21 @@ namespace OHOS {
 namespace AbilityRuntime {
 EXTERN_C_START
 
-bool ConvertFormInfoFilter(NativeEngine &engine, NativeValue* jsValue, AppExecFwk::FormInfoFilter &formInfoFilter)
+bool ConvertFormInfoFilter(napi_env env, napi_value value, AppExecFwk::FormInfoFilter &formInfoFilter)
 {
-    if (jsValue->TypeOf() != NATIVE_OBJECT) {
+    napi_valuetype type = napi_undefined;
+    napi_typeof(env, value, &type);
+    if (type != napi_object) {
         HILOG_ERROR("%{public}s, an object is expected, but an argument of different type is passed in.", __func__);
         return false;
     }
 
-    NativeObject* nativeObject = ConvertNativeValueTo<NativeObject>(jsValue);
-    if (nativeObject == nullptr) {
-        HILOG_ERROR("%{public}s called, nativeObject is nullptr.", __func__);
-        return false;
-    }
-    NativeValue* nativeDataValue = nativeObject->GetProperty("moduleName");
-    if (nativeDataValue == nullptr || (nativeDataValue->TypeOf() != NATIVE_UNDEFINED &&
-        !ConvertFromJsValue(engine, nativeDataValue, formInfoFilter.moduleName))) {
+    napi_value nativeDataValue = nullptr;
+    napi_get_named_property(env, value, "moduleName", &nativeDataValue);
+    napi_valuetype nativeDataValueType = napi_undefined;
+    napi_typeof(env, nativeDataValue, &nativeDataValueType);
+    if (nativeDataValue == nullptr || (nativeDataValueType != napi_undefined &&
+        !ConvertFromJsValue(env, nativeDataValue, formInfoFilter.moduleName))) {
         HILOG_ERROR("%{public}s called, convert nativeDataValue failed.", __func__);
         return false;
     }
@@ -46,21 +46,21 @@ bool ConvertFormInfoFilter(NativeEngine &engine, NativeValue* jsValue, AppExecFw
     return true;
 }
 
-NativeValue* CreateJsFormInfo(NativeEngine &engine, const AppExecFwk::FormInfo &formInfo)
+napi_value CreateJsFormInfo(napi_env env, const AppExecFwk::FormInfo &formInfo)
 {
-    NativeValue* objValue = engine.CreateObject();
-    napi_value napiValue = reinterpret_cast<napi_value>(objValue);
-    ParseFormInfoIntoNapi(reinterpret_cast<napi_env>(&engine), formInfo, napiValue);
+    napi_value objValue = nullptr;
+    napi_create_object(env, &objValue);
+    ParseFormInfoIntoNapi(env, formInfo, objValue);
     return objValue;
 }
 
-NativeValue* CreateJsFormInfoArray(NativeEngine &engine, const std::vector<AppExecFwk::FormInfo> &formInfos)
+napi_value CreateJsFormInfoArray(napi_env env, const std::vector<AppExecFwk::FormInfo> &formInfos)
 {
-    NativeValue* arrayValue = engine.CreateArray(formInfos.size());
-    NativeArray* array = ConvertNativeValueTo<NativeArray>(arrayValue);
+    napi_value arrayValue = nullptr;
+    napi_create_array_with_length(env, formInfos.size(), &arrayValue);
     uint32_t index = 0;
     for (const auto &formInfo : formInfos) {
-        array->SetElement(index++, CreateJsFormInfo(engine, formInfo));
+        napi_set_element(env, arrayValue, index++, CreateJsFormInfo(env, formInfo));
     }
     return arrayValue;
 }

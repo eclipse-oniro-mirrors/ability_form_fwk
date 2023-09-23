@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,30 +22,20 @@
 EXTERN_C_START
 using namespace OHOS::AbilityRuntime;
 
-static NativeValue* JsProviderInit(NativeEngine* engine, NativeValue* exports)
+static napi_value JsProviderInit(napi_env env, napi_value value)
 {
     HILOG_INFO("JsProviderInit is called");
-    if (engine == nullptr || exports == nullptr) {
-        HILOG_ERROR("Invalid input parameters");
-        return nullptr;
-    }
-
-    NativeObject* object = ConvertNativeValueTo<NativeObject>(exports);
-    if (object == nullptr) {
-        HILOG_ERROR("object is nullptr");
-        return nullptr;
-    }
 
     std::unique_ptr<JsFormProvider> jsFormPorivder = std::make_unique<JsFormProvider>();
-    object->SetNativePointer(jsFormPorivder.release(), JsFormProvider::Finalizer, nullptr);
+    napi_wrap(env, value, jsFormPorivder.release(), JsFormProvider::Finalizer, nullptr, nullptr);
 
     const char *moduleName = "JsFormProvider";
-    BindNativeFunction(*engine, *object, "getFormsInfo", moduleName, JsFormProvider::GetFormsInfo);
-    BindNativeFunction(*engine, *object, "setFormNextRefreshTime", moduleName, JsFormProvider::SetFormNextRefreshTime);
-    BindNativeFunction(*engine, *object, "updateForm", moduleName, JsFormProvider::UpdateForm);
-    BindNativeFunction(*engine, *object, "isRequestPublishFormSupported", moduleName,
+    BindNativeFunction(env, value, "getFormsInfo", moduleName, JsFormProvider::GetFormsInfo);
+    BindNativeFunction(env, value, "setFormNextRefreshTime", moduleName, JsFormProvider::SetFormNextRefreshTime);
+    BindNativeFunction(env, value, "updateForm", moduleName, JsFormProvider::UpdateForm);
+    BindNativeFunction(env, value, "isRequestPublishFormSupported", moduleName,
         JsFormProvider::IsRequestPublishFormSupported);
-    return exports;
+    return value;
 }
 
 /**
@@ -64,8 +54,7 @@ static napi_value Init(napi_env env, napi_value exports)
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(properties) / sizeof(properties[0]), properties));
     HILOG_INFO("napi_module Init end...");
-    return reinterpret_cast<napi_value>(JsProviderInit(reinterpret_cast<NativeEngine*>(env),
-        reinterpret_cast<NativeValue*>(exports)));
+    return JsProviderInit(env, exports);
 }
 
 EXTERN_C_END
