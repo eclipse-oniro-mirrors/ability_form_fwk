@@ -720,18 +720,20 @@ ErrCode FormInfoMgr::ReloadFormInfos(const int32_t userId)
         bundleNameSet.emplace(appInfo.bundleName);
     }
 
+    HILOG_INFO("bundle name set number: %{public}zu", bundleNameSet.size());
+
     std::unique_lock<std::shared_timed_mutex> guard(bundleFormInfoMapMutex_);
     for (auto const &bundleFormInfoPair : bundleFormInfoMap_) {
         const std::string &bundleName = bundleFormInfoPair.first;
         auto setFindIter = bundleNameSet.find(bundleName);
         if (setFindIter == bundleNameSet.end()) {
             bundleFormInfoPair.second->Remove(userId);
-            HILOG_DEBUG("remove forms info success, bundleName=%{public}s", bundleName.c_str());
+            HILOG_INFO("remove forms info success, bundleName=%{public}s", bundleName.c_str());
             continue;
         }
         bundleNameSet.erase(setFindIter);
         bundleFormInfoPair.second->UpdateStaticFormInfos(userId);
-        HILOG_DEBUG("update forms info success, bundleName=%{public}s", bundleName.c_str());
+        HILOG_INFO("update forms info success, bundleName=%{public}s", bundleName.c_str());
     }
 
     for (auto const &bundleName : bundleNameSet) {
@@ -741,7 +743,7 @@ ErrCode FormInfoMgr::ReloadFormInfos(const int32_t userId)
             continue;
         }
         bundleFormInfoMap_[bundleName] = bundleFormInfoPtr;
-        HILOG_DEBUG("add forms info success, bundleName=%{public}s", bundleName.c_str());
+        HILOG_INFO("add forms info success, bundleName=%{public}s", bundleName.c_str());
     }
     return ERR_OK;
 }

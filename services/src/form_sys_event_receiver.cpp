@@ -26,13 +26,14 @@
 #include "form_render_mgr.h"
 #include "form_serial_queue.h"
 #include "form_timer_mgr.h"
+#include "form_util.h"
 #include "in_process_call_wrapper.h"
 #include "want.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-const std::string COMMON_EVENT_BUNDLE_SCAN_FINISHED = "usual.event.BUNDLE_SCAN_FINISHED";
+const int32_t MAIN_USER_ID = 100;
 } // namespace
 /**
  * @brief Receiver Constructor.
@@ -55,7 +56,8 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
         return;
     }
     if (bundleName.empty() && action != EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED &&
-        action != COMMON_EVENT_BUNDLE_SCAN_FINISHED &&
+        action != EventFwk::CommonEventSupport::COMMON_EVENT_BUNDLE_SCAN_FINISHED &&
+        action != EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED &&
         action != EventFwk::CommonEventSupport::COMMON_EVENT_USER_UNLOCKED) {
         HILOG_ERROR("%{public}s failed, invalid param, action: %{public}s, bundleName: %{public}s",
             __func__, action.c_str(), bundleName.c_str());
@@ -88,15 +90,10 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
         if (userId != -1) {
             serialQueue_->ScheduleTask(0, task);
         }
-    } else if (action == COMMON_EVENT_BUNDLE_SCAN_FINISHED) {
-        auto task = [weakThis, want]() {
-            std::shared_ptr<FormSysEventReceiver> sharedThis = weakThis.lock();
-            if (sharedThis) {
-                int32_t userId = want.GetIntParam(KEY_USER_ID, Constants::DEFAULT_USERID);
-                sharedThis->HandleBundleScanFinished(userId);
-            }
-        };
-        serialQueue_->ScheduleTask(0, task);
+    } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_BUNDLE_SCAN_FINISHED) {
+        HandleBundleScanFinished();
+    } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
+        HandleUserSwitched(eventData);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_DATA_CLEARED) {
         int userId = want.GetIntParam(KEY_USER_ID, Constants::DEFAULT_USERID);
         auto task = [weakThis, bundleName, userId]() {
@@ -133,10 +130,42 @@ void FormSysEventReceiver::HandleUserIdRemoved(const int32_t userId)
     }
 }
 
-void FormSysEventReceiver::HandleBundleScanFinished(const int32_t userId)
+void FormSysEventReceiver::HandleBundleScanFinished()
 {
-    HILOG_INFO("%{public}s start", __func__);
-    FormInfoMgr::GetInstance().ReloadFormInfos(userId);
+    if (!serialQueue_) {
+        HILOG_ERROR("serialQueue is nullptr!");
+        return;
+    }
+
+    serialQueue_->ScheduleTask(0, []() {
+        int32_t currUserId = FormUtil::GetCurrentAccountId();
+        if (currUserId == Constants::ANY_USERID) {
+            HILOG_INFO("use MAIN_USER_ID(%{public}d) instead of current userId: ANY_USERID(%{public}d)",
+                MAIN_USER_ID, currUserId);
+            currUserId = MAIN_USER_ID;
+        }
+
+        FormInfoMgr::GetInstance().ReloadFormInfos(currUserId);
+    });
+}
+
+void FormSysEventReceiver::HandleUserSwitched(const EventFwk::CommonEventData &eventData)
+{
+    int32_t userId = eventData.GetCode();
+    if (userId < 0) {
+        HILOG_ERROR("invalid switched userId: %{public}d", userId);
+        return;
+    }
+    HILOG_INFO("switch to userId: (%{public}d)", userId);
+
+    if (!serialQueue_) {
+        HILOG_ERROR("serialQueue is nullptr");
+        return;
+    }
+
+    serialQueue_->ScheduleTask(0, [userId]() {
+        FormInfoMgr::GetInstance().ReloadFormInfos(userId);
+    });
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

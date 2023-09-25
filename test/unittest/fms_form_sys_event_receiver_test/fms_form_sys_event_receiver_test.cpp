@@ -71,7 +71,6 @@ const std::string KEY_USER_ID = "userId";
 const std::string KEY_BUNDLE_NAME = "bundleName";
 const std::string DEVICE_ID = "ohos-phone1";
 const std::string DEF_LABEL1 = "PermissionFormRequireGrant";
-const std::string COMMON_EVENT_BUNDLE_SCAN_FINISHED = "usual.event.BUNDLE_SCAN_FINISHED";
 
 class FmsFormSysEventReceiverTest : public testing::Test {
 public:
@@ -599,7 +598,7 @@ HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_0011, TestSize.Level0)
     EXPECT_FALSE(want.GetAction().empty());
     EXPECT_TRUE(want.GetElement().GetBundleName().empty() &&
     action != EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED &&
-    action != COMMON_EVENT_BUNDLE_SCAN_FINISHED);
+    action != EventFwk::CommonEventSupport::COMMON_EVENT_BUNDLE_SCAN_FINISHED);
     GTEST_LOG_(INFO) << "OnReceiveEvent_0011 end";
 }
 
@@ -646,7 +645,6 @@ HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_0013, TestSize.Level0)
     eventData.SetWant(want);
     eventData.SetCode(code);
     testCase->OnReceiveEvent(eventData);
-    EXPECT_TRUE(action == EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED);
     GTEST_LOG_(INFO) << "OnReceiveEvent_0013 end";
 }
 
@@ -671,7 +669,6 @@ HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_0014, TestSize.Level0)
     eventData.SetWant(want);
     eventData.SetCode(code);
     testCase->OnReceiveEvent(eventData);
-    EXPECT_TRUE(action == EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED);
     GTEST_LOG_(INFO) << "OnReceiveEvent_0014 end";
 }
 
@@ -687,14 +684,13 @@ HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_0015, TestSize.Level0)
     EXPECT_TRUE(testCase != nullptr);
     EventFwk::CommonEventData eventData;
     AAFwk::Want want = eventData.GetWant();
-    std::string action = COMMON_EVENT_BUNDLE_SCAN_FINISHED;
+    std::string action = EventFwk::CommonEventSupport::COMMON_EVENT_BUNDLE_SCAN_FINISHED;
     std::string bundleName = EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED;
     std::string abilityName = "abc";
     want.SetAction(action);
     want.SetElementName(bundleName, abilityName);
     eventData.SetWant(want);
     testCase->OnReceiveEvent(eventData);
-    EXPECT_TRUE(action == COMMON_EVENT_BUNDLE_SCAN_FINISHED);
     GTEST_LOG_(INFO) << "OnReceiveEvent_0015 end";
 }
 
@@ -717,7 +713,6 @@ HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_0016, TestSize.Level0)
     want.SetElementName(bundleName, abilityName);
     eventData.SetWant(want);
     testCase->OnReceiveEvent(eventData);
-    EXPECT_TRUE(action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REPLACED);
     GTEST_LOG_(INFO) << "OnReceiveEvent_0016 end";
 }
 
@@ -746,9 +741,41 @@ HWTEST_F(FmsFormSysEventReceiverTest, HandleBundleScanFinished_0001, TestSize.Le
     GTEST_LOG_(INFO) << "HandleBundleScanFinished_0001 start";
     std::shared_ptr<FormSysEventReceiver> testCase = std::make_shared<FormSysEventReceiver>();
     ASSERT_NE(nullptr, testCase);
-    const int32_t userId = 0;
-    testCase->HandleBundleScanFinished(userId);
+    testCase->HandleBundleScanFinished();
     GTEST_LOG_(INFO) << "HandleBundleScanFinished_0001 end";
+}
+
+/**
+ * @tc.number: HandleUserSwitched_0001
+ * @tc.name: HandleUserSwitched
+ * @tc.desc: Verify whether the HandleUserSwitched interface is called normally
+ */
+HWTEST_F(FmsFormSysEventReceiverTest, HandleUserSwitched_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "HandleUserSwitched_0001 start";
+    std::shared_ptr<FormSysEventReceiver> receiver = std::make_shared<FormSysEventReceiver>();
+    ASSERT_NE(nullptr, receiver);
+    OHOS::EventFwk::CommonEventData eventData;
+    eventData.SetCode(Constants::ANY_USERID);
+    receiver->HandleUserSwitched(eventData);
+    GTEST_LOG_(INFO) << "HandleUserSwitched_0001 end";
+}
+
+/**
+ * @tc.number: HandleUserSwitched_0002
+ * @tc.name: HandleUserSwitched
+ * @tc.desc: Verify whether the HandleUserSwitched interface is called normally
+ */
+HWTEST_F(FmsFormSysEventReceiverTest, HandleUserSwitched_0002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "HandleUserSwitched_0002 start";
+    std::shared_ptr<FormSysEventReceiver> receiver = std::make_shared<FormSysEventReceiver>();
+    ASSERT_NE(nullptr, receiver);
+    OHOS::EventFwk::CommonEventData eventData;
+    const int32_t MAIN_USER_ID = 100;
+    eventData.SetCode(MAIN_USER_ID);
+    receiver->HandleUserSwitched(eventData);
+    GTEST_LOG_(INFO) << "HandleUserSwitched_0002 end";
 }
 
 /**

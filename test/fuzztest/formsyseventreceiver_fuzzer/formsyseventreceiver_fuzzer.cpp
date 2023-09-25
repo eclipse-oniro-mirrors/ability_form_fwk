@@ -76,7 +76,9 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     FormTimerCfg cfg;
     formSysEventReceiver.formEventHelper_.HandleTimerUpdate(formId, formRecord, cfg);
     formSysEventReceiver.HandleUserIdRemoved(userIds);
-    formSysEventReceiver.HandleBundleScanFinished(userIds);
+    formSysEventReceiver.HandleBundleScanFinished();
+    eventData.SetCode(userIds);
+    formSysEventReceiver.HandleUserSwitched(eventData);
     return formSysEventReceiver.formEventHelper_.ProviderFormUpdated(formId, formRecord, targetForms);
 }
 }
