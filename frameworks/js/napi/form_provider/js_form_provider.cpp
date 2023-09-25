@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -56,9 +56,14 @@ bool ConvertFormInfoFilterThrow(napi_env env, napi_value jsValue, AppExecFwk::Fo
 
     napi_value nativeDataValue = nullptr;
     napi_status ret = napi_get_named_property(env, jsValue, "moduleName", &nativeDataValue);
+    if (ret != napi_ok) {
+        HILOG_ERROR("%{public}s, get property failed.", __func__);
+        NapiFormUtil::ThrowParamError(env, "Failed to get property.");
+        return false;
+    }
     napi_valuetype nativeDataValueType = napi_undefined;
     napi_typeof(env, nativeDataValue, &nativeDataValueType);
-    if (nativeDataValue == nullptr || ret != napi_ok || (nativeDataValueType != napi_undefined &&
+    if (nativeDataValue == nullptr || (nativeDataValueType != napi_undefined &&
         !ConvertFromJsValue(env, nativeDataValue, formInfoFilter.moduleName))) {
         HILOG_ERROR("%{public}s called, convert nativeDataValue failed.", __func__);
         NapiFormUtil::ThrowParamError(env, "Failed to convert FormInfoFilter.");
@@ -164,9 +169,9 @@ napi_value JsFormProvider::OnGetFormsInfo(napi_env env, size_t argc, napi_value*
                 if (ConvertFormInfoFilterThrow(env, argv[0], formInfoFilter)) {
                     convertArgc++;
                     // GetformsInfo(fliter, callback)
-                    napi_valuetype typeTwo = napi_undefined;
-                    napi_typeof(env, argv[1], &typeTwo);
-                    isPromise = typeTwo != napi_function;
+                    napi_valuetype paramTwoType = napi_undefined;
+                    napi_typeof(env, argv[1], &paramTwoType);
+                    isPromise = paramTwoType != napi_function;
                 } else {
                     HILOG_ERROR("convert form info filter failed.");
                     return CreateJsUndefined(env);
@@ -444,9 +449,9 @@ bool JsFormProvider::ConvertFromDataProxies(napi_env env, napi_value value,
 
     uint32_t length = 0;
     napi_get_array_length(env, value, &length);
+    napi_value element = nullptr;
     for (uint32_t i = 0; i < length; i++) {
         AppExecFwk::FormDataProxy formDataProxy("", "");
-        napi_value element = nullptr;
         napi_get_element(env, value, i, &element);
         if (!ConvertFormDataProxy(env, element, formDataProxy)) {
             HILOG_ERROR("GetElement from array [%{public}u] error", i);
