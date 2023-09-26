@@ -461,13 +461,13 @@ void FormTaskMgr::NotifyFormUpdate(const int64_t formId, const Want &want, const
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
     if (formProviderProxy == nullptr) {
-        FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
+        RemoveConnection(connectId);
         HILOG_ERROR("%{public}s fail, failed to get formProviderProxy", __func__);
         return;
     }
     int error = formProviderProxy->NotifyFormUpdate(formId, want, FormSupplyCallback::GetInstance());
     if (error != ERR_OK) {
-        FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
+        RemoveConnection(connectId);
         HILOG_ERROR("%{public}s fail, Failed to notify form update.", __func__);
     }
 }
@@ -489,14 +489,14 @@ void FormTaskMgr::EventNotify(const std::vector<int64_t> &formEvents, const int3
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
     if (formProviderProxy == nullptr) {
-        FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
+        RemoveConnection(connectId);
         HILOG_ERROR("%{public}s fail, failed to get formProviderProxy", __func__);
         return;
     }
 
     int error = formProviderProxy->EventNotify(formEvents, formVisibleType, want, FormSupplyCallback::GetInstance());
     if (error != ERR_OK) {
-        FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
+        RemoveConnection(connectId);
         HILOG_ERROR("%{public}s fail, Failed to send event notify.", __func__);
     }
 }
@@ -516,14 +516,14 @@ void FormTaskMgr::NotifyCastTemp(const int64_t formId, const Want &want, const s
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
     if (formProviderProxy == nullptr) {
-        FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
+        RemoveConnection(connectId);
         HILOG_ERROR("%{public}s fail, failed to get formProviderProxy", __func__);
         return;
     }
 
     int error = formProviderProxy->NotifyFormCastTempForm(formId, want, FormSupplyCallback::GetInstance());
     if (error != ERR_OK) {
-        FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
+        RemoveConnection(connectId);
         HILOG_ERROR("%{public}s fail, Failed to get acquire provider form info", __func__);
     }
 }
@@ -603,7 +603,7 @@ void FormTaskMgr::ProviderBatchDelete(std::set<int64_t> &formIds, const Want &wa
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
     if (formProviderProxy == nullptr) {
-        FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
+        RemoveConnection(connectId);
         HILOG_ERROR("%{public}s fail, Failed to get formProviderProxy", __func__);
         return;
     }
@@ -611,7 +611,7 @@ void FormTaskMgr::ProviderBatchDelete(std::set<int64_t> &formIds, const Want &wa
     vFormIds.assign(formIds.begin(), formIds.end());
     int error = formProviderProxy->NotifyFormsDelete(vFormIds, want, FormSupplyCallback::GetInstance());
     if (error != ERR_OK) {
-        FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
+        RemoveConnection(connectId);
         HILOG_ERROR("%{public}s failed", __func__);
     }
 }
@@ -629,14 +629,14 @@ void FormTaskMgr::FireFormEvent(const int64_t formId, const std::string &message
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
     if (formProviderProxy == nullptr) {
-        FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
+        RemoveConnection(connectId);
         HILOG_ERROR("%{public}s, Failed to get formProviderProxy", __func__);
         return;
     }
 
     int error = formProviderProxy->FireFormEvent(formId, message, want, FormSupplyCallback::GetInstance());
     if (error != ERR_OK) {
-        FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
+        RemoveConnection(connectId);
         HILOG_ERROR("%{public}s, Failed to fire message event to form provider", __func__);
     }
     HILOG_INFO("%{public}s end", __func__);
@@ -656,14 +656,14 @@ void FormTaskMgr::AcquireState(const Want &wantArg, const std::string &provider,
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
     if (formProviderProxy == nullptr) {
-    FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
+        RemoveConnection(connectId);
         HILOG_ERROR("%{public}s, Failed to get formProviderProxy", __func__);
         return;
     }
 
     int error = formProviderProxy->AcquireState(wantArg, provider, want, FormSupplyCallback::GetInstance());
     if (error != ERR_OK) {
-        FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
+        RemoveConnection(connectId);
         HILOG_ERROR("%{public}s, Failed to acquire form state to form provider", __func__);
     }
     HILOG_INFO("%{public}s end", __func__);
@@ -682,17 +682,17 @@ void FormTaskMgr::AcquireFormData(const int64_t formId, const Want &want, const 
     int64_t requestCode = static_cast<int64_t>(want.GetLongParam(Constants::FORM_ACQUIRE_DATA_REQUEST_CODE, 0));
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
     if (formProviderProxy == nullptr) {
-        FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
+        RemoveConnection(connectId);
         HILOG_ERROR("Failed to get formProviderProxy");
         return;
     }
 
     int error = formProviderProxy->AcquireFormData(formId, FormSupplyCallback::GetInstance(), requestCode);
     if (error != ERR_OK) {
-        FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
+        RemoveConnection(connectId);
         HILOG_ERROR("Failed to acquire form state to form provider");
     }
-    FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
+    RemoveConnection(connectId);
     HILOG_INFO("end");
 }
 
@@ -789,7 +789,12 @@ FormJsInfo FormTaskMgr::CreateFormJsInfo(const int64_t formId, const FormRecord 
 
 void FormTaskMgr::FormShareSendResponse(int64_t formShareRequestCode, int32_t result)
 {
-    DelayedSingleton<FormShareMgr>::GetInstance()->SendResponse(formShareRequestCode, result);
+    auto formShareMgr = DelayedSingleton<FormShareMgr>::GetInstance();
+    if (formShareMgr == nullptr) {
+        HILOG_ERROR("formShareMgr is nullptr.");
+        return;
+    }
+    formShareMgr->SendResponse(formShareRequestCode, result);
 }
 
 void FormTaskMgr::PostRenderForm(const FormRecord &formRecord, const Want &want,
@@ -814,7 +819,7 @@ void FormTaskMgr::RenderForm(const FormRecord &formRecord, const Want &want, con
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormRender> remoteFormRender = iface_cast<IFormRender>(remoteObject);
     if (remoteFormRender == nullptr) {
-        FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
+        RemoveConnection(connectId);
         HILOG_ERROR("%{public}s fail, Failed to get form render proxy.", __func__);
         return;
     }
@@ -822,7 +827,7 @@ void FormTaskMgr::RenderForm(const FormRecord &formRecord, const Want &want, con
     FormJsInfo formJsInfo = CreateFormJsInfo(formRecord.formId, formRecord);
     int32_t error = remoteFormRender->RenderForm(formJsInfo, want, FormSupplyCallback::GetInstance());
     if (error != ERR_OK) {
-        FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
+        RemoveConnection(connectId);
         HILOG_ERROR("%{public}s fail, Failed to add form renderer", __func__);
         return;
     }
@@ -853,7 +858,7 @@ void FormTaskMgr::StopRenderingForm(
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormRender> remoteFormDeleteRender = iface_cast<IFormRender>(remoteObject);
     if (remoteFormDeleteRender == nullptr) {
-        FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
+        RemoveConnection(connectId);
         HILOG_ERROR("%{public}s fail, Failed to get form render proxy.", __func__);
         return;
     }
@@ -861,7 +866,7 @@ void FormTaskMgr::StopRenderingForm(
     FormJsInfo formJsInfo = CreateFormJsInfo(formRecord.formId, formRecord);
     int32_t error = remoteFormDeleteRender->StopRenderingForm(formJsInfo, want, FormSupplyCallback::GetInstance());
     if (error != ERR_OK) {
-        FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
+        RemoveConnection(connectId);
         HILOG_ERROR("%{public}s fail, Failed to add form renderer", __func__);
         return;
     }
@@ -970,6 +975,16 @@ void FormTaskMgr::PostOnUnlock(const sptr<IRemoteObject> &remoteObject)
     };
     serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, task);
     HILOG_DEBUG("end");
+}
+
+void FormTaskMgr::RemoveConnection(int32_t connectId)
+{
+    auto formSupplyCallback = FormSupplyCallback::GetInstance();
+    if (formSupplyCallback == nullptr) {
+        HILOG_ERROR("formSupplyCallback is nullptr.");
+        return;
+    }
+    formSupplyCallback->RemoveConnection(connectId);
 }
 } // namespace AppExecFwk
 } // namespace OHOS

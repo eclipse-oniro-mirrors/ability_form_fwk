@@ -180,7 +180,7 @@ public:
     */
     void PostAcquireStateTaskToHost(AppExecFwk::FormState state, const AAFwk::Want &want,
                                     const sptr<IRemoteObject> &remoteObject);
-    
+
     /**
     * @brief Post acquire form data message to form host(task).
     * @param wantParams Indicates the data information acquired by the form.
@@ -326,7 +326,7 @@ private:
      */
     void AcquireFormDataBack(const AAFwk::WantParams &wantParams, int64_t requestCode,
                             const sptr<IRemoteObject> &remoteObject);
-    
+
     /**
      * @brief Acquire form data to form provider.
      * @param formId The Id of the form.
@@ -388,6 +388,8 @@ private:
         int64_t formId, const std::string &compId, const std::string &uid, const sptr<IRemoteObject> &remoteObject);
 
     void OnUnlock(const sptr<IRemoteObject> &remoteObject);
+
+    void RemoveConnection(int32_t connectId);
 private:
     std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;
 };
