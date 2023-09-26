@@ -40,10 +40,10 @@ public:
     JsFormAgent() = default;
     ~JsFormAgent() = default;
 
-    static void Finalizer(NativeEngine* engine, void* data, void* hint);
-    static NativeValue* RequestPublishForm(NativeEngine *engine, NativeCallbackInfo *info);
+    static void Finalizer(napi_env env, void* data, void* hint);
+    static napi_value RequestPublishForm(napi_env env, napi_callback_info info);
 private:
-    NativeValue* OnRequestPublishForm(NativeEngine &engine, NativeCallbackInfo &info);
+    napi_value OnRequestPublishForm(napi_env env, size_t argc, napi_value* argv);
 };
 }  // namespace AbilityRuntime
 }  // namespace OHOS

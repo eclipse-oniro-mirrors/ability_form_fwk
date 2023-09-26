@@ -42,61 +42,61 @@ constexpr size_t ARGS_SIZE_TWO = 2;
 const std::string IS_FORM_AGENT = "isFormAgent";
 }
 
-void JsFormAgent::Finalizer(NativeEngine *engine, void *data, void *hint)
+void JsFormAgent::Finalizer(napi_env env, void *data, void *hint)
 {
     HILOG_INFO("JsFormAgent::Finalizer is called");
     std::unique_ptr<JsFormAgent>(static_cast<JsFormAgent *>(data));
 }
 
-NativeValue *JsFormAgent::RequestPublishForm(NativeEngine *engine, NativeCallbackInfo *info)
+napi_value JsFormAgent::RequestPublishForm(napi_env env, napi_callback_info info)
 {
-    JsFormAgent *me = CheckParamsAndGetThis<JsFormAgent>(engine, info);
-    return (me != nullptr) ? me->OnRequestPublishForm(*engine, *info) : nullptr;
+    GET_CB_INFO_AND_CALL(env, info, JsFormAgent, OnRequestPublishForm);
 }
 
-NativeValue *JsFormAgent::OnRequestPublishForm(NativeEngine &engine, NativeCallbackInfo &info)
+napi_value JsFormAgent::OnRequestPublishForm(napi_env env, size_t argc, napi_value* argv)
 {
     HILOG_INFO("OnRequestPublishForm is called");
-    auto env = reinterpret_cast<napi_env>(&engine);
-    if (env == nullptr || info.argc < ARGS_SIZE_ONE || info.argc > ARGS_SIZE_TWO) {
+    if (env == nullptr || argc < ARGS_SIZE_ONE || argc > ARGS_SIZE_TWO) {
         HILOG_ERROR("wrong number of arguments.");
-        NapiFormUtil::ThrowParamNumError(engine, std::to_string(info.argc), "1 or 2");
-        return engine.CreateUndefined();
+        NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1 or 2");
+        return CreateJsUndefined(env);
     }
 
     auto asyncCallbackInfo = std::make_shared<RequestPublishFormCallbackInfo>();
-    decltype(info.argc) convertArgc = 0;
-    if (info.argv[PARAM0]->TypeOf() != NATIVE_OBJECT) {
+    decltype(argc) convertArgc = 0;
+    napi_valuetype paramZeroType = napi_undefined;
+    napi_typeof(env, argv[0], &paramZeroType);
+    if (paramZeroType != napi_object) {
         HILOG_ERROR("formId is not napi_object.");
-        NapiFormUtil::ThrowParamTypeError(engine, "want", "Want");
-        return engine.CreateUndefined();
+        NapiFormUtil::ThrowParamTypeError(env, "want", "Want");
+        return CreateJsUndefined(env);
     }
 
-    if (!AppExecFwk::UnwrapWant(env, reinterpret_cast<napi_value>(info.argv[PARAM0]), asyncCallbackInfo->want)) {
+    if (!AppExecFwk::UnwrapWant(env, argv[PARAM0], asyncCallbackInfo->want)) {
         HILOG_ERROR("Failed to convert want.");
-        NapiFormUtil::ThrowParamError(engine, "Failed to convert want.");
-        return engine.CreateUndefined();
+        NapiFormUtil::ThrowParamError(env, "Failed to convert want.");
+        return CreateJsUndefined(env);
     }
 
     convertArgc++;
-    AsyncTask::CompleteCallback complete = [asyncCallbackInfo](NativeEngine &engine, AsyncTask &task, int32_t status) {
+    NapiAsyncTask::CompleteCallback complete = [asyncCallbackInfo](napi_env env, NapiAsyncTask &task, int32_t status) {
         int64_t formId = 0;
         asyncCallbackInfo->want.SetParam(IS_FORM_AGENT, true);
         ErrCode ret = FormMgr::GetInstance().RequestPublishForm(asyncCallbackInfo->want, false,
             asyncCallbackInfo->formProviderData, formId, asyncCallbackInfo->formDataProxies);
         if (ret != ERR_OK) {
             HILOG_ERROR("Failed to RequestPublishForm.");
-            task.Reject(engine, NapiFormUtil::CreateErrorByInternalErrorCode(engine, ret));
+            task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
             return;
         }
 
         std::string formIdStr = std::to_string(formId);
-        task.ResolveWithNoError(engine, engine.CreateString(formIdStr.c_str(), formIdStr.size()));
+        task.ResolveWithNoError(env, CreateJsValue(env, formIdStr));
     };
-    NativeValue *lastParam = (info.argc <= convertArgc) ? nullptr : info.argv[convertArgc];
-    NativeValue *result = nullptr;
-    AsyncTask::ScheduleWithDefaultQos("JsFormAgent::OnRequestPublishForm",
-        engine, CreateAsyncTaskWithLastParam(engine, lastParam, nullptr, std::move(complete), &result));
+    napi_value lastParam = (argc <= convertArgc) ? nullptr : argv[convertArgc];
+    napi_value result = nullptr;
+    NapiAsyncTask::ScheduleWithDefaultQos("JsFormAgent::OnRequestPublishForm",
+        env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
     return result;
 }
 }  // namespace AbilityRuntime

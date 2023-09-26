@@ -22,25 +22,15 @@
 EXTERN_C_START
 using namespace OHOS::AbilityRuntime;
 
-static NativeValue* JsFormAgentInit(NativeEngine* engine, NativeValue* exports)
+static napi_value JsFormAgentInit(napi_env env, napi_value exports)
 {
     HILOG_INFO("JsFormAgentInit is called");
-    if (engine == nullptr || exports == nullptr) {
-        HILOG_ERROR("Invalid input parameters");
-        return nullptr;
-    }
-
-    NativeObject* object = ConvertNativeValueTo<NativeObject>(exports);
-    if (object == nullptr) {
-        HILOG_ERROR("object is nullptr");
-        return nullptr;
-    }
 
     std::unique_ptr<JsFormAgent> jsFormAgent = std::make_unique<JsFormAgent>();
-    object->SetNativePointer(jsFormAgent.release(), JsFormAgent::Finalizer, nullptr);
+    napi_wrap(env, exports, jsFormAgent.release(), JsFormAgent::Finalizer, nullptr, nullptr);
 
     const char *moduleName = "JsFormAgent";
-    BindNativeFunction(*engine, *object, "requestPublishForm", moduleName, JsFormAgent::RequestPublishForm);
+    BindNativeFunction(env, exports, "requestPublishForm", moduleName, JsFormAgent::RequestPublishForm);
     return exports;
 }
 
@@ -54,8 +44,7 @@ static NativeValue* JsFormAgentInit(NativeEngine* engine, NativeValue* exports)
  */
 static napi_value Init(napi_env env, napi_value exports)
 {
-    return reinterpret_cast<napi_value>(JsFormAgentInit(reinterpret_cast<NativeEngine*>(env),
-        reinterpret_cast<NativeValue*>(exports)));
+    return JsFormAgentInit(env, exports);
 }
 
 EXTERN_C_END
