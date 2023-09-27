@@ -493,6 +493,16 @@ void FormItemInfo::SetIsDynamic(bool isDynamic)
     isDynamic_ = isDynamic;
 }
 
+bool FormItemInfo::IsTransparentEnabled() const
+{
+    return transparentEnabled_;
+}
+
+void FormItemInfo::SetTransparentEnabled(bool isTransparentEnabled)
+{
+    transparentEnabled_ = isTransparentEnabled;
+}
+
 FormType FormItemInfo::GetUiSyntax() const
 {
     return uiSyntax_;
