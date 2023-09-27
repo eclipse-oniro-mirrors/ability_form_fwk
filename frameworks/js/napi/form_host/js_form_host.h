@@ -23,7 +23,7 @@
 
 namespace OHOS {
 namespace AbilityRuntime {
-NativeValue* JsFormHostInit(NativeEngine* engine, NativeValue* exportObj);
+napi_value JsFormHostInit(napi_env env, napi_value exportObj);
 } // namespace AbilityRuntime
 } // namespace OHOS
 #endif /* OHOS_FORM_FWK_JS_FORM_HOST_H */

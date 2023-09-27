@@ -27,45 +27,39 @@
 EXTERN_C_START
 using namespace OHOS::AbilityRuntime;
 
-static NativeValue* NapiFormHostInit(NativeEngine *engine, NativeValue *exports)
+static napi_value NapiFormHostInit(napi_env env, napi_value exports)
 {
     HILOG_DEBUG("NapiFormHostInit is called");
-    if (engine == nullptr || exports == nullptr) {
+    if (env == nullptr || exports == nullptr) {
         HILOG_ERROR("Invalid input parameters");
         return nullptr;
     }
 
-    NativeObject *object = OHOS::AbilityRuntime::ConvertNativeValueTo<NativeObject>(exports);
-    if (object == nullptr) {
-        HILOG_ERROR("object is nullptr");
-        return nullptr;
-    }
-
     std::unique_ptr<NapiFormHost> napiFormHost = std::make_unique<NapiFormHost>();
-    object->SetNativePointer(napiFormHost.release(), NapiFormHost::Finalizer, nullptr);
+    napi_wrap(env, exports, napiFormHost.release(), NapiFormHost::Finalizer, nullptr, nullptr);
 
     const char *moduleName = "NapiFormHost";
-    OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "shareForm", moduleName, NapiFormHost::ShareForm);
+    OHOS::AbilityRuntime::BindNativeFunction(env, exports, "shareForm", moduleName, NapiFormHost::ShareForm);
     OHOS::AbilityRuntime::BindNativeFunction(
-        *engine, *object, "disableFormsUpdate", moduleName, NapiFormHost::DisableFormsUpdate);
-    OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "isSystemReady", moduleName, NapiFormHost::IsSystemReady);
-    OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "deleteForm", moduleName, NapiFormHost::DeleteForm);
-    OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "releaseForm", moduleName, NapiFormHost::ReleaseForm);
-    OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "requestForm", moduleName, NapiFormHost::RequestForm);
-    OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "castTempForm", moduleName, NapiFormHost::CastTempForm);
+        env, exports, "disableFormsUpdate", moduleName, NapiFormHost::DisableFormsUpdate);
+    OHOS::AbilityRuntime::BindNativeFunction(env, exports, "isSystemReady", moduleName, NapiFormHost::IsSystemReady);
+    OHOS::AbilityRuntime::BindNativeFunction(env, exports, "deleteForm", moduleName, NapiFormHost::DeleteForm);
+    OHOS::AbilityRuntime::BindNativeFunction(env, exports, "releaseForm", moduleName, NapiFormHost::ReleaseForm);
+    OHOS::AbilityRuntime::BindNativeFunction(env, exports, "requestForm", moduleName, NapiFormHost::RequestForm);
+    OHOS::AbilityRuntime::BindNativeFunction(env, exports, "castTempForm", moduleName, NapiFormHost::CastTempForm);
     OHOS::AbilityRuntime::BindNativeFunction(
-        *engine, *object, "getAllFormsInfo", moduleName, NapiFormHost::GetAllFormsInfo);
-    OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "getFormsInfo", moduleName, NapiFormHost::GetFormsInfo);
-    OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "enableFormsUpdate", moduleName,
+        env, exports, "getAllFormsInfo", moduleName, NapiFormHost::GetAllFormsInfo);
+    OHOS::AbilityRuntime::BindNativeFunction(env, exports, "getFormsInfo", moduleName, NapiFormHost::GetFormsInfo);
+    OHOS::AbilityRuntime::BindNativeFunction(env, exports, "enableFormsUpdate", moduleName,
         NapiFormHost::EnableFormsUpdate);
-    OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "notifyFormsPrivacyProtected",
+    OHOS::AbilityRuntime::BindNativeFunction(env, exports, "notifyFormsPrivacyProtected",
         moduleName, NapiFormHost::NotifyFormsPrivacyProtected);
-    OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "notifyVisibleForms",
+    OHOS::AbilityRuntime::BindNativeFunction(env, exports, "notifyVisibleForms",
         moduleName, NapiFormHost::NotifyVisibleForms);
-    OHOS::AbilityRuntime::BindNativeFunction(*engine, *object, "notifyInvisibleForms",
+    OHOS::AbilityRuntime::BindNativeFunction(env, exports, "notifyInvisibleForms",
         moduleName, NapiFormHost::NotifyInVisibleForms);
     OHOS::AbilityRuntime::BindNativeFunction(
-        *engine, *object, "deleteInvalidForms", moduleName, NapiFormHost::DeleteInvalidForms);
+        env, exports, "deleteInvalidForms", moduleName, NapiFormHost::DeleteInvalidForms);
 
     return exports;
 }
@@ -91,8 +85,7 @@ static napi_value Init(napi_env env, napi_value exports)
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(properties) / sizeof(properties[0]), properties));
     HILOG_INFO("napi_module Init end...");
 
-    return reinterpret_cast<napi_value>(NapiFormHostInit(reinterpret_cast<NativeEngine*>(env),
-        reinterpret_cast<NativeValue*>(exports)));
+    return NapiFormHostInit(env, exports);
 }
 
 EXTERN_C_END

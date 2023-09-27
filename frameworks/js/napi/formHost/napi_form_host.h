@@ -79,40 +79,40 @@ public:
     NapiFormHost() = default;
     ~NapiFormHost() = default;
 
-    static void Finalizer(NativeEngine* engine, void* data, void* hint);
-    static NativeValue* ShareForm(NativeEngine* engine, NativeCallbackInfo* info);
-    static NativeValue* DisableFormsUpdate(NativeEngine *engine, NativeCallbackInfo *info);
-    static NativeValue* IsSystemReady(NativeEngine *engine, NativeCallbackInfo *info);
-    static NativeValue* DeleteForm(NativeEngine *engine, NativeCallbackInfo *info);
-    static NativeValue* ReleaseForm(NativeEngine *engine, NativeCallbackInfo *info);
-    static NativeValue* RequestForm(NativeEngine *engine, NativeCallbackInfo *info);
-    static NativeValue* CastTempForm(NativeEngine *engine, NativeCallbackInfo *info);
-    static NativeValue* GetAllFormsInfo(NativeEngine *engine, NativeCallbackInfo *info);
-    static NativeValue* GetFormsInfo(NativeEngine *engine, NativeCallbackInfo *info);
-    static NativeValue* EnableFormsUpdate(NativeEngine *engine, NativeCallbackInfo *info);
-    static NativeValue* NotifyFormsPrivacyProtected(NativeEngine *engine, NativeCallbackInfo *info);
-    static NativeValue* NotifyVisibleForms(NativeEngine *engine, NativeCallbackInfo *info);
-    static NativeValue* NotifyInVisibleForms(NativeEngine *engine, NativeCallbackInfo *info);
-    static NativeValue* DeleteInvalidForms(NativeEngine *engine, NativeCallbackInfo *info);
+    static void Finalizer(napi_env env, void* data, void* hint);
+    static napi_value ShareForm(napi_env env, napi_callback_info info);
+    static napi_value DisableFormsUpdate(napi_env env, napi_callback_info info);
+    static napi_value IsSystemReady(napi_env env, napi_callback_info info);
+    static napi_value DeleteForm(napi_env env, napi_callback_info info);
+    static napi_value ReleaseForm(napi_env env, napi_callback_info info);
+    static napi_value RequestForm(napi_env env, napi_callback_info info);
+    static napi_value CastTempForm(napi_env env, napi_callback_info info);
+    static napi_value GetAllFormsInfo(napi_env env, napi_callback_info info);
+    static napi_value GetFormsInfo(napi_env env, napi_callback_info info);
+    static napi_value EnableFormsUpdate(napi_env env, napi_callback_info info);
+    static napi_value NotifyFormsPrivacyProtected(napi_env env, napi_callback_info info);
+    static napi_value NotifyVisibleForms(napi_env env, napi_callback_info info);
+    static napi_value NotifyInVisibleForms(napi_env env, napi_callback_info info);
+    static napi_value DeleteInvalidForms(napi_env env, napi_callback_info info);
 private:
-    NativeValue* OnDisableFormsUpdate(NativeEngine &engine, NativeCallbackInfo &info);
-    NativeValue* OnIsSystemReady(NativeEngine &engine, const NativeCallbackInfo &info);
-    NativeValue* OnDeleteForm(NativeEngine &engine, NativeCallbackInfo &info);
-    NativeValue* OnReleaseForm(NativeEngine &engine, NativeCallbackInfo &info);
-    NativeValue* OnRequestForm(NativeEngine &engine, NativeCallbackInfo &info);
-    NativeValue* OnCastTempForm(NativeEngine &engine, NativeCallbackInfo &info);
-    NativeValue* OnGetAllFormsInfo(NativeEngine &engine, const NativeCallbackInfo &info);
-    NativeValue* OnGetFormsInfo(NativeEngine &engine, NativeCallbackInfo &info);
-    NativeValue* OnEnableFormsUpdate(NativeEngine &engine, NativeCallbackInfo &info);
-    NativeValue* OnShareForm(NativeEngine &engine, NativeCallbackInfo &info);
-    NativeValue* OnNotifyFormsPrivacyProtected(NativeEngine &engine, NativeCallbackInfo &info);
-    NativeValue* OnNotifyVisibleForms(NativeEngine &engine, NativeCallbackInfo &info);
-    NativeValue* OnNotifyInVisibleForms(NativeEngine &engine, NativeCallbackInfo &info);
-    NativeValue* OnDeleteInvalidForms(NativeEngine &engine, const NativeCallbackInfo &info);
-    void InnerShareForm(NativeEngine &engine, const std::shared_ptr<OHOS::AbilityRuntime::AsyncTask> &asyncTask,
+    napi_value OnDisableFormsUpdate(napi_env env, size_t argc, napi_value* argv);
+    napi_value OnIsSystemReady(napi_env env, size_t argc, napi_value* argv);
+    napi_value OnDeleteForm(napi_env env, size_t argc, napi_value* argv);
+    napi_value OnReleaseForm(napi_env env, size_t argc, napi_value* argv);
+    napi_value OnRequestForm(napi_env env, size_t argc, napi_value* argv);
+    napi_value OnCastTempForm(napi_env env, size_t argc, napi_value* argv);
+    napi_value OnGetAllFormsInfo(napi_env env, size_t argc, napi_value* argv);
+    napi_value OnGetFormsInfo(napi_env env, size_t argc, napi_value* argv);
+    napi_value OnEnableFormsUpdate(napi_env env, size_t argc, napi_value* argv);
+    napi_value OnShareForm(napi_env env, size_t argc, napi_value* argv);
+    napi_value OnNotifyFormsPrivacyProtected(napi_env env, size_t argc, napi_value* argv);
+    napi_value OnNotifyVisibleForms(napi_env env, size_t argc, napi_value* argv);
+    napi_value OnNotifyInVisibleForms(napi_env env, size_t argc, napi_value* argv);
+    napi_value OnDeleteInvalidForms(napi_env env, size_t argc, napi_value* argv);
+    void InnerShareForm(napi_env env, const std::shared_ptr<OHOS::AbilityRuntime::NapiAsyncTask> &asyncTask,
         ShareFormTask &&task, int64_t formId, const std::string &remoteDeviceId);
-    bool GetStringsValue(NativeEngine &engine, NativeValue *object, std::vector<std::string> &strList);
-    static bool UnwrapGetFormsInfoParams(NativeEngine &engine, NativeCallbackInfo &info, std::string &moduleName,
+    bool GetStringsValue(napi_env env, napi_value object, std::vector<std::string> &strList);
+    static bool UnwrapGetFormsInfoParams(napi_env env, size_t argc, napi_value* argv, std::string &moduleName,
         bool &bParam);
 };
 }  // namespace AbilityRuntime
