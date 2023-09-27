@@ -63,6 +63,7 @@ public:
     FormType type = FormType::JS;
     FormType uiSyntax = FormType::JS;
     bool isDynamic = true;
+    bool transparentEnabled = false;
     bool isTimerRefresh = false;
     bool isDataProxy = false;
     bool isSystemApp = false;

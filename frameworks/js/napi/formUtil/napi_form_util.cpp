@@ -657,6 +657,7 @@ napi_value CreateFormInfo(napi_env env, const FormInfo &formInfo)
     napi_set_named_property(env, objContext, "supportDimensions", CreateNativeArray(env, formInfo.supportDimensions));
     napi_set_named_property(env, objContext, "customizeData", CreateFormCustomizeDatas(env, formInfo.customizeDatas));
     napi_set_named_property(env, objContext, "isDynamic", CreateJsValue(env, formInfo.isDynamic));
+    napi_set_named_property(env, objContext, "transparentEnabled", CreateJsValue(env, formInfo.transparentEnabled));
 
     return objContext;
 }
