@@ -513,9 +513,11 @@ void FormRenderRecord::HandleUpdateStaticForm(const FormJsInfo &formJsInfo, cons
             continue;
         }
 
-        AddRenderer(formJsInfo, formRequest.want);
-        formRequest.hasRelease = false;
-        AddStaticFormRequest(formJsInfo.formId, formRequest);
+        if (staticFormRequests.size() == 1) {
+            AddRenderer(formJsInfo, formRequest.want);
+            formRequest.hasRelease = false;
+            AddStaticFormRequest(formJsInfo.formId, formRequest);
+        }
     }
 }
 
