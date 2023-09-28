@@ -42,7 +42,7 @@ bool FormJsInfo::ReadFromParcel(Parcel &parcel)
     type = static_cast<FormType>(typeData);
     uiSyntax = static_cast<FormType>(parcel.ReadInt32());
     isDynamic = parcel.ReadBool();
-    transparentEnabled = parcel.ReadBool();
+    transparencyEnabled = parcel.ReadBool();
 
     std::unique_ptr<FormProviderData> bindingData(parcel.ReadParcelable<FormProviderData>());
     if (bindingData == nullptr) {
@@ -134,7 +134,7 @@ bool FormJsInfo::Marshalling(Parcel &parcel) const
     if (!parcel.WriteBool(isDynamic)) {
         return false;
     }
-    if (!parcel.WriteBool(transparentEnabled)) {
+    if (!parcel.WriteBool(transparencyEnabled)) {
         return false;
     }
     // write formProviderData

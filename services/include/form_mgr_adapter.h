@@ -819,6 +819,11 @@ private:
      */
     bool IsErmsSupportPublishForm(std::string bundleName, std::vector<Want> wants);
 
+    ErrCode CheckFormCountLimit(const int64_t formId, const Want &want);
+
+    ErrCode AllotForm(const int64_t formId, const Want &want,
+        const sptr<IRemoteObject> &callerToken, FormJsInfo &formInfo, const FormItemInfo &formItemInfo);
+
     /**
      * @class ClientDeathRecipient
      * notices IRemoteBroker died.

@@ -103,11 +103,53 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    // check form count limit
+    ErrCode ret = CheckFormCountLimit(formId, want);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("CheckFormCountLimit failed");
+        return ret;
+    }
+
+    // get from config info
+    FormItemInfo formItemInfo;
+    int32_t errCode = GetFormConfigInfo(want, formItemInfo);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("fail, get form config info failed.");
+        return errCode;
+    }
+    // Check trust list
+    formItemInfo.SetFormId(formId);
+    if (!FormTrustMgr::GetInstance().IsTrust(formItemInfo.GetProviderBundleName())) {
+        HILOG_ERROR("AddForm fail, %{public}s is unTrust",
+            formItemInfo.GetProviderBundleName().c_str());
+        return ERR_APPEXECFWK_FORM_NOT_TRUST;
+    }
+
+    // publish form
+    if (formId > 0 && FormDataMgr::GetInstance().IsRequestPublishForm(formId)) {
+        ret = AddRequestPublishForm(formItemInfo, want, callerToken, formInfo);
+        if (ret != ERR_OK) {
+            HILOG_ERROR("failed, add request publish form failed.");
+            return ret;
+        }
+        bool tempFormFlag = want.GetBoolParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
+        if (!tempFormFlag && (ret == ERR_OK)) {
+            HILOG_DEBUG("Checks if there is a listener listening for adding form");
+            HandleFormAddObserver(formInfo.formId);
+        }
+    }
+
+    ret = AllotForm(formId, want, callerToken, formInfo, formItemInfo);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("failed, allot form failed.");
+    }
+    return ret;
+}
+
+ErrCode FormMgrAdapter::CheckFormCountLimit(const int64_t formId, const Want &want)
+{
     bool tempFormFlag = want.GetBoolParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
     int callingUid = IPCSkeleton::GetCallingUid();
-    int checkCode = 0;
-    auto ret = 0;
+    ErrCode checkCode = 0;
     if (tempFormFlag && !FormRenderMgr::GetInstance().IsRerenderForRenderServiceDied(formId)) {
         if (formId > 0) {
             HILOG_ERROR("fail, temp form id is invalid, formId:%{public}" PRId64 "", formId);
@@ -123,36 +165,13 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
     }
     if (checkCode != 0) {
         HILOG_ERROR("fail, too much forms in system");
-        return checkCode;
     }
+    return checkCode;
+}
 
-    // get from config info
-    FormItemInfo formItemInfo;
-    int32_t errCode = GetFormConfigInfo(want, formItemInfo);
-    if (errCode != ERR_OK) {
-        HILOG_ERROR("fail, get form config info failed.");
-        return errCode;
-    }
-    formItemInfo.SetFormId(formId);
-    if (!FormTrustMgr::GetInstance().IsTrust(formItemInfo.GetProviderBundleName())) {
-        HILOG_ERROR("AddForm fail, %{public}s is unTrust",
-            formItemInfo.GetProviderBundleName().c_str());
-        return ERR_APPEXECFWK_FORM_NOT_TRUST;
-    }
-
-    // publish form
-    if (formId > 0 && FormDataMgr::GetInstance().IsRequestPublishForm(formId)) {
-        ret = AddRequestPublishForm(formItemInfo, want, callerToken, formInfo);
-        if (ret != ERR_OK) {
-            HILOG_ERROR("failed, add request publish form failed.");
-            return ret;
-        }
-        if (!tempFormFlag && (ret == ERR_OK)) {
-            HILOG_DEBUG("Checks if there is a listener listening for adding form");
-            HandleFormAddObserver(formInfo.formId);
-        }
-    }
-
+ErrCode FormMgrAdapter::AllotForm(const int64_t formId, const Want &want,
+    const sptr<IRemoteObject> &callerToken, FormJsInfo &formInfo, const FormItemInfo &formItemInfo)
+{
     Want newWant(want);
     // in application form
     if (formItemInfo.GetProviderBundleName() == formItemInfo.GetHostBundleName()) {
@@ -171,6 +190,12 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
         specificFormFlag = want.GetBoolParam(Constants::PARAM_FORM_MIGRATE_FORM_KEY, false);
         wantParams.Remove(Constants::PARAM_FORM_MIGRATE_FORM_KEY);
     }
+
+    if (!formItemInfo.IsTransparencyEnabled()) {
+        wantParams.Remove(Constants::PARAM_FORM_TRANSPARENCY_KEY);
+    }
+
+    ErrCode ret = 0;
     if (formId > 0) {
         if (specificFormFlag) {
             ret = AllotFormBySpecificId(formItemInfo, callerToken, wantParams, formInfo);
@@ -179,17 +204,12 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
         }
     } else {
         ret = AllotFormByInfo(formItemInfo, callerToken, wantParams, formInfo);
+        bool tempFormFlag = want.GetBoolParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
         if (!tempFormFlag && (ret == ERR_OK)) {
             HILOG_DEBUG("Checks if there is a listener listening for adding form");
             HandleFormAddObserver(formInfo.formId);
         }
     }
-
-    if (ret != ERR_OK) {
-        HILOG_ERROR("failed, allot form failed.");
-        return ret;
-    }
-
     return ret;
 }
 
@@ -1487,7 +1507,7 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
     itemInfo.SetType(formInfo.type);
     itemInfo.SetUiSyntax(formInfo.uiSyntax);
     itemInfo.SetIsDynamic(formInfo.isDynamic);
-    itemInfo.SetTransparentEnabled(formInfo.transparentEnabled);
+    itemInfo.SetTransparencyEnabled(formInfo.transparencyEnabled);
 
     for (const auto &abilityInfo : bundleInfo.abilityInfos) {
         if (abilityInfo.name == formInfo.abilityName) {

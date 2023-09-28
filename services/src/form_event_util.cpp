@@ -479,7 +479,7 @@ void FormEventUtil::UpdateFormRecord(const FormInfo &formInfo, FormRecord &formR
     formRecord.formSrc = formInfo.src;
     formRecord.uiSyntax = formInfo.uiSyntax;
     formRecord.isDynamic = formInfo.isDynamic;
-    formRecord.transparentEnabled = formInfo.transparentEnabled;
+    formRecord.transparencyEnabled = formInfo.transparencyEnabled;
     formRecord.isEnableUpdate = formInfo.updateEnabled;
     formRecord.updateDuration = formInfo.updateDuration * Constants::TIME_CONVERSION;
     std::vector<std::string> time = FormUtil::StringSplit(formInfo.scheduledUpdateTime, Constants::TIME_DELIMETER);
