@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+# Copyright (c) 2021-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -23,6 +23,7 @@ ohos_unittest("FmsFormDataMgrTest") {
     "${form_fwk_path}/test/mock/src/mock_form_host_client.cpp",
     "${form_fwk_path}/test/unittest/fms_form_data_mgr_test/fms_form_data_mgr_test.cpp",
     "${form_fwk_path}/test/unittest/fms_form_data_mgr_test/mock_form_bms_helper.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_data_mgr_test/mock_form_db_cache.cpp",
   ]
 
   include_dirs = [
@@ -51,6 +52,7 @@ ohos_unittest("FmsFormDataMgrTest") {
     "form_fwk:form_manager",
     "hilog:libhilog",
     "ipc:ipc_core",
+    "relational_store:native_rdb",
   ]
 }
 

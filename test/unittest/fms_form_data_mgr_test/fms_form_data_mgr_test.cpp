@@ -39,6 +39,7 @@ static const std::string PARAM_PROVIDER_MODULE_NAME = "com.form.provider.app.tes
 static const std::string FORM_NAME = "formName";
 
 extern void MockGetBundleNameByUid(ErrCode mockRet);
+extern void MockGetAllFormInfo(int32_t mockRet);
 
 namespace {
 class FmsFormDataMgrTest : public testing::Test {
@@ -489,22 +490,17 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckTempEnoughForm_002, TestSiz
  * @tc.name: CheckEnoughForm
  * @tc.desc: Verify that the return value is correct.
  * @tc.details:
- *      formRecords_'s size is over 512.
+ *      formDBInfos_'s size is over 512.
  */
 HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckEnoughForm_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckEnoughForm_001 start";
 
     int callingUid = 0;
+    int32_t checkAllDBFormMaxSize = 2;
 
-    // create formRecords
-    for (int formId_index = 0; formId_index < Constants::MAX_FORMS; formId_index++) {
-        FormItemInfo formItemInfo;
-        InitFormItemInfo(formId_index, formItemInfo, false);
-
-        FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid++);
-        formDataMgr_.formRecords_.emplace(formId_index, record);
-    }
+    // set formDbInfos size is over 512
+    MockGetAllFormInfo(checkAllDBFormMaxSize);
 
     EXPECT_EQ(ERR_APPEXECFWK_FORM_MAX_SYSTEM_FORMS, formDataMgr_.CheckEnoughForm(callingUid));
 
@@ -523,6 +519,9 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckEnoughForm_002, TestSize.Le
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckEnoughForm_002 start";
 
     int callingUid = 0;
+    int32_t checkAllDBFormPreAPPSize = 1;
+
+    MockGetAllFormInfo(checkAllDBFormPreAPPSize);
 
     EXPECT_EQ(ERR_OK, formDataMgr_.CheckEnoughForm(callingUid));
 
@@ -534,22 +533,17 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckEnoughForm_002, TestSize.Le
  * @tc.name: CheckEnoughForm
  * @tc.desc: Verify that the return value is correct.
  * @tc.details:
- *      there is 256 formRecords and their callingUid is 0.
+ *      there is 256 formDBInfos_ and their callingUid is -1.
  */
 HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckEnoughForm_003, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckEnoughForm_003 start";
 
-    int callingUid = 0;
+    int callingUid = -1;
+    int32_t checkAllDBFormPreAPPSize = 1;
 
-    // create formRecords
-    for (int formId_index = 0; formId_index < Constants::MAX_RECORD_PER_APP; formId_index++) {
-        FormItemInfo formItemInfo;
-        InitFormItemInfo(formId_index, formItemInfo);
-        formItemInfo.SetTemporaryFlag(false);
-        FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
-        formDataMgr_.formRecords_.emplace(formId_index, record);
-    }
+    // set formDbInfos size is over 256
+    MockGetAllFormInfo(checkAllDBFormPreAPPSize);
 
     EXPECT_EQ(ERR_APPEXECFWK_FORM_MAX_FORMS_PER_CLIENT, formDataMgr_.CheckEnoughForm(callingUid));
 
