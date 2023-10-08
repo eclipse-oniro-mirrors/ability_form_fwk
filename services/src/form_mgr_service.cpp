@@ -609,7 +609,8 @@ ErrCode FormMgrService::Init()
         matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_DATA_CLEARED);
         matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED);
         matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_USER_UNLOCKED);
-        matchingSkills.AddEvent(COMMON_EVENT_BUNDLE_SCAN_FINISHED);
+        matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_BUNDLE_SCAN_FINISHED);
+        matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED);
         // init TimerReceiver
         EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
         subscribeInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
@@ -620,7 +621,13 @@ ErrCode FormMgrService::Init()
 
     FormTrustMgr::GetInstance().Start();
     FormInfoMgr::GetInstance().Start();
-    FormInfoMgr::GetInstance().ReloadFormInfos(MAIN_USER_ID);
+    int currUserId = FormUtil::GetCurrentAccountId();
+    if (currUserId == Constants::ANY_USERID) {
+        HILOG_INFO("FormMgrService use MAIN_USER_ID(%{public}d instead of currentUserId: ANY_USERID(%{public}d)",
+            MAIN_USER_ID, Constants::ANY_USERID);
+        currUserId = MAIN_USER_ID;
+    }
+    FormInfoMgr::GetInstance().ReloadFormInfos(currUserId);
     FormDbCache::GetInstance().Start();
     FormTimerMgr::GetInstance(); // Init FormTimerMgr
     FormCacheMgr::GetInstance().Start();

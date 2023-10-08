@@ -51,7 +51,8 @@ public:
 private:
     void HandleUserIdRemoved(const int32_t userId); // multiuser
     bool IsSameForm(const FormRecord &record, const FormInfo &formInfo);
-    void HandleBundleScanFinished(int32_t userId);
+    void HandleBundleScanFinished();
+    void HandleUserSwitched(const EventFwk::CommonEventData &eventData);
 private:
     FormEventUtil formEventHelper_;
     std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;
