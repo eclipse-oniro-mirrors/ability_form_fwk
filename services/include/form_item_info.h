@@ -306,15 +306,15 @@ public:
      */
     void SetIsDynamic(bool isDynamic);
     /**
-     * @brief Obtains the transparentEnabled.
-     * @return Returns transparentEnabled.
+     * @brief Obtains the transparencyEnabled.
+     * @return Returns transparencyEnabled.
      */
-    bool IsTransparentEnabled() const;
+    bool IsTransparencyEnabled() const;
     /**
-     * @brief Set value of transparentEnabled.
-     * @param isTransparentEnabled transparentEnabled flag.
+     * @brief Set value of transparencyEnabled.
+     * @param isTransparencyEnabled transparencyEnabled flag.
      */
-    void SetTransparentEnabled(bool isTransparentEnabled);
+    void SetTransparencyEnabled(bool isTransparencyEnabled);
     /**
      * @brief Get uiSyntax.
      * @return uiSyntax.
@@ -382,7 +382,7 @@ private:
     FormType uiSyntax_ = FormType::JS;
     std::string icon_ = "";
     bool isDynamic_ = true;
-    bool transparentEnabled_ = false;
+    bool transparencyEnabled_ = false;
     std::string jsComponentName_ = "";
     std::string abilityModuleName_ = "";
     std::unordered_map<std::string, std::string> moduleInfoMap_;

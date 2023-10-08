@@ -181,7 +181,7 @@ FormRecord FormDataMgr::CreateFormRecord(const FormItemInfo &formInfo, const int
     newRecord.type = formInfo.GetType();
     newRecord.uiSyntax = formInfo.GetUiSyntax();
     newRecord.isDynamic = formInfo.IsDynamic();
-    newRecord.transparentEnabled = formInfo.IsTransparentEnabled();
+    newRecord.transparencyEnabled = formInfo.IsTransparencyEnabled();
     newRecord.isSystemApp = formInfo.GetSystemAppFlag();
     if (newRecord.isEnableUpdate) {
         ParseUpdateConfig(newRecord, formInfo);
@@ -219,7 +219,7 @@ void FormDataMgr::CreateFormJsInfo(const int64_t formId, const FormRecord &recor
     formInfo.type = record.type;
     formInfo.uiSyntax = record.uiSyntax;
     formInfo.isDynamic = record.isDynamic;
-    formInfo.transparentEnabled = record.transparentEnabled;
+    formInfo.transparencyEnabled = record.transparencyEnabled;
 }
 
 void FormDataMgr::SetConfigMap(const std::map<std::string, int32_t> &configMap)

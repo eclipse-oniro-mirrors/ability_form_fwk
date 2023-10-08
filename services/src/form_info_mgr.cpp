@@ -98,6 +98,9 @@ ErrCode FormInfoHelper::LoadStageFormConfigInfo(const BundleInfo &bundleInfo, st
             }
             for (const auto &extensionFormInfo: extensionFormInfos) {
                 FormInfo formInfo(extensionInfo, extensionFormInfo);
+                if (!bundleInfo.applicationInfo.isSystemApp) {
+                    formInfo.transparencyEnabled = false;
+                }
                 if (GetFormInfoDescription(resourceManager, formInfo) != ERR_OK) {
                     HILOG_INFO("Get FormInfo Description fail");
                 }

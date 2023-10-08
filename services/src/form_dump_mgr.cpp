@@ -62,7 +62,7 @@ void FormDumpMgr::DumpTemporaryFormInfos(const std::vector<FormRecord> &formReco
         formInfos += "    moduleName [" + info.moduleName + "]\n";
         formInfos += "    abilityName [" + info.abilityName + "]\n";
         formInfos += "    isDynamic [" + std::to_string(info.isDynamic) + "]\n";
-        formInfos += "    transparentEnabled [" + std::to_string(info.transparentEnabled) + "]\n";
+        formInfos += "    transparencyEnabled [" + std::to_string(info.transparencyEnabled) + "]\n";
         formInfos += "    formUserUids [";
         for (const auto &uId : info.formUserUids) {
             formInfos += " Uid[" + std::to_string(uId) + "] ";
@@ -80,7 +80,7 @@ void FormDumpMgr::DumpStaticBundleFormInfos(const std::vector<FormInfo> &bundleF
         formInfos += "    abilityName [" + info.abilityName + "]\n";
         formInfos += "    formName [" + info.name + "]\n";
         formInfos += "    isDynamic [" + std::to_string(info.isDynamic) + "]\n";
-        formInfos += "    transparentEnabled [" + std::to_string(info.transparentEnabled) + "]\n" + LINE_SEPARATOR;
+        formInfos += "    transparencyEnabled [" + std::to_string(info.transparencyEnabled) + "]\n" + LINE_SEPARATOR;
     }
 }
 /**
@@ -111,7 +111,7 @@ void FormDumpMgr::DumpFormInfos(const std::vector<FormRecord> &formRecordInfos, 
         formInfos += "    userId [" + std::to_string(info.userId) + "]\n";
         formInfos += "    type [" + std::to_string(static_cast<int32_t>(info.type)) + "]\n";
         formInfos += "    isDynamic [" + std::to_string(info.isDynamic) + "]\n";
-        formInfos += "    transparentEnabled [" + std::to_string(info.transparentEnabled) + "]\n";
+        formInfos += "    transparencyEnabled [" + std::to_string(info.transparencyEnabled) + "]\n";
 
         if (!info.hapSourceDirs.empty()) {
             formInfos += "    hapSourceDirs [";
@@ -182,7 +182,7 @@ void FormDumpMgr::DumpFormInfo(const FormRecord &formRecordInfo, std::string &fo
     formInfo += "    compatibleVersion [" + std::to_string(formRecordInfo.compatibleVersion) + "]\n";
     formInfo += "    userId [" + std::to_string(formRecordInfo.userId) + "]\n";
     formInfo += "    isDynamic [" + std::to_string(formRecordInfo.isDynamic) + "]\n";
-    formInfo += "    transparentEnabled [" + std::to_string(formRecordInfo.transparentEnabled) + "]\n";
+    formInfo += "    transparencyEnabled [" + std::to_string(formRecordInfo.transparencyEnabled) + "]\n";
 
     if (!formRecordInfo.hapSourceDirs.empty()) {
         formInfo += "    hapSourceDirs [";
