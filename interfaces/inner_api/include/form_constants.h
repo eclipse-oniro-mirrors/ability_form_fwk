@@ -201,7 +201,7 @@ namespace Constants {
     constexpr int32_t RENDER_FORM = 0; // default value
     constexpr int32_t UPDATE_RENDERING_FORM = 1;
     constexpr const char* FORM_COMPILE_MODE_KEY = "form_compile_mode";
-    constexpr const char* FORM_COMPATIBLE_VERSION_CODE_KEY = "form_compatible_version_code";
+    constexpr const char* FORM_COMPATIBLE_VERSION_KEY = "form_compatible_version";
 
     //ArkTs card
     constexpr const char* FORM_COMP_ID = "ohos.extra.param.key.form_comp_id";
