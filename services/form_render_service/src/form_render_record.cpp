@@ -457,7 +457,7 @@ std::shared_ptr<Ace::FormRendererGroup> FormRenderRecord::CreateFormRendererGrou
     const std::shared_ptr<AbilityRuntime::Context> &context, const std::shared_ptr<AbilityRuntime::Runtime> &runtime)
 {
     HILOG_INFO("Create formRendererGroup.");
-    auto formRendererGroup = Ace::FormRendererGroup::Create(context, runtime);
+    auto formRendererGroup = Ace::FormRendererGroup::Create(context, runtime, eventHandler_);
     if (formRendererGroup == nullptr) {
         HILOG_ERROR("Create formRendererGroup failed");
         return nullptr;
