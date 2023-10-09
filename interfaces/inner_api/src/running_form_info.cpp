@@ -31,6 +31,7 @@ bool RunningFormInfo::ReadFromParcel(Parcel &parcel)
     hostBundleName = Str16ToStr8(parcel.ReadString16());
     int32_t formVisiblityInt = parcel.ReadInt32();
     formVisiblity = (FormVisibilityType)formVisiblityInt;
+    formUsageState = static_cast<FormUsageState>(parcel.ReadInt32());
     return true;
 }
 
@@ -73,6 +74,11 @@ bool RunningFormInfo::Marshalling(Parcel &parcel) const
 
     // write formVisiblity
     if (!parcel.WriteInt32((int32_t)formVisiblity)) {
+        return false;
+    }
+
+    // write formUsageState
+    if (!parcel.WriteInt32(static_cast<int32_t>(formUsageState))) {
         return false;
     }
 

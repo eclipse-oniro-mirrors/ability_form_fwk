@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "js_form_host.h"
+#include "js_form_observer.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 
@@ -22,7 +22,7 @@ using namespace OHOS::AbilityRuntime;
 static napi_module _module = {
     .nm_version = 0,
     .nm_modname = "app.form.formObserver",
-    .nm_register_func = OHOS::AbilityRuntime::JsFormHostInit,
+    .nm_register_func = OHOS::AbilityRuntime::JsFormObserverInit,
 };
 
 extern "C" __attribute__((constructor))

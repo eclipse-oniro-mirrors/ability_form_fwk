@@ -21,6 +21,11 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+enum class FormUsageState {
+    USED = 0,
+    UNUSED,
+};
+
 enum class FormVisibilityType {
     UNKNOWN = 0,
     VISIBLE,
@@ -36,6 +41,7 @@ struct FormInstance : public Parcelable {
     std::string moduleName = "";
     std::string abilityName = "";
     std::string formName = "";
+    FormUsageState formUsageState = FormUsageState::USED;
     bool ReadFromParcel(Parcel &parcel);
     bool Marshalling(Parcel &parcel) const override;
     static FormInstance *Unmarshalling(Parcel &parcel);

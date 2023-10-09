@@ -37,6 +37,7 @@ struct RunningFormInfo : public Parcelable {
     int32_t dimension;
     std::string hostBundleName;
     FormVisibilityType formVisiblity = FormVisibilityType::UNKNOWN;
+    FormUsageState formUsageState = FormUsageState::USED;
 
     bool ReadFromParcel(Parcel &parcel);
     bool Marshalling(Parcel &parcel) const override;

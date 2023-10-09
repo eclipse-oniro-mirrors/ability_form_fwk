@@ -25,7 +25,6 @@
 #include "form_mgr.h"
 #include "form_mgr_errors.h"
 #include "ipc_skeleton.h"
-#include "js_form_state_observer.h"
 #include "js_runtime.h"
 #include "js_runtime_utils.h"
 #include "napi_form_util.h"
@@ -48,8 +47,6 @@ namespace {
     constexpr int64_t NANOSECONDS = 1000000000;
     // MICROSECONDS mean 10^6 millias second
     constexpr int64_t MICROSECONDS = 1000000;
-    //input parameters illegal
-    const std::string EMPTY_BUNDLE = "";
 }
 
 int64_t SystemTimeMillis() noexcept
@@ -352,11 +349,6 @@ public:
         GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnGetFormsInfo);
     }
 
-    static napi_value GetRunningFormInfos(napi_env env, napi_callback_info info)
-    {
-        GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnGetRunningFormInfos);
-    }
-
     static napi_value ShareForm(napi_env env, napi_callback_info info)
     {
         GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnShareForm);
@@ -370,15 +362,6 @@ public:
     static napi_value NotifyFormsPrivacyProtected(napi_env env, napi_callback_info info)
     {
         GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnNotifyFormsPrivacyProtected);
-    }
-    static napi_value GetFormInstancesByFilter(napi_env env, napi_callback_info info)
-    {
-        GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnGetFormInstancesByFilter);
-    }
-
-    static napi_value GetFormInstanceById(napi_env env, napi_callback_info info)
-    {
-        GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnGetFormInstanceById);
     }
 private:
     bool CheckCallerIsSystemApp()
@@ -880,88 +863,6 @@ private:
         return result;
     }
 
-    napi_value OnRegisterFormAddObserver(napi_env env, size_t argc, napi_value* argv)
-    {
-        HILOG_DEBUG("called.");
-        // Check the number of input arguments.
-        if (argc > ARGS_THREE || argc < ARGS_TWO) {
-            HILOG_ERROR("wrong number of arguments.");
-            NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "2 or 3");
-            return CreateJsUndefined(env);
-        }
-
-        std::string bundleName("");
-        if (argc == ARGS_THREE) {
-            if (!ConvertFromJsValue(env, argv[PARAM1], bundleName)) {
-                HILOG_ERROR("convert type failed!");
-                NapiFormUtil::ThrowParamTypeError(env, "bundleName", "string");
-                return CreateJsUndefined(env);
-            }
-        } else {
-            bundleName = "all";
-        }
-
-        if (!IsTypeForNapiValue(env, argv[argc - 1], napi_function)) {
-            HILOG_ERROR("the last param is invalid");
-            NapiFormUtil::ThrowParamTypeError(env, "callback", "Callback<formInfo.RunningFormInfo>");
-            return CreateJsUndefined(env);
-        }
-
-        // Check the size of the map.
-        if (!JsFormStateObserver::GetInstance()->CheckMapSize("formAdd", bundleName)) {
-            NapiFormUtil::ThrowParamError(env,
-                "The number of bundleNames registered to listen has exceeded the limit");
-            return CreateJsUndefined(env);
-        }
-
-        if (!JsFormStateObserver::GetInstance()->RegisterFormAddCallback(env, bundleName, argv[argc - 1])) {
-            return CreateJsUndefined(env);
-        }
-        FormMgr::GetInstance().RegisterFormAddObserverByBundle(bundleName, JsFormStateObserver::GetInstance());
-        return CreateJsUndefined(env);
-    }
-
-    napi_value OnRegisterFormRemoveObserver(napi_env env, size_t argc, napi_value* argv)
-    {
-        HILOG_DEBUG("called.");
-        // Check the number of input parameters.
-        if (argc > ARGS_THREE || argc < ARGS_TWO) {
-            HILOG_ERROR("wrong number of arguments.");
-            NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "2 or 3");
-            return CreateJsUndefined(env);
-        }
-
-        std::string bundleName("");
-        if (argc == ARGS_THREE) {
-            if (!ConvertFromJsValue(env, argv[PARAM1], bundleName)) {
-                HILOG_ERROR("convert type failed!");
-                NapiFormUtil::ThrowParamTypeError(env, "bundleName", "string");
-                return CreateJsUndefined(env);
-            }
-        } else {
-            bundleName = "all";
-        }
-
-        if (!IsTypeForNapiValue(env, argv[argc - 1], napi_function)) {
-            HILOG_ERROR("the last param is invalid");
-            NapiFormUtil::ThrowParamTypeError(env, "callback", "Callback<formInfo.RunningFormInfo>");
-            return CreateJsUndefined(env);
-        }
-
-        // Check the size of the map.
-        if (!JsFormStateObserver::GetInstance()->CheckMapSize("formRemove", bundleName)) {
-            NapiFormUtil::ThrowParamError(env,
-                "The number of bundleNames registered to listen has exceeded the limit");
-            return CreateJsUndefined(env);
-        }
-
-        if (!JsFormStateObserver::GetInstance()->RegisterFormRemoveCallback(env, bundleName, argv[argc - 1])) {
-            return CreateJsUndefined(env);
-        }
-
-        FormMgr::GetInstance().RegisterFormRemoveObserverByBundle(bundleName, JsFormStateObserver::GetInstance());
-        return CreateJsUndefined(env);
-    }
     napi_value OnRegisterFormUninstallObserver(napi_env env, size_t argc, napi_value* argv)
     {
         // Check the number of input parameters.
@@ -1000,129 +901,13 @@ private:
             return CreateJsUndefined(env);
         }
 
-        if (type == "formAdd") {
-            return OnRegisterFormAddObserver(env, argc, argv);
-        } else if (type == "formRemove") {
-            return OnRegisterFormRemoveObserver(env, argc, argv);
-        } else if (type == "formUninstall") {
+        if (type == "formUninstall") {
             return OnRegisterFormUninstallObserver(env, argc, argv);
-        } else if (type == "notifyVisible") {
-            return OnRegisterFormIsVisibleObserver(env, argc, argv, true);
-        } else if (type == "notifyInvisible") {
-            return OnRegisterFormIsVisibleObserver(env, argc, argv, false);
         } else {
-            HILOG_ERROR("args[0] should be formAdd, formRemove, formUninstall, notifyVisible or notifyInvisible.");
-            NapiFormUtil::ThrowParamTypeError(env, "type",
-                "formAdd, formRemove, formUninstall, notifyVisible or notifyInvisible");
+            HILOG_ERROR("args[0] should be formUninstall.");
+            NapiFormUtil::ThrowParamTypeError(env, "type", "formUninstall");
             return CreateJsUndefined(env);
         }
-    }
-
-    napi_value OnRegisterFormIsVisibleObserver(napi_env env, size_t argc, napi_value* argv, bool isVisibility)
-    {
-        HILOG_DEBUG("called.");
-        if (argc < ARGS_TWO || argc > ARGS_THREE) {
-            HILOG_ERROR("wrong number of arguments.");
-            NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "2");
-            return CreateJsUndefined(env);
-        }
-
-        int32_t funcPos = 0;
-        std::string bundleName(EMPTY_BUNDLE);
-        if (IsTypeForNapiValue(env, argv[PARAM1], napi_function)) {
-            // There are two or more arguments, and the type of argument2 is function.
-            funcPos = PARAM1;
-        } else if (IsTypeForNapiValue(env, argv[PARAM1], napi_string)) {
-            // There are three or more arguments, and the type of argument2 is string.
-            if (!ConvertFromJsValue(env, argv[PARAM1], bundleName)) {
-                HILOG_ERROR("param1 is invalid");
-                NapiFormUtil::ThrowParamTypeError(env, "bundleName", "string");
-                return CreateJsUndefined(env);
-            }
-            if (bundleName.empty()) {
-                HILOG_ERROR("bundleName is empty!");
-                NapiFormUtil::ThrowParamTypeError(env, "bundleName", "string");
-                return CreateJsUndefined(env);
-            }
-            funcPos = PARAM2;
-        } else {
-            HILOG_ERROR("param1 is invalid");
-            NapiFormUtil::ThrowParamTypeError(env, "param 2", "type");
-            return CreateJsUndefined(env);
-        }
-
-        if (!IsTypeForNapiValue(env, argv[funcPos], napi_function)) {
-            HILOG_ERROR("the last param is invalid");
-            NapiFormUtil::ThrowParamTypeError(env, "callback", "Callback<Array<RunningFormInfo>>");
-            return CreateJsUndefined(env);
-        }
-
-        if (formObserver_ == nullptr) {
-            HILOG_ERROR("formObserver_ is nullptr");
-            formObserver_ = JsFormStateObserver::GetInstance();
-        }
-        JsFormStateObserver::GetInstance()->
-            RegisterFormInstanceCallback(env, argv[funcPos], isVisibility, bundleName, formObserver_);
-        return CreateJsUndefined(env);
-    }
-
-    napi_value OnUnregisterFormIsVisibleObserver(napi_env env, size_t argc, napi_value* argv, bool isVisibility)
-    {
-        HILOG_DEBUG("called.");
-        int32_t funcPos = 0;
-        int32_t bundlePos = 0;
-        if (argc < ARGS_ONE || argc > ARGS_THREE) {
-            HILOG_ERROR("wrong number of arguments.");
-            NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1 or 2 or 3");
-            return CreateJsUndefined(env);
-        }
-        std::string bundleName(EMPTY_BUNDLE);
-        if (argc == ARGS_TWO) {
-            if (IsTypeForNapiValue(env, argv[PARAM1], napi_function)) {
-                HILOG_DEBUG("param1 is function");
-                funcPos = PARAM1;
-            } else if (IsTypeForNapiValue(env, argv[PARAM1], napi_string)) {
-                bundlePos = PARAM1;
-            } else {
-                NapiFormUtil::ThrowParamTypeError(env, "param 2", "type");
-                return CreateJsUndefined(env);
-            }
-        }
-
-        if (argc == ARGS_THREE) {
-            HILOG_DEBUG("There are three params.");
-            if (IsTypeForNapiValue(env, argv[PARAM1], napi_string)
-                && IsTypeForNapiValue(env, argv[PARAM2], napi_function)) {
-                bundlePos = PARAM1;
-                funcPos = PARAM2;
-            } else {
-                NapiFormUtil::ThrowParamTypeError(env, "param 2 or 3", "type");
-                return CreateJsUndefined(env);
-            }
-        }
-
-        if (bundlePos != 0) {
-            if (!ConvertFromJsValue(env, argv[bundlePos], bundleName)) {
-                HILOG_ERROR("convert bundleName failed!");
-                NapiFormUtil::ThrowParamTypeError(env, "bundleName", "string");
-                return CreateJsUndefined(env);
-            }
-            if (bundleName.empty()) {
-                HILOG_ERROR("bundleName is empty!");
-                NapiFormUtil::ThrowParamTypeError(env, "bundleName", "string");
-                return CreateJsUndefined(env);
-            }
-        }
-
-        if (funcPos != 0) {
-            JsFormStateObserver::GetInstance()->
-                DelFormNotifyVisibleCallbackByBundle(bundleName, isVisibility, argv[funcPos], formObserver_);
-            return CreateJsUndefined(env);
-        }
-        // If there is only one argument.
-        JsFormStateObserver::GetInstance()->
-            ClearFormNotifyVisibleCallbackByBundle(bundleName, isVisibility, formObserver_);
-        return CreateJsUndefined(env);
     }
 
     napi_value OnUnregisterFormUninstallObserver(napi_env env, size_t argc, napi_value* argv)
@@ -1150,125 +935,6 @@ private:
         return CreateJsUndefined(env);
     }
 
-    napi_value OnUnregisterFormRemoveObserver(napi_env env, size_t argc, napi_value* argv)
-    {
-        // Check the number of input parameters.
-        if (argc > ARGS_THREE || argc < ARGS_ONE) {
-            HILOG_ERROR("wrong number of arguments.");
-            NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1 or 2 or 3");
-            return CreateJsUndefined(env);
-        }
-
-        // If there is only one argument, all listening will be cancelled.
-        if (argc == ARGS_ONE) {
-            JsFormStateObserver::GetInstance()->ClearFormRemoveCallbackByBundle("all");
-            return CreateJsUndefined(env);
-        }
-
-        if (argc == ARGS_TWO) {
-            if (IsTypeForNapiValue(env, argv[PARAM1], napi_function)) {
-                JsFormStateObserver::GetInstance()->DelFormRemoveCallbackByBundle(
-                    reinterpret_cast<napi_value>(argv[PARAM1]), "all");
-                return CreateJsUndefined(env);
-            } else if (IsTypeForNapiValue(env, argv[PARAM1], napi_string)) {
-                std::string bundleName;
-                if (!ConvertFromJsValue(env, argv[PARAM1], bundleName)) {
-                    HILOG_ERROR("convert bundleName error!");
-                    NapiFormUtil::ThrowParamTypeError(env, "bundleName", "string");
-                    return CreateJsUndefined(env);
-                }
-                JsFormStateObserver::GetInstance()->ClearFormRemoveCallbackByBundle(bundleName);
-                return CreateJsUndefined(env);
-            } else {
-                HILOG_ERROR("param1 is ineffective");
-                NapiFormUtil::ThrowParamTypeError(env, "callback or bundleName",
-                    "Callback<formInfo.RunningFormInfo> or string");
-                return CreateJsUndefined(env);
-            }
-        }
-
-        if (argc == ARGS_THREE) {
-            if (!IsTypeForNapiValue(env, argv[PARAM1], napi_string)) {
-                HILOG_ERROR("param1 is ineffective");
-                NapiFormUtil::ThrowParamTypeError(env, "bundleName", "string");
-                return CreateJsUndefined(env);
-            }
-            if (!IsTypeForNapiValue(env, argv[PARAM2], napi_function)) {
-                HILOG_ERROR("param2 is ineffective");
-                NapiFormUtil::ThrowParamTypeError(env, "callback", "Callback<formInfo.RunningFormInfo>");
-                return CreateJsUndefined(env);
-            }
-            std::string bundleName;
-            if (!ConvertFromJsValue(env, argv[PARAM1], bundleName)) {
-                HILOG_ERROR("convert bundleName failed!");
-                NapiFormUtil::ThrowParamTypeError(env, "bundleName", "string");
-                return CreateJsUndefined(env);
-            }
-            JsFormStateObserver::GetInstance()->DelFormRemoveCallbackByBundle(argv[PARAM2], bundleName);
-            return CreateJsUndefined(env);
-        }
-        return CreateJsUndefined(env);
-    }
-
-    napi_value OnUnregisterFormAddObserver(napi_env env, size_t argc, napi_value* argv)
-    {
-        // Check the number of input parameters.
-        if (argc > ARGS_THREE || argc < ARGS_ONE) {
-            HILOG_ERROR("wrong number of arguments.");
-            NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1 or 2 or 3");
-            return CreateJsUndefined(env);
-        }
-
-        // If there is only one argument, full listening will be cancelled.
-        if (argc == ARGS_ONE) {
-            JsFormStateObserver::GetInstance()->ClearFormAddCallbackByBundle("all");
-            return CreateJsUndefined(env);
-        }
-
-        if (argc == ARGS_TWO) {
-            if (IsTypeForNapiValue(env, argv[PARAM1], napi_function)) {
-                JsFormStateObserver::GetInstance()->DelFormAddCallbackByBundle(argv[PARAM1], "all");
-                return CreateJsUndefined(env);
-            } else if (IsTypeForNapiValue(env, argv[PARAM1], napi_string)) {
-                std::string bundleName;
-                if (!ConvertFromJsValue(env, argv[PARAM1], bundleName)) {
-                    HILOG_ERROR("convert bundleName failed!");
-                    NapiFormUtil::ThrowParamTypeError(env, "bundleName", "string");
-                    return CreateJsUndefined(env);
-                }
-                JsFormStateObserver::GetInstance()->ClearFormAddCallbackByBundle(bundleName);
-                return CreateJsUndefined(env);
-            } else {
-                HILOG_ERROR("param1 is invalid");
-                NapiFormUtil::ThrowParamTypeError(env, "callback or bundleName",
-                    "Callback<formInfo.RunningFormInfo> or string");
-                return CreateJsUndefined(env);
-            }
-        }
-
-        if (argc == ARGS_THREE) {
-            if (!IsTypeForNapiValue(env, argv[PARAM1], napi_string)) {
-                HILOG_ERROR("param1 is invalid");
-                NapiFormUtil::ThrowParamTypeError(env, "bundleName", "string");
-                return CreateJsUndefined(env);
-            }
-            if (!IsTypeForNapiValue(env, argv[PARAM2], napi_function)) {
-                HILOG_ERROR("param2 is invalid");
-                NapiFormUtil::ThrowParamTypeError(env, "callback", "Callback<formInfo.RunningFormInfo>");
-                return CreateJsUndefined(env);
-            }
-            std::string bundleName;
-            if (!ConvertFromJsValue(env, argv[PARAM1], bundleName)) {
-                HILOG_ERROR("convert bundleName failed!");
-                NapiFormUtil::ThrowParamTypeError(env, "bundleName", "string");
-                return CreateJsUndefined(env);
-            }
-            JsFormStateObserver::GetInstance()->DelFormAddCallbackByBundle(argv[PARAM2], bundleName);
-            return CreateJsUndefined(env);
-        }
-        return CreateJsUndefined(env);
-    }
-
     napi_value OnUnregisterFormObserver(napi_env env, size_t argc, napi_value* argv)
     {
         HILOG_DEBUG("called.");
@@ -1288,20 +954,11 @@ private:
             return CreateJsUndefined(env);
         }
 
-        if (type == "formAdd") {
-            return OnUnregisterFormAddObserver(env, argc, argv);
-        } else if (type == "formRemove") {
-            return OnUnregisterFormRemoveObserver(env, argc, argv);
-        } else if (type == "notifyVisible") {
-            return OnUnregisterFormIsVisibleObserver(env, argc, argv, true);
-        } else if (type == "notifyInvisible") {
-            return OnUnregisterFormIsVisibleObserver(env, argc, argv, false);
-        } else if (type == "formUninstall") {
+        if (type == "formUninstall") {
             return OnUnregisterFormUninstallObserver(env, argc, argv);
         } else {
-            HILOG_ERROR("args[0] should be formAdd, formRemove, formUninstall, visibility or notifyInvisible.");
-            NapiFormUtil::ThrowParamTypeError(env,
-                "type", "formAdd, formRemove, formUninstall, visibility or notifyInvisible");
+            HILOG_ERROR("args[0] should be formUninstall.");
+            NapiFormUtil::ThrowParamTypeError(env, "type", "formUninstall");
             return CreateJsUndefined(env);
         }
     }
@@ -1473,62 +1130,6 @@ private:
         return result;
     }
 
-    napi_value OnGetRunningFormInfos(napi_env env, size_t argc, napi_value* argv)
-    {
-        HILOG_DEBUG("called");
-        if (argc > ARGS_TWO) {
-            HILOG_ERROR("wrong number of arguments.");
-            NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "0 or 1 or 2");
-            return CreateJsUndefined(env);
-        }
-
-        decltype(argc) convertArgc = 0;
-        std::string bundleName("");
-        if (argc == ARGS_ONE && !IsTypeForNapiValue(env, argv[PARAM0], napi_function)) {
-            if (!ConvertFromJsValue(env, argv[PARAM0], bundleName)) {
-                HILOG_ERROR("bundleName convert failed.");
-                NapiFormUtil::ThrowParamTypeError(env, "bundleName", "string");
-                return CreateJsUndefined(env);
-            }
-            convertArgc++;
-        }
-
-        if (argc == ARGS_TWO) {
-            if (!ConvertFromJsValue(env, argv[PARAM1], bundleName)) {
-                HILOG_ERROR("bundleName convert failed.");
-                NapiFormUtil::ThrowParamTypeError(env, "bundleName", "string");
-                return CreateJsUndefined(env);
-            }
-            convertArgc++;
-        }
-
-        auto complete = [bundleName, convertArgc](napi_env env, NapiAsyncTask &task, int32_t status) {
-            std::string hostBundleName(bundleName);
-            std::vector<RunningFormInfo> runningFormInfos;
-            int32_t ret = ERR_OK;
-            if (convertArgc == ARGS_ZERO) {
-                ret = FormMgr::GetInstance().GetRunningFormInfos(runningFormInfos);
-            } else {
-                ret = FormMgr::GetInstance().GetRunningFormInfosByBundleName(hostBundleName, runningFormInfos);
-            }
-            if (ret != ERR_OK) {
-                task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
-                return;
-            }
-            task.ResolveWithNoError(env, CreateRunningFormInfos(env, runningFormInfos));
-        };
-        napi_value result = nullptr;
-        napi_value lastParam = nullptr;
-        if (argc == ARGS_TWO) {
-            lastParam = argv[ARGS_ZERO];
-        } else {
-            lastParam = (argc <= convertArgc) ? nullptr : argv[convertArgc];
-        }
-        NapiAsyncTask::ScheduleWithDefaultQos("JsFormHost::OnGetRunningFormInfos",
-            env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
-        return result;
-    }
-
     void InnerShareForm(napi_env env, const std::shared_ptr<AbilityRuntime::NapiAsyncTask> &asyncTask,
         ShareFormCallBackClient::ShareFormTask &&task, int64_t formId, const std::string &remoteDeviceId)
     {
@@ -1688,107 +1289,6 @@ private:
             env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
         return result;
     }
-
-    napi_value OnGetFormInstancesByFilter(napi_env env, size_t argc, napi_value* argv)
-    {
-        HILOG_DEBUG("is called");
-        if (argc < ARGS_ONE || argc > ARGS_THREE) {
-            NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1 or 2");
-            HILOG_ERROR("wrong number of arguments!");
-            return CreateJsUndefined(env);
-        }
-
-        FormInstancesFilter filter;
-        if (!IsTypeForNapiValue(env, argv[PARAM0], napi_object)) {
-            HILOG_ERROR("input params is not object!");
-            NapiFormUtil::ThrowParamTypeError(env, "formProviderFilter", "object");
-            return CreateJsUndefined(env);
-        }
-        auto arg = argv[PARAM0];
-        if (!ParseParam(env, arg, filter)) {
-            HILOG_ERROR("input params parse failed!");
-            NapiFormUtil::ThrowParamTypeError(env, "formProviderFilter", "object");
-            return CreateJsUndefined(env);
-        }
-        if (argc == ARGS_TWO && !IsTypeForNapiValue(env, argv[PARAM1], napi_function)) {
-            HILOG_ERROR("param1 is invalid");
-            NapiFormUtil::ThrowParamTypeError(env, "callback", "Callback<string>");
-            return CreateJsUndefined(env);
-        }
-        std::shared_ptr<std::vector<FormInstance>> formInstances = std::make_shared<std::vector<FormInstance>>();
-        auto apiResult = std::make_shared<int32_t>();
-        auto execute = [filter, formInstances, ret = apiResult]() {
-            *ret = FormMgr::GetInstance().GetFormInstancesByFilter(filter, *formInstances);
-        };
-
-        auto complete =
-            [formInstances, ret = apiResult](napi_env env, NapiAsyncTask &task, int32_t status) {
-                if (*ret != ERR_OK) {
-                    HILOG_ERROR("failed");
-                    task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, *ret));
-                } else {
-                    task.ResolveWithNoError(env, CreateFormInstances(env, *formInstances));
-                }
-            };
-        napi_value lastParam = (argc == ARGS_ONE) ? nullptr : argv[PARAM1];
-        napi_value result = nullptr;
-        NapiAsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnGetFormInstancesByFilter",
-            env, CreateAsyncTaskWithLastParam(env, lastParam, std::move(execute), std::move(complete), &result));
-        return result;
-    }
-
-    napi_value OnGetFormInstanceById(napi_env env, size_t argc, napi_value* argv)
-    {
-        HILOG_DEBUG("called");
-        if (argc < ARGS_ONE || argc > ARGS_THREE) {
-            HILOG_ERROR("wrong number of arguments!");
-            NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1 or 2 or 3");
-            return CreateJsUndefined(env);
-        }
-        decltype(argc) convertArgc = 0;
-        int64_t formId;
-        if (!ConvertFromId(env, argv[PARAM0], formId)) {
-            HILOG_ERROR("convert strFormIdList failed!");
-            NapiFormUtil::ThrowParamTypeError(env, "formId", "string");
-            return CreateJsUndefined(env);
-        }
-        convertArgc++;
-        bool isIncludeUnused = false;
-        if ((argc == ARGS_TWO || argc == ARGS_THREE) && !IsTypeForNapiValue(env, argv[PARAM1], napi_function)) {
-            if (!ConvertFromJsValue(env, argv[PARAM1], isIncludeUnused)) {
-                HILOG_ERROR("convert isIncludeUnused failed.");
-                NapiFormUtil::ThrowParamTypeError(env, "isIncludeUnused", "bool");
-                return CreateJsUndefined(env);
-            }
-            convertArgc++;
-        }
-        if (argc == ARGS_THREE && !IsTypeForNapiValue(env, argv[PARAM2], napi_function)) {
-            HILOG_ERROR("param2 is invalid");
-            NapiFormUtil::ThrowParamTypeError(env, "callback", "Callback<string>");
-            return CreateJsUndefined(env);
-        }
-        std::shared_ptr<FormInstance> formInstance = std::make_shared<FormInstance>();
-        auto apiResult = std::make_shared<int32_t>();
-        auto execute = [formId, isIncludeUnused, formInstance, ret = apiResult]() {
-            *ret = FormMgr::GetInstance().GetFormInstanceById(formId, isIncludeUnused, *formInstance);
-        };
-
-        auto complete =
-            [formInstance, ret = apiResult](napi_env env, NapiAsyncTask &task, int32_t status) {
-                if (*ret != ERR_OK) {
-                    HILOG_ERROR("failed");
-                    task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, *ret));
-                } else {
-                    task.ResolveWithNoError(env, CreateFormInstance(env, *formInstance));
-                }
-            };
-        napi_value lastParam = (argc == convertArgc) ? nullptr : argv[convertArgc];
-        napi_value result = nullptr;
-        NapiAsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnGetFormInstanceById",
-            env, CreateAsyncTaskWithLastParam(env, lastParam, std::move(execute), std::move(complete), &result));
-        return result;
-    }
-    sptr<JsFormStateObserver> formObserver_ = nullptr;
 };
 
 napi_value JsFormHostInit(napi_env env, napi_value exportObj)
@@ -1820,11 +1320,7 @@ napi_value JsFormHostInit(napi_env env, napi_value exportObj)
     BindNativeFunction(env, exportObj, "shareForm", moduleName, JsFormHost::ShareForm);
     BindNativeFunction(env, exportObj, "notifyFormsPrivacyProtected", moduleName,
         JsFormHost::NotifyFormsPrivacyProtected);
-    BindNativeFunction(env, exportObj, "getRunningFormInfos", moduleName, JsFormHost::GetRunningFormInfos);
     BindNativeFunction(env, exportObj, "acquireFormData", moduleName, JsFormHost::AcquireFormData);
-    BindNativeFunction(env, exportObj, "getRunningFormInfosByFilter", moduleName,
-        JsFormHost::GetFormInstancesByFilter);
-    BindNativeFunction(env, exportObj, "getRunningFormInfoById", moduleName, JsFormHost::GetFormInstanceById);
 
     return CreateJsUndefined(env);
 }

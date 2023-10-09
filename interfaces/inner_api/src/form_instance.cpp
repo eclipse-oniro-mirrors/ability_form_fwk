@@ -30,6 +30,7 @@ bool FormInstance::ReadFromParcel(Parcel &parcel)
     moduleName = Str16ToStr8(parcel.ReadString16());
     abilityName = Str16ToStr8(parcel.ReadString16());
     formName = Str16ToStr8(parcel.ReadString16());
+    formUsageState = static_cast<FormUsageState>(parcel.ReadInt32());
     return true;
 }
 
@@ -72,6 +73,11 @@ bool FormInstance::Marshalling(Parcel &parcel) const
 
     // write formName
     if (!parcel.WriteString16(Str8ToStr16(formName))) {
+        return false;
+    }
+
+    // write formUsageState
+    if (!parcel.WriteInt32(static_cast<int32_t>(formUsageState))) {
         return false;
     }
     return true;

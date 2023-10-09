@@ -13,24 +13,18 @@
  * limitations under the License.
  */
 
-#ifndef FOUNDATION_APPEXECFWK_OHOS_FORM_INSTANCES_FILTER_H
-#define FOUNDATION_APPEXECFWK_OHOS_FORM_INSTANCES_FILTER_H
+#ifndef OHOS_FORM_FWK_JS_FORM_OBSERVER_H
+#define OHOS_FORM_FWK_JS_FORM_OBSERVER_H
 
-#include <string>
-#include "parcel.h"
+#include "js_runtime_utils.h"
+#include "napi/native_api.h"
+#include "napi/native_common.h"
+#include "napi/native_node_api.h"
 
 namespace OHOS {
-namespace AppExecFwk {
-struct FormInstancesFilter : public Parcelable {
-    std::string bundleName;
-    std::string formName;
-    std::string moduleName;
-    std::string abilityName;
-    bool isUnusedInclude = false;
-    bool ReadFromParcel(Parcel &parcel);
-    bool Marshalling(Parcel &parcel) const override;
-    static FormInstancesFilter *Unmarshalling(Parcel &parcel);
-};
-} // namespace AppExecFwk
+namespace AbilityRuntime {
+napi_value JsFormObserverInit(napi_env env, napi_value exportObj);
+} // namespace AbilityRuntime
 } // namespace OHOS
-#endif // FOUNDATION_APPEXECFWK_OHOS_FORM_INSTANCES_FILTER_H
+#endif /* OHOS_FORM_FWK_JS_FORM_OBSERVER_H */
+

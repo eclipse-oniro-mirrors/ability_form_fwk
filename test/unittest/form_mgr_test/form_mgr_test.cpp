@@ -1820,13 +1820,14 @@ HWTEST_F(FormMgrTest, FormMgrTest_0091, TestSize.Level1) {
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0092, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0092 starts";
-    EXPECT_CALL(*mockProxy, GetRunningFormInfos(_))
+    EXPECT_CALL(*mockProxy, GetRunningFormInfos(_, _))
         .Times(1)
         .WillOnce(Return(OHOS::ERR_OK));
     FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
 
     std::vector<RunningFormInfo> runningFormInfos;
-    int result = FormMgr::GetInstance().GetRunningFormInfos(runningFormInfos);
+    bool isUnusedInclude = false;
+    int result = FormMgr::GetInstance().GetRunningFormInfos(isUnusedInclude, runningFormInfos);
 
     EXPECT_EQ(result, 0);
     GTEST_LOG_(INFO) << "FormMgrTest_0092 test ends";
@@ -1840,13 +1841,14 @@ HWTEST_F(FormMgrTest, FormMgrTest_0092, TestSize.Level1) {
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0093, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0093 starts";
-    EXPECT_CALL(*mockProxy, GetRunningFormInfos(_))
+    EXPECT_CALL(*mockProxy, GetRunningFormInfos(_, _))
         .Times(1)
         .WillOnce(Return(OHOS::ERR_OK));
     FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
 
     std::vector<RunningFormInfo> runningFormInfos;
-    int result = FormMgr::GetInstance().GetRunningFormInfos(runningFormInfos);
+    bool isUnusedInclude = false;
+    int result = FormMgr::GetInstance().GetRunningFormInfos(isUnusedInclude, runningFormInfos);
 
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR);
     GTEST_LOG_(INFO) << "FormMgrTest_0093 test ends";
@@ -1861,11 +1863,12 @@ HWTEST_F(FormMgrTest, FormMgrTest_0093, TestSize.Level1) {
 HWTEST_F(FormMgrTest, FormMgrTest_0094, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0094 starts";
     FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
-    EXPECT_CALL(*mockProxy, GetRunningFormInfos(_))
+    EXPECT_CALL(*mockProxy, GetRunningFormInfos(_, _))
         .Times(1)
         .WillOnce(Return(ERROR_NUM));
     std::vector<RunningFormInfo> runningFormInfos;
-    int result = FormMgr::GetInstance().GetRunningFormInfos(runningFormInfos);
+    bool isUnusedInclude = false;
+    int result = FormMgr::GetInstance().GetRunningFormInfos(isUnusedInclude, runningFormInfos);
 
     EXPECT_EQ(result, ERROR_NUM);
     GTEST_LOG_(INFO) << "FormMgrTest_0094 test ends";
@@ -1880,11 +1883,12 @@ HWTEST_F(FormMgrTest, FormMgrTest_0094, TestSize.Level1) {
 HWTEST_F(FormMgrTest, FormMgrTest_0095, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0095 starts";
     FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
-    EXPECT_CALL(*mockProxy, GetRunningFormInfos(_))
+    EXPECT_CALL(*mockProxy, GetRunningFormInfos(_, _))
         .Times(1)
         .WillOnce(Return(NEGATIVE_NUM));
     std::vector<RunningFormInfo> runningFormInfos;
-    int result = FormMgr::GetInstance().GetRunningFormInfos(runningFormInfos);
+    bool isUnusedInclude = false;
+    int result = FormMgr::GetInstance().GetRunningFormInfos(isUnusedInclude, runningFormInfos);
 
     EXPECT_EQ(result, NEGATIVE_NUM);
     GTEST_LOG_(INFO) << "FormMgrTest_0095 test ends";
@@ -1898,14 +1902,15 @@ HWTEST_F(FormMgrTest, FormMgrTest_0095, TestSize.Level1) {
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0096, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0096 starts";
-    EXPECT_CALL(*mockProxy, GetRunningFormInfosByBundleName(_, _))
+    EXPECT_CALL(*mockProxy, GetRunningFormInfosByBundleName(_, _, _))
         .Times(1)
         .WillOnce(Return(OHOS::ERR_OK));
     FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
 
     std::string bundleName = "a";
+    bool isUnusedInclude = false;
     std::vector<RunningFormInfo> runningFormInfos;
-    int result = FormMgr::GetInstance().GetRunningFormInfosByBundleName(bundleName, runningFormInfos);
+    int result = FormMgr::GetInstance().GetRunningFormInfosByBundleName(bundleName, isUnusedInclude, runningFormInfos);
 
     EXPECT_EQ(result, 0);
     GTEST_LOG_(INFO) << "FormMgrTest_0096 test ends";
@@ -1919,13 +1924,14 @@ HWTEST_F(FormMgrTest, FormMgrTest_0096, TestSize.Level1) {
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0097, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0097 starts";
-    EXPECT_CALL(*mockProxy, GetRunningFormInfosByBundleName(_, _))
+    EXPECT_CALL(*mockProxy, GetRunningFormInfosByBundleName(_, _, _))
         .Times(1)
         .WillOnce(Return(OHOS::ERR_OK));
     FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
     std::string bundleName = "a";
+    bool isUnusedInclude = false;
     std::vector<RunningFormInfo> runningFormInfos;
-    int result = FormMgr::GetInstance().GetRunningFormInfosByBundleName(bundleName, runningFormInfos);
+    int result = FormMgr::GetInstance().GetRunningFormInfosByBundleName(bundleName, isUnusedInclude, runningFormInfos);
 
     EXPECT_EQ(result, 0);
     GTEST_LOG_(INFO) << "FormMgrTest_0097 test ends";
@@ -1939,13 +1945,14 @@ HWTEST_F(FormMgrTest, FormMgrTest_0097, TestSize.Level1) {
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0098, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0098 starts";
-    EXPECT_CALL(*mockProxy, GetRunningFormInfosByBundleName(_, _))
+    EXPECT_CALL(*mockProxy, GetRunningFormInfosByBundleName(_, _, _))
         .Times(1)
         .WillOnce(Return(OHOS::ERR_OK));
     FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
     std::string bundleName = "a";
+    bool isUnusedInclude = false;
     std::vector<RunningFormInfo> runningFormInfos;
-    int result = FormMgr::GetInstance().GetRunningFormInfosByBundleName(bundleName, runningFormInfos);
+    int result = FormMgr::GetInstance().GetRunningFormInfosByBundleName(bundleName, isUnusedInclude, runningFormInfos);
 
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR);
     GTEST_LOG_(INFO) << "FormMgrTest_0098 test ends";
@@ -1960,12 +1967,13 @@ HWTEST_F(FormMgrTest, FormMgrTest_0098, TestSize.Level1) {
 HWTEST_F(FormMgrTest, FormMgrTest_0099, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0099 starts";
     FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
-    EXPECT_CALL(*mockProxy, GetRunningFormInfosByBundleName(_, _))
+    EXPECT_CALL(*mockProxy, GetRunningFormInfosByBundleName(_, _, _))
         .Times(1)
         .WillOnce(Return(ERROR_NUM));
     std::string bundleName = "a";
+    bool isUnusedInclude = false;
     std::vector<RunningFormInfo> runningFormInfos;
-    int result = FormMgr::GetInstance().GetRunningFormInfosByBundleName(bundleName, runningFormInfos);
+    int result = FormMgr::GetInstance().GetRunningFormInfosByBundleName(bundleName, isUnusedInclude, runningFormInfos);
 
     EXPECT_EQ(result, ERROR_NUM);
     GTEST_LOG_(INFO) << "FormMgrTest_0099 test ends";

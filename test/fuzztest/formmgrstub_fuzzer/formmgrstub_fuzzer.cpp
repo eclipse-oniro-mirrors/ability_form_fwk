@@ -186,12 +186,12 @@ public:
     {
         return 0;
     }
-    ErrCode GetRunningFormInfos(std::vector<RunningFormInfo> &runningFormInfos) override
+    ErrCode GetRunningFormInfos(bool isUnusedInclude, std::vector<RunningFormInfo> &runningFormInfos) override
     {
         return 0;
     }
-    ErrCode GetRunningFormInfosByBundleName(const std::string &bundleName,
-        std::vector<RunningFormInfo> &runningFormInfos) override
+    ErrCode GetRunningFormInfosByBundleName(
+        const std::string &bundleName, bool isUnusedInclude, std::vector<RunningFormInfo> &runningFormInfos) override
     {
         return 0;
     }

@@ -1013,9 +1013,9 @@ int32_t FormMgrStub::HandleGetFormInstanceById(MessageParcel &data, MessageParce
 {
     HILOG_DEBUG("called.");
     int64_t formId = data.ReadInt64();
-    bool isIncludeUnused = data.ReadBool();
+    bool isUnusedInclude = data.ReadBool();
     FormInstance info;
-    auto result = GetFormInstanceById(formId, isIncludeUnused, info);
+    auto result = GetFormInstanceById(formId, isUnusedInclude, info);
     reply.WriteInt32(result);
     if (result == ERR_OK) {
         if (!reply.WriteParcelable(&info)) {
@@ -1047,8 +1047,9 @@ int32_t FormMgrStub::HandleGetHostFormsCount(MessageParcel &data, MessageParcel 
 ErrCode FormMgrStub::HandleGetRunningFormInfos(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_DEBUG("called.");
+    bool isUnusedInclude = data.ReadBool();
     std::vector<RunningFormInfo> runningFormInfos;
-    ErrCode result = GetRunningFormInfos(runningFormInfos);
+    ErrCode result = GetRunningFormInfos(isUnusedInclude, runningFormInfos);
     reply.WriteInt32(result);
     if (result == ERR_OK) {
         if (!WriteParcelableVector(runningFormInfos, reply)) {
@@ -1063,8 +1064,9 @@ ErrCode FormMgrStub::HandleGetRunningFormInfosByBundleName(MessageParcel &data, 
 {
     HILOG_DEBUG("called.");
     std::string bundleName = data.ReadString();
+    bool isUnusedInclude = data.ReadBool();
     std::vector<RunningFormInfo> runningFormInfos;
-    ErrCode result = GetRunningFormInfosByBundleName(bundleName, runningFormInfos);
+    ErrCode result = GetRunningFormInfosByBundleName(bundleName, isUnusedInclude, runningFormInfos);
     reply.WriteInt32(result);
     if (result == ERR_OK) {
         if (!WriteParcelableVector(runningFormInfos, reply)) {
