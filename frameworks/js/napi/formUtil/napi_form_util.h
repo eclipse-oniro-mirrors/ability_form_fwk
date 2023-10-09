@@ -76,24 +76,6 @@ struct AsyncErrMsgCallbackInfo {
 
 class NapiFormUtil {
 public:
-    static bool Throw(NativeEngine &engine, int32_t errCode, const std::string &errMessage);
-
-    static bool ThrowByInternalErrorCode(NativeEngine &engine, int32_t internalErrorCode);
-
-    static bool ThrowByExternalErrorCode(NativeEngine &engine, int32_t externalErrorCode);
-
-    static NativeValue *CreateErrorByInternalErrorCode(NativeEngine &engine, int32_t internalErrorCode);
-
-    static NativeValue *CreateErrorByExternalErrorCode(NativeEngine &engine, int32_t externalErrorCode);
-
-    static bool ThrowParamTypeError(NativeEngine &engine, const std::string &paramName, const std::string &type);
-
-    static bool ThrowParamNumError(NativeEngine &engine, const std::string &gotNum, const std::string &expectedNum);
-
-    static bool ThrowParamError(NativeEngine &engine, const std::string &extraMessage);
-
-    // above to delete
-
     static bool Throw(napi_env env, int32_t errCode, const std::string &errMessage);
 
     static bool ThrowByInternalErrorCode(napi_env env, int32_t internalErrorCode);

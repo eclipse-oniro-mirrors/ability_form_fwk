@@ -115,59 +115,6 @@ const std::map<int32_t, std::string> CODE_MSG_MAP = {
 };
 }
 
-bool NapiFormUtil::Throw(NativeEngine &engine, int32_t errCode, const std::string &errMessage)
-{
-    NativeValue *error = engine.CreateError(CreateJsValue(engine, errCode), CreateJsValue(engine, errMessage));
-    return engine.Throw(error);
-}
-
-bool NapiFormUtil::ThrowByInternalErrorCode(NativeEngine &engine, int32_t internalErrorCode)
-{
-    int32_t externalErrorCode = 0;
-    std::string externalErrorMessage;
-    FormMgr::GetInstance().GetExternalError(internalErrorCode, externalErrorCode, externalErrorMessage);
-    return Throw(engine, externalErrorCode, externalErrorMessage);
-}
-
-bool NapiFormUtil::ThrowByExternalErrorCode(NativeEngine &engine, int32_t externalErrorCode)
-{
-    std::string externalErrorMessage = FormMgr::GetInstance().GetErrorMsgByExternalErrorCode(externalErrorCode);
-    return Throw(engine, externalErrorCode, externalErrorMessage);
-}
-
-NativeValue *NapiFormUtil::CreateErrorByInternalErrorCode(NativeEngine &engine, int32_t internalErrorCode)
-{
-    int32_t externalErrorCode = 0;
-    std::string externalErrorMessage;
-    FormMgr::GetInstance().GetExternalError(internalErrorCode, externalErrorCode, externalErrorMessage);
-    return CreateJsError(engine, externalErrorCode, externalErrorMessage);
-}
-
-NativeValue *NapiFormUtil::CreateErrorByExternalErrorCode(NativeEngine &engine, int32_t externalErrorCode)
-{
-    std::string externalErrorMessage = FormMgr::GetInstance().GetErrorMsgByExternalErrorCode(externalErrorCode);
-    return CreateJsError(engine, externalErrorCode, externalErrorMessage);
-}
-
-bool NapiFormUtil::ThrowParamTypeError(NativeEngine &engine, const std::string &paramName, const std::string &type)
-{
-    return Throw(engine, ERR_FORM_EXTERNAL_PARAM_INVALID, CreateParamTypeErrorMessage(paramName, type));
-}
-
-bool NapiFormUtil::ThrowParamNumError(NativeEngine &engine, const std::string &gotNum, const std::string &expectedNum)
-{
-    std::string errorMessage = "Parameter error. Got " + gotNum + ", expected " + expectedNum;
-    return Throw(engine, ERR_FORM_EXTERNAL_PARAM_INVALID, errorMessage);
-}
-
-bool NapiFormUtil::ThrowParamError(NativeEngine &engine, const std::string &extraMessage)
-{
-    std::string errorMessage = "Parameter error. " + extraMessage;
-    return Throw(engine, ERR_FORM_EXTERNAL_PARAM_INVALID, errorMessage);
-}
-
-// above to delete
-
 bool NapiFormUtil::Throw(napi_env env, int32_t errCode, const std::string &errMessage)
 {
     napi_value error = CreateJsError(env, errCode, errMessage);
