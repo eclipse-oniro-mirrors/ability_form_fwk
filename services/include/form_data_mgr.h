@@ -751,9 +751,8 @@ private:
 private:
     void GetUnusedFormInstancesByFilter(
         const FormInstancesFilter &formInstancesFilter, std::vector<FormInstance> &formInstances);
-    void GetRunningFormInfosByCache(std::vector<RunningFormInfo> &runningFormInfos);
-    void GetRunningFormInfosByCache(
-        const std::string &bundleName, std::vector<RunningFormInfo> &runningFormInfos);
+    void GetUnusedFormInfos(std::vector<RunningFormInfo> &runningFormInfos);
+    void GetUnusedFormInfos(const std::string &bundleName, std::vector<RunningFormInfo> &runningFormInfos);
     mutable std::mutex formRecordMutex_;
     mutable std::mutex formHostRecordMutex_;
     mutable std::mutex formTempMutex_;

@@ -568,13 +568,11 @@ private:
             if (!ParseGetRunningFormInfosOneParam(env, argv, bundleName, hasBundleName, isUnusedInclude)) {
                 return CreateJsUndefined(env);
             }
-        }
-        if (argc == ARGS_TWO) {
+        } else if (argc == ARGS_TWO) {
             if (!ParseGetRunningFormInfosTwoParams(env, argv, bundleName, hasBundleName, isUnusedInclude)) {
                 return CreateJsUndefined(env);
             }
-        }
-        if (argc == ARGS_THREE) {
+        } else if (argc == ARGS_THREE) {
             if (!ParseGetRunningFormInfosParams(env, argv, bundleName, isUnusedInclude, PARAM1)) {
                 return CreateJsUndefined(env);
             }
