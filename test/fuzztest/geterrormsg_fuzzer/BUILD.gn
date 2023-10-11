@@ -37,6 +37,7 @@ ohos_fuzztest("GetErrorMsgFuzzTest") {
   deps = [
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
+    "//third_party/bounds_checking_function:libsec_shared",
   ]
 
   external_deps = [
