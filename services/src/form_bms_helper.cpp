@@ -294,8 +294,7 @@ bool FormBmsHelper::GetCompileMode(const std::string &bundleName, const std::str
     return false;
 }
 
-bool FormBmsHelper::GetCompatibleVersionCode(
-    const std::string& bundleName, int32_t userId, int32_t& minCompatibleVersionCode)
+bool FormBmsHelper::GetCompatibleVersion(const std::string& bundleName, int32_t userId, int32_t& compatibleVersion)
 {
     HILOG_DEBUG("called.");
     sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
@@ -310,7 +309,7 @@ bool FormBmsHelper::GetCompatibleVersionCode(
         return false;
     }
 
-    minCompatibleVersionCode = bundleInfo.minCompatibleVersionCode;
+    compatibleVersion = bundleInfo.compatibleVersion;
     return true;
 }
 

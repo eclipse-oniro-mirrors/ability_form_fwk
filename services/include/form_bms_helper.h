@@ -127,7 +127,7 @@ public:
     bool GetCompileMode(const std::string &bundleName, const std::string &moduleName,
         int32_t userId, int32_t &compileMode);
 
-    bool GetCompatibleVersionCode(const std::string& bundleName, int32_t userId, int32_t& minCompatibleVersionCode);
+    bool GetCompatibleVersion(const std::string& bundleName, int32_t userId, int32_t& compatibleVersion);
 
     int32_t GetBundleNameByUid(const int32_t uid, std::string &bundleName);
 

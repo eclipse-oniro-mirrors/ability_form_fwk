@@ -56,9 +56,9 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
         return;
     }
 
-    int32_t compatibleVersionCode = 0;
-    if (!FormBmsHelper::GetInstance().GetCompatibleVersionCode(
-            formRecord_.bundleName, FormUtil::GetCurrentAccountId(), compatibleVersionCode)) {
+    int32_t compatibleVersion = 0;
+    if (!FormBmsHelper::GetInstance().GetCompatibleVersion(
+            formRecord_.bundleName, FormUtil::GetCurrentAccountId(), compatibleVersion)) {
         HILOG_ERROR("get compatible version code failed.");
         return;
     }
@@ -78,7 +78,7 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
     want.SetParams(wantParams_);
     want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
     want.SetParam(Constants::FORM_COMPILE_MODE_KEY, compileMode);
-    want.SetParam(Constants::FORM_COMPATIBLE_VERSION_CODE_KEY, compatibleVersionCode);
+    want.SetParam(Constants::FORM_COMPATIBLE_VERSION_KEY, compatibleVersion);
     FormTaskMgr::GetInstance().PostRenderForm(newRecord, std::move(want), remoteObject);
 }
 
