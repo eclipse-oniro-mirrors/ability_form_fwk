@@ -627,7 +627,8 @@ napi_value CreateRunningFormInfo(napi_env env, const RunningFormInfo &runningFor
     napi_value objContext = nullptr;
     napi_create_object(env, &objContext);
 
-    napi_set_named_property(env, objContext, "formId", CreateJsValue(env, runningFormInfo.formId));
+    std::string formStr = std::to_string(runningFormInfo.formId);
+    napi_set_named_property(env, objContext, "formId", CreateJsValue(env, formStr));
     napi_set_named_property(env, objContext, "bundleName", CreateJsValue(env, runningFormInfo.bundleName));
     napi_set_named_property(env, objContext, "hostBundleName", CreateJsValue(env, runningFormInfo.hostBundleName));
     napi_set_named_property(env, objContext, "visibilityType", CreateJsValue(env, runningFormInfo.formVisiblity));
@@ -635,6 +636,7 @@ napi_value CreateRunningFormInfo(napi_env env, const RunningFormInfo &runningFor
     napi_set_named_property(env, objContext, "abilityName", CreateJsValue(env, runningFormInfo.abilityName));
     napi_set_named_property(env, objContext, "formName", CreateJsValue(env, runningFormInfo.formName));
     napi_set_named_property(env, objContext, "dimension", CreateJsValue(env, runningFormInfo.dimension));
+    napi_set_named_property(env, objContext, "formUsageState", CreateJsValue(env, runningFormInfo.formUsageState));
 
     return objContext;
 }
@@ -680,6 +682,15 @@ bool ParseParam(napi_env env, napi_value args, FormInstancesFilter &filter)
     prop = nullptr;
     napi_get_named_property(env, args, "abilityName", &prop);
     filter.abilityName = GetStringFromNapi(env, prop);
+    bool hasIsUnusedInclude = false;
+    napi_has_named_property(env, args, "isUnusedInclude", &hasIsUnusedInclude);
+    if (hasIsUnusedInclude) {
+        prop = nullptr;
+        napi_get_named_property(env, args, "isUnusedInclude", &prop);
+        if (napi_get_value_bool(env, prop, &filter.isUnusedInclude) != napi_ok) {
+            return false;
+        }
+    }
     return true;
 }
 
@@ -728,6 +739,7 @@ napi_value CreateFormInstance(napi_env env, const FormInstance &formInstance)
     napi_set_named_property(env, objContext, "moduleName", CreateJsValue(env, formInstance.moduleName));
     napi_set_named_property(env, objContext, "abilityName", CreateJsValue(env, formInstance.abilityName));
     napi_set_named_property(env, objContext, "formName", CreateJsValue(env, formInstance.formName));
+    napi_set_named_property(env, objContext, "formUsageState", CreateJsValue(env, formInstance.formUsageState));
     return objContext;
 }
 }  // namespace AbilityRuntime

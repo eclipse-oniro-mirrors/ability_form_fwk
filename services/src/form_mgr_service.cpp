@@ -1236,7 +1236,7 @@ int32_t FormMgrService::GetHostFormsCount(std::string &bundleName, int32_t &form
     return FormMgrAdapter::GetInstance().GetHostFormsCount(bundleName, formCount);
 }
 
-ErrCode FormMgrService::GetRunningFormInfos(std::vector<RunningFormInfo> &runningFormInfos)
+ErrCode FormMgrService::GetRunningFormInfos(bool isUnusedInclude, std::vector<RunningFormInfo> &runningFormInfos)
 {
     HILOG_DEBUG("called.");
     ErrCode ret = CheckFormObserverPermission();
@@ -1244,11 +1244,11 @@ ErrCode FormMgrService::GetRunningFormInfos(std::vector<RunningFormInfo> &runnin
         HILOG_ERROR("fail, get running form infos permission denied");
         return ret;
     }
-    return FormMgrAdapter::GetInstance().GetRunningFormInfos(runningFormInfos);
+    return FormMgrAdapter::GetInstance().GetRunningFormInfos(isUnusedInclude, runningFormInfos);
 }
 
-ErrCode FormMgrService::GetRunningFormInfosByBundleName(const std::string &bundleName,
-    std::vector<RunningFormInfo> &runningFormInfos)
+ErrCode FormMgrService::GetRunningFormInfosByBundleName(
+    const std::string &bundleName, bool isUnusedInclude, std::vector<RunningFormInfo> &runningFormInfos)
 {
     HILOG_DEBUG("called.");
     ErrCode ret = CheckFormObserverPermission();
@@ -1256,7 +1256,7 @@ ErrCode FormMgrService::GetRunningFormInfosByBundleName(const std::string &bundl
         HILOG_ERROR("fail, get running form infos by bundle name permission denied");
         return ret;
     }
-    return FormMgrAdapter::GetInstance().GetRunningFormInfosByBundleName(bundleName, runningFormInfos);
+    return FormMgrAdapter::GetInstance().GetRunningFormInfosByBundleName(bundleName, isUnusedInclude, runningFormInfos);
 }
 
 ErrCode FormMgrService::GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
@@ -1282,7 +1282,7 @@ ErrCode FormMgrService::GetFormInstanceById(const int64_t formId, FormInstance &
     return FormMgrAdapter::GetInstance().GetFormInstanceById(formId, formInstance);
 }
 
-ErrCode FormMgrService::GetFormInstanceById(const int64_t formId, bool isIncludeUnused, FormInstance &formInstance)
+ErrCode FormMgrService::GetFormInstanceById(const int64_t formId, bool isUnusedInclude, FormInstance &formInstance)
 {
     HILOG_DEBUG("called.");
     ErrCode ret = CheckFormObserverPermission();
@@ -1290,7 +1290,7 @@ ErrCode FormMgrService::GetFormInstanceById(const int64_t formId, bool isInclude
         HILOG_ERROR("fail, get form instance by id permission denied");
         return ret;
     }
-    return FormMgrAdapter::GetInstance().GetFormInstanceById(formId, isIncludeUnused, formInstance);
+    return FormMgrAdapter::GetInstance().GetFormInstanceById(formId, isUnusedInclude, formInstance);
 }
 
 ErrCode FormMgrService::RegisterAddObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken)

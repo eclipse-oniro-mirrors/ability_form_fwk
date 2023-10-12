@@ -13,20 +13,18 @@
  * limitations under the License.
  */
 
-#include "js_form_observer.h"
+#ifndef OHOS_FORM_FWK_JS_FORM_OBSERVER_H
+#define OHOS_FORM_FWK_JS_FORM_OBSERVER_H
+
+#include "js_runtime_utils.h"
 #include "napi/native_api.h"
+#include "napi/native_common.h"
 #include "napi/native_node_api.h"
 
-using namespace OHOS::AbilityRuntime;
+namespace OHOS {
+namespace AbilityRuntime {
+napi_value JsFormObserverInit(napi_env env, napi_value exportObj);
+} // namespace AbilityRuntime
+} // namespace OHOS
+#endif /* OHOS_FORM_FWK_JS_FORM_OBSERVER_H */
 
-static napi_module _module = {
-    .nm_version = 0,
-    .nm_modname = "app.form.formObserver",
-    .nm_register_func = OHOS::AbilityRuntime::JsFormObserverInit,
-};
-
-extern "C" __attribute__((constructor))
-void NAPI_app_form_formObserver_AutoRegister()
-{
-    napi_module_register(&_module);
-}

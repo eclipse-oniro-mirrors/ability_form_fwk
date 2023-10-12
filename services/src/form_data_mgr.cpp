@@ -1992,6 +1992,54 @@ int32_t FormDataMgr::GetHostFormsCount(const std::string &bundleName, int32_t &f
     return ERR_OK;
 }
 
+void FormDataMgr::GetUnusedFormInstancesByFilter(
+    const FormInstancesFilter &formInstancesFilter, std::vector<FormInstance> &formInstances)
+{
+    HILOG_DEBUG("Called.");
+    std::vector<FormDBInfo> formDBInfos;
+    FormDbCache::GetInstance().GetAllFormInfo(formDBInfos);
+    for (const auto& dbInfo : formDBInfos) {
+        if (formInstancesFilter.bundleName != dbInfo.bundleName) {
+            continue;
+        }
+        if (!formInstancesFilter.moduleName.empty() && formInstancesFilter.moduleName != dbInfo.moduleName) {
+            continue;
+        } else if (!formInstancesFilter.abilityName.empty() && formInstancesFilter.abilityName != dbInfo.abilityName) {
+            continue;
+        } else if (!formInstancesFilter.formName.empty() && formInstancesFilter.formName != dbInfo.formName) {
+            continue;
+        }
+        auto item = std::find_if(formInstances.begin(), formInstances.end(),
+            [&dbInfo](const auto &it) { return it.formId == dbInfo.formId; });
+        if (item != formInstances.end()) {
+            continue;
+        }
+        FormRecord dbRecord;
+        ErrCode getDbRet = FormDbCache::GetInstance().GetDBRecord(dbInfo.formId, dbRecord);
+        if (getDbRet != ERR_OK) {
+            continue;
+        }
+        FormInstance instance;
+        instance.formId = dbInfo.formId;
+        instance.specification = dbRecord.specification;
+        instance.formVisiblity = static_cast<FormVisibilityType>(dbRecord.formVisibleNotifyState);
+        instance.bundleName = dbRecord.bundleName;
+        instance.moduleName = dbRecord.moduleName;
+        instance.abilityName = dbRecord.abilityName;
+        instance.formName = dbRecord.formName;
+        instance.formUsageState = FormUsageState::UNUSED;
+        if (!dbRecord.formUserUids.empty()) {
+            auto ret =
+                FormBmsHelper::GetInstance().GetBundleNameByUid(*dbRecord.formUserUids.begin(), instance.formHostName);
+            if (ret != ERR_OK) {
+                HILOG_ERROR("Get bundleName by uid failed.");
+                continue;
+            }
+            formInstances.emplace_back(instance);
+        }
+    }
+}
+
 ErrCode FormDataMgr::GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
     std::vector<FormInstance> &formInstances)
 {
@@ -2034,10 +2082,10 @@ ErrCode FormDataMgr::GetFormInstancesByFilter(const FormInstancesFilter &formIns
             }
         }
     }
-    if (formInstances.size() == 0) {
-        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+    if (formInstancesFilter.isUnusedInclude) {
+        GetUnusedFormInstancesByFilter(formInstancesFilter, formInstances);
     }
-    return ERR_OK;
+    return (formInstances.size() == 0) ? ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED : ERR_OK;
 }
 
 ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, FormInstance &formInstance)
@@ -2072,7 +2120,7 @@ ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, FormInstance &for
     return ERR_OK;
 }
 
-ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, bool isIncludeUnused, FormInstance &formInstance)
+ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, bool isUnusedInclude, FormInstance &formInstance)
 {
     HILOG_DEBUG("get form instance by formId");
     if (formId <= 0) {
@@ -2080,22 +2128,16 @@ ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, bool isIncludeUnu
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     FormRecord formRecord;
-    bool formRecordExist = false;
+    std::vector<FormHostRecord> formHostRecords;
     {
         std::lock_guard<std::mutex> lock(formRecordMutex_);
         auto info = formRecords_.find(formId);
         if (info != formRecords_.end()) {
             formRecord = info->second;
-            formRecordExist = true;
+            GetFormHostRecord(formId, formHostRecords);
         }
     }
-    if (formRecordExist) {
-        std::vector<FormHostRecord> formHostRecords;
-        GetFormHostRecord(formId, formHostRecords);
-        if (formHostRecords.empty()) {
-            HILOG_ERROR("fail, clientHost is empty");
-            return ERR_APPEXECFWK_FORM_COMMON_CODE;
-        }
+    if (!formHostRecords.empty()) {
         formInstance.formHostName = formHostRecords.begin()->GetHostBundleName();
         formInstance.formId = formRecord.formId;
         formInstance.specification = formRecord.specification;
@@ -2104,11 +2146,20 @@ ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, bool isIncludeUnu
         formInstance.moduleName = formRecord.moduleName;
         formInstance.abilityName = formRecord.abilityName;
         formInstance.formName = formRecord.formName;
-    } else if (isIncludeUnused == true) {
+        formInstance.formUsageState = FormUsageState::USED;
+    } else if (isUnusedInclude) {
         FormRecord dbRecord;
         ErrCode getDbRet = FormDbCache::GetInstance().GetDBRecord(formId, dbRecord);
         if (getDbRet == ERR_OK) {
-            formInstance.formHostName = "";
+            if (dbRecord.formUserUids.empty()) {
+                return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+            }
+            auto ret = FormBmsHelper::GetInstance().GetBundleNameByUid(
+                *dbRecord.formUserUids.begin(), formInstance.formHostName);
+            if (ret != ERR_OK) {
+                HILOG_ERROR("Get bundleName by uid failed.");
+                return ret;
+            }
             formInstance.formId = formId;
             formInstance.specification = dbRecord.specification;
             formInstance.formVisiblity = static_cast<FormVisibilityType>(dbRecord.formVisibleNotifyState);
@@ -2116,6 +2167,7 @@ ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, bool isIncludeUnu
             formInstance.moduleName = dbRecord.moduleName;
             formInstance.abilityName = dbRecord.abilityName;
             formInstance.formName = dbRecord.formName;
+            formInstance.formUsageState = FormUsageState::UNUSED;
         }
     } else {
         return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
@@ -2124,7 +2176,44 @@ ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, bool isIncludeUnu
     return ERR_OK;
 }
 
-ErrCode FormDataMgr::GetRunningFormInfos(std::vector<RunningFormInfo> &runningFormInfos)
+void FormDataMgr::GetUnusedFormInfos(std::vector<RunningFormInfo> &runningFormInfos)
+{
+    HILOG_DEBUG("Called.");
+    std::vector<FormDBInfo> formDBInfos;
+    FormDbCache::GetInstance().GetAllFormInfo(formDBInfos);
+    for (const auto& dbInfo : formDBInfos) {
+        auto item = std::find_if(runningFormInfos.begin(), runningFormInfos.end(),
+            [&dbInfo](const auto &it) { return it.formId == dbInfo.formId; });
+        if (item != runningFormInfos.end()) {
+            continue;
+        }
+        FormRecord dbRecord;
+        ErrCode getDbRet = FormDbCache::GetInstance().GetDBRecord(dbInfo.formId, dbRecord);
+        if (getDbRet != ERR_OK) {
+            continue;
+        }
+        RunningFormInfo info;
+        info.formId = dbInfo.formId;
+        info.dimension = dbRecord.specification;
+        info.formVisiblity = static_cast<FormVisibilityType>(dbRecord.formVisibleNotifyState);
+        info.bundleName = dbRecord.bundleName;
+        info.moduleName = dbRecord.moduleName;
+        info.abilityName = dbRecord.abilityName;
+        info.formName = dbRecord.formName;
+        info.formUsageState = FormUsageState::UNUSED;
+        if (!dbRecord.formUserUids.empty()) {
+            auto ret =
+                FormBmsHelper::GetInstance().GetBundleNameByUid(*dbRecord.formUserUids.begin(), info.hostBundleName);
+            if (ret != ERR_OK) {
+                HILOG_ERROR("Get bundleName by uid failed.");
+                continue;
+            }
+            runningFormInfos.emplace_back(info);
+        }
+    }
+}
+
+ErrCode FormDataMgr::GetRunningFormInfos(bool isUnusedInclude, std::vector<RunningFormInfo> &runningFormInfos)
 {
     HILOG_DEBUG("start");
     std::lock_guard<std::mutex> lock(formRecordMutex_);
@@ -2140,21 +2229,66 @@ ErrCode FormDataMgr::GetRunningFormInfos(std::vector<RunningFormInfo> &runningFo
             info.moduleName = record.second.moduleName;
             info.abilityName = record.second.abilityName;
             info.formVisiblity = static_cast<FormVisibilityType>(record.second.formVisibleNotifyState);
+            info.formUsageState = FormUsageState::USED;
             std::vector<FormHostRecord> formHostRecords;
             GetFormHostRecord(record.first, formHostRecords);
             if (formHostRecords.empty()) {
-                HILOG_ERROR("fail, clientHost is empty");
-                return ERR_APPEXECFWK_FORM_COMMON_CODE;
+                HILOG_ERROR("Get form host failed.");
+                continue;
             }
             info.hostBundleName = formHostRecords.begin()->GetHostBundleName();
             runningFormInfos.emplace_back(info);
         }
     }
+    if (isUnusedInclude) {
+        GetUnusedFormInfos(runningFormInfos);
+    }
     return ERR_OK;
 }
 
-ErrCode FormDataMgr::GetRunningFormInfosByBundleName(const std::string &bundleName,
-    std::vector<RunningFormInfo> &runningFormInfos)
+void FormDataMgr::GetUnusedFormInfos(const std::string &bundleName, std::vector<RunningFormInfo> &runningFormInfos)
+{
+    HILOG_DEBUG("Called.");
+    std::vector<FormDBInfo> formDBInfos;
+    FormDbCache::GetInstance().GetAllFormInfo(formDBInfos);
+    for (const auto& dbInfo : formDBInfos) {
+        auto item = std::find_if(runningFormInfos.begin(), runningFormInfos.end(),
+            [&dbInfo](const auto &it) { return it.formId == dbInfo.formId; });
+        if (item != runningFormInfos.end()) {
+            continue;
+        }
+        for (auto uid : dbInfo.formUserUids) {
+            std::string hostBundleName = "";
+            auto ret = FormBmsHelper::GetInstance().GetBundleNameByUid(uid, hostBundleName);
+            if (ret != ERR_OK) {
+                HILOG_ERROR("Get bundleName by uid failed.");
+                continue;
+            }
+            if (hostBundleName != bundleName) {
+                continue;
+            }
+            FormRecord dbRecord;
+            ErrCode getDbRet = FormDbCache::GetInstance().GetDBRecord(dbInfo.formId, dbRecord);
+            if (getDbRet != ERR_OK) {
+                continue;
+            }
+            RunningFormInfo info;
+            info.formId = dbInfo.formId;
+            info.hostBundleName = bundleName;
+            info.dimension = dbRecord.specification;
+            info.formVisiblity = static_cast<FormVisibilityType>(dbRecord.formVisibleNotifyState);
+            info.bundleName = dbRecord.bundleName;
+            info.moduleName = dbRecord.moduleName;
+            info.abilityName = dbRecord.abilityName;
+            info.formName = dbRecord.formName;
+            info.formUsageState = FormUsageState::UNUSED;
+            runningFormInfos.emplace_back(info);
+        }
+    }
+}
+
+ErrCode FormDataMgr::GetRunningFormInfosByBundleName(
+    const std::string &bundleName, bool isUnusedInclude, std::vector<RunningFormInfo> &runningFormInfos)
 {
     HILOG_DEBUG("start");
 
@@ -2169,7 +2303,8 @@ ErrCode FormDataMgr::GetRunningFormInfosByBundleName(const std::string &bundleNa
             std::string hostBundleName = "";
             auto ret = FormBmsHelper::GetInstance().GetBundleNameByUid(uid, hostBundleName);
             if (ret != ERR_OK) {
-                return ret;
+                HILOG_ERROR("Get bundleName by uid failed.");
+                continue;
             }
             bool flag = (!record.second.formTempFlag) &&
                 ((FormUtil::GetCurrentAccountId() == record.second.providerUserId) ||
@@ -2184,10 +2319,16 @@ ErrCode FormDataMgr::GetRunningFormInfosByBundleName(const std::string &bundleNa
                 info.moduleName = record.second.moduleName;
                 info.abilityName = record.second.abilityName;
                 info.formVisiblity = static_cast<FormVisibilityType>(record.second.formVisibleNotifyState);
+                info.formUsageState = FormUsageState::USED;
                 runningFormInfos.emplace_back(info);
             }
         }
     }
+    if (isUnusedInclude) {
+        GetUnusedFormInfos(bundleName, runningFormInfos);
+    }
+    HILOG_DEBUG(
+        "bundleName is %{public}s, runningFormInfo.size = %{public}zu.", bundleName.c_str(), runningFormInfos.size());
     if (runningFormInfos.size() == 0) {
         return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
     }

@@ -2758,17 +2758,17 @@ int32_t FormMgrAdapter::GetHostFormsCount(std::string &bundleName, int32_t &form
     return FormDataMgr::GetInstance().GetHostFormsCount(bundleName, formCount);
 }
 
-ErrCode FormMgrAdapter::GetRunningFormInfos(std::vector<RunningFormInfo> &runningFormInfos)
+ErrCode FormMgrAdapter::GetRunningFormInfos(bool isUnusedInclude, std::vector<RunningFormInfo> &runningFormInfos)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    return FormDataMgr::GetInstance().GetRunningFormInfos(runningFormInfos);
+    return FormDataMgr::GetInstance().GetRunningFormInfos(isUnusedInclude, runningFormInfos);
 }
 
-ErrCode FormMgrAdapter::GetRunningFormInfosByBundleName(const std::string &bundleName,
-    std::vector<RunningFormInfo> &runningFormInfos)
+ErrCode FormMgrAdapter::GetRunningFormInfosByBundleName(
+    const std::string &bundleName, bool isUnusedInclude, std::vector<RunningFormInfo> &runningFormInfos)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    return FormDataMgr::GetInstance().GetRunningFormInfosByBundleName(bundleName, runningFormInfos);
+    return FormDataMgr::GetInstance().GetRunningFormInfosByBundleName(bundleName, isUnusedInclude, runningFormInfos);
 }
 
 ErrCode FormMgrAdapter::GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
@@ -2782,9 +2782,9 @@ ErrCode FormMgrAdapter::GetFormInstanceById(const int64_t formId, FormInstance &
     return FormDataMgr::GetInstance().GetFormInstanceById(formId, formInstance);
 }
 
-ErrCode FormMgrAdapter::GetFormInstanceById(const int64_t formId, bool isIncludeUnused, FormInstance &formInstance)
+ErrCode FormMgrAdapter::GetFormInstanceById(const int64_t formId, bool isUnusedInclude, FormInstance &formInstance)
 {
-    return FormDataMgr::GetInstance().GetFormInstanceById(formId, isIncludeUnused, formInstance);
+    return FormDataMgr::GetInstance().GetFormInstanceById(formId, isUnusedInclude, formInstance);
 }
 
 ErrCode FormMgrAdapter::RegisterAddObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken)

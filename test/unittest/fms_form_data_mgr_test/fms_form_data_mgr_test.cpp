@@ -2250,7 +2250,8 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetRunningFormInfos_001, TestSiz
 
     std::vector<RunningFormInfo> runningFormInfos;
     EXPECT_EQ(1, formDataMgr_.clientRecords_.size());
-    EXPECT_EQ(ERR_OK, formDataMgr_.GetRunningFormInfos(runningFormInfos));
+    bool isUnusedInclude = false;
+    EXPECT_EQ(ERR_OK, formDataMgr_.GetRunningFormInfos(isUnusedInclude, runningFormInfos));
     EXPECT_EQ(1, runningFormInfos.size());
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetRunningFormInfos_001 end";
@@ -2279,7 +2280,8 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetRunningFormInfos_002, TestSiz
     formDataMgr_.formRecords_.emplace(otherFormId, record);
 
     std::vector<RunningFormInfo> runningFormInfos;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formDataMgr_.GetRunningFormInfos(runningFormInfos));
+    bool isUnusedInclude = false;
+    EXPECT_EQ(0, formDataMgr_.GetRunningFormInfos(isUnusedInclude, runningFormInfos));
     EXPECT_EQ(0, runningFormInfos.size());
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetRunningFormInfos_002 end";
@@ -2308,8 +2310,9 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetRunningFormInfosByBundleName_
     formDataMgr_.formRecords_.emplace(otherFormId, record);
 
     std::vector<RunningFormInfo> runningFormInfos;
+    bool isUnusedInclude = false;
     EXPECT_EQ(0, runningFormInfos.size());
-    EXPECT_EQ(ERR_OK, formDataMgr_.GetRunningFormInfosByBundleName(bundleName, runningFormInfos));
+    EXPECT_EQ(ERR_OK, formDataMgr_.GetRunningFormInfosByBundleName(bundleName, isUnusedInclude, runningFormInfos));
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetRunningFormInfosByBundleName_001 end";
 }
@@ -2338,9 +2341,10 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetRunningFormInfosByBundleName_
     formDataMgr_.formRecords_.emplace(otherFormId, record);
 
     std::vector<RunningFormInfo> runningFormInfos;
+    bool isUnusedInclude = false;
     EXPECT_EQ(0, runningFormInfos.size());
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_INFO_FAILED,
-        formDataMgr_.GetRunningFormInfosByBundleName(bundleName, runningFormInfos));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED,
+        formDataMgr_.GetRunningFormInfosByBundleName(bundleName, isUnusedInclude, runningFormInfos));
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetRunningFormInfosByBundleName_002 end";
 }
@@ -2369,9 +2373,10 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetRunningFormInfosByBundleName_
     formDataMgr_.formRecords_.emplace(otherFormId, record);
 
     std::vector<RunningFormInfo> runningFormInfos;
+    bool isUnusedInclude = false;
     EXPECT_EQ(0, runningFormInfos.size());
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
-        formDataMgr_.GetRunningFormInfosByBundleName(bundleName, runningFormInfos));
+        formDataMgr_.GetRunningFormInfosByBundleName(bundleName, isUnusedInclude, runningFormInfos));
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetRunningFormInfosByBundleName_003 end";
 }
@@ -2401,7 +2406,8 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetRunningFormInfosByBundleName_
     formDataMgr_.formRecords_.emplace(otherFormId, record);
 
     std::vector<RunningFormInfo> runningFormInfos;
-    EXPECT_EQ(ERR_OK, formDataMgr_.GetRunningFormInfosByBundleName(bundleName, runningFormInfos));
+    bool isUnusedInclude = false;
+    EXPECT_EQ(ERR_OK, formDataMgr_.GetRunningFormInfosByBundleName(bundleName, isUnusedInclude, runningFormInfos));
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetRunningFormInfosByBundleName_004 end";
 }

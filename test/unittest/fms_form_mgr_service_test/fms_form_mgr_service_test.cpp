@@ -1295,7 +1295,8 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0074, TestSize.Level1)
     std::string args = "args";
     std::string result = "result";
     std::vector<RunningFormInfo> runningFormInfos;
-    ErrCode ret = formMgrService.GetRunningFormInfos(runningFormInfos);
+    bool isUnusedInclude = false;
+    ErrCode ret = formMgrService.GetRunningFormInfos(isUnusedInclude, runningFormInfos);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, ret);
     GTEST_LOG_(INFO) << "FormMgrService_0074 end";
 }
@@ -1311,7 +1312,8 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0075, TestSize.Level1)
     FormMgrService formMgrService;
     std::string bundleName = "bundleName";
     std::vector<RunningFormInfo> runningFormInfos;
-    ErrCode ret = formMgrService.GetRunningFormInfosByBundleName(bundleName, runningFormInfos);
+    bool isUnusedInclude = false;
+    ErrCode ret = formMgrService.GetRunningFormInfosByBundleName(bundleName, isUnusedInclude, runningFormInfos);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, ret);
     GTEST_LOG_(INFO) << "FormMgrService_0075 end";
 }

@@ -1091,7 +1091,7 @@ std::string FormMgr::GetErrorMsgByExternalErrorCode(int32_t externalErrorCode)
     return FormErrors::GetInstance().GetErrorMsgByExternalErrorCode(externalErrorCode);
 }
 
-ErrCode FormMgr::GetRunningFormInfos(std::vector<RunningFormInfo> &runningFormInfos)
+ErrCode FormMgr::GetRunningFormInfos(bool isUnusedInclude, std::vector<RunningFormInfo> &runningFormInfos)
 {
     HILOG_DEBUG("start.");
     if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
@@ -1105,15 +1105,15 @@ ErrCode FormMgr::GetRunningFormInfos(std::vector<RunningFormInfo> &runningFormIn
         return errCode;
     }
 
-    ErrCode resultCode = remoteProxy_->GetRunningFormInfos(runningFormInfos);
+    ErrCode resultCode = remoteProxy_->GetRunningFormInfos(isUnusedInclude, runningFormInfos);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("error, failed to GetRunningFormInfos, error code is %{public}d.", resultCode);
     }
     return resultCode;
 }
 
-ErrCode FormMgr::GetRunningFormInfosByBundleName(const std::string &bundleName,
-    std::vector<RunningFormInfo> &runningFormInfos)
+ErrCode FormMgr::GetRunningFormInfosByBundleName(
+    const std::string &bundleName, bool isUnusedInclude, std::vector<RunningFormInfo> &runningFormInfos)
 {
     HILOG_DEBUG("start.");
     if (bundleName.empty()) {
@@ -1131,7 +1131,7 @@ ErrCode FormMgr::GetRunningFormInfosByBundleName(const std::string &bundleName,
         return errCode;
     }
 
-    ErrCode resultCode = remoteProxy_->GetRunningFormInfosByBundleName(bundleName, runningFormInfos);
+    ErrCode resultCode = remoteProxy_->GetRunningFormInfosByBundleName(bundleName, isUnusedInclude, runningFormInfos);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("error, failed to GetRunningFormInfosByBundleName, error code is %{public}d.", resultCode);
     }
@@ -1239,7 +1239,7 @@ ErrCode FormMgr::GetFormInstanceById(const int64_t formId, FormInstance &formIns
     return remoteProxy_->GetFormInstanceById(formId, formInstance);
 }
 
-ErrCode FormMgr::GetFormInstanceById(const int64_t formId, bool isIncludeUnused, FormInstance &formInstance)
+ErrCode FormMgr::GetFormInstanceById(const int64_t formId, bool isUnusedInclude, FormInstance &formInstance)
 {
     HILOG_DEBUG("called.");
     auto errCode = Connect();
@@ -1251,7 +1251,7 @@ ErrCode FormMgr::GetFormInstanceById(const int64_t formId, bool isIncludeUnused,
         HILOG_ERROR("remoteProxy_ is nullptr.");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    return remoteProxy_->GetFormInstanceById(formId, isIncludeUnused, formInstance);
+    return remoteProxy_->GetFormInstanceById(formId, isUnusedInclude, formInstance);
 }
 
 ErrCode FormMgr::RegisterAddObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken)

@@ -280,8 +280,9 @@ HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0009, TestSize.Level1) {
  */
 HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0010, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrProxyTest_0010 starts";
+    bool isUnusedInclude = false;
     std::vector<RunningFormInfo> runningFormInfos;
-    int result = formMgrProxy ->GetRunningFormInfos(runningFormInfos);
+    int result = formMgrProxy ->GetRunningFormInfos(isUnusedInclude, runningFormInfos);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrProxyTest_0010 test ends";
 }
@@ -296,7 +297,8 @@ HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0011, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrProxyTest_0011 starts";
     std::vector<RunningFormInfo> runningFormInfos;
     std::string bundleName = "ohos.samples.FormApplication";
-    int result = formMgrProxy ->GetRunningFormInfosByBundleName(bundleName, runningFormInfos);
+    bool isUnusedInclude = false;
+    int result = formMgrProxy ->GetRunningFormInfosByBundleName(bundleName, isUnusedInclude, runningFormInfos);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrProxyTest_0011 test ends";
 }

@@ -1143,11 +1143,16 @@ int FormMgrProxy::GetFormsInfoByModule(std::string &bundleName, std::string &mod
     return error;
 }
 
-ErrCode FormMgrProxy::GetRunningFormInfos(std::vector<RunningFormInfo> &runningFormInfos)
+ErrCode FormMgrProxy::GetRunningFormInfos(bool isUnusedInclude, std::vector<RunningFormInfo> &runningFormInfos)
 {
     MessageParcel data;
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("failed to write interface token");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteBool(isUnusedInclude)) {
+        HILOG_ERROR("Failed to write isUnusedInclude.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -1158,8 +1163,8 @@ ErrCode FormMgrProxy::GetRunningFormInfos(std::vector<RunningFormInfo> &runningF
     return error;
 }
 
-ErrCode FormMgrProxy::GetRunningFormInfosByBundleName(const std::string &bundleName,
-    std::vector<RunningFormInfo> &runningFormInfos)
+ErrCode FormMgrProxy::GetRunningFormInfosByBundleName(
+    const std::string &bundleName, bool isUnusedInclude, std::vector<RunningFormInfo> &runningFormInfos)
 {
     MessageParcel data;
     if (!WriteInterfaceToken(data)) {
@@ -1169,6 +1174,11 @@ ErrCode FormMgrProxy::GetRunningFormInfosByBundleName(const std::string &bundleN
 
     if (!data.WriteString(bundleName)) {
         HILOG_ERROR("failed to write bundleName");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteBool(isUnusedInclude)) {
+        HILOG_ERROR("Failed to write isUnusedInclude.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -1577,7 +1587,7 @@ ErrCode FormMgrProxy::GetFormInstanceById(const int64_t formId, FormInstance &fo
     return error;
 }
 
-ErrCode FormMgrProxy::GetFormInstanceById(const int64_t formId, bool isIncludeUnused, FormInstance &formInstance)
+ErrCode FormMgrProxy::GetFormInstanceById(const int64_t formId, bool isUnusedInclude, FormInstance &formInstance)
 {
     HILOG_DEBUG("start.");
     MessageParcel data;
@@ -1590,8 +1600,8 @@ ErrCode FormMgrProxy::GetFormInstanceById(const int64_t formId, bool isIncludeUn
         HILOG_ERROR("failed to write formId");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (!data.WriteBool(isIncludeUnused)) {
-        HILOG_ERROR("failed to write isIncludeUnused");
+    if (!data.WriteBool(isUnusedInclude)) {
+        HILOG_ERROR("Failed to write isUnusedInclude.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
