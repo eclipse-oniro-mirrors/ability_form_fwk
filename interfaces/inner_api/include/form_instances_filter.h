@@ -26,7 +26,7 @@ struct FormInstancesFilter : public Parcelable {
     std::string formName;
     std::string moduleName;
     std::string abilityName;
-    bool isUnusedInclude = false;
+    bool isUnusedIncluded = false;
 
     bool ReadFromParcel(Parcel &parcel);
     bool Marshalling(Parcel &parcel) const override;

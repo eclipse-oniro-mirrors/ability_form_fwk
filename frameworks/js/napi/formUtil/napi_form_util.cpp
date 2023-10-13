@@ -682,12 +682,12 @@ bool ParseParam(napi_env env, napi_value args, FormInstancesFilter &filter)
     prop = nullptr;
     napi_get_named_property(env, args, "abilityName", &prop);
     filter.abilityName = GetStringFromNapi(env, prop);
-    bool hasIsUnusedInclude = false;
-    napi_has_named_property(env, args, "isUnusedInclude", &hasIsUnusedInclude);
-    if (hasIsUnusedInclude) {
+    bool hasIsUnusedIncluded = false;
+    napi_has_named_property(env, args, "isUnusedIncluded", &hasIsUnusedIncluded);
+    if (hasIsUnusedIncluded) {
         prop = nullptr;
-        napi_get_named_property(env, args, "isUnusedInclude", &prop);
-        if (napi_get_value_bool(env, prop, &filter.isUnusedInclude) != napi_ok) {
+        napi_get_named_property(env, args, "isUnusedIncluded", &prop);
+        if (napi_get_value_bool(env, prop, &filter.isUnusedIncluded) != napi_ok) {
             return false;
         }
     }

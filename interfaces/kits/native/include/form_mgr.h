@@ -366,21 +366,21 @@ public:
 
     /**
      * @brief Get all running form infos.
-     * @param isUnusedInclude Indicates whether to include unused forms.
+     * @param isUnusedIncluded Indicates whether to include unused forms.
      * @param runningFormInfos Return the running forms' infos currently.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode GetRunningFormInfos(bool isUnusedInclude, std::vector<RunningFormInfo> &runningFormInfos);
+    ErrCode GetRunningFormInfos(bool isUnusedIncluded, std::vector<RunningFormInfo> &runningFormInfos);
 
     /**
      * @brief Get the running form infos by bundle name.
      * @param bundleName Application name.
-     * @param isUnusedInclude Indicates whether to include unused forms.
+     * @param isUnusedIncluded Indicates whether to include unused forms.
      * @param runningFormInfos Return the running forms' infos of the specify application name.
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode GetRunningFormInfosByBundleName(
-        const std::string &bundleName, bool isUnusedInclude, std::vector<RunningFormInfo> &runningFormInfos);
+        const std::string &bundleName, bool isUnusedIncluded, std::vector<RunningFormInfo> &runningFormInfos);
 
     /**
      * @brief Check if the request of publishing a form is supported by the host.
@@ -509,11 +509,11 @@ public:
     /**
      * @brief Get form instance by formId, include form store in DB.
      * @param formId formId Indicates the unique id of form.
-     * @param isUnusedInclude Indicates whether to include unused form.
+     * @param isUnusedIncluded Indicates whether to include unused form.
      * @param formInstance return formInstance
      * @return return ERR_OK on get info success, others on failure.
      */
-    ErrCode GetFormInstanceById(const int64_t formId, bool isUnusedInclude, FormInstance &formInstance);
+    ErrCode GetFormInstanceById(const int64_t formId, bool isUnusedIncluded, FormInstance &formInstance);
 
     /**
      * @brief Register form add observer.
