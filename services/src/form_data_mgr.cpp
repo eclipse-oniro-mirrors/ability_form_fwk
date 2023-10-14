@@ -2082,7 +2082,7 @@ ErrCode FormDataMgr::GetFormInstancesByFilter(const FormInstancesFilter &formIns
             }
         }
     }
-    if (formInstancesFilter.isUnusedInclude) {
+    if (formInstancesFilter.isUnusedIncluded) {
         GetUnusedFormInstancesByFilter(formInstancesFilter, formInstances);
     }
     return (formInstances.size() == 0) ? ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED : ERR_OK;
@@ -2120,7 +2120,7 @@ ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, FormInstance &for
     return ERR_OK;
 }
 
-ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, bool isUnusedInclude, FormInstance &formInstance)
+ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, bool isUnusedIncluded, FormInstance &formInstance)
 {
     HILOG_DEBUG("get form instance by formId");
     if (formId <= 0) {
@@ -2147,7 +2147,7 @@ ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, bool isUnusedIncl
         formInstance.abilityName = formRecord.abilityName;
         formInstance.formName = formRecord.formName;
         formInstance.formUsageState = FormUsageState::USED;
-    } else if (isUnusedInclude) {
+    } else if (isUnusedIncluded) {
         FormRecord dbRecord;
         ErrCode getDbRet = FormDbCache::GetInstance().GetDBRecord(formId, dbRecord);
         if (getDbRet == ERR_OK) {
@@ -2213,7 +2213,7 @@ void FormDataMgr::GetUnusedFormInfos(std::vector<RunningFormInfo> &runningFormIn
     }
 }
 
-ErrCode FormDataMgr::GetRunningFormInfos(bool isUnusedInclude, std::vector<RunningFormInfo> &runningFormInfos)
+ErrCode FormDataMgr::GetRunningFormInfos(bool isUnusedIncluded, std::vector<RunningFormInfo> &runningFormInfos)
 {
     HILOG_DEBUG("start");
     std::lock_guard<std::mutex> lock(formRecordMutex_);
@@ -2240,7 +2240,7 @@ ErrCode FormDataMgr::GetRunningFormInfos(bool isUnusedInclude, std::vector<Runni
             runningFormInfos.emplace_back(info);
         }
     }
-    if (isUnusedInclude) {
+    if (isUnusedIncluded) {
         GetUnusedFormInfos(runningFormInfos);
     }
     return ERR_OK;
@@ -2288,7 +2288,7 @@ void FormDataMgr::GetUnusedFormInfos(const std::string &bundleName, std::vector<
 }
 
 ErrCode FormDataMgr::GetRunningFormInfosByBundleName(
-    const std::string &bundleName, bool isUnusedInclude, std::vector<RunningFormInfo> &runningFormInfos)
+    const std::string &bundleName, bool isUnusedIncluded, std::vector<RunningFormInfo> &runningFormInfos)
 {
     HILOG_DEBUG("start");
 
@@ -2324,7 +2324,7 @@ ErrCode FormDataMgr::GetRunningFormInfosByBundleName(
             }
         }
     }
-    if (isUnusedInclude) {
+    if (isUnusedIncluded) {
         GetUnusedFormInfos(bundleName, runningFormInfos);
     }
     HILOG_DEBUG(

@@ -479,7 +479,7 @@ private:
     }
 
     bool ParseGetRunningFormInfosOneParam(const napi_env &env, const napi_value *argv, std::string &bundleName,
-        bool &hasBundleName, bool &isUnusedInclude)
+        bool &hasBundleName, bool &isUnusedIncluded)
     {
         HILOG_DEBUG("Called.");
         if (AppExecFwk::IsTypeForNapiValue(env, argv[PARAM0], napi_string)) {
@@ -490,9 +490,9 @@ private:
             }
             hasBundleName = true;
         } else if (AppExecFwk::IsTypeForNapiValue(env, argv[PARAM0], napi_boolean)) {
-            if (!ConvertFromJsValue(env, argv[PARAM0], isUnusedInclude)) {
-                HILOG_ERROR("Convert isUnusedInclude failed.");
-                NapiFormUtil::ThrowParamTypeError(env, "isUnusedInclude", "bool");
+            if (!ConvertFromJsValue(env, argv[PARAM0], isUnusedIncluded)) {
+                HILOG_ERROR("Convert isUnusedIncluded failed.");
+                NapiFormUtil::ThrowParamTypeError(env, "isUnusedIncluded", "bool");
                 return false;
             }
         } else {
@@ -504,12 +504,12 @@ private:
     }
 
     bool ParseGetRunningFormInfosParams(const napi_env &env, const napi_value *argv, std::string &bundleName,
-        bool &isUnusedInclude, int startPos)
+        bool &isUnusedIncluded, int startPos)
     {
         HILOG_DEBUG("Called.");
-        if (!ConvertFromJsValue(env, argv[startPos], isUnusedInclude)) {
-            HILOG_ERROR("Convert isUnusedInclude failed.");
-            NapiFormUtil::ThrowParamTypeError(env, "isUnusedInclude", "bool");
+        if (!ConvertFromJsValue(env, argv[startPos], isUnusedIncluded)) {
+            HILOG_ERROR("Convert isUnusedIncluded failed.");
+            NapiFormUtil::ThrowParamTypeError(env, "isUnusedIncluded", "bool");
             return false;
         }
         if (!ConvertFromJsValue(env, argv[startPos + 1], bundleName)) {
@@ -521,7 +521,7 @@ private:
     }
 
     bool ParseGetRunningFormInfosTwoParams(const napi_env &env, const napi_value *argv, std::string &bundleName,
-        bool &hasBundleName, bool &isUnusedInclude)
+        bool &hasBundleName, bool &isUnusedIncluded)
     {
         HILOG_DEBUG("Called.");
         if (AppExecFwk::IsTypeForNapiValue(env, argv[PARAM0], napi_function)) {
@@ -533,9 +533,9 @@ private:
                 }
                 hasBundleName = true;
             } else if (AppExecFwk::IsTypeForNapiValue(env, argv[PARAM1], napi_boolean)) {
-                if (!ConvertFromJsValue(env, argv[PARAM1], isUnusedInclude)) {
-                    HILOG_ERROR("Convert isUnusedInclude failed.");
-                    NapiFormUtil::ThrowParamTypeError(env, "isUnusedInclude", "bool");
+                if (!ConvertFromJsValue(env, argv[PARAM1], isUnusedIncluded)) {
+                    HILOG_ERROR("Convert isUnusedIncluded failed.");
+                    NapiFormUtil::ThrowParamTypeError(env, "isUnusedIncluded", "bool");
                     return false;
                 }
             } else {
@@ -544,7 +544,7 @@ private:
                 return false;
             }
         } else {
-            if (!ParseGetRunningFormInfosParams(env, argv, bundleName, isUnusedInclude, PARAM0)) {
+            if (!ParseGetRunningFormInfosParams(env, argv, bundleName, isUnusedIncluded, PARAM0)) {
                 return false;
             }
             hasBundleName = true;
@@ -563,28 +563,28 @@ private:
 
         std::string bundleName("");
         bool hasBundleName = false;
-        bool isUnusedInclude = false;
+        bool isUnusedIncluded = false;
         if (argc == ARGS_ONE && !AppExecFwk::IsTypeForNapiValue(env, argv[PARAM0], napi_function)) {
-            if (!ParseGetRunningFormInfosOneParam(env, argv, bundleName, hasBundleName, isUnusedInclude)) {
+            if (!ParseGetRunningFormInfosOneParam(env, argv, bundleName, hasBundleName, isUnusedIncluded)) {
                 return CreateJsUndefined(env);
             }
         } else if (argc == ARGS_TWO) {
-            if (!ParseGetRunningFormInfosTwoParams(env, argv, bundleName, hasBundleName, isUnusedInclude)) {
+            if (!ParseGetRunningFormInfosTwoParams(env, argv, bundleName, hasBundleName, isUnusedIncluded)) {
                 return CreateJsUndefined(env);
             }
         } else if (argc == ARGS_THREE) {
-            if (!ParseGetRunningFormInfosParams(env, argv, bundleName, isUnusedInclude, PARAM1)) {
+            if (!ParseGetRunningFormInfosParams(env, argv, bundleName, isUnusedIncluded, PARAM1)) {
                 return CreateJsUndefined(env);
             }
             hasBundleName = true;
         }
 
-        auto complete = [hostBundleName = bundleName, isUnusedInclude, hasBundleName](
+        auto complete = [hostBundleName = bundleName, isUnusedIncluded, hasBundleName](
                             napi_env env, NapiAsyncTask &task, int32_t status) {
             std::vector<AppExecFwk::RunningFormInfo> runningFormInfos;
             auto ret = hasBundleName ? FormMgr::GetInstance().GetRunningFormInfosByBundleName(
-                                           hostBundleName, isUnusedInclude, runningFormInfos)
-                                     : FormMgr::GetInstance().GetRunningFormInfos(isUnusedInclude, runningFormInfos);
+                                           hostBundleName, isUnusedIncluded, runningFormInfos)
+                                     : FormMgr::GetInstance().GetRunningFormInfos(isUnusedIncluded, runningFormInfos);
             if (ret != ERR_OK) {
                 task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
                 return;
@@ -663,11 +663,12 @@ private:
             return CreateJsUndefined(env);
         }
         convertArgc++;
-        bool isUnusedInclude = false;
-        if ((argc == ARGS_TWO || argc == ARGS_THREE) && !AppExecFwk::IsTypeForNapiValue(env, argv[PARAM1], napi_function)) {
-            if (!ConvertFromJsValue(env, argv[PARAM1], isUnusedInclude)) {
-                HILOG_ERROR("Convert isUnusedInclude failed.");
-                NapiFormUtil::ThrowParamTypeError(env, "isUnusedInclude", "bool");
+        bool isUnusedIncluded = false;
+        if ((argc == ARGS_TWO || argc == ARGS_THREE) &&
+            !AppExecFwk::IsTypeForNapiValue(env, argv[PARAM1], napi_function)) {
+            if (!ConvertFromJsValue(env, argv[PARAM1], isUnusedIncluded)) {
+                HILOG_ERROR("Convert isUnusedIncluded failed.");
+                NapiFormUtil::ThrowParamTypeError(env, "isUnusedIncluded", "bool");
                 return CreateJsUndefined(env);
             }
             convertArgc++;
@@ -679,8 +680,8 @@ private:
         }
         std::shared_ptr<AppExecFwk::FormInstance> formInstance = std::make_shared<AppExecFwk::FormInstance>();
         auto apiResult = std::make_shared<int32_t>();
-        auto execute = [formId, isUnusedInclude, formInstance, ret = apiResult]() {
-            *ret = FormMgr::GetInstance().GetFormInstanceById(formId, isUnusedInclude, *formInstance);
+        auto execute = [formId, isUnusedIncluded, formInstance, ret = apiResult]() {
+            *ret = FormMgr::GetInstance().GetFormInstanceById(formId, isUnusedIncluded, *formInstance);
         };
 
         auto complete =

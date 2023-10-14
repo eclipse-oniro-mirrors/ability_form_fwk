@@ -386,21 +386,21 @@ public:
 
     /**
      * @brief Get the running form infos.
-     * @param isUnusedInclude Indicates whether to include unused forms.
+     * @param isUnusedIncluded Indicates whether to include unused forms.
      * @param runningFormInfos Return the running forms' infos currently.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual ErrCode GetRunningFormInfos(bool isUnusedInclude, std::vector<RunningFormInfo> &runningFormInfos) = 0;
+    virtual ErrCode GetRunningFormInfos(bool isUnusedIncluded, std::vector<RunningFormInfo> &runningFormInfos) = 0;
 
     /**
      * @brief Get the running form infos by bundle name.
      * @param bundleName Application name.
-     * @param isUnusedInclude Indicates whether to include unused forms.
+     * @param isUnusedIncluded Indicates whether to include unused forms.
      * @param runningFormInfos Return the running forms' infos of the specify application name.
      * @return Returns ERR_OK on success, others on failure.
      */
     virtual ErrCode GetRunningFormInfosByBundleName(
-        const std::string &bundleName, bool isUnusedInclude, std::vector<RunningFormInfo> &runningFormInfos) = 0;
+        const std::string &bundleName, bool isUnusedIncluded, std::vector<RunningFormInfo> &runningFormInfos) = 0;
 
     /**
     * @brief Get form instances by filter info.
@@ -422,11 +422,11 @@ public:
     /**
      * @brief Get form instance by formId, include form store in DB.
      * @param formId formId Indicates the unique id of form.
-     * @param isUnusedInclude Indicates whether to include unused form instance.
+     * @param isUnusedIncluded Indicates whether to include unused form instance.
      * @param formInstance return formInstance
      * @return return ERR_OK on get info success, others on failure.
      */
-    virtual ErrCode GetFormInstanceById(const int64_t formId, bool isUnusedInclude, FormInstance &formInstance)
+    virtual ErrCode GetFormInstanceById(const int64_t formId, bool isUnusedIncluded, FormInstance &formInstance)
     {
         return 0;
     }

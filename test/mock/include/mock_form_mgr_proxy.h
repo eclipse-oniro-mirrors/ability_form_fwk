@@ -62,9 +62,9 @@ public:
          AAFwk::WantParams &formData));
     MOCK_METHOD2(GetFormsCount, int32_t(bool isTempFormFlag, int32_t &formCount));
     MOCK_METHOD2(GetHostFormsCount, int32_t(std::string &bundleName, int32_t &formCount));
-    MOCK_METHOD2(GetRunningFormInfos, ErrCode(bool isUnusedInclude, std::vector<RunningFormInfo> &runningFormInfos));
+    MOCK_METHOD2(GetRunningFormInfos, ErrCode(bool isUnusedIncluded, std::vector<RunningFormInfo> &runningFormInfos));
     MOCK_METHOD3(GetRunningFormInfosByBundleName,
-        ErrCode(const std::string &bundleName, bool isUnusedInclude, std::vector<RunningFormInfo> &runningFormInfos));
+        ErrCode(const std::string &bundleName, bool isUnusedIncluded, std::vector<RunningFormInfo> &runningFormInfos));
     MOCK_METHOD2(RegisterFormAddObserverByBundle, ErrCode(const std::string bundleName,
         const sptr<IRemoteObject> &callerToken));
     MOCK_METHOD2(RegisterFormRemoveObserverByBundle, ErrCode(const std::string bundleName,

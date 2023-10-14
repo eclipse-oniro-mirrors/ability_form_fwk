@@ -2758,17 +2758,17 @@ int32_t FormMgrAdapter::GetHostFormsCount(std::string &bundleName, int32_t &form
     return FormDataMgr::GetInstance().GetHostFormsCount(bundleName, formCount);
 }
 
-ErrCode FormMgrAdapter::GetRunningFormInfos(bool isUnusedInclude, std::vector<RunningFormInfo> &runningFormInfos)
+ErrCode FormMgrAdapter::GetRunningFormInfos(bool isUnusedIncluded, std::vector<RunningFormInfo> &runningFormInfos)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    return FormDataMgr::GetInstance().GetRunningFormInfos(isUnusedInclude, runningFormInfos);
+    return FormDataMgr::GetInstance().GetRunningFormInfos(isUnusedIncluded, runningFormInfos);
 }
 
 ErrCode FormMgrAdapter::GetRunningFormInfosByBundleName(
-    const std::string &bundleName, bool isUnusedInclude, std::vector<RunningFormInfo> &runningFormInfos)
+    const std::string &bundleName, bool isUnusedIncluded, std::vector<RunningFormInfo> &runningFormInfos)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    return FormDataMgr::GetInstance().GetRunningFormInfosByBundleName(bundleName, isUnusedInclude, runningFormInfos);
+    return FormDataMgr::GetInstance().GetRunningFormInfosByBundleName(bundleName, isUnusedIncluded, runningFormInfos);
 }
 
 ErrCode FormMgrAdapter::GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
@@ -2782,9 +2782,9 @@ ErrCode FormMgrAdapter::GetFormInstanceById(const int64_t formId, FormInstance &
     return FormDataMgr::GetInstance().GetFormInstanceById(formId, formInstance);
 }
 
-ErrCode FormMgrAdapter::GetFormInstanceById(const int64_t formId, bool isUnusedInclude, FormInstance &formInstance)
+ErrCode FormMgrAdapter::GetFormInstanceById(const int64_t formId, bool isUnusedIncluded, FormInstance &formInstance)
 {
-    return FormDataMgr::GetInstance().GetFormInstanceById(formId, isUnusedInclude, formInstance);
+    return FormDataMgr::GetInstance().GetFormInstanceById(formId, isUnusedIncluded, formInstance);
 }
 
 ErrCode FormMgrAdapter::RegisterAddObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken)

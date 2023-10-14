@@ -26,7 +26,7 @@ bool FormInstancesFilter::ReadFromParcel(Parcel &parcel)
     formName = Str16ToStr8(parcel.ReadString16());
     moduleName = Str16ToStr8(parcel.ReadString16());
     abilityName = Str16ToStr8(parcel.ReadString16());
-    isUnusedInclude = parcel.ReadBool();
+    isUnusedIncluded = parcel.ReadBool();
 
     return true;
 }
@@ -53,8 +53,8 @@ bool FormInstancesFilter::Marshalling(Parcel &parcel) const
         return false;
     }
 
-    // write isUnusedInclude
-    if (!parcel.WriteBool(isUnusedInclude)) {
+    // write isUnusedIncluded
+    if (!parcel.WriteBool(isUnusedIncluded)) {
         return false;
     }
 
