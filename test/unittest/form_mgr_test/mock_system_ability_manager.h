@@ -136,6 +136,11 @@ public:
         return {};
     };
 
+    int32_t GetOnDemandSystemAbilityIds(std::vector<int32_t>& systemAbilityIds)
+    {
+        return {};
+    }
+
     std::weak_ptr<bool> weakGetSystemAbility_;
 };
 
