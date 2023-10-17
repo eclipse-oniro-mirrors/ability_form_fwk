@@ -309,7 +309,7 @@ bool FormBmsHelper::GetCompatibleVersion(const std::string& bundleName, int32_t 
         return false;
     }
 
-    compatibleVersion = bundleInfo.compatibleVersion;
+    compatibleVersion = static_cast<int32_t>(bundleInfo.compatibleVersion);
     return true;
 }
 

@@ -21,8 +21,8 @@ using namespace OHOS::AbilityRuntime;
 
 static napi_module _module = {
     .nm_version = 0,
-    .nm_modname = "app.form.formObserver",
     .nm_register_func = OHOS::AbilityRuntime::JsFormObserverInit,
+    .nm_modname = "app.form.formObserver",
 };
 
 extern "C" __attribute__((constructor))

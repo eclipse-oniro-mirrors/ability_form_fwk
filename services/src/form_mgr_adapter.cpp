@@ -2079,7 +2079,6 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
     }
 
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
-    int32_t userId = FormUtil::GetCurrentAccountId();
     FormRecord record;
     bool bGetRecord = FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record);
     if (!bGetRecord) {

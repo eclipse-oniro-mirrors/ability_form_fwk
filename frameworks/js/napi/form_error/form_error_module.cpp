@@ -18,8 +18,8 @@
 
 static napi_module _module = {
     .nm_version = 0,
-    .nm_modname = "application.formError",
     .nm_filename = "application/libformerror_napi.so/formError.js",
+    .nm_modname = "application.formError",
     .nm_register_func = OHOS::AbilityRuntime::FormErrorInit,
 };
 
