@@ -2151,6 +2151,7 @@ ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, bool isUnusedIncl
         FormRecord dbRecord;
         ErrCode getDbRet = FormDbCache::GetInstance().GetDBRecord(formId, dbRecord);
         if (getDbRet != ERR_OK) {
+            HILOG_ERROR("Get formRecord by formId failed.");
             return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
         }
         if (dbRecord.formUserUids.empty()) {
