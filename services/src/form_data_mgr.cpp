@@ -2150,25 +2150,26 @@ ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, bool isUnusedIncl
     } else if (isUnusedIncluded) {
         FormRecord dbRecord;
         ErrCode getDbRet = FormDbCache::GetInstance().GetDBRecord(formId, dbRecord);
-        if (getDbRet == ERR_OK) {
-            if (dbRecord.formUserUids.empty()) {
-                return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
-            }
-            auto ret = FormBmsHelper::GetInstance().GetBundleNameByUid(
-                *dbRecord.formUserUids.begin(), formInstance.formHostName);
-            if (ret != ERR_OK) {
-                HILOG_ERROR("Get bundleName by uid failed.");
-                return ret;
-            }
-            formInstance.formId = formId;
-            formInstance.specification = dbRecord.specification;
-            formInstance.formVisiblity = static_cast<FormVisibilityType>(dbRecord.formVisibleNotifyState);
-            formInstance.bundleName = dbRecord.bundleName;
-            formInstance.moduleName = dbRecord.moduleName;
-            formInstance.abilityName = dbRecord.abilityName;
-            formInstance.formName = dbRecord.formName;
-            formInstance.formUsageState = FormUsageState::UNUSED;
+        if (getDbRet != ERR_OK) {
+            return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
         }
+        if (dbRecord.formUserUids.empty()) {
+            return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+        }
+        auto ret = FormBmsHelper::GetInstance().GetBundleNameByUid(
+            *dbRecord.formUserUids.begin(), formInstance.formHostName);
+        if (ret != ERR_OK) {
+            HILOG_ERROR("Get bundleName by uid failed.");
+            return ret;
+        }
+        formInstance.formId = formId;
+        formInstance.specification = dbRecord.specification;
+        formInstance.formVisiblity = static_cast<FormVisibilityType>(dbRecord.formVisibleNotifyState);
+        formInstance.bundleName = dbRecord.bundleName;
+        formInstance.moduleName = dbRecord.moduleName;
+        formInstance.abilityName = dbRecord.abilityName;
+        formInstance.formName = dbRecord.formName;
+        formInstance.formUsageState = FormUsageState::UNUSED;
     } else {
         return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
     }
