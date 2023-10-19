@@ -363,6 +363,11 @@ public:
     {
         GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnNotifyFormsPrivacyProtected);
     }
+
+    static napi_value GetRunningFormInfos(napi_env env, napi_callback_info info)
+    {
+        GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnGetRunningFormInfos);
+    }
 private:
     bool CheckCallerIsSystemApp()
     {
@@ -1289,6 +1294,128 @@ private:
             env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
         return result;
     }
+
+    bool ParseGetRunningFormInfosOneParam(const napi_env &env, const napi_value *argv, std::string &bundleName,
+        bool &hasBundleName, bool &isUnusedIncluded)
+    {
+        HILOG_DEBUG("Called.");
+        if (AppExecFwk::IsTypeForNapiValue(env, argv[PARAM0], napi_string)) {
+            if (!ConvertFromJsValue(env, argv[PARAM0], bundleName)) {
+                HILOG_ERROR("Convert bundleName failed.");
+                NapiFormUtil::ThrowParamTypeError(env, "bundleName", "string");
+                return false;
+            }
+            hasBundleName = true;
+        } else if (AppExecFwk::IsTypeForNapiValue(env, argv[PARAM0], napi_boolean)) {
+            if (!ConvertFromJsValue(env, argv[PARAM0], isUnusedIncluded)) {
+                HILOG_ERROR("Convert isUnusedIncluded failed.");
+                NapiFormUtil::ThrowParamTypeError(env, "isUnusedIncluded", "bool");
+                return false;
+            }
+        } else {
+            HILOG_ERROR("Input params is not a string or boolean.");
+            NapiFormUtil::ThrowParamTypeError(env, "the first param", "string or boolean");
+            return false;
+        }
+        return true;
+    }
+
+    bool ParseGetRunningFormInfosParams(const napi_env &env, const napi_value *argv, std::string &bundleName,
+        bool &isUnusedIncluded, int startPos)
+    {
+        HILOG_DEBUG("Called.");
+        if (!ConvertFromJsValue(env, argv[startPos], isUnusedIncluded)) {
+            HILOG_ERROR("Convert isUnusedIncluded failed.");
+            NapiFormUtil::ThrowParamTypeError(env, "isUnusedIncluded", "bool");
+            return false;
+        }
+        if (!ConvertFromJsValue(env, argv[startPos + 1], bundleName)) {
+            HILOG_ERROR("Convert bundleName failed.");
+            NapiFormUtil::ThrowParamTypeError(env, "bundleName", "string");
+            return false;
+        }
+        return true;
+    }
+
+    bool ParseGetRunningFormInfosTwoParams(const napi_env &env, const napi_value *argv, std::string &bundleName,
+        bool &hasBundleName, bool &isUnusedIncluded)
+    {
+        HILOG_DEBUG("Called.");
+        if (AppExecFwk::IsTypeForNapiValue(env, argv[PARAM0], napi_function)) {
+            if (AppExecFwk::IsTypeForNapiValue(env, argv[PARAM1], napi_string)) {
+                if (!ConvertFromJsValue(env, argv[PARAM1], bundleName)) {
+                    HILOG_ERROR("Convert bundleName failed.");
+                    NapiFormUtil::ThrowParamTypeError(env, "bundleName", "string");
+                    return false;
+                }
+                hasBundleName = true;
+            } else if (AppExecFwk::IsTypeForNapiValue(env, argv[PARAM1], napi_boolean)) {
+                if (!ConvertFromJsValue(env, argv[PARAM1], isUnusedIncluded)) {
+                    HILOG_ERROR("Convert isUnusedIncluded failed.");
+                    NapiFormUtil::ThrowParamTypeError(env, "isUnusedIncluded", "bool");
+                    return false;
+                }
+            } else {
+                HILOG_ERROR("Input params is not a string or boolean.");
+                NapiFormUtil::ThrowParamTypeError(env, "the second param", "string or boolean");
+                return false;
+            }
+        } else {
+            if (!ParseGetRunningFormInfosParams(env, argv, bundleName, isUnusedIncluded, PARAM0)) {
+                return false;
+            }
+            hasBundleName = true;
+        }
+        return true;
+    }
+
+    napi_value OnGetRunningFormInfos(napi_env env, size_t argc, napi_value *argv)
+    {
+        HILOG_DEBUG("Called.");
+        if (argc > ARGS_THREE) {
+            HILOG_ERROR("Wrong number of arguments.");
+            NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "0 or 1 or 2 or 3");
+            return CreateJsUndefined(env);
+        }
+
+        std::string bundleName("");
+        bool hasBundleName = false;
+        bool isUnusedIncluded = false;
+        if (argc == ARGS_ONE && !AppExecFwk::IsTypeForNapiValue(env, argv[PARAM0], napi_function)) {
+            if (!ParseGetRunningFormInfosOneParam(env, argv, bundleName, hasBundleName, isUnusedIncluded)) {
+                return CreateJsUndefined(env);
+            }
+        } else if (argc == ARGS_TWO) {
+            if (!ParseGetRunningFormInfosTwoParams(env, argv, bundleName, hasBundleName, isUnusedIncluded)) {
+                return CreateJsUndefined(env);
+            }
+        } else if (argc == ARGS_THREE) {
+            if (!ParseGetRunningFormInfosParams(env, argv, bundleName, isUnusedIncluded, PARAM1)) {
+                return CreateJsUndefined(env);
+            }
+            hasBundleName = true;
+        }
+
+        auto complete = [hostBundleName = bundleName, isUnusedIncluded, hasBundleName](
+                            napi_env env, NapiAsyncTask &task, int32_t status) {
+            std::vector<AppExecFwk::RunningFormInfo> runningFormInfos;
+            auto ret = hasBundleName ? FormMgr::GetInstance().GetRunningFormInfosByBundleName(
+                                           hostBundleName, isUnusedIncluded, runningFormInfos)
+                                     : FormMgr::GetInstance().GetRunningFormInfos(isUnusedIncluded, runningFormInfos);
+            if (ret != ERR_OK) {
+                task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
+                return;
+            }
+            task.ResolveWithNoError(env, CreateRunningFormInfos(env, runningFormInfos));
+        };
+        napi_value result = nullptr;
+        napi_value callbackParam =
+            (argc >= ARGS_ONE) &&
+                (AppExecFwk::IsTypeForNapiValue(env, argv[PARAM0], napi_function)) ? argv[PARAM0] : nullptr;
+        NapiAsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnGetRunningFormInfos", env,
+            CreateAsyncTaskWithLastParam(env, callbackParam, nullptr, std::move(complete), &result));
+        return result;
+    }
 };
 
 napi_value JsFormHostInit(napi_env env, napi_value exportObj)
@@ -1321,6 +1448,7 @@ napi_value JsFormHostInit(napi_env env, napi_value exportObj)
     BindNativeFunction(env, exportObj, "notifyFormsPrivacyProtected", moduleName,
         JsFormHost::NotifyFormsPrivacyProtected);
     BindNativeFunction(env, exportObj, "acquireFormData", moduleName, JsFormHost::AcquireFormData);
+    BindNativeFunction(env, exportObj, "getRunningFormInfos", moduleName, JsFormHost::GetRunningFormInfos);
 
     return CreateJsUndefined(env);
 }
