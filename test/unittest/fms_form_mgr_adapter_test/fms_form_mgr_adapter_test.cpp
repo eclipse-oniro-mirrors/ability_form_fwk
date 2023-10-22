@@ -82,7 +82,6 @@ extern void MockGetRequestPublishFormInfo(bool mockRet);
 extern void MockGetRequestPublishFormInfoWant(OHOS::AAFwk::Want mockWant);
 extern void MockGetAbilityInfo(bool mockRet);
 extern void MockGetAbilityInfoByAction(bool mockRet);
-extern void MockGetStringParam(bool mockRet);
 extern void MockGetFormsInfoByModule(bool mockRet);
 extern void MockGetFormsInfoByModuleParam(bool mockRet);
 extern void MockGetRefreshCount(bool mockRet);
@@ -1102,7 +1101,8 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_057, TestSize.Level0)
     std::string abilityName = "aa";
     Want want;
     std::string provider = "";
-    MockGetStringParam(false);
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, std::string());
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, std::string());
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
         formMgrAdapter.AcquireFormStateCheck(bundleName, abilityName, want, provider));
     GTEST_LOG_(INFO) << "FormMgrAdapter_057 end";
@@ -1121,7 +1121,9 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_059, TestSize.Level0)
     std::string abilityName = "aa";
     Want want;
     std::string provider = "";
-    MockGetStringParam(true);
+    std::string str = "aa";
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, str);
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, str);
     MockGetFormsInfoByModule(false);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
         formMgrAdapter.AcquireFormStateCheck(bundleName, abilityName, want, provider));
@@ -1863,6 +1865,8 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0101, TestSize.Level0)
     sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
     FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
     want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, dimensionId);
+    std::string str = "aa";
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, str);
     want.SetElement(elementName);
     MockGetFormsInfoByModule(false);
     MockGetFormsInfoByModuleParam(true);
@@ -1902,6 +1906,8 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0102, TestSize.Level0)
     sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
     sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
     FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
+    std::string str = "aa";
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, str);
     want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, dimensionId);
     want.SetElement(elementName);
     MockGetFormsInfoByModule(false);
@@ -1943,6 +1949,8 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0103, TestSize.Level0)
     sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
     sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
     FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
+    std::string str = "aa";
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, str);
     want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, dimensionId);
     want.SetElement(elementName);
     MockGetFormsInfoByModule(false);
@@ -2757,8 +2765,10 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0143, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormMgrAdapter_0143 start";
     FormMgrAdapter formMgrAdapter;
+    std::string str = "aa";
     Want want = {};
     want.SetElementName("bundleName", "abilityName");
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, str);
     BundleInfo bundleInfo = {};
     std::string packageName = "";
     sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
@@ -2783,8 +2793,10 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0144, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormMgrAdapter_0144 start";
     FormMgrAdapter formMgrAdapter;
+    std::string str = "aa";
     Want want = {};
     want.SetElementName("bundleName", "abilityName");
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, str);
     BundleInfo bundleInfo = {};
     std::string packageName = "";
     sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
@@ -2847,7 +2859,8 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0147, TestSize.Level0)
     Want want = {};
     FormInfo formInfo = {};
     want.SetElementName("bundleName", "abilityName");
-    MockGetStringParam(false);
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, std::string());
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, std::string());
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.GetFormInfo(want, formInfo));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0147 end";
 }
@@ -2866,7 +2879,9 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0148, TestSize.Level0)
     want.SetElementName("bundleName", "abilityName");
     MockGetFormsInfoByModule(true);
     MockGetFormsInfoByModuleParam(false);
-    MockGetStringParam(true);
+    std::string str = "aa";
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, str);
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, str);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE, formMgrAdapter.GetFormInfo(want, formInfo));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0148 end";
 }
@@ -2925,7 +2940,9 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0151, TestSize.Level0)
     want.SetElementName("bundleName", "abilityName");
     MockGetFormsInfoByModule(false);
     MockGetFormsInfoByModuleParam(false);
-    MockGetStringParam(true);
+    std::string str = "aa";
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, str);
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, str);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_NO_SUCH_ABILITY, formMgrAdapter.GetFormInfo(want, formInfo));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0151 end";
 }
@@ -3553,9 +3570,11 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0185, TestSize.Level0)
     FormMgrAdapter formMgrAdapter;
     std::string bundleName = "aa";
     std::string abilityName = "aa";
-    Want want;
     std::string provider = "";
-    MockGetStringParam(true);
+    Want want;
+    std::string str = "aa";
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, str);
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, str);
     MockGetFormsInfoByModule(false);
     MockGetFormsInfoByModuleParam(true);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
@@ -3966,5 +3985,57 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_208, TestSize.Level0)
     auto formPublishInterceptor_ = interceptor;
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.UnregisterPublishFormInterceptor(interceptorCallback));
     GTEST_LOG_(INFO) << "FormMgrAdapter_208 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_209
+ * @tc.desc: test BackGroundEvent function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_209, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_209 start";
+    auto amsHelperBackup = FormAmsHelper::GetInstance().GetAbilityManager();
+    auto mockAmsMgr = new (std::nothrow) MockAbilityMgrService();
+    mockAmsMgr->startAbilityByCall_ = ERR_OK;
+    FormAmsHelper::GetInstance().abilityManager_ = mockAmsMgr;
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    Want want;
+    want.SetBundle("bundle");
+    nlohmann::json params;
+    params[Constants::PARAM_FORM_CALL_EVENT_METHOD_KEY] = "test";
+    want.SetParam(Constants::FORM_CALL_EVENT_PARAMS, params.dump());
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    MockGetFormRecord(true);
+    EXPECT_EQ(ERR_OK, formMgrAdapter.BackgroundEvent(formId, want, callerToken));
+    FormAmsHelper::GetInstance().abilityManager_ = amsHelperBackup;
+    GTEST_LOG_(INFO) << "FormMgrAdapter_209 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_210
+ * @tc.desc: test BackGroundEvent function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_210, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_210 start";
+    auto amsHelperBackup = FormAmsHelper::GetInstance().GetAbilityManager();
+    auto mockAmsMgr = new (std::nothrow) MockAbilityMgrService();
+    mockAmsMgr->startAbilityByCall_ = ERR_OK;
+    FormAmsHelper::GetInstance().abilityManager_ = mockAmsMgr;
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    Want want;
+    want.SetBundle("bundle");
+    nlohmann::json params;
+    params[Constants::PARAM_FORM_CALL_EVENT_METHOD_KEY] = 1;
+    want.SetParam(Constants::FORM_CALL_EVENT_PARAMS, params.dump());
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    MockGetFormRecord(true);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.BackgroundEvent(formId, want, callerToken));
+    FormAmsHelper::GetInstance().abilityManager_ = amsHelperBackup;
+    GTEST_LOG_(INFO) << "FormMgrAdapter_210 end";
 }
 }
