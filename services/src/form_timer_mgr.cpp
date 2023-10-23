@@ -1076,7 +1076,7 @@ std::shared_ptr<WantAgent> FormTimerMgr::GetLimiterWantAgent()
     std::vector<std::shared_ptr<AAFwk::Want>> wants;
     wants.emplace_back(want);
     WantAgentInfo wantAgentInfo(REQUEST_LIMITER_CODE, WantAgentConstant::OperationType::SEND_COMMON_EVENT,
-        WantAgentConstant::Flags::UPDATE_PRESENT_FLAG, wants, nullptr);
+        WantAgentConstant::Flags::CANCEL_PRESENT_FLAG, wants, nullptr);
     return IN_PROCESS_CALL(WantAgentHelper::GetWantAgent(wantAgentInfo));
 }
 
@@ -1167,7 +1167,7 @@ std::shared_ptr<WantAgent> FormTimerMgr::GetDynamicWantAgent(int64_t nextTime, i
     std::vector<std::shared_ptr<AAFwk::Want>> wants;
     wants.emplace_back(want);
     WantAgentInfo wantAgentInfo(REQUEST_DYNAMIC_CODE, WantAgentConstant::OperationType::SEND_COMMON_EVENT,
-        WantAgentConstant::Flags::UPDATE_PRESENT_FLAG, wants, nullptr);
+        WantAgentConstant::Flags::CANCEL_PRESENT_FLAG, wants, nullptr);
     return IN_PROCESS_CALL(WantAgentHelper::GetWantAgent(wantAgentInfo, userId));
 }
 
