@@ -19,8 +19,8 @@
 #ifdef ENABLE_ERRCODE
 static napi_module _module = {
     .nm_version = 0,
-    .nm_modname = "app.form.formInfo",
     .nm_filename = "app/form/libforminfo_napi.so/formInfo.js",
+    .nm_modname = "app.form.formInfo",
     .nm_register_func = OHOS::AbilityRuntime::FormInfoInit,
 };
 
@@ -31,8 +31,8 @@ extern "C" __attribute__((constructor)) void NAPI_app_form_formInfo_AutoRegister
 #else
 static napi_module _module = {
     .nm_version = 0,
-    .nm_modname = "application.formInfo",
     .nm_filename = "application/libforminfo_napi.so/formInfo.js",
+    .nm_modname = "application.formInfo",
     .nm_register_func = OHOS::AbilityRuntime::FormInfoInit,
 };
 

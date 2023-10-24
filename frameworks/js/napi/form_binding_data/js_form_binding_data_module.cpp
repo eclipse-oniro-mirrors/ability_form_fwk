@@ -18,8 +18,8 @@
 
 static napi_module _module = {
     .nm_version = 0,
-    .nm_modname = "app.form.formBindingData",
     .nm_filename = "app/form/libformbindingdata.so/formBindingData.js",
+    .nm_modname = "app.form.formBindingData",
     .nm_register_func = OHOS::AbilityRuntime::JsFormBindingDataInit,
 };
 

@@ -417,7 +417,7 @@ private:
     bool ConvertFromIds(napi_env env, napi_value jsValue, std::vector<int64_t> &formIds)
     {
         std::vector<string> strFormIdList;
-        if(!GetStringsValue(env, jsValue, strFormIdList)) {
+        if (!GetStringsValue(env, jsValue, strFormIdList)) {
             HILOG_ERROR("convert strFormIdList failed!");
             return false;
         }

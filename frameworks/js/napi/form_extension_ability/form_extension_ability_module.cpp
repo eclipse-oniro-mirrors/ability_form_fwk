@@ -23,8 +23,8 @@ extern const char _binary_form_extension_ability_abc_end[];
 
 static napi_module _module = {
     .nm_version = 0,
-    .nm_modname = "app.form.FormExtensionAbility",
     .nm_filename = "app/form/libformextensionability_napi.so/FormExtension.js",
+    .nm_modname = "app.form.FormExtensionAbility",
 };
 
 extern "C" __attribute__((constructor))
