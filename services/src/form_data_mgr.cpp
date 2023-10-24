@@ -2301,29 +2301,28 @@ ErrCode FormDataMgr::GetRunningFormInfosByBundleName(
 
     std::lock_guard<std::mutex> lock(formRecordMutex_);
     for (auto record : formRecords_) {
-        for (auto uid : record.second.formUserUids) {
-            std::string hostBundleName = "";
-            auto ret = FormBmsHelper::GetInstance().GetBundleNameByUid(uid, hostBundleName);
-            if (ret != ERR_OK) {
-                HILOG_ERROR("Get bundleName by uid failed.");
-                continue;
-            }
-            bool flag = (!record.second.formTempFlag) &&
-                ((FormUtil::GetCurrentAccountId() == record.second.providerUserId) ||
-                (record.second.providerUserId == Constants::DEFAULT_USER_ID));
-            if (hostBundleName == bundleName && flag) {
-                RunningFormInfo info;
-                info.formId = record.first;
-                info.formName = record.second.formName;
-                info.dimension = record.second.specification;
-                info.bundleName = record.second.bundleName;
-                info.hostBundleName = bundleName;
-                info.moduleName = record.second.moduleName;
-                info.abilityName = record.second.abilityName;
-                info.formVisiblity = static_cast<FormVisibilityType>(record.second.formVisibleNotifyState);
-                info.formUsageState = FormUsageState::USED;
-                runningFormInfos.emplace_back(info);
-            }
+        std::vector<FormHostRecord> formHostRecords;
+        GetFormHostRecord(record.first, formHostRecords);
+        if (formHostRecords.empty()) {
+            HILOG_ERROR("Get form host failed.");
+            continue;
+        }
+        auto hostBundleName = formHostRecords.begin()->GetHostBundleName();
+        bool flag = (!record.second.formTempFlag) &&
+            ((FormUtil::GetCurrentAccountId() == record.second.providerUserId) ||
+            (record.second.providerUserId == Constants::DEFAULT_USER_ID));
+        if (hostBundleName == bundleName && flag) {
+            RunningFormInfo info;
+            info.formId = record.first;
+            info.formName = record.second.formName;
+            info.dimension = record.second.specification;
+            info.bundleName = record.second.bundleName;
+            info.hostBundleName = bundleName;
+            info.moduleName = record.second.moduleName;
+            info.abilityName = record.second.abilityName;
+            info.formVisiblity = static_cast<FormVisibilityType>(record.second.formVisibleNotifyState);
+            info.formUsageState = FormUsageState::USED;
+            runningFormInfos.emplace_back(info);
         }
     }
     if (isUnusedIncluded) {
