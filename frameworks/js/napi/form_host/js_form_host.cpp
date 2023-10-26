@@ -1400,7 +1400,7 @@ private:
                             napi_env env, NapiAsyncTask &task, int32_t status) {
             std::vector<AppExecFwk::RunningFormInfo> runningFormInfos;
             auto ret = hasBundleName ? FormMgr::GetInstance().GetRunningFormInfosByBundleName(
-                                           hostBundleName, isUnusedIncluded, runningFormInfos)
+                hostBundleName, isUnusedIncluded, runningFormInfos)
                                      : FormMgr::GetInstance().GetRunningFormInfos(isUnusedIncluded, runningFormInfos);
             if (ret != ERR_OK) {
                 task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
