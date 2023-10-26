@@ -15,6 +15,7 @@
 
 #include "form_bms_helper.h"
 
+#include "form_constants.h"
 #include "form_mgr_errors.h"
 #include "ipc_skeleton.h"
 
@@ -100,6 +101,12 @@ bool FormBmsHelper::GetAbilityInfo(const AAFwk::Want &want, int32_t userId, Abil
         abilityInfo.name = "name";
     }
     return g_mockGetAbilityInfoRet;
+}
+
+bool FormBmsHelper::GetBundleInfoWithPermission(const std::string &bundleName, int32_t userId, BundleInfo &bundleInfo)
+{
+    bundleInfo.reqPermissions.push_back(Constants::PERMISSION_KEEP_BACKGROUND_RUNNING);
+    return true;
 }
 } // namespace AppExecFwk
 } // namespace OHOS

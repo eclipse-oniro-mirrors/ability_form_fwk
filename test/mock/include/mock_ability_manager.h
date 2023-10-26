@@ -313,6 +313,12 @@ public:
     {
         return 0;
     }
+
+    int32_t ExecuteIntent(uint64_t key,  const sptr<IRemoteObject> &callerToken,
+        const InsightIntentExecuteParam &param)
+    {
+        return 0;
+    }
 };
 
 class MockAbilityMgrStub : public IRemoteStub<AAFwk::IAbilityManager> {
@@ -724,7 +730,7 @@ public:
     int StartAbilityByCall(const Want &want, const sptr<IAbilityConnection> &connect,
         const sptr<IRemoteObject> &callerToken, int32_t accountId = DEFAULT_INVAL_VALUE) override
     {
-        return 0;
+        return startAbilityByCall_;
     }
     int ReleaseCall(
         const sptr<IAbilityConnection> &connect, const AppExecFwk::ElementName &element) override
@@ -788,7 +794,15 @@ public:
         return 0;
     }
 
+    int32_t ExecuteIntent(uint64_t key,  const sptr<IRemoteObject> &callerToken,
+        const InsightIntentExecuteParam &param)
+    {
+        return 0;
+    }
+
     int32_t startAbility_ = 0;
+
+    int32_t startAbilityByCall_ = 0;
 private:
     Semaphore sem_;
 };
