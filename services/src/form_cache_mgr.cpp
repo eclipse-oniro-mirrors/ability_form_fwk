@@ -155,7 +155,7 @@ bool FormCacheMgr::InnerGetImageData(
         }
 
         if (!formAshmem->WriteToAshmem(key, reinterpret_cast<char *>(blob.data()),
-                        static_cast<int32_t>(blob.size()))) {
+            static_cast<int32_t>(blob.size()))) {
             HILOG_ERROR("Write to ashmem failed");
             return false;
         }

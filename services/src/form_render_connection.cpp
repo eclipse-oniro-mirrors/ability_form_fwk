@@ -58,7 +58,7 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
 
     int32_t compatibleVersion = 0;
     if (!FormBmsHelper::GetInstance().GetCompatibleVersion(
-            formRecord_.bundleName, FormUtil::GetCurrentAccountId(), compatibleVersion)) {
+        formRecord_.bundleName, FormUtil::GetCurrentAccountId(), compatibleVersion)) {
         HILOG_ERROR("get compatible version code failed.");
         return;
     }
