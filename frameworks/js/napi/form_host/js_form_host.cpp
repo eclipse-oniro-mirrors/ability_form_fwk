@@ -368,6 +368,11 @@ public:
     {
         GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnGetRunningFormInfos);
     }
+
+    static napi_value GetFormInstanceById(napi_env env, napi_callback_info info)
+    {
+        GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnGetFormInstanceById);
+    }
 private:
     bool CheckCallerIsSystemApp()
     {
@@ -1416,6 +1421,59 @@ private:
             CreateAsyncTaskWithLastParam(env, callbackParam, nullptr, std::move(complete), &result));
         return result;
     }
+
+    napi_value OnGetFormInstanceById(napi_env env, size_t argc, napi_value *argv)
+    {
+        HILOG_DEBUG("Called.");
+        if (argc < ARGS_ONE || argc > ARGS_THREE) {
+            HILOG_ERROR("Wrong number of arguments.");
+            NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1 or 2 or 3");
+            return CreateJsUndefined(env);
+        }
+        decltype(argc) convertArgc = 0;
+        int64_t formId;
+        if (!ConvertFromId(env, argv[PARAM0], formId)) {
+            HILOG_ERROR("Convert strFormIdList failed.");
+            NapiFormUtil::ThrowParamTypeError(env, "formId", "string");
+            return CreateJsUndefined(env);
+        }
+        convertArgc++;
+        bool isUnusedIncluded = false;
+        if ((argc == ARGS_TWO || argc == ARGS_THREE) &&
+            !AppExecFwk::IsTypeForNapiValue(env, argv[PARAM1], napi_function)) {
+            if (!ConvertFromJsValue(env, argv[PARAM1], isUnusedIncluded)) {
+                HILOG_ERROR("Convert isUnusedIncluded failed.");
+                NapiFormUtil::ThrowParamTypeError(env, "isUnusedIncluded", "bool");
+                return CreateJsUndefined(env);
+            }
+            convertArgc++;
+        }
+        if (argc == ARGS_THREE && !AppExecFwk::IsTypeForNapiValue(env, argv[PARAM2], napi_function)) {
+            HILOG_ERROR("The third param is invalid.");
+            NapiFormUtil::ThrowParamTypeError(env, "callback", "Callback<string>");
+            return CreateJsUndefined(env);
+        }
+        std::shared_ptr<AppExecFwk::FormInstance> formInstance = std::make_shared<AppExecFwk::FormInstance>();
+        auto apiResult = std::make_shared<int32_t>();
+        auto execute = [formId, isUnusedIncluded, formInstance, ret = apiResult]() {
+            *ret = FormMgr::GetInstance().GetFormInstanceById(formId, isUnusedIncluded, *formInstance);
+        };
+
+        auto complete =
+            [formInstance, ret = apiResult](napi_env env, NapiAsyncTask &task, int32_t status) {
+                if (*ret != ERR_OK) {
+                    HILOG_ERROR("Get formInstance by id failed.");
+                    task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, *ret));
+                } else {
+                    task.ResolveWithNoError(env, CreateFormInstance(env, *formInstance));
+                }
+            };
+        napi_value lastParam = (argc == convertArgc) ? nullptr : argv[convertArgc];
+        napi_value result = nullptr;
+        NapiAsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnGetFormInstanceById",
+            env, CreateAsyncTaskWithLastParam(env, lastParam, std::move(execute), std::move(complete), &result));
+        return result;
+    }
 };
 
 napi_value JsFormHostInit(napi_env env, napi_value exportObj)
@@ -1449,6 +1507,7 @@ napi_value JsFormHostInit(napi_env env, napi_value exportObj)
         JsFormHost::NotifyFormsPrivacyProtected);
     BindNativeFunction(env, exportObj, "acquireFormData", moduleName, JsFormHost::AcquireFormData);
     BindNativeFunction(env, exportObj, "getRunningFormInfos", moduleName, JsFormHost::GetRunningFormInfos);
+    BindNativeFunction(env, exportObj, "getRunningFormInfoById", moduleName, JsFormHost::GetFormInstanceById);
 
     return CreateJsUndefined(env);
 }
