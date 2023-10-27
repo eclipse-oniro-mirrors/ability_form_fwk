@@ -20,8 +20,8 @@
 static napi_module _module = {
     .nm_version = 0,
     .nm_filename = "app/form/libforminfo_napi.so/formInfo.js",
-    .nm_modname = "app.form.formInfo",
     .nm_register_func = OHOS::AbilityRuntime::FormInfoInit,
+    .nm_modname = "app.form.formInfo",
 };
 
 extern "C" __attribute__((constructor)) void NAPI_app_form_formInfo_AutoRegister()
@@ -32,8 +32,8 @@ extern "C" __attribute__((constructor)) void NAPI_app_form_formInfo_AutoRegister
 static napi_module _module = {
     .nm_version = 0,
     .nm_filename = "application/libforminfo_napi.so/formInfo.js",
-    .nm_modname = "application.formInfo",
     .nm_register_func = OHOS::AbilityRuntime::FormInfoInit,
+    .nm_modname = "application.formInfo",
 };
 
 extern "C" __attribute__((constructor)) void NAPI_application_formInfo_AutoRegister()
