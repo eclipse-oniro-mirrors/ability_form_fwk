@@ -19,8 +19,8 @@
 static napi_module _module = {
     .nm_version = 0,
     .nm_filename = "application/libformbindingdata_napi.so/formBindingData.js",
-    .nm_modname = "application.formBindingData",
     .nm_register_func = OHOS::AbilityRuntime::FormBindingDataInit,
+    .nm_modname = "application.formBindingData",
 };
 
 extern "C" __attribute__((constructor)) void NAPI_application_formBindingData_AutoRegister()
