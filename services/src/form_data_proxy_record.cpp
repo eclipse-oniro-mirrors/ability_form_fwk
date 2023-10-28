@@ -15,6 +15,8 @@
 
 #include "form_data_proxy_record.h"
 
+#include <cstddef>
+#include <string>
 #include <vector>
 
 #ifdef SUPPORT_ERMS
@@ -46,6 +48,8 @@ FormDataProxyRecord::FormDataProxyRecord(int64_t formId, const std::string &bund
     uint32_t tokenId, int32_t uid) : formId_(formId), bundleName_(bundleName), uiSyntax_(uiSyntax),
     tokenId_(tokenId), uid_(uid)
 {
+    HILOG_INFO("create FormDataProxyRecord formId: %{public}s, bundleName: %{public}s",
+        std::to_string(formId).c_str(), bundleName.c_str());
     std::string uri = "datashareproxy://" + bundleName;
     DataShare::CreateOptions options;
     options.isProxy_ = true;
@@ -54,6 +58,8 @@ FormDataProxyRecord::FormDataProxyRecord(int64_t formId, const std::string &bund
 
 FormDataProxyRecord::~FormDataProxyRecord()
 {
+    HILOG_INFO("destroy FormDataProxyRecod formId: %{public}s, bundleName: %{public}s",
+        std::to_string(formId_).c_str(), bundleName_.c_str());
     if (dataShareHelper_ != nullptr) {
         dataShareHelper_->Release();
     }
@@ -61,7 +67,7 @@ FormDataProxyRecord::~FormDataProxyRecord()
 
 ErrCode FormDataProxyRecord::SubscribeFormData(const std::vector<FormDataProxy> &formDataProxies)
 {
-    HILOG_DEBUG("subscribe form data.");
+    HILOG_INFO("subscribe form data, formDataProxies size: %{public}zu.", formDataProxies.size());
     ParseFormDataProxies(formDataProxies);
     ErrCode ret = ERR_OK;
     ret = SubscribeRdbFormData(rdbSubscribeMap_);
@@ -79,13 +85,14 @@ ErrCode FormDataProxyRecord::SubscribeFormData(const std::vector<FormDataProxy> 
 
 ErrCode FormDataProxyRecord::SubscribeRdbFormData(std::map<std::string, std::string> &rdbSubscribeMap)
 {
+    HILOG_INFO("SubscribeRdbFormData");
     if (dataShareHelper_ == nullptr) {
         HILOG_ERROR("dataShareHelper is nullptr.");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
     if (rdbSubscribeMap.empty()) {
-        HILOG_DEBUG("rdbSubscribeMap is empty.");
+        HILOG_ERROR("rdbSubscribeMap is empty.");
         return ERR_OK;
     }
 
@@ -108,8 +115,11 @@ ErrCode FormDataProxyRecord::SubscribeRdbFormData(std::map<std::string, std::str
         auto ret = dataShareHelper_->SubscribeRdbData(search.uris, templateId, rdbTask);
         uint32_t failNum = 0;
         for (const auto &iter : ret) {
+            SubscribeResultRecord record{iter.key_, search.subscribeId, iter.errCode_, false, 0};
+            AddSubscribeResultRecord(record, true);
             if (iter.errCode_ != 0) {
-                HILOG_ERROR("subscribe rdb data failed. %{public}s", iter.key_.c_str());
+                HILOG_ERROR("subscribe rdb data failed. uri: %{public}s, errCode: %{public}d",
+                    iter.key_.c_str(), iter.errCode_);        
                 failNum++;
             }
         }
@@ -122,13 +132,14 @@ ErrCode FormDataProxyRecord::SubscribeRdbFormData(std::map<std::string, std::str
 
 ErrCode FormDataProxyRecord::SubscribePublishFormData(std::map<std::string, std::string> &publishSubscribeMap)
 {
+    HILOG_INFO("SubscribePublishFormData");
     if (dataShareHelper_ == nullptr) {
         HILOG_ERROR("dataShareHelper is nullptr.");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
     if (publishSubscribeMap.empty()) {
-        HILOG_DEBUG("publishSubscribeMap is nullptr.");
+        HILOG_ERROR("publishSubscribeMap is nullptr.");
         return ERR_OK;
     }
 
@@ -148,8 +159,11 @@ ErrCode FormDataProxyRecord::SubscribePublishFormData(std::map<std::string, std:
         auto ret = dataShareHelper_->SubscribePublishedData(search.uris, search.subscribeId, publishedTask);
         uint32_t failNum = 0;
         for (const auto &iter : ret) {
+            SubscribeResultRecord record{iter.key_, search.subscribeId, iter.errCode_, false, 0};
+            AddSubscribeResultRecord(record, false);
             if (iter.errCode_ != 0) {
-                HILOG_ERROR("subscribe published data failed. %{public}s", iter.key_.c_str());
+                HILOG_ERROR("subscribe published data failed. uri: %{public}s, errCode: %{public}d",
+                    iter.key_.c_str(), iter.errCode_);        
                 failNum++;
             }
         }
@@ -180,6 +194,9 @@ ErrCode FormDataProxyRecord::UnsubscribeFormData(std::map<std::string, std::stri
         templateId.subscriberId_ = search.subscribeId;
         templateId.bundleName_ = bundleName_;
         dataShareHelper_->UnsubscribeRdbData(search.uris, templateId);
+        for (const auto& uri : search.uris) {
+            RemoveSubscribeResultRecord(uri, search.subscribeId, true);
+        }
     }
     rdbSubscribeMap.clear();
 
@@ -187,6 +204,9 @@ ErrCode FormDataProxyRecord::UnsubscribeFormData(std::map<std::string, std::stri
     ConvertSubscribeMapToRequests(publishSubscribeMap, publishRequests);
     for (const auto &search : publishRequests) {
         dataShareHelper_->UnsubscribePublishedData(search.uris, search.subscribeId);
+        for (const auto& uri : search.uris) {
+            RemoveSubscribeResultRecord(uri, search.subscribeId, false);
+        }
     }
     publishSubscribeMap.clear();
     return ERR_OK;
@@ -196,19 +216,23 @@ void FormDataProxyRecord::ParseFormDataProxies(const std::vector<FormDataProxy> 
 {
     std::vector<ProxyData> proxyData;
     FormBmsHelper::GetInstance().GetAllProxyDataInfos(FormUtil::GetCurrentAccountId(), proxyData);
+    HILOG_INFO("ParseFormDataProxies proxyData.size: %{public}zu", proxyData.size());
+    for (size_t i = 0; i < proxyData.size(); ++i) {
+        HILOG_INFO("ParseFormDataProxies proxyData[%{public}zu].uri: %{public}s", i, proxyData[i].uri.c_str());
+    }
 
     for (const auto& formDataProxy : formDataProxies) {
         auto subscribe = formDataProxy.subscribeId.empty() ? std::to_string(formId_) : formDataProxy.subscribeId;
         for (const auto& iter : proxyData) {
             if (formDataProxy.key == iter.uri) {
                 rdbSubscribeMap_[formDataProxy.key] = subscribe;
-                HILOG_DEBUG("subscribe rdb data. key: %{public}s, subscribeId: %{public}s",
+                HILOG_INFO("subscribe rdb data. key: %{public}s, subscribeId: %{public}s",
                     formDataProxy.key.c_str(), subscribe.c_str());
                 break;
             }
         }
         publishSubscribeMap_[formDataProxy.key] = subscribe;
-        HILOG_DEBUG("subscribe publish data. key: %{public}s, subscribeId: %{public}s",
+        HILOG_INFO("subscribe publish data. key: %{public}s, subscribeId: %{public}s",
             formDataProxy.key.c_str(), subscribe.c_str());
     }
 }
@@ -220,7 +244,8 @@ void FormDataProxyRecord::ConvertSubscribeMapToRequests(std::map<std::string, st
     for (const auto &subscribe : subscribeMap) {
         int64_t subscriberId = formId_;
         if (!FormUtil::ConvertStringToInt64(subscribe.second, subscriberId)) {
-            HILOG_WARN("Convert string to int64 failed, change to default value formId.");
+            HILOG_WARN("Convert string subscriberId[%{public}s] to int64 failed, change to default value "
+                "formId[%{public}s].", subscribe.second.c_str(), std::to_string(formId_).c_str());
         }
         bool isNewSubscriberId = true;
         std::string uri;
@@ -266,8 +291,11 @@ void FormDataProxyRecord::UpdatePublishedDataForm(const std::vector<DataShare::P
         }
     }
     std::string formDataStr = object.empty() ? "" : object.dump();
-    HILOG_INFO("update published data. formDataStr: %{private}s, imageDataMap size: %{publish}zu.",
-        formDataStr.c_str(), imageDataMap.size());
+    std::string subStr = formDataStr.substr(0, std::min((int)formDataStr.length(), 30));
+    HILOG_INFO("form[formId: %{public}s] will update published data. formDataStr[len: %{public}zu]: %{private}s, "
+        "imageDataMap size: %{publish}zu.", std::to_string(formId_).c_str(), formDataStr.length(),
+        subStr.c_str(), imageDataMap.size());
+
     FormProviderData formProviderData;
     formProviderData.SetDataString(formDataStr);
     if (!imageDataMap.empty()) {
@@ -291,7 +319,10 @@ void FormDataProxyRecord::UpdateRdbDataForm(const std::vector<std::string> &data
     }
 
     std::string formDataStr = object.empty() ? "" : object.dump();
-    HILOG_INFO("update rdb data. formDataStr: %{private}s.", formDataStr.c_str());
+    std::string subStr = formDataStr.substr(0, std::min((int)formDataStr.size(), 30));
+    HILOG_INFO("form[formId: %{public}s] will update rdb data. formDataStr[len: %{public}zu]: %{private}s.",
+        std::to_string(formId_).c_str(), formDataStr.length(), subStr.c_str());
+
     FormProviderData formProviderData;
     formProviderData.SetDataString(formDataStr);
     FormMgrAdapter::GetInstance().UpdateForm(formId_, uid_, formProviderData);
@@ -299,6 +330,7 @@ void FormDataProxyRecord::UpdateRdbDataForm(const std::vector<std::string> &data
 
 void FormDataProxyRecord::UpdateSubscribeFormData(const std::vector<FormDataProxy> &formDataProxies)
 {
+    HILOG_INFO("UpdateSubscribeFormData");
     std::map<std::string, std::string> originRdbMap;
     std::map<std::string, std::string> newRdbMap;
     std::map<std::string, std::string> originPublishMap;
@@ -348,6 +380,18 @@ void FormDataProxyRecord::DisableSubscribeFormData()
     SetPublishSubsState(publishSubscribeMap_, false);
 }
 
+void FormDataProxyRecord::RetryFailureSubscribes()
+{
+    HILOG_INFO("retry subscribe form, formId: %{public}s", std::to_string(formId_).c_str());
+    if (dataShareHelper_ == nullptr) {
+        HILOG_ERROR("dataShareHelper is nullptr.");
+        return;
+    }
+
+    RetryFailureRdbSubscribes();
+    RetryFailurePublishSubscribes();
+}
+
 ErrCode FormDataProxyRecord::SetRdbSubsState(std::map<std::string, std::string> &rdbSubscribeMap, bool subsState)
 {
     if (dataShareHelper_ == nullptr) {
@@ -376,7 +420,7 @@ ErrCode FormDataProxyRecord::SetRdbSubsState(std::map<std::string, std::string> 
         uint32_t failNum = 0;
         for (const auto &iter : ret) {
             if (iter.errCode_ != 0) {
-                HILOG_ERROR("set rdb state failed. %{public}s", iter.key_.c_str());
+                CheckAndPrintPrevSubscribeState(iter.key_, search.subscribeId, true);
                 failNum++;
             }
         }
@@ -413,7 +457,7 @@ ErrCode FormDataProxyRecord::SetPublishSubsState(std::map<std::string, std::stri
         uint32_t failNum = 0;
         for (const auto &iter : ret) {
             if (iter.errCode_ != 0) {
-                HILOG_ERROR("set published state failed. %{public}s", iter.key_.c_str());
+                CheckAndPrintPrevSubscribeState(iter.key_, search.subscribeId, false);
                 failNum++;
             }
         }
@@ -455,6 +499,131 @@ bool FormDataProxyRecord::PrepareImageData(const DataShare::PublishedDataItem &d
     std::pair<sptr<FormAshmem>, int32_t> imageDataRecord = std::make_pair(formAshmem, sizeof(formAshmem));
     imageDataMap[imageName] = imageDataRecord;
     return true;
+}
+
+void FormDataProxyRecord::AddSubscribeResultRecord(SubscribeResultRecord record, bool isRdbType)
+{
+    std::map<std::string, std::map<int64_t, SubscribeResultRecord>>* resultMap = 
+        isRdbType ? &rdbSubscribeResultMap_ : &publishSubscribeResultMap_;
+    auto mapIter = resultMap->find(record.uri);
+    if (mapIter == resultMap->end()) {
+        std::map<int64_t, SubscribeResultRecord> records;
+        records.emplace(record.subscribeId, record);
+        resultMap->emplace(record.uri, records);
+    } else {
+        mapIter->second.emplace(record.subscribeId, record);
+    }
+}
+
+void FormDataProxyRecord::RemoveSubscribeResultRecord(const std::string& uri, int64_t subscribeId, bool isRdbType)
+{
+    std::map<std::string, std::map<int64_t, SubscribeResultRecord>>* resultMap = 
+        isRdbType ? &rdbSubscribeResultMap_ : &publishSubscribeResultMap_;
+    auto mapIter = resultMap->find(uri);
+    if (mapIter == resultMap->end()) {
+        return;
+    }
+    auto it = mapIter->second.find(subscribeId);
+    mapIter->second.erase(it);
+}
+
+void FormDataProxyRecord::CheckAndPrintPrevSubscribeState(const std::string& uri, int64_t subscribeId, bool isRdbType)
+{
+    std::string type = isRdbType ? "rdb" : "publish";
+    std::map<std::string, std::map<int64_t, SubscribeResultRecord>>* resultMap = 
+        isRdbType ? &rdbSubscribeResultMap_ : &publishSubscribeResultMap_;
+    bool alreadySubscribed = true;
+    auto mapIter = resultMap->find(uri);
+    if (mapIter == resultMap->end()) {
+        alreadySubscribed = false;
+    } else {
+        auto it = mapIter->second.find(subscribeId);
+        if (it == mapIter->second.end()) {
+            alreadySubscribed = false;
+        } else {
+            HILOG_ERROR("failed to set %{public}s state, [uri: %{public}s, subscriberId: %{public}s, ret: %{public}d, "
+                "retry: %{public}s, retryRet: %{public}d", type.c_str(), uri.c_str(),
+                std::to_string(subscribeId).c_str(), it->second.ret, (it->second.retry ? "yes" : "no"),
+                it->second.retryRet);
+        }
+    }
+    if (!alreadySubscribed) {
+        HILOG_ERROR("failed to set %{public}s state, which [uri: %{public}s, subscriberId: %{public}s] can't been "
+            "found! ", type.c_str(), uri.c_str(), std::to_string(subscribeId).c_str());
+    }
+}
+
+void FormDataProxyRecord::RetryFailureRdbSubscribes()
+{
+    std::weak_ptr<FormDataProxyRecord> weak(shared_from_this());
+    auto rdbTask = [weak](const DataShare::RdbChangeNode &changeNode) {
+        auto formDataRecord = weak.lock();
+        if (formDataRecord == nullptr) {
+            HILOG_ERROR("formDataRecord is nullptr.");
+            return;
+        }
+        formDataRecord->OnRdbDataChange(changeNode);
+    };
+    for (auto& result : rdbSubscribeResultMap_) {
+        const std::string& uri = result.first;
+        for (auto& records : result.second) {
+            int64_t subscribeId = records.first;
+            auto& record = records.second;
+            // ok or already retry
+            if (record.ret == 0 || record.retry) {
+                continue;
+            }
+
+            record.retry = true;
+            std::vector<std::string> uris{uri};
+            DataShare::TemplateId templateId;
+            templateId.subscriberId_ = subscribeId;
+            templateId.bundleName_ = bundleName_;
+            auto ret = dataShareHelper_->SubscribeRdbData(uris, templateId, rdbTask);
+            for (const auto &iter : ret) {
+                if (iter.errCode_ != 0) {
+                    HILOG_ERROR("retry subscribe rdb data failed, uri: %{public}s, errCode: %{public}d",
+                        iter.key_.c_str(), iter.errCode_);
+                }
+                record.retryRet = iter.errCode_;
+            }
+        }
+    }
+}
+
+void FormDataProxyRecord::RetryFailurePublishSubscribes()
+{
+    std::weak_ptr<FormDataProxyRecord> weak(shared_from_this());
+    auto publishedTask = [weak](const DataShare::PublishedDataChangeNode &changeNode) {
+        auto formDataRecord = weak.lock();
+        if (formDataRecord == nullptr) {
+            HILOG_ERROR("formDataRecord is nullptr.");
+            return;
+        }
+        formDataRecord->OnPublishedDataChange(changeNode);
+    };
+    for (auto& result : publishSubscribeResultMap_) {
+        const std::string& uri = result.first;
+        for (auto& records : result.second) {
+            int64_t subscribeId = records.first;
+            auto& record = records.second;
+            // ok or already retry
+            if (record.ret == 0 || record.retry) {
+                continue;
+            }
+
+            record.retry = true;
+            std::vector<std::string> uris{uri};
+            auto ret = dataShareHelper_->SubscribePublishedData(uris, subscribeId, publishedTask);
+            for (const auto &iter : ret) {
+                if (iter.errCode_ != 0) {
+                    HILOG_ERROR("retry subscribe published data failed, uri: %{public}s, errCode: %{public}d",
+                        iter.key_.c_str(), iter.errCode_);
+                }
+                record.retryRet = iter.errCode_;
+            }
+        }
+    }
 }
 } // namespace AppExecFwk
 } // namespace OHOS

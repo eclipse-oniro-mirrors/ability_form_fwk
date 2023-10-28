@@ -39,6 +39,8 @@ public:
     bool ConsumeFormDataProxies(int64_t formId, std::vector<FormDataProxy> &formDataProxies);
     void EnableSubscribeFormData(const std::vector<int64_t> &formIds);
     void DisableSubscribeFormData(const std::vector<int64_t> &formIds);
+    // will run only once
+    void RetryFailureSubscribes();
 private:
     std::mutex formDataProxyRecordMutex_;
     std::map<int64_t, std::shared_ptr<FormDataProxyRecord>> formDataProxyRecordMap_; // formId:FormDataProxyRecord

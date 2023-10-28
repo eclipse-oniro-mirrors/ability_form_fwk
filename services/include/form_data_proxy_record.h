@@ -41,10 +41,18 @@ public:
     void UpdateSubscribeFormData(const std::vector<FormDataProxy> &formDataProxies);
     void EnableSubscribeFormData();
     void DisableSubscribeFormData();
+    void RetryFailureSubscribes();
 private:
     struct FormDataProxyRequest {
         int64_t subscribeId;
         std::vector<std::string> uris;
+    };
+    struct SubscribeResultRecord {
+        std::string uri;
+        int64_t subscribeId;
+        int ret;
+        bool retry;
+        int retryRet;
     };
     void ParseFormDataProxies(const std::vector<FormDataProxy> &formDataProxies);
     void ConvertSubscribeMapToRequests(std::map<std::string, std::string> &subscribeMap,
@@ -69,6 +77,11 @@ private:
 
     bool PrepareImageData(const DataShare::PublishedDataItem &data, nlohmann::json &jsonObj,
         std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> &imageDataMap);
+    void AddSubscribeResultRecord(SubscribeResultRecord record, bool isRdbType);
+    void RemoveSubscribeResultRecord(const std::string& uri, int64_t subscribeId, bool isRdbType);
+    void CheckAndPrintPrevSubscribeState(const std::string& uri, int64_t subscribeId, bool isRdbType);
+    void RetryFailureRdbSubscribes();
+    void RetryFailurePublishSubscribes();
 
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper_;
     int64_t formId_ = -1;
@@ -78,6 +91,8 @@ private:
     int32_t uid_;
     std::map<std::string, std::string> rdbSubscribeMap_; // key: subscribeId
     std::map<std::string, std::string> publishSubscribeMap_; // key: subscribeId
+    std::map<std::string, std::map<int64_t, SubscribeResultRecord>> rdbSubscribeResultMap_;
+    std::map<std::string, std::map<int64_t, SubscribeResultRecord>> publishSubscribeResultMap_;
 };
 } // namespace AppExecFwk
 } // namespace OHOS

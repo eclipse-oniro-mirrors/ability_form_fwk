@@ -513,6 +513,15 @@ public:
      */
     int32_t UnregisterPublishFormInterceptor(const sptr<IRemoteObject> &interceptorCallback) override;
 private:
+    /**
+     * OnAddSystemAbility, OnAddSystemAbility will be called when the listening SA starts.
+     *
+     * @param systemAbilityId, The said being listened to.
+     * @param deviceId, deviceId is empty.
+     * @return void.
+     */
+    virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
+
     enum class DumpKey {
         KEY_DUMP_HELP = 0,
         KEY_DUMP_STORAGE,
@@ -545,10 +554,15 @@ private:
     void HiDumpFormInfoByBundleName(const std::string &args, std::string &result);
     void HiDumpFormInfoByFormId(const std::string &args, std::string &result);
     bool CheckCallerIsSystemApp() const;
+    static std::string GetCurrentDateTime();
 private:
     static const int32_t ENABLE_FORM_UPDATE = 5;
     const static std::map<std::string, DumpKey> dumpKeyMap_;
     using DumpFuncType = void (FormMgrService::*)(const std::string &args, std::string &result);
+    std::string onStartBeginTime_;
+    std::string onStartPublishTime_;
+    std::string onStartEndTime_;
+    std::string onKvDataServiceAddTime_;
     std::map<DumpKey, DumpFuncType> dumpFuncMap_;
     ServiceRunningState state_ = ServiceRunningState::STATE_NOT_START;
     std::shared_ptr<FormEventHandler> handler_ = nullptr;
