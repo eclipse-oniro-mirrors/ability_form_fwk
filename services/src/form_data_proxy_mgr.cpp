@@ -18,6 +18,7 @@
 #include "fms_log_wrapper.h"
 #include "form_bms_helper.h"
 #include "form_data_mgr.h"
+#include "form_data_proxy_record.h"
 #include "form_util.h"
 #include "form_mgr_errors.h"
 
@@ -129,7 +130,7 @@ void FormDataProxyMgr::EnableSubscribeFormData(const std::vector<int64_t> &formI
         if (search != formDataProxyRecordMap_.end()) {
             if (search->second != nullptr) {
                 search->second->EnableSubscribeFormData();
-                HILOG_DEBUG("enable subscribe form data. formId: %{public}s", std::to_string(formId).c_str());
+                HILOG_INFO("enable subscribe form data. formId: %{public}s", std::to_string(formId).c_str());
             }
         }
     }
@@ -143,9 +144,17 @@ void FormDataProxyMgr::DisableSubscribeFormData(const std::vector<int64_t> &form
         if (search != formDataProxyRecordMap_.end()) {
             if (search->second != nullptr) {
                 search->second->DisableSubscribeFormData();
-                HILOG_DEBUG("disable subscribe form data. formId: %{public}s", std::to_string(formId).c_str());
+                HILOG_INFO("disable subscribe form data. formId: %{public}s", std::to_string(formId).c_str());
             }
         }
+    }
+}
+
+void FormDataProxyMgr::RetryFailureSubscribes()
+{
+    std::lock_guard<std::mutex> lock(formDataProxyRecordMutex_);
+    for (auto& record : formDataProxyRecordMap_) {
+        record.second->RetryFailureSubscribes();
     }
 }
 } // namespace AppExecFwk
