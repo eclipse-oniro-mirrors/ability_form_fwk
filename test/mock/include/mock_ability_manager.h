@@ -319,6 +319,12 @@ public:
     {
         return 0;
     }
+
+    int32_t ExecuteInsightIntentDone(const sptr<IRemoteObject> &token, uint64_t intentId,
+        const InsightIntentExecuteResult &result)
+    {
+        return 0;
+    }
 };
 
 class MockAbilityMgrStub : public IRemoteStub<AAFwk::IAbilityManager> {
@@ -796,6 +802,12 @@ public:
 
     int32_t ExecuteIntent(uint64_t key,  const sptr<IRemoteObject> &callerToken,
         const InsightIntentExecuteParam &param)
+    {
+        return 0;
+    }
+
+    int32_t ExecuteInsightIntentDone(const sptr<IRemoteObject> &token, uint64_t intentId,
+        const InsightIntentExecuteResult &result)
     {
         return 0;
     }
