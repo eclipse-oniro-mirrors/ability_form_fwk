@@ -500,19 +500,20 @@ ErrCode FormMgrAdapter::HandleDeleteFormCache(FormRecord &dbRecord, const int ui
     }
 
     ErrCode result = ERR_OK;
+    int32_t deleteFormError = ERR_OK;
     if (dbRecord.formUserUids.empty()) {
         result = FormProviderMgr::GetInstance().NotifyProviderFormDelete(formId, dbRecord);
         if (result != ERR_OK) {
             HILOG_ERROR("%{public}s, failed to notify provider form delete", __func__);
-            return result;
+            deleteFormError = deleteFormError != ERR_OK ? deleteFormError : result;
         }
         if (!FormDataMgr::GetInstance().DeleteFormRecord(formId)) {
             HILOG_ERROR("%{public}s, failed to remove cache data", __func__);
-            return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+            deleteFormError = deleteFormError != ERR_OK ? deleteFormError : ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
         }
         if (result = FormDbCache::GetInstance().DeleteFormInfo(formId); result != ERR_OK) {
             HILOG_ERROR("failed to remove db data");
-            return result;
+            deleteFormError = deleteFormError != ERR_OK ? deleteFormError : result;
         }
 
         int32_t matchCount = FormDbCache::GetInstance().GetMatchCount(dbRecord.bundleName, dbRecord.moduleName);
@@ -522,13 +523,14 @@ ErrCode FormMgrAdapter::HandleDeleteFormCache(FormRecord &dbRecord, const int ui
 
         if (!FormCacheMgr::GetInstance().DeleteData(formId)) {
             HILOG_ERROR("%{public}s, failed to remove cache data", __func__);
-            return ERR_APPEXECFWK_FORM_COMMON_CODE;
+            deleteFormError = deleteFormError != ERR_OK ? deleteFormError : ERR_APPEXECFWK_FORM_COMMON_CODE;
         }
         if (!FormTimerMgr::GetInstance().RemoveFormTimer(formId)) {
             HILOG_ERROR("%{public}s, remove timer error", __func__);
-            return ERR_APPEXECFWK_FORM_COMMON_CODE;
+            deleteFormError = deleteFormError != ERR_OK ? deleteFormError : ERR_APPEXECFWK_FORM_COMMON_CODE;
         }
-        return ERR_OK;
+
+        return deleteFormError;
     }
 
     if (result = FormDbCache::GetInstance().UpdateDBRecord(formId, dbRecord); result != ERR_OK) {
