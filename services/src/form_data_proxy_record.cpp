@@ -83,7 +83,7 @@ ErrCode FormDataProxyRecord::SubscribeFormData(const std::vector<FormDataProxy> 
     return ret;
 }
 
-ErrCode FormDataProxyRecord::SubscribeRdbFormData(std::map<std::string, std::string> &rdbSubscribeMap)
+ErrCode FormDataProxyRecord::SubscribeRdbFormData(const SubscribeMap &rdbSubscribeMap)
 {
     HILOG_INFO("SubscribeRdbFormData");
     if (dataShareHelper_ == nullptr) {
@@ -130,7 +130,7 @@ ErrCode FormDataProxyRecord::SubscribeRdbFormData(std::map<std::string, std::str
     return ERR_OK;
 }
 
-ErrCode FormDataProxyRecord::SubscribePublishFormData(std::map<std::string, std::string> &publishSubscribeMap)
+ErrCode FormDataProxyRecord::SubscribePublishFormData(const SubscribeMap &publishSubscribeMap)
 {
     HILOG_INFO("SubscribePublishFormData");
     if (dataShareHelper_ == nullptr) {
@@ -179,8 +179,7 @@ ErrCode FormDataProxyRecord::UnsubscribeFormData()
     return UnsubscribeFormData(rdbSubscribeMap_, publishSubscribeMap_);
 }
 
-ErrCode FormDataProxyRecord::UnsubscribeFormData(std::map<std::string, std::string> &rdbSubscribeMap,
-    std::map<std::string, std::string> &publishSubscribeMap)
+ErrCode FormDataProxyRecord::UnsubscribeFormData(SubscribeMap &rdbSubscribeMap, SubscribeMap &publishSubscribeMap)
 {
     if (dataShareHelper_ == nullptr) {
         HILOG_ERROR("dataShareHelper is nullptr.");
@@ -194,7 +193,7 @@ ErrCode FormDataProxyRecord::UnsubscribeFormData(std::map<std::string, std::stri
         templateId.subscriberId_ = search.subscribeId;
         templateId.bundleName_ = bundleName_;
         dataShareHelper_->UnsubscribeRdbData(search.uris, templateId);
-        for (const auto& uri : search.uris) {
+        for (const auto &uri : search.uris) {
             RemoveSubscribeResultRecord(uri, search.subscribeId, true);
         }
     }
@@ -204,7 +203,7 @@ ErrCode FormDataProxyRecord::UnsubscribeFormData(std::map<std::string, std::stri
     ConvertSubscribeMapToRequests(publishSubscribeMap, publishRequests);
     for (const auto &search : publishRequests) {
         dataShareHelper_->UnsubscribePublishedData(search.uris, search.subscribeId);
-        for (const auto& uri : search.uris) {
+        for (const auto &uri : search.uris) {
             RemoveSubscribeResultRecord(uri, search.subscribeId, false);
         }
     }
@@ -221,51 +220,72 @@ void FormDataProxyRecord::ParseFormDataProxies(const std::vector<FormDataProxy> 
         HILOG_INFO("ParseFormDataProxies proxyData[%{public}zu].uri: %{public}s", i, proxyData[i].uri.c_str());
     }
 
-    for (const auto& formDataProxy : formDataProxies) {
-        auto subscribe = formDataProxy.subscribeId.empty() ? std::to_string(formId_) : formDataProxy.subscribeId;
-        for (const auto& iter : proxyData) {
-            if (formDataProxy.key == iter.uri) {
-                rdbSubscribeMap_[formDataProxy.key] = subscribe;
-                HILOG_INFO("subscribe rdb data. key: %{public}s, subscribeId: %{public}s",
-                    formDataProxy.key.c_str(), subscribe.c_str());
-                break;
-            }
+    std::unordered_set<std::string> expectedKeys;
+    for (auto &data : proxyData) {
+        expectedKeys.emplace(data.uri);
+    }
+
+    HILOG_INFO("subscribe rdb data");
+    ParseFormDataProxiesIntoSubscribeMapWithExpectedKeys(formDataProxies, expectedKeys, true, rdbSubscribeMap_);
+    HILOG_INFO("subscribe publish data");
+    ParseFormDataProxiesIntoSubscribeMapWithExpectedKeys(formDataProxies, expectedKeys, false, publishSubscribeMap_);
+}
+
+void FormDataProxyRecord::ParseFormDataProxiesIntoSubscribeMapWithExpectedKeys(
+    const std::vector<FormDataProxy> &formDataProxies, const std::unordered_set<std::string> &expectedKeys,
+    bool keyCheckingNeeded, SubscribeMap &subscribeMap)
+{
+    subscribeMap.clear();
+    for (const auto &formDataProxy : formDataProxies) {
+        if (keyCheckingNeeded && expectedKeys.find(formDataProxy.key) == expectedKeys.end()) {
+            continue;
         }
-        publishSubscribeMap_[formDataProxy.key] = subscribe;
-        HILOG_INFO("subscribe publish data. key: %{public}s, subscribeId: %{public}s",
+        auto subscribe = formDataProxy.subscribeId.empty() ? std::to_string(formId_) : formDataProxy.subscribeId;
+        auto it = subscribeMap.find(formDataProxy.key);
+        if (it == subscribeMap.end()) {
+            std::unordered_set<std::string> subscribeIds;
+            subscribeIds.emplace(subscribe);
+            subscribeMap.emplace(formDataProxy.key, subscribeIds);
+        } else {
+            it->second.emplace(subscribe);
+        }
+        HILOG_INFO("parse subscribe record: key: %{public}s, subscribeId: %{public}s",
             formDataProxy.key.c_str(), subscribe.c_str());
     }
 }
 
-void FormDataProxyRecord::ConvertSubscribeMapToRequests(std::map<std::string, std::string> &subscribeMap,
-    std::vector<FormDataProxyRequest> &formDataProxyRequests)
+void FormDataProxyRecord::ConvertSubscribeMapToRequests(
+    const SubscribeMap &subscribeMap, std::vector<FormDataProxyRequest> &formDataProxyRequests)
 {
+    formDataProxyRequests.clear();
     std::string userId = std::to_string(FormUtil::GetCurrentAccountId());
-    for (const auto &subscribe : subscribeMap) {
-        int64_t subscriberId = formId_;
-        if (!FormUtil::ConvertStringToInt64(subscribe.second, subscriberId)) {
-            HILOG_WARN("Convert string subscriberId[%{public}s] to int64 failed, change to default value "
-                "formId[%{public}s].", subscribe.second.c_str(), std::to_string(formId_).c_str());
-        }
-        bool isNewSubscriberId = true;
-        std::string uri;
-        for (auto &search : formDataProxyRequests) {
-            if (search.subscribeId == subscriberId) {
-                uri = subscribe.first + "?" + "user=" + userId + "&srcToken=" + std::to_string(tokenId_) +
-                    "&dstBundleName=" + bundleName_;
-                search.uris.push_back(uri);
-                isNewSubscriberId = false;
-                break;
+    std::string token = std::to_string(tokenId_);
+    std::unordered_map<int64_t, std::vector<std::string>> subscribeId2UrisMap;
+
+    for (const auto &record : subscribeMap) {
+        const auto &key = record.first;
+        for (const auto &subscribe : record.second) {
+            int64_t subscriberId = formId_;
+            if (!FormUtil::ConvertStringToInt64(subscribe, subscriberId)) {
+                HILOG_WARN("Convert string subscribe[%{public}s] to int64 failed, change to default value "
+                    "formId[%{public}s].", subscribe.c_str(), std::to_string(formId_).c_str());
+            }
+
+            std::string uri = key + "?" + "user=" + userId + "&srcToken=" + token + "&dstBundleName=" + bundleName_;
+            auto it = subscribeId2UrisMap.find(subscriberId);
+            if (it == subscribeId2UrisMap.end()) {
+                std::vector<std::string> uris;
+                uris.push_back(uri);
+                subscribeId2UrisMap.emplace(subscriberId, uris);
+            } else {
+                it->second.push_back(uri);
             }
         }
-        if (isNewSubscriberId == true) {
-            FormDataProxyRequest formDataProxyRequest;
-            formDataProxyRequest.subscribeId = subscriberId;
-            uri = subscribe.first + "?" + "user=" + userId + "&srcToken=" + std::to_string(tokenId_) +
-                "&dstBundleName=" + bundleName_;
-            formDataProxyRequest.uris.emplace_back(uri);
-            formDataProxyRequests.push_back(formDataProxyRequest);
-        }
+    }
+
+    for (auto &record : subscribeId2UrisMap) {
+        FormDataProxyRequest request{record.first, std::move(record.second)};
+        formDataProxyRequests.push_back(request);
     }
 }
 
@@ -331,10 +351,10 @@ void FormDataProxyRecord::UpdateRdbDataForm(const std::vector<std::string> &data
 void FormDataProxyRecord::UpdateSubscribeFormData(const std::vector<FormDataProxy> &formDataProxies)
 {
     HILOG_INFO("UpdateSubscribeFormData");
-    std::map<std::string, std::string> originRdbMap;
-    std::map<std::string, std::string> newRdbMap;
-    std::map<std::string, std::string> originPublishMap;
-    std::map<std::string, std::string> newPublishMap;
+    SubscribeMap originRdbMap;
+    SubscribeMap newRdbMap;
+    SubscribeMap originPublishMap;
+    SubscribeMap newPublishMap;
     UpdateSubscribeMap(formDataProxies, originRdbMap, newRdbMap, originPublishMap, newPublishMap);
     UnsubscribeFormData(originRdbMap, originPublishMap);
     SubscribeRdbFormData(newRdbMap);
@@ -342,26 +362,25 @@ void FormDataProxyRecord::UpdateSubscribeFormData(const std::vector<FormDataProx
 }
 
 void FormDataProxyRecord::UpdateSubscribeMap(const std::vector<FormDataProxy> &formDataProxies,
-    std::map<std::string, std::string> &originRdbMap,
-    std::map<std::string, std::string> &newRdbMap,
-    std::map<std::string, std::string> &originPublishMap,
-    std::map<std::string, std::string> &newPublishMap)
+    SubscribeMap &originRdbMap, SubscribeMap &newRdbMap, SubscribeMap &originPublishMap, SubscribeMap &newPublishMap)
 {
-    for (const auto &formDataProxy : formDataProxies) {
-        std::string key = formDataProxy.key;
-        std::string subscribe = formDataProxy.subscribeId.empty() ? std::to_string(formId_) : formDataProxy.subscribeId;
-        auto iter = rdbSubscribeMap_.find(key);
-        if (iter != rdbSubscribeMap_.end() && iter->second != subscribe) {
-            originRdbMap[key] = iter->second;
-            newRdbMap[key] = subscribe;
-            rdbSubscribeMap_[key] = subscribe;
-            continue;
+    SubscribeMap updateMap;
+    std::unordered_set<std::string> expectedKeys;
+    ParseFormDataProxiesIntoSubscribeMapWithExpectedKeys(formDataProxies, expectedKeys, false, updateMap);
+    for (const auto &record : updateMap) {
+        const auto &key = record.first;
+        const auto &newSubscribeIds = record.second;
+        auto it = rdbSubscribeMap_.find(key);
+        if (it != rdbSubscribeMap_.end()) {
+            originRdbMap[key] = it->second;
+            newRdbMap[key] = newSubscribeIds;
+            rdbSubscribeMap_[key] = newSubscribeIds;
         }
-        iter = publishSubscribeMap_.find(key);
-        if (iter != publishSubscribeMap_.end() && iter->second != subscribe) {
-            originPublishMap[key] = iter->second;
-            newPublishMap[key] = subscribe;
-            publishSubscribeMap_[key] = subscribe;
+        it = publishSubscribeMap_.find(key);
+        if (it != publishSubscribeMap_.end()) {
+            originPublishMap[key] = it->second;
+            newPublishMap[key] = newSubscribeIds;
+            publishSubscribeMap_[key] = newSubscribeIds;
         }
     }
 }
@@ -403,7 +422,7 @@ void FormDataProxyRecord::RetryFailureSubscribes()
     }
 }
 
-ErrCode FormDataProxyRecord::SetRdbSubsState(std::map<std::string, std::string> &rdbSubscribeMap, bool subsState)
+ErrCode FormDataProxyRecord::SetRdbSubsState(const SubscribeMap &rdbSubscribeMap, bool subsState)
 {
     if (dataShareHelper_ == nullptr) {
         HILOG_ERROR("dataShareHelper is nullptr.");
@@ -442,7 +461,7 @@ ErrCode FormDataProxyRecord::SetRdbSubsState(std::map<std::string, std::string> 
     return ERR_OK;
 }
 
-ErrCode FormDataProxyRecord::SetPublishSubsState(std::map<std::string, std::string> &publishSubscribeMap,
+ErrCode FormDataProxyRecord::SetPublishSubsState(const SubscribeMap &publishSubscribeMap,
     bool subsState)
 {
     if (dataShareHelper_ == nullptr) {
@@ -526,7 +545,7 @@ void FormDataProxyRecord::AddSubscribeResultRecord(SubscribeResultRecord record,
     }
 }
 
-void FormDataProxyRecord::RemoveSubscribeResultRecord(const std::string& uri, int64_t subscribeId, bool isRdbType)
+void FormDataProxyRecord::RemoveSubscribeResultRecord(const std::string &uri, int64_t subscribeId, bool isRdbType)
 {
     std::map<std::string, std::map<int64_t, SubscribeResultRecord>>* resultMap =
         isRdbType ? &rdbSubscribeResultMap_ : &publishSubscribeResultMap_;
@@ -543,7 +562,7 @@ void FormDataProxyRecord::RemoveSubscribeResultRecord(const std::string& uri, in
     }
 }
 
-void FormDataProxyRecord::PrintSubscribeState(const std::string& uri, int64_t subscribeId, bool isRdbType)
+void FormDataProxyRecord::PrintSubscribeState(const std::string &uri, int64_t subscribeId, bool isRdbType)
 {
     std::string type = isRdbType ? "rdb" : "published";
     std::map<std::string, std::map<int64_t, SubscribeResultRecord>>* resultMap =
@@ -569,7 +588,7 @@ void FormDataProxyRecord::PrintSubscribeState(const std::string& uri, int64_t su
     }
 }
 
-void FormDataProxyRecord::RetryFailureRdbSubscribes(SubscribeResultRecord& record)
+void FormDataProxyRecord::RetryFailureRdbSubscribes(SubscribeResultRecord &record)
 {
     // ok or already retry
     if (record.ret == 0 || record.retry) {
@@ -604,7 +623,7 @@ void FormDataProxyRecord::RetryFailureRdbSubscribes(SubscribeResultRecord& recor
     }
 }
 
-void FormDataProxyRecord::RetryFailurePublishedSubscribes(SubscribeResultRecord& record)
+void FormDataProxyRecord::RetryFailurePublishedSubscribes(SubscribeResultRecord &record)
 {
     // ok or already retry
     if (record.ret == 0 || record.retry) {

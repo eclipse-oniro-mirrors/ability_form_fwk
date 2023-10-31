@@ -16,6 +16,9 @@
 #ifndef OHOS_FORM_FWK_FORM_DATA_PROXY_RECORD_H
 #define OHOS_FORM_FWK_FORM_DATA_PROXY_RECORD_H
 
+#include <string>
+#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "datashare_helper.h"
@@ -54,34 +57,38 @@ private:
         bool retry;
         int retryRet;
     };
+
+    // map from key to vector of subscriberId
+    using SubscribeMap = std::unordered_map<std::string, std::unordered_set<std::string>>;
+
     void ParseFormDataProxies(const std::vector<FormDataProxy> &formDataProxies);
-    void ConvertSubscribeMapToRequests(std::map<std::string, std::string> &subscribeMap,
+    void ParseFormDataProxiesIntoSubscribeMapWithExpectedKeys(
+        const std::vector<FormDataProxy> &formDataProxies, const std::unordered_set<std::string> &expectedKeys,
+        bool keyCheckingNeeded, SubscribeMap &subscribeMap);
+    void ConvertSubscribeMapToRequests(const SubscribeMap &subscribeMap,
         std::vector<FormDataProxyRequest> &formDataProxyRequests);
     void UpdatePublishedDataForm(const std::vector<DataShare::PublishedDataItem> &data);
     void UpdateRdbDataForm(const std::vector<std::string> &data);
-    ErrCode SubscribeRdbFormData(std::map<std::string, std::string> &rdbSubscribeMap);
-    ErrCode SubscribePublishFormData(std::map<std::string, std::string> &publishSubscribeMap);
-    ErrCode UnsubscribeFormData(std::map<std::string, std::string> &rdbSubscribeMap,
-        std::map<std::string, std::string> &publishSubscribeMap);
+    ErrCode SubscribeRdbFormData(const SubscribeMap &rdbSubscribeMap);
+    ErrCode SubscribePublishFormData(const SubscribeMap &publishSubscribeMap);
+    ErrCode UnsubscribeFormData(SubscribeMap &rdbSubscribeMap, SubscribeMap &publishSubscribeMap);
     void OnRdbDataChange(const DataShare::RdbChangeNode &changeNode);
     void OnPublishedDataChange(const DataShare::PublishedDataChangeNode &changeNode);
 
     void UpdateSubscribeMap(const std::vector<FormDataProxy> &formDataProxies,
-        std::map<std::string, std::string> &originRdbMap,
-        std::map<std::string, std::string> &newRdbMap,
-        std::map<std::string, std::string> &originPublishMap,
-        std::map<std::string, std::string> &newPublishMap);
+        SubscribeMap &originRdbMap, SubscribeMap &newRdbMap,
+        SubscribeMap &originPublishMap, SubscribeMap &newPublishMap);
 
-    ErrCode SetRdbSubsState(std::map<std::string, std::string> &rdbSubscribeMap, bool subsState);
-    ErrCode SetPublishSubsState(std::map<std::string, std::string> &publishSubscribeMap, bool subsState);
+    ErrCode SetRdbSubsState(const SubscribeMap &rdbSubscribeMap, bool subsState);
+    ErrCode SetPublishSubsState(const SubscribeMap &publishSubscribeMap, bool subsState);
 
     bool PrepareImageData(const DataShare::PublishedDataItem &data, nlohmann::json &jsonObj,
         std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> &imageDataMap);
     void AddSubscribeResultRecord(SubscribeResultRecord record, bool isRdbType);
-    void RemoveSubscribeResultRecord(const std::string& uri, int64_t subscribeId, bool isRdbType);
-    void PrintSubscribeState(const std::string& uri, int64_t subscribeId, bool isRdbType);
-    void RetryFailureRdbSubscribes(SubscribeResultRecord& record);
-    void RetryFailurePublishedSubscribes(SubscribeResultRecord& record);
+    void RemoveSubscribeResultRecord(const std::string &uri, int64_t subscribeId, bool isRdbType);
+    void PrintSubscribeState(const std::string &uri, int64_t subscribeId, bool isRdbType);
+    void RetryFailureRdbSubscribes(SubscribeResultRecord &record);
+    void RetryFailurePublishedSubscribes(SubscribeResultRecord &record);
 
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper_;
     int64_t formId_ = -1;
@@ -89,8 +96,8 @@ private:
     FormType uiSyntax_;
     int32_t tokenId_;
     int32_t uid_;
-    std::map<std::string, std::string> rdbSubscribeMap_; // key: subscribeId
-    std::map<std::string, std::string> publishSubscribeMap_; // key: subscribeId
+    SubscribeMap rdbSubscribeMap_;
+    SubscribeMap publishSubscribeMap_;
     std::map<std::string, std::map<int64_t, SubscribeResultRecord>> rdbSubscribeResultMap_;
     std::map<std::string, std::map<int64_t, SubscribeResultRecord>> publishSubscribeResultMap_;
 };
