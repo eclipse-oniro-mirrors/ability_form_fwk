@@ -119,7 +119,7 @@ ErrCode FormDataProxyRecord::SubscribeRdbFormData(std::map<std::string, std::str
             AddSubscribeResultRecord(record, true);
             if (iter.errCode_ != 0) {
                 HILOG_ERROR("subscribe rdb data failed. uri: %{public}s, errCode: %{public}d",
-                    iter.key_.c_str(), iter.errCode_);        
+                    iter.key_.c_str(), iter.errCode_);
                 failNum++;
             }
         }
@@ -163,7 +163,7 @@ ErrCode FormDataProxyRecord::SubscribePublishFormData(std::map<std::string, std:
             AddSubscribeResultRecord(record, false);
             if (iter.errCode_ != 0) {
                 HILOG_ERROR("subscribe published data failed. uri: %{public}s, errCode: %{public}d",
-                    iter.key_.c_str(), iter.errCode_);        
+                    iter.key_.c_str(), iter.errCode_);
                 failNum++;
             }
         }
@@ -293,7 +293,7 @@ void FormDataProxyRecord::UpdatePublishedDataForm(const std::vector<DataShare::P
     std::string formDataStr = object.empty() ? "" : object.dump();
     std::string subStr = formDataStr.substr(0, std::min((int)formDataStr.length(), 30));
     HILOG_INFO("form[formId: %{public}s] will update published data. formDataStr[len: %{public}zu]: %{private}s, "
-        "imageDataMap size: %{publish}zu.", std::to_string(formId_).c_str(), formDataStr.length(),
+        "imageDataMap size: %{public}zu.", std::to_string(formId_).c_str(), formDataStr.length(),
         subStr.c_str(), imageDataMap.size());
 
     FormProviderData formProviderData;
@@ -388,8 +388,19 @@ void FormDataProxyRecord::RetryFailureSubscribes()
         return;
     }
 
-    RetryFailureRdbSubscribes();
-    RetryFailurePublishSubscribes();
+    for (auto& result : rdbSubscribeResultMap_) {
+        for (auto& records : result.second) {
+            auto& record = records.second;
+            RetryFailureRdbSubscribes(record);
+        }
+    }
+
+    for (auto& result : publishSubscribeResultMap_) {
+        for (auto& records : result.second) {
+            auto& record = records.second;
+            RetryFailurePublishedSubscribes(record);
+        }
+    }
 }
 
 ErrCode FormDataProxyRecord::SetRdbSubsState(std::map<std::string, std::string> &rdbSubscribeMap, bool subsState)
@@ -420,7 +431,7 @@ ErrCode FormDataProxyRecord::SetRdbSubsState(std::map<std::string, std::string> 
         uint32_t failNum = 0;
         for (const auto &iter : ret) {
             if (iter.errCode_ != 0) {
-                CheckAndPrintPrevSubscribeState(iter.key_, search.subscribeId, true);
+                PrintSubscribeState(iter.key_, search.subscribeId, true);
                 failNum++;
             }
         }
@@ -457,7 +468,7 @@ ErrCode FormDataProxyRecord::SetPublishSubsState(std::map<std::string, std::stri
         uint32_t failNum = 0;
         for (const auto &iter : ret) {
             if (iter.errCode_ != 0) {
-                CheckAndPrintPrevSubscribeState(iter.key_, search.subscribeId, false);
+                PrintSubscribeState(iter.key_, search.subscribeId, false);
                 failNum++;
             }
         }
@@ -503,7 +514,7 @@ bool FormDataProxyRecord::PrepareImageData(const DataShare::PublishedDataItem &d
 
 void FormDataProxyRecord::AddSubscribeResultRecord(SubscribeResultRecord record, bool isRdbType)
 {
-    std::map<std::string, std::map<int64_t, SubscribeResultRecord>>* resultMap = 
+    std::map<std::string, std::map<int64_t, SubscribeResultRecord>>* resultMap =
         isRdbType ? &rdbSubscribeResultMap_ : &publishSubscribeResultMap_;
     auto mapIter = resultMap->find(record.uri);
     if (mapIter == resultMap->end()) {
@@ -517,20 +528,25 @@ void FormDataProxyRecord::AddSubscribeResultRecord(SubscribeResultRecord record,
 
 void FormDataProxyRecord::RemoveSubscribeResultRecord(const std::string& uri, int64_t subscribeId, bool isRdbType)
 {
-    std::map<std::string, std::map<int64_t, SubscribeResultRecord>>* resultMap = 
+    std::map<std::string, std::map<int64_t, SubscribeResultRecord>>* resultMap =
         isRdbType ? &rdbSubscribeResultMap_ : &publishSubscribeResultMap_;
     auto mapIter = resultMap->find(uri);
     if (mapIter == resultMap->end()) {
         return;
     }
     auto it = mapIter->second.find(subscribeId);
-    mapIter->second.erase(it);
+    if (it != mapIter->second.end()) {
+        mapIter->second.erase(it);
+    }
+    if (mapIter->second.empty()) {
+        resultMap->erase(mapIter);
+    }
 }
 
-void FormDataProxyRecord::CheckAndPrintPrevSubscribeState(const std::string& uri, int64_t subscribeId, bool isRdbType)
+void FormDataProxyRecord::PrintSubscribeState(const std::string& uri, int64_t subscribeId, bool isRdbType)
 {
-    std::string type = isRdbType ? "rdb" : "publish";
-    std::map<std::string, std::map<int64_t, SubscribeResultRecord>>* resultMap = 
+    std::string type = isRdbType ? "rdb" : "published";
+    std::map<std::string, std::map<int64_t, SubscribeResultRecord>>* resultMap =
         isRdbType ? &rdbSubscribeResultMap_ : &publishSubscribeResultMap_;
     bool alreadySubscribed = true;
     auto mapIter = resultMap->find(uri);
@@ -541,20 +557,25 @@ void FormDataProxyRecord::CheckAndPrintPrevSubscribeState(const std::string& uri
         if (it == mapIter->second.end()) {
             alreadySubscribed = false;
         } else {
-            HILOG_ERROR("failed to set %{public}s state, [uri: %{public}s, subscriberId: %{public}s, ret: %{public}d, "
-                "retry: %{public}s, retryRet: %{public}d", type.c_str(), uri.c_str(),
+            HILOG_ERROR("subscribe state, type: %{public}s, uri: %{public}s, subscriberId: %{public}s, "
+                "ret: %{public}d, retry: %{public}s, retryRet: %{public}d", type.c_str(), uri.c_str(),
                 std::to_string(subscribeId).c_str(), it->second.ret, (it->second.retry ? "yes" : "no"),
                 it->second.retryRet);
         }
     }
     if (!alreadySubscribed) {
-        HILOG_ERROR("failed to set %{public}s state, which [uri: %{public}s, subscriberId: %{public}s] can't been "
-            "found! ", type.c_str(), uri.c_str(), std::to_string(subscribeId).c_str());
+        HILOG_ERROR("failed to find subscribe record, type: %{public}s uri: %{public}s, subscriberId: %{public}s",
+            type.c_str(), uri.c_str(), std::to_string(subscribeId).c_str());
     }
 }
 
-void FormDataProxyRecord::RetryFailureRdbSubscribes()
+void FormDataProxyRecord::RetryFailureRdbSubscribes(SubscribeResultRecord& record)
 {
+    // ok or already retry
+    if (record.ret == 0 || record.retry) {
+        return;
+    }
+
     std::weak_ptr<FormDataProxyRecord> weak(shared_from_this());
     auto rdbTask = [weak](const DataShare::RdbChangeNode &changeNode) {
         auto formDataRecord = weak.lock();
@@ -564,35 +585,32 @@ void FormDataProxyRecord::RetryFailureRdbSubscribes()
         }
         formDataRecord->OnRdbDataChange(changeNode);
     };
-    for (auto& result : rdbSubscribeResultMap_) {
-        const std::string& uri = result.first;
-        for (auto& records : result.second) {
-            int64_t subscribeId = records.first;
-            auto& record = records.second;
-            // ok or already retry
-            if (record.ret == 0 || record.retry) {
-                continue;
-            }
 
-            record.retry = true;
-            std::vector<std::string> uris{uri};
-            DataShare::TemplateId templateId;
-            templateId.subscriberId_ = subscribeId;
-            templateId.bundleName_ = bundleName_;
-            auto ret = dataShareHelper_->SubscribeRdbData(uris, templateId, rdbTask);
-            for (const auto &iter : ret) {
-                if (iter.errCode_ != 0) {
-                    HILOG_ERROR("retry subscribe rdb data failed, uri: %{public}s, errCode: %{public}d",
-                        iter.key_.c_str(), iter.errCode_);
-                }
-                record.retryRet = iter.errCode_;
-            }
+    record.retry = true;
+    std::vector<std::string> uris{record.uri};
+    DataShare::TemplateId templateId;
+    templateId.subscriberId_ = record.subscribeId;
+    templateId.bundleName_ = bundleName_;
+    auto ret = dataShareHelper_->SubscribeRdbData(uris, templateId, rdbTask);
+    for (const auto &iter : ret) {
+        if (iter.errCode_ != 0) {
+            HILOG_ERROR("retry subscribe rdb data failed, uri: %{public}s, subscriberId: %{public}s, "
+                "errCode: %{public}d", iter.key_.c_str(), std::to_string(record.subscribeId).c_str(), iter.errCode_);
+        } else {
+            HILOG_INFO("retry subscribe rdb data success, uri: %{public}s, subscriberId: %{public}s",
+                iter.key_.c_str(), std::to_string(record.subscribeId).c_str());
         }
+        record.retryRet = iter.errCode_;
     }
 }
 
-void FormDataProxyRecord::RetryFailurePublishSubscribes()
+void FormDataProxyRecord::RetryFailurePublishedSubscribes(SubscribeResultRecord& record)
 {
+    // ok or already retry
+    if (record.ret == 0 || record.retry) {
+        return;
+    }
+
     std::weak_ptr<FormDataProxyRecord> weak(shared_from_this());
     auto publishedTask = [weak](const DataShare::PublishedDataChangeNode &changeNode) {
         auto formDataRecord = weak.lock();
@@ -602,27 +620,19 @@ void FormDataProxyRecord::RetryFailurePublishSubscribes()
         }
         formDataRecord->OnPublishedDataChange(changeNode);
     };
-    for (auto& result : publishSubscribeResultMap_) {
-        const std::string& uri = result.first;
-        for (auto& records : result.second) {
-            int64_t subscribeId = records.first;
-            auto& record = records.second;
-            // ok or already retry
-            if (record.ret == 0 || record.retry) {
-                continue;
-            }
 
-            record.retry = true;
-            std::vector<std::string> uris{uri};
-            auto ret = dataShareHelper_->SubscribePublishedData(uris, subscribeId, publishedTask);
-            for (const auto &iter : ret) {
-                if (iter.errCode_ != 0) {
-                    HILOG_ERROR("retry subscribe published data failed, uri: %{public}s, errCode: %{public}d",
-                        iter.key_.c_str(), iter.errCode_);
-                }
-                record.retryRet = iter.errCode_;
-            }
+    record.retry = true;
+    std::vector<std::string> uris{record.uri};
+    auto ret = dataShareHelper_->SubscribePublishedData(uris, record.subscribeId, publishedTask);
+    for (const auto &iter : ret) {
+        if (iter.errCode_ != 0) {
+            HILOG_ERROR("retry subscribe published data failed, uri: %{public}s, subscriberId: %{public}s, "
+                "errCode: %{public}d", iter.key_.c_str(), std::to_string(record.subscribeId).c_str(), iter.errCode_);
+        } else {
+            HILOG_INFO("retry subscribe published data success, uri: %{public}s, subscriberId: %{public}s",
+                iter.key_.c_str(), std::to_string(record.subscribeId).c_str());
         }
+        record.retryRet = iter.errCode_;
     }
 }
 } // namespace AppExecFwk

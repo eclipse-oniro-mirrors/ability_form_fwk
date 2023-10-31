@@ -79,9 +79,9 @@ private:
         std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> &imageDataMap);
     void AddSubscribeResultRecord(SubscribeResultRecord record, bool isRdbType);
     void RemoveSubscribeResultRecord(const std::string& uri, int64_t subscribeId, bool isRdbType);
-    void CheckAndPrintPrevSubscribeState(const std::string& uri, int64_t subscribeId, bool isRdbType);
-    void RetryFailureRdbSubscribes();
-    void RetryFailurePublishSubscribes();
+    void PrintSubscribeState(const std::string& uri, int64_t subscribeId, bool isRdbType);
+    void RetryFailureRdbSubscribes(SubscribeResultRecord& record);
+    void RetryFailurePublishedSubscribes(SubscribeResultRecord& record);
 
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper_;
     int64_t formId_ = -1;
