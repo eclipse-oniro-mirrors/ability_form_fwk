@@ -60,6 +60,8 @@ namespace AppExecFwk {
 namespace {
 const int32_t MAIN_USER_ID = 100;
 constexpr int32_t GET_CALLING_UID_TRANSFORM_DIVISOR = 200000;
+constexpr int MILLISECOND_WIDTH = 3;
+constexpr char MILLISECOND_FILLCHAR = '0';
 }
 using namespace std::chrono;
 
@@ -152,7 +154,7 @@ bool FormMgrService::CheckFMSReady()
 int FormMgrService::AddForm(const int64_t formId, const Want &want,
     const sptr<IRemoteObject> &callerToken, FormJsInfo &formInfo)
 {
-    HILOG_INFO("FMS AddForm called, startTime: begin: %{public}s, publish: %{publish}s, end: %{pubic}s, "
+    HILOG_INFO("FMS AddForm called, startTime: begin: %{public}s, publish: %{public}s, end: %{public}s, "
         "onKvDataServiceAddTime: %{public}s", onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
 
@@ -178,7 +180,7 @@ int FormMgrService::AddForm(const int64_t formId, const Want &want,
  */
 int FormMgrService::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("FMS DeleteForm called, startTime: begin: %{public}s, publish: %{publish}s, end: %{pubic}s, "
+    HILOG_INFO("FMS DeleteForm called, startTime: begin: %{public}s, publish: %{public}s, end: %{public}s, "
         "onKvDataServiceAddTime: %{public}s", onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
 
@@ -216,8 +218,6 @@ int FormMgrService::StopRenderingForm(const int64_t formId, const std::string &c
     return FormMgrAdapter::GetInstance().StopRenderingForm(formId, compId);
 }
 
-
-
 /**
  * @brief Release forms with formIds, send formIds to form manager service.
  * @param formId The Id of the forms to release.
@@ -227,7 +227,7 @@ int FormMgrService::StopRenderingForm(const int64_t formId, const std::string &c
  */
 int FormMgrService::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> &callerToken, const bool delCache)
 {
-    HILOG_INFO("FMS ReleaseForm called, startTime: begin: %{public}s, publish: %{publish}s, end: %{pubic}s, "
+    HILOG_INFO("FMS ReleaseForm called, startTime: begin: %{public}s, publish: %{public}s, end: %{public}s, "
         "onKvDataServiceAddTime: %{public}s", onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
 
@@ -265,7 +265,7 @@ int FormMgrService::UpdateForm(const int64_t formId, const FormProviderData &for
  */
 int FormMgrService::RequestForm(const int64_t formId, const sptr<IRemoteObject> &callerToken, const Want &want)
 {
-    HILOG_INFO("FMS RequestForm called, startTime: begin: %{public}s, publish: %{publish}s, end: %{pubic}s, "
+    HILOG_INFO("FMS RequestForm called, startTime: begin: %{public}s, publish: %{public}s, end: %{public}s, "
         "onKvDataServiceAddTime: %{public}s", onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
 
@@ -315,7 +315,7 @@ int FormMgrService::ReleaseRenderer(int64_t formId, const std::string &compId)
 ErrCode FormMgrService::RequestPublishForm(Want &want, bool withFormBindingData,
     std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId)
 {
-    HILOG_INFO("FMS RequestPublishForm called, startTime: begin: %{public}s, publish: %{publish}s, end: %{pubic}s, "
+    HILOG_INFO("FMS RequestPublishForm called, startTime: begin: %{public}s, publish: %{public}s, end: %{public}s, "
         "onKvDataServiceAddTime: %{public}s", onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
     bool isFormAgent = want.GetBoolParam(Constants::IS_FORM_AGENT, false);
@@ -465,7 +465,7 @@ int FormMgrService::DumpFormTimerByFormId(const std::int64_t formId, std::string
  */
 int FormMgrService::MessageEvent(const int64_t formId, const Want &want, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("FMS MessageEvent called, startTime: begin: %{public}s, publish: %{publish}s, end: %{pubic}s, "
+    HILOG_INFO("FMS MessageEvent called, startTime: begin: %{public}s, publish: %{public}s, end: %{public}s, "
         "onKvDataServiceAddTime: %{public}s", onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
     ErrCode ret = CheckFormPermission();
@@ -495,7 +495,7 @@ int FormMgrService::MessageEvent(const int64_t formId, const Want &want, const s
  */
 int FormMgrService::RouterEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("FMS RouterEvent called, startTime: begin: %{public}s, publish: %{publish}s, end: %{pubic}s, "
+    HILOG_INFO("FMS RouterEvent called, startTime: begin: %{public}s, publish: %{public}s, end: %{public}s, "
         "onKvDataServiceAddTime: %{public}s", onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
     ErrCode ret = CheckFormPermission();
@@ -526,7 +526,7 @@ int FormMgrService::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
  */
 int FormMgrService::BackgroundEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("FMS BackgroundEvent called, startTime: begin: %{public}s, publish: %{publish}s, end: %{pubic}s, "
+    HILOG_INFO("FMS BackgroundEvent called, startTime: begin: %{public}s, publish: %{public}s, end: %{public}s, "
         "onKvDataServiceAddTime: %{public}s", onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
     ErrCode ret = CheckFormPermission();
@@ -796,7 +796,7 @@ int FormMgrService::AcquireFormState(const Want &want,
 int FormMgrService::NotifyFormsVisible(const std::vector<int64_t> &formIds,
     bool isVisible, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("FMS NotifyFormsVisible called, startTime: begin: %{public}s, publish: %{publish}s, end: %{pubic}s, "
+    HILOG_INFO("FMS NotifyFormsVisible called, startTime: begin: %{public}s, publish: %{public}s, end: %{public}s, "
         "onKvDataServiceAddTime: %{public}s", onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
     ErrCode ret = CheckFormPermission();
@@ -954,7 +954,7 @@ bool FormMgrService::IsRequestPublishFormSupported()
 
 int32_t FormMgrService::StartAbility(const Want &want, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("FMS StartAbility called, startTime: begin: %{public}s, publish: %{publish}s, end: %{pubic}s, "
+    HILOG_INFO("FMS StartAbility called, startTime: begin: %{public}s, publish: %{public}s, end: %{public}s, "
         "onKvDataServiceAddTime: %{public}s", onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
     sptr<IBundleMgr> bundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
@@ -1229,14 +1229,15 @@ bool FormMgrService::CheckCallerIsSystemApp() const
 std::string FormMgrService::GetCurrentDateTime()
 {
     auto cTimeNow = std::chrono::system_clock::now();
-    auto microPart = std::chrono::duration_cast<std::chrono::microseconds>(
+    auto microPart = std::chrono::duration_cast<std::chrono::milliseconds>(
         cTimeNow.time_since_epoch()).count() % 1000;
     std::time_t t1 = std::chrono::system_clock::to_time_t(cTimeNow);
     char buf[32];
     std::tm t2;
+    localtime_r(&t1, &t2);
     strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S.", &t2);
     std::stringstream ss;
-    ss << buf << std::setw(3) << std::setfill('0') << microPart;
+    ss << buf << std::setw(MILLISECOND_WIDTH) << std::setfill(MILLISECOND_FILLCHAR) << microPart;
     return ss.str();
 }
 
