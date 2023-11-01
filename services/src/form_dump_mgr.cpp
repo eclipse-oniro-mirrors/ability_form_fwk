@@ -61,6 +61,7 @@ void FormDumpMgr::DumpTemporaryFormInfos(const std::vector<FormRecord> &formReco
         formInfos += "    bundleName [" + info.bundleName + "]\n";
         formInfos += "    moduleName [" + info.moduleName + "]\n";
         formInfos += "    abilityName [" + info.abilityName + "]\n";
+        formInfos += "    type [" + std::string(info.uiSyntax == FormType::JS ? "JS" : "ArkTS") + "]\n";
         formInfos += "    isDynamic [" + std::to_string(info.isDynamic) + "]\n";
         formInfos += "    transparencyEnabled [" + std::to_string(info.transparencyEnabled) + "]\n";
         formInfos += "    formUserUids [";
@@ -79,6 +80,7 @@ void FormDumpMgr::DumpStaticBundleFormInfos(const std::vector<FormInfo> &bundleF
         formInfos += "    moduleName [" + info.moduleName + "]\n";
         formInfos += "    abilityName [" + info.abilityName + "]\n";
         formInfos += "    formName [" + info.name + "]\n";
+        formInfos += "    type [" + std::string(info.uiSyntax == FormType::JS ? "JS" : "ArkTS") + "]\n";
         formInfos += "    isDynamic [" + std::to_string(info.isDynamic) + "]\n";
         formInfos += "    transparencyEnabled [" + std::to_string(info.transparencyEnabled) + "]\n" + LINE_SEPARATOR;
     }
@@ -109,7 +111,7 @@ void FormDumpMgr::DumpFormInfos(const std::vector<FormRecord> &formRecordInfos, 
         formInfos += "    formVisibleNotify [" + std::to_string(info.formVisibleNotify) + "]\n";
         formInfos += "    formVisibleNotifyState [" + std::to_string(info.formVisibleNotifyState) + "]\n";
         formInfos += "    userId [" + std::to_string(info.userId) + "]\n";
-        formInfos += "    type [" + std::to_string(static_cast<int32_t>(info.type)) + "]\n";
+        formInfos += "    type [" + std::string(info.uiSyntax == FormType::JS ? "JS" : "ArkTS") + "]\n";
         formInfos += "    isDynamic [" + std::to_string(info.isDynamic) + "]\n";
         formInfos += "    transparencyEnabled [" + std::to_string(info.transparencyEnabled) + "]\n";
 
@@ -181,6 +183,7 @@ void FormDumpMgr::DumpFormInfo(const FormRecord &formRecordInfo, std::string &fo
     formInfo += "    versionName [" + formRecordInfo.versionName + "]\n";
     formInfo += "    compatibleVersion [" + std::to_string(formRecordInfo.compatibleVersion) + "]\n";
     formInfo += "    userId [" + std::to_string(formRecordInfo.userId) + "]\n";
+    formInfo += "    type [" + std::string(formRecordInfo.uiSyntax == FormType::JS ? "JS" : "ArkTS") + "]\n";
     formInfo += "    isDynamic [" + std::to_string(formRecordInfo.isDynamic) + "]\n";
     formInfo += "    transparencyEnabled [" + std::to_string(formRecordInfo.transparencyEnabled) + "]\n";
 
