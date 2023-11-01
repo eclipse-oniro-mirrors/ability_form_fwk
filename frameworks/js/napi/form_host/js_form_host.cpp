@@ -860,7 +860,7 @@ private:
             AbilityRuntime::CreateAsyncTaskWithLastParam(env, lastParam, nullptr, nullptr, &result);
         std::shared_ptr<AbilityRuntime::NapiAsyncTask> asyncTask = std::move(uasyncTask);
 
-        JsFormStateCallbackClient::AcquireFormStateTask task = [&env, asyncTask](int32_t state, Want want) {
+        JsFormStateCallbackClient::AcquireFormStateTask task = [env, asyncTask](int32_t state, Want want) {
             HILOG_DEBUG("task complete state: %{public}d", state);
             napi_value objValue = nullptr;
             napi_create_object(env, &objValue);
@@ -1205,7 +1205,7 @@ private:
             AbilityRuntime::CreateAsyncTaskWithLastParam(env, lastParam, nullptr, nullptr, &result);
         std::shared_ptr<AbilityRuntime::NapiAsyncTask> asyncTask = std::move(uasyncTask);
 
-        ShareFormCallBackClient::ShareFormTask task = [&env, asyncTask](int32_t code) {
+        ShareFormCallBackClient::ShareFormTask task = [env, asyncTask](int32_t code) {
             HILOG_DEBUG("task complete code: %{public}d", code);
             if (code == ERR_OK) {
                 asyncTask->ResolveWithNoError(env, CreateJsUndefined(env));
@@ -1244,7 +1244,7 @@ private:
             AbilityRuntime::CreateAsyncTaskWithLastParam(env, lastParam, nullptr, nullptr, &result);
         std::shared_ptr<AbilityRuntime::NapiAsyncTask> asyncTask = std::move(uasyncTask);
 
-        JsFormDataCallbackClient::AcquireFormDataTask task = [&env, asyncTask](AAFwk::WantParams data) {
+        JsFormDataCallbackClient::AcquireFormDataTask task = [env, asyncTask](AAFwk::WantParams data) {
             HILOG_DEBUG("task complete form data");
             napi_value objValue = nullptr;
             napi_create_object(env, &objValue);
