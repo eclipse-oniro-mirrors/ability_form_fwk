@@ -2304,7 +2304,7 @@ ErrCode FormDataMgr::GetRunningFormInfosByBundleName(
         std::vector<FormHostRecord> formHostRecords;
         GetFormHostRecord(record.first, formHostRecords);
         if (formHostRecords.empty()) {
-            HILOG_ERROR("Get form host failed.");
+            HILOG_WARN("Form has released in host, formId = %{public}" PRId64, record.first);
             continue;
         }
         auto hostBundleName = formHostRecords.begin()->GetHostBundleName();

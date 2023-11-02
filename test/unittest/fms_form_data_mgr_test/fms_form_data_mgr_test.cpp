@@ -2308,6 +2308,11 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetRunningFormInfosByBundleName_
     formItemInfo.SetHostBundleName(bundleName);
     FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
     formDataMgr_.formRecords_.emplace(otherFormId, record);
+    FormHostRecord formHostRecord;
+    formHostRecord.SetFormHostClient(token_);
+    formHostRecord.SetHostBundleName(bundleName);
+    formHostRecord.AddForm(otherFormId);
+    formDataMgr_.clientRecords_.push_back(formHostRecord);
 
     std::vector<RunningFormInfo> runningFormInfos;
     bool isUnusedInclude = false;
@@ -2404,6 +2409,11 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetRunningFormInfosByBundleName_
     GTEST_LOG_(INFO) << "providerUserId = " << record.providerUserId;
     GTEST_LOG_(INFO) << "formTempFlag = " << record.formTempFlag;
     formDataMgr_.formRecords_.emplace(otherFormId, record);
+    FormHostRecord formHostRecord;
+    formHostRecord.SetFormHostClient(token_);
+    formHostRecord.SetHostBundleName(bundleName);
+    formHostRecord.AddForm(otherFormId);
+    formDataMgr_.clientRecords_.push_back(formHostRecord);
 
     std::vector<RunningFormInfo> runningFormInfos;
     bool isUnusedInclude = false;
