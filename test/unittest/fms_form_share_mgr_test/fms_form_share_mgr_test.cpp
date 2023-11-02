@@ -2444,6 +2444,23 @@ HWTEST_F(FmsFormShareMgrTest, FormDumpMgr_0008, TestSize.Level0)
 }
 
 /**
+ * @tc.name: FormDumpMgr_0009
+ * @tc.desc: test DumpFormSubscribedInfo function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDumpMgr_0009, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDumpMgr_0009 start";
+    std::vector<std::string> subscribedKeys;
+    int32_t count = 0;
+    std::string formInfo = "com.form.info";
+    std::shared_ptr<FormDumpMgr> formDumpMgr = std::make_shared<FormDumpMgr>();
+    ASSERT_NE(nullptr, formDumpMgr);
+    formDumpMgr->DumpFormSubscribeInfo(subscribedKeys, count, formInfo);
+    GTEST_LOG_(INFO) << "FormDumpMgr_0009 end";
+}
+
+/**
  * @tc.name: FormDataMgr_0001
  * @tc.desc: test IsCallingUidValid function
  * @tc.type: FUNC

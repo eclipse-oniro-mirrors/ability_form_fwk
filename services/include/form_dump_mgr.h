@@ -71,6 +71,15 @@ public:
      */
     void DumpFormInfo(const FormRecord &formRecordInfo, std::string &formInfo) const;
 
+    /**
+     * @brief Dump form subscribe info.
+     * @param subscribedKeys Form subscribe key info.
+     * @param count Form received data count
+     * @param formInfo Form dump info.
+     */
+    void DumpFormSubscribeInfo(
+        const std::vector<std::string> &subscribedKeys, const int64_t &count, std::string &formInfo) const;
+
 private:
     void AppendBundleFormInfo(const FormRecord &formRecordInfo, std::string &formInfo) const;
 };

@@ -524,4 +524,61 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_028, TestSize.Le
     EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_028 end";
 }
+
+/**
+ * @tc.name: FmsFormDataProxyRecordTest_029
+ * @tc.desc: test GetFormSubscribedInfo function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_029, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_029 start";
+    FormItemInfo formItemInfo;
+    FormRecord formRecord;
+    int64_t formId = 1;
+    uint32_t tokenId = 1;
+    FormDataProxyRecord formDataProxyRecord(formId, formRecord.bundleName, formRecord.uiSyntax, tokenId, 1);
+    std::vector<std::string> subscribedKeys;
+    int32_t count = 0;
+    formDataProxyRecord.GetFormSubscribeInfo(subscribedKeys, count);
+    EXPECT_EQ(count, formDataProxyRecord.receivedDataCount_);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_029 end";
+}
+
+/**
+ * @tc.name: FmsFormDataProxyRecordTest_030
+ * @tc.desc: test AddSubscribeSuccessKey function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_030, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_030 start";
+    FormItemInfo formItemInfo;
+    FormRecord formRecord;
+    int64_t formId = 1;
+    uint32_t tokenId = 1;
+    FormDataProxyRecord formDataProxyRecord(formId, formRecord.bundleName, formRecord.uiSyntax, tokenId, 1);
+    std::string errorUri = "this is a error uri";
+    FormDataProxyRecord::SubscribeResultRecord errorRecord{errorUri, 1, 1, false, 0};
+    formDataProxyRecord.AddSubscribeResultRecord(errorRecord, false);
+    formDataProxyRecord.AddSubscribeResultRecord(errorRecord, true);
+    std::vector<std::string> subscribedKeys;
+    formDataProxyRecord.GetFormSubscribeKeys(subscribedKeys, false);
+    EXPECT_EQ(subscribedKeys.size(), 0);
+    subscribedKeys.clear();
+    formDataProxyRecord.GetFormSubscribeKeys(subscribedKeys, true);
+    EXPECT_EQ(subscribedKeys.size(), 0);
+
+    std::string correctUri = "this is a correct uri?";
+    FormDataProxyRecord::SubscribeResultRecord successRecord{correctUri, 1, 0, false, 0};
+    formDataProxyRecord.AddSubscribeResultRecord(successRecord, false);
+    formDataProxyRecord.AddSubscribeResultRecord(successRecord, true);
+    subscribedKeys.clear();
+    formDataProxyRecord.GetFormSubscribeKeys(subscribedKeys, false);
+    EXPECT_EQ(subscribedKeys.size(), 1);
+    subscribedKeys.clear();
+    formDataProxyRecord.GetFormSubscribeKeys(subscribedKeys, true);
+    EXPECT_EQ(subscribedKeys.size(), 1);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_03 end";
+}
 }

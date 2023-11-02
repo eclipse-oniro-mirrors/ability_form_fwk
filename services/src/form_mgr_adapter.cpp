@@ -922,6 +922,13 @@ int FormMgrAdapter::DumpFormInfoByFormId(const std::int64_t formId, std::string 
         reply = ERR_OK;
     }
 
+    std::vector<std::string> subscribedKeys;
+    int32_t count = 0;
+    if (reply == ERR_OK) {
+        FormDataProxyMgr::GetInstance().GetFormSubscribeInfo(formId, subscribedKeys, count);
+        FormDumpMgr::GetInstance().DumpFormSubscribeInfo(subscribedKeys, count, formInfo);
+    }
+
     std::vector<FormHostRecord> formHostRecords;
     FormDataMgr::GetInstance().GetFormHostRecord(formId, formHostRecords);
     for (const auto &iter : formHostRecords) {

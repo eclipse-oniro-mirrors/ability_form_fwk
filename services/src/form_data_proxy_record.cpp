@@ -32,6 +32,9 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+namespace {
+const std::string KEY_DELIMITER = "?"; // the delimiter between key and uid
+} // namespace
 void FormDataProxyRecord::OnRdbDataChange(const DataShare::RdbChangeNode &changeNode)
 {
     HILOG_INFO("on rdb data change. data size is %{public}zu", changeNode.data_.size());
@@ -322,7 +325,10 @@ void FormDataProxyRecord::UpdatePublishedDataForm(const std::vector<DataShare::P
         formProviderData.SetImageDataState(FormProviderData::IMAGE_DATA_STATE_ADDED);
         formProviderData.SetImageDataMap(imageDataMap);
     }
-    FormMgrAdapter::GetInstance().UpdateForm(formId_, uid_, formProviderData);
+    auto ret = FormMgrAdapter::GetInstance().UpdateForm(formId_, uid_, formProviderData);
+    if (ret == ERR_OK && receivedDataCount_ < INT32_MAX) {
+        receivedDataCount_ += 1;
+    }
 }
 
 void FormDataProxyRecord::UpdateRdbDataForm(const std::vector<std::string> &data)
@@ -345,7 +351,10 @@ void FormDataProxyRecord::UpdateRdbDataForm(const std::vector<std::string> &data
 
     FormProviderData formProviderData;
     formProviderData.SetDataString(formDataStr);
-    FormMgrAdapter::GetInstance().UpdateForm(formId_, uid_, formProviderData);
+    auto ret = FormMgrAdapter::GetInstance().UpdateForm(formId_, uid_, formProviderData);
+    if (ret == ERR_OK && receivedDataCount_ < INT32_MAX) {
+        receivedDataCount_ += 1;
+    }
 }
 
 void FormDataProxyRecord::UpdateSubscribeFormData(const std::vector<FormDataProxy> &formDataProxies)
@@ -420,6 +429,13 @@ void FormDataProxyRecord::RetryFailureSubscribes()
             RetryFailurePublishedSubscribes(record);
         }
     }
+}
+
+void FormDataProxyRecord::GetFormSubscribeInfo(std::vector<std::string> &subscribedKeys, int32_t &count)
+{
+    GetFormSubscribeKeys(subscribedKeys, true);
+    GetFormSubscribeKeys(subscribedKeys, false);
+    count = receivedDataCount_;
 }
 
 ErrCode FormDataProxyRecord::SetRdbSubsState(const SubscribeMap &rdbSubscribeMap, bool subsState)
@@ -652,6 +668,29 @@ void FormDataProxyRecord::RetryFailurePublishedSubscribes(SubscribeResultRecord 
                 iter.key_.c_str(), std::to_string(record.subscribeId).c_str());
         }
         record.retryRet = iter.errCode_;
+    }
+}
+
+void FormDataProxyRecord::GetFormSubscribeKeys(std::vector<std::string> &subscribedKeys, bool isRdbType)
+{
+    auto resultMap = isRdbType ? rdbSubscribeResultMap_ : publishSubscribeResultMap_;
+    for (auto &result : resultMap) {
+        for (auto &records : result.second) {
+            auto &record = records.second;
+            if (record.ret != 0) {
+                continue;
+            }
+            auto uri = record.uri;
+            auto index = uri.find(KEY_DELIMITER);
+            if (index == std::string::npos) {
+                return;
+            }
+            auto subscribeKey = uri.substr(0, index);
+            auto search = std::find(subscribedKeys.begin(), subscribedKeys.end(), subscribeKey);
+            if (search == subscribedKeys.end()) {
+                subscribedKeys.emplace_back(subscribeKey);
+            }
+        }
     }
 }
 } // namespace AppExecFwk

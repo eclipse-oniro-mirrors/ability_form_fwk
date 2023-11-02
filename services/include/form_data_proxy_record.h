@@ -45,6 +45,7 @@ public:
     void EnableSubscribeFormData();
     void DisableSubscribeFormData();
     void RetryFailureSubscribes();
+    void GetFormSubscribeInfo(std::vector<std::string> &subscribedKeys, int32_t &count);
 private:
     struct FormDataProxyRequest {
         int64_t subscribeId;
@@ -89,6 +90,7 @@ private:
     void PrintSubscribeState(const std::string &uri, int64_t subscribeId, bool isRdbType);
     void RetryFailureRdbSubscribes(SubscribeResultRecord &record);
     void RetryFailurePublishedSubscribes(SubscribeResultRecord &record);
+    void GetFormSubscribeKeys(std::vector<std::string> &subscribedKeys, bool isRdbType);
 
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper_;
     int64_t formId_ = -1;
@@ -100,6 +102,7 @@ private:
     SubscribeMap publishSubscribeMap_;
     std::map<std::string, std::map<int64_t, SubscribeResultRecord>> rdbSubscribeResultMap_;
     std::map<std::string, std::map<int64_t, SubscribeResultRecord>> publishSubscribeResultMap_;
+    int32_t receivedDataCount_ = 0;
 };
 } // namespace AppExecFwk
 } // namespace OHOS
