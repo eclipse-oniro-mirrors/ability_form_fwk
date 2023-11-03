@@ -98,6 +98,8 @@ private:
 
     void NotifyHostRenderServiceIsDead() const;
 
+    int32_t GetCompatibleVersion(const std::string &bundleName) const;
+
 private:
     class RemoteObjHash {
     public:

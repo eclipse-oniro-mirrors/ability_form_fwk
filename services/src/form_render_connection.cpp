@@ -56,13 +56,6 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
         return;
     }
 
-    int32_t compatibleVersion = 0;
-    if (!FormBmsHelper::GetInstance().GetCompatibleVersion(
-        formRecord_.bundleName, FormUtil::GetCurrentAccountId(), compatibleVersion)) {
-        HILOG_ERROR("get compatible version code failed.");
-        return;
-    }
-
     FormRecord newRecord(formRecord_);
     std::string cacheData;
     std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
@@ -78,7 +71,6 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
     want.SetParams(wantParams_);
     want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
     want.SetParam(Constants::FORM_COMPILE_MODE_KEY, compileMode);
-    want.SetParam(Constants::FORM_COMPATIBLE_VERSION_KEY, compatibleVersion);
     FormTaskMgr::GetInstance().PostRenderForm(newRecord, std::move(want), remoteObject);
 }
 
@@ -86,7 +78,7 @@ void FormRenderConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName
 {
     HILOG_DEBUG("element:%{public}s, resultCode:%{public}d, connectState: %{public}d",
         element.GetURI().c_str(), resultCode, connectState_);
-    // If connectState_ is CONNECTING, it means connect failed, need to notify host 
+    // If connectState_ is CONNECTING, it means connect failed, need to notify host
     if (resultCode && connectState_ == ConnectState::CONNECTING) {
         FormRenderMgr::GetInstance().RemoveConnection(GetFormId());
         FormRenderMgr::GetInstance().HandleConnectFailed(

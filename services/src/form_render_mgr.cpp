@@ -84,6 +84,7 @@ ErrCode FormRenderMgr::RenderForm(
     int32_t userId = FormUtil::GetCurrentAccountId();
     Want want;
     want.SetParams(wantParams);
+    want.SetParam(Constants::FORM_COMPATIBLE_VERSION_KEY, GetCompatibleVersion(formRecord.bundleName));
     want.SetParam(Constants::FORM_SUPPLY_UID, std::to_string(userId) + formRecord.bundleName);
     {
         std::lock_guard<std::mutex> lock(isVerifiedMutex_);
@@ -180,6 +181,7 @@ ErrCode FormRenderMgr::UpdateRenderingForm(int64_t formId, const FormProviderDat
 
     Want want;
     want.SetParams(wantParams);
+    want.SetParam(Constants::FORM_COMPATIBLE_VERSION_KEY, GetCompatibleVersion(formRecord.bundleName));
     want.SetParam(Constants::FORM_RENDER_TYPE_KEY, Constants::UPDATE_RENDERING_FORM);
     int32_t userId = FormUtil::GetCurrentAccountId();
     want.SetParam(Constants::FORM_SUPPLY_UID, std::to_string(userId) + formRecord.bundleName);
@@ -222,9 +224,20 @@ ErrCode FormRenderMgr::ReloadForm(
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     Want want;
+    want.SetParam(Constants::FORM_COMPATIBLE_VERSION_KEY, GetCompatibleVersion(bundleName));
     want.SetParam(Constants::FORM_SUPPLY_UID, std::to_string(userId) + bundleName);
     FormTaskMgr::GetInstance().PostReloadForm(std::forward<decltype(formRecords)>(formRecords), want, remoteObject);
     return ERR_OK;
+}
+
+int32_t FormRenderMgr::GetCompatibleVersion(const std::string &bundleName) const
+{
+    int32_t compatibleVersion = 0;
+    if (!FormBmsHelper::GetInstance().GetCompatibleVersion(
+        bundleName, FormUtil::GetCurrentAccountId(), compatibleVersion)) {
+        HILOG_ERROR("get compatible version code failed.");
+    }
+    return compatibleVersion;
 }
 
 void FormRenderMgr::SetFormRenderState(bool isVerified)
