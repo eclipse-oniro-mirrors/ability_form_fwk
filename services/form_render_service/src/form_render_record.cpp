@@ -399,12 +399,16 @@ std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::GetContext(const Form
         std::lock_guard<std::mutex> lock(contextsMapMutex_);
         auto iter = contextsMapForModuleName_.find(GenerateContextKey(formJsInfo));
         if (iter != contextsMapForModuleName_.end()) {
-            HILOG_DEBUG("Find context and set apiCompatibleVersion");
             if (iter->second != nullptr) {
                 auto applicationInfo = iter->second->GetApplicationInfo();
                 if (applicationInfo != nullptr) {
-                    applicationInfo->apiCompatibleVersion = static_cast<uint32_t>(
+                    int32_t apiCompatibleVersion = static_cast<uint32_t>(
                         want.GetIntParam(Constants::FORM_COMPATIBLE_VERSION_KEY, 0));
+                    if (apiCompatibleVersion != 0) {
+                        applicationInfo->apiCompatibleVersion = apiCompatibleVersion;
+                    }
+                    HILOG_INFO("GetContext bundleName %{public}s, apiCompatibleVersion = %{public}d",
+                        formJsInfo.bundleName.c_str(), applicationInfo->apiCompatibleVersion);
                 }
             }
             return iter->second;
