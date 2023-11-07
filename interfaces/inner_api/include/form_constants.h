@@ -146,10 +146,12 @@ namespace Constants {
     constexpr int32_t MAX_RECORD_PER_APP = 256;
     constexpr int32_t MAX_TEMP_FORMS = 256;
     constexpr int32_t MAX_FORM_DATA_SIZE = 1024;
+    constexpr int32_t DEFAULT_VISIBLE_NOTIFY_DELAY = 1000;
 
     constexpr char MAX_NORMAL_FORM_SIZE [] = "maxNormalFormSize";
     constexpr char MAX_TEMP_FORM_SIZE [] = "maxTempFormSize";
     constexpr char HOST_MAX_FORM_SIZE [] = "hostMaxFormSize";
+    constexpr char VISIBLE_NOTIFY_DELAY [] = "visibleNotifyDelayTime";
 
     constexpr int32_t NOT_IN_RECOVERY = 0;
     constexpr int32_t RECOVER_FAIL = 1;
