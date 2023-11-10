@@ -27,6 +27,7 @@
 namespace OHOS {
 namespace AppExecFwk {
 const int32_t LIMIT_PARCEL_SIZE = 1024;
+constexpr size_t MAX_PARCEL_CAPACITY = 4 * 1024 * 1024; // 4M
 
 void SplitString(const std::string &source, std::vector<std::string> &strings)
 {
@@ -759,9 +760,10 @@ int32_t FormMgrStub::HandleNotifyFormsEnableUpdate(MessageParcel &data, MessageP
  */
 int32_t FormMgrStub::HandleGetAllFormsInfo(MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("%{public}s called. max parcel capacity : %{public}zu", __func__, MAX_PARCEL_CAPACITY);
     std::vector<FormInfo> infos;
     int32_t result = GetAllFormsInfo(infos);
+    (void)reply.SetMaxCapacity(MAX_PARCEL_CAPACITY);
     reply.WriteInt32(result);
     if (result == ERR_OK) {
         if (!WriteParcelableVector(infos, reply)) {
