@@ -204,9 +204,25 @@ void FormDumpMgr::DumpFormInfo(const FormRecord &formRecordInfo, std::string &fo
     }
 
     AppendBundleFormInfo(formRecordInfo, formInfo);
-    formInfo += LINE_SEPARATOR;
 
     HILOG_DEBUG("%{public}s success. Form infos:%{private}s", __func__, formInfo.c_str());
+}
+
+/**
+ * @brief Dump form subscribe info.
+ * @param subscribedKeys Form subscribe key info.
+ * @param count Form received data count
+ * @param formInfo Form dump info.
+ */
+void FormDumpMgr::DumpFormSubscribeInfo(
+    const std::vector<std::string> &subscribedKeys, const int64_t &count, std::string &formInfo) const
+{
+    formInfo += "    formDataProxy [ key [";
+    for (size_t i = 0; i < subscribedKeys.size(); i++) {
+        formInfo += " [" + subscribedKeys[i] + "]";
+    }
+    formInfo += " ] updatedCount [" + std::to_string(count) + "] ]\n";
+    formInfo += LINE_SEPARATOR;
 }
 
 void FormDumpMgr::AppendBundleFormInfo(const FormRecord &formRecordInfo, std::string &formInfo) const

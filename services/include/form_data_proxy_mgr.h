@@ -41,6 +41,7 @@ public:
     void DisableSubscribeFormData(const std::vector<int64_t> &formIds);
     // will run only once
     void RetryFailureSubscribes();
+    void GetFormSubscribeInfo(const int64_t formId, std::vector<std::string> &subscribedKeys, int32_t &count);
 private:
     std::mutex formDataProxyRecordMutex_;
     std::map<int64_t, std::shared_ptr<FormDataProxyRecord>> formDataProxyRecordMap_; // formId:FormDataProxyRecord
