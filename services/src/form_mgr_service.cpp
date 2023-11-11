@@ -649,7 +649,6 @@ ErrCode FormMgrService::Init()
         EventFwk::CommonEventManager::SubscribeCommonEvent(formSysEventReceiver_);
     }
 
-    FormTrustMgr::GetInstance().Start();
     FormInfoMgr::GetInstance().Start();
     int currUserId = FormUtil::GetCurrentAccountId();
     if (currUserId == Constants::ANY_USERID) {
