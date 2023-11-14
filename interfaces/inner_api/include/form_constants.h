@@ -71,7 +71,7 @@ namespace Constants {
     constexpr int32_t TYPE_STATIC_UPDATE = 2;
     constexpr int32_t TYPE_DYNAMIC_UPDATE = 3;
     const long ABS_REFRESH_MS = 2500;
-    
+
     constexpr int32_t UNKNOWN = 0;
     // The form events type which means that the form becomes visible.
     constexpr int32_t FORM_VISIBLE = 1;
@@ -178,7 +178,8 @@ namespace Constants {
         DIMENSION_2_4,
         DIMENSION_4_4,
         DIMENSION_2_1,
-        DIMENSION_MAX = DIMENSION_2_1
+        DIMENSION_1_1,
+        DIMENSION_MAX = DIMENSION_1_1
     };
 
     const std::map<Dimension, std::string> DIMENSION_MAP = {
@@ -186,7 +187,8 @@ namespace Constants {
         {Dimension::DIMENSION_2_2, "2*2"},
         {Dimension::DIMENSION_2_4, "2*4"},
         {Dimension::DIMENSION_4_4, "4*4"},
-        {Dimension::DIMENSION_2_1, "2*1"}
+        {Dimension::DIMENSION_2_1, "2*1"},
+        {Dimension::DIMENSION_1_1, "1*1"}
     };
 
     // rdb
