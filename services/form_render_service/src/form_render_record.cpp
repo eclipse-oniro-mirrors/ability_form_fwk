@@ -402,7 +402,7 @@ std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::GetContext(const Form
             if (iter->second != nullptr) {
                 auto applicationInfo = iter->second->GetApplicationInfo();
                 if (applicationInfo != nullptr) {
-                    int32_t apiCompatibleVersion = static_cast<uint32_t>(
+                    int32_t apiCompatibleVersion = static_cast<int32_t>(
                         want.GetIntParam(Constants::FORM_COMPATIBLE_VERSION_KEY, 0));
                     if (apiCompatibleVersion != 0) {
                         applicationInfo->apiCompatibleVersion = apiCompatibleVersion;
