@@ -140,6 +140,11 @@ public:
     {
         return {};
     }
+    int32_t SendStrategy(int32_t type, std::vector<int32_t>& systemAbilityIds,
+        int32_t level, std::string& action) override
+    {
+        return {};
+    }
 
     std::weak_ptr<bool> weakGetSystemAbility_;
 };
