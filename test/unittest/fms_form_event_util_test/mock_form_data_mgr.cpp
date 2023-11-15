@@ -27,6 +27,7 @@ namespace {
     bool g_mockGetPackageFormRet = true;
     bool g_mockGetNoHostTempFormsOne = true;
     bool g_mockGetNoHostTempFormsTwo = true;
+    constexpr int32_t UPDATE_DURATION  = 2;
 }
 
 void MockGetFormRecord(bool mockRet)
@@ -83,10 +84,23 @@ bool FormDataMgr::GetFormRecord(
     formRecord.formId = 1;
     if (false == g_mockSetFormTempFlagRet) {
         formRecord.formTempFlag = false;
+        formRecord.isEnableUpdate = true;
+        formRecord.updateDuration = UPDATE_DURATION * Constants::TIME_CONVERSION;
     } else {
         formRecord.formTempFlag = true;
     }
     formInfos.emplace_back(formRecord);
+    return g_mockGetFormRecordRet;
+}
+
+bool FormDataMgr::GetFormRecord(const int64_t formId, FormRecord &formRecord) const
+{
+    if (g_mockGetFormRecordRet) {
+        formRecord.bundleName = "com.form.provider.service";
+        formRecord.formId = 1;
+        formRecord.isEnableUpdate = true;
+        formRecord.updateDuration = UPDATE_DURATION * Constants::TIME_CONVERSION;
+    }
     return g_mockGetFormRecordRet;
 }
 

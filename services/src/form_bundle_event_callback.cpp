@@ -17,6 +17,10 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+namespace {
+const std::string BMS_EVENT_ADDITIONAL_INFO_CHANGED = "bms.event.ADDITIONAL_INFO_CHANGED";
+} // namespace
+
 void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eventData)
 {
     const AAFwk::Want& want = eventData.GetWant();
@@ -43,6 +47,10 @@ void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eve
         HILOG_INFO("%{public}s, bundle removed, bundleName: %{public}s", __func__, bundleName.c_str());
         formEventHelper_.HandleBundleFormInfoRemoved(bundleName, userId);
         formEventHelper_.HandleProviderRemoved(bundleName, userId);
+    } else if (action == BMS_EVENT_ADDITIONAL_INFO_CHANGED) {
+        // additional info changed
+        HILOG_INFO("Additional info changed, bundleName: %{public}s", bundleName.c_str());
+        formEventHelper_.HandleAdditionalInfoChanged(bundleName);
     }
 }
 

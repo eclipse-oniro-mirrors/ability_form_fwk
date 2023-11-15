@@ -50,6 +50,7 @@ using namespace OHOS::AppExecFwk;
 namespace {
 
 const std::string FORM_MESSAGE_EVENT_VALUE_1 = "event message1";
+const std::string BMS_EVENT_ADDITIONAL_INFO_CHANGED = "bms.event.ADDITIONAL_INFO_CHANGED";
 class FmsFormRefreshConnectionTest : public testing::Test {
 public:
     void SetUp();
@@ -1026,6 +1027,29 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormBundleEventCallback_008, TestSize.Lev
     EXPECT_FALSE(want.GetAction().empty());
     EXPECT_TRUE(want.GetElement().GetBundleName().empty());
     GTEST_LOG_(INFO) << "FormBundleEventCallback_008 end";
+}
+
+/**
+ * @tc.name: FormBundleEventCallback_009
+ * @tc.desc: test OnReceiveEvent function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormRefreshConnectionTest, FormBundleEventCallback_009, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormBundleEventCallback_009 start";
+    sptr<FormBundleEventCallback> formBundleEventCallback = new (std::nothrow) FormBundleEventCallback();
+    EXPECT_TRUE(formBundleEventCallback != nullptr);
+    EventFwk::CommonEventData eventData;
+    AAFwk::Want want = eventData.GetWant();
+    std::string action = BMS_EVENT_ADDITIONAL_INFO_CHANGED;
+    want.SetAction(action);
+    std::string bundleName = "com.example.form";
+    std::string abilityName = "entry";
+    want.SetElementName(bundleName, abilityName);
+    eventData.SetWant(want);
+    formBundleEventCallback->OnReceiveEvent(eventData);
+    EXPECT_TRUE(want.GetAction() == BMS_EVENT_ADDITIONAL_INFO_CHANGED);
+    GTEST_LOG_(INFO) << "FormBundleEventCallback_009 end";
 }
 
 /**

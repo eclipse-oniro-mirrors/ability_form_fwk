@@ -74,8 +74,10 @@ using namespace OHOS::EcologicalRuleMgrService;
 namespace {
 constexpr int32_t CALLING_UID_TRANSFORM_DIVISOR = 200000;
 constexpr int32_t SYSTEM_UID = 1000;
+constexpr int32_t API_11 = 11;
 const std::string POINT_ETS = ".ets";
-
+constexpr int DATA_FIELD = 1;
+constexpr int FORM_UPDATE_LEVEL_VALUE_MAX_LENGTH = 3; // update level is 1~336, so max length is 3.
 const std::string EMPTY_BUNDLE = "";
 } // namespace
 
@@ -903,6 +905,19 @@ int FormMgrAdapter::DumpFormInfoByBundleName(const std::string &bundleName, std:
     if (!FormDataMgr::GetInstance().GetFormRecord(bundleName, formRecordInfos)) {
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
+
+    /**
+     * The updateDuration stored in FormRecord is the config.json configuration.
+     * The app gallery may modify the updateDuration.
+     * The real updateDuration value needs to be obtained from FormTimerMgr.
+     */
+    for (auto &formRecord : formRecordInfos) {
+        FormTimer formTimer;
+        if (formRecord.isEnableUpdate && formRecord.updateDuration > 0 &&
+            FormTimerMgr::GetInstance().GetIntervalTimer(formRecord.formId, formTimer)) {
+            formRecord.updateDuration = formTimer.period;
+        }
+    }
     FormDumpMgr::GetInstance().DumpFormInfos(formRecordInfos, formInfos);
     return ERR_OK;
 }
@@ -918,6 +933,16 @@ int FormMgrAdapter::DumpFormInfoByFormId(const std::int64_t formId, std::string 
     int reply = ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     FormRecord formRecord;
     if (FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
+        /**
+         * The updateDuration stored in FormRecord is the config.json configuration.
+         * The app gallery may modify the updateDuration.
+         * The real updateDuration value needs to be obtained from FormTimerMgr.
+         */
+        FormTimer formTimer;
+        if (formRecord.isEnableUpdate && formRecord.updateDuration > 0 &&
+            FormTimerMgr::GetInstance().GetIntervalTimer(formRecord.formId, formTimer)) {
+            formRecord.updateDuration = formTimer.period;
+        }
         FormDumpMgr::GetInstance().DumpFormInfo(formRecord, formInfo);
         reply = ERR_OK;
     }
@@ -1228,8 +1253,12 @@ ErrCode FormMgrAdapter::AddFormTimer(const FormRecord &formRecord)
         return ERR_OK;
     }
     if (formRecord.updateDuration > 0 && !formRecord.isDataProxy) {
+        int64_t updateDuration = formRecord.updateDuration;
+        if (!GetValidFormUpdateDuration(formRecord.formId, updateDuration)) {
+            HILOG_WARN("Get updateDuration failed, uses local configuration.");
+        }
         bool ret = FormTimerMgr::GetInstance().AddFormTimer(formRecord.formId,
-            formRecord.updateDuration, formRecord.providerUserId);
+            updateDuration, formRecord.providerUserId);
         return ret ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     if (formRecord.updateAtHour >= 0 && formRecord.updateAtMin >= 0) {
@@ -2921,6 +2950,82 @@ int32_t FormMgrAdapter::UnregisterPublishFormInterceptor(const sptr<IRemoteObjec
     }
     HILOG_ERROR("the param not equal to the current interceptor.");
     return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+}
+
+bool FormMgrAdapter::GetValidFormUpdateDuration(const int64_t formId, int64_t &updateDuration) const
+{
+    HILOG_DEBUG("Called.");
+    FormRecord formRecord;
+    if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
+        HILOG_ERROR("Error, not exist such form:%{public}" PRId64 ".", formId);
+        return false;
+    }
+
+    ApplicationInfo appInfo;
+    if (FormBmsHelper::GetInstance().GetApplicationInfo(formRecord.bundleName, FormUtil::GetCurrentAccountId(),
+        appInfo) != ERR_OK) {
+        HILOG_ERROR("Get app info failed.");
+        return false;
+    }
+
+    if (appInfo.apiTargetVersion < API_11) {
+        HILOG_INFO("API version is lower than 11, uses local configuration.");
+        updateDuration = formRecord.updateDuration;
+        return true;
+    }
+
+    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
+    if (iBundleMgr == nullptr) {
+        HILOG_ERROR("Failed to get IBundleMgr, uses local configuration.");
+        updateDuration = formRecord.updateDuration;
+        return true;
+    }
+
+    std::string additionalInfo;
+    if (IN_PROCESS_CALL(iBundleMgr->GetAdditionalInfo(formRecord.bundleName, additionalInfo)) != ERR_OK) {
+        HILOG_ERROR("Failed to get GetAdditionalInfo, uses local configuration.");
+        updateDuration = formRecord.updateDuration;
+        return true;
+    }
+
+    if (additionalInfo.empty()) {
+        HILOG_DEBUG("AdditionalInfo is empty, uses local configuration.");
+        updateDuration = formRecord.updateDuration;
+        return true;
+    }
+
+    std::vector<int> durationArray;
+    GetUpdateDurationFromAdditionalInfo(additionalInfo, durationArray);
+    if (durationArray.empty()) {
+        HILOG_INFO("No valid formUpdateLevel in additionalInfo, uses local configuration.");
+        updateDuration = formRecord.updateDuration;
+        return true;
+    }
+
+    int duration = durationArray.back();
+    int64_t cloudsDuration = duration * Constants::TIME_CONVERSION;
+    updateDuration = std::max(formRecord.updateDuration, cloudsDuration);
+    return true;
+}
+
+void FormMgrAdapter::GetUpdateDurationFromAdditionalInfo(
+    const std::string &additionalInfo, std::vector<int> &durationArray) const
+{
+    std::regex regex(R"(formUpdateLevel:(\d+))");
+    std::smatch searchResult;
+    std::string::const_iterator iterStart = additionalInfo.begin();
+    std::string::const_iterator iterEnd = additionalInfo.end();
+
+    while (std::regex_search(iterStart, iterEnd, searchResult, regex)) {
+        iterStart = searchResult[0].second;
+        if (searchResult[DATA_FIELD].str().length() > FORM_UPDATE_LEVEL_VALUE_MAX_LENGTH) {
+            continue;
+        }
+        int val = std::stoi(searchResult[DATA_FIELD].str());
+        if (val >= Constants::MIN_CONFIG_DURATION && val <= Constants::MAX_CONFIG_DURATION) {
+            durationArray.emplace_back(val);
+        }
+    }
 }
 
 #ifdef SUPPORT_ERMS
