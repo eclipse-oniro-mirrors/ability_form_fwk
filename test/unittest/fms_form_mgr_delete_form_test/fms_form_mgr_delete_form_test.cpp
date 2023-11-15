@@ -347,19 +347,16 @@ HWTEST_F(FmsFormMgrDeleteFormTest, DeleteForm_008, TestSize.Level0)
 
     ASSERT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, FormMgr::GetInstance().DeleteForm(formId, token_));
 
-    // Cache uid is not deleted yet.
+    // Cache uid has been deleted.
     FormRecord formInfo;
     bool ret = FormDataMgr::GetInstance().GetFormRecord(formId, formInfo);
-    EXPECT_TRUE(ret);
-    size_t dataCnt {1};
+    EXPECT_FALSE(ret);
+    size_t dataCnt {0};
     EXPECT_EQ(dataCnt, formInfo.formUserUids.size());
-    // Database is not deleted yet.
+    // Database has been deleted.
     std::vector<FormDBInfo> formDBInfos;
     FormDbCache::GetInstance().GetAllFormInfo(formDBInfos);
     EXPECT_EQ(dataCnt, formDBInfos.size());
-    FormDBInfo dbInfo {formDBInfos[0]};
-    EXPECT_EQ(formId, dbInfo.formId);
-    EXPECT_EQ(dataCnt, dbInfo.formUserUids.size());
     // form host record is not deleted yet.
     std::vector<FormHostRecord> hostRecords;
     FormDataMgr::GetInstance().GetFormHostRecord(formId, hostRecords);
@@ -374,16 +371,13 @@ HWTEST_F(FmsFormMgrDeleteFormTest, DeleteForm_008, TestSize.Level0)
 
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, FormMgr::GetInstance().DeleteForm(formId, token_));
 
-    // Cache uid is not deleted yet.
-    EXPECT_TRUE(FormDataMgr::GetInstance().GetFormRecord(formId, formInfo));
+    // Cache uid has been deleted.
+    EXPECT_FALSE(FormDataMgr::GetInstance().GetFormRecord(formId, formInfo));
     EXPECT_EQ(dataCnt, formInfo.formUserUids.size());
-    // Database is not deleted yet.
+    // Database has been deleted.
     formDBInfos.clear();
     FormDbCache::GetInstance().GetAllFormInfo(formDBInfos);
     EXPECT_EQ(dataCnt, formDBInfos.size());
-    dbInfo = formDBInfos[0];
-    EXPECT_EQ(formId, dbInfo.formId);
-    EXPECT_EQ(dataCnt, dbInfo.formUserUids.size());
     // form host record is not deleted yet.
     FormDataMgr::GetInstance().GetFormHostRecord(formId, hostRecords);
     EXPECT_FALSE(hostRecords.empty());
