@@ -22,6 +22,7 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace {
 const std::string UNTRUST_LIST = "untrust_list";
+const int32_t UNTRUST_THRESHOLD = 3;
 } // namespace
 
 FormTrustMgr::FormTrustMgr()
@@ -40,16 +41,15 @@ FormTrustMgr::~FormTrustMgr()
     HILOG_INFO("FormTrustMgr is deleted");
 }
 
-void FormTrustMgr::Start()
-{
-    std::lock_guard<std::mutex> lock(rdbStoreMutex_);
-    rdbDataManager_->QueryAllKeys(unTrustList_);
-}
-
 bool FormTrustMgr::IsTrust(const std::string &bundleName)
 {
     std::lock_guard<std::mutex> lock(rdbStoreMutex_);
-    return unTrustList_.find(bundleName) == unTrustList_.end();
+    auto iter = unTrustList_.find(bundleName);
+    if (iter == unTrustList_.end()) {
+        return true;
+    }
+
+    return iter->second <= UNTRUST_THRESHOLD;
 }
 
 void FormTrustMgr::MarkTrustFlag(const std::string &bundleName, bool isTrust)
@@ -60,21 +60,27 @@ void FormTrustMgr::MarkTrustFlag(const std::string &bundleName, bool isTrust)
         auto ret = rdbDataManager_->DeleteData(bundleName);
         if (ret != ERR_OK) {
             HILOG_ERROR("DeleteData failed, key: %{public}s", bundleName.c_str());
-            return;
         }
 
         unTrustList_.erase(iter);
         return;
     }
 
-    if (!isTrust && iter == unTrustList_.end()) {
-        auto ret = rdbDataManager_->InsertData(bundleName);
-        if (ret != ERR_OK) {
-            HILOG_ERROR("InsertData failed, key: %{public}s", bundleName.c_str());
+    if (!isTrust) {
+        if (iter == unTrustList_.end()) {
+            unTrustList_[bundleName] = 1;
             return;
         }
 
-        unTrustList_.insert(bundleName);
+        int32_t trustNum = iter->second;
+        trustNum++;
+        unTrustList_[bundleName] = trustNum;
+        if (trustNum > UNTRUST_THRESHOLD) {
+            auto ret = rdbDataManager_->InsertData(bundleName);
+            if (ret != ERR_OK) {
+                HILOG_ERROR("InsertData failed, key: %{public}s", bundleName.c_str());
+            }
+        }
     }
 }
 } // namespace AppExecFwk
