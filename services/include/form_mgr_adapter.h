@@ -440,6 +440,21 @@ public:
     ErrCode RegisterRemoveObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken);
 
     /**
+     * @brief Register form router event proxy.
+     * @param formIds Indicates the ID of the forms.
+     * @param callerToken Router proxy call back client.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RegisterFormRouterProxy(const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &callerToken);
+
+    /**
+     * @brief Unregister form router event proxy.
+     * @param formIds Indicates the ID of the forms.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UnregisterFormRouterProxy(const std::vector<int64_t> &formIds);
+
+    /**
      * @brief Registers the callback for publish form. The callback is used to process the publish form request
      * when the system handler is not found.
      * @param interceptorCallback The injected callback, should implementation IFormPublishInterceptor.

@@ -49,6 +49,7 @@
 #include "form_provider_info.h"
 #include "form_provider_interface.h"
 #include "form_provider_mgr.h"
+#include "form_router_proxy_mgr.h"
 #include "form_render_connection.h"
 #include "form_render_mgr.h"
 #include "form_share_mgr.h"
@@ -2079,6 +2080,11 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
     want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, formId);
     if (!want.GetUriString().empty()) {
         HILOG_INFO("Router by uri");
+        if (FormRouterProxyMgr::GetInstance().HasRouterProxy(formId)) {
+            HILOG_INFO("Router proxy was setted sucessful");
+            FormRouterProxyMgr::GetInstance().OnFormRouterEvent(formId, want);
+            return ERR_OK;
+        }
         int32_t result = FormAmsHelper::GetInstance().GetAbilityManager()->StartAbility(want, callerToken);
         if (result != ERR_OK && result != START_ABILITY_WAITING) {
             HILOG_ERROR("Failed to StartAbility, result: %{public}d.", result);
@@ -2107,7 +2113,11 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
             want.SetBundle(record.bundleName);
         }
     }
-
+    if (FormRouterProxyMgr::GetInstance().HasRouterProxy(formId)) {
+        HILOG_INFO("Router proxy was setted sucessful");
+        FormRouterProxyMgr::GetInstance().OnFormRouterEvent(formId, want);
+        return ERR_OK;
+    }
     int32_t result = FormAmsHelper::GetInstance().GetAbilityManager()->StartAbility(want, callerToken);
     if (result != ERR_OK && result != START_ABILITY_WAITING) {
         HILOG_ERROR("Failed to StartAbility, result: %{public}d.", result);
@@ -2830,6 +2840,108 @@ ErrCode FormMgrAdapter::RegisterRemoveObserver(const std::string &bundleName, co
     }
     HILOG_DEBUG("success.");
     return ERR_OK;
+}
+
+ErrCode FormMgrAdapter::RegisterFormRouterProxy(
+    const std::vector<int64_t>& formIds, const sptr<IRemoteObject>& callerToken)
+{
+    HILOG_DEBUG("Called.");
+    if (callerToken == nullptr) {
+        HILOG_ERROR("CallerToken is nullptr.");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    std::vector<int64_t> matchedFormIds {};
+    std::vector<int64_t> hostOwnFormIds {};
+    auto uid = IPCSkeleton::GetCallingUid();
+    FormRecord record;
+    for (int64_t formId : formIds) {
+        if (formId <= 0) {
+            HILOG_WARN("FormId %{public}" PRId64 " is less than 0", formId);
+            continue;
+        }
+        auto matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+        if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record)) {
+            HILOG_ERROR("No matching formRecord was found for the formId: %{public}" PRId64 "", formId);
+            continue;
+        }
+        matchedFormIds.push_back(formId);
+
+        // Checks for cross-user operations.
+        if (record.providerUserId != FormUtil::GetCurrentAccountId()) {
+            HILOG_ERROR("The formId: %{public}" PRId64
+                        " corresponds to a card that is not for the currently active user.",
+                formId);
+            continue;
+        }
+        // Checks for cross-host operations
+        else if (std::find(record.formUserUids.begin(), record.formUserUids.end(), uid) == record.formUserUids.end()) {
+            HILOG_ERROR("The formId:%{public}" PRId64 " owned by other formHost", formId);
+            continue;
+        } else {
+            HILOG_DEBUG("The setup was sucessful, matchedFormIds: %{public}" PRId64 "", formId);
+            hostOwnFormIds.push_back(formId);
+        }
+    }
+    if (matchedFormIds.empty()) {
+        HILOG_ERROR("All formIds is Invalid!");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    if (hostOwnFormIds.empty()) {
+        HILOG_ERROR("All formIds was not setted by self!");
+        return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
+    }
+
+    return FormRouterProxyMgr::GetInstance().SetFormRouterProxy(hostOwnFormIds, callerToken);
+}
+
+ErrCode FormMgrAdapter::UnregisterFormRouterProxy(const std::vector<int64_t>& formIds)
+{
+    HILOG_DEBUG("Called.");
+    std::vector<int64_t> matchedFormIds {};
+    std::vector<int64_t> hostOwnFormIds {};
+    auto uid = IPCSkeleton::GetCallingUid();
+    FormRecord record;
+    for (int64_t formId : formIds) {
+        if (formId <= 0) {
+            HILOG_WARN("FormId %{public}" PRId64 " is less than 0", formId);
+            continue;
+        }
+        auto matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+        if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record)) {
+            HILOG_ERROR("No matching formRecord was found for the formId: %{public}" PRId64 "", formId);
+            continue;
+        }
+        matchedFormIds.push_back(formId);
+
+        // Checks for cross-user operations.
+        if (record.providerUserId != FormUtil::GetCurrentAccountId()) {
+            HILOG_ERROR("The formId: %{public}" PRId64
+                        " corresponds to a card that is not for the currently active user.",
+                formId);
+            continue;
+        }
+        // Checks for cross-host operations
+        else if (std::find(record.formUserUids.begin(), record.formUserUids.end(), uid) == record.formUserUids.end()) {
+            HILOG_ERROR("The formId:%{public}" PRId64 " owned by other formHost", formId);
+            continue;
+        } else {
+            HILOG_DEBUG("The setup was sucessful, matchedFormIds: %{public}" PRId64 "", formId);
+            hostOwnFormIds.push_back(formId);
+        }
+    }
+    if (matchedFormIds.empty()) {
+        HILOG_ERROR("All formIds is Invalid!");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    if (hostOwnFormIds.empty()) {
+        HILOG_ERROR("All formIds was not setted by self!");
+        return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
+    }
+
+    return FormRouterProxyMgr::GetInstance().RemoveFormRouterProxy(hostOwnFormIds);
 }
 
 void FormMgrAdapter::SetDeathRecipient(const sptr<IRemoteObject> &callerToken,

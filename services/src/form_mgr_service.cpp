@@ -786,6 +786,40 @@ int FormMgrService::AcquireFormState(const Want &want,
 }
 
 /**
+ * @brief Register form router event proxy.
+ * @param formIds Indicates the ID of the forms.
+ * @param callerToken Host client.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormMgrService::RegisterFormRouterProxy(const std::vector<int64_t> &formIds,
+    const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_DEBUG("Called.");
+    ErrCode ret = CheckFormPermission();
+    if (ret != ERR_OK) {
+        HILOG_ERROR("Fail, register form router proxy permission denied");
+        return ret;
+    }
+    return FormMgrAdapter::GetInstance().RegisterFormRouterProxy(formIds, callerToken);
+}
+
+/**
+* @brief Unregister form router event proxy.
+* @param formIds Indicates the ID of the forms.
+* @return Returns ERR_OK on success, others on failure.
+*/
+int FormMgrService::UnregisterFormRouterProxy(const std::vector<int64_t> &formIds)
+{
+    HILOG_DEBUG("Called.");
+    ErrCode ret = CheckFormPermission();
+    if (ret != ERR_OK) {
+        HILOG_ERROR("Fail, unregister form router proxy permission denied");
+        return ret;
+    }
+    return FormMgrAdapter::GetInstance().UnregisterFormRouterProxy(formIds);
+}
+
+/**
  * @brief Notify the form is visible or not.
  * @param formIds Indicates the ID of the forms.
  * @param isVisible Visible or not.

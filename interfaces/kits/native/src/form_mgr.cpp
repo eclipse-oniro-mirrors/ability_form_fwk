@@ -1283,5 +1283,35 @@ ErrCode FormMgr::RegisterRemoveObserver(const std::string &bundleName, const spt
     }
     return remoteProxy_->RegisterRemoveObserver(bundleName, callerToken);
 }
+
+int FormMgr::RegisterFormRouterProxy(const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_DEBUG("Called.");
+    if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
+        HILOG_ERROR("Error, form is in recover status, can't do action on form.");
+        return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
+    }
+    auto errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("Failed, errCode:%{public}d.", errCode);
+        return errCode;
+    }
+    return remoteProxy_->RegisterFormRouterProxy(formIds, callerToken);
+}
+
+int FormMgr::UnregisterFormRouterProxy(const std::vector<int64_t> &formIds)
+{
+    HILOG_DEBUG("Called.");
+    if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
+        HILOG_ERROR("Error, form is in recover status, can't do action on form.");
+        return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
+    }
+    auto errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("Failed, errCode:%{public}d.", errCode);
+        return errCode;
+    }
+    return remoteProxy_->UnregisterFormRouterProxy(formIds);
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -433,6 +433,22 @@ public:
     ErrCode RegisterRemoveObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken) override;
 
     /**
+     * @brief Register form router event proxy.
+     * @param formIds Indicates the id of the forms.
+     * @param callerToken Router proxy call back client.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RegisterFormRouterProxy(const std::vector<int64_t> &formIds,
+        const sptr<IRemoteObject> &callerToken) override;
+
+    /**
+     * @brief Unregister form router event proxy.
+     * @param formIds Indicates the id of the forms.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UnregisterFormRouterProxy(const std::vector<int64_t> &formIds) override;
+
+    /**
      * @brief Update proxy form with formId, send formId to form manager service.
      * @param formId The Id of the form to update.
      * @param FormProviderData Form binding data.

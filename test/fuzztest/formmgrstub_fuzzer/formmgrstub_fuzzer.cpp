@@ -226,6 +226,17 @@ public:
     {
         return ERR_OK;
     }
+
+    ErrCode RegisterFormRouterProxy(const std::vector<int64_t> &formIds,
+        const sptr<IRemoteObject> &callerToken) override
+    {
+        return ERR_OK;
+    }
+
+    ErrCode UnregisterFormRouterProxy(const std::vector<int64_t> &formIds) override
+    {
+        return ERR_OK;
+    }
 };
 
 uint32_t GetU32Data(const char* ptr)

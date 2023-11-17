@@ -378,6 +378,22 @@ private:
     ErrCode HandleRegisterRemoveObserver(MessageParcel &data, MessageParcel &reply);
 
     /**
+     * @brief Register form router event proxy.
+     * @param data input param
+     * @param reply output param
+     * @return Return ERR_OK on success, others on failure
+     */
+    ErrCode HandleRegisterFormRouterProxy(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Unregister form router event proxy.
+     * @param data input param
+     * @param reply output param
+     * @return Return ERR_OK on success, others on failure
+     */
+    ErrCode HandleUnregisterFormRouterProxy(MessageParcel &data, MessageParcel &reply);
+
+    /**
      * @brief update proxy form.
      * @param data input param
      * @param reply output param
