@@ -16,14 +16,19 @@
 import router from '@ohos.router';
 import Logger from '../../model/Logger';
 
+interface BusinessError{
+  code: number
+  msg: string | null | object | undefined
+}
+
 async function routePage() {
-  let options = {
+  let options: router.RouterOptions = {
     url: 'pages/second'
   }
   try {
     await router.push(options)
   } catch (err) {
-    Logger.error(`fail callback, code: ${err.code}, msg: ${err.msg}`)
+    Logger.error(`fail callback, code: ${(err as BusinessError).code}, msg: ${(err as BusinessError).msg}`)
   }
 }
 
