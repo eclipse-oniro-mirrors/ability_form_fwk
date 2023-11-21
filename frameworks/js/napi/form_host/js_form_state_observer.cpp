@@ -457,6 +457,12 @@ int32_t JsFormStateObserver::NotifyWhetherFormsVisible(const AppExecFwk::FormVis
                 HILOG_ERROR("sharedThis is nullptr.");
                 return;
             }
+            napi_handle_scope scope = nullptr;
+            napi_open_handle_scope(sharedThis->env_, &scope);
+            if (scope == nullptr) {
+                HILOG_ERROR("scope is nullptr.");
+                return;
+            }
             if (visibleType == AppExecFwk::FormVisibilityType::VISIBLE) {
                 isVisibleTypeFlag = true;
                 if (bundleName.find((specialFlag + std::to_string(isVisibleTypeFlag))) != std::string::npos) {
@@ -484,6 +490,7 @@ int32_t JsFormStateObserver::NotifyWhetherFormsVisible(const AppExecFwk::FormVis
                     }
                 }
             }
+            napi_close_handle_scope(sharedThis->env_, scope);
         });
     }
     return ERR_OK;
