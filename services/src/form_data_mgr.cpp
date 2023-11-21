@@ -303,8 +303,9 @@ int FormDataMgr::CheckEnoughForm(const int callingUid, const int32_t currentUser
         return ERR_APPEXECFWK_FORM_MAX_SYSTEM_FORMS;
     }
 
+    int32_t currentAccountId = FormUtil::GetCurrentAccountId();
     for (const auto &record : formDbInfos) {
-        if ((record.providerUserId == FormUtil::GetCurrentAccountId())) {
+        if ((record.providerUserId == currentAccountId)) {
             HILOG_DEBUG("Is called by the current active user");
             for (const auto &userUid : record.formUserUids) {
                 if (userUid != callingUid) {
