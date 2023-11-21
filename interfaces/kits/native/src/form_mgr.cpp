@@ -1044,16 +1044,16 @@ int32_t FormMgr::AcquireFormData(int64_t formId, int64_t requestCode, const sptr
 bool FormMgr::CheckFMSReady()
 {
     HILOG_INFO("%{public}s called.", __func__);
-
-    sptr<ISystemAbilityManager> systemAbilityManager =
-        SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    auto remoteObject = systemAbilityManager->GetSystemAbility(FORM_MGR_SERVICE_ID);
-    if (remoteObject == nullptr) {
-        HILOG_INFO("%{public}s, form manager service is not ready.", __func__);
+    int32_t errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("Connect failed. errCode:%{public}d.", errCode);
         return false;
     }
-
-    return true;
+    bool resultCode = remoteProxy_->CheckFMSReady();
+    if (resultCode == false) {
+        HILOG_ERROR("CheckFMSReady failed.");
+    }
+    return resultCode;
 }
 
 int32_t FormMgr::RegisterPublishFormInterceptor(const sptr<IRemoteObject> &interceptorCallback)
