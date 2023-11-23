@@ -456,18 +456,18 @@ public:
     int32_t UnregisterPublishFormInterceptor(const sptr<IRemoteObject> &interceptorCallback);
 
     /**
-     * @brief Register click call observer.
+     * @brief Register click callback observer.
      * @param callerToken Caller ability token.
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode RegisterClickCallbackEventObserver(const sptr<IRemoteObject> &observer);
 
     /**
-     * @brief Unregister click call observer.
+     * @brief Unregister click callback observer.
      * @param callerToken Caller ability token.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode UnRegisterClickCallbackEventObserver(const sptr<IRemoteObject> &observer);
+    ErrCode UnregisterClickCallbackEventObserver(const sptr<IRemoteObject> &observer);
 private:
     /**
      * @brief Get form configure info.
@@ -822,9 +822,8 @@ private:
     std::map<std::string, sptr<IRemoteObject>> formObservers_;
     std::map<sptr<IRemoteObject>, sptr<IRemoteObject::DeathRecipient>> deathRecipients_;
 
-    void NotifyFormClickEvent(const int64_t formId, const std::string &formClickType);
-    ErrCode AddClickEventObserver(const sptr<IRemoteObject> &observer);
-    ErrCode RemoveClickEventObserver(const sptr<IRemoteObject> &observer);
+    void NotifyFormClickEvent(int64_t formId, const std::string &formClickType);
+
     /**
      * @brief Get caller type.
      * @param bundleName the caller's bundle name.

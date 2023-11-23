@@ -143,7 +143,7 @@ FormMgrStub::FormMgrStub()
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_CLICK_CALLBACK)] =
         &FormMgrStub::HandleRegisterClickCallbackEventObserver;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_CLICK_CALLBACK)] =
-        &FormMgrStub::HandleUnRegisterClickCallbackEventObserver;
+        &FormMgrStub::HandleUnregisterClickCallbackEventObserver;
 }
 
 FormMgrStub::~FormMgrStub()
@@ -1131,7 +1131,7 @@ int32_t FormMgrStub::HandleRegisterClickCallbackEventObserver(MessageParcel &dat
     return result;
 }
 
-int32_t FormMgrStub::HandleUnRegisterClickCallbackEventObserver(MessageParcel &data, MessageParcel &reply)
+int32_t FormMgrStub::HandleUnregisterClickCallbackEventObserver(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_DEBUG("Called.");
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
@@ -1139,7 +1139,7 @@ int32_t FormMgrStub::HandleUnRegisterClickCallbackEventObserver(MessageParcel &d
         HILOG_ERROR("Failed to get remote object.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    int32_t result = UnRegisterClickCallbackEventObserver(callerToken);
+    int32_t result = UnregisterClickCallbackEventObserver(callerToken);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("Failed to write result");
         return ERR_APPEXECFWK_PARCEL_ERROR;

@@ -1303,7 +1303,7 @@ ErrCode FormMgr::RegisterClickCallbackEventObserver(const sptr<IRemoteObject> &o
     return remoteProxy_->RegisterClickCallbackEventObserver(observer);
 }
 
-ErrCode FormMgr::UnRegisterClickCallbackEventObserver(const sptr<IRemoteObject> &observer)
+ErrCode FormMgr::UnregisterClickCallbackEventObserver(const sptr<IRemoteObject> &observer)
 {
     if (observer == nullptr) {
         HILOG_ERROR("Caller token parameteris empty.");
@@ -1318,7 +1318,7 @@ ErrCode FormMgr::UnRegisterClickCallbackEventObserver(const sptr<IRemoteObject> 
         HILOG_ERROR("Failed, errCode:%{public}d.", errCode);
         return errCode;
     }
-    return remoteProxy_->UnRegisterClickCallbackEventObserver(observer);
+    return remoteProxy_->UnregisterClickCallbackEventObserver(observer);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

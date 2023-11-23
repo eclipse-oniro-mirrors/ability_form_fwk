@@ -89,6 +89,8 @@ public:
     MOCK_METHOD5(RequestPublishProxyForm, ErrCode(Want &want, bool withFormBindingData,
         std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
         const std::vector<FormDataProxy> &formDataProxies));
+    MOCK_METHOD1(RegisterClickCallbackEventObserver, ErrCode(const sptr<IRemoteObject> &observer));
+    MOCK_METHOD1(UnregisterClickCallbackEventObserver, ErrCode(const sptr<IRemoteObject> &observer));
 };
 }
 }

@@ -2197,7 +2197,7 @@ int FormMgrAdapter::BackgroundEvent(const int64_t formId, Want &want, const sptr
         HILOG_ERROR("Failed to StartAbilityByCall, result: %{public}d.", result);
         return result;
     }
-    NotifyFormClickEvent(formId, FORM_CLICK_CALL)
+    NotifyFormClickEvent(formId, FORM_CLICK_CALL);
     return ERR_OK;
 }
 
@@ -2938,15 +2938,14 @@ int32_t FormMgrAdapter::UnregisterPublishFormInterceptor(const sptr<IRemoteObjec
     return ERR_APPEXECFWK_FORM_INVALID_PARAM;
 }
 
-ErrCode FormMgrAdapter::AddClickEventObserver(const sptr<IRemoteObject> &observer)
+ErrCode FormMgrAdapter::RegisterClickCallbackEventObserver(const sptr<IRemoteObject> &observer)
 {
-    auto result = ERR_APPEXECFWK_FORM_INVALID_PARAM;
     if (observer == nullptr) {
-        HILOG_ERROR("Observer object is null.");
-        return result;
+        HILOG_ERROR("Caller token is null.");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    std::lock_guard<std::mutex> lock(clickEventObserversMutex_);
+    std::unique_lock<std::mutex> lock(clickEventObserversMutex_);
     if (clickEventObservers_.find(observer) != clickEventObservers_.end()) {
         HILOG_DEBUG("The observer has been added.");
         return ERR_OK;
@@ -2955,28 +2954,23 @@ ErrCode FormMgrAdapter::AddClickEventObserver(const sptr<IRemoteObject> &observe
     sptr<IRemoteObject::DeathRecipient> deathRecipient = new (std::nothrow) FormMgrAdapter::ClientDeathRecipient();
     if (deathRecipient == nullptr) {
         HILOG_ERROR("Create deathRecipient object is null.");
-        return result;
-    }
-
-    observer->AddDeathRecipient(deathRecipient);
-    auto empaceResult = clickEventObservers_.emplace(observer, deathRecipient);
-    if (empaceResult.second) {
-        return ERR_OK;
-    }
-
-    HILOG_DEBUG("Emplace data error.");
-    return result;
-}
-
-ErrCode FormMgrAdapter::RemoveClickEventObserver(const sptr<IRemoteObject> &observer)
-{
-    HILOG_DEBUG("Called.");
-    if (observer == nullptr) {
-        HILOG_ERROR("Observer object is nullptr");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    std::lock_guard<std::mutex> lock(clickEventObserversMutex_);
+    observer->AddDeathRecipient(deathRecipient);
+    clickEventObservers_.emplace(observer, deathRecipient);
+
+    return ERR_OK;
+}
+
+ErrCode FormMgrAdapter::UnregisterClickCallbackEventObserver(const sptr<IRemoteObject> &observer)
+{
+    if (observer == nullptr) {
+        HILOG_ERROR("Caller token is null.");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    std::unique_lock<std::mutex> lock(clickEventObserversMutex_);
     auto iter = clickEventObservers_.find(observer);
     if (iter == clickEventObservers_.end()) {
         HILOG_DEBUG("The observer not found.");
@@ -2991,37 +2985,20 @@ ErrCode FormMgrAdapter::RemoveClickEventObserver(const sptr<IRemoteObject> &obse
     return ERR_OK;
 }
 
-ErrCode FormMgrAdapter::RegisterClickCallbackEventObserver(const sptr<IRemoteObject> &observer)
-{
-    if (observer == nullptr) {
-        HILOG_ERROR("Caller token is null.");
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
-    }
-    return AddClickEventObserver(observer);
-}
-
-ErrCode FormMgrAdapter::UnRegisterClickCallbackEventObserver(const sptr<IRemoteObject> &observer)
-{
-    if (observer == nullptr) {
-        HILOG_ERROR("Caller token is null.");
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
-    }
-    return RemoveClickEventObserver(observer);
-}
-
-void FormMgrAdapter::NotifyFormClickEvent(const int64_t formId, const std::string &formClickType)
+void FormMgrAdapter::NotifyFormClickEvent(int64_t formId, const std::string &formClickType)
 {
     HILOG_DEBUG("Called.");
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
     RunningFormInfo runningFormInfo;
     FormDataMgr::GetInstance().GetRunningFormInfosByFormId(matchedFormId, runningFormInfo);
-    std::lock_guard<std::mutex> lock(clickEventObserversMutex_);
+    std::unique_lock<std::mutex> lock(clickEventObserversMutex_);
     for (const auto &item : clickEventObservers_) {
         if (item.first == nullptr) {
             continue;
         }
 
-        if (auto formStateObs = iface_cast<AbilityRuntime::IJsFormStateObserver>(item.first); formStateObs != nullptr) {
+        auto formStateObs = iface_cast<AbilityRuntime::IJsFormStateObserver>(item.first);
+        if (formStateObs != nullptr) {
             formStateObs->OnFormClickEvent(formClickType, runningFormInfo);
         }
     }

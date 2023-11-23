@@ -1409,7 +1409,7 @@ ErrCode FormMgrService::RegisterClickCallbackEventObserver(const sptr<IRemoteObj
     return FormMgrAdapter::GetInstance().RegisterClickCallbackEventObserver(observer);
 }
 
-ErrCode FormMgrService::UnRegisterClickCallbackEventObserver(const sptr<IRemoteObject> &observer)
+ErrCode FormMgrService::UnregisterClickCallbackEventObserver(const sptr<IRemoteObject> &observer)
 {
     HILOG_DEBUG("Called.");
     if (observer == nullptr) {
@@ -1421,7 +1421,7 @@ ErrCode FormMgrService::UnRegisterClickCallbackEventObserver(const sptr<IRemoteO
         HILOG_ERROR("Fail, register form add observer permission denied");
         return ret;
     }
-    return FormMgrAdapter::GetInstance().UnRegisterClickCallbackEventObserver(observer);
+    return FormMgrAdapter::GetInstance().UnregisterClickCallbackEventObserver(observer);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -1873,7 +1873,7 @@ ErrCode FormMgrProxy::RegisterClickCallbackEventObserver(const sptr<IRemoteObjec
     return reply.ReadInt32();
 }
 
-ErrCode FormMgrProxy::UnRegisterClickCallbackEventObserver(const sptr<IRemoteObject> &observer)
+ErrCode FormMgrProxy::UnregisterClickCallbackEventObserver(const sptr<IRemoteObject> &observer)
 {
     HILOG_DEBUG("Click callback event start.");
     MessageParcel data;

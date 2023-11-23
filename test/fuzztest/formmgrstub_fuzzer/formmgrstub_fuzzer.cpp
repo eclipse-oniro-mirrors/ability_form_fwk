@@ -226,6 +226,16 @@ public:
     {
         return ERR_OK;
     }
+
+    ErrCode RegisterClickCallbackEventObserver(const sptr<IRemoteObject> &observer) override
+    {
+        return ERR_OK;
+    }
+
+    ErrCode UnregisterClickCallbackEventObserver(const sptr<IRemoteObject> &observer) override
+    {
+        return ERR_OK;
+    }
 };
 
 uint32_t GetU32Data(const char* ptr)

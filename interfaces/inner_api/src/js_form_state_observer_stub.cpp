@@ -37,7 +37,6 @@ JsFormStateObserverStub::JsFormStateObserverStub()
         &JsFormStateObserverStub::HandleNotifyWhetherFormsVisible;
     memberFuncMap_[static_cast<uint32_t>(IJsFormStateObserver::Message::FORM_STATE_OBSERVER_ON_FORM_CLICK)] =
         &JsFormStateObserverStub::HandleOnFormClick;
-
 }
 
 JsFormStateObserverStub::~JsFormStateObserverStub()

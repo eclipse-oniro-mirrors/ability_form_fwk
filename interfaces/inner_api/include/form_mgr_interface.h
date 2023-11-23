@@ -493,18 +493,18 @@ public:
     }
 
     /**
-     * @brief Register click call observer.
+     * @brief Register click callback observer.
      * @param observer Form click event callback listener.
      * @return Returns ERR_OK on success, others on failure.
      */
     virtual ErrCode RegisterClickCallbackEventObserver(const sptr<IRemoteObject> &observer) = 0;
 
     /**
-     * @brief Unregister click call observer.
+     * @brief Unregister click callback observer.
      * @param observer Form click event callback listener.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual ErrCode UnRegisterClickCallbackEventObserver(const sptr<IRemoteObject> &observer) = 0;
+    virtual ErrCode UnregisterClickCallbackEventObserver(const sptr<IRemoteObject> &observer) = 0;
 
     enum class Message {
         // ipc id 1-1000 for kit

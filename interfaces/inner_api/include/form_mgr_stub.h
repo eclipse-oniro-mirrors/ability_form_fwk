@@ -423,7 +423,7 @@ private:
      * @param reply output param
      * @return Return ERR_OK on success, others on failure
     */
-    int32_t HandleUnRegisterClickCallbackEventObserver(MessageParcel &data, MessageParcel &reply);
+    int32_t HandleUnregisterClickCallbackEventObserver(MessageParcel &data, MessageParcel &reply);
 
     bool ReadFormDataProxies(MessageParcel &data, std::vector<FormDataProxy> &formDataProxies);
 private:

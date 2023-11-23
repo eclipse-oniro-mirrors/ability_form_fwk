@@ -514,18 +514,19 @@ public:
     int32_t UnregisterPublishFormInterceptor(const sptr<IRemoteObject> &interceptorCallback) override;
 
     /**
-     * @brief Register click call observer.
+     * @brief Register click callback observer.
      * @param observer Form click event callback listener.
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode RegisterClickCallbackEventObserver(const sptr<IRemoteObject> &observer) override;
 
     /**
-     * @brief Unregister click call observer.
+     * @brief Unregister click callback observer.
      * @param observer Form click event callback listener.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode UnRegisterClickCallbackEventObserver(const sptr<IRemoteObject> &observer) override;
+    ErrCode UnregisterClickCallbackEventObserver(const sptr<IRemoteObject> &observer) override;
+
 private:
     /**
      * OnAddSystemAbility, OnAddSystemAbility will be called when the listening SA starts.
