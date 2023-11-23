@@ -542,5 +542,15 @@ int32_t FormItemInfo::GetProviderUid() const
 {
     return uid_;
 }
+
+void FormItemInfo::SetDescription(const std::string &description)
+{
+    description_ = description;
+}
+
+std::string FormItemInfo::GetDescription() const
+{
+    return description_;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -226,6 +226,8 @@ namespace Constants {
     constexpr int32_t FORM_SHARE = 2;
     // Specify the form Id
     constexpr const char* PARAM_FORM_MIGRATE_FORM_KEY = "ohos.extra.param.key.migrate_form";
+    // For click message event
+    constexpr const char* KEY_DIRECT_CALL_INAPP = "directCallInApp";
 }  // namespace Constants
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -102,17 +102,39 @@ public:
 
     ErrCode DelFormNotifyVisibleCallbackByBundle(const std::string bundleName, bool isVisibility,
         napi_value jsObserverObject, sptr<JsFormStateObserver> &formObserver);
+
+    ErrCode OnFormClickEvent(
+        const std::string &callType, const AppExecFwk::RunningFormInfo &runningFormInfo);
+
+    bool IsFormClickCallbackMapEmpty();
+
+    ErrCode FormClickAddCallTask(napi_env env, napi_value callback,
+        std::vector<std::shared_ptr<NativeReference>> &callbacks);
+
+    ErrCode RegisterClickCallbackEventCallback(const napi_env env, const std::string &bundleName,
+        const napi_value callback, const std::string &type);
+
+    ErrCode UnregisterClickCallbackEventCallback(const napi_env env,
+        const std::string &bundleName, const napi_value callback, const std::string &type);
+
+    ErrCode ClearFormClickCallbackByBundleName(const std::string &type,
+        const std::string &bundleName);
+
+    ErrCode ClearFormClickCallback(const std::string &type, const std::string &bundleName,
+        const napi_value &callback);
 private:
     static std::mutex mutex_;
     static sptr<JsFormStateObserver> instance_;
     mutable std::mutex addFormCallbackMutex_;
     mutable std::mutex removeFormCallbackMutex_;
     mutable std::mutex formIsvisibleCallbackMutex_;
+    mutable std::mutex formClickCallbackMutex_;
 
     std::map<std::string, std::vector<std::shared_ptr<FormAddCallbackClient>>> formAddCallbackMap_;
     std::map<std::string, std::vector<std::shared_ptr<FormRemoveCallbackClient>>> formRemoveCallbackMap_;
     std::map<std::string, std::shared_ptr<NativeReference>> formVisibleCallbackMap_;
     std::map<std::string, std::shared_ptr<NativeReference>> formInvisibleCallbackMap_;
+    std::map<std::string, std::map<std::string, std::vector<std::shared_ptr<NativeReference>>>> formClickCallbackMap_;
     napi_env env_ = nullptr;
     std::shared_ptr<AppExecFwk::EventHandler> handler_ = nullptr;
 };

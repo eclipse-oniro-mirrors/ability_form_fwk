@@ -409,6 +409,22 @@ private:
      */
     int32_t HandleUnregisterPublishFormInterceptor(MessageParcel &data, MessageParcel &reply);
 
+    /**
+     * @brief Handle retister click callback event observer message.
+     * @param data input param
+     * @param reply output param
+     * @return Return ERR_OK on success, others on failure
+    */
+    int32_t HandleRegisterClickCallbackEventObserver(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle unretister click callback event observer message.
+     * @param data input param
+     * @param reply output param
+     * @return Return ERR_OK on success, others on failure
+    */
+    int32_t HandleUnRegisterClickCallbackEventObserver(MessageParcel &data, MessageParcel &reply);
+
     bool ReadFormDataProxies(MessageParcel &data, std::vector<FormDataProxy> &formDataProxies);
 private:
     using FormMgrFunc = int32_t (FormMgrStub::*)(MessageParcel &data, MessageParcel &reply);

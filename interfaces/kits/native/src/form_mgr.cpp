@@ -1283,5 +1283,42 @@ ErrCode FormMgr::RegisterRemoveObserver(const std::string &bundleName, const spt
     }
     return remoteProxy_->RegisterRemoveObserver(bundleName, callerToken);
 }
+
+ErrCode FormMgr::RegisterClickCallbackEventObserver(const sptr<IRemoteObject> &observer)
+{
+    HILOG_DEBUG("Called.");
+    if (observer == nullptr) {
+        HILOG_ERROR("Caller token parameteris empty.");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
+        HILOG_ERROR("Error, form is in recover status, can't do action on form.");
+        return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
+    }
+    int errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("Failed, errCode:%{public}d.", errCode);
+        return errCode;
+    }
+    return remoteProxy_->RegisterClickCallbackEventObserver(observer);
+}
+
+ErrCode FormMgr::UnRegisterClickCallbackEventObserver(const sptr<IRemoteObject> &observer)
+{
+    if (observer == nullptr) {
+        HILOG_ERROR("Caller token parameteris empty.");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
+        HILOG_ERROR("Error, form is in recover status, can't do action on form.");
+        return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
+    }
+    int errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("Failed, errCode:%{public}d.", errCode);
+        return errCode;
+    }
+    return remoteProxy_->UnRegisterClickCallbackEventObserver(observer);
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

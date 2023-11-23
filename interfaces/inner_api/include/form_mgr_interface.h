@@ -492,6 +492,20 @@ public:
         return 0;
     }
 
+    /**
+     * @brief Register click call observer.
+     * @param observer Form click event callback listener.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode RegisterClickCallbackEventObserver(const sptr<IRemoteObject> &observer) = 0;
+
+    /**
+     * @brief Unregister click call observer.
+     * @param observer Form click event callback listener.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode UnRegisterClickCallbackEventObserver(const sptr<IRemoteObject> &observer) = 0;
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -556,6 +570,8 @@ public:
         FORM_MGR_RELEASE_RENDERER,
         FORM_MGR_REGISTER_PUBLISH_FORM_INTERCEPTOR,
         FORM_MGR_UNREGISTER_PUBLISH_FORM_INTERCEPTOR,
+        FORM_MGR_REGISTER_CLICK_CALLBACK,
+        FORM_MGR_UNREGISTER_CLICK_CALLBACK,
     };
 };
 }  // namespace AppExecFwk

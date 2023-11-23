@@ -349,6 +349,18 @@ public:
      * @return uid.
      */
     int32_t GetProviderUid() const;
+
+    /**
+     * @brief Save the description of formInfo.
+     * @param description The description of formInfo.
+     */
+    void SetDescription(const std::string &description);
+    /**
+     * @brief Get the description of formInfo.
+     * @return description.
+     */
+    std::string GetDescription() const;
+
 private:
     /**
      * @brief Equal or not.
@@ -390,6 +402,7 @@ private:
     bool dataProxyEnabled_ = false;
     bool isSystemApp_ = false;
     int32_t uid_ = -1;
+    std::string description_ = "";
 };
 } // namespace AppExecFwk
 } // namespace OHOS
