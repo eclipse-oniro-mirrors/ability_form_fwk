@@ -213,7 +213,7 @@ private:
             return OnRegisterFormIsVisibleObserver(env, argc, argv, true);
         } else if (type == "notifyInvisible") {
             return OnRegisterFormIsVisibleObserver(env, argc, argv, false);
-        } else if (type == "router" || type == "message"|| type == "call") {
+        } else if (type == "router" || type == "message" || type == "call") {
             return OnRegisterClickCallbackEventCallback(env, argc, argv, type);
         } else {
             HILOG_ERROR("args[0] should be formAdd, formRemove, notifyVisible, notifyInvisible, router, message, call");
@@ -737,7 +737,6 @@ private:
                 NapiFormUtil::ThrowParamTypeError(env, "callback", "Callback<formInfo.RunningFormInfo>");
                 return CreateJsUndefined(env);
             }
-            HILOG_DEBUG("Input three parameters.");
             callFunc = argv[PARAM2];
         }
         if (AppExecFwk::IsTypeForNapiValue(env, argv[PARAM1], napi_function)) {

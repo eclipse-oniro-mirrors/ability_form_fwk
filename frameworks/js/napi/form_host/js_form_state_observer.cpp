@@ -526,7 +526,6 @@ ErrCode JsFormStateObserver::OnFormClickEvent(
                 for (const auto &callback : callBacks->second) {
                     napi_value value = callback->GetNapiValue();
                     napi_value argv[] = { CreateRunningFormInfo(sharedThis->env_, runningFormInfo) };
-                    HILOG_DEBUG("Callfunction successful");
                     napi_call_function(sharedThis->env_, value, value, sizeof(argv) / sizeof(argv[0]), argv, nullptr);
                 }
             }
@@ -544,7 +543,6 @@ ErrCode JsFormStateObserver::OnFormClickEvent(
     return ERR_OK;
 }
 
-
 bool JsFormStateObserver::IsFormClickCallbackMapEmpty()
 {
     HILOG_DEBUG("Called.");
@@ -552,7 +550,6 @@ bool JsFormStateObserver::IsFormClickCallbackMapEmpty()
         HILOG_DEBUG("Form click callback map is empty.");
         return true;
     }
-    HILOG_DEBUG("Form click callback map is not empty.");
     return false;
 }
 
@@ -611,7 +608,7 @@ ErrCode JsFormStateObserver::RegisterClickCallbackEventCallback(
         std::vector<std::shared_ptr<NativeReference>> callbacks;
         napi_create_reference(env, callback, REF_COUNT, &callbackRef);
         callbacks.emplace_back(std::shared_ptr<NativeReference>(reinterpret_cast<NativeReference *>(callbackRef)));
-        std::map<std::string, std::vector<std::shared_ptr<NativeReference>>> typeMap = { {bundleName, callbacks} };
+        std::map<std::string, std::vector<std::shared_ptr<NativeReference>>> typeMap = { { bundleName, callbacks } };
         formClickCallbackMap_[type] = typeMap;
     }
     return ERR_OK;
@@ -653,12 +650,12 @@ ErrCode JsFormStateObserver::ClearFormClickCallback(
         HILOG_ERROR("There is no bundlename has been registed");
         return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
     }
-    auto iter = std::find_if(
-        callBacks->second.begin(), callBacks->second.end(), [env = env_, callback](const auto &cb) {
-        bool isEqual;
-        napi_strict_equals(env, cb->GetNapiValue(), callback, &isEqual);
-        return isEqual;
-    });
+    auto iter =
+        std::find_if(callBacks->second.begin(), callBacks->second.end(), [env = env_, callback](const auto &cb) {
+            bool isEqual;
+            napi_strict_equals(env, cb->GetNapiValue(), callback, &isEqual);
+            return isEqual;
+        });
     if (iter == callBacks->second.end()) {
         HILOG_ERROR("There is no callback has been registed");
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
