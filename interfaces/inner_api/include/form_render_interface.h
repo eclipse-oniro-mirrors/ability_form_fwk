@@ -42,7 +42,7 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     virtual int32_t RenderForm(const FormJsInfo &formJsInfo, const Want &want,
-        const sptr<IRemoteObject> &callerToken) = 0;
+        sptr<IRemoteObject> callerToken) = 0;
 
     /**
      * @brief Stop rendering form. This is sync API.

@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace AppExecFwk {
 int32_t FormRenderProxy::RenderForm(const FormJsInfo &formJsInfo, const Want &want,
-    const sptr<IRemoteObject> &callerToken)
+    sptr<IRemoteObject> callerToken)
 {
     MessageParcel data;
     MessageParcel reply;
