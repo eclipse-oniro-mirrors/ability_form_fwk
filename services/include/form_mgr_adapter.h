@@ -454,6 +454,16 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t UnregisterPublishFormInterceptor(const sptr<IRemoteObject> &interceptorCallback);
+
+    /**
+     * @brief Compare the locally configured update duration with the update duration in additionalInfo and
+     * return a larger value.
+     * @param formId The Id of the form.
+     * @param updateDuration The valid form update duration.
+     * @return Returns true on success, false on failure.
+     */
+    bool GetValidFormUpdateDuration(const int64_t formId, int64_t &updateDuration) const;
+
 private:
     /**
      * @brief Get form configure info.
@@ -826,6 +836,7 @@ private:
     ErrCode AllotForm(const int64_t formId, const Want &want,
         const sptr<IRemoteObject> &callerToken, FormJsInfo &formInfo, const FormItemInfo &formItemInfo);
 
+    void GetUpdateDurationFromAdditionalInfo(const std::string &additionalInfo, std::vector<int> &durationArray) const;
     /**
      * @class ClientDeathRecipient
      * notices IRemoteBroker died.
