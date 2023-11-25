@@ -76,6 +76,7 @@ group("unittest") {
     "unittest/fms_form_render_record_test:unittest",
     "unittest/fms_form_render_service_extension_test:unittest",
     "unittest/fms_form_render_stub_test:unittest",
+    "unittest/fms_form_router_proxy_mgr_test:unittest",
     "unittest/fms_form_serial_queue_test:unittest",
     "unittest/fms_form_set_next_refresh_test:unittest",
     "unittest/fms_form_share_mgr_test:unittest",

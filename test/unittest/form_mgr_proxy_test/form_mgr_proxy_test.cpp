@@ -363,6 +363,55 @@ HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0015, TestSize.Level1) {
 }
 
 /**
+ * @tc.name: FormMgrProxyTest_0016
+ * @tc.desc: text RegisterFormRouterProxy function.
+ * @tc.type: FUNC
+ * @tc.require: IssueI8H9R5
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0016, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_0016 starts";
+    int64_t formId = 2;
+    std::vector<int64_t> formIds;
+    formIds.push_back(formId);
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    int result = formMgrProxy ->RegisterFormRouterProxy(formIds, token);
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_0016 test ends";
+}
+
+/**
+ * @tc.name: FormMgrProxyTest_0017
+ * @tc.desc: text RegisterFormRouterProxy function.
+ * @tc.type: FUNC
+ * @tc.require: IssueI8H9R5
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0017, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_0016 starts";
+    int64_t formId = 2;
+    std::vector<int64_t> formIds;
+    formIds.push_back(formId);
+    int result = formMgrProxy ->RegisterFormRouterProxy(formIds, nullptr);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_0016 test ends";
+}
+
+/**
+ * @tc.name: FormMgrProxyTest_0018
+ * @tc.desc: text UnregisterFormRouterProxy function.
+ * @tc.type: FUNC
+ * @tc.require: IssueI8H9R5
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0018, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_0018 starts";
+    int64_t formId = 2;
+    std::vector<int64_t> formIds;
+    formIds.push_back(formId);
+    int result = formMgrProxy ->UnregisterFormRouterProxy(formIds);
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_0018 test ends";
+}
+
+/**
  * @tc.name: FormProviderProxyTest_0001
  * @tc.desc: text AcquireProviderFormInfo function.
  * @tc.type: FUNC
