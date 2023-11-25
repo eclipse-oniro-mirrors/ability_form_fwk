@@ -19,6 +19,7 @@
 #include <singleton.h>
 #include "ability_manager_interface.h"
 #include "bundle_mgr_interface.h"
+#include "bundle_installer_interface.h"
 #include "want.h"
 
 namespace OHOS {
@@ -53,6 +54,12 @@ public:
      * @return returns the bundle manager ipc object, or nullptr for failed.
      */
     sptr<IBundleMgr> GetBundleMgr();
+
+    /**
+     * @brief Acquire a bundle install manager, if it not existed,
+     * @return returns the bundle manager ipc object, or nullptr for failed.
+     */
+    sptr<IBundleInstaller> GetBundleInstaller();
 
     /**
      * @brief Add the bundle manager instance for debug.
@@ -149,6 +156,7 @@ private:
 
 private:
     sptr<IBundleMgr> iBundleMgr_ = nullptr;
+    sptr<IBundleInstaller> bundleInstallerProxy_ = nullptr;
     std::mutex ibundleMutex_;
 };
 }  // namespace AppExecFwk

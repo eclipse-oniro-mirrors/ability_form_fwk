@@ -65,6 +65,8 @@ namespace Constants {
     constexpr const char* PARAM_PUBLISH_FORM_HOST_BUNDLE_KEY = "ohos.extra.param.key.form_host_bundle_name";
     constexpr const char* PARAM_PUBLISH_FORM_HOST_MODULE_KEY = "ohos.extra.param.key.form_host_module_name";
     constexpr const char* PARAM_PUBLISH_FORM_HOST_ABILITY_KEY = "ohos.extra.param.key.form_host_ability_name";
+    constexpr const char* FRS_BUNDLE_NAME = "com.ohos.formrenderservice";
+    constexpr const char* FRS_APP_INDEX = "ohos.extra.param.key.frs_index";
     constexpr const char* PARAM_FORM_ID = "formID";
     constexpr const char* IS_FORM_AGENT = "isFormAgent";
     constexpr int32_t TYPE_RESET_LIMIT = 1;

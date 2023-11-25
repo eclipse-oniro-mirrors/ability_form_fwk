@@ -1547,6 +1547,7 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
     itemInfo.SetUiSyntax(formInfo.uiSyntax);
     itemInfo.SetIsDynamic(formInfo.isDynamic);
     itemInfo.SetTransparencyEnabled(formInfo.transparencyEnabled);
+    itemInfo.SetPrivacyLevel(formInfo.privacyLevel);
 
     for (const auto &abilityInfo : bundleInfo.abilityInfos) {
         if (abilityInfo.name == formInfo.abilityName) {

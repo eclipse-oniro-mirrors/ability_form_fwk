@@ -91,7 +91,8 @@ ErrCode FormInfoHelper::LoadStageFormConfigInfo(const BundleInfo &bundleInfo, st
 
         for (const auto &profileInfo: profileInfos) {
             std::vector<ExtensionFormInfo> extensionFormInfos;
-            ErrCode errCode = ExtensionFormProfile::TransformTo(profileInfo, extensionFormInfos);
+            int32_t privacyLevel = 0;
+            ErrCode errCode = ExtensionFormProfile::TransformTo(profileInfo, extensionFormInfos, privacyLevel);
             if (errCode != ERR_OK) {
                 HILOG_WARN("failed to transform profile to extension form info");
                 continue;
@@ -104,6 +105,7 @@ ErrCode FormInfoHelper::LoadStageFormConfigInfo(const BundleInfo &bundleInfo, st
                 if (GetFormInfoDescription(resourceManager, formInfo) != ERR_OK) {
                     HILOG_INFO("Get FormInfo Description fail");
                 }
+                formInfo.privacyLevel = privacyLevel;
                 formInfos.emplace_back(formInfo);
             }
         }

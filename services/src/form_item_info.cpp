@@ -503,6 +503,16 @@ void FormItemInfo::SetTransparencyEnabled(bool isTransparencyEnabled)
     transparencyEnabled_ = isTransparencyEnabled;
 }
 
+int32_t FormItemInfo::GetPrivacyLevel() const
+{
+    return privacyLevel_;
+}
+
+void FormItemInfo::SetPrivacyLevel(int32_t level)
+{
+    privacyLevel_ = level;
+}
+
 FormType FormItemInfo::GetUiSyntax() const
 {
     return uiSyntax_;
