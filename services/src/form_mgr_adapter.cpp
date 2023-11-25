@@ -49,6 +49,7 @@
 #include "form_provider_info.h"
 #include "form_provider_interface.h"
 #include "form_provider_mgr.h"
+#include "form_router_proxy_mgr.h"
 #include "form_render_connection.h"
 #include "form_render_mgr.h"
 #include "form_share_mgr.h"
@@ -74,8 +75,10 @@ using namespace OHOS::EcologicalRuleMgrService;
 namespace {
 constexpr int32_t CALLING_UID_TRANSFORM_DIVISOR = 200000;
 constexpr int32_t SYSTEM_UID = 1000;
+constexpr int32_t API_11 = 11;
 const std::string POINT_ETS = ".ets";
-
+constexpr int DATA_FIELD = 1;
+constexpr int FORM_UPDATE_LEVEL_VALUE_MAX_LENGTH = 3; // update level is 1~336, so max length is 3.
 const std::string EMPTY_BUNDLE = "";
 const std::string FORM_CLICK_ROUTER = "router";
 const std::string FORM_CLICK_MESSAGE = "message";
@@ -907,6 +910,19 @@ int FormMgrAdapter::DumpFormInfoByBundleName(const std::string &bundleName, std:
     if (!FormDataMgr::GetInstance().GetFormRecord(bundleName, formRecordInfos)) {
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
+
+    /**
+     * The updateDuration stored in FormRecord is the config.json configuration.
+     * The app gallery may modify the updateDuration.
+     * The real updateDuration value needs to be obtained from FormTimerMgr.
+     */
+    for (auto &formRecord : formRecordInfos) {
+        FormTimer formTimer;
+        if (formRecord.isEnableUpdate && formRecord.updateDuration > 0 &&
+            FormTimerMgr::GetInstance().GetIntervalTimer(formRecord.formId, formTimer)) {
+            formRecord.updateDuration = formTimer.period;
+        }
+    }
     FormDumpMgr::GetInstance().DumpFormInfos(formRecordInfos, formInfos);
     return ERR_OK;
 }
@@ -922,6 +938,16 @@ int FormMgrAdapter::DumpFormInfoByFormId(const std::int64_t formId, std::string 
     int reply = ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     FormRecord formRecord;
     if (FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
+        /**
+         * The updateDuration stored in FormRecord is the config.json configuration.
+         * The app gallery may modify the updateDuration.
+         * The real updateDuration value needs to be obtained from FormTimerMgr.
+         */
+        FormTimer formTimer;
+        if (formRecord.isEnableUpdate && formRecord.updateDuration > 0 &&
+            FormTimerMgr::GetInstance().GetIntervalTimer(formRecord.formId, formTimer)) {
+            formRecord.updateDuration = formTimer.period;
+        }
         FormDumpMgr::GetInstance().DumpFormInfo(formRecord, formInfo);
         reply = ERR_OK;
     }
@@ -1232,8 +1258,12 @@ ErrCode FormMgrAdapter::AddFormTimer(const FormRecord &formRecord)
         return ERR_OK;
     }
     if (formRecord.updateDuration > 0 && !formRecord.isDataProxy) {
+        int64_t updateDuration = formRecord.updateDuration;
+        if (!GetValidFormUpdateDuration(formRecord.formId, updateDuration)) {
+            HILOG_WARN("Get updateDuration failed, uses local configuration.");
+        }
         bool ret = FormTimerMgr::GetInstance().AddFormTimer(formRecord.formId,
-            formRecord.updateDuration, formRecord.providerUserId);
+            updateDuration, formRecord.providerUserId);
         return ret ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     if (formRecord.updateAtHour >= 0 && formRecord.updateAtMin >= 0) {
@@ -2085,6 +2115,11 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
     want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, formId);
     if (!want.GetUriString().empty()) {
         HILOG_INFO("Router by uri");
+        if (FormRouterProxyMgr::GetInstance().HasRouterProxy(formId)) {
+            HILOG_INFO("Router proxy was setted sucessful");
+            FormRouterProxyMgr::GetInstance().OnFormRouterEvent(formId, want);
+            return ERR_OK;
+        }
         int32_t result = FormAmsHelper::GetInstance().GetAbilityManager()->StartAbility(want, callerToken);
         if (result != ERR_OK && result != START_ABILITY_WAITING) {
             HILOG_ERROR("Failed to StartAbility, result: %{public}d.", result);
@@ -2113,7 +2148,11 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
             want.SetBundle(record.bundleName);
         }
     }
-
+    if (FormRouterProxyMgr::GetInstance().HasRouterProxy(formId)) {
+        HILOG_INFO("Router proxy was setted sucessful");
+        FormRouterProxyMgr::GetInstance().OnFormRouterEvent(formId, want);
+        return ERR_OK;
+    }
     int32_t result = FormAmsHelper::GetInstance().GetAbilityManager()->StartAbility(want, callerToken);
     if (result != ERR_OK && result != START_ABILITY_WAITING) {
         HILOG_ERROR("Failed to StartAbility, result: %{public}d.", result);
@@ -2840,6 +2879,108 @@ ErrCode FormMgrAdapter::RegisterRemoveObserver(const std::string &bundleName, co
     return ERR_OK;
 }
 
+ErrCode FormMgrAdapter::RegisterFormRouterProxy(
+    const std::vector<int64_t>& formIds, const sptr<IRemoteObject>& callerToken)
+{
+    HILOG_DEBUG("Called.");
+    if (callerToken == nullptr) {
+        HILOG_ERROR("CallerToken is nullptr.");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    std::vector<int64_t> matchedFormIds {};
+    std::vector<int64_t> hostOwnFormIds {};
+    auto uid = IPCSkeleton::GetCallingUid();
+    FormRecord record;
+    for (int64_t formId : formIds) {
+        if (formId <= 0) {
+            HILOG_WARN("FormId %{public}" PRId64 " is less than 0", formId);
+            continue;
+        }
+        auto matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+        if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record)) {
+            HILOG_ERROR("No matching formRecord was found for the formId: %{public}" PRId64 "", formId);
+            continue;
+        }
+        matchedFormIds.push_back(formId);
+
+        // Checks for cross-user operations.
+        if (record.providerUserId != FormUtil::GetCurrentAccountId()) {
+            HILOG_ERROR("The formId: %{public}" PRId64
+                        " corresponds to a card that is not for the currently active user.",
+                formId);
+            continue;
+        }
+        // Checks for cross-host operations
+        else if (std::find(record.formUserUids.begin(), record.formUserUids.end(), uid) == record.formUserUids.end()) {
+            HILOG_ERROR("The formId:%{public}" PRId64 " owned by other formHost", formId);
+            continue;
+        } else {
+            HILOG_DEBUG("The setup was sucessful, matchedFormIds: %{public}" PRId64 "", formId);
+            hostOwnFormIds.push_back(formId);
+        }
+    }
+    if (matchedFormIds.empty()) {
+        HILOG_ERROR("All formIds is Invalid!");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    if (hostOwnFormIds.empty()) {
+        HILOG_ERROR("All formIds was not setted by self!");
+        return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
+    }
+
+    return FormRouterProxyMgr::GetInstance().SetFormRouterProxy(hostOwnFormIds, callerToken);
+}
+
+ErrCode FormMgrAdapter::UnregisterFormRouterProxy(const std::vector<int64_t>& formIds)
+{
+    HILOG_DEBUG("Called.");
+    std::vector<int64_t> matchedFormIds {};
+    std::vector<int64_t> hostOwnFormIds {};
+    auto uid = IPCSkeleton::GetCallingUid();
+    FormRecord record;
+    for (int64_t formId : formIds) {
+        if (formId <= 0) {
+            HILOG_WARN("FormId %{public}" PRId64 " is less than 0", formId);
+            continue;
+        }
+        auto matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+        if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record)) {
+            HILOG_ERROR("No matching formRecord was found for the formId: %{public}" PRId64 "", formId);
+            continue;
+        }
+        matchedFormIds.push_back(formId);
+
+        // Checks for cross-user operations.
+        if (record.providerUserId != FormUtil::GetCurrentAccountId()) {
+            HILOG_ERROR("The formId: %{public}" PRId64
+                        " corresponds to a card that is not for the currently active user.",
+                formId);
+            continue;
+        }
+        // Checks for cross-host operations
+        else if (std::find(record.formUserUids.begin(), record.formUserUids.end(), uid) == record.formUserUids.end()) {
+            HILOG_ERROR("The formId:%{public}" PRId64 " owned by other formHost", formId);
+            continue;
+        } else {
+            HILOG_DEBUG("The setup was sucessful, matchedFormIds: %{public}" PRId64 "", formId);
+            hostOwnFormIds.push_back(formId);
+        }
+    }
+    if (matchedFormIds.empty()) {
+        HILOG_ERROR("All formIds is Invalid!");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    if (hostOwnFormIds.empty()) {
+        HILOG_ERROR("All formIds was not setted by self!");
+        return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
+    }
+
+    return FormRouterProxyMgr::GetInstance().RemoveFormRouterProxy(hostOwnFormIds);
+}
+
 void FormMgrAdapter::SetDeathRecipient(const sptr<IRemoteObject> &callerToken,
     const sptr<IRemoteObject::DeathRecipient> &deathRecipient)
 {
@@ -3003,6 +3144,82 @@ void FormMgrAdapter::NotifyFormClickEvent(int64_t formId, const std::string &for
         }
     }
 }
+bool FormMgrAdapter::GetValidFormUpdateDuration(const int64_t formId, int64_t &updateDuration) const
+{
+    HILOG_DEBUG("Called.");
+    FormRecord formRecord;
+    if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
+        HILOG_ERROR("Error, not exist such form:%{public}" PRId64 ".", formId);
+        return false;
+    }
+
+    ApplicationInfo appInfo;
+    if (FormBmsHelper::GetInstance().GetApplicationInfo(formRecord.bundleName, FormUtil::GetCurrentAccountId(),
+        appInfo) != ERR_OK) {
+        HILOG_ERROR("Get app info failed.");
+        return false;
+    }
+
+    if (appInfo.apiTargetVersion < API_11) {
+        HILOG_INFO("API version is lower than 11, uses local configuration.");
+        updateDuration = formRecord.updateDuration;
+        return true;
+    }
+
+    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
+    if (iBundleMgr == nullptr) {
+        HILOG_ERROR("Failed to get IBundleMgr, uses local configuration.");
+        updateDuration = formRecord.updateDuration;
+        return true;
+    }
+
+    std::string additionalInfo;
+    if (IN_PROCESS_CALL(iBundleMgr->GetAdditionalInfo(formRecord.bundleName, additionalInfo)) != ERR_OK) {
+        HILOG_ERROR("Failed to get GetAdditionalInfo, uses local configuration.");
+        updateDuration = formRecord.updateDuration;
+        return true;
+    }
+
+    if (additionalInfo.empty()) {
+        HILOG_DEBUG("AdditionalInfo is empty, uses local configuration.");
+        updateDuration = formRecord.updateDuration;
+        return true;
+    }
+
+    std::vector<int> durationArray;
+    GetUpdateDurationFromAdditionalInfo(additionalInfo, durationArray);
+    if (durationArray.empty()) {
+        HILOG_INFO("No valid formUpdateLevel in additionalInfo, uses local configuration.");
+        updateDuration = formRecord.updateDuration;
+        return true;
+    }
+
+    int duration = durationArray.back();
+    int64_t cloudsDuration = duration * Constants::TIME_CONVERSION;
+    updateDuration = std::max(formRecord.updateDuration, cloudsDuration);
+    return true;
+}
+
+void FormMgrAdapter::GetUpdateDurationFromAdditionalInfo(
+    const std::string &additionalInfo, std::vector<int> &durationArray) const
+{
+    std::regex regex(R"(formUpdateLevel:(\d+))");
+    std::smatch searchResult;
+    std::string::const_iterator iterStart = additionalInfo.begin();
+    std::string::const_iterator iterEnd = additionalInfo.end();
+
+    while (std::regex_search(iterStart, iterEnd, searchResult, regex)) {
+        iterStart = searchResult[0].second;
+        if (searchResult[DATA_FIELD].str().length() > FORM_UPDATE_LEVEL_VALUE_MAX_LENGTH) {
+            continue;
+        }
+        int val = std::stoi(searchResult[DATA_FIELD].str());
+        if (val >= Constants::MIN_CONFIG_DURATION && val <= Constants::MAX_CONFIG_DURATION) {
+            durationArray.emplace_back(val);
+        }
+    }
+}
+
 #ifdef SUPPORT_ERMS
 int32_t FormMgrAdapter::GetCallerType(std::string bundleName)
 {

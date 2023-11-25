@@ -21,6 +21,7 @@
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
 #include "form_data_mgr.h"
+#include "form_host_delegate_proxy.h"
 #include "form_host_interface.h"
 #include "form_mgr_adapter.h"
 #include "form_mgr_errors.h"
@@ -986,6 +987,46 @@ void FormTaskMgr::RemoveConnection(int32_t connectId)
         return;
     }
     formSupplyCallback->RemoveConnection(connectId);
+}
+
+/**
+ * @brief want data from form router event(task).
+ * @param formId The id of the form.
+ * @param remoteObject Form router proxy manager object.
+ * @param want The want of the form for router event.
+ */
+void FormTaskMgr::PostRouterProxyToHost(const int64_t formId, const sptr<IRemoteObject> &remoteObject, const Want &want)
+{
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("Fail, serialQueue_ invalidate.");
+        return;
+    }
+
+    auto routerProxyFunc = [formId, want, remoteObject]() {
+        FormTaskMgr::GetInstance().FormRouterEventProxy(formId, remoteObject, want);
+    };
+    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, routerProxyFunc);
+}
+
+/**
+ * @brief Form router event proxy.
+ * @param formId The id of the form.
+ * @param remoteObject Form router proxy manager object.
+ * @param want The want of the form for router event.
+ */
+void FormTaskMgr::FormRouterEventProxy(const int64_t formId, const sptr<IRemoteObject> &remoteObject, const Want &want)
+{
+    if (remoteObject == nullptr) {
+        HILOG_ERROR("Fail, remoteObject is nullptr!");
+        return;
+    }
+    
+    sptr<IFormHostDelegate> remoteFormHostDelegateProxy = iface_cast<IFormHostDelegate>(remoteObject);
+    if (remoteFormHostDelegateProxy == nullptr) {
+        HILOG_ERROR("Fail, remoteFormHostDelegateProxy is nullptr!");
+        return;
+    }
+    remoteFormHostDelegateProxy->RouterEvent(formId, want);
 }
 } // namespace AppExecFwk
 } // namespace OHOS

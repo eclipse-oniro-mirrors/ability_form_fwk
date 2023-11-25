@@ -30,6 +30,7 @@ enum UpdateType {
     TYPE_INTERVAL_TO_ATTIME,
     TYPE_ATTIME_TO_INTERVAL,
     TYPE_INTERVAL_ONCE,
+    TYPE_NO_CHANGE,
 };
 /**
  * @class FormTimer

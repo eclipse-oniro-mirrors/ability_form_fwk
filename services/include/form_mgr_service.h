@@ -244,6 +244,22 @@ public:
                                  FormStateInfo &stateInfo) override;
 
     /**
+     * @brief Register form router event proxy.
+     * @param formIds Indicates the ID of the forms.
+     * @param callerToken Host client.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode RegisterFormRouterProxy(const std::vector<int64_t> &formIds,
+                                            const sptr<IRemoteObject> &callerToken) override;
+
+    /**
+     * @brief Unregister form router event proxy.
+     * @param formIds Indicates the ID of the forms.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode UnregisterFormRouterProxy(const std::vector<int64_t> &formIds) override;
+
+    /**
      * @brief Notify the form is visible or not.
      * @param formIds Indicates the ID of the forms.
      * @param isVisible Visible or not.

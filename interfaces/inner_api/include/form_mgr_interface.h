@@ -448,6 +448,22 @@ public:
     virtual ErrCode RegisterRemoveObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken) = 0;
 
     /**
+     * @brief Register form router event proxy.
+     * @param formIds Indicates the id of the forms.
+     * @param callerToken Router proxy call back client.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode RegisterFormRouterProxy(const std::vector<int64_t> &formIds,
+        const sptr<IRemoteObject> &callerToken) = 0;
+
+    /**
+     * @brief Unregister form router event proxy.
+     * @param formIds Indicates the id of the forms.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode UnregisterFormRouterProxy(const std::vector<int64_t> &formIds) = 0;
+
+    /**
      * @brief Update proxy form with formId.
      * @param formId The Id of the form to update.
      * @param FormProviderData Form binding data.
@@ -572,6 +588,8 @@ public:
         FORM_MGR_UNREGISTER_PUBLISH_FORM_INTERCEPTOR,
         FORM_MGR_REGISTER_CLICK_CALLBACK,
         FORM_MGR_UNREGISTER_CLICK_CALLBACK,
+        FORM_MGR_REGISTER_FORM_ROUTER_PROXY,
+        FORM_MGR_UNREGISTER_FORM_ROUTER_PROXY,
     };
 };
 }  // namespace AppExecFwk

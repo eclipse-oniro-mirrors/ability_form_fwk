@@ -359,6 +359,16 @@ public:
         GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnAcquireFormData);
     }
 
+    static napi_value SetRouterProxy(napi_env env, napi_callback_info info)
+    {
+        GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnSetRouterProxy);
+    }
+
+    static napi_value ClearRouterProxy(napi_env env, napi_callback_info info)
+    {
+        GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnClearRouterProxy);
+    }
+
     static napi_value NotifyFormsPrivacyProtected(napi_env env, napi_callback_info info)
     {
         GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnNotifyFormsPrivacyProtected);
@@ -891,6 +901,94 @@ private:
         FormHostClient::GetInstance()->RegisterUninstallCallback(FormUninstallCallback);
         AddFormUninstallCallback(env, argv[1]);
         return CreateJsUndefined(env);
+    }
+
+    napi_value OnSetRouterProxy(napi_env env, size_t argc, napi_value* argv)
+    {
+        if (argc > ARGS_THREE || argc < ARGS_TWO) {
+            HILOG_ERROR("Wrong number of arguments.");
+            NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "2 or 3");
+            return CreateJsUndefined(env);
+        }
+        decltype(argc) convertArgc = 0;
+
+        // Check the type of the PARAM0.
+        std::vector<int64_t> formIds;
+        if (!ConvertFromIds(env, argv[PARAM0], formIds)) {
+            HILOG_ERROR("Form id list is invalid.");
+            NapiFormUtil::ThrowParamTypeError(env, "formIds", "Array<string>");
+            return CreateJsUndefined(env);
+        }
+        convertArgc++;
+
+        // Check the type of the PARAM1.
+        if (!IsTypeForNapiValue(env, argv[PARAM1], napi_function)) {
+            HILOG_ERROR("Param2 is invalid");
+            NapiFormUtil::ThrowParamTypeError(env, "callback", "Callback<Want>");
+            return CreateJsUndefined(env);
+        }
+        convertArgc++;
+
+        auto apiResult = std::make_shared<int32_t>();
+        JsFormRouterProxyMgr::GetInstance()->AddFormRouterProxyCallback(env, argv[PARAM1], formIds);
+        auto execute = [formIds, ret = apiResult]() {
+            *ret = FormMgr::GetInstance().RegisterFormRouterProxy(formIds, JsFormRouterProxyMgr::GetInstance());
+        };
+
+        NapiAsyncTask::CompleteCallback complete =
+            [ret = apiResult](napi_env env, NapiAsyncTask &task, int32_t status) {
+                if (*ret == ERR_OK) {
+                    task.ResolveWithNoError(env, CreateJsUndefined(env));
+                } else {
+                    task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, *ret));
+                }
+            };
+
+        napi_value lastParam = (argc <= convertArgc) ? nullptr : argv[convertArgc];
+        napi_value result = nullptr;
+        NapiAsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnSetRouterProxy",
+            env, CreateAsyncTaskWithLastParam(env, lastParam, std::move(execute), std::move(complete), &result));
+        return result;
+    }
+
+    napi_value OnClearRouterProxy(napi_env env, size_t argc, napi_value* argv)
+    {
+        // Check the number of input parameters.
+        if (argc > ARGS_TWO || argc < ARGS_ONE) {
+            HILOG_ERROR("Wrong number of arguments.");
+            NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1 or 2");
+            return CreateJsUndefined(env);
+        }
+        decltype(argc) convertArgc = 0;
+
+        // Check the type of the PARAM0.
+        std::vector<int64_t> formIds;
+        if (!ConvertFromIds(env, argv[PARAM0], formIds)) {
+            HILOG_ERROR("Form id list is invalid.");
+            NapiFormUtil::ThrowParamTypeError(env, "formIds", "Array<string>");
+            return CreateJsUndefined(env);
+        }
+        convertArgc++;
+
+        auto apiResult = std::make_shared<int32_t>();
+        JsFormRouterProxyMgr::GetInstance()->RemoveFormRouterProxyCallback(formIds);
+        auto execute = [formIds, ret = apiResult]() {
+            *ret = FormMgr::GetInstance().UnregisterFormRouterProxy(formIds);
+        };
+
+        NapiAsyncTask::CompleteCallback complete =
+            [ret = apiResult](napi_env env, NapiAsyncTask &task, int32_t status) {
+                if (*ret == ERR_OK) {
+                    task.ResolveWithNoError(env, CreateJsUndefined(env));
+                } else {
+                    task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, *ret));
+                }
+            };
+        napi_value lastParam = (argc <= convertArgc) ? nullptr : argv[convertArgc];
+        napi_value result = nullptr;
+        NapiAsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnClearRouterProxy",
+            env, CreateAsyncTaskWithLastParam(env, lastParam, std::move(execute), std::move(complete), &result));
+        return result;
     }
 
     napi_value OnRegisterFormObserver(napi_env env, size_t argc, napi_value* argv)
@@ -1506,10 +1604,111 @@ napi_value JsFormHostInit(napi_env env, napi_value exportObj)
     BindNativeFunction(env, exportObj, "notifyFormsPrivacyProtected", moduleName,
         JsFormHost::NotifyFormsPrivacyProtected);
     BindNativeFunction(env, exportObj, "acquireFormData", moduleName, JsFormHost::AcquireFormData);
+    BindNativeFunction(env, exportObj, "setRouterProxy", moduleName, JsFormHost::SetRouterProxy);
+    BindNativeFunction(env, exportObj, "clearRouterProxy", moduleName, JsFormHost::ClearRouterProxy);
     BindNativeFunction(env, exportObj, "getRunningFormInfos", moduleName, JsFormHost::GetRunningFormInfos);
     BindNativeFunction(env, exportObj, "getRunningFormInfoById", moduleName, JsFormHost::GetFormInstanceById);
 
     return CreateJsUndefined(env);
+}
+
+FormRouterProxyCallbackClient::FormRouterProxyCallbackClient(napi_env env, napi_ref callbackRef)
+{
+    env_ = env;
+    callbackRef_ = callbackRef;
+    handler_ = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
+}
+
+FormRouterProxyCallbackClient::~FormRouterProxyCallbackClient()
+{
+    napi_delete_reference(env_, callbackRef_);
+}
+
+void FormRouterProxyCallbackClient::ProcessFormRouterProxy(const Want &want)
+{
+    HILOG_INFO("ProcessFormRouterProxy start");
+    if (handler_ == nullptr) {
+        HILOG_ERROR("Handler is nullptr");
+        return;
+    }
+    handler_->PostSyncTask([thisWeakPtr = weak_from_this(), want]() {
+        auto sharedThis = thisWeakPtr.lock();
+        if (sharedThis == nullptr) {
+            HILOG_ERROR("SharedThis is nullptr.");
+            return;
+        }
+
+        napi_value callbackValues = CreateJsWant(sharedThis->env_, want);
+        napi_value callResult;
+        napi_value myCallback = nullptr;
+        napi_get_reference_value(sharedThis->env_, sharedThis->callbackRef_, &myCallback);
+        if (myCallback != nullptr) {
+            napi_call_function(sharedThis->env_, nullptr, myCallback, ARGS_ONE, &callbackValues, &callResult);
+        }
+    });
+}
+
+sptr<JsFormRouterProxyMgr> JsFormRouterProxyMgr::instance_ = nullptr;
+std::mutex JsFormRouterProxyMgr::mutex_;
+sptr<JsFormRouterProxyMgr> JsFormRouterProxyMgr::GetInstance()
+{
+    if (instance_ == nullptr) {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (instance_ == nullptr) {
+            instance_ = new (std::nothrow) JsFormRouterProxyMgr();
+            if (instance_ == nullptr) {
+                HILOG_ERROR("Error, failed to create JsFormRouterProxyMgr.");
+            }
+        }
+    }
+    return instance_;
+}
+
+ErrCode JsFormRouterProxyMgr::RouterEvent(int64_t formId, const Want &want)
+{
+    HILOG_INFO("Called.");
+
+    std::lock_guard<std::mutex> lock(FormRouterProxyCallbackMutex_);
+    auto callbackClient = formRouterProxyCallbackMap_.find(formId);
+    if (callbackClient != formRouterProxyCallbackMap_.end()) {
+        if (callbackClient->second != nullptr) {
+            callbackClient->second->ProcessFormRouterProxy(want);
+        }
+    }
+    return ERR_OK;
+}
+
+void JsFormRouterProxyMgr::AddFormRouterProxyCallback(napi_env env, napi_value callback,
+    const std::vector<int64_t> &formIds)
+{
+    HILOG_INFO("Called.");
+    std::lock_guard<std::mutex> lock(FormRouterProxyCallbackMutex_);
+
+    napi_ref callbackRef;
+    napi_create_reference(env, callback, REF_COUNT, &callbackRef);
+    std::shared_ptr<FormRouterProxyCallbackClient> callbackClient = std::make_shared<FormRouterProxyCallbackClient>(env,
+        callbackRef);
+
+    for (const auto &formId : formIds) {
+        auto iter = formRouterProxyCallbackMap_.find(formId);
+        if (iter != formRouterProxyCallbackMap_.end()) {
+            iter->second = callbackClient;
+            continue;
+        }
+        formRouterProxyCallbackMap_.emplace(formId, callbackClient);
+    }
+}
+
+void JsFormRouterProxyMgr::RemoveFormRouterProxyCallback(const std::vector<int64_t> &formIds)
+{
+    HILOG_INFO("Start");
+    std::lock_guard<std::mutex> lock(FormRouterProxyCallbackMutex_);
+    for (const auto &formId : formIds) {
+        auto iter = formRouterProxyCallbackMap_.find(formId);
+        if (iter != formRouterProxyCallbackMap_.end()) {
+            formRouterProxyCallbackMap_.erase(formId);
+        }
+    }
 }
 } // namespace AbilityRuntime
 } // namespace OHOS

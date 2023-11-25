@@ -46,6 +46,7 @@ public:
     MOCK_METHOD4(GetBundleInfo, bool(const std::string &, const BundleFlag , BundleInfo &, int32_t));
     MOCK_METHOD2(GetBundleNameForUid, bool(const int, std::string &));
     MOCK_METHOD2(GetNameForUid, int32_t(const int, std::string &));
+    MOCK_METHOD2(GetAdditionalInfo, ErrCode(const std::string &, std::string &));
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

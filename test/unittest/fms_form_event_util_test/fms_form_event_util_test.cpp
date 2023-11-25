@@ -23,16 +23,25 @@
 #include "form_constants.h"
 #include "form_mgr_errors.h"
 #define private public
+#include "form_bms_helper.h"
 #include "form_data_mgr.h"
 #include "form_event_util.h"
+#include "form_timer_mgr.h"
 #undef private
-#include "mock_form_provider_client.h"
-#include "ipc_types.h"
 #include "fms_log_wrapper.h"
+#include "ipc_types.h"
+#include "mock_bundle_mgr.h"
+#include "mock_form_provider_client.h"
 
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::AppExecFwk;
+using ::testing::_;
+using ::testing::Invoke;
+using ::testing::DoAll;
+using ::testing::Return;
+using ::testing::SetArgReferee;
+
 static const std::string FORM_HOST_BUNDLE_NAME = "com.form.provider.service";
 static const std::string PARAM_PROVIDER_MODULE_NAME = "com.form.provider.app.test.ability";
 static const std::string FORM_PROVIDER_ABILITY_NAME = "com.form.provider.app.test.ability";
@@ -1165,5 +1174,61 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_055, TestSize.Level1)
     MockNotifyProviderFormsBatchDelete(false);
     formEventUtil->BatchDeleteNoHostTempForms(userId, noHostTempFormsMap, foundFormsMap);
     GTEST_LOG_(INFO) << "FormEventUtil_055 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_056
+ * @tc.desc: test HandleAdditionalInfoChanged function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_056, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_056 start";
+    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
+    ASSERT_NE(nullptr, formEventUtil);
+    std::string bundleName = FORM_HOST_BUNDLE_NAME;
+    MockGetFormRecord(false);
+    EXPECT_EQ(false, formEventUtil->HandleAdditionalInfoChanged(bundleName));
+    GTEST_LOG_(INFO) << "FormEventUtil_056 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_057
+ * @tc.desc: test HandleAdditionalInfoChanged function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_057, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_057 start";
+
+    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
+    ASSERT_NE(nullptr, formEventUtil);
+    std::string bundleName = FORM_HOST_BUNDLE_NAME;
+    int64_t formId = 1;
+    int64_t updateDuration = 2 * Constants::TIME_CONVERSION;
+    MockGetFormRecord(true);
+    MockSetFormTempFlag(false);
+    FormTimerMgr::GetInstance().AddFormTimer(formId, updateDuration, 0);
+
+    sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
+    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
+    FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
+    AppExecFwk::ApplicationInfo appInfo;
+    appInfo.apiTargetVersion = 11;
+    EXPECT_CALL(*bmsProxy, GetApplicationInfoV9(_, _, _, _))
+        .WillRepeatedly(DoAll(SetArgReferee<3>(appInfo), Return(ERR_OK)));
+
+    std::string additionalInfo = "formUpdateLevel:10";
+    EXPECT_CALL(*bmsProxy, GetAdditionalInfo(_, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(additionalInfo), Return(ERR_OK)));
+
+    EXPECT_EQ(true, formEventUtil->HandleAdditionalInfoChanged(bundleName));
+
+    FormTimer formTimer;
+    FormTimerMgr::GetInstance().GetIntervalTimer(formId, formTimer);
+
+    EXPECT_EQ(formTimer.period, 10 * Constants::TIME_CONVERSION);
+    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
+    GTEST_LOG_(INFO) << "FormEventUtil_057 end";
 }
 }

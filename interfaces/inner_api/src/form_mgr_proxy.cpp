@@ -1691,6 +1691,57 @@ ErrCode FormMgrProxy::RegisterRemoveObserver(const std::string &bundleName, cons
     return reply.ReadInt32();
 }
 
+ErrCode FormMgrProxy::RegisterFormRouterProxy(const std::vector<int64_t> &formIds,
+    const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("Called.");
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("Failed to write interface token.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt64Vector(formIds)) {
+        HILOG_ERROR("Failed to write vector formIds.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteRemoteObject(callerToken)) {
+        HILOG_ERROR("Failed to write callerToken.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    auto error = Remote()->SendRequest(
+        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_FORM_ROUTER_PROXY), data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("Failed to SendRequest: %{public}d", error);
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+    return reply.ReadInt32();
+}
+
+ErrCode FormMgrProxy::UnregisterFormRouterProxy(const std::vector<int64_t> &formIds)
+{
+    HILOG_INFO("Called.");
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("Failed to write interface token.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt64Vector(formIds)) {
+        HILOG_ERROR("Failed to write vector formIds.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    auto error = Remote()->SendRequest(
+        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_FORM_ROUTER_PROXY), data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("Failed to SendRequest: %{public}d", error);
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+    return reply.ReadInt32();
+}
+
 ErrCode FormMgrProxy::UpdateProxyForm(int64_t formId, const FormProviderData &FormProviderData,
     const std::vector<FormDataProxy> &formDataProxies)
 {

@@ -388,6 +388,17 @@ public:
     {
         return ERR_OK;
     }
+
+    ErrCode RegisterFormRouterProxy(const std::vector<int64_t> &formIds,
+        const sptr<IRemoteObject> &callerToken) override
+    {
+        return ERR_OK;
+    }
+    
+    ErrCode UnregisterFormRouterProxy(const std::vector<int64_t> &formIds) override
+    {
+        return ERR_OK;
+    }
     const int number_ = 1;
 };
 
