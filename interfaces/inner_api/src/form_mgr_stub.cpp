@@ -140,6 +140,10 @@ FormMgrStub::FormMgrStub()
         &FormMgrStub::HandleRegisterPublishFormInterceptor;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_PUBLISH_FORM_INTERCEPTOR)] =
         &FormMgrStub::HandleUnregisterPublishFormInterceptor;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_FORM_ROUTER_PROXY)] =
+        &FormMgrStub::HandleRegisterFormRouterProxy;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_FORM_ROUTER_PROXY)] =
+        &FormMgrStub::HandleUnregisterFormRouterProxy;
 }
 
 FormMgrStub::~FormMgrStub()
@@ -1158,6 +1162,37 @@ ErrCode FormMgrStub::HandleRegisterRemoveObserver(MessageParcel &data, MessagePa
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     auto result = RegisterRemoveObserver(bundleName, callerToken);
+    reply.WriteInt32(result);
+    return result;
+}
+
+ErrCode FormMgrStub::HandleRegisterFormRouterProxy(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("Called.");
+    std::vector<int64_t> formIds;
+    if (!data.ReadInt64Vector(&formIds)) {
+        HILOG_ERROR("Failed to ReadInt64Vector.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
+    if (callerToken == nullptr) {
+        HILOG_ERROR("Failed to get remote object.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    auto result = RegisterFormRouterProxy(formIds, callerToken);
+    reply.WriteInt32(result);
+    return result;
+}
+
+ErrCode FormMgrStub::HandleUnregisterFormRouterProxy(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("Called.");
+    std::vector<int64_t> formIds;
+    if (!data.ReadInt64Vector(&formIds)) {
+        HILOG_ERROR("Failed to ReadInt64Vector.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    auto result = UnregisterFormRouterProxy(formIds);
     reply.WriteInt32(result);
     return result;
 }

@@ -207,6 +207,8 @@ public:
     void PostAddTaskToHost(const std::string bundleName, const sptr<IRemoteObject> &remoteObject,
         const RunningFormInfo &runningFormInfo);
 
+    void PostRouterProxyToHost(const int64_t formId, const sptr<IRemoteObject> &remoteObject, const Want &want);
+
     void PostRemoveTaskToHost(const std::string bundleName, const sptr<IRemoteObject> &remoteObject,
         const RunningFormInfo &runningFormInfo);
 
@@ -390,6 +392,15 @@ private:
     void OnUnlock(const sptr<IRemoteObject> &remoteObject);
 
     void RemoveConnection(int32_t connectId);
+
+    /**
+     * @brief Form router event proxy.
+     * @param formId The id of the form.
+     * @param remoteObject Form router proxy manager object.
+     * @param want The want of the form for router event.
+     */
+    void FormRouterEventProxy(const int64_t formId, const sptr<IRemoteObject> &remoteObject, const Want &want);
+
 private:
     std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;
 };
