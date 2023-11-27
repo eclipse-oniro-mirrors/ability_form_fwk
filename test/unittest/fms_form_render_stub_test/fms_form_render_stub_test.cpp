@@ -62,7 +62,7 @@ public:
     virtual ~MockFormRenderImpl() {};
 
     int32_t RenderForm(const FormJsInfo &formJsInfo, const Want &want,
-        const sptr<IRemoteObject> &callerToken) override
+        sptr<IRemoteObject> callerToken) override
     {
         return ERR_OK;
     };

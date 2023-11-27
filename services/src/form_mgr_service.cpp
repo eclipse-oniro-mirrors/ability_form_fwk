@@ -681,6 +681,7 @@ ErrCode FormMgrService::Init()
     if (result != ERR_OK) {
         HILOG_WARN("parse form config failed, use the default vaule.");
     }
+    FormMgrAdapter::GetInstance().Init();
     HILOG_INFO("init success");
     return ERR_OK;
 }

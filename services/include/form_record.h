@@ -69,6 +69,7 @@ public:
     bool isSystemApp = false;
     int32_t uid = 0;
     std::string description = "";
+    bool isNeedNotify = true;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

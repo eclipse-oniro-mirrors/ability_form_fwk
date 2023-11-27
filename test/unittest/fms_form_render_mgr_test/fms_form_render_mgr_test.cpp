@@ -54,7 +54,7 @@ void FormRenderMgrTest::TearDown()
 class MockIFormRender : public IFormRender {
 public:
     int32_t RenderForm(const FormJsInfo &formJsInfo, const Want &want,
-        const sptr<IRemoteObject> &callerToken) override
+        sptr<IRemoteObject> callerToken) override
     {
         return ERR_OK;
     }
