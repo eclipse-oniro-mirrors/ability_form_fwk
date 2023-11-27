@@ -34,6 +34,7 @@ namespace Constants {
     constexpr const char* PARAM_ABILITY_NAME_KEY = "ohos.extra.param.key.ability_name";
     constexpr const char* PARAM_FORM_NAME_KEY = "ohos.extra.param.key.form_name";
     constexpr const char* PARAM_FORM_DIMENSION_KEY = "ohos.extra.param.key.form_dimension";
+    constexpr const char* PARAM_FORM_RENDERINGMODE_KEY = "ohos.extra.param.key.form_rendering_mode";
     constexpr const char* PARAM_MESSAGE_KEY = "ohos.extra.param.key.message";
     constexpr const char* PARAM_FORM_TEMPORARY_KEY = "ohos.extra.param.key.form_temporary";
     constexpr const char* PARAM_FORM_TRANSPARENCY_KEY = "ohos.extra.param.key.form_background_transparency";
@@ -191,6 +192,11 @@ namespace Constants {
         {Dimension::DIMENSION_4_4, "4*4"},
         {Dimension::DIMENSION_2_1, "2*1"},
         {Dimension::DIMENSION_1_1, "1*1"}
+    };
+
+    enum class RenderingMode : int8_t {
+        FULL_COLOR = 0,
+        SINGLE_COLOR
     };
 
     // rdb
