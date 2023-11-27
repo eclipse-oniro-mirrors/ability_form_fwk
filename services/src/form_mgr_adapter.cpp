@@ -88,6 +88,16 @@ FormMgrAdapter::FormMgrAdapter()
 FormMgrAdapter::~FormMgrAdapter()
 {
 }
+
+/**
+ * @brief Init properties like visibleNotifyDelayTime.
+ */
+void FormMgrAdapter::Init()
+{
+    FormDataMgr::GetInstance().GetConfigParamFormMap(Constants::VISIBLE_NOTIFY_DELAY, visibleNotifyDelay_);
+    HILOG_INFO("load visibleNotifyDelayTime: %{public}d", visibleNotifyDelay_);
+}
+
 /**
  * @brief Add form with want, send want to form manager service.
  * @param formId The Id of the forms to add.
@@ -721,23 +731,33 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
         }
     }
 
+    HILOG_DEBUG("ScheduleTask formVisibleType: %{public}d, visibleNotifyDelay: %{public}d",
+        formVisibleType, visibleNotifyDelay_);
+    FormTaskMgr::GetInstance().PostVisibleNotify(formIds, formInstanceMaps, eventMaps, formVisibleType,
+        visibleNotifyDelay_);
+    return ERR_OK;
+}
+
+/**
+ * @brief Handle forms visible/invisible notify after delay time, notification will be cancelled when
+ * formVisibleState recovered during the delay time.
+ * @param formIds The vector of form Ids.
+ * @param formInstanceMaps formInstances for visibleNotify.
+ * @param eventMaps eventMaps for event notify.
+ * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
+ */
+void FormMgrAdapter::HandlerNotifyWhetherVisibleForms(const std::vector<int64_t> &formIds,
+    std::map<std::string, std::vector<FormInstance>> formInstanceMaps,
+    std::map<std::string, std::vector<int64_t>> eventMaps, const int32_t formVisibleType)
+{
+    HILOG_DEBUG("start");
+    FilterDataByVisibleType(formInstanceMaps, eventMaps, formVisibleType);
     for (auto formObserver : formObservers_) {
-        sptr<AbilityRuntime::IJsFormStateObserver> remoteJsFormStateObserver =
-            iface_cast<AbilityRuntime::IJsFormStateObserver>(formObserver.second);
-        auto observer = formInstanceMaps.find(formObserver.first);
-        if (observer != formInstanceMaps.end()) {
-            if (formVisibleType == static_cast<int32_t>(FormVisibilityType::VISIBLE)) {
-                remoteJsFormStateObserver->NotifyWhetherFormsVisible(FormVisibilityType::VISIBLE,
-                    formObserver.first, observer->second);
-            } else if (formVisibleType == static_cast<int32_t>(FormVisibilityType::INVISIBLE)){
-                remoteJsFormStateObserver->NotifyWhetherFormsVisible(FormVisibilityType::INVISIBLE, formObserver.first,
-                    observer->second);
-            }
-        }
+        NotifyWhetherFormsVisible(formObserver.first, formObserver.second, formInstanceMaps, formVisibleType);
     }
     for (auto iter = eventMaps.begin(); iter != eventMaps.end(); iter++) {
         if (HandleEventNotify(iter->first, iter->second, formVisibleType) != ERR_OK) {
-            HILOG_WARN("%{public}s fail, HandleEventNotify error, key is %{public}s.", __func__, iter->first.c_str());
+            HILOG_WARN("HandleEventNotify error, key is %{public}s.", iter->first.c_str());
         }
     }
     if (formVisibleType == static_cast<int32_t>(FormVisibilityType::VISIBLE)) {
@@ -745,8 +765,149 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
     } else if (formVisibleType == static_cast<int32_t>(FormVisibilityType::INVISIBLE)) {
         FormDataProxyMgr::GetInstance().DisableSubscribeFormData(formIds);
     }
+}
 
-    return ERR_OK;
+/**
+ * @brief Notify forms visible/invisible to remoteCallers.
+ * @param bundleName the caller's bundle name.
+ * @param remoteObjects refs of remoteCallers.
+ * @param formInstanceMaps formInstances for visibleNotify.
+ * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
+ */
+void FormMgrAdapter::NotifyWhetherFormsVisible(const std::string &bundleName,
+    std::vector<sptr<IRemoteObject>> &remoteObjects,
+    std::map<std::string, std::vector<FormInstance>> &formInstanceMaps, const int32_t formVisibleType)
+{
+    HILOG_DEBUG("bundleName: %{public}s, remoteObjects: %{public}d", bundleName.c_str(), (int)remoteObjects.size());
+    for (auto remoteObject : remoteObjects) {
+        sptr<AbilityRuntime::IJsFormStateObserver> remoteJsFormStateObserver =
+            iface_cast<AbilityRuntime::IJsFormStateObserver>(remoteObject);
+        auto observer = formInstanceMaps.find(bundleName);
+        if (observer != formInstanceMaps.end()) {
+            if (formVisibleType == static_cast<int32_t>(FormVisibilityType::VISIBLE)) {
+                remoteJsFormStateObserver->NotifyWhetherFormsVisible(FormVisibilityType::VISIBLE,
+                    bundleName, observer->second);
+            } else if (formVisibleType == static_cast<int32_t>(FormVisibilityType::INVISIBLE)){
+                remoteJsFormStateObserver->NotifyWhetherFormsVisible(FormVisibilityType::INVISIBLE,
+                    bundleName, observer->second);
+            }
+        }
+    }
+}
+
+/**
+ * @brief Forms formInstanceMaps or eventMaps should remove when visible/invisible status recovered.
+ * @param formInstanceMaps formInstances for visibleNotify.
+ * @param eventMaps eventMaps for event notify.
+ * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
+ */
+void FormMgrAdapter::FilterDataByVisibleType(std::map<std::string, std::vector<FormInstance>> &formInstanceMaps,
+    std::map<std::string, std::vector<int64_t>> &eventMaps, const int32_t formVisibleType)
+{
+    HILOG_DEBUG("start");
+    std::map<int64_t, FormRecord> restoreFormRecords;
+    FilterFormInstanceMapsByVisibleType(formInstanceMaps, formVisibleType, restoreFormRecords);
+    FilterEventMapsByVisibleType(eventMaps, formVisibleType, restoreFormRecords);
+
+    for (auto formRecordEntry : restoreFormRecords) {
+        FormRecord formRecord = formRecordEntry.second;
+        formRecord.isNeedNotify = false;
+        HILOG_INFO("formRecord no need notify, formId: %{public}" PRId64 ".", formRecord.formId);
+        if (!FormDataMgr::GetInstance().UpdateFormRecord(formRecord.formId, formRecord)) {
+            HILOG_ERROR("update restoreFormRecords failed, formId: %{public}" PRId64 ".", formRecord.formId);
+        }
+    }
+}
+
+/**
+ * @brief Forms formInstanceMaps should remove when visible/invisible status recovered.
+ * @param formInstanceMaps formInstances for visibleNotify.
+ * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
+ * @param restoreFormRecords formRecords of forms no need to notify.
+ */
+void FormMgrAdapter::FilterFormInstanceMapsByVisibleType(
+    std::map<std::string, std::vector<FormInstance>> &formInstanceMaps,
+    const int32_t formVisibleType, std::map<int64_t, FormRecord> &restoreFormRecords)
+{
+    for (auto iter = formInstanceMaps.begin(); iter != formInstanceMaps.end();) {
+        std::vector<FormInstance> formInstances = iter->second;
+        HILOG_DEBUG("bundName: %{public}s, formInstances: %{public}d", iter->first.c_str(), (int)formInstances.size());
+        auto instanceIter = formInstances.begin();
+        while (instanceIter != formInstances.end()) {
+            FormRecord record;
+            if (!FormDataMgr::GetInstance().GetFormRecord(instanceIter->formId, record)) {
+                HILOG_WARN("get formRecord failed! formId: %{public}" PRId64 ".", instanceIter->formId);
+                ++instanceIter;
+                continue;
+            }
+            if (record.formVisibleNotifyState != formVisibleType) {
+                HILOG_INFO("erase formInstance formId: %{public}" PRId64 ", formVisibleNotifyState: %{public}d",
+                    instanceIter->formId, record.formVisibleNotifyState);
+                restoreFormRecords[record.formId] = record;
+                instanceIter = formInstances.erase(instanceIter);
+                continue;
+            }
+            if (!record.isNeedNotify) {
+                HILOG_INFO("erase formInstance formId: %{public}" PRId64
+                    ", isNeedNotify: %{public}d, formVisibleNotifyState %{public}d",
+                    instanceIter->formId, record.isNeedNotify, record.formVisibleNotifyState);
+                instanceIter = formInstances.erase(instanceIter);
+                continue;
+            }
+            ++instanceIter;
+        }
+        if (formInstances.empty()) {
+            HILOG_INFO("formInstanceMaps remove bundName: %{public}s", iter->first.c_str());
+            iter = formInstanceMaps.erase(iter);
+            continue;
+        }
+        ++iter;
+    }
+}
+
+/**
+ * @brief Forms eventMaps should remove when visible/invisible status recovered.
+ * @param eventMaps eventMaps for event notify.
+ * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
+ * @param restoreFormRecords formRecords of forms no need to notify.
+ */
+void FormMgrAdapter::FilterEventMapsByVisibleType(std::map<std::string, std::vector<int64_t>> &eventMaps,
+    const int32_t formVisibleType, std::map<int64_t, FormRecord> &restoreFormRecords)
+{
+    for (auto iter = eventMaps.begin(); iter != eventMaps.end();) {
+        std::vector<int64_t> formIds = iter->second;
+        HILOG_DEBUG("bundName: %{public}s, eventMaps: %{public}d", iter->first.c_str(), (int)formIds.size());
+        auto formItr = formIds.begin();
+        while (formItr != formIds.end()) {
+            FormRecord record;
+            if (!FormDataMgr::GetInstance().GetFormRecord(*formItr, record)) {
+                HILOG_WARN("get formRecord failed! formId: %{public}" PRId64 ".", *formItr);
+                ++formItr;
+                continue;
+            }
+            if (record.formVisibleNotifyState != formVisibleType) {
+                HILOG_INFO("erase notifyEvent formId: %{public}" PRId64 ", formVisibleNotifyState: %{public}d",
+                    *formItr, record.formVisibleNotifyState);
+                restoreFormRecords[record.formId] = record;
+                formItr = formIds.erase(formItr);
+                continue;
+            }
+            if (!record.isNeedNotify) {
+                HILOG_INFO("erase notifyEvent formId: %{public}" PRId64
+                    ", isNeedNotify: %{public}d, formVisibleNotifyState %{public}d",
+                    *formItr, record.isNeedNotify, record.formVisibleNotifyState);
+                formItr = formIds.erase(formItr);
+                continue;
+            }
+            ++formItr;
+        }
+        if (formIds.empty()) {
+            HILOG_INFO("eventMaps remove bundName: %{public}s", iter->first.c_str());
+            iter = eventMaps.erase(iter);
+            continue;
+        }
+        ++iter;
+    }
 }
 
 /**
@@ -2370,6 +2531,7 @@ bool FormMgrAdapter::UpdateProviderInfoToHost(const int64_t &matchedFormId, cons
     }
 
     formRecord.formVisibleNotifyState = formVisibleType;
+    formRecord.isNeedNotify = true;
     if (!FormDataMgr::GetInstance().UpdateFormRecord(matchedFormId, formRecord)) {
         HILOG_WARN("fail, set formVisibleNotifyState error, formId:%{public}" PRId64 ".",
             matchedFormId);
@@ -2840,12 +3002,21 @@ ErrCode FormMgrAdapter::RegisterAddObserver(const std::string &bundleName, const
     std::lock_guard<std::mutex> lock(formObserversMutex_);
     auto formObserver = formObservers_.find(bundleName);
     if (formObserver == formObservers_.end()) {
-        formObservers_.emplace(bundleName, callerToken);
-        SetDeathRecipient(callerToken, new (std::nothrow) FormMgrAdapter::ClientDeathRecipient());
+        HILOG_DEBUG("%{public}s start register.", bundleName.c_str());
+        std::vector<sptr<IRemoteObject>> remoteObjects;
+        remoteObjects.emplace_back(callerToken);
+        formObservers_.emplace(bundleName, remoteObjects);
     } else {
-        HILOG_ERROR("callback is already exist");
-        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+        auto &remoteObjects = formObserver->second;
+        auto itr = std::find(remoteObjects.begin(), remoteObjects.end(), callerToken);
+        if (itr != remoteObjects.end()) {
+            HILOG_ERROR("callback is already exist");
+            return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+        }
+        HILOG_DEBUG("%{public}s add register.", bundleName.c_str());
+        remoteObjects.emplace_back(callerToken);
     }
+    SetDeathRecipient(callerToken, new (std::nothrow) FormMgrAdapter::ClientDeathRecipient());
     HILOG_DEBUG("success.");
     return ERR_OK;
 }
@@ -2859,16 +3030,19 @@ ErrCode FormMgrAdapter::RegisterRemoveObserver(const std::string &bundleName, co
         HILOG_ERROR("bundleName is not exist");
         return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
     } else {
-        if (formObserver->second == callerToken) {
-            formObservers_.erase(formObserver);
-            SetDeathRecipient(callerToken, new (std::nothrow) FormMgrAdapter::ClientDeathRecipient());
-        } else {
-            HILOG_ERROR("callback is not exist");
-            return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+        auto &remoteObjects = formObserver->second;
+        for (auto itr = remoteObjects.begin(); itr != remoteObjects.end();) {
+            if (*itr == callerToken) {
+                remoteObjects.erase(itr);
+                SetDeathRecipient(callerToken, new (std::nothrow) FormMgrAdapter::ClientDeathRecipient());
+                HILOG_DEBUG("success.");
+                return ERR_OK;
+            }
+            ++itr;
         }
     }
-    HILOG_DEBUG("success.");
-    return ERR_OK;
+    HILOG_ERROR("callback is not exist");
+    return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
 }
 
 ErrCode FormMgrAdapter::RegisterFormRouterProxy(
@@ -3004,12 +3178,19 @@ void FormMgrAdapter::CleanResource(const wptr<IRemoteObject> &remote)
     {
         std::lock_guard<std::mutex> lock(formObserversMutex_);
         for (auto it = formObservers_.begin(); it != formObservers_.end();) {
-            auto& observer = it->second;
-            if (observer == object) {
-                it = formObservers_.erase(it);
-            } else {
-                ++it;
+            auto &remoteObjects = it->second;
+            for (auto iter = remoteObjects.begin(); iter != remoteObjects.end();) {
+                if (*iter == object) {
+                    iter = remoteObjects.erase(iter);
+                    continue;
+                }
+                ++iter;
             }
+            if (remoteObjects.empty()) {
+                it = formObservers_.erase(it);
+                continue;
+            }
+            ++it;
         }
     }
     std::lock_guard<std::mutex> deathLock(deathRecipientsMutex_);

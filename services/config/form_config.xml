@@ -4,5 +4,6 @@
       <maxNormalFormSize>512</maxNormalFormSize>
       <maxTempFormSize>256</maxTempFormSize>
       <hostMaxFormSize>256</hostMaxFormSize>
+      <visibleNotifyDelayTime>1000</visibleNotifyDelayTime>
   </quantityConfig>
 </FORM>

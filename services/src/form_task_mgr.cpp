@@ -1028,5 +1028,46 @@ void FormTaskMgr::FormRouterEventProxy(const int64_t formId, const sptr<IRemoteO
     }
     remoteFormHostDelegateProxy->RouterEvent(formId, want);
 }
+
+/**
+ * @brief Post Form visible/invisible notify.
+ * @param formIds  the Ids of forms need to notify.
+ * @param formInstanceMaps formInstances for visibleNotify.
+ * @param eventMaps eventMaps for event notify.
+ * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
+ * @param visibleNotifyDelay delay time.
+ */
+void FormTaskMgr::PostVisibleNotify(const std::vector<int64_t> &formIds,
+    std::map<std::string, std::vector<FormInstance>> &formInstanceMaps,
+    std::map<std::string, std::vector<int64_t>> &eventMaps,
+    const int32_t formVisibleType, int32_t visibleNotifyDelay)
+{
+    HILOG_DEBUG("called");
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("serialQueue_ is nullptr.");
+        FormTaskMgr::GetInstance().NotifyVisible(formIds, formInstanceMaps, eventMaps, formVisibleType);
+        return;
+    }
+    auto task = [formIds, formInstanceMaps, eventMaps, formVisibleType]() {
+        FormTaskMgr::GetInstance().NotifyVisible(formIds, formInstanceMaps, eventMaps, formVisibleType);
+    };
+    serialQueue_->ScheduleTask(visibleNotifyDelay, task);
+    HILOG_DEBUG("end");
+}
+
+/**
+* @brief Form visible/invisible notify.
+* @param formIds  the Ids of forms need to notify.
+* @param formInstanceMaps formInstances for visibleNotify.
+* @param eventMaps eventMaps for event notify.
+* @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
+*/
+void FormTaskMgr::NotifyVisible(const std::vector<int64_t> &formIds,
+    std::map<std::string, std::vector<FormInstance>> formInstanceMaps,
+    std::map<std::string, std::vector<int64_t>> eventMaps, const int32_t formVisibleType)
+{
+    FormMgrAdapter::GetInstance().HandlerNotifyWhetherVisibleForms(formIds,
+        formInstanceMaps, eventMaps, formVisibleType);
+}
 } // namespace AppExecFwk
 } // namespace OHOS

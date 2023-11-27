@@ -23,6 +23,7 @@
 #ifdef SUPPORT_ERMS
 #include "ecological_rule_mgr_service_client.h"
 #endif
+#include "form_constants.h"
 #include "form_info.h"
 #include "form_instance.h"
 #include "form_instances_filter.h"
@@ -31,6 +32,7 @@
 #include "form_provider_data.h"
 #include "form_publish_interceptor_interface.h"
 #include "form_state_info.h"
+#include "form_task_mgr.h"
 #include "iremote_object.h"
 #include "running_form_info.h"
 #include "want.h"
@@ -50,6 +52,11 @@ class FormMgrAdapter  final : public DelayedRefSingleton<FormMgrAdapter> {
 DECLARE_DELAYED_REF_SINGLETON(FormMgrAdapter)
 public:
     DISALLOW_COPY_AND_MOVE(FormMgrAdapter);
+
+    /**
+     * @brief Init properties like visibleNotifyDelayTime.
+     */
+    void Init();
 
     /**
      * @brief Add form with want, send want to form manager service.
@@ -479,6 +486,17 @@ public:
      */
     bool GetValidFormUpdateDuration(const int64_t formId, int64_t &updateDuration) const;
 
+    /**
+     * @brief Handle forms visible/invisible notify after delay time, notification will be cancelled when
+     * formVisibleState recovered during the delay time.
+     * @param formIds the Ids of forms need to notify.
+     * @param formInstanceMaps formInstances for visibleNotify.
+     * @param eventMaps eventMaps for event notify.
+     * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
+     */
+    void HandlerNotifyWhetherVisibleForms(const std::vector<int64_t> &formIds,
+        std::map<std::string, std::vector<FormInstance>> formInstanceMaps,
+        std::map<std::string, std::vector<int64_t>> eventMaps, const int32_t formVisibleType);
 private:
     /**
      * @brief Get form configure info.
@@ -830,7 +848,7 @@ private:
         const sptr<IRemoteObject::DeathRecipient> &deathRecipient);
     mutable std::mutex formObserversMutex_;
     mutable std::mutex deathRecipientsMutex_;
-    std::map<std::string, sptr<IRemoteObject>> formObservers_;
+    std::map<std::string, std::vector<sptr<IRemoteObject>>> formObservers_;
     std::map<sptr<IRemoteObject>, sptr<IRemoteObject::DeathRecipient>> deathRecipients_;
 
     /**
@@ -845,6 +863,44 @@ private:
      * @param wants Wants of the request.
      */
     bool IsErmsSupportPublishForm(std::string bundleName, std::vector<Want> wants);
+
+    /**
+     * @brief Notify forms visible/invisible to remoteCallers.
+     * @param bundleName the caller's bundle name.
+     * @param remoteObjects refs of remoteCallers.
+     * @param formInstanceMaps formInstances for visibleNotify.
+     * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
+     */
+    void NotifyWhetherFormsVisible(const std::string &bundleName,
+        std::vector<sptr<IRemoteObject>> &remoteObjects,
+        std::map<std::string, std::vector<FormInstance>> &formInstanceMaps, const int32_t formVisibleType);
+
+    /**
+     * @brief Forms formInstanceMaps or eventMaps should remove when visible/invisible status recovered.
+     * @param formInstanceMaps formInstances for visibleNotify.
+     * @param eventMaps eventMaps for event notify.
+     * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
+     */
+    void FilterDataByVisibleType(std::map<std::string, std::vector<FormInstance>> &formInstanceMaps,
+        std::map<std::string, std::vector<int64_t>> &eventMaps, const int32_t formVisibleType);
+
+    /**
+     * @brief Forms formInstanceMaps should remove when visible/invisible status recovered.
+     * @param formInstanceMaps formInstances for visibleNotify.
+     * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
+     * @param restoreFormRecords formRecords of forms no need to notify.
+     */
+    void FilterFormInstanceMapsByVisibleType(std::map<std::string, std::vector<FormInstance>> &formInstanceMaps,
+        const int32_t formVisibleType, std::map<int64_t, FormRecord> &restoreFormRecords);
+
+    /**
+     * @brief Forms eventMaps should remove when visible/invisible status recovered.
+     * @param eventMaps eventMaps for event notify.
+     * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
+     * @param restoreFormRecords formRecords of forms no need to notify.
+     */
+    void FilterEventMapsByVisibleType(std::map<std::string, std::vector<int64_t>> &eventMaps,
+        const int32_t formVisibleType, std::map<int64_t, FormRecord> &restoreFormRecords);
 
     ErrCode CheckFormCountLimit(const int64_t formId, const Want &want);
 
@@ -872,6 +928,7 @@ private:
 
 private:
     sptr<IFormPublishInterceptor> formPublishInterceptor_ = nullptr;
+    int32_t visibleNotifyDelay_ = Constants::DEFAULT_VISIBLE_NOTIFY_DELAY;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
