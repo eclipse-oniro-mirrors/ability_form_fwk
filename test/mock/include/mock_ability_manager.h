@@ -780,12 +780,12 @@ public:
         return 0;
     }
 
-    int32_t RegisterAppDebugListener(const sptr<AppExecFwk::IAppDebugListener> &listener)
+    int32_t RegisterAppDebugListener(sptr<AppExecFwk::IAppDebugListener> listener)
     {
         return 0;
     }
 
-    int32_t UnregisterAppDebugListener(const sptr<AppExecFwk::IAppDebugListener> &listener)
+    int32_t UnregisterAppDebugListener(sptr<AppExecFwk::IAppDebugListener> listener)
     {
         return 0;
     }
