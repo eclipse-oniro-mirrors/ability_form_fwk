@@ -18,6 +18,7 @@
 #include <chrono>
 #include <utility>
 
+#include "ecmascript/napi/include/jsnapi.h"
 #include "extractor.h"
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
@@ -1060,6 +1061,35 @@ void FormRenderRecord::HandleUpdateConfiguration(
             iter->second->UpdateConfiguration(config);
         }
     }
+}
+
+void FormRenderRecord::FormRenderGC()
+{
+    std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
+    auto task = [thisWeakPtr]() {
+        auto renderRecord = thisWeakPtr.lock();
+        if (renderRecord == nullptr) {
+            HILOG_ERROR("renderRecord is nullptr.");
+            return;
+        }
+        renderRecord->HandleFormRenderGC();
+    };
+    if (eventHandler_ == nullptr) {
+        HILOG_ERROR("eventHandler_ is nullptr.");
+        return;
+    }
+    eventHandler_->PostSyncTask(task, "HandleFormRenderGC");
+}
+
+void FormRenderRecord::HandleFormRenderGC()
+{
+    HILOG_INFO("HandleFormRenderGC.");
+    if (runtime_ == nullptr) {
+        HILOG_ERROR("runtime_ is null.");
+        return;
+    }
+    panda::JSNApi::TriggerGC((static_cast<AbilityRuntime::JsRuntime&>(*runtime_)).GetEcmaVm(),
+        panda::JSNApi::TRIGGER_GC_TYPE::FULL_GC);
 }
 } // namespace FormRender
 } // namespace AppExecFwk

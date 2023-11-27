@@ -42,6 +42,7 @@
               "samgr",
               "c_utils",
               "ability_base",
+              "ets_runtime",
               "eventhandler",
               "hitrace",
               "access_token",
