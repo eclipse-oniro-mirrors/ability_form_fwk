@@ -51,7 +51,7 @@ FormRenderImpl::FormRenderImpl() = default;
 FormRenderImpl::~FormRenderImpl() = default;
 
 int32_t FormRenderImpl::RenderForm(const FormJsInfo &formJsInfo, const Want &want,
-                                   const sptr<IRemoteObject> &callerToken)
+                                   sptr<IRemoteObject> callerToken)
 {
     HILOG_INFO("Render form, bundleName = %{public}s, abilityName = %{public}s, formName = %{public}s,"
         "moduleName = %{public}s, jsFormCodePath = %{public}s, formSrc = %{public}s",

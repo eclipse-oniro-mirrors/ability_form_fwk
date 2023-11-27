@@ -48,7 +48,7 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t RenderForm(const FormJsInfo &formJsInfo, const Want &want,
-        const sptr<IRemoteObject> &callerToken) override;
+        sptr<IRemoteObject> callerToken) override;
 
     /**
      * @brief Stop rendering form. This is sync API.
