@@ -69,6 +69,7 @@ public:
     bool isSystemApp = false;
     int32_t uid = 0;
     int32_t privacyLevel = 0;
+    bool isNeedNotify = true;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

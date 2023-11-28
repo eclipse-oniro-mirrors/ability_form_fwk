@@ -90,7 +90,8 @@ bool FormXMLParser::ParseInternal(xmlNodePtr &node)
         std::string childNodeName = reinterpret_cast<const char*>(curChildNodePtr->name);
         if (childNodeName != std::string(Constants::MAX_NORMAL_FORM_SIZE)
             && childNodeName != std::string(Constants::MAX_TEMP_FORM_SIZE)
-            && childNodeName != std::string(Constants::HOST_MAX_FORM_SIZE)) {
+            && childNodeName != std::string(Constants::HOST_MAX_FORM_SIZE)
+            && childNodeName != std::string(Constants::VISIBLE_NOTIFY_DELAY)) {
             continue;
         }
         xmlChar* content = xmlNodeGetContent(curChildNodePtr);

@@ -217,6 +217,19 @@ public:
 
     void PostOnUnlock(const sptr<IRemoteObject> &remoteObject);
 
+    /**
+    * @brief Post Form visible/invisible notify.
+    * @param formIds  the Ids of forms need to notify.
+    * @param formInstanceMaps formInstances for visibleNotify.
+    * @param eventMaps eventMaps for event notify.
+    * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
+    * @param visibleNotifyDelay delay time.
+    */
+    void PostVisibleNotify(const std::vector<int64_t> &formIds,
+        std::map<std::string, std::vector<FormInstance>> &formInstanceMaps,
+        std::map<std::string, std::vector<int64_t>> &eventMaps,
+        const int32_t formVisibleType, int32_t visibleNotifyDelay);
+
 private:
     /**
      * @brief Acquire form data from form provider.
@@ -401,6 +414,16 @@ private:
      */
     void FormRouterEventProxy(const int64_t formId, const sptr<IRemoteObject> &remoteObject, const Want &want);
 
+    /**
+    * @brief Form visible/invisible notify.
+    * @param formIds  the Ids of forms need to notify.
+    * @param formInstanceMaps formInstances for visibleNotify.
+    * @param eventMaps eventMaps for event notify.
+    * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
+    */
+    void NotifyVisible(const std::vector<int64_t> &formIds,
+        std::map<std::string, std::vector<FormInstance>> formInstanceMaps,
+        std::map<std::string, std::vector<int64_t>> eventMaps, const int32_t formVisibleType);
 private:
     std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;
 };

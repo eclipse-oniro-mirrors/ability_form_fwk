@@ -325,6 +325,11 @@ public:
     {
         return 0;
     }
+
+    int32_t GetForegroundUIAbilities(std::vector<AppExecFwk::AbilityStateData> &list) override
+    {
+        return 0;
+    }
 };
 
 class MockAbilityMgrStub : public IRemoteStub<AAFwk::IAbilityManager> {
@@ -780,12 +785,12 @@ public:
         return 0;
     }
 
-    int32_t RegisterAppDebugListener(const sptr<AppExecFwk::IAppDebugListener> &listener)
+    int32_t RegisterAppDebugListener(sptr<AppExecFwk::IAppDebugListener> listener)
     {
         return 0;
     }
 
-    int32_t UnregisterAppDebugListener(const sptr<AppExecFwk::IAppDebugListener> &listener)
+    int32_t UnregisterAppDebugListener(sptr<AppExecFwk::IAppDebugListener> listener)
     {
         return 0;
     }
@@ -808,6 +813,11 @@ public:
 
     int32_t ExecuteInsightIntentDone(const sptr<IRemoteObject> &token, uint64_t intentId,
         const InsightIntentExecuteResult &result)
+    {
+        return 0;
+    }
+
+    int32_t GetForegroundUIAbilities(std::vector<AppExecFwk::AbilityStateData> &list) override
     {
         return 0;
     }

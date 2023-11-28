@@ -101,6 +101,10 @@ public:
     {
         return {};
     };
+    int32_t UnloadAllIdleSystemAbility()
+    {
+        return {};
+    };
     int32_t GetSystemProcessInfo(int32_t systemAbilityId, SystemProcessInfo& systemProcessInfo) override
     {
         return {};

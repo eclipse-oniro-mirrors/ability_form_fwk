@@ -63,6 +63,8 @@ napi_value CreateJsFormParam(napi_env engine)
         engine, objValue, "IDENTITY_KEY", CreateJsValue(engine, AppExecFwk::Constants::PARAM_FORM_IDENTITY_KEY));
     napi_set_named_property(
         engine, objValue, "DIMENSION_KEY", CreateJsValue(engine, AppExecFwk::Constants::PARAM_FORM_DIMENSION_KEY));
+    napi_set_named_property(engine, objValue, "RENDERINGMODE_KEY", CreateJsValue(
+        engine, AppExecFwk::Constants::PARAM_FORM_RENDERINGMODE_KEY));
     napi_set_named_property(
         engine, objValue, "NAME_KEY", CreateJsValue(engine, AppExecFwk::Constants::PARAM_FORM_NAME_KEY));
     napi_set_named_property(
