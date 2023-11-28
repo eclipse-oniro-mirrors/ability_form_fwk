@@ -130,6 +130,11 @@ public:
         return setModuleRemovable_;
     }
 
+    sptr<IBundleInstaller> GetBundleInstaller() override
+    {
+        return nullptr;
+    }
+
     ErrCode GetBundlePackInfo_ = ERR_APPEXECFWK_SERVICE_INTERNAL_ERROR;
     bool setModuleRemovable_ = false;
     int32_t GetNameForUid_ = ERR_OK + 1;
@@ -528,6 +533,20 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_021, TestSize.Level1)
     GTEST_LOG_(INFO) << "FmsFormBmsHelperTest_021 end";
 }
 
-
+/**
+ * @tc.name: FmsFormBmsHelperTest_022
+ * @tc.desc: Verify that the GetBundleInstaller interface executes as expected and the return value is empty.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_022, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_022 start";
+    FormBmsHelper formBmsHelper;
+    const sptr<IRemoteObject> impl;
+    const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
+    formBmsHelper.SetBundleManager(bundleManager);
+    EXPECT_EQ(nullptr, formBmsHelper.GetBundleInstaller());
+    GTEST_LOG_(INFO) << "FmsFormHostRecordTest FmsFormBmsHelperTest_022 end";
+}
 } // namespace AppExecFwk
 } // namespace OHOS
