@@ -111,11 +111,8 @@ public:
     ErrCode FormClickAddCallTask(napi_env env, napi_value callback,
         std::vector<std::shared_ptr<NativeReference>> &callbacks);
 
-    ErrCode RegisterClickCallbackEventCallback(const napi_env env, const std::string &bundleName,
+    ErrCode RegisterClickEventCallback(const napi_env env, const std::string &bundleName,
         const napi_value callback, const std::string &type);
-
-    ErrCode UnregisterClickCallbackEventCallback(const napi_env env,
-        const std::string &bundleName, const napi_value callback, const std::string &type);
 
     ErrCode ClearFormClickCallbackByBundleName(const std::string &type,
         const std::string &bundleName);

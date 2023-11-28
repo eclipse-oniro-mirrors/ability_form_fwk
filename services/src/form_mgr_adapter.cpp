@@ -2286,6 +2286,7 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
             HILOG_ERROR("Failed to StartAbility, result: %{public}d.", result);
             return result;
         }
+        NotifyFormClickEvent(formId, FORM_CLICK_ROUTER);
         return ERR_OK;
     }
 
@@ -3276,7 +3277,7 @@ ErrCode FormMgrAdapter::RegisterClickCallbackEventObserver(const sptr<IRemoteObj
     sptr<IRemoteObject::DeathRecipient> deathRecipient = new (std::nothrow) FormMgrAdapter::ClientDeathRecipient();
     if (deathRecipient == nullptr) {
         HILOG_ERROR("Create deathRecipient object is null.");
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
     observer->AddDeathRecipient(deathRecipient);
@@ -3312,7 +3313,12 @@ void FormMgrAdapter::NotifyFormClickEvent(int64_t formId, const std::string &for
     HILOG_DEBUG("Called.");
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
     RunningFormInfo runningFormInfo;
-    FormDataMgr::GetInstance().GetRunningFormInfosByFormId(matchedFormId, runningFormInfo);
+
+    auto ref = FormDataMgr::GetInstance().GetRunningFormInfosByFormId(matchedFormId, runningFormInfo);
+    if (ref != ERR_OK) {
+        HILOG_DEBUG("Get Running info error.");
+        return;
+    }
     std::unique_lock<std::mutex> lock(clickEventObserversMutex_);
     for (const auto &item : clickEventObservers_) {
         if (item.first == nullptr) {

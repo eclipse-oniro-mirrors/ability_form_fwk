@@ -1127,12 +1127,7 @@ int32_t FormMgrStub::HandleRegisterClickCallbackEventObserver(MessageParcel &dat
         HILOG_ERROR("Failed to get remote object.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    int32_t result = RegisterClickCallbackEventObserver(callerToken);
-    if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("Failed to write result");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    return result;
+    return RegisterClickCallbackEventObserver(callerToken);
 }
 
 int32_t FormMgrStub::HandleUnregisterClickCallbackEventObserver(MessageParcel &data, MessageParcel &reply)
@@ -1143,12 +1138,7 @@ int32_t FormMgrStub::HandleUnregisterClickCallbackEventObserver(MessageParcel &d
         HILOG_ERROR("Failed to get remote object.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    int32_t result = UnregisterClickCallbackEventObserver(callerToken);
-    if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("Failed to write result");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    return result;
+    return UnregisterClickCallbackEventObserver(callerToken);
 }
 
 /**

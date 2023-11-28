@@ -1909,7 +1909,7 @@ ErrCode FormMgrProxy::RegisterClickCallbackEventObserver(const sptr<IRemoteObjec
     }
 
     MessageParcel reply;
-    MessageOption option;
+    MessageOption option(MessageOption::TF_ASYNC);
     auto remote = Remote();
     if (remote == nullptr) {
         HILOG_ERROR("Remote object is nullptr.");
@@ -1921,7 +1921,7 @@ ErrCode FormMgrProxy::RegisterClickCallbackEventObserver(const sptr<IRemoteObjec
         HILOG_ERROR("Failed to SendRequest: %{public}d", error);
         return error;
     }
-    return reply.ReadInt32();
+    return ERR_OK;
 }
 
 ErrCode FormMgrProxy::UnregisterClickCallbackEventObserver(const sptr<IRemoteObject> &observer)
@@ -1939,7 +1939,7 @@ ErrCode FormMgrProxy::UnregisterClickCallbackEventObserver(const sptr<IRemoteObj
     }
 
     MessageParcel reply;
-    MessageOption option;
+    MessageOption option(MessageOption::TF_ASYNC);
     auto remote = Remote();
     if (remote == nullptr) {
         HILOG_ERROR("Remote object is nullptr.");
@@ -1951,7 +1951,7 @@ ErrCode FormMgrProxy::UnregisterClickCallbackEventObserver(const sptr<IRemoteObj
         HILOG_ERROR("Failed to SendRequest: %{public}d", error);
         return error;
     }
-    return reply.ReadInt32();
+    return ERR_OK;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

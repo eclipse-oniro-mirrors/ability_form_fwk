@@ -214,7 +214,7 @@ private:
         } else if (type == "notifyInvisible") {
             return OnRegisterFormIsVisibleObserver(env, argc, argv, false);
         } else if (type == "router" || type == "message" || type == "call") {
-            return OnRegisterClickCallbackEventCallback(env, argc, argv, type);
+            return OnRegisterClickEventCallback(env, argc, argv, type);
         } else {
             HILOG_ERROR("args[0] should be formAdd, formRemove, notifyVisible, notifyInvisible, router, message, call");
             NapiFormUtil::ThrowParamTypeError(env, "type", "formAdd,"
@@ -476,7 +476,7 @@ private:
         } else if (type == "notifyInvisible") {
             return OnUnregisterFormIsVisibleObserver(env, argc, argv, false);
         } else if (type == "router" || type == "message" || type == "call") {
-            return OnUnregisterClickCallbackEventCallback(env, argc, argv, type);
+            return OnUnregisterClickEventCallback(env, argc, argv, type);
         } else {
             HILOG_ERROR("args[0] should be formAdd, formRemove, notifyVisible, notifyInvisible, router, message, call");
             NapiFormUtil::ThrowParamTypeError(env, "type",
@@ -709,15 +709,10 @@ private:
     }
     sptr<JsFormStateObserver> formObserver_ = nullptr;
 
-    napi_value OnRegisterClickCallbackEventCallback(
+    napi_value OnRegisterClickEventCallback(
         napi_env env, size_t argc, napi_value *argv, const std::string &type)
     {
         HILOG_DEBUG("Called.");
-        if (!CheckCallerIsSystemApp()) {
-            HILOG_ERROR("This application is not system-app, can not use system-api.");
-            NapiFormUtil::ThrowByExternalErrorCode(env, AppExecFwk::ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
-            return CreateJsUndefined(env);
-        }
         if (argc < ARGS_TWO) {
             HILOG_ERROR("Wrong number of params.");
             NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "2");
@@ -764,16 +759,10 @@ private:
     {
         if (JsFormStateObserver::GetInstance()->IsFormClickCallbackMapEmpty()) {
             HILOG_DEBUG("Form click callback map is empty,register click callback observer");
-            auto result = AppExecFwk::FormMgr::GetInstance().RegisterClickCallbackEventObserver(
-                JsFormStateObserver::GetInstance());
-            if (result != ERR_OK) {
-                HILOG_ERROR("Register click callback in form manager error");
-                NapiFormUtil::ThrowByInternalErrorCode(env, result);
-                return CreateJsUndefined(env);
-            }
+            AppExecFwk::FormMgr::GetInstance().RegisterClickCallbackEventObserver(JsFormStateObserver::GetInstance());
         }
         auto result =
-            JsFormStateObserver::GetInstance()->RegisterClickCallbackEventCallback(env, bundleName, callFunc, type);
+            JsFormStateObserver::GetInstance()->RegisterClickEventCallback(env, bundleName, callFunc, type);
         if (result == ERR_OK) {
             HILOG_DEBUG("Register click callback successfully.");
             return CreateJsUndefined(env);
@@ -785,23 +774,14 @@ private:
             return CreateJsUndefined(env);
         }
         HILOG_DEBUG("Form click callback map is empty.");
-        auto errorCode =
-            FormMgr::GetInstance().UnregisterClickCallbackEventObserver(JsFormStateObserver::GetInstance());
-        if (errorCode != ERR_OK) {
-            HILOG_ERROR("Unregister click callback in form manager error");
-        }
+        FormMgr::GetInstance().UnregisterClickCallbackEventObserver(JsFormStateObserver::GetInstance());
         return CreateJsUndefined(env);
     }
 
-    napi_value OnUnregisterClickCallbackEventCallback(
+    napi_value OnUnregisterClickEventCallback(
         napi_env env, size_t argc, napi_value *argv, const std::string &type)
     {
         HILOG_DEBUG("Called.");
-        if (!CheckCallerIsSystemApp()) {
-            HILOG_ERROR("This application is not system-app, can not use system-api.");
-            NapiFormUtil::ThrowByExternalErrorCode(env, AppExecFwk::ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
-            return CreateJsUndefined(env);
-        }
         std::string bundleName(EMPTY_BUNDLE);
         napi_value callback = nullptr;
         if (argc >= ARGS_TWO) {
@@ -841,12 +821,7 @@ private:
                 HILOG_DEBUG("Form click callback map is not empty.");
                 return CreateJsUndefined(env);
             }
-            result = FormMgr::GetInstance().UnregisterClickCallbackEventObserver(JsFormStateObserver::GetInstance());
-            if (result != ERR_OK) {
-                HILOG_ERROR("Unregister click callback in form manager error");
-                NapiFormUtil::ThrowByInternalErrorCode(env, result);
-                return CreateJsUndefined(env);
-            }
+            FormMgr::GetInstance().UnregisterClickCallbackEventObserver(JsFormStateObserver::GetInstance());
             return CreateJsUndefined(env);
         }
         result = JsFormStateObserver::GetInstance()->ClearFormClickCallback(type, bundleName, callback);
@@ -859,12 +834,7 @@ private:
             HILOG_DEBUG("Form click callback map is not empty.");
             return CreateJsUndefined(env);
         }
-        result = FormMgr::GetInstance().UnregisterClickCallbackEventObserver(JsFormStateObserver::GetInstance());
-        if (result != ERR_OK) {
-            HILOG_ERROR("Unregister click callback in form manager error");
-            NapiFormUtil::ThrowByInternalErrorCode(env, result);
-            return CreateJsUndefined(env);
-        }
+        FormMgr::GetInstance().UnregisterClickCallbackEventObserver(JsFormStateObserver::GetInstance());
         return CreateJsUndefined(env);
     }
 };

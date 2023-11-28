@@ -514,14 +514,14 @@ ErrCode JsFormStateObserver::OnFormClickEvent(
     }
     wptr<JsFormStateObserver> weakObserver = this;
     handler_->PostSyncTask([weakObserver, runningFormInfo, callType]() {
-        auto formClickCallbacks = weakObserver->formClickCallbackMap_.find(callType);
-        if (formClickCallbacks != weakObserver->formClickCallbackMap_.end()) {
+        auto sharedThis = weakObserver.promote();
+        if (sharedThis == nullptr) {
+            HILOG_ERROR("Sharedthis is nullptr.");
+            return ERR_INVALID_VALUE;
+        }
+        auto formClickCallbacks = sharedThis->formClickCallbackMap_.find(callType);
+        if (formClickCallbacks != sharedThis->formClickCallbackMap_.end()) {
             auto callBacks = formClickCallbacks->second.find("");
-            auto sharedThis = weakObserver.promote();
-            if (sharedThis == nullptr) {
-                HILOG_ERROR("Sharedthis is nullptr.");
-                return ERR_INVALID_VALUE;
-            }
             if (callBacks != formClickCallbacks->second.end()) {
                 for (const auto &callback : callBacks->second) {
                     napi_value value = callback->GetNapiValue();
@@ -557,10 +557,6 @@ ErrCode JsFormStateObserver::FormClickAddCallTask(
     napi_env env, napi_value callback, std::vector<std::shared_ptr<NativeReference>> &callbacks)
 {
     HILOG_DEBUG("Called.");
-    if (env == nullptr || callback == nullptr) {
-        HILOG_ERROR("The callback or the env is nullptr.");
-        return ERR_INVALID_VALUE;
-    }
 
     for (auto &iter : callbacks) {
         if (iter == nullptr) {
@@ -580,7 +576,7 @@ ErrCode JsFormStateObserver::FormClickAddCallTask(
     return ERR_OK;
 }
 
-ErrCode JsFormStateObserver::RegisterClickCallbackEventCallback(
+ErrCode JsFormStateObserver::RegisterClickEventCallback(
     const napi_env env, const std::string &bundleName, const napi_value callback, const std::string &type)
 {
     HILOG_DEBUG("Called.");
