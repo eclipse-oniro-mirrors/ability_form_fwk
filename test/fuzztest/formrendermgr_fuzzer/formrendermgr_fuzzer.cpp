@@ -59,15 +59,13 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formRenderMgr.RenderFormCallback(formId, want);
     formRenderMgr.StopRenderingFormCallback(formId, want);
     sptr<FormRenderConnection> connection = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
-    formRenderMgr.AddConnection(formId, connection);
-    formRenderMgr.RerenderAllForms();
+    int32_t privacyLevel = 0;
+    formRenderMgr.AddConnection(formId, connection, privacyLevel);
     sptr<IRemoteObject> host = nullptr;
     formRenderMgr.CleanFormHost(host);
     sptr<IRemoteObject> remoteObject = nullptr;
-    formRenderMgr.AddRenderDeathRecipient(remoteObject);
+    formRenderMgr.AddRenderDeathRecipient(remoteObject, privacyLevel);
     formRenderMgr.IsNeedRender(formId);
-    formRenderMgr.RemoveHostToken(host);
-    formRenderMgr.NotifyHostRenderServiceIsDead();
     int32_t errorCode = static_cast<int32_t>(GetU32Data(data));
     formRenderMgr.HandleConnectFailed(formId, errorCode);
     formRenderMgr.IsRerenderForRenderServiceDied(formId);

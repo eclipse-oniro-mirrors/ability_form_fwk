@@ -182,6 +182,7 @@ FormRecord FormDataMgr::CreateFormRecord(const FormItemInfo &formInfo, const int
     newRecord.uiSyntax = formInfo.GetUiSyntax();
     newRecord.isDynamic = formInfo.IsDynamic();
     newRecord.transparencyEnabled = formInfo.IsTransparencyEnabled();
+    newRecord.privacyLevel = formInfo.GetPrivacyLevel();
     newRecord.isSystemApp = formInfo.GetSystemAppFlag();
     newRecord.description = formInfo.GetDescription();
     if (newRecord.isEnableUpdate) {

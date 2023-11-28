@@ -61,6 +61,19 @@ sptr<IBundleMgr> FormBmsHelper::GetBundleMgr()
     return iBundleMgr_;
 }
 
+sptr<IBundleInstaller> FormBmsHelper::GetBundleInstaller()
+{
+    HILOG_DEBUG("called.");
+    if (bundleInstallerProxy_ == nullptr) {
+        sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
+        if (iBundleMgr != nullptr) {
+            bundleInstallerProxy_ = iBundleMgr->GetBundleInstaller();
+        }
+    }
+    return bundleInstallerProxy_;
+}
+
+
 void FormBmsHelper::SetBundleManager(const sptr<IBundleMgr> &bundleManager)
 {
     HILOG_DEBUG("SetBundleManager called.");

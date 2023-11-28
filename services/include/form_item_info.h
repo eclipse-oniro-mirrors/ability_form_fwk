@@ -316,6 +316,16 @@ public:
      */
     void SetTransparencyEnabled(bool isTransparencyEnabled);
     /**
+     * @brief Obtains the privacyLevel.
+     * @return Returns privacyLevel.
+     */
+    int32_t GetPrivacyLevel() const;
+    /**
+     * @brief Set value of privacyLevel.
+     * @param level privacyLevel.
+     */
+    void SetPrivacyLevel(int32_t level);
+    /**
      * @brief Get uiSyntax.
      * @return uiSyntax.
      */
@@ -395,6 +405,7 @@ private:
     std::string icon_ = "";
     bool isDynamic_ = true;
     bool transparencyEnabled_ = false;
+    int32_t privacyLevel_ = 0;
     std::string jsComponentName_ = "";
     std::string abilityModuleName_ = "";
     std::unordered_map<std::string, std::string> moduleInfoMap_;
