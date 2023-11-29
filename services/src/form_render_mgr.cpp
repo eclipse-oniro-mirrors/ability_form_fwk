@@ -350,7 +350,7 @@ bool FormRenderMgr::IsRerenderForRenderServiceDied(int64_t formId)
     if (renderInner_ != nullptr) {
         rerenderCount = renderInner_->GetReRenderCount();
     }
-    if (renderInner_ != nullptr) {
+    if (sandboxInner_ != nullptr) {
         reSandboxRenderCount = sandboxInner_->GetReRenderCount();
     }
     bool ret = IsNeedRender(formId) && (rerenderCount > 0 || reSandboxRenderCount > 0);
