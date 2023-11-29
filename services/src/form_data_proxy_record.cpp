@@ -38,6 +38,9 @@ const std::string KEY_DELIMITER = "?"; // the delimiter between key and uid
 void FormDataProxyRecord::OnRdbDataChange(const DataShare::RdbChangeNode &changeNode)
 {
     HILOG_INFO("on rdb data change. data size is %{public}zu", changeNode.data_.size());
+    if (changeNode.data_.size() == 0) {
+        return;
+    }
     UpdateRdbDataForm(changeNode.data_);
 }
 

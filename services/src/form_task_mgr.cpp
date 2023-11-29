@@ -784,7 +784,7 @@ FormJsInfo FormTaskMgr::CreateFormJsInfo(const int64_t formId, const FormRecord 
     form.uiSyntax = record.uiSyntax;
     form.isDynamic = record.isDynamic;
     form.transparencyEnabled = record.transparencyEnabled;
-    HILOG_DEBUG("%{public}s end, jsPath: %{private}s, data: %{public}s", __func__,
+    HILOG_DEBUG("%{public}s end, jsPath: %{private}s, data: %{private}s", __func__,
         form.jsFormCodePath.c_str(), form.formData.c_str());
     return form;
 }
