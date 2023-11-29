@@ -1418,6 +1418,9 @@ ErrCode FormMgrAdapter::AddFormTimer(const FormRecord &formRecord)
         return ERR_OK;
     }
     if (formRecord.updateDuration > 0 && !formRecord.isDataProxy) {
+        if (!FormDataMgr::GetInstance().HasFormCloudUpdateDuration(formRecord.bundleName)) {
+            UpdateFormCloudUpdateDuration(formRecord.bundleName);
+        }
         int64_t updateDuration = formRecord.updateDuration;
         if (!GetValidFormUpdateDuration(formRecord.formId, updateDuration)) {
             HILOG_WARN("Get updateDuration failed, uses local configuration.");
@@ -3318,48 +3321,45 @@ bool FormMgrAdapter::GetValidFormUpdateDuration(const int64_t formId, int64_t &u
         return true;
     }
 
-    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
-    if (iBundleMgr == nullptr) {
-        HILOG_ERROR("Failed to get IBundleMgr, uses local configuration.");
+    int duration = FormDataMgr::GetInstance().GetFormCloudUpdateDuration(formRecord.bundleName);
+    if (duration == 0) {
+        HILOG_INFO("No valid cloud update duration, uses local configuration.");
         updateDuration = formRecord.updateDuration;
         return true;
     }
-
-    std::string additionalInfo;
-    if (IN_PROCESS_CALL(iBundleMgr->GetAdditionalInfo(formRecord.bundleName, additionalInfo)) != ERR_OK) {
-        HILOG_ERROR("Failed to get GetAdditionalInfo, uses local configuration.");
-        updateDuration = formRecord.updateDuration;
-        return true;
-    }
-
-    if (additionalInfo.empty()) {
-        HILOG_DEBUG("AdditionalInfo is empty, uses local configuration.");
-        updateDuration = formRecord.updateDuration;
-        return true;
-    }
-
-    std::vector<int> durationArray;
-    GetUpdateDurationFromAdditionalInfo(additionalInfo, durationArray);
-    if (durationArray.empty()) {
-        HILOG_INFO("No valid formUpdateLevel in additionalInfo, uses local configuration.");
-        updateDuration = formRecord.updateDuration;
-        return true;
-    }
-
-    int duration = durationArray.back();
     int64_t cloudsDuration = duration * Constants::TIME_CONVERSION;
     updateDuration = std::max(formRecord.updateDuration, cloudsDuration);
     return true;
 }
 
-void FormMgrAdapter::GetUpdateDurationFromAdditionalInfo(
-    const std::string &additionalInfo, std::vector<int> &durationArray) const
+void FormMgrAdapter::UpdateFormCloudUpdateDuration(const std::string &bundleName)
 {
+    HILOG_DEBUG("Called.");
+    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
+    if (iBundleMgr == nullptr) {
+        HILOG_ERROR("Failed to get IBundleMgr.");
+        FormDataMgr::GetInstance().RemoveFormCloudUpdateDuration(bundleName);
+        return;
+    }
+
+    std::string additionalInfo;
+    if (IN_PROCESS_CALL(iBundleMgr->GetAdditionalInfo(bundleName, additionalInfo)) != ERR_OK) {
+        HILOG_ERROR("Failed to get additionalInfo.");
+        FormDataMgr::GetInstance().RemoveFormCloudUpdateDuration(bundleName);
+        return;
+    }
+
+    if (additionalInfo.empty()) {
+        HILOG_INFO("AdditionalInfo is empty.");
+        FormDataMgr::GetInstance().RemoveFormCloudUpdateDuration(bundleName);
+        return;
+    }
+
     std::regex regex(R"(formUpdateLevel:(\d+))");
     std::smatch searchResult;
     std::string::const_iterator iterStart = additionalInfo.begin();
     std::string::const_iterator iterEnd = additionalInfo.end();
-
+    std::vector<int> durationArray;
     while (std::regex_search(iterStart, iterEnd, searchResult, regex)) {
         iterStart = searchResult[0].second;
         if (searchResult[DATA_FIELD].str().length() > FORM_UPDATE_LEVEL_VALUE_MAX_LENGTH) {
@@ -3370,6 +3370,14 @@ void FormMgrAdapter::GetUpdateDurationFromAdditionalInfo(
             durationArray.emplace_back(val);
         }
     }
+
+    if (durationArray.empty()) {
+        HILOG_INFO("No valid formUpdateLevel in additionalInfo.");
+        FormDataMgr::GetInstance().RemoveFormCloudUpdateDuration(bundleName);
+        return;
+    }
+
+    FormDataMgr::GetInstance().UpdateFormCloudUpdateDuration(bundleName, durationArray.back());
 }
 
 int32_t FormMgrAdapter::GetCallerType(std::string bundleName)

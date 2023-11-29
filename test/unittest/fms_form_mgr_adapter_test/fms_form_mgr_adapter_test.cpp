@@ -4155,42 +4155,49 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_215, TestSize.Level0)
     std::string additionalInfo = "";
     EXPECT_CALL(*bmsProxy, GetAdditionalInfo(_, _))
         .WillRepeatedly(DoAll(SetArgReferee<1>(additionalInfo), Return(ERR_TIMED_OUT)));
+    formMgrAdapter.UpdateFormCloudUpdateDuration("bundleName");
     EXPECT_EQ(true, formMgrAdapter.GetValidFormUpdateDuration(formId, updateDuration));
     EXPECT_EQ(updateDuration, 2 * Constants::TIME_CONVERSION);
 
     additionalInfo = "";
     EXPECT_CALL(*bmsProxy, GetAdditionalInfo(_, _))
         .WillRepeatedly(DoAll(SetArgReferee<1>(additionalInfo), Return(ERR_OK)));
+    formMgrAdapter.UpdateFormCloudUpdateDuration("bundleName");
     EXPECT_EQ(true, formMgrAdapter.GetValidFormUpdateDuration(formId, updateDuration));
     EXPECT_EQ(updateDuration, 2 * Constants::TIME_CONVERSION);
 
     additionalInfo = "abcdefg";
     EXPECT_CALL(*bmsProxy, GetAdditionalInfo(_, _))
         .WillRepeatedly(DoAll(SetArgReferee<1>(additionalInfo), Return(ERR_OK)));
+    formMgrAdapter.UpdateFormCloudUpdateDuration("bundleName");
     EXPECT_EQ(true, formMgrAdapter.GetValidFormUpdateDuration(formId, updateDuration));
     EXPECT_EQ(updateDuration, 2 * Constants::TIME_CONVERSION);
 
     additionalInfo = "formUpdateLevel:dfd";
     EXPECT_CALL(*bmsProxy, GetAdditionalInfo(_, _))
         .WillRepeatedly(DoAll(SetArgReferee<1>(additionalInfo), Return(ERR_OK)));
+    formMgrAdapter.UpdateFormCloudUpdateDuration("bundleName");
     EXPECT_EQ(true, formMgrAdapter.GetValidFormUpdateDuration(formId, updateDuration));
     EXPECT_EQ(updateDuration, 2 * Constants::TIME_CONVERSION);
 
     additionalInfo = "formUpdateLevel:0";
     EXPECT_CALL(*bmsProxy, GetAdditionalInfo(_, _))
         .WillRepeatedly(DoAll(SetArgReferee<1>(additionalInfo), Return(ERR_OK)));
+    formMgrAdapter.UpdateFormCloudUpdateDuration("bundleName");
     EXPECT_EQ(true, formMgrAdapter.GetValidFormUpdateDuration(formId, updateDuration));
     EXPECT_EQ(updateDuration, 2 * Constants::TIME_CONVERSION);
 
     additionalInfo = "formUpdateLevel:4, time:0, formUpdateLevel:7";
     EXPECT_CALL(*bmsProxy, GetAdditionalInfo(_, _))
         .WillRepeatedly(DoAll(SetArgReferee<1>(additionalInfo), Return(ERR_OK)));
+    formMgrAdapter.UpdateFormCloudUpdateDuration("bundleName");
     EXPECT_EQ(true, formMgrAdapter.GetValidFormUpdateDuration(formId, updateDuration));
     EXPECT_EQ(updateDuration, 7 * Constants::TIME_CONVERSION);
 
     additionalInfo = "formUpdateLevel:4, time:0, formUpdateLevel:1111";
     EXPECT_CALL(*bmsProxy, GetAdditionalInfo(_, _))
         .WillRepeatedly(DoAll(SetArgReferee<1>(additionalInfo), Return(ERR_OK)));
+    formMgrAdapter.UpdateFormCloudUpdateDuration("bundleName");
     EXPECT_EQ(true, formMgrAdapter.GetValidFormUpdateDuration(formId, updateDuration));
     EXPECT_EQ(updateDuration, 4 * Constants::TIME_CONVERSION);
 

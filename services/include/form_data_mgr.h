@@ -671,6 +671,32 @@ public:
      * @param want The want of forms to be recycled.
      */
     void RecycleForms(const std::vector<int64_t> &formIds, const int &callingUid, const Want &want) const;
+
+    /**
+     * @brief Update the form cloud update duration by bundleName.
+     * @param bundleName The specified bundleName.
+     * @param duration The form cloud update duration.
+     */
+    void UpdateFormCloudUpdateDuration(const std::string &bundleName, int duration);
+
+    /**
+     * @brief Remove the form cloud update duration by bundleName.
+     * @param bundleName The specified bundleName.
+     */
+    void RemoveFormCloudUpdateDuration(const std::string &bundleName);
+
+    /**
+     * @brief Get the form cloud update duration by bundleName.
+     * @param bundleName The specified bundleName.
+     */
+    int GetFormCloudUpdateDuration(const std::string &bundleName) const;
+
+    /**
+     * @brief Determine if the form cloud update duration exists by bundleName.
+     * @param bundleName The specified bundleName.
+     */
+    bool HasFormCloudUpdateDuration(const std::string &bundleName) const;
+
 private:
     /**
      * @brief Create form record.
@@ -761,6 +787,7 @@ private:
     template<typename T>
     bool GetAbilityFormInfo(const FormRecord &record, const std::vector<T> &abilities,
         AbilityFormInfo &abilityFormInfo);
+
 private:
     void GetUnusedFormInstancesByFilter(
         const FormInstancesFilter &formInstancesFilter, std::vector<FormInstance> &formInstances);
@@ -773,6 +800,7 @@ private:
     mutable std::mutex formRequestPublishFormsMutex_;
     mutable std::mutex formAcquireDataRecordMutex_;
     mutable std::mutex formConfigMapMutex_;
+    mutable std::mutex formCloudUpdateDurationMapMutex_;
     std::map<int64_t, FormRecord> formRecords_;
     std::vector<FormHostRecord> clientRecords_;
     std::vector<int64_t> tempForms_;
@@ -784,6 +812,7 @@ private:
     int64_t udidHash_ = 0;
     std::vector<sptr<IRemoteObject>> formObservers_;
     std::map<std::string, int32_t> formConfigMap_;
+    std::unordered_map<std::string, int> formCloudUpdateDurationMap_;
 };
 } // namespace AppExecFwk
 } // namespace OHOS
