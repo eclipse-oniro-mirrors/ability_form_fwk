@@ -513,14 +513,14 @@ public:
      * @param observer Form click event callback listener.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual ErrCode RegisterClickCallbackEventObserver(const sptr<IRemoteObject> &observer) = 0;
+    virtual ErrCode RegisterClickEventObserver(const sptr<IRemoteObject> &observer) = 0;
 
     /**
      * @brief Unregister click callback observer.
      * @param observer Form click event callback listener.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual ErrCode UnregisterClickCallbackEventObserver(const sptr<IRemoteObject> &observer) = 0;
+    virtual ErrCode UnregisterClickEventObserver(const sptr<IRemoteObject> &observer) = 0;
 
     enum class Message {
         // ipc id 1-1000 for kit
@@ -586,8 +586,8 @@ public:
         FORM_MGR_RELEASE_RENDERER,
         FORM_MGR_REGISTER_PUBLISH_FORM_INTERCEPTOR,
         FORM_MGR_UNREGISTER_PUBLISH_FORM_INTERCEPTOR,
-        FORM_MGR_REGISTER_CLICK_CALLBACK,
-        FORM_MGR_UNREGISTER_CLICK_CALLBACK,
+        FORM_MGR_REGISTER_CLICK_EVENT_OBSERVER,
+        FORM_MGR_UNREGISTER_CLICK_EVENT_OBSERVER,
         FORM_MGR_REGISTER_FORM_ROUTER_PROXY,
         FORM_MGR_UNREGISTER_FORM_ROUTER_PROXY,
     };

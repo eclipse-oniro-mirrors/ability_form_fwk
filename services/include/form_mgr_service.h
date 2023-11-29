@@ -534,14 +534,14 @@ public:
      * @param observer Form click event callback listener.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode RegisterClickCallbackEventObserver(const sptr<IRemoteObject> &observer) override;
+    ErrCode RegisterClickEventObserver(const sptr<IRemoteObject> &observer) override;
 
     /**
      * @brief Unregister click callback observer.
      * @param observer Form click event callback listener.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode UnregisterClickCallbackEventObserver(const sptr<IRemoteObject> &observer) override;
+    ErrCode UnregisterClickEventObserver(const sptr<IRemoteObject> &observer) override;
 
 private:
     /**

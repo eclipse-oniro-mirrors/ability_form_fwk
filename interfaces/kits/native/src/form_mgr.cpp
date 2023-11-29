@@ -1284,7 +1284,7 @@ ErrCode FormMgr::RegisterRemoveObserver(const std::string &bundleName, const spt
     return remoteProxy_->RegisterRemoveObserver(bundleName, callerToken);
 }
 
-ErrCode FormMgr::RegisterClickCallbackEventObserver(const sptr<IRemoteObject> &observer)
+ErrCode FormMgr::RegisterClickEventObserver(const sptr<IRemoteObject> &observer)
 {
     HILOG_DEBUG("Called.");
     if (observer == nullptr) {
@@ -1300,10 +1300,10 @@ ErrCode FormMgr::RegisterClickCallbackEventObserver(const sptr<IRemoteObject> &o
         HILOG_ERROR("Failed, errCode:%{public}d.", errCode);
         return errCode;
     }
-    return remoteProxy_->RegisterClickCallbackEventObserver(observer);
+    return remoteProxy_->RegisterClickEventObserver(observer);
 }
 
-ErrCode FormMgr::UnregisterClickCallbackEventObserver(const sptr<IRemoteObject> &observer)
+ErrCode FormMgr::UnregisterClickEventObserver(const sptr<IRemoteObject> &observer)
 {
     if (observer == nullptr) {
         HILOG_ERROR("Caller token parameteris empty.");
@@ -1318,7 +1318,7 @@ ErrCode FormMgr::UnregisterClickCallbackEventObserver(const sptr<IRemoteObject> 
         HILOG_ERROR("Failed, errCode:%{public}d.", errCode);
         return errCode;
     }
-    return remoteProxy_->UnregisterClickCallbackEventObserver(observer);
+    return remoteProxy_->UnregisterClickEventObserver(observer);
 }
 
 int FormMgr::RegisterFormRouterProxy(const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &callerToken)

@@ -759,7 +759,7 @@ private:
     {
         if (JsFormStateObserver::GetInstance()->IsFormClickCallbackMapEmpty()) {
             HILOG_DEBUG("Form click callback map is empty,register click callback observer");
-            AppExecFwk::FormMgr::GetInstance().RegisterClickCallbackEventObserver(JsFormStateObserver::GetInstance());
+            AppExecFwk::FormMgr::GetInstance().RegisterClickEventObserver(JsFormStateObserver::GetInstance());
         }
         auto result =
             JsFormStateObserver::GetInstance()->RegisterClickEventCallback(env, bundleName, callFunc, type);
@@ -774,7 +774,7 @@ private:
             return CreateJsUndefined(env);
         }
         HILOG_DEBUG("Form click callback map is empty.");
-        FormMgr::GetInstance().UnregisterClickCallbackEventObserver(JsFormStateObserver::GetInstance());
+        FormMgr::GetInstance().UnregisterClickEventObserver(JsFormStateObserver::GetInstance());
         return CreateJsUndefined(env);
     }
 
@@ -821,7 +821,7 @@ private:
                 HILOG_DEBUG("Form click callback map is not empty.");
                 return CreateJsUndefined(env);
             }
-            FormMgr::GetInstance().UnregisterClickCallbackEventObserver(JsFormStateObserver::GetInstance());
+            FormMgr::GetInstance().UnregisterClickEventObserver(JsFormStateObserver::GetInstance());
             return CreateJsUndefined(env);
         }
         result = JsFormStateObserver::GetInstance()->ClearFormClickCallback(type, bundleName, callback);
@@ -834,7 +834,7 @@ private:
             HILOG_DEBUG("Form click callback map is not empty.");
             return CreateJsUndefined(env);
         }
-        FormMgr::GetInstance().UnregisterClickCallbackEventObserver(JsFormStateObserver::GetInstance());
+        FormMgr::GetInstance().UnregisterClickEventObserver(JsFormStateObserver::GetInstance());
         return CreateJsUndefined(env);
     }
 };

@@ -546,6 +546,7 @@ ErrCode JsFormStateObserver::OnFormClickEvent(
 bool JsFormStateObserver::IsFormClickCallbackMapEmpty()
 {
     HILOG_DEBUG("Called.");
+    std::lock_guard<std::mutex> lock(formClickCallbackMutex_);
     if (formClickCallbackMap_.empty()) {
         HILOG_DEBUG("Form click callback map is empty.");
         return true;

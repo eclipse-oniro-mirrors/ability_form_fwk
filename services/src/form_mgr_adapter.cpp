@@ -3262,7 +3262,7 @@ int32_t FormMgrAdapter::UnregisterPublishFormInterceptor(const sptr<IRemoteObjec
     return ERR_APPEXECFWK_FORM_INVALID_PARAM;
 }
 
-ErrCode FormMgrAdapter::RegisterClickCallbackEventObserver(const sptr<IRemoteObject> &observer)
+ErrCode FormMgrAdapter::RegisterClickEventObserver(const sptr<IRemoteObject> &observer)
 {
     if (observer == nullptr) {
         HILOG_ERROR("Caller token is null.");
@@ -3287,7 +3287,7 @@ ErrCode FormMgrAdapter::RegisterClickCallbackEventObserver(const sptr<IRemoteObj
     return ERR_OK;
 }
 
-ErrCode FormMgrAdapter::UnregisterClickCallbackEventObserver(const sptr<IRemoteObject> &observer)
+ErrCode FormMgrAdapter::UnregisterClickEventObserver(const sptr<IRemoteObject> &observer)
 {
     if (observer == nullptr) {
         HILOG_ERROR("Caller token is null.");

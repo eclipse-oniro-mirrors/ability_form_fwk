@@ -57,14 +57,14 @@ public:
      * @param observer Form click event callback listener.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode RegisterClickCallbackEventObserver(const sptr<IRemoteObject> &observer);
+    ErrCode RegisterClickEventObserver(const sptr<IRemoteObject> &observer);
 
     /**
      * @brief Unregister click callback observer.
      * @param observer Form click event callback listener.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode UnregisterClickCallbackEventObserver(const sptr<IRemoteObject> &observer);
+    ErrCode UnregisterClickEventObserver(const sptr<IRemoteObject> &observer);
 
     /**
      * @brief Get the error message by error code.

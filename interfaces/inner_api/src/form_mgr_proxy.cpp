@@ -1894,7 +1894,7 @@ int32_t FormMgrProxy::UnregisterPublishFormInterceptor(const sptr<IRemoteObject>
     return reply.ReadInt32();
 }
 
-ErrCode FormMgrProxy::RegisterClickCallbackEventObserver(const sptr<IRemoteObject> &observer)
+ErrCode FormMgrProxy::RegisterClickEventObserver(const sptr<IRemoteObject> &observer)
 {
     HILOG_DEBUG("Click callback event start.");
     MessageParcel data;
@@ -1916,7 +1916,7 @@ ErrCode FormMgrProxy::RegisterClickCallbackEventObserver(const sptr<IRemoteObjec
         return ERR_INVALID_OPERATION;
     }
     auto error = remote->SendRequest(
-        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_CLICK_CALLBACK), data, reply, option);
+        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_CLICK_EVENT_OBSERVER), data, reply, option);
     if (error != ERR_OK) {
         HILOG_ERROR("Failed to SendRequest: %{public}d", error);
         return error;
@@ -1924,7 +1924,7 @@ ErrCode FormMgrProxy::RegisterClickCallbackEventObserver(const sptr<IRemoteObjec
     return ERR_OK;
 }
 
-ErrCode FormMgrProxy::UnregisterClickCallbackEventObserver(const sptr<IRemoteObject> &observer)
+ErrCode FormMgrProxy::UnregisterClickEventObserver(const sptr<IRemoteObject> &observer)
 {
     HILOG_DEBUG("Click callback event start.");
     MessageParcel data;
@@ -1946,7 +1946,7 @@ ErrCode FormMgrProxy::UnregisterClickCallbackEventObserver(const sptr<IRemoteObj
         return ERR_INVALID_OPERATION;
     }
     auto error = remote->SendRequest(
-        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_CLICK_CALLBACK), data, reply, option);
+        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_CLICK_EVENT_OBSERVER), data, reply, option);
     if (error != ERR_OK) {
         HILOG_ERROR("Failed to SendRequest: %{public}d", error);
         return error;

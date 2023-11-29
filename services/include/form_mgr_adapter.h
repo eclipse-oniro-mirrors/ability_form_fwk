@@ -482,14 +482,14 @@ public:
      * @param callerToken Caller ability token.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode RegisterClickCallbackEventObserver(const sptr<IRemoteObject> &observer);
+    ErrCode RegisterClickEventObserver(const sptr<IRemoteObject> &observer);
 
     /**
      * @brief Unregister click callback observer.
      * @param callerToken Caller ability token.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode UnregisterClickCallbackEventObserver(const sptr<IRemoteObject> &observer);
+    ErrCode UnregisterClickEventObserver(const sptr<IRemoteObject> &observer);
 
     /**
      * @brief Compare the locally configured update duration with the update duration in additionalInfo and
