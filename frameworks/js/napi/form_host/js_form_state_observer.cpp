@@ -499,7 +499,7 @@ int32_t JsFormStateObserver::NotifyWhetherFormsVisible(const AppExecFwk::FormVis
 ErrCode JsFormStateObserver::OnFormClickEvent(
     const std::string &callType, const AppExecFwk::RunningFormInfo &runningFormInfo)
 {
-    HILOG_DEBUG("Called.");
+    HILOG_INFO("Called.");
     std::lock_guard<std::mutex> lock(formClickCallbackMutex_);
     if (callType.empty()) {
         HILOG_ERROR("Calltype is empty.");

@@ -3271,7 +3271,7 @@ ErrCode FormMgrAdapter::RegisterClickEventObserver(const sptr<IRemoteObject> &ob
 
     std::unique_lock<std::mutex> lock(clickEventObserversMutex_);
     if (clickEventObservers_.find(observer) != clickEventObservers_.end()) {
-        HILOG_DEBUG("The observer has been added.");
+        HILOG_INFO("The observer has been added.");
         return ERR_OK;
     }
 
@@ -3297,7 +3297,7 @@ ErrCode FormMgrAdapter::UnregisterClickEventObserver(const sptr<IRemoteObject> &
     std::unique_lock<std::mutex> lock(clickEventObserversMutex_);
     auto iter = clickEventObservers_.find(observer);
     if (iter == clickEventObservers_.end()) {
-        HILOG_DEBUG("The observer not found.");
+        HILOG_INFO("The observer not found.");
         return ERR_APPEXECFWK_FORM_INVALID_PROVIDER_DATA;
     }
 
@@ -3311,18 +3311,19 @@ ErrCode FormMgrAdapter::UnregisterClickEventObserver(const sptr<IRemoteObject> &
 
 void FormMgrAdapter::NotifyFormClickEvent(int64_t formId, const std::string &formClickType)
 {
-    HILOG_DEBUG("Called.");
+    HILOG_INFO("Called.");
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
     RunningFormInfo runningFormInfo;
 
     auto ref = FormDataMgr::GetInstance().GetRunningFormInfosByFormId(matchedFormId, runningFormInfo);
     if (ref != ERR_OK) {
-        HILOG_DEBUG("Get Running info error.");
+        HILOG_ERROR("Get Running info error.");
         return;
     }
     std::unique_lock<std::mutex> lock(clickEventObserversMutex_);
     for (const auto &item : clickEventObservers_) {
         if (item.first == nullptr) {
+            HILOG_ERROR("Observers died.");
             continue;
         }
 
