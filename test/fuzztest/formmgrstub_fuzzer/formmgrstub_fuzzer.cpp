@@ -227,8 +227,18 @@ public:
         return ERR_OK;
     }
 
+    ErrCode RegisterClickEventObserver(const sptr<IRemoteObject> &observer) override
+    {
+        return ERR_OK;
+    }
+    
     ErrCode RegisterFormRouterProxy(const std::vector<int64_t> &formIds,
         const sptr<IRemoteObject> &callerToken) override
+    {
+        return ERR_OK;
+    }
+
+    ErrCode UnregisterClickEventObserver(const sptr<IRemoteObject> &observer) override
     {
         return ERR_OK;
     }

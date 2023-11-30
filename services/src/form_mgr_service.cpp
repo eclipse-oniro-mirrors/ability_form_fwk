@@ -1428,5 +1428,35 @@ ErrCode FormMgrService::RequestPublishProxyForm(Want &want, bool withFormBinding
     return FormMgrAdapter::GetInstance().RequestPublishForm(want, withFormBindingData, formBindingData, formId,
         formDataProxies);
 }
+
+ErrCode FormMgrService::RegisterClickEventObserver(const sptr<IRemoteObject> &observer)
+{
+    HILOG_DEBUG("Called.");
+    if (observer == nullptr) {
+        HILOG_ERROR("Caller token parameter is empty.");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    ErrCode ret = CheckFormObserverPermission();
+    if (ret != ERR_OK) {
+        HILOG_ERROR("Fail, register form add observer permission denied");
+        return ret;
+    }
+    return FormMgrAdapter::GetInstance().RegisterClickEventObserver(observer);
+}
+
+ErrCode FormMgrService::UnregisterClickEventObserver(const sptr<IRemoteObject> &observer)
+{
+    HILOG_DEBUG("Called.");
+    if (observer == nullptr) {
+        HILOG_ERROR("Caller token parameter is empty.");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    ErrCode ret = CheckFormObserverPermission();
+    if (ret != ERR_OK) {
+        HILOG_ERROR("Fail, register form add observer permission denied");
+        return ret;
+    }
+    return FormMgrAdapter::GetInstance().UnregisterClickEventObserver(observer);
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

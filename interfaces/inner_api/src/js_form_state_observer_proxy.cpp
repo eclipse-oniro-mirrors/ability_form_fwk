@@ -150,5 +150,40 @@ int JsFormStateObserverProxy::SendTransactCmd(IJsFormStateObserver::Message code
     }
     return ERR_OK;
 }
+
+int32_t JsFormStateObserverProxy::OnFormClickEvent(
+    const std::string &callType, const AppExecFwk::RunningFormInfo &runningFormInfo)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_ASYNC);
+
+    if (!data.WriteInterfaceToken(AbilityRuntime::IJsFormStateObserver::GetDescriptor())) {
+        HILOG_ERROR("Failed to write interface token");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteString(callType)) {
+        HILOG_ERROR("failed to write call type");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteParcelable(&runningFormInfo)) {
+        HILOG_ERROR("failed to write runningFormInfo");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    sptr<IRemoteObject> remote = Remote();
+    if (!remote) {
+        HILOG_ERROR("Failed to get remote object");
+        return ERR_APPEXECFWK_SERVICE_NOT_CONNECTED;
+    }
+    int32_t error = remote->SendRequest(
+        static_cast<uint32_t>(IJsFormStateObserver::Message::FORM_STATE_OBSERVER_ON_FORM_CLICK), data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("failed to SendRequest: %{public}d", error);
+    }
+    return error;
+}
 } // namespace AbilityRuntime
 } // namespace OHOS

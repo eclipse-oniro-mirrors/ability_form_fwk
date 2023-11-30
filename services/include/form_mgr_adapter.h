@@ -478,6 +478,20 @@ public:
     int32_t UnregisterPublishFormInterceptor(const sptr<IRemoteObject> &interceptorCallback);
 
     /**
+     * @brief Register click callback observer.
+     * @param callerToken Caller ability token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RegisterClickEventObserver(const sptr<IRemoteObject> &observer);
+
+    /**
+     * @brief Unregister click callback observer.
+     * @param callerToken Caller ability token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UnregisterClickEventObserver(const sptr<IRemoteObject> &observer);
+
+    /**
      * @brief Compare the locally configured update duration with the update duration in additionalInfo and
      * return a larger value.
      * @param formId The Id of the form.
@@ -851,6 +865,8 @@ private:
     std::map<std::string, std::vector<sptr<IRemoteObject>>> formObservers_;
     std::map<sptr<IRemoteObject>, sptr<IRemoteObject::DeathRecipient>> deathRecipients_;
 
+    void NotifyFormClickEvent(int64_t formId, const std::string &formClickType);
+
     /**
      * @brief Get caller type.
      * @param bundleName the caller's bundle name.
@@ -928,6 +944,8 @@ private:
 
 private:
     sptr<IFormPublishInterceptor> formPublishInterceptor_ = nullptr;
+    mutable std::mutex clickEventObserversMutex_;
+    std::map<sptr<IRemoteObject>, sptr<IRemoteObject::DeathRecipient>> clickEventObservers_;
     int32_t visibleNotifyDelay_ = Constants::DEFAULT_VISIBLE_NOTIFY_DELAY;
 };
 }  // namespace AppExecFwk

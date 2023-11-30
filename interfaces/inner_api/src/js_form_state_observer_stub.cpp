@@ -35,6 +35,8 @@ JsFormStateObserverStub::JsFormStateObserverStub()
     memberFuncMap_[
         static_cast<uint32_t>(IJsFormStateObserver::Message::FORM_STATE_OBSERVER_NOTIFY_WHETHER_FORMS_VISIBLE)] =
         &JsFormStateObserverStub::HandleNotifyWhetherFormsVisible;
+    memberFuncMap_[static_cast<uint32_t>(IJsFormStateObserver::Message::FORM_STATE_OBSERVER_ON_FORM_CLICK)] =
+        &JsFormStateObserverStub::HandleOnFormClick;
 }
 
 JsFormStateObserverStub::~JsFormStateObserverStub()
@@ -128,6 +130,24 @@ int32_t JsFormStateObserverStub::GetParcelableInfos(MessageParcel &data, std::ve
     }
     HILOG_DEBUG("get parcelable infos success");
     return ERR_OK;
+}
+
+int32_t JsFormStateObserverStub::HandleOnFormClick(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("Called.");
+    std::string callType = data.ReadString();
+    if (callType.empty()) {
+        HILOG_ERROR("Call type is empty.");
+        return ERR_APPEXECFWK_INSTALLD_PARAM_ERROR;
+    }
+    std::unique_ptr<AppExecFwk::RunningFormInfo> runningFormInfo(data.ReadParcelable<AppExecFwk::RunningFormInfo>());
+    if (!runningFormInfo) {
+        HILOG_ERROR("Failed to ReadParcelable<RunningFormInfo>");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int32_t result = OnFormClickEvent(callType, *runningFormInfo);
+    reply.WriteInt32(result);
+    return result;
 }
 } // namespace AbilityRuntime
 } // namespace OHOS

@@ -1893,5 +1893,65 @@ int32_t FormMgrProxy::UnregisterPublishFormInterceptor(const sptr<IRemoteObject>
     // retrieve and return result.
     return reply.ReadInt32();
 }
+
+ErrCode FormMgrProxy::RegisterClickEventObserver(const sptr<IRemoteObject> &observer)
+{
+    HILOG_DEBUG("Click callback event start.");
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("Failed to write interface token.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteRemoteObject(observer)) {
+        HILOG_ERROR("Failed to write observer.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_ASYNC);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        HILOG_ERROR("Remote object is nullptr.");
+        return ERR_INVALID_OPERATION;
+    }
+    auto error = remote->SendRequest(
+        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_CLICK_EVENT_OBSERVER), data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("Failed to SendRequest: %{public}d", error);
+        return error;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrProxy::UnregisterClickEventObserver(const sptr<IRemoteObject> &observer)
+{
+    HILOG_DEBUG("Click callback event start.");
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("Failed to write interface token.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteRemoteObject(observer)) {
+        HILOG_ERROR("Failed to write observer.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_ASYNC);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        HILOG_ERROR("Remote object is nullptr.");
+        return ERR_INVALID_OPERATION;
+    }
+    auto error = remote->SendRequest(
+        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_CLICK_EVENT_OBSERVER), data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("Failed to SendRequest: %{public}d", error);
+        return error;
+    }
+    return ERR_OK;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -184,6 +184,7 @@ FormRecord FormDataMgr::CreateFormRecord(const FormItemInfo &formInfo, const int
     newRecord.transparencyEnabled = formInfo.IsTransparencyEnabled();
     newRecord.privacyLevel = formInfo.GetPrivacyLevel();
     newRecord.isSystemApp = formInfo.GetSystemAppFlag();
+    newRecord.description = formInfo.GetDescription();
     if (newRecord.isEnableUpdate) {
         ParseUpdateConfig(newRecord, formInfo);
     }
@@ -1921,6 +1922,7 @@ ErrCode FormDataMgr::GetRunningFormInfosByFormId(const int64_t formId, RunningFo
     runningFormInfo.bundleName = formRecord.bundleName;
     runningFormInfo.moduleName = formRecord.moduleName;
     runningFormInfo.abilityName = formRecord.abilityName;
+    runningFormInfo.description = formRecord.description;
     std::vector<FormHostRecord> formHostRecords;
     GetFormHostRecord(matchedFormId, formHostRecords);
     if (formHostRecords.empty()) {

@@ -80,6 +80,9 @@ const std::string POINT_ETS = ".ets";
 constexpr int DATA_FIELD = 1;
 constexpr int FORM_UPDATE_LEVEL_VALUE_MAX_LENGTH = 3; // update level is 1~336, so max length is 3.
 const std::string EMPTY_BUNDLE = "";
+const std::string FORM_CLICK_ROUTER = "router";
+const std::string FORM_CLICK_MESSAGE = "message";
+const std::string FORM_CLICK_CALL = "call";
 } // namespace
 
 FormMgrAdapter::FormMgrAdapter()
@@ -186,8 +189,9 @@ ErrCode FormMgrAdapter::AllotForm(const int64_t formId, const Want &want,
     const sptr<IRemoteObject> &callerToken, FormJsInfo &formInfo, const FormItemInfo &formItemInfo)
 {
     Want newWant(want);
+    bool directCallInApp = newWant.GetBoolParam(Constants::KEY_DIRECT_CALL_INAPP, false);
     // in application form
-    if (formItemInfo.GetProviderBundleName() == formItemInfo.GetHostBundleName()) {
+    if (formItemInfo.GetProviderBundleName() == formItemInfo.GetHostBundleName() && directCallInApp) {
         HILOG_DEBUG("form in application");
         newWant.SetParam(Constants::PARAM_FORM_HOST_TOKEN, callerToken);
     }
@@ -1674,6 +1678,7 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
     itemInfo.SetCompatibleVersion(bundleInfo.compatibleVersion);
     itemInfo.SetSystemAppFlag(bundleInfo.applicationInfo.isSystemApp);
     itemInfo.SetProviderUid(bundleInfo.applicationInfo.uid);
+    itemInfo.SetDescription(formInfo.description);
 
     std::string hostBundleName;
     bool isSaUid = IPCSkeleton::GetCallingUid() == SYSTEM_UID;
@@ -2240,6 +2245,7 @@ int FormMgrAdapter::MessageEvent(const int64_t formId, const Want &want, const s
     }
     HILOG_INFO("%{public}s, find target client.", __func__);
 
+    NotifyFormClickEvent(formId, FORM_CLICK_MESSAGE);
 #ifdef DEVICE_USAGE_STATISTICS_ENABLE
     if (!FormDataMgr::GetInstance().ExistTempForm(matchedFormId)) {
         int callingUid = IPCSkeleton::GetCallingUid();
@@ -2281,6 +2287,7 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
             HILOG_ERROR("Failed to StartAbility, result: %{public}d.", result);
             return result;
         }
+        NotifyFormClickEvent(formId, FORM_CLICK_ROUTER);
         return ERR_OK;
     }
 
@@ -2315,6 +2322,7 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
         return result;
     }
 
+    NotifyFormClickEvent(formId, FORM_CLICK_ROUTER);
 #ifdef DEVICE_USAGE_STATISTICS_ENABLE
     if (!FormDataMgr::GetInstance().ExistTempForm(matchedFormId)) {
         int32_t callingUid = IPCSkeleton::GetCallingUid();
@@ -2391,6 +2399,7 @@ int FormMgrAdapter::BackgroundEvent(const int64_t formId, Want &want, const sptr
         HILOG_ERROR("Failed to StartAbilityByCall, result: %{public}d.", result);
         return result;
     }
+    NotifyFormClickEvent(formId, FORM_CLICK_CALL);
     return ERR_OK;
 }
 
@@ -3201,6 +3210,13 @@ void FormMgrAdapter::CleanResource(const wptr<IRemoteObject> &remote)
         deathRecipients_.erase(iter);
         object->RemoveDeathRecipient(deathRecipient);
     }
+    std::lock_guard<std::mutex> lock(clickEventObserversMutex_);
+    auto clickIter = clickEventObservers_.find(object);
+    if (clickIter != clickEventObservers_.end()) {
+        auto deathRecipient = clickIter->second;
+        clickEventObservers_.erase(clickIter);
+        object->RemoveDeathRecipient(deathRecipient);
+    }
 }
 
 void FormMgrAdapter::ClientDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
@@ -3246,6 +3262,77 @@ int32_t FormMgrAdapter::UnregisterPublishFormInterceptor(const sptr<IRemoteObjec
     return ERR_APPEXECFWK_FORM_INVALID_PARAM;
 }
 
+ErrCode FormMgrAdapter::RegisterClickEventObserver(const sptr<IRemoteObject> &observer)
+{
+    if (observer == nullptr) {
+        HILOG_ERROR("Caller token is null.");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    std::unique_lock<std::mutex> lock(clickEventObserversMutex_);
+    if (clickEventObservers_.find(observer) != clickEventObservers_.end()) {
+        HILOG_INFO("The observer has been added.");
+        return ERR_OK;
+    }
+
+    sptr<IRemoteObject::DeathRecipient> deathRecipient = new (std::nothrow) FormMgrAdapter::ClientDeathRecipient();
+    if (deathRecipient == nullptr) {
+        HILOG_ERROR("Create deathRecipient object is null.");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
+    observer->AddDeathRecipient(deathRecipient);
+    clickEventObservers_.emplace(observer, deathRecipient);
+
+    return ERR_OK;
+}
+
+ErrCode FormMgrAdapter::UnregisterClickEventObserver(const sptr<IRemoteObject> &observer)
+{
+    if (observer == nullptr) {
+        HILOG_ERROR("Caller token is null.");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    std::unique_lock<std::mutex> lock(clickEventObserversMutex_);
+    auto iter = clickEventObservers_.find(observer);
+    if (iter == clickEventObservers_.end()) {
+        HILOG_INFO("The observer not found.");
+        return ERR_APPEXECFWK_FORM_INVALID_PROVIDER_DATA;
+    }
+
+    if (iter->first != nullptr) {
+        iter->first->RemoveDeathRecipient(iter->second);
+    }
+
+    clickEventObservers_.erase(iter);
+    return ERR_OK;
+}
+
+void FormMgrAdapter::NotifyFormClickEvent(int64_t formId, const std::string &formClickType)
+{
+    HILOG_INFO("Called.");
+    int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+    RunningFormInfo runningFormInfo;
+
+    auto ref = FormDataMgr::GetInstance().GetRunningFormInfosByFormId(matchedFormId, runningFormInfo);
+    if (ref != ERR_OK) {
+        HILOG_ERROR("Get Running info error.");
+        return;
+    }
+    std::unique_lock<std::mutex> lock(clickEventObserversMutex_);
+    for (const auto &item : clickEventObservers_) {
+        if (item.first == nullptr) {
+            HILOG_ERROR("Observers died.");
+            continue;
+        }
+
+        auto formStateObs = iface_cast<AbilityRuntime::IJsFormStateObserver>(item.first);
+        if (formStateObs != nullptr) {
+            formStateObs->OnFormClickEvent(formClickType, runningFormInfo);
+        }
+    }
+}
 bool FormMgrAdapter::GetValidFormUpdateDuration(const int64_t formId, int64_t &updateDuration) const
 {
     HILOG_DEBUG("Called.");

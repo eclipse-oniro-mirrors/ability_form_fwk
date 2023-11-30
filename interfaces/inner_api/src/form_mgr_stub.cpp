@@ -140,6 +140,10 @@ FormMgrStub::FormMgrStub()
         &FormMgrStub::HandleRegisterPublishFormInterceptor;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_PUBLISH_FORM_INTERCEPTOR)] =
         &FormMgrStub::HandleUnregisterPublishFormInterceptor;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_CLICK_EVENT_OBSERVER)] =
+        &FormMgrStub::HandleRegisterClickCallbackEventObserver;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_CLICK_EVENT_OBSERVER)] =
+        &FormMgrStub::HandleUnregisterClickCallbackEventObserver;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_FORM_ROUTER_PROXY)] =
         &FormMgrStub::HandleRegisterFormRouterProxy;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_FORM_ROUTER_PROXY)] =
@@ -1113,6 +1117,28 @@ int32_t FormMgrStub::HandleUnregisterPublishFormInterceptor(MessageParcel &data,
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
+}
+
+int32_t FormMgrStub::HandleRegisterClickCallbackEventObserver(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("Called.");
+    sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
+    if (callerToken == nullptr) {
+        HILOG_ERROR("Failed to get remote object.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return RegisterClickEventObserver(callerToken);
+}
+
+int32_t FormMgrStub::HandleUnregisterClickCallbackEventObserver(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("Called.");
+    sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
+    if (callerToken == nullptr) {
+        HILOG_ERROR("Failed to get remote object.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return UnregisterClickEventObserver(callerToken);
 }
 
 /**

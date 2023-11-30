@@ -53,6 +53,20 @@ public:
     friend class FormMgrDeathRecipient;
 
     /**
+     * @brief Register click callback observer.
+     * @param observer Form click event callback listener.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RegisterClickEventObserver(const sptr<IRemoteObject> &observer);
+
+    /**
+     * @brief Unregister click callback observer.
+     * @param observer Form click event callback listener.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UnregisterClickEventObserver(const sptr<IRemoteObject> &observer);
+
+    /**
      * @brief Get the error message by error code.
      * @param errorCode the error code return form fms.
      * @return Returns the error message detail.
