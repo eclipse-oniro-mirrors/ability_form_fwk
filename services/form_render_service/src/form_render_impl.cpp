@@ -32,6 +32,7 @@ namespace FormRender {
 namespace {
 constexpr int32_t RENDER_FORM_FAILED = -1;
 constexpr int32_t RELOAD_FORM_FAILED = -1;
+constexpr int32_t FORM_RENDER_TASK_DELAY_TIME = 20; // ms
 }
 using namespace AbilityRuntime;
 
@@ -91,6 +92,7 @@ int32_t FormRenderImpl::RenderForm(const FormJsInfo &formJsInfo, const Want &wan
             record->SetConfiguration(configuration_);
             result = record->UpdateRenderRecord(formJsInfo, want, hostToken);
             renderRecordMap_.emplace(uid, record);
+            FormRenderGCTask(uid);
         }
     }
     formSupplyClient->OnRenderTaskDone(formJsInfo.formId, want);
@@ -263,6 +265,33 @@ void FormRenderImpl::OnRenderingBlock(const std::string &bundleName)
     }
 
     formSupplyClient->OnRenderingBlock(bundleName);
+}
+
+void FormRenderImpl::FormRenderGCTask(const std::string &uid)
+{
+    auto mainHandler = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
+    if (mainHandler == nullptr) {
+        HILOG_ERROR("main handler is nullptr");
+        return;
+    }
+    auto formRenderGCFunc = [uid]() {
+        auto formRenderImpl = OHOS::DelayedSingleton<FormRenderImpl>::GetInstance();
+        if (formRenderImpl == nullptr) {
+            HILOG_ERROR("formRenderImpl is nullptr");
+            return;
+        }
+        formRenderImpl->FormRenderGC(uid);
+    };
+    mainHandler->PostTask(formRenderGCFunc, "FormRenderGC", FORM_RENDER_TASK_DELAY_TIME);
+}
+
+void FormRenderImpl::FormRenderGC(const std::string &uid)
+{
+    HILOG_INFO("form gc, uid is %{s}public", uid.c_str());
+    std::lock_guard<std::mutex> lock(renderRecordMutex_);
+    if (auto search = renderRecordMap_.find(uid); search != renderRecordMap_.end()) {
+        search->second->FormRenderGC();
+    }
 }
 } // namespace FormRender
 } // namespace AppExecFwk

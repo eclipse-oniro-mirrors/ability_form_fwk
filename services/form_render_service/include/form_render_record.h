@@ -126,6 +126,8 @@ public:
 
     void Release();
 
+    void FormRenderGC();
+
 private:
     class RemoteObjHash {
     public:
@@ -200,6 +202,8 @@ private:
     void ReAddAllStaticForms();
 
     void ReAddStaticForms(const std::vector<FormJsInfo> &formJsInfos);
+
+    void HandleFormRenderGC();
 
     std::string bundleName_;
     std::string uid_;
