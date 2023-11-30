@@ -270,5 +270,77 @@ int32_t FormRenderProxy::WriteParcelableVector(const std::vector<T> &parcelableV
     }
     return ERR_OK;
 }
+
+int32_t FormRenderProxy::RecycleForm(const int64_t &formId, const Want &want)
+{
+    MessageParcel data;
+    MessageOption option(MessageOption::TF_ASYNC);
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("failed to write interface token");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt64(formId)) {
+        HILOG_ERROR("failed to write formId");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteParcelable(&want)) {
+        HILOG_ERROR("failed to write want");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!Remote()) {
+        HILOG_ERROR("Remote obj is nullptr");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    MessageParcel reply;
+    int32_t error = Remote()->SendRequest(
+        static_cast<uint32_t>(IFormRender::Message::FORM_RECYCLE_FORM),
+        data,
+        reply,
+        option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("failed to SendRequest: %{public}d", error);
+        return error;
+    }
+
+    return ERR_OK;
+}
+
+int32_t FormRenderProxy::RecoverForm(const int64_t &formId, const Want &want)
+{
+    MessageParcel data;
+    MessageOption option(MessageOption::TF_ASYNC);
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("failed to write interface token");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt64(formId)) {
+        HILOG_ERROR("failed to write formId");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteParcelable(&want)) {
+        HILOG_ERROR("failed to write want");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!Remote()) {
+        HILOG_ERROR("Remote obj is nullptr");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    MessageParcel reply;
+    int32_t error = Remote()->SendRequest(
+        static_cast<uint32_t>(IFormRender::Message::FORM_RECOVER_FORM),
+        data,
+        reply,
+        option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("failed to SendRequest: %{public}d", error);
+        return error;
+    }
+
+    return ERR_OK;
+}
 } // namespace AppExecFwk
 } // namespace OHOS

@@ -442,6 +442,30 @@ private:
     int32_t HandleUnregisterClickCallbackEventObserver(MessageParcel &data, MessageParcel &reply);
 
     bool ReadFormDataProxies(MessageParcel &data, std::vector<FormDataProxy> &formDataProxies);
+
+    /**
+     * @brief Handle set forms recyclable message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t HandleSetFormsRecyclable(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle recycle forms message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t HandleRecycleForms(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle recover forms message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t HandleRecoverForms(MessageParcel &data, MessageParcel &reply);
 private:
     using FormMgrFunc = int32_t (FormMgrStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, FormMgrFunc> memberFuncMap_;

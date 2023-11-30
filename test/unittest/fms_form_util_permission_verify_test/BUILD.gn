@@ -60,6 +60,12 @@ ohos_unittest("FmsFormUtilPermissionVerifyTest") {
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
   ]
+
+  if (cite_memmgr_plugin) {
+    external_deps += [ "memmgr_plugin:memmgrclient" ]
+  } else if (cite_memmgr) {
+    external_deps += [ "memmgr:memmgrclient" ]
+  }
 }
 
 ###############################################################################

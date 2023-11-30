@@ -183,6 +183,12 @@ public:
      * @param formJsInfo Form js info.
      */
     void UpdateForm(const FormJsInfo &formJsInfo);
+
+    /**
+     * @brief Recycle dynamic ArkTS form.
+     * @param formId The id of form to be recycled.
+     */
+    void OnRecycleForm(const int64_t &formId) override;
 private:
     static std::mutex instanceMutex_;
     static sptr<FormHostClient> instance_;

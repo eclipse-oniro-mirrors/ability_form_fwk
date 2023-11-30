@@ -330,5 +330,36 @@ int32_t FormSupplyProxy::OnRenderingBlock(const std::string &bundleName)
     }
     return error;
 }
+
+int32_t FormSupplyProxy::OnRecycleForm(const int64_t &formId, const Want &want)
+{
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("error to write interface token");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteInt64(formId)) {
+        HILOG_ERROR("error to write formId");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteParcelable(&want)) {
+        HILOG_ERROR("failed to write want");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_ASYNC);
+    int error = Remote()->SendRequest(
+        static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_RECYCLE_FORM),
+        data,
+        reply,
+        option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("failed to SendRequest: %{public}d", error);
+    }
+    return error;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

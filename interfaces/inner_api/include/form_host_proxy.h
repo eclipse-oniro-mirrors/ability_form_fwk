@@ -82,6 +82,12 @@ public:
      */
     void OnError(int32_t errorCode, const std::string &errorMsg) override;
 
+    /**
+     * @brief Recycle form.
+     *
+     * @param formId The id of form to be recycled.
+     */
+    void OnRecycleForm(const int64_t &formId) override;
 private:
     template <typename T>
     int GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos);

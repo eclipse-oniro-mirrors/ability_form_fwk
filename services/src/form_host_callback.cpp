@@ -20,6 +20,7 @@
 #include "fms_log_wrapper.h"
 #include "form_host_interface.h"
 #include "form_task_mgr.h"
+#include "form_render_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -108,6 +109,27 @@ void FormHostCallback::OnAcquireState(AppExecFwk::FormState state, const AAFwk::
     }
     // post updateTask to host
     FormTaskMgr::GetInstance().PostAcquireStateTaskToHost(state, want, callerToken);
+}
+
+/**
+ * @brief Send recycle form message to form host.
+ * @param formIds The Id list of forms.
+ * @param want The want of forms to be recycled.
+ * @param callerToken Caller ability token.
+ */
+void FormHostCallback::OnRecycleForms(
+    const std::vector<int64_t> &formIds, const Want &want, const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_DEBUG("start.");
+    if (formIds.empty()) {
+        HILOG_ERROR("formIds is empty.");
+        return;
+    }
+    if (callerToken == nullptr) {
+        HILOG_ERROR("callerToken can not be NULL");
+        return;
+    }
+    FormRenderMgr::GetInstance().RecycleForms(formIds, want, callerToken);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

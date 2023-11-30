@@ -224,7 +224,7 @@ ErrCode FormRdbDataMgr::QueryData(const std::string &key, std::string &value)
     auto absSharedResultSet = rdbStore_->Query(absRdbPredicates, std::vector<std::string>());
     if (absSharedResultSet == nullptr) {
         HILOG_ERROR("absSharedResultSet is nullptr");
-        return false;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
     ScopeGuard stateGuard([absSharedResultSet] {
@@ -234,21 +234,21 @@ ErrCode FormRdbDataMgr::QueryData(const std::string &key, std::string &value)
     });
     if (!absSharedResultSet->HasBlock()) {
         HILOG_ERROR("absSharedResultSet has no block");
-        return false;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     auto ret = absSharedResultSet->GoToFirstRow();
     if (ret != NativeRdb::E_OK) {
         HILOG_ERROR("GoToFirstRow failed, ret: %{public}d", ret);
-        return false;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
     ret = absSharedResultSet->GetString(FORM_VALUE_INDEX, value);
     if (ret != NativeRdb::E_OK) {
         HILOG_ERROR("QueryData failed, ret: %{public}d", ret);
-        return false;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
-    return true;
+    return ERR_OK;
 }
 
 ErrCode FormRdbDataMgr::QueryData(const std::string &key, std::unordered_map<std::string, std::string> &values)
