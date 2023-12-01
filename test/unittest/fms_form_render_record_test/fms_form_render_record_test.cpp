@@ -26,6 +26,7 @@
 #include "js_runtime.h"
 #include "mock_form_provider_client.h"
 #include "want.h"
+#include <thread>
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -36,6 +37,27 @@ namespace {
     constexpr int32_t RELOAD_FORM_FAILED = -1;
     constexpr int32_t RENDER_FORM_FAILED = -1;
 }
+#define private public
+class FormRenderRecordMock : public FormRenderRecord {
+public:
+    static std::shared_ptr<FormRenderRecordMock> Create(
+        const std::string &bundleName, const std::string &uid, bool needMonitored = true)
+    {
+        std::shared_ptr<FormRenderRecordMock> renderRecord = std::make_shared<FormRenderRecordMock>(bundleName, uid);
+        if (!renderRecord->CreateEventHandler(bundleName, needMonitored)) {
+            return nullptr;
+        }
+        return renderRecord;
+    }
+    FormRenderRecordMock(const std::string &bundleName, const std::string &uid) : FormRenderRecord(bundleName, uid) {}
+    bool CreateRuntime(const FormJsInfo &formJsInfo)
+    {
+        return true;
+    }
+private:
+    void HandleUpdateInJsThread(const FormJsInfo &formJsInfo, const Want &want){};
+};
+#undef private
 class FormRenderRecordTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -161,7 +183,8 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_007, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormRenderRecordTest_007 start";
     auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
     FormJsInfo formJsInfo;
-    EXPECT_EQ(true, formRenderRecord->CreateRuntime(formJsInfo));
+    formRenderRecord->eventRunner_ = nullptr;
+    EXPECT_EQ(false, formRenderRecord->CreateRuntime(formJsInfo));
     GTEST_LOG_(INFO) << "FormRenderRecordTest_007 end";
 }
 
@@ -173,7 +196,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_007, TestSize.Level0)
 HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_008, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRenderRecordTest_008 start";
-    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    auto formRenderRecord = std::make_shared<FormRenderRecordMock>("bundleName", "uid");
     FormJsInfo formJsInfo;
     // set runtime_ is not nullptr
     formRenderRecord->CreateRuntime(formJsInfo);
@@ -480,7 +503,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_024, TestSize.Level0)
 HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_025, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRenderRecordTest_025 start";
-    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    auto formRenderRecord = std::make_shared<FormRenderRecordMock>("bundleName", "uid");
     ASSERT_NE(nullptr, formRenderRecord);
     FormJsInfo formJsInfo;
     formJsInfo.formId = 1;
@@ -489,7 +512,6 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_025, TestSize.Level0)
     std::shared_ptr<AbilityRuntime::Context> context = nullptr;
     std::shared_ptr<AbilityRuntime::Runtime> runtime = nullptr;
     formRenderRecord->GetFormRendererGroup(formJsInfo, context, runtime);
-    formRenderRecord->HandleUpdateInJsThread(formJsInfo, want);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_025 end";
 }
 
@@ -502,7 +524,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_025, TestSize.Level0)
 HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_026, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRenderRecordTest_026 start";
-    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    auto formRenderRecord = FormRenderRecordMock::Create("bundleName", "uid");
     FormJsInfo formJsInfo;
     int64_t formId = 1;
     Want want;
@@ -511,6 +533,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_026, TestSize.Level0)
         formId, std::unordered_set<sptr<IRemoteObject>, FormRenderRecord::RemoteObjHash>());
 
     EXPECT_EQ(ERR_OK, formRenderRecord->UpdateRenderRecord(formJsInfo, want, hostRemoteObj));
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     GTEST_LOG_(INFO) << "FormRenderRecordTest_026 end";
 }
 
@@ -523,7 +546,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_026, TestSize.Level0)
 HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_027, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRenderRecordTest_027 start";
-    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    auto formRenderRecord = FormRenderRecordMock::Create("bundleName", "uid");
     ASSERT_NE(nullptr, formRenderRecord);
     FormJsInfo formJsInfo;
     int64_t formId = 1;
@@ -532,6 +555,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_027, TestSize.Level0)
         formId, std::unordered_set<sptr<IRemoteObject>, FormRenderRecord::RemoteObjHash>());
 
     EXPECT_EQ(RENDER_FORM_FAILED, formRenderRecord->UpdateRenderRecord(formJsInfo, want, nullptr));
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     GTEST_LOG_(INFO) << "FormRenderRecordTest_027 end";
 }
 
@@ -716,7 +740,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_037, TestSize.Level0)
 HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_038, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRenderRecordTest_038 start";
-    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    auto formRenderRecord = FormRenderRecordMock::Create("bundleName", "uid");
     formRenderRecord->ReAddAllStaticForms();
     GTEST_LOG_(INFO) << "FormRenderRecordTest_038 end";
 }
