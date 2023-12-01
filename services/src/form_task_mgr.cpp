@@ -1020,7 +1020,7 @@ void FormTaskMgr::FormRouterEventProxy(const int64_t formId, const sptr<IRemoteO
         HILOG_ERROR("Fail, remoteObject is nullptr!");
         return;
     }
-    
+
     sptr<IFormHostDelegate> remoteFormHostDelegateProxy = iface_cast<IFormHostDelegate>(remoteObject);
     if (remoteFormHostDelegateProxy == nullptr) {
         HILOG_ERROR("Fail, remoteFormHostDelegateProxy is nullptr!");
