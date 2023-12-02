@@ -1374,7 +1374,7 @@ int32_t FormMgr::RecycleForms(const std::vector<int64_t> &formIds, const Want &w
 {
     HILOG_DEBUG("called.");
     if (GetRecoverStatus() == Constants::IN_RECOVERING) {
-        HILOG_ERROR("%{public}s error, form is in recover status, can't do action on form.");
+        HILOG_ERROR("form is in recover status, can't do action on form.");
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
     }
     if (formIds.empty()) {

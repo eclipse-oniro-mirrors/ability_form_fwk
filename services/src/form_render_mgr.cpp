@@ -376,10 +376,10 @@ ErrCode FormRenderMgr::RecycleForms(
     const std::vector<int64_t> &formIds, const Want &want, const sptr<IRemoteObject> &remoteObjectOfHost)
 {
     if (renderInner_ != nullptr) {
-        renderInner_->RecycleForms(formIds, want, remoteObjectOfHost);
+        return renderInner_->RecycleForms(formIds, want, remoteObjectOfHost);
     }
     if (sandboxInner_ != nullptr) {
-        sandboxInner_->RecycleForms(formIds, want, remoteObjectOfHost);
+        return sandboxInner_->RecycleForms(formIds, want, remoteObjectOfHost);
     }
     return ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED;
 }
@@ -388,10 +388,10 @@ ErrCode FormRenderMgr::RecoverForms(
     const std::vector<int64_t> &formIds, const std::string &bundleName, const WantParams &wantParams)
 {
     if (renderInner_ != nullptr) {
-        renderInner_->RecoverForms(formIds, bundleName, wantParams);
+        return renderInner_->RecoverForms(formIds, bundleName, wantParams);
     }
     if (sandboxInner_ != nullptr) {
-        sandboxInner_->RecoverForms(formIds, bundleName, wantParams);
+        return sandboxInner_->RecoverForms(formIds, bundleName, wantParams);
     }
     return ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED;
 }
