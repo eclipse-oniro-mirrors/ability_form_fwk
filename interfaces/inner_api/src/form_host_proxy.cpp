@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -48,8 +48,8 @@ void FormHostProxy::OnAcquired(const FormJsInfo &formInfo, const sptr<IRemoteObj
         }
     }
 
-    error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_ACQUIRED),
+    error = SendTransactCmd(
+        IFormHost::Message::FORM_HOST_ON_ACQUIRED,
         data,
         reply,
         option);
@@ -78,7 +78,7 @@ void FormHostProxy::OnUpdate(const FormJsInfo &formInfo)
         HILOG_ERROR("%{public}s, failed to write formInfo", __func__);
     }
 
-    error = Remote()->SendRequest(static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_UPDATE), data, reply, option);
+    error = SendTransactCmd(IFormHost::Message::FORM_HOST_ON_UPDATE, data, reply, option);
     if (error != ERR_OK) {
         HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d", __func__, error);
     }
@@ -104,8 +104,8 @@ void  FormHostProxy::OnUninstall(const std::vector<int64_t> &formIds)
         HILOG_ERROR("%{public}s, failed to write formIds", __func__);
     }
 
-    error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_UNINSTALL),
+    error = SendTransactCmd(
+        IFormHost::Message::FORM_HOST_ON_UNINSTALL,
         data,
         reply,
         option);
@@ -141,8 +141,8 @@ void FormHostProxy::OnAcquireState(FormState state, const AAFwk::Want &want)
         return;
     }
 
-    error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_ACQUIRE_FORM_STATE),
+    error = SendTransactCmd(
+        IFormHost::Message::FORM_HOST_ON_ACQUIRE_FORM_STATE,
         data,
         reply,
         option);
@@ -172,8 +172,8 @@ void FormHostProxy::OnAcquireDataResponse(const AAFwk::WantParams &wantParams, i
     }
     int error;
 
-    error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_ACQUIRE_FORM_DATA),
+    error = SendTransactCmd(
+        IFormHost::Message::FORM_HOST_ON_ACQUIRE_FORM_DATA,
         data,
         reply,
         option);
@@ -233,8 +233,8 @@ void FormHostProxy::OnShareFormResponse(int64_t requestCode, int32_t result)
         return;
     }
 
-    int32_t error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_SHARE_FORM_RESPONSE),
+    int32_t error = SendTransactCmd(
+        IFormHost::Message::FORM_HOST_ON_SHARE_FORM_RESPONSE,
         data,
         reply,
         option);
@@ -264,17 +264,29 @@ void FormHostProxy::OnError(int32_t errorCode, const std::string &errorMsg)
         return;
     }
 
-    auto remote = Remote();
-    if (remote == nullptr) {
-        HILOG_ERROR("remote is nullptr.");
-        return;
-    }
-    int error = remote->SendRequest(
-        static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_ERROR),
+    int error = SendTransactCmd(
+        IFormHost::Message::FORM_HOST_ON_ERROR,
         data, reply, option);
     if (error != ERR_OK) {
         HILOG_ERROR("failed to SendRequest: %{public}d", error);
     }
 }
+
+int FormHostProxy::SendTransactCmd(IFormHost::Message code, MessageParcel &data,
+    MessageParcel &reply, MessageOption &option)
+{
+    sptr<IRemoteObject> remote = Remote();
+    if (!remote) {
+        HILOG_ERROR("failed to get remote object, cmd: %{public}d", code);
+        return ERR_APPEXECFWK_SERVICE_NOT_CONNECTED;
+    }
+    int32_t result = remote->SendRequest(static_cast<uint32_t>(code), data, reply, option);
+    if (result != ERR_OK) {
+        HILOG_ERROR("failed to SendRequest: %{public}d, cmd: %{public}d", result, code);
+        return result;
+    }
+    return ERR_OK;
+}
+
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -70,7 +70,8 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     std::vector<FormInfo> formInfos;
     formInfos.emplace_back(formInfoes);
     formMgrProxy.GetFormsInfo(IFormMgr::Message::FORM_MGR_ADD_FORM, datas, formInfos);
-    formMgrProxy.SendTransactCmd(IFormMgr::Message::FORM_MGR_ADD_FORM, datas, datas);
+    MessageOption option(MessageOption::TF_SYNC);
+    formMgrProxy.SendTransactCmd(IFormMgr::Message::FORM_MGR_ADD_FORM, datas, datas, option);
     int32_t numFormsDeleted = static_cast<int32_t>(GetU32Data(data));
     formMgrProxy.DeleteInvalidForms(formIds, callerToken, numFormsDeleted);
     FormStateInfo stateInfo;

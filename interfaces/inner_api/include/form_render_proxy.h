@@ -69,6 +69,8 @@ private:
     bool WriteInterfaceToken(MessageParcel &data);
     template<typename T>
     int32_t WriteParcelableVector(const std::vector<T> &parcelableVector, MessageParcel &reply);
+    int SendTransactCmd(IFormRender::Message code, MessageParcel &data,
+        MessageParcel &reply, MessageOption &option);
 
 private:
     static inline BrokerDelegator<FormRenderProxy> delegator_;

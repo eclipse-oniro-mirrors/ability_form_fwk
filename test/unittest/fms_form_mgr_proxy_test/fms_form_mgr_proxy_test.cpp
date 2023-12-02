@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1395,7 +1395,7 @@ HWTEST_F(FmsFormMgrProxyTest, StartAbilityTest_0300, Function | MediumTest | Lev
     ASSERT_NE(nullptr, proxy);
     Want want;
     int32_t result = proxy->StartAbility(want, nullptr);
-    EXPECT_EQ(-1, result);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_SEND_FMS_MSG, result);
 }
 
 /*
@@ -1605,7 +1605,8 @@ HWTEST_F(FmsFormMgrProxyTest, SendTransactCmdTest_0100, Function | MediumTest | 
     IFormMgr::Message code = IFormMgr::Message::FORM_MGR_FORM_TIMER_INFO_BY_ID;
     MessageParcel data;
     MessageParcel reply;
-    int32_t result = proxy->SendTransactCmd(code, data, reply);
+    MessageOption option(MessageOption::TF_SYNC);
+    int32_t result = proxy->SendTransactCmd(code, data, reply, option);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_SEND_FMS_MSG, result);
 }
 
@@ -1628,7 +1629,8 @@ HWTEST_F(FmsFormMgrProxyTest, SendTransactCmdTest_0200, Function | MediumTest | 
     IFormMgr::Message code = IFormMgr::Message::FORM_MGR_FORM_TIMER_INFO_BY_ID;
     MessageParcel data;
     MessageParcel reply;
-    int32_t result = proxy->SendTransactCmd(code, data, reply);
+    MessageOption option(MessageOption::TF_SYNC);
+    int32_t result = proxy->SendTransactCmd(code, data, reply, option);
     EXPECT_EQ(ERR_OK, result);
 }
 

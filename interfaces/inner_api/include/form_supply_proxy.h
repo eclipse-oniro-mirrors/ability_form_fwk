@@ -104,6 +104,8 @@ private:
     template<typename T>
     int GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos);
     bool WriteInterfaceToken(MessageParcel &data);
+    int SendTransactCmd(IFormSupply::Message code, MessageParcel &data,
+        MessageParcel &reply, MessageOption &option);
 
 private:
     static inline BrokerDelegator<FormSupplyProxy> delegator_;

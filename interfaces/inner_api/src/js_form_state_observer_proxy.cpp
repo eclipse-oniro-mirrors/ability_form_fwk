@@ -45,8 +45,8 @@ int32_t JsFormStateObserverProxy::OnAddForm(const std::string &bundleName,
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    int32_t error = Remote()->SendRequest(
-        static_cast<uint32_t>(IJsFormStateObserver::Message::FORM_STATE_OBSERVER_ON_ADD_FORM),
+    int32_t error = SendTransactCmd(
+        IJsFormStateObserver::Message::FORM_STATE_OBSERVER_ON_ADD_FORM,
         data,
         reply,
         option);
@@ -78,8 +78,8 @@ int32_t JsFormStateObserverProxy::OnRemoveForm(const std::string &bundleName,
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    int32_t error = Remote()->SendRequest(
-        static_cast<uint32_t>(IJsFormStateObserver::Message::FORM_STATE_OBSERVER_ON_REMOVE_FORM),
+    int32_t error = SendTransactCmd(
+        IJsFormStateObserver::Message::FORM_STATE_OBSERVER_ON_REMOVE_FORM,
         data,
         reply,
         option);
@@ -121,8 +121,8 @@ int32_t JsFormStateObserverProxy::NotifyWhetherFormsVisible(const AppExecFwk::Fo
             return false;
         }
     }
-    int32_t error = Remote()->SendRequest(
-        static_cast<uint32_t>(IJsFormStateObserver::Message::FORM_STATE_OBSERVER_NOTIFY_WHETHER_FORMS_VISIBLE),
+    int32_t error = SendTransactCmd(
+        IJsFormStateObserver::Message::FORM_STATE_OBSERVER_NOTIFY_WHETHER_FORMS_VISIBLE,
         data,
         reply,
         option);
@@ -134,10 +134,8 @@ int32_t JsFormStateObserverProxy::NotifyWhetherFormsVisible(const AppExecFwk::Fo
 }
 
 int JsFormStateObserverProxy::SendTransactCmd(IJsFormStateObserver::Message code,
-    MessageParcel &data, MessageParcel &reply)
+    MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    MessageOption option(MessageOption::TF_SYNC);
-
     sptr<IRemoteObject> remote = Remote();
     if (!remote) {
         HILOG_ERROR("%{public}s, failed to get remote object, cmd: %{public}d", __func__, code);

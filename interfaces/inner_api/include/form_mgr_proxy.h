@@ -507,7 +507,7 @@ private:
     bool WriteInterfaceToken(MessageParcel &data);
     template<typename T>
     int GetParcelableInfo(IFormMgr::Message code, MessageParcel &data, T &parcelableInfo);
-    int SendTransactCmd(IFormMgr::Message code, MessageParcel &data, MessageParcel &reply);
+    int SendTransactCmd(IFormMgr::Message code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     int GetStringInfo(IFormMgr::Message code, MessageParcel &data, std::string &stringInfo);
     int32_t GetFormsInfo(IFormMgr::Message code, MessageParcel &data, std::vector<FormInfo> &formInfos);
     ErrCode GetRunningFormInfos(IFormMgr::Message code, MessageParcel &data,

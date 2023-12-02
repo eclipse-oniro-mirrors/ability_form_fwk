@@ -51,7 +51,8 @@ public:
 
 private:
     static inline BrokerDelegator<JsFormStateObserverProxy> delegator_;
-    int SendTransactCmd(IJsFormStateObserver::Message code, MessageParcel &data, MessageParcel &reply);
+    int SendTransactCmd(IJsFormStateObserver::Message code, MessageParcel &data,
+        MessageParcel &reply, MessageOption &option);
 };
 } // namespace AbilityRuntime
 } // namespace OHOS

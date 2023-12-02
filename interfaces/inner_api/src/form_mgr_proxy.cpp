@@ -91,8 +91,8 @@ int FormMgrProxy::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &ca
     }
     MessageParcel reply;
     MessageOption option;
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_DELETE_FORM),
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_DELETE_FORM,
         data,
         reply,
         option);
@@ -120,8 +120,8 @@ int FormMgrProxy::StopRenderingForm(const int64_t formId, const std::string &com
     }
     MessageParcel reply;
     MessageOption option;
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_STOP_RENDERING_FORM),
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_STOP_RENDERING_FORM,
         data,
         reply,
         option);
@@ -161,8 +161,8 @@ int FormMgrProxy::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> &c
 
     MessageParcel reply;
     MessageOption option;
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_RELEASE_FORM),
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_RELEASE_FORM,
         data,
         reply,
         option);
@@ -197,8 +197,8 @@ int FormMgrProxy::UpdateForm(const int64_t formId, const FormProviderData &FormP
     }
     MessageParcel reply;
     MessageOption option;
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UPDATE_FORM),
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_UPDATE_FORM,
         data,
         reply,
         option);
@@ -234,8 +234,8 @@ int FormMgrProxy::SetNextRefreshTime(const int64_t formId, const int64_t nextTim
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     MessageOption option;
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_SET_NEXT_REFRESH_TIME),
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_SET_NEXT_REFRESH_TIME,
         data,
         reply,
         option);
@@ -264,8 +264,8 @@ int FormMgrProxy::ReleaseRenderer(int64_t formId, const std::string &compId)
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     MessageOption option;
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_RELEASE_RENDERER),
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_RELEASE_RENDERER,
         data,
         reply,
         option);
@@ -302,8 +302,8 @@ ErrCode FormMgrProxy::RequestPublishForm(Want &want, bool withFormBindingData,
     }
 
     MessageOption option;
-    int32_t error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_FORM),
+    int32_t error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_FORM,
         data,
         reply,
         option);
@@ -343,8 +343,8 @@ int FormMgrProxy::LifecycleUpdate(
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     MessageOption option;
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_LIFECYCLE_UPDATE),
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_LIFECYCLE_UPDATE,
         data,
         reply,
         option);
@@ -386,8 +386,8 @@ int FormMgrProxy::RequestForm(const int64_t formId, const sptr<IRemoteObject> &c
 
     MessageParcel reply;
     MessageOption option;
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REQUEST_FORM),
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_REQUEST_FORM,
         data,
         reply,
         option);
@@ -433,8 +433,8 @@ int FormMgrProxy::NotifyWhetherVisibleForms(
 
     MessageParcel reply;
     MessageOption option;
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_NOTIFY_FORM_WHETHER_VISIBLE),
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_NOTIFY_FORM_WHETHER_VISIBLE,
         data,
         reply,
         option);
@@ -469,9 +469,8 @@ int FormMgrProxy::CastTempForm(const int64_t formId, const sptr<IRemoteObject> &
 
     MessageParcel reply;
     MessageOption option;
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(
-            IFormMgr::Message::FORM_MGR_CAST_TEMP_FORM),
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_CAST_TEMP_FORM,
         data,
         reply,
         option);
@@ -607,7 +606,7 @@ int FormMgrProxy::MessageEvent(const int64_t formId, const Want &want, const spt
 
     MessageParcel reply;
     MessageOption option;
-    int error = Remote()->SendRequest(static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_MESSAGE_EVENT),
+    int error = SendTransactCmd(IFormMgr::Message::FORM_MGR_MESSAGE_EVENT,
         data, reply, option);
     if (error != ERR_OK) {
         HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d", __func__, error);
@@ -646,7 +645,7 @@ int FormMgrProxy::BackgroundEvent(const int64_t formId, Want &want, const sptr<I
 
     MessageParcel reply;
     MessageOption option;
-    int error = Remote()->SendRequest(static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_BACKGROUND_EVENT),
+    int error = SendTransactCmd(IFormMgr::Message::FORM_MGR_BACKGROUND_EVENT,
         data, reply, option);
     if (error != ERR_OK) {
         HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d", __func__, error);
@@ -685,7 +684,7 @@ int FormMgrProxy::RouterEvent(const int64_t formId, Want &want, const sptr<IRemo
 
     MessageParcel reply;
     MessageOption option;
-    int error = Remote()->SendRequest(static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_ROUTER_EVENT),
+    int error = SendTransactCmd(IFormMgr::Message::FORM_MGR_ROUTER_EVENT,
         data, reply, option);
     if (error != ERR_OK) {
         HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d", __func__, error);
@@ -726,7 +725,8 @@ int FormMgrProxy::GetStringInfo(IFormMgr::Message code, MessageParcel &data, std
     HILOG_DEBUG("GetStringInfo start");
     int error;
     MessageParcel reply;
-    error = SendTransactCmd(code, data, reply);
+    MessageOption option(MessageOption::TF_SYNC);
+    error = SendTransactCmd(code, data, reply, option);
     if (error != ERR_OK) {
         return error;
     }
@@ -756,7 +756,8 @@ int FormMgrProxy::GetFormsInfo(IFormMgr::Message code, MessageParcel &data, std:
     HILOG_DEBUG("GetFormsInfo start");
     int error;
     MessageParcel reply;
-    error = SendTransactCmd(code, data, reply);
+    MessageOption option(MessageOption::TF_SYNC);
+    error = SendTransactCmd(code, data, reply, option);
     if (error != ERR_OK) {
         return error;
     }
@@ -775,7 +776,8 @@ ErrCode FormMgrProxy::GetRunningFormInfos(IFormMgr::Message code, MessageParcel 
 {
     ErrCode error;
     MessageParcel reply;
-    error = SendTransactCmd(code, data, reply);
+    MessageOption option(MessageOption::TF_SYNC);
+    error = SendTransactCmd(code, data, reply, option);
     if (error != ERR_OK) {
         return error;
     }
@@ -793,7 +795,8 @@ int FormMgrProxy::GetParcelableInfo(IFormMgr::Message code, MessageParcel &data,
 {
     int error;
     MessageParcel reply;
-    error = SendTransactCmd(code, data, reply);
+    MessageOption option(MessageOption::TF_SYNC);
+    error = SendTransactCmd(code, data, reply, option);
     if (error != ERR_OK) {
         return error;
     }
@@ -813,10 +816,10 @@ int FormMgrProxy::GetParcelableInfo(IFormMgr::Message code, MessageParcel &data,
     HILOG_DEBUG("get parcelable info success");
     return ERR_OK;
 }
-int FormMgrProxy::SendTransactCmd(IFormMgr::Message code, MessageParcel &data, MessageParcel &reply)
-{
-    MessageOption option(MessageOption::TF_SYNC);
 
+int FormMgrProxy::SendTransactCmd(IFormMgr::Message code, MessageParcel &data,
+                                  MessageParcel &reply, MessageOption &option)
+{
     sptr<IRemoteObject> remote = Remote();
     if (!remote) {
         HILOG_ERROR("%{public}s, error to get remote object, cmd: %{public}d", __func__, code);
@@ -856,9 +859,8 @@ int FormMgrProxy::DeleteInvalidForms(const std::vector<int64_t> &formIds, const 
 
     MessageParcel reply;
     MessageOption option;
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(
-            IFormMgr::Message::FORM_MGR_DELETE_INVALID_FORMS),
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_DELETE_INVALID_FORMS,
         data,
         reply,
         option);
@@ -901,9 +903,8 @@ int FormMgrProxy::AcquireFormState(const Want &want, const sptr<IRemoteObject> &
 
     MessageParcel reply;
     MessageOption option;
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(
-            IFormMgr::Message::FORM_MGR_ACQUIRE_FORM_STATE),
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_ACQUIRE_FORM_STATE,
         data,
         reply,
         option);
@@ -952,9 +953,8 @@ int FormMgrProxy::NotifyFormsVisible(const std::vector<int64_t> &formIds, bool i
 
     MessageParcel reply;
     MessageOption option;
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(
-            IFormMgr::Message::FORM_MGR_NOTIFY_FORMS_VISIBLE),
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_NOTIFY_FORMS_VISIBLE,
         data,
         reply,
         option);
@@ -994,8 +994,8 @@ int FormMgrProxy::NotifyFormsPrivacyProtected(const std::vector<int64_t> &formId
 
     MessageParcel reply;
     MessageOption option;
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_NOTIFY_FORMS_PRIVACY_PROTECTED),
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_NOTIFY_FORMS_PRIVACY_PROTECTED,
         data,
         reply,
         option);
@@ -1042,9 +1042,8 @@ int FormMgrProxy::NotifyFormsEnableUpdate(const std::vector<int64_t> &formIds, b
 
     MessageParcel reply;
     MessageOption option;
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(
-            IFormMgr::Message::FORM_MGR_NOTIFY_FORMS_ENABLE_UPDATE),
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_NOTIFY_FORMS_ENABLE_UPDATE,
         data,
         reply,
         option);
@@ -1225,9 +1224,8 @@ bool FormMgrProxy::IsRequestPublishFormSupported()
     // send request.
     MessageParcel reply;
     MessageOption option;
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(
-            IFormMgr::Message::FORM_MGR_IS_REQUEST_PUBLISH_FORM_SUPPORTED),
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_IS_REQUEST_PUBLISH_FORM_SUPPORTED,
         data,
         reply,
         option);
@@ -1261,8 +1259,8 @@ int32_t FormMgrProxy::StartAbility(const Want &want, const sptr<IRemoteObject> &
     // send request.
     MessageParcel reply;
     MessageOption option;
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_START_ABILITY),
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_START_ABILITY,
         data,
         reply,
         option);
@@ -1305,8 +1303,8 @@ int32_t FormMgrProxy::ShareForm(int64_t formId, const std::string &deviceId, con
 
     MessageParcel reply;
     MessageOption option;
-    auto error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_SHARE_FORM), data, reply, option);
+    auto error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_SHARE_FORM, data, reply, option);
     if (error != ERR_OK) {
         HILOG_ERROR("failed to SendRequest: %{public}d", error);
         return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
@@ -1340,7 +1338,8 @@ int32_t FormMgrProxy::AcquireFormData(int64_t formId, int64_t requestCode, const
 
     int error;
     MessageParcel reply;
-    error = SendTransactCmd(IFormMgr::Message::FORM_MGR_ACQUIRE_DATA, data, reply);
+    MessageOption option(MessageOption::TF_SYNC);
+    error = SendTransactCmd(IFormMgr::Message::FORM_MGR_ACQUIRE_DATA, data, reply, option);
     if (error != ERR_OK) {
         return error;
     }
@@ -1374,8 +1373,8 @@ int32_t FormMgrProxy::RecvFormShareInfoFromRemote(const FormShareInfo &info)
 
     MessageParcel reply;
     MessageOption option;
-    auto error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_RECV_FORM_SHARE_INFO_FROM_REMOTE), data, reply, option);
+    auto error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_RECV_FORM_SHARE_INFO_FROM_REMOTE, data, reply, option);
     if (error != ERR_OK) {
         HILOG_ERROR("failed to SendRequest: %{public}d", error);
         return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
@@ -1395,8 +1394,8 @@ bool FormMgrProxy::CheckFMSReady()
     // send request
     MessageParcel reply;
     MessageOption option;
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_CHECK_FMS_READY), data, reply, option);
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_CHECK_FMS_READY, data, reply, option);
     if (error != ERR_OK) {
         HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d", __func__, error);
         return false;
@@ -1421,7 +1420,12 @@ int32_t FormMgrProxy::SetBackgroundFunction(const std::string funcName, const st
     // send request
     MessageParcel reply;
     MessageOption option;
-    int error = Remote()->SendRequest(Constants::EVENT_CALL_NOTIFY, data, reply, option);
+    sptr<IRemoteObject> remote = Remote();
+    if (!remote) {
+        HILOG_ERROR("failed to get remote object");
+        return ERR_APPEXECFWK_SERVICE_NOT_CONNECTED;
+    }
+    int error = remote->SendRequest(Constants::EVENT_CALL_NOTIFY, data, reply, option);
     if (error != ERR_OK) {
         HILOG_ERROR("failed to SendRequest: %{public}d", error);
         return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
@@ -1444,8 +1448,8 @@ int32_t FormMgrProxy::GetFormsCount(bool isTempFormFlag, int32_t &formCount)
     }
     MessageParcel reply;
     MessageOption option;
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORMS_COUNT), data, reply, option);
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_GET_FORMS_COUNT, data, reply, option);
     if (error != ERR_OK) {
         HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d", __func__, error);
         return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
@@ -1477,8 +1481,8 @@ ErrCode FormMgrProxy::RegisterFormAddObserverByBundle(const std::string bundleNa
 
     MessageParcel reply;
     MessageOption option(MessageOption::TF_ASYNC);
-    auto error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_FORM_ADD_OBSERVER_BY_BUNDLE), data, reply, option);
+    auto error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_REGISTER_FORM_ADD_OBSERVER_BY_BUNDLE, data, reply, option);
     if (error != ERR_OK) {
         HILOG_ERROR("failed to SendRequest: %{public}d", error);
         return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
@@ -1508,8 +1512,8 @@ ErrCode FormMgrProxy::RegisterFormRemoveObserverByBundle(const std::string bundl
 
     MessageParcel reply;
     MessageOption option(MessageOption::TF_ASYNC);
-    auto error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_FORM_REMOVE_OBSERVER_BY_BUNDLE),
+    auto error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_REGISTER_FORM_REMOVE_OBSERVER_BY_BUNDLE,
         data, reply, option);
     if (error != ERR_OK) {
         HILOG_ERROR("failed to SendRequest: %{public}d", error);
@@ -1532,8 +1536,8 @@ int32_t FormMgrProxy::GetHostFormsCount(std::string &bundleName, int32_t &formCo
     }
     MessageParcel reply;
     MessageOption option;
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_HOST_FORMS_COUNT), data, reply, option);
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_GET_HOST_FORMS_COUNT, data, reply, option);
     if (error != ERR_OK) {
         HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d", __func__, error);
         return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
@@ -1620,7 +1624,8 @@ ErrCode FormMgrProxy::GetFormInstance(IFormMgr::Message code, MessageParcel &dat
     HILOG_DEBUG("GetFormInstance start");
     int error;
     MessageParcel reply;
-    error = SendTransactCmd(code, data, reply);
+    MessageOption option(MessageOption::TF_SYNC);
+    error = SendTransactCmd(code, data, reply, option);
     if (error != ERR_OK) {
         return error;
     }
@@ -1655,8 +1660,8 @@ ErrCode FormMgrProxy::RegisterAddObserver(const std::string &bundleName, const s
     }
     MessageParcel reply;
     MessageOption option(MessageOption::TF_ASYNC);
-    auto error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_ADD_OBSERVER), data, reply, option);
+    auto error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_REGISTER_ADD_OBSERVER, data, reply, option);
     if (error != ERR_OK) {
         HILOG_ERROR("error to SendRequest: %{public}d", error);
         return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
@@ -1682,8 +1687,8 @@ ErrCode FormMgrProxy::RegisterRemoveObserver(const std::string &bundleName, cons
     }
     MessageParcel reply;
     MessageOption option(MessageOption::TF_ASYNC);
-    auto error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_REMOVE_OBSERVER), data, reply, option);
+    auto error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_REGISTER_REMOVE_OBSERVER, data, reply, option);
     if (error != ERR_OK) {
         HILOG_ERROR("failed to SendRequest: %{public}d", error);
         return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
@@ -1763,7 +1768,8 @@ ErrCode FormMgrProxy::UpdateProxyForm(int64_t formId, const FormProviderData &Fo
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     MessageParcel reply;
-    int32_t error = SendTransactCmd(IFormMgr::Message::FORM_MGR_UPDATE_PROXY_FORM, data, reply);
+    MessageOption option(MessageOption::TF_SYNC);
+    int32_t error = SendTransactCmd(IFormMgr::Message::FORM_MGR_UPDATE_PROXY_FORM, data, reply, option);
     if (error != ERR_OK) {
         HILOG_ERROR("failed to SendTransactCmd.");
         return error;
@@ -1801,7 +1807,8 @@ ErrCode FormMgrProxy::RequestPublishProxyForm(Want &want, bool withFormBindingDa
     }
 
     MessageParcel reply;
-    int32_t error = SendTransactCmd(IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_PROXY_FORM, data, reply);
+    MessageOption option(MessageOption::TF_SYNC);
+    int32_t error = SendTransactCmd(IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_PROXY_FORM, data, reply, option);
     if (error != ERR_OK) {
         HILOG_ERROR("failed to SendTransactCmd.");
         return error;
@@ -1851,8 +1858,8 @@ int32_t FormMgrProxy::RegisterPublishFormInterceptor(const sptr<IRemoteObject> &
     // send request.
     MessageParcel reply;
     MessageOption option;
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_PUBLISH_FORM_INTERCEPTOR),
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_REGISTER_PUBLISH_FORM_INTERCEPTOR,
         data,
         reply,
         option);
@@ -1881,8 +1888,8 @@ int32_t FormMgrProxy::UnregisterPublishFormInterceptor(const sptr<IRemoteObject>
     // send request.
     MessageParcel reply;
     MessageOption option;
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_PUBLISH_FORM_INTERCEPTOR),
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_UNREGISTER_PUBLISH_FORM_INTERCEPTOR,
         data,
         reply,
         option);
