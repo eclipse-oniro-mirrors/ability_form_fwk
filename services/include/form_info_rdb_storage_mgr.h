@@ -82,6 +82,21 @@ public:
      */
     ErrCode DeleteStorageFormData(const std::string &formId);
 
+    /**
+     * @brief Load status data of form from DB.
+     * @param formId The form data Id.
+     * @param statusData Status data of form.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode LoadStatusData(const std::string &formId, std::string &statusData);
+
+    /**
+     * @brief Save or update the status data of form in DB.
+     * @param formId The form data Id.
+     * @param statusData Status data of form.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UpdateStatusData(const std::string &formId, const std::string &statusData);
 private:
     void SaveEntries(const std::unordered_map<std::string, std::string> &value, std::vector<InnerFormInfo> &innerFormInfos);
     bool CheckRdbStore();

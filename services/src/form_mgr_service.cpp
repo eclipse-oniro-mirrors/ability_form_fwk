@@ -47,6 +47,7 @@
 #include "in_process_call_wrapper.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
+#include "mem_status_listener.h"
 #include "os_account_manager.h"
 #include "permission_constants.h"
 #include "permission_verification.h"
@@ -54,6 +55,7 @@
 #include "tokenid_kit.h"
 #include "hisysevent.h"
 #include "xcollie/watchdog.h"
+#include "mem_mgr_client.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -116,6 +118,9 @@ FormMgrService::~FormMgrService()
             HILOG_ERROR("%{public}s fail, UnregisterBundleEventCallback failed", __func__);
         }
         formBundleEventCallback_ = nullptr;
+    }
+    if (memStatusListener_ != nullptr) {
+        Memory::MemMgrClient::GetInstance().UnsubscribeAppState(*memStatusListener_);
     }
 }
 
@@ -569,6 +574,7 @@ void FormMgrService::OnStart()
     state_ = ServiceRunningState::STATE_RUNNING;
     // listener for FormDataProxyMgr
     AddSystemAbilityListener(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
+    AddSystemAbilityListener(MEMORY_MANAGER_SA_ID);
     onStartEndTime_ = GetCurrentDateTime();
     HILOG_INFO("Form Mgr Service start success, time: %{public}s, onKvDataServiceAddTime: %{public}s",
         onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
@@ -648,6 +654,9 @@ ErrCode FormMgrService::Init()
         formSysEventReceiver_->SetSerialQueue(serialQueue_);
         EventFwk::CommonEventManager::SubscribeCommonEvent(formSysEventReceiver_);
     }
+
+    memStatusListener_ = std::make_shared<MemStatusListener>();
+    Memory::MemMgrClient::GetInstance().SubscribeAppState(*memStatusListener_);
 
     FormInfoMgr::GetInstance().Start();
     int currUserId = FormUtil::GetCurrentAccountId();
@@ -1163,6 +1172,11 @@ int32_t FormMgrService::UnregisterPublishFormInterceptor(const sptr<IRemoteObjec
 
 void FormMgrService::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {
+    if (systemAbilityId == MEMORY_MANAGER_SA_ID) {
+        HILOG_INFO("MEMORY_MANAGER_SA start, SubscribeAppState");
+        Memory::MemMgrClient::GetInstance().SubscribeAppState(*memStatusListener_);
+        return;
+    }
     if (systemAbilityId != DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID) {
         return;
     }
@@ -1457,6 +1471,39 @@ ErrCode FormMgrService::UnregisterClickEventObserver(const sptr<IRemoteObject> &
         return ret;
     }
     return FormMgrAdapter::GetInstance().UnregisterClickEventObserver(observer);
+}
+
+int32_t FormMgrService::SetFormsRecyclable(const std::vector<int64_t> &formIds)
+{
+    HILOG_DEBUG("called.");
+    ErrCode ret = CheckFormPermission();
+    if (ret != ERR_OK) {
+        HILOG_ERROR("set forms recyclable permission denied");
+        return ret;
+    }
+    return FormMgrAdapter::GetInstance().SetFormsRecyclable(formIds);
+}
+
+int32_t FormMgrService::RecycleForms(const std::vector<int64_t> &formIds, const Want &want)
+{
+    HILOG_DEBUG("called.");
+    ErrCode ret = CheckFormPermission();
+    if (ret != ERR_OK) {
+        HILOG_ERROR("recycle forms permission denied");
+        return ret;
+    }
+    return FormMgrAdapter::GetInstance().RecycleForms(formIds, want);
+}
+
+int32_t FormMgrService::RecoverForms(const std::vector<int64_t> &formIds, const Want &want)
+{
+    HILOG_DEBUG("called.");
+    ErrCode ret = CheckFormPermission();
+    if (ret != ERR_OK) {
+        HILOG_ERROR("recover forms permission denied");
+        return ret;
+    }
+    return FormMgrAdapter::GetInstance().RecoverForms(formIds, want);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

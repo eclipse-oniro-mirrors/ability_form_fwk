@@ -1960,5 +1960,79 @@ ErrCode FormMgrProxy::UnregisterClickEventObserver(const sptr<IRemoteObject> &ob
     }
     return ERR_OK;
 }
+
+int32_t FormMgrProxy::SetFormsRecyclable(const std::vector<int64_t> &formIds)
+{
+    HILOG_DEBUG("start.");
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("failed to write interface token");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt64Vector(formIds)) {
+        HILOG_ERROR("failed to write vector formIds.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+    int32_t error = SendTransactCmd(IFormMgr::Message::FORM_MGR_SET_FORMS_RECYCLABLE, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("failed to SendTransactCmd: %{public}d.", error);
+        return error;
+    }
+    return reply.ReadInt32();
+}
+
+int32_t FormMgrProxy::RecycleForms(const std::vector<int64_t> &formIds, const Want &want)
+{
+    HILOG_DEBUG("start.");
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("failed to write interface token");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt64Vector(formIds)) {
+        HILOG_ERROR("failed to write vector formIds");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteParcelable(&want)) {
+        HILOG_ERROR("failed to write want");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+    int32_t error = SendTransactCmd(IFormMgr::Message::FORM_MGR_RECYCLE_FORMS, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("failed to SendTransactCmd: %{public}d.", error);
+        return error;
+    }
+    return reply.ReadInt32();
+}
+
+int32_t FormMgrProxy::RecoverForms(const std::vector<int64_t> &formIds, const Want &want)
+{
+    HILOG_DEBUG("start.");
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("failed to write interface token");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt64Vector(formIds)) {
+        HILOG_ERROR("failed to write vector formIds");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteParcelable(&want)) {
+        HILOG_ERROR("failed to write want");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+    int32_t error = SendTransactCmd(IFormMgr::Message::FORM_MGR_RECOVER_FORMS, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("failed to SendTransactCmd: %{public}d.", error);
+        return error;
+    }
+    return reply.ReadInt32();
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

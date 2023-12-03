@@ -76,6 +76,15 @@ public:
      */
     void OnAcquireFormData(const AAFwk::WantParams &wantParams, int64_t requestCode,
                             const sptr<IRemoteObject> &callerToken);
+
+    /**
+     * @brief Send recycle form message to form host.
+     * @param formIds The Id list of forms.
+     * @param want The want of forms to be recycled.
+     * @param callerToken Caller ability token.
+     */
+    void OnRecycleForms(const std::vector<int64_t> &formIds, const AAFwk::Want &want,
+        const sptr<IRemoteObject> &callerToken);
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

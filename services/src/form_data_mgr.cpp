@@ -27,6 +27,7 @@
 #include "form_mgr_errors.h"
 #include "form_observer_record.h"
 #include "form_provider_mgr.h"
+#include "form_record.h"
 #include "form_render_mgr.h"
 #include "form_task_mgr.h"
 #include "form_util.h"
@@ -244,6 +245,57 @@ void FormDataMgr::GetConfigParamFormMap(const std::string &key, int32_t &value) 
     }
     value = iter->second;
     HILOG_INFO("found config parameter, key: %{public}s, value:%{public}d.", key.c_str(), value);
+}
+
+void FormDataMgr::RecycleAllRecyclableForms() const
+{
+    HILOG_INFO("start");
+    std::vector<int64_t> formIds;
+    {
+        std::lock_guard<std::mutex> lock(formRecordMutex_);
+        for (auto itFormRecord = formRecords_.begin(); itFormRecord != formRecords_.end(); itFormRecord++) {
+            if (itFormRecord->second.recycleStatus ==  RecycleStatus::RECYCLABLE) {
+                formIds.emplace_back(itFormRecord->first);
+            }
+        }
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(formHostRecordMutex_);
+        for (auto itHostRecord = clientRecords_.begin(); itHostRecord != clientRecords_.end(); itHostRecord++) {
+            std::vector<int64_t> matchedFormIds;
+            for (const int64_t &formId : formIds) {
+                if (itHostRecord->Contains(formId)) {
+                    matchedFormIds.emplace_back(formId);
+                }
+            }
+            if (!matchedFormIds.empty()) {
+                Want want;
+                itHostRecord->OnRecycleForms(matchedFormIds, want);
+            }
+        }
+    }
+}
+
+void FormDataMgr::RecycleForms(const std::vector<int64_t> &formIds, const int &callingUid, const Want &want) const
+{
+    HILOG_INFO("start");
+    std::lock_guard<std::mutex> lock(formHostRecordMutex_);
+    for (auto itHostRecord = clientRecords_.begin(); itHostRecord != clientRecords_.end(); itHostRecord++) {
+        if (itHostRecord->GetCallerUid() != callingUid) {
+            continue;
+        }
+        std::vector<int64_t> matchedFormIds;
+        for (const int64_t &formId : formIds) {
+            if (itHostRecord->Contains(formId)) {
+                matchedFormIds.emplace_back(formId);
+            }
+        }
+        if (!matchedFormIds.empty()) {
+            itHostRecord->OnRecycleForms(matchedFormIds, want);
+        }
+        break;
+    }
 }
 
 /**

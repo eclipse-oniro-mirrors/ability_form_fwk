@@ -53,7 +53,9 @@
               "resource_management",
               "time_service",
               "device_usage_statistics",
-              "ace_engine"
+              "ace_engine",
+              "memmgr_plugin",
+              "memmgr"
           ],
           "third_party": [
               "node",

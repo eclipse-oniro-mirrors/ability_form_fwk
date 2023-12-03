@@ -44,6 +44,8 @@ FormSupplyStub::FormSupplyStub()
         &FormSupplyStub::HandleOnAcquireDataResult;
     memberFuncMap_[static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_RENDERING_BLOCK)] =
         &FormSupplyStub::HandleOnRenderingBlock;
+    memberFuncMap_[static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_RECYCLE_FORM)] =
+        &FormSupplyStub::HandleOnRecycleForm;
 }
 
 FormSupplyStub::~FormSupplyStub()
@@ -263,6 +265,26 @@ int32_t FormSupplyStub::HandleOnRenderingBlock(MessageParcel &data, MessageParce
     }
 
     int32_t result = OnRenderingBlock(bundleName);
+    reply.WriteInt32(result);
+    return result;
+}
+
+int32_t FormSupplyStub::HandleOnRecycleForm(MessageParcel &data, MessageParcel &reply)
+{
+    int64_t formId = data.ReadInt64();
+    if (formId <= 0) {
+        HILOG_ERROR("failed to ReadInt64<formId>");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
+    if (!want) {
+        HILOG_ERROR("failed to ReadParcelable<Want>");
+        reply.WriteInt32(ERR_APPEXECFWK_PARCEL_ERROR);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    int32_t result = OnRecycleForm(formId, *want);
     reply.WriteInt32(result);
     return result;
 }

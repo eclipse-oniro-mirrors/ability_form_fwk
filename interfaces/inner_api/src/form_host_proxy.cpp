@@ -288,5 +288,36 @@ int FormHostProxy::SendTransactCmd(IFormHost::Message code, MessageParcel &data,
     return ERR_OK;
 }
 
+void FormHostProxy::OnRecycleForm(const int64_t &formId)
+{
+    MessageParcel data;
+    MessageOption option(MessageOption::TF_ASYNC);
+
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("failed to write interface token.");
+        return;
+    }
+
+    if (!data.WriteInt64(formId)) {
+        HILOG_ERROR("failed to write formId.");
+        return;
+    }
+
+    auto remote = Remote();
+    if (remote == nullptr) {
+        HILOG_ERROR("remote is nullptr.");
+        return;
+    }
+
+    MessageParcel reply;
+    int error = remote->SendRequest(
+        static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_RECYCLE_FORM),
+        data,
+        reply,
+        option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("failed to SendRequest: %{public}d", error);
+    }
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

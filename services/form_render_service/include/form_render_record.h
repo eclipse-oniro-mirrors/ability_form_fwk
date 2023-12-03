@@ -128,6 +128,10 @@ public:
 
     void FormRenderGC();
 
+    int32_t RecycleForm(const int64_t &formId, std::string &statusData);
+
+    int32_t RecoverForm(const int64_t &formId, const std::string &statusData,
+        const bool &isRecoverFormToHandleClickEvent);
 private:
     class RemoteObjHash {
     public:
@@ -174,10 +178,6 @@ private:
 
     void HandleUpdateForm(const FormJsInfo &formJsInfo, const Want &want);
 
-    void HandleUpdateDynamicForm(const FormJsInfo &formJsInfo, const Want &want);
-
-    void HandleUpdateStaticForm(const FormJsInfo &formJsInfo, const Want &want);
-
     void AddRenderer(const FormJsInfo &formJsInfo, const Want &want);
 
     void UpdateRenderer(const FormJsInfo &formJsInfo);
@@ -190,18 +190,23 @@ private:
 
     bool CheckEventHandler(bool createThead = true, bool needMonitored = false);
 
-    void AddStaticFormRequest(const FormJsInfo &formJsInfo, const Want &want);
+    void AddFormRequest(const FormJsInfo &formJsInfo, const Want &want);
 
-    void AddStaticFormRequest(int64_t formId, const Ace::FormRequest &formRequest);
+    void AddFormRequest(int64_t formId, const Ace::FormRequest &formRequest);
 
-    void DeleteStaticFormRequest(int64_t formId, const std::string &compId);
+    void DeleteFormRequest(int64_t formId, const std::string &compId);
 
-    void UpdateStaticFormRequestReleaseState(
+    void UpdateFormRequestReleaseState(
         int64_t formId, const std::string &compId, bool hasRelease);
 
-    void ReAddAllStaticForms();
+    void ReAddAllRecycledForms();
 
-    void ReAddStaticForms(const std::vector<FormJsInfo> &formJsInfos);
+    void ReAddRecycledForms(const std::vector<FormJsInfo> &formJsInfos);
+
+    int32_t HandleRecycleForm(const int64_t &formId, std::string &statusData);
+
+    void HandleRecoverForm(const int64_t &formId, const std::string &statusData,
+        const bool &isRecoverFormToHandleClickEvent);
 
     void HandleFormRenderGC();
 
@@ -221,8 +226,8 @@ private:
     // <formId, formRendererGroup>
     std::mutex formRendererGroupMutex_;
     std::unordered_map<int64_t, std::shared_ptr<Ace::FormRendererGroup>> formRendererGroupMap_;
-    std::mutex staticFormRequestsMutex_;
-    std::unordered_map<int64_t, std::unordered_map<std::string, Ace::FormRequest>> staticFormRequests_;
+    std::mutex formRequestsMutex_;
+    std::unordered_map<int64_t, std::unordered_map<std::string, Ace::FormRequest>> formRequests_;
     std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration_;
 
     std::string hapPath_;

@@ -100,6 +100,14 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t OnRenderingBlock(const std::string &bundleName) override;
+
+    /**
+     * @brief Accept status data of form to be recycled from render service.
+     * @param formId The id of the form.
+     * @param want Input data.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t OnRecycleForm(const int64_t &formId, const Want &want) override;
 private:
     template<typename T>
     int GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos);

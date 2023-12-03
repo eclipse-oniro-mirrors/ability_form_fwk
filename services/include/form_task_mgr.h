@@ -32,6 +32,9 @@ namespace OHOS {
 namespace AppExecFwk {
 using Want = OHOS::AAFwk::Want;
 using WantParams = OHOS::AAFwk::WantParams;
+enum class TaskType : int64_t {
+    RECYCLE_FORM,
+};
 /**
  * @class FormTaskMgr
  * form task manager.
@@ -230,6 +233,29 @@ public:
         std::map<std::string, std::vector<int64_t>> &eventMaps,
         const int32_t formVisibleType, int32_t visibleNotifyDelay);
 
+    /**
+     * @brief Post recycle forms.
+     * @param formIds the Ids of forms to be recycled.
+     * @param want The want of the request.
+     * @param remoteObjectOfHost Form host proxy object.
+     * @param remoteObjectOfRender Form render proxy object.
+     */
+    void PostRecycleForms(const std::vector<int64_t> &formIds, const Want &want,
+        const sptr<IRemoteObject> &remoteObjectOfHost, const sptr<IRemoteObject> &remoteObjectOfRender);
+
+    /**
+     * @brief Post recover form.
+     * @param formIds the Id of form to be recovered.
+     * @param want The want of the request.
+     * @param remoteObject Form render proxy object.
+     */
+    void PostRecoverForm(const int64_t &formId, const Want &want, const sptr<IRemoteObject> &remoteObject);
+
+    /**
+     * @brief Cancel delay task.
+     * @param eventMsg Delay Task.
+     */
+    void CancelDelayTask(const std::pair<int64_t, int64_t> &eventMsg);
 private:
     /**
      * @brief Acquire form data from form provider.
@@ -424,6 +450,23 @@ private:
     void NotifyVisible(const std::vector<int64_t> &formIds,
         std::map<std::string, std::vector<FormInstance>> formInstanceMaps,
         std::map<std::string, std::vector<int64_t>> eventMaps, const int32_t formVisibleType);
+
+    /**
+     * @brief Handle recycle form message.
+     * @param formId The Id of form to be recycled.
+     * @param remoteObjectOfHost Form host proxy object.
+     * @param remoteObjectOfRender Form render proxy object.
+     */
+    void RecycleForm(const int64_t &formId, const sptr<IRemoteObject> &remoteObjectOfHost,
+        const sptr<IRemoteObject> &remoteObjectOfRender);
+
+    /**
+     * @brief Handle recover form message.
+     * @param formId The Id of form to be recovered.
+     * @param want The want of the request.
+     * @param remoteObject Form render proxy object.
+     */
+    void RecoverForm(const int64_t &formId, const Want &want, const sptr<IRemoteObject> &remoteObject);
 private:
     std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;
 };

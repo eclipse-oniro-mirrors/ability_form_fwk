@@ -61,3 +61,17 @@ declare_args() {
     fms_ecologic_rule_mgr_enabled = true
   }
 }
+
+declare_args() {
+  cite_memmgr_plugin = false
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.resourceschedule_memmgr_plugin)) {
+    cite_memmgr_plugin = true
+  }
+
+  cite_memmgr = false
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.resourceschedule_memmgr)) {
+    cite_memmgr = true
+  }
+}

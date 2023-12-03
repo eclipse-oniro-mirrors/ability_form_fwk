@@ -73,6 +73,12 @@ public:
 
     void SetRenderRemoteObj(sptr<IFormRender> remoteObject);
 
+    ErrCode RecycleForms(const std::vector<int64_t> &formIds, const Want &want,
+        const sptr<IRemoteObject> &remoteObjectOfHost);
+
+    ErrCode RecoverForms(const std::vector<int64_t> &formIds, const std::string &bundleName,
+        const WantParams &wantParams);
+
 private:
     ErrCode ConnectRenderService(const sptr<FormRenderConnection> &connection, int32_t level) const;
 
@@ -85,6 +91,8 @@ private:
     void NotifyHostRenderServiceIsDead() const;
 
     int32_t GetCompatibleVersion(const std::string &bundleName) const;
+
+    void CheckIfFormRecycled(FormRecord &formRecord, Want& want) const;
 
 private:
     class RemoteObjHash {

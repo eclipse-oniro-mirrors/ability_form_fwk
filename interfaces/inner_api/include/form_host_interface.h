@@ -83,6 +83,12 @@ public:
      */
     virtual void OnAcquireDataResponse(const AAFwk::WantParams &wantParams, int64_t requestCode) = 0;
 
+    /**
+     * @brief Recycle form
+     * @param formId The id of form to be recycled.
+     */
+    virtual void OnRecycleForm(const int64_t &formId) {}
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -107,6 +113,9 @@ public:
 
         // ipc id for acquire form data response (3687)
         FORM_HOST_ON_ACQUIRE_FORM_DATA,
+
+        // ipc id for acquire form data response (3688)
+        FORM_HOST_ON_RECYCLE_FORM,
     };
 };
 }  // namespace AppExecFwk

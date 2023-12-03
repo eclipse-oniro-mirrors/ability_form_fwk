@@ -23,6 +23,11 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+enum class RecycleStatus {
+    RECYCLABLE,
+    RECYCLED,
+    NON_RECYCLABLE,
+};
 /**
  * @class FormRecord
  * Form data.
@@ -71,6 +76,7 @@ public:
     std::string description = "";
     int32_t privacyLevel = 0;
     bool isNeedNotify = true;
+    RecycleStatus recycleStatus = RecycleStatus::NON_RECYCLABLE;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

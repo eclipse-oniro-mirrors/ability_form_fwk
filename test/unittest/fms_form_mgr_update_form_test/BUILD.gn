@@ -72,6 +72,13 @@ ohos_unittest("FmsFormMgrUpdateFormTest") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
+
+  if (cite_memmgr_plugin) {
+    external_deps += [ "memmgr_plugin:memmgrclient" ]
+  } else if (cite_memmgr) {
+    external_deps += [ "memmgr:memmgrclient" ]
+  }
+
   if (fms_ecologic_rule_mgr_enabled) {
     external_deps += [ "ecological_rule_manager:erms_client" ]
   }

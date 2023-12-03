@@ -1350,5 +1350,62 @@ int FormMgr::UnregisterFormRouterProxy(const std::vector<int64_t> &formIds)
     }
     return remoteProxy_->UnregisterFormRouterProxy(formIds);
 }
+
+int32_t FormMgr::SetFormsRecyclable(const std::vector<int64_t> &formIds)
+{
+    HILOG_DEBUG("called.");
+    if (GetRecoverStatus() == Constants::IN_RECOVERING) {
+        HILOG_ERROR("form is in recover status, can't do action on form.");
+        return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
+    }
+    if (formIds.empty()) {
+        HILOG_ERROR("formIds is empty.");
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+    }
+    auto errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("errCode: %{public}d.", errCode);
+        return errCode;
+    }
+    return remoteProxy_->SetFormsRecyclable(formIds);
+}
+
+int32_t FormMgr::RecycleForms(const std::vector<int64_t> &formIds, const Want &want)
+{
+    HILOG_DEBUG("called.");
+    if (GetRecoverStatus() == Constants::IN_RECOVERING) {
+        HILOG_ERROR("form is in recover status, can't do action on form.");
+        return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
+    }
+    if (formIds.empty()) {
+        HILOG_ERROR("formIds is empty.");
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+    }
+    auto errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("errCode: %{public}d.", errCode);
+        return errCode;
+    }
+    return remoteProxy_->RecycleForms(formIds, want);
+}
+
+int32_t FormMgr::RecoverForms(const std::vector<int64_t> &formIds, const Want &want)
+{
+    HILOG_DEBUG("called.");
+    if (GetRecoverStatus() == Constants::IN_RECOVERING) {
+        HILOG_ERROR("form is in recover status, can't do action on form.");
+        return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
+    }
+    if (formIds.empty()) {
+        HILOG_ERROR("formIds is empty.");
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+    }
+    auto errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("errCode: %{public}d.", errCode);
+        return errCode;
+    }
+    return remoteProxy_->RecoverForms(formIds, want);
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS
