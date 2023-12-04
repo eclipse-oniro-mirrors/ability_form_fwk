@@ -95,6 +95,7 @@ ohos_shared_library("libfms") {
     "services/src/form_util.cpp",
     "services/src/free_install_status_callback_proxy.cpp",
     "services/src/free_install_status_callback_stub.cpp",
+    "services/src/mem_status_listener.cpp",
   ]
 
   configs = [
@@ -145,6 +146,12 @@ ohos_shared_library("libfms") {
     "samgr:samgr_proxy",
     "time_service:time_client",
   ]
+
+  if (cite_memmgr_plugin) {
+    external_deps += [ "memmgr_plugin:memmgrclient" ]
+  } else if (cite_memmgr) {
+    external_deps += [ "memmgr:memmgrclient" ]
+  }
 
   defines = []
   if (ability_runtime_power) {

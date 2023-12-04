@@ -106,6 +106,14 @@ public:
      */
     virtual int32_t OnRenderingBlock(const std::string &bundleName) { return ERR_OK; }
 
+    /**
+     * @brief Accept status data of form to be recycled from render service.
+     * @param formId The id of the form.
+     * @param want Input data.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int32_t OnRecycleForm(const int64_t &formId, const Want &want) { return ERR_OK; }
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -119,6 +127,7 @@ public:
         TRANSACTION_FORM_STOP_RENDERING_TASK_DONE,
         TRANSACTION_FORM_ACQUIRED_DATA,
         TRANSACTION_FORM_RENDERING_BLOCK,
+        TRANSACTION_FORM_RECYCLE_FORM,
     };
 };
 }  // namespace AppExecFwk

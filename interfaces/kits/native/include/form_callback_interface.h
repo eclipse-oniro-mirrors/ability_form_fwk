@@ -49,6 +49,11 @@ public:
      * @param errorMsg Indicates error-message of the form.
      */
     virtual void OnError(const int32_t errorCode, const std::string &errorMsg) = 0;
+
+    /**
+     * @brief Recycle form.
+     */
+    virtual void ProcessRecycleForm() {}
 };
 
 class FormStateCallbackInterface {

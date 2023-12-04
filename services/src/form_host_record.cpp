@@ -325,5 +325,19 @@ int32_t FormHostRecord::GetFormsCount() const
 {
     return static_cast<int32_t>(forms_.size());
 }
+
+void FormHostRecord::OnRecycleForms(const std::vector<int64_t> &formIds, const Want &want) const
+{
+    HILOG_DEBUG("start.");
+    if (formIds.empty()) {
+        HILOG_ERROR("formIds is empty");
+        return;
+    }
+    if (formHostCallback_ == nullptr) {
+        HILOG_ERROR("formHostCallback_ can not be null.");
+        return;
+    }
+    formHostCallback_->OnRecycleForms(formIds, want, formHostClient_);
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -35,6 +35,7 @@
 #include "ipc_skeleton.h"
 #include "os_account_manager.h"
 #include "want.h"
+#include "form_info_rdb_storage_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -114,6 +115,21 @@ ErrCode FormRenderMgrInner::RenderForm(
     return ERR_OK;
 }
 
+void FormRenderMgrInner::CheckIfFormRecycled(FormRecord &formRecord, Want& want) const
+{
+    if (formRecord.recycleStatus == RecycleStatus::RECYCLED) {
+        formRecord.recycleStatus = RecycleStatus::NON_RECYCLABLE;
+        FormDataMgr::GetInstance().UpdateFormRecord(formRecord.formId, formRecord);
+        std::string statusData;
+        if (FormInfoRdbStorageMgr::GetInstance().LoadStatusData(
+            std::to_string(formRecord.formId), statusData) != ERR_OK) {
+            HILOG_ERROR("read status data of %{public}" PRId64 " failed.", formRecord.formId);
+        } else {
+            want.SetParam(Constants::FORM_STATUS_DATA, statusData);
+        }
+    }
+}
+
 ErrCode FormRenderMgrInner::UpdateRenderingForm(FormRecord &formRecord, const FormProviderData &formProviderData,
     const WantParams &wantParams, bool mergeData)
 {
@@ -160,6 +176,7 @@ ErrCode FormRenderMgrInner::UpdateRenderingForm(FormRecord &formRecord, const Fo
                 HILOG_ERROR("remoteObject is nullptr, can not get obj from renderRemoteObj.");
                 return ERR_APPEXECFWK_FORM_INVALID_PARAM;
             }
+            CheckIfFormRecycled(formRecord, want);
             want.SetParam(Constants::FORM_CONNECT_ID, connection->GetConnectId());
             FormTaskMgr::GetInstance().PostRenderForm(formRecord, std::move(want), remoteObject);
             return ERR_OK;
@@ -564,6 +581,85 @@ void FormRenderMgrInner::SetRenderRemoteObj(sptr<IFormRender> remoteObject)
 int32_t FormRenderMgrInner::GetReRenderCount() const
 {
     return atomicRerenderCount_;
+}
+
+ErrCode FormRenderMgrInner::RecycleForms(
+    const std::vector<int64_t> &formIds, const Want &want, const sptr<IRemoteObject> &remoteObjectOfHost)
+{
+    HILOG_DEBUG("called.");
+    if (renderRemoteObj_ == nullptr) {
+        HILOG_ERROR("renderRemoteObj_ is nullptr");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    auto remoteObject = renderRemoteObj_->AsObject();
+    if (remoteObject == nullptr) {
+        HILOG_ERROR("remoteObject is nullptr, can not get obj from renderRemoteObj.");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    std::lock_guard<std::mutex> lock(resourceMutex_);
+    std::vector<int64_t> connectedForms;
+    for (const int64_t &formId : formIds) {
+        auto conIterator = renderFormConnections_.find(formId);
+        if (conIterator != renderFormConnections_.end()) {
+            auto connection = conIterator->second;
+            if (connection == nullptr) {
+                HILOG_ERROR("connection of %{public}" PRId64 " is null.", formId);
+                continue;
+            }
+            connectedForms.emplace_back(formId);
+        }
+    }
+    FormTaskMgr::GetInstance().PostRecycleForms(connectedForms, want, remoteObjectOfHost, remoteObject);
+    return ERR_OK;
+}
+
+ErrCode FormRenderMgrInner::RecoverForms(
+    const std::vector<int64_t> &formIds, const std::string &bundleName, const WantParams &wantParams)
+{
+    HILOG_DEBUG("called.");
+    if (bundleName.empty()) {
+        HILOG_ERROR("bundleName is empty.");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    if (renderRemoteObj_ == nullptr) {
+        HILOG_ERROR("renderRemoteObj_ is nullptr");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    auto remoteObject = renderRemoteObj_->AsObject();
+    if (remoteObject == nullptr) {
+        HILOG_ERROR("remoteObject is nullptr, can not get obj from renderRemoteObj.");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    std::string uid = std::to_string(FormUtil::GetCurrentAccountId()) + bundleName;
+    for (const int64_t &formId : formIds) {
+        Want want;
+        want.SetParams(wantParams);
+        want.SetParam(Constants::FORM_SUPPLY_UID, uid);
+
+        std::lock_guard<std::mutex> lock(resourceMutex_);
+        auto conIterator = renderFormConnections_.find(formId);
+        if (conIterator != renderFormConnections_.end()) {
+            auto connection = conIterator->second;
+            if (connection == nullptr) {
+                HILOG_ERROR("connection of %{public}" PRId64 " is null.", formId);
+                continue;
+            }
+            want.SetParam(Constants::FORM_CONNECT_ID, connection->GetConnectId());
+
+            std::string statusData;
+            if (FormInfoRdbStorageMgr::GetInstance().LoadStatusData(std::to_string(formId), statusData) != ERR_OK) {
+                HILOG_ERROR("read status data of %{public}" PRId64 " failed.", formId);
+            }
+            want.SetParam(Constants::FORM_STATUS_DATA, statusData);
+
+            FormTaskMgr::GetInstance().PostRecoverForm(formId, want, remoteObject);
+        } else {
+            HILOG_ERROR("can't find connection of %{public}" PRId64, formId);
+        }
+    }
+    return ERR_OK;
 }
 
 void FormRenderRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)

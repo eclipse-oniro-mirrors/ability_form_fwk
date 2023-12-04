@@ -767,7 +767,6 @@ private:
             HILOG_DEBUG("Register click callback successfully.");
             return CreateJsUndefined(env);
         }
-        NapiFormUtil::ThrowByInternalErrorCode(env, result);
         HILOG_DEBUG("Register click callback fail.");
         if (!JsFormStateObserver::GetInstance()->IsFormClickCallbackMapEmpty()) {
             HILOG_DEBUG("Form click callback map is not empty.");
@@ -814,7 +813,6 @@ private:
             result = JsFormStateObserver::GetInstance()->ClearFormClickCallbackByBundleName(type, bundleName);
             if (result != ERR_OK) {
                 HILOG_ERROR("Clear form click callback by bundlename click callback in form manager error.");
-                NapiFormUtil::ThrowByInternalErrorCode(env, result);
                 return CreateJsUndefined(env);
             }
             if (!JsFormStateObserver::GetInstance()->IsFormClickCallbackMapEmpty()) {
@@ -827,7 +825,6 @@ private:
         result = JsFormStateObserver::GetInstance()->ClearFormClickCallback(type, bundleName, callback);
         if (result != ERR_OK) {
             HILOG_ERROR("Clear form click callback click callback in form manager error.");
-            NapiFormUtil::ThrowByInternalErrorCode(env, result);
             return CreateJsUndefined(env);
         }
         if (!JsFormStateObserver::GetInstance()->IsFormClickCallbackMapEmpty()) {

@@ -410,5 +410,25 @@ void FormHostClient::UpdateForm(const FormJsInfo &formJsInfo)
         callback->ProcessFormUpdate(formJsInfo);
     }
 }
+
+void FormHostClient::OnRecycleForm(const int64_t &formId)
+{
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    HILOG_DEBUG("formId:%{public}s.", std::to_string(formId).c_str());
+
+    if (formId < 0) {
+        HILOG_ERROR("the passed form id can't be negative.");
+        return;
+    }
+    std::lock_guard<std::mutex> lock(callbackMutex_);
+    auto iter = formCallbackMap_.find(formId);
+    if (iter == formCallbackMap_.end()) {
+        HILOG_ERROR("can't find formId:%{public}s.", std::to_string(formId).c_str());
+        return;
+    }
+    for (const auto &callback : iter->second) {
+        callback->ProcessRecycleForm();
+    }
+}
 } // namespace AppExecFwk
 } // namespace OHOS

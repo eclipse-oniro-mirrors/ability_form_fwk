@@ -87,6 +87,12 @@ public:
 
     void PostOnUnlockTask();
 
+    ErrCode RecycleForms(const std::vector<int64_t> &formIds, const Want &want,
+        const sptr<IRemoteObject> &remoteObjectOfHost);
+
+    ErrCode RecoverForms(const std::vector<int64_t> &formIds, const std::string &bundleName,
+        const WantParams &wantParams);
+
 private:
     void InitRenderInner(bool isSandbox);
 

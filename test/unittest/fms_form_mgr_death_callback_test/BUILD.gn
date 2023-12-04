@@ -73,6 +73,12 @@ ohos_unittest("FmsFormMgrDeathCallbackTest") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
+
+  if (cite_memmgr_plugin) {
+    external_deps += [ "memmgr_plugin:memmgrclient" ]
+  } else if (cite_memmgr) {
+    external_deps += [ "memmgr:memmgrclient" ]
+  }
 }
 
 group("unittest") {

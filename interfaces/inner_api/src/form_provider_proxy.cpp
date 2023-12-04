@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -49,8 +49,8 @@ int FormProviderProxy::AcquireProviderFormInfo(
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormProvider::Message::FORM_ACQUIRE_PROVIDER_FORM_INFO),
+    error = SendTransactCmd(
+        IFormProvider::Message::FORM_ACQUIRE_PROVIDER_FORM_INFO,
         data,
         reply,
         option);
@@ -92,8 +92,8 @@ int FormProviderProxy::NotifyFormDelete(const int64_t formId, const Want &want, 
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormProvider::Message::FORM_PROVIDER_NOTIFY_FORM_DELETE),
+    error = SendTransactCmd(
+        IFormProvider::Message::FORM_PROVIDER_NOTIFY_FORM_DELETE,
         data,
         reply,
         option);
@@ -137,8 +137,8 @@ int FormProviderProxy::NotifyFormsDelete(
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormProvider::Message::FORM_PROVIDER_NOTIFY_FORMS_DELETE),
+    error = SendTransactCmd(
+        IFormProvider::Message::FORM_PROVIDER_NOTIFY_FORMS_DELETE,
         data,
         reply,
         option);
@@ -182,8 +182,8 @@ int FormProviderProxy::NotifyFormUpdate(const int64_t formId, const Want &want, 
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormProvider::Message::FORM_PROVIDER_NOTIFY_FORM_UPDATE),
+    error = SendTransactCmd(
+        IFormProvider::Message::FORM_PROVIDER_NOTIFY_FORM_UPDATE,
         data,
         reply,
         option);
@@ -236,8 +236,8 @@ int FormProviderProxy::EventNotify(const std::vector<int64_t> &formIds, const in
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormProvider::Message::FORM_PROVIDER_EVENT_NOTIFY),
+    error = SendTransactCmd(
+        IFormProvider::Message::FORM_PROVIDER_EVENT_NOTIFY,
         data,
         reply,
         option);
@@ -283,8 +283,8 @@ int FormProviderProxy::NotifyFormCastTempForm(
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormProvider::Message::FORM_PROVIDER_NOTIFY_TEMP_FORM_CAST),
+    error = SendTransactCmd(
+        IFormProvider::Message::FORM_PROVIDER_NOTIFY_TEMP_FORM_CAST,
         data,
         reply,
         option);
@@ -332,8 +332,8 @@ int FormProviderProxy::FireFormEvent(
     }
     MessageParcel reply;
     MessageOption option(MessageOption::TF_ASYNC);
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormProvider::Message::FORM_PROVIDER_EVENT_MESSAGE),
+    int error = SendTransactCmd(
+        IFormProvider::Message::FORM_PROVIDER_EVENT_MESSAGE,
         data,
         reply,
         option);
@@ -382,8 +382,8 @@ int FormProviderProxy::AcquireState(const Want &wantArg, const std::string &prov
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormProvider::Message::FORM_PROVIDER_NOTIFY_STATE_ACQUIRE),
+    error = SendTransactCmd(
+        IFormProvider::Message::FORM_PROVIDER_NOTIFY_STATE_ACQUIRE,
         data,
         reply,
         option);
@@ -420,8 +420,8 @@ int32_t FormProviderProxy::AcquireFormData(int64_t formId, const sptr<IRemoteObj
         HILOG_ERROR("failed to write requestCode.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    int32_t result = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormProvider::Message::FORM_ACQUIRE_PROVIDER_FOMR_DATA),
+    int32_t result = SendTransactCmd(
+        IFormProvider::Message::FORM_ACQUIRE_PROVIDER_FOMR_DATA,
         data,
         reply,
         option);
@@ -498,8 +498,8 @@ int32_t FormProviderProxy::AcquireShareFormData(int64_t formId, const std::strin
         HILOG_ERROR("failed to write requestCode.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    int32_t result = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormProvider::Message::FORM_ACQUIRE_PROVIDER_SHARE_FOMR_INFO),
+    int32_t result = SendTransactCmd(
+        IFormProvider::Message::FORM_ACQUIRE_PROVIDER_SHARE_FOMR_INFO,
         data,
         reply,
         option);
@@ -515,5 +515,23 @@ int32_t FormProviderProxy::AcquireShareFormData(int64_t formId, const std::strin
 
     return retval;
 }
+
+int FormProviderProxy::SendTransactCmd(IFormProvider::Message code, MessageParcel &data,
+    MessageParcel &reply, MessageOption &option)
+{
+    sptr<IRemoteObject> remote = Remote();
+    if (remote == nullptr) {
+        HILOG_ERROR("remote object is nullptr.");
+        return ERR_NULL_OBJECT;
+    }
+
+    int ret = remote->SendRequest(static_cast<uint32_t>(code), data, reply, option);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("SendRequest failed. code is %{public}d, ret is %{public}d.", code, ret);
+        return ret;
+    }
+    return ERR_OK;
+}
+
 }  // namespace AppExecFwk
 }  // namespace OHOS

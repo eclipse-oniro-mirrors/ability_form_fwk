@@ -15,11 +15,14 @@
 
 #include "form_mgr_adapter.h"
 
+#include <algorithm>
 #include <cinttypes>
 #include <regex>
+#include <unordered_map>
 #include <unordered_set>
 
 #include "ability_manager_errors.h"
+#include "form_record.h"
 #ifdef DEVICE_USAGE_STATISTICS_ENABLE
 #include "bundle_active_client.h"
 #endif
@@ -66,6 +69,7 @@
 #include "nlohmann/json.hpp"
 #include "os_account_manager.h"
 #include "system_ability_definition.h"
+#include "form_task_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -1802,7 +1806,10 @@ int FormMgrAdapter::ReleaseRenderer(int64_t formId, const std::string &compId)
     }
 
     FormRecord record;
-    FormDataMgr::GetInstance().GetFormRecord(formId, record);
+    if (!FormDataMgr::GetInstance().GetFormRecord(formId, record)) {
+        HILOG_ERROR("no matched form record");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
     FormRenderMgr::GetInstance().ReleaseRenderer(formId, record, compId);
     return ERR_OK;
 }
@@ -3460,6 +3467,163 @@ bool FormMgrAdapter::IsErmsSupportPublishForm(std::string bundleName, std::vecto
     }
 #endif
     return isSupport;
+}
+
+int32_t FormMgrAdapter::SetFormsRecyclable(const std::vector<int64_t> &formIds)
+{
+    HILOG_DEBUG("called");
+    FormRecord record;
+    std::vector<int64_t> validFormIds;
+    int callingUid = IPCSkeleton::GetCallingUid();
+    for (int64_t formId : formIds) {
+        if (formId <= 0) {
+            HILOG_ERROR("form id is negative");
+            continue;
+        }
+
+        int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+        if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record)) {
+            HILOG_WARN("form %{public}" PRId64 " not exist", formId);
+            continue;
+        }
+        if (record.formTempFlag) {
+            HILOG_WARN("form %{public}" PRId64 " is temp form", formId);
+            continue;
+        }
+        if (!record.isDynamic) {
+            HILOG_WARN("form %{public}" PRId64 " is static form", formId);
+            continue;
+        }
+        if (record.uiSyntax != FormType::ETS) {
+            HILOG_WARN("form %{public}" PRId64 " is not ETS form", formId);
+            continue;
+        }
+        if (record.recycleStatus != RecycleStatus::NON_RECYCLABLE) {
+            HILOG_WARN("form %{public}" PRId64 " is already RECYCLABLE or RECYCLED", formId);
+            continue;
+        }
+        if (std::find(record.formUserUids.begin(), record.formUserUids.end(), callingUid)
+            == record.formUserUids.end()) {
+            HILOG_WARN("form %{public}" PRId64 " is not owned by %{public}d", formId, callingUid);
+            continue;
+        }
+
+        record.recycleStatus = RecycleStatus::RECYCLABLE;
+        FormDataMgr::GetInstance().UpdateFormRecord(matchedFormId, record);
+        validFormIds.emplace_back(matchedFormId);
+        HILOG_INFO("set %{public}" PRId64 " recyclable", formId);
+    }
+
+    if (validFormIds.empty()) {
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    return ERR_OK;
+}
+
+int32_t FormMgrAdapter::RecycleForms(const std::vector<int64_t> &formIds, const Want &want)
+{
+    HILOG_DEBUG("called");
+    FormRecord record;
+    std::vector<int64_t> validFormIds;
+    int callingUid = IPCSkeleton::GetCallingUid();
+    for (int64_t formId : formIds) {
+        if (formId <= 0) {
+            HILOG_ERROR("form id is negative");
+            continue;
+        }
+
+        int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+        if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record)) {
+            HILOG_WARN("form %{public}" PRId64 " not exist", formId);
+            continue;
+        }
+        if (record.formTempFlag) {
+            HILOG_WARN("form %{public}" PRId64 " is temp form", formId);
+            continue;
+        }
+        if (!record.isDynamic) {
+            HILOG_WARN("form %{public}" PRId64 " is static form", formId);
+            continue;
+        }
+        if (record.uiSyntax != FormType::ETS) {
+            HILOG_WARN("form %{public}" PRId64 " is not ETS form", formId);
+            continue;
+        }
+        if (record.recycleStatus == RecycleStatus::RECYCLED) {
+            HILOG_WARN("form %{public}" PRId64 " is already RECYCLED", formId);
+            continue;
+        }
+        if (std::find(record.formUserUids.begin(), record.formUserUids.end(), callingUid)
+            == record.formUserUids.end()) {
+            HILOG_WARN("form %{public}" PRId64 " is not owned by %{public}d", formId, callingUid);
+            continue;
+        }
+
+        record.recycleStatus = RecycleStatus::RECYCLABLE;
+        FormDataMgr::GetInstance().UpdateFormRecord(matchedFormId, record);
+        validFormIds.emplace_back(matchedFormId);
+        HILOG_INFO("set %{public}" PRId64 " recyclable", formId);
+    }
+
+    if (validFormIds.empty()) {
+        HILOG_WARN("validFormIds is empty");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    FormDataMgr::GetInstance().RecycleForms(validFormIds, callingUid, want);
+    return ERR_OK;
+}
+
+int32_t FormMgrAdapter::RecoverForms(const std::vector<int64_t> &formIds, const Want &want)
+{
+    HILOG_DEBUG("called.");
+    FormRecord record;
+    std::vector<int64_t> validFormIds;
+    int callingUid = IPCSkeleton::GetCallingUid();
+    std::string bundleName;
+    for (int64_t formId : formIds) {
+        if (formId <= 0) {
+            HILOG_ERROR("form id is negative");
+            continue;
+        }
+
+        int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+        if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record)) {
+            HILOG_WARN("form %{public}" PRId64 " not exist", formId);
+            continue;
+        }
+        if (record.recycleStatus == RecycleStatus::RECYCLABLE) {
+            HILOG_WARN("form %{public}" PRId64 " is RECYCLABLE, set it to NON_RECYCLABLE", formId);
+            FormTaskMgr::GetInstance().CancelDelayTask(std::make_pair((int64_t)TaskType::RECYCLE_FORM, formId));
+            record.recycleStatus = RecycleStatus::NON_RECYCLABLE;
+            FormDataMgr::GetInstance().UpdateFormRecord(matchedFormId, record);
+            continue;
+        }
+        if (record.recycleStatus != RecycleStatus::RECYCLED) {
+            HILOG_WARN("form %{public}" PRId64 " is not RECYCLED", formId);
+            continue;
+        }
+        if (std::find(record.formUserUids.begin(), record.formUserUids.end(), callingUid)
+            == record.formUserUids.end()) {
+            HILOG_WARN("form %{public}" PRId64 " is not owned by %{public}d", formId, callingUid);
+            continue;
+        }
+
+        bundleName = record.bundleName;
+        record.recycleStatus = RecycleStatus::NON_RECYCLABLE;
+        FormDataMgr::GetInstance().UpdateFormRecord(matchedFormId, record);
+        validFormIds.emplace_back(matchedFormId);
+        HILOG_INFO("set %{public}" PRId64 " recyclable", formId);
+    }
+
+    if (validFormIds.empty()) {
+        HILOG_WARN("validFormIds is empty");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    FormRenderMgr::GetInstance().RecoverForms(validFormIds, bundleName, want.GetParams());
+    return ERR_OK;
 }
 } // namespace AppExecFwk
 } // namespace OHOS

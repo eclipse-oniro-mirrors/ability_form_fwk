@@ -42,6 +42,8 @@ FormHostStub::FormHostStub()
         &FormHostStub::HandleOnError;
     memberFuncMap_[static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_ACQUIRE_FORM_DATA)] =
         &FormHostStub::HandleOnAcquireDataResponse;
+    memberFuncMap_[static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_RECYCLE_FORM)] =
+        &FormHostStub::HandleOnRecycleForm;
 }
 
 FormHostStub::~FormHostStub()
@@ -191,6 +193,14 @@ int32_t FormHostStub::HandleOnAcquireDataResponse(MessageParcel &data, MessagePa
     }
 
     OnAcquireDataResponse(*wantParams, requestCode);
+    reply.WriteInt32(ERR_OK);
+    return ERR_OK;
+}
+
+int32_t FormHostStub::HandleOnRecycleForm(MessageParcel &data, MessageParcel &reply)
+{
+    int64_t formId = data.ReadInt64();
+    OnRecycleForm(formId);
     reply.WriteInt32(ERR_OK);
     return ERR_OK;
 }

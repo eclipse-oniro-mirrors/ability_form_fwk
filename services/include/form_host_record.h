@@ -199,6 +199,13 @@ public:
      * @return the number of host form.
      */
     int32_t GetFormsCount() const;
+
+    /**
+     * @brief Send recycle form message to form host.
+     * @param formIds The Id list of forms.
+     * @param want The want of forms to be recycled.
+     */
+    void OnRecycleForms(const std::vector<int64_t> &formIds, const AAFwk::Want &want) const;
 private:
     int callerUid_ = 0;
     sptr<IRemoteObject> formHostClient_ = nullptr;

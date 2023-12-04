@@ -522,6 +522,38 @@ public:
      */
     virtual ErrCode UnregisterClickEventObserver(const sptr<IRemoteObject> &observer) = 0;
 
+    /**
+     * @brief Set forms recyclable
+     * @param formIds Indicates the id of the forms.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int32_t SetFormsRecyclable(const std::vector<int64_t> &formIds)
+    {
+        return 0;
+    }
+
+    /**
+     * @brief Recycle forms
+     * @param formIds Indicates the id of the forms.
+     * @param want The want of forms to be recycled.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int32_t RecycleForms(const std::vector<int64_t> &formIds, const Want &want)
+    {
+        return 0;
+    }
+
+    /**
+     * @brief Recover recycled forms
+     * @param formIds Indicates the id of the forms.
+     * @param want The want of forms to be recovered.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int32_t RecoverForms(const std::vector<int64_t> &formIds, const Want &want)
+    {
+        return 0;
+    }
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -590,6 +622,9 @@ public:
         FORM_MGR_UNREGISTER_CLICK_EVENT_OBSERVER,
         FORM_MGR_REGISTER_FORM_ROUTER_PROXY,
         FORM_MGR_UNREGISTER_FORM_ROUTER_PROXY,
+        FORM_MGR_SET_FORMS_RECYCLABLE,
+        FORM_MGR_RECYCLE_FORMS,
+        FORM_MGR_RECOVER_FORMS,
     };
 };
 }  // namespace AppExecFwk
