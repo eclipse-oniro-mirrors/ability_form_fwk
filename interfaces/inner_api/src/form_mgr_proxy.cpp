@@ -753,7 +753,7 @@ int FormMgrProxy::GetStringInfo(IFormMgr::Message code, MessageParcel &data, std
 }
 int FormMgrProxy::GetFormsInfo(IFormMgr::Message code, MessageParcel &data, std::vector<FormInfo> &formInfos)
 {
-    HILOG_DEBUG("GetFormsInfo start");
+    HILOG_INFO("GetFormsInfo start");
     int error;
     MessageParcel reply;
     error = SendTransactCmd(code, data, reply);
@@ -1090,6 +1090,7 @@ int FormMgrProxy::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
  */
 int FormMgrProxy::GetFormsInfoByApp(std::string &bundleName, std::vector<FormInfo> &formInfos)
 {
+    HILOG_INFO("bundleName:%{public}s", bundleName.c_str());
     MessageParcel data;
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("%{public}s, failed to write interface token", __func__);

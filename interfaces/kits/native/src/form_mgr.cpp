@@ -922,7 +922,7 @@ int FormMgr::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
  */
 int FormMgr::GetFormsInfoByApp(std::string &bundleName, std::vector<FormInfo> &formInfos)
 {
-    HILOG_INFO("%{public}s start.", __func__);
+    HILOG_INFO("%{public}s start and bundleName:%{public}s.", __func__, bundleName.c_str());
 
     if (bundleName.empty()) {
         HILOG_WARN("Failed to Get forms info, because empty bundle name");
