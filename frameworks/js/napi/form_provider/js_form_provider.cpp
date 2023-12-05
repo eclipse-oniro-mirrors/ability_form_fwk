@@ -409,6 +409,12 @@ napi_value JsFormProvider::OnRequestPublishForm(napi_env env, size_t argc, napi_
                 ConvertFromDataProxies(env, nativeProxies, asyncCallbackInfo->formDataProxies);
             }
             convertArgc++;
+        } else if (paramOneType == napi_function) {
+            asyncCallbackInfo->withFormBindingData = false;
+        } else {
+            HILOG_ERROR("formBindingData is not napi_object.");
+            NapiFormUtil::ThrowParamTypeError(env, "formBindingData", "formBindingData.FormBindingData");
+            return CreateJsUndefined(env);
         }
     }
 
