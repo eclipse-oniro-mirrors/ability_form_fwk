@@ -30,7 +30,6 @@
               "distributed_notification_service",
               "bundle_framework",
               "common_event_service",
-              "ecological_rule_manager",
               "ffrt",
               "hilog",
               "ipc",

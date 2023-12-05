@@ -78,10 +78,6 @@ ohos_unittest("FmsFormMgrUpdateFormTest") {
   } else if (cite_memmgr) {
     external_deps += [ "memmgr:memmgrclient" ]
   }
-
-  if (fms_ecologic_rule_mgr_enabled) {
-    external_deps += [ "ecological_rule_manager:erms_client" ]
-  }
 }
 
 group("unittest") {

@@ -20,9 +20,6 @@
 
 #include "bundle_info.h"
 #include "bundle_mgr_interface.h"
-#ifdef SUPPORT_ERMS
-#include "ecological_rule_mgr_service_client.h"
-#endif
 #include "form_constants.h"
 #include "form_info.h"
 #include "form_instance.h"
@@ -39,9 +36,6 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-#ifdef SUPPORT_ERMS
-using ErmsCallerInfo = OHOS::EcologicalRuleMgrService::CallerInfo;
-#endif
 using Want = OHOS::AAFwk::Want;
 using WantParams = OHOS::AAFwk::WantParams;
 /**
@@ -810,7 +804,7 @@ private:
      */
     bool CheckIsSystemAppByBundleName(const sptr<IBundleMgr> &iBundleMgr,
         const int32_t &userId, const std::string &bundleName);
-    
+
     /**
      * @brief if the ability have permission for keeping background running is true,
      * @param iBundleMgr BundleManagerProxy
