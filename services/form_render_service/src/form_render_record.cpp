@@ -85,7 +85,7 @@ std::string HandlerDumper::GetDumpInfo()
 std::shared_ptr<FormRenderRecord> FormRenderRecord::Create(
     const std::string &bundleName, const std::string &uid, bool needMonitored)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("bundleName is %{public}s, uid is %{public}s.", bundleName.c_str(), uid.c_str());
     std::shared_ptr<FormRenderRecord> renderRecord = std::make_shared<FormRenderRecord>(bundleName, uid);
     if (!renderRecord) {
         HILOG_ERROR("Create FormRenderRecord failed.");
@@ -102,11 +102,13 @@ std::shared_ptr<FormRenderRecord> FormRenderRecord::Create(
 FormRenderRecord::FormRenderRecord(
     const std::string &bundleName, const std::string &uid) : bundleName_(bundleName), uid_(uid)
 {
+    HILOG_INFO("bundleName is %{public}s, uid is %{public}s.", bundleName.c_str(), uid.c_str());
     threadState_ = std::make_shared<ThreadState>(CHECK_THREAD_TIME);
 }
 
 FormRenderRecord::~FormRenderRecord()
 {
+    FMS_CALL_INFO_ENTER;
     std::shared_ptr<EventHandler> eventHandler = nullptr;
     {
         std::lock_guard<std::mutex> lock(eventHandlerMutex_);
@@ -114,6 +116,7 @@ FormRenderRecord::~FormRenderRecord()
     }
 
     if (eventHandler == nullptr) {
+        HILOG_WARN("eventHandler is nullptr");
         return;
     }
 
@@ -300,7 +303,8 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
     return ERR_OK;
 }
 
-void FormRenderRecord::DeleteRenderRecord(int64_t formId, const std::string &compId, const sptr<IRemoteObject> hostRemoteObj, bool &isRenderGroupEmpty)
+void FormRenderRecord::DeleteRenderRecord(int64_t formId, const std::string &compId,
+    const sptr<IRemoteObject> hostRemoteObj, bool &isRenderGroupEmpty)
 {
     // Some resources need to be deleted in a JS thread
     HILOG_INFO("Delete some resources formId: %{public}" PRId64 ", %{public}s", formId, compId.c_str());
@@ -592,16 +596,16 @@ bool FormRenderRecord::HandleDeleteInJsThread(int64_t formId, const std::string 
         std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
         auto search = formRendererGroupMap_.find(formId);
         if (search == formRendererGroupMap_.end()) {
-            HILOG_INFO("HandleDeleteInJsThread failed. FormRendererGroup was not founded.");
+            HILOG_ERROR("HandleDeleteInJsThread failed. FormRendererGroup was not founded.");
             return false;
         }
         if (!search->second) {
-            HILOG_INFO("HandleDeleteInJsThread failed. FormRendererGroup was founded but is null.");
+            HILOG_ERROR("HandleDeleteInJsThread failed. FormRendererGroup was founded but is null.");
             return false;
         }
         if (!compId.empty()) {
             search->second->DeleteForm(compId);
-            HILOG_INFO("HandleDeleteInJsThread compid is %{public}s", compId.c_str());
+            HILOG_ERROR("HandleDeleteInJsThread compid is %{public}s", compId.c_str());
             return false;
         }
         search->second->DeleteForm();

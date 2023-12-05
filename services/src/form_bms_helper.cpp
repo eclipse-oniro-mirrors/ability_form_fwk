@@ -31,10 +31,14 @@
 namespace OHOS {
 namespace AppExecFwk {
 FormBmsHelper::FormBmsHelper()
-{}
+{
+    HILOG_INFO("called");
+}
 
 FormBmsHelper::~FormBmsHelper()
-{}
+{
+    HILOG_INFO("called");
+}
 
 sptr<IBundleMgr> FormBmsHelper::GetBundleMgr()
 {

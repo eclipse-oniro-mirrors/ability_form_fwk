@@ -28,9 +28,15 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-FormMgr::FormMgr() {}
+
+FormMgr::FormMgr()
+{
+    HILOG_INFO("called");
+}
+
 FormMgr::~FormMgr()
 {
+    FMS_CALL_INFO_ENTER;
     if (remoteProxy_ != nullptr) {
         auto remoteObject = remoteProxy_->AsObject();
         if (remoteObject != nullptr) {
@@ -63,10 +69,9 @@ int FormMgr::AddForm(
     const sptr<IRemoteObject> &callerToken,
     FormJsInfo &formInfo)
 {
-    HILOG_INFO("AddForm.");
+    HILOG_INFO("formId is %{public}" PRId64, formId);
     int errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("AddForm failed errCode:%{public}d.", errCode);
         return errCode;
     }
     return remoteProxy_->AddForm(formId, want, callerToken, formInfo);
@@ -80,7 +85,7 @@ int FormMgr::AddForm(
  */
 int FormMgr::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("delete form");
+    HILOG_INFO("formId is %{public}" PRId64, formId);
     // check fms recover status
     if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
         HILOG_ERROR("delete form failed, form is in recover status, can't do action on form.");
@@ -94,7 +99,6 @@ int FormMgr::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &callerT
 
     int errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("delete form failed, errCode:%{public}d.", errCode);
         return errCode;
     }
     FormCallerMgr::GetInstance().RemoveFormHostCaller(formId);
@@ -109,21 +113,20 @@ int FormMgr::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &callerT
 */
 int FormMgr::StopRenderingForm(const int64_t formId, const std::string &compId)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("formId is %{public}" PRId64, formId);
     // check fms recover status
     if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
-        HILOG_ERROR("%{public}s error, form is in recover status, can't do action on form.", __func__);
+        HILOG_ERROR("form is in recover status, can't do action on form.");
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
     }
     // check formId
     if (formId <= 0 || compId.empty()) {
-        HILOG_ERROR("%{public}s error, the formId is invalid or compId is empty.", __func__);
+        HILOG_ERROR("the formId is invalid or compId is empty.");
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
 
     int errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
         return errCode;
     }
 
@@ -139,21 +142,20 @@ int FormMgr::StopRenderingForm(const int64_t formId, const std::string &compId)
  */
 int FormMgr::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> &callerToken, const bool delCache)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("formId is %{public}" PRId64 ", delCache is %{public}d", formId, delCache);
     // check fms recover status
     if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
-        HILOG_ERROR("%{public}s error, form is in recover status, can't do action on form.", __func__);
+        HILOG_ERROR("form is in recover status, can't do action on form.");
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
     }
     // check formId
     if (formId <= 0) {
-        HILOG_ERROR("%{public}s error, the passed in formId can't be negative or zero.", __func__);
+        HILOG_ERROR("the passed in formId can't be negative or zero.");
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
 
     int errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
         return errCode;
     }
     FormCallerMgr::GetInstance().RemoveFormHostCaller(formId);
@@ -169,8 +171,7 @@ int FormMgr::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> &caller
 int FormMgr::UpdateForm(const int64_t formId, const FormProviderData &formBindingData,
     const std::vector<FormDataProxy> &formDataProxies)
 {
-    HILOG_INFO("UpdateForm called.");
-
+    HILOG_INFO("called");
     if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
         HILOG_ERROR("UpdateForm failed, form is in recover status, can't do action on form.");
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
@@ -189,7 +190,6 @@ int FormMgr::UpdateForm(const int64_t formId, const FormProviderData &formBindin
 
     int errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("UpdateForm failed errCode:%{public}d.", errCode);
         return errCode;
     }
 
@@ -220,18 +220,17 @@ int FormMgr::ReleaseRenderer(const int64_t formId, const std::string &compId)
     HILOG_INFO("%{public}s called.", __func__);
     // check fms recover status
     if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
-        HILOG_ERROR("%{public}s error, form is in recover status, can't do action on form.", __func__);
+        HILOG_ERROR("form is in recover status, can't do action on form.");
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
     }
     // check formId and compId
     if (formId <= 0 || compId.empty()) {
-        HILOG_ERROR("%{public}s error, the formId is invalid or compId is empty.", __func__);
+        HILOG_ERROR("the formId is invalid or compId is empty.");
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
 
     int errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
         return errCode;
     }
 
@@ -250,18 +249,17 @@ int FormMgr::ReleaseRenderer(const int64_t formId, const std::string &compId)
  */
 int FormMgr::RequestForm(const int64_t formId, const sptr<IRemoteObject> &callerToken, const Want &want)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("formId is %{public}" PRId64, formId);
     if (formId <= 0) {
-        HILOG_ERROR("%{public}s error, The passed formid is invalid. Its value must be larger than 0.", __func__);
+        HILOG_ERROR("The passed formid is invalid. Its value must be larger than 0.");
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
     if (GetRecoverStatus() == Constants::IN_RECOVERING) {
-        HILOG_ERROR("%{public}s error, form is in recover status, can't do action on form.", __func__);
+        HILOG_ERROR("form is in recover status, can't do action on form.");
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
     }
     int errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
         return errCode;
     }
     auto hostCaller = FormCallerMgr::GetInstance().GetFormHostCaller(formId);
@@ -271,11 +269,8 @@ int FormMgr::RequestForm(const int64_t formId, const sptr<IRemoteObject> &caller
     }
     ErrCode resultCode = remoteProxy_->RequestForm(formId, callerToken, want);
     if (resultCode != ERR_OK) {
-        HILOG_ERROR(
-            "%{public}s error, failed to notify the form service that the form user's lifecycle is updated, error "
-            "code is %{public}d.",
-            __func__,
-            resultCode);
+        HILOG_ERROR("failed to notify the form service that the form user's lifecycle is updated, error "
+            "code is %{public}d.", resultCode);
     }
     return resultCode;
 }
@@ -292,27 +287,26 @@ int FormMgr::NotifyWhetherVisibleForms(
     const sptr<IRemoteObject> &callerToken,
     const int32_t formVisibleType)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("formVisibleType is %{public}d", formVisibleType);
 
     if (formIds.empty() || formIds.size() > Constants::MAX_VISIBLE_NOTIFY_LIST) {
-        HILOG_ERROR("%{public}s, formIds is empty or exceed 32.", __func__);
+        HILOG_ERROR("formIds is empty or exceed 32.");
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
 
     if (GetRecoverStatus() == Constants::IN_RECOVERING) {
-        HILOG_ERROR("%{public}s error, form is in recover status, can't do action on form.", __func__);
+        HILOG_ERROR("form is in recover status, can't do action on form.");
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
     }
 
     int errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
         return errCode;
     }
     // IPC entry
     ErrCode resultCode = remoteProxy_->NotifyWhetherVisibleForms(formIds, callerToken, formVisibleType);
     if (resultCode != ERR_OK) {
-        HILOG_ERROR("%{public}s error, internal error occurs, error code:%{public}d.", __func__, resultCode);
+        HILOG_ERROR("internal error occurs, error code:%{public}d.", resultCode);
     }
     return resultCode;
 }
@@ -325,15 +319,14 @@ int FormMgr::NotifyWhetherVisibleForms(
  */
 int FormMgr::CastTempForm(const int64_t formId, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("formId is %{public}" PRId64, formId);
     if (formId <= 0) {
-        HILOG_ERROR("%{public}s error, passing in form id can't be negative.", __func__);
+        HILOG_ERROR("passing in form id can't be negative.");
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
 
     int errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
         return errCode;
     }
     return remoteProxy_->CastTempForm(formId, callerToken);
@@ -346,10 +339,9 @@ int FormMgr::CastTempForm(const int64_t formId, const sptr<IRemoteObject> &calle
  */
 int FormMgr::DumpStorageFormInfos(std::string &formInfos)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("called.");
     int errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
         return errCode;
     }
     return remoteProxy_->DumpStorageFormInfos(formInfos);
@@ -362,10 +354,9 @@ int FormMgr::DumpStorageFormInfos(std::string &formInfos)
  */
 int FormMgr::DumpFormInfoByBundleName(const std::string bundleName, std::string &formInfos)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("bundleName is %{public}s", bundleName.c_str());
     int errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
         return errCode;
     }
     return remoteProxy_->DumpFormInfoByBundleName(bundleName, formInfos);
@@ -378,10 +369,9 @@ int FormMgr::DumpFormInfoByBundleName(const std::string bundleName, std::string 
  */
 int FormMgr::DumpFormInfoByFormId(const std::int64_t formId, std::string &formInfo)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("formId is %{public}" PRId64, formId);
     int errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
         return errCode;
     }
     return remoteProxy_->DumpFormInfoByFormId(formId, formInfo);
@@ -657,7 +647,7 @@ void FormMgr::FormMgrDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &rem
  */
 bool FormMgr::Reconnect()
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("called.");
     for (int i = 0; i < Constants::MAX_RETRY_TIME; i++) {
         // Sleep 1000 milliseconds before reconnect.
         std::this_thread::sleep_for(std::chrono::milliseconds(Constants::SLEEP_TIME));
@@ -688,26 +678,30 @@ ErrCode FormMgr::Connect()
 
     sptr<ISystemAbilityManager> systemManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (systemManager == nullptr) {
-        HILOG_ERROR("%{private}s fail to get registry", __func__);
+        HILOG_ERROR("fail to get registry");
         return ERR_APPEXECFWK_FORM_GET_SYSMGR_FAILED;
     }
     sptr<IRemoteObject> remoteObject = systemManager->GetSystemAbility(FORM_MGR_SERVICE_ID);
     if (remoteObject == nullptr) {
-        HILOG_ERROR("%{private}s fail to connect FormMgrService", __func__);
+        HILOG_ERROR("fail to connect FormMgrService");
         return ERR_APPEXECFWK_FORM_GET_FMS_FAILED;
     }
     deathRecipient_ = sptr<IRemoteObject::DeathRecipient>(new (std::nothrow) FormMgrDeathRecipient());
     if (deathRecipient_ == nullptr) {
-        HILOG_ERROR("%{public}s Failed to create FormMgrDeathRecipient!", __func__);
+        HILOG_ERROR("Failed to create FormMgrDeathRecipient!");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     if ((remoteObject->IsProxyObject()) && (!remoteObject->AddDeathRecipient(deathRecipient_))) {
-        HILOG_ERROR("%{public}s Add death recipient to FormMgrService failed.", __func__);
+        HILOG_ERROR("failed to add death recipient to FormMgrService.");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
     remoteProxy_ = iface_cast<IFormMgr>(remoteObject);
-    HILOG_DEBUG("%{public}s Connecting FormMgrService success.", __func__);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("remoteProxy_ is nullptr");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    HILOG_DEBUG("Connecting FormMgrService success.");
     return ERR_OK;
 }
 
@@ -717,10 +711,10 @@ ErrCode FormMgr::Connect()
  */
 void FormMgr::ResetProxy(const wptr<IRemoteObject> &remote)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("called.");
     std::lock_guard<std::mutex> lock(connectMutex_);
     if (remoteProxy_ == nullptr) {
-        HILOG_ERROR("%{public}s failed, remote proxy is nullptr.", __func__);
+        HILOG_ERROR("failed, remote proxy is nullptr.");
         return;
     }
 
@@ -741,7 +735,8 @@ void FormMgr::ResetProxy(const wptr<IRemoteObject> &remote)
  */
 void FormMgr::SetFormMgrService(sptr<IFormMgr> formMgrService)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("called");
+    std::lock_guard<std::mutex> lock(connectMutex_);
     remoteProxy_ = formMgrService;
 }
 
@@ -755,21 +750,19 @@ void FormMgr::SetFormMgrService(sptr<IFormMgr> formMgrService)
 int FormMgr::DeleteInvalidForms(const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &callerToken,
                                 int32_t &numFormsDeleted)
 {
-    HILOG_INFO("%{public}s start.", __func__);
-
+    HILOG_INFO("called");
     if (GetRecoverStatus() == Constants::IN_RECOVERING) {
-        HILOG_ERROR("%{public}s error, form is in recover status, can't do action on form.", __func__);
+        HILOG_ERROR("form is in recover status, can't do action on form.");
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
     }
 
     int errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("%{public}s failed, errCode: %{public}d.", __func__, errCode);
         return errCode;
     }
     int resultCode = remoteProxy_->DeleteInvalidForms(formIds, callerToken, numFormsDeleted);
     if (resultCode != ERR_OK) {
-        HILOG_ERROR("%{public}s error, failed to DeleteInvalidForms, error code is %{public}d.", __func__, resultCode);
+        HILOG_ERROR("failed to DeleteInvalidForms, error code is %{public}d.", resultCode);
     }
     return resultCode;
 }
@@ -783,21 +776,19 @@ int FormMgr::DeleteInvalidForms(const std::vector<int64_t> &formIds, const sptr<
  */
 int FormMgr::AcquireFormState(const Want &want, const sptr<IRemoteObject> &callerToken, FormStateInfo &stateInfo)
 {
-    HILOG_INFO("%{public}s start.", __func__);
-
+    HILOG_INFO("called");
     if (GetRecoverStatus() == Constants::IN_RECOVERING) {
-        HILOG_ERROR("%{public}s error, form is in recover status, can't do action on form.", __func__);
+        HILOG_ERROR("form is in recover status, can't do action on form.");
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
     }
 
     int errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("%{public}s failed, errCode: %{public}d.", __func__, errCode);
         return errCode;
     }
     int resultCode = remoteProxy_->AcquireFormState(want, callerToken, stateInfo);
     if (resultCode != ERR_OK) {
-        HILOG_ERROR("%{public}s error, failed to AcquireFormState, error code is %{public}d.", __func__, resultCode);
+        HILOG_ERROR("failed to AcquireFormState, error code is %{public}d.", resultCode);
     }
     return resultCode;
 }
@@ -812,22 +803,20 @@ int FormMgr::AcquireFormState(const Want &want, const sptr<IRemoteObject> &calle
 int FormMgr::NotifyFormsVisible(const std::vector<int64_t> &formIds, bool isVisible,
                                 const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("%{public}s NotifyFormsVisible start.", __func__);
-
+    HILOG_INFO("called");
     if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
-        HILOG_ERROR("%{public}s faild, form is in recover status, can't do action on form.", __func__);
+        HILOG_ERROR("form is in recover status, can't do action on form.");
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
     }
 
     int errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("%{public}s error, errCode: %{public}d.", __func__, errCode);
         return errCode;
     }
 
     int resultCode = remoteProxy_->NotifyFormsVisible(formIds, isVisible, callerToken);
     if (resultCode != ERR_OK) {
-        HILOG_ERROR("%{public}s error, failed to NotifyFormsVisible, error code is %{public}d.", __func__, resultCode);
+        HILOG_ERROR("failed to NotifyFormsVisible, error code is %{public}d.", resultCode);
     }
     return resultCode;
 }
@@ -835,23 +824,20 @@ int FormMgr::NotifyFormsVisible(const std::vector<int64_t> &formIds, bool isVisi
 int FormMgr::NotifyFormsPrivacyProtected(const std::vector<int64_t> &formIds, bool isProtected,
                                          const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("%{public}s NotifyFormsPrivacyProtected start.", __func__);
-
+    HILOG_INFO("called");
     if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
-        HILOG_ERROR("%{public}s error, form is in recover status, can't do action on form.", __func__);
+        HILOG_ERROR("form is in recover status, can't do action on form.");
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
     }
 
     int errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("%{public}s failed, errCode: %{public}d.", __func__, errCode);
         return errCode;
     }
 
     int resultCode = remoteProxy_->NotifyFormsPrivacyProtected(formIds, isProtected, callerToken);
     if (resultCode != ERR_OK) {
-        HILOG_ERROR("%{public}s error, failed to NotifyFormsPrivacyProtected, error code is %{public}d.", __func__,
-            resultCode);
+        HILOG_ERROR("failed to NotifyFormsPrivacyProtected, error code is %{public}d.", resultCode);
     }
     return resultCode;
 }
@@ -866,23 +852,20 @@ int FormMgr::NotifyFormsPrivacyProtected(const std::vector<int64_t> &formIds, bo
 int FormMgr::NotifyFormsEnableUpdate(const std::vector<int64_t> &formIds, bool isEnableUpdate,
                                      const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("%{public}s NotifyFormsEnableUpdate start.", __func__);
-
+    HILOG_INFO("called");
     if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
-        HILOG_ERROR("%{public}s error, form is in recover status, can't do action on form.", __func__);
+        HILOG_ERROR("form is in recover status, can't do action on form.");
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
     }
 
     int errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("%{public}s error, errCode: %{public}d.", __func__, errCode);
         return errCode;
     }
 
     int resultCode = remoteProxy_->NotifyFormsEnableUpdate(formIds, isEnableUpdate, callerToken);
     if (resultCode != ERR_OK) {
-        HILOG_ERROR("%{public}s error, failed to NotifyFormsEnableUpdate, error code is %{public}d.", __func__,
-            resultCode);
+        HILOG_ERROR("failed to NotifyFormsEnableUpdate, error code is %{public}d.", resultCode);
     }
     return resultCode;
 }
@@ -894,22 +877,19 @@ int FormMgr::NotifyFormsEnableUpdate(const std::vector<int64_t> &formIds, bool i
  */
 int FormMgr::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
 {
-    HILOG_INFO("%{public}s start.", __func__);
-
+    HILOG_INFO("called");
     if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
-        HILOG_ERROR("%{public}s error, form is in recover status, can't do action on form.", __func__);
+        HILOG_ERROR("form is in recover status, can't do action on form.");
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
     }
 
     int errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_INFO("%{public}s failed, errCode: %{public}d.", __func__, errCode);
         return errCode;
     }
     int resultCode = remoteProxy_->GetAllFormsInfo(formInfos);
     if (resultCode != ERR_OK) {
-        HILOG_ERROR("%{public}s error, failed to GetAllFormsInfo, error code is %{public}d.", __func__,
-            resultCode);
+        HILOG_ERROR("failed to GetAllFormsInfo, error code is %{public}d.", resultCode);
     }
     return resultCode;
 }
@@ -922,28 +902,25 @@ int FormMgr::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
  */
 int FormMgr::GetFormsInfoByApp(std::string &bundleName, std::vector<FormInfo> &formInfos)
 {
-    HILOG_INFO("%{public}s start and bundleName:%{public}s.", __func__, bundleName.c_str());
-
+    HILOG_INFO("bundleName is %{public}s", bundleName.c_str());
     if (bundleName.empty()) {
         HILOG_WARN("Failed to Get forms info, because empty bundle name");
         return ERR_APPEXECFWK_FORM_INVALID_BUNDLENAME;
     }
 
     if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
-        HILOG_ERROR("%{public}s error, form is in recover status, can't do action on form.", __func__);
+        HILOG_ERROR("form is in recover status, can't do action on form.");
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
     }
 
     int errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
         return errCode;
     }
 
     int resultCode = remoteProxy_->GetFormsInfoByApp(bundleName, formInfos);
     if (resultCode != ERR_OK) {
-        HILOG_ERROR("%{public}s error, failed to GetFormsInfoByApp, error code is %{public}d.", __func__,
-            resultCode);
+        HILOG_ERROR("failed to GetFormsInfoByApp, error code is %{public}d.", resultCode);
     }
     return resultCode;
 }
@@ -954,9 +931,10 @@ int FormMgr::GetFormsInfoByApp(std::string &bundleName, std::vector<FormInfo> &f
  * @param formInfos Return the forms' information of the specify bundle name and module name.
  * @return Returns ERR_OK on success, others on failure.
  */
-int FormMgr::GetFormsInfoByModule(std::string &bundleName, std::string &moduleName, std::vector<FormInfo> &formInfos)
+int FormMgr::GetFormsInfoByModule(std::string &bundleName, std::string &moduleName,
+    std::vector<FormInfo> &formInfos)
 {
-    HILOG_INFO("%{public}s start.", __func__);
+    HILOG_INFO("bundleName is %{public}s, moduleName is %{public}s", bundleName.c_str(), moduleName.c_str());
     if (bundleName.empty()) {
         HILOG_WARN("Failed to Get forms info, because empty bundleName");
         return ERR_APPEXECFWK_FORM_INVALID_BUNDLENAME;
@@ -968,28 +946,26 @@ int FormMgr::GetFormsInfoByModule(std::string &bundleName, std::string &moduleNa
     }
 
     if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
-        HILOG_ERROR("%{public}s error, form is in recover status, can't do action on form.", __func__);
+        HILOG_ERROR("form is in recover status, can't do action on form.");
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
     }
 
     int errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
         return errCode;
     }
 
     int resultCode = remoteProxy_->GetFormsInfoByModule(bundleName, moduleName, formInfos);
     if (resultCode != ERR_OK) {
-        HILOG_ERROR("%{public}s error, failed to GetFormsInfoByApp, error code is %{public}d.", __func__, resultCode);
+        HILOG_ERROR("failed to GetFormsInfoByApp, error code is %{public}d.", resultCode);
     }
     return resultCode;
 }
 int32_t FormMgr::GetFormsInfo(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos)
 {
-    HILOG_INFO("%{public}s starts.", __func__);
+    HILOG_INFO("called");
     int errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
         return errCode;
     }
     return remoteProxy_->GetFormsInfo(filter, formInfos);
@@ -997,10 +973,9 @@ int32_t FormMgr::GetFormsInfo(const FormInfoFilter &filter, std::vector<FormInfo
 
 bool FormMgr::IsRequestPublishFormSupported()
 {
-    HILOG_INFO("%{public}s starts.", __func__);
+    HILOG_INFO("called");
     int errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
         return false;
     }
     return remoteProxy_->IsRequestPublishFormSupported();
@@ -1008,22 +983,20 @@ bool FormMgr::IsRequestPublishFormSupported()
 
 int32_t FormMgr::StartAbility(const Want &want, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("%{public}s starts.", __func__);
+    HILOG_INFO("called");
     int32_t errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
         return errCode;
     }
     return remoteProxy_->StartAbility(want, callerToken);
 }
 
-int32_t FormMgr::ShareForm(int64_t formId, const std::string &remoteDeviceId, const sptr<IRemoteObject> &callerToken,
-    int64_t requestCode)
+int32_t FormMgr::ShareForm(int64_t formId, const std::string &remoteDeviceId,
+    const sptr<IRemoteObject> &callerToken, int64_t requestCode)
 {
-    HILOG_DEBUG("%{public}s called.", __func__);
+    HILOG_INFO("formId is %{public}" PRId64, formId);
     int32_t errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("share form failed, errCode:%{public}d.", errCode);
         return errCode;
     }
     return remoteProxy_->ShareForm(formId, remoteDeviceId, callerToken, requestCode);
@@ -1032,10 +1005,9 @@ int32_t FormMgr::ShareForm(int64_t formId, const std::string &remoteDeviceId, co
 int32_t FormMgr::AcquireFormData(int64_t formId, int64_t requestCode, const sptr<IRemoteObject> &callerToken,
     AAFwk::WantParams &formData)
 {
-    HILOG_DEBUG("called.");
+    HILOG_INFO("formId is %{public}" PRId64, formId);
     int32_t errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("acquire form data failed, errCode:%{public}d.", errCode);
         return errCode;
     }
     return remoteProxy_->AcquireFormData(formId, requestCode, callerToken, formData);
@@ -1043,10 +1015,9 @@ int32_t FormMgr::AcquireFormData(int64_t formId, int64_t requestCode, const sptr
 
 bool FormMgr::CheckFMSReady()
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("called");
     int32_t errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("Connect failed. errCode:%{public}d.", errCode);
         return false;
     }
     bool resultCode = remoteProxy_->CheckFMSReady();
@@ -1058,7 +1029,7 @@ bool FormMgr::CheckFMSReady()
 
 int32_t FormMgr::RegisterPublishFormInterceptor(const sptr<IRemoteObject> &interceptorCallback)
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("called");
     int32_t errCode = Connect();
     if (errCode != ERR_OK) {
         HILOG_ERROR("register publish form failed, errCode:%{public}d.", errCode);
@@ -1069,10 +1040,9 @@ int32_t FormMgr::RegisterPublishFormInterceptor(const sptr<IRemoteObject> &inter
 
 int32_t FormMgr::UnregisterPublishFormInterceptor(const sptr<IRemoteObject> &interceptorCallback)
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("called");
     int32_t errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("unregister publish form failed, errCode:%{public}d.", errCode);
         return errCode;
     }
     return remoteProxy_->UnregisterPublishFormInterceptor(interceptorCallback);
@@ -1093,7 +1063,7 @@ std::string FormMgr::GetErrorMsgByExternalErrorCode(int32_t externalErrorCode)
 
 ErrCode FormMgr::GetRunningFormInfos(bool isUnusedIncluded, std::vector<RunningFormInfo> &runningFormInfos)
 {
-    HILOG_DEBUG("start.");
+    HILOG_INFO("isUnusedIncluded is %{public}d", isUnusedIncluded);
     if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
         HILOG_ERROR("error, form is in recover status, can't do action on form.");
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
@@ -1101,7 +1071,6 @@ ErrCode FormMgr::GetRunningFormInfos(bool isUnusedIncluded, std::vector<RunningF
 
     ErrCode errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("failed errCode:%{public}d.", errCode);
         return errCode;
     }
 
@@ -1115,39 +1084,39 @@ ErrCode FormMgr::GetRunningFormInfos(bool isUnusedIncluded, std::vector<RunningF
 ErrCode FormMgr::GetRunningFormInfosByBundleName(
     const std::string &bundleName, bool isUnusedIncluded, std::vector<RunningFormInfo> &runningFormInfos)
 {
-    HILOG_DEBUG("start.");
+    HILOG_DEBUG("bundleName is %{public}s", bundleName.c_str());
     if (bundleName.empty()) {
         HILOG_WARN("Failed to Get running form infos, because empty bundleName");
         return ERR_APPEXECFWK_FORM_INVALID_BUNDLENAME;
     }
     if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
-        HILOG_ERROR("error, form is in recover status, can't do action on form.");
+        HILOG_ERROR("form is in recover status, can't do action on form.");
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
     }
 
     ErrCode errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("failed errCode:%{public}d.", errCode);
         return errCode;
     }
 
-    ErrCode resultCode = remoteProxy_->GetRunningFormInfosByBundleName(bundleName, isUnusedIncluded, runningFormInfos);
+    ErrCode resultCode = remoteProxy_->GetRunningFormInfosByBundleName(
+        bundleName, isUnusedIncluded, runningFormInfos);
     if (resultCode != ERR_OK) {
-        HILOG_ERROR("error, failed to GetRunningFormInfosByBundleName, error code is %{public}d.", resultCode);
+        HILOG_ERROR("failed to GetRunningFormInfosByBundleName, error code is %{public}d.", resultCode);
     }
     return resultCode;
 }
 
-ErrCode FormMgr::RegisterFormAddObserverByBundle(const std::string bundleName, const sptr<IRemoteObject> &callerToken)
+ErrCode FormMgr::RegisterFormAddObserverByBundle(const std::string bundleName,
+    const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("starts.");
+    HILOG_DEBUG("bundleName is %{public}s", bundleName.c_str());
     if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
         HILOG_ERROR("error, form is in recover status, can't do action on form.");
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
     }
     int errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("failed, errCode:%{public}d.", errCode);
         return errCode;
     }
     return remoteProxy_->RegisterFormAddObserverByBundle(bundleName, callerToken);
@@ -1156,14 +1125,13 @@ ErrCode FormMgr::RegisterFormAddObserverByBundle(const std::string bundleName, c
 ErrCode FormMgr::RegisterFormRemoveObserverByBundle(const std::string bundleName,
     const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("starts.");
+    HILOG_INFO("bundleName is %{public}s", bundleName.c_str());
     if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
         HILOG_ERROR("error, form is in recover status, can't do action on form.");
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
     }
     int errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("failed, errCode:%{public}d.", errCode);
         return errCode;
     }
     return remoteProxy_->RegisterFormRemoveObserverByBundle(bundleName, callerToken);
@@ -1171,31 +1139,30 @@ ErrCode FormMgr::RegisterFormRemoveObserverByBundle(const std::string bundleName
 
 int32_t FormMgr::GetFormsCount(bool isTempFormFlag, int32_t &formCount)
 {
-    HILOG_INFO("%{public}s start.", __func__);
+    HILOG_INFO("isTempFormFlag is %{public}d", isTempFormFlag);
 
     if (GetRecoverStatus() == Constants::IN_RECOVERING) {
-        HILOG_ERROR("%{public}s error, form is in recover status, can't do action on form.", __func__);
+        HILOG_ERROR("form is in recover status, can't do action on form.");
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
     }
 
     int32_t errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("%{public}s failed, errCode: %{public}d.", __func__, errCode);
         return errCode;
     }
     int32_t resultCode = remoteProxy_->GetFormsCount(isTempFormFlag, formCount);
     if (resultCode != ERR_OK) {
-        HILOG_ERROR("%{public}s error, failed to GetFormsCount, error code is %{public}d.", __func__, resultCode);
+        HILOG_ERROR("failed to GetFormsCount, error code is %{public}d.", resultCode);
     }
     return resultCode;
 }
 
 int32_t FormMgr::GetHostFormsCount(std::string &bundleName, int32_t &formCount)
 {
-    HILOG_INFO("%{public}s start.", __func__);
+    HILOG_DEBUG("bundleName is %{public}s.", bundleName.c_str());
 
     if (GetRecoverStatus() == Constants::IN_RECOVERING) {
-        HILOG_ERROR("%{public}s error, form is in recover status, can't do action on form.", __func__);
+        HILOG_ERROR("form is in recover status, can't do action on form.");
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
     }
 
@@ -1206,12 +1173,11 @@ int32_t FormMgr::GetHostFormsCount(std::string &bundleName, int32_t &formCount)
 
     int32_t errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("%{public}s failed, errCode: %{public}d.", __func__, errCode);
         return errCode;
     }
     int32_t resultCode = remoteProxy_->GetHostFormsCount(bundleName, formCount);
     if (resultCode != ERR_OK) {
-        HILOG_ERROR("%{public}s error, failed to GetFormsCount, error code is %{public}d.", __func__, resultCode);
+        HILOG_ERROR("failed to GetFormsCount, error code is %{public}d.", resultCode);
     }
     return resultCode;
 }
@@ -1219,10 +1185,9 @@ int32_t FormMgr::GetHostFormsCount(std::string &bundleName, int32_t &formCount)
 ErrCode FormMgr::GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
     std::vector<FormInstance> &formInstances)
 {
-    HILOG_DEBUG("called.");
+    HILOG_INFO("called");
     auto errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("get form instances by filter failed, errCode:%{public}d.", errCode);
         return errCode;
     }
     return remoteProxy_->GetFormInstancesByFilter(formInstancesFilter, formInstances);
@@ -1230,10 +1195,9 @@ ErrCode FormMgr::GetFormInstancesByFilter(const FormInstancesFilter &formInstanc
 
 ErrCode FormMgr::GetFormInstanceById(const int64_t formId, FormInstance &formInstance)
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("formId is %{public}" PRId64, formId);
     auto errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("get form instance by formId failed, errCode:%{public}d.", errCode);
         return errCode;
     }
     return remoteProxy_->GetFormInstanceById(formId, formInstance);
@@ -1241,10 +1205,9 @@ ErrCode FormMgr::GetFormInstanceById(const int64_t formId, FormInstance &formIns
 
 ErrCode FormMgr::GetFormInstanceById(const int64_t formId, bool isUnusedIncluded, FormInstance &formInstance)
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("formId is %{public}" PRId64, formId);
     auto errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("get form instance by formId failed, errCode:%{public}d.", errCode);
         return errCode;
     }
     if (remoteProxy_ == nullptr) {
@@ -1256,14 +1219,13 @@ ErrCode FormMgr::GetFormInstanceById(const int64_t formId, bool isUnusedIncluded
 
 ErrCode FormMgr::RegisterAddObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("bundleName is %{public}s", bundleName.c_str());
     if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
         HILOG_ERROR("error, form is in recover status, can't do action on form.");
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
     }
     auto errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("failed, errCode:%{public}d.", errCode);
         return errCode;
     }
     return remoteProxy_->RegisterAddObserver(bundleName, callerToken);
@@ -1271,14 +1233,13 @@ ErrCode FormMgr::RegisterAddObserver(const std::string &bundleName, const sptr<I
 
 ErrCode FormMgr::RegisterRemoveObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("bundleName is %{public}s", bundleName.c_str());
     if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
         HILOG_ERROR("error, form is in recover status, can't do action on form.");
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
     }
     auto errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("failed, errCode:%{public}d.", errCode);
         return errCode;
     }
     return remoteProxy_->RegisterRemoveObserver(bundleName, callerToken);
@@ -1286,7 +1247,7 @@ ErrCode FormMgr::RegisterRemoveObserver(const std::string &bundleName, const spt
 
 ErrCode FormMgr::RegisterClickEventObserver(const sptr<IRemoteObject> &observer)
 {
-    HILOG_DEBUG("Called.");
+    HILOG_DEBUG("called.");
     if (observer == nullptr) {
         HILOG_ERROR("Caller token parameteris empty.");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -1297,7 +1258,6 @@ ErrCode FormMgr::RegisterClickEventObserver(const sptr<IRemoteObject> &observer)
     }
     int errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("Failed, errCode:%{public}d.", errCode);
         return errCode;
     }
     return remoteProxy_->RegisterClickEventObserver(observer);
@@ -1305,6 +1265,7 @@ ErrCode FormMgr::RegisterClickEventObserver(const sptr<IRemoteObject> &observer)
 
 ErrCode FormMgr::UnregisterClickEventObserver(const sptr<IRemoteObject> &observer)
 {
+    HILOG_DEBUG("called.");
     if (observer == nullptr) {
         HILOG_ERROR("Caller token parameteris empty.");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -1315,7 +1276,6 @@ ErrCode FormMgr::UnregisterClickEventObserver(const sptr<IRemoteObject> &observe
     }
     int errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("Failed, errCode:%{public}d.", errCode);
         return errCode;
     }
     return remoteProxy_->UnregisterClickEventObserver(observer);
@@ -1330,7 +1290,6 @@ int FormMgr::RegisterFormRouterProxy(const std::vector<int64_t> &formIds, const 
     }
     auto errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("Failed, errCode:%{public}d.", errCode);
         return errCode;
     }
     return remoteProxy_->RegisterFormRouterProxy(formIds, callerToken);
@@ -1345,7 +1304,6 @@ int FormMgr::UnregisterFormRouterProxy(const std::vector<int64_t> &formIds)
     }
     auto errCode = Connect();
     if (errCode != ERR_OK) {
-        HILOG_ERROR("Failed, errCode:%{public}d.", errCode);
         return errCode;
     }
     return remoteProxy_->UnregisterFormRouterProxy(formIds);

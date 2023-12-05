@@ -466,7 +466,7 @@ bool FormDataMgr::AddFormUserUid(const int64_t formId, const int formUserUid)
  */
 bool FormDataMgr::DeleteFormUserUid(const int64_t formId, const int uid)
 {
-    HILOG_INFO("%{public}s, delete form user uid from form record", __func__);
+    HILOG_INFO("formId is %{public}" PRId64 ", uid is %{public}d", formId, uid);
     std::lock_guard<std::mutex> lock(formRecordMutex_);
     if (formRecords_.count(formId) > 0) {
         auto iter = std::find(formRecords_.at(formId).formUserUids.begin(),
