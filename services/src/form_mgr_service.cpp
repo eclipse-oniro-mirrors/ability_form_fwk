@@ -102,11 +102,13 @@ FormMgrService::FormMgrService()
       state_(ServiceRunningState::STATE_NOT_START),
       serialQueue_(nullptr)
 {
+    HILOG_INFO("called");
     DumpInit();
 }
 
 FormMgrService::~FormMgrService()
 {
+    FMS_CALL_INFO_ENTER;
     if (formSysEventReceiver_ != nullptr) {
         EventFwk::CommonEventManager::UnSubscribeCommonEvent(formSysEventReceiver_);
         formSysEventReceiver_ = nullptr;

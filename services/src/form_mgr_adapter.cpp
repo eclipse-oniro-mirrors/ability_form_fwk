@@ -91,9 +91,11 @@ const std::string FORM_CLICK_CALL = "call";
 
 FormMgrAdapter::FormMgrAdapter()
 {
+    HILOG_INFO("called");
 }
 FormMgrAdapter::~FormMgrAdapter()
 {
+    HILOG_INFO("called");
 }
 
 /**
@@ -117,7 +119,7 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
     const sptr<IRemoteObject> &callerToken, FormJsInfo &formInfo)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_DEBUG("called.");
+    HILOG_INFO("called.");
     if (formId < 0 || callerToken == nullptr) {
         HILOG_ERROR("fail, callerToken can not be NULL");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -271,8 +273,9 @@ ErrCode FormMgrAdapter::HandleFormRemoveObserver(const RunningFormInfo runningFo
 int FormMgrAdapter::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &callerToken)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    HILOG_INFO("formId is %{public}" PRId64, formId);
     if (formId <= 0 || callerToken == nullptr) {
-        HILOG_ERROR("%{public}s, deleteForm invalid param", __func__);
+        HILOG_ERROR("deleteForm invalid param");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
@@ -326,7 +329,7 @@ int FormMgrAdapter::StopRenderingForm(const int64_t formId, const std::string &c
 int FormMgrAdapter::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> &callerToken, const bool delCache)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("formId is %{public}" PRId64, formId);
     if (formId <= 0 || callerToken == nullptr) {
         HILOG_ERROR("%{public}s, releaseForm invalid param", __func__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -381,7 +384,7 @@ int FormMgrAdapter::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> 
  */
 ErrCode FormMgrAdapter::HandleReleaseForm(const int64_t formId, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("formId is %{public}" PRId64, formId);
     if (!FormDataMgr::GetInstance().ExistFormRecord(formId)) {
         HILOG_ERROR("%{public}s, not exist such db or temp form:%{public}" PRId64 "", __func__, formId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
@@ -395,7 +398,6 @@ ErrCode FormMgrAdapter::HandleReleaseForm(const int64_t formId, const sptr<IRemo
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
 
-    HILOG_DEBUG("%{public}s, release formRecords, formId: %{public}" PRId64 "", __func__, formId);
     FormDataMgr::GetInstance().DeleteFormUserUid(formId, IPCSkeleton::GetCallingUid());
     if (!FormDataMgr::GetInstance().HasFormUserUids(formId)) {
         FormDataMgr::GetInstance().DeleteFormRecord(formId);
@@ -415,7 +417,7 @@ ErrCode FormMgrAdapter::HandleReleaseForm(const int64_t formId, const sptr<IRemo
  */
 ErrCode FormMgrAdapter::HandleDeleteForm(const int64_t formId, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("called.");
+    HILOG_INFO("formId is %{public}" PRId64, formId);
     FormRecord dbRecord;
     if (FormDbCache::GetInstance().GetDBRecord(formId, dbRecord) != ERR_OK) {
         HILOG_ERROR("%{public}s, not exist such db form:%{public}" PRId64 "", __func__, formId);
@@ -433,8 +435,7 @@ ErrCode FormMgrAdapter::HandleDeleteForm(const int64_t formId, const sptr<IRemot
     bool isSelfDbFormId = (userId == dbRecord.providerUserId) && ((std::find(dbRecord.formUserUids.begin(),
         dbRecord.formUserUids.end(), callingUid) != dbRecord.formUserUids.end()) ? true : false);
     if (!isSelfDbFormId) {
-        HILOG_ERROR("%{public}s, not self form:%{public}" PRId64 ", callingUid:%{public}d",
-            __func__, formId, callingUid);
+        HILOG_ERROR("not self form:%{public}" PRId64 ", callingUid:%{public}d", formId, callingUid);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
 
@@ -444,7 +445,7 @@ ErrCode FormMgrAdapter::HandleDeleteForm(const int64_t formId, const sptr<IRemot
     }
 
     if (!FormDataMgr::GetInstance().DeleteHostRecord(callerToken, formId)) {
-        HILOG_ERROR("%{public}s, failed to remove host record", __func__);
+        HILOG_ERROR("failed to remove host record");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -462,7 +463,7 @@ ErrCode FormMgrAdapter::HandleDeleteForm(const int64_t formId, const sptr<IRemot
  */
 ErrCode FormMgrAdapter::HandleDeleteTempForm(const int64_t formId, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("formId is %{public}" PRId64, formId);
     int uid = IPCSkeleton::GetCallingUid();
     FormRecord record;
     bool isFormRecExist = FormDataMgr::GetInstance().GetFormRecord(formId, record);
@@ -473,7 +474,7 @@ ErrCode FormMgrAdapter::HandleDeleteTempForm(const int64_t formId, const sptr<IR
             record.formUserUids.end()) ? true : false);
     }
     if (!isSelfTempFormId) {
-        HILOG_ERROR("%{public}s, not self form:%{public}" PRId64 "", __func__, formId);
+        HILOG_ERROR("not self form:%{public}" PRId64 "", formId);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
     FormRenderMgr::GetInstance().StopRenderingForm(formId, record, "", callerToken);
@@ -514,7 +515,7 @@ ErrCode FormMgrAdapter::HandleDeleteTempForm(const int64_t formId, const sptr<IR
  */
 ErrCode FormMgrAdapter::HandleDeleteFormCache(FormRecord &dbRecord, const int uid, const int64_t formId)
 {
-    HILOG_DEBUG("delete formDBRecords, formId: %{public}" PRId64 "", formId);
+    HILOG_INFO("delete formDBRecords, formId: %{public}" PRId64 "", formId);
     auto iter = std::find(dbRecord.formUserUids.begin(), dbRecord.formUserUids.end(), uid);
     if (iter != dbRecord.formUserUids.end()) {
         dbRecord.formUserUids.erase(iter);
@@ -568,7 +569,7 @@ int FormMgrAdapter::UpdateForm(const int64_t formId, const int32_t callingUid,
     const FormProviderData &formProviderData, const std::vector<FormDataProxy> &formDataProxies)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_DEBUG("UpdateForm start.");
+    HILOG_INFO("formId is %{public}" PRId64, formId);
 
     // check formId and bundleName
     if (formId <= 0) {
@@ -623,7 +624,7 @@ int FormMgrAdapter::UpdateForm(const int64_t formId, const int32_t callingUid,
 int FormMgrAdapter::RequestForm(const int64_t formId, const sptr<IRemoteObject> &callerToken, const Want &want)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("formId is %{public}" PRId64, formId);
     if (formId <= 0 || callerToken == nullptr) {
         HILOG_ERROR("%{public}s fail, invalid formId or callerToken.", __func__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -665,7 +666,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
     const sptr<IRemoteObject> &callerToken, const int32_t formVisibleType)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_DEBUG("called.");
+    HILOG_INFO("called.");
     if (callerToken == nullptr) {
         HILOG_ERROR("fail, callerToken can not be NULL.");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -739,8 +740,6 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
         }
     }
 
-    HILOG_DEBUG("ScheduleTask formVisibleType: %{public}d, visibleNotifyDelay: %{public}d",
-        formVisibleType, visibleNotifyDelay_);
     FormTaskMgr::GetInstance().PostVisibleNotify(formIds, formInstanceMaps, eventMaps, formVisibleType,
         visibleNotifyDelay_);
     return ERR_OK;
