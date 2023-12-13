@@ -3086,15 +3086,15 @@ ErrCode FormMgrAdapter::RegisterFormRouterProxy(
         }
         matchedFormIds.push_back(formId);
 
-        // Checks for cross-user operations.
         if (record.providerUserId != FormUtil::GetCurrentAccountId()) {
+            // Checks for cross-user operations.
             HILOG_ERROR("The formId: %{public}" PRId64
                         " corresponds to a card that is not for the currently active user.",
                 formId);
             continue;
-        }
-        // Checks for cross-host operations
-        else if (std::find(record.formUserUids.begin(), record.formUserUids.end(), uid) == record.formUserUids.end()) {
+        } else if (std::find(record.formUserUids.begin(),
+            record.formUserUids.end(), uid) == record.formUserUids.end()) {
+            // Checks for cross-host operations
             HILOG_ERROR("The formId:%{public}" PRId64 " owned by other formHost", formId);
             continue;
         } else {
@@ -3134,15 +3134,15 @@ ErrCode FormMgrAdapter::UnregisterFormRouterProxy(const std::vector<int64_t>& fo
         }
         matchedFormIds.push_back(formId);
 
-        // Checks for cross-user operations.
         if (record.providerUserId != FormUtil::GetCurrentAccountId()) {
+            // Checks for cross-user operations.
             HILOG_ERROR("The formId: %{public}" PRId64
                         " corresponds to a card that is not for the currently active user.",
                 formId);
             continue;
-        }
-        // Checks for cross-host operations
-        else if (std::find(record.formUserUids.begin(), record.formUserUids.end(), uid) == record.formUserUids.end()) {
+        } else if (std::find(record.formUserUids.begin(),
+            record.formUserUids.end(), uid) == record.formUserUids.end()) {
+            // Checks for cross-host operations
             HILOG_ERROR("The formId:%{public}" PRId64 " owned by other formHost", formId);
             continue;
         } else {

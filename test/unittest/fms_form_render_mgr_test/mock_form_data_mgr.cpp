@@ -32,7 +32,6 @@ bool FormDataMgr::GetFormRecord(const int64_t formId, FormRecord &formRecord) co
 {
     FormRecord formRecord_;
     formRecord_.formId = 100;
-    int32_t level = formRecord_.privacyLevel;
     formRecord = formRecord_;
     if (g_mockType == 1) {
         formRecord.privacyLevel = 1;
