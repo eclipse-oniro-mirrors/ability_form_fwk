@@ -2675,7 +2675,7 @@ int FormMgrAdapter::DeleteInvalidForms(const std::vector<int64_t> &formIds,
     for (int64_t formId : formIds) {
         int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
         matchedFormIds.emplace(matchedFormId);
-        HILOG_DEBUG("valid formId, matchedFormIds: %{public}" PRId64 "", formId);
+        HILOG_INFO("valid formId, matchedFormIds: %{public}" PRId64 "", formId);
     }
     std::map<int64_t, bool> removedFormsMap {};
     int32_t callingUid = IPCSkeleton::GetCallingUid();
