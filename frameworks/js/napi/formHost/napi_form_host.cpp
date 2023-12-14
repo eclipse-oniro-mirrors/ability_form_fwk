@@ -1717,12 +1717,10 @@ napi_value NapiFormHost::OnNotifyVisibleForms(napi_env env, size_t argc, napi_va
         }
         auto ret = FormMgr::GetInstance().NotifyWhetherVisibleForms(iFormIds, FormHostClient::GetInstance(),
             Constants::FORM_VISIBLE);
+        auto retCode = QueryRetCode(ret);
         if (ret == ERR_OK) {
-            auto result = QueryRetCode(ret);
-            task.ResolveWithCustomize(
-                env, CreateJsError(env, result, QueryRetMsg(result)), CreateJsUndefined(env));
+            task.ResolveWithCustomize(env, CreateJsError(env, retCode, QueryRetMsg(retCode)), CreateJsUndefined(env));
         } else {
-            auto retCode = QueryRetCode(ret);
             task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));
         }
     };

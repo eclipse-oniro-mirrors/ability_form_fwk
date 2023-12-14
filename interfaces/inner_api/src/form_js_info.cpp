@@ -97,32 +97,20 @@ bool FormJsInfo::Marshalling(Parcel &parcel) const
         return false;
     }
 
-    // write formData
-    if (!parcel.WriteString16(Str8ToStr16(formData))) {
-        return false;
-    }
-
-    // write formSrc
-    if (!parcel.WriteString16(Str8ToStr16(formSrc))) {
+    // write formData and formSrc
+    if (!parcel.WriteString16(Str8ToStr16(formData)) || !parcel.WriteString16(Str8ToStr16(formSrc))) {
         return false;
     }
 
     // write formWindow
-    if (!parcel.WriteInt32(formWindow.designWidth)) {
-        return false;
-    }
-    if (!parcel.WriteBool(formWindow.autoDesignWidth)) {
+    if (!parcel.WriteInt32(formWindow.designWidth) || !parcel.WriteBool(formWindow.autoDesignWidth)) {
         return false;
     }
 
     // write version
-    if (!parcel.WriteUint32(versionCode)) {
-        return false;
-    }
-    if (!parcel.WriteString16(Str8ToStr16(versionName))) {
-        return false;
-    }
-    if (!parcel.WriteUint32(compatibleVersion)) {
+    if (!parcel.WriteUint32(versionCode) ||
+        !parcel.WriteString16(Str8ToStr16(versionName)) ||
+        !parcel.WriteUint32(compatibleVersion)) {
         return false;
     }
     if (!parcel.WriteInt32(static_cast<int32_t>(type))) {
@@ -131,10 +119,7 @@ bool FormJsInfo::Marshalling(Parcel &parcel) const
     if (!parcel.WriteInt32(static_cast<int32_t>(uiSyntax))) {
         return false;
     }
-    if (!parcel.WriteBool(isDynamic)) {
-        return false;
-    }
-    if (!parcel.WriteBool(transparencyEnabled)) {
+    if (!parcel.WriteBool(isDynamic) || !parcel.WriteBool(transparencyEnabled)) {
         return false;
     }
     // write formProviderData

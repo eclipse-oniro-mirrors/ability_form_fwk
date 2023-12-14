@@ -470,10 +470,9 @@ int32_t JsFormStateObserver::NotifyWhetherFormsVisible(const AppExecFwk::FormVis
                         std::regex_replace(bundleName, std::regex(specialFlag + std::to_string(isVisibleTypeFlag)), "");
                     auto visibleCallback = sharedThis->formVisibleCallbackMap_.find(bundleNameNew);
                     if (visibleCallback != sharedThis->formVisibleCallbackMap_.end()) {
-                        napi_value value = visibleCallback->second->GetNapiValue();
+                        napi_value res = visibleCallback->second->GetNapiValue();
                         napi_value argv[] = { CreateFormInstances(sharedThis->env_, formInstances) };
-                        napi_call_function(sharedThis->env_,
-                            value, value, sizeof(argv) / sizeof(argv[0]), argv, nullptr);
+                        napi_call_function(sharedThis->env_, res, res, sizeof(argv) / sizeof(argv[0]), argv, nullptr);
                     }
                 }
             } else {
@@ -483,10 +482,9 @@ int32_t JsFormStateObserver::NotifyWhetherFormsVisible(const AppExecFwk::FormVis
                         std::regex_replace(bundleName, std::regex(specialFlag + std::to_string(isVisibleTypeFlag)), "");
                     auto invisibleCallback = sharedThis->formInvisibleCallbackMap_.find(bundleNameNew);
                     if (invisibleCallback != sharedThis->formInvisibleCallbackMap_.end()) {
-                        napi_value value = invisibleCallback->second->GetNapiValue();
+                        napi_value res = invisibleCallback->second->GetNapiValue();
                         napi_value argv[] = { CreateFormInstances(sharedThis->env_, formInstances) };
-                        napi_call_function(sharedThis->env_,
-                            value, value, sizeof(argv) / sizeof(argv[0]), argv, nullptr);
+                        napi_call_function(sharedThis->env_, res, res, sizeof(argv) / sizeof(argv[0]), argv, nullptr);
                     }
                 }
             }
