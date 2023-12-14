@@ -479,17 +479,23 @@ public:
 
     /**
      * @brief Register click callback observer.
+     * @param bundleName Form bundle names that need attention.
+     * @param formEventType Form event type.
      * @param callerToken Caller ability token.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode RegisterClickEventObserver(const sptr<IRemoteObject> &observer);
+    ErrCode RegisterClickEventObserver(
+        const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer);
 
     /**
      * @brief Unregister click callback observer.
+     * @param bundleName Form bundle names that need delete.
+     * @param formEventType Form event type.
      * @param callerToken Caller ability token.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode UnregisterClickEventObserver(const sptr<IRemoteObject> &observer);
+    ErrCode UnregisterClickEventObserver(
+        const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer);
 
     /**
      * @brief Compare the locally configured update duration with the update duration in additionalInfo and
@@ -968,8 +974,6 @@ private:
 
 private:
     sptr<IFormPublishInterceptor> formPublishInterceptor_ = nullptr;
-    mutable std::mutex clickEventObserversMutex_;
-    std::map<sptr<IRemoteObject>, sptr<IRemoteObject::DeathRecipient>> clickEventObservers_;
     int32_t visibleNotifyDelay_ = Constants::DEFAULT_VISIBLE_NOTIFY_DELAY;
 };
 }  // namespace AppExecFwk

@@ -1128,23 +1128,27 @@ int32_t FormMgrStub::HandleUnregisterPublishFormInterceptor(MessageParcel &data,
 int32_t FormMgrStub::HandleRegisterClickCallbackEventObserver(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_DEBUG("Called.");
+    std::string bundleName = data.ReadString();
+    std::string formEventType = data.ReadString();
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
     if (callerToken == nullptr) {
         HILOG_ERROR("Failed to get remote object.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    return RegisterClickEventObserver(callerToken);
+    return RegisterClickEventObserver(bundleName, formEventType, callerToken);
 }
 
 int32_t FormMgrStub::HandleUnregisterClickCallbackEventObserver(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_DEBUG("Called.");
+    std::string bundleName = data.ReadString();
+    std::string formEventType = data.ReadString();
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
     if (callerToken == nullptr) {
         HILOG_ERROR("Failed to get remote object.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    return UnregisterClickEventObserver(callerToken);
+    return UnregisterClickEventObserver(bundleName, formEventType, callerToken);
 }
 
 /**

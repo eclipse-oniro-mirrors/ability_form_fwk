@@ -489,17 +489,23 @@ public:
 
     /**
      * @brief Register click callback observer.
+     * @param bundleName Form bundle names that need attention.
+     * @param formEventType Form event type.
      * @param observer Form click event callback listener.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode RegisterClickEventObserver(const sptr<IRemoteObject> &observer) override;
+    ErrCode RegisterClickEventObserver(
+        const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer) override;
 
     /**
      * @brief Unregister click callback observer.
+     * @param bundleName Form bundle names that need delete.
+     * @param formEventType Form event type.
      * @param observer Form click event callback listener.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode UnregisterClickEventObserver(const sptr<IRemoteObject> &observer) override;
+    ErrCode UnregisterClickEventObserver(
+        const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer) override;
 
     /**
      * @brief Set forms recyclable

@@ -3216,13 +3216,6 @@ void FormMgrAdapter::CleanResource(const wptr<IRemoteObject> &remote)
         deathRecipients_.erase(iter);
         object->RemoveDeathRecipient(deathRecipient);
     }
-    std::lock_guard<std::mutex> lock(clickEventObserversMutex_);
-    auto clickIter = clickEventObservers_.find(object);
-    if (clickIter != clickEventObservers_.end()) {
-        auto deathRecipient = clickIter->second;
-        clickEventObservers_.erase(clickIter);
-        object->RemoveDeathRecipient(deathRecipient);
-    }
 }
 
 void FormMgrAdapter::ClientDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
@@ -3268,77 +3261,40 @@ int32_t FormMgrAdapter::UnregisterPublishFormInterceptor(const sptr<IRemoteObjec
     return ERR_APPEXECFWK_FORM_INVALID_PARAM;
 }
 
-ErrCode FormMgrAdapter::RegisterClickEventObserver(const sptr<IRemoteObject> &observer)
+ErrCode FormMgrAdapter::RegisterClickEventObserver(
+    const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer)
 {
     if (observer == nullptr) {
         HILOG_ERROR("Caller token is null.");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
-
-    std::unique_lock<std::mutex> lock(clickEventObserversMutex_);
-    if (clickEventObservers_.find(observer) != clickEventObservers_.end()) {
-        HILOG_INFO("The observer has been added.");
-        return ERR_OK;
-    }
-
-    sptr<IRemoteObject::DeathRecipient> deathRecipient = new (std::nothrow) FormMgrAdapter::ClientDeathRecipient();
-    if (deathRecipient == nullptr) {
-        HILOG_ERROR("Create deathRecipient object is null.");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
-
-    observer->AddDeathRecipient(deathRecipient);
-    clickEventObservers_.emplace(observer, deathRecipient);
-
-    return ERR_OK;
+    return FormObserverRecord::GetInstance().SetFormEventObserver(bundleName, formEventType, observer);
 }
 
-ErrCode FormMgrAdapter::UnregisterClickEventObserver(const sptr<IRemoteObject> &observer)
+ErrCode FormMgrAdapter::UnregisterClickEventObserver(
+    const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer)
 {
-    if (observer == nullptr) {
-        HILOG_ERROR("Caller token is null.");
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
-    }
-
-    std::unique_lock<std::mutex> lock(clickEventObserversMutex_);
-    auto iter = clickEventObservers_.find(observer);
-    if (iter == clickEventObservers_.end()) {
-        HILOG_INFO("The observer not found.");
-        return ERR_APPEXECFWK_FORM_INVALID_PROVIDER_DATA;
-    }
-
-    if (iter->first != nullptr) {
-        iter->first->RemoveDeathRecipient(iter->second);
-    }
-
-    clickEventObservers_.erase(iter);
-    return ERR_OK;
+    return FormObserverRecord::GetInstance().RemoveFormEventObserver(bundleName, formEventType, observer);
 }
 
 void FormMgrAdapter::NotifyFormClickEvent(int64_t formId, const std::string &formClickType)
 {
     HILOG_INFO("Called.");
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
-    RunningFormInfo runningFormInfo;
 
+    RunningFormInfo runningFormInfo;
     auto ref = FormDataMgr::GetInstance().GetRunningFormInfosByFormId(matchedFormId, runningFormInfo);
     if (ref != ERR_OK) {
         HILOG_ERROR("Get Running info error.");
         return;
     }
-    std::unique_lock<std::mutex> lock(clickEventObserversMutex_);
-    for (const auto &item : clickEventObservers_) {
-        if (item.first == nullptr) {
-            HILOG_ERROR("Observers died.");
-            continue;
-        }
 
-        auto formStateObs = iface_cast<AbilityRuntime::IJsFormStateObserver>(item.first);
-        if (formStateObs != nullptr) {
-            formStateObs->OnFormClickEvent(formClickType, runningFormInfo);
-        }
-    }
+    FormObserverRecord::GetInstance().HandleFormEvent(runningFormInfo.hostBundleName, formClickType, runningFormInfo);
+    // The application layer can pass in an empty Bundlename,
+    // Which represents listening to a certain event of all applications
+    FormObserverRecord::GetInstance().HandleFormEvent("", formClickType, runningFormInfo);
 }
+
 bool FormMgrAdapter::GetValidFormUpdateDuration(const int64_t formId, int64_t &updateDuration) const
 {
     HILOG_DEBUG("Called.");

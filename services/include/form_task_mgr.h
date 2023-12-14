@@ -234,6 +234,17 @@ public:
         const int32_t formVisibleType, int32_t visibleNotifyDelay);
 
     /**
+    * @brief Post form click event.
+    * @param bundleName the clicked budnle
+    * @param formEventType form event type.
+    * @param remoteObject thr remote observer.
+    * @param runningFormInfo Current form data.
+    */
+    void PostFormClickEventToHost(
+        const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &remoteObject,
+        const RunningFormInfo &runningFormInfo);
+
+    /**
      * @brief Post recycle forms.
      * @param formIds the Ids of forms to be recycled.
      * @param want The want of the request.
@@ -467,6 +478,17 @@ private:
      * @param remoteObject Form render proxy object.
      */
     void RecoverForm(const int64_t &formId, const Want &want, const sptr<IRemoteObject> &remoteObject);
+
+    /**
+    * @brief Notify remote observer form click event.
+    * @param bundleName the clicked budnle
+    * @param formEventType  form event type.
+    * @param remoteObject thr remote observer.
+    * @param runningFormInfo Current form data.
+    */
+    void FormClickEvent(const std::string &bundleName, const std::string &formEventType,
+        const sptr<IRemoteObject> &remoteObject, const RunningFormInfo &runningFormInfo);
+
 private:
     std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;
 };

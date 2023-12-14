@@ -1200,5 +1200,38 @@ void FormTaskMgr::CancelDelayTask(const std::pair<int64_t, int64_t> &eventMsg)
     serialQueue_->CancelDelayTask(eventMsg);
     HILOG_DEBUG("end");
 }
+
+void FormTaskMgr::PostFormClickEventToHost(
+    const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &remoteObject,
+    const RunningFormInfo &runningFormInfo)
+{
+    HILOG_DEBUG("Called.");
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("Fail, serialQueue_ invalidate.");
+        return;
+    }
+    auto task = [bundleName, formEventType, remoteObject, runningFormInfo]() {
+        if (remoteObject == nullptr) {
+            HILOG_ERROR("Fail, remoteObject is null.");
+            return;
+        }
+        FormTaskMgr::GetInstance().FormClickEvent(bundleName, formEventType, remoteObject, runningFormInfo);
+    };
+    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, task);
+}
+
+void FormTaskMgr::FormClickEvent(const std::string &bundleName, const std::string &formEventType,
+    const sptr<IRemoteObject> &remoteObject, const RunningFormInfo &runningFormInfo)
+{
+    HILOG_DEBUG("Called");
+    sptr<AbilityRuntime::IJsFormStateObserver> remoteJsFormStateObserver =
+        iface_cast<AbilityRuntime::IJsFormStateObserver>(remoteObject);
+    if (remoteJsFormStateObserver == nullptr) {
+        HILOG_ERROR("Failed to get js form state observer proxy.");
+        return;
+    }
+
+    remoteJsFormStateObserver->OnFormClickEvent(bundleName, formEventType, runningFormInfo);
+}
 } // namespace AppExecFwk
 } // namespace OHOS

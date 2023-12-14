@@ -1902,12 +1902,23 @@ int32_t FormMgrProxy::UnregisterPublishFormInterceptor(const sptr<IRemoteObject>
     return reply.ReadInt32();
 }
 
-ErrCode FormMgrProxy::RegisterClickEventObserver(const sptr<IRemoteObject> &observer)
+ErrCode FormMgrProxy::RegisterClickEventObserver(
+    const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer)
 {
     HILOG_DEBUG("Click callback event start.");
     MessageParcel data;
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("Failed to write interface token.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteString(bundleName)) {
+        HILOG_ERROR("Failed to write bundle name.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteString(formEventType)) {
+        HILOG_ERROR("Failed to write form event type.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -1932,12 +1943,23 @@ ErrCode FormMgrProxy::RegisterClickEventObserver(const sptr<IRemoteObject> &obse
     return ERR_OK;
 }
 
-ErrCode FormMgrProxy::UnregisterClickEventObserver(const sptr<IRemoteObject> &observer)
+ErrCode FormMgrProxy::UnregisterClickEventObserver(
+    const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer)
 {
     HILOG_DEBUG("Click callback event start.");
     MessageParcel data;
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("Failed to write interface token.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteString(bundleName)) {
+        HILOG_ERROR("Failed to write bundle name.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteString(formEventType)) {
+        HILOG_ERROR("Failed to write form event type.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 

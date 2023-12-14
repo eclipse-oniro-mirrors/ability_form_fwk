@@ -135,6 +135,7 @@ int32_t JsFormStateObserverStub::GetParcelableInfos(MessageParcel &data, std::ve
 int32_t JsFormStateObserverStub::HandleOnFormClick(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_DEBUG("Called.");
+    std::string bundleName = data.ReadString();
     std::string callType = data.ReadString();
     if (callType.empty()) {
         HILOG_ERROR("Call type is empty.");
@@ -145,7 +146,7 @@ int32_t JsFormStateObserverStub::HandleOnFormClick(MessageParcel &data, MessageP
         HILOG_ERROR("Failed to ReadParcelable<RunningFormInfo>");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    int32_t result = OnFormClickEvent(callType, *runningFormInfo);
+    int32_t result = OnFormClickEvent(bundleName, callType, *runningFormInfo);
     reply.WriteInt32(result);
     return result;
 }

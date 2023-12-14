@@ -1245,9 +1245,10 @@ ErrCode FormMgr::RegisterRemoveObserver(const std::string &bundleName, const spt
     return remoteProxy_->RegisterRemoveObserver(bundleName, callerToken);
 }
 
-ErrCode FormMgr::RegisterClickEventObserver(const sptr<IRemoteObject> &observer)
+ErrCode FormMgr::RegisterClickEventObserver(
+    const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer)
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("Called.");
     if (observer == nullptr) {
         HILOG_ERROR("Caller token parameteris empty.");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -1260,12 +1261,13 @@ ErrCode FormMgr::RegisterClickEventObserver(const sptr<IRemoteObject> &observer)
     if (errCode != ERR_OK) {
         return errCode;
     }
-    return remoteProxy_->RegisterClickEventObserver(observer);
+    return remoteProxy_->RegisterClickEventObserver(bundleName, formEventType, observer);
 }
 
-ErrCode FormMgr::UnregisterClickEventObserver(const sptr<IRemoteObject> &observer)
+ErrCode FormMgr::UnregisterClickEventObserver(
+    const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer)
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("Called.");
     if (observer == nullptr) {
         HILOG_ERROR("Caller token parameteris empty.");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -1278,7 +1280,7 @@ ErrCode FormMgr::UnregisterClickEventObserver(const sptr<IRemoteObject> &observe
     if (errCode != ERR_OK) {
         return errCode;
     }
-    return remoteProxy_->UnregisterClickEventObserver(observer);
+    return remoteProxy_->UnregisterClickEventObserver(bundleName, formEventType, observer);
 }
 
 int FormMgr::RegisterFormRouterProxy(const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &callerToken)

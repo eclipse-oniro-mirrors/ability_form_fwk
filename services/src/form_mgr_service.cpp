@@ -1445,7 +1445,8 @@ ErrCode FormMgrService::RequestPublishProxyForm(Want &want, bool withFormBinding
         formDataProxies);
 }
 
-ErrCode FormMgrService::RegisterClickEventObserver(const sptr<IRemoteObject> &observer)
+ErrCode FormMgrService::RegisterClickEventObserver(
+    const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer)
 {
     HILOG_DEBUG("Called.");
     if (observer == nullptr) {
@@ -1457,10 +1458,11 @@ ErrCode FormMgrService::RegisterClickEventObserver(const sptr<IRemoteObject> &ob
         HILOG_ERROR("Fail, register form add observer permission denied");
         return ret;
     }
-    return FormMgrAdapter::GetInstance().RegisterClickEventObserver(observer);
+    return FormMgrAdapter::GetInstance().RegisterClickEventObserver(bundleName, formEventType, observer);
 }
 
-ErrCode FormMgrService::UnregisterClickEventObserver(const sptr<IRemoteObject> &observer)
+ErrCode FormMgrService::UnregisterClickEventObserver(
+    const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer)
 {
     HILOG_DEBUG("Called.");
     if (observer == nullptr) {
@@ -1472,7 +1474,7 @@ ErrCode FormMgrService::UnregisterClickEventObserver(const sptr<IRemoteObject> &
         HILOG_ERROR("Fail, register form add observer permission denied");
         return ret;
     }
-    return FormMgrAdapter::GetInstance().UnregisterClickEventObserver(observer);
+    return FormMgrAdapter::GetInstance().UnregisterClickEventObserver(bundleName, formEventType, observer);
 }
 
 int32_t FormMgrService::SetFormsRecyclable(const std::vector<int64_t> &formIds)
