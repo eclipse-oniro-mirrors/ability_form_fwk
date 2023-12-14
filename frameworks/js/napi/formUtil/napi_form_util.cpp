@@ -504,6 +504,7 @@ void ParseFormInfoIntoNapi(napi_env env, const FormInfo &formInfo, napi_value &r
     SetFormInfoPropertyString(env, formInfo.moduleName.c_str(), result, "moduleName");
     SetFormInfoPropertyString(env, formInfo.abilityName.c_str(), result, "abilityName");
     SetFormInfoPropertyString(env, formInfo.name.c_str(), result, "name");
+    SetFormInfoPropertyString(env, formInfo.displayName.c_str(), result, "displayName");
     SetFormInfoPropertyString(env, formInfo.description.c_str(), result, "description");
     SetFormInfoPropertyInt32(env, formInfo.descriptionId, result, "descriptionId");
     FormType formType = formInfo.type;
