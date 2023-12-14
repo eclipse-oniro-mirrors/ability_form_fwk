@@ -146,6 +146,7 @@ void FormProviderData::AddImageData(const std::string &picName, int fd)
     char* bytes = new (std::nothrow) char[size];
     if (bytes == nullptr) {
         HILOG_ERROR("malloc memory failed", errno);
+        return;
     }
     if (read(fd, bytes, size) < 0) {
         delete[] bytes;
