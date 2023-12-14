@@ -29,12 +29,119 @@
 #include "form_mgr_errors.h"
 #include "form_util.h"
 #include "ipc_skeleton.h"
+#include "accesstoken_kit.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
 const std::string KEY_DELIMITER = "?"; // the delimiter between key and uid
 } // namespace
+
+class PermissionCustomizeListener : public Security::AccessToken::PermStateChangeCallbackCustomize
+{
+    public:
+        FormDataProxyRecord *formDataProxyRecord_;
+
+        explicit PermissionCustomizeListener(const Security::AccessToken::PermStateChangeScope &scopeInfo, FormDataProxyRecord *formDataProxyRecord)
+            : Security::AccessToken::PermStateChangeCallbackCustomize(scopeInfo)
+        {
+            formDataProxyRecord_ = formDataProxyRecord;
+        }
+
+        virtual void PermStateChangeCallback(Security::AccessToken::PermStateChangeInfo& result)
+        {
+            HILOG_INFO("PermStateChangeCallback type = %{public}d, permissionName = %{public}s",
+                result.permStateChangeType, result.permissionName.c_str());
+            formDataProxyRecord_->PermStateChangeCallback(result.permStateChangeType, result.permissionName);
+        }
+};
+
+void FormDataProxyRecord::PermStateChangeCallback(const int32_t permStateChangeType, const std::string permissionName)
+{
+    auto search = formDataPermissionProxyMap_.find(permissionName);
+    if (search == formDataPermissionProxyMap_.end()) {
+        HILOG_ERROR("no permission data proxy, permissionName : %{public}s", permissionName.c_str());
+        return;
+    }
+    std::vector<FormDataProxy> formDataProxies = search->second;
+    std::vector<FormDataProxy> subscribeFormDataProxies;
+    std::vector<FormDataProxy> unSubscribeFormDataProxies;
+    for (const auto &formDataProxy : formDataProxies) {
+        std::string userId = std::to_string(FormUtil::GetCurrentAccountId());
+        std::string token = std::to_string(tokenId_);
+        std::string uri = formDataProxy.key + "?" + "user=" + userId + "&srcToken=" + token + "&dstBundleName=" + bundleName_;
+        auto rdbSubscribeResult = rdbSubscribeResultMap_.find(uri);
+        if (rdbSubscribeResult != rdbSubscribeResultMap_.end()) {
+            int64_t subscriberId = formId_;
+            if (!FormUtil::ConvertStringToInt64(formDataProxy.subscribeId, subscriberId)) {
+                HILOG_WARN("Convert string subscribe[%{public}s] to int64 failed, change to default value "
+                    "formId[%{public}s].", formDataProxy.subscribeId.c_str(), std::to_string(formId_).c_str());
+            }
+            auto subscribeResultRecord = rdbSubscribeResult->second.find(subscriberId);
+            if (subscribeResultRecord != rdbSubscribeResult->second.end()) {
+                if (subscribeResultRecord->second.ret != 0) {
+                    subscribeFormDataProxies.emplace_back(formDataProxy);
+                } else {
+                    unSubscribeFormDataProxies.emplace_back(formDataProxy);
+                }
+            }
+        }
+    }
+    SubscribeMap rdbSubscribeMap;
+    SubscribeMap publishSubscribeMap;
+    if (permStateChangeType == PERMISSION_GRANTED_OPER && subscribeFormDataProxies.size() != 0) {
+        SubscribeFormData(subscribeFormDataProxies, rdbSubscribeMap, publishSubscribeMap);
+    } else if (unSubscribeFormDataProxies.size() != 0) {
+        ParseFormDataProxies(unSubscribeFormDataProxies, rdbSubscribeMap, publishSubscribeMap);
+        UnsubscribeFormData(rdbSubscribeMap, publishSubscribeMap);
+    }
+}
+
+void FormDataProxyRecord::UnRegisterPermissionListener()
+{
+    if (callbackPtr_ != nullptr) {
+        int32_t accessTokenKit = Security::AccessToken::AccessTokenKit::UnRegisterPermStateChangeCallback(callbackPtr_);
+        callbackPtr_ = nullptr;
+    }
+}
+
+void FormDataProxyRecord::RegisterPermissionListener(const std::vector<FormDataProxy> &formDataProxies)
+{
+    std::vector<ProxyData> proxyData;
+    std::vector<std::string> permList;
+    FormBmsHelper::GetInstance().GetAllProxyDataInfos(FormUtil::GetCurrentAccountId(), proxyData);
+    if (proxyData.size() == 0 || formDataPermissionProxyMap_.size() != 0) {
+        return;
+    }
+    for (const auto &formDataProxy : formDataProxies) {
+        for (const auto &data : proxyData) {
+            if (formDataProxy.key == data.uri) {
+                auto search = formDataPermissionProxyMap_.find(data.requiredReadPermission);
+                std::vector<FormDataProxy> proxies;
+                if (search != formDataPermissionProxyMap_.end()) {
+                    proxies = search -> second;
+                }
+                permList.emplace_back(data.requiredReadPermission);
+                proxies.emplace_back(formDataProxy);
+                formDataPermissionProxyMap_[data.requiredReadPermission] = proxies;
+                continue;
+            }
+        }
+    }
+    std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
+    Security::AccessToken::PermStateChangeScope scopeInfo;
+    scopeInfo.permList = {permList};
+    scopeInfo.tokenIDs = {tokenId_};
+    callbackPtr_ = std::make_shared<PermissionCustomizeListener>(scopeInfo, this);
+    int32_t accessTokenKit = Security::AccessToken::AccessTokenKit::RegisterPermStateChangeCallback(callbackPtr_);
+    IPCSkeleton::SetCallingIdentity(callingIdentity);
+    HILOG_INFO("RegisterPermissionListener formId = %{public}s", std::to_string(formId_).c_str());
+    if (accessTokenKit != 0) {
+        formDataPermissionProxyMap_.clear();
+    }
+}
+
+
 void FormDataProxyRecord::OnRdbDataChange(const DataShare::RdbChangeNode &changeNode)
 {
     HILOG_INFO("on rdb data change. data size is %{public}zu", changeNode.data_.size());
@@ -66,6 +173,7 @@ FormDataProxyRecord::~FormDataProxyRecord()
 {
     HILOG_INFO("destroy FormDataProxyRecod formId: %{public}s, bundleName: %{public}s",
         std::to_string(formId_).c_str(), bundleName_.c_str());
+    UnRegisterPermissionListener();
     if (dataShareHelper_ != nullptr) {
         dataShareHelper_->Release();
     }
@@ -73,15 +181,22 @@ FormDataProxyRecord::~FormDataProxyRecord()
 
 ErrCode FormDataProxyRecord::SubscribeFormData(const std::vector<FormDataProxy> &formDataProxies)
 {
+    RegisterPermissionListener(formDataProxies);
+    return SubscribeFormData(formDataProxies, rdbSubscribeMap_, publishSubscribeMap_);
+}
+
+ErrCode FormDataProxyRecord::SubscribeFormData(const std::vector<FormDataProxy> &formDataProxies, SubscribeMap &rdbSubscribeMap, 
+    SubscribeMap &publishSubscribeMap)
+{
     HILOG_INFO("subscribe form data, formDataProxies size: %{public}zu.", formDataProxies.size());
     ParseFormDataProxies(formDataProxies);
     ErrCode ret = ERR_OK;
-    ret = SubscribeRdbFormData(rdbSubscribeMap_);
+    ret = SubscribeRdbFormData(rdbSubscribeMap_, rdbSubscribeMap, publishSubscribeMap);
     if (ret != ERR_OK) {
         HILOG_ERROR("subscribe rdb form data failed.");
         return ret;
     }
-    ret = SubscribePublishFormData(publishSubscribeMap_);
+    ret = SubscribePublishFormData(publishSubscribeMap);
     if (ret != ERR_OK) {
         HILOG_ERROR("subscribe publish form data failed.");
         return ret;
@@ -217,7 +332,8 @@ ErrCode FormDataProxyRecord::UnsubscribeFormData(SubscribeMap &rdbSubscribeMap, 
     return ERR_OK;
 }
 
-void FormDataProxyRecord::ParseFormDataProxies(const std::vector<FormDataProxy> &formDataProxies)
+void FormDataProxyRecord::ParseFormDataProxies(const std::vector<FormDataProxy> &formDataProxies, SubscribeMap &rdbSubscribeMap,
+    SubscribeMap &publishSubscribeMap)
 {
     std::vector<ProxyData> proxyData;
     FormBmsHelper::GetInstance().GetAllProxyDataInfos(FormUtil::GetCurrentAccountId(), proxyData);
@@ -232,9 +348,9 @@ void FormDataProxyRecord::ParseFormDataProxies(const std::vector<FormDataProxy> 
     }
 
     HILOG_INFO("subscribe rdb data");
-    ParseFormDataProxiesIntoSubscribeMapWithExpectedKeys(formDataProxies, expectedKeys, true, rdbSubscribeMap_);
+    ParseFormDataProxiesIntoSubscribeMapWithExpectedKeys(formDataProxies, expectedKeys, true, rdbSubscribeMap);
     HILOG_INFO("subscribe publish data");
-    ParseFormDataProxiesIntoSubscribeMapWithExpectedKeys(formDataProxies, expectedKeys, false, publishSubscribeMap_);
+    ParseFormDataProxiesIntoSubscribeMapWithExpectedKeys(formDataProxies, expectedKeys, false, publishSubscribeMap);
 }
 
 void FormDataProxyRecord::ParseFormDataProxiesIntoSubscribeMapWithExpectedKeys(
@@ -560,7 +676,7 @@ void FormDataProxyRecord::AddSubscribeResultRecord(SubscribeResultRecord record,
         records.emplace(record.subscribeId, record);
         resultMap->emplace(record.uri, records);
     } else {
-        mapIter->second.emplace(record.subscribeId, record);
+        mapIter->second[record.subscribeId] = record;
     }
 }
 

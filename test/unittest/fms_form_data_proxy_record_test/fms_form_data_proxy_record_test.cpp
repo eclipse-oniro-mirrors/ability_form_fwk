@@ -199,7 +199,9 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_012, TestSize.Le
     uint32_t tokenId = 1;
     FormDataProxyRecord formDataProxyRecord(formId, formRecord.bundleName, formRecord.uiSyntax, tokenId, 1);
     const std::vector<FormDataProxy> formDataProxies;
-    formDataProxyRecord.ParseFormDataProxies(formDataProxies);
+    FormDataProxyRecord::SubscribeMap rdbSubscribeMap;
+    FormDataProxyRecord::SubscribeMap publishSubscribeMap;
+    formDataProxyRecord.ParseFormDataProxies(formDataProxies, rdbSubscribeMap, publishSubscribeMap);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_012 end";
 }
 
@@ -580,5 +582,66 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_030, TestSize.Le
     formDataProxyRecord.GetFormSubscribeKeys(subscribedKeys, true);
     EXPECT_EQ(subscribedKeys.size(), 1);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_03 end";
+}
+
+/**
+ * @tc.name: FmsFormDataProxyRecordTest_031
+ * @tc.desc: test SubscribeFormData function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_031, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_031 start";
+    FormRecord formRecord;
+    int64_t formId = 1;
+    uint32_t tokenId = 1;
+    FormDataProxyRecord formDataProxyRecord(formId, formRecord.bundleName, formRecord.uiSyntax, tokenId, 1);
+    const std::vector<FormDataProxy> formDataProxies;
+    SubscribeMap rdbSubscribeMap;
+    SubscribeMap publishSubscribeMap;
+    ErrCode ret = formDataProxyRecord.SubscribeFormData(formDataProxies, rdbSubscribeMap, publishSubscribeMap);
+    EXPECT_EQ(ret, ERR_OK);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_031 end";
+}
+
+/**
+ * @tc.name: FmsFormDataProxyRecordTest_032
+ * @tc.desc: test RegisterPermissionListener&&UnRegisterPermissionListener function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_032, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_032 start";
+    FormRecord formRecord;
+    int64_t formId = 1;
+    uint32_t tokenId = 1;
+    FormDataProxyRecord formDataProxyRecord(formId, formRecord.bundleName, formRecord.uiSyntax, tokenId, 1);
+    const std::vector<FormDataProxy> formDataProxies;
+    formDataProxyRecord.RegisterPermissionListener(formDataProxies);
+    formDataProxyRecord.UnRegisterPermissionListener();
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_032 end";
+}
+
+/**
+ * @tc.name: FmsFormDataProxyRecordTest_033
+ * @tc.desc: test PermStateChangeCallback function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_033, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_033 start";
+    FormRecord formRecord;
+    int64_t formId = 1;
+    uint32_t tokenId = 1;
+    FormDataProxyRecord formDataProxyRecord(formId, formRecord.bundleName, formRecord.uiSyntax, tokenId, 1);
+    const std::vector<FormDataProxy> formDataProxies;
+    ErrCode ret = formDataProxyRecord.SubscribeFormData(formDataProxies);
+    EXPECT_EQ(ret, ERR_OK);
+    int32_t permStateChangeType = 1;
+    std::string permissionName;
+    formDataProxyRecord.PermStateChangeCallback(permStateChangeType, permissionName);
+    permStateChangeType = 0;
+    formDataProxyRecord.PermStateChangeCallback(permStateChangeType, permissionName);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_033 end";
 }
 }
