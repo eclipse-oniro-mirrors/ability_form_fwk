@@ -47,6 +47,7 @@ public:
     void DisableSubscribeFormData();
     void RetryFailureSubscribes();
     void GetFormSubscribeInfo(std::vector<std::string> &subscribedKeys, int32_t &count);
+    void PermStateChangeCallback(const int32_t permStateChangeType, const std::string permissionName);
     void UnRegisterPermissionListener();
 private:
     struct FormDataProxyRequest {
@@ -94,7 +95,6 @@ private:
     void RetryFailureRdbSubscribes(SubscribeResultRecord &record);
     void RetryFailurePublishedSubscribes(SubscribeResultRecord &record);
     void GetFormSubscribeKeys(std::vector<std::string> &subscribedKeys, bool isRdbType);
-    void PermStateChangeCallback(const int32_t permStateChangeType, const std::string permissionName);
     void RegisterPermissionListener(const std::vector<FormDataProxy> &formDataProxies);
     ErrCode SubscribeFormData(const std::vector<FormDataProxy> &formDataProxies, SubscribeMap &rdbSubscribeMap, 
         SubscribeMap &publicSubscribeMap);
