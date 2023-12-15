@@ -123,7 +123,7 @@ public:
 
     /**
      * @brief Notify form event.
-     * @param bundleName The bundle name where the event occurred.
+     * @param bundleName BundleName of the form host.
      * @param formEventType Form event type.
      * @param runningFormInfo Current form data.
      * @return Returns ERR_OK on success, others on failure.
@@ -133,7 +133,7 @@ public:
 
     /**
      * @brief Register form event callback observer.
-     * @param bundleName Form bundle names that need attention.
+     * @param bundleName BundleName of the form host.
      * @param formEventType Form event type.
      * @param callerToken Caller ability token.
      * @return Returns ERR_OK on success, others on failure.
@@ -143,7 +143,7 @@ public:
 
     /**
      * @brief Remove form event callback observer.
-     * @param bundleName Form bundle names that need delete.
+     * @param bundleName BundleName of the form host.
      * @param formEventType Form event type.
      * @param callerToken Caller ability token.
      * @return Returns ERR_OK on success, others on failure.

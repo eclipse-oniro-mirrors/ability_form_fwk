@@ -204,9 +204,6 @@ void FormObserverRecord::HandleFormEvent(
 FormEventId FormObserverRecord::ConvertToFormEventId(const std::string &formEventType)
 {
     HILOG_INFO("Called.");
-    if (formEventType.empty()) {
-        return FormEventId::FORM_EVENT_NON;
-    }
 
     auto iter = formEventMap.find(formEventType);
     if (iter != formEventMap.end()) {
@@ -351,15 +348,15 @@ ErrCode FormObserverRecord::RemoveFormEventObserverLocked(
 void FormObserverRecord::ClearDeathRemoteObserver(const wptr<IRemoteObject> &remote)
 {
     HILOG_INFO("Called.");
+    auto object = remote.promote();
+    if (object == nullptr) {
+        HILOG_ERROR("remote object is nullptr");
+        return;
+    }
     std::lock_guard<std::mutex> formEventLock(formEventObserversMutex_);
     for (auto it = formEventObservers_.begin(); it != formEventObservers_.end();) {
         auto& observer = it->second;
-        auto iter = std::find_if(observer.begin(), observer.end(), [remote](auto &item) {
-            auto object = remote.promote();
-            if (object == nullptr) {
-                HILOG_ERROR("remote object is nullptr");
-                return false;
-            }
+        auto iter = std::find_if(observer.begin(), observer.end(), [remote, object](auto &item) {
             return object == item.GetRemote();
         });
         if (iter != observer.end()) {

@@ -54,7 +54,7 @@ public:
 
     /**
      * @brief Register click callback observer.
-     * @param bundleName Form bundle names that need attention.
+     * @param bundleName BundleName of the form host.
      * @param formEventType Form event type.
      * @param observer Form click event callback listener.
      * @return Returns ERR_OK on success, others on failure.
@@ -64,7 +64,7 @@ public:
 
     /**
      * @brief Unregister click callback observer.
-     * @param bundleName Form bundle names that need delete.
+     * @param bundleName BundleName of the form host.
      * @param formEventType Form event type.
      * @param observer Form click event callback listener.
      * @return Returns ERR_OK on success, others on failure.

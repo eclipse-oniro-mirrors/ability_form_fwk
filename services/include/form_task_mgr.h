@@ -235,7 +235,7 @@ public:
 
     /**
     * @brief Post form click event.
-    * @param bundleName the clicked budnle
+    * @param bundleName BundleName of the form host
     * @param formEventType form event type.
     * @param remoteObject thr remote observer.
     * @param runningFormInfo Current form data.
@@ -481,7 +481,7 @@ private:
 
     /**
     * @brief Notify remote observer form click event.
-    * @param bundleName the clicked budnle
+    * @param bundleName BundleName of the form host
     * @param formEventType  form event type.
     * @param remoteObject thr remote observer.
     * @param runningFormInfo Current form data.

@@ -751,14 +751,13 @@ private:
         HILOG_DEBUG("Called.");
         std::string bundleName(EMPTY_BUNDLE);
         napi_value callback = nullptr;
-        ErrCode result = ERR_OK;
         if (argc < ARGS_ONE) {
             HILOG_ERROR("Wrong number of params.");
             NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1");
             return CreateJsUndefined(env);
         }
         if (argc == ARGS_ONE) {
-            result = JsFormStateObserver::GetInstance()->ClearFormClickCallbackByBundleName(type, "");
+            JsFormStateObserver::GetInstance()->ClearFormClickCallbackByBundleName(type, "");
             return CreateJsUndefined(env);
         }
         if (argc == ARGS_TWO) {
@@ -779,13 +778,21 @@ private:
             HILOG_ERROR("Convert bundleName failed.");
             return CreateJsUndefined(env);
         }
-        if (AppExecFwk::IsTypeForNapiValue(env, argv[PARAM2], napi_function)) {
+        if (AppExecFwk::IsTypeForNapiValue(env, argv[PARAM2], napi_null) &&
+            AppExecFwk::IsTypeForNapiValue(env, argv[PARAM2], napi_undefined)) {
+            HILOG_DEBUG("The third param is null or undefined.");
+            JsFormStateObserver::GetInstance()->ClearFormClickCallbackByBundleName(type, bundleName);
+            return CreateJsUndefined(env);
+        } else if (AppExecFwk::IsTypeForNapiValue(env, argv[PARAM2], napi_function)) {
             HILOG_DEBUG("The third param is callback.");
             callback = argv[PARAM2];
             JsFormStateObserver::GetInstance()->ClearFormClickCallback(type, bundleName, callback);
             return CreateJsUndefined(env);
+        } else {
+            HILOG_ERROR("The third param is invalid.");
+            NapiFormUtil::ThrowParamTypeError(env, "callback", "Callback<formInfo.RunningFormInfo>");
+            return CreateJsUndefined(env);
         }
-        JsFormStateObserver::GetInstance()->ClearFormClickCallbackByBundleName(type, bundleName);
         return CreateJsUndefined(env);
     }
 };

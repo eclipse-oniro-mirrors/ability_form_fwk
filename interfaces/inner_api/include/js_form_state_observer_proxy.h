@@ -41,7 +41,7 @@ public:
 
     /**
      * @brief The form click event.
-     * @param bundleName The clicked bundle name.
+     * @param bundleName BundleName of the form host.
      * @param callType The click event type.
      * @param runningFormInfo The running form info.
      */
