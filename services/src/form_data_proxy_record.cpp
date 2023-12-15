@@ -189,7 +189,7 @@ ErrCode FormDataProxyRecord::SubscribeFormData(const std::vector<FormDataProxy> 
     SubscribeMap &publishSubscribeMap)
 {
     HILOG_INFO("subscribe form data, formDataProxies size: %{public}zu.", formDataProxies.size());
-    ParseFormDataProxies(formDataProxies);
+    ParseFormDataProxies(formDataProxies, rdbSubscribeMap, publishSubscribeMap);
     ErrCode ret = ERR_OK;
     ret = SubscribeRdbFormData(rdbSubscribeMap);
     if (ret != ERR_OK) {
