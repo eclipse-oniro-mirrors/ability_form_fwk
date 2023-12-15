@@ -41,7 +41,7 @@ class PermissionCustomizeListener : public Security::AccessToken::PermStateChang
     public:
         FormDataProxyRecord *formDataProxyRecord_;
 
-        explicit PermissionCustomizeListener(const Security::AccessToken::PermStateChangeScope &scopeInfo, 
+        explicit PermissionCustomizeListener(const Security::AccessToken::PermStateChangeScope &scopeInfo,
             FormDataProxyRecord *formDataProxyRecord)
             : Security::AccessToken::PermStateChangeCallbackCustomize(scopeInfo)
         {
@@ -88,7 +88,7 @@ void FormDataProxyRecord::getSubscribeFormDataProxies(FormDataProxy &formdataPro
 {
     std::string userId = std::to_string(FormUtil::GetCurrentAccountId());
     std::string token = std::to_string(tokenId_);
-    std::string uri = formDataProxy.key + "?" + "user=" + userId + "&srcToken=" + token + 
+    std::string uri = formDataProxy.key + "?" + "user=" + userId + "&srcToken=" + token +
         "&dstBundleName=" + bundleName_;
     auto rdbSubscribeResult = rdbSubscribeResultMap_.find(uri);
     if (rdbSubscribeResult != rdbSubscribeResultMap_.end()) {
@@ -197,7 +197,7 @@ ErrCode FormDataProxyRecord::SubscribeFormData(const std::vector<FormDataProxy> 
     return SubscribeFormData(formDataProxies, rdbSubscribeMap_, publishSubscribeMap_);
 }
 
-ErrCode FormDataProxyRecord::SubscribeFormData(const std::vector<FormDataProxy> &formDataProxies, 
+ErrCode FormDataProxyRecord::SubscribeFormData(const std::vector<FormDataProxy> &formDataProxies,
     SubscribeMap &rdbSubscribeMap, SubscribeMap &publishSubscribeMap)
 {
     HILOG_INFO("subscribe form data, formDataProxies size: %{public}zu.", formDataProxies.size());
@@ -344,7 +344,7 @@ ErrCode FormDataProxyRecord::UnsubscribeFormData(SubscribeMap &rdbSubscribeMap, 
     return ERR_OK;
 }
 
-void FormDataProxyRecord::ParseFormDataProxies(const std::vector<FormDataProxy> &formDataProxies, 
+void FormDataProxyRecord::ParseFormDataProxies(const std::vector<FormDataProxy> &formDataProxies,
     SubscribeMap &rdbSubscribeMap, SubscribeMap &publishSubscribeMap)
 {
     std::vector<ProxyData> proxyData;
