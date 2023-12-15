@@ -126,17 +126,18 @@ void FormDataProxyRecord::RegisterPermissionListener(const std::vector<FormDataP
     }
     for (const auto &formDataProxy : formDataProxies) {
         for (const auto &data : proxyData) {
-            if (formDataProxy.key == data.uri) {
-                auto search = formDataPermissionProxyMap_.find(data.requiredReadPermission);
-                std::vector<FormDataProxy> proxies;
-                if (search != formDataPermissionProxyMap_.end()) {
-                    proxies = search -> second;
-                }
-                permList.emplace_back(data.requiredReadPermission);
-                proxies.emplace_back(formDataProxy);
-                formDataPermissionProxyMap_[data.requiredReadPermission] = proxies;
+            if (formDataProxy.key != data.uri) {
                 continue;
             }
+            auto search = formDataPermissionProxyMap_.find(data.requiredReadPermission);
+            std::vector<FormDataProxy> proxies;
+            if (search != formDataPermissionProxyMap_.end()) {
+                proxies = search -> second;
+            }
+            permList.emplace_back(data.requiredReadPermission);
+            proxies.emplace_back(formDataProxy);
+            formDataPermissionProxyMap_[data.requiredReadPermission] = proxies;
+            break;
         }
     }
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
