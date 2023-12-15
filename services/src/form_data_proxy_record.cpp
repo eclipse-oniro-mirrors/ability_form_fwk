@@ -67,26 +67,7 @@ void FormDataProxyRecord::PermStateChangeCallback(const int32_t permStateChangeT
     std::vector<FormDataProxy> subscribeFormDataProxies;
     std::vector<FormDataProxy> unSubscribeFormDataProxies;
     for (const auto &formDataProxy : formDataProxies) {
-        std::string userId = std::to_string(FormUtil::GetCurrentAccountId());
-        std::string token = std::to_string(tokenId_);
-        std::string uri = formDataProxy.key + "?" + "user=" + userId + "&srcToken=" + token + 
-            "&dstBundleName=" + bundleName_;
-        auto rdbSubscribeResult = rdbSubscribeResultMap_.find(uri);
-        if (rdbSubscribeResult != rdbSubscribeResultMap_.end()) {
-            int64_t subscriberId = formId_;
-            if (!FormUtil::ConvertStringToInt64(formDataProxy.subscribeId, subscriberId)) {
-                HILOG_WARN("Convert string subscribe[%{public}s] to int64 failed, change to default value "
-                    "formId[%{public}s].", formDataProxy.subscribeId.c_str(), std::to_string(formId_).c_str());
-            }
-            auto subscribeResultRecord = rdbSubscribeResult->second.find(subscriberId);
-            if (subscribeResultRecord != rdbSubscribeResult->second.end()) {
-                if (subscribeResultRecord->second.ret != 0) {
-                    subscribeFormDataProxies.emplace_back(formDataProxy);
-                } else {
-                    unSubscribeFormDataProxies.emplace_back(formDataProxy);
-                }
-            }
-        }
+        getSubscribeFormDataProxies(formdataProxy, subscribeFormDataProxies, unSubscribeFormDataProxies);
     }
     SubscribeMap rdbSubscribeMap;
     SubscribeMap publishSubscribeMap;
@@ -98,6 +79,31 @@ void FormDataProxyRecord::PermStateChangeCallback(const int32_t permStateChangeT
         if (unSubscribeFormDataProxies.size() != 0) {
             ParseFormDataProxies(unSubscribeFormDataProxies, rdbSubscribeMap, publishSubscribeMap);
             UnsubscribeFormData(rdbSubscribeMap, publishSubscribeMap);
+        }
+    }
+}
+
+void FormDataProxyRecord::getSubscribeFormDataProxies(FormDataProxy &formdataProxy
+    std::vector<FormDataProxy> &subscribeFormDataProxies, std::vector<FormDataProxy> &unsubscribeFormDataProxies)
+{
+    std::string userId = std::to_string(FormUtil::GetCurrentAccountId());
+    std::string token = std::to_string(tokenId_);
+    std::string uri = formDataProxy.key + "?" + "user=" + userId + "&srcToken=" + token + 
+        "&dstBundleName=" + bundleName_;
+    auto rdbSubscribeResult = rdbSubscribeResultMap_.find(uri);
+    if (rdbSubscribeResult != rdbSubscribeResultMap_.end()) {
+        int64_t subscriberId = formId_;
+        if (!FormUtil::ConvertStringToInt64(formDataProxy.subscribeId, subscriberId)) {
+            HILOG_WARN("Convert string subscribe[%{public}s] to int64 failed, change to default value "
+                "formId[%{public}s].", formDataProxy.subscribeId.c_str(), std::to_string(formId_).c_str());
+        }
+        auto subscribeResultRecord = rdbSubscribeResult->second.find(subscriberId);
+        if (subscribeResultRecord != rdbSubscribeResult->second.end()) {
+            if (subscribeResultRecord->second.ret != 0) {
+                subscribeFormDataProxies.emplace_back(formDataProxy);
+            } else {
+                unSubscribeFormDataProxies.emplace_back(formDataProxy);
+            }
         }
     }
 }
