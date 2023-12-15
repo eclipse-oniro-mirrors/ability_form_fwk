@@ -83,7 +83,7 @@ void FormDataProxyRecord::PermStateChangeCallback(const int32_t permStateChangeT
     }
 }
 
-void FormDataProxyRecord::getSubscribeFormDataProxies(FormDataProxy &formDataProxy
+void FormDataProxyRecord::getSubscribeFormDataProxies(FormDataProxy &formDataProxy,
     std::vector<FormDataProxy> &subscribeFormDataProxies, std::vector<FormDataProxy> &unsubscribeFormDataProxies)
 {
     std::string userId = std::to_string(FormUtil::GetCurrentAccountId());
