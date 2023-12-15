@@ -29,11 +29,13 @@ public:
 
     /**
      * @brief Check whether the module is allowed to be loaded in form
-     * 
      * @param moduleName module name
      * @return return true if the module can be loaded, false can not be loaded
      */
-    bool CheckModuleLoadable(const char* moduleName) override;
+    bool CheckModuleLoadable(const char* moduleName,
+        std::unique_ptr<ApiAllowListChecker>& apiAllowListChecker) override;
+private:
+    static bool CheckApiAllowList(const std::string& apiPath);
+    static bool CheckApiWithSuffix(const std::string& apiPath, const std::string& item);
 };
-
 #endif /* OHOS_FORM_FWK_FORM_MODULE_CHECKER_H */
