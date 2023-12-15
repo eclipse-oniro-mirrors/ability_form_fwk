@@ -41,7 +41,7 @@ class PermissionCustomizeListener : public Security::AccessToken::PermStateChang
     public:
         FormDataProxyRecord *formDataProxyRecord_;
 
-        explicit PermissionCustomizeListener(const Security::AccessToken::PermStateChangeScope &scopeInfo,
+        PermissionCustomizeListener(const Security::AccessToken::PermStateChangeScope &scopeInfo,
             FormDataProxyRecord *formDataProxyRecord)
             : Security::AccessToken::PermStateChangeCallbackCustomize(scopeInfo)
         {
@@ -72,11 +72,11 @@ void FormDataProxyRecord::PermStateChangeCallback(const int32_t permStateChangeT
     SubscribeMap rdbSubscribeMap;
     SubscribeMap publishSubscribeMap;
     if (permStateChangeType == PERMISSION_GRANTED_OPER) {
-        if (subscribeFormDataProxies.size() != 0) {
+        if (!subscribeFormDataProxies.empty()) {
             SubscribeFormData(subscribeFormDataProxies, rdbSubscribeMap, publishSubscribeMap);
         }
     } else {
-        if (unSubscribeFormDataProxies.size() != 0) {
+        if (!unSubscribeFormDataProxies.empty()) {
             ParseFormDataProxies(unSubscribeFormDataProxies, rdbSubscribeMap, publishSubscribeMap);
             UnsubscribeFormData(rdbSubscribeMap, publishSubscribeMap);
         }
@@ -121,7 +121,7 @@ void FormDataProxyRecord::RegisterPermissionListener(const std::vector<FormDataP
     std::vector<ProxyData> proxyData;
     std::vector<std::string> permList;
     FormBmsHelper::GetInstance().GetAllProxyDataInfos(FormUtil::GetCurrentAccountId(), proxyData);
-    if (proxyData.size() == 0 || formDataPermissionProxyMap_.size() != 0) {
+    if (proxyData.empty() || !formDataPermissionProxyMap_.empty()) {
         return;
     }
     for (const auto &formDataProxy : formDataProxies) {
@@ -132,7 +132,7 @@ void FormDataProxyRecord::RegisterPermissionListener(const std::vector<FormDataP
             auto search = formDataPermissionProxyMap_.find(data.requiredReadPermission);
             std::vector<FormDataProxy> proxies;
             if (search != formDataPermissionProxyMap_.end()) {
-                proxies = search -> second;
+                proxies = search->second;
             }
             permList.emplace_back(data.requiredReadPermission);
             proxies.emplace_back(formDataProxy);
