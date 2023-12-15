@@ -67,7 +67,7 @@ void FormDataProxyRecord::PermStateChangeCallback(const int32_t permStateChangeT
     std::vector<FormDataProxy> subscribeFormDataProxies;
     std::vector<FormDataProxy> unSubscribeFormDataProxies;
     for (const auto &formDataProxy : formDataProxies) {
-        getSubscribeFormDataProxies(formdataProxy, subscribeFormDataProxies, unSubscribeFormDataProxies);
+        getSubscribeFormDataProxies(formDataProxy, subscribeFormDataProxies, unSubscribeFormDataProxies);
     }
     SubscribeMap rdbSubscribeMap;
     SubscribeMap publishSubscribeMap;
@@ -83,7 +83,7 @@ void FormDataProxyRecord::PermStateChangeCallback(const int32_t permStateChangeT
     }
 }
 
-void FormDataProxyRecord::getSubscribeFormDataProxies(FormDataProxy &formdataProxy
+void FormDataProxyRecord::getSubscribeFormDataProxies(FormDataProxy &formDataProxy
     std::vector<FormDataProxy> &subscribeFormDataProxies, std::vector<FormDataProxy> &unsubscribeFormDataProxies)
 {
     std::string userId = std::to_string(FormUtil::GetCurrentAccountId());
