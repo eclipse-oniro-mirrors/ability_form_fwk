@@ -99,7 +99,7 @@ private:
     void RegisterPermissionListener(const std::vector<FormDataProxy> &formDataProxies);
     ErrCode SubscribeFormData(const std::vector<FormDataProxy> &formDataProxies, SubscribeMap &rdbSubscribeMap,
         SubscribeMap &publicSubscribeMap);
-    void getSubscribeFormDataProxies(const FormDataProxy formdataProxy,
+    void GetSubscribeFormDataProxies(const FormDataProxy formdataProxy,
         std::vector<FormDataProxy> &subscribeFormDataProxies, std::vector<FormDataProxy> &unsubscribeFormDataProxies);
 
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper_;
