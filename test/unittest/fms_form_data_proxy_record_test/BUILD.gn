@@ -31,7 +31,7 @@ ohos_unittest("FmsFormDataProxyRecordTest") {
     "${form_fwk_path}/interfaces/inner_api/include",
     "${form_fwk_path}/services/include",
     "${form_fwk_path}/test/mock/include",
-    "//base/security/access_token/interfaces/innerkits/accesstoken/include",
+    "${access_token_path}/interfaces/innerkits/accesstoken/include",
   ]
 
   configs = []
