@@ -37,12 +37,12 @@ namespace {
 const std::string KEY_DELIMITER = "?"; // the delimiter between key and uid
 } // namespace
 
-class PermissionCustomizeListener : public Security::AccessToken::PermStateChangeCallbackCustomize
-{
+class PermissionCustomizeListener : public Security::AccessToken::PermStateChangeCallbackCustomize {
     public:
         FormDataProxyRecord *formDataProxyRecord_;
 
-        explicit PermissionCustomizeListener(const Security::AccessToken::PermStateChangeScope &scopeInfo, FormDataProxyRecord *formDataProxyRecord)
+        explicit PermissionCustomizeListener(const Security::AccessToken::PermStateChangeScope &scopeInfo, 
+            FormDataProxyRecord *formDataProxyRecord)
             : Security::AccessToken::PermStateChangeCallbackCustomize(scopeInfo)
         {
             formDataProxyRecord_ = formDataProxyRecord;
@@ -69,7 +69,8 @@ void FormDataProxyRecord::PermStateChangeCallback(const int32_t permStateChangeT
     for (const auto &formDataProxy : formDataProxies) {
         std::string userId = std::to_string(FormUtil::GetCurrentAccountId());
         std::string token = std::to_string(tokenId_);
-        std::string uri = formDataProxy.key + "?" + "user=" + userId + "&srcToken=" + token + "&dstBundleName=" + bundleName_;
+        std::string uri = formDataProxy.key + "?" + "user=" + userId + "&srcToken=" + token + 
+            "&dstBundleName=" + bundleName_;
         auto rdbSubscribeResult = rdbSubscribeResultMap_.find(uri);
         if (rdbSubscribeResult != rdbSubscribeResultMap_.end()) {
             int64_t subscriberId = formId_;
@@ -189,8 +190,8 @@ ErrCode FormDataProxyRecord::SubscribeFormData(const std::vector<FormDataProxy> 
     return SubscribeFormData(formDataProxies, rdbSubscribeMap_, publishSubscribeMap_);
 }
 
-ErrCode FormDataProxyRecord::SubscribeFormData(const std::vector<FormDataProxy> &formDataProxies, SubscribeMap &rdbSubscribeMap, 
-    SubscribeMap &publishSubscribeMap)
+ErrCode FormDataProxyRecord::SubscribeFormData(const std::vector<FormDataProxy> &formDataProxies, 
+    SubscribeMap &rdbSubscribeMap, SubscribeMap &publishSubscribeMap)
 {
     HILOG_INFO("subscribe form data, formDataProxies size: %{public}zu.", formDataProxies.size());
     ParseFormDataProxies(formDataProxies, rdbSubscribeMap, publishSubscribeMap);
@@ -336,8 +337,8 @@ ErrCode FormDataProxyRecord::UnsubscribeFormData(SubscribeMap &rdbSubscribeMap, 
     return ERR_OK;
 }
 
-void FormDataProxyRecord::ParseFormDataProxies(const std::vector<FormDataProxy> &formDataProxies, SubscribeMap &rdbSubscribeMap,
-    SubscribeMap &publishSubscribeMap)
+void FormDataProxyRecord::ParseFormDataProxies(const std::vector<FormDataProxy> &formDataProxies, 
+    SubscribeMap &rdbSubscribeMap, SubscribeMap &publishSubscribeMap)
 {
     std::vector<ProxyData> proxyData;
     FormBmsHelper::GetInstance().GetAllProxyDataInfos(FormUtil::GetCurrentAccountId(), proxyData);
