@@ -757,13 +757,13 @@ private:
             return CreateJsUndefined(env);
         }
         if (argc == ARGS_ONE) {
-            JsFormStateObserver::GetInstance()->ClearFormClickCallbackByBundleName(type, "");
+            JsFormStateObserver::GetInstance()->ClearFormClickCallbackByBundleName(type, EMPTY_BUNDLE);
             return CreateJsUndefined(env);
         }
         if (argc == ARGS_TWO) {
             if (!AppExecFwk::IsTypeForNapiValue(env, argv[PARAM1], napi_string)) {
                 HILOG_DEBUG("The second param as bundlename is not string");
-                JsFormStateObserver::GetInstance()->ClearFormClickCallbackByBundleName(type, "");
+                JsFormStateObserver::GetInstance()->ClearFormClickCallbackByBundleName(type, EMPTY_BUNDLE);
                 return CreateJsUndefined(env);
             } else if (!ConvertFromJsValue(env, argv[PARAM1], bundleName)) {
                 HILOG_ERROR("Convert bundleName failed.");
@@ -778,7 +778,7 @@ private:
             HILOG_ERROR("Convert bundleName failed.");
             return CreateJsUndefined(env);
         }
-        if (AppExecFwk::IsTypeForNapiValue(env, argv[PARAM2], napi_null) &&
+        if (AppExecFwk::IsTypeForNapiValue(env, argv[PARAM2], napi_null) ||
             AppExecFwk::IsTypeForNapiValue(env, argv[PARAM2], napi_undefined)) {
             HILOG_DEBUG("The third param is null or undefined.");
             JsFormStateObserver::GetInstance()->ClearFormClickCallbackByBundleName(type, bundleName);

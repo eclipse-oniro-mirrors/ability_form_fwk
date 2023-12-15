@@ -48,17 +48,17 @@ public:
         return remote_;
     };
 
-    inline bool NonFollowEvents()
+    bool NonFollowEvents()
     {
         return eventGroup_.empty();
     }
 
-    inline std::string BindHostBundle() const
+    std::string BindHostBundle() const
     {
         return bindHostBundle;
     }
 
-    inline void SetBindHostBundle(const std::string &hostBundleName)
+    void SetBindHostBundle(const std::string &hostBundleName)
     {
         bindHostBundle = hostBundleName;
     }
@@ -176,7 +176,7 @@ private:
     mutable std::mutex formEventObserversMutex_;
     std::unordered_map<std::string, std::vector<FormObserverRecordInner>> formEventObservers_;
 
-    const std::multimap<std::string, FormEventId> formEventMap = {
+    const std::unordered_map<std::string, FormEventId> formEventMap = {
         {"call", FormEventId::FORM_EVENT_CALL},
         {"message", FormEventId::FORM_EVENT_MESSAGE},
         {"router", FormEventId::FORM_EVENT_ROUTER},

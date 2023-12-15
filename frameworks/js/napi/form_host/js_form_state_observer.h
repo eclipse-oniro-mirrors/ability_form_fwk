@@ -61,8 +61,8 @@ public:
     }
 
 private:
-    std::string bindHostBundleName {""};
-    std::string eventType_ {""};
+    std::string bindHostBundleName;
+    std::string eventType_;
     std::vector<napi_ref> callbacks_;
     napi_env env_ = nullptr;
 };

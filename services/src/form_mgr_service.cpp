@@ -1448,7 +1448,7 @@ ErrCode FormMgrService::RequestPublishProxyForm(Want &want, bool withFormBinding
 ErrCode FormMgrService::RegisterClickEventObserver(
     const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer)
 {
-    HILOG_DEBUG("Called.");
+    HILOG_INFO("Called.");
     if (observer == nullptr) {
         HILOG_ERROR("Caller token parameter is empty.");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -1464,7 +1464,7 @@ ErrCode FormMgrService::RegisterClickEventObserver(
 ErrCode FormMgrService::UnregisterClickEventObserver(
     const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer)
 {
-    HILOG_DEBUG("Called.");
+    HILOG_INFO("Called.");
     if (observer == nullptr) {
         HILOG_ERROR("Caller token parameter is empty.");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;

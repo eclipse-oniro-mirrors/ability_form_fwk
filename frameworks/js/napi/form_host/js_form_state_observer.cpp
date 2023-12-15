@@ -543,8 +543,6 @@ ErrCode JsFormStateObserver::RegisterClickEventCallback(
     const napi_env env, const std::string &bundleName, const napi_value callback, const std::string &type)
 {
     HILOG_DEBUG("Called.");
-    std::unique_lock<std::mutex> lock(formEventMapMutex_);
-
     auto record = std::make_shared<FormEventCallbackList>(bundleName, type, env);
     if (record == nullptr) {
         HILOG_ERROR("New obj error");
@@ -552,10 +550,12 @@ ErrCode JsFormStateObserver::RegisterClickEventCallback(
     }
     record->PushCallback(callback);
 
+    std::unique_lock<std::mutex> lock(formEventMapMutex_);
+
     auto formEventCallbackListIter = formEventMap_.find(bundleName);
     if (formEventCallbackListIter == formEventMap_.end()) {
-        std::vector<std::shared_ptr<FormEventCallbackList>> vec {record};
-        formEventMap_.emplace(bundleName, vec);
+        std::vector<std::shared_ptr<FormEventCallbackList>> formEventCallbackListVector {record};
+        formEventMap_.emplace(bundleName, formEventCallbackListVector);
         AppExecFwk::FormMgr::GetInstance().RegisterClickEventObserver(
             bundleName, type, JsFormStateObserver::GetInstance());
         return ERR_OK;

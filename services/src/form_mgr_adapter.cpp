@@ -3264,6 +3264,7 @@ int32_t FormMgrAdapter::UnregisterPublishFormInterceptor(const sptr<IRemoteObjec
 ErrCode FormMgrAdapter::RegisterClickEventObserver(
     const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer)
 {
+    HILOG_INFO("Called.");
     if (observer == nullptr) {
         HILOG_ERROR("Caller token is null.");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -3274,6 +3275,11 @@ ErrCode FormMgrAdapter::RegisterClickEventObserver(
 ErrCode FormMgrAdapter::UnregisterClickEventObserver(
     const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer)
 {
+    HILOG_INFO("Called.");
+    if (observer == nullptr) {
+        HILOG_ERROR("Caller token is null.");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
     return FormObserverRecord::GetInstance().RemoveFormEventObserver(bundleName, formEventType, observer);
 }
 
@@ -3292,7 +3298,7 @@ void FormMgrAdapter::NotifyFormClickEvent(int64_t formId, const std::string &for
     FormObserverRecord::GetInstance().HandleFormEvent(runningFormInfo.hostBundleName, formClickType, runningFormInfo);
     // The application layer can pass in an empty Bundlename,
     // Which represents listening to a certain event of all applications
-    FormObserverRecord::GetInstance().HandleFormEvent("", formClickType, runningFormInfo);
+    FormObserverRecord::GetInstance().HandleFormEvent(EMPTY_BUNDLE, formClickType, runningFormInfo);
 }
 
 bool FormMgrAdapter::GetValidFormUpdateDuration(const int64_t formId, int64_t &updateDuration) const
