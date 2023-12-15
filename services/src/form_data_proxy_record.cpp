@@ -89,11 +89,15 @@ void FormDataProxyRecord::PermStateChangeCallback(const int32_t permStateChangeT
     }
     SubscribeMap rdbSubscribeMap;
     SubscribeMap publishSubscribeMap;
-    if (permStateChangeType == PERMISSION_GRANTED_OPER && subscribeFormDataProxies.size() != 0) {
-        SubscribeFormData(subscribeFormDataProxies, rdbSubscribeMap, publishSubscribeMap);
-    } else if (unSubscribeFormDataProxies.size() != 0) {
-        ParseFormDataProxies(unSubscribeFormDataProxies, rdbSubscribeMap, publishSubscribeMap);
-        UnsubscribeFormData(rdbSubscribeMap, publishSubscribeMap);
+    if (permStateChangeType == PERMISSION_GRANTED_OPER) {
+        if (subscribeFormDataProxies.size() != 0) {
+            SubscribeFormData(subscribeFormDataProxies, rdbSubscribeMap, publishSubscribeMap);
+        }
+    } else {
+        if (unSubscribeFormDataProxies.size() != 0) {
+            ParseFormDataProxies(unSubscribeFormDataProxies, rdbSubscribeMap, publishSubscribeMap);
+            UnsubscribeFormData(rdbSubscribeMap, publishSubscribeMap);
+        }
     }
 }
 
