@@ -597,8 +597,8 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_031, TestSize.Le
     uint32_t tokenId = 1;
     FormDataProxyRecord formDataProxyRecord(formId, formRecord.bundleName, formRecord.uiSyntax, tokenId, 1);
     const std::vector<FormDataProxy> formDataProxies;
-    SubscribeMap rdbSubscribeMap;
-    SubscribeMap publishSubscribeMap;
+    FormDataProxyRecord::SubscribeMap rdbSubscribeMap;
+    FormDataProxyRecord::SubscribeMap publishSubscribeMap;
     ErrCode ret = formDataProxyRecord.SubscribeFormData(formDataProxies, rdbSubscribeMap, publishSubscribeMap);
     EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_031 end";
