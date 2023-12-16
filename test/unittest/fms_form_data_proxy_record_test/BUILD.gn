@@ -31,6 +31,8 @@ ohos_unittest("FmsFormDataProxyRecordTest") {
     "${form_fwk_path}/interfaces/inner_api/include",
     "${form_fwk_path}/services/include",
     "${form_fwk_path}/test/mock/include",
+    "${ability_runtime_path}/services/common/include",
+    "${ability_runtime_native_path}/appkit/ability_runtime",
   ]
 
   configs = []
@@ -48,6 +50,8 @@ ohos_unittest("FmsFormDataProxyRecordTest") {
     "ability_base:want",
     "ability_base:zuri",
     "ability_runtime:app_manager",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libtokenid_sdk",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
