@@ -41,11 +41,12 @@ public:
 
     /**
      * @brief The form click event.
-     * @param callType The click event type.
+     * @param bundleName BundleName of the form host.
+     * @param formEventType The click event type.
      * @param runningFormInfo The running form info.
      */
-    virtual int32_t OnFormClickEvent(
-        const std::string &callType, const AppExecFwk::RunningFormInfo &runningFormInfo) = 0;
+    virtual int32_t OnFormClickEvent(const std::string &bundleName, const std::string &formEventType,
+        const AppExecFwk::RunningFormInfo &runningFormInfo) = 0;
 
     virtual int32_t NotifyWhetherFormsVisible(const AppExecFwk::FormVisibilityType visibleType,
         const std::string &bundleName, std::vector<AppExecFwk::FormInstance> &runningFormInfos) = 0;

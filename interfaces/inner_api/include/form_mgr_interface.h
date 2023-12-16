@@ -510,17 +510,23 @@ public:
 
     /**
      * @brief Register click callback observer.
+     * @param bundleName BundleName of the form host.
+     * @param formEventType Form event type.
      * @param observer Form click event callback listener.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual ErrCode RegisterClickEventObserver(const sptr<IRemoteObject> &observer) = 0;
+    virtual ErrCode RegisterClickEventObserver(
+        const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer) = 0;
 
     /**
      * @brief Unregister click callback observer.
+     * @param bundleName BundleName of the form host.
+     * @param formEventType Form event type.
      * @param observer Form click event callback listener.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual ErrCode UnregisterClickEventObserver(const sptr<IRemoteObject> &observer) = 0;
+    virtual ErrCode UnregisterClickEventObserver(
+        const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer) = 0;
 
     /**
      * @brief Set forms recyclable

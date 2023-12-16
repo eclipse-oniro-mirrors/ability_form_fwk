@@ -150,7 +150,7 @@ int JsFormStateObserverProxy::SendTransactCmd(IJsFormStateObserver::Message code
 }
 
 int32_t JsFormStateObserverProxy::OnFormClickEvent(
-    const std::string &callType, const AppExecFwk::RunningFormInfo &runningFormInfo)
+    const std::string &bundleName, const std::string &callType, const AppExecFwk::RunningFormInfo &runningFormInfo)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -158,6 +158,11 @@ int32_t JsFormStateObserverProxy::OnFormClickEvent(
 
     if (!data.WriteInterfaceToken(AbilityRuntime::IJsFormStateObserver::GetDescriptor())) {
         HILOG_ERROR("Failed to write interface token");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteString(bundleName)) {
+        HILOG_ERROR("Failed to write bundle name.");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
