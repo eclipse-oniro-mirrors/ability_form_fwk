@@ -16,10 +16,6 @@
 #include "form_bms_helper.h"
 
 #include "ability_manager_interface.h"
-#ifndef SUPPORT_ERMS
-#include "erms_mgr_interface.h"
-#include "erms_mgr_param.h"
-#endif
 #include "fms_log_wrapper.h"
 #include "form_mgr_errors.h"
 #include "if_system_ability_manager.h"
@@ -61,7 +57,7 @@ sptr<IBundleMgr> FormBmsHelper::GetBundleMgr()
             }
         }
     }
-    
+
     return iBundleMgr_;
 }
 

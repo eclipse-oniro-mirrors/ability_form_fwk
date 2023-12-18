@@ -26,9 +26,6 @@
 #ifdef DEVICE_USAGE_STATISTICS_ENABLE
 #include "bundle_active_client.h"
 #endif
-#ifdef SUPPORT_ERMS
-#include "erms_mgr_interface.h"
-#endif
 #include "fms_log_wrapper.h"
 #include "form_acquire_connection.h"
 #include "form_acquire_data_connection.h"
@@ -44,6 +41,8 @@
 #include "form_db_cache.h"
 #include "form_db_info.h"
 #include "form_dump_mgr.h"
+#include "form_ecological_rule_param.h"
+#include "form_ecological_rule_service.h"
 #include "form_event_notify_connection.h"
 #include "form_info_mgr.h"
 #include "form_mgr_errors.h"
@@ -73,9 +72,6 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-#ifdef SUPPORT_ERMS
-using namespace OHOS::EcologicalRuleMgrService;
-#endif
 namespace {
 constexpr int32_t CALLING_UID_TRANSFORM_DIVISOR = 200000;
 constexpr int32_t SYSTEM_UID = 1000;
@@ -3377,13 +3373,12 @@ void FormMgrAdapter::GetUpdateDurationFromAdditionalInfo(
     }
 }
 
-#ifdef SUPPORT_ERMS
 int32_t FormMgrAdapter::GetCallerType(std::string bundleName)
 {
     sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
     if (iBundleMgr == nullptr) {
         HILOG_ERROR("fail, failed to get IBundleMgr.");
-        return ErmsCallerInfo::TYPE_INVALID;
+        return FormErmsCallerInfo::TYPE_INVALID;
     }
 
     AppExecFwk::ApplicationInfo callerAppInfo;
@@ -3392,41 +3387,38 @@ int32_t FormMgrAdapter::GetCallerType(std::string bundleName)
     bool getCallerResult = IN_PROCESS_CALL(iBundleMgr->GetApplicationInfo(bundleName, flag, userId, callerAppInfo));
     if (!getCallerResult) {
         HILOG_ERROR("Get callerAppInfo failed.");
-        return ErmsCallerInfo::TYPE_INVALID;
+        return FormErmsCallerInfo::TYPE_INVALID;
     }
 
     switch (callerAppInfo.bundleType) {
         case AppExecFwk::BundleType::ATOMIC_SERVICE:
-            return ErmsCallerInfo::TYPE_ATOM_SERVICE;
+            return FormErmsCallerInfo::TYPE_ATOM_SERVICE;
         case AppExecFwk::BundleType::APP:
-            return ErmsCallerInfo::TYPE_HARMONY_APP;
+            return FormErmsCallerInfo::TYPE_HARMONY_APP;
         default:
             HILOG_WARN("the caller type is not harmony app or atom service: %{public}d", callerAppInfo.bundleType);
             break;
     }
-    return ErmsCallerInfo::TYPE_INVALID;
+    return FormErmsCallerInfo::TYPE_INVALID;
 }
-#endif
 
 bool FormMgrAdapter::IsErmsSupportPublishForm(std::string bundleName, std::vector<Want> wants)
 {
     bool isSupport = true;
-#ifdef SUPPORT_ERMS
-    ErmsCallerInfo callerInfo;
+    FormErmsCallerInfo callerInfo;
     callerInfo.packageName = bundleName;
     callerInfo.uid = IPCSkeleton::GetCallingUid();
     callerInfo.pid = IPCSkeleton::GetCallingPid();
     callerInfo.callerAppType = GetCallerType(bundleName);
 
     auto start = FormUtil::GetCurrentMicrosecond();
-    int32_t ret = EcologicalRuleMgrServiceClient::GetInstance()->IsSupportPublishForm(wants, callerInfo, isSupport);
+    int32_t ret = FormEcologicalRuleClient::GetInstance().IsSupportPublishForm(wants, callerInfo, isSupport);
     auto end = FormUtil::GetCurrentMicrosecond();
     HILOG_INFO("[ERMS-DFX] IsSupportPublishForm cost %{public}" PRId64 " micro seconds", (end - start));
     if (ret != ERR_OK) {
         HILOG_ERROR("call IsSupportPublishForm failed: %{public}d, default is support.", ret);
         return true;
     }
-#endif
     return isSupport;
 }
 
