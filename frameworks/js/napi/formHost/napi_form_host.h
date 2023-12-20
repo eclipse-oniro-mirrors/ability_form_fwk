@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -114,6 +114,9 @@ private:
     bool GetStringsValue(napi_env env, napi_value object, std::vector<std::string> &strList);
     static bool UnwrapGetFormsInfoParams(napi_env env, size_t argc, napi_value* argv, std::string &moduleName,
         bool &bParam);
+
+    int32_t OnNotifyInVisibleFormsParseParam(napi_env env, size_t argc, napi_value* argv,
+        std::vector<int64_t> &formIds);
 };
 }  // namespace AbilityRuntime
 }  // namespace OHOS
