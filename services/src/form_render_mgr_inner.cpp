@@ -293,7 +293,7 @@ ErrCode FormRenderMgrInner::StopRenderingFormCallback(int64_t formId, const Want
             return ERR_APPEXECFWK_FORM_INVALID_PARAM;
         }
         stopConnection = conIterator->second;
-        renderFormConnectionSize = renderFormConnections_.size();
+        renderFormConnectionSize = static_cast<int32_t>(renderFormConnections_.size());
         for (auto iter = etsHosts_.begin(); iter != etsHosts_.end();) {
             iter->second.erase(formId);
             if (iter->second.empty()) {
@@ -541,7 +541,7 @@ void FormRenderMgrInner::RemoveHostToken(const sptr<IRemoteObject> &host)
                 }
             }
         }
-        left = renderFormConnections_.size();
+        left = static_cast<int32_t>(renderFormConnections_.size());
     }
     for (auto iter = connections.begin(); iter != connections.end();) {
         DisconnectRenderService(iter->second, connections.size() > left ? connections.size() : left);

@@ -2042,9 +2042,8 @@ ErrCode FormMgrAdapter::CheckAddRequestPublishForm(const Want &want, const Want 
     }
     if (errCode != ERR_OK) {
         HILOG_ERROR("fail, too much forms in system");
-        return errCode;
     }
-    return ERR_OK;
+    return errCode;
 }
 
 ErrCode FormMgrAdapter::AddRequestPublishForm(const FormItemInfo &formItemInfo, const Want &want,

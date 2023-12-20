@@ -84,8 +84,7 @@ void FormEventReport::SendFormEvent(const FormEventName &eventName, HiSysEventTy
         case FormEventName::CASTTEMP_FORM:
         case FormEventName::RELEASE_FORM:
         case FormEventName::SET_NEXT_REFRESH_TIME_FORM:
-            HiSysEventWrite(
-                HiSysEvent::Domain::FORM_MANAGER, name, type, EVENT_KEY_FORM_ID, eventInfo.formId);
+            HiSysEventWrite(HiSysEvent::Domain::FORM_MANAGER, name, type, EVENT_KEY_FORM_ID, eventInfo.formId);
             break;
         case FormEventName::FORM_RENDER_BLOCK:
             HiSysEventWrite(
