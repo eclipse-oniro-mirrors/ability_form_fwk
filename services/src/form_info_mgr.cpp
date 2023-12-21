@@ -102,6 +102,9 @@ ErrCode FormInfoHelper::LoadStageFormConfigInfo(const BundleInfo &bundleInfo, st
                 if (!bundleInfo.applicationInfo.isSystemApp) {
                     formInfo.transparencyEnabled = false;
                 }
+                if (GetFormInfoDisplayName(resourceManager, formInfo) != ERR_OK) {
+                    HILOG_INFO("Get FormInfo DisplayName fail");
+                }
                 if (GetFormInfoDescription(resourceManager, formInfo) != ERR_OK) {
                     HILOG_INFO("Get FormInfo Description fail");
                 }
@@ -159,6 +162,21 @@ std::shared_ptr<Global::Resource::ResourceManager> FormInfoHelper::GetResourceMa
         }
     }
     return resourceManager;
+}
+
+ErrCode FormInfoHelper::GetFormInfoDisplayName(std::shared_ptr<Global::Resource::ResourceManager> &resourceManager,
+    FormInfo &formInfo)
+{
+    if (formInfo.displayNameId != 0) {
+        std::string displayName;
+        auto state = resourceManager->GetStringById(static_cast<uint32_t>(formInfo.displayNameId), displayName);
+        if (state != OHOS::Global::Resource::RState::SUCCESS) {
+            HILOG_ERROR("ResourceManager GetStringById with displayNameId failed");
+            return ERR_APPEXECFWK_FORM_COMMON_CODE;
+        }
+        formInfo.displayName = displayName;
+    }
+    return ERR_OK;
 }
 
 ErrCode FormInfoHelper::GetFormInfoDescription(std::shared_ptr<Global::Resource::ResourceManager> &resourceManager, FormInfo &formInfo)
