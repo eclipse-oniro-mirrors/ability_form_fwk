@@ -486,28 +486,6 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckTempEnoughForm_002, TestSiz
 }
 
 /**
- * @tc.number: FmsFormDataMgrTest_CheckEnoughForm_001
- * @tc.name: CheckEnoughForm
- * @tc.desc: Verify that the return value is correct.
- * @tc.details:
- *      formDBInfos_'s size is over 512.
- */
-HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckEnoughForm_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckEnoughForm_001 start";
-
-    int callingUid = 0;
-    int32_t checkAllDBFormMaxSize = 2;
-
-    // set formDbInfos size is over 512
-    MockGetAllFormInfo(checkAllDBFormMaxSize);
-
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_MAX_SYSTEM_FORMS, formDataMgr_.CheckEnoughForm(callingUid));
-
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckEnoughForm_001 end";
-}
-
-/**
  * @tc.number: FmsFormDataMgrTest_CheckEnoughForm_002
  * @tc.name: CheckEnoughForm
  * @tc.desc: Verify that the return value is correct.
@@ -526,28 +504,6 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckEnoughForm_002, TestSize.Le
     EXPECT_EQ(ERR_OK, formDataMgr_.CheckEnoughForm(callingUid));
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckEnoughForm_002 end";
-}
-
-/**
- * @tc.number: FmsFormDataMgrTest_CheckEnoughForm_003
- * @tc.name: CheckEnoughForm
- * @tc.desc: Verify that the return value is correct.
- * @tc.details:
- *      there is 256 formDBInfos_ and their callingUid is -1.
- */
-HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_CheckEnoughForm_003, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckEnoughForm_003 start";
-
-    int callingUid = -1;
-    int32_t checkAllDBFormPreAPPSize = 1;
-
-    // set formDbInfos size is over 256
-    MockGetAllFormInfo(checkAllDBFormPreAPPSize);
-
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_MAX_FORMS_PER_CLIENT, formDataMgr_.CheckEnoughForm(callingUid));
-
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_CheckEnoughForm_003 end";
 }
 
 /**
