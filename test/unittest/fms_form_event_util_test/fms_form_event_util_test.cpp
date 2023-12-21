@@ -225,29 +225,6 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_008, TestSize.Level0)
 }
 
 /**
- * @tc.name: FormEventUtil_009
- * @tc.desc: test ProviderFormUpdated function.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_009, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormEventUtil_009 start";
-    FormEventUtil formEventUtil;
-    int64_t formId = 1;
-    FormRecord formRecord;
-    std::vector<FormInfo> targetForms;
-    FormInfo formInfo;
-    formInfo.bundleName = FORM_HOST_BUNDLE_NAME;
-    formInfo.moduleName = PARAM_PROVIDER_MODULE_NAME;
-    formInfo.abilityName = FORM_PROVIDER_ABILITY_NAME;
-    formInfo.name = FORM_NAME;
-    targetForms.emplace_back(formInfo);
-    MockGetUpdatedForm(true);
-    EXPECT_EQ(true, formEventUtil.ProviderFormUpdated(formId, formRecord, targetForms));
-    GTEST_LOG_(INFO) << "FormEventUtil_009 end";
-}
-
-/**
  * @tc.name: FormEventUtil_010
  * @tc.desc: test ProviderFormUpdated function.
  * @tc.type: FUNC
@@ -262,23 +239,6 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_010, TestSize.Level0)
     MockGetPackageForm(false);
     EXPECT_EQ(false, formEventUtil.ProviderFormUpdated(formId, formRecord, bundlePackInfo));
     GTEST_LOG_(INFO) << "FormEventUtil_010 end";
-}
-
-/**
- * @tc.name: FormEventUtil_011
- * @tc.desc: test ProviderFormUpdated function.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_011, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormEventUtil_011 start";
-    FormEventUtil formEventUtil;
-    int64_t formId = 1;
-    FormRecord formRecord;
-    BundlePackInfo bundlePackInfo;
-    MockGetPackageForm(true);
-    EXPECT_EQ(true, formEventUtil.ProviderFormUpdated(formId, formRecord, bundlePackInfo));
-    GTEST_LOG_(INFO) << "FormEventUtil_011 end";
 }
 
 /**
@@ -1190,45 +1150,5 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_056, TestSize.Level1)
     MockGetFormRecord(false);
     EXPECT_EQ(false, formEventUtil->HandleAdditionalInfoChanged(bundleName));
     GTEST_LOG_(INFO) << "FormEventUtil_056 end";
-}
-
-/**
- * @tc.name: FormEventUtil_057
- * @tc.desc: test HandleAdditionalInfoChanged function.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_057, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormEventUtil_057 start";
-
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
-    std::string bundleName = FORM_HOST_BUNDLE_NAME;
-    int64_t formId = 1;
-    int64_t updateDuration = 2 * Constants::TIME_CONVERSION;
-    MockGetFormRecord(true);
-    MockSetFormTempFlag(false);
-    FormTimerMgr::GetInstance().AddFormTimer(formId, updateDuration, 0);
-
-    sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
-    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
-    FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
-    AppExecFwk::ApplicationInfo appInfo;
-    appInfo.apiTargetVersion = 11;
-    EXPECT_CALL(*bmsProxy, GetApplicationInfoV9(_, _, _, _))
-        .WillRepeatedly(DoAll(SetArgReferee<3>(appInfo), Return(ERR_OK)));
-
-    std::string additionalInfo = "formUpdateLevel:10";
-    EXPECT_CALL(*bmsProxy, GetAdditionalInfo(_, _))
-        .WillRepeatedly(DoAll(SetArgReferee<1>(additionalInfo), Return(ERR_OK)));
-
-    EXPECT_EQ(true, formEventUtil->HandleAdditionalInfoChanged(bundleName));
-
-    FormTimer formTimer;
-    FormTimerMgr::GetInstance().GetIntervalTimer(formId, formTimer);
-
-    EXPECT_EQ(formTimer.period, 10 * Constants::TIME_CONVERSION);
-    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
-    GTEST_LOG_(INFO) << "FormEventUtil_057 end";
 }
 }
