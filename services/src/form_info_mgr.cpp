@@ -197,7 +197,6 @@ ErrCode BundleFormInfo::InitFromJson(const std::string &formInfoStoragesJson)
 ErrCode BundleFormInfo::UpdateStaticFormInfos(int32_t userId)
 {
     HILOG_INFO("Update static form infos, userId is %{public}d.", userId);
-    std::unique_lock<std::shared_timed_mutex> guard(formInfosMutex_);
     std::vector<FormInfo> formInfos;
     ErrCode errCode = FormInfoHelper::LoadFormConfigInfoByBundleName(bundleName_, formInfos, userId);
     if (errCode != ERR_OK) {
@@ -205,6 +204,7 @@ ErrCode BundleFormInfo::UpdateStaticFormInfos(int32_t userId)
         return errCode;
     }
 
+    std::unique_lock<std::shared_timed_mutex> guard(formInfosMutex_);
     if (!formInfos.empty()) {
         bool findUser = false;
         for (auto item = formInfoStorages_.begin(); item != formInfoStorages_.end(); ++item) {
