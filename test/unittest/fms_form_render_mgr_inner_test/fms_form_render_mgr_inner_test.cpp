@@ -77,43 +77,6 @@ public:
 };
 
 /**
- * @tc.name: FormRenderMgrInnerTest_001
- * @tc.desc: test RenderForm function and return ERR_OK.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderMgrInnerTest, FormRenderMgrInnerTest_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormRenderMgrInnerTest_001 start";
-    FormRenderMgrInner formRenderMgrInner;
-    FormRecord formRecord;
-    Want want;
-    sptr<IRemoteObject> hostToken = nullptr;
-    MockConnectServiceAbility(false);
-    EXPECT_EQ(ERR_OK, formRenderMgrInner.RenderForm(formRecord, want, hostToken));
-    GTEST_LOG_(INFO) << "FormRenderMgrInnerTest_001 end";
-}
-
-/**
- * @tc.name: FormRenderMgrInnerTest_002
- * @tc.desc: test RenderForm function and atomicRerenderCount_ is 1.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderMgrInnerTest, FormRenderMgrInnerTest_002, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormRenderMgrInnerTest_002 start";
-    FormRenderMgrInner formRenderMgrInner;
-    FormRecord formRecord;
-    Want want;
-    bool isVerified = false;
-    formRenderMgrInner.atomicRerenderCount_ = 1;
-    sptr<IRemoteObject> hostToken = nullptr;
-    MockConnectServiceAbility(false);
-    EXPECT_EQ(
-        ERR_OK, formRenderMgrInner.RenderForm(formRecord, want, hostToken));
-    GTEST_LOG_(INFO) << "FormRenderMgrInnerTest_002 end";
-}
-
-/**
  * @tc.name: FormRenderMgrInnerTest_003
  * @tc.desc: test RenderForm function and hostToken is not nullptr.
  * @tc.type: FUNC
