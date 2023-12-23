@@ -790,7 +790,7 @@ void FormMgrAdapter::NotifyWhetherFormsVisible(const std::string &bundleName,
             if (formVisibleType == static_cast<int32_t>(FormVisibilityType::VISIBLE)) {
                 remoteJsFormStateObserver->NotifyWhetherFormsVisible(FormVisibilityType::VISIBLE,
                     bundleName, observer->second);
-            } else if (formVisibleType == static_cast<int32_t>(FormVisibilityType::INVISIBLE)){
+            } else if (formVisibleType == static_cast<int32_t>(FormVisibilityType::INVISIBLE)) {
                 remoteJsFormStateObserver->NotifyWhetherFormsVisible(FormVisibilityType::INVISIBLE,
                     bundleName, observer->second);
             }
