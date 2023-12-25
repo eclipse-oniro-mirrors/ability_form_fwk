@@ -282,7 +282,7 @@ ErrCode FormRenderMgrInner::StopRenderingForm(int64_t formId, const FormRecord &
 
 ErrCode FormRenderMgrInner::StopRenderingFormCallback(int64_t formId, const Want &want)
 {
-    int32_t renderFormConnectionSize = 0;
+    size_t renderFormConnectionSize = 0;
     sptr<FormRenderConnection> stopConnection = nullptr;
     {
         std::lock_guard<std::mutex> lock(resourceMutex_);
@@ -293,7 +293,7 @@ ErrCode FormRenderMgrInner::StopRenderingFormCallback(int64_t formId, const Want
             return ERR_APPEXECFWK_FORM_INVALID_PARAM;
         }
         stopConnection = conIterator->second;
-        renderFormConnectionSize = static_cast<int32_t>(renderFormConnections_.size());
+        renderFormConnectionSize = renderFormConnections_.size();
         for (auto iter = etsHosts_.begin(); iter != etsHosts_.end();) {
             iter->second.erase(formId);
             if (iter->second.empty()) {
@@ -517,7 +517,7 @@ inline void FormRenderMgrInner::AddHostToken(const sptr<IRemoteObject> &host, in
 
 void FormRenderMgrInner::RemoveHostToken(const sptr<IRemoteObject> &host)
 {
-    int32_t left = 0;
+    size_t left = 0;
     std::unordered_map<int64_t, sptr<FormRenderConnection>> connections;
     {
         std::lock_guard<std::mutex> lock(resourceMutex_);
@@ -541,7 +541,7 @@ void FormRenderMgrInner::RemoveHostToken(const sptr<IRemoteObject> &host)
                 }
             }
         }
-        left = static_cast<int32_t>(renderFormConnections_.size());
+        left = renderFormConnections_.size();
     }
     for (auto iter = connections.begin(); iter != connections.end();) {
         DisconnectRenderService(iter->second, connections.size() > left ? connections.size() : left);

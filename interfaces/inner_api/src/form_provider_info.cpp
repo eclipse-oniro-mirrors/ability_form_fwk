@@ -32,7 +32,7 @@ bool FormProviderInfo::ReadFromParcel(Parcel &parcel)
         return false;
     }
     HILOG_DEBUG("proxies number: %{public}d.", number);
-    for (auto i = 0; i < number; i++) {
+    for (int32_t i = 0; i < number; i++) {
         FormDataProxy formDataProxy("", "");
         formDataProxy.key = Str16ToStr8(parcel.ReadString16());
         formDataProxy.subscribeId = Str16ToStr8(parcel.ReadString16());
