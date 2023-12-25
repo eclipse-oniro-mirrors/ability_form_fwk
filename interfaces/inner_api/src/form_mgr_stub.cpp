@@ -1290,7 +1290,7 @@ bool FormMgrStub::ReadFormDataProxies(MessageParcel &data, std::vector<FormDataP
         return false;
     }
 
-    for (auto i = 0; i < number; i++) {
+    for (int32_t i = 0; i < number; i++) {
         FormDataProxy formDataProxy("", "");
         formDataProxy.key = Str16ToStr8(data.ReadString16());
         formDataProxy.subscribeId = Str16ToStr8(data.ReadString16());
