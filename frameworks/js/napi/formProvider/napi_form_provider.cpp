@@ -161,37 +161,8 @@ static ErrCode RequestPublishFormParse(napi_env env, napi_value *argv,
     return ERR_OK;
 }
 
-static napi_value RequestPublishFormCallback(napi_env env, napi_value *argv, bool withFormBindingData)
+static void FormCallbackCreateAsyncWork(napi_env env, AsyncRequestPublishFormCallbackInfo *asyncCallbackInfo)
 {
-    HILOG_INFO("%{public}s, asyncCallback.", __func__);
-
-    int32_t callbackIdx = 1;
-    if (withFormBindingData) {
-        callbackIdx++;
-    }
-    napi_valuetype valueType = napi_undefined;
-    NAPI_CALL(env, napi_typeof(env, argv[callbackIdx], &valueType));
-    if (valueType != napi_function) {
-        HILOG_ERROR("The arguments[1] type of requestPublishForm is incorrect, expected type is function.");
-        return nullptr;
-    }
-
-    auto *asyncCallbackInfo = new (std::nothrow) AsyncRequestPublishFormCallbackInfo {
-        .env = env,
-        .withFormBindingData = withFormBindingData,
-    };
-    if (asyncCallbackInfo == nullptr) {
-        HILOG_ERROR("asyncCallbackInfo == nullptr");
-        return nullptr;
-    }
-
-    ErrCode errCode = RequestPublishFormParse(env, argv, asyncCallbackInfo);
-    if (errCode != ERR_OK) {
-        delete asyncCallbackInfo;
-        return RetErrMsg(InitErrMsg(env, errCode, CALLBACK_FLG, argv[callbackIdx]));
-    }
-    napi_create_reference(env, argv[callbackIdx], REF_COUNT, &asyncCallbackInfo->callback);
-
     napi_value resourceName;
     napi_create_string_latin1(env, __func__, NAPI_AUTO_LENGTH, &resourceName);
     napi_create_async_work(
@@ -229,20 +200,25 @@ static napi_value RequestPublishFormCallback(napi_env env, napi_value *argv, boo
         },
         (void *) asyncCallbackInfo,
         &asyncCallbackInfo->asyncWork);
-    NAPI_CALL(env, napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default));
-    return NapiGetResult(env, 1);
 }
 
-static napi_value RequestPublishFormPromise(napi_env env, napi_value *argv, bool withFormBindingData)
+static napi_value RequestPublishFormCallback(napi_env env, napi_value *argv, bool withFormBindingData)
 {
-    HILOG_INFO("%{public}s, promise.", __func__);
-    napi_deferred deferred;
-    napi_value promise;
-    NAPI_CALL(env, napi_create_promise(env, &deferred, &promise));
+    HILOG_INFO("%{public}s, asyncCallback.", __func__);
+
+    int32_t callbackIdx = 1;
+    if (withFormBindingData) {
+        callbackIdx++;
+    }
+    napi_valuetype valueType = napi_undefined;
+    NAPI_CALL(env, napi_typeof(env, argv[callbackIdx], &valueType));
+    if (valueType != napi_function) {
+        HILOG_ERROR("The arguments[1] type of requestPublishForm is incorrect, expected type is function.");
+        return nullptr;
+    }
 
     auto *asyncCallbackInfo = new (std::nothrow) AsyncRequestPublishFormCallbackInfo {
         .env = env,
-        .deferred = deferred,
         .withFormBindingData = withFormBindingData,
     };
     if (asyncCallbackInfo == nullptr) {
@@ -253,9 +229,17 @@ static napi_value RequestPublishFormPromise(napi_env env, napi_value *argv, bool
     ErrCode errCode = RequestPublishFormParse(env, argv, asyncCallbackInfo);
     if (errCode != ERR_OK) {
         delete asyncCallbackInfo;
-        return RetErrMsg(InitErrMsg(env, errCode, PROMISE_FLG, nullptr));
+        return RetErrMsg(InitErrMsg(env, errCode, CALLBACK_FLG, argv[callbackIdx]));
     }
+    napi_create_reference(env, argv[callbackIdx], REF_COUNT, &asyncCallbackInfo->callback);
 
+    FormCallbackCreateAsyncWork(env, asyncCallbackInfo);
+    NAPI_CALL(env, napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default));
+    return NapiGetResult(env, 1);
+}
+
+static void FormPromiseCreateAsyncWork(napi_env env, AsyncRequestPublishFormCallbackInfo *asyncCallbackInfo)
+{
     napi_value resourceName;
     napi_create_string_latin1(env, __func__, NAPI_AUTO_LENGTH, &resourceName);
     napi_create_async_work(
@@ -288,6 +272,32 @@ static napi_value RequestPublishFormPromise(napi_env env, napi_value *argv, bool
         },
         (void *) asyncCallbackInfo,
         &asyncCallbackInfo->asyncWork);
+}
+
+static napi_value RequestPublishFormPromise(napi_env env, napi_value *argv, bool withFormBindingData)
+{
+    HILOG_INFO("%{public}s, promise.", __func__);
+    napi_deferred deferred;
+    napi_value promise;
+    NAPI_CALL(env, napi_create_promise(env, &deferred, &promise));
+
+    auto *asyncCallbackInfo = new (std::nothrow) AsyncRequestPublishFormCallbackInfo {
+        .env = env,
+        .deferred = deferred,
+        .withFormBindingData = withFormBindingData,
+    };
+    if (asyncCallbackInfo == nullptr) {
+        HILOG_ERROR("asyncCallbackInfo == nullptr");
+        return nullptr;
+    }
+
+    ErrCode errCode = RequestPublishFormParse(env, argv, asyncCallbackInfo);
+    if (errCode != ERR_OK) {
+        delete asyncCallbackInfo;
+        return RetErrMsg(InitErrMsg(env, errCode, PROMISE_FLG, nullptr));
+    }
+    
+    FormPromiseCreateAsyncWork(env, asyncCallbackInfo);
     napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
     return promise;
 }
@@ -329,6 +339,29 @@ napi_value NAPI_RequestPublishForm(napi_env env, napi_callback_info info)
             // promise, with form binding data
             return RequestPublishFormPromise(env, argv, true);
         }
+    }
+}
+
+static void CheckFormArgv(napi_env env, size_t argc, napi_value* argv, int32_t *errCode, int64_t *formId)
+{
+    HILOG_INFO("%{public}s, asyncCallback.", __func__);
+
+    napi_valuetype paramZeroType = napi_undefined;
+    napi_typeof(env, argv[PARAM0], &paramZeroType);
+    if (paramZeroType != napi_string) {
+        HILOG_ERROR("formId is not napi_string.");
+        *errCode = ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+    }
+
+    std::string strFormId;
+    bool confirm = ConvertFromJsValue(env, argv[PARAM0], strFormId);
+    if (!confirm) {
+        HILOG_ERROR("ConvertFromJsValue failed.");
+        *errCode = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR;
+    }
+    if (!ConvertStringToInt64(strFormId, *formId)) {
+        HILOG_ERROR("convert form string failed.");
+        *errCode = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR;
     }
 }
 
@@ -395,30 +428,16 @@ napi_value JsFormProvider::SetFormNextRefreshTime(napi_env env, napi_callback_in
 napi_value JsFormProvider::OnSetFormNextRefreshTime(napi_env env, size_t argc, napi_value* argv)
 {
     HILOG_DEBUG("%{public}s is called", __FUNCTION__);
-    int32_t errCode = ERR_OK;
     if (argc < ARGS_SIZE_TWO || argc > ARGS_SIZE_THREE) {
-        HILOG_ERROR("wrong number of parameter.");
+        HILOG_ERROR("wrong number of arguments.");
         napi_value jsNull = nullptr;
         NAPI_CALL(env, napi_get_null(env, &jsNull));
         return jsNull;
     }
-    napi_valuetype paramZeroType = napi_undefined;
-    napi_typeof(env, argv[PARAM0], &paramZeroType);
-    if (paramZeroType != napi_string) {
-        HILOG_ERROR("formId is not napi_string.");
-        errCode = ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
-    }
+    int32_t errCode = ERR_OK;
     int64_t formId = 0;
-    std::string strFormId;
-    bool confirm = ConvertFromJsValue(env, argv[PARAM0], strFormId);
-    if (!confirm) {
-        HILOG_ERROR("ConvertFromJsValue error.");
-        errCode = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR;
-    }
-    if (!ConvertStringToInt64(strFormId, formId)) {
-        HILOG_ERROR("convert form string error.");
-        errCode = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR;
-    }
+    CheckFormArgv(env, argc, argv, &errCode, &formId);
+
     napi_valuetype paramOneType = napi_undefined;
     napi_typeof(env, argv[PARAM1], &paramOneType);
     if (paramOneType != napi_number) {
@@ -460,30 +479,16 @@ napi_value JsFormProvider::UpdateForm(napi_env env, napi_callback_info info)
 napi_value JsFormProvider::OnUpdateForm(napi_env env, size_t argc, napi_value* argv)
 {
     HILOG_DEBUG("%{public}s is called", __FUNCTION__);
-    int32_t errCode = ERR_OK;
     if (argc < ARGS_SIZE_TWO || argc > ARGS_SIZE_THREE) {
         HILOG_ERROR("wrong number of arguments.");
         napi_value jsNull = nullptr;
         NAPI_CALL(env, napi_get_null(env, &jsNull));
         return jsNull;
     }
-    napi_valuetype paramZeroType = napi_undefined;
-    napi_typeof(env, argv[PARAM0], &paramZeroType);
-    if (paramZeroType != napi_string) {
-        HILOG_ERROR("formId is not napi_string.");
-        errCode = ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
-    }
+    int32_t errCode = ERR_OK;
     int64_t formId = 0;
-    std::string strFormId;
-    bool confirm = ConvertFromJsValue(env, argv[PARAM0], strFormId);
-    if (!confirm) {
-        HILOG_ERROR("ConvertFromJsValue failed.");
-        errCode = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR;
-    }
-    if (!ConvertStringToInt64(strFormId, formId)) {
-        HILOG_ERROR("convert form string failed.");
-        errCode = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR;
-    }
+    CheckFormArgv(env, argc, argv, &errCode, &formId);
+
     napi_valuetype paramOneType = napi_undefined;
     napi_typeof(env, argv[PARAM1], &paramOneType);
     if (paramOneType != napi_object) {
