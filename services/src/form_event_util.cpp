@@ -43,16 +43,14 @@ void FormEventUtil::HandleBundleFormInfoChanged(const std::string &bundleName, i
 
 void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const int userId)
 {
-    HILOG_INFO("%{public}s, bundleName:%{public}s, userId:%{public}d.", __func__, bundleName.c_str(), userId);
+    HILOG_INFO("bundleName:%{public}s, userId:%{public}d.", bundleName.c_str(), userId);
     std::vector<FormRecord> formInfos;
     if (!FormDataMgr::GetInstance().GetFormRecord(bundleName, formInfos)) {
-        HILOG_INFO("%{public}s, no form info.", __func__);
         return;
     }
 
     std::vector<FormInfo> targetForms;
     if (FormInfoMgr::GetInstance().GetFormsInfoByBundle(bundleName, targetForms, userId) != ERR_OK) {
-        HILOG_ERROR("%{public}s error, failed to get forms info.", __func__);
         return;
     }
 
@@ -72,12 +70,12 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
             continue;
         }
 
-        HILOG_INFO("%{public}s, no such form anymore, delete it:%{public}s", __func__, formRecord.formName.c_str());
         if (formRecord.formTempFlag) {
             FormDataMgr::GetInstance().DeleteTempForm(formId);
         } else {
             FormDbCache::GetInstance().DeleteFormInfo(formId);
         }
+        HILOG_INFO("form %{public}s deleted", formRecord.formName.c_str());
         removedForms.emplace_back(formId);
         FormDataMgr::GetInstance().DeleteFormRecord(formId);
         FormRenderMgr::GetInstance().StopRenderingForm(formId, formRecord);
@@ -85,13 +83,13 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
     }
 
     if (!removedForms.empty()) {
-        HILOG_INFO("%{public}s, clean removed forms and timer", __func__);
+        HILOG_INFO("clean removed forms and timer");
         FormDataMgr::GetInstance().CleanHostRemovedForms(removedForms);
         for (const int64_t id : removedForms) {
             FormTimerMgr::GetInstance().RemoveFormTimer(id);
         }
     }
-    HILOG_INFO("%{public}s, refresh form", __func__);
+
     Want want;
     want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
     for (const auto &updatedForm : updatedForms) {

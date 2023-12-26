@@ -74,6 +74,19 @@ struct AsyncErrMsgCallbackInfo {
     int type;
 };
 
+struct NapiParamPackage {
+    napi_env env;
+    size_t argc;
+    napi_value* argv;
+
+    NapiParamPackage(napi_env env, size_t argc, napi_value* argv)
+    {
+        this->env = env;
+        this->argc = argc;
+        this->argv = argv;
+    }
+};
+
 class NapiFormUtil {
 public:
     static bool Throw(napi_env env, int32_t errCode, const std::string &errMessage);

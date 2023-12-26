@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1680,7 +1680,7 @@ napi_value NapiFormHost::OnDeleteInvalidForms(napi_env env, size_t argc, napi_va
 
 napi_value NapiFormHost::OnNotifyVisibleForms(napi_env env, size_t argc, napi_value* argv)
 {
-    HILOG_DEBUG("%{public}s is called", __FUNCTION__);
+    HILOG_DEBUG("called");
 
     int32_t errCode = ERR_OK;
     std::vector<int64_t> iFormIds;
@@ -1731,17 +1731,16 @@ napi_value NapiFormHost::OnNotifyVisibleForms(napi_env env, size_t argc, napi_va
     return result;
 }
 
-napi_value NapiFormHost::OnNotifyInVisibleForms(napi_env env, size_t argc, napi_value* argv)
+int32_t NapiFormHost::OnNotifyInVisibleFormsParseParam(napi_env env, size_t argc, napi_value* argv,
+    std::vector<int64_t> &formIds)
 {
-    HILOG_DEBUG("%{public}s is called", __FUNCTION__);
-
-    int32_t errCode = ERR_OK;
-    std::vector<int64_t> iFormIds;
     if (argc > ARGS_TWO || argc < ARGS_ONE) {
-        HILOG_ERROR("wrong number of arguments!");
-        return CreateJsUndefined(env);
+        HILOG_ERROR("wrong number of arguments. argc is %{public}d", argc);
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
+
     bool isArray = false;
+    int32_t errCode = ERR_OK;
     napi_is_array(env, argv[PARAM0], &isArray);
     if (!isArray) {
         HILOG_ERROR("input params is not array!");
@@ -1763,11 +1762,26 @@ napi_value NapiFormHost::OnNotifyInVisibleForms(napi_env env, size_t argc, napi_
                 HILOG_ERROR("transform  int failed!");
                 errCode = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR;
             } else {
-                iFormIds.push_back(formIdValue);
+                formIds.push_back(formIdValue);
             }
         }
     }
-    auto complete = [formIds = iFormIds, errCode](napi_env env, NapiAsyncTask &task, int32_t status) {
+    return errCode;
+}
+
+napi_value NapiFormHost::OnNotifyInVisibleForms(napi_env env, size_t argc, napi_value* argv)
+{
+    HILOG_DEBUG("called");
+
+    int32_t errCode;
+    std::vector<int64_t> formIds;
+
+    errCode = OnNotifyInVisibleFormsParseParam(env, argc, argv, formIds);
+    if (errCode == ERR_APPEXECFWK_FORM_INVALID_PARAM) {
+        return CreateJsUndefined(env);
+    }
+
+    auto complete = [formIds = formIds, errCode](napi_env env, NapiAsyncTask &task, int32_t status) {
         if (errCode != ERR_OK) {
             auto code = QueryRetCode(errCode);
             task.Reject(env, CreateJsError(env, code, QueryRetMsg(code)));

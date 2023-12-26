@@ -17,6 +17,7 @@
 #define OHOS_FORM_FWK_JS_FORM_PROVIDER_H
 
 #include "ability.h"
+#include "form_info_filter.h"
 #include "form_provider_info.h"
 #include "napi_form_util.h"
 #include "napi/native_api.h"
@@ -75,6 +76,10 @@ private:
     bool ConvertFromDataProxies(napi_env env, napi_value jsValue,
         std::vector<AppExecFwk::FormDataProxy> &formDataProxies);
     bool ConvertFormDataProxy(napi_env env, napi_value jsValue, AppExecFwk::FormDataProxy &formDataProxy);
+
+    napi_value OnGetFormsInfoParseParam(NapiParamPackage &napiParam,
+        size_t &convertArgc, bool &isPromise, AppExecFwk::FormInfoFilter &formInfoFilter);
+    napi_value OnUpdateFormParseParam(napi_env env, size_t argc, napi_value* argv, int64_t &formId);
 };
 }  // namespace AbilityRuntime
 }  // namespace OHOS
