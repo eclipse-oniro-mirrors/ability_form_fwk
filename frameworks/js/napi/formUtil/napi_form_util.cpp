@@ -590,6 +590,7 @@ napi_value CreateFormInfo(napi_env env, const FormInfo &formInfo)
     napi_set_named_property(env, objContext, "moduleName", CreateJsValue(env, formInfo.moduleName));
     napi_set_named_property(env, objContext, "abilityName", CreateJsValue(env, formInfo.abilityName));
     napi_set_named_property(env, objContext, "name", CreateJsValue(env, formInfo.name));
+    napi_set_named_property(env, objContext, "displayName", CreateJsValue(env, formInfo.displayName));
     napi_set_named_property(env, objContext, "description", CreateJsValue(env, formInfo.description));
     napi_set_named_property(env, objContext, "descriptionId", CreateJsValue(env, formInfo.descriptionId));
     napi_set_named_property(env, objContext, "type", CreateJsValue(env, GetFormType(formInfo)));
