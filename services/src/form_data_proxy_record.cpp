@@ -102,6 +102,8 @@ void FormDataProxyRecord::GetSubscribeFormDataProxies(const FormDataProxy formDa
                 unSubscribeFormDataProxies.emplace_back(formDataProxy);
             }
         }
+    } else {
+        subscribeFormDataProxies.emplace_back(formDataProxy);
     }
 }
 
