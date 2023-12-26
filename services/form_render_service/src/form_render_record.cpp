@@ -353,7 +353,6 @@ bool FormRenderRecord::IsEmpty()
         std::lock_guard<std::mutex> lock(formRequestsMutex_);
         formRequestsEmpty = formRequests_.empty();
     }
-
     return rendererEmpty && formRequestsEmpty;
 }
 
@@ -683,6 +682,11 @@ void FormRenderRecord::DeleteFormRequest(int64_t formId, const std::string &comp
     std::lock_guard<std::mutex> lock(formRequestsMutex_);
     auto iter = formRequests_.find(formId);
     if (iter == formRequests_.end()) {
+        return;
+    }
+
+    if (compId.empty()) {
+        formRequests_.erase(iter);
         return;
     }
 
