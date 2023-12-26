@@ -20,6 +20,7 @@
 #include "form_mgr_stub.h"
 #include "form_instance.h"
 #include "form_instances_filter.h"
+#include "message_parcel.h"
 namespace OHOS {
 namespace AppExecFwk {
 class MockFormMgrService : public FormMgrStub {
@@ -89,6 +90,7 @@ public:
     MOCK_METHOD5(RequestPublishProxyForm, ErrCode(Want &want, bool withFormBindingData,
         std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
         const std::vector<FormDataProxy> &formDataProxies));
+    MOCK_METHOD3(GetFormInstanceById, int32_t(int64_t formId, bool isUnusedIncluded, FormInstance &formInstances));
 };
 }
 }

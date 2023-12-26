@@ -20,6 +20,7 @@
 
 #include "appexecfwk_errors.h"
 #define private public
+#include "form_db_cache.h"
 #include "form_data_mgr.h"
 #undef private
 #include "form_constants.h"
@@ -29,6 +30,7 @@
 #include "fms_log_wrapper.h"
 #include "ipc_skeleton.h"
 #include "mock_form_host_client.h"
+#include "running_form_info.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -37,6 +39,10 @@ static const std::string FORM_HOST_BUNDLE_NAME = "com.form.provider.service";
 static const std::string FORM_PROVIDER_ABILITY_NAME = "com.form.provider.app.test.ability";
 static const std::string PARAM_PROVIDER_MODULE_NAME = "com.form.provider.app.test.ability";
 static const std::string FORM_NAME = "formName";
+const std::string FORM_BUNDLE_NAME = "formBundleName";
+const int64_t FORM_ID_ONE = 1;
+const int64_t FORM_ID_ZERO = 0;
+const int64_t FORM_USER_UIDS_ZERO = 0;
 
 extern void MockGetBundleNameByUid(ErrCode mockRet);
 extern void MockGetAllFormInfo(int32_t mockRet);
@@ -75,6 +81,9 @@ void FmsFormDataMgrTest::TearDown(void)
     if (!formDataMgr_.tempForms_.empty()) {
         formDataMgr_.tempForms_.erase(formDataMgr_.tempForms_.begin(), formDataMgr_.tempForms_.end());
     }
+    if (!FormDbCache::GetInstance().formDBInfos_.empty()) {
+        FormDbCache::GetInstance().formDBInfos_.clear();
+    }    
     formDataMgr_.udidHash_ = 0;
 }
 
@@ -2483,5 +2492,189 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetConfigParamFormMap_003, TestS
     formDataMgr_.GetConfigParamFormMap(key, value2);
     EXPECT_EQ(value1, 3);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetConfigParamFormMap_003 end";
+}
+
+/**
+ * @tc.name: FmsFormDataMgrTest_GetUnusedFormInstancesByFilter_0100
+ * @tc.desc: Test GetUnusedFormInstancesByFilter by the size of formInstances.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInstancesByFilter_0100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInstancesByFilter_0100 start";
+    FormDBInfo formDbInfo;
+    formDbInfo.formId = FORM_ID_ONE;
+    formDbInfo.formUserUids.emplace_back(0);
+    formDbInfo.bundleName = FORM_HOST_BUNDLE_NAME;
+    FormDbCache::GetInstance().formDBInfos_.emplace_back(formDbInfo);
+    MockGetBundleNameByUid(ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
+    MockGetAllFormInfo(0);
+    FormInstancesFilter formInstancesFilter;
+    formInstancesFilter.bundleName = FORM_HOST_BUNDLE_NAME;
+    std::vector<FormInstance> formInstances;
+    formDataMgr_.GetUnusedFormInstancesByFilter(formInstancesFilter, formInstances);
+    EXPECT_EQ(0, formInstances.size());
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInstancesByFilter_0100 end";
+}
+
+/**
+ * @tc.name: FmsFormDataMgrTest_GetFormInstancesByFilter_0100
+ * @tc.desc: Test GetFormInstancesByFilter by bundleName of formInstancesFilter empty.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormInstancesByFilter_0100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstancesByFilter_0100 start";
+    FormInstancesFilter formInstancesFilter;
+    formInstancesFilter.bundleName = "";
+    std::vector<FormInstance> formInstances;
+    auto res = formDataMgr_.GetFormInstancesByFilter(formInstancesFilter, formInstances);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, res);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstancesByFilter_0100 end";
+}
+
+/**
+ * @tc.name: FmsFormDataMgrTest_GetFormInstancesByFilter_0200
+ * @tc.desc: Test GetFormInstancesByFilter by the size of formInstances.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormInstancesByFilter_0200, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstancesByFilter_0200 start";
+    FormRecord formRecord;
+    formRecord.bundleName = FORM_HOST_BUNDLE_NAME;
+    formRecord.formId = FORM_ID_ONE;
+    formDataMgr_.formRecords_.emplace(1, formRecord);
+    FormHostRecord formHostRecord;
+    formHostRecord.AddForm(1);
+    formDataMgr_.clientRecords_.push_back(formHostRecord);
+    FormInstancesFilter formInstancesFilter;
+    formInstancesFilter.bundleName = FORM_HOST_BUNDLE_NAME;
+    formInstancesFilter.isUnusedIncluded = false;
+    std::vector<FormInstance> formInstances;
+    auto res = formDataMgr_.GetFormInstancesByFilter(formInstancesFilter, formInstances);
+    EXPECT_NE(0, formInstances.size());
+    EXPECT_EQ(ERR_OK, res);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstancesByFilter_0200 end";
+}
+
+/**
+ * @tc.name: FmsFormDataMgrTest_GetFormInstancesByFilter_0300
+ * @tc.desc: Test GetFormInstancesByFilter by the size of formInstances.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormInstancesByFilter_0300, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstancesByFilter_0300 start";
+    FormRecord formRecord;
+    formRecord.bundleName = FORM_BUNDLE_NAME;
+    formRecord.moduleName = PARAM_PROVIDER_MODULE_NAME;
+    formDataMgr_.formRecords_.clear();
+    formDataMgr_.formRecords_.emplace(FORM_ID_ONE, formRecord);
+    FormInstancesFilter formInstancesFilter;
+    formInstancesFilter.bundleName = FORM_HOST_BUNDLE_NAME;
+    formInstancesFilter.isUnusedIncluded = false;
+    formInstancesFilter.moduleName = PARAM_PROVIDER_MODULE_NAME;
+    std::vector<FormInstance> formInstances;
+    auto res = formDataMgr_.GetFormInstancesByFilter(formInstancesFilter, formInstances);
+    EXPECT_EQ(0, formInstances.size());
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, res);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstancesByFilter_0300 end";
+}
+
+/**
+ * @tc.name: FmsFormDataMgrTest_GetFormInstanceById_0100
+ * @tc.desc: Test GetFormInstancesByFilter by the price of formId.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormInstanceById_0100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstanceById_0100 start";
+    int64_t formId = FORM_ID_ZERO;
+    bool isUnusedInclude = false;
+    FormInstance formInstance;
+    auto ret = formDataMgr_.GetFormInstanceById(formId, isUnusedInclude, formInstance);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, ret);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstanceById_0100 end";
+}
+
+/**
+ * @tc.name: FmsFormDataMgrTest_GetFormInstanceById_0200
+ * @tc.desc: Test GetFormInstancesByFilter by the price of formUsageState.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormInstanceById_0200, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstanceById_0200 start";
+    int64_t formId = FORM_ID_ONE;
+    FormRecord formRecord;
+    formDataMgr_.formRecords_.emplace(formId, formRecord);
+    FormHostRecord formHostRecord;
+    formHostRecord.AddForm(formId);
+    formDataMgr_.clientRecords_.push_back(formHostRecord);
+    bool isUnusedInclude = false;
+    FormInstance formInstance;
+    auto res = formDataMgr_.GetFormInstanceById(formId, isUnusedInclude, formInstance);
+    EXPECT_EQ(FormUsageState::USED, formInstance.formUsageState);
+    EXPECT_EQ(ERR_OK, res);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstanceById_0200 end";
+}
+
+/**
+ * @tc.name: FmsFormDataMgrTest_GetFormInstanceById_0300
+ * @tc.desc: Verify that the return value when all condition inconformity.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormInstanceById_0300, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstanceById_0300 start";
+    formDataMgr_.formRecords_.clear();
+    int64_t formId = FORM_ID_ONE;
+    bool isUnusedInclude = false;
+    FormInstance formInstance;
+    auto res = formDataMgr_.GetFormInstanceById(formId, isUnusedInclude, formInstance);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, res);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstanceById_0300 end";
+}
+
+/**
+ * @tc.name: FmsFormDataMgrTest_GetFormInstanceById_0400
+ * @tc.desc: Verify that the return value when formUserUids is empty and isUnusedIncluded is ture.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormInstanceById_0400, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstanceById_0400 start";
+    formDataMgr_.clientRecords_.clear();
+    EXPECT_EQ(0, FormDbCache::GetInstance().formDBInfos_.size());
+    FormDBInfo formDbInfo;
+    formDbInfo.formId = FORM_ID_ONE;
+    FormDbCache::GetInstance().formDBInfos_.emplace_back(formDbInfo);
+    int64_t formId = FORM_ID_ONE;
+    bool isUnusedInclude = true;
+    FormInstance formInstance;
+    auto res = formDataMgr_.GetFormInstanceById(formId, isUnusedInclude, formInstance);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, res);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstanceById_0400 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetUnusedFormInfos_0100
+ * @tc.desc: Verify that the runningFormInfos size.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos_0100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos_0100 start";
+    FormDBInfo formDbInfo;
+    formDbInfo.formId = 1;
+    formDbInfo.formUserUids.emplace_back(FORM_USER_UIDS_ZERO);
+    FormDbCache::GetInstance().formDBInfos_.emplace_back(formDbInfo);
+    MockGetBundleNameByUid(ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
+    MockGetAllFormInfo(0);
+    std::vector<RunningFormInfo> runningFormInfos;
+    formDataMgr_.GetUnusedFormInfos(runningFormInfos);
+    EXPECT_EQ(0, runningFormInfos.size());
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos_0100 end";
 }
 }

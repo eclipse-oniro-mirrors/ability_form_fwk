@@ -54,6 +54,8 @@ void FormDbCache::GetAllFormInfo(std::vector<FormDBInfo> &formDBInfos)
             formDBInfo.providerUserId = FormUtil::GetCurrentAccountId();
             formDBInfos.emplace_back(formDBInfo);
         }
+    } else {
+         formDBInfos = formDBInfos_;
     }
 }
 } // namespace AppExecFwk

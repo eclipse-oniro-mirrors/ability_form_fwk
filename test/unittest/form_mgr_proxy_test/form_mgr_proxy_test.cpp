@@ -22,6 +22,7 @@
 #include "mock_form_token.h"
 #include "form_provider_proxy.h"
 #include "form_mgr_errors.h"
+#include "form_mgr_proxy.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -704,5 +705,20 @@ HWTEST_F(FormMgrProxyTest, FormProviderProxyTest_0020, TestSize.Level1) {
     int result = formProviderProxy ->AcquireFormData(formId, nullptr, requestCode);
     EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
     GTEST_LOG_(INFO) << "FormProviderProxyTest_0020 test ends";
+}
+
+/**
+ * @tc.name: GetFormInstanceById_0100
+ * @tc.desc: text the return of GetFormInstanceById.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrProxyTest, GetFormInstanceById_0100, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "GetFormInstanceById_0100 starts";
+    int64_t formId = 2;
+    bool isUnusedIncluded = false;    
+    FormInstance formInstance;
+    auto result = formMgrProxy ->GetFormInstanceById(formId, isUnusedIncluded, formInstance);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "GetFormInstanceById_0100 test ends";
 }
 }
