@@ -16,7 +16,7 @@
 #ifndef OHOS_FORM_FWK_FORM_TRUST_MGR_H
 #define OHOS_FORM_FWK_FORM_TRUST_MGR_H
 
-#include <set>
+#include <map>
 #include <singleton.h>
 #include <string>
 
@@ -35,11 +35,6 @@ public:
     DISALLOW_COPY_AND_MOVE(FormTrustMgr);
 
     /**
-     * @brief Start.
-     */
-    void Start();
-
-    /**
      * @brief IsTrust or not.
      * @param bundleName Storage all form info.
      * @return Returns result.
@@ -56,7 +51,7 @@ public:
 
 private:
     std::shared_ptr<FormRdbDataMgr> rdbDataManager_;
-    std::set<std::string> unTrustList_;
+    std::map<std::string, int32_t> unTrustList_;
     mutable std::mutex rdbStoreMutex_;
 };
 }  // namespace AppExecFwk

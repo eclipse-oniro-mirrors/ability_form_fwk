@@ -457,6 +457,12 @@ int32_t JsFormStateObserver::NotifyWhetherFormsVisible(const AppExecFwk::FormVis
                 HILOG_ERROR("sharedThis is nullptr.");
                 return;
             }
+            napi_handle_scope scope = nullptr;
+            napi_open_handle_scope(sharedThis->env_, &scope);
+            if (scope == nullptr) {
+                HILOG_ERROR("scope is nullptr.");
+                return;
+            }
             if (visibleType == AppExecFwk::FormVisibilityType::VISIBLE) {
                 isVisibleTypeFlag = true;
                 if (bundleName.find((specialFlag + std::to_string(isVisibleTypeFlag))) != std::string::npos) {
@@ -464,10 +470,9 @@ int32_t JsFormStateObserver::NotifyWhetherFormsVisible(const AppExecFwk::FormVis
                         std::regex_replace(bundleName, std::regex(specialFlag + std::to_string(isVisibleTypeFlag)), "");
                     auto visibleCallback = sharedThis->formVisibleCallbackMap_.find(bundleNameNew);
                     if (visibleCallback != sharedThis->formVisibleCallbackMap_.end()) {
-                        napi_value value = visibleCallback->second->GetNapiValue();
+                        napi_value res = visibleCallback->second->GetNapiValue();
                         napi_value argv[] = { CreateFormInstances(sharedThis->env_, formInstances) };
-                        napi_call_function(sharedThis->env_,
-                            value, value, sizeof(argv) / sizeof(argv[0]), argv, nullptr);
+                        napi_call_function(sharedThis->env_, res, res, sizeof(argv) / sizeof(argv[0]), argv, nullptr);
                     }
                 }
             } else {
@@ -477,16 +482,242 @@ int32_t JsFormStateObserver::NotifyWhetherFormsVisible(const AppExecFwk::FormVis
                         std::regex_replace(bundleName, std::regex(specialFlag + std::to_string(isVisibleTypeFlag)), "");
                     auto invisibleCallback = sharedThis->formInvisibleCallbackMap_.find(bundleNameNew);
                     if (invisibleCallback != sharedThis->formInvisibleCallbackMap_.end()) {
-                        napi_value value = invisibleCallback->second->GetNapiValue();
+                        napi_value res = invisibleCallback->second->GetNapiValue();
                         napi_value argv[] = { CreateFormInstances(sharedThis->env_, formInstances) };
-                        napi_call_function(sharedThis->env_,
-                            value, value, sizeof(argv) / sizeof(argv[0]), argv, nullptr);
+                        napi_call_function(sharedThis->env_, res, res, sizeof(argv) / sizeof(argv[0]), argv, nullptr);
                     }
                 }
             }
+            napi_close_handle_scope(sharedThis->env_, scope);
         });
     }
     return ERR_OK;
+}
+
+ErrCode JsFormStateObserver::OnFormClickEvent(
+    const std::string &bundleName, const std::string &callType, const AppExecFwk::RunningFormInfo &runningFormInfo)
+{
+    HILOG_INFO("Called.");
+    if (callType.empty()) {
+        HILOG_ERROR("Calltype is empty.");
+        return ERR_INVALID_VALUE;
+    }
+    if (handler_ == nullptr) {
+        handler_ = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
+        if (handler_ == nullptr) {
+            HILOG_ERROR("Handler is nullptr.");
+            return ERR_INVALID_VALUE;
+        }
+    }
+
+    wptr<JsFormStateObserver> weakObserver = this;
+    auto notify = [bundleName, callType, runningFormInfo, weakObserver]() {
+        auto self = weakObserver.promote();
+        if (self == nullptr) {
+            HILOG_ERROR("Self is nullptr.");
+            return;
+        }
+        std::unique_lock<std::mutex> lock(self->formEventMapMutex_);
+        auto formEventCallbackListIter = self->formEventMap_.find(bundleName);
+        if (formEventCallbackListIter != self->formEventMap_.end()) {
+            auto &callbackListVec = formEventCallbackListIter->second;
+            auto callBackListIter = std::find_if(callbackListVec.begin(), callbackListVec.end(),
+            [bundleName, callType](auto &iter) {
+                return iter != nullptr &&
+                       iter->BindFormEventType() == callType &&
+                       iter->BindHostBundleName() == bundleName;
+            });
+            if (callBackListIter != callbackListVec.end() && (*callBackListIter) != nullptr) {
+                (*callBackListIter)->HandleFormEvent(runningFormInfo);
+            }
+        }
+    };
+
+    handler_->PostSyncTask(notify);
+    return ERR_OK;
+}
+
+ErrCode JsFormStateObserver::RegisterClickEventCallback(
+    const napi_env env, const std::string &bundleName, const napi_value callback, const std::string &type)
+{
+    HILOG_DEBUG("Called.");
+    auto record = std::make_shared<FormEventCallbackList>(bundleName, type, env);
+    if (record == nullptr) {
+        HILOG_ERROR("New obj error");
+        return ERR_INVALID_VALUE;
+    }
+    record->PushCallback(callback);
+
+    std::unique_lock<std::mutex> lock(formEventMapMutex_);
+
+    auto formEventCallbackListIter = formEventMap_.find(bundleName);
+    if (formEventCallbackListIter == formEventMap_.end()) {
+        std::vector<std::shared_ptr<FormEventCallbackList>> formEventCallbackListVector {record};
+        formEventMap_.emplace(bundleName, formEventCallbackListVector);
+        AppExecFwk::FormMgr::GetInstance().RegisterClickEventObserver(
+            bundleName, type, JsFormStateObserver::GetInstance());
+        return ERR_OK;
+    }
+
+    auto &callbackListVec = formEventCallbackListIter->second;
+    auto callBackListIter = std::find_if(
+        callbackListVec.begin(), callbackListVec.end(), [bundleName, type](auto &iter) {
+            return iter != nullptr && iter->BindFormEventType() == type && iter->BindHostBundleName() == bundleName;
+        });
+    if (callBackListIter != callbackListVec.end() && (*callBackListIter) != nullptr) {
+        (*callBackListIter)->PushCallback(callback);
+        return ERR_OK;
+    }
+
+    formEventCallbackListIter->second.emplace_back(record);
+    AppExecFwk::FormMgr::GetInstance().RegisterClickEventObserver(bundleName, type, JsFormStateObserver::GetInstance());
+    return ERR_OK;
+}
+
+ErrCode JsFormStateObserver::ClearFormClickCallbackByBundleName(const std::string &type, const std::string &bundleName)
+{
+    HILOG_DEBUG("Called");
+    std::unique_lock<std::mutex> lock(formEventMapMutex_);
+    auto formEventCallbackListIter = formEventMap_.find(bundleName);
+    if (formEventCallbackListIter == formEventMap_.end()) {
+        HILOG_ERROR("Input bundle key not found.");
+        return ERR_INVALID_VALUE;
+    }
+
+    auto &callbackListVec = formEventCallbackListIter->second;
+    auto callBackListIter = std::find_if(
+        callbackListVec.begin(), callbackListVec.end(), [bundleName, type](auto &iter) {
+            return iter != nullptr && iter->BindFormEventType() == type && iter->BindHostBundleName() == bundleName;
+        });
+    if (callBackListIter == callbackListVec.end()) {
+        HILOG_ERROR("This bundle has not registered any callback of this type");
+        return ERR_INVALID_VALUE;
+    }
+    callbackListVec.erase(callBackListIter);
+    AppExecFwk::FormMgr::GetInstance().UnregisterClickEventObserver(
+        bundleName, type, JsFormStateObserver::GetInstance());
+    return ERR_OK;
+}
+
+ErrCode JsFormStateObserver::ClearFormClickCallback(
+    const std::string &type, const std::string &bundleName, const napi_value &callback)
+{
+    HILOG_DEBUG("Called");
+    std::unique_lock<std::mutex> lock(formEventMapMutex_);
+    auto formEventCallbackListIter = formEventMap_.find(bundleName);
+    if (formEventCallbackListIter == formEventMap_.end()) {
+        HILOG_ERROR("Input bundle key not found.");
+        return ERR_INVALID_VALUE;
+    }
+
+    auto &callbackListVec = formEventCallbackListIter->second;
+    auto callBackListIter = std::find_if(
+        callbackListVec.begin(), callbackListVec.end(), [bundleName, type](auto &iter) {
+            return iter != nullptr && iter->BindFormEventType() == type && iter->BindHostBundleName() == bundleName;
+        });
+    if (callBackListIter == callbackListVec.end()) {
+        HILOG_ERROR("This bundle has not registered any callback of this type");
+        return ERR_INVALID_VALUE;
+    }
+
+    auto sharedItem = *callBackListIter;
+    if (sharedItem == nullptr) {
+        HILOG_ERROR("Holding empty objects.");
+        return ERR_INVALID_VALUE;
+    }
+
+    sharedItem->RemoveCallback(callback);
+    if (sharedItem->IsEmpty()) {
+        callbackListVec.erase(callBackListIter);
+        // Need to notify fms
+        AppExecFwk::FormMgr::GetInstance().UnregisterClickEventObserver(
+            bundleName, type, JsFormStateObserver::GetInstance());
+    }
+    return ERR_OK;
+}
+
+FormEventCallbackList::~FormEventCallbackList()
+{
+    for (auto &iter : callbacks_) {
+        napi_delete_reference(env_, iter);
+    }
+}
+
+bool FormEventCallbackList::ContainEqualCallback(napi_value callback) const
+{
+    HILOG_DEBUG("Called");
+    if (env_ == nullptr) {
+        HILOG_ERROR("Napi environment env error.");
+        return false;
+    }
+    bool ref = false;
+    napi_value compareCallback = nullptr;
+    for (auto &call : callbacks_) {
+        napi_get_reference_value(env_, call, &compareCallback);
+        napi_strict_equals(env_, compareCallback, callback, &ref);
+        if (ref) {
+            return ref;
+        }
+    }
+    return ref;
+}
+
+void FormEventCallbackList::PushCallback(napi_value call)
+{
+    HILOG_DEBUG("Called");
+    if (env_ == nullptr) {
+        HILOG_ERROR("Napi environment env error.");
+        return;
+    }
+    if (!ContainEqualCallback(call)) {
+        napi_ref callbackRef;
+        napi_create_reference(env_, call, REF_COUNT, &callbackRef);
+        if (callbackRef != nullptr) {
+            callbacks_.emplace_back(callbackRef);
+        }
+    }
+}
+
+void FormEventCallbackList::RemoveCallback(napi_value call)
+{
+    HILOG_DEBUG("Called");
+    if (env_ == nullptr) {
+        HILOG_ERROR("Napi environment env error.");
+        return;
+    }
+    auto iter = std::find_if(callbacks_.begin(), callbacks_.end(), [env = env_, callback = call](auto &item) {
+        bool equal = false;
+        napi_value callbackFun = nullptr;
+        napi_get_reference_value(env, item, &callbackFun);
+        if (callbackFun != nullptr) {
+            napi_strict_equals(env, callbackFun, callback, &equal);
+        }
+        return equal;
+    });
+    if (iter != callbacks_.end()) {
+        napi_delete_reference(env_, *iter);
+        callbacks_.erase(iter);
+    }
+}
+
+void FormEventCallbackList::HandleFormEvent(const AppExecFwk::RunningFormInfo &runningFormInfo) const
+{
+    HILOG_DEBUG("Called");
+    if (env_ == nullptr) {
+        HILOG_ERROR("Napi environment env error.");
+        return;
+    }
+    napi_value formInfo = nullptr;
+    napi_create_object(env_, &formInfo);
+    ParseRunningFormInfoIntoNapi(env_, runningFormInfo, formInfo);
+    napi_value callResult;
+    napi_value callbackfun = nullptr;
+    for (auto &iter : callbacks_) {
+        napi_get_reference_value(env_, iter, &callbackfun);
+        if (callbackfun != nullptr) {
+            napi_call_function(env_, nullptr, callbackfun, ARGS_ONE, &formInfo, &callResult);
+        }
+    }
 }
 }  // namespace AbilityRuntime
 }  // namespace OHOS

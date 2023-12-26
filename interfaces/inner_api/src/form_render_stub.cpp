@@ -42,6 +42,10 @@ FormRenderStub::FormRenderStub()
         &FormRenderStub::HandleReleaseRenderer;
     memberFuncMap_[static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_UNLOCKED)] =
         &FormRenderStub::HandleOnUnlock;
+    memberFuncMap_[static_cast<uint32_t>(IFormRender::Message::FORM_RECYCLE_FORM)] =
+        &FormRenderStub::HandleRecycleForm;
+    memberFuncMap_[static_cast<uint32_t>(IFormRender::Message::FORM_RECOVER_FORM)] =
+        &FormRenderStub::HandleRecoverForm;
 }
 
 FormRenderStub::~FormRenderStub()
@@ -186,6 +190,32 @@ int32_t FormRenderStub::GetParcelableInfos(MessageParcel &reply, std::vector<T> 
         parcelableInfos.emplace_back(*info);
     }
     return ERR_OK;
+}
+
+int32_t FormRenderStub::HandleRecycleForm(MessageParcel &data, MessageParcel &reply)
+{
+    int64_t formId = data.ReadInt64();
+    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
+    if (!want) {
+        HILOG_ERROR("error to ReadParcelable<Want>");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int32_t result = RecycleForm(formId, *want);
+    reply.WriteInt32(result);
+    return result;
+}
+
+int32_t FormRenderStub::HandleRecoverForm(MessageParcel &data, MessageParcel &reply)
+{
+    int64_t formId = data.ReadInt64();
+    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
+    if (!want) {
+        HILOG_ERROR("error to ReadParcelable<Want>");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int32_t result = RecoverForm(formId, *want);
+    reply.WriteInt32(result);
+    return result;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

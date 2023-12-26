@@ -28,6 +28,7 @@ constexpr int32_t MAX_TIMES = 600; // 600 * 100ms = 1min
 constexpr int32_t SLEEP_INTERVAL = 100 * 1000; // 100ms
 const std::string FORM_INFO_PREFIX = "formInfo_";
 const std::string FORM_ID_PREFIX = "formId_";
+const std::string STATUS_DATA_PREFIX = "statusData_";
 } // namespace
 
 FormInfoRdbStorageMgr::FormInfoRdbStorageMgr()
@@ -256,7 +257,70 @@ ErrCode FormInfoRdbStorageMgr::DeleteStorageFormData(const std::string &formId)
         HILOG_ERROR("delete key error");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
+
+    key = std::string().append(STATUS_DATA_PREFIX).append(formId);
+    {
+        std::lock_guard<std::mutex> lock(rdbStorePtrMutex_);
+        result = rdbDataManager_->DeleteData(key);
+    }
+    if (result != ERR_OK) {
+        HILOG_ERROR("delete status data of %{public}s failed", formId.c_str());
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
     HILOG_DEBUG("delete value to RdbStore success");
+    return ERR_OK;
+}
+
+ErrCode FormInfoRdbStorageMgr::LoadStatusData(const std::string &formId, std::string &statusData)
+{
+    HILOG_DEBUG("formId is %{public}s", formId.c_str());
+    if (formId.empty()) {
+        HILOG_ERROR("formId is empty");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    ErrCode result;
+    std::string key = std::string().append(STATUS_DATA_PREFIX).append(formId);
+    {
+        std::lock_guard<std::mutex> lock(rdbStorePtrMutex_);
+        if (!CheckRdbStore()) {
+            HILOG_ERROR("RdbStore is nullptr");
+            return ERR_APPEXECFWK_FORM_COMMON_CODE;
+        }
+        result = rdbDataManager_->QueryData(key, statusData);
+    }
+    if (result != ERR_OK) {
+        HILOG_ERROR("load status data of %{public}s failed, code is %{public}d", formId.c_str(), result);
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    
+    return ERR_OK;
+}
+
+ErrCode FormInfoRdbStorageMgr::UpdateStatusData(const std::string &formId, const std::string &statusData)
+{
+    HILOG_DEBUG("formId is %{public}s", formId.c_str());
+    if (formId.empty() || statusData.empty()) {
+        HILOG_ERROR("formId or statusData is empty");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    ErrCode result;
+    std::string key = std::string().append(STATUS_DATA_PREFIX).append(formId);
+    {
+        std::lock_guard<std::mutex> lock(rdbStorePtrMutex_);
+        if (!CheckRdbStore()) {
+            HILOG_ERROR("RdbStore is nullptr");
+            return ERR_APPEXECFWK_FORM_COMMON_CODE;
+        }
+        result = rdbDataManager_->InsertData(key, statusData);
+    }
+    if (result != ERR_OK) {
+        HILOG_ERROR("update status data of %{public}s to rdbstore failed, code is %{public}d", formId.c_str(), result);
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    
     return ERR_OK;
 }
 } // namespace AppExecFwk

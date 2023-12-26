@@ -503,6 +503,16 @@ void FormItemInfo::SetTransparencyEnabled(bool isTransparencyEnabled)
     transparencyEnabled_ = isTransparencyEnabled;
 }
 
+int32_t FormItemInfo::GetPrivacyLevel() const
+{
+    return privacyLevel_;
+}
+
+void FormItemInfo::SetPrivacyLevel(int32_t level)
+{
+    privacyLevel_ = level;
+}
+
 FormType FormItemInfo::GetUiSyntax() const
 {
     return uiSyntax_;
@@ -541,6 +551,16 @@ void FormItemInfo::SetProviderUid(int32_t uid)
 int32_t FormItemInfo::GetProviderUid() const
 {
     return uid_;
+}
+
+void FormItemInfo::SetDescription(const std::string &description)
+{
+    description_ = description;
+}
+
+std::string FormItemInfo::GetDescription() const
+{
+    return description_;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

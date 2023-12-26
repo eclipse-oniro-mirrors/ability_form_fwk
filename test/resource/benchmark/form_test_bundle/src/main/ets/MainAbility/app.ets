@@ -15,11 +15,11 @@
 
 import Logger from '../model/Logger';
 
-export default {
+export default class{
   onCreate() {
     Logger.info('Application onCreate')
-  },
+  }
   onDestroy() {
     Logger.info('Application onDestroy')
-  },
+  }
 }

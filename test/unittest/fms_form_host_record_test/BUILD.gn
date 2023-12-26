@@ -72,6 +72,12 @@ ohos_unittest("FmsFormHostRecordTest") {
     "samgr:samgr_proxy",
   ]
 
+  if (cite_memmgr_plugin) {
+    external_deps += [ "memmgr_plugin:memmgrclient" ]
+  } else if (cite_memmgr) {
+    external_deps += [ "memmgr:memmgrclient" ]
+  }
+
   if (device_usage_statistics) {
     external_deps += [ "device_usage_statistics:usagestatsinner" ]
     defines = [ "DEVICE_USAGE_STATISTICS_ENABLE" ]

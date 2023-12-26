@@ -21,9 +21,9 @@ ohos_unittest("FmsFormRenderMgrTest") {
 
   sources = [
     "${form_fwk_path}/test/mock/src/mock_form_provider_client.cpp",
-    "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_ams_helper.cpp",
     "${form_fwk_path}/test/unittest/fms_form_render_mgr_test/fms_form_render_mgr_test.cpp",
     "${form_fwk_path}/test/unittest/fms_form_render_mgr_test/mock_form_data_mgr.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_render_mgr_test/mock_form_render_mgr_inner.cpp",
   ]
 
   include_dirs = [

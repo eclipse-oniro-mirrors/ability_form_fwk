@@ -32,6 +32,8 @@ namespace FormRender {
 namespace {
 constexpr int32_t RENDER_FORM_FAILED = -1;
 constexpr int32_t RELOAD_FORM_FAILED = -1;
+constexpr int32_t RECYCLE_FORM_FAILED = -1;
+constexpr int32_t FORM_RENDER_TASK_DELAY_TIME = 20; // ms
 }
 using namespace AbilityRuntime;
 
@@ -51,7 +53,7 @@ FormRenderImpl::FormRenderImpl() = default;
 FormRenderImpl::~FormRenderImpl() = default;
 
 int32_t FormRenderImpl::RenderForm(const FormJsInfo &formJsInfo, const Want &want,
-                                   const sptr<IRemoteObject> &callerToken)
+                                   sptr<IRemoteObject> callerToken)
 {
     HILOG_INFO("Render form, bundleName = %{public}s, abilityName = %{public}s, formName = %{public}s,"
         "moduleName = %{public}s, jsFormCodePath = %{public}s, formSrc = %{public}s",
@@ -91,6 +93,7 @@ int32_t FormRenderImpl::RenderForm(const FormJsInfo &formJsInfo, const Want &wan
             record->SetConfiguration(configuration_);
             result = record->UpdateRenderRecord(formJsInfo, want, hostToken);
             renderRecordMap_.emplace(uid, record);
+            FormRenderGCTask(uid);
         }
     }
     formSupplyClient->OnRenderTaskDone(formJsInfo.formId, want);
@@ -263,6 +266,116 @@ void FormRenderImpl::OnRenderingBlock(const std::string &bundleName)
     }
 
     formSupplyClient->OnRenderingBlock(bundleName);
+}
+
+void FormRenderImpl::FormRenderGCTask(const std::string &uid)
+{
+    auto mainHandler = std::make_shared<AppExecFwk::EventHandler>(AppExecFwk::EventRunner::GetMainEventRunner());
+    if (mainHandler == nullptr) {
+        HILOG_ERROR("main handler is nullptr");
+        return;
+    }
+    auto formRenderGCFunc = [uid]() {
+        auto formRenderImpl = OHOS::DelayedSingleton<FormRenderImpl>::GetInstance();
+        if (formRenderImpl == nullptr) {
+            HILOG_ERROR("formRenderImpl is nullptr");
+            return;
+        }
+        formRenderImpl->FormRenderGC(uid);
+    };
+    mainHandler->PostTask(formRenderGCFunc, "FormRenderGC", FORM_RENDER_TASK_DELAY_TIME);
+}
+
+void FormRenderImpl::FormRenderGC(const std::string &uid)
+{
+    HILOG_INFO("form gc, uid is %{s}public", uid.c_str());
+    std::lock_guard<std::mutex> lock(renderRecordMutex_);
+    if (auto search = renderRecordMap_.find(uid); search != renderRecordMap_.end()) {
+        search->second->FormRenderGC();
+    }
+}
+
+int32_t FormRenderImpl::RecycleForm(const int64_t &formId, const Want &want)
+{
+    HILOG_INFO("formId: %{public}s.", std::to_string(formId).c_str());
+    if (formId <= 0) {
+        HILOG_ERROR("formId is negative.");
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+    }
+
+    std::string uid = want.GetStringParam(Constants::FORM_SUPPLY_UID);
+    if (uid.empty()) {
+        HILOG_ERROR("uid is empty");
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+    }
+
+    std::string statusData;
+    {
+        std::lock_guard<std::mutex> lock(renderRecordMutex_);
+        if (auto search = renderRecordMap_.find(uid); search != renderRecordMap_.end()) {
+            if (search->second == nullptr) {
+                HILOG_ERROR("render record of %{public}s is null.", std::to_string(formId).c_str());
+                return RECYCLE_FORM_FAILED;
+            }
+            search->second->RecycleForm(formId, statusData);
+        } else {
+            HILOG_ERROR("can't find render record of %{public}s.", std::to_string(formId).c_str());
+            return RECYCLE_FORM_FAILED;
+        }
+        if (statusData.empty()) {
+            HILOG_ERROR("statusData of %{public}s is empty.", std::to_string(formId).c_str());
+            return RECYCLE_FORM_FAILED;
+        }
+    }
+
+    sptr<IFormSupply> formSupplyClient = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(formSupplyMutex_);
+        formSupplyClient = formSupplyClient_;
+    }
+    if (formSupplyClient == nullptr) {
+        HILOG_ERROR("formSupplyClient_ is null");
+        return RECYCLE_FORM_FAILED;
+    }
+
+    Want newWant = want;
+    newWant.SetParam(Constants::FORM_STATUS_DATA, statusData);
+    formSupplyClient->OnRecycleForm(formId, newWant);
+    return ERR_OK;
+}
+
+int32_t FormRenderImpl::RecoverForm(const int64_t &formId, const Want &want)
+{
+    HILOG_INFO("formId:%{public}s, connectId: %{public}d.",
+        std::to_string(formId).c_str(), want.GetIntParam(Constants::FORM_CONNECT_ID, 0L));
+    if (formId <= 0) {
+        HILOG_ERROR("formId is negative.");
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+    }
+
+    std::string uid = want.GetStringParam(Constants::FORM_SUPPLY_UID);
+    if (uid.empty()) {
+        HILOG_ERROR("uid is empty");
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+    }
+
+    std::string statusData = want.GetStringParam(Constants::FORM_STATUS_DATA);
+    if (statusData.empty()) {
+        HILOG_WARN("statusData of %{public}s is empty", std::to_string(formId).c_str());
+    }
+
+    bool isRecoverFormToHandleClickEvent = want.GetBoolParam(
+        Constants::FORM_IS_RECOVER_FORM_TO_HANDLE_CLICK_EVENT, false);
+    std::lock_guard<std::mutex> lock(renderRecordMutex_);
+    if (auto search = renderRecordMap_.find(uid); search != renderRecordMap_.end()) {
+        if (search->second == nullptr) {
+            HILOG_ERROR("render record of %{public}s is null.", std::to_string(formId).c_str());
+            return RECYCLE_FORM_FAILED;
+        }
+        return search->second->RecoverForm(formId, statusData, isRecoverFormToHandleClickEvent);
+    }
+    HILOG_ERROR("can't find render record of %{public}s.", std::to_string(formId).c_str());
+    return RENDER_FORM_FAILED;
 }
 } // namespace FormRender
 } // namespace AppExecFwk

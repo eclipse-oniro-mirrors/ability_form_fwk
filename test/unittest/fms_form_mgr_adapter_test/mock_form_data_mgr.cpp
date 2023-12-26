@@ -52,6 +52,7 @@ namespace {
     bool g_mockGetFormHostRecord = false;
     bool g_mockGetRunningFormInfosByFormIdRet = true;
     OHOS::AAFwk::Want g_mockGetRequestPublishFormInfoWant = {};
+    constexpr int32_t UPDATE_DURATION  = 2;
 }
 
 void MockExistTempForm(bool mockRet)
@@ -253,6 +254,7 @@ bool FormDataMgr::GetFormRecord(const int64_t formId, FormRecord &formRecord) co
         formRecord.specification = 0;
         formRecord.formVisibleNotify = true;
         formRecord.uid = 0;
+        formRecord.updateDuration = UPDATE_DURATION * Constants::TIME_CONVERSION;
     }
     return g_mockGetFormRecordRet;
 }

@@ -23,16 +23,25 @@
 #include "form_constants.h"
 #include "form_mgr_errors.h"
 #define private public
+#include "form_bms_helper.h"
 #include "form_data_mgr.h"
 #include "form_event_util.h"
+#include "form_timer_mgr.h"
 #undef private
-#include "mock_form_provider_client.h"
-#include "ipc_types.h"
 #include "fms_log_wrapper.h"
+#include "ipc_types.h"
+#include "mock_bundle_mgr.h"
+#include "mock_form_provider_client.h"
 
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::AppExecFwk;
+using ::testing::_;
+using ::testing::Invoke;
+using ::testing::DoAll;
+using ::testing::Return;
+using ::testing::SetArgReferee;
+
 static const std::string FORM_HOST_BUNDLE_NAME = "com.form.provider.service";
 static const std::string PARAM_PROVIDER_MODULE_NAME = "com.form.provider.app.test.ability";
 static const std::string FORM_PROVIDER_ABILITY_NAME = "com.form.provider.app.test.ability";
@@ -216,29 +225,6 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_008, TestSize.Level0)
 }
 
 /**
- * @tc.name: FormEventUtil_009
- * @tc.desc: test ProviderFormUpdated function.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_009, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormEventUtil_009 start";
-    FormEventUtil formEventUtil;
-    int64_t formId = 1;
-    FormRecord formRecord;
-    std::vector<FormInfo> targetForms;
-    FormInfo formInfo;
-    formInfo.bundleName = FORM_HOST_BUNDLE_NAME;
-    formInfo.moduleName = PARAM_PROVIDER_MODULE_NAME;
-    formInfo.abilityName = FORM_PROVIDER_ABILITY_NAME;
-    formInfo.name = FORM_NAME;
-    targetForms.emplace_back(formInfo);
-    MockGetUpdatedForm(true);
-    EXPECT_EQ(true, formEventUtil.ProviderFormUpdated(formId, formRecord, targetForms));
-    GTEST_LOG_(INFO) << "FormEventUtil_009 end";
-}
-
-/**
  * @tc.name: FormEventUtil_010
  * @tc.desc: test ProviderFormUpdated function.
  * @tc.type: FUNC
@@ -253,23 +239,6 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_010, TestSize.Level0)
     MockGetPackageForm(false);
     EXPECT_EQ(false, formEventUtil.ProviderFormUpdated(formId, formRecord, bundlePackInfo));
     GTEST_LOG_(INFO) << "FormEventUtil_010 end";
-}
-
-/**
- * @tc.name: FormEventUtil_011
- * @tc.desc: test ProviderFormUpdated function.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormEventUtilTest, FormEventUtil_011, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormEventUtil_011 start";
-    FormEventUtil formEventUtil;
-    int64_t formId = 1;
-    FormRecord formRecord;
-    BundlePackInfo bundlePackInfo;
-    MockGetPackageForm(true);
-    EXPECT_EQ(true, formEventUtil.ProviderFormUpdated(formId, formRecord, bundlePackInfo));
-    GTEST_LOG_(INFO) << "FormEventUtil_011 end";
 }
 
 /**
@@ -1165,5 +1134,21 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_055, TestSize.Level1)
     MockNotifyProviderFormsBatchDelete(false);
     formEventUtil->BatchDeleteNoHostTempForms(userId, noHostTempFormsMap, foundFormsMap);
     GTEST_LOG_(INFO) << "FormEventUtil_055 end";
+}
+
+/**
+ * @tc.name: FormEventUtil_056
+ * @tc.desc: test HandleAdditionalInfoChanged function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_056, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_056 start";
+    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
+    ASSERT_NE(nullptr, formEventUtil);
+    std::string bundleName = FORM_HOST_BUNDLE_NAME;
+    MockGetFormRecord(false);
+    EXPECT_EQ(false, formEventUtil->HandleAdditionalInfoChanged(bundleName));
+    GTEST_LOG_(INFO) << "FormEventUtil_056 end";
 }
 }

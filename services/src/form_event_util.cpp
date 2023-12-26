@@ -22,6 +22,7 @@
 #include "form_data_proxy_mgr.h"
 #include "form_db_cache.h"
 #include "form_info_mgr.h"
+#include "form_mgr_adapter.h"
 #include "form_render_mgr.h"
 #include "form_timer_mgr.h"
 #include "form_trust_mgr.h"
@@ -363,7 +364,11 @@ void FormEventUtil::HandleTimerUpdate(const int64_t formId,
             timerCfg.updateDuration, timerCfg.updateAtHour, timerCfg.updateAtMin);
         if (timerCfg.updateDuration > 0) {
             HILOG_INFO("%{public}s, add interval timer:%{public}" PRId64 "", __func__, timerCfg.updateDuration);
-            FormTimerMgr::GetInstance().AddFormTimer(formId, timerCfg.updateDuration, record.providerUserId);
+            int64_t updateDuration = timerCfg.updateDuration;
+            if (!FormMgrAdapter::GetInstance().GetValidFormUpdateDuration(formId, updateDuration)) {
+                HILOG_WARN("Get updateDuration failed, uses local configuration.");
+            }
+            FormTimerMgr::GetInstance().AddFormTimer(formId, updateDuration, record.providerUserId);
         } else {
             HILOG_INFO("%{public}s, add at timer:%{public}d, %{public}d", __func__,
                 timerCfg.updateAtHour, timerCfg.updateAtMin);
@@ -374,35 +379,51 @@ void FormEventUtil::HandleTimerUpdate(const int64_t formId,
     }
 
     // both enable
-    UpdateType type;
-    if (record.updateDuration > 0) {
-        if (timerCfg.updateDuration > 0) {
-            // no change
-            if (record.updateDuration == timerCfg.updateDuration) {
-                return;
-            }
-            // interval change
-            type = TYPE_INTERVAL_CHANGE;
-        } else {
-            // interval to update at time
-            type = TYPE_INTERVAL_TO_ATTIME;
-        }
-    } else {
-        if (timerCfg.updateDuration > 0) {
-            // update at time to interval
-            type = TYPE_ATTIME_TO_INTERVAL;
-        } else {
-            if (record.updateAtHour == timerCfg.updateAtHour && record.updateAtMin == timerCfg.updateAtMin) {
-                return;
-            }
-            // update at time change
-            type = TYPE_ATTIME_CHANGE;
-        }
+    UpdateType type = GetUpdateType(record, timerCfg);
+    if (type == TYPE_NO_CHANGE) {
+        return;
     }
 
     FormDataMgr::GetInstance().SetUpdateInfo(formId, true,
         timerCfg.updateDuration, timerCfg.updateAtHour, timerCfg.updateAtMin);
-    FormTimerMgr::GetInstance().UpdateFormTimer(formId, type, timerCfg);
+    auto newTimerCfg = timerCfg;
+    if (type == TYPE_INTERVAL_CHANGE || type == TYPE_ATTIME_TO_INTERVAL) {
+        int64_t updateDuration = timerCfg.updateDuration;
+        if (!FormMgrAdapter::GetInstance().GetValidFormUpdateDuration(formId, updateDuration)) {
+            HILOG_WARN("Get updateDuration failed, uses local configuration.");
+        }
+        newTimerCfg.updateDuration = updateDuration;
+    }
+    FormTimerMgr::GetInstance().UpdateFormTimer(formId, type, newTimerCfg);
+}
+
+UpdateType FormEventUtil::GetUpdateType(const FormRecord &record, const FormTimerCfg &timerCfg) const
+{
+    HILOG_DEBUG("called.");
+    if (record.updateDuration > 0) {
+        if (timerCfg.updateDuration > 0) {
+            // no change
+            if (record.updateDuration == timerCfg.updateDuration) {
+                return TYPE_NO_CHANGE;
+            }
+            // interval change
+            return TYPE_INTERVAL_CHANGE;
+        } else {
+            // interval to update at time
+            return TYPE_INTERVAL_TO_ATTIME;
+        }
+    } else {
+        if (timerCfg.updateDuration > 0) {
+            // update at time to interval
+            return TYPE_ATTIME_TO_INTERVAL;
+        } else {
+            if (record.updateAtHour == timerCfg.updateAtHour && record.updateAtMin == timerCfg.updateAtMin) {
+                return TYPE_NO_CHANGE;
+            }
+            // update at time change
+            return TYPE_ATTIME_CHANGE;
+        }
+    }
 }
 
 void FormEventUtil::ReCreateForm(const int64_t formId)
@@ -474,12 +495,39 @@ void FormEventUtil::BatchDeleteNoHostDBForms(const int uid, std::map<FormIdKey, 
     }
 }
 
+bool FormEventUtil::HandleAdditionalInfoChanged(const std::string &bundleName)
+{
+    HILOG_DEBUG("Called, bundleName:%{public}s.", bundleName.c_str());
+    std::vector<FormRecord> formInfos;
+    if (!FormDataMgr::GetInstance().GetFormRecord(bundleName, formInfos)) {
+        HILOG_DEBUG("No form info.");
+        return false;
+    }
+
+    for (const auto& formRecord : formInfos) {
+        if (!formRecord.isEnableUpdate || (formRecord.updateDuration <= 0)) {
+            continue;
+        }
+        int64_t updateDuration = formRecord.updateDuration;
+        if (!FormMgrAdapter::GetInstance().GetValidFormUpdateDuration(formRecord.formId, updateDuration)) {
+            HILOG_WARN("Get updateDuration failed, uses local configuration.");
+        }
+
+        FormTimerCfg timerCfg;
+        timerCfg.enableUpdate = true;
+        timerCfg.updateDuration = updateDuration;
+        FormTimerMgr::GetInstance().UpdateFormTimer(formRecord.formId, UpdateType::TYPE_INTERVAL_CHANGE, timerCfg);
+    }
+    return true;
+}
+
 void FormEventUtil::UpdateFormRecord(const FormInfo &formInfo, FormRecord &formRecord)
 {
     formRecord.formSrc = formInfo.src;
     formRecord.uiSyntax = formInfo.uiSyntax;
     formRecord.isDynamic = formInfo.isDynamic;
     formRecord.transparencyEnabled = formInfo.transparencyEnabled;
+    formRecord.privacyLevel = formInfo.privacyLevel;
     formRecord.isEnableUpdate = formInfo.updateEnabled;
     formRecord.updateDuration = formInfo.updateDuration * Constants::TIME_CONVERSION;
     std::vector<std::string> time = FormUtil::StringSplit(formInfo.scheduledUpdateTime, Constants::TIME_DELIMETER);

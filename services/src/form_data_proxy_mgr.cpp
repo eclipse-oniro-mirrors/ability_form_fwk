@@ -157,5 +157,16 @@ void FormDataProxyMgr::RetryFailureSubscribes()
         record.second->RetryFailureSubscribes();
     }
 }
+
+void FormDataProxyMgr::GetFormSubscribeInfo(
+    const int64_t formId, std::vector<std::string> &subscribedKeys, int32_t &count)
+{
+    auto search = formDataProxyRecordMap_.find(formId);
+    if (search != formDataProxyRecordMap_.end()) {
+        if (search->second != nullptr) {
+            search->second->GetFormSubscribeInfo(subscribedKeys, count);
+        }
+    }
+}
 } // namespace AppExecFwk
 } // namespace OHOS

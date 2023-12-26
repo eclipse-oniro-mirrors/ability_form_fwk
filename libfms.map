@@ -55,6 +55,8 @@
         *OHOS::AppExecFwk::FormRefreshLimiter*;
         *OHOS::AppExecFwk::FormRenderConnection*;
         *OHOS::AppExecFwk::FormRenderMgr*;
+        *OHOS::AppExecFwk::FormRenderMgrInner*;
+        *OHOS::AppExecFwk::FormSandboxRenderMgrInner*;
         *OHOS::AppExecFwk::FormSerialQueue*;
         *OHOS::AppExecFwk::FormShareConnection*;
         *OHOS::AppExecFwk::FormShareMgr*;

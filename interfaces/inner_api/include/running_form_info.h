@@ -34,6 +34,7 @@ struct RunningFormInfo : public Parcelable {
     std::string bundleName;
     std::string moduleName;
     std::string abilityName;
+    std::string description;
     int32_t dimension;
     std::string hostBundleName;
     FormVisibilityType formVisiblity = FormVisibilityType::UNKNOWN;

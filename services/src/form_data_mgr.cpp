@@ -27,6 +27,7 @@
 #include "form_mgr_errors.h"
 #include "form_observer_record.h"
 #include "form_provider_mgr.h"
+#include "form_record.h"
 #include "form_render_mgr.h"
 #include "form_task_mgr.h"
 #include "form_util.h"
@@ -182,7 +183,9 @@ FormRecord FormDataMgr::CreateFormRecord(const FormItemInfo &formInfo, const int
     newRecord.uiSyntax = formInfo.GetUiSyntax();
     newRecord.isDynamic = formInfo.IsDynamic();
     newRecord.transparencyEnabled = formInfo.IsTransparencyEnabled();
+    newRecord.privacyLevel = formInfo.GetPrivacyLevel();
     newRecord.isSystemApp = formInfo.GetSystemAppFlag();
+    newRecord.description = formInfo.GetDescription();
     if (newRecord.isEnableUpdate) {
         ParseUpdateConfig(newRecord, formInfo);
     }
@@ -244,6 +247,57 @@ void FormDataMgr::GetConfigParamFormMap(const std::string &key, int32_t &value) 
     HILOG_INFO("found config parameter, key: %{public}s, value:%{public}d.", key.c_str(), value);
 }
 
+void FormDataMgr::RecycleAllRecyclableForms() const
+{
+    HILOG_INFO("start");
+    std::vector<int64_t> formIds;
+    {
+        std::lock_guard<std::mutex> lock(formRecordMutex_);
+        for (auto itFormRecord = formRecords_.begin(); itFormRecord != formRecords_.end(); itFormRecord++) {
+            if (itFormRecord->second.recycleStatus ==  RecycleStatus::RECYCLABLE) {
+                formIds.emplace_back(itFormRecord->first);
+            }
+        }
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(formHostRecordMutex_);
+        for (auto itHostRecord = clientRecords_.begin(); itHostRecord != clientRecords_.end(); itHostRecord++) {
+            std::vector<int64_t> matchedFormIds;
+            for (const int64_t &formId : formIds) {
+                if (itHostRecord->Contains(formId)) {
+                    matchedFormIds.emplace_back(formId);
+                }
+            }
+            if (!matchedFormIds.empty()) {
+                Want want;
+                itHostRecord->OnRecycleForms(matchedFormIds, want);
+            }
+        }
+    }
+}
+
+void FormDataMgr::RecycleForms(const std::vector<int64_t> &formIds, const int &callingUid, const Want &want) const
+{
+    HILOG_INFO("start");
+    std::lock_guard<std::mutex> lock(formHostRecordMutex_);
+    for (auto itHostRecord = clientRecords_.begin(); itHostRecord != clientRecords_.end(); itHostRecord++) {
+        if (itHostRecord->GetCallerUid() != callingUid) {
+            continue;
+        }
+        std::vector<int64_t> matchedFormIds;
+        for (const int64_t &formId : formIds) {
+            if (itHostRecord->Contains(formId)) {
+                matchedFormIds.emplace_back(formId);
+            }
+        }
+        if (!matchedFormIds.empty()) {
+            itHostRecord->OnRecycleForms(matchedFormIds, want);
+        }
+        break;
+    }
+}
+
 /**
  * @brief Check temp form count is max.
  * @return Returns ERR_OK if the temp form not reached; returns ERR_MAX_SYSTEM_TEMP_FORMS is reached.
@@ -303,8 +357,9 @@ int FormDataMgr::CheckEnoughForm(const int callingUid, const int32_t currentUser
         return ERR_APPEXECFWK_FORM_MAX_SYSTEM_FORMS;
     }
 
+    int32_t currentAccountId = FormUtil::GetCurrentAccountId();
     for (const auto &record : formDbInfos) {
-        if ((record.providerUserId == FormUtil::GetCurrentAccountId())) {
+        if ((record.providerUserId == currentAccountId)) {
             HILOG_DEBUG("Is called by the current active user");
             for (const auto &userUid : record.formUserUids) {
                 if (userUid != callingUid) {
@@ -411,7 +466,7 @@ bool FormDataMgr::AddFormUserUid(const int64_t formId, const int formUserUid)
  */
 bool FormDataMgr::DeleteFormUserUid(const int64_t formId, const int uid)
 {
-    HILOG_INFO("%{public}s, delete form user uid from form record", __func__);
+    HILOG_INFO("formId is %{public}" PRId64 ", uid is %{public}d", formId, uid);
     std::lock_guard<std::mutex> lock(formRecordMutex_);
     if (formRecords_.count(formId) > 0) {
         auto iter = std::find(formRecords_.at(formId).formUserUids.begin(),
@@ -1919,6 +1974,7 @@ ErrCode FormDataMgr::GetRunningFormInfosByFormId(const int64_t formId, RunningFo
     runningFormInfo.bundleName = formRecord.bundleName;
     runningFormInfo.moduleName = formRecord.moduleName;
     runningFormInfo.abilityName = formRecord.abilityName;
+    runningFormInfo.description = formRecord.description;
     std::vector<FormHostRecord> formHostRecords;
     GetFormHostRecord(matchedFormId, formHostRecords);
     if (formHostRecords.empty()) {

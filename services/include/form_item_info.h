@@ -316,6 +316,16 @@ public:
      */
     void SetTransparencyEnabled(bool isTransparencyEnabled);
     /**
+     * @brief Obtains the privacyLevel.
+     * @return Returns privacyLevel.
+     */
+    int32_t GetPrivacyLevel() const;
+    /**
+     * @brief Set value of privacyLevel.
+     * @param level privacyLevel.
+     */
+    void SetPrivacyLevel(int32_t level);
+    /**
      * @brief Get uiSyntax.
      * @return uiSyntax.
      */
@@ -349,6 +359,18 @@ public:
      * @return uid.
      */
     int32_t GetProviderUid() const;
+
+    /**
+     * @brief Save the description of formInfo.
+     * @param description The description of formInfo.
+     */
+    void SetDescription(const std::string &description);
+    /**
+     * @brief Get the description of formInfo.
+     * @return description.
+     */
+    std::string GetDescription() const;
+
 private:
     /**
      * @brief Equal or not.
@@ -383,6 +405,7 @@ private:
     std::string icon_ = "";
     bool isDynamic_ = true;
     bool transparencyEnabled_ = false;
+    int32_t privacyLevel_ = 0;
     std::string jsComponentName_ = "";
     std::string abilityModuleName_ = "";
     std::unordered_map<std::string, std::string> moduleInfoMap_;
@@ -390,6 +413,7 @@ private:
     bool dataProxyEnabled_ = false;
     bool isSystemApp_ = false;
     int32_t uid_ = -1;
+    std::string description_ = "";
 };
 } // namespace AppExecFwk
 } // namespace OHOS

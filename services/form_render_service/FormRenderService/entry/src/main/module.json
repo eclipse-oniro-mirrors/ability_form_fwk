@@ -12,7 +12,6 @@
     "installationFree": false,
     "pages": "",
     "uiSyntax": "ets",
-    "compressNativeLibs": false,
     "abilities": [],
     "requestPermissions": [
       {

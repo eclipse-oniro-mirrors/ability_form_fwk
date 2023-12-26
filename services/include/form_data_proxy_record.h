@@ -26,6 +26,7 @@
 #include "form_provider_data_proxy.h"
 #include "form_info_base.h"
 #include "nlohmann/json.hpp"
+#include "perm_state_change_callback_customize.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -45,6 +46,9 @@ public:
     void EnableSubscribeFormData();
     void DisableSubscribeFormData();
     void RetryFailureSubscribes();
+    void GetFormSubscribeInfo(std::vector<std::string> &subscribedKeys, int32_t &count);
+    void UnRegisterPermissionListener();
+    void PermStateChangeCallback(const int32_t permStateChangeType, const std::string permissionName);
 private:
     struct FormDataProxyRequest {
         int64_t subscribeId;
@@ -61,7 +65,8 @@ private:
     // map from key to vector of subscriberId
     using SubscribeMap = std::unordered_map<std::string, std::unordered_set<std::string>>;
 
-    void ParseFormDataProxies(const std::vector<FormDataProxy> &formDataProxies);
+    void ParseFormDataProxies(const std::vector<FormDataProxy> &formDataProxies, SubscribeMap &rdbSubscribeMap,
+        SubscribeMap &publishSubscribeMap);
     void ParseFormDataProxiesIntoSubscribeMapWithExpectedKeys(
         const std::vector<FormDataProxy> &formDataProxies, const std::unordered_set<std::string> &expectedKeys,
         bool keyCheckingNeeded, SubscribeMap &subscribeMap);
@@ -89,8 +94,16 @@ private:
     void PrintSubscribeState(const std::string &uri, int64_t subscribeId, bool isRdbType);
     void RetryFailureRdbSubscribes(SubscribeResultRecord &record);
     void RetryFailurePublishedSubscribes(SubscribeResultRecord &record);
+    void GetFormSubscribeKeys(std::vector<std::string> &subscribedKeys, bool isRdbType);
+    
+    void RegisterPermissionListener(const std::vector<FormDataProxy> &formDataProxies);
+    ErrCode SubscribeFormData(const std::vector<FormDataProxy> &formDataProxies, SubscribeMap &rdbSubscribeMap,
+        SubscribeMap &publicSubscribeMap);
+    void GetSubscribeFormDataProxies(const FormDataProxy formdataProxy,
+        std::vector<FormDataProxy> &subscribeFormDataProxies, std::vector<FormDataProxy> &unsubscribeFormDataProxies);
 
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper_;
+    std::shared_ptr<Security::AccessToken::PermStateChangeCallbackCustomize> callbackPtr_;
     int64_t formId_ = -1;
     std::string bundleName_;
     FormType uiSyntax_;
@@ -100,6 +113,9 @@ private:
     SubscribeMap publishSubscribeMap_;
     std::map<std::string, std::map<int64_t, SubscribeResultRecord>> rdbSubscribeResultMap_;
     std::map<std::string, std::map<int64_t, SubscribeResultRecord>> publishSubscribeResultMap_;
+    std::map<std::string, std::vector<FormDataProxy>> formDataPermissionProxyMap_;
+    int32_t receivedDataCount_ = 0;
+    const int32_t PERMISSION_GRANTED_OPER = 1;
 };
 } // namespace AppExecFwk
 } // namespace OHOS

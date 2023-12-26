@@ -36,7 +36,13 @@ int32_t FormPublishInterceptorProxy::ProcessPublishForm(const AAFwk::Want &want)
         return ERR_FLATTEN_OBJECT;
     }
 
-    int32_t error = Remote()->SendRequest(
+    sptr<IRemoteObject> remote = Remote();
+    if (remote == nullptr) {
+        HILOG_ERROR("remote object is nullptr.");
+        return ERR_NULL_OBJECT;
+    }
+
+    int32_t error = remote->SendRequest(
         static_cast<uint32_t>(IFormPublishInterceptor::Message::FORM_PROCESS_PUBLISH_FORM),
         data,
         reply,

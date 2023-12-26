@@ -34,6 +34,7 @@ namespace Constants {
     constexpr const char* PARAM_ABILITY_NAME_KEY = "ohos.extra.param.key.ability_name";
     constexpr const char* PARAM_FORM_NAME_KEY = "ohos.extra.param.key.form_name";
     constexpr const char* PARAM_FORM_DIMENSION_KEY = "ohos.extra.param.key.form_dimension";
+    constexpr const char* PARAM_FORM_RENDERINGMODE_KEY = "ohos.extra.param.key.form_rendering_mode";
     constexpr const char* PARAM_MESSAGE_KEY = "ohos.extra.param.key.message";
     constexpr const char* PARAM_FORM_TEMPORARY_KEY = "ohos.extra.param.key.form_temporary";
     constexpr const char* PARAM_FORM_TRANSPARENCY_KEY = "ohos.extra.param.key.form_background_transparency";
@@ -65,13 +66,15 @@ namespace Constants {
     constexpr const char* PARAM_PUBLISH_FORM_HOST_BUNDLE_KEY = "ohos.extra.param.key.form_host_bundle_name";
     constexpr const char* PARAM_PUBLISH_FORM_HOST_MODULE_KEY = "ohos.extra.param.key.form_host_module_name";
     constexpr const char* PARAM_PUBLISH_FORM_HOST_ABILITY_KEY = "ohos.extra.param.key.form_host_ability_name";
+    constexpr const char* FRS_BUNDLE_NAME = "com.ohos.formrenderservice";
+    constexpr const char* FRS_APP_INDEX = "ohos.extra.param.key.frs_index";
     constexpr const char* PARAM_FORM_ID = "formID";
     constexpr const char* IS_FORM_AGENT = "isFormAgent";
     constexpr int32_t TYPE_RESET_LIMIT = 1;
     constexpr int32_t TYPE_STATIC_UPDATE = 2;
     constexpr int32_t TYPE_DYNAMIC_UPDATE = 3;
     const long ABS_REFRESH_MS = 2500;
-    
+
     constexpr int32_t UNKNOWN = 0;
     // The form events type which means that the form becomes visible.
     constexpr int32_t FORM_VISIBLE = 1;
@@ -140,16 +143,21 @@ namespace Constants {
 
     constexpr const char* FORM_SUPPLY_UID = "form_supply_uid";
     constexpr const char* FORM_RENDER_COMP_ID = "form_render_comp_id";
+    constexpr const char* FORM_DELAY_TIME_OF_RECYCLE = "form_delay_time_of_recycle";
+    constexpr const char* FORM_STATUS_DATA = "form_status_data";
+    constexpr const char* FORM_IS_RECOVER_FORM_TO_HANDLE_CLICK_EVENT = "form_is_recover_form_to_handle_click_event";
 
     const size_t MAX_LAYOUT = 8;
     constexpr int32_t MAX_FORMS = 512;
     constexpr int32_t MAX_RECORD_PER_APP = 256;
     constexpr int32_t MAX_TEMP_FORMS = 256;
     constexpr int32_t MAX_FORM_DATA_SIZE = 1024;
+    constexpr int32_t DEFAULT_VISIBLE_NOTIFY_DELAY = 1000;
 
     constexpr char MAX_NORMAL_FORM_SIZE [] = "maxNormalFormSize";
     constexpr char MAX_TEMP_FORM_SIZE [] = "maxTempFormSize";
     constexpr char HOST_MAX_FORM_SIZE [] = "hostMaxFormSize";
+    constexpr char VISIBLE_NOTIFY_DELAY [] = "visibleNotifyDelayTime";
 
     constexpr int32_t NOT_IN_RECOVERY = 0;
     constexpr int32_t RECOVER_FAIL = 1;
@@ -178,7 +186,8 @@ namespace Constants {
         DIMENSION_2_4,
         DIMENSION_4_4,
         DIMENSION_2_1,
-        DIMENSION_MAX = DIMENSION_2_1
+        DIMENSION_1_1,
+        DIMENSION_MAX = DIMENSION_1_1
     };
 
     const std::map<Dimension, std::string> DIMENSION_MAP = {
@@ -186,7 +195,13 @@ namespace Constants {
         {Dimension::DIMENSION_2_2, "2*2"},
         {Dimension::DIMENSION_2_4, "2*4"},
         {Dimension::DIMENSION_4_4, "4*4"},
-        {Dimension::DIMENSION_2_1, "2*1"}
+        {Dimension::DIMENSION_2_1, "2*1"},
+        {Dimension::DIMENSION_1_1, "1*1"}
+    };
+
+    enum class RenderingMode : int8_t {
+        FULL_COLOR = 0,
+        SINGLE_COLOR
     };
 
     // rdb
@@ -224,6 +239,8 @@ namespace Constants {
     constexpr int32_t FORM_SHARE = 2;
     // Specify the form Id
     constexpr const char* PARAM_FORM_MIGRATE_FORM_KEY = "ohos.extra.param.key.migrate_form";
+    // For click message event
+    constexpr const char* KEY_DIRECT_CALL_INAPP = "directCallInApp";
 }  // namespace Constants
 }  // namespace AppExecFwk
 }  // namespace OHOS

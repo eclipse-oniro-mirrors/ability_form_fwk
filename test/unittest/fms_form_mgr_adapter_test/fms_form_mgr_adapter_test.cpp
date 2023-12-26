@@ -4038,4 +4038,163 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_210, TestSize.Level0)
     FormAmsHelper::GetInstance().abilityManager_ = amsHelperBackup;
     GTEST_LOG_(INFO) << "FormMgrAdapter_210 end";
 }
+
+/**
+ * @tc.name: FormMgrAdapter_211
+ * @tc.desc: test GetValidFormUpdateDuration function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_211, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_211 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    int64_t updateDuration = 1;
+    MockGetFormRecord(false);
+    EXPECT_EQ(false, formMgrAdapter.GetValidFormUpdateDuration(formId, updateDuration));
+    EXPECT_EQ(updateDuration, 1);
+    GTEST_LOG_(INFO) << "FormMgrAdapter_211 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_212
+ * @tc.desc: test GetValidFormUpdateDuration function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_212, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_212 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    int64_t updateDuration = 1;
+    MockGetFormRecord(true);
+    MockGetFormRecordParams(true);
+    EXPECT_EQ(false, formMgrAdapter.GetValidFormUpdateDuration(formId, updateDuration));
+    EXPECT_EQ(updateDuration, 1);
+    GTEST_LOG_(INFO) << "FormMgrAdapter_212 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_213
+ * @tc.desc: test GetValidFormUpdateDuration function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_213, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_213 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    int64_t updateDuration = 1;
+    MockGetFormRecord(true);
+    MockGetFormRecordParams(true);
+
+    sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
+    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
+    FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
+    AppExecFwk::ApplicationInfo appInfo;
+    appInfo.apiTargetVersion = 9;
+    EXPECT_CALL(*bmsProxy, GetApplicationInfoV9(_, _, _, _)).Times(1)
+        .WillRepeatedly(DoAll(SetArgReferee<3>(appInfo), Return(ERR_OK)));
+
+    EXPECT_EQ(true, formMgrAdapter.GetValidFormUpdateDuration(formId, updateDuration));
+    EXPECT_EQ(updateDuration, 2 * Constants::TIME_CONVERSION);
+    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
+    GTEST_LOG_(INFO) << "FormMgrAdapter_213 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_214
+ * @tc.desc: test GetValidFormUpdateDuration function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_214, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_214 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    int64_t updateDuration = 1;
+    MockGetFormRecord(true);
+    MockGetFormRecordParams(true);
+
+    sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
+    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
+    FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
+    AppExecFwk::ApplicationInfo appInfo;
+    appInfo.apiTargetVersion = 11;
+    EXPECT_CALL(*bmsProxy, GetApplicationInfoV9(_, _, _, _)).Times(1)
+        .WillRepeatedly(DoAll(SetArgReferee<3>(appInfo), Return(ERR_OK)));
+
+    EXPECT_EQ(true, formMgrAdapter.GetValidFormUpdateDuration(formId, updateDuration));
+    EXPECT_EQ(updateDuration, 2 * Constants::TIME_CONVERSION);
+    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
+    GTEST_LOG_(INFO) << "FormMgrAdapter_214 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_215
+ * @tc.desc: test GetValidFormUpdateDuration function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_215, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_215 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    int64_t updateDuration = 1;
+    MockGetFormRecord(true);
+    MockGetFormRecordParams(true);
+
+    sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
+    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
+    FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
+    AppExecFwk::ApplicationInfo appInfo;
+    appInfo.apiTargetVersion = 11;
+    EXPECT_CALL(*bmsProxy, GetApplicationInfoV9(_, _, _, _))
+        .WillRepeatedly(DoAll(SetArgReferee<3>(appInfo), Return(ERR_OK)));
+
+    std::string additionalInfo = "";
+    EXPECT_CALL(*bmsProxy, GetAdditionalInfo(_, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(additionalInfo), Return(ERR_TIMED_OUT)));
+    EXPECT_EQ(true, formMgrAdapter.GetValidFormUpdateDuration(formId, updateDuration));
+    EXPECT_EQ(updateDuration, 2 * Constants::TIME_CONVERSION);
+
+    additionalInfo = "";
+    EXPECT_CALL(*bmsProxy, GetAdditionalInfo(_, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(additionalInfo), Return(ERR_OK)));
+    EXPECT_EQ(true, formMgrAdapter.GetValidFormUpdateDuration(formId, updateDuration));
+    EXPECT_EQ(updateDuration, 2 * Constants::TIME_CONVERSION);
+
+    additionalInfo = "abcdefg";
+    EXPECT_CALL(*bmsProxy, GetAdditionalInfo(_, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(additionalInfo), Return(ERR_OK)));
+    EXPECT_EQ(true, formMgrAdapter.GetValidFormUpdateDuration(formId, updateDuration));
+    EXPECT_EQ(updateDuration, 2 * Constants::TIME_CONVERSION);
+
+    additionalInfo = "formUpdateLevel:dfd";
+    EXPECT_CALL(*bmsProxy, GetAdditionalInfo(_, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(additionalInfo), Return(ERR_OK)));
+    EXPECT_EQ(true, formMgrAdapter.GetValidFormUpdateDuration(formId, updateDuration));
+    EXPECT_EQ(updateDuration, 2 * Constants::TIME_CONVERSION);
+
+    additionalInfo = "formUpdateLevel:0";
+    EXPECT_CALL(*bmsProxy, GetAdditionalInfo(_, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(additionalInfo), Return(ERR_OK)));
+    EXPECT_EQ(true, formMgrAdapter.GetValidFormUpdateDuration(formId, updateDuration));
+    EXPECT_EQ(updateDuration, 2 * Constants::TIME_CONVERSION);
+
+    additionalInfo = "formUpdateLevel:4, time:0, formUpdateLevel:7";
+    EXPECT_CALL(*bmsProxy, GetAdditionalInfo(_, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(additionalInfo), Return(ERR_OK)));
+    EXPECT_EQ(true, formMgrAdapter.GetValidFormUpdateDuration(formId, updateDuration));
+    EXPECT_EQ(updateDuration, 7 * Constants::TIME_CONVERSION);
+
+    additionalInfo = "formUpdateLevel:4, time:0, formUpdateLevel:1111";
+    EXPECT_CALL(*bmsProxy, GetAdditionalInfo(_, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(additionalInfo), Return(ERR_OK)));
+    EXPECT_EQ(true, formMgrAdapter.GetValidFormUpdateDuration(formId, updateDuration));
+    EXPECT_EQ(updateDuration, 4 * Constants::TIME_CONVERSION);
+
+    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
+    GTEST_LOG_(INFO) << "FormMgrAdapter_215 end";
+}
 }

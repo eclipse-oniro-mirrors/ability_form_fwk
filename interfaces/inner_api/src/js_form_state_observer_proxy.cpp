@@ -45,8 +45,8 @@ int32_t JsFormStateObserverProxy::OnAddForm(const std::string &bundleName,
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    int32_t error = Remote()->SendRequest(
-        static_cast<uint32_t>(IJsFormStateObserver::Message::FORM_STATE_OBSERVER_ON_ADD_FORM),
+    int32_t error = SendTransactCmd(
+        IJsFormStateObserver::Message::FORM_STATE_OBSERVER_ON_ADD_FORM,
         data,
         reply,
         option);
@@ -78,8 +78,8 @@ int32_t JsFormStateObserverProxy::OnRemoveForm(const std::string &bundleName,
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    int32_t error = Remote()->SendRequest(
-        static_cast<uint32_t>(IJsFormStateObserver::Message::FORM_STATE_OBSERVER_ON_REMOVE_FORM),
+    int32_t error = SendTransactCmd(
+        IJsFormStateObserver::Message::FORM_STATE_OBSERVER_ON_REMOVE_FORM,
         data,
         reply,
         option);
@@ -121,8 +121,8 @@ int32_t JsFormStateObserverProxy::NotifyWhetherFormsVisible(const AppExecFwk::Fo
             return false;
         }
     }
-    int32_t error = Remote()->SendRequest(
-        static_cast<uint32_t>(IJsFormStateObserver::Message::FORM_STATE_OBSERVER_NOTIFY_WHETHER_FORMS_VISIBLE),
+    int32_t error = SendTransactCmd(
+        IJsFormStateObserver::Message::FORM_STATE_OBSERVER_NOTIFY_WHETHER_FORMS_VISIBLE,
         data,
         reply,
         option);
@@ -134,10 +134,8 @@ int32_t JsFormStateObserverProxy::NotifyWhetherFormsVisible(const AppExecFwk::Fo
 }
 
 int JsFormStateObserverProxy::SendTransactCmd(IJsFormStateObserver::Message code,
-    MessageParcel &data, MessageParcel &reply)
+    MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    MessageOption option(MessageOption::TF_SYNC);
-
     sptr<IRemoteObject> remote = Remote();
     if (!remote) {
         HILOG_ERROR("%{public}s, failed to get remote object, cmd: %{public}d", __func__, code);
@@ -149,6 +147,46 @@ int JsFormStateObserverProxy::SendTransactCmd(IJsFormStateObserver::Message code
         return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
     }
     return ERR_OK;
+}
+
+int32_t JsFormStateObserverProxy::OnFormClickEvent(
+    const std::string &bundleName, const std::string &callType, const AppExecFwk::RunningFormInfo &runningFormInfo)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_ASYNC);
+
+    if (!data.WriteInterfaceToken(AbilityRuntime::IJsFormStateObserver::GetDescriptor())) {
+        HILOG_ERROR("Failed to write interface token");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteString(bundleName)) {
+        HILOG_ERROR("Failed to write bundle name.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteString(callType)) {
+        HILOG_ERROR("failed to write call type");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteParcelable(&runningFormInfo)) {
+        HILOG_ERROR("failed to write runningFormInfo");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    sptr<IRemoteObject> remote = Remote();
+    if (!remote) {
+        HILOG_ERROR("Failed to get remote object");
+        return ERR_APPEXECFWK_SERVICE_NOT_CONNECTED;
+    }
+    int32_t error = remote->SendRequest(
+        static_cast<uint32_t>(IJsFormStateObserver::Message::FORM_STATE_OBSERVER_ON_FORM_CLICK), data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("failed to SendRequest: %{public}d", error);
+    }
+    return error;
 }
 } // namespace AbilityRuntime
 } // namespace OHOS

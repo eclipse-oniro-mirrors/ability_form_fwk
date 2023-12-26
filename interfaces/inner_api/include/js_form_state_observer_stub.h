@@ -42,6 +42,7 @@ public:
 
     int32_t HandleNotifyWhetherFormsVisible(MessageParcel &data, MessageParcel &reply);
 
+    int32_t HandleOnFormClick(MessageParcel &data, MessageParcel &reply);
 private:
     using FormStateObserverFunc = int32_t (JsFormStateObserverStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, FormStateObserverFunc> memberFuncMap_;

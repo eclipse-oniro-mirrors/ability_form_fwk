@@ -32,6 +32,9 @@ namespace OHOS {
 namespace AppExecFwk {
 using Want = OHOS::AAFwk::Want;
 using WantParams = OHOS::AAFwk::WantParams;
+enum class TaskType : int64_t {
+    RECYCLE_FORM,
+};
 /**
  * @class FormTaskMgr
  * form task manager.
@@ -207,6 +210,8 @@ public:
     void PostAddTaskToHost(const std::string bundleName, const sptr<IRemoteObject> &remoteObject,
         const RunningFormInfo &runningFormInfo);
 
+    void PostRouterProxyToHost(const int64_t formId, const sptr<IRemoteObject> &remoteObject, const Want &want);
+
     void PostRemoveTaskToHost(const std::string bundleName, const sptr<IRemoteObject> &remoteObject,
         const RunningFormInfo &runningFormInfo);
 
@@ -215,6 +220,53 @@ public:
 
     void PostOnUnlock(const sptr<IRemoteObject> &remoteObject);
 
+    /**
+    * @brief Post Form visible/invisible notify.
+    * @param formIds  the Ids of forms need to notify.
+    * @param formInstanceMaps formInstances for visibleNotify.
+    * @param eventMaps eventMaps for event notify.
+    * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
+    * @param visibleNotifyDelay delay time.
+    */
+    void PostVisibleNotify(const std::vector<int64_t> &formIds,
+        std::map<std::string, std::vector<FormInstance>> &formInstanceMaps,
+        std::map<std::string, std::vector<int64_t>> &eventMaps,
+        const int32_t formVisibleType, int32_t visibleNotifyDelay);
+
+    /**
+    * @brief Post form click event.
+    * @param bundleName BundleName of the form host
+    * @param formEventType form event type.
+    * @param remoteObject thr remote observer.
+    * @param runningFormInfo Current form data.
+    */
+    void PostFormClickEventToHost(
+        const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &remoteObject,
+        const RunningFormInfo &runningFormInfo);
+
+    /**
+     * @brief Post recycle forms.
+     * @param formIds the Ids of forms to be recycled.
+     * @param want The want of the request.
+     * @param remoteObjectOfHost Form host proxy object.
+     * @param remoteObjectOfRender Form render proxy object.
+     */
+    void PostRecycleForms(const std::vector<int64_t> &formIds, const Want &want,
+        const sptr<IRemoteObject> &remoteObjectOfHost, const sptr<IRemoteObject> &remoteObjectOfRender);
+
+    /**
+     * @brief Post recover form.
+     * @param formIds the Id of form to be recovered.
+     * @param want The want of the request.
+     * @param remoteObject Form render proxy object.
+     */
+    void PostRecoverForm(const int64_t &formId, const Want &want, const sptr<IRemoteObject> &remoteObject);
+
+    /**
+     * @brief Cancel delay task.
+     * @param eventMsg Delay Task.
+     */
+    void CancelDelayTask(const std::pair<int64_t, int64_t> &eventMsg);
 private:
     /**
      * @brief Acquire form data from form provider.
@@ -390,6 +442,53 @@ private:
     void OnUnlock(const sptr<IRemoteObject> &remoteObject);
 
     void RemoveConnection(int32_t connectId);
+
+    /**
+     * @brief Form router event proxy.
+     * @param formId The id of the form.
+     * @param remoteObject Form router proxy manager object.
+     * @param want The want of the form for router event.
+     */
+    void FormRouterEventProxy(const int64_t formId, const sptr<IRemoteObject> &remoteObject, const Want &want);
+
+    /**
+    * @brief Form visible/invisible notify.
+    * @param formIds  the Ids of forms need to notify.
+    * @param formInstanceMaps formInstances for visibleNotify.
+    * @param eventMaps eventMaps for event notify.
+    * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
+    */
+    void NotifyVisible(const std::vector<int64_t> &formIds,
+        std::map<std::string, std::vector<FormInstance>> formInstanceMaps,
+        std::map<std::string, std::vector<int64_t>> eventMaps, const int32_t formVisibleType);
+
+    /**
+     * @brief Handle recycle form message.
+     * @param formId The Id of form to be recycled.
+     * @param remoteObjectOfHost Form host proxy object.
+     * @param remoteObjectOfRender Form render proxy object.
+     */
+    void RecycleForm(const int64_t &formId, const sptr<IRemoteObject> &remoteObjectOfHost,
+        const sptr<IRemoteObject> &remoteObjectOfRender);
+
+    /**
+     * @brief Handle recover form message.
+     * @param formId The Id of form to be recovered.
+     * @param want The want of the request.
+     * @param remoteObject Form render proxy object.
+     */
+    void RecoverForm(const int64_t &formId, const Want &want, const sptr<IRemoteObject> &remoteObject);
+
+    /**
+    * @brief Notify remote observer form click event.
+    * @param bundleName BundleName of the form host
+    * @param formEventType  form event type.
+    * @param remoteObject thr remote observer.
+    * @param runningFormInfo Current form data.
+    */
+    void FormClickEvent(const std::string &bundleName, const std::string &formEventType,
+        const sptr<IRemoteObject> &remoteObject, const RunningFormInfo &runningFormInfo);
+
 private:
     std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;
 };

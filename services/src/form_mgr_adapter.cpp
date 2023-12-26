@@ -15,16 +15,16 @@
 
 #include "form_mgr_adapter.h"
 
+#include <algorithm>
 #include <cinttypes>
 #include <regex>
+#include <unordered_map>
 #include <unordered_set>
 
 #include "ability_manager_errors.h"
+#include "form_record.h"
 #ifdef DEVICE_USAGE_STATISTICS_ENABLE
 #include "bundle_active_client.h"
-#endif
-#ifdef SUPPORT_ERMS
-#include "erms_mgr_interface.h"
 #endif
 #include "fms_log_wrapper.h"
 #include "form_acquire_connection.h"
@@ -41,6 +41,8 @@
 #include "form_db_cache.h"
 #include "form_db_info.h"
 #include "form_dump_mgr.h"
+#include "form_ecological_rule_param.h"
+#include "form_ecological_rule_service.h"
 #include "form_event_notify_connection.h"
 #include "form_info_mgr.h"
 #include "form_mgr_errors.h"
@@ -49,6 +51,7 @@
 #include "form_provider_info.h"
 #include "form_provider_interface.h"
 #include "form_provider_mgr.h"
+#include "form_router_proxy_mgr.h"
 #include "form_render_connection.h"
 #include "form_render_mgr.h"
 #include "form_share_mgr.h"
@@ -65,26 +68,41 @@
 #include "nlohmann/json.hpp"
 #include "os_account_manager.h"
 #include "system_ability_definition.h"
+#include "form_task_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {
-#ifdef SUPPORT_ERMS
-using namespace OHOS::EcologicalRuleMgrService;
-#endif
 namespace {
 constexpr int32_t CALLING_UID_TRANSFORM_DIVISOR = 200000;
 constexpr int32_t SYSTEM_UID = 1000;
+constexpr int32_t API_11 = 11;
 const std::string POINT_ETS = ".ets";
-
+constexpr int DATA_FIELD = 1;
+constexpr int FORM_UPDATE_LEVEL_VALUE_MAX_LENGTH = 3; // update level is 1~336, so max length is 3.
 const std::string EMPTY_BUNDLE = "";
+const std::string FORM_CLICK_ROUTER = "router";
+const std::string FORM_CLICK_MESSAGE = "message";
+const std::string FORM_CLICK_CALL = "call";
 } // namespace
 
 FormMgrAdapter::FormMgrAdapter()
 {
+    HILOG_INFO("called");
 }
 FormMgrAdapter::~FormMgrAdapter()
 {
+    HILOG_INFO("called");
 }
+
+/**
+ * @brief Init properties like visibleNotifyDelayTime.
+ */
+void FormMgrAdapter::Init()
+{
+    FormDataMgr::GetInstance().GetConfigParamFormMap(Constants::VISIBLE_NOTIFY_DELAY, visibleNotifyDelay_);
+    HILOG_INFO("load visibleNotifyDelayTime: %{public}d", visibleNotifyDelay_);
+}
+
 /**
  * @brief Add form with want, send want to form manager service.
  * @param formId The Id of the forms to add.
@@ -97,7 +115,7 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
     const sptr<IRemoteObject> &callerToken, FormJsInfo &formInfo)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_DEBUG("called.");
+    HILOG_INFO("called.");
     if (formId < 0 || callerToken == nullptr) {
         HILOG_ERROR("fail, callerToken can not be NULL");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -173,8 +191,9 @@ ErrCode FormMgrAdapter::AllotForm(const int64_t formId, const Want &want,
     const sptr<IRemoteObject> &callerToken, FormJsInfo &formInfo, const FormItemInfo &formItemInfo)
 {
     Want newWant(want);
+    bool directCallInApp = newWant.GetBoolParam(Constants::KEY_DIRECT_CALL_INAPP, false);
     // in application form
-    if (formItemInfo.GetProviderBundleName() == formItemInfo.GetHostBundleName()) {
+    if (formItemInfo.GetProviderBundleName() == formItemInfo.GetHostBundleName() && directCallInApp) {
         HILOG_DEBUG("form in application");
         newWant.SetParam(Constants::PARAM_FORM_HOST_TOKEN, callerToken);
     }
@@ -250,8 +269,9 @@ ErrCode FormMgrAdapter::HandleFormRemoveObserver(const RunningFormInfo runningFo
 int FormMgrAdapter::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &callerToken)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    HILOG_INFO("formId is %{public}" PRId64, formId);
     if (formId <= 0 || callerToken == nullptr) {
-        HILOG_ERROR("%{public}s, deleteForm invalid param", __func__);
+        HILOG_ERROR("deleteForm invalid param");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
@@ -305,7 +325,7 @@ int FormMgrAdapter::StopRenderingForm(const int64_t formId, const std::string &c
 int FormMgrAdapter::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> &callerToken, const bool delCache)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("formId is %{public}" PRId64, formId);
     if (formId <= 0 || callerToken == nullptr) {
         HILOG_ERROR("%{public}s, releaseForm invalid param", __func__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -360,7 +380,7 @@ int FormMgrAdapter::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> 
  */
 ErrCode FormMgrAdapter::HandleReleaseForm(const int64_t formId, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("formId is %{public}" PRId64, formId);
     if (!FormDataMgr::GetInstance().ExistFormRecord(formId)) {
         HILOG_ERROR("%{public}s, not exist such db or temp form:%{public}" PRId64 "", __func__, formId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
@@ -374,7 +394,6 @@ ErrCode FormMgrAdapter::HandleReleaseForm(const int64_t formId, const sptr<IRemo
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
 
-    HILOG_DEBUG("%{public}s, release formRecords, formId: %{public}" PRId64 "", __func__, formId);
     FormDataMgr::GetInstance().DeleteFormUserUid(formId, IPCSkeleton::GetCallingUid());
     if (!FormDataMgr::GetInstance().HasFormUserUids(formId)) {
         FormDataMgr::GetInstance().DeleteFormRecord(formId);
@@ -394,7 +413,7 @@ ErrCode FormMgrAdapter::HandleReleaseForm(const int64_t formId, const sptr<IRemo
  */
 ErrCode FormMgrAdapter::HandleDeleteForm(const int64_t formId, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("called.");
+    HILOG_INFO("formId is %{public}" PRId64, formId);
     FormRecord dbRecord;
     if (FormDbCache::GetInstance().GetDBRecord(formId, dbRecord) != ERR_OK) {
         HILOG_ERROR("%{public}s, not exist such db form:%{public}" PRId64 "", __func__, formId);
@@ -412,8 +431,7 @@ ErrCode FormMgrAdapter::HandleDeleteForm(const int64_t formId, const sptr<IRemot
     bool isSelfDbFormId = (userId == dbRecord.providerUserId) && ((std::find(dbRecord.formUserUids.begin(),
         dbRecord.formUserUids.end(), callingUid) != dbRecord.formUserUids.end()) ? true : false);
     if (!isSelfDbFormId) {
-        HILOG_ERROR("%{public}s, not self form:%{public}" PRId64 ", callingUid:%{public}d",
-            __func__, formId, callingUid);
+        HILOG_ERROR("not self form:%{public}" PRId64 ", callingUid:%{public}d", formId, callingUid);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
 
@@ -423,7 +441,7 @@ ErrCode FormMgrAdapter::HandleDeleteForm(const int64_t formId, const sptr<IRemot
     }
 
     if (!FormDataMgr::GetInstance().DeleteHostRecord(callerToken, formId)) {
-        HILOG_ERROR("%{public}s, failed to remove host record", __func__);
+        HILOG_ERROR("failed to remove host record");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -441,7 +459,7 @@ ErrCode FormMgrAdapter::HandleDeleteForm(const int64_t formId, const sptr<IRemot
  */
 ErrCode FormMgrAdapter::HandleDeleteTempForm(const int64_t formId, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("formId is %{public}" PRId64, formId);
     int uid = IPCSkeleton::GetCallingUid();
     FormRecord record;
     bool isFormRecExist = FormDataMgr::GetInstance().GetFormRecord(formId, record);
@@ -452,7 +470,7 @@ ErrCode FormMgrAdapter::HandleDeleteTempForm(const int64_t formId, const sptr<IR
             record.formUserUids.end()) ? true : false);
     }
     if (!isSelfTempFormId) {
-        HILOG_ERROR("%{public}s, not self form:%{public}" PRId64 "", __func__, formId);
+        HILOG_ERROR("not self form:%{public}" PRId64 "", formId);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
     FormRenderMgr::GetInstance().StopRenderingForm(formId, record, "", callerToken);
@@ -493,7 +511,7 @@ ErrCode FormMgrAdapter::HandleDeleteTempForm(const int64_t formId, const sptr<IR
  */
 ErrCode FormMgrAdapter::HandleDeleteFormCache(FormRecord &dbRecord, const int uid, const int64_t formId)
 {
-    HILOG_DEBUG("delete formDBRecords, formId: %{public}" PRId64 "", formId);
+    HILOG_INFO("delete formDBRecords, formId: %{public}" PRId64 "", formId);
     auto iter = std::find(dbRecord.formUserUids.begin(), dbRecord.formUserUids.end(), uid);
     if (iter != dbRecord.formUserUids.end()) {
         dbRecord.formUserUids.erase(iter);
@@ -547,7 +565,7 @@ int FormMgrAdapter::UpdateForm(const int64_t formId, const int32_t callingUid,
     const FormProviderData &formProviderData, const std::vector<FormDataProxy> &formDataProxies)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_DEBUG("UpdateForm start.");
+    HILOG_INFO("formId is %{public}" PRId64, formId);
 
     // check formId and bundleName
     if (formId <= 0) {
@@ -602,7 +620,7 @@ int FormMgrAdapter::UpdateForm(const int64_t formId, const int32_t callingUid,
 int FormMgrAdapter::RequestForm(const int64_t formId, const sptr<IRemoteObject> &callerToken, const Want &want)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("formId is %{public}" PRId64, formId);
     if (formId <= 0 || callerToken == nullptr) {
         HILOG_ERROR("%{public}s fail, invalid formId or callerToken.", __func__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -644,7 +662,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
     const sptr<IRemoteObject> &callerToken, const int32_t formVisibleType)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_DEBUG("called.");
+    HILOG_INFO("called.");
     if (callerToken == nullptr) {
         HILOG_ERROR("fail, callerToken can not be NULL.");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -718,23 +736,31 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
         }
     }
 
+    FormTaskMgr::GetInstance().PostVisibleNotify(formIds, formInstanceMaps, eventMaps, formVisibleType,
+        visibleNotifyDelay_);
+    return ERR_OK;
+}
+
+/**
+ * @brief Handle forms visible/invisible notify after delay time, notification will be cancelled when
+ * formVisibleState recovered during the delay time.
+ * @param formIds The vector of form Ids.
+ * @param formInstanceMaps formInstances for visibleNotify.
+ * @param eventMaps eventMaps for event notify.
+ * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
+ */
+void FormMgrAdapter::HandlerNotifyWhetherVisibleForms(const std::vector<int64_t> &formIds,
+    std::map<std::string, std::vector<FormInstance>> formInstanceMaps,
+    std::map<std::string, std::vector<int64_t>> eventMaps, const int32_t formVisibleType)
+{
+    HILOG_DEBUG("start");
+    FilterDataByVisibleType(formInstanceMaps, eventMaps, formVisibleType);
     for (auto formObserver : formObservers_) {
-        sptr<AbilityRuntime::IJsFormStateObserver> remoteJsFormStateObserver =
-            iface_cast<AbilityRuntime::IJsFormStateObserver>(formObserver.second);
-        auto observer = formInstanceMaps.find(formObserver.first);
-        if (observer != formInstanceMaps.end()) {
-            if (formVisibleType == static_cast<int32_t>(FormVisibilityType::VISIBLE)) {
-                remoteJsFormStateObserver->NotifyWhetherFormsVisible(FormVisibilityType::VISIBLE,
-                    formObserver.first, observer->second);
-            } else if (formVisibleType == static_cast<int32_t>(FormVisibilityType::INVISIBLE)){
-                remoteJsFormStateObserver->NotifyWhetherFormsVisible(FormVisibilityType::INVISIBLE, formObserver.first,
-                    observer->second);
-            }
-        }
+        NotifyWhetherFormsVisible(formObserver.first, formObserver.second, formInstanceMaps, formVisibleType);
     }
     for (auto iter = eventMaps.begin(); iter != eventMaps.end(); iter++) {
         if (HandleEventNotify(iter->first, iter->second, formVisibleType) != ERR_OK) {
-            HILOG_WARN("%{public}s fail, HandleEventNotify error, key is %{public}s.", __func__, iter->first.c_str());
+            HILOG_WARN("HandleEventNotify error, key is %{public}s.", iter->first.c_str());
         }
     }
     if (formVisibleType == static_cast<int32_t>(FormVisibilityType::VISIBLE)) {
@@ -742,8 +768,149 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
     } else if (formVisibleType == static_cast<int32_t>(FormVisibilityType::INVISIBLE)) {
         FormDataProxyMgr::GetInstance().DisableSubscribeFormData(formIds);
     }
+}
 
-    return ERR_OK;
+/**
+ * @brief Notify forms visible/invisible to remoteCallers.
+ * @param bundleName the caller's bundle name.
+ * @param remoteObjects refs of remoteCallers.
+ * @param formInstanceMaps formInstances for visibleNotify.
+ * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
+ */
+void FormMgrAdapter::NotifyWhetherFormsVisible(const std::string &bundleName,
+    std::vector<sptr<IRemoteObject>> &remoteObjects,
+    std::map<std::string, std::vector<FormInstance>> &formInstanceMaps, const int32_t formVisibleType)
+{
+    HILOG_DEBUG("bundleName: %{public}s, remoteObjects: %{public}d", bundleName.c_str(), (int)remoteObjects.size());
+    for (auto remoteObject : remoteObjects) {
+        sptr<AbilityRuntime::IJsFormStateObserver> remoteJsFormStateObserver =
+            iface_cast<AbilityRuntime::IJsFormStateObserver>(remoteObject);
+        auto observer = formInstanceMaps.find(bundleName);
+        if (observer != formInstanceMaps.end()) {
+            if (formVisibleType == static_cast<int32_t>(FormVisibilityType::VISIBLE)) {
+                remoteJsFormStateObserver->NotifyWhetherFormsVisible(FormVisibilityType::VISIBLE,
+                    bundleName, observer->second);
+            } else if (formVisibleType == static_cast<int32_t>(FormVisibilityType::INVISIBLE)) {
+                remoteJsFormStateObserver->NotifyWhetherFormsVisible(FormVisibilityType::INVISIBLE,
+                    bundleName, observer->second);
+            }
+        }
+    }
+}
+
+/**
+ * @brief Forms formInstanceMaps or eventMaps should remove when visible/invisible status recovered.
+ * @param formInstanceMaps formInstances for visibleNotify.
+ * @param eventMaps eventMaps for event notify.
+ * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
+ */
+void FormMgrAdapter::FilterDataByVisibleType(std::map<std::string, std::vector<FormInstance>> &formInstanceMaps,
+    std::map<std::string, std::vector<int64_t>> &eventMaps, const int32_t formVisibleType)
+{
+    HILOG_DEBUG("start");
+    std::map<int64_t, FormRecord> restoreFormRecords;
+    FilterFormInstanceMapsByVisibleType(formInstanceMaps, formVisibleType, restoreFormRecords);
+    FilterEventMapsByVisibleType(eventMaps, formVisibleType, restoreFormRecords);
+
+    for (auto formRecordEntry : restoreFormRecords) {
+        FormRecord formRecord = formRecordEntry.second;
+        formRecord.isNeedNotify = false;
+        HILOG_INFO("formRecord no need notify, formId: %{public}" PRId64 ".", formRecord.formId);
+        if (!FormDataMgr::GetInstance().UpdateFormRecord(formRecord.formId, formRecord)) {
+            HILOG_ERROR("update restoreFormRecords failed, formId: %{public}" PRId64 ".", formRecord.formId);
+        }
+    }
+}
+
+/**
+ * @brief Forms formInstanceMaps should remove when visible/invisible status recovered.
+ * @param formInstanceMaps formInstances for visibleNotify.
+ * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
+ * @param restoreFormRecords formRecords of forms no need to notify.
+ */
+void FormMgrAdapter::FilterFormInstanceMapsByVisibleType(
+    std::map<std::string, std::vector<FormInstance>> &formInstanceMaps,
+    const int32_t formVisibleType, std::map<int64_t, FormRecord> &restoreFormRecords)
+{
+    for (auto iter = formInstanceMaps.begin(); iter != formInstanceMaps.end();) {
+        std::vector<FormInstance> formInstances = iter->second;
+        HILOG_DEBUG("bundName: %{public}s, formInstances: %{public}d", iter->first.c_str(), (int)formInstances.size());
+        auto instanceIter = formInstances.begin();
+        while (instanceIter != formInstances.end()) {
+            FormRecord record;
+            if (!FormDataMgr::GetInstance().GetFormRecord(instanceIter->formId, record)) {
+                HILOG_WARN("get formRecord failed! formId: %{public}" PRId64 ".", instanceIter->formId);
+                ++instanceIter;
+                continue;
+            }
+            if (record.formVisibleNotifyState != formVisibleType) {
+                HILOG_INFO("erase formInstance formId: %{public}" PRId64 ", formVisibleNotifyState: %{public}d",
+                    instanceIter->formId, record.formVisibleNotifyState);
+                restoreFormRecords[record.formId] = record;
+                instanceIter = formInstances.erase(instanceIter);
+                continue;
+            }
+            if (!record.isNeedNotify) {
+                HILOG_INFO("erase formInstance formId: %{public}" PRId64
+                    ", isNeedNotify: %{public}d, formVisibleNotifyState %{public}d",
+                    instanceIter->formId, record.isNeedNotify, record.formVisibleNotifyState);
+                instanceIter = formInstances.erase(instanceIter);
+                continue;
+            }
+            ++instanceIter;
+        }
+        if (formInstances.empty()) {
+            HILOG_INFO("formInstanceMaps remove bundName: %{public}s", iter->first.c_str());
+            iter = formInstanceMaps.erase(iter);
+            continue;
+        }
+        ++iter;
+    }
+}
+
+/**
+ * @brief Forms eventMaps should remove when visible/invisible status recovered.
+ * @param eventMaps eventMaps for event notify.
+ * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
+ * @param restoreFormRecords formRecords of forms no need to notify.
+ */
+void FormMgrAdapter::FilterEventMapsByVisibleType(std::map<std::string, std::vector<int64_t>> &eventMaps,
+    const int32_t formVisibleType, std::map<int64_t, FormRecord> &restoreFormRecords)
+{
+    for (auto iter = eventMaps.begin(); iter != eventMaps.end();) {
+        std::vector<int64_t> formIds = iter->second;
+        HILOG_DEBUG("bundName: %{public}s, eventMaps: %{public}d", iter->first.c_str(), (int)formIds.size());
+        auto formItr = formIds.begin();
+        while (formItr != formIds.end()) {
+            FormRecord record;
+            if (!FormDataMgr::GetInstance().GetFormRecord(*formItr, record)) {
+                HILOG_WARN("get formRecord failed! formId: %{public}" PRId64 ".", *formItr);
+                ++formItr;
+                continue;
+            }
+            if (record.formVisibleNotifyState != formVisibleType) {
+                HILOG_INFO("erase notifyEvent formId: %{public}" PRId64 ", formVisibleNotifyState: %{public}d",
+                    *formItr, record.formVisibleNotifyState);
+                restoreFormRecords[record.formId] = record;
+                formItr = formIds.erase(formItr);
+                continue;
+            }
+            if (!record.isNeedNotify) {
+                HILOG_INFO("erase notifyEvent formId: %{public}" PRId64
+                    ", isNeedNotify: %{public}d, formVisibleNotifyState %{public}d",
+                    *formItr, record.isNeedNotify, record.formVisibleNotifyState);
+                formItr = formIds.erase(formItr);
+                continue;
+            }
+            ++formItr;
+        }
+        if (formIds.empty()) {
+            HILOG_INFO("eventMaps remove bundName: %{public}s", iter->first.c_str());
+            iter = eventMaps.erase(iter);
+            continue;
+        }
+        ++iter;
+    }
 }
 
 /**
@@ -903,6 +1070,19 @@ int FormMgrAdapter::DumpFormInfoByBundleName(const std::string &bundleName, std:
     if (!FormDataMgr::GetInstance().GetFormRecord(bundleName, formRecordInfos)) {
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
+
+    /**
+     * The updateDuration stored in FormRecord is the config.json configuration.
+     * The app gallery may modify the updateDuration.
+     * The real updateDuration value needs to be obtained from FormTimerMgr.
+     */
+    for (auto &formRecord : formRecordInfos) {
+        FormTimer formTimer;
+        if (formRecord.isEnableUpdate && formRecord.updateDuration > 0 &&
+            FormTimerMgr::GetInstance().GetIntervalTimer(formRecord.formId, formTimer)) {
+            formRecord.updateDuration = formTimer.period;
+        }
+    }
     FormDumpMgr::GetInstance().DumpFormInfos(formRecordInfos, formInfos);
     return ERR_OK;
 }
@@ -918,8 +1098,25 @@ int FormMgrAdapter::DumpFormInfoByFormId(const std::int64_t formId, std::string 
     int reply = ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     FormRecord formRecord;
     if (FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
+        /**
+         * The updateDuration stored in FormRecord is the config.json configuration.
+         * The app gallery may modify the updateDuration.
+         * The real updateDuration value needs to be obtained from FormTimerMgr.
+         */
+        FormTimer formTimer;
+        if (formRecord.isEnableUpdate && formRecord.updateDuration > 0 &&
+            FormTimerMgr::GetInstance().GetIntervalTimer(formRecord.formId, formTimer)) {
+            formRecord.updateDuration = formTimer.period;
+        }
         FormDumpMgr::GetInstance().DumpFormInfo(formRecord, formInfo);
         reply = ERR_OK;
+    }
+
+    std::vector<std::string> subscribedKeys;
+    int32_t count = 0;
+    if (reply == ERR_OK) {
+        FormDataProxyMgr::GetInstance().GetFormSubscribeInfo(formId, subscribedKeys, count);
+        FormDumpMgr::GetInstance().DumpFormSubscribeInfo(subscribedKeys, count, formInfo);
     }
 
     std::vector<FormHostRecord> formHostRecords;
@@ -1221,8 +1418,12 @@ ErrCode FormMgrAdapter::AddFormTimer(const FormRecord &formRecord)
         return ERR_OK;
     }
     if (formRecord.updateDuration > 0 && !formRecord.isDataProxy) {
+        int64_t updateDuration = formRecord.updateDuration;
+        if (!GetValidFormUpdateDuration(formRecord.formId, updateDuration)) {
+            HILOG_WARN("Get updateDuration failed, uses local configuration.");
+        }
         bool ret = FormTimerMgr::GetInstance().AddFormTimer(formRecord.formId,
-            formRecord.updateDuration, formRecord.providerUserId);
+            updateDuration, formRecord.providerUserId);
         return ret ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     if (formRecord.updateAtHour >= 0 && formRecord.updateAtMin >= 0) {
@@ -1476,6 +1677,7 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
     itemInfo.SetCompatibleVersion(bundleInfo.compatibleVersion);
     itemInfo.SetSystemAppFlag(bundleInfo.applicationInfo.isSystemApp);
     itemInfo.SetProviderUid(bundleInfo.applicationInfo.uid);
+    itemInfo.SetDescription(formInfo.description);
 
     std::string hostBundleName;
     bool isSaUid = IPCSkeleton::GetCallingUid() == SYSTEM_UID;
@@ -1510,6 +1712,7 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
     itemInfo.SetUiSyntax(formInfo.uiSyntax);
     itemInfo.SetIsDynamic(formInfo.isDynamic);
     itemInfo.SetTransparencyEnabled(formInfo.transparencyEnabled);
+    itemInfo.SetPrivacyLevel(formInfo.privacyLevel);
 
     for (const auto &abilityInfo : bundleInfo.abilityInfos) {
         if (abilityInfo.name == formInfo.abilityName) {
@@ -1598,7 +1801,10 @@ int FormMgrAdapter::ReleaseRenderer(int64_t formId, const std::string &compId)
     }
 
     FormRecord record;
-    FormDataMgr::GetInstance().GetFormRecord(formId, record);
+    if (!FormDataMgr::GetInstance().GetFormRecord(formId, record)) {
+        HILOG_ERROR("no matched form record");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
     FormRenderMgr::GetInstance().ReleaseRenderer(formId, record, compId);
     return ERR_OK;
 }
@@ -1836,9 +2042,8 @@ ErrCode FormMgrAdapter::CheckAddRequestPublishForm(const Want &want, const Want 
     }
     if (errCode != ERR_OK) {
         HILOG_ERROR("fail, too much forms in system");
-        return errCode;
     }
-    return ERR_OK;
+    return errCode;
 }
 
 ErrCode FormMgrAdapter::AddRequestPublishForm(const FormItemInfo &formItemInfo, const Want &want,
@@ -2041,6 +2246,7 @@ int FormMgrAdapter::MessageEvent(const int64_t formId, const Want &want, const s
     }
     HILOG_INFO("%{public}s, find target client.", __func__);
 
+    NotifyFormClickEvent(formId, FORM_CLICK_MESSAGE);
 #ifdef DEVICE_USAGE_STATISTICS_ENABLE
     if (!FormDataMgr::GetInstance().ExistTempForm(matchedFormId)) {
         int callingUid = IPCSkeleton::GetCallingUid();
@@ -2072,11 +2278,17 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
     want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, formId);
     if (!want.GetUriString().empty()) {
         HILOG_INFO("Router by uri");
+        if (FormRouterProxyMgr::GetInstance().HasRouterProxy(formId)) {
+            HILOG_INFO("Router proxy was setted sucessful");
+            FormRouterProxyMgr::GetInstance().OnFormRouterEvent(formId, want);
+            return ERR_OK;
+        }
         int32_t result = FormAmsHelper::GetInstance().GetAbilityManager()->StartAbility(want, callerToken);
         if (result != ERR_OK && result != START_ABILITY_WAITING) {
             HILOG_ERROR("Failed to StartAbility, result: %{public}d.", result);
             return result;
         }
+        NotifyFormClickEvent(formId, FORM_CLICK_ROUTER);
         return ERR_OK;
     }
 
@@ -2100,13 +2312,18 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
             want.SetBundle(record.bundleName);
         }
     }
-
+    if (FormRouterProxyMgr::GetInstance().HasRouterProxy(formId)) {
+        HILOG_INFO("Router proxy was setted sucessful");
+        FormRouterProxyMgr::GetInstance().OnFormRouterEvent(formId, want);
+        return ERR_OK;
+    }
     int32_t result = FormAmsHelper::GetInstance().GetAbilityManager()->StartAbility(want, callerToken);
     if (result != ERR_OK && result != START_ABILITY_WAITING) {
         HILOG_ERROR("Failed to StartAbility, result: %{public}d.", result);
         return result;
     }
 
+    NotifyFormClickEvent(formId, FORM_CLICK_ROUTER);
 #ifdef DEVICE_USAGE_STATISTICS_ENABLE
     if (!FormDataMgr::GetInstance().ExistTempForm(matchedFormId)) {
         int32_t callingUid = IPCSkeleton::GetCallingUid();
@@ -2183,6 +2400,7 @@ int FormMgrAdapter::BackgroundEvent(const int64_t formId, Want &want, const sptr
         HILOG_ERROR("Failed to StartAbilityByCall, result: %{public}d.", result);
         return result;
     }
+    NotifyFormClickEvent(formId, FORM_CLICK_CALL);
     return ERR_OK;
 }
 
@@ -2324,6 +2542,7 @@ bool FormMgrAdapter::UpdateProviderInfoToHost(const int64_t &matchedFormId, cons
     }
 
     formRecord.formVisibleNotifyState = formVisibleType;
+    formRecord.isNeedNotify = true;
     if (!FormDataMgr::GetInstance().UpdateFormRecord(matchedFormId, formRecord)) {
         HILOG_WARN("fail, set formVisibleNotifyState error, formId:%{public}" PRId64 ".",
             matchedFormId);
@@ -2451,7 +2670,7 @@ int FormMgrAdapter::DeleteInvalidForms(const std::vector<int64_t> &formIds,
     for (int64_t formId : formIds) {
         int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
         matchedFormIds.emplace(matchedFormId);
-        HILOG_DEBUG("valid formId, matchedFormIds: %{public}" PRId64 "", formId);
+        HILOG_INFO("valid formId, matchedFormIds: %{public}" PRId64 "", formId);
     }
     std::map<int64_t, bool> removedFormsMap {};
     int32_t callingUid = IPCSkeleton::GetCallingUid();
@@ -2794,12 +3013,21 @@ ErrCode FormMgrAdapter::RegisterAddObserver(const std::string &bundleName, const
     std::lock_guard<std::mutex> lock(formObserversMutex_);
     auto formObserver = formObservers_.find(bundleName);
     if (formObserver == formObservers_.end()) {
-        formObservers_.emplace(bundleName, callerToken);
-        SetDeathRecipient(callerToken, new (std::nothrow) FormMgrAdapter::ClientDeathRecipient());
+        HILOG_DEBUG("%{public}s start register.", bundleName.c_str());
+        std::vector<sptr<IRemoteObject>> remoteObjects;
+        remoteObjects.emplace_back(callerToken);
+        formObservers_.emplace(bundleName, remoteObjects);
     } else {
-        HILOG_ERROR("callback is already exist");
-        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+        auto &remoteObjects = formObserver->second;
+        auto itr = std::find(remoteObjects.begin(), remoteObjects.end(), callerToken);
+        if (itr != remoteObjects.end()) {
+            HILOG_ERROR("callback is already exist");
+            return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+        }
+        HILOG_DEBUG("%{public}s add register.", bundleName.c_str());
+        remoteObjects.emplace_back(callerToken);
     }
+    SetDeathRecipient(callerToken, new (std::nothrow) FormMgrAdapter::ClientDeathRecipient());
     HILOG_DEBUG("success.");
     return ERR_OK;
 }
@@ -2813,16 +3041,121 @@ ErrCode FormMgrAdapter::RegisterRemoveObserver(const std::string &bundleName, co
         HILOG_ERROR("bundleName is not exist");
         return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
     } else {
-        if (formObserver->second == callerToken) {
-            formObservers_.erase(formObserver);
-            SetDeathRecipient(callerToken, new (std::nothrow) FormMgrAdapter::ClientDeathRecipient());
-        } else {
-            HILOG_ERROR("callback is not exist");
-            return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+        auto &remoteObjects = formObserver->second;
+        for (auto itr = remoteObjects.begin(); itr != remoteObjects.end();) {
+            if (*itr == callerToken) {
+                remoteObjects.erase(itr);
+                SetDeathRecipient(callerToken, new (std::nothrow) FormMgrAdapter::ClientDeathRecipient());
+                HILOG_DEBUG("success.");
+                return ERR_OK;
+            }
+            ++itr;
         }
     }
-    HILOG_DEBUG("success.");
-    return ERR_OK;
+    HILOG_ERROR("callback is not exist");
+    return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+}
+
+ErrCode FormMgrAdapter::RegisterFormRouterProxy(
+    const std::vector<int64_t>& formIds, const sptr<IRemoteObject>& callerToken)
+{
+    HILOG_DEBUG("Called.");
+    if (callerToken == nullptr) {
+        HILOG_ERROR("CallerToken is nullptr.");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    std::vector<int64_t> matchedFormIds {};
+    std::vector<int64_t> hostOwnFormIds {};
+    auto uid = IPCSkeleton::GetCallingUid();
+    FormRecord record;
+    for (int64_t formId : formIds) {
+        if (formId <= 0) {
+            HILOG_WARN("FormId %{public}" PRId64 " is less than 0", formId);
+            continue;
+        }
+        auto matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+        if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record)) {
+            HILOG_ERROR("No matching formRecord was found for the formId: %{public}" PRId64 "", formId);
+            continue;
+        }
+        matchedFormIds.push_back(formId);
+
+        if (record.providerUserId != FormUtil::GetCurrentAccountId()) {
+            // Checks for cross-user operations.
+            HILOG_ERROR("The formId: %{public}" PRId64
+                        " corresponds to a card that is not for the currently active user.",
+                formId);
+            continue;
+        } else if (std::find(record.formUserUids.begin(),
+            record.formUserUids.end(), uid) == record.formUserUids.end()) {
+            // Checks for cross-host operations
+            HILOG_ERROR("The formId:%{public}" PRId64 " owned by other formHost", formId);
+            continue;
+        } else {
+            HILOG_DEBUG("The setup was sucessful, matchedFormIds: %{public}" PRId64 "", formId);
+            hostOwnFormIds.push_back(formId);
+        }
+    }
+    if (matchedFormIds.empty()) {
+        HILOG_ERROR("All formIds is Invalid!");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    if (hostOwnFormIds.empty()) {
+        HILOG_ERROR("All formIds was not setted by self!");
+        return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
+    }
+
+    return FormRouterProxyMgr::GetInstance().SetFormRouterProxy(hostOwnFormIds, callerToken);
+}
+
+ErrCode FormMgrAdapter::UnregisterFormRouterProxy(const std::vector<int64_t>& formIds)
+{
+    HILOG_DEBUG("Called.");
+    std::vector<int64_t> matchedFormIds {};
+    std::vector<int64_t> hostOwnFormIds {};
+    auto uid = IPCSkeleton::GetCallingUid();
+    FormRecord record;
+    for (int64_t formId : formIds) {
+        if (formId <= 0) {
+            HILOG_WARN("FormId %{public}" PRId64 " is less than 0", formId);
+            continue;
+        }
+        auto matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+        if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record)) {
+            HILOG_ERROR("No matching formRecord was found for the formId: %{public}" PRId64 "", formId);
+            continue;
+        }
+        matchedFormIds.push_back(formId);
+
+        if (record.providerUserId != FormUtil::GetCurrentAccountId()) {
+            // Checks for cross-user operations.
+            HILOG_ERROR("The formId: %{public}" PRId64
+                        " corresponds to a card that is not for the currently active user.",
+                formId);
+            continue;
+        } else if (std::find(record.formUserUids.begin(),
+            record.formUserUids.end(), uid) == record.formUserUids.end()) {
+            // Checks for cross-host operations
+            HILOG_ERROR("The formId:%{public}" PRId64 " owned by other formHost", formId);
+            continue;
+        } else {
+            HILOG_DEBUG("The setup was sucessful, matchedFormIds: %{public}" PRId64 "", formId);
+            hostOwnFormIds.push_back(formId);
+        }
+    }
+    if (matchedFormIds.empty()) {
+        HILOG_ERROR("All formIds is Invalid!");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    if (hostOwnFormIds.empty()) {
+        HILOG_ERROR("All formIds was not setted by self!");
+        return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
+    }
+
+    return FormRouterProxyMgr::GetInstance().RemoveFormRouterProxy(hostOwnFormIds);
 }
 
 void FormMgrAdapter::SetDeathRecipient(const sptr<IRemoteObject> &callerToken,
@@ -2856,12 +3189,19 @@ void FormMgrAdapter::CleanResource(const wptr<IRemoteObject> &remote)
     {
         std::lock_guard<std::mutex> lock(formObserversMutex_);
         for (auto it = formObservers_.begin(); it != formObservers_.end();) {
-            auto& observer = it->second;
-            if (observer == object) {
-                it = formObservers_.erase(it);
-            } else {
-                ++it;
+            auto &remoteObjects = it->second;
+            for (auto iter = remoteObjects.begin(); iter != remoteObjects.end();) {
+                if (*iter == object) {
+                    iter = remoteObjects.erase(iter);
+                    continue;
+                }
+                ++iter;
             }
+            if (remoteObjects.empty()) {
+                it = formObservers_.erase(it);
+                continue;
+            }
+            ++it;
         }
     }
     std::lock_guard<std::mutex> deathLock(deathRecipientsMutex_);
@@ -2916,13 +3256,128 @@ int32_t FormMgrAdapter::UnregisterPublishFormInterceptor(const sptr<IRemoteObjec
     return ERR_APPEXECFWK_FORM_INVALID_PARAM;
 }
 
-#ifdef SUPPORT_ERMS
+ErrCode FormMgrAdapter::RegisterClickEventObserver(
+    const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer)
+{
+    HILOG_INFO("Called.");
+    if (observer == nullptr) {
+        HILOG_ERROR("Caller token is null.");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    return FormObserverRecord::GetInstance().SetFormEventObserver(bundleName, formEventType, observer);
+}
+
+ErrCode FormMgrAdapter::UnregisterClickEventObserver(
+    const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer)
+{
+    HILOG_INFO("Called.");
+    if (observer == nullptr) {
+        HILOG_ERROR("Caller token is null.");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    return FormObserverRecord::GetInstance().RemoveFormEventObserver(bundleName, formEventType, observer);
+}
+
+void FormMgrAdapter::NotifyFormClickEvent(int64_t formId, const std::string &formClickType)
+{
+    HILOG_INFO("Called.");
+    int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+
+    RunningFormInfo runningFormInfo;
+    auto ref = FormDataMgr::GetInstance().GetRunningFormInfosByFormId(matchedFormId, runningFormInfo);
+    if (ref != ERR_OK) {
+        HILOG_ERROR("Get Running info error.");
+        return;
+    }
+
+    FormObserverRecord::GetInstance().HandleFormEvent(runningFormInfo.hostBundleName, formClickType, runningFormInfo);
+    // The application layer can pass in an empty Bundlename,
+    // Which represents listening to a certain event of all applications
+    FormObserverRecord::GetInstance().HandleFormEvent(EMPTY_BUNDLE, formClickType, runningFormInfo);
+}
+
+bool FormMgrAdapter::GetValidFormUpdateDuration(const int64_t formId, int64_t &updateDuration) const
+{
+    HILOG_DEBUG("Called.");
+    FormRecord formRecord;
+    if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
+        HILOG_ERROR("Error, not exist such form:%{public}" PRId64 ".", formId);
+        return false;
+    }
+
+    ApplicationInfo appInfo;
+    if (FormBmsHelper::GetInstance().GetApplicationInfo(formRecord.bundleName, FormUtil::GetCurrentAccountId(),
+        appInfo) != ERR_OK) {
+        HILOG_ERROR("Get app info failed.");
+        return false;
+    }
+
+    if (appInfo.apiTargetVersion < API_11) {
+        HILOG_INFO("API version is lower than 11, uses local configuration.");
+        updateDuration = formRecord.updateDuration;
+        return true;
+    }
+
+    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
+    if (iBundleMgr == nullptr) {
+        HILOG_ERROR("Failed to get IBundleMgr, uses local configuration.");
+        updateDuration = formRecord.updateDuration;
+        return true;
+    }
+
+    std::string additionalInfo;
+    if (IN_PROCESS_CALL(iBundleMgr->GetAdditionalInfo(formRecord.bundleName, additionalInfo)) != ERR_OK) {
+        HILOG_ERROR("Failed to get GetAdditionalInfo, uses local configuration.");
+        updateDuration = formRecord.updateDuration;
+        return true;
+    }
+
+    if (additionalInfo.empty()) {
+        HILOG_DEBUG("AdditionalInfo is empty, uses local configuration.");
+        updateDuration = formRecord.updateDuration;
+        return true;
+    }
+
+    std::vector<int> durationArray;
+    GetUpdateDurationFromAdditionalInfo(additionalInfo, durationArray);
+    if (durationArray.empty()) {
+        HILOG_INFO("No valid formUpdateLevel in additionalInfo, uses local configuration.");
+        updateDuration = formRecord.updateDuration;
+        return true;
+    }
+
+    int duration = durationArray.back();
+    int64_t cloudsDuration = duration * Constants::TIME_CONVERSION;
+    updateDuration = std::max(formRecord.updateDuration, cloudsDuration);
+    return true;
+}
+
+void FormMgrAdapter::GetUpdateDurationFromAdditionalInfo(
+    const std::string &additionalInfo, std::vector<int> &durationArray) const
+{
+    std::regex regex(R"(formUpdateLevel:(\d+))");
+    std::smatch searchResult;
+    std::string::const_iterator iterStart = additionalInfo.begin();
+    std::string::const_iterator iterEnd = additionalInfo.end();
+
+    while (std::regex_search(iterStart, iterEnd, searchResult, regex)) {
+        iterStart = searchResult[0].second;
+        if (searchResult[DATA_FIELD].str().length() > FORM_UPDATE_LEVEL_VALUE_MAX_LENGTH) {
+            continue;
+        }
+        int val = std::stoi(searchResult[DATA_FIELD].str());
+        if (val >= Constants::MIN_CONFIG_DURATION && val <= Constants::MAX_CONFIG_DURATION) {
+            durationArray.emplace_back(val);
+        }
+    }
+}
+
 int32_t FormMgrAdapter::GetCallerType(std::string bundleName)
 {
     sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
     if (iBundleMgr == nullptr) {
         HILOG_ERROR("fail, failed to get IBundleMgr.");
-        return ErmsCallerInfo::TYPE_INVALID;
+        return FormErmsCallerInfo::TYPE_INVALID;
     }
 
     AppExecFwk::ApplicationInfo callerAppInfo;
@@ -2931,42 +3386,196 @@ int32_t FormMgrAdapter::GetCallerType(std::string bundleName)
     bool getCallerResult = IN_PROCESS_CALL(iBundleMgr->GetApplicationInfo(bundleName, flag, userId, callerAppInfo));
     if (!getCallerResult) {
         HILOG_ERROR("Get callerAppInfo failed.");
-        return ErmsCallerInfo::TYPE_INVALID;
+        return FormErmsCallerInfo::TYPE_INVALID;
     }
 
     switch (callerAppInfo.bundleType) {
         case AppExecFwk::BundleType::ATOMIC_SERVICE:
-            return ErmsCallerInfo::TYPE_ATOM_SERVICE;
+            return FormErmsCallerInfo::TYPE_ATOM_SERVICE;
         case AppExecFwk::BundleType::APP:
-            return ErmsCallerInfo::TYPE_HARMONY_APP;
+            return FormErmsCallerInfo::TYPE_HARMONY_APP;
         default:
             HILOG_WARN("the caller type is not harmony app or atom service: %{public}d", callerAppInfo.bundleType);
             break;
     }
-    return ErmsCallerInfo::TYPE_INVALID;
+    return FormErmsCallerInfo::TYPE_INVALID;
 }
-#endif
 
 bool FormMgrAdapter::IsErmsSupportPublishForm(std::string bundleName, std::vector<Want> wants)
 {
     bool isSupport = true;
-#ifdef SUPPORT_ERMS
-    ErmsCallerInfo callerInfo;
+    FormErmsCallerInfo callerInfo;
     callerInfo.packageName = bundleName;
     callerInfo.uid = IPCSkeleton::GetCallingUid();
     callerInfo.pid = IPCSkeleton::GetCallingPid();
     callerInfo.callerAppType = GetCallerType(bundleName);
 
     auto start = FormUtil::GetCurrentMicrosecond();
-    int32_t ret = EcologicalRuleMgrServiceClient::GetInstance()->IsSupportPublishForm(wants, callerInfo, isSupport);
+    int32_t ret = FormEcologicalRuleClient::GetInstance().IsSupportPublishForm(wants, callerInfo, isSupport);
     auto end = FormUtil::GetCurrentMicrosecond();
     HILOG_INFO("[ERMS-DFX] IsSupportPublishForm cost %{public}" PRId64 " micro seconds", (end - start));
     if (ret != ERR_OK) {
         HILOG_ERROR("call IsSupportPublishForm failed: %{public}d, default is support.", ret);
         return true;
     }
-#endif
     return isSupport;
+}
+
+int32_t FormMgrAdapter::SetFormsRecyclable(const std::vector<int64_t> &formIds)
+{
+    HILOG_DEBUG("called");
+    FormRecord record;
+    std::vector<int64_t> validFormIds;
+    int callingUid = IPCSkeleton::GetCallingUid();
+    for (int64_t formId : formIds) {
+        if (formId <= 0) {
+            HILOG_ERROR("form id is negative");
+            continue;
+        }
+
+        int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+        if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record)) {
+            HILOG_WARN("form %{public}" PRId64 " not exist", formId);
+            continue;
+        }
+        if (record.formTempFlag) {
+            HILOG_WARN("form %{public}" PRId64 " is temp form", formId);
+            continue;
+        }
+        if (!record.isDynamic) {
+            HILOG_WARN("form %{public}" PRId64 " is static form", formId);
+            continue;
+        }
+        if (record.uiSyntax != FormType::ETS) {
+            HILOG_WARN("form %{public}" PRId64 " is not ETS form", formId);
+            continue;
+        }
+        if (record.recycleStatus != RecycleStatus::NON_RECYCLABLE) {
+            HILOG_WARN("form %{public}" PRId64 " is already RECYCLABLE or RECYCLED", formId);
+            continue;
+        }
+        if (std::find(record.formUserUids.begin(), record.formUserUids.end(), callingUid)
+            == record.formUserUids.end()) {
+            HILOG_WARN("form %{public}" PRId64 " is not owned by %{public}d", formId, callingUid);
+            continue;
+        }
+
+        record.recycleStatus = RecycleStatus::RECYCLABLE;
+        FormDataMgr::GetInstance().UpdateFormRecord(matchedFormId, record);
+        validFormIds.emplace_back(matchedFormId);
+        HILOG_INFO("set %{public}" PRId64 " recyclable", formId);
+    }
+
+    if (validFormIds.empty()) {
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    return ERR_OK;
+}
+
+int32_t FormMgrAdapter::RecycleForms(const std::vector<int64_t> &formIds, const Want &want)
+{
+    HILOG_DEBUG("called");
+    FormRecord record;
+    std::vector<int64_t> validFormIds;
+    int callingUid = IPCSkeleton::GetCallingUid();
+    for (int64_t formId : formIds) {
+        if (formId <= 0) {
+            HILOG_ERROR("form id is negative");
+            continue;
+        }
+
+        int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+        if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record)) {
+            HILOG_WARN("form %{public}" PRId64 " not exist", formId);
+            continue;
+        }
+        if (record.formTempFlag) {
+            HILOG_WARN("form %{public}" PRId64 " is temp form", formId);
+            continue;
+        }
+        if (!record.isDynamic) {
+            HILOG_WARN("form %{public}" PRId64 " is static form", formId);
+            continue;
+        }
+        if (record.uiSyntax != FormType::ETS) {
+            HILOG_WARN("form %{public}" PRId64 " is not ETS form", formId);
+            continue;
+        }
+        if (record.recycleStatus == RecycleStatus::RECYCLED) {
+            HILOG_WARN("form %{public}" PRId64 " is already RECYCLED", formId);
+            continue;
+        }
+        if (std::find(record.formUserUids.begin(), record.formUserUids.end(), callingUid)
+            == record.formUserUids.end()) {
+            HILOG_WARN("form %{public}" PRId64 " is not owned by %{public}d", formId, callingUid);
+            continue;
+        }
+
+        record.recycleStatus = RecycleStatus::RECYCLABLE;
+        FormDataMgr::GetInstance().UpdateFormRecord(matchedFormId, record);
+        validFormIds.emplace_back(matchedFormId);
+        HILOG_INFO("set %{public}" PRId64 " recyclable", formId);
+    }
+
+    if (validFormIds.empty()) {
+        HILOG_WARN("validFormIds is empty");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    FormDataMgr::GetInstance().RecycleForms(validFormIds, callingUid, want);
+    return ERR_OK;
+}
+
+int32_t FormMgrAdapter::RecoverForms(const std::vector<int64_t> &formIds, const Want &want)
+{
+    HILOG_DEBUG("called.");
+    FormRecord record;
+    std::vector<int64_t> validFormIds;
+    int callingUid = IPCSkeleton::GetCallingUid();
+    std::string bundleName;
+    for (int64_t formId : formIds) {
+        if (formId <= 0) {
+            HILOG_ERROR("form id is negative");
+            continue;
+        }
+
+        int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+        if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record)) {
+            HILOG_WARN("form %{public}" PRId64 " not exist", formId);
+            continue;
+        }
+        if (record.recycleStatus == RecycleStatus::RECYCLABLE) {
+            HILOG_WARN("form %{public}" PRId64 " is RECYCLABLE, set it to NON_RECYCLABLE", formId);
+            FormTaskMgr::GetInstance().CancelDelayTask(std::make_pair((int64_t)TaskType::RECYCLE_FORM, formId));
+            record.recycleStatus = RecycleStatus::NON_RECYCLABLE;
+            FormDataMgr::GetInstance().UpdateFormRecord(matchedFormId, record);
+            continue;
+        }
+        if (record.recycleStatus != RecycleStatus::RECYCLED) {
+            HILOG_WARN("form %{public}" PRId64 " is not RECYCLED", formId);
+            continue;
+        }
+        if (std::find(record.formUserUids.begin(), record.formUserUids.end(), callingUid)
+            == record.formUserUids.end()) {
+            HILOG_WARN("form %{public}" PRId64 " is not owned by %{public}d", formId, callingUid);
+            continue;
+        }
+
+        bundleName = record.bundleName;
+        record.recycleStatus = RecycleStatus::NON_RECYCLABLE;
+        FormDataMgr::GetInstance().UpdateFormRecord(matchedFormId, record);
+        validFormIds.emplace_back(matchedFormId);
+        HILOG_INFO("set %{public}" PRId64 " recyclable", formId);
+    }
+
+    if (validFormIds.empty()) {
+        HILOG_WARN("validFormIds is empty");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    FormRenderMgr::GetInstance().RecoverForms(validFormIds, bundleName, want.GetParams());
+    return ERR_OK;
 }
 } // namespace AppExecFwk
 } // namespace OHOS

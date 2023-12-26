@@ -53,6 +53,26 @@ public:
     friend class FormMgrDeathRecipient;
 
     /**
+     * @brief Register click callback observer.
+     * @param bundleName BundleName of the form host.
+     * @param formEventType Form event type.
+     * @param observer Form click event callback listener.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RegisterClickEventObserver(
+        const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer);
+
+    /**
+     * @brief Unregister click callback observer.
+     * @param bundleName BundleName of the form host.
+     * @param formEventType Form event type.
+     * @param observer Form click event callback listener.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UnregisterClickEventObserver(
+        const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer);
+
+    /**
      * @brief Get the error message by error code.
      * @param errorCode the error code return form fms.
      * @return Returns the error message detail.
@@ -530,6 +550,44 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode RegisterRemoveObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken);
+
+    /**
+     * @brief Register form router event proxy.
+     * @param formIds Indicates the ID of the forms.
+     * @param callerToken Router proxy call back client.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RegisterFormRouterProxy(const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &callerToken);
+
+    /**
+     * @brief Unregister form router event proxy.
+     * @param formIds Indicates the ID of the forms.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UnregisterFormRouterProxy(const std::vector<int64_t> &formIds);
+
+    /**
+     * @brief Set forms recyclable
+     * @param formIds Indicates the id of the forms.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t SetFormsRecyclable(const std::vector<int64_t> &formIds);
+
+    /**
+     * @brief Recycle forms
+     * @param formIds Indicates the id of the forms.
+     * @param want The want of forms to be recycled.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t RecycleForms(const std::vector<int64_t> &formIds, const Want &want);
+
+    /**
+     * @brief Recover recycled forms
+     * @param formIds Indicates the id of the forms.
+     * @param want The want of forms to be recovered.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t RecoverForms(const std::vector<int64_t> &formIds, const Want &want);
 
 private:
     /**

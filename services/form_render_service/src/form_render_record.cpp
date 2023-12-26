@@ -18,6 +18,7 @@
 #include <chrono>
 #include <utility>
 
+#include "ecmascript/napi/include/jsnapi.h"
 #include "extractor.h"
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
@@ -30,6 +31,7 @@ namespace AppExecFwk {
 namespace FormRender {
 constexpr int32_t RENDER_FORM_FAILED = -1;
 constexpr int32_t RELOAD_FORM_FAILED = -1;
+constexpr int32_t RECYCLE_FORM_FAILED = -1;
 constexpr int32_t TIMEOUT = 10 * 1000;
 constexpr int32_t CHECK_THREAD_TIME = 3;
 constexpr char FORM_RENDERER_COMP_ID[] = "ohos.extra.param.key.form_comp_id";
@@ -83,7 +85,7 @@ std::string HandlerDumper::GetDumpInfo()
 std::shared_ptr<FormRenderRecord> FormRenderRecord::Create(
     const std::string &bundleName, const std::string &uid, bool needMonitored)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("bundleName is %{public}s, uid is %{public}s.", bundleName.c_str(), uid.c_str());
     std::shared_ptr<FormRenderRecord> renderRecord = std::make_shared<FormRenderRecord>(bundleName, uid);
     if (!renderRecord) {
         HILOG_ERROR("Create FormRenderRecord failed.");
@@ -100,11 +102,13 @@ std::shared_ptr<FormRenderRecord> FormRenderRecord::Create(
 FormRenderRecord::FormRenderRecord(
     const std::string &bundleName, const std::string &uid) : bundleName_(bundleName), uid_(uid)
 {
+    HILOG_INFO("bundleName is %{public}s, uid is %{public}s.", bundleName.c_str(), uid.c_str());
     threadState_ = std::make_shared<ThreadState>(CHECK_THREAD_TIME);
 }
 
 FormRenderRecord::~FormRenderRecord()
 {
+    FMS_CALL_INFO_ENTER;
     std::shared_ptr<EventHandler> eventHandler = nullptr;
     {
         std::lock_guard<std::mutex> lock(eventHandlerMutex_);
@@ -112,6 +116,7 @@ FormRenderRecord::~FormRenderRecord()
     }
 
     if (eventHandler == nullptr) {
+        HILOG_WARN("eventHandler is nullptr");
         return;
     }
 
@@ -298,7 +303,8 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
     return ERR_OK;
 }
 
-void FormRenderRecord::DeleteRenderRecord(int64_t formId, const std::string &compId, const sptr<IRemoteObject> hostRemoteObj, bool &isRenderGroupEmpty)
+void FormRenderRecord::DeleteRenderRecord(int64_t formId, const std::string &compId,
+    const sptr<IRemoteObject> hostRemoteObj, bool &isRenderGroupEmpty)
 {
     // Some resources need to be deleted in a JS thread
     HILOG_INFO("Delete some resources formId: %{public}" PRId64 ", %{public}s", formId, compId.c_str());
@@ -321,7 +327,7 @@ void FormRenderRecord::DeleteRenderRecord(int64_t formId, const std::string &com
         }
 
         isRenderGroupEmpty = renderRecord->HandleDeleteInJsThread(formId, compId);
-        renderRecord->DeleteStaticFormRequest(formId, compId);
+        renderRecord->DeleteFormRequest(formId, compId);
     };
 
     if (hostRemoteObj != nullptr) {
@@ -338,17 +344,17 @@ void FormRenderRecord::DeleteRenderRecord(int64_t formId, const std::string &com
 bool FormRenderRecord::IsEmpty()
 {
     bool rendererEmpty = false;
-    bool staticFormRequestsEmpty = false;
+    bool formRequestsEmpty = false;
     {
         std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
         rendererEmpty = formRendererGroupMap_.empty();
     }
     {
-        std::lock_guard<std::mutex> lock(staticFormRequestsMutex_);
-        staticFormRequestsEmpty = staticFormRequests_.empty();
+        std::lock_guard<std::mutex> lock(formRequestsMutex_);
+        formRequestsEmpty = formRequests_.empty();
     }
 
-    return rendererEmpty && staticFormRequestsEmpty;
+    return rendererEmpty && formRequestsEmpty;
 }
 
 std::string FormRenderRecord::GetUid() const
@@ -402,7 +408,7 @@ std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::GetContext(const Form
             if (iter->second != nullptr) {
                 auto applicationInfo = iter->second->GetApplicationInfo();
                 if (applicationInfo != nullptr) {
-                    int32_t apiCompatibleVersion = static_cast<uint32_t>(
+                    uint32_t apiCompatibleVersion = static_cast<uint32_t>(
                         want.GetIntParam(Constants::FORM_COMPATIBLE_VERSION_KEY, 0));
                     if (apiCompatibleVersion != 0) {
                         applicationInfo->apiCompatibleVersion = apiCompatibleVersion;
@@ -502,61 +508,53 @@ bool FormRenderRecord::BeforeHandleUpdateForm(const FormJsInfo &formJsInfo)
 
 void FormRenderRecord::HandleUpdateForm(const FormJsInfo &formJsInfo, const Want &want)
 {
-    if (formJsInfo.isDynamic) {
-        HandleUpdateDynamicForm(formJsInfo, want);
-    } else {
-        HandleUpdateStaticForm(formJsInfo, want);
-    }
-}
-
-void FormRenderRecord::HandleUpdateDynamicForm(const FormJsInfo &formJsInfo, const Want &want)
-{
     auto renderType = want.GetIntParam(Constants::FORM_RENDER_TYPE_KEY, Constants::RENDER_FORM);
     HILOG_INFO("renderType is %{public}d.", renderType);
     if (renderType == Constants::RENDER_FORM) {
         AddRenderer(formJsInfo, want);
-    } else {
-        UpdateRenderer(formJsInfo);
-    }
-
-    auto compId = want.GetStringParam(FORM_RENDERER_COMP_ID);
-    DeleteStaticFormRequest(formJsInfo.formId, compId);
-}
-
-void FormRenderRecord::HandleUpdateStaticForm(const FormJsInfo &formJsInfo, const Want &want)
-{
-    auto renderType = want.GetIntParam(Constants::FORM_RENDER_TYPE_KEY, Constants::RENDER_FORM);
-    HILOG_INFO("renderType is %{public}d.", renderType);
-    if (renderType == Constants::RENDER_FORM) {
-        AddRenderer(formJsInfo, want);
-        AddStaticFormRequest(formJsInfo, want);
+        AddFormRequest(formJsInfo, want);
         return;
     }
 
-    std::unordered_map<std::string, Ace::FormRequest> staticFormRequests;
+    std::unordered_map<std::string, Ace::FormRequest> formRequests;
     {
-        std::lock_guard<std::mutex> lock(staticFormRequestsMutex_);
-        auto iter = staticFormRequests_.find(formJsInfo.formId);
-        if (iter == staticFormRequests_.end()) {
+        std::lock_guard<std::mutex> lock(formRequestsMutex_);
+        auto iter = formRequests_.find(formJsInfo.formId);
+        if (iter == formRequests_.end()) {
             return;
         }
 
-        staticFormRequests = iter->second;
+        formRequests = iter->second;
     }
 
-    for (const auto& iter : staticFormRequests) {
+    for (const auto& iter : formRequests) {
         auto formRequest = iter.second;
         formRequest.formJsInfo = formJsInfo;
         if (!formRequest.hasRelease) {
             UpdateRenderer(formJsInfo);
-            AddStaticFormRequest(formJsInfo.formId, formRequest);
+            AddFormRequest(formJsInfo.formId, formRequest);
             continue;
         }
 
-        if (staticFormRequests.size() == 1) {
-            AddRenderer(formJsInfo, formRequest.want);
-            formRequest.hasRelease = false;
-            AddStaticFormRequest(formJsInfo.formId, formRequest);
+        if (formRequests.size() == 1) {
+            if (formJsInfo.isDynamic) {
+                // recover form
+                Want oldWant = formRequest.want;
+                std::string statusData = want.GetStringParam(Constants::FORM_STATUS_DATA);
+                oldWant.SetParam(Constants::FORM_STATUS_DATA, statusData);
+                oldWant.SetParam(Constants::FORM_IS_RECOVER_FORM_TO_HANDLE_CLICK_EVENT, true);
+
+                AddRenderer(formRequest.formJsInfo, oldWant);
+                formRequest.hasRelease = false;
+                AddFormRequest(formJsInfo.formId, formRequest);
+
+                // update form
+                UpdateRenderer(formJsInfo);
+            } else {
+                AddRenderer(formJsInfo, formRequest.want);
+                formRequest.hasRelease = false;
+                AddFormRequest(formJsInfo.formId, formRequest);
+            }
         }
     }
 }
@@ -598,16 +596,16 @@ bool FormRenderRecord::HandleDeleteInJsThread(int64_t formId, const std::string 
         std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
         auto search = formRendererGroupMap_.find(formId);
         if (search == formRendererGroupMap_.end()) {
-            HILOG_INFO("HandleDeleteInJsThread failed. FormRendererGroup was not founded.");
+            HILOG_ERROR("HandleDeleteInJsThread failed. FormRendererGroup was not founded.");
             return false;
         }
         if (!search->second) {
-            HILOG_INFO("HandleDeleteInJsThread failed. FormRendererGroup was founded but is null.");
+            HILOG_ERROR("HandleDeleteInJsThread failed. FormRendererGroup was founded but is null.");
             return false;
         }
         if (!compId.empty()) {
             search->second->DeleteForm(compId);
-            HILOG_INFO("HandleDeleteInJsThread compid is %{public}s", compId.c_str());
+            HILOG_ERROR("HandleDeleteInJsThread compid is %{public}s", compId.c_str());
             return false;
         }
         search->second->DeleteForm();
@@ -627,27 +625,27 @@ bool FormRenderRecord::CheckEventHandler(bool createThead, bool needMonitored)
     return eventHandler_ != nullptr;
 }
 
-void FormRenderRecord::AddStaticFormRequest(const FormJsInfo &formJsInfo, const Want &want)
+void FormRenderRecord::AddFormRequest(const FormJsInfo &formJsInfo, const Want &want)
 {
     auto compId = want.GetStringParam(FORM_RENDERER_COMP_ID);
-    HILOG_INFO("AddStaticFormRequest formId: %{public}s, compId: %{public}s.",
+    HILOG_INFO("AddFormRequest formId: %{public}s, compId: %{public}s.",
         std::to_string(formJsInfo.formId).c_str(), compId.c_str());
     if (compId.empty()) {
         return;
     }
 
-    std::lock_guard<std::mutex> lock(staticFormRequestsMutex_);
+    std::lock_guard<std::mutex> lock(formRequestsMutex_);
     Ace::FormRequest formRequest;
     formRequest.compId = compId;
     formRequest.want = want;
     formRequest.want.SetParam(Constants::FORM_RENDER_TYPE_KEY, Constants::RENDER_FORM);
     formRequest.isDynamic = formJsInfo.isDynamic;
     formRequest.formJsInfo = formJsInfo;
-    auto iter = staticFormRequests_.find(formJsInfo.formId);
-    if (iter == staticFormRequests_.end()) {
+    auto iter = formRequests_.find(formJsInfo.formId);
+    if (iter == formRequests_.end()) {
         std::unordered_map<std::string, Ace::FormRequest> formRequests;
         formRequests.emplace(compId, formRequest);
-        staticFormRequests_.emplace(formJsInfo.formId, formRequests);
+        formRequests_.emplace(formJsInfo.formId, formRequests);
         return;
     }
 
@@ -658,16 +656,16 @@ void FormRenderRecord::AddStaticFormRequest(const FormJsInfo &formJsInfo, const 
     iter->second.emplace(compId, formRequest);
 }
 
-void FormRenderRecord::AddStaticFormRequest(int64_t formId, const Ace::FormRequest &formRequest)
+void FormRenderRecord::AddFormRequest(int64_t formId, const Ace::FormRequest &formRequest)
 {
-    HILOG_INFO("AddStaticFormRequest by FormRequest formId: %{public}s, compId: %{public}s.",
+    HILOG_INFO("AddFormRequest by FormRequest formId: %{public}s, compId: %{public}s.",
         std::to_string(formId).c_str(), formRequest.compId.c_str());
-    std::lock_guard<std::mutex> lock(staticFormRequestsMutex_);
-    auto iter = staticFormRequests_.find(formId);
-    if (iter == staticFormRequests_.end()) {
+    std::lock_guard<std::mutex> lock(formRequestsMutex_);
+    auto iter = formRequests_.find(formId);
+    if (iter == formRequests_.end()) {
         std::unordered_map<std::string, Ace::FormRequest> formRequests;
         formRequests.emplace(formRequest.compId, formRequest);
-        staticFormRequests_.emplace(formId, formRequests);
+        formRequests_.emplace(formId, formRequests);
         return;
     }
 
@@ -678,13 +676,13 @@ void FormRenderRecord::AddStaticFormRequest(int64_t formId, const Ace::FormReque
     iter->second.emplace(formRequest.compId, formRequest);
 }
 
-void FormRenderRecord::DeleteStaticFormRequest(int64_t formId, const std::string &compId)
+void FormRenderRecord::DeleteFormRequest(int64_t formId, const std::string &compId)
 {
-    HILOG_INFO("DeleteStaticFormRequest formId: %{public}s, compId: %{public}s.",
+    HILOG_INFO("DeleteFormRequest formId: %{public}s, compId: %{public}s.",
         std::to_string(formId).c_str(), compId.c_str());
-    std::lock_guard<std::mutex> lock(staticFormRequestsMutex_);
-    auto iter = staticFormRequests_.find(formId);
-    if (iter == staticFormRequests_.end()) {
+    std::lock_guard<std::mutex> lock(formRequestsMutex_);
+    auto iter = formRequests_.find(formId);
+    if (iter == formRequests_.end()) {
         return;
     }
 
@@ -692,28 +690,24 @@ void FormRenderRecord::DeleteStaticFormRequest(int64_t formId, const std::string
     if (innerIter != iter->second.end()) {
         iter->second.erase(innerIter);
         if (iter->second.empty()) {
-            staticFormRequests_.erase(iter);
+            formRequests_.erase(iter);
         }
     }
 }
 
-void FormRenderRecord::UpdateStaticFormRequestReleaseState(
+void FormRenderRecord::UpdateFormRequestReleaseState(
     int64_t formId, const std::string &compId, bool hasRelease)
 {
-    HILOG_INFO("UpdateStatic ReleaseState formId: %{public}s, compId: %{public}s, hasRelease: %{public}d.",
+    HILOG_INFO("Update ReleaseState formId: %{public}s, compId: %{public}s, hasRelease: %{public}d.",
         std::to_string(formId).c_str(), compId.c_str(), hasRelease);
-    std::lock_guard<std::mutex> lock(staticFormRequestsMutex_);
-    auto iter = staticFormRequests_.find(formId);
-    if (iter == staticFormRequests_.end()) {
+    std::lock_guard<std::mutex> lock(formRequestsMutex_);
+    auto iter = formRequests_.find(formId);
+    if (iter == formRequests_.end()) {
         return;
     }
 
     auto innerIter = iter->second.find(compId);
     if (innerIter == iter->second.end()) {
-        return;
-    }
-
-    if (innerIter->second.isDynamic) {
         return;
     }
 
@@ -745,7 +739,7 @@ void FormRenderRecord::ReleaseRenderer(
 
         bool ret = renderRecord->HandleReleaseRendererInJsThread(formId, compId, isRenderGroupEmpty);
         if (ret) {
-            renderRecord->UpdateStaticFormRequestReleaseState(formId, compId, true);
+            renderRecord->UpdateFormRequestReleaseState(formId, compId, true);
         }
     };
     eventHandler->PostSyncTask(task, "ReleaseRenderer");
@@ -815,69 +809,69 @@ void FormRenderRecord::HandleReleaseInJsThread()
     ReleaseHapFileHandle();
 }
 
-void FormRenderRecord::ReAddAllStaticForms()
+void FormRenderRecord::ReAddAllRecycledForms()
 {
-    HILOG_INFO("ReAdd all static forms start.");
-    if (!CheckEventHandler(false)) {
+    HILOG_INFO("ReAdd all recycled forms start.");
+    if (!CheckEventHandler(false, true)) {
         HILOG_ERROR("CheckEventHandler failed.");
         return;
     }
 
-    std::lock_guard<std::mutex> lock(staticFormRequestsMutex_);
-    for (const auto& staticFormRequests : staticFormRequests_) {
-        for (const auto& staticFormRequest : staticFormRequests.second) {
-            if (staticFormRequest.second.isDynamic || !staticFormRequest.second.hasRelease) {
+    std::lock_guard<std::mutex> lock(formRequestsMutex_);
+    for (const auto& formRequests : formRequests_) {
+        for (const auto& formRequest : formRequests.second) {
+            if (!formRequest.second.hasRelease) {
                 continue;
             }
 
             std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
-            auto task = [thisWeakPtr, formJsInfo = staticFormRequest.second.formJsInfo,
-                want = staticFormRequest.second.want]() {
+            auto task = [thisWeakPtr, formJsInfo = formRequest.second.formJsInfo,
+                want = formRequest.second.want]() {
                 auto renderRecord = thisWeakPtr.lock();
                 if (renderRecord) {
                     renderRecord->HandleUpdateInJsThread(formJsInfo, want);
                 }
             };
-            eventHandler_->PostTask(task, "ReAddAllStaticForms");
+            eventHandler_->PostTask(task, "ReAddAllRecycledForms");
         }
     }
 
-    HILOG_INFO("ReAdd all static forms end.");
+    HILOG_INFO("ReAdd all recycled forms end.");
 }
 
-void FormRenderRecord::ReAddStaticForms(const std::vector<FormJsInfo> &formJsInfos)
+void FormRenderRecord::ReAddRecycledForms(const std::vector<FormJsInfo> &formJsInfos)
 {
-    HILOG_INFO("ReAdd static form start");
-    if (!CheckEventHandler(false)) {
+    HILOG_INFO("ReAdd recycled form start");
+    if (!CheckEventHandler(false, true)) {
         HILOG_ERROR("CheckEventHandler failed.");
         return;
     }
 
-    std::lock_guard<std::mutex> lock(staticFormRequestsMutex_);
+    std::lock_guard<std::mutex> lock(formRequestsMutex_);
     for (const auto &form : formJsInfos) {
-        auto iter = staticFormRequests_.find(form.formId);
-        if (iter == staticFormRequests_.end()) {
+        auto iter = formRequests_.find(form.formId);
+        if (iter == formRequests_.end()) {
             continue;
         }
 
-        for (const auto& staticFormRequest : iter->second) {
-            if (!staticFormRequest.second.hasRelease) {
+        for (const auto& formRequest : iter->second) {
+            if (!formRequest.second.hasRelease) {
                 continue;
             }
 
             std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
             auto task = [thisWeakPtr, form,
-                    want = staticFormRequest.second.want]() {
+                    want = formRequest.second.want]() {
                 auto renderRecord = thisWeakPtr.lock();
                 if (renderRecord) {
                     renderRecord->HandleUpdateInJsThread(form, want);
                 }
             };
-            eventHandler_->PostTask(task, "ReAddStaticForms");
+            eventHandler_->PostTask(task, "ReAddRecycledForms");
         }
     }
 
-    HILOG_INFO("ReAdd static form end.");
+    HILOG_INFO("ReAdd recycled forms end.");
 }
 
 void FormRenderRecord::HandleDestroyInJsThread()
@@ -885,8 +879,8 @@ void FormRenderRecord::HandleDestroyInJsThread()
     HILOG_INFO("FormRenderService is exiting, destroy some resources in js thread.");
     MarkThreadAlive();
     {
-        std::lock_guard<std::mutex> lock(staticFormRequestsMutex_);
-        staticFormRequests_.clear();
+        std::lock_guard<std::mutex> lock(formRequestsMutex_);
+        formRequests_.clear();
     }
     std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
     formRendererGroupMap_.clear();
@@ -915,12 +909,12 @@ int32_t FormRenderRecord::ReloadFormRecord(const std::vector<FormJsInfo> &&formJ
     HILOG_INFO("Reload form record");
     std::lock_guard<std::mutex> lock(eventHandlerMutex_);
     if (eventHandler_ == nullptr) {
-        if (!CheckEventHandler(true, false)) {
+        if (!CheckEventHandler(true, true)) {
             HILOG_ERROR("eventHandler is nullptr");
             return RELOAD_FORM_FAILED;
         }
 
-        ReAddStaticForms(formJsInfos);
+        ReAddRecycledForms(formJsInfos);
         return ERR_OK;
     }
 
@@ -935,7 +929,7 @@ int32_t FormRenderRecord::ReloadFormRecord(const std::vector<FormJsInfo> &&formJ
         renderRecord->HandleReloadFormRecord(std::move(ids), want);
     };
     eventHandler_->PostTask(task, "ReloadFormRecord");
-    ReAddStaticForms(formJsInfos);
+    ReAddRecycledForms(formJsInfos);
     return ERR_OK;
 }
 
@@ -997,12 +991,10 @@ int32_t FormRenderRecord::HandleReloadFormRecord(const std::vector<FormJsInfo> &
             HILOG_ERROR("HandleReloadFormRecord failed. FormRendererGroup is null.");
             continue;
         }
-        if (!form.isDynamic) {
-            for (auto formRequest : group->GetAllRendererFormRequests()) {
-                formRequest.isDynamic = false;
-                formRequest.formJsInfo = form;
-                AddStaticFormRequest(form.formId, formRequest);
-            }
+        for (auto formRequest : group->GetAllRendererFormRequests()) {
+            formRequest.isDynamic = form.isDynamic;
+            formRequest.formJsInfo = form;
+            AddFormRequest(form.formId, formRequest);
         }
         group->ReloadForm(form);
     }
@@ -1021,12 +1013,12 @@ void FormRenderRecord::UpdateConfiguration(
     SetConfiguration(config);
     std::lock_guard<std::mutex> lock(eventHandlerMutex_);
     if (eventHandler_ == nullptr) {
-        if (!CheckEventHandler(true, false)) {
+        if (!CheckEventHandler(true, true)) {
             HILOG_ERROR("eventHandler is nullptr");
             return;
         }
 
-        ReAddAllStaticForms();
+        ReAddAllRecycledForms();
         return;
     }
 
@@ -1041,7 +1033,7 @@ void FormRenderRecord::UpdateConfiguration(
     };
 
     eventHandler_->PostTask(task, "UpdateConfiguration");
-    ReAddAllStaticForms();
+    ReAddAllRecycledForms();
 }
 
 void FormRenderRecord::HandleUpdateConfiguration(
@@ -1058,6 +1050,138 @@ void FormRenderRecord::HandleUpdateConfiguration(
     for (auto iter = formRendererGroupMap_.begin(); iter != formRendererGroupMap_.end(); ++iter) {
         if (iter->second) {
             iter->second->UpdateConfiguration(config);
+        }
+    }
+}
+
+void FormRenderRecord::FormRenderGC()
+{
+    std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
+    auto task = [thisWeakPtr]() {
+        auto renderRecord = thisWeakPtr.lock();
+        if (renderRecord == nullptr) {
+            HILOG_ERROR("renderRecord is nullptr.");
+            return;
+        }
+        renderRecord->HandleFormRenderGC();
+    };
+    if (eventHandler_ == nullptr) {
+        HILOG_ERROR("eventHandler_ is nullptr.");
+        return;
+    }
+    eventHandler_->PostSyncTask(task, "HandleFormRenderGC");
+}
+
+void FormRenderRecord::HandleFormRenderGC()
+{
+    HILOG_INFO("HandleFormRenderGC.");
+    if (runtime_ == nullptr) {
+        HILOG_ERROR("runtime_ is null.");
+        return;
+    }
+    panda::JSNApi::TriggerGC((static_cast<AbilityRuntime::JsRuntime&>(*runtime_)).GetEcmaVm(),
+        panda::JSNApi::TRIGGER_GC_TYPE::FULL_GC);
+}
+
+int32_t FormRenderRecord::RecycleForm(const int64_t &formId, std::string &statusData)
+{
+    HILOG_INFO("RecycleForm begin, formId: %{public}s.", std::to_string(formId).c_str());
+    int32_t result = RECYCLE_FORM_FAILED;
+    if (!CheckEventHandler(true, true)) {
+        HILOG_ERROR("eventHandler_ is nullptr");
+        return RENDER_FORM_FAILED;
+    }
+
+    auto task = [thisWeakPtr = weak_from_this(), formId, &statusData, &result]() {
+        auto renderRecord = thisWeakPtr.lock();
+        if (renderRecord == nullptr) {
+            HILOG_ERROR("renderRecord is nullptr.");
+            return;
+        }
+
+        result = renderRecord->HandleRecycleForm(formId, statusData);
+    };
+    eventHandler_->PostSyncTask(task, "RecycleForm");
+    return result;
+}
+
+int32_t FormRenderRecord::HandleRecycleForm(const int64_t &formId, std::string &statusData)
+{
+    HILOG_INFO("HandleRecycleForm begin, formId: %{public}s.", std::to_string(formId).c_str());
+    MarkThreadAlive();
+
+    std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
+    auto search = formRendererGroupMap_.find(formId);
+    if (search == formRendererGroupMap_.end()) {
+        HILOG_ERROR("HandleRecycleForm failed. FormRendererGroup was not founded.");
+        return RECYCLE_FORM_FAILED;
+    }
+    if (!search->second) {
+        HILOG_ERROR("HandleRecycleForm failed. FormRendererGroup was founded but is null.");
+        return RECYCLE_FORM_FAILED;
+    }
+
+    search->second->RecycleForm(statusData);
+    return ERR_OK;
+}
+
+int32_t FormRenderRecord::RecoverForm(const int64_t &formId,
+    const std::string &statusData, const bool &isRecoverFormToHandleClickEvent)
+{
+    HILOG_INFO("RecoverForm begin, formId: %{public}s.", std::to_string(formId).c_str());
+    std::lock_guard<std::mutex> lock(eventHandlerMutex_);
+    if (!CheckEventHandler(true, true)) {
+        HILOG_ERROR("eventHandler_ is nullptr");
+        return RENDER_FORM_FAILED;
+    }
+
+    std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
+    auto task = [thisWeakPtr, formId, statusData, isRecoverFormToHandleClickEvent]() {
+        auto renderRecord = thisWeakPtr.lock();
+        if (renderRecord == nullptr) {
+            HILOG_ERROR("renderRecord is nullptr");
+            return;
+        }
+        renderRecord->HandleRecoverForm(formId, statusData, isRecoverFormToHandleClickEvent);
+    };
+    eventHandler_->PostTask(task, "RecoverForm");
+    return ERR_OK;
+}
+
+void FormRenderRecord::HandleRecoverForm(const int64_t &formId,
+    const std::string &statusData, const bool &isRecoverFormToHandleClickEvent)
+{
+    HILOG_INFO("HandleRecoverForm begin, formId: %{public}s.", std::to_string(formId).c_str());
+    std::unordered_map<std::string, Ace::FormRequest> formRequests;
+    {
+        std::lock_guard<std::mutex> lock(formRequestsMutex_);
+        auto iter = formRequests_.find(formId);
+        if (iter == formRequests_.end()) {
+            HILOG_ERROR("%{public}s doesn't has formRequest", std::to_string(formId).c_str());
+            return;
+        }
+        formRequests = iter->second;
+    }
+    if (formRequests.empty()) {
+        HILOG_ERROR("formRequests is empty");
+        return;
+    }
+
+    if (!BeforeHandleUpdateForm(formRequests.begin()->second.formJsInfo)) {
+        HILOG_ERROR("recover form prepare failed");
+        return;
+    }
+
+    if (formRequests.size() == 1) {
+        auto formRequest = formRequests.begin()->second;
+        if (formRequest.hasRelease) {
+            Want want = formRequest.want;
+            want.SetParam(Constants::FORM_STATUS_DATA, statusData);
+            want.SetParam(Constants::FORM_IS_RECOVER_FORM_TO_HANDLE_CLICK_EVENT, isRecoverFormToHandleClickEvent);
+
+            AddRenderer(formRequest.formJsInfo, want);
+            formRequest.hasRelease = false;
+            AddFormRequest(formId, formRequest);
         }
     }
 }

@@ -448,6 +448,22 @@ public:
     virtual ErrCode RegisterRemoveObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken) = 0;
 
     /**
+     * @brief Register form router event proxy.
+     * @param formIds Indicates the id of the forms.
+     * @param callerToken Router proxy call back client.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode RegisterFormRouterProxy(const std::vector<int64_t> &formIds,
+        const sptr<IRemoteObject> &callerToken) = 0;
+
+    /**
+     * @brief Unregister form router event proxy.
+     * @param formIds Indicates the id of the forms.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode UnregisterFormRouterProxy(const std::vector<int64_t> &formIds) = 0;
+
+    /**
      * @brief Update proxy form with formId.
      * @param formId The Id of the form to update.
      * @param FormProviderData Form binding data.
@@ -488,6 +504,58 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     virtual int32_t UnregisterPublishFormInterceptor(const sptr<IRemoteObject> &interceptorCallback)
+    {
+        return 0;
+    }
+
+    /**
+     * @brief Register click callback observer.
+     * @param bundleName BundleName of the form host.
+     * @param formEventType Form event type.
+     * @param observer Form click event callback listener.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode RegisterClickEventObserver(
+        const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer) = 0;
+
+    /**
+     * @brief Unregister click callback observer.
+     * @param bundleName BundleName of the form host.
+     * @param formEventType Form event type.
+     * @param observer Form click event callback listener.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode UnregisterClickEventObserver(
+        const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer) = 0;
+
+    /**
+     * @brief Set forms recyclable
+     * @param formIds Indicates the id of the forms.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int32_t SetFormsRecyclable(const std::vector<int64_t> &formIds)
+    {
+        return 0;
+    }
+
+    /**
+     * @brief Recycle forms
+     * @param formIds Indicates the id of the forms.
+     * @param want The want of forms to be recycled.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int32_t RecycleForms(const std::vector<int64_t> &formIds, const Want &want)
+    {
+        return 0;
+    }
+
+    /**
+     * @brief Recover recycled forms
+     * @param formIds Indicates the id of the forms.
+     * @param want The want of forms to be recovered.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int32_t RecoverForms(const std::vector<int64_t> &formIds, const Want &want)
     {
         return 0;
     }
@@ -556,6 +624,13 @@ public:
         FORM_MGR_RELEASE_RENDERER,
         FORM_MGR_REGISTER_PUBLISH_FORM_INTERCEPTOR,
         FORM_MGR_UNREGISTER_PUBLISH_FORM_INTERCEPTOR,
+        FORM_MGR_REGISTER_CLICK_EVENT_OBSERVER,
+        FORM_MGR_UNREGISTER_CLICK_EVENT_OBSERVER,
+        FORM_MGR_REGISTER_FORM_ROUTER_PROXY,
+        FORM_MGR_UNREGISTER_FORM_ROUTER_PROXY,
+        FORM_MGR_SET_FORMS_RECYCLABLE,
+        FORM_MGR_RECYCLE_FORMS,
+        FORM_MGR_RECOVER_FORMS,
     };
 };
 }  // namespace AppExecFwk

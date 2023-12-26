@@ -16,10 +16,6 @@
 #include "form_bms_helper.h"
 
 #include "ability_manager_interface.h"
-#ifndef SUPPORT_ERMS
-#include "erms_mgr_interface.h"
-#include "erms_mgr_param.h"
-#endif
 #include "fms_log_wrapper.h"
 #include "form_mgr_errors.h"
 #include "if_system_ability_manager.h"
@@ -31,10 +27,14 @@
 namespace OHOS {
 namespace AppExecFwk {
 FormBmsHelper::FormBmsHelper()
-{}
+{
+    HILOG_INFO("called");
+}
 
 FormBmsHelper::~FormBmsHelper()
-{}
+{
+    HILOG_INFO("called");
+}
 
 sptr<IBundleMgr> FormBmsHelper::GetBundleMgr()
 {
@@ -57,9 +57,22 @@ sptr<IBundleMgr> FormBmsHelper::GetBundleMgr()
             }
         }
     }
-    
+
     return iBundleMgr_;
 }
+
+sptr<IBundleInstaller> FormBmsHelper::GetBundleInstaller()
+{
+    HILOG_DEBUG("called.");
+    if (bundleInstallerProxy_ == nullptr) {
+        sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
+        if (iBundleMgr != nullptr) {
+            bundleInstallerProxy_ = iBundleMgr->GetBundleInstaller();
+        }
+    }
+    return bundleInstallerProxy_;
+}
+
 
 void FormBmsHelper::SetBundleManager(const sptr<IBundleMgr> &bundleManager)
 {

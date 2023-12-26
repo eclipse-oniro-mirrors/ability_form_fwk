@@ -658,6 +658,19 @@ public:
      * @param value the return value.
      */
     void GetConfigParamFormMap(const std::string &key, int32_t &value) const;
+
+    /**
+     * @brief Recycle all recyclable forms.
+     */
+    void RecycleAllRecyclableForms() const;
+
+    /**
+     * @brief Recycle forms.
+     * @param formIds Indicates the ID of the forms.
+     * @param callingUid The uid of caller.
+     * @param want The want of forms to be recycled.
+     */
+    void RecycleForms(const std::vector<int64_t> &formIds, const int &callingUid, const Want &want) const;
 private:
     /**
      * @brief Create form record.

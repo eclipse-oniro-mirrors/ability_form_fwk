@@ -62,7 +62,7 @@ public:
     virtual ~MockFormRenderImpl() {};
 
     int32_t RenderForm(const FormJsInfo &formJsInfo, const Want &want,
-        const sptr<IRemoteObject> &callerToken) override
+        sptr<IRemoteObject> callerToken) override
     {
         return ERR_OK;
     };
@@ -375,6 +375,29 @@ public:
         return ERR_OK;
     }
     ErrCode RegisterRemoveObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken) override
+    {
+        return ERR_OK;
+    }
+
+    ErrCode RegisterClickEventObserver(
+        const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer) override
+    {
+        return ERR_OK;
+    }
+
+    ErrCode UnregisterClickEventObserver(
+        const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer) override
+    {
+        return ERR_OK;
+    }
+
+    ErrCode RegisterFormRouterProxy(const std::vector<int64_t> &formIds,
+        const sptr<IRemoteObject> &callerToken) override
+    {
+        return ERR_OK;
+    }
+
+    ErrCode UnregisterFormRouterProxy(const std::vector<int64_t> &formIds) override
     {
         return ERR_OK;
     }

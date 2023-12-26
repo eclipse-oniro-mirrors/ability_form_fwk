@@ -91,7 +91,7 @@ public:
     {
         return nullptr;
     }
-    int SendWantSender(const sptr<AAFwk::IWantSender> &target, const AAFwk::SenderInfo &senderInfo) override
+    int SendWantSender(sptr<AAFwk::IWantSender> target, const AAFwk::SenderInfo &senderInfo) override
     {
         return 0;
     }
@@ -325,6 +325,11 @@ public:
     {
         return 0;
     }
+
+    int32_t GetForegroundUIAbilities(std::vector<AppExecFwk::AbilityStateData> &list) override
+    {
+        return 0;
+    }
 };
 
 class MockAbilityMgrStub : public IRemoteStub<AAFwk::IAbilityManager> {
@@ -335,6 +340,16 @@ public:
 
     int OnRemoteRequest(
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override
+    {
+        return 0;
+    }
+
+    int32_t SetApplicationAutoStartupByEDM(const AutoStartupInfo &info, bool flag) override
+    {
+        return 0;
+    }
+
+    int32_t CancelApplicationAutoStartupByEDM(const AutoStartupInfo &info, bool flag) override
     {
         return 0;
     }
@@ -469,7 +484,7 @@ public:
     {
         return nullptr;
     }
-    int SendWantSender(const sptr<AAFwk::IWantSender> &target, const AAFwk::SenderInfo &senderInfo) override
+    int SendWantSender(sptr<AAFwk::IWantSender> target, const AAFwk::SenderInfo &senderInfo) override
     {
         return 0;
     }
@@ -553,7 +568,7 @@ public:
     {
         return 0;
     }
-    int ClearUpApplicationData(const std::string &bundleName) override
+    int ClearUpApplicationData(const std::string &bundleName, const int32_t userId = DEFAULT_INVAL_VALUE) override
     {
         return 0;
     }
@@ -780,12 +795,12 @@ public:
         return 0;
     }
 
-    int32_t RegisterAppDebugListener(const sptr<AppExecFwk::IAppDebugListener> &listener)
+    int32_t RegisterAppDebugListener(sptr<AppExecFwk::IAppDebugListener> listener)
     {
         return 0;
     }
 
-    int32_t UnregisterAppDebugListener(const sptr<AppExecFwk::IAppDebugListener> &listener)
+    int32_t UnregisterAppDebugListener(sptr<AppExecFwk::IAppDebugListener> listener)
     {
         return 0;
     }
@@ -808,6 +823,11 @@ public:
 
     int32_t ExecuteInsightIntentDone(const sptr<IRemoteObject> &token, uint64_t intentId,
         const InsightIntentExecuteResult &result)
+    {
+        return 0;
+    }
+
+    int32_t GetForegroundUIAbilities(std::vector<AppExecFwk::AbilityStateData> &list) override
     {
         return 0;
     }

@@ -604,12 +604,11 @@ HWTEST_F(FormMgrTest, FormMgrTest_0024, TestSize.Level1) {
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0025, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0025 starts";
-    sptr<MockSystemAbilityManager> mockSamgr = new (std::nothrow) MockSystemAbilityManager();
-    sptr<ISystemAbilityManager> backupSamgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    SystemAbilityManagerClient::GetInstance().systemAbilityManager_ = mockSamgr;
+    EXPECT_CALL(*mockProxy, CheckFMSReady())
+        .Times(2)
+        .WillOnce(Return(true));
 
     auto result = FormMgr::GetInstance().CheckFMSReady();
-
     EXPECT_TRUE(result);
     GTEST_LOG_(INFO) << "FormMgrTest_0025 test ends";
 }

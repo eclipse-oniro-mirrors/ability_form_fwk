@@ -80,6 +80,9 @@ public:
     MOCK_METHOD2(RegisterAddObserver, ErrCode(const std::string &bundleName, const sptr<IRemoteObject> &callerToken));
     MOCK_METHOD2(RegisterRemoveObserver, ErrCode(const std::string &bundleName,
         const sptr<IRemoteObject> &callerToken));
+    MOCK_METHOD2(RegisterFormRouterProxy, ErrCode(const std::vector<int64_t> &formIds,
+        const sptr<IRemoteObject> &callerToken));
+    MOCK_METHOD1(UnregisterFormRouterProxy, ErrCode(const std::vector<int64_t> &formIds));
 };
 }
 }

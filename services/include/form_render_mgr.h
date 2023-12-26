@@ -19,11 +19,12 @@
 #include <atomic>
 #include <queue>
 #include <singleton.h>
-#include <unordered_map>
 
 #include "form_record.h"
 #include "form_render_connection.h"
 #include "form_render_interface.h"
+#include "form_render_mgr_inner.h"
+#include "form_sandbox_render_mgr_inner.h"
 #include "want.h"
 
 namespace OHOS {
@@ -47,7 +48,8 @@ public:
 
     void OnUnlock();
 
-    ErrCode StopRenderingForm(int64_t formId, const FormRecord &formRecord, const std::string &compId = "", const sptr<IRemoteObject> &hostToken = nullptr);
+    ErrCode StopRenderingForm(int64_t formId, const FormRecord &formRecord,
+        const std::string &compId = "", const sptr<IRemoteObject> &hostToken = nullptr);
 
     ErrCode ReloadForm(const std::vector<FormRecord> &&formRecords, const std::string &bundleName, int32_t userId);
 
@@ -59,15 +61,13 @@ public:
 
     bool GetIsVerified() const;
 
-    ErrCode AddConnection(int64_t formId, sptr<FormRenderConnection> connection);
+    ErrCode AddConnection(int64_t formId, sptr<FormRenderConnection> connection, int32_t privacyLevel);
 
-    void RemoveConnection(int64_t formId);
+    void RemoveConnection(int64_t formId, int32_t privacyLevel);
 
-    void AddRenderDeathRecipient(const sptr<IRemoteObject> &renderRemoteObj);
+    void AddRenderDeathRecipient(const sptr<IRemoteObject> &renderRemoteObj, int32_t privacyLevel);
 
     bool IsNeedRender(int64_t formId);
-
-    void RerenderAllForms();
 
     void CleanFormHost(const sptr<IRemoteObject> &host);
 
@@ -87,58 +87,23 @@ public:
 
     void PostOnUnlockTask();
 
-private:
-    ErrCode ConnectRenderService(const sptr<FormRenderConnection> &connection) const;
+    ErrCode RecycleForms(const std::vector<int64_t> &formIds, const Want &want,
+        const sptr<IRemoteObject> &remoteObjectOfHost);
 
-    void DisconnectRenderService(const sptr<FormRenderConnection> connection, size_t size) const;
-
-    void AddHostToken(const sptr<IRemoteObject> &host, int64_t formId);
-
-    void RemoveHostToken(const sptr<IRemoteObject> &host);
-
-    void NotifyHostRenderServiceIsDead() const;
-
-    int32_t GetCompatibleVersion(const std::string &bundleName) const;
+    ErrCode RecoverForms(const std::vector<int64_t> &formIds, const std::string &bundleName,
+        const WantParams &wantParams);
 
 private:
-    class RemoteObjHash {
-    public:
-        size_t operator() (const sptr<IRemoteObject> &remoteObj) const
-        {
-            return reinterpret_cast<size_t>(remoteObj.GetRefPtr());
-        }
-    };
+    void InitRenderInner(bool isSandbox);
 
-    mutable std::mutex resourceMutex_;
+private:
     mutable std::mutex isVerifiedMutex_;
+    std::mutex renderInnerMutex_;
     std::mutex taskQueueMutex_;
     std::queue<std::function<void()>> taskQueue_;
-    // <formId, connectionToRenderService>
-    std::unordered_map<int64_t, sptr<FormRenderConnection>> renderFormConnections_;
-    // <hostToken, formIds>
-    std::unordered_map<sptr<IRemoteObject>, std::unordered_set<int64_t>, RemoteObjHash> etsHosts_;
-    sptr<IFormRender> renderRemoteObj_ = nullptr;
-    sptr<IRemoteObject::DeathRecipient> renderDeathRecipient_ = nullptr;
-    std::atomic<int32_t> atomicRerenderCount_ = 0;
+    std::shared_ptr<FormRenderMgrInner> renderInner_ = nullptr;
+    std::shared_ptr<FormSandboxRenderMgrInner> sandboxInner_ = nullptr;
     mutable bool isVerified_ = false;
-};
-
-/**
- * @class FormRenderRecipient
- * FormRenderRecipient notices IRemoteBroker died.
- */
-class FormRenderRecipient : public IRemoteObject::DeathRecipient {
-public:
-    using RemoteDiedHandler = std::function<void()>;
-
-    explicit FormRenderRecipient(RemoteDiedHandler handler);
-
-    virtual ~FormRenderRecipient();
-
-    void OnRemoteDied(const wptr<IRemoteObject> &remote) override;
-
-private:
-    RemoteDiedHandler handler_;
 };
 } // namespace AppExecFwk
 } // namespace OHOS

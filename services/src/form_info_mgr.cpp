@@ -91,7 +91,8 @@ ErrCode FormInfoHelper::LoadStageFormConfigInfo(const BundleInfo &bundleInfo, st
 
         for (const auto &profileInfo: profileInfos) {
             std::vector<ExtensionFormInfo> extensionFormInfos;
-            ErrCode errCode = ExtensionFormProfile::TransformTo(profileInfo, extensionFormInfos);
+            int32_t privacyLevel = 0;
+            ErrCode errCode = ExtensionFormProfile::TransformTo(profileInfo, extensionFormInfos, privacyLevel);
             if (errCode != ERR_OK) {
                 HILOG_WARN("failed to transform profile to extension form info");
                 continue;
@@ -104,6 +105,7 @@ ErrCode FormInfoHelper::LoadStageFormConfigInfo(const BundleInfo &bundleInfo, st
                 if (GetFormInfoDescription(resourceManager, formInfo) != ERR_OK) {
                     HILOG_INFO("Get FormInfo Description fail");
                 }
+                formInfo.privacyLevel = privacyLevel;
                 formInfos.emplace_back(formInfo);
             }
         }
@@ -195,7 +197,6 @@ ErrCode BundleFormInfo::InitFromJson(const std::string &formInfoStoragesJson)
 ErrCode BundleFormInfo::UpdateStaticFormInfos(int32_t userId)
 {
     HILOG_INFO("Update static form infos, userId is %{public}d.", userId);
-    std::unique_lock<std::shared_timed_mutex> guard(formInfosMutex_);
     std::vector<FormInfo> formInfos;
     ErrCode errCode = FormInfoHelper::LoadFormConfigInfoByBundleName(bundleName_, formInfos, userId);
     if (errCode != ERR_OK) {
@@ -203,6 +204,7 @@ ErrCode BundleFormInfo::UpdateStaticFormInfos(int32_t userId)
         return errCode;
     }
 
+    std::unique_lock<std::shared_timed_mutex> guard(formInfosMutex_);
     if (!formInfos.empty()) {
         bool findUser = false;
         for (auto item = formInfoStorages_.begin(); item != formInfoStorages_.end(); ++item) {

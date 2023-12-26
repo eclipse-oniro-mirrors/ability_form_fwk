@@ -26,6 +26,53 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+enum class FormEventId {
+    FORM_EVENT_NON,
+    FORM_EVENT_CALL,
+    FORM_EVENT_MESSAGE,
+    FORM_EVENT_ROUTER,
+    FORM_EVENT_FORM_ADD,
+    FORM_EVENT_FORM_REMOVE
+};
+
+class FormObserverRecordInner final {
+public:
+    FormObserverRecordInner(const sptr<IRemoteObject> &remote) : remote_(remote) {}
+    ~FormObserverRecordInner() {}
+    bool IsFollowEvents(FormEventId type) const;
+    void PushEvent(FormEventId type);
+    void RemoveEvent(FormEventId type);
+
+    sptr<IRemoteObject> GetRemote() const
+    {
+        return remote_;
+    };
+
+    bool NonFollowEvents()
+    {
+        return eventGroup_.empty();
+    }
+
+    std::string BindHostBundle() const
+    {
+        return bindHostBundle;
+    }
+
+    void SetBindHostBundle(const std::string &hostBundleName)
+    {
+        bindHostBundle = hostBundleName;
+    }
+
+    bool operator==(const FormObserverRecordInner &other)
+    {
+        return (remote_ == other.GetRemote() && bindHostBundle == other.BindHostBundle());
+    }
+private:
+    std::string bindHostBundle;
+    sptr<IRemoteObject> remote_ {nullptr};
+    std::vector<FormEventId> eventGroup_;
+};
+
 /**
  * @class FormObserverRecord
  * Form observer record.
@@ -74,6 +121,51 @@ public:
      */
     void CleanResource(const wptr<IRemoteObject> &remote);
 
+    /**
+     * @brief Notify form event.
+     * @param bundleName BundleName of the form host.
+     * @param formEventType Form event type.
+     * @param runningFormInfo Current form data.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    void HandleFormEvent(
+        const std::string &bundleName, const std::string &formEventType, RunningFormInfo &runningFormInfo);
+
+    /**
+     * @brief Register form event callback observer.
+     * @param bundleName BundleName of the form host.
+     * @param formEventType Form event type.
+     * @param callerToken Caller ability token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode SetFormEventObserver(
+        const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &callerToken);
+
+    /**
+     * @brief Remove form event callback observer.
+     * @param bundleName BundleName of the form host.
+     * @param formEventType Form event type.
+     * @param callerToken Caller ability token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RemoveFormEventObserver(
+        const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &callerToken);
+
+private:
+    FormEventId ConvertToFormEventId(const std::string &formEventType);
+
+    void NotifyFormEvent(
+        const FormObserverRecordInner &recordInner, FormEventId formEventId, RunningFormInfo &runningFormInfo,
+        const std::string &formEventType);
+
+    ErrCode SetFormEventObserverLocked(
+        const std::string &bundleName, FormEventId formEventType, const sptr<IRemoteObject> &callerToken);
+
+    ErrCode RemoveFormEventObserverLocked(
+        const std::string &bundleName, FormEventId formEventType, const sptr<IRemoteObject> &callerToken);
+
+    void ClearDeathRemoteObserver(const wptr<IRemoteObject> &remote);
+
 private:
     mutable std::mutex formAddObserverMutex_;
     mutable std::mutex formRemoveObserverMutex_;
@@ -81,6 +173,16 @@ private:
     std::map<std::string, std::vector<sptr<IRemoteObject>>> formAddObservers_;
     std::map<std::string, std::vector<sptr<IRemoteObject>>> formRemoveObservers_;
     std::map<sptr<IRemoteObject>, sptr<IRemoteObject::DeathRecipient>> deathRecipients_;
+    mutable std::mutex formEventObserversMutex_;
+    std::unordered_map<std::string, std::vector<FormObserverRecordInner>> formEventObservers_;
+
+    const std::unordered_map<std::string, FormEventId> formEventMap = {
+        {"call", FormEventId::FORM_EVENT_CALL},
+        {"message", FormEventId::FORM_EVENT_MESSAGE},
+        {"router", FormEventId::FORM_EVENT_ROUTER},
+        {"formAdd", FormEventId::FORM_EVENT_FORM_ADD},
+        {"formRemove", FormEventId::FORM_EVENT_FORM_REMOVE},
+    };
 
     /**
      * @class ClientDeathRecipient

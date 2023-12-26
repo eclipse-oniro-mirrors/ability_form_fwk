@@ -39,7 +39,8 @@ const std::map<FormEventName, std::string> EVENT_NAME_MAP = {
     std::map<FormEventName, std::string>::value_type(FormEventName::BACKGROUND_EVENT_FORM, "BACKGROUND_EVENT_FORM"),
     std::map<FormEventName, std::string>::value_type(FormEventName::RELEASE_FORM, "RELEASE_FORM"),
     std::map<FormEventName, std::string>::value_type(FormEventName::DELETE_INVALID_FORM, "DELETE_INVALID_FORM"),
-    std::map<FormEventName, std::string>::value_type(FormEventName::SET_NEXT_REFRESH_TIME_FORM, "SET_NEXT_REFRESH_TIME_FORM"),
+    std::map<FormEventName, std::string>::value_type(
+        FormEventName::SET_NEXT_REFRESH_TIME_FORM, "SET_NEXT_REFRESH_TIME_FORM"),
     std::map<FormEventName, std::string>::value_type(FormEventName::FORM_RENDER_BLOCK, "FORM_RENDER_BLOCK"),
 };
 }
@@ -83,8 +84,7 @@ void FormEventReport::SendFormEvent(const FormEventName &eventName, HiSysEventTy
         case FormEventName::CASTTEMP_FORM:
         case FormEventName::RELEASE_FORM:
         case FormEventName::SET_NEXT_REFRESH_TIME_FORM:
-            HiSysEventWrite(
-                HiSysEvent::Domain::FORM_MANAGER, name, type, EVENT_KEY_FORM_ID, eventInfo.formId);
+            HiSysEventWrite(HiSysEvent::Domain::FORM_MANAGER, name, type, EVENT_KEY_FORM_ID, eventInfo.formId);
             break;
         case FormEventName::FORM_RENDER_BLOCK:
             HiSysEventWrite(

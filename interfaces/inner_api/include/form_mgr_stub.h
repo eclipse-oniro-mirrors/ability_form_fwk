@@ -378,6 +378,22 @@ private:
     ErrCode HandleRegisterRemoveObserver(MessageParcel &data, MessageParcel &reply);
 
     /**
+     * @brief Register form router event proxy.
+     * @param data input param
+     * @param reply output param
+     * @return Return ERR_OK on success, others on failure
+     */
+    ErrCode HandleRegisterFormRouterProxy(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Unregister form router event proxy.
+     * @param data input param
+     * @param reply output param
+     * @return Return ERR_OK on success, others on failure
+     */
+    ErrCode HandleUnregisterFormRouterProxy(MessageParcel &data, MessageParcel &reply);
+
+    /**
      * @brief update proxy form.
      * @param data input param
      * @param reply output param
@@ -409,7 +425,47 @@ private:
      */
     int32_t HandleUnregisterPublishFormInterceptor(MessageParcel &data, MessageParcel &reply);
 
+    /**
+     * @brief Handle retister click callback event observer message.
+     * @param data input param
+     * @param reply output param
+     * @return Return ERR_OK on success, others on failure
+    */
+    int32_t HandleRegisterClickCallbackEventObserver(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle unretister click callback event observer message.
+     * @param data input param
+     * @param reply output param
+     * @return Return ERR_OK on success, others on failure
+    */
+    int32_t HandleUnregisterClickCallbackEventObserver(MessageParcel &data, MessageParcel &reply);
+
     bool ReadFormDataProxies(MessageParcel &data, std::vector<FormDataProxy> &formDataProxies);
+
+    /**
+     * @brief Handle set forms recyclable message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t HandleSetFormsRecyclable(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle recycle forms message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t HandleRecycleForms(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle recover forms message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t HandleRecoverForms(MessageParcel &data, MessageParcel &reply);
 private:
     using FormMgrFunc = int32_t (FormMgrStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, FormMgrFunc> memberFuncMap_;

@@ -27,6 +27,7 @@
 namespace OHOS {
 namespace AppExecFwk {
 const int32_t LIMIT_PARCEL_SIZE = 1024;
+constexpr size_t MAX_PARCEL_CAPACITY = 4 * 1024 * 1024; // 4M
 
 void SplitString(const std::string &source, std::vector<std::string> &strings)
 {
@@ -139,6 +140,20 @@ FormMgrStub::FormMgrStub()
         &FormMgrStub::HandleRegisterPublishFormInterceptor;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_PUBLISH_FORM_INTERCEPTOR)] =
         &FormMgrStub::HandleUnregisterPublishFormInterceptor;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_CLICK_EVENT_OBSERVER)] =
+        &FormMgrStub::HandleRegisterClickCallbackEventObserver;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_CLICK_EVENT_OBSERVER)] =
+        &FormMgrStub::HandleUnregisterClickCallbackEventObserver;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_FORM_ROUTER_PROXY)] =
+        &FormMgrStub::HandleRegisterFormRouterProxy;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_FORM_ROUTER_PROXY)] =
+        &FormMgrStub::HandleUnregisterFormRouterProxy;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_SET_FORMS_RECYCLABLE)] =
+        &FormMgrStub::HandleSetFormsRecyclable;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_RECYCLE_FORMS)] =
+        &FormMgrStub::HandleRecycleForms;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_RECOVER_FORMS)] =
+        &FormMgrStub::HandleRecoverForms;
 }
 
 FormMgrStub::~FormMgrStub()
@@ -759,9 +774,10 @@ int32_t FormMgrStub::HandleNotifyFormsEnableUpdate(MessageParcel &data, MessageP
  */
 int32_t FormMgrStub::HandleGetAllFormsInfo(MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("%{public}s called. max parcel capacity : %{public}zu", __func__, MAX_PARCEL_CAPACITY);
     std::vector<FormInfo> infos;
     int32_t result = GetAllFormsInfo(infos);
+    (void)reply.SetMaxCapacity(MAX_PARCEL_CAPACITY);
     reply.WriteInt32(result);
     if (result == ERR_OK) {
         if (!WriteParcelableVector(infos, reply)) {
@@ -1109,6 +1125,32 @@ int32_t FormMgrStub::HandleUnregisterPublishFormInterceptor(MessageParcel &data,
     return result;
 }
 
+int32_t FormMgrStub::HandleRegisterClickCallbackEventObserver(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("Called.");
+    std::string bundleName = data.ReadString();
+    std::string formEventType = data.ReadString();
+    sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
+    if (callerToken == nullptr) {
+        HILOG_ERROR("Failed to get remote object.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return RegisterClickEventObserver(bundleName, formEventType, callerToken);
+}
+
+int32_t FormMgrStub::HandleUnregisterClickCallbackEventObserver(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("Called.");
+    std::string bundleName = data.ReadString();
+    std::string formEventType = data.ReadString();
+    sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
+    if (callerToken == nullptr) {
+        HILOG_ERROR("Failed to get remote object.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return UnregisterClickEventObserver(bundleName, formEventType, callerToken);
+}
+
 /**
  * @brief Write a parcelabe vector objects to the proxy node.
  * @param parcelableVector Indicates the objects to be write.
@@ -1156,6 +1198,37 @@ ErrCode FormMgrStub::HandleRegisterRemoveObserver(MessageParcel &data, MessagePa
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     auto result = RegisterRemoveObserver(bundleName, callerToken);
+    reply.WriteInt32(result);
+    return result;
+}
+
+ErrCode FormMgrStub::HandleRegisterFormRouterProxy(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("Called.");
+    std::vector<int64_t> formIds;
+    if (!data.ReadInt64Vector(&formIds)) {
+        HILOG_ERROR("Failed to ReadInt64Vector.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
+    if (callerToken == nullptr) {
+        HILOG_ERROR("Failed to get remote object.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    auto result = RegisterFormRouterProxy(formIds, callerToken);
+    reply.WriteInt32(result);
+    return result;
+}
+
+ErrCode FormMgrStub::HandleUnregisterFormRouterProxy(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("Called.");
+    std::vector<int64_t> formIds;
+    if (!data.ReadInt64Vector(&formIds)) {
+        HILOG_ERROR("Failed to ReadInt64Vector.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    auto result = UnregisterFormRouterProxy(formIds);
     reply.WriteInt32(result);
     return result;
 }
@@ -1217,13 +1290,71 @@ bool FormMgrStub::ReadFormDataProxies(MessageParcel &data, std::vector<FormDataP
         return false;
     }
 
-    for (auto i = 0; i < number; i++) {
+    for (int32_t i = 0; i < number; i++) {
         FormDataProxy formDataProxy("", "");
         formDataProxy.key = Str16ToStr8(data.ReadString16());
         formDataProxy.subscribeId = Str16ToStr8(data.ReadString16());
         formDataProxies.push_back(formDataProxy);
     }
     return true;
+}
+
+int32_t FormMgrStub::HandleSetFormsRecyclable(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("Called.");
+    std::vector<int64_t> formIds;
+    if (!data.ReadInt64Vector(&formIds)) {
+        HILOG_ERROR("failed to ReadInt64Vector");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int32_t result = SetFormsRecyclable(formIds);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("failed to write result");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return result;
+}
+
+int32_t FormMgrStub::HandleRecycleForms(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("Called.");
+    std::vector<int64_t> formIds;
+    if (!data.ReadInt64Vector(&formIds)) {
+        HILOG_ERROR("failed to ReadInt64Vector");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
+    if (!want) {
+        HILOG_ERROR("failed to ReadParcelable<Want>");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int32_t result = RecycleForms(formIds, *want);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("failed to write result");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return result;
+}
+
+int32_t FormMgrStub::HandleRecoverForms(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("Called.");
+    std::vector<int64_t> formIds;
+    if (!data.ReadInt64Vector(&formIds)) {
+        HILOG_ERROR("failed to ReadInt64Vector");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
+    if (!want) {
+        HILOG_ERROR("failed to ReadParcelable<Want>");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int32_t result = RecoverForms(formIds, *want);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("failed to write result");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return result;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

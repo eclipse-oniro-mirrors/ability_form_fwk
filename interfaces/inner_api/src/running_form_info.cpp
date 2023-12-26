@@ -27,6 +27,7 @@ bool RunningFormInfo::ReadFromParcel(Parcel &parcel)
     bundleName = Str16ToStr8(parcel.ReadString16());
     moduleName = Str16ToStr8(parcel.ReadString16());
     abilityName = Str16ToStr8(parcel.ReadString16());
+    description = parcel.ReadString();
     dimension = parcel.ReadInt32();
     hostBundleName = Str16ToStr8(parcel.ReadString16());
     int32_t formVisiblityInt = parcel.ReadInt32();
@@ -59,6 +60,11 @@ bool RunningFormInfo::Marshalling(Parcel &parcel) const
 
     // write abilityName
     if (!parcel.WriteString16(Str8ToStr16(abilityName))) {
+        return false;
+    }
+
+    // write description
+    if (!parcel.WriteString(description)) {
         return false;
     }
 

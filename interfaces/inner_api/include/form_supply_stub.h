@@ -100,6 +100,14 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t HandleOnRenderingBlock(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief handle OnRecycleForm message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t HandleOnRecycleForm(MessageParcel &data, MessageParcel &reply);
 private:
     using FormSupplyFunc = int32_t (FormSupplyStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, FormSupplyFunc> memberFuncMap_;

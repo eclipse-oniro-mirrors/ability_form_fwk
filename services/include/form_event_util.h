@@ -52,10 +52,12 @@ public:
     void BatchDeleteNoHostDBForms(const int uid, std::map<FormIdKey, std::set<int64_t>> &noHostFormDbMap,
         std::map<int64_t, bool> &removedFormsMap);
     void HandleOnUnlock();
+    bool HandleAdditionalInfoChanged(const std::string &bundleName);
 
 private:
     void UpdateFormRecord(const FormInfo &formInfo, FormRecord &formRecord);
     void UpdateFormRecord(const AbilityFormInfo &formInfo, FormRecord &formRecord);
+    UpdateType GetUpdateType(const FormRecord &record, const FormTimerCfg &timerCfg) const;
 };
 } // namespace AppExecFwk
 } // namespace OHOS

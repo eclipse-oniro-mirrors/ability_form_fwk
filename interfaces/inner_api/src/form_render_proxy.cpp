@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace AppExecFwk {
 int32_t FormRenderProxy::RenderForm(const FormJsInfo &formJsInfo, const Want &want,
-    const sptr<IRemoteObject> &callerToken)
+    sptr<IRemoteObject> callerToken)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -47,13 +47,8 @@ int32_t FormRenderProxy::RenderForm(const FormJsInfo &formJsInfo, const Want &wa
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    if (!Remote()) {
-        HILOG_ERROR("Remote obj is nullptr");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_RENDER_FORM),
+    int error = SendTransactCmd(
+        IFormRender::Message::FORM_RENDER_RENDER_FORM,
         data,
         reply,
         option);
@@ -89,13 +84,8 @@ int32_t FormRenderProxy::StopRenderingForm(const FormJsInfo &formJsInfo, const W
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    if (!Remote()) {
-        HILOG_ERROR("Remote obj is nullptr");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_STOP_RENDERING_FORM),
+    int error = SendTransactCmd(
+        IFormRender::Message::FORM_RENDER_STOP_RENDERING_FORM,
         data,
         reply,
         option);
@@ -122,13 +112,8 @@ int32_t FormRenderProxy::CleanFormHost(const sptr<IRemoteObject> &hostToken)
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    if (!Remote()) {
-        HILOG_ERROR("Remote obj is nullptr");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_FORM_HOST_DIED),
+    int error = SendTransactCmd(
+        IFormRender::Message::FORM_RENDER_FORM_HOST_DIED,
         data,
         reply,
         option);
@@ -171,12 +156,8 @@ int32_t FormRenderProxy::ReleaseRenderer(
         HILOG_ERROR("%{public}s, failed to write uid", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (!Remote()) {
-        HILOG_ERROR("Remote obj is nullptr");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_RELEASE_RENDERER),
+    int error = SendTransactCmd(
+        IFormRender::Message::FORM_RENDER_RELEASE_RENDERER,
         data,
         reply,
         option);
@@ -208,13 +189,8 @@ int32_t FormRenderProxy::ReloadForm(const std::vector<FormJsInfo> &&formJsInfos,
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    if (!Remote()) {
-        HILOG_ERROR("Remote obj is nullptr");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-
-    error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_RELOAD_FORM),
+    error = SendTransactCmd(
+        IFormRender::Message::FORM_RENDER_RELOAD_FORM,
         data,
         reply,
         option);
@@ -236,13 +212,8 @@ int32_t FormRenderProxy::OnUnlock()
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    if (!Remote()) {
-        HILOG_ERROR("Remote obj is nullptr");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-
-    int32_t error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_UNLOCKED),
+    int32_t error = SendTransactCmd(
+        IFormRender::Message::FORM_RENDER_UNLOCKED,
         data,
         reply,
         option);
@@ -251,6 +222,22 @@ int32_t FormRenderProxy::OnUnlock()
         return error;
     }
 
+    return ERR_OK;
+}
+
+int FormRenderProxy::SendTransactCmd(IFormRender::Message code, MessageParcel &data,
+                                     MessageParcel &reply, MessageOption &option)
+{
+    sptr<IRemoteObject> remote = Remote();
+    if (!remote) {
+        HILOG_ERROR("error to get remote object, cmd: %{public}d", code);
+        return ERR_APPEXECFWK_SERVICE_NOT_CONNECTED;
+    }
+    int32_t result = remote->SendRequest(static_cast<uint32_t>(code), data, reply, option);
+    if (result != ERR_OK) {
+        HILOG_ERROR("error to SendRequest: %{public}d, cmd: %{public}d", result, code);
+        return result;
+    }
     return ERR_OK;
 }
 
@@ -268,6 +255,78 @@ int32_t FormRenderProxy::WriteParcelableVector(const std::vector<T> &parcelableV
             return ERR_APPEXECFWK_PARCEL_ERROR;
         }
     }
+    return ERR_OK;
+}
+
+int32_t FormRenderProxy::RecycleForm(const int64_t &formId, const Want &want)
+{
+    MessageParcel data;
+    MessageOption option(MessageOption::TF_ASYNC);
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("failed to write interface token");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt64(formId)) {
+        HILOG_ERROR("failed to write formId");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteParcelable(&want)) {
+        HILOG_ERROR("failed to write want");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!Remote()) {
+        HILOG_ERROR("Remote obj is nullptr");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    MessageParcel reply;
+    int32_t error = Remote()->SendRequest(
+        static_cast<uint32_t>(IFormRender::Message::FORM_RECYCLE_FORM),
+        data,
+        reply,
+        option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("failed to SendRequest: %{public}d", error);
+        return error;
+    }
+
+    return ERR_OK;
+}
+
+int32_t FormRenderProxy::RecoverForm(const int64_t &formId, const Want &want)
+{
+    MessageParcel data;
+    MessageOption option(MessageOption::TF_ASYNC);
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("failed to write interface token");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt64(formId)) {
+        HILOG_ERROR("failed to write formId");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteParcelable(&want)) {
+        HILOG_ERROR("failed to write want");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!Remote()) {
+        HILOG_ERROR("Remote obj is nullptr");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    MessageParcel reply;
+    int32_t error = Remote()->SendRequest(
+        static_cast<uint32_t>(IFormRender::Message::FORM_RECOVER_FORM),
+        data,
+        reply,
+        option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("failed to SendRequest: %{public}d", error);
+        return error;
+    }
+
     return ERR_OK;
 }
 } // namespace AppExecFwk

@@ -101,6 +101,10 @@ public:
     {
         return {};
     };
+    int32_t UnloadAllIdleSystemAbility()
+    {
+        return {};
+    };
     int32_t GetSystemProcessInfo(int32_t systemAbilityId, SystemProcessInfo& systemProcessInfo) override
     {
         return {};
@@ -137,6 +141,11 @@ public:
     };
 
     int32_t GetOnDemandSystemAbilityIds(std::vector<int32_t>& systemAbilityIds)
+    {
+        return {};
+    }
+    int32_t SendStrategy(int32_t type, std::vector<int32_t>& systemAbilityIds,
+        int32_t level, std::string& action) override
     {
         return {};
     }

@@ -504,6 +504,7 @@ void ParseFormInfoIntoNapi(napi_env env, const FormInfo &formInfo, napi_value &r
     SetFormInfoPropertyString(env, formInfo.moduleName.c_str(), result, "moduleName");
     SetFormInfoPropertyString(env, formInfo.abilityName.c_str(), result, "abilityName");
     SetFormInfoPropertyString(env, formInfo.name.c_str(), result, "name");
+    SetFormInfoPropertyString(env, formInfo.displayName.c_str(), result, "displayName");
     SetFormInfoPropertyString(env, formInfo.description.c_str(), result, "description");
     SetFormInfoPropertyInt32(env, formInfo.descriptionId, result, "descriptionId");
     FormType formType = formInfo.type;
@@ -556,6 +557,7 @@ void ParseRunningFormInfoIntoNapi(napi_env env, const RunningFormInfo &runningFo
     SetFormInfoPropertyString(env, runningFormInfo.formName.c_str(), result, "formName");
     SetFormInfoPropertyInt32(env, runningFormInfo.dimension, result, "dimension");
     SetFormInfoPropertyString(env, runningFormInfo.abilityName.c_str(), result, "abilityName");
+    SetFormInfoPropertyString(env, runningFormInfo.description.c_str(), result, "formDescription");
 }
 
 inline FormType GetFormType(const FormInfo &formInfo)
@@ -634,6 +636,7 @@ napi_value CreateRunningFormInfo(napi_env env, const RunningFormInfo &runningFor
     napi_set_named_property(env, objContext, "visibilityType", CreateJsValue(env, runningFormInfo.formVisiblity));
     napi_set_named_property(env, objContext, "moduleName", CreateJsValue(env, runningFormInfo.moduleName));
     napi_set_named_property(env, objContext, "abilityName", CreateJsValue(env, runningFormInfo.abilityName));
+    napi_set_named_property(env, objContext, "formDescription", CreateJsValue(env, runningFormInfo.description));
     napi_set_named_property(env, objContext, "formName", CreateJsValue(env, runningFormInfo.formName));
     napi_set_named_property(env, objContext, "dimension", CreateJsValue(env, runningFormInfo.dimension));
     napi_set_named_property(env, objContext, "formUsageState", CreateJsValue(env, runningFormInfo.formUsageState));

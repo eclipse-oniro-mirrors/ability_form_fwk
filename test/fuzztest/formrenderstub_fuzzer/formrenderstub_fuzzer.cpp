@@ -34,7 +34,7 @@ public:
     FormRenderStubFuzzTest() = default;
     virtual ~FormRenderStubFuzzTest() = default;
     int32_t RenderForm(const FormJsInfo &formJsInfo, const Want &want,
-        const sptr<IRemoteObject> &callerToken) override
+        sptr<IRemoteObject> callerToken) override
     {
         return 0;
     }

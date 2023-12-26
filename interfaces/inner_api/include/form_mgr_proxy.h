@@ -433,6 +433,22 @@ public:
     ErrCode RegisterRemoveObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken) override;
 
     /**
+     * @brief Register form router event proxy.
+     * @param formIds Indicates the id of the forms.
+     * @param callerToken Router proxy call back client.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RegisterFormRouterProxy(const std::vector<int64_t> &formIds,
+        const sptr<IRemoteObject> &callerToken) override;
+
+    /**
+     * @brief Unregister form router event proxy.
+     * @param formIds Indicates the id of the forms.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UnregisterFormRouterProxy(const std::vector<int64_t> &formIds) override;
+
+    /**
      * @brief Update proxy form with formId, send formId to form manager service.
      * @param formId The Id of the form to update.
      * @param FormProviderData Form binding data.
@@ -471,13 +487,55 @@ public:
      */
     int32_t UnregisterPublishFormInterceptor(const sptr<IRemoteObject> &interceptorCallback) override;
 
+    /**
+     * @brief Register click callback observer.
+     * @param bundleName BundleName of the form host.
+     * @param formEventType Form event type.
+     * @param observer Form click event callback listener.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RegisterClickEventObserver(
+        const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer) override;
+
+    /**
+     * @brief Unregister click callback observer.
+     * @param bundleName BundleName of the form host.
+     * @param formEventType Form event type.
+     * @param observer Form click event callback listener.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UnregisterClickEventObserver(
+        const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer) override;
+
+    /**
+     * @brief Set forms recyclable
+     * @param formIds Indicates the id of the forms.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t SetFormsRecyclable(const std::vector<int64_t> &formIds) override;
+
+    /**
+     * @brief Recycle forms
+     * @param formIds Indicates the id of the forms.
+     * @param want The want of forms to be recycled.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t RecycleForms(const std::vector<int64_t> &formIds, const Want &want) override;
+
+    /**
+     * @brief Recover recycled forms
+     * @param formIds Indicates the id of the forms.
+     * @param want The want of forms to be recovered.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t RecoverForms(const std::vector<int64_t> &formIds, const Want &want) override;
 private:
     template<typename T>
     int GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos);
     bool WriteInterfaceToken(MessageParcel &data);
     template<typename T>
     int GetParcelableInfo(IFormMgr::Message code, MessageParcel &data, T &parcelableInfo);
-    int SendTransactCmd(IFormMgr::Message code, MessageParcel &data, MessageParcel &reply);
+    int SendTransactCmd(IFormMgr::Message code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     int GetStringInfo(IFormMgr::Message code, MessageParcel &data, std::string &stringInfo);
     int32_t GetFormsInfo(IFormMgr::Message code, MessageParcel &data, std::vector<FormInfo> &formInfos);
     ErrCode GetRunningFormInfos(IFormMgr::Message code, MessageParcel &data,

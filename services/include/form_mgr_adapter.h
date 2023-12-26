@@ -20,9 +20,7 @@
 
 #include "bundle_info.h"
 #include "bundle_mgr_interface.h"
-#ifdef SUPPORT_ERMS
-#include "ecological_rule_mgr_service_client.h"
-#endif
+#include "form_constants.h"
 #include "form_info.h"
 #include "form_instance.h"
 #include "form_instances_filter.h"
@@ -31,15 +29,13 @@
 #include "form_provider_data.h"
 #include "form_publish_interceptor_interface.h"
 #include "form_state_info.h"
+#include "form_task_mgr.h"
 #include "iremote_object.h"
 #include "running_form_info.h"
 #include "want.h"
 
 namespace OHOS {
 namespace AppExecFwk {
-#ifdef SUPPORT_ERMS
-using ErmsCallerInfo = OHOS::EcologicalRuleMgrService::CallerInfo;
-#endif
 using Want = OHOS::AAFwk::Want;
 using WantParams = OHOS::AAFwk::WantParams;
 /**
@@ -50,6 +46,11 @@ class FormMgrAdapter  final : public DelayedRefSingleton<FormMgrAdapter> {
 DECLARE_DELAYED_REF_SINGLETON(FormMgrAdapter)
 public:
     DISALLOW_COPY_AND_MOVE(FormMgrAdapter);
+
+    /**
+     * @brief Init properties like visibleNotifyDelayTime.
+     */
+    void Init();
 
     /**
      * @brief Add form with want, send want to form manager service.
@@ -440,6 +441,21 @@ public:
     ErrCode RegisterRemoveObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken);
 
     /**
+     * @brief Register form router event proxy.
+     * @param formIds Indicates the ID of the forms.
+     * @param callerToken Router proxy call back client.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RegisterFormRouterProxy(const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &callerToken);
+
+    /**
+     * @brief Unregister form router event proxy.
+     * @param formIds Indicates the ID of the forms.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UnregisterFormRouterProxy(const std::vector<int64_t> &formIds);
+
+    /**
      * @brief Registers the callback for publish form. The callback is used to process the publish form request
      * when the system handler is not found.
      * @param interceptorCallback The injected callback, should implementation IFormPublishInterceptor.
@@ -454,6 +470,71 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t UnregisterPublishFormInterceptor(const sptr<IRemoteObject> &interceptorCallback);
+
+    /**
+     * @brief Register click callback observer.
+     * @param bundleName BundleName of the form host.
+     * @param formEventType Form event type.
+     * @param callerToken Caller ability token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RegisterClickEventObserver(
+        const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer);
+
+    /**
+     * @brief Unregister click callback observer.
+     * @param bundleName BundleName of the form host.
+     * @param formEventType Form event type.
+     * @param callerToken Caller ability token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UnregisterClickEventObserver(
+        const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer);
+
+    /**
+     * @brief Compare the locally configured update duration with the update duration in additionalInfo and
+     * return a larger value.
+     * @param formId The Id of the form.
+     * @param updateDuration The valid form update duration.
+     * @return Returns true on success, false on failure.
+     */
+    bool GetValidFormUpdateDuration(const int64_t formId, int64_t &updateDuration) const;
+
+    /**
+     * @brief Handle forms visible/invisible notify after delay time, notification will be cancelled when
+     * formVisibleState recovered during the delay time.
+     * @param formIds the Ids of forms need to notify.
+     * @param formInstanceMaps formInstances for visibleNotify.
+     * @param eventMaps eventMaps for event notify.
+     * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
+     */
+    void HandlerNotifyWhetherVisibleForms(const std::vector<int64_t> &formIds,
+        std::map<std::string, std::vector<FormInstance>> formInstanceMaps,
+        std::map<std::string, std::vector<int64_t>> eventMaps, const int32_t formVisibleType);
+
+    /**
+     * @brief Set forms recyclable
+     * @param formIds Indicates the id of the forms.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t SetFormsRecyclable(const std::vector<int64_t> &formIds);
+
+    /**
+     * @brief Recycle forms
+     * @param formIds Indicates the id of the forms.
+     * @param want The want of forms to be recycled.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t RecycleForms(const std::vector<int64_t> &formIds, const Want &want);
+
+    /**
+     * @brief Recover recycled forms
+     * @param formIds Indicates the id of the forms.
+     * @param want The want of forms to be recovered.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t RecoverForms(const std::vector<int64_t> &formIds, const Want &want);
+
 private:
     /**
      * @brief Get form configure info.
@@ -729,7 +810,7 @@ private:
      */
     bool CheckIsSystemAppByBundleName(const sptr<IBundleMgr> &iBundleMgr,
         const int32_t &userId, const std::string &bundleName);
-    
+
     /**
      * @brief if the ability have permission for keeping background running is true,
      * @param iBundleMgr BundleManagerProxy
@@ -805,8 +886,10 @@ private:
         const sptr<IRemoteObject::DeathRecipient> &deathRecipient);
     mutable std::mutex formObserversMutex_;
     mutable std::mutex deathRecipientsMutex_;
-    std::map<std::string, sptr<IRemoteObject>> formObservers_;
+    std::map<std::string, std::vector<sptr<IRemoteObject>>> formObservers_;
     std::map<sptr<IRemoteObject>, sptr<IRemoteObject::DeathRecipient>> deathRecipients_;
+
+    void NotifyFormClickEvent(int64_t formId, const std::string &formClickType);
 
     /**
      * @brief Get caller type.
@@ -821,11 +904,50 @@ private:
      */
     bool IsErmsSupportPublishForm(std::string bundleName, std::vector<Want> wants);
 
+    /**
+     * @brief Notify forms visible/invisible to remoteCallers.
+     * @param bundleName the caller's bundle name.
+     * @param remoteObjects refs of remoteCallers.
+     * @param formInstanceMaps formInstances for visibleNotify.
+     * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
+     */
+    void NotifyWhetherFormsVisible(const std::string &bundleName,
+        std::vector<sptr<IRemoteObject>> &remoteObjects,
+        std::map<std::string, std::vector<FormInstance>> &formInstanceMaps, const int32_t formVisibleType);
+
+    /**
+     * @brief Forms formInstanceMaps or eventMaps should remove when visible/invisible status recovered.
+     * @param formInstanceMaps formInstances for visibleNotify.
+     * @param eventMaps eventMaps for event notify.
+     * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
+     */
+    void FilterDataByVisibleType(std::map<std::string, std::vector<FormInstance>> &formInstanceMaps,
+        std::map<std::string, std::vector<int64_t>> &eventMaps, const int32_t formVisibleType);
+
+    /**
+     * @brief Forms formInstanceMaps should remove when visible/invisible status recovered.
+     * @param formInstanceMaps formInstances for visibleNotify.
+     * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
+     * @param restoreFormRecords formRecords of forms no need to notify.
+     */
+    void FilterFormInstanceMapsByVisibleType(std::map<std::string, std::vector<FormInstance>> &formInstanceMaps,
+        const int32_t formVisibleType, std::map<int64_t, FormRecord> &restoreFormRecords);
+
+    /**
+     * @brief Forms eventMaps should remove when visible/invisible status recovered.
+     * @param eventMaps eventMaps for event notify.
+     * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
+     * @param restoreFormRecords formRecords of forms no need to notify.
+     */
+    void FilterEventMapsByVisibleType(std::map<std::string, std::vector<int64_t>> &eventMaps,
+        const int32_t formVisibleType, std::map<int64_t, FormRecord> &restoreFormRecords);
+
     ErrCode CheckFormCountLimit(const int64_t formId, const Want &want);
 
     ErrCode AllotForm(const int64_t formId, const Want &want,
         const sptr<IRemoteObject> &callerToken, FormJsInfo &formInfo, const FormItemInfo &formItemInfo);
 
+    void GetUpdateDurationFromAdditionalInfo(const std::string &additionalInfo, std::vector<int> &durationArray) const;
     /**
      * @class ClientDeathRecipient
      * notices IRemoteBroker died.
@@ -846,6 +968,7 @@ private:
 
 private:
     sptr<IFormPublishInterceptor> formPublishInterceptor_ = nullptr;
+    int32_t visibleNotifyDelay_ = Constants::DEFAULT_VISIBLE_NOTIFY_DELAY;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

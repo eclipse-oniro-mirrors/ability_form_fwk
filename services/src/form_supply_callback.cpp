@@ -28,6 +28,9 @@
 #include "form_task_mgr.h"
 #include "form_util.h"
 #include "hitrace_meter.h"
+#include "form_info_rdb_storage_mgr.h"
+#include "form_data_mgr.h"
+#include "form_host_interface.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -318,6 +321,45 @@ int32_t FormSupplyCallback::OnRenderingBlock(const std::string &bundleName)
 {
     HILOG_INFO("OnRenderingBlock called, bundleName: %{public}s.", bundleName.c_str());
     FormRenderMgr::GetInstance().OnRenderingBlock(bundleName);
+    return ERR_OK;
+}
+
+int32_t FormSupplyCallback::OnRecycleForm(const int64_t &formId, const Want &want)
+{
+    HILOG_INFO("formId: %{public}" PRId64, formId);
+    std::string statusData = want.GetStringParam(Constants::FORM_STATUS_DATA);
+    if (statusData.empty()) {
+        HILOG_WARN("status data of %{public}" PRId64 " is empty", formId);
+        return ERR_OK;
+    }
+    if (FormInfoRdbStorageMgr::GetInstance().UpdateStatusData(std::to_string(formId), statusData) != ERR_OK) {
+        HILOG_ERROR("update status data of %{public}" PRId64 " failed", formId);
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
+    FormRecord formRecord;
+    if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
+        HILOG_WARN("form %{public}" PRId64 " not exist", formId);
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    if (formRecord.recycleStatus != RecycleStatus::RECYCLABLE) {
+        HILOG_WARN("form %{public}" PRId64 " is not RECYCLABLE", formId);
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    formRecord.recycleStatus = RecycleStatus::RECYCLED;
+    FormDataMgr::GetInstance().UpdateFormRecord(formId, formRecord);
+
+    sptr<IRemoteObject> remoteObjectOfHost = want.GetRemoteObject(Constants::PARAM_FORM_HOST_TOKEN);
+    if (remoteObjectOfHost == nullptr) {
+        HILOG_ERROR("remoteObjectOfHost is null.");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    sptr<IFormHost> remoteFormHost = iface_cast<IFormHost>(remoteObjectOfHost);
+    if (remoteFormHost == nullptr) {
+        HILOG_ERROR("remoteFormHost is null.");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    remoteFormHost->OnRecycleForm(formId);
     return ERR_OK;
 }
 } // namespace AppExecFwk

@@ -47,6 +47,7 @@
 #include "in_process_call_wrapper.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
+#include "mem_status_listener.h"
 #include "os_account_manager.h"
 #include "permission_constants.h"
 #include "permission_verification.h"
@@ -54,6 +55,7 @@
 #include "tokenid_kit.h"
 #include "hisysevent.h"
 #include "xcollie/watchdog.h"
+#include "mem_mgr_client.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -100,11 +102,13 @@ FormMgrService::FormMgrService()
       state_(ServiceRunningState::STATE_NOT_START),
       serialQueue_(nullptr)
 {
+    HILOG_INFO("called");
     DumpInit();
 }
 
 FormMgrService::~FormMgrService()
 {
+    FMS_CALL_INFO_ENTER;
     if (formSysEventReceiver_ != nullptr) {
         EventFwk::CommonEventManager::UnSubscribeCommonEvent(formSysEventReceiver_);
         formSysEventReceiver_ = nullptr;
@@ -116,6 +120,9 @@ FormMgrService::~FormMgrService()
             HILOG_ERROR("%{public}s fail, UnregisterBundleEventCallback failed", __func__);
         }
         formBundleEventCallback_ = nullptr;
+    }
+    if (memStatusListener_ != nullptr) {
+        Memory::MemMgrClient::GetInstance().UnsubscribeAppState(*memStatusListener_);
     }
 }
 
@@ -569,6 +576,7 @@ void FormMgrService::OnStart()
     state_ = ServiceRunningState::STATE_RUNNING;
     // listener for FormDataProxyMgr
     AddSystemAbilityListener(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
+    AddSystemAbilityListener(MEMORY_MANAGER_SA_ID);
     onStartEndTime_ = GetCurrentDateTime();
     HILOG_INFO("Form Mgr Service start success, time: %{public}s, onKvDataServiceAddTime: %{public}s",
         onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
@@ -649,7 +657,9 @@ ErrCode FormMgrService::Init()
         EventFwk::CommonEventManager::SubscribeCommonEvent(formSysEventReceiver_);
     }
 
-    FormTrustMgr::GetInstance().Start();
+    memStatusListener_ = std::make_shared<MemStatusListener>();
+    Memory::MemMgrClient::GetInstance().SubscribeAppState(*memStatusListener_);
+
     FormInfoMgr::GetInstance().Start();
     int currUserId = FormUtil::GetCurrentAccountId();
     if (currUserId == Constants::ANY_USERID) {
@@ -682,6 +692,7 @@ ErrCode FormMgrService::Init()
     if (result != ERR_OK) {
         HILOG_WARN("parse form config failed, use the default vaule.");
     }
+    FormMgrAdapter::GetInstance().Init();
     HILOG_INFO("init success");
     return ERR_OK;
 }
@@ -784,6 +795,40 @@ int FormMgrService::AcquireFormState(const Want &want,
     eventInfo.abilityName = want.GetElement().GetAbilityName();
     FormEventReport::SendFormEvent(FormEventName::ACQUIREFORMSTATE_FORM, HiSysEventType::BEHAVIOR, eventInfo);
     return FormMgrAdapter::GetInstance().AcquireFormState(want, callerToken, stateInfo);
+}
+
+/**
+ * @brief Register form router event proxy.
+ * @param formIds Indicates the ID of the forms.
+ * @param callerToken Host client.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormMgrService::RegisterFormRouterProxy(const std::vector<int64_t> &formIds,
+    const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_DEBUG("Called.");
+    ErrCode ret = CheckFormPermission();
+    if (ret != ERR_OK) {
+        HILOG_ERROR("Fail, register form router proxy permission denied");
+        return ret;
+    }
+    return FormMgrAdapter::GetInstance().RegisterFormRouterProxy(formIds, callerToken);
+}
+
+/**
+* @brief Unregister form router event proxy.
+* @param formIds Indicates the ID of the forms.
+* @return Returns ERR_OK on success, others on failure.
+*/
+int FormMgrService::UnregisterFormRouterProxy(const std::vector<int64_t> &formIds)
+{
+    HILOG_DEBUG("Called.");
+    ErrCode ret = CheckFormPermission();
+    if (ret != ERR_OK) {
+        HILOG_ERROR("Fail, unregister form router proxy permission denied");
+        return ret;
+    }
+    return FormMgrAdapter::GetInstance().UnregisterFormRouterProxy(formIds);
 }
 
 /**
@@ -1129,6 +1174,11 @@ int32_t FormMgrService::UnregisterPublishFormInterceptor(const sptr<IRemoteObjec
 
 void FormMgrService::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {
+    if (systemAbilityId == MEMORY_MANAGER_SA_ID) {
+        HILOG_INFO("MEMORY_MANAGER_SA start, SubscribeAppState");
+        Memory::MemMgrClient::GetInstance().SubscribeAppState(*memStatusListener_);
+        return;
+    }
     if (systemAbilityId != DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID) {
         return;
     }
@@ -1393,6 +1443,71 @@ ErrCode FormMgrService::RequestPublishProxyForm(Want &want, bool withFormBinding
     }
     return FormMgrAdapter::GetInstance().RequestPublishForm(want, withFormBindingData, formBindingData, formId,
         formDataProxies);
+}
+
+ErrCode FormMgrService::RegisterClickEventObserver(
+    const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer)
+{
+    HILOG_INFO("Called.");
+    if (observer == nullptr) {
+        HILOG_ERROR("Caller token parameter is empty.");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    ErrCode ret = CheckFormObserverPermission();
+    if (ret != ERR_OK) {
+        HILOG_ERROR("Fail, register form add observer permission denied");
+        return ret;
+    }
+    return FormMgrAdapter::GetInstance().RegisterClickEventObserver(bundleName, formEventType, observer);
+}
+
+ErrCode FormMgrService::UnregisterClickEventObserver(
+    const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer)
+{
+    HILOG_INFO("Called.");
+    if (observer == nullptr) {
+        HILOG_ERROR("Caller token parameter is empty.");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    ErrCode ret = CheckFormObserverPermission();
+    if (ret != ERR_OK) {
+        HILOG_ERROR("Fail, register form add observer permission denied");
+        return ret;
+    }
+    return FormMgrAdapter::GetInstance().UnregisterClickEventObserver(bundleName, formEventType, observer);
+}
+
+int32_t FormMgrService::SetFormsRecyclable(const std::vector<int64_t> &formIds)
+{
+    HILOG_DEBUG("called.");
+    ErrCode ret = CheckFormPermission();
+    if (ret != ERR_OK) {
+        HILOG_ERROR("set forms recyclable permission denied");
+        return ret;
+    }
+    return FormMgrAdapter::GetInstance().SetFormsRecyclable(formIds);
+}
+
+int32_t FormMgrService::RecycleForms(const std::vector<int64_t> &formIds, const Want &want)
+{
+    HILOG_DEBUG("called.");
+    ErrCode ret = CheckFormPermission();
+    if (ret != ERR_OK) {
+        HILOG_ERROR("recycle forms permission denied");
+        return ret;
+    }
+    return FormMgrAdapter::GetInstance().RecycleForms(formIds, want);
+}
+
+int32_t FormMgrService::RecoverForms(const std::vector<int64_t> &formIds, const Want &want)
+{
+    HILOG_DEBUG("called.");
+    ErrCode ret = CheckFormPermission();
+    if (ret != ERR_OK) {
+        HILOG_ERROR("recover forms permission denied");
+        return ret;
+    }
+    return FormMgrAdapter::GetInstance().RecoverForms(formIds, want);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

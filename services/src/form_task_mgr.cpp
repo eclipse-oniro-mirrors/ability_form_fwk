@@ -21,6 +21,7 @@
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
 #include "form_data_mgr.h"
+#include "form_host_delegate_proxy.h"
 #include "form_host_interface.h"
 #include "form_mgr_adapter.h"
 #include "form_mgr_errors.h"
@@ -30,6 +31,8 @@
 #include "form_share_mgr.h"
 #include "form_supply_callback.h"
 #include "js_form_state_observer_interface.h"
+#include "form_info_rdb_storage_mgr.h"
+#include "form_util.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -783,7 +786,7 @@ FormJsInfo FormTaskMgr::CreateFormJsInfo(const int64_t formId, const FormRecord 
     form.uiSyntax = record.uiSyntax;
     form.isDynamic = record.isDynamic;
     form.transparencyEnabled = record.transparencyEnabled;
-    HILOG_DEBUG("%{public}s end, jsPath: %{private}s, data: %{public}s", __func__,
+    HILOG_DEBUG("%{public}s end, jsPath: %{private}s, data: %{private}s", __func__,
         form.jsFormCodePath.c_str(), form.formData.c_str());
     return form;
 }
@@ -986,6 +989,249 @@ void FormTaskMgr::RemoveConnection(int32_t connectId)
         return;
     }
     formSupplyCallback->RemoveConnection(connectId);
+}
+
+/**
+ * @brief want data from form router event(task).
+ * @param formId The id of the form.
+ * @param remoteObject Form router proxy manager object.
+ * @param want The want of the form for router event.
+ */
+void FormTaskMgr::PostRouterProxyToHost(const int64_t formId, const sptr<IRemoteObject> &remoteObject, const Want &want)
+{
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("Fail, serialQueue_ invalidate.");
+        return;
+    }
+
+    auto routerProxyFunc = [formId, want, remoteObject]() {
+        FormTaskMgr::GetInstance().FormRouterEventProxy(formId, remoteObject, want);
+    };
+    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, routerProxyFunc);
+}
+
+/**
+ * @brief Form router event proxy.
+ * @param formId The id of the form.
+ * @param remoteObject Form router proxy manager object.
+ * @param want The want of the form for router event.
+ */
+void FormTaskMgr::FormRouterEventProxy(const int64_t formId, const sptr<IRemoteObject> &remoteObject, const Want &want)
+{
+    if (remoteObject == nullptr) {
+        HILOG_ERROR("Fail, remoteObject is nullptr!");
+        return;
+    }
+
+    sptr<IFormHostDelegate> remoteFormHostDelegateProxy = iface_cast<IFormHostDelegate>(remoteObject);
+    if (remoteFormHostDelegateProxy == nullptr) {
+        HILOG_ERROR("Fail, remoteFormHostDelegateProxy is nullptr!");
+        return;
+    }
+    remoteFormHostDelegateProxy->RouterEvent(formId, want);
+}
+
+/**
+ * @brief Post Form visible/invisible notify.
+ * @param formIds  the Ids of forms need to notify.
+ * @param formInstanceMaps formInstances for visibleNotify.
+ * @param eventMaps eventMaps for event notify.
+ * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
+ * @param visibleNotifyDelay delay time.
+ */
+void FormTaskMgr::PostVisibleNotify(const std::vector<int64_t> &formIds,
+    std::map<std::string, std::vector<FormInstance>> &formInstanceMaps,
+    std::map<std::string, std::vector<int64_t>> &eventMaps,
+    const int32_t formVisibleType, int32_t visibleNotifyDelay)
+{
+    HILOG_DEBUG("called");
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("serialQueue_ is nullptr.");
+        FormTaskMgr::GetInstance().NotifyVisible(formIds, formInstanceMaps, eventMaps, formVisibleType);
+        return;
+    }
+    auto task = [formIds, formInstanceMaps, eventMaps, formVisibleType]() {
+        FormTaskMgr::GetInstance().NotifyVisible(formIds, formInstanceMaps, eventMaps, formVisibleType);
+    };
+    serialQueue_->ScheduleTask(visibleNotifyDelay, task);
+    HILOG_DEBUG("end");
+}
+
+/**
+* @brief Form visible/invisible notify.
+* @param formIds  the Ids of forms need to notify.
+* @param formInstanceMaps formInstances for visibleNotify.
+* @param eventMaps eventMaps for event notify.
+* @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
+*/
+void FormTaskMgr::NotifyVisible(const std::vector<int64_t> &formIds,
+    std::map<std::string, std::vector<FormInstance>> formInstanceMaps,
+    std::map<std::string, std::vector<int64_t>> eventMaps, const int32_t formVisibleType)
+{
+    FormMgrAdapter::GetInstance().HandlerNotifyWhetherVisibleForms(formIds,
+        formInstanceMaps, eventMaps, formVisibleType);
+}
+
+/**
+ * @brief Post recycle forms.
+ * @param formIds the Ids of forms to be recycled.
+ * @param want The want of the request.
+ * @param remoteObjectOfHost Form host proxy object.
+ * @param remoteObjectOfRender Form render proxy object.
+ */
+void FormTaskMgr::PostRecycleForms(const std::vector<int64_t> &formIds, const Want &want,
+    const sptr<IRemoteObject> &remoteObjectOfHost, const sptr<IRemoteObject> &remoteObjectOfRender)
+{
+    HILOG_DEBUG("start.");
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("serialQueue_ is null.");
+        return;
+    }
+
+    auto delayTime = want.GetIntParam(Constants::FORM_DELAY_TIME_OF_RECYCLE, FORM_TASK_DELAY_TIME);
+    for (const int64_t &formId : formIds) {
+        auto recycleForm = [formId, remoteObjectOfHost, remoteObjectOfRender]() {
+            FormTaskMgr::GetInstance().RecycleForm(formId, remoteObjectOfHost, remoteObjectOfRender);
+        };
+        serialQueue_->ScheduleDelayTask(
+            std::make_pair((int64_t)TaskType::RECYCLE_FORM, formId), delayTime, recycleForm);
+    }
+    HILOG_DEBUG("end");
+}
+
+/**
+ * @brief Handle recycle form message.
+ * @param formId The Id of form to be recycled.
+ * @param remoteObjectOfHost Form host proxy object.
+ * @param remoteObjectOfRender Form render proxy object.
+ */
+void FormTaskMgr::RecycleForm(const int64_t &formId, const sptr<IRemoteObject> &remoteObjectOfHost,
+    const sptr<IRemoteObject> &remoteObjectOfRender)
+{
+    HILOG_DEBUG("start.");
+
+    sptr<IFormRender> remoteFormRender = iface_cast<IFormRender>(remoteObjectOfRender);
+    if (remoteFormRender == nullptr) {
+        HILOG_ERROR("Failed to get form render proxy, formId is %{public}" PRId64, formId);
+        return;
+    }
+
+    FormRecord formRecord;
+    if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
+        HILOG_ERROR("form %{public}" PRId64 " not exist", formId);
+        return;
+    }
+    if (formRecord.recycleStatus != RecycleStatus::RECYCLABLE) {
+        HILOG_ERROR("form %{public}" PRId64 " is not RECYCLABLE", formId);
+        return;
+    }
+
+    Want want;
+    int32_t userId = FormUtil::GetCurrentAccountId();
+    want.SetParam(Constants::FORM_SUPPLY_UID, std::to_string(userId) + formRecord.bundleName);
+    want.SetParam(Constants::PARAM_FORM_HOST_TOKEN, remoteObjectOfHost);
+    int32_t error = remoteFormRender->RecycleForm(formId, want);
+    if (error != ERR_OK) {
+        HILOG_ERROR("fail");
+        return;
+    }
+}
+
+/**
+ * @brief Post recover forms.
+ * @param formIds the Ids of forms to be recycled.
+ * @param want The want of the request.
+ * @param remoteObject Form render proxy object.
+ */
+void FormTaskMgr::PostRecoverForm(const int64_t &formId, const Want &want, const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_DEBUG("start.");
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("serialQueue_ is null.");
+        return;
+    }
+
+    auto recoverForm = [formId, want, remoteObject]() {
+        FormTaskMgr::GetInstance().RecoverForm(formId, want, remoteObject);
+    };
+    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, recoverForm);
+    HILOG_DEBUG("end");
+}
+
+/**
+ * @brief Handle recover form message.
+ * @param formId The Id of form to be recovered.
+ * @param want The want of the request.
+ * @param remoteObject Form render proxy object.
+ */
+void FormTaskMgr::RecoverForm(const int64_t &formId, const Want &want, const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_DEBUG("start.");
+    auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
+    sptr<IFormRender> remoteFormRender = iface_cast<IFormRender>(remoteObject);
+    if (remoteFormRender == nullptr) {
+        RemoveConnection(connectId);
+        HILOG_ERROR("Failed to get form render proxy.");
+        return;
+    }
+
+    int32_t error = remoteFormRender->RecoverForm(formId, want);
+    if (error != ERR_OK) {
+        RemoveConnection(connectId);
+        HILOG_ERROR("Failed to recover form");
+        return;
+    }
+
+    HILOG_DEBUG("end");
+}
+/**
+ * @brief Cancel delay task.
+ * @param eventMsg Delay Task.
+ */
+void FormTaskMgr::CancelDelayTask(const std::pair<int64_t, int64_t> &eventMsg)
+{
+    HILOG_DEBUG("cancel delay task: <%{public}" PRId64", %{public}" PRId64">.",
+        eventMsg.first, eventMsg.second);
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("serialQueue_ is null.");
+        return;
+    }
+
+    serialQueue_->CancelDelayTask(eventMsg);
+    HILOG_DEBUG("end");
+}
+
+void FormTaskMgr::PostFormClickEventToHost(
+    const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &remoteObject,
+    const RunningFormInfo &runningFormInfo)
+{
+    HILOG_DEBUG("Called.");
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("Fail, serialQueue_ invalidate.");
+        return;
+    }
+    auto task = [bundleName, formEventType, remoteObject, runningFormInfo]() {
+        if (remoteObject == nullptr) {
+            HILOG_ERROR("Fail, remoteObject is null.");
+            return;
+        }
+        FormTaskMgr::GetInstance().FormClickEvent(bundleName, formEventType, remoteObject, runningFormInfo);
+    };
+    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, task);
+}
+
+void FormTaskMgr::FormClickEvent(const std::string &bundleName, const std::string &formEventType,
+    const sptr<IRemoteObject> &remoteObject, const RunningFormInfo &runningFormInfo)
+{
+    HILOG_DEBUG("Called");
+    sptr<AbilityRuntime::IJsFormStateObserver> remoteJsFormStateObserver =
+        iface_cast<AbilityRuntime::IJsFormStateObserver>(remoteObject);
+    if (remoteJsFormStateObserver == nullptr) {
+        HILOG_ERROR("Failed to get js form state observer proxy.");
+        return;
+    }
+
+    remoteJsFormStateObserver->OnFormClickEvent(bundleName, formEventType, runningFormInfo);
 }
 } // namespace AppExecFwk
 } // namespace OHOS

@@ -17,11 +17,13 @@
 
 namespace {
     bool g_mockGetFormRecordRet = true;
+    int32_t g_mockType = 0;
 }
 
-void MockGetFormRecord(bool mockRet)
+void MockGetFormRecord(bool mockRet, int32_t type)
 {
     g_mockGetFormRecordRet = mockRet;
+    g_mockType = type;
 }
 
 namespace OHOS {
@@ -31,12 +33,10 @@ bool FormDataMgr::GetFormRecord(const int64_t formId, FormRecord &formRecord) co
     FormRecord formRecord_;
     formRecord_.formId = 100;
     formRecord = formRecord_;
+    if (g_mockType == 1) {
+        formRecord.privacyLevel = 1;
+    }
     return g_mockGetFormRecordRet;
-}
-
-void FormDataMgr::GetFormHostRemoteObj(const int64_t formId, std::vector<sptr<IRemoteObject>> &formHostObjs) const
-{
-    formHostObjs.emplace_back(nullptr);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

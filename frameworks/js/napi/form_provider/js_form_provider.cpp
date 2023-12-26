@@ -393,26 +393,29 @@ napi_value JsFormProvider::OnRequestPublishForm(napi_env env, size_t argc, napi_
     convertArgc++;
 
     if (argc > ARGS_SIZE_ONE) {
-        asyncCallbackInfo->withFormBindingData = true;
         napi_valuetype paramOneType = napi_undefined;
         napi_typeof(env, argv[PARAM1], &paramOneType);
-        if (paramOneType != napi_object) {
+        if (paramOneType == napi_object) {
+            asyncCallbackInfo->withFormBindingData = true;
+            auto formProviderData = std::make_unique<FormProviderData>();
+            std::string formDataStr = GetStringByProp(env, argv[PARAM1], "data");
+            formProviderData->SetDataString(formDataStr);
+            formProviderData->ParseImagesData();
+            asyncCallbackInfo->formProviderData = std::move(formProviderData);
+
+            napi_value nativeProxies = nullptr;
+            napi_get_named_property(env, argv[PARAM1], "proxies", &nativeProxies);
+            if (nativeProxies != nullptr) {
+                ConvertFromDataProxies(env, nativeProxies, asyncCallbackInfo->formDataProxies);
+            }
+            convertArgc++;
+        } else if (paramOneType == napi_function) {
+            asyncCallbackInfo->withFormBindingData = false;
+        } else {
             HILOG_ERROR("formBindingData is not napi_object.");
             NapiFormUtil::ThrowParamTypeError(env, "formBindingData", "formBindingData.FormBindingData");
             return CreateJsUndefined(env);
         }
-        auto formProviderData = std::make_unique<FormProviderData>();
-        std::string formDataStr = GetStringByProp(env, argv[PARAM1], "data");
-        formProviderData->SetDataString(formDataStr);
-        formProviderData->ParseImagesData();
-        asyncCallbackInfo->formProviderData = std::move(formProviderData);
-
-        napi_value nativeProxies = nullptr;
-        napi_get_named_property(env, argv[PARAM1], "proxies", &nativeProxies);
-        if (nativeProxies != nullptr) {
-            ConvertFromDataProxies(env, nativeProxies, asyncCallbackInfo->formDataProxies);
-        }
-        convertArgc++;
     }
 
     NapiAsyncTask::CompleteCallback complete = [asyncCallbackInfo](napi_env env, NapiAsyncTask &task, int32_t status) {

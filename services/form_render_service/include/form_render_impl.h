@@ -48,7 +48,7 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t RenderForm(const FormJsInfo &formJsInfo, const Want &want,
-        const sptr<IRemoteObject> &callerToken) override;
+        sptr<IRemoteObject> callerToken) override;
 
     /**
      * @brief Stop rendering form. This is sync API.
@@ -66,7 +66,7 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t CleanFormHost(const sptr<IRemoteObject> &hostToken) override;
-    
+
     /**
      * @brief Reload form When app updated. This is sync API.
      * @param formIds the form id need to update.
@@ -90,7 +90,14 @@ public:
 
     int32_t OnUnlock() override;
 
+    int32_t RecycleForm(const int64_t &formId, const Want &want) override;
+
+    int32_t RecoverForm(const int64_t &formId, const Want &want) override;
+
 private:
+    void FormRenderGCTask(const std::string &uid);
+    void FormRenderGC(const std::string &uid);
+
     std::mutex renderRecordMutex_;
     std::unordered_map<std::string, std::shared_ptr<FormRenderRecord>> renderRecordMap_; // <uid(userId + bundleName), renderRecord>
     std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration_;
