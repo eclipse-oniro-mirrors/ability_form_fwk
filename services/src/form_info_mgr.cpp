@@ -547,7 +547,7 @@ ErrCode FormInfoMgr::GetFormsInfoByRecord(const FormRecord &formRecord, FormInfo
             HILOG_ERROR("BundleFormInfo is nullptr, GetFormsInfoByModule failed.");
             return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
         }
-        
+
         bundleFormInfoIter->second->GetFormsInfoByModule(formRecord.moduleName, formInfos);
     }
     for (const FormInfo &info : formInfos) {
