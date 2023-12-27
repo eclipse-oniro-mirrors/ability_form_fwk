@@ -25,6 +25,8 @@
 namespace OHOS {
 namespace AppExecFwk {
 using namespace std::chrono;
+static inline const std::u16string ERMS_INTERFACE_TOKEN =
+    u"ohos.cloud.ecologicalrulemgrservice.IEcologicalRuleMgrService";
 std::mutex FormEcologicalRuleClient::instanceLock_;
 sptr<IFormEcologicalRule> FormEcologicalRuleClient::ecologicalRuleMgrServiceProxy_;
 sptr<IRemoteObject::DeathRecipient> FormEcologicalRuleClient::deathRecipient_;
@@ -112,7 +114,7 @@ int32_t FormEcologicalRuleProxy::IsSupportPublishForm(const std::vector<Want> &w
 {
     HILOG_INFO("called");
     MessageParcel data;
-    if (!data.WriteInterfaceToken(FormEcologicalRuleProxy::GetDescriptor())) {
+    if (!data.WriteInterfaceToken(ERMS_INTERFACE_TOKEN)) {
         HILOG_ERROR("write token failed");
         return ERR_FAILED;
     }
