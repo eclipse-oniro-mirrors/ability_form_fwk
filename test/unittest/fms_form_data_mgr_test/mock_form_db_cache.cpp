@@ -55,7 +55,7 @@ void FormDbCache::GetAllFormInfo(std::vector<FormDBInfo> &formDBInfos)
             formDBInfos.emplace_back(formDBInfo);
         }
     } else {
-         formDBInfos = formDBInfos_;
+        formDBInfos = formDBInfos_;
     }
 }
 } // namespace AppExecFwk

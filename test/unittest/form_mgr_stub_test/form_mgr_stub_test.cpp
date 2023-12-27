@@ -2326,14 +2326,14 @@ HWTEST_F(FormMgrStubTest, HandleGetFormInstanceById_0100, TestSize.Level1) {
     GTEST_LOG_(INFO) << "HandleGetFormInstanceById_0100 starts";
     MessageParcel data;
     MessageParcel reply;
-    EXPECT_CALL(*mockFormMgrService,GetFormInstanceById(_, _, _))
+    EXPECT_CALL(*mockFormMgrService, GetFormInstanceById(_, _, _))
         .Times(1)
         .WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->HandleGetFormInstanceById(data, reply);
     std::vector<FormInfo> resultInfos;
     GetParcelableInfos(reply, resultInfos);
-    EXPECT_EQ(0, resultInfos.size());
-    EXPECT_EQ(ERR_OK, result); 
+    EXPECT_EQ(resultInfos.size(), 0);
+    EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "HandleGetFormInstanceById_0100 ends";
 }
 
@@ -2352,8 +2352,8 @@ HWTEST_F(FormMgrStubTest, HandleGetRunningFormInfos_0100, TestSize.Level1) {
     auto result = mockFormMgrService->HandleGetRunningFormInfos(data, reply);
     std::vector<FormInfo> resultInfos;
     GetParcelableInfos(reply, resultInfos);
-    EXPECT_EQ(0, resultInfos.size());
-    EXPECT_EQ(ERR_OK, result);
+    EXPECT_EQ(resultInfos.size(), 0);
+    EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "HandleGetRunningFormInfos_0100 ends";
 }
 
@@ -2366,14 +2366,14 @@ HWTEST_F(FormMgrStubTest, HandleGetRunningFormInfosByBundleName_0100, TestSize.L
     GTEST_LOG_(INFO) << "HandleGetRunningFormInfosByBundleName_0100 starts";
     MessageParcel data;
     MessageParcel reply;
-    EXPECT_CALL(*mockFormMgrService,GetRunningFormInfosByBundleName(_, _, _))
+    EXPECT_CALL(*mockFormMgrService, GetRunningFormInfosByBundleName(_, _, _))
         .Times(1)
         .WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->HandleGetRunningFormInfosByBundleName(data, reply);
     std::vector<FormInfo> resultInfos;
     GetParcelableInfos(reply, resultInfos);
-    EXPECT_EQ(0, resultInfos.size());
-    EXPECT_EQ(ERR_OK, result); 
+    EXPECT_EQ(resultInfos.size(), 0);
+    EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "HandleGetRunningFormInfosByBundleName_0100 ends";
 }
 }

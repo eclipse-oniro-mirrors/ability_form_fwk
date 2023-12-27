@@ -83,7 +83,7 @@ void FmsFormDataMgrTest::TearDown(void)
     }
     if (!FormDbCache::GetInstance().formDBInfos_.empty()) {
         FormDbCache::GetInstance().formDBInfos_.clear();
-    }    
+    }
     formDataMgr_.udidHash_ = 0;
 }
 
@@ -2469,7 +2469,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInstancesByFilter_0
     formInstancesFilter.bundleName = FORM_HOST_BUNDLE_NAME;
     std::vector<FormInstance> formInstances;
     formDataMgr_.GetUnusedFormInstancesByFilter(formInstancesFilter, formInstances);
-    EXPECT_EQ(0, formInstances.size());
+    EXPECT_EQ(formInstances.size(), 0);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInstancesByFilter_0100 end";
 }
 
@@ -2485,7 +2485,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormInstancesByFilter_0100, T
     formInstancesFilter.bundleName = "";
     std::vector<FormInstance> formInstances;
     auto res = formDataMgr_.GetFormInstancesByFilter(formInstancesFilter, formInstances);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, res);
+    EXPECT_EQ(res, ERR_APPEXECFWK_FORM_INVALID_PARAM);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstancesByFilter_0100 end";
 }
 
@@ -2509,8 +2509,8 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormInstancesByFilter_0200, T
     formInstancesFilter.isUnusedIncluded = false;
     std::vector<FormInstance> formInstances;
     auto res = formDataMgr_.GetFormInstancesByFilter(formInstancesFilter, formInstances);
-    EXPECT_NE(0, formInstances.size());
-    EXPECT_EQ(ERR_OK, res);
+    EXPECT_NE(formInstances.size(), 0);
+    EXPECT_EQ(res, ERR_OK);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstancesByFilter_0200 end";
 }
 
@@ -2533,8 +2533,8 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormInstancesByFilter_0300, T
     formInstancesFilter.moduleName = PARAM_PROVIDER_MODULE_NAME;
     std::vector<FormInstance> formInstances;
     auto res = formDataMgr_.GetFormInstancesByFilter(formInstancesFilter, formInstances);
-    EXPECT_EQ(0, formInstances.size());
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, res);
+    EXPECT_EQ(formInstances.size(), 0);
+    EXPECT_EQ(res, ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstancesByFilter_0300 end";
 }
 
@@ -2550,7 +2550,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormInstanceById_0100, TestSi
     bool isUnusedInclude = false;
     FormInstance formInstance;
     auto ret = formDataMgr_.GetFormInstanceById(formId, isUnusedInclude, formInstance);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, ret);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstanceById_0100 end";
 }
 
@@ -2571,8 +2571,8 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormInstanceById_0200, TestSi
     bool isUnusedInclude = false;
     FormInstance formInstance;
     auto res = formDataMgr_.GetFormInstanceById(formId, isUnusedInclude, formInstance);
-    EXPECT_EQ(FormUsageState::USED, formInstance.formUsageState);
-    EXPECT_EQ(ERR_OK, res);
+    EXPECT_EQ(formInstance.formUsageState, FormUsageState::USED);
+    EXPECT_EQ(res, ERR_OK);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstanceById_0200 end";
 }
 
@@ -2589,7 +2589,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormInstanceById_0300, TestSi
     bool isUnusedInclude = false;
     FormInstance formInstance;
     auto res = formDataMgr_.GetFormInstanceById(formId, isUnusedInclude, formInstance);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, res);
+    EXPECT_EQ(res, ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstanceById_0300 end";
 }
 
@@ -2602,7 +2602,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormInstanceById_0400, TestSi
 {
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstanceById_0400 start";
     formDataMgr_.clientRecords_.clear();
-    EXPECT_EQ(0, FormDbCache::GetInstance().formDBInfos_.size());
+    EXPECT_EQ(FormDbCache::GetInstance().formDBInfos_.size(), 0);
     FormDBInfo formDbInfo;
     formDbInfo.formId = FORM_ID_ONE;
     FormDbCache::GetInstance().formDBInfos_.emplace_back(formDbInfo);
@@ -2610,7 +2610,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormInstanceById_0400, TestSi
     bool isUnusedInclude = true;
     FormInstance formInstance;
     auto res = formDataMgr_.GetFormInstanceById(formId, isUnusedInclude, formInstance);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, res);
+    EXPECT_EQ(res, ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstanceById_0400 end";
 }
 
@@ -2630,7 +2630,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos_0100, TestSiz
     MockGetAllFormInfo(0);
     std::vector<RunningFormInfo> runningFormInfos;
     formDataMgr_.GetUnusedFormInfos(runningFormInfos);
-    EXPECT_EQ(0, runningFormInfos.size());
+    EXPECT_EQ(runningFormInfos.size(), 0);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos_0100 end";
 }
 }
