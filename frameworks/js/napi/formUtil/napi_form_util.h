@@ -116,6 +116,8 @@ bool ConvertStringToInt64(const std::string &strInfo, int64_t &int64Value);
 void InnerCreateCallbackRetMsg(napi_env env, int32_t code, napi_value (&result)[CALLBACK_RETURN_MSG_SIZE]);
 void InnerCreatePromiseRetMsg(napi_env env, int32_t code, napi_value* result);
 napi_value RetErrMsg(AsyncErrMsgCallbackInfo* asyncCallbackInfo);
+napi_value RetErrMsgForCallback(AsyncErrMsgCallbackInfo* asyncCallbackInfo);
+napi_value RetErrMsgForPromise(AsyncErrMsgCallbackInfo* asyncCallbackInfo);
 void ParseFormInfoIntoNapi(napi_env env, const OHOS::AppExecFwk::FormInfo &formInfo, napi_value &result);
 void ParseRunningFormInfoIntoNapi(napi_env env, const AppExecFwk::RunningFormInfo &runningFormInfo, napi_value &result);
 AsyncErrMsgCallbackInfo *InitErrMsg(napi_env env, int32_t code, int32_t type, napi_value callbackValue);

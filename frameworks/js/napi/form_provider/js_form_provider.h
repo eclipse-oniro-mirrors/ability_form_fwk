@@ -77,7 +77,7 @@ private:
         std::vector<AppExecFwk::FormDataProxy> &formDataProxies);
     bool ConvertFormDataProxy(napi_env env, napi_value jsValue, AppExecFwk::FormDataProxy &formDataProxy);
 
-    napi_value OnGetFormsInfoParseParam(NapiParamPackage &napiParam,
+    bool OnGetFormsInfoParseParam(NapiParamPackage &napiParam,
         size_t &convertArgc, bool &isPromise, AppExecFwk::FormInfoFilter &formInfoFilter);
     napi_value OnUpdateFormParseParam(napi_env env, size_t argc, napi_value* argv, int64_t &formId);
 };

@@ -612,35 +612,9 @@ ErrCode FormMgrService::ReadFormConfigXML()
     return ERR_OK;
 }
 
-/**
- * @brief initialization of form manager service.
- */
-ErrCode FormMgrService::Init()
+
+void FormMgrService::SubscribeSysEventReceiver()
 {
-    HILOG_INFO("FormMgrService Init start");
-    serialQueue_ = std::make_shared<FormSerialQueue>(FORM_MGR_SERVICE_QUEUE.c_str());
-    if (serialQueue_ == nullptr) {
-        HILOG_ERROR("Init fail, Failed to init due to create serialQueue_ error");
-        return ERR_INVALID_OPERATION;
-    }
-
-    handler_ = std::make_shared<FormEventHandler>(serialQueue_);
-    if (handler_ == nullptr) {
-        HILOG_ERROR("%{public}s fail, Failed to init due to create handler error", __func__);
-        return ERR_INVALID_OPERATION;
-    }
-    FormTaskMgr::GetInstance().SetSerialQueue(serialQueue_);
-    FormAmsHelper::GetInstance().SetSerialQueue(serialQueue_);
-    /* Publish service maybe failed, so we need call this function at the last,
-     * so it can't affect the TDD test program */
-    bool ret = Publish(DelayedSingleton<FormMgrService>::GetInstance().get());
-    onStartPublishTime_ = GetCurrentDateTime();
-    HILOG_INFO("FMS onStart publish done, time: %{public}s", onStartPublishTime_.c_str());
-    if (!ret) {
-        HILOG_ERROR("%{public}s fail, FormMgrService::Init Publish failed!", __func__);
-        return ERR_INVALID_OPERATION;
-    }
-
     if (formSysEventReceiver_ == nullptr) {
         EventFwk::MatchingSkills matchingSkills;
         matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_ABILITY_UPDATED);
@@ -656,6 +630,56 @@ ErrCode FormMgrService::Init()
         formSysEventReceiver_->SetSerialQueue(serialQueue_);
         EventFwk::CommonEventManager::SubscribeCommonEvent(formSysEventReceiver_);
     }
+}
+
+ErrCode FormMgrService::RegisterBundleEventCallback()
+{
+    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
+    if (iBundleMgr == nullptr) {
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    formBundleEventCallback_ = new (std::nothrow) FormBundleEventCallback();
+    if (formBundleEventCallback_ == nullptr) {
+        HILOG_ERROR("fail, allocate formBundleEventCallback_ failed!");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    if (!iBundleMgr->RegisterBundleEventCallback(formBundleEventCallback_)) {
+        HILOG_ERROR("fail, RegisterBundleEventCallback failed!");
+        delete formBundleEventCallback_;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    return ERR_OK;
+}
+
+/**
+ * @brief initialization of form manager service.
+ */
+ErrCode FormMgrService::Init()
+{
+    FMS_CALL_INFO_ENTER;
+    serialQueue_ = std::make_shared<FormSerialQueue>(FORM_MGR_SERVICE_QUEUE.c_str());
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("Init fail, Failed to init due to create serialQueue_ error");
+        return ERR_INVALID_OPERATION;
+    }
+
+    handler_ = std::make_shared<FormEventHandler>(serialQueue_);
+    if (handler_ == nullptr) {
+        HILOG_ERROR("%{public}s fail, Failed to init due to create handler error", __func__);
+        return ERR_INVALID_OPERATION;
+    }
+    FormTaskMgr::GetInstance().SetSerialQueue(serialQueue_);
+    FormAmsHelper::GetInstance().SetSerialQueue(serialQueue_);
+    /* Publish service maybe failed, so we need call this function at the last,
+     * so it can't affect the TDD test program */
+    if (!Publish(DelayedSingleton<FormMgrService>::GetInstance().get())) {
+        HILOG_ERROR("FormMgrService::Init Publish failed!");
+        return ERR_INVALID_OPERATION;
+    }
+    onStartPublishTime_ = GetCurrentDateTime();
+    HILOG_INFO("FMS onStart publish done, time: %{public}s", onStartPublishTime_.c_str());
+
+    SubscribeSysEventReceiver();
 
     memStatusListener_ = std::make_shared<MemStatusListener>();
     Memory::MemMgrClient::GetInstance().SubscribeAppState(*memStatusListener_);
@@ -671,29 +695,16 @@ ErrCode FormMgrService::Init()
     FormDbCache::GetInstance().Start();
     FormTimerMgr::GetInstance(); // Init FormTimerMgr
     FormCacheMgr::GetInstance().Start();
-    // Register formbundleEventCallback to receive hap updates
-    formBundleEventCallback_ = new (std::nothrow) FormBundleEventCallback();
-    if (formBundleEventCallback_ == nullptr) {
-        HILOG_ERROR("fail, allocate formBundleEventCallback_ failed!");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
-    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
-    if (iBundleMgr == nullptr) {
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
-    bool re = iBundleMgr->RegisterBundleEventCallback(formBundleEventCallback_);
-    if (!re) {
-        HILOG_ERROR("fail, RegisterBundleEventCallback failed!");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
 
+    auto ret = RegisterBundleEventCallback();
+    if (ret != ERR_OK) {
+        return ret;
+    }
     // read param form form_config.xml.
-    int32_t result = ReadFormConfigXML();
-    if (result != ERR_OK) {
+    if (ReadFormConfigXML() != ERR_OK) {
         HILOG_WARN("parse form config failed, use the default vaule.");
     }
     FormMgrAdapter::GetInstance().Init();
-    HILOG_INFO("init success");
     return ERR_OK;
 }
 

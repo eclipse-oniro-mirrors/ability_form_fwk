@@ -53,6 +53,12 @@ namespace {
     constexpr int64_t NANOSECONDS = 1000000000;
     // MICROSECONDS mean 10^6 millias second
     constexpr int64_t MICROSECONDS = 1000000;
+
+    struct OnDeleteInvalidFormsS {
+        int result;
+        int32_t numFormsDeleted = 0;
+        std::vector<int64_t> iFormIds;
+    };
 }
 
 /**
@@ -1612,21 +1618,13 @@ napi_value NapiFormHost::OnNotifyFormsPrivacyProtected(napi_env env, size_t argc
     return result;
 }
 
-napi_value NapiFormHost::OnDeleteInvalidForms(napi_env env, size_t argc, napi_value* argv)
+bool NapiFormHost::OnDeleteInvalidFormsParseParam(napi_env env, size_t argc, napi_value* argv,
+    int32_t &errCode, std::vector<std::string> &strFormIdList)
 {
-    HILOG_DEBUG("%{public}s is called", __FUNCTION__);
-    int32_t errCode = ERR_OK;
     if (argc > ARGS_TWO || argc < ARGS_ONE) {
         HILOG_ERROR("wrong number of arguments.");
-        return CreateJsNull(env);
+        return false;
     }
-    struct OnDeleteInvalidForms {
-        int result;
-        int32_t numFormsDeleted = 0;
-        std::vector<int64_t> iFormIds;
-    };
-    std::shared_ptr<OnDeleteInvalidForms> onDeleteInvalidForms = std::make_shared<OnDeleteInvalidForms>();
-    std::vector<string> strFormIdList;
     if (!GetStringsValue(env, argv[PARAM0], strFormIdList)) {
         HILOG_ERROR("conversion string failed!");
         errCode = ERR_APPEXECFWK_FORM_FORM_ID_NUM_ERR;
@@ -1635,6 +1633,21 @@ napi_value NapiFormHost::OnDeleteInvalidForms(napi_env env, size_t argc, napi_va
         HILOG_ERROR("formId list is empty!");
         errCode = ERR_APPEXECFWK_FORM_FORM_ID_ARRAY_ERR;
     }
+    return true;
+}
+
+napi_value NapiFormHost::OnDeleteInvalidForms(napi_env env, size_t argc, napi_value* argv)
+{
+    HILOG_DEBUG("called");
+
+    int32_t errCode = ERR_OK;
+    std::vector<std::string> strFormIdList;
+    if (!OnDeleteInvalidFormsParseParam(env, argc, argv, errCode, strFormIdList)) {
+        HILOG_ERROR("parse param failed");
+        return CreateJsNull(env);
+    }
+
+    std::shared_ptr<OnDeleteInvalidFormsS> onDeleteInvalidForms = std::make_shared<OnDeleteInvalidFormsS>();
     for (size_t i = 0; i < strFormIdList.size(); i++) {
         int64_t formIdValue;
         if (!ConvertStringToInt64(strFormIdList[i], formIdValue)) {
@@ -1659,14 +1672,12 @@ napi_value NapiFormHost::OnDeleteInvalidForms(napi_env env, size_t argc, napi_va
             task.Reject(env, CreateJsError(env, retCode, retMsg));
             return;
         }
+        auto retCode = QueryRetCode(data->result);
+        auto retMsg = QueryRetMsg(retCode);
         if (data->result == ERR_OK) {
-            auto retCode = QueryRetCode(data->result);
-            auto retMsg = QueryRetMsg(retCode);
             task.ResolveWithCustomize(env, CreateJsError(env, retCode, retMsg),
             CreateJsValue(env, data->numFormsDeleted));
         } else {
-            auto retCode = QueryRetCode(data->result);
-            auto retMsg = QueryRetMsg(retCode);
             task.Reject(env, CreateJsError(env, retCode, retMsg));
         }
     };
@@ -1735,7 +1746,7 @@ int32_t NapiFormHost::OnNotifyInVisibleFormsParseParam(napi_env env, size_t argc
     std::vector<int64_t> &formIds)
 {
     if (argc > ARGS_TWO || argc < ARGS_ONE) {
-        HILOG_ERROR("wrong number of arguments. argc is %{public}d", argc);
+        HILOG_ERROR("wrong number of arguments. argc is %{public}zu", argc);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 

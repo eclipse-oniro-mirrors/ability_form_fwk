@@ -632,6 +632,9 @@ private:
     mutable std::mutex instanceMutex_;
     DISALLOW_COPY_AND_MOVE(FormMgrService);
     std::shared_ptr<MemStatusListener> memStatusListener_ = nullptr;
+
+    void SubscribeSysEventReceiver();
+    ErrCode RegisterBundleEventCallback();
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

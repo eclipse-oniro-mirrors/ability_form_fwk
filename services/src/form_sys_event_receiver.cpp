@@ -42,6 +42,59 @@ const int32_t MAIN_USER_ID = 100;
 FormSysEventReceiver::FormSysEventReceiver(const EventFwk::CommonEventSubscribeInfo &subscriberInfo)
     : EventFwk::CommonEventSubscriber(subscriberInfo)
 {}
+
+void FormSysEventReceiver::OnReceiveEventForAbilityUpdate(const AAFwk::Want& want, std::string &bundleName)
+{
+    std::weak_ptr<FormSysEventReceiver> weakThis = shared_from_this();
+    auto task = [weakThis, want, bundleName]() {
+        HILOG_INFO("bundle updated, bundleName is %{public}s", bundleName.c_str());
+        std::shared_ptr<FormSysEventReceiver> sharedThis = weakThis.lock();
+        if (sharedThis) {
+            int userId = want.GetIntParam(KEY_USER_ID, 0);
+            sharedThis->formEventHelper_.HandleProviderUpdated(bundleName, userId);
+        }
+    };
+    serialQueue_->ScheduleTask(0, task);
+}
+
+void FormSysEventReceiver::OnReceiveEventForUserRemoved(int32_t userId)
+{
+    std::weak_ptr<FormSysEventReceiver> weakThis = shared_from_this();
+    auto task = [weakThis, userId]() {
+        std::shared_ptr<FormSysEventReceiver> sharedThis = weakThis.lock();
+        if (sharedThis) {
+            sharedThis->HandleUserIdRemoved(userId);
+        }
+    };
+    if (userId != -1) {
+        serialQueue_->ScheduleTask(0, task);
+    }
+}
+
+void FormSysEventReceiver::OnReceiveEventForPackageDataCleared(std::string &bundleName, int32_t userId)
+{
+    std::weak_ptr<FormSysEventReceiver> weakThis = shared_from_this();
+    auto task = [weakThis, bundleName, userId]() {
+        std::shared_ptr<FormSysEventReceiver> sharedThis = weakThis.lock();
+        if (sharedThis) {
+            sharedThis->formEventHelper_.HandleBundleDataCleared(bundleName, userId);
+        }
+    };
+    serialQueue_->ScheduleTask(0, task);
+}
+
+void FormSysEventReceiver::OnReceiveEventForUserUnlocked()
+{
+    std::weak_ptr<FormSysEventReceiver> weakThis = shared_from_this();
+    auto task = [weakThis]() {
+        std::shared_ptr<FormSysEventReceiver> sharedThis = weakThis.lock();
+        if (sharedThis) {
+            sharedThis->formEventHelper_.HandleOnUnlock();
+        }
+    };
+    serialQueue_->ScheduleTask(0, task);
+}
+
 /**
  * @brief Receive common event.
  * @param eventData Common event data.
@@ -70,47 +123,19 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
     HILOG_INFO("%{public}s, action:%{public}s.", __func__, action.c_str());
     std::weak_ptr<FormSysEventReceiver> weakThis = shared_from_this();
     if (action == EventFwk::CommonEventSupport::COMMON_EVENT_ABILITY_UPDATED) {
-        auto task = [weakThis, want, bundleName]() {
-            HILOG_INFO("%{public}s, bundle updated, bundleName: %{public}s", __func__, bundleName.c_str());
-            std::shared_ptr<FormSysEventReceiver> sharedThis = weakThis.lock();
-            if (sharedThis) {
-                int userId = want.GetIntParam(KEY_USER_ID, 0);
-                sharedThis->formEventHelper_.HandleProviderUpdated(bundleName, userId);
-            }
-        };
-        serialQueue_->ScheduleTask(0, task);
+        OnReceiveEventForAbilityUpdate(want, bundleName);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED) {
         int32_t userId = eventData.GetCode();
-        auto task = [weakThis, userId]() {
-            std::shared_ptr<FormSysEventReceiver> sharedThis = weakThis.lock();
-            if (sharedThis) {
-                sharedThis->HandleUserIdRemoved(userId);
-            }
-        };
-        if (userId != -1) {
-            serialQueue_->ScheduleTask(0, task);
-        }
+        OnReceiveEventForUserRemoved(userId);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_BUNDLE_SCAN_FINISHED) {
         HandleBundleScanFinished();
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
         HandleUserSwitched(eventData);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_DATA_CLEARED) {
         int userId = want.GetIntParam(KEY_USER_ID, Constants::DEFAULT_USERID);
-        auto task = [weakThis, bundleName, userId]() {
-            std::shared_ptr<FormSysEventReceiver> sharedThis = weakThis.lock();
-            if (sharedThis) {
-                sharedThis->formEventHelper_.HandleBundleDataCleared(bundleName, userId);
-            }
-        };
-        serialQueue_->ScheduleTask(0, task);
+        OnReceiveEventForPackageDataCleared(bundleName, userId);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_USER_UNLOCKED) {
-        auto task = [weakThis]() {
-            std::shared_ptr<FormSysEventReceiver> sharedThis = weakThis.lock();
-            if (sharedThis) {
-                sharedThis->formEventHelper_.HandleOnUnlock();
-            }
-        };
-        serialQueue_->ScheduleTask(0, task);
+        OnReceiveEventForUserUnlocked();
     } else {
         HILOG_WARN("%{public}s warnning, invalid action.", __func__);
     }
