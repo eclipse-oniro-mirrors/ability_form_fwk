@@ -4197,4 +4197,37 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_215, TestSize.Level0)
     FormBmsHelper::GetInstance().iBundleMgr_ = backup;
     GTEST_LOG_(INFO) << "FormMgrAdapter_215 end";
 }
+
+/**
+ * @tc.name: FormMgrAdapter_216
+ * @tc.desc: test GetFormInstancesByFilter function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_216, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_216 start";
+    FormMgrAdapter formMgrAdapter;
+
+    FormInstancesFilter formInstancesFilter;
+    std::vector<FormInstance> formInstances;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
+        formMgrAdapter.GetFormInstancesByFilter(formInstancesFilter, formInstances));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_216 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_217
+ * @tc.desc: test GetFormInstanceById function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_217, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_217 start";
+    FormMgrAdapter formMgrAdapter;
+
+    FormInstancesFilter formInstancesFilter;
+    FormInstance formInstance;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, formMgrAdapter.GetFormInstanceById(1, formInstance));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_217 end";
+}
 }

@@ -2376,4 +2376,63 @@ HWTEST_F(FormMgrStubTest, HandleGetRunningFormInfosByBundleName_0100, TestSize.L
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "HandleGetRunningFormInfosByBundleName_0100 ends";
 }
+
+/**
+ * @tc.number: FormMgrStubTest_0093
+ * @tc.name: HandleGetFormInstancesByFilter
+ * @tc.desc: return ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0093, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0093 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    FormInstancesFilter formInstancesFilter;
+    std::string bundleName = "com.example.test";
+    formInstancesFilter.bundleName = bundleName;
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORM_INSTANCES_FROM_BY_FILTER);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    data.WriteParcelable(&formInstancesFilter);
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0093 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_0094
+ * @tc.name: HandleGetFormInstancesByFilter
+ * @tc.desc: return ERR_APPEXECFWK_PARCEL_ERROR.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0094, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0094 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORM_INSTANCES_FROM_BY_FILTER);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0094 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_0095
+ * @tc.name: HandleGetFormInstancesById
+ * @tc.desc: return ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0095, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0095 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORM_INSTANCES_FROM_BY_ID);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    data.WriteInt64(0);
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0095 ends";
+}
 }

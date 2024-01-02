@@ -1495,4 +1495,121 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0085, TestSize.Level1)
     EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, ret);
     GTEST_LOG_(INFO) << "FormMgrService_0085 end";
 }
+
+/**
+ * @tc.number: FormMgrService_0086
+ * @tc.name: test GetFormInstancesByFilter function.
+ * @tc.desc: Verify that the GetFormInstancesByFilter interface is called normally
+ * and the return value is ERR_APPEXECFWK_FORM_INVALID_PARAM.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0086, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0086 start";
+    MockIsSACall(true);
+    MockIsSystemAppByFullTokenID(true);
+    MockVerifyCallingPermission(true);
+    FormMgrService formMgrService;
+    FormInstancesFilter formInstancesFilter;
+    std::vector<FormInstance> formInstances;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
+        formMgrService.GetFormInstancesByFilter(formInstancesFilter, formInstances));
+    GTEST_LOG_(INFO) << "FormMgrService_0086 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0087
+ * @tc.name: test GetFormInstancesByFilter function.
+ * @tc.desc: Verify that the GetFormInstancesByFilter interface is called normally
+ * and the return value is ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0087, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0087 start";
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(false);
+    MockVerifyCallingPermission(true);
+    FormMgrService formMgrService;
+    FormInstancesFilter formInstancesFilter;
+    std::vector<FormInstance> formInstances;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS,
+        formMgrService.GetFormInstancesByFilter(formInstancesFilter, formInstances));
+    GTEST_LOG_(INFO) << "FormMgrService_0087 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0088
+ * @tc.name: test GetFormInstancesByFilter function.
+ * @tc.desc: Verify that the GetFormInstancesByFilter interface is called normally
+ * and the return value is ERR_APPEXECFWK_FORM_PERMISSION_DENY.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0088, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0088 start";
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(true);
+    MockVerifyCallingPermission(false);
+    FormMgrService formMgrService;
+    FormInstancesFilter formInstancesFilter;
+    std::vector<FormInstance> formInstances;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY,
+        formMgrService.GetFormInstancesByFilter(formInstancesFilter, formInstances));
+    GTEST_LOG_(INFO) << "FormMgrService_0088 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0089
+ * @tc.name: test GetFormInstanceById function.
+ * @tc.desc: Verify that the GetFormInstanceById interface is called normally
+ * and the return value is ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0089, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0089 start";
+    MockIsSACall(true);
+    MockIsSystemAppByFullTokenID(true);
+    MockVerifyCallingPermission(true);
+    FormMgrService formMgrService;
+    int64_t formId = 800;
+    FormInstance formInstance;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, formMgrService.GetFormInstanceById(formId, formInstance));
+    GTEST_LOG_(INFO) << "FormMgrService_0089 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0090
+ * @tc.name: test GetFormInstanceById function.
+ * @tc.desc: Verify that the GetFormInstanceById interface is called normally
+ * and the return value is ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0090, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0090 start";
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(false);
+    MockVerifyCallingPermission(true);
+    FormMgrService formMgrService;
+    int64_t formId = 800;
+    FormInstance formInstance;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, formMgrService.GetFormInstanceById(formId, formInstance));
+    GTEST_LOG_(INFO) << "FormMgrService_0090 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0091
+ * @tc.name: test GetFormInstanceById function.
+ * @tc.desc: Verify that the GetFormInstanceById interface is called normally
+ * and the return value is ERR_APPEXECFWK_FORM_PERMISSION_DENY.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0091, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0091 start";
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(true);
+    MockVerifyCallingPermission(false);
+    FormMgrService formMgrService;
+    int64_t formId = 800;
+    FormInstance formInstance;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY, formMgrService.GetFormInstanceById(formId, formInstance));
+    GTEST_LOG_(INFO) << "FormMgrService_0091 end";
+}
 }
