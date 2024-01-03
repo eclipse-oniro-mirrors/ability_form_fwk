@@ -30,6 +30,7 @@ struct FormEventInfo {
     std::string bundleName;
     std::string moduleName;
     std::string abilityName;
+    std::string hostBundleName = "";
 };
 
 enum class FormEventName {
@@ -51,6 +52,8 @@ enum class FormEventName {
 class FormEventReport {
 public:
     static void SendFormEvent(const FormEventName &eventName, HiSysEventType type, const FormEventInfo &eventInfo);
+    static void SendSecondFormEvent(const FormEventName &eventName, HiSysEventType type,
+        const FormEventInfo &eventInfo);
 
 private:
     static std::string ConvertEventName(const FormEventName &eventName);

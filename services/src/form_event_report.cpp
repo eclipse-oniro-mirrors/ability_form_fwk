@@ -27,6 +27,7 @@ constexpr const char *EVENT_KEY_FORM_ID = "FORM_ID";
 constexpr const char *EVENT_KEY_BUNDLE_NAME = "BUNDLE_NAME";
 constexpr const char *EVENT_KEY_MODULE_NAME = "MODULE_NAME";
 constexpr const char *EVENT_KEY_ABILITY_NAME = "ABILITY_NAME";
+constexpr const char *EVENT_KEY_HOST_BUNDLE_NAME = "HOST_BUNDLE_NAME";
 const std::map<FormEventName, std::string> EVENT_NAME_MAP = {
     std::map<FormEventName, std::string>::value_type(FormEventName::ADD_FORM, "ADD_FORM"),
     std::map<FormEventName, std::string>::value_type(FormEventName::REQUEST_FORM, "REQUEST_FORM"),
@@ -45,7 +46,8 @@ const std::map<FormEventName, std::string> EVENT_NAME_MAP = {
 };
 }
 
-void FormEventReport::SendFormEvent(const FormEventName &eventName, HiSysEventType type, const FormEventInfo &eventInfo)
+void FormEventReport::SendFormEvent(const FormEventName &eventName, HiSysEventType type,
+    const FormEventInfo &eventInfo)
 {
     std::string name = ConvertEventName(eventName);
     if (name == "INVALIDEVENTNAME") {
@@ -58,7 +60,6 @@ void FormEventReport::SendFormEvent(const FormEventName &eventName, HiSysEventTy
             HiSysEventWrite(HiSysEvent::Domain::FORM_MANAGER, name, type);
             break;
         case FormEventName::ACQUIREFORMSTATE_FORM:
-        case FormEventName::MESSAGE_EVENT_FORM:
             HiSysEventWrite(
                 HiSysEvent::Domain::FORM_MANAGER,
                 name,
@@ -67,10 +68,43 @@ void FormEventReport::SendFormEvent(const FormEventName &eventName, HiSysEventTy
                 EVENT_KEY_MODULE_NAME, eventInfo.moduleName,
                 EVENT_KEY_ABILITY_NAME, eventInfo.abilityName);
             break;
+        case FormEventName::MESSAGE_EVENT_FORM:
+            HiSysEventWrite(
+                HiSysEvent::Domain::FORM_MANAGER,
+                name,
+                type,
+                EVENT_KEY_BUNDLE_NAME, eventInfo.bundleName,
+                EVENT_KEY_MODULE_NAME, eventInfo.moduleName,
+                EVENT_KEY_ABILITY_NAME, eventInfo.abilityName,
+                EVENT_KEY_HOST_BUNDLE_NAME, eventInfo.hostBundleName);
+            break;
         case FormEventName::ADD_FORM:
+        case FormEventName::ROUTE_EVENT_FORM:
+            HiSysEventWrite(
+                HiSysEvent::Domain::FORM_MANAGER, name, type,
+                EVENT_KEY_FORM_ID, eventInfo.formId,
+                EVENT_KEY_BUNDLE_NAME, eventInfo.bundleName,
+                EVENT_KEY_MODULE_NAME, eventInfo.moduleName,
+                EVENT_KEY_ABILITY_NAME, eventInfo.abilityName,
+                EVENT_KEY_HOST_BUNDLE_NAME, eventInfo.hostBundleName);
+            break;
+        default:
+            break;
+    }
+}
+
+void FormEventReport::SendSecondFormEvent(const FormEventName &eventName, HiSysEventType type,
+    const FormEventInfo &eventInfo)
+{
+    std::string name = ConvertEventName(eventName);
+    if (name == "INVALIDEVENTNAME") {
+        HILOG_ERROR("invalid eventName");
+        return;
+    }
+
+    switch (eventName) {
         case FormEventName::REQUEST_FORM:
         case FormEventName::BACKGROUND_EVENT_FORM:
-        case FormEventName::ROUTE_EVENT_FORM:
             HiSysEventWrite(
                 HiSysEvent::Domain::FORM_MANAGER,
                 name,
@@ -81,6 +115,10 @@ void FormEventReport::SendFormEvent(const FormEventName &eventName, HiSysEventTy
                 EVENT_KEY_ABILITY_NAME, eventInfo.abilityName);
             break;
         case FormEventName::DELETE_FORM:
+            HiSysEventWrite(HiSysEvent::Domain::FORM_MANAGER, name, type,
+                EVENT_KEY_FORM_ID, eventInfo.formId,
+                EVENT_KEY_HOST_BUNDLE_NAME, eventInfo.hostBundleName);
+            break;
         case FormEventName::CASTTEMP_FORM:
         case FormEventName::RELEASE_FORM:
         case FormEventName::SET_NEXT_REFRESH_TIME_FORM:

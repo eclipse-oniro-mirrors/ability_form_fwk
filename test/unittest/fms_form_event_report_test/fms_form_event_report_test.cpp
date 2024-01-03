@@ -128,8 +128,8 @@ HWTEST_F(FormFormEventReportTest, SendFormEvent_0500, TestSize.Level0)
  */
 HWTEST_F(FormFormEventReportTest, SendFormEvent_0600, TestSize.Level0)
 {
-    FormEventName eventName = FormEventName::REQUEST_FORM;
-    EXPECT_EQ(FormEventReport::ConvertEventName(eventName), "REQUEST_FORM");
+    FormEventName eventName = FormEventName::ROUTE_EVENT_FORM;
+    EXPECT_EQ(FormEventReport::ConvertEventName(eventName), "ROUTE_EVENT_FORM");
     HiSysEventType type = HiSysEventType::BEHAVIOR;
     FormEventInfo eventInfo;
     FormEventReport::SendFormEvent(eventName, type, eventInfo);
@@ -143,86 +143,146 @@ HWTEST_F(FormFormEventReportTest, SendFormEvent_0600, TestSize.Level0)
  */
 HWTEST_F(FormFormEventReportTest, SendFormEvent_0700, TestSize.Level0)
 {
+    FormEventName eventName = FormEventName::REQUEST_FORM;
+    EXPECT_EQ(FormEventReport::ConvertEventName(eventName), "REQUEST_FORM");
+    HiSysEventType type = HiSysEventType::BEHAVIOR;
+    FormEventInfo eventInfo;
+    FormEventReport::SendFormEvent(eventName, type, eventInfo);
+}
+
+/**
+ * @tc.name: SendSecondFormEvent_0100
+ * @tc.desc: Check SendSecondFormEvent Test
+ * @tc.type: FUNC
+ * @tc.require: issueI67H0J
+ */
+HWTEST_F(FormFormEventReportTest, SendSecondFormEvent_0100, TestSize.Level0)
+{
+    FormEventName eventName = static_cast<FormEventName>(-1);
+    EXPECT_EQ(FormEventReport::ConvertEventName(eventName), "INVALIDEVENTNAME");
+    HiSysEventType type = HiSysEventType::BEHAVIOR;
+    FormEventInfo eventInfo;
+    FormEventReport::SendSecondFormEvent(eventName, type, eventInfo);
+}
+
+/**
+ * @tc.name: SendSecondFormEvent_0200
+ * @tc.desc: Check SendSecondFormEvent Test
+ * @tc.type: FUNC
+ * @tc.require: issueI67H0J
+ */
+HWTEST_F(FormFormEventReportTest, SendSecondFormEvent_0200, TestSize.Level0)
+{
+    FormEventName eventName = FormEventName::REQUEST_FORM;
+    EXPECT_EQ(FormEventReport::ConvertEventName(eventName), "REQUEST_FORM");
+    HiSysEventType type = HiSysEventType::BEHAVIOR;
+    FormEventInfo eventInfo;
+    FormEventReport::SendSecondFormEvent(eventName, type, eventInfo);
+}
+
+/**
+ * @tc.name: SendSecondFormEvent_0300
+ * @tc.desc: Check SendSecondFormEvent Test
+ * @tc.type: FUNC
+ * @tc.require: issueI67H0J
+ */
+HWTEST_F(FormFormEventReportTest, SendSecondFormEvent_0300, TestSize.Level0)
+{
     FormEventName eventName = FormEventName::BACKGROUND_EVENT_FORM;
     EXPECT_EQ(FormEventReport::ConvertEventName(eventName), "BACKGROUND_EVENT_FORM");
     HiSysEventType type = HiSysEventType::BEHAVIOR;
     FormEventInfo eventInfo;
-    FormEventReport::SendFormEvent(eventName, type, eventInfo);
+    FormEventReport::SendSecondFormEvent(eventName, type, eventInfo);
 }
 
 /**
- * @tc.name: SendFormEvent_0800
- * @tc.desc: Check SendFormEvent Test
+ * @tc.name: SendSecondFormEvent_0400
+ * @tc.desc: Check SendSecondFormEvent Test
  * @tc.type: FUNC
  * @tc.require: issueI67H0J
  */
-HWTEST_F(FormFormEventReportTest, SendFormEvent_0800, TestSize.Level0)
-{
-    FormEventName eventName = FormEventName::ROUTE_EVENT_FORM;
-    EXPECT_EQ(FormEventReport::ConvertEventName(eventName), "ROUTE_EVENT_FORM");
-    HiSysEventType type = HiSysEventType::BEHAVIOR;
-    FormEventInfo eventInfo;
-    FormEventReport::SendFormEvent(eventName, type, eventInfo);
-}
-
-/**
- * @tc.name: SendFormEvent_0900
- * @tc.desc: Check SendFormEvent Test
- * @tc.type: FUNC
- * @tc.require: issueI67H0J
- */
-HWTEST_F(FormFormEventReportTest, SendFormEvent_0900, TestSize.Level0)
+HWTEST_F(FormFormEventReportTest, SendSecondFormEvent_0400, TestSize.Level0)
 {
     FormEventName eventName = FormEventName::DELETE_FORM;
     EXPECT_EQ(FormEventReport::ConvertEventName(eventName), "DELETE_FORM");
     HiSysEventType type = HiSysEventType::BEHAVIOR;
     FormEventInfo eventInfo;
-    FormEventReport::SendFormEvent(eventName, type, eventInfo);
+    FormEventReport::SendSecondFormEvent(eventName, type, eventInfo);
 }
 
 /**
- * @tc.name: SendFormEvent_1000
- * @tc.desc: Check SendFormEvent Test
+ * @tc.name: SendSecondFormEvent_0500
+ * @tc.desc: Check SendSecondFormEvent Test
  * @tc.type: FUNC
  * @tc.require: issueI67H0J
  */
-HWTEST_F(FormFormEventReportTest, SendFormEvent_1000, TestSize.Level0)
+HWTEST_F(FormFormEventReportTest, SendSecondFormEvent_0500, TestSize.Level0)
 {
     FormEventName eventName = FormEventName::CASTTEMP_FORM;
     EXPECT_EQ(FormEventReport::ConvertEventName(eventName), "CASTTEMP_FORM");
     HiSysEventType type = HiSysEventType::BEHAVIOR;
     FormEventInfo eventInfo;
-    FormEventReport::SendFormEvent(eventName, type, eventInfo);
+    FormEventReport::SendSecondFormEvent(eventName, type, eventInfo);
 }
 
 /**
- * @tc.name: SendFormEvent_1100
- * @tc.desc: Check SendFormEvent Test
+ * @tc.name: SendSecondFormEvent_0600
+ * @tc.desc: Check SendSecondFormEvent Test
  * @tc.type: FUNC
- * @tc.require: issueI67H0J
+ * @tc.require: issueI8TDOZ
  */
-HWTEST_F(FormFormEventReportTest, SendFormEvent_1100, TestSize.Level0)
+HWTEST_F(FormFormEventReportTest, SendSecondFormEvent_0600, TestSize.Level0)
 {
     FormEventName eventName = FormEventName::RELEASE_FORM;
     EXPECT_EQ(FormEventReport::ConvertEventName(eventName), "RELEASE_FORM");
     HiSysEventType type = HiSysEventType::BEHAVIOR;
     FormEventInfo eventInfo;
-    FormEventReport::SendFormEvent(eventName, type, eventInfo);
+    FormEventReport::SendSecondFormEvent(eventName, type, eventInfo);
 }
 
 /**
- * @tc.name: SendFormEvent_1200
- * @tc.desc: Check SendFormEvent Test
+ * @tc.name: SendSecondFormEvent_0700
+ * @tc.desc: Check SendSecondFormEvent Test
  * @tc.type: FUNC
- * @tc.require: issueI67H0J
+ * @tc.require: issueI8TDOZ
  */
-HWTEST_F(FormFormEventReportTest, SendFormEvent_1200, TestSize.Level0)
+HWTEST_F(FormFormEventReportTest, SendSecondFormEvent_0700, TestSize.Level0)
 {
     FormEventName eventName = FormEventName::SET_NEXT_REFRESH_TIME_FORM;
     EXPECT_EQ(FormEventReport::ConvertEventName(eventName), "SET_NEXT_REFRESH_TIME_FORM");
     HiSysEventType type = HiSysEventType::BEHAVIOR;
     FormEventInfo eventInfo;
-    FormEventReport::SendFormEvent(eventName, type, eventInfo);
+    FormEventReport::SendSecondFormEvent(eventName, type, eventInfo);
+}
+
+/**
+ * @tc.name: SendSecondFormEvent_0800
+ * @tc.desc: Check SendSecondFormEvent Test
+ * @tc.type: FUNC
+ * @tc.require: issueI8TDOZ
+ */
+HWTEST_F(FormFormEventReportTest, SendSecondFormEvent_0800, TestSize.Level0)
+{
+    FormEventName eventName = FormEventName::FORM_RENDER_BLOCK;
+    EXPECT_EQ(FormEventReport::ConvertEventName(eventName), "FORM_RENDER_BLOCK");
+    HiSysEventType type = HiSysEventType::BEHAVIOR;
+    FormEventInfo eventInfo;
+    FormEventReport::SendSecondFormEvent(eventName, type, eventInfo);
+}
+
+/**
+ * @tc.name: SendSecondFormEvent_0900
+ * @tc.desc: Check SendSecondFormEvent Test
+ * @tc.type: FUNC
+ * @tc.require: issueI8TDOZ
+ */
+HWTEST_F(FormFormEventReportTest, SendSecondFormEvent_0900, TestSize.Level0)
+{
+    FormEventName eventName = FormEventName::ROUTE_EVENT_FORM;
+    EXPECT_EQ(FormEventReport::ConvertEventName(eventName), "ROUTE_EVENT_FORM");
+    HiSysEventType type = HiSysEventType::BEHAVIOR;
+    FormEventInfo eventInfo;
+    FormEventReport::SendSecondFormEvent(eventName, type, eventInfo);
 }
 } // namespace AppExecFwk
 } // namespace OHOS
