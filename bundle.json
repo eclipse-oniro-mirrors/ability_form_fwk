@@ -54,7 +54,8 @@
               "device_usage_statistics",
               "ace_engine",
               "memmgr_plugin",
-              "memmgr"
+              "memmgr",
+              "init"
           ],
           "third_party": [
               "node",

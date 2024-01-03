@@ -36,6 +36,7 @@ ohos_shared_library("libfms") {
     "${ability_runtime_path}/services/common/include",
     "${ability_runtime_native_path}/appkit/ability_runtime",
     "${form_fwk_napi_path}/form_host/form_state_observer/include",
+    "${init_path}/interfaces/innerkits/include/syspara/",
   ]
 
   sources = [
@@ -138,6 +139,7 @@ ohos_shared_library("libfms") {
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
+    "init:libbegetutil",
     "ipc:ipc_core",
     "kv_store:distributeddata_inner",
     "os_account:os_account_innerkits",

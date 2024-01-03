@@ -67,6 +67,7 @@
 #include "js_form_state_observer_interface.h"
 #include "nlohmann/json.hpp"
 #include "os_account_manager.h"
+#include "parameters.h"
 #include "system_ability_definition.h"
 #include "form_task_mgr.h"
 
@@ -83,6 +84,7 @@ const std::string EMPTY_BUNDLE = "";
 const std::string FORM_CLICK_ROUTER = "router";
 const std::string FORM_CLICK_MESSAGE = "message";
 const std::string FORM_CLICK_CALL = "call";
+const std::string FORM_SUPPORT_ECOLOGICAL_RULEMGRSERVICE = "persist.sys.fms.support.ecologicalrulemgrservice";
 } // namespace
 
 FormMgrAdapter::FormMgrAdapter()
@@ -3404,6 +3406,11 @@ int32_t FormMgrAdapter::GetCallerType(std::string bundleName)
 bool FormMgrAdapter::IsErmsSupportPublishForm(std::string bundleName, std::vector<Want> wants)
 {
     bool isSupport = true;
+    std::string supportErms = OHOS::system::GetParameter(FORM_SUPPORT_ECOLOGICAL_RULEMGRSERVICE, "true");
+    if (supportErms == "false") {
+        HILOG_ERROR("fms not support Erms between applications.");
+        return true;
+    }
     FormErmsCallerInfo callerInfo;
     callerInfo.packageName = bundleName;
     callerInfo.uid = IPCSkeleton::GetCallingUid();
