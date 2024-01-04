@@ -362,6 +362,83 @@ void InnerCreatePromiseRetMsg(napi_env env, int32_t code, napi_value* result)
     HILOG_DEBUG("%{public}s, end.", __func__);
 }
 
+napi_value RetErrMsgForCallback(AsyncErrMsgCallbackInfo* asyncCallbackInfo)
+{
+    HILOG_INFO("called.");
+
+    napi_env env = asyncCallbackInfo->env;
+    napi_value value = asyncCallbackInfo->callbackValue;
+
+    // Check the value type of the arguments
+    napi_valuetype valueType = napi_undefined;
+    NAPI_CALL(env, napi_typeof(env, value, &valueType));
+    NAPI_ASSERT(env, valueType == napi_function, "The arguments[1] type of deleteForm is incorrect,\
+        expected type is function.");
+
+    napi_create_reference(env, value, REF_COUNT, &asyncCallbackInfo->callback);
+
+    napi_value resourceName;
+    napi_create_string_latin1(env, __func__, NAPI_AUTO_LENGTH, &resourceName);
+    napi_create_async_work(
+        env,
+        nullptr,
+        resourceName,
+        [](napi_env env, void *data) {},
+        [](napi_env env, napi_status status, void *data) {
+            AsyncErrMsgCallbackInfo *asyncCallbackInfo = (AsyncErrMsgCallbackInfo *)data;
+            HILOG_INFO("napi_create_async_work complete");
+            if (asyncCallbackInfo->callback != nullptr) {
+                napi_value callback;
+                napi_value undefined;
+                napi_value result[ARGS_SIZE_TWO] = {0};
+                InnerCreateCallbackRetMsg(env, asyncCallbackInfo->code, result);
+                napi_get_undefined(env, &undefined);
+                napi_get_reference_value(env, asyncCallbackInfo->callback, &callback);
+                napi_value callResult;
+                napi_call_function(env, undefined, callback, ARGS_SIZE_TWO, result, &callResult);
+                napi_delete_reference(env, asyncCallbackInfo->callback);
+            }
+            napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
+            delete asyncCallbackInfo;
+        },
+        (void *)asyncCallbackInfo,
+        &asyncCallbackInfo->asyncWork);
+    NAPI_CALL(env, napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default));
+    return NapiGetResult(env, 1);
+}
+
+napi_value RetErrMsgForPromise(AsyncErrMsgCallbackInfo* asyncCallbackInfo)
+{
+    HILOG_INFO("called.");
+
+    napi_env env = asyncCallbackInfo->env;
+    napi_deferred deferred;
+    napi_value promise;
+    NAPI_CALL(env, napi_create_promise(env, &deferred, &promise));
+    asyncCallbackInfo->deferred = deferred;
+
+    napi_value resourceName;
+    napi_create_string_latin1(env, __func__, NAPI_AUTO_LENGTH, &resourceName);
+    napi_create_async_work(
+        env,
+        nullptr,
+        resourceName,
+        [](napi_env env, void *data) {},
+        [](napi_env env, napi_status status, void *data) {
+            HILOG_INFO("promise complete");
+            AsyncErrMsgCallbackInfo *asyncCallbackInfo = (AsyncErrMsgCallbackInfo *)data;
+            napi_value result;
+            InnerCreatePromiseRetMsg(env, asyncCallbackInfo->code, &result);
+            napi_reject_deferred(env, asyncCallbackInfo->deferred, result);
+            napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
+            delete asyncCallbackInfo;
+        },
+        (void *)asyncCallbackInfo,
+        &asyncCallbackInfo->asyncWork);
+    napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
+    return promise;
+}
+
 /**
  * @brief Send error message.
  *
@@ -373,82 +450,15 @@ void InnerCreatePromiseRetMsg(napi_env env, int32_t code, napi_value* result)
  */
 napi_value RetErrMsg(AsyncErrMsgCallbackInfo* asyncCallbackInfo)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("called.");
     if (asyncCallbackInfo == nullptr) {
         HILOG_ERROR("asyncCallback == nullptr");
         return nullptr;
     }
-
-    napi_env env = asyncCallbackInfo->env;
-    napi_value value = asyncCallbackInfo->callbackValue;
-
     if (asyncCallbackInfo->type == CALLBACK_FLG) {
-        HILOG_INFO("%{public}s, asyncCallback.", __func__);
-
-        // Check the value type of the arguments
-        napi_valuetype valueType = napi_undefined;
-        NAPI_CALL(env, napi_typeof(env, value, &valueType));
-        NAPI_ASSERT(env, valueType == napi_function, "The arguments[1] type of deleteForm is incorrect,\
-            expected type is function.");
-
-        napi_create_reference(env, value, REF_COUNT, &asyncCallbackInfo->callback);
-
-        napi_value resourceName;
-        napi_create_string_latin1(env, __func__, NAPI_AUTO_LENGTH, &resourceName);
-        napi_create_async_work(
-            env,
-            nullptr,
-            resourceName,
-            [](napi_env env, void *data) {},
-            [](napi_env env, napi_status status, void *data) {
-                AsyncErrMsgCallbackInfo *asyncCallbackInfo = (AsyncErrMsgCallbackInfo *)data;
-                HILOG_INFO("%{public}s, napi_create_async_work complete", __func__);
-                if (asyncCallbackInfo->callback != nullptr) {
-                    napi_value callback;
-                    napi_value undefined;
-                    napi_value result[ARGS_SIZE_TWO] = {0};
-                    InnerCreateCallbackRetMsg(env, asyncCallbackInfo->code, result);
-                    napi_get_undefined(env, &undefined);
-                    napi_get_reference_value(env, asyncCallbackInfo->callback, &callback);
-                    napi_value callResult;
-                    napi_call_function(env, undefined, callback, ARGS_SIZE_TWO, result, &callResult);
-                    napi_delete_reference(env, asyncCallbackInfo->callback);
-                }
-                napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
-                delete asyncCallbackInfo;
-            },
-            (void *)asyncCallbackInfo,
-            &asyncCallbackInfo->asyncWork);
-        NAPI_CALL(env, napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default));
-        return NapiGetResult(env, 1);
-    } else {
-        HILOG_INFO("%{public}s, promise.", __func__);
-        napi_deferred deferred;
-        napi_value promise;
-        NAPI_CALL(env, napi_create_promise(env, &deferred, &promise));
-        asyncCallbackInfo->deferred = deferred;
-
-        napi_value resourceName;
-        napi_create_string_latin1(env, __func__, NAPI_AUTO_LENGTH, &resourceName);
-        napi_create_async_work(
-            env,
-            nullptr,
-            resourceName,
-            [](napi_env env, void *data) {},
-            [](napi_env env, napi_status status, void *data) {
-                HILOG_INFO("%{public}s, promise complete", __func__);
-                AsyncErrMsgCallbackInfo *asyncCallbackInfo = (AsyncErrMsgCallbackInfo *)data;
-                napi_value result;
-                InnerCreatePromiseRetMsg(env, asyncCallbackInfo->code, &result);
-                napi_reject_deferred(env, asyncCallbackInfo->deferred, result);
-                napi_delete_async_work(env, asyncCallbackInfo->asyncWork);
-                delete asyncCallbackInfo;
-            },
-            (void *)asyncCallbackInfo,
-            &asyncCallbackInfo->asyncWork);
-        napi_queue_async_work_with_qos(env, asyncCallbackInfo->asyncWork, napi_qos_default);
-        return promise;
+        return RetErrMsgForCallback(asyncCallbackInfo);
     }
+    return RetErrMsgForPromise(asyncCallbackInfo);
 }
 
 AsyncErrMsgCallbackInfo *InitErrMsg(napi_env env, int32_t code, int32_t type, napi_value callbackValue)

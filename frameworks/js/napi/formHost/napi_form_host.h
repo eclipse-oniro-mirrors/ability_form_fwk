@@ -114,9 +114,10 @@ private:
     bool GetStringsValue(napi_env env, napi_value object, std::vector<std::string> &strList);
     static bool UnwrapGetFormsInfoParams(napi_env env, size_t argc, napi_value* argv, std::string &moduleName,
         bool &bParam);
-
     int32_t OnNotifyInVisibleFormsParseParam(napi_env env, size_t argc, napi_value* argv,
         std::vector<int64_t> &formIds);
+    bool OnDeleteInvalidFormsParseParam(napi_env env, size_t argc, napi_value* argv,
+        int32_t &errCode, std::vector<std::string> &strFormIdList);
 };
 }  // namespace AbilityRuntime
 }  // namespace OHOS

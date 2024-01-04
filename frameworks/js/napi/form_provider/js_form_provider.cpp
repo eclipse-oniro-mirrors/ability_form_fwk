@@ -46,9 +46,10 @@ const std::string IS_FORM_AGENT = "isFormAgent";
 
 bool CheckParamNum(napi_env env, size_t argc, size_t minParamNum, size_t maxParamNum)
 {
-    HILOG_DEBUG("argc is %{public}d, param range is [%{public}d, %{public}d]", argc, minParamNum, maxParamNum);
+    HILOG_DEBUG("argc is %{public}zu, param range is [%{public}zu, %{public}zu]",
+        argc, minParamNum, maxParamNum);
     if (argc > maxParamNum || argc < minParamNum) {
-        HILOG_ERROR("invalid param number %{public}d.", argc);
+        HILOG_ERROR("invalid param number %{public}zu.", argc);
         std::string errMsg = "[" + std::to_string(minParamNum) + ", " + std::to_string(maxParamNum) + "]";
         NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), errMsg);
         return false;
@@ -135,7 +136,7 @@ napi_value JsFormProvider::GetFormsInfo(napi_env env, napi_callback_info info)
     GET_CB_INFO_AND_CALL(env, info, JsFormProvider, OnGetFormsInfo);
 }
 
-napi_value JsFormProvider::OnGetFormsInfoParseParam(NapiParamPackage &napiParam,
+bool JsFormProvider::OnGetFormsInfoParseParam(NapiParamPackage &napiParam,
     size_t &convertArgc, bool &isPromise, AppExecFwk::FormInfoFilter &formInfoFilter)
 {
     napi_env env = napiParam.env;
@@ -160,7 +161,7 @@ napi_value JsFormProvider::OnGetFormsInfoParseParam(NapiParamPackage &napiParam,
                     isPromise = true;
                 } else {
                     // no default value
-                    return CreateJsUndefined(env);
+                    return false;
                 }
             }
         } else {
@@ -185,14 +186,14 @@ napi_value JsFormProvider::OnGetFormsInfoParseParam(NapiParamPackage &napiParam,
                     isPromise = paramTwoType != napi_function;
                 } else {
                     HILOG_ERROR("convert form info filter failed.");
-                    return CreateJsUndefined(env);
+                    return false;
                 }
             }
         } else {
             isPromise = true;
         }
     }
-    return nullptr;
+    return true;
 }
 
 napi_value JsFormProvider::OnGetFormsInfo(napi_env env, size_t argc, napi_value* argv)
@@ -205,10 +206,9 @@ napi_value JsFormProvider::OnGetFormsInfo(napi_env env, size_t argc, napi_value*
 
     NapiParamPackage napiParam(env, argc, argv);
 
-    napi_value parseResult = OnGetFormsInfoParseParam(napiParam, convertArgc, isPromise, formInfoFilter);
-    if (parseResult != nullptr) {
+    if (!OnGetFormsInfoParseParam(napiParam, convertArgc, isPromise, formInfoFilter)) {
         HILOG_ERROR("failed to parse param");
-        return parseResult;
+        return CreateJsUndefined(env);
     }
 
     NapiAsyncTask::CompleteCallback complete =
