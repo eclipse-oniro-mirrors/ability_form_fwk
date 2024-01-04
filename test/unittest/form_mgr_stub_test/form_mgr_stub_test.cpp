@@ -2318,6 +2318,117 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0092, TestSize.Level1) {
 }
 
 /**
+ * @tc.number: FormMgrStubTest_0093
+ * @tc.name: Verify OnRemoteRequest and HandleRegisterFormRouterProxy
+ * @tc.desc: When the parameter code is FORM_MGR_REGISTER_FORM_ROUTER_PROXY, the interface return value is ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0093, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0093 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    const std::vector<int64_t> formIds;
+    const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormToken();
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_FORM_ROUTER_PROXY);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    data.WriteInt64Vector(formIds);
+    data.WriteRemoteObject(callerToken);
+    EXPECT_CALL(*mockFormMgrService, RegisterFormRouterProxy(_, _))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0093 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_0094
+ * @tc.name: Verify OnRemoteRequest and HandleRegisterFormRouterProxy
+ * @tc.desc: When the parameter code is FORM_MGR_REGISTER_FORM_ROUTER_PROXY, the interface return value is
+ *           ERR_APPEXECFWK_PARCEL_ERROR.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0094, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0094 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    const std::vector<int64_t> formIds;
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_FORM_ROUTER_PROXY);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    data.WriteInt64Vector(formIds);
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0094 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_0095
+ * @tc.name: Verify OnRemoteRequest and HandleLifecycleUpdate
+ * @tc.desc: When the parameter code is FORM_MGR_REGISTER_FORM_ROUTER_PROXY, the interface return value is
+ *           ERR_APPEXECFWK_PARCEL_ERROR.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0095, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0095 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_FORM_ROUTER_PROXY);
+    constexpr int32_t valueCode = -1;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    data.WriteInt32(valueCode);
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0095 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_0096
+ * @tc.name: Verify OnRemoteRequest and HandleUnregisterFormRouterProxy
+ * @tc.desc: When the parameter code is FORM_MGR_UNREGISTER_FORM_ROUTER_PROXY, the interface return value is ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0096, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0096 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    const std::vector<int64_t> formIds;
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_FORM_ROUTER_PROXY);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    data.WriteInt64Vector(formIds);
+    EXPECT_CALL(*mockFormMgrService, UnregisterFormRouterProxy(_))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0096 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_0097
+ * @tc.name: Verify OnRemoteRequest and HandleUnregisterFormRouterProxy
+ * @tc.desc: When the parameter code is FORM_MGR_UNREGISTER_FORM_ROUTER_PROXY, the interface return value is
+ *           ERR_APPEXECFWK_PARCEL_ERROR.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0097, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0097 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_FORM_ROUTER_PROXY);
+    constexpr int32_t valueCode = -1;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    data.WriteInt32(valueCode);
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0097 ends";
+}
+
+/**
  * @tc.name: HandleGetFormInstanceById_0100
  * @tc.desc: Verify that the return value and the size of resultInfos
  * @tc.type: FUNC

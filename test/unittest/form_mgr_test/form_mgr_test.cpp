@@ -2311,4 +2311,45 @@ HWTEST_F(FormMgrTest, FormMgrTest_0118, TestSize.Level1) {
     EXPECT_EQ(result, ERROR_NUM);
     GTEST_LOG_(INFO) << "FormMgrTest_0118 test ends";
 }
+
+/**
+ * @tc.name: FormMgrTest_0119
+ * @tc.desc: Verify RegisterFormRouterProxy
+ * @tc.type: FUNC
+ * @tc.require: IssueI8H9R5
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0119, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0119 starts";
+    EXPECT_CALL(*mockProxy, RegisterFormRouterProxy(_, _))
+        .Times(1)
+        .WillOnce(Return(OHOS::ERR_OK));
+    FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
+    std::vector<int64_t> formIds;
+    formIds.push_back(0);
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+
+    ErrCode result = FormMgr::GetInstance().RegisterFormRouterProxy(formIds, callerToken);
+    EXPECT_EQ(result, ERROR_NUM);
+    GTEST_LOG_(INFO) << "FormMgrTest_0119 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0120
+ * @tc.desc: Verify UnregisterFormRouterProxy
+ * @tc.type: FUNC
+ * @tc.require: IssueI8H9R5
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0120, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0120 starts";
+    EXPECT_CALL(*mockProxy, UnregisterFormRouterProxy(_))
+        .Times(1)
+        .WillOnce(Return(OHOS::ERR_OK));
+    FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
+    std::vector<int64_t> formIds;
+    formIds.push_back(0);
+
+    ErrCode result = FormMgr::GetInstance().UnregisterFormRouterProxy(formIds);
+    EXPECT_EQ(result, ERROR_NUM);
+    GTEST_LOG_(INFO) << "FormMgrTest_0120 test ends";
+}
 } // namespace

@@ -4200,34 +4200,121 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_215, TestSize.Level0)
 
 /**
  * @tc.name: FormMgrAdapter_216
+ * @tc.desc: test RegisterFormRouterProxy function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_216, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_216 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    EXPECT_EQ(ERR_OK, formMgrAdapter.RegisterFormRouterProxy(formIds, callerToken));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_216 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_217
+ * @tc.desc: test RegisterFormRouterProxy function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_217, TestSize.Level2)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_217 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 0;
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+    MockCheckInvalidForm(ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.RegisterFormRouterProxy(formIds, callerToken));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_217 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_218
+ * @tc.desc: test RegisterFormRouterProxy function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_218, TestSize.Level2)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_218 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 0;
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+    sptr<IRemoteObject> callerToken = nullptr;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.RegisterFormRouterProxy(formIds, callerToken));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_218 end";
+}
+
+
+/**
+ * @tc.name: FormMgrAdapter_219
+ * @tc.desc: test UnregisterFormRouterProxy function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_219, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_219 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+    MockCheckInvalidForm(ERR_OK);
+    EXPECT_EQ(ERR_OK, formMgrAdapter.UnregisterFormRouterProxy(formIds));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_219 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_220
+ * @tc.desc: test UnregisterFormRouterProxy function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_220, TestSize.Level2)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_220 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 0;
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+    MockCheckInvalidForm(ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.UnregisterFormRouterProxy(formIds));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_220 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_221
  * @tc.desc: test GetFormInstancesByFilter function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_216, TestSize.Level0)
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_221, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "FormMgrAdapter_216 start";
+    GTEST_LOG_(INFO) << "FormMgrAdapter_221 start";
     FormMgrAdapter formMgrAdapter;
 
     FormInstancesFilter formInstancesFilter;
     std::vector<FormInstance> formInstances;
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
         formMgrAdapter.GetFormInstancesByFilter(formInstancesFilter, formInstances));
-    GTEST_LOG_(INFO) << "FormMgrAdapter_216 end";
+    GTEST_LOG_(INFO) << "FormMgrAdapter_221 end";
 }
 
 /**
- * @tc.name: FormMgrAdapter_217
+ * @tc.name: FormMgrAdapter_222
  * @tc.desc: test GetFormInstanceById function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_217, TestSize.Level0)
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_222, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "FormMgrAdapter_217 start";
+    GTEST_LOG_(INFO) << "FormMgrAdapter_222 start";
     FormMgrAdapter formMgrAdapter;
 
     FormInstancesFilter formInstancesFilter;
     FormInstance formInstance;
     EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, formMgrAdapter.GetFormInstanceById(1, formInstance));
-    GTEST_LOG_(INFO) << "FormMgrAdapter_217 end";
+    GTEST_LOG_(INFO) << "FormMgrAdapter_222 end";
 }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -55,70 +55,30 @@ bool InnerFormInfo::FromJson(const nlohmann::json &jsonObject)
 {
     const auto &jsonObjectEnd = jsonObject.end();
     int32_t parseResult = ERR_OK;
-    GetValueIfFindKey<int64_t>(jsonObject,
-        jsonObjectEnd,
-        INNER_FORM_INFO_FORM_ID,
-        formDBInfo_.formId,
-        JsonType::NUMBER,
-        false,
-        parseResult,
-        ArrayType::NOT_ARRAY);
-    GetValueIfFindKey<int32_t>(jsonObject,
-        jsonObjectEnd,
-        INNER_FORM_INFO_USER_ID,
-        formDBInfo_.userId,
-        JsonType::NUMBER,
-        false,
-        parseResult,
-        ArrayType::NOT_ARRAY);
-    GetValueIfFindKey<int32_t>(jsonObject,
-        jsonObjectEnd,
-        INNER_FORM_INFO_PROVIDER_USER_ID,
-        formDBInfo_.providerUserId,
-        JsonType::NUMBER,
-        false,
-        parseResult,
-        ArrayType::NOT_ARRAY);
-    GetValueIfFindKey<std::string>(jsonObject,
-        jsonObjectEnd,
-        INNER_FORM_INFO_FORM_NAME,
-        formDBInfo_.formName,
-        JsonType::STRING,
-        false,
-        parseResult,
-        ArrayType::NOT_ARRAY);
-    GetValueIfFindKey<std::string>(jsonObject,
-        jsonObjectEnd,
-        INNER_FORM_INFO_BUNDLE_NAME,
-        formDBInfo_.bundleName,
-        JsonType::STRING,
-        false,
-        parseResult,
-        ArrayType::NOT_ARRAY);
-    GetValueIfFindKey<std::string>(jsonObject,
-        jsonObjectEnd,
-        INNER_FORM_INFO_MODULE_NAME,
-        formDBInfo_.moduleName,
-        JsonType::STRING,
-        false,
-        parseResult,
-        ArrayType::NOT_ARRAY);
-    GetValueIfFindKey<std::string>(jsonObject,
-        jsonObjectEnd,
-        INNER_FORM_INFO_ABILITY_NAME,
-        formDBInfo_.abilityName,
-        JsonType::STRING,
-        false,
-        parseResult,
-        ArrayType::NOT_ARRAY);
-    GetValueIfFindKey<std::vector<int>>(jsonObject,
-        jsonObjectEnd,
-        INNER_FORM_INFO_FORM_USER_UIDS,
-        formDBInfo_.formUserUids,
-        JsonType::ARRAY,
-        false,
-        parseResult,
-        ArrayType::NUMBER);
+    GetValueIfFindKey<int64_t>(jsonObject, jsonObjectEnd, INNER_FORM_INFO_FORM_ID,
+        formDBInfo_.formId, JsonType::NUMBER, false, parseResult, ArrayType::NOT_ARRAY);
+
+    GetValueIfFindKey<int32_t>(jsonObject, jsonObjectEnd, INNER_FORM_INFO_USER_ID,
+        formDBInfo_.userId, JsonType::NUMBER, false, parseResult, ArrayType::NOT_ARRAY);
+
+    GetValueIfFindKey<int32_t>(jsonObject, jsonObjectEnd, INNER_FORM_INFO_PROVIDER_USER_ID,
+        formDBInfo_.providerUserId, JsonType::NUMBER, false, parseResult, ArrayType::NOT_ARRAY);
+
+    GetValueIfFindKey<std::string>(jsonObject, jsonObjectEnd, INNER_FORM_INFO_FORM_NAME,
+        formDBInfo_.formName, JsonType::STRING, false, parseResult, ArrayType::NOT_ARRAY);
+
+    GetValueIfFindKey<std::string>(jsonObject, jsonObjectEnd, INNER_FORM_INFO_BUNDLE_NAME,
+        formDBInfo_.bundleName, JsonType::STRING, false, parseResult, ArrayType::NOT_ARRAY);
+
+    GetValueIfFindKey<std::string>(jsonObject, jsonObjectEnd, INNER_FORM_INFO_MODULE_NAME,
+        formDBInfo_.moduleName, JsonType::STRING, false, parseResult, ArrayType::NOT_ARRAY);
+
+    GetValueIfFindKey<std::string>(jsonObject, jsonObjectEnd, INNER_FORM_INFO_ABILITY_NAME,
+        formDBInfo_.abilityName, JsonType::STRING, false, parseResult, ArrayType::NOT_ARRAY);
+
+    GetValueIfFindKey<std::vector<int>>(jsonObject, jsonObjectEnd, INNER_FORM_INFO_FORM_USER_UIDS,
+        formDBInfo_.formUserUids, JsonType::ARRAY, false, parseResult, ArrayType::NUMBER);
+
     return parseResult == ERR_OK;
 }
 

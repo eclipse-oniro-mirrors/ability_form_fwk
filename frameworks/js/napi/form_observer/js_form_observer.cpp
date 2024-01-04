@@ -87,7 +87,8 @@ private:
 
     bool CheckParamNum(napi_env env, size_t argc, size_t minParamNum, size_t maxParamNum)
     {
-        HILOG_DEBUG("argc is %{public}d, param range is [%{public}d, %{public}d]", argc, minParamNum, maxParamNum);
+        HILOG_DEBUG("argc is %{public}zu, param range is [%{public}zu, %{public}zu]",
+            argc, minParamNum, maxParamNum);
         if (argc > maxParamNum || argc < minParamNum) {
             HILOG_ERROR("invalid param number %{public}d.", argc);
             std::string errMsg = "[" + std::to_string(minParamNum) + ", " + std::to_string(maxParamNum) + "]";
@@ -277,7 +278,7 @@ private:
 
     napi_value OnUnregisterFormIsVisibleObserver(napi_env env, size_t argc, napi_value *argv, bool isVisibility)
     {
-        HILOG_DEBUG("argc is %{public}d, isVisibility is %{public}d", argc, isVisibility);
+        HILOG_DEBUG("argc is %{public}zu, isVisibility is %{public}d", argc, isVisibility);
         int32_t funcPos = 0;
         int32_t bundlePos = 0;
         if (CheckParamNum(env, argc, ARGS_ONE, ARGS_THREE) == false) {

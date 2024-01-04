@@ -2633,4 +2633,493 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetUnusedFormInfos_0100, TestSiz
     EXPECT_EQ(runningFormInfos.size(), 0);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetUnusedFormInfos_0100 end";
 }
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetFormInstancesByFilter_001
+ * @tc.name: GetFormInstancesByFilter
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *      If temp form count is greater than zero, return true, and the count is correct.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormInstancesByFilter_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstancesByFilter_001 start";
+    formDataMgr_.formRecords_.clear();
+    FormInstancesFilter instancesFilter;
+    std::vector<FormInstance> formInstances;
+    auto ret = formDataMgr_.GetFormInstancesByFilter(instancesFilter, formInstances);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstancesByFilter_001 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetFormInstancesByFilter_002
+ * @tc.name: GetFormInstancesByFilter
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *      If temp form count is greater than zero, return true, and the count is correct.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormInstancesByFilter_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstancesByFilter_002 start";
+    // create formRecord
+    formDataMgr_.formRecords_.clear();
+    FormInstancesFilter instancesFilter;
+    instancesFilter.bundleName = "com.example.text";
+    std::vector<FormInstance> formInstances;
+    auto ret = formDataMgr_.GetFormInstancesByFilter(instancesFilter, formInstances);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstancesByFilter_002 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetFormInstancesByFilter_003
+ * @tc.name: GetFormInstancesByFilter
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *      If temp form count is greater than zero, return true, and the count is correct.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormInstancesByFilter_003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstancesByFilter_003 start";
+    // create formRecord
+    formDataMgr_.formRecords_.clear();
+    FormItemInfo formItemInfo;
+    formItemInfo.SetTemporaryFlag(false);
+    FormInstancesFilter instancesFilter;
+    instancesFilter.bundleName = "com.example.text";
+    formItemInfo.SetProviderBundleName(instancesFilter.bundleName);
+    formItemInfo.SetHostBundleName(instancesFilter.bundleName);
+    int callingUid = 100;
+    FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
+    int64_t otherFormId = 800;
+    formDataMgr_.formRecords_.emplace(otherFormId, record);
+    FormHostRecord hostRecord;
+    formDataMgr_.CreateHostRecord(formItemInfo, token_, 1000, hostRecord);
+    formDataMgr_.clientRecords_.emplace_back(hostRecord);
+
+    std::vector<FormInstance> formInstances;
+    auto ret = formDataMgr_.GetFormInstancesByFilter(instancesFilter, formInstances);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstancesByFilter_003 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetFormInstancesByFilter_004
+ * @tc.name: GetFormInstancesByFilter
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *      If temp form count is greater than zero, return true, and the count is correct.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormInstancesByFilter_004, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstancesByFilter_004 start";
+    // create formRecord
+    formDataMgr_.formRecords_.clear();
+    FormItemInfo formItemInfo;
+    formItemInfo.SetTemporaryFlag(false);
+    std::string bundleName = "com.example.demo";
+    formItemInfo.SetProviderBundleName(bundleName);
+    formItemInfo.SetHostBundleName(bundleName);
+    int callingUid = 100;
+    FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
+    int64_t otherFormId = 800;
+    formDataMgr_.formRecords_.emplace(otherFormId, record);
+    FormHostRecord hostRecord;
+    formDataMgr_.CreateHostRecord(formItemInfo, token_, 1000, hostRecord);
+    formDataMgr_.clientRecords_.emplace_back(hostRecord);
+
+    FormInstancesFilter instancesFilter;
+    instancesFilter.bundleName = "com.example.text";
+    std::vector<FormInstance> formInstances;
+    auto ret = formDataMgr_.GetFormInstancesByFilter(instancesFilter, formInstances);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstancesByFilter_004 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetFormInstancesByFilter_005
+ * @tc.name: GetFormInstancesByFilter
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *      If temp form count is greater than zero, return true, and the count is correct.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormInstancesByFilter_005, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstancesByFilter_005 start";
+    // create formRecord
+    formDataMgr_.formRecords_.clear();
+    FormItemInfo formItemInfo;
+    formItemInfo.SetTemporaryFlag(false);
+    std::string bundleName = "com.example.text";
+    formItemInfo.SetHostBundleName(bundleName);
+    formItemInfo.SetProviderBundleName(bundleName);
+    std::string moduleName = "entry";
+    formItemInfo.SetModuleName(moduleName);
+    int callingUid = 100;
+    FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
+    int64_t otherFormId = 800;
+    record.formId = otherFormId;
+    formDataMgr_.formRecords_.emplace(otherFormId, record);
+    FormHostRecord hostRecord;
+    formDataMgr_.CreateHostRecord(formItemInfo, token_, 1000, hostRecord);
+    hostRecord.AddForm(otherFormId);
+    formDataMgr_.clientRecords_.emplace_back(hostRecord);
+
+    FormInstancesFilter instancesFilter;
+    instancesFilter.bundleName = "com.example.text";
+    instancesFilter.moduleName = "entry";
+    std::vector<FormInstance> formInstances;
+    auto ret = formDataMgr_.GetFormInstancesByFilter(instancesFilter, formInstances);
+    EXPECT_EQ(ret, ERR_OK);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstancesByFilter_005 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetFormInstancesByFilter_006
+ * @tc.name: GetFormInstancesByFilter
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *      If temp form count is greater than zero, return true, and the count is correct.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormInstancesByFilter_006, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstancesByFilter_006 start";
+    // create formRecord
+    formDataMgr_.formRecords_.clear();
+    FormItemInfo formItemInfo;
+    formItemInfo.SetTemporaryFlag(false);
+    std::string bundleName = "com.example.text";
+    formItemInfo.SetProviderBundleName(bundleName);
+    formItemInfo.SetHostBundleName(bundleName);
+    std::string moduleName = "entry";
+    formItemInfo.SetModuleName(moduleName);
+    std::string abilityName = "MainAbility";
+    formItemInfo.SetAbilityName(abilityName);
+    int callingUid = 100;
+    FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
+    int64_t otherFormId = 800;
+    record.formId = otherFormId;
+    formDataMgr_.formRecords_.emplace(otherFormId, record);
+    FormHostRecord hostRecord;
+    formDataMgr_.CreateHostRecord(formItemInfo, token_, 1000, hostRecord);
+    hostRecord.AddForm(otherFormId);
+    formDataMgr_.clientRecords_.emplace_back(hostRecord);
+
+    FormInstancesFilter instancesFilter;
+    instancesFilter.bundleName = "com.example.text";
+    instancesFilter.moduleName = "entry";
+    instancesFilter.abilityName = "MainAbility";
+    std::vector<FormInstance> formInstances;
+    auto ret = formDataMgr_.GetFormInstancesByFilter(instancesFilter, formInstances);
+    EXPECT_EQ(ret, ERR_OK);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstancesByFilter_006 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetFormInstancesByFilter_007
+ * @tc.name: GetFormInstancesByFilter
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *      If temp form count is greater than zero, return true, and the count is correct.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormInstancesByFilter_007, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstancesByFilter_007 start";
+    // create formRecord
+    formDataMgr_.formRecords_.clear();
+    FormItemInfo formItemInfo;
+    formItemInfo.SetTemporaryFlag(false);
+    std::string bundleName = "com.example.text";
+    formItemInfo.SetProviderBundleName(bundleName);
+    formItemInfo.SetHostBundleName(bundleName);
+    std::string moduleName = "entry";
+    formItemInfo.SetModuleName(moduleName);
+    std::string abilityName = "MainAbility";
+    formItemInfo.SetAbilityName(abilityName);
+    std::string formName = "FormAbility";
+    formItemInfo.SetFormName(formName);
+    int callingUid = 100;
+    FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
+    int64_t otherFormId = 800;
+    record.formId = otherFormId;
+    formDataMgr_.formRecords_.emplace(otherFormId, record);
+    FormHostRecord hostRecord;
+    formDataMgr_.CreateHostRecord(formItemInfo, token_, 1000, hostRecord);
+    hostRecord.AddForm(otherFormId);
+    formDataMgr_.clientRecords_.emplace_back(hostRecord);
+
+    FormInstancesFilter instancesFilter;
+    instancesFilter.bundleName = "com.example.text";
+    instancesFilter.moduleName = "entry";
+    instancesFilter.abilityName = "MainAbility";
+    instancesFilter.formName = "FormAbility";
+    std::vector<FormInstance> formInstances;
+    auto ret = formDataMgr_.GetFormInstancesByFilter(instancesFilter, formInstances);
+    EXPECT_EQ(ret, ERR_OK);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstancesByFilter_007 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetFormInstancesByFilter_008
+ * @tc.name: GetFormInstancesByFilter
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *      If temp form count is greater than zero, return true, and the count is correct.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormInstancesByFilter_008, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstancesByFilter_008 start";
+    // create formRecord
+    formDataMgr_.formRecords_.clear();
+    FormItemInfo formItemInfo;
+    formItemInfo.SetTemporaryFlag(false);
+    std::string bundleName = "com.example.text";
+    formItemInfo.SetProviderBundleName(bundleName);
+    formItemInfo.SetHostBundleName(bundleName);
+    std::string moduleName = "entry";
+    formItemInfo.SetModuleName(moduleName);
+    std::string abilityName = "MainAbility";
+    formItemInfo.SetAbilityName(abilityName);
+    std::string formName = "FormAbility";
+    formItemInfo.SetFormName(formName);
+    int callingUid = 100;
+    FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
+    int64_t otherFormId = 800;
+    record.formId = otherFormId;
+    formDataMgr_.formRecords_.emplace(otherFormId, record);
+    FormHostRecord hostRecord;
+    formDataMgr_.CreateHostRecord(formItemInfo, token_, 1000, hostRecord);
+    hostRecord.AddForm(otherFormId);
+    formDataMgr_.clientRecords_.emplace_back(hostRecord);
+
+    FormInstancesFilter instancesFilter;
+    instancesFilter.bundleName = "com.example.text";
+    instancesFilter.moduleName = "testEntry";
+    instancesFilter.abilityName = "MainAbility";
+    instancesFilter.formName = "FormAbility";
+    std::vector<FormInstance> formInstances;
+    auto ret = formDataMgr_.GetFormInstancesByFilter(instancesFilter, formInstances);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstancesByFilter_008 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetFormInstancesByFilter_009
+ * @tc.name: GetFormInstancesByFilter
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *      If temp form count is greater than zero, return true, and the count is correct.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormInstancesByFilter_009, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstancesByFilter_009 start";
+    // create formRecord
+    formDataMgr_.formRecords_.clear();
+    FormItemInfo formItemInfo;
+    formItemInfo.SetTemporaryFlag(false);
+    std::string bundleName = "com.example.text";
+    formItemInfo.SetProviderBundleName(bundleName);
+    formItemInfo.SetHostBundleName(bundleName);
+    std::string moduleName = "entry";
+    formItemInfo.SetModuleName(moduleName);
+    std::string abilityName = "MainAbility";
+    formItemInfo.SetAbilityName(abilityName);
+    std::string formName = "FormAbility";
+    formItemInfo.SetFormName(formName);
+    int callingUid = 100;
+    FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
+    int64_t otherFormId = 800;
+    record.formId = otherFormId;
+    formDataMgr_.formRecords_.emplace(otherFormId, record);
+    FormHostRecord hostRecord;
+    formDataMgr_.CreateHostRecord(formItemInfo, token_, 1000, hostRecord);
+    hostRecord.AddForm(otherFormId);
+    formDataMgr_.clientRecords_.emplace_back(hostRecord);
+
+    FormInstancesFilter instancesFilter;
+    instancesFilter.bundleName = "com.example.text";
+    instancesFilter.moduleName = "entry";
+    instancesFilter.abilityName = "EntryAbility";
+    instancesFilter.formName = "FormAbility";
+    std::vector<FormInstance> formInstances;
+    auto ret = formDataMgr_.GetFormInstancesByFilter(instancesFilter, formInstances);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstancesByFilter_009 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetFormInstancesByFilter_0010
+ * @tc.name: GetFormInstancesByFilter
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *      If temp form count is greater than zero, return true, and the count is correct.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormInstancesByFilter_0010, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstancesByFilter_0010 start";
+    // create formRecord
+    formDataMgr_.formRecords_.clear();
+    FormItemInfo formItemInfo;
+    formItemInfo.SetTemporaryFlag(false);
+    std::string bundleName = "com.example.text";
+    formItemInfo.SetProviderBundleName(bundleName);
+    formItemInfo.SetHostBundleName(bundleName);
+    std::string moduleName = "entry";
+    formItemInfo.SetModuleName(moduleName);
+    std::string abilityName = "MainAbility";
+    formItemInfo.SetAbilityName(abilityName);
+    std::string formName = "FormAbility";
+    formItemInfo.SetFormName(formName);
+    int callingUid = 100;
+    FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
+    int64_t otherFormId = 800;
+    record.formId = otherFormId;
+    formDataMgr_.formRecords_.emplace(otherFormId, record);
+    FormHostRecord hostRecord;
+    formDataMgr_.CreateHostRecord(formItemInfo, token_, 1000, hostRecord);
+    hostRecord.AddForm(otherFormId);
+    formDataMgr_.clientRecords_.emplace_back(hostRecord);
+
+    FormInstancesFilter instancesFilter;
+    instancesFilter.bundleName = "com.example.text";
+    instancesFilter.moduleName = "entry";
+    instancesFilter.abilityName = "EntryAbility";
+    instancesFilter.formName = "TestFormAbility";
+    std::vector<FormInstance> formInstances;
+    auto ret = formDataMgr_.GetFormInstancesByFilter(instancesFilter, formInstances);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstancesByFilter_0010 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetFormInstanceById_001
+ * @tc.name: GetFormInstanceById
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *      If temp form count is greater than zero, return true, and the count is correct.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormInstancesById_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstanceById_001 start";
+    FormInstancesFilter instancesFilter;
+    int64_t invalidFormId = -1;
+    FormInstance formInstance;
+    auto ret = formDataMgr_.GetFormInstanceById(invalidFormId, formInstance);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstanceById_001 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetFormInstanceById_002
+ * @tc.name: GetFormInstanceById
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *      If temp form count is greater than zero, return true, and the count is correct.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormInstanceById_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstanceById_002 start";
+    formDataMgr_.formRecords_.clear();
+    FormItemInfo formItemInfo;
+    formItemInfo.SetTemporaryFlag(false);
+    std::string bundleName = "com.example.text";
+    formItemInfo.SetProviderBundleName(bundleName);
+    formItemInfo.SetHostBundleName(bundleName);
+    std::string moduleName = "entry";
+    formItemInfo.SetModuleName(moduleName);
+    std::string abilityName = "MainAbility";
+    formItemInfo.SetAbilityName(abilityName);
+    std::string formName = "FormAbility";
+    formItemInfo.SetFormName(formName);
+    int callingUid = 100;
+    FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
+    int64_t otherFormId = 800;
+    formDataMgr_.formRecords_.emplace(otherFormId, record);
+    FormHostRecord hostRecord;
+    formDataMgr_.CreateHostRecord(formItemInfo, token_, 1000, hostRecord);
+    hostRecord.AddForm(otherFormId);
+    formDataMgr_.clientRecords_.emplace_back(hostRecord);
+
+    FormInstancesFilter instancesFilter;
+    int64_t formId = 800;
+    FormInstance formInstance;
+    auto ret = formDataMgr_.GetFormInstanceById(formId, formInstance);
+    EXPECT_EQ(ret, ERR_OK);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstanceById_002 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetFormInstanceById_003
+ * @tc.name: GetFormInstanceById
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *      If temp form count is greater than zero, return true, and the count is correct.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormInstancesById_003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstanceById_003 start";
+    formDataMgr_.formRecords_.clear();
+    FormItemInfo formItemInfo;
+    formItemInfo.SetTemporaryFlag(false);
+    std::string bundleName = "com.example.text";
+    formItemInfo.SetProviderBundleName(bundleName);
+    formItemInfo.SetHostBundleName(bundleName);
+    std::string moduleName = "entry";
+    formItemInfo.SetModuleName(moduleName);
+    std::string abilityName = "MainAbility";
+    formItemInfo.SetAbilityName(abilityName);
+    std::string formName = "FormAbility";
+    formItemInfo.SetFormName(formName);
+    int callingUid = 100;
+    FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
+    int64_t otherFormId = 800;
+    formDataMgr_.formRecords_.emplace(otherFormId, record);
+    FormHostRecord hostRecord;
+    hostRecord.AddForm(otherFormId);
+    formDataMgr_.CreateHostRecord(formItemInfo, token_, 1000, hostRecord);
+    formDataMgr_.clientRecords_.emplace_back(hostRecord);
+
+    FormInstancesFilter instancesFilter;
+    int64_t formId = 100;
+    FormInstance formInstance;
+    auto ret = formDataMgr_.GetFormInstanceById(formId, formInstance);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstanceById_003 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetFormInstanceById_004
+ * @tc.name: GetFormInstanceById
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *      If temp form count is greater than zero, return true, and the count is correct.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormInstanceById_004, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstanceById_004 start";
+    formDataMgr_.formRecords_.clear();
+    FormItemInfo formItemInfo;
+    formItemInfo.SetTemporaryFlag(false);
+    std::string bundleName = "com.example.text";
+    formItemInfo.SetProviderBundleName(bundleName);
+    formItemInfo.SetHostBundleName(bundleName);
+    std::string moduleName = "entry";
+    formItemInfo.SetModuleName(moduleName);
+    std::string abilityName = "MainAbility";
+    formItemInfo.SetAbilityName(abilityName);
+    std::string formName = "FormAbility";
+    formItemInfo.SetFormName(formName);
+    int callingUid = 100;
+    FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
+    int64_t otherFormId = 800;
+    formDataMgr_.formRecords_.emplace(otherFormId, record);
+
+    FormInstancesFilter instancesFilter;
+    int64_t formId = 800;
+    FormInstance formInstance;
+    auto ret = formDataMgr_.GetFormInstanceById(formId, formInstance);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstanceById_004 end";
+}
 }
