@@ -4284,4 +4284,37 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_220, TestSize.Level2)
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.UnregisterFormRouterProxy(formIds));
     GTEST_LOG_(INFO) << "FormMgrAdapter_220 end";
 }
+
+/**
+ * @tc.name: FormMgrAdapter_221
+ * @tc.desc: test GetFormInstancesByFilter function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_221, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_221 start";
+    FormMgrAdapter formMgrAdapter;
+
+    FormInstancesFilter formInstancesFilter;
+    std::vector<FormInstance> formInstances;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
+        formMgrAdapter.GetFormInstancesByFilter(formInstancesFilter, formInstances));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_221 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_222
+ * @tc.desc: test GetFormInstanceById function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_222, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_222 start";
+    FormMgrAdapter formMgrAdapter;
+
+    FormInstancesFilter formInstancesFilter;
+    FormInstance formInstance;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, formMgrAdapter.GetFormInstanceById(1, formInstance));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_222 end";
+}
 }
