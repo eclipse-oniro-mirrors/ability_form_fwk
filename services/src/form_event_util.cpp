@@ -38,6 +38,7 @@ void FormEventUtil::HandleBundleFormInfoChanged(const std::string &bundleName, i
 {
     FormTrustMgr::GetInstance().MarkTrustFlag(bundleName, true);
     FormInfoMgr::GetInstance().UpdateStaticFormInfos(bundleName, userId);
+    FormMgrAdapter::GetInstance().UpdateFormCloudUpdateDuration(bundleName);
 }
 
 
@@ -107,6 +108,7 @@ void FormEventUtil::HandleBundleFormInfoRemoved(const std::string &bundleName, i
 {
     FormTrustMgr::GetInstance().MarkTrustFlag(bundleName, true);
     FormInfoMgr::GetInstance().Remove(bundleName, userId);
+    FormDataMgr::GetInstance().RemoveFormCloudUpdateDuration(bundleName);
 }
 
 void FormEventUtil::HandleProviderRemoved(const std::string &bundleName, const int32_t userId)
@@ -496,6 +498,7 @@ void FormEventUtil::BatchDeleteNoHostDBForms(const int uid, std::map<FormIdKey, 
 bool FormEventUtil::HandleAdditionalInfoChanged(const std::string &bundleName)
 {
     HILOG_DEBUG("Called, bundleName:%{public}s.", bundleName.c_str());
+    FormMgrAdapter::GetInstance().UpdateFormCloudUpdateDuration(bundleName);
     std::vector<FormRecord> formInfos;
     if (!FormDataMgr::GetInstance().GetFormRecord(bundleName, formInfos)) {
         HILOG_DEBUG("No form info.");

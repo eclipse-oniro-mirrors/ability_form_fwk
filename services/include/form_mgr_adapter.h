@@ -535,6 +535,12 @@ public:
      */
     int32_t RecoverForms(const std::vector<int64_t> &formIds, const Want &want);
 
+    /**
+     * @brief Update form cloud update duration when additionalInfo changed.
+     * @param bundleName The bundleName of the form with a specified update duration in app gallery.
+     */
+    void UpdateFormCloudUpdateDuration(const std::string &bundleName);
+
 private:
     /**
      * @brief Get form configure info.

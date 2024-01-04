@@ -3122,4 +3122,136 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormInstanceById_004, TestSiz
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_COMMON_CODE);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormInstanceById_004 end";
 }
+
+/**
+ * @tc.number: FmsFormDataMgrTest_UpdateFormCloudUpdateDuration_001
+ * @tc.name: UpdateFormCloudUpdateDuration
+ * @tc.desc: Verify that the map can be operated normally.
+ * @tc.details: Add an element to an empty map, and add success.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_UpdateFormCloudUpdateDuration_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_UpdateFormCloudUpdateDuration_001 start";
+    std::string bundleName = "bundleName";
+    int duration = 1;
+    formDataMgr_.formCloudUpdateDurationMap_.clear();
+    formDataMgr_.UpdateFormCloudUpdateDuration(bundleName, duration);
+    int expectDuration = formDataMgr_.GetFormCloudUpdateDuration(bundleName);
+    EXPECT_EQ(expectDuration, duration);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_UpdateFormCloudUpdateDuration_001 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_UpdateFormCloudUpdateDuration_002
+ * @tc.name: UpdateFormCloudUpdateDuration
+ * @tc.desc: Verify that the map can be operated normally.
+ * @tc.details: Add an existing element to a map, and the previous element was replaced.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_UpdateFormCloudUpdateDuration_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_UpdateFormCloudUpdateDuration_002 start";
+    std::string bundleName = "bundleName";
+    int duration = 0;
+    formDataMgr_.formCloudUpdateDurationMap_.clear();
+    formDataMgr_.UpdateFormCloudUpdateDuration(bundleName, duration);
+    duration = 1;
+    formDataMgr_.UpdateFormCloudUpdateDuration(bundleName, duration);
+    int expectDuration = formDataMgr_.GetFormCloudUpdateDuration(bundleName);
+    EXPECT_EQ(expectDuration, duration);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_UpdateFormCloudUpdateDuration_002 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_RemoveFormCloudUpdateDuration_001
+ * @tc.name: RemoveFormCloudUpdateDuration
+ * @tc.desc: Verify that the map can be operated normally.
+ * @tc.details: Remove an element from the map, and remove success.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_RemoveFormCloudUpdateDuration_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_RemoveFormCloudUpdateDuration_001 start";
+    std::string bundleName = "bundleName";
+    int duration = 1;
+    formDataMgr_.formCloudUpdateDurationMap_.clear();
+    formDataMgr_.UpdateFormCloudUpdateDuration(bundleName, duration);
+    EXPECT_EQ(formDataMgr_.formCloudUpdateDurationMap_.size(), 1);
+    formDataMgr_.RemoveFormCloudUpdateDuration(bundleName);
+    EXPECT_EQ(formDataMgr_.formCloudUpdateDurationMap_.size(), 0);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_RemoveFormCloudUpdateDuration_001 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_RemoveFormCloudUpdateDuration_002
+ * @tc.name: RemoveFormCloudUpdateDuration
+ * @tc.desc: Verify that the map can be operated normally.
+ * @tc.details: Remove a non-existent element from the map, and no operation.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_RemoveFormCloudUpdateDuration_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_RemoveFormCloudUpdateDuration_002 start";
+    std::string bundleName = "bundleName";
+    int duration = 1;
+    formDataMgr_.formCloudUpdateDurationMap_.clear();
+    formDataMgr_.UpdateFormCloudUpdateDuration(bundleName, duration);
+    EXPECT_EQ(formDataMgr_.formCloudUpdateDurationMap_.size(), 1);
+    formDataMgr_.RemoveFormCloudUpdateDuration("");
+    EXPECT_EQ(formDataMgr_.formCloudUpdateDurationMap_.size(), 1);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_RemoveFormCloudUpdateDuration_002 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetFormCloudUpdateDuration_001
+ * @tc.name: GetFormCloudUpdateDuration
+ * @tc.desc: Verify that the map can be operated normally.
+ * @tc.details: Get an element from the map, and get success.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormCloudUpdateDuration_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormCloudUpdateDuration_001 start";
+    std::string bundleName = "bundleName";
+    int duration = 1;
+    formDataMgr_.formCloudUpdateDurationMap_.clear();
+    formDataMgr_.UpdateFormCloudUpdateDuration(bundleName, duration);
+    int expectDuration = formDataMgr_.GetFormCloudUpdateDuration(bundleName);
+    EXPECT_EQ(expectDuration, duration);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormCloudUpdateDuration_001 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetFormCloudUpdateDuration_002
+ * @tc.name: GetFormCloudUpdateDuration
+ * @tc.desc: Verify that the map can be operated normally.
+ * @tc.details: Get a non-existent element from the map, and result is 0.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormCloudUpdateDuration_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormCloudUpdateDuration_002 start";
+    std::string bundleName = "bundleName";
+    int duration = 1;
+    formDataMgr_.formCloudUpdateDurationMap_.clear();
+    formDataMgr_.UpdateFormCloudUpdateDuration(bundleName, duration);
+    int expectDuration = formDataMgr_.GetFormCloudUpdateDuration("");
+    EXPECT_EQ(expectDuration, 0);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormCloudUpdateDuration_002 end";
+}
+
+/**
+ * @tc.number: FmsFormDataMgrTest_HasFormCloudUpdateDuration_001
+ * @tc.name: HasFormCloudUpdateDuration
+ * @tc.desc: Verify that the map can be operated normally.
+ * @tc.details: Determine whether an element exists in the map.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_HasFormCloudUpdateDuration_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_HasFormCloudUpdateDuration_001 start";
+    std::string bundleName = "bundleName";
+    int duration = 1;
+    formDataMgr_.formCloudUpdateDurationMap_.clear();
+    formDataMgr_.UpdateFormCloudUpdateDuration(bundleName, duration);
+    bool isHas = formDataMgr_.HasFormCloudUpdateDuration(bundleName);
+    EXPECT_TRUE(isHas);
+    isHas = formDataMgr_.HasFormCloudUpdateDuration("");
+    EXPECT_FALSE(isHas);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_HasFormCloudUpdateDuration_001 end";
+}
 }
