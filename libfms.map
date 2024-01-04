@@ -56,6 +56,7 @@
         *OHOS::AppExecFwk::FormRenderConnection*;
         *OHOS::AppExecFwk::FormRenderMgr*;
         *OHOS::AppExecFwk::FormRenderMgrInner*;
+        *OHOS::AppExecFwk::FormRouterProxyMgr*;
         *OHOS::AppExecFwk::FormSandboxRenderMgrInner*;
         *OHOS::AppExecFwk::FormSerialQueue*;
         *OHOS::AppExecFwk::FormShareConnection*;

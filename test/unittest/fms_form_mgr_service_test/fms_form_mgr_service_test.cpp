@@ -1495,4 +1495,88 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0085, TestSize.Level1)
     EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, ret);
     GTEST_LOG_(INFO) << "FormMgrService_0085 end";
 }
+
+/**
+ * @tc.number: FormMgrService_0086
+ * @tc.name: test RegisterFormRouterProxy function.
+ * @tc.desc: Verify that the RegisterFormRouterProxy interface is called normally
+ * and the return value is ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0086, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0086 start";
+    FormMgrService formMgrService;
+    int64_t formId = 1;
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+    const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();;
+    int ret = formMgrService.RegisterFormRouterProxy(formIds, callerToken);
+    MockIsSACall(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, ret);
+    GTEST_LOG_(INFO) << "FormMgrService_0086 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0087
+ * @tc.name: test UnregisterFormRouterProxy function.
+ * @tc.desc: Verify that the UnregisterFormRouterProxy interface is called normally
+ * and the return value is ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0087, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0087 start";
+    FormMgrService formMgrService;
+    int64_t formId = 1;
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+    int ret = formMgrService.UnregisterFormRouterProxy(formIds);
+    MockIsSACall(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, ret);
+    GTEST_LOG_(INFO) << "FormMgrService_0087 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0088
+ * @tc.name: test RegisterFormRouterProxy function.
+ * @tc.desc: Verify that the RegisterFormRouterProxy interface is called normally
+ * and the return value is ERR_APPEXECFWK_FORM_PERMISSION_DENY.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0088, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0088 start";
+    FormMgrService formMgrService;
+    int64_t formId = 1;
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+    const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();;
+    int ret = formMgrService.RegisterFormRouterProxy(formIds, callerToken);
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(true);
+    MockVerifyCallingPermission(true);
+    MockCheckAcrossLocalAccountsPermission(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY, formMgrService.CheckFormPermission());
+    GTEST_LOG_(INFO) << "FormMgrService_0088 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0089
+ * @tc.name: test UnregisterFormRouterProxy function.
+ * @tc.desc: Verify that the UnregisterFormRouterProxy interface is called normally
+ * and the return value is ERR_APPEXECFWK_FORM_PERMISSION_DENY.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0089, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0089 start";
+    FormMgrService formMgrService;
+    int64_t formId = 1;
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+    int ret = formMgrService.UnregisterFormRouterProxy(formIds);
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(true);
+    MockVerifyCallingPermission(true);
+    MockCheckAcrossLocalAccountsPermission(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY, formMgrService.CheckFormPermission());
+    GTEST_LOG_(INFO) << "FormMgrService_0089 end";
+}
 }
