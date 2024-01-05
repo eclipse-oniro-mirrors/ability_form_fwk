@@ -525,6 +525,12 @@ void FormRenderRecord::HandleUpdateForm(const FormJsInfo &formJsInfo, const Want
 
         formRequests = iter->second;
     }
+    std::string compMaxId = 0;
+    for (const auto& iter : formRequests) {
+        if (iter.second.compId > compMaxId) {
+            compMaxId = iter.second.compId;
+        }
+    }
 
     for (const auto& iter : formRequests) {
         auto formRequest = iter.second;
@@ -534,8 +540,7 @@ void FormRenderRecord::HandleUpdateForm(const FormJsInfo &formJsInfo, const Want
             AddFormRequest(formJsInfo.formId, formRequest);
             continue;
         }
-
-        if (formRequests.size() == 1) {
+        if (compMaxId == formRequest.compId) {
             if (formJsInfo.isDynamic) {
                 // recover form
                 Want oldWant = formRequest.want;
