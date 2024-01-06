@@ -525,7 +525,7 @@ void FormRenderRecord::HandleUpdateForm(const FormJsInfo &formJsInfo, const Want
 
         formRequests = iter->second;
     }
-    std::string compMaxId = 0;
+    std::string compMaxId = "0";
     for (const auto& iter : formRequests) {
         if (iter.second.compId > compMaxId) {
             compMaxId = iter.second.compId;
