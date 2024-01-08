@@ -1294,6 +1294,7 @@ ErrCode FormMgrAdapter::AddExistFormRecord(const FormItemInfo &info, const sptr<
     }
 
     if (hasCacheData) {
+        HILOG_INFO("use cache data, formId:%{public}" PRId64 "", formId);
         formInfo.formData = cacheData;
         formInfo.formProviderData.SetDataString(cacheData);
         formInfo.formProviderData.SetImageDataMap(imageDataMap);
