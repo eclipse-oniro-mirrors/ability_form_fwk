@@ -670,7 +670,6 @@ ErrCode FormMgrService::RegisterBundleEventCallback()
     }
     if (!iBundleMgr->RegisterBundleEventCallback(formBundleEventCallback_)) {
         HILOG_ERROR("fail, RegisterBundleEventCallback failed!");
-        delete formBundleEventCallback_;
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return ERR_OK;
