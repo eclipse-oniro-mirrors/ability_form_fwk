@@ -301,7 +301,7 @@ void FormRenderMgr::OnRenderingBlock(const std::string &bundleName)
     HILOG_INFO("OnRenderingBlock called, bundleName: %{public}s.", bundleName.c_str());
     FormEventInfo eventInfo;
     eventInfo.bundleName = bundleName;
-    FormEventReport::SendFormEvent(
+    FormEventReport::SendSecondFormEvent(
         FormEventName::FORM_RENDER_BLOCK, HiSysEventType::FAULT, eventInfo);
 
     FormTrustMgr::GetInstance().MarkTrustFlag(bundleName, false);

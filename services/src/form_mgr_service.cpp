@@ -171,6 +171,16 @@ int FormMgrService::AddForm(const int64_t formId, const Want &want,
     eventInfo.bundleName = want.GetElement().GetBundleName();
     eventInfo.moduleName = want.GetStringParam(AppExecFwk::Constants::PARAM_MODULE_NAME_KEY);
     eventInfo.abilityName = want.GetElement().GetAbilityName();
+    sptr iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
+    if (iBundleMgr != nullptr) {
+        int uid = IPCSkeleton::GetCallingUid();
+        int32_t result = IN_PROCESS_CALL(iBundleMgr->GetNameForUid(uid, eventInfo.hostBundleName));
+        if (result != ERR_OK || eventInfo.hostBundleName.empty()) {
+            HILOG_ERROR("%{public}s fail, cannot get host bundle name by uid:%{public}d", __func__, uid);
+        }
+    } else {
+        HILOG_ERROR("%{public}s, failed to get IBundleMgr.", __func__);
+    }
     FormEventReport::SendFormEvent(FormEventName::ADD_FORM, HiSysEventType::BEHAVIOR, eventInfo);
     if (ret != ERR_OK) {
         HILOG_ERROR("%{public}s fail, add form permission denied", __func__);
@@ -198,7 +208,12 @@ int FormMgrService::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
     }
     FormEventInfo eventInfo;
     eventInfo.formId = formId;
-    FormEventReport::SendFormEvent(FormEventName::DELETE_FORM, HiSysEventType::BEHAVIOR, eventInfo);
+    std::vector<FormHostRecord> formHostRecords;
+    FormDataMgr::GetInstance().GetFormHostRecord(formId, formHostRecords);
+    if (formHostRecords.size() != 0) {
+        eventInfo.hostBundleName = formHostRecords.begin()->GetHostBundleName();
+    }
+    FormEventReport::SendSecondFormEvent(FormEventName::DELETE_FORM, HiSysEventType::BEHAVIOR, eventInfo);
 
     return FormMgrAdapter::GetInstance().DeleteForm(formId, callerToken);
 }
@@ -245,7 +260,7 @@ int FormMgrService::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> 
     }
     FormEventInfo eventInfo;
     eventInfo.formId = formId;
-    FormEventReport::SendFormEvent(FormEventName::RELEASE_FORM, HiSysEventType::BEHAVIOR, eventInfo);
+    FormEventReport::SendSecondFormEvent(FormEventName::RELEASE_FORM, HiSysEventType::BEHAVIOR, eventInfo);
 
     return FormMgrAdapter::GetInstance().ReleaseForm(formId, callerToken, delCache);
 }
@@ -286,7 +301,7 @@ int FormMgrService::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
     eventInfo.bundleName = want.GetElement().GetBundleName();
     eventInfo.moduleName = want.GetStringParam(AppExecFwk::Constants::PARAM_MODULE_NAME_KEY);
     eventInfo.abilityName = want.GetElement().GetAbilityName();
-    FormEventReport::SendFormEvent(FormEventName::REQUEST_FORM, HiSysEventType::BEHAVIOR, eventInfo);
+    FormEventReport::SendSecondFormEvent(FormEventName::REQUEST_FORM, HiSysEventType::BEHAVIOR, eventInfo);
 
     return FormMgrAdapter::GetInstance().RequestForm(formId, callerToken, want);
 }
@@ -302,7 +317,7 @@ int FormMgrService::SetNextRefreshTime(const int64_t formId, const int64_t nextT
     HILOG_INFO("%{public}s called.", __func__);
     FormEventInfo eventInfo;
     eventInfo.formId = formId;
-    FormEventReport::SendFormEvent(
+    FormEventReport::SendSecondFormEvent(
         FormEventName::SET_NEXT_REFRESH_TIME_FORM, HiSysEventType::BEHAVIOR, eventInfo);
 
     return FormMgrAdapter::GetInstance().SetNextRefreshTime(formId, nextTime);
@@ -383,7 +398,7 @@ int FormMgrService::CastTempForm(const int64_t formId, const sptr<IRemoteObject>
     }
     FormEventInfo eventInfo;
     eventInfo.formId = formId;
-    FormEventReport::SendFormEvent(FormEventName::CASTTEMP_FORM, HiSysEventType::BEHAVIOR, eventInfo);
+    FormEventReport::SendSecondFormEvent(FormEventName::CASTTEMP_FORM, HiSysEventType::BEHAVIOR, eventInfo);
 
     return FormMgrAdapter::GetInstance().CastTempForm(formId, callerToken);
 }
@@ -489,6 +504,11 @@ int FormMgrService::MessageEvent(const int64_t formId, const Want &want, const s
     eventInfo.bundleName = want.GetElement().GetBundleName();
     eventInfo.moduleName = want.GetStringParam(AppExecFwk::Constants::PARAM_MODULE_NAME_KEY);
     eventInfo.abilityName = want.GetElement().GetAbilityName();
+    std::vector<FormHostRecord> formHostRecords;
+    FormDataMgr::GetInstance().GetFormHostRecord(formId, formHostRecords);
+    if (formHostRecords.size() != 0) {
+        eventInfo.hostBundleName = formHostRecords.begin()->GetHostBundleName();
+    }
     FormEventReport::SendFormEvent(FormEventName::MESSAGE_EVENT_FORM, HiSysEventType::BEHAVIOR, eventInfo);
     return FormMgrAdapter::GetInstance().MessageEvent(formId, want, callerToken);
 }
@@ -520,6 +540,11 @@ int FormMgrService::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
     eventInfo.bundleName = want.GetElement().GetBundleName();
     eventInfo.moduleName = want.GetStringParam(AppExecFwk::Constants::PARAM_MODULE_NAME_KEY);
     eventInfo.abilityName = want.GetElement().GetAbilityName();
+    std::vector<FormHostRecord> formHostRecords;
+    FormDataMgr::GetInstance().GetFormHostRecord(formId, formHostRecords);
+    if (formHostRecords.size() != 0) {
+        eventInfo.hostBundleName = formHostRecords.begin()->GetHostBundleName();
+    }
     FormEventReport::SendFormEvent(FormEventName::ROUTE_EVENT_FORM, HiSysEventType::BEHAVIOR, eventInfo);
     return FormMgrAdapter::GetInstance().RouterEvent(formId, want, callerToken);
 }
@@ -551,7 +576,7 @@ int FormMgrService::BackgroundEvent(const int64_t formId, Want &want, const sptr
     eventInfo.bundleName = want.GetElement().GetBundleName();
     eventInfo.moduleName = want.GetStringParam(AppExecFwk::Constants::PARAM_MODULE_NAME_KEY);
     eventInfo.abilityName = want.GetElement().GetAbilityName();
-    FormEventReport::SendFormEvent(FormEventName::BACKGROUND_EVENT_FORM, HiSysEventType::BEHAVIOR, eventInfo);
+    FormEventReport::SendSecondFormEvent(FormEventName::BACKGROUND_EVENT_FORM, HiSysEventType::BEHAVIOR, eventInfo);
     return FormMgrAdapter::GetInstance().BackgroundEvent(formId, want, callerToken);
 }
 

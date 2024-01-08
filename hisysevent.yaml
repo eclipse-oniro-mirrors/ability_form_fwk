@@ -21,6 +21,7 @@ ADD_FORM:
   BUNDLE_NAME: {type: STRING, desc: bundle name}
   MODULE_NAME: {type: STRING, desc: module name}
   ABILITY_NAME: {type: STRING, desc: ability name}
+  HOST_BUNDLE_NAME: {type: STRING, desc: host bundle name}
 
 REQUEST_FORM:
   __BASE: {type: BEHAVIOR, level: MINOR, tag: ability, desc: form manager}
@@ -32,6 +33,7 @@ REQUEST_FORM:
 DELETE_FORM:
   __BASE: {type: BEHAVIOR, level: MINOR, tag: ability, desc: form manager}
   FORM_ID: {type: INT64, desc: formId}
+  HOST_BUNDLE_NAME: {type: STRING, desc: host bundle name}
 
 CASTTEMP_FORM:
   __BASE: {type: BEHAVIOR, level: MINOR, tag: ability, desc: form manager}
@@ -48,6 +50,7 @@ MESSAGE_EVENT_FORM:
   BUNDLE_NAME: {type: STRING, desc: bundle name}
   MODULE_NAME: {type: STRING, desc: module name}
   ABILITY_NAME: {type: STRING, desc: ability name}
+  HOST_BUNDLE_NAME: {type: STRING, desc: host bundle name}
 
 ROUTE_EVENT_FORM:
   __BASE: {type: BEHAVIOR, level: MINOR, tag: ability, desc: form manager}
@@ -55,6 +58,7 @@ ROUTE_EVENT_FORM:
   BUNDLE_NAME: {type: STRING, desc: bundle name}
   MODULE_NAME: {type: STRING, desc: module name}
   ABILITY_NAME: {type: STRING, desc: ability name}
+  HOST_BUNDLE_NAME: {type: STRING, desc: host bundle name}
 
 RELEASE_FORM:
   __BASE: {type: BEHAVIOR, level: MINOR, tag: ability, desc: form manager}
