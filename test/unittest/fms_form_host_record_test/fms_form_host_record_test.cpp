@@ -637,6 +637,49 @@ HWTEST_F(FmsFormHostRecordTest, FormMgrService_0021, TestSize.Level0)
 }
 
 /**
+ * @tc.name: FormMgrService_0022
+ * @tc.desc: test GetFormsInfo function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_0022, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0022 start";
+    FormMgrService formMgrService;
+    FormInfoFilter filter;
+    std::vector<FormInfo> formInfos;
+    auto bmsTaskGetBundleNameForUid = [] (const int uid, std::string &name) {
+        name = FORM_PROVIDER_BUNDLE_NAME;
+        GTEST_LOG_(INFO) << "AddForm_002 bmsTaskGetBundleNameForUid called";
+        return ERR_OK;
+    };
+    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, formMgrService.GetFormsInfo(filter, formInfos));
+    GTEST_LOG_(INFO) << "FormMgrService_0022 end";
+}
+
+/**
+ * @tc.name: FormMgrService_0023
+ * @tc.desc: test GetFormsInfo function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_0023, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0023 start";
+    FormMgrService formMgrService;
+    FormInfoFilter filter;
+    filter.moduleName = "aa";
+    std::vector<FormInfo> formInfos;
+    auto bmsTaskGetBundleNameForUid = [] (const int uid, std::string &name) {
+        name = FORM_PROVIDER_BUNDLE_NAME;
+        GTEST_LOG_(INFO) << "AddForm_002 bmsTaskGetBundleNameForUid called";
+        return ERR_OK;
+    };
+    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, formMgrService.GetFormsInfo(filter, formInfos));
+    GTEST_LOG_(INFO) << "FormMgrService_0023 end";
+}
+
+/**
  * @tc.name: FormMgrService_0024
  * @tc.desc: test IsRequestPublishFormSupported function.
  * @tc.type: FUNC
