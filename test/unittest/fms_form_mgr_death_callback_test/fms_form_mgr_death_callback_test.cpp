@@ -91,7 +91,9 @@ void FmsFormMgrDeathCallbackTest::SetUpTestCase()
 sptr<BundleMgrService> FmsFormMgrDeathCallbackTest::mockBundleMgrService = nullptr;
 
 void FmsFormMgrDeathCallbackTest::TearDownTestCase()
-{}
+{
+    mockBundleMgrService = nullptr;
+}
 
 void FmsFormMgrDeathCallbackTest::SetUp()
 {
@@ -161,7 +163,7 @@ HWTEST_F(FmsFormMgrDeathCallbackTest, OnRemoteDied_001, TestSize.Level0)
         GTEST_LOG_(INFO) << "AddForm_002 bmsTaskGetBundleNameForUid called";
         return ERR_OK;
     };
-    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(2).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
+    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(3).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().AddForm(0L, want, token_, formJsInfo));
     token_->Wait();
 
@@ -214,7 +216,7 @@ HWTEST_F(FmsFormMgrDeathCallbackTest, OnRemoteDied_002, TestSize.Level0)
         GTEST_LOG_(INFO) << "AddForm_002 bmsTaskGetBundleNameForUid called";
         return ERR_OK;
     };
-    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(2).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
+    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(3).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().AddForm(0L, want, token_, formJsInfo));
     token_->Wait();
 
