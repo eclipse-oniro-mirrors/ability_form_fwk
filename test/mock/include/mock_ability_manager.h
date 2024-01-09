@@ -61,7 +61,7 @@ public:
     {
         return 0;
     }
-    int DisconnectAbility(const sptr<AAFwk::IAbilityConnection> &connect) override
+    int DisconnectAbility(sptr<AAFwk::IAbilityConnection> connect) override
     {
         return 0;
     }
@@ -418,7 +418,7 @@ public:
         connect->OnAbilityConnectDone(want.GetElement(), new (std::nothrow) MockFormProviderClient(), 0);
         return 0;
     }
-    int DisconnectAbility(const sptr<AAFwk::IAbilityConnection> &connect) override
+    int DisconnectAbility(sptr<AAFwk::IAbilityConnection> connect) override
     {
         return 0;
     }
