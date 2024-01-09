@@ -746,6 +746,7 @@ ErrCode FormInfoMgr::ReloadFormInfos(const int32_t userId)
     HILOG_INFO("bundle name set number: %{public}zu", bundleNameSet.size());
 
     std::unique_lock<std::shared_timed_mutex> guard(bundleFormInfoMapMutex_);
+    hasReloadedFormInfosState_ = false;
     for (auto const &bundleFormInfoPair : bundleFormInfoMap_) {
         const std::string &bundleName = bundleFormInfoPair.first;
         auto setFindIter = bundleNameSet.find(bundleName);
@@ -768,7 +769,14 @@ ErrCode FormInfoMgr::ReloadFormInfos(const int32_t userId)
         bundleFormInfoMap_[bundleName] = bundleFormInfoPtr;
         HILOG_INFO("add forms info success, bundleName=%{public}s", bundleName.c_str());
     }
+    hasReloadedFormInfosState_ = true;
     return ERR_OK;
+}
+
+bool FormInfoMgr::HasReloadedFormInfos()
+{
+    HILOG_INFO("Reloaded Form Infos state %{public}d", hasReloadedFormInfosState_);
+    return hasReloadedFormInfosState_;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

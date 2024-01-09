@@ -19,7 +19,6 @@
 #include <singleton.h>
 #include <system_ability.h>
 
-#include "form_bundle_event_callback.h"
 #include "form_event_handler.h"
 #include "form_instance.h"
 #include "form_instances_filter.h"
@@ -628,13 +627,11 @@ private:
     std::shared_ptr<FormEventHandler> handler_ = nullptr;
     std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;
     std::shared_ptr<FormSysEventReceiver> formSysEventReceiver_ = nullptr;
-    sptr<FormBundleEventCallback> formBundleEventCallback_ = nullptr;
     mutable std::mutex instanceMutex_;
     DISALLOW_COPY_AND_MOVE(FormMgrService);
     std::shared_ptr<MemStatusListener> memStatusListener_ = nullptr;
 
     void SubscribeSysEventReceiver();
-    ErrCode RegisterBundleEventCallback();
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

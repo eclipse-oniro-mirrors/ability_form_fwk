@@ -19,6 +19,7 @@
 
 #include "common_event_support.h"
 #include "fms_log_wrapper.h"
+#include "form_bms_helper.h"
 #include "form_constants.h"
 #include "form_data_mgr.h"
 #include "form_db_cache.h"
@@ -34,6 +35,7 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace {
 const int32_t MAIN_USER_ID = 100;
+constexpr int32_t FORM_TASK_DELAY_TIME = 30; // ms
 } // namespace
 /**
  * @brief Receiver Constructor.
@@ -129,8 +131,6 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
         OnReceiveEventForUserRemoved(userId);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_BUNDLE_SCAN_FINISHED) {
         HandleBundleScanFinished();
-    } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
-        HandleUserSwitched(eventData);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_DATA_CLEARED) {
         int userId = want.GetIntParam(KEY_USER_ID, Constants::DEFAULT_USERID);
         OnReceiveEventForPackageDataCleared(bundleName, userId);
@@ -162,34 +162,15 @@ void FormSysEventReceiver::HandleBundleScanFinished()
         return;
     }
 
-    serialQueue_->ScheduleTask(0, []() {
+    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, []() {
         int32_t currUserId = FormUtil::GetCurrentAccountId();
         if (currUserId == Constants::ANY_USERID) {
             HILOG_INFO("use MAIN_USER_ID(%{public}d) instead of current userId: ANY_USERID(%{public}d)",
                 MAIN_USER_ID, currUserId);
             currUserId = MAIN_USER_ID;
         }
-
+        FormBmsHelper::GetInstance().RegisterBundleEventCallback();
         FormInfoMgr::GetInstance().ReloadFormInfos(currUserId);
-    });
-}
-
-void FormSysEventReceiver::HandleUserSwitched(const EventFwk::CommonEventData &eventData)
-{
-    int32_t userId = eventData.GetCode();
-    if (userId < 0) {
-        HILOG_ERROR("invalid switched userId: %{public}d", userId);
-        return;
-    }
-    HILOG_INFO("switch to userId: (%{public}d)", userId);
-
-    if (!serialQueue_) {
-        HILOG_ERROR("serialQueue is nullptr");
-        return;
-    }
-
-    serialQueue_->ScheduleTask(0, [userId]() {
-        FormInfoMgr::GetInstance().ReloadFormInfos(userId);
     });
 }
 }  // namespace AppExecFwk
