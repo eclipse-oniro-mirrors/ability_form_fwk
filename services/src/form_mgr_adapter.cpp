@@ -1424,9 +1424,11 @@ ErrCode FormMgrAdapter::AddFormTimer(const FormRecord &formRecord)
             UpdateFormCloudUpdateDuration(formRecord.bundleName);
         }
         int64_t updateDuration = formRecord.updateDuration;
+        HILOG_INFO("Get form update duration start.");
         if (!GetValidFormUpdateDuration(formRecord.formId, updateDuration)) {
             HILOG_WARN("Get updateDuration failed, uses local configuration.");
         }
+        HILOG_INFO("Get form update duration end.");
         bool ret = FormTimerMgr::GetInstance().AddFormTimer(formRecord.formId,
             updateDuration, formRecord.providerUserId);
         return ret ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -3322,7 +3324,7 @@ bool FormMgrAdapter::GetValidFormUpdateDuration(const int64_t formId, int64_t &u
         updateDuration = formRecord.updateDuration;
         return true;
     }
-
+    HILOG_INFO("Get form cloud update duration from cache.");
     int duration = FormDataMgr::GetInstance().GetFormCloudUpdateDuration(formRecord.bundleName);
     if (duration == 0) {
         HILOG_INFO("No valid cloud update duration, uses local configuration.");

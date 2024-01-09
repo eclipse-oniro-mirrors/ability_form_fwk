@@ -19,6 +19,7 @@
 #include <map>
 #include <mutex>
 #include <set>
+#include <shared_mutex>
 #include <singleton.h>
 #include <string>
 
@@ -800,7 +801,7 @@ private:
     mutable std::mutex formRequestPublishFormsMutex_;
     mutable std::mutex formAcquireDataRecordMutex_;
     mutable std::mutex formConfigMapMutex_;
-    mutable std::mutex formCloudUpdateDurationMapMutex_;
+    mutable std::shared_mutex formCloudUpdateDurationMapMutex_;
     std::map<int64_t, FormRecord> formRecords_;
     std::vector<FormHostRecord> clientRecords_;
     std::vector<int64_t> tempForms_;
