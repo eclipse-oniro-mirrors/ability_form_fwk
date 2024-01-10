@@ -20,6 +20,7 @@
 #include "ability_manager_interface.h"
 #include "bundle_mgr_interface.h"
 #include "bundle_installer_interface.h"
+#include "form_bundle_event_callback.h"
 #include "want.h"
 
 namespace OHOS {
@@ -144,6 +145,9 @@ public:
     ErrCode GetAllProxyDataInfos(int32_t userId, std::vector<ProxyData> &proxyData);
 
     ErrCode GetApplicationInfo(const std::string &bundleName, int32_t userId, ApplicationInfo &appInfo);
+
+    ErrCode RegisterBundleEventCallback();
+    ErrCode UnregisterBundleEventCallback();
     static constexpr int64_t INVALID_UID = -1;
 private:
     /**
@@ -157,6 +161,7 @@ private:
 private:
     sptr<IBundleMgr> iBundleMgr_ = nullptr;
     sptr<IBundleInstaller> bundleInstallerProxy_ = nullptr;
+    sptr<FormBundleEventCallback> formBundleEventCallback_ = nullptr;
     std::mutex ibundleMutex_;
 };
 }  // namespace AppExecFwk

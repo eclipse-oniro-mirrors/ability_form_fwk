@@ -112,6 +112,8 @@ public:
 
     ErrCode ReloadFormInfos(int32_t userId);
 
+    bool HasReloadedFormInfos();
+
 private:
     std::shared_ptr<BundleFormInfo> GetOrCreateBundleFromInfo(const std::string &bundleName);
     static bool IsCaller(const std::string& bundleName);
@@ -120,6 +122,7 @@ private:
 
     mutable std::shared_timed_mutex bundleFormInfoMapMutex_ {};
     std::unordered_map<std::string, std::shared_ptr<BundleFormInfo>> bundleFormInfoMap_ {};
+    bool hasReloadedFormInfosState_ = false;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

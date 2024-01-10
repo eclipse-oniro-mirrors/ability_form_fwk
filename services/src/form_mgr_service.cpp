@@ -112,14 +112,7 @@ FormMgrService::~FormMgrService()
     if (formSysEventReceiver_ != nullptr) {
         EventFwk::CommonEventManager::UnSubscribeCommonEvent(formSysEventReceiver_);
         formSysEventReceiver_ = nullptr;
-        sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
-        if (iBundleMgr == nullptr) {
-            return;
-        }
-        if (!iBundleMgr->UnregisterBundleEventCallback(formBundleEventCallback_)) {
-            HILOG_ERROR("%{public}s fail, UnregisterBundleEventCallback failed", __func__);
-        }
-        formBundleEventCallback_ = nullptr;
+        FormBmsHelper::GetInstance().UnregisterBundleEventCallback();
     }
     if (memStatusListener_ != nullptr) {
         Memory::MemMgrClient::GetInstance().UnsubscribeAppState(*memStatusListener_);
@@ -137,7 +130,7 @@ bool FormMgrService::IsReady() const
         HILOG_ERROR("%{public}s fail, account is empty", __func__);
         return false;
     }
-    return true;
+    return FormInfoMgr::GetInstance().HasReloadedFormInfos();
 }
 
 /**
@@ -647,7 +640,6 @@ void FormMgrService::SubscribeSysEventReceiver()
         matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED);
         matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_USER_UNLOCKED);
         matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_BUNDLE_SCAN_FINISHED);
-        matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED);
         // init TimerReceiver
         EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
         subscribeInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
@@ -655,24 +647,6 @@ void FormMgrService::SubscribeSysEventReceiver()
         formSysEventReceiver_->SetSerialQueue(serialQueue_);
         EventFwk::CommonEventManager::SubscribeCommonEvent(formSysEventReceiver_);
     }
-}
-
-ErrCode FormMgrService::RegisterBundleEventCallback()
-{
-    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
-    if (iBundleMgr == nullptr) {
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
-    formBundleEventCallback_ = new (std::nothrow) FormBundleEventCallback();
-    if (formBundleEventCallback_ == nullptr) {
-        HILOG_ERROR("fail, allocate formBundleEventCallback_ failed!");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
-    if (!iBundleMgr->RegisterBundleEventCallback(formBundleEventCallback_)) {
-        HILOG_ERROR("fail, RegisterBundleEventCallback failed!");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
-    return ERR_OK;
 }
 
 /**
@@ -709,21 +683,10 @@ ErrCode FormMgrService::Init()
     Memory::MemMgrClient::GetInstance().SubscribeAppState(*memStatusListener_);
 
     FormInfoMgr::GetInstance().Start();
-    int currUserId = FormUtil::GetCurrentAccountId();
-    if (currUserId == Constants::ANY_USERID) {
-        HILOG_INFO("FormMgrService use MAIN_USER_ID(%{public}d instead of currentUserId: ANY_USERID(%{public}d)",
-            MAIN_USER_ID, Constants::ANY_USERID);
-        currUserId = MAIN_USER_ID;
-    }
-    FormInfoMgr::GetInstance().ReloadFormInfos(currUserId);
     FormDbCache::GetInstance().Start();
     FormTimerMgr::GetInstance(); // Init FormTimerMgr
     FormCacheMgr::GetInstance().Start();
 
-    auto ret = RegisterBundleEventCallback();
-    if (ret != ERR_OK) {
-        return ret;
-    }
     // read param form form_config.xml.
     if (ReadFormConfigXML() != ERR_OK) {
         HILOG_WARN("parse form config failed, use the default vaule.");

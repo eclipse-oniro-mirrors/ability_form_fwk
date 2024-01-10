@@ -363,5 +363,37 @@ ErrCode FormBmsHelper::GetApplicationInfo(const std::string &bundleName, int32_t
     return IN_PROCESS_CALL(iBundleMgr->GetApplicationInfoV9(bundleName, AppExecFwk::BundleFlag::GET_BUNDLE_DEFAULT,
         userId, appInfo));
 }
+
+ErrCode FormBmsHelper::RegisterBundleEventCallback()
+{
+    sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
+    if (iBundleMgr == nullptr) {
+        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
+    }
+    formBundleEventCallback_ = new (std::nothrow) FormBundleEventCallback();
+    if (formBundleEventCallback_ == nullptr) {
+        HILOG_ERROR("fail, allocate formBundleEventCallback_ failed!");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    if (!iBundleMgr->RegisterBundleEventCallback(formBundleEventCallback_)) {
+        HILOG_ERROR("fail, RegisterBundleEventCallback failed!");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormBmsHelper::UnregisterBundleEventCallback()
+{
+    sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
+    if (iBundleMgr == nullptr) {
+        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
+    }
+    if (!iBundleMgr->UnregisterBundleEventCallback(formBundleEventCallback_)) {
+        HILOG_ERROR("fail, RegisterBundleEventCallback failed!");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    formBundleEventCallback_ = nullptr;
+    return ERR_OK;
+}
 } // namespace AppExecFwk
 } // namespace OHOS
