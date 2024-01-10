@@ -21,8 +21,6 @@
 #include <string>
 #include <thread>
 
-#include "erms_mgr_param.h"
-#include "erms_mgr_interface.h"
 #include "form_constants.h"
 #include "form_mgr_errors.h"
 #include "form_util.h"
@@ -37,7 +35,6 @@
 #undef private
 #include "mock_ability_manager.h"
 #include "mock_bundle_mgr.h"
-#include "mock_ecological_rule_manager.h"
 #include "mock_form_provider_client.h"
 
 using namespace testing::ext;
@@ -117,8 +114,6 @@ void FmsFormMgrAdapterTest::SetUp()
 
 void FmsFormMgrAdapterTest::TearDown()
 {}
-
-using ExperienceRule = OHOS::AppExecFwk::ErmsParams::ExperienceRule;
 
 /**
  * @tc.name: FormMgrAdapter_001
@@ -3721,12 +3716,9 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_193, TestSize.Level0)
     FormMgrAdapter formMgrAdapter;
     Want want;
     sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
-    sptr<MockEcologicalRuleMgrService> erMgrService = new  MockEcologicalRuleMgrService();
 
     sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
     FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
-    ExperienceRule rule;
-    rule.isAllow = false;
     AppExecFwk::ApplicationInfo appInfo;
     appInfo.isSystemApp = true;
     EXPECT_CALL(*bmsProxy, GetApplicationInfoV9(_, _, _, _)).Times(1)
@@ -3748,12 +3740,9 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_194, TestSize.Level0)
     FormMgrAdapter formMgrAdapter;
     Want want;
     sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
-    sptr<MockEcologicalRuleMgrService> erMgrService = new  MockEcologicalRuleMgrService();
 
     sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
     FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
-    ExperienceRule rule;
-    rule.isAllow = true;
     AppExecFwk::ApplicationInfo appInfo;
     appInfo.isSystemApp = true;
     EXPECT_CALL(*bmsProxy, GetApplicationInfoV9(_, _, _, _)).Times(1)
