@@ -64,7 +64,6 @@ ohos_unittest("fms_form_mgr_service_test") {
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "device_manager:devicemanagersdk",
-    "device_usage_statistics:usagestatsinner",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
     "form_fwk:form_manager",
@@ -80,6 +79,11 @@ ohos_unittest("fms_form_mgr_service_test") {
     external_deps += [ "memmgr_plugin:memmgrclient" ]
   } else if (cite_memmgr) {
     external_deps += [ "memmgr:memmgrclient" ]
+  }
+
+  if (device_usage_statistics) {
+    external_deps += [ "device_usage_statistics:usagestatsinner" ]
+    defines = [ "DEVICE_USAGE_STATISTICS_ENABLE" ]
   }
 }
 
