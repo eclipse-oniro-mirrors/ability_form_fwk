@@ -746,6 +746,39 @@ HWTEST_F(FmsFormSysEventReceiverTest, HandleBundleScanFinished_0001, TestSize.Le
 }
 
 /**
+ * @tc.number: HandleUserSwitched_0001
+ * @tc.name: HandleUserSwitched
+ * @tc.desc: Verify whether the HandleUserSwitched interface is called normally
+ */
+HWTEST_F(FmsFormSysEventReceiverTest, HandleUserSwitched_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "HandleUserSwitched_0001 start";
+    std::shared_ptr<FormSysEventReceiver> receiver = std::make_shared<FormSysEventReceiver>();
+    ASSERT_NE(nullptr, receiver);
+    OHOS::EventFwk::CommonEventData eventData;
+    eventData.SetCode(Constants::ANY_USERID);
+    receiver->HandleUserSwitched(eventData);
+    GTEST_LOG_(INFO) << "HandleUserSwitched_0001 end";
+}
+
+/**
+ * @tc.number: HandleUserSwitched_0002
+ * @tc.name: HandleUserSwitched
+ * @tc.desc: Verify whether the HandleUserSwitched interface is called normally
+ */
+HWTEST_F(FmsFormSysEventReceiverTest, HandleUserSwitched_0002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "HandleUserSwitched_0002 start";
+    std::shared_ptr<FormSysEventReceiver> receiver = std::make_shared<FormSysEventReceiver>();
+    ASSERT_NE(nullptr, receiver);
+    OHOS::EventFwk::CommonEventData eventData;
+    const int32_t MAIN_USER_ID = 100;
+    eventData.SetCode(MAIN_USER_ID);
+    receiver->HandleUserSwitched(eventData);
+    GTEST_LOG_(INFO) << "HandleUserSwitched_0002 end";
+}
+
+/**
  * @tc.number: FormSysEventReceiver_0001
  * @tc.name: FormSysEventReceiver
  * @tc.desc: Verify whether the FormSysEventReceiver interface is called normally
