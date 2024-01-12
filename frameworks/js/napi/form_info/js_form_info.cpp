@@ -18,6 +18,7 @@
 #include "form_constants.h"
 #include "form_info.h"
 #include "form_info_base.h"
+#include "form_instance.h"
 #include "form_state_info.h"
 #include "js_runtime_utils.h"
 namespace OHOS {
@@ -127,6 +128,15 @@ napi_value CreateJsFormLaunchReason(napi_env engine)
     return objValue;
 }
 
+napi_value CreateJsFormUsageState(napi_env engine)
+{
+    napi_value objValue = nullptr;
+    napi_create_object(engine, &objValue);
+    napi_set_named_property(engine, objValue, "USED", CreateJsValue(engine, AppExecFwk::FormUsageState::USED));
+    napi_set_named_property(engine, objValue, "UNUSED", CreateJsValue(engine, AppExecFwk::FormUsageState::UNUSED));
+    return objValue;
+}
+
 napi_value FormInfoInit(napi_env engine, napi_value exportObj)
 {
     HILOG_INFO("%{public}s called.", __func__);
@@ -138,6 +148,7 @@ napi_value FormInfoInit(napi_env engine, napi_value exportObj)
     napi_set_named_property(engine, exportObj, "FormDimension", CreateJsFormDimension(engine));
     napi_set_named_property(engine, exportObj, "VisibilityType", CreateJsFormVisibilityType(engine));
     napi_set_named_property(engine, exportObj, "LaunchReason", CreateJsFormLaunchReason(engine));
+    napi_set_named_property(engine, exportObj, "FormUsageState", CreateJsFormUsageState(engine));
     HILOG_INFO("%{public}s called end.", __func__);
     return exportObj;
 }
