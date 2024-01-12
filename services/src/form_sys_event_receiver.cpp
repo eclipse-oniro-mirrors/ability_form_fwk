@@ -131,6 +131,8 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
         OnReceiveEventForUserRemoved(userId);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_BUNDLE_SCAN_FINISHED) {
         HandleBundleScanFinished();
+    } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
+        HandleUserSwitched(eventData);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_DATA_CLEARED) {
         int userId = want.GetIntParam(KEY_USER_ID, Constants::DEFAULT_USERID);
         OnReceiveEventForPackageDataCleared(bundleName, userId);
@@ -171,6 +173,30 @@ void FormSysEventReceiver::HandleBundleScanFinished()
         }
         FormBmsHelper::GetInstance().RegisterBundleEventCallback();
         FormInfoMgr::GetInstance().ReloadFormInfos(currUserId);
+    });
+}
+
+void FormSysEventReceiver::HandleUserSwitched(const EventFwk::CommonEventData &eventData)
+{
+    int32_t userId = eventData.GetCode();
+    if (userId < 0) {
+        HILOG_ERROR("invalid switched userId: %{public}d", userId);
+        return;
+    }
+
+    if (userId == MAIN_USER_ID) {
+        HILOG_INFO("main user id has reload");
+        return;
+    }
+    HILOG_INFO("switch to userId: (%{public}d)", userId);
+
+    if (!serialQueue_) {
+        HILOG_ERROR("serialQueue is nullptr");
+        return;
+    }
+
+    serialQueue_->ScheduleTask(0, [userId]() {
+        FormInfoMgr::GetInstance().ReloadFormInfos(userId);
     });
 }
 }  // namespace AppExecFwk
