@@ -18,6 +18,7 @@
 #include "form_ams_helper.h"
 #define private public
 #include "form_bms_helper.h"
+#include "form_info_mgr.h"
 #undef private
 #include "form_data_mgr.h"
 #include "form_db_cache.h"
@@ -353,6 +354,7 @@ HWTEST_F(FmsFormHostRecordTest, FormMgrService_0003, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormMgrService_0003 start";
     FormMgrService formMgrService;
     formMgrService.state_ = ServiceRunningState::STATE_RUNNING;
+    FormInfoMgr::GetInstance().hasReloadedFormInfosState_ = true;
     EXPECT_EQ(true, formMgrService.IsReady());
     GTEST_LOG_(INFO) << "FormMgrService_0003 end";
 }

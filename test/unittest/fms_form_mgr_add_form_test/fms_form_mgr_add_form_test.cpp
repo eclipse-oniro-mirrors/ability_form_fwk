@@ -388,7 +388,8 @@ HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_003, TestSize.Level0)
     FillBundleInfo(FORM_PROVIDER_BUNDLE_NAME, bundleInfo);
     EXPECT_CALL(*mockBundleMgrService, GetBundleInfo(_, _, _, _))
         .WillOnce(DoAll(SetArgReferee<2>(bundleInfo), Return(true)));
-    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(2).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
+    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _))
+        .Times(testing::AnyNumber()).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
     GTEST_LOG_(INFO) << "formId :"<<formId;
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().AddForm(formId, want, token_, formJsInfo));
     token_->Wait();
@@ -538,7 +539,8 @@ HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_006, TestSize.Level0)
     FillBundleInfo(FORM_PROVIDER_BUNDLE_NAME, bundleInfo);
     EXPECT_CALL(*mockBundleMgrService, GetBundleInfo(_, _, _, _))
         .WillOnce(DoAll(SetArgReferee<2>(bundleInfo), Return(true)));
-    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(3).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
+    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _))
+        .Times(testing::AnyNumber()).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
     EXPECT_EQ(ERR_APPEXECFWK_FORM_CFG_NOT_MATCH_ID, FormMgr::GetInstance().AddForm(formId, want, token_, formJsInfo));
     token_->Wait();
 

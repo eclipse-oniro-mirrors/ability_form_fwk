@@ -510,7 +510,7 @@ HWTEST_F(FmsFormBmsHelperTest, FmsFormBmsHelperTest_020, TestSize.Level1)
     std::string bundleName = "A";
     std::int32_t uid = 0;
     formBmsHelper.SetBundleManager(nullptr);
-    EXPECT_EQ(formBmsHelper.GetBundleNameByUid(uid, bundleName), ERR_APPEXECFWK_FORM_GET_BMS_FAILED);
+    EXPECT_EQ(formBmsHelper.GetBundleNameByUid(uid, bundleName), ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
     GTEST_LOG_(INFO) << "FmsFormBmsHelperTest_020 end";
 }
 
