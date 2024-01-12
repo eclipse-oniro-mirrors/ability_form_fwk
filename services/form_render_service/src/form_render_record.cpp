@@ -139,7 +139,9 @@ bool FormRenderRecord::HandleHostDied(const sptr<IRemoteObject> hostRemoteObj)
         std::unordered_set<sptr<IRemoteObject>, RemoteObjHash> &hosts = iter->second;
         hosts.erase(hostRemoteObj);
         if (hosts.empty()) {
+            int64_t formId = iter->first;
             iter = hostsMapForFormId_.erase(iter);
+            formRendererGroupMap_.erase(formId);
         } else {
             ++iter;
         }
