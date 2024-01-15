@@ -139,12 +139,46 @@ bool FormRenderRecord::HandleHostDied(const sptr<IRemoteObject> hostRemoteObj)
         std::unordered_set<sptr<IRemoteObject>, RemoteObjHash> &hosts = iter->second;
         hosts.erase(hostRemoteObj);
         if (hosts.empty()) {
+            int64_t formId = iter->first;
             iter = hostsMapForFormId_.erase(iter);
+            DeleteRendererGroup(formId);
         } else {
             ++iter;
         }
     }
     return hostsMapForFormId_.empty();
+}
+
+void FormRenderRecord::DeleteRendererGroup(int64_t formId)
+{
+    std::shared_ptr<EventHandler> eventHandler = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(eventHandlerMutex_);
+        eventHandler = eventHandler_;
+    }
+
+    if (eventHandler == nullptr) {
+        HILOG_ERROR("eventHandler is null");
+        return;
+    }
+
+    auto task = [weak = weak_from_this(), formId]() {
+        auto renderRecord = weak.lock();
+        if (renderRecord == nullptr) {
+            HILOG_ERROR("renderRecord is null.");
+            return;
+        }
+
+        renderRecord->HandleDeleteRendererGroup(formId);
+    };
+
+    eventHandler->PostSyncTask(task, "DeleteRendererGroup");
+}
+
+void FormRenderRecord::HandleDeleteRendererGroup(int64_t formId)
+{
+    std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
+    formRendererGroupMap_.erase(formId);
 }
 
 bool FormRenderRecord::CreateEventHandler(const std::string &bundleName, bool needMonitored)

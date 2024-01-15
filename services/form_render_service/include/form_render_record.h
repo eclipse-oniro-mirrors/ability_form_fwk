@@ -164,6 +164,10 @@ private:
 
     bool HandleReleaseRendererInJsThread(int64_t formId, const std::string &compId, bool &isRenderGroupEmpty);
 
+    void DeleteRendererGroup(int64_t formId);
+
+    void HandleDeleteRendererGroup(int64_t formId);
+
     std::string GenerateContextKey(const FormJsInfo &formJsInfo);
 
     void ReleaseHapFileHandle();
