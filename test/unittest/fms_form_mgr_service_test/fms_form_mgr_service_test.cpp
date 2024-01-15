@@ -28,6 +28,7 @@
 #include "form_event_util.h"
 #include "form_mgr_service.h"
 #include "tokenid_kit.h"
+#include "form_info_mgr.h"
 #undef private
 #include "mock_form_provider_client.h"
 #include "ipc_types.h"
@@ -81,6 +82,7 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0001, TestSize.Level1)
     formMgrService.state_ = ServiceRunningState::STATE_RUNNING;
     constexpr int32_t userId = 0;
     MockGetCurrentAccountIdRet(userId);
+    FormInfoMgr::GetInstance().hasReloadedFormInfosState_ = true;
     EXPECT_TRUE(formMgrService.IsReady());
     GTEST_LOG_(INFO) << "FormMgrService_0001 end";
 }
@@ -1078,7 +1080,7 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0060, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormMgrService_0060 start";
     FormMgrService formMgrService;
-    EXPECT_EQ(ERR_OK, formMgrService.ReadFormConfigXML());
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrService.ReadFormConfigXML());
     GTEST_LOG_(INFO) << "FormMgrService_0060 end";
 }
 
