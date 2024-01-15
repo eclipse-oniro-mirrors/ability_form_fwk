@@ -86,6 +86,8 @@ napi_value CreateJsFormParam(napi_env engine)
         engine, objValue, "LAUNCH_REASON_KEY", CreateJsValue(engine, AppExecFwk::Constants::LAUNCH_REASON_KEY));
     napi_set_named_property(engine, objValue,
         "PARAM_FORM_CUSTOMIZE_KEY", CreateJsValue(engine, AppExecFwk::Constants::PARAM_FORM_CUSTOMIZE_KEY));
+    napi_set_named_property(engine, objValue,
+        "FORM_RENDERING_MODE_KEY", CreateJsValue(engine, AppExecFwk::Constants::PARAM_FORM_RENDERINGMODE_KEY));
     return objValue;
 }
 
@@ -103,6 +105,8 @@ napi_value CreateJsFormDimension(napi_env engine)
         engine, objValue, "Dimension_4_4", CreateJsValue(engine, AppExecFwk::Constants::Dimension::DIMENSION_4_4));
     napi_set_named_property(
         engine, objValue, "Dimension_2_1", CreateJsValue(engine, AppExecFwk::Constants::Dimension::DIMENSION_2_1));
+    napi_set_named_property(
+        engine, objValue, "DIMENSION_1_1", CreateJsValue(engine, AppExecFwk::Constants::Dimension::DIMENSION_1_1));
     return objValue;
 }
 
