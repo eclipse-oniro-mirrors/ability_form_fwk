@@ -1631,7 +1631,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_087, TestSize.Level0)
 
 /**
  * @tc.name: FormMgrAdapter_088
- * @tc.desc: test UpdateProviderInfoToHost function and the return value is false.
+ * @tc.desc: test isFormShouldUpdateProviderInfoToHost function and the return value is false.
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_088, TestSize.Level0)
@@ -1641,16 +1641,15 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_088, TestSize.Level0)
     FormRecord formRecord;
     int64_t matchedFormId = 1;
     sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
-    int32_t formVisibleType = 2;
     int32_t userId = FormUtil::GetCurrentAccountId();
-    EXPECT_EQ(false, formMgrAdapter.UpdateProviderInfoToHost(matchedFormId, userId,
-        callerToken, formVisibleType, formRecord));
+    EXPECT_EQ(false, formMgrAdapter.isFormShouldUpdateProviderInfoToHost(matchedFormId, userId,
+        callerToken, formRecord));
     GTEST_LOG_(INFO) << "FormMgrAdapter_088 end";
 }
 
 /**
  * @tc.name: FormMgrAdapter_089
- * @tc.desc: test UpdateProviderInfoToHost function and the return value is false.
+ * @tc.desc: test isFormShouldUpdateProviderInfoToHost function and the return value is false.
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_089, TestSize.Level0)
@@ -1660,11 +1659,10 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_089, TestSize.Level0)
     FormRecord formRecord;
     int64_t matchedFormId = 1;
     sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
-    int32_t formVisibleType = 2;
     int32_t userId = FormUtil::GetCurrentAccountId();
     MockGetFormRecord(true);
-    EXPECT_EQ(false, formMgrAdapter.UpdateProviderInfoToHost(matchedFormId, userId,
-        callerToken, formVisibleType, formRecord));
+    EXPECT_EQ(false, formMgrAdapter.isFormShouldUpdateProviderInfoToHost(matchedFormId, userId,
+        callerToken, formRecord));
     GTEST_LOG_(INFO) << "FormMgrAdapter_089 end";
 }
 

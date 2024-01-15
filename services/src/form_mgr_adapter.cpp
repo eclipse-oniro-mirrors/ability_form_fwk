@@ -680,7 +680,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
     int32_t userId = FormUtil::GetCurrentAccountId();
     std::map<std::string, std::vector<int64_t>> eventMaps;
     std::map<std::string, std::vector<FormInstance>> formInstanceMaps;
-    std::string specialFlag = "#";
+    
     for (int64_t formId : formIds) {
         if (formId <= 0) {
             HILOG_WARN("formId %{public}" PRId64 " is less than 0", formId);
@@ -689,32 +689,15 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
         matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
         FormRecord formRecord;
 
-        // Update provider info to host
-        if (!UpdateProviderInfoToHost(matchedFormId, userId, callerToken, formVisibleType, formRecord)) {
+        if (!isFormShouldUpdateProviderInfoToHost(matchedFormId, userId, callerToken, formRecord)) {
             continue;
         }
-        bool isVisibility = (formVisibleType == static_cast<int32_t>(FormVisibilityType::VISIBLE));
-        FormInstance formInstance;
-        // Get the updated card status
-        FormDataMgr::GetInstance().GetFormInstanceById(matchedFormId, false, formInstance);
-        std::string formHostName = formInstance.formHostName;
-        std::string formAllHostName = EMPTY_BUNDLE;
-        for (auto formObserver : formObservers_) {
-            if (formObserver.first == formHostName + specialFlag + std::to_string(isVisibility) ||
-                formObserver.first == formAllHostName + specialFlag + std::to_string(isVisibility)) {
-                auto observer = formInstanceMaps.find(formObserver.first);
-                if (observer == formInstanceMaps.end()) {
-                    std::vector<FormInstance> formInstances;
-                    formInstances.emplace_back(formInstance);
-                    formInstanceMaps.emplace(formObserver.first, formInstances);
-                } else {
-                    observer->second.emplace_back(formInstance);
-                }
-            }
-        }
 
-        // Check if the form provider is system app
-        if (!formRecord.isSystemApp) {
+        PaddingNotifyVisibleFormsMap(formVisibleType, formId, formInstanceMaps);
+        
+        // Update info to host and check if the form was created by the system application.
+        if ((!UpdateProviderInfoToHost(matchedFormId, userId, callerToken, formVisibleType, formRecord)) ||
+            (!formRecord.isSystemApp)) {
             continue;
         }
 
@@ -741,6 +724,41 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
     FormTaskMgr::GetInstance().PostVisibleNotify(formIds, formInstanceMaps, eventMaps, formVisibleType,
         visibleNotifyDelay_);
     return ERR_OK;
+}
+
+/**
+ * @brief Padding the formInstances map for visibleNotify.
+ * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
+ * @param formId Form Id.
+ * @param formInstanceMaps formInstances for visibleNotify.
+ */
+void FormMgrAdapter::PaddingNotifyVisibleFormsMap(const int32_t formVisibleType, int64_t formId,
+    std::map<std::string, std::vector<FormInstance>> &formInstanceMaps)
+{
+    std::string specialFlag = "#";
+    bool isVisibility = (formVisibleType == static_cast<int32_t>(FormVisibilityType::VISIBLE));
+    FormInstance formInstance;
+    // Get the updated card status
+    int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+    FormDataMgr::GetInstance().GetFormInstanceById(matchedFormId, false, formInstance);
+    std::string formHostName = formInstance.formHostName;
+    std::string formAllHostName = EMPTY_BUNDLE;
+    if (formVisibleType == static_cast<int32_t>(formInstance.formVisiblity)) {
+        return;
+    }
+    for (auto formObserver : formObservers_) {
+        if (formObserver.first == formHostName + specialFlag + std::to_string(isVisibility) ||
+            formObserver.first == formAllHostName + specialFlag + std::to_string(isVisibility)) {
+            auto observer = formInstanceMaps.find(formObserver.first);
+            if (observer == formInstanceMaps.end()) {
+                std::vector<FormInstance> formInstances;
+                formInstances.emplace_back(formInstance);
+                formInstanceMaps.emplace(formObserver.first, formInstances);
+            } else {
+                observer->second.emplace_back(formInstance);
+            }
+        }
+    }
 }
 
 /**
@@ -2521,17 +2539,18 @@ bool FormMgrAdapter::CreateHandleEventMap(const int64_t matchedFormId, const For
     }
     return true;
 }
+
 /**
- * @brief Update provider info to host
+ * @brief Check if the form should update information to the host.
  *
  * @param matchedFormId The Id of the form
+ * @param userId User ID.
  * @param callerToken Caller ability token.
- * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
  * @param formRecord Form storage information
  * @return Returns true on success, false on failure.
  */
-bool FormMgrAdapter::UpdateProviderInfoToHost(const int64_t &matchedFormId, const int32_t &userId,
-    const sptr<IRemoteObject> &callerToken, const int32_t &formVisibleType, FormRecord &formRecord)
+bool FormMgrAdapter::isFormShouldUpdateProviderInfoToHost(const int64_t &matchedFormId, const int32_t &userId,
+    const sptr<IRemoteObject> &callerToken, FormRecord &formRecord)
 {
     if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, formRecord)) {
         HILOG_WARN("fail, not exist such form, formId:%{public}" PRId64 ".", matchedFormId);
@@ -2548,7 +2567,22 @@ bool FormMgrAdapter::UpdateProviderInfoToHost(const int64_t &matchedFormId, cons
         HILOG_WARN("fail, form is not belong to self, formId:%{public}" PRId64 ".", matchedFormId);
         return false;
     }
+    return true;
+}
 
+/**
+ * @brief Update provider info to host
+ *
+ * @param matchedFormId The Id of the form
+ * @param userId User ID.
+ * @param callerToken Caller ability token.
+ * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
+ * @param formRecord Form storage information
+ * @return Returns true on success, false on failure.
+ */
+bool FormMgrAdapter::UpdateProviderInfoToHost(const int64_t &matchedFormId, const int32_t &userId,
+    const sptr<IRemoteObject> &callerToken, const int32_t &formVisibleType, FormRecord &formRecord)
+{
     formRecord.formVisibleNotifyState = formVisibleType;
     formRecord.isNeedNotify = true;
     if (!FormDataMgr::GetInstance().UpdateFormRecord(matchedFormId, formRecord)) {
@@ -2571,6 +2605,8 @@ bool FormMgrAdapter::UpdateProviderInfoToHost(const int64_t &matchedFormId, cons
         } else {
             std::string cacheData;
             std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
+            FormHostRecord formHostRecord;
+            (void)FormDataMgr::GetInstance().GetMatchedHostClient(callerToken, formHostRecord);
             // If the form has business cache, refresh the form host.
             if (FormCacheMgr::GetInstance().GetData(matchedFormId, cacheData, imageDataMap)) {
                 formRecord.formProviderInfo.SetFormDataString(cacheData);

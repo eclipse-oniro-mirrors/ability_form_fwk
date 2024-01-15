@@ -120,6 +120,15 @@ public:
         const int32_t formVisibleType);
 
     /**
+     * @brief Padding the formInstances map for visibleNotify.
+     * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
+     * @param formId Form Id.
+     * @param formInstanceMaps formInstances for visibleNotify.
+     */
+    void PaddingNotifyVisibleFormsMap(const int32_t formVisibleType, int64_t formId,
+        std::map<std::string, std::vector<FormInstance>> &formInstanceMaps);
+
+    /**
      * @brief temp form to normal form.
      * @param formId The Id of the form.
      * @param callerToken Caller ability token.
@@ -796,9 +805,22 @@ private:
     bool GetBundleName(std::string &bundleName);
 
     /**
+     * @brief Check if the form should update information to the host.
+     *
+     * @param matchedFormId The Id of the form
+     * @param userId User ID.
+     * @param callerToken Caller ability token.
+     * @param formRecord Form storage information
+     * @return Returns true on success, false on failure.
+     */
+    bool isFormShouldUpdateProviderInfoToHost(const int64_t &matchedFormId, const int32_t &userId,
+        const sptr<IRemoteObject> &callerToken, FormRecord &formRecord);
+
+    /**
      * @brief Update provider info to host
      *
      * @param matchedFormId The Id of the form
+     * @param userId User ID.
      * @param callerToken Caller ability token.
      * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
      * @param formRecord Form storage information
