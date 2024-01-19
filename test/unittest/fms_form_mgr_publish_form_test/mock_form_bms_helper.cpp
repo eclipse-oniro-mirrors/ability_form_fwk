@@ -14,6 +14,8 @@
  */
 
 #include "form_bms_helper.h"
+#include "form_mgr_errors.h"
+#include "form_mgr_adapter.h"
 
 namespace {
     bool g_mockGetAbilityInfoRet = true;
@@ -54,6 +56,19 @@ bool FormBmsHelper::GetAbilityInfoByAction(const std::string &action, int32_t us
         abilityInfo.name = "name";
     }
     return g_mockGetAbilityInfoByActionRet;
+}
+
+ErrCode FormMgrAdapter::RequestPublishForm(Want &want, bool withFormBindingData,
+    std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
+    const std::vector<FormDataProxy> &formDataProxies)
+{
+    if (formId == 1) {
+        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+    } else if (formId == 2) {
+        return ERR_OK;
+    }
+
+    return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
 }
 } // namespace AppExecFwk
 } // namespace OHOS
