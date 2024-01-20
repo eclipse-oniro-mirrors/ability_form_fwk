@@ -58,12 +58,12 @@ HWTEST_F(FmsFormXMLParserTest, FmsFormXMLParserTest_Parse_001, TestSize.Level0)
     GTEST_LOG_(INFO) << "FmsFormXMLParserTest_Parse_001 start";
     FormXMLParser parser;
     int32_t ret = parser.Parse();
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    EXPECT_EQ(ret, ERR_OK);
     const std::map<std::string, int32_t> &configMap = parser.GetConfigMap();
-    EXPECT_TRUE(configMap.empty());
-    EXPECT_FALSE(configMap.find("maxNormalFormSize") != configMap.end());
-    EXPECT_FALSE(configMap.find("maxTempFormSize") != configMap.end());
-    EXPECT_FALSE(configMap.find("hostMaxFormSize") != configMap.end());
+    EXPECT_FALSE(configMap.empty());
+    EXPECT_TRUE(configMap.find("maxNormalFormSize") != configMap.end());
+    EXPECT_TRUE(configMap.find("maxTempFormSize") != configMap.end());
+    EXPECT_TRUE(configMap.find("hostMaxFormSize") != configMap.end());
     GTEST_LOG_(INFO) << "FmsFormXMLParserTest_Parse_001 end";
 }
 }
