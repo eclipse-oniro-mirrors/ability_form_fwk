@@ -714,8 +714,7 @@ ErrCode FormMgrService::CheckFormObserverPermission()
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
 
-    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_REQUIRE_FORM) &&
-        !FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_OBSERVE_FORM_RUNNING)) {
+    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_OBSERVE_FORM_RUNNING)) {
         HILOG_ERROR("verify calling permission failed!");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
