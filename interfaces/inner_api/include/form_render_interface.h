@@ -51,7 +51,8 @@ public:
      * @param callerToken Caller ability token.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual int32_t StopRenderingForm(const FormJsInfo &formJsInfo, const Want &want, const sptr<IRemoteObject> &callerToken) = 0;
+    virtual int32_t StopRenderingForm(const FormJsInfo &formJsInfo, const Want &want,
+        const sptr<IRemoteObject> &callerToken) = 0;
 
     /**
      * @brief When host is died, clean resources. This is async API.

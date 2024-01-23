@@ -78,7 +78,7 @@ int32_t RdbStoreDataCallBackFormInfoStorage::onCorruption(std::string databaseFi
 }
 
 FormRdbDataMgr::FormRdbDataMgr(const FormRdbConfig &formRdbConfig)
-    : formRdbConfig_(formRdbConfig) 
+    : formRdbConfig_(formRdbConfig)
 {
     HILOG_DEBUG("create form rdb data manager");
 }

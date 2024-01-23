@@ -56,8 +56,7 @@ ErrCode FormInfoRdbStorageMgr::LoadFormInfos(std::vector<std::pair<std::string, 
     }
 
     std::unordered_map<std::string, std::string> value;
-    ErrCode result;
-    result = rdbDataManager_->QueryData(FORM_INFO_PREFIX, value);
+    ErrCode result = rdbDataManager_->QueryData(FORM_INFO_PREFIX, value);
     if (result != ERR_OK) {
         HILOG_ERROR("get entries error");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -129,7 +128,7 @@ ErrCode FormInfoRdbStorageMgr::UpdateBundleFormInfos(const std::string &bundleNa
 
 bool FormInfoRdbStorageMgr::CheckRdbStore()
 {
-    if(rdbDataManager_ == nullptr) {
+    if (rdbDataManager_ == nullptr) {
         HILOG_ERROR("rdbDataManager is null");
         return false;
     }

@@ -3864,7 +3864,7 @@ HWTEST_F(FmsFormShareMgrTest, HandleProviderShareData_004, TestSize.Level1)
     wantParams.SetParam(keyStr, AAFwk::String::Box(valueString));
 
     bool testFlag = false;
-    auto hostCallback = [&testFlag](const int64_t requestCode, const int32_t result) { 
+    auto hostCallback = [&testFlag](const int64_t requestCode, const int32_t result) {
         if (result == ERR_APPEXECFWK_FORM_GET_INFO_FAILED) {
             testFlag = true;
         }
@@ -3907,7 +3907,7 @@ HWTEST_F(FmsFormShareMgrTest, HandleProviderShareData_005, TestSize.Level1)
     wantParams.SetParam(keyStr, AAFwk::String::Box(valueString));
 
     bool testFlag = false;
-    auto hostCallback = [&testFlag](const int64_t requestCode, const int32_t result) { 
+    auto hostCallback = [&testFlag](const int64_t requestCode, const int32_t result) {
         if (result == ERR_APPEXECFWK_FORM_COMMON_CODE) {
             testFlag = true;
         }

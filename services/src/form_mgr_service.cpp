@@ -1320,7 +1320,7 @@ std::string FormMgrService::GetCurrentDateTime()
     char buf[32];
     std::tm t2;
     localtime_r(&t1, &t2);
-    strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S.", &t2);
+    (void)strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S.", &t2);
     std::stringstream ss;
     ss << buf << std::setw(MILLISECOND_WIDTH) << std::setfill(MILLISECOND_FILLCHAR) << microPart;
     return ss.str();

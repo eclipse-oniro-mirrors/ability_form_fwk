@@ -140,7 +140,7 @@ void FormDataMgr::GetNoHostTempForms(
     }
     if (false == g_mockGetNoHostTempFormsTwo) {
         foundFormsMap.emplace(formId, false);
-    }                        
+    }
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

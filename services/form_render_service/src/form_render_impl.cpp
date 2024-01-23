@@ -100,7 +100,8 @@ int32_t FormRenderImpl::RenderForm(const FormJsInfo &formJsInfo, const Want &wan
     return result;
 }
 
-int32_t FormRenderImpl::StopRenderingForm(const FormJsInfo &formJsInfo, const Want &want, const sptr<IRemoteObject> &callerToken)
+int32_t FormRenderImpl::StopRenderingForm(const FormJsInfo &formJsInfo, const Want &want,
+    const sptr<IRemoteObject> &callerToken)
 {
     HILOG_INFO("%{public}s called.", __func__);
     sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
@@ -121,12 +122,12 @@ int32_t FormRenderImpl::StopRenderingForm(const FormJsInfo &formJsInfo, const Wa
         std::lock_guard<std::mutex> lock(renderRecordMutex_);
         auto search = renderRecordMap_.find(uid);
         if (search == renderRecordMap_.end()) {
-            HILOG_ERROR("%{public}s failed", __func__ );
+            HILOG_ERROR("%{public}s failed", __func__);
             return RENDER_FORM_FAILED;
         }
 
         if (!search->second) {
-            HILOG_ERROR("%{public}s failed", __func__ );
+            HILOG_ERROR("%{public}s failed", __func__);
             return RENDER_FORM_FAILED;
         }
 

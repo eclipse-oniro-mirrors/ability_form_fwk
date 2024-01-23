@@ -266,7 +266,7 @@ HWTEST_F(FmsFormHostClientTest, AddFormState_0400, TestSize.Level1)
     result = formHostClient->AddFormState(callback, want);
     EXPECT_TRUE(result);
     auto size = static_cast<int32_t>(formHostClient->formStateCallbackMap_.size());
-    EXPECT_EQ(size , 1);
+    EXPECT_EQ(size, 1);
     formHostClient->formStateCallbackMap_.clear();
     GTEST_LOG_(INFO) << "FmsFormHostClientTest AddFormState_0400 end";
 }
@@ -289,7 +289,7 @@ HWTEST_F(FmsFormHostClientTest, RemoveForm_0100, TestSize.Level1)
     std::shared_ptr<FormCallbackInterface> formCallback = nullptr;
     formHostClient->RemoveForm(formCallback, formId);
     auto size = static_cast<int32_t>(formHostClient->formCallbackMap_.size());
-    EXPECT_EQ(size , 1);
+    EXPECT_EQ(size, 1);
     formHostClient->formCallbackMap_.clear();
     GTEST_LOG_(INFO) << "FmsFormHostClientTest RemoveForm_0100 end";
 }
@@ -312,7 +312,7 @@ HWTEST_F(FmsFormHostClientTest, RemoveForm_0200, TestSize.Level1)
     formId = -1;
     formHostClient->RemoveForm(callback, formId);
     auto size = static_cast<int32_t>(formHostClient->formCallbackMap_.size());
-    EXPECT_EQ(size , 1);
+    EXPECT_EQ(size, 1);
     formHostClient->formCallbackMap_.clear();
     GTEST_LOG_(INFO) << "FmsFormHostClientTest RemoveForm_0200 end";
 }
@@ -335,7 +335,7 @@ HWTEST_F(FmsFormHostClientTest, RemoveForm_0300, TestSize.Level1)
     formId = 10;
     formHostClient->RemoveForm(callback, formId);
     auto size = static_cast<int32_t>(formHostClient->formCallbackMap_.size());
-    EXPECT_EQ(size , 1);
+    EXPECT_EQ(size, 1);
     formHostClient->formCallbackMap_.clear();
     GTEST_LOG_(INFO) << "FmsFormHostClientTest RemoveForm_0300 end";
 }
@@ -357,7 +357,7 @@ HWTEST_F(FmsFormHostClientTest, RemoveForm_0400, TestSize.Level1)
 
     formHostClient->RemoveForm(callback, formId);
     auto size = static_cast<int32_t>(formHostClient->formCallbackMap_.size());
-    EXPECT_EQ(size , 0);
+    EXPECT_EQ(size, 0);
     formHostClient->formCallbackMap_.clear();
     GTEST_LOG_(INFO) << "FmsFormHostClientTest RemoveForm_0400 end";
 }

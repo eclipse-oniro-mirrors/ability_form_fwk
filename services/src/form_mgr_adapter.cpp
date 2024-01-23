@@ -2628,13 +2628,15 @@ bool FormMgrAdapter::IsValidPublishEvent(const sptr<IBundleMgr> &iBundleMgr,
  * @param bundleName BundleName
  * @return Returns true if the ability have permission for keeping background running, false if not.
  */
-bool FormMgrAdapter::CheckKeepBackgroundRunningPermission(const sptr<IBundleMgr> &iBundleMgr, const std::string &bundleName)
+bool FormMgrAdapter::CheckKeepBackgroundRunningPermission(const sptr<IBundleMgr> &iBundleMgr,
+    const std::string &bundleName)
 {
     BundleInfo bundleInfo;
     if (FormBmsHelper::GetInstance().GetBundleInfoWithPermission(bundleName,
         FormUtil::GetCurrentAccountId(), bundleInfo)) {
         HILOG_DEBUG("%{public}s, get bundleInfo success", __func__);
-        auto item = find(bundleInfo.reqPermissions.begin(), bundleInfo.reqPermissions.end(), Constants::PERMISSION_KEEP_BACKGROUND_RUNNING);
+        auto item = find(bundleInfo.reqPermissions.begin(), bundleInfo.reqPermissions.end(),
+            Constants::PERMISSION_KEEP_BACKGROUND_RUNNING);
         if (item == bundleInfo.reqPermissions.end()) {
             return false;
         }

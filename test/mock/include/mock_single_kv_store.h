@@ -26,8 +26,7 @@
 
 namespace OHOS {
 
-class MockSingleKvStore : public DistributedKv::SingleKvStore
-{
+class MockSingleKvStore : public DistributedKv::SingleKvStore {
 public:
     MockSingleKvStore() {};
 

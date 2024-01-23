@@ -265,7 +265,8 @@ void FormRenderRecord::MarkThreadAlive()
     threadState_->ResetState();
 }
 
-int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const Want &want, const sptr<IRemoteObject> hostRemoteObj)
+int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const Want &want,
+    const sptr<IRemoteObject> hostRemoteObj)
 {
     HILOG_INFO("Updated record.");
     {

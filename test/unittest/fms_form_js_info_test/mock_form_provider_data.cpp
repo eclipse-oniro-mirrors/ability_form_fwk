@@ -26,9 +26,9 @@ int32_t Parcel::ReadInt32()
 
 bool Parcel::WriteInt32(int32_t value)
 {
-    if(value) {
+    if (value) {
         return false;
-    } else{
+    } else {
         return true;
     }
 }

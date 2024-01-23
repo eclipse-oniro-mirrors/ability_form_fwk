@@ -143,7 +143,7 @@ bool FormCacheMgr::InnerGetImageData(
             return false;
         }
 
-	    if (blob.size() <= 0) {
+        if (blob.size() <= 0) {
             HILOG_ERROR("GetImgCacheFromDb failed due to blob is empty.");
             return false;
         }

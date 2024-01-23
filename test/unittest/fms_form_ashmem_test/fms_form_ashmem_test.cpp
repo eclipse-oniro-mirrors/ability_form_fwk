@@ -69,7 +69,7 @@ HWTEST_F(FmsFormAshmemTest, FmsFormAshmemTest_001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormAshmemTest_001 start";
     Parcel parcel;
-    int32_t fd = -1; 
+    int32_t fd = -1;
     int32_t size = -1;
     form_ashmem_->ashmem_ = new (std::nothrow) Ashmem(fd, size);
     EXPECT_TRUE(form_ashmem_->ashmem_ != nullptr);
@@ -133,7 +133,7 @@ HWTEST_F(FmsFormAshmemTest, FmsFormAshmemTest_004, TestSize.Level1)
 HWTEST_F(FmsFormAshmemTest, FmsFormAshmemTest_005, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormAshmemTest_005 start";
-    int32_t fd = -1; 
+    int32_t fd = -1;
     int32_t size = -1;
     form_ashmem_->ashmem_ = new (std::nothrow) Ashmem(fd, size);
     form_ashmem_->GetAshmemSize();
@@ -150,7 +150,7 @@ HWTEST_F(FmsFormAshmemTest, FmsFormAshmemTest_005, TestSize.Level1)
 HWTEST_F(FmsFormAshmemTest, FmsFormAshmemTest_006, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormAshmemTest_006 start";
-    int32_t fd = -1; 
+    int32_t fd = -1;
     int32_t size = -1;
     form_ashmem_->ashmem_ = new (std::nothrow) Ashmem(fd, size);
     form_ashmem_->GetAshmemFd();
@@ -244,7 +244,7 @@ HWTEST_F(FmsFormAshmemTest, FmsFormAshmemTest_012, TestSize.Level1)
     std::string name = "abc";
     char data[] = "ab";
     int32_t size = 1;
-    int32_t fd = -1; 
+    int32_t fd = -1;
     form_ashmem_->ashmem_ = new (std::nothrow) Ashmem(fd, size);
     MockMapReadAndWriteAshmem(true);
     MockWriteToAshmem(false);
@@ -264,7 +264,7 @@ HWTEST_F(FmsFormAshmemTest, FmsFormAshmemTest_013, TestSize.Level1)
     std::string name = "abc";
     char data[] = "ab";
     int32_t size = 1;
-    int32_t fd = -1; 
+    int32_t fd = -1;
     form_ashmem_->ashmem_ = new (std::nothrow) Ashmem(fd, size);
     MockMapReadAndWriteAshmem(true);
     MockWriteToAshmem(true);

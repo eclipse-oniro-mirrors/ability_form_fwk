@@ -179,7 +179,8 @@ ErrCode FormInfoHelper::GetFormInfoDisplayName(std::shared_ptr<Global::Resource:
     return ERR_OK;
 }
 
-ErrCode FormInfoHelper::GetFormInfoDescription(std::shared_ptr<Global::Resource::ResourceManager> &resourceManager, FormInfo &formInfo)
+ErrCode FormInfoHelper::GetFormInfoDescription(std::shared_ptr<Global::Resource::ResourceManager> &resourceManager,
+    FormInfo &formInfo)
 {
     if (formInfo.descriptionId != 0) {
         std::string description;
