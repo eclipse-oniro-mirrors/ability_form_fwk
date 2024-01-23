@@ -1943,6 +1943,8 @@ ErrCode FormMgrAdapter::RequestPublishFormToHost(Want &want)
     wantToHost.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, dimensionId);
     bool tempFormFlag = want.GetBoolParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
     wantToHost.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, tempFormFlag);
+    std::string callerBundleName = want.GetStringParam(Constants::PARAM_CALLER_BUNDLE_NAME_KEY);
+    wantToHost.SetParam(Constants::PARAM_CALLER_BUNDLE_NAME_KEY, callerBundleName);
     int32_t userId = want.GetIntParam(Constants::PARAM_FORM_USER_ID, -1);
     std::string bundleName = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_BUNDLE_KEY);
     std::string abilityName = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_ABILITY_KEY);
