@@ -23,6 +23,7 @@
 #include "form_info_rdb_storage_mgr.h"
 #include "form_mgr_errors.h"
 #include "form_util.h"
+#include "hitrace_meter.h"
 #include "in_process_call_wrapper.h"
 #include "ipc_skeleton.h"
 #include "json_serializer.h"
@@ -37,6 +38,7 @@ const std::string FORM_METADATA_NAME = "ohos.extension.form";
 ErrCode FormInfoHelper::LoadFormConfigInfoByBundleName(const std::string &bundleName, std::vector<FormInfo> &formInfos,
     int32_t userId)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     if (bundleName.empty()) {
         HILOG_ERROR("bundleName is invalid");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -66,6 +68,7 @@ ErrCode FormInfoHelper::LoadFormConfigInfoByBundleName(const std::string &bundle
 
 ErrCode FormInfoHelper::LoadStageFormConfigInfo(const BundleInfo &bundleInfo, std::vector<FormInfo> &formInfos)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     std::shared_ptr<BundleMgrClient> client = DelayedSingleton<BundleMgrClient>::GetInstance();
     if (client == nullptr) {
         HILOG_ERROR("failed to get BundleMgrClient.");
@@ -147,6 +150,8 @@ ErrCode FormInfoHelper::LoadAbilityFormConfigInfo(const BundleInfo &bundleInfo, 
 }
 std::shared_ptr<Global::Resource::ResourceManager> FormInfoHelper::GetResourceManager(const BundleInfo &bundleInfo)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    HILOG_INFO("bundleInfo name is %{public}s", bundleInfo.name.c_str());
     std::shared_ptr<Global::Resource::ResourceManager> resourceManager(Global::Resource::CreateResourceManager());
     if (resourceManager == nullptr) {
         HILOG_ERROR("InitResourceManager failed");
@@ -725,6 +730,7 @@ bool FormInfoMgr::CheckBundlePermission()
 
 ErrCode FormInfoMgr::ReloadFormInfos(const int32_t userId)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     HILOG_INFO("ReloadFormInfos userId: %{public}d.", userId);
     sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
     if (iBundleMgr == nullptr) {
