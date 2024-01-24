@@ -29,7 +29,7 @@ namespace AppExecFwk {
  */
 class FormHostCaller {
 public:
-    FormHostCaller(const FormJsInfo &formJsInfo, const sptr<IRemoteObject> &callerToken) 
+    FormHostCaller(const FormJsInfo &formJsInfo, const sptr<IRemoteObject> &callerToken)
         : formJsInfo_(formJsInfo), callerToken_(callerToken) {}
     ~FormHostCaller() = default;
 

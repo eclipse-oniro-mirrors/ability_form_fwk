@@ -789,7 +789,7 @@ private:
             // Use original logic.
             // Use the error code to return whether the function executed successfully.
             auto ret = FormMgr::GetInstance().CheckFMSReady() ? 0 : 1;
-            if(ret == ERR_OK) {
+            if (ret == ERR_OK) {
                 task.ResolveWithNoError(env, CreateJsUndefined(env));
             } else {
                 task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
