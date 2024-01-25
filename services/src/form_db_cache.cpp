@@ -142,7 +142,7 @@ ErrCode FormDbCache::DeleteFormInfo(int64_t formId)
 ErrCode FormDbCache::DeleteFormInfoByBundleName(const std::string &bundleName, const int32_t userId,
     std::vector<FormDBInfo> &removedDBForms)
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("Called.");
     std::lock_guard<std::mutex> lock(formDBInfosMutex_);
     std::vector<FormDBInfo>::iterator itRecord;
     for (itRecord = formDBInfos_.begin(); itRecord != formDBInfos_.end();) {

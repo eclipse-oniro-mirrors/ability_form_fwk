@@ -31,7 +31,7 @@ namespace AppExecFwk {
 
 FormMgr::FormMgr()
 {
-    HILOG_INFO("called");
+    HILOG_DEBUG("called.");
 }
 
 FormMgr::~FormMgr()
@@ -171,7 +171,7 @@ int FormMgr::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> &caller
 int FormMgr::UpdateForm(const int64_t formId, const FormProviderData &formBindingData,
     const std::vector<FormDataProxy> &formDataProxies)
 {
-    HILOG_INFO("called");
+    HILOG_DEBUG("called.");
     if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
         HILOG_ERROR("UpdateForm failed, form is in recover status, can't do action on form.");
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
@@ -287,7 +287,7 @@ int FormMgr::NotifyWhetherVisibleForms(
     const sptr<IRemoteObject> &callerToken,
     const int32_t formVisibleType)
 {
-    HILOG_INFO("formVisibleType is %{public}d", formVisibleType);
+    HILOG_DEBUG("formVisibleType is %{public}d", formVisibleType);
 
     if (formIds.empty() || formIds.size() > Constants::MAX_VISIBLE_NOTIFY_LIST) {
         HILOG_ERROR("formIds is empty or exceed 32.");
@@ -339,7 +339,7 @@ int FormMgr::CastTempForm(const int64_t formId, const sptr<IRemoteObject> &calle
  */
 int FormMgr::DumpStorageFormInfos(std::string &formInfos)
 {
-    HILOG_INFO("called.");
+    HILOG_DEBUG("called.");
     int errCode = Connect();
     if (errCode != ERR_OK) {
         return errCode;
@@ -521,7 +521,7 @@ int FormMgr::LifecycleUpdate(
  */
 int FormMgr::GetRecoverStatus()
 {
-    HILOG_INFO("get recover status");
+    HILOG_DEBUG("get recover status");
     return recoverStatus_;
 }
 
@@ -647,7 +647,7 @@ void FormMgr::FormMgrDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &rem
  */
 bool FormMgr::Reconnect()
 {
-    HILOG_INFO("called.");
+    HILOG_DEBUG("called.");
     for (int i = 0; i < Constants::MAX_RETRY_TIME; i++) {
         // Sleep 1000 milliseconds before reconnect.
         std::this_thread::sleep_for(std::chrono::milliseconds(Constants::SLEEP_TIME));
@@ -711,7 +711,7 @@ ErrCode FormMgr::Connect()
  */
 void FormMgr::ResetProxy(const wptr<IRemoteObject> &remote)
 {
-    HILOG_INFO("called.");
+    HILOG_DEBUG("called.");
     std::lock_guard<std::mutex> lock(connectMutex_);
     if (remoteProxy_ == nullptr) {
         HILOG_ERROR("failed, remote proxy is nullptr.");
@@ -735,7 +735,7 @@ void FormMgr::ResetProxy(const wptr<IRemoteObject> &remote)
  */
 void FormMgr::SetFormMgrService(sptr<IFormMgr> formMgrService)
 {
-    HILOG_INFO("called");
+    HILOG_DEBUG("called.");
     std::lock_guard<std::mutex> lock(connectMutex_);
     remoteProxy_ = formMgrService;
 }
@@ -750,7 +750,7 @@ void FormMgr::SetFormMgrService(sptr<IFormMgr> formMgrService)
 int FormMgr::DeleteInvalidForms(const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &callerToken,
                                 int32_t &numFormsDeleted)
 {
-    HILOG_INFO("called");
+    HILOG_DEBUG("called.");
     if (GetRecoverStatus() == Constants::IN_RECOVERING) {
         HILOG_ERROR("form is in recover status, can't do action on form.");
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
@@ -776,7 +776,7 @@ int FormMgr::DeleteInvalidForms(const std::vector<int64_t> &formIds, const sptr<
  */
 int FormMgr::AcquireFormState(const Want &want, const sptr<IRemoteObject> &callerToken, FormStateInfo &stateInfo)
 {
-    HILOG_INFO("called");
+    HILOG_DEBUG("called.");
     if (GetRecoverStatus() == Constants::IN_RECOVERING) {
         HILOG_ERROR("form is in recover status, can't do action on form.");
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
@@ -803,7 +803,7 @@ int FormMgr::AcquireFormState(const Want &want, const sptr<IRemoteObject> &calle
 int FormMgr::NotifyFormsVisible(const std::vector<int64_t> &formIds, bool isVisible,
                                 const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("called");
+    HILOG_DEBUG("called.");
     if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
         HILOG_ERROR("form is in recover status, can't do action on form.");
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
@@ -824,7 +824,7 @@ int FormMgr::NotifyFormsVisible(const std::vector<int64_t> &formIds, bool isVisi
 int FormMgr::NotifyFormsPrivacyProtected(const std::vector<int64_t> &formIds, bool isProtected,
                                          const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("called");
+    HILOG_DEBUG("called.");
     if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
         HILOG_ERROR("form is in recover status, can't do action on form.");
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
@@ -852,7 +852,7 @@ int FormMgr::NotifyFormsPrivacyProtected(const std::vector<int64_t> &formIds, bo
 int FormMgr::NotifyFormsEnableUpdate(const std::vector<int64_t> &formIds, bool isEnableUpdate,
                                      const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("called");
+    HILOG_DEBUG("called.");
     if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
         HILOG_ERROR("form is in recover status, can't do action on form.");
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
@@ -877,7 +877,7 @@ int FormMgr::NotifyFormsEnableUpdate(const std::vector<int64_t> &formIds, bool i
  */
 int FormMgr::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
 {
-    HILOG_INFO("called");
+    HILOG_DEBUG("called.");
     if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
         HILOG_ERROR("form is in recover status, can't do action on form.");
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
@@ -963,7 +963,7 @@ int FormMgr::GetFormsInfoByModule(std::string &bundleName, std::string &moduleNa
 }
 int32_t FormMgr::GetFormsInfo(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos)
 {
-    HILOG_INFO("called");
+    HILOG_DEBUG("called.");
     int errCode = Connect();
     if (errCode != ERR_OK) {
         return errCode;
@@ -973,7 +973,7 @@ int32_t FormMgr::GetFormsInfo(const FormInfoFilter &filter, std::vector<FormInfo
 
 bool FormMgr::IsRequestPublishFormSupported()
 {
-    HILOG_INFO("called");
+    HILOG_DEBUG("called.");
     int errCode = Connect();
     if (errCode != ERR_OK) {
         return false;
@@ -983,7 +983,7 @@ bool FormMgr::IsRequestPublishFormSupported()
 
 int32_t FormMgr::StartAbility(const Want &want, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("called");
+    HILOG_DEBUG("called.");
     int32_t errCode = Connect();
     if (errCode != ERR_OK) {
         return errCode;
@@ -1015,7 +1015,7 @@ int32_t FormMgr::AcquireFormData(int64_t formId, int64_t requestCode, const sptr
 
 bool FormMgr::CheckFMSReady()
 {
-    HILOG_INFO("called");
+    HILOG_DEBUG("called.");
     int32_t errCode = Connect();
     if (errCode != ERR_OK) {
         return false;
@@ -1185,7 +1185,7 @@ int32_t FormMgr::GetHostFormsCount(std::string &bundleName, int32_t &formCount)
 ErrCode FormMgr::GetFormInstancesByFilter(const FormInstancesFilter &formInstancesFilter,
     std::vector<FormInstance> &formInstances)
 {
-    HILOG_INFO("called");
+    HILOG_DEBUG("called.");
     auto errCode = Connect();
     if (errCode != ERR_OK) {
         return errCode;
@@ -1248,7 +1248,7 @@ ErrCode FormMgr::RegisterRemoveObserver(const std::string &bundleName, const spt
 ErrCode FormMgr::RegisterClickEventObserver(
     const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer)
 {
-    HILOG_DEBUG("Called.");
+    HILOG_DEBUG("called.");
     if (observer == nullptr) {
         HILOG_ERROR("Caller token parameteris empty.");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -1267,7 +1267,7 @@ ErrCode FormMgr::RegisterClickEventObserver(
 ErrCode FormMgr::UnregisterClickEventObserver(
     const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer)
 {
-    HILOG_DEBUG("Called.");
+    HILOG_DEBUG("called.");
     if (observer == nullptr) {
         HILOG_ERROR("Caller token parameteris empty.");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -1285,7 +1285,7 @@ ErrCode FormMgr::UnregisterClickEventObserver(
 
 int FormMgr::RegisterFormRouterProxy(const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("Called.");
+    HILOG_DEBUG("called.");
     if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
         HILOG_ERROR("Error, form is in recover status, can't do action on form.");
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
@@ -1299,7 +1299,7 @@ int FormMgr::RegisterFormRouterProxy(const std::vector<int64_t> &formIds, const 
 
 int FormMgr::UnregisterFormRouterProxy(const std::vector<int64_t> &formIds)
 {
-    HILOG_DEBUG("Called.");
+    HILOG_DEBUG("called.");
     if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
         HILOG_ERROR("Error, form is in recover status, can't do action on form.");
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;

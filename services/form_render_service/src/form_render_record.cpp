@@ -302,7 +302,7 @@ void FormRenderRecord::MarkThreadAlive()
 int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const Want &want,
     const sptr<IRemoteObject> hostRemoteObj)
 {
-    HILOG_INFO("Updated record.");
+    HILOG_DEBUG("Updated record.");
     {
         // Some resources need to be initialized in a JS thread
         std::lock_guard<std::mutex> lock(eventHandlerMutex_);
@@ -519,7 +519,7 @@ std::shared_ptr<Ace::FormRendererGroup> FormRenderRecord::CreateFormRendererGrou
 
 void FormRenderRecord::HandleUpdateInJsThread(const FormJsInfo &formJsInfo, const Want &want)
 {
-    HILOG_INFO("Update record in js thread.");
+    HILOG_DEBUG("Update record in js thread.");
     bool ret = BeforeHandleUpdateForm(formJsInfo);
     if (!ret) {
         HILOG_ERROR("Handle Update Form prepare failed");
@@ -536,14 +536,14 @@ bool FormRenderRecord::BeforeHandleUpdateForm(const FormJsInfo &formJsInfo)
         HILOG_ERROR("Create runtime failed.");
         return false;
     }
-    HILOG_INFO("BeforeHandleUpdateForm end");
+    HILOG_DEBUG("BeforeHandleUpdateForm end");
     return true;
 }
 
 void FormRenderRecord::HandleUpdateForm(const FormJsInfo &formJsInfo, const Want &want)
 {
     auto renderType = want.GetIntParam(Constants::FORM_RENDER_TYPE_KEY, Constants::RENDER_FORM);
-    HILOG_INFO("renderType is %{public}d.", renderType);
+    HILOG_DEBUG("renderType is %{public}d.", renderType);
     if (renderType == Constants::RENDER_FORM) {
         AddRenderer(formJsInfo, want);
         AddFormRequest(formJsInfo, want);

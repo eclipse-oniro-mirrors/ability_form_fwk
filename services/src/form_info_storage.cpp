@@ -35,7 +35,7 @@ FormInfoStorage::FormInfoStorage(int32_t userId, const std::vector<AppExecFwk::F
 
 void FormInfoStorage::GetAllFormsInfo(int32_t userId, std::vector<AppExecFwk::FormInfo> &formInfos) const
 {
-    HILOG_INFO("Get all forms infos, current userId is%{public}d, this userId is %{public}d.", userId, this->userId);
+    HILOG_DEBUG("Get all forms infos, current userId is%{public}d, this userId is %{public}d.", userId, this->userId);
     if (this->userId != userId && this->userId != AppExecFwk::Constants::DEFAULT_USERID) {
         return;
     }

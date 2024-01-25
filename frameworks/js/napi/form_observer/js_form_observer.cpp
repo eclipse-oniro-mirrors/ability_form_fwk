@@ -50,7 +50,7 @@ public:
 
     static void Finalizer(napi_env env, void *data, void *hint)
     {
-        HILOG_DEBUG("Called.");
+        HILOG_DEBUG("called.");
         std::unique_ptr<JsFormObserver>(static_cast<JsFormObserver*>(data));
     }
 
@@ -197,7 +197,7 @@ private:
 
     napi_value OnRegisterFormObserver(napi_env env, size_t argc, napi_value *argv)
     {
-        HILOG_DEBUG("Called.");
+        HILOG_DEBUG("called.");
         if (!CheckCallerIsSystemApp()) {
             HILOG_ERROR("This app is not system-app, can not use system-api.");
             NapiFormUtil::ThrowByExternalErrorCode(env, AppExecFwk::ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
@@ -470,7 +470,7 @@ private:
 
     napi_value OnUnregisterFormObserver(napi_env env, size_t argc, napi_value *argv)
     {
-        HILOG_DEBUG("Called.");
+        HILOG_DEBUG("called.");
         if (!CheckCallerIsSystemApp()) {
             HILOG_ERROR("This application is not system-app, can not use system-api.");
             NapiFormUtil::ThrowByExternalErrorCode(env, AppExecFwk::ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
@@ -508,7 +508,7 @@ private:
     bool ParseGetRunningFormInfosOneParam(const napi_env &env, const napi_value *argv, std::string &bundleName,
         bool &hasBundleName, bool &isUnusedIncluded)
     {
-        HILOG_DEBUG("Called.");
+        HILOG_DEBUG("called.");
         if (AppExecFwk::IsTypeForNapiValue(env, argv[PARAM0], napi_string)) {
             if (!ConvertFromJsValue(env, argv[PARAM0], bundleName)) {
                 HILOG_ERROR("Convert bundleName failed.");
@@ -533,7 +533,7 @@ private:
     bool ParseGetRunningFormInfosParams(const napi_env &env, const napi_value *argv, std::string &bundleName,
         bool &isUnusedIncluded, int startPos)
     {
-        HILOG_DEBUG("Called.");
+        HILOG_DEBUG("called.");
         if (!ConvertFromJsValue(env, argv[startPos], isUnusedIncluded)) {
             HILOG_ERROR("Convert isUnusedIncluded failed.");
             NapiFormUtil::ThrowParamTypeError(env, "isUnusedIncluded", "bool");
@@ -550,7 +550,7 @@ private:
     bool ParseGetRunningFormInfosTwoParams(const napi_env &env, const napi_value *argv, std::string &bundleName,
         bool &hasBundleName, bool &isUnusedIncluded)
     {
-        HILOG_DEBUG("Called.");
+        HILOG_DEBUG("called.");
         if (AppExecFwk::IsTypeForNapiValue(env, argv[PARAM0], napi_function)) {
             if (AppExecFwk::IsTypeForNapiValue(env, argv[PARAM1], napi_string)) {
                 if (!ConvertFromJsValue(env, argv[PARAM1], bundleName)) {
@@ -725,7 +725,7 @@ private:
     napi_value OnRegisterClickEventCallback(
         napi_env env, size_t argc, napi_value *argv, const std::string &type)
     {
-        HILOG_DEBUG("Called.");
+        HILOG_DEBUG("called.");
         if (argc < ARGS_TWO) {
             HILOG_ERROR("Wrong number of params.");
             NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "2");
@@ -761,7 +761,7 @@ private:
     napi_value OnUnregisterClickEventCallback(
         napi_env env, size_t argc, napi_value *argv, const std::string &type)
     {
-        HILOG_DEBUG("Called.");
+        HILOG_DEBUG("called.");
         std::string bundleName(EMPTY_BUNDLE);
         napi_value callback = nullptr;
         if (argc < ARGS_ONE) {
@@ -812,7 +812,7 @@ private:
 
 napi_value JsFormObserverInit(napi_env env, napi_value exportObj)
 {
-    HILOG_DEBUG("Called.");
+    HILOG_DEBUG("called.");
     std::unique_ptr<JsFormObserver> jsFormObserver = std::make_unique<JsFormObserver>();
     napi_wrap(env, exportObj, jsFormObserver.release(), JsFormObserver::Finalizer, nullptr, nullptr);
 

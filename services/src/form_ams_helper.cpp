@@ -68,7 +68,7 @@ sptr<AAFwk::IAbilityManager> FormAmsHelper::GetAbilityManager()
 ErrCode FormAmsHelper::ConnectServiceAbility(
     const Want &want, const sptr<AAFwk::IAbilityConnection> &connect)
 {
-    HILOG_INFO("connect service ability");
+    HILOG_DEBUG("connect service ability");
     sptr<AAFwk::IAbilityManager> ams = GetAbilityManager();
     if (ams == nullptr) {
         HILOG_ERROR("ability service not connect");

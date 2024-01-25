@@ -497,7 +497,7 @@ int32_t JsFormStateObserver::NotifyWhetherFormsVisible(const AppExecFwk::FormVis
 ErrCode JsFormStateObserver::OnFormClickEvent(
     const std::string &bundleName, const std::string &callType, const AppExecFwk::RunningFormInfo &runningFormInfo)
 {
-    HILOG_INFO("Called.");
+    HILOG_DEBUG("called.");
     if (callType.empty()) {
         HILOG_ERROR("Calltype is empty.");
         return ERR_INVALID_VALUE;
@@ -540,7 +540,7 @@ ErrCode JsFormStateObserver::OnFormClickEvent(
 ErrCode JsFormStateObserver::RegisterClickEventCallback(
     const napi_env env, const std::string &bundleName, const napi_value callback, const std::string &type)
 {
-    HILOG_DEBUG("Called.");
+    HILOG_DEBUG("called.");
     auto record = std::make_shared<FormEventCallbackList>(bundleName, type, env);
     if (record == nullptr) {
         HILOG_ERROR("New obj error");
