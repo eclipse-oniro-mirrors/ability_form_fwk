@@ -135,12 +135,12 @@ bool FormJsInfo::Marshalling(Parcel &parcel) const
 
 bool FormJsInfo::WriteImageData(Parcel &parcel) const
 {
-    HILOG_INFO("%{public}s called", __func__);
+    HILOG_DEBUG("%{public}s called", __func__);
     auto imageDateState = formProviderData.GetImageDataState();
     if (!parcel.WriteInt32(imageDateState)) {
         return false;
     }
-    HILOG_INFO("%{public}s imageDateState is %{public}d", __func__, imageDateState);
+    HILOG_DEBUG("%{public}s imageDateState is %{public}d", __func__, imageDateState);
     switch (imageDateState) {
         case FormProviderData::IMAGE_DATA_STATE_ADDED: {
             auto sharedImageMap = formProviderData.GetImageDataMap();
@@ -167,19 +167,19 @@ bool FormJsInfo::WriteImageData(Parcel &parcel) const
         case FormProviderData::IMAGE_DATA_STATE_REMOVED:
             break;
         default: {
-            HILOG_INFO("%{public}s unexpected imageDateState %{public}d", __func__, imageDateState);
+            HILOG_WARN("%{public}s unexpected imageDateState %{public}d", __func__, imageDateState);
             break;
         }
     }
-    HILOG_INFO("%{public}s end", __func__);
+    HILOG_DEBUG("%{public}s end", __func__);
     return true;
 }
 
 void FormJsInfo::ReadImageData(Parcel &parcel)
 {
-    HILOG_INFO("%{public}s called", __func__);
+    HILOG_DEBUG("%{public}s called", __func__);
     auto imageDateState = parcel.ReadInt32();
-    HILOG_INFO("%{public}s imageDateState is %{public}d", __func__, imageDateState);
+    HILOG_DEBUG("%{public}s imageDateState is %{public}d", __func__, imageDateState);
     switch (imageDateState) {
         case FormProviderData::IMAGE_DATA_STATE_ADDED: {
             auto size = parcel.ReadInt32();
@@ -209,7 +209,7 @@ void FormJsInfo::ReadImageData(Parcel &parcel)
             break;
         }
     }
-    HILOG_INFO("%{public}s end", __func__);
+    HILOG_DEBUG("%{public}s end", __func__);
     return;
 }
 

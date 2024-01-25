@@ -164,7 +164,7 @@ void FormDataProxyRecord::OnRdbDataChange(const DataShare::RdbChangeNode &change
 
 void FormDataProxyRecord::OnPublishedDataChange(const DataShare::PublishedDataChangeNode &changeNode)
 {
-    HILOG_INFO("on published data change. data size is %{public}zu", changeNode.datas_.size());
+    HILOG_DEBUG("on published data change. data size is %{public}zu", changeNode.datas_.size());
     UpdatePublishedDataForm(changeNode.datas_);
 }
 

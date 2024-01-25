@@ -160,7 +160,7 @@ std::shared_ptr<Global::Resource::ResourceManager> FormInfoHelper::GetResourceMa
     for (auto hapModuleInfo : bundleInfo.hapModuleInfos) {
         std::string moduleResPath = hapModuleInfo.hapPath.empty() ? hapModuleInfo.resourcePath : hapModuleInfo.hapPath;
         if (!moduleResPath.empty()) {
-            HILOG_INFO("DistributedBms::InitResourceManager, moduleResPath: %{private}s", moduleResPath.c_str());
+            HILOG_DEBUG("DistributedBms::InitResourceManager, moduleResPath: %{private}s", moduleResPath.c_str());
             if (!resourceManager->AddResource(moduleResPath.c_str())) {
                 HILOG_ERROR("DistributedBms::InitResourceManager AddResource failed");
             }
@@ -220,7 +220,7 @@ ErrCode BundleFormInfo::InitFromJson(const std::string &formInfoStoragesJson)
 
 ErrCode BundleFormInfo::UpdateStaticFormInfos(int32_t userId)
 {
-    HILOG_INFO("Update static form infos, userId is %{public}d.", userId);
+    HILOG_DEBUG("Update static form infos, userId is %{public}d.", userId);
     std::vector<FormInfo> formInfos;
     ErrCode errCode = FormInfoHelper::LoadFormConfigInfoByBundleName(bundleName_, formInfos, userId);
     if (errCode != ERR_OK) {
@@ -353,7 +353,7 @@ bool BundleFormInfo::Empty() const
 
 ErrCode BundleFormInfo::GetAllFormsInfo(std::vector<FormInfo> &formInfos, int32_t userId)
 {
-    HILOG_INFO("%{public}s begin.",  __func__);
+    HILOG_DEBUG("%{public}s begin.",  __func__);
     std::shared_lock<std::shared_timed_mutex> guard(formInfosMutex_);
     userId = (userId == Constants::INVALID_USER_ID) ? FormUtil::GetCurrentAccountId() : userId;
     for (const auto &item : formInfoStorages_) {

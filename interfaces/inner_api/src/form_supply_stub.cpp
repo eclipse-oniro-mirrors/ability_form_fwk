@@ -61,7 +61,7 @@ FormSupplyStub::~FormSupplyStub()
  */
 int FormSupplyStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    HILOG_INFO("FormSupplyStub::OnReceived, code = %{public}u, flags= %{public}d.", code, option.GetFlags());
+    HILOG_DEBUG("FormSupplyStub::OnReceived, code = %{public}u, flags= %{public}d.", code, option.GetFlags());
     std::u16string descriptor = FormSupplyStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
     if (descriptor != remoteDescriptor) {

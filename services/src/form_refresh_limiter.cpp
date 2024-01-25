@@ -76,7 +76,7 @@ void FormRefreshLimiter::ResetLimit()
  */
 bool FormRefreshLimiter::IsEnableRefresh(const int64_t formId)
 {
-    HILOG_INFO("%{public}s start", __func__);
+    HILOG_DEBUG("%{public}s start", __func__);
     bool isEnable = false;
     std::lock_guard<std::mutex> lock(limiterMutex_);
     auto info = limiterMap_.find(formId);
@@ -90,7 +90,7 @@ bool FormRefreshLimiter::IsEnableRefresh(const int64_t formId)
             HILOG_INFO("report refresh to 50 count, formId:%{public}" PRId64 "", formId);
         }
     }
-    HILOG_INFO("%{public}s end", __func__);
+    HILOG_DEBUG("%{public}s end", __func__);
     return isEnable;
 }
 /**

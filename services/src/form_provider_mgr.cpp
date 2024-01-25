@@ -139,7 +139,7 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
     bool screenOnFlag = PowerMgr::PowerMgrClient::GetInstance().IsScreenOn();
     if (!screenOnFlag) {
         FormDataMgr::GetInstance().SetNeedRefresh(formId, true);
-        HILOG_ERROR("%{public}s fail, screen off, set refresh flag, do not refresh now", __func__);
+        HILOG_DEBUG("%{public}s fail, screen off, set refresh flag, do not refresh now", __func__);
         return ERR_OK;
     }
 #endif

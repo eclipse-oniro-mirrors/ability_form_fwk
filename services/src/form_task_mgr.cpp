@@ -769,7 +769,7 @@ void FormTaskMgr::AcquireFormDataBack(const AAFwk::WantParams &wantParams,
  */
 FormJsInfo FormTaskMgr::CreateFormJsInfo(const int64_t formId, const FormRecord &record)
 {
-    HILOG_INFO("create formJsInfo");
+    HILOG_DEBUG("create formJsInfo");
     FormJsInfo form;
     form.formId = formId;
     form.bundleName = record.bundleName;
@@ -804,7 +804,7 @@ void FormTaskMgr::FormShareSendResponse(int64_t formShareRequestCode, int32_t re
 void FormTaskMgr::PostRenderForm(const FormRecord &formRecord, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("PostRenderForm");
+    HILOG_DEBUG("PostRenderForm");
     if (serialQueue_ == nullptr) {
         HILOG_ERROR("serialQueue_ is nullptr.");
         return;
@@ -814,12 +814,12 @@ void FormTaskMgr::PostRenderForm(const FormRecord &formRecord, const Want &want,
         FormTaskMgr::GetInstance().RenderForm(formRecord, want, remoteObject);
     };
     serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, renderForm);
-    HILOG_INFO("%{public}s end", __func__);
+    HILOG_DEBUG("%{public}s end", __func__);
 }
 
 void FormTaskMgr::RenderForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("render form");
+    HILOG_DEBUG("render form");
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormRender> remoteFormRender = iface_cast<IFormRender>(remoteObject);
     if (remoteFormRender == nullptr) {
@@ -836,7 +836,7 @@ void FormTaskMgr::RenderForm(const FormRecord &formRecord, const Want &want, con
         return;
     }
 
-    HILOG_INFO("%{public}s end", __func__);
+    HILOG_DEBUG("%{public}s end", __func__);
 }
 
 void FormTaskMgr::PostStopRenderingForm(
