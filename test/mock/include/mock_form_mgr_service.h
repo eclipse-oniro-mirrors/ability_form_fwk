@@ -84,7 +84,8 @@ public:
     MOCK_METHOD2(RegisterFormRemoveObserverByBundle, ErrCode(const std::string bundleName,
         const sptr<IRemoteObject> &callerToken));
     MOCK_METHOD2(RegisterAddObserver, ErrCode(const std::string &bundleName, const sptr<IRemoteObject> &callerToken));
-    MOCK_METHOD2(RegisterRemoveObserver, ErrCode(const std::string &bundleName, const sptr<IRemoteObject> &callerToken));
+    MOCK_METHOD2(RegisterRemoveObserver, ErrCode(const std::string &bundleName,
+        const sptr<IRemoteObject> &callerToken));
     MOCK_METHOD3(UpdateProxyForm, ErrCode(const int64_t formId, const FormProviderData &formProviderData,
         const std::vector<FormDataProxy> &formDataProxies));
     MOCK_METHOD5(RequestPublishProxyForm, ErrCode(Want &want, bool withFormBindingData,

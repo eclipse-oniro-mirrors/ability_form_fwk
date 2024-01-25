@@ -45,16 +45,18 @@ public:
         const sptr<IRemoteObject> &callerToken));
     MOCK_METHOD1(GetAllFormsInfo, int(std::vector<FormInfo> &formInfos));
     MOCK_METHOD2(GetFormsInfoByApp, int(std::string &bundleName, std::vector<FormInfo> &formInfos));
-    MOCK_METHOD3(GetFormsInfoByModule, int(std::string &bundleName, std::string &moduleName, std::vector<FormInfo> &formInfos));
+    MOCK_METHOD3(GetFormsInfoByModule, int(std::string &bundleName, std::string &moduleName,
+        std::vector<FormInfo> &formInfos));
     MOCK_METHOD2(DumpFormInfoByBundleName, int(const std::string &bundleName, std::string &formInfos));
-    MOCK_METHOD3(AcquireFormState, int(const Want &want, const sptr<IRemoteObject> &callerToken, FormStateInfo &stateInfo));
+    MOCK_METHOD3(AcquireFormState, int(const Want &want, const sptr<IRemoteObject> &callerToken,
+        FormStateInfo &stateInfo));
     MOCK_METHOD0(CheckFMSReady, bool());
-    MOCK_METHOD3(NotifyWhetherVisibleForms, int(const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &callerToken,
-        const int32_t formVisibleType));
+    MOCK_METHOD3(NotifyWhetherVisibleForms, int(const std::vector<int64_t> &formIds,
+        const sptr<IRemoteObject> &callerToken, const int32_t formVisibleType));
     MOCK_METHOD2(CastTempForm, int(const int64_t formId, const sptr<IRemoteObject> &callerToken));
     MOCK_METHOD0(Reconnect, bool());
-    MOCK_METHOD4(ShareForm, int(int64_t formId, const std::string &remoteDeviceId, const sptr<IRemoteObject> &callerToken,
-    int64_t requestCode));
+    MOCK_METHOD4(ShareForm, int(int64_t formId, const std::string &remoteDeviceId,
+        const sptr<IRemoteObject> &callerToken, int64_t requestCode));
     MOCK_METHOD2(DeleteForm, int(const int64_t formId, const sptr<IRemoteObject> &callerToken));
     MOCK_METHOD3(ReleaseForm, int(const int64_t formId, const sptr<IRemoteObject> &callerToken, const bool delCache));
     MOCK_METHOD2(SetBackgroundFunction, int32_t(const std::string funcName, const std::string params));

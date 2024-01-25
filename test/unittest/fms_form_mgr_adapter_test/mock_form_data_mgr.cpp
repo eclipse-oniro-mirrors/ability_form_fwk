@@ -276,7 +276,6 @@ int64_t FormDataMgr::GenerateFormId()
         return -1;
     }
     return 1;
-    
 }
 
 ErrCode FormDataMgr::GetRequestPublishFormInfo(int64_t formId, Want &want,

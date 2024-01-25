@@ -84,8 +84,7 @@ private:
     std::shared_ptr<AppExecFwk::EventHandler> handler_;
 };
 
-class FormUninstallCallbackClient : public std::enable_shared_from_this<FormUninstallCallbackClient>
-{
+class FormUninstallCallbackClient : public std::enable_shared_from_this<FormUninstallCallbackClient> {
 public:
     FormUninstallCallbackClient(napi_env env, napi_ref callbackRef) : callbackRef_(callbackRef), env_(env)
     {
@@ -448,7 +447,7 @@ private:
             return false;
         }
 
-        for(size_t i = 0; i < strFormIdList.size(); i++) {
+        for (size_t i = 0; i < strFormIdList.size(); i++) {
             int64_t formIdValue;
             if (!ConvertStringToInt64(strFormIdList[i], formIdValue)) {
                 HILOG_ERROR("convert formIdValue failed!");
@@ -790,7 +789,7 @@ private:
             // Use original logic.
             // Use the error code to return whether the function executed successfully.
             auto ret = FormMgr::GetInstance().CheckFMSReady() ? 0 : 1;
-            if( ret == ERR_OK ) {
+            if (ret == ERR_OK) {
                 task.ResolveWithNoError(env, CreateJsUndefined(env));
             } else {
                 task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));

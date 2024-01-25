@@ -221,7 +221,6 @@ HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_007, TestSize.Level0)
 
     EXPECT_EQ(jsonData_, result);
     GTEST_LOG_(INFO) << "FmsFormProviderDataTest_007 end";
-
 }
 
 /**

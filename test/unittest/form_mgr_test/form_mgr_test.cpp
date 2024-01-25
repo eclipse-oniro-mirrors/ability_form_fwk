@@ -1694,7 +1694,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0084, TestSize.Level1) {
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0085, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrTest_0085 starts";
-    EXPECT_CALL(*mockProxy, ShareForm(_, _, _,_))
+    EXPECT_CALL(*mockProxy, ShareForm(_, _, _, _))
         .Times(1)
         .WillOnce(Return(OHOS::ERR_OK));
     int64_t formId = 0;

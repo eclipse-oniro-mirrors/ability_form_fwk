@@ -99,7 +99,8 @@ private:
     void FormRenderGC(const std::string &uid);
 
     std::mutex renderRecordMutex_;
-    std::unordered_map<std::string, std::shared_ptr<FormRenderRecord>> renderRecordMap_; // <uid(userId + bundleName), renderRecord>
+    // <uid(userId + bundleName), renderRecord>
+    std::unordered_map<std::string, std::shared_ptr<FormRenderRecord>> renderRecordMap_;
     std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration_;
     std::mutex formSupplyMutex_;
     sptr<IFormSupply> formSupplyClient_;
