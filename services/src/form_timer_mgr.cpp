@@ -896,7 +896,7 @@ bool FormTimerMgr::UpdateAtTimerAlarm()
 
     auto timerOption = std::make_shared<FormTimerOption>();
     int32_t flag = ((unsigned int)(timerOption->TIMER_TYPE_REALTIME))
-      | ((unsigned int)(timerOption->TIMER_TYPE_WAKEUP)) | ((unsigned int)(timerOption->TIMER_TYPE_EXACT));
+      | ((unsigned int)(timerOption->TIMER_TYPE_EXACT));
     HILOG_DEBUG("timerOption type is %{public}d", flag);
     timerOption->SetType(flag);
     timerOption->SetRepeat(false);
@@ -1016,7 +1016,7 @@ bool FormTimerMgr::UpdateLimiterAlarm()
     int64_t limiterWakeUpTime = FormUtil::GetMillisecondFromTm(tmAtTime);
 
     auto timerOption = std::make_shared<FormTimerOption>();
-    timerOption->SetType(timerOption->TIMER_TYPE_WAKEUP);
+    timerOption->SetType(timerOption->TIMER_TYPE_EXACT);
     timerOption->SetRepeat(false);
     timerOption->SetInterval(0);
     std::shared_ptr<WantAgent> wantAgent = GetLimiterWantAgent();
@@ -1102,7 +1102,7 @@ bool FormTimerMgr::UpdateDynamicAlarm()
     auto firstTask = dynamicRefreshTasks_.begin();
     auto timerOption = std::make_shared<FormTimerOption>();
     timerOption->SetType(((unsigned int)(timerOption->TIMER_TYPE_REALTIME))
-     | ((unsigned int)(timerOption->TIMER_TYPE_WAKEUP)));
+     | ((unsigned int)(timerOption->TIMER_TYPE_EXACT)));
     timerOption->SetRepeat(false);
     timerOption->SetInterval(0);
     std::shared_ptr<WantAgent> wantAgent = GetDynamicWantAgent(dynamicWakeUpTime_, firstTask->userId);
@@ -1235,7 +1235,7 @@ void FormTimerMgr::EnsureInitIntervalTimer()
     // 1. Create Timer Option
     auto timerOption = std::make_shared<FormTimerOption>();
     int32_t flag = ((unsigned int)(timerOption->TIMER_TYPE_REALTIME))
-      | ((unsigned int)(timerOption->TIMER_TYPE_WAKEUP)) | ((unsigned int)(timerOption->TIMER_TYPE_EXACT));
+      | ((unsigned int)(timerOption->TIMER_TYPE_EXACT));
     timerOption->SetType(flag);
     timerOption->SetRepeat(true);
     int64_t interval = Constants::MIN_PERIOD / timeSpeed_;
