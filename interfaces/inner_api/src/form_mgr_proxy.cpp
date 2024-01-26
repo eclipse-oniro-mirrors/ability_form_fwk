@@ -709,7 +709,7 @@ int  FormMgrProxy::GetParcelableInfos(MessageParcel &reply, std::vector<T> &parc
         }
         parcelableInfos.emplace_back(*info);
     }
-    HILOG_INFO("get parcelable infos success");
+    HILOG_DEBUG("get parcelable infos success");
     return ERR_OK;
 }
 bool FormMgrProxy::WriteInterfaceToken(MessageParcel &data)
@@ -753,7 +753,7 @@ int FormMgrProxy::GetStringInfo(IFormMgr::Message code, MessageParcel &data, std
 }
 int FormMgrProxy::GetFormsInfo(IFormMgr::Message code, MessageParcel &data, std::vector<FormInfo> &formInfos)
 {
-    HILOG_INFO("GetFormsInfo start");
+    HILOG_DEBUG("GetFormsInfo start");
     int error;
     MessageParcel reply;
     MessageOption option(MessageOption::TF_SYNC);
@@ -1385,7 +1385,7 @@ int32_t FormMgrProxy::RecvFormShareInfoFromRemote(const FormShareInfo &info)
 
 bool FormMgrProxy::CheckFMSReady()
 {
-    HILOG_INFO("%{public}s start.", __func__);
+    HILOG_DEBUG("%{public}s start.", __func__);
     MessageParcel data;
     // write in token to help identify which stub to be called
     if (!WriteInterfaceToken(data)) {
@@ -1700,7 +1700,7 @@ ErrCode FormMgrProxy::RegisterRemoveObserver(const std::string &bundleName, cons
 ErrCode FormMgrProxy::RegisterFormRouterProxy(const std::vector<int64_t> &formIds,
     const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("Called.");
+    HILOG_DEBUG("Called.");
     MessageParcel data;
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("Failed to write interface token.");
@@ -1727,7 +1727,7 @@ ErrCode FormMgrProxy::RegisterFormRouterProxy(const std::vector<int64_t> &formId
 
 ErrCode FormMgrProxy::UnregisterFormRouterProxy(const std::vector<int64_t> &formIds)
 {
-    HILOG_INFO("Called.");
+    HILOG_DEBUG("Called.");
     MessageParcel data;
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("Failed to write interface token.");

@@ -145,7 +145,7 @@ int FormSupplyCallback::OnAcquireStateResult(FormState state,
 
 int FormSupplyCallback::OnAcquireDataResult(const AAFwk::WantParams &wantParams, int64_t requestCode)
 {
-    HILOG_INFO("called.");
+    HILOG_DEBUG("called.");
     ErrCode errCode = FormProviderMgr::GetInstance().AcquireFormDataBack(wantParams, requestCode);
     HILOG_INFO("end, errCode:%{public}d.", errCode);
     return errCode;
@@ -157,7 +157,7 @@ int FormSupplyCallback::OnAcquireDataResult(const AAFwk::WantParams &wantParams,
  */
 void FormSupplyCallback::AddConnection(sptr<FormAbilityConnection> connection)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_DEBUG("%{public}s called.", __func__);
     if (connection == nullptr) {
         return;
     }
@@ -168,7 +168,7 @@ void FormSupplyCallback::AddConnection(sptr<FormAbilityConnection> connection)
     }
     connection->SetConnectId(connectKey);
     connections_.emplace(connectKey, connection);
-    HILOG_INFO("%{public}s end.", __func__);
+    HILOG_DEBUG("%{public}s end.", __func__);
 }
 
 /**
@@ -177,7 +177,7 @@ void FormSupplyCallback::AddConnection(sptr<FormAbilityConnection> connection)
  */
 void FormSupplyCallback::RemoveConnection(int32_t connectId)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_DEBUG("%{public}s called.", __func__);
     sptr<FormAbilityConnection> connection = nullptr;
     {
         std::lock_guard<std::mutex> lock(conMutex_);
@@ -197,7 +197,7 @@ void FormSupplyCallback::RemoveConnection(int32_t connectId)
             HILOG_INFO("%{public}s end, disconnect service ability delay", __func__);
         }
     }
-    HILOG_INFO("%{public}s end.", __func__);
+    HILOG_DEBUG("%{public}s end.", __func__);
 }
 /**
  * @brief check if disconnect ability or not.
@@ -305,7 +305,7 @@ void FormSupplyCallback::HandleHostDied(const sptr<IRemoteObject> &hostToken)
 
 int32_t FormSupplyCallback::OnRenderTaskDone(int64_t formId, const Want &want)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_DEBUG("%{public}s called.", __func__);
     FormRenderMgr::GetInstance().RenderFormCallback(formId, want);
     return ERR_OK;
 }

@@ -26,12 +26,12 @@ const std::string NAME_FORM_CALLER_MGR = "FormCallerMgr";
 }
 FormCallerMgr::FormCallerMgr()
 {
-    HILOG_INFO("called");
+    HILOG_DEBUG("called.");
 }
 
 FormCallerMgr::~FormCallerMgr()
 {
-    HILOG_INFO("called");
+    HILOG_DEBUG("called.");
 }
 
 void FormCallerMgr::AddFormHostCaller(const FormJsInfo &formJsInfo, const sptr<IRemoteObject> &callerToken)
