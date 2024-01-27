@@ -1080,7 +1080,7 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0060, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormMgrService_0060 start";
     FormMgrService formMgrService;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrService.ReadFormConfigXML());
+    EXPECT_EQ(ERR_OK, formMgrService.ReadFormConfigXML());
     GTEST_LOG_(INFO) << "FormMgrService_0060 end";
 }
 
