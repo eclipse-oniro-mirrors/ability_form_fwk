@@ -206,7 +206,7 @@ ErrCode FormRenderMgr::StopRenderingForm(
 
 ErrCode FormRenderMgr::RenderFormCallback(int64_t formId, const Want &want)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_DEBUG("%{public}s called.", __func__);
     return ERR_OK;
 }
 

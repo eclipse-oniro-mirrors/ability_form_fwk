@@ -94,7 +94,7 @@ nlohmann::json FormProviderData::GetData() const
  */
 std::string FormProviderData::GetDataString() const
 {
-    HILOG_INFO("get data string");
+    HILOG_DEBUG("get data string");
     std::string dataStr = jsonFormProviderData_.empty() ? "" : jsonFormProviderData_.dump();
     HILOG_DEBUG("%{public}s, data: %{private}s", __func__, dataStr.c_str());
     return dataStr;
@@ -208,7 +208,7 @@ void FormProviderData::SetDataString(std::string &jsonDataString)
  */
 void FormProviderData::MergeData(nlohmann::json &addJsonData)
 {
-    HILOG_INFO("merge data");
+    HILOG_DEBUG("merge data");
     if (addJsonData.empty()) {
         return;
     }
@@ -318,14 +318,14 @@ bool FormProviderData::ReadFromParcel(Parcel &parcel)
  */
 bool FormProviderData::Marshalling(Parcel &parcel) const
 {
-    HILOG_INFO("%{public}s called, jsonFormProviderData_: %{private}s", __func__, jsonFormProviderData_.dump().c_str());
+    HILOG_DEBUG("%{public}s called, jsonFormProviderData_ is private", __func__);
     if (!parcel.WriteString16(Str8ToStr16(jsonFormProviderData_.empty() ?
         JSON_EMPTY_STRING : jsonFormProviderData_.dump()))) {
         return false;
     }
 
     parcel.WriteInt32(imageDataState_);
-    HILOG_INFO("%{public}s imageDateState is %{public}d", __func__, imageDataState_);
+    HILOG_DEBUG("%{public}s imageDateState is %{public}d", __func__, imageDataState_);
     switch (imageDataState_) {
         case IMAGE_DATA_STATE_ADDED: {
             parcel.WriteInt32(rawImageBytesMap_.size()); // firstly write the number of shared image to add

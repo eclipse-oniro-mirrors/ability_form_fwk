@@ -112,7 +112,7 @@ void FormEcologicalRuleDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &o
 int32_t FormEcologicalRuleProxy::IsSupportPublishForm(const std::vector<Want> &wants,
     const CallerInfo &callerInfo, bool &bSupport)
 {
-    HILOG_INFO("called");
+    HILOG_DEBUG("Called.");
     MessageParcel data;
     if (!data.WriteInterfaceToken(ERMS_INTERFACE_TOKEN)) {
         HILOG_ERROR("write token failed");

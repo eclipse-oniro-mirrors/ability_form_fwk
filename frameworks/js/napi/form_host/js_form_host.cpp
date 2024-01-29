@@ -1411,7 +1411,7 @@ private:
     bool ParseGetRunningFormInfosOneParam(const napi_env &env, const napi_value *argv, std::string &bundleName,
         bool &hasBundleName, bool &isUnusedIncluded)
     {
-        HILOG_DEBUG("Called.");
+        HILOG_DEBUG("called.");
         if (AppExecFwk::IsTypeForNapiValue(env, argv[PARAM0], napi_string)) {
             if (!ConvertFromJsValue(env, argv[PARAM0], bundleName)) {
                 HILOG_ERROR("Convert bundleName failed.");
@@ -1436,7 +1436,7 @@ private:
     bool ParseGetRunningFormInfosParams(const napi_env &env, const napi_value *argv, std::string &bundleName,
         bool &isUnusedIncluded, int startPos)
     {
-        HILOG_DEBUG("Called.");
+        HILOG_DEBUG("called.");
         if (!ConvertFromJsValue(env, argv[startPos], isUnusedIncluded)) {
             HILOG_ERROR("Convert isUnusedIncluded failed.");
             NapiFormUtil::ThrowParamTypeError(env, "isUnusedIncluded", "bool");
@@ -1453,7 +1453,7 @@ private:
     bool ParseGetRunningFormInfosTwoParams(const napi_env &env, const napi_value *argv, std::string &bundleName,
         bool &hasBundleName, bool &isUnusedIncluded)
     {
-        HILOG_DEBUG("Called.");
+        HILOG_DEBUG("called.");
         if (AppExecFwk::IsTypeForNapiValue(env, argv[PARAM0], napi_function)) {
             if (AppExecFwk::IsTypeForNapiValue(env, argv[PARAM1], napi_string)) {
                 if (!ConvertFromJsValue(env, argv[PARAM1], bundleName)) {
@@ -1484,7 +1484,7 @@ private:
 
     napi_value OnGetRunningFormInfos(napi_env env, size_t argc, napi_value *argv)
     {
-        HILOG_DEBUG("Called.");
+        HILOG_DEBUG("called.");
         if (argc > ARGS_THREE) {
             HILOG_ERROR("Wrong number of arguments.");
             NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "0 or 1 or 2 or 3");
@@ -1532,7 +1532,7 @@ private:
 
     napi_value OnGetFormInstanceById(napi_env env, size_t argc, napi_value *argv)
     {
-        HILOG_DEBUG("Called.");
+        HILOG_DEBUG("called.");
         if (argc < ARGS_ONE || argc > ARGS_THREE) {
             HILOG_ERROR("Wrong number of arguments.");
             NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1 or 2 or 3");
@@ -1585,7 +1585,7 @@ private:
 
     napi_value OnSetFormsRecyclable(napi_env env, size_t argc, napi_value *argv)
     {
-        HILOG_DEBUG("Called.");
+        HILOG_DEBUG("called.");
         if (argc < ARGS_ONE) {
             HILOG_ERROR("Wrong number of arguments.");
             NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1 or 2");
@@ -1619,7 +1619,7 @@ private:
 
     napi_value OnRecoverForms(napi_env env, size_t argc, napi_value *argv)
     {
-        HILOG_DEBUG("Called.");
+        HILOG_DEBUG("called.");
         if (argc < ARGS_ONE) {
             HILOG_ERROR("Wrong number of arguments.");
             NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1 or 2");
@@ -1655,7 +1655,7 @@ private:
 
 napi_value JsFormHostInit(napi_env env, napi_value exportObj)
 {
-    HILOG_INFO("JsFormHostInit is called");
+    HILOG_DEBUG("JsFormHostInit is called");
 
     std::unique_ptr<JsFormHost> jsFormHost = std::make_unique<JsFormHost>();
     napi_wrap(env, exportObj, jsFormHost.release(), JsFormHost::Finalizer, nullptr, nullptr);
@@ -1747,7 +1747,7 @@ sptr<JsFormRouterProxyMgr> JsFormRouterProxyMgr::GetInstance()
 
 ErrCode JsFormRouterProxyMgr::RouterEvent(int64_t formId, const Want &want)
 {
-    HILOG_INFO("Called.");
+    HILOG_DEBUG("called.");
 
     std::lock_guard<std::mutex> lock(FormRouterProxyCallbackMutex_);
     auto callbackClient = formRouterProxyCallbackMap_.find(formId);
@@ -1762,7 +1762,7 @@ ErrCode JsFormRouterProxyMgr::RouterEvent(int64_t formId, const Want &want)
 void JsFormRouterProxyMgr::AddFormRouterProxyCallback(napi_env env, napi_value callback,
     const std::vector<int64_t> &formIds)
 {
-    HILOG_INFO("Called.");
+    HILOG_DEBUG("called.");
     std::lock_guard<std::mutex> lock(FormRouterProxyCallbackMutex_);
 
     napi_ref callbackRef;

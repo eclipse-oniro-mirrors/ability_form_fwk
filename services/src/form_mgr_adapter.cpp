@@ -89,11 +89,11 @@ const std::string FORM_SUPPORT_ECOLOGICAL_RULEMGRSERVICE = "persist.sys.fms.supp
 
 FormMgrAdapter::FormMgrAdapter()
 {
-    HILOG_INFO("called");
+    HILOG_DEBUG("called.");
 }
 FormMgrAdapter::~FormMgrAdapter()
 {
-    HILOG_INFO("called");
+    HILOG_DEBUG("called.");
 }
 
 /**
@@ -117,7 +117,7 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
     const sptr<IRemoteObject> &callerToken, FormJsInfo &formInfo)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_INFO("called.");
+    HILOG_DEBUG("called.");
     if (formId < 0 || callerToken == nullptr) {
         HILOG_ERROR("fail, callerToken can not be NULL");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -664,7 +664,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
     const sptr<IRemoteObject> &callerToken, const int32_t formVisibleType)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_INFO("called.");
+    HILOG_DEBUG("called.");
     if (callerToken == nullptr) {
         HILOG_ERROR("fail, callerToken can not be NULL.");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -1974,7 +1974,7 @@ ErrCode FormMgrAdapter::RequestPublishForm(Want &want, bool withFormBindingData,
     std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
     const std::vector<FormDataProxy> &formDataProxies)
 {
-    HILOG_INFO("called.");
+    HILOG_DEBUG("called.");
     ErrCode errCode = CheckPublishForm(want);
     if (errCode != ERR_OK) {
         return errCode;
@@ -2296,7 +2296,7 @@ int FormMgrAdapter::MessageEvent(const int64_t formId, const Want &want, const s
  */
 int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("called.");
+    HILOG_DEBUG("called.");
     if (formId <= 0) {
         HILOG_ERROR("form formId or bundleName is invalid");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -2373,7 +2373,7 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
  */
 int FormMgrAdapter::BackgroundEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("called.");
+    HILOG_DEBUG("called.");
     if (formId <= 0) {
         HILOG_ERROR("form formId or bundleName is invalid");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -3082,7 +3082,7 @@ ErrCode FormMgrAdapter::RegisterAddObserver(const std::string &bundleName, const
 
 ErrCode FormMgrAdapter::RegisterRemoveObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("%{public}s called.", __func__);
     std::lock_guard<std::mutex> lock(formObserversMutex_);
     auto formObserver = formObservers_.find(bundleName);
     if (formObserver == formObservers_.end()) {
@@ -3307,7 +3307,7 @@ int32_t FormMgrAdapter::UnregisterPublishFormInterceptor(const sptr<IRemoteObjec
 ErrCode FormMgrAdapter::RegisterClickEventObserver(
     const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer)
 {
-    HILOG_INFO("Called.");
+    HILOG_DEBUG("Called.");
     if (observer == nullptr) {
         HILOG_ERROR("Caller token is null.");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -3318,7 +3318,7 @@ ErrCode FormMgrAdapter::RegisterClickEventObserver(
 ErrCode FormMgrAdapter::UnregisterClickEventObserver(
     const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer)
 {
-    HILOG_INFO("Called.");
+    HILOG_DEBUG("Called.");
     if (observer == nullptr) {
         HILOG_ERROR("Caller token is null.");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -3328,7 +3328,7 @@ ErrCode FormMgrAdapter::UnregisterClickEventObserver(
 
 void FormMgrAdapter::NotifyFormClickEvent(int64_t formId, const std::string &formClickType)
 {
-    HILOG_INFO("Called.");
+    HILOG_DEBUG("Called.");
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
 
     RunningFormInfo runningFormInfo;
