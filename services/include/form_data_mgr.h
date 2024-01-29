@@ -779,6 +779,13 @@ private:
                                      FormHostRecord &formHostRecord, std::vector<int64_t> &refreshForms);
 
     /**
+     * @brief Fill the basic running form info by form record.
+     * @param formRecord The form record.
+     * @param runningFormInfo Return the running forms' info.
+     */
+    void FillBasicRunningFormInfoByFormRecord(const FormRecord &formRecord, RunningFormInfo &runningFormInfo);
+
+    /**
     * @brief Get ability form info.
     * @param record Indicates form record.
     * @param abilities Indicates the ModuleAbilityInfo in FA model or ExtensionAbilities in stage model.

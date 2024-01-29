@@ -565,9 +565,11 @@ void ParseRunningFormInfoIntoNapi(napi_env env, const RunningFormInfo &runningFo
     FormVisibilityType formVisiblity = runningFormInfo.formVisiblity;
     SetFormInfoPropertyInt32(env, (int32_t)formVisiblity, result, "visibilityType");
     SetFormInfoPropertyString(env, runningFormInfo.moduleName.c_str(), result, "moduleName");
+    SetFormInfoPropertyString(env, runningFormInfo.abilityName.c_str(), result, "abilityName");
     SetFormInfoPropertyString(env, runningFormInfo.formName.c_str(), result, "formName");
     SetFormInfoPropertyInt32(env, runningFormInfo.dimension, result, "dimension");
-    SetFormInfoPropertyString(env, runningFormInfo.abilityName.c_str(), result, "abilityName");
+    FormUsageState formUsageState = runningFormInfo.formUsageState;
+    SetFormInfoPropertyInt32(env, (int32_t)formUsageState, result, "formUsageState");
     SetFormInfoPropertyString(env, runningFormInfo.description.c_str(), result, "formDescription");
 }
 
@@ -649,10 +651,10 @@ napi_value CreateRunningFormInfo(napi_env env, const RunningFormInfo &runningFor
     napi_set_named_property(env, objContext, "visibilityType", CreateJsValue(env, runningFormInfo.formVisiblity));
     napi_set_named_property(env, objContext, "moduleName", CreateJsValue(env, runningFormInfo.moduleName));
     napi_set_named_property(env, objContext, "abilityName", CreateJsValue(env, runningFormInfo.abilityName));
-    napi_set_named_property(env, objContext, "formDescription", CreateJsValue(env, runningFormInfo.description));
     napi_set_named_property(env, objContext, "formName", CreateJsValue(env, runningFormInfo.formName));
     napi_set_named_property(env, objContext, "dimension", CreateJsValue(env, runningFormInfo.dimension));
     napi_set_named_property(env, objContext, "formUsageState", CreateJsValue(env, runningFormInfo.formUsageState));
+    napi_set_named_property(env, objContext, "formDescription", CreateJsValue(env, runningFormInfo.description));
 
     return objContext;
 }
