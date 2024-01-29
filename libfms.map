@@ -42,7 +42,6 @@
         *OHOS::AppExecFwk::FormInfoHelper*;
         *OHOS::AppExecFwk::FormInfoMgr*;
         *OHOS::AppExecFwk::FormInfoRdbStorageMgr*;
-        *OHOS::AppExecFwk::FormInfoStorageMgr*;
         *OHOS::AppExecFwk::FormItemInfo*;
         *OHOS::AppExecFwk::FormMgrAdapter*;
         *OHOS::AppExecFwk::FormMgrService*;

@@ -71,7 +71,6 @@ ohos_shared_library("libfms") {
     "services/src/form_info_mgr.cpp",
     "services/src/form_info_rdb_storage_mgr.cpp",
     "services/src/form_info_storage.cpp",
-    "services/src/form_info_storage_mgr.cpp",
     "services/src/form_item_info.cpp",
     "services/src/form_mgr_adapter.cpp",
     "services/src/form_mgr_service.cpp",
