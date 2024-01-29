@@ -1946,6 +1946,17 @@ ErrCode FormDataMgr::CheckInvalidForm(const int64_t formId)
     return ERR_OK;
 }
 
+void FormDataMgr::FillBasicRunningFormInfoByFormRecord(const FormRecord &formRecord, RunningFormInfo &runningFormInfo)
+{
+    runningFormInfo.formName = formRecord.formName;
+    runningFormInfo.dimension = formRecord.specification;
+    runningFormInfo.bundleName = formRecord.bundleName;
+    runningFormInfo.moduleName = formRecord.moduleName;
+    runningFormInfo.abilityName = formRecord.abilityName;
+    runningFormInfo.description = formRecord.description;
+    runningFormInfo.formVisiblity = static_cast<FormVisibilityType>(formRecord.formVisibleNotifyState);
+}
+
 ErrCode FormDataMgr::GetRunningFormInfosByFormId(const int64_t formId, RunningFormInfo &runningFormInfo)
 {
     HILOG_DEBUG("start");
@@ -1968,13 +1979,6 @@ ErrCode FormDataMgr::GetRunningFormInfosByFormId(const int64_t formId, RunningFo
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
 
-    runningFormInfo.formId = matchedFormId;
-    runningFormInfo.formName = formRecord.formName;
-    runningFormInfo.dimension = formRecord.specification;
-    runningFormInfo.bundleName = formRecord.bundleName;
-    runningFormInfo.moduleName = formRecord.moduleName;
-    runningFormInfo.abilityName = formRecord.abilityName;
-    runningFormInfo.description = formRecord.description;
     std::vector<FormHostRecord> formHostRecords;
     GetFormHostRecord(matchedFormId, formHostRecords);
     if (formHostRecords.empty()) {
@@ -1982,7 +1986,9 @@ ErrCode FormDataMgr::GetRunningFormInfosByFormId(const int64_t formId, RunningFo
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     runningFormInfo.hostBundleName = formHostRecords.begin()->GetHostBundleName();
-    runningFormInfo.formVisiblity = formRecord.isVisible ? FormVisibilityType::VISIBLE : FormVisibilityType::INVISIBLE;
+    runningFormInfo.formId = matchedFormId;
+    FillBasicRunningFormInfoByFormRecord(formRecord, runningFormInfo);
+
     return ERR_OK;
 }
 
@@ -2252,12 +2258,7 @@ void FormDataMgr::GetUnusedFormInfos(std::vector<RunningFormInfo> &runningFormIn
         }
         RunningFormInfo info;
         info.formId = dbInfo.formId;
-        info.dimension = dbRecord.specification;
-        info.formVisiblity = static_cast<FormVisibilityType>(dbRecord.formVisibleNotifyState);
-        info.bundleName = dbRecord.bundleName;
-        info.moduleName = dbRecord.moduleName;
-        info.abilityName = dbRecord.abilityName;
-        info.formName = dbRecord.formName;
+        FillBasicRunningFormInfoByFormRecord(dbRecord, info);
         info.formUsageState = FormUsageState::UNUSED;
         if (!dbRecord.formUserUids.empty()) {
             auto ret =
@@ -2281,12 +2282,7 @@ ErrCode FormDataMgr::GetRunningFormInfos(bool isUnusedIncluded, std::vector<Runn
             (record.second.providerUserId == Constants::DEFAULT_USER_ID))) {
             RunningFormInfo info;
             info.formId = record.first;
-            info.formName = record.second.formName;
-            info.dimension = record.second.specification;
-            info.bundleName = record.second.bundleName;
-            info.moduleName = record.second.moduleName;
-            info.abilityName = record.second.abilityName;
-            info.formVisiblity = static_cast<FormVisibilityType>(record.second.formVisibleNotifyState);
+            FillBasicRunningFormInfoByFormRecord(record.second, info);
             info.formUsageState = FormUsageState::USED;
             std::vector<FormHostRecord> formHostRecords;
             GetFormHostRecord(record.first, formHostRecords);
@@ -2333,12 +2329,7 @@ void FormDataMgr::GetUnusedFormInfos(const std::string &bundleName, std::vector<
             RunningFormInfo info;
             info.formId = dbInfo.formId;
             info.hostBundleName = bundleName;
-            info.dimension = dbRecord.specification;
-            info.formVisiblity = static_cast<FormVisibilityType>(dbRecord.formVisibleNotifyState);
-            info.bundleName = dbRecord.bundleName;
-            info.moduleName = dbRecord.moduleName;
-            info.abilityName = dbRecord.abilityName;
-            info.formName = dbRecord.formName;
+            FillBasicRunningFormInfoByFormRecord(dbRecord, info);
             info.formUsageState = FormUsageState::UNUSED;
             runningFormInfos.emplace_back(info);
         }
@@ -2370,13 +2361,8 @@ ErrCode FormDataMgr::GetRunningFormInfosByBundleName(
         if (hostBundleName == bundleName && flag) {
             RunningFormInfo info;
             info.formId = record.first;
-            info.formName = record.second.formName;
-            info.dimension = record.second.specification;
-            info.bundleName = record.second.bundleName;
             info.hostBundleName = bundleName;
-            info.moduleName = record.second.moduleName;
-            info.abilityName = record.second.abilityName;
-            info.formVisiblity = static_cast<FormVisibilityType>(record.second.formVisibleNotifyState);
+            FillBasicRunningFormInfoByFormRecord(record.second, info);
             info.formUsageState = FormUsageState::USED;
             runningFormInfos.emplace_back(info);
         }
