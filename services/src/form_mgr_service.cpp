@@ -907,7 +907,7 @@ int FormMgrService::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
  */
 int FormMgrService::GetFormsInfoByApp(std::string &bundleName, std::vector<FormInfo> &formInfos)
 {
-    HILOG_INFO("called.");
+    HILOG_DEBUG("called.");
     if (!CheckCallerIsSystemApp()) {
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
     }
@@ -928,7 +928,7 @@ int FormMgrService::GetFormsInfoByApp(std::string &bundleName, std::vector<FormI
 int FormMgrService::GetFormsInfoByModule(std::string &bundleName, std::string &moduleName,
                                          std::vector<FormInfo> &formInfos)
 {
-    HILOG_INFO("called.");
+    HILOG_DEBUG("called.");
     if (!CheckCallerIsSystemApp()) {
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
     }
