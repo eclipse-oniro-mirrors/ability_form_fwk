@@ -752,6 +752,7 @@ void FormMgrAdapter::PaddingNotifyVisibleFormsMap(const int32_t formVisibleType,
             auto observer = formInstanceMaps.find(formObserver.first);
             if (observer == formInstanceMaps.end()) {
                 std::vector<FormInstance> formInstances;
+                formInstance.formVisiblity = static_cast<FormVisibilityType>(formVisibleType);
                 formInstances.emplace_back(formInstance);
                 formInstanceMaps.emplace(formObserver.first, formInstances);
             } else {
