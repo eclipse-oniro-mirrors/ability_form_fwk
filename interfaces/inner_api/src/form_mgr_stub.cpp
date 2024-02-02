@@ -170,7 +170,7 @@ FormMgrStub::~FormMgrStub()
  */
 int FormMgrStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    HILOG_INFO("FormMgrStub::OnReceived, code = %{public}u, flags= %{public}d.", code, option.GetFlags());
+    HILOG_DEBUG("FormMgrStub::OnReceived, code = %{public}u, flags= %{public}d.", code, option.GetFlags());
     std::u16string descriptor = FormMgrStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
     if (descriptor != remoteDescriptor) {
@@ -796,7 +796,7 @@ int32_t FormMgrStub::HandleGetAllFormsInfo(MessageParcel &data, MessageParcel &r
  */
 int32_t FormMgrStub::HandleGetFormsInfoByApp(MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_DEBUG("%{public}s called.", __func__);
     std::string bundleName = data.ReadString();
     std::vector<FormInfo> infos;
     int32_t result = GetFormsInfoByApp(bundleName, infos);
@@ -818,7 +818,7 @@ int32_t FormMgrStub::HandleGetFormsInfoByApp(MessageParcel &data, MessageParcel 
  */
 int32_t FormMgrStub::HandleGetFormsInfoByModule(MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_DEBUG("%{public}s called.", __func__);
     std::string bundleName = data.ReadString();
     std::string moduleName = data.ReadString();
     std::vector<FormInfo> infos;
@@ -942,7 +942,7 @@ int32_t FormMgrStub::HandleStartAbility(MessageParcel &data, MessageParcel &repl
 
 int32_t FormMgrStub::HandleCheckFMSReady(MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_DEBUG("%{public}s called.", __func__);
     bool result = CheckFMSReady();
     if (!reply.WriteBool(result)) {
         HILOG_ERROR("%{public}s, failed to write action", __func__);

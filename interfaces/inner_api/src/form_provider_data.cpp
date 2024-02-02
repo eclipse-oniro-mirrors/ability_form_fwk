@@ -280,7 +280,7 @@ bool FormProviderData::ReadFromParcel(Parcel &parcel)
     jsonFormProviderData_ = jsonObject;
 
     imageDataState_ = parcel.ReadInt32();
-    HILOG_INFO("%{public}s imageDateState is %{public}d", __func__, imageDataState_);
+    HILOG_DEBUG("%{public}s imageDateState is %{public}d", __func__, imageDataState_);
     switch (imageDataState_) {
         case IMAGE_DATA_STATE_ADDED: {
             int32_t imageDataNum = parcel.ReadInt32();

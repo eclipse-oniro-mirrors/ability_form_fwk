@@ -519,7 +519,7 @@ std::shared_ptr<Ace::FormRendererGroup> FormRenderRecord::CreateFormRendererGrou
 
 void FormRenderRecord::HandleUpdateInJsThread(const FormJsInfo &formJsInfo, const Want &want)
 {
-    HILOG_DEBUG("Update record in js thread.");
+    HILOG_DEBUG("Update record in js thread, formId:%{public}s", std::to_string(formJsInfo.formId).c_str());
     bool ret = BeforeHandleUpdateForm(formJsInfo);
     if (!ret) {
         HILOG_ERROR("Handle Update Form prepare failed");
