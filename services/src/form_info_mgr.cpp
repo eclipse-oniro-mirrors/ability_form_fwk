@@ -782,7 +782,7 @@ ErrCode FormInfoMgr::ReloadFormInfos(const int32_t userId)
 
 bool FormInfoMgr::HasReloadedFormInfos()
 {
-    HILOG_INFO("Reloaded Form Infos state %{public}d", hasReloadedFormInfosState_);
+    HILOG_DEBUG("Reloaded Form Infos state %{public}d", hasReloadedFormInfosState_);
     return hasReloadedFormInfosState_;
 }
 }  // namespace AppExecFwk
