@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1988,6 +1988,7 @@ ErrCode FormDataMgr::GetRunningFormInfosByFormId(const int64_t formId, RunningFo
     runningFormInfo.hostBundleName = formHostRecords.begin()->GetHostBundleName();
     runningFormInfo.formId = matchedFormId;
     FillBasicRunningFormInfoByFormRecord(formRecord, runningFormInfo);
+    runningFormInfo.formUsageState = FormUsageState::USED;
 
     return ERR_OK;
 }
@@ -2090,6 +2091,7 @@ void FormDataMgr::GetUnusedFormInstancesByFilter(
         instance.abilityName = dbRecord.abilityName;
         instance.formName = dbRecord.formName;
         instance.formUsageState = FormUsageState::UNUSED;
+        instance.description = dbRecord.description;
         if (!dbRecord.formUserUids.empty()) {
             auto ret =
                 FormBmsHelper::GetInstance().GetBundleNameByUid(*dbRecord.formUserUids.begin(), instance.formHostName);
@@ -2139,6 +2141,7 @@ ErrCode FormDataMgr::GetFormInstancesByFilter(const FormInstancesFilter &formIns
                     instance.moduleName = itFormRecord->second.moduleName;
                     instance.abilityName = itFormRecord->second.abilityName;
                     instance.formName = itFormRecord->second.formName;
+                    instance.description = itFormRecord->second.description;
                     formInstances.emplace_back(instance);
                 }
             }
@@ -2209,6 +2212,7 @@ ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, bool isUnusedIncl
         formInstance.abilityName = formRecord.abilityName;
         formInstance.formName = formRecord.formName;
         formInstance.formUsageState = FormUsageState::USED;
+        formInstance.description = formRecord.description;
     } else if (isUnusedIncluded) {
         FormRecord dbRecord;
         ErrCode getDbRet = FormDbCache::GetInstance().GetDBRecord(formId, dbRecord);
@@ -2233,6 +2237,7 @@ ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, bool isUnusedIncl
         formInstance.abilityName = dbRecord.abilityName;
         formInstance.formName = dbRecord.formName;
         formInstance.formUsageState = FormUsageState::UNUSED;
+        formInstance.description = dbRecord.description;
     } else {
         return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
     }
