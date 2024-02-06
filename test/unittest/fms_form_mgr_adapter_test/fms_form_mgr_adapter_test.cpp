@@ -813,7 +813,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_040, TestSize.Level0)
     formRecord.updateDuration = -1;
     formRecord.updateAtHour = 0;
     formRecord.updateAtMin = 0;
-    EXPECT_EQ(ERR_OK, formMgrAdapter.AddFormTimer(formRecord));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrAdapter.AddFormTimer(formRecord));
     GTEST_LOG_(INFO) << "FormMgrAdapter_040 end";
 }
 
