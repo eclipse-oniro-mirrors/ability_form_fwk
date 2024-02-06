@@ -51,10 +51,6 @@
 #define FMS_LOG_TAG "FormManagerService"
 #endif
 
-#ifdef FMS_LOG_LABEL
-#undef FMS_LOG_LABEL
-#endif
-
 #ifndef FMS_FUNC_FMT
 #define FMS_FUNC_FMT "[%{public}s(%{public}s:%{public}d)]"
 #endif
@@ -67,36 +63,29 @@
 #define FMS_FUNC_INFO FMS_FILE_NAME, __FUNCTION__, __LINE__
 #endif
 
-static constexpr OHOS::HiviewDFX::HiLogLabel FMS_LOG_LABEL = {LOG_CORE, FMS_LOG_DOMAIN, FMS_LOG_TAG};
-
 #define HILOG_ERROR(fmt, ...) do { \
-    if (HiLogIsLoggable(FMS_LOG_DOMAIN, FMS_LOG_LABEL.tag, LOG_ERROR)) {                                        \
-        (void)::OHOS::HiviewDFX::HiLog::Error(FMS_LOG_LABEL, FMS_FUNC_FMT fmt, FMS_FUNC_INFO, ##__VA_ARGS__);   \
-    }                                                                                                           \
+    (void)HILOG_IMPL(LOG_CORE, LOG_ERROR, FMS_LOG_DOMAIN, FMS_LOG_TAG, \
+    FMS_FUNC_FMT fmt, FMS_FUNC_INFO, ##__VA_ARGS__);                   \
 } while (0)
 
 #define HILOG_WARN(fmt, ...) do { \
-    if (HiLogIsLoggable(FMS_LOG_DOMAIN, FMS_LOG_LABEL.tag, LOG_WARN)) {                                         \
-        (void)::OHOS::HiviewDFX::HiLog::Warn(FMS_LOG_LABEL, FMS_FUNC_FMT fmt, FMS_FUNC_INFO, ##__VA_ARGS__);    \
-    }                                                                                                           \
+    (void)HILOG_IMPL(LOG_CORE, LOG_WARN, FMS_LOG_DOMAIN, FMS_LOG_TAG, \
+    FMS_FUNC_FMT fmt, FMS_FUNC_INFO, ##__VA_ARGS__);                  \
 } while (0)
 
 #define HILOG_INFO(fmt, ...) do { \
-    if (HiLogIsLoggable(FMS_LOG_DOMAIN, FMS_LOG_LABEL.tag, LOG_INFO)) {                                         \
-        (void)::OHOS::HiviewDFX::HiLog::Info(FMS_LOG_LABEL, FMS_FUNC_FMT fmt, FMS_FUNC_INFO, ##__VA_ARGS__);    \
-    }                                                                                                           \
+    (void)HILOG_IMPL(LOG_CORE, LOG_INFO, FMS_LOG_DOMAIN, FMS_LOG_TAG, \
+    FMS_FUNC_FMT fmt, FMS_FUNC_INFO, ##__VA_ARGS__);                  \
 } while (0)
 
 #define HILOG_DEBUG(fmt, ...) do { \
-    if (HiLogIsLoggable(FMS_LOG_DOMAIN, FMS_LOG_LABEL.tag, LOG_DEBUG)) {                                        \
-        (void)::OHOS::HiviewDFX::HiLog::Debug(FMS_LOG_LABEL, FMS_FUNC_FMT fmt, FMS_FUNC_INFO, ##__VA_ARGS__);   \
-    }                                                                                                           \
+    (void)HILOG_IMPL(LOG_CORE, LOG_DEBUG, FMS_LOG_DOMAIN, FMS_LOG_TAG, \
+    FMS_FUNC_FMT fmt, FMS_FUNC_INFO, ##__VA_ARGS__);                   \
 } while (0)
 
 #define HILOG_FATAL(fmt, ...) do { \
-    if (HiLogIsLoggable(FMS_LOG_DOMAIN, FMS_LOG_LABEL.tag, LOG_FATAL)) {                                        \
-        (void)::OHOS::HiviewDFX::HiLog::Fatal(FMS_LOG_LABEL, FMS_FUNC_FMT fmt, FMS_FUNC_INFO, ##__VA_ARGS__);   \
-    }                                                                                                           \
+    (void)HILOG_IMPL(LOG_CORE, LOG_FATAL, FMS_LOG_DOMAIN, FMS_LOG_TAG, \
+    FMS_FUNC_FMT fmt, FMS_FUNC_INFO, ##__VA_ARGS__);                   \
 } while (0)
 
 
@@ -134,14 +123,14 @@ private:
 
 #ifndef FMS_CALL_DEBUG_ENTER
 #define FMS_CALL_DEBUG_ENTER    ::OHOS::AppExecFwk::InnerFunctionTracer ___innerFuncTracer_Debug___     \
-    { std::bind(&::OHOS::HiviewDFX::HiLog::Debug, FMS_LOG_LABEL, std::placeholders::_1,                 \
-      FMS_FUNC_INFO), FMS_LOG_LABEL.tag, LOG_DEBUG }
+    { std::bind(&HiLogPrint, LOG_CORE, LOG_DEBUG, FMS_LOG_DOMAIN, FMS_LOG_TAG, std::placeholders::_1,   \
+      FMS_FUNC_INFO), FMS_LOG_TAG, LOG_DEBUG }
 #endif // FMS_CALL_DEBUG_ENTER
 
 #ifndef FMS_CALL_INFO_ENTER
 #define FMS_CALL_INFO_ENTER     ::OHOS::AppExecFwk::InnerFunctionTracer ___innerFuncTracer_Debug___     \
-    { std::bind(&::OHOS::HiviewDFX::HiLog::Info, FMS_LOG_LABEL, std::placeholders::_1,                  \
-      FMS_FUNC_INFO), FMS_LOG_LABEL.tag, LOG_INFO }
+    { std::bind(&HiLogPrint, LOG_CORE, LOG_INFO, FMS_LOG_DOMAIN, FMS_LOG_TAG, std::placeholders::_1,    \
+      FMS_FUNC_INFO), FMS_LOG_TAG, LOG_INFO }
 #endif // FMS_CALL_INFO_ENTER
 
 #else
