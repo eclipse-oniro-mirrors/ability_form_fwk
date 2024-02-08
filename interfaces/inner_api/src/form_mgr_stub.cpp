@@ -154,6 +154,8 @@ FormMgrStub::FormMgrStub()
         &FormMgrStub::HandleRecycleForms;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_RECOVER_FORMS)] =
         &FormMgrStub::HandleRecoverForms;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_HAS_FORM_VISIBLE_WITH_TOKENID)] =
+        &FormMgrStub::HandleHasFormVisible;
 }
 
 FormMgrStub::~FormMgrStub()
@@ -419,6 +421,26 @@ int32_t FormMgrStub::HandleNotifyWhetherVisibleForms(MessageParcel &data, Messag
     int32_t result = NotifyWhetherVisibleForms(formIds, client, formVisibleType);
     reply.WriteInt32(result);
     return result;
+}
+
+
+/**
+ * @brief Handle HasFormVisible message.
+ * @param data input param.
+ * @param reply output param.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int32_t FormMgrStub::HandleHasFormVisible(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("%{public}s called.", __func__);
+    uint32_t tokenId = data.ReadInt32();
+    bool result = HasFormVisible(tokenId);
+    if (!reply.WriteBool(result)) {
+        HILOG_ERROR("%{public}s, failed to write action", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    return ERR_OK;
 }
 
 /**
