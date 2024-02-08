@@ -74,6 +74,10 @@ public:
     {
         return 0;
     }
+    bool HasFormVisible(const uint32_t tokenId) override
+    {
+        return false;
+    }
     int CastTempForm(const int64_t formId, const sptr<IRemoteObject> &callerToken) override
     {
         return 0;

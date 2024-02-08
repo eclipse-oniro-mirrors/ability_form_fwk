@@ -79,6 +79,7 @@ constexpr int32_t FORM_DUMP_ARGC_MAX = 2;
 const std::string FORM_DUMP_HELP = "options list:\n"
     "  -h, --help                           list available commands\n"
     "  -b, --bundle-form-info               query all form infos from bundle, Un-added form info will also be dumped\n"
+    "  -v, --visible                        query form visible infos from args like bundleName_userId_instIndex\n"
     "  -s, --storage                        query form storage info\n"
     "  -t, --temp                           query temporary form info\n"
     "  -n  <bundle-name>                    query form info by a bundle name\n"
@@ -89,6 +90,8 @@ const std::map<std::string, FormMgrService::DumpKey> FormMgrService::dumpKeyMap_
     {"--help", FormMgrService::DumpKey::KEY_DUMP_HELP},
     {"-b", FormMgrService::DumpKey::KEY_DUMP_STATIC},   // *****
     {"--bundle-form-info", FormMgrService::DumpKey::KEY_DUMP_STATIC},
+    {"-v", FormMgrService::DumpKey::KEY_DUMP_VISIBLE},
+    {"--visible", FormMgrService::DumpKey::KEY_DUMP_VISIBLE},
     {"-s", FormMgrService::DumpKey::KEY_DUMP_STORAGE},
     {"--storage", FormMgrService::DumpKey::KEY_DUMP_STORAGE},
     {"-t", FormMgrService::DumpKey::KEY_DUMP_TEMPORARY},
@@ -367,6 +370,22 @@ int FormMgrService::NotifyWhetherVisibleForms(const std::vector<int64_t> &formId
         return ret;
     }
     return FormMgrAdapter::GetInstance().NotifyWhetherVisibleForms(formIds, callerToken, formVisibleType);
+}
+
+/**
+ * @brief Query whether has visible form by tokenId.
+ * @param tokenId Unique identification of application.
+ * @return Returns true if has visible form, false otherwise.
+ */
+bool FormMgrService::HasFormVisible(const uint32_t tokenId)
+{
+    HILOG_DEBUG("called.");
+
+    if (!FormUtil::IsSACall()) {
+        HILOG_ERROR("%{public}s fail, query form visible with tokenid not a SACall", __func__);
+        return false;
+    }
+    return FormMgrAdapter::GetInstance().HasFormVisible(tokenId);
 }
 
 /**
@@ -1093,6 +1112,7 @@ void FormMgrService::DumpInit()
     dumpFuncMap_[DumpKey::KEY_DUMP_HELP] = &FormMgrService::HiDumpHelp;
     dumpFuncMap_[DumpKey::KEY_DUMP_STATIC] = &FormMgrService::HiDumpStaticBundleFormInfos;
     dumpFuncMap_[DumpKey::KEY_DUMP_STORAGE] = &FormMgrService::HiDumpStorageFormInfos;
+    dumpFuncMap_[DumpKey::KEY_DUMP_VISIBLE] = &FormMgrService::HiDumpHasFormVisible;
     dumpFuncMap_[DumpKey::KEY_DUMP_TEMPORARY] = &FormMgrService::HiDumpTemporaryFormInfos;
     dumpFuncMap_[DumpKey::KEY_DUMP_BY_BUNDLE_NAME] = &FormMgrService::HiDumpFormInfoByBundleName;
     dumpFuncMap_[DumpKey::KEY_DUMP_BY_FORM_ID] = &FormMgrService::HiDumpFormInfoByFormId;
@@ -1248,6 +1268,14 @@ void FormMgrService::HiDumpFormInfoByBundleName(const std::string &args, std::st
         return;
     }
     DumpFormInfoByBundleName(args, result);
+}
+
+void FormMgrService::HiDumpHasFormVisible(const std::string &args, std::string &result)
+{
+    if (args.empty()) {
+        result = "error:request bundle info like bundleName_userId_instIndex.";
+    }
+    FormMgrAdapter::GetInstance().DumpHasFormVisible(args, result);
 }
 
 void FormMgrService::HiDumpFormInfoByFormId(const std::string &args, std::string &result)
