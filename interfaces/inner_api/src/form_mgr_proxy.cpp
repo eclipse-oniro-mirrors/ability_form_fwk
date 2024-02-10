@@ -446,42 +446,6 @@ int FormMgrProxy::NotifyWhetherVisibleForms(
 }
 
 /**
- * @brief Query whether has visible form by tokenId.
- * @param tokenId Unique identification of application.
- * @return Returns true if has visible form, false otherwise.
- */
-bool FormMgrProxy::HasFormVisible(const uint32_t tokenId)
-{
-    HILOG_DEBUG("called.");
-
-    MessageParcel data;
-    if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("%{public}s, error to write interface token", __func__);
-        return false;
-    }
-    if (!data.WriteInt32(tokenId)) {
-        HILOG_ERROR("%{public}s, failed to write tokenId", __func__);
-        return false;
-    }
-
-    // send request
-    MessageParcel reply;
-    MessageOption option;
-    int error = SendTransactCmd(
-        IFormMgr::Message::FORM_MGR_HAS_FORM_VISIBLE_WITH_TOKENID,
-        data,
-        reply,
-        option);
-    if (error != ERR_OK) {
-        HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d", __func__, error);
-        return false;
-    }
-
-    // retrieve and return result.
-    return reply.ReadBool();
-}
-
-/**
  * @brief temp form to normal form.
  * @param formId The Id of the form.
  * @param callerToken Caller ability token.

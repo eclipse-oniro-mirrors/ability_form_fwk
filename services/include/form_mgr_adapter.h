@@ -120,13 +120,6 @@ public:
         const int32_t formVisibleType);
 
     /**
-     * @brief Query whether has visible form by tokenId.
-     * @param tokenId Unique identification of application.
-     * @return Returns true if has visible form, false otherwise.
-     */
-    bool HasFormVisible(const uint32_t tokenId);
-
-    /**
      * @brief Padding the formInstances map for visibleNotify.
      * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
      * @param formId Form Id.
@@ -161,15 +154,6 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     int DumpStaticBundleFormInfos(std::string &formInfos) const;
-
-    /**
-     * @brief Dump has form visible with bundleInfo.
-     * @param bundleInfo Bundle info like bundleName_userId_instIndex.
-     * @param formInfos Form dump infos.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    int DumpHasFormVisible(const std::string &bundleInfo, std::string &formInfos) const;
-
     /**
      * @brief Dump form info by a bundle name.
      * @param bundleName The bundle name of form provider.

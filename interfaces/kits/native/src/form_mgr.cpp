@@ -312,23 +312,6 @@ int FormMgr::NotifyWhetherVisibleForms(
 }
 
 /**
- * @brief Query whether has visible form by tokenId.
- * @param tokenId Unique identification of application.
- * @return Returns true if has visible form, false otherwise.
- */
-bool FormMgr::HasFormVisible(const uint32_t tokenId)
-{
-    HILOG_INFO("called.");
-    int errCode = Connect();
-    if (errCode != ERR_OK) {
-        HILOG_ERROR("Connect error, code:%{public}d.", errCode);
-        return false;
-    }
-
-    return remoteProxy_->HasFormVisible(tokenId);
-}
-
-/**
  * @brief temp form to normal form.
  * @param formId The Id of the form.
  * @param callerToken Caller ability token.

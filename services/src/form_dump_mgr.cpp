@@ -17,11 +17,10 @@
 
 #include "fms_log_wrapper.h"
 #include "form_cache_mgr.h"
-#include "form_mgr_adapter.h"
 
 namespace OHOS {
 namespace AppExecFwk {
-const std::string LINE_FEED = "\n";
+const std::string LINE_SEPARATOR = "\n";
 
 FormDumpMgr::FormDumpMgr() {}
 FormDumpMgr::~FormDumpMgr() {}
@@ -32,7 +31,7 @@ FormDumpMgr::~FormDumpMgr() {}
  */
 void FormDumpMgr::DumpStorageFormInfos(const std::vector<FormDBInfo> &storageInfos, std::string &formInfos) const
 {
-    formInfos += "  Total Storage-Form count is " + std::to_string(storageInfos.size()) + "\n" + LINE_FEED;
+    formInfos += "  Total Storage-Form count is " + std::to_string(storageInfos.size()) + "\n" + LINE_SEPARATOR;
     for (const auto &info : storageInfos) {
         formInfos += "  FormId #" + std::to_string(info.formId) + "\n";
         formInfos += "    formName [" + info.formName + "]\n";
@@ -44,7 +43,7 @@ void FormDumpMgr::DumpStorageFormInfos(const std::vector<FormDBInfo> &storageInf
         for (const auto &uId : info.formUserUids) {
             formInfos += " Uid[" + std::to_string(uId) + "] ";
         }
-        formInfos += "]\n" + LINE_FEED;
+        formInfos += "]\n" + LINE_SEPARATOR;
     }
 }
 /**
@@ -54,7 +53,7 @@ void FormDumpMgr::DumpStorageFormInfos(const std::vector<FormDBInfo> &storageInf
  */
 void FormDumpMgr::DumpTemporaryFormInfos(const std::vector<FormRecord> &formRecordInfos, std::string &formInfos) const
 {
-    formInfos += "  Total Temporary-Form count is " + std::to_string(formRecordInfos.size()) + "\n" + LINE_FEED;
+    formInfos += "  Total Temporary-Form count is " + std::to_string(formRecordInfos.size()) + "\n" + LINE_SEPARATOR;
     for (const auto &info : formRecordInfos) {
         formInfos += "  FormId #" + std::to_string(info.formId) + "\n";
         formInfos += "    formName [" + info.formName + "]\n";
@@ -69,13 +68,13 @@ void FormDumpMgr::DumpTemporaryFormInfos(const std::vector<FormRecord> &formReco
         for (const auto &uId : info.formUserUids) {
             formInfos += " Uid[" + std::to_string(uId) + "] ";
         }
-        formInfos += "]\n" + LINE_FEED;
+        formInfos += "]\n" + LINE_SEPARATOR;
     }
 }
 
 void FormDumpMgr::DumpStaticBundleFormInfos(const std::vector<FormInfo> &bundleFormInfos, std::string &formInfos) const
 {
-    formInfos += "  These are static-form-infos, it means un-added form's info will also be dumped\n" + LINE_FEED;
+    formInfos += "  These are static-form-infos, it means un-added form's info will also be dumped\n" + LINE_SEPARATOR;
     for (const auto &info : bundleFormInfos) {
         formInfos += "  bundleName #" + info.bundleName + "\n";
         formInfos += "    moduleName [" + info.moduleName + "]\n";
@@ -83,33 +82,9 @@ void FormDumpMgr::DumpStaticBundleFormInfos(const std::vector<FormInfo> &bundleF
         formInfos += "    formName [" + info.name + "]\n";
         formInfos += "    type [" + std::string(info.uiSyntax == FormType::JS ? "JS" : "ArkTS") + "]\n";
         formInfos += "    isDynamic [" + std::to_string(info.isDynamic) + "]\n";
-        formInfos += "    transparencyEnabled [" + std::to_string(info.transparencyEnabled) + "]\n" + LINE_FEED;
+        formInfos += "    transparencyEnabled [" + std::to_string(info.transparencyEnabled) + "]\n" + LINE_SEPARATOR;
     }
 }
-
-/**
- * @brief Dump has form visible with bundleInfo.
- * @param tokenId *Unique identifaication of application.
- * @param bundleName Bundle name.
- * @param userId User ID.
- * @param instIndex Index of application instance.
- * @param formInfos Form dump infos.
- */
-void FormDumpMgr::DumpHasFormVisible(
-    const uint32_t tokenId,
-    const std::string &bundleName,
-    const int32_t userId,
-    const int32_t instIndex,
-    std::string &formInfos) const
-{
-    formInfos += "Query whether has visible forms by bundleInfo\n";
-    formInfos += "  tokenId [" + std::to_string(tokenId) + "]\n";
-    formInfos += "    bundleName [" + bundleName + "]\n";
-    formInfos += "    userId [" + std::to_string(userId) + "]\n";
-    formInfos += "    instIndex [" + std::to_string(instIndex) + "]\n";
-    formInfos += "    hasFormVisible [" + std::to_string(FormMgrAdapter::GetInstance().HasFormVisible(tokenId)) + "]\n";
-}
-
 /**
  * @brief Dump form infos.
  * @param formRecordInfos Form record infos.
@@ -157,7 +132,7 @@ void FormDumpMgr::DumpFormInfos(const std::vector<FormRecord> &formRecordInfos, 
         }
 
         AppendBundleFormInfo(info, formInfos);
-        formInfos += LINE_FEED;
+        formInfos += LINE_SEPARATOR;
     }
 
     HILOG_DEBUG("%{public}s success. Form infos:%{private}s", __func__, formInfos.c_str());
@@ -247,7 +222,7 @@ void FormDumpMgr::DumpFormSubscribeInfo(
         formInfo += " [" + subscribedKeys[i] + "]";
     }
     formInfo += " ] updatedCount [" + std::to_string(count) + "] ]\n";
-    formInfo += LINE_FEED;
+    formInfo += LINE_SEPARATOR;
 }
 
 void FormDumpMgr::AppendBundleFormInfo(const FormRecord &formRecordInfo, std::string &formInfo) const
