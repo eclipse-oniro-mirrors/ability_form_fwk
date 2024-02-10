@@ -52,22 +52,6 @@ public:
      * @param formInfos Form dump infos.
      */
     void DumpStaticBundleFormInfos(const std::vector<FormInfo> &bundleFormInfos, std::string &formInfos) const;
-
-    /**
-     * @brief Dump has form visible with bundleInfo.
-     * @param tokenId *Unique identifaication of application.
-     * @param bundleName Bundle name.
-     * @param userId User ID.
-     * @param instIndex Index of application instance.
-     * @param formInfos Form dump infos.
-     */
-    void DumpHasFormVisible(
-        const uint32_t tokenId,
-        const std::string &bundleName,
-        const int32_t userId,
-        const int32_t instIndex,
-        std::string &formInfos) const;
-
     /**
      * @brief Dump form infos.
      * @param formRecordInfos Form record infos.

@@ -38,7 +38,6 @@ public:
     MOCK_METHOD3(RequestForm, int(const int64_t formId, const sptr<IRemoteObject> &callerToken, const Want &want));
     MOCK_METHOD3(NotifyWhetherVisibleForms, int(const std::vector<int64_t> &formIds,
         const sptr<IRemoteObject> &callerToken, const int32_t formVisibleType));
-    MOCK_METHOD1(HasFormVisible, bool(const uint32_t tokenId));
     MOCK_METHOD2(CastTempForm, int(const int64_t formId, const sptr<IRemoteObject> &callerToken));
     MOCK_METHOD1(DumpStorageFormInfos, int(std::string &formInfos));
     MOCK_METHOD2(DumpFormInfoByBundleName, int(const std::string &bundleName, std::string &formInfos));

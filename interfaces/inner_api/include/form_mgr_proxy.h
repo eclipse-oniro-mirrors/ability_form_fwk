@@ -136,13 +136,6 @@ public:
     const int32_t formVisibleType) override;
 
     /**
-     * @brief Query whether has visible form by tokenId.
-     * @param tokenId Unique identification of application.
-     * @return Returns true if has visible form, false otherwise.
-     */
-    virtual bool HasFormVisible(const uint32_t tokenId) override;
-
-    /**
      * @brief temp form to normal form.
      * @param formId The Id of the form.
      * @param callerToken Caller ability token.

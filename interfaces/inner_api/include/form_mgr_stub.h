@@ -127,15 +127,6 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t HandleNotifyWhetherVisibleForms(MessageParcel &data, MessageParcel &reply);
-
-    /**
-     * @brief Handle HasFormVisible message.
-     * @param data input param.
-     * @param reply output param.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    int32_t HandleHasFormVisible(MessageParcel &data, MessageParcel &reply);
-
     /**
      * @brief Handle CastTempForm message.
      * @param data input param.
