@@ -90,7 +90,7 @@ private:
         HILOG_DEBUG("argc is %{public}zu, param range is [%{public}zu, %{public}zu]",
             argc, minParamNum, maxParamNum);
         if (argc > maxParamNum || argc < minParamNum) {
-            HILOG_ERROR("invalid param number %{public}d.", argc);
+            HILOG_ERROR("invalid param number %{public}zu.", argc);
             std::string errMsg = "[" + std::to_string(minParamNum) + ", " + std::to_string(maxParamNum) + "]";
             NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), errMsg);
             return false;
