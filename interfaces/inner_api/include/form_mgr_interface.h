@@ -149,6 +149,13 @@ public:
     const int32_t formVisibleType) = 0;
 
     /**
+     * @brief Query whether has visible form by tokenId.
+     * @param tokenId Unique identification of application.
+     * @return Returns true if has visible form, false otherwise.
+     */
+    virtual bool HasFormVisible(const uint32_t tokenId) = 0;
+
+    /**
      * @brief temp form to normal form.
      * @param formId The Id of the form.
      * @param callerToken Caller ability token.
@@ -631,6 +638,7 @@ public:
         FORM_MGR_SET_FORMS_RECYCLABLE,
         FORM_MGR_RECYCLE_FORMS,
         FORM_MGR_RECOVER_FORMS,
+        FORM_MGR_HAS_FORM_VISIBLE_WITH_TOKENID,
     };
 };
 }  // namespace AppExecFwk
