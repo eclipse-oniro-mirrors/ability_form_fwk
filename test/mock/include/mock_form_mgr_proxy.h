@@ -33,6 +33,7 @@ public:
     MOCK_METHOD3(MessageEvent, int32_t(int64_t formId, const Want &want, const sptr<IRemoteObject> &callerToken));
     MOCK_METHOD3(NotifyFormsPrivacyProtected, int(const std::vector<int64_t> &formIds, bool isProtected,
         const sptr<IRemoteObject> &callerToken));
+    MOCK_METHOD1(HasFormVisible, bool(const uint32_t tokenId));
     MOCK_METHOD1(DumpStorageFormInfos, int(std::string &formInfos));
     MOCK_METHOD2(DumpFormInfoByFormId, int(int64_t formId, std::string &formInfos));
     MOCK_METHOD2(DumpFormTimerByFormId, int(int64_t formId, std::string &isTimingService));

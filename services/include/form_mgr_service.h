@@ -164,6 +164,13 @@ public:
     int CastTempForm(const int64_t formId, const sptr<IRemoteObject> &callerToken) override;
 
     /**
+     * @brief Query whether has visible form by tokenId.
+     * @param tokenId Unique identification of application.
+     * @return Returns true if has visible form, false otherwise.
+     */
+    bool HasFormVisible(const uint32_t tokenId) override;
+
+    /**
      * @brief Dump all of form storage infos.
      * @param formInfos All of form storage infos.
      * @return Returns ERR_OK on success, others on failure.
@@ -588,6 +595,7 @@ private:
         KEY_DUMP_BY_FORM_ID,
         KEY_DUMP_TEMPORARY,
         KEY_DUMP_STATIC,
+        KEY_DUMP_VISIBLE,
     };
     /**
      * @brief initialization of form manager service.
@@ -610,6 +618,7 @@ private:
     void HiDumpStorageFormInfos([[maybe_unused]] const std::string &args, std::string &result);
     void HiDumpTemporaryFormInfos([[maybe_unused]] const std::string &args, std::string &result);
     void HiDumpStaticBundleFormInfos([[maybe_unused]] const std::string &args, std::string &result);
+    void HiDumpHasFormVisible(const std::string &args, std::string &result);
     void HiDumpFormInfoByBundleName(const std::string &args, std::string &result);
     void HiDumpFormInfoByFormId(const std::string &args, std::string &result);
     bool CheckCallerIsSystemApp() const;

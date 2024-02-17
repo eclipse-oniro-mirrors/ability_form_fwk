@@ -148,6 +148,13 @@ public:
     const int32_t formVisibleType);
 
     /**
+     * @brief Query whether has visible form by tokenId.
+     * @param tokenId Unique identification of application.
+     * @return Returns true if has visible form, false otherwise.
+     */
+    bool HasFormVisible(const uint32_t tokenId);
+
+    /**
      * @brief Release renderer.
      * @param formId The Id of the forms to release.
      * @param compId The compId of the forms to release.

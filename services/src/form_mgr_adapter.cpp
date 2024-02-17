@@ -23,6 +23,8 @@
 
 #include "ability_manager_errors.h"
 #include "form_record.h"
+#include "accesstoken_kit.h"
+#include "hap_token_info.h"
 #ifdef DEVICE_USAGE_STATISTICS_ENABLE
 #include "bundle_active_client.h"
 #endif
@@ -77,6 +79,11 @@ namespace {
 constexpr int32_t CALLING_UID_TRANSFORM_DIVISOR = 200000;
 constexpr int32_t SYSTEM_UID = 1000;
 constexpr int32_t API_11 = 11;
+constexpr int32_t DEFAULT_USER_ID = 100;
+constexpr int32_t BUNDLE_NAME_INDEX = 0;
+constexpr int32_t USER_ID_INDEX = 1;
+constexpr int32_t INSTANCE_SEQ_INDEX = 2;
+const std::string BUNDLE_INFO_SEPARATOR = "_";
 const std::string POINT_ETS = ".ets";
 constexpr int DATA_FIELD = 1;
 constexpr int FORM_UPDATE_LEVEL_VALUE_MAX_LENGTH = 3; // update level is 1~336, so max length is 3.
@@ -727,6 +734,42 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
 }
 
 /**
+ * @brief Query whether has visible form by tokenId.
+ * @param tokenId Unique identification of application.
+ * @return Returns true if has visible form, false otherwise.
+ */
+bool FormMgrAdapter::HasFormVisible(const uint32_t tokenId)
+{
+    HILOG_DEBUG("called.");
+    Security::AccessToken::HapTokenInfo hapTokenInfo;
+    int ret = Security::AccessToken::AccessTokenKit::GetHapTokenInfo(tokenId, hapTokenInfo);
+    if (ret != Security::AccessToken::AccessTokenKitRet::RET_SUCCESS) {
+        HILOG_ERROR("GetHapTokenInfo error with ret:%{public}d", ret);
+        return false;
+    }
+
+    std::string bundleName = hapTokenInfo.bundleName;
+    int32_t userId = hapTokenInfo.userID;
+    HILOG_DEBUG("getHapTokenInfo bundleName:%{public}s, userId:%{public}d", bundleName.c_str(), userId);
+
+    std::vector<FormRecord> formInfos;
+    if (!FormDataMgr::GetInstance().GetFormRecord(bundleName, formInfos)) {
+        HILOG_ERROR("GetFormRecord error");
+        return false;
+    }
+
+    for (const auto& formRecord : formInfos) {
+        HILOG_DEBUG("query record, visible:%{public}d, userId:%{public}d", formRecord.formVisibleNotifyState, userId);
+        if (formRecord.formVisibleNotifyState == static_cast<int32_t>(FormVisibilityType::VISIBLE) &&
+            formRecord.userId == userId) {
+                return true;
+        }
+    }
+
+    return false;
+}
+
+/**
  * @brief Padding the formInstances map for visibleNotify.
  * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
  * @param formId Form Id.
@@ -1107,6 +1150,40 @@ int FormMgrAdapter::DumpFormInfoByBundleName(const std::string &bundleName, std:
     FormDumpMgr::GetInstance().DumpFormInfos(formRecordInfos, formInfos);
     return ERR_OK;
 }
+
+/**
+ * @brief Dump has form visible with bundleInfo.
+ * @param bundleInfo Bundle info like bundleName_userId_instIndex.
+ * @param formInfos Form dump infos.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormMgrAdapter::DumpHasFormVisible(const std::string &bundleInfo, std::string &formInfos) const
+{
+    HILOG_INFO("bundleInfo:%{public}s", bundleInfo.c_str());
+    std::vector<std::string> bundleInfoList = FormUtil::StringSplit(bundleInfo, BUNDLE_INFO_SEPARATOR);
+    int size = bundleInfoList.size();
+    if (size == 0) {
+        HILOG_ERROR("args size is zero.");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    // resolve bundle info
+    std::string bundleName = bundleInfoList[BUNDLE_NAME_INDEX];
+    int32_t userId = DEFAULT_USER_ID;
+    int32_t instIndex = 0;
+    if (size > USER_ID_INDEX) {
+        userId = std::stoi(bundleInfoList[USER_ID_INDEX]);
+        if (size > INSTANCE_SEQ_INDEX) {
+            instIndex = std::stoi(bundleInfoList[INSTANCE_SEQ_INDEX]);
+        }
+    }
+    HILOG_INFO("resolve bundleInfo, bundleName:%{public}s, userId:%{public}d, instIndex:%{public}d",
+        bundleName.c_str(), userId, instIndex);
+    uint32_t tokenId = Security::AccessToken::AccessTokenKit::GetHapTokenID(userId, bundleName, instIndex);
+    FormDumpMgr::GetInstance().DumpHasFormVisible(tokenId, bundleName, userId, instIndex, formInfos);
+    return ERR_OK;
+}
+
 /**
  * @brief Dump form info by a bundle name.
  * @param formId The id of the form.
