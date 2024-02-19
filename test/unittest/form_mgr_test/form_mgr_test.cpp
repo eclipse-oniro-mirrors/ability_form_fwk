@@ -2352,4 +2352,20 @@ HWTEST_F(FormMgrTest, FormMgrTest_0120, TestSize.Level1) {
     EXPECT_EQ(result, ERROR_NUM);
     GTEST_LOG_(INFO) << "FormMgrTest_0120 test ends";
 }
+
+/**
+ * @tc.name: FormMgrTest_0121
+ * @tc.desc: Verify HasFormVisible
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0121, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0121 starts";
+    EXPECT_CALL(*mockProxy, HasFormVisible(_))
+        .Times(1)
+        .WillOnce(Return(true));
+    uint32_t tokenId = 0;
+    bool result = FormMgr::GetInstance().HasFormVisible(tokenId);
+    EXPECT_EQ(result, true);
+    GTEST_LOG_(INFO) << "FormMgrTest_0121 test ends";
+}
 } // namespace

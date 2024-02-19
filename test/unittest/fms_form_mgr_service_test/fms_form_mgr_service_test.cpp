@@ -33,10 +33,12 @@
 #include "mock_form_provider_client.h"
 #include "ipc_types.h"
 #include "fms_log_wrapper.h"
+#include "accesstoken_kit.h"
 
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::AppExecFwk;
+using namespace OHOS::Security::AccessToken;
 
 extern void MockCheckAcrossLocalAccountsPermission(bool mockRet);
 extern void MockIsSACall(bool mockRet);
@@ -1697,5 +1699,87 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0095, TestSize.Level1)
     FormInstance formInstance;
     EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY, formMgrService.GetFormInstanceById(formId, formInstance));
     GTEST_LOG_(INFO) << "FormMgrService_0095 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0096
+ * @tc.name: test HasFormVisible function.
+ * @tc.desc: Verify that the HasFormVisible interface is called normally and the return value is right.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0096, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0096 start";
+    std::string bundleName = "ohos.samples.FormApplication";
+    int32_t userId = 0;
+    int32_t instIndex = 0;
+    // create formRecords_
+    FormRecord record;
+    record.bundleName = bundleName;
+    record.userId = userId;
+    record.formVisibleNotifyState = 1;
+    int64_t formId = 123456;
+    FormDataMgr::GetInstance().formRecords_.emplace(formId, record);
+
+    // create tokeninfo
+    HapInfoParams infoManagerTestInfoParms = {
+        .userID = userId,
+        .bundleName = bundleName,
+        .instIndex = instIndex,
+        .appIDDesc = "test",
+        .isSystemApp = true
+    };
+
+    PermissionDef infoManagerTestPermDef = {
+        .permissionName = "ohos.permission.test",
+        .bundleName = bundleName,
+        .grantMode = 1,
+        .availableLevel = APL_SYSTEM_CORE,
+        .label = "label",
+        .labelId = 1,
+        .description = "form manager service test",
+        .descriptionId = 1,
+    };
+
+    PermissionStateFull infoManagerTestState = {
+        .permissionName = "ohos.permission.test",
+        .isGeneral = true,
+        .resDeviceID = { "local" },
+        .grantStatus = { PermissionState::PERMISSION_GRANTED },
+        .grantFlags = { 1 },
+    };
+
+    HapPolicyParams infoManagerTestPolicyPrams = {
+        .apl = APL_SYSTEM_CORE,
+        .domain = "test.domain",
+        .permList = { infoManagerTestPermDef },
+        .permStateList = { infoManagerTestState }
+    };
+    AccessTokenKit::AllocHapToken(infoManagerTestInfoParms, infoManagerTestPolicyPrams);
+
+    // create tokenid
+    uint32_t tokenId1 = AccessTokenKit::GetHapTokenID(userId, bundleName, instIndex);
+
+    MockIsSACall(true);
+    FormMgrService formMgrService;
+    EXPECT_EQ(true, formMgrService.HasFormVisible(tokenId1));
+
+    uint32_t tokenId2 = 0;
+    EXPECT_EQ(false, formMgrService.HasFormVisible(tokenId2));
+    GTEST_LOG_(INFO) << "FormMgrService_0096 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0097
+ * @tc.name: test HiDumpHasFormVisible function.
+ * @tc.desc: Verify that the HiDumpHasFormVisible interface is called normally
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0097, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0097 start";
+    FormMgrService formMgrService;
+    std::string args = "args";
+    std::string result = "result";
+    formMgrService.HiDumpHasFormVisible(args, result);
+    GTEST_LOG_(INFO) << "FormMgrService_0097 end";
 }
 }
