@@ -770,4 +770,20 @@ HWTEST_F(FormMgrProxyTest, GetFormInstanceById_0100, TestSize.Level1) {
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "GetFormInstanceById_0100 test ends";
 }
+
+/**
+ * @tc.name: FormMgrProxyTest_0101
+ * @tc.desc: Verify HasFormVisible
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0101, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_0101 starts";
+    EXPECT_CALL(*mockFormMgrService, HasFormVisible(_))
+        .Times(1)
+        .WillOnce(Return(true));
+    uint32_t tokenId = 0;
+    bool result = formMgrProxy->HasFormVisible(tokenId);
+    EXPECT_EQ(result, true);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_0101 test ends";
+}
 }
