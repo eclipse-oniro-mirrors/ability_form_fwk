@@ -34,6 +34,12 @@
 #include "ipc_types.h"
 #include "fms_log_wrapper.h"
 #include "accesstoken_kit.h"
+#include "form_ams_helper.h"
+#include "form_bms_helper.h"
+#include "ability_info.h"
+#include "bundle_mgr_interface.h"
+#include "gmock/gmock.h"
+#include "mock_ability_manager.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -51,6 +57,86 @@ extern void MockGetTokenTypeFlag(uint32_t mockRet);
 
 namespace {
 const std::string NAME_FORM_MGR_SERVICE = "FormMgrService";
+
+const int32_t APP_600 = 600;
+
+class MockBundleMgrProxy : public IRemoteProxy<IBundleMgr> {
+public:
+    explicit MockBundleMgrProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IBundleMgr>(impl)
+    {}
+    virtual ~MockBundleMgrProxy()
+    {}
+
+    MOCK_METHOD5(QueryAbilityInfo, bool(const Want &want, int32_t flags, int32_t userId, AbilityInfo &abilityInfo,
+        const sptr<IRemoteObject> &callBack));
+    bool QueryAbilityInfo(const AAFwk::Want &want, AbilityInfo &abilityInfo) override
+    {
+        return true;
+    }
+
+    std::string GetAppType(const std::string &bundleName) override
+    {
+        return "system";
+    }
+
+    int GetUidByBundleName(const std::string &bundleName, const int userId) override
+    {
+        if (bundleName.compare("com.form.host.app600") == 0) {
+            return APP_600;
+        }
+        return 0;
+    }
+
+    bool GetBundleNameForUid(const int uid, std::string &bundleName) override
+    {
+        bundleName = "com.form.service";
+        return true;
+    }
+
+    int32_t GetNameForUid(const int uid, std::string &bundleName) override
+    {
+        return GetNameForUid_;
+    };
+
+    bool GetFormsInfoByApp(const std::string &bundleName, std::vector<FormInfo> &formInfo) override
+    {
+        return false;
+    };
+    bool GetFormsInfoByModule(const std::string &bundleName, const std::string &moduleName,
+    std::vector<FormInfo> &formInfo) override
+    {
+        return false;
+    };
+
+    ErrCode GetBundlePackInfo(const std::string &bundleName, int32_t flags,
+        BundlePackInfo &bundlePackInfo, int32_t userId = Constants::UNSPECIFIED_USERID) override
+    {
+        GTEST_LOG_(INFO) << "GetBundlePackInfo int32_t";
+        return GetBundlePackInfo_;
+    }
+
+    ErrCode GetBundlePackInfo(const std::string &bundleName, const BundlePackFlag flag,
+        BundlePackInfo &bundlePackInfo, int32_t userId = Constants::UNSPECIFIED_USERID) override
+    {
+        GTEST_LOG_(INFO) << "GetBundlePackInfo BundlePackFlag";
+        return GetBundlePackInfo_;
+    }
+
+    bool SetModuleRemovable(
+        const std::string &bundleName, const std::string &moduleName, bool isEnable) override
+    {
+        return setModuleRemovable_;
+    }
+
+    sptr<IBundleInstaller> GetBundleInstaller() override
+    {
+        return nullptr;
+    }
+
+    ErrCode GetBundlePackInfo_ = ERR_APPEXECFWK_SERVICE_INTERNAL_ERROR;
+    bool setModuleRemovable_ = false;
+    int32_t GetNameForUid_ = ERR_OK;
+};
 
 class FmsFormMgrServiceTest : public testing::Test {
 public:
@@ -1729,7 +1815,7 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0096, TestSize.Level1)
         .isSystemApp = true
     };
 
-    PermissionDef infoManagerTestPermDef = {
+    OHOS::Security::AccessToken::PermissionDef infoManagerTestPermDef = {
         .permissionName = "ohos.permission.test",
         .bundleName = bundleName,
         .grantMode = 1,
@@ -1781,5 +1867,30 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0097, TestSize.Level1)
     std::string result = "result";
     formMgrService.HiDumpHasFormVisible(args, result);
     GTEST_LOG_(INFO) << "FormMgrService_0097 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0098
+ * @tc.name: test StartAbility function.
+ * @tc.desc: Verify that the StartAbility interface is called normally
+ * and the return value is ERR_OK.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0098, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0098 start";
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(true);
+    FormMgrService formMgrService;
+    std::string str = "aa";
+    Want want;
+    want.SetElementName("bundleName", "abilityName");
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, str);
+    const sptr<IRemoteObject> callerToken = nullptr;
+    const sptr<IRemoteObject> impl;
+    const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
+    FormBmsHelper::GetInstance().SetBundleManager(bundleManager);
+    FormAmsHelper::GetInstance().SetAbilityManager(new MockAbilityMgrService());
+    EXPECT_EQ(ERR_OK, formMgrService.StartAbility(want, callerToken));
+    GTEST_LOG_(INFO) << "FormMgrService_0098 end";
 }
 }
