@@ -76,7 +76,7 @@ public:
     {
         return;
     }
-    int32_t NotifyContinuationResultFromRemote(int32_t sessionId, bool isSuccess) override
+    int32_t NotifyContinuationResultFromRemote(int32_t sessionId, bool isSuccess, const std::string dstInfo) override
     {
         return 0;
     }
