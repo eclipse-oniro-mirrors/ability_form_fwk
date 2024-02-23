@@ -348,7 +348,7 @@ void FormRenderRecord::DeleteRenderRecord(int64_t formId, const std::string &com
         HILOG_ERROR("eventHandler_ is nullptr.");
         return;
     }
-    
+
     auto task = [weak = weak_from_this(), formId, compId, &isRenderGroupEmpty]() {
         auto renderRecord = weak.lock();
         if (renderRecord == nullptr) {
