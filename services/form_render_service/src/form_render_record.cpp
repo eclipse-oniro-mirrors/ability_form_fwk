@@ -343,17 +343,12 @@ void FormRenderRecord::DeleteRenderRecord(int64_t formId, const std::string &com
 {
     // Some resources need to be deleted in a JS thread
     HILOG_INFO("Delete some resources formId: %{public}" PRId64 ", %{public}s", formId, compId.c_str());
-    std::shared_ptr<EventHandler> eventHandler = nullptr;
-    {
-        std::lock_guard<std::mutex> lock(eventHandlerMutex_);
-        eventHandler = eventHandler_;
-    }
-
-    if (eventHandler == nullptr) {
-        HILOG_ERROR("eventHandler is null");
+    std::lock_guard<std::mutex> lock(eventHandlerMutex_);
+    if (!CheckEventHandler(true, true)) {
+        HILOG_ERROR("eventHandler_ is nullptr.");
         return;
     }
-
+    
     auto task = [weak = weak_from_this(), formId, compId, &isRenderGroupEmpty]() {
         auto renderRecord = weak.lock();
         if (renderRecord == nullptr) {

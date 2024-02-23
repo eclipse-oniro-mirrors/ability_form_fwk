@@ -36,6 +36,7 @@ namespace OHOS {
 namespace AppExecFwk {
 sptr<FormSupplyCallback> FormSupplyCallback::instance_ = nullptr;
 std::mutex FormSupplyCallback::mutex_;
+const std::string EMPTY_STATUS_DATA = "empty_status_data";
 
 sptr<FormSupplyCallback> FormSupplyCallback::GetInstance()
 {
@@ -330,7 +331,7 @@ int32_t FormSupplyCallback::OnRecycleForm(const int64_t &formId, const Want &wan
     std::string statusData = want.GetStringParam(Constants::FORM_STATUS_DATA);
     if (statusData.empty()) {
         HILOG_WARN("status data of %{public}" PRId64 " is empty", formId);
-        return ERR_OK;
+        statusData = EMPTY_STATUS_DATA;
     }
     if (FormInfoRdbStorageMgr::GetInstance().UpdateStatusData(std::to_string(formId), statusData) != ERR_OK) {
         HILOG_ERROR("update status data of %{public}" PRId64 " failed", formId);

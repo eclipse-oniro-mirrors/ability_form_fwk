@@ -324,8 +324,7 @@ int32_t FormRenderImpl::RecycleForm(const int64_t &formId, const Want &want)
             return RECYCLE_FORM_FAILED;
         }
         if (statusData.empty()) {
-            HILOG_ERROR("statusData of %{public}s is empty.", std::to_string(formId).c_str());
-            return RECYCLE_FORM_FAILED;
+            HILOG_WARN("statusData of %{public}s is empty.", std::to_string(formId).c_str());
         }
     }
 
