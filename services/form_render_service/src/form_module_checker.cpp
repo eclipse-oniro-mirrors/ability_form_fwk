@@ -61,6 +61,10 @@ bool FormModuleChecker::CheckApiWithSuffix(const std::string& apiPath, const std
 bool FormModuleChecker::CheckModuleLoadable(const char *moduleName,
     std::unique_ptr<ApiAllowListChecker> &apiAllowListChecker)
 {
+    if (std::string(moduleName) == "mediaquery") {
+        HILOG_INFO("load mediaquery");
+        return true;
+    }
     if (std::string(moduleName) == "i18n" || std::string(moduleName) == "intl") {
         HILOG_INFO("module has been allowed by the allowlist in form, module name = %{public}s", moduleName);
         if (apiAllowListChecker == nullptr) {
