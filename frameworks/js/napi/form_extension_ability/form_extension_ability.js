@@ -48,6 +48,10 @@ class FormExtensionAbility {
   onShareForm(formId) {
     console.log('FormExtension onShareForm, formId:' + formId);
   }
+
+  onStop() {
+    console.log('FormExtension onStop');
+  }
 }
 
 export default FormExtensionAbility;
