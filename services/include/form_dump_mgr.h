@@ -98,6 +98,7 @@ public:
 
 private:
     void AppendBundleFormInfo(const FormRecord &formRecordInfo, std::string &formInfo) const;
+    void AppendRecycleStatus(const FormRecord &formRecordInfo, std::string &formInfo) const;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

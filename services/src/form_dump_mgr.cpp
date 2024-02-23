@@ -157,6 +157,7 @@ void FormDumpMgr::DumpFormInfos(const std::vector<FormRecord> &formRecordInfos, 
         }
 
         AppendBundleFormInfo(info, formInfos);
+        AppendRecycleStatus(info, formInfos);
         formInfos += LINE_FEED;
     }
 
@@ -229,6 +230,7 @@ void FormDumpMgr::DumpFormInfo(const FormRecord &formRecordInfo, std::string &fo
     }
 
     AppendBundleFormInfo(formRecordInfo, formInfo);
+    AppendRecycleStatus(formRecordInfo, formInfo);
 
     HILOG_DEBUG("%{public}s success. Form infos:%{private}s", __func__, formInfo.c_str());
 }
@@ -264,6 +266,17 @@ void FormDumpMgr::AppendBundleFormInfo(const FormRecord &formRecordInfo, std::st
             formInfo += " [" + std::to_string(dimension) + "] ";
         }
         formInfo += "]\n";
+    }
+}
+
+void FormDumpMgr::AppendRecycleStatus(const FormRecord &formRecordInfo, std::string &formInfo) const
+{
+    if (formRecordInfo.recycleStatus == RecycleStatus::RECYCLABLE) {
+        formInfo += "    recycleStatus [RECYCLABLE]\n";
+    } else if (formRecordInfo.recycleStatus == RecycleStatus::RECYCLED) {
+        formInfo += "    recycleStatus [RECYCLED]\n";
+    } else {
+        formInfo += "    recycleStatus [NON_RECYCLABLE]\n";
     }
 }
 }  // namespace AppExecFwk

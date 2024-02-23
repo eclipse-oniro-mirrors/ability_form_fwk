@@ -393,6 +393,11 @@ public:
     {
         GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnRecoverForms);
     }
+
+    static napi_value RecycleForms(napi_env env, napi_callback_info info)
+    {
+        GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnRecycleForms);
+    }
 private:
     bool CheckCallerIsSystemApp()
     {
@@ -1612,7 +1617,7 @@ private:
 
         napi_value lastParam = (argc <= convertArgc) ? nullptr : argv[convertArgc];
         napi_value result = nullptr;
-        NapiAsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnSetFormsRecyclable",
+        NapiAsyncTask::ScheduleWithDefaultQos("JsFormHost::OnSetFormsRecyclable",
             env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
         return result;
     }
@@ -1647,7 +1652,42 @@ private:
 
         napi_value lastParam = (argc <= convertArgc) ? nullptr : argv[convertArgc];
         napi_value result = nullptr;
-        NapiAsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnRecoverForms",
+        NapiAsyncTask::ScheduleWithDefaultQos("JsFormHost::OnRecoverForms",
+            env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
+        return result;
+    }
+
+    napi_value OnRecycleForms(napi_env env, size_t argc, napi_value *argv)
+    {
+        HILOG_DEBUG("called.");
+        if (argc < ARGS_ONE) {
+            HILOG_ERROR("Wrong number of arguments.");
+            NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1 or 2");
+            return CreateJsUndefined(env);
+        }
+
+        decltype(argc) convertArgc = 0;
+        std::vector<int64_t> formIds;
+        if (!ConvertFromIds(env, argv[PARAM0], formIds)) {
+            HILOG_ERROR("form id list is invalid.");
+            NapiFormUtil::ThrowParamTypeError(env, "formIds", "Array<string>");
+            return CreateJsUndefined(env);
+        }
+        convertArgc++;
+
+        NapiAsyncTask::CompleteCallback complete = [formIds](napi_env env, NapiAsyncTask &task, int32_t status) {
+            Want want;
+            auto ret = FormMgr::GetInstance().RecycleForms(formIds, want);
+            if (ret == ERR_OK) {
+                task.ResolveWithNoError(env, CreateJsUndefined(env));
+            } else {
+                task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
+            }
+        };
+
+        napi_value lastParam = (argc <= convertArgc) ? nullptr : argv[convertArgc];
+        napi_value result = nullptr;
+        NapiAsyncTask::ScheduleWithDefaultQos("JsFormHost::OnRecycleForms",
             env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
         return result;
     }
@@ -1689,6 +1729,7 @@ napi_value JsFormHostInit(napi_env env, napi_value exportObj)
     BindNativeFunction(env, exportObj, "getRunningFormInfoById", moduleName, JsFormHost::GetFormInstanceById);
     BindNativeFunction(env, exportObj, "setFormsRecyclable", moduleName, JsFormHost::SetFormsRecyclable);
     BindNativeFunction(env, exportObj, "recoverForms", moduleName, JsFormHost::RecoverForms);
+    BindNativeFunction(env, exportObj, "recycleForms", moduleName, JsFormHost::RecycleForms);
 
     return CreateJsUndefined(env);
 }
