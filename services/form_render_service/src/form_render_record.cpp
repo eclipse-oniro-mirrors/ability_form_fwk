@@ -1054,6 +1054,7 @@ void FormRenderRecord::UpdateConfiguration(
         return;
     }
 
+    contextsMapForModuleName_.clear();
     SetConfiguration(config);
     std::lock_guard<std::mutex> lock(eventHandlerMutex_);
     if (eventHandler_ == nullptr) {
