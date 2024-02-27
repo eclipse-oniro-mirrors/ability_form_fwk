@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,6 +31,7 @@ bool FormInstance::ReadFromParcel(Parcel &parcel)
     abilityName = Str16ToStr8(parcel.ReadString16());
     formName = Str16ToStr8(parcel.ReadString16());
     formUsageState = static_cast<FormUsageState>(parcel.ReadInt32());
+    description = Str16ToStr8(parcel.ReadString16());
     return true;
 }
 
@@ -78,6 +79,11 @@ bool FormInstance::Marshalling(Parcel &parcel) const
 
     // write formUsageState
     if (!parcel.WriteInt32(static_cast<int32_t>(formUsageState))) {
+        return false;
+    }
+
+    // write description
+    if (!parcel.WriteString16(Str8ToStr16(description))) {
         return false;
     }
     return true;
