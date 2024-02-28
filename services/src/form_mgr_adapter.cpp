@@ -2427,7 +2427,15 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
         FormRouterProxyMgr::GetInstance().OnFormRouterEvent(formId, want);
         return ERR_OK;
     }
-    int32_t result = FormAmsHelper::GetInstance().GetAbilityManager()->StartAbility(want, callerToken);
+    ApplicationInfo appInfo;
+    int32_t result;
+    if (FormBmsHelper::GetInstance().GetApplicationInfo(record.bundleName, FormUtil::GetCurrentAccountId(),
+        appInfo) != ERR_OK) {
+        HILOG_ERROR("Get app info failed.");
+        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED; 
+    }
+    result = IN_PROCESS_CALL(FormAmsHelper::GetInstance().GetAbilityManager()->StartAbilityWithSpecifyTokenId(
+        want, callerToken, appInfo.accessTokenId));
     if (result != ERR_OK && result != START_ABILITY_WAITING) {
         HILOG_ERROR("Failed to StartAbility, result: %{public}d.", result);
         return result;
