@@ -279,6 +279,11 @@ public:
         GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnRequestForm);
     }
 
+    static napi_value RequestFormWithParams(napi_env env, napi_callback_info info)
+    {
+        GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnRequestFormWithParams);
+    }
+
     static napi_value CastTempForm(napi_env env, napi_callback_info info)
     {
         GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnCastTempForm);
@@ -590,6 +595,55 @@ private:
         napi_value lastParam = (argc <= convertArgc) ? nullptr : argv[convertArgc];
         napi_value result = nullptr;
         NapiAsyncTask::ScheduleWithDefaultQos("JsFormHost::OnRequestForm",
+            env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
+        return result;
+    }
+
+    napi_value OnRequestFormWithParams(napi_env env, size_t argc, napi_value* argv)
+    {
+        HILOG_DEBUG("%{public}s called.", __func__);
+
+        if (argc > ARGS_TWO || argc < ARGS_ONE) {
+            HILOG_ERROR("%{public}s, wrong number of arguments.", __func__);
+            NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1 or 2");
+            return CreateJsUndefined(env);
+        }
+
+        decltype(argc) convertArgc = 0;
+        int64_t formId = 0;
+        if (!ConvertFromId(env, argv[PARAM0], formId)) {
+            HILOG_ERROR("form id is invalid.");
+            NapiFormUtil::ThrowParamTypeError(env, "formId", "string");
+            return CreateJsUndefined(env);
+        }
+        convertArgc++;
+
+        if (argc == ARGS_TWO && !IsTypeForNapiValue(env, argv[PARAM1], napi_object)) {
+            HILOG_ERROR("second input param is invalid.");
+            NapiFormUtil::ThrowParamTypeError(env, "wantParams", "object");
+            return CreateJsUndefined(env);
+        }
+
+        Want want;
+        AAFwk::WantParams wantParams;
+        if (UnwrapWantParams(env, argv[PARAM1], wantParams)) {
+            want.SetParams(wantParams);
+        }
+        convertArgc++;
+
+        NapiAsyncTask::CompleteCallback complete = [formId, want](napi_env env, NapiAsyncTask &task, int32_t status) {
+            
+            auto ret = FormMgr::GetInstance().RequestForm(formId, FormHostClient::GetInstance(), want);
+            if (ret == ERR_OK) {
+                task.ResolveWithNoError(env, CreateJsUndefined(env));
+            } else {
+                task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
+            }
+        };
+
+        napi_value lastParam = (argc <= convertArgc) ? nullptr : argv[convertArgc];
+        napi_value result = nullptr;
+        NapiAsyncTask::ScheduleWithDefaultQos("JsFormHost::OnRequestFormWithParams",
             env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
         return result;
     }
@@ -1704,6 +1758,7 @@ napi_value JsFormHostInit(napi_env env, napi_value exportObj)
     BindNativeFunction(env, exportObj, "deleteForm", moduleName, JsFormHost::DeleteForm);
     BindNativeFunction(env, exportObj, "releaseForm", moduleName, JsFormHost::ReleaseForm);
     BindNativeFunction(env, exportObj, "requestForm", moduleName, JsFormHost::RequestForm);
+    BindNativeFunction(env, exportObj, "requestFormWithParams", moduleName, JsFormHost::RequestFormWithParams);
     BindNativeFunction(env, exportObj, "castTempForm", moduleName, JsFormHost::CastTempForm);
     BindNativeFunction(env, exportObj, "castToNormalForm", moduleName, JsFormHost::CastTempForm);
     BindNativeFunction(env, exportObj, "notifyVisibleForms", moduleName, JsFormHost::NotifyVisibleForms);
