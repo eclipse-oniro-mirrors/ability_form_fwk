@@ -178,7 +178,7 @@ int FormProviderClient::NotifyFormUpdate(
         std::map<std::string, std::string> formParamsMap;
         if (want.HasParameter(Constants::PARAM_HOST_BG_INVERSE_COLOR_KEY)) {
             std::string reverseColor = want.GetStringParam(Constants::PARAM_HOST_BG_INVERSE_COLOR_KEY);
-            formParamsMap.insert(std::make_pair(Constants::PARAM_HOST_BG_INVERSE_COLOR_KEY, reverseColor))
+            formParamsMap.insert(std::make_pair(Constants::PARAM_HOST_BG_INVERSE_COLOR_KEY, reverseColor));
             HILOG_INFO("providerClient find reverseColor: %{public}s.", reverseColor.c_str());
         }
         ownerAbility->OnUpdate(formId, formParamsMap);
