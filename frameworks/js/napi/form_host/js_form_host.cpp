@@ -632,7 +632,6 @@ private:
         convertArgc++;
 
         NapiAsyncTask::CompleteCallback complete = [formId, want](napi_env env, NapiAsyncTask &task, int32_t status) {
-            
             auto ret = FormMgr::GetInstance().RequestForm(formId, FormHostClient::GetInstance(), want);
             if (ret == ERR_OK) {
                 task.ResolveWithNoError(env, CreateJsUndefined(env));
