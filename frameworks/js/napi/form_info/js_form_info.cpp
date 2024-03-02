@@ -88,6 +88,8 @@ napi_value CreateJsFormParam(napi_env engine)
         "PARAM_FORM_CUSTOMIZE_KEY", CreateJsValue(engine, AppExecFwk::Constants::PARAM_FORM_CUSTOMIZE_KEY));
     napi_set_named_property(engine, objValue,
         "FORM_RENDERING_MODE_KEY", CreateJsValue(engine, AppExecFwk::Constants::PARAM_FORM_RENDERINGMODE_KEY));
+    napi_set_named_property(engine, objValue,
+        "HOST_BG_INVERSE_COLOR_KEY", CreateJsValue(engine, AppExecFwk::Constants::PARAM_HOST_BG_INVERSE_COLOR_KEY));
     return objValue;
 }
 
