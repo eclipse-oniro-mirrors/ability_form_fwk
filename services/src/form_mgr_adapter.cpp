@@ -2432,7 +2432,7 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
     if (FormBmsHelper::GetInstance().GetApplicationInfo(record.bundleName, FormUtil::GetCurrentAccountId(),
         appInfo) != ERR_OK) {
         HILOG_ERROR("Get app info failed.");
-        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED; 
+        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
     result = IN_PROCESS_CALL(FormAmsHelper::GetInstance().GetAbilityManager()->StartAbilityWithSpecifyTokenId(
         want, callerToken, appInfo.accessTokenId));
