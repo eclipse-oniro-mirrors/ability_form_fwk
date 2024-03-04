@@ -175,7 +175,7 @@ int FormProviderClient::NotifyFormUpdate(
         }
 
         HILOG_INFO("Ability name is %{public}s.", ownerAbility->GetAbilityName().c_str());
-        ownerAbility->OnUpdate(formId);
+        ownerAbility->OnUpdate(formId, want.GetParams());
     } while (false);
 
     if (!want.HasParameter(Constants::FORM_CONNECT_ID)) {

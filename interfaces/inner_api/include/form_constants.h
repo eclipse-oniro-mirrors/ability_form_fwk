@@ -76,6 +76,7 @@ namespace Constants {
     constexpr int32_t TYPE_STATIC_UPDATE = 2;
     constexpr int32_t TYPE_DYNAMIC_UPDATE = 3;
     const long ABS_REFRESH_MS = 2500;
+    constexpr const char* PARAM_HOST_BG_INVERSE_COLOR_KEY = "ohos.extra.param.key.host_bg_inverse_color";
 
     constexpr int32_t UNKNOWN = 0;
     // The form events type which means that the form becomes visible.

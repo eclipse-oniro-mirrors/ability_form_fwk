@@ -264,7 +264,7 @@ int FormMgr::RequestForm(const int64_t formId, const sptr<IRemoteObject> &caller
     }
     auto hostCaller = FormCallerMgr::GetInstance().GetFormHostCaller(formId);
     if (hostCaller != nullptr) {
-        HILOG_DEBUG("request form by host caller");
+        HILOG_INFO("request form by host caller");
         return hostCaller->RequestForm(formId, callerToken, want);
     }
     ErrCode resultCode = remoteProxy_->RequestForm(formId, callerToken, want);

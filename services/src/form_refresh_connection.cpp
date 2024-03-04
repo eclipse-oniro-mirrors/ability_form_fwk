@@ -66,7 +66,7 @@ void FormRefreshConnection::OnAbilityConnectDone(
         cloneWant.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
         FormTaskMgr::GetInstance().PostAcquireTask(GetFormId(), cloneWant, remoteObject);
     } else {
-        Want want;
+        Want want = Want(want_);
         want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
         FormTaskMgr::GetInstance().PostRefreshTask(GetFormId(), want, remoteObject);
     }
