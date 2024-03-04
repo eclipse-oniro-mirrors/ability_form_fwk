@@ -115,6 +115,7 @@ group("unittest") {
     "unittest/form_napi_util_test:unittest",
     "unittest/form_provider_caller_test:unittest",
     "unittest/form_provider_info_test:unittest",
+    "unittest/frs_form_module_checker_test:unittest",
   ]
 }
 

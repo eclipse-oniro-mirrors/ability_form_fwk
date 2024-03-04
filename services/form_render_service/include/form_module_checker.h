@@ -36,6 +36,7 @@ public:
         std::unique_ptr<ApiAllowListChecker>& apiAllowListChecker) override;
 private:
     static bool CheckApiAllowList(const std::string& apiPath);
+    static bool IsModuelAllowToLoad(const std::string& moduleName);
     static bool CheckApiWithSuffix(const std::string& apiPath, const std::string& item);
 };
 #endif /* OHOS_FORM_FWK_FORM_MODULE_CHECKER_H */
