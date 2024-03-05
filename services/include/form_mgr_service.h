@@ -596,6 +596,7 @@ private:
         KEY_DUMP_TEMPORARY,
         KEY_DUMP_STATIC,
         KEY_DUMP_VISIBLE,
+        KEY_DUMP_RUNNING,
     };
     /**
      * @brief initialization of form manager service.
@@ -621,6 +622,7 @@ private:
     void HiDumpHasFormVisible(const std::string &args, std::string &result);
     void HiDumpFormInfoByBundleName(const std::string &args, std::string &result);
     void HiDumpFormInfoByFormId(const std::string &args, std::string &result);
+    void HiDumpFormRunningFormInfos([[maybe_unused]] const std::string &args, std::string &result);
     bool CheckCallerIsSystemApp() const;
     static std::string GetCurrentDateTime();
 private:

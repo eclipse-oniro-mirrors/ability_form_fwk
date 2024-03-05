@@ -22,6 +22,7 @@
 #include "form_dump_mgr.h"
 #include "form_host_record.h"
 #include "form_info_mgr.h"
+#include "running_form_info.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -96,9 +97,20 @@ public:
     void DumpFormSubscribeInfo(
         const std::vector<std::string> &subscribedKeys, const int64_t &count, std::string &formInfo) const;
 
+    /**
+     * @brief Dump running form information.
+     * @param runningFormInfos All the running form information
+     * @param infosResult The dump info of all the running form info.
+     */
+    void DumpRunningFormInfos(const std::vector<RunningFormInfo> &runningFormInfos,
+        std::string &infosResult) const;
+
 private:
     void AppendBundleFormInfo(const FormRecord &formRecordInfo, std::string &formInfo) const;
     void AppendRecycleStatus(const FormRecord &formRecordInfo, std::string &formInfo) const;
+    void AppendRunningFormInfors(const std::string &formHostBundleName,
+        const std::vector<RunningFormInfo> &runningFormInfos,
+        std::string &infosResult) const;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
