@@ -280,6 +280,14 @@ public:
                                      std::vector<FormInfo> &formInfos) override;
 
     /**
+     * @brief Get forms info specfied by filter parameters.
+     * @param filter Filter that contains necessary conditions, such as bundle name, module name, dimensions.
+     * @param formInfos Return the forms' information specified by filter.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int GetFormsInfoByFilter(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos) override;
+
+    /**
     * @brief This function is called by formProvider and gets forms info by the bundle name of the calling ability.
     *        The bundle name will be retrieved by form service manager.
     * @param filter Filter that contains attributes that the formInfos have to have.

@@ -372,6 +372,19 @@ ErrCode BundleFormInfo::GetFormsInfoByModule(const std::string &moduleName, std:
     return ERR_OK;
 }
 
+ErrCode BundleFormInfo::GetFormsInfoByFilter(
+    const FormInfoFilter &filter, std::vector<FormInfo> &formInfos, int32_t userId)
+{
+    HILOG_DEBUG("%{public}s begin.",  __func__);
+    std::shared_lock<std::shared_timed_mutex> guard(formInfosMutex_);
+    auto newUserId = (userId == Constants::INVALID_USER_ID) ? FormUtil::GetCurrentAccountId() : userId;
+
+    for (const auto &item : formInfoStorages_) {
+        item.GetFormsInfoByFilter(newUserId, filter, formInfos);
+    }
+    return ERR_OK;
+}
+
 ErrCode BundleFormInfo::UpdateFormInfoStorageLocked()
 {
     ErrCode errCode;
@@ -489,6 +502,35 @@ ErrCode FormInfoMgr::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
     for (const auto &bundleFormInfo : bundleFormInfoMap_) {
         if (bundleFormInfo.second != nullptr) {
             bundleFormInfo.second->GetAllFormsInfo(formInfos);
+        }
+    }
+    return ERR_OK;
+}
+
+ErrCode FormInfoMgr::GetFormsInfoByFilter(
+    const FormInfoFilter &filter, std::vector<FormInfo> &formInfos, int32_t userId)
+{
+    std::shared_lock<std::shared_timed_mutex> guard(bundleFormInfoMapMutex_);
+    if (!CheckBundlePermission()) {
+        if (filter.bundleName.empty() || !IsCaller(filter.bundleName)) {
+            HILOG_ERROR("Permission is wrong.");
+            return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
+        }
+    }
+    if (filter.bundleName.empty()) {
+        for (const auto &bundleFormInfo : bundleFormInfoMap_) {
+            if (bundleFormInfo.second != nullptr) {
+                bundleFormInfo.second->GetFormsInfoByFilter(filter, formInfos, userId);
+            }
+        }
+    } else {
+        auto bundleFormInfoIter = bundleFormInfoMap_.find(filter.bundleName);
+        if (bundleFormInfoIter == bundleFormInfoMap_.end()) {
+            HILOG_WARN("no forms found for bundle name:%{public}s.", filter.bundleName.c_str());
+            return ERR_OK;
+        }
+        if (bundleFormInfoIter->second != nullptr) {
+            bundleFormInfoIter->second->GetFormsInfoByFilter(filter, formInfos, userId);
         }
     }
     return ERR_OK;

@@ -958,6 +958,20 @@ int FormMgrService::GetFormsInfoByModule(std::string &bundleName, std::string &m
     return FormMgrAdapter::GetInstance().GetFormsInfoByModule(bundleName, moduleName, formInfos);
 }
 
+int FormMgrService::GetFormsInfoByFilter(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos)
+{
+    HILOG_DEBUG("called.");
+    if (!CheckCallerIsSystemApp()) {
+        HILOG_ERROR("Need system authority");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+    if (!CheckAcrossLocalAccountsPermission()) {
+        HILOG_ERROR("Across local accounts permission failed.");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    }
+    return FormMgrAdapter::GetInstance().GetFormsInfoByFilter(filter, formInfos);
+}
+
 int32_t FormMgrService::GetFormsInfo(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos)
 {
     HILOG_INFO("called.");

@@ -88,6 +88,8 @@ FormMgrStub::FormMgrStub()
         &FormMgrStub::HandleGetFormsInfoByApp;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORMS_INFO_BY_MODULE)] =
         &FormMgrStub::HandleGetFormsInfoByModule;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORMS_INFO_BY_FILTER)] =
+        &FormMgrStub::HandleGetFormsInfoByFilter;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORMS_INFO)] =
         &FormMgrStub::HandleGetFormsInfo;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_ROUTER_EVENT)] =
@@ -851,6 +853,24 @@ int32_t FormMgrStub::HandleGetFormsInfoByModule(MessageParcel &data, MessageParc
             HILOG_ERROR("write failed");
             return ERR_APPEXECFWK_PARCEL_ERROR;
         }
+    }
+    return result;
+}
+
+int32_t FormMgrStub::HandleGetFormsInfoByFilter(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("%{public}s called.", __func__);
+    FormInfoFilter filter;
+    filter.bundleName = data.ReadString();
+    filter.moduleName = data.ReadString();
+    data.ReadInt32Vector(&filter.supportDimensions);
+
+    std::vector<FormInfo> infos;
+    int32_t result = GetFormsInfoByFilter(filter, infos);
+    reply.WriteInt32(result);
+    if (result == ERR_OK && !WriteParcelableVector(infos, reply)) {
+        HILOG_ERROR("write failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
 }

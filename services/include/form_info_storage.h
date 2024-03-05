@@ -17,6 +17,7 @@
 #define OHOS_FORM_FWK_FORM_INFO_STORAGE_H
 
 #include "form_info.h"
+#include "form_info_filter.h"
 #include "nlohmann/json.hpp"
 
 namespace OHOS {
@@ -32,6 +33,8 @@ struct FormInfoStorage {
     void GetAllFormsInfo(int32_t userId, std::vector<AppExecFwk::FormInfo> &formInfos) const;
     void GetFormsInfoByModule(int32_t userId, const std::string &moduleName,
         std::vector<AppExecFwk::FormInfo> &formInfos) const;
+    void GetFormsInfoByFilter(int32_t userId,
+        const AppExecFwk::FormInfoFilter &filter, std::vector<AppExecFwk::FormInfo> &formInfos) const;
 };
 
 void to_json(nlohmann::json &jsonObject, const FormInfoStorage &formInfoStorage);
