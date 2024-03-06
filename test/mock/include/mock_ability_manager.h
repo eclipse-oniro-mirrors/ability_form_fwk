@@ -838,12 +838,14 @@ public:
         int32_t userId = DEFAULT_INVAL_VALUE,
         int requestCode = DEFAULT_INVAL_VALUE)
     {
-        return 0;
+        return startAbilityWithSpecifyTokenId_;
     }
 
     int32_t startAbility_ = 0;
 
     int32_t startAbilityByCall_ = 0;
+
+    int32_t startAbilityWithSpecifyTokenId_ = 0;
 private:
     Semaphore sem_;
 };
