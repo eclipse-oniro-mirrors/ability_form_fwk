@@ -172,7 +172,9 @@ void FormSysEventReceiver::HandleBundleScanFinished()
             currUserId = MAIN_USER_ID;
         }
         FormBmsHelper::GetInstance().RegisterBundleEventCallback();
-        FormInfoMgr::GetInstance().ReloadFormInfos(currUserId);
+        if (!FormInfoMgr::GetInstance().HasReloadedFormInfos()) {
+            FormInfoMgr::GetInstance().ReloadFormInfos(currUserId);
+        }
     });
 }
 

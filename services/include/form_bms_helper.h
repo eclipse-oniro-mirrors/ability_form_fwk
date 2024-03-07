@@ -163,6 +163,8 @@ private:
     sptr<IBundleInstaller> bundleInstallerProxy_ = nullptr;
     sptr<FormBundleEventCallback> formBundleEventCallback_ = nullptr;
     std::mutex ibundleMutex_;
+    std::mutex registerMutex_;
+    bool hasRegisterBundleEvent_ = false;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
