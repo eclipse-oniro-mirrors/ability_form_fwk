@@ -83,7 +83,8 @@ const std::string FORM_DUMP_HELP = "options list:\n"
     "  -s, --storage                        query form storage info\n"
     "  -t, --temp                           query temporary form info\n"
     "  -n  <bundle-name>                    query form info by a bundle name\n"
-    "  -i  <form-id>                        query form info by a form ID\n";
+    "  -i  <form-id>                        query form info by a form ID\n"
+    "  -r  --running                        query running form info\n";
 
 const std::map<std::string, FormMgrService::DumpKey> FormMgrService::dumpKeyMap_ = {
     {"-h", FormMgrService::DumpKey::KEY_DUMP_HELP},
@@ -98,6 +99,8 @@ const std::map<std::string, FormMgrService::DumpKey> FormMgrService::dumpKeyMap_
     {"--temp", FormMgrService::DumpKey::KEY_DUMP_TEMPORARY},
     {"-n", FormMgrService::DumpKey::KEY_DUMP_BY_BUNDLE_NAME},
     {"-i", FormMgrService::DumpKey::KEY_DUMP_BY_FORM_ID},
+    {"-r", FormMgrService::DumpKey::KEY_DUMP_RUNNING},
+    {"--running", FormMgrService::DumpKey::KEY_DUMP_RUNNING},
 };
 
 FormMgrService::FormMgrService()
@@ -490,6 +493,7 @@ int FormMgrService::DumpFormTimerByFormId(const std::int64_t formId, std::string
     }
     return FormMgrAdapter::GetInstance().DumpFormTimerByFormId(formId, isTimingService);
 }
+
 /**
  * @brief Process js message event.
  * @param formId Indicates the unique id of form.
@@ -1129,6 +1133,7 @@ void FormMgrService::DumpInit()
     dumpFuncMap_[DumpKey::KEY_DUMP_TEMPORARY] = &FormMgrService::HiDumpTemporaryFormInfos;
     dumpFuncMap_[DumpKey::KEY_DUMP_BY_BUNDLE_NAME] = &FormMgrService::HiDumpFormInfoByBundleName;
     dumpFuncMap_[DumpKey::KEY_DUMP_BY_FORM_ID] = &FormMgrService::HiDumpFormInfoByFormId;
+    dumpFuncMap_[DumpKey::KEY_DUMP_RUNNING] = &FormMgrService::HiDumpFormRunningFormInfos;
 }
 
 int FormMgrService::Dump(int fd, const std::vector<std::u16string> &args)
@@ -1235,7 +1240,7 @@ bool FormMgrService::ParseOption(const std::vector<std::u16string> &args, DumpKe
     std::string optionKey = Str16ToStr8(args[0]);
     auto iter = dumpKeyMap_.find(optionKey);
     if (iter == dumpKeyMap_.end()) {
-        result = "error: unkown option.";
+        result = "error: unknown option.";
         return false;
     }
 
@@ -1246,6 +1251,17 @@ bool FormMgrService::ParseOption(const std::vector<std::u16string> &args, DumpKe
     }
 
     return true;
+}
+
+void FormMgrService::HiDumpFormRunningFormInfos([[maybe_unused]]const std::string &args, std::string &result)
+{
+    HILOG_DEBUG("called.");
+
+    if (!CheckCallerIsSystemApp()) {
+        return;
+    }
+
+    FormMgrAdapter::GetInstance().DumpFormRunningFormInfos(result);
 }
 
 void FormMgrService::HiDumpHelp([[maybe_unused]] const std::string &args, std::string &result)

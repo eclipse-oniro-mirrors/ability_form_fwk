@@ -1250,6 +1250,20 @@ int FormMgrAdapter::DumpFormTimerByFormId(const std::int64_t formId, std::string
     }
     return ERR_OK;
 }
+
+int FormMgrAdapter::DumpFormRunningFormInfos(std::string &runningFormInfosResult) const
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    std::vector<RunningFormInfo> runningFormInfos;
+    auto ret = FormMgrAdapter::GetInstance().GetRunningFormInfos(true, runningFormInfos);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("GetRunningFormInfos error.");
+        return ret;
+    }
+
+    FormDumpMgr::GetInstance().DumpRunningFormInfos(runningFormInfos, runningFormInfosResult);
+    return ERR_OK;
+}
 /**
  * @brief Get form configure info.
  * @param want The want of the request.

@@ -193,6 +193,13 @@ public:
     int DumpFormTimerByFormId(const std::int64_t formId, std::string &isTimingService) const;
 
     /**
+     * @brief Dump running form info.
+     * @param runningFormInfosResult The dump info of all the running form info.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int DumpFormRunningFormInfos(std::string &runningFormInfosResult) const;
+
+    /**
      * @brief set next refresh time.
      * @param formId The id of the form.
      * @param nextTime next refresh time.

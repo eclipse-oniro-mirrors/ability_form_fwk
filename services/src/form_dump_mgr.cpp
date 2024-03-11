@@ -18,6 +18,8 @@
 #include "fms_log_wrapper.h"
 #include "form_cache_mgr.h"
 #include "form_mgr_adapter.h"
+#include <utility>
+#include <map>
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -250,6 +252,79 @@ void FormDumpMgr::DumpFormSubscribeInfo(
     }
     formInfo += " ] updatedCount [" + std::to_string(count) + "] ]\n";
     formInfo += LINE_FEED;
+}
+
+void FormDumpMgr::AppendRunningFormInfors(const std::string &formHostBundleName,
+    const std::vector<RunningFormInfo> &runningFormInfos,
+    std::string &infosResult) const
+{
+    HILOG_INFO("%{public}s called.", __func__);
+
+    for (const auto& info : runningFormInfos) {
+        if (info.hostBundleName == formHostBundleName) {
+            infosResult += "  FormId [ " + std::to_string(info.formId) + " ] \n";
+            infosResult += "    formName [ " + info.formName + " ]\n";
+            infosResult += "    bundleName [ " + info.bundleName + " ] \n";
+            infosResult += "    moduleName [ " + info.moduleName + " ] \n";
+            infosResult += "    abilityName [ " + info.abilityName + " ] \n";
+            infosResult += "    description [ " + info.description + " ] \n";
+            infosResult += "    dimension [ " + std::to_string(info.dimension) + " ] \n";
+
+            switch (info.formVisiblity) {
+                case FormVisibilityType::UNKNOWN:
+                    infosResult += "    formVisibility [ UNKNOWN ] \n";
+                    break;
+                case FormVisibilityType::VISIBLE:
+                    infosResult += "    formVisibility [ VISIBLE ] \n";
+                    break;
+                case FormVisibilityType::INVISIBLE:
+                    infosResult += "    formVisibility [ INVISIBLE ] \n";
+                    break;
+                default:
+                    infosResult += "    formVisibility [ UNKNOWN_TYPE ] \n";
+                    break;
+            }
+
+            switch (info.formUsageState) {
+                case FormUsageState::USED:
+                    infosResult += "    FormUsageState [ USED ] \n";
+                    break;
+                case FormUsageState::UNUSED:
+                    infosResult += "    FormUsageState [ UNUSED ] \n";
+                    break;
+                default:
+                    infosResult += "    FormUsageState [ UNKNOWN_TYPE ] \n";
+                    break;
+            }
+
+            infosResult += " \n";
+        }
+    }
+}
+
+/**
+ * @brief Dump Running form info.
+ * @param runningFormInfos Form Running Form infos.
+ * @param infosResult Running Form dump info.
+ */
+void FormDumpMgr::DumpRunningFormInfos(const std::vector<RunningFormInfo> &runningFormInfos,
+    std::string &infosResult) const
+{
+    HILOG_INFO("%{public}s called.", __func__);
+
+    std::unordered_map<std::string, int> countMap;
+
+    for (const auto& info : runningFormInfos) {
+        countMap[info.hostBundleName]++;
+    }
+
+    for (const auto& infoPair : countMap) {
+        infosResult += "hostBundleName [ " + infoPair.first + " ]\n";
+        infosResult += "Total running form count: " + std::to_string(infoPair.second)  + " ] \n";
+        infosResult += "  ================RunningFormInfo=================\n";
+
+        AppendRunningFormInfors(infoPair.first, runningFormInfos, infosResult);
+    }
 }
 
 void FormDumpMgr::AppendBundleFormInfo(const FormRecord &formRecordInfo, std::string &formInfo) const
