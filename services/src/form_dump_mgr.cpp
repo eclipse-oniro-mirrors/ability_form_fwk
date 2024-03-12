@@ -254,7 +254,7 @@ void FormDumpMgr::DumpFormSubscribeInfo(
     formInfo += LINE_FEED;
 }
 
-void FormDumpMgr::AppendRunningFormInfors(const std::string &formHostBundleName,
+void FormDumpMgr::AppendRunningFormInfos(const std::string &formHostBundleName,
     const std::vector<RunningFormInfo> &runningFormInfos,
     std::string &infosResult) const
 {
@@ -323,7 +323,7 @@ void FormDumpMgr::DumpRunningFormInfos(const std::vector<RunningFormInfo> &runni
         infosResult += "Total running form count: " + std::to_string(infoPair.second)  + " ] \n";
         infosResult += "  ================RunningFormInfo=================\n";
 
-        AppendRunningFormInfors(infoPair.first, runningFormInfos, infosResult);
+        AppendRunningFormInfos(infoPair.first, runningFormInfos, infosResult);
     }
 }
 

@@ -1256,11 +1256,9 @@ bool FormMgrService::ParseOption(const std::vector<std::u16string> &args, DumpKe
 void FormMgrService::HiDumpFormRunningFormInfos([[maybe_unused]]const std::string &args, std::string &result)
 {
     HILOG_DEBUG("called.");
-
     if (!CheckCallerIsSystemApp()) {
         return;
     }
-
     FormMgrAdapter::GetInstance().DumpFormRunningFormInfos(result);
 }
 

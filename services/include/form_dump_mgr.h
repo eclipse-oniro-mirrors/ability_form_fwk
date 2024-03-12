@@ -108,7 +108,7 @@ public:
 private:
     void AppendBundleFormInfo(const FormRecord &formRecordInfo, std::string &formInfo) const;
     void AppendRecycleStatus(const FormRecord &formRecordInfo, std::string &formInfo) const;
-    void AppendRunningFormInfors(const std::string &formHostBundleName,
+    void AppendRunningFormInfos(const std::string &formHostBundleName,
         const std::vector<RunningFormInfo> &runningFormInfos,
         std::string &infosResult) const;
 };

@@ -101,6 +101,7 @@ extern void MockGetFormRecordParamsTemp(bool mockRet);
 extern void MockGetAbilityInfoByActionAbilityInfo(bool mockRet);
 extern void MockGetAbilityInfoByActionExtensionInfo(bool mockRet);
 extern void MockGetRunningFormInfosByFormId(int32_t mockRet);
+extern void MockGetRunningFormInfos(int32_t mockRet);
 
 namespace {
 class FmsFormMgrAdapterTest : public testing::Test {
@@ -4324,5 +4325,35 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_222, TestSize.Level0)
     FormInstance formInstance;
     EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, formMgrAdapter.GetFormInstanceById(1, formInstance));
     GTEST_LOG_(INFO) << "FormMgrAdapter_222 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_223
+ * @tc.desc: test DumpFormRunningForminfos function and the return OK when formInfos is not empty.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_223, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_223 start";
+    FormMgrAdapter formMgrAdapter;
+    std::string formInfos;
+    MockGetRunningFormInfos(ERR_OK);
+    EXPECT_EQ(ERR_OK, formMgrAdapter.DumpFormRunningFormInfos(formInfos));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_223 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_224
+ * @tc.desc: test DumpFormInfoByFormId function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_224, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_224 start";
+    FormMgrAdapter formMgrAdapter;
+    std::string formInfo = "aa";
+    MockGetRunningFormInfos(false);
+    EXPECT_EQ(false, formMgrAdapter.DumpFormRunningFormInfos(formInfo));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_224 end";
 }
 }
