@@ -23,6 +23,7 @@
 #include "appexecfwk_errors.h"
 #include "bundle_info.h"
 #include "form_info.h"
+#include "form_info_filter.h"
 #include "form_info_storage.h"
 #include "form_record.h"
 #include "resource_manager.h"
@@ -70,6 +71,9 @@ public:
 
     ErrCode GetFormsInfoByModule(const std::string &moduleName, std::vector<FormInfo> &formInfos);
 
+    ErrCode GetFormsInfoByFilter(
+        const FormInfoFilter &filter, std::vector<FormInfo> &formInfos, int32_t userId = Constants::INVALID_USER_ID);
+
 private:
     ErrCode UpdateFormInfoStorageLocked();
 
@@ -97,6 +101,9 @@ public:
 
     ErrCode GetFormsInfoByModule(const std::string &bundleName, const std::string &moduleName,
                                  std::vector<FormInfo> &formInfos);
+
+    ErrCode GetFormsInfoByFilter(
+        const FormInfoFilter &filter, std::vector<FormInfo> &formInfos, int32_t userId = Constants::INVALID_USER_ID);
 
     ErrCode GetFormsInfoByRecord(const FormRecord &formRecord, FormInfo &formInfo);
 

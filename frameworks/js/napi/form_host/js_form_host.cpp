@@ -18,6 +18,7 @@
 
 #include "fms_log_wrapper.h"
 #include "form_info.h"
+#include "form_info_filter.h"
 #include "form_instance.h"
 #include "form_instances_filter.h"
 #include "form_callback_interface.h"
@@ -1253,15 +1254,62 @@ private:
         return result;
     }
 
+    napi_value GetFormsInfoByFilter(napi_env env, size_t argc, napi_value* argv)
+    {
+        HILOG_DEBUG("%{public}s is called", __FUNCTION__);
+        if (argc != ARGS_ONE) {
+            HILOG_ERROR("wrong number of arguments.");
+            NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1");
+            return CreateJsUndefined(env);
+        }
+
+        decltype(argc) convertArgc = 0;
+        AppExecFwk::FormInfoFilter filter;
+        napi_value jsValue = GetPropertyValueByPropertyName(env, argv[PARAM0], "supportedDimensions", napi_object);
+        if (jsValue != nullptr) {
+            std::vector<int32_t> dimensions;
+            UnwrapArrayInt32FromJS(env, jsValue, dimensions);
+            for (size_t i = 0; i < dimensions.size(); ++i) {
+                if (dimensions[i] < 0) {
+                    HILOG_ERROR("dimensions value should not be negative");
+                    NapiFormUtil::ThrowParamError(env, "dimensions value should not be negative");
+                    return CreateJsUndefined(env);
+                }
+                filter.supportDimensions.emplace_back(dimensions[i]);
+            }
+        }
+        UnwrapStringByPropertyName(env, argv[PARAM0], "moduleName", filter.moduleName);
+        UnwrapStringByPropertyName(env, argv[PARAM0], "bundleName", filter.bundleName);
+
+        convertArgc++;
+        auto complete = [filter](napi_env env, NapiAsyncTask &task, int32_t status) {
+            std::vector<FormInfo> formInfos;
+            int ret = FormMgr::GetInstance().GetFormsInfoByFilter(filter, formInfos);
+            if (ret != ERR_OK) {
+                task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
+                return;
+            }
+            task.ResolveWithNoError(env, CreateFormInfos(env, formInfos));
+        };
+
+        napi_value result = nullptr;
+        napi_value lastParam = (argc <= convertArgc) ? nullptr : argv[convertArgc];
+        NapiAsyncTask::ScheduleWithDefaultQos("JsFormHost::OnGetFormsInfo",
+            env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
+        return result;
+    }
+
     napi_value OnGetFormsInfo(napi_env env, size_t argc, napi_value* argv)
     {
         HILOG_DEBUG("%{public}s is called", __FUNCTION__);
+        if (argc == ARGS_ONE && IsTypeForNapiValue(env, argv[PARAM0], napi_object)) {
+            return GetFormsInfoByFilter(env, argc, argv);
+        }
         if (argc > ARGS_THREE || argc < ARGS_ONE) {
             HILOG_ERROR("wrong number of arguments.");
             NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1 or 2 or 3");
             return CreateJsUndefined(env);
         }
-
         decltype(argc) convertArgc = 0;
         std::string bName("");
         if (!ConvertFromJsValue(env, argv[PARAM0], bName)) {
@@ -1270,7 +1318,6 @@ private:
             return CreateJsUndefined(env);
         }
         convertArgc++;
-
         std::string mName("");
         if ((argc == ARGS_TWO || argc == ARGS_THREE) && !IsTypeForNapiValue(env, argv[PARAM1], napi_function)) {
             if (!ConvertFromJsValue(env, argv[PARAM1], mName)) {
@@ -1280,7 +1327,6 @@ private:
             }
             convertArgc++;
         }
-
         auto complete = [bName, mName, convertArgc](napi_env env, NapiAsyncTask &task, int32_t status) {
             std::string bundleName(bName);
             std::string moduleName(mName);
@@ -1291,14 +1337,12 @@ private:
             } else {
                 ret = FormMgr::GetInstance().GetFormsInfoByModule(bundleName, moduleName, formInfos);
             }
-
             if (ret != ERR_OK) {
                 task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
                 return;
             }
             task.ResolveWithNoError(env, CreateFormInfos(env, formInfos));
         };
-
         napi_value result = nullptr;
         napi_value lastParam = (argc <= convertArgc) ? nullptr : argv[convertArgc];
         NapiAsyncTask::ScheduleWithDefaultQos("JsFormHost::OnGetFormsInfo",

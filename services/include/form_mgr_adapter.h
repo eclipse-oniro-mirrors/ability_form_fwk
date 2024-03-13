@@ -22,6 +22,7 @@
 #include "bundle_mgr_interface.h"
 #include "form_constants.h"
 #include "form_info.h"
+#include "form_info_filter.h"
 #include "form_instance.h"
 #include "form_instances_filter.h"
 #include "form_item_info.h"
@@ -366,6 +367,14 @@ public:
      */
     int GetFormsInfoByModule(const std::string &bundleName, const std::string &moduleName,
         std::vector<FormInfo> &formInfos);
+
+    /**
+     * @brief Get forms info specfied by filter parameters.
+     * @param filter Filter that contains necessary conditions, such as bundle name, module name, dimensions.
+     * @param formInfos Return the forms' information specified by filter.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int GetFormsInfoByFilter(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos);
 
     /**
     * @brief get forms count.

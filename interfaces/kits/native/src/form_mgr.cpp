@@ -978,6 +978,21 @@ int FormMgr::GetFormsInfoByModule(std::string &bundleName, std::string &moduleNa
     }
     return resultCode;
 }
+
+int FormMgr::GetFormsInfoByFilter(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos)
+{
+    HILOG_DEBUG("called.");
+    int errCode = Connect();
+    if (errCode != ERR_OK) {
+        return errCode;
+    }
+    int resultCode = remoteProxy_->GetFormsInfoByFilter(filter, formInfos);
+    if (resultCode != ERR_OK) {
+        HILOG_ERROR("failed to GetFormsInfoByFilter, error code is %{public}d.", resultCode);
+    }
+    return resultCode;
+}
+
 int32_t FormMgr::GetFormsInfo(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos)
 {
     HILOG_DEBUG("called.");

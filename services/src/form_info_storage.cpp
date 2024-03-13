@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include "form_info.h"
+#include "form_info_filter.h"
 #include "form_info_storage.h"
 
 #include "fms_log_wrapper.h"
@@ -41,6 +43,43 @@ void FormInfoStorage::GetAllFormsInfo(int32_t userId, std::vector<AppExecFwk::Fo
     }
     for (const auto &item : this->formInfos) {
         formInfos.push_back(item);
+    }
+}
+
+static bool find_match_dimensions(const std::vector<int32_t> &targetDimensions,
+    const std::vector<int32_t> &supportDimensions, std::vector<int32_t> &results)
+{
+    for (const auto &val : supportDimensions) {
+        auto it = std::find(targetDimensions.begin(), targetDimensions.end(), val);
+        if (it != targetDimensions.end()) {
+            results.emplace_back(val);
+        }
+    }
+    return !results.empty();
+}
+
+void FormInfoStorage::GetFormsInfoByFilter(int32_t userId,
+    const AppExecFwk::FormInfoFilter &filter, std::vector<AppExecFwk::FormInfo> &formInfos) const
+{
+    HILOG_DEBUG("called. current userId is:%{public}d, this userId is %{public}d.", userId, this->userId);
+    if (this->userId != userId && this->userId != AppExecFwk::Constants::DEFAULT_USERID) {
+        HILOG_ERROR("UserId is not valid.");
+        return;
+    }
+    for (const auto &item : this->formInfos) {
+        if (!filter.moduleName.empty() && filter.moduleName != item.moduleName) {
+            continue;
+        }
+        if (filter.supportDimensions.empty()) {
+            formInfos.emplace_back(item);
+        } else {
+            std::vector<int32_t> results;
+            if (find_match_dimensions(filter.supportDimensions, item.supportDimensions, results)) {
+                AppExecFwk::FormInfo formInfo = item;
+                formInfo.supportDimensions = results;
+                formInfos.emplace_back(formInfo);
+            }
+        }
     }
 }
 

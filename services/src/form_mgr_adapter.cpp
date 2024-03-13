@@ -23,6 +23,7 @@
 
 #include "ability_manager_errors.h"
 #include "form_record.h"
+#include "form_info_filter.h"
 #include "accesstoken_kit.h"
 #include "hap_token_info.h"
 #ifdef DEVICE_USAGE_STATISTICS_ENABLE
@@ -3037,6 +3038,18 @@ int FormMgrAdapter::GetFormsInfoByApp(const std::string &bundleName, std::vector
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     return FormInfoMgr::GetInstance().GetFormsInfoByBundle(bundleName, formInfos);
+}
+
+/**
+ * @brief Get forms info specified by filter parameters .
+ * @param filter Filter that contains necessary conditions, such as bundle name, module name, dimensions.
+ * @param formInfos Return the forms' information specified by filter.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormMgrAdapter::GetFormsInfoByFilter(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos)
+{
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    return FormInfoMgr::GetInstance().GetFormsInfoByFilter(filter, formInfos);
 }
 
 /**

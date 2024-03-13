@@ -1179,6 +1179,37 @@ int FormMgrProxy::GetFormsInfoByModule(std::string &bundleName, std::string &mod
     return error;
 }
 
+int FormMgrProxy::GetFormsInfoByFilter(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos)
+{
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("%{public}s, failed to write interface token", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteString(filter.bundleName)) {
+        HILOG_ERROR("%{public}s, failed to write bundleName", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteString(filter.moduleName)) {
+        HILOG_ERROR("%{public}s, failed to write moduleName", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteInt32Vector(filter.supportDimensions)) {
+        HILOG_ERROR("Failed to write vector supportDimensions.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    int error = GetFormsInfo(IFormMgr::Message::FORM_MGR_GET_FORMS_INFO_BY_FILTER, data, formInfos);
+    if (error != ERR_OK) {
+        HILOG_ERROR("%{public}s, failed to GetFormsInfoByFilter: %{public}d", __func__, error);
+    }
+
+    return error;
+}
+
 ErrCode FormMgrProxy::GetRunningFormInfos(bool isUnusedInclude, std::vector<RunningFormInfo> &runningFormInfos)
 {
     MessageParcel data;
