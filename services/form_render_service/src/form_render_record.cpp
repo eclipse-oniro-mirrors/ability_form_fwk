@@ -439,17 +439,19 @@ std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::GetContext(const Form
         std::lock_guard<std::mutex> lock(contextsMapMutex_);
         auto iter = contextsMapForModuleName_.find(GenerateContextKey(formJsInfo));
         if (iter != contextsMapForModuleName_.end()) {
-            if (iter->second != nullptr) {
-                auto applicationInfo = iter->second->GetApplicationInfo();
-                if (applicationInfo != nullptr) {
-                    uint32_t apiCompatibleVersion = static_cast<uint32_t>(
-                        want.GetIntParam(Constants::FORM_COMPATIBLE_VERSION_KEY, 0));
-                    if (apiCompatibleVersion != 0) {
-                        applicationInfo->apiCompatibleVersion = apiCompatibleVersion;
-                    }
-                    HILOG_INFO("GetContext bundleName %{public}s, apiCompatibleVersion = %{public}d",
-                        formJsInfo.bundleName.c_str(), applicationInfo->apiCompatibleVersion);
+            if (iter->second == nullptr) {
+                HILOG_WARN("Context is nullptr, bundle name is %{public}s", formJsInfo.bundleName.c_str());
+                return nullptr;
+            }
+            auto applicationInfo = iter->second->GetApplicationInfo();
+            if (applicationInfo != nullptr) {
+                uint32_t apiCompatibleVersion = static_cast<uint32_t>(
+                    want.GetIntParam(Constants::FORM_COMPATIBLE_VERSION_KEY, 0));
+                if (apiCompatibleVersion != 0) {
+                    applicationInfo->apiCompatibleVersion = apiCompatibleVersion;
                 }
+                HILOG_INFO("GetContext bundleName %{public}s, apiCompatibleVersion = %{public}d",
+                    formJsInfo.bundleName.c_str(), applicationInfo->apiCompatibleVersion);
             }
             return iter->second;
         }
@@ -575,25 +577,26 @@ void FormRenderRecord::HandleUpdateForm(const FormJsInfo &formJsInfo, const Want
             AddFormRequest(formJsInfo.formId, formRequest);
             continue;
         }
-        if (compMaxId == formRequest.compId) {
-            if (formJsInfo.isDynamic) {
-                // recover form
-                Want oldWant = formRequest.want;
-                std::string statusData = want.GetStringParam(Constants::FORM_STATUS_DATA);
-                oldWant.SetParam(Constants::FORM_STATUS_DATA, statusData);
-                oldWant.SetParam(Constants::FORM_IS_RECOVER_FORM_TO_HANDLE_CLICK_EVENT, true);
+        if (compMaxId != formRequest.compId) {
+            continue;
+        }
+        if (formJsInfo.isDynamic) {
+            // recover form
+            Want oldWant = formRequest.want;
+            std::string statusData = want.GetStringParam(Constants::FORM_STATUS_DATA);
+            oldWant.SetParam(Constants::FORM_STATUS_DATA, statusData);
+            oldWant.SetParam(Constants::FORM_IS_RECOVER_FORM_TO_HANDLE_CLICK_EVENT, true);
 
-                AddRenderer(formRequest.formJsInfo, oldWant);
-                formRequest.hasRelease = false;
-                AddFormRequest(formJsInfo.formId, formRequest);
+            AddRenderer(formRequest.formJsInfo, oldWant);
+            formRequest.hasRelease = false;
+            AddFormRequest(formJsInfo.formId, formRequest);
 
-                // update form
-                UpdateRenderer(formJsInfo);
-            } else {
-                AddRenderer(formJsInfo, formRequest.want);
-                formRequest.hasRelease = false;
-                AddFormRequest(formJsInfo.formId, formRequest);
-            }
+            // update form
+            UpdateRenderer(formJsInfo);
+        } else {
+            AddRenderer(formJsInfo, formRequest.want);
+            formRequest.hasRelease = false;
+            AddFormRequest(formJsInfo.formId, formRequest);
         }
     }
 }
@@ -1001,6 +1004,15 @@ int32_t FormRenderRecord::OnUnlock()
 int32_t FormRenderRecord::HandleOnUnlock()
 {
     HILOG_INFO("HandleOnUnlock called.");
+    {
+        std::lock_guard<std::mutex> lock(formRequestsMutex_);
+        for (const auto& formRequests : formRequests_) {
+            for (auto& formRequestElement : formRequests.second) {
+                Want* want = const_cast<Want*>(&formRequestElement.second.want);
+                want->SetParam(Constants::FORM_RENDER_STATE, true);
+            }
+        }
+    }
     std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
     for (const auto& iter : formRendererGroupMap_) {
         if (iter.second) {
