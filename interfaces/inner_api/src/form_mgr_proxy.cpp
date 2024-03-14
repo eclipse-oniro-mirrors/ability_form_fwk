@@ -2124,5 +2124,32 @@ int32_t FormMgrProxy::RecoverForms(const std::vector<int64_t> &formIds, const Wa
     }
     return reply.ReadInt32();
 }
+
+ErrCode FormMgrProxy::UpdateFormLocation(const int64_t &formId, const int32_t &formLocation)
+{
+    HILOG_DEBUG("start.");
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("failed to write interface token");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt64(formId)) {
+        HILOG_ERROR("%{public}s, failed to write formId", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt32(formLocation)) {
+        HILOG_ERROR("failed to write formLocation");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+    int32_t error = SendTransactCmd(IFormMgr::Message::FORM_MGR_UPDATE_FORM_LOCATION, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("failed to SendTransactCmd: %{public}d.", error);
+        return error;
+    }
+    return reply.ReadInt32();
+}
+
 }  // namespace AppExecFwk
 }  // namespace OHOS

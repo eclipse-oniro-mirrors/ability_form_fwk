@@ -23,7 +23,7 @@
 #include "form_host_record.h"
 #include "form_info_mgr.h"
 #include "running_form_info.h"
-
+#include "form_constants.h"
 namespace OHOS {
 namespace AppExecFwk {
 /**
@@ -111,6 +111,7 @@ private:
     void AppendRunningFormInfors(const std::string &formHostBundleName,
         const std::vector<RunningFormInfo> &runningFormInfos,
         std::string &infosResult) const;
+    void AppendFormLocation(std::string &infosResult, Constants::FormLocation formLocation) const;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

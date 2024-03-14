@@ -582,6 +582,14 @@ public:
      */
     void UpdateFormCloudUpdateDuration(const std::string &bundleName);
 
+    /**
+     * @brief Update formLocation with formId.
+     * @param formId The Id of the form to update.
+     * @param formLocation formLocation.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UpdateFormLocation(const int64_t &formId, const int32_t &formLocation);
+
 private:
     /**
      * @brief Get form configure info.

@@ -698,6 +698,14 @@ public:
      */
     bool HasFormCloudUpdateDuration(const std::string &bundleName) const;
 
+    /**
+     * @brief Update form location.
+     * @param formId The Id of the form.
+     * @param formLocation The form location.
+     * @param hostBundleName the bundle name of form host.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UpdateFormLocation(const int64_t &formId, const int32_t &formLocation);
 private:
     /**
      * @brief Create form record.

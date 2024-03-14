@@ -571,6 +571,7 @@ void ParseRunningFormInfoIntoNapi(napi_env env, const RunningFormInfo &runningFo
     FormUsageState formUsageState = runningFormInfo.formUsageState;
     SetFormInfoPropertyInt32(env, (int32_t)formUsageState, result, "formUsageState");
     SetFormInfoPropertyString(env, runningFormInfo.description.c_str(), result, "formDescription");
+    SetFormInfoPropertyInt32(env, (int32_t)runningFormInfo.formLocation, result, "formLocation");
 }
 
 inline FormType GetFormType(const FormInfo &formInfo)
@@ -655,6 +656,7 @@ napi_value CreateRunningFormInfo(napi_env env, const RunningFormInfo &runningFor
     napi_set_named_property(env, objContext, "dimension", CreateJsValue(env, runningFormInfo.dimension));
     napi_set_named_property(env, objContext, "formUsageState", CreateJsValue(env, runningFormInfo.formUsageState));
     napi_set_named_property(env, objContext, "formDescription", CreateJsValue(env, runningFormInfo.description));
+    napi_set_named_property(env, objContext, "formLocation", CreateJsValue(env, (int32_t)runningFormInfo.formLocation));
 
     return objContext;
 }

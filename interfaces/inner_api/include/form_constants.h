@@ -72,6 +72,7 @@ namespace Constants {
     constexpr const char* PARAM_FORM_ID = "formID";
     constexpr const char* IS_FORM_AGENT = "isFormAgent";
     constexpr const char* PARAM_FORM_BORDER_WIDTH_KEY = "ohos.extra.param.key.form_border_width";
+    constexpr const char* FORM_LOCATION_KEY = "ohos.extra.param.key.form_location";
     constexpr int32_t TYPE_RESET_LIMIT = 1;
     constexpr int32_t TYPE_STATIC_UPDATE = 2;
     constexpr int32_t TYPE_DYNAMIC_UPDATE = 3;
@@ -207,6 +208,18 @@ namespace Constants {
     enum class RenderingMode : int8_t {
         FULL_COLOR = 0,
         SINGLE_COLOR
+    };
+
+    enum class FormLocation : int8_t {
+        OTHER = -1,
+        DESKTOP = 0,
+        FORM_CENTER = 1,
+        FORM_MANAGER = 2,
+        NEGATIVE_SCREEN = 3,
+        FORM_CENTER_NEGATIVE_SCREEN = 4,
+        FORM_MANAGER_NEGATIVE_SCREEN = 5,
+        SCREEN_LOCK = 6,
+        AI_SUGGESTION = 7,
     };
 
     // rdb

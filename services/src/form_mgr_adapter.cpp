@@ -1306,7 +1306,15 @@ ErrCode FormMgrAdapter::GetFormConfigInfo(const Want &want, FormItemInfo &formCo
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
 
-    HILOG_DEBUG("GetFormConfigInfo end.");
+    int formLocation = want.GetParams().GetIntParam(Constants::FORM_LOCATION_KEY,
+        static_cast<int>(Constants::FormLocation::OTHER));
+    if (formLocation < static_cast<int32_t>(Constants::FormLocation::OTHER) ||
+            formLocation > static_cast<int32_t>(Constants::FormLocation::AI_SUGGESTION)) {
+        HILOG_ERROR("formLocation is not FormLocation enum, formLocation = %{public}d", formLocation);
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    formConfigInfo.SetFormLocation((Constants::FormLocation)formLocation);
+    HILOG_DEBUG("GetFormConfigInfo end, formLocation = %{public}d", formLocation);
     return ERR_OK;
 }
 /**
@@ -1324,6 +1332,7 @@ ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
     int64_t formId = FormDataMgr::GetInstance().PaddingUdidHash(info.GetFormId());
     FormRecord record;
     bool hasRecord = FormDataMgr::GetInstance().GetFormRecord(formId, record);
+    record.formLocation = info.GetFormLocation();
     if (hasRecord && record.recycleStatus != RecycleStatus::NON_RECYCLABLE) {
         record.recycleStatus = RecycleStatus::NON_RECYCLABLE;
         FormDataMgr::GetInstance().UpdateFormRecord(formId, record);
@@ -3752,5 +3761,31 @@ int32_t FormMgrAdapter::RecoverForms(const std::vector<int64_t> &formIds, const 
     FormRenderMgr::GetInstance().RecoverForms(validFormIds, bundleName, want.GetParams());
     return ERR_OK;
 }
+
+ErrCode FormMgrAdapter::UpdateFormLocation(const int64_t &formId, const int32_t &formLocation)
+{
+    // find matched formId
+    int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+
+    // check exist and get the formRecord
+    FormRecord formRecord;
+    if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, formRecord)) {
+        HILOG_ERROR("error, not exist such form, formId = %{public}" PRId64 " formLocation = %{public}d",
+            formId, formLocation);
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    }
+    if ((int32_t)formRecord.formLocation != formLocation) {
+        FormDataMgr::GetInstance().UpdateFormLocation(matchedFormId, formLocation);
+        if (!formRecord.formTempFlag) {
+            auto ret = HandleFormAddObserver(matchedFormId);
+            if (ret != ERR_OK) {
+                return ret;
+            }
+            return FormDbCache::GetInstance().UpdateFormLocation(matchedFormId, formLocation);
+        }
+    }
+    return ERR_OK;
+}
+
 } // namespace AppExecFwk
 } // namespace OHOS

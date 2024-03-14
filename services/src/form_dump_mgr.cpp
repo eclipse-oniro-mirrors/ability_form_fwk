@@ -297,8 +297,46 @@ void FormDumpMgr::AppendRunningFormInfors(const std::string &formHostBundleName,
                     break;
             }
 
+            AppendFormLocation(infosResult, info.formLocation);
+
             infosResult += " \n";
         }
+    }
+}
+
+void FormDumpMgr::AppendFormLocation(std::string &infosResult, Constants::FormLocation formLocation) const
+{
+    switch (formLocation) {
+        case Constants::FormLocation::OTHER:
+            infosResult += "    formLocation [ OTHER ] \n";
+            break;
+        case Constants::FormLocation::DESKTOP:
+            infosResult += "    formLocation [ DESKTOP ] \n";
+            break;
+        case Constants::FormLocation::FORM_CENTER:
+            infosResult += "    formLocation [ FORM_CENTER ] \n";
+            break;
+        case Constants::FormLocation::FORM_MANAGER:
+            infosResult += "    formLocation [ FORM_MANAGER ] \n";
+            break;
+        case Constants::FormLocation::NEGATIVE_SCREEN:
+            infosResult += "    formLocation [ NEGATIVE_SCREEN ] \n";
+            break;
+        case Constants::FormLocation::FORM_CENTER_NEGATIVE_SCREEN:
+            infosResult += "    formLocation [ FORM_CENTER_NEGATIVE_SCREEN ] \n";
+            break;
+        case Constants::FormLocation::FORM_MANAGER_NEGATIVE_SCREEN:
+            infosResult += "    formLocation [ FORM_MANAGER_NEGATIVE_SCREEN ] \n";
+            break;
+        case Constants::FormLocation::SCREEN_LOCK:
+            infosResult += "    formLocation [ SCREEN_LOCK ] \n";
+            break;
+        case Constants::FormLocation::AI_SUGGESTION:
+            infosResult += "    formLocation [ AI_SUGGESTION ] \n";
+            break;
+        default:
+            infosResult += "    formLocation [ UNKNOWN_TYPE ] \n";
+            break;
     }
 }
 

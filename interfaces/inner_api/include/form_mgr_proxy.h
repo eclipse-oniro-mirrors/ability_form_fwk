@@ -544,6 +544,14 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t RecoverForms(const std::vector<int64_t> &formIds, const Want &want) override;
+
+    /**
+     * @brief Update formLocation with formId.
+     * @param formId The Id of the form to update.
+     * @param formLocation The FormLocation.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UpdateFormLocation(const int64_t &formId, const int32_t &formLocation) override;
 private:
     template<typename T>
     int GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos);

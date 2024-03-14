@@ -482,6 +482,14 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t HandleRecoverForms(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle UpdateFormLocation.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleUpdateFormLocation(MessageParcel &data, MessageParcel &reply);
 private:
     using FormMgrFunc = int32_t (FormMgrStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, FormMgrFunc> memberFuncMap_;

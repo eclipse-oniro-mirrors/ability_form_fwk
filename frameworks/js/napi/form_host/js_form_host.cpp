@@ -49,6 +49,7 @@ namespace {
     constexpr int64_t NANOSECONDS = 1000000000;
     // MICROSECONDS mean 10^6 millias second
     constexpr int64_t MICROSECONDS = 1000000;
+    constexpr int32_t INVALID_FORM_LOCATION = -2;
 }
 
 int64_t SystemTimeMillis() noexcept
@@ -403,6 +404,11 @@ public:
     static napi_value RecycleForms(napi_env env, napi_callback_info info)
     {
         GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnRecycleForms);
+    }
+
+    static napi_value UpdateFormLocation(napi_env env, napi_callback_info info)
+    {
+        GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnUpdateFormLocation);
     }
 private:
     bool CheckCallerIsSystemApp()
@@ -1788,6 +1794,44 @@ private:
             env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
         return result;
     }
+
+    napi_value OnUpdateFormLocation(napi_env env, size_t argc, napi_value *argv)
+    {
+        HILOG_DEBUG("UpdateFormLocation called.");
+        if (argc != ARGS_TWO) {
+            HILOG_ERROR("Wrong number of arguments.");
+            NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "argc != 2");
+            return CreateJsUndefined(env);
+        }
+
+        int64_t formId = -1;
+        if (!ConvertFromId(env, argv[PARAM0], formId)) {
+            HILOG_ERROR("Convert strFormIdList failed.");
+            NapiFormUtil::ThrowParamTypeError(env, "formId", "string");
+            return CreateJsUndefined(env);
+        }
+        HILOG_INFO("UpdateFormLocation formId value=%{public}s", std::to_string(formId).c_str());
+        int32_t formLocation = INVALID_FORM_LOCATION;
+        if (napi_get_value_int32(env, argv[PARAM1], &formLocation) == napi_ok) {
+            if (formLocation < static_cast<int32_t>(Constants::FormLocation::OTHER) ||
+                 formLocation > static_cast<int32_t>(Constants::FormLocation::AI_SUGGESTION)) {
+                HILOG_ERROR("formLocation is not FormLocation enum.");
+                NapiFormUtil::ThrowParamTypeError(env, "formLocation", "FormLocation enum");
+                return CreateJsUndefined(env);
+            }
+        } else {
+            HILOG_ERROR("formLocation is not number.");
+            NapiFormUtil::ThrowParamTypeError(env, "formLocation", "number");
+            return CreateJsUndefined(env);
+        }
+        HILOG_INFO("UpdateFormLocation formLocation value=%{public}s", std::to_string(formLocation).c_str());
+        auto ret = FormMgr::GetInstance().UpdateFormLocation(formId, formLocation);
+        if (ret == ERR_OK) {
+            return CreateJsUndefined(env);
+        }
+        NapiFormUtil::ThrowByInternalErrorCode(env, ret);
+        return CreateJsUndefined(env);
+    }
 };
 
 napi_value JsFormHostInit(napi_env env, napi_value exportObj)
@@ -1828,6 +1872,7 @@ napi_value JsFormHostInit(napi_env env, napi_value exportObj)
     BindNativeFunction(env, exportObj, "setFormsRecyclable", moduleName, JsFormHost::SetFormsRecyclable);
     BindNativeFunction(env, exportObj, "recoverForms", moduleName, JsFormHost::RecoverForms);
     BindNativeFunction(env, exportObj, "recycleForms", moduleName, JsFormHost::RecycleForms);
+    BindNativeFunction(env, exportObj, "updateFormLocation", moduleName, JsFormHost::UpdateFormLocation);
 
     return CreateJsUndefined(env);
 }
