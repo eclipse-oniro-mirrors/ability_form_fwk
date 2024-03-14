@@ -19,6 +19,7 @@
 #include <vector>
 #include "form_info.h"
 #include "form_info_filter.h"
+#include "form_info_config_update_filter.h"
 #include "form_instance.h"
 #include "form_instances_filter.h"
 #include "form_js_info.h"
@@ -589,6 +590,18 @@ public:
         return ERR_OK;
     }
 
+    /**
+     * @brief Set configUpdate enable Flags with formId.
+     * @param formId The Id of the form to update.
+     * @param configUpdateFilter The configUpdate enable Flags.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode SetFormConfigUpdateFlags(const int64_t &formId,
+        const FormInfoConfigUpdateFilter &configUpdateFilter)
+    {
+        return ERR_OK;
+    }
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -663,6 +676,7 @@ public:
         FORM_MGR_HAS_FORM_VISIBLE_WITH_TOKENID,
         FORM_MGR_UPDATE_FORM_LOCATION,
         FORM_MGR_GET_FORMS_INFO_BY_FILTER,
+        FORM_MGR_SET_CONFIG_UPDATE_ENABLE,
     };
 };
 }  // namespace AppExecFwk

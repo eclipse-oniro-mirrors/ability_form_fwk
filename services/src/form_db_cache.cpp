@@ -455,5 +455,21 @@ ErrCode FormDbCache::UpdateFormLocation(const int64_t formId, const int32_t form
     return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
 }
 
+ErrCode FormDbCache::SetFormConfigUpdateFlags(const int64_t &formId,
+    const FormInfoConfigUpdateFilter &configUpdateFilter)
+{
+    std::lock_guard<std::mutex> lock(formDBInfosMutex_);
+    std::vector<FormDBInfo>::iterator itRecord;
+    for (itRecord = formDBInfos_.begin(); itRecord != formDBInfos_.end();) {
+        if (itRecord->formId == formId) {
+            itRecord->fontUpdateEnable = configUpdateFilter.fontEnabled;
+            InnerFormInfo innerFormInfo(*itRecord);
+            return FormInfoRdbStorageMgr::GetInstance().ModifyStorageFormData(innerFormInfo);
+        }
+        ++itRecord;
+    }
+    return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+}
+
 } // namespace AppExecFwk
 } // namespace OHOS

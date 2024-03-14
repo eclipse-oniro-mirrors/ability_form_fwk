@@ -254,6 +254,7 @@ ohos_shared_library("form_manager") {
     "interfaces/inner_api/src/form_host_proxy.cpp",
     "interfaces/inner_api/src/form_host_stub.cpp",
     "interfaces/inner_api/src/form_info_filter.cpp",
+    "interfaces/inner_api/src/form_info_config_update_filter.cpp",
     "interfaces/inner_api/src/form_instance.cpp",
     "interfaces/inner_api/src/form_instances_filter.cpp",
     "interfaces/inner_api/src/form_js_info.cpp",

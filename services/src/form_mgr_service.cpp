@@ -1590,5 +1590,18 @@ ErrCode FormMgrService::UpdateFormLocation(const int64_t &formId, const int32_t 
     return FormMgrAdapter::GetInstance().UpdateFormLocation(formId, formLocation);
 }
 
+ErrCode FormMgrService::SetFormConfigUpdateFlags(const int64_t &formId,
+    const FormInfoConfigUpdateFilter &configUpdateFilter)
+{
+    HILOG_DEBUG("called.");
+    ErrCode ret = CheckFormPermission();
+    if (ret != ERR_OK) {
+        HILOG_ERROR("fail, update formLocation form infos permission denied");
+        return ret;
+    }
+    HILOG_INFO("Config Update Flags, fontEnabled is %{public}s.", configUpdateFilter.fontEnabled ? "true" : "false");
+    return FormMgrAdapter::GetInstance().SetFormConfigUpdateFlags(formId, configUpdateFilter);
+}
+
 }  // namespace AppExecFwk
 }  // namespace OHOS

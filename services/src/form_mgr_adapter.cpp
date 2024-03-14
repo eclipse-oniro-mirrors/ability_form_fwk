@@ -3787,5 +3787,26 @@ ErrCode FormMgrAdapter::UpdateFormLocation(const int64_t &formId, const int32_t 
     return ERR_OK;
 }
 
+ErrCode FormMgrAdapter::SetFormConfigUpdateFlags(const int64_t &formId,
+    const FormInfoConfigUpdateFilter &configUpdateFilter)
+{
+    // find matched formId
+    int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+
+    // check exist and get the formRecord
+    FormRecord formRecord;
+    if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, formRecord)) {
+        HILOG_ERROR("error, not exist such form, formId = %{public}" PRId64 " configUpdateFilter = %{public}s",
+            formId, configUpdateFilter.fontEnabled ? "true" : "false");
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    }
+
+    FormDataMgr::GetInstance().SetFormConfigUpdateFlags(matchedFormId, configUpdateFilter);
+    if (!formRecord.formTempFlag) {
+        return FormDbCache::GetInstance().SetFormConfigUpdateFlags(matchedFormId, configUpdateFilter);
+    }
+    return ERR_OK;
+}
+
 } // namespace AppExecFwk
 } // namespace OHOS
