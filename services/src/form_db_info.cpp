@@ -28,6 +28,7 @@ const std::string INNER_FORM_INFO_BUNDLE_NAME = "bundleName";
 const std::string INNER_FORM_INFO_MODULE_NAME = "moduleName";
 const std::string INNER_FORM_INFO_ABILITY_NAME = "abilityName";
 const std::string INNER_FORM_INFO_FORM_USER_UIDS = "formUserUids";
+const std::string INNER_FORM_INFO_FORM_LOCATION = "formLocation";
 } // namespace
 
 /**
@@ -44,6 +45,7 @@ void InnerFormInfo::ToJson(nlohmann::json &jsonObject) const
     jsonObject[INNER_FORM_INFO_MODULE_NAME] = formDBInfo_.moduleName;
     jsonObject[INNER_FORM_INFO_ABILITY_NAME] = formDBInfo_.abilityName;
     jsonObject[INNER_FORM_INFO_FORM_USER_UIDS] = formDBInfo_.formUserUids;
+    jsonObject[INNER_FORM_INFO_FORM_LOCATION] = (int)formDBInfo_.formLocation;
 }
 
 /**
@@ -78,6 +80,9 @@ bool InnerFormInfo::FromJson(const nlohmann::json &jsonObject)
 
     GetValueIfFindKey<std::vector<int>>(jsonObject, jsonObjectEnd, INNER_FORM_INFO_FORM_USER_UIDS,
         formDBInfo_.formUserUids, JsonType::ARRAY, false, parseResult, ArrayType::NUMBER);
+
+    GetValueIfFindKey<Constants::FormLocation>(jsonObject, jsonObjectEnd, INNER_FORM_INFO_FORM_LOCATION,
+        formDBInfo_.formLocation, JsonType::NUMBER, false, parseResult, ArrayType::NOT_ARRAY);
 
     return parseResult == ERR_OK;
 }

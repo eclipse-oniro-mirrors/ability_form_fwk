@@ -33,6 +33,7 @@ bool RunningFormInfo::ReadFromParcel(Parcel &parcel)
     int32_t formVisiblityInt = parcel.ReadInt32();
     formVisiblity = (FormVisibilityType)formVisiblityInt;
     formUsageState = static_cast<FormUsageState>(parcel.ReadInt32());
+    formLocation = static_cast<Constants::FormLocation>(parcel.ReadInt32());
     return true;
 }
 
@@ -88,6 +89,10 @@ bool RunningFormInfo::Marshalling(Parcel &parcel) const
         return false;
     }
 
+    // write formLocation
+    if (!parcel.WriteInt32(static_cast<int32_t>(formLocation))) {
+        return false;
+    }
     return true;
 }
 

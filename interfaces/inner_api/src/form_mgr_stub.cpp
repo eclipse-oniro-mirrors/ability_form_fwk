@@ -158,6 +158,8 @@ FormMgrStub::FormMgrStub()
         &FormMgrStub::HandleRecoverForms;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_HAS_FORM_VISIBLE_WITH_TOKENID)] =
         &FormMgrStub::HandleHasFormVisible;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UPDATE_FORM_LOCATION)] =
+        &FormMgrStub::HandleUpdateFormLocation;
 }
 
 FormMgrStub::~FormMgrStub()
@@ -1398,5 +1400,19 @@ int32_t FormMgrStub::HandleRecoverForms(MessageParcel &data, MessageParcel &repl
     }
     return result;
 }
+
+ErrCode FormMgrStub::HandleUpdateFormLocation(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("Called.");
+    int64_t formId = data.ReadInt64();
+    int32_t formLocation = data.ReadInt32();
+    ErrCode result = UpdateFormLocation(formId, formLocation);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("failed to write result");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return result;
+}
+
 }  // namespace AppExecFwk
 }  // namespace OHOS

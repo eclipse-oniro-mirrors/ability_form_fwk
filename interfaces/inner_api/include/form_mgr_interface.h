@@ -578,6 +578,17 @@ public:
         return 0;
     }
 
+    /**
+     * @brief Update formLocation with formId.
+     * @param formId The Id of the form to update.
+     * @param formLocation The FormLocation.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode UpdateFormLocation(const int64_t &formId, const int32_t &formLocation)
+    {
+        return ERR_OK;
+    }
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -650,6 +661,7 @@ public:
         FORM_MGR_RECYCLE_FORMS,
         FORM_MGR_RECOVER_FORMS,
         FORM_MGR_HAS_FORM_VISIBLE_WITH_TOKENID,
+        FORM_MGR_UPDATE_FORM_LOCATION,
         FORM_MGR_GET_FORMS_INFO_BY_FILTER,
     };
 };

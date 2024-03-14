@@ -1578,5 +1578,17 @@ int32_t FormMgrService::RecoverForms(const std::vector<int64_t> &formIds, const 
     }
     return FormMgrAdapter::GetInstance().RecoverForms(formIds, want);
 }
+
+ErrCode FormMgrService::UpdateFormLocation(const int64_t &formId, const int32_t &formLocation)
+{
+    HILOG_DEBUG("called.");
+    ErrCode ret = CheckFormPermission();
+    if (ret != ERR_OK) {
+        HILOG_ERROR("fail, update formLocation form infos permission denied");
+        return ret;
+    }
+    return FormMgrAdapter::GetInstance().UpdateFormLocation(formId, formLocation);
+}
+
 }  // namespace AppExecFwk
 }  // namespace OHOS

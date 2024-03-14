@@ -191,6 +191,7 @@ ErrCode FormDbCache::GetDBRecord(const int64_t formId, FormRecord &record) const
             record.moduleName = dbInfo.moduleName;
             record.abilityName = dbInfo.abilityName;
             record.formUserUids = dbInfo.formUserUids;
+            record.formLocation = dbInfo.formLocation;
             return ERR_OK;
         }
     }
@@ -438,5 +439,21 @@ bool FormDbCache::IsHostOwner(int64_t formId, int32_t hostUid)
 
     return false;
 }
+
+ErrCode FormDbCache::UpdateFormLocation(const int64_t formId, const int32_t formLocation)
+{
+    std::lock_guard<std::mutex> lock(formDBInfosMutex_);
+    std::vector<FormDBInfo>::iterator itRecord;
+    for (itRecord = formDBInfos_.begin(); itRecord != formDBInfos_.end();) {
+        if (itRecord->formId == formId) {
+            itRecord->formLocation = (Constants::FormLocation)formLocation;
+            InnerFormInfo innerFormInfo(*itRecord);
+            return FormInfoRdbStorageMgr::GetInstance().ModifyStorageFormData(innerFormInfo);
+        }
+        ++itRecord;
+    }
+    return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+}
+
 } // namespace AppExecFwk
 } // namespace OHOS
