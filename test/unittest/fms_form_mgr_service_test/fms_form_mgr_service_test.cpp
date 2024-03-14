@@ -1926,4 +1926,21 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0100, TestSize.Level1)
     EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, formMgrService.GetFormsInfoByFilter(filter, formInfos));
     GTEST_LOG_(INFO) << "FormMgrService_0100 end";
 }
+
+/**
+ * @tc.number: FormMgrService_0101
+ * @tc.name: test UpdateFormLocation function.
+ * @tc.desc: Verify that the UpdateFormLocation interface is called normally
+ * and the return value is ERR_OK.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0101, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0101 start";
+    MockIsSACall(true);
+    FormMgrService formMgrService;
+    int64_t formId = 1;
+    int32_t formLocation = 1;
+    EXPECT_EQ(ERR_OK, formMgrService.UpdateFormLocation(formId, formLocation));
+    GTEST_LOG_(INFO) << "FormMgrService_0101 end";
+}
 }

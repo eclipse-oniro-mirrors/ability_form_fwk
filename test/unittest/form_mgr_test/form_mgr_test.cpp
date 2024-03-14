@@ -2391,4 +2391,22 @@ HWTEST_F(FormMgrTest, FormMgrTest_0122, TestSize.Level1) {
     testing::Mock::AllowLeak(mockProxy);
     GTEST_LOG_(INFO) << "FormMgrTest_0122 test ends";
 }
+
+/**
+ * @tc.name: FormMgrTest_0123
+ * @tc.desc: Verify UpdateFormLocation (The return value of mock function is not 0)
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0123, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0123 starts";
+    EXPECT_CALL(*mockProxy, UpdateFormLocation(_, _))
+        .Times(1)
+        .WillOnce(Return(OHOS::ERR_OK));
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
+    int64_t formId = 0;
+    int32_t formLocation = 1;
+    EXPECT_EQ(FormMgr::GetInstance().UpdateFormLocation(formId, formLocation), ERROR_NUM);
+    GTEST_LOG_(INFO) << "FormMgrTest_0123 test ends";
+}
 } // namespace

@@ -183,4 +183,23 @@ HWTEST_F(FmsFormDbRecordTest, FmsFormDbRecordTest_008, TestSize.Level0) // Delet
     EXPECT_EQ(ERR_OK, FormDbCache::GetInstance().DeleteFormInfo(2));
     GTEST_LOG_(INFO) << "FmsFormDbRecordTest_008 end";
 }
+
+/**
+ * @tc.number: FmsFormDbRecordTest_009
+ * @tc.name: UpdateFormLocation
+ * @tc.desc: Verify that the vector can be operated normally.
+ * @tc.details: Determine whether an element exists in the vector.
+ */
+HWTEST_F(FmsFormDbRecordTest, FmsFormDbRecordTest_009, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDbRecordTest_009 start";
+    InitFormRecord();
+    int64_t formId = 0;
+    int32_t formLocation = 1;
+    FormDbCache::GetInstance().UpdateDBRecord(formId, formRecord_);
+    EXPECT_EQ(ERR_OK, FormDbCache::GetInstance().UpdateFormLocation(formId, formLocation));
+    FormDbCache::GetInstance().DeleteFormInfo(formId);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_FORM_ID, FormDbCache::GetInstance().UpdateFormLocation(formId, formLocation));
+    GTEST_LOG_(INFO) << "FmsFormDbRecordTest_009 end";
+}
 }

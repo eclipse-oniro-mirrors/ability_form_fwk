@@ -4371,4 +4371,20 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_225, TestSize.Level0)
     EXPECT_EQ(ERR_OK, formMgrAdapter.GetFormsInfoByFilter(filter, formInfos));
     GTEST_LOG_(INFO) << "FormMgrAdapter_225 end";
 }
+
+/**
+ * @tc.number: FormMgrAdapter_226
+ * @tc.name: UpdateFormLocation
+ * @tc.desc: Verify that the map can be operated normally.
+ * @tc.details: Determine whether an element exists in the map.
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_226, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_226 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    int32_t formLocation = 1;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, formMgrAdapter.UpdateFormLocation(formId, formLocation));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_226 end";
+}
 }
