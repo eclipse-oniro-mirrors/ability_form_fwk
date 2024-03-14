@@ -235,13 +235,14 @@ HWTEST_F(FmsFormMgrDumpTest, Dump_008, TestSize.Level0)
 
     GTEST_LOG_(INFO) << "fms_form_mgr_dump_test_008 end";
 }
+
 /*
  * Feature: FormMgrService
  * Function: FormMgr
  * SubFunction: Dump Function
  * FunctionPoints: FormMgr Dump interface
  * EnvConditions: Mobile that can run ohos test framework
- * CaseDescription: Verify if FormMgr invoke dump temp-form works.
+ * CaseDescription: Verify if FormMgr invoke dump form works.
  */
 HWTEST_F(FmsFormMgrDumpTest, Dump_009, TestSize.Level0)
 {

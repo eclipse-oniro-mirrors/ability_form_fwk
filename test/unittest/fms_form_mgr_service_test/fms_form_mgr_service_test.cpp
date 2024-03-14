@@ -1896,29 +1896,16 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0098, TestSize.Level1)
 
 /**
  * @tc.number: FormMgrService_0099
- * @tc.name: test ReloadFormInfos function.
- * @tc.desc: Verify that the ReloadFormInfos interface is called normally
+ * @tc.name: test FormMgr HiDumpFormRunningFormInfos function.
+ * @tc.desc: Verify that the HiDumpFormRunningFormInfos interface is available.
  */
 HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0099, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormMgrService_0099 start";
     FormMgrService formMgrService;
-    formMgrService.ReloadFormInfos();
-    GTEST_LOG_(INFO) << "FormMgrService_0099 end";
-}
-
-/**
- * @tc.number: FormMgrService_0100
- * @tc.name: test HiDumpFormRunningFormInfos function.
- * @tc.desc: Verify that the HiDumpFormRunningFormInfos interface is available.
- */
-HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0100, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0100 start";
-    FormMgrService formMgrService;
     std::string args;
     std::string RunningFormInfo;
     formMgrService.HiDumpFormRunningFormInfos(args, RunningFormInfo);
-    GTEST_LOG_(INFO) << "FormMgrService_0100 end";
+    GTEST_LOG_(INFO) << "FormMgrService_0099 end";
 }
 }

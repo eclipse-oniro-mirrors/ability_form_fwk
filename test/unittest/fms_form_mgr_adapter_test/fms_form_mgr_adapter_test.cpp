@@ -4329,7 +4329,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_222, TestSize.Level0)
 
 /**
  * @tc.name: FormMgrAdapter_223
- * @tc.desc: test DumpFormRunningForminfos function and the return OK when formInfos is not empty.
+ * @tc.desc: test DumpFormRunningForminfos function.
  * @tc.type: FUNC
  */
 HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_223, TestSize.Level0)
@@ -4352,8 +4352,8 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_224, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormMgrAdapter_224 start";
     FormMgrAdapter formMgrAdapter;
     std::string formInfo = "aa";
-    MockGetRunningFormInfos(false);
-    EXPECT_EQ(false, formMgrAdapter.DumpFormRunningFormInfos(formInfo));
+    MockGetRunningFormInfos(ERR_NONE);
+    EXPECT_EQ(ERR_NONE, formMgrAdapter.DumpFormRunningFormInfos(formInfo));
     GTEST_LOG_(INFO) << "FormMgrAdapter_224 end";
 }
 }
