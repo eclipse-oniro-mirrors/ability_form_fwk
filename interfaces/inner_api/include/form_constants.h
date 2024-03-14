@@ -190,8 +190,8 @@ namespace Constants {
         DIMENSION_4_4,
         DIMENSION_2_1,
         DIMENSION_1_1,
-        DIMENSION_4_6,
-        DIMENSION_MAX = DIMENSION_4_6
+        DIMENSION_6_4,
+        DIMENSION_MAX = DIMENSION_6_4
     };
 
     const std::map<Dimension, std::string> DIMENSION_MAP = {
@@ -201,7 +201,7 @@ namespace Constants {
         {Dimension::DIMENSION_4_4, "4*4"},
         {Dimension::DIMENSION_2_1, "2*1"},
         {Dimension::DIMENSION_1_1, "1*1"},
-        {Dimension::DIMENSION_4_6, "4*6"}
+        {Dimension::DIMENSION_6_4, "6*4"}
     };
 
     enum class RenderingMode : int8_t {
