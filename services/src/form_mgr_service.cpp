@@ -114,7 +114,7 @@ FormMgrService::FormMgrService()
 
 FormMgrService::~FormMgrService()
 {
-    FMS_CALL_INFO_ENTER;
+    HILOG_INFO("called");
     if (formSysEventReceiver_ != nullptr) {
         EventFwk::CommonEventManager::UnSubscribeCommonEvent(formSysEventReceiver_);
         formSysEventReceiver_ = nullptr;
@@ -678,7 +678,7 @@ void FormMgrService::SubscribeSysEventReceiver()
  */
 ErrCode FormMgrService::Init()
 {
-    FMS_CALL_INFO_ENTER;
+    HILOG_INFO("called");
     serialQueue_ = std::make_shared<FormSerialQueue>(FORM_MGR_SERVICE_QUEUE.c_str());
     if (serialQueue_ == nullptr) {
         HILOG_ERROR("Init fail, Failed to init due to create serialQueue_ error");
