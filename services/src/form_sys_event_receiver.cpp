@@ -159,6 +159,11 @@ void FormSysEventReceiver::HandleUserIdRemoved(const int32_t userId)
 
 void FormSysEventReceiver::HandleBundleScanFinished()
 {
+    InitFormInfosAndRegister();
+}
+
+void FormSysEventReceiver::InitFormInfosAndRegister()
+{
     if (!serialQueue_) {
         HILOG_ERROR("serialQueue is nullptr!");
         return;
