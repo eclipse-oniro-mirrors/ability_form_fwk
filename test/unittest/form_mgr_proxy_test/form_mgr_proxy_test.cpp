@@ -786,4 +786,21 @@ HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0101, TestSize.Level1) {
     EXPECT_EQ(result, true);
     GTEST_LOG_(INFO) << "FormMgrProxyTest_0101 test ends";
 }
+
+/**
+ * @tc.name: FormMgrProxyTest_0102
+ * @tc.desc: Verify GetFormsInfoByFilter is called.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0102, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_0102 starts";
+    EXPECT_CALL(*mockFormMgrService, GetFormsInfoByFilter(_, _))
+        .Times(1)
+        .WillOnce(Return(true));
+    std::vector<FormInfo> formInfos;
+    FormInfoFilter filter;
+    bool result = formMgrProxy->GetFormsInfoByFilter(filter, formInfos);
+    EXPECT_EQ(result, true);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_0102 test ends";
+}
 }

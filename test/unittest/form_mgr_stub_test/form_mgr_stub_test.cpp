@@ -2544,4 +2544,32 @@ HWTEST_F(FormMgrStubTest, HandleGetRunningFormInfosByBundleName_0100, TestSize.L
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "HandleGetRunningFormInfosByBundleName_0100 ends";
 }
+
+/**
+ * @tc.number: FormMgrStubTest_0101
+ * @tc.name: Verify OnRemoteRequest and HandleGetFormsInfoByFilter
+ * @tc.desc: When the parameter code is FORM_MGR_GET_FORMS_INFO_BY_FILTER, the interface return value is ERR_OK + 1.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0101, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0101 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    const std::string bundleName = "bundleName";
+    const std::string moduleName = "moduleName";
+    std::vector<int32_t> supportDimensions{1, 2};
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORMS_INFO_BY_FILTER);
+    constexpr int32_t errorCode = ERR_OK + 1;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    data.WriteString(bundleName);
+    data.WriteString(moduleName);
+    data.WriteInt32Vector(supportDimensions);
+    EXPECT_CALL(*mockFormMgrService, GetFormsInfoByFilter(_, _))
+        .Times(1)
+        .WillOnce(Return(errorCode));
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, errorCode);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0101 ends";
+}
 }

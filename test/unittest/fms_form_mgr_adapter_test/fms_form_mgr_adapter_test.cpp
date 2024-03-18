@@ -4325,4 +4325,19 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_222, TestSize.Level0)
     EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, formMgrAdapter.GetFormInstanceById(1, formInstance));
     GTEST_LOG_(INFO) << "FormMgrAdapter_222 end";
 }
+
+/**
+ * @tc.name: FormMgrAdapter_223
+ * @tc.desc: test GetFormsInfoByFilter function and the return value is ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_223, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_223 start";
+    FormMgrAdapter formMgrAdapter;
+    std::vector<FormInfo> formInfos;
+    FormInfoFilter filter;
+    EXPECT_EQ(ERR_OK, formMgrAdapter.GetFormsInfoByFilter(filter, formInfos));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_223 end";
+}
 }

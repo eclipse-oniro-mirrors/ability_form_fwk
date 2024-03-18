@@ -1893,4 +1893,22 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0098, TestSize.Level1)
     EXPECT_EQ(ERR_OK, formMgrService.StartAbility(want, callerToken));
     GTEST_LOG_(INFO) << "FormMgrService_0098 end";
 }
+
+/**
+ * @tc.number: FormMgrService_0099
+ * @tc.name: test GetFormsInfoByFilter function.
+ * @tc.desc: Verify that the GetFormsInfoByFilter interface if the caller is not a system app
+ *           and the return value is ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0099, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0099 start";
+    FormMgrService formMgrService;
+    std::vector<FormInfo> formInfos;
+    FormInfoFilter filter;
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, formMgrService.GetFormsInfoByFilter(filter, formInfos));
+    GTEST_LOG_(INFO) << "FormMgrService_0099 end";
+}
 }
