@@ -87,6 +87,40 @@ bool ConvertFormInfoFilterThrow(napi_env env, napi_value jsValue, AppExecFwk::Fo
 
     return true;
 }
+
+bool ConvertFormInfoConfigUpdateFiltersThrow(napi_env env, napi_value jsValue,
+    AppExecFwk::FormInfoConfigUpdateFilter &formInfoUpdateFilter)
+{
+    napi_valuetype jsValueType = napi_undefined;
+    napi_typeof(env, jsValue, &jsValueType);
+    if (jsValueType != napi_object) {
+        HILOG_ERROR("configuration UpdateFlags is not napi_object.");
+        NapiFormUtil::ThrowParamTypeError(env, "enableFlags", "formInfo.ConfigurationUpdateFlags");
+        return false;
+    }
+
+    napi_value fontEnabledValue = nullptr;
+    napi_status ret = napi_get_named_property(env, jsValue, "fontEnabled", &fontEnabledValue);
+    if (ret != napi_ok) {
+        HILOG_ERROR("get property fontEnabled failed.");
+        NapiFormUtil::ThrowParamError(env, "Failed to get property fontEnabled.");
+        return false;
+    }
+    napi_valuetype fontEnabledValueType = napi_undefined;
+    napi_typeof(env, fontEnabledValue, &fontEnabledValueType);
+    if (fontEnabledValue == nullptr || fontEnabledValueType == napi_undefined) {
+        HILOG_ERROR("fontEnabledValueType is invalid.");
+        NapiFormUtil::ThrowParamTypeError(env, "fontEnabled", "boolean");
+        return false;
+    }
+    if (!ConvertFromJsValue(env, fontEnabledValue, formInfoUpdateFilter.fontEnabled)) {
+        HILOG_ERROR("convert nativeDataValue failed.");
+        NapiFormUtil::ThrowParamError(env, "Failed to convert formInfoUpdateFilter.");
+        return false;
+    }
+    HILOG_INFO("fontEnabled is %{public}s.", formInfoUpdateFilter.fontEnabled ? "true" : "false");
+    return true;
+}
 }
 
 static std::string GetStringByProp(napi_env env, napi_value value, const std::string &prop)
@@ -467,6 +501,59 @@ napi_value JsFormProvider::OnRequestPublishForm(napi_env env, size_t argc, napi_
     napi_value result = nullptr;
     NapiAsyncTask::ScheduleWithDefaultQos("JsFormProvider::OnRequestPublishForm",
         env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
+    return result;
+}
+
+napi_value JsFormProvider::SetConfigurationUpdateFlags(napi_env env, napi_callback_info info)
+{
+    GET_CB_INFO_AND_CALL(env, info, JsFormProvider, OnSetConfigurationUpdateFlags);
+}
+
+napi_value JsFormProvider::OnSetConfigurationUpdateFlags(napi_env env, size_t argc, napi_value* argv)
+{
+    HILOG_DEBUG("called");
+    if (argc != ARGS_TWO) {
+        HILOG_ERROR("invalid param number %{public}zu.", argc);
+        NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "2");
+        return CreateJsUndefined(env);
+    }
+    
+    napi_valuetype paramZeroType = napi_undefined;
+    napi_typeof(env, argv[PARAM0], &paramZeroType);
+    std::string strFormId;
+    if (paramZeroType != napi_string || !ConvertFromJsValue(env, argv[PARAM0], strFormId)) {
+        HILOG_ERROR("formId is not napi_string.");
+        NapiFormUtil::ThrowParamTypeError(env, "formId", "string");
+        return CreateJsUndefined(env);
+    }
+
+    int64_t formId = 0;
+    if (!ConvertStringToInt64(strFormId, formId)) {
+        HILOG_ERROR("convert form string failed.");
+        NapiFormUtil::ThrowParamError(env, "Failed to convert formId.");
+        return CreateJsUndefined(env);
+    }
+
+    FormInfoConfigUpdateFilter formInfoUpdateFilter;
+    if (!ConvertFormInfoConfigUpdateFiltersThrow(env, argv[PARAM1], formInfoUpdateFilter)) {
+        HILOG_ERROR("convert form updateconfig failed.");
+        NapiFormUtil::ThrowParamError(env, "Failed to convert formInfoUpdateConfig.");
+        return CreateJsUndefined(env);
+    }
+
+    NapiAsyncTask::CompleteCallback complete =
+        [formId, formInfoUpdateFilter](napi_env env, NapiAsyncTask &task, int32_t status) {
+            int32_t ret = FormMgr::GetInstance().SetFormConfigUpdateFlags(formId, formInfoUpdateFilter);
+            if (ret != ERR_OK) {
+                task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
+                return;
+            }
+            task.ResolveWithNoError(env, CreateJsUndefined(env));
+        };
+
+    napi_value result = nullptr;
+    NapiAsyncTask::ScheduleWithDefaultQos("JsFormProvider::OnSetConfigurationUpdateFlags",
+        env, CreateAsyncTaskWithLastParam(env, nullptr, nullptr, std::move(complete), &result));
     return result;
 }
 
