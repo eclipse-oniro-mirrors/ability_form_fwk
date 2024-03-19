@@ -1893,17 +1893,4 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0098, TestSize.Level1)
     EXPECT_EQ(ERR_OK, formMgrService.StartAbility(want, callerToken));
     GTEST_LOG_(INFO) << "FormMgrService_0098 end";
 }
-
-/**
- * @tc.number: FormMgrService_0099
- * @tc.name: test ReloadFormInfos function.
- * @tc.desc: Verify that the ReloadFormInfos interface is called normally
- */
-HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0099, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0099 start";
-    FormMgrService formMgrService;
-    formMgrService.ReloadFormInfos();
-    GTEST_LOG_(INFO) << "FormMgrService_0099 end";
-}
 }

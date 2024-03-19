@@ -711,10 +711,7 @@ ErrCode FormMgrService::Init()
     FormTimerMgr::GetInstance(); // Init FormTimerMgr
     FormCacheMgr::GetInstance().Start();
 
-    FormBmsHelper::GetInstance().RegisterBundleEventCallback();
-    if (!FormInfoMgr::GetInstance().HasReloadedFormInfos()) {
-        ReloadFormInfos();
-    }
+    formSysEventReceiver_->InitFormInfosAndRegister();
 
     // read param form form_config.xml.
     if (ReadFormConfigXML() != ERR_OK) {
@@ -722,17 +719,6 @@ ErrCode FormMgrService::Init()
     }
     FormMgrAdapter::GetInstance().Init();
     return ERR_OK;
-}
-
-void FormMgrService::ReloadFormInfos()
-{
-    int currUserId = FormUtil::GetCurrentAccountId();
-    if (currUserId == Constants::ANY_USERID) {
-        HILOG_INFO("FormMgrService use MAIN_USER_ID(%{public}d instead of currentUserId: ANY_USERID(%{public}d)",
-            MAIN_USER_ID, Constants::ANY_USERID);
-        currUserId = MAIN_USER_ID;
-    }
-    FormInfoMgr::GetInstance().ReloadFormInfos(currUserId);
 }
 
 ErrCode FormMgrService::CheckFormObserverPermission()
