@@ -628,11 +628,6 @@ private:
 
     void InitFormShareMgrSerialQueue();
 
-    /**
-     * @brief Reload form infos when initialize.
-     */
-    void ReloadFormInfos();
-
     void DumpInit();
     void Dump(const std::vector<std::u16string> &args, std::string &result);
     bool ParseOption(const std::vector<std::u16string> &args, DumpKey &key, std::string &value, std::string &result);

@@ -48,6 +48,12 @@ public:
     {
         serialQueue_ = serialQueue;
     }
+
+    /**
+     * @brief Init form infos and register form bundle event callback.
+     */
+    void InitFormInfosAndRegister();
+
 private:
     void HandleUserIdRemoved(const int32_t userId); // multiuser
     bool IsSameForm(const FormRecord &record, const FormInfo &formInfo);
