@@ -100,6 +100,14 @@ void FormRenderServiceExtension::OnConfigurationUpdated(const AppExecFwk::Config
     Extension::OnConfigurationUpdated(configuration);
     HILOG_INFO("%{public}s called.", __func__);
     auto config = std::make_shared<AppExecFwk::Configuration>(configuration);
+    std::string fontSizeScale = config->GetItem(AAFwk::GlobalConfigurationKey::SYSTEM_FONT_SIZE_SCALE);
+    if (fontSizeScale == AppExecFwk::ConfigurationInner::EMPTY_STRING) {
+        HILOG_WARN("%{public}s fontSizeScale is empty string.", __func__);
+    }
+    if (std::stof(fontSizeScale) > 1.3f) {
+        config->AddItem(AAFwk::GlobalConfigurationKey::SYSTEM_FONT_SIZE_SCALE, std::string("1.3"));
+        HILOG_WARN("%{public}s adjust font_size_scale %{public}s maxRange 1.3.", __func__, fontSizeScale.c_str());
+    }
     OHOS::DelayedSingleton<FormRenderImpl>::GetInstance()->OnConfigurationUpdated(config);
 }
 }
