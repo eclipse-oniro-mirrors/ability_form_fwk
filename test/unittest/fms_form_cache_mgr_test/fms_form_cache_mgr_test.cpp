@@ -24,7 +24,7 @@ using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::AppExecFwk;
 
-static const int64_t PARAM_FORM_ID_FIRST = numeric_limits<int64_t>::max();
+static const int64_t PARAM_FORM_ID_FIRST = std::numeric_limits<int64_t>::max();
 
 namespace {
 class FmsFormCacheMgrTest : public testing::Test {
@@ -80,7 +80,12 @@ HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_002, TestSize.Level0)
 {
     HILOG_INFO("fms_form_cache_mgr_test_002 start");
 
-    std::string dataResult = "{'a':'1','b':'2'}";
+    nlohmann::json dataResult = R"(
+        {
+            "a" : "1",
+            "b" : "2"
+        }
+    )"_json;
     FormProviderData formProviderData;
     formProviderData.UpdateData(dataResult);
     EXPECT_TRUE(formCacheMgr_.AddData(PARAM_FORM_ID_FIRST, formProviderData));
@@ -102,8 +107,20 @@ HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_002, TestSize.Level0)
 HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_003, TestSize.Level0)
 {
     HILOG_INFO("fms_form_cache_mgr_test_003 start");
-    std::string dataResult1 = "{'a':'1','b':'2'}";
-    std::string dataResult2 = "{'a':'2','b':'2'}";
+    std::string result1 = "{\"a\":\"1\",\"b\":\"2\"}";
+    std::string result2 = "{\"a\":\"2\",\"b\":\"2\"}";
+    nlohmann::json dataResult1 = R"(
+        {
+            "a" : "1",
+            "b" : "2"
+        }
+    )"_json;
+    nlohmann::json dataResult2 = R"(
+        {
+            "a" : "2",
+            "b" : "2"
+        }
+    )"_json;
     FormProviderData formProviderData;
     formProviderData.UpdateData(dataResult1);
     EXPECT_TRUE(formCacheMgr_.AddData(PARAM_FORM_ID_FIRST, formProviderData));
@@ -111,12 +128,12 @@ HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_003, TestSize.Level0)
     std::string queryResult;
     std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
     EXPECT_TRUE(formCacheMgr_.GetData(PARAM_FORM_ID_FIRST, queryResult, imageDataMap));
-    EXPECT_EQ(dataResult1, queryResult);
+    EXPECT_EQ(result1, queryResult);
 
     formProviderData.UpdateData(dataResult2);
     EXPECT_TRUE(formCacheMgr_.AddData(PARAM_FORM_ID_FIRST, formProviderData));
     EXPECT_TRUE(formCacheMgr_.GetData(PARAM_FORM_ID_FIRST, queryResult, imageDataMap));
-    EXPECT_EQ(dataResult2, queryResult);
+    EXPECT_EQ(result2, queryResult);
     GTEST_LOG_(INFO) << "fms_form_cache_mgr_test_003 end";
 }
 
@@ -130,8 +147,14 @@ HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_003, TestSize.Level0)
 HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_004, TestSize.Level0)
 {
     HILOG_INFO("fms_form_cache_mgr_test_004 start");
-
-    std::string dataResult1 = "{'a':'1','b':'2'}";
+    std::string result1 = "{\"a\":\"1\",\"b\":\"2\"}";
+    nlohmann::json dataResult1 = R"(
+        {
+            "a" : "1",
+            "b" : "2"
+        }
+    )"_json;
+    
     FormProviderData formProviderData;
     formProviderData.UpdateData(dataResult1);
     EXPECT_TRUE(formCacheMgr_.AddData(PARAM_FORM_ID_FIRST, formProviderData));
@@ -139,7 +162,7 @@ HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_004, TestSize.Level0)
     std::string queryResult;
     std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
     EXPECT_TRUE(formCacheMgr_.GetData(PARAM_FORM_ID_FIRST, queryResult, imageDataMap));
-    EXPECT_EQ(dataResult1, queryResult);
+    EXPECT_EQ(result1, queryResult);
     EXPECT_TRUE(formCacheMgr_.DeleteData(PARAM_FORM_ID_FIRST));
     EXPECT_FALSE(formCacheMgr_.GetData(PARAM_FORM_ID_FIRST, queryResult, imageDataMap));
     GTEST_LOG_(INFO) << "fms_form_cache_mgr_test_004 end";
