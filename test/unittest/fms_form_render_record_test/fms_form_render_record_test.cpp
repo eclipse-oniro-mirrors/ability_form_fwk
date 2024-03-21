@@ -789,7 +789,6 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_041, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormRenderRecordTest_041 end";
 }
 
-
 /**
  * @tc.name: FormRenderRecordTest_042
  * @tc.desc: Verify DumpEventHandler
