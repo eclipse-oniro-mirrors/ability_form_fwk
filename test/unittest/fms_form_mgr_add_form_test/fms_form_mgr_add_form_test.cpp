@@ -68,6 +68,7 @@ const std::string FORM_HOST_BUNDLE_NAME = "com.form.host.app";
 
 const int32_t PARAM_FORM_DIMENSION_VALUE = 1;
 const int32_t PARAM_FORM_DIMENSION_2_1 = 5;
+const int32_t PARAM_FORM_DIMENSION_6_4 = 7;
 
 const std::string DEVICE_ID = "ohos-phone1";
 const std::string DEF_LABEL1 = "PermissionFormRequireGrant";
@@ -130,7 +131,7 @@ void FmsFormMgrAddFormTest::CreateProviderData()
     formInfo.scheduledUpdateTime = "06:06";
     formInfo.jsComponentName = FORM_JS_COMPONENT_NAME;
     formInfo.formVisibleNotify = true;
-    formInfo.supportDimensions = {1, 2, 5};
+    formInfo.supportDimensions = {1, 2, 5, 7};
     formInfo.defaultDimension = 1;
     FormInfoStorage formInfoStorage;
     formInfoStorage.userId = userId_;
@@ -964,4 +965,71 @@ HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_011, TestSize.Level0)
     testing::Mock::AllowLeak(mockBundleMgrService);
     GTEST_LOG_(INFO) << "fms_form_mgr_add_form_test_011 end";
 }
+}
+
+/**
+ * @tc.name: AddForm_012
+ * @tc.desc: Add 6_4 form
+ * @tc.type: FUNC
+ * @tc.require: issueI983FU
+ */
+HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_012, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "fms_form_mgr_add_form_test_012 start";
+    CreateProviderData();
+    // No cache
+    FormJsInfo formJsInfo;
+    Want want;
+    want.SetParam(Constants::PARAM_FORM_HOST_BUNDLENAME_KEY, FORM_HOST_BUNDLE_NAME);
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, PARAM_PROVIDER_MODULE_NAME);
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, PARAM_FORM_NAME);
+    want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, PARAM_FORM_DIMENSION_6_4);
+    want.SetElementName(DEVICE_ID, FORM_PROVIDER_BUNDLE_NAME, FORM_PROVIDER_ABILITY_NAME);
+    want.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
+    want.SetParam(Constants::ACQUIRE_TYPE, Constants::ACQUIRE_TYPE_CREATE_FORM);
+    // clear old data
+    FormDataMgr::GetInstance().ClearFormRecords();
+    std::vector<FormDBInfo> oldFormDBInfos;
+    FormDbCache::GetInstance().GetAllFormInfo(oldFormDBInfos);
+    for (auto oldFormDBInfo: oldFormDBInfos) {
+        FormDbCache::GetInstance().DeleteFormInfo(oldFormDBInfo.formId);
+    }
+    auto bmsTaskGetBundleNameForUid = [] (const int uid, std::string &name) {
+        name = FORM_PROVIDER_BUNDLE_NAME;
+        GTEST_LOG_(INFO) << "AddForm_012 bmsTaskGetBundleNameForUid called";
+        return ERR_OK;
+    };
+
+    BundleInfo bundleInfo;
+    FillBundleInfo(FORM_PROVIDER_BUNDLE_NAME, bundleInfo);
+    EXPECT_CALL(*mockBundleMgrService, GetBundleInfo(_, _, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(bundleInfo), Return(true)));
+    EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(3).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
+    // add form
+    EXPECT_EQ(ERR_OK, FormMgr::GetInstance().AddForm(0L, want, token_, formJsInfo));
+    token_->Wait();
+
+    size_t dataCnt {1};
+    int64_t formId = formJsInfo.formId;
+    // Form record alloted.
+    FormRecord formInfo;
+    bool ret = FormDataMgr::GetInstance().GetFormRecord(formId, formInfo);
+    EXPECT_TRUE(ret);
+    EXPECT_EQ(dataCnt, formInfo.formUserUids.size());
+    // Database info alloted.
+    std::vector<FormDBInfo> formDBInfos;
+    FormDbCache::GetInstance().GetAllFormInfo(formDBInfos);
+    EXPECT_EQ(dataCnt, formDBInfos.size());
+    FormDBInfo dbInfo {formDBInfos[0]};
+    EXPECT_EQ(formId, dbInfo.formId);
+    EXPECT_EQ(dataCnt, dbInfo.formUserUids.size());
+    // Form host record alloted.
+    std::vector<FormHostRecord> hostRecords;
+    FormDataMgr::GetInstance().GetFormHostRecord(formId, hostRecords);
+    EXPECT_FALSE(hostRecords.empty());
+
+    FormDataMgr::GetInstance().DeleteFormRecord(formId);
+    FormDbCache::GetInstance().DeleteFormInfo(formId);
+    FormDataMgr::GetInstance().DeleteHostRecord(token_, formId);
+    GTEST_LOG_(INFO) << "fms_form_mgr_add_form_test_012 end";
 }
