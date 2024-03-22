@@ -20,6 +20,7 @@
 
 #include "form_record.h"
 #include "nlohmann/json.hpp"
+#include "form_constants.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -32,7 +33,7 @@ struct FormDBInfo {
     std::string moduleName;
     std::string abilityName;
     std::vector<int> formUserUids;
-
+    Constants::FormLocation formLocation;
     /**
      * @brief Constructors
      *
@@ -53,6 +54,7 @@ struct FormDBInfo {
         moduleName = formRecord.moduleName;
         abilityName = formRecord.abilityName;
         formUserUids = formRecord.formUserUids;
+        formLocation = formRecord.formLocation;
     }
     bool Contains(const int uId) const
     {
@@ -103,6 +105,9 @@ struct FormDBInfo {
         if (formUserUids != formDBInfo.formUserUids) {
             return false;
         }
+        if (formLocation != formDBInfo.formLocation) {
+            return false;
+        }
 
         return true;
     }
@@ -131,6 +136,7 @@ public:
         formDBInfo_.moduleName = formDBInfo.moduleName;
         formDBInfo_.abilityName = formDBInfo.abilityName;
         formDBInfo_.formUserUids = formDBInfo.formUserUids;
+        formDBInfo_.formLocation = formDBInfo.formLocation;
     }
     /**
      * @brief Constructors
@@ -146,6 +152,7 @@ public:
         formDBInfo_.moduleName = innerFormInfo.formDBInfo_.moduleName;
         formDBInfo_.abilityName = innerFormInfo.formDBInfo_.abilityName;
         formDBInfo_.formUserUids = innerFormInfo.formDBInfo_.formUserUids;
+        formDBInfo_.formLocation = innerFormInfo.formDBInfo_.formLocation;
     }
      /**
      * @brief Constructors
@@ -161,6 +168,7 @@ public:
         formDBInfo_.moduleName = formRecord.moduleName;
         formDBInfo_.abilityName = formRecord.abilityName;
         formDBInfo_.formUserUids = formRecord.formUserUids;
+        formDBInfo_.formLocation = formRecord.formLocation;
     }
     std::string ToString() const
     {
@@ -173,6 +181,7 @@ public:
         obj["moduleName"] = formDBInfo_.moduleName;
         obj["abilityName"] = formDBInfo_.abilityName;
         obj["formUserUids"] = formDBInfo_.formUserUids;
+        obj["formLocation"] = formDBInfo_.formLocation;
         return obj.dump();
     }
     /**

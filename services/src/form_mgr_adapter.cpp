@@ -23,6 +23,7 @@
 
 #include "ability_manager_errors.h"
 #include "form_record.h"
+#include "form_info_filter.h"
 #include "accesstoken_kit.h"
 #include "hap_token_info.h"
 #ifdef DEVICE_USAGE_STATISTICS_ENABLE
@@ -1305,7 +1306,15 @@ ErrCode FormMgrAdapter::GetFormConfigInfo(const Want &want, FormItemInfo &formCo
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
 
-    HILOG_DEBUG("GetFormConfigInfo end.");
+    int formLocation = want.GetParams().GetIntParam(Constants::FORM_LOCATION_KEY,
+        static_cast<int>(Constants::FormLocation::OTHER));
+    if (formLocation < static_cast<int32_t>(Constants::FormLocation::OTHER) ||
+            formLocation > static_cast<int32_t>(Constants::FormLocation::AI_SUGGESTION)) {
+        HILOG_ERROR("formLocation is not FormLocation enum, formLocation = %{public}d", formLocation);
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    formConfigInfo.SetFormLocation((Constants::FormLocation)formLocation);
+    HILOG_DEBUG("GetFormConfigInfo end, formLocation = %{public}d", formLocation);
     return ERR_OK;
 }
 /**
@@ -1323,6 +1332,7 @@ ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
     int64_t formId = FormDataMgr::GetInstance().PaddingUdidHash(info.GetFormId());
     FormRecord record;
     bool hasRecord = FormDataMgr::GetInstance().GetFormRecord(formId, record);
+    record.formLocation = info.GetFormLocation();
     if (hasRecord && record.recycleStatus != RecycleStatus::NON_RECYCLABLE) {
         record.recycleStatus = RecycleStatus::NON_RECYCLABLE;
         FormDataMgr::GetInstance().UpdateFormRecord(formId, record);
@@ -3040,6 +3050,18 @@ int FormMgrAdapter::GetFormsInfoByApp(const std::string &bundleName, std::vector
 }
 
 /**
+ * @brief Get forms info specified by filter parameters .
+ * @param filter Filter that contains necessary conditions, such as bundle name, module name, dimensions.
+ * @param formInfos Return the forms' information specified by filter.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormMgrAdapter::GetFormsInfoByFilter(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos)
+{
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    return FormInfoMgr::GetInstance().GetFormsInfoByFilter(filter, formInfos);
+}
+
+/**
  * @brief Get forms info by bundle name and module name.
  * @param bundleName bundle name.
  * @param moduleName Module name of hap.
@@ -3739,5 +3761,31 @@ int32_t FormMgrAdapter::RecoverForms(const std::vector<int64_t> &formIds, const 
     FormRenderMgr::GetInstance().RecoverForms(validFormIds, bundleName, want.GetParams());
     return ERR_OK;
 }
+
+ErrCode FormMgrAdapter::UpdateFormLocation(const int64_t &formId, const int32_t &formLocation)
+{
+    // find matched formId
+    int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+
+    // check exist and get the formRecord
+    FormRecord formRecord;
+    if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, formRecord)) {
+        HILOG_ERROR("error, not exist such form, formId = %{public}" PRId64 " formLocation = %{public}d",
+            formId, formLocation);
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    }
+    if ((int32_t)formRecord.formLocation != formLocation) {
+        FormDataMgr::GetInstance().UpdateFormLocation(matchedFormId, formLocation);
+        if (!formRecord.formTempFlag) {
+            auto ret = HandleFormAddObserver(matchedFormId);
+            if (ret != ERR_OK) {
+                return ret;
+            }
+            return FormDbCache::GetInstance().UpdateFormLocation(matchedFormId, formLocation);
+        }
+    }
+    return ERR_OK;
+}
+
 } // namespace AppExecFwk
 } // namespace OHOS

@@ -19,7 +19,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-
+#include "form_constants.h"
 #include "form_record.h"
 
 namespace OHOS {
@@ -371,6 +371,18 @@ public:
      */
     std::string GetDescription() const;
 
+    /**
+     * @brief Get the formLocation of formInfo.
+     * @return formLocation.
+     */
+    Constants::FormLocation GetFormLocation() const;
+
+    /**
+     * @brief set the formLocation.
+     * @param formLocation The FormLocation.
+     */
+    void SetFormLocation(Constants::FormLocation formLocation);
+
 private:
     /**
      * @brief Equal or not.
@@ -414,6 +426,7 @@ private:
     bool isSystemApp_ = false;
     int32_t uid_ = -1;
     std::string description_ = "";
+    Constants::FormLocation formLocation_;
 };
 } // namespace AppExecFwk
 } // namespace OHOS

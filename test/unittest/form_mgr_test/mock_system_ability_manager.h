@@ -105,6 +105,14 @@ public:
     {
         return {};
     };
+    int32_t GetExtensionSaIds(const std::string& extension, std::vector<int32_t> &saIds)
+    {
+        return {};
+    }
+    int32_t GetExtensionRunningSaList(const std::string& extension, std::vector<sptr<IRemoteObject>>& saList)
+    {
+        return {};
+    }
     int32_t GetSystemProcessInfo(int32_t systemAbilityId, SystemProcessInfo& systemProcessInfo) override
     {
         return {};

@@ -322,6 +322,14 @@ public:
                              std::vector<FormInfo> &formInfos) override;
 
     /**
+    * @brief This function is called by host and gets formsInfos info specifild by filter.
+    * @param filter Filter that contains necessary conditions, such as bundle name, module name, dimensions.
+    * @param formInfos Return the forms' information specified by filter.
+    * @return Returns ERR_OK on success, others on failure.
+    */
+    int GetFormsInfoByFilter(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos) override;
+
+    /**
     * @brief This function is called by formProvider and gets forms info by the bundle name of the calling ability.
     *        The bundle name will be retrieved here.
     * @param filter Filter that contains attributes that the formInfos have to have.
@@ -578,6 +586,14 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t RecoverForms(const std::vector<int64_t> &formIds, const Want &want) override;
+
+    /**
+     * @brief Update formLocation with formId.
+     * @param formId The Id of the form to update.
+     * @param formLocation The FormLocation.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UpdateFormLocation(const int64_t &formId, const int32_t &formLocation) override;
 private:
     /**
      * OnAddSystemAbility, OnAddSystemAbility will be called when the listening SA starts.
@@ -611,11 +627,6 @@ private:
     bool CheckAcrossLocalAccountsPermission() const;
 
     void InitFormShareMgrSerialQueue();
-
-    /**
-     * @brief Reload form infos when initialize.
-     */
-    void ReloadFormInfos();
 
     void DumpInit();
     void Dump(const std::vector<std::u16string> &args, std::string &result);

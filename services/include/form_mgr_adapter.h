@@ -22,6 +22,7 @@
 #include "bundle_mgr_interface.h"
 #include "form_constants.h"
 #include "form_info.h"
+#include "form_info_filter.h"
 #include "form_instance.h"
 #include "form_instances_filter.h"
 #include "form_item_info.h"
@@ -368,6 +369,14 @@ public:
         std::vector<FormInfo> &formInfos);
 
     /**
+     * @brief Get forms info specfied by filter parameters.
+     * @param filter Filter that contains necessary conditions, such as bundle name, module name, dimensions.
+     * @param formInfos Return the forms' information specified by filter.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int GetFormsInfoByFilter(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos);
+
+    /**
     * @brief get forms count.
     * @param isTempFormFlag Indicates temp form or not.
     * @param formCount Returns the number of the cast or temp form.
@@ -572,6 +581,14 @@ public:
      * @param bundleName The bundleName of the form with a specified update duration in app gallery.
      */
     void UpdateFormCloudUpdateDuration(const std::string &bundleName);
+
+    /**
+     * @brief Update formLocation with formId.
+     * @param formId The Id of the form to update.
+     * @param formLocation formLocation.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UpdateFormLocation(const int64_t &formId, const int32_t &formLocation);
 
 private:
     /**

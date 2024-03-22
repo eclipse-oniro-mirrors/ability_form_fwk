@@ -77,6 +77,7 @@ public:
     int32_t privacyLevel = 0;
     bool isNeedNotify = true;
     RecycleStatus recycleStatus = RecycleStatus::NON_RECYCLABLE;
+    Constants::FormLocation formLocation;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

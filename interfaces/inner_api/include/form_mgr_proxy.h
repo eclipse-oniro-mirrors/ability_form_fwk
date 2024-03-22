@@ -280,6 +280,14 @@ public:
                                      std::vector<FormInfo> &formInfos) override;
 
     /**
+     * @brief Get forms info specfied by filter parameters.
+     * @param filter Filter that contains necessary conditions, such as bundle name, module name, dimensions.
+     * @param formInfos Return the forms' information specified by filter.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int GetFormsInfoByFilter(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos) override;
+
+    /**
     * @brief This function is called by formProvider and gets forms info by the bundle name of the calling ability.
     *        The bundle name will be retrieved by form service manager.
     * @param filter Filter that contains attributes that the formInfos have to have.
@@ -536,6 +544,14 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t RecoverForms(const std::vector<int64_t> &formIds, const Want &want) override;
+
+    /**
+     * @brief Update formLocation with formId.
+     * @param formId The Id of the form to update.
+     * @param formLocation The FormLocation.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UpdateFormLocation(const int64_t &formId, const int32_t &formLocation) override;
 private:
     template<typename T>
     int GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos);

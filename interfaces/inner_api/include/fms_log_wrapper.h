@@ -88,51 +88,6 @@
     FMS_FUNC_FMT fmt, FMS_FUNC_INFO, ##__VA_ARGS__);                   \
 } while (0)
 
-
-namespace OHOS {
-namespace AppExecFwk {
-
-class InnerFunctionTracer {
-public:
-    using HilogFunc = std::function<int(const char *)>;
-
-    InnerFunctionTracer(HilogFunc logfn, const char* tag, LogLevel level)
-        : logfn_(logfn), tag_(tag), level_(level)
-    {
-        if (HiLogIsLoggable(FMS_LOG_DOMAIN, tag_, level_)) {
-            if (logfn_ != nullptr) {
-                logfn_(FMS_FUNC_FMT "enter");
-            }
-        }
-    }
-    ~InnerFunctionTracer()
-    {
-        if (HiLogIsLoggable(FMS_LOG_DOMAIN, tag_, level_)) {
-            if (logfn_ != nullptr) {
-                logfn_(FMS_FUNC_FMT "leave");
-            }
-        }
-    }
-private:
-    HilogFunc logfn_ { nullptr };
-    const char* tag_ { nullptr };
-    LogLevel level_ { LOG_LEVEL_MIN };
-};
-} // namespace AppExecFwk
-} // namespace OHOS
-
-#ifndef FMS_CALL_DEBUG_ENTER
-#define FMS_CALL_DEBUG_ENTER    ::OHOS::AppExecFwk::InnerFunctionTracer ___innerFuncTracer_Debug___     \
-    { std::bind(&HiLogPrint, LOG_CORE, LOG_DEBUG, FMS_LOG_DOMAIN, FMS_LOG_TAG, std::placeholders::_1,   \
-      FMS_FUNC_INFO), FMS_LOG_TAG, LOG_DEBUG }
-#endif // FMS_CALL_DEBUG_ENTER
-
-#ifndef FMS_CALL_INFO_ENTER
-#define FMS_CALL_INFO_ENTER     ::OHOS::AppExecFwk::InnerFunctionTracer ___innerFuncTracer_Debug___     \
-    { std::bind(&HiLogPrint, LOG_CORE, LOG_INFO, FMS_LOG_DOMAIN, FMS_LOG_TAG, std::placeholders::_1,    \
-      FMS_FUNC_INFO), FMS_LOG_TAG, LOG_INFO }
-#endif // FMS_CALL_INFO_ENTER
-
 #else
 
 #define HILOG_FATAL(...)

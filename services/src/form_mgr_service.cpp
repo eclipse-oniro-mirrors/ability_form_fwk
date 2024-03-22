@@ -114,7 +114,7 @@ FormMgrService::FormMgrService()
 
 FormMgrService::~FormMgrService()
 {
-    FMS_CALL_INFO_ENTER;
+    HILOG_INFO("called");
     if (formSysEventReceiver_ != nullptr) {
         EventFwk::CommonEventManager::UnSubscribeCommonEvent(formSysEventReceiver_);
         formSysEventReceiver_ = nullptr;
@@ -678,7 +678,7 @@ void FormMgrService::SubscribeSysEventReceiver()
  */
 ErrCode FormMgrService::Init()
 {
-    FMS_CALL_INFO_ENTER;
+    HILOG_INFO("called");
     serialQueue_ = std::make_shared<FormSerialQueue>(FORM_MGR_SERVICE_QUEUE.c_str());
     if (serialQueue_ == nullptr) {
         HILOG_ERROR("Init fail, Failed to init due to create serialQueue_ error");
@@ -711,10 +711,7 @@ ErrCode FormMgrService::Init()
     FormTimerMgr::GetInstance(); // Init FormTimerMgr
     FormCacheMgr::GetInstance().Start();
 
-    FormBmsHelper::GetInstance().RegisterBundleEventCallback();
-    if (!FormInfoMgr::GetInstance().HasReloadedFormInfos()) {
-        ReloadFormInfos();
-    }
+    formSysEventReceiver_->InitFormInfosAndRegister();
 
     // read param form form_config.xml.
     if (ReadFormConfigXML() != ERR_OK) {
@@ -722,17 +719,6 @@ ErrCode FormMgrService::Init()
     }
     FormMgrAdapter::GetInstance().Init();
     return ERR_OK;
-}
-
-void FormMgrService::ReloadFormInfos()
-{
-    int currUserId = FormUtil::GetCurrentAccountId();
-    if (currUserId == Constants::ANY_USERID) {
-        HILOG_INFO("FormMgrService use MAIN_USER_ID(%{public}d instead of currentUserId: ANY_USERID(%{public}d)",
-            MAIN_USER_ID, Constants::ANY_USERID);
-        currUserId = MAIN_USER_ID;
-    }
-    FormInfoMgr::GetInstance().ReloadFormInfos(currUserId);
 }
 
 ErrCode FormMgrService::CheckFormObserverPermission()
@@ -976,6 +962,20 @@ int FormMgrService::GetFormsInfoByModule(std::string &bundleName, std::string &m
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
     return FormMgrAdapter::GetInstance().GetFormsInfoByModule(bundleName, moduleName, formInfos);
+}
+
+int FormMgrService::GetFormsInfoByFilter(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos)
+{
+    HILOG_DEBUG("called.");
+    if (!CheckCallerIsSystemApp()) {
+        HILOG_ERROR("Need system authority");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+    if (!CheckAcrossLocalAccountsPermission()) {
+        HILOG_ERROR("Across local accounts permission failed.");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    }
+    return FormMgrAdapter::GetInstance().GetFormsInfoByFilter(filter, formInfos);
 }
 
 int32_t FormMgrService::GetFormsInfo(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos)
@@ -1562,5 +1562,17 @@ int32_t FormMgrService::RecoverForms(const std::vector<int64_t> &formIds, const 
     }
     return FormMgrAdapter::GetInstance().RecoverForms(formIds, want);
 }
+
+ErrCode FormMgrService::UpdateFormLocation(const int64_t &formId, const int32_t &formLocation)
+{
+    HILOG_DEBUG("called.");
+    ErrCode ret = CheckFormPermission();
+    if (ret != ERR_OK) {
+        HILOG_ERROR("fail, update formLocation form infos permission denied");
+        return ret;
+    }
+    return FormMgrAdapter::GetInstance().UpdateFormLocation(formId, formLocation);
+}
+
 }  // namespace AppExecFwk
 }  // namespace OHOS

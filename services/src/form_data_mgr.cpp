@@ -186,6 +186,7 @@ FormRecord FormDataMgr::CreateFormRecord(const FormItemInfo &formInfo, const int
     newRecord.privacyLevel = formInfo.GetPrivacyLevel();
     newRecord.isSystemApp = formInfo.GetSystemAppFlag();
     newRecord.description = formInfo.GetDescription();
+    newRecord.formLocation = formInfo.GetFormLocation();
     if (newRecord.isEnableUpdate) {
         ParseUpdateConfig(newRecord, formInfo);
     }
@@ -1954,6 +1955,7 @@ void FormDataMgr::FillBasicRunningFormInfoByFormRecord(const FormRecord &formRec
     runningFormInfo.moduleName = formRecord.moduleName;
     runningFormInfo.abilityName = formRecord.abilityName;
     runningFormInfo.description = formRecord.description;
+    runningFormInfo.formLocation = formRecord.formLocation;
     runningFormInfo.formVisiblity = static_cast<FormVisibilityType>(formRecord.formVisibleNotifyState);
 }
 
@@ -2440,5 +2442,21 @@ bool FormDataMgr::HasFormCloudUpdateDuration(const std::string &bundleName) cons
     HILOG_INFO("Not has cloud update duration, bundleName: %{public}s", bundleName.c_str());
     return false;
 }
+
+ErrCode FormDataMgr::UpdateFormLocation(const int64_t &formId, const int32_t &formLocation)
+{
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    auto info = formRecords_.find(formId);
+    if (info == formRecords_.end()) {
+        HILOG_INFO("form info not find, formId = %{public}" PRId64 " formLocation = %{public}d",
+            formId, formLocation);
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+    }
+    info->second.formLocation = (Constants::FormLocation)formLocation;
+    HILOG_INFO("update form location successfully, formId = %{public}" PRId64 " formLocation = %{public}d",
+        formId, formLocation);
+    return ERR_OK;
+}
+
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -110,7 +110,7 @@ napi_value CreateJsFormDimension(napi_env engine)
     napi_set_named_property(
         engine, objValue, "DIMENSION_1_1", CreateJsValue(engine, AppExecFwk::Constants::Dimension::DIMENSION_1_1));
     napi_set_named_property(
-        engine, objValue, "DIMENSION_4_6", CreateJsValue(engine, AppExecFwk::Constants::Dimension::DIMENSION_4_6));
+        engine, objValue, "DIMENSION_6_4", CreateJsValue(engine, AppExecFwk::Constants::Dimension::DIMENSION_6_4));
     return objValue;
 }
 
@@ -145,6 +145,34 @@ napi_value CreateJsFormUsageState(napi_env engine)
     return objValue;
 }
 
+napi_value CreateJsFormLocation(napi_env engine)
+{
+    napi_value objValue = nullptr;
+    napi_create_object(engine, &objValue);
+    napi_set_named_property(
+        engine, objValue, "DESKTOP", CreateJsValue(engine, AppExecFwk::Constants::FormLocation::DESKTOP));
+    napi_set_named_property(
+        engine, objValue, "FORM_CENTER", CreateJsValue(engine, AppExecFwk::Constants::FormLocation::FORM_CENTER));
+    napi_set_named_property(
+        engine, objValue, "FORM_MANAGER", CreateJsValue(engine, AppExecFwk::Constants::FormLocation::FORM_MANAGER));
+    napi_set_named_property(
+        engine, objValue, "NEGATIVE_SCREEN", CreateJsValue(engine,
+            AppExecFwk::Constants::FormLocation::NEGATIVE_SCREEN));
+    napi_set_named_property(
+        engine, objValue, "FORM_CENTER_NEGATIVE_SCREEN", CreateJsValue(engine,
+            AppExecFwk::Constants::FormLocation::FORM_CENTER_NEGATIVE_SCREEN));
+    napi_set_named_property(
+        engine, objValue, "FORM_MANAGER_NEGATIVE_SCREEN", CreateJsValue(engine,
+            AppExecFwk::Constants::FormLocation::FORM_MANAGER_NEGATIVE_SCREEN));
+    napi_set_named_property(
+        engine, objValue, "SCREEN_LOCK", CreateJsValue(engine, AppExecFwk::Constants::FormLocation::SCREEN_LOCK));
+    napi_set_named_property(
+        engine, objValue, "AI_SUGGESTION", CreateJsValue(engine, AppExecFwk::Constants::FormLocation::AI_SUGGESTION));
+    napi_set_named_property(
+        engine, objValue, "OTHER", CreateJsValue(engine, AppExecFwk::Constants::FormLocation::OTHER));
+    return objValue;
+}
+
 napi_value FormInfoInit(napi_env engine, napi_value exportObj)
 {
     HILOG_INFO("%{public}s called.", __func__);
@@ -157,6 +185,7 @@ napi_value FormInfoInit(napi_env engine, napi_value exportObj)
     napi_set_named_property(engine, exportObj, "VisibilityType", CreateJsFormVisibilityType(engine));
     napi_set_named_property(engine, exportObj, "LaunchReason", CreateJsFormLaunchReason(engine));
     napi_set_named_property(engine, exportObj, "FormUsageState", CreateJsFormUsageState(engine));
+    napi_set_named_property(engine, exportObj, "FormLocation", CreateJsFormLocation(engine));
     HILOG_INFO("%{public}s called end.", __func__);
     return exportObj;
 }

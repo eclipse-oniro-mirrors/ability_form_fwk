@@ -383,6 +383,14 @@ public:
     int GetFormsInfoByModule(std::string &bundleName, std::string &moduleName, std::vector<FormInfo> &formInfos);
 
     /**
+     * @brief Get forms info specified by filter parameters.
+     * @param filter Filter that contains necessary conditions, such as bundle name, module name, dimensions.
+     * @param formInfos Return the forms' information specified by filter.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int GetFormsInfoByFilter(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos);
+
+    /**
     * @brief This function is called by formProvider and gets forms info by the bundle name of the calling ability.
     *        The bundle name will be retrieved by form service manager.
     * @param filter filter that contains attributes that the formInfos have to have.
@@ -595,6 +603,14 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t RecoverForms(const std::vector<int64_t> &formIds, const Want &want);
+
+    /**
+     * @brief Update formLocation with formId.
+     * @param formId The Id of the form to update.
+     * @param formLocation The FormLocation.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UpdateFormLocation(const int64_t &formId, const int32_t &formLocation);
 
 private:
     /**

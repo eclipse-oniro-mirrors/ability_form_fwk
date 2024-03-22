@@ -26,7 +26,9 @@ namespace AppExecFwk {
  */
 struct FormInfoFilter final : public Parcelable {
     // list of parameters
+    std::string bundleName = "";
     std::string moduleName = "";
+    std::vector<int32_t> supportDimensions;
 
     /**
      * @brief Serialize the list of parameters for IPC.

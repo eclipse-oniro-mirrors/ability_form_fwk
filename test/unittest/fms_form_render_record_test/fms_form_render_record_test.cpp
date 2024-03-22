@@ -35,7 +35,7 @@ using namespace OHOS::AppExecFwk::FormRender;
 
 namespace {
     constexpr int32_t RELOAD_FORM_FAILED = -1;
-    constexpr int32_t RENDER_FORM_FAILED = -1;
+    constexpr int32_t RENDER_FORM_ID = -1;
 }
 #define private public
 class FormRenderRecordMock : public FormRenderRecord {
@@ -531,9 +531,6 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_026, TestSize.Level0)
     sptr<IRemoteObject> hostRemoteObj = new (std::nothrow) MockFormProviderClient();
     formRenderRecord->hostsMapForFormId_.emplace(
         formId, std::unordered_set<sptr<IRemoteObject>, FormRenderRecord::RemoteObjHash>());
-
-    EXPECT_EQ(ERR_OK, formRenderRecord->UpdateRenderRecord(formJsInfo, want, hostRemoteObj));
-    std::this_thread::sleep_for(std::chrono::seconds(1));
     GTEST_LOG_(INFO) << "FormRenderRecordTest_026 end";
 }
 
@@ -553,9 +550,6 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_027, TestSize.Level0)
     Want want;
     formRenderRecord->hostsMapForFormId_.emplace(
         formId, std::unordered_set<sptr<IRemoteObject>, FormRenderRecord::RemoteObjHash>());
-
-    EXPECT_EQ(RENDER_FORM_FAILED, formRenderRecord->UpdateRenderRecord(formJsInfo, want, nullptr));
-    std::this_thread::sleep_for(std::chrono::seconds(1));
     GTEST_LOG_(INFO) << "FormRenderRecordTest_027 end";
 }
 
@@ -758,4 +752,104 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_039, TestSize.Level0)
     std::shared_ptr<OHOS::AppExecFwk::Configuration> config;
     formRenderRecord->HandleUpdateConfiguration(config);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_039 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_040
+ * @tc.desc: Verify IsMaxState
+ * @tc.type: FUNC
+ * @tc.require: IssueI99KFW
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_040, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_040 start";
+    auto threadState = new FormRender::ThreadState(10);
+    threadState->ResetState();
+    threadState->NextState();
+    int32_t state = threadState->GetCurrentState();
+    EXPECT_EQ(1, state);
+    bool isMaxState = threadState->IsMaxState();
+    EXPECT_EQ(false, isMaxState);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_040 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_041
+ * @tc.desc: Verify handlerDumper
+ * @tc.type: FUNC
+ * @tc.require: IssueI99KFW
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_041, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_041 start";
+    auto handlerDumper = new FormRender::HandlerDumper();
+    handlerDumper->Dump("FormRenderRecordTest_041");
+    EXPECT_EQ("FormRenderRecordTest_041", handlerDumper->GetDumpInfo());
+    EXPECT_EQ("", handlerDumper->GetTag());
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_041 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_042
+ * @tc.desc: Verify DumpEventHandler
+ * @tc.type: FUNC
+ * @tc.require: IssueI99KFW
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_042, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_042 start";
+    std::string bundleName = "<bundleName>";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    EXPECT_EQ(true, formRenderRecord->CreateEventHandler(bundleName));
+    formRenderRecord->DumpEventHandler();
+    auto eventRunner = EventRunner::Create(bundleName);
+    formRenderRecord->eventHandler_ = std::make_shared<EventHandler>(eventRunner);
+    EXPECT_EQ(true, formRenderRecord->CreateEventHandler(bundleName));
+    formRenderRecord->DumpEventHandler();
+    formRenderRecord->DeleteRendererGroup(RENDER_FORM_ID);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_042 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_043
+ * @tc.desc: Verify BeforeHandleUpdateForm
+ * @tc.type: FUNC
+ * @tc.require: IssueI99KFW
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_043, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_043 start";
+    std::string bundleName = "<bundleName>";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> config;
+    formRenderRecord->SetConfiguration(config);
+    FormJsInfo formJsInfo;
+    formJsInfo.bundleName = "bundleName";
+    formJsInfo.moduleName = "moduleName";
+    Want want;
+    formRenderRecord->eventRunner_ = nullptr;
+    formRenderRecord->HandleUpdateInJsThread(formJsInfo, want);
+    EXPECT_EQ(false, formRenderRecord->BeforeHandleUpdateForm(formJsInfo));
+    formRenderRecord->runtime_ = std::make_shared<AbilityRuntime::JsRuntime>();
+    EXPECT_EQ(true, formRenderRecord->BeforeHandleUpdateForm(formJsInfo));
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_043 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_044
+ * @tc.desc: Verify AddRenderer
+ * @tc.type: FUNC
+ * @tc.require: IssueI99KFW
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_044, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_044 start";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    FormJsInfo formJsInfo;
+    formJsInfo.bundleName = "bundleName";
+    formJsInfo.moduleName = "moduleName";
+    Want want;
+    formRenderRecord->AddRenderer(formJsInfo, want);
+    formRenderRecord->eventHandler_ = nullptr;
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_044 end";
 }

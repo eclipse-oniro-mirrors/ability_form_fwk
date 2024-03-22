@@ -21,6 +21,7 @@
 
 #include "form_instance.h"
 #include "parcel.h"
+#include "form_constants.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -37,6 +38,7 @@ struct RunningFormInfo : public Parcelable {
     std::string description;
     int32_t dimension;
     std::string hostBundleName;
+    Constants::FormLocation formLocation;
     FormVisibilityType formVisiblity = FormVisibilityType::UNKNOWN;
     FormUsageState formUsageState = FormUsageState::USED;
 

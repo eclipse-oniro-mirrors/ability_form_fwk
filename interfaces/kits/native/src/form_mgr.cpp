@@ -36,7 +36,7 @@ FormMgr::FormMgr()
 
 FormMgr::~FormMgr()
 {
-    FMS_CALL_INFO_ENTER;
+    HILOG_INFO("called");
     if (remoteProxy_ != nullptr) {
         auto remoteObject = remoteProxy_->AsObject();
         if (remoteObject != nullptr) {
@@ -978,6 +978,21 @@ int FormMgr::GetFormsInfoByModule(std::string &bundleName, std::string &moduleNa
     }
     return resultCode;
 }
+
+int FormMgr::GetFormsInfoByFilter(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos)
+{
+    HILOG_DEBUG("called.");
+    int errCode = Connect();
+    if (errCode != ERR_OK) {
+        return errCode;
+    }
+    int resultCode = remoteProxy_->GetFormsInfoByFilter(filter, formInfos);
+    if (resultCode != ERR_OK) {
+        HILOG_ERROR("failed to GetFormsInfoByFilter, error code is %{public}d.", resultCode);
+    }
+    return resultCode;
+}
+
 int32_t FormMgr::GetFormsInfo(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos)
 {
     HILOG_DEBUG("called.");
@@ -1384,5 +1399,24 @@ int32_t FormMgr::RecoverForms(const std::vector<int64_t> &formIds, const Want &w
     }
     return remoteProxy_->RecoverForms(formIds, want);
 }
+
+ErrCode FormMgr::UpdateFormLocation(const int64_t &formId, const int32_t &formLocation)
+{
+    if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
+        HILOG_ERROR("form is in recover status, can't do action on form.");
+        return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
+    }
+
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        return errCode;
+    }
+    ErrCode resultCode = remoteProxy_->UpdateFormLocation(formId, formLocation);
+    if (resultCode != ERR_OK) {
+        HILOG_ERROR("failed to UpdateFormLocation, error code is %{public}d.", resultCode);
+    }
+    return resultCode;
+}
+
 }  // namespace AppExecFwk
 }  // namespace OHOS

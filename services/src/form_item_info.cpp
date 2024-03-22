@@ -562,5 +562,15 @@ std::string FormItemInfo::GetDescription() const
 {
     return description_;
 }
+
+Constants::FormLocation FormItemInfo::GetFormLocation() const
+{
+    return formLocation_;
+}
+
+void FormItemInfo::SetFormLocation(Constants::FormLocation formLocation)
+{
+    formLocation_ = formLocation;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS
