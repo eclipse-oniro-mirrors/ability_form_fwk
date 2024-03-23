@@ -1893,4 +1893,19 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0098, TestSize.Level1)
     EXPECT_EQ(ERR_OK, formMgrService.StartAbility(want, callerToken));
     GTEST_LOG_(INFO) << "FormMgrService_0098 end";
 }
+
+/**
+ * @tc.number: FormMgrService_0099
+ * @tc.name: test FormMgr HiDumpFormRunningFormInfos function.
+ * @tc.desc: Verify that the HiDumpFormRunningFormInfos interface is available.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0099, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0099 start";
+    FormMgrService formMgrService;
+    std::string args;
+    std::string RunningFormInfo;
+    formMgrService.HiDumpFormRunningFormInfos(args, RunningFormInfo);
+    GTEST_LOG_(INFO) << "FormMgrService_0099 end";
+}
 }
