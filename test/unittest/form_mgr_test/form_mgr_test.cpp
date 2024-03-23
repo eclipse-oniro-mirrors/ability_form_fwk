@@ -2368,4 +2368,27 @@ HWTEST_F(FormMgrTest, FormMgrTest_0121, TestSize.Level1) {
     EXPECT_EQ(result, true);
     GTEST_LOG_(INFO) << "FormMgrTest_0121 test ends";
 }
+
+/**
+ * @tc.name: FormMgrTest_0122
+ * @tc.desc: Verify GetFormsInfoByFilter
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0122, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0122 starts";
+    FormInfoFilter filter;
+    std::vector<FormInfo> formInfos;
+    std::vector<FormInfo> expectFormInfos;
+    FormInfo formInfo = {};
+    formInfo.bundleName = "ohos.samples.FormApplication";
+    expectFormInfos.push_back(formInfo);
+    EXPECT_CALL(*mockProxy, GetFormsInfoByFilter(_, _))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<1>(expectFormInfos), Return(ERR_OK)));
+    FormMgr::GetInstance().GetFormsInfoByFilter(filter, formInfos);
+    EXPECT_THAT(formInfos, ContainerEq(expectFormInfos));
+    testing::Mock::AllowLeak(mockProxy);
+    GTEST_LOG_(INFO) << "FormMgrTest_0122 test ends";
+}
 } // namespace

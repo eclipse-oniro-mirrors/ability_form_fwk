@@ -347,6 +347,32 @@ HWTEST_F(FormInfoMgrTest, BundleFormInfo_GetFormsInfoByModule_0100, TestSize.Lev
 }
 
 /**
+ * @tc.name: BundleFormInfo_GetFormsInfoByFilter_0100
+ * @tc.number: GetFormsInfoByFilter
+ * @tc.desc: call GetFormsInfoByFilter success
+ */
+HWTEST_F(FormInfoMgrTest, BundleFormInfo_GetFormsInfoByFilter_0100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "BundleFormInfo_GetFormsInfoByFilter_0100 start";
+    BundleFormInfo bundleFormInfo(FORM_BUNDLE_NAME_TEST);
+    std::vector<FormInfo> formInfos;
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    formInfoStorage.formInfos.push_back(GetTestFormInfo());
+    bundleFormInfo.formInfoStorages_.emplace_back(formInfoStorage);
+    FormInfoFilter filter;
+    filter.bundleName = FORM_BUNDLE_NAME_TEST;
+    filter.moduleName = PARAM_MODULE_NAME_TEST;
+    filter.supportDimensions = {1, 2};
+    EXPECT_EQ(ERR_OK, bundleFormInfo.GetFormsInfoByFilter(filter, formInfos));
+    EXPECT_EQ(1, formInfos.size());
+    EXPECT_EQ(FORM_BUNDLE_NAME_TEST, formInfos[0].bundleName);
+    EXPECT_EQ(PARAM_MODULE_NAME_TEST, formInfos[0].moduleName);
+    EXPECT_EQ(filter.supportDimensions, formInfos[0].supportDimensions);
+    GTEST_LOG_(INFO) << "BundleFormInfo_GetFormsInfoByFilter_0100 end";
+}
+
+/**
  * @tc.name: FormInfoMgr_UpdateStaticFormInfos_0100
  * @tc.number: UpdateStaticFormInfos
  * @tc.desc: call UpdateStaticFormInfos success with update forms info

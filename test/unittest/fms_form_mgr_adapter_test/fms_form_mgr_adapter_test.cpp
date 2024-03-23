@@ -4356,4 +4356,19 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_224, TestSize.Level0)
     EXPECT_EQ(ERR_NONE, formMgrAdapter.DumpFormRunningFormInfos(formInfo));
     GTEST_LOG_(INFO) << "FormMgrAdapter_224 end";
 }
+
+/**
+ * @tc.name: FormMgrAdapter_225
+ * @tc.desc: test GetFormsInfoByFilter function and the return value is ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_225, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_225 start";
+    FormMgrAdapter formMgrAdapter;
+    std::vector<FormInfo> formInfos;
+    FormInfoFilter filter;
+    EXPECT_EQ(ERR_OK, formMgrAdapter.GetFormsInfoByFilter(filter, formInfos));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_225 end";
+}
 }

@@ -2226,4 +2226,27 @@ HWTEST_F(FmsFormMgrProxyTest, GetFormInstance_0200, Function | MediumTest | Leve
         proxy->GetFormInstance(IFormMgr::Message::FORM_MGR_GET_FORM_INSTANCES_FROM_BY_ID, data, formInstance);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SEND_FMS_MSG);
 }
+
+/*
+ * @tc.name: GetFormsInfoByFilterTest_0201
+ * @tc.desc: test GetFormsInfoByFilter function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrProxyTest, GetFormsInfoByFilterTest_0201, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO)
+        << "FmsFormMgrProxyTest, GetFormsInfoByFilterTest_0201, TestSize.Level1";
+    sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
+    ASSERT_NE(nullptr, iremoteObject);
+    EXPECT_CALL(*iremoteObject, SendRequest(_, _, _, _))
+        .WillRepeatedly(DoAll(Invoke(std::bind(SendRequestReplaceFormInfo, _1, _2, _3, _4,
+        ERR_OK, true, 1)), Return(NO_ERROR)));
+    std::shared_ptr<FormMgrProxy> proxy = std::make_shared<FormMgrProxy>(iremoteObject);
+    ASSERT_NE(nullptr, proxy);
+    std::vector<FormInfo> formInfos;
+    FormInfoFilter filter;
+    int32_t result = proxy->GetFormsInfoByFilter(filter, formInfos);
+    EXPECT_EQ(ERR_OK, result);
+    EXPECT_EQ(1, formInfos.size());
+}
 }
