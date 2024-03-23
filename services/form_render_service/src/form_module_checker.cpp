@@ -22,20 +22,35 @@
 
 #include "fms_log_wrapper.h"
 
-
 bool FormModuleChecker::CheckApiAllowList(const std::string& apiPath)
 {
     const std::vector<std::string> allowList = {
         "i18n.System.getSystemLanguage",
         "i18n.System.is24HourClock",
         "intl.Locale.*",
-        "intl.DateTimeFormat.*"
+        "intl.DateTimeFormat.*",
+        "effectKit.*",
+        "multimedia.image.PixelMapFormat.*",
+        "multimedia.image.Size.*",
+        "multimedia.image.AlphaType.*",
+        "multimedia.image.ScaleMode.*",
+        "multimedia.image.Region.*",
+        "multimedia.image.PositionArea.*",
+        "multimedia.image.ImageInfo.*",
+        "multimedia.image.DecodingOptions.*",
+        "multimedia.image.InitializationOptions.*",
+        "multimedia.image.SourceOptions.*",
+        "multimedia.image.createImageSource",
+        "multimedia.image.PixelMap.*",
+        "multimedia.image.ImageSource.*"
     };
+
     for (const auto& item : allowList) {
         if (CheckApiWithSuffix(apiPath, item)) {
             return true;
         }
     }
+
     return false;
 }
 
@@ -65,7 +80,7 @@ bool FormModuleChecker::CheckModuleLoadable(const char *moduleName,
         HILOG_INFO("load mediaquery");
         return true;
     }
-    if (std::string(moduleName) == "i18n" || std::string(moduleName) == "intl") {
+    if (IsModuelAllowToLoad(moduleName)) {
         HILOG_INFO("module has been allowed by the allowlist in form, module name = %{public}s", moduleName);
         if (apiAllowListChecker == nullptr) {
             apiAllowListChecker = std::make_unique<ApiAllowListChecker>([](const std::string& apiPath) {
@@ -75,5 +90,23 @@ bool FormModuleChecker::CheckModuleLoadable(const char *moduleName,
         return true;
     }
     HILOG_INFO("module can not load in form, module name = %{public}s", moduleName);
+    return false;
+}
+
+bool FormModuleChecker::IsModuelAllowToLoad(const std::string& moduleName)
+{
+    const std::vector<std::string> moduleAllowList = {
+        "i18n",
+        "intl",
+        "effectKit",
+        "multimedia.image"
+    };
+
+    for (const auto& item : moduleAllowList) {
+        if (item == moduleName) {
+            return true;
+        }
+    }
+
     return false;
 }

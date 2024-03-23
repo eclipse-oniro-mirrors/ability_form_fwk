@@ -1119,6 +1119,10 @@ int32_t FormMgrService::ShareForm(int64_t formId, const std::string &deviceId, c
 int32_t FormMgrService::RecvFormShareInfoFromRemote(const FormShareInfo &info)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
+    if (!FormUtil::IsSACall()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    }
+
     InitFormShareMgrSerialQueue();
 
     return DelayedSingleton<FormShareMgr>::GetInstance()->RecvFormShareInfoFromRemote(info);
@@ -1256,11 +1260,9 @@ bool FormMgrService::ParseOption(const std::vector<std::u16string> &args, DumpKe
 void FormMgrService::HiDumpFormRunningFormInfos([[maybe_unused]]const std::string &args, std::string &result)
 {
     HILOG_DEBUG("called.");
-
     if (!CheckCallerIsSystemApp()) {
         return;
     }
-
     FormMgrAdapter::GetInstance().DumpFormRunningFormInfos(result);
 }
 

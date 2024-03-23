@@ -37,6 +37,7 @@
 #include "form_mgr.h"
 #include "form_serial_queue.h"
 #include "form_share_mgr.h"
+#include "running_form_info.h"
 #undef private
 #include "form_event_util.h"
 #include "iremote_proxy.h"
@@ -2458,6 +2459,31 @@ HWTEST_F(FmsFormShareMgrTest, FormDumpMgr_0009, TestSize.Level0)
     ASSERT_NE(nullptr, formDumpMgr);
     formDumpMgr->DumpFormSubscribeInfo(subscribedKeys, count, formInfo);
     GTEST_LOG_(INFO) << "FormDumpMgr_0009 end";
+}
+
+/**
+ * @tc.name: FormDumpMgr_0010
+ * @tc.desc: test DumpRunningFormInfos function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormShareMgrTest, FormDumpMgr_0010, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormDumpMgr_0010 start";
+    std::vector<RunningFormInfo> runningFormInfos;
+    RunningFormInfo runningFormInfo;
+    runningFormInfo.formId = 1;
+    runningFormInfo.formName = "aa";
+    runningFormInfo.moduleName = "bb";
+    runningFormInfo.abilityName = "cc";
+    runningFormInfo.description = "dd";
+    runningFormInfo.dimension = 2;
+    runningFormInfo.hostBundleName = "hh";
+    runningFormInfos.emplace_back(runningFormInfo);
+    std::string infosResult;
+    std::shared_ptr<FormDumpMgr> formDumpMgr = std::make_shared<FormDumpMgr>();
+    ASSERT_NE(nullptr, formDumpMgr);
+    formDumpMgr->DumpRunningFormInfos(runningFormInfos, infosResult);
+    GTEST_LOG_(INFO) << "FormDumpMgr_0010 end";
 }
 
 /**
