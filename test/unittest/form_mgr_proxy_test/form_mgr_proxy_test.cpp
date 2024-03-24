@@ -803,4 +803,18 @@ HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0102, TestSize.Level1) {
     EXPECT_EQ(result, true);
     GTEST_LOG_(INFO) << "FormMgrProxyTest_0102 test ends";
 }
+
+/**
+ * @tc.number: FormMgrProxyTest_0103
+ * @tc.name: test UpdateFormLocation function.
+ * @tc.desc: Verify that the UpdateFormLocation interface is called normally
+ * and the return value is ERR_OK.
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0103, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_0103 starts";
+    int64_t formId = 0;
+    int32_t formLocation = 1;
+    EXPECT_EQ(formMgrProxy->UpdateFormLocation(formId, formLocation), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_0103 test ends";
+}
 }

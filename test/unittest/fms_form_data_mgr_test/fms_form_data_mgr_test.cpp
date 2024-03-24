@@ -3298,4 +3298,22 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_HasFormCloudUpdateDuration_001, 
     EXPECT_FALSE(isHas);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_HasFormCloudUpdateDuration_001 end";
 }
+
+/**
+ * @tc.number: FmsFormDataMgrTest_UpdateFormLocation_001
+ * @tc.name: UpdateFormLocation
+ * @tc.desc: Verify that the map can be operated normally.
+ * @tc.details: Determine whether an element exists in the map.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_UpdateFormLocation_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_UpdateFormLocation_001 start";
+    FormRecord record;
+    record.formLocation = Constants::FormLocation::FORM_CENTER;
+    int64_t formId = 1;
+    int32_t formLocation = 1;
+    formDataMgr_.formRecords_.emplace(formId, record);
+    EXPECT_EQ(ERR_OK, formDataMgr_.UpdateFormLocation(formId, formLocation));
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_UpdateFormLocation_001 end";
+}
 }

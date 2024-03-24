@@ -2526,6 +2526,23 @@ HWTEST_F(FormMgrStubTest, HandleGetRunningFormInfos_0100, TestSize.Level1) {
 }
 
 /**
+ * @tc.number: HandleUpdateFormLocation_0100
+ * @tc.name: test UpdateFormLocation function.
+ * @tc.desc: Verify that the UpdateFormLocation interface is called normally
+ * and the return value is ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, HandleUpdateFormLocation_0100, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "HandleUpdateFormLocation_0100 starts";
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_CALL(*mockFormMgrService, UpdateFormLocation(_, _))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    EXPECT_EQ(ERR_OK, mockFormMgrService->HandleUpdateFormLocation(data, reply));
+    GTEST_LOG_(INFO) << "HandleUpdateFormLocation_0100 ends";
+}
+
+/**
  * @tc.name: HandleGetRunningFormInfosByBundleName_0100
  * @tc.desc: Verify that the return value and the size of resultInfos
  * @tc.type: FUNC
