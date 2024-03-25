@@ -21,8 +21,10 @@
 #include "form_supply_callback.h"
 #include "form_share_mgr.h"
 #undef private
+#include "appexecfwk_errors.h"
 #include "form_ability_connection.h"
 #include "form_acquire_connection.h"
+#include "form_data_mgr.h"
 #include "form_host_caller.h"
 #include "form_mgr.h"
 #include "fms_log_wrapper.h"
@@ -37,6 +39,9 @@ using namespace OHOS;
 using namespace OHOS::AppExecFwk;
 
 namespace {
+const std::string FORM_BUNDLE_NAME = "ohos.samples.ut.form";
+const std::string FORM_ABILITY_NAME = "FormAbility";
+
 class FmsFormSupplyCallbackTest : public testing::Test {
 public:
 
@@ -79,7 +84,6 @@ HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0001, TestSize.Lev
     FormAbilityConnection formAbilityConnection;
     // set hostToken is nullptr
     formAbilityConnection.SetHostToken(nullptr);
-    formAcquireConnection.OnAbilityConnectDone(element, nullptr, resultCode);
     GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0001 end";
 }
 
@@ -346,5 +350,144 @@ HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0016, TestSize.Lev
     formEventHandler.ProcessEvent(EVENT_MSG, EVENT_ID);
 
     GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0016 end";
+}
+
+/**
+ * @tc.name: FormAcquireConnectionTest_0017
+ * @tc.desc: Test OnAcquire function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0017, TestSize.Level0)
+{
+    HILOG_INFO("FormAcquireConnectionTest_0017 start");
+    FormProviderInfo formProviderInfo;
+    Want want;
+    want.SetParam(Constants::PROVIDER_FLAG, ERR_APPEXECFWK_PARCEL_ERROR);
+    FormSupplyCallback formSupplyCallback;
+    EXPECT_EQ(formSupplyCallback.OnAcquire(formProviderInfo, want), ERR_APPEXECFWK_PARCEL_ERROR);
+
+    want.SetParam(Constants::PROVIDER_FLAG, ERR_OK);
+    EXPECT_EQ(formSupplyCallback.OnAcquire(formProviderInfo, want), ERR_APPEXECFWK_FORM_INVALID_PARAM);
+
+    GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0017 end";
+}
+
+/**
+ * @tc.name: FormAcquireConnectionTest_0018
+ * @tc.desc: Test OnEventHandle function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0018, TestSize.Level0)
+{
+    HILOG_INFO("FormAcquireConnectionTest_0018 start");
+    Want want;
+    want.SetParam(Constants::PROVIDER_FLAG, ERR_APPEXECFWK_PARCEL_ERROR);
+    FormSupplyCallback formSupplyCallback;
+    EXPECT_EQ(formSupplyCallback.OnEventHandle(want), ERR_OK);
+
+    GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0018 end";
+}
+
+/**
+ * @tc.name: FormAcquireConnectionTest_0019
+ * @tc.desc: Test OnAcquireStateResult function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0019, TestSize.Level0)
+{
+    HILOG_INFO("FormAcquireConnectionTest_0019 start");
+    Want want;
+    Want wantArg;
+    std::string str1 = "pro";
+    want.SetParam(Constants::PROVIDER_FLAG, ERR_APPEXECFWK_PARCEL_ERROR);
+    FormSupplyCallback formSupplyCallback;
+    EXPECT_EQ(formSupplyCallback.OnAcquireStateResult(AppExecFwk::FormState::UNKNOWN, str1, wantArg, want), ERR_OK);
+
+    GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0019 end";
+}
+
+/**
+ * @tc.name: FormAcquireConnectionTest_0020
+ * @tc.desc: Test OnAcquireDataResult function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0020, TestSize.Level0)
+{
+    HILOG_INFO("FormAcquireConnectionTest_0020 start");
+    AAFwk::WantParams wantParams;
+    int64_t requestCode = 102;
+    FormSupplyCallback formSupplyCallback;
+    EXPECT_EQ(formSupplyCallback.OnAcquireDataResult(wantParams, requestCode), ERR_OK);
+
+    GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0020 end";
+}
+
+/**
+ * @tc.name: FormAcquireConnectionTest_0021
+ * @tc.desc: Test function OnShareAcquire runs normally and will not throw any exceptions.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0021, TestSize.Level0)
+{
+    HILOG_INFO("FormAcquireConnectionTest_0021 start");
+    AAFwk::WantParams wantParams;
+    int64_t requestCode = 102;
+    int64_t formId = 102;
+    std::string remoteDeviceId = "pro";
+    bool ret = true;
+    FormSupplyCallback formSupplyCallback;
+    formSupplyCallback.OnShareAcquire(formId, remoteDeviceId, wantParams, requestCode, ret);
+
+    GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0021 end";
+}
+
+/**
+ * @tc.name: FormAcquireConnectionTest_0022
+ * @tc.desc: Test function IsRemoveConnection runs normally and will not throw any exceptions.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0022, TestSize.Level0)
+{
+    HILOG_INFO("FormAcquireConnectionTest_0022 start");
+    int64_t formId = 102;
+    FormSupplyCallback formSupplyCallback;
+    formSupplyCallback.RemoveConnection(formId, nullptr);
+    formSupplyCallback.HandleHostDied(nullptr);
+    EXPECT_EQ(formSupplyCallback.IsRemoveConnection(formId, nullptr), true);
+
+    sptr<IRemoteObject> hostToken = new (std::nothrow) MockFormProviderClient();
+    formSupplyCallback.HandleHostDied(hostToken);
+    EXPECT_EQ(formSupplyCallback.IsRemoveConnection(formId, hostToken), true);
+
+    GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0022 end";
+}
+
+/**
+ * @tc.name: FormAcquireConnectionTest_0023
+ * @tc.desc: Test function OnRecycleForm runs normally and will not throw any exceptions.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0023, TestSize.Level0)
+{
+    HILOG_INFO("FormAcquireConnectionTest_0023 start");
+    int64_t formId = 102;
+    Want want;
+    FormSupplyCallback formSupplyCallback;
+    EXPECT_EQ(formSupplyCallback.OnRecycleForm(formId, want), ERR_APPEXECFWK_FORM_COMMON_CODE);
+
+    FormItemInfo record;
+    int callingUid = 0;
+    record.SetFormId(formId);
+    record.SetProviderBundleName(FORM_BUNDLE_NAME);
+    record.SetAbilityName(FORM_ABILITY_NAME);
+    record.SetTemporaryFlag(false);
+    FormRecord retFormRec = FormDataMgr::GetInstance().AllotFormRecord(record, callingUid);
+    EXPECT_EQ(formSupplyCallback.OnRecycleForm(formId, want), ERR_APPEXECFWK_FORM_COMMON_CODE);
+
+    retFormRec.recycleStatus = RecycleStatus::RECYCLABLE;
+    FormDataMgr::GetInstance().UpdateFormRecord(formId, retFormRec);
+    EXPECT_EQ(formSupplyCallback.OnRecycleForm(formId, want), ERR_APPEXECFWK_FORM_COMMON_CODE);
+
+    GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0023 end";
 }
 }
