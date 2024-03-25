@@ -1896,14 +1896,51 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0098, TestSize.Level1)
 
 /**
  * @tc.number: FormMgrService_0099
- * @tc.name: test ReloadFormInfos function.
- * @tc.desc: Verify that the ReloadFormInfos interface is called normally
+ * @tc.name: test FormMgr HiDumpFormRunningFormInfos function.
+ * @tc.desc: Verify that the HiDumpFormRunningFormInfos interface is available.
  */
 HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0099, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormMgrService_0099 start";
     FormMgrService formMgrService;
-    formMgrService.ReloadFormInfos();
+    std::string args;
+    std::string RunningFormInfo;
+    formMgrService.HiDumpFormRunningFormInfos(args, RunningFormInfo);
     GTEST_LOG_(INFO) << "FormMgrService_0099 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0100
+ * @tc.name: test GetFormsInfoByFilter function.
+ * @tc.desc: Verify that the GetFormsInfoByFilter interface if the caller is not a system app
+ *           and the return value is ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0100 start";
+    FormMgrService formMgrService;
+    std::vector<FormInfo> formInfos;
+    FormInfoFilter filter;
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, formMgrService.GetFormsInfoByFilter(filter, formInfos));
+    GTEST_LOG_(INFO) << "FormMgrService_0100 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0101
+ * @tc.name: test UpdateFormLocation function.
+ * @tc.desc: Verify that the UpdateFormLocation interface is called normally
+ * and the return value is ERR_OK.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0101, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0101 start";
+    MockIsSACall(true);
+    FormMgrService formMgrService;
+    int64_t formId = 1;
+    int32_t formLocation = 1;
+    EXPECT_EQ(ERR_OK, formMgrService.UpdateFormLocation(formId, formLocation));
+    GTEST_LOG_(INFO) << "FormMgrService_0101 end";
 }
 }

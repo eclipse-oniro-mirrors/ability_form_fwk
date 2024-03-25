@@ -37,6 +37,7 @@ namespace {
     int g_getFormsInfoByApp = OHOS::ERR_OK;
     int g_getFormsInfoByModule = OHOS::ERR_OK;
     int g_updateForm = OHOS::ERR_OK;
+    int g_updateFormLocation = OHOS::ERR_OK;
     bool g_isRequestPublishFormSupported = true;
 }
 
@@ -234,6 +235,11 @@ int FormMgrAdapter::UpdateForm(const int64_t formId, const int32_t uid,
     const FormProviderData &formProviderData, const std::vector<FormDataProxy> &formDataProxies)
 {
     return g_updateForm;
+}
+
+int FormMgrAdapter::UpdateFormLocation(const int64_t &formId, const int32_t &formLocation)
+{
+    return g_updateFormLocation;
 }
 } // namespace AppExecFwk
 } // namespace OHOS

@@ -743,10 +743,6 @@ public:
         return 0;
     }
 #endif
-    int SendANRProcessID(int pid) override
-    {
-        return 0;
-    }
 
     int StartAbilityByCall(const Want &want, const sptr<IAbilityConnection> &connect,
         const sptr<IRemoteObject> &callerToken, int32_t accountId = DEFAULT_INVAL_VALUE) override

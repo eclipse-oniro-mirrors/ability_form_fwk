@@ -108,7 +108,7 @@ FormRenderRecord::FormRenderRecord(
 
 FormRenderRecord::~FormRenderRecord()
 {
-    FMS_CALL_INFO_ENTER;
+    HILOG_INFO("called");
     std::shared_ptr<EventHandler> eventHandler = nullptr;
     {
         std::lock_guard<std::mutex> lock(eventHandlerMutex_);

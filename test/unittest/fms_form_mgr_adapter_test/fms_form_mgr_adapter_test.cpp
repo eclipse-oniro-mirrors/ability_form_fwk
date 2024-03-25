@@ -101,6 +101,7 @@ extern void MockGetFormRecordParamsTemp(bool mockRet);
 extern void MockGetAbilityInfoByActionAbilityInfo(bool mockRet);
 extern void MockGetAbilityInfoByActionExtensionInfo(bool mockRet);
 extern void MockGetRunningFormInfosByFormId(int32_t mockRet);
+extern void MockGetRunningFormInfos(int32_t mockRet);
 
 namespace {
 class FmsFormMgrAdapterTest : public testing::Test {
@@ -4324,5 +4325,66 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_222, TestSize.Level0)
     FormInstance formInstance;
     EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, formMgrAdapter.GetFormInstanceById(1, formInstance));
     GTEST_LOG_(INFO) << "FormMgrAdapter_222 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_223
+ * @tc.desc: test DumpFormRunningForminfos function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_223, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_223 start";
+    FormMgrAdapter formMgrAdapter;
+    std::string formInfos;
+    MockGetRunningFormInfos(ERR_OK);
+    EXPECT_EQ(ERR_OK, formMgrAdapter.DumpFormRunningFormInfos(formInfos));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_223 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_224
+ * @tc.desc: test DumpFormInfoByFormId function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_224, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_224 start";
+    FormMgrAdapter formMgrAdapter;
+    std::string formInfo = "aa";
+    MockGetRunningFormInfos(ERR_NONE);
+    EXPECT_EQ(ERR_NONE, formMgrAdapter.DumpFormRunningFormInfos(formInfo));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_224 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_225
+ * @tc.desc: test GetFormsInfoByFilter function and the return value is ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_225, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_225 start";
+    FormMgrAdapter formMgrAdapter;
+    std::vector<FormInfo> formInfos;
+    FormInfoFilter filter;
+    EXPECT_EQ(ERR_OK, formMgrAdapter.GetFormsInfoByFilter(filter, formInfos));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_225 end";
+}
+
+/**
+ * @tc.number: FormMgrAdapter_226
+ * @tc.name: UpdateFormLocation
+ * @tc.desc: Verify that the map can be operated normally.
+ * @tc.details: Determine whether an element exists in the map.
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_226, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_226 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    int32_t formLocation = 1;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, formMgrAdapter.UpdateFormLocation(formId, formLocation));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_226 end";
 }
 }

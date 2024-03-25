@@ -2368,4 +2368,45 @@ HWTEST_F(FormMgrTest, FormMgrTest_0121, TestSize.Level1) {
     EXPECT_EQ(result, true);
     GTEST_LOG_(INFO) << "FormMgrTest_0121 test ends";
 }
+
+/**
+ * @tc.name: FormMgrTest_0122
+ * @tc.desc: Verify GetFormsInfoByFilter
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0122, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0122 starts";
+    FormInfoFilter filter;
+    std::vector<FormInfo> formInfos;
+    std::vector<FormInfo> expectFormInfos;
+    FormInfo formInfo = {};
+    formInfo.bundleName = "ohos.samples.FormApplication";
+    expectFormInfos.push_back(formInfo);
+    EXPECT_CALL(*mockProxy, GetFormsInfoByFilter(_, _))
+        .Times(1)
+        .WillOnce(DoAll(SetArgReferee<1>(expectFormInfos), Return(ERR_OK)));
+    FormMgr::GetInstance().GetFormsInfoByFilter(filter, formInfos);
+    EXPECT_THAT(formInfos, ContainerEq(expectFormInfos));
+    testing::Mock::AllowLeak(mockProxy);
+    GTEST_LOG_(INFO) << "FormMgrTest_0122 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0123
+ * @tc.desc: Verify UpdateFormLocation (The return value of mock function is not 0)
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0123, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0123 starts";
+    EXPECT_CALL(*mockProxy, UpdateFormLocation(_, _))
+        .Times(1)
+        .WillOnce(Return(OHOS::ERR_OK));
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
+    int64_t formId = 0;
+    int32_t formLocation = 1;
+    EXPECT_EQ(FormMgr::GetInstance().UpdateFormLocation(formId, formLocation), ERROR_NUM);
+    GTEST_LOG_(INFO) << "FormMgrTest_0123 test ends";
+}
 } // namespace

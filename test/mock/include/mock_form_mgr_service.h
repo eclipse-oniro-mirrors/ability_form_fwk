@@ -62,6 +62,7 @@ public:
     MOCK_METHOD2(GetFormsInfoByApp, int(std::string &bundleName, std::vector<FormInfo> &formInfos));
     MOCK_METHOD3(GetFormsInfoByModule, int(std::string &bundleName, std::string &moduleName,
         std::vector<FormInfo> &formInfos));
+    MOCK_METHOD2(GetFormsInfoByFilter, int(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos));
     MOCK_METHOD2(GetFormsInfo, int(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos));
     MOCK_METHOD0(IsRequestPublishFormSupported, bool());
     MOCK_METHOD2(StartAbility, int32_t(const Want &want, const sptr<IRemoteObject> &callerToken));
@@ -100,6 +101,7 @@ public:
     MOCK_METHOD2(RegisterFormRouterProxy, ErrCode(const std::vector<int64_t> &formIds,
         const sptr<IRemoteObject> &callerToken));
     MOCK_METHOD1(UnregisterFormRouterProxy, ErrCode(const std::vector<int64_t> &formIds));
+    MOCK_METHOD2(UpdateFormLocation, ErrCode(const int64_t &formId, const int32_t &formLocation));
 };
 }
 }

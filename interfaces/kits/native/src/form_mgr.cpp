@@ -36,7 +36,7 @@ FormMgr::FormMgr()
 
 FormMgr::~FormMgr()
 {
-    FMS_CALL_INFO_ENTER;
+    HILOG_INFO("called");
     if (remoteProxy_ != nullptr) {
         auto remoteObject = remoteProxy_->AsObject();
         if (remoteObject != nullptr) {
