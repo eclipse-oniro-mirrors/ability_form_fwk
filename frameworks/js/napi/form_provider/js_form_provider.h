@@ -18,6 +18,7 @@
 
 #include "ability.h"
 #include "form_info_filter.h"
+#include "form_info_config_update_filter.h"
 #include "form_provider_info.h"
 #include "napi_form_util.h"
 #include "napi/native_api.h"
@@ -67,6 +68,7 @@ public:
     static napi_value UpdateForm(napi_env env, napi_callback_info info);
     static napi_value IsRequestPublishFormSupported(napi_env env, napi_callback_info info);
     static napi_value RequestPublishForm(napi_env env, napi_callback_info info);
+    static napi_value SetConfigurationUpdateFlags(napi_env env, napi_callback_info info);
 private:
     napi_value OnGetFormsInfo(napi_env env, size_t argc, napi_value* argv);
     napi_value OnSetFormNextRefreshTime(napi_env env, size_t argc, napi_value* argv);
@@ -80,6 +82,7 @@ private:
     bool OnGetFormsInfoParseParam(NapiParamPackage &napiParam,
         size_t &convertArgc, bool &isPromise, AppExecFwk::FormInfoFilter &formInfoFilter);
     napi_value OnUpdateFormParseParam(napi_env env, size_t argc, napi_value* argv, int64_t &formId);
+    napi_value OnSetConfigurationUpdateFlags(napi_env env, size_t argc, napi_value* argv);
 };
 }  // namespace AbilityRuntime
 }  // namespace OHOS

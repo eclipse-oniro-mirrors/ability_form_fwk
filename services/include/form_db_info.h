@@ -34,6 +34,7 @@ struct FormDBInfo {
     std::string abilityName;
     std::vector<int> formUserUids;
     Constants::FormLocation formLocation;
+    bool fontResizeEnable = true;
     /**
      * @brief Constructors
      *
@@ -55,6 +56,7 @@ struct FormDBInfo {
         abilityName = formRecord.abilityName;
         formUserUids = formRecord.formUserUids;
         formLocation = formRecord.formLocation;
+        fontResizeEnable = formRecord.fontResizeEnable;
     }
     bool Contains(const int uId) const
     {
@@ -137,6 +139,7 @@ public:
         formDBInfo_.abilityName = formDBInfo.abilityName;
         formDBInfo_.formUserUids = formDBInfo.formUserUids;
         formDBInfo_.formLocation = formDBInfo.formLocation;
+        formDBInfo_.fontResizeEnable = formDBInfo.fontResizeEnable;
     }
     /**
      * @brief Constructors
@@ -153,6 +156,7 @@ public:
         formDBInfo_.abilityName = innerFormInfo.formDBInfo_.abilityName;
         formDBInfo_.formUserUids = innerFormInfo.formDBInfo_.formUserUids;
         formDBInfo_.formLocation = innerFormInfo.formDBInfo_.formLocation;
+        formDBInfo_.fontResizeEnable = innerFormInfo.formDBInfo_.fontResizeEnable;
     }
      /**
      * @brief Constructors
@@ -169,6 +173,7 @@ public:
         formDBInfo_.abilityName = formRecord.abilityName;
         formDBInfo_.formUserUids = formRecord.formUserUids;
         formDBInfo_.formLocation = formRecord.formLocation;
+        formDBInfo_.fontResizeEnable = formRecord.fontResizeEnable;
     }
     std::string ToString() const
     {
@@ -182,6 +187,7 @@ public:
         obj["abilityName"] = formDBInfo_.abilityName;
         obj["formUserUids"] = formDBInfo_.formUserUids;
         obj["formLocation"] = formDBInfo_.formLocation;
+        obj["fontResizeEnable"] = formDBInfo_.fontResizeEnable;
         return obj.dump();
     }
     /**

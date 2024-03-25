@@ -552,6 +552,15 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode UpdateFormLocation(const int64_t &formId, const int32_t &formLocation) override;
+
+    /**
+     * @brief Update formInfoUpdateFlags with formId.
+     * @param formId The Id of the form to update.
+     * @param configUpdateFilter The formInfoUpdateFilter.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode SetFormConfigUpdateFlags(const int64_t formId,
+        const FormInfoConfigUpdateFilter &configUpdateFilter) override;
 private:
     template<typename T>
     int GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos);

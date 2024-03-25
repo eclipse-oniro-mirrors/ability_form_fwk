@@ -160,6 +160,8 @@ FormMgrStub::FormMgrStub()
         &FormMgrStub::HandleHasFormVisible;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UPDATE_FORM_LOCATION)] =
         &FormMgrStub::HandleUpdateFormLocation;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_SET_CONFIG_UPDATE_ENABLE)] =
+        &FormMgrStub::HandleSetFormConfigUpdateFlags;
 }
 
 FormMgrStub::~FormMgrStub()
@@ -1407,6 +1409,23 @@ ErrCode FormMgrStub::HandleUpdateFormLocation(MessageParcel &data, MessageParcel
     int64_t formId = data.ReadInt64();
     int32_t formLocation = data.ReadInt32();
     ErrCode result = UpdateFormLocation(formId, formLocation);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("failed to write result");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return result;
+}
+
+ErrCode FormMgrStub::HandleSetFormConfigUpdateFlags(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("Called.");
+    int64_t formId = data.ReadInt64();
+    std::unique_ptr<FormInfoConfigUpdateFilter> configUpdateFlags(data.ReadParcelable<FormInfoConfigUpdateFilter>());
+    if (configUpdateFlags == nullptr) {
+        HILOG_ERROR("%{public}s, failed to get configUpdateFlags.", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    ErrCode result = SetFormConfigUpdateFlags(formId, *configUpdateFlags);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("failed to write result");
         return ERR_APPEXECFWK_PARCEL_ERROR;
