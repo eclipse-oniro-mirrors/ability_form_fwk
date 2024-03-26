@@ -1399,8 +1399,8 @@ ErrCode FormMgrAdapter::AddExistFormRecord(const FormItemInfo &info, const sptr<
     }
     FormRenderMgr::GetInstance().RenderForm(newRecord, wantParams, callerToken);
     if (newRecord.needRefresh || FormCacheMgr::GetInstance().NeedAcquireProviderData(newRecord.formId)
-        || wantParams.HasParam(Constants.PARAM_HOST_BG_INVERSE_COLOR_KEY)) {
-        HILOG_DEBUG("%{public}s begin acquire ProviderFormInfo async", __func__);
+        || wantParams.HasParam(Constants::PARAM_HOST_BG_INVERSE_COLOR_KEY)) {
+        HILOG_INFO("%{public}s begin acquire ProviderFormInfo async", __func__);
         newRecord.isInited = false;
         FormDataMgr::GetInstance().SetFormCacheInited(formId, false);
 
