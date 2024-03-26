@@ -26,6 +26,8 @@
 #include "form_render_impl.h"
 #include "xcollie/watchdog.h"
 
+using namespace OHOS::AAFwk::GlobalConfigurationKey;
+
 namespace OHOS {
 namespace AppExecFwk {
 namespace FormRender {
@@ -430,6 +432,21 @@ bool FormRenderRecord::CreateRuntime(const FormJsInfo &formJsInfo)
 
 void FormRenderRecord::SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration>& config)
 {
+    if (config != nullptr && configuration_ != nullptr) {
+        std::string colorMode = config->GetItem(SYSTEM_COLORMODE);
+        std::string languageTag = config->GetItem(SYSTEM_LANGUAGE);
+        std::string colorModeOld = configuration_->GetItem(SYSTEM_COLORMODE);
+        std::string languageTagOld = configuration_->GetItem(SYSTEM_LANGUAGE);
+        configuration_ = config;
+        if (colorMode.empty()) {
+            configuration_->AddItem(SYSTEM_COLORMODE, colorModeOld);
+        }
+        if (languageTag.empty()) {
+            configuration_->AddItem(SYSTEM_LANGUAGE, languageTagOld);
+        }
+        return;
+    }
+
     configuration_ = config;
 }
 
@@ -452,6 +469,14 @@ std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::GetContext(const Form
                 }
                 HILOG_INFO("GetContext bundleName %{public}s, apiCompatibleVersion = %{public}d",
                     formJsInfo.bundleName.c_str(), applicationInfo->apiCompatibleVersion);
+            }
+
+            std::shared_ptr<OHOS::AppExecFwk::Configuration> config = iter->second->GetConfiguration();
+            if (config != nullptr && configuration_ != nullptr) {
+                std::string colorMode = configuration_->GetItem(SYSTEM_COLORMODE);
+                std::string languageTag = configuration_->GetItem(SYSTEM_LANGUAGE);
+                config->AddItem(SYSTEM_COLORMODE, colorMode);
+                config->AddItem(SYSTEM_LANGUAGE, languageTag);
             }
             return iter->second;
         }
@@ -1066,7 +1091,6 @@ void FormRenderRecord::UpdateConfiguration(
         return;
     }
 
-    contextsMapForModuleName_.clear();
     SetConfiguration(config);
     std::lock_guard<std::mutex> lock(eventHandlerMutex_);
     if (eventHandler_ == nullptr) {
