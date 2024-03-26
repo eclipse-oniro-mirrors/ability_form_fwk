@@ -98,12 +98,13 @@ HWTEST_F(FmsFormDataProxyMgrTest, FmsFormDataProxyMgrTest_001, TestSize.Level0)
     GTEST_LOG_(INFO) << "FmsFormDataProxyMgrTest_001 start";
     FormRecord formRecord;
     int64_t formId = 1;
+    AAFwk::Want want;
     std::vector<FormDataProxy> formDataProxies;
-    uint32_t ret = FormDataProxyMgr::GetInstance().SubscribeFormData(formId, formDataProxies);
+    uint32_t ret = FormDataProxyMgr::GetInstance().SubscribeFormData(formId, formDataProxies, want);
     EXPECT_EQ(ret, ERR_OK);
     FormDataProxy formDataProxy("test", "0002");
     formDataProxies.push_back(formDataProxy);
-    ret = FormDataProxyMgr::GetInstance().SubscribeFormData(formId, formDataProxies);
+    ret = FormDataProxyMgr::GetInstance().SubscribeFormData(formId, formDataProxies, want);
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
 
     int callingUid {0};
@@ -117,13 +118,13 @@ HWTEST_F(FmsFormDataProxyMgrTest, FmsFormDataProxyMgrTest_001, TestSize.Level0)
     record1.SetSpecificationId(PARAM_FORM_DIMENSION_VALUE);
     record1.SetTemporaryFlag(false);
     FormRecord formRecord2 = FormDataMgr::GetInstance().AllotFormRecord(record1, callingUid);
-    ret = FormDataProxyMgr::GetInstance().SubscribeFormData(formId, formDataProxies);
+    ret = FormDataProxyMgr::GetInstance().SubscribeFormData(formId, formDataProxies, want);
     EXPECT_EQ(ret, ERR_OK);
 
     formRecord2.isDataProxy = true;
     FormDataMgr::GetInstance().UpdateFormRecord(formId, formRecord2);
     MockGetApplicationInfo(ERR_OK + 1);
-    ret = FormDataProxyMgr::GetInstance().SubscribeFormData(formId, formDataProxies);
+    ret = FormDataProxyMgr::GetInstance().SubscribeFormData(formId, formDataProxies, want);
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_COMMON_CODE);
 
     GTEST_LOG_(INFO) << "FmsFormDataProxyMgrTest_001 end";

@@ -26,18 +26,26 @@
 #include "form_data_proxy_record.h"
 #include "form_item_info.h"
 #undef private
+#include "form_bms_helper.h"
 #include "form_constants.h"
+#include "form_data_mgr.h"
 #include "form_mgr_errors.h"
 #include "form_record.h"
 #include "form_util.h"
 #include "fms_log_wrapper.h"
 #include "ipc_skeleton.h"
+#include "mock_form_data_proxy_record_test.h"
 
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::AppExecFwk;
 
 namespace {
+const std::string TEST_DATA_URI = "com.form.app.test.uri";
+const std::string TEST_REQUIRED_READ_PERMISSON = "com.form.app.test.READ_PERMISSION";
+const std::string TEST_REQUIRED_WRITE_PERMISSON = "com.form.app.test.WRITE_PERMISSION";
+const std::string TEST_PROXY_SUBSCRIBE_ID = "12345678";
+
 class FmsFormDataProxyRecordTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -774,5 +782,79 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_038, TestSize.Le
     formDataProxyRecord.GetFormSubscribeKeys(subscribedKeys, true);
     EXPECT_EQ(subscribedKeys.size(), 0);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_038 end";
+}
+
+/**
+ * @tc.name: FmsFormDataProxyRecordTest_039
+ * @tc.desc: test PermStateChangeCallback function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_039, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_039 start";
+    FormRecord formRecord;
+    int64_t formId = 1;
+    MockGetFormRecord(true);
+    bool result = FormDataMgr::GetInstance().GetFormRecord(formId, formRecord);
+    EXPECT_TRUE(result);
+    uint32_t tokenId = 1;
+    FormDataProxyRecord formDataProxyRecord(formId, formRecord.bundleName, formRecord.uiSyntax, tokenId, 1);
+    int32_t userId = 0;
+    OHOS::AppExecFwk::ProxyData proxyData;
+    proxyData.uri = TEST_DATA_URI;
+    proxyData.requiredReadPermission = TEST_REQUIRED_READ_PERMISSON;
+    proxyData.requiredWritePermission = TEST_REQUIRED_WRITE_PERMISSON;
+    std::vector<FormDataProxy> formDataProxies;
+    formDataProxies.emplace_back(TEST_DATA_URI, TEST_PROXY_SUBSCRIBE_ID);
+    MockGetCurrentAccountIdRet(userId);
+    MockGetAllProxyDataInfos(true, proxyData);
+    int32_t ret = 0;
+    MockRegisterPermStateChangeCallback(ret);
+    formDataProxyRecord.RegisterPermissionListener(formDataProxies);
+    MockConnectServiceAbility(true);
+    int32_t permStateChangeType = 0;
+    formDataProxyRecord.PermStateChangeCallback(permStateChangeType, TEST_REQUIRED_READ_PERMISSON);
+    MockConnectServiceAbility(false);
+    formDataProxyRecord.PermStateChangeCallback(permStateChangeType, TEST_REQUIRED_READ_PERMISSON);
+    formDataProxyRecord.UnRegisterPermissionListener();
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_039 end";
+}
+
+/**
+ * @tc.name: FmsFormDataProxyRecordTest_040
+ * @tc.desc: test ConnectAmsForRefreshPermission function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_040, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_040 start";
+    FormRecord formRecord;
+    int64_t formId = 1;
+    MockGetFormRecord(true);
+    bool result = FormDataMgr::GetInstance().GetFormRecord(formId, formRecord);
+    EXPECT_TRUE(result);
+    uint32_t tokenId = 1;
+    FormDataProxyRecord formDataProxyRecord(formId, formRecord.bundleName, formRecord.uiSyntax, tokenId, 1);
+    const std::vector<FormDataProxy> formDataProxies;
+    Want want;
+    formDataProxyRecord.SetWant(want);
+    MockConnectServiceAbility(true);
+    ErrCode ret = formDataProxyRecord.ConnectAmsForRefreshPermission(TEST_REQUIRED_READ_PERMISSON, true);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+    MockConnectServiceAbility(false);
+    ret = formDataProxyRecord.ConnectAmsForRefreshPermission(TEST_REQUIRED_READ_PERMISSON, true);
+    EXPECT_EQ(ret, ERR_OK);
+    MockGetFormRecord(false);
+    ret = formDataProxyRecord.ConnectAmsForRefreshPermission(TEST_REQUIRED_READ_PERMISSON, true);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+    ret = formDataProxyRecord.ConnectAmsForRefreshPermission(TEST_REQUIRED_READ_PERMISSON, false);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+    MockGetFormRecord(true);
+    ret = formDataProxyRecord.ConnectAmsForRefreshPermission(TEST_REQUIRED_READ_PERMISSON, false);
+    EXPECT_EQ(ret, ERR_OK);
+    MockConnectServiceAbility(true);
+    ret = formDataProxyRecord.ConnectAmsForRefreshPermission(TEST_REQUIRED_READ_PERMISSON, false);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_040 end";
 }
 }

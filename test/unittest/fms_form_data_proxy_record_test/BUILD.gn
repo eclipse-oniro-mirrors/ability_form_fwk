@@ -22,6 +22,11 @@ ohos_unittest("FmsFormDataProxyRecordTest") {
   sources = [
     "${form_fwk_path}/services/src/form_data_proxy_record.cpp",
     "${form_fwk_path}/test/unittest/fms_form_data_proxy_record_test/fms_form_data_proxy_record_test.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_data_proxy_record_test/mock_accesstoken_kit.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_data_proxy_record_test/mock_form_ams_helper.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_data_proxy_record_test/mock_form_bms_helper.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_data_proxy_record_test/mock_form_data_mgr.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_data_proxy_record_test/mock_form_util.cpp",
   ]
 
   include_dirs = [
