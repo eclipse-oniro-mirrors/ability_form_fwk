@@ -1400,7 +1400,7 @@ ErrCode FormMgrAdapter::AddExistFormRecord(const FormItemInfo &info, const sptr<
     FormRenderMgr::GetInstance().RenderForm(newRecord, wantParams, callerToken);
     if (newRecord.needRefresh || FormCacheMgr::GetInstance().NeedAcquireProviderData(newRecord.formId)
         || wantParams.HasParam(Constants::PARAM_HOST_BG_INVERSE_COLOR_KEY)) {
-        HILOG_INFO("%{public}s begin acquire ProviderFormInfo async", __func__);
+        HILOG_INFO("%{public}s acquire ProviderFormInfo async, formId: %{public}" PRId64 "", __func__, formId);
         newRecord.isInited = false;
         FormDataMgr::GetInstance().SetFormCacheInited(formId, false);
 
