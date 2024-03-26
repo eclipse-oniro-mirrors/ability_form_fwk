@@ -358,7 +358,7 @@ void FormDumpMgr::DumpRunningFormInfos(const std::vector<RunningFormInfo> &runni
 
     for (const auto& infoPair : countMap) {
         infosResult += "hostBundleName [ " + infoPair.first + " ]\n";
-        infosResult += "Total running form count: " + std::to_string(infoPair.second)  + " ] \n";
+        infosResult += "Total running form count: [ " + std::to_string(infoPair.second)  + " ] \n";
         infosResult += "  ================RunningFormInfo=================\n";
 
         AppendRunningFormInfos(infoPair.first, runningFormInfos, infosResult);
