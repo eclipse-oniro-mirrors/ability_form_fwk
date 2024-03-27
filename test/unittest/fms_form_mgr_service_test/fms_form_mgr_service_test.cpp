@@ -160,8 +160,8 @@ void FmsFormMgrServiceTest::TearDown()
 
 /**
  * @tc.number: FormMgrService_0001
- * @tc.name: test IsReady function.
- * @tc.desc: Verify that the return value of the IsReady interface is true.
+ * @tc.name: test CheckFMSReady function.
+ * @tc.desc: Verify that the return value of the CheckFMSReady interface is true.
  */
 HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0001, TestSize.Level1)
 {
@@ -171,7 +171,7 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0001, TestSize.Level1)
     constexpr int32_t userId = 0;
     MockGetCurrentAccountIdRet(userId);
     FormInfoMgr::GetInstance().hasReloadedFormInfosState_ = true;
-    EXPECT_TRUE(formMgrService.IsReady());
+    EXPECT_TRUE(formMgrService.CheckFMSReady());
     GTEST_LOG_(INFO) << "FormMgrService_0001 end";
 }
 

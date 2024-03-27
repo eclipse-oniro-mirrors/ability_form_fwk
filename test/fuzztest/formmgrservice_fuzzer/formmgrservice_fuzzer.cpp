@@ -39,7 +39,7 @@ uint32_t GetU32Data(const char* ptr)
 bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
 {
     FormMgrService formMgrService;
-    formMgrService.IsReady();
+    formMgrService.CheckFMSReady();
     int64_t formId = static_cast<int64_t>(GetU32Data(data));
     Want want;
     sptr<IRemoteObject> callerToken = nullptr;
