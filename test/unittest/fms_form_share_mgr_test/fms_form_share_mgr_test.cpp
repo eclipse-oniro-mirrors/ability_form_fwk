@@ -283,6 +283,7 @@ HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_001, TestSiz
     result = DelayedSingleton<FormShareMgr>::GetInstance()->HandleRecvFormShareInfoFromRemoteTask(info);
     EXPECT_NE(result, ERR_OK);
 
+    DelayedSingleton<FormShareMgr>::GetInstance()->shareInfo_.clear();
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest HandleRecvFormShareInfoFromRemoteTask_001 end";
 }
 
@@ -453,6 +454,7 @@ HWTEST_F(FmsFormShareMgrTest, HandleRecvFormShareInfoFromRemoteTask_005, TestSiz
     auto result = DelayedSingleton<FormShareMgr>::GetInstance()->HandleRecvFormShareInfoFromRemoteTask(info);
     EXPECT_NE(result, ERR_OK);
 
+    DelayedSingleton<FormShareMgr>::GetInstance()->shareInfo_.clear();
     testing::Mock::AllowLeak(bundleMgr_);
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest HandleRecvFormShareInfoFromRemoteTask_005 end";
 }
@@ -872,7 +874,7 @@ HWTEST_F(FmsFormShareMgrTest, AddProviderData_001, TestSize.Level0)
     if (ao != nullptr) {
         EXPECT_EQ(String::Unbox(ao), "device");
     }
-
+    DelayedSingleton<FormShareMgr>::GetInstance()->shareInfo_.clear();
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest AddProviderData_001 end";
 }
 
@@ -3992,7 +3994,7 @@ HWTEST_F(FmsFormShareMgrTest, AddProviderData_003, TestSize.Level1)
     if (ao != nullptr) {
         EXPECT_EQ(String::Unbox(ao), "device");
     }
-
+    DelayedSingleton<FormShareMgr>::GetInstance()->shareInfo_.clear();
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest AddProviderData_003 end";
 }
 
@@ -4037,6 +4039,7 @@ HWTEST_F(FmsFormShareMgrTest, HandleFormShareInfoTimeout_001, TestSize.Level1)
 
     auto size = static_cast<int32_t>(DelayedSingleton<FormShareMgr>::GetInstance()->eventMap_.size());
     EXPECT_EQ(size, 0);
+    DelayedSingleton<FormShareMgr>::GetInstance()->shareInfo_.clear();
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest HandleFormShareInfoTimeout_001 end";
 }
 
@@ -4082,6 +4085,7 @@ HWTEST_F(FmsFormShareMgrTest, HandleFormShareInfoTimeout_002, TestSize.Level1)
 
     auto size = static_cast<int32_t>(DelayedSingleton<FormShareMgr>::GetInstance()->eventMap_.size());
     EXPECT_EQ(size, 1);
+    DelayedSingleton<FormShareMgr>::GetInstance()->shareInfo_.clear();
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest HandleFormShareInfoTimeout_002 end";
 }
 
@@ -4133,6 +4137,7 @@ HWTEST_F(FmsFormShareMgrTest, OnInstallFinished_001, TestSize.Level1)
 
     auto size = static_cast<int32_t>(DelayedSingleton<FormShareMgr>::GetInstance()->shareInfo_.size());
     EXPECT_EQ(size, 0);
+    DelayedSingleton<FormShareMgr>::GetInstance()->shareInfo_.clear();
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest OnInstallFinished_001 end";
 }
 
@@ -4166,6 +4171,7 @@ HWTEST_F(FmsFormShareMgrTest, OnInstallFinished_002, TestSize.Level1)
     auto size = static_cast<int32_t>(DelayedSingleton<FormShareMgr>::GetInstance()->shareInfo_.size());
     EXPECT_EQ(size, 1);
     DelayedSingleton<FormShareMgr>::GetInstance()->freeInstallOperatorMap_.clear();
+    DelayedSingleton<FormShareMgr>::GetInstance()->shareInfo_.clear();
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest OnInstallFinished_002 end";
 }
 
@@ -4199,6 +4205,7 @@ HWTEST_F(FmsFormShareMgrTest, OnInstallFinished_003, TestSize.Level1)
     auto size = static_cast<int32_t>(DelayedSingleton<FormShareMgr>::GetInstance()->shareInfo_.size());
     EXPECT_EQ(size, 1);
     DelayedSingleton<FormShareMgr>::GetInstance()->freeInstallOperatorMap_.clear();
+    DelayedSingleton<FormShareMgr>::GetInstance()->shareInfo_.clear();
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest OnInstallFinished_003 end";
 }
 
@@ -4363,6 +4370,7 @@ HWTEST_F(FmsFormShareMgrTest, OnEventTimeoutResponse_001, TestSize.Level1)
 
     auto size = static_cast<int32_t>(DelayedSingleton<FormShareMgr>::GetInstance()->eventMap_.size());
     EXPECT_EQ(size, 0);
+    DelayedSingleton<FormShareMgr>::GetInstance()->shareInfo_.clear();
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest OnEventTimeoutResponse_001 end";
 }
 
