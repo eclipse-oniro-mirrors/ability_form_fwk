@@ -17,7 +17,7 @@
 #include <chrono>
 
 #include "form_ecological_rule_service.h"
-#include "hilog_wrapper.h"
+#include "fms_log_wrapper.h"
 #include "iremote_broker.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
