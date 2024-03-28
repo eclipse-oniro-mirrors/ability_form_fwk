@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License")_;
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,6 +20,7 @@
 
 namespace {
     int32_t shareForm = OHOS::ERR_OK;
+    int32_t g_recvFormShareInfoFromRemote = OHOS::ERR_OK;
 }
 
 void MockShareForm(bool mockRet)
@@ -34,6 +35,11 @@ int32_t FormShareMgr::ShareForm(
 {
     GTEST_LOG_(INFO) << "ShareForm called " << shareForm;
     return shareForm;
+}
+
+int32_t FormShareMgr::RecvFormShareInfoFromRemote(const FormShareInfo &info)
+{
+    return g_recvFormShareInfoFromRemote;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

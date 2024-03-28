@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,6 +39,25 @@ namespace {
     int g_updateForm = OHOS::ERR_OK;
     int g_updateFormLocation = OHOS::ERR_OK;
     bool g_isRequestPublishFormSupported = true;
+    int g_stopRenderingForm = OHOS::ERR_OK;
+    int g_releaseRenderer = OHOS::ERR_OK;
+    int g_dumpStorageFormInfos = OHOS::ERR_OK;
+    int g_dumpFormInfoByBundleName = OHOS::ERR_OK;
+    int g_dumpFormInfoByFormId = OHOS::ERR_OK;
+    int g_dumpFormTimerByFormId = OHOS::ERR_OK;
+    int g_backgroundEvent = OHOS::ERR_OK;
+    int g_registerFormRouterProxy = OHOS::ERR_OK;
+    int g_unregisterFormRouterProxy = OHOS::ERR_OK;
+    int g_getFormsCount = OHOS::ERR_OK;
+    int g_getHostFormsCount = OHOS::ERR_OK;
+    int g_getRunningFormInfos = OHOS::ERR_OK;
+    int g_getRunningFormInfosByBundleName = OHOS::ERR_OK;
+    int g_getFormInstanceById = OHOS::ERR_OK;
+    int g_handleFormAddObserver = OHOS::ERR_OK;
+    int g_registerAddObserver = OHOS::ERR_OK;
+    int g_registerRemoveObserver = OHOS::ERR_OK;
+    int g_registerClickEventObserver = OHOS::ERR_OK;
+    int g_unregisterClickEventObserver = OHOS::ERR_OK;
 }
 
 void MockEnableUpdateForm(int mockRet)
@@ -119,6 +138,11 @@ void MockGetFormsInfoByModule(int mockRet)
 void MockIsRequestPublishFormSupported(bool mockRet)
 {
     g_isRequestPublishFormSupported = mockRet;
+}
+
+void MockStopRenderingForm(int mockRet)
+{
+    g_stopRenderingForm = mockRet;
 }
 
 namespace OHOS {
@@ -240,6 +264,100 @@ int FormMgrAdapter::UpdateForm(const int64_t formId, const int32_t uid,
 int FormMgrAdapter::UpdateFormLocation(const int64_t &formId, const int32_t &formLocation)
 {
     return g_updateFormLocation;
+}
+
+int FormMgrAdapter::StopRenderingForm(const int64_t formId, const std::string &compId)
+{
+    return g_stopRenderingForm;
+}
+
+int FormMgrAdapter::ReleaseRenderer(int64_t formId, const std::string &compId)
+{
+    return g_releaseRenderer;
+}
+
+int FormMgrAdapter::DumpStorageFormInfos(std::string &formInfos) const
+{
+    return g_dumpStorageFormInfos;
+}
+
+int FormMgrAdapter::DumpFormInfoByBundleName(const std::string &bundleName, std::string &formInfos) const
+{
+    return g_dumpFormInfoByBundleName;
+}
+
+int FormMgrAdapter::DumpFormInfoByFormId(const std::int64_t formId, std::string &formInfo) const
+{
+    return g_dumpFormInfoByFormId;
+}
+
+int FormMgrAdapter::DumpFormTimerByFormId(const std::int64_t formId, std::string &isTimingService) const
+{
+    return g_dumpFormTimerByFormId;
+}
+
+int FormMgrAdapter::BackgroundEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken)
+{
+    return g_backgroundEvent;
+}
+
+ErrCode FormMgrAdapter::RegisterFormRouterProxy(const std::vector<int64_t> &formIds,
+    const sptr<IRemoteObject> &callerToken)
+{
+    return g_registerFormRouterProxy;
+}
+
+ErrCode FormMgrAdapter::UnregisterFormRouterProxy(const std::vector<int64_t> &formIds)
+{
+    return g_unregisterFormRouterProxy;
+}
+
+int32_t FormMgrAdapter::GetFormsCount(bool isTempFormFlag, int32_t &formCount)
+{
+    return g_getFormsCount;
+}
+
+int32_t FormMgrAdapter::GetHostFormsCount(std::string &bundleName, int32_t &formCount)
+{
+    return g_getHostFormsCount;
+}
+
+ErrCode FormMgrAdapter::GetRunningFormInfos(bool isUnusedIncluded, std::vector<RunningFormInfo> &runningFormInfos)
+{
+    return g_getRunningFormInfos;
+}
+
+ErrCode FormMgrAdapter::GetRunningFormInfosByBundleName(
+    const std::string &bundleName, bool isUnusedIncluded, std::vector<RunningFormInfo> &runningFormInfos)
+{
+    return g_getRunningFormInfosByBundleName;
+}
+
+ErrCode FormMgrAdapter::GetFormInstanceById(const int64_t formId, bool isUnusedIncluded, FormInstance &formInstance)
+{
+    return g_getFormInstanceById;
+}
+
+ErrCode FormMgrAdapter::RegisterAddObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken)
+{
+    return g_registerAddObserver;
+}
+
+ErrCode FormMgrAdapter::RegisterRemoveObserver(const std::string &bundleName, const sptr<IRemoteObject> &callerToken)
+{
+    return g_registerRemoveObserver;
+}
+
+ErrCode FormMgrAdapter::RegisterClickEventObserver(
+    const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer)
+{
+    return g_registerClickEventObserver;
+}
+
+ErrCode FormMgrAdapter::UnregisterClickEventObserver(
+    const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer)
+{
+    return g_unregisterClickEventObserver;
 }
 } // namespace AppExecFwk
 } // namespace OHOS
