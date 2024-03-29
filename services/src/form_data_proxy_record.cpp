@@ -426,6 +426,7 @@ void FormDataProxyRecord::UpdatePublishedDataForm(const std::vector<DataShare::P
 {
     std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
     nlohmann::json object;
+    std::string formDataKeysStr = "";
     for (const auto& iter : data) {
         if (iter.key_.empty()) {
             HILOG_ERROR("key is empty.");
@@ -441,13 +442,15 @@ void FormDataProxyRecord::UpdatePublishedDataForm(const std::vector<DataShare::P
                 continue;
             }
             object[iter.key_] = dataObject;
+            std::string newKeyStr = formDataKeysStr.empty() ? iter.key_ : (", " + iter.key_);
+            formDataKeysStr += newKeyStr;
         }
     }
     std::string formDataStr = object.empty() ? "" : object.dump();
     std::string subStr = formDataStr.substr(0, std::min((int)formDataStr.length(), 30));
     HILOG_INFO("form[formId: %{public}s] will update published data. formDataStr[len: %{public}zu]: %{private}s, "
-        "imageDataMap size: %{public}zu.", std::to_string(formId_).c_str(), formDataStr.length(),
-        subStr.c_str(), imageDataMap.size());
+        "formDataKeysStr: %{public}s, imageDataMap size: %{public}zu.", std::to_string(formId_).c_str(),
+        formDataStr.length(), subStr.c_str(), formDataKeysStr.c_str(), imageDataMap.size());
 
     FormProviderData formProviderData;
     formProviderData.SetDataString(formDataStr);

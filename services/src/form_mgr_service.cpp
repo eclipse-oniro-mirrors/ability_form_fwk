@@ -125,7 +125,12 @@ FormMgrService::~FormMgrService()
     }
 }
 
-bool FormMgrService::IsReady() const
+/**
+* @brief Check form manager service ready.
+* @return Return true if form manager service Ready; return false otherwise.
+*/
+
+bool FormMgrService::CheckFMSReady()
 {
     if (state_ != ServiceRunningState::STATE_RUNNING) {
         return false;
@@ -137,16 +142,6 @@ bool FormMgrService::IsReady() const
         return false;
     }
     return FormInfoMgr::GetInstance().HasReloadedFormInfos();
-}
-
-/**
-* @brief Check form manager service ready.
-* @return Return true if form manager service Ready; return false otherwise.
-*/
-
-bool FormMgrService::CheckFMSReady()
-{
-    return IsReady();
 }
 
 /**
@@ -721,32 +716,6 @@ ErrCode FormMgrService::Init()
     return ERR_OK;
 }
 
-ErrCode FormMgrService::CheckFormObserverPermission()
-{
-    HILOG_DEBUG("called.");
-
-    if (FormUtil::IsSACall()) {
-        return ERR_OK;
-    }
-
-    // check if system app
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
-    }
-
-    if (!CheckAcrossLocalAccountsPermission()) {
-        HILOG_ERROR("Across local accounts permission failed.");
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
-    }
-
-    if (!FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_OBSERVE_FORM_RUNNING)) {
-        HILOG_ERROR("verify calling permission failed!");
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
-    }
-    HILOG_DEBUG("Form Observer permission verification ok!");
-    return ERR_OK;
-}
-
 ErrCode FormMgrService::CheckFormPermission(const std::string &permission)
 {
     HILOG_DEBUG("called.");
@@ -773,6 +742,12 @@ ErrCode FormMgrService::CheckFormPermission(const std::string &permission)
 
     HILOG_DEBUG("Permission verification ok!");
     return ERR_OK;
+}
+
+ErrCode FormMgrService::CheckFormObserverPermission()
+{
+    HILOG_DEBUG("called.");
+    return CheckFormPermission(AppExecFwk::Constants::PERMISSION_OBSERVE_FORM_RUNNING);
 }
 
 /**
@@ -1142,7 +1117,7 @@ void FormMgrService::DumpInit()
 
 int FormMgrService::Dump(int fd, const std::vector<std::u16string> &args)
 {
-    if (!IsReady()) {
+    if (!CheckFMSReady()) {
         HILOG_ERROR("%{public}s, fms is not ready.", __func__);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }

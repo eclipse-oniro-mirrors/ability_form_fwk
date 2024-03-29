@@ -225,12 +225,6 @@ public:
     int BackgroundEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken) override;
 
     /**
-     * @brief Check whether if the form manager service is ready.
-     * @return Returns true if the form manager service is ready; returns false otherwise.
-     */
-    bool IsReady() const;
-
-    /**
      * @brief Delete the invalid forms.
      * @param formIds Indicates the ID of the valid forms.
      * @param callerToken Caller ability token.
@@ -628,10 +622,10 @@ private:
      */
     ErrCode Init();
 
-    ErrCode CheckFormObserverPermission();
-
     ErrCode CheckFormPermission(
         const std::string &permission = AppExecFwk::Constants::PERMISSION_REQUIRE_FORM);
+
+    ErrCode CheckFormObserverPermission();
 
     bool CheckAcrossLocalAccountsPermission() const;
 
