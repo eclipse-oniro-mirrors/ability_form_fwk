@@ -761,6 +761,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_037, TestSize.Level0)
     WantParams wantParams;
     FormJsInfo formInfo;
     MockAllotFormHostRecord(true);
+    MockConnectServiceAbility(true);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED,
         formMgrAdapter.AddNewFormRecord(info, formId, callerToken, wantParams, formInfo));
     GTEST_LOG_(INFO) << "FormMgrAdapter_037 end";
