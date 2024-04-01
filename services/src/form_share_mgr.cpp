@@ -34,6 +34,7 @@ namespace AppExecFwk {
 namespace {
 constexpr int64_t FORM_SHARE_INFO_DELAY_TIMER = 50000;
 constexpr int64_t FORM_PACKAGE_FREE_INSTALL_TIMER = 40000;
+constexpr int64_t FORM_SHARE_INFO_MAX_SIZE = 32;
 constexpr const char* ACTION_SHARE_FORM = "action.form.share";
 }
 
@@ -131,6 +132,10 @@ int32_t FormShareMgr::HandleRecvFormShareInfoFromRemoteTask(const FormShareInfo 
         if (shareInfo_.find(formShareInfoKey) != shareInfo_.end()) {
             HILOG_ERROR("form is sharing.");
             return ERR_APPEXECFWK_FORM_SHARING;
+        }
+        if (shareInfo_.size() > FORM_SHARE_INFO_MAX_SIZE) {
+            HILOG_ERROR("The maximum number of shared cards has been reached.");
+            return ERR_APPEXECFWK_FORM_SHARING_MAX_SIZE;
         }
 
         shareInfo_.emplace(formShareInfoKey, info);

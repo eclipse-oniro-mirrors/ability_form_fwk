@@ -2139,8 +2139,8 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0099, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormMgrService_0099 start";
     FormMgrService formMgrService;
     std::string args;
-    std::string runningFormInfo;
-    formMgrService.HiDumpFormRunningFormInfos(args, runningFormInfo);
+    std::string RunningFormInfo;
+    formMgrService.HiDumpFormRunningFormInfos(args, RunningFormInfo);
     GTEST_LOG_(INFO) << "FormMgrService_0099 end";
 }
 
