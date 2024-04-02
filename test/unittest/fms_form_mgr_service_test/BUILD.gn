@@ -20,8 +20,10 @@ ohos_unittest("fms_form_mgr_service_test") {
   module_out_path = module_output_path
 
   sources = [
+    "${form_fwk_path}/test/mock/src/mock_form_params.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_provider_client.cpp",
     "${form_fwk_path}/test/unittest/fms_form_mgr_service_test/fms_form_mgr_service_test.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_mgr_service_test/mock_accesstoken_kit.cpp",
     "${form_fwk_path}/test/unittest/fms_form_mgr_service_test/mock_form_bms_helper.cpp",
     "${form_fwk_path}/test/unittest/fms_form_mgr_service_test/mock_form_data_mgr.cpp",
     "${form_fwk_path}/test/unittest/fms_form_mgr_service_test/mock_form_mgr_adapter.cpp",

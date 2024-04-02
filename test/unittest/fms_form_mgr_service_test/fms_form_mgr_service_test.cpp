@@ -40,6 +40,7 @@
 #include "bundle_mgr_interface.h"
 #include "gmock/gmock.h"
 #include "mock_ability_manager.h"
+#include "mock_form_params.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -2023,7 +2024,7 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0096, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormMgrService_0096 start";
     std::string bundleName = "ohos.samples.FormApplication";
-    int32_t userId = 0;
+    int32_t userId = 100;
     int32_t instIndex = 0;
     // create formRecords_
     FormRecord record;
@@ -2033,51 +2034,17 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0096, TestSize.Level1)
     int64_t formId = 123456;
     FormDataMgr::GetInstance().formRecords_.emplace(formId, record);
 
-    // create tokeninfo
-    HapInfoParams infoManagerTestInfoParms = {
-        .userID = userId,
-        .bundleName = bundleName,
-        .instIndex = instIndex,
-        .appIDDesc = "test",
-        .isSystemApp = true
-    };
-
-    OHOS::Security::AccessToken::PermissionDef infoManagerTestPermDef = {
-        .permissionName = "ohos.permission.test",
-        .bundleName = bundleName,
-        .grantMode = 1,
-        .availableLevel = APL_SYSTEM_CORE,
-        .label = "label",
-        .labelId = 1,
-        .description = "form manager service test",
-        .descriptionId = 1,
-    };
-
-    PermissionStateFull infoManagerTestState = {
-        .permissionName = "ohos.permission.test",
-        .isGeneral = true,
-        .resDeviceID = { "local" },
-        .grantStatus = { PermissionState::PERMISSION_GRANTED },
-        .grantFlags = { 1 },
-    };
-
-    HapPolicyParams infoManagerTestPolicyPrams = {
-        .apl = APL_SYSTEM_CORE,
-        .domain = "test.domain",
-        .permList = { infoManagerTestPermDef },
-        .permStateList = { infoManagerTestState }
-    };
-    AccessTokenKit::AllocHapToken(infoManagerTestInfoParms, infoManagerTestPolicyPrams);
-
     // create tokenid
-    uint32_t tokenId1 = AccessTokenKit::GetHapTokenID(userId, bundleName, instIndex);
+    uint32_t tokenId = 0;
+    MockFormParams::bundleName = bundleName;
+    MockFormParams::userId = userId;
 
     MockIsSACall(true);
     FormMgrService formMgrService;
-    EXPECT_EQ(true, formMgrService.HasFormVisible(tokenId1));
+    EXPECT_EQ(true, formMgrService.HasFormVisible(tokenId));
 
-    uint32_t tokenId2 = 0;
-    EXPECT_EQ(false, formMgrService.HasFormVisible(tokenId2));
+    MockFormParams::Reset();
+    EXPECT_EQ(false, formMgrService.HasFormVisible(tokenId));
     GTEST_LOG_(INFO) << "FormMgrService_0096 end";
 }
 
