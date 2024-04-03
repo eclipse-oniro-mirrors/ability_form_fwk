@@ -183,6 +183,8 @@ private:
 
     void HandleUpdateForm(const FormJsInfo &formJsInfo, const Want &want);
 
+    void MergeFormData(Ace::FormRequest &formRequest, const FormJsInfo &formJsInfo);
+
     void AddRenderer(const FormJsInfo &formJsInfo, const Want &want);
 
     void UpdateRenderer(const FormJsInfo &formJsInfo);
