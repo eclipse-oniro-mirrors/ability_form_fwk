@@ -103,6 +103,10 @@ ohos_shared_library("formrender") {
     "hitrace:hitrace_meter",
     "ipc:ipc_core",
     "napi:ace_napi",
+    "hisysevent:libhisysevent",
+    "faultloggerd:libbacktrace_local",
+    "faultloggerd:libdfx_dumpcatcher",
+    "hilog:libhilog",
   ]
 
   subsystem_name = "ability"

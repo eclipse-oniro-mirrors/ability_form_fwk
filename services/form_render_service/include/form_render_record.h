@@ -216,6 +216,7 @@ private:
         const bool &isRecoverFormToHandleClickEvent);
 
     void HandleFormRenderGC();
+    int32_t  jsThreadId_;
 
     std::string bundleName_;
     std::string uid_;
