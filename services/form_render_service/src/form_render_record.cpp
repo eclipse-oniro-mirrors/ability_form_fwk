@@ -596,7 +596,14 @@ void FormRenderRecord::HandleUpdateForm(const FormJsInfo &formJsInfo, const Want
 
     for (const auto& iter : formRequests) {
         auto formRequest = iter.second;
-        MergeFormData(formRequest, formJsInfo);
+
+        // merge last form data with new data
+        FormProviderData formProviderData = FormProviderData(formRequest.formJsInfo.formData);
+        nlohmann::json newFormData = formJsInfo.formProviderData.GetData();
+        formProviderData.MergeData(newFormData);
+        formRequest.formJsInfo = formJsInfo;
+        formRequest.formJsInfo.formData = formProviderData.GetDataString();
+
         if (!formRequest.hasRelease) {
             UpdateRenderer(formJsInfo);
             AddFormRequest(formJsInfo.formId, formRequest);
@@ -624,16 +631,6 @@ void FormRenderRecord::HandleUpdateForm(const FormJsInfo &formJsInfo, const Want
             AddFormRequest(formJsInfo.formId, formRequest);
         }
     }
-}
-
-void FormRenderRecord::MergeFormData(const Ace::FormRequest &formRequest, const FormJsInfo &formJsInfo)
-{
-    FormProviderData formProviderData = FormProviderData(formRequest.formJsInfo.formData);
-    nlohmann::json newFormData = formJsInfo.formProviderData.GetData();
-    formProviderData.MergeData(newFormData);
-
-    formRequest.formJsInfo = formJsInfo;
-    formRequest.formJsInfo.formData = formProviderData.GetDataString();
 }
 
 void FormRenderRecord::AddRenderer(const FormJsInfo &formJsInfo, const Want &want)
