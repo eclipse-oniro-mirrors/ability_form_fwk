@@ -1242,7 +1242,7 @@ int32_t FormRenderRecord::RecoverForm(const int64_t &formId,
 void FormRenderRecord::HandleRecoverForm(const int64_t &formId,
     const std::string &statusData, const bool &isRecoverFormToHandleClickEvent)
 {
-    HILOG_INFO("HandleRecoverForm begin, formId: %{public}s, uid: %{public}s.", std::to_string(formId).c_str(), 
+    HILOG_INFO("HandleRecoverForm begin, formId: %{public}s, uid: %{public}s.", std::to_string(formId).c_str(),
         uid_.c_str());
     std::unordered_map<std::string, Ace::FormRequest> formRequests;
     {
