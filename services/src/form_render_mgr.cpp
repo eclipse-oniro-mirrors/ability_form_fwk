@@ -384,14 +384,13 @@ ErrCode FormRenderMgr::RecycleForms(
     return ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED;
 }
 
-ErrCode FormRenderMgr::RecoverForms(
-    const std::vector<int64_t> &formIds, const std::string &bundleName, const WantParams &wantParams)
+ErrCode FormRenderMgr::RecoverForms(const std::vector<int64_t> &formIds, const WantParams &wantParams)
 {
     if (renderInner_ != nullptr) {
-        return renderInner_->RecoverForms(formIds, bundleName, wantParams);
+        return renderInner_->RecoverForms(formIds, wantParams);
     }
     if (sandboxInner_ != nullptr) {
-        return sandboxInner_->RecoverForms(formIds, bundleName, wantParams);
+        return sandboxInner_->RecoverForms(formIds, wantParams);
     }
     return ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED;
 }

@@ -3719,7 +3719,6 @@ int32_t FormMgrAdapter::RecoverForms(const std::vector<int64_t> &formIds, const 
     FormRecord record;
     std::vector<int64_t> validFormIds;
     int callingUid = IPCSkeleton::GetCallingUid();
-    std::string bundleName;
     for (int64_t formId : formIds) {
         if (formId <= 0) {
             HILOG_ERROR("form id is negative");
@@ -3748,7 +3747,6 @@ int32_t FormMgrAdapter::RecoverForms(const std::vector<int64_t> &formIds, const 
             continue;
         }
 
-        bundleName = record.bundleName;
         record.recycleStatus = RecycleStatus::NON_RECYCLABLE;
         FormDataMgr::GetInstance().UpdateFormRecord(matchedFormId, record);
         validFormIds.emplace_back(matchedFormId);
@@ -3760,7 +3758,7 @@ int32_t FormMgrAdapter::RecoverForms(const std::vector<int64_t> &formIds, const 
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    FormRenderMgr::GetInstance().RecoverForms(validFormIds, bundleName, want.GetParams());
+    FormRenderMgr::GetInstance().RecoverForms(validFormIds, want.GetParams());
     return ERR_OK;
 }
 
