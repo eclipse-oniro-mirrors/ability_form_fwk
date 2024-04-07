@@ -409,7 +409,7 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0012, TestSize.Level1)
 
     formMgrService.state_ = ServiceRunningState::STATE_RUNNING;
     EXPECT_EQ(formMgrService.Dump(fd, args), ERR_APPEXECFWK_FORM_COMMON_CODE);
-    
+
     GTEST_LOG_(INFO) << "FormMgrService_0012 end";
 }
 
@@ -583,26 +583,26 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0020, TestSize.Level1)
     int64_t invalidFormId = 0;
     EXPECT_EQ(formMgrService.ShareForm(invalidFormId, deviceId, callerToken, requestCode),
               ERR_APPEXECFWK_FORM_COMMON_CODE);
-    
+
     const std::string invalidDeviceId = "";
     EXPECT_EQ(formMgrService.ShareForm(formId, invalidDeviceId, callerToken, requestCode),
               ERR_APPEXECFWK_FORM_COMMON_CODE);
-    
+
     int64_t invalidRequestCode = 0;
     EXPECT_EQ(formMgrService.ShareForm(formId, deviceId, callerToken, invalidRequestCode),
               ERR_APPEXECFWK_FORM_COMMON_CODE);
-    
+
     MockIsSACall(false);
     MockIsSystemAppByFullTokenID(false);
     EXPECT_EQ(formMgrService.ShareForm(formId, deviceId, callerToken, requestCode),
               ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
-    
+
     MockIsSACall(true);
     MockIsSystemAppByFullTokenID(true);
     MockCheckInvalidForm(ERR_APPEXECFWK_FORM_COMMON_CODE);
     EXPECT_EQ(formMgrService.ShareForm(formId, deviceId, callerToken, requestCode),
               ERR_APPEXECFWK_FORM_COMMON_CODE);
-    
+
     MockCheckInvalidForm(ERR_OK);
     EXPECT_EQ(formMgrService.ShareForm(formId, deviceId, callerToken, requestCode), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrService_0020 end";
@@ -848,7 +848,7 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0034, TestSize.Level1)
     MockIsSystemAppByFullTokenID(false);
     EXPECT_EQ(formMgrService.GetFormsInfoByModule(bundleName, moduleName, formInfos),
               ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
-    
+
     MockIsSACall(true);
     MockCheckAcrossLocalAccountsPermission(false);
     EXPECT_EQ(formMgrService.GetFormsInfoByModule(bundleName, moduleName, formInfos),
@@ -1118,18 +1118,18 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0051, TestSize.Level1)
     AAFwk::WantParams formData;
     EXPECT_EQ(formMgrService.AcquireFormData(formId, requestCode, callerToken, formData),
               ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
-    
+
     int64_t invalidFormId = 0;
     EXPECT_EQ(formMgrService.AcquireFormData(invalidFormId, requestCode, callerToken, formData),
               ERR_APPEXECFWK_FORM_COMMON_CODE);
 
     EXPECT_EQ(formMgrService.AcquireFormData(formId, requestCode, nullptr, formData),
               ERR_APPEXECFWK_FORM_COMMON_CODE);
-    
+
     int64_t invalidRequestCode = 0;
     EXPECT_EQ(formMgrService.AcquireFormData(formId, invalidRequestCode, callerToken, formData),
               ERR_APPEXECFWK_FORM_COMMON_CODE);
-    
+
     MockIsSACall(false);
     EXPECT_EQ(formMgrService.AcquireFormData(formId, requestCode, callerToken, formData),
               ERR_APPEXECFWK_FORM_PERMISSION_DENY);
@@ -1236,7 +1236,7 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0056, TestSize.Level1)
     MockCheckAcrossLocalAccountsPermission(false);
     EXPECT_EQ(formMgrService.RegisterFormAddObserverByBundle(bundleName, callerToken),
               ERR_APPEXECFWK_FORM_PERMISSION_DENY);
-    
+
     MockIsSACall(false);
     MockIsSystemAppByFullTokenID(true);
     MockCheckAcrossLocalAccountsPermission(true);
@@ -2160,7 +2160,7 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0102, TestSize.Level1)
     const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
     FormBmsHelper::GetInstance().SetBundleManager(bundleManager);
     EXPECT_EQ(formMgrService.RegisterPublishFormInterceptor(callerToken), ERR_APPEXECFWK_FORM_PERMISSION_DENY);
-    
+
     GTEST_LOG_(INFO) << "FormMgrService_0102 end";
 }
 
@@ -2178,7 +2178,7 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0103, TestSize.Level1)
     const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
     FormBmsHelper::GetInstance().SetBundleManager(bundleManager);
     EXPECT_EQ(formMgrService.UnregisterPublishFormInterceptor(callerToken), ERR_APPEXECFWK_FORM_PERMISSION_DENY);
-    
+
     GTEST_LOG_(INFO) << "FormMgrService_0103 end";
 }
 
@@ -2206,7 +2206,7 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0104, TestSize.Level1)
     formMgrService.HiDumpFormInfoByFormId(args0, formInfo);
     std::string args1 = "1";
     formMgrService.HiDumpFormInfoByFormId(args1, formInfo);
-    
+
     GTEST_LOG_(INFO) << "FormMgrService_0104 end";
 }
 
@@ -2220,7 +2220,7 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0105, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormMgrService_0105 start";
     FormMgrService formMgrService;
     EXPECT_NE(formMgrService.GetCurrentDateTime(), "");
-    
+
     GTEST_LOG_(INFO) << "FormMgrService_0105 end";
 }
 
@@ -2242,7 +2242,7 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0106, TestSize.Level1)
     MockIsSACall(true);
     ret = formMgrService.RecoverForms(formIds, want);
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
-    
+
     GTEST_LOG_(INFO) << "FormMgrService_0106 end";
 }
 
@@ -2258,7 +2258,7 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0107, TestSize.Level1)
     bool isTempFormFlag = true;
     int32_t formCount;
     EXPECT_EQ(formMgrService.GetFormsCount(isTempFormFlag, formCount), ERR_OK);
-    
+
     GTEST_LOG_(INFO) << "FormMgrService_0107 end";
 }
 
@@ -2274,7 +2274,7 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0108, TestSize.Level1)
     std::string bundleName = "bundleName";
     int32_t formCount;
     EXPECT_EQ(formMgrService.GetHostFormsCount(bundleName, formCount), ERR_OK);
-    
+
     GTEST_LOG_(INFO) << "FormMgrService_0108 end";
 }
 
@@ -2406,7 +2406,7 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0114, TestSize.Level1)
     const int64_t formId = 1;
     FormProviderData formProviderData;
     EXPECT_EQ(formMgrService.UpdateForm(formId, formProviderData), ERR_OK);
-    
+
     GTEST_LOG_(INFO) << "FormMgrService_0114 end";
 }
 
@@ -2427,7 +2427,7 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0115, TestSize.Level1)
 
     MockIsSACall(true);
     EXPECT_EQ(formMgrService.DumpFormTimerByFormId(formId, isTimingService), ERR_OK);
-    
+
     GTEST_LOG_(INFO) << "FormMgrService_0115 end";
 }
 
@@ -2447,7 +2447,22 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0116, TestSize.Level1)
 
     MockIsSACall(true);
     EXPECT_EQ(formMgrService.RecvFormShareInfoFromRemote(formShareInfo), ERR_OK);
-    
+
     GTEST_LOG_(INFO) << "FormMgrService_0116 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0117
+ * @tc.name: test FormMgr HiDumpFormBlockedApps function.
+ * @tc.desc: Verify that the HiDumpFormBlockedApps interface is available.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0117, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0117 start";
+    FormMgrService formMgrService;
+    std::string args;
+    std::string blockAppInfo;
+    formMgrService.HiDumpFormBlockedApps(args, blockAppInfo);
+    GTEST_LOG_(INFO) << "FormMgrService_0117 end";
 }
 }

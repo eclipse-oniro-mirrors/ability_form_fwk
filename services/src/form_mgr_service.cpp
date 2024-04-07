@@ -84,7 +84,8 @@ const std::string FORM_DUMP_HELP = "options list:\n"
     "  -t, --temp                           query temporary form info\n"
     "  -n  <bundle-name>                    query form info by a bundle name\n"
     "  -i  <form-id>                        query form info by a form ID\n"
-    "  -r  --running                        query running form info\n";
+    "  -r  --running                        query running form info\n"
+    "  -a  --apps-blocked                   query blocked app name list\n";
 
 const std::map<std::string, FormMgrService::DumpKey> FormMgrService::dumpKeyMap_ = {
     {"-h", FormMgrService::DumpKey::KEY_DUMP_HELP},
@@ -101,6 +102,8 @@ const std::map<std::string, FormMgrService::DumpKey> FormMgrService::dumpKeyMap_
     {"-i", FormMgrService::DumpKey::KEY_DUMP_BY_FORM_ID},
     {"-r", FormMgrService::DumpKey::KEY_DUMP_RUNNING},
     {"--running", FormMgrService::DumpKey::KEY_DUMP_RUNNING},
+    {"-a", FormMgrService::DumpKey::KEY_DUMP_BLOCKED_APPS},
+    {"--apps-blocked", FormMgrService::DumpKey::KEY_DUMP_BLOCKED_APPS},
 };
 
 FormMgrService::FormMgrService()
@@ -1005,7 +1008,6 @@ int32_t FormMgrService::StartAbility(const Want &want, const sptr<IRemoteObject>
     if (!CheckCallerIsSystemApp()) {
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
     }
-    
     // check abilityName to void implicit want.
     if (want.GetElement().GetAbilityName() == "") {
         HILOG_ERROR("error, AbilityName is empty");
@@ -1089,7 +1091,9 @@ void FormMgrService::DumpInit()
     dumpFuncMap_[DumpKey::KEY_DUMP_BY_BUNDLE_NAME] = &FormMgrService::HiDumpFormInfoByBundleName;
     dumpFuncMap_[DumpKey::KEY_DUMP_BY_FORM_ID] = &FormMgrService::HiDumpFormInfoByFormId;
     dumpFuncMap_[DumpKey::KEY_DUMP_RUNNING] = &FormMgrService::HiDumpFormRunningFormInfos;
+    dumpFuncMap_[DumpKey::KEY_DUMP_BLOCKED_APPS] = &FormMgrService::HiDumpFormBlockedApps;
 }
+
 
 int FormMgrService::Dump(int fd, const std::vector<std::u16string> &args)
 {
@@ -1258,6 +1262,14 @@ void FormMgrService::HiDumpHasFormVisible(const std::string &args, std::string &
         result = "error:request bundle info like bundleName_userId_instIndex.";
     }
     FormMgrAdapter::GetInstance().DumpHasFormVisible(args, result);
+}
+
+void FormMgrService::HiDumpFormBlockedApps([[maybe_unused]] const std::string &args, std::string &result)
+{
+    if (!CheckCallerIsSystemApp()) {
+        return;
+    }
+    FormTrustMgr::GetInstance().GetUntrustAppNameList(result);
 }
 
 void FormMgrService::HiDumpFormInfoByFormId(const std::string &args, std::string &result)

@@ -14,19 +14,18 @@
  */
 
 #include "form_render_record.h"
-#include <cstdio.h>
-#include <string>
-#include <unistd.h>
 
+#include <chrono>
+#include <cstdio>
 #include <iostream>
+#include <securec.h>
 #include <string>
 #include <thread>
 #include <unistd.h>
-#include <securec.h>
-#include <chrono>
 #include <utility>
-#include "dfx_dump_catcher.h"
+
 #include "backtrace_local.h"
+#include "dfx_dump_catcher.h"
 #include "ecmascript/napi/include/jsnapi.h"
 #include "extractor.h"
 #include "fms_log_wrapper.h"
@@ -34,8 +33,9 @@
 #include "form_memory_guard.h"
 #include "form_module_checker.h"
 #include "form_render_impl.h"
-#include "xcollie/watchdog.h"
 #include "hisysevent.h"
+#include "xcollie/watchdog.h"
+
 using namespace OHOS::AAFwk::GlobalConfigurationKey;
 
 namespace OHOS {
@@ -49,8 +49,7 @@ constexpr int32_t CHECK_THREAD_TIME = 3;
 constexpr char FORM_RENDERER_COMP_ID[] = "ohos.extra.param.key.form_comp_id";
 constexpr const char *EVENT_KEY_FORM_BLOCK_CALLSTACK = "EVENT_KEY_FORM_BLOCK_CALLSTACK";
 constexpr const char *EVENT_KEY_FORM_BLOCK_APPNAME = "EVENT_KEY_FORM_BLOCK_APPNAME";
-static constexpr char FORM_MANAGERTEST[] = "FORM_MANAGER";
-constexpr int32_t  CALLSTACKBUFSIZE = 10 * 1024;
+constexpr char FORM_MANAGER[] = "FORM_MANAGER";
 namespace {
 uint64_t GetCurrentTickMillseconds()
 {
@@ -221,16 +220,17 @@ bool FormRenderRecord::CreateEventHandler(const std::string &bundleName, bool ne
 
     if (needMonitored && !hasMonitor_) {
         std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
-            auto task = [thisWeakPtr]() {
+        auto task = [thisWeakPtr]() {
             auto renderRecord = thisWeakPtr.lock();
             if (renderRecord == nullptr) {
                 HILOG_ERROR("renderRecord is nullptr.");
                 return;
             }
-            renderRecord->jsThreadId_ = gettid();
-            HILOG_ERROR("YYH4 get  renderRecord->jsThreadId_ %{public}d", renderRecord->jsThreadId_);
+            renderRecord->jsThreadId_ = getproctid();
+            renderRecord->processId_ = getprocpid();
+            HILOG_INFO("Get thread %{public}d and psid %{public}d", renderRecord->jsThreadId_, renderRecord->processId_);
         };
-        eventHandler_->PostTask(task, "GotJSThreadId");
+        eventHandler_->PostHighPriorityTask(task, "GotJSThreadId");
 
         hasMonitor_.store(true);
         AddWatchDogThreadMonitor();
@@ -259,14 +259,18 @@ void FormRenderRecord::Timer()
     TaskState taskState = RunTask();
     if (taskState == TaskState::BLOCK) {
         HILOG_ERROR("FRS block happened when bundleName is %{public}s", bundleName_.c_str());
-        OHOS::DelayedSingleton<FormRenderImpl>::GetInstance()->OnRenderingBlock(bundleName_);
+        OHOS::HiviewDFX::DfxDumpCatcher dumplog;
+        std::string traceStr;
+        bool ret = dumplog.DumpCatch(processId_, jsThreadId_, traceStr);
+        if (ret) {
+            HILOG_INFO("Print block form's process id %{public}d and thread %{public}d call stack %{public}s .",
+                processId_, jsThreadId_, traceStr.c_str());
+        }
 
-        std::string trace;
-        HiviewDFX::GetBacktraceStringByTid(trace, jsThreadId_, 0, 0, CALLSTACKBUFSIZE);
-        HILOG_INFO("YYH test call stack is %{public}s .", trace.c_str());
-        HiSysEventWrite(FORM_MANAGERTEST, "FORM_RENDER_BLOCK", OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
-            EVENT_KEY_FORM_BLOCK_CALLSTACK, trace,
+        HiSysEventWrite(FORM_MANAGER, "FORM_RENDER_BLOCK", OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
+            EVENT_KEY_FORM_BLOCK_CALLSTACK, traceStr,
             EVENT_KEY_FORM_BLOCK_APPNAME, bundleName_);
+        OHOS::DelayedSingleton<FormRenderImpl>::GetInstance()->OnRenderingBlock(bundleName_);
     }
 }
 

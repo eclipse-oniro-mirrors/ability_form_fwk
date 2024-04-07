@@ -25,7 +25,6 @@ config("formmgr_config") {
     "services/config",
     "services/include",
     "//third_party/json/include",
-    "//base/hiviewdfx/faultloggerd/interfaces/innerkits/dump_catcher/include/",
   ]
 }
 
@@ -38,7 +37,6 @@ ohos_shared_library("libfms") {
     "${ability_runtime_native_path}/appkit/ability_runtime",
     "${form_fwk_napi_path}/form_host/form_state_observer/include",
     "${init_path}/interfaces/innerkits/include/syspara/",
-    "//base/hiviewdfx/faultloggerd/interfaces/innerkits/dump_catcher/include/",
   ]
 
   sources = [
@@ -124,8 +122,6 @@ ohos_shared_library("libfms") {
     "ability_base:zuri",
     "ability_runtime:ability_deps_wrapper",
     "ability_runtime:ability_manager",
-    "faultloggerd:libbacktrace_local",
-    "faultloggerd:libdfx_dumpcatcher",
     "ability_runtime:app_manager",
     "ability_runtime:wantagent_innerkits",
     "access_token:libaccesstoken_sdk",
@@ -138,6 +134,8 @@ ohos_shared_library("libfms") {
     "data_share:datashare_common",
     "data_share:datashare_consumer",
     "eventhandler:libeventhandler",
+    "faultloggerd:libbacktrace_local",
+    "faultloggerd:libdfx_dumpcatcher",
     "ffrt:libffrt",
     "hicollie:libhicollie",
     "hilog:libhilog",
@@ -195,7 +193,6 @@ config("fmskit_public_config") {
     "${ability_runtime_path}/services/common/include",
     "${form_fwk_path}/interfaces/inner_api/include",
     "${bundlefwk_inner_api_path}/appexecfwk_base/include",
-    "//base/hiviewdfx/faultloggerd/interfaces/innerkits/dump_catcher/include/",
   ]
 }
 
@@ -224,8 +221,6 @@ ohos_shared_library("fmskit_native") {
     "ability_runtime:abilitykit_native",
     "c_utils:utils",
     "eventhandler:libeventhandler",
-    "faultloggerd:libbacktrace_local",
-    "faultloggerd:libdfx_dumpcatcher",
     "hilog:libhilog",
     "hitrace:hitrace_meter",
     "ipc:ipc_core",
@@ -249,7 +244,6 @@ config("formmgr_sdk_config") {
     "${ability_runtime_innerapi_path}/ability_manager/include",
     "${ability_runtime_innerapi_path}/app_manager/include/appmgr",
     "${ability_runtime_path}/services/common/include",
-    "//base/hiviewdfx/faultloggerd/interfaces/innerkits/dump_catcher/include/",
   ]
   cflags = []
   if (target_cpu == "arm") {
@@ -258,9 +252,7 @@ config("formmgr_sdk_config") {
 }
 
 ohos_shared_library("form_manager") {
-  include_dirs = [ "${ability_runtime_innerapi_path}/runtime/include",
-       "//base/hiviewdfx/faultloggerd/interfaces/innerkits/dump_catcher/include/",
-   ]
+  include_dirs = [ "${ability_runtime_innerapi_path}/runtime/include" ]
 
   sources = [
     "interfaces/inner_api/src/form_ashmem.cpp",
@@ -306,8 +298,6 @@ ohos_shared_library("form_manager") {
     "ability_base:want",
     "bundle_framework:appexecfwk_base",
     "c_utils:utils",
-    "faultloggerd:libbacktrace_local",
-    "faultloggerd:libdfx_dumpcatcher",
     "hilog:libhilog",
     "ipc:ipc_core",
     "napi:ace_napi",
