@@ -76,8 +76,7 @@ public:
     ErrCode RecycleForms(const std::vector<int64_t> &formIds, const Want &want,
         const sptr<IRemoteObject> &remoteObjectOfHost);
 
-    ErrCode RecoverForms(const std::vector<int64_t> &formIds, const std::string &bundleName,
-        const WantParams &wantParams);
+    ErrCode RecoverForms(const std::vector<int64_t> &formIds, const WantParams &wantParams);
 
 private:
     ErrCode ConnectRenderService(const sptr<FormRenderConnection> &connection, int32_t level) const;

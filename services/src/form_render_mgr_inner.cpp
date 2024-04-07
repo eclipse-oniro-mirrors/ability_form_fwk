@@ -614,14 +614,9 @@ ErrCode FormRenderMgrInner::RecycleForms(
     return ERR_OK;
 }
 
-ErrCode FormRenderMgrInner::RecoverForms(
-    const std::vector<int64_t> &formIds, const std::string &bundleName, const WantParams &wantParams)
+ErrCode FormRenderMgrInner::RecoverForms(const std::vector<int64_t> &formIds, const WantParams &wantParams)
 {
     HILOG_DEBUG("called.");
-    if (bundleName.empty()) {
-        HILOG_ERROR("bundleName is empty.");
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
-    }
     if (renderRemoteObj_ == nullptr) {
         HILOG_ERROR("renderRemoteObj_ is nullptr");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -632,10 +627,16 @@ ErrCode FormRenderMgrInner::RecoverForms(
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    std::string uid = std::to_string(FormUtil::GetCurrentAccountId()) + bundleName;
     for (const int64_t &formId : formIds) {
         Want want;
         want.SetParams(wantParams);
+
+        FormRecord formRecord;
+        if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
+            HILOG_ERROR("form record %{public}" PRId64 " not exist", formId);
+            continue;
+        }
+        std::string uid = std::to_string(FormUtil::GetCurrentAccountId()) + formRecord.bundleName;
         want.SetParam(Constants::FORM_SUPPLY_UID, uid);
 
         std::lock_guard<std::mutex> lock(resourceMutex_);
