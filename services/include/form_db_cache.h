@@ -24,7 +24,6 @@
 #include "form_id_key.h"
 #include "form_record.h"
 #include "form_info_rdb_storage_mgr.h"
-#include "form_info_config_update_filter.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -157,14 +156,6 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode UpdateFormLocation(const int64_t formId, const int32_t formLocation);
-
-    /**
-     * @brief Set formInfoUpdateFlags with formId.
-     * @param formId The Id of the form to update.
-     * @param configUpdateFilter The formInfoUpdateFilter.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    ErrCode SetFormConfigUpdateFlags(const int64_t formId, const FormInfoConfigUpdateFilter &configUpdateFilter);
 private:
     /**
      * @brief Save or update form data to DbCache and DB.

@@ -974,7 +974,7 @@ int FormMgr::GetFormsInfoByModule(std::string &bundleName, std::string &moduleNa
 
     int resultCode = remoteProxy_->GetFormsInfoByModule(bundleName, moduleName, formInfos);
     if (resultCode != ERR_OK) {
-        HILOG_ERROR("failed to GetFormsInfoByModule, error code is %{public}d.", resultCode);
+        HILOG_ERROR("failed to GetFormsInfoByApp, error code is %{public}d.", resultCode);
     }
     return resultCode;
 }
@@ -1414,25 +1414,6 @@ ErrCode FormMgr::UpdateFormLocation(const int64_t &formId, const int32_t &formLo
     ErrCode resultCode = remoteProxy_->UpdateFormLocation(formId, formLocation);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("failed to UpdateFormLocation, error code is %{public}d.", resultCode);
-    }
-    return resultCode;
-}
-
-ErrCode FormMgr::SetFormConfigUpdateFlags(const int64_t formId, const FormInfoConfigUpdateFilter &configUpdateFilter)
-{
-    if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
-        HILOG_ERROR("form is in recover status, can't do action on form.");
-        return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
-    }
-
-    ErrCode errCode = Connect();
-    if (errCode != ERR_OK) {
-        return errCode;
-    }
-    
-    ErrCode resultCode = remoteProxy_->SetFormConfigUpdateFlags(formId, configUpdateFilter);
-    if (resultCode != ERR_OK) {
-        HILOG_ERROR("failed to setFormConfigUpdateFlags, error code is %{public}d.", resultCode);
     }
     return resultCode;
 }

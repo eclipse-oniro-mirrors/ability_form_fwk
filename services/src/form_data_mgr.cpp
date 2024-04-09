@@ -2458,20 +2458,5 @@ ErrCode FormDataMgr::UpdateFormLocation(const int64_t &formId, const int32_t &fo
     return ERR_OK;
 }
 
-ErrCode FormDataMgr::SetFormConfigUpdateFlags(const int64_t formId,
-    const FormInfoConfigUpdateFilter &configUpdateFilter)
-{
-    std::lock_guard<std::mutex> lock(formRecordMutex_);
-    auto info = formRecords_.find(formId);
-    if (info == formRecords_.end()) {
-        HILOG_INFO("form info not find, formId = %{public}" PRId64 " configUpdateFilter", formId);
-        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
-    }
-    info->second.fontResizeEnable = configUpdateFilter.fontEnabled;
-    HILOG_INFO("update form fontEnabled successfully, formId = %{public}" PRId64 " fontEnabled = %{public}s",
-        formId, configUpdateFilter.fontEnabled ? "true" : "false");
-    return ERR_OK;
-}
-
 }  // namespace AppExecFwk
 }  // namespace OHOS

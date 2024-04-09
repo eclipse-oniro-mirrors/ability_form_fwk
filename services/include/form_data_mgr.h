@@ -28,7 +28,6 @@
 #include "form_host_record.h"
 #include "form_id_key.h"
 #include "form_info.h"
-#include "form_info_config_update_filter.h"
 #include "form_instance.h"
 #include "form_instances_filter.h"
 #include "form_item_info.h"
@@ -707,14 +706,6 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode UpdateFormLocation(const int64_t &formId, const int32_t &formLocation);
-
-    /**
-     * @brief Set formInfoUpdateFlags with formId.
-     * @param formId The Id of the form to update.
-     * @param configUpdateFilter The formInfoUpdateFilter.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    ErrCode SetFormConfigUpdateFlags(const int64_t formId, const FormInfoConfigUpdateFilter &configUpdateFilter);
 private:
     /**
      * @brief Create form record.
