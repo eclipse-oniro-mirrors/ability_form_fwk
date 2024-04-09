@@ -2235,7 +2235,7 @@ ErrCode FormMgrAdapter::AddRequestPublishForm(const FormItemInfo &formItemInfo, 
     }
     std::vector<FormDataProxy> formDataProxies;
     if (FormDataProxyMgr::GetInstance().ConsumeFormDataProxies(formId, formDataProxies)) {
-        FormDataProxyMgr::GetInstance().SubscribeFormData(formId, formDataProxies);
+        FormDataProxyMgr::GetInstance().SubscribeFormData(formId, formDataProxies, want);
     }
     // start update timer
     return AddFormTimer(formRecord);

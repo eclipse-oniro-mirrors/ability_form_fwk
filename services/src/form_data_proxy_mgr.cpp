@@ -30,7 +30,8 @@ FormDataProxyMgr::FormDataProxyMgr()
 FormDataProxyMgr::~FormDataProxyMgr()
 {}
 
-ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<FormDataProxy> &formDataProxies)
+ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<FormDataProxy> &formDataProxies,
+    const AAFwk::Want &want)
 {
     HILOG_DEBUG("subscribe form data. formId: %{public}s, proxy data size: %{public}zu",
         std::to_string(formId).c_str(), formDataProxies.size());
@@ -67,6 +68,7 @@ ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<Fo
     }
     std::shared_ptr<FormDataProxyRecord> formDataProxyRecord = std::make_shared<FormDataProxyRecord>(formId,
         formRecord.bundleName, formRecord.uiSyntax, appInfo.accessTokenId, formRecord.uid);
+    formDataProxyRecord->SetWant(want);
     auto ret = formDataProxyRecord->SubscribeFormData(formDataProxies);
     if (ret != ERR_OK) {
         HILOG_ERROR("SubscribeFormData failed.");

@@ -27,6 +27,7 @@
 #include "form_info_base.h"
 #include "nlohmann/json.hpp"
 #include "perm_state_change_callback_customize.h"
+#include "want.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -49,6 +50,7 @@ public:
     void GetFormSubscribeInfo(std::vector<std::string> &subscribedKeys, int32_t &count);
     void UnRegisterPermissionListener();
     void PermStateChangeCallback(const int32_t permStateChangeType, const std::string permissionName);
+    void SetWant(const AAFwk::Want &want);
 private:
     struct FormDataProxyRequest {
         int64_t subscribeId;
@@ -101,6 +103,7 @@ private:
         SubscribeMap &publicSubscribeMap);
     void GetSubscribeFormDataProxies(const FormDataProxy formdataProxy,
         std::vector<FormDataProxy> &subscribeFormDataProxies, std::vector<FormDataProxy> &unsubscribeFormDataProxies);
+    ErrCode ConnectAmsForRefreshPermission(const std::string &permissionName, bool isAuthorized);
 
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper_;
     std::shared_ptr<Security::AccessToken::PermStateChangeCallbackCustomize> callbackPtr_;
@@ -109,6 +112,7 @@ private:
     FormType uiSyntax_;
     int32_t tokenId_;
     int32_t uid_;
+    AAFwk::Want wantCache_;
     SubscribeMap rdbSubscribeMap_;
     SubscribeMap publishSubscribeMap_;
     std::map<std::string, std::map<int64_t, SubscribeResultRecord>> rdbSubscribeResultMap_;

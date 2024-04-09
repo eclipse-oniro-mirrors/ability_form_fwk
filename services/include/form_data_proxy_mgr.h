@@ -32,7 +32,8 @@ class FormDataProxyMgr final : public DelayedRefSingleton<FormDataProxyMgr> {
 public:
     DISALLOW_COPY_AND_MOVE(FormDataProxyMgr);
 
-    ErrCode SubscribeFormData(int64_t formId, const std::vector<FormDataProxy> &formDataProxies);
+    ErrCode SubscribeFormData(int64_t formId, const std::vector<FormDataProxy> &formDataProxies,
+        const AAFwk::Want &want);
     ErrCode UnsubscribeFormData(int64_t formId);
     void UpdateSubscribeFormData(int64_t formId, const std::vector<FormDataProxy> &formDataProxies);
     void ProduceFormDataProxies(int64_t formId, const std::vector<FormDataProxy> &formDataProxies);

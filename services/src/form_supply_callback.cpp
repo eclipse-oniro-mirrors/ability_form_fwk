@@ -83,7 +83,7 @@ int FormSupplyCallback::OnAcquire(const FormProviderInfo &formProviderInfo, cons
     if (FormRenderMgr::GetInstance().IsNeedRender(formId)) {
         errCode = FormRenderMgr::GetInstance().UpdateRenderingForm(formId, formProviderInfo.GetFormData(),
             want.GetParams(), false);
-        FormDataProxyMgr::GetInstance().SubscribeFormData(formId, formProviderInfo.GetFormProxies());
+        FormDataProxyMgr::GetInstance().SubscribeFormData(formId, formProviderInfo.GetFormProxies(), want);
         return errCode;
     }
 
@@ -102,7 +102,7 @@ int FormSupplyCallback::OnAcquire(const FormProviderInfo &formProviderInfo, cons
             HILOG_WARN("%{public}s warning, onAcquired type: %{public}d", __func__, type);
     }
 
-    FormDataProxyMgr::GetInstance().SubscribeFormData(formId, formProviderInfo.GetFormProxies());
+    FormDataProxyMgr::GetInstance().SubscribeFormData(formId, formProviderInfo.GetFormProxies(), want);
     HILOG_INFO("%{public}s end.", __func__);
     return ret;
 }

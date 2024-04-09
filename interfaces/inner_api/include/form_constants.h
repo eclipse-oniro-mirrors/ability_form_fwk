@@ -260,6 +260,10 @@ namespace Constants {
     constexpr const char* PARAM_FORM_MIGRATE_FORM_KEY = "ohos.extra.param.key.migrate_form";
     // For click message event
     constexpr const char* KEY_DIRECT_CALL_INAPP = "directCallInApp";
+    // Is the user granted
+    constexpr const char* FORM_PERMISSION_GRANTED_KEY = "ohos.extra.param.key.permission_granted";
+    // User permission name
+    constexpr const char* FORM_PERMISSION_NAME_KEY = "ohos.extra.param.key.permission_name";
 }  // namespace Constants
 }  // namespace AppExecFwk
 }  // namespace OHOS

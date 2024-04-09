@@ -20,10 +20,13 @@
 #include <vector>
 
 #include "fms_log_wrapper.h"
+#include "form_ams_helper.h"
 #include "form_bms_helper.h"
 #include "form_data_mgr.h"
 #include "form_mgr_adapter.h"
 #include "form_mgr_errors.h"
+#include "form_record.h"
+#include "form_refresh_connection.h"
 #include "form_util.h"
 #include "ipc_skeleton.h"
 #include "accesstoken_kit.h"
@@ -55,6 +58,8 @@ class PermissionCustomizeListener : public Security::AccessToken::PermStateChang
 
 void FormDataProxyRecord::PermStateChangeCallback(const int32_t permStateChangeType, const std::string permissionName)
 {
+    HILOG_DEBUG("Permission has been changed, form id: %{public}" PRId64 ", permission name: %{public}s.", formId_,
+        permissionName.c_str());
     auto search = formDataPermissionProxyMap_.find(permissionName);
     if (search == formDataPermissionProxyMap_.end()) {
         HILOG_ERROR("no permission data proxy, permissionName : %{public}s", permissionName.c_str());
@@ -66,9 +71,15 @@ void FormDataProxyRecord::PermStateChangeCallback(const int32_t permStateChangeT
     for (const auto &formDataProxy : formDataProxies) {
         GetSubscribeFormDataProxies(formDataProxy, subscribeFormDataProxies, unSubscribeFormDataProxies);
     }
+
+    bool isAuthorized = permStateChangeType == PERMISSION_GRANTED_OPER;
+    if (ConnectAmsForRefreshPermission(permissionName, isAuthorized) != ERR_OK) {
+        HILOG_ERROR("connection provider failed to refresh permissions, isAuthorized: %{public}d", isAuthorized);
+        return;
+    }
     SubscribeMap rdbSubscribeMap;
     SubscribeMap publishSubscribeMap;
-    if (permStateChangeType == PERMISSION_GRANTED_OPER) {
+    if (isAuthorized) {
         if (!subscribeFormDataProxies.empty()) {
             SubscribeFormData(subscribeFormDataProxies, rdbSubscribeMap, publishSubscribeMap);
         }
@@ -78,6 +89,54 @@ void FormDataProxyRecord::PermStateChangeCallback(const int32_t permStateChangeT
             UnsubscribeFormData(rdbSubscribeMap, publishSubscribeMap);
         }
     }
+}
+
+void FormDataProxyRecord::SetWant(const AAFwk::Want &want)
+{
+    wantCache_ = want;
+}
+
+ErrCode FormDataProxyRecord::ConnectAmsForRefreshPermission(const std::string &permissionName, bool isAuthorized)
+{
+    HILOG_DEBUG(
+        "start connect provider form id: %{public}" PRId64 ", user permission: %{public}s, is authorized: %{public}d",
+        formId_, permissionName.c_str(), isAuthorized);
+    FormRecord record;
+    bool result = FormDataMgr::GetInstance().GetFormRecord(formId_, record);
+    if (!result) {
+        HILOG_ERROR("get form record fail, not exist such form:%{public}" PRId64 "", formId_);
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    }
+    Want newWant(wantCache_);
+    newWant.RemoveParam(Constants::KEY_IS_TIMER);
+    newWant.RemoveParam(Constants::KEY_TIMER_REFRESH);
+
+    newWant.SetParam(Constants::FORM_PERMISSION_NAME_KEY, permissionName);
+    newWant.SetParam(Constants::FORM_PERMISSION_GRANTED_KEY, isAuthorized);
+
+    sptr<IAbilityConnection> formRefreshConnection = new (std::nothrow) FormRefreshConnection(formId_, newWant,
+        record.bundleName, record.abilityName, record.needFreeInstall);
+    if (formRefreshConnection == nullptr) {
+        HILOG_ERROR("failed to create FormRefreshConnection.");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
+    Want connectWant;
+    connectWant.AddFlags(Want::FLAG_ABILITY_FORM_ENABLED);
+    connectWant.SetElementName(record.bundleName, record.abilityName);
+
+    if (record.needFreeInstall) {
+        connectWant.AddFlags(Want::FLAG_INSTALL_ON_DEMAND | Want::FLAG_INSTALL_WITH_BACKGROUND_MODE);
+        connectWant.SetModuleName(record.moduleName);
+    }
+
+    ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbility(connectWant, formRefreshConnection);
+    if (errorCode != ERR_OK) {
+        HILOG_ERROR("ConnectServiceAbility failed.");
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+    }
+
+    return ERR_OK;
 }
 
 void FormDataProxyRecord::GetSubscribeFormDataProxies(const FormDataProxy formDataProxy,
