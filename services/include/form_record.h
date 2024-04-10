@@ -78,7 +78,6 @@ public:
     bool isNeedNotify = true;
     RecycleStatus recycleStatus = RecycleStatus::NON_RECYCLABLE;
     Constants::FormLocation formLocation;
-    bool fontResizeEnable = true;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

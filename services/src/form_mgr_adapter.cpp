@@ -3787,47 +3787,5 @@ ErrCode FormMgrAdapter::UpdateFormLocation(const int64_t &formId, const int32_t 
     return ERR_OK;
 }
 
-ErrCode FormMgrAdapter::SetFormConfigUpdateFlags(const int64_t formId,
-    const FormInfoConfigUpdateFilter &configUpdateFilter)
-{
-    if (formId <= 0) {
-        HILOG_ERROR("%{public}s formId is invalid", __func__);
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
-    }
-    // find matched formId
-    int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
-    // check exist and get the formRecord
-    FormRecord formRecord;
-    if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, formRecord)) {
-        HILOG_ERROR("error, not exist such form, formId = %{public}" PRId64 " configUpdateFilter = %{public}s",
-            formId, configUpdateFilter.fontEnabled ? "true" : "false");
-        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
-    }
-
-    int32_t callingUid = IPCSkeleton::GetCallingUid();
-    int32_t userId = GetCurrentUserId(callingUid);
-    HILOG_DEBUG("%{public}s, userId:%{public}d, callingUid:%{public}d.", __func__, userId, callingUid);
-    if (userId != formRecord.providerUserId) {
-        HILOG_ERROR("%{public}s, not self form:%{public}" PRId64 "", __func__, formId);
-        return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
-    }
-
-    std::string bundleName;
-    auto ret = FormBmsHelper::GetInstance().GetCallerBundleName(bundleName);
-    if (ret != ERR_OK) {
-        HILOG_ERROR("%{public}s failed to get BundleName", __func__);
-        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
-    }
-    if (bundleName != formRecord.bundleName) {
-        HILOG_ERROR("%{public}s, not match bundleName:%{public}s", __func__, bundleName.c_str());
-        return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
-    }
-
-    FormDataMgr::GetInstance().SetFormConfigUpdateFlags(matchedFormId, configUpdateFilter);
-    if (!formRecord.formTempFlag) {
-        return FormDbCache::GetInstance().SetFormConfigUpdateFlags(matchedFormId, configUpdateFilter);
-    }
-    return ERR_OK;
-}
 } // namespace AppExecFwk
 } // namespace OHOS

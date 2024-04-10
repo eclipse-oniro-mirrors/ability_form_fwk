@@ -1139,7 +1139,7 @@ int FormMgrProxy::GetFormsInfoByApp(std::string &bundleName, std::vector<FormInf
 
     int error = GetFormsInfo(IFormMgr::Message::FORM_MGR_GET_FORMS_INFO_BY_APP, data, formInfos);
     if (error != ERR_OK) {
-        HILOG_ERROR("%{public}s, failed to GetFormsInfoByApp: %{public}d", __func__, error);
+        HILOG_ERROR("%{public}s, failed to GetAllFormsInfo: %{public}d", __func__, error);
     }
 
     return error;
@@ -1173,7 +1173,7 @@ int FormMgrProxy::GetFormsInfoByModule(std::string &bundleName, std::string &mod
 
     int error = GetFormsInfo(IFormMgr::Message::FORM_MGR_GET_FORMS_INFO_BY_MODULE, data, formInfos);
     if (error != ERR_OK) {
-        HILOG_ERROR("%{public}s, failed to GetFormsInfoByModule: %{public}d", __func__, error);
+        HILOG_ERROR("%{public}s, failed to GetAllFormsInfo: %{public}d", __func__, error);
     }
 
     return error;
@@ -2144,33 +2144,6 @@ ErrCode FormMgrProxy::UpdateFormLocation(const int64_t &formId, const int32_t &f
     MessageParcel reply;
     MessageOption option(MessageOption::TF_SYNC);
     int32_t error = SendTransactCmd(IFormMgr::Message::FORM_MGR_UPDATE_FORM_LOCATION, data, reply, option);
-    if (error != ERR_OK) {
-        HILOG_ERROR("failed to SendTransactCmd: %{public}d.", error);
-        return error;
-    }
-    return reply.ReadInt32();
-}
-
-ErrCode FormMgrProxy::SetFormConfigUpdateFlags(const int64_t formId,
-    const FormInfoConfigUpdateFilter &configUpdateFilter)
-{
-    HILOG_DEBUG("start.");
-    MessageParcel data;
-    if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("failed to write interface token");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    if (!data.WriteInt64(formId)) {
-        HILOG_ERROR("%{public}s, failed to write formId", __func__);
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    if (!data.WriteParcelable(&configUpdateFilter)) {
-        HILOG_ERROR("failed to write configUpdateFilter");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    MessageParcel reply;
-    MessageOption option(MessageOption::TF_SYNC);
-    int32_t error = SendTransactCmd(IFormMgr::Message::FORM_MGR_SET_CONFIG_UPDATE_ENABLE, data, reply, option);
     if (error != ERR_OK) {
         HILOG_ERROR("failed to SendTransactCmd: %{public}d.", error);
         return error;
