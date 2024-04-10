@@ -13,27 +13,29 @@
  * limitations under the License.
  */
 
+import type rpc from '@ohos.rpc';
 import ServiceExtensionAbility from '@ohos.app.ability.ServiceExtensionAbility';
+import Want from '@ohos.app.ability.Want';
 
 export default class ServiceExtension extends ServiceExtensionAbility {
-  onCreate(want) {
+  onCreate(want: Want): void {
     console.log('[FormRender] onCreate');
   }
 
-  onRequest(want, startId) {
+  onRequest(want: Want, startId: number): void {
     console.log('[FormRender] onRequest');
   }
 
-  onConnect(want) {
+  onConnect(want: Want): rpc.RemoteObject | Promise<rpc.RemoteObject> {
     console.log('[FormRender] onConnect');
     return undefined;
   }
 
-  onDisconnect(want) {
+  onDisconnect(want: Want): void | Promise<void> {
     console.log('[FormRender] onDisconnect');
   }
 
-  onDestroy() {
+  onDestroy(): void {
     console.log('[FormRender] onDestroy');
   }
 }
