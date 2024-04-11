@@ -327,7 +327,7 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
     }
 
     if (hostRemoteObj == nullptr) {
-        HILOG_ERROR("hostRemoteObj is nullptr");
+        HILOG_WARN("hostRemoteObj is nullptr");
         return RENDER_FORM_FAILED;
     }
     std::lock_guard<std::mutex> lock(hostsMapMutex_);

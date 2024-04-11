@@ -974,7 +974,7 @@ int FormMgr::GetFormsInfoByModule(std::string &bundleName, std::string &moduleNa
 
     int resultCode = remoteProxy_->GetFormsInfoByModule(bundleName, moduleName, formInfos);
     if (resultCode != ERR_OK) {
-        HILOG_ERROR("failed to GetFormsInfoByApp, error code is %{public}d.", resultCode);
+        HILOG_ERROR("failed to GetFormsInfoByModule, error code is %{public}d.", resultCode);
     }
     return resultCode;
 }
