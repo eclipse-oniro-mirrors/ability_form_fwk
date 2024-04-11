@@ -1284,6 +1284,22 @@ private:
                 filter.supportDimensions.emplace_back(dimensions[i]);
             }
         }
+
+        napi_value jsShapeValue = GetPropertyValueByPropertyName(env, argv[PARAM0], "supportedShapes", napi_object);
+        if (jsValue != nullptr) {
+            std::vector<int32_t> shapes;
+            UnwrapArrayInt32FromJS(env, jsShapeValue, shapes);
+            for (size_t i = 0; i < shapes.size(); ++i) {
+                if (shapes[i] < 0) {
+                    HILOG_ERROR("shapes value should not be negative");
+                    NapiFormUtil::ThrowParamError(env, "shapes value should not be negative");
+                    return CreateJsUndefined(env);
+                }
+                HILOG_ERROR("LLTest shapes %{public}d", shapes[i]);
+                filter.supportShapes.emplace_back(shapes[i]);
+            }
+        }
+
         UnwrapStringByPropertyName(env, argv[PARAM0], "moduleName", filter.moduleName);
         UnwrapStringByPropertyName(env, argv[PARAM0], "bundleName", filter.bundleName);
 
