@@ -1178,20 +1178,22 @@ private:
             return CreateJsUndefined(env);
         }
 
-        auto complete = [](napi_env env, NapiAsyncTask &task, int32_t status) {
-            std::vector<FormInfo> formInfos;
-            auto ret = FormMgr::GetInstance().GetAllFormsInfo(formInfos);
-            if (ret != ERR_OK) {
-                task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
+        auto errCodeVal = std::make_shared<int32_t>(0);
+        auto formInfoList = std::make_shared<std::vector<FormInfo>>();
+        NapiAsyncTask::ExecuteCallback execute = [formInfos = formInfoList, errCode = errCodeVal]() {
+            if (formInfos == nullptr || errCode == nullptr) {
+                HILOG_ERROR("The param is invalid.");
                 return;
             }
-            task.ResolveWithNoError(env, CreateFormInfos(env, formInfos));
+            *errCode = FormMgr::GetInstance().GetAllFormsInfo(*formInfos);
         };
+
+        NapiAsyncTask::CompleteCallback complete = CreateFormInfosCompleteCallback(errCodeVal, formInfoList);
 
         auto callback = (argc == ARGS_ZERO) ? nullptr : argv[PARAM0];
         napi_value result = nullptr;
         NapiAsyncTask::ScheduleWithDefaultQos("JsFormHost::OnGetAllFormsInfo",
-            env, CreateAsyncTaskWithLastParam(env, callback, nullptr, std::move(complete), &result));
+            env, CreateAsyncTaskWithLastParam(env, callback, std::move(execute), std::move(complete), &result));
         return result;
     }
 
@@ -1222,30 +1224,48 @@ private:
             }
             convertArgc++;
         }
-
-        auto complete = [bName, mName, convertArgc](napi_env env, NapiAsyncTask &task, int32_t status) {
-            std::string bundleName(bName);
-            std::string moduleName(mName);
-            std::vector<FormInfo> formInfos;
-            int ret = ERR_OK;
-            if (convertArgc == ARGS_ONE) {
-                ret = FormMgr::GetInstance().GetFormsInfoByApp(bundleName, formInfos);
-            } else {
-                ret = FormMgr::GetInstance().GetFormsInfoByModule(bundleName, moduleName, formInfos);
-            }
-
-            if (ret != ERR_OK) {
-                task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
+        
+        auto errCodeVal = std::make_shared<int32_t>(0);
+        auto formInfoList = std::make_shared<std::vector<FormInfo>>();
+        NapiAsyncTask::ExecuteCallback execute = [bName, mName, convertArgc, formInfos = formInfoList,
+            errCode = errCodeVal]() {
+            if (formInfos == nullptr || errCode == nullptr) {
+                HILOG_ERROR("The param is invalid.");
                 return;
             }
-            task.ResolveWithNoError(env, CreateFormInfos(env, formInfos));
+            std::string bundleName(bName);
+            std::string moduleName(mName);
+            if (convertArgc == ARGS_ONE) {
+                *errCode = FormMgr::GetInstance().GetFormsInfoByApp(bundleName, *formInfos);
+            } else {
+                *errCode = FormMgr::GetInstance().GetFormsInfoByModule(bundleName, moduleName, *formInfos);
+            }
         };
 
+        NapiAsyncTask::CompleteCallback complete = CreateFormInfosCompleteCallback(errCodeVal, formInfoList);
         napi_value result = nullptr;
         napi_value lastParam = (argc <= convertArgc) ? nullptr : argv[convertArgc];
         NapiAsyncTask::ScheduleWithDefaultQos("JsFormHost::OnGetFormsInfo",
-            env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
+            env, CreateAsyncTaskWithLastParam(env, lastParam, std::move(execute), std::move(complete), &result));
         return result;
+    }
+
+    NapiAsyncTask::CompleteCallback CreateFormInfosCompleteCallback(std::shared_ptr<int32_t> errCodeVal,
+        std::shared_ptr<std::vector<FormInfo>> formInfoList)
+    {
+        return [errCode = errCodeVal, formInfos = formInfoList](
+            napi_env env, NapiAsyncTask &task, int32_t status) {
+            if (errCode == nullptr || formInfos == nullptr) {
+                HILOG_ERROR("The param is invalid.");
+                task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ERR_APPEXECFWK_FORM_COMMON_CODE));
+                return;
+            }
+            if (*errCode != ERR_OK) {
+                task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, *errCode));
+                return;
+            }
+            task.ResolveWithNoError(env, CreateFormInfos(env, *formInfos));
+        };
     }
 
     void InnerShareForm(napi_env env, const std::shared_ptr<AbilityRuntime::NapiAsyncTask> &asyncTask,
