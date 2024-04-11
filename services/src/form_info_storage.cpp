@@ -58,17 +58,16 @@ static bool find_match_dimensions(const std::vector<int32_t> &targetDimensions,
     return !results.empty();
 }
 
-static bool find_match_shapes(const std::vector<int32_t> &targetShapes,
-    const std::vector<int32_t> &supportShapes, std::vector<int32_t> &results)
+static bool find_match_shapes(const std::vector<int32_t> &targetShapes, const std::vector<int32_t> &supportShapes)
 {
     for (const auto &val : supportShapes) {
         auto it = std::find(targetShapes.begin(), targetShapes.end(), val);
         if (it != targetShapes.end()) {
             HILOG_ERROR("match shapes %{public}d", val);
-            results.emplace_back(val);
+            return true;
         }
     }
-    return !results.empty();
+    return false;
 }
 
 static bool find_rect_shape(const std::vector<int32_t> &supportShapes)
@@ -94,13 +93,12 @@ void FormInfoStorage::GetFormsInfoByFilter(int32_t userId,
             continue;
         }
 
-        if (filter.supportShapes.empty() && !find_rect_shape()) {
+        if (filter.supportShapes.empty() && !find_rect_shape(item.supportShapes)) {
             HILOG_ERROR("circle shape");
             continue;
         }
-        if (!filter.supportShapes.empty()
-            && !find_match_shapes(filter.supportedShapes, item.supportedShapes, results)) {
-            HILOG_ERROR("not match shape %{public}s ", item.name);
+        if (!filter.supportShapes.empty() && !find_match_shapes(filter.supportShapes, item.supportShapes)) {
+            HILOG_ERROR("not match shape %{public}s ", item.name.c_str());
             continue;
         }
         if (filter.supportDimensions.empty()) {
