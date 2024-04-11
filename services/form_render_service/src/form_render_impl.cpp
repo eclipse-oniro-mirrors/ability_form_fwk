@@ -25,6 +25,7 @@
 #include "form_util.h"
 #include "js_runtime.h"
 #include "service_extension.h"
+#include "form_memmgr_client.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -92,6 +93,9 @@ int32_t FormRenderImpl::RenderForm(const FormJsInfo &formJsInfo, const Want &wan
 
             record->SetConfiguration(configuration_);
             result = record->UpdateRenderRecord(formJsInfo, want, hostToken);
+            if (renderRecordMap_.empty()) {
+                FormMemmgrClient::GetInstance().SetCritical(true);
+            }
             renderRecordMap_.emplace(uid, record);
             FormRenderGCTask(uid);
         }
@@ -136,6 +140,9 @@ int32_t FormRenderImpl::StopRenderingForm(const FormJsInfo &formJsInfo, const Wa
         if (search->second->IsEmpty()) {
             renderRecordMap_.erase(search);
             HILOG_INFO("DeleteRenderRecord success, uid: %{public}s", uid.c_str());
+            if (renderRecordMap_.empty()) {
+                FormMemmgrClient::GetInstance().SetCritical(false);
+            }
         }
     }
 
@@ -194,6 +201,7 @@ int32_t FormRenderImpl::CleanFormHost(const sptr<IRemoteObject> &hostToken)
     }
     if (renderRecordMap_.empty()) {
         HILOG_INFO("renderRecordMap_ is empty, FormRenderService will exit later.");
+        FormMemmgrClient::GetInstance().SetCritical(false);
     }
     return ERR_OK;
 }
