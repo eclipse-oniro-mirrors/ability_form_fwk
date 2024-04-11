@@ -41,6 +41,11 @@ void FormInfoStorage::GetAllFormsInfo(int32_t userId, std::vector<AppExecFwk::Fo
     if (this->userId != userId && this->userId != AppExecFwk::Constants::DEFAULT_USERID) {
         return;
     }
+    /////////////////// to del
+    for (int32_t i = 0; i < item.supportShapes.size(); i++) {
+        HILOG_ERROR("LLTest item.shape %{public}d ", item.supportShapes[i]);
+    }
+    //////////////////////////
     for (const auto &item : this->formInfos) {
         formInfos.push_back(item);
     }
@@ -93,12 +98,18 @@ void FormInfoStorage::GetFormsInfoByFilter(int32_t userId,
             continue;
         }
 
+        /////////////////// to del
+        for (int32_t i = 0; i < item.supportShapes.size(); i++) {
+            HILOG_ERROR("LLTest item.shape %{public}d ", item.supportShapes[i]);
+        }
+        //////////////////////////
+        
         if (filter.supportShapes.empty() && !find_rect_shape(item.supportShapes)) {
-            HILOG_ERROR("circle shape");
+            HILOG_ERROR("LLTest circle shape");
             continue;
         }
         if (!filter.supportShapes.empty() && !find_match_shapes(filter.supportShapes, item.supportShapes)) {
-            HILOG_ERROR("not match shape %{public}s ", item.name.c_str());
+            HILOG_ERROR("LLTest not match shape %{public}s ", item.name.c_str());
             continue;
         }
         if (filter.supportDimensions.empty()) {
