@@ -41,12 +41,13 @@ void FormInfoStorage::GetAllFormsInfo(int32_t userId, std::vector<AppExecFwk::Fo
     if (this->userId != userId && this->userId != AppExecFwk::Constants::DEFAULT_USERID) {
         return;
     }
-    /////////////////// to del
-    for (int32_t i = 0; i < item.supportShapes.size(); i++) {
-        HILOG_ERROR("LLTest item.shape %{public}d ", item.supportShapes[i]);
-    }
-    //////////////////////////
+    
     for (const auto &item : this->formInfos) {
+        /////////////////// to del
+        for (int32_t i = 0; i < item.supportShapes.size(); i++) {
+            HILOG_ERROR("LLTest item.shape %{public}d ", item.supportShapes[i]);
+        }
+        //////////////////////////
         formInfos.push_back(item);
     }
 }
