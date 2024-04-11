@@ -35,10 +35,14 @@ foundation/ability/form_fwk
 │   └── js
 │       └── napi                    # form_fwk的napi代码实现
 ├── interfaces
-│   ├── inner_api                     # form_fwk的系统内部件间接口 
+│   ├── inner_api                   # form_fwk的系统内部件间接口 
 │   └── kits
-│       └── native                    # form_fwk的对外接口  
+│       └── native                  # form_fwk的对外接口  
 ├── services                        # form管理服务框架代码
+│   ├── config                      # form 管理服务配置文件及解析实现
+│   ├── form_render_service         # form_render_service.hap(FRS)实现
+│   ├── include                     # form 管理服务依赖头文件
+│   └── src                         # form 管理服务业务实现
 └── test                            # 测试目录
 ```
 
@@ -55,7 +59,7 @@ foundation/ability/form_fwk
 -   通过FormProvider更新卡片。
 -   开发卡片页面。
 
-开发步骤可参考[开发指南](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/application-models/widget-development-fa.md)
+开发步骤可参考[开发指南](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/form/widget-development-fa.md)
 
 **Stage卡片开发**
 基于[Stage模型](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/application-models/stage-model-development-overview.md)的卡片提供方开发，主要涉及如下功能逻辑：
@@ -65,9 +69,14 @@ foundation/ability/form_fwk
 - 通过FormProvider更新卡片。
 - 卡片页面开发。
 
-开发步骤可参考[开发指南](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/application-models/service-widget-overview.md)
+开发步骤可参考[开发指南](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/form/Readme-CN.md)
 
 ## 相关仓
+
+ArkTS API 接口
+
+[interface_sdk-js](https://gitee.com/openharmony/interface_sdk-js)
+
 元能力子系统
 
 [ability_base](https://gitee.com/openharmony/ability_ability_base)
@@ -79,3 +88,7 @@ foundation/ability/form_fwk
 [**form_fwk**](https://gitee.com/openharmony/ability_form_fwk)
 
 [idl_tool](https://gitee.com/openharmony/ability_idl_tool)
+
+ArkUI框架
+
+[arkui_ace_engine](https://gitee.com/openharmony/arkui_ace_engine)
