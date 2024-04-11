@@ -1286,7 +1286,7 @@ private:
         }
 
         napi_value jsShapeValue = GetPropertyValueByPropertyName(env, argv[PARAM0], "supportedShapes", napi_object);
-        if (jsValue != nullptr) {
+        if (jsShapeValue != nullptr) {
             std::vector<int32_t> shapes;
             UnwrapArrayInt32FromJS(env, jsShapeValue, shapes);
             for (size_t i = 0; i < shapes.size(); ++i) {
