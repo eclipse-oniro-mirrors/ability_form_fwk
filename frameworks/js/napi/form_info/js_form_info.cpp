@@ -90,6 +90,10 @@ napi_value CreateJsFormParam(napi_env engine)
         "FORM_RENDERING_MODE_KEY", CreateJsValue(engine, AppExecFwk::Constants::PARAM_FORM_RENDERINGMODE_KEY));
     napi_set_named_property(engine, objValue,
         "HOST_BG_INVERSE_COLOR_KEY", CreateJsValue(engine, AppExecFwk::Constants::PARAM_HOST_BG_INVERSE_COLOR_KEY));
+    napi_set_named_property(engine, objValue,
+        "FORM_PERMISSION_GRANTED_KEY", CreateJsValue(engine, AppExecFwk::Constants::FORM_PERMISSION_GRANTED_KEY));
+    napi_set_named_property(engine, objValue,
+        "FORM_PERMISSION_NAME_KEY", CreateJsValue(engine, AppExecFwk::Constants::FORM_PERMISSION_NAME_KEY));
     return objValue;
 }
 
