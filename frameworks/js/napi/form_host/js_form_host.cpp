@@ -1286,18 +1286,10 @@ private:
         }
 
         napi_value jsShapeValue = GetPropertyValueByPropertyName(env, argv[PARAM0], "supportedShapes", napi_object);
-        if (jsShapeValue != nullptr) {
-            std::vector<int32_t> shapes;
-            UnwrapArrayInt32FromJS(env, jsShapeValue, shapes);
-            for (size_t i = 0; i < shapes.size(); ++i) {
-                if (shapes[i] < 0) {
-                    HILOG_ERROR("shapes value should not be negative");
-                    NapiFormUtil::ThrowParamError(env, "shapes value should not be negative");
-                    return CreateJsUndefined(env);
-                }
-                HILOG_ERROR("LLTest shapes %{public}d", shapes[i]);
-                filter.supportShapes.emplace_back(shapes[i]);
-            }
+        if (jsShapeValue != nullptr && !GetIntVecValue(env, jsShapeValue, filter.supportShapes)) {
+            HILOG_ERROR("shapes value should not be negative");
+            NapiFormUtil::ThrowParamError(env, "shapes value should not be negative");
+            return CreateJsUndefined(env);
         }
 
         UnwrapStringByPropertyName(env, argv[PARAM0], "moduleName", filter.moduleName);
@@ -1319,6 +1311,21 @@ private:
         NapiAsyncTask::ScheduleWithDefaultQos("JsFormHost::OnGetFormsInfo",
             env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
         return result;
+    }
+
+    bool GetIntVecValue(napi_env &env, napi_value &jsValue, std::vector<int32_t> &results)
+    {
+        std::vector<int32_t> vals;
+        UnwrapArrayInt32FromJS(env, jsValue, vals);
+        for (size_t i = 0; i < vals.size(); ++i) {
+            if (vals[i] < 0) {
+                HILOG_ERROR("value should not be negative");
+                return false;
+            }
+            HILOG_ERROR("LLTest vals %{public}d", vals[i]);
+            results.emplace_back(vals[i]);
+        }
+        return true;
     }
 
     napi_value OnGetFormsInfo(napi_env env, size_t argc, napi_value* argv)
