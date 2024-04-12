@@ -75,12 +75,7 @@ ErrCode FormInfoHelper::LoadStageFormConfigInfo(const BundleInfo &bundleInfo, st
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
 
-    std::shared_ptr<OHOS::Global::Resource::ResourceManager> resourceManager = GetResourceManager(bundleInfo);
-    if (resourceManager == nullptr) {
-        HILOG_ERROR("InitResourceManager failed");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
-
+    std::shared_ptr<OHOS::Global::Resource::ResourceManager> resourceManager = nullptr;
     for (auto const &extensionInfo: bundleInfo.extensionInfos) {
         if (extensionInfo.type != ExtensionAbilityType::FORM) {
             continue;
@@ -105,6 +100,13 @@ ErrCode FormInfoHelper::LoadStageFormConfigInfo(const BundleInfo &bundleInfo, st
                 if (!bundleInfo.applicationInfo.isSystemApp) {
                     formInfo.transparencyEnabled = false;
                 }
+                if (resourceManager == nullptr) {
+                    resourceManager = GetResourceManager(bundleInfo);
+                }
+                if (resourceManager == nullptr) {
+                    HILOG_ERROR("InitResourceManager failed");
+                    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+                }
                 if (GetFormInfoDisplayName(resourceManager, formInfo) != ERR_OK) {
                     HILOG_INFO("Get FormInfo DisplayName fail");
                 }
@@ -126,11 +128,7 @@ ErrCode FormInfoHelper::LoadAbilityFormConfigInfo(const BundleInfo &bundleInfo, 
         HILOG_ERROR("failed to get IBundleMgr.");
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
-    std::shared_ptr<OHOS::Global::Resource::ResourceManager> resourceManager = GetResourceManager(bundleInfo);
-    if (resourceManager == nullptr) {
-        HILOG_ERROR("InitResourceManager failed");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
+    std::shared_ptr<OHOS::Global::Resource::ResourceManager> resourceManager = nullptr;
     const std::string &bundleName = bundleInfo.name;
     for (const auto &modelInfo: bundleInfo.hapModuleInfos) {
         const std::string &moduleName = modelInfo.moduleName;
@@ -139,6 +137,13 @@ ErrCode FormInfoHelper::LoadAbilityFormConfigInfo(const BundleInfo &bundleInfo, 
             continue;
         }
         for (auto &formInfo: formInfoVec) {
+            if (resourceManager == nullptr) {
+                resourceManager = GetResourceManager(bundleInfo);
+            }
+            if (resourceManager == nullptr) {
+                HILOG_ERROR("InitResourceManager failed");
+                return ERR_APPEXECFWK_FORM_COMMON_CODE;
+            }
             if (GetFormInfoDescription(resourceManager, formInfo) != ERR_OK) {
                 HILOG_INFO("Get FormInfo Description fail");
             }
@@ -819,6 +824,7 @@ ErrCode FormInfoMgr::ReloadFormInfos(const int32_t userId)
         HILOG_INFO("add forms info success, bundleName=%{public}s", bundleName.c_str());
     }
     hasReloadedFormInfosState_ = true;
+    HILOG_INFO("ReloadFormInfos end, formInfoMapSize: %{public}zu", bundleFormInfoMap_.size());
     return ERR_OK;
 }
 

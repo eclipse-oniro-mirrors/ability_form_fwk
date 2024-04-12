@@ -102,7 +102,7 @@ ErrCode FormRenderMgr::RenderForm(
 ErrCode FormRenderMgr::UpdateRenderingForm(int64_t formId, const FormProviderData &formProviderData,
     const WantParams &wantParams, bool mergeData)
 {
-    HILOG_ERROR("UpdateRenderingForm with formId: %{public}" PRId64 "", formId);
+    HILOG_INFO("UpdateRenderingForm with formId: %{public}" PRId64 "", formId);
     FormRecord formRecord;
     bool isGetFormRecord = FormDataMgr::GetInstance().GetFormRecord(formId, formRecord);
     if (!isGetFormRecord) {
