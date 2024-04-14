@@ -616,8 +616,6 @@ private:
     ErrCode CheckFormPermission(
         const std::string &permission = AppExecFwk::Constants::PERMISSION_REQUIRE_FORM);
 
-    ErrCode CheckFormObserverPermission();
-
     bool CheckAcrossLocalAccountsPermission() const;
 
     void InitFormShareMgrSerialQueue();

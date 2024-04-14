@@ -498,12 +498,11 @@ ErrCode FormInfoMgr::Remove(const std::string &bundleName, int32_t userId)
 
 ErrCode FormInfoMgr::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
 {
-    bool hasPermission = CheckBundlePermission();
-    std::shared_lock<std::shared_timed_mutex> guard(bundleFormInfoMapMutex_);
-    if (!hasPermission) {
+    if (!CheckBundlePermission()) {
         HILOG_ERROR("CheckBundlePermission is failed.");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
     }
+    std::shared_lock<std::shared_timed_mutex> guard(bundleFormInfoMapMutex_);
     for (const auto &bundleFormInfo : bundleFormInfoMap_) {
         if (bundleFormInfo.second != nullptr) {
             bundleFormInfo.second->GetAllFormsInfo(formInfos);
@@ -515,13 +514,13 @@ ErrCode FormInfoMgr::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
 ErrCode FormInfoMgr::GetFormsInfoByFilter(
     const FormInfoFilter &filter, std::vector<FormInfo> &formInfos, int32_t userId)
 {
-    std::shared_lock<std::shared_timed_mutex> guard(bundleFormInfoMapMutex_);
     if (!CheckBundlePermission()) {
         if (filter.bundleName.empty() || !IsCaller(filter.bundleName)) {
             HILOG_ERROR("Permission is wrong.");
             return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
         }
     }
+    std::shared_lock<std::shared_timed_mutex> guard(bundleFormInfoMapMutex_);
     if (filter.bundleName.empty()) {
         for (const auto &bundleFormInfo : bundleFormInfoMap_) {
             if (bundleFormInfo.second != nullptr) {
@@ -763,13 +762,10 @@ bool FormInfoMgr::IsCaller(const std::string& bundleName)
 
 bool FormInfoMgr::CheckBundlePermission()
 {
-    auto isSaCall = FormUtil::IsSACall();
-    if (isSaCall) {
+    if (FormUtil::IsSACall()) {
         return true;
     }
-    auto isCallingPerm = FormUtil::VerifyCallingPermission(
-        AppExecFwk::Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED);
-    if (isCallingPerm) {
+    if (FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)) {
         return true;
     }
     HILOG_ERROR("Permission verification failed");
