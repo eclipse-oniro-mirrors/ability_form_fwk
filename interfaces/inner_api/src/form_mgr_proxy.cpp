@@ -1202,6 +1202,11 @@ int FormMgrProxy::GetFormsInfoByFilter(const FormInfoFilter &filter, std::vector
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
+    if (!data.WriteInt32Vector(filter.supportShapes)) {
+        HILOG_ERROR("Failed to write vector supportShapes.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
     int error = GetFormsInfo(IFormMgr::Message::FORM_MGR_GET_FORMS_INFO_BY_FILTER, data, formInfos);
     if (error != ERR_OK) {
         HILOG_ERROR("%{public}s, failed to GetFormsInfoByFilter: %{public}d", __func__, error);
