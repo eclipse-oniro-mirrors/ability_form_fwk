@@ -3798,5 +3798,12 @@ ErrCode FormMgrAdapter::UpdateFormLocation(const int64_t &formId, const int32_t 
     return ERR_OK;
 }
 
+#ifdef RES_SCHEDULE_ENABLE
+void FormMgrAdapter::SetTimerTaskNeeded(bool isTimerTaskNeeded)
+{
+    FormTimerMgr::GetInstance().SetTimerTaskNeeded(isTimerTaskNeeded);
+}
+#endif // RES_SCHEDULE_ENABLE
+
 } // namespace AppExecFwk
 } // namespace OHOS

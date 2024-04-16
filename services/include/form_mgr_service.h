@@ -588,6 +588,14 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode UpdateFormLocation(const int64_t &formId, const int32_t &formLocation) override;
+
+#ifdef RES_SCHEDULE_ENABLE
+    /**
+     * @brief Update refresh_Timer_task_needed_flag depend on the systemload level.
+     * @param level The value of the systemload level.
+     */
+    void OnSystemloadLevel(int32_t level);
+#endif // RES_SCHEDULE_ENABLE
 private:
     /**
      * OnAddSystemAbility, OnAddSystemAbility will be called when the listening SA starts.
