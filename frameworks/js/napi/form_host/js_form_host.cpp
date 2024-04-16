@@ -1322,7 +1322,6 @@ private:
                 HILOG_ERROR("value should not be negative");
                 return false;
             }
-            HILOG_ERROR("LLTest vals %{public}d", vals[i]);
             results.emplace_back(vals[i]);
         }
         return true;
