@@ -57,7 +57,6 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formRenderRecord->GetUid();
     FormJsInfo formJsInfo;
     Want want;
-    formRenderRecord->CreateRuntime(formJsInfo);
     formRenderRecord->GetContext(formJsInfo, want);
     formRenderRecord->CreateContext(formJsInfo, want);
     std::shared_ptr<AbilityRuntime::Context> context = nullptr;
