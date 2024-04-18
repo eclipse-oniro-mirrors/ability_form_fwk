@@ -29,6 +29,7 @@ struct FormInfoFilter final : public Parcelable {
     std::string bundleName = "";
     std::string moduleName = "";
     std::vector<int32_t> supportDimensions;
+    std::vector<int32_t> supportShapes;
 
     /**
      * @brief Serialize the list of parameters for IPC.

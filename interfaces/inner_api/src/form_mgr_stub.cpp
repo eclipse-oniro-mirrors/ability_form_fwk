@@ -866,6 +866,7 @@ int32_t FormMgrStub::HandleGetFormsInfoByFilter(MessageParcel &data, MessageParc
     filter.bundleName = data.ReadString();
     filter.moduleName = data.ReadString();
     data.ReadInt32Vector(&filter.supportDimensions);
+    data.ReadInt32Vector(&filter.supportShapes);
 
     std::vector<FormInfo> infos;
     int32_t result = GetFormsInfoByFilter(filter, infos);

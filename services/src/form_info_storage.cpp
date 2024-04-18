@@ -25,6 +25,7 @@ namespace AAFwk {
 namespace {
 const std::string JSON_KEY_USER_ID = "userId";
 const std::string JSON_KEY_FORM_INFO = "formInfos";
+const int32_t DEFAULT_RECT_SHAPE = 1;
 } // namespace
 
 FormInfoStorage::FormInfoStorage(int32_t userId, const std::vector<AppExecFwk::FormInfo> &formInfos)
@@ -41,6 +42,7 @@ void FormInfoStorage::GetAllFormsInfo(int32_t userId, std::vector<AppExecFwk::Fo
     if (this->userId != userId && this->userId != AppExecFwk::Constants::DEFAULT_USERID) {
         return;
     }
+    
     for (const auto &item : this->formInfos) {
         formInfos.push_back(item);
     }
@@ -58,6 +60,27 @@ static bool find_match_dimensions(const std::vector<int32_t> &targetDimensions,
     return !results.empty();
 }
 
+static bool find_match_shapes(const std::vector<int32_t> &targetShapes, const std::vector<int32_t> &supportShapes)
+{
+    for (const auto &val : supportShapes) {
+        auto it = std::find(targetShapes.begin(), targetShapes.end(), val);
+        if (it != targetShapes.end()) {
+            return true;
+        }
+    }
+    return false;
+}
+
+static bool find_rect_shape(const std::vector<int32_t> &supportShapes)
+{
+    for (const auto &val : supportShapes) {
+        if (val == DEFAULT_RECT_SHAPE) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void FormInfoStorage::GetFormsInfoByFilter(int32_t userId,
     const AppExecFwk::FormInfoFilter &filter, std::vector<AppExecFwk::FormInfo> &formInfos) const
 {
@@ -68,6 +91,12 @@ void FormInfoStorage::GetFormsInfoByFilter(int32_t userId,
     }
     for (const auto &item : this->formInfos) {
         if (!filter.moduleName.empty() && filter.moduleName != item.moduleName) {
+            continue;
+        }
+        if (filter.supportShapes.empty() && !find_rect_shape(item.supportShapes)) {
+            continue;
+        }
+        if (!filter.supportShapes.empty() && !find_match_shapes(filter.supportShapes, item.supportShapes)) {
             continue;
         }
         if (filter.supportDimensions.empty()) {
