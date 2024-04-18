@@ -115,10 +115,9 @@ ErrCode FormInfoRdbStorageMgr::UpdateBundleFormInfos(const std::string &bundleNa
         }
     }
     std::string key = std::string().append(FORM_INFO_PREFIX).append(bundleName);
-    ErrCode result;
     std::lock_guard<std::mutex> lock(rdbStorePtrMutex_);
     std::string value = formInfoStorages;
-    result = rdbDataManager_->InsertData(key, value);
+    ErrCode result = rdbDataManager_->InsertData(key, value);
     if (result != ERR_OK) {
         HILOG_ERROR("update formInfoStorages to rdbStore error");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;

@@ -57,6 +57,7 @@ group("unittest") {
     "unittest/fms_form_instance_test:unittest",
     "unittest/fms_form_js_info_base_test:unittest",
     "unittest/fms_form_js_info_test:unittest",
+    "unittest/fms_form_memmgr_client_test:unittest",
     "unittest/fms_form_mgr_adapter_test:unittest",
     "unittest/fms_form_mgr_add_form_test:unittest",
     "unittest/fms_form_mgr_cast_temp_form_test:unittest",

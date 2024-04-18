@@ -1139,7 +1139,7 @@ int FormMgrProxy::GetFormsInfoByApp(std::string &bundleName, std::vector<FormInf
 
     int error = GetFormsInfo(IFormMgr::Message::FORM_MGR_GET_FORMS_INFO_BY_APP, data, formInfos);
     if (error != ERR_OK) {
-        HILOG_ERROR("%{public}s, failed to GetAllFormsInfo: %{public}d", __func__, error);
+        HILOG_ERROR("%{public}s, failed to GetFormsInfoByApp: %{public}d", __func__, error);
     }
 
     return error;
@@ -1173,7 +1173,7 @@ int FormMgrProxy::GetFormsInfoByModule(std::string &bundleName, std::string &mod
 
     int error = GetFormsInfo(IFormMgr::Message::FORM_MGR_GET_FORMS_INFO_BY_MODULE, data, formInfos);
     if (error != ERR_OK) {
-        HILOG_ERROR("%{public}s, failed to GetAllFormsInfo: %{public}d", __func__, error);
+        HILOG_ERROR("%{public}s, failed to GetFormsInfoByModule: %{public}d", __func__, error);
     }
 
     return error;

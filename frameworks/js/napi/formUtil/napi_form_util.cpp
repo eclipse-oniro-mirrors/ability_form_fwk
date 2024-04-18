@@ -623,6 +623,8 @@ napi_value CreateFormInfo(napi_env env, const FormInfo &formInfo)
     napi_set_named_property(env, objContext, "customizeData", CreateFormCustomizeDatas(env, formInfo.customizeDatas));
     napi_set_named_property(env, objContext, "isDynamic", CreateJsValue(env, formInfo.isDynamic));
     napi_set_named_property(env, objContext, "transparencyEnabled", CreateJsValue(env, formInfo.transparencyEnabled));
+    napi_set_named_property(env, objContext, "fontScaleFollowSystem",
+        CreateJsValue(env, formInfo.fontScaleFollowSystem));
     napi_set_named_property(env, objContext, "supportShapes", CreateNativeArray(env, formInfo.supportShapes));
 
     return objContext;
