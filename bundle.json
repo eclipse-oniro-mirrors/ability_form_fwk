@@ -53,7 +53,7 @@
               "time_service",
               "device_usage_statistics",
               "ace_engine",
-              "memmgr_plugin",
+              "memmgr_override",
               "memmgr",
               "init"
           ],
