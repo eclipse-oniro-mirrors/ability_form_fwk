@@ -306,8 +306,7 @@ void FormDataMgr::RecycleForms(const std::vector<int64_t> &formIds, const int &c
 int FormDataMgr::CheckTempEnoughForm() const
 {
     int32_t maxTempSize = Constants::MAX_TEMP_FORMS;
-    const std::string maxTempSizeKey = Constants::MAX_TEMP_FORM_SIZE;
-    GetConfigParamFormMap(maxTempSizeKey, maxTempSize);
+    GetConfigParamFormMap(Constants::MAX_TEMP_FORM_SIZE, maxTempSize);
     maxTempSize = ((maxTempSize > Constants::MAX_TEMP_FORMS) || (maxTempSize < 0)) ?
         Constants::MAX_TEMP_FORMS : maxTempSize;
     HILOG_DEBUG("maxTempSize:%{public}d", maxTempSize);
@@ -331,15 +330,13 @@ int FormDataMgr::CheckEnoughForm(const int callingUid, const int32_t currentUser
 
     int callingUidFormCounts = 0;
     int32_t maxFormsSize = Constants::MAX_FORMS;
-    const std::string maxFormsSizeKey = Constants::MAX_NORMAL_FORM_SIZE;
-    GetConfigParamFormMap(maxFormsSizeKey, maxFormsSize);
+    GetConfigParamFormMap(Constants::MAX_NORMAL_FORM_SIZE, maxFormsSize);
     maxFormsSize = ((maxFormsSize > Constants::MAX_FORMS) || (maxFormsSize < 0)) ?
         Constants::MAX_FORMS : maxFormsSize;
     HILOG_DEBUG("maxFormsSize:%{public}d", maxFormsSize);
 
     int32_t maxRecordPerApp = Constants::MAX_RECORD_PER_APP;
-    const std::string maxRecordPerAppKey = Constants::HOST_MAX_FORM_SIZE;
-    GetConfigParamFormMap(maxRecordPerAppKey, maxRecordPerApp);
+    GetConfigParamFormMap(Constants::HOST_MAX_FORM_SIZE, maxRecordPerApp);
     maxRecordPerApp = ((maxRecordPerApp > Constants::MAX_RECORD_PER_APP) || (maxRecordPerApp < 0)) ?
         Constants::MAX_RECORD_PER_APP : maxRecordPerApp;
     HILOG_DEBUG("maxRecordPerApp:%{public}d", maxRecordPerApp);
