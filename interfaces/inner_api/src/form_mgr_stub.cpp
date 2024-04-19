@@ -437,7 +437,7 @@ int32_t FormMgrStub::HandleNotifyWhetherVisibleForms(MessageParcel &data, Messag
 int32_t FormMgrStub::HandleHasFormVisible(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
-    uint32_t tokenId = data.ReadInt32();
+    uint32_t tokenId = data.ReadUint32();
     bool result = HasFormVisible(tokenId);
     if (!reply.WriteBool(result)) {
         HILOG_ERROR("%{public}s, failed to write action", __func__);

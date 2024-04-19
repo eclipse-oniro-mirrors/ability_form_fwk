@@ -44,17 +44,14 @@ private:
 
 napi_value JsFormBindingData::OnCreateFormBindingData(napi_env env, size_t argc, napi_value* argv)
 {
-    HILOG_DEBUG("%{public}s called.", __func__);
     std::string formDataStr;
     if (argc > 0) {
         napi_value nativeValue = nullptr;
         napi_valuetype type = napi_undefined;
         napi_typeof(env, argv[0], &type);
         if (type == napi_string) {
-            HILOG_DEBUG("%{public}s called, param type is string.", __func__);
             nativeValue = argv[0];
         } else if (type == napi_object) {
-            HILOG_DEBUG("%{public}s called, param type is object.", __func__);
             napi_value globalValue = nullptr;
             napi_get_global(env, &globalValue);
             napi_value jsonValue;
@@ -72,7 +69,6 @@ napi_value JsFormBindingData::OnCreateFormBindingData(napi_env env, size_t argc,
     napi_value objValue = nullptr;
     napi_create_object(env, &objValue);
     napi_set_named_property(env, objValue, "data", CreateJsValue(env, formDataStr));
-    HILOG_DEBUG("%{public}s called:%{private}s", __func__, formDataStr.c_str());
     return objValue;
 }
 }

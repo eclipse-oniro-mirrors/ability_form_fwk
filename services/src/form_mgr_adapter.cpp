@@ -1162,7 +1162,7 @@ int FormMgrAdapter::DumpHasFormVisible(const std::string &bundleInfo, std::strin
 {
     HILOG_INFO("bundleInfo:%{public}s", bundleInfo.c_str());
     std::vector<std::string> bundleInfoList = FormUtil::StringSplit(bundleInfo, BUNDLE_INFO_SEPARATOR);
-    int size = bundleInfoList.size();
+    size_t size = bundleInfoList.size();
     if (size == 0) {
         HILOG_ERROR("args size is zero.");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
