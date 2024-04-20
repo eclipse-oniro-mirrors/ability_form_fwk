@@ -20,7 +20,7 @@ config("form_mgr_stub_test_config") {
   ]
 }
 
-ohos_unittest("form_mgr_stub_test") {
+ohos_unittest("FmsFormMgrStubTest") {
   module_out_path = "form_fwk/form_mgr_stub"
 
   configs = [ ":form_mgr_stub_test_config" ]
@@ -46,5 +46,5 @@ ohos_unittest("form_mgr_stub_test") {
 
 group("unittest") {
   testonly = true
-  deps = [ ":form_mgr_stub_test" ]
+  deps = [ ":FmsFormMgrStubTest" ]
 }

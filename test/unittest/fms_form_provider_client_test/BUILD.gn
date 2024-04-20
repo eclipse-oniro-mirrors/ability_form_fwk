@@ -16,7 +16,7 @@ import("//foundation/ability/form_fwk/form_fwk.gni")
 
 module_output_path = "form_fwk/form_mgr"
 
-ohos_unittest("form_provider_client_test") {
+ohos_unittest("FmsFormProviderClientTest") {
   module_out_path = module_output_path
 
   include_dirs = [ "${form_fwk_path}/test/mock/include" ]
@@ -49,5 +49,5 @@ ohos_unittest("form_provider_client_test") {
 
 group("unittest") {
   testonly = true
-  deps = [ ":form_provider_client_test" ]
+  deps = [ ":FmsFormProviderClientTest" ]
 }

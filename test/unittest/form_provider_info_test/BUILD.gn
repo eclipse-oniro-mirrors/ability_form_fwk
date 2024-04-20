@@ -17,7 +17,7 @@ config("form_provider_info_test_config") {
   include_dirs = [ "${form_fwk_path}/interfaces/kits/native/include" ]
 }
 
-ohos_unittest("form_provider_info_test") {
+ohos_unittest("FmsFormProviderInfoTest") {
   module_out_path = "form_fwk/form_mgr"
 
   configs = [ ":form_provider_info_test_config" ]
@@ -37,5 +37,5 @@ ohos_unittest("form_provider_info_test") {
 
 group("unittest") {
   testonly = true
-  deps = [ ":form_provider_info_test" ]
+  deps = [ ":FmsFormProviderInfoTest" ]
 }

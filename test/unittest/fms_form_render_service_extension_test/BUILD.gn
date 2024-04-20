@@ -14,9 +14,9 @@
 import("//build/test.gni")
 import("//foundation/ability/form_fwk/form_fwk.gni")
 
-module_output_path = "form_fwk/formmgrservice"
+module_output_path = "form_fwk/form_render_service"
 
-ohos_unittest("FmsFormRenderServiceExtensionTest") {
+ohos_unittest("FrsFormRenderServiceExtensionTest") {
   module_out_path = module_output_path
 
   sources = [ "${form_fwk_path}/test/unittest/fms_form_render_service_extension_test/fms_form_render_service_extension_test.cpp" ]
@@ -74,6 +74,6 @@ ohos_unittest("FmsFormRenderServiceExtensionTest") {
 group("unittest") {
   testonly = true
 
-  deps = [ ":FmsFormRenderServiceExtensionTest" ]
+  deps = [ ":FrsFormRenderServiceExtensionTest" ]
 }
 ###############################################################################

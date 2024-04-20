@@ -20,8 +20,8 @@ config("form_render_proxy_test_config") {
   ]
 }
 
-ohos_unittest("form_render_proxy_test") {
-  module_out_path = "form_fwk/formmgrservice"
+ohos_unittest("FmsFormRenderProxyTest") {
+  module_out_path = "form_fwk/form_mgr_service"
 
   configs = [ ":form_render_proxy_test_config" ]
 
@@ -57,5 +57,5 @@ ohos_unittest("form_render_proxy_test") {
 
 group("unittest") {
   testonly = true
-  deps = [ ":form_render_proxy_test" ]
+  deps = [ ":FmsFormRenderProxyTest" ]
 }

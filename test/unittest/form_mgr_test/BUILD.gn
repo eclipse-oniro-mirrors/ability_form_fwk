@@ -21,7 +21,7 @@ config("form_mgr_test_config") {
 }
 
 # ohos_unittest is a template that will add gtest as deps.
-ohos_unittest("form_mgr_test") {
+ohos_unittest("FmsFormMgrTest") {
   module_out_path = "form_fwk/form_mgr"
 
   configs = [ ":form_mgr_test_config" ]
@@ -52,5 +52,5 @@ ohos_unittest("form_mgr_test") {
 
 group("unittest") {
   testonly = true
-  deps = [ ":form_mgr_test" ]
+  deps = [ ":FmsFormMgrTest" ]
 }

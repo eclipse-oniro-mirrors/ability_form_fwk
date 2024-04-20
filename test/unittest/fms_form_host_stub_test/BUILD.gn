@@ -14,9 +14,9 @@
 import("//build/test.gni")
 import("//foundation/ability/form_fwk/form_fwk.gni")
 
-module_output_path = "form_fwk/formmgrservice"
+module_output_path = "form_fwk/form_mgr_service"
 
-ohos_unittest("fms_form_host_stub_test") {
+ohos_unittest("FmsFormHostStubTest") {
   module_out_path = module_output_path
 
   sources = [
@@ -56,6 +56,6 @@ ohos_unittest("fms_form_host_stub_test") {
 group("unittest") {
   testonly = true
 
-  deps = [ ":fms_form_host_stub_test" ]
+  deps = [ ":FmsFormHostStubTest" ]
 }
 ###############################################################################
