@@ -22,6 +22,7 @@
 #include "extractor.h"
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
+#include "form_memory_guard.h"
 #include "form_module_checker.h"
 #include "form_render_impl.h"
 #include "xcollie/watchdog.h"
@@ -363,6 +364,7 @@ void FormRenderRecord::DeleteRenderRecord(int64_t formId, const std::string &com
             return;
         }
 
+        FormMemoryGuard memoryGuard;
         isRenderGroupEmpty = renderRecord->HandleDeleteInJsThread(formId, compId);
         renderRecord->DeleteFormRequest(formId, compId);
     };
@@ -819,6 +821,7 @@ void FormRenderRecord::ReleaseRenderer(
             return;
         }
 
+        FormMemoryGuard memoryGuard;
         bool ret = renderRecord->HandleReleaseRendererInJsThread(formId, compId, isRenderGroupEmpty);
         if (ret) {
             renderRecord->UpdateFormRequestReleaseState(formId, compId, true);
