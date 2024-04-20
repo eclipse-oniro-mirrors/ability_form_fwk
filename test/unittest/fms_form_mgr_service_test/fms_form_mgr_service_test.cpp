@@ -808,7 +808,7 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0032, TestSize.Level1)
     const AAFwk::Want want = {};
     const sptr<IRemoteObject> callerToken = nullptr;
     MockIsSACall(true);
-    EXPECT_EQ(formMgrService.StartAbility(want, callerToken), ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
+    EXPECT_EQ(formMgrService.StartAbility(want, callerToken), ERR_APPEXECFWK_FORM_NO_SUCH_ABILITY);
 
     MockIsSACall(false);
     MockIsSystemAppByFullTokenID(false);

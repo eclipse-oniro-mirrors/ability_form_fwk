@@ -459,7 +459,7 @@ bool FormMgrProxy::HasFormVisible(const uint32_t tokenId)
         HILOG_ERROR("%{public}s, error to write interface token", __func__);
         return false;
     }
-    if (!data.WriteInt32(tokenId)) {
+    if (!data.WriteUint32(tokenId)) {
         HILOG_ERROR("%{public}s, failed to write tokenId", __func__);
         return false;
     }

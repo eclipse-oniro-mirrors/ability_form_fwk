@@ -57,16 +57,14 @@ bool FormModuleChecker::CheckApiAllowList(const std::string& apiPath)
 bool FormModuleChecker::CheckApiWithSuffix(const std::string& apiPath, const std::string& item)
 {
     if (item.compare(0, apiPath.size(), apiPath) == 0) {
-        HILOG_DEBUG("api allowed by allowlist: '%{public}s' matches '%{public}s'",
-                    apiPath.c_str(), item.c_str());
+        HILOG_DEBUG("api allowed by allowlist: '%{public}s' matches '%{public}s'", apiPath.c_str(), item.c_str());
         return true;
     }
     const int32_t kSuffixLength = 2;
     if (item.size() >= kSuffixLength && item.substr(item.size() - kSuffixLength) == ".*") {
         const std::string path = item.substr(0, item.rfind('.'));
         if (apiPath.compare(0, path.size(), path) == 0) {
-            HILOG_DEBUG("api allowed by allowlist: '%{public}s' matches '%{public}s'",
-                        apiPath.c_str(), item.c_str());
+            HILOG_DEBUG("api allowed by allowlist: '%{public}s' matches '%{public}s'", apiPath.c_str(), item.c_str());
             return true;
         }
     }
