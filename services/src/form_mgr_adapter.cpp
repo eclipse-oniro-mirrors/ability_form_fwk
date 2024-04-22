@@ -73,6 +73,7 @@
 #include "parameters.h"
 #include "system_ability_definition.h"
 #include "form_task_mgr.h"
+#include "form_ability_connection_reporter.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -1636,8 +1637,8 @@ ErrCode FormMgrAdapter::InnerAcquireProviderFormInfoAsync(const int64_t formId,
     Want newWant;
     newWant.SetParams(wantParams);
     auto hostToken = newWant.GetRemoteObject(Constants::PARAM_FORM_HOST_TOKEN);
-    sptr<IAbilityConnection> formAcquireConnection = new (std::nothrow) FormAcquireConnection(formId, info, wantParams,
-        hostToken);
+    sptr<FormAbilityConnection> formAcquireConnection = new (std::nothrow) FormAcquireConnection(formId, info,
+        wantParams, hostToken);
     if (formAcquireConnection == nullptr) {
         HILOG_ERROR("formAcquireConnection is null.");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
@@ -1650,6 +1651,16 @@ ErrCode FormMgrAdapter::InnerAcquireProviderFormInfoAsync(const int64_t formId,
         HILOG_ERROR("%{public}s fail, ConnectServiceAbility failed.", __func__);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
+#ifdef RES_SCHEDULE_ENABLE
+    auto && connectCallback = [](const sptr<FormAbilityConnection>& formAbilityConnection) {
+        FormAbilityConnectionReporter::GetInstance().ReportFormAbilityConnection(formAbilityConnection);
+    };
+    auto && disconnectCallback = [](const sptr<FormAbilityConnection>& formAbilityConnection) {
+        FormAbilityConnectionReporter::GetInstance().ReportFormAbilityDisconnection(formAbilityConnection);
+    };
+    formAcquireConnection->SetFormAbilityConnectCb(connectCallback);
+    formAcquireConnection->SetFormAbilityDisconnectCb(disconnectCallback);
+#endif
     return ERR_OK;
 }
 

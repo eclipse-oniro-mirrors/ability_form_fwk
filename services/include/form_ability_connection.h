@@ -124,6 +124,32 @@ public:
      * @brief Add death recipient.
      */
     void AddHostDeathRecipient();
+
+    /**
+     * @brief Set form ability connection callback.
+     */
+    void SetFormAbilityConnectCb(std::function<void(const sptr<FormAbilityConnection> &connection)> &&callback);
+
+    /**
+     * @brief Set form ability disconnection callback.
+     */
+    void SetFormAbilityDisconnectCb(std::function<void(const sptr<FormAbilityConnection> &connection)> &&callback);
+
+    /**
+     * @brief On form ability connect callback.
+     */
+    void OnFormAbilityConnectDoneCallback();
+
+    /**
+     * @brief On form ability disconnect callback.
+     */
+    void OnFormAbilityDisconnectDoneCallback();
+
+    /**
+     * @brief Get bundle name.
+     */
+    std::string GetBundleName();
+
 private:
     int64_t formId_ = -1;
     std::string deviceId_ = "";
@@ -133,6 +159,8 @@ private:
     int32_t connectId_ = 0;
     sptr<IRemoteObject> hostToken_ = nullptr;
     sptr<IRemoteObject> providerToken_ = nullptr;
+    std::function<void(const sptr<FormAbilityConnection> &connection)> onFormAblityConnectCb_;
+    std::function<void(const sptr<FormAbilityConnection> &connection)> onFormAblityDisconnectCb_;
 
     DISALLOW_COPY_AND_MOVE(FormAbilityConnection);
 };

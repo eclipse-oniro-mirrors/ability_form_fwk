@@ -42,6 +42,7 @@ ohos_shared_library("libfms") {
   sources = [
     "services/config/form_xml_parser.cpp",
     "services/src/form_ability_connection.cpp",
+    "services/src/form_ability_connection_reporter.cpp",
     "services/src/form_acquire_connection.cpp",
     "services/src/form_acquire_data_connection.cpp",
     "services/src/form_acquire_state_connection.cpp",
@@ -164,6 +165,11 @@ ohos_shared_library("libfms") {
   if (device_usage_statistics) {
     external_deps += [ "device_usage_statistics:usagestatsinner" ]
     defines += [ "DEVICE_USAGE_STATISTICS_ENABLE" ]
+  }
+
+  if (res_schedule_service) {
+    external_deps += [ "resource_schedule_service:ressched_client" ]
+    defines += [ "RES_SCHEDULE_ENABLE" ]
   }
 
   if (build_variant == "root") {

@@ -67,3 +67,11 @@ declare_args() {
     cite_memmgr = true
   }
 }
+
+declare_args() {
+  res_schedule_service = false
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.resourceschedule_resource_schedule_service)) {
+    res_schedule_service = true
+  }
+}
