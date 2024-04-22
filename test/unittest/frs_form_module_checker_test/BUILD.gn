@@ -14,7 +14,7 @@
 import("//build/test.gni")
 import("//foundation/ability/form_fwk/form_fwk.gni")
 
-ohos_unittest("test_form_module_checker") {
+ohos_unittest("FmsFormModuleCheckerTest") {
   module_out_path = "form_fwk/form_mgr"
 
   cflags = [ "-g3" ]
@@ -40,5 +40,5 @@ ohos_unittest("test_form_module_checker") {
 
 group("unittest") {
   testonly = true
-  deps = [ ":test_form_module_checker" ]
+  deps = [ ":FmsFormModuleCheckerTest" ]
 }

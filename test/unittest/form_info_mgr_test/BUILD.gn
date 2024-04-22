@@ -14,9 +14,9 @@
 import("//build/test.gni")
 import("//foundation/ability/form_fwk/form_fwk.gni")
 
-module_output_path = "form_fwk/formmgrservice"
+module_output_path = "form_fwk/form_mgr_service"
 
-ohos_unittest("FormInfoMgrTest") {
+ohos_unittest("FmsFormInfoMgrTest") {
   module_out_path = module_output_path
 
   sources = [ "form_info_mgr_test.cpp" ]
@@ -60,5 +60,5 @@ ohos_unittest("FormInfoMgrTest") {
 
 group("unittest") {
   testonly = true
-  deps = [ ":FormInfoMgrTest" ]
+  deps = [ ":FmsFormInfoMgrTest" ]
 }

@@ -46,6 +46,7 @@ const nlohmann::json JSON_FORMS = R"(
             "updateEnabled": true,
             "scheduledUpdateTime": "10:30",
             "updateDuration": 1,
+            "fontScaleFollowSystem": false,
             "defaultDimension": "2*2",
             "supportDimensions": ["2*2"],
             "metadata": [

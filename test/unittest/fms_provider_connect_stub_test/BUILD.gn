@@ -14,9 +14,9 @@
 import("//build/test.gni")
 import("//foundation/ability/form_fwk/form_fwk.gni")
 
-module_output_path = "form_fwk/formmgrservice"
+module_output_path = "form_fwk/form_mgr_service"
 
-ohos_unittest("ProviderConnectStubTest") {
+ohos_unittest("FmsProviderConnectStubTest") {
   module_out_path = module_output_path
 
   sources = [ "${form_fwk_path}/test/unittest/fms_provider_connect_stub_test/fms_provider_connect_stub_test.cpp" ]
@@ -51,6 +51,6 @@ ohos_unittest("ProviderConnectStubTest") {
 group("unittest") {
   testonly = true
 
-  deps = [ ":ProviderConnectStubTest" ]
+  deps = [ ":FmsProviderConnectStubTest" ]
 }
 ###############################################################################

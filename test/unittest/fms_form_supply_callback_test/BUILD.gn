@@ -14,9 +14,9 @@
 import("//build/test.gni")
 import("//foundation/ability/form_fwk/form_fwk.gni")
 
-module_output_path = "form_fwk/formmgrservice"
+module_output_path = "form_fwk/form_mgr_service"
 
-ohos_unittest("form_supply_callback_test") {
+ohos_unittest("FmsFormSupplyCallbackTest") {
   module_out_path = module_output_path
 
   sources = [
@@ -97,5 +97,5 @@ ohos_unittest("form_supply_callback_test") {
 
 group("unittest") {
   testonly = true
-  deps = [ ":form_supply_callback_test" ]
+  deps = [ ":FmsFormSupplyCallbackTest" ]
 }
