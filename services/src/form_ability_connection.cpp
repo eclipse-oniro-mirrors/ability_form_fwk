@@ -46,6 +46,10 @@ void FormAbilityConnection::OnAbilityConnectDone(
         return;
     }
 
+#ifdef RES_SCHEDULE_ENABLE
+    OnFormAbilityConnectDoneCallback();
+#endif
+
     HILOG_INFO("%{public}s, free install is %{public}d.", __func__, isFreeInstall_);
     if (!isFreeInstall_) {
         return;
@@ -93,12 +97,15 @@ void FormAbilityConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementNam
 {
     HILOG_DEBUG("%{public}s, element:%{public}s, resultCode:%{public}d",
         __func__, element.GetURI().c_str(), resultCode);
-    if (connectId_ != 0) {
-        FormSupplyCallback::GetInstance()->RemoveConnection(connectId_);
-        connectId_ = 0;
-    } else {
+    if (connectId_ == 0) {
         HILOG_ERROR("%{public}s fail, invalid connectId_: %{public}d", __func__, connectId_);
+        return;
     }
+    FormSupplyCallback::GetInstance()->RemoveConnection(connectId_);
+    connectId_ = 0;
+#ifdef RES_SCHEDULE_ENABLE
+    OnFormAbilityDisconnectDoneCallback();
+#endif
 }
 
 /**
@@ -192,6 +199,41 @@ void FormAbilityConnection::SetProviderToken(const sptr<IRemoteObject> providerT
 sptr<IRemoteObject> FormAbilityConnection::GetProviderToken() const
 {
     return providerToken_;
+}
+
+void FormAbilityConnection::SetFormAbilityConnectCb(
+    std::function<void(const sptr<FormAbilityConnection> &connection)> &&callback)
+{
+    onFormAblityConnectCb_ = std::move(callback);
+}
+
+void FormAbilityConnection::SetFormAbilityDisconnectCb(
+    std::function<void(const sptr<FormAbilityConnection> &connection)> &&callback)
+{
+    onFormAblityDisconnectCb_ = std::move(callback);
+}
+
+void FormAbilityConnection::OnFormAbilityConnectDoneCallback()
+{
+    if (!onFormAblityConnectCb_) {
+        HILOG_ERROR("Empty form ability connect callback!");
+        return;
+    }
+    onFormAblityConnectCb_(this);
+}
+
+void FormAbilityConnection::OnFormAbilityDisconnectDoneCallback()
+{
+    if (!onFormAblityDisconnectCb_) {
+        HILOG_ERROR("Empty form ability disconnect callback!");
+        return;
+    }
+    onFormAblityDisconnectCb_(this);
+}
+
+std::string FormAbilityConnection::GetBundleName()
+{
+    return bundleName_;
 }
 } // namespace AppExecFwk
 } // namespace OHOS
