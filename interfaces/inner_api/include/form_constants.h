@@ -197,6 +197,11 @@ namespace Constants {
         DIMENSION_MAX = DIMENSION_6_4
     };
 
+    enum class Shape : int8_t {
+        RECT = 1,
+        CIRCLE
+    };
+
     const std::map<Dimension, std::string> DIMENSION_MAP = {
         {Dimension::DIMENSION_1_2, "1*2"},
         {Dimension::DIMENSION_2_2, "2*2"},

@@ -177,6 +177,17 @@ napi_value CreateJsFormLocation(napi_env engine)
     return objValue;
 }
 
+napi_value CreateJsFormShape(napi_env engine)
+{
+    napi_value objValue = nullptr;
+    napi_create_object(engine, &objValue);
+    napi_set_named_property(
+        engine, objValue, "RECT", CreateJsValue(engine, AppExecFwk::Constants::Shape::RECT));
+    napi_set_named_property(
+        engine, objValue, "CIRCLE", CreateJsValue(engine, AppExecFwk::Constants::Shape::CIRCLE));
+    return objValue;
+}
+
 napi_value FormInfoInit(napi_env engine, napi_value exportObj)
 {
     HILOG_INFO("%{public}s called.", __func__);
@@ -190,6 +201,7 @@ napi_value FormInfoInit(napi_env engine, napi_value exportObj)
     napi_set_named_property(engine, exportObj, "LaunchReason", CreateJsFormLaunchReason(engine));
     napi_set_named_property(engine, exportObj, "FormUsageState", CreateJsFormUsageState(engine));
     napi_set_named_property(engine, exportObj, "FormLocation", CreateJsFormLocation(engine));
+    napi_set_named_property(engine, exportObj, "FormShape", CreateJsFormShape(engine));
     HILOG_INFO("%{public}s called end.", __func__);
     return exportObj;
 }
