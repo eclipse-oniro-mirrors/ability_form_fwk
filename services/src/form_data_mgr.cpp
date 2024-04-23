@@ -2135,7 +2135,8 @@ ErrCode FormDataMgr::GetFormInstancesByFilter(const FormInstancesFilter &formIns
                     instance.formHostName = formHostRecord.GetHostBundleName();
                     instance.formId = itFormRecord->second.formId;
                     instance.specification = itFormRecord->second.specification;
-                    instance.formVisiblity = static_cast<FormVisibilityType>(itFormRecord->second.formVisibleNotifyState);
+                    instance.formVisiblity =
+                        static_cast<FormVisibilityType>(itFormRecord->second.formVisibleNotifyState);
                     instance.bundleName = itFormRecord->second.bundleName;
                     instance.moduleName = itFormRecord->second.moduleName;
                     instance.abilityName = itFormRecord->second.abilityName;
