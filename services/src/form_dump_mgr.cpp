@@ -159,7 +159,7 @@ void FormDumpMgr::DumpFormInfos(const std::vector<FormRecord> &formRecordInfos, 
         }
 
         AppendBundleFormInfo(info, formInfos);
-        AppendRecycleStatus(info, formInfos);
+        AppendRecycleStatus(info.recycleStatus, formInfos);
         formInfos += LINE_FEED;
     }
 
@@ -232,7 +232,7 @@ void FormDumpMgr::DumpFormInfo(const FormRecord &formRecordInfo, std::string &fo
     }
 
     AppendBundleFormInfo(formRecordInfo, formInfo);
-    AppendRecycleStatus(formRecordInfo, formInfo);
+    AppendRecycleStatus(formRecordInfo.recycleStatus, formInfo);
 
     HILOG_DEBUG("%{public}s success. Form infos:%{private}s", __func__, formInfo.c_str());
 }
@@ -270,72 +270,75 @@ void FormDumpMgr::AppendRunningFormInfos(const std::string &formHostBundleName,
             infosResult += "    description [ " + info.description + " ] \n";
             infosResult += "    dimension [ " + std::to_string(info.dimension) + " ] \n";
 
+            infosResult += "    formVisibility ";
             switch (info.formVisiblity) {
                 case FormVisibilityType::UNKNOWN:
-                    infosResult += "    formVisibility [ UNKNOWN ] \n";
+                    infosResult += "[ UNKNOWN ] \n";
                     break;
                 case FormVisibilityType::VISIBLE:
-                    infosResult += "    formVisibility [ VISIBLE ] \n";
+                    infosResult += "[ VISIBLE ] \n";
                     break;
                 case FormVisibilityType::INVISIBLE:
-                    infosResult += "    formVisibility [ INVISIBLE ] \n";
+                    infosResult += "[ INVISIBLE ] \n";
                     break;
                 default:
-                    infosResult += "    formVisibility [ UNKNOWN_TYPE ] \n";
+                    infosResult += "[ UNKNOWN_TYPE ] \n";
                     break;
             }
 
+            infosResult += "    FormUsageState ";
             switch (info.formUsageState) {
                 case FormUsageState::USED:
-                    infosResult += "    FormUsageState [ USED ] \n";
+                    infosResult += "[ USED ] \n";
                     break;
                 case FormUsageState::UNUSED:
-                    infosResult += "    FormUsageState [ UNUSED ] \n";
+                    infosResult += "[ UNUSED ] \n";
                     break;
                 default:
-                    infosResult += "    FormUsageState [ UNKNOWN_TYPE ] \n";
+                    infosResult += "[ UNKNOWN_TYPE ] \n";
                     break;
             }
 
-            AppendFormLocation(infosResult, info.formLocation);
-
+            AppendFormLocation(info.formLocation, infosResult);
+            AppendRecycleStatus(info.recycleStatus, infosResult);
             infosResult += " \n";
         }
     }
 }
 
-void FormDumpMgr::AppendFormLocation(std::string &infosResult, Constants::FormLocation formLocation) const
+void FormDumpMgr::AppendFormLocation(Constants::FormLocation formLocation, std::string &infosResult) const
 {
+    infosResult += "    formLocation ";
     switch (formLocation) {
         case Constants::FormLocation::OTHER:
-            infosResult += "    formLocation [ OTHER ] \n";
+            infosResult += "[ OTHER ] \n";
             break;
         case Constants::FormLocation::DESKTOP:
-            infosResult += "    formLocation [ DESKTOP ] \n";
+            infosResult += "[ DESKTOP ] \n";
             break;
         case Constants::FormLocation::FORM_CENTER:
-            infosResult += "    formLocation [ FORM_CENTER ] \n";
+            infosResult += "[ FORM_CENTER ] \n";
             break;
         case Constants::FormLocation::FORM_MANAGER:
-            infosResult += "    formLocation [ FORM_MANAGER ] \n";
+            infosResult += "[ FORM_MANAGER ] \n";
             break;
         case Constants::FormLocation::NEGATIVE_SCREEN:
-            infosResult += "    formLocation [ NEGATIVE_SCREEN ] \n";
+            infosResult += "[ NEGATIVE_SCREEN ] \n";
             break;
         case Constants::FormLocation::FORM_CENTER_NEGATIVE_SCREEN:
-            infosResult += "    formLocation [ FORM_CENTER_NEGATIVE_SCREEN ] \n";
+            infosResult += "[ FORM_CENTER_NEGATIVE_SCREEN ] \n";
             break;
         case Constants::FormLocation::FORM_MANAGER_NEGATIVE_SCREEN:
-            infosResult += "    formLocation [ FORM_MANAGER_NEGATIVE_SCREEN ] \n";
+            infosResult += "[ FORM_MANAGER_NEGATIVE_SCREEN ] \n";
             break;
         case Constants::FormLocation::SCREEN_LOCK:
-            infosResult += "    formLocation [ SCREEN_LOCK ] \n";
+            infosResult += "[ SCREEN_LOCK ] \n";
             break;
         case Constants::FormLocation::AI_SUGGESTION:
-            infosResult += "    formLocation [ AI_SUGGESTION ] \n";
+            infosResult += "[ AI_SUGGESTION ] \n";
             break;
         default:
-            infosResult += "    formLocation [ UNKNOWN_TYPE ] \n";
+            infosResult += "[ UNKNOWN_TYPE ] \n";
             break;
     }
 }
@@ -382,14 +385,15 @@ void FormDumpMgr::AppendBundleFormInfo(const FormRecord &formRecordInfo, std::st
     }
 }
 
-void FormDumpMgr::AppendRecycleStatus(const FormRecord &formRecordInfo, std::string &formInfo) const
+void FormDumpMgr::AppendRecycleStatus(const RecycleStatus recycleStatus, std::string &formInfo) const
 {
-    if (formRecordInfo.recycleStatus == RecycleStatus::RECYCLABLE) {
-        formInfo += "    recycleStatus [RECYCLABLE]\n";
-    } else if (formRecordInfo.recycleStatus == RecycleStatus::RECYCLED) {
-        formInfo += "    recycleStatus [RECYCLED]\n";
+    formInfo += "    recycleStatus ";
+    if (recycleStatus == RecycleStatus::RECYCLABLE) {
+        formInfo += "[ RECYCLABLE ]\n";
+    } else if (recycleStatus == RecycleStatus::RECYCLED) {
+        formInfo += "[ RECYCLED ]\n";
     } else {
-        formInfo += "    recycleStatus [NON_RECYCLABLE]\n";
+        formInfo += "[ NON_RECYCLABLE ]\n";
     }
 }
 }  // namespace AppExecFwk

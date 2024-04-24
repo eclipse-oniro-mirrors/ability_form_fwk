@@ -107,11 +107,11 @@ public:
 
 private:
     void AppendBundleFormInfo(const FormRecord &formRecordInfo, std::string &formInfo) const;
-    void AppendRecycleStatus(const FormRecord &formRecordInfo, std::string &formInfo) const;
+    void AppendRecycleStatus(const RecycleStatus recycleStatus, std::string &formInfo) const;
     void AppendRunningFormInfos(const std::string &formHostBundleName,
         const std::vector<RunningFormInfo> &runningFormInfos,
         std::string &infosResult) const;
-    void AppendFormLocation(std::string &infosResult, Constants::FormLocation formLocation) const;
+    void AppendFormLocation(Constants::FormLocation formLocation, std::string &infosResult) const;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

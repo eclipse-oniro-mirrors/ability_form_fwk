@@ -19,15 +19,11 @@
 #include <vector>
 #include "form_constants.h"
 #include "form_info_base.h"
+#include "form_instance.h"
 #include "form_provider_info.h"
 
 namespace OHOS {
 namespace AppExecFwk {
-enum class RecycleStatus {
-    RECYCLABLE,
-    RECYCLED,
-    NON_RECYCLABLE,
-};
 /**
  * @class FormRecord
  * Form data.
