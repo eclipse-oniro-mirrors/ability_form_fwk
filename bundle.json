@@ -56,7 +56,8 @@
               "memmgr_plugin",
               "memmgr",
               "init",
-              "resource_schedule_service"
+              "resource_schedule_service",
+              "theme_mgr"
           ],
           "third_party": [
               "node",

@@ -240,7 +240,7 @@ ErrCode BundleFormInfo::UpdateStaticFormInfos(int32_t userId)
             // Update all user's formInfos
             HILOG_DEBUG("Update formInfos, user: %{public}d", item->userId);
             item->formInfos = formInfos;
-            findUser |= (item->userId == userId);
+            findUser = findUser || (item->userId == userId);
         }
         if (!findUser) {
             HILOG_DEBUG("Add new userId, user: %{public}d", userId);

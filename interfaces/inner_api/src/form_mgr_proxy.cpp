@@ -69,6 +69,30 @@ int FormMgrProxy::AddForm(
 }
 
 /**
+ * @brief Add form with want, send want to form manager service.
+ * @param want The want of the form to add.
+ * @param runningFormInfo Running form info.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormMgrProxy::CreateForm(const Want &want, RunningFormInfo &runningFormInfo)
+{
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write to interface token failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteParcelable(&want)) {
+        HILOG_ERROR("write to want failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int ret = GetParcelableInfo<RunningFormInfo>(IFormMgr::Message::FORM_MGR_CREATE_FORM, data, runningFormInfo);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("failed to SendRequest: %{public}d", ret);
+    }
+    return ret;
+}
+
+/**
  * @brief Delete forms with formIds, send formIds to form manager service.
  * @param formId The Id of the forms to delete.
  * @param callerToken Caller ability token.

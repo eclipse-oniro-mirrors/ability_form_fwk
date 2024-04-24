@@ -383,6 +383,18 @@ public:
      */
     void SetFormLocation(Constants::FormLocation formLocation);
 
+    /**
+     * @brief Get whether it belongs to theme form.
+     * @return is theme form or not.
+     */
+    bool GetIsThemeForm() const;
+
+    /**
+     * @brief Set whether it belongs to theme form.
+     * @param isThemeForm is theme form or not.
+     */
+    void SetIsThemeForm(bool isThemeForm);
+
 private:
     /**
      * @brief Equal or not.
@@ -427,6 +439,7 @@ private:
     int32_t uid_ = -1;
     std::string description_ = "";
     Constants::FormLocation formLocation_;
+    bool isThemeForm_ = false;
 };
 } // namespace AppExecFwk
 } // namespace OHOS

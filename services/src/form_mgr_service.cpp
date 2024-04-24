@@ -164,17 +164,43 @@ int FormMgrService::AddForm(const int64_t formId, const Want &want,
         HILOG_ERROR("fail, add form permission denied");
         return ret;
     }
+    ReportAddFormEvent(formId, want);
+    return FormMgrAdapter::GetInstance().AddForm(formId, want, callerToken, formInfo);
+}
+
+/**
+ * @brief Add form with want, send want to form manager service.
+ * @param want The want of the form to add.
+ * @param runningFormInfo Running form info.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormMgrService::CreateForm(const Want &want, RunningFormInfo &runningFormInfo)
+{
+    HILOG_INFO("CreateForm called, startTime: begin: %{public}s, publish: %{public}s, end: %{public}s, "
+        "onKvDataServiceAddTime: %{public}s", onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
+        onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
+
+    ErrCode ret = CheckFormPermission();
+    if (ret != ERR_OK) {
+        HILOG_ERROR("create form permission denied");
+        return ret;
+    }
+    ReportAddFormEvent(0, want);
+    return FormMgrAdapter::GetInstance().CreateForm(want, runningFormInfo);
+}
+
+void FormMgrService::ReportAddFormEvent(const int64_t formId, const Want &want)
+{
     FormEventInfo eventInfo;
     eventInfo.formId = formId;
     eventInfo.bundleName = want.GetElement().GetBundleName();
     eventInfo.moduleName = want.GetStringParam(AppExecFwk::Constants::PARAM_MODULE_NAME_KEY);
     eventInfo.abilityName = want.GetElement().GetAbilityName();
-    ret = FormBmsHelper::GetInstance().GetCallerBundleName(eventInfo.hostBundleName);
+    int ret = FormBmsHelper::GetInstance().GetCallerBundleName(eventInfo.hostBundleName);
     if (ret != ERR_OK || eventInfo.hostBundleName.empty()) {
         HILOG_ERROR("fail, cannot get host bundle name by uid");
     }
     FormEventReport::SendFormEvent(FormEventName::ADD_FORM, HiSysEventType::BEHAVIOR, eventInfo);
-    return FormMgrAdapter::GetInstance().AddForm(formId, want, callerToken, formInfo);
 }
 
 /**
