@@ -75,6 +75,7 @@ FormInfo GetTestFormInfo()
     formInfo.formVisibleNotify = true;
     formInfo.supportDimensions = {1, 2};
     formInfo.defaultDimension = 1;
+    formInfo.supportShapes = {1, 2};
     return formInfo;
 }
 
