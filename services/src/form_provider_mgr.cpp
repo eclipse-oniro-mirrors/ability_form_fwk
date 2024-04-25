@@ -211,6 +211,55 @@ ErrCode FormProviderMgr::ConnectAmsForRefresh(const int64_t formId,
 }
 
 /**
+ * @brief Connect ability manager service for refresh app permission
+ *
+ * @param formId The form id.
+ * @param want The want of the form.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+ErrCode FormProviderMgr::ConnectAmsForRefreshPermission(const int64_t formId, Want &want)
+{
+    HILOG_DEBUG("ConnectAmsForRefreshPermission start, form id: %{public}" PRId64 "", formId);
+    if (!want.HasParameter(Constants::FORM_PERMISSION_NAME_KEY) ||
+        !want.HasParameter(Constants::FORM_PERMISSION_GRANTED_KEY)) {
+        HILOG_ERROR("permission info is not exist, form:%{public}" PRId64 "", formId);
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    FormRecord record;
+    bool result = FormDataMgr::GetInstance().GetFormRecord(formId, record);
+    if (!result) {
+        HILOG_ERROR("get form record fail, not exist such form:%{public}" PRId64 "", formId);
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    }
+    want.RemoveParam(Constants::KEY_IS_TIMER);
+    want.RemoveParam(Constants::KEY_TIMER_REFRESH);
+
+    sptr<IAbilityConnection> formRefreshConnection = new (std::nothrow) FormRefreshConnection(formId, want,
+        record.bundleName, record.abilityName, record.needFreeInstall);
+    if (formRefreshConnection == nullptr) {
+        HILOG_ERROR("failed to create FormRefreshConnection.");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+
+    Want connectWant;
+    connectWant.AddFlags(Want::FLAG_ABILITY_FORM_ENABLED);
+    connectWant.SetElementName(record.bundleName, record.abilityName);
+
+    if (record.needFreeInstall) {
+        connectWant.AddFlags(Want::FLAG_INSTALL_ON_DEMAND | Want::FLAG_INSTALL_WITH_BACKGROUND_MODE);
+        connectWant.SetModuleName(record.moduleName);
+    }
+
+    ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbility(connectWant, formRefreshConnection);
+    if (errorCode != ERR_OK) {
+        HILOG_ERROR("ConnectServiceAbility failed.");
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+    }
+
+    return ERR_OK;
+}
+
+/**
  * @brief Notify provider form delete.
  * @param formId The form id.
  * @param record Form information.
