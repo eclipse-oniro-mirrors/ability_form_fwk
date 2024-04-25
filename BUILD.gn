@@ -151,7 +151,7 @@ ohos_shared_library("libfms") {
   ]
 
   if (cite_memmgr_plugin) {
-    external_deps += [ "memmgr_plugin:memmgrclient" ]
+    external_deps += [ "memmgr_override:memmgrclient" ]
   } else if (cite_memmgr) {
     external_deps += [ "memmgr:memmgrclient" ]
   }
