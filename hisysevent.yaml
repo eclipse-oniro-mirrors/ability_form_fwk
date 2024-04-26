@@ -74,3 +74,10 @@ SET_NEXT_REFRESH_TIME_FORM:
 FORM_RENDER_BLOCK:
   __BASE: {type: FAULT, level: MINOR, tag: ability, desc: form manager}
   BUNDLE_NAME: {type: STRING, desc: bundle name}
+
+UNBIND_FORM_APP:
+  __BASE: {type: BEHAVIOR, level: MINOR, tag: ability, desc: form manager}
+  FORM_ID: {type: INT64, desc: formId}
+  BUNDLE_NAME: {type: STRING, desc: bundle name}
+  FORM_APP_PID: {type: INT32, desc: form provider pid}
+  UNBIND_TIME: {type: INT64, desc: unbind time stamp}

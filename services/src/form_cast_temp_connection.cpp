@@ -26,8 +26,9 @@
 namespace OHOS {
 namespace AppExecFwk {
 FormCastTempConnection::FormCastTempConnection(const int64_t formId, const std::string &bundleName,
-    const std::string &abilityName) : formId_(formId)
+    const std::string &abilityName)
 {
+    SetFormId(formId);
     SetProviderKey(bundleName, abilityName);
 }
 /**
@@ -42,15 +43,16 @@ void FormCastTempConnection::OnAbilityConnectDone(
     HILOG_INFO("%{public}s called.", __func__);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("%{public}s, abilityName:%{public}s, formId:%{public}" PRId64 ", resultCode:%{public}d",
-            __func__, element.GetAbilityName().c_str(), formId_, resultCode);
+            __func__, element.GetAbilityName().c_str(), GetFormId(), resultCode);
         return;
     }
+    onFormAppConnect();
     sptr<FormCastTempConnection> connection(this);
     FormSupplyCallback::GetInstance()->AddConnection(connection);
 
     Want want;
     want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
-    FormTaskMgr::GetInstance().PostCastTempTask(formId_, want, remoteObject);
+    FormTaskMgr::GetInstance().PostCastTempTask(GetFormId(), want, remoteObject);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

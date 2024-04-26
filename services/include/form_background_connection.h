@@ -40,7 +40,6 @@ public:
         const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode) override;
 
 private:
-    int64_t formId_ = -1;
     std::string funcName_ = "";
     std::string params_ = "";
     DISALLOW_COPY_AND_MOVE(FormBackgroundConnection);

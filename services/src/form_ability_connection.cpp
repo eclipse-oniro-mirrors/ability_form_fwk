@@ -23,10 +23,15 @@
 #include "form_bms_helper.h"
 #include "form_data_mgr.h"
 #include "form_db_cache.h"
+#include "form_event_report.h"
 #include "form_info.h"
 #include "form_info_mgr.h"
 #include "form_supply_callback.h"
 #include "form_timer_mgr.h"
+#include "form_util.h"
+#include "iremote_proxy.h"
+#include "iservice_registry.h"
+#include "system_ability_definition.h"
 #include "want.h"
 
 namespace OHOS {
@@ -95,7 +100,7 @@ void FormAbilityConnection::OnAbilityConnectDone(
  */
 void FormAbilityConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
 {
-    HILOG_DEBUG("%{public}s, element:%{public}s, resultCode:%{public}d",
+    HILOG_INFO("%{public}s, element:%{public}s, resultCode:%{public}d",
         __func__, element.GetURI().c_str(), resultCode);
     if (connectId_ == 0) {
         HILOG_ERROR("%{public}s fail, invalid connectId_: %{public}d", __func__, connectId_);
@@ -106,6 +111,7 @@ void FormAbilityConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementNam
 #ifdef RES_SCHEDULE_ENABLE
     OnFormAbilityDisconnectDoneCallback();
 #endif
+    ReportFormAppUnbindEvent();
 }
 
 /**
@@ -120,6 +126,59 @@ void FormAbilityConnection::OnConnectDied(const wptr<IRemoteObject> &remoteObjec
     } else {
         HILOG_ERROR("%{public}s fail, connectId_ invalidate. connectId_: %{public}d", __func__, connectId_);
     }
+}
+
+sptr<OHOS::AppExecFwk::IAppMgr> FormAbilityConnection::GetAppMgr()
+{
+    sptr<ISystemAbilityManager> systemMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (systemMgr == nullptr) {
+        HILOG_ERROR("Fail to connect system ability manager.");
+        return nullptr;
+    }
+    sptr<IRemoteObject> remoteObject = systemMgr->GetSystemAbility(APP_MGR_SERVICE_ID);
+    if (remoteObject == nullptr) {
+        HILOG_ERROR(" Fail to connect app mgr service.");
+        return nullptr;
+    }
+    return iface_cast<OHOS::AppExecFwk::IAppMgr>(remoteObject);
+}
+
+bool FormAbilityConnection::onFormAppConnect()
+{
+    std::string bundleName = GetBundleName();
+    if (bundleName.empty()) {
+        HILOG_ERROR("Empty bundle name.");
+        return false;
+    }
+    auto appMgr = GetAppMgr();
+    std::vector<AppExecFwk::RunningProcessInfo> infos;
+    int32_t userId = FormUtil::GetCurrentAccountId();
+    int32_t ret = appMgr->GetRunningProcessInformation(bundleName, userId, infos);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("Get running process info failed!");
+        return false;
+    }
+    std::string targetProcessName = bundleName + ":form";
+    for (std::vector<AppExecFwk::RunningProcessInfo>::iterator iter = infos.begin(); iter != infos.end(); iter++) {
+        if ((*iter).processName_ != targetProcessName) {
+            continue;
+        }
+        appFormPid_ = (*iter).pid_;
+        return true;
+    }
+    return false;
+}
+
+void FormAbilityConnection::ReportFormAppUnbindEvent()
+{
+    FormEventInfo eventInfo;
+    eventInfo.timeStamp = FormUtil::GetNowMillisecond();
+    eventInfo.formId = GetFormId();
+    eventInfo.bundleName = GetBundleName() + ":form";
+    eventInfo.formAppPid = GetAppFormPid();
+    HILOG_INFO("bundleName:%{public}s, formId:%{public}" PRId64 ",pid: %{public}" PRId32 ",timstamp:%{public}" PRId64,
+        eventInfo.bundleName.c_str(), eventInfo.formId, eventInfo.formAppPid, eventInfo.timeStamp);
+    FormEventReport::SendThirdFormEvent(FormEventName::UNBIND_FORM_APP, HiSysEventType::BEHAVIOR, eventInfo);
 }
 
 /**
@@ -235,5 +294,11 @@ std::string FormAbilityConnection::GetBundleName()
 {
     return bundleName_;
 }
+
+int32_t FormAbilityConnection::GetAppFormPid()
+{
+    return appFormPid_;
+}
+
 } // namespace AppExecFwk
 } // namespace OHOS

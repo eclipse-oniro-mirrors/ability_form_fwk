@@ -49,6 +49,7 @@ void FormAcquireConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &
            __func__, element.GetAbilityName().c_str(), GetFormId(), resultCode);
         return;
     }
+    onFormAppConnect();
 #ifdef RES_SCHEDULE_ENABLE
     OnFormAbilityConnectDoneCallback();
 #endif
