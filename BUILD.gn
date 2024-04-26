@@ -157,6 +157,11 @@ ohos_shared_library("libfms") {
     external_deps += [ "memmgr:memmgrclient" ]
   }
 
+  if (theme_mgr_enable) {
+    external_deps += [ "theme_mgr:theme_manager_client" ]
+    cflags_cc += [ "-DTHEME_MGR_ENABLE" ]
+  }
+
   defines = []
   if (ability_runtime_power) {
     defines = [ "SUPPORT_POWER" ]

@@ -187,6 +187,7 @@ FormRecord FormDataMgr::CreateFormRecord(const FormItemInfo &formInfo, const int
     newRecord.isSystemApp = formInfo.GetSystemAppFlag();
     newRecord.description = formInfo.GetDescription();
     newRecord.formLocation = formInfo.GetFormLocation();
+    newRecord.isThemeForm = formInfo.GetIsThemeForm();
     if (newRecord.isEnableUpdate) {
         ParseUpdateConfig(newRecord, formInfo);
     }

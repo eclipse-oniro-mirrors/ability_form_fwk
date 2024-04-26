@@ -34,6 +34,9 @@
 #include "iremote_object.h"
 #include "running_form_info.h"
 #include "want.h"
+#ifdef THEME_MGR_ENABLE
+#include "theme_manager_client.h"
+#endif
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -62,6 +65,14 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     int AddForm(const int64_t formId, const Want &want, const sptr<IRemoteObject> &callerToken, FormJsInfo &formInfo);
+
+    /**
+     * @brief Add form with want, send want to form manager service.
+     * @param want The want of the form to add.
+     * @param runningFormInfo Running form info.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int CreateForm(const Want &want, RunningFormInfo &runningFormInfo);
 
     /**
      * @brief Delete forms with formIds, send formIds to form manager service.
@@ -1044,6 +1055,46 @@ private:
 private:
     sptr<IFormPublishInterceptor> formPublishInterceptor_ = nullptr;
     int32_t visibleNotifyDelay_ = Constants::DEFAULT_VISIBLE_NOTIFY_DELAY;
+#ifdef THEME_MGR_ENABLE
+    /**
+     * @brief Fill ThemeFormInfo with want and formId
+     * @param formId Indicates the id of form.
+     * @param themeFormInfo Info of theme form defined by ThemeManager.
+     * @param want The want of form.
+     */
+    void FillThemeFormInfo(const Want &want, ThemeManager::ThemeFormInfo &themeFormInfo, int64_t formId);
+
+    /**
+     * @brief Call ThemeManager to delete form and clear record in database.
+     * @param formId Indicates the id of form.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int DeleteThemeForm(const int64_t formId);
+
+    /**
+     * @brief Add theme form record in database.
+     * @param want The want of form.
+     * @param formId Indicates the id of form.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int AddThemeDBRecord(const Want &want, int64_t formId);
+
+    /**
+     * @brief Allot theme form record in FormDataMgr.
+     * @param want The want of form.
+     * @param formId Indicates the id of form.
+     * @return Returns formrecord created.
+     */
+    FormRecord AllotThemeRecord(const Want &want, int64_t formId);
+#endif
+
+    /**
+     * @brief Delete common forms with formId.
+     * @param formId Indicates the id of form.
+     * @param callerToken Caller ability token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int DeleteCommonForm(const int64_t formId, const sptr<IRemoteObject> &callerToken);
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

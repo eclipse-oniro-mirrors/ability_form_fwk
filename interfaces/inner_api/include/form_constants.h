@@ -80,6 +80,9 @@ namespace Constants {
     const long ABS_REFRESH_MS = 2500;
     constexpr const char* PARAM_HOST_BG_INVERSE_COLOR_KEY = "ohos.extra.param.key.host_bg_inverse_color";
     constexpr const char* PARAM_FONT_FOLLOW_SYSTEM_KEY = "ohos.inner.key.font_follow_system";
+    constexpr const char* PARAM_THEME_KEY  = "ohos.extra.param.key.form_is_theme";
+    constexpr const char* PARAM_THEME_THEME_FORM_ID  = "themeFormId";
+    constexpr const char* PARAM_THEME_THEME_ID  = "themeId";
 
     constexpr int32_t UNKNOWN = 0;
     // The form events type which means that the form becomes visible.

@@ -87,6 +87,11 @@ ohos_unittest("FmsFormMgrServiceTest") {
     external_deps += [ "device_usage_statistics:usagestatsinner" ]
     defines = [ "DEVICE_USAGE_STATISTICS_ENABLE" ]
   }
+
+  if (theme_mgr_enable) {
+    external_deps += [ "theme_mgr:theme_manager_client" ]
+    cflags_cc += [ "-DTHEME_MGR_ENABLE" ]
+  }
 }
 
 ###############################################################################

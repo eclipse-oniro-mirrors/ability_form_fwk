@@ -817,4 +817,21 @@ HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0103, TestSize.Level1) {
     EXPECT_EQ(formMgrProxy->UpdateFormLocation(formId, formLocation), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrProxyTest_0103 test ends";
 }
+
+/**
+ * @tc.name: FormMgrProxyTest_0104
+ * @tc.desc: Verify CreateForm
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0104, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_0104 starts";
+    EXPECT_CALL(*mockFormMgrService, CreateForm(_, _))
+        .Times(1)
+        .WillOnce(Return(0));
+    Want want;
+    RunningFormInfo runningFormInfo;
+    int result = formMgrProxy->CreateForm(want, runningFormInfo);
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_0104 test ends";
+}
 }
