@@ -590,6 +590,13 @@ public:
      */
     ErrCode UpdateFormLocation(const int64_t &formId, const int32_t &formLocation);
 
+#ifdef RES_SCHEDULE_ENABLE
+    /**
+     * @brief Set the value which indicate whether Refresh Timer task should be triggered.
+     * @param isTimerTaskNeeded The value of whether Refresh Timer task should be triggered.
+     */
+    void SetTimerTaskNeeded(bool isTimerTaskNeeded);
+#endif // RES_SCHEDULE_ENABLE
 private:
     /**
      * @brief Get form configure info.
