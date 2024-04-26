@@ -2589,4 +2589,36 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0101, TestSize.Level1) {
     EXPECT_EQ(result, errorCode);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0101 ends";
 }
+
+/**
+ * @tc.number: FormMgrStubTest_0102
+ * @tc.name: test SetPublishFormResult function.
+ * @tc.desc: Verify that the SetPublishFormResult interface is called normally and the return value is ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0102, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0102 starts";
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_CALL(*mockFormMgrService, SetPublishFormResult(_, _))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    EXPECT_EQ(mockFormMgrService->HandleSetPublishFormResult(data, reply), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0102 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_0103
+ * @tc.name: test AcquireAddFormResult function.
+ * @tc.desc: Verify that the AcquireAddFormResult interface is called normally and the return value is ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0103, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0103 starts";
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_CALL(*mockFormMgrService, AcquireAddFormResult(_))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    EXPECT_EQ(mockFormMgrService->HandleAcquireAddFormResult(data, reply), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0103 ends";
+}
 }

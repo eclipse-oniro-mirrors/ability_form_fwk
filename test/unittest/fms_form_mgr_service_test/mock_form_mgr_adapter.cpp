@@ -38,6 +38,8 @@ namespace {
     int g_getFormsInfoByModule = OHOS::ERR_OK;
     int g_updateForm = OHOS::ERR_OK;
     int g_updateFormLocation = OHOS::ERR_OK;
+    int g_setPublishFormResult = OHOS::ERR_OK;
+    int g_acquireAddFormResult = OHOS::ERR_OK;
     bool g_isRequestPublishFormSupported = true;
     int g_stopRenderingForm = OHOS::ERR_OK;
     int g_releaseRenderer = OHOS::ERR_OK;
@@ -264,6 +266,16 @@ int FormMgrAdapter::UpdateForm(const int64_t formId, const int32_t uid,
 int FormMgrAdapter::UpdateFormLocation(const int64_t &formId, const int32_t &formLocation)
 {
     return g_updateFormLocation;
+}
+
+int FormMgrAdapter::SetPublishFormResult(const int64_t formId, Constants::PublishFormResult &errorCodeInfo)
+{
+    return g_setPublishFormResult;
+}
+
+int FormMgrAdapter::AcquireAddFormResult(const int64_t formId)
+{
+    return g_acquireAddFormResult;
 }
 
 int FormMgrAdapter::StopRenderingForm(const int64_t formId, const std::string &compId)
