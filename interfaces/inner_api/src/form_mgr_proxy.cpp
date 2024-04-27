@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -341,6 +341,49 @@ ErrCode FormMgrProxy::RequestPublishForm(Want &want, bool withFormBindingData,
     }
     return errCode;
 }
+
+ErrCode FormMgrProxy::RequestPublishFormWithSnapshot(Want &want, bool withFormBindingData,
+    std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId)
+{
+    MessageParcel data;
+    MessageParcel reply;
+
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("%{public}s, failed to write interface token", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteParcelable(&want)) {
+        HILOG_ERROR("%{public}s, failed to write want", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteBool(withFormBindingData)) {
+        HILOG_ERROR("%{public}s, failed to write withFormBindingData", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (withFormBindingData) {
+        if (!data.WriteParcelable(formBindingData.get())) {
+            HILOG_ERROR("%{public}s, failed to write formBindingData", __func__);
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+    }
+
+    MessageOption option;
+    int32_t error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_FORM_WITH_SNAPSHOT,
+        data,
+        reply,
+        option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d", __func__, error);
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+    ErrCode errCode = reply.ReadInt32();
+    if (errCode == ERR_OK) {
+        formId = reply.ReadInt64();
+    }
+    return errCode;
+}
+
 
 int FormMgrProxy::LifecycleUpdate(
     const std::vector<int64_t> &formIds,
