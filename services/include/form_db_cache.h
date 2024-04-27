@@ -24,6 +24,9 @@
 #include "form_id_key.h"
 #include "form_record.h"
 #include "form_info_rdb_storage_mgr.h"
+#ifdef THEME_MGR_ENABLE
+#include "theme_manager_client.h"
+#endif
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -164,6 +167,13 @@ private:
      */
     ErrCode SaveFormInfoNolock(const FormDBInfo &formDBInfo);
 
+#ifdef THEME_MGR_ENABLE
+    /**
+     * @brief Call ThemeManager to delete form.
+     * @param removedFormsMap Indicates the map of forms to be delete.
+     */
+    void DeleteThemeForms(std::map<int64_t, bool> &removedFormsMap);
+#endif
     mutable std::mutex formDBInfosMutex_;
     std::vector<FormDBInfo> formDBInfos_;
 };

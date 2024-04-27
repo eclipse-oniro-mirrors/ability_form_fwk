@@ -34,6 +34,7 @@ struct FormDBInfo {
     std::string abilityName;
     std::vector<int> formUserUids;
     Constants::FormLocation formLocation;
+    bool isThemeForm = false;
     /**
      * @brief Constructors
      *
@@ -55,6 +56,7 @@ struct FormDBInfo {
         abilityName = formRecord.abilityName;
         formUserUids = formRecord.formUserUids;
         formLocation = formRecord.formLocation;
+        isThemeForm = formRecord.isThemeForm;
     }
     bool Contains(const int uId) const
     {
@@ -108,6 +110,9 @@ struct FormDBInfo {
         if (formLocation != formDBInfo.formLocation) {
             return false;
         }
+        if (isThemeForm != formDBInfo.isThemeForm) {
+            return false;
+        }
 
         return true;
     }
@@ -137,6 +142,7 @@ public:
         formDBInfo_.abilityName = formDBInfo.abilityName;
         formDBInfo_.formUserUids = formDBInfo.formUserUids;
         formDBInfo_.formLocation = formDBInfo.formLocation;
+        formDBInfo_.isThemeForm = formDBInfo.isThemeForm;
     }
     /**
      * @brief Constructors
@@ -153,6 +159,7 @@ public:
         formDBInfo_.abilityName = innerFormInfo.formDBInfo_.abilityName;
         formDBInfo_.formUserUids = innerFormInfo.formDBInfo_.formUserUids;
         formDBInfo_.formLocation = innerFormInfo.formDBInfo_.formLocation;
+        formDBInfo_.isThemeForm = innerFormInfo.formDBInfo_.isThemeForm;
     }
      /**
      * @brief Constructors
@@ -169,6 +176,7 @@ public:
         formDBInfo_.abilityName = formRecord.abilityName;
         formDBInfo_.formUserUids = formRecord.formUserUids;
         formDBInfo_.formLocation = formRecord.formLocation;
+        formDBInfo_.isThemeForm = formRecord.isThemeForm;
     }
     std::string ToString() const
     {
@@ -182,6 +190,7 @@ public:
         obj["abilityName"] = formDBInfo_.abilityName;
         obj["formUserUids"] = formDBInfo_.formUserUids;
         obj["formLocation"] = formDBInfo_.formLocation;
+        obj["isThemeForm"] = formDBInfo_.isThemeForm;
         return obj.dump();
     }
     /**
@@ -353,6 +362,24 @@ public:
     FormDBInfo GetFormDBInfo() const
     {
         return formDBInfo_;
+    }
+
+    /**
+     * @brief Set whether it belongs to theme form.
+     * @param isThemeForm is theme form or not.
+     */
+    void SetIsThemeForm(bool isThemeForm)
+    {
+        formDBInfo_.isThemeForm = isThemeForm;
+    }
+
+    /**
+     * @brief Set whether it belongs to theme form.
+     * @param isThemeForm is theme form or not.
+     */
+    bool GetIsThemeForm() const
+    {
+        return formDBInfo_.isThemeForm;
     }
 
     void AddUserUid(const int callingUid);

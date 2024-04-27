@@ -57,7 +57,7 @@ declare_args() {
 declare_args() {
   cite_memmgr_plugin = false
   if (defined(global_parts_info) &&
-      defined(global_parts_info.resourceschedule_memmgr_plugin)) {
+      defined(global_parts_info.resourceschedule_memmgr_override)) {
     cite_memmgr_plugin = true
   }
 
@@ -73,5 +73,13 @@ declare_args() {
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
     res_schedule_service = true
+  }
+}
+
+declare_args() {
+  theme_mgr_enable = false
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.theme_theme_mgr)) {
+    theme_mgr_enable = true
   }
 }

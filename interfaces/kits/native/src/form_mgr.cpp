@@ -78,6 +78,28 @@ int FormMgr::AddForm(
 }
 
 /**
+ * @brief Add form with want, send want to form manager service.
+ * @param want The want of the form to add.
+ * @param runningFormInfo Running form info.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormMgr::CreateForm(const Want &want, RunningFormInfo &runningFormInfo)
+{
+    HILOG_INFO("called.");
+    int resultCode = Connect();
+    if (resultCode != ERR_OK) {
+        HILOG_ERROR("Connect failed errCode:%{public}d.", resultCode);
+        return resultCode;
+    }
+    resultCode = remoteProxy_->CreateForm(want, runningFormInfo);
+    if (resultCode != ERR_OK) {
+        HILOG_ERROR("failed to CreateForm, error code is %{public}d.", resultCode);
+    }
+    HILOG_INFO("return formId: %{public}s.", std::to_string(runningFormInfo.formId).c_str());
+    return resultCode;
+}
+
+/**
  * @brief Delete forms with formIds, send formIds to form manager service.
  * @param formId The Id of the forms to delete.
  * @param callerToken Caller ability token.

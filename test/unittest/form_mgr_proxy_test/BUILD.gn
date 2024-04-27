@@ -20,7 +20,7 @@ config("form_mgr_proxy_test_config") {
   ]
 }
 
-ohos_unittest("FmsFormMgrProxyTest") {
+ohos_unittest("FmsFormMgrProxyTempTest") {
   module_out_path = "form_fwk/form_mgr_service"
 
   configs = [ ":form_mgr_proxy_test_config" ]
@@ -57,5 +57,5 @@ ohos_unittest("FmsFormMgrProxyTest") {
 
 group("unittest") {
   testonly = true
-  deps = [ ":FmsFormMgrProxyTest" ]
+  deps = [ ":FmsFormMgrProxyTempTest" ]
 }

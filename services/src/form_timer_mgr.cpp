@@ -1283,11 +1283,65 @@ void FormTimerMgr::InnerClearIntervalTimer()
     HILOG_INFO("%{public}s end", __func__);
 }
 
+#ifdef RES_SCHEDULE_ENABLE
+void FormTimerMgr::SetTimerTaskNeeded(bool isTimerTaskNeeded)
+{
+    HILOG_INFO("isTimerTaskNeeded_ is set to %{public}s", isTimerTaskNeeded ? "true" : "false");
+    if (!isTimerTaskNeeded_ && isTimerTaskNeeded) {
+        TriggerAndClearNotExecTaskVec();
+    }
+    isTimerTaskNeeded_ = isTimerTaskNeeded;
+}
+
+void FormTimerMgr::AddToNotExecTaskVec(const FormTimer &task)
+{
+    for (auto &item : notExecTaskVec_) {
+        if (item.formId == task.formId && item.userId == task.userId) {
+            item = task;
+            return;
+        }
+    }
+    notExecTaskVec_.emplace_back(task);
+    HILOG_DEBUG("the task(formId: %{public}" PRId64 ", userId: %{public}d) is added to notExecTaskVec",
+        task.formId, task.userId);
+}
+
+void FormTimerMgr::TriggerAndClearNotExecTaskVec()
+{
+    for (auto &item : notExecTaskVec_) {
+        ExecTimerTaskCore(item);
+        HILOG_INFO("the task(formId: %{public}" PRId64 ", userId: %{public}d) is triggered when level is down",
+            item.formId, item.userId);
+    }
+    notExecTaskVec_.clear();
+}
+
 /**
  * @brief Execute Form timer task.
  * @param timerTask Form timer task.
  */
 void FormTimerMgr::ExecTimerTask(const FormTimer &timerTask)
+{
+    if (!isTimerTaskNeeded_) {
+        AddToNotExecTaskVec(timerTask);
+        return;
+    }
+
+    ExecTimerTaskCore(timerTask);
+}
+
+/**
+ * @brief Execute Form timer task.
+ * @param timerTask Form timer task core.
+ */
+void FormTimerMgr::ExecTimerTaskCore(const FormTimer &timerTask)
+#else
+/**
+ * @brief Execute Form timer task.
+ * @param timerTask Form timer task.
+ */
+void FormTimerMgr::ExecTimerTask(const FormTimer &timerTask)
+#endif // RES_SCHEDULE_ENABLE
 {
     HILOG_INFO("%{public}s start", __func__);
     HILOG_INFO("%{public}s run", __func__);
