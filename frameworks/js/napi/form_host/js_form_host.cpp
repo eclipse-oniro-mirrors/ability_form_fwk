@@ -512,9 +512,9 @@ private:
         }
 
         std::shared_ptr<AppExecFwk::RunningFormInfo> runningFormInfo =
-            std::shared_ptr<AppExecFwk::RunningFormInfo>();
+            std::make_shared<AppExecFwk::RunningFormInfo>();
         auto apiResult = std::make_shared<int32_t>();
-        NapiAsyncTask::ExecuteCallback  execute = [want, runningFormInfo, ret = apiResult]() {
+        NapiAsyncTask::ExecuteCallback execute = [want, runningFormInfo, ret = apiResult]() {
             *ret = FormMgr::GetInstance().CreateForm(want, *runningFormInfo);
         };
 
