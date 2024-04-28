@@ -266,6 +266,11 @@ public:
         std::unique_ptr<JsFormHost>(static_cast<JsFormHost*>(data));
     }
 
+    static napi_value AddForm(napi_env env, napi_callback_info info)
+    {
+        GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnAddForm);
+    }
+
     static napi_value DeleteForm(napi_env env, napi_callback_info info)
     {
         GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnDeleteForm);
@@ -488,6 +493,45 @@ private:
         }
 
         return true;
+    }
+
+    napi_value OnAddForm(napi_env env, size_t argc, napi_value* argv)
+    {
+        HILOG_INFO("called.");
+
+        if (argc != ARGS_ONE) {
+            HILOG_ERROR("wrong number of arguments.");
+            NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1");
+            return CreateJsUndefined(env);
+        }
+
+        Want want;
+        if (!UnwrapWant(env, argv[PARAM0], want)) {
+            HILOG_ERROR("UnwrapWant failed");
+            return CreateJsUndefined(env);
+        }
+
+        std::shared_ptr<AppExecFwk::RunningFormInfo> runningFormInfo =
+            std::make_shared<AppExecFwk::RunningFormInfo>();
+        auto apiResult = std::make_shared<int32_t>();
+        NapiAsyncTask::ExecuteCallback execute = [want, runningFormInfo, ret = apiResult]() {
+            *ret = FormMgr::GetInstance().CreateForm(want, *runningFormInfo);
+        };
+
+        NapiAsyncTask::CompleteCallback complete = [runningFormInfo, ret = apiResult](napi_env env,
+            NapiAsyncTask &task, int32_t status) {
+            HILOG_INFO("return ret: %{public}d, formId: %{public}" PRId64 "", *ret, runningFormInfo->formId);
+            if (*ret == ERR_OK) {
+                task.ResolveWithNoError(env, CreateRunningFormInfo(env, *runningFormInfo));
+            } else {
+                task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, *ret));
+            }
+        };
+
+        napi_value result = nullptr;
+        NapiAsyncTask::ScheduleWithDefaultQos("JsFormHost::OnAddForm",
+            env, CreateAsyncTaskWithLastParam(env, nullptr, std::move(execute), std::move(complete), &result));
+        return result;
     }
 
     napi_value OnDeleteForm(napi_env env, size_t argc, napi_value* argv)
@@ -1921,6 +1965,7 @@ napi_value JsFormHostInit(napi_env env, napi_value exportObj)
     BindNativeFunction(env, exportObj, "recoverForms", moduleName, JsFormHost::RecoverForms);
     BindNativeFunction(env, exportObj, "recycleForms", moduleName, JsFormHost::RecycleForms);
     BindNativeFunction(env, exportObj, "updateFormLocation", moduleName, JsFormHost::UpdateFormLocation);
+    BindNativeFunction(env, exportObj, "addForm", moduleName, JsFormHost::AddForm);
 
     return CreateJsUndefined(env);
 }

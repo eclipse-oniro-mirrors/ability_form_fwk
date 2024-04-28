@@ -41,6 +41,7 @@ struct RunningFormInfo : public Parcelable {
     Constants::FormLocation formLocation;
     FormVisibilityType formVisiblity = FormVisibilityType::UNKNOWN;
     FormUsageState formUsageState = FormUsageState::USED;
+    RecycleStatus recycleStatus = RecycleStatus::NON_RECYCLABLE;
 
     bool ReadFromParcel(Parcel &parcel);
     bool Marshalling(Parcel &parcel) const override;

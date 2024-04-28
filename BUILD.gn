@@ -91,6 +91,7 @@ ohos_shared_library("libfms") {
     "services/src/form_share_mgr.cpp",
     "services/src/form_supply_callback.cpp",
     "services/src/form_sys_event_receiver.cpp",
+    "services/src/form_systemload_listener.cpp",
     "services/src/form_task_mgr.cpp",
     "services/src/form_timer_mgr.cpp",
     "services/src/form_trust_mgr.cpp",
@@ -153,9 +154,14 @@ ohos_shared_library("libfms") {
   ]
 
   if (cite_memmgr_plugin) {
-    external_deps += [ "memmgr_plugin:memmgrclient" ]
+    external_deps += [ "memmgr_override:memmgrclient" ]
   } else if (cite_memmgr) {
     external_deps += [ "memmgr:memmgrclient" ]
+  }
+
+  if (theme_mgr_enable) {
+    external_deps += [ "theme_mgr:theme_manager_client" ]
+    cflags_cc += [ "-DTHEME_MGR_ENABLE" ]
   }
 
   defines = []

@@ -21,6 +21,7 @@
 #include "iremote_broker.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
+#include "ipc_skeleton.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -145,7 +146,10 @@ int32_t FormEcologicalRuleProxy::IsSupportPublishForm(const std::vector<Want> &w
         HILOG_ERROR("get Remote failed");
         return ERR_FAILED;
     }
+
+    std::string originId = IPCSkeleton::ResetCallingIdentity();
     int32_t ret = remote->SendRequest(IS_SUPPORT_PUBLISH_FORM_CMD, data, reply, option);
+    IPCSkeleton::SetCallingIdentity(originId);
     if (ret != ERR_NONE) {
         HILOG_ERROR("SendRequest error, ret = %{public}d", ret);
         return ERR_FAILED;

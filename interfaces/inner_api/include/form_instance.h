@@ -32,6 +32,12 @@ enum class FormVisibilityType {
     INVISIBLE,
 };
 
+enum class RecycleStatus {
+    RECYCLABLE,
+    RECYCLED,
+    NON_RECYCLABLE,
+};
+
 struct FormInstance : public Parcelable {
     int64_t formId = 0;
     std::string formHostName = "";

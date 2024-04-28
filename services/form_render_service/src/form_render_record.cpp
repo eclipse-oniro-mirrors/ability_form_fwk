@@ -228,7 +228,8 @@ bool FormRenderRecord::CreateEventHandler(const std::string &bundleName, bool ne
             }
             renderRecord->jsThreadId_ = getproctid();
             renderRecord->processId_ = getprocpid();
-            HILOG_INFO("Get thread %{public}d and psid %{public}d", renderRecord->jsThreadId_, renderRecord->processId_);
+            HILOG_INFO("Get thread %{public}d and psid %{public}d", renderRecord->jsThreadId_,
+                renderRecord->processId_);
         };
         eventHandler_->PostHighPriorityTask(task, "GotJSThreadId");
 

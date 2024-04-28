@@ -174,6 +174,104 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
     return ret;
 }
 
+/**
+ * @brief Add form with want, send want to form manager service.
+ * @param want The want of the form to add.
+ * @param runningFormInfo Running form info.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormMgrAdapter::CreateForm(const Want &want, RunningFormInfo &runningFormInfo)
+{
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    HILOG_INFO("called.");
+
+    bool isThemeForm = want.GetBoolParam(AppExecFwk::Constants::PARAM_THEME_KEY, false);
+    if (isThemeForm) {
+        HILOG_INFO("isThemeForm.");
+#ifdef THEME_MGR_ENABLE
+        int ret = CheckFormCountLimit(0, want);
+        if (ret != ERR_OK) {
+            HILOG_ERROR("CheckFormCountLimit failed");
+            return ret;
+        }
+
+        // generate formId
+        int64_t formId = FormDataMgr::GetInstance().GenerateFormId();
+        HILOG_INFO("generate formId:%{public}" PRId64 "", formId);
+        if (formId < 0) {
+            HILOG_ERROR("generate invalid formId");
+            return ERR_APPEXECFWK_FORM_COMMON_CODE;
+        }
+
+        // call theme manager service to add
+        ThemeManager::ThemeFormInfo themeFormInfo;
+        FillThemeFormInfo(want, themeFormInfo, formId);
+        ret = ThemeManager::ThemeManagerClient::GetInstance().AddForm(themeFormInfo);
+        if (ret != ERR_OK) {
+            HILOG_ERROR("ThemeManager AddForm failed");
+            return ret;
+        }
+
+        // add record
+        ret = AddThemeDBRecord(want, formId);
+        if (ret != ERR_OK) {
+            HILOG_ERROR("AddThemeDBRecord failed");
+        }
+
+        runningFormInfo.formId = formId;
+        return ret;
+#else
+        HILOG_INFO("THEME_MGR_ENABLE undefined.");
+        return ERR_APPEXECFWK_FORM_GET_SYSMGR_FAILED;
+#endif
+    } else {
+        HILOG_INFO("Invalid to add commom form.");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+}
+
+#ifdef THEME_MGR_ENABLE
+int FormMgrAdapter::AddThemeDBRecord(const Want &want, int64_t formId)
+{
+    HILOG_DEBUG("called.");
+    FormRecord formRecord = AllotThemeRecord(want, formId);
+    int ret = FormDbCache::GetInstance().UpdateDBRecord(formId, formRecord);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("fail, UpdateDBRecord failed");
+    }
+    return ret;
+}
+
+void FormMgrAdapter::FillThemeFormInfo(const Want &want, ThemeManager::ThemeFormInfo &themeFormInfo, int64_t formId)
+{
+    HILOG_DEBUG("called.");
+    themeFormInfo.formId = formId;
+    themeFormInfo.themeFormDimension =
+        static_cast<ThemeManager::ThemeFormDimension>(want.GetIntParam(Constants::PARAM_FORM_DIMENSION_KEY, 0));
+    themeFormInfo.themeFormLocation =
+        static_cast<ThemeManager::ThemeFormLocation>(want.GetIntParam(Constants::FORM_LOCATION_KEY, 0));
+    themeFormInfo.themeFormId = want.GetIntParam(Constants::PARAM_THEME_THEME_FORM_ID, 0);
+    themeFormInfo.themeId = want.GetIntParam(Constants::PARAM_THEME_THEME_ID, 0);
+}
+
+FormRecord FormMgrAdapter::AllotThemeRecord(const Want &want, int64_t formId)
+{
+    HILOG_DEBUG("called.");
+    FormItemInfo formInfo;
+    formInfo.SetFormId(formId);
+    formInfo.SetProviderBundleName(want.GetStringParam(Constants::PARAM_BUNDLE_NAME_KEY));
+    formInfo.SetModuleName(want.GetStringParam(Constants::PARAM_MODULE_NAME_KEY));
+    formInfo.SetAbilityName(want.GetStringParam(Constants::PARAM_ABILITY_NAME_KEY));
+    formInfo.SetSpecificationId(want.GetIntParam(Constants::PARAM_FORM_DIMENSION_KEY, 0));
+    formInfo.SetFormName(want.GetStringParam(Constants::PARAM_FORM_NAME_KEY));
+    formInfo.SetIsThemeForm(true);
+
+    int callingUid = IPCSkeleton::GetCallingUid();
+    int32_t currentUserId = GetCurrentUserId(callingUid);
+    return FormDataMgr::GetInstance().AllotFormRecord(formInfo, callingUid, currentUserId);
+}
+#endif
+
 ErrCode FormMgrAdapter::CheckFormCountLimit(const int64_t formId, const Want &want)
 {
     bool tempFormFlag = want.GetBoolParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
@@ -286,6 +384,39 @@ int FormMgrAdapter::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
+#ifdef THEME_MGR_ENABLE
+    FormDBInfo dbInfo;
+    ErrCode getDbRet = FormDbCache::GetInstance().GetDBRecord(formId, dbInfo);
+    HILOG_INFO("getDbRet: %{public}d.", getDbRet);
+    if (getDbRet == ERR_OK && dbInfo.isThemeForm) {
+        return DeleteThemeForm(formId);
+    }
+#endif
+    return DeleteCommonForm(formId, callerToken);
+}
+
+#ifdef THEME_MGR_ENABLE
+int FormMgrAdapter::DeleteThemeForm(const int64_t formId)
+{
+    HILOG_INFO("called.");
+    std::vector<int64_t> removeList;
+    removeList.emplace_back(formId);
+    int ret = ThemeManager::ThemeManagerClient::GetInstance().DeleteForm(removeList);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("call ThemeManager to delete failed");
+        return ret;
+    }
+
+    ret = FormDbCache::GetInstance().DeleteFormInfo(formId);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("DeleteFormDBInfo failed");
+    }
+    return ret;
+}
+#endif
+
+int FormMgrAdapter::DeleteCommonForm(const int64_t formId, const sptr<IRemoteObject> &callerToken)
+{
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
     // remove connection for in application form
     FormSupplyCallback::GetInstance()->RemoveConnection(matchedFormId, callerToken);
@@ -3797,6 +3928,13 @@ ErrCode FormMgrAdapter::UpdateFormLocation(const int64_t &formId, const int32_t 
     }
     return ERR_OK;
 }
+
+#ifdef RES_SCHEDULE_ENABLE
+void FormMgrAdapter::SetTimerTaskNeeded(bool isTimerTaskNeeded)
+{
+    FormTimerMgr::GetInstance().SetTimerTaskNeeded(isTimerTaskNeeded);
+}
+#endif // RES_SCHEDULE_ENABLE
 
 } // namespace AppExecFwk
 } // namespace OHOS

@@ -187,6 +187,7 @@ FormRecord FormDataMgr::CreateFormRecord(const FormItemInfo &formInfo, const int
     newRecord.isSystemApp = formInfo.GetSystemAppFlag();
     newRecord.description = formInfo.GetDescription();
     newRecord.formLocation = formInfo.GetFormLocation();
+    newRecord.isThemeForm = formInfo.GetIsThemeForm();
     if (newRecord.isEnableUpdate) {
         ParseUpdateConfig(newRecord, formInfo);
     }
@@ -1954,6 +1955,7 @@ void FormDataMgr::FillBasicRunningFormInfoByFormRecord(const FormRecord &formRec
     runningFormInfo.description = formRecord.description;
     runningFormInfo.formLocation = formRecord.formLocation;
     runningFormInfo.formVisiblity = static_cast<FormVisibilityType>(formRecord.formVisibleNotifyState);
+    runningFormInfo.recycleStatus = formRecord.recycleStatus;
 }
 
 ErrCode FormDataMgr::GetRunningFormInfosByFormId(const int64_t formId, RunningFormInfo &runningFormInfo)

@@ -2453,16 +2453,65 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0116, TestSize.Level1)
 
 /**
  * @tc.number: FormMgrService_0117
- * @tc.name: test FormMgr HiDumpFormBlockedApps function.
- * @tc.desc: Verify that the HiDumpFormBlockedApps interface is available.
+ * @tc.name: test CreateForm function.
+ * @tc.desc: Verify that the CreateForm interface is called normally and the return value is ERR_OK.
  */
 HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0117, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormMgrService_0117 start";
     FormMgrService formMgrService;
+    Want want;
+    RunningFormInfo runningFormInfo;
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(true);
+    MockVerifyCallingPermission(true);
+    MockCheckAcrossLocalAccountsPermission(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY, formMgrService.CreateForm(want, runningFormInfo));
+
+    MockCheckAcrossLocalAccountsPermission(true);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrService.CreateForm(want, runningFormInfo));
+    GTEST_LOG_(INFO) << "FormMgrService_0117 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0118
+ * @tc.name: test CreateForm function.
+ * @tc.desc: Verify that the CreateForm interface is called normally and the return value is ERR_OK.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0118, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0118 start";
+    FormMgrService formMgrService;
+    Want want;
+    want.SetParam(AppExecFwk::Constants::PARAM_THEME_KEY, true);
+    RunningFormInfo runningFormInfo;
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(true);
+    MockVerifyCallingPermission(true);
+    MockCheckAcrossLocalAccountsPermission(true);
+#ifdef THEME_MGR_ENABLE
+    GTEST_LOG_(INFO) << "FormMgrService_0118 THEME_MGR_ENABLE defined";
+    EXPECT_EQ(ERR_OK, formMgrService.CreateForm(want, runningFormInfo));
+#else
+    GTEST_LOG_(INFO) << "FormMgrService_0118 THEME_MGR_ENABLE undefined";
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_SYSMGR_FAILED, formMgrService.CreateForm(want, runningFormInfo));
+#endif
+
+    GTEST_LOG_(INFO) << "FormMgrService_0118 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0119
+ * @tc.name: test FormMgr HiDumpFormBlockedApps function.
+ * @tc.desc: Verify that the HiDumpFormBlockedApps interface is available.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0119, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0119 start";
+    FormMgrService formMgrService;
     std::string args;
     std::string blockAppInfo;
     formMgrService.HiDumpFormBlockedApps(args, blockAppInfo);
-    GTEST_LOG_(INFO) << "FormMgrService_0117 end";
+    GTEST_LOG_(INFO) << "FormMgrService_0119 end";
 }
 }

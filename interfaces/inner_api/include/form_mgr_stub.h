@@ -52,6 +52,15 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t HandleAddForm(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle CreateForm message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t HandleCreateForm(MessageParcel &data, MessageParcel &reply);
+
     /**
      * @brief Handle DeleteForm message.
      * @param data input param.
