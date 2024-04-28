@@ -148,6 +148,12 @@ public:
         return {};
     };
 
+    int32_t GetRunningSaExtensionInfoList(const std::string& extension,
+        std::vector<SaExtensionInfo>& infoList)
+    {
+        return {};
+    };
+
     int32_t GetOnDemandSystemAbilityIds(std::vector<int32_t>& systemAbilityIds)
     {
         return {};
