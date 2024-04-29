@@ -106,6 +106,9 @@ public:
     ErrCode RequestPublishForm(Want &want, bool withFormBindingData,
                                std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId) override;
 
+    ErrCode SetPublishFormResult(const std::string &formId, Constants::PublishFormResult &errorCodeInfo) override;
+
+    ErrCode AcquireAddFormResult(const int64_t formId) override;
     /**
      * @brief Lifecycle update.
      * @param formIds The Id of the forms.

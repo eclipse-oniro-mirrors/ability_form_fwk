@@ -50,6 +50,7 @@ namespace {
     // MICROSECONDS mean 10^6 millias second
     constexpr int64_t MICROSECONDS = 1000000;
     constexpr int32_t INVALID_FORM_LOCATION = -2;
+    constexpr int32_t INVALID_FORM_RESULT_ERRCODE = -2;
 }
 
 int64_t SystemTimeMillis() noexcept
@@ -410,6 +411,12 @@ public:
     {
         GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnUpdateFormLocation);
     }
+
+    static napi_value SetPublishFormResult(napi_env env, napi_callback_info info)
+    {
+        GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnSetPublishFormResult);
+    }
+
 private:
     bool CheckCallerIsSystemApp()
     {
@@ -487,6 +494,36 @@ private:
             return false;
         }
 
+        return true;
+    }
+
+    bool ParseParameter(napi_env env, napi_value *argv, int32_t &formErrorCode, std::string &messageInfo)
+    {
+        napi_valuetype param1Type = napi_undefined;
+        napi_typeof(env, argv[1], &param1Type);
+        if (param1Type != napi_object) {
+            HILOG_ERROR("result is not napi_object.");
+            return false;
+        }
+        napi_value publishFormErrorCode = nullptr;
+        napi_status codeRet = napi_get_named_property(env, argv[1], "code", &publishFormErrorCode);
+        napi_value message = nullptr;
+        napi_status messageRet = napi_get_named_property(env, argv[1], "message", &message);
+        if (codeRet != napi_ok || messageRet != napi_ok) {
+            HILOG_ERROR("get property failed.");
+            return false;
+        }
+        messageInfo = GetStringFromNapi(env, message);
+        if (napi_get_value_int32(env, publishFormErrorCode, &formErrorCode) == napi_ok) {
+            if (formErrorCode < static_cast<int32_t>(Constants::PublishFormErrorCode::SUCCESS) ||
+                    formErrorCode > static_cast<int32_t>(Constants::PublishFormErrorCode::INTERNAL_ERROR)) {
+                HILOG_ERROR("PublishFormResult is convert fail.");
+                return false;
+            }
+        } else {
+            HILOG_ERROR("PublishFormErrorCode is not number.");
+            return false;
+        }
         return true;
     }
 
@@ -1880,6 +1917,50 @@ private:
         NapiFormUtil::ThrowByInternalErrorCode(env, ret);
         return CreateJsUndefined(env);
     }
+
+    napi_value OnSetPublishFormResult(napi_env env, size_t argc, napi_value *argv)
+    {
+        HILOG_DEBUG("OnSetPublishFormResult called.");
+        if (!CheckCallerIsSystemApp()) {
+            HILOG_ERROR("This application is not system-app, can not use system-api");
+            NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
+            return CreateJsUndefined(env);
+        }
+        if (argc != ARGS_TWO) {
+            HILOG_ERROR("Wrong number of arguments.");
+            NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "2");
+            return CreateJsUndefined(env);
+        }
+        decltype(argc) convertArgc = 0;
+        std::string formId = GetStringFromNapi(env, argv[0]);
+        convertArgc++;
+        std::string messageInfo = "";
+        int32_t formErrorCode = INVALID_FORM_RESULT_ERRCODE;
+        if (!ParseParameter(env, argv, formErrorCode, messageInfo)) {
+            HILOG_ERROR("Parsing Argument Errors.");
+            NapiFormUtil::ThrowParamError(env, "Failed to get property.");
+            return CreateJsUndefined(env);
+        }
+        convertArgc++;
+
+        AppExecFwk::Constants::PublishFormResult publishFormResult;
+        publishFormResult.code = static_cast<AppExecFwk::Constants::PublishFormErrorCode>(formErrorCode);
+        publishFormResult.message = messageInfo;
+        NapiAsyncTask::CompleteCallback complete = [formId, publishFormResult](napi_env env, NapiAsyncTask &task,
+            int32_t status) mutable {
+            ErrCode ret = FormMgr::GetInstance().SetPublishFormResult(formId, publishFormResult);
+            if (ret == ERR_OK) {
+                task.ResolveWithNoError(env, CreateJsUndefined(env));
+            } else {
+                task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
+            }
+        };
+        napi_value lastParam = (argc <= convertArgc) ? nullptr : argv[convertArgc];
+        napi_value result = nullptr;
+        NapiAsyncTask::ScheduleWithDefaultQos("JsFormHost::OnSetPublishFormResult",
+            env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
+        return result;
+    }
 };
 
 napi_value JsFormHostInit(napi_env env, napi_value exportObj)
@@ -1921,7 +2002,7 @@ napi_value JsFormHostInit(napi_env env, napi_value exportObj)
     BindNativeFunction(env, exportObj, "recoverForms", moduleName, JsFormHost::RecoverForms);
     BindNativeFunction(env, exportObj, "recycleForms", moduleName, JsFormHost::RecycleForms);
     BindNativeFunction(env, exportObj, "updateFormLocation", moduleName, JsFormHost::UpdateFormLocation);
-
+    BindNativeFunction(env, exportObj, "setPublishFormResult", moduleName, JsFormHost::SetPublishFormResult);
     return CreateJsUndefined(env);
 }
 

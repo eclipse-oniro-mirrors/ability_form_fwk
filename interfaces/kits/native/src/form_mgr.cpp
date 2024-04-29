@@ -512,6 +512,37 @@ ErrCode FormMgr::RequestPublishForm(Want &want, bool withFormBindingData,
     return remoteProxy_->RequestPublishProxyForm(want, withFormBindingData, formBindingData, formId, formDataProxies);
 }
 
+
+ErrCode FormMgr::SetPublishFormResult(const std::string &formId, Constants::PublishFormResult &errorCodeInfo)
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    if (stoi(formId) <= 0) {
+        HILOG_ERROR("%{public}s is invalid errCode:%{public}d.", __func__, stoi(formId));
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+    }
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
+        return errCode;
+    }
+    return remoteProxy_->SetPublishFormResult(formId, errorCodeInfo);
+}
+
+ErrCode FormMgr::AcquireAddFormResult(const int64_t formId)
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    if (formId <= 0) {
+        HILOG_ERROR("%{public}s is invalid errCode:%{public}" PRId64, __func__, formId);
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+    }
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
+        return errCode;
+    }
+    return remoteProxy_->AcquireAddFormResult(formId);
+}
+
 int FormMgr::LifecycleUpdate(
     const std::vector<int64_t> &formIds,
     const sptr<IRemoteObject> &callerToken,
