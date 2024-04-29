@@ -135,6 +135,8 @@ ohos_shared_library("libfms") {
     "data_share:datashare_common",
     "data_share:datashare_consumer",
     "eventhandler:libeventhandler",
+    "faultloggerd:libbacktrace_local",
+    "faultloggerd:libdfx_dumpcatcher",
     "ffrt:libffrt",
     "hicollie:libhicollie",
     "hilog:libhilog",

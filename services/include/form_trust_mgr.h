@@ -49,6 +49,12 @@ public:
      */
     void MarkTrustFlag(const std::string &bundleName, bool isTrust);
 
+    /**
+     * @brief Get the Untrust App Name List object
+     *
+     * @param result
+     */
+    void GetUntrustAppNameList(std::string &result);
 private:
     std::shared_ptr<FormRdbDataMgr> rdbDataManager_;
     std::map<std::string, int32_t> unTrustList_;

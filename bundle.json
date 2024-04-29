@@ -30,6 +30,7 @@
               "distributed_notification_service",
               "bundle_framework",
               "common_event_service",
+              "faultloggerd",
               "ffrt",
               "hilog",
               "ipc",
