@@ -49,6 +49,7 @@ public:
     int updateAtMin = -1;
     FormProviderInfo formProviderInfo;
     std::vector<std::string> hapSourceDirs;
+    std::map<std::string, std::string> modulePkgNameMap;
     std::string jsFormCodePath = "";
     bool formTempFlag = false;
     std::vector<int> formUserUids;

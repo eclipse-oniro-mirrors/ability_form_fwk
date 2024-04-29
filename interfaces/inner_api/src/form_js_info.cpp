@@ -51,6 +51,7 @@ bool FormJsInfo::ReadFromParcel(Parcel &parcel)
     formProviderData = *bindingData;
 
     ReadImageData(parcel);
+    ReadPkgNameMap(parcel);
     return true;
 }
 
@@ -122,12 +123,24 @@ bool FormJsInfo::Marshalling(Parcel &parcel) const
     if (!parcel.WriteBool(isDynamic) || !parcel.WriteBool(transparencyEnabled)) {
         return false;
     }
+    if (!WriteObjects(parcel)) {
+        return false;
+    }
+    return true;
+}
+
+bool FormJsInfo::WriteObjects(Parcel &parcel) const
+{
     // write formProviderData
     if (!parcel.WriteParcelable(&formProviderData)) {
         return false;
     }
 
     if (!WriteImageData(parcel)) {
+        return false;
+    }
+
+    if (!WritePkgNameMap(parcel)) {
         return false;
     }
     return true;
@@ -229,6 +242,51 @@ bool FormJsInfo::ConvertRawImageData()
         imageDataMap[entry.first] = entry.second.first;
     }
     return true;
+}
+
+bool FormJsInfo::WritePkgNameMap(Parcel &parcel) const
+{
+    HILOG_DEBUG("called");
+    std::vector<std::string> keys;
+    std::vector<std::string> values;
+
+    for (const auto &pkgNameInfo : modulePkgNameMap) {
+        keys.emplace_back(pkgNameInfo.first);
+        values.emplace_back(pkgNameInfo.second);
+    }
+
+    parcel.WriteStringVector(keys);
+    parcel.WriteStringVector(values);
+    return true;
+}
+
+void FormJsInfo::ReadPkgNameMap(Parcel &parcel)
+{
+    HILOG_DEBUG("called");
+    std::vector<std::string> keys;
+    std::vector<std::string> values;
+    if (!parcel.ReadStringVector(&keys)) {
+        HILOG_ERROR("ReadStringVector for keys failed.");
+        return;
+    }
+    if (!parcel.ReadStringVector(&values)) {
+        HILOG_ERROR("ReadStringVector for values failed.");
+        return;
+    }
+    size_t keySize = keys.size();
+    size_t valueSize = values.size();
+    if (keySize != valueSize) {
+        HILOG_ERROR("ReadFromParcel failed, invalid size.");
+        return;
+    }
+
+    std::string key;
+    std::string val;
+    for (size_t index = 0; index < keySize; index++) {
+        key = keys.at(index);
+        val = values.at(index);
+        modulePkgNameMap.emplace(key, val);
+    }
 }
 } // namespace AppExecFwk
 } // namespace OHOS

@@ -1820,8 +1820,15 @@ ErrCode FormMgrAdapter::GetBundleInfo(const AAFwk::Want &want, BundleInfo &bundl
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
 
-    if (!IN_PROCESS_CALL(iBundleMgr->GetBundleInfo(bundleName, AppExecFwk::BundleFlag::GET_BUNDLE_WITH_ABILITIES,
-        bundleInfo, FormUtil::GetCurrentAccountId()))) {
+    if (IN_PROCESS_CALL(iBundleMgr->GetBundleInfoV9(bundleName,
+        (static_cast<int32_t>(AppExecFwk::GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_HAP_MODULE) +
+        static_cast<int32_t>(AppExecFwk::GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_ABILITY) +
+        static_cast<int32_t>(AppExecFwk::GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_APPLICATION) +
+        static_cast<int32_t>(AppExecFwk::GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_DISABLE) +
+        static_cast<int32_t>(AppExecFwk::GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_SIGNATURE_INFO) +
+        static_cast<int32_t>(AppExecFwk::GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_EXTENSION_ABILITY) +
+        static_cast<int32_t>(AppExecFwk::GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_METADATA)),
+        bundleInfo, FormUtil::GetCurrentAccountId())) != ERR_OK) {
         HILOG_ERROR("GetBundleInfo, failed to get bundle info.");
         return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
     }
@@ -1989,8 +1996,38 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
     itemInfo.SetIsDynamic(formInfo.isDynamic);
     itemInfo.SetTransparencyEnabled(formInfo.transparencyEnabled);
     itemInfo.SetPrivacyLevel(formInfo.privacyLevel);
+    itemInfo.SetDataProxyFlag(formInfo.dataProxyEnabled);
 
-    for (const auto &abilityInfo : bundleInfo.abilityInfos) {
+    SetFormItemInfoParams(bundleInfo, formInfo, itemInfo);
+    return ERR_OK;
+}
+
+void FormMgrAdapter::SetFormItemInfoParams(const BundleInfo& bundleInfo, const FormInfo& formInfo,
+    FormItemInfo& itemInfo)
+{
+    if (!bundleInfo.hapModuleInfos.empty()) {
+        for (auto hapModuleInfo : bundleInfo.hapModuleInfos) {
+            SetFormItemModuleInfo(hapModuleInfo, formInfo, itemInfo);
+        }
+    }
+
+    HILOG_INFO("%{public}s moduleInfos size: %{public}zu", __func__, bundleInfo.applicationInfo.moduleInfos.size());
+    for (const auto &item : bundleInfo.applicationInfo.moduleInfos) {
+        HILOG_INFO("%{public}s moduleInfos,  moduleName: %{public}s, moduleSourceDir: %{public}s", __func__,
+            item.moduleName.c_str(), item.moduleSourceDir.c_str());
+        if (formInfo.moduleName == item.moduleName) {
+            itemInfo.AddHapSourceDirs(item.moduleSourceDir);
+        }
+    }
+}
+
+void FormMgrAdapter::SetFormItemModuleInfo(const HapModuleInfo& hapModuleInfo, const FormInfo& formInfo,
+    FormItemInfo& itemInfo)
+{
+    HILOG_DEBUG("module [%{public}s] packageName is %{public}s", hapModuleInfo.moduleName.c_str(),
+        hapModuleInfo.packageName.c_str());
+    itemInfo.AddModulePkgName(hapModuleInfo.moduleName, hapModuleInfo.packageName);
+    for (const auto &abilityInfo : hapModuleInfo.abilityInfos) {
         if (abilityInfo.name == formInfo.abilityName) {
             itemInfo.SetAbilityModuleName(abilityInfo.moduleName);
             if (!abilityInfo.isModuleJson) {
@@ -2004,17 +2041,6 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
         itemInfo.AddModuleInfo(abilityInfo.moduleName, hapPath);
         HILOG_DEBUG("%{public}s hap path is %{public}s", abilityInfo.moduleName.c_str(), hapPath.c_str());
     }
-
-    HILOG_INFO("%{public}s moduleInfos size: %{public}zu", __func__, bundleInfo.applicationInfo.moduleInfos.size());
-    for (const auto &item : bundleInfo.applicationInfo.moduleInfos) {
-        HILOG_INFO("%{public}s moduleInfos,  moduleName: %{public}s, moduleSourceDir: %{public}s", __func__,
-            item.moduleName.c_str(), item.moduleSourceDir.c_str());
-        if (formInfo.moduleName == item.moduleName) {
-            itemInfo.AddHapSourceDirs(item.moduleSourceDir);
-        }
-    }
-    itemInfo.SetDataProxyFlag(formInfo.dataProxyEnabled);
-    return ERR_OK;
 }
 
 /**

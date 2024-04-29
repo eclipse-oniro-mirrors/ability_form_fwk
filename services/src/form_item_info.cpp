@@ -358,6 +358,17 @@ void FormItemInfo::AddModuleInfo(const std::string &moduleName, const std::strin
 {
     moduleInfoMap_.emplace(std::make_pair(moduleName, moduleSourceDir));
 }
+
+void FormItemInfo::AddModulePkgName(const std::string &moduleName, const std::string &packageName)
+{
+    modulePkgNameMap_.emplace(std::make_pair(moduleName, packageName));
+}
+
+const std::map<std::string, std::string>& FormItemInfo::GetModulePkgNameMap() const
+{
+    return modulePkgNameMap_;
+}
+
 /**
  * @brief Set value of formVisibleNotify_.
  * @param isFormVisibleNotify visible notify or not.
