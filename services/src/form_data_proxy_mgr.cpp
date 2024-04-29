@@ -132,7 +132,6 @@ void FormDataProxyMgr::EnableSubscribeFormData(const std::vector<int64_t> &formI
         if (search != formDataProxyRecordMap_.end()) {
             if (search->second != nullptr) {
                 search->second->EnableSubscribeFormData();
-                HILOG_INFO("enable subscribe form data. formId: %{public}s", std::to_string(formId).c_str());
             }
         }
     }
