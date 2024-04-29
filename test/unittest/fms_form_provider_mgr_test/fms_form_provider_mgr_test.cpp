@@ -41,6 +41,30 @@
 #include "running_process_info.h"
 #include "system_ability_definition.h"
 
+namespace {
+    bool g_mockConnectServiceAbilityRet = false;
+}
+
+namespace OHOS {
+void MockConnectServiceAbility(bool mockRet)
+{
+    g_mockConnectServiceAbilityRet = mockRet;
+}
+} // namespace OHOS
+
+namespace OHOS {
+namespace AppExecFwk {
+ErrCode FormAmsHelper::ConnectServiceAbility(
+    const Want &want, const sptr<AAFwk::IAbilityConnection> &connect)
+{
+    if (!g_mockConnectServiceAbilityRet) {
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+    }
+    return ERR_OK;
+}
+} // namespace AppExecFwk
+} // namespace OHOS
+
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::AppExecFwk;
@@ -61,6 +85,7 @@ const std::string FORM_HOST_BUNDLE_NAME = "com.form.host.app";
 
 const std::string DEVICE_ID = "ohos-phone1";
 const std::string DEF_LABEL1 = "PermissionFormRequireGrant";
+const std::string TEST_PARAM_FORM_PERMISSION_NAME = "com.permission.TEST_PER";
 
 class FmsFormProviderMgrTest : public testing::Test {
 public:
@@ -70,8 +95,7 @@ public:
     void TearDown();
 
 protected:
-    sptr<MockFormHostClient> token_;
-    std::shared_ptr<FormMgrService> formyMgrServ_ = DelayedSingleton<FormMgrService>::GetInstance();
+    sptr<IRemoteObject> token_;
 };
 
 void FmsFormProviderMgrTest::SetUpTestCase()
@@ -85,7 +109,6 @@ void FmsFormProviderMgrTest::TearDownTestCase()
 
 void FmsFormProviderMgrTest::SetUp()
 {
-    formyMgrServ_->OnStart();
     token_ = new (std::nothrow) MockFormHostClient();
 
     // Permission install
@@ -289,5 +312,77 @@ HWTEST_F(FmsFormProviderMgrTest, RefreshForm_004, TestSize.Level1)
     EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, FormProviderMgr::GetInstance().RefreshForm(formId, want, true));
 #endif
     GTEST_LOG_(INFO) << "fms_form_mgr_provider_test_007 end";
+}
+
+/*
+ * Feature: FmsFormProviderMgr
+ * Function: FormMgr
+ * SubFunction: ConnectAmsForRefreshPermission Function
+ * FunctionPoints: FormMgr ConnectAmsForRefreshPermission interface
+ * EnvConditions: Mobile that can run ohos test framework
+ * CaseDescription: Verify if ConnectAmsForRefreshPermission works without permission parameters or form record.
+ */
+HWTEST_F(FmsFormProviderMgrTest, ConnectAmsForRefreshPermission_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "fms_form_mgr_provider_test_008 start";
+    int64_t formId = 1;
+    Want want;
+    ErrCode ret = FormProviderMgr::GetInstance().ConnectAmsForRefreshPermission(formId, want);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    want.SetParam(Constants::FORM_PERMISSION_NAME_KEY, TEST_PARAM_FORM_PERMISSION_NAME);
+    ret = FormProviderMgr::GetInstance().ConnectAmsForRefreshPermission(formId, want);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    want.RemoveParam(Constants::FORM_PERMISSION_NAME_KEY);
+    want.SetParam(Constants::FORM_PERMISSION_GRANTED_KEY, true);
+    ret = FormProviderMgr::GetInstance().ConnectAmsForRefreshPermission(formId, want);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    want.SetParam(Constants::FORM_PERMISSION_NAME_KEY, TEST_PARAM_FORM_PERMISSION_NAME);
+    FormDataMgr::GetInstance().DeleteFormRecord(formId);
+    ret = FormProviderMgr::GetInstance().ConnectAmsForRefreshPermission(formId, want);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+    int callingUid {0};
+    FormItemInfo record;
+    record.SetFormId(formId);
+    record.SetModuleName(PARAM_FORM_NAME);
+    record.SetProviderBundleName(FORM_PROVIDER_BUNDLE_NAME);
+    record.SetAbilityName(FORM_PROVIDER_ABILITY_NAME);
+    FormDataMgr::GetInstance().AllotFormRecord(record, callingUid);
+    ret = FormProviderMgr::GetInstance().ConnectAmsForRefreshPermission(formId, want);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+    FormDataMgr::GetInstance().DeleteFormRecord(formId);
+    GTEST_LOG_(INFO) << "fms_form_mgr_provider_test_008 end";
+}
+
+/*
+ * Feature: FmsFormProviderMgr
+ * Function: FormMgr
+ * SubFunction: ConnectAmsForRefreshPermission Function
+ * FunctionPoints: FormMgr ConnectAmsForRefreshPermission interface
+ * EnvConditions: Mobile that can run ohos test framework
+ * CaseDescription: Verify if ConnectAmsForRefreshPermission works without application service.
+ */
+HWTEST_F(FmsFormProviderMgrTest, ConnectAmsForRefreshPermission_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "fms_form_mgr_provider_test_009 start";
+    int64_t formId = 1;
+    Want want;
+    want.SetParam(Constants::FORM_PERMISSION_NAME_KEY, TEST_PARAM_FORM_PERMISSION_NAME);
+    want.SetParam(Constants::FORM_PERMISSION_GRANTED_KEY, true);
+    FormDataMgr::GetInstance().DeleteFormRecord(formId);
+    int callingUid {0};
+    FormItemInfo record;
+    record.SetFormId(formId);
+    record.SetModuleName(PARAM_FORM_NAME);
+    record.SetProviderBundleName(FORM_PROVIDER_BUNDLE_NAME);
+    record.SetAbilityName(FORM_PROVIDER_ABILITY_NAME);
+    FormDataMgr::GetInstance().AllotFormRecord(record, callingUid);
+    MockConnectServiceAbility(false);
+    ErrCode ret = FormProviderMgr::GetInstance().ConnectAmsForRefreshPermission(formId, want);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+    MockConnectServiceAbility(true);
+    ret = FormProviderMgr::GetInstance().ConnectAmsForRefreshPermission(formId, want);
+    EXPECT_EQ(ret, ERR_OK);
+    FormDataMgr::GetInstance().DeleteFormRecord(formId);
+    GTEST_LOG_(INFO) << "fms_form_mgr_provider_test_009 end";
 }
 }

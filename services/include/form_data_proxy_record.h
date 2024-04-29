@@ -103,7 +103,6 @@ private:
         SubscribeMap &publicSubscribeMap);
     void GetSubscribeFormDataProxies(const FormDataProxy formdataProxy,
         std::vector<FormDataProxy> &subscribeFormDataProxies, std::vector<FormDataProxy> &unsubscribeFormDataProxies);
-    ErrCode ConnectAmsForRefreshPermission(const std::string &permissionName, bool isAuthorized);
 
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper_;
     std::shared_ptr<Security::AccessToken::PermStateChangeCallbackCustomize> callbackPtr_;

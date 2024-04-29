@@ -56,6 +56,17 @@ public:
     FormJsInfo &formInfo) = 0;
 
     /**
+     * @brief Add form with want, send want to form manager service.
+     * @param want The want of the form to add.
+     * @param runningFormInfo Running form info.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int CreateForm(const Want &want, RunningFormInfo &runningFormInfo)
+    {
+        return ERR_OK;
+    };
+
+    /**
      * @brief Delete forms with formIds, send formIds to form manager service.
      * @param formId The Id of the forms to delete.
      * @param callerToken Caller ability token.
@@ -674,6 +685,7 @@ public:
         FORM_MGR_GET_FORMS_INFO_BY_FILTER,
         FORM_MGR_PUBLISH_FORM_ERRCODE_RESULT,
         FORM_MGR_ACQUIRE_ADD_FORM_RESULT,
+        FORM_MGR_CREATE_FORM,
     };
 };
 }  // namespace AppExecFwk

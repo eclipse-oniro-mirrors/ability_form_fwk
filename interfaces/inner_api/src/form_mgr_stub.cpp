@@ -164,6 +164,8 @@ FormMgrStub::FormMgrStub()
         &FormMgrStub::HandleSetPublishFormResult;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_ACQUIRE_ADD_FORM_RESULT)] =
         &FormMgrStub::HandleAcquireAddFormResult;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_CREATE_FORM)] =
+        &FormMgrStub::HandleCreateForm;
 }
 
 FormMgrStub::~FormMgrStub()
@@ -225,6 +227,28 @@ int32_t FormMgrStub::HandleAddForm(MessageParcel &data, MessageParcel &reply)
 
     return result;
 }
+
+/**
+ * @brief handle CreateForm message.
+ * @param data input param.
+ * @param reply output param.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int32_t FormMgrStub::HandleCreateForm(MessageParcel &data, MessageParcel &reply)
+{
+    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
+    if (!want) {
+        HILOG_ERROR("failed to ReadParcelable");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    RunningFormInfo runningFormInfo;
+    int32_t result = CreateForm(*want, runningFormInfo);
+    reply.WriteInt32(result);
+    reply.WriteParcelable(&runningFormInfo);
+    return result;
+}
+
 /**
  * @brief handle DeleteForm message.
  * @param data input param.

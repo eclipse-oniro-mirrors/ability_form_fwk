@@ -65,6 +65,14 @@ public:
         FormJsInfo &formInfo) override;
 
     /**
+     * @brief Add form with want, send want to form manager service.
+     * @param want The want of the form to add.
+     * @param runningFormInfo Running form info.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int CreateForm(const Want &want, RunningFormInfo &runningFormInfo) override;
+
+    /**
      * @brief Delete forms with formIds, send formIds to form manager service.
      * @param formId The Id of the forms to delete.
      * @param callerToken Caller ability token.
@@ -592,6 +600,14 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode UpdateFormLocation(const int64_t &formId, const int32_t &formLocation) override;
+
+#ifdef RES_SCHEDULE_ENABLE
+    /**
+     * @brief Update refresh_Timer_task_needed_flag depend on the systemload level.
+     * @param level The value of the systemload level.
+     */
+    void OnSystemloadLevel(int32_t level);
+#endif // RES_SCHEDULE_ENABLE
 private:
     /**
      * OnAddSystemAbility, OnAddSystemAbility will be called when the listening SA starts.
@@ -611,6 +627,7 @@ private:
         KEY_DUMP_STATIC,
         KEY_DUMP_VISIBLE,
         KEY_DUMP_RUNNING,
+        KEY_DUMP_BLOCKED_APPS,
     };
     /**
      * @brief initialization of form manager service.
@@ -635,6 +652,7 @@ private:
     void HiDumpFormInfoByBundleName(const std::string &args, std::string &result);
     void HiDumpFormInfoByFormId(const std::string &args, std::string &result);
     void HiDumpFormRunningFormInfos([[maybe_unused]] const std::string &args, std::string &result);
+    void HiDumpFormBlockedApps([[maybe_unused]] const std::string &args, std::string &result);
     bool CheckCallerIsSystemApp() const;
     static std::string GetCurrentDateTime();
 private:
@@ -655,6 +673,13 @@ private:
     std::shared_ptr<MemStatusListener> memStatusListener_ = nullptr;
 
     void SubscribeSysEventReceiver();
+
+    /**
+     * @brief report add form event
+     * @param formId Indicates the id of form.
+     * @param want The want of form.
+     */
+    void ReportAddFormEvent(const int64_t formId, const Want &want);
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

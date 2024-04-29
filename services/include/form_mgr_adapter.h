@@ -35,6 +35,9 @@
 #include "running_form_info.h"
 #include "want.h"
 #include "form_serial_queue.h"
+#ifdef THEME_MGR_ENABLE
+#include "theme_manager_client.h"
+#endif
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -71,6 +74,14 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     int AddForm(const int64_t formId, const Want &want, const sptr<IRemoteObject> &callerToken, FormJsInfo &formInfo);
+
+    /**
+     * @brief Add form with want, send want to form manager service.
+     * @param want The want of the form to add.
+     * @param runningFormInfo Running form info.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int CreateForm(const Want &want, RunningFormInfo &runningFormInfo);
 
     /**
      * @brief Delete forms with formIds, send formIds to form manager service.
@@ -602,6 +613,13 @@ public:
      */
     ErrCode UpdateFormLocation(const int64_t &formId, const int32_t &formLocation);
 
+#ifdef RES_SCHEDULE_ENABLE
+    /**
+     * @brief Set the value which indicate whether Refresh Timer task should be triggered.
+     * @param isTimerTaskNeeded The value of whether Refresh Timer task should be triggered.
+     */
+    void SetTimerTaskNeeded(bool isTimerTaskNeeded);
+#endif // RES_SCHEDULE_ENABLE
 private:
     /**
      * @brief Get form configure info.
@@ -1061,6 +1079,46 @@ private:
     std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;
     std::mutex formResultMutex_;
     std::condition_variable condition_;
+#ifdef THEME_MGR_ENABLE
+    /**
+     * @brief Fill ThemeFormInfo with want and formId
+     * @param formId Indicates the id of form.
+     * @param themeFormInfo Info of theme form defined by ThemeManager.
+     * @param want The want of form.
+     */
+    void FillThemeFormInfo(const Want &want, ThemeManager::ThemeFormInfo &themeFormInfo, int64_t formId);
+
+    /**
+     * @brief Call ThemeManager to delete form and clear record in database.
+     * @param formId Indicates the id of form.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int DeleteThemeForm(const int64_t formId);
+
+    /**
+     * @brief Add theme form record in database.
+     * @param want The want of form.
+     * @param formId Indicates the id of form.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int AddThemeDBRecord(const Want &want, int64_t formId);
+
+    /**
+     * @brief Allot theme form record in FormDataMgr.
+     * @param want The want of form.
+     * @param formId Indicates the id of form.
+     * @return Returns formrecord created.
+     */
+    FormRecord AllotThemeRecord(const Want &want, int64_t formId);
+#endif
+
+    /**
+     * @brief Delete common forms with formId.
+     * @param formId Indicates the id of form.
+     * @param callerToken Caller ability token.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int DeleteCommonForm(const int64_t formId, const sptr<IRemoteObject> &callerToken);
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

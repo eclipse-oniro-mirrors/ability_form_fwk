@@ -572,5 +572,15 @@ void FormItemInfo::SetFormLocation(Constants::FormLocation formLocation)
 {
     formLocation_ = formLocation;
 }
+
+bool FormItemInfo::GetIsThemeForm() const
+{
+    return isThemeForm_;
+}
+
+void FormItemInfo::SetIsThemeForm(bool isThemeForm)
+{
+    isThemeForm_ = isThemeForm;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

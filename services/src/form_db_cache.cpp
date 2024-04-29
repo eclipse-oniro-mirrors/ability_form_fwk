@@ -418,11 +418,26 @@ ErrCode FormDbCache::DeleteInvalidDBForms(int32_t userId, int32_t callingUid, st
 
     if (!foundFormsMap.empty()) {
         removedFormsMap.insert(foundFormsMap.begin(), foundFormsMap.end());
+#ifdef THEME_MGR_ENABLE
+        DeleteThemeForms(removedFormsMap);
+#endif
     }
 
     HILOG_INFO("DeleteInvalidDBForms done");
     return ERR_OK;
 }
+
+#ifdef THEME_MGR_ENABLE
+void FormDbCache::DeleteThemeForms(std::map<int64_t, bool> &removedFormsMap)
+{
+    HILOG_INFO("DeleteThemeForms");
+    std::vector<int64_t> removeList;
+    for (const auto &element : removedFormsMap) {
+        removeList.emplace_back(element.first);
+    }
+    ThemeManager::ThemeManagerClient::GetInstance().DeleteForm(removeList);
+}
+#endif
 
 bool FormDbCache::IsHostOwner(int64_t formId, int32_t hostUid)
 {

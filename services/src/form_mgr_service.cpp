@@ -57,6 +57,12 @@
 #include "xcollie/watchdog.h"
 #include "mem_mgr_client.h"
 
+#ifdef RES_SCHEDULE_ENABLE
+#include "form_systemload_listener.h"
+#include "res_sched_client.h"
+#include "res_type.h"
+#endif // RES_SCHEDULE_ENABLE
+
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
@@ -64,6 +70,9 @@ const int32_t MAIN_USER_ID = 100;
 constexpr int32_t GET_CALLING_UID_TRANSFORM_DIVISOR = 200000;
 constexpr int MILLISECOND_WIDTH = 3;
 constexpr char MILLISECOND_FILLCHAR = '0';
+#ifdef RES_SCHEDULE_ENABLE
+constexpr uint64_t SYSTEMLOADLEVEL_TIMERSTOP_THRESHOLD = ResourceSchedule::ResType::SystemloadLevel::HIGH;
+#endif // RES_SCHEDULE_ENABLE
 }
 using namespace std::chrono;
 
@@ -84,7 +93,8 @@ const std::string FORM_DUMP_HELP = "options list:\n"
     "  -t, --temp                           query temporary form info\n"
     "  -n  <bundle-name>                    query form info by a bundle name\n"
     "  -i  <form-id>                        query form info by a form ID\n"
-    "  -r  --running                        query running form info\n";
+    "  -r  --running                        query running form info\n"
+    "  -a  --apps-blocked                   query blocked app name list\n";
 
 const std::map<std::string, FormMgrService::DumpKey> FormMgrService::dumpKeyMap_ = {
     {"-h", FormMgrService::DumpKey::KEY_DUMP_HELP},
@@ -101,6 +111,8 @@ const std::map<std::string, FormMgrService::DumpKey> FormMgrService::dumpKeyMap_
     {"-i", FormMgrService::DumpKey::KEY_DUMP_BY_FORM_ID},
     {"-r", FormMgrService::DumpKey::KEY_DUMP_RUNNING},
     {"--running", FormMgrService::DumpKey::KEY_DUMP_RUNNING},
+    {"-a", FormMgrService::DumpKey::KEY_DUMP_BLOCKED_APPS},
+    {"--apps-blocked", FormMgrService::DumpKey::KEY_DUMP_BLOCKED_APPS},
 };
 
 FormMgrService::FormMgrService()
@@ -164,17 +176,43 @@ int FormMgrService::AddForm(const int64_t formId, const Want &want,
         HILOG_ERROR("fail, add form permission denied");
         return ret;
     }
+    ReportAddFormEvent(formId, want);
+    return FormMgrAdapter::GetInstance().AddForm(formId, want, callerToken, formInfo);
+}
+
+/**
+ * @brief Add form with want, send want to form manager service.
+ * @param want The want of the form to add.
+ * @param runningFormInfo Running form info.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormMgrService::CreateForm(const Want &want, RunningFormInfo &runningFormInfo)
+{
+    HILOG_INFO("CreateForm called, startTime: begin: %{public}s, publish: %{public}s, end: %{public}s, "
+        "onKvDataServiceAddTime: %{public}s", onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
+        onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
+
+    ErrCode ret = CheckFormPermission();
+    if (ret != ERR_OK) {
+        HILOG_ERROR("create form permission denied");
+        return ret;
+    }
+    ReportAddFormEvent(0, want);
+    return FormMgrAdapter::GetInstance().CreateForm(want, runningFormInfo);
+}
+
+void FormMgrService::ReportAddFormEvent(const int64_t formId, const Want &want)
+{
     FormEventInfo eventInfo;
     eventInfo.formId = formId;
     eventInfo.bundleName = want.GetElement().GetBundleName();
     eventInfo.moduleName = want.GetStringParam(AppExecFwk::Constants::PARAM_MODULE_NAME_KEY);
     eventInfo.abilityName = want.GetElement().GetAbilityName();
-    ret = FormBmsHelper::GetInstance().GetCallerBundleName(eventInfo.hostBundleName);
+    int ret = FormBmsHelper::GetInstance().GetCallerBundleName(eventInfo.hostBundleName);
     if (ret != ERR_OK || eventInfo.hostBundleName.empty()) {
         HILOG_ERROR("fail, cannot get host bundle name by uid");
     }
     FormEventReport::SendFormEvent(FormEventName::ADD_FORM, HiSysEventType::BEHAVIOR, eventInfo);
-    return FormMgrAdapter::GetInstance().AddForm(formId, want, callerToken, formInfo);
 }
 
 /**
@@ -629,6 +667,9 @@ void FormMgrService::OnStart()
     // listener for FormDataProxyMgr
     AddSystemAbilityListener(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
     AddSystemAbilityListener(MEMORY_MANAGER_SA_ID);
+#ifdef RES_SCHEDULE_ENABLE
+    AddSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
+#endif // RES_SCHEDULE_ENABLE
     onStartEndTime_ = GetCurrentDateTime();
     HILOG_INFO("Form Mgr Service start success, time: %{public}s, onKvDataServiceAddTime: %{public}s",
         onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
@@ -1027,7 +1068,6 @@ int32_t FormMgrService::StartAbility(const Want &want, const sptr<IRemoteObject>
     if (!CheckCallerIsSystemApp()) {
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
     }
-    
     // check abilityName to void implicit want.
     if (want.GetElement().GetAbilityName() == "") {
         HILOG_ERROR("error, AbilityName is empty");
@@ -1111,7 +1151,9 @@ void FormMgrService::DumpInit()
     dumpFuncMap_[DumpKey::KEY_DUMP_BY_BUNDLE_NAME] = &FormMgrService::HiDumpFormInfoByBundleName;
     dumpFuncMap_[DumpKey::KEY_DUMP_BY_FORM_ID] = &FormMgrService::HiDumpFormInfoByFormId;
     dumpFuncMap_[DumpKey::KEY_DUMP_RUNNING] = &FormMgrService::HiDumpFormRunningFormInfos;
+    dumpFuncMap_[DumpKey::KEY_DUMP_BLOCKED_APPS] = &FormMgrService::HiDumpFormBlockedApps;
 }
+
 
 int FormMgrService::Dump(int fd, const std::vector<std::u16string> &args)
 {
@@ -1187,6 +1229,17 @@ int32_t FormMgrService::UnregisterPublishFormInterceptor(const sptr<IRemoteObjec
 
 void FormMgrService::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {
+#ifdef RES_SCHEDULE_ENABLE
+    if (systemAbilityId == RES_SCHED_SYS_ABILITY_ID) {
+        auto formSystemloadLevelCb = std::bind(&FormMgrService::OnSystemloadLevel, this, std::placeholders::_1);
+        sptr<FormSystemloadListener> formSystemloadListener
+            = new (std::nothrow) FormSystemloadListener(formSystemloadLevelCb);
+        ResourceSchedule::ResSchedClient::GetInstance().RegisterSystemloadNotifier(formSystemloadListener);
+        HILOG_INFO("RegisterSystemloadNotifier for Systemloadlevel change");
+        return;
+    }
+#endif // RES_SCHEDULE_ENABLE
+
     if (systemAbilityId == MEMORY_MANAGER_SA_ID) {
         HILOG_INFO("MEMORY_MANAGER_SA start, SubscribeAppState");
         Memory::MemMgrClient::GetInstance().SubscribeAppState(*memStatusListener_);
@@ -1280,6 +1333,14 @@ void FormMgrService::HiDumpHasFormVisible(const std::string &args, std::string &
         result = "error:request bundle info like bundleName_userId_instIndex.";
     }
     FormMgrAdapter::GetInstance().DumpHasFormVisible(args, result);
+}
+
+void FormMgrService::HiDumpFormBlockedApps([[maybe_unused]] const std::string &args, std::string &result)
+{
+    if (!CheckCallerIsSystemApp()) {
+        return;
+    }
+    FormTrustMgr::GetInstance().GetUntrustAppNameList(result);
 }
 
 void FormMgrService::HiDumpFormInfoByFormId(const std::string &args, std::string &result)
@@ -1551,5 +1612,15 @@ ErrCode FormMgrService::UpdateFormLocation(const int64_t &formId, const int32_t 
     return FormMgrAdapter::GetInstance().UpdateFormLocation(formId, formLocation);
 }
 
+#ifdef RES_SCHEDULE_ENABLE
+void FormMgrService::OnSystemloadLevel(int32_t level)
+{
+    if (level >= SYSTEMLOADLEVEL_TIMERSTOP_THRESHOLD) {
+        FormMgrAdapter::GetInstance().SetTimerTaskNeeded(false);
+    } else {
+        FormMgrAdapter::GetInstance().SetTimerTaskNeeded(true);
+    }
+}
+#endif // RES_SCHEDULE_ENABLE
 }  // namespace AppExecFwk
 }  // namespace OHOS

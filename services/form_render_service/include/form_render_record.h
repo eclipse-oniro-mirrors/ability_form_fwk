@@ -217,6 +217,9 @@ private:
 
     void HandleFormRenderGC();
 
+    pid_t jsThreadId_;
+    pid_t processId_;
+
     std::string bundleName_;
     std::string uid_;
     std::shared_ptr<EventRunner> eventRunner_;

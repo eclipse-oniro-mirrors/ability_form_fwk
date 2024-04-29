@@ -75,3 +75,11 @@ declare_args() {
     res_schedule_service = true
   }
 }
+
+declare_args() {
+  theme_mgr_enable = false
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.theme_theme_mgr)) {
+    theme_mgr_enable = true
+  }
+}

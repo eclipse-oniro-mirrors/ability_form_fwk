@@ -159,6 +159,13 @@ public:
      */
     void SetTimeSpeed(int32_t timeSpeed);
 
+#ifdef RES_SCHEDULE_ENABLE
+    /**
+     * @brief Set the value which indicate whether Refresh Timer task should be triggered.
+     * @param isTimerTaskNeeded The value of whether Refresh Timer task should be triggered.
+     */
+    void SetTimerTaskNeeded(bool isTimerTaskNeeded);
+#endif // RES_SCHEDULE_ENABLE
 private:
     /**
      * @brief Add update at timer.
@@ -280,6 +287,25 @@ private:
      */
     void ExecTimerTask(const FormTimer &task);
 
+#ifdef RES_SCHEDULE_ENABLE
+    /**
+     * @brief Execute Form timer task.
+     * @param task Form timer task core.
+     */
+    void ExecTimerTaskCore(const FormTimer &task);
+
+    /**
+     * @brief Add to the task vector triggered on systemloadlevel down.
+     * @param task Form timer task.
+     */
+    void AddToNotExecTaskVec(const FormTimer &task);
+
+    /**
+     * @brief tiggered and clear the task vector triggered on systemloadlevel down.
+     */
+    void TriggerAndClearNotExecTaskVec();
+#endif // RES_SCHEDULE_ENABLE
+
     /**
      * @brief Init.
      */
@@ -359,7 +385,8 @@ private:
     std::map<int64_t, FormTimer> intervalTimerTasks_;
     std::list<UpdateAtItem> updateAtTimerTasks_;
     std::list<DynamicRefreshItem> dynamicRefreshTasks_;
-    std::shared_ptr<TimerReceiver> timerReceiver_ = nullptr;
+    std::shared_ptr<TimerReceiver> systemTimerEventReceiver_ = nullptr;
+    std::shared_ptr<TimerReceiver> customTimerEventReceiver_ = nullptr;
     int32_t timeSpeed_ = 1;
 
     uint64_t intervalTimerId_ = 0L;
@@ -373,6 +400,11 @@ private:
 
     int64_t dynamicWakeUpTime_ = INT64_MAX;
     long atTimerWakeUpTime_ = LONG_MAX;
+
+#ifdef RES_SCHEDULE_ENABLE
+    bool isTimerTaskNeeded_ = true;
+    std::vector<FormTimer> notExecTaskVec_;
+#endif // RES_SCHEDULE_ENABLE
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

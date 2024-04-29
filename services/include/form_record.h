@@ -74,6 +74,7 @@ public:
     bool isNeedNotify = true;
     RecycleStatus recycleStatus = RecycleStatus::NON_RECYCLABLE;
     Constants::FormLocation formLocation;
+    bool isThemeForm = false;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

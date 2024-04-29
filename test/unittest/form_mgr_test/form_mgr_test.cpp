@@ -2409,4 +2409,22 @@ HWTEST_F(FormMgrTest, FormMgrTest_0123, TestSize.Level1) {
     EXPECT_EQ(FormMgr::GetInstance().UpdateFormLocation(formId, formLocation), ERROR_NUM);
     GTEST_LOG_(INFO) << "FormMgrTest_0123 test ends";
 }
+
+/**
+ * @tc.name: FormMgrTest_0124
+ * @tc.desc: Verify CreateForm
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0124, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_0124 starts";
+    EXPECT_CALL(*mockProxy, CreateForm(_, _))
+        .Times(1)
+        .WillOnce(Return(0));
+    Want want;
+    RunningFormInfo runningFormInfo;
+    int result = FormMgr::GetInstance().CreateForm(want, runningFormInfo);
+    EXPECT_EQ(result, 0);
+    GTEST_LOG_(INFO) << "FormMgrTest_0124 test ends";
+}
 } // namespace
