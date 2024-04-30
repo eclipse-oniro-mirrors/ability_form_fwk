@@ -659,6 +659,21 @@ private:
     ErrCode CreateFormItemInfo(const BundleInfo& bundleInfo, const FormInfo& formInfo, FormItemInfo& itemInfo,
         const AAFwk::Want &want);
     /**
+     * @brief Set form item info params.
+     * @param bundleInfo Bundle info.
+     * @param formInfo Form info.
+     * @param itemInfo Form item info.
+     */
+    void SetFormItemInfoParams(const BundleInfo& bundleInfo, const FormInfo& formInfo, FormItemInfo& itemInfo);
+    /**
+     * @brief Set form item module info.
+     * @param hapModuleInfo Hap module info.
+     * @param formInfo Form info.
+     * @param itemInfo Form item info.
+     */
+    void SetFormItemModuleInfo(const HapModuleInfo& hapModuleInfo, const FormInfo& formInfo,
+        FormItemInfo& itemInfo);
+    /**
      * @brief Allocate form by formId.
      * @param info Form configure info.
      * @param callerToken Caller ability token.

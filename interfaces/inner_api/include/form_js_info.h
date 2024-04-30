@@ -35,6 +35,7 @@ struct FormJsInfo : public Parcelable {
     std::string bundleName;
     std::string abilityName;
     std::string moduleName;
+    std::map<std::string, std::string> modulePkgNameMap;
     bool formTempFlag = false;
     std::string jsFormCodePath;
     std::string formData;
@@ -53,9 +54,12 @@ struct FormJsInfo : public Parcelable {
     bool ReadFromParcel(Parcel &parcel);
     virtual bool Marshalling(Parcel &parcel) const override;
     static FormJsInfo *Unmarshalling(Parcel &parcel);
+    bool WriteObjects(Parcel &parcel) const;
     bool WriteImageData(Parcel &parcel) const;
     void ReadImageData(Parcel &parcel);
     bool ConvertRawImageData();
+    bool WritePkgNameMap(Parcel &parcel) const;
+    void ReadPkgNameMap(Parcel &parcel);
 };
 } // namespace AppExecFwk
 } // namespace OHOS

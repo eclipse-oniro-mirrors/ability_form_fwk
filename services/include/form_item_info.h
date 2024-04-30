@@ -196,6 +196,17 @@ public:
      */
     void AddModuleInfo(const std::string &moduleName, const std::string &moduleSourceDir);
     /**
+     * @brief Add module package name.
+     * @param moduleName Module name.
+     * @param packageName Package name.
+     */
+    void AddModulePkgName(const std::string &moduleName, const std::string &packageName);
+    /**
+     * @brief Get module package name map.
+     * @return Module package name map
+     */
+    const std::map<std::string, std::string>& GetModulePkgNameMap() const;
+    /**
      * @brief Check if item valid or not.
      * @return Valid or not
      */
@@ -433,6 +444,7 @@ private:
     std::string jsComponentName_ = "";
     std::string abilityModuleName_ = "";
     std::unordered_map<std::string, std::string> moduleInfoMap_;
+    std::map<std::string, std::string> modulePkgNameMap_;
     std::string deviceId_ = "";
     bool dataProxyEnabled_ = false;
     bool isSystemApp_ = false;

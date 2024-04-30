@@ -83,6 +83,37 @@ bool BundleMgrService::GetBundleInfo(
     return true;
 }
 
+ErrCode BundleMgrService::GetBundleInfoV9(const std::string &bundleName, int32_t flags,
+    BundleInfo &bundleInfo, int32_t userId)
+{
+    ApplicationInfo applicationInfo;
+    ModuleInfo moduleInfo;
+
+    moduleInfo.moduleSourceDir = FORM_PROVIDER_MODULE_SOURCE_DIR;
+    moduleInfo.moduleName = PARAM_PROVIDER_MODULE_NAME;
+    bundleInfo.name = bundleName;
+    applicationInfo.bundleName = bundleName;
+    applicationInfo.moduleInfos.emplace_back(moduleInfo);
+    bundleInfo.applicationInfo = applicationInfo;
+
+    bundleInfo.moduleNames.emplace_back(PARAM_PROVIDER_MODULE_NAME);
+
+    AbilityInfo abilityInfo;
+    abilityInfo.name = FORM_PROVIDER_ABILITY_NAME;
+    abilityInfo.package = PARAM_PROVIDER_PACKAGE_NAME;
+    abilityInfo.bundleName = bundleName;
+    abilityInfo.moduleName = PARAM_PROVIDER_MODULE_NAME;
+    abilityInfo.deviceId = DEVICE_ID;
+
+    HapModuleInfo hapModuleInfo;
+    hapModuleInfo.moduleName = PARAM_PROVIDER_MODULE_NAME;
+    hapModuleInfo.abilityInfos.emplace_back(abilityInfo);
+    bundleInfo.hapModuleInfos.emplace_back(hapModuleInfo);
+    bundleInfo.abilityInfos.emplace_back(abilityInfo);
+
+    return ERR_OK;
+}
+
 bool BundleMgrService::GetFormsInfoByApp(const std::string &bundleName, std::vector<FormInfo> &formInfo)
 {
     FormInfo form;

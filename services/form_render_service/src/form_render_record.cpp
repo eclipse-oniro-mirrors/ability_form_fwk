@@ -29,6 +29,7 @@
 #include "ecmascript/napi/include/jsnapi.h"
 #include "extractor.h"
 #include "fms_log_wrapper.h"
+#include "form_bundle_mgr_helper.h"
 #include "form_constants.h"
 #include "form_memory_guard.h"
 #include "form_module_checker.h"
@@ -459,12 +460,46 @@ bool FormRenderRecord::CreateRuntime(const FormJsInfo &formJsInfo)
     options.isBundle = true;
     options.isUnique = true;
     options.moduleCheckerDelegate = std::make_shared<FormModuleChecker>();
+
+    SetPkgContextInfoMap(formJsInfo, options, uid_);
+
     runtime_ = AbilityRuntime::Runtime::Create(options);
     if (runtime_ == nullptr) {
         HILOG_ERROR("Create runtime Failed!");
         return false;
     }
     hapPath_ = formJsInfo.jsFormCodePath;
+    return true;
+}
+
+bool FormRenderRecord::SetPkgContextInfoMap(const FormJsInfo &formJsInfo, AbilityRuntime::Runtime::Options &options,
+    std::string &uid)
+{
+    auto bundleMgrHelper = DelayedSingleton<FormBundleMgrHelper>::GetInstance();
+    if (bundleMgrHelper == nullptr) {
+        HILOG_ERROR("The bundleMgrHelper is nullptr.");
+        return false;
+    }
+
+    std::map<std::string, std::string> pkgContextInfoJsonStringMap;
+    for (auto modulePkgNamePair : formJsInfo.modulePkgNameMap) {
+        std::string pkgContextInfoJsonString;
+        ErrCode errCode = bundleMgrHelper->GetJsonProfile(
+            AppExecFwk::PKG_CONTEXT_PROFILE, formJsInfo.bundleName, modulePkgNamePair.first, pkgContextInfoJsonString,
+            static_cast<int32_t>(std::stoi(uid)));
+        if (errCode != ERR_OK) {
+            HILOG_ERROR("GetJsonProfile failed: %{public}d.", errCode);
+            return false;
+        }
+        if (!pkgContextInfoJsonString.empty()) {
+            pkgContextInfoJsonStringMap[modulePkgNamePair.first] = pkgContextInfoJsonString;
+        }
+        options.packageNameList[modulePkgNamePair.first] = modulePkgNamePair.second;
+    }
+    if (!pkgContextInfoJsonStringMap.empty()) {
+        HILOG_INFO("set pkgContextInfoJsonStringMap for %{public}s.", formJsInfo.bundleName.c_str());
+        options.pkgContextInfoJsonStringMap = pkgContextInfoJsonStringMap;
+    }
     return true;
 }
 
