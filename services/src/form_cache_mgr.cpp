@@ -67,15 +67,21 @@ FormCacheMgr::~FormCacheMgr()
 
 void FormCacheMgr::CreateFormCacheTable()
 {
-    FormRdbConfig formRdbConfig;
-    formRdbConfig.tableName = FORM_CACHE_TABLE;
-    formRdbConfig.createTableSql = "CREATE TABLE IF NOT EXISTS " + FORM_CACHE_TABLE
+    FormRdbTableConfig formRdbCacheTableConfig;
+    formRdbCacheTableConfig.tableName = FORM_CACHE_TABLE;
+    formRdbCacheTableConfig.createTableSql = "CREATE TABLE IF NOT EXISTS " + FORM_CACHE_TABLE
         + " (FORM_ID TEXT NOT NULL PRIMARY KEY, DATA_CACHE TEXT, FORM_IMAGES TEXT, CACHE_STATE INTEGER);";
-    rdbDataManager_ = std::make_shared<FormRdbDataMgr>(formRdbConfig);
-    rdbDataManager_->Init();
-    std::string createImgCacheTableSql = "CREATE TABLE IF NOT EXISTS " + IMG_CACHE_TABLE
+    if (FormRdbDataMgr::GetInstance().InitFormRdbTable(formRdbCacheTableConfig) != ERR_OK) {
+        HILOG_ERROR("Form cache mgr init form rdb cache table fail.");
+    }
+
+    FormRdbTableConfig formRdbImgTableConfig;
+    formRdbImgTableConfig.tableName = IMG_CACHE_TABLE;
+    formRdbImgTableConfig.createTableSql = "CREATE TABLE IF NOT EXISTS " + IMG_CACHE_TABLE
         + " (IMAGE_ID INTEGER PRIMARY KEY AUTOINCREMENT, IMAGE_BIT BLOB, IMAGE_SIZE TEXT);";
-    rdbDataManager_->ExecuteSql(createImgCacheTableSql);
+    if (FormRdbDataMgr::GetInstance().InitFormRdbTable(formRdbImgTableConfig) != ERR_OK) {
+        HILOG_ERROR("Form cache mgr init form rdb img table fail.");
+    }
 }
 
 void FormCacheMgr::Start()
@@ -363,7 +369,7 @@ bool FormCacheMgr::GetDataCacheFromDb(int64_t formId, FormCache &formCache) cons
 {
     NativeRdb::AbsRdbPredicates absRdbPredicates(FORM_CACHE_TABLE);
     absRdbPredicates.EqualTo(FORM_ID, std::to_string(formId));
-    auto absSharedResultSet = rdbDataManager_->QueryData(absRdbPredicates);
+    auto absSharedResultSet = FormRdbDataMgr::GetInstance().QueryData(absRdbPredicates);
     if (absSharedResultSet == nullptr) {
         HILOG_ERROR("GetDataCacheFromDb failed.");
         return false;
@@ -412,7 +418,7 @@ bool FormCacheMgr::SaveDataCacheToDb(int64_t formId, const FormCache &formCache)
     valuesBucket.PutString(FORM_IMAGES, formCache.imgCache);
     valuesBucket.PutInt(CACHE_STATE, static_cast<int>(formCache.cacheState));
     int64_t rowId;
-    bool ret = rdbDataManager_->InsertData(FORM_CACHE_TABLE, valuesBucket, rowId);
+    bool ret = FormRdbDataMgr::GetInstance().InsertData(FORM_CACHE_TABLE, valuesBucket, rowId);
     if (!ret) {
         HILOG_ERROR("SaveDataCacheToDb formId:%{public}s failed.", std::to_string(formId).c_str());
         return false;
@@ -444,7 +450,7 @@ bool FormCacheMgr::DeleteDataCacheInDb(int64_t formId)
 {
     NativeRdb::AbsRdbPredicates absRdbPredicates(FORM_CACHE_TABLE);
     absRdbPredicates.EqualTo(FORM_ID, std::to_string(formId));
-    return rdbDataManager_->DeleteData(absRdbPredicates);
+    return FormRdbDataMgr::GetInstance().DeleteData(absRdbPredicates);
 }
 
 bool FormCacheMgr::GetImgCacheFromDb(
@@ -452,7 +458,7 @@ bool FormCacheMgr::GetImgCacheFromDb(
 {
     NativeRdb::AbsRdbPredicates absRdbPredicates(IMG_CACHE_TABLE);
     absRdbPredicates.EqualTo(IMAGE_ID, std::to_string(rowId));
-    auto absSharedResultSet = rdbDataManager_->QueryData(absRdbPredicates);
+    auto absSharedResultSet = FormRdbDataMgr::GetInstance().QueryData(absRdbPredicates);
     if (absSharedResultSet == nullptr) {
         HILOG_ERROR("GetImgCacheFromDb failed.");
         return false;
@@ -494,7 +500,7 @@ bool FormCacheMgr::SaveImgCacheToDb(const std::vector<uint8_t> &value, int32_t s
     NativeRdb::ValuesBucket valuesBucket;
     valuesBucket.PutBlob(IMAGE_BIT, value);
     valuesBucket.PutInt(IMAGE_SIZE, size);
-    bool ret = rdbDataManager_->InsertData(IMG_CACHE_TABLE, valuesBucket, rowId);
+    bool ret = FormRdbDataMgr::GetInstance().InsertData(IMG_CACHE_TABLE, valuesBucket, rowId);
     if (!ret) {
         HILOG_ERROR("SaveImgCacheToDb failed.");
         return false;
@@ -510,13 +516,13 @@ bool FormCacheMgr::DeleteImgCacheInDb(const std::string &rowId)
 
     NativeRdb::AbsRdbPredicates absRdbPredicates(IMG_CACHE_TABLE);
     absRdbPredicates.EqualTo(IMAGE_ID, rowId);
-    return rdbDataManager_->DeleteData(absRdbPredicates);
+    return FormRdbDataMgr::GetInstance().DeleteData(absRdbPredicates);
 }
 
 void FormCacheMgr::ResetCacheStateAfterReboot()
 {
     std::string sql = "UPDATE " + FORM_CACHE_TABLE + " SET " + CACHE_STATE + " = 1;";
-    rdbDataManager_->ExecuteSql(sql);
+    FormRdbDataMgr::GetInstance().ExecuteSql(sql);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

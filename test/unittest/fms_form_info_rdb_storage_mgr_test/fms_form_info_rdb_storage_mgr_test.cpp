@@ -50,32 +50,21 @@ void FmsFormInfoRdbStorageMgrTest::TearDown()
 {}
 
 /**
- * @tc.name: FmsFormInfoRdbStorageMgrTest_014
+ * @tc.name: FmsFormInfoRdbStorageMgrTest_001
  * @tc.desc: Test LoadFormData
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_000, TestSize.Level0)
+HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_001, TestSize.Level0)
 {
     std::string formId;
     std::string statusData;
     std::vector<InnerFormInfo> innerFormInfos;
     MockInit(false);
+    MockQueryData(false);
     auto result = FormInfoRdbStorageMgr::GetInstance().LoadFormData(innerFormInfos);
+    MockQueryData(true);
     MockInit(true);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
-}
-
-/**
- * @tc.name: FmsFormInfoRdbStorageMgrTest_001
- * @tc.desc: Test UpdateBundleFormInfos
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_001, TestSize.Level0)
-{
-    std::string bundleName = "testKey";
-    std::string formInfoStorages = "formInfo";
-    auto result = FormInfoRdbStorageMgr::GetInstance().UpdateBundleFormInfos(bundleName, formInfoStorages);
-    EXPECT_EQ(result, ERR_OK);
 }
 
 /**
@@ -85,6 +74,19 @@ HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_001, TestSiz
  */
 HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_002, TestSize.Level0)
 {
+    std::string bundleName = "testKey";
+    std::string formInfoStorages = "formInfo";
+    auto result = FormInfoRdbStorageMgr::GetInstance().UpdateBundleFormInfos(bundleName, formInfoStorages);
+    EXPECT_EQ(result, ERR_OK);
+}
+
+/**
+ * @tc.name: FmsFormInfoRdbStorageMgrTest_003
+ * @tc.desc: Test UpdateBundleFormInfos
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_003, TestSize.Level0)
+{
     std::string bundleName = "";
     std::string formInfoStorages = "";
     auto result = FormInfoRdbStorageMgr::GetInstance().UpdateBundleFormInfos(bundleName, formInfoStorages);
@@ -92,11 +94,11 @@ HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_002, TestSiz
 }
 
 /**
- * @tc.name: FmsFormInfoRdbStorageMgrTest_003
+ * @tc.name: FmsFormInfoRdbStorageMgrTest_004
  * @tc.desc: Test LoadFormInfos
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_003, TestSize.Level0)
+HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_004, TestSize.Level0)
 {
     std::vector<std::pair<std::string, std::string>> formInfoStorages;
     auto result = FormInfoRdbStorageMgr::GetInstance().LoadFormInfos(formInfoStorages);
@@ -104,11 +106,11 @@ HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_003, TestSiz
 }
 
 /**
- * @tc.name: FmsFormInfoRdbStorageMgrTest_004
+ * @tc.name: FmsFormInfoRdbStorageMgrTest_005
  * @tc.desc: Test RemoveBundleFormInfos fail
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_004, TestSize.Level0)
+HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_005, TestSize.Level0)
 {
     std::string bundleName = "";
     auto result = FormInfoRdbStorageMgr::GetInstance().RemoveBundleFormInfos(bundleName);
@@ -116,11 +118,11 @@ HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_004, TestSiz
 }
 
 /**
- * @tc.name: FmsFormInfoRdbStorageMgrTest_005
+ * @tc.name: FmsFormInfoRdbStorageMgrTest_006
  * @tc.desc: Test RemoveBundleFormInfos
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_005, TestSize.Level0)
+HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_006, TestSize.Level0)
 {
     std::string bundleName = "testKey";
     auto result = FormInfoRdbStorageMgr::GetInstance().RemoveBundleFormInfos(bundleName);
@@ -128,11 +130,11 @@ HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_005, TestSiz
 }
 
 /**
- * @tc.name: FmsFormInfoRdbStorageMgrTest_006
+ * @tc.name: FmsFormInfoRdbStorageMgrTest_007
  * @tc.desc: Test ModifyStorageFormData
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_006, TestSize.Level0)
+HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_007, TestSize.Level0)
 {
     const int64_t formId = 1;
     InnerFormInfo innerFormInfo;
@@ -142,11 +144,11 @@ HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_006, TestSiz
 }
 
 /**
- * @tc.name: FmsFormInfoRdbStorageMgrTest_007
+ * @tc.name: FmsFormInfoRdbStorageMgrTest_008
  * @tc.desc: Test LoadFormData
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_007, TestSize.Level0)
+HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_008, TestSize.Level0)
 {
     std::vector<InnerFormInfo> innerFormInfos;
     auto result = FormInfoRdbStorageMgr::GetInstance().LoadFormData(innerFormInfos);
@@ -154,11 +156,11 @@ HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_007, TestSiz
 }
 
 /**
- * @tc.name: FmsFormInfoRdbStorageMgrTest_008
+ * @tc.name: FmsFormInfoRdbStorageMgrTest_009
  * @tc.desc: Test DeleteStorageFormData
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_008, TestSize.Level0)
+HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_009, TestSize.Level0)
 {
     std::string formId = "formId_1";
     auto result = FormInfoRdbStorageMgr::GetInstance().DeleteStorageFormData(formId);
@@ -166,14 +168,13 @@ HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_008, TestSiz
 }
 
 /**
- * @tc.name: FmsFormInfoRdbStorageMgrTest_009
+ * @tc.name: FmsFormInfoRdbStorageMgrTest_010
  * @tc.desc: Test LoadFormData
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_009, TestSize.Level0)
+HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_010, TestSize.Level0)
 {
     std::vector<InnerFormInfo> innerFormInfos;
-    FormRdbConfig formRdbConfig;
     std::vector<std::pair<std::string, std::string>> formInfoStorages;
     MockQueryData(false);
     auto result = FormInfoRdbStorageMgr::GetInstance().LoadFormInfos(formInfoStorages);
@@ -184,14 +185,13 @@ HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_009, TestSiz
 }
 
 /**
- * @tc.name: FmsFormInfoRdbStorageMgrTest_010
+ * @tc.name: FmsFormInfoRdbStorageMgrTest_011
  * @tc.desc: Test SaveStorageFormData
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_010, TestSize.Level0)
+HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_011, TestSize.Level0)
 {
     InnerFormInfo innerFormInfos;
-    FormRdbConfig formRdbConfig;
     MockInsertData(false);
     auto result = FormInfoRdbStorageMgr::GetInstance().SaveStorageFormData(innerFormInfos);
     MockInsertData(true);
@@ -199,14 +199,13 @@ HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_010, TestSiz
 }
 
 /**
- * @tc.name: FmsFormInfoRdbStorageMgrTest_011
+ * @tc.name: FmsFormInfoRdbStorageMgrTest_012
  * @tc.desc: Test DeleteStorageFormData
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_011, TestSize.Level0)
+HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_012, TestSize.Level0)
 {
     std::string formId;
-    FormRdbConfig formRdbConfig;
     MockDeleteData(false);
     auto result = FormInfoRdbStorageMgr::GetInstance().DeleteStorageFormData(formId);
     MockDeleteData(true);
@@ -214,11 +213,11 @@ HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_011, TestSiz
 }
 
 /**
- * @tc.name: FmsFormInfoRdbStorageMgrTest_012
+ * @tc.name: FmsFormInfoRdbStorageMgrTest_013
  * @tc.desc: Test LoadStatusData
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_012, TestSize.Level0)
+HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_013, TestSize.Level0)
 {
     std::string formId = "1";
     std::string statusData;
@@ -229,15 +228,17 @@ HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_012, TestSiz
 }
 
 /**
- * @tc.name: FmsFormInfoRdbStorageMgrTest_013
+ * @tc.name: FmsFormInfoRdbStorageMgrTest_014
  * @tc.desc: Test CheckRdbStore
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_013, TestSize.Level0)
+HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_014, TestSize.Level0)
 {
     std::vector<std::pair<std::string, std::string>> formInfoStorages;
     MockInit(false);
+    MockQueryData(false);
     auto result = FormInfoRdbStorageMgr::GetInstance().LoadFormInfos(formInfoStorages);
+    MockQueryData(true);
     MockInit(true);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
 }

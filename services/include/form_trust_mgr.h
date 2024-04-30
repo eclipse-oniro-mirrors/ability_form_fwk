@@ -56,7 +56,6 @@ public:
      */
     void GetUntrustAppNameList(std::string &result);
 private:
-    std::shared_ptr<FormRdbDataMgr> rdbDataManager_;
     std::map<std::string, int32_t> unTrustList_;
     mutable std::mutex rdbStoreMutex_;
 };

@@ -20,6 +20,7 @@
 #include "form_rdb_data_mgr.h"
 #undef private
 #include "form_mgr_errors.h"
+#include "form_constants.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -41,26 +42,28 @@ public:
     static void TearDownTestCase();
     void SetUp() override;
     void TearDown() override;
-
-    std::shared_ptr<FormRdbDataMgr> rdbDataManager_;
     std::shared_ptr<RdbStoreDataCallBackFormInfoStorage> rdbDataCallBack_;
 };
+
 void FmsFormRdbDataMgrTest::SetUpTestCase()
-{}
+{
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest SetUpTestCase.";
+}
 
 void FmsFormRdbDataMgrTest::TearDownTestCase()
-{}
+{
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest TearDownTestCase";
+}
 
 void FmsFormRdbDataMgrTest::SetUp()
 {
-    FormRdbConfig formRdbConfig;
-    rdbDataManager_ = std::make_shared<FormRdbDataMgr>(formRdbConfig);
-    rdbDataManager_->Init();
-    rdbDataCallBack_ = std::make_shared<RdbStoreDataCallBackFormInfoStorage>(formRdbConfig);
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest SetUp.";
 }
 
 void FmsFormRdbDataMgrTest::TearDown()
-{}
+{
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest TearDown";
+}
 
 /**
  * @tc.name: FmsFormRdbDataMgrTest_001
@@ -69,8 +72,13 @@ void FmsFormRdbDataMgrTest::TearDown()
  */
 HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_001, Function | SmallTest | Level1)
 {
-    auto result = rdbDataManager_->Init();
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_001 start";
+    FormRdbTableConfig formRdbTableConfig;
+    auto result = FormRdbDataMgr::GetInstance().InitFormRdbTable(formRdbTableConfig);
+    rdbDataCallBack_ = std::make_shared<RdbStoreDataCallBackFormInfoStorage>(
+        Constants::FORM_MANAGER_SERVICE_PATH + Constants::FORM_RDB_NAME);
     EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_001 end";
 }
 
 /**
@@ -80,10 +88,13 @@ HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_001, Function | SmallTest 
  */
 HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_002, Function | SmallTest | Level1)
 {
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_002 start";
     std::string key = "testKey";
     std::string value = "values";
-    auto result = rdbDataManager_->InsertData(key, value);
+    auto result = FormRdbDataMgr::GetInstance().InsertData(Constants::FORM_RDB_TABLE_NAME,
+        key, value);
     EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_002 end";
 }
 
 /**
@@ -93,14 +104,15 @@ HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_002, Function | SmallTest 
  */
 HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_003, Function | SmallTest | Level1)
 {
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_003 start";
     std::string key = "testKey";
     std::unordered_map<std::string, std::string> datas;
-    auto result = rdbDataManager_->QueryData(key, datas);
+    auto result = FormRdbDataMgr::GetInstance().QueryData(Constants::FORM_RDB_TABLE_NAME, key, datas);
     EXPECT_EQ(result, ERR_OK);
-
     std::string nothingkey = "nothingKey";
-    result = rdbDataManager_->QueryData(nothingkey, datas);
+    result = FormRdbDataMgr::GetInstance().QueryData(Constants::FORM_RDB_TABLE_NAME, nothingkey, datas);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_003 end";
 }
 
 /**
@@ -110,9 +122,11 @@ HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_003, Function | SmallTest 
  */
 HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_004, Function | SmallTest | Level1)
 {
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_004 start";
     std::unordered_map<std::string, std::string> datas;
-    auto result = rdbDataManager_->QueryAllData(datas);
+    auto result = FormRdbDataMgr::GetInstance().QueryAllData(Constants::FORM_RDB_TABLE_NAME, datas);
     EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_004 end";
 }
 
 /**
@@ -122,9 +136,11 @@ HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_004, Function | SmallTest 
  */
 HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_005, Function | SmallTest | Level1)
 {
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_005 start";
     std::string key = "testKey";
-    auto result = rdbDataManager_->DeleteData(key);
+    auto result = FormRdbDataMgr::GetInstance().DeleteData(Constants::FORM_RDB_TABLE_NAME, key);
     EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_005 end";
 }
 
 /**
@@ -136,8 +152,11 @@ HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_005, Function | SmallTest 
 HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_006, Function | SmallTest | Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_006 start";
-
-    auto result = rdbDataCallBack_->OnCreate(*(rdbDataManager_->rdbStore_.get()));
+    if (rdbDataCallBack_ == nullptr) {
+        rdbDataCallBack_ = std::make_shared<RdbStoreDataCallBackFormInfoStorage>(
+            Constants::FORM_MANAGER_SERVICE_PATH + Constants::FORM_RDB_NAME);
+    }
+    auto result = rdbDataCallBack_->OnCreate(*(FormRdbDataMgr::GetInstance().rdbStore_.get()));
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_006 end";
 }
@@ -151,10 +170,14 @@ HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_006, Function | SmallTest 
 HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_007, Function | SmallTest | Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_007 start";
-   
     int currentVersion = 1;
     int targetVersion = 2;
-    auto result = rdbDataCallBack_->OnUpgrade(*(rdbDataManager_->rdbStore_.get()), currentVersion, targetVersion);
+    if (rdbDataCallBack_ == nullptr) {
+        rdbDataCallBack_ = std::make_shared<RdbStoreDataCallBackFormInfoStorage>(
+            Constants::FORM_MANAGER_SERVICE_PATH + Constants::FORM_RDB_NAME);
+    }
+    auto result = rdbDataCallBack_->OnUpgrade(*(FormRdbDataMgr::GetInstance().rdbStore_.get()),
+        currentVersion, targetVersion);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_007 end";
 }
@@ -171,7 +194,12 @@ HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_008, Function | SmallTest 
 
     int currentVersion = 2;
     int targetVersion = 1;
-    auto result = rdbDataCallBack_->OnDowngrade(*(rdbDataManager_->rdbStore_.get()), currentVersion, targetVersion);
+    if (rdbDataCallBack_ == nullptr) {
+        rdbDataCallBack_ = std::make_shared<RdbStoreDataCallBackFormInfoStorage>(
+            Constants::FORM_MANAGER_SERVICE_PATH + Constants::FORM_RDB_NAME);
+    }
+    auto result = rdbDataCallBack_->OnDowngrade(*(FormRdbDataMgr::GetInstance().rdbStore_.get()),
+        currentVersion, targetVersion);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_008 end";
 }
@@ -186,6 +214,10 @@ HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_009, Function | SmallTest 
 {
     GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_009 start";
     std::string data = "testKey";
+    if (rdbDataCallBack_ == nullptr) {
+        rdbDataCallBack_ = std::make_shared<RdbStoreDataCallBackFormInfoStorage>(
+            Constants::FORM_MANAGER_SERVICE_PATH + Constants::FORM_RDB_NAME);
+    }
     auto result = rdbDataCallBack_->onCorruption(data);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_009 end";
@@ -201,7 +233,7 @@ HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_010, Function | SmallTest 
 {
     GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_010 start";
     std::string data = "testKey";
-    auto result = rdbDataManager_->InsertData(data);
+    auto result = FormRdbDataMgr::GetInstance().InsertData(Constants::FORM_RDB_TABLE_NAME, data);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
     GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_010 end";
 }
@@ -217,17 +249,17 @@ HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_011, Function | SmallTest 
     GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_011 start";
     std::string key = "testKey";
     std::string retValue = "";
-    auto result = rdbDataManager_->QueryData(key, retValue);
+    auto result = FormRdbDataMgr::GetInstance().QueryData(Constants::FORM_RDB_TABLE_NAME, key, retValue);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
 
     std::string value = "values";
-    result = rdbDataManager_->InsertData(key, value);
+    result = FormRdbDataMgr::GetInstance().InsertData(Constants::FORM_RDB_TABLE_NAME, key, value);
     EXPECT_EQ(result, ERR_OK);
 
-    result = rdbDataManager_->QueryData(key, retValue);
+    result = FormRdbDataMgr::GetInstance().QueryData(Constants::FORM_RDB_TABLE_NAME, key, retValue);
     EXPECT_EQ(result, ERR_OK);
 
-    result = rdbDataManager_->DeleteData(key);
+    result = FormRdbDataMgr::GetInstance().DeleteData(Constants::FORM_RDB_TABLE_NAME, key);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_011 end";
 }
@@ -241,6 +273,11 @@ HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_011, Function | SmallTest 
 HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_012, Function | SmallTest | Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_012 start";
+
+    FormRdbTableConfig formRdbTableConfig;
+    formRdbTableConfig.tableName = FORM_CACHE_TABLE;
+    auto result = FormRdbDataMgr::GetInstance().InitFormRdbTable(formRdbTableConfig);
+    EXPECT_EQ(result, ERR_OK);
     
     int64_t formId = 1;
     NativeRdb::ValuesBucket valuesBucket;
@@ -249,12 +286,12 @@ HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_012, Function | SmallTest 
     valuesBucket.PutString(FORM_IMAGES, "imgCache");
     valuesBucket.PutInt(CACHE_STATE, 0);
     int64_t rowId;
-    bool ret = rdbDataManager_->InsertData(FORM_CACHE_TABLE, valuesBucket, rowId);
+    bool ret = FormRdbDataMgr::GetInstance().InsertData(FORM_CACHE_TABLE, valuesBucket, rowId);
     EXPECT_EQ(ret, true);
 
     NativeRdb::AbsRdbPredicates absRdbPredicates(FORM_CACHE_TABLE);
     absRdbPredicates.EqualTo(FORM_ID, std::to_string(formId));
-    ret = rdbDataManager_->DeleteData(absRdbPredicates);
+    ret = FormRdbDataMgr::GetInstance().DeleteData(absRdbPredicates);
     EXPECT_EQ(ret, true);
 
     GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_012 end";
@@ -271,7 +308,7 @@ HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_013, Function | SmallTest 
     GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_013 start";
     
     std::set<std::string> datas;
-    auto result = rdbDataManager_->QueryAllKeys(datas);
+    auto result = FormRdbDataMgr::GetInstance().QueryAllKeys(Constants::FORM_RDB_TABLE_NAME, datas);
     EXPECT_EQ(result, ERR_OK);
 
     GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_013 end";
@@ -288,7 +325,7 @@ HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_014, Function | SmallTest 
     GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_014 start";
     
     std::string key = "testKey";
-    auto result = rdbDataManager_->QuerySql(key);
+    auto result = FormRdbDataMgr::GetInstance().QuerySql(key);
     EXPECT_NE(result, nullptr);
 
     GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_014 end";
@@ -301,9 +338,9 @@ HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_014, Function | SmallTest 
  */
 HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_015, Function | SmallTest | Level1)
 {
-    FormRdbConfig formRdbConfig_;
-    RdbStoreDataCallBackFormInfoStorage rdbDataCallBack_(formRdbConfig_);
-    auto result = rdbDataCallBack_.onCorruption(FORM_CACHE_TABLE);
+    RdbStoreDataCallBackFormInfoStorage rdbDataCallBack_(Constants::FORM_MANAGER_SERVICE_PATH +
+        Constants::FORM_RDB_NAME);
+    auto result = rdbDataCallBack_.onCorruption(Constants::FORM_RDB_TABLE_NAME);
     EXPECT_EQ(result, NativeRdb::E_OK);
 }
 }

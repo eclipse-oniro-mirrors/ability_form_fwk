@@ -75,7 +75,6 @@ private:
     void ResetCacheStateAfterReboot();
 
     mutable std::mutex cacheMutex_;
-    std::shared_ptr<FormRdbDataMgr> rdbDataManager_;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
