@@ -535,11 +535,11 @@ ErrCode FormMgr::RequestPublishForm(Want &want, bool withFormBindingData,
 }
 
 
-ErrCode FormMgr::SetPublishFormResult(const std::string &formId, Constants::PublishFormResult &errorCodeInfo)
+ErrCode FormMgr::SetPublishFormResult(const int64_t formId, Constants::PublishFormResult &errorCodeInfo)
 {
     HILOG_INFO("%{public}s called.", __func__);
-    if (stoi(formId) <= 0) {
-        HILOG_ERROR("%{public}s is invalid errCode:%{public}d.", __func__, stoi(formId));
+    if (formId <= 0) {
+        HILOG_ERROR("%{public}s is invalid errCode:%{public}." PRId64, __func__, formId);
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
     ErrCode errCode = Connect();

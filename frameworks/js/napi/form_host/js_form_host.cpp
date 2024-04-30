@@ -1976,7 +1976,12 @@ private:
             return CreateJsUndefined(env);
         }
         decltype(argc) convertArgc = 0;
-        std::string formId = GetStringFromNapi(env, argv[0]);
+        int64_t formId;
+        if (!ConvertFromId(env, argv[PARAM0], formId)) {
+            HILOG_ERROR("Convert strFormId failed.");
+            NapiFormUtil::ThrowParamTypeError(env, "formId", "string");
+            return CreateJsUndefined(env);
+        }
         convertArgc++;
         std::string messageInfo = "";
         int32_t formErrorCode = INVALID_FORM_RESULT_ERRCODE;

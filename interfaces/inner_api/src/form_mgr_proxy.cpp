@@ -341,7 +341,7 @@ ErrCode FormMgrProxy::RequestPublishForm(Want &want, bool withFormBindingData,
     return errCode;
 }
 
-ErrCode FormMgrProxy::SetPublishFormResult(const std::string &formId, Constants::PublishFormResult &errorCodeInfo)
+ErrCode FormMgrProxy::SetPublishFormResult(const int64_t formId, Constants::PublishFormResult &errorCodeInfo)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -350,7 +350,7 @@ ErrCode FormMgrProxy::SetPublishFormResult(const std::string &formId, Constants:
         HILOG_ERROR("%{public}s, failed to write interface token", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (!data.WriteString(formId)) {
+    if (!data.WriteInt64(formId)) {
         HILOG_ERROR("%{public}s, failed to write want", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }

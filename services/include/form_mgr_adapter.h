@@ -29,12 +29,12 @@
 #include "form_js_info.h"
 #include "form_provider_data.h"
 #include "form_publish_interceptor_interface.h"
+#include "form_serial_queue.h"
 #include "form_state_info.h"
 #include "form_task_mgr.h"
 #include "iremote_object.h"
 #include "running_form_info.h"
 #include "want.h"
-#include "form_serial_queue.h"
 #ifdef THEME_MGR_ENABLE
 #include "theme_manager_client.h"
 #endif
@@ -249,7 +249,7 @@ public:
         std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
         const std::vector<FormDataProxy> &formDataProxies = {});
 
-    ErrCode SetPublishFormResult(const std::string &formId, Constants::PublishFormResult &errorCodeInfo);
+    ErrCode SetPublishFormResult(const int64_t formId, Constants::PublishFormResult &errorCodeInfo);
 
     ErrCode AcquireAddFormResult(const int64_t formId);
     /**

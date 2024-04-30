@@ -382,7 +382,7 @@ ErrCode FormMgrService::RequestPublishForm(Want &want, bool withFormBindingData,
     return FormMgrAdapter::GetInstance().RequestPublishForm(want, withFormBindingData, formBindingData, formId);
 }
 
-ErrCode FormMgrService::SetPublishFormResult(const std::string &formId, Constants::PublishFormResult &errorCodeInfo)
+ErrCode FormMgrService::SetPublishFormResult(const int64_t formId, Constants::PublishFormResult &errorCodeInfo)
 {
     HILOG_INFO("%{public}s called.", __func__);
     ErrCode ret = CheckFormPermission(AppExecFwk::Constants::PERMISSION_REQUIRE_FORM);

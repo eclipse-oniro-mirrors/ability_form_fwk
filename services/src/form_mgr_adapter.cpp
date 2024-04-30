@@ -2366,18 +2366,17 @@ ErrCode FormMgrAdapter::RequestPublishForm(Want &want, bool withFormBindingData,
     return errCode;
 }
 
-ErrCode FormMgrAdapter::SetPublishFormResult(const std::string &formId, Constants::PublishFormResult &errorCodeInfo)
+ErrCode FormMgrAdapter::SetPublishFormResult(const int64_t formId, Constants::PublishFormResult &errorCodeInfo)
 {
     HILOG_INFO("%{public}s called.", __func__);
     if (serialQueue_ == nullptr) {
         HILOG_ERROR("%{public}s fail, serialQueue_ invalidate", __func__);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    int64_t cardId = std::stoi(formId);
-    std::pair<int64_t, int64_t> eventMsg(static_cast<int64_t>(AddFormTaskType::ADD_FORM_TIMER), cardId);
+    std::pair<int64_t, int64_t> eventMsg(static_cast<int64_t>(AddFormTaskType::ADD_FORM_TIMER), formId);
     serialQueue_->CancelDelayTask(eventMsg);
     std::lock_guard<std::mutex> lock(formResultMutex_);
-    auto iter = formIdMap_.find(cardId);
+    auto iter = formIdMap_.find(formId);
     if (iter != formIdMap_.end()) {
         if (errorCodeInfo.code == Constants::PublishFormErrorCode::SUCCESS) {
             iter->second = AddFormResultErrorCode::SUCCESS;

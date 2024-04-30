@@ -381,7 +381,7 @@ ErrCode FormMgrStub::HandleRequestPublishForm(MessageParcel &data, MessageParcel
 
 ErrCode FormMgrStub::HandleSetPublishFormResult(MessageParcel &data, MessageParcel &reply)
 {
-    std::string formId = data.ReadString();
+    int64_t formId = data.ReadInt64();
     Constants::PublishFormResult errorCodeInfo;
     errorCodeInfo.message = data.ReadString();
     int32_t err = data.ReadInt32();
