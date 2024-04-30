@@ -58,13 +58,14 @@
               "memmgr",
               "init",
               "resource_schedule_service",
-              "theme_mgr"
+              "theme_mgr",
+              "jsoncpp",
+              "libxml2"
+
           ],
           "third_party": [
               "node",
-              "jsoncpp",
-              "json",
-              "libxml2"
+              "json"
           ]
         },
         "build": {

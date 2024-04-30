@@ -32,12 +32,8 @@ ohos_shared_library("libfms") {
   shlib_type = "sa"
   version_script = "libfms.map"
   cflags_cc = []
-  include_dirs = [
-    "${ability_runtime_path}/services/common/include",
-    "${ability_runtime_native_path}/appkit/ability_runtime",
-    "${form_fwk_napi_path}/form_host/form_state_observer/include",
-    "${init_path}/interfaces/innerkits/include/syspara/",
-  ]
+  include_dirs =
+      [ "${form_fwk_napi_path}/form_host/form_state_observer/include" ]
 
   sources = [
     "services/config/form_xml_parser.cpp",
@@ -114,7 +110,6 @@ ohos_shared_library("libfms") {
   deps = [
     "${form_fwk_path}:form_config",
     "${form_fwk_path}:form_manager",
-    "//third_party/libxml2:libxml2",
   ]
 
   external_deps = [
@@ -145,12 +140,17 @@ ohos_shared_library("libfms") {
     "init:libbegetutil",
     "ipc:ipc_core",
     "kv_store:distributeddata_inner",
+    "libxml2:libxml2",
     "os_account:os_account_innerkits",
     "relational_store:native_rdb",
     "resource_management:global_resmgr",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "time_service:time_client",
+  ]
+  public_external_deps = [
+    "ability_runtime:abilitykit_native",
+    "ability_runtime:appkit_native",
   ]
 
   if (cite_memmgr_plugin) {
@@ -196,9 +196,7 @@ config("fmskit_config") {
 config("fmskit_public_config") {
   include_dirs = [
     "interfaces/kits/native/include",
-    "${ability_runtime_path}/services/common/include",
     "${form_fwk_path}/interfaces/inner_api/include",
-    "${bundlefwk_inner_api_path}/appexecfwk_base/include",
   ]
 }
 
@@ -225,6 +223,7 @@ ohos_shared_library("fmskit_native") {
   external_deps = [
     "ability_base:want",
     "ability_runtime:abilitykit_native",
+    "ability_runtime:abilitykit_native",
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "hilog:libhilog",
@@ -232,6 +231,10 @@ ohos_shared_library("fmskit_native") {
     "ipc:ipc_core",
     "napi:ace_napi",
     "samgr:samgr_proxy",
+  ]
+  public_external_deps = [
+    "ability_runtime:abilitykit_native",
+    "bundle_framework:appexecfwk_base",
   ]
 
   subsystem_name = "ability"
@@ -245,11 +248,6 @@ config("formmgr_sdk_config") {
   include_dirs = [
     "interfaces/inner_api/include/",
     "//third_party/json/include",
-    "${ability_base_kits_path}/configuration/include",
-    "${ability_runtime_path}/interfaces/kits/native/ability/native",
-    "${ability_runtime_innerapi_path}/ability_manager/include",
-    "${ability_runtime_innerapi_path}/app_manager/include/appmgr",
-    "${ability_runtime_path}/services/common/include",
   ]
   cflags = []
   if (target_cpu == "arm") {
@@ -258,7 +256,7 @@ config("formmgr_sdk_config") {
 }
 
 ohos_shared_library("form_manager") {
-  include_dirs = [ "${ability_runtime_innerapi_path}/runtime/include" ]
+  include_dirs = []
 
   sources = [
     "interfaces/inner_api/src/form_ashmem.cpp",
@@ -298,16 +296,24 @@ ohos_shared_library("form_manager") {
     "${form_fwk_path}:formmgr_config",
   ]
 
-  deps = [ "//third_party/jsoncpp:jsoncpp" ]
+  deps = []
 
   external_deps = [
     "ability_base:want",
+    "ability_runtime:runtime",
     "bundle_framework:appexecfwk_base",
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_core",
+    "jsoncpp:jsoncpp",
     "napi:ace_napi",
     "samgr:samgr_proxy",
+  ]
+  public_external_deps = [
+    "ability_base:configuration",
+    "ability_runtime:ability_context_native",
+    "ability_runtime:app_manager",
+    "ability_runtime:mission_info",
   ]
 
   subsystem_name = "ability"
