@@ -275,6 +275,10 @@ public:
         std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
         const std::vector<FormDataProxy> &formDataProxies = {});
 
+    ErrCode SetPublishFormResult(const int64_t formId, Constants::PublishFormResult &errorCodeInfo);
+
+    ErrCode AcquireAddFormResult(const int64_t formId);
+
     /**
      * @brief Lifecycle Update.
      * @param formIds The id of the forms.

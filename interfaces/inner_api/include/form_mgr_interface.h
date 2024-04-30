@@ -130,6 +130,15 @@ public:
     virtual ErrCode RequestPublishForm(Want &want, bool withFormBindingData,
                                        std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId) = 0;
 
+    virtual ErrCode SetPublishFormResult(const int64_t formId, Constants::PublishFormResult &errorCodeInfo)
+    {
+        return ERR_OK;
+    }
+
+    virtual ErrCode AcquireAddFormResult(const int64_t formId)
+    {
+        return ERR_OK;
+    }
     /**
      * @brief Lifecycle update.
      * @param formIds The Id of the forms.
@@ -675,6 +684,8 @@ public:
         FORM_MGR_UPDATE_FORM_LOCATION,
         FORM_MGR_GET_FORMS_INFO_BY_FILTER,
         FORM_MGR_CREATE_FORM,
+        FORM_MGR_PUBLISH_FORM_ERRCODE_RESULT,
+        FORM_MGR_ACQUIRE_ADD_FORM_RESULT,
     };
 };
 }  // namespace AppExecFwk

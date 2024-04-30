@@ -232,6 +232,18 @@ namespace Constants {
         AI_SUGGESTION = 7,
     };
 
+    enum class PublishFormErrorCode : int8_t {
+        SUCCESS,
+        NO_SPACE,
+        PARAM_ERROR,
+        INTERNAL_ERROR,
+    };
+
+    struct PublishFormResult {
+        PublishFormErrorCode code;
+        std::string message;
+    };
+
     // rdb
     constexpr const char* FORM_RDB_NAME = "/formdb.db";
     constexpr const char* FORM_RDB_TABLE_NAME = "form_table";
