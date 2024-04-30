@@ -1858,7 +1858,7 @@ ErrCode FormMgrAdapter::InnerAcquireProviderFormInfoAsync(const int64_t formId,
     Want newWant;
     newWant.SetParams(wantParams);
     auto hostToken = newWant.GetRemoteObject(Constants::PARAM_FORM_HOST_TOKEN);
-    sptr<FormAbilityConnection> formAcquireConnection = new (std::nothrow) FormAcquireConnection(formId, info,
+    sptr<FormAcquireConnection> formAcquireConnection = new (std::nothrow) FormAcquireConnection(formId, info,
         wantParams, hostToken);
     if (formAcquireConnection == nullptr) {
         HILOG_ERROR("formAcquireConnection is null.");
@@ -1873,11 +1873,11 @@ ErrCode FormMgrAdapter::InnerAcquireProviderFormInfoAsync(const int64_t formId,
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
 #ifdef RES_SCHEDULE_ENABLE
-    auto && connectCallback = [](const sptr<FormAbilityConnection>& formAbilityConnection) {
-        FormAbilityConnectionReporter::GetInstance().ReportFormAbilityConnection(formAbilityConnection);
+    auto && connectCallback = [](const std::string &bundleName) {
+        FormAbilityConnectionReporter::GetInstance().ReportFormAbilityConnection(bundleName);
     };
-    auto && disconnectCallback = [](const sptr<FormAbilityConnection>& formAbilityConnection) {
-        FormAbilityConnectionReporter::GetInstance().ReportFormAbilityDisconnection(formAbilityConnection);
+    auto && disconnectCallback = [](const std::string &bundleName) {
+        FormAbilityConnectionReporter::GetInstance().ReportFormAbilityDisconnection(bundleName);
     };
     formAcquireConnection->SetFormAbilityConnectCb(connectCallback);
     formAcquireConnection->SetFormAbilityDisconnectCb(disconnectCallback);

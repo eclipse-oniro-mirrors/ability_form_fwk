@@ -30,7 +30,6 @@ namespace AppExecFwk {
  * Struct FormConnectionInfo
 */
 struct FormConnectionInfo {
-    std::string bundleName_;
     int32_t pid_;
     int32_t connectCount_;
 };
@@ -48,13 +47,13 @@ public:
      * @brief Report form ability connection info to rss.
      * @param connection Form ability connection pointer.
      */
-    void ReportFormAbilityConnection(const sptr<FormAbilityConnection> &connection);
+    void ReportFormAbilityConnection(const std::string &bundleName);
 
     /**
      * @brief Report form ability disconnection info to rss.
      * @param connection Form ability connection pointer.
      */
-    void ReportFormAbilityDisconnection(const sptr<FormAbilityConnection> &connection);
+    void ReportFormAbilityDisconnection(const std::string &bundleName);
 
 private:
     /**
@@ -70,14 +69,14 @@ private:
      * @param infos The vector which contains running form ability process infos;
      */
     void AddFormAbilityConnectProcessInfo(const std::string &bundleName,
-        const std::string &connectionProviderKey, std::vector<AppExecFwk::RunningProcessInfo> &infos);
+        std::vector<AppExecFwk::RunningProcessInfo> &infos);
 
     /**
      * @brief Reporter form ability connection infos to rss.
      * @param connectionProviderKey The connection's key of form ability connection.
      * @param isConnected True for form ability connected, false for form ability disconnected.
      */
-    void ReportConnectionInfosToRss(const std::string &connectionProviderKey, bool isConnected);
+    void ReportConnectionInfosToRss(const std::string &bundleName, bool isConnected);
 
 private:
     std::mutex formConnectionInfoMapMutex_;
