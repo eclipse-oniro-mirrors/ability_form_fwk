@@ -324,7 +324,6 @@ ErrCode FormMgrProxy::RequestPublishForm(Want &want, bool withFormBindingData,
             return ERR_APPEXECFWK_PARCEL_ERROR;
         }
     }
-
     MessageOption option;
     int32_t error = SendTransactCmd(
         IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_FORM,
@@ -342,8 +341,7 @@ ErrCode FormMgrProxy::RequestPublishForm(Want &want, bool withFormBindingData,
     return errCode;
 }
 
-ErrCode FormMgrProxy::RequestPublishFormWithSnapshot(Want &want, bool withFormBindingData,
-    std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId)
+ErrCode FormMgrProxy::SetPublishFormResult(const int64_t formId, Constants::PublishFormResult &errorCodeInfo)
 {
     MessageParcel data;
     MessageParcel reply;
@@ -352,24 +350,24 @@ ErrCode FormMgrProxy::RequestPublishFormWithSnapshot(Want &want, bool withFormBi
         HILOG_ERROR("%{public}s, failed to write interface token", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (!data.WriteParcelable(&want)) {
+    if (!data.WriteInt64(formId)) {
         HILOG_ERROR("%{public}s, failed to write want", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (!data.WriteBool(withFormBindingData)) {
-        HILOG_ERROR("%{public}s, failed to write withFormBindingData", __func__);
+
+    if (!data.WriteString(errorCodeInfo.message)) {
+        HILOG_ERROR("%{public}s, failed to write ErrorCode message", __func__);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (withFormBindingData) {
-        if (!data.WriteParcelable(formBindingData.get())) {
-            HILOG_ERROR("%{public}s, failed to write formBindingData", __func__);
-            return ERR_APPEXECFWK_PARCEL_ERROR;
-        }
+
+    if (!data.WriteInt32(static_cast<int32_t>(errorCodeInfo.code))) {
+        HILOG_ERROR("%{public}s, failed to write ErrorCode", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     MessageOption option;
     int32_t error = SendTransactCmd(
-        IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_FORM_WITH_SNAPSHOT,
+        IFormMgr::Message::FORM_MGR_PUBLISH_FORM_ERRCODE_RESULT,
         data,
         reply,
         option);
@@ -377,13 +375,35 @@ ErrCode FormMgrProxy::RequestPublishFormWithSnapshot(Want &want, bool withFormBi
         HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d", __func__, error);
         return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
     }
-    ErrCode errCode = reply.ReadInt32();
-    if (errCode == ERR_OK) {
-        formId = reply.ReadInt64();
-    }
-    return errCode;
+    return reply.ReadInt32();
 }
 
+ErrCode FormMgrProxy::AcquireAddFormResult(const int64_t formId)
+{
+    MessageParcel data;
+    MessageParcel reply;
+
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("%{public}s, failed to write interface token", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt64(formId)) {
+        HILOG_ERROR("%{public}s, failed to write want", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    MessageOption option(MessageOption::TF_ASYNC);
+    int32_t error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_ACQUIRE_ADD_FORM_RESULT,
+        data,
+        reply,
+        option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d", __func__, error);
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+    return reply.ReadInt32();
+}
 
 int FormMgrProxy::LifecycleUpdate(
     const std::vector<int64_t> &formIds,
@@ -2223,5 +2243,46 @@ ErrCode FormMgrProxy::UpdateFormLocation(const int64_t &formId, const int32_t &f
     return reply.ReadInt32();
 }
 
+ErrCode FormMgrProxy::RequestPublishFormWithSnapshot(Want &want, bool withFormBindingData,
+    std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId)
+{
+    MessageParcel data;
+    MessageParcel reply;
+
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("%{public}s, failed to write interface token", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteParcelable(&want)) {
+        HILOG_ERROR("%{public}s, failed to write want", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteBool(withFormBindingData)) {
+        HILOG_ERROR("%{public}s, failed to write withFormBindingData", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (withFormBindingData) {
+        if (!data.WriteParcelable(formBindingData.get())) {
+            HILOG_ERROR("%{public}s, failed to write formBindingData", __func__);
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+    }
+
+    MessageOption option;
+    int32_t error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_FORM_WITH_SNAPSHOT,
+        data,
+        reply,
+        option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d", __func__, error);
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+    ErrCode errCode = reply.ReadInt32();
+    if (errCode == ERR_OK) {
+        formId = reply.ReadInt64();
+    }
+    return errCode;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

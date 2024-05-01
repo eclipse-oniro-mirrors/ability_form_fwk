@@ -40,6 +40,8 @@ const int REQUEST_DYNAMIC_CODE = 3;
 const int SHIFT_BIT_LENGTH = 32;
 const int NANO_TO_SECOND =  1000000000;
 const std::string FMS_TIME_SPEED = "fms.time_speed";
+// Specified custom timer event publisher uid, publisher must be foundation
+const int32_t FOUNDATION_UID = 5523;
 } // namespace
 
 FormTimerMgr::FormTimerMgr()
@@ -1371,18 +1373,27 @@ void FormTimerMgr::ExecTimerTask(const FormTimer &timerTask)
 void FormTimerMgr::Init()
 {
     HILOG_INFO("%{public}s start", __func__);
-    timerReceiver_ = nullptr;
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(Constants::ACTION_UPDATEATTIMER);
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_TIME_CHANGED);
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_TIMEZONE_CHANGED);
+    systemTimerEventReceiver_ = nullptr;
+    EventFwk::MatchingSkills systemEventMatchingSkills;
+    systemEventMatchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_TIME_CHANGED);
+    systemEventMatchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_TIMEZONE_CHANGED);
 #ifdef FORM_EVENT_FOR_TEST
-    matchingSkills.AddEvent(FMS_TIME_SPEED);
+    systemEventMatchingSkills.AddEvent(FMS_TIME_SPEED);
 #endif
-    EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
-    subscribeInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
-    timerReceiver_ = std::make_shared<TimerReceiver>(subscribeInfo);
-    EventFwk::CommonEventManager::SubscribeCommonEvent(timerReceiver_);
+    EventFwk::CommonEventSubscribeInfo systemTimerEventSubInfo(systemEventMatchingSkills);
+    systemTimerEventSubInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
+    systemTimerEventReceiver_ = std::make_shared<TimerReceiver>(systemTimerEventSubInfo);
+    EventFwk::CommonEventManager::SubscribeCommonEvent(systemTimerEventReceiver_);
+
+    // Custom timer event need to set specified publisher uid
+    customTimerEventReceiver_ = nullptr;
+    EventFwk::MatchingSkills customEventMatchingSkills;
+    customEventMatchingSkills.AddEvent(Constants::ACTION_UPDATEATTIMER);
+    EventFwk::CommonEventSubscribeInfo customTimerEventSubInfo(customEventMatchingSkills);
+    customTimerEventSubInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
+    customTimerEventSubInfo.SetPublisherUid(FOUNDATION_UID);
+    customTimerEventReceiver_ = std::make_shared<TimerReceiver>(customTimerEventSubInfo);
+    EventFwk::CommonEventManager::SubscribeCommonEvent(customTimerEventReceiver_);
 
     intervalTimerId_ = 0L;
     updateAtTimerId_ = 0L;

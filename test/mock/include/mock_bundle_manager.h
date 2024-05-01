@@ -87,6 +87,9 @@ public:
     virtual bool GetBundleInfo(
         const std::string &bundleName, const BundleFlag flag, BundleInfo &bundleInfo, int32_t userId) override;
 
+    virtual ErrCode GetBundleInfoV9(const std::string &bundleName, int32_t flags,
+        BundleInfo &bundleInfo, int32_t userId) override;
+
     virtual bool GetBundleNameForUid(const int uid, std::string &bundleName) override
     {
         bundleName = "com.form.provider.service";
@@ -123,6 +126,9 @@ class MockBundleMgrService : public BundleMgrService {
 public:
     MOCK_METHOD(bool, GetBundleInfo,
         (const std::string &bundleName, const BundleFlag flag, BundleInfo &bundleInfo, int32_t userId), (override));
+
+    MOCK_METHOD(ErrCode, GetBundleInfoV9,
+        (const std::string &bundleName, int32_t flags, BundleInfo &bundleInfo, int32_t userId), (override));
 
     MOCK_METHOD(ErrCode, GetApplicationInfoV9,
         (const std::string &, int32_t, int32_t, ApplicationInfo &), (override));

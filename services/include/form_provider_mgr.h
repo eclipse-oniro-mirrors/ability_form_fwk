@@ -77,6 +77,14 @@ public:
     ErrCode ConnectAmsForRefresh(const int64_t formId, const FormRecord &record, const Want &want,
         const bool isCountTimerRefresh);
     /**
+     * @brief Connect ability manager service for refresh app permission
+     *
+     * @param formId The form id.
+     * @param want The want of the form.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode ConnectAmsForRefreshPermission(const int64_t formId, Want &want);
+    /**
      * @brief Notify provider form delete.
      * @param formId The form id.
      * @param record Form information.

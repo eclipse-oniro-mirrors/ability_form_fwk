@@ -197,6 +197,7 @@ FormRecord FormDataMgr::CreateFormRecord(const FormItemInfo &formInfo, const int
     }
     newRecord.isDataProxy = formInfo.GetDataProxyFlag();
     newRecord.uid = formInfo.GetProviderUid();
+    newRecord.modulePkgNameMap = formInfo.GetModulePkgNameMap();
     formInfo.GetHapSourceDirs(newRecord.hapSourceDirs);
     HILOG_INFO("end");
     return newRecord;

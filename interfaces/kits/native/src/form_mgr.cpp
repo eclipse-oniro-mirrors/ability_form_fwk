@@ -534,19 +534,36 @@ ErrCode FormMgr::RequestPublishForm(Want &want, bool withFormBindingData,
     return remoteProxy_->RequestPublishProxyForm(want, withFormBindingData, formBindingData, formId, formDataProxies);
 }
 
-ErrCode FormMgr::RequestPublishFormWithSnapshot(Want &want, bool withFormBindingData,
-    std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
-    const std::vector<FormDataProxy> &formDataProxies)
+
+ErrCode FormMgr::SetPublishFormResult(const int64_t formId, Constants::PublishFormResult &errorCodeInfo)
 {
     HILOG_INFO("%{public}s called.", __func__);
+    if (formId <= 0) {
+        HILOG_ERROR("%{public}s is invalid errCode:%{public}." PRId64, __func__, formId);
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+    }
     ErrCode errCode = Connect();
     if (errCode != ERR_OK) {
         HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
         return errCode;
     }
-    return remoteProxy_->RequestPublishFormWithSnapshot(want, withFormBindingData, formBindingData, formId);
+    return remoteProxy_->SetPublishFormResult(formId, errorCodeInfo);
 }
 
+ErrCode FormMgr::AcquireAddFormResult(const int64_t formId)
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    if (formId <= 0) {
+        HILOG_ERROR("%{public}s is invalid errCode:%{public}" PRId64, __func__, formId);
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+    }
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
+        return errCode;
+    }
+    return remoteProxy_->AcquireAddFormResult(formId);
+}
 
 int FormMgr::LifecycleUpdate(
     const std::vector<int64_t> &formIds,
@@ -1454,5 +1471,17 @@ ErrCode FormMgr::UpdateFormLocation(const int64_t &formId, const int32_t &formLo
     return resultCode;
 }
 
+ErrCode FormMgr::RequestPublishFormWithSnapshot(Want &want, bool withFormBindingData,
+    std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
+    const std::vector<FormDataProxy> &formDataProxies)
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
+        return errCode;
+    }
+    return remoteProxy_->RequestPublishFormWithSnapshot(want, withFormBindingData, formBindingData, formId);
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

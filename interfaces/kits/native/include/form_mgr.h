@@ -275,19 +275,9 @@ public:
         std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
         const std::vector<FormDataProxy> &formDataProxies = {});
 
-    /**
-     * @brief Request to publish a form to the form host for normal authority.
-     *
-     * @param want The want of the form to publish.
-     * @param withFormBindingData Indicates whether the formBindingData is carried with.
-     * @param formBindingData Indicates the form data.
-     * @param formId Return the form id to be published.
-     * @return Returns ERR_OK on success, others on failure.
-     */
+    ErrCode SetPublishFormResult(const int64_t formId, Constants::PublishFormResult &errorCodeInfo);
 
-    ErrCode RequestPublishFormWithSnapshot(Want &want, bool withFormBindingData,
-        std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
-        const std::vector<FormDataProxy> &formDataProxies = {});
+    ErrCode AcquireAddFormResult(const int64_t formId);
 
     /**
      * @brief Lifecycle Update.
@@ -634,6 +624,18 @@ public:
      */
     ErrCode UpdateFormLocation(const int64_t &formId, const int32_t &formLocation);
 
+    /**
+     * @brief Request to publish a form to the form host for normal authority.
+    *
+    * @param want The want of the form to publish.
+    * @param withFormBindingData Indicates whether the formBindingData is carried with.
+    * @param formBindingData Indicates the form data.
+    * @param formId Return the form id to be published.
+    * @return Returns ERR_OK on success, others on failure.
+    */
+    ErrCode RequestPublishFormWithSnapshot(Want &want, bool withFormBindingData,
+        std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
+        const std::vector<FormDataProxy> &formDataProxies = {});
 private:
     /**
      * @brief Connect form manager service.

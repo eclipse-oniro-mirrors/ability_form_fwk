@@ -853,3 +853,21 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_044, TestSize.Level0)
     formRenderRecord->eventHandler_ = nullptr;
     GTEST_LOG_(INFO) << "FormRenderRecordTest_044 end";
 }
+
+/**
+ * @tc.name: FormRenderRecordTest_045
+ * @tc.desc: Verify SetPkgContextInfoMap
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_045, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_045 start";
+    std::string uid = "uid";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", uid);
+    FormJsInfo formJsInfo;
+    formJsInfo.bundleName = "bundleName";
+    formJsInfo.moduleName = "moduleName";
+    AbilityRuntime::Runtime::Options options;
+    EXPECT_EQ(true, formRenderRecord->SetPkgContextInfoMap(formJsInfo, options, uid));
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_045 end";
+}

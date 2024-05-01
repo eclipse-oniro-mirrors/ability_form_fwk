@@ -819,42 +819,4 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_039, TestSize.Le
     formDataProxyRecord.UnRegisterPermissionListener();
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_039 end";
 }
-
-/**
- * @tc.name: FmsFormDataProxyRecordTest_040
- * @tc.desc: test ConnectAmsForRefreshPermission function.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_040, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_040 start";
-    FormRecord formRecord;
-    int64_t formId = 1;
-    MockGetFormRecord(true);
-    bool result = FormDataMgr::GetInstance().GetFormRecord(formId, formRecord);
-    EXPECT_TRUE(result);
-    uint32_t tokenId = 1;
-    FormDataProxyRecord formDataProxyRecord(formId, formRecord.bundleName, formRecord.uiSyntax, tokenId, 1);
-    const std::vector<FormDataProxy> formDataProxies;
-    Want want;
-    formDataProxyRecord.SetWant(want);
-    MockConnectServiceAbility(true);
-    ErrCode ret = formDataProxyRecord.ConnectAmsForRefreshPermission(TEST_REQUIRED_READ_PERMISSON, true);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
-    MockConnectServiceAbility(false);
-    ret = formDataProxyRecord.ConnectAmsForRefreshPermission(TEST_REQUIRED_READ_PERMISSON, true);
-    EXPECT_EQ(ret, ERR_OK);
-    MockGetFormRecord(false);
-    ret = formDataProxyRecord.ConnectAmsForRefreshPermission(TEST_REQUIRED_READ_PERMISSON, true);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
-    ret = formDataProxyRecord.ConnectAmsForRefreshPermission(TEST_REQUIRED_READ_PERMISSON, false);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
-    MockGetFormRecord(true);
-    ret = formDataProxyRecord.ConnectAmsForRefreshPermission(TEST_REQUIRED_READ_PERMISSON, false);
-    EXPECT_EQ(ret, ERR_OK);
-    MockConnectServiceAbility(true);
-    ret = formDataProxyRecord.ConnectAmsForRefreshPermission(TEST_REQUIRED_READ_PERMISSON, false);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_040 end";
-}
 }

@@ -93,7 +93,8 @@ const std::string FORM_DUMP_HELP = "options list:\n"
     "  -t, --temp                           query temporary form info\n"
     "  -n  <bundle-name>                    query form info by a bundle name\n"
     "  -i  <form-id>                        query form info by a form ID\n"
-    "  -r  --running                        query running form info\n";
+    "  -r  --running                        query running form info\n"
+    "  -a  --apps-blocked                   query blocked app name list\n";
 
 const std::map<std::string, FormMgrService::DumpKey> FormMgrService::dumpKeyMap_ = {
     {"-h", FormMgrService::DumpKey::KEY_DUMP_HELP},
@@ -110,6 +111,8 @@ const std::map<std::string, FormMgrService::DumpKey> FormMgrService::dumpKeyMap_
     {"-i", FormMgrService::DumpKey::KEY_DUMP_BY_FORM_ID},
     {"-r", FormMgrService::DumpKey::KEY_DUMP_RUNNING},
     {"--running", FormMgrService::DumpKey::KEY_DUMP_RUNNING},
+    {"-a", FormMgrService::DumpKey::KEY_DUMP_BLOCKED_APPS},
+    {"--apps-blocked", FormMgrService::DumpKey::KEY_DUMP_BLOCKED_APPS},
 };
 
 FormMgrService::FormMgrService()
@@ -379,15 +382,26 @@ ErrCode FormMgrService::RequestPublishForm(Want &want, bool withFormBindingData,
     return FormMgrAdapter::GetInstance().RequestPublishForm(want, withFormBindingData, formBindingData, formId);
 }
 
-ErrCode FormMgrService::RequestPublishFormWithSnapshot(Want &want, bool withFormBindingData,
-    std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId)
+ErrCode FormMgrService::SetPublishFormResult(const int64_t formId, Constants::PublishFormResult &errorCodeInfo)
 {
-    HILOG_INFO("FMS RequestPublishFormWithSnapshot called, startTime: begin: %{public}s, publish: %{public}s,\
-        end:  %{public}s, onKvDataServiceAddTime: %{public}s", onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
-        onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
+    HILOG_INFO("%{public}s called.", __func__);
+    ErrCode ret = CheckFormPermission(AppExecFwk::Constants::PERMISSION_REQUIRE_FORM);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("%{public}s fail, request form permission denied", __func__);
+        return ret;
+    }
+    return FormMgrAdapter::GetInstance().SetPublishFormResult(formId, errorCodeInfo);
+}
 
-    return FormMgrAdapter::GetInstance().RequestPublishForm(want, withFormBindingData, formBindingData,
-                                                            formId, {}, false);
+ErrCode FormMgrService::AcquireAddFormResult(const int64_t formId)
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    ErrCode ret = CheckFormPermission(AppExecFwk::Constants::PERMISSION_AGENT_REQUIRE_FORM);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("%{public}s fail, request form permission denied", __func__);
+        return ret;
+    }
+    return FormMgrAdapter::GetInstance().AcquireAddFormResult(formId);
 }
 
 /**
@@ -1054,7 +1068,6 @@ int32_t FormMgrService::StartAbility(const Want &want, const sptr<IRemoteObject>
     if (!CheckCallerIsSystemApp()) {
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
     }
-    
     // check abilityName to void implicit want.
     if (want.GetElement().GetAbilityName() == "") {
         HILOG_ERROR("error, AbilityName is empty");
@@ -1138,7 +1151,9 @@ void FormMgrService::DumpInit()
     dumpFuncMap_[DumpKey::KEY_DUMP_BY_BUNDLE_NAME] = &FormMgrService::HiDumpFormInfoByBundleName;
     dumpFuncMap_[DumpKey::KEY_DUMP_BY_FORM_ID] = &FormMgrService::HiDumpFormInfoByFormId;
     dumpFuncMap_[DumpKey::KEY_DUMP_RUNNING] = &FormMgrService::HiDumpFormRunningFormInfos;
+    dumpFuncMap_[DumpKey::KEY_DUMP_BLOCKED_APPS] = &FormMgrService::HiDumpFormBlockedApps;
 }
+
 
 int FormMgrService::Dump(int fd, const std::vector<std::u16string> &args)
 {
@@ -1318,6 +1333,14 @@ void FormMgrService::HiDumpHasFormVisible(const std::string &args, std::string &
         result = "error:request bundle info like bundleName_userId_instIndex.";
     }
     FormMgrAdapter::GetInstance().DumpHasFormVisible(args, result);
+}
+
+void FormMgrService::HiDumpFormBlockedApps([[maybe_unused]] const std::string &args, std::string &result)
+{
+    if (!CheckCallerIsSystemApp()) {
+        return;
+    }
+    FormTrustMgr::GetInstance().GetUntrustAppNameList(result);
 }
 
 void FormMgrService::HiDumpFormInfoByFormId(const std::string &args, std::string &result)
@@ -1589,6 +1612,16 @@ ErrCode FormMgrService::UpdateFormLocation(const int64_t &formId, const int32_t 
     return FormMgrAdapter::GetInstance().UpdateFormLocation(formId, formLocation);
 }
 
+ErrCode FormMgrService::RequestPublishFormWithSnapshot(Want &want, bool withFormBindingData,
+    std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId)
+{
+    HILOG_INFO("FMS RequestPublishFormWithSnapshot called, startTime: begin: %{public}s, publish: %{public}s,\
+        end:  %{public}s, onKvDataServiceAddTime: %{public}s", onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
+        onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
+
+    return FormMgrAdapter::GetInstance().RequestPublishForm(want, withFormBindingData, formBindingData,
+                                                            formId, {}, false);
+}
 #ifdef RES_SCHEDULE_ENABLE
 void FormMgrService::OnSystemloadLevel(int32_t level)
 {

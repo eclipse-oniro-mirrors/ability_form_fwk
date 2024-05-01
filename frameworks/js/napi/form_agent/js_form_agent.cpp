@@ -79,24 +79,32 @@ napi_value JsFormAgent::OnRequestPublishForm(napi_env env, size_t argc, napi_val
     }
 
     convertArgc++;
-    NapiAsyncTask::CompleteCallback complete = [asyncCallbackInfo](napi_env env, NapiAsyncTask &task, int32_t status) {
-        int64_t formId = 0;
-        asyncCallbackInfo->want.SetParam(IS_FORM_AGENT, true);
-        ErrCode ret = FormMgr::GetInstance().RequestPublishForm(asyncCallbackInfo->want, false,
-            asyncCallbackInfo->formProviderData, formId, asyncCallbackInfo->formDataProxies);
-        if (ret != ERR_OK) {
-            HILOG_ERROR("Failed to RequestPublishForm.");
-            task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
+    auto apiResult = std::make_shared<int32_t>();
+    auto formId = std::make_shared<int64_t>();
+    NapiAsyncTask::ExecuteCallback execute = [asyncCallbackInfo, cardId = formId, ret = apiResult]() {
+        *ret = FormMgr::GetInstance().RequestPublishForm(asyncCallbackInfo->want, false,
+            asyncCallbackInfo->formProviderData, *cardId, asyncCallbackInfo->formDataProxies);
+        if (*ret != ERR_OK) {
+            HILOG_ERROR("Failed to RequestPublishForm startAbility.");
             return;
         }
+        *ret = FormMgr::GetInstance().AcquireAddFormResult(*cardId);
+    };
 
-        std::string formIdStr = std::to_string(formId);
-        task.ResolveWithNoError(env, CreateJsValue(env, formIdStr));
+    NapiAsyncTask::CompleteCallback complete =
+        [formId, ret = apiResult](napi_env env, NapiAsyncTask &task, int32_t status) {
+        if (*ret == ERR_OK) {
+            HILOG_INFO("Sucess to RequestPublishForm.");
+            task.ResolveWithNoError(env, CreateJsValue(env, std::to_string(*formId)));
+        } else {
+            HILOG_ERROR("Failed to RequestPublishForm.");
+            task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, *ret));
+        }
     };
     napi_value lastParam = (argc <= convertArgc) ? nullptr : argv[convertArgc];
     napi_value result = nullptr;
     NapiAsyncTask::ScheduleWithDefaultQos("JsFormAgent::OnRequestPublishForm",
-        env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
+        env, CreateAsyncTaskWithLastParam(env, lastParam, std::move(execute), std::move(complete), &result));
     return result;
 }
 }  // namespace AbilityRuntime

@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("//build/ohos/app/app.gni")
 import("//foundation/ability/ability_runtime/ability_runtime.gni")
 import("//foundation/ability/form_fwk/form_fwk.gni")
 
@@ -64,6 +65,7 @@ ohos_shared_library("formrender") {
   configs = [ ":formrender_config" ]
 
   sources = [
+    "src/form_bundle_mgr_helper.cpp",
     "src/form_memmgr_client.cpp",
     "src/form_memory_guard.cpp",
     "src/form_module_checker.cpp",
@@ -98,11 +100,15 @@ ohos_shared_library("formrender") {
     "common_event_service:cesfwk_innerkits",
     "ets_runtime:libark_jsruntime",
     "eventhandler:libeventhandler",
+    "faultloggerd:libbacktrace_local",
+    "faultloggerd:libdfx_dumpcatcher",
     "hicollie:libhicollie",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "ipc:ipc_core",
     "napi:ace_napi",
+    "samgr:samgr_proxy",
   ]
 
   subsystem_name = "ability"

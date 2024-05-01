@@ -1867,14 +1867,14 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0101, TestSize.Level0)
     MockGetFormsInfoByModuleParam(true);
     MockCheckTempEnoughForm(false);
     MockGetBoolParam(true);
-    auto bmsTask = [] (const std::string &bundleName, const BundleFlag flag, BundleInfo &bundleInfo, int32_t userId) {
+    auto bmsTask = [] (const std::string &bundleName, int32_t flags, BundleInfo &bundleInfo, int32_t userId) {
         std::string moduleName = "aa";
         bundleInfo.moduleNames.push_back(moduleName);
         bundleInfo.name = "name";
         GTEST_LOG_(INFO) << "FormMgrAdapter_0101 bmsTask called";
-        return true;
+        return ERR_OK;
     };
-    EXPECT_CALL(*bmsProxy, GetBundleInfo(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
+    EXPECT_CALL(*bmsProxy, GetBundleInfoV9(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
     EXPECT_NE(formMgrAdapter.AddForm(formId, want, callerToken, formInfo), ERR_OK);
     FormBmsHelper::GetInstance().iBundleMgr_ = backup;
     GTEST_LOG_(INFO) << "FormMgrAdapter_0101 end";
@@ -1910,14 +1910,14 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0102, TestSize.Level0)
     MockCheckTempEnoughForm(false);
     MockGetBoolParam(false);
     MockIsRequestPublishForm(false);
-    auto bmsTask = [] (const std::string &bundleName, const BundleFlag flag, BundleInfo &bundleInfo, int32_t userId) {
+    auto bmsTask = [] (const std::string &bundleName, int32_t flags, BundleInfo &bundleInfo, int32_t userId) {
         std::string moduleName = "aa";
         bundleInfo.moduleNames.push_back(moduleName);
         bundleInfo.name = "name";
         GTEST_LOG_(INFO) << "FormMgrAdapter_0102 bmsTask called";
-        return true;
+        return ERR_OK;
     };
-    EXPECT_CALL(*bmsProxy, GetBundleInfo(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
+    EXPECT_CALL(*bmsProxy, GetBundleInfoV9(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
     EXPECT_NE(formMgrAdapter.AddForm(formId, want, callerToken, formInfo), ERR_OK);
     FormBmsHelper::GetInstance().iBundleMgr_ = backup;
     GTEST_LOG_(INFO) << "FormMgrAdapter_0102 end";
@@ -1953,14 +1953,14 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0103, TestSize.Level0)
     MockCheckTempEnoughForm(false);
     MockGetBoolParam(false);
     MockIsRequestPublishForm(true);
-    auto bmsTask = [] (const std::string &bundleName, const BundleFlag flag, BundleInfo &bundleInfo, int32_t userId) {
+    auto bmsTask = [] (const std::string &bundleName, int32_t flags, BundleInfo &bundleInfo, int32_t userId) {
         std::string moduleName = "aa";
         bundleInfo.moduleNames.push_back(moduleName);
         bundleInfo.name = "aa";
         GTEST_LOG_(INFO) << "FormMgrAdapter_0103 bmsTask called";
-        return true;
+        return ERR_OK;
     };
-    EXPECT_CALL(*bmsProxy, GetBundleInfo(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
+    EXPECT_CALL(*bmsProxy, GetBundleInfoV9(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
     EXPECT_NE(formMgrAdapter.AddForm(formId, want, callerToken, formInfo), ERR_OK);
     FormBmsHelper::GetInstance().iBundleMgr_ = backup;
     GTEST_LOG_(INFO) << "FormMgrAdapter_0103 end";
@@ -2769,11 +2769,11 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0143, TestSize.Level0)
     sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
     sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
     FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
-    auto bmsTask = [] (const std::string &bundleName, const BundleFlag flag, BundleInfo &bundleInfo, int32_t userId) {
+    auto bmsTask = [] (const std::string &bundleName, int32_t flags, BundleInfo &bundleInfo, int32_t userId) {
         GTEST_LOG_(INFO) << "FormMgrAdapter_0143 bmsTask called";
-        return false;
+        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
     };
-    EXPECT_CALL(*bmsProxy, GetBundleInfo(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
+    EXPECT_CALL(*bmsProxy, GetBundleInfoV9(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
     EXPECT_EQ(formMgrAdapter.GetBundleInfo(want, bundleInfo, packageName), ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED);
     FormBmsHelper::GetInstance().iBundleMgr_ = backup;
     GTEST_LOG_(INFO) << "FormMgrAdapter_0143 end";
@@ -2797,14 +2797,14 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0144, TestSize.Level0)
     sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
     sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
     FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
-    auto bmsTask = [] (const std::string &bundleName, const BundleFlag flag, BundleInfo &bundleInfo, int32_t userId) {
+    auto bmsTask = [] (const std::string &bundleName, int32_t flags, BundleInfo &bundleInfo, int32_t userId) {
         std::string moduleName = "moduleName";
         bundleInfo.moduleNames.push_back(moduleName);
         bundleInfo.name = "name";
         GTEST_LOG_(INFO) << "FormMgrAdapter_0144 bmsTask called";
-        return true;
+        return ERR_OK;
     };
-    EXPECT_CALL(*bmsProxy, GetBundleInfo(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
+    EXPECT_CALL(*bmsProxy, GetBundleInfoV9(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
     EXPECT_EQ(formMgrAdapter.GetBundleInfo(want, bundleInfo, packageName), ERR_APPEXECFWK_FORM_NO_SUCH_MODULE);
     FormBmsHelper::GetInstance().iBundleMgr_ = backup;
     GTEST_LOG_(INFO) << "FormMgrAdapter_0144 end";

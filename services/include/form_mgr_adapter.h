@@ -29,6 +29,7 @@
 #include "form_js_info.h"
 #include "form_provider_data.h"
 #include "form_publish_interceptor_interface.h"
+#include "form_serial_queue.h"
 #include "form_state_info.h"
 #include "form_task_mgr.h"
 #include "iremote_object.h"
@@ -42,6 +43,14 @@ namespace OHOS {
 namespace AppExecFwk {
 using Want = OHOS::AAFwk::Want;
 using WantParams = OHOS::AAFwk::WantParams;
+
+enum class AddFormResultErrorCode : int8_t {
+    UNKNOWN = 0,
+    SUCCESS,
+    FAILED,
+    TIMEOUT
+};
+
 /**
  * @class FormMgrAdapter
  * Form request handler from form host.
@@ -241,6 +250,9 @@ public:
         std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
         const std::vector<FormDataProxy> &formDataProxies = {}, bool needCheckFormPermission = true);
 
+    ErrCode SetPublishFormResult(const int64_t formId, Constants::PublishFormResult &errorCodeInfo);
+
+    ErrCode AcquireAddFormResult(const int64_t formId);
     /**
      * @brief Check if the request of publishing a form is supported by the host.
      * @return Returns true if the request is supported and false otherwise.
@@ -660,6 +672,21 @@ private:
     ErrCode CreateFormItemInfo(const BundleInfo& bundleInfo, const FormInfo& formInfo, FormItemInfo& itemInfo,
         const AAFwk::Want &want);
     /**
+     * @brief Set form item info params.
+     * @param bundleInfo Bundle info.
+     * @param formInfo Form info.
+     * @param itemInfo Form item info.
+     */
+    void SetFormItemInfoParams(const BundleInfo& bundleInfo, const FormInfo& formInfo, FormItemInfo& itemInfo);
+    /**
+     * @brief Set form item module info.
+     * @param hapModuleInfo Hap module info.
+     * @param formInfo Form info.
+     * @param itemInfo Form item info.
+     */
+    void SetFormItemModuleInfo(const HapModuleInfo& hapModuleInfo, const FormInfo& formInfo,
+        FormItemInfo& itemInfo);
+    /**
      * @brief Allocate form by formId.
      * @param info Form configure info.
      * @param callerToken Caller ability token.
@@ -1055,6 +1082,14 @@ private:
         const sptr<IRemoteObject> &callerToken, FormJsInfo &formInfo, const FormItemInfo &formItemInfo);
 
     void GetUpdateDurationFromAdditionalInfo(const std::string &additionalInfo, std::vector<int> &durationArray) const;
+
+    void IncreaseAddFormRequestTimeOutTask(const int64_t formId);
+
+    void CancelAddFormRequestTimeOutTask(const int64_t formId, const int result);
+
+    ErrCode CheckAddFormTaskTimeoutOrFailed(const int64_t formId, AddFormResultErrorCode &formStates);
+
+    void RemoveFormIdMapElement(const int64_t formId);
     /**
      * @class ClientDeathRecipient
      * notices IRemoteBroker died.
@@ -1076,6 +1111,10 @@ private:
 private:
     sptr<IFormPublishInterceptor> formPublishInterceptor_ = nullptr;
     int32_t visibleNotifyDelay_ = Constants::DEFAULT_VISIBLE_NOTIFY_DELAY;
+    std::map<int64_t, AddFormResultErrorCode> formIdMap_;
+    std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;
+    std::mutex formResultMutex_;
+    std::condition_variable condition_;
 #ifdef THEME_MGR_ENABLE
     /**
      * @brief Fill ThemeFormInfo with want and formId

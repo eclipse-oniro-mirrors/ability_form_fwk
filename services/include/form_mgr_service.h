@@ -134,6 +134,10 @@ public:
     ErrCode RequestPublishForm(Want &want, bool withFormBindingData,
                                std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId) override;
 
+    ErrCode SetPublishFormResult(const int64_t formId, Constants::PublishFormResult &errorCodeInfo) override;
+
+    ErrCode AcquireAddFormResult(const int64_t formId) override;
+
     /**
      * @brief Request to publish a form to the form host for normal authority.
      *
@@ -634,6 +638,7 @@ private:
         KEY_DUMP_STATIC,
         KEY_DUMP_VISIBLE,
         KEY_DUMP_RUNNING,
+        KEY_DUMP_BLOCKED_APPS,
     };
     /**
      * @brief initialization of form manager service.
@@ -658,6 +663,7 @@ private:
     void HiDumpFormInfoByBundleName(const std::string &args, std::string &result);
     void HiDumpFormInfoByFormId(const std::string &args, std::string &result);
     void HiDumpFormRunningFormInfos([[maybe_unused]] const std::string &args, std::string &result);
+    void HiDumpFormBlockedApps([[maybe_unused]] const std::string &args, std::string &result);
     bool CheckCallerIsSystemApp() const;
     static std::string GetCurrentDateTime();
 private:

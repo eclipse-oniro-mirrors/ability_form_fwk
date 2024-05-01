@@ -385,7 +385,8 @@ private:
     std::map<int64_t, FormTimer> intervalTimerTasks_;
     std::list<UpdateAtItem> updateAtTimerTasks_;
     std::list<DynamicRefreshItem> dynamicRefreshTasks_;
-    std::shared_ptr<TimerReceiver> timerReceiver_ = nullptr;
+    std::shared_ptr<TimerReceiver> systemTimerEventReceiver_ = nullptr;
+    std::shared_ptr<TimerReceiver> customTimerEventReceiver_ = nullptr;
     int32_t timeSpeed_ = 1;
 
     uint64_t intervalTimerId_ = 0L;

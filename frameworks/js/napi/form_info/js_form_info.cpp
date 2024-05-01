@@ -177,6 +177,21 @@ napi_value CreateJsFormLocation(napi_env engine)
     return objValue;
 }
 
+napi_value CreateJsPublishFormErrorCode(napi_env engine)
+{
+    napi_value objValue = nullptr;
+    napi_create_object(engine, &objValue);
+    napi_set_named_property(
+        engine, objValue, "SUCCESS", CreateJsValue(engine, AppExecFwk::Constants::PublishFormErrorCode::SUCCESS));
+    napi_set_named_property(
+        engine, objValue, "NO_SPACE", CreateJsValue(engine, AppExecFwk::Constants::PublishFormErrorCode::NO_SPACE));
+    napi_set_named_property(engine, objValue, "PARAM_ERROR",
+        CreateJsValue(engine, AppExecFwk::Constants::PublishFormErrorCode::PARAM_ERROR));
+    napi_set_named_property(engine, objValue, "INTERNAL_ERROR",
+        CreateJsValue(engine, AppExecFwk::Constants::PublishFormErrorCode::INTERNAL_ERROR));
+    return objValue;
+}
+
 napi_value CreateJsFormShape(napi_env engine)
 {
     napi_value objValue = nullptr;
@@ -201,6 +216,7 @@ napi_value FormInfoInit(napi_env engine, napi_value exportObj)
     napi_set_named_property(engine, exportObj, "LaunchReason", CreateJsFormLaunchReason(engine));
     napi_set_named_property(engine, exportObj, "FormUsageState", CreateJsFormUsageState(engine));
     napi_set_named_property(engine, exportObj, "FormLocation", CreateJsFormLocation(engine));
+    napi_set_named_property(engine, exportObj, "PublishFormErrorCode", CreateJsPublishFormErrorCode(engine));
     napi_set_named_property(engine, exportObj, "FormShape", CreateJsFormShape(engine));
     HILOG_INFO("%{public}s called end.", __func__);
     return exportObj;

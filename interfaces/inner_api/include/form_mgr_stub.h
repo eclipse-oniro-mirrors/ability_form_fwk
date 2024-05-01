@@ -122,6 +122,10 @@ private:
      */
     ErrCode HandleRequestPublishForm(MessageParcel &data, MessageParcel &reply);
 
+    ErrCode HandleSetPublishFormResult(MessageParcel &data, MessageParcel &reply);
+
+    ErrCode HandleAcquireAddFormResult(MessageParcel &data, MessageParcel &reply);
+
     /**
      * @brief Handle RequestForm message.
      * @param data input param.
