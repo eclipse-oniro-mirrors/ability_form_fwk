@@ -26,8 +26,9 @@ namespace OHOS {
 namespace AppExecFwk {
 FormBackgroundConnection::FormBackgroundConnection(const int64_t formId, const std::string &bundleName,
     const std::string &abilityName, const std::string &funcName, const std::string &params)
-    : formId_(formId), funcName_(funcName), params_(params)
+    : funcName_(funcName), params_(params)
 {
+    SetFormId(formId);
     SetProviderKey(bundleName, abilityName);
 }
 /**
@@ -45,7 +46,8 @@ void FormBackgroundConnection::OnAbilityConnectDone(
             __func__, element.GetAbilityName().c_str(), resultCode);
         return;
     }
-    HILOG_DEBUG("%{public}lld formId.", (long long)formId_);
+    onFormAppConnect();
+
     sptr<IFormMgr> formMgrProxy = iface_cast<IFormMgr>(remoteObject);
     if (formMgrProxy == nullptr) {
         HILOG_ERROR("Failed to get formMgrProxy");

@@ -217,7 +217,7 @@ bool FormSupplyCallback::CanDisconnect(sptr<FormAbilityConnection> &connection)
         if (connection->GetProviderKey() == conn.second->GetProviderKey()) {
             HILOG_INFO("%{public}s, key: %{public}s", __func__, conn.second->GetProviderKey().c_str());
             count++;
-            if (count > 1) {
+            if (count >= 1) {
                 HILOG_INFO("%{public}s end, true.", __func__);
                 return true;
             }

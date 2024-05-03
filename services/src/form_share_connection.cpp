@@ -43,7 +43,7 @@ void FormShareConnection::OnAbilityConnectDone(
             ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
         return;
     }
-
+    onFormAppConnect();
     sptr<FormShareConnection> connection(this);
     FormSupplyCallback::GetInstance()->AddConnection(connection);
     Want want;
