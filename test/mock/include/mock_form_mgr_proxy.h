@@ -90,6 +90,13 @@ public:
         const sptr<IRemoteObject> &callerToken));
     MOCK_METHOD1(UnregisterFormRouterProxy, ErrCode(const std::vector<int64_t> &formIds));
     MOCK_METHOD2(UpdateFormLocation, ErrCode(const int64_t &formId, const int32_t &formLocation));
+    MOCK_METHOD3(RegisterClickEventObserver,
+        ErrCode(const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observe));
+    MOCK_METHOD3(UnregisterClickEventObserver,
+        ErrCode(const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observe));
+    MOCK_METHOD1(SetFormsRecyclable, int32_t(const std::vector<int64_t> &formIds));
+    MOCK_METHOD2(RecycleForms, int32_t(const std::vector<int64_t> &formIds, const Want &want));
+    MOCK_METHOD2(RecoverForms, int32_t(const std::vector<int64_t> &formIds, const Want &want));
 };
 }
 }
