@@ -45,9 +45,38 @@ public:
     void OnAbilityConnectDone(
         const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode) override;
 
+    /**
+     * @brief OnAbilityDisconnectDone, AbilityMs notify caller ability the result of disconnect.
+     * @param element service ability's ElementName.
+     * @param resultCode ERR_OK on success, others on failure.
+     */
+    void OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode) override;
+
+    /**
+     * @brief Set form ability connection callback.
+     */
+    void SetFormAbilityConnectCb(std::function<void(const std::string &bundleName)> &&callback);
+
+    /**
+     * @brief Set form ability disconnection callback.
+     */
+    void SetFormAbilityDisconnectCb(std::function<void(const std::string &bundleName)> &&callback);
+
+    /**
+     * @brief On form ability connect callback.
+     */
+    void OnFormAbilityConnectDoneCallback();
+
+    /**
+     * @brief On form ability disconnect callback.
+     */
+    void OnFormAbilityDisconnectDoneCallback();
+
 private:
     FormItemInfo info_;
     WantParams wantParams_;
+    std::function<void(const std::string &bundleName)> onFormAblityConnectCb_;
+    std::function<void(const std::string &bundleName)> onFormAblityDisconnectCb_;
 
     DISALLOW_COPY_AND_MOVE(FormAcquireConnection);
 };
