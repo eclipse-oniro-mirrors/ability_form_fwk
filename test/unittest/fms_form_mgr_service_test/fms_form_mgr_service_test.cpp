@@ -46,6 +46,7 @@ using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::AppExecFwk;
 using namespace OHOS::Security::AccessToken;
+using namespace OHOS::AAFwk;
 
 extern void MockCheckAcrossLocalAccountsPermission(bool mockRet);
 extern void MockIsSACall(bool mockRet);
@@ -55,6 +56,7 @@ extern void MockIsSystemAppByFullTokenID(bool mockRet);
 extern void MockGetCurrentAccountIdRet(int32_t userId);
 extern void MockGetCallerBundleName(int32_t mockRet);
 extern void MockGetTokenTypeFlag(uint32_t mockRet);
+extern void MockGetAbilityManager(sptr<AAFwk::IAbilityManager> abilityManager);
 
 namespace {
 const std::string NAME_FORM_MGR_SERVICE = "FormMgrService";
@@ -2080,17 +2082,14 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0098, TestSize.Level1)
     want.SetElementName("", "");
     want.SetParam(Constants::PARAM_MODULE_NAME_KEY, str);
     const sptr<IRemoteObject> callerToken = nullptr;
-    const sptr<IRemoteObject> impl;
-    const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
-    FormBmsHelper::GetInstance().SetBundleManager(bundleManager);
-    FormAmsHelper::GetInstance().SetAbilityManager(new MockAbilityMgrService());
+    MockGetAbilityManager(new MockAbilityMgrService());
     EXPECT_EQ(formMgrService.StartAbility(want, callerToken), ERR_APPEXECFWK_FORM_NO_SUCH_ABILITY);
 
     want.SetElementName("bundleName", "abilityName");
-    FormAmsHelper::GetInstance().SetAbilityManager(nullptr);
+    MockGetAbilityManager(nullptr);
     EXPECT_EQ(formMgrService.StartAbility(want, callerToken), ERR_APPEXECFWK_FORM_COMMON_CODE);
 
-    FormAmsHelper::GetInstance().SetAbilityManager(new MockAbilityMgrService());
+    MockGetAbilityManager(new MockAbilityMgrService());
     EXPECT_EQ(formMgrService.StartAbility(want, callerToken), ERR_OK);
 
     GTEST_LOG_(INFO) << "FormMgrService_0098 end";

@@ -181,6 +181,8 @@ public:
     {}
     void OnError(const int32_t errorCode, const std::string &errorMsg) override
     {}
+    void ProcessRecycleForm() override
+    {}
 };
 }   // namespace OHOS
 #endif  // MOCK_SYSTEM_ABILITY_MANAGER_H_

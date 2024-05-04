@@ -19,7 +19,7 @@ ohos_unittest("FmsFormModuleCheckerTest") {
 
   cflags = [ "-g3" ]
 
-  sources = [ "test_form_module_checker.cpp" ]
+  sources = [ "form_module_checker_test.cpp" ]
 
   include_dirs = [
     "//third_party/json/include",
