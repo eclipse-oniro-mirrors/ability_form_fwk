@@ -57,6 +57,9 @@ extern void MockGetCurrentAccountIdRet(int32_t userId);
 extern void MockGetCallerBundleName(int32_t mockRet);
 extern void MockGetTokenTypeFlag(uint32_t mockRet);
 extern void MockGetAbilityManager(sptr<AAFwk::IAbilityManager> abilityManager);
+#ifdef THEME_MGR_ENABLE
+extern void MockSetThemeManagerAddFormResult(int mockRet);
+#endif
 
 namespace {
 const std::string NAME_FORM_MGR_SERVICE = "FormMgrService";
@@ -2490,6 +2493,7 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0118, TestSize.Level1)
     MockCheckAcrossLocalAccountsPermission(true);
 #ifdef THEME_MGR_ENABLE
     GTEST_LOG_(INFO) << "FormMgrService_0118 THEME_MGR_ENABLE defined";
+    MockSetThemeManagerAddFormResult(ERR_OK);
     EXPECT_EQ(ERR_OK, formMgrService.CreateForm(want, runningFormInfo));
 #else
     GTEST_LOG_(INFO) << "FormMgrService_0118 THEME_MGR_ENABLE undefined";
