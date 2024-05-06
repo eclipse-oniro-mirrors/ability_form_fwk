@@ -2420,22 +2420,22 @@ ErrCode FormMgrAdapter::SetPublishFormResult(const int64_t formId, Constants::Pu
 ErrCode FormMgrAdapter::AcquireAddFormResult(const int64_t formId)
 {
     HILOG_INFO("%{public}s called.", __func__);
-    ErrCode ret = ERR_OK;
+    auto apiRet = std::make_shared<ErrCode>(ERR_OK);
     std::unique_lock<std::mutex> lock(formResultMutex_);
-    condition_.wait(lock, [this, formId, &ret]() {
+    condition_.wait(lock, [this, formId, ret = apiRet]() {
         auto iter = formIdMap_.find(formId);
         if (iter != formIdMap_.end()) {
             if (iter->second == AddFormResultErrorCode::SUCCESS) {
                 HILOG_INFO("Acquire the result of the success");
-                ret = ERR_OK;
+                *ret = ERR_OK;
                 return true;
             } else if (iter->second == AddFormResultErrorCode::FAILED) {
                 HILOG_ERROR("Acquire the result of the failed");
-                ret = ERR_APPEXECFWK_FORM_COMMON_CODE;
+                *ret = ERR_APPEXECFWK_FORM_COMMON_CODE;
                 return true;
             } else if (iter->second == AddFormResultErrorCode::TIMEOUT) {
                 HILOG_ERROR("Acquire the result of the timeout");
-                ret = ERR_APPEXECFWK_FORM_ADD_FORM_TIME_OUT;
+                *ret = ERR_APPEXECFWK_FORM_ADD_FORM_TIME_OUT;
                 return true;
             } else {
                 HILOG_INFO("Add form result state is unknown");
@@ -2443,10 +2443,10 @@ ErrCode FormMgrAdapter::AcquireAddFormResult(const int64_t formId)
             }
         }
         HILOG_ERROR("The formid has not find.");
-        ret = ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+        *ret = ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
         return true;
     });
-    return ret;
+    return *apiRet;
 }
 
 ErrCode FormMgrAdapter::CheckAddRequestPublishForm(const Want &want, const Want &formProviderWant)
