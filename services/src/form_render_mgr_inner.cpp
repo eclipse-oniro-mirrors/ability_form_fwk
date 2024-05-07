@@ -64,7 +64,7 @@ ErrCode FormRenderMgrInner::RenderForm(
         AddHostToken(hostToken, formRecord.formId);
         want.SetParam(Constants::PARAM_FORM_HOST_TOKEN, hostToken);
     }
-    want.SetParam(Constants::FORM_COMPATIBLE_VERSION_KEY, GetCompatibleVersion(formRecord.bundleName));
+    FillBundleInfo(want, formRecord.bundleName);
 
     bool connectionExisted = false;
     sptr<FormRenderConnection> connection = nullptr;
@@ -154,7 +154,7 @@ ErrCode FormRenderMgrInner::UpdateRenderingForm(FormRecord &formRecord, const Fo
 
     Want want;
     want.SetParams(wantParams);
-    want.SetParam(Constants::FORM_COMPATIBLE_VERSION_KEY, GetCompatibleVersion(formRecord.bundleName));
+    FillBundleInfo(want, formRecord.bundleName);
     want.SetParam(Constants::FORM_RENDER_TYPE_KEY, Constants::UPDATE_RENDERING_FORM);
     int32_t userId = FormUtil::GetCurrentAccountId();
     want.SetParam(Constants::FORM_SUPPLY_UID, std::to_string(userId) + formRecord.bundleName);
@@ -198,20 +198,23 @@ ErrCode FormRenderMgrInner::ReloadForm(
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     Want want;
-    want.SetParam(Constants::FORM_COMPATIBLE_VERSION_KEY, GetCompatibleVersion(bundleName));
+    FillBundleInfo(want, bundleName);
     want.SetParam(Constants::FORM_SUPPLY_UID, std::to_string(userId) + bundleName);
     FormTaskMgr::GetInstance().PostReloadForm(std::forward<decltype(formRecords)>(formRecords), want, remoteObject);
     return ERR_OK;
 }
 
-int32_t FormRenderMgrInner::GetCompatibleVersion(const std::string &bundleName) const
+void FormRenderMgrInner::FillBundleInfo(Want &want, const std::string &bundleName) const
 {
-    int32_t compatibleVersion = 0;
-    if (!FormBmsHelper::GetInstance().GetCompatibleVersion(
-        bundleName, FormUtil::GetCurrentAccountId(), compatibleVersion)) {
-        HILOG_ERROR("get compatible version code failed.");
+    BundleInfo bundleInfo;
+    if (!FormBmsHelper::GetInstance().GetBundleInfoDefault(
+        bundleName, FormUtil::GetCurrentAccountId(), bundleInfo)) {
+        HILOG_ERROR("get bundle info failed. %{public}s", bundleName.c_str());
+        return;
     }
-    return compatibleVersion;
+    
+    want.SetParam(Constants::FORM_COMPATIBLE_VERSION_KEY, static_cast<int32_t>(bundleInfo.compatibleVersion));
+    want.SetParam(Constants::FORM_TARGET_VERSION_KEY, static_cast<int32_t>(bundleInfo.targetVersion));
 }
 
 void FormRenderMgrInner::PostOnUnlockTask()

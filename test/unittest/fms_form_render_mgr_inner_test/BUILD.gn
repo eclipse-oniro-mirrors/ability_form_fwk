@@ -23,6 +23,7 @@ ohos_unittest("FrsFormRenderMgrInnerTest") {
     "${form_fwk_path}/test/mock/src/mock_form_provider_client.cpp",
     "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_ams_helper.cpp",
     "${form_fwk_path}/test/unittest/fms_form_render_mgr_inner_test/fms_form_render_mgr_inner_test.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_render_mgr_inner_test/mock_form_bms_helper.cpp",
     "${form_fwk_path}/test/unittest/fms_form_render_mgr_test/mock_form_data_mgr.cpp",
   ]
 
@@ -51,6 +52,8 @@ ohos_unittest("FrsFormRenderMgrInnerTest") {
     "ability_base:want",
     "ability_runtime:app_manager",
     "ability_runtime:wantagent_innerkits",
+    "bundle_framework:appexecfwk_base",
+    "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",

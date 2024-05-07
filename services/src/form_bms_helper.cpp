@@ -217,25 +217,28 @@ bool FormBmsHelper::GetAbilityInfoByAction(const std::string &action, int32_t us
 
 bool FormBmsHelper::GetBundleInfo(const std::string &bundleName, int32_t userId, BundleInfo &bundleInfo)
 {
-    sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
-    if (iBundleMgr == nullptr) {
-        HILOG_ERROR("iBundleMgr is nullptr");
-        return false;
-    }
-
-    int32_t flags = BundleFlag::GET_BUNDLE_WITH_ABILITIES;
-    return (IN_PROCESS_CALL(iBundleMgr->GetBundleInfo(bundleName, flags, bundleInfo, userId)));
+    return GetBundleInfoByFlags(bundleName, BundleFlag::GET_BUNDLE_WITH_ABILITIES, userId, bundleInfo);
 }
 
 bool FormBmsHelper::GetBundleInfoWithPermission(const std::string &bundleName, int32_t userId, BundleInfo &bundleInfo)
 {
+    return GetBundleInfoByFlags(bundleName, BundleFlag::GET_BUNDLE_WITH_REQUESTED_PERMISSION, userId, bundleInfo);
+}
+
+bool FormBmsHelper::GetBundleInfoDefault(const std::string& bundleName, int32_t userId, BundleInfo &bundleInfo)
+{
+    return GetBundleInfoByFlags(bundleName, BundleFlag::GET_BUNDLE_DEFAULT, userId, bundleInfo);
+}
+
+bool FormBmsHelper::GetBundleInfoByFlags(const std::string& bundleName, int32_t flags, int32_t userId,
+    BundleInfo &bundleInfo)
+{
+    HILOG_DEBUG("called.");
     sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
     if (iBundleMgr == nullptr) {
         HILOG_ERROR("iBundleMgr is nullptr");
         return false;
     }
-
-    int32_t flags = BundleFlag::GET_BUNDLE_WITH_REQUESTED_PERMISSION;
     return (IN_PROCESS_CALL(iBundleMgr->GetBundleInfo(bundleName, flags, bundleInfo, userId)));
 }
 

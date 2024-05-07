@@ -89,7 +89,7 @@ private:
 
     void NotifyHostRenderServiceIsDead() const;
 
-    int32_t GetCompatibleVersion(const std::string &bundleName) const;
+    void FillBundleInfo(Want &want, const std::string &bundleName) const;
 
     void CheckIfFormRecycled(FormRecord &formRecord, Want& want) const;
 
