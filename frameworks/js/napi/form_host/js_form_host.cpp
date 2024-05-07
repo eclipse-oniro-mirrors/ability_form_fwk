@@ -1995,20 +1995,12 @@ private:
         AppExecFwk::Constants::PublishFormResult publishFormResult;
         publishFormResult.code = static_cast<AppExecFwk::Constants::PublishFormErrorCode>(formErrorCode);
         publishFormResult.message = messageInfo;
-        NapiAsyncTask::CompleteCallback complete = [formId, publishFormResult](napi_env env, NapiAsyncTask &task,
-            int32_t status) mutable {
-            ErrCode ret = FormMgr::GetInstance().SetPublishFormResult(formId, publishFormResult);
-            if (ret == ERR_OK) {
-                task.ResolveWithNoError(env, CreateJsUndefined(env));
-            } else {
-                task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
-            }
-        };
-        napi_value lastParam = (argc <= convertArgc) ? nullptr : argv[convertArgc];
-        napi_value result = nullptr;
-        NapiAsyncTask::ScheduleWithDefaultQos("JsFormHost::OnSetPublishFormResult",
-            env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
-        return result;
+        ErrCode ret = FormMgr::GetInstance().SetPublishFormResult(formId, publishFormResult);
+        if (ret == ERR_OK) {
+            return CreateJsUndefined(env);
+        }
+        NapiFormUtil::ThrowByInternalErrorCode(env, ret);
+        return CreateJsUndefined(env);
     }
 };
 
