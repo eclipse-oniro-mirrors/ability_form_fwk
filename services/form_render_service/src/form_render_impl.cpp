@@ -21,8 +21,8 @@
 #include "event_handler.h"
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
+#include "form_render_event_report.h"
 #include "form_render_service_extension.h"
-#include "form_util.h"
 #include "js_runtime.h"
 #include "service_extension.h"
 #include "form_memmgr_client.h"
@@ -254,6 +254,11 @@ void FormRenderImpl::OnConfigurationUpdated(
             iter->second->UpdateConfiguration(configuration);
         }
     }
+    PerformanceEventInfo eventInfo;
+    eventInfo.timeStamp = FormRenderEventReport::GetNowMillisecond();
+    eventInfo.bundleName = Constants::FRS_BUNDLE_NAME;
+    eventInfo.sceneId = Constants::CPU_SCENE_ID_CONFIG_UPDATE;
+    FormRenderEventReport::SendPerformanceEvent(SceneType::CPU_SCENE_ENTRY, eventInfo);
 }
 
 void FormRenderImpl::SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration>& config)

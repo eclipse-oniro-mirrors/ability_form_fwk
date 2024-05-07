@@ -83,6 +83,7 @@ namespace Constants {
     constexpr const char* PARAM_THEME_KEY  = "ohos.extra.param.key.form_is_theme";
     constexpr const char* PARAM_THEME_THEME_FORM_ID  = "themeFormId";
     constexpr const char* PARAM_THEME_THEME_ID  = "themeId";
+    constexpr const char* CPU_SCENE_ID_CONFIG_UPDATE  = "1";
 
     constexpr int32_t UNKNOWN = 0;
     // The form events type which means that the form becomes visible.
