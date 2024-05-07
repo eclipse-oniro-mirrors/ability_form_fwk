@@ -130,6 +130,34 @@ void FormRenderMgrInner::CheckIfFormRecycled(FormRecord &formRecord, Want& want)
     }
 }
 
+ErrCode FormRenderMgrInner::GetConnectionAndRenderForm(FormRecord &formRecord, Want &want)
+{
+    std::lock_guard<std::mutex> lock(resourceMutex_);
+    auto conIterator = renderFormConnections_.find(formRecord.formId);
+    if (conIterator == renderFormConnections_.end()) {
+        HILOG_ERROR("Not find renderFormConnection.");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    auto connection = conIterator->second;
+    if (connection == nullptr) {
+        HILOG_ERROR("connection is null.");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    if (renderRemoteObj_ == nullptr) {
+        HILOG_ERROR("%{public}s, renderRemoteObj_ is nullptr", __func__);
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    auto remoteObject = renderRemoteObj_->AsObject();
+    if (remoteObject == nullptr) {
+        HILOG_ERROR("remoteObject is nullptr, can not get obj from renderRemoteObj.");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    CheckIfFormRecycled(formRecord, want);
+    want.SetParam(Constants::FORM_CONNECT_ID, connection->GetConnectId());
+    FormTaskMgr::GetInstance().PostRenderForm(formRecord, std::move(want), remoteObject);
+    return ERR_OK;
+}
+
 ErrCode FormRenderMgrInner::UpdateRenderingForm(FormRecord &formRecord, const FormProviderData &formProviderData,
     const WantParams &wantParams, bool mergeData)
 {
@@ -158,31 +186,7 @@ ErrCode FormRenderMgrInner::UpdateRenderingForm(FormRecord &formRecord, const Fo
     want.SetParam(Constants::FORM_RENDER_TYPE_KEY, Constants::UPDATE_RENDERING_FORM);
     int32_t userId = FormUtil::GetCurrentAccountId();
     want.SetParam(Constants::FORM_SUPPLY_UID, std::to_string(userId) + formRecord.bundleName);
-    {
-        std::lock_guard<std::mutex> lock(resourceMutex_);
-        auto conIterator = renderFormConnections_.find(formRecord.formId);
-        if (conIterator != renderFormConnections_.end()) {
-            auto connection = conIterator->second;
-            if (connection == nullptr) {
-                HILOG_ERROR("connection is null.");
-                return ERR_APPEXECFWK_FORM_INVALID_PARAM;
-            }
-            if (renderRemoteObj_ == nullptr) {
-                HILOG_ERROR("%{public}s, renderRemoteObj_ is nullptr", __func__);
-                return ERR_APPEXECFWK_FORM_INVALID_PARAM;
-            }
-            auto remoteObject = renderRemoteObj_->AsObject();
-            if (remoteObject == nullptr) {
-                HILOG_ERROR("remoteObject is nullptr, can not get obj from renderRemoteObj.");
-                return ERR_APPEXECFWK_FORM_INVALID_PARAM;
-            }
-            CheckIfFormRecycled(formRecord, want);
-            want.SetParam(Constants::FORM_CONNECT_ID, connection->GetConnectId());
-            FormTaskMgr::GetInstance().PostRenderForm(formRecord, std::move(want), remoteObject);
-            return ERR_OK;
-        }
-    }
-    return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    return GetConnectionAndRenderForm(formRecord, want);
 }
 
 ErrCode FormRenderMgrInner::ReloadForm(

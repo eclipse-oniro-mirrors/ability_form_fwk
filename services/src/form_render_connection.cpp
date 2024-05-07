@@ -41,7 +41,7 @@ FormRenderConnection::FormRenderConnection(
 void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &element,
     const sptr<IRemoteObject> &remoteObject, int resultCode)
 {
-    HILOG_INFO("ConnectDone");
+    HILOG_INFO("ConnectDone, formId:%{public}" PRId64, GetFormId());
     if (resultCode != ERR_OK) {
         HILOG_ERROR("%{public}s, abilityName:%{public}s, formId:%{public}" PRId64 ", resultCode:%{public}d",
            __func__, element.GetAbilityName().c_str(), GetFormId(), resultCode);
