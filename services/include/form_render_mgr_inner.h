@@ -93,6 +93,8 @@ private:
 
     void CheckIfFormRecycled(FormRecord &formRecord, Want& want) const;
 
+    ErrCode GetConnectionAndRenderForm(FormRecord &formRecord, Want &want);
+
 private:
     class RemoteObjHash {
     public:
