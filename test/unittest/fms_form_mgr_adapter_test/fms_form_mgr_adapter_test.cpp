@@ -4456,4 +4456,30 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_228, TestSize.Level0)
 
     GTEST_LOG_(INFO) << "FormMgrAdapter_228 end";
 }
+
+/**
+ * @tc.name: FormMgrAdapter_229
+ * @tc.desc: test SetTimerTaskNeeded function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_229, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_229 start";
+    FormMgrAdapter formMgrAdapter;
+    formMgrAdapter.SetTimerTaskNeeded(false);
+    GTEST_LOG_(INFO) << "FormMgrAdapter_229 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_230
+ * @tc.desc: test SetTimerTaskNeeded function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_230, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_230 start";
+    FormMgrAdapter formMgrAdapter;
+    formMgrAdapter.SetTimerTaskNeeded(true);
+    GTEST_LOG_(INFO) << "FormMgrAdapter_230 end";
+}
 }

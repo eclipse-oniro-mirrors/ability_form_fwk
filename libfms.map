@@ -68,6 +68,7 @@
         *OHOS::AppExecFwk::FreeInstallStatusCallBack*;
         *OHOS::AppExecFwk::InnerFormInfo*;
         *OHOS::AppExecFwk::KvStoreDeathRecipientCallbackFormInfoStorage*;
+        *OHOS::AppExecFwk::FormSystemloadListener*;
     };
   local:
     *;
