@@ -28,6 +28,8 @@ constexpr const char *EVENT_KEY_BUNDLE_NAME = "BUNDLE_NAME";
 constexpr const char *EVENT_KEY_MODULE_NAME = "MODULE_NAME";
 constexpr const char *EVENT_KEY_ABILITY_NAME = "ABILITY_NAME";
 constexpr const char *EVENT_KEY_HOST_BUNDLE_NAME = "HOST_BUNDLE_NAME";
+constexpr const char *EVENT_KEY_FORM_APP_PID = "FORM_APP_PID";
+constexpr const char *EVENT_KEY_TIMESTAMP = "TIMESTAMP";
 const std::map<FormEventName, std::string> EVENT_NAME_MAP = {
     std::map<FormEventName, std::string>::value_type(FormEventName::ADD_FORM, "ADD_FORM"),
     std::map<FormEventName, std::string>::value_type(FormEventName::REQUEST_FORM, "REQUEST_FORM"),
@@ -43,6 +45,7 @@ const std::map<FormEventName, std::string> EVENT_NAME_MAP = {
     std::map<FormEventName, std::string>::value_type(
         FormEventName::SET_NEXT_REFRESH_TIME_FORM, "SET_NEXT_REFRESH_TIME_FORM"),
     std::map<FormEventName, std::string>::value_type(FormEventName::FORM_RENDER_BLOCK, "FORM_RENDER_BLOCK"),
+    std::map<FormEventName, std::string>::value_type(FormEventName::UNBIND_FORM_APP, "UNBIND_FORM_APP"),
 };
 }
 
@@ -130,6 +133,31 @@ void FormEventReport::SendSecondFormEvent(const FormEventName &eventName, HiSysE
                 name,
                 type,
                 EVENT_KEY_BUNDLE_NAME, eventInfo.bundleName);
+            break;
+        default:
+            break;
+    }
+}
+
+void FormEventReport::SendThirdFormEvent(const FormEventName &eventName, HiSysEventType type,
+    const FormEventInfo &eventInfo)
+{
+    std::string name = ConvertEventName(eventName);
+    if (name == "INVALIDEVENTNAME") {
+        HILOG_ERROR("invalid eventName");
+        return;
+    }
+
+    switch (eventName) {
+        case FormEventName::UNBIND_FORM_APP:
+            HiSysEventWrite(
+                HiSysEvent::Domain::FORM_MANAGER,
+                name,
+                type,
+                EVENT_KEY_TIMESTAMP, eventInfo.timeStamp,
+                EVENT_KEY_FORM_ID, eventInfo.formId,
+                EVENT_KEY_BUNDLE_NAME, eventInfo.bundleName,
+                EVENT_KEY_FORM_APP_PID, eventInfo.formAppPid);
             break;
         default:
             break;

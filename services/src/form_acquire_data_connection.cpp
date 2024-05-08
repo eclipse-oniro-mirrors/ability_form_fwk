@@ -27,8 +27,9 @@
 namespace OHOS {
 namespace AppExecFwk {
 FormAcquireDataConnection::FormAcquireDataConnection(const int64_t formId, const std::string &bundleName,
-    const std::string &abilityName, int64_t formRequestCode) : formId_(formId), formRequestCode_(formRequestCode)
+    const std::string &abilityName, int64_t formRequestCode) : formRequestCode_(formRequestCode)
 {
+    SetFormId(formId);
     SetProviderKey(bundleName, abilityName);
 }
 
@@ -41,13 +42,13 @@ void FormAcquireDataConnection::OnAbilityConnectDone(const AppExecFwk::ElementNa
             element.GetAbilityName().c_str(), resultCode);
         return;
     }
-
+    onFormAppConnect();
     sptr<FormAcquireDataConnection> connection(this);
     FormSupplyCallback::GetInstance()->AddConnection(connection);
     Want want;
     want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
     want.SetParam(Constants::FORM_ACQUIRE_DATA_REQUEST_CODE, formRequestCode_);
-    FormTaskMgr::GetInstance().PostAcquireDataTask(formId_, want, remoteObject);
+    FormTaskMgr::GetInstance().PostAcquireDataTask(GetFormId(), want, remoteObject);
 }
 } // namespace AppExecFwk
 } // namespace OHOS

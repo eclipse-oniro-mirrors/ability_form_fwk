@@ -51,6 +51,7 @@ void FormRefreshConnection::OnAbilityConnectDone(
             __func__, element.GetAbilityName().c_str(), GetFormId(), resultCode);
         return;
     }
+    onFormAppConnect();
     sptr<FormRefreshConnection> connection(this);
     FormSupplyCallback::GetInstance()->AddConnection(connection);
 

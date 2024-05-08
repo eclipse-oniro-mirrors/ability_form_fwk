@@ -16,6 +16,7 @@
 #ifndef OHOS_FORM_FWK_FORM_ABILITY_CONNECTION_H
 #define OHOS_FORM_FWK_FORM_ABILITY_CONNECTION_H
 
+#include "app_mgr_interface.h"
 #include "provider_connect_stub.h"
 #include "want.h"
 
@@ -53,6 +54,17 @@ public:
      * @param remoteObject the remote object of service ability.
      */
     void OnConnectDied(const wptr<IRemoteObject> &remoteObject);
+
+    /**
+     * @brief onFormAppConnect, when ability connetDone.
+     * @return result of onFormAppConnect.
+    */
+    bool onFormAppConnect();
+
+    /**
+     * @brief Report Hisys FormApp UnbindEvent.
+    */
+    void ReportFormAppUnbindEvent();
 
     /**
      * @brief Get connectId.
@@ -126,41 +138,31 @@ public:
     void AddHostDeathRecipient();
 
     /**
-     * @brief Set form ability connection callback.
-     */
-    void SetFormAbilityConnectCb(std::function<void(const sptr<FormAbilityConnection> &connection)> &&callback);
-
-    /**
-     * @brief Set form ability disconnection callback.
-     */
-    void SetFormAbilityDisconnectCb(std::function<void(const sptr<FormAbilityConnection> &connection)> &&callback);
-
-    /**
-     * @brief On form ability connect callback.
-     */
-    void OnFormAbilityConnectDoneCallback();
-
-    /**
-     * @brief On form ability disconnect callback.
-     */
-    void OnFormAbilityDisconnectDoneCallback();
-
-    /**
      * @brief Get bundle name.
      */
     std::string GetBundleName();
 
+    /**
+     * @brief Get process pid.
+     */
+    int32_t GetAppFormPid();
+
 private:
+    /**
+     * @brief Get app manager proxy.
+     * @return App manager proxy.
+     */
+    sptr<OHOS::AppExecFwk::IAppMgr> GetAppMgr();
+
     int64_t formId_ = -1;
     std::string deviceId_ = "";
     std::string bundleName_ = "";
     std::string abilityName_ = "";
     bool isFreeInstall_ = false;
     int32_t connectId_ = 0;
+    int32_t appFormPid_ = -1;
     sptr<IRemoteObject> hostToken_ = nullptr;
     sptr<IRemoteObject> providerToken_ = nullptr;
-    std::function<void(const sptr<FormAbilityConnection> &connection)> onFormAblityConnectCb_;
-    std::function<void(const sptr<FormAbilityConnection> &connection)> onFormAblityDisconnectCb_;
 
     DISALLOW_COPY_AND_MOVE(FormAbilityConnection);
 };

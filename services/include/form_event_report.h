@@ -31,6 +31,8 @@ struct FormEventInfo {
     std::string moduleName;
     std::string abilityName;
     std::string hostBundleName = "";
+    int32_t formAppPid = -1;
+    int64_t timeStamp = 0;
 };
 
 enum class FormEventName {
@@ -47,6 +49,8 @@ enum class FormEventName {
     DELETE_INVALID_FORM,
     SET_NEXT_REFRESH_TIME_FORM,
     FORM_RENDER_BLOCK,
+    LAUNCH_FORM_APP,
+    UNBIND_FORM_APP,
 };
 
 class FormEventReport {
@@ -54,6 +58,7 @@ public:
     static void SendFormEvent(const FormEventName &eventName, HiSysEventType type, const FormEventInfo &eventInfo);
     static void SendSecondFormEvent(const FormEventName &eventName, HiSysEventType type,
         const FormEventInfo &eventInfo);
+    static void SendThirdFormEvent(const FormEventName &eventName, HiSysEventType type, const FormEventInfo &eventInfo);
 
 private:
     static std::string ConvertEventName(const FormEventName &eventName);

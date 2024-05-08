@@ -43,22 +43,20 @@ FormAbilityConnectionReporter::~FormAbilityConnectionReporter()
     HILOG_INFO("Called.");
 }
 
-void FormAbilityConnectionReporter::ReportFormAbilityConnection(const sptr<FormAbilityConnection> &connection)
+void FormAbilityConnectionReporter::ReportFormAbilityConnection(const std::string &bundleName)
 {
-    if (!connection) {
-        HILOG_ERROR("Invalid connection!");
+    if (bundleName.empty()) {
+        HILOG_ERROR("Invalid bundleName!");
         return;
     }
-    std::string connectionProviderKey = connection->GetProviderKey();
     std::lock_guard<std::mutex> lock(formConnectionInfoMapMutex_);
-    auto iter = formConnectionInfoMap_.find(connectionProviderKey);
+    auto iter = formConnectionInfoMap_.find(bundleName);
     if (iter != formConnectionInfoMap_.end()) {
         FormConnectionInfo &connectionInfo = iter->second;
         connectionInfo.connectCount_++;
         return;
     }
     auto appMgr = GetAppMgr();
-    std::string bundleName = connection->GetBundleName();
     std::vector<AppExecFwk::RunningProcessInfo> infos;
     int32_t userId = FormUtil::GetCurrentAccountId();
     int32_t ret = appMgr->GetRunningProcessInformation(bundleName, userId, infos);
@@ -66,36 +64,34 @@ void FormAbilityConnectionReporter::ReportFormAbilityConnection(const sptr<FormA
         HILOG_ERROR("Get running process info failed!");
         return;
     }
-    HILOG_INFO("Connection name: %{public}s, the size of current bundle's process infos  is %{public}zu.",
-        connectionProviderKey.c_str(), infos.size());
-    AddFormAbilityConnectProcessInfo(bundleName, connectionProviderKey, infos);
-    ReportConnectionInfosToRss(connectionProviderKey, true);
+    HILOG_INFO("Bundle name: %{public}s, the size of current bundle's process infos  is %{public}zu.",
+        bundleName.c_str(), infos.size());
+    AddFormAbilityConnectProcessInfo(bundleName, infos);
+    ReportConnectionInfosToRss(bundleName, true);
 }
 
-void FormAbilityConnectionReporter::ReportFormAbilityDisconnection(const sptr<FormAbilityConnection> &connection)
+void FormAbilityConnectionReporter::ReportFormAbilityDisconnection(const std::string &bundleName)
 {
-    if (!connection) {
-        HILOG_ERROR("Invalid connection!");
+    if (bundleName.empty()) {
+        HILOG_ERROR("Invalid bundleName!");
         return;
     }
-    std::string connectionProviderKey = connection->GetProviderKey();
     std::lock_guard<std::mutex> lock(formConnectionInfoMapMutex_);
-    auto iter = formConnectionInfoMap_.find(connectionProviderKey);
+    auto iter = formConnectionInfoMap_.find(bundleName);
     if (iter == formConnectionInfoMap_.end()) {
         HILOG_ERROR("Disconnect ability connection: %{public}s, but without created connection notified!",
-            connectionProviderKey.c_str());
+            bundleName.c_str());
         return;
     }
     int count = iter->second.connectCount_ - 1;
     if (count > 0) {
-        formConnectionInfoMap_[connectionProviderKey].connectCount_ = count;
+        formConnectionInfoMap_[bundleName].connectCount_ = count;
         return;
     }
 
-    ReportConnectionInfosToRss(connectionProviderKey, false);
-    formConnectionInfoMap_.erase(connectionProviderKey);
-    HILOG_INFO("Reporter disconnection info, connection's name: %{public}s.",
-        connectionProviderKey.c_str());
+    ReportConnectionInfosToRss(bundleName, false);
+    formConnectionInfoMap_.erase(bundleName);
+    HILOG_INFO("Report disconnection info, bundle name: %{public}s.", bundleName.c_str());
 }
 
 sptr<OHOS::AppExecFwk::IAppMgr> FormAbilityConnectionReporter::GetAppMgr()
@@ -118,7 +114,7 @@ sptr<OHOS::AppExecFwk::IAppMgr> FormAbilityConnectionReporter::GetAppMgr()
 }
 
 void FormAbilityConnectionReporter::AddFormAbilityConnectProcessInfo(const std::string& bundleName,
-    const std::string& connectionProviderKey, std::vector<AppExecFwk::RunningProcessInfo>& infos)
+    std::vector<AppExecFwk::RunningProcessInfo>& infos)
 {
     if (bundleName.empty()) {
         HILOG_WARN("Empty bundle name.");
@@ -133,21 +129,20 @@ void FormAbilityConnectionReporter::AddFormAbilityConnectProcessInfo(const std::
         HILOG_INFO("Get running process: %{public}s, pid: %{public}" PRId32 ".", targetProceName.c_str(),
             (*iter).pid_);
         FormConnectionInfo connectionInfo;
-        connectionInfo.bundleName_ = bundleName;
         connectionInfo.pid_ = (*iter).pid_;
         connectionInfo.connectCount_ = 1;
-        formConnectionInfoMap_.emplace(connectionProviderKey, connectionInfo);
+        formConnectionInfoMap_.emplace(bundleName, connectionInfo);
         return;
     }
 }
 
-void FormAbilityConnectionReporter::ReportConnectionInfosToRss(const std::string &connectionProviderKey,
+void FormAbilityConnectionReporter::ReportConnectionInfosToRss(const std::string &bundleName,
     bool isConnected)
 {
-    auto iter = formConnectionInfoMap_.find(connectionProviderKey);
+    auto iter = formConnectionInfoMap_.find(bundleName);
     if (iter == formConnectionInfoMap_.end()) {
-        HILOG_WARN("Report connection info failed, empty info, connection name: %{public}s.",
-            connectionProviderKey.c_str());
+        HILOG_WARN("Report connection info failed, empty info, bundle name: %{public}s.",
+            bundleName.c_str());
         return;
     }
 #ifdef RES_SCHEDULE_ENABLE

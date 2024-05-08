@@ -49,6 +49,7 @@ void FormAcquireConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &
            __func__, element.GetAbilityName().c_str(), GetFormId(), resultCode);
         return;
     }
+    onFormAppConnect();
 #ifdef RES_SCHEDULE_ENABLE
     OnFormAbilityConnectDoneCallback();
 #endif
@@ -72,6 +73,49 @@ void FormAcquireConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &
     if (GetHostToken() != nullptr) {
         SetProviderToken(remoteObject);
     }
+}
+
+/**
+ * @brief OnAbilityDisconnectDone, AbilityMs notify caller ability the result of disconnect.
+ * @param element service ability's ElementName.
+ * @param resultCode ERR_OK on success, others on failure.
+ */
+void FormAcquireConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
+{
+    FormAbilityConnection::OnAbilityDisconnectDone(element, resultCode);
+#ifdef RES_SCHEDULE_ENABLE
+    OnFormAbilityDisconnectDoneCallback();
+#endif
+}
+
+void FormAcquireConnection::SetFormAbilityConnectCb(
+    std::function<void(const std::string &bundleName)> &&callback)
+{
+    onFormAblityConnectCb_ = std::move(callback);
+}
+
+void FormAcquireConnection::SetFormAbilityDisconnectCb(
+    std::function<void(const std::string &bundleName)> &&callback)
+{
+    onFormAblityDisconnectCb_ = std::move(callback);
+}
+
+void FormAcquireConnection::OnFormAbilityConnectDoneCallback()
+{
+    if (!onFormAblityConnectCb_) {
+        HILOG_ERROR("Empty form ability connect callback!");
+        return;
+    }
+    onFormAblityConnectCb_(GetBundleName());
+}
+
+void FormAcquireConnection::OnFormAbilityDisconnectDoneCallback()
+{
+    if (!onFormAblityDisconnectCb_) {
+        HILOG_ERROR("Empty form ability disconnect callback!");
+        return;
+    }
+    onFormAblityDisconnectCb_(GetBundleName());
 }
 } // namespace AppExecFwk
 } // namespace OHOS

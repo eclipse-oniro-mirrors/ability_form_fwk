@@ -39,7 +39,6 @@ public:
         const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode) override;
 
 private:
-    int64_t formId_ = -1;
     DISALLOW_COPY_AND_MOVE(FormDeleteConnection);
 };
 }  // namespace AppExecFwk

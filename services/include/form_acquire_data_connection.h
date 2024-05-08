@@ -46,7 +46,6 @@ public:
         const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode) override;
 
 private:
-    int64_t formId_ {-1};
     int64_t formRequestCode_ {0};
     DISALLOW_COPY_AND_MOVE(FormAcquireDataConnection);
 };

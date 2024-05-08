@@ -392,7 +392,7 @@ ErrCode FormMgrProxy::AcquireAddFormResult(const int64_t formId)
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    MessageOption option(MessageOption::TF_ASYNC);
+    MessageOption option(MessageOption::TF_SYNC);
     int32_t error = SendTransactCmd(
         IFormMgr::Message::FORM_MGR_ACQUIRE_ADD_FORM_RESULT,
         data,

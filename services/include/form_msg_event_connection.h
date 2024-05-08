@@ -43,7 +43,6 @@ public:
         const sptr<IRemoteObject> &remoteObject, int resultCode) override;
 
 private:
-    int64_t formId_ = -1;
     Want want_;
     DISALLOW_COPY_AND_MOVE(FormMsgEventConnection);
 };
