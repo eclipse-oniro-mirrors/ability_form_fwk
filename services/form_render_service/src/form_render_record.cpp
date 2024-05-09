@@ -563,6 +563,8 @@ std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::CreateContext(const F
     applicationInfo->bundleName = formJsInfo.bundleName;
     applicationInfo->apiCompatibleVersion = static_cast<uint32_t>(want.GetIntParam(
         Constants::FORM_COMPATIBLE_VERSION_KEY, 0));
+    applicationInfo->apiTargetVersion = static_cast<int32_t>(want.GetIntParam(
+        Constants::FORM_TARGET_VERSION_KEY, 0));
     context->SetApplicationInfo(applicationInfo);
     HILOG_DEBUG("bundleName is %{public}s, moduleName is %{public}s",
         formJsInfo.bundleName.c_str(), formJsInfo.moduleName.c_str());

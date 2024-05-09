@@ -29,6 +29,8 @@
 namespace OHOS {
 namespace AppExecFwk {
 const int32_t APP_600 = 600;
+const uint32_t COMPATIBLE_VERSION = 1;
+const uint32_t TARGET_VERSION = 1;
 
 class BundleMgrProxy : public IRemoteProxy<IBundleMgr> {
 public:
