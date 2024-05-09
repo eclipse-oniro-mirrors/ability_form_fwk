@@ -97,6 +97,8 @@ public:
     MOCK_METHOD1(SetFormsRecyclable, int32_t(const std::vector<int64_t> &formIds));
     MOCK_METHOD2(RecycleForms, int32_t(const std::vector<int64_t> &formIds, const Want &want));
     MOCK_METHOD2(RecoverForms, int32_t(const std::vector<int64_t> &formIds, const Want &want));
+    MOCK_METHOD2(SetPublishFormResult, ErrCode(const int64_t formId, Constants::PublishFormResult &errorCodeInfo));
+    MOCK_METHOD1(AcquireAddFormResult, ErrCode(const int64_t formId));
 };
 }
 }
