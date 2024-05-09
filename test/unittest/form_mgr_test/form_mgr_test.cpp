@@ -2690,4 +2690,39 @@ HWTEST_F(FormMgrTest, RecoverForms_003, TestSize.Level0) {
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "RecoverForms_003 test ends";
 }
+
+/**
+ * @tc.name: FormMgrTest_0125
+ * @tc.desc: Verify SetPublishFormResult (The return value of mock function is not 0)
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0125, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0125 starts";
+    EXPECT_CALL(*mockProxy, SetPublishFormResult(_, _))
+        .Times(1)
+        .WillOnce(Return(OHOS::ERR_OK));
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
+    int64_t formId = 0;
+    Constants::PublishFormResult result {Constants::PublishFormErrorCode::SUCCESS, ""};
+    EXPECT_EQ(FormMgr::GetInstance().SetPublishFormResult(formId, result), ERR_APPEXECFWK_FORM_INVALID_FORM_ID);
+    GTEST_LOG_(INFO) << "FormMgrTest_0125 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0126
+ * @tc.desc: Verify AcquireAddFormResult (The return value of mock function is not 0)
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0126, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0126 starts";
+    EXPECT_CALL(*mockProxy, AcquireAddFormResult(_))
+        .Times(1)
+        .WillOnce(Return(OHOS::ERR_OK));
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
+    int64_t formId = 0;
+    EXPECT_EQ(FormMgr::GetInstance().AcquireAddFormResult(formId), ERR_APPEXECFWK_FORM_INVALID_FORM_ID);
+    GTEST_LOG_(INFO) << "FormMgrTest_0126 test ends";
+}
 } // namespace

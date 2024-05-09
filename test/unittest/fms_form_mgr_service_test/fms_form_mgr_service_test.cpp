@@ -2517,4 +2517,35 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0119, TestSize.Level1)
     formMgrService.HiDumpFormBlockedApps(args, blockAppInfo);
     GTEST_LOG_(INFO) << "FormMgrService_0119 end";
 }
+
+/**
+ * @tc.number: FormMgrService_0120
+ * @tc.name: test SetPublishFormResult function.
+ * @tc.desc: Verify that the SetPublishFormResult interface is called normally and the return value is ERR_OK.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0120, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0120 start";
+    MockIsSACall(true);
+    FormMgrService formMgrService;
+    int64_t formId = 1;
+    Constants::PublishFormResult result {Constants::PublishFormErrorCode::SUCCESS, ""};
+    EXPECT_EQ(formMgrService.SetPublishFormResult(formId, result), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrService_0120 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0121
+ * @tc.name: test AcquireAddFormResult function.
+ * @tc.desc: Verify that the AcquireAddFormResult interface is called normally and the return value is ERR_OK.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0121, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0121 start";
+    MockIsSACall(true);
+    FormMgrService formMgrService;
+    int64_t formId = 1;
+    EXPECT_EQ(formMgrService.AcquireAddFormResult(formId), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrService_0121 end";
+}
 }

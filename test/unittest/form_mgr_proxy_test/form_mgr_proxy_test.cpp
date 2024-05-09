@@ -834,4 +834,29 @@ HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0104, TestSize.Level1) {
     EXPECT_EQ(result, 0);
     GTEST_LOG_(INFO) << "FormMgrProxyTest_0104 test ends";
 }
+
+/**
+ * @tc.number: FormMgrProxyTest_0105
+ * @tc.name: test SetPublishFormResult function.
+ * @tc.desc: Verify that the SetPublishFormResult interface is called normally and the return value is ERR_OK.
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0105, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_0105 starts";
+    int64_t formId = 0;
+    Constants::PublishFormResult result {Constants::PublishFormErrorCode::SUCCESS, ""};
+    EXPECT_EQ(formMgrProxy->SetPublishFormResult(formId, result), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_0105 test ends";
+}
+
+/**
+ * @tc.number: FormMgrProxyTest_0106
+ * @tc.name: test AcquireAddFormResult function.
+ * @tc.desc: Verify that the AcquireAddFormResult interface is called normally and the return value is ERR_OK.
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0106, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_0106 starts";
+    int64_t formId = 0;
+    EXPECT_EQ(formMgrProxy->AcquireAddFormResult(formId), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_0106 test ends";
+}
 }

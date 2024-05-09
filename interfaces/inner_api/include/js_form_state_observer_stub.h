@@ -22,9 +22,6 @@
 #include "js_form_state_observer_interface.h"
 #include "iremote_object.h"
 #include "iremote_stub.h"
-#include "napi/native_api.h"
-#include "napi/native_common.h"
-#include "napi/native_node_api.h"
 
 namespace OHOS {
 namespace AbilityRuntime {

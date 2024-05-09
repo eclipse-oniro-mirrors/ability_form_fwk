@@ -40,6 +40,7 @@ ohos_unittest("FmsFormProviderClientTest") {
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "form_fwk:fmskit_native",
+    "form_fwk:fmskit_provider_client",
     "form_fwk:form_manager",
     "hilog:libhilog",
     "ipc:ipc_core",

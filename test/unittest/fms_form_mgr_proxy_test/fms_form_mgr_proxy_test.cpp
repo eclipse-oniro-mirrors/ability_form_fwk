@@ -2746,4 +2746,26 @@ HWTEST_F(FmsFormMgrProxyTest, RecoverForms_0200, Function | MediumTest | Level1)
 
     GTEST_LOG_(INFO) << "FmsFormMgrProxyTest, RecoverForms_0200, end";
 }
+
+/*
+ * @tc.name: RecoverForms_0201
+ * @tc.desc: test RecoverForms function and return ERR.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrProxyTest, RecoverForms_0201, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO)
+        << "FmsFormMgrProxyTest, RequestPublishFormWithSnapshot_0201, TestSize.Level1";
+    MockWriteInterfaceToken(false);
+    sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
+    ASSERT_NE(nullptr, iremoteObject);
+    std::shared_ptr<FormMgrProxy> proxy = std::make_shared<FormMgrProxy>(iremoteObject);
+    ASSERT_NE(nullptr, proxy);
+    Want want;
+    bool withFormBindingData = false;
+    std::unique_ptr<FormProviderData> formBindingData;
+    int64_t formId = 1;
+    int32_t result = proxy->RequestPublishFormWithSnapshot(want, withFormBindingData, formBindingData, formId);
+    EXPECT_EQ(ERR_APPEXECFWK_PARCEL_ERROR, result);
+}
 }

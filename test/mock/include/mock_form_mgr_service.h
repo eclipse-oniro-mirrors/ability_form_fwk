@@ -103,6 +103,8 @@ public:
         const sptr<IRemoteObject> &callerToken));
     MOCK_METHOD1(UnregisterFormRouterProxy, ErrCode(const std::vector<int64_t> &formIds));
     MOCK_METHOD2(UpdateFormLocation, ErrCode(const int64_t &formId, const int32_t &formLocation));
+    MOCK_METHOD2(SetPublishFormResult, ErrCode(const int64_t formId, Constants::PublishFormResult &errorCodeInfo));
+    MOCK_METHOD1(AcquireAddFormResult, ErrCode(const int64_t formId));
     MOCK_METHOD4(RequestPublishFormWithSnapshot, ErrCode(Want &want, bool withFormBindingData,
         std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId));
 };

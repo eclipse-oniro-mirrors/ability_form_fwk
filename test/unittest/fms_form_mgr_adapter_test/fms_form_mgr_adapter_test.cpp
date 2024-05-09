@@ -4388,4 +4388,72 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_226, TestSize.Level0)
     EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, formMgrAdapter.UpdateFormLocation(formId, formLocation));
     GTEST_LOG_(INFO) << "FormMgrAdapter_226 end";
 }
+
+/**
+ * @tc.number: FormMgrAdapter_227
+ * @tc.name: SetPublishFormResult
+ * @tc.desc: test SetPublishFormResult function.
+ * @tc.details: Validating results in different scenarios.
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_227, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_227 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId = 1;
+    Constants::PublishFormResult result {Constants::PublishFormErrorCode::SUCCESS, ""};
+    EXPECT_EQ(formMgrAdapter.SetPublishFormResult(formId, result), ERR_APPEXECFWK_FORM_COMMON_CODE);
+
+    formMgrAdapter.serialQueue_ = std::make_shared<FormSerialQueue>("FormMgrTimerTaskQueueTest");
+    EXPECT_EQ(formMgrAdapter.SetPublishFormResult(formId, result), ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+
+    formMgrAdapter.formIdMap_.insert(std::make_pair(formId, AddFormResultErrorCode::UNKNOWN));
+    EXPECT_EQ(formMgrAdapter.SetPublishFormResult(formId, result), ERR_OK);
+
+    GTEST_LOG_(INFO) << "FormMgrAdapter_227 end";
+}
+
+/**
+ * @tc.number: FormMgrAdapter_228
+ * @tc.name: AcquireAddFormResult
+ * @tc.desc: test AcquireAddFormResult function.
+ * @tc.details: Verify that the results can be obtained in different scenarios.
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_228, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_228 start";
+    FormMgrAdapter formMgrAdapter;
+    const int64_t formId1 = 1;
+    formMgrAdapter.condition_.notify_all();
+    EXPECT_EQ(formMgrAdapter.AcquireAddFormResult(formId1), ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
+
+    formMgrAdapter.formIdMap_.insert(std::make_pair(formId1, AddFormResultErrorCode::SUCCESS));
+    formMgrAdapter.condition_.notify_all();
+    EXPECT_EQ(formMgrAdapter.AcquireAddFormResult(formId1), ERR_OK);
+
+    const int64_t formId2 = 2;
+    formMgrAdapter.formIdMap_.insert(std::make_pair(formId2, AddFormResultErrorCode::FAILED));
+    formMgrAdapter.condition_.notify_all();
+    EXPECT_EQ(formMgrAdapter.AcquireAddFormResult(formId2), ERR_APPEXECFWK_FORM_COMMON_CODE);
+
+    const int64_t formId3 = 3;
+    formMgrAdapter.formIdMap_.insert(std::make_pair(formId3, AddFormResultErrorCode::TIMEOUT));
+    formMgrAdapter.condition_.notify_all();
+    EXPECT_EQ(formMgrAdapter.AcquireAddFormResult(formId3), ERR_APPEXECFWK_FORM_ADD_FORM_TIME_OUT);
+
+    const int64_t formId4 = 4;
+    formMgrAdapter.formIdMap_.insert(std::make_pair(formId4, AddFormResultErrorCode::UNKNOWN));
+    GTEST_LOG_(INFO) << "notify UNKNOWN status";
+    formMgrAdapter.condition_.notify_all();
+    std::thread setResultThread ([formId4, &formMgrAdapter] {
+        std::lock_guard<std::mutex> lock(formMgrAdapter.formResultMutex_);
+        formMgrAdapter.formIdMap_[formId4] = AddFormResultErrorCode::SUCCESS;
+        GTEST_LOG_(INFO) << "notify SUCCESS status";
+        formMgrAdapter.condition_.notify_all();
+    });
+    EXPECT_EQ(formMgrAdapter.AcquireAddFormResult(formId4), ERR_OK);
+    GTEST_LOG_(INFO) << "Acquire no UNKNOWN status";
+    setResultThread.join();
+
+    GTEST_LOG_(INFO) << "FormMgrAdapter_228 end";
+}
 }
