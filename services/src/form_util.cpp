@@ -157,6 +157,14 @@ int64_t FormUtil::GetCurrentMicrosecond()
     auto timeMicroseconds = chrono::duration_cast<chrono::microseconds>(pointTime.time_since_epoch());
     return timeMicroseconds.count();
 }
+
+int64_t FormUtil::GetNowMillisecond()
+{
+    system_clock::time_point pointTime = system_clock::now();
+    auto timeMilliseconds = chrono::duration_cast<chrono::milliseconds>(pointTime.time_since_epoch());
+    return timeMilliseconds.count();
+}
+
 /**
  * @brief Get millisecond from tm.
  * @param tmAtTime tm time.

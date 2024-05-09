@@ -284,5 +284,19 @@ HWTEST_F(FormFormEventReportTest, SendSecondFormEvent_0900, TestSize.Level0)
     FormEventInfo eventInfo;
     FormEventReport::SendSecondFormEvent(eventName, type, eventInfo);
 }
+/**
+ * @tc.name: SendThirdFormEvent_0100
+ * @tc.desc: Check SendThirdFormEvent Test
+ * @tc.type: FUNC
+ * @tc.require: issuesI9K1NP
+ */
+HWTEST_F(FormFormEventReportTest, SendThirdFormEvent_0100, TestSize.Level0)
+{
+    FormEventName eventName = FormEventName::UNBIND_FORM_APP;
+    EXPECT_EQ(FormEventReport::ConvertEventName(eventName), "UNBIND_FORM_APP");
+    HiSysEventType type = HiSysEventType::BEHAVIOR;
+    FormEventInfo eventInfo;
+    FormEventReport::SendThirdFormEvent(eventName, type, eventInfo);
+}
 } // namespace AppExecFwk
 } // namespace OHOS

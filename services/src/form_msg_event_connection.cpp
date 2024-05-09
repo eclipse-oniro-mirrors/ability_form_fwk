@@ -28,8 +28,9 @@ namespace OHOS {
 namespace AppExecFwk {
 FormMsgEventConnection::FormMsgEventConnection(const int64_t formId, const Want& want,
     const std::string &bundleName, const std::string &abilityName)
-    : formId_(formId), want_(want)
+    : want_(want)
 {
+    SetFormId(formId);
     SetProviderKey(bundleName, abilityName);
 }
 /**
@@ -45,9 +46,10 @@ void FormMsgEventConnection::OnAbilityConnectDone(
     HILOG_INFO("%{public}s called.", __func__);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("%{public}s, abilityName:%{public}s, formId:%{public}" PRId64 ", resultCode:%{public}d",
-            __func__, element.GetAbilityName().c_str(), formId_, resultCode);
+            __func__, element.GetAbilityName().c_str(), GetFormId(), resultCode);
         return;
     }
+    onFormAppConnect();
     sptr<FormMsgEventConnection> connection(this);
     FormSupplyCallback::GetInstance()->AddConnection(connection);
     if (!want_.HasParameter(Constants::PARAM_MESSAGE_KEY)) {
@@ -57,7 +59,7 @@ void FormMsgEventConnection::OnAbilityConnectDone(
     std::string message = want_.GetStringParam(Constants::PARAM_MESSAGE_KEY);
     Want eventWant = Want(want_);
     eventWant.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
-    FormTaskMgr::GetInstance().PostFormEventTask(formId_, message, eventWant, remoteObject);
+    FormTaskMgr::GetInstance().PostFormEventTask(GetFormId(), message, eventWant, remoteObject);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

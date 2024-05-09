@@ -285,5 +285,18 @@ HWTEST_F(FormUtilTest, FormUtilTest_015, TestSize.Level1)
 
     EXPECT_NE(result, accountId);
 }
+
+/**
+ * @tc.name: FormUtilTest_010
+ * @tc.desc: Verify GetNowMillisecond
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormUtilTest, FormUtilTest_016, TestSize.Level1)
+{
+    auto result1 = FormUtil::GetNowMillisecond();
+    auto result2 = FormUtil::GetNowMillisecond();
+
+    EXPECT_TRUE(result2 >= result1);
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

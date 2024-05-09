@@ -15,7 +15,6 @@
 
 #include <gtest/gtest.h>
 #include "form_ability_connection_reporter.h"
-#include "form_ability_connection.h"
 
 using namespace testing::ext;
 
@@ -48,9 +47,8 @@ void FmsFormAbilityConnectionReporterTest::TearDown() {}
 HWTEST_F(FmsFormAbilityConnectionReporterTest, FormAbilityConnectionReporterTest_001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormAbilityConnectionReporterTest_ReportFormAbilityConnection begin";
-    sptr<FormAbilityConnection> formAbilityConnection = new (std::nothrow) FormAbilityConnection();
-    formAbilityConnection->SetProviderKey("testKey");
-    FormAbilityConnectionReporter::GetInstance().ReportFormAbilityConnection(formAbilityConnection);
+    std::string bundleName = "testBundleName";
+    FormAbilityConnectionReporter::GetInstance().ReportFormAbilityConnection(bundleName);
     GTEST_LOG_(INFO) << "FormAbilityConnectionReporterTest_ReportFormAbilityConnection end";
 }
 
@@ -62,8 +60,8 @@ HWTEST_F(FmsFormAbilityConnectionReporterTest, FormAbilityConnectionReporterTest
 HWTEST_F(FmsFormAbilityConnectionReporterTest, FormAbilityConnectionReporterTest_002, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormAbilityConnectionReporterTest_ReportFormAbilityDisconnection begin";
-    sptr<FormAbilityConnection> formAbilityConnection = new (std::nothrow) FormAbilityConnection();
-    FormAbilityConnectionReporter::GetInstance().ReportFormAbilityDisconnection(formAbilityConnection);
+    std::string bundleName = "testBundleName";
+    FormAbilityConnectionReporter::GetInstance().ReportFormAbilityDisconnection(bundleName);
     GTEST_LOG_(INFO) << "FormAbilityConnectionReporterTest_ReportFormAbilityDisconnection end";
 }
 } // namespace AppExecFwk

@@ -88,7 +88,6 @@ group("unittest") {
     "unittest/fms_form_render_mgr_inner_test:unittest",
     "unittest/fms_form_render_mgr_test:unittest",
     "unittest/fms_form_render_proxy_test:unittest",
-    "unittest/fms_form_render_record_test:unittest",
     "unittest/fms_form_render_service_extension_test:unittest",
     "unittest/fms_form_render_stub_test:unittest",
     "unittest/fms_form_router_proxy_mgr_test:unittest",
@@ -118,6 +117,8 @@ group("unittest") {
     "unittest/form_provider_caller_test:unittest",
     "unittest/form_provider_info_test:unittest",
     "unittest/frs_form_module_checker_test:unittest",
+    "unittest/frs_form_render_event_report_test:unittest",
+    "unittest/frs_form_render_record_test:unittest",
   ]
 }
 

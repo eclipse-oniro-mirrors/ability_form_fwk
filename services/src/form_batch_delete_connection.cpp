@@ -44,6 +44,7 @@ void FormBatchDeleteConnection::OnAbilityConnectDone(
             __func__, element.GetAbilityName().c_str(), resultCode);
         return;
     }
+    onFormAppConnect();
     sptr<FormBatchDeleteConnection> connection(this);
     FormSupplyCallback::GetInstance()->AddConnection(connection);
     Want want;

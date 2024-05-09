@@ -21,8 +21,8 @@
 #include "event_handler.h"
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
+#include "form_render_event_report.h"
 #include "form_render_service_extension.h"
-#include "form_util.h"
 #include "js_runtime.h"
 #include "service_extension.h"
 #include "form_memmgr_client.h"
@@ -56,10 +56,11 @@ FormRenderImpl::~FormRenderImpl() = default;
 int32_t FormRenderImpl::RenderForm(const FormJsInfo &formJsInfo, const Want &want,
                                    sptr<IRemoteObject> callerToken)
 {
-    HILOG_INFO("Render form, bundleName = %{public}s, abilityName = %{public}s, formName = %{public}s,"
-        "moduleName = %{public}s, jsFormCodePath = %{public}s, formSrc = %{public}s",
+    HILOG_INFO("Render form, bundleName=%{public}s, abilityName=%{public}s, formName=%{public}s,"
+        "moduleName=%{public}s, jsFormCodePath=%{public}s, formSrc=%{public}s, formId=%{public}" PRId64,
         formJsInfo.bundleName.c_str(), formJsInfo.abilityName.c_str(), formJsInfo.formName.c_str(),
-        formJsInfo.moduleName.c_str(), formJsInfo.jsFormCodePath.c_str(), formJsInfo.formSrc.c_str());
+        formJsInfo.moduleName.c_str(), formJsInfo.jsFormCodePath.c_str(), formJsInfo.formSrc.c_str(),
+        formJsInfo.formId);
 
     sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
     if (formSupplyClient == nullptr) {
@@ -254,6 +255,11 @@ void FormRenderImpl::OnConfigurationUpdated(
             iter->second->UpdateConfiguration(configuration);
         }
     }
+    PerformanceEventInfo eventInfo;
+    eventInfo.timeStamp = FormRenderEventReport::GetNowMillisecond();
+    eventInfo.bundleName = Constants::FRS_BUNDLE_NAME;
+    eventInfo.sceneId = Constants::CPU_SCENE_ID_CONFIG_UPDATE;
+    FormRenderEventReport::SendPerformanceEvent(SceneType::CPU_SCENE_ENTRY, eventInfo);
 }
 
 void FormRenderImpl::SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration>& config)

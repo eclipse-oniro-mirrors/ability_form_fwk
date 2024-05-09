@@ -564,4 +564,30 @@ HWTEST_F(FmsFormHostClientTest, OnShareFormResponse_0100, TestSize.Level0)
     formHostClient->OnError(errorCode, errorMsg);
     GTEST_LOG_(INFO) << "FmsFormHostClientTest OnShareFormResponse_0100 end";
 }
+/**
+ * @tc.number: OnRecycleForm_0100
+ * @tc.name: OnRecycleForm
+ * @tc.desc: Verify OnRecycleForm succeeded.
+ */
+HWTEST_F(FmsFormHostClientTest, OnRecycleForm_0100, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest OnRecycleForm_0100 start";
+    sptr<FormHostClient> formHostClient = FormHostClient::GetInstance();
+    int64_t formId = -1;
+    formHostClient->OnRecycleForm(formId);
+
+    auto callback = std::make_shared<FormCallback>();
+    std::set<std::shared_ptr<FormCallbackInterface>> callbackSet;
+    callbackSet.emplace(callback);
+    formHostClient->formCallbackMap_.emplace(2, callbackSet);
+    
+    formId = 1;
+    formHostClient->OnRecycleForm(formId);
+
+    formId = 2;
+    formHostClient->OnRecycleForm(formId);
+    formHostClient->formCallbackMap_.clear();
+
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest OnRecycleForm_0100 end";
+}
 }

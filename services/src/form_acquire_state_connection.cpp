@@ -46,6 +46,7 @@ void FormAcquireStateConnection::OnAbilityConnectDone(
             __func__, element.GetAbilityName().c_str(), resultCode);
         return;
     }
+    onFormAppConnect();
     sptr<FormAcquireStateConnection> connection(this);
     FormSupplyCallback::GetInstance()->AddConnection(connection);
     Want want;

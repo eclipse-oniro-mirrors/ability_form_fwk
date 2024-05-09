@@ -73,6 +73,7 @@
               "fwk_group": [
                 "//foundation/ability/form_fwk:fms_innerkits_target",
                 "//foundation/ability/form_fwk:fmskit_native",
+                "//foundation/ability/form_fwk:fmskit_provider_client",
                 "//foundation/ability/form_fwk:form_napi_packages"
               ],
               "service_group": [
@@ -117,6 +118,15 @@
                   ]
                 },
                 "name": "//foundation/ability/form_fwk:fmskit_native"
+              },
+              {
+                "header": {
+                  "header_base": "//foundation/ability/form_fwk/interfaces/kits/native/include",
+                  "header_files": [
+                    "form_provider_client.h"
+                  ]
+                },
+                "name": "//foundation/ability/form_fwk:fmskit_provider_client"
               },
               {
                 "header": {

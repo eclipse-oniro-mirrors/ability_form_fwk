@@ -94,6 +94,11 @@ const std::string FORM_CLICK_ROUTER = "router";
 const std::string FORM_CLICK_MESSAGE = "message";
 const std::string FORM_CLICK_CALL = "call";
 const std::string FORM_SUPPORT_ECOLOGICAL_RULEMGRSERVICE = "persist.sys.fms.support.ecologicalrulemgrservice";
+constexpr int ADD_FORM_REQUEST_TIMTOUT_PERIOD = 3000;
+const std::string FORM_ADD_FORM_TIMER_TASK_QUEUE = "FormMgrTimerTaskQueue";
+enum class AddFormTaskType : int64_t {
+    ADD_FORM_TIMER,
+};
 } // namespace
 
 FormMgrAdapter::FormMgrAdapter()
@@ -112,6 +117,10 @@ void FormMgrAdapter::Init()
 {
     FormDataMgr::GetInstance().GetConfigParamFormMap(Constants::VISIBLE_NOTIFY_DELAY, visibleNotifyDelay_);
     HILOG_INFO("load visibleNotifyDelayTime: %{public}d", visibleNotifyDelay_);
+    serialQueue_ = std::make_shared<FormSerialQueue>(FORM_ADD_FORM_TIMER_TASK_QUEUE.c_str());
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("FormMgrAdapter Init fail, due to create serialQueue_ error");
+    }
 }
 
 /**
@@ -131,8 +140,13 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
         HILOG_ERROR("fail, callerToken can not be NULL");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
-
-    ErrCode ret = CheckFormCountLimit(formId, want);
+    AddFormResultErrorCode states = AddFormResultErrorCode::SUCCESS;
+    ErrCode ret = CheckAddFormTaskTimeoutOrFailed(formId, states);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("AddForm Task Timeout or Failed");
+        return ret;
+    }
+    ret = CheckFormCountLimit(formId, want);
     if (ret != ERR_OK) {
         HILOG_ERROR("CheckFormCountLimit failed");
         return ret;
@@ -148,8 +162,7 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
     // Check trust list
     formItemInfo.SetFormId(formId);
     if (!FormTrustMgr::GetInstance().IsTrust(formItemInfo.GetProviderBundleName())) {
-        HILOG_ERROR("AddForm fail, %{public}s is unTrust",
-            formItemInfo.GetProviderBundleName().c_str());
+        HILOG_ERROR("AddForm fail, %{public}s is unTrust", formItemInfo.GetProviderBundleName().c_str());
         return ERR_APPEXECFWK_FORM_NOT_TRUST;
     }
 
@@ -166,8 +179,11 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
             HandleFormAddObserver(formInfo.formId);
         }
     }
-
+    if (states == AddFormResultErrorCode::UNKNOWN) {
+        CancelAddFormRequestTimeOutTask(formId, ret);
+    }
     ret = AllotForm(formId, want, callerToken, formInfo, formItemInfo);
+    RemoveFormIdMapElement(formId);
     if (ret != ERR_OK) {
         HILOG_ERROR("failed, allot form failed.");
     }
@@ -339,6 +355,80 @@ ErrCode FormMgrAdapter::AllotForm(const int64_t formId, const Want &want,
         }
     }
     return ret;
+}
+
+void FormMgrAdapter::IncreaseAddFormRequestTimeOutTask(const int64_t formId)
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("%{public}s fail, serialQueue_ invalidate", __func__);
+        return;
+    }
+    auto timerTask = [this, formId]() {
+        std::lock_guard<std::mutex> lock(formResultMutex_);
+        auto iter = formIdMap_.find(formId);
+        if (iter != formIdMap_.end()) {
+            iter->second = AddFormResultErrorCode::TIMEOUT;
+            condition_.notify_all();
+        }
+    };
+    serialQueue_->ScheduleDelayTask(std::make_pair(static_cast<int64_t>(AddFormTaskType::ADD_FORM_TIMER), formId),
+        ADD_FORM_REQUEST_TIMTOUT_PERIOD, timerTask);
+}
+
+void FormMgrAdapter::CancelAddFormRequestTimeOutTask(const int64_t formId, const int result)
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("%{public}s fail, serialQueue_ invalidate", __func__);
+        return;
+    }
+    serialQueue_->CancelDelayTask(std::make_pair(static_cast<int64_t>(AddFormTaskType::ADD_FORM_TIMER), formId));
+    std::lock_guard<std::mutex> lock(formResultMutex_);
+    auto iter = formIdMap_.find(formId);
+    if (iter != formIdMap_.end()) {
+        if (result != ERR_OK) {
+            iter->second = AddFormResultErrorCode::FAILED;
+        } else {
+            iter->second = AddFormResultErrorCode::SUCCESS;
+        }
+        condition_.notify_all();
+    }
+}
+
+ErrCode FormMgrAdapter::CheckAddFormTaskTimeoutOrFailed(const int64_t formId, AddFormResultErrorCode &formStates)
+{
+    std::lock_guard<std::mutex> lock(formResultMutex_);
+    auto result = std::find_if(formIdMap_.begin(), formIdMap_.end(), [this, formId, &formStates] (const auto elem) {
+        if (elem.first == formId) {
+            if (elem.second == AddFormResultErrorCode::FAILED) {
+                formIdMap_.erase(formId);
+                return true;
+            } else if (elem.second == AddFormResultErrorCode::TIMEOUT) {
+                formIdMap_.erase(formId);
+                return true;
+            } else if (elem.second == AddFormResultErrorCode::SUCCESS) {
+                formStates = AddFormResultErrorCode::SUCCESS;
+                return false;
+            } else {
+                formStates = AddFormResultErrorCode::UNKNOWN;
+                return false;
+            }
+        }
+        return false;
+    });
+    if (result != formIdMap_.end()) {
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    return ERR_OK;
+}
+
+void FormMgrAdapter::RemoveFormIdMapElement(const int64_t formId)
+{
+    std::lock_guard<std::mutex> lock(formResultMutex_);
+    if (formIdMap_.find(formId) != formIdMap_.end()) {
+        formIdMap_.erase(formId);
+    }
 }
 
 ErrCode FormMgrAdapter::HandleFormAddObserver(const int64_t formId)
@@ -1768,7 +1858,7 @@ ErrCode FormMgrAdapter::InnerAcquireProviderFormInfoAsync(const int64_t formId,
     Want newWant;
     newWant.SetParams(wantParams);
     auto hostToken = newWant.GetRemoteObject(Constants::PARAM_FORM_HOST_TOKEN);
-    sptr<FormAbilityConnection> formAcquireConnection = new (std::nothrow) FormAcquireConnection(formId, info,
+    sptr<FormAcquireConnection> formAcquireConnection = new (std::nothrow) FormAcquireConnection(formId, info,
         wantParams, hostToken);
     if (formAcquireConnection == nullptr) {
         HILOG_ERROR("formAcquireConnection is null.");
@@ -1783,11 +1873,11 @@ ErrCode FormMgrAdapter::InnerAcquireProviderFormInfoAsync(const int64_t formId,
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
 #ifdef RES_SCHEDULE_ENABLE
-    auto && connectCallback = [](const sptr<FormAbilityConnection>& formAbilityConnection) {
-        FormAbilityConnectionReporter::GetInstance().ReportFormAbilityConnection(formAbilityConnection);
+    auto && connectCallback = [](const std::string &bundleName) {
+        FormAbilityConnectionReporter::GetInstance().ReportFormAbilityConnection(bundleName);
     };
-    auto && disconnectCallback = [](const sptr<FormAbilityConnection>& formAbilityConnection) {
-        FormAbilityConnectionReporter::GetInstance().ReportFormAbilityDisconnection(formAbilityConnection);
+    auto && disconnectCallback = [](const std::string &bundleName) {
+        FormAbilityConnectionReporter::GetInstance().ReportFormAbilityDisconnection(bundleName);
     };
     formAcquireConnection->SetFormAbilityConnectCb(connectCallback);
     formAcquireConnection->SetFormAbilityDisconnectCb(disconnectCallback);
@@ -2267,6 +2357,15 @@ ErrCode FormMgrAdapter::RequestPublishForm(Want &want, bool withFormBindingData,
         HILOG_ERROR("fail, generateFormId no invalid formId");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
+    {
+        std::lock_guard<std::mutex> lock(formResultMutex_);
+        auto iter = formIdMap_.find(formId);
+        if (iter != formIdMap_.end()) {
+            iter->second = AddFormResultErrorCode::UNKNOWN;
+        } else {
+            formIdMap_.insert(std::make_pair(formId, AddFormResultErrorCode::UNKNOWN));
+        }
+    }
     HILOG_DEBUG("formId:%{public}" PRId64 "", formId);
     std::string strFormId = std::to_string(formId);
     want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, strFormId);
@@ -2281,15 +2380,73 @@ ErrCode FormMgrAdapter::RequestPublishForm(Want &want, bool withFormBindingData,
         HILOG_ERROR("fail, add form info error");
         return errCode;
     }
-
     errCode = RequestPublishFormToHost(want);
     if (errCode != ERR_OK) {
         FormDataMgr::GetInstance().RemoveRequestPublishFormInfo(formId);
     }
+
+    IncreaseAddFormRequestTimeOutTask(formId);
     if (!formDataProxies.empty()) {
         FormDataProxyMgr::GetInstance().ProduceFormDataProxies(formId, formDataProxies);
     }
     return errCode;
+}
+
+ErrCode FormMgrAdapter::SetPublishFormResult(const int64_t formId, Constants::PublishFormResult &errorCodeInfo)
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("%{public}s fail, serialQueue_ invalidate", __func__);
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    std::pair<int64_t, int64_t> eventMsg(static_cast<int64_t>(AddFormTaskType::ADD_FORM_TIMER), formId);
+    serialQueue_->CancelDelayTask(eventMsg);
+    std::lock_guard<std::mutex> lock(formResultMutex_);
+    auto iter = formIdMap_.find(formId);
+    if (iter != formIdMap_.end()) {
+        if (errorCodeInfo.code == Constants::PublishFormErrorCode::SUCCESS) {
+            iter->second = AddFormResultErrorCode::SUCCESS;
+            errorCodeInfo.message = "set add form success, PublishFormErrorCode is success";
+        } else {
+            iter->second = AddFormResultErrorCode::FAILED;
+            errorCodeInfo.message = "set add form fail, PublishFormErrorCode is not success";
+        }
+        condition_.notify_all();
+        return ERR_OK;
+    }
+    return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+}
+
+ErrCode FormMgrAdapter::AcquireAddFormResult(const int64_t formId)
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    auto apiRet = std::make_shared<ErrCode>(ERR_OK);
+    std::unique_lock<std::mutex> lock(formResultMutex_);
+    condition_.wait(lock, [this, formId, ret = apiRet]() {
+        auto iter = formIdMap_.find(formId);
+        if (iter != formIdMap_.end()) {
+            if (iter->second == AddFormResultErrorCode::SUCCESS) {
+                HILOG_INFO("Acquire the result of the success");
+                *ret = ERR_OK;
+                return true;
+            } else if (iter->second == AddFormResultErrorCode::FAILED) {
+                HILOG_ERROR("Acquire the result of the failed");
+                *ret = ERR_APPEXECFWK_FORM_COMMON_CODE;
+                return true;
+            } else if (iter->second == AddFormResultErrorCode::TIMEOUT) {
+                HILOG_ERROR("Acquire the result of the timeout");
+                *ret = ERR_APPEXECFWK_FORM_ADD_FORM_TIME_OUT;
+                return true;
+            } else {
+                HILOG_INFO("Add form result state is unknown");
+                return false;
+            }
+        }
+        HILOG_ERROR("The formid has not find.");
+        *ret = ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+        return true;
+    });
+    return *apiRet;
 }
 
 ErrCode FormMgrAdapter::CheckAddRequestPublishForm(const Want &want, const Want &formProviderWant)

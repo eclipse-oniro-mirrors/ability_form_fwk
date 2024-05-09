@@ -46,6 +46,7 @@ using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::AppExecFwk;
 using namespace OHOS::Security::AccessToken;
+using namespace OHOS::AAFwk;
 
 extern void MockCheckAcrossLocalAccountsPermission(bool mockRet);
 extern void MockIsSACall(bool mockRet);
@@ -55,6 +56,10 @@ extern void MockIsSystemAppByFullTokenID(bool mockRet);
 extern void MockGetCurrentAccountIdRet(int32_t userId);
 extern void MockGetCallerBundleName(int32_t mockRet);
 extern void MockGetTokenTypeFlag(uint32_t mockRet);
+extern void MockGetAbilityManager(sptr<AAFwk::IAbilityManager> abilityManager);
+#ifdef THEME_MGR_ENABLE
+extern void MockSetThemeManagerAddFormResult(int mockRet);
+#endif
 
 namespace {
 const std::string NAME_FORM_MGR_SERVICE = "FormMgrService";
@@ -2080,17 +2085,14 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0098, TestSize.Level1)
     want.SetElementName("", "");
     want.SetParam(Constants::PARAM_MODULE_NAME_KEY, str);
     const sptr<IRemoteObject> callerToken = nullptr;
-    const sptr<IRemoteObject> impl;
-    const sptr<IBundleMgr> bundleManager = new (std::nothrow) MockBundleMgrProxy(impl);
-    FormBmsHelper::GetInstance().SetBundleManager(bundleManager);
-    FormAmsHelper::GetInstance().SetAbilityManager(new MockAbilityMgrService());
+    MockGetAbilityManager(new MockAbilityMgrService());
     EXPECT_EQ(formMgrService.StartAbility(want, callerToken), ERR_APPEXECFWK_FORM_NO_SUCH_ABILITY);
 
     want.SetElementName("bundleName", "abilityName");
-    FormAmsHelper::GetInstance().SetAbilityManager(nullptr);
+    MockGetAbilityManager(nullptr);
     EXPECT_EQ(formMgrService.StartAbility(want, callerToken), ERR_APPEXECFWK_FORM_COMMON_CODE);
 
-    FormAmsHelper::GetInstance().SetAbilityManager(new MockAbilityMgrService());
+    MockGetAbilityManager(new MockAbilityMgrService());
     EXPECT_EQ(formMgrService.StartAbility(want, callerToken), ERR_OK);
 
     GTEST_LOG_(INFO) << "FormMgrService_0098 end";
@@ -2491,6 +2493,7 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0118, TestSize.Level1)
     MockCheckAcrossLocalAccountsPermission(true);
 #ifdef THEME_MGR_ENABLE
     GTEST_LOG_(INFO) << "FormMgrService_0118 THEME_MGR_ENABLE defined";
+    MockSetThemeManagerAddFormResult(ERR_OK);
     EXPECT_EQ(ERR_OK, formMgrService.CreateForm(want, runningFormInfo));
 #else
     GTEST_LOG_(INFO) << "FormMgrService_0118 THEME_MGR_ENABLE undefined";
@@ -2513,5 +2516,36 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0119, TestSize.Level1)
     std::string blockAppInfo;
     formMgrService.HiDumpFormBlockedApps(args, blockAppInfo);
     GTEST_LOG_(INFO) << "FormMgrService_0119 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0120
+ * @tc.name: test SetPublishFormResult function.
+ * @tc.desc: Verify that the SetPublishFormResult interface is called normally and the return value is ERR_OK.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0120, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0120 start";
+    MockIsSACall(true);
+    FormMgrService formMgrService;
+    int64_t formId = 1;
+    Constants::PublishFormResult result {Constants::PublishFormErrorCode::SUCCESS, ""};
+    EXPECT_EQ(formMgrService.SetPublishFormResult(formId, result), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrService_0120 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0121
+ * @tc.name: test AcquireAddFormResult function.
+ * @tc.desc: Verify that the AcquireAddFormResult interface is called normally and the return value is ERR_OK.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0121, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0121 start";
+    MockIsSACall(true);
+    FormMgrService formMgrService;
+    int64_t formId = 1;
+    EXPECT_EQ(formMgrService.AcquireAddFormResult(formId), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrService_0121 end";
 }
 }

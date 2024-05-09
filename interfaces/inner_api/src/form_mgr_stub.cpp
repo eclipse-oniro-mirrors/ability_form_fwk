@@ -160,6 +160,10 @@ FormMgrStub::FormMgrStub()
         &FormMgrStub::HandleHasFormVisible;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UPDATE_FORM_LOCATION)] =
         &FormMgrStub::HandleUpdateFormLocation;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_PUBLISH_FORM_ERRCODE_RESULT)] =
+        &FormMgrStub::HandleSetPublishFormResult;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_ACQUIRE_ADD_FORM_RESULT)] =
+        &FormMgrStub::HandleAcquireAddFormResult;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_CREATE_FORM)] =
         &FormMgrStub::HandleCreateForm;
 }
@@ -366,13 +370,32 @@ ErrCode FormMgrStub::HandleRequestPublishForm(MessageParcel &data, MessageParcel
             return ERR_APPEXECFWK_PARCEL_ERROR;
         }
     }
-
     int64_t formId = 0;
     ErrCode result = RequestPublishForm(*want, withFormBindingData, formProviderData, formId);
     reply.WriteInt32(result);
     if (result == ERR_OK) {
         reply.WriteInt64(formId);
     }
+    return result;
+}
+
+ErrCode FormMgrStub::HandleSetPublishFormResult(MessageParcel &data, MessageParcel &reply)
+{
+    int64_t formId = data.ReadInt64();
+    Constants::PublishFormResult errorCodeInfo;
+    errorCodeInfo.message = data.ReadString();
+    int32_t err = data.ReadInt32();
+    errorCodeInfo.code = (Constants::PublishFormErrorCode)(err) ;
+    ErrCode result = SetPublishFormResult(formId, errorCodeInfo);
+    reply.WriteInt32(result);
+    return result;
+}
+
+ErrCode FormMgrStub::HandleAcquireAddFormResult(MessageParcel &data, MessageParcel &reply)
+{
+    int64_t formId = data.ReadInt64();
+    ErrCode result = AcquireAddFormResult(formId);
+    reply.WriteInt32(result);
     return result;
 }
 /**

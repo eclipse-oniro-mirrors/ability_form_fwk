@@ -210,7 +210,6 @@ ohos_shared_library("fmskit_native") {
     "interfaces/kits/native/src/form_host_client.cpp",
     "interfaces/kits/native/src/form_mgr.cpp",
     "interfaces/kits/native/src/form_provider_caller.cpp",
-    "interfaces/kits/native/src/form_provider_client.cpp",
   ]
 
   cflags = []
@@ -219,6 +218,48 @@ ohos_shared_library("fmskit_native") {
   }
 
   deps = [ ":form_manager" ]
+
+  external_deps = [
+    "ability_base:want",
+    "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "hilog:libhilog",
+    "hitrace:hitrace_meter",
+    "ipc:ipc_core",
+    "samgr:samgr_proxy",
+  ]
+
+  subsystem_name = "ability"
+  innerapi_tags = [ "platformsdk" ]
+  part_name = "form_fwk"
+}
+
+################################### fmskit_provider_client ########################################
+config("fmskit_provider_config") {
+  defines = [ "FMS_LOG_TAG = \"FmskitNative\"" ]
+}
+
+config("fmskit_provider_public_config") {
+  include_dirs = [
+    "interfaces/kits/native/include",
+    "${form_fwk_path}/interfaces/inner_api/include",
+  ]
+}
+
+ohos_shared_library("fmskit_provider_client") {
+  configs = [ ":fmskit_provider_config" ]
+  public_configs = [ ":fmskit_provider_public_config" ]
+  sources = [ "interfaces/kits/native/src/form_provider_client.cpp" ]
+
+  cflags = []
+  if (target_cpu == "arm") {
+    cflags += [ "-DBINDER_IPC_32BIT" ]
+  }
+
+  deps = [
+    ":fmskit_native",
+    ":form_manager",
+  ]
 
   external_deps = [
     "ability_base:want",

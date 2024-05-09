@@ -69,6 +69,7 @@ HWTEST_F(FormBatchDeleteConnectionTest, FormBatchDeleteConnectionTest_0001, Test
     sptr<IRemoteObject> remoteObject = nullptr;
     int resultCode = 11;
     formBatchDeleteConnection.OnAbilityConnectDone(element, remoteObject, resultCode);
+    ASSERT_FALSE(formBatchDeleteConnection.onFormAppConnect());
     GTEST_LOG_(INFO) << "FormBatchDeleteConnectionTest_0001 end";
 }
 

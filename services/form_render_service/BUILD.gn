@@ -65,6 +65,7 @@ ohos_shared_library("formrender") {
     "src/form_memmgr_client.cpp",
     "src/form_memory_guard.cpp",
     "src/form_module_checker.cpp",
+    "src/form_render_event_report.cpp",
     "src/form_render_impl.cpp",
     "src/form_render_record.cpp",
     "src/form_render_service_extension.cpp",

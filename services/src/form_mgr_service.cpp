@@ -382,6 +382,28 @@ ErrCode FormMgrService::RequestPublishForm(Want &want, bool withFormBindingData,
     return FormMgrAdapter::GetInstance().RequestPublishForm(want, withFormBindingData, formBindingData, formId);
 }
 
+ErrCode FormMgrService::SetPublishFormResult(const int64_t formId, Constants::PublishFormResult &errorCodeInfo)
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    ErrCode ret = CheckFormPermission(AppExecFwk::Constants::PERMISSION_REQUIRE_FORM);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("%{public}s fail, request form permission denied", __func__);
+        return ret;
+    }
+    return FormMgrAdapter::GetInstance().SetPublishFormResult(formId, errorCodeInfo);
+}
+
+ErrCode FormMgrService::AcquireAddFormResult(const int64_t formId)
+{
+    HILOG_INFO("%{public}s called.", __func__);
+    ErrCode ret = CheckFormPermission(AppExecFwk::Constants::PERMISSION_AGENT_REQUIRE_FORM);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("%{public}s fail, request form permission denied", __func__);
+        return ret;
+    }
+    return FormMgrAdapter::GetInstance().AcquireAddFormResult(formId);
+}
+
 /**
  * @brief Form visible/invisible notify, send formIds to form manager service.
  * @param formIds The Id list of the forms to notify.
