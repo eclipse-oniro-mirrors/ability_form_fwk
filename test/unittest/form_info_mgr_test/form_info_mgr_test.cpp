@@ -79,6 +79,25 @@ FormInfo GetTestFormInfo()
     return formInfo;
 }
 
+FormInfo GetTestCircleFormInfo()
+{
+    FormInfo formInfo;
+    formInfo.bundleName = FORM_BUNDLE_NAME_TEST;
+    formInfo.abilityName = FORM_ABILITY_NAME_TEST;
+    formInfo.moduleName = PARAM_MODULE_NAME_TEST;
+    formInfo.name = PARAM_FORM_NAME;
+    formInfo.isStatic = true;
+    formInfo.updateEnabled = true;
+    formInfo.updateDuration = 1;
+    formInfo.scheduledUpdateTime = "06:06";
+    formInfo.jsComponentName = FORM_JS_COMPONENT_NAME;
+    formInfo.formVisibleNotify = true;
+    formInfo.supportDimensions = {1, 2};
+    formInfo.defaultDimension = 1;
+    formInfo.supportShapes = {2};
+    return formInfo;
+}
+
 /**
  * @tc.name: FormInfoHelper_LoadFormConfigInfoByBundleName_0100
  * @tc.number: LoadFormConfigInfoByBundleName
@@ -371,6 +390,84 @@ HWTEST_F(FormInfoMgrTest, BundleFormInfo_GetFormsInfoByFilter_0100, TestSize.Lev
     EXPECT_EQ(PARAM_MODULE_NAME_TEST, formInfos[0].moduleName);
     EXPECT_EQ(filter.supportDimensions, formInfos[0].supportDimensions);
     GTEST_LOG_(INFO) << "BundleFormInfo_GetFormsInfoByFilter_0100 end";
+}
+
+/**
+ * @tc.name: BundleFormInfo_GetFormsInfoByFilter_0200
+ * @tc.number: GetFormsInfoByFilter
+ * @tc.desc: call GetFormsInfoByFilter success
+ */
+HWTEST_F(FormInfoMgrTest, BundleFormInfo_GetFormsInfoByFilter_0200, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "BundleFormInfo_GetFormsInfoByFilter_0200 start";
+    BundleFormInfo bundleFormInfo(FORM_BUNDLE_NAME_TEST);
+    std::vector<FormInfo> formInfos;
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    formInfoStorage.formInfos.push_back(GetTestCircleFormInfo());
+    bundleFormInfo.formInfoStorages_.emplace_back(formInfoStorage);
+    FormInfoFilter filter;
+    filter.bundleName = FORM_BUNDLE_NAME_TEST;
+    filter.moduleName = PARAM_MODULE_NAME_TEST;
+    filter.supportShapes = {2};
+    EXPECT_EQ(ERR_OK, bundleFormInfo.GetFormsInfoByFilter(filter, formInfos));
+    EXPECT_EQ(1, formInfos.size());
+    EXPECT_EQ(FORM_BUNDLE_NAME_TEST, formInfos[0].bundleName);
+    EXPECT_EQ(PARAM_MODULE_NAME_TEST, formInfos[0].moduleName);
+    EXPECT_EQ(filter.supportShapes, formInfos[0].supportShapes);
+    GTEST_LOG_(INFO) << "BundleFormInfo_GetFormsInfoByFilter_0200 end";
+}
+
+/**
+ * @tc.name: BundleFormInfo_GetFormsInfoByFilter_0200
+ * @tc.number: GetFormsInfoByFilter
+ * @tc.desc: call GetFormsInfoByFilter success
+ */
+HWTEST_F(FormInfoMgrTest, BundleFormInfo_GetFormsInfoByFilter_0300, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "BundleFormInfo_GetFormsInfoByFilter_0300 start";
+    BundleFormInfo bundleFormInfo(FORM_BUNDLE_NAME_TEST);
+    std::vector<FormInfo> formInfos;
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    formInfoStorage.formInfos.push_back(GetTestCircleFormInfo());
+    bundleFormInfo.formInfoStorages_.emplace_back(formInfoStorage);
+    FormInfoFilter filter;
+    filter.bundleName = FORM_BUNDLE_NAME_TEST;
+    filter.moduleName = PARAM_MODULE_NAME_TEST;
+    filter.supportDimensions = {1, 2};
+    filter.supportShapes = {1};
+    EXPECT_EQ(ERR_OK, bundleFormInfo.GetFormsInfoByFilter(filter, formInfos));
+    EXPECT_EQ(0, formInfos.size());
+    GTEST_LOG_(INFO) << "BundleFormInfo_GetFormsInfoByFilter_0300 end";
+}
+
+/**
+ * @tc.name: BundleFormInfo_GetFormsInfoByFilter_0200
+ * @tc.number: GetFormsInfoByFilter
+ * @tc.desc: call GetFormsInfoByFilter success
+ */
+HWTEST_F(FormInfoMgrTest, BundleFormInfo_GetFormsInfoByFilter_0400, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "BundleFormInfo_GetFormsInfoByFilter_0400 start";
+    BundleFormInfo bundleFormInfo(FORM_BUNDLE_NAME_TEST);
+    std::vector<FormInfo> formInfos;
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    formInfoStorage.formInfos.push_back(GetTestCircleFormInfo());
+    bundleFormInfo.formInfoStorages_.emplace_back(formInfoStorage);
+    FormInfoFilter filter;
+    filter.bundleName = FORM_BUNDLE_NAME_TEST;
+    filter.moduleName = PARAM_MODULE_NAME_TEST;
+    filter.supportShapes = {2};
+    filter.supportDimensions = {1, 2};
+    EXPECT_EQ(ERR_OK, bundleFormInfo.GetFormsInfoByFilter(filter, formInfos));
+    EXPECT_EQ(1, formInfos.size());
+    EXPECT_EQ(FORM_BUNDLE_NAME_TEST, formInfos[0].bundleName);
+    EXPECT_EQ(PARAM_MODULE_NAME_TEST, formInfos[0].moduleName);
+    EXPECT_EQ(filter.supportShapes, formInfos[0].supportShapes);
+    EXPECT_EQ(filter.supportDimensions, formInfos[0].supportDimensions);
+    GTEST_LOG_(INFO) << "BundleFormInfo_GetFormsInfoByFilter_0400 end";
 }
 
 /**
