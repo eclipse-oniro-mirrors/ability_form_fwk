@@ -843,6 +843,22 @@ HWTEST_F(FmsFormHostRecordTest, FormMgrService_0033, TestSize.Level0)
 }
 
 /**
+ * @tc.name: FormMgrService_0034
+ * @tc.desc: test OnAddSystemAbility function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostRecordTest, FormMgrService_0034, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0034 start";
+    std::shared_ptr<FormMgrService> formMgrService = std::make_shared<FormMgrService>();
+    ASSERT_NE(nullptr, formMgrService);
+    int32_t systemAbilityId = RES_SCHED_SYS_ABILITY_ID;
+    std::string deviceId;
+    formMgrService->OnAddSystemAbility(systemAbilityId, deviceId);
+    GTEST_LOG_(INFO) << "FormMgrService_0034 end";
+}
+
+/**
  * @tc.name: InnerFormInfo_0001
  * @tc.desc: test AddUserUid function.
  * @tc.type: FUNC

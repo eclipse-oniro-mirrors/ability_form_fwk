@@ -1479,4 +1479,46 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0088, Function | MediumTest | Lev
     formTimerMgr->ExecTimerTask(timerTask);
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0088 end";
 }
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0089
+ * @tc.name: ExecTimerTask.
+ * @tc.desc: test ExecTimerTask function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0089, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0089 start";
+    std::shared_ptr<FormTimerMgr> formTimerMgr = std::make_shared<FormTimerMgr>();
+    formTimerMgr->SetTimerTaskNeeded(false);
+    FormTimer timerTask;
+    timerTask.formId = 0;
+    timerTask.userId = 0;
+    EXPECT_EQ(0, formTimerMgr->notExecTaskVec_.size());
+    formTimerMgr->ExecTimerTask(timerTask);
+    EXPECT_EQ(1, formTimerMgr->notExecTaskVec_.size());
+    formTimerMgr->ExecTimerTask(timerTask);
+    EXPECT_EQ(1, formTimerMgr->notExecTaskVec_.size());
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0089 end";
+}
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0090
+ * @tc.name: ExecTimerTask.
+ * @tc.desc: test ExecTimerTask function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0090, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0090 start";
+    std::shared_ptr<FormTimerMgr> formTimerMgr = std::make_shared<FormTimerMgr>();
+    formTimerMgr->SetTimerTaskNeeded(false);
+    FormTimer timerTask;
+    timerTask.formId = 0;
+    timerTask.userId = 0;
+    EXPECT_EQ(0, formTimerMgr->notExecTaskVec_.size());
+    formTimerMgr->ExecTimerTask(timerTask);
+    EXPECT_EQ(1, formTimerMgr->notExecTaskVec_.size());
+    formTimerMgr->SetTimerTaskNeeded(true);
+    EXPECT_EQ(0, formTimerMgr->notExecTaskVec_.size());
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0090 end";
+}
 }
