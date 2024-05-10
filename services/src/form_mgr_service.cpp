@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1612,6 +1612,16 @@ ErrCode FormMgrService::UpdateFormLocation(const int64_t &formId, const int32_t 
     return FormMgrAdapter::GetInstance().UpdateFormLocation(formId, formLocation);
 }
 
+ErrCode FormMgrService::RequestPublishFormWithSnapshot(Want &want, bool withFormBindingData,
+    std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId)
+{
+    HILOG_INFO("FMS RequestPublishFormWithSnapshot called, startTime: begin: %{public}s, publish: %{public}s,\
+        end:  %{public}s, onKvDataServiceAddTime: %{public}s", onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
+        onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
+
+    return FormMgrAdapter::GetInstance().RequestPublishForm(want, withFormBindingData, formBindingData,
+                                                            formId, {}, false);
+}
 #ifdef RES_SCHEDULE_ENABLE
 void FormMgrService::OnSystemloadLevel(int32_t level)
 {

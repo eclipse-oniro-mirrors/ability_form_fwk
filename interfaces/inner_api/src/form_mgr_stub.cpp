@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -166,6 +166,8 @@ FormMgrStub::FormMgrStub()
         &FormMgrStub::HandleAcquireAddFormResult;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_CREATE_FORM)] =
         &FormMgrStub::HandleCreateForm;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_FORM_WITH_SNAPSHOT)] =
+        &FormMgrStub::HandleRequestPublishFormWithSnapshot;
 }
 
 FormMgrStub::~FormMgrStub()
@@ -1459,6 +1461,42 @@ ErrCode FormMgrStub::HandleUpdateFormLocation(MessageParcel &data, MessageParcel
         HILOG_ERROR("failed to write result");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
+    return result;
+}
+
+/**
+ * @brief handle CreateForm message.
+ * @param data input param.
+ * @param reply output param.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+ErrCode FormMgrStub::HandleRequestPublishFormWithSnapshot(MessageParcel &data, MessageParcel &reply)
+{
+    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
+    if (want == nullptr) {
+        HILOG_ERROR("%{public}s, error to get want.", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    bool withFormBindingData = data.ReadBool();
+    std::unique_ptr<FormProviderData> formBindingData = nullptr;
+    if (withFormBindingData) {
+        formBindingData.reset(data.ReadParcelable<FormProviderData>());
+        if (formBindingData == nullptr) {
+            HILOG_ERROR("%{public}s, error to get formBindingData.", __func__);
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+    }
+
+    int64_t formId = 0;
+    ErrCode result = RequestPublishFormWithSnapshot(*want, withFormBindingData, formBindingData, formId);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("failed to write result");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    } else {
+        reply.WriteInt64(formId);
+    }
+
     return result;
 }
 
