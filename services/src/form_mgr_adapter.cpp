@@ -2327,7 +2327,7 @@ void FormMgrAdapter::AddSnapshotToHostWant(const Want &want, Want &wantToHost)
         wantToHost.SetParam(Constants::PARAM_PUBLISH_FORM_HOST_HEIGHT_KEY, height);
         wantToHost.SetParam(Constants::PARAM_PUBLISH_FORM_HOST_SCREENX_KEY, screenX);
         wantToHost.SetParam(Constants::PARAM_PUBLISH_FORM_HOST_SCREENY_KEY, screenY);
-        HILOG_DEBUG("AddSnapshotToHostWant snapshot length: %{public}d", snapshot.length());
+        HILOG_DEBUG("AddSnapshotToHostWant snapshot.");
         HILOG_DEBUG("AddSnapshotToHostWant width: %{public}d height: %{public}d .", width, height);
         HILOG_DEBUG("AddSnapshotToHostWant screenX: %{public}d screenY: %{public}d.", screenX, screenY);
     } else {
