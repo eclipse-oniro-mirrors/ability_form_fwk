@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -60,7 +60,7 @@ bool FormBmsHelper::GetAbilityInfoByAction(const std::string &action, int32_t us
 
 ErrCode FormMgrAdapter::RequestPublishForm(Want &want, bool withFormBindingData,
     std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
-    const std::vector<FormDataProxy> &formDataProxies, bool needCheckFormPermission)
+    const std::vector<FormDataProxy> &formDataProxies)
 {
     if (formId == 1) {
         return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;

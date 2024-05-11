@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -83,11 +83,6 @@ namespace Constants {
     constexpr const char* PARAM_THEME_KEY  = "ohos.extra.param.key.form_is_theme";
     constexpr const char* PARAM_THEME_THEME_FORM_ID  = "themeFormId";
     constexpr const char* PARAM_THEME_THEME_ID  = "themeId";
-    constexpr const char* PARAM_PUBLISH_FORM_HOST_SNAPSHOT_KEY = "ohos.extra.param.key.add_form_to_host_snapshot";
-    constexpr const char* PARAM_PUBLISH_FORM_HOST_WIDTH_KEY = "ohos.extra.param.key.add_form_to_host_width";
-    constexpr const char* PARAM_PUBLISH_FORM_HOST_HEIGHT_KEY = "ohos.extra.param.key.add_form_to_host_height";
-    constexpr const char* PARAM_PUBLISH_FORM_HOST_SCREENX_KEY = "ohos.extra.param.key.add_form_to_host_screenx";
-    constexpr const char* PARAM_PUBLISH_FORM_HOST_SCREENY_KEY = "ohos.extra.param.key.add_form_to_host_screeny";
     constexpr const char* CPU_SCENE_ID_CONFIG_UPDATE  = "1";
 
     constexpr int32_t UNKNOWN = 0;

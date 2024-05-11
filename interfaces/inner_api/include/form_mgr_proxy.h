@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -563,18 +563,6 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode UpdateFormLocation(const int64_t &formId, const int32_t &formLocation) override;
-
-    /**
-     * @brief Request to publish a form to the form host with normal authority.
-     *
-     * @param want The want of the form to publish.
-     * @param withFormBindingData Indicates whether the formBindingData is carried wit
-     * @param formBindingData Indicates the form data.
-     * @param formId Return the form id to be published.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    ErrCode RequestPublishFormWithSnapshot(Want &want, bool withFormBindingData,
-        std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId) override;
 private:
     template<typename T>
     int GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos);
