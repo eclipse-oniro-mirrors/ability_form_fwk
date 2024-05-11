@@ -135,7 +135,7 @@ void FormMgrAdapter::Init()
  * @return Returns ERR_OK on success, others on failure.
  */
 int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
-    const sptr<IRemoteObject> &callerToken, FormJsInfo &formInfo)
+    const sptr<IRemoteObject> &callerToken, FormJsInfo &formJsInfo)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     HILOG_DEBUG("called.");
@@ -171,7 +171,7 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
 
     // publish form
     if (formId > 0 && FormDataMgr::GetInstance().IsRequestPublishForm(formId)) {
-        ret = AddRequestPublishForm(formItemInfo, want, callerToken, formInfo);
+        ret = AddRequestPublishForm(formItemInfo, want, callerToken, formJsInfo);
         if (ret != ERR_OK) {
             HILOG_ERROR("failed, add request publish form failed.");
             return ret;
@@ -179,13 +179,13 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
         bool tempFormFlag = want.GetBoolParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
         if (!tempFormFlag && (ret == ERR_OK)) {
             HILOG_DEBUG("Checks if there is a listener listening for adding form");
-            HandleFormAddObserver(formInfo.formId);
+            HandleFormAddObserver(formJsInfo.formId);
         }
     }
     if (states == AddFormResultErrorCode::UNKNOWN) {
         CancelAddFormRequestTimeOutTask(formId, ret);
     }
-    ret = AllotForm(formId, want, callerToken, formInfo, formItemInfo);
+    ret = AllotForm(formId, want, callerToken, formJsInfo, formItemInfo);
     RemoveFormIdMapElement(formId);
     if (ret != ERR_OK) {
         HILOG_ERROR("failed, allot form failed.");
@@ -316,7 +316,7 @@ ErrCode FormMgrAdapter::CheckFormCountLimit(const int64_t formId, const Want &wa
 }
 
 ErrCode FormMgrAdapter::AllotForm(const int64_t formId, const Want &want,
-    const sptr<IRemoteObject> &callerToken, FormJsInfo &formInfo, const FormItemInfo &formItemInfo)
+    const sptr<IRemoteObject> &callerToken, FormJsInfo &formJsInfo, const FormItemInfo &formItemInfo)
 {
     Want newWant(want);
     bool directCallInApp = newWant.GetBoolParam(Constants::KEY_DIRECT_CALL_INAPP, false);
@@ -346,16 +346,16 @@ ErrCode FormMgrAdapter::AllotForm(const int64_t formId, const Want &want,
     ErrCode ret = 0;
     if (formId > 0) {
         if (specificFormFlag) {
-            ret = AllotFormBySpecificId(formItemInfo, callerToken, wantParams, formInfo);
+            ret = AllotFormBySpecificId(formItemInfo, callerToken, wantParams, formJsInfo);
         } else {
-            ret = AllotFormById(formItemInfo, callerToken, wantParams, formInfo);
+            ret = AllotFormById(formItemInfo, callerToken, wantParams, formJsInfo);
         }
     } else {
-        ret = AllotFormByInfo(formItemInfo, callerToken, wantParams, formInfo);
+        ret = AllotFormByInfo(formItemInfo, callerToken, wantParams, formJsInfo);
         bool tempFormFlag = want.GetBoolParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
         if (!tempFormFlag && (ret == ERR_OK)) {
             HILOG_DEBUG("Checks if there is a listener listening for adding form");
-            HandleFormAddObserver(formInfo.formId);
+            HandleFormAddObserver(formJsInfo.formId);
         }
     }
     return ret;
@@ -1714,7 +1714,7 @@ ErrCode FormMgrAdapter::AllotFormByInfo(const FormItemInfo &info,
  * @return Returns ERR_OK on success, others on failure.
  */
 ErrCode FormMgrAdapter::AddNewFormRecord(const FormItemInfo &info, const int64_t formId,
-    const sptr<IRemoteObject> &callerToken, const WantParams &wantParams, FormJsInfo &formInfo)
+    const sptr<IRemoteObject> &callerToken, const WantParams &wantParams, FormJsInfo &formJsInfo)
 {
     HILOG_INFO("add new formRecord");
     FormItemInfo newInfo(info);
@@ -1741,7 +1741,7 @@ ErrCode FormMgrAdapter::AddNewFormRecord(const FormItemInfo &info, const int64_t
     }
 
     // create form info for js
-    FormDataMgr::GetInstance().CreateFormJsInfo(formId, formRecord, formInfo);
+    FormDataMgr::GetInstance().CreateFormJsInfo(formId, formRecord, formJsInfo);
 
     // storage info
     if (!newInfo.IsTemporaryForm()) {
@@ -2092,6 +2092,7 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
     itemInfo.SetTransparencyEnabled(formInfo.transparencyEnabled);
     itemInfo.SetPrivacyLevel(formInfo.privacyLevel);
     itemInfo.SetDataProxyFlag(formInfo.dataProxyEnabled);
+    itemInfo.SetFormBundleType(formInfo.bundleType);
 
     SetFormItemInfoParams(bundleInfo, formInfo, itemInfo);
     return ERR_OK;

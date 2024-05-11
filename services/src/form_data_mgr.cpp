@@ -200,6 +200,7 @@ FormRecord FormDataMgr::CreateFormRecord(const FormItemInfo &formInfo, const int
     newRecord.isDataProxy = formInfo.GetDataProxyFlag();
     newRecord.uid = formInfo.GetProviderUid();
     newRecord.modulePkgNameMap = formInfo.GetModulePkgNameMap();
+    newRecord.formBundleType = formInfo.GetFormBundleType();
     formInfo.GetHapSourceDirs(newRecord.hapSourceDirs);
     HILOG_INFO("end");
     return newRecord;
@@ -1963,6 +1964,7 @@ void FormDataMgr::FillBasicRunningFormInfoByFormRecord(const FormRecord &formRec
     runningFormInfo.formLocation = formRecord.formLocation;
     runningFormInfo.formVisiblity = static_cast<FormVisibilityType>(formRecord.formVisibleNotifyState);
     runningFormInfo.recycleStatus = formRecord.recycleStatus;
+    runningFormInfo.formBundleType = formRecord.formBundleType;
 }
 
 ErrCode FormDataMgr::GetRunningFormInfosByFormId(const int64_t formId, RunningFormInfo &runningFormInfo)
