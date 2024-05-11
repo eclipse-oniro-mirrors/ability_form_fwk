@@ -238,6 +238,8 @@ bool FormRenderRecord::CreateEventHandler(const std::string &bundleName, bool ne
 
 void FormRenderRecord::AddWatchDogThreadMonitor()
 {
+    HILOG_INFO("add watchDog monitor, bundleName is %{public}s, uid is %{public}s",
+        bundleName_.c_str(), uid_.c_str());
     std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
     auto watchdogTask = [thisWeakPtr]() {
         auto renderRecord = thisWeakPtr.lock();
@@ -255,7 +257,8 @@ void FormRenderRecord::Timer()
 {
     TaskState taskState = RunTask();
     if (taskState == TaskState::BLOCK) {
-        HILOG_ERROR("FRS block happened when bundleName is %{public}s", bundleName_.c_str());
+        HILOG_ERROR("FRS block happened when bundleName is %{public}s, uid is %{public}s",
+            bundleName_.c_str(), uid_.c_str());
         FormRenderEventReport::SendBlockFaultEvent(processId_, jsThreadId_, bundleName_);
         OHOS::DelayedSingleton<FormRenderImpl>::GetInstance()->OnRenderingBlock(bundleName_);
     }

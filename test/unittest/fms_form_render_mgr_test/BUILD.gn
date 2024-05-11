@@ -24,6 +24,7 @@ ohos_unittest("FrsFormRenderMgrTest") {
     "${form_fwk_path}/test/unittest/fms_form_render_mgr_test/fms_form_render_mgr_test.cpp",
     "${form_fwk_path}/test/unittest/fms_form_render_mgr_test/mock_form_data_mgr.cpp",
     "${form_fwk_path}/test/unittest/fms_form_render_mgr_test/mock_form_render_mgr_inner.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_render_mgr_test/mock_form_sandbox_render_mgr_inner.cpp",
   ]
 
   include_dirs = [

@@ -32,7 +32,7 @@ FormMemmgrClient::~FormMemmgrClient()
 
 void FormMemmgrClient::SetCritical(bool critical)
 {
-    int32_t pid = getpid();
+    int32_t pid = getprocpid();
     HILOG_INFO("%{public}s, pid:%{public}" PRId32 ", critical:%{public}d.", __func__, pid, critical);
 
     void *libMemmgrClientHandle = dlopen("libmemmgrclient.z.so", RTLD_NOW);
