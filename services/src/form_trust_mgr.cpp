@@ -56,7 +56,7 @@ void FormTrustMgr::GetUntrustAppNameList(std::string &result)
 {
     std::map<std::string, int32_t>::iterator it = unTrustList_.begin();
     for (; it != unTrustList_.end(); it++) {
-        if (it->second >= UNTRUST_THRESHOLD) {
+        if (it->second > UNTRUST_THRESHOLD) {
             result += it->first + " untrusty\n";
         } else {
             result += it->first + " trusty\n";
