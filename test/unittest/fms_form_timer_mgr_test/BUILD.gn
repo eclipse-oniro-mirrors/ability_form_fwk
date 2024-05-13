@@ -40,7 +40,11 @@ ohos_unittest("FmsFormTimerMgrTest") {
     "//third_party/googletest:gmock_main",
   ]
 
-  defines = [ "RES_SCHEDULE_ENABLE" ]
+  defines = []
+
+  if (res_schedule_service) {
+    defines += [ "RES_SCHEDULE_ENABLE" ]
+  }
 
   external_deps = [
     "ability_base:base",

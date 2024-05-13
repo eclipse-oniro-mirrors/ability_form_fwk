@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -243,11 +243,12 @@ public:
      * @param withFormBindingData Indicates whether the formBindingData is carried with.
      * @param formBindingData Indicates the form data.
      * @param formId Return the form id to be published.
+     * @param needCheckFormPermission Indicates whether the app have system permissions.default value is true.
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode RequestPublishForm(Want &want, bool withFormBindingData,
         std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
-        const std::vector<FormDataProxy> &formDataProxies = {});
+        const std::vector<FormDataProxy> &formDataProxies = {}, bool needCheckFormPermission = true);
 
     ErrCode SetPublishFormResult(const int64_t formId, Constants::PublishFormResult &errorCodeInfo);
 
@@ -843,11 +844,21 @@ private:
     ErrCode AddFormTimer(const FormRecord &formRecord);
 
     /**
-     * @brief check the publish form.
+     * @brief Genera checking the publish form.
      * @param want The want of the form to publish.
+     * @param bundleName BundleName
+     * @param needCheckFormPermission Indicates whether the app have system permissions.default value is true.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode CheckPublishForm(Want &want);
+    ErrCode CheckFormBundleName(Want &want, std::string &bundleName, bool needCheckFormPermission);
+
+    /**
+     * @brief check the publish form.
+     * @param want The want of the form to publish.
+     * @param needCheckFormPermission Indicates whether the app have system permissions.default value is true.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode CheckPublishForm(Want &want, bool needCheckFormPermission = true);
 
     /**
      * @brief Query the request host.
@@ -862,6 +873,13 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode RequestPublishFormToHost(Want &want);
+
+    /**
+     * @brief Post request publish form to host.
+     * @param want The want of the form to publish.
+     * @param wantToHost The other want of the form to publish.
+     */
+    void AddSnapshotToHostWant(const Want &want, Want &wantToHost);
 
     /**
      * @brief check the argv of AddRequestPublishForm.
@@ -885,9 +903,10 @@ private:
     /**
      * @brief get bundleName.
      * @param bundleName for output.
+     * @param needCheckFormPermission Indicates whether the app have system permissions.default value is true.
      * @return Returns true on success, others on failure.
      */
-    bool GetBundleName(std::string &bundleName);
+    bool GetBundleName(std::string &bundleName, bool needCheckFormPermission = true);
 
     /**
      * @brief Check if the form should update information to the host.
@@ -969,9 +988,11 @@ private:
      * @param iBundleMgr BundleManagerProxy
      * @param bundleName BundleName of caller
      * @param want want of target form
+     * @param needCheckFormPermission Indicates whether the app have system permissions.default value is true.
      * @return Returns true if the caller is in the whitelist, others if not.
      */
-    bool IsValidPublishEvent(const sptr<IBundleMgr> &iBundleMgr, const std::string &bundleName, const Want &want);
+    bool IsValidPublishEvent(const sptr<IBundleMgr> &iBundleMgr, const std::string &bundleName, const Want &want,
+        bool needCheckFormPermission = true);
 
     /**
      * @brief Allocate form by specific Id.
