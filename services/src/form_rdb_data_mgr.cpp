@@ -24,6 +24,7 @@
 #include "form_constants.h"
 #include "form_mgr_errors.h"
 #include "scope_guard.h"
+#include "form_event_report.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -74,6 +75,8 @@ int32_t RdbStoreDataCallBackFormInfoStorage::OnOpen(NativeRdb::RdbStore &rdbStor
 
 int32_t RdbStoreDataCallBackFormInfoStorage::onCorruption(std::string databaseFile)
 {
+    FormEventReport::SendFormFailedEvent(FormEventName::INIT_FMS_FAILED, HiSysEventType::FAULT,
+        NewFormEventInfo::errorType::DATABASE_EXIT_ABNORMA);
     return NativeRdb::E_OK;
 }
 

@@ -30,6 +30,8 @@
 #include "os_account_manager_wrapper.h"
 #include "time_service_client.h"
 #include "want.h"
+#include "form_event_report.h"
+#include "form_record_report.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -534,6 +536,10 @@ bool FormTimerMgr::HandleResetLimiter()
         HILOG_INFO("%{public}s failed, remind when reset limiter", __func__);
         for (auto &task : remindTasks) {
             ExecTimerTask(task);
+            int64_t formId = task.formId;
+            FormRecordReport::GetInstance().IncreaseUpdateTimes(formId, HiSysEventPointType::TYPE_HF_RECOVER_UPDATE);
+            FormRecordReport::GetInstance().IncreaseUpdateTimes(
+                formId, HiSysEventPointType::TYPE_PASSIVE_RECOVER_UPDATE);
         }
     }
 
@@ -1262,6 +1268,34 @@ void FormTimerMgr::EnsureInitIntervalTimer()
     HILOG_INFO("Create intervalTimer end");
 }
 
+void FormTimerMgr::FormRefreshCountReport()
+{
+    HILOG_INFO("%{public}s, init base Refresh count task", __func__);
+    if (intervalTimerId_ != 0L) {
+        return;
+    }
+    auto timerOption = std::make_shared<FormTimerOption>();
+    int32_t flag = ((unsigned int)(timerOption->TIMER_TYPE_REALTIME))
+      | ((unsigned int)(timerOption->TIMER_TYPE_EXACT));
+    timerOption->SetType(flag);
+    timerOption->SetRepeat(true);
+    int64_t interval = Constants::MS_PER_DAY / timeSpeed_;
+    timerOption->SetInterval(interval);
+    auto timeCallback = []() { FormRecordReport::GetInstance().HandleFormRefreshCount(); };
+    timerOption->SetCallbackInfo(timeCallback);
+    intervalTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption);
+    int64_t timeInSec = GetBootTimeMs();
+    HILOG_INFO("TimerId: %{public}" PRId64 ", timeInSec: %{public}" PRId64 ", interval: %{public}" PRId64 ".",
+        intervalTimerId_, timeInSec, interval);
+    int64_t startTime = timeInSec + interval;
+    bool bRet = MiscServices::TimeServiceClient::GetInstance()->StartTimer(intervalTimerId_,
+        static_cast<uint64_t>(startTime));
+    if (!bRet) {
+        HILOG_ERROR("%{public}s failed, init intervalTimer task error", __func__);
+        InnerClearIntervalTimer();
+    }
+    HILOG_INFO("Create intervalTimer end");
+}
 /**
  * @brief Clear interval timer resource.
  */
@@ -1399,6 +1433,7 @@ void FormTimerMgr::Init()
     updateAtTimerId_ = 0L;
     dynamicAlarmTimerId_ = 0L;
     limiterTimerId_ = 0L;
+    FormRefreshCountReport();
 
     HILOG_INFO("%{public}s end", __func__);
 }

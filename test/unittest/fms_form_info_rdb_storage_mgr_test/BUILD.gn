@@ -23,6 +23,7 @@ ohos_unittest("FmsFormInfoRdbStorageMgrTest") {
     "${form_fwk_path}/test/mock/src/mock_bundle_manager.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_host_client.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_provider_client.cpp",
+    "mock_form_rdb_data_mgr.cpp",
   ]
   sources += [ "fms_form_info_rdb_storage_mgr_test.cpp" ]
 

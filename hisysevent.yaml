@@ -81,3 +81,70 @@ UNBIND_FORM_APP:
   BUNDLE_NAME: {type: STRING, desc: bundle name}
   FORM_APP_PID: {type: INT32, desc: form provider pid}
   UNBIND_TIME: {type: INT64, desc: unbind time stamp}
+
+CALLEN_DB_FAILED:
+  __BASE: {type: FAULT, level: MINOR, tag: ability, desc: form manager}
+  ERROR_TYPE: {type: INT64, desc: error type}
+
+INIT_FMS_FAILED:
+  __BASE: {type: FAULT, level: MINOR, tag: ability, desc: form manager}
+  ERROR_TYPE: {type: INT64, desc: error type}
+
+ADD_FORM_FAILED:
+  __BASE: {type: FAULT, level: MINOR, tag: ability, desc: form manager}
+  ERROR_TYPE: {type: INT64, desc: error type}
+
+FIRST_ADD_FORM_DURATION:
+  __BASE: {type: STATISTIC, level: MINOR, tag: ability, desc: form manager}
+  SESSION_ID: {type: INT64, desc: sessionId}
+  FORM_ID: {type: INT64, desc: formId}
+  BIND_DURATION: {type: INT64, desc: bind duration}
+  GET_DURATION: {type: INT64, desc: get duration}
+  BUNDLE_NAME: {type: STRING, desc: bundle name}
+  MODULE_NAME: {type: STRING, desc: module name}
+  ABILITY_NAME: {type: STRING, desc: ability name}
+  FORM_NAME: {type: STRING, desc: form name}
+  FORM_DIMENSION: {type: INT64, desc: form dimension}
+  ACQUIRE_DURATION: {type: INT64, desc: acquire duration}
+
+FIRST_UPDATE_FORM_DURATION:
+  __BASE: {type: STATISTIC, level: MINOR, tag: ability, desc: form manager}
+  SESSION_ID: {type: STRING, desc: sessionId}
+  FORM_ID: {type: INT64, desc: formId}
+  DURATION: {type: INT64, desc: update duration}
+  DURATION_TYPE: {type: INT64, desc: duration type}
+
+UPDATE_FORM_REFRESH_TIMES:
+  __BASE: {type: STATISTIC, level: MINOR, tag: ability, desc: form manager}
+  FORM_ID: {type: INT64, desc: formId}
+  BUNDLE_NAME: {type: STRING, desc: bundle name}
+  MODULE_NAME: {type: STRING, desc: module name}
+  FORM_NAME: {type: STRING, desc: form name}
+  DAILY_REFRESH_TIMES: {type: INT32, desc: daily refresh times}
+  INVISIBLE_REFRESH_TIMES: {type: INT32, desc: invisible refresh times}
+  HF_REFRESH_BLOCK_TIMES: {type: INT32, desc: hf refresh block times}
+  INVISIBLE_REFRESH_BLOCK_TIMES: {type: INT32, desc: invisible refresh block times}
+  HIGH_LOAD_REFRESH_BLOCK_TIMES: {type: INT32, desc: high Load refresh block times}
+  ACTIVE_RECOVER_REFRESH_TIMES: {type: INT32, desc: active recover refresh times}
+  PASSIVE_RECOVER_REFRESH_TIMES: {type: INT32, desc: passive recover refresh times}
+  HF_RECOVER_REFRESH_TIMES: {type: INT32, desc: hf recover refresh times}
+  OFFLOAD_RECOVER_REFRESH_TIMES: {type: INT32, desc: offload recover refresh times}
+
+PROXY_UPDATE_FORM:
+  __BASE: {type: STATISTIC, level: MINOR, tag: ability, desc: form manager}
+  FORM_ID: {type: INT64, desc: formId}
+  BUNDLE_NAME: {type: STRING, desc: bundle name}
+  MODULE_NAME: {type: STRING, desc: module name}
+  FORM_NAME: {type: STRING, desc: form name}
+  FORM_DIMENSION: {type: INT64, desc: form dimension}
+  ABILITY_NAME: {type: STRING, desc: ability name}
+
+UNNORMATIVE_PUBLISH_FORM_TO_HOST:
+  __BASE: {type: STATISTIC, level: MINOR, tag: ability, desc: form manager}
+  CLIENT_BUNDLE_NAME: {type: STRING, desc: client bundle name}
+  HOST_BUNDLE_NAME: {type: STRING, desc: host bundle name}
+  FORM_BUNDLE_NAME: {type: STRING, desc: form bundle name}
+  MODULE_NAME: {type: STRING, desc: module name}
+  FORM_NAME: {type: STRING, desc: form name}
+  FORM_DIMENSION: {type: INT64, desc: form dimension}
+  ABILITY_NAME: {type: STRING, desc: ability name}

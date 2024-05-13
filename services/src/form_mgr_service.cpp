@@ -56,6 +56,7 @@
 #include "hisysevent.h"
 #include "xcollie/watchdog.h"
 #include "mem_mgr_client.h"
+#include "form_report.h"
 
 #ifdef RES_SCHEDULE_ENABLE
 #include "form_systemload_listener.h"
@@ -316,7 +317,7 @@ int FormMgrService::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
     HILOG_INFO("FMS RequestForm called, startTime: begin: %{public}s, publish: %{public}s, end: %{public}s, "
         "onKvDataServiceAddTime: %{public}s", onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
-
+    FormReport::GetInstance().SetDurationStartTime(formId, FormUtil::GetCurrentMicrosecond());
     ErrCode ret = CheckFormPermission();
     if (ret != ERR_OK) {
         HILOG_ERROR("fail, request form permission denied");
@@ -747,7 +748,9 @@ ErrCode FormMgrService::Init()
     /* Publish service maybe failed, so we need call this function at the last,
      * so it can't affect the TDD test program */
     if (!Publish(DelayedSingleton<FormMgrService>::GetInstance().get())) {
-        HILOG_ERROR("FormMgrService::Init Publish failed!");
+        FormEventReport::SendFormFailedEvent(FormEventName::INIT_FMS_FAILED, HiSysEventType::FAULT,
+            NewFormEventInfo::errorType::PUBLISH_SER_FAILED);
+        HILOG_ERROR("FormMgrService::Init Publish failed");
         return ERR_INVALID_OPERATION;
     }
     onStartPublishTime_ = GetCurrentDateTime();

@@ -376,6 +376,7 @@ private:
 
     bool IsNeedUpdate();
 
+    void FormRefreshCountReport();
     void InnerClearIntervalTimer();
 
     mutable std::mutex intervalMutex_;

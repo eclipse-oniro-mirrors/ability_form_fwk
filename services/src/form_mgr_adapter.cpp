@@ -73,6 +73,9 @@
 #include "parameters.h"
 #include "system_ability_definition.h"
 #include "form_task_mgr.h"
+#include "form_event_report.h"
+#include "form_report.h"
+#include "form_record_report.h"
 #include "form_ability_connection_reporter.h"
 
 namespace OHOS {
@@ -1868,6 +1871,7 @@ ErrCode FormMgrAdapter::InnerAcquireProviderFormInfoAsync(const int64_t formId,
     want.SetElementName(info.GetProviderBundleName(), info.GetAbilityName());
     want.AddFlags(Want::FLAG_ABILITY_FORM_ENABLED);
     ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbility(want, formAcquireConnection);
+    FormReport::GetInstance().SetStartBindTime(formId, FormUtil::GetCurrentMicrosecond());
     if (errorCode != ERR_OK) {
         HILOG_ERROR("%{public}s fail, ConnectServiceAbility failed.", __func__);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
@@ -2427,6 +2431,9 @@ ErrCode FormMgrAdapter::RequestPublishForm(Want &want, bool withFormBindingData,
     errCode = RequestPublishFormToHost(want);
     if (errCode != ERR_OK) {
         FormDataMgr::GetInstance().RemoveRequestPublishFormInfo(formId);
+        NewFormEventInfo eventInfo;
+        FormEventReport::SendFourthFormEvent(FormEventName::UNNORMATIVE_PUBLISH_FORM_TO_HOST,
+            HiSysEventType::STATISTIC, eventInfo, want);
     }
 
     IncreaseAddFormRequestTimeOutTask(formId);
@@ -2651,6 +2658,7 @@ int FormMgrAdapter::SetNextRefreshTimeLocked(const int64_t formId, const int64_t
     int32_t timerRefreshedCount = FormTimerMgr::GetInstance().GetRefreshCount(formId);
     if (timerRefreshedCount >= Constants::LIMIT_COUNT) {
         HILOG_ERROR("%{public}s, already refresh times:%{public}d", __func__, timerRefreshedCount);
+        FormRecordReport::GetInstance().IncreaseUpdateTimes(formId, HiSysEventPointType::TYPE_HIGH_FREQUENCY);
         FormTimerMgr::GetInstance().MarkRemind(formId);
         return ERR_APPEXECFWK_FORM_MAX_REFRESH;
     }
@@ -2974,6 +2982,7 @@ void FormMgrAdapter::AcquireProviderFormInfo(const int64_t formId, const Want &w
         FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
         HILOG_ERROR("%{public}s fail, Failed to get acquire provider form info", __func__);
     }
+    FormReport::GetInstance().SetEndGetTime(formId, FormUtil::GetCurrentMicrosecond());
 }
 
 /**
