@@ -2621,4 +2621,78 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0103, TestSize.Level1) {
     EXPECT_EQ(mockFormMgrService->HandleAcquireAddFormResult(data, reply), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0103 ends";
 }
+
+/**
+ * @tc.number: FormMgrStubTest_0104
+ * @tc.name: Verify OnRemoteRequest and HandleRequestPublishFormWithSnapshot
+ * @tc.desc: When the parameter code is FORM_MGR_REQUEST_PUBLISH_FORM_WITH_SNAPSHOT, the interface return
+ *           value is ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0104, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0104 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    const Want want = {};
+    constexpr bool withFormBindingData = true;
+    const FormProviderData formProviderData = {};
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_FORM_WITH_SNAPSHOT);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    data.WriteParcelable(&want);
+    data.WriteBool(withFormBindingData);
+    data.WriteParcelable(&formProviderData);
+    EXPECT_CALL(*mockFormMgrService, RequestPublishFormWithSnapshot(_, _, _, _))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0104 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_0105
+ * @tc.name: Verify OnRemoteRequest and HandleRequestPublishFormWithSnapshot
+ * @tc.desc: When the parameter code is FORM_MGR_REQUEST_PUBLISH_FORM_WITH_SNAPSHOT, the interface
+ *           return value is ERR_OK + 1.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0105, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0105 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    const Want want = {};
+    constexpr bool withFormBindingData = false;
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_FORM_WITH_SNAPSHOT);
+    constexpr int32_t errorCode = ERR_OK + 1;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    data.WriteParcelable(&want);
+    data.WriteBool(withFormBindingData);
+    EXPECT_CALL(*mockFormMgrService, RequestPublishFormWithSnapshot(_, _, _, _))
+        .Times(1)
+        .WillOnce(Return(errorCode));
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, errorCode);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0105 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_0106
+ * @tc.name: Verify OnRemoteRequest and HandleRequestPublishFormWithSnapshot
+ * @tc.desc: When the parameter code is FORM_MGR_REQUEST_PUBLISH_FORM_WITH_SNAPSHOT, the interface return value is
+ *           ERR_APPEXECFWK_PARCEL_ERROR.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0106, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0106 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_FORM_WITH_SNAPSHOT);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0106 ends";
+}
 }
