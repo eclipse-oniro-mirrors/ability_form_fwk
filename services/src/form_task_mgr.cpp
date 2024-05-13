@@ -33,6 +33,8 @@
 #include "js_form_state_observer_interface.h"
 #include "form_info_rdb_storage_mgr.h"
 #include "form_util.h"
+#include "form_report.h"
+#include "form_record_report.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -829,8 +831,19 @@ void FormTaskMgr::RenderForm(const FormRecord &formRecord, const Want &want, con
         return;
     }
 
+    FormRecordReport::GetInstance().SetFormRecordRecordInfo(formRecord.formId, want);
     FormJsInfo formJsInfo = CreateFormJsInfo(formRecord.formId, formRecord);
     int32_t error = remoteFormRender->RenderForm(formJsInfo, want, FormSupplyCallback::GetInstance());
+    FormRecordReport::GetInstance().IncreaseUpdateTimes(formRecord.formId, HiSysEventPointType::TYPE_DAILY_REFRESH);
+    if (processedFormIds.find(formRecord.formId) == processedFormIds.end()) {
+        HILOG_INFO("report firtUpdateForm");
+        FormReport::GetInstance().SetDurationEndTime(formRecord.formId, FormUtil::GetCurrentMicrosecond());
+        processedFormIds.insert(formRecord.formId);
+    }
+    if (!formRecord.isVisible) {
+        FormRecordReport::GetInstance().IncreaseUpdateTimes(formRecord.formId,
+            HiSysEventPointType::TYPE_INVISIBLE_UPDATE);
+    }
     if (error != ERR_OK) {
         RemoveConnection(connectId);
         HILOG_ERROR("%{public}s fail, Failed to add form renderer", __func__);

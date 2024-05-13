@@ -20,6 +20,7 @@
 #include <unistd.h>
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
+#include "form_event_report.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -35,7 +36,11 @@ FormInfoRdbStorageMgr::FormInfoRdbStorageMgr()
 {
     FormRdbConfig formRdbConfig;
     rdbDataManager_ = std::make_shared<FormRdbDataMgr>(formRdbConfig);
-    rdbDataManager_->Init();
+    ErrCode result = rdbDataManager_->Init();
+    if (result != ERR_OK) {
+        FormEventReport::SendFormFailedEvent(FormEventName::INIT_FMS_FAILED, HiSysEventType::FAULT,
+            NewFormEventInfo::errorType::LOAD_FORM_DB_FAILED);
+    }
     HILOG_DEBUG("FormInfoRdbStorageMgr is created");
 }
 
@@ -59,6 +64,8 @@ ErrCode FormInfoRdbStorageMgr::LoadFormInfos(std::vector<std::pair<std::string, 
     ErrCode result = rdbDataManager_->QueryData(FORM_INFO_PREFIX, value);
     if (result != ERR_OK) {
         HILOG_ERROR("get entries error");
+        FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, HiSysEventType::FAULT,
+            NewFormEventInfo::errorType::LOAD_DATABASE_FAILED);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -141,6 +148,8 @@ bool FormInfoRdbStorageMgr::CheckRdbStore()
         usleep(SLEEP_INTERVAL);
         tryTimes--;
     }
+    FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, HiSysEventType::FAULT,
+        NewFormEventInfo::errorType::DATABASE_RESET_CONNECT_FAILED);
     return false;
 }
 
@@ -188,6 +197,8 @@ ErrCode FormInfoRdbStorageMgr::LoadFormData(std::vector<InnerFormInfo> &innerFor
     }
     if (result != ERR_OK) {
         HILOG_ERROR("get entries error");
+        FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, HiSysEventType::FAULT,
+            NewFormEventInfo::errorType::LOAD_DATABASE_FAILED);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     SaveEntries(value, innerFormInfos);
@@ -217,6 +228,8 @@ ErrCode FormInfoRdbStorageMgr::SaveStorageFormData(const InnerFormInfo &innerFor
     }
     if (result != ERR_OK) {
         HILOG_ERROR("put innerFormInfo to RdbStore error");
+        FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, HiSysEventType::FAULT,
+            NewFormEventInfo::errorType::DATABASE_SAVE_FORMID_FAILED);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return ERR_OK;
@@ -253,6 +266,8 @@ ErrCode FormInfoRdbStorageMgr::DeleteStorageFormData(const std::string &formId)
 
     if (result != ERR_OK) {
         HILOG_ERROR("delete key error");
+        FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, HiSysEventType::FAULT,
+            NewFormEventInfo::errorType::DATABASE_DELETE_FORMID_FAILED);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -263,6 +278,8 @@ ErrCode FormInfoRdbStorageMgr::DeleteStorageFormData(const std::string &formId)
     }
     if (result != ERR_OK) {
         HILOG_ERROR("delete status data of %{public}s failed", formId.c_str());
+        FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, HiSysEventType::FAULT,
+            NewFormEventInfo::errorType::DATABASE_DELETE_FORMID_FAILED);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -290,6 +307,8 @@ ErrCode FormInfoRdbStorageMgr::LoadStatusData(const std::string &formId, std::st
     }
     if (result != ERR_OK) {
         HILOG_ERROR("load status data of %{public}s failed, code is %{public}d", formId.c_str(), result);
+        FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, HiSysEventType::FAULT,
+            NewFormEventInfo::errorType::DATABASE_QUERY_FORMID_FAILED);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     

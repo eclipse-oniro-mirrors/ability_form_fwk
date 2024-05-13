@@ -24,6 +24,12 @@ using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
 namespace AppExecFwk {
+void MockQueryData(bool mockRet);
+void MockInit(bool mockRet);
+void MockInsertData(bool mockRet);
+void MockDeleteData(bool mockRet);
+void MockFormRdbDataMgrInit(bool mockRet);
+
 class FmsFormInfoRdbStorageMgrTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -141,6 +147,99 @@ HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_008, TestSiz
     std::string formId = "formId_1";
     auto result = FormInfoRdbStorageMgr::GetInstance().DeleteStorageFormData(formId);
     EXPECT_EQ(result, ERR_OK);
+}
+
+/**
+ * @tc.name: FmsFormInfoRdbStorageMgrTest_009
+ * @tc.desc: Test LoadFormData
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_009, TestSize.Level0)
+{
+    std::vector<InnerFormInfo> innerFormInfos;
+    FormRdbConfig formRdbConfig;
+    std::vector<std::pair<std::string, std::string>> formInfoStorages;
+    MockQueryData(false);
+    auto result = FormInfoRdbStorageMgr::GetInstance().LoadFormInfos(formInfoStorages);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    result = FormInfoRdbStorageMgr::GetInstance().LoadFormData(innerFormInfos);
+    MockQueryData(true);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+}
+
+/**
+ * @tc.name: FmsFormInfoRdbStorageMgrTest_010
+ * @tc.desc: Test SaveStorageFormData
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_010, TestSize.Level0)
+{
+    InnerFormInfo innerFormInfos;
+    FormRdbConfig formRdbConfig;
+    MockInsertData(false);
+    auto result = FormInfoRdbStorageMgr::GetInstance().SaveStorageFormData(innerFormInfos);
+    MockInsertData(true);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+}
+
+/**
+ * @tc.name: FmsFormInfoRdbStorageMgrTest_011
+ * @tc.desc: Test DeleteStorageFormData
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_011, TestSize.Level0)
+{
+    std::string formId;
+    FormRdbConfig formRdbConfig;
+    MockDeleteData(false);
+    auto result = FormInfoRdbStorageMgr::GetInstance().DeleteStorageFormData(formId);
+    MockDeleteData(true);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+}
+
+/**
+ * @tc.name: FmsFormInfoRdbStorageMgrTest_012
+ * @tc.desc: Test LoadStatusData
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_012, TestSize.Level0)
+{
+    std::string formId = "1";
+    std::string statusData;
+    MockQueryData(false);
+    auto result = FormInfoRdbStorageMgr::GetInstance().LoadStatusData(formId, statusData);
+    MockQueryData(true);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+}
+
+/**
+ * @tc.name: FmsFormInfoRdbStorageMgrTest_013
+ * @tc.desc: Test CheckRdbStore
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_013, TestSize.Level0)
+{
+    std::vector<std::pair<std::string, std::string>> formInfoStorages;
+    MockInit(false);
+    auto result = FormInfoRdbStorageMgr::GetInstance().LoadFormInfos(formInfoStorages);
+    MockInit(true);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+}
+
+/**
+ * @tc.name: FmsFormInfoRdbStorageMgrTest_014
+ * @tc.desc: Test LoadFormData
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_014, TestSize.Level0)
+{
+    std::string formId;
+    std::string statusData;
+    std::vector<InnerFormInfo> innerFormInfos;
+    MockInit(false);
+    auto result = FormInfoRdbStorageMgr::GetInstance().LoadFormData(innerFormInfos);
+    MockInit(true);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
 }
 }
 }

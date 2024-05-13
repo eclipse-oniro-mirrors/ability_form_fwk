@@ -28,6 +28,7 @@
 #include "form_util.h"
 #include "ipc_skeleton.h"
 #include "accesstoken_kit.h"
+#include "form_event_report.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -478,6 +479,11 @@ void FormDataProxyRecord::UpdatePublishedDataForm(const std::vector<DataShare::P
         formProviderData.SetImageDataMap(imageDataMap);
     }
     auto ret = FormMgrAdapter::GetInstance().UpdateForm(formId_, uid_, formProviderData);
+    NewFormEventInfo eventInfo;
+    eventInfo.formId = formId_;
+    eventInfo.bundleName = bundleName_;
+    FormEventReport::SendFourthFormEvent(FormEventName::PROXY_UPDATE_FORM,
+        HiSysEventType::STATISTIC, eventInfo, wantCache_);
     if (ret == ERR_OK && receivedDataCount_ < INT32_MAX) {
         receivedDataCount_ += 1;
     }

@@ -33,6 +33,8 @@ const std::string DATA_CACHE = "DATA_CACHE";
 const std::string FORM_IMAGES = "FORM_IMAGES";
 const std::string CACHE_STATE = "CACHE_STATE";
 
+void MockInit(bool mockRet);
+
 class FmsFormRdbDataMgrTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -290,6 +292,19 @@ HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_014, Function | SmallTest 
     EXPECT_NE(result, nullptr);
 
     GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_014 end";
+}
+
+/**
+ * @tc.name: FmsFormRdbDataMgrTest_015
+ * @tc.desc: Test onCorruption
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_015, Function | SmallTest | Level1)
+{
+    FormRdbConfig formRdbConfig_;
+    RdbStoreDataCallBackFormInfoStorage rdbDataCallBack_(formRdbConfig_);
+    auto result = rdbDataCallBack_.onCorruption(FORM_CACHE_TABLE);
+    EXPECT_EQ(result, NativeRdb::E_OK);
 }
 }
 }
