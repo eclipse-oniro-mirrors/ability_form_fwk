@@ -44,7 +44,7 @@ void FormRecordReport::SetFormRecordRecordInfo(int64_t formId, const Want &want)
 
 void FormRecordReport::IncreaseUpdateTimes(int64_t formId, HiSysEventPointType type)
 {
-    HILOG_INFO("IncreaseUpdateTimes start, formId [%{public}lld]", formId);
+    HILOG_INFO("IncreaseUpdateTimes start, formId [%{public}" PRId64 "]", formId);
     FormRecordReportInfo info;
     if (formRecordReportMap_.find(formId) != formRecordReportMap_.end()) {
         info = formRecordReportMap_[formId];

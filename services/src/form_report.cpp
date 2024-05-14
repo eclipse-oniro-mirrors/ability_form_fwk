@@ -151,7 +151,7 @@ void FormReport::HandleAddFormStatistic(int64_t formId)
     std::lock_guard<std::mutex> guard(formReport_);
     auto &record = formStatisticMap_[formId];
     if (formStatisticMap_.count(formId) == 0) {
-        HILOG_INFO("Form ID not found in formStatisticMap_: %lld", formId);
+        HILOG_INFO("Form ID not found in formStatisticMap_: %{public}" PRId64, formId);
         return;
     }
     NewFormEventInfo eventInfo;
