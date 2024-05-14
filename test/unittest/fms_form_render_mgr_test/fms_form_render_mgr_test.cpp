@@ -36,6 +36,7 @@ using namespace OHOS::AppExecFwk;
 
 extern void MockGetFormRecord(bool mockRet, int32_t type);
 extern void MockRenderForm(bool mockRet);
+extern void MockSandboxRenderForm(bool mockRet);
 extern void MockUpdateRenderingForm(bool mockRet);
 extern void MockStopRenderingForm(bool mockRet);
 extern void MockReleaseRenderer(bool mockRet);
@@ -105,7 +106,7 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_003, TestSize.Level0)
     WantParams wantParams;
     sptr<IRemoteObject> hostToken = nullptr;
     formRecord.privacyLevel = 1;
-    MockRenderForm(true);
+    MockSandboxRenderForm(true);
     EXPECT_EQ(ERR_OK, formRenderMgr.RenderForm(formRecord, wantParams, hostToken));
     GTEST_LOG_(INFO) << "FormRenderMgrTest_003 end";
 }

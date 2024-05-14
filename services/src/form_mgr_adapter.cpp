@@ -335,6 +335,7 @@ ErrCode FormMgrAdapter::AllotForm(const int64_t formId, const Want &want,
     bool specificFormFlag = false;
     if (want.HasParameter(Constants::PARAM_FORM_MIGRATE_FORM_KEY)) {
         specificFormFlag = want.GetBoolParam(Constants::PARAM_FORM_MIGRATE_FORM_KEY, false);
+        HILOG_INFO("migrate_form is %{public}d", specificFormFlag);
         wantParams.Remove(Constants::PARAM_FORM_MIGRATE_FORM_KEY);
     }
 

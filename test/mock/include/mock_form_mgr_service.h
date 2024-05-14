@@ -95,6 +95,8 @@ public:
         std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
         const std::vector<FormDataProxy> &formDataProxies));
     MOCK_METHOD3(GetFormInstanceById, int32_t(int64_t formId, bool isUnusedIncluded, FormInstance &formInstances));
+    MOCK_METHOD1(RegisterPublishFormInterceptor, int32_t(const sptr<IRemoteObject> &interceptorCallback));
+    MOCK_METHOD1(UnregisterPublishFormInterceptor, int32_t(const sptr<IRemoteObject> &interceptorCallback));
     MOCK_METHOD3(RegisterClickEventObserver, ErrCode(
         const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &observer));
     MOCK_METHOD3(UnregisterClickEventObserver, ErrCode(
@@ -102,6 +104,9 @@ public:
     MOCK_METHOD2(RegisterFormRouterProxy, ErrCode(const std::vector<int64_t> &formIds,
         const sptr<IRemoteObject> &callerToken));
     MOCK_METHOD1(UnregisterFormRouterProxy, ErrCode(const std::vector<int64_t> &formIds));
+    MOCK_METHOD1(SetFormsRecyclable, int32_t(const std::vector<int64_t> &formIds));
+    MOCK_METHOD2(RecycleForms, int32_t(const std::vector<int64_t> &formIds, const Want &want));
+    MOCK_METHOD2(RecoverForms, int32_t(const std::vector<int64_t> &formIds, const Want &want));
     MOCK_METHOD2(UpdateFormLocation, ErrCode(const int64_t &formId, const int32_t &formLocation));
     MOCK_METHOD2(SetPublishFormResult, ErrCode(const int64_t formId, Constants::PublishFormResult &errorCodeInfo));
     MOCK_METHOD1(AcquireAddFormResult, ErrCode(const int64_t formId));

@@ -2695,4 +2695,261 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0106, TestSize.Level1) {
     EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0106 ends";
 }
+
+/**
+ * @tc.number: FormMgrStubTest_0107
+ * @tc.name: test HandleRegisterPublishFormInterceptor function.
+ * @tc.desc: Verify that the HandleRegisterPublishFormInterceptor interface is called normally
+ *           and the return value is ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0107, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0107 starts";
+    MessageParcel data;
+    MessageParcel reply;
+    const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormToken();
+    data.WriteRemoteObject(callerToken);
+    EXPECT_CALL(*mockFormMgrService, RegisterPublishFormInterceptor(_))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    EXPECT_EQ(mockFormMgrService->HandleRegisterPublishFormInterceptor(data, reply), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0107 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_0108
+ * @tc.name: test HandleUnregisterPublishFormInterceptor function.
+ * @tc.desc: Verify that the HandleUnregisterPublishFormInterceptor interface is called normally
+ *           and the return value is ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0108, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0108 starts";
+    MessageParcel data;
+    MessageParcel reply;
+    const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormToken();
+    data.WriteRemoteObject(callerToken);
+    EXPECT_CALL(*mockFormMgrService, UnregisterPublishFormInterceptor(_))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    EXPECT_EQ(mockFormMgrService->HandleUnregisterPublishFormInterceptor(data, reply), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0108 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_0109
+ * @tc.name: test HandleRegisterClickCallbackEventObserver function.
+ * @tc.desc: Verify that the HandleRegisterClickCallbackEventObserver interface is called normally
+ *           and the return value is ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0109, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0109 starts";
+    MessageParcel data;
+    MessageParcel reply;
+    const std::string bundleName = "bundleName";
+    data.WriteString(bundleName);
+    const std::string formEventType = "formEventType";
+    data.WriteString(formEventType);
+    const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormToken();
+    data.WriteRemoteObject(callerToken);
+    EXPECT_CALL(*mockFormMgrService, RegisterClickEventObserver(_, _, _))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    EXPECT_EQ(mockFormMgrService->HandleRegisterClickCallbackEventObserver(data, reply), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0109 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_0110
+ * @tc.name: test HandleUnregisterClickCallbackEventObserver function.
+ * @tc.desc: Verify that the HandleUnregisterClickCallbackEventObserver interface is called normally
+ *           and the return value is ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0110, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0110 starts";
+    MessageParcel data;
+    MessageParcel reply;
+    const std::string bundleName = "bundleName";
+    data.WriteString(bundleName);
+    const std::string formEventType = "formEventType";
+    data.WriteString(formEventType);
+    const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormToken();
+    data.WriteRemoteObject(callerToken);
+    EXPECT_CALL(*mockFormMgrService, UnregisterClickEventObserver(_, _, _))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    EXPECT_EQ(mockFormMgrService->HandleUnregisterClickCallbackEventObserver(data, reply), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0110 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_0111
+ * @tc.name: test HandleRegisterAddObserver function.
+ * @tc.desc: Verify that the HandleRegisterAddObserver interface is called normally and the return value is ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0111, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0111 starts";
+    MessageParcel data;
+    MessageParcel reply;
+    const std::string bundleName = "bundleName";
+    data.WriteString(bundleName);
+    const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormToken();
+    data.WriteRemoteObject(callerToken);
+    EXPECT_CALL(*mockFormMgrService, RegisterAddObserver(_, _))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    EXPECT_EQ(mockFormMgrService->HandleRegisterAddObserver(data, reply), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0111 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_0112
+ * @tc.name: test HandleRegisterRemoveObserver function.
+ * @tc.desc: Verify that the HandleRegisterRemoveObserver interface is called normally and the return value is ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0112, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0112 starts";
+    MessageParcel data;
+    MessageParcel reply;
+    const std::string bundleName = "bundleName";
+    data.WriteString(bundleName);
+    const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormToken();
+    data.WriteRemoteObject(callerToken);
+    EXPECT_CALL(*mockFormMgrService, RegisterRemoveObserver(_, _))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    EXPECT_EQ(mockFormMgrService->HandleRegisterRemoveObserver(data, reply), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0112 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_0113
+ * @tc.name: test HandleRegisterRemoveObserver function.
+ * @tc.desc: Verify that the HandleRegisterRemoveObserver interface is called normally and the return value is ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0113, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0113 starts";
+    MessageParcel data;
+    MessageParcel reply;
+    const std::string bundleName = "bundleName";
+    data.WriteString(bundleName);
+    const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormToken();
+    data.WriteRemoteObject(callerToken);
+    EXPECT_CALL(*mockFormMgrService, RegisterRemoveObserver(_, _))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    EXPECT_EQ(mockFormMgrService->HandleRegisterRemoveObserver(data, reply), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0113 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_0114
+ * @tc.name: test HandleSetFormsRecyclable function.
+ * @tc.desc: Verify that the HandleSetFormsRecyclable interface is called normally and the return value is ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0114, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0114 starts";
+    MessageParcel data;
+    MessageParcel reply;
+    std::vector<int64_t> formIds;
+    data.WriteInt64Vector(formIds);
+    EXPECT_CALL(*mockFormMgrService, SetFormsRecyclable(_))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    EXPECT_EQ(mockFormMgrService->HandleSetFormsRecyclable(data, reply), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0114 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_0115
+ * @tc.name: test HandleRecycleForms function.
+ * @tc.desc: Verify that the HandleRecycleForms interface is called normally and the return value is ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0115, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0115 starts";
+    MessageParcel data;
+    MessageParcel reply;
+    const Want want = {};
+    data.WriteParcelable(&want);
+    EXPECT_CALL(*mockFormMgrService, RecycleForms(_, _))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    EXPECT_EQ(mockFormMgrService->HandleRecycleForms(data, reply), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0115 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_0116
+ * @tc.name: test HandleRecoverForms function.
+ * @tc.desc: Verify that the HandleRecoverForms interface is called normally and the return value is ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0116, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0116 starts";
+    MessageParcel data;
+    MessageParcel reply;
+    const Want want = {};
+    data.WriteParcelable(&want);
+    EXPECT_CALL(*mockFormMgrService, RecoverForms(_, _))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    EXPECT_EQ(mockFormMgrService->HandleRecoverForms(data, reply), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0116 ends";
+}
+
+
+/**
+ * @tc.number: FormMgrStubTest_0117
+ * @tc.name: test HandleBackgroundEvent function.
+ * @tc.desc: Verify that the HandleBackgroundEvent interface is called normally and the return value is ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0117, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0117 starts";
+    MessageParcel data;
+    MessageParcel reply;
+    constexpr int64_t formId = 1;
+    data.WriteInt64(formId);
+    const Want want = {};
+    data.WriteParcelable(&want);
+    const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormToken();
+    data.WriteRemoteObject(callerToken);
+    EXPECT_CALL(*mockFormMgrService, BackgroundEvent(_, _, _))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    EXPECT_EQ(mockFormMgrService->HandleBackgroundEvent(data, reply), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0117 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_0118
+ * @tc.name: test HandleGetFormsCount function.
+ * @tc.desc: Verify that the HandleGetFormsCount interface is called normally and the return value is ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0118, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0118 starts";
+    MessageParcel data;
+    MessageParcel reply;
+    bool isTempFormFlag = false;
+    data.WriteBool(isTempFormFlag);
+    EXPECT_CALL(*mockFormMgrService, GetFormsCount(_, _))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    EXPECT_EQ(mockFormMgrService->HandleGetFormsCount(data, reply), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0118 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_0119
+ * @tc.name: test HandleGetHostFormsCount function.
+ * @tc.desc: Verify that the HandleGetHostFormsCount interface is called normally and the return value is ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0119, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0119 starts";
+    MessageParcel data;
+    MessageParcel reply;
+    const std::string bundleName = "bundleName";
+    data.WriteString(bundleName);
+    EXPECT_CALL(*mockFormMgrService, GetHostFormsCount(_, _))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    EXPECT_EQ(mockFormMgrService->HandleGetHostFormsCount(data, reply), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0119 ends";
+}
 }
