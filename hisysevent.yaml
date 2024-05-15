@@ -149,6 +149,6 @@ UNNORMATIVE_PUBLISH_FORM_TO_HOST:
   FORM_DIMENSION: {type: INT64, desc: form dimension}
   ABILITY_NAME: {type: STRING, desc: ability name}
 
-FORM_CARD_BLOCK:
+FORM_BLOCK_CALLSTACK:
   __BASE: {type: FAULT, level: MINOR, tag: ability, desc: form manager}
   BUNDLE_NAME: {type: STRING, desc: bundle name}
