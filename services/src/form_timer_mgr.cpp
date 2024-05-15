@@ -1271,7 +1271,7 @@ void FormTimerMgr::EnsureInitIntervalTimer()
 void FormTimerMgr::FormRefreshCountReport()
 {
     HILOG_INFO("%{public}s, init base Refresh count task", __func__);
-    if (intervalTimerId_ != 0L) {
+    if (limiterTimerReportId_ != 0L) {
         return;
     }
     auto timerOption = std::make_shared<FormTimerOption>();
@@ -1283,16 +1283,16 @@ void FormTimerMgr::FormRefreshCountReport()
     timerOption->SetInterval(interval);
     auto timeCallback = []() { FormRecordReport::GetInstance().HandleFormRefreshCount(); };
     timerOption->SetCallbackInfo(timeCallback);
-    intervalTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption);
+    limiterTimerReportId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption);
     int64_t timeInSec = GetBootTimeMs();
     HILOG_INFO("TimerId: %{public}" PRId64 ", timeInSec: %{public}" PRId64 ", interval: %{public}" PRId64 ".",
-        intervalTimerId_, timeInSec, interval);
+        limiterTimerReportId_, timeInSec, interval);
     int64_t startTime = timeInSec + interval;
-    bool bRet = MiscServices::TimeServiceClient::GetInstance()->StartTimer(intervalTimerId_,
+    bool bRet = MiscServices::TimeServiceClient::GetInstance()->StartTimer(limiterTimerReportId_,
         static_cast<uint64_t>(startTime));
     if (!bRet) {
-        HILOG_ERROR("%{public}s failed, init intervalTimer task error", __func__);
-        InnerClearIntervalTimer();
+        HILOG_ERROR("%{public}s failed, init limiterTimerReport task error", __func__);
+        InnerClearIntervalReportTimer();
     }
     HILOG_INFO("Create intervalTimer end");
 }
@@ -1304,6 +1304,7 @@ void FormTimerMgr::ClearIntervalTimer()
     HILOG_INFO("%{public}s start", __func__);
     std::lock_guard<std::mutex> lock(intervalMutex_);
     InnerClearIntervalTimer();
+    InnerClearIntervalReportTimer();
     HILOG_INFO("%{public}s end", __func__);
 }
 
@@ -1315,6 +1316,18 @@ void FormTimerMgr::InnerClearIntervalTimer()
         MiscServices::TimeServiceClient::GetInstance()->StopTimer(intervalTimerId_);
         MiscServices::TimeServiceClient::GetInstance()->DestroyTimer(intervalTimerId_);
         intervalTimerId_ = 0L;
+    }
+    HILOG_INFO("%{public}s end", __func__);
+}
+
+void FormTimerMgr::InnerClearIntervalReportTimer()
+{
+    HILOG_INFO("%{public}s start", __func__);
+    if (limiterTimerReportId_ != 0L) {
+        HILOG_INFO("Destroy interval Report Timerr");
+        MiscServices::TimeServiceClient::GetInstance()->StopTimer(limiterTimerReportId_);
+        MiscServices::TimeServiceClient::GetInstance()->DestroyTimer(limiterTimerReportId_);
+        limiterTimerReportId_ = 0L;
     }
     HILOG_INFO("%{public}s end", __func__);
 }
@@ -1433,8 +1446,8 @@ void FormTimerMgr::Init()
     updateAtTimerId_ = 0L;
     dynamicAlarmTimerId_ = 0L;
     limiterTimerId_ = 0L;
+    limiterTimerReportId_ = 0L;
     FormRefreshCountReport();
-
     HILOG_INFO("%{public}s end", __func__);
 }
 

@@ -378,6 +378,7 @@ private:
 
     void FormRefreshCountReport();
     void InnerClearIntervalTimer();
+    void InnerClearIntervalReportTimer();
 
     mutable std::mutex intervalMutex_;
     mutable std::mutex updateAtMutex_;
@@ -394,6 +395,7 @@ private:
     uint64_t updateAtTimerId_ = 0L;
     uint64_t dynamicAlarmTimerId_ = 0L;
     uint64_t limiterTimerId_ = 0L;
+    uint64_t limiterTimerReportId_ = 0L;
 
     std::shared_ptr<WantAgent> currentUpdateAtWantAgent_ = nullptr;
     std::shared_ptr<WantAgent> currentDynamicWantAgent_ = nullptr;

@@ -50,6 +50,22 @@ void FmsFormInfoRdbStorageMgrTest::TearDown()
 {}
 
 /**
+ * @tc.name: FmsFormInfoRdbStorageMgrTest_014
+ * @tc.desc: Test LoadFormData
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_000, TestSize.Level0)
+{
+    std::string formId;
+    std::string statusData;
+    std::vector<InnerFormInfo> innerFormInfos;
+    MockInit(false);
+    auto result = FormInfoRdbStorageMgr::GetInstance().LoadFormData(innerFormInfos);
+    MockInit(true);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+}
+
+/**
  * @tc.name: FmsFormInfoRdbStorageMgrTest_001
  * @tc.desc: Test UpdateBundleFormInfos
  * @tc.type: FUNC
@@ -222,22 +238,6 @@ HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_013, TestSiz
     std::vector<std::pair<std::string, std::string>> formInfoStorages;
     MockInit(false);
     auto result = FormInfoRdbStorageMgr::GetInstance().LoadFormInfos(formInfoStorages);
-    MockInit(true);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
-}
-
-/**
- * @tc.name: FmsFormInfoRdbStorageMgrTest_014
- * @tc.desc: Test LoadFormData
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormInfoRdbStorageMgrTest, FmsFormInfoRdbStorageMgrTest_014, TestSize.Level0)
-{
-    std::string formId;
-    std::string statusData;
-    std::vector<InnerFormInfo> innerFormInfos;
-    MockInit(false);
-    auto result = FormInfoRdbStorageMgr::GetInstance().LoadFormData(innerFormInfos);
     MockInit(true);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
 }

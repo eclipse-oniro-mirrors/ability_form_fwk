@@ -835,11 +835,7 @@ void FormTaskMgr::RenderForm(const FormRecord &formRecord, const Want &want, con
     FormJsInfo formJsInfo = CreateFormJsInfo(formRecord.formId, formRecord);
     int32_t error = remoteFormRender->RenderForm(formJsInfo, want, FormSupplyCallback::GetInstance());
     FormRecordReport::GetInstance().IncreaseUpdateTimes(formRecord.formId, HiSysEventPointType::TYPE_DAILY_REFRESH);
-    if (processedFormIds.find(formRecord.formId) == processedFormIds.end()) {
-        HILOG_INFO("report firtUpdateForm");
-        FormReport::GetInstance().SetDurationEndTime(formRecord.formId, FormUtil::GetCurrentMicrosecond());
-        processedFormIds.insert(formRecord.formId);
-    }
+    FormReport::GetInstance().SetDurationEndTime(formRecord.formId, FormUtil::GetCurrentMicrosecond());
     if (!formRecord.isVisible) {
         FormRecordReport::GetInstance().IncreaseUpdateTimes(formRecord.formId,
             HiSysEventPointType::TYPE_INVISIBLE_UPDATE);

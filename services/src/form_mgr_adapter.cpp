@@ -154,6 +154,10 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
         HILOG_ERROR("CheckFormCountLimit failed");
         return ret;
     }
+    if (formId > 0) {
+        FormReport::GetInstance().InsertFormId(formId);
+        HILOG_DEBUG("HiSysevent Insert Formid");
+    }
 
     // get from config info
     FormItemInfo formItemInfo;
@@ -168,7 +172,6 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
         HILOG_ERROR("AddForm fail, %{public}s is unTrust", formItemInfo.GetProviderBundleName().c_str());
         return ERR_APPEXECFWK_FORM_NOT_TRUST;
     }
-
     // publish form
     if (formId > 0 && FormDataMgr::GetInstance().IsRequestPublishForm(formId)) {
         ret = AddRequestPublishForm(formItemInfo, want, callerToken, formInfo);
