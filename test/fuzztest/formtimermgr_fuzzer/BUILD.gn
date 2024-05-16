@@ -42,6 +42,12 @@ ohos_fuzztest("FormTimerMgrFuzzTest") {
     "${form_fwk_path}:fmskit_native",
   ]
 
+  defines = []
+
+  if (res_schedule_service) {
+    defines += [ "RES_SCHEDULE_ENABLE" ]
+  }
+
   external_deps = [
     "ability_base:base",
     "ability_base:want",
