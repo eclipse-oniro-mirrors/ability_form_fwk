@@ -77,7 +77,7 @@ const std::map<FormEventName, std::string> EVENT_NAME_MAP = {
         FormEventName::UPDATE_FORM_REFRESH_TIMES, "UPDATE_FORM_REFRESH_TIMES"),
     std::map<FormEventName, std::string>::value_type(FormEventName::PROXY_UPDATE_FORM, "PROXY_UPDATE_FORM"),
     std::map<FormEventName, std::string>::value_type(
-        FormEventName::UNNORMATIVE_PUBLISH_FORM_TO_HOST, "UNNORMATIVE_PUBLISH_FORM_TO_HOST"),
+        FormEventName::INVALID_PUBLISH_FORM_TO_HOST, "INVALID_PUBLISH_FORM_TO_HOST"),
     std::map<FormEventName, std::string>::value_type(FormEventName::UNBIND_FORM_APP, "UNBIND_FORM_APP"),
 };
 }
@@ -261,7 +261,7 @@ void FormEventReport::SendFourthFormEvent(const FormEventName &eventName, HiSysE
                     GetIntParam(Constants::PARAM_FORM_DIMENSION_KEY, 0)),
                 EVENT_KEY_ABILITY_NAME, want.GetStringParam(Constants::PARAM_ABILITY_NAME_KEY));
             break;
-        case FormEventName::UNNORMATIVE_PUBLISH_FORM_TO_HOST:
+        case FormEventName::INVALID_PUBLISH_FORM_TO_HOST:
             HiSysEventWrite(HiSysEvent::Domain::FORM_MANAGER, name, type,
                 EVENT_KEY_CLIENT_BUNDLE_NAME, want.GetStringParam(AppExecFwk::Constants::PARAM_CALLER_BUNDLE_NAME_KEY),
                 EVENT_KEY_HOST_BUNDLE_NAME, want.GetStringParam(AppExecFwk::Constants::PARAM_FORM_HOST_BUNDLENAME_KEY),
