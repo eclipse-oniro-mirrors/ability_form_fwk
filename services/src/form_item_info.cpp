@@ -593,5 +593,16 @@ void FormItemInfo::SetIsThemeForm(bool isThemeForm)
 {
     isThemeForm_ = isThemeForm;
 }
+
+BundleType FormItemInfo::GetFormBundleType() const
+{
+    return bundleType_;
+}
+
+void FormItemInfo::SetFormBundleType(BundleType formBundleType)
+{
+    bundleType_ = formBundleType;
+}
+
 }  // namespace AppExecFwk
 }  // namespace OHOS

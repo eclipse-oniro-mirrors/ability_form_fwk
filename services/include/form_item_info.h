@@ -406,6 +406,18 @@ public:
      */
     void SetIsThemeForm(bool isThemeForm);
 
+    /**
+     * @brief Get bundleType of formProvider.
+     * @return bundleType of from.
+     */
+    BundleType GetFormBundleType() const;
+
+    /**
+     * @brief Set bundleType of formProvider.
+     * @param formBundleType formBundleType
+     */
+    void SetFormBundleType(BundleType formBundleType);
+
 private:
     /**
      * @brief Equal or not.
@@ -452,6 +464,7 @@ private:
     std::string description_ = "";
     Constants::FormLocation formLocation_;
     bool isThemeForm_ = false;
+    BundleType bundleType_ = BundleType::APP;
 };
 } // namespace AppExecFwk
 } // namespace OHOS
