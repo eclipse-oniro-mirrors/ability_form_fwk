@@ -280,6 +280,7 @@ HWTEST_F(FmsFormProviderMgrTest, RefreshForm_003, TestSize.Level1)
     FormItemInfo info;
     FormDataMgr::GetInstance().AllotFormHostRecord(info, token_, formId, callingUid);
 #ifdef SUPPORT_POWER
+    MockConnectServiceAbility(true);
     EXPECT_EQ(ERR_OK, FormProviderMgr::GetInstance().RefreshForm(formId, want, true));
 #endif
 
@@ -327,6 +328,7 @@ HWTEST_F(FmsFormProviderMgrTest, ConnectAmsForRefreshPermission_001, TestSize.Le
     GTEST_LOG_(INFO) << "fms_form_mgr_provider_test_008 start";
     int64_t formId = 1;
     Want want;
+    MockConnectServiceAbility(false);
     ErrCode ret = FormProviderMgr::GetInstance().ConnectAmsForRefreshPermission(formId, want);
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
     want.SetParam(Constants::FORM_PERMISSION_NAME_KEY, TEST_PARAM_FORM_PERMISSION_NAME);
