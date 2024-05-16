@@ -67,7 +67,7 @@ void FormRenderEventReport::SendBlockFaultEvent(pid_t processId, pid_t jsThreadI
     }
     HiSysEventWrite(
         HiSysEvent::Domain::FORM_MANAGER,
-        "FORM_RENDER_BLOCK",
+        "FORM_BLOCK_CALLSTACK",
         HiSysEvent::EventType::FAULT,
         EVENT_KEY_FORM_BLOCK_CALLSTACK, traceStr,
         EVENT_KEY_FORM_BLOCK_APPNAME, bundleName);
