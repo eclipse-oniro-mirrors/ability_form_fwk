@@ -225,6 +225,7 @@ ohos_shared_library("fmskit_native") {
 
   external_deps = [
     "ability_base:want",
+    "ability_runtime:extensionkit_native",
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "hilog:libhilog",
@@ -267,6 +268,7 @@ ohos_shared_library("fmskit_provider_client") {
 
   external_deps = [
     "ability_base:want",
+    "ability_runtime:ability_connect_callback_stub",
     "ability_runtime:abilitykit_native",
     "c_utils:utils",
     "eventhandler:libeventhandler",
