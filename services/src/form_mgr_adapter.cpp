@@ -2433,7 +2433,7 @@ ErrCode FormMgrAdapter::RequestPublishForm(Want &want, bool withFormBindingData,
     if (errCode != ERR_OK) {
         FormDataMgr::GetInstance().RemoveRequestPublishFormInfo(formId);
         NewFormEventInfo eventInfo;
-        FormEventReport::SendFourthFormEvent(FormEventName::UNNORMATIVE_PUBLISH_FORM_TO_HOST,
+        FormEventReport::SendFourthFormEvent(FormEventName::INVALID_PUBLISH_FORM_TO_HOST,
             HiSysEventType::STATISTIC, eventInfo, want);
     }
 
