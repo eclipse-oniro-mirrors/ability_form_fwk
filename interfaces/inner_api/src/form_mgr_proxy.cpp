@@ -2284,5 +2284,26 @@ ErrCode FormMgrProxy::RequestPublishFormWithSnapshot(Want &want, bool withFormBi
     }
     return errCode;
 }
+
+int32_t FormMgrProxy::BatchRefreshForms(const int32_t formRefreshType)
+{
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("failed to write interface token");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt32(formRefreshType)) {
+        HILOG_ERROR("failed to write formRefreshType");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+    int32_t error = SendTransactCmd(IFormMgr::Message::FORM_MGR_BATCH_REFRESH_FORMS, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("failed to SendTransactCmd: %{public}d.", error);
+        return error;
+    }
+    return reply.ReadInt32();
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

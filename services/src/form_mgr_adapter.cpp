@@ -4171,6 +4171,24 @@ ErrCode FormMgrAdapter::UpdateFormLocation(const int64_t &formId, const int32_t 
     return ERR_OK;
 }
 
+ErrCode FormMgrAdapter::BatchRefreshForms(const int32_t formRefreshType)
+{
+    std::vector<FormRecord> visibleFormRecords;
+    std::vector<FormRecord> inVisibleFormRecords;
+    FormDataMgr::GetInstance().GetRecordsByFormType(formRefreshType, visibleFormRecords, inVisibleFormRecords);
+    HILOG_INFO("getVisibleRecords ByFormType size: %{public}zu.", visibleFormRecords.size());
+    Want reqWant;
+    int32_t currentActiveUserId = FormUtil::GetCurrentAccountId();
+    reqWant.SetParam(Constants::PARAM_FORM_USER_ID, currentActiveUserId);
+    for (auto formRecord : visibleFormRecords) {
+        FormProviderMgr::GetInstance().RefreshForm(formRecord.formId, reqWant, true);
+    }
+    for (auto formRecord : inVisibleFormRecords) {
+        FormProviderMgr::GetInstance().RefreshForm(formRecord.formId, reqWant, true);
+    }
+    return ERR_OK;
+}
+
 #ifdef RES_SCHEDULE_ENABLE
 void FormMgrAdapter::SetTimerTaskNeeded(bool isTimerTaskNeeded)
 {

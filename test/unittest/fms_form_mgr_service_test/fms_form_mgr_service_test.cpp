@@ -2576,4 +2576,36 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0123, TestSize.Level1)
     formMgrService.OnSystemloadLevel(level);
     GTEST_LOG_(INFO) << "FormMgrService_0123 end";
 }
+
+/**
+ * @tc.number: FormMgrService_0124
+ * @tc.name: test BatchRefreshForms function.
+ * @tc.desc: Verify that the BatchRefreshForms interface is called normally.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0124, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0124 start";
+    FormMgrService formMgrService;
+    MockIsSACall(true);
+    int32_t formRefreshType = Constants::REFRESH_ALL_FORM;
+    EXPECT_EQ(ERR_OK, formMgrService.BatchRefreshForms(formRefreshType));
+    GTEST_LOG_(INFO) << "FormMgrService_0124 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0125
+ * @tc.name: test BatchRefreshForms function.
+ * @tc.desc: Verify that the BatchRefreshForms interface is called normally.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0125, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0125 start";
+    FormMgrService formMgrService;
+    MockIsSACall(false);
+    MockIsSystemAppByFullTokenID(false);
+    MockVerifyCallingPermission(true);
+    int32_t formRefreshType = Constants::REFRESH_ALL_FORM;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, formMgrService.BatchRefreshForms(formRefreshType));
+    GTEST_LOG_(INFO) << "FormMgrService_0125 end";
+}
 }

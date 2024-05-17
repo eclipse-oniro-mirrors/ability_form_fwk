@@ -2725,4 +2725,49 @@ HWTEST_F(FormMgrTest, FormMgrTest_0126, TestSize.Level1) {
     EXPECT_EQ(FormMgr::GetInstance().AcquireAddFormResult(formId), ERR_APPEXECFWK_FORM_INVALID_FORM_ID);
     GTEST_LOG_(INFO) << "FormMgrTest_0126 test ends";
 }
+
+/**
+ * @tc.name: FormMgrTest_0127
+ * @tc.desc: Verify BatchRefreshForms (The return value of mock function is not 0)
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0127, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0127 starts";
+    FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
+    int32_t formRefreshType = Constants::REFRESH_ALL_FORM;
+    EXPECT_EQ(FormMgr::GetInstance().BatchRefreshForms(formRefreshType), ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR);
+    GTEST_LOG_(INFO) << "FormMgrTest_0127 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0128
+ * @tc.desc: Verify BatchRefreshForms (The return value of mock function is not 0)
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0128, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0128 starts";
+    FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
+    int32_t formRefreshType = Constants::REFRESH_ALL_FORM - 1;
+    EXPECT_EQ(FormMgr::GetInstance().BatchRefreshForms(formRefreshType), ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    formRefreshType = Constants::REFRESH_ATOMIC_FORM + 1;
+    EXPECT_EQ(FormMgr::GetInstance().BatchRefreshForms(formRefreshType), ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FormMgrTest_0128 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0129
+ * @tc.desc: Verify BatchRefreshForms (The return value of mock function is not 0)
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0129, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0129 starts";
+    EXPECT_CALL(*mockProxy, BatchRefreshForms(_))
+        .Times(1)
+        .WillOnce(Return(OHOS::ERR_OK));
+    sptr<MockFormToken> token = new (std::nothrow) MockFormToken();
+    FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
+        int32_t formRefreshType = Constants::REFRESH_ALL_FORM;
+    EXPECT_EQ(FormMgr::GetInstance().BatchRefreshForms(formRefreshType), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrTest_0129 test ends";
+}
 } // namespace
