@@ -102,6 +102,7 @@ extern void MockGetAbilityInfoByActionAbilityInfo(bool mockRet);
 extern void MockGetAbilityInfoByActionExtensionInfo(bool mockRet);
 extern void MockGetRunningFormInfosByFormId(int32_t mockRet);
 extern void MockGetRunningFormInfos(int32_t mockRet);
+void MockRequestPublishFormToHost(bool mockRet);
 
 namespace {
 class FmsFormMgrAdapterTest : public testing::Test {
@@ -3064,7 +3065,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0156, TestSize.Level0)
     FormMgrAdapter formMgrAdapter;
     Want want = {};
     MockConnectServiceAbility(false);
-    EXPECT_NE(formMgrAdapter.RequestPublishFormToHost(want), ERR_OK);
+    EXPECT_NE(formMgrAdapter.RequestPublishFormToHost(want), ERR_APPEXECFWK_FORM_GET_HOST_FAILED);
     GTEST_LOG_(INFO) << "FormMgrAdapter_0156 end";
 }
 
@@ -4503,5 +4504,22 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_231, TestSize.Level0)
     EXPECT_EQ(true, formMgrAdapter.IsValidPublishEvent(bmsProxy, bundleName, want, needCheckFormPermission));
     FormBmsHelper::GetInstance().iBundleMgr_ = backup;
     GTEST_LOG_(INFO) << "FormMgrAdapter_231 end";
+}
+
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_232, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_232 start";
+    FormMgrAdapter formMgrAdapter;
+    Want want;
+    bool withFormBindingData = false;
+    int64_t formId1 = 1;
+    std::unique_ptr<FormProviderData> formBindingData = std::make_unique<FormProviderData>();
+    std::vector<FormDataProxy> formDataProxies;
+
+    MockRequestPublishFormToHost(false);
+    auto ret = formMgrAdapter.RequestPublishForm(want, withFormBindingData, formBindingData, formId1, formDataProxies);
+    MockRequestPublishFormToHost(true);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED);
+    GTEST_LOG_(INFO) << "FormMgrAdapter_232 end";
 }
 }

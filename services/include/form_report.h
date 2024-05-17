@@ -53,6 +53,7 @@ public:
     void SetFormRecordInfo(int64_t formId, const Want &want);
     void SetStartAquireTime(int64_t formId, int64_t startTime);
     void SetEndAquireTime(int64_t formId, int64_t endTime);
+    void GetEndAquireTime(int64_t formId, int64_t &endTime);
     void SetStartBindTime(int64_t formId, int64_t startTime);
     void SetEndBindTime(int64_t formId, int64_t endBindTime_);
     void SetStartGetTime(int64_t formId, int64_t startTime);
@@ -61,11 +62,13 @@ public:
     void SetDurationEndTime(int64_t formId, int64_t endTime);
     void HandleAddFormStatistic(int64_t formId);
     void HandleFirstUpdateStatistic(int64_t formId);
+    void InsertFormId(int64_t formId);
     std::unordered_map<int64_t, FormStatistic>& GetStatistic();
 
 private:
     mutable std::mutex formReport_;
     std::unordered_map<int64_t, FormStatistic> formStatisticMap_;
+    std::set<int64_t> FormIds;
 };
 } // namespace AppExecFwk
 } // namespace OHOS

@@ -491,7 +491,6 @@ private:
 
 private:
     std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;
-    std::set<int64_t> processedFormIds;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
