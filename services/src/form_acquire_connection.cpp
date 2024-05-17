@@ -18,6 +18,7 @@
 
 #include <cinttypes>
 
+#include "form_report.h"
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
 #include "form_supply_callback.h"
@@ -49,6 +50,7 @@ void FormAcquireConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &
            __func__, element.GetAbilityName().c_str(), GetFormId(), resultCode);
         return;
     }
+    FormReport::GetInstance().SetEndBindTime(GetFormId(), FormUtil::GetCurrentMicrosecond());
     onFormAppConnect();
 #ifdef RES_SCHEDULE_ENABLE
     OnFormAbilityConnectDoneCallback();
@@ -70,6 +72,7 @@ void FormAcquireConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &
         __func__, info_.GetDeviceId().c_str(), info_.GetProviderBundleName().c_str(), info_.GetAbilityName().c_str());
 
     FormTaskMgr::GetInstance().PostAcquireTask(GetFormId(), want, remoteObject);
+    FormReport::GetInstance().SetStartGetTime(GetFormId(), FormUtil::GetCurrentMicrosecond());
     if (GetHostToken() != nullptr) {
         SetProviderToken(remoteObject);
     }

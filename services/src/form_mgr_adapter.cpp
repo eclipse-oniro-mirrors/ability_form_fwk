@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -73,6 +73,9 @@
 #include "parameters.h"
 #include "system_ability_definition.h"
 #include "form_task_mgr.h"
+#include "form_event_report.h"
+#include "form_report.h"
+#include "form_record_report.h"
 #include "form_ability_connection_reporter.h"
 
 namespace OHOS {
@@ -132,7 +135,7 @@ void FormMgrAdapter::Init()
  * @return Returns ERR_OK on success, others on failure.
  */
 int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
-    const sptr<IRemoteObject> &callerToken, FormJsInfo &formInfo)
+    const sptr<IRemoteObject> &callerToken, FormJsInfo &formJsInfo)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     HILOG_DEBUG("called.");
@@ -151,6 +154,10 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
         HILOG_ERROR("CheckFormCountLimit failed");
         return ret;
     }
+    if (formId > 0) {
+        FormReport::GetInstance().InsertFormId(formId);
+        HILOG_DEBUG("HiSysevent Insert Formid");
+    }
 
     // get from config info
     FormItemInfo formItemInfo;
@@ -165,10 +172,9 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
         HILOG_ERROR("AddForm fail, %{public}s is unTrust", formItemInfo.GetProviderBundleName().c_str());
         return ERR_APPEXECFWK_FORM_NOT_TRUST;
     }
-
     // publish form
     if (formId > 0 && FormDataMgr::GetInstance().IsRequestPublishForm(formId)) {
-        ret = AddRequestPublishForm(formItemInfo, want, callerToken, formInfo);
+        ret = AddRequestPublishForm(formItemInfo, want, callerToken, formJsInfo);
         if (ret != ERR_OK) {
             HILOG_ERROR("failed, add request publish form failed.");
             return ret;
@@ -176,13 +182,13 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
         bool tempFormFlag = want.GetBoolParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
         if (!tempFormFlag && (ret == ERR_OK)) {
             HILOG_DEBUG("Checks if there is a listener listening for adding form");
-            HandleFormAddObserver(formInfo.formId);
+            HandleFormAddObserver(formJsInfo.formId);
         }
     }
     if (states == AddFormResultErrorCode::UNKNOWN) {
         CancelAddFormRequestTimeOutTask(formId, ret);
     }
-    ret = AllotForm(formId, want, callerToken, formInfo, formItemInfo);
+    ret = AllotForm(formId, want, callerToken, formJsInfo, formItemInfo);
     RemoveFormIdMapElement(formId);
     if (ret != ERR_OK) {
         HILOG_ERROR("failed, allot form failed.");
@@ -313,7 +319,7 @@ ErrCode FormMgrAdapter::CheckFormCountLimit(const int64_t formId, const Want &wa
 }
 
 ErrCode FormMgrAdapter::AllotForm(const int64_t formId, const Want &want,
-    const sptr<IRemoteObject> &callerToken, FormJsInfo &formInfo, const FormItemInfo &formItemInfo)
+    const sptr<IRemoteObject> &callerToken, FormJsInfo &formJsInfo, const FormItemInfo &formItemInfo)
 {
     Want newWant(want);
     bool directCallInApp = newWant.GetBoolParam(Constants::KEY_DIRECT_CALL_INAPP, false);
@@ -332,6 +338,7 @@ ErrCode FormMgrAdapter::AllotForm(const int64_t formId, const Want &want,
     bool specificFormFlag = false;
     if (want.HasParameter(Constants::PARAM_FORM_MIGRATE_FORM_KEY)) {
         specificFormFlag = want.GetBoolParam(Constants::PARAM_FORM_MIGRATE_FORM_KEY, false);
+        HILOG_INFO("migrate_form is %{public}d", specificFormFlag);
         wantParams.Remove(Constants::PARAM_FORM_MIGRATE_FORM_KEY);
     }
 
@@ -342,16 +349,16 @@ ErrCode FormMgrAdapter::AllotForm(const int64_t formId, const Want &want,
     ErrCode ret = 0;
     if (formId > 0) {
         if (specificFormFlag) {
-            ret = AllotFormBySpecificId(formItemInfo, callerToken, wantParams, formInfo);
+            ret = AllotFormBySpecificId(formItemInfo, callerToken, wantParams, formJsInfo);
         } else {
-            ret = AllotFormById(formItemInfo, callerToken, wantParams, formInfo);
+            ret = AllotFormById(formItemInfo, callerToken, wantParams, formJsInfo);
         }
     } else {
-        ret = AllotFormByInfo(formItemInfo, callerToken, wantParams, formInfo);
+        ret = AllotFormByInfo(formItemInfo, callerToken, wantParams, formJsInfo);
         bool tempFormFlag = want.GetBoolParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
         if (!tempFormFlag && (ret == ERR_OK)) {
             HILOG_DEBUG("Checks if there is a listener listening for adding form");
-            HandleFormAddObserver(formInfo.formId);
+            HandleFormAddObserver(formJsInfo.formId);
         }
     }
     return ret;
@@ -910,7 +917,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
     int32_t userId = FormUtil::GetCurrentAccountId();
     std::map<std::string, std::vector<int64_t>> eventMaps;
     std::map<std::string, std::vector<FormInstance>> formInstanceMaps;
-    
+
     for (int64_t formId : formIds) {
         if (formId <= 0) {
             HILOG_WARN("formId %{public}" PRId64 " is less than 0", formId);
@@ -924,7 +931,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
         }
 
         PaddingNotifyVisibleFormsMap(formVisibleType, formId, formInstanceMaps);
-        
+
         // Update info to host and check if the form was created by the system application.
         if ((!UpdateProviderInfoToHost(matchedFormId, userId, callerToken, formVisibleType, formRecord)) ||
             (!formRecord.isSystemApp)) {
@@ -1710,7 +1717,7 @@ ErrCode FormMgrAdapter::AllotFormByInfo(const FormItemInfo &info,
  * @return Returns ERR_OK on success, others on failure.
  */
 ErrCode FormMgrAdapter::AddNewFormRecord(const FormItemInfo &info, const int64_t formId,
-    const sptr<IRemoteObject> &callerToken, const WantParams &wantParams, FormJsInfo &formInfo)
+    const sptr<IRemoteObject> &callerToken, const WantParams &wantParams, FormJsInfo &formJsInfo)
 {
     HILOG_INFO("add new formRecord");
     FormItemInfo newInfo(info);
@@ -1737,7 +1744,7 @@ ErrCode FormMgrAdapter::AddNewFormRecord(const FormItemInfo &info, const int64_t
     }
 
     // create form info for js
-    FormDataMgr::GetInstance().CreateFormJsInfo(formId, formRecord, formInfo);
+    FormDataMgr::GetInstance().CreateFormJsInfo(formId, formRecord, formJsInfo);
 
     // storage info
     if (!newInfo.IsTemporaryForm()) {
@@ -1868,6 +1875,7 @@ ErrCode FormMgrAdapter::InnerAcquireProviderFormInfoAsync(const int64_t formId,
     want.SetElementName(info.GetProviderBundleName(), info.GetAbilityName());
     want.AddFlags(Want::FLAG_ABILITY_FORM_ENABLED);
     ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbility(want, formAcquireConnection);
+    FormReport::GetInstance().SetStartBindTime(formId, FormUtil::GetCurrentMicrosecond());
     if (errorCode != ERR_OK) {
         HILOG_ERROR("%{public}s fail, ConnectServiceAbility failed.", __func__);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
@@ -2087,6 +2095,7 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
     itemInfo.SetTransparencyEnabled(formInfo.transparencyEnabled);
     itemInfo.SetPrivacyLevel(formInfo.privacyLevel);
     itemInfo.SetDataProxyFlag(formInfo.dataProxyEnabled);
+    itemInfo.SetFormBundleType(formInfo.bundleType);
 
     SetFormItemInfoParams(bundleInfo, formInfo, itemInfo);
     return ERR_OK;
@@ -2201,20 +2210,36 @@ int FormMgrAdapter::ReleaseRenderer(int64_t formId, const std::string &compId)
     return ERR_OK;
 }
 
-ErrCode FormMgrAdapter::CheckPublishForm(Want &want)
+ErrCode FormMgrAdapter::CheckFormBundleName(Want &want, std::string &bundleName,
+                                            bool needCheckFormPermission)
 {
-    std::string bundleName;
-    if (!GetBundleName(bundleName)) {
+    if (!GetBundleName(bundleName, needCheckFormPermission)) {
         HILOG_ERROR("failed to get BundleName");
         return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
     }
+
+    if (!needCheckFormPermission && bundleName != want.GetBundle()) {
+        HILOG_ERROR("error, is not self bundle.");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrAdapter::CheckPublishForm(Want &want, bool needCheckFormPermission)
+{
+    std::string bundleName;
+    ErrCode errCode = CheckFormBundleName(want, bundleName, needCheckFormPermission);
+    if (errCode != ERR_OK) {
+        return errCode;
+    }
+
     sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
     if (iBundleMgr == nullptr) {
         HILOG_ERROR("fail, failed to get IBundleMgr.");
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
 
-    if (!IsValidPublishEvent(iBundleMgr, bundleName, want)) {
+    if (needCheckFormPermission && !IsValidPublishEvent(iBundleMgr, bundleName, want)) {
         HILOG_ERROR("Check valid publish event failed.");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
     }
@@ -2239,7 +2264,7 @@ ErrCode FormMgrAdapter::CheckPublishForm(Want &want)
     std::string abilityName = want.GetElement().GetAbilityName();
     std::string formName = want.GetStringParam(AppExecFwk::Constants::PARAM_FORM_NAME_KEY);
     std::vector<FormInfo> formInfos {};
-    ErrCode errCode = FormInfoMgr::GetInstance()
+    errCode = FormInfoMgr::GetInstance()
         .GetFormsInfoByModuleWithoutCheck(want.GetElement().GetBundleName(), moduleName, formInfos);
     if (errCode != ERR_OK) {
         HILOG_ERROR("error, failed to get forms info.");
@@ -2293,6 +2318,32 @@ ErrCode FormMgrAdapter::QueryPublishFormToHost(Want &wantToHost)
     return ERR_OK;
 }
 
+void FormMgrAdapter::AddSnapshotToHostWant(const Want &want, Want &wantToHost)
+{
+    if (want.HasParameter(Constants::PARAM_PUBLISH_FORM_HOST_SNAPSHOT_KEY) &&
+        want.HasParameter(Constants::PARAM_PUBLISH_FORM_HOST_WIDTH_KEY) &&
+        want.HasParameter(Constants::PARAM_PUBLISH_FORM_HOST_HEIGHT_KEY) &&
+        want.HasParameter(Constants::PARAM_PUBLISH_FORM_HOST_SCREENX_KEY) &&
+        want.HasParameter(Constants::PARAM_PUBLISH_FORM_HOST_SCREENY_KEY)) {
+        std::string  snapshot = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_SNAPSHOT_KEY);
+        int32_t  width = want.GetIntParam(Constants::PARAM_PUBLISH_FORM_HOST_WIDTH_KEY, 0);
+        int32_t  height = want.GetIntParam(Constants::PARAM_PUBLISH_FORM_HOST_HEIGHT_KEY, 0);
+        int32_t  screenX = want.GetIntParam(Constants::PARAM_PUBLISH_FORM_HOST_SCREENX_KEY, 0);
+        int32_t  screenY = want.GetIntParam(Constants::PARAM_PUBLISH_FORM_HOST_SCREENY_KEY, 0);
+        
+        wantToHost.SetParam(Constants::PARAM_PUBLISH_FORM_HOST_SNAPSHOT_KEY, snapshot);
+        wantToHost.SetParam(Constants::PARAM_PUBLISH_FORM_HOST_WIDTH_KEY, width);
+        wantToHost.SetParam(Constants::PARAM_PUBLISH_FORM_HOST_HEIGHT_KEY, height);
+        wantToHost.SetParam(Constants::PARAM_PUBLISH_FORM_HOST_SCREENX_KEY, screenX);
+        wantToHost.SetParam(Constants::PARAM_PUBLISH_FORM_HOST_SCREENY_KEY, screenY);
+        HILOG_DEBUG("AddSnapshotToHostWant snapshot.");
+        HILOG_DEBUG("AddSnapshotToHostWant width: %{public}d height: %{public}d .", width, height);
+        HILOG_DEBUG("AddSnapshotToHostWant screenX: %{public}d screenY: %{public}d.", screenX, screenY);
+    } else {
+        HILOG_DEBUG("AddSnapshotToHostWant: want has no component snapshot info");
+    }
+}
+
 ErrCode FormMgrAdapter::RequestPublishFormToHost(Want &want)
 {
     Want wantToHost;
@@ -2314,6 +2365,8 @@ ErrCode FormMgrAdapter::RequestPublishFormToHost(Want &want)
     int32_t userId = want.GetIntParam(Constants::PARAM_FORM_USER_ID, -1);
     std::string bundleName = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_BUNDLE_KEY);
     std::string abilityName = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_ABILITY_KEY);
+    AddSnapshotToHostWant(want, wantToHost);
+    wantToHost.SetParam(Constants::PARAM_CALLER_BUNDLE_NAME_KEY, callerBundleName);
     wantToHost.SetElementName(bundleName, abilityName);
     wantToHost.SetAction(Constants::FORM_PUBLISH_ACTION);
 
@@ -2338,10 +2391,10 @@ ErrCode FormMgrAdapter::RequestPublishFormToHost(Want &want)
 
 ErrCode FormMgrAdapter::RequestPublishForm(Want &want, bool withFormBindingData,
     std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
-    const std::vector<FormDataProxy> &formDataProxies)
+    const std::vector<FormDataProxy> &formDataProxies, bool needCheckFormPermission)
 {
     HILOG_DEBUG("called.");
-    ErrCode errCode = CheckPublishForm(want);
+    ErrCode errCode = CheckPublishForm(want, needCheckFormPermission);
     if (errCode != ERR_OK) {
         return errCode;
     }
@@ -2383,6 +2436,9 @@ ErrCode FormMgrAdapter::RequestPublishForm(Want &want, bool withFormBindingData,
     errCode = RequestPublishFormToHost(want);
     if (errCode != ERR_OK) {
         FormDataMgr::GetInstance().RemoveRequestPublishFormInfo(formId);
+        NewFormEventInfo eventInfo;
+        FormEventReport::SendFourthFormEvent(FormEventName::INVALID_PUBLISH_FORM_TO_HOST,
+            HiSysEventType::STATISTIC, eventInfo, want);
     }
 
     IncreaseAddFormRequestTimeOutTask(formId);
@@ -2569,9 +2625,10 @@ ErrCode FormMgrAdapter::AddRequestPublishForm(const FormItemInfo &formItemInfo, 
 /**
  * @brief get bundleName.
  * @param bundleName for output.
+ * @param needCheckFormPermission Indicates whether the app have system permissions.default value is true.
  * @return Returns true on success, others on failure.
  */
-bool FormMgrAdapter::GetBundleName(std::string &bundleName)
+bool FormMgrAdapter::GetBundleName(std::string &bundleName, bool needCheckFormPermission)
 {
     sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
     if (iBundleMgr == nullptr) {
@@ -2580,7 +2637,7 @@ bool FormMgrAdapter::GetBundleName(std::string &bundleName)
     }
 
     int uid = IPCSkeleton::GetCallingUid();
-    if (!IN_PROCESS_CALL(iBundleMgr->CheckIsSystemAppByUid(uid))) {
+    if (needCheckFormPermission && !IN_PROCESS_CALL(iBundleMgr->CheckIsSystemAppByUid(uid))) {
         HILOG_ERROR("%{public}s fail, form is not system app. uid:%{public}d", __func__, uid);
         return false;
     }
@@ -2606,6 +2663,7 @@ int FormMgrAdapter::SetNextRefreshTimeLocked(const int64_t formId, const int64_t
     int32_t timerRefreshedCount = FormTimerMgr::GetInstance().GetRefreshCount(formId);
     if (timerRefreshedCount >= Constants::LIMIT_COUNT) {
         HILOG_ERROR("%{public}s, already refresh times:%{public}d", __func__, timerRefreshedCount);
+        FormRecordReport::GetInstance().IncreaseUpdateTimes(formId, HiSysEventPointType::TYPE_HIGH_FREQUENCY);
         FormTimerMgr::GetInstance().MarkRemind(formId);
         return ERR_APPEXECFWK_FORM_MAX_REFRESH;
     }
@@ -2929,6 +2987,7 @@ void FormMgrAdapter::AcquireProviderFormInfo(const int64_t formId, const Want &w
         FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
         HILOG_ERROR("%{public}s fail, Failed to get acquire provider form info", __func__);
     }
+    FormReport::GetInstance().SetEndGetTime(formId, FormUtil::GetCurrentMicrosecond());
 }
 
 /**
@@ -3087,13 +3146,14 @@ bool FormMgrAdapter::CheckIsSystemAppByBundleName(const sptr<IBundleMgr> &iBundl
  * @param iBundleMgr BundleManagerProxy
  * @param bundleName BundleName of caller
  * @param want want of target form
+ * @param needCheckFormPermission Indicates whether the app have system permissions.default value is true.
  * @return Returns ERR_OK if the caller is in the whitelist.
  */
 bool FormMgrAdapter::IsValidPublishEvent(const sptr<IBundleMgr> &iBundleMgr,
-    const std::string &bundleName, const Want &want)
+    const std::string &bundleName, const Want &want, bool needCheckFormPermission)
 {
     int32_t userId = FormUtil::GetCurrentAccountId();
-    if (!CheckIsSystemAppByBundleName(iBundleMgr, userId, bundleName)) {
+    if (needCheckFormPermission && !CheckIsSystemAppByBundleName(iBundleMgr, userId, bundleName)) {
         HILOG_ERROR("Only system app can request publish form.");
         return false;
     }

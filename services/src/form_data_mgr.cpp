@@ -35,6 +35,8 @@
 #include "ipc_skeleton.h"
 #include "js_form_state_observer_interface.h"
 #include "running_form_info.h"
+#include "form_record_report.h"
+#include "form_event_report.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -198,6 +200,7 @@ FormRecord FormDataMgr::CreateFormRecord(const FormItemInfo &formInfo, const int
     newRecord.isDataProxy = formInfo.GetDataProxyFlag();
     newRecord.uid = formInfo.GetProviderUid();
     newRecord.modulePkgNameMap = formInfo.GetModulePkgNameMap();
+    newRecord.formBundleType = formInfo.GetFormBundleType();
     formInfo.GetHapSourceDirs(newRecord.hapSourceDirs);
     HILOG_INFO("end");
     return newRecord;
@@ -316,6 +319,8 @@ int FormDataMgr::CheckTempEnoughForm() const
     std::lock_guard<std::mutex> lock(formTempMutex_);
     if (static_cast<int32_t>(tempForms_.size()) >= maxTempSize) {
         HILOG_WARN("already exist %{public}d temp forms in system", maxTempSize);
+        FormEventReport::SendFormFailedEvent(FormEventName::ADD_FORM_FAILED, HiSysEventType::FAULT,
+            NewFormEventInfo::errorType::NUMBER_EXCEEDING_LIMIT);
         return ERR_APPEXECFWK_FORM_MAX_SYSTEM_TEMP_FORMS;
     }
     return ERR_OK;
@@ -354,6 +359,8 @@ int FormDataMgr::CheckEnoughForm(const int callingUid, const int32_t currentUser
     HILOG_DEBUG("already use %{public}zu forms", formDbInfos.size());
     if (static_cast<int32_t>(formDbInfos.size()) >= maxFormsSize) {
         HILOG_WARN("already use %{public}d forms, exceeds max form number", maxFormsSize);
+        FormEventReport::SendFormFailedEvent(FormEventName::ADD_FORM_FAILED, HiSysEventType::FAULT,
+            NewFormEventInfo::errorType::NUMBER_EXCEEDING_LIMIT);
         return ERR_APPEXECFWK_FORM_MAX_SYSTEM_FORMS;
     }
 
@@ -1957,6 +1964,7 @@ void FormDataMgr::FillBasicRunningFormInfoByFormRecord(const FormRecord &formRec
     runningFormInfo.formLocation = formRecord.formLocation;
     runningFormInfo.formVisiblity = static_cast<FormVisibilityType>(formRecord.formVisibleNotifyState);
     runningFormInfo.recycleStatus = formRecord.recycleStatus;
+    runningFormInfo.formBundleType = formRecord.formBundleType;
 }
 
 ErrCode FormDataMgr::GetRunningFormInfosByFormId(const int64_t formId, RunningFormInfo &runningFormInfo)

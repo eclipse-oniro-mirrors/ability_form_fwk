@@ -18,6 +18,7 @@
 #include "form_constants.h"
 #include "fms_log_wrapper.h"
 #include "form_refresh_limiter.h"
+#include "form_record_report.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -82,6 +83,7 @@ bool FormRefreshLimiter::IsEnableRefresh(const int64_t formId)
     auto info = limiterMap_.find(formId);
     if (info != limiterMap_.end()) {
         if (info->second.refreshCount < Constants::LIMIT_COUNT) {
+            FormRecordReport::GetInstance().IncreaseUpdateTimes(formId, HiSysEventPointType::TYPE_HIGH_FREQUENCY);
             isEnable = true;
         }
 

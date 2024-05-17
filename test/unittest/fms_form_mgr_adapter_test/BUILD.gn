@@ -28,6 +28,7 @@ ohos_unittest("FmsFormMgrAdapterTest") {
     "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_data_mgr.cpp",
     "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_db_cache.cpp",
     "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_info_mgr.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_mgr_adapter.cpp",
     "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_provider_mgr.cpp",
     "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_render_mgr.cpp",
     "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_timer_mgr.cpp",
@@ -79,9 +80,15 @@ ohos_unittest("FmsFormMgrAdapterTest") {
     "samgr:samgr_proxy",
   ]
 
+  defines = []
+
+  if (res_schedule_service) {
+    defines += [ "RES_SCHEDULE_ENABLE" ]
+  }
+
   if (device_usage_statistics) {
     external_deps += [ "device_usage_statistics:usagestatsinner" ]
-    defines = [ "DEVICE_USAGE_STATISTICS_ENABLE" ]
+    defines += [ "DEVICE_USAGE_STATISTICS_ENABLE" ]
   }
 }
 

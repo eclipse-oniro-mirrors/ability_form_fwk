@@ -21,6 +21,7 @@
 #include "form_info_base.h"
 #include "form_instance.h"
 #include "form_provider_info.h"
+#include "application_info.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -76,6 +77,7 @@ public:
     RecycleStatus recycleStatus = RecycleStatus::NON_RECYCLABLE;
     Constants::FormLocation formLocation;
     bool isThemeForm = false;
+    BundleType formBundleType = BundleType::APP;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

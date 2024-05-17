@@ -31,6 +31,7 @@ public:
     virtual ~FormSupplyCallback() = default;
     static sptr<FormSupplyCallback> GetInstance();
 
+    void ProcessFormAcquisition(int64_t formId);
     /**
      * @brief Accept form binding data from form provider.
      * @param providerFormInfo Form binding data.

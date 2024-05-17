@@ -29,6 +29,8 @@
 #include "form_record.h"
 #include "form_refresh_connection.h"
 #include "form_timer_mgr.h"
+#include "form_report.h"
+#include "form_record_report.h"
 #ifdef SUPPORT_POWER
 #include "power_mgr_client.h"
 #endif
@@ -494,6 +496,9 @@ bool FormProviderMgr::IsNeedToFresh(FormRecord &record, int64_t formId, bool isV
 
     HILOG_DEBUG("isVisibleToFresh is %{public}d, record.isVisible is %{public}d", isVisibleToFresh, record.isVisible);
     if (isVisibleToFresh) {
+        if (!record.isVisible) {
+            FormRecordReport::GetInstance().IncreaseUpdateTimes(formId, HiSysEventPointType::TYPE_INVISIBLE_INTERCEPT);
+        }
         return record.isVisible;
     }
 

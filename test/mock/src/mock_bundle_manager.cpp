@@ -18,6 +18,7 @@
 
 #include "ability_info.h"
 #include "application_info.h"
+#include "fms_log_wrapper.h"
 #include "form_info.h"
 
 namespace OHOS {
@@ -35,6 +36,7 @@ bool BundleMgrService::IsSystemApp = false;
 
 int BundleMgrService::GetUidByBundleName(const std::string &bundleName, const int userId)
 {
+    HILOG_INFO("mock %{public}s called.", __func__);
     if (bundleName.compare("com.form.host.app600") == 0) {
         return APP_600;
     }
@@ -43,22 +45,26 @@ int BundleMgrService::GetUidByBundleName(const std::string &bundleName, const in
 
 int BundleMgrStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    HILOG_INFO("mock %{public}s called.", __func__);
     return 0;
 }
 
 bool BundleMgrService::QueryAbilityInfo(const AAFwk::Want &want, AbilityInfo &abilityInfo)
 {
+    HILOG_INFO("mock %{public}s called.", __func__);
     return true;
 }
 
 std::string BundleMgrService::GetAppType(const std::string &bundleName)
 {
+    HILOG_INFO("mock %{public}s called.", __func__);
     return "system";
 }
 
 bool BundleMgrService::GetBundleInfo(
     const std::string &bundleName, const BundleFlag flag, BundleInfo &bundleInfo, int32_t userId)
 {
+    HILOG_INFO("mock %{public}s called.", __func__);
     std::vector<AbilityInfo> abilityInfos;
     ApplicationInfo applicationInfo;
     ModuleInfo moduleInfo;
@@ -79,6 +85,8 @@ bool BundleMgrService::GetBundleInfo(
     abilityInfo.moduleName = PARAM_PROVIDER_MODULE_NAME;
     abilityInfo.deviceId = DEVICE_ID;
     bundleInfo.abilityInfos.emplace_back(abilityInfo);
+    bundleInfo.compatibleVersion = COMPATIBLE_VERSION;
+    bundleInfo.targetVersion = TARGET_VERSION;
 
     return true;
 }
@@ -86,6 +94,7 @@ bool BundleMgrService::GetBundleInfo(
 ErrCode BundleMgrService::GetBundleInfoV9(const std::string &bundleName, int32_t flags,
     BundleInfo &bundleInfo, int32_t userId)
 {
+    HILOG_INFO("mock %{public}s called.", __func__);
     ApplicationInfo applicationInfo;
     ModuleInfo moduleInfo;
 
@@ -116,6 +125,7 @@ ErrCode BundleMgrService::GetBundleInfoV9(const std::string &bundleName, int32_t
 
 bool BundleMgrService::GetFormsInfoByApp(const std::string &bundleName, std::vector<FormInfo> &formInfo)
 {
+    HILOG_INFO("mock %{public}s called.", __func__);
     FormInfo form;
     form.bundleName = bundleName;
     form.abilityName = FORM_PROVIDER_ABILITY_NAME;
@@ -134,6 +144,7 @@ bool BundleMgrService::GetFormsInfoByApp(const std::string &bundleName, std::vec
 bool BundleMgrService::GetFormsInfoByModule(const std::string &bundleName, const std::string &moduleName,
     std::vector<FormInfo> &formInfo)
 {
+    HILOG_INFO("mock %{public}s called.", __func__);
     FormInfo form;
     form.bundleName = bundleName;
     form.abilityName = FORM_PROVIDER_ABILITY_NAME;

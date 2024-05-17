@@ -31,6 +31,8 @@
 #include "form_info_rdb_storage_mgr.h"
 #include "form_data_mgr.h"
 #include "form_host_interface.h"
+#include "form_report.h"
+#include "form_record_report.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -52,6 +54,19 @@ sptr<FormSupplyCallback> FormSupplyCallback::GetInstance()
     return instance_;
 }
 
+void FormSupplyCallback::ProcessFormAcquisition(int64_t formId)
+{
+    FormRecord record;
+    bool hasRecord = FormDataMgr::GetInstance().GetFormRecord(formId, record);
+    if (hasRecord) {
+        int64_t endTime;
+        FormReport::GetInstance().GetEndAquireTime(formId, endTime);
+        if (!endTime) {
+            FormReport::GetInstance().SetEndAquireTime(formId, FormUtil::GetCurrentMicrosecond());
+            FormReport::GetInstance().HandleAddFormStatistic(formId);
+        }
+    }
+}
 /**
  * @brief Accept form binding data from form provider.
  * @param providerFormInfo Form binding data.
@@ -76,6 +91,9 @@ int FormSupplyCallback::OnAcquire(const FormProviderInfo &formProviderInfo, cons
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     int64_t formId = std::stoll(strFormId);
+    ProcessFormAcquisition(formId);
+    FormReport::GetInstance().SetFormRecordInfo(formId, want);
+    FormReport::GetInstance().SetStartAquireTime(formId, FormUtil::GetCurrentMicrosecond());
     if (IsRemoveConnection(formId, want.GetRemoteObject(Constants::PARAM_FORM_HOST_TOKEN))) {
         RemoveConnection(connectId);
     }

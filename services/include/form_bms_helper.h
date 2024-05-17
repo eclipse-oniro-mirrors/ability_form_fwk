@@ -100,7 +100,7 @@ public:
         ExtensionAbilityInfo &extensionAbilityInfo);
 
     /**
-     * @brief Obtains the BundleInfo based on a given bundle name.
+     * @brief Obtains the BundleInfo with abilities based on a given bundle name.
      * @param bundleName Indicates the application bundle name to be queried.
      * @param userId Indicates the user ID.
      * @param bundleInfo Indicates the obtained BundleInfo object.
@@ -116,6 +116,25 @@ public:
      * @return Returns true if the BundleInfo is successfully obtained; returns false otherwise.
      */
     bool GetBundleInfoWithPermission(const std::string &bundleName, int32_t userId, BundleInfo &bundleInfo);
+
+    /**
+     * @brief Obtains the BundleInfo with default info based on a given bundle name.
+     * @param bundleName Indicates the application bundle name to be queried.
+     * @param userId Indicates the user ID.
+     * @param bundleInfo Indicates the obtained BundleInfo object.
+     * @return Returns true if the BundleInfo is successfully obtained; returns false otherwise.
+     */
+    bool GetBundleInfoDefault(const std::string& bundleName, int32_t userId, BundleInfo &bundleInfo);
+
+    /**
+     * @brief Obtains the BundleInfo by flags based on a given bundle name.
+     * @param bundleName Indicates the application bundle name to be queried.
+     * @param flags Indicates the flags.
+     * @param userId Indicates the user ID.
+     * @param bundleInfo Indicates the obtained BundleInfo object.
+     * @return Returns true if the BundleInfo is successfully obtained; returns false otherwise.
+     */
+    bool GetBundleInfoByFlags(const std::string& bundleName, int32_t flags, int32_t userId, BundleInfo &bundleInfo);
 
     /**
      * @brief Get caller bundle name.

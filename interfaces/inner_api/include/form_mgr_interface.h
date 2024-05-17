@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -139,6 +139,19 @@ public:
     {
         return ERR_OK;
     }
+
+    /**
+     * @brief Request to publish a form to the form host for normal authority.
+     *
+     * @param want The want of the form to publish.
+     * @param withFormBindingData Indicates whether the formBindingData is carried with.
+     * @param formBindingData Indicates the form data.
+     * @param formId Return the form id to be published.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode RequestPublishFormWithSnapshot(Want &want, bool withFormBindingData,
+        std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId) = 0;
+
     /**
      * @brief Lifecycle update.
      * @param formIds The Id of the forms.
@@ -686,6 +699,7 @@ public:
         FORM_MGR_CREATE_FORM,
         FORM_MGR_PUBLISH_FORM_ERRCODE_RESULT,
         FORM_MGR_ACQUIRE_ADD_FORM_RESULT,
+        FORM_MGR_REQUEST_PUBLISH_FORM_WITH_SNAPSHOT,
     };
 };
 }  // namespace AppExecFwk

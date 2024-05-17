@@ -338,7 +338,7 @@ HWTEST_F(FormRenderMgrInnerTest, FormRenderMgrInnerTest_013, TestSize.Level0)
 
 /**
  * @tc.name: FormRenderMgrInnerTest_014
- * @tc.desc: test GetCompatibleVersion function.
+ * @tc.desc: test FillBundleInfo function.
  * @tc.type: FUNC
  */
 HWTEST_F(FormRenderMgrInnerTest, FormRenderMgrInnerTest_014, TestSize.Level0)
@@ -346,7 +346,10 @@ HWTEST_F(FormRenderMgrInnerTest, FormRenderMgrInnerTest_014, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormRenderMgrInnerTest_014 start";
     FormRenderMgrInner formRenderMgrInner;
     std::string bundleName = "<bundleName>";
-    EXPECT_EQ(0, formRenderMgrInner.GetCompatibleVersion(bundleName));
+    Want want;
+    formRenderMgrInner.FillBundleInfo(want, bundleName);
+    EXPECT_EQ(true, want.HasParameter(Constants::FORM_COMPATIBLE_VERSION_KEY));
+    EXPECT_EQ(true, want.HasParameter(Constants::FORM_TARGET_VERSION_KEY));
     GTEST_LOG_(INFO) << "FormRenderMgrInnerTest_014 end";
 }
 
@@ -986,5 +989,84 @@ HWTEST_F(FormRenderMgrInnerTest, FormRenderMgrInnerTest_048, TestSize.Level0)
     formRenderMgrInner.RemoveConnection(formIdOther);
     EXPECT_EQ(1, formRenderMgrInner.renderFormConnections_.size());
     GTEST_LOG_(INFO) << "FormRenderMgrInnerTest_048 end";
+}
+
+/**
+ * @tc.name: FormRenderMgrInnerTest_049
+ * @tc.desc: test GetConnectionAndRenderForm function runs normally and returns the expected result.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, FormRenderMgrInnerTest_049, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderMgrInnerTest_049 start";
+    FormRenderMgrInner formRenderMgrInner;
+    FormRecord formRecord;
+    Want want;
+    EXPECT_EQ(formRenderMgrInner.GetConnectionAndRenderForm(formRecord, want),
+              ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FormRenderMgrInnerTest_049 end";
+}
+
+/**
+ * @tc.name: FormRenderMgrInnerTest_050
+ * @tc.desc: 1.test UpdateRenderingForm function and isGetFormRecord is true.
+ *           2.connection is nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, FormRenderMgrInnerTest_050, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderMgrInnerTest_050 start";
+    FormRenderMgrInner formRenderMgrInner;
+    FormRecord formRecord;
+    formRecord.formId = 1;
+    formRenderMgrInner.renderFormConnections_.emplace(formRecord.formId, nullptr);
+    Want want;
+    EXPECT_EQ(formRenderMgrInner.GetConnectionAndRenderForm(formRecord, want),
+              ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FormRenderMgrInnerTest_050 end";
+}
+
+/**
+ * @tc.name: FormRenderMgrInnerTest_051
+ * @tc.desc: 1.test UpdateRenderingForm function and isGetFormRecord is true.
+ *           2.renderRemoteObj_ is nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, FormRenderMgrInnerTest_051, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderMgrInnerTest_051 start";
+    FormRenderMgrInner formRenderMgrInner;
+    FormRecord formRecord;
+    formRecord.formId = 1;
+    WantParams wantParams;
+    sptr<FormRenderConnection> conn = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
+    formRenderMgrInner.renderFormConnections_.emplace(formRecord.formId, conn);
+    formRenderMgrInner.renderRemoteObj_ = nullptr;
+    Want want;
+    EXPECT_EQ(formRenderMgrInner.GetConnectionAndRenderForm(formRecord, want),
+              ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FormRenderMgrInnerTest_051 end";
+}
+
+/**
+ * @tc.name: FormRenderMgrInnerTest_052
+ * @tc.desc: 1.test UpdateRenderingForm function and isGetFormRecord is true.
+ *           2.renderRemoteObj_ is not nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, FormRenderMgrInnerTest_052, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderMgrInnerTest_052 start";
+    FormRenderMgrInner formRenderMgrInner;
+    FormRecord formRecord;
+    formRecord.formId = 1;
+    WantParams wantParams;
+    sptr<FormRenderConnection> conn = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
+    formRenderMgrInner.renderFormConnections_.emplace(formRecord.formId, conn);
+    formRenderMgrInner.renderRemoteObj_ = new (std::nothrow) MockIFormRender();
+    Want want;
+    EXPECT_EQ(formRenderMgrInner.GetConnectionAndRenderForm(formRecord, want),
+              ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FormRenderMgrInnerTest_052 end";
 }
 }

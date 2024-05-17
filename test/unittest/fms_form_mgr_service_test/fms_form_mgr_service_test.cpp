@@ -2548,4 +2548,32 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0121, TestSize.Level1)
     EXPECT_EQ(formMgrService.AcquireAddFormResult(formId), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrService_0121 end";
 }
+
+/**
+ * @tc.number: FormMgrService_0122
+ * @tc.name: test OnSystemloadLevel function.
+ * @tc.desc: Verify that the OnSystemloadLevel interface is called normally.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0122, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0122 start";
+    FormMgrService formMgrService;
+    int32_t level = 5;
+    formMgrService.OnSystemloadLevel(level);
+    GTEST_LOG_(INFO) << "FormMgrService_0122 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0123
+ * @tc.name: test OnSystemloadLevel function.
+ * @tc.desc: Verify that the OnSystemloadLevel interface is called normally.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0123, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0123 start";
+    FormMgrService formMgrService;
+    int32_t level = 1;
+    formMgrService.OnSystemloadLevel(level);
+    GTEST_LOG_(INFO) << "FormMgrService_0123 end";
+}
 }
