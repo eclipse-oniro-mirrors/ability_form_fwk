@@ -2104,9 +2104,19 @@ void FormMgrAdapter::SetFormItemInfoParams(const BundleInfo& bundleInfo, const F
 void FormMgrAdapter::SetFormItemModuleInfo(const HapModuleInfo& hapModuleInfo, const FormInfo& formInfo,
     FormItemInfo& itemInfo)
 {
-    HILOG_DEBUG("module [%{public}s] packageName is %{public}s", hapModuleInfo.moduleName.c_str(),
-        hapModuleInfo.packageName.c_str());
-    itemInfo.AddModulePkgName(hapModuleInfo.moduleName, hapModuleInfo.packageName);
+    auto hapPath = hapModuleInfo.hapPath;
+    auto moduleName = hapModuleInfo.moduleName;
+    HILOG_DEBUG("module [%{public}s] packageName is %{public}s, hap path is %{public}s", moduleName.c_str(),
+        hapModuleInfo.packageName.c_str(), hapPath.c_str());
+    if (hapPath.find(Constants::ABS_CODE_PATH) != std::string::npos) {
+        hapPath = std::regex_replace(hapPath, std::regex(Constants::ABS_CODE_PATH), Constants::LOCAL_BUNDLES);
+    }
+    nlohmann::json moduleInfos = {
+        {Constants::MODULE_PKG_NAME_KEY, hapModuleInfo.packageName},
+        {Constants::MODULE_HAP_PATH_KEY, hapPath}
+    };
+    itemInfo.AddModulePkgName(moduleName, moduleInfos.dump());
+    itemInfo.AddModuleInfo(moduleName, hapPath);
     for (const auto &abilityInfo : hapModuleInfo.abilityInfos) {
         if (abilityInfo.name == formInfo.abilityName) {
             itemInfo.SetAbilityModuleName(abilityInfo.moduleName);
@@ -2114,12 +2124,6 @@ void FormMgrAdapter::SetFormItemModuleInfo(const HapModuleInfo& hapModuleInfo, c
                 itemInfo.SetFormSrc("");
             }
         }
-        auto hapPath = abilityInfo.hapPath;
-        if (hapPath.find(Constants::ABS_CODE_PATH) != std::string::npos) {
-            hapPath = std::regex_replace(hapPath, std::regex(Constants::ABS_CODE_PATH), Constants::LOCAL_BUNDLES);
-        }
-        itemInfo.AddModuleInfo(abilityInfo.moduleName, hapPath);
-        HILOG_DEBUG("%{public}s hap path is %{public}s", abilityInfo.moduleName.c_str(), hapPath.c_str());
     }
 }
 

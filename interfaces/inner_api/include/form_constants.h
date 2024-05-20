@@ -296,6 +296,9 @@ namespace Constants {
     constexpr const char* FORM_PERMISSION_GRANTED_KEY = "ohos.extra.param.key.permission_granted";
     // User permission name
     constexpr const char* FORM_PERMISSION_NAME_KEY = "ohos.extra.param.key.permission_name";
+
+    constexpr const char* MODULE_PKG_NAME_KEY = "pkg_name";
+    constexpr const char* MODULE_HAP_PATH_KEY = "hap_path";
 }  // namespace Constants
 }  // namespace AppExecFwk
 }  // namespace OHOS

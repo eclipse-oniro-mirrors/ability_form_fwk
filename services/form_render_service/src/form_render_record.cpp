@@ -33,6 +33,7 @@
 #include "form_module_checker.h"
 #include "form_render_event_report.h"
 #include "form_render_impl.h"
+#include "nlohmann/json.hpp"
 #include "xcollie/watchdog.h"
 
 using namespace OHOS::AAFwk::GlobalConfigurationKey;
@@ -471,18 +472,21 @@ bool FormRenderRecord::SetPkgContextInfoMap(const FormJsInfo &formJsInfo, Abilit
 
     std::map<std::string, std::string> pkgContextInfoJsonStringMap;
     for (auto modulePkgNamePair : formJsInfo.modulePkgNameMap) {
-        std::string pkgContextInfoJsonString;
-        ErrCode errCode = bundleMgrHelper->GetJsonProfile(
-            AppExecFwk::PKG_CONTEXT_PROFILE, formJsInfo.bundleName, modulePkgNamePair.first, pkgContextInfoJsonString,
-            static_cast<int32_t>(std::stoi(uid)));
-        if (errCode != ERR_OK) {
-            HILOG_ERROR("GetJsonProfile failed: %{public}d.", errCode);
-            return false;
+        nlohmann::json moduleInfos = nlohmann::json::parse(modulePkgNamePair.second, nullptr, false);
+        std::string pkgName = "";
+        std::string hapPath = "";
+        if (moduleInfos.contains(Constants::MODULE_PKG_NAME_KEY) &&
+            moduleInfos.at(Constants::MODULE_PKG_NAME_KEY).is_string()) {
+            pkgName = moduleInfos[Constants::MODULE_PKG_NAME_KEY].get<std::string>();
+            options.packageNameList[modulePkgNamePair.first] = pkgName;
         }
-        if (!pkgContextInfoJsonString.empty()) {
-            pkgContextInfoJsonStringMap[modulePkgNamePair.first] = pkgContextInfoJsonString;
+        if (moduleInfos.contains(Constants::MODULE_HAP_PATH_KEY) &&
+            moduleInfos.at(Constants::MODULE_HAP_PATH_KEY).is_string()) {
+            hapPath = moduleInfos[Constants::MODULE_HAP_PATH_KEY].get<std::string>();
+            pkgContextInfoJsonStringMap[modulePkgNamePair.first] = hapPath;
         }
-        options.packageNameList[modulePkgNamePair.first] = modulePkgNamePair.second;
+        HILOG_DEBUG("SetPkgContextInfoMap module: %{public}s, pkgName: %{public}s, hapPath: %{public}s.",
+            modulePkgNamePair.first.c_str(), pkgName.c_str(), hapPath.c_str());
     }
     if (!pkgContextInfoJsonStringMap.empty()) {
         HILOG_INFO("set pkgContextInfoJsonStringMap for %{public}s.", formJsInfo.bundleName.c_str());
