@@ -2325,20 +2325,19 @@ void FormMgrAdapter::AddSnapshotToHostWant(const Want &want, Want &wantToHost)
         want.HasParameter(Constants::PARAM_PUBLISH_FORM_HOST_HEIGHT_KEY) &&
         want.HasParameter(Constants::PARAM_PUBLISH_FORM_HOST_SCREENX_KEY) &&
         want.HasParameter(Constants::PARAM_PUBLISH_FORM_HOST_SCREENY_KEY)) {
-        std::string  snapshot = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_SNAPSHOT_KEY);
-        int32_t  width = want.GetIntParam(Constants::PARAM_PUBLISH_FORM_HOST_WIDTH_KEY, 0);
-        int32_t  height = want.GetIntParam(Constants::PARAM_PUBLISH_FORM_HOST_HEIGHT_KEY, 0);
-        int32_t  screenX = want.GetIntParam(Constants::PARAM_PUBLISH_FORM_HOST_SCREENX_KEY, 0);
-        int32_t  screenY = want.GetIntParam(Constants::PARAM_PUBLISH_FORM_HOST_SCREENY_KEY, 0);
-        
+        std::string snapshot = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_SNAPSHOT_KEY);
+        std::string width = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_WIDTH_KEY);
+        std::string height = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_HEIGHT_KEY);
+        std::string screenX = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_SCREENX_KEY);
+        std::string screenY = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_SCREENY_KEY);
+
         wantToHost.SetParam(Constants::PARAM_PUBLISH_FORM_HOST_SNAPSHOT_KEY, snapshot);
         wantToHost.SetParam(Constants::PARAM_PUBLISH_FORM_HOST_WIDTH_KEY, width);
         wantToHost.SetParam(Constants::PARAM_PUBLISH_FORM_HOST_HEIGHT_KEY, height);
         wantToHost.SetParam(Constants::PARAM_PUBLISH_FORM_HOST_SCREENX_KEY, screenX);
         wantToHost.SetParam(Constants::PARAM_PUBLISH_FORM_HOST_SCREENY_KEY, screenY);
-        HILOG_DEBUG("AddSnapshotToHostWant snapshot.");
-        HILOG_DEBUG("AddSnapshotToHostWant width: %{public}d height: %{public}d .", width, height);
-        HILOG_DEBUG("AddSnapshotToHostWant screenX: %{public}d screenY: %{public}d.", screenX, screenY);
+        HILOG_INFO("SnapshotInfo screenX: %{public}s, screenY: %{public}s, width: %{public}s, height: %{public}s",
+            screenX.c_str(), screenY.c_str(), width.c_str(), height.c_str());
     } else {
         HILOG_DEBUG("AddSnapshotToHostWant: want has no component snapshot info");
     }
