@@ -907,12 +907,6 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
-    if (iBundleMgr == nullptr) {
-        HILOG_ERROR("fail, failed to get IBundleMgr.");
-        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
-    }
-
     int64_t matchedFormId = 0;
     int32_t userId = FormUtil::GetCurrentAccountId();
     std::map<std::string, std::vector<int64_t>> eventMaps;
@@ -931,24 +925,11 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
         }
 
         PaddingNotifyVisibleFormsMap(formVisibleType, formId, formInstanceMaps);
+        HILOG_DEBUG("formRecord formVisibleNotify: %{public}d.", formRecord.formVisibleNotify);
 
         // Update info to host and check if the form was created by the system application.
         if ((!UpdateProviderInfoToHost(matchedFormId, userId, callerToken, formVisibleType, formRecord)) ||
             (!formRecord.isSystemApp)) {
-            continue;
-        }
-
-        // Check the value of formVisibleNotify.
-        AppExecFwk::ApplicationInfo info;
-
-        if (!IN_PROCESS_CALL(iBundleMgr->GetApplicationInfo(formRecord.bundleName,
-            AppExecFwk::ApplicationFlag::GET_BASIC_APPLICATION_INFO, formRecord.providerUserId, info))) {
-            HILOG_ERROR("failed to get Application info.");
-            return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
-        }
-
-        if (!info.formVisibleNotify) {
-            HILOG_DEBUG("the value of formVisibleNotify is false.");
             continue;
         }
 
@@ -3026,7 +3007,7 @@ bool FormMgrAdapter::CreateHandleEventMap(const int64_t matchedFormId, const For
     std::map<std::string, std::vector<int64_t>> &eventMaps)
 {
     if (!formRecord.formVisibleNotify) {
-        HILOG_WARN("%{public}s fail, the config 'formVisibleNotify' is false, formId:%{public}" PRId64 ".",
+        HILOG_DEBUG("%{public}s fail, the config 'formVisibleNotify' is false, formId:%{public}" PRId64 ".",
             __func__, matchedFormId);
         return false;
     }
