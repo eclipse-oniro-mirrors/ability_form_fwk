@@ -859,4 +859,16 @@ HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0106, TestSize.Level1) {
     EXPECT_EQ(formMgrProxy->AcquireAddFormResult(formId), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrProxyTest_0106 test ends";
 }
+
+/**
+ * @tc.number: FormMgrProxyTest_BatchRefreshForms_001
+ * @tc.name: test BatchRefreshForms function.
+ * @tc.desc: Verify that the BatchRefreshForms interface is called normally and the return value is ERR_OK.
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_BatchRefreshForms_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_BatchRefreshForms_001 starts";
+    int32_t formRefreshType = Constants::REFRESH_ALL_FORM;
+    EXPECT_EQ(formMgrProxy->BatchRefreshForms(formRefreshType), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_BatchRefreshForms_001 test ends";
+}
 }

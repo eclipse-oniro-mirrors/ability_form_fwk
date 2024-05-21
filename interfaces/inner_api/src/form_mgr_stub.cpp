@@ -168,6 +168,8 @@ FormMgrStub::FormMgrStub()
         &FormMgrStub::HandleCreateForm;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_FORM_WITH_SNAPSHOT)] =
         &FormMgrStub::HandleRequestPublishFormWithSnapshot;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_BATCH_REFRESH_FORMS)] =
+        &FormMgrStub::HandleBatchRefreshForms;
 }
 
 FormMgrStub::~FormMgrStub()
@@ -1496,9 +1498,18 @@ ErrCode FormMgrStub::HandleRequestPublishFormWithSnapshot(MessageParcel &data, M
     } else {
         reply.WriteInt64(formId);
     }
-
     return result;
 }
 
+ErrCode FormMgrStub::HandleBatchRefreshForms(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t formRefreshType = data.ReadInt32();
+    ErrCode result = BatchRefreshForms(formRefreshType);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("failed to write result");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return result;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

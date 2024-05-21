@@ -4506,6 +4506,11 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_231, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormMgrAdapter_231 end";
 }
 
+/**
+ * @tc.name: FormMgrAdapter_232
+ * @tc.desc: test RequestPublishForm function.
+ * @tc.type: FUNC
+ */
 HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_232, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormMgrAdapter_232 start";
@@ -4521,5 +4526,19 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_232, TestSize.Level0)
     MockRequestPublishFormToHost(true);
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED);
     GTEST_LOG_(INFO) << "FormMgrAdapter_232 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_233
+ * @tc.desc: test BatchRefreshForms function and the return value is true.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_233, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_233 start";
+    FormMgrAdapter formMgrAdapter;
+    int32_t formRefreshType = Constants::REFRESH_ALL_FORM;
+    EXPECT_EQ(ERR_OK, formMgrAdapter.BatchRefreshForms(formRefreshType));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_233 end";
 }
 }

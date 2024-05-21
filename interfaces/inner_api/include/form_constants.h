@@ -194,6 +194,10 @@ namespace Constants {
 
     constexpr int64_t INVALID_UDID_HASH = 0L;
 
+    constexpr int32_t REFRESH_ALL_FORM = 0;
+    constexpr int32_t REFRESH_APP_FORM = 1;
+    constexpr int32_t REFRESH_ATOMIC_FORM = 2;
+
     enum class Dimension : int8_t {
         DIMENSION_MIN = 1,
         DIMENSION_1_2 = DIMENSION_MIN,

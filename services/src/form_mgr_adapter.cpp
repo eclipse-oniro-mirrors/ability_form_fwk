@@ -2346,7 +2346,6 @@ ErrCode FormMgrAdapter::RequestPublishFormToHost(Want &want)
     std::string bundleName = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_BUNDLE_KEY);
     std::string abilityName = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_ABILITY_KEY);
     AddSnapshotToHostWant(want, wantToHost);
-    wantToHost.SetParam(Constants::PARAM_CALLER_BUNDLE_NAME_KEY, callerBundleName);
     wantToHost.SetElementName(bundleName, abilityName);
     wantToHost.SetAction(Constants::FORM_PUBLISH_ACTION);
 
@@ -4148,6 +4147,24 @@ ErrCode FormMgrAdapter::UpdateFormLocation(const int64_t &formId, const int32_t 
             }
             return FormDbCache::GetInstance().UpdateFormLocation(matchedFormId, formLocation);
         }
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrAdapter::BatchRefreshForms(const int32_t formRefreshType)
+{
+    std::vector<FormRecord> visibleFormRecords;
+    std::vector<FormRecord> inVisibleFormRecords;
+    FormDataMgr::GetInstance().GetRecordsByFormType(formRefreshType, visibleFormRecords, inVisibleFormRecords);
+    HILOG_INFO("getVisibleRecords ByFormType size: %{public}zu.", visibleFormRecords.size());
+    Want reqWant;
+    int32_t currentActiveUserId = FormUtil::GetCurrentAccountId();
+    reqWant.SetParam(Constants::PARAM_FORM_USER_ID, currentActiveUserId);
+    for (auto formRecord : visibleFormRecords) {
+        FormProviderMgr::GetInstance().RefreshForm(formRecord.formId, reqWant, true);
+    }
+    for (auto formRecord : inVisibleFormRecords) {
+        FormProviderMgr::GetInstance().RefreshForm(formRecord.formId, reqWant, true);
     }
     return ERR_OK;
 }

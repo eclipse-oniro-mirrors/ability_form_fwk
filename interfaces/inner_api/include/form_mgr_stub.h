@@ -511,6 +511,13 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode HandleRequestPublishFormWithSnapshot(MessageParcel &data, MessageParcel &reply);
+	
+    /**
+     * @brief Update form with formRefreshType, send to form manager service.
+     * @param formRefreshType The type of the form to refresh, 0: AllForm 1: 2: AppForm 2: AtomicServiceForm
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleBatchRefreshForms(MessageParcel &data, MessageParcel &reply);
 private:
     using FormMgrFunc = int32_t (FormMgrStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, FormMgrFunc> memberFuncMap_;

@@ -2467,5 +2467,50 @@ ErrCode FormDataMgr::UpdateFormLocation(const int64_t &formId, const int32_t &fo
     return ERR_OK;
 }
 
+ErrCode FormDataMgr::GetRecordsByFormType(const int32_t formRefreshType,
+    std::vector<FormRecord> &visibleFormRecords, std::vector<FormRecord> &inVisiblehFormRecord)
+{
+    HILOG_INFO("GetRecordsByFormType formRefreshType: %{public}d", formRefreshType);
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    if (formRefreshType == Constants::REFRESH_ALL_FORM) {
+        for (auto formRecord : formRecords_) {
+            if (formRecord.second.formVisibleNotifyState == static_cast<int32_t>(FormVisibilityType::VISIBLE)) {
+                visibleFormRecords.emplace_back(formRecord.second);
+                continue;
+            }
+            inVisiblehFormRecord.emplace_back(formRecord.second);
+        }
+        return ERR_OK;
+    }
+    
+    if (formRefreshType == Constants::REFRESH_APP_FORM) {
+        for (auto formRecord : formRecords_) {
+            if (formRecord.second.formBundleType != BundleType::APP) {
+                continue;
+            }
+            if (formRecord.second.formVisibleNotifyState == static_cast<int32_t>(FormVisibilityType::VISIBLE)) {
+                visibleFormRecords.emplace_back(formRecord.second);
+                continue;
+            }
+            inVisiblehFormRecord.emplace_back(formRecord.second);
+        }
+        return ERR_OK;
+    }
+
+    if (formRefreshType == Constants::REFRESH_ATOMIC_FORM) {
+        for (auto formRecord : formRecords_) {
+            if (formRecord.second.formBundleType != BundleType::ATOMIC_SERVICE) {
+                continue;
+            }
+            if (formRecord.second.formVisibleNotifyState == static_cast<int32_t>(FormVisibilityType::VISIBLE)) {
+                visibleFormRecords.emplace_back(formRecord.second);
+                continue;
+            }
+            inVisiblehFormRecord.emplace_back(formRecord.second);
+        }
+    }
+    return ERR_OK;
+}
+
 }  // namespace AppExecFwk
 }  // namespace OHOS
