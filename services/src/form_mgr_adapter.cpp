@@ -2346,7 +2346,6 @@ ErrCode FormMgrAdapter::RequestPublishFormToHost(Want &want)
     std::string bundleName = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_BUNDLE_KEY);
     std::string abilityName = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_ABILITY_KEY);
     AddSnapshotToHostWant(want, wantToHost);
-    wantToHost.SetParam(Constants::PARAM_CALLER_BUNDLE_NAME_KEY, callerBundleName);
     wantToHost.SetElementName(bundleName, abilityName);
     wantToHost.SetAction(Constants::FORM_PUBLISH_ACTION);
 
