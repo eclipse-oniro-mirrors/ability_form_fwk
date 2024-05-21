@@ -14,7 +14,7 @@
  */
 #include "form_mgr_errors.h"
 #include "form_mgr_adapter.h"
-
+#include "form_info_mgr.h"
 namespace {
     bool g_mockRequestPublishFormToHost = true;
 }
@@ -27,20 +27,24 @@ void MockRequestPublishFormToHost(bool mockRet)
 namespace OHOS {
 namespace AppExecFwk {
 
-ErrCode CheckPublishForm(Want &want, bool needCheckFormPermission = true)
+ErrCode FormInfoMgr::GetFormsInfoByModuleWithoutCheck(const std::string &bundleName, const std::string &moduleName,
+    std::vector<FormInfo> &formInfos)
 {
-    if (g_mockRequestPublishFormToHost) {
-        return ERR_OK;
-    }
-    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    FormInfo formInfo;
+    formInfo.abilityName = "mm";
+    formInfo.name = "bb";
+    formInfo.supportDimensions.push_back(0);
+    formInfo.supportDimensions.push_back(1);
+    formInfos.push_back(formInfo);
+    return ERR_OK;
 }
 
 ErrCode FormMgrAdapter::RequestPublishFormToHost(Want &want)
 {
     if (g_mockRequestPublishFormToHost) {
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+        return ERR_OK;
     }
-    return ERR_OK;
+    return ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
 }
 }
