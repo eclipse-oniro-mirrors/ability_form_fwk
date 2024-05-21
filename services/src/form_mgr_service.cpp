@@ -317,7 +317,6 @@ int FormMgrService::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
     HILOG_INFO("FMS RequestForm called, startTime: begin: %{public}s, publish: %{public}s, end: %{public}s, "
         "onKvDataServiceAddTime: %{public}s", onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
-    FormReport::GetInstance().SetDurationStartTime(formId, FormUtil::GetCurrentMicrosecond());
     ErrCode ret = CheckFormPermission();
     if (ret != ERR_OK) {
         HILOG_ERROR("fail, request form permission denied");
@@ -575,6 +574,7 @@ int FormMgrService::MessageEvent(const int64_t formId, const Want &want, const s
     if (formHostRecords.size() != 0) {
         eventInfo.hostBundleName = formHostRecords.begin()->GetHostBundleName();
     }
+    FormReport::GetInstance().SetDurationStartTime(formId, FormUtil::GetCurrentSteadyClockMillseconds());
     FormEventReport::SendFormEvent(FormEventName::MESSAGE_EVENT_FORM, HiSysEventType::BEHAVIOR, eventInfo);
     return FormMgrAdapter::GetInstance().MessageEvent(formId, want, callerToken);
 }
@@ -749,7 +749,7 @@ ErrCode FormMgrService::Init()
      * so it can't affect the TDD test program */
     if (!Publish(DelayedSingleton<FormMgrService>::GetInstance().get())) {
         FormEventReport::SendFormFailedEvent(FormEventName::INIT_FMS_FAILED, HiSysEventType::FAULT,
-            NewFormEventInfo::errorType::PUBLISH_SER_FAILED);
+            static_cast<int64_t>(InitFmsFiledErrorType::PUBLISH_SER_FAILED));
         HILOG_ERROR("FormMgrService::Init Publish failed");
         return ERR_INVALID_OPERATION;
     }

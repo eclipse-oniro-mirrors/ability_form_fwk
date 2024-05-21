@@ -33,7 +33,6 @@
 #include "js_form_state_observer_interface.h"
 #include "form_info_rdb_storage_mgr.h"
 #include "form_util.h"
-#include "form_report.h"
 #include "form_record_report.h"
 
 namespace OHOS {
@@ -831,11 +830,9 @@ void FormTaskMgr::RenderForm(const FormRecord &formRecord, const Want &want, con
         return;
     }
 
-    FormRecordReport::GetInstance().SetFormRecordRecordInfo(formRecord.formId, want);
     FormJsInfo formJsInfo = CreateFormJsInfo(formRecord.formId, formRecord);
     int32_t error = remoteFormRender->RenderForm(formJsInfo, want, FormSupplyCallback::GetInstance());
     FormRecordReport::GetInstance().IncreaseUpdateTimes(formRecord.formId, HiSysEventPointType::TYPE_DAILY_REFRESH);
-    FormReport::GetInstance().SetDurationEndTime(formRecord.formId, FormUtil::GetCurrentMicrosecond());
     if (!formRecord.isVisible) {
         FormRecordReport::GetInstance().IncreaseUpdateTimes(formRecord.formId,
             HiSysEventPointType::TYPE_INVISIBLE_UPDATE);

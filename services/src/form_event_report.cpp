@@ -197,8 +197,7 @@ void FormEventReport::SendThirdFormEvent(const FormEventName &eventName, HiSysEv
     }
 }
 
-void FormEventReport::SendFormFailedEvent(const FormEventName &eventName, HiSysEventType type,
-    NewFormEventInfo::errorType errorType)
+void FormEventReport::SendFormFailedEvent(const FormEventName &eventName, HiSysEventType type, int64_t errorType)
 {
     std::string name = ConvertEventName(eventName);
     if (name == "INVALIDEVENTNAME") {
@@ -209,8 +208,7 @@ void FormEventReport::SendFormFailedEvent(const FormEventName &eventName, HiSysE
         case FormEventName::INIT_FMS_FAILED:
         case FormEventName::CALLEN_DB_FAILED:
         case FormEventName::ADD_FORM_FAILED:
-            HiSysEventWrite(HiSysEvent::Domain::FORM_MANAGER, name, type, EVENT_KEY_ERROR_TYPE,
-                static_cast<int64_t>(errorType));
+            HiSysEventWrite(HiSysEvent::Domain::FORM_MANAGER, name, type, EVENT_KEY_ERROR_TYPE, errorType);
             break;
         default:
             break;

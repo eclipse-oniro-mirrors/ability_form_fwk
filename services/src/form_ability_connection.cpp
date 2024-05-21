@@ -33,6 +33,7 @@
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 #include "want.h"
+#include "form_report.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -171,6 +172,7 @@ void FormAbilityConnection::ReportFormAppUnbindEvent()
     eventInfo.formAppPid = GetAppFormPid();
     HILOG_INFO("bundleName:%{public}s, formId:%{public}" PRId64 ",pid: %{public}" PRId32 ",timstamp:%{public}" PRId64,
         eventInfo.bundleName.c_str(), eventInfo.formId, eventInfo.formAppPid, eventInfo.timeStamp);
+    FormReport::GetInstance().SetDurationEndTime(eventInfo.formId, FormUtil::GetCurrentSteadyClockMillseconds());
     FormEventReport::SendThirdFormEvent(FormEventName::UNBIND_FORM_APP, HiSysEventType::BEHAVIOR, eventInfo);
 }
 

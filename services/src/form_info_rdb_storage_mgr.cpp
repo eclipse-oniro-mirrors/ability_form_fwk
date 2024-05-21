@@ -39,7 +39,7 @@ FormInfoRdbStorageMgr::FormInfoRdbStorageMgr()
     ErrCode result = rdbDataManager_->Init();
     if (result != ERR_OK) {
         FormEventReport::SendFormFailedEvent(FormEventName::INIT_FMS_FAILED, HiSysEventType::FAULT,
-            NewFormEventInfo::errorType::LOAD_FORM_DB_FAILED);
+            static_cast<int64_t>(InitFmsFiledErrorType::LOAD_FORM_DB_FAILED));
     }
     HILOG_DEBUG("FormInfoRdbStorageMgr is created");
 }
@@ -65,7 +65,7 @@ ErrCode FormInfoRdbStorageMgr::LoadFormInfos(std::vector<std::pair<std::string, 
     if (result != ERR_OK) {
         HILOG_ERROR("get entries error");
         FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, HiSysEventType::FAULT,
-            NewFormEventInfo::errorType::LOAD_DATABASE_FAILED);
+            static_cast<int64_t>(CallDbFiledErrorType::LOAD_DATABASE_FAILED));
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -149,7 +149,7 @@ bool FormInfoRdbStorageMgr::CheckRdbStore()
         tryTimes--;
     }
     FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, HiSysEventType::FAULT,
-        NewFormEventInfo::errorType::DATABASE_RESET_CONNECT_FAILED);
+        static_cast<int64_t>(CallDbFiledErrorType::DATABASE_RESET_CONNECT_FAILED));
     return false;
 }
 
@@ -198,7 +198,7 @@ ErrCode FormInfoRdbStorageMgr::LoadFormData(std::vector<InnerFormInfo> &innerFor
     if (result != ERR_OK) {
         HILOG_ERROR("get entries error");
         FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, HiSysEventType::FAULT,
-            NewFormEventInfo::errorType::LOAD_DATABASE_FAILED);
+            static_cast<int64_t>(CallDbFiledErrorType::LOAD_DATABASE_FAILED));
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     SaveEntries(value, innerFormInfos);
@@ -229,7 +229,7 @@ ErrCode FormInfoRdbStorageMgr::SaveStorageFormData(const InnerFormInfo &innerFor
     if (result != ERR_OK) {
         HILOG_ERROR("put innerFormInfo to RdbStore error");
         FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, HiSysEventType::FAULT,
-            NewFormEventInfo::errorType::DATABASE_SAVE_FORMID_FAILED);
+            static_cast<int64_t>(CallDbFiledErrorType::DATABASE_SAVE_FORMID_FAILED));
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return ERR_OK;
@@ -267,7 +267,7 @@ ErrCode FormInfoRdbStorageMgr::DeleteStorageFormData(const std::string &formId)
     if (result != ERR_OK) {
         HILOG_ERROR("delete key error");
         FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, HiSysEventType::FAULT,
-            NewFormEventInfo::errorType::DATABASE_DELETE_FORMID_FAILED);
+            static_cast<int64_t>(CallDbFiledErrorType::DATABASE_DELETE_FORMID_FAILED));
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -279,7 +279,7 @@ ErrCode FormInfoRdbStorageMgr::DeleteStorageFormData(const std::string &formId)
     if (result != ERR_OK) {
         HILOG_ERROR("delete status data of %{public}s failed", formId.c_str());
         FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, HiSysEventType::FAULT,
-            NewFormEventInfo::errorType::DATABASE_DELETE_FORMID_FAILED);
+            static_cast<int64_t>(CallDbFiledErrorType::DATABASE_DELETE_FORMID_FAILED));
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -308,7 +308,7 @@ ErrCode FormInfoRdbStorageMgr::LoadStatusData(const std::string &formId, std::st
     if (result != ERR_OK) {
         HILOG_ERROR("load status data of %{public}s failed, code is %{public}d", formId.c_str(), result);
         FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, HiSysEventType::FAULT,
-            NewFormEventInfo::errorType::DATABASE_QUERY_FORMID_FAILED);
+            static_cast<int64_t>(CallDbFiledErrorType::DATABASE_QUERY_FORMID_FAILED));
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     
