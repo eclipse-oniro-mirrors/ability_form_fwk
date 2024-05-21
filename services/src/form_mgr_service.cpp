@@ -1615,6 +1615,17 @@ ErrCode FormMgrService::UpdateFormLocation(const int64_t &formId, const int32_t 
     return FormMgrAdapter::GetInstance().UpdateFormLocation(formId, formLocation);
 }
 
+ErrCode FormMgrService::BatchRefreshForms(const int32_t formRefreshType)
+{
+    HILOG_DEBUG("called.");
+    ErrCode ret = CheckFormPermission();
+    if (ret != ERR_OK) {
+        HILOG_ERROR("fail, batch update forms permission denied");
+        return ret;
+    }
+    return FormMgrAdapter::GetInstance().BatchRefreshForms(formRefreshType);
+}
+
 ErrCode FormMgrService::RequestPublishFormWithSnapshot(Want &want, bool withFormBindingData,
     std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId)
 {

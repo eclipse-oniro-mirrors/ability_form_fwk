@@ -622,6 +622,16 @@ public:
         return ERR_OK;
     }
 
+    /**
+     * @brief Update form with formRefreshType, send to form manager service.
+     * @param formRefreshType The type of the form to refresh, 0: AllForm 1: 2: AppForm 2: AtomicServiceForm
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int32_t BatchRefreshForms(const int32_t formRefreshType)
+    {
+        return 0;
+    }
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -700,6 +710,7 @@ public:
         FORM_MGR_PUBLISH_FORM_ERRCODE_RESULT,
         FORM_MGR_ACQUIRE_ADD_FORM_RESULT,
         FORM_MGR_REQUEST_PUBLISH_FORM_WITH_SNAPSHOT,
+        FORM_MGR_BATCH_REFRESH_FORMS,
     };
 };
 }  // namespace AppExecFwk

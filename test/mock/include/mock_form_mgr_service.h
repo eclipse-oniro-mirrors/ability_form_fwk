@@ -112,6 +112,7 @@ public:
     MOCK_METHOD1(AcquireAddFormResult, ErrCode(const int64_t formId));
     MOCK_METHOD4(RequestPublishFormWithSnapshot, ErrCode(Want &want, bool withFormBindingData,
         std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId));
+    MOCK_METHOD1(BatchRefreshForms, ErrCode(const int32_t formRefreshType));
 };
 }
 }

@@ -1483,5 +1483,26 @@ ErrCode FormMgr::RequestPublishFormWithSnapshot(Want &want, bool withFormBinding
     }
     return remoteProxy_->RequestPublishFormWithSnapshot(want, withFormBindingData, formBindingData, formId);
 }
+
+int32_t FormMgr::BatchRefreshForms(const int32_t formRefreshType)
+{
+    HILOG_INFO("called.");
+    if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
+        HILOG_ERROR("BatchRefreshForms failed, form is in recover status, can't do action on form.");
+        return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
+    }
+
+    if (formRefreshType < Constants::REFRESH_ALL_FORM || formRefreshType > Constants::REFRESH_ATOMIC_FORM) {
+        HILOG_ERROR("BatchRefreshForms failed, invalid formRefreshType %{public}d.", formRefreshType);
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+
+    int errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("errCode: %{public}d.", errCode);
+        return errCode;
+    }
+    return remoteProxy_->BatchRefreshForms(formRefreshType);
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

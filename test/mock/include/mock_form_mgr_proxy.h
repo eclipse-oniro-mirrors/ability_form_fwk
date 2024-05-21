@@ -99,6 +99,7 @@ public:
     MOCK_METHOD2(RecoverForms, int32_t(const std::vector<int64_t> &formIds, const Want &want));
     MOCK_METHOD2(SetPublishFormResult, ErrCode(const int64_t formId, Constants::PublishFormResult &errorCodeInfo));
     MOCK_METHOD1(AcquireAddFormResult, ErrCode(const int64_t formId));
+    MOCK_METHOD1(BatchRefreshForms, ErrCode(const int32_t formRefreshType));
 };
 }
 }
