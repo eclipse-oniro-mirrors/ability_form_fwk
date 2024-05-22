@@ -45,6 +45,14 @@ ohos_unittest("FmsFormMgrPublishFormTest") {
   if (target_cpu == "arm") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
+
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    blocklist = "../../../cfi_blocklist.txt"
+  }
+
   deps = [
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",

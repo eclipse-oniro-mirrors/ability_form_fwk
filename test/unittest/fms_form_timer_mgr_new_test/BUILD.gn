@@ -35,10 +35,24 @@ ohos_unittest("FmsFormTimerMgrNewTest") {
   if (target_cpu == "arm") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
+
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    blocklist = "../../../cfi_blocklist.txt"
+  }
+
   deps = [
     "${form_fwk_path}:fms_target",
     "//third_party/googletest:gmock_main",
   ]
+
+  defines = []
+
+  if (res_schedule_service) {
+    defines += [ "RES_SCHEDULE_ENABLE" ]
+  }
 
   external_deps = [
     "ability_base:base",

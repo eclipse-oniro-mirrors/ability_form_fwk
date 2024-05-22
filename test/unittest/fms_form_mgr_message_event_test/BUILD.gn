@@ -46,6 +46,13 @@ ohos_unittest("FmsFormMgrMessageEventTest") {
   if (target_cpu == "arm") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
+
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   deps = [
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",

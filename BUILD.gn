@@ -29,6 +29,12 @@ config("formmgr_config") {
 }
 
 ohos_shared_library("libfms") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   shlib_type = "sa"
   version_script = "libfms.map"
   cflags_cc = []
