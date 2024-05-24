@@ -144,6 +144,11 @@ bool FormAbilityConnection::onFormAppConnect()
         return false;
     }
     auto appMgr = GetAppMgr();
+    if (!appMgr) {
+        HILOG_ERROR("Get app mgr failed!");
+        return false;
+    }
+
     std::vector<AppExecFwk::RunningProcessInfo> infos;
     int32_t userId = FormUtil::GetCurrentAccountId();
     int32_t ret = appMgr->GetRunningProcessInformation(bundleName, userId, infos);
