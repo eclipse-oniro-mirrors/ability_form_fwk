@@ -4543,6 +4543,11 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_233, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormMgrAdapter_233 end";
 }
 
+/**
+ * @tc.name: FormMgrAdapter_234
+ * @tc.desc: test RequestPublishForm function and the return value is true.
+ * @tc.type: FUNC
+ */
 HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_234, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormMgrAdapter_234 start";
@@ -4550,9 +4555,9 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_234, TestSize.Level0)
     Want want;
     std::string str1 = "aa";
     std::string str2 = "bb";
-    std::string str4= "mm";
-    std::string str5= "x";
-    std::string str6= "cc";
+    std::string str4 = "mm";
+    std::string str5 = "xx";
+    std::string str6 = "cc";
     want.SetParam(Constants::PARAM_MODULE_NAME_KEY, str1);
     want.SetParam(Constants::PARAM_FORM_NAME_KEY, str2);
     want.SetElementName(str5, str6, str4);

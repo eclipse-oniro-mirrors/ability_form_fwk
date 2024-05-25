@@ -151,6 +151,12 @@ int64_t FormUtil::GetCurrentMillisecond()
     return (ts.tv_sec * SEC_TO_MILLISEC + ts.tv_nsec / MILLISEC_TO_NANOSEC);
 }
 
+int64_t FormUtil::GetCurrentSteadyClockMillseconds()
+{
+    return std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::steady_clock::now().time_since_epoch()).count();
+}
+
 int64_t FormUtil::GetCurrentMicrosecond()
 {
     system_clock::time_point pointTime = system_clock::now();

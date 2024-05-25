@@ -142,6 +142,7 @@ void FormReport::SetDurationStartTime(int64_t formId, int64_t startTime)
     }
     FormStatistic tmp;
     tmp.durationStartTime_ = startTime;
+    tmp.durationEndTime_ = 0;
     formStatisticMap_[formId] = tmp;
 }
 
@@ -183,8 +184,18 @@ void FormReport::HandleAddFormStatistic(int64_t formId)
     eventInfo.abilityName = record.abilityName_;
     eventInfo.formName = record.formName_;
     eventInfo.formDimension = record.dimensionId_;
-    eventInfo.bindDuration = (record.endBindTime_ - record.startBindTime_);
-    eventInfo.getDuration = (record.endGetTime_ - record.startGetTime_);
+    if (record.endBindTime_ > record.startBindTime_) {
+        eventInfo.bindDuration = (record.endBindTime_ - record.startBindTime_);
+    } else {
+        eventInfo.bindDuration = 0;
+        HILOG_ERROR("bindDuration error formid: %{public}" PRId64, formId);
+    }
+    if (record.endGetTime_ > record.startGetTime_) {
+        eventInfo.getDuration = (record.endGetTime_ - record.startGetTime_);
+    } else {
+        eventInfo.bindDuration = 0;
+        HILOG_ERROR("getDuration error formid: %{public}" PRId64, formId);
+    }
     eventInfo.acquireDuration = (record.endAquireTime_ - record.startAquireTime_);
     FormEventReport::SendFirstAddFormEvent(FormEventName::FIRST_ADD_FORM_DURATION,
         HiSysEventType::STATISTIC, eventInfo);
@@ -201,6 +212,9 @@ void FormReport::HandleFirstUpdateStatistic(int64_t formId)
     for (auto iter = formStatisticMap_.begin(); iter != formStatisticMap_.end(); ++iter) {
         if (formId == iter->first) {
             FormStatistic& record = iter->second;
+            if (!record.durationStartTime_) {
+                return;
+            }
             int64_t durationNow = (record.durationEndTime_ - record.durationStartTime_);
             eventInfo.sessionId = 0;
             eventInfo.formId = formId;
@@ -212,6 +226,7 @@ void FormReport::HandleFirstUpdateStatistic(int64_t formId)
             eventInfo.duration = durationNow;
             FormEventReport::SendFirstUpdateFormEvent(FormEventName::FIRST_UPDATE_FORM_DURATION,
                 HiSysEventType::STATISTIC, eventInfo);
+            iter->second.durationStartTime_ = 0;
         }
     }
 }

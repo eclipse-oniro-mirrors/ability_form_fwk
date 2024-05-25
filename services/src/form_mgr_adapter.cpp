@@ -1856,7 +1856,7 @@ ErrCode FormMgrAdapter::InnerAcquireProviderFormInfoAsync(const int64_t formId,
     want.SetElementName(info.GetProviderBundleName(), info.GetAbilityName());
     want.AddFlags(Want::FLAG_ABILITY_FORM_ENABLED);
     ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbility(want, formAcquireConnection);
-    FormReport::GetInstance().SetStartBindTime(formId, FormUtil::GetCurrentMicrosecond());
+    FormReport::GetInstance().SetStartBindTime(formId, FormUtil::GetCurrentSteadyClockMillseconds());
     if (errorCode != ERR_OK) {
         HILOG_ERROR("%{public}s fail, ConnectServiceAbility failed.", __func__);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
@@ -2970,7 +2970,7 @@ void FormMgrAdapter::AcquireProviderFormInfo(const int64_t formId, const Want &w
         FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
         HILOG_ERROR("%{public}s fail, Failed to get acquire provider form info", __func__);
     }
-    FormReport::GetInstance().SetEndGetTime(formId, FormUtil::GetCurrentMicrosecond());
+    FormReport::GetInstance().SetEndGetTime(formId, FormUtil::GetCurrentSteadyClockMillseconds());
 }
 
 /**

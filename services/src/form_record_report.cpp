@@ -39,7 +39,9 @@ void FormRecordReport::SetFormRecordRecordInfo(int64_t formId, const Want &want)
     info.bundleName = want.GetElement().GetBundleName();
     info.moduleName = want.GetStringParam(Constants::PARAM_MODULE_NAME_KEY);
     info.formName = want.GetStringParam(Constants::PARAM_FORM_NAME_KEY);
-    formRecordReportMap_[formId] = info;
+    if (formRecordReportMap_.find(formId) == formRecordReportMap_.end()) {
+        formRecordReportMap_[formId] = info;
+    }
 }
 
 void FormRecordReport::IncreaseUpdateTimes(int64_t formId, HiSysEventPointType type)
@@ -48,39 +50,39 @@ void FormRecordReport::IncreaseUpdateTimes(int64_t formId, HiSysEventPointType t
     FormRecordReportInfo info;
     if (formRecordReportMap_.find(formId) != formRecordReportMap_.end()) {
         info = formRecordReportMap_[formId];
+        switch (type) {
+            case TYPE_DAILY_REFRESH:
+                info.dailyRefreshTimes++;
+                break;
+            case TYPE_INVISIBLE_UPDATE:
+                info.invisibleRefreshTimes++;
+                break;
+            case TYPE_HIGH_FREQUENCY:
+                info.hfRefreshBlockTimes++;
+                break;
+            case TYPE_INVISIBLE_INTERCEPT:
+                info.invisibleRefreshBlockTimes++;
+                break;
+            case TYPE_HIGH_LOAD:
+                info.highLoadRefreshBlockTimes = 0;
+                break;
+            case TYPE_ACTIVE_RECVOER_UPDATE:
+                info.activeRecoverRefreshTimes = 0;
+                break;
+            case TYPE_PASSIVE_RECOVER_UPDATE:
+                info.passiveRecoverRefreshTimes++;
+                break;
+            case TYPE_HF_RECOVER_UPDATE:
+                info.hfRecoverRefreshTimes++;
+                break;
+            case TYPE_OFFLOAD_RECOVER_UPDATE:
+                info.offloadRecoverRefreshTimes = 0;
+                break;
+            default:
+                break;
+        }
+        formRecordReportMap_[formId] = info;
     }
-    switch (type) {
-        case TYPE_DAILY_REFRESH:
-            info.dailyRefreshTimes++;
-            break;
-        case TYPE_INVISIBLE_UPDATE:
-            info.invisibleRefreshTimes++;
-            break;
-        case TYPE_HIGH_FREQUENCY:
-            info.hfRefreshBlockTimes++;
-            break;
-        case TYPE_INVISIBLE_INTERCEPT:
-            info.invisibleRefreshBlockTimes++;
-            break;
-        case TYPE_HIGH_LOAD:
-            info.highLoadRefreshBlockTimes = 0;
-            break;
-        case TYPE_ACTIVE_RECVOER_UPDATE:
-            info.activeRecoverRefreshTimes = 0;
-            break;
-        case TYPE_PASSIVE_RECOVER_UPDATE:
-            info.passiveRecoverRefreshTimes++;
-            break;
-        case TYPE_HF_RECOVER_UPDATE:
-            info.hfRecoverRefreshTimes++;
-            break;
-        case TYPE_OFFLOAD_RECOVER_UPDATE:
-            info.offloadRecoverRefreshTimes = 0;
-            break;
-        default:
-            break;
-    }
-    formRecordReportMap_[formId] = info;
 }
 
 void FormRecordReport::HandleFormRefreshCount()

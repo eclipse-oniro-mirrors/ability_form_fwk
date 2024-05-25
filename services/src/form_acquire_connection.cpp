@@ -50,7 +50,7 @@ void FormAcquireConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &
            __func__, element.GetAbilityName().c_str(), GetFormId(), resultCode);
         return;
     }
-    FormReport::GetInstance().SetEndBindTime(GetFormId(), FormUtil::GetCurrentMicrosecond());
+    FormReport::GetInstance().SetEndBindTime(GetFormId(), FormUtil::GetCurrentSteadyClockMillseconds());
     onFormAppConnect();
 #ifdef RES_SCHEDULE_ENABLE
     OnFormAbilityConnectDoneCallback();
@@ -72,7 +72,7 @@ void FormAcquireConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &
         __func__, info_.GetDeviceId().c_str(), info_.GetProviderBundleName().c_str(), info_.GetAbilityName().c_str());
 
     FormTaskMgr::GetInstance().PostAcquireTask(GetFormId(), want, remoteObject);
-    FormReport::GetInstance().SetStartGetTime(GetFormId(), FormUtil::GetCurrentMicrosecond());
+    FormReport::GetInstance().SetStartGetTime(GetFormId(), FormUtil::GetCurrentSteadyClockMillseconds());
     if (GetHostToken() != nullptr) {
         SetProviderToken(remoteObject);
     }
