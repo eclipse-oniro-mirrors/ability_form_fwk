@@ -113,6 +113,11 @@ public:
     {
         return {};
     }
+    int32_t GetCommonEventExtraDataIdlist(int32_t saId,
+        std::vector<int64_t>& extraDataIdList, const std::string& eventName)
+    {
+        return {};
+    }
     int32_t GetSystemProcessInfo(int32_t systemAbilityId, SystemProcessInfo& systemProcessInfo) override
     {
         return {};
