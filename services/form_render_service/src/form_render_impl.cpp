@@ -37,6 +37,7 @@ constexpr int32_t RECYCLE_FORM_FAILED = -1;
 constexpr int32_t FORM_RENDER_TASK_DELAY_TIME = 20; // ms
 }
 using namespace AbilityRuntime;
+using namespace OHOS::AAFwk::GlobalConfigurationKey;
 
 static OHOS::AbilityRuntime::ServiceExtension *FormRenderServiceCreator(const std::unique_ptr<Runtime> &runtime)
 {
@@ -50,7 +51,15 @@ __attribute__((constructor)) void RegisterServiceExtensionCreator()
     OHOS::AbilityRuntime::ServiceExtension::SetCreator(FormRenderServiceCreator);
 }
 
-FormRenderImpl::FormRenderImpl() = default;
+FormRenderImpl::FormRenderImpl()
+{
+    const std::string queueName = "FormRenderSerialQueue";
+    serialQueue_ = std::make_shared<FormRenderSerialQueue>(queueName);
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("Init fail. Failed to init due to create serialQueue_ error");
+    }
+}
+
 FormRenderImpl::~FormRenderImpl() = default;
 
 int32_t FormRenderImpl::RenderForm(const FormJsInfo &formJsInfo, const Want &want,
@@ -242,7 +251,7 @@ int32_t FormRenderImpl::OnUnlock()
 void FormRenderImpl::OnConfigurationUpdated(
     const std::shared_ptr<OHOS::AppExecFwk::Configuration>& configuration)
 {
-    HILOG_INFO("OnConfigurationUpdated start");
+    HILOG_DEBUG("OnConfigurationUpdated start");
     std::lock_guard<std::mutex> lock(renderRecordMutex_);
     if (!configuration) {
         HILOG_ERROR("configuration is nullptr");
@@ -250,11 +259,34 @@ void FormRenderImpl::OnConfigurationUpdated(
     }
 
     SetConfiguration(configuration);
+    constexpr int64_t minDurationMs = 1500;
+    const std::string taskName = "FormRenderImpl::OnConfigurationUpdated";
+    serialQueue_->CancelDelayTask(taskName);
+    auto duration = std::chrono::steady_clock::now() - configUpdateTime_;
+    if (std::chrono::duration_cast<std::chrono::milliseconds>(duration).count() < minDurationMs) {
+        HILOG_INFO("OnConfigurationUpdated ignored.");
+        auto configUpdateFunc = [this]() {
+            HILOG_INFO("OnConfigurationUpdated task run");
+            this->OnConfigurationUpdatedInner();
+        };
+        constexpr int64_t taskDelayMs = 1000;
+        serialQueue_->ScheduleDelayTask(taskName, taskDelayMs, configUpdateFunc);
+        return;
+    }
+    OnConfigurationUpdatedInner();
+}
+
+void FormRenderImpl::OnConfigurationUpdatedInner()
+{
+    configUpdateTime_ = std::chrono::steady_clock::now();
+    size_t allFormCount = 0;
     for (auto iter = renderRecordMap_.begin(); iter != renderRecordMap_.end(); ++iter) {
         if (iter->second) {
-            iter->second->UpdateConfiguration(configuration);
+            iter->second->UpdateConfiguration(configuration_);
+            allFormCount += iter->second->FormCount();
         }
     }
+    HILOG_INFO("OnConfigurationUpdated %{public}zu forms updated.", allFormCount);
     PerformanceEventInfo eventInfo;
     eventInfo.timeStamp = FormRenderEventReport::GetNowMillisecond();
     eventInfo.bundleName = Constants::FRS_BUNDLE_NAME;
@@ -264,6 +296,21 @@ void FormRenderImpl::OnConfigurationUpdated(
 
 void FormRenderImpl::SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration>& config)
 {
+    if (config != nullptr && configuration_ != nullptr) {
+        std::string colorMode = config->GetItem(SYSTEM_COLORMODE);
+        std::string languageTag = config->GetItem(SYSTEM_LANGUAGE);
+        std::string colorModeOld = configuration_->GetItem(SYSTEM_COLORMODE);
+        std::string languageTagOld = configuration_->GetItem(SYSTEM_LANGUAGE);
+        configuration_ = config;
+        if (colorMode.empty()) {
+            configuration_->AddItem(SYSTEM_COLORMODE, colorModeOld);
+        }
+        if (languageTag.empty()) {
+            configuration_->AddItem(SYSTEM_LANGUAGE, languageTagOld);
+        }
+        return;
+    }
+
     configuration_ = config;
 }
 

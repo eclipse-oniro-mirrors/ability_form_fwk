@@ -497,21 +497,6 @@ bool FormRenderRecord::SetPkgContextInfoMap(const FormJsInfo &formJsInfo, Abilit
 
 void FormRenderRecord::SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration>& config)
 {
-    if (config != nullptr && configuration_ != nullptr) {
-        std::string colorMode = config->GetItem(SYSTEM_COLORMODE);
-        std::string languageTag = config->GetItem(SYSTEM_LANGUAGE);
-        std::string colorModeOld = configuration_->GetItem(SYSTEM_COLORMODE);
-        std::string languageTagOld = configuration_->GetItem(SYSTEM_LANGUAGE);
-        configuration_ = config;
-        if (colorMode.empty()) {
-            configuration_->AddItem(SYSTEM_COLORMODE, colorModeOld);
-        }
-        if (languageTag.empty()) {
-            configuration_->AddItem(SYSTEM_LANGUAGE, languageTagOld);
-        }
-        return;
-    }
-
     configuration_ = config;
 }
 
@@ -1158,6 +1143,11 @@ int32_t FormRenderRecord::HandleReloadFormRecord(const std::vector<FormJsInfo> &
         group->ReloadForm(form);
     }
     return ERR_OK;
+}
+
+size_t FormRenderRecord::FormCount()
+{
+    return formRequests_.size();
 }
 
 void FormRenderRecord::UpdateConfiguration(

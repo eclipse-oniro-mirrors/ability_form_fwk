@@ -133,6 +133,8 @@ public:
 
     int32_t RecoverForm(const int64_t &formId, const std::string &statusData,
         const bool &isRecoverFormToHandleClickEvent);
+
+    size_t FormCount();
 private:
     class RemoteObjHash {
     public:

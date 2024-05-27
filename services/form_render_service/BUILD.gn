@@ -72,6 +72,7 @@ ohos_shared_library("formrender") {
     "src/form_render_event_report.cpp",
     "src/form_render_impl.cpp",
     "src/form_render_record.cpp",
+    "src/form_render_serial_queue.cpp",
     "src/form_render_service_extension.cpp",
   ]
 
@@ -103,6 +104,7 @@ ohos_shared_library("formrender") {
     "eventhandler:libeventhandler",
     "faultloggerd:libbacktrace_local",
     "faultloggerd:libdfx_dumpcatcher",
+    "ffrt:libffrt",
     "hicollie:libhicollie",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
