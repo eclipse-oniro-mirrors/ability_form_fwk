@@ -24,6 +24,10 @@ namespace AppExecFwk {
 bool FormProviderInfo::ReadFromParcel(Parcel &parcel)
 {
     std::unique_ptr<FormProviderData> bindingData(parcel.ReadParcelable<FormProviderData>());
+    if (bindingData == nullptr) {
+        HILOG_ERROR("Binding data is nullptr.");
+        return false;
+    }
     jsBindingData_ = *bindingData;
 
     auto number = parcel.ReadInt32();
