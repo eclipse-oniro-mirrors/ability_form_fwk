@@ -177,7 +177,7 @@ public:
         return;
     }
 
-    int KillProcess(const std::string &bundleName) override
+    int KillProcess(const std::string &bundleName, const bool clreaPageStack = true) override
     {
         return 0;
     }
@@ -541,7 +541,7 @@ public:
         return;
     }
 
-    int KillProcess(const std::string &bundleName) override
+    int KillProcess(const std::string &bundleName, const bool clreaPageStack = true) override
     {
         return 0;
     }
