@@ -25,6 +25,7 @@
 #include "context_impl.h"
 #include "event_handler.h"
 #include "form_render_record.h"
+#include "form_render_serial_queue.h"
 #include "form_supply_proxy.h"
 #include "js_runtime.h"
 #include "runtime.h"
@@ -97,11 +98,14 @@ public:
 private:
     void FormRenderGCTask(const std::string &uid);
     void FormRenderGC(const std::string &uid);
+    void OnConfigurationUpdatedInner();
 
     std::mutex renderRecordMutex_;
     // <uid(userId + bundleName), renderRecord>
     std::unordered_map<std::string, std::shared_ptr<FormRenderRecord>> renderRecordMap_;
     std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration_;
+    std::chrono::steady_clock::time_point configUpdateTime_ = std::chrono::steady_clock::now();
+    std::shared_ptr<FormRenderSerialQueue> serialQueue_ = nullptr;
     std::mutex formSupplyMutex_;
     sptr<IFormSupply> formSupplyClient_;
 };

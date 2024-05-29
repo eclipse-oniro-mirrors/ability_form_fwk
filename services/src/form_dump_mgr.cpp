@@ -301,6 +301,7 @@ void FormDumpMgr::AppendRunningFormInfos(const std::string &formHostBundleName,
 
             AppendFormLocation(info.formLocation, infosResult);
             AppendRecycleStatus(info.recycleStatus, infosResult);
+            AppendBundleType(info.formBundleType, infosResult);
             infosResult += " \n";
         }
     }
@@ -394,6 +395,18 @@ void FormDumpMgr::AppendRecycleStatus(const RecycleStatus recycleStatus, std::st
         formInfo += "[ RECYCLED ]\n";
     } else {
         formInfo += "[ NON_RECYCLABLE ]\n";
+    }
+}
+
+void FormDumpMgr::AppendBundleType(const BundleType formBundleType, std::string &formInfo) const
+{
+    formInfo += "    formBundleType ";
+    if (formBundleType == BundleType::APP) {
+        formInfo += "[ APP ]\n";
+    } else if (formBundleType == BundleType::ATOMIC_SERVICE) {
+        formInfo += "[ ATOMIC_SERVICE ]\n";
+    } else {
+        formInfo += "[ INVALID ]\n";
     }
 }
 }  // namespace AppExecFwk

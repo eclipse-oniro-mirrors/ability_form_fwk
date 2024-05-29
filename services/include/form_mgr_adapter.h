@@ -614,6 +614,13 @@ public:
      */
     ErrCode UpdateFormLocation(const int64_t &formId, const int32_t &formLocation);
 
+    /**
+     * @brief Update form with formRefreshType, send to form manager service.
+     * @param formRefreshType The type of the form to refresh, 0: AllForm 1: 2: AppForm 2: AtomicServiceForm
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode BatchRefreshForms(const int32_t formRefreshType);
+
 #ifdef RES_SCHEDULE_ENABLE
     /**
      * @brief Set the value which indicate whether Refresh Timer task should be triggered.

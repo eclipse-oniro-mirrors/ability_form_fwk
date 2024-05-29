@@ -78,6 +78,14 @@ void FormReport::SetEndAquireTime(int64_t formId, int64_t endTime)
     }
 }
 
+void FormReport::GetEndAquireTime(int64_t formId, int64_t &endTime)
+{
+    auto it = formStatisticMap_.find(formId);
+    if (it != formStatisticMap_.end()) {
+        endTime = formStatisticMap_[formId].endAquireTime_;
+    }
+}
+
 void FormReport::SetStartBindTime(int64_t formId, int64_t startTime)
 {
     std::lock_guard<std::mutex> guard(formReport_);
@@ -134,6 +142,7 @@ void FormReport::SetDurationStartTime(int64_t formId, int64_t startTime)
     }
     FormStatistic tmp;
     tmp.durationStartTime_ = startTime;
+    tmp.durationEndTime_ = 0;
     formStatisticMap_[formId] = tmp;
 }
 
@@ -141,8 +150,17 @@ void FormReport::SetDurationEndTime(int64_t formId, int64_t endTime)
 {
     auto it = formStatisticMap_.find(formId);
     if (it != formStatisticMap_.end()) {
-        formStatisticMap_[formId].durationEndTime_ = endTime;
-        HandleFirstUpdateStatistic(formId);
+        if (!formStatisticMap_[formId].durationEndTime_) {
+            formStatisticMap_[formId].durationEndTime_ = endTime;
+            HandleFirstUpdateStatistic(formId);
+        }
+    }
+}
+
+void FormReport::InsertFormId(int64_t formId)
+{
+    if (FormIds.find(formId) == FormIds.end()) {
+        FormIds.insert(formId);
     }
 }
 
@@ -151,7 +169,11 @@ void FormReport::HandleAddFormStatistic(int64_t formId)
     std::lock_guard<std::mutex> guard(formReport_);
     auto &record = formStatisticMap_[formId];
     if (formStatisticMap_.count(formId) == 0) {
-        HILOG_INFO("Form ID not found in formStatisticMap_: %{public}" PRId64, formId);
+        HILOG_INFO("formid not found in formStatisticMap_: %{public}" PRId64, formId);
+        return;
+    }
+    if (FormIds.find(formId) != FormIds.end()) {
+        HILOG_ERROR("hisysevent yet formid: %{public}" PRId64, formId);
         return;
     }
     NewFormEventInfo eventInfo;
@@ -162,11 +184,22 @@ void FormReport::HandleAddFormStatistic(int64_t formId)
     eventInfo.abilityName = record.abilityName_;
     eventInfo.formName = record.formName_;
     eventInfo.formDimension = record.dimensionId_;
-    eventInfo.bindDuration = (record.endBindTime_ - record.startBindTime_);
-    eventInfo.getDuration = (record.endGetTime_ - record.startGetTime_);
+    if (record.endBindTime_ > record.startBindTime_) {
+        eventInfo.bindDuration = (record.endBindTime_ - record.startBindTime_);
+    } else {
+        eventInfo.bindDuration = 0;
+        HILOG_ERROR("bindDuration error formid: %{public}" PRId64, formId);
+    }
+    if (record.endGetTime_ > record.startGetTime_) {
+        eventInfo.getDuration = (record.endGetTime_ - record.startGetTime_);
+    } else {
+        eventInfo.bindDuration = 0;
+        HILOG_ERROR("getDuration error formid: %{public}" PRId64, formId);
+    }
     eventInfo.acquireDuration = (record.endAquireTime_ - record.startAquireTime_);
     FormEventReport::SendFirstAddFormEvent(FormEventName::FIRST_ADD_FORM_DURATION,
         HiSysEventType::STATISTIC, eventInfo);
+    FormIds.insert(formId);
 }
 
 void FormReport::HandleFirstUpdateStatistic(int64_t formId)
@@ -174,22 +207,27 @@ void FormReport::HandleFirstUpdateStatistic(int64_t formId)
     if (formId <= 0) {
         return;
     }
+    NewFormEventInfo eventInfo;
     std::lock_guard<std::mutex> guard(formReport_);
     for (auto iter = formStatisticMap_.begin(); iter != formStatisticMap_.end(); ++iter) {
-        const int64_t formId = iter->first;
-        FormStatistic& record = iter->second;
-        float durationNow = (record.durationEndTime_ - record.durationStartTime_);
-        NewFormEventInfo eventInfo;
-        eventInfo.sessionId = 0;
-        eventInfo.formId = formId;
-        if (durationNow >= DELAY_TIME_MICROSECONDS) {
-            eventInfo.durationType = 1;
-        } else {
-            eventInfo.durationType = 0;
+        if (formId == iter->first) {
+            FormStatistic& record = iter->second;
+            if (!record.durationStartTime_) {
+                return;
+            }
+            int64_t durationNow = (record.durationEndTime_ - record.durationStartTime_);
+            eventInfo.sessionId = 0;
+            eventInfo.formId = formId;
+            if (durationNow >= DELAY_TIME_MICROSECONDS) {
+                eventInfo.durationType = 1;
+            } else {
+                eventInfo.durationType = 0;
+            }
+            eventInfo.duration = durationNow;
+            FormEventReport::SendFirstUpdateFormEvent(FormEventName::FIRST_UPDATE_FORM_DURATION,
+                HiSysEventType::STATISTIC, eventInfo);
+            iter->second.durationStartTime_ = 0;
         }
-        eventInfo.duration = durationNow;
-        FormEventReport::SendFirstUpdateFormEvent(FormEventName::FIRST_UPDATE_FORM_DURATION,
-            HiSysEventType::STATISTIC, eventInfo);
     }
 }
 

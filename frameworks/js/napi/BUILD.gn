@@ -22,7 +22,7 @@ config("fmskit_config") {
 
 ################################### formbindingdata_napi ########################################
 ohos_shared_library("formbindingdata_napi") {
-  include_dirs = [ "${ipc_core_path}/include" ]
+  include_dirs = []
 
   sources = [
     "form_binding_data/form_binding_data.cpp",
@@ -37,6 +37,7 @@ ohos_shared_library("formbindingdata_napi") {
     "ability_runtime:runtime",
     "c_utils:utils",
     "hilog:libhilog",
+    "ipc:ipc_core",
     "napi:ace_napi",
   ]
 
@@ -47,7 +48,7 @@ ohos_shared_library("formbindingdata_napi") {
 }
 
 ohos_shared_library("formbindingdata") {
-  include_dirs = [ "${ipc_core_path}/include" ]
+  include_dirs = []
 
   sources = [
     "form_binding_data/js_form_binding_data.cpp",
@@ -68,6 +69,7 @@ ohos_shared_library("formbindingdata") {
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "hilog:libhilog",
+    "ipc:ipc_core",
     "napi:ace_napi",
   ]
 
@@ -248,7 +250,7 @@ ohos_shared_library("forminfo") {
 
 ################################### formhost_napi ########################################
 ohos_shared_library("formhost_napi") {
-  include_dirs = [ "${ability_runtime_innerapi_path}/runtime/include" ]
+  include_dirs = []
 
   sources = [
     "formHost/napi_form_host.cpp",
@@ -284,10 +286,7 @@ ohos_shared_library("formhost_napi") {
 
 ################################### formhost ########################################
 ohos_shared_library("formhost") {
-  include_dirs = [
-    "${ability_runtime_innerapi_path}/runtime/include",
-    "${form_fwk_path}/interfaces/inner_api/include",
-  ]
+  include_dirs = [ "${form_fwk_path}/interfaces/inner_api/include" ]
 
   sources = [
     "form_host/js_form_host.cpp",
@@ -328,7 +327,6 @@ ohos_shared_library("formhost") {
 ################################### formobserver ########################################
 ohos_shared_library("formobserver") {
   include_dirs = [
-    "${ability_runtime_innerapi_path}/runtime/include",
     "${form_fwk_path}/interfaces/inner_api/include",
     "${form_fwk_path}/frameworks/js/napi/form_host",
     "${form_fwk_path}/frameworks/js/napi/form_observer",
@@ -373,7 +371,7 @@ ohos_shared_library("formobserver") {
 
 ################################### formprovider_napi ########################################
 ohos_shared_library("formprovider_napi") {
-  include_dirs = [ "${ability_runtime_innerapi_path}/runtime/include" ]
+  include_dirs = []
 
   sources = [
     "formProvider/napi_form_provider.cpp",
@@ -408,7 +406,7 @@ ohos_shared_library("formprovider_napi") {
 }
 
 ohos_shared_library("formprovider") {
-  include_dirs = [ "${ability_runtime_innerapi_path}/runtime/include" ]
+  include_dirs = []
 
   sources = [
     "form_provider/js_form_provider.cpp",
@@ -446,7 +444,7 @@ ohos_shared_library("formprovider") {
 
 ################################### formagent_napi ########################################
 ohos_shared_library("formagent") {
-  include_dirs = [ "${ability_runtime_innerapi_path}/runtime/include" ]
+  include_dirs = []
 
   sources = [
     "form_agent/js_form_agent.cpp",
@@ -516,10 +514,7 @@ ohos_shared_library("formutil_napi") {
 
 ################################### formerror_napi ########################################
 ohos_shared_library("formerror_napi") {
-  include_dirs = [
-    "${ability_runtime_innerapi_path}/runtime/include",
-    "${form_fwk_napi_path}/formUtil",
-  ]
+  include_dirs = [ "${form_fwk_napi_path}/formUtil" ]
 
   sources = [
     "form_error/form_error_module.cpp",
@@ -531,6 +526,7 @@ ohos_shared_library("formerror_napi") {
   external_deps = [
     "ability_runtime:abilitykit_native",
     "ability_runtime:extensionkit_native",
+    "ability_runtime:runtime",
     "common_event_service:cesfwk_innerkits",
     "hilog:libhilog",
     "napi:ace_napi",

@@ -706,6 +706,16 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode UpdateFormLocation(const int64_t &formId, const int32_t &formLocation);
+
+    /**
+     * @brief Get the formRecords by refreshType.
+     * @param formRefreshType form refresh type.
+     * @param visibleFormRecords Return the visible forms' infos need to refresh.
+     * @param inVisiblehFormRecords Return the invisible forms' infos need to refresh.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode GetRecordsByFormType(const int32_t formRefreshType,
+        std::vector<FormRecord> &visibleFormRecords, std::vector<FormRecord> &inVisiblehFormRecords);
 private:
     /**
      * @brief Create form record.

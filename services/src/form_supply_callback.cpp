@@ -59,8 +59,12 @@ void FormSupplyCallback::ProcessFormAcquisition(int64_t formId)
     FormRecord record;
     bool hasRecord = FormDataMgr::GetInstance().GetFormRecord(formId, record);
     if (hasRecord) {
-        FormReport::GetInstance().SetEndAquireTime(formId, FormUtil::GetCurrentMicrosecond());
-        FormReport::GetInstance().HandleAddFormStatistic(formId);
+        int64_t endTime;
+        FormReport::GetInstance().GetEndAquireTime(formId, endTime);
+        if (!endTime) {
+            FormReport::GetInstance().SetEndAquireTime(formId, FormUtil::GetCurrentSteadyClockMillseconds());
+            FormReport::GetInstance().HandleAddFormStatistic(formId);
+        }
     }
 }
 /**
@@ -87,8 +91,10 @@ int FormSupplyCallback::OnAcquire(const FormProviderInfo &formProviderInfo, cons
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     int64_t formId = std::stoll(strFormId);
+    FormReport::GetInstance().SetStartAquireTime(formId, FormUtil::GetCurrentSteadyClockMillseconds());
+    FormRecordReport::GetInstance().SetFormRecordRecordInfo(formId, want);
     FormReport::GetInstance().SetFormRecordInfo(formId, want);
-    FormReport::GetInstance().SetStartAquireTime(formId, FormUtil::GetCurrentMicrosecond());
+    ProcessFormAcquisition(formId);
     if (IsRemoveConnection(formId, want.GetRemoteObject(Constants::PARAM_FORM_HOST_TOKEN))) {
         RemoveConnection(connectId);
     }
@@ -96,7 +102,6 @@ int FormSupplyCallback::OnAcquire(const FormProviderInfo &formProviderInfo, cons
     if (FormRenderMgr::GetInstance().IsNeedRender(formId)) {
         errCode = FormRenderMgr::GetInstance().UpdateRenderingForm(formId, formProviderInfo.GetFormData(),
             want.GetParams(), false);
-        ProcessFormAcquisition(formId);
         FormDataProxyMgr::GetInstance().SubscribeFormData(formId, formProviderInfo.GetFormProxies(), want);
         return errCode;
     }
@@ -117,7 +122,6 @@ int FormSupplyCallback::OnAcquire(const FormProviderInfo &formProviderInfo, cons
     }
 
     FormDataProxyMgr::GetInstance().SubscribeFormData(formId, formProviderInfo.GetFormProxies(), want);
-    ProcessFormAcquisition(formId);
     HILOG_INFO("%{public}s end.", __func__);
     return ret;
 }
@@ -177,7 +181,7 @@ void FormSupplyCallback::AddConnection(sptr<FormAbilityConnection> connection)
     if (connection == nullptr) {
         return;
     }
-    int32_t connectKey = static_cast<int32_t>(FormUtil::GetCurrentMillisecond());
+    int32_t connectKey = static_cast<int32_t>(FormUtil::GetCurrentSteadyClockMillseconds());
     std::lock_guard<std::mutex> lock(conMutex_);
     while (connections_.find(connectKey) != connections_.end()) {
         connectKey++;

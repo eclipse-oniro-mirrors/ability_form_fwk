@@ -75,8 +75,8 @@ int32_t RdbStoreDataCallBackFormInfoStorage::OnOpen(NativeRdb::RdbStore &rdbStor
 
 int32_t RdbStoreDataCallBackFormInfoStorage::onCorruption(std::string databaseFile)
 {
-    FormEventReport::SendFormFailedEvent(FormEventName::INIT_FMS_FAILED, HiSysEventType::FAULT,
-        NewFormEventInfo::errorType::DATABASE_EXIT_ABNORMA);
+    FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, HiSysEventType::FAULT,
+        static_cast<int64_t>(CallDbFiledErrorType::DATABASE_EXIT_ABNORMA));
     return NativeRdb::E_OK;
 }
 

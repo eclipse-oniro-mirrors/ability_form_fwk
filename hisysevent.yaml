@@ -139,7 +139,7 @@ PROXY_UPDATE_FORM:
   FORM_DIMENSION: {type: INT64, desc: form dimension}
   ABILITY_NAME: {type: STRING, desc: ability name}
 
-UNNORMATIVE_PUBLISH_FORM_TO_HOST:
+INVALID_PUBLISH_FORM_TO_HOST:
   __BASE: {type: STATISTIC, level: MINOR, tag: ability, desc: form manager}
   CLIENT_BUNDLE_NAME: {type: STRING, desc: client bundle name}
   HOST_BUNDLE_NAME: {type: STRING, desc: host bundle name}

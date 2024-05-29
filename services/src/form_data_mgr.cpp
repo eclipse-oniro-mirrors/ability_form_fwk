@@ -200,6 +200,7 @@ FormRecord FormDataMgr::CreateFormRecord(const FormItemInfo &formInfo, const int
     newRecord.isDataProxy = formInfo.GetDataProxyFlag();
     newRecord.uid = formInfo.GetProviderUid();
     newRecord.modulePkgNameMap = formInfo.GetModulePkgNameMap();
+    newRecord.formBundleType = formInfo.GetFormBundleType();
     formInfo.GetHapSourceDirs(newRecord.hapSourceDirs);
     HILOG_INFO("end");
     return newRecord;
@@ -319,7 +320,7 @@ int FormDataMgr::CheckTempEnoughForm() const
     if (static_cast<int32_t>(tempForms_.size()) >= maxTempSize) {
         HILOG_WARN("already exist %{public}d temp forms in system", maxTempSize);
         FormEventReport::SendFormFailedEvent(FormEventName::ADD_FORM_FAILED, HiSysEventType::FAULT,
-            NewFormEventInfo::errorType::NUMBER_EXCEEDING_LIMIT);
+            static_cast<int64_t>(AddFormFiledErrorType::NUMBER_EXCEEDING_LIMIT));
         return ERR_APPEXECFWK_FORM_MAX_SYSTEM_TEMP_FORMS;
     }
     return ERR_OK;
@@ -355,11 +356,11 @@ int FormDataMgr::CheckEnoughForm(const int callingUid, const int32_t currentUser
     std::lock_guard<std::mutex> lock(formRecordMutex_);
     std::vector<FormDBInfo> formDbInfos;
     FormDbCache::GetInstance().GetAllFormInfo(formDbInfos);
-    HILOG_DEBUG("already use %{public}zu forms", formDbInfos.size());
+    HILOG_INFO("already use %{public}zu forms", formDbInfos.size());
     if (static_cast<int32_t>(formDbInfos.size()) >= maxFormsSize) {
         HILOG_WARN("already use %{public}d forms, exceeds max form number", maxFormsSize);
         FormEventReport::SendFormFailedEvent(FormEventName::ADD_FORM_FAILED, HiSysEventType::FAULT,
-            NewFormEventInfo::errorType::NUMBER_EXCEEDING_LIMIT);
+            static_cast<int64_t>(AddFormFiledErrorType::NUMBER_EXCEEDING_LIMIT));
         return ERR_APPEXECFWK_FORM_MAX_SYSTEM_FORMS;
     }
 
@@ -1963,6 +1964,7 @@ void FormDataMgr::FillBasicRunningFormInfoByFormRecord(const FormRecord &formRec
     runningFormInfo.formLocation = formRecord.formLocation;
     runningFormInfo.formVisiblity = static_cast<FormVisibilityType>(formRecord.formVisibleNotifyState);
     runningFormInfo.recycleStatus = formRecord.recycleStatus;
+    runningFormInfo.formBundleType = formRecord.formBundleType;
 }
 
 ErrCode FormDataMgr::GetRunningFormInfosByFormId(const int64_t formId, RunningFormInfo &runningFormInfo)
@@ -2462,6 +2464,51 @@ ErrCode FormDataMgr::UpdateFormLocation(const int64_t &formId, const int32_t &fo
     info->second.formLocation = (Constants::FormLocation)formLocation;
     HILOG_INFO("update form location successfully, formId = %{public}" PRId64 " formLocation = %{public}d",
         formId, formLocation);
+    return ERR_OK;
+}
+
+ErrCode FormDataMgr::GetRecordsByFormType(const int32_t formRefreshType,
+    std::vector<FormRecord> &visibleFormRecords, std::vector<FormRecord> &inVisiblehFormRecord)
+{
+    HILOG_INFO("GetRecordsByFormType formRefreshType: %{public}d", formRefreshType);
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    if (formRefreshType == Constants::REFRESH_ALL_FORM) {
+        for (auto formRecord : formRecords_) {
+            if (formRecord.second.formVisibleNotifyState == static_cast<int32_t>(FormVisibilityType::VISIBLE)) {
+                visibleFormRecords.emplace_back(formRecord.second);
+                continue;
+            }
+            inVisiblehFormRecord.emplace_back(formRecord.second);
+        }
+        return ERR_OK;
+    }
+    
+    if (formRefreshType == Constants::REFRESH_APP_FORM) {
+        for (auto formRecord : formRecords_) {
+            if (formRecord.second.formBundleType != BundleType::APP) {
+                continue;
+            }
+            if (formRecord.second.formVisibleNotifyState == static_cast<int32_t>(FormVisibilityType::VISIBLE)) {
+                visibleFormRecords.emplace_back(formRecord.second);
+                continue;
+            }
+            inVisiblehFormRecord.emplace_back(formRecord.second);
+        }
+        return ERR_OK;
+    }
+
+    if (formRefreshType == Constants::REFRESH_ATOMIC_FORM) {
+        for (auto formRecord : formRecords_) {
+            if (formRecord.second.formBundleType != BundleType::ATOMIC_SERVICE) {
+                continue;
+            }
+            if (formRecord.second.formVisibleNotifyState == static_cast<int32_t>(FormVisibilityType::VISIBLE)) {
+                visibleFormRecords.emplace_back(formRecord.second);
+                continue;
+            }
+            inVisiblehFormRecord.emplace_back(formRecord.second);
+        }
+    }
     return ERR_OK;
 }
 

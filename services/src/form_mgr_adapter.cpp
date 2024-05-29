@@ -135,7 +135,7 @@ void FormMgrAdapter::Init()
  * @return Returns ERR_OK on success, others on failure.
  */
 int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
-    const sptr<IRemoteObject> &callerToken, FormJsInfo &formInfo)
+    const sptr<IRemoteObject> &callerToken, FormJsInfo &formJsInfo)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     HILOG_DEBUG("called.");
@@ -154,6 +154,10 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
         HILOG_ERROR("CheckFormCountLimit failed");
         return ret;
     }
+    if (formId > 0) {
+        FormReport::GetInstance().InsertFormId(formId);
+        HILOG_DEBUG("HiSysevent Insert Formid");
+    }
 
     // get from config info
     FormItemInfo formItemInfo;
@@ -168,10 +172,9 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
         HILOG_ERROR("AddForm fail, %{public}s is unTrust", formItemInfo.GetProviderBundleName().c_str());
         return ERR_APPEXECFWK_FORM_NOT_TRUST;
     }
-
     // publish form
     if (formId > 0 && FormDataMgr::GetInstance().IsRequestPublishForm(formId)) {
-        ret = AddRequestPublishForm(formItemInfo, want, callerToken, formInfo);
+        ret = AddRequestPublishForm(formItemInfo, want, callerToken, formJsInfo);
         if (ret != ERR_OK) {
             HILOG_ERROR("failed, add request publish form failed.");
             return ret;
@@ -179,13 +182,13 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
         bool tempFormFlag = want.GetBoolParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
         if (!tempFormFlag && (ret == ERR_OK)) {
             HILOG_DEBUG("Checks if there is a listener listening for adding form");
-            HandleFormAddObserver(formInfo.formId);
+            HandleFormAddObserver(formJsInfo.formId);
         }
     }
     if (states == AddFormResultErrorCode::UNKNOWN) {
         CancelAddFormRequestTimeOutTask(formId, ret);
     }
-    ret = AllotForm(formId, want, callerToken, formInfo, formItemInfo);
+    ret = AllotForm(formId, want, callerToken, formJsInfo, formItemInfo);
     RemoveFormIdMapElement(formId);
     if (ret != ERR_OK) {
         HILOG_ERROR("failed, allot form failed.");
@@ -316,7 +319,7 @@ ErrCode FormMgrAdapter::CheckFormCountLimit(const int64_t formId, const Want &wa
 }
 
 ErrCode FormMgrAdapter::AllotForm(const int64_t formId, const Want &want,
-    const sptr<IRemoteObject> &callerToken, FormJsInfo &formInfo, const FormItemInfo &formItemInfo)
+    const sptr<IRemoteObject> &callerToken, FormJsInfo &formJsInfo, const FormItemInfo &formItemInfo)
 {
     Want newWant(want);
     bool directCallInApp = newWant.GetBoolParam(Constants::KEY_DIRECT_CALL_INAPP, false);
@@ -346,16 +349,16 @@ ErrCode FormMgrAdapter::AllotForm(const int64_t formId, const Want &want,
     ErrCode ret = 0;
     if (formId > 0) {
         if (specificFormFlag) {
-            ret = AllotFormBySpecificId(formItemInfo, callerToken, wantParams, formInfo);
+            ret = AllotFormBySpecificId(formItemInfo, callerToken, wantParams, formJsInfo);
         } else {
-            ret = AllotFormById(formItemInfo, callerToken, wantParams, formInfo);
+            ret = AllotFormById(formItemInfo, callerToken, wantParams, formJsInfo);
         }
     } else {
-        ret = AllotFormByInfo(formItemInfo, callerToken, wantParams, formInfo);
+        ret = AllotFormByInfo(formItemInfo, callerToken, wantParams, formJsInfo);
         bool tempFormFlag = want.GetBoolParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
         if (!tempFormFlag && (ret == ERR_OK)) {
             HILOG_DEBUG("Checks if there is a listener listening for adding form");
-            HandleFormAddObserver(formInfo.formId);
+            HandleFormAddObserver(formJsInfo.formId);
         }
     }
     return ret;
@@ -904,12 +907,6 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
-    if (iBundleMgr == nullptr) {
-        HILOG_ERROR("fail, failed to get IBundleMgr.");
-        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
-    }
-
     int64_t matchedFormId = 0;
     int32_t userId = FormUtil::GetCurrentAccountId();
     std::map<std::string, std::vector<int64_t>> eventMaps;
@@ -928,24 +925,11 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
         }
 
         PaddingNotifyVisibleFormsMap(formVisibleType, formId, formInstanceMaps);
+        HILOG_DEBUG("formRecord formVisibleNotify: %{public}d.", formRecord.formVisibleNotify);
 
         // Update info to host and check if the form was created by the system application.
         if ((!UpdateProviderInfoToHost(matchedFormId, userId, callerToken, formVisibleType, formRecord)) ||
             (!formRecord.isSystemApp)) {
-            continue;
-        }
-
-        // Check the value of formVisibleNotify.
-        AppExecFwk::ApplicationInfo info;
-
-        if (!IN_PROCESS_CALL(iBundleMgr->GetApplicationInfo(formRecord.bundleName,
-            AppExecFwk::ApplicationFlag::GET_BASIC_APPLICATION_INFO, formRecord.providerUserId, info))) {
-            HILOG_ERROR("failed to get Application info.");
-            return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
-        }
-
-        if (!info.formVisibleNotify) {
-            HILOG_DEBUG("the value of formVisibleNotify is false.");
             continue;
         }
 
@@ -1714,7 +1698,7 @@ ErrCode FormMgrAdapter::AllotFormByInfo(const FormItemInfo &info,
  * @return Returns ERR_OK on success, others on failure.
  */
 ErrCode FormMgrAdapter::AddNewFormRecord(const FormItemInfo &info, const int64_t formId,
-    const sptr<IRemoteObject> &callerToken, const WantParams &wantParams, FormJsInfo &formInfo)
+    const sptr<IRemoteObject> &callerToken, const WantParams &wantParams, FormJsInfo &formJsInfo)
 {
     HILOG_INFO("add new formRecord");
     FormItemInfo newInfo(info);
@@ -1741,7 +1725,7 @@ ErrCode FormMgrAdapter::AddNewFormRecord(const FormItemInfo &info, const int64_t
     }
 
     // create form info for js
-    FormDataMgr::GetInstance().CreateFormJsInfo(formId, formRecord, formInfo);
+    FormDataMgr::GetInstance().CreateFormJsInfo(formId, formRecord, formJsInfo);
 
     // storage info
     if (!newInfo.IsTemporaryForm()) {
@@ -1872,7 +1856,7 @@ ErrCode FormMgrAdapter::InnerAcquireProviderFormInfoAsync(const int64_t formId,
     want.SetElementName(info.GetProviderBundleName(), info.GetAbilityName());
     want.AddFlags(Want::FLAG_ABILITY_FORM_ENABLED);
     ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbility(want, formAcquireConnection);
-    FormReport::GetInstance().SetStartBindTime(formId, FormUtil::GetCurrentMicrosecond());
+    FormReport::GetInstance().SetStartBindTime(formId, FormUtil::GetCurrentSteadyClockMillseconds());
     if (errorCode != ERR_OK) {
         HILOG_ERROR("%{public}s fail, ConnectServiceAbility failed.", __func__);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
@@ -2092,6 +2076,7 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
     itemInfo.SetTransparencyEnabled(formInfo.transparencyEnabled);
     itemInfo.SetPrivacyLevel(formInfo.privacyLevel);
     itemInfo.SetDataProxyFlag(formInfo.dataProxyEnabled);
+    itemInfo.SetFormBundleType(formInfo.bundleType);
 
     SetFormItemInfoParams(bundleInfo, formInfo, itemInfo);
     return ERR_OK;
@@ -2119,9 +2104,19 @@ void FormMgrAdapter::SetFormItemInfoParams(const BundleInfo& bundleInfo, const F
 void FormMgrAdapter::SetFormItemModuleInfo(const HapModuleInfo& hapModuleInfo, const FormInfo& formInfo,
     FormItemInfo& itemInfo)
 {
-    HILOG_DEBUG("module [%{public}s] packageName is %{public}s", hapModuleInfo.moduleName.c_str(),
-        hapModuleInfo.packageName.c_str());
-    itemInfo.AddModulePkgName(hapModuleInfo.moduleName, hapModuleInfo.packageName);
+    auto hapPath = hapModuleInfo.hapPath;
+    auto moduleName = hapModuleInfo.moduleName;
+    HILOG_DEBUG("module [%{public}s] packageName is %{public}s, hap path is %{public}s", moduleName.c_str(),
+        hapModuleInfo.packageName.c_str(), hapPath.c_str());
+    if (hapPath.find(Constants::ABS_CODE_PATH) != std::string::npos) {
+        hapPath = std::regex_replace(hapPath, std::regex(Constants::ABS_CODE_PATH), Constants::LOCAL_BUNDLES);
+    }
+    nlohmann::json moduleInfos = {
+        {Constants::MODULE_PKG_NAME_KEY, hapModuleInfo.packageName},
+        {Constants::MODULE_HAP_PATH_KEY, hapPath}
+    };
+    itemInfo.AddModulePkgName(moduleName, moduleInfos.dump());
+    itemInfo.AddModuleInfo(moduleName, hapPath);
     for (const auto &abilityInfo : hapModuleInfo.abilityInfos) {
         if (abilityInfo.name == formInfo.abilityName) {
             itemInfo.SetAbilityModuleName(abilityInfo.moduleName);
@@ -2129,12 +2124,6 @@ void FormMgrAdapter::SetFormItemModuleInfo(const HapModuleInfo& hapModuleInfo, c
                 itemInfo.SetFormSrc("");
             }
         }
-        auto hapPath = abilityInfo.hapPath;
-        if (hapPath.find(Constants::ABS_CODE_PATH) != std::string::npos) {
-            hapPath = std::regex_replace(hapPath, std::regex(Constants::ABS_CODE_PATH), Constants::LOCAL_BUNDLES);
-        }
-        itemInfo.AddModuleInfo(abilityInfo.moduleName, hapPath);
-        HILOG_DEBUG("%{public}s hap path is %{public}s", abilityInfo.moduleName.c_str(), hapPath.c_str());
     }
 }
 
@@ -2321,20 +2310,19 @@ void FormMgrAdapter::AddSnapshotToHostWant(const Want &want, Want &wantToHost)
         want.HasParameter(Constants::PARAM_PUBLISH_FORM_HOST_HEIGHT_KEY) &&
         want.HasParameter(Constants::PARAM_PUBLISH_FORM_HOST_SCREENX_KEY) &&
         want.HasParameter(Constants::PARAM_PUBLISH_FORM_HOST_SCREENY_KEY)) {
-        std::string  snapshot = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_SNAPSHOT_KEY);
-        int32_t  width = want.GetIntParam(Constants::PARAM_PUBLISH_FORM_HOST_WIDTH_KEY, 0);
-        int32_t  height = want.GetIntParam(Constants::PARAM_PUBLISH_FORM_HOST_HEIGHT_KEY, 0);
-        int32_t  screenX = want.GetIntParam(Constants::PARAM_PUBLISH_FORM_HOST_SCREENX_KEY, 0);
-        int32_t  screenY = want.GetIntParam(Constants::PARAM_PUBLISH_FORM_HOST_SCREENY_KEY, 0);
-        
+        std::string snapshot = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_SNAPSHOT_KEY);
+        std::string width = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_WIDTH_KEY);
+        std::string height = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_HEIGHT_KEY);
+        std::string screenX = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_SCREENX_KEY);
+        std::string screenY = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_SCREENY_KEY);
+
         wantToHost.SetParam(Constants::PARAM_PUBLISH_FORM_HOST_SNAPSHOT_KEY, snapshot);
         wantToHost.SetParam(Constants::PARAM_PUBLISH_FORM_HOST_WIDTH_KEY, width);
         wantToHost.SetParam(Constants::PARAM_PUBLISH_FORM_HOST_HEIGHT_KEY, height);
         wantToHost.SetParam(Constants::PARAM_PUBLISH_FORM_HOST_SCREENX_KEY, screenX);
         wantToHost.SetParam(Constants::PARAM_PUBLISH_FORM_HOST_SCREENY_KEY, screenY);
-        HILOG_DEBUG("AddSnapshotToHostWant snapshot.");
-        HILOG_DEBUG("AddSnapshotToHostWant width: %{public}d height: %{public}d .", width, height);
-        HILOG_DEBUG("AddSnapshotToHostWant screenX: %{public}d screenY: %{public}d.", screenX, screenY);
+        HILOG_INFO("SnapshotInfo screenX: %{public}s, screenY: %{public}s, width: %{public}s, height: %{public}s",
+            screenX.c_str(), screenY.c_str(), width.c_str(), height.c_str());
     } else {
         HILOG_DEBUG("AddSnapshotToHostWant: want has no component snapshot info");
     }
@@ -2362,7 +2350,6 @@ ErrCode FormMgrAdapter::RequestPublishFormToHost(Want &want)
     std::string bundleName = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_BUNDLE_KEY);
     std::string abilityName = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_ABILITY_KEY);
     AddSnapshotToHostWant(want, wantToHost);
-    wantToHost.SetParam(Constants::PARAM_CALLER_BUNDLE_NAME_KEY, callerBundleName);
     wantToHost.SetElementName(bundleName, abilityName);
     wantToHost.SetAction(Constants::FORM_PUBLISH_ACTION);
 
@@ -2433,7 +2420,7 @@ ErrCode FormMgrAdapter::RequestPublishForm(Want &want, bool withFormBindingData,
     if (errCode != ERR_OK) {
         FormDataMgr::GetInstance().RemoveRequestPublishFormInfo(formId);
         NewFormEventInfo eventInfo;
-        FormEventReport::SendFourthFormEvent(FormEventName::UNNORMATIVE_PUBLISH_FORM_TO_HOST,
+        FormEventReport::SendFourthFormEvent(FormEventName::INVALID_PUBLISH_FORM_TO_HOST,
             HiSysEventType::STATISTIC, eventInfo, want);
     }
 
@@ -2983,7 +2970,7 @@ void FormMgrAdapter::AcquireProviderFormInfo(const int64_t formId, const Want &w
         FormSupplyCallback::GetInstance()->RemoveConnection(connectId);
         HILOG_ERROR("%{public}s fail, Failed to get acquire provider form info", __func__);
     }
-    FormReport::GetInstance().SetEndGetTime(formId, FormUtil::GetCurrentMicrosecond());
+    FormReport::GetInstance().SetEndGetTime(formId, FormUtil::GetCurrentSteadyClockMillseconds());
 }
 
 /**
@@ -3022,7 +3009,7 @@ bool FormMgrAdapter::CreateHandleEventMap(const int64_t matchedFormId, const For
     std::map<std::string, std::vector<int64_t>> &eventMaps)
 {
     if (!formRecord.formVisibleNotify) {
-        HILOG_WARN("%{public}s fail, the config 'formVisibleNotify' is false, formId:%{public}" PRId64 ".",
+        HILOG_DEBUG("%{public}s fail, the config 'formVisibleNotify' is false, formId:%{public}" PRId64 ".",
             __func__, matchedFormId);
         return false;
     }
@@ -4164,6 +4151,24 @@ ErrCode FormMgrAdapter::UpdateFormLocation(const int64_t &formId, const int32_t 
             }
             return FormDbCache::GetInstance().UpdateFormLocation(matchedFormId, formLocation);
         }
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrAdapter::BatchRefreshForms(const int32_t formRefreshType)
+{
+    std::vector<FormRecord> visibleFormRecords;
+    std::vector<FormRecord> inVisibleFormRecords;
+    FormDataMgr::GetInstance().GetRecordsByFormType(formRefreshType, visibleFormRecords, inVisibleFormRecords);
+    HILOG_INFO("getVisibleRecords ByFormType size: %{public}zu.", visibleFormRecords.size());
+    Want reqWant;
+    int32_t currentActiveUserId = FormUtil::GetCurrentAccountId();
+    reqWant.SetParam(Constants::PARAM_FORM_USER_ID, currentActiveUserId);
+    for (auto formRecord : visibleFormRecords) {
+        FormProviderMgr::GetInstance().RefreshForm(formRecord.formId, reqWant, true);
+    }
+    for (auto formRecord : inVisibleFormRecords) {
+        FormProviderMgr::GetInstance().RefreshForm(formRecord.formId, reqWant, true);
     }
     return ERR_OK;
 }

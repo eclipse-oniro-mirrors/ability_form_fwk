@@ -22,6 +22,7 @@
 #include "form_instance.h"
 #include "parcel.h"
 #include "form_constants.h"
+#include "application_info.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -42,6 +43,7 @@ struct RunningFormInfo : public Parcelable {
     FormVisibilityType formVisiblity = FormVisibilityType::UNKNOWN;
     FormUsageState formUsageState = FormUsageState::USED;
     RecycleStatus recycleStatus = RecycleStatus::NON_RECYCLABLE;
+    BundleType formBundleType = BundleType::APP;
 
     bool ReadFromParcel(Parcel &parcel);
     bool Marshalling(Parcel &parcel) const override;

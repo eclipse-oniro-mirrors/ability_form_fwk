@@ -75,6 +75,11 @@ public:
      * @return Current system millisecond.
      */
     static int64_t GetCurrentMillisecond();
+    /**
+     * @brief Get current system GetCurrentSteadyClockMillseconds.
+     * @return Current system GetCurrentSteadyClockMillseconds.
+     */
+    static int64_t GetCurrentSteadyClockMillseconds();
 
     /**
      * @brief Get current system microsecond.

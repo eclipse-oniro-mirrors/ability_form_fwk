@@ -37,18 +37,25 @@ struct FormEventInfo {
     int64_t timeStamp = 0;
 };
 
+enum class CallDbFiledErrorType : int64_t {
+    LOAD_DATABASE_FAILED = 1,
+    DATABASE_RESET_CONNECT_FAILED,
+    DATABASE_SAVE_FORMID_FAILED,
+    DATABASE_DELETE_FORMID_FAILED,
+    DATABASE_QUERY_FORMID_FAILED,
+    DATABASE_EXIT_ABNORMA,
+};
+
+enum class InitFmsFiledErrorType : int64_t {
+    LOAD_FORM_DB_FAILED = 1,
+    PUBLISH_SER_FAILED,
+};
+
+enum class AddFormFiledErrorType : int64_t {
+    NUMBER_EXCEEDING_LIMIT = 1,
+};
+
 struct NewFormEventInfo {
-    enum class errorType : int64_t {
-        LOAD_FORM_DB_FAILED = 1,
-        PUBLISH_SER_FAILED,
-        NUMBER_EXCEEDING_LIMIT,
-        LOAD_DATABASE_FAILED,
-        DATABASE_RESET_CONNECT_FAILED,
-        DATABASE_SAVE_FORMID_FAILED,
-        DATABASE_DELETE_FORMID_FAILED,
-        DATABASE_QUERY_FORMID_FAILED,
-        DATABASE_EXIT_ABNORMA
-    };
     int64_t formId = -1;
     std::string bundleName;
     std::string moduleName;
@@ -61,7 +68,6 @@ struct NewFormEventInfo {
     int64_t formDimension;
     int64_t acquireDuration;
     int64_t duration;
-    errorType type;
     int64_t durationType;
     int32_t dailyRefreshTimes;
     int32_t invisibleRefreshTimes;
@@ -75,6 +81,7 @@ struct NewFormEventInfo {
     std::string clientBundleName = "";
     std::string formBundleName = "";
 };
+
 enum class FormEventName {
     // form behavior event
     ADD_FORM,
@@ -96,7 +103,7 @@ enum class FormEventName {
     FIRST_UPDATE_FORM_DURATION,
     UPDATE_FORM_REFRESH_TIMES,
     PROXY_UPDATE_FORM,
-    UNNORMATIVE_PUBLISH_FORM_TO_HOST,
+    INVALID_PUBLISH_FORM_TO_HOST,
     LAUNCH_FORM_APP,
     UNBIND_FORM_APP,
 };
@@ -108,8 +115,7 @@ public:
         const FormEventInfo &eventInfo);
     static void SendThirdFormEvent(const FormEventName &eventName, HiSysEventType type,
         const FormEventInfo &eventInfo);
-    static void SendFormFailedEvent(const FormEventName &eventName, HiSysEventType type,
-        NewFormEventInfo::errorType errorType);
+    static void SendFormFailedEvent(const FormEventName &eventName, HiSysEventType type, int64_t errorType);
     static void SendFirstAddFormEvent(const FormEventName &eventName, HiSysEventType type,
         const NewFormEventInfo &eventInfo);
     static void SendFirstUpdateFormEvent(const FormEventName &eventName, HiSysEventType type,

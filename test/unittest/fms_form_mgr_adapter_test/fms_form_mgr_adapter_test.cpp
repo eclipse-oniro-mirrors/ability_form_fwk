@@ -32,6 +32,7 @@
 #include "form_ams_helper.h"
 #include "form_bms_helper.h"
 #include "form_data_mgr.h"
+#include "form_info_mgr.h"
 #undef private
 #include "mock_ability_manager.h"
 #include "mock_bundle_mgr.h"
@@ -102,6 +103,7 @@ extern void MockGetAbilityInfoByActionAbilityInfo(bool mockRet);
 extern void MockGetAbilityInfoByActionExtensionInfo(bool mockRet);
 extern void MockGetRunningFormInfosByFormId(int32_t mockRet);
 extern void MockGetRunningFormInfos(int32_t mockRet);
+void MockRequestPublishFormToHost(bool mockRet);
 
 namespace {
 class FmsFormMgrAdapterTest : public testing::Test {
@@ -3064,7 +3066,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0156, TestSize.Level0)
     FormMgrAdapter formMgrAdapter;
     Want want = {};
     MockConnectServiceAbility(false);
-    EXPECT_NE(formMgrAdapter.RequestPublishFormToHost(want), ERR_OK);
+    EXPECT_NE(formMgrAdapter.RequestPublishFormToHost(want), ERR_APPEXECFWK_FORM_GET_HOST_FAILED);
     GTEST_LOG_(INFO) << "FormMgrAdapter_0156 end";
 }
 
@@ -4503,5 +4505,97 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_231, TestSize.Level0)
     EXPECT_EQ(true, formMgrAdapter.IsValidPublishEvent(bmsProxy, bundleName, want, needCheckFormPermission));
     FormBmsHelper::GetInstance().iBundleMgr_ = backup;
     GTEST_LOG_(INFO) << "FormMgrAdapter_231 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_232
+ * @tc.desc: test RequestPublishForm function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_232, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_232 start";
+    FormMgrAdapter formMgrAdapter;
+    Want want;
+    bool withFormBindingData = false;
+    int64_t formId1 = 1;
+    std::unique_ptr<FormProviderData> formBindingData = std::make_unique<FormProviderData>();
+    std::vector<FormDataProxy> formDataProxies;
+
+    MockRequestPublishFormToHost(false);
+    auto ret = formMgrAdapter.RequestPublishForm(want, withFormBindingData, formBindingData, formId1, formDataProxies);
+    MockRequestPublishFormToHost(true);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED);
+    GTEST_LOG_(INFO) << "FormMgrAdapter_232 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_233
+ * @tc.desc: test BatchRefreshForms function and the return value is true.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_233, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_233 start";
+    FormMgrAdapter formMgrAdapter;
+    int32_t formRefreshType = Constants::REFRESH_ALL_FORM;
+    EXPECT_EQ(ERR_OK, formMgrAdapter.BatchRefreshForms(formRefreshType));
+    GTEST_LOG_(INFO) << "FormMgrAdapter_233 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_234
+ * @tc.desc: test RequestPublishForm function and the return value is true.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_234, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_234 start";
+    FormMgrAdapter formMgrAdapter;
+    Want want;
+    std::string str1 = "aa";
+    std::string str2 = "bb";
+    std::string str4 = "mm";
+    std::string str5 = "xx";
+    std::string str6 = "cc";
+    want.SetParam(Constants::PARAM_MODULE_NAME_KEY, str1);
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, str2);
+    want.SetElementName(str5, str6, str4);
+    bool withFormBindingData = false;
+    int64_t formId1 = 1;
+    std::unique_ptr<FormProviderData> formBindingData = std::make_unique<FormProviderData>();
+    std::vector<FormDataProxy> formDataProxies;
+    sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
+    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
+    FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
+    int32_t times = 0;
+    constexpr int32_t counts = 2;
+    auto bmsTaskCheckIsSystemAppByUid = [&times, counts] (const int uid) {
+        return !(++times == counts);
+    };
+    EXPECT_CALL(*bmsProxy, CheckIsSystemAppByUid(_)).Times(2).WillOnce(Invoke(bmsTaskCheckIsSystemAppByUid))
+        .WillOnce(Invoke(bmsTaskCheckIsSystemAppByUid));
+    auto bmsTaskGetBundleNameForUid = [] (const int uid, std::string &name) {
+        name = "name";
+        return ERR_OK;
+    };
+    EXPECT_CALL(*bmsProxy, GetNameForUid(_, _)).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
+    AppExecFwk::ApplicationInfo appInfo;
+    appInfo.isSystemApp = true;
+    EXPECT_CALL(*bmsProxy, GetApplicationInfoV9(_, _, _, _)).Times(1)
+        .WillRepeatedly(DoAll(SetArgReferee<3>(appInfo), Return(ERR_OK)));
+    int32_t uid = 1;
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    FormJsInfo formInfo1;
+    MockGetBoolParam(false);
+    formMgrAdapter.AddForm(formId1, want, callerToken, formInfo1);
+    FormProviderData formProviderData;
+    MockGetFormRecord(false);
+    formMgrAdapter.UpdateForm(formId1, uid, formProviderData);
+    MockRequestPublishFormToHost(false);
+    auto ret = formMgrAdapter.RequestPublishForm(want, withFormBindingData, formBindingData, formId1, formDataProxies);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, formMgrAdapter.CheckPublishForm(want));
+    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
+    GTEST_LOG_(INFO) << "FormMgrAdapter_234 end";
 }
 }

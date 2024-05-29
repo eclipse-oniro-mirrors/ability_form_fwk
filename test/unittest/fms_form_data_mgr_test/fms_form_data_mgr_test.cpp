@@ -3316,4 +3316,66 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_UpdateFormLocation_001, TestSize
     EXPECT_EQ(ERR_OK, formDataMgr_.UpdateFormLocation(formId, formLocation));
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_UpdateFormLocation_001 end";
 }
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetRecordsByFormType_001
+ * @tc.name: GetRecordsByFormType
+ * @tc.desc: Verify that the map can be operated normally.
+ * @tc.details: Determine whether an element exists in the map.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetRecordsByFormType_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetRecordsByFormType_001 start";
+    FormRecord record1;
+    int64_t formId = 1;
+    record1.formBundleType = BundleType::APP;
+    record1.formVisibleNotifyState = static_cast<int32_t>(FormVisibilityType::VISIBLE);
+    formDataMgr_.formRecords_.emplace(formId, record1);
+    
+    FormRecord record2;
+    formId = 2;
+    record2.formBundleType = BundleType::ATOMIC_SERVICE;
+    record2.formVisibleNotifyState = static_cast<int32_t>(FormVisibilityType::VISIBLE);
+    formDataMgr_.formRecords_.emplace(formId, record2);
+
+    FormRecord record3;
+    formId = 3;
+    record3.formBundleType = BundleType::ATOMIC_SERVICE;
+    record3.formVisibleNotifyState = static_cast<int32_t>(FormVisibilityType::UNKNOWN);
+    formDataMgr_.formRecords_.emplace(formId, record3);
+
+    FormRecord record4;
+    formId = 4;
+    record4.formBundleType = BundleType::APP;
+    record4.formVisibleNotifyState = static_cast<int32_t>(FormVisibilityType::INVISIBLE);
+    formDataMgr_.formRecords_.emplace(formId, record4);
+
+    FormRecord record5;
+    formId = 5;
+    record5.formBundleType = BundleType::ATOMIC_SERVICE;
+    record5.formVisibleNotifyState = static_cast<int32_t>(FormVisibilityType::INVISIBLE);
+    formDataMgr_.formRecords_.emplace(formId, record5);
+
+    int32_t formRefreshType = Constants::REFRESH_ALL_FORM;
+    std::vector<FormRecord> visibleFormRecords1;
+    std::vector<FormRecord> inVisibleFormRecords1;
+    EXPECT_EQ(ERR_OK, formDataMgr_.GetRecordsByFormType(formRefreshType, visibleFormRecords1, inVisibleFormRecords1));
+    EXPECT_EQ(2, visibleFormRecords1.size());
+    EXPECT_EQ(3, inVisibleFormRecords1.size());
+
+    formRefreshType = Constants::REFRESH_APP_FORM;
+    std::vector<FormRecord> visibleFormRecords2;
+    std::vector<FormRecord> inVisibleFormRecords2;
+    EXPECT_EQ(ERR_OK, formDataMgr_.GetRecordsByFormType(formRefreshType, visibleFormRecords2, inVisibleFormRecords2));
+    EXPECT_EQ(1, visibleFormRecords2.size());
+    EXPECT_EQ(1, inVisibleFormRecords2.size());
+
+    formRefreshType = Constants::REFRESH_ATOMIC_FORM;
+    std::vector<FormRecord> visibleFormRecords3;
+    std::vector<FormRecord> inVisibleFormRecords3;
+    EXPECT_EQ(ERR_OK, formDataMgr_.GetRecordsByFormType(formRefreshType, visibleFormRecords3, inVisibleFormRecords3));
+    EXPECT_EQ(1, visibleFormRecords3.size());
+    EXPECT_EQ(2, inVisibleFormRecords3.size());
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetRecordsByFormType_001 end";
+}
 }
