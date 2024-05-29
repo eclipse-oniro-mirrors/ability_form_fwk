@@ -13,15 +13,11 @@
 
 import("//build/ohos.gni")
 import("//build/ohos/app/app.gni")
-import("//foundation/ability/ability_runtime/ability_runtime.gni")
 import("//foundation/ability/form_fwk/form_fwk.gni")
 
 config("formrender_config") {
   visibility = [ ":*" ]
-  include_dirs = [
-    "${arkui_ace_engine_components_path}/form/resource/",
-    "include",
-  ]
+  include_dirs = [ "include" ]
   cflags = []
   if (target_cpu == "arm") {
     cflags += [ "-DBINDER_IPC_32BIT" ]

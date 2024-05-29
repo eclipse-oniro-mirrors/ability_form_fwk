@@ -45,6 +45,7 @@ ohos_unittest("FmsFormBmsHelperTest") {
 
   external_deps = [
     "ability_base:want",
+    "ability_runtime:abilitykit_native",
     "ability_runtime:app_manager",
     "appspawn:appspawn_socket_client",
     "bundle_framework:appexecfwk_base",

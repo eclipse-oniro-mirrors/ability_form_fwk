@@ -64,6 +64,7 @@ ohos_unittest("FmsFormEventUtilTest") {
     "ffrt:libffrt",
     "form_fwk:form_manager",
     "hilog:libhilog",
+    "image_framework:image_native",
     "ipc:ipc_core",
     "kv_store:distributeddata_inner",
     "relational_store:native_rdb",

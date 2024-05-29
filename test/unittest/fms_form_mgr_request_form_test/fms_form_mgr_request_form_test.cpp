@@ -34,8 +34,8 @@
 #include "mock_bundle_manager.h"
 #include "mock_ability_manager.h"
 #include "system_ability_definition.h"
-#include "../../mock/include/mock_form_token.h"
-#include "../../mock/include/mock_form_host_client.h"
+#include "foundation/ability/form_fwk/test/mock/include/mock_form_token.h"
+#include "foundation/ability/form_fwk/test/mock/include/mock_form_host_client.h"
 
 using namespace testing::ext;
 using namespace OHOS;
