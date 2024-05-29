@@ -174,6 +174,12 @@ ErrCode FormRenderMgrInner::UpdateRenderingForm(FormRecord &formRecord, const Fo
 
     if (formRecord.formProviderInfo.NeedCache()) {
         FormCacheMgr::GetInstance().AddData(formRecord.formId, formRecord.formProviderInfo.GetFormData());
+        std::string cacheData;
+        std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
+        // Ensure that the data in the database is the same as the data in FRS.
+        if (FormCacheMgr::GetInstance().GetData(formRecord.formId, cacheData, imageDataMap)) {
+            formRecord.formProviderInfo.SetImageDataMap(imageDataMap);
+        }
     } else {
         HILOG_DEBUG("need to delete data.");
         FormCacheMgr::GetInstance().DeleteData(formRecord.formId);
