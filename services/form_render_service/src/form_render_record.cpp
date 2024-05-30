@@ -473,6 +473,10 @@ bool FormRenderRecord::SetPkgContextInfoMap(const FormJsInfo &formJsInfo, Abilit
     std::map<std::string, std::string> pkgContextInfoJsonStringMap;
     for (auto modulePkgNamePair : formJsInfo.modulePkgNameMap) {
         nlohmann::json moduleInfos = nlohmann::json::parse(modulePkgNamePair.second, nullptr, false);
+        if (moduleInfos.is_discarded()) {
+            HILOG_ERROR("failed to parse modulePkgNamePair");
+            continue;
+        }
         std::string pkgName = "";
         std::string hapPath = "";
         if (moduleInfos.contains(Constants::MODULE_PKG_NAME_KEY) &&

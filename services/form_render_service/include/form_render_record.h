@@ -222,8 +222,8 @@ private:
 
     void HandleFormRenderGC();
 
-    pid_t jsThreadId_;
-    pid_t processId_;
+    pid_t jsThreadId_ = 0;
+    pid_t processId_ = 0;
 
     std::string bundleName_;
     std::string uid_;
