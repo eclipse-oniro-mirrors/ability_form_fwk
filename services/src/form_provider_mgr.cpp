@@ -488,6 +488,12 @@ ErrCode FormProviderMgr::AcquireFormDataBack(const AAFwk::WantParams &wantParams
 
 bool FormProviderMgr::IsNeedToFresh(FormRecord &record, int64_t formId, bool isVisibleToFresh)
 {
+    bool isFormVisible = record.formVisibleNotifyState == Constants::FORM_VISIBLE;
+    if (!isFormVisible) {
+        HILOG_DEBUG("form is invisible.");
+        FormRecordReport::GetInstance().IncreaseUpdateTimes(formId, HiSysEventPointType::TYPE_INVISIBLE_INTERCEPT);
+        return false;
+    }
     bool isEnableRefresh = FormDataMgr::GetInstance().IsEnableRefresh(formId);
     HILOG_DEBUG("isEnableRefresh is %{public}d", isEnableRefresh);
     if (isEnableRefresh) {
