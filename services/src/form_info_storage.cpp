@@ -135,10 +135,12 @@ void to_json(nlohmann::json &jsonObject, const FormInfoStorage &formInfoStorage)
 
 void from_json(const nlohmann::json &jsonObject, FormInfoStorage &formInfoStorage)
 {
-    if (!jsonObject.at(JSON_KEY_USER_ID).is_null() && jsonObject.at(JSON_KEY_USER_ID).is_number_integer()) {
+    if (jsonObject.contains(JSON_KEY_USER_ID) && !jsonObject.at(JSON_KEY_USER_ID).is_null() &&
+        jsonObject.at(JSON_KEY_USER_ID).is_number_integer()) {
         formInfoStorage.userId = jsonObject.at(JSON_KEY_USER_ID).get<int32_t>();
     }
-    if (!jsonObject.at(JSON_KEY_FORM_INFO).is_null() && jsonObject.at(JSON_KEY_FORM_INFO).is_array()) {
+    if (jsonObject.contains(JSON_KEY_FORM_INFO) && !jsonObject.at(JSON_KEY_FORM_INFO).is_null() &&
+        jsonObject.at(JSON_KEY_FORM_INFO).is_array()) {
         formInfoStorage.formInfos = jsonObject.at(JSON_KEY_FORM_INFO).get<std::vector<AppExecFwk::FormInfo>>();
     }
 }
