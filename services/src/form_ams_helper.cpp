@@ -27,7 +27,7 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-const int FORM_DISCONNECT_DELAY_TIME = 5000; // ms
+const int FORM_DISCONNECT_DELAY_TIME = 10000; // ms
 FormAmsHelper::FormAmsHelper()
 {}
 
