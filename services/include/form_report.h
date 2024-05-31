@@ -63,6 +63,7 @@ public:
     void HandleAddFormStatistic(int64_t formId);
     void HandleFirstUpdateStatistic(int64_t formId);
     void InsertFormId(int64_t formId);
+    void RemoveFormId(int64_t formId);
     std::unordered_map<int64_t, FormStatistic>& GetStatistic();
 
 private:
