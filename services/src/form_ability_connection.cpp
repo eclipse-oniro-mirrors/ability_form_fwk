@@ -177,7 +177,7 @@ void FormAbilityConnection::ReportFormAppUnbindEvent()
     eventInfo.formAppPid = GetAppFormPid();
     HILOG_INFO("bundleName:%{public}s, formId:%{public}" PRId64 ",pid: %{public}" PRId32 ",timstamp:%{public}" PRId64,
         eventInfo.bundleName.c_str(), eventInfo.formId, eventInfo.formAppPid, eventInfo.timeStamp);
-    FormReport::GetInstance().SetDurationEndTime(eventInfo.formId, FormUtil::GetCurrentSteadyClockMillseconds());
+    FormReport::GetInstance().RemoveFormId(eventInfo.formId);
     FormEventReport::SendThirdFormEvent(FormEventName::UNBIND_FORM_APP, HiSysEventType::BEHAVIOR, eventInfo);
 }
 

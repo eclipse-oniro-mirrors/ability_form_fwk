@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-constexpr int64_t DELAY_TIME_MICROSECONDS = 10 * 1000000;
+constexpr int64_t DELAY_TIME_MICROSECONDS = 10 * 1000;
 }
 
 FormReport::FormReport()
@@ -161,6 +161,13 @@ void FormReport::InsertFormId(int64_t formId)
 {
     if (FormIds.find(formId) == FormIds.end()) {
         FormIds.insert(formId);
+    }
+}
+
+void FormReport::RemoveFormId(int64_t formId)
+{
+    if (FormIds.find(formId) != FormIds.end()) {
+        FormIds.erase(formId);
     }
 }
 

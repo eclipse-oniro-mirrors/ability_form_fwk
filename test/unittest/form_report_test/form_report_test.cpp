@@ -15,6 +15,7 @@
 #include <gtest/gtest.h>
 #include "form_report.h"
 #include "want.h"
+#include "form_event_report.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -108,5 +109,20 @@ HWTEST_F(FormReportTest, FormReport_004, TestSize.Level1)
     auto statisticIt = formReport.GetStatistic().find(testFormId);
     ASSERT_NE(statisticIt, formReport.GetStatistic().end());
     EXPECT_FLOAT_EQ(statisticIt->second.endGetTime_, endTime);
+}
+
+/**
+ * @tc.name: FormReport_005
+ * @tc.desc: test SetStartGetTime function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormReportTest, FormReport_005, TestSize.Level1)
+{
+    int64_t endTime = 12 * 1000;
+    int64_t startTime = 1* 1000;
+    formReport.SetDurationStartTime(testFormId, startTime);
+    formReport.SetDurationEndTime(testFormId, endTime);
+    auto statisticIt = formReport.GetStatistic().find(testFormId);
+    ASSERT_NE(statisticIt, formReport.GetStatistic().end());
 }
 } // namespace

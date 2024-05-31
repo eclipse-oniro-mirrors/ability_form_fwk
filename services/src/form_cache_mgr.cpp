@@ -20,6 +20,8 @@
 #include "fms_log_wrapper.h"
 #include "nlohmann/json.hpp"
 #include "scope_guard.h"
+#include "form_util.h"
+#include "form_report.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -186,6 +188,7 @@ bool FormCacheMgr::AddData(int64_t formId, const FormProviderData &formProviderD
 
     // Save dataCache and imgCache
     formCache.cacheState = CacheState::DEFAULT;
+    FormReport::GetInstance().SetDurationEndTime(formId, FormUtil::GetCurrentSteadyClockMillseconds());
     return SaveDataCacheToDb(formId, formCache);
 }
 
