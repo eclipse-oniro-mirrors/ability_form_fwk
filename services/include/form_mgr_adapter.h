@@ -628,6 +628,14 @@ public:
      */
     void SetTimerTaskNeeded(bool isTimerTaskNeeded);
 #endif // RES_SCHEDULE_ENABLE
+
+    /**
+     * @brief enable/disable form update.
+     * @param bundleName BundleName of the form host.
+     * @param enable True for enable form, false for disable form.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t EnableForms(const std::string bundleName, const bool enable);
 private:
     /**
      * @brief Get form configure info.
@@ -1097,6 +1105,7 @@ private:
     ErrCode CheckAddFormTaskTimeoutOrFailed(const int64_t formId, AddFormResultErrorCode &formStates);
 
     void RemoveFormIdMapElement(const int64_t formId);
+
     /**
      * @class ClientDeathRecipient
      * notices IRemoteBroker died.

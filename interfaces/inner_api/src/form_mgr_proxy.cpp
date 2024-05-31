@@ -2305,5 +2305,40 @@ int32_t FormMgrProxy::BatchRefreshForms(const int32_t formRefreshType)
     }
     return reply.ReadInt32();
 }
+
+int32_t FormMgrProxy::EnableForms(const std::string bundleName, const bool enable)
+{
+    HILOG_DEBUG("FormMgrProxy::EnableForms start. %{public}s", bundleName.c_str());
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("Failed to write interface token.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteString(bundleName)) {
+        HILOG_ERROR("Failed to write bundle name.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteBool(enable)) {
+        HILOG_ERROR("Failed to write enable.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        HILOG_ERROR("Remote object is nullptr.");
+        return ERR_INVALID_OPERATION;
+    }
+    auto error = remote->SendRequest(
+        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_ENABLE_FORMS), data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("Failed to SendRequest: %{public}d", error);
+        return error;
+    }
+    return ERR_OK;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

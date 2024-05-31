@@ -78,6 +78,9 @@ public:
     Constants::FormLocation formLocation;
     bool isThemeForm = false;
     BundleType formBundleType = BundleType::APP;
+    bool enableForm = true;
+    bool isRefreshDuringDisableForm = false;
+    bool isUpdateDuringDisableForm = false;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

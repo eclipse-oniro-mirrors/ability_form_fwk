@@ -2770,4 +2770,35 @@ HWTEST_F(FormMgrTest, FormMgrTest_0129, TestSize.Level1) {
     EXPECT_EQ(FormMgr::GetInstance().BatchRefreshForms(formRefreshType), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrTest_0129 test ends";
 }
+
+/**
+ * @tc.name: EnableForms_001
+ * @tc.desc: Verify EnableForms
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, EnableForms_001, TestSize.Level0) {
+    GTEST_LOG_(INFO) << "EnableForms_001 begin";
+    std::string bundleName = "";
+    FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
+    int32_t result = FormMgr::GetInstance().EnableForms(bundleName, true);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR);
+    GTEST_LOG_(INFO) << "EnableForms_001 test ends";
+}
+
+/**
+ * @tc.name: EnableForms_002
+ * @tc.desc: Verify EnableForms
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, EnableForms_002, TestSize.Level0) {
+    GTEST_LOG_(INFO) << "EnableForms_002 begin";
+    std::string bundleName = "";
+    FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
+    EXPECT_CALL(*mockProxy, EnableForms(_, _))
+    .Times(1)
+    .WillOnce(Return(OHOS::ERR_OK));
+    int32_t result = FormMgr::GetInstance().EnableForms(bundleName, true);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "EnableForms_002 test ends";
+}
 } // namespace

@@ -643,6 +643,14 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t BatchRefreshForms(const int32_t formRefreshType);
+
+    /**
+     * @brief enable/disable form update.
+     * @param bundleName BundleName of the form host.
+     * @param enable True for enable form, false for disable form.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t EnableForms(const std::string bundleName, const bool enable);
 private:
     /**
      * @brief Connect form manager service.

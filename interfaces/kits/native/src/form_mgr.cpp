@@ -1504,5 +1504,28 @@ int32_t FormMgr::BatchRefreshForms(const int32_t formRefreshType)
     }
     return remoteProxy_->BatchRefreshForms(formRefreshType);
 }
+
+int32_t FormMgr::EnableForms(const std::string bundleName, const bool enable)
+{
+    if (bundleName.empty()) {
+        HILOG_ERROR("EnableForms,bundleName is empty");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
+        HILOG_ERROR("form is in recover status, can't do action on form.");
+        return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
+    }
+
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        return errCode;
+    }
+
+    ErrCode resultCode = remoteProxy_->EnableForms(bundleName, enable);
+    if (resultCode != ERR_OK) {
+        HILOG_ERROR("failed to EnableForms, error code is %{public}d.", resultCode);
+    }
+    return resultCode;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -105,7 +105,6 @@ ErrCode FormProviderMgr::AcquireForm(const int64_t formId, const FormProviderInf
  */
 ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, bool isVisibleToFresh)
 {
-    HILOG_INFO("%{public}s called, formId:%{public}" PRId64 ".", __func__, formId);
     FormRecord record;
     bool bGetRecord = FormDataMgr::GetInstance().GetFormRecord(formId, record);
     if (!bGetRecord) {
@@ -121,7 +120,12 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
             __func__, record.providerUserId);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
-
+    HILOG_INFO("FormProviderMgr::RefreshForm, formId:%{public}" PRId64 "., record.enableForm = %{public}d",
+        formId, record.enableForm);
+    if (!record.enableForm) {
+        FormDataMgr::GetInstance().SetRefreshDuringDisableForm(formId, true);
+        return ERR_APPEXECFWK_FORM_DISABLE_REFRESH;
+    }
     bool isCountTimerRefresh = want.GetBoolParam(Constants::KEY_IS_TIMER, false);
     Want newWant(want);
     newWant.RemoveParam(Constants::KEY_IS_TIMER);

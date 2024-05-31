@@ -135,6 +135,8 @@ public:
         const bool &isRecoverFormToHandleClickEvent);
 
     size_t FormCount();
+
+    int32_t EnableFormRecord(const std::vector<FormJsInfo> &&formJsInfos, const Want &want, const bool enable);
 private:
     class RemoteObjHash {
     public:
@@ -221,6 +223,9 @@ private:
         const bool &isRecoverFormToHandleClickEvent);
 
     void HandleFormRenderGC();
+    
+    int32_t HandleEnableFormRecord(const std::vector<FormJsInfo> &&formJsInfos,
+        const Want &want, const bool enable);
 
     pid_t jsThreadId_ = 0;
     pid_t processId_ = 0;

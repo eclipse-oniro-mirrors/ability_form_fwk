@@ -170,6 +170,8 @@ FormMgrStub::FormMgrStub()
         &FormMgrStub::HandleRequestPublishFormWithSnapshot;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_BATCH_REFRESH_FORMS)] =
         &FormMgrStub::HandleBatchRefreshForms;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_ENABLE_FORMS)] =
+        &FormMgrStub::HandleEnableForms;
 }
 
 FormMgrStub::~FormMgrStub()
@@ -1505,6 +1507,23 @@ ErrCode FormMgrStub::HandleBatchRefreshForms(MessageParcel &data, MessageParcel 
 {
     int32_t formRefreshType = data.ReadInt32();
     ErrCode result = BatchRefreshForms(formRefreshType);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("failed to write result");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return result;
+}
+
+int32_t FormMgrStub::HandleEnableForms(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("Called.");
+    std::string bundleName = data.ReadString();
+    if (bundleName.empty()) {
+        HILOG_ERROR("failed to ReadString<bundleName>");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    bool enable = data.ReadBool();
+    int32_t result = EnableForms(bundleName, enable);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("failed to write result");
         return ERR_APPEXECFWK_PARCEL_ERROR;

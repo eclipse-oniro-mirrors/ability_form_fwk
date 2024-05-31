@@ -716,6 +716,27 @@ public:
      */
     ErrCode GetRecordsByFormType(const int32_t formRefreshType,
         std::vector<FormRecord> &visibleFormRecords, std::vector<FormRecord> &inVisiblehFormRecords);
+
+    /**
+     * @brief Set form enable or disable.
+     * @param formId The Id of the form.
+     * @param enable Ture or false.
+     */
+    ErrCode SetFormEnable(const int64_t formId, const bool enable);
+
+     /**
+     * @brief Set form refresh flag or in disable during.
+     * @param formId The Id of the form.
+     * @param enable Ture or false.
+     */
+    ErrCode SetRefreshDuringDisableForm(const int64_t formId, const bool enable);
+
+     /**
+     * @brief Set form update flag or in disable during.
+     * @param formId The Id of the form.
+     * @param enable Ture or false.
+     */
+    ErrCode SetUpdateDuringDisableForm(const int64_t formId, const bool enable);
 private:
     /**
      * @brief Create form record.
