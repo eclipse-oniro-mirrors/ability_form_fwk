@@ -868,6 +868,6 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_045, TestSize.Level0)
     formJsInfo.bundleName = "bundleName";
     formJsInfo.moduleName = "moduleName";
     AbilityRuntime::Runtime::Options options;
-    EXPECT_EQ(true, formRenderRecord->SetPkgContextInfoMap(formJsInfo, options, uid));
+    EXPECT_EQ(true, formRenderRecord->SetPkgContextInfoMap(formJsInfo, options));
     GTEST_LOG_(INFO) << "FormRenderRecordTest_045 end";
 }
