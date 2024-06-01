@@ -278,11 +278,20 @@ void FormRenderImpl::OnConfigurationUpdated(
 
 void FormRenderImpl::OnConfigurationUpdatedInner()
 {
+    sptr<IFormSupply> formSupplyClient = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(formSupplyMutex_);
+        formSupplyClient = formSupplyClient_;
+    }
+    if (formSupplyClient == nullptr) {
+        HILOG_ERROR("formSupplyClient_ is nullptr");
+    }
+
     configUpdateTime_ = std::chrono::steady_clock::now();
     size_t allFormCount = 0;
     for (auto iter = renderRecordMap_.begin(); iter != renderRecordMap_.end(); ++iter) {
         if (iter->second) {
-            iter->second->UpdateConfiguration(configuration_);
+            iter->second->UpdateConfiguration(configuration_, formSupplyClient);
             allFormCount += iter->second->FormCount();
         }
     }

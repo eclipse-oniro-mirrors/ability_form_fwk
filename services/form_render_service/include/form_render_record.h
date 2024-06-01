@@ -25,6 +25,7 @@
 #include "event_handler.h"
 #include "form_js_info.h"
 #include "form_mgr_errors.h"
+#include "form_supply_proxy.h"
 #include "form_renderer_group.h"
 #include "js_runtime.h"
 #include "want.h"
@@ -117,7 +118,8 @@ public:
 
     bool IsEmpty();
 
-    void UpdateConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration>& config);
+    void UpdateConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration>& config,
+        const sptr<IFormSupply> &formSupplyClient);
 
     void SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration>& config);
 
@@ -211,7 +213,9 @@ private:
     void UpdateFormRequestReleaseState(
         int64_t formId, const std::string &compId, bool hasRelease);
 
-    void ReAddAllRecycledForms();
+    void RecoverFormsByConfigUpdate(std::vector<int64_t> &formIds, const sptr<IFormSupply> &formSupplyClient);
+    
+    void ReAddAllRecycledForms(const sptr<IFormSupply> &formSupplyClient);
 
     void ReAddRecycledForms(const std::vector<FormJsInfo> &formJsInfos);
 

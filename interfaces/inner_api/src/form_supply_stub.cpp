@@ -46,6 +46,8 @@ FormSupplyStub::FormSupplyStub()
         &FormSupplyStub::HandleOnRenderingBlock;
     memberFuncMap_[static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_RECYCLE_FORM)] =
         &FormSupplyStub::HandleOnRecycleForm;
+    memberFuncMap_[static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_RECOVER_FORM_BY_CONFIG_UPDATE)] =
+        &FormSupplyStub::HandleOnRecoverFormsByConfigUpdate;
 }
 
 FormSupplyStub::~FormSupplyStub()
@@ -285,6 +287,25 @@ int32_t FormSupplyStub::HandleOnRecycleForm(MessageParcel &data, MessageParcel &
     }
 
     int32_t result = OnRecycleForm(formId, *want);
+    reply.WriteInt32(result);
+    return result;
+}
+
+int32_t FormSupplyStub::HandleOnRecoverFormsByConfigUpdate(MessageParcel &data, MessageParcel &reply)
+{
+    std::vector<int64_t> formIds;
+
+    if (!data.ReadInt64Vector(&formIds)) {
+        HILOG_ERROR("Failed to ReadInt64Vector.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (formIds.empty()) {
+        HILOG_ERROR("formIds is empty.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    int32_t result = OnRecoverFormsByConfigUpdate(formIds);
     reply.WriteInt32(result);
     return result;
 }

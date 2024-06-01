@@ -33,6 +33,7 @@
 #include "form_host_interface.h"
 #include "form_report.h"
 #include "form_record_report.h"
+#include "form_mgr_adapter.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -381,6 +382,13 @@ int32_t FormSupplyCallback::OnRecycleForm(const int64_t &formId, const Want &wan
     }
     remoteFormHost->OnRecycleForm(formId);
     return ERR_OK;
+}
+
+int32_t FormSupplyCallback::OnRecoverFormsByConfigUpdate(std::vector<int64_t> &formIds)
+{
+    HILOG_INFO("recover forms by config update");
+    Want want;
+    return FormMgrAdapter::GetInstance().RecoverForms(formIds, want);
 }
 } // namespace AppExecFwk
 } // namespace OHOS

@@ -948,7 +948,23 @@ void FormRenderRecord::HandleReleaseInJsThread()
     ReleaseHapFileHandle();
 }
 
-void FormRenderRecord::ReAddAllRecycledForms()
+void FormRenderRecord::RecoverFormsByConfigUpdate(std::vector<int64_t> &formIds,
+    const sptr<IFormSupply> &formSupplyClient)
+{
+    if (formSupplyClient == nullptr) {
+        HILOG_ERROR("formSupplyClient is nullptr");
+        return;
+    }
+
+    if (formIds.empty()) {
+        HILOG_INFO("need recover formIds is empty.");
+        return;
+    }
+
+    formSupplyClient->OnRecoverFormsByConfigUpdate(formIds);
+}
+
+void FormRenderRecord::ReAddAllRecycledForms(const sptr<IFormSupply> &formSupplyClient)
 {
     HILOG_INFO("ReAdd all recycled forms start.");
     if (!CheckEventHandler(false, true)) {
@@ -956,10 +972,16 @@ void FormRenderRecord::ReAddAllRecycledForms()
         return;
     }
 
+    std::vector<int64_t> formIds;
     std::lock_guard<std::mutex> lock(formRequestsMutex_);
     for (const auto& formRequests : formRequests_) {
         for (const auto& formRequest : formRequests.second) {
             if (!formRequest.second.hasRelease) {
+                continue;
+            }
+
+            if (formRequest.second.isDynamic) {
+                formIds.push_back(formRequest.second.formJsInfo.formId);
                 continue;
             }
 
@@ -974,6 +996,8 @@ void FormRenderRecord::ReAddAllRecycledForms()
             eventHandler_->PostTask(task, "ReAddAllRecycledForms");
         }
     }
+
+    RecoverFormsByConfigUpdate(formIds, formSupplyClient);
 
     HILOG_INFO("ReAdd all recycled forms end.");
 }
@@ -1155,7 +1179,7 @@ size_t FormRenderRecord::FormCount()
 }
 
 void FormRenderRecord::UpdateConfiguration(
-    const std::shared_ptr<OHOS::AppExecFwk::Configuration>& config)
+    const std::shared_ptr<OHOS::AppExecFwk::Configuration>& config, const sptr<IFormSupply> &formSupplyClient)
 {
     HILOG_INFO("UpdateConfiguration begin");
     if (!config) {
@@ -1171,7 +1195,7 @@ void FormRenderRecord::UpdateConfiguration(
             return;
         }
 
-        ReAddAllRecycledForms();
+        ReAddAllRecycledForms(formSupplyClient);
         return;
     }
 
@@ -1186,7 +1210,7 @@ void FormRenderRecord::UpdateConfiguration(
     };
 
     eventHandler_->PostTask(task, "UpdateConfiguration");
-    ReAddAllRecycledForms();
+    ReAddAllRecycledForms(formSupplyClient);
 }
 
 void FormRenderRecord::HandleUpdateConfiguration(

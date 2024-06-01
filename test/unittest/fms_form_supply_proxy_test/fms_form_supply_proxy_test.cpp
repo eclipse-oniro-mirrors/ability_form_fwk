@@ -327,5 +327,41 @@ HWTEST_F(FormSupplyProxyTest, FormSupplyProxyTest_014, TestSize.Level1)
     EXPECT_EQ(ERR_OK, proxy->OnAcquireDataResult(wantParams, requestCode));
     GTEST_LOG_(INFO)<< "FmsFormHostProxyTest, FormSupplyProxyTest_014, TestSize.Level1";
 }
+
+/*
+* @tc.name: FormSupplyProxyTest_015
+* @tc.name: OnRecoverFormsByConfigUpdate
+* @tc.desc: Verify function OnRecoverFormsByConfigUpdate return value is ERR_OK
+*/
+HWTEST_F(FormSupplyProxyTest, FormSupplyProxyTest_015, TestSize.Level1)
+{
+    GTEST_LOG_(INFO)<< "FmsFormHostProxyTest, FormSupplyProxyTest_015, TestSize.Level1";
+    sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
+    ASSERT_NE(iremoteObject, nullptr);
+    EXPECT_CALL(*iremoteObject, SendRequest(_, _, _, _)).Times(1).WillRepeatedly(DoAll(Return(ERR_OK)));
+    std::shared_ptr<FormSupplyProxy> proxy = std::make_shared<FormSupplyProxy>(iremoteObject);
+    ASSERT_NE(proxy, nullptr);
+    std::vector<int64_t> formIds;
+    EXPECT_EQ(proxy->OnRecoverFormsByConfigUpdate(formIds), ERR_OK);
+    GTEST_LOG_(INFO)<< "FmsFormHostProxyTest, FormSupplyProxyTest_015, TestSize.Level1";
+}
+
+/*
+* @tc.name: FormSupplyProxyTest_016
+* @tc.name: OnRecoverFormsByConfigUpdate
+* @tc.desc: Verify function OnRecoverFormsByConfigUpdate return value is ERROR_NUM
+*/
+HWTEST_F(FormSupplyProxyTest, FormSupplyProxyTest_016, TestSize.Level1)
+{
+    GTEST_LOG_(INFO)<< "FmsFormHostProxyTest, FormSupplyProxyTest_016, TestSize.Level1";
+    sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
+    ASSERT_NE(iremoteObject, nullptr);
+    EXPECT_CALL(*iremoteObject, SendRequest(_, _, _, _)).Times(1).WillRepeatedly(DoAll(Return(ERROR_NUM)));
+    std::shared_ptr<FormSupplyProxy> proxy = std::make_shared<FormSupplyProxy>(iremoteObject);
+    ASSERT_NE(proxy, nullptr);
+    std::vector<int64_t> formIds;
+    EXPECT_EQ(proxy->OnRecoverFormsByConfigUpdate(formIds), ERROR_NUM);
+    GTEST_LOG_(INFO)<< "FmsFormHostProxyTest, FormSupplyProxyTest_016, TestSize.Level1";
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

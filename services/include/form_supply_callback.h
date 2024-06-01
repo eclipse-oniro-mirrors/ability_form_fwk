@@ -123,6 +123,14 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t OnRecycleForm(const int64_t &formId, const Want &want) override;
+
+    /**
+     * @brief Trigger card recover when configuration changes occur.
+     * @param formIds The ids of the forms.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t OnRecoverFormsByConfigUpdate(std::vector<int64_t> &formIds) override;
+
 private:
     /**
      * @brief check if disconnect ability or not.
