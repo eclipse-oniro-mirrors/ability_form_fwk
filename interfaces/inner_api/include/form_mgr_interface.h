@@ -632,6 +632,11 @@ public:
         return 0;
     }
 
+    virtual int32_t EnableForms(const std::string bundleName, const bool enable)
+    {
+        return 0;
+    }
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -711,6 +716,7 @@ public:
         FORM_MGR_ACQUIRE_ADD_FORM_RESULT,
         FORM_MGR_REQUEST_PUBLISH_FORM_WITH_SNAPSHOT,
         FORM_MGR_BATCH_REFRESH_FORMS,
+        FORM_MGR_ENABLE_FORMS,
     };
 };
 }  // namespace AppExecFwk

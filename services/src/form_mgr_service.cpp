@@ -1646,5 +1646,15 @@ void FormMgrService::OnSystemloadLevel(int32_t level)
     }
 }
 #endif // RES_SCHEDULE_ENABLE
+
+int32_t FormMgrService::EnableForms(const std::string bundleName, const bool enable)
+{
+    ErrCode ret = CheckFormPermission();
+    if (ret != ERR_OK) {
+        HILOG_ERROR("fail, disable forms permission denied");
+        return ret;
+    }
+    return FormMgrAdapter::GetInstance().EnableForms(bundleName, enable);
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

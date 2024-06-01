@@ -92,6 +92,9 @@ public:
 
     ErrCode RecoverForms(const std::vector<int64_t> &formIds, const WantParams &wantParams);
 
+    int32_t EnableForms(const std::vector<FormRecord> &&formRecords, const std::string bundleName,
+        int32_t userId, const bool enable);
+
 private:
     void InitRenderInner(bool isSandbox);
 

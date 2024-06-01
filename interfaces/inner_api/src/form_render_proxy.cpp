@@ -329,5 +329,44 @@ int32_t FormRenderProxy::RecoverForm(const int64_t &formId, const Want &want)
 
     return ERR_OK;
 }
+
+int32_t FormRenderProxy::EnableForm(const std::vector<FormJsInfo> &&formJsInfos, const Want &want, const bool enable)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_ASYNC);
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("%{public}s, failed to write interface token", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    int32_t error = WriteParcelableVector<FormJsInfo>(formJsInfos, data);
+    if (error != ERR_OK) {
+        HILOG_ERROR("%{public}s, failed to WriteParcelableVector<FormJsInfo>", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteParcelable(&want)) {
+        HILOG_ERROR("%{public}s, failed to write want", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteBool(enable)) {
+        HILOG_ERROR("%{public}s, failed to write enable", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    error = SendTransactCmd(
+        IFormRender::Message::FORM_ENABLE_FORM,
+        data,
+        reply,
+        option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d", __func__, error);
+        return error;
+    }
+
+    return ERR_OK;
+}
 } // namespace AppExecFwk
 } // namespace OHOS

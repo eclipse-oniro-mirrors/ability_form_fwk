@@ -35,6 +35,7 @@ struct FormDBInfo {
     std::vector<int> formUserUids;
     Constants::FormLocation formLocation;
     bool isThemeForm = false;
+    bool enableForm = true;
     /**
      * @brief Constructors
      *
@@ -57,6 +58,7 @@ struct FormDBInfo {
         formUserUids = formRecord.formUserUids;
         formLocation = formRecord.formLocation;
         isThemeForm = formRecord.isThemeForm;
+        enableForm = formRecord.enableForm;
     }
     bool Contains(const int uId) const
     {
@@ -113,6 +115,9 @@ struct FormDBInfo {
         if (isThemeForm != formDBInfo.isThemeForm) {
             return false;
         }
+        if (enableForm != formDBInfo.enableForm) {
+            return false;
+        }
 
         return true;
     }
@@ -143,6 +148,7 @@ public:
         formDBInfo_.formUserUids = formDBInfo.formUserUids;
         formDBInfo_.formLocation = formDBInfo.formLocation;
         formDBInfo_.isThemeForm = formDBInfo.isThemeForm;
+        formDBInfo_.enableForm = formDBInfo.enableForm;
     }
     /**
      * @brief Constructors
@@ -160,6 +166,7 @@ public:
         formDBInfo_.formUserUids = innerFormInfo.formDBInfo_.formUserUids;
         formDBInfo_.formLocation = innerFormInfo.formDBInfo_.formLocation;
         formDBInfo_.isThemeForm = innerFormInfo.formDBInfo_.isThemeForm;
+        formDBInfo_.enableForm = innerFormInfo.formDBInfo_.enableForm;
     }
      /**
      * @brief Constructors
@@ -177,6 +184,7 @@ public:
         formDBInfo_.formUserUids = formRecord.formUserUids;
         formDBInfo_.formLocation = formRecord.formLocation;
         formDBInfo_.isThemeForm = formRecord.isThemeForm;
+        formDBInfo_.enableForm = formRecord.enableForm;
     }
     std::string ToString() const
     {
@@ -191,6 +199,7 @@ public:
         obj["formUserUids"] = formDBInfo_.formUserUids;
         obj["formLocation"] = formDBInfo_.formLocation;
         obj["isThemeForm"] = formDBInfo_.isThemeForm;
+        obj["enableForm"] = formDBInfo_.enableForm;
         return obj.dump();
     }
     /**

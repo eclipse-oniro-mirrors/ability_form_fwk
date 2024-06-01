@@ -35,6 +35,7 @@ constexpr int32_t RENDER_FORM_FAILED = -1;
 constexpr int32_t RELOAD_FORM_FAILED = -1;
 constexpr int32_t RECYCLE_FORM_FAILED = -1;
 constexpr int32_t FORM_RENDER_TASK_DELAY_TIME = 20; // ms
+constexpr int32_t ENABLE_FORM_FAILED = -1;
 }
 using namespace AbilityRuntime;
 using namespace OHOS::AAFwk::GlobalConfigurationKey;
@@ -437,6 +438,25 @@ int32_t FormRenderImpl::RecoverForm(const int64_t &formId, const Want &want)
     }
     HILOG_ERROR("can't find render record of %{public}s.", std::to_string(formId).c_str());
     return RENDER_FORM_FAILED;
+}
+
+int32_t FormRenderImpl::EnableForm(const std::vector<FormJsInfo> &&formJsInfos, const Want &want, const bool enable)
+{
+    std::lock_guard<std::mutex> lock(renderRecordMutex_);
+    std::string uid = want.GetStringParam(Constants::FORM_SUPPLY_UID);
+    if (uid.empty()) {
+        HILOG_ERROR("Get uid failed");
+        return ENABLE_FORM_FAILED;
+    }
+    auto search = renderRecordMap_.find(uid);
+    if (search == renderRecordMap_.end()) {
+        HILOG_ERROR("RenderRecord not find");
+        return ENABLE_FORM_FAILED;
+    }
+    if (search->second) {
+        search->second->EnableFormRecord(std::forward<decltype(formJsInfos)>(formJsInfos), want, enable);
+    }
+    return ERR_OK;
 }
 } // namespace FormRender
 } // namespace AppExecFwk

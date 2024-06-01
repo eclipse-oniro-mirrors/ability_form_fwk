@@ -626,6 +626,14 @@ public:
      */
     void OnSystemloadLevel(int32_t level);
 #endif // RES_SCHEDULE_ENABLE
+    
+    /**
+     * @brief enable/disable form update.
+     * @param bundleName BundleName of the form host.
+     * @param enable True for enable form, false for disable form.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t EnableForms(const std::string bundleName, const bool enable) override;
 private:
     /**
      * OnAddSystemAbility, OnAddSystemAbility will be called when the listening SA starts.

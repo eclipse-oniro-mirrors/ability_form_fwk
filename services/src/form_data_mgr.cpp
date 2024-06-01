@@ -2512,5 +2512,45 @@ ErrCode FormDataMgr::GetRecordsByFormType(const int32_t formRefreshType,
     return ERR_OK;
 }
 
+ErrCode FormDataMgr::SetFormEnable(const int64_t formId, const bool enable)
+{
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    auto itFormRecord = formRecords_.find(formId);
+    if (itFormRecord == formRecords_.end()) {
+        HILOG_ERROR("%{public}s, form info not find", __func__);
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+    }
+    itFormRecord->second.enableForm = enable;
+    HILOG_INFO("FormDataMgr::SetFormEnable, formId = %{public}" PRId64 " enable = %{public}d", formId, enable);
+    return ERR_OK;
+}
+
+ErrCode FormDataMgr::SetRefreshDuringDisableForm(const int64_t formId, const bool enable)
+{
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    auto itFormRecord = formRecords_.find(formId);
+    if (itFormRecord == formRecords_.end()) {
+        HILOG_ERROR("%{public}s, form info not find", __func__);
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+    }
+    itFormRecord->second.isRefreshDuringDisableForm = enable;
+    HILOG_INFO("FormDataMgr::SetRefreshDuringDisableForm, formId = %{public}" PRId64 " enable = %{public}d",
+        formId, enable);
+    return ERR_OK;
+}
+
+ErrCode FormDataMgr::SetUpdateDuringDisableForm(const int64_t formId, const bool enable)
+{
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    auto itFormRecord = formRecords_.find(formId);
+    if (itFormRecord == formRecords_.end()) {
+        HILOG_ERROR("%{public}s, form info not find", __func__);
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+    }
+    itFormRecord->second.isUpdateDuringDisableForm = enable;
+    HILOG_INFO("FormDataMgr::SetUpdateDuringDisableForm, formId = %{public}" PRId64 " enable = %{public}d",
+        formId, enable);
+    return ERR_OK;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -1822,6 +1822,13 @@ ErrCode FormMgrAdapter::HandleEventNotify(const std::string &providerKey, const 
 ErrCode FormMgrAdapter::AcquireProviderFormInfoAsync(const int64_t formId,
     const FormItemInfo &info, const WantParams &wantParams)
 {
+    FormRecord formRecord;
+    if (FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)
+        && !formRecord.enableForm) {
+        HILOG_INFO("formRecord.bundleName = %{public}s, formRecord.formId = %{public}" PRId64 "",
+            formRecord.bundleName.c_str(), formRecord.formId);
+        return ERR_OK;
+    }
     if (FormRenderMgr::GetInstance().GetIsVerified()) {
         HILOG_INFO("The authentication status of the current user is true.");
         return InnerAcquireProviderFormInfoAsync(formId, info, wantParams);
@@ -4180,5 +4187,43 @@ void FormMgrAdapter::SetTimerTaskNeeded(bool isTimerTaskNeeded)
 }
 #endif // RES_SCHEDULE_ENABLE
 
+int32_t FormMgrAdapter::EnableForms(const std::string bundleName, const bool enable)
+{
+    std::vector<FormRecord> formInfos;
+    if (!FormDataMgr::GetInstance().GetFormRecord(bundleName, formInfos)) {
+        HILOG_ERROR("GetFormRecord error");
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    }
+    int32_t userId = FormUtil::GetCurrentAccountId();
+    HILOG_INFO("FormMgrAdapter::EnableForms userId = %{public}d, formInfos.size = %{public}zu, enable = %{public}d",
+        userId, formInfos.size(), enable);
+    for (auto iter = formInfos.begin(); iter != formInfos.end();) {
+        if (iter->enableForm == enable) {
+            iter = formInfos.erase(iter);
+            continue;
+        }
+        iter->enableForm = enable;
+        FormDataMgr::GetInstance().SetFormEnable(iter->formId, enable);
+        FormDbCache::GetInstance().UpdateDBRecord(iter->formId, *iter);
+        if (enable) {
+            if (iter->isRefreshDuringDisableForm) {
+                iter->isRefreshDuringDisableForm = false;
+                Want want;
+                want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
+                FormProviderMgr::GetInstance().RefreshForm(iter->formId, want, true);
+            } else if (iter->isUpdateDuringDisableForm) {
+                iter->isUpdateDuringDisableForm = false;
+                FormProviderData data = iter->formProviderInfo.GetFormData();
+                WantParams wantParams;
+                FormRenderMgr::GetInstance().UpdateRenderingForm(iter->formId, data, wantParams, true);
+            }
+        }
+        ++iter;
+    }
+    if (!formInfos.empty()) {
+        FormRenderMgr::GetInstance().EnableForms(std::move(formInfos), bundleName, userId, enable);
+    }
+    return ERR_OK;
+}
 } // namespace AppExecFwk
 } // namespace OHOS
