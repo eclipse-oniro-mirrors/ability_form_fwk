@@ -21,7 +21,6 @@
 #include "fms_log_wrapper.h"
 #include "form_mgr_errors.h"
 #include "form_mgr.h"
-#include "js_form_info_util.h"
 #include "js_runtime_utils.h"
 #include "ipc_skeleton.h"
 #include "napi_common_util.h"
@@ -219,7 +218,7 @@ napi_value JsFormProvider::OnGetFormsInfo(napi_env env, size_t argc, napi_value*
                 task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
                 return;
             }
-            task.ResolveWithNoError(env, CreateJsFormInfoArray(env, formInfos));
+            task.ResolveWithNoError(env, CreateFormInfos(env, formInfos));
         };
 
     napi_value lastParam = isPromise ? nullptr : argv[convertArgc];

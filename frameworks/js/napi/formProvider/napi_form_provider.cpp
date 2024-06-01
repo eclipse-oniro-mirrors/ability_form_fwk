@@ -21,7 +21,6 @@
 #include "fms_log_wrapper.h"
 #include "form_mgr_errors.h"
 #include "form_mgr.h"
-#include "js_form_info_util.h"
 #include "js_runtime_utils.h"
 #include "napi_common_util.h"
 #include "napi_common_want.h"
@@ -407,7 +406,7 @@ napi_value JsFormProvider::OnGetFormsInfo(napi_env env, size_t argc, napi_value*
             std::vector<FormInfo> formInfos;
             auto ret = FormMgr::GetInstance().GetFormsInfo(formInfoFilter, formInfos);
             if (ret == ERR_OK) {
-                task.Resolve(env, CreateJsFormInfoArray(env, formInfos));
+                task.Resolve(env, CreateFormInfos(env, formInfos));
             } else {
                 auto retCode = QueryRetCode(ret);
                 task.Reject(env, CreateJsError(env, retCode, QueryRetMsg(retCode)));

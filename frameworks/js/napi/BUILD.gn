@@ -489,10 +489,7 @@ ohos_shared_library("formutil_napi") {
 
   public_configs = [ ":formutil_napi_public_config" ]
 
-  sources = [
-    "formUtil/js_form_info_util.cpp",
-    "formUtil/napi_form_util.cpp",
-  ]
+  sources = [ "formUtil/napi_form_util.cpp" ]
 
   configs = [ ":fmskit_config" ]
 

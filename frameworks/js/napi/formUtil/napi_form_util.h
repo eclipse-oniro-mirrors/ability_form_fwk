@@ -17,6 +17,7 @@
 #define OHOS_FORM_FWK_NAPI_FORM_UTIL_H
 
 #include "ability.h"
+#include "form_info_filter.h"
 #include "form_instance.h"
 #include "form_instances_filter.h"
 #include "js_runtime_utils.h"
@@ -118,7 +119,6 @@ void InnerCreatePromiseRetMsg(napi_env env, int32_t code, napi_value* result);
 napi_value RetErrMsg(AsyncErrMsgCallbackInfo* asyncCallbackInfo);
 napi_value RetErrMsgForCallback(AsyncErrMsgCallbackInfo* asyncCallbackInfo);
 napi_value RetErrMsgForPromise(AsyncErrMsgCallbackInfo* asyncCallbackInfo);
-void ParseFormInfoIntoNapi(napi_env env, const OHOS::AppExecFwk::FormInfo &formInfo, napi_value &result);
 void ParseRunningFormInfoIntoNapi(napi_env env, const AppExecFwk::RunningFormInfo &runningFormInfo, napi_value &result);
 AsyncErrMsgCallbackInfo *InitErrMsg(napi_env env, int32_t code, int32_t type, napi_value callbackValue);
 napi_value CreateFormInfos(napi_env env, const std::vector<OHOS::AppExecFwk::FormInfo> &formInfos);
@@ -135,6 +135,7 @@ bool ParseParam(napi_env env, napi_value args, AppExecFwk::FormInstancesFilter &
 std::string GetStringFromNapi(napi_env env, napi_value value);
 napi_value CreateFormInstances(napi_env env, const std::vector<AppExecFwk::FormInstance> &formInstances);
 napi_value CreateFormInstance(napi_env env, const AppExecFwk::FormInstance &formInstance);
+bool ConvertFormInfoFilter(napi_env env, napi_value value, AppExecFwk::FormInfoFilter &formInfoFilter);
 }  // namespace AbilityRuntime
 }  // namespace OHOS
 #endif /* OHOS_FORM_FWK_NAPI_FORM_UTIL_H */
