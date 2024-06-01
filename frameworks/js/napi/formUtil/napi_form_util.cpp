@@ -554,6 +554,7 @@ void ParseFormInfoIntoNapi(napi_env env, const FormInfo &formInfo, napi_value &r
     }
     HILOG_DEBUG("%{public}s, customizeData size=%{public}zu.", __func__, formInfo.customizeDatas.size());
     napi_set_named_property(env, result, "customizeData", customizeData);
+    napi_set_named_property(env, result, "supportedShapes", CreateNativeArray(env, formInfo.supportShapes));
 }
 
 void ParseRunningFormInfoIntoNapi(napi_env env, const RunningFormInfo &runningFormInfo, napi_value &result)
