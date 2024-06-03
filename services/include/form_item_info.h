@@ -418,6 +418,18 @@ public:
      */
     void SetFormBundleType(BundleType formBundleType);
 
+    /**
+     * @brief Get whether form bundle is enable.
+     * @return True for enable form bundle, false for disable form bundle.
+     */
+    bool IsEnableForm() const;
+
+    /**
+     * @brief Set whether form bundle is enable.
+     * @param enableForm True for enable form bundle, false for disable form bundle.
+     */
+    void SetEnableForm(bool enableForm);
+
 private:
     /**
      * @brief Equal or not.
@@ -465,6 +477,7 @@ private:
     Constants::FormLocation formLocation_;
     bool isThemeForm_ = false;
     BundleType bundleType_ = BundleType::APP;
+    bool enableForm_ = true;
 };
 } // namespace AppExecFwk
 } // namespace OHOS

@@ -36,6 +36,7 @@
 #include "form_ams_helper.h"
 #include "form_background_connection.h"
 #include "form_bms_helper.h"
+#include "form_bundle_forbid_mgr.h"
 #include "form_cache_mgr.h"
 #include "form_cast_temp_connection.h"
 #include "form_constants.h"
@@ -1524,7 +1525,11 @@ ErrCode FormMgrAdapter::GetFormConfigInfo(const Want &want, FormItemInfo &formCo
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     formConfigInfo.SetFormLocation((Constants::FormLocation)formLocation);
-    HILOG_DEBUG("GetFormConfigInfo end, formLocation = %{public}d", formLocation);
+    bool isFormBundleForbidden = FormBundleForbidMgr::GetInstance().IsBundleForbidden(
+        formConfigInfo.GetProviderBundleName());
+    formConfigInfo.SetEnableForm(!isFormBundleForbidden);
+    HILOG_DEBUG("GetFormConfigInfo end, formLocation = %{public}d, enable is %{public}d",
+        formLocation, isFormBundleForbidden);
     return ERR_OK;
 }
 /**
@@ -1543,6 +1548,7 @@ ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
     FormRecord record;
     bool hasRecord = FormDataMgr::GetInstance().GetFormRecord(formId, record);
     record.formLocation = info.GetFormLocation();
+    record.enableForm = info.IsEnableForm();
     if (hasRecord && record.recycleStatus != RecycleStatus::NON_RECYCLABLE) {
         record.recycleStatus = RecycleStatus::NON_RECYCLABLE;
         FormDataMgr::GetInstance().UpdateFormRecord(formId, record);
@@ -1822,13 +1828,12 @@ ErrCode FormMgrAdapter::HandleEventNotify(const std::string &providerKey, const 
 ErrCode FormMgrAdapter::AcquireProviderFormInfoAsync(const int64_t formId,
     const FormItemInfo &info, const WantParams &wantParams)
 {
-    FormRecord formRecord;
-    if (FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)
-        && !formRecord.enableForm) {
-        HILOG_INFO("formRecord.bundleName = %{public}s, formRecord.formId = %{public}" PRId64 "",
-            formRecord.bundleName.c_str(), formRecord.formId);
+    std::string providerBundleName = info.GetProviderBundleName();
+    if (!info.IsEnableForm()) {
+        HILOG_INFO("Bundle: %{public}s is forbidden.", providerBundleName.c_str());
         return ERR_OK;
     }
+
     if (FormRenderMgr::GetInstance().GetIsVerified()) {
         HILOG_INFO("The authentication status of the current user is true.");
         return InnerAcquireProviderFormInfoAsync(formId, info, wantParams);
@@ -4205,11 +4210,13 @@ void FormMgrAdapter::SetTimerTaskNeeded(bool isTimerTaskNeeded)
 
 int32_t FormMgrAdapter::EnableForms(const std::string bundleName, const bool enable)
 {
+    FormBundleForbidMgr::GetInstance().SetBundleForbiddenStatus(bundleName, !enable);
     std::vector<FormRecord> formInfos;
     if (!FormDataMgr::GetInstance().GetFormRecord(bundleName, formInfos)) {
         HILOG_ERROR("GetFormRecord error");
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
+
     int32_t userId = FormUtil::GetCurrentAccountId();
     HILOG_INFO("FormMgrAdapter::EnableForms userId = %{public}d, formInfos.size = %{public}zu, enable = %{public}d",
         userId, formInfos.size(), enable);

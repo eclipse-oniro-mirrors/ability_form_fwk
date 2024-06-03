@@ -1538,5 +1538,16 @@ int32_t FormMgr::EnableForms(const std::string bundleName, const bool enable)
     }
     return resultCode;
 }
+
+bool FormMgr::IsFormBundleForbidden(const std::string &bundleName)
+{
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("connect form mgr service failed, error code is %{public}d.", errCode);
+        return false;
+    }
+
+    return remoteProxy_->IsFormBundleForbidden(bundleName);
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

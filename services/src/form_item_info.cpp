@@ -604,5 +604,14 @@ void FormItemInfo::SetFormBundleType(BundleType formBundleType)
     bundleType_ = formBundleType;
 }
 
+bool FormItemInfo::IsEnableForm() const
+{
+    return enableForm_;
+}
+
+void FormItemInfo::SetEnableForm(bool enableForm)
+{
+    enableForm_ = enableForm;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -54,6 +54,7 @@ ohos_shared_library("libfms") {
     "services/src/form_batch_delete_connection.cpp",
     "services/src/form_bms_helper.cpp",
     "services/src/form_bundle_event_callback.cpp",
+    "services/src/form_bundle_forbid_mgr.cpp",
     "services/src/form_cache_mgr.cpp",
     "services/src/form_cast_temp_connection.cpp",
     "services/src/form_data_mgr.cpp",

@@ -27,6 +27,7 @@
 #include "fms_log_wrapper.h"
 #include "form_ams_helper.h"
 #include "form_bms_helper.h"
+#include "form_bundle_forbid_mgr.h"
 #include "form_cache_mgr.h"
 #include "form_constants.h"
 #include "form_data_mgr.h"
@@ -1670,6 +1671,16 @@ int32_t FormMgrService::EnableForms(const std::string bundleName, const bool ena
         return ret;
     }
     return FormMgrAdapter::GetInstance().EnableForms(bundleName, enable);
+}
+
+bool FormMgrService::IsFormBundleForbidden(const std::string &bundleName)
+{
+    HILOG_DEBUG("Called.");
+    if (!CheckCallerIsSystemApp()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+
+    return FormBundleForbidMgr::GetInstance().IsBundleForbidden(bundleName);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

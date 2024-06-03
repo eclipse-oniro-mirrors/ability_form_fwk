@@ -2067,7 +2067,7 @@ int32_t FormMgrProxy::UnregisterPublishFormInterceptor(const sptr<IRemoteObject>
         HILOG_ERROR("failed to write interceptor");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    // send request.
+
     MessageParcel reply;
     MessageOption option;
     int error = SendTransactCmd(
@@ -2079,7 +2079,6 @@ int32_t FormMgrProxy::UnregisterPublishFormInterceptor(const sptr<IRemoteObject>
         HILOG_ERROR("failed to SendRequest: %{public}d", error);
         return error;
     }
-    // retrieve and return result.
     return reply.ReadInt32();
 }
 
@@ -2361,6 +2360,30 @@ int32_t FormMgrProxy::EnableForms(const std::string bundleName, const bool enabl
         return error;
     }
     return ERR_OK;
+}
+
+bool FormMgrProxy::IsFormBundleForbidden(const std::string &bundleName)
+{
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("failed to write interface token");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteString(bundleName)) {
+        HILOG_ERROR("Failed to write bundle name.");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_IS_FORM_BUNDLE_FORBIDDEN, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("%{public}s, failed to SendRequest: %{public}d", __func__, error);
+        return false;
+    }
+    return reply.ReadBool();
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

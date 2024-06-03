@@ -641,6 +641,13 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t EnableForms(const std::string bundleName, const bool enable) override;
+
+    /**
+     * @brief Check form bundle is controlled.
+     * @param bundleName The bundle name of form to be check.
+     * @return Returns true for form bundle is controlled.
+     */
+    bool IsFormBundleForbidden(const std::string &bundleName) override;
 private:
     /**
      * OnAddSystemAbility, OnAddSystemAbility will be called when the listening SA starts.
