@@ -73,23 +73,25 @@ const std::map<int32_t, int32_t> ERROR_CODE_MAP_EXTERNAL = {
 const std::map<int32_t, std::string> ERR_MSG_MAP_EXTERNAL = {
     { ERR_OK,                                         "success" },
     { ERR_FORM_EXTERNAL_PERMISSION_DENIED,            "Permissions denied." },
-    { ERR_FORM_EXTERNAL_PARAM_INVALID,                "Parameter error." },
-    { ERR_FORM_EXTERNAL_SYSTEMCAP_ERROR,              "The specified SystemCapability names was not found." },
+    { ERR_FORM_EXTERNAL_PARAM_INVALID,                "Parameter error. Possible causes:1.Mandatory parameters \
+                    are left unspecified; 2.Incorrect parameter types; 3.Parameter verification failed." },
+    { ERR_FORM_EXTERNAL_SYSTEMCAP_ERROR,              "Capability not supported.Failed to call ${functionName} \
+                    due to limited device capabilities." },
     { ERR_FORM_EXTERNAL_KERNEL_ERROR,                 "A generic kernel error occurred." },
     { ERR_FORM_EXTERNAL_KERNEL_MALLOC_ERROR,          "Failed to alloc." },
-    { ERR_FORM_EXTERNAL_IPC_ERROR,                    "An IPC connection error happened." },
-    { ERR_FORM_EXTERNAL_SERVICE_CONNECTION_ERROR,     "A service connection error happened, please try again later." },
+    { ERR_FORM_EXTERNAL_IPC_ERROR,                    "IPC connection error." },
+    { ERR_FORM_EXTERNAL_SERVICE_CONNECTION_ERROR,     "Service connection error." },
     { ERR_FORM_EXTERNAL_GET_INFO_FAILED,              "Failed to obtain the configuration information." },
     { ERR_FORM_EXTERNAL_NOT_SYSTEM_APP,               "The application is not a system application." },
     { ERR_FORM_EXTERNAL_FUNCTIONAL_ERROR,             "An internal functional error occurred." },
-    { ERR_FORM_EXTERNAL_FORM_NUM_EXCEEDS_UPPER_BOUND, "The number of forms exceeds upper bound." },
+    { ERR_FORM_EXTERNAL_FORM_NUM_EXCEEDS_UPPER_BOUND, "The number of forms exceeds the maximum allowed." },
     { ERR_FORM_EXTERNAL_FORM_ID_NOT_EXIST,            "The ID of the form to be operated does not exist" },
-    { ERR_FORM_EXTERNAL_OPERATION_FORM_NOT_SELF,      "The form can not be operated by the current application" },
+    { ERR_FORM_EXTERNAL_OPERATION_FORM_NOT_SELF,      "The form cannot be operated by the current application." },
     { ERR_FORM_EXTERNAL_ABILITY_NOT_INSTALLED,        "The ability is not installed" },
-    { ERR_FORM_EXTERNAL_CONNECT_RENDER_FAILED,        "Connect FormRenderService failed, please try again later." },
+    { ERR_FORM_EXTERNAL_CONNECT_RENDER_FAILED,        "Failed to connect to FormRenderService." },
     { ERR_FORM_EXTERNAL_RENDER_DIED,                  "FormRenderService is dead, please reconnect." },
     { ERR_FORM_EXTERNAL_FORM_NOT_TRUST,               "Form is not trust." },
-    { ERR_FORM_EXTERNAL_ADD_FORM_TIME_OUT,            "Waiting for the form addition to the desktop timeout." },
+    { ERR_FORM_EXTERNAL_ADD_FORM_TIME_OUT,            "Waiting for the form addition to the desktop timed out." },
 };
 
 const std::map<int32_t, std::string> ERR_MSG_MAP_INTERNAL = {
