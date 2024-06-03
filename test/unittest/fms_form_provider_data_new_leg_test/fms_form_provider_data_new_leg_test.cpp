@@ -760,6 +760,7 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_013, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormProviderMgr_013 start";
     FormProviderMgr formProviderMgr;
     FormRecord record;
+    record.formVisibleNotifyState = Constants::FORM_VISIBLE;
     int64_t formId = 1;
     bool isVisibleToFresh = true;
     MockIsEnableRefresh(true);
