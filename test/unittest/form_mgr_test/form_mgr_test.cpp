@@ -2778,7 +2778,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0129, TestSize.Level1) {
  */
 HWTEST_F(FormMgrTest, EnableForms_001, TestSize.Level0) {
     GTEST_LOG_(INFO) << "EnableForms_001 begin";
-    std::string bundleName = "";
+    std::string bundleName = "ohos.samples.FormApplication";
     FormMgr::GetInstance().SetRecoverStatus(Constants::IN_RECOVERING);
     int32_t result = FormMgr::GetInstance().EnableForms(bundleName, true);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR);
@@ -2792,7 +2792,7 @@ HWTEST_F(FormMgrTest, EnableForms_001, TestSize.Level0) {
  */
 HWTEST_F(FormMgrTest, EnableForms_002, TestSize.Level0) {
     GTEST_LOG_(INFO) << "EnableForms_002 begin";
-    std::string bundleName = "";
+    std::string bundleName = "ohos.samples.FormApplication";
     FormMgr::GetInstance().SetRecoverStatus(Constants::NOT_IN_RECOVERY);
     EXPECT_CALL(*mockProxy, EnableForms(_, _))
     .Times(1)
