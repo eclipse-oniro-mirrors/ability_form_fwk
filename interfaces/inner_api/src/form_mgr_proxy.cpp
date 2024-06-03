@@ -1564,6 +1564,28 @@ bool FormMgrProxy::CheckFMSReady()
     return reply.ReadBool();
 }
 
+bool FormMgrProxy::IsSystemAppForm(const std::string &bundleName)
+{
+    MessageParcel data;
+    // write in token to help identify which stub to be called
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("%{public}s, failed to write interface token", __func__);
+        return false;
+    }
+    if (!data.WriteString(bundleName)) {
+        HILOG_ERROR("failed to write bundleName");
+        return false;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    int error = SendTransactCmd(IFormMgr::Message::FORM_MGR_IS_SYSTEM_APP_FORM, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("failed to SendTransactCmd: %{public}d.", error);
+        return false;
+    }
+    return reply.ReadBool();
+}
+
 int32_t FormMgrProxy::SetBackgroundFunction(const std::string funcName, const std::string params)
 {
     HILOG_DEBUG("start");

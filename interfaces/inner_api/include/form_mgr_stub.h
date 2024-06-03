@@ -328,6 +328,14 @@ private:
     int32_t HandleCheckFMSReady(MessageParcel &data, MessageParcel &reply);
 
     /**
+     * @brief Check whether the form is system app.
+     * @param data input param
+     * @param reply output param
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleIsSystemAppForm(MessageParcel &data, MessageParcel &reply);
+
+    /**
      * @brief Handle RegisterFormAddObserverByBundle message.
      * @param data input param
      * @param reply output param

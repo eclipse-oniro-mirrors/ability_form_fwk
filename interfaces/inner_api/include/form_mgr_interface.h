@@ -395,6 +395,16 @@ public:
     virtual bool CheckFMSReady() = 0;
 
     /**
+     * @brief Check whether the form is system app.
+     * @param bundleName The bundleName of the form.
+     * @return Returns true if the form app is system, others false.
+     */
+    virtual bool IsSystemAppForm(const std::string &bundleName)
+    {
+        return false;
+    }
+
+    /**
      * @brief Register form add observer by bundle.
      * @param bundleName BundleName of the form host
      * @param callerToken Caller ability token.
@@ -717,6 +727,7 @@ public:
         FORM_MGR_REQUEST_PUBLISH_FORM_WITH_SNAPSHOT,
         FORM_MGR_BATCH_REFRESH_FORMS,
         FORM_MGR_ENABLE_FORMS,
+        FORM_MGR_IS_SYSTEM_APP_FORM,
     };
 };
 }  // namespace AppExecFwk

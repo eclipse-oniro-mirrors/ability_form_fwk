@@ -431,6 +431,13 @@ public:
     bool CheckFMSReady() override;
 
     /**
+     * @brief Check whether the form is system app.
+     * @param bundleName The bundleName of the form.
+     * @return Returns true if the form app is system, others false.
+     */
+    bool IsSystemAppForm(const std::string &bundleName) override;
+
+    /**
      * @brief The Call Event triggers the callee method.
      * @param funcName function name which is used by callee.
      * @param params parameter which is used by callee.

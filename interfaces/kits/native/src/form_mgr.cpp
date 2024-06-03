@@ -1112,6 +1112,17 @@ bool FormMgr::CheckFMSReady()
     return resultCode;
 }
 
+bool FormMgr::IsSystemAppForm(const std::string &bundleName)
+{
+    HILOG_DEBUG("check %{public}s is system form.", bundleName.c_str());
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("%{public}s failed errCode:%{public}d.", __func__, errCode);
+        return false;
+    }
+    return remoteProxy_->IsSystemAppForm(bundleName);
+}
+
 int32_t FormMgr::RegisterPublishFormInterceptor(const sptr<IRemoteObject> &interceptorCallback)
 {
     HILOG_DEBUG("called");

@@ -357,6 +357,13 @@ public:
     bool CheckFMSReady() override;
 
     /**
+     * @brief Check whether the form is system app.
+     * @param bundleName The bundleName of the form.
+     * @return Returns true if the form app is system, others false.
+     */
+    bool IsSystemAppForm(const std::string &bundleName) override;
+
+    /**
      * @brief Register form add observer by bundle.
      * @param bundleName BundleName of the form host
      * @param callerToken Caller ability token.
