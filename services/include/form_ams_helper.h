@@ -22,6 +22,7 @@
 #include "ability_manager_interface.h"
 #include "form_event_handler.h"
 #include "form_serial_queue.h"
+#include "iconfiguration_observer.h"
 #include "uri.h"
 
 namespace OHOS {
@@ -89,6 +90,14 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode StopExtensionAbility(const Want &want);
+    /**
+     * @brief register Configuration Observer.
+     */
+    void RegisterConfigurationObserver();
+    /**
+     * @brief unregister Configuration Observer.
+     */
+    void UnRegisterConfigurationObserver();
 private:
     /**
      * @brief Disconnect ability task, disconnect session with service ability.
@@ -99,6 +108,7 @@ private:
 private:
     sptr<AAFwk::IAbilityManager> abilityManager_ = nullptr;
     std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;
+    sptr<IConfigurationObserver> configurationObserver = nullptr;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

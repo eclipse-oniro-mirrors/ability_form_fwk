@@ -1275,5 +1275,20 @@ void FormTaskMgr::EnableForms(const std::vector<FormRecord> &&formRecords, const
         return;
     }
 }
+
+void FormTaskMgr::PostBatchRefreshForms(const int32_t formRefreshType)
+{
+    HILOG_DEBUG("start.");
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("serialQueue_ is null.");
+        return;
+    }
+
+    auto batchRefreshForms = [formRefreshType]() {
+        return FormMgrAdapter::GetInstance().BatchRefreshForms(formRefreshType);
+    };
+    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, batchRefreshForms);
+    HILOG_DEBUG("end");
+}
 } // namespace AppExecFwk
 } // namespace OHOS

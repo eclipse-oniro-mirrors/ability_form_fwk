@@ -16,6 +16,8 @@
 #include "form_ams_helper.h"
 
 #include "ability_manager_interface.h"
+#include "app_mgr_client.h"
+#include "form_resource_observer.h"
 #include "fms_log_wrapper.h"
 #include "form_mgr_errors.h"
 #include "form_serial_queue.h"
@@ -161,5 +163,43 @@ ErrCode FormAmsHelper::StartAbility(const Want &want, int32_t userId)
     }
     return IN_PROCESS_CALL(ams->StartAbility(want, userId));
 }
+
+void FormAmsHelper::RegisterConfigurationObserver()
+{
+    HILOG_INFO("%{public}s begin.", __func__);
+    if (configurationObserver != nullptr) {
+        HILOG_WARN("configurationObserver is not nullptr");
+        return;
+    }
+    sptr<IConfigurationObserver> configurationObserver(new (std::nothrow) FormFwkResourceObserver());
+    if (configurationObserver == nullptr) {
+        HILOG_ERROR("fail to create configurationObserver");
+        return;
+    }
+    auto appMgrClient = std::make_unique<AppMgrClient>();
+    if (appMgrClient == nullptr) {
+        HILOG_ERROR("fail to create appMgrClient");
+        return;
+    }
+    appMgrClient->RegisterConfigurationObserver(configurationObserver);
+    HILOG_INFO("%{public}s end.", __func__);
+}
+
+void FormAmsHelper::UnRegisterConfigurationObserver()
+{
+    HILOG_INFO("%{public}s begin.", __func__);
+    if (configurationObserver == nullptr) {
+        HILOG_WARN("configurationObserver is nullptr");
+        return;
+    }
+    auto appMgrClient = std::make_unique<AppMgrClient>();
+    if (appMgrClient == nullptr) {
+        HILOG_ERROR("fail to create appMgrClient");
+        return;
+    }
+    appMgrClient->UnregisterConfigurationObserver(configurationObserver);
+    HILOG_INFO("%{public}s end.", __func__);
+}
+
 }  // namespace AppExecFwk
 }  // namespace OHOS

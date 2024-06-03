@@ -691,6 +691,7 @@ void FormMgrService::OnStop()
     if (handler_) {
         handler_.reset();
     }
+    FormAmsHelper::GetInstance().UnRegisterConfigurationObserver();
 }
 
 ErrCode FormMgrService::ReadFormConfigXML()
@@ -773,6 +774,7 @@ ErrCode FormMgrService::Init()
         HILOG_WARN("parse form config failed, use the default vaule.");
     }
     FormMgrAdapter::GetInstance().Init();
+    FormAmsHelper::GetInstance().RegisterConfigurationObserver();
     return ERR_OK;
 }
 
