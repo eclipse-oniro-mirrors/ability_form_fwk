@@ -2480,10 +2480,7 @@ ErrCode FormDataMgr::GetRecordsByFormType(const int32_t formRefreshType,
             }
             inVisiblehFormRecord.emplace_back(formRecord.second);
         }
-        return ERR_OK;
-    }
-    
-    if (formRefreshType == Constants::REFRESH_APP_FORM) {
+    } else if (formRefreshType == Constants::REFRESH_APP_FORM) {
         for (auto formRecord : formRecords_) {
             if (formRecord.second.formBundleType != BundleType::APP) {
                 continue;
@@ -2494,12 +2491,20 @@ ErrCode FormDataMgr::GetRecordsByFormType(const int32_t formRefreshType,
             }
             inVisiblehFormRecord.emplace_back(formRecord.second);
         }
-        return ERR_OK;
-    }
-
-    if (formRefreshType == Constants::REFRESH_ATOMIC_FORM) {
+    } else if (formRefreshType == Constants::REFRESH_ATOMIC_FORM) {
         for (auto formRecord : formRecords_) {
             if (formRecord.second.formBundleType != BundleType::ATOMIC_SERVICE) {
+                continue;
+            }
+            if (formRecord.second.formVisibleNotifyState == static_cast<int32_t>(FormVisibilityType::VISIBLE)) {
+                visibleFormRecords.emplace_back(formRecord.second);
+                continue;
+            }
+            inVisiblehFormRecord.emplace_back(formRecord.second);
+        }
+    } else if (formRefreshType == Constants::REFRESH_SYSTEMAPP_FORM) {
+        for (auto formRecord : formRecords_) {
+            if (!formRecord.second.isSystemApp) {
                 continue;
             }
             if (formRecord.second.formVisibleNotifyState == static_cast<int32_t>(FormVisibilityType::VISIBLE)) {

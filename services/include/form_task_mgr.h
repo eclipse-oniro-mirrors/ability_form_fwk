@@ -277,6 +277,12 @@ public:
      */
     void PostEnableForms(const std::vector<FormRecord> &&formRecords,
         const Want &want, const sptr<IRemoteObject> &remoteObject, const bool enable);
+
+    /**
+    * @brief Post BatchRefresh forms.
+    * @param formRefreshType batch refresh forms type.
+    */
+    void PostBatchRefreshForms(const int32_t formRefreshType);
 private:
     /**
      * @brief Acquire form data from form provider.
