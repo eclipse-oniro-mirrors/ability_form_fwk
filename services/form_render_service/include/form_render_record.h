@@ -151,8 +151,9 @@ private:
 
     bool CreateRuntime(const FormJsInfo &formJsInfo);
 
-    bool SetPkgContextInfoMap(const FormJsInfo &formJsInfo, AbilityRuntime::Runtime::Options &options,
-        std::string &uid);
+    bool UpdateRuntime(const FormJsInfo &formJsInfo);
+
+    bool SetPkgContextInfoMap(const FormJsInfo &formJsInfo, AbilityRuntime::Runtime::Options &options);
 
     std::shared_ptr<AbilityRuntime::Context> GetContext(const FormJsInfo &formJsInfo, const Want &want);
 

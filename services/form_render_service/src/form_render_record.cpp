@@ -450,7 +450,7 @@ bool FormRenderRecord::CreateRuntime(const FormJsInfo &formJsInfo)
     options.isUnique = true;
     options.moduleCheckerDelegate = std::make_shared<FormModuleChecker>();
 
-    SetPkgContextInfoMap(formJsInfo, options, uid_);
+    SetPkgContextInfoMap(formJsInfo, options);
 
     runtime_ = AbilityRuntime::Runtime::Create(options);
     if (runtime_ == nullptr) {
@@ -461,8 +461,34 @@ bool FormRenderRecord::CreateRuntime(const FormJsInfo &formJsInfo)
     return true;
 }
 
-bool FormRenderRecord::SetPkgContextInfoMap(const FormJsInfo &formJsInfo, AbilityRuntime::Runtime::Options &options,
-    std::string &uid)
+bool FormRenderRecord::UpdateRuntime(const FormJsInfo &formJsInfo)
+{
+    auto moduleInfo = contextsMapForModuleName_.find(GenerateContextKey(formJsInfo));
+    if (moduleInfo != contextsMapForModuleName_.end()) {
+        return false;
+    }
+    if (!runtime_) {
+        HILOG_ERROR("runtime is not exist. %{public}s", formJsInfo.bundleName.c_str());
+        return false;
+    }
+    std::string moduleName = formJsInfo.moduleName;
+    HILOG_INFO("update runtime for bundle: %{public}s, module %{public}s",
+        formJsInfo.bundleName.c_str(), moduleName.c_str());
+    AbilityRuntime::Runtime::Options options;
+    SetPkgContextInfoMap(formJsInfo, options);
+    auto contextInfo = options.pkgContextInfoJsonStringMap.find(moduleName);
+    if (contextInfo != options.pkgContextInfoJsonStringMap.end()) {
+        auto pkgNameInfo = options.packageNameList.find(moduleName);
+        std::string packageName;
+        if (pkgNameInfo != options.packageNameList.end()) {
+            packageName = pkgNameInfo->second;
+        }
+        runtime_->UpdatePkgContextInfoJson(moduleName, contextInfo->second, packageName);
+    }
+    return true;
+}
+
+bool FormRenderRecord::SetPkgContextInfoMap(const FormJsInfo &formJsInfo, AbilityRuntime::Runtime::Options &options)
 {
     auto bundleMgrHelper = DelayedSingleton<FormBundleMgrHelper>::GetInstance();
     if (bundleMgrHelper == nullptr) {
@@ -615,9 +641,13 @@ void FormRenderRecord::HandleUpdateInJsThread(const FormJsInfo &formJsInfo, cons
 bool FormRenderRecord::BeforeHandleUpdateForm(const FormJsInfo &formJsInfo)
 {
     MarkThreadAlive();
-    if (runtime_ == nullptr && !CreateRuntime(formJsInfo)) {
-        HILOG_ERROR("Create runtime failed.");
-        return false;
+    if (runtime_ == nullptr) {
+        if (!CreateRuntime(formJsInfo)) {
+            HILOG_ERROR("Create runtime failed.");
+            return false;
+        }
+    } else {
+        UpdateRuntime(formJsInfo);
     }
     HILOG_DEBUG("BeforeHandleUpdateForm end");
     return true;
