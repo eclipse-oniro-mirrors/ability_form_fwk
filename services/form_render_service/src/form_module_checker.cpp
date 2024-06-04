@@ -30,6 +30,7 @@ bool FormModuleChecker::CheckApiAllowList(const std::string& apiPath)
         "intl.Locale.*",
         "intl.DateTimeFormat.*",
         "effectKit.*",
+        "font.registerFont",
         "multimedia.image.PixelMapFormat.*",
         "multimedia.image.Size.*",
         "multimedia.image.AlphaType.*",
@@ -97,6 +98,7 @@ bool FormModuleChecker::IsModuelAllowToLoad(const std::string& moduleName)
         "i18n",
         "intl",
         "effectKit",
+        "font",
         "multimedia.image"
     };
 

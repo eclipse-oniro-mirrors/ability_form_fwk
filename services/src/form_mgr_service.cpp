@@ -157,6 +157,18 @@ bool FormMgrService::CheckFMSReady()
     return FormInfoMgr::GetInstance().HasReloadedFormInfos();
 }
 
+bool FormMgrService::IsSystemAppForm(const std::string &bundleName)
+{
+    HILOG_DEBUG("check %{public}s is system form.", bundleName.c_str());
+    
+    std::vector<FormRecord> formRecords;
+    FormDataMgr::GetInstance().GetFormRecord(bundleName, formRecords);
+    if (formRecords.empty()) {
+        return false;
+    }
+    return formRecords.front().isSystemApp;
+}
+
 /**
  * @brief Add form with want, send want to form manager service.
  * @param formId The Id of the forms to add.
@@ -1638,6 +1650,7 @@ ErrCode FormMgrService::RequestPublishFormWithSnapshot(Want &want, bool withForm
     return FormMgrAdapter::GetInstance().RequestPublishForm(want, withFormBindingData, formBindingData,
                                                             formId, {}, false);
 }
+
 #ifdef RES_SCHEDULE_ENABLE
 void FormMgrService::OnSystemloadLevel(int32_t level)
 {

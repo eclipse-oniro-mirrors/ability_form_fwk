@@ -172,6 +172,8 @@ FormMgrStub::FormMgrStub()
         &FormMgrStub::HandleBatchRefreshForms;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_ENABLE_FORMS)] =
         &FormMgrStub::HandleEnableForms;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_IS_SYSTEM_APP_FORM)] =
+        &FormMgrStub::HandleIsSystemAppForm;
 }
 
 FormMgrStub::~FormMgrStub()
@@ -1044,6 +1046,17 @@ int32_t FormMgrStub::HandleCheckFMSReady(MessageParcel &data, MessageParcel &rep
     bool result = CheckFMSReady();
     if (!reply.WriteBool(result)) {
         HILOG_ERROR("%{public}s, failed to write action", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleIsSystemAppForm(MessageParcel &data, MessageParcel &reply)
+{
+    std::string bundleName = data.ReadString();
+    bool result = IsSystemAppForm(bundleName);
+    if (!reply.WriteBool(result)) {
+        HILOG_ERROR("failed to write result");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;

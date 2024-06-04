@@ -473,6 +473,13 @@ public:
     bool CheckFMSReady();
 
     /**
+     * @brief Check whether the form is system app.
+     * @param bundleName The bundleName of the form.
+     * @return Returns true if the form app is system, others false.
+     */
+    bool IsSystemAppForm(const std::string &bundleName);
+
+    /**
      * @brief Registers the callback for publish form. The callback is used to process the publish form request
      * when the system handler is not found.
      * @param interceptorCallback The injected callback, should implementation IFormPublishInterceptor.
