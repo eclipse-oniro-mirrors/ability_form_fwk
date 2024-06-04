@@ -34,14 +34,13 @@ const std::string STATUS_DATA_PREFIX = "statusData_";
 
 FormInfoRdbStorageMgr::FormInfoRdbStorageMgr()
 {
-    FormRdbConfig formRdbConfig;
-    rdbDataManager_ = std::make_shared<FormRdbDataMgr>(formRdbConfig);
-    ErrCode result = rdbDataManager_->Init();
-    if (result != ERR_OK) {
+    HILOG_DEBUG("FormInfoRdbStorageMgr is created");
+    FormRdbTableConfig formRdbTableConfig;
+    if (FormRdbDataMgr::GetInstance().InitFormRdbTable(formRdbTableConfig) != ERR_OK) {
+        HILOG_ERROR("Form info rdb storage mgr init form rdb table fail.");
         FormEventReport::SendFormFailedEvent(FormEventName::INIT_FMS_FAILED, HiSysEventType::FAULT,
             static_cast<int64_t>(InitFmsFiledErrorType::LOAD_FORM_DB_FAILED));
     }
-    HILOG_DEBUG("FormInfoRdbStorageMgr is created");
 }
 
 FormInfoRdbStorageMgr::~FormInfoRdbStorageMgr()
@@ -52,16 +51,9 @@ FormInfoRdbStorageMgr::~FormInfoRdbStorageMgr()
 ErrCode FormInfoRdbStorageMgr::LoadFormInfos(std::vector<std::pair<std::string, std::string>> &formInfoStorages)
 {
     HILOG_DEBUG("FormInfoAllRdbStorageMgr load all form infos");
-    {
-        std::lock_guard<std::mutex> lock(rdbStorePtrMutex_);
-        if (!CheckRdbStore()) {
-            HILOG_ERROR("RdbStore is nullptr");
-            return ERR_APPEXECFWK_FORM_COMMON_CODE;
-        }
-    }
-
     std::unordered_map<std::string, std::string> value;
-    ErrCode result = rdbDataManager_->QueryData(FORM_INFO_PREFIX, value);
+    ErrCode result = FormRdbDataMgr::GetInstance().QueryData(Constants::FORM_RDB_TABLE_NAME,
+        FORM_INFO_PREFIX, value);
     if (result != ERR_OK) {
         HILOG_ERROR("get entries error");
         FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, HiSysEventType::FAULT,
@@ -84,19 +76,12 @@ ErrCode FormInfoRdbStorageMgr::RemoveBundleFormInfos(const std::string &bundleNa
     }
 
     HILOG_DEBUG("FormInfoRdbStorageMgr remove form info, bundleName=%{public}s", bundleName.c_str());
-    {
-        std::lock_guard<std::mutex> lock(rdbStorePtrMutex_);
-        if (!CheckRdbStore()) {
-            HILOG_ERROR("RdbStore is nullptr");
-            return ERR_APPEXECFWK_FORM_COMMON_CODE;
-        }
-    }
 
     std::string key = std::string().append(FORM_INFO_PREFIX).append(bundleName);
     ErrCode result;
     {
         std::lock_guard<std::mutex> lock(rdbStorePtrMutex_);
-        result = rdbDataManager_->DeleteData(key);
+        result = FormRdbDataMgr::GetInstance().DeleteData(Constants::FORM_RDB_TABLE_NAME, key);
     }
 
     if (result != ERR_OK) {
@@ -114,43 +99,15 @@ ErrCode FormInfoRdbStorageMgr::UpdateBundleFormInfos(const std::string &bundleNa
     }
 
     HILOG_DEBUG("FormInfoRdbStorageMgr update form info, bundleName=%{public}s", bundleName.c_str());
-    {
-        std::lock_guard<std::mutex> lock(rdbStorePtrMutex_);
-        if (!CheckRdbStore()) {
-            HILOG_ERROR("RdbStore is nullptr");
-            return ERR_APPEXECFWK_FORM_COMMON_CODE;
-        }
-    }
     std::string key = std::string().append(FORM_INFO_PREFIX).append(bundleName);
     std::lock_guard<std::mutex> lock(rdbStorePtrMutex_);
     std::string value = formInfoStorages;
-    ErrCode result = rdbDataManager_->InsertData(key, value);
+    ErrCode result = FormRdbDataMgr::GetInstance().InsertData(Constants::FORM_RDB_TABLE_NAME, key, value);
     if (result != ERR_OK) {
         HILOG_ERROR("update formInfoStorages to rdbStore error");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return ERR_OK;
-}
-
-bool FormInfoRdbStorageMgr::CheckRdbStore()
-{
-    if (rdbDataManager_ == nullptr) {
-        HILOG_ERROR("rdbDataManager is null");
-        return false;
-    }
-    int32_t tryTimes = MAX_TIMES;
-    while (tryTimes > 0) {
-        ErrCode result = rdbDataManager_->Init();
-        if (result == ERR_OK) {
-            return true;
-        }
-        HILOG_DEBUG("CheckRdbStore, Times: %{public}d", tryTimes);
-        usleep(SLEEP_INTERVAL);
-        tryTimes--;
-    }
-    FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, HiSysEventType::FAULT,
-        static_cast<int64_t>(CallDbFiledErrorType::DATABASE_RESET_CONNECT_FAILED));
-    return false;
 }
 
 void FormInfoRdbStorageMgr::SaveEntries(
@@ -161,14 +118,7 @@ void FormInfoRdbStorageMgr::SaveEntries(
         nlohmann::json jsonObject = nlohmann::json::parse(item.second, nullptr, false);
         if (jsonObject.is_discarded() || innerFormInfo.FromJson(jsonObject) != true) {
             HILOG_ERROR("error key: %{private}s", item.first.c_str());
-            {
-                std::lock_guard<std::mutex> lock(rdbStorePtrMutex_);
-                if (!CheckRdbStore()) {
-                    HILOG_ERROR("RdbStore is nullptr");
-                    return;
-                }
-                rdbDataManager_->DeleteData(item.first);
-            }
+            FormRdbDataMgr::GetInstance().DeleteData(Constants::FORM_RDB_TABLE_NAME, item.first);
             continue;
         }
 
@@ -182,18 +132,11 @@ void FormInfoRdbStorageMgr::SaveEntries(
 ErrCode FormInfoRdbStorageMgr::LoadFormData(std::vector<InnerFormInfo> &innerFormInfos)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
-    {
-        std::lock_guard<std::mutex> lock(rdbStorePtrMutex_);
-        if (!CheckRdbStore()) {
-            HILOG_ERROR("RdbStore is nullptr");
-            return ERR_APPEXECFWK_FORM_COMMON_CODE;
-        }
-    }
     ErrCode result;
     std::unordered_map<std::string, std::string> value;
     {
         std::lock_guard<std::mutex> lock(rdbStorePtrMutex_);
-        result = rdbDataManager_->QueryData(FORM_ID_PREFIX, value);
+        result = FormRdbDataMgr::GetInstance().QueryData(Constants::FORM_RDB_TABLE_NAME, FORM_ID_PREFIX, value);
     }
     if (result != ERR_OK) {
         HILOG_ERROR("get entries error");
@@ -210,21 +153,13 @@ ErrCode FormInfoRdbStorageMgr::LoadFormData(std::vector<InnerFormInfo> &innerFor
 ErrCode FormInfoRdbStorageMgr::SaveStorageFormData(const InnerFormInfo &innerFormInfo)
 {
     HILOG_DEBUG("%{public}s called, formId[%{public}" PRId64 "]", __func__, innerFormInfo.GetFormId());
-    {
-        std::lock_guard<std::mutex> lock(rdbStorePtrMutex_);
-        if (!CheckRdbStore()) {
-            HILOG_ERROR("RdbStore is nullptr");
-            return ERR_APPEXECFWK_FORM_COMMON_CODE;
-        }
-    }
-
     std::string formId = std::to_string(innerFormInfo.GetFormId());
     std::string key = std::string().append(FORM_ID_PREFIX).append(formId);
     std::string value = innerFormInfo.ToString();
     ErrCode result;
     {
         std::lock_guard<std::mutex> lock(rdbStorePtrMutex_);
-        result = rdbDataManager_->InsertData(key, value);
+        result = FormRdbDataMgr::GetInstance().InsertData(Constants::FORM_RDB_TABLE_NAME, key, value);
     }
     if (result != ERR_OK) {
         HILOG_ERROR("put innerFormInfo to RdbStore error");
@@ -250,18 +185,11 @@ ErrCode FormInfoRdbStorageMgr::ModifyStorageFormData(const InnerFormInfo &innerF
 ErrCode FormInfoRdbStorageMgr::DeleteStorageFormData(const std::string &formId)
 {
     HILOG_DEBUG("%{public}s called, formId[%{public}s]", __func__, formId.c_str());
-    {
-        std::lock_guard<std::mutex> lock(rdbStorePtrMutex_);
-        if (!CheckRdbStore()) {
-            HILOG_ERROR("RdbStore is nullptr");
-            return ERR_APPEXECFWK_FORM_COMMON_CODE;
-        }
-    }
     std::string key = std::string().append(FORM_ID_PREFIX).append(formId);
     ErrCode result;
     {
         std::lock_guard<std::mutex> lock(rdbStorePtrMutex_);
-        result = rdbDataManager_->DeleteData(key);
+        result = FormRdbDataMgr::GetInstance().DeleteData(Constants::FORM_RDB_TABLE_NAME, key);
     }
 
     if (result != ERR_OK) {
@@ -274,7 +202,7 @@ ErrCode FormInfoRdbStorageMgr::DeleteStorageFormData(const std::string &formId)
     key = std::string().append(STATUS_DATA_PREFIX).append(formId);
     {
         std::lock_guard<std::mutex> lock(rdbStorePtrMutex_);
-        result = rdbDataManager_->DeleteData(key);
+        result = FormRdbDataMgr::GetInstance().DeleteData(Constants::FORM_RDB_TABLE_NAME, key);
     }
     if (result != ERR_OK) {
         HILOG_ERROR("delete status data of %{public}s failed", formId.c_str());
@@ -297,14 +225,7 @@ ErrCode FormInfoRdbStorageMgr::LoadStatusData(const std::string &formId, std::st
 
     ErrCode result;
     std::string key = std::string().append(STATUS_DATA_PREFIX).append(formId);
-    {
-        std::lock_guard<std::mutex> lock(rdbStorePtrMutex_);
-        if (!CheckRdbStore()) {
-            HILOG_ERROR("RdbStore is nullptr");
-            return ERR_APPEXECFWK_FORM_COMMON_CODE;
-        }
-        result = rdbDataManager_->QueryData(key, statusData);
-    }
+    result = FormRdbDataMgr::GetInstance().QueryData(Constants::FORM_RDB_TABLE_NAME, key, statusData);
     if (result != ERR_OK) {
         HILOG_ERROR("load status data of %{public}s failed, code is %{public}d", formId.c_str(), result);
         FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, HiSysEventType::FAULT,
@@ -325,14 +246,7 @@ ErrCode FormInfoRdbStorageMgr::UpdateStatusData(const std::string &formId, const
 
     ErrCode result;
     std::string key = std::string().append(STATUS_DATA_PREFIX).append(formId);
-    {
-        std::lock_guard<std::mutex> lock(rdbStorePtrMutex_);
-        if (!CheckRdbStore()) {
-            HILOG_ERROR("RdbStore is nullptr");
-            return ERR_APPEXECFWK_FORM_COMMON_CODE;
-        }
-        result = rdbDataManager_->InsertData(key, statusData);
-    }
+    result = FormRdbDataMgr::GetInstance().InsertData(Constants::FORM_RDB_TABLE_NAME, key, statusData);
     if (result != ERR_OK) {
         HILOG_ERROR("update status data of %{public}s to rdbstore failed, code is %{public}d", formId.c_str(), result);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;

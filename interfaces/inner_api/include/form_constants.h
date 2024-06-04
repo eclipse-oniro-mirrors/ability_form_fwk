@@ -256,9 +256,9 @@ namespace Constants {
     };
 
     // rdb
-    constexpr const char* FORM_RDB_NAME = "/formdb.db";
+    const std::string FORM_MANAGER_SERVICE_PATH = "/data/service/el1/public/database/form_storage";
+    const std::string FORM_RDB_NAME = "/formdb.db";
     constexpr const char* FORM_RDB_TABLE_NAME = "form_table";
-    constexpr const char* FORM_MANAGER_SERVICE_PATH = "/data/service/el1/public/database/form_storage";
     constexpr const char* FORM_JOURNAL_MODE = "WAL";
     constexpr const char* FORM_SYNC_MODE = "FULL";
     constexpr int32_t FORM_RDB_VERSION = 1;

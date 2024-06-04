@@ -49,7 +49,8 @@ void MockDeleteData(bool mockRet)
 
 namespace OHOS {
 namespace AppExecFwk {
-ErrCode FormRdbDataMgr::QueryData(const std::string &key, std::string &value)
+ErrCode FormRdbDataMgr::QueryData(const std::string &tableName, const std::string &key,
+    std::string &value)
 {
     if (g_mockQueryDataRet) {
         return ERR_OK;
@@ -57,7 +58,8 @@ ErrCode FormRdbDataMgr::QueryData(const std::string &key, std::string &value)
     return ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
 
-ErrCode FormRdbDataMgr::QueryData(const std::string &key, std::unordered_map<std::string, std::string> &values)
+ErrCode FormRdbDataMgr::QueryData(const std::string &tableName, const std::string &key,
+    std::unordered_map<std::string, std::string> &values)
 {
     if (g_mockQueryDataRet) {
         return ERR_OK;
@@ -65,7 +67,8 @@ ErrCode FormRdbDataMgr::QueryData(const std::string &key, std::unordered_map<std
     return ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
 
-ErrCode FormRdbDataMgr::InsertData(const std::string &key, const std::string &value)
+ErrCode FormRdbDataMgr::InsertData(const std::string &tableName, const std::string &key,
+    const std::string &value)
 {
     if (g_mockInsertDataRet) {
         return ERR_OK;
@@ -73,7 +76,7 @@ ErrCode FormRdbDataMgr::InsertData(const std::string &key, const std::string &va
     return ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
 
-ErrCode FormRdbDataMgr::DeleteData(const std::string &key)
+ErrCode FormRdbDataMgr::DeleteData(const std::string &tableName, const std::string &key)
 {
     if (g_mockDeleteDataRet) {
         return ERR_OK;
@@ -81,8 +84,7 @@ ErrCode FormRdbDataMgr::DeleteData(const std::string &key)
     return ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
 
-RdbStoreDataCallBackFormInfoStorage::RdbStoreDataCallBackFormInfoStorage(const FormRdbConfig &formRdbConfig)
-    : formRdbConfig_(formRdbConfig)
+RdbStoreDataCallBackFormInfoStorage::RdbStoreDataCallBackFormInfoStorage(const std::string &rdbPath)
 {
 }
 
@@ -117,30 +119,29 @@ int32_t RdbStoreDataCallBackFormInfoStorage::onCorruption(std::string databaseFi
     return NativeRdb::E_OK;
 }
 
-ErrCode FormRdbDataMgr::Init()
+ErrCode FormRdbDataMgr::InitFormRdbTable(const FormRdbTableConfig &formRdbTableConfig)
 {
     if (g_mockInitRet) {
         if (rdbStore_ != nullptr) {
             return ERR_OK;
         }
+        std::string rdbPath = Constants::FORM_MANAGER_SERVICE_PATH + Constants::FORM_RDB_NAME;
         NativeRdb::RdbStoreConfig rdbStoreConfig(
-            formRdbConfig_.dbPath + formRdbConfig_.dbName,
+            rdbPath,
             NativeRdb::StorageMode::MODE_DISK,
             false,
             std::vector<uint8_t>(),
-            formRdbConfig_.journalMode,
-            formRdbConfig_.syncMode,
+            Constants::FORM_JOURNAL_MODE,
+            Constants::FORM_SYNC_MODE,
             "",
             NativeRdb::SecurityLevel::S1);
+        rdbStoreConfig.SetAllowRebuild(true);
         int32_t errCode = NativeRdb::E_OK;
-        OHOS::AppExecFwk::RdbStoreDataCallBackFormInfoStorage rdbDataCallBack_(formRdbConfig_);
-        rdbStore_ = NativeRdb::RdbHelper::GetRdbStore(rdbStoreConfig, formRdbConfig_.version, rdbDataCallBack_,
+        OHOS::AppExecFwk::RdbStoreDataCallBackFormInfoStorage rdbDataCallBack_(rdbPath);
+        rdbStore_ = NativeRdb::RdbHelper::GetRdbStore(rdbStoreConfig, Constants::FORM_RDB_VERSION, rdbDataCallBack_,
             errCode);
-        if (rdbStore_ == nullptr) {
-            return ERR_APPEXECFWK_FORM_COMMON_CODE;
-        }
-        return ERR_OK;
     }
+
     return ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
 }

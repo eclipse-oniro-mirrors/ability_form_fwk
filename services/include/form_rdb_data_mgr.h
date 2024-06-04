@@ -18,6 +18,7 @@
 
 #include <vector>
 #include <unordered_map>
+#include <shared_mutex>
 #include <singleton.h>
 #include <string>
 #include "form_constants.h"
@@ -29,19 +30,13 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-struct FormRdbConfig {
-    std::string dbPath { Constants::FORM_MANAGER_SERVICE_PATH };
-    std::string dbName { Constants::FORM_RDB_NAME };
+struct FormRdbTableConfig {
     std::string tableName { Constants::FORM_RDB_TABLE_NAME };
-    std::string journalMode { Constants::FORM_JOURNAL_MODE };
-    std::string syncMode { Constants::FORM_SYNC_MODE };
-    int32_t version { Constants::FORM_RDB_VERSION };
-    std::string databaseFileType { Constants::FORM_RDB_FILE_TYPE };
     std::string createTableSql;
 };
 class RdbStoreDataCallBackFormInfoStorage : public NativeRdb::RdbOpenCallback {
 public:
-    RdbStoreDataCallBackFormInfoStorage(const FormRdbConfig &formRdbConfig);
+    RdbStoreDataCallBackFormInfoStorage(const std::string &rdbPath);
 
     virtual ~RdbStoreDataCallBackFormInfoStorage();
 
@@ -54,79 +49,132 @@ public:
     int32_t OnOpen(NativeRdb::RdbStore &rdbStore) override;
 
     int32_t onCorruption(std::string databaseFile) override;
+
 private:
-    FormRdbConfig formRdbConfig_;
+    std::string rdbPath_;
 };
 
 /**
  * @class FormRdbDataMgr
  * Form Rdb Data Manager.
  */
-class FormRdbDataMgr {
+class FormRdbDataMgr final : public DelayedRefSingleton<FormRdbDataMgr> {
+    DECLARE_DELAYED_REF_SINGLETON(FormRdbDataMgr)
 public:
+    DISALLOW_COPY_AND_MOVE(FormRdbDataMgr);
 
-    explicit FormRdbDataMgr(const FormRdbConfig &formRdbConfig);
-
-    ErrCode Init();
-
-    /**
-     * @brief Insert the form data in DB.
-     * @param key The data Key.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    ErrCode InsertData(const std::string &key);
+    ErrCode InitFormRdbTable(const FormRdbTableConfig &formRdbTableConfig);
 
     /**
      * @brief Insert the form data in DB.
-     * @param key The data Key.
+     * @param tableName The name of table to be inserted
+     * @param key The data's Key.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode InsertData(const std::string &key, const std::string &value);
+    ErrCode InsertData(const std::string &tableName, const std::string &key);
+
+    /**
+     * @brief Insert the form data in DB.
+     * @param tableName The name of table to be inserted
+     * @param key The data's key.
+     * @param value the data's value
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode InsertData(const std::string &tableName, const std::string &key, const std::string &value);
 
     /**
      * @brief Delete the form data in DB.
-     * @param key The data Key.
+     * @param tableName The name of table to be excute deleted action.
+     * @param key The data's Key.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode DeleteData(const std::string &key);
+    ErrCode DeleteData(const std::string &tableName, const std::string &key);
 
     /**
      * @brief Query the form data in DB.
+     * @param tableName The name of table to be query.
+     * @param key The data's Key.
+     * @param values The map of data's values
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode QueryData(const std::string &key, std::unordered_map<std::string, std::string> &values);
+    ErrCode QueryData(const std::string &tableName, const std::string &key,
+        std::unordered_map<std::string, std::string> &values);
 
     /**
      * @brief Query all the form data in DB.
+     * @param tableName The name of table to be query.
+     * @param datas The map of data's values
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode QueryAllData(std::unordered_map<std::string, std::string> &values);
+    ErrCode QueryAllData(const std::string &tableName, std::unordered_map<std::string, std::string> &datas);
 
     /**
      * @brief Query all key in DB.
+     * @param tableName The name of table to be query.
+     * @param datas All keys of data
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode QueryAllKeys(std::set<std::string> &datas);
+    ErrCode QueryAllKeys(const std::string &tableName, std::set<std::string> &datas);
 
+    /**
+     * @brief Excute sql in DB.
+     * @param sql The sql to be excute.
+     * @return Returns ERR_OK on success, others on failure.
+     */
     ErrCode ExecuteSql(const std::string &sql);
 
-    ErrCode QueryData(const std::string &key, std::string &value);
+    /**
+     * @brief Query data in DB.
+     * @param tableName The name of table to be query.
+     * @param key The data's Key.
+     * @param value The data's value.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode QueryData(const std::string &tableName, const std::string &key, std::string &value);
 
+    /**
+     * @brief Query data in DB.
+     * @param absRdbPredicates The rdb's predicates to be query.
+     * @return Returns query result.
+     */
     std::shared_ptr<NativeRdb::AbsSharedResultSet> QueryData(
         const NativeRdb::AbsRdbPredicates &absRdbPredicates);
 
+    /**
+     * @brief Query data in DB.
+     * @param sql The sql to be query.
+     * @return Returns query result.
+     */
     std::shared_ptr<NativeRdb::AbsSharedResultSet> QuerySql(const std::string &sql);
 
+    /**
+     * @brief Insert data in DB.
+     * @param tableName The name of table to be insert.
+     * @param valuesBucket The bucket of values.
+     * @param rowId Row's id.
+     * @return Returns true for success, false for failure.
+     */
     bool InsertData(
         const std::string &tableName, const NativeRdb::ValuesBucket &valuesBucket, int64_t &rowId);
 
+    /**
+     * @brief Delete data in DB.
+     * @param absRdbPredicates The rdb's predicates to be delete.
+     * @return Returns true for success, false for failure.
+     */
     bool DeleteData(const NativeRdb::AbsRdbPredicates &absRdbPredicates);
 
 private:
-    ErrCode CreateTable();
+    bool IsFormRdbLoaded();
 
-    FormRdbConfig formRdbConfig_;
+    ErrCode CheckAndRebuildRdbStore(int32_t rdbOperateRet);
+
+    ErrCode LoadRdbStore();
+
+    std::map<std::string, FormRdbTableConfig> formRdbTableCfgMap_;
     std::shared_ptr<NativeRdb::RdbStore> rdbStore_;
+    std::shared_mutex rdbStoreMutex_;
+    int64_t lastRdbBuildTime_;
 };
 } // namespace AppExecFwk
 } // namespace OHOS

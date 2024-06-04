@@ -86,6 +86,7 @@ enum {
     // error code in enable or disable form
     ERR_APPEXECFWK_FORM_DISABLE_REFRESH,
     ERR_APPEXECFWK_FORM_REPEAT_DISABLE,
+    ERR_APPEXECFWK_FORM_RDB_REPEATED_BUILD,
 };
 }  // namespace OHOS
 #endif  // OHOS_FORM_FWK_FORM_MGR_ERRORS_H
