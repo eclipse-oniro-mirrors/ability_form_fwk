@@ -735,7 +735,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_038, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRenderRecordTest_038 start";
     auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
-    formRenderRecord->ReAddAllRecycledForms();
+    formRenderRecord->ReAddAllRecycledForms(nullptr);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_038 end";
 }
 
@@ -870,4 +870,19 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_045, TestSize.Level0)
     AbilityRuntime::Runtime::Options options;
     EXPECT_EQ(true, formRenderRecord->SetPkgContextInfoMap(formJsInfo, options));
     GTEST_LOG_(INFO) << "FormRenderRecordTest_045 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_046
+ * @tc.desc: Verify RecoverFormsByConfigUpdate
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_046, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_046 start";
+    std::string uid = "uid";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", uid);
+    std::vector<int64_t> formIds;
+    formRenderRecord->RecoverFormsByConfigUpdate(formIds, nullptr);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_046 end";
 }

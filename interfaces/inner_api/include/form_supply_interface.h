@@ -114,6 +114,13 @@ public:
      */
     virtual int32_t OnRecycleForm(const int64_t &formId, const Want &want) { return ERR_OK; }
 
+    /**
+     * @brief Trigger card recover when configuration changes occur.
+     * @param formIds The ids of the forms.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int32_t OnRecoverFormsByConfigUpdate(std::vector<int64_t> &formIds) { return ERR_OK; }
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -128,6 +135,7 @@ public:
         TRANSACTION_FORM_ACQUIRED_DATA,
         TRANSACTION_FORM_RENDERING_BLOCK,
         TRANSACTION_FORM_RECYCLE_FORM,
+        TRANSACTION_FORM_RECOVER_FORM_BY_CONFIG_UPDATE,
     };
 };
 }  // namespace AppExecFwk

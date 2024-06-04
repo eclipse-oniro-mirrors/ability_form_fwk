@@ -102,6 +102,11 @@ public:
         return ERR_OK;
     }
 
+    int OnRecoverFormsByConfigUpdate(std::vector<int64_t> &formIds) override
+    {
+        return ERR_OK;
+    }
+
     bool asObject_ = true;
 };
 
@@ -543,6 +548,48 @@ HWTEST_F(FormSupplyStubTest, FormSupplyStubTest_023, TestSize.Level1)
     AAFwk::WantParams wantParams;
     data.WriteParcelable(&wantParams);
     data.WriteInt64(1);
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+}
+
+/**
+ * @tc.name: FormSupplyStubTest_024
+ * @tc.desc: Verify function HandleOnRecoverFormsByConfigUpdate the return value is ERR_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormSupplyStubTest, FormSupplyStubTest_024, TestSize.Level1)
+{
+    sptr<MockFormSupplyCallback> callback = new (std::nothrow) MockFormSupplyCallback();
+    constexpr uint32_t code =
+        static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_RECOVER_FORM_BY_CONFIG_UPDATE);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormSupplyCallback::GetDescriptor());
+    std::vector<int64_t> formIds;
+    data.WriteInt64Vector(formIds);
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+}
+
+/**
+ * @tc.name: FormSupplyStubTest_025
+ * @tc.desc: Verify function HandleOnRecoverFormsByConfigUpdate the return value is ERR_OK
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormSupplyStubTest, FormSupplyStubTest_025, TestSize.Level1)
+{
+    sptr<MockFormSupplyCallback> callback = new (std::nothrow) MockFormSupplyCallback();
+    constexpr uint32_t code =
+        static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_RECOVER_FORM_BY_CONFIG_UPDATE);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormSupplyCallback::GetDescriptor());
+    std::vector<int64_t> formIds;
+    int64_t formId = 1;
+    formIds.push_back(formId);
+    data.WriteInt64Vector(formIds);
     auto result = callback->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
 }

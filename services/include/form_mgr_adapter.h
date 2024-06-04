@@ -1054,6 +1054,13 @@ private:
     bool IsErmsSupportPublishForm(std::string bundleName, std::vector<Want> wants);
 
     /**
+     * @brief Check if the caller is formRenderService.
+     * @param callingUid the caller's Uid.
+     * @return Returns true if the caller is formRenderService, false if not.
+     */
+    bool IsFormRenderServiceCall(int callingUid);
+
+    /**
      * @brief Notify forms visible/invisible to remoteCallers.
      * @param bundleName the caller's bundle name.
      * @param remoteObjects refs of remoteCallers.

@@ -3982,6 +3982,22 @@ bool FormMgrAdapter::IsErmsSupportPublishForm(std::string bundleName, std::vecto
     return isSupport;
 }
 
+bool FormMgrAdapter::IsFormRenderServiceCall(int callingUid)
+{
+    std::string callBundleName = "";
+    auto ret = FormBmsHelper::GetInstance().GetBundleNameByUid(callingUid, callBundleName);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("Get bundleName by uid failed.");
+        return false;
+    }
+    if (callBundleName == Constants::FRS_BUNDLE_NAME) {
+        HILOG_INFO("FRS call.");
+        return true;
+    }
+
+    return false;
+}
+
 int32_t FormMgrAdapter::SetFormsRecyclable(const std::vector<int64_t> &formIds)
 {
     HILOG_DEBUG("called");
@@ -4015,8 +4031,8 @@ int32_t FormMgrAdapter::SetFormsRecyclable(const std::vector<int64_t> &formIds)
             HILOG_WARN("form %{public}" PRId64 " is already RECYCLABLE or RECYCLED", formId);
             continue;
         }
-        if (std::find(record.formUserUids.begin(), record.formUserUids.end(), callingUid)
-            == record.formUserUids.end()) {
+        if (std::find(record.formUserUids.begin(), record.formUserUids.end(), callingUid) ==
+            record.formUserUids.end()) {
             HILOG_WARN("form %{public}" PRId64 " is not owned by %{public}d", formId, callingUid);
             continue;
         }
@@ -4067,8 +4083,8 @@ int32_t FormMgrAdapter::RecycleForms(const std::vector<int64_t> &formIds, const 
             HILOG_WARN("form %{public}" PRId64 " is already RECYCLED", formId);
             continue;
         }
-        if (std::find(record.formUserUids.begin(), record.formUserUids.end(), callingUid)
-            == record.formUserUids.end()) {
+        if (std::find(record.formUserUids.begin(), record.formUserUids.end(), callingUid) ==
+            record.formUserUids.end()) {
             HILOG_WARN("form %{public}" PRId64 " is not owned by %{public}d", formId, callingUid);
             continue;
         }
@@ -4116,8 +4132,8 @@ int32_t FormMgrAdapter::RecoverForms(const std::vector<int64_t> &formIds, const 
             HILOG_WARN("form %{public}" PRId64 " is not RECYCLED", formId);
             continue;
         }
-        if (std::find(record.formUserUids.begin(), record.formUserUids.end(), callingUid)
-            == record.formUserUids.end()) {
+        if (std::find(record.formUserUids.begin(), record.formUserUids.end(), callingUid) ==
+            record.formUserUids.end() && !IsFormRenderServiceCall(callingUid)) {
             HILOG_WARN("form %{public}" PRId64 " is not owned by %{public}d", formId, callingUid);
             continue;
         }

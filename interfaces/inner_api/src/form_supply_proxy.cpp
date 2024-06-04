@@ -377,5 +377,31 @@ int32_t FormSupplyProxy::OnRecycleForm(const int64_t &formId, const Want &want)
     }
     return error;
 }
+
+int32_t FormSupplyProxy::OnRecoverFormsByConfigUpdate(std::vector<int64_t> &formIds)
+{
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("error to write interface token");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteInt64Vector(formIds)) {
+        HILOG_ERROR("error to write formIds");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_ASYNC);
+    int error = SendTransactCmd(
+        IFormSupply::Message::TRANSACTION_FORM_RECOVER_FORM_BY_CONFIG_UPDATE,
+        data,
+        reply,
+        option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("failed to SendRequest: %{public}d", error);
+    }
+    return error;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS
