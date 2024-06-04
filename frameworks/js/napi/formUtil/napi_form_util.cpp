@@ -475,104 +475,22 @@ AsyncErrMsgCallbackInfo *InitErrMsg(napi_env env, int32_t code, int32_t type, na
     return asyncErrorInfo;
 }
 
-void SetFormInfoPropertyString(napi_env env, const char *inValue, napi_value &result, const char *outName)
-{
-    napi_value temp;
-    napi_create_string_utf8(env, inValue, NAPI_AUTO_LENGTH, &temp);
-    HILOG_DEBUG("%{public}s, %{public}s=%{public}s.", __func__, outName, inValue);
-    napi_set_named_property(env, result, outName, temp);
-}
-
-void SetFormInfoPropertyInt32(napi_env env, int32_t inValue, napi_value &result, const char *outName)
-{
-    napi_value temp;
-    napi_create_int32(env, inValue, &temp);
-    HILOG_DEBUG("%{public}s, %{public}s=%{public}d.", __func__, outName, inValue);
-    napi_set_named_property(env, result, outName, temp);
-}
-
-void SetFormInfoPropertyBoolean(napi_env env, bool inValue, napi_value &result, const char *outName)
-{
-    napi_value temp;
-    napi_get_boolean(env, inValue, &temp);
-    HILOG_DEBUG("%{public}s, %{public}s=%{public}d.", __func__, outName, inValue);
-    napi_set_named_property(env, result, outName, temp);
-}
-
-/**
- * @brief Parse form info into Node-API
- *
- * @param[in] env The environment that the Node-API call is invoked under
- * @param[in] formInfo it is used for return forminfo to JavaScript
- * @param[out] result This is an opaque pointer that is used to represent a JavaScript value
- *
- * @return void
- */
-void ParseFormInfoIntoNapi(napi_env env, const FormInfo &formInfo, napi_value &result)
-{
-    SetFormInfoPropertyString(env, formInfo.bundleName.c_str(), result, "bundleName");
-    SetFormInfoPropertyString(env, formInfo.moduleName.c_str(), result, "moduleName");
-    SetFormInfoPropertyString(env, formInfo.abilityName.c_str(), result, "abilityName");
-    SetFormInfoPropertyString(env, formInfo.name.c_str(), result, "name");
-    SetFormInfoPropertyString(env, formInfo.displayName.c_str(), result, "displayName");
-    SetFormInfoPropertyInt32(env, formInfo.displayNameId, result, "displayNameId");
-    SetFormInfoPropertyString(env, formInfo.description.c_str(), result, "description");
-    SetFormInfoPropertyInt32(env, formInfo.descriptionId, result, "descriptionId");
-    FormType formType = formInfo.type;
-    SetFormInfoPropertyInt32(env, (int32_t)formType, result, "type");
-    SetFormInfoPropertyString(env, formInfo.jsComponentName.c_str(), result, "jsComponentName");
-    FormsColorMode formsColorMode = formInfo.colorMode;
-    SetFormInfoPropertyInt32(env, (int32_t)formsColorMode, result, "colorMode");
-    SetFormInfoPropertyBoolean(env, formInfo.defaultFlag, result, "isDefault");
-    SetFormInfoPropertyBoolean(env, formInfo.updateEnabled, result, "updateEnabled");
-    SetFormInfoPropertyBoolean(env, formInfo.formVisibleNotify, result, "formVisibleNotify");
-    SetFormInfoPropertyString(env, formInfo.formConfigAbility.c_str(), result, "formConfigAbility");
-    SetFormInfoPropertyInt32(env, formInfo.updateDuration, result, "updateDuration");
-    SetFormInfoPropertyString(env, formInfo.scheduledUpdateTime.c_str(), result, "scheduledUpdateTime");
-    SetFormInfoPropertyInt32(env, formInfo.defaultDimension, result, "defaultDimension");
-    SetFormInfoPropertyString(env, formInfo.relatedBundleName.c_str(), result, "relatedBundleName");
-
-    // supportDimensions
-    napi_value supportDimensions;
-    napi_create_array(env, &supportDimensions);
-    int32_t iDimensionsCount = 0;
-    for (auto dimension : formInfo.supportDimensions) {
-        HILOG_DEBUG("%{public}s, dimension=%{public}d.", __func__, dimension);
-        napi_value dimensionInfo;
-        napi_create_int32(env, (int32_t)dimension, &dimensionInfo);
-        napi_set_element(env, supportDimensions, iDimensionsCount, dimensionInfo);
-        ++iDimensionsCount;
-    }
-    HILOG_DEBUG("%{public}s, supportDimensions size=%{public}zu.", __func__, formInfo.supportDimensions.size());
-    napi_set_named_property(env, result, "supportDimensions", supportDimensions);
-
-    // customizeData
-    napi_value customizeData;
-    napi_create_object(env, &customizeData);
-    for (const auto& data : formInfo.customizeDatas) {
-        SetFormInfoPropertyString(env, data.value.c_str(), customizeData, data.name.c_str());
-    }
-    HILOG_DEBUG("%{public}s, customizeData size=%{public}zu.", __func__, formInfo.customizeDatas.size());
-    napi_set_named_property(env, result, "customizeData", customizeData);
-    napi_set_named_property(env, result, "supportedShapes", CreateNativeArray(env, formInfo.supportShapes));
-}
-
 void ParseRunningFormInfoIntoNapi(napi_env env, const RunningFormInfo &runningFormInfo, napi_value &result)
 {
-    std::string formIdString = std::to_string(runningFormInfo.formId);
-    SetFormInfoPropertyString(env, formIdString.c_str(), result, "formId");
-    SetFormInfoPropertyString(env, runningFormInfo.bundleName.c_str(), result, "bundleName");
-    SetFormInfoPropertyString(env, runningFormInfo.hostBundleName.c_str(), result, "hostBundleName");
-    FormVisibilityType formVisiblity = runningFormInfo.formVisiblity;
-    SetFormInfoPropertyInt32(env, (int32_t)formVisiblity, result, "visibilityType");
-    SetFormInfoPropertyString(env, runningFormInfo.moduleName.c_str(), result, "moduleName");
-    SetFormInfoPropertyString(env, runningFormInfo.abilityName.c_str(), result, "abilityName");
-    SetFormInfoPropertyString(env, runningFormInfo.formName.c_str(), result, "formName");
-    SetFormInfoPropertyInt32(env, runningFormInfo.dimension, result, "dimension");
-    FormUsageState formUsageState = runningFormInfo.formUsageState;
-    SetFormInfoPropertyInt32(env, (int32_t)formUsageState, result, "formUsageState");
-    SetFormInfoPropertyString(env, runningFormInfo.description.c_str(), result, "formDescription");
-    SetFormInfoPropertyInt32(env, (int32_t)runningFormInfo.formLocation, result, "formLocation");
+    napi_create_object(env, &result);
+
+    napi_set_named_property(env, result, "formId", CreateJsValue(env, std::to_string(runningFormInfo.formId)));
+    napi_set_named_property(env, result, "bundleName", CreateJsValue(env, runningFormInfo.bundleName));
+    napi_set_named_property(env, result, "hostBundleName", CreateJsValue(env, runningFormInfo.hostBundleName));
+    napi_set_named_property(env, result, "visibilityType", CreateJsValue(env, (int32_t)runningFormInfo.formVisiblity));
+    napi_set_named_property(env, result, "moduleName", CreateJsValue(env, runningFormInfo.moduleName));
+    napi_set_named_property(env, result, "abilityName", CreateJsValue(env, runningFormInfo.abilityName));
+    napi_set_named_property(env, result, "bundleName", CreateJsValue(env, runningFormInfo.bundleName));
+    napi_set_named_property(env, result, "formName", CreateJsValue(env, runningFormInfo.formName));
+    napi_set_named_property(env, result, "dimension", CreateJsValue(env, runningFormInfo.dimension));
+    napi_set_named_property(env, result, "formUsageState", CreateJsValue(env, runningFormInfo.formUsageState));
+    napi_set_named_property(env, result, "formDescription", CreateJsValue(env, runningFormInfo.description));
+    napi_set_named_property(env, result, "formLocation", CreateJsValue(env, (int32_t)runningFormInfo.formLocation));
 }
 
 inline FormType GetFormType(const FormInfo &formInfo)
@@ -766,6 +684,29 @@ napi_value CreateFormInstance(napi_env env, const FormInstance &formInstance)
     napi_set_named_property(env, objContext, "formUsageState", CreateJsValue(env, formInstance.formUsageState));
     napi_set_named_property(env, objContext, "formDescription", CreateJsValue(env, formInstance.description));
     return objContext;
+}
+
+bool ConvertFormInfoFilter(napi_env env, napi_value value, AppExecFwk::FormInfoFilter &formInfoFilter)
+{
+    napi_valuetype type = napi_undefined;
+    napi_typeof(env, value, &type);
+    if (type != napi_object) {
+        HILOG_ERROR("%{public}s, an object is expected, but an argument of different type is passed in.", __func__);
+        return false;
+    }
+
+    napi_value nativeDataValue = nullptr;
+    napi_get_named_property(env, value, "moduleName", &nativeDataValue);
+    napi_valuetype nativeDataValueType = napi_undefined;
+    napi_typeof(env, nativeDataValue, &nativeDataValueType);
+    if (nativeDataValue == nullptr || (nativeDataValueType != napi_undefined &&
+        !ConvertFromJsValue(env, nativeDataValue, formInfoFilter.moduleName))) {
+        HILOG_ERROR("%{public}s called, convert nativeDataValue failed.", __func__);
+        return false;
+    }
+    HILOG_INFO("%{public}s called, module name is %{public}s.", __func__, formInfoFilter.moduleName.c_str());
+
+    return true;
 }
 }  // namespace AbilityRuntime
 }  // namespace OHOS
