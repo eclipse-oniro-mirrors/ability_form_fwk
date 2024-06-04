@@ -890,11 +890,10 @@ private:
     ErrCode RequestPublishFormToHost(Want &want);
 
     /**
-     * @brief Post request publish form to host.
+     * @brief check request publish form want.
      * @param want The want of the form to publish.
-     * @param wantToHost The other want of the form to publish.
      */
-    void AddSnapshotToHostWant(const Want &want, Want &wantToHost);
+    void CheckSnapshotWant(const Want &want);
 
     /**
      * @brief check the argv of AddRequestPublishForm.
