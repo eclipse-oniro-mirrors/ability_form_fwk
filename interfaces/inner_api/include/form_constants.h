@@ -160,6 +160,8 @@ namespace Constants {
     constexpr const char* FORM_RENDER_COMP_ID = "form_render_comp_id";
     constexpr const char* FORM_DELAY_TIME_OF_RECYCLE = "form_delay_time_of_recycle";
     constexpr const char* FORM_STATUS_DATA = "form_status_data";
+    constexpr const char* FORM_IS_DYNAMIC = "form_is_dynamic";
+    constexpr const char* FORM_IS_RECOVER_FORM = "form_is_recover_form";
     constexpr const char* FORM_IS_RECOVER_FORM_TO_HANDLE_CLICK_EVENT = "form_is_recover_form_to_handle_click_event";
 
     const size_t MAX_LAYOUT = 8;
