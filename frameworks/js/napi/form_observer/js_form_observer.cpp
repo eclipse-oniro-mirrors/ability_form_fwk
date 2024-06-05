@@ -208,7 +208,7 @@ private:
         if (!ConvertFromJsValue(env, argv[PARAM0], type)) {
             HILOG_ERROR("Convert type failed.");
             NapiFormUtil::ThrowParamTypeError(env, "type",
-                "formAdd, formRemove, formUninstall, notifyVisible or notifyInvisible.");
+                "formAdd, formRemove, notifyVisible, notifyInvisible, router, message, call.");
             return CreateJsUndefined(env);
         }
 
@@ -224,8 +224,8 @@ private:
             return OnRegisterClickEventCallback(env, argc, argv, type);
         } else {
             HILOG_ERROR("args[0] should be formAdd, formRemove, notifyVisible, notifyInvisible, router, message, call");
-            NapiFormUtil::ThrowParamTypeError(env, "type", "formAdd,"
-                "formRemove, notifyVisible, notifyInvisible, router, message, call");
+            NapiFormUtil::ThrowParamTypeError(env, "type",
+                "formAdd, formRemove, notifyVisible, notifyInvisible, router, message, call.");
             return CreateJsUndefined(env);
         }
     }
@@ -513,6 +513,11 @@ private:
             if (!ConvertFromJsValue(env, argv[PARAM0], bundleName)) {
                 HILOG_ERROR("Convert bundleName failed.");
                 NapiFormUtil::ThrowParamTypeError(env, "bundleName", "string");
+                return false;
+            }
+            if (bundleName.empty()) {
+                HILOG_ERROR("bundleName is empty.");
+                NapiFormUtil::ThrowParamError(env, "bundleName is empty.");
                 return false;
             }
             hasBundleName = true;
