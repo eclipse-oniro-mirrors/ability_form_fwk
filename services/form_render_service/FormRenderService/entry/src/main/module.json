@@ -17,9 +17,6 @@
     "requestPermissions": [
       {
         "name": "ohos.permission.ACCESS_BUNDLE_DIR"
-      },
-      {
-        "name": "ohos.permission.GET_BUNDLE_INFO"
       }
     ],
     "extensionAbilities": [

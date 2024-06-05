@@ -61,7 +61,6 @@ ohos_shared_library("formrender") {
   configs = [ ":formrender_config" ]
 
   sources = [
-    "src/form_bundle_mgr_helper.cpp",
     "src/form_memmgr_client.cpp",
     "src/form_memory_guard.cpp",
     "src/form_module_checker.cpp",

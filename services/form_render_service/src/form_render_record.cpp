@@ -27,7 +27,6 @@
 #include "ecmascript/napi/include/jsnapi.h"
 #include "extractor.h"
 #include "fms_log_wrapper.h"
-#include "form_bundle_mgr_helper.h"
 #include "form_constants.h"
 #include "form_memory_guard.h"
 #include "form_module_checker.h"
@@ -490,12 +489,6 @@ bool FormRenderRecord::UpdateRuntime(const FormJsInfo &formJsInfo)
 
 bool FormRenderRecord::SetPkgContextInfoMap(const FormJsInfo &formJsInfo, AbilityRuntime::Runtime::Options &options)
 {
-    auto bundleMgrHelper = DelayedSingleton<FormBundleMgrHelper>::GetInstance();
-    if (bundleMgrHelper == nullptr) {
-        HILOG_ERROR("The bundleMgrHelper is nullptr.");
-        return false;
-    }
-
     std::map<std::string, std::string> pkgContextInfoJsonStringMap;
     for (auto modulePkgNamePair : formJsInfo.modulePkgNameMap) {
         nlohmann::json moduleInfos = nlohmann::json::parse(modulePkgNamePair.second, nullptr, false);
