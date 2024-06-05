@@ -2309,66 +2309,46 @@ ErrCode FormMgrAdapter::QueryPublishFormToHost(Want &wantToHost)
     return ERR_OK;
 }
 
-void FormMgrAdapter::AddSnapshotToHostWant(const Want &want, Want &wantToHost)
+void FormMgrAdapter::CheckSnapshotWant(const Want &want)
 {
     if (want.HasParameter(Constants::PARAM_PUBLISH_FORM_HOST_SNAPSHOT_KEY) &&
         want.HasParameter(Constants::PARAM_PUBLISH_FORM_HOST_WIDTH_KEY) &&
         want.HasParameter(Constants::PARAM_PUBLISH_FORM_HOST_HEIGHT_KEY) &&
         want.HasParameter(Constants::PARAM_PUBLISH_FORM_HOST_SCREENX_KEY) &&
         want.HasParameter(Constants::PARAM_PUBLISH_FORM_HOST_SCREENY_KEY)) {
-        std::string  snapshot = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_SNAPSHOT_KEY);
-        int32_t  width = want.GetIntParam(Constants::PARAM_PUBLISH_FORM_HOST_WIDTH_KEY, 0);
-        int32_t  height = want.GetIntParam(Constants::PARAM_PUBLISH_FORM_HOST_HEIGHT_KEY, 0);
-        int32_t  screenX = want.GetIntParam(Constants::PARAM_PUBLISH_FORM_HOST_SCREENX_KEY, 0);
-        int32_t  screenY = want.GetIntParam(Constants::PARAM_PUBLISH_FORM_HOST_SCREENY_KEY, 0);
-        
-        wantToHost.SetParam(Constants::PARAM_PUBLISH_FORM_HOST_SNAPSHOT_KEY, snapshot);
-        wantToHost.SetParam(Constants::PARAM_PUBLISH_FORM_HOST_WIDTH_KEY, width);
-        wantToHost.SetParam(Constants::PARAM_PUBLISH_FORM_HOST_HEIGHT_KEY, height);
-        wantToHost.SetParam(Constants::PARAM_PUBLISH_FORM_HOST_SCREENX_KEY, screenX);
-        wantToHost.SetParam(Constants::PARAM_PUBLISH_FORM_HOST_SCREENY_KEY, screenY);
-        HILOG_DEBUG("AddSnapshotToHostWant snapshot.");
-        HILOG_DEBUG("AddSnapshotToHostWant width: %{public}d height: %{public}d .", width, height);
-        HILOG_DEBUG("AddSnapshotToHostWant screenX: %{public}d screenY: %{public}d.", screenX, screenY);
+        std::string snapshot = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_SNAPSHOT_KEY);
+        std::string width = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_WIDTH_KEY);
+        std::string height = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_HEIGHT_KEY);
+        std::string screenX = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_SCREENX_KEY);
+        std::string screenY = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_SCREENY_KEY);
+        HILOG_INFO("SnapshotInfo screenX: %{public}s, screenY: %{public}s, width: %{public}s, height: %{public}s",
+            screenX.c_str(), screenY.c_str(), width.c_str(), height.c_str());
     } else {
-        HILOG_DEBUG("AddSnapshotToHostWant: want has no component snapshot info");
+        HILOG_DEBUG("CheckSnapshotWant: want has no component snapshot info");
     }
 }
 
 ErrCode FormMgrAdapter::RequestPublishFormToHost(Want &want)
 {
-    Want wantToHost;
+    Want wantToHost(want);
     ElementName elementName = want.GetElement();
     wantToHost.SetParam(Constants::PARAM_BUNDLE_NAME_KEY, elementName.GetBundleName());
     wantToHost.SetParam(Constants::PARAM_ABILITY_NAME_KEY, elementName.GetAbilityName());
-    std::string strFormId = want.GetStringParam(Constants::PARAM_FORM_IDENTITY_KEY);
-    wantToHost.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, strFormId);
-    std::string formName = want.GetStringParam(Constants::PARAM_FORM_NAME_KEY);
-    wantToHost.SetParam(Constants::PARAM_FORM_NAME_KEY, formName);
-    std::string moduleName = want.GetStringParam(Constants::PARAM_MODULE_NAME_KEY);
-    wantToHost.SetParam(Constants::PARAM_MODULE_NAME_KEY, moduleName);
-    int32_t dimensionId = want.GetIntParam(Constants::PARAM_FORM_DIMENSION_KEY, 0);
-    wantToHost.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, dimensionId);
-    bool tempFormFlag = want.GetBoolParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
-    wantToHost.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, tempFormFlag);
-    std::string callerBundleName = want.GetStringParam(Constants::PARAM_CALLER_BUNDLE_NAME_KEY);
-    wantToHost.SetParam(Constants::PARAM_CALLER_BUNDLE_NAME_KEY, callerBundleName);
-    int32_t userId = want.GetIntParam(Constants::PARAM_FORM_USER_ID, -1);
     std::string bundleName = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_BUNDLE_KEY);
     std::string abilityName = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_ABILITY_KEY);
-    AddSnapshotToHostWant(want, wantToHost);
-    wantToHost.SetParam(Constants::PARAM_CALLER_BUNDLE_NAME_KEY, callerBundleName);
     wantToHost.SetElementName(bundleName, abilityName);
     wantToHost.SetAction(Constants::FORM_PUBLISH_ACTION);
+    CheckSnapshotWant(wantToHost);
 
     ErrCode errCode = QueryPublishFormToHost(wantToHost);
     if (errCode == ERR_OK) {
+        int32_t userId = want.GetIntParam(Constants::PARAM_FORM_USER_ID, -1);
         return FormAmsHelper::GetInstance().StartAbility(wantToHost, userId);
     }
 
     // Handle by interceptor callback when the system handler is not found.
     if (formPublishInterceptor_ == nullptr) {
-        HILOG_DEBUG("query publish form failed, and have not publish interceptor. errCode:%{public}d.", errCode);
+        HILOG_ERROR("query publish form failed, and have not publish interceptor. errCode:%{public}d.", errCode);
         return errCode;
     }
     int ret = formPublishInterceptor_->ProcessPublishForm(wantToHost);
