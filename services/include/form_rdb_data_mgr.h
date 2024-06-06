@@ -174,7 +174,7 @@ private:
     std::map<std::string, FormRdbTableConfig> formRdbTableCfgMap_;
     std::shared_ptr<NativeRdb::RdbStore> rdbStore_;
     std::shared_mutex rdbStoreMutex_;
-    int64_t lastRdbBuildTime_;
+    int64_t lastRdbBuildTime_ = 0;
 };
 } // namespace AppExecFwk
 } // namespace OHOS

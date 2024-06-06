@@ -113,9 +113,6 @@ FormMgrAdapter::~FormMgrAdapter()
     HILOG_DEBUG("called.");
 }
 
-/**
- * @brief Init properties like visibleNotifyDelayTime.
- */
 void FormMgrAdapter::Init()
 {
     FormDataMgr::GetInstance().GetConfigParamFormMap(Constants::VISIBLE_NOTIFY_DELAY, visibleNotifyDelay_);
@@ -126,14 +123,6 @@ void FormMgrAdapter::Init()
     }
 }
 
-/**
- * @brief Add form with want, send want to form manager service.
- * @param formId The Id of the forms to add.
- * @param want The want of the form to add.
- * @param callerToken Caller ability token.
- * @param formInfo Form info.
- * @return Returns ERR_OK on success, others on failure.
- */
 int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
     const sptr<IRemoteObject> &callerToken, FormJsInfo &formJsInfo)
 {
@@ -196,12 +185,6 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
     return ret;
 }
 
-/**
- * @brief Add form with want, send want to form manager service.
- * @param want The want of the form to add.
- * @param runningFormInfo Running form info.
- * @return Returns ERR_OK on success, others on failure.
- */
 int FormMgrAdapter::CreateForm(const Want &want, RunningFormInfo &runningFormInfo)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
@@ -466,12 +449,6 @@ ErrCode FormMgrAdapter::HandleFormRemoveObserver(const RunningFormInfo runningFo
     return FormDataMgr::GetInstance().HandleFormRemoveObserver(hostBundleName, runningFormInfo);
 }
 
-/**
- * @brief Delete forms with formIds, send formIds to form manager service.
- * @param formId The Id of the forms to delete.
- * @param callerToken Caller ability token.
- * @return Returns ERR_OK on success, others on failure.
- */
 int FormMgrAdapter::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &callerToken)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
@@ -534,12 +511,6 @@ int FormMgrAdapter::DeleteCommonForm(const int64_t formId, const sptr<IRemoteObj
     return ERR_OK;
 }
 
-/**
- * @brief Stop rendering form.
- * @param formId The Id of the forms to delete.
- * @param compId The compId of the forms to delete.
- * @return Returns ERR_OK on success, others on failure.
- */
 int FormMgrAdapter::StopRenderingForm(const int64_t formId, const std::string &compId)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
@@ -554,13 +525,6 @@ int FormMgrAdapter::StopRenderingForm(const int64_t formId, const std::string &c
     return ERR_OK;
 }
 
-/**
- * @brief Release forms with formIds, send formIds to form Mgr service.
- * @param formId The Id of the forms to release.
- * @param callerToken Caller ability token.
- * @param delCache Delete Cache or not.
- * @return Returns ERR_OK on success, others on failure.
- */
 int FormMgrAdapter::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> &callerToken, const bool delCache)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
@@ -611,12 +575,6 @@ int FormMgrAdapter::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> 
     return ERR_OK;
 }
 
-/**
- * @brief Handle release form.
- * @param formId The form id.
- * @param callerToken Caller ability token.
- * @return Returns ERR_OK on success, others on failure.
- */
 ErrCode FormMgrAdapter::HandleReleaseForm(const int64_t formId, const sptr<IRemoteObject> &callerToken)
 {
     HILOG_INFO("formId is %{public}" PRId64, formId);
@@ -644,12 +602,6 @@ ErrCode FormMgrAdapter::HandleReleaseForm(const int64_t formId, const sptr<IRemo
     return ERR_OK;
 }
 
-/**
- * @brief Handle delete form.
- * @param formId The form id.
- * @param callerToken Caller ability token.
- * @return Returns ERR_OK on success, others on failure.
- */
 ErrCode FormMgrAdapter::HandleDeleteForm(const int64_t formId, const sptr<IRemoteObject> &callerToken)
 {
     HILOG_INFO("formId is %{public}" PRId64, formId);
@@ -690,12 +642,6 @@ ErrCode FormMgrAdapter::HandleDeleteForm(const int64_t formId, const sptr<IRemot
     return ERR_OK;
 }
 
-/**
- * @brief Handle delete temp form.
- * @param formId The form id.
- * @param callerToken Caller ability token.
- * @return Returns ERR_OK on success, others on failure.
- */
 ErrCode FormMgrAdapter::HandleDeleteTempForm(const int64_t formId, const sptr<IRemoteObject> &callerToken)
 {
     HILOG_INFO("formId is %{public}" PRId64, formId);
@@ -741,13 +687,6 @@ ErrCode FormMgrAdapter::HandleDeleteTempForm(const int64_t formId, const sptr<IR
     return ERR_OK;
 }
 
-/**
- * @brief Handle delete form cache.
- * @param dbRecord Form storage information.
- * @param uid calling user id.
- * @param formId The form id.
- * @return Returns ERR_OK on success, others on failure.
- */
 ErrCode FormMgrAdapter::HandleDeleteFormCache(FormRecord &dbRecord, const int uid, const int64_t formId)
 {
     HILOG_INFO("delete formDBRecords, formId: %{public}" PRId64 "", formId);
@@ -849,13 +788,6 @@ int FormMgrAdapter::UpdateForm(const int64_t formId, const int32_t callingUid,
     return ret;
 }
 
-/**
- * @brief Request form with formId and want, send formId and want to form manager service.
- * @param formId The Id of the form to update.
- * @param callerToken Caller ability token.
- * @param want The want of the form to request.
- * @return Returns ERR_OK on success, others on failure.
- */
 int FormMgrAdapter::RequestForm(const int64_t formId, const sptr<IRemoteObject> &callerToken, const Want &want)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
@@ -890,13 +822,6 @@ int FormMgrAdapter::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
     return FormProviderMgr::GetInstance().RefreshForm(matchedFormId, reqWant, true);
 }
 
-/**
- * @brief Form visible/invisible notify, send formIds to form manager service.
- * @param formIds The vector of form Ids.
- * @param callerToken Caller ability token.
- * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
- * @return Returns ERR_OK on success, others on failure.
- */
 ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &formIds,
     const sptr<IRemoteObject> &callerToken, const int32_t formVisibleType)
 {
@@ -944,11 +869,6 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
     return ERR_OK;
 }
 
-/**
- * @brief Query whether has visible form by tokenId.
- * @param tokenId Unique identification of application.
- * @return Returns true if has visible form, false otherwise.
- */
 bool FormMgrAdapter::HasFormVisible(const uint32_t tokenId)
 {
     HILOG_DEBUG("called.");
@@ -980,12 +900,6 @@ bool FormMgrAdapter::HasFormVisible(const uint32_t tokenId)
     return false;
 }
 
-/**
- * @brief Padding the formInstances map for visibleNotify.
- * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
- * @param formId Form Id.
- * @param formInstanceMaps formInstances for visibleNotify.
- */
 void FormMgrAdapter::PaddingNotifyVisibleFormsMap(const int32_t formVisibleType, int64_t formId,
     std::map<std::string, std::vector<FormInstance>> &formInstanceMaps)
 {
@@ -1016,14 +930,6 @@ void FormMgrAdapter::PaddingNotifyVisibleFormsMap(const int32_t formVisibleType,
     }
 }
 
-/**
- * @brief Handle forms visible/invisible notify after delay time, notification will be cancelled when
- * formVisibleState recovered during the delay time.
- * @param formIds The vector of form Ids.
- * @param formInstanceMaps formInstances for visibleNotify.
- * @param eventMaps eventMaps for event notify.
- * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
- */
 void FormMgrAdapter::HandlerNotifyWhetherVisibleForms(const std::vector<int64_t> &formIds,
     std::map<std::string, std::vector<FormInstance>> formInstanceMaps,
     std::map<std::string, std::vector<int64_t>> eventMaps, const int32_t formVisibleType)
@@ -1045,13 +951,6 @@ void FormMgrAdapter::HandlerNotifyWhetherVisibleForms(const std::vector<int64_t>
     }
 }
 
-/**
- * @brief Notify forms visible/invisible to remoteCallers.
- * @param bundleName the caller's bundle name.
- * @param remoteObjects refs of remoteCallers.
- * @param formInstanceMaps formInstances for visibleNotify.
- * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
- */
 void FormMgrAdapter::NotifyWhetherFormsVisible(const std::string &bundleName,
     std::vector<sptr<IRemoteObject>> &remoteObjects,
     std::map<std::string, std::vector<FormInstance>> &formInstanceMaps, const int32_t formVisibleType)
@@ -1073,12 +972,6 @@ void FormMgrAdapter::NotifyWhetherFormsVisible(const std::string &bundleName,
     }
 }
 
-/**
- * @brief Forms formInstanceMaps or eventMaps should remove when visible/invisible status recovered.
- * @param formInstanceMaps formInstances for visibleNotify.
- * @param eventMaps eventMaps for event notify.
- * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
- */
 void FormMgrAdapter::FilterDataByVisibleType(std::map<std::string, std::vector<FormInstance>> &formInstanceMaps,
     std::map<std::string, std::vector<int64_t>> &eventMaps, const int32_t formVisibleType)
 {
@@ -1097,12 +990,6 @@ void FormMgrAdapter::FilterDataByVisibleType(std::map<std::string, std::vector<F
     }
 }
 
-/**
- * @brief Forms formInstanceMaps should remove when visible/invisible status recovered.
- * @param formInstanceMaps formInstances for visibleNotify.
- * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
- * @param restoreFormRecords formRecords of forms no need to notify.
- */
 void FormMgrAdapter::FilterFormInstanceMapsByVisibleType(
     std::map<std::string, std::vector<FormInstance>> &formInstanceMaps,
     const int32_t formVisibleType, std::map<int64_t, FormRecord> &restoreFormRecords)
@@ -1143,12 +1030,6 @@ void FormMgrAdapter::FilterFormInstanceMapsByVisibleType(
     }
 }
 
-/**
- * @brief Forms eventMaps should remove when visible/invisible status recovered.
- * @param eventMaps eventMaps for event notify.
- * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
- * @param restoreFormRecords formRecords of forms no need to notify.
- */
 void FormMgrAdapter::FilterEventMapsByVisibleType(std::map<std::string, std::vector<int64_t>> &eventMaps,
     const int32_t formVisibleType, std::map<int64_t, FormRecord> &restoreFormRecords)
 {
@@ -1188,12 +1069,6 @@ void FormMgrAdapter::FilterEventMapsByVisibleType(std::map<std::string, std::vec
     }
 }
 
-/**
- * @brief Temp form to normal form.
- * @param formId The Id of the form.
- * @param callerToken Caller ability token.
- * @return Returns ERR_OK on success, others on failure.
- */
 int FormMgrAdapter::CastTempForm(const int64_t formId, const sptr<IRemoteObject> &callerToken)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
@@ -1263,12 +1138,7 @@ int FormMgrAdapter::CastTempForm(const int64_t formId, const sptr<IRemoteObject>
     // start timer
     return AddFormTimer(formRecord);
 }
-/**
- * @brief Handle cast temp form.
- * @param formId The form id.
- * @param record Form information.
- * @return Returns ERR_OK on success, others on failure.
- */
+
 ErrCode FormMgrAdapter::HandleCastTempForm(const int64_t formId, const FormRecord &record)
 {
     HILOG_DEBUG("%{public}s, cast temp form to normal form, notify supplier, package:%{public}s, class:%{public}s",
@@ -1286,11 +1156,7 @@ ErrCode FormMgrAdapter::HandleCastTempForm(const int64_t formId, const FormRecor
     }
     return ERR_OK;
 }
-/**
- * @brief Dump all of form storage infos.
- * @param formInfos All of form storage infos.
- * @return Returns ERR_OK on success, others on failure.
- */
+
 int FormMgrAdapter::DumpStorageFormInfos(std::string &formInfos) const
 {
     std::vector<FormDBInfo> formDBInfos;
@@ -1305,11 +1171,7 @@ int FormMgrAdapter::DumpStorageFormInfos(std::string &formInfos) const
     FormDumpMgr::GetInstance().DumpStorageFormInfos(formDBInfos, formInfos);
     return ERR_OK;
 }
-/**
- * @brief Dump all of temporary form infos.
- * @param formInfos All of temporary form infos.
- * @return Returns ERR_OK on success, others on failure.
- */
+
 int FormMgrAdapter::DumpTemporaryFormInfos(std::string &formInfos) const
 {
     HILOG_INFO("%{public}s called.", __func__);
@@ -1332,12 +1194,7 @@ int FormMgrAdapter::DumpStaticBundleFormInfos(std::string &formInfos) const
     FormDumpMgr::GetInstance().DumpStaticBundleFormInfos(bundleFormInfos, formInfos);
     return ERR_OK;
 }
-/**
- * @brief Dump form info by a bundle name.
- * @param bundleName The bundle name of form provider.
- * @param formInfos Form infos.
- * @return Returns ERR_OK on success, others on failure.
- */
+
 int FormMgrAdapter::DumpFormInfoByBundleName(const std::string &bundleName, std::string &formInfos) const
 {
     HILOG_INFO("%{public}s called.", __func__);
@@ -1362,12 +1219,6 @@ int FormMgrAdapter::DumpFormInfoByBundleName(const std::string &bundleName, std:
     return ERR_OK;
 }
 
-/**
- * @brief Dump has form visible with bundleInfo.
- * @param bundleInfo Bundle info like bundleName_userId_instIndex.
- * @param formInfos Form dump infos.
- * @return Returns ERR_OK on success, others on failure.
- */
 int FormMgrAdapter::DumpHasFormVisible(const std::string &bundleInfo, std::string &formInfos) const
 {
     HILOG_INFO("bundleInfo:%{public}s", bundleInfo.c_str());
@@ -1395,12 +1246,6 @@ int FormMgrAdapter::DumpHasFormVisible(const std::string &bundleInfo, std::strin
     return ERR_OK;
 }
 
-/**
- * @brief Dump form info by a bundle name.
- * @param formId The id of the form.
- * @param formInfo Form info.
- * @return Returns ERR_OK on success, others on failure.
- */
 int FormMgrAdapter::DumpFormInfoByFormId(const std::int64_t formId, std::string &formInfo) const
 {
     HILOG_INFO("%{public}s called.", __func__);
@@ -1437,12 +1282,7 @@ int FormMgrAdapter::DumpFormInfoByFormId(const std::int64_t formId, std::string 
 
     return reply;
 }
-/**
- * @brief Dump form timer by form id.
- * @param formId The id of the form.
- * @param isTimingService "true" or "false".
- * @return Returns ERR_OK on success, others on failure.
- */
+
 int FormMgrAdapter::DumpFormTimerByFormId(const std::int64_t formId, std::string &isTimingService) const
 {
     HILOG_INFO("%{public}s called.", __func__);
@@ -1475,12 +1315,7 @@ int FormMgrAdapter::DumpFormRunningFormInfos(std::string &runningFormInfosResult
     FormDumpMgr::GetInstance().DumpRunningFormInfos(runningFormInfos, runningFormInfosResult);
     return ERR_OK;
 }
-/**
- * @brief Get form configure info.
- * @param want The want of the request.
- * @param formItemInfo Form configure info.
- * @return Returns ERR_OK on success, others on failure.
- */
+
 ErrCode FormMgrAdapter::GetFormConfigInfo(const Want &want, FormItemInfo &formConfigInfo)
 {
     HILOG_DEBUG("GetFormConfigInfo start.");
@@ -1527,14 +1362,7 @@ ErrCode FormMgrAdapter::GetFormConfigInfo(const Want &want, FormItemInfo &formCo
     HILOG_DEBUG("GetFormConfigInfo end, formLocation = %{public}d", formLocation);
     return ERR_OK;
 }
-/**
- * @brief Allocate form by formId.
- * @param info Form configure info.
- * @param callerToken Caller ability token.
- * @param wantParams WantParams of the request.
- * @param formInfo Form info for form host.
- * @return Returns ERR_OK on success, others on failure.
- */
+
 ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
     const sptr<IRemoteObject> &callerToken, const WantParams &wantParams, FormJsInfo &formInfo)
 {
@@ -1667,14 +1495,6 @@ ErrCode FormMgrAdapter::AllotFormBySpecificId(const FormItemInfo &info,
     return AddNewFormRecord(info, formId, callerToken, wantParams, formInfo);
 }
 
-/**
- * @brief Allocate form by form configure info.
- * @param info Form configure info.
- * @param callerToken Caller ability token.
- * @param wantParams WantParams of the request.
- * @param formInfo Form info for form host.
- * @return Returns ERR_OK on success, others on failure.
- */
 ErrCode FormMgrAdapter::AllotFormByInfo(const FormItemInfo &info,
     const sptr<IRemoteObject> &callerToken, const WantParams &wantParams, FormJsInfo &formInfo)
 {
@@ -1688,15 +1508,6 @@ ErrCode FormMgrAdapter::AllotFormByInfo(const FormItemInfo &info,
     return AddNewFormRecord(info, newFormId, callerToken, wantParams, formInfo);
 }
 
-/**
- * @brief Add new form record.
- * @param info Form configure info.
- * @param formId The form id.
- * @param callerToken Caller ability token.
- * @param wantParams WantParams of the request.
- * @param formInfo Form info for form host.
- * @return Returns ERR_OK on success, others on failure.
- */
 ErrCode FormMgrAdapter::AddNewFormRecord(const FormItemInfo &info, const int64_t formId,
     const sptr<IRemoteObject> &callerToken, const WantParams &wantParams, FormJsInfo &formJsInfo)
 {
@@ -1743,11 +1554,6 @@ ErrCode FormMgrAdapter::AddNewFormRecord(const FormItemInfo &info, const int64_t
     return ERR_OK;
 }
 
-/**
- * @brief Add form timer.
- * @param formRecord Form information.
- * @return Returns ERR_OK on success, others on failure.
- */
 ErrCode FormMgrAdapter::AddFormTimer(const FormRecord &formRecord)
 {
     HILOG_INFO("add form timer start");
@@ -1779,14 +1585,6 @@ ErrCode FormMgrAdapter::AddFormTimer(const FormRecord &formRecord)
     return ERR_OK;
 }
 
-/**
- * @brief Send event notify to form provider. The event notify type include FORM_VISIBLE and FORM_INVISIBLE.
- *
- * @param providerKey The provider key string which consists of the provider bundle name and ability name.
- * @param formIdsByProvider The vector of form Ids which have the same provider.
- * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
- * @return Returns ERR_OK on success, others on failure.
- */
 ErrCode FormMgrAdapter::HandleEventNotify(const std::string &providerKey, const std::vector<int64_t> &formIdsByProvider,
     const int32_t formVisibleType)
 {
@@ -1812,13 +1610,6 @@ ErrCode FormMgrAdapter::HandleEventNotify(const std::string &providerKey, const 
     return ERR_OK;
 }
 
-/**
- * @brief Acquire form data from form provider.
- * @param formId The Id of the form.
- * @param info Form configure info.
- * @param wantParams WantParams of the request.
- * @return Returns ERR_OK on success, others on failure.
- */
 ErrCode FormMgrAdapter::AcquireProviderFormInfoAsync(const int64_t formId,
     const FormItemInfo &info, const WantParams &wantParams)
 {
@@ -1881,13 +1672,6 @@ ErrCode FormMgrAdapter::InnerAcquireProviderFormInfoAsync(const int64_t formId,
     return ERR_OK;
 }
 
-/**
- * @brief Get bundle info.
- * @param want The want of the request.
- * @param bundleInfo Bundle info.
- * @param packageName Package name.
- * @return Returns ERR_OK on success, others on failure.
- */
 ErrCode FormMgrAdapter::GetBundleInfo(const AAFwk::Want &want, BundleInfo &bundleInfo, std::string &packageName)
 {
     HILOG_DEBUG("GetBundleInfo start.");
@@ -1936,12 +1720,7 @@ ErrCode FormMgrAdapter::GetBundleInfo(const AAFwk::Want &want, BundleInfo &bundl
     HILOG_DEBUG("GetBundleInfo end.");
     return ERR_OK;
 }
-/**
- * @brief Get form info.
- * @param want The want of the request.
- * @param formInfo Form info.
- * @return Returns ERR_OK on success, others on failure.
- */
+
 ErrCode FormMgrAdapter::GetFormInfo(const AAFwk::Want &want, FormInfo &formInfo)
 {
     HILOG_DEBUG("GetFormInfo start.");
@@ -1980,14 +1759,7 @@ ErrCode FormMgrAdapter::GetFormInfo(const AAFwk::Want &want, FormInfo &formInfo)
         abilityName.c_str(), formName.c_str());
     return abilityExisting ? ERR_APPEXECFWK_FORM_GET_INFO_FAILED : ERR_APPEXECFWK_FORM_NO_SUCH_ABILITY;
 }
-/**
- * @brief Get form configure info.
- * @param want The want of the request.
- * @param bundleInfo Bundle info.
- * @param formInfo Form info.
- * @param formItemInfo Form configure info.
- * @return Returns ERR_OK on success, others on failure.
- */
+
 ErrCode FormMgrAdapter::GetFormItemInfo(const AAFwk::Want &want, const BundleInfo &bundleInfo,
     const FormInfo &formInfo, FormItemInfo &formItemInfo)
 {
@@ -2008,12 +1780,7 @@ ErrCode FormMgrAdapter::GetFormItemInfo(const AAFwk::Want &want, const BundleInf
     HILOG_DEBUG("GetFormItemInfo end.");
     return ERR_OK;
 }
-/**
- * @brief Dimension valid check.
- * @param formInfo Form info.
- * @param dimensionId Dimension id.
- * @return Returns true on success, false on failure.
- */
+
 bool FormMgrAdapter::IsDimensionValid(const FormInfo &formInfo, int dimensionId) const
 {
     if (formInfo.supportDimensions.empty()) {
@@ -2030,13 +1797,7 @@ bool FormMgrAdapter::IsDimensionValid(const FormInfo &formInfo, int dimensionId)
     HILOG_ERROR("No matched dimension found for %{public}d.", dimensionId);
     return false;
 }
-/**
- * @brief Create form configure info.
- * @param bundleInfo Bundle info.
- * @param formInfo Form info.
- * @param itemInfo Form configure info.
- * @return Returns ERR_OK on success, others on failure.
- */
+
 ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
     const FormInfo &formInfo, FormItemInfo &itemInfo, const AAFwk::Want &want)
 {
@@ -2134,12 +1895,6 @@ void FormMgrAdapter::SetFormItemModuleInfo(const HapModuleInfo& hapModuleInfo, c
     }
 }
 
-/**
- * @brief set next refresh time.
- * @param formId The id of the form.
- * @param nextTime next refresh time.
- * @return Returns ERR_OK on success, others on failure.
- */
 int FormMgrAdapter::SetNextRefreshTime(const int64_t formId, const int64_t nextTime)
 {
     HILOG_INFO("%{public}s begin here, formId:%{public}" PRId64 ",nextTime:%{public}" PRId64 "",
@@ -2594,12 +2349,6 @@ ErrCode FormMgrAdapter::AddRequestPublishForm(const FormItemInfo &formItemInfo, 
     return AddFormTimer(formRecord);
 }
 
-/**
- * @brief get bundleName.
- * @param bundleName for output.
- * @param needCheckFormPermission Indicates whether the app have system permissions.default value is true.
- * @return Returns true on success, others on failure.
- */
 bool FormMgrAdapter::GetBundleName(std::string &bundleName, bool needCheckFormPermission)
 {
     sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
@@ -2622,13 +2371,6 @@ bool FormMgrAdapter::GetBundleName(std::string &bundleName, bool needCheckFormPe
     return true;
 }
 
-/**
- * @brief set next refresh time locked.
- * @param formId The form's id.
- * @param nextTime next refresh time.
- * @param userId User ID.
- * @return Returns ERR_OK on success, others on failure.
- */
 int FormMgrAdapter::SetNextRefreshTimeLocked(const int64_t formId, const int64_t nextTime, const int32_t userId)
 {
     HILOG_ERROR("SetNextRefreshTimeLocked.");
@@ -2648,12 +2390,6 @@ int FormMgrAdapter::SetNextRefreshTimeLocked(const int64_t formId, const int64_t
     return ERR_OK;
 }
 
-/**
- * @brief set next refresh time locked.
- * @param formId The form's id.
- * @param bundleName Provider ability bundleName.
- * @return Returns true or false.
- */
 bool FormMgrAdapter::IsUpdateValid(const int64_t formId, const std::string &bundleName)
 {
     if (formId <= 0 || bundleName.empty()) {
@@ -2662,37 +2398,18 @@ bool FormMgrAdapter::IsUpdateValid(const int64_t formId, const std::string &bund
     return true;
 }
 
-/**
- * @brief enable update form.
- * @param formIDs The id of the forms.
- * @param callerToken Caller ability token.
- * @return Returns ERR_OK on success, others on failure.
- */
 int FormMgrAdapter::EnableUpdateForm(const std::vector<int64_t> formIDs, const sptr<IRemoteObject> &callerToken)
 {
     HILOG_DEBUG("enableUpdateForm");
     return HandleUpdateFormFlag(formIDs, callerToken, true, false);
 }
 
-/**
- * @brief disable update form.
- * @param formIDs The id of the forms.
- * @param callerToken Caller ability token.
- * @return Returns ERR_OK on success, others on failure.
- */
 int FormMgrAdapter::DisableUpdateForm(const std::vector<int64_t> formIDs, const sptr<IRemoteObject> &callerToken)
 {
     HILOG_DEBUG("disableUpdateForm");
     return HandleUpdateFormFlag(formIDs, callerToken, false, false);
 }
 
-/**
- * @brief Process js message event.
- * @param formId Indicates the unique id of form.
- * @param want information passed to supplier.
- * @param callerToken Caller ability token.
- * @return Returns true if execute success, false otherwise.
- */
 int FormMgrAdapter::MessageEvent(const int64_t formId, const Want &want, const sptr<IRemoteObject> &callerToken)
 {
     HILOG_INFO("%{public}s called.", __func__);
@@ -2750,13 +2467,6 @@ int FormMgrAdapter::MessageEvent(const int64_t formId, const Want &want, const s
     return ERR_OK;
 }
 
-/**
- * @brief Process js router event.
- * @param formId Indicates the unique id of form.
- * @param want the want of the ability to start.
- * @param callerToken Caller ability token.
- * @return Returns true if execute success, false otherwise.
- */
 int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken)
 {
     HILOG_DEBUG("called.");
@@ -2835,13 +2545,6 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
     return ERR_OK;
 }
 
-/**
- * @brief Process background router event.
- * @param formId Indicates the unique id of form.
- * @param want the want of the ability to start.
- * @param callerToken Caller ability token.
- * @return Returns true if execute success, false otherwise.
- */
 int FormMgrAdapter::BackgroundEvent(const int64_t formId, Want &want, const sptr<IRemoteObject> &callerToken)
 {
     HILOG_DEBUG("called.");
@@ -2926,11 +2629,6 @@ ErrCode FormMgrAdapter::HandleUpdateFormFlag(const std::vector<int64_t> &formIds
     return errCode;
 }
 
-/**
- * @brief check form cached.
- * @param record Form information.
- * @return Returns true on cached, false on not.
- */
 bool FormMgrAdapter::IsFormCached(const FormRecord record)
 {
     if (record.versionUpgrade) {
@@ -2962,13 +2660,6 @@ void FormMgrAdapter::AcquireProviderFormInfo(const int64_t formId, const Want &w
     FormReport::GetInstance().SetEndGetTime(formId, FormUtil::GetCurrentSteadyClockMillseconds());
 }
 
-/**
- * @brief Notify form provider for delete form.
- *
- * @param formId The Id of the from.
- * @param want The want of the form.
- * @param remoteObject Form provider proxy object.
- */
 void FormMgrAdapter::NotifyFormDelete(const int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_INFO("%{public}s called.", __func__);
@@ -2986,14 +2677,6 @@ void FormMgrAdapter::NotifyFormDelete(const int64_t formId, const Want &want, co
     }
 }
 
-/**
- * @brief Create eventMaps for event notify.
- *
- * @param matchedFormId The Id of the form
- * @param formRecord Form storage information
- * @param eventMaps eventMaps for event notify
- * @return Returns true on success, false on failure.
- */
 bool FormMgrAdapter::CreateHandleEventMap(const int64_t matchedFormId, const FormRecord &formRecord,
     std::map<std::string, std::vector<int64_t>> &eventMaps)
 {
@@ -3014,15 +2697,6 @@ bool FormMgrAdapter::CreateHandleEventMap(const int64_t matchedFormId, const For
     return true;
 }
 
-/**
- * @brief Check if the form should update information to the host.
- *
- * @param matchedFormId The Id of the form
- * @param userId User ID.
- * @param callerToken Caller ability token.
- * @param formRecord Form storage information
- * @return Returns true on success, false on failure.
- */
 bool FormMgrAdapter::isFormShouldUpdateProviderInfoToHost(const int64_t &matchedFormId, const int32_t &userId,
     const sptr<IRemoteObject> &callerToken, FormRecord &formRecord)
 {
@@ -3044,16 +2718,6 @@ bool FormMgrAdapter::isFormShouldUpdateProviderInfoToHost(const int64_t &matched
     return true;
 }
 
-/**
- * @brief Update provider info to host
- *
- * @param matchedFormId The Id of the form
- * @param userId User ID.
- * @param callerToken Caller ability token.
- * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
- * @param formRecord Form storage information
- * @return Returns true on success, false on failure.
- */
 bool FormMgrAdapter::UpdateProviderInfoToHost(const int64_t &matchedFormId, const int32_t &userId,
     const sptr<IRemoteObject> &callerToken, const int32_t &formVisibleType, FormRecord &formRecord)
 {
@@ -3091,14 +2755,7 @@ bool FormMgrAdapter::UpdateProviderInfoToHost(const int64_t &matchedFormId, cons
     }
     return true;
 }
-/**
- * @brief If the form provider is system app and the config item 'formVisibleNotify' is true,
- *        notify the form provider that the current form is visible.
- * @param iBundleMgr BundleManagerProxy
- * @param bundleName BundleName
- * @param userId UserId
- * @return Returns true if the form provider is system app, false if not.
- */
+
 bool FormMgrAdapter::CheckIsSystemAppByBundleName(const sptr<IBundleMgr> &iBundleMgr,
     const int32_t &userId, const std::string &bundleName)
 {
@@ -3113,14 +2770,6 @@ bool FormMgrAdapter::CheckIsSystemAppByBundleName(const sptr<IBundleMgr> &iBundl
     return appInfo.isSystemApp;
 }
 
-/**
- * @brief Check whether the caller for publish form is in the whitelist.
- * @param iBundleMgr BundleManagerProxy
- * @param bundleName BundleName of caller
- * @param want want of target form
- * @param needCheckFormPermission Indicates whether the app have system permissions.default value is true.
- * @return Returns ERR_OK if the caller is in the whitelist.
- */
 bool FormMgrAdapter::IsValidPublishEvent(const sptr<IBundleMgr> &iBundleMgr,
     const std::string &bundleName, const Want &want, bool needCheckFormPermission)
 {
@@ -3133,12 +2782,6 @@ bool FormMgrAdapter::IsValidPublishEvent(const sptr<IBundleMgr> &iBundleMgr,
     return IsErmsSupportPublishForm(bundleName, wants);
 }
 
-/**
- * @brief if the ability have permission for keeping background running is true,
- * @param iBundleMgr BundleManagerProxy
- * @param bundleName BundleName
- * @return Returns true if the ability have permission for keeping background running, false if not.
- */
 bool FormMgrAdapter::CheckKeepBackgroundRunningPermission(const sptr<IBundleMgr> &iBundleMgr,
     const std::string &bundleName)
 {
@@ -3158,11 +2801,7 @@ bool FormMgrAdapter::CheckKeepBackgroundRunningPermission(const sptr<IBundleMgr>
 
     return true;
 }
-/**
- * @brief Get current user ID.
- * @param callingUid calling Uid.
- * @return Returns user ID.
- */
+
 int32_t FormMgrAdapter::GetCurrentUserId(const int callingUid)
 {
     // get current userId
@@ -3171,13 +2810,6 @@ int32_t FormMgrAdapter::GetCurrentUserId(const int callingUid)
     return userId;
 }
 
-/**
- * @brief Delete the invalid forms.
- * @param formIds Indicates the ID of the valid forms.
- * @param callerToken Caller ability token.
- * @param numFormsDeleted Returns the number of the deleted forms.
- * @return Returns ERR_OK on success, others on failure.
- */
 int FormMgrAdapter::DeleteInvalidForms(const std::vector<int64_t> &formIds,
     const sptr<IRemoteObject> &callerToken, int32_t &numFormsDeleted)
 {
@@ -3223,14 +2855,6 @@ int FormMgrAdapter::DeleteInvalidForms(const std::vector<int64_t> &formIds,
     return ERR_OK;
 }
 
-/**
- * @brief AcquireFormState want check.
- * @param bundleName The bundle name of the form.
- * @param abilityName The ability name of the form.
- * @param want The want of the form.
- * @param provider the provider info.
- * @return Returns ERR_OK on success, others on failure.
- */
 ErrCode FormMgrAdapter::AcquireFormStateCheck(const std::string &bundleName,
     const std::string &abilityName, const Want &want, std::string &provider)
 {
@@ -3278,13 +2902,6 @@ ErrCode FormMgrAdapter::AcquireFormStateCheck(const std::string &bundleName,
     return ERR_OK;
 }
 
-/**
- * @brief Acquire form state info by passing a set of parameters (using Want) to the form provider.
- * @param want Indicates a set of parameters to be transparently passed to the form provider.
- * @param callerToken Caller ability token.
- * @param stateInfo Returns the form's state info of the specify.
- * @return Returns ERR_OK on success, others on failure.
- */
 int FormMgrAdapter::AcquireFormState(const Want &want, const sptr<IRemoteObject> &callerToken,
     FormStateInfo &stateInfo)
 {
@@ -3357,13 +2974,6 @@ int FormMgrAdapter::AcquireFormData(int64_t formId, int64_t requestCode, const s
     return ERR_OK;
 }
 
-/**
- * @brief Notify the form is visible or not.
- * @param formIds Indicates the ID of the forms.
- * @param isVisible Visible or not.
- * @param callerToken Host client.
- * @return Returns ERR_OK on success, others on failure.
- */
 int FormMgrAdapter::NotifyFormsVisible(const std::vector<int64_t> &formIds,
     bool isVisible, const sptr<IRemoteObject> &callerToken)
 {
@@ -3371,13 +2981,6 @@ int FormMgrAdapter::NotifyFormsVisible(const std::vector<int64_t> &formIds,
     return FormDataMgr::GetInstance().NotifyFormsVisible(formIds, isVisible, callerToken);
 }
 
-/**
- * @brief Notify the form is enable to be updated or not.
- * @param formIds Indicates the ID of the forms.
- * @param isEnableUpdate enable update or not.
- * @param callerToken Host client.
- * @return Returns ERR_OK on success, others on failure.
- */
 int FormMgrAdapter::NotifyFormsEnableUpdate(const std::vector<int64_t> &formIds,
     bool isEnableUpdate, const sptr<IRemoteObject> &callerToken)
 {
@@ -3385,48 +2988,24 @@ int FormMgrAdapter::NotifyFormsEnableUpdate(const std::vector<int64_t> &formIds,
     return HandleUpdateFormFlag(formIds, callerToken, isEnableUpdate, true);
 }
 
-/**
- * @brief Get All FormsInfo.
- * @param formInfos Return the forms' information of all forms provided.
- * @return Returns ERR_OK on success, others on failure.
- */
 int FormMgrAdapter::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     return FormInfoMgr::GetInstance().GetAllFormsInfo(formInfos);
 }
 
-/**
- * @brief Get forms info by bundle name .
- * @param bundleName Application name.
- * @param formInfos Return the forms' information of the specify application name.
- * @return Returns ERR_OK on success, others on failure.
- */
 int FormMgrAdapter::GetFormsInfoByApp(const std::string &bundleName, std::vector<FormInfo> &formInfos)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     return FormInfoMgr::GetInstance().GetFormsInfoByBundle(bundleName, formInfos);
 }
 
-/**
- * @brief Get forms info specified by filter parameters .
- * @param filter Filter that contains necessary conditions, such as bundle name, module name, dimensions.
- * @param formInfos Return the forms' information specified by filter.
- * @return Returns ERR_OK on success, others on failure.
- */
 int FormMgrAdapter::GetFormsInfoByFilter(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     return FormInfoMgr::GetInstance().GetFormsInfoByFilter(filter, formInfos);
 }
 
-/**
- * @brief Get forms info by bundle name and module name.
- * @param bundleName bundle name.
- * @param moduleName Module name of hap.
- * @param formInfos Return the forms' information of the specify bundle name and module name.
- * @return Returns ERR_OK on success, others on failure.
- */
 int FormMgrAdapter::GetFormsInfoByModule(const std::string &bundleName,
     const std::string &moduleName, std::vector<FormInfo> &formInfos)
 {
@@ -3471,11 +3050,6 @@ bool FormMgrAdapter::IsRequestPublishFormSupported()
     return true;
 }
 
-/**
- * @brief check if the form host is system app
- * @param formRecord Form storage information
- * @return Returns true if the form host is system app, false if not.
- */
 bool FormMgrAdapter::checkFormHostHasSaUid(const FormRecord &formRecord)
 {
     return std::find(formRecord.formUserUids.begin(), formRecord.formUserUids.end(),
