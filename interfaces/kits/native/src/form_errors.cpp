@@ -73,10 +73,10 @@ const std::map<int32_t, int32_t> ERROR_CODE_MAP_EXTERNAL = {
 const std::map<int32_t, std::string> ERR_MSG_MAP_EXTERNAL = {
     { ERR_OK,                                         "success" },
     { ERR_FORM_EXTERNAL_PERMISSION_DENIED,            "Permissions denied." },
-    { ERR_FORM_EXTERNAL_PARAM_INVALID,                "Parameter error. Possible causes:1.Mandatory parameters \
-                    are left unspecified; 2.Incorrect parameter types; 3.Parameter verification failed." },
-    { ERR_FORM_EXTERNAL_SYSTEMCAP_ERROR,              "Capability not supported.Failed to call ${functionName} \
-                    due to limited device capabilities." },
+    { ERR_FORM_EXTERNAL_PARAM_INVALID,                "Parameter error. Possible causes: "
+        "1.Mandatory parameters are left unspecified; 2.Incorrect parameter types; 3.Parameter verification failed." },
+    { ERR_FORM_EXTERNAL_SYSTEMCAP_ERROR,              "Capability not supported. "
+        "Failed to call ${functionName} due to limited device capabilities." },
     { ERR_FORM_EXTERNAL_KERNEL_ERROR,                 "A generic kernel error occurred." },
     { ERR_FORM_EXTERNAL_KERNEL_MALLOC_ERROR,          "Failed to alloc." },
     { ERR_FORM_EXTERNAL_IPC_ERROR,                    "IPC connection error." },
