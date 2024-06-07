@@ -174,6 +174,8 @@ FormMgrStub::FormMgrStub()
         &FormMgrStub::HandleEnableForms;
     memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_IS_SYSTEM_APP_FORM)] =
         &FormMgrStub::HandleIsSystemAppForm;
+    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_IS_FORM_BUNDLE_FORBIDDEN)] =
+        &FormMgrStub::HandleIsFormBundleForbidden;
 }
 
 FormMgrStub::~FormMgrStub()
@@ -1542,6 +1544,18 @@ int32_t FormMgrStub::HandleEnableForms(MessageParcel &data, MessageParcel &reply
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
+}
+
+ErrCode FormMgrStub::HandleIsFormBundleForbidden(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("Called.");
+    std::string bundleName = data.ReadString();
+    bool result = IsFormBundleForbidden(bundleName);
+    if (!reply.WriteBool(result)) {
+        HILOG_ERROR("%{public}s, failed to write action", __func__);
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

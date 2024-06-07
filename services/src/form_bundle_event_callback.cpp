@@ -15,6 +15,8 @@
 
 #include "form_bundle_event_callback.h"
 
+#include "form_bundle_forbid_mgr.h"
+
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
@@ -47,6 +49,9 @@ void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eve
         HILOG_INFO("%{public}s, bundle removed, bundleName: %{public}s", __func__, bundleName.c_str());
         formEventHelper_.HandleBundleFormInfoRemoved(bundleName, userId);
         formEventHelper_.HandleProviderRemoved(bundleName, userId);
+        // Ensure clear forbidden form db when bundle uninstall
+        // Health contol will set again when reinstall
+        FormBundleForbidMgr::GetInstance().SetBundleForbiddenStatus(bundleName, false);
     } else if (action == BMS_EVENT_ADDITIONAL_INFO_CHANGED) {
         // additional info changed
         HILOG_INFO("Additional info changed, bundleName: %{public}s", bundleName.c_str());

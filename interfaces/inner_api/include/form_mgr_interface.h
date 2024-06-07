@@ -642,9 +642,25 @@ public:
         return 0;
     }
 
+    /**
+     * @brief enable/disable form update.
+     * @param bundleName BundleName of the form host.
+     * @param enable True for enable form, false for disable form.
+     * @return Returns ERR_OK on success, others on failure.
+     */
     virtual int32_t EnableForms(const std::string bundleName, const bool enable)
     {
         return 0;
+    }
+
+    /**
+     * @brief Check form bundle is controlled.
+     * @param bundleName The bundle name of form to be check.
+     * @return Returns true for form bundle is controlled.
+     */
+    virtual bool IsFormBundleForbidden(const std::string &bundleName)
+    {
+        return false;
     }
 
     enum class Message {
@@ -728,6 +744,7 @@ public:
         FORM_MGR_BATCH_REFRESH_FORMS,
         FORM_MGR_ENABLE_FORMS,
         FORM_MGR_IS_SYSTEM_APP_FORM,
+        FORM_MGR_IS_FORM_BUNDLE_FORBIDDEN,
     };
 };
 }  // namespace AppExecFwk

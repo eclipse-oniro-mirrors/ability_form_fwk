@@ -391,6 +391,16 @@ public:
         return formDBInfo_.isThemeForm;
     }
 
+    bool IsEnableForm() const
+    {
+        return formDBInfo_.enableForm;
+    }
+
+    void SetEnableForm(bool enableForm)
+    {
+        formDBInfo_.enableForm = enableForm;
+    }
+
     void AddUserUid(const int callingUid);
     bool DeleteUserUid(const int callingUid);
 
