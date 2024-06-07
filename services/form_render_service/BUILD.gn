@@ -56,7 +56,7 @@ ohos_resources("FormRender_resources") {
 }
 
 ohos_shared_library("formrender") {
-  install_enable = true
+  install_enable = false
 
   configs = [ ":formrender_config" ]
 
