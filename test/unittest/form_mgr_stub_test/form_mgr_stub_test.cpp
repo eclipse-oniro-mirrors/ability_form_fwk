@@ -2954,6 +2954,21 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0119, TestSize.Level1) {
 }
 
 /**
+ * @tc.number: FormMgrStubTest_HandleIsFormBundleForbidden_001
+ * @tc.name: test HandleIsFormBundleForbidden function.
+ * @tc.desc: Verify that the HandleIsFormBundleForbidden interface is called normally and the return value is ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleIsFormBundleForbidden_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_HandleIsFormBundleForbidden_001 starts";
+    MessageParcel data;
+    MessageParcel reply;
+    const std::string bundleName = "bundleName";
+    data.WriteString(bundleName);
+    EXPECT_EQ(mockFormMgrService->HandleIsFormBundleForbidden(data, reply), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_HandleIsFormBundleForbidden_001 ends";
+}
+
+/**
  * @tc.number: FormMgrStubTest_HandleBatchRefreshForms_001
  * @tc.name: test HandleBatchRefreshForms function.
  * @tc.desc: Verify that the HandleBatchRefreshForms interface is called normally and the return value is ERR_OK.
