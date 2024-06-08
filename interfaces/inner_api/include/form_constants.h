@@ -74,6 +74,7 @@ namespace Constants {
     constexpr const char* IS_FORM_AGENT = "isFormAgent";
     constexpr const char* PARAM_FORM_BORDER_WIDTH_KEY = "ohos.extra.param.key.form_border_width";
     constexpr const char* FORM_LOCATION_KEY = "ohos.extra.param.key.form_location";
+    constexpr const char* FORM_DISABLE_GESTURE_KEY = "ohos.extra.param.key.form_disable_gesture";
     constexpr int32_t TYPE_RESET_LIMIT = 1;
     constexpr int32_t TYPE_STATIC_UPDATE = 2;
     constexpr int32_t TYPE_DYNAMIC_UPDATE = 3;
