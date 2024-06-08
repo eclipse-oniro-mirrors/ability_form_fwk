@@ -70,10 +70,10 @@ public:
      * @param uid The uid of form bundle.(userId + bundleName)
      * @return Returns FormRenderRecord instance.
      */
-    static std::shared_ptr<FormRenderRecord> Create(
-        const std::string &bundleName, const std::string &uid, bool needMonitored = true);
+    static std::shared_ptr<FormRenderRecord> Create(const std::string &bundleName, const std::string &uid,
+        bool needMonitored = true, sptr<IFormSupply> formSupplyClient = nullptr);
 
-    FormRenderRecord(const std::string &bundleName, const std::string &uid);
+    FormRenderRecord(const std::string &bundleName, const std::string &uid, sptr<IFormSupply> formSupplyClient);
 
     ~FormRenderRecord();
 
@@ -187,6 +187,8 @@ private:
 
     void AddWatchDogThreadMonitor();
 
+    void OnRenderingBlock(const std::string &bundleName);
+
     void Timer();
 
     bool BeforeHandleUpdateForm(const FormJsInfo &formJsInfo);
@@ -260,6 +262,8 @@ private:
     bool threadIsAlive_ = true;
     std::atomic_bool hasMonitor_ = false;
     std::shared_ptr<ThreadState> threadState_;
+    std::mutex formSupplyMutex_;
+    sptr<IFormSupply> formSupplyClient_;
 };
 }  // namespace FormRender
 }  // namespace AppExecFwk

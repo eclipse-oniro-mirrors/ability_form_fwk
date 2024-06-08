@@ -30,7 +30,7 @@ ohos_hap("formrender_service_hap") {
     ":FormRender_js_assets",
     ":FormRender_resources",
   ]
-  shared_libraries = [ ":formrender" ]
+  shared_libraries = [ ":formrender_service" ]
   certificate_profile = "${form_render_service_path}/signature/formrender.p7b"
   hap_name = "Form_Render_Service"
   part_name = "form_fwk"
@@ -65,10 +65,8 @@ ohos_shared_library("formrender") {
     "src/form_memory_guard.cpp",
     "src/form_module_checker.cpp",
     "src/form_render_event_report.cpp",
-    "src/form_render_impl.cpp",
     "src/form_render_record.cpp",
     "src/form_render_serial_queue.cpp",
-    "src/form_render_service_extension.cpp",
   ]
 
   defines = [ "FMS_LOG_TAG = \"FormRenderService\"" ]
@@ -109,6 +107,53 @@ ohos_shared_library("formrender") {
     "ipc:ipc_core",
     "napi:ace_napi",
     "samgr:samgr_proxy",
+  ]
+
+  subsystem_name = "ability"
+  part_name = "form_fwk"
+}
+
+ohos_shared_library("formrender_service") {
+  install_enable = true
+
+  configs = [ ":formrender_config" ]
+
+  sources = [
+    "src/form_render_impl.cpp",
+    "src/form_render_service_extension.cpp",
+  ]
+
+  defines = [ "FMS_LOG_TAG = \"FormRenderService\"" ]
+
+  if (use_musl) {
+    if (use_jemalloc && use_jemalloc_dfx_intf) {
+      defines += [ "CONFIG_USE_JEMALLOC_DFX_INTF" ]
+    }
+  }
+
+  deps = [
+    ":formrender",
+    "${form_fwk_path}:form_manager",
+  ]
+
+  external_deps = [
+    "ability_base:configuration",
+    "ability_base:want",
+    "ability_runtime:ability_manager",
+    "ability_runtime:abilitykit_native",
+    "ability_runtime:app_context",
+    "ability_runtime:runtime",
+    "ability_runtime:service_extension",
+    "ace_engine:ace_form_render",
+    "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
+    "ets_runtime:libark_jsruntime",
+    "eventhandler:libeventhandler",
+    "ffrt:libffrt",
+    "hilog:libhilog",
+    "hitrace:hitrace_meter",
+    "ipc:ipc_core",
+    "napi:ace_napi",
   ]
 
   subsystem_name = "ability"

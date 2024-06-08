@@ -84,8 +84,6 @@ public:
 
     void SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration>& config);
 
-    void OnRenderingBlock(const std::string &bundleName);
-
     int32_t ReleaseRenderer(
         int64_t formId, const std::string &compId, const std::string &uid) override;
 
