@@ -451,6 +451,12 @@ private:
 
     bool GetStringsValue(napi_env env, napi_value array, std::vector<std::string> &strList)
     {
+        napi_valuetype paramType = napi_undefined;
+        napi_typeof(env, array, &paramType);
+        if (paramType == napi_undefined || paramType == napi_null) {
+            HILOG_ERROR("input array is napi_undefined or napi_null.");
+            return false;
+        }
         uint32_t nativeArrayLen = 0;
         napi_get_array_length(env, array, &nativeArrayLen);
         napi_value element = nullptr;
