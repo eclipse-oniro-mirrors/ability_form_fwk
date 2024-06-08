@@ -181,7 +181,11 @@ void FormRenderMgr::ExecAcquireProviderTask()
 
 void FormRenderMgr::OnUnlock()
 {
-    HILOG_DEBUG("called. The authentication status of the current user is true.");
+    HILOG_DEBUG("called. The authentication status of the current user is true. %{public}d", isVerified_);
+    if (isVerified_) {
+        return;
+    }
+    
     SetFormRenderState(true);
     PostOnUnlockTask();
     ExecAcquireProviderTask();

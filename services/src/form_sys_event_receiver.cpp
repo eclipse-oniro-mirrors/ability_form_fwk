@@ -113,7 +113,7 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
     if (bundleName.empty() && action != EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED &&
         action != EventFwk::CommonEventSupport::COMMON_EVENT_BUNDLE_SCAN_FINISHED &&
         action != EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED &&
-        action != EventFwk::CommonEventSupport::COMMON_EVENT_USER_UNLOCKED) {
+        action != EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED) {
         HILOG_ERROR("%{public}s failed, invalid param, action: %{public}s, bundleName: %{public}s",
             __func__, action.c_str(), bundleName.c_str());
         return;
@@ -136,7 +136,7 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_DATA_CLEARED) {
         int userId = want.GetIntParam(KEY_USER_ID, Constants::DEFAULT_USERID);
         OnReceiveEventForPackageDataCleared(bundleName, userId);
-    } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_USER_UNLOCKED) {
+    } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED) {
         OnReceiveEventForUserUnlocked();
     } else {
         HILOG_WARN("%{public}s warnning, invalid action.", __func__);
