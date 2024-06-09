@@ -96,7 +96,7 @@ int32_t FormRenderImpl::RenderForm(const FormJsInfo &formJsInfo, const Want &wan
         if (auto search = renderRecordMap_.find(uid); search != renderRecordMap_.end()) {
             result = search->second->UpdateRenderRecord(formJsInfo, want, hostToken);
         } else {
-            auto record = FormRenderRecord::Create(formJsInfo.bundleName, uid, formJsInfo.isDynamic);
+            auto record = FormRenderRecord::Create(formJsInfo.bundleName, uid, formJsInfo.isDynamic, formSupplyClient);
             if (record == nullptr) {
                 HILOG_ERROR("record is nullptr");
                 return RENDER_FORM_FAILED;
@@ -322,22 +322,6 @@ void FormRenderImpl::SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Co
     }
 
     configuration_ = config;
-}
-
-void FormRenderImpl::OnRenderingBlock(const std::string &bundleName)
-{
-    sptr<IFormSupply> formSupplyClient = nullptr;
-    {
-        std::lock_guard<std::mutex> lock(formSupplyMutex_);
-        formSupplyClient = formSupplyClient_;
-    }
-
-    if (formSupplyClient == nullptr) {
-        HILOG_ERROR("formSupplyClient_ is nullptr");
-        return;
-    }
-
-    formSupplyClient->OnRenderingBlock(bundleName);
 }
 
 void FormRenderImpl::FormRenderGCTask(const std::string &uid)

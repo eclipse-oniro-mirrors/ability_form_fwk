@@ -42,6 +42,7 @@ ohos_fuzztest("FormRenderRecordFuzzTest") {
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
     "${form_fwk_path}/services/form_render_service:formrender",
+    "${form_fwk_path}/services/form_render_service:formrender_service",
   ]
 
   external_deps = [

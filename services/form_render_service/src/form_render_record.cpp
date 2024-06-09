@@ -31,7 +31,6 @@
 #include "form_memory_guard.h"
 #include "form_module_checker.h"
 #include "form_render_event_report.h"
-#include "form_render_impl.h"
 #include "nlohmann/json.hpp"
 #include "xcollie/watchdog.h"
 
@@ -93,10 +92,10 @@ std::string HandlerDumper::GetDumpInfo()
 }
 
 std::shared_ptr<FormRenderRecord> FormRenderRecord::Create(
-    const std::string &bundleName, const std::string &uid, bool needMonitored)
+    const std::string &bundleName, const std::string &uid, bool needMonitored, sptr<IFormSupply> client)
 {
     HILOG_INFO("bundleName is %{public}s, uid is %{public}s.", bundleName.c_str(), uid.c_str());
-    std::shared_ptr<FormRenderRecord> renderRecord = std::make_shared<FormRenderRecord>(bundleName, uid);
+    std::shared_ptr<FormRenderRecord> renderRecord = std::make_shared<FormRenderRecord>(bundleName, uid, client);
     if (!renderRecord) {
         HILOG_ERROR("Create FormRenderRecord failed.");
         return nullptr;
@@ -110,10 +109,12 @@ std::shared_ptr<FormRenderRecord> FormRenderRecord::Create(
 }
 
 FormRenderRecord::FormRenderRecord(
-    const std::string &bundleName, const std::string &uid) : bundleName_(bundleName), uid_(uid)
+    const std::string &bundleName, const std::string &uid, const sptr<IFormSupply> client)
+    : bundleName_(bundleName), uid_(uid), formSupplyClient_(client)
 {
     HILOG_INFO("bundleName is %{public}s, uid is %{public}s.", bundleName.c_str(), uid.c_str());
     threadState_ = std::make_shared<ThreadState>(CHECK_THREAD_TIME);
+    formSupplyClient_ = client;
 }
 
 FormRenderRecord::~FormRenderRecord()
@@ -253,6 +254,22 @@ void FormRenderRecord::AddWatchDogThreadMonitor()
     OHOS::HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask(eventHandleName, watchdogTask, TIMEOUT);
 }
 
+void FormRenderRecord::OnRenderingBlock(const std::string &bundleName)
+{
+    sptr<IFormSupply> formSupplyClient = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(formSupplyMutex_);
+        formSupplyClient = formSupplyClient_;
+    }
+
+    if (formSupplyClient == nullptr) {
+        HILOG_ERROR("formSupplyClient_ is nullptr");
+        return;
+    }
+
+    formSupplyClient->OnRenderingBlock(bundleName);
+}
+
 void FormRenderRecord::Timer()
 {
     TaskState taskState = RunTask();
@@ -260,7 +277,7 @@ void FormRenderRecord::Timer()
         HILOG_ERROR("FRS block happened when bundleName is %{public}s, uid is %{public}s",
             bundleName_.c_str(), uid_.c_str());
         FormRenderEventReport::SendBlockFaultEvent(processId_, jsThreadId_, bundleName_);
-        OHOS::DelayedSingleton<FormRenderImpl>::GetInstance()->OnRenderingBlock(bundleName_);
+        OnRenderingBlock(bundleName_);
     }
 }
 

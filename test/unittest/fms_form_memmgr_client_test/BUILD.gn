@@ -29,6 +29,7 @@ ohos_unittest("FmsFormMemmgrClientTest") {
 
   deps = [
     "${form_fwk_path}/services/form_render_service:formrender",
+    "${form_fwk_path}/services/form_render_service:formrender_service",
     "//third_party/googletest:gmock_main",
   ]
 

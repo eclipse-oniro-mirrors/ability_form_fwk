@@ -40,16 +40,18 @@ namespace {
 #define private public
 class FormRenderRecordMock : public FormRenderRecord {
 public:
-    static std::shared_ptr<FormRenderRecordMock> Create(
-        const std::string &bundleName, const std::string &uid, bool needMonitored = true)
+    static std::shared_ptr<FormRenderRecordMock> Create(const std::string &bundleName, const std::string &uid,
+        bool needMonitored = true,  sptr<IFormSupply> formSupplyClient = nullptr)
     {
-        std::shared_ptr<FormRenderRecordMock> renderRecord = std::make_shared<FormRenderRecordMock>(bundleName, uid);
+        std::shared_ptr<FormRenderRecordMock> renderRecord =
+            std::make_shared<FormRenderRecordMock>(bundleName, uid, formSupplyClient);
         if (!renderRecord->CreateEventHandler(bundleName, needMonitored)) {
             return nullptr;
         }
         return renderRecord;
     }
-    FormRenderRecordMock(const std::string &bundleName, const std::string &uid) : FormRenderRecord(bundleName, uid) {}
+    FormRenderRecordMock(const std::string &bundleName, const std::string &uid, sptr<IFormSupply> formSupplyClient)
+        : FormRenderRecord(bundleName, uid, formSupplyClient) {}
     bool CreateRuntime(const FormJsInfo &formJsInfo)
     {
         return true;
@@ -196,7 +198,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_007, TestSize.Level0)
 HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_008, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRenderRecordTest_008 start";
-    auto formRenderRecord = std::make_shared<FormRenderRecordMock>("bundleName", "uid");
+    auto formRenderRecord = std::make_shared<FormRenderRecordMock>("bundleName", "uid", nullptr);
     FormJsInfo formJsInfo;
     // set runtime_ is not nullptr
     formRenderRecord->CreateRuntime(formJsInfo);
@@ -503,7 +505,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_024, TestSize.Level0)
 HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_025, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRenderRecordTest_025 start";
-    auto formRenderRecord = std::make_shared<FormRenderRecordMock>("bundleName", "uid");
+    auto formRenderRecord = std::make_shared<FormRenderRecordMock>("bundleName", "uid", nullptr);
     ASSERT_NE(nullptr, formRenderRecord);
     FormJsInfo formJsInfo;
     formJsInfo.formId = 1;

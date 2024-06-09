@@ -34,6 +34,7 @@ ohos_unittest("FrsFormRenderEventReportTest") {
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:form_manager",
     "${form_fwk_path}/services/form_render_service:formrender",
+    "${form_fwk_path}/services/form_render_service:formrender_service",
     "//third_party/googletest:gmock_main",
   ]
 
