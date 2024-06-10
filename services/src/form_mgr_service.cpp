@@ -73,7 +73,8 @@ constexpr int32_t GET_CALLING_UID_TRANSFORM_DIVISOR = 200000;
 constexpr int MILLISECOND_WIDTH = 3;
 constexpr char MILLISECOND_FILLCHAR = '0';
 #ifdef RES_SCHEDULE_ENABLE
-constexpr uint64_t SYSTEMLOADLEVEL_TIMERSTOP_THRESHOLD = ResourceSchedule::ResType::SystemloadLevel::HIGH;
+constexpr int32_t SYSTEMLOADLEVEL_TIMERSTOP_THRESHOLD =
+    static_cast<int32_t>(ResourceSchedule::ResType::SystemloadLevel::HIGH);
 #endif // RES_SCHEDULE_ENABLE
 }
 using namespace std::chrono;
