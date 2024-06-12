@@ -166,12 +166,12 @@ ErrCode FormRdbDataMgr::InsertData(const std::string &tableName, const std::stri
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
-    int64_t rowId = -1;
     NativeRdb::ValuesBucket valuesBucket;
     valuesBucket.PutString(FORM_KEY, key);
     int32_t ret = NativeRdb::E_OK;
     {
         std::shared_lock<std::shared_mutex> guard(rdbStoreMutex_);
+        int64_t rowId = -1;
         ret = rdbStore_->InsertWithConflictResolution(rowId, tableName, valuesBucket,
             NativeRdb::ConflictResolution::ON_CONFLICT_REPLACE);
     }
@@ -199,13 +199,13 @@ ErrCode FormRdbDataMgr::InsertData(const std::string &tableName, const std::stri
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
-    int64_t rowId = -1;
     NativeRdb::ValuesBucket valuesBucket;
     valuesBucket.PutString(FORM_KEY, key);
     valuesBucket.PutString(FORM_VALUE, value);
     int32_t ret = NativeRdb::E_OK;
     {
         std::shared_lock<std::shared_mutex> guard(rdbStoreMutex_);
+        int64_t rowId = -1;
         ret = rdbStore_->InsertWithConflictResolution(rowId, tableName, valuesBucket,
             NativeRdb::ConflictResolution::ON_CONFLICT_REPLACE);
     }
@@ -234,12 +234,12 @@ ErrCode FormRdbDataMgr::DeleteData(const std::string &tableName, const std::stri
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
-    int32_t rowId = -1;
     NativeRdb::AbsRdbPredicates absRdbPredicates(tableName);
     absRdbPredicates.EqualTo(FORM_KEY, key);
     int32_t ret = NativeRdb::E_OK;
     {
         std::shared_lock<std::shared_mutex> guard(rdbStoreMutex_);
+        int32_t rowId = -1;
         ret = rdbStore_->Delete(rowId, absRdbPredicates);
     }
 
@@ -561,10 +561,10 @@ bool FormRdbDataMgr::DeleteData(const NativeRdb::AbsRdbPredicates &absRdbPredica
         return false;
     }
 
-    int32_t rowId = -1;
     int32_t ret = NativeRdb::E_OK;
     {
         std::shared_lock<std::shared_mutex> guard(rdbStoreMutex_);
+        int32_t rowId = -1;
         ret = rdbStore_->Delete(rowId, absRdbPredicates);
     }
 
@@ -630,10 +630,10 @@ ErrCode FormRdbDataMgr::CheckAndRebuildRdbStore(int32_t rdbOperateRet)
         std::string createTableSql = !iter->second.createTableSql.empty() ? iter->second.createTableSql
             : "CREATE TABLE IF NOT EXISTS " + iter->second.tableName
             + " (KEY TEXT NOT NULL PRIMARY KEY, VALUE TEXT NOT NULL);";
-        int32_t ret = rdbStore_->ExecuteSql(createTableSql);
-        if (ret != NativeRdb::E_OK) {
+        int32_t result = rdbStore_->ExecuteSql(createTableSql);
+        if (result != NativeRdb::E_OK) {
             HILOG_ERROR("Recreate form rdb table failed, ret: %{public}" PRId32 ", name is %{public}s",
-                ret, iter->first.c_str());
+                result, iter->first.c_str());
         }
     }
     return ERR_OK;

@@ -711,11 +711,11 @@ public:
      * @brief Get the formRecords by refreshType.
      * @param formRefreshType form refresh type.
      * @param visibleFormRecords Return the visible forms' infos need to refresh.
-     * @param inVisiblehFormRecords Return the invisible forms' infos need to refresh.
+     * @param invisibleFormRecords Return the invisible forms' infos need to refresh.
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode GetRecordsByFormType(const int32_t formRefreshType,
-        std::vector<FormRecord> &visibleFormRecords, std::vector<FormRecord> &inVisiblehFormRecords);
+        std::vector<FormRecord> &visibleFormRecords, std::vector<FormRecord> &invisibleFormRecords);
 
     /**
      * @brief Set form enable or disable.
