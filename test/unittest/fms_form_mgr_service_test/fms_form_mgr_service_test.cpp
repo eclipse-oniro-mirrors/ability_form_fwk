@@ -2608,4 +2608,19 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0125, TestSize.Level1)
     EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS, formMgrService.BatchRefreshForms(formRefreshType));
     GTEST_LOG_(INFO) << "FormMgrService_0125 end";
 }
+
+/**
+ * @tc.number: FormMgrService_0126
+ * @tc.name: test IsFormBundleForbidden function.
+ * @tc.desc: Verify that the IsFormBundleForbidden interface is called normally.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0126, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0126 start";
+    FormMgrService formMgrService;
+    MockIsSACall(true);
+    std::string bundleName = "bundleName";
+    EXPECT_FALSE(formMgrService.IsFormBundleForbidden(bundleName));
+    GTEST_LOG_(INFO) << "FormMgrService_0126 end";
+}
 }

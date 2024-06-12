@@ -871,4 +871,17 @@ HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_BatchRefreshForms_001, TestSize.Leve
     EXPECT_EQ(formMgrProxy->BatchRefreshForms(formRefreshType), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrProxyTest_BatchRefreshForms_001 test ends";
 }
+
+/**
+ * @tc.number: FormMgrProxyTest_IsFormBundleForbidden_001
+ * @tc.name: test IsFormBundleForbidden function.
+ * @tc.desc: Verify that the IsFormBundleForbidden.
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_IsFormBundleForbidden_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_IsFormBundleForbidden_001 starts";
+    std::string bundleName = "ohos.samples.FormApplication";
+    bool result = formMgrProxy->IsFormBundleForbidden(bundleName);
+    EXPECT_EQ(result, false);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_IsFormBundleForbidden_001 test ends";
+}
 }

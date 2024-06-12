@@ -2801,4 +2801,17 @@ HWTEST_F(FormMgrTest, EnableForms_002, TestSize.Level0) {
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "EnableForms_002 test ends";
 }
+
+/**
+ * @tc.name: IsFormBundleForbidden_001
+ * @tc.desc: Verify IsFormBundleForbidden
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, IsFormBundleForbidden_001, TestSize.Level0) {
+    GTEST_LOG_(INFO) << "IsFormBundleForbidden_001 begin";
+    std::string bundleName = "ohos.samples.FormApplication";
+    bool result = FormMgr::GetInstance().IsFormBundleForbidden(bundleName);
+    EXPECT_EQ(result, false);
+    GTEST_LOG_(INFO) << "IsFormBundleForbidden_001 test ends";
+}
 } // namespace
