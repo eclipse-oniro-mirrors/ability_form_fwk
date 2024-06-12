@@ -134,6 +134,7 @@ private:
      */
     void IncreaseTimerRefreshCount(const int64_t formId);
     bool IsFormCached(const FormRecord &record);
+    ErrCode RefreshCheck(FormRecord &record, const int64_t formId, const Want &want);
 
     /**
      * @brief Rebind form to provider by free install.

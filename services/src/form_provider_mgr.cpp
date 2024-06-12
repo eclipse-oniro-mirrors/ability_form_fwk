@@ -106,26 +106,11 @@ ErrCode FormProviderMgr::AcquireForm(const int64_t formId, const FormProviderInf
 ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, bool isVisibleToFresh)
 {
     FormRecord record;
-    bool bGetRecord = FormDataMgr::GetInstance().GetFormRecord(formId, record);
-    if (!bGetRecord) {
-        HILOG_ERROR("%{public}s fail, not exist such form:%{public}" PRId64 "", __func__, formId);
-        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    ErrCode result = RefreshCheck(record, formId, want);
+    if (result != ERR_OK) {
+        return result;
     }
 
-    // get current userId
-    int32_t currentActiveUserId = want.GetIntParam(Constants::PARAM_FORM_USER_ID, Constants::DEFAULT_PROVIDER_USER_ID);
-    if (currentActiveUserId != record.providerUserId) {
-        FormDataMgr::GetInstance().SetNeedRefresh(formId, true);
-        HILOG_ERROR("%{public}s, not current user, just set refresh flag, userId:%{public}d",
-            __func__, record.providerUserId);
-        return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
-    }
-    HILOG_INFO("FormProviderMgr::RefreshForm, formId:%{public}" PRId64 "., record.enableForm = %{public}d",
-        formId, record.enableForm);
-    if (!record.enableForm) {
-        FormDataMgr::GetInstance().SetRefreshDuringDisableForm(formId, true);
-        return ERR_APPEXECFWK_FORM_DISABLE_REFRESH;
-    }
     bool isCountTimerRefresh = want.GetBoolParam(Constants::KEY_IS_TIMER, false);
     Want newWant(want);
     newWant.RemoveParam(Constants::KEY_IS_TIMER);
@@ -139,6 +124,13 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
 
     if (isTimerRefresh) {
         FormDataMgr::GetInstance().SetTimerRefresh(formId, true);
+        bool isFormVisible = record.formVisibleNotifyState == Constants::FORM_VISIBLE;
+        if (!isFormVisible) {
+            HILOG_DEBUG("form is invisible.");
+            FormDataMgr::GetInstance().SetNeedRefresh(formId, true);
+            FormRecordReport::GetInstance().IncreaseUpdateTimes(formId, HiSysEventPointType::TYPE_INVISIBLE_INTERCEPT);
+            return ERR_OK;
+        }
     }
 
 #ifdef SUPPORT_POWER
@@ -161,6 +153,32 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
     refreshRecord.isCountTimerRefresh = isCountTimerRefresh;
     refreshRecord.isTimerRefresh = isTimerRefresh;
     return ConnectAmsForRefresh(formId, refreshRecord, newWant, isCountTimerRefresh);
+}
+
+ErrCode FormProviderMgr::RefreshCheck(FormRecord &record, const int64_t formId, const Want &want)
+{
+    bool bGetRecord = FormDataMgr::GetInstance().GetFormRecord(formId, record);
+    if (!bGetRecord) {
+        HILOG_ERROR("%{public}s fail, not exist such form:%{public}" PRId64 "", __func__, formId);
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    }
+
+    // get current userId
+    int32_t currentActiveUserId = want.GetIntParam(Constants::PARAM_FORM_USER_ID, Constants::DEFAULT_PROVIDER_USER_ID);
+    if (currentActiveUserId != record.providerUserId) {
+        FormDataMgr::GetInstance().SetNeedRefresh(formId, true);
+        HILOG_ERROR("%{public}s, not current user, just set refresh flag, userId:%{public}d",
+            __func__, record.providerUserId);
+        return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
+    }
+    HILOG_INFO("FormProviderMgr::RefreshForm, formId:%{public}" PRId64 "., record.enableForm = %{public}d",
+        formId, record.enableForm);
+    if (!record.enableForm) {
+        FormDataMgr::GetInstance().SetRefreshDuringDisableForm(formId, true);
+        return ERR_APPEXECFWK_FORM_DISABLE_REFRESH;
+    }
+
+    return ERR_OK;
 }
 
 /**
@@ -492,12 +510,6 @@ ErrCode FormProviderMgr::AcquireFormDataBack(const AAFwk::WantParams &wantParams
 
 bool FormProviderMgr::IsNeedToFresh(FormRecord &record, int64_t formId, bool isVisibleToFresh)
 {
-    bool isFormVisible = record.formVisibleNotifyState == Constants::FORM_VISIBLE;
-    if (!isFormVisible) {
-        HILOG_DEBUG("form is invisible.");
-        FormRecordReport::GetInstance().IncreaseUpdateTimes(formId, HiSysEventPointType::TYPE_INVISIBLE_INTERCEPT);
-        return false;
-    }
     bool isEnableRefresh = FormDataMgr::GetInstance().IsEnableRefresh(formId);
     HILOG_DEBUG("isEnableRefresh is %{public}d", isEnableRefresh);
     if (isEnableRefresh) {
