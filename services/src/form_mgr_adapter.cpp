@@ -3742,17 +3742,20 @@ ErrCode FormMgrAdapter::UpdateFormLocation(const int64_t &formId, const int32_t 
 ErrCode FormMgrAdapter::BatchRefreshForms(const int32_t formRefreshType)
 {
     std::vector<FormRecord> visibleFormRecords;
-    std::vector<FormRecord> inVisibleFormRecords;
-    FormDataMgr::GetInstance().GetRecordsByFormType(formRefreshType, visibleFormRecords, inVisibleFormRecords);
-    HILOG_INFO("getVisibleRecords ByFormType size: %{public}zu.", visibleFormRecords.size());
+    std::vector<FormRecord> invisibleFormRecords;
+    FormDataMgr::GetInstance().GetRecordsByFormType(formRefreshType, visibleFormRecords, invisibleFormRecords);
+    HILOG_INFO("getRecords visible size: %{public}zu, invisible size: %{public}zu.",
+        visibleFormRecords.size(), invisibleFormRecords.size());
     Want reqWant;
-    int32_t currentActiveUserId = FormUtil::GetCurrentAccountId();
-    reqWant.SetParam(Constants::PARAM_FORM_USER_ID, currentActiveUserId);
     for (auto formRecord : visibleFormRecords) {
-        FormProviderMgr::GetInstance().RefreshForm(formRecord.formId, reqWant, true);
+        formRecord.isCountTimerRefresh = false;
+        formRecord.isTimerRefresh = false;
+        FormProviderMgr::GetInstance().ConnectAmsForRefresh(formRecord.formId, formRecord, reqWant, false);
     }
-    for (auto formRecord : inVisibleFormRecords) {
-        FormProviderMgr::GetInstance().RefreshForm(formRecord.formId, reqWant, true);
+    for (auto formRecord : invisibleFormRecords) {
+        formRecord.isCountTimerRefresh = false;
+        formRecord.isTimerRefresh = false;
+        FormProviderMgr::GetInstance().ConnectAmsForRefresh(formRecord.formId, formRecord, reqWant, false);
     }
     return ERR_OK;
 }
