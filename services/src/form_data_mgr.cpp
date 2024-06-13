@@ -2469,7 +2469,7 @@ ErrCode FormDataMgr::UpdateFormLocation(const int64_t &formId, const int32_t &fo
 }
 
 ErrCode FormDataMgr::GetRecordsByFormType(const int32_t formRefreshType,
-    std::vector<FormRecord> &visibleFormRecords, std::vector<FormRecord> &inVisiblehFormRecord)
+    std::vector<FormRecord> &visibleFormRecords, std::vector<FormRecord> &invisibleFormRecords)
 {
     HILOG_INFO("GetRecordsByFormType formRefreshType: %{public}d", formRefreshType);
     std::lock_guard<std::mutex> lock(formRecordMutex_);
@@ -2479,7 +2479,7 @@ ErrCode FormDataMgr::GetRecordsByFormType(const int32_t formRefreshType,
                 visibleFormRecords.emplace_back(formRecord.second);
                 continue;
             }
-            inVisiblehFormRecord.emplace_back(formRecord.second);
+            invisibleFormRecords.emplace_back(formRecord.second);
         }
     } else if (formRefreshType == Constants::REFRESH_APP_FORM) {
         for (auto formRecord : formRecords_) {
@@ -2490,7 +2490,7 @@ ErrCode FormDataMgr::GetRecordsByFormType(const int32_t formRefreshType,
                 visibleFormRecords.emplace_back(formRecord.second);
                 continue;
             }
-            inVisiblehFormRecord.emplace_back(formRecord.second);
+            invisibleFormRecords.emplace_back(formRecord.second);
         }
     } else if (formRefreshType == Constants::REFRESH_ATOMIC_FORM) {
         for (auto formRecord : formRecords_) {
@@ -2501,7 +2501,7 @@ ErrCode FormDataMgr::GetRecordsByFormType(const int32_t formRefreshType,
                 visibleFormRecords.emplace_back(formRecord.second);
                 continue;
             }
-            inVisiblehFormRecord.emplace_back(formRecord.second);
+            invisibleFormRecords.emplace_back(formRecord.second);
         }
     } else if (formRefreshType == Constants::REFRESH_SYSTEMAPP_FORM) {
         for (auto formRecord : formRecords_) {
@@ -2512,7 +2512,7 @@ ErrCode FormDataMgr::GetRecordsByFormType(const int32_t formRefreshType,
                 visibleFormRecords.emplace_back(formRecord.second);
                 continue;
             }
-            inVisiblehFormRecord.emplace_back(formRecord.second);
+            invisibleFormRecords.emplace_back(formRecord.second);
         }
     }
     return ERR_OK;
