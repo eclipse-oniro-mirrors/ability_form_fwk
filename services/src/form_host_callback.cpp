@@ -131,5 +131,22 @@ void FormHostCallback::OnRecycleForms(
     }
     FormRenderMgr::GetInstance().RecycleForms(formIds, want, callerToken);
 }
+
+void FormHostCallback::OnEnableForms(
+    const std::vector<int64_t> &formIds, const bool enable, const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("start. size = %{public}zu, enable = %{public}d", formIds.size(), enable);
+    if (formIds.empty()) {
+        HILOG_ERROR("formIds is empty.");
+        return;
+    }
+
+    if (callerToken == nullptr) {
+        HILOG_ERROR("callerToken can not be NULL");
+        return;
+    }
+    // post enableFormsTask to host
+    FormTaskMgr::GetInstance().PostEnableFormsTaskToHost(formIds, enable, callerToken);
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

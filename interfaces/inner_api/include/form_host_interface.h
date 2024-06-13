@@ -89,6 +89,13 @@ public:
      */
     virtual void OnRecycleForm(const int64_t &formId) {}
 
+    /**
+     * @brief enable form style
+     * @param formIds The Id list of the forms.
+     * @param enable True is enableform, false is disableform.
+     */
+    virtual void OnEnableForm(const std::vector<int64_t> &formIds, const bool enable) {}
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -116,6 +123,9 @@ public:
 
         // ipc id for acquire form data response (3688)
         FORM_HOST_ON_RECYCLE_FORM,
+
+        // ipc id for enable form style (3689)
+        FORM_HOST_ON_ENABLE_FORM,
     };
 };
 }  // namespace AppExecFwk

@@ -2558,5 +2558,22 @@ ErrCode FormDataMgr::SetUpdateDuringDisableForm(const int64_t formId, const bool
         formId, enable);
     return ERR_OK;
 }
+
+void FormDataMgr::EnableForms(const std::vector<FormRecord> &&formRecords, const bool enable)
+{
+    HILOG_INFO("start");
+    std::lock_guard<std::mutex> lock(formHostRecordMutex_);
+    for (auto itHostRecord = clientRecords_.begin(); itHostRecord != clientRecords_.end(); itHostRecord++) {
+        std::vector<int64_t> matchedFormIds;
+        for (auto formRecord : formRecords) {
+            if (itHostRecord->Contains(formRecord.formId)) {
+                matchedFormIds.emplace_back(formRecord.formId);
+            }
+        }
+        if (!matchedFormIds.empty()) {
+            itHostRecord->OnEnableForms(matchedFormIds, enable);
+        }
+    }
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

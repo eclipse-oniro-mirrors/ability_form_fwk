@@ -319,5 +319,40 @@ void FormHostProxy::OnRecycleForm(const int64_t &formId)
         HILOG_ERROR("failed to SendRequest: %{public}d", error);
     }
 }
+
+void FormHostProxy::OnEnableForm(const std::vector<int64_t> &formIds, const bool enable)
+{
+    MessageParcel data;
+    MessageOption option(MessageOption::TF_ASYNC);
+
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("failed to write interface token.");
+        return;
+    }
+
+    if (!data.WriteInt64Vector(formIds)) {
+        HILOG_ERROR("failed to write formIds");
+        return;
+    }
+
+    if (!data.WriteBool(enable)) {
+        HILOG_ERROR("failed to write formId.");
+        return;
+    }
+
+    auto remote = Remote();
+    if (remote == nullptr) {
+        HILOG_ERROR("remote is nullptr.");
+        return;
+    }
+
+    MessageParcel reply;
+    int error = remote->SendRequest(
+        static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_ENABLE_FORM),
+        data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("failed to SendRequest: %{public}d", error);
+    }
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

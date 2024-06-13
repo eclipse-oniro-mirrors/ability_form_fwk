@@ -339,5 +339,19 @@ void FormHostRecord::OnRecycleForms(const std::vector<int64_t> &formIds, const W
     }
     formHostCallback_->OnRecycleForms(formIds, want, formHostClient_);
 }
+
+void FormHostRecord::OnEnableForms(const std::vector<int64_t> &formIds, const bool enable)
+{
+    HILOG_DEBUG("start.");
+    if (formIds.empty()) {
+        HILOG_ERROR("formIds is empty");
+        return;
+    }
+    if (formHostCallback_ == nullptr) {
+        HILOG_ERROR("formHostCallback_ can not be null.");
+        return;
+    }
+    formHostCallback_->OnEnableForms(formIds, enable, formHostClient_);
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

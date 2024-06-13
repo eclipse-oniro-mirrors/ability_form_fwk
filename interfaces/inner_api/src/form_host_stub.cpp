@@ -44,6 +44,8 @@ FormHostStub::FormHostStub()
         &FormHostStub::HandleOnAcquireDataResponse;
     memberFuncMap_[static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_RECYCLE_FORM)] =
         &FormHostStub::HandleOnRecycleForm;
+    memberFuncMap_[static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_ENABLE_FORM)] =
+        &FormHostStub::HandleOnEnableForm;
 }
 
 FormHostStub::~FormHostStub()
@@ -201,6 +203,20 @@ int32_t FormHostStub::HandleOnRecycleForm(MessageParcel &data, MessageParcel &re
 {
     int64_t formId = data.ReadInt64();
     OnRecycleForm(formId);
+    reply.WriteInt32(ERR_OK);
+    return ERR_OK;
+}
+
+int32_t FormHostStub::HandleOnEnableForm(MessageParcel &data, MessageParcel &reply)
+{
+    std::vector<int64_t> formIds;
+    bool ret = data.ReadInt64Vector(&formIds);
+    if (!ret) {
+        HILOG_ERROR("failed to ReadInt64Vector<formIds>");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    bool enable = data.ReadBool();
+    OnEnableForm(formIds, enable);
     reply.WriteInt32(ERR_OK);
     return ERR_OK;
 }

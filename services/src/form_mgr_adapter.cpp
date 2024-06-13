@@ -3803,7 +3803,7 @@ int32_t FormMgrAdapter::EnableForms(const std::string bundleName, const bool ena
         ++iter;
     }
     if (!formInfos.empty()) {
-        FormRenderMgr::GetInstance().EnableForms(std::move(formInfos), bundleName, userId, enable);
+        FormDataMgr::GetInstance().EnableForms(std::move(formInfos), enable);
     }
     return ERR_OK;
 }

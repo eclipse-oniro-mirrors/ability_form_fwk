@@ -54,6 +54,12 @@ public:
      * @brief Recycle form.
      */
     virtual void ProcessRecycleForm() {}
+
+    /**
+     * @brief Enable form.
+     * @param enable True is enable form, false is disable form.
+     */
+    virtual void ProcessEnableForm(bool enable) {}
 };
 
 class FormStateCallbackInterface {
