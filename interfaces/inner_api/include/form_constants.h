@@ -27,6 +27,8 @@ namespace Constants {
     constexpr const char* PERMISSION_AGENT_REQUIRE_FORM = "ohos.permission.AGENT_REQUIRE_FORM";
     constexpr const char* PERMISSION_KEEP_BACKGROUND_RUNNING = "ohos.permission.KEEP_BACKGROUND_RUNNING";
     constexpr const char* PERMISSION_OBSERVE_FORM_RUNNING = "ohos.permission.OBSERVE_FORM_RUNNING";
+    constexpr const char* PERMISSION_START_ABILITIES_FROM_BACKGROUND =
+        "ohos.permission.START_ABILITIES_FROM_BACKGROUND";
     constexpr const char* PARAM_FORM_IDENTITY_KEY = "ohos.extra.param.key.form_identity";
     constexpr const char* PARAM_FORM_CALLING_IDENTITY_KEY = "ohos.extra.param.key.form_calling_identity";
     constexpr const char* PARAM_MODULE_NAME_KEY = "ohos.extra.param.key.module_name";
