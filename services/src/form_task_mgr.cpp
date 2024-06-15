@@ -1290,5 +1290,34 @@ void FormTaskMgr::PostBatchRefreshForms(const int32_t formRefreshType)
     serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, batchRefreshForms);
     HILOG_DEBUG("end");
 }
+
+void FormTaskMgr::PostEnableFormsTaskToHost(const std::vector<int64_t> &formIds, const bool enable,
+    const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_DEBUG("called.");
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("serialQueue_ invalidate.");
+        return;
+    }
+
+    auto enableFormsTaskToHostFunc = [formIds, enable, remoteObject]() {
+        FormTaskMgr::GetInstance().EnableFormsTaskToHost(formIds, enable, remoteObject);
+    };
+    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, enableFormsTaskToHostFunc);
+}
+
+void FormTaskMgr::EnableFormsTaskToHost(const std::vector<int64_t> &formIds, const bool enable,
+    const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_DEBUG("start.");
+    sptr<IFormHost> remoteFormHost = iface_cast<IFormHost>(remoteObject);
+    if (remoteFormHost == nullptr) {
+        HILOG_ERROR("Failed to get form host proxy.");
+        return;
+    }
+
+    remoteFormHost->OnEnableForm(formIds, enable);
+    HILOG_DEBUG("end.");
+}
 } // namespace AppExecFwk
 } // namespace OHOS

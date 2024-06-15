@@ -283,6 +283,15 @@ public:
     * @param formRefreshType batch refresh forms type.
     */
     void PostBatchRefreshForms(const int32_t formRefreshType);
+
+    /**
+     * @brief Post enable form task.
+     * @param formIds formIds The Id list of the forms.
+     * @param enable True or false.
+     * @param remoteObject Form host proxy object.
+     */
+    void PostEnableFormsTaskToHost(const std::vector<int64_t> &formIds, const bool enable,
+        const sptr<IRemoteObject> &remoteObject);
 private:
     /**
      * @brief Acquire form data from form provider.
@@ -507,6 +516,15 @@ private:
 
     void EnableForms(const std::vector<FormRecord> &&formRecords, const Want &want,
         const sptr<IRemoteObject> &remoteObject, const bool enable);
+
+    /**
+     * @brief Enable form or disable form.
+     * @param formIds formIds The Id list of the forms.
+     * @param enable True or false.
+     * @param remoteObject Form host proxy object.
+     */
+    void EnableFormsTaskToHost(const std::vector<int64_t> &formIds, const bool enable,
+        const sptr<IRemoteObject> &remoteObject);
 private:
     std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;
 };

@@ -737,6 +737,13 @@ public:
      * @param enable Ture or false.
      */
     ErrCode SetUpdateDuringDisableForm(const int64_t formId, const bool enable);
+
+    /**
+     * @brief Enable forms style.
+     * @param formRecords The Id list of the formRecord.
+     * @param enable True is enable form, false is disable form.
+     */
+    void EnableForms(const std::vector<FormRecord> &&formRecords, const bool enable);
 private:
     /**
      * @brief Create form record.

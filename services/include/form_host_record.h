@@ -206,6 +206,13 @@ public:
      * @param want The want of forms to be recycled.
      */
     void OnRecycleForms(const std::vector<int64_t> &formIds, const AAFwk::Want &want) const;
+
+    /**
+     * @brief Enable form or disable form.
+     * @param formIds The Id list of forms.
+     * @param enable True is enable form, false is disable form.
+     */
+    void OnEnableForms(const std::vector<int64_t> &formIds, const bool enable);
 private:
     int callerUid_ = 0;
     sptr<IRemoteObject> formHostClient_ = nullptr;

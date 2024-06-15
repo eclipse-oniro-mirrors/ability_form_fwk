@@ -85,6 +85,14 @@ public:
      */
     void OnRecycleForms(const std::vector<int64_t> &formIds, const AAFwk::Want &want,
         const sptr<IRemoteObject> &callerToken);
+
+    /**
+     * @brief Enable form or disable form.
+     * @param formIds The Id list of forms.
+     * @param enable True is enable form, false is disable form.
+     * @param callerToken Caller ability token.
+     */
+    void OnEnableForms(const std::vector<int64_t> &formIds, const bool enable, const sptr<IRemoteObject> &callerToken);
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

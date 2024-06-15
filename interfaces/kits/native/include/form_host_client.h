@@ -189,6 +189,13 @@ public:
      * @param formId The id of form to be recycled.
      */
     void OnRecycleForm(const int64_t &formId) override;
+
+    /**
+     * @brief enable form style
+     * @param formIds The Id list of the forms.
+     * @param enable True is enableform, false is disableform.
+     */
+    void OnEnableForm(const std::vector<int64_t> &formIds, const bool enable) override;
 private:
     static std::mutex instanceMutex_;
     static sptr<FormHostClient> instance_;
