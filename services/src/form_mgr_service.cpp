@@ -1084,12 +1084,14 @@ int32_t FormMgrService::StartAbility(const Want &want, const sptr<IRemoteObject>
     HILOG_INFO("FMS StartAbility called, startTime: begin: %{public}s, publish: %{public}s, end: %{public}s, "
         "onKvDataServiceAddTime: %{public}s", onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
-    if (!CheckCallerIsSystemApp()) {
-        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    ErrCode ret = CheckFormPermission(AppExecFwk::Constants::PERMISSION_START_ABILITIES_FROM_BACKGROUND);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("start ability check permission denied");
+        return ret;
     }
-    // check abilityName to void implicit want.
-    if (want.GetElement().GetAbilityName() == "") {
-        HILOG_ERROR("error, AbilityName is empty");
+    // check abilityName and uri to void implicit want.
+    if (want.GetElement().GetAbilityName().empty() && want.GetUriString().empty()) {
+        HILOG_ERROR("error, AbilityName and uri is empty");
         return ERR_APPEXECFWK_FORM_NO_SUCH_ABILITY;
     }
     sptr<AAFwk::IAbilityManager> ams = FormAmsHelper::GetInstance().GetAbilityManager();
