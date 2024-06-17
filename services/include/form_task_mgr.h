@@ -269,16 +269,6 @@ public:
     void CancelDelayTask(const std::pair<int64_t, int64_t> &eventMsg);
 
     /**
-     * @brief Post enable form.
-     * @param formRecords the record of forms.
-     * @param want The want of the request.
-     * @param remoteObject Form render proxy object.
-     * @param enable True or false.
-     */
-    void PostEnableForms(const std::vector<FormRecord> &&formRecords,
-        const Want &want, const sptr<IRemoteObject> &remoteObject, const bool enable);
-
-    /**
     * @brief Post BatchRefresh forms.
     * @param formRefreshType batch refresh forms type.
     */
@@ -513,9 +503,6 @@ private:
     */
     void FormClickEvent(const std::string &bundleName, const std::string &formEventType,
         const sptr<IRemoteObject> &remoteObject, const RunningFormInfo &runningFormInfo);
-
-    void EnableForms(const std::vector<FormRecord> &&formRecords, const Want &want,
-        const sptr<IRemoteObject> &remoteObject, const bool enable);
 
     /**
      * @brief Enable form or disable form.

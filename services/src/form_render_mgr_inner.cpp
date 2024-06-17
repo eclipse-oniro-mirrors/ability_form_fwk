@@ -683,27 +683,6 @@ ErrCode FormRenderMgrInner::RecoverForms(const std::vector<int64_t> &formIds, co
     return ERR_OK;
 }
 
-int32_t FormRenderMgrInner::EnableForms(const std::vector<FormRecord> &&formRecords,
-    const std::string bundleName, int32_t userId, const bool enable)
-{
-    if (renderRemoteObj_ == nullptr) {
-        HILOG_ERROR("renderRemoteObj_ is nullptr");
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
-    }
-    auto remoteObject = renderRemoteObj_->AsObject();
-    if (remoteObject == nullptr) {
-        HILOG_ERROR("remoteObject is nullptr, can not get obj from renderRemoteObj.");
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
-    }
-    Want want;
-    want.SetParam(Constants::FORM_SUPPLY_UID, std::to_string(userId) + bundleName);
-    HILOG_INFO("FormRenderMgrInner::EnableForms FORM_SUPPLY_UID = %{public}s, enable = %{public}d",
-        (std::to_string(userId) + bundleName).c_str(), enable);
-    FormTaskMgr::GetInstance().PostEnableForms(std::forward<decltype(formRecords)>(formRecords),
-        want, remoteObject, enable);
-    return ERR_OK;
-}
-
 void FormRenderRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
     HILOG_INFO("Recv FormRenderService death notice");
