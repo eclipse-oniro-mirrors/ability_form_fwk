@@ -25,7 +25,7 @@ FormAshmem::~FormAshmem()
     if (ashmem_ != nullptr) {
         ashmem_->CloseAshmem();
     }
-    HILOG_INFO("formAshmem has been destroyed");
+    HILOG_INFO("formAshmem destroy");
 }
 
 bool FormAshmem::Marshalling(Parcel &parcel) const
@@ -45,7 +45,7 @@ bool FormAshmem::ReadFromParcel(Parcel &parcel)
     if (ashmem_ == nullptr) {
         return false;
     }
-    HILOG_INFO("fd: %{public}d, size: %{public}d", ashmem_->GetAshmemFd(), ashmem_->GetAshmemSize());
+    HILOG_INFO("fd:%{public}d, size:%{public}d", ashmem_->GetAshmemFd(), ashmem_->GetAshmemSize());
     return true;
 }
 

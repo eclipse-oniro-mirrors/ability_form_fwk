@@ -145,7 +145,7 @@ void FormDataProxyMgr::DisableSubscribeFormData(const std::vector<int64_t> &form
         if (search != formDataProxyRecordMap_.end()) {
             if (search->second != nullptr) {
                 search->second->DisableSubscribeFormData();
-                HILOG_INFO("disable subscribe form data. formId: %{public}s", std::to_string(formId).c_str());
+                HILOG_INFO("formId:%{public}s", std::to_string(formId).c_str());
             }
         }
     }

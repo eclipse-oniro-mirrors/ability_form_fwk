@@ -86,7 +86,7 @@ ErrCode FormAmsHelper::ConnectServiceAbility(
  */
 ErrCode FormAmsHelper::DisconnectServiceAbility(const sptr<AAFwk::IAbilityConnection> &connect)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("call");
     sptr<AAFwk::IAbilityManager> ams = GetAbilityManager();
     if (ams == nullptr) {
         HILOG_ERROR("%{public}s:ability service not connect", __func__);
@@ -166,7 +166,7 @@ ErrCode FormAmsHelper::StartAbility(const Want &want, int32_t userId)
 
 void FormAmsHelper::RegisterConfigurationObserver()
 {
-    HILOG_INFO("%{public}s begin.", __func__);
+    HILOG_INFO("begin");
     if (configurationObserver != nullptr) {
         HILOG_WARN("configurationObserver is not nullptr");
         return;
@@ -182,12 +182,12 @@ void FormAmsHelper::RegisterConfigurationObserver()
         return;
     }
     appMgrClient->RegisterConfigurationObserver(configurationObserver);
-    HILOG_INFO("%{public}s end.", __func__);
+    HILOG_INFO("end");
 }
 
 void FormAmsHelper::UnRegisterConfigurationObserver()
 {
-    HILOG_INFO("%{public}s begin.", __func__);
+    HILOG_INFO("begin");
     if (configurationObserver == nullptr) {
         HILOG_WARN("configurationObserver is nullptr");
         return;
@@ -198,7 +198,7 @@ void FormAmsHelper::UnRegisterConfigurationObserver()
         return;
     }
     appMgrClient->UnregisterConfigurationObserver(configurationObserver);
-    HILOG_INFO("%{public}s end.", __func__);
+    HILOG_INFO("end");
 }
 
 }  // namespace AppExecFwk

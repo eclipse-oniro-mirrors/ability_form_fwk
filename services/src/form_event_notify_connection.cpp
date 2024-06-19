@@ -40,7 +40,7 @@ FormEventNotifyConnection::FormEventNotifyConnection(const std::vector<int64_t> 
 void FormEventNotifyConnection::OnAbilityConnectDone(
     const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("call");
     if (resultCode != ERR_OK) {
         HILOG_ERROR("%{public}s, abilityName:%{public}s, resultCode:%{public}d",
             __func__, element.GetAbilityName().c_str(), resultCode);

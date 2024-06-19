@@ -178,10 +178,10 @@ void FormTaskMgr::PostAcquireDataTaskToHost(const AAFwk::WantParams &wantParams,
 void FormTaskMgr::PostUpdateTaskToHost(const int64_t formId, const FormRecord &record,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("call");
 
     if (serialQueue_ == nullptr) {
-        HILOG_ERROR("%{public}s fail, serialQueue_ invalidate.", __func__);
+        HILOG_ERROR("serialQueue_ invalidate");
         return;
     }
 
@@ -320,7 +320,7 @@ void FormTaskMgr::PostAcquireDataTask(const int64_t formId, const Want &want,
  */
 void FormTaskMgr::PostUninstallTaskToHost(const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("%{public}s start", __func__);
+    HILOG_INFO("start");
     if (serialQueue_ == nullptr) {
         HILOG_ERROR("%{public}s fail, serialQueue_ invalidate.", __func__);
         return;
@@ -329,7 +329,7 @@ void FormTaskMgr::PostUninstallTaskToHost(const std::vector<int64_t> &formIds, c
         FormTaskMgr::GetInstance().FormUninstall(formIds, remoteObject);
     };
     serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, uninstallFunc);
-    HILOG_INFO("%{public}s end", __func__);
+    HILOG_INFO("end");
 }
 
 /**
@@ -341,7 +341,7 @@ void FormTaskMgr::PostUninstallTaskToHost(const std::vector<int64_t> &formIds, c
 void FormTaskMgr::PostAcquireStateTaskToHost(AppExecFwk::FormState state, const AAFwk::Want &want,
                                              const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("%{public}s start", __func__);
+    HILOG_INFO("start");
     if (serialQueue_ == nullptr) {
         HILOG_ERROR("%{public}s fail, serialQueue_ invalidate.", __func__);
         return;
@@ -350,12 +350,12 @@ void FormTaskMgr::PostAcquireStateTaskToHost(AppExecFwk::FormState state, const 
         FormTaskMgr::GetInstance().AcquireStateBack(state, want, remoteObject);
     };
     serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, acquireStateFunc);
-    HILOG_INFO("%{public}s end", __func__);
+    HILOG_INFO("end");
 }
 
 void FormTaskMgr::PostFormShareSendResponse(int64_t formShareRequestCode, int32_t result)
 {
-    HILOG_INFO("%{public}s start", __func__);
+    HILOG_INFO("start");
     if (serialQueue_ == nullptr) {
         HILOG_ERROR("serialQueue_ is nullptr.");
         return;
@@ -365,7 +365,7 @@ void FormTaskMgr::PostFormShareSendResponse(int64_t formShareRequestCode, int32_
         FormTaskMgr::GetInstance().FormShareSendResponse(formShareRequestCode, result);
     };
     serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, formShareSendResponseFunc);
-    HILOG_INFO("%{public}s end", __func__);
+    HILOG_INFO("end");
 }
 
 void FormTaskMgr::PostAddTaskToHost(const std::string bundleName,
@@ -460,7 +460,7 @@ void FormTaskMgr::NotifyFormDelete(const int64_t formId, const Want &want, const
  */
 void FormTaskMgr::NotifyFormUpdate(const int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("call");
 
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
@@ -488,7 +488,7 @@ void FormTaskMgr::NotifyFormUpdate(const int64_t formId, const Want &want, const
 void FormTaskMgr::EventNotify(const std::vector<int64_t> &formEvents, const int32_t formVisibleType,
     const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("call");
 
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
@@ -515,7 +515,7 @@ void FormTaskMgr::EventNotify(const std::vector<int64_t> &formEvents, const int3
  */
 void FormTaskMgr::NotifyCastTemp(const int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("call");
 
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
@@ -543,7 +543,7 @@ void FormTaskMgr::NotifyCastTemp(const int64_t formId, const Want &want, const s
 void FormTaskMgr::AcquireTaskToHost(const int64_t formId, const FormRecord &record,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("FormTaskMgr AcquireTaskToHost, formId:%{public}" PRId64 "", formId);
+    HILOG_INFO("formId:%{public}" PRId64, formId);
 
     sptr<IFormHost> remoteFormHost = iface_cast<IFormHost>(remoteObject);
     if (remoteFormHost == nullptr) {
@@ -566,7 +566,7 @@ void FormTaskMgr::AcquireTaskToHost(const int64_t formId, const FormRecord &reco
 void FormTaskMgr::UpdateTaskToHost(const int64_t formId, const FormRecord &record,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("%{public}s start.", __func__);
+    HILOG_INFO("start");
 
     sptr<IFormHost> remoteFormHost = iface_cast<IFormHost>(remoteObject);
     if (remoteFormHost == nullptr) {
@@ -577,7 +577,7 @@ void FormTaskMgr::UpdateTaskToHost(const int64_t formId, const FormRecord &recor
     HILOG_DEBUG("%{public}s, FormTaskMgr remoteFormHost OnUpdate.", __func__);
     remoteFormHost->OnUpdate(CreateFormJsInfo(formId, record));
 
-    HILOG_INFO("%{public}s end.", __func__);
+    HILOG_INFO("end");
 }
 
 /**
@@ -586,9 +586,9 @@ void FormTaskMgr::UpdateTaskToHost(const int64_t formId, const FormRecord &recor
  */
 void FormTaskMgr::HostDied(const sptr<IRemoteObject> &remoteHost)
 {
-    HILOG_INFO("%{public}s, remote client died event", __func__);
+    HILOG_INFO("remote client died event");
     if (remoteHost == nullptr) {
-        HILOG_INFO("%{public}s, remote client died, invalid param", __func__);
+        HILOG_INFO("remote client died, invalid param");
         return;
     }
     FormDataMgr::GetInstance().HandleHostDied(remoteHost);
@@ -603,12 +603,12 @@ void FormTaskMgr::HostDied(const sptr<IRemoteObject> &remoteHost)
 void FormTaskMgr::ProviderBatchDelete(std::set<int64_t> &formIds, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("%{public}s start.", __func__);
+    HILOG_INFO("start");
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
     if (formProviderProxy == nullptr) {
         RemoveConnection(connectId);
-        HILOG_ERROR("%{public}s fail, Failed to get formProviderProxy", __func__);
+        HILOG_ERROR("Failed to get formProviderProxy");
         return;
     }
     std::vector<int64_t> vFormIds;
@@ -629,7 +629,7 @@ void FormTaskMgr::ProviderBatchDelete(std::set<int64_t> &formIds, const Want &wa
 void FormTaskMgr::FireFormEvent(const int64_t formId, const std::string &message, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("%{public}s start", __func__);
+    HILOG_INFO("start");
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
     if (formProviderProxy == nullptr) {
@@ -643,7 +643,6 @@ void FormTaskMgr::FireFormEvent(const int64_t formId, const std::string &message
         RemoveConnection(connectId);
         HILOG_ERROR("%{public}s, Failed to fire message event to form provider", __func__);
     }
-    HILOG_INFO("%{public}s end", __func__);
 }
 
 /**
@@ -656,7 +655,7 @@ void FormTaskMgr::FireFormEvent(const int64_t formId, const std::string &message
 void FormTaskMgr::AcquireState(const Want &wantArg, const std::string &provider, const Want &want,
                                const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("%{public}s start", __func__);
+    HILOG_INFO("start");
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
     if (formProviderProxy == nullptr) {
@@ -670,7 +669,7 @@ void FormTaskMgr::AcquireState(const Want &wantArg, const std::string &provider,
         RemoveConnection(connectId);
         HILOG_ERROR("%{public}s, Failed to acquire form state to form provider", __func__);
     }
-    HILOG_INFO("%{public}s end", __func__);
+    HILOG_INFO("end");
 }
 
 /**
@@ -708,7 +707,7 @@ void FormTaskMgr::AcquireFormData(const int64_t formId, const Want &want, const 
 void FormTaskMgr::FormUninstall(const std::vector<int64_t> &formIds,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("%{public}s start", __func__);
+    HILOG_INFO("start");
     sptr<IFormHost> remoteFormHost = iface_cast<IFormHost>(remoteObject);
     if (remoteFormHost == nullptr) {
         HILOG_ERROR("%{public}s fail, Failed to get form host proxy.", __func__);
@@ -717,7 +716,7 @@ void FormTaskMgr::FormUninstall(const std::vector<int64_t> &formIds,
 
     remoteFormHost->OnUninstall(formIds);
 
-    HILOG_INFO("%{public}s end", __func__);
+    HILOG_INFO("end");
 }
 
 /**
@@ -729,7 +728,7 @@ void FormTaskMgr::FormUninstall(const std::vector<int64_t> &formIds,
 void FormTaskMgr::AcquireStateBack(AppExecFwk::FormState state, const AAFwk::Want &want,
                                    const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("%{public}s start", __func__);
+    HILOG_INFO("start");
     sptr<IFormHost> remoteFormHost = iface_cast<IFormHost>(remoteObject);
     if (remoteFormHost == nullptr) {
         HILOG_ERROR("%{public}s fail, Failed to get form host proxy.", __func__);
@@ -738,7 +737,7 @@ void FormTaskMgr::AcquireStateBack(AppExecFwk::FormState state, const AAFwk::Wan
 
     remoteFormHost->OnAcquireState(state, want);
 
-    HILOG_INFO("%{public}s end", __func__);
+    HILOG_INFO("end");
 }
 
 /**
@@ -849,7 +848,7 @@ void FormTaskMgr::RenderForm(const FormRecord &formRecord, const Want &want, con
 void FormTaskMgr::PostStopRenderingForm(
     const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("PostStopRenderingForm");
+    HILOG_INFO("call");
     if (serialQueue_ == nullptr) {
         HILOG_ERROR("serialQueue_ is nullptr.");
         return;
@@ -859,13 +858,12 @@ void FormTaskMgr::PostStopRenderingForm(
         FormTaskMgr::GetInstance().StopRenderingForm(formRecord, want, remoteObject);
     };
     serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, deleterenderForm);
-    HILOG_INFO("%{public}s end", __func__);
 }
 
 void FormTaskMgr::StopRenderingForm(
     const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("%{public}s begin", __func__);
+    HILOG_INFO("begin");
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormRender> remoteFormDeleteRender = iface_cast<IFormRender>(remoteObject);
     if (remoteFormDeleteRender == nullptr) {
@@ -882,13 +880,13 @@ void FormTaskMgr::StopRenderingForm(
         return;
     }
 
-    HILOG_INFO("%{public}s end", __func__);
+    HILOG_INFO("end");
 }
 
 void FormTaskMgr::PostReleaseRenderer(
     int64_t formId, const std::string &compId, const std::string &uid, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("%{public}s begin", __func__);
+    HILOG_INFO("begin");
     if (serialQueue_ == nullptr) {
         HILOG_ERROR("serialQueue_ is nullptr.");
         return;
@@ -898,13 +896,13 @@ void FormTaskMgr::PostReleaseRenderer(
         FormTaskMgr::GetInstance().ReleaseRenderer(formId, compId, uid, remoteObject);
     };
     serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, deleterenderForm);
-    HILOG_INFO("%{public}s end", __func__);
+    HILOG_INFO("end");
 }
 
 void FormTaskMgr::ReleaseRenderer(
     int64_t formId, const std::string &compId, const std::string &uid, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("%{public}s begin", __func__);
+    HILOG_INFO("begin");
     sptr<IFormRender> remoteFormDeleteRender = iface_cast<IFormRender>(remoteObject);
     if (remoteFormDeleteRender == nullptr) {
         HILOG_ERROR("%{public}s fail, Failed to get form render proxy.", __func__);
@@ -916,13 +914,13 @@ void FormTaskMgr::ReleaseRenderer(
         HILOG_ERROR("%{public}s fail, Failed to release form renderer", __func__);
         return;
     }
-    HILOG_INFO("%{public}s end", __func__);
+    HILOG_INFO("end");
 }
 
 void FormTaskMgr::ReloadForm(const std::vector<FormRecord> &&formRecords, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("%{public}s begin", __func__);
+    HILOG_INFO("begin");
     sptr<IFormRender> remoteFormRender = iface_cast<IFormRender>(remoteObject);
     if (remoteFormRender == nullptr) {
         HILOG_ERROR("%{public}s fail, Failed to get form render proxy.", __func__);
@@ -940,13 +938,13 @@ void FormTaskMgr::ReloadForm(const std::vector<FormRecord> &&formRecords, const 
         HILOG_ERROR("%{public}s fail, Failed to reload form.", __func__);
         return;
     }
-    HILOG_INFO("%{public}s end", __func__);
+    HILOG_INFO("end");
 }
 
 void FormTaskMgr::PostReloadForm(const std::vector<FormRecord> &&formRecords, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("%{public}s begin", __func__);
+    HILOG_INFO("begin");
     if (serialQueue_ == nullptr) {
         HILOG_ERROR("serialQueue_ is nullptr.");
         return;
@@ -955,7 +953,7 @@ void FormTaskMgr::PostReloadForm(const std::vector<FormRecord> &&formRecords, co
         FormTaskMgr::GetInstance().ReloadForm(std::move(forms), want, remoteObject);
     };
     serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, reloadForm);
-    HILOG_INFO("%{public}s end", __func__);
+    HILOG_INFO("end");
 }
 
 void FormTaskMgr::OnUnlock(const sptr<IRemoteObject> &remoteObject)
@@ -1252,7 +1250,7 @@ void FormTaskMgr::PostEnableForms(const std::vector<FormRecord> &&formRecords, c
         FormTaskMgr::GetInstance().EnableForms(std::move(forms), want, remoteObject, enable);
     };
     serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, enableForms);
-    HILOG_INFO("%{public}s end", __func__);
+    HILOG_INFO("end");
 }
 
 void FormTaskMgr::EnableForms(const std::vector<FormRecord> &&formRecords, const Want &want,

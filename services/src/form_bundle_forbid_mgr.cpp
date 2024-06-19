@@ -25,12 +25,12 @@ namespace {
 
 FormBundleForbidMgr::FormBundleForbidMgr()
 {
-    HILOG_INFO("Create form bundle contol manager instance");
+    HILOG_INFO("Create");
 }
 
 FormBundleForbidMgr::~FormBundleForbidMgr()
 {
-    HILOG_INFO("Destroy form bundle control manager instance");
+    HILOG_INFO("Destroy");
 }
 
 bool FormBundleForbidMgr::Init()
@@ -46,7 +46,7 @@ bool FormBundleForbidMgr::Init()
 
     FormRdbDataMgr::GetInstance().QueryAllKeys(FORBIDDEN_FORM_BUNDLE_TABLE, formBundleForbiddenSet_);
     isInitialized_ = true;
-    HILOG_INFO("FormBundleForbidMgr is initialized.");
+    HILOG_INFO("initialized");
     return true;
 }
 

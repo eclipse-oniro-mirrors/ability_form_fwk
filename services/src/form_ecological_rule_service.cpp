@@ -155,7 +155,7 @@ int32_t FormEcologicalRuleProxy::IsSupportPublishForm(const std::vector<Want> &w
         return ERR_FAILED;
     }
     bSupport = reply.ReadBool();
-    HILOG_INFO("IsSupportPublishForm end, bSupport=%{public}d", bSupport);
+    HILOG_INFO("end, bSupport=%{public}d", bSupport);
     return ERR_OK;
 }
 } // namespace AppExecFwk

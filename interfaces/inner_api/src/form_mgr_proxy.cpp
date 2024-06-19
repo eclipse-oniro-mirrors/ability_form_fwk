@@ -451,7 +451,7 @@ int FormMgrProxy::LifecycleUpdate(
  */
 int FormMgrProxy::RequestForm(const int64_t formId, const sptr<IRemoteObject> &callerToken, const Want &want)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("call");
 
     MessageParcel data;
     if (!WriteInterfaceToken(data)) {
@@ -865,7 +865,7 @@ int FormMgrProxy::GetStringInfo(IFormMgr::Message code, MessageParcel &data, std
         return false;
     }
     if (stringInfoList.empty()) {
-        HILOG_INFO("%{public}s, No string info", __func__);
+        HILOG_INFO("No string info");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     for (const auto &info : stringInfoList) {
@@ -1351,7 +1351,7 @@ ErrCode FormMgrProxy::GetRunningFormInfosByBundleName(
 
 int32_t FormMgrProxy::GetFormsInfo(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos)
 {
-    HILOG_INFO("%{public}s start.", __func__);
+    HILOG_INFO("start");
     MessageParcel data;
     // write in token to help identify which stub to be called.
     if (!WriteInterfaceToken(data)) {
@@ -1374,7 +1374,7 @@ int32_t FormMgrProxy::GetFormsInfo(const FormInfoFilter &filter, std::vector<For
 
 bool FormMgrProxy::IsRequestPublishFormSupported()
 {
-    HILOG_INFO("%{public}s start.", __func__);
+    HILOG_INFO("start");
     MessageParcel data;
     // write in token to help identify which stub to be called.
     if (!WriteInterfaceToken(data)) {
@@ -1399,7 +1399,7 @@ bool FormMgrProxy::IsRequestPublishFormSupported()
 
 int32_t FormMgrProxy::StartAbility(const Want &want, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("%{public}s start.", __func__);
+    HILOG_INFO("start");
     MessageParcel data;
     // write in token to help identify which stub to be called.
     if (!WriteInterfaceToken(data)) {
@@ -1618,7 +1618,7 @@ int32_t FormMgrProxy::SetBackgroundFunction(const std::string funcName, const st
 
 int32_t FormMgrProxy::GetFormsCount(bool isTempFormFlag, int32_t &formCount)
 {
-    HILOG_INFO("%{public}s start.", __func__);
+    HILOG_INFO("start");
     MessageParcel data;
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("failed to write interface token.");
@@ -1706,7 +1706,7 @@ ErrCode FormMgrProxy::RegisterFormRemoveObserverByBundle(const std::string bundl
 
 int32_t FormMgrProxy::GetHostFormsCount(std::string &bundleName, int32_t &formCount)
 {
-    HILOG_INFO("%{public}s start.", __func__);
+    HILOG_INFO("start");
     MessageParcel data;
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("failed to write interface token.");

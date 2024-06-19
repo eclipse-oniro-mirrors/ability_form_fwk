@@ -235,7 +235,7 @@ int32_t FormRenderStub::HandleEnableForm(MessageParcel &data, MessageParcel &rep
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     bool enable = data.ReadBool();
-    HILOG_INFO("FormRenderStub::HandleEnableForm, enable = %{public}d", enable);
+    HILOG_INFO("enable = %{public}d", enable);
     result = EnableForm(std::move(formJsInfos), *want, enable);
     reply.WriteInt32(result);
     return result;

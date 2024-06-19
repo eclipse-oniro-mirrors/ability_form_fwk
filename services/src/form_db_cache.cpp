@@ -28,12 +28,12 @@ namespace OHOS {
 namespace AppExecFwk {
 FormDbCache::FormDbCache()
 {
-    HILOG_INFO("FormDbCache is created");
+    HILOG_INFO("create");
 }
 
 FormDbCache::~FormDbCache()
 {
-    HILOG_INFO("FormDbCache is destroyed");
+    HILOG_INFO("destroy");
 }
 
 /**
@@ -42,7 +42,7 @@ FormDbCache::~FormDbCache()
  */
 void FormDbCache::Start()
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("call");
     std::lock_guard<std::mutex> lock(formDBInfosMutex_);
     std::vector<InnerFormInfo> innerFormInfos;
     innerFormInfos.clear();
@@ -64,7 +64,7 @@ void FormDbCache::Start()
  */
 ErrCode FormDbCache::SaveFormInfo(const FormDBInfo &formDBInfo)
 {
-    HILOG_INFO("save formInfo, formId:%{public}" PRId64 "", formDBInfo.formId);
+    HILOG_INFO("formId:%{public}" PRId64, formDBInfo.formId);
     std::lock_guard<std::mutex> lock(formDBInfosMutex_);
     auto iter = find(formDBInfos_.begin(), formDBInfos_.end(), formDBInfo);
     if (iter != formDBInfos_.end()) {
@@ -91,7 +91,7 @@ ErrCode FormDbCache::SaveFormInfo(const FormDBInfo &formDBInfo)
  */
 ErrCode FormDbCache::SaveFormInfoNolock(const FormDBInfo &formDBInfo)
 {
-    HILOG_INFO("%{public}s called, formId:%{public}" PRId64 "", __func__, formDBInfo.formId);
+    HILOG_INFO("formId:%{public}" PRId64, formDBInfo.formId);
     auto iter = find(formDBInfos_.begin(), formDBInfos_.end(), formDBInfo);
     if (iter != formDBInfos_.end()) {
         if (iter->Compare(formDBInfo) == false) {
@@ -117,7 +117,7 @@ ErrCode FormDbCache::SaveFormInfoNolock(const FormDBInfo &formDBInfo)
  */
 ErrCode FormDbCache::DeleteFormInfo(int64_t formId)
 {
-    HILOG_INFO("delete form info");
+    HILOG_INFO("call");
     std::lock_guard<std::mutex> lock(formDBInfosMutex_);
     FormDBInfo tmpForm;
     tmpForm.formId = formId;
@@ -168,7 +168,7 @@ ErrCode FormDbCache::DeleteFormInfoByBundleName(const std::string &bundleName, c
  */
 void FormDbCache::GetAllFormInfo(std::vector<FormDBInfo> &formDBInfos)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("call");
     std::lock_guard<std::mutex> lock(formDBInfosMutex_);
     formDBInfos = formDBInfos_;
 }
@@ -401,7 +401,7 @@ void FormDbCache::BatchDeleteNoHostDBForms(int32_t callingUid, std::map<FormIdKe
 ErrCode FormDbCache::DeleteInvalidDBForms(int32_t userId, int32_t callingUid, std::set<int64_t> &matchedFormIds,
                                           std::map<int64_t, bool> &removedFormsMap)
 {
-    HILOG_INFO("DeleteInvalidDBForms start, userId = %{public}d, callingUid = %{public}d", userId, callingUid);
+    HILOG_INFO("userId:%{public}d, callingUid:%{public}d", userId, callingUid);
     std::map<int64_t, bool> foundFormsMap {};
     std::map<FormIdKey, std::set<int64_t>> noHostDBFormsMap {};
 
@@ -424,14 +424,14 @@ ErrCode FormDbCache::DeleteInvalidDBForms(int32_t userId, int32_t callingUid, st
 #endif
     }
 
-    HILOG_INFO("DeleteInvalidDBForms done");
+    HILOG_INFO("done");
     return ERR_OK;
 }
 
 #ifdef THEME_MGR_ENABLE
 void FormDbCache::DeleteThemeForms(std::map<int64_t, bool> &removedFormsMap)
 {
-    HILOG_INFO("DeleteThemeForms");
+    HILOG_INFO("call");
     std::vector<int64_t> removeList;
     for (const auto &element : removedFormsMap) {
         removeList.emplace_back(element.first);

@@ -156,7 +156,7 @@ ErrCode FormInfoHelper::LoadAbilityFormConfigInfo(const BundleInfo &bundleInfo, 
 std::shared_ptr<Global::Resource::ResourceManager> FormInfoHelper::GetResourceManager(const BundleInfo &bundleInfo)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_INFO("bundleInfo name is %{public}s", bundleInfo.name.c_str());
+    HILOG_INFO("bundleInfoName:%{public}s", bundleInfo.name.c_str());
     std::shared_ptr<Global::Resource::ResourceManager> resourceManager(Global::Resource::CreateResourceManager());
     if (resourceManager == nullptr) {
         HILOG_ERROR("InitResourceManager failed");
@@ -256,7 +256,7 @@ ErrCode BundleFormInfo::UpdateStaticFormInfos(int32_t userId)
 
 ErrCode BundleFormInfo::Remove(int32_t userId)
 {
-    HILOG_INFO("Remove form infos, userId is %{public}d.", userId);
+    HILOG_INFO("userId is %{public}d.", userId);
     std::unique_lock<std::shared_timed_mutex> guard(formInfosMutex_);
     for (auto item = formInfoStorages_.begin(); item != formInfoStorages_.end();) {
         if (item->userId == userId) {
@@ -270,7 +270,7 @@ ErrCode BundleFormInfo::Remove(int32_t userId)
 
 ErrCode BundleFormInfo::AddDynamicFormInfo(const FormInfo &formInfo, int32_t userId)
 {
-    HILOG_INFO("Add dynamic form info, userId is %{public}d.", userId);
+    HILOG_INFO("userId is %{public}d", userId);
     std::unique_lock<std::shared_timed_mutex> guard(formInfosMutex_);
     for (auto &formInfoStorage : formInfoStorages_) {
         if (formInfoStorage.userId != userId) {
@@ -301,7 +301,7 @@ ErrCode BundleFormInfo::AddDynamicFormInfo(const FormInfo &formInfo, int32_t use
 ErrCode BundleFormInfo::RemoveDynamicFormInfo(const std::string &moduleName, const std::string &formName,
                                               int32_t userId)
 {
-    HILOG_INFO("remove dynamic form info, userId is %{public}d.", userId);
+    HILOG_INFO("userId is %{public}d", userId);
     std::unique_lock<std::shared_timed_mutex> guard(formInfosMutex_);
     for (auto &formInfoStorage : formInfoStorages_) {
         if (formInfoStorage.userId != userId) {
@@ -326,7 +326,7 @@ ErrCode BundleFormInfo::RemoveDynamicFormInfo(const std::string &moduleName, con
 
 ErrCode BundleFormInfo::RemoveAllDynamicFormsInfo(int32_t userId)
 {
-    HILOG_INFO("remove all dynamic forms info, userId is %{public}d.", userId);
+    HILOG_INFO("userId is %{public}d", userId);
     std::unique_lock<std::shared_timed_mutex> guard(formInfosMutex_);
     int32_t numRemoved = 0;
     for (auto &formInfoStorage : formInfoStorages_) {
@@ -409,7 +409,7 @@ ErrCode BundleFormInfo::UpdateFormInfoStorageLocked()
 
 FormInfoMgr::FormInfoMgr()
 {
-    HILOG_INFO("FormInfoMgr is created");
+    HILOG_INFO("create");
 }
 
 FormInfoMgr::~FormInfoMgr() = default;
@@ -466,7 +466,7 @@ ErrCode FormInfoMgr::UpdateStaticFormInfos(const std::string &bundleName, int32_
     }
 
     bundleFormInfoMap_[bundleName] = bundleFormInfoPtr;
-    HILOG_INFO("update forms info success, bundleName=%{public}s.", bundleName.c_str());
+    HILOG_INFO("success, bundleName=%{public}s.", bundleName.c_str());
     return ERR_OK;
 }
 
@@ -492,7 +492,7 @@ ErrCode FormInfoMgr::Remove(const std::string &bundleName, int32_t userId)
     if (bundleFormInfoIter->second && bundleFormInfoIter->second->Empty()) {
         bundleFormInfoMap_.erase(bundleFormInfoIter);
     }
-    HILOG_INFO("remove forms info success, bundleName=%{public}s.", bundleName.c_str());
+    HILOG_INFO("success, bundleName=%{public}s.", bundleName.c_str());
     return errCode;
 }
 
@@ -775,7 +775,7 @@ bool FormInfoMgr::CheckBundlePermission()
 ErrCode FormInfoMgr::ReloadFormInfos(const int32_t userId)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_INFO("ReloadFormInfos userId: %{public}d.", userId);
+    HILOG_INFO("userId:%{public}d", userId);
     sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
     if (iBundleMgr == nullptr) {
         HILOG_ERROR("failed to get IBundleMgr.");
@@ -820,7 +820,7 @@ ErrCode FormInfoMgr::ReloadFormInfos(const int32_t userId)
         HILOG_INFO("add forms info success, bundleName=%{public}s", bundleName.c_str());
     }
     hasReloadedFormInfosState_ = true;
-    HILOG_INFO("ReloadFormInfos end, formInfoMapSize: %{public}zu", bundleFormInfoMap_.size());
+    HILOG_INFO("end, formInfoMapSize:%{public}zu", bundleFormInfoMap_.size());
     return ERR_OK;
 }
 

@@ -28,7 +28,7 @@ constexpr int64_t DELAY_TIME_MICROSECONDS = 10 * 1000;
 
 FormReport::FormReport()
 {
-    HILOG_INFO("FormReport begin");
+    HILOG_INFO("begin");
 }
 
 FormReport::~FormReport()
@@ -176,7 +176,7 @@ void FormReport::HandleAddFormStatistic(int64_t formId)
     std::lock_guard<std::mutex> guard(formReport_);
     auto &record = formStatisticMap_[formId];
     if (formStatisticMap_.count(formId) == 0) {
-        HILOG_INFO("formid not found in formStatisticMap_: %{public}" PRId64, formId);
+        HILOG_INFO("not found formId:%{public}" PRId64, formId);
         return;
     }
     if (FormIds.find(formId) != FormIds.end()) {

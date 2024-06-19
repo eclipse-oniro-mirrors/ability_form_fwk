@@ -39,13 +39,13 @@ void FormFwkResourceObserver::OnConfigurationUpdated(const AppExecFwk::Configura
     bool needUpdateForms = false;
     std::string colorMode = configuration.GetItem(AAFwk::GlobalConfigurationKey::SYSTEM_COLORMODE);
     if (!colorMode.empty() && colorMode != colorMode_) {
-        HILOG_INFO("OnSystemColorModeChanged colorMode:%{public}s", colorMode.c_str());
+        HILOG_INFO("colorMode:%{public}s", colorMode.c_str());
         needUpdateForms = true;
         colorMode_ = colorMode;
     }
     std::string language = configuration.GetItem(AAFwk::GlobalConfigurationKey::SYSTEM_LANGUAGE);
     if (!language.empty() && language != language_) {
-        HILOG_INFO("OnSystemLanguageChange language:%{public}s", language.c_str());
+        HILOG_INFO("language:%{public}s", language.c_str());
         needUpdateForms = true;
         language_ = language;
     }

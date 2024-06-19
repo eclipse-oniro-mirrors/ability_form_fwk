@@ -49,7 +49,7 @@ void FormSysEventReceiver::OnReceiveEventForAbilityUpdate(const AAFwk::Want& wan
 {
     std::weak_ptr<FormSysEventReceiver> weakThis = shared_from_this();
     auto task = [weakThis, want, bundleName]() {
-        HILOG_INFO("bundle updated, bundleName is %{public}s", bundleName.c_str());
+        HILOG_INFO("bundle updated, bundleName:%{public}s", bundleName.c_str());
         std::shared_ptr<FormSysEventReceiver> sharedThis = weakThis.lock();
         if (sharedThis) {
             int userId = want.GetIntParam(KEY_USER_ID, 0);
@@ -122,7 +122,7 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
         HILOG_ERROR("%{public}s fail, serialQueue_ invalidate.", __func__);
         return;
     }
-    HILOG_INFO("%{public}s, action:%{public}s.", __func__, action.c_str());
+    HILOG_INFO("action:%{public}s", action.c_str());
     std::weak_ptr<FormSysEventReceiver> weakThis = shared_from_this();
     if (action == EventFwk::CommonEventSupport::COMMON_EVENT_ABILITY_UPDATED) {
         OnReceiveEventForAbilityUpdate(want, bundleName);

@@ -57,11 +57,11 @@ napi_value CreateJsFormError(napi_env env)
 
 napi_value FormErrorInit(napi_env env, napi_value exportObj)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("call");
 
     napi_set_named_property(env, exportObj, "FormError", CreateJsFormError(env));
 
-    HILOG_INFO("%{public}s called end.", __func__);
+    HILOG_INFO("call");
     return exportObj;
 }
 }  // namespace AbilityRuntime

@@ -454,7 +454,7 @@ int  FormProviderProxy::GetParcelableInfos(MessageParcel &reply, std::vector<T> 
         }
         parcelableInfos.emplace_back(*info);
     }
-    HILOG_INFO("%{public}s, get parcelable infos success", __func__);
+    HILOG_INFO("get success");
     return ERR_OK;
 }
 

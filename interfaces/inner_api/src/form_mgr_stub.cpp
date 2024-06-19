@@ -439,7 +439,7 @@ int32_t FormMgrStub::HandleLifecycleUpdate(MessageParcel &data, MessageParcel &r
  */
 int32_t FormMgrStub::HandleRequestForm(MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("call");
 
     int64_t formId = data.ReadInt64();
 
@@ -621,7 +621,7 @@ int32_t FormMgrStub::HandleDumpFormTimerByFormId(MessageParcel &data, MessagePar
  */
 int32_t FormMgrStub::HandleMessageEvent(MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("call");
     int64_t formId = data.ReadInt64();
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
@@ -648,7 +648,7 @@ int32_t FormMgrStub::HandleMessageEvent(MessageParcel &data, MessageParcel &repl
  */
 int32_t FormMgrStub::HandleRouterEvent(MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("call");
     int64_t formId = data.ReadInt64();
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
@@ -674,7 +674,7 @@ int32_t FormMgrStub::HandleRouterEvent(MessageParcel &data, MessageParcel &reply
  */
 int32_t FormMgrStub::HandleBackgroundEvent(MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("call");
     int64_t formId = data.ReadInt64();
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
@@ -700,7 +700,7 @@ int32_t FormMgrStub::HandleBackgroundEvent(MessageParcel &data, MessageParcel &r
  */
 int32_t FormMgrStub::HandleDeleteInvalidForms(MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("call");
     std::vector<int64_t> formIds;
     if (!data.ReadInt64Vector(&formIds)) {
         HILOG_ERROR("%{public}s, failed to ReadInt64Vector", __func__);
@@ -732,7 +732,7 @@ int32_t FormMgrStub::HandleDeleteInvalidForms(MessageParcel &data, MessageParcel
  */
 int32_t FormMgrStub::HandleAcquireFormState(MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("call");
     FormStateInfo stateInfo {};
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (want == nullptr) {
@@ -764,7 +764,7 @@ int32_t FormMgrStub::HandleAcquireFormState(MessageParcel &data, MessageParcel &
  */
 int32_t FormMgrStub::HandleNotifyFormsVisible(MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("call");
     std::vector<int64_t> formIds;
     if (!data.ReadInt64Vector(&formIds)) {
         HILOG_ERROR("%{public}s, failed to ReadInt64Vector", __func__);
@@ -824,7 +824,7 @@ int32_t FormMgrStub::HandleNotifyFormsPrivacyProtected(MessageParcel &data, Mess
  */
 int32_t FormMgrStub::HandleNotifyFormsEnableUpdate(MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("call");
     std::vector<int64_t> formIds;
     if (!data.ReadInt64Vector(&formIds)) {
         HILOG_ERROR("%{public}s, failed to ReadInt64Vector", __func__);
@@ -857,7 +857,7 @@ int32_t FormMgrStub::HandleNotifyFormsEnableUpdate(MessageParcel &data, MessageP
  */
 int32_t FormMgrStub::HandleGetAllFormsInfo(MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("%{public}s called. max parcel capacity : %{public}zu", __func__, MAX_PARCEL_CAPACITY);
+    HILOG_INFO("max parcel capacity:%{public}zu", MAX_PARCEL_CAPACITY);
     std::vector<FormInfo> infos;
     int32_t result = GetAllFormsInfo(infos);
     (void)reply.SetMaxCapacity(MAX_PARCEL_CAPACITY);
@@ -937,7 +937,7 @@ int32_t FormMgrStub::HandleGetFormsInfoByFilter(MessageParcel &data, MessageParc
 
 int32_t FormMgrStub::HandleGetFormsInfo(MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("call");
     // read filter from data.
     std::unique_ptr<FormInfoFilter> filter(data.ReadParcelable<FormInfoFilter>());
     if (filter == nullptr) {
@@ -978,7 +978,7 @@ int32_t FormMgrStub::HandleShareForm(MessageParcel &data, MessageParcel &reply)
 
 int32_t FormMgrStub::HandleAcquireFormData(MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("called.");
+    HILOG_INFO("call");
     int64_t formId = data.ReadInt64();
     int64_t requestCode = data.ReadInt64();
     sptr<IRemoteObject> callerToken = data.ReadRemoteObject();
@@ -1010,7 +1010,7 @@ int32_t FormMgrStub::HandleRecvFormShareInfoFromRemote(MessageParcel &data, Mess
 
 int32_t FormMgrStub::HandleIsRequestPublishFormSupported(MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("call");
     bool result = IsRequestPublishFormSupported();
     if (!reply.WriteBool(result)) {
         HILOG_ERROR("%{public}s, failed to write action", __func__);
@@ -1021,7 +1021,7 @@ int32_t FormMgrStub::HandleIsRequestPublishFormSupported(MessageParcel &data, Me
 
 int32_t FormMgrStub::HandleStartAbility(MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("call");
     // retrieve want
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (want == nullptr) {
@@ -1096,7 +1096,7 @@ int32_t FormMgrStub::HandleRegisterFormRemoveObserverByBundle(MessageParcel &dat
 
 int32_t FormMgrStub::HandleGetFormsCount(MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("call");
     bool isTempFormFlag = false;
     if (!data.ReadBool(isTempFormFlag)) {
         HILOG_ERROR("%{public}s, failed to read temp flag", __func__);
@@ -1129,7 +1129,7 @@ int32_t FormMgrStub::HandleGetFormInstancesByFilter(MessageParcel &data, Message
     HILOG_DEBUG("info size = %{public}zu", infos.size());
     reply.WriteInt32(result);
     if (result == ERR_OK) {
-        HILOG_INFO("result i true.");
+        HILOG_INFO("result is ok");
         if (!WriteParcelableVector(infos, reply)) {
             HILOG_ERROR("write failed");
             return ERR_APPEXECFWK_PARCEL_ERROR;
@@ -1157,7 +1157,7 @@ int32_t FormMgrStub::HandleGetFormInstanceById(MessageParcel &data, MessageParce
 
 int32_t FormMgrStub::HandleGetHostFormsCount(MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("call");
     std::string bundleName = data.ReadString();
 
     int32_t formCount = 0;

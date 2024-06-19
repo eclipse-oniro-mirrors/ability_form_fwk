@@ -35,7 +35,7 @@ int ProviderConnectStub::OnRemoteRequest(
     std::u16string descriptor = ProviderConnectStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
     if (descriptor != remoteDescriptor) {
-        HILOG_INFO("%{public}s failed, local descriptor is not equal to remote", __func__);
+        HILOG_INFO("failed, local descriptor is not equal to remote");
         return ERR_INVALID_STATE;
     }
 

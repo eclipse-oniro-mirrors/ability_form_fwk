@@ -56,13 +56,13 @@ inline bool HasContent(const std::string &str)
 
 FormCacheMgr::FormCacheMgr()
 {
-    HILOG_INFO("create form cache manager instance");
+    HILOG_INFO("create");
     CreateFormCacheTable();
 }
 
 FormCacheMgr::~FormCacheMgr()
 {
-    HILOG_INFO("destroy form cache manager instance");
+    HILOG_INFO("destroy");
 }
 
 void FormCacheMgr::CreateFormCacheTable()
@@ -86,7 +86,7 @@ void FormCacheMgr::CreateFormCacheTable()
 
 void FormCacheMgr::Start()
 {
-    HILOG_INFO("FormCacheMgr Start.");
+    HILOG_INFO("Start");
     ResetCacheStateAfterReboot();
 }
 
@@ -176,7 +176,7 @@ bool FormCacheMgr::InnerGetImageData(
 
 bool FormCacheMgr::AddData(int64_t formId, const FormProviderData &formProviderData)
 {
-    HILOG_INFO("AddData start, formId:%{public}" PRId64 "", formId);
+    HILOG_INFO("formId:%{public}" PRId64, formId);
     std::lock_guard<std::mutex> lock(cacheMutex_);
 
     FormCache formCache;
@@ -337,7 +337,7 @@ bool FormCacheMgr::GetImageDataFromAshmem(
 
 bool FormCacheMgr::DeleteData(const int64_t formId)
 {
-    HILOG_INFO("DeleteData start, formId:%{public}" PRId64" ", formId);
+    HILOG_INFO("formId:%{public}" PRId64, formId);
     std::lock_guard<std::mutex> lock(cacheMutex_);
     FormCache formCache;
     bool ret = GetDataCacheFromDb(formId, formCache);

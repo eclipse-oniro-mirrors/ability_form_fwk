@@ -205,7 +205,7 @@ napi_value CreateJsFormShape(napi_env engine)
 
 napi_value FormInfoInit(napi_env engine, napi_value exportObj)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("call");
 
     napi_set_named_property(engine, exportObj, "FormType", CreateJsFormType(engine));
     napi_set_named_property(engine, exportObj, "ColorMode", CreateJsColorMode(engine));
@@ -218,7 +218,7 @@ napi_value FormInfoInit(napi_env engine, napi_value exportObj)
     napi_set_named_property(engine, exportObj, "FormLocation", CreateJsFormLocation(engine));
     napi_set_named_property(engine, exportObj, "PublishFormErrorCode", CreateJsPublishFormErrorCode(engine));
     napi_set_named_property(engine, exportObj, "FormShape", CreateJsFormShape(engine));
-    HILOG_INFO("%{public}s called end.", __func__);
+    HILOG_INFO("end");
     return exportObj;
 }
 }  // namespace AbilityRuntime

@@ -55,7 +55,7 @@ ErrCode FormSandboxRenderMgrInner::IsSandboxFRSInstalled() const
 
 ErrCode FormSandboxRenderMgrInner::InstallSandboxFRS(int32_t &appIndex) const
 {
-    HILOG_INFO("InstallSandboxFRS start.");
+    HILOG_INFO("start");
     sptr<IBundleInstaller> bundleInstallerProxy = FormBmsHelper::GetInstance().GetBundleInstaller();
     if (bundleInstallerProxy == nullptr) {
         HILOG_ERROR("GetBundleInstaller failed.");
@@ -67,11 +67,11 @@ ErrCode FormSandboxRenderMgrInner::InstallSandboxFRS(int32_t &appIndex) const
 ErrCode FormSandboxRenderMgrInner::RenderForm(
     const FormRecord &formRecord, Want &want, const sptr<IRemoteObject> &hostToken)
 {
-    HILOG_INFO("FormSandboxRenderMgrInner RenderForm start");
+    HILOG_INFO("start");
     {
         std::lock_guard<std::mutex> lock(sandboxMutex_);
         if (GetRenderRemoteObj() == nullptr && IsSandboxFRSInstalled() != ERR_OK) {
-            HILOG_INFO("RenderForm, sandbox frs not installed.");
+            HILOG_INFO("sandbox frs not installed.");
             int32_t appIndex = 0;
             std::string identity  = IPCSkeleton::ResetCallingIdentity();
             ErrCode ret = InstallSandboxFRS(appIndex);

@@ -28,12 +28,12 @@ namespace OHOS {
 namespace AppExecFwk {
 FormBmsHelper::FormBmsHelper()
 {
-    HILOG_INFO("called");
+    HILOG_INFO("call");
 }
 
 FormBmsHelper::~FormBmsHelper()
 {
-    HILOG_INFO("called");
+    HILOG_INFO("call");
 }
 
 sptr<IBundleMgr> FormBmsHelper::GetBundleMgr()
@@ -372,7 +372,7 @@ ErrCode FormBmsHelper::RegisterBundleEventCallback()
     if (!hasRegisterBundleEvent_) {
         std::lock_guard<std::mutex> lock(registerMutex_);
         if (!hasRegisterBundleEvent_) {
-            HILOG_INFO("RegisterBundleEventCallback");
+            HILOG_INFO("call");
             sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
             if (iBundleMgr == nullptr) {
                 return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;

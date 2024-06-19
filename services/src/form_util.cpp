@@ -84,11 +84,10 @@ int64_t FormUtil::GenerateFormId(int64_t udidHash)
 
     int64_t elapsedTime { ((t.tv_sec) * SEC_TO_NANOSEC + t.tv_nsec) };
     size_t elapsedHash = std::hash<std::string>()(std::to_string(elapsedTime));
-    HILOG_INFO("GenerateFormId generate elapsed hash %{public}zu", elapsedHash);
     uint64_t unsignedUdidHash = static_cast<uint64_t>(udidHash);
     uint64_t formId = unsignedUdidHash | (uint32_t)(elapsedHash & 0x000000007fffffffL);
     int64_t ret = static_cast<int64_t>(formId);
-    HILOG_INFO("GenerateFormId generate formId %{public}" PRId64 "", ret);
+    HILOG_INFO("generate elapsed hash %{public}zu, formId:%{public}" PRId64, elapsedHash, ret);
     return ret;
 }
 
@@ -114,7 +113,7 @@ int64_t FormUtil::PaddingUdidHash(uint64_t formId, uint64_t udidHash)
  */
 bool FormUtil::GenerateUdidHash(int64_t &udidHash)
 {
-    HILOG_INFO("%{public}s start, udidHash:%{private}s", __func__, std::to_string(udidHash).c_str());
+    HILOG_INFO("udidHash:%{private}s", std::to_string(udidHash).c_str());
     if (udidHash != INVALID_UDID_HASH) {
         return true;
     }
@@ -125,7 +124,7 @@ bool FormUtil::GenerateUdidHash(int64_t &udidHash)
     if (udidHash < 0) {
         udidHash = 0L;
     }
-    HILOG_INFO("%{public}s, generate hash %{private}s", __func__, std::to_string(udidHash).c_str());
+    HILOG_INFO("generate hash %{private}s", std::to_string(udidHash).c_str());
     return true;
 }
 /**

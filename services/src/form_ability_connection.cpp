@@ -52,7 +52,7 @@ void FormAbilityConnection::OnAbilityConnectDone(
         return;
     }
 
-    HILOG_INFO("%{public}s, free install is %{public}d.", __func__, isFreeInstall_);
+    HILOG_INFO("free install is %{public}d", isFreeInstall_);
     if (!isFreeInstall_) {
         return;
     }
@@ -72,7 +72,7 @@ void FormAbilityConnection::OnAbilityConnectDone(
     FormDataMgr::GetInstance().SetRecordNeedFreeInstall(formId_, false);
     FormInfo updatedForm;
     if (FormDataMgr::GetInstance().GetUpdatedForm(formRecord, targetForms, updatedForm)) {
-        HILOG_INFO("%{public}s, refresh form", __func__);
+        HILOG_INFO("refresh form");
         FormDataMgr::GetInstance().SetNeedRefresh(formId_, true);
         FormBmsHelper::GetInstance().NotifyModuleNotRemovable(formRecord.bundleName, formRecord.moduleName);
         return;
@@ -97,8 +97,7 @@ void FormAbilityConnection::OnAbilityConnectDone(
  */
 void FormAbilityConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
 {
-    HILOG_INFO("%{public}s, element:%{public}s, resultCode:%{public}d",
-        __func__, element.GetURI().c_str(), resultCode);
+    HILOG_INFO("element:%{public}s, resultCode:%{public}d", element.GetURI().c_str(), resultCode);
     if (connectId_ != 0) {
         FormSupplyCallback::GetInstance()->RemoveConnection(connectId_);
         connectId_ = 0;
@@ -175,7 +174,7 @@ void FormAbilityConnection::ReportFormAppUnbindEvent()
     eventInfo.formId = GetFormId();
     eventInfo.bundleName = GetBundleName() + ":form";
     eventInfo.formAppPid = GetAppFormPid();
-    HILOG_INFO("bundleName:%{public}s, formId:%{public}" PRId64 ",pid: %{public}" PRId32 ",timstamp:%{public}" PRId64,
+    HILOG_DEBUG("bundleName:%{public}s, formId:%{public}" PRId64 ",pid: %{public}" PRId32 ",timstamp:%{public}" PRId64,
         eventInfo.bundleName.c_str(), eventInfo.formId, eventInfo.formAppPid, eventInfo.timeStamp);
     FormReport::GetInstance().RemoveFormId(eventInfo.formId);
     FormEventReport::SendThirdFormEvent(FormEventName::UNBIND_FORM_APP, HiSysEventType::BEHAVIOR, eventInfo);
@@ -187,7 +186,7 @@ void FormAbilityConnection::ReportFormAppUnbindEvent()
  */
 void FormAbilityConnection::SetConnectId(int32_t connectId)
 {
-    HILOG_INFO("%{public}s, connectId_: %{public}d", __func__, connectId);
+    HILOG_INFO("connectId_: %{public}d", connectId);
     connectId_ = connectId;
 }
 

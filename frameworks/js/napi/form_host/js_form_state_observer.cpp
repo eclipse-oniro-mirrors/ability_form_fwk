@@ -233,7 +233,7 @@ void JsFormStateObserver::ClearFormAddCallbackByBundle(const std::string &bundle
     std::lock_guard<std::mutex> lock(addFormCallbackMutex_);
     auto formAddCallbacks = formAddCallbackMap_.find(bundleName);
     if (formAddCallbacks == formAddCallbackMap_.end()) {
-        HILOG_INFO("There is no formAddCallback has been register");
+        HILOG_INFO("No formAddCallback register");
     } else {
         auto &callbacks = formAddCallbacks->second;
         callbacks.clear();
@@ -248,17 +248,17 @@ void JsFormStateObserver::DelFormAddCallbackByBundle(const napi_value callback, 
     std::lock_guard<std::mutex> lock(addFormCallbackMutex_);
     auto formAddCallbacks = formAddCallbackMap_.find(bundleName);
     if (formAddCallbacks == formAddCallbackMap_.end()) {
-        HILOG_INFO("There is no formAddCallback has been registered with this bundleName.");
+        HILOG_INFO("no formAddCallback registered with this bundleName.");
     } else {
         auto &callbacks = formAddCallbacks->second;
         auto iter = std::find_if(callbacks.begin(), callbacks.end(), [&](const auto &cb) {
             return cb->IsStrictEqual(callback);
         });
         if (iter != callbacks.end()) {
-            HILOG_INFO("Found equal callback");
+            HILOG_INFO("equal callback");
             callbacks.erase(iter);
         } else {
-            HILOG_INFO("There is no formAddCallback has been registered with the same callback.");
+            HILOG_INFO("no formAddCallback registered with the callback.");
         }
     }
 }
@@ -284,7 +284,7 @@ void JsFormStateObserver::ClearFormRemoveCallbackByBundle(const std::string &bun
     std::lock_guard<std::mutex> lock(removeFormCallbackMutex_);
     auto formRemoveCallbacks = formRemoveCallbackMap_.find(bundleName);
     if (formRemoveCallbacks == formRemoveCallbackMap_.end()) {
-        HILOG_INFO("There is no formRemoveCallback has been register");
+        HILOG_INFO("no formRemoveCallback register");
     } else {
         auto &callbacks = formRemoveCallbacks->second;
         callbacks.clear();
@@ -299,17 +299,17 @@ void JsFormStateObserver::DelFormRemoveCallbackByBundle(const napi_value callbac
     std::lock_guard<std::mutex> lock(removeFormCallbackMutex_);
     auto formRemoveCallbacks = formRemoveCallbackMap_.find(bundleName);
     if (formRemoveCallbacks == formRemoveCallbackMap_.end()) {
-        HILOG_INFO("There is no formRemoveCallback has been registered with this bundleName.");
+        HILOG_INFO("no formRemoveCallback registered with this bundleName.");
     } else {
         auto &callbacks = formRemoveCallbacks->second;
         auto iter = std::find_if(callbacks.begin(), callbacks.end(), [&](const auto &cb) {
             return cb->IsStrictEqual(callback);
         });
         if (iter != callbacks.end()) {
-            HILOG_INFO("Found equal callback");
+            HILOG_INFO("equal callback");
             callbacks.erase(iter);
         } else {
-            HILOG_INFO("There is no formRemoveCallback has been registered with the same callback.");
+            HILOG_INFO("no formRemoveCallback registered with the same callback.");
         }
     }
 }

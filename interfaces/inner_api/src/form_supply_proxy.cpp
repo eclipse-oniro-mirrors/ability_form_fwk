@@ -158,7 +158,7 @@ int  FormSupplyProxy::GetParcelableInfos(MessageParcel &reply, std::vector<T> &p
         }
         parcelableInfos.emplace_back(*info);
     }
-    HILOG_INFO("get parcelable infos success");
+    HILOG_INFO("success");
     return ERR_OK;
 }
 

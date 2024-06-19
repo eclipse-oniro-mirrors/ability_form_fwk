@@ -171,7 +171,7 @@ ErrCode FormProviderMgr::RefreshCheck(FormRecord &record, const int64_t formId, 
             __func__, record.providerUserId);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
-    HILOG_INFO("FormProviderMgr::RefreshForm, formId:%{public}" PRId64 "., record.enableForm = %{public}d",
+    HILOG_INFO("formId:%{public}" PRId64 ", enableForm:%{public}d",
         formId, record.enableForm);
     if (!record.enableForm) {
         FormDataMgr::GetInstance().SetRefreshDuringDisableForm(formId, true);
@@ -386,7 +386,7 @@ ErrCode FormProviderMgr::UpdateForm(const int64_t formId, const FormProviderInfo
 ErrCode FormProviderMgr::UpdateForm(const int64_t formId,
     FormRecord &formRecord, const FormProviderData &formProviderData)
 {
-    HILOG_INFO("%{public}s start, imageDateState is %{public}d", __func__, formProviderData.GetImageDataState());
+    HILOG_INFO("imageDateState is %{public}d", formProviderData.GetImageDataState());
     if (formRecord.versionUpgrade) {
         formRecord.formProviderInfo.SetFormData(formProviderData);
         formRecord.formProviderInfo.SetUpgradeFlg(true);
@@ -420,7 +420,7 @@ ErrCode FormProviderMgr::UpdateForm(const int64_t formId,
 #endif
 
     if (formRecord.formProviderInfo.NeedCache()) {
-        HILOG_INFO("%{public}s, updateJsForm, data is less than 1k, cache data.", __func__);
+        HILOG_INFO("updateJsForm, data is less than 1k, cache data.");
         FormCacheMgr::GetInstance().AddData(formId, formRecord.formProviderInfo.GetFormData());
     } else {
         FormCacheMgr::GetInstance().DeleteData(formId);
@@ -438,7 +438,7 @@ ErrCode FormProviderMgr::UpdateForm(const int64_t formId,
  */
 int FormProviderMgr::MessageEvent(const int64_t formId, const FormRecord &record, const Want &want)
 {
-    HILOG_INFO("%{public}s called, formId:%{public}" PRId64 ".", __func__, formId);
+    HILOG_INFO("formId:%{public}" PRId64, formId);
 
 #ifdef SUPPORT_POWER
     bool screenOnFlag = PowerMgr::PowerMgrClient::GetInstance().IsScreenOn();
@@ -552,7 +552,7 @@ bool FormProviderMgr::IsFormCached(const FormRecord &record)
 ErrCode FormProviderMgr::RebindByFreeInstall(const FormRecord &record, Want &want,
     const sptr<AAFwk::IAbilityConnection> formRefreshConnection)
 {
-    HILOG_INFO("%{public}s start", __func__);
+    HILOG_INFO("start");
     want.AddFlags(Want::FLAG_INSTALL_ON_DEMAND | Want::FLAG_INSTALL_WITH_BACKGROUND_MODE);
     want.SetModuleName(record.moduleName);
     ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbility(want, formRefreshConnection);

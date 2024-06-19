@@ -66,7 +66,7 @@ ErrCode FormRouterProxyMgr::RemoveFormRouterProxy(const std::vector<int64_t> &fo
         std::lock_guard<std::mutex> lock(formRouterProxyMutex_);
         auto formRouterProxys = formRouterProxyMap_.find(formId);
         if (formRouterProxys == formRouterProxyMap_.end()) {
-            HILOG_INFO("There is no formRouterProxy has been register");
+            HILOG_INFO("no formRouterProxy has been register");
         } else {
             formRouterProxyMap_.erase(formId);
         }

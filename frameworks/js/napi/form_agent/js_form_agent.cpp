@@ -43,7 +43,7 @@ const std::string IS_FORM_AGENT = "isFormAgent";
 
 void JsFormAgent::Finalizer(napi_env env, void *data, void *hint)
 {
-    HILOG_INFO("JsFormAgent::Finalizer is called");
+    HILOG_INFO("Finalizer is called");
     std::unique_ptr<JsFormAgent>(static_cast<JsFormAgent *>(data));
 }
 
@@ -54,7 +54,7 @@ napi_value JsFormAgent::RequestPublishForm(napi_env env, napi_callback_info info
 
 napi_value JsFormAgent::OnRequestPublishForm(napi_env env, size_t argc, napi_value* argv)
 {
-    HILOG_INFO("OnRequestPublishForm is called");
+    HILOG_INFO("called");
     if (env == nullptr || argc < ARGS_SIZE_ONE || argc > ARGS_SIZE_TWO) {
         HILOG_ERROR("wrong number of arguments.");
         NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1 or 2");

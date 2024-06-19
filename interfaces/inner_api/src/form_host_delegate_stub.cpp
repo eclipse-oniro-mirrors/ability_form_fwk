@@ -37,7 +37,7 @@ FormHostDelegateStub::~FormHostDelegateStub()
 int32_t FormHostDelegateStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
     MessageParcel &reply, MessageOption &option)
 {
-    HILOG_INFO("FormHostDelegateStub::OnReceived, code = %{public}u, flags= %{public}d.", code, option.GetFlags());
+    HILOG_INFO("code:%{public}u, flags:%{public}d.", code, option.GetFlags());
     std::u16string descriptor = FormHostDelegateStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
     if (descriptor != remoteDescriptor) {
