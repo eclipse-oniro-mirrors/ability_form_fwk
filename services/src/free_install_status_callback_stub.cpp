@@ -44,7 +44,7 @@ int32_t FreeInstallStatusCallBackStub::OnInstallFinishedInner(MessageParcel &dat
 int32_t FreeInstallStatusCallBackStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    HILOG_INFO("OnRemoteRequest, code: %{public}d", code);
+    HILOG_INFO("code:%{public}d", code);
     std::u16string descriptor = FreeInstallStatusCallBackStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
     if (descriptor != remoteDescriptor) {

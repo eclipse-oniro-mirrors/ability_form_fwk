@@ -45,7 +45,7 @@ private:
 
 napi_value FormBindingData::OnCreateFormBindingData(napi_env env, size_t argc, napi_value* argv)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("called");
     std::string formDataStr;
     if (argc > 0) {
         napi_value nativeValue = nullptr;
@@ -88,7 +88,7 @@ napi_value FormBindingData::OnCreateFormBindingData(napi_env env, size_t argc, n
 
 napi_value FormBindingDataInit(napi_env env, napi_value exportObj)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("called");
 
     auto formProviderData = std::make_shared<AppExecFwk::FormProviderData>();
     auto formBindingData = std::make_unique<FormBindingData>(formProviderData);
@@ -97,7 +97,7 @@ napi_value FormBindingDataInit(napi_env env, napi_value exportObj)
     const char *moduleName = "FormBindingData";
     BindNativeFunction(env, exportObj, "createFormBindingData", moduleName, FormBindingData::CreateFormBindingData);
 
-    HILOG_INFO("%{public}s called end.", __func__);
+    HILOG_INFO("end");
     return exportObj;
 }
 } // namespace AbilityRuntime

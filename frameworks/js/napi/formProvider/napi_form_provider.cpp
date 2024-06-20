@@ -169,12 +169,12 @@ static void FormCallbackCreateAsyncWork(napi_env env, AsyncRequestPublishFormCal
         nullptr,
         resourceName,
         [](napi_env env, void *data) {
-            HILOG_INFO("%{public}s, napi_create_async_work running", __func__);
+            HILOG_INFO("running");
             auto *asyncCallbackInfo = (AsyncRequestPublishFormCallbackInfo *) data;
             InnerRequestPublishForm(env, asyncCallbackInfo);
         },
         [](napi_env env, napi_status status, void *data) {
-            HILOG_INFO("%{public}s, napi_create_async_work complete", __func__);
+            HILOG_INFO("complete");
             auto *asyncCallbackInfo = (AsyncRequestPublishFormCallbackInfo *) data;
 
             if (asyncCallbackInfo->callback != nullptr) {
@@ -203,7 +203,7 @@ static void FormCallbackCreateAsyncWork(napi_env env, AsyncRequestPublishFormCal
 
 static napi_value RequestPublishFormCallback(napi_env env, napi_value *argv, bool withFormBindingData)
 {
-    HILOG_INFO("%{public}s, asyncCallback.", __func__);
+    HILOG_INFO("asyncCallback.");
 
     int32_t callbackIdx = 1;
     if (withFormBindingData) {
@@ -246,14 +246,14 @@ static void FormPromiseCreateAsyncWork(napi_env env, AsyncRequestPublishFormCall
         nullptr,
         resourceName,
         [](napi_env env, void *data) {
-            HILOG_INFO("%{public}s, promise running", __func__);
+            HILOG_INFO("running");
             auto *asyncCallbackInfo = (AsyncRequestPublishFormCallbackInfo *) data;
             if (asyncCallbackInfo) {
                 InnerRequestPublishForm(env, asyncCallbackInfo);
             }
         },
         [](napi_env env, napi_status status, void *data) {
-            HILOG_INFO("%{public}s, promise complete", __func__);
+            HILOG_INFO("complete");
             auto *asyncCallbackInfo = (AsyncRequestPublishFormCallbackInfo *) data;
             napi_value result;
             if (asyncCallbackInfo) {
@@ -275,7 +275,7 @@ static void FormPromiseCreateAsyncWork(napi_env env, AsyncRequestPublishFormCall
 
 static napi_value RequestPublishFormPromise(napi_env env, napi_value *argv, bool withFormBindingData)
 {
-    HILOG_INFO("%{public}s, promise.", __func__);
+    HILOG_INFO("promise");
     napi_deferred deferred;
     napi_value promise;
     NAPI_CALL(env, napi_create_promise(env, &deferred, &promise));
@@ -311,7 +311,7 @@ static napi_value RequestPublishFormPromise(napi_env env, napi_value *argv, bool
  */
 napi_value NAPI_RequestPublishForm(napi_env env, napi_callback_info info)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("call");
     // Check the number of the arguments
     size_t argc = ARGS_SIZE_THREE;
     napi_value argv[ARGS_SIZE_THREE] = {nullptr, nullptr, nullptr};
@@ -320,7 +320,7 @@ napi_value NAPI_RequestPublishForm(napi_env env, napi_callback_info info)
         HILOG_ERROR("%{public}s, wrong number of arguments.", __func__);
         return nullptr;
     }
-    HILOG_INFO("%{public}s, argc = [%{public}zu]", __func__, argc);
+    HILOG_INFO("argc = [%{public}zu]", argc);
 
     if (argc < ARGS_SIZE_TWO) {
         // promise, no form binding data
@@ -343,7 +343,7 @@ napi_value NAPI_RequestPublishForm(napi_env env, napi_callback_info info)
 
 static void CheckFormArgv(napi_env env, size_t argc, napi_value* argv, int32_t *errCode, int64_t *formId)
 {
-    HILOG_INFO("%{public}s, asyncCallback.", __func__);
+    HILOG_INFO("asyncCallback");
 
     napi_valuetype paramZeroType = napi_undefined;
     napi_typeof(env, argv[PARAM0], &paramZeroType);
@@ -366,7 +366,7 @@ static void CheckFormArgv(napi_env env, size_t argc, napi_value* argv, int32_t *
 
 void JsFormProvider::Finalizer(napi_env env, void* data, void* hint)
 {
-    HILOG_INFO("JsFormProvider::Finalizer is called");
+    HILOG_INFO("Finalizer is called");
     std::unique_ptr<JsFormProvider>(static_cast<JsFormProvider*>(data));
 }
 
@@ -377,7 +377,7 @@ napi_value JsFormProvider::GetFormsInfo(napi_env env, napi_callback_info info)
 
 napi_value JsFormProvider::OnGetFormsInfo(napi_env env, size_t argc, napi_value* argv)
 {
-    HILOG_INFO("%{public}s is called", __FUNCTION__);
+    HILOG_INFO("call");
     int32_t errCode = ERR_OK;
     if (argc > ARGS_SIZE_TWO) {
         HILOG_ERROR("%{public}s, wrong number of arguments.", __func__);

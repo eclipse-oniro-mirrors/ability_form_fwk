@@ -124,7 +124,7 @@ void FormProviderData::AddImageData(const std::string &picName, const std::share
  */
 void FormProviderData::AddImageData(const std::string &picName, int fd)
 {
-    HILOG_INFO("%{public}s called. fd is %{public}d", __func__, fd);
+    HILOG_INFO("fd is %{public}d", fd);
     if (fd < 0) {
         HILOG_ERROR("fd is invalid.");
         return;
@@ -155,7 +155,7 @@ void FormProviderData::AddImageData(const std::string &picName, int fd)
     }
     std::shared_ptr<char> data(bytes, DeleteBytes());
     AddImageData(picName, data, size);
-    HILOG_INFO("%{public}s called end.", __func__);
+    HILOG_INFO("end");
 }
 
 void FormProviderData::ParseImagesData()
@@ -287,7 +287,7 @@ bool FormProviderData::ReadFromParcel(Parcel &parcel)
             if (imageDataNum > READ_PARCEL_MAX_IMAGE_DATA_NUM_SIZE) {
                 return false;
             }
-            HILOG_INFO("%{public}s imageDataNum is %{public}d", __func__, imageDataNum);
+            HILOG_INFO("imageDataNum is %{public}d", imageDataNum);
             for (int32_t i = 0; i < imageDataNum; i++) {
                 sptr<FormAshmem> formAshmem = parcel.ReadParcelable<FormAshmem>();
                 if (formAshmem == nullptr) {
@@ -395,7 +395,7 @@ bool FormProviderData::WriteImageDataToParcel(Parcel &parcel, const std::string 
 
 bool FormProviderData::ConvertRawImageData()
 {
-    HILOG_INFO("%{public}s called", __func__);
+    HILOG_INFO("call");
     for (auto &entry : rawImageBytesMap_) {
         sptr<FormAshmem> formAshmem = new (std::nothrow) FormAshmem();
         if (formAshmem == nullptr) {
@@ -410,7 +410,7 @@ bool FormProviderData::ConvertRawImageData()
         imageDataMap_[entry.first] = imageDataRecord;
     }
     rawImageBytesMap_.clear();
-    HILOG_INFO("%{public}s end", __func__);
+    HILOG_INFO("end");
     return true;
 }
 } // namespace AppExecFwk

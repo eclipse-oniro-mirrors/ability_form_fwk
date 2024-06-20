@@ -35,18 +35,18 @@ void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eve
         HILOG_ERROR("%{public}s failed, empty action/bundleName", __func__);
         return;
     }
-    HILOG_INFO("%{public}s, action:%{public}s.", __func__, action.c_str());
+    HILOG_INFO("action:%{public}s", action.c_str());
 
     wptr<FormBundleEventCallback> weakThis = this;
     if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_ADDED ||
         action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_CHANGED) {
         // install or update
-        HILOG_INFO("%{public}s, bundle changed, bundleName: %{public}s", __func__, bundleName.c_str());
+        HILOG_INFO("bundleName:%{public}s changed", bundleName.c_str());
         formEventHelper_.HandleBundleFormInfoChanged(bundleName, userId);
         formEventHelper_.HandleProviderUpdated(bundleName, userId);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED) {
         // uninstall module/bundle
-        HILOG_INFO("%{public}s, bundle removed, bundleName: %{public}s", __func__, bundleName.c_str());
+        HILOG_INFO("bundleName:%{public}s removed", bundleName.c_str());
         formEventHelper_.HandleBundleFormInfoRemoved(bundleName, userId);
         formEventHelper_.HandleProviderRemoved(bundleName, userId);
         // Ensure clear forbidden form db when bundle uninstall
@@ -54,7 +54,7 @@ void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eve
         FormBundleForbidMgr::GetInstance().SetBundleForbiddenStatus(bundleName, false);
     } else if (action == BMS_EVENT_ADDITIONAL_INFO_CHANGED) {
         // additional info changed
-        HILOG_INFO("Additional info changed, bundleName: %{public}s", bundleName.c_str());
+        HILOG_INFO("bundleName:%{public}s additional info changed", bundleName.c_str());
         formEventHelper_.HandleAdditionalInfoChanged(bundleName);
     }
 }

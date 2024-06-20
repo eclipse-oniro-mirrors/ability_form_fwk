@@ -111,7 +111,7 @@ public:
                 HILOG_ERROR("sharedThis is nullptr.");
                 return;
             }
-            HILOG_DEBUG("task complete formId: form: %{public}" PRId64 ".", formId);
+            HILOG_DEBUG("task complete formId:%{public}" PRId64 ".", formId);
             std::string formIdString = std::to_string(formId);
             napi_value callbackValues;
             napi_create_string_utf8(sharedThis->env_, formIdString.c_str(), NAPI_AUTO_LENGTH, &callbackValues);
@@ -209,7 +209,7 @@ void FormUninstallCallback(const std::vector<int64_t> &formIds)
 
 bool AddFormUninstallCallback(napi_env env, napi_value callback)
 {
-    HILOG_DEBUG("AddFormUninstallCallback start");
+    HILOG_DEBUG("start");
     std::lock_guard<std::mutex> lock(g_formUninstallCallbackMapMutex_);
     for (auto &iter : g_formUninstallCallbackMap) {
         if (iter.second->IsStrictEqual(callback)) {
@@ -233,7 +233,7 @@ bool AddFormUninstallCallback(napi_env env, napi_value callback)
 
 bool DelFormUninstallCallback(napi_value callback)
 {
-    HILOG_DEBUG("DelFormUninstallCallback start");
+    HILOG_DEBUG("start");
     int32_t count = 0;
     std::lock_guard<std::mutex> lock(g_formUninstallCallbackMapMutex_);
     for (auto iter = g_formUninstallCallbackMap.begin(); iter != g_formUninstallCallbackMap.end();) {
@@ -263,7 +263,7 @@ public:
 
     static void Finalizer(napi_env env, void* data, void* hint)
     {
-        HILOG_INFO("JsFormHost::Finalizer is called");
+        HILOG_INFO("Finalizer is called");
         std::unique_ptr<JsFormHost>(static_cast<JsFormHost*>(data));
     }
 
@@ -563,7 +563,7 @@ private:
 
         NapiAsyncTask::CompleteCallback complete = [runningFormInfo, ret = apiResult](napi_env env,
             NapiAsyncTask &task, int32_t status) {
-            HILOG_INFO("return ret: %{public}d, formId: %{public}" PRId64 "", *ret, runningFormInfo->formId);
+            HILOG_INFO("ret:%{public}d, formId:%{public}" PRId64, *ret, runningFormInfo->formId);
             if (*ret == ERR_OK) {
                 task.ResolveWithNoError(env, CreateRunningFormInfo(env, *runningFormInfo));
             } else {
@@ -1501,7 +1501,7 @@ private:
         ErrCode ret = FormMgr::GetInstance().ShareForm(
             formId, remoteDeviceId, FormHostClient::GetInstance(), requestCode);
         if (ret != ERR_OK) {
-            HILOG_INFO("%{public}s, share form failed.", __func__);
+            HILOG_INFO("share form fail");
             asyncTask->Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
             FormHostClient::GetInstance()->RemoveShareFormCallback(requestCode);
         }
@@ -1609,7 +1609,7 @@ private:
 
     napi_value OnNotifyFormsPrivacyProtected(napi_env env, size_t argc, napi_value* argv)
     {
-        HILOG_INFO("%{public}s is called", __func__);
+        HILOG_INFO("call");
         if (argc > ARGS_THREE || argc < ARGS_TWO) {
             HILOG_ERROR("wrong number of arguments.");
             NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "2 or 3");
@@ -1945,7 +1945,7 @@ private:
             NapiFormUtil::ThrowParamTypeError(env, "formId", "string");
             return CreateJsUndefined(env);
         }
-        HILOG_INFO("UpdateFormLocation formId value=%{public}s", std::to_string(formId).c_str());
+        HILOG_INFO("formId:%{public}s", std::to_string(formId).c_str());
         int32_t formLocation = INVALID_FORM_LOCATION;
         if (napi_get_value_int32(env, argv[PARAM1], &formLocation) == napi_ok) {
             if (formLocation < static_cast<int32_t>(Constants::FormLocation::OTHER) ||
@@ -1959,7 +1959,7 @@ private:
             NapiFormUtil::ThrowParamTypeError(env, "formLocation", "number");
             return CreateJsUndefined(env);
         }
-        HILOG_INFO("UpdateFormLocation formLocation value=%{public}s", std::to_string(formLocation).c_str());
+        HILOG_INFO("formLocation:%{public}s", std::to_string(formLocation).c_str());
         auto ret = FormMgr::GetInstance().UpdateFormLocation(formId, formLocation);
         if (ret == ERR_OK) {
             return CreateJsUndefined(env);
@@ -2069,7 +2069,7 @@ FormRouterProxyCallbackClient::~FormRouterProxyCallbackClient()
 
 void FormRouterProxyCallbackClient::ProcessFormRouterProxy(const Want &want)
 {
-    HILOG_INFO("ProcessFormRouterProxy start");
+    HILOG_INFO("call");
     if (handler_ == nullptr) {
         HILOG_ERROR("Handler is nullptr");
         return;
@@ -2144,7 +2144,7 @@ void JsFormRouterProxyMgr::AddFormRouterProxyCallback(napi_env env, napi_value c
 
 void JsFormRouterProxyMgr::RemoveFormRouterProxyCallback(const std::vector<int64_t> &formIds)
 {
-    HILOG_INFO("Start");
+    HILOG_INFO("call");
     std::lock_guard<std::mutex> lock(FormRouterProxyCallbackMutex_);
     for (const auto &formId : formIds) {
         auto iter = formRouterProxyCallbackMap_.find(formId);

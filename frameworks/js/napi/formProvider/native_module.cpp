@@ -24,7 +24,7 @@ using namespace OHOS::AbilityRuntime;
 
 static napi_value JsProviderInit(napi_env env, napi_value value)
 {
-    HILOG_INFO("JsProviderInit is called");
+    HILOG_INFO("call");
 
     std::unique_ptr<JsFormProvider> jsFormPorivder = std::make_unique<JsFormProvider>();
     napi_wrap(env, value, jsFormPorivder.release(), JsFormProvider::Finalizer, nullptr, nullptr);
@@ -48,12 +48,12 @@ static napi_value JsProviderInit(napi_env env, napi_value value)
  */
 static napi_value Init(napi_env env, napi_value exports)
 {
-    HILOG_INFO("napi_module Init start...");
+    HILOG_INFO("Init start");
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("requestPublishForm", NAPI_RequestPublishForm),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(properties) / sizeof(properties[0]), properties));
-    HILOG_INFO("napi_module Init end...");
+    HILOG_INFO("Init end");
     return JsProviderInit(env, exports);
 }
 

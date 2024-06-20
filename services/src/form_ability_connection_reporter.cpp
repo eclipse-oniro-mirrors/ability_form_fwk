@@ -35,12 +35,12 @@ const std::string FORM_CONNECTION_PROCESS_NAME_SUFFIX = ":form";
 
 FormAbilityConnectionReporter::FormAbilityConnectionReporter()
 {
-    HILOG_INFO("Called.");
+    HILOG_INFO("Call");
 }
 
 FormAbilityConnectionReporter::~FormAbilityConnectionReporter()
 {
-    HILOG_INFO("Called.");
+    HILOG_INFO("Call");
 }
 
 void FormAbilityConnectionReporter::ReportFormAbilityConnection(const std::string &bundleName)
@@ -64,7 +64,7 @@ void FormAbilityConnectionReporter::ReportFormAbilityConnection(const std::strin
         HILOG_ERROR("Get running process info failed!");
         return;
     }
-    HILOG_INFO("Bundle name: %{public}s, the size of current bundle's process infos  is %{public}zu.",
+    HILOG_INFO("BundleName:%{public}s, infosSize:%{public}zu.",
         bundleName.c_str(), infos.size());
     AddFormAbilityConnectProcessInfo(bundleName, infos);
     ReportConnectionInfosToRss(bundleName, true);
@@ -91,7 +91,7 @@ void FormAbilityConnectionReporter::ReportFormAbilityDisconnection(const std::st
 
     ReportConnectionInfosToRss(bundleName, false);
     formConnectionInfoMap_.erase(bundleName);
-    HILOG_INFO("Report disconnection info, bundle name: %{public}s.", bundleName.c_str());
+    HILOG_INFO("bundleName:%{public}s", bundleName.c_str());
 }
 
 sptr<OHOS::AppExecFwk::IAppMgr> FormAbilityConnectionReporter::GetAppMgr()
@@ -107,7 +107,7 @@ sptr<OHOS::AppExecFwk::IAppMgr> FormAbilityConnectionReporter::GetAppMgr()
             HILOG_ERROR(" Fail to connect app mgr service.");
             return nullptr;
         }
-        HILOG_INFO("Connect app mgr service sucess.");
+        HILOG_INFO("Connect AMS sucess.");
         appManager_ = iface_cast<OHOS::AppExecFwk::IAppMgr>(remoteObject);
     }
     return appManager_;
@@ -126,7 +126,7 @@ void FormAbilityConnectionReporter::AddFormAbilityConnectProcessInfo(const std::
         if ((*iter).processName_ != targetProceName) {
             continue;
         }
-        HILOG_INFO("Get running process: %{public}s, pid: %{public}" PRId32 ".", targetProceName.c_str(),
+        HILOG_INFO("Get running process:%{public}s, pid:%{public}" PRId32, targetProceName.c_str(),
             (*iter).pid_);
         FormConnectionInfo connectionInfo;
         connectionInfo.pid_ = (*iter).pid_;

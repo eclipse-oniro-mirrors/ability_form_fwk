@@ -27,7 +27,7 @@ const int32_t UNTRUST_THRESHOLD = 3;
 
 FormTrustMgr::FormTrustMgr()
 {
-    HILOG_INFO("FormTrustMgr is created");
+    HILOG_INFO("create");
     FormRdbTableConfig formRdbTableConfig;
     formRdbTableConfig.tableName = UNTRUST_LIST;
     formRdbTableConfig.createTableSql = "CREATE TABLE IF NOT EXISTS " +
@@ -39,7 +39,7 @@ FormTrustMgr::FormTrustMgr()
 
 FormTrustMgr::~FormTrustMgr()
 {
-    HILOG_INFO("FormTrustMgr is deleted");
+    HILOG_INFO("delete");
 }
 
 bool FormTrustMgr::IsTrust(const std::string &bundleName)

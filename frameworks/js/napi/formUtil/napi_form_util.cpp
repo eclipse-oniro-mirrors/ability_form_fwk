@@ -386,7 +386,7 @@ napi_value RetErrMsgForCallback(AsyncErrMsgCallbackInfo* asyncCallbackInfo)
         [](napi_env env, void *data) {},
         [](napi_env env, napi_status status, void *data) {
             AsyncErrMsgCallbackInfo *asyncCallbackInfo = (AsyncErrMsgCallbackInfo *)data;
-            HILOG_INFO("napi_create_async_work complete");
+            HILOG_INFO("complete");
             if (asyncCallbackInfo->callback != nullptr) {
                 napi_value callback;
                 napi_value undefined;
@@ -704,7 +704,7 @@ bool ConvertFormInfoFilter(napi_env env, napi_value value, AppExecFwk::FormInfoF
         HILOG_ERROR("%{public}s called, convert nativeDataValue failed.", __func__);
         return false;
     }
-    HILOG_INFO("%{public}s called, module name is %{public}s.", __func__, formInfoFilter.moduleName.c_str());
+    HILOG_INFO("module:%{public}s.", formInfoFilter.moduleName.c_str());
 
     return true;
 }

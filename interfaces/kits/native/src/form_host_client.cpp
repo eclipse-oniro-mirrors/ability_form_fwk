@@ -64,7 +64,7 @@ sptr<FormHostClient> FormHostClient::GetInstance()
 void FormHostClient::AddForm(std::shared_ptr<FormCallbackInterface> formCallback, const FormJsInfo &formJsInfo)
 {
     auto formId = formJsInfo.formId;
-    HILOG_INFO("%{public}s called, formId: %{public}" PRId64 ".", __func__, formId);
+    HILOG_INFO("formId:%{public}" PRId64, formId);
     if (formId <= 0 || formCallback == nullptr) {
         HILOG_ERROR("%{public}s error, invalid formId or formCallback.", __func__);
         return;
@@ -93,7 +93,7 @@ void FormHostClient::AddForm(std::shared_ptr<FormCallbackInterface> formCallback
  */
 void FormHostClient::RemoveForm(std::shared_ptr<FormCallbackInterface> formCallback, const int64_t formId)
 {
-    HILOG_INFO("%{public}s called, formId: %{public}" PRId64 ".", __func__, formId);
+    HILOG_INFO("formId:%{public}" PRId64, formId);
     if (formId <= 0 || formCallback == nullptr) {
         HILOG_ERROR("%{public}s, invalid formId or formCallback.", __func__);
         return;
@@ -106,7 +106,7 @@ void FormHostClient::RemoveForm(std::shared_ptr<FormCallbackInterface> formCallb
     }
     iter->second.erase(formCallback);
     if (iter->second.empty()) {
-        HILOG_INFO("All callbacks have been removed, remove formId");
+        HILOG_INFO("All callbacks have been removed");
         formCallbackMap_.erase(iter);
         etsFormIds_.erase(formId);
     }
@@ -120,7 +120,7 @@ void FormHostClient::RemoveForm(std::shared_ptr<FormCallbackInterface> formCallb
  */
 bool FormHostClient::ContainsForm(int64_t formId)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("call");
     std::lock_guard<std::mutex> lock(callbackMutex_);
     return formCallbackMap_.find(formId) != formCallbackMap_.end();
 }
@@ -135,7 +135,7 @@ bool FormHostClient::ContainsForm(int64_t formId)
 bool FormHostClient::AddFormState(const std::shared_ptr<FormStateCallbackInterface> &formStateCallback,
                                   const AAFwk::Want &want)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("call");
     std::string bundleName = want.GetElement().GetBundleName();
     std::string abilityName = want.GetElement().GetAbilityName();
     const std::string doubleColon = "::";
@@ -153,13 +153,13 @@ bool FormHostClient::AddFormState(const std::shared_ptr<FormStateCallbackInterfa
     } else {
         iter->second.insert(formStateCallback);
     }
-    HILOG_INFO("%{public}s done.", __func__);
+    HILOG_INFO("done");
     return true;
 }
 
 void FormHostClient::RemoveFormState(const AAFwk::Want &want)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("call");
     std::string bundleName = want.GetElement().GetBundleName();
     std::string abilityName = want.GetElement().GetAbilityName();
     const std::string doubleColon = "::";
@@ -173,7 +173,7 @@ void FormHostClient::RemoveFormState(const AAFwk::Want &want)
     if (iter != formStateCallbackMap_.end()) {
         formStateCallbackMap_.erase(key);
     }
-    HILOG_INFO("%{public}s end.", __func__);
+    HILOG_INFO("end");
 }
 
 bool FormHostClient::RegisterUninstallCallback(UninstallCallback callback)
@@ -216,7 +216,7 @@ void FormHostClient::OnUpdate(const FormJsInfo &formJsInfo)
 void FormHostClient::OnUninstall(const std::vector<int64_t> &formIds)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("call");
     if (formIds.empty()) {
         HILOG_ERROR("%{public}s error, formIds is empty.", __func__);
         return;
@@ -253,7 +253,7 @@ void FormHostClient::OnUninstall(const std::vector<int64_t> &formIds)
 void FormHostClient::OnAcquireState(FormState state, const AAFwk::Want &want)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    HILOG_INFO("%{public}s state:%{public}d.", __func__, state);
+    HILOG_INFO("state:%{public}d", state);
     std::string bundleName = want.GetElement().GetBundleName();
     std::string abilityName = want.GetElement().GetAbilityName();
     const std::string doubleColon = "::";
@@ -266,7 +266,7 @@ void FormHostClient::OnAcquireState(FormState state, const AAFwk::Want &want)
     std::lock_guard<std::mutex> lock(formStateCallbackMutex_);
     auto iter = formStateCallbackMap_.find(key);
     if (iter == formStateCallbackMap_.end()) {
-        HILOG_INFO("form state callback not found");
+        HILOG_INFO("state callback not found");
     } else {
         std::set<std::shared_ptr<FormStateCallbackInterface>> &callbackSet = iter->second;
         for (auto &callback: callbackSet) {
@@ -274,7 +274,7 @@ void FormHostClient::OnAcquireState(FormState state, const AAFwk::Want &want)
         }
         formStateCallbackMap_.erase(iter);
     }
-    HILOG_INFO("%{public}s done", __func__);
+    HILOG_INFO("done");
 }
 
 bool FormHostClient::AddShareFormCallback(const std::shared_ptr<ShareFormCallBack> &shareFormCallback,
@@ -375,7 +375,7 @@ void FormHostClient::RemoveShareFormCallback(int64_t requestCode)
     if (iter != shareFormCallbackMap_.end()) {
         shareFormCallbackMap_.erase(requestCode);
     }
-    HILOG_INFO("%{public}s end.", __func__);
+    HILOG_INFO("end");
 }
 
 void FormHostClient::RemoveAcquireDataCallback(int64_t requestCode)
@@ -386,7 +386,7 @@ void FormHostClient::RemoveAcquireDataCallback(int64_t requestCode)
     if (iter != acquireDataCallbackMap_.end()) {
         acquireDataCallbackMap_.erase(requestCode);
     }
-    HILOG_INFO("RemoveAcquireDataCallback end.");
+    HILOG_INFO("end");
 }
 
 void FormHostClient::UpdateForm(const FormJsInfo &formJsInfo)
@@ -433,7 +433,7 @@ void FormHostClient::OnRecycleForm(const int64_t &formId)
 
 void FormHostClient::OnEnableForm(const std::vector<int64_t> &formIds, const bool enable)
 {
-    HILOG_INFO("FormHostClient::OnEnableForm, size = %{public}zu", formIds.size());
+    HILOG_INFO("size:%{public}zu", formIds.size());
     for (auto &formId : formIds) {
         if (formId < 0) {
             HILOG_ERROR("the passed form id can't be negative.");

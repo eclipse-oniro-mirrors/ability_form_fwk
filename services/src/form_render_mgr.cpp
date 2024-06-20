@@ -69,11 +69,11 @@ bool FormRenderMgr::GetIsVerified() const
 ErrCode FormRenderMgr::RenderForm(
     const FormRecord &formRecord, const WantParams &wantParams, const sptr<IRemoteObject> &hostToken)
 {
-    HILOG_INFO("RenderForm formId: %{public}" PRId64 "", formRecord.formId);
+    HILOG_INFO("formId:%{public}" PRId64, formRecord.formId);
     std::once_flag flag;
     std::function<void()> func = std::bind(&FormRenderMgr::GetFormRenderState, this);
     std::call_once(flag, func);
-    HILOG_INFO("The authentication status of the current user is : %{public}d", isVerified_);
+    HILOG_INFO("the current user authentication status:%{public}d", isVerified_);
     if (formRecord.uiSyntax != FormType::ETS) {
         return ERR_OK;
     }
@@ -102,7 +102,7 @@ ErrCode FormRenderMgr::RenderForm(
 ErrCode FormRenderMgr::UpdateRenderingForm(int64_t formId, const FormProviderData &formProviderData,
     const WantParams &wantParams, bool mergeData)
 {
-    HILOG_INFO("UpdateRenderingForm with formId: %{public}" PRId64 "", formId);
+    HILOG_INFO("formId:%{public}" PRId64, formId);
     FormRecord formRecord;
     bool isGetFormRecord = FormDataMgr::GetInstance().GetFormRecord(formId, formRecord);
     if (!isGetFormRecord) {
@@ -170,7 +170,8 @@ void FormRenderMgr::AddAcquireProviderFormInfoTask(std::function<void()> task)
 
 void FormRenderMgr::ExecAcquireProviderTask()
 {
-    HILOG_INFO("start to execute asynchronous tasks in the queue.");
+    HILOG_INFO("start");
+    // start to execute asynchronous tasks in the queue
     std::lock_guard<std::mutex> lock(taskQueueMutex_);
     while (!taskQueue_.empty()) {
         auto task = taskQueue_.front();
@@ -216,7 +217,7 @@ ErrCode FormRenderMgr::RenderFormCallback(int64_t formId, const Want &want)
 
 ErrCode FormRenderMgr::StopRenderingFormCallback(int64_t formId, const Want &want)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("call");
     if (renderInner_ != nullptr) {
         renderInner_->StopRenderingFormCallback(formId, want);
     }
@@ -245,7 +246,7 @@ ErrCode FormRenderMgr::ReleaseRenderer(int64_t formId, const FormRecord &formRec
 ErrCode FormRenderMgr::AddConnection(
     int64_t formId, sptr<FormRenderConnection> connection, int32_t privacyLevel)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("call");
     if (privacyLevel > 0) {
         if (sandboxInner_ == nullptr) {
             return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -261,7 +262,7 @@ ErrCode FormRenderMgr::AddConnection(
 
 void FormRenderMgr::RemoveConnection(int64_t formId, int32_t privacyLevel)
 {
-    HILOG_INFO("Call.");
+    HILOG_INFO("Call");
     if (privacyLevel > 0) {
         if (sandboxInner_ == nullptr) {
             return;
@@ -302,7 +303,7 @@ void FormRenderMgr::AddRenderDeathRecipient(const sptr<IRemoteObject> &remoteObj
 
 void FormRenderMgr::OnRenderingBlock(const std::string &bundleName)
 {
-    HILOG_INFO("OnRenderingBlock called, bundleName: %{public}s.", bundleName.c_str());
+    HILOG_INFO("bundleName:%{public}s", bundleName.c_str());
     FormEventInfo eventInfo;
     eventInfo.bundleName = bundleName;
     FormEventReport::SendSecondFormEvent(

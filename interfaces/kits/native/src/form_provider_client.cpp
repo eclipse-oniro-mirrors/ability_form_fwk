@@ -51,7 +51,7 @@ int FormProviderClient::AcquireProviderFormInfo(
         return HandleAcquire(formProviderInfo, newWant, callerToken);
     }
 
-    HILOG_INFO("Ability name is %{public}s.", ownerAbility->GetAbilityName().c_str());
+    HILOG_INFO("AbilityName:%{public}s.", ownerAbility->GetAbilityName().c_str());
 
     if (!CheckIsSystemApp()) {
         HILOG_WARN("Permission denied.");
@@ -112,7 +112,7 @@ int FormProviderClient::NotifyFormDelete(const int64_t formId, const Want &want,
             break;
         }
 
-        HILOG_INFO("Ability name is %{public}s.", ownerAbility->GetAbilityName().c_str());
+        HILOG_INFO("AbilityName:%{public}s.", ownerAbility->GetAbilityName().c_str());
         ownerAbility->OnDelete(formId);
     } while (false);
 
@@ -141,7 +141,7 @@ int FormProviderClient::NotifyFormsDelete(
             break;
         }
 
-        HILOG_INFO("formIds size = %{public}zu, abilityName is %{public}s.", formIds.size(),
+        HILOG_INFO("formIdsSize:%{public}zu, abilityName:%{public}s.", formIds.size(),
             ownerAbility->GetAbilityName().c_str());
         for (int64_t formId : formIds) {
             ownerAbility->OnDelete(formId);
@@ -174,7 +174,7 @@ int FormProviderClient::NotifyFormUpdate(
             break;
         }
 
-        HILOG_INFO("Ability name is %{public}s.", ownerAbility->GetAbilityName().c_str());
+        HILOG_INFO("AbilityName:%{public}s.", ownerAbility->GetAbilityName().c_str());
         ownerAbility->OnUpdate(formId, want.GetParams());
     } while (false);
 
@@ -213,7 +213,7 @@ int FormProviderClient::EventNotify(
             formEventsMap.insert(std::make_pair(formId, formVisibleType));
         }
 
-        HILOG_INFO("Ability name is %{public}s.", ownerAbility->GetAbilityName().c_str());
+        HILOG_INFO("AbilityName:%{public}s.", ownerAbility->GetAbilityName().c_str());
         ownerAbility->OnVisibilityChanged(formEventsMap);
     } while (false);
 
@@ -243,7 +243,7 @@ int FormProviderClient::NotifyFormCastTempForm(
             break;
         }
 
-        HILOG_INFO("Ability name is %{public}s.", ownerAbility->GetAbilityName().c_str());
+        HILOG_INFO("AbilityName:%{public}s.", ownerAbility->GetAbilityName().c_str());
         ownerAbility->OnCastTemptoNormal(formId);
     } while (false);
 
@@ -274,7 +274,7 @@ int FormProviderClient::FireFormEvent(
             break;
         }
 
-        HILOG_INFO("Ability name is %{public}s.", ownerAbility->GetAbilityName().c_str());
+        HILOG_INFO("AbilityName:%{public}s.", ownerAbility->GetAbilityName().c_str());
         ownerAbility->OnTriggerEvent(formId, message);
     } while (false);
 
@@ -306,7 +306,7 @@ int FormProviderClient::AcquireState(const Want &wantArg, const std::string &pro
             break;
         }
 
-        HILOG_INFO("Ability name is %{public}s.", ownerAbility->GetAbilityName().c_str());
+        HILOG_INFO("AbilityName:%{public}s.", ownerAbility->GetAbilityName().c_str());
         state = ownerAbility->OnAcquireFormState(wantArg);
     } while (false);
 
@@ -369,7 +369,7 @@ int FormProviderClient::HandleAcquire(
     const Want &newWant,
     const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("Image state is %{public}d.", formProviderInfo.GetFormData().GetImageDataState());
+    HILOG_INFO("ImageState:%{public}d.", formProviderInfo.GetFormData().GetImageDataState());
     sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
     if (formSupplyClient == nullptr) {
         HILOG_ERROR("IFormSupply is nullptr.");
@@ -393,7 +393,7 @@ int FormProviderClient::DCRtnHelper(const int &errCode, const Want &want, const 
 
 int  FormProviderClient::HandleDisconnect(const Want &want, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("ConnectId: %{public}d.", want.GetIntParam(Constants::FORM_CONNECT_ID, 0L));
+    HILOG_INFO("ConnectId:%{public}d", want.GetIntParam(Constants::FORM_CONNECT_ID, 0L));
     sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
     if (formSupplyClient == nullptr) {
         HILOG_ERROR("IFormSupply is nullptr.");
@@ -407,7 +407,7 @@ int  FormProviderClient::HandleDisconnect(const Want &want, const sptr<IRemoteOb
 int FormProviderClient::HandleAcquireStateResult(FormState state, const std::string &provider, const Want &wantArg,
                                                  const Want &want, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("Form state is %{public}d", state);
+    HILOG_INFO("FormState:%{public}d", state);
     sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
     if (formSupplyClient == nullptr) {
         HILOG_ERROR("IFormSupply is nullptr.");
@@ -433,7 +433,7 @@ int32_t FormProviderClient::AcquireShareFormData(int64_t formId, const std::stri
         return ERR_APPEXECFWK_FORM_NO_SUCH_ABILITY;
     }
 
-    HILOG_INFO("Ability name is %{public}s.", ownerAbility->GetAbilityName().c_str());
+    HILOG_INFO("AbilityName:%{public}s.", ownerAbility->GetAbilityName().c_str());
     if (!CheckIsSystemApp()) {
         HILOG_WARN("Permission denied.");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;

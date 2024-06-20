@@ -162,7 +162,7 @@ void FormHostRecord::OnAcquire(int64_t id, const FormRecord &record)
  */
 void FormHostRecord::OnUpdate(int64_t id, const FormRecord &record)
 {
-    HILOG_INFO("%{public}s start.", __func__);
+    HILOG_INFO("start");
     if (formHostCallback_ == nullptr) {
         HILOG_ERROR("%{public}s: formHostCallback_ can not be null.", __func__);
         return;
@@ -176,7 +176,7 @@ void FormHostRecord::OnUpdate(int64_t id, const FormRecord &record)
  */
 void FormHostRecord::OnFormUninstalled(std::vector<int64_t> &formIds)
 {
-    HILOG_INFO("%{public}s start.", __func__);
+    HILOG_INFO("start");
     if (formHostCallback_ == nullptr) {
         HILOG_ERROR("%{public}s: formHostCallback_ can not be null.", __func__);
         return;
@@ -192,7 +192,7 @@ void FormHostRecord::OnFormUninstalled(std::vector<int64_t> &formIds)
  */
 void FormHostRecord::OnAcquireState(AppExecFwk::FormState state, const AAFwk::Want &want)
 {
-    HILOG_INFO("%{public}s start.", __func__);
+    HILOG_INFO("start");
     if (formHostCallback_ == nullptr) {
         HILOG_ERROR("%{public}s: formHostCallback_ can not be null.", __func__);
         return;
@@ -202,7 +202,7 @@ void FormHostRecord::OnAcquireState(AppExecFwk::FormState state, const AAFwk::Wa
 
 void FormHostRecord::OnAcquireFormData(const AAFwk::WantParams &wantParams, int64_t requestCode)
 {
-    HILOG_INFO("start.");
+    HILOG_INFO("start");
     if (formHostCallback_ == nullptr) {
         HILOG_ERROR("formHostCallback_ can not be null.");
         return;

@@ -40,7 +40,7 @@ FormAcquireStateConnection::FormAcquireStateConnection(const std::string &bundle
 void FormAcquireStateConnection::OnAbilityConnectDone(
     const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("call");
     if (resultCode != ERR_OK) {
         HILOG_ERROR("%{public}s, abilityName:%{public}s, resultCode:%{public}d",
             __func__, element.GetAbilityName().c_str(), resultCode);

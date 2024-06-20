@@ -45,7 +45,7 @@ void FormHostCallback::OnAcquired(const int64_t formId, const FormRecord& record
 */
 void FormHostCallback::OnUpdate(const int64_t formId, const FormRecord &record, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("%{public}s start.", __func__);
+    HILOG_INFO("start");
 
     // check formId
     if (formId < 0) {
@@ -135,7 +135,7 @@ void FormHostCallback::OnRecycleForms(
 void FormHostCallback::OnEnableForms(
     const std::vector<int64_t> &formIds, const bool enable, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("start. size = %{public}zu, enable = %{public}d", formIds.size(), enable);
+    HILOG_INFO("size:%{public}zu, enable:%{public}d", formIds.size(), enable);
     if (formIds.empty()) {
         HILOG_ERROR("formIds is empty.");
         return;

@@ -49,7 +49,7 @@ class PermissionCustomizeListener : public Security::AccessToken::PermStateChang
 
         virtual void PermStateChangeCallback(Security::AccessToken::PermStateChangeInfo& result)
         {
-            HILOG_INFO("PermStateChangeCallback type = %{public}d, permissionName = %{public}s",
+            HILOG_INFO("PermStateChangeCallback type:%{public}d, permissionName:%{public}s",
                 result.permStateChangeType, result.permissionName.c_str());
             formDataProxyRecord_->PermStateChangeCallback(result.permStateChangeType, result.permissionName);
         }
@@ -166,7 +166,7 @@ void FormDataProxyRecord::RegisterPermissionListener(const std::vector<FormDataP
     callbackPtr_ = std::make_shared<PermissionCustomizeListener>(scopeInfo, this);
     int32_t accessTokenKit = Security::AccessToken::AccessTokenKit::RegisterPermStateChangeCallback(callbackPtr_);
     IPCSkeleton::SetCallingIdentity(callingIdentity);
-    HILOG_INFO("RegisterPermissionListener formId = %{public}s", std::to_string(formId_).c_str());
+    HILOG_INFO("formId:%{public}s", std::to_string(formId_).c_str());
     if (accessTokenKit != 0) {
         formDataPermissionProxyMap_.clear();
     }
@@ -175,7 +175,7 @@ void FormDataProxyRecord::RegisterPermissionListener(const std::vector<FormDataP
 
 void FormDataProxyRecord::OnRdbDataChange(const DataShare::RdbChangeNode &changeNode)
 {
-    HILOG_INFO("on rdb data change. data size is %{public}zu", changeNode.data_.size());
+    HILOG_INFO("rdb change. data size is %{public}zu", changeNode.data_.size());
     if (changeNode.data_.size() == 0) {
         return;
     }
@@ -192,7 +192,7 @@ FormDataProxyRecord::FormDataProxyRecord(int64_t formId, const std::string &bund
     uint32_t tokenId, int32_t uid) : formId_(formId), bundleName_(bundleName), uiSyntax_(uiSyntax),
     tokenId_(tokenId), uid_(uid)
 {
-    HILOG_INFO("create FormDataProxyRecord formId: %{public}s, bundleName: %{public}s",
+    HILOG_INFO("create formId:%{public}s, bundleName:%{public}s",
         std::to_string(formId).c_str(), bundleName.c_str());
     std::string uri = "datashareproxy://" + bundleName;
     DataShare::CreateOptions options;
@@ -202,7 +202,7 @@ FormDataProxyRecord::FormDataProxyRecord(int64_t formId, const std::string &bund
 
 FormDataProxyRecord::~FormDataProxyRecord()
 {
-    HILOG_INFO("destroy FormDataProxyRecod formId: %{public}s, bundleName: %{public}s",
+    HILOG_INFO("destroy formId:%{public}s, bundleName:%{public}s",
         std::to_string(formId_).c_str(), bundleName_.c_str());
     UnRegisterPermissionListener();
     if (dataShareHelper_ != nullptr) {
@@ -368,9 +368,9 @@ void FormDataProxyRecord::ParseFormDataProxies(const std::vector<FormDataProxy> 
 {
     std::vector<ProxyData> proxyData;
     FormBmsHelper::GetInstance().GetAllProxyDataInfos(FormUtil::GetCurrentAccountId(), proxyData);
-    HILOG_INFO("ParseFormDataProxies proxyData.size: %{public}zu", proxyData.size());
+    HILOG_INFO("size: %{public}zu", proxyData.size());
     for (size_t i = 0; i < proxyData.size(); ++i) {
-        HILOG_INFO("ParseFormDataProxies proxyData[%{public}zu].uri: %{public}s", i, proxyData[i].uri.c_str());
+        HILOG_INFO("proxyData[%{public}zu].uri: %{public}s", i, proxyData[i].uri.c_str());
     }
 
     std::unordered_set<std::string> expectedKeys;
@@ -402,7 +402,7 @@ void FormDataProxyRecord::ParseFormDataProxiesIntoSubscribeMapWithExpectedKeys(
         } else {
             it->second.emplace(subscribe);
         }
-        HILOG_INFO("parse subscribe record: key: %{public}s, subscribeId: %{public}s",
+        HILOG_INFO("parse subscribe, key:%{public}s, subscribeId:%{public}s",
             formDataProxy.key.c_str(), subscribe.c_str());
     }
 }
@@ -468,7 +468,7 @@ void FormDataProxyRecord::UpdatePublishedDataForm(const std::vector<DataShare::P
     }
     std::string formDataStr = object.empty() ? "" : object.dump();
     std::string subStr = formDataStr.substr(0, std::min((int)formDataStr.length(), 30));
-    HILOG_INFO("form[formId: %{public}s] will update published data. formDataStr[len: %{public}zu]: %{private}s, "
+    HILOG_INFO("[formId:%{public}s] update published data. formDataStr[len: %{public}zu]: %{private}s, "
         "formDataKeysStr: %{public}s, imageDataMap size: %{public}zu.", std::to_string(formId_).c_str(),
         formDataStr.length(), subStr.c_str(), formDataKeysStr.c_str(), imageDataMap.size());
 
@@ -504,7 +504,7 @@ void FormDataProxyRecord::UpdateRdbDataForm(const std::vector<std::string> &data
 
     std::string formDataStr = object.empty() ? "" : object.dump();
     std::string subStr = formDataStr.substr(0, std::min((int)formDataStr.size(), 30));
-    HILOG_INFO("form[formId: %{public}s] will update rdb data. formDataStr[len: %{public}zu]: %{private}s.",
+    HILOG_INFO("[formId:%{public}s] update rdb data. formDataStr[len: %{public}zu]: %{private}s.",
         std::to_string(formId_).c_str(), formDataStr.length(), subStr.c_str());
 
     FormProviderData formProviderData;
@@ -517,7 +517,7 @@ void FormDataProxyRecord::UpdateRdbDataForm(const std::vector<std::string> &data
 
 void FormDataProxyRecord::UpdateSubscribeFormData(const std::vector<FormDataProxy> &formDataProxies)
 {
-    HILOG_INFO("UpdateSubscribeFormData");
+    HILOG_INFO("call");
     SubscribeMap originRdbMap;
     SubscribeMap newRdbMap;
     SubscribeMap originPublishMap;
@@ -569,7 +569,7 @@ void FormDataProxyRecord::DisableSubscribeFormData()
 
 void FormDataProxyRecord::RetryFailureSubscribes()
 {
-    HILOG_INFO("retry subscribe form, formId: %{public}s", std::to_string(formId_).c_str());
+    HILOG_INFO("formId:%{public}s", std::to_string(formId_).c_str());
     if (dataShareHelper_ == nullptr) {
         HILOG_ERROR("dataShareHelper is nullptr.");
         return;
@@ -791,7 +791,7 @@ void FormDataProxyRecord::RetryFailureRdbSubscribes(SubscribeResultRecord &recor
             HILOG_ERROR("retry subscribe rdb data failed, uri: %{public}s, subscriberId: %{public}s, "
                 "errCode: %{public}d", iter.key_.c_str(), std::to_string(record.subscribeId).c_str(), iter.errCode_);
         } else {
-            HILOG_INFO("retry subscribe rdb data success, uri: %{public}s, subscriberId: %{public}s",
+            HILOG_INFO("success, uri:%{public}s, subscriberId:%{public}s",
                 iter.key_.c_str(), std::to_string(record.subscribeId).c_str());
         }
         record.retryRet = iter.errCode_;
@@ -823,7 +823,7 @@ void FormDataProxyRecord::RetryFailurePublishedSubscribes(SubscribeResultRecord 
             HILOG_ERROR("retry subscribe published data failed, uri: %{public}s, subscriberId: %{public}s, "
                 "errCode: %{public}d", iter.key_.c_str(), std::to_string(record.subscribeId).c_str(), iter.errCode_);
         } else {
-            HILOG_INFO("retry subscribe published data success, uri: %{public}s, subscriberId: %{public}s",
+            HILOG_INFO("success, uri:%{public}s, subscriberId:%{public}s",
                 iter.key_.c_str(), std::to_string(record.subscribeId).c_str());
         }
         record.retryRet = iter.errCode_;

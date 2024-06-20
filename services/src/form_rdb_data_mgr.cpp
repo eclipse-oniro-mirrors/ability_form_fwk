@@ -84,17 +84,17 @@ int32_t RdbStoreDataCallBackFormInfoStorage::onCorruption(std::string databaseFi
 
 FormRdbDataMgr::FormRdbDataMgr()
 {
-    HILOG_INFO("Create form rdb data manager");
+    HILOG_INFO("Create");
 }
 
 FormRdbDataMgr::~FormRdbDataMgr()
 {
-    HILOG_INFO("Destruct form rdb data manager");
+    HILOG_INFO("Destruct");
 }
 
 ErrCode FormRdbDataMgr::InitFormRdbTable(const FormRdbTableConfig &formRdbTableConfig)
 {
-    HILOG_INFO("Init form rdb table.");
+    HILOG_INFO("Init");
     if (formRdbTableConfig.tableName.empty()) {
         HILOG_ERROR("Form rdb table name is empty.");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -609,7 +609,7 @@ bool FormRdbDataMgr::IsFormRdbLoaded()
 ErrCode FormRdbDataMgr::CheckAndRebuildRdbStore(int32_t rdbOperateRet)
 {
     if (rdbOperateRet != NativeRdb::E_SQLITE_CORRUPT) {
-        HILOG_INFO("Rdb not corrupt, other error occur, error code is %{public}" PRId32 ".", rdbOperateRet);
+        HILOG_INFO("errorCode:%{public}" PRId32, rdbOperateRet);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 

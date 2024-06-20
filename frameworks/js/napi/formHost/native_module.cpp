@@ -74,7 +74,7 @@ static napi_value NapiFormHostInit(napi_env env, napi_value exports)
  */
 static napi_value Init(napi_env env, napi_value exports)
 {
-    HILOG_INFO("napi_module Init start...");
+    HILOG_INFO("Init start");
     napi_property_descriptor properties[] = {
         DECLARE_NAPI_FUNCTION("acquireFormState", NAPI_AcquireFormState),
         DECLARE_NAPI_FUNCTION("on", NAPI_RegisterFormUninstallObserver),
@@ -83,7 +83,7 @@ static napi_value Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("notifyFormsEnableUpdate", NAPI_NotifyFormsEnableUpdate),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(properties) / sizeof(properties[0]), properties));
-    HILOG_INFO("napi_module Init end...");
+    HILOG_INFO("Init end");
 
     return NapiFormHostInit(env, exports);
 }

@@ -82,7 +82,7 @@ bool ConvertFormInfoFilterThrow(napi_env env, napi_value jsValue, AppExecFwk::Fo
         return false;
     }
 
-    HILOG_INFO("module name is %{public}s.", formInfoFilter.moduleName.c_str());
+    HILOG_INFO("module:%{public}s.", formInfoFilter.moduleName.c_str());
 
     return true;
 }
@@ -126,7 +126,7 @@ static std::string GetStringByProp(napi_env env, napi_value value, const std::st
 
 void JsFormProvider::Finalizer(napi_env env, void *data, void *hint)
 {
-    HILOG_INFO("JsFormProvider::Finalizer is called");
+    HILOG_INFO("Finalizer is called");
     std::unique_ptr<JsFormProvider>(static_cast<JsFormProvider *>(data));
 }
 
@@ -517,7 +517,7 @@ bool JsFormProvider::ConvertFormDataProxy(napi_env env, napi_value value,
         HILOG_WARN("Parse subscribeId failed, use empty as default value.");
         formDataProxy.subscribeId = "";
     }
-    HILOG_INFO("key is %{public}s, subscribeId is %{public}s", formDataProxy.key.c_str(),
+    HILOG_INFO("key:%{public}s, subscribeId:%{public}s", formDataProxy.key.c_str(),
         formDataProxy.subscribeId.c_str());
     return true;
 }

@@ -142,7 +142,7 @@ napi_value ParseFormStateInfo(napi_env env, FormStateInfo &stateInfo)
 
 void AcquireFormStateCallbackComplete(uv_work_t *work, int32_t status)
 {
-    HILOG_INFO("%{public}s, onAcquireFormState back", __func__);
+    HILOG_INFO("call");
     if (work == nullptr) {
         HILOG_ERROR("work == nullptr.");
         return;
@@ -173,12 +173,12 @@ void AcquireFormStateCallbackComplete(uv_work_t *work, int32_t status)
     asyncCallbackInfo = nullptr;
     delete work;
     work = nullptr;
-    HILOG_INFO("%{public}s, onAcquireFormState back done", __func__);
+    HILOG_INFO("end");
 }
 
 void AcquireFormStatePromiseComplete(uv_work_t *work, int32_t status)
 {
-    HILOG_INFO("%{public}s, onAcquireFormState back", __func__);
+    HILOG_INFO("onAcquireFormState back");
     if (work == nullptr) {
         HILOG_ERROR("%{public}s, work == nullptr.", __func__);
         return;
@@ -204,7 +204,7 @@ void AcquireFormStatePromiseComplete(uv_work_t *work, int32_t status)
     asyncCallbackInfo = nullptr;
     delete work;
     work = nullptr;
-    HILOG_INFO("%{public}s, onAcquireFormState back done", __func__);
+    HILOG_INFO("onAcquireFormState done");
 }
 
 namespace {
@@ -302,7 +302,7 @@ public:
         napi_value myCallback = nullptr;
         napi_get_reference_value(env_, callbackRef_, &myCallback);
         napi_strict_equals(env_, myCallback, callback, &isEqual);
-        HILOG_INFO("isStrictEqual: %{public}d", isEqual);
+        HILOG_INFO("isStrictEqual:%{public}d", isEqual);
         return isEqual;
     }
 
@@ -354,7 +354,7 @@ bool DelFormUninstallCallback(napi_value callback)
     std::lock_guard<std::mutex> lock(formUninstallCallbackMapMutex_);
     for (auto iter = g_formUninstallCallbackMap.begin(); iter != g_formUninstallCallbackMap.end();) {
         if (iter->second->IsStrictEqual(callback)) {
-            HILOG_INFO("found equal callback");
+            HILOG_INFO("equal callback");
             iter = g_formUninstallCallbackMap.erase(iter);
             count++;
         } else {
@@ -387,7 +387,7 @@ static void InnerAcquireFormState(napi_env env, AsyncAcquireFormStateCallbackInf
 
 napi_value AcquireFormStateCallback(napi_env env, AsyncAcquireFormStateCallbackInfo *const asyncCallbackInfo)
 {
-    HILOG_INFO("%{public}s, asyncCallback.", __func__);
+    HILOG_INFO("asyncCallback.");
     napi_value resourceName;
     napi_create_string_latin1(env, __func__, NAPI_AUTO_LENGTH, &resourceName);
     napi_create_async_work(
@@ -395,12 +395,12 @@ napi_value AcquireFormStateCallback(napi_env env, AsyncAcquireFormStateCallbackI
         nullptr,
         resourceName,
         [](napi_env env, void *data) {
-            HILOG_INFO("%{public}s, napi_create_async_work running", __func__);
+            HILOG_INFO("napi_create_async_work running");
             auto *asyncCallbackInfo = (AsyncAcquireFormStateCallbackInfo *) data;
             InnerAcquireFormState(env, asyncCallbackInfo);
         },
         [](napi_env env, napi_status status, void *data) {
-            HILOG_INFO("%{public}s, napi_create_async_work complete", __func__);
+            HILOG_INFO("napi_create_async_work complete");
             auto *asyncCallbackInfo = (AsyncAcquireFormStateCallbackInfo *) data;
             // asyncCallbackInfo will be freed in OnAcquireState, so save the member variable asyncWork.
             napi_async_work asyncWork = asyncCallbackInfo->asyncWork;
@@ -419,7 +419,7 @@ napi_value AcquireFormStateCallback(napi_env env, AsyncAcquireFormStateCallbackI
 
 napi_value AcquireFormStatePromise(napi_env env, AsyncAcquireFormStateCallbackInfo *const asyncCallbackInfo)
 {
-    HILOG_INFO("%{public}s, promise.", __func__);
+    HILOG_INFO("promise.");
     napi_deferred deferred;
     napi_value promise;
     NAPI_CALL(env, napi_create_promise(env, &deferred, &promise));
@@ -432,12 +432,12 @@ napi_value AcquireFormStatePromise(napi_env env, AsyncAcquireFormStateCallbackIn
         nullptr,
         resourceName,
         [](napi_env env, void *data) {
-            HILOG_INFO("%{public}s, promise runnning", __func__);
+            HILOG_INFO("runnning");
             auto *asyncCallbackInfo = (AsyncAcquireFormStateCallbackInfo *) data;
             InnerAcquireFormState(env, asyncCallbackInfo);
         },
         [](napi_env env, napi_status status, void *data) {
-            HILOG_INFO("%{public}s, promise complete", __func__);
+            HILOG_INFO("complete");
             auto *asyncCallbackInfo = (AsyncAcquireFormStateCallbackInfo *) data;
             // asyncCallbackInfo will be freed in OnAcquireState, so save the member variable asyncWork.
             napi_async_work asyncWork = asyncCallbackInfo->asyncWork;
@@ -464,7 +464,7 @@ napi_value AcquireFormStatePromise(napi_env env, AsyncAcquireFormStateCallbackIn
  */
 napi_value NAPI_AcquireFormState(napi_env env, napi_callback_info info)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("call");
 
     // Check the number of the arguments
     size_t argc = ARGS_SIZE_TWO;
@@ -474,7 +474,7 @@ napi_value NAPI_AcquireFormState(napi_env env, napi_callback_info info)
         HILOG_ERROR("%{public}s, wrong number of arguments.", __func__);
         return nullptr;
     }
-    HILOG_INFO("%{public}s, argc = [%{public}zu]", __func__, argc);
+    HILOG_INFO("argc:[%{public}zu]", argc);
 
     int32_t callbackType = (argc == ARGS_SIZE_TWO) ? CALLBACK_FLG : PROMISE_FLG;
     napi_valuetype valueType = napi_undefined;
@@ -531,7 +531,7 @@ napi_value NAPI_AcquireFormState(napi_env env, napi_callback_info info)
  */
 napi_value NAPI_RegisterFormUninstallObserver(napi_env env, napi_callback_info info)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("call");
 
     // Check the number of the arguments
     size_t argc = ARGS_SIZE_TWO;
@@ -541,7 +541,7 @@ napi_value NAPI_RegisterFormUninstallObserver(napi_env env, napi_callback_info i
         HILOG_ERROR("%{public}s, wrong number of arguments.", __func__);
         return nullptr;
     }
-    HILOG_INFO("%{public}s, argc = [%{public}zu]", __func__, argc);
+    HILOG_INFO("argc:[%{public}zu]", argc);
 
     napi_valuetype valueType = napi_undefined;
     NAPI_CALL(env, napi_typeof(env, argv[0], &valueType));
@@ -582,7 +582,7 @@ napi_value NAPI_RegisterFormUninstallObserver(napi_env env, napi_callback_info i
  */
 napi_value NAPI_UnregisterFormUninstallObserver(napi_env env, napi_callback_info info)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("call");
 
     // Check the number of the arguments
     size_t argc = ARGS_SIZE_TWO;
@@ -592,7 +592,7 @@ napi_value NAPI_UnregisterFormUninstallObserver(napi_env env, napi_callback_info
         HILOG_ERROR("%{public}s, wrong number of arguments.", __func__);
         return nullptr;
     }
-    HILOG_INFO("%{public}s, argc = [%{public}zu]", __func__, argc);
+    HILOG_INFO("argc:[%{public}zu]", argc);
 
     napi_valuetype valueType = napi_undefined;
     NAPI_CALL(env, napi_typeof(env, argv[0], &valueType));
@@ -637,7 +637,7 @@ static void InnerNotifyFormsVisible(napi_env env, AsyncNotifyFormsVisibleCallbac
 
 napi_value NotifyFormsVisibleCallback(napi_env env, AsyncNotifyFormsVisibleCallbackInfo *const asyncCallbackInfo)
 {
-    HILOG_INFO("NotifyFormsVisibleCallback start");
+    HILOG_INFO("start");
     napi_value resourceName;
     napi_create_string_latin1(env, __func__, NAPI_AUTO_LENGTH, &resourceName);
     napi_create_async_work(
@@ -645,12 +645,12 @@ napi_value NotifyFormsVisibleCallback(napi_env env, AsyncNotifyFormsVisibleCallb
         nullptr,
         resourceName,
         [](napi_env env, void *data) {
-            HILOG_INFO("%{public}s, napi_create_async_work running", __func__);
+            HILOG_INFO("running");
             auto *asyncCallbackInfo = (AsyncNotifyFormsVisibleCallbackInfo *) data;
             InnerNotifyFormsVisible(env, asyncCallbackInfo);
         },
         [](napi_env env, napi_status status, void *data) {
-            HILOG_INFO("%{public}s, napi_create_async_work complete", __func__);
+            HILOG_INFO("complete");
             auto *asyncCallbackInfo = (AsyncNotifyFormsVisibleCallbackInfo *) data;
 
             if (asyncCallbackInfo->callback != nullptr) {
@@ -687,12 +687,12 @@ napi_value NotifyFormsVisiblePromise(napi_env env, AsyncNotifyFormsVisibleCallba
         nullptr,
         resourceName,
         [](napi_env env, void *data) {
-            HILOG_INFO("%{public}s, promise runnning", __func__);
+            HILOG_INFO("promise runnning");
             auto *asyncCallbackInfo = (AsyncNotifyFormsVisibleCallbackInfo *) data;
             InnerNotifyFormsVisible(env, asyncCallbackInfo);
         },
         [](napi_env env, napi_status status, void *data) {
-            HILOG_INFO("%{public}s, promise complete", __func__);
+            HILOG_INFO("promise complete");
             auto *asyncCallbackInfo = (AsyncNotifyFormsVisibleCallbackInfo *) data;
             napi_value result;
             InnerCreatePromiseRetMsg(env, asyncCallbackInfo->result, &result);
@@ -720,7 +720,7 @@ napi_value NotifyFormsVisiblePromise(napi_env env, AsyncNotifyFormsVisibleCallba
  */
 napi_value NAPI_NotifyFormsVisible(napi_env env, napi_callback_info info)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("call");
 
     // Check the number of the arguments
     size_t argc = ARGS_SIZE_THREE;
@@ -799,12 +799,12 @@ napi_value NotifyFormsEnableUpdateCallback(napi_env env,
         nullptr,
         resourceName,
         [](napi_env env, void *data) {
-            HILOG_INFO("%{public}s, napi_create_async_work running", __func__);
+            HILOG_INFO("running");
             auto *asyncCallbackInfo = (AsyncNotifyFormsEnableUpdateCallbackInfo *) data;
             InnerNotifyFormsEnableUpdate(env, asyncCallbackInfo);
         },
         [](napi_env env, napi_status status, void *data) {
-            HILOG_INFO("%{public}s, napi_create_async_work complete", __func__);
+            HILOG_INFO("complete");
             auto *asyncCallbackInfo = (AsyncNotifyFormsEnableUpdateCallbackInfo *) data;
 
             if (asyncCallbackInfo->callback != nullptr) {
@@ -842,12 +842,12 @@ napi_value NotifyFormsEnableUpdatePromise(napi_env env,
         nullptr,
         resourceName,
         [](napi_env env, void *data) {
-            HILOG_INFO("%{public}s, promise runnning", __func__);
+            HILOG_INFO("runnning");
             auto *asyncCallbackInfo = (AsyncNotifyFormsEnableUpdateCallbackInfo *) data;
             InnerNotifyFormsEnableUpdate(env, asyncCallbackInfo);
         },
         [](napi_env env, napi_status status, void *data) {
-            HILOG_INFO("%{public}s, promise complete", __func__);
+            HILOG_INFO("complete");
             auto *asyncCallbackInfo = (AsyncNotifyFormsEnableUpdateCallbackInfo *) data;
             napi_value result;
             InnerCreatePromiseRetMsg(env, asyncCallbackInfo->result, &result);
@@ -875,7 +875,7 @@ napi_value NotifyFormsEnableUpdatePromise(napi_env env,
  */
 napi_value NAPI_NotifyFormsEnableUpdate(napi_env env, napi_callback_info info)
 {
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("call");
 
     // Check the number of the arguments
     size_t argc = ARGS_SIZE_THREE;
@@ -1554,7 +1554,7 @@ void NapiFormHost::InnerShareForm(
     ErrCode ret = FormMgr::GetInstance().ShareForm(
         formId, remoteDeviceId, FormHostClient::GetInstance(), requestCode);
     if (ret != ERR_OK) {
-        HILOG_INFO("%{public}s, share form failed.", __func__);
+        HILOG_INFO("share form fail");
         auto retCode = QueryRetCode(ret);
         auto retMsg = QueryRetMsg(retCode);
         asyncTask->Reject(env, AbilityRuntime::CreateJsError(env, retCode, retMsg));
@@ -1569,7 +1569,7 @@ napi_value NapiFormHost::NotifyFormsPrivacyProtected(napi_env env, napi_callback
 
 napi_value NapiFormHost::OnNotifyFormsPrivacyProtected(napi_env env, size_t argc, napi_value* argv)
 {
-    HILOG_INFO("%{public}s is called", __func__);
+    HILOG_INFO("call");
     if (argc > ARGS_SIZE_THREE || argc < ARGS_SIZE_TWO) {
         HILOG_ERROR("%{public}s, wrong number of arguments.", __func__);
         return nullptr;

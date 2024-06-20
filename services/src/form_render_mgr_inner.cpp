@@ -85,7 +85,7 @@ ErrCode FormRenderMgrInner::RenderForm(
         if (renderRemoteObj_ == nullptr) {
             connection->UpdateWantParams(want.GetParams());
             ErrCode ret = ConnectRenderService(connection, formRecord.privacyLevel);
-            HILOG_INFO("renderRemoteObj is nullptr, render may exit, need reconnect, ret: %{public}d.", ret);
+            HILOG_INFO("renderRemoteObj is nullptr, need reconnect, ret:%{public}d.", ret);
             if (ret) {
                 FormRenderMgr::GetInstance().HandleConnectFailed(formRecord.formId, ret);
             }
@@ -186,8 +186,7 @@ ErrCode FormRenderMgrInner::UpdateRenderingForm(FormRecord &formRecord, const Fo
     }
     FormDataMgr::GetInstance().SetFormCacheInited(formRecord.formId, true);
     
-    HILOG_INFO("FormRenderMgrInner::UpdateRenderingForm, formRecord.enableForm = %{public}d",
-        formRecord.enableForm);
+    HILOG_INFO("enableForm:%{public}d", formRecord.enableForm);
     if (!formRecord.enableForm) {
         FormDataMgr::GetInstance().UpdateFormRecord(formRecord.formId, formRecord);
         FormDataMgr::GetInstance().SetUpdateDuringDisableForm(formRecord.formId, true);
@@ -506,7 +505,7 @@ void FormRenderMgrInner::DisconnectRenderService(const sptr<FormRenderConnection
 
 void FormRenderMgrInner::OnRenderingBlock(const std::string &bundleName)
 {
-    HILOG_INFO("OnRenderingBlock called, bundleName: %{public}s.", bundleName.c_str());
+    HILOG_INFO("bundleName:%{public}s.", bundleName.c_str());
     FormEventInfo eventInfo;
     eventInfo.bundleName = bundleName;
     FormEventReport::SendSecondFormEvent(
@@ -574,7 +573,7 @@ void FormRenderMgrInner::NotifyHostRenderServiceIsDead() const
     std::unordered_map<sptr<IRemoteObject>, std::unordered_set<int64_t>, RemoteObjHash> hostsForNotify;
     {
         std::lock_guard<std::mutex> lock(resourceMutex_);
-        HILOG_INFO("Notify hosts the render is dead, hosts.size: %{public}zu.", etsHosts_.size());
+        HILOG_INFO("Notify hosts the render is dead, hosts.size:%{public}zu.", etsHosts_.size());
         auto tmpMap(etsHosts_);
         hostsForNotify.swap(tmpMap);
     }

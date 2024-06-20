@@ -162,7 +162,7 @@ bool FormJsInfo::WriteImageData(Parcel &parcel) const
                 return false;
             }
             if (size > IMAGE_DATA_THRESHOLD) {
-                HILOG_INFO("%{public}s unexpected image number %{public}zu", __func__, size);
+                HILOG_INFO("unexpected image number %{public}zu", size);
                 break;
             }
             for (auto entry : sharedImageMap) {
@@ -196,7 +196,7 @@ void FormJsInfo::ReadImageData(Parcel &parcel)
     switch (imageDateState) {
         case FormProviderData::IMAGE_DATA_STATE_ADDED: {
             auto size = parcel.ReadInt32();
-            HILOG_INFO("%{public}s image numer is %{public}d",  __func__, size);
+            HILOG_INFO("image numer is %{public}d", size);
             if (size > IMAGE_DATA_THRESHOLD) {
                 HILOG_WARN("%{public}s unexpected image number %{public}d", __func__, size);
                 break;
