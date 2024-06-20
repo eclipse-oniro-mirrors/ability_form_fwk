@@ -1408,59 +1408,6 @@ void FormRenderRecord::HandleRecoverForm(const int64_t &formId,
         }
     }
 }
-
-int32_t FormRenderRecord::EnableFormRecord(const std::vector<FormJsInfo> &&formJsInfos,
-    const Want &want, const bool enable)
-{
-    HILOG_INFO("EnableFormRecord forms, enable = %{public}d", enable);
-    std::lock_guard<std::mutex> lock(eventHandlerMutex_);
-    if (eventHandler_ == nullptr) {
-        if (!CheckEventHandler(true, true)) {
-            HILOG_ERROR("eventHandler is nullptr");
-            return RELOAD_FORM_FAILED;
-        }
-    }
-
-    std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
-    auto task = [thisWeakPtr, ids = std::forward<decltype(formJsInfos)>(formJsInfos), want, enable]() {
-        HILOG_DEBUG("EnableFormRecord begin.");
-        auto renderRecord = thisWeakPtr.lock();
-        if (renderRecord == nullptr) {
-            HILOG_ERROR("renderRecord is nullptr.");
-            return;
-        }
-        renderRecord->HandleEnableFormRecord(std::move(ids), want, enable);
-    };
-    eventHandler_->PostTask(task, "EnableFormRecord");
-    return ERR_OK;
-}
-
-int32_t FormRenderRecord::HandleEnableFormRecord(const std::vector<FormJsInfo> &&formJsInfos,
-    const Want &want, const bool enable)
-{
-    HILOG_INFO("Enable record in js thread.");
-    MarkThreadAlive();
-    if (runtime_ == nullptr) {
-        HILOG_ERROR("runtime_ is null.");
-        return RELOAD_FORM_FAILED;
-    }
-
-    std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
-    for (auto form : formJsInfos) {
-        auto search = formRendererGroupMap_.find(form.formId);
-        if (search == formRendererGroupMap_.end()) {
-            HILOG_ERROR("HandleEnableFormRecord failed. FormRendererGroup was not found.");
-            continue;
-        }
-        auto group = search->second;
-        if (!group) {
-            HILOG_ERROR("HandleEnableFormRecord failed. FormRendererGroup is null.");
-            continue;
-        }
-        group->EnableForm(form, enable);
-    }
-    return ERR_OK;
-}
 } // namespace FormRender
 } // namespace AppExecFwk
 } // namespace OHOS

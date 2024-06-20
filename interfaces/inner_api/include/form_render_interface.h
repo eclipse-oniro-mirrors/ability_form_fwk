@@ -71,9 +71,6 @@ public:
     virtual int32_t RecycleForm(const int64_t &formId, const Want &want) { return ERR_OK; }
 
     virtual int32_t RecoverForm(const int64_t &formId, const Want &want) { return ERR_OK; }
-    
-    virtual int32_t EnableForm(const std::vector<FormJsInfo> &&formJsInfos, const Want &want,
-        const bool enable) { return ERR_OK; };
 
     enum class Message {
         // ipc id 1-1000 for kit
@@ -93,7 +90,6 @@ public:
         FORM_RENDER_UNLOCKED = 3106,
         FORM_RECYCLE_FORM = 3107,
         FORM_RECOVER_FORM = 3108,
-        FORM_ENABLE_FORM = 3109,
     };
 };
 } // namespace AppExecFwk

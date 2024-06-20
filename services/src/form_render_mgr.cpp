@@ -399,27 +399,5 @@ ErrCode FormRenderMgr::RecoverForms(const std::vector<int64_t> &formIds, const W
     }
     return ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED;
 }
-
-int32_t FormRenderMgr::EnableForms(const std::vector<FormRecord> &&formRecords,
-    const std::string bundleName, int32_t userId, const bool enable)
-{
-    HILOG_DEBUG("called");
-    std::vector<FormRecord> sandboxRecords;
-    std::vector<FormRecord> normalRecords;
-    for (const auto &record : formRecords) {
-        if (record.privacyLevel > 0) {
-            sandboxRecords.emplace_back(record);
-        } else {
-            normalRecords.emplace_back(record);
-        }
-    }
-    if (renderInner_ != nullptr) {
-        return renderInner_->EnableForms(std::move(normalRecords), bundleName, userId, enable);
-    }
-    if (sandboxInner_ != nullptr) {
-        return sandboxInner_->EnableForms(std::move(sandboxRecords), bundleName, userId, enable);
-    }
-    return ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED;
-}
 } // namespace AppExecFwk
 } // namespace OHOS

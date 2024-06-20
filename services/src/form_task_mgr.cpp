@@ -1239,41 +1239,6 @@ void FormTaskMgr::FormClickEvent(const std::string &bundleName, const std::strin
     remoteJsFormStateObserver->OnFormClickEvent(bundleName, formEventType, runningFormInfo);
 }
 
-void FormTaskMgr::PostEnableForms(const std::vector<FormRecord> &&formRecords, const Want &want,
-    const sptr<IRemoteObject> &remoteObject, const bool enable)
-{
-    if (serialQueue_ == nullptr) {
-        HILOG_ERROR("serialQueue_ is nullptr.");
-        return;
-    }
-    auto enableForms = [forms = std::forward<decltype(formRecords)>(formRecords), want, remoteObject, enable]() {
-        FormTaskMgr::GetInstance().EnableForms(std::move(forms), want, remoteObject, enable);
-    };
-    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, enableForms);
-    HILOG_INFO("end");
-}
-
-void FormTaskMgr::EnableForms(const std::vector<FormRecord> &&formRecords, const Want &want,
-    const sptr<IRemoteObject> &remoteObject, const bool enable)
-{
-    sptr<IFormRender> remoteFormRender = iface_cast<IFormRender>(remoteObject);
-    if (remoteFormRender == nullptr) {
-        HILOG_ERROR("%{public}s fail, Failed to get form render proxy.", __func__);
-        return;
-    }
-    std::vector<FormJsInfo> formJsInfos;
-    for (const auto &formRecord : formRecords) {
-        FormJsInfo formJsInfo = CreateFormJsInfo(formRecord.formId, formRecord);
-        formJsInfos.emplace_back(formJsInfo);
-    }
-
-    int32_t error = remoteFormRender->EnableForm(std::move(formJsInfos), want, enable);
-    if (error != ERR_OK) {
-        HILOG_ERROR("%{public}s fail, Failed to reload form.", __func__);
-        return;
-    }
-}
-
 void FormTaskMgr::PostBatchRefreshForms(const int32_t formRefreshType)
 {
     HILOG_DEBUG("start.");
