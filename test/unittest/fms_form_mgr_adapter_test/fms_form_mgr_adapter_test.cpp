@@ -4598,4 +4598,18 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_234, TestSize.Level0)
     FormBmsHelper::GetInstance().iBundleMgr_ = backup;
     GTEST_LOG_(INFO) << "FormMgrAdapter_234 end";
 }
+
+/**
+ * @tc.name: FormMgrAdapter_235
+ * @tc.desc: test SetNextRefreshTime function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_235, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_235 start";
+    FormMgrAdapter formMgrAdapter;
+    std::string bundleName = "com.ohos.launcher";
+    EXPECT_EQ(ERR_OK, formMgrAdapter.EnableForms(bundleName, true));
+    EXPECT_EQ(ERR_OK, formMgrAdapter.EnableForms(bundleName, false));
+}
 }

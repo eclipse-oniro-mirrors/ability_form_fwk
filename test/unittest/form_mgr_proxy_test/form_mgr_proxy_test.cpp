@@ -884,4 +884,17 @@ HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_IsFormBundleForbidden_001, TestSize.
     EXPECT_EQ(result, false);
     GTEST_LOG_(INFO) << "FormMgrProxyTest_IsFormBundleForbidden_001 test ends";
 }
+
+/**
+ * @tc.number: FormMgrProxyTest_EnableForms_001
+ * @tc.name: test EnableForms function.
+ * @tc.desc: Verify that the EnableForms interface is called normally and the return value is ERR_OK.
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_EnableForms_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_EnableForms_001 starts";
+    std::string bundleName = "ohos.samples.FormApplication";
+    EXPECT_EQ(formMgrProxy->EnableForms(bundleName, true), ERR_OK);
+    EXPECT_EQ(formMgrProxy->EnableForms(bundleName, false), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_EnableForms_001 test ends";
+}
 }

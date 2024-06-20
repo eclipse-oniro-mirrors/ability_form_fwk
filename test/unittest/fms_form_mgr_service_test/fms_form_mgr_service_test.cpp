@@ -2623,4 +2623,20 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0126, TestSize.Level1)
     EXPECT_FALSE(formMgrService.IsFormBundleForbidden(bundleName));
     GTEST_LOG_(INFO) << "FormMgrService_0126 end";
 }
+
+/**
+ * @tc.number: FormMgrService_0127
+ * @tc.name: test EnableForms function.
+ * @tc.desc: Verify that the EnableForms interface is called normally.
+ */
+HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0127, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0127 start";
+    FormMgrService formMgrService;
+    MockIsSACall(true);
+    std::string bundleName = "bundleName";
+    EXPECT_EQ(ERR_OK, formMgrService.EnableForms(bundleName, true));
+    EXPECT_EQ(ERR_OK, formMgrService.EnableForms(bundleName, false));
+    GTEST_LOG_(INFO) << "FormMgrService_0127 end";
+}
 }

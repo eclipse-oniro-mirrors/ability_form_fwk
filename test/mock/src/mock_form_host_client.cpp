@@ -83,5 +83,11 @@ void MockFormHostClient::OnAcquireDataResponse(const AAFwk::WantParams &wantPara
     HILOG_DEBUG("MockFormHostClient OnAcquireDataResponse");
     PostVoid();
 }
+
+void MockFormHostClient::OnEnableForm(const std::vector<int64_t> &formIds, const bool enable)
+{
+    HILOG_DEBUG("MockFormHostClient OnEnableForm");
+    PostVoid();
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS
