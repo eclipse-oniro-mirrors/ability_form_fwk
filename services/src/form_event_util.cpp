@@ -32,15 +32,16 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-
-
 void FormEventUtil::HandleBundleFormInfoChanged(const std::string &bundleName, int32_t userId)
 {
     FormTrustMgr::GetInstance().MarkTrustFlag(bundleName, true);
     FormInfoMgr::GetInstance().UpdateStaticFormInfos(bundleName, userId);
-    FormMgrAdapter::GetInstance().UpdateFormCloudUpdateDuration(bundleName);
 }
 
+void FormEventUtil::HandleUpdateFormCloud(const std::string &bundleName)
+{
+    FormMgrAdapter::GetInstance().UpdateFormCloudUpdateDuration(bundleName);
+}
 
 void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const int userId)
 {

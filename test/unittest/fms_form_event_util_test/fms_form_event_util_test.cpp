@@ -1231,4 +1231,19 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_057, TestSize.Level1)
     FormBmsHelper::GetInstance().iBundleMgr_ = backup;
     GTEST_LOG_(INFO) << "FormEventUtil_057 end";
 }
+
+/**
+ * @tc.name: FormEventUtil_058
+ * @tc.desc: test HandleUpdateFormCloud function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormEventUtilTest, FormEventUtil_058, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormEventUtil_058 start";
+    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
+    ASSERT_NE(nullptr, formEventUtil);
+    std::string bundleName = FORM_HOST_BUNDLE_NAME;
+    formEventUtil->HandleUpdateFormCloud(bundleName);
+    GTEST_LOG_(INFO) << "FormEventUtil_058 end";
+}
 }

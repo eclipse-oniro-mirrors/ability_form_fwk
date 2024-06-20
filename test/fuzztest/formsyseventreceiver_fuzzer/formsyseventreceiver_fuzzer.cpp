@@ -55,6 +55,7 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     BundlePackInfo bundlePackInfo;
     formSysEventReceiver.formEventHelper_.ProviderFormUpdated(formId, formRecord, bundlePackInfo);
     formSysEventReceiver.formEventHelper_.HandleBundleFormInfoChanged(bundleName, userIds);
+    formSysEventReceiver.formEventHelper_.HandleUpdateFormCloud(bundleName);
     formSysEventReceiver.formEventHelper_.HandleBundleFormInfoRemoved(bundleName, userIds);
     formSysEventReceiver.formEventHelper_.HandleBundleDataCleared(bundleName, userIds);
     int uid = static_cast<int>(GetU32Data(data));

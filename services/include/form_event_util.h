@@ -15,6 +15,7 @@
 #ifndef OHOS_FORM_FWK_FORM_EVENT_UTIL_H
 #define OHOS_FORM_FWK_FORM_EVENT_UTIL_H
 
+#include <memory>
 #include <set>
 #include <string>
 
@@ -28,12 +29,13 @@ namespace OHOS {
 namespace AppExecFwk {
 const std::string KEY_UID = "uid";
 const std::string KEY_USER_ID = "userId";
-class FormEventUtil {
+class FormEventUtil : public std::enable_shared_from_this<FormEventUtil> {
 public:
 
     FormEventUtil() = default;
 
     void HandleBundleFormInfoChanged(const std::string &bundleName, int32_t userId);
+    void HandleUpdateFormCloud(const std::string &bundleName);
     void HandleProviderUpdated(const std::string &bundleName, const int userId);
     void HandleBundleFormInfoRemoved(const std::string &bundleName, int32_t userId);
     void HandleProviderRemoved(const std::string &bundleName, const int32_t userId);
