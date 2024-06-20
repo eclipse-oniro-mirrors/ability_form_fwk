@@ -46,8 +46,6 @@ FormRenderStub::FormRenderStub()
         &FormRenderStub::HandleRecycleForm;
     memberFuncMap_[static_cast<uint32_t>(IFormRender::Message::FORM_RECOVER_FORM)] =
         &FormRenderStub::HandleRecoverForm;
-    memberFuncMap_[static_cast<uint32_t>(IFormRender::Message::FORM_ENABLE_FORM)] =
-        &FormRenderStub::HandleEnableForm;
 }
 
 FormRenderStub::~FormRenderStub()
@@ -216,27 +214,6 @@ int32_t FormRenderStub::HandleRecoverForm(MessageParcel &data, MessageParcel &re
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t result = RecoverForm(formId, *want);
-    reply.WriteInt32(result);
-    return result;
-}
-
-int32_t FormRenderStub::HandleEnableForm(MessageParcel &data, MessageParcel &reply)
-{
-    std::vector<FormJsInfo> formJsInfos;
-    int32_t result = GetParcelableInfos(data, formJsInfos);
-    if (result != ERR_OK) {
-        HILOG_ERROR("%{public}s, failed to GetParcelableInfos<FormJsInfo>", __func__);
-        return result;
-    }
-
-    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
-    if (!want) {
-        HILOG_ERROR("%{public}s, failed to ReadParcelable<Want>", __func__);
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    bool enable = data.ReadBool();
-    HILOG_INFO("FormRenderStub::HandleEnableForm, enable = %{public}d", enable);
-    result = EnableForm(std::move(formJsInfos), *want, enable);
     reply.WriteInt32(result);
     return result;
 }
