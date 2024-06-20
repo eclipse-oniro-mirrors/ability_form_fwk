@@ -392,6 +392,11 @@ ErrCode FormMgrService::RequestPublishForm(Want &want, bool withFormBindingData,
         if (!CheckCallerIsSystemApp()) {
             return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
         }
+
+        if (!CheckAcrossLocalAccountsPermission()) {
+            HILOG_ERROR("Across local accounts permission failed.");
+            return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+        }
     }
     return FormMgrAdapter::GetInstance().RequestPublishForm(want, withFormBindingData, formBindingData, formId);
 }
@@ -1552,6 +1557,11 @@ ErrCode FormMgrService::RequestPublishProxyForm(Want &want, bool withFormBinding
     HILOG_DEBUG("called.");
     if (!CheckCallerIsSystemApp()) {
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
+
+    if (!CheckAcrossLocalAccountsPermission()) {
+        HILOG_ERROR("Across local accounts permission failed.");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
     return FormMgrAdapter::GetInstance().RequestPublishForm(want, withFormBindingData, formBindingData, formId,
         formDataProxies);
