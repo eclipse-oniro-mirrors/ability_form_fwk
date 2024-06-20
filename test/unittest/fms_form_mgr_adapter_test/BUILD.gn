@@ -99,10 +99,96 @@ ohos_unittest("FmsFormMgrAdapterTest") {
   }
 }
 
+ohos_unittest("FmsFormMgrAdapterTest2") {
+  module_out_path = module_output_path
+
+  sources = [
+    "${form_fwk_path}/test/mock/src/mock_form_provider_client.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/fms_form_mgr_adapter_test2.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_ams_helper.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_bms_helper.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_cache_mgr.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_data_mgr.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_db_cache.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_info_mgr.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_mgr_adapter.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_provider_mgr.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_render_mgr.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_timer_mgr.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_want.cpp",
+  ]
+
+  include_dirs = [
+    "//third_party/json/include",
+    "${ability_runtime_path}/services/formmgr/include",
+    "${systemabilitymgr_path}/samgr/interfaces/innerkits/samgr_proxy/include",
+    "${form_fwk_path}/interfaces/inner_api/include",
+    "${form_fwk_path}/test/mock/include",
+  ]
+
+  configs = []
+  cflags = []
+  if (target_cpu == "arm") {
+    cflags += [ "-DBINDER_IPC_32BIT" ]
+  }
+  deps = [
+    "${form_fwk_path}:fms_target",
+    "${form_fwk_path}:fmskit_native",
+    "${form_fwk_path}:form_manager",
+    "//third_party/googletest:gmock_main",
+  ]
+
+  external_deps = [
+    "ability_base:base",
+    "ability_base:configuration",
+    "ability_base:want",
+    "ability_runtime:app_manager",
+    "ability_runtime:wantagent_innerkits",
+    "access_token:libaccesstoken_sdk",
+    "appspawn:appspawn_socket_client",
+    "bundle_framework:appexecfwk_base",
+    "bundle_framework:appexecfwk_core",
+    "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
+    "device_manager:devicemanagersdk",
+    "eventhandler:libeventhandler",
+    "ffrt:libffrt",
+    "form_fwk:form_manager",
+    "hilog:libhilog",
+    "image_framework:image_native",
+    "ipc:ipc_core",
+    "kv_store:distributeddata_inner",
+    "relational_store:native_rdb",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+  ]
+
+  defines = []
+
+  if (res_schedule_service) {
+    defines += [ "RES_SCHEDULE_ENABLE" ]
+  }
+
+  if (device_usage_statistics) {
+    external_deps += [ "device_usage_statistics:usagestatsinner" ]
+    defines += [ "DEVICE_USAGE_STATISTICS_ENABLE" ]
+  }
+
+  if (ability_runtime_graphics) {
+    defines += [
+      "SUPPORT_SCREEN",
+      "SUPPORT_GRAPHICS",
+    ]
+  }
+}
+
 ###############################################################################
 group("unittest") {
   testonly = true
 
-  deps = [ ":FmsFormMgrAdapterTest" ]
+  deps = [
+    ":FmsFormMgrAdapterTest",
+    ":FmsFormMgrAdapterTest2",
+  ]
 }
 ###############################################################################
