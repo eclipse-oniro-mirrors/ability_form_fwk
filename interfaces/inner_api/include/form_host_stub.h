@@ -113,9 +113,6 @@ private:
      */
     int32_t HandleOnEnableForm(MessageParcel &data, MessageParcel &reply);
 private:
-    using FormHostFunc = int32_t (FormHostStub::*)(MessageParcel &data, MessageParcel &reply);
-    std::map<uint32_t, FormHostFunc> memberFuncMap_;
-
     DISALLOW_COPY_AND_MOVE(FormHostStub);
 };
 }  // namespace AppExecFwk

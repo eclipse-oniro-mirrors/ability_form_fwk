@@ -118,9 +118,6 @@ private:
      */
     int32_t HandleAcquireFormData(MessageParcel &data, MessageParcel &reply);
 private:
-    using FormProviderFunc = int32_t (FormProviderStub::*)(MessageParcel &data, MessageParcel &reply);
-    std::map<uint32_t, FormProviderFunc> memberFuncMap_;
-
     DISALLOW_COPY_AND_MOVE(FormProviderStub);
 };
 }  // namespace AppExecFwk

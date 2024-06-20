@@ -29,29 +29,10 @@ namespace {
 }
 
 FormRenderStub::FormRenderStub()
-{
-    memberFuncMap_[static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_RENDER_FORM)] =
-        &FormRenderStub::HandleRenderForm;
-    memberFuncMap_[static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_STOP_RENDERING_FORM)] =
-        &FormRenderStub::HandleStopRenderingForm;
-    memberFuncMap_[static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_FORM_HOST_DIED)] =
-        &FormRenderStub::HandleCleanFormHost;
-    memberFuncMap_[static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_RELOAD_FORM)] =
-        &FormRenderStub::HandleReloadForm;
-    memberFuncMap_[static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_RELEASE_RENDERER)] =
-        &FormRenderStub::HandleReleaseRenderer;
-    memberFuncMap_[static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_UNLOCKED)] =
-        &FormRenderStub::HandleOnUnlock;
-    memberFuncMap_[static_cast<uint32_t>(IFormRender::Message::FORM_RECYCLE_FORM)] =
-        &FormRenderStub::HandleRecycleForm;
-    memberFuncMap_[static_cast<uint32_t>(IFormRender::Message::FORM_RECOVER_FORM)] =
-        &FormRenderStub::HandleRecoverForm;
-}
+{}
 
 FormRenderStub::~FormRenderStub()
-{
-    memberFuncMap_.clear();
-}
+{}
 
 int FormRenderStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
@@ -63,15 +44,26 @@ int FormRenderStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageP
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    auto itFunc = memberFuncMap_.find(code);
-    if (itFunc != memberFuncMap_.end()) {
-        auto memberFunc = itFunc->second;
-        if (memberFunc != nullptr) {
-            return (this->*memberFunc)(data, reply);
-        }
+    switch (code) {
+        case static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_RENDER_FORM):
+            return HandleRenderForm(data, reply);
+        case static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_STOP_RENDERING_FORM):
+            return HandleStopRenderingForm(data, reply);
+        case static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_FORM_HOST_DIED):
+            return HandleCleanFormHost(data, reply);
+        case static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_RELOAD_FORM):
+            return HandleReloadForm(data, reply);
+        case static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_RELEASE_RENDERER):
+            return HandleReleaseRenderer(data, reply);
+        case static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_UNLOCKED):
+            return HandleOnUnlock(data, reply);
+        case static_cast<uint32_t>(IFormRender::Message::FORM_RECYCLE_FORM):
+            return HandleRecycleForm(data, reply);
+        case static_cast<uint32_t>(IFormRender::Message::FORM_RECOVER_FORM):
+            return HandleRecoverForm(data, reply);
+        default:
+            return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
-
-    return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 
 int FormRenderStub::HandleRenderForm(MessageParcel &data, MessageParcel &reply)

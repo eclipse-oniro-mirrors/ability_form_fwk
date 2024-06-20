@@ -71,7 +71,7 @@ ErrCode FormRenderMgr::RenderForm(
 {
     HILOG_INFO("formId:%{public}" PRId64, formRecord.formId);
     std::once_flag flag;
-    std::function<void()> func = std::bind(&FormRenderMgr::GetFormRenderState, this);
+    std::function<void()> func = [this] { this->GetFormRenderState(); };
     std::call_once(flag, func);
     HILOG_INFO("the current user authentication status:%{public}d", isVerified_);
     if (formRecord.uiSyntax != FormType::ETS) {

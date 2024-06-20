@@ -542,10 +542,48 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode HandleIsFormBundleForbidden(MessageParcel &data, MessageParcel &reply);
-private:
-    using FormMgrFunc = int32_t (FormMgrStub::*)(MessageParcel &data, MessageParcel &reply);
-    std::map<uint32_t, FormMgrFunc> memberFuncMap_;
 
+    /**
+     * @brief the first part of handle remote request.
+     * @param code ipc code.
+     * @param data input param.
+     * @param reply output param.
+     * @param option message option.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int OnRemoteRequestFirst(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+
+    /**
+     * @brief the second part of handle remote request.
+     * @param code ipc code.
+     * @param data input param.
+     * @param reply output param.
+     * @param option message option.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int OnRemoteRequestSecond(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+
+    /**
+     * @brief the third part of handle remote request.
+     * @param code ipc code.
+     * @param data input param.
+     * @param reply output param.
+     * @param option message option.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int OnRemoteRequestThird(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+
+    /**
+     * @brief the fourth part of handle remote request.
+     * @param code ipc code.
+     * @param data input param.
+     * @param reply output param.
+     * @param option message option.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int OnRemoteRequestFourth(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+
+private:
     DISALLOW_COPY_AND_MOVE(FormMgrStub);
 
     /**

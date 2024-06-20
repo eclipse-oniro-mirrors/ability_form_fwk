@@ -27,22 +27,10 @@ static constexpr int32_t MAX_ALLOW_SIZE = 8 * 1024;
 namespace OHOS {
 namespace AbilityRuntime {
 JsFormStateObserverStub::JsFormStateObserverStub()
-{
-    memberFuncMap_[static_cast<uint32_t>(IJsFormStateObserver::Message::FORM_STATE_OBSERVER_ON_ADD_FORM)] =
-        &JsFormStateObserverStub::HandleOnAddForm;
-    memberFuncMap_[static_cast<uint32_t>(IJsFormStateObserver::Message::FORM_STATE_OBSERVER_ON_REMOVE_FORM)] =
-        &JsFormStateObserverStub::HandleOnRemoveForm;
-    memberFuncMap_[
-        static_cast<uint32_t>(IJsFormStateObserver::Message::FORM_STATE_OBSERVER_NOTIFY_WHETHER_FORMS_VISIBLE)] =
-        &JsFormStateObserverStub::HandleNotifyWhetherFormsVisible;
-    memberFuncMap_[static_cast<uint32_t>(IJsFormStateObserver::Message::FORM_STATE_OBSERVER_ON_FORM_CLICK)] =
-        &JsFormStateObserverStub::HandleOnFormClick;
-}
+{}
 
 JsFormStateObserverStub::~JsFormStateObserverStub()
-{
-    memberFuncMap_.clear();
-}
+{}
 
 int32_t JsFormStateObserverStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
     MessageParcel &reply, MessageOption &option)
@@ -55,15 +43,18 @@ int32_t JsFormStateObserverStub::OnRemoteRequest(uint32_t code, MessageParcel &d
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    auto itFunc = memberFuncMap_.find(code);
-    if (itFunc != memberFuncMap_.end()) {
-        auto memberFunc = itFunc->second;
-        if (memberFunc != nullptr) {
-            return (this->*memberFunc)(data, reply);
-        }
+    switch (code) {
+        case static_cast<uint32_t>(IJsFormStateObserver::Message::FORM_STATE_OBSERVER_ON_ADD_FORM):
+            return HandleOnAddForm(data, reply);
+        case static_cast<uint32_t>(IJsFormStateObserver::Message::FORM_STATE_OBSERVER_ON_REMOVE_FORM):
+            return HandleOnRemoveForm(data, reply);
+        case static_cast<uint32_t>(IJsFormStateObserver::Message::FORM_STATE_OBSERVER_NOTIFY_WHETHER_FORMS_VISIBLE):
+            return HandleNotifyWhetherFormsVisible(data, reply);
+        case static_cast<uint32_t>(IJsFormStateObserver::Message::FORM_STATE_OBSERVER_ON_FORM_CLICK):
+            return HandleOnFormClick(data, reply);
+        default:
+            return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
-
-    return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 
 int32_t JsFormStateObserverStub::HandleOnAddForm(MessageParcel &data, MessageParcel &reply)

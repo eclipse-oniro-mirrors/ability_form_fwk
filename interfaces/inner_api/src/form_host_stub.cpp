@@ -27,31 +27,10 @@
 namespace OHOS {
 namespace AppExecFwk {
 FormHostStub::FormHostStub()
-{
-    memberFuncMap_[static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_ACQUIRED)] =
-        &FormHostStub::HandleAcquired;
-    memberFuncMap_[static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_UPDATE)] =
-        &FormHostStub::HandleOnUpdate;
-    memberFuncMap_[static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_UNINSTALL)] =
-        &FormHostStub::HandleOnUninstall;
-    memberFuncMap_[static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_ACQUIRE_FORM_STATE)] =
-        &FormHostStub::HandleOnAcquireState;
-    memberFuncMap_[static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_SHARE_FORM_RESPONSE)] =
-        &FormHostStub::HandleOnShareFormResponse;
-    memberFuncMap_[static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_ERROR)] =
-        &FormHostStub::HandleOnError;
-    memberFuncMap_[static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_ACQUIRE_FORM_DATA)] =
-        &FormHostStub::HandleOnAcquireDataResponse;
-    memberFuncMap_[static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_RECYCLE_FORM)] =
-        &FormHostStub::HandleOnRecycleForm;
-    memberFuncMap_[static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_ENABLE_FORM)] =
-        &FormHostStub::HandleOnEnableForm;
-}
+{}
 
 FormHostStub::~FormHostStub()
-{
-    memberFuncMap_.clear();
-}
+{}
 /**
  * @brief handle remote request.
  * @param data input param.
@@ -68,16 +47,29 @@ int FormHostStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessagePar
         HILOG_ERROR("%{public}s failed, local describe is not equal to remote", __func__);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
-    
-    auto itFunc = memberFuncMap_.find(code);
-    if (itFunc != memberFuncMap_.end()) {
-        auto memberFunc = itFunc->second;
-        if (memberFunc != nullptr) {
-            return (this->*memberFunc)(data, reply);
-        }
-    }
 
-    return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+    switch (code) {
+        case static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_ACQUIRED):
+            return HandleAcquired(data, reply);
+        case static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_UPDATE):
+            return HandleOnUpdate(data, reply);
+        case static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_UNINSTALL):
+            return HandleOnUninstall(data, reply);
+        case static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_ACQUIRE_FORM_STATE):
+            return HandleOnAcquireState(data, reply);
+        case static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_SHARE_FORM_RESPONSE):
+            return HandleOnShareFormResponse(data, reply);
+        case static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_ERROR):
+            return HandleOnError(data, reply);
+        case static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_ACQUIRE_FORM_DATA):
+            return HandleOnAcquireDataResponse(data, reply);
+        case static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_RECYCLE_FORM):
+            return HandleOnRecycleForm(data, reply);
+        case static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_ENABLE_FORM):
+            return HandleOnEnableForm(data, reply);
+        default:
+            return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+    }
 }
 /**
  * @brief handle OnAcquired event.

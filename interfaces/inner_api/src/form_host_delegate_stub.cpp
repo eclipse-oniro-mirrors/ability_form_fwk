@@ -24,15 +24,10 @@
 namespace OHOS {
 namespace AppExecFwk {
 FormHostDelegateStub::FormHostDelegateStub()
-{
-    memberFuncMap_[static_cast<uint32_t>(IFormHostDelegate::Message::FORM_ROUTER_PROXY_MGR)] =
-        &FormHostDelegateStub::HandleRouterEvent;
-}
+{}
 
 FormHostDelegateStub::~FormHostDelegateStub()
-{
-    memberFuncMap_.clear();
-}
+{}
 
 int32_t FormHostDelegateStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
     MessageParcel &reply, MessageOption &option)
@@ -45,15 +40,12 @@ int32_t FormHostDelegateStub::OnRemoteRequest(uint32_t code, MessageParcel &data
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    auto itFunc = memberFuncMap_.find(code);
-    if (itFunc != memberFuncMap_.end()) {
-        auto memberFunc = itFunc->second;
-        if (memberFunc != nullptr) {
-            return (this->*memberFunc)(data, reply);
-        }
+    switch (code) {
+        case static_cast<uint32_t>(IFormHostDelegate::Message::FORM_ROUTER_PROXY_MGR):
+            return HandleRouterEvent(data, reply);
+        default:
+            return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
-
-    return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 
 int32_t FormHostDelegateStub::HandleRouterEvent(MessageParcel &data, MessageParcel &reply)

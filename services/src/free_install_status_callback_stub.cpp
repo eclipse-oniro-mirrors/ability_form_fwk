@@ -21,11 +21,7 @@
 namespace OHOS {
 namespace AppExecFwk {
 FreeInstallStatusCallBackStub::FreeInstallStatusCallBackStub()
-{
-    vecMemberFunc_.resize(IFreeInstallStatusCallBackCmd::CMD_MAX);
-    vecMemberFunc_[IFreeInstallStatusCallBackCmd::ON_FREE_INSTALL_DONE] =
-        &FreeInstallStatusCallBackStub::OnInstallFinishedInner;
-}
+{}
 
 int32_t FreeInstallStatusCallBackStub::OnInstallFinishedInner(MessageParcel &data, MessageParcel &reply)
 {
@@ -53,9 +49,8 @@ int32_t FreeInstallStatusCallBackStub::OnRemoteRequest(
         return ERR_INVALID_STATE;
     }
 
-    if (code < IFreeInstallStatusCallBackCmd::CMD_MAX && code >= 0) {
-        auto memberFunc = vecMemberFunc_[code];
-        return (this->*memberFunc)(data, reply);
+    if (code == IFreeInstallStatusCallBackCmd::ON_FREE_INSTALL_DONE) {
+        return OnInstallFinishedInner(data, reply);
     }
 
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);

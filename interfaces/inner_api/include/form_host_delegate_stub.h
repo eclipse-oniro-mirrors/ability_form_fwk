@@ -34,9 +34,6 @@ public:
     int32_t HandleRouterEvent(MessageParcel &data, MessageParcel &reply);
 
 private:
-    using FormRouterProxyFunc = int32_t (FormHostDelegateStub::*)(MessageParcel &data, MessageParcel &reply);
-    std::map<uint32_t, FormRouterProxyFunc> memberFuncMap_;
-
     DISALLOW_COPY_AND_MOVE(FormHostDelegateStub);
 };
 }  // namespace AppExecFwk

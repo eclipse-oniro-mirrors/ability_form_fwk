@@ -43,148 +43,14 @@ void SplitString(const std::string &source, std::vector<std::string> &strings)
 }
 
 FormMgrStub::FormMgrStub()
-{
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_ADD_FORM)] =
-        &FormMgrStub::HandleAddForm;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_DELETE_FORM)] =
-        &FormMgrStub::HandleDeleteForm;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_RELEASE_FORM)] =
-        &FormMgrStub::HandleReleaseForm;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UPDATE_FORM)] =
-        &FormMgrStub::HandleUpdateForm;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REQUEST_FORM)] =
-        &FormMgrStub::HandleRequestForm;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_NOTIFY_FORM_WHETHER_VISIBLE)] =
-        &FormMgrStub::HandleNotifyWhetherVisibleForms;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_CAST_TEMP_FORM)] =
-        &FormMgrStub::HandleCastTempForm;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_STORAGE_FORM_INFOS)] =
-        &FormMgrStub::HandleDumpStorageFormInfos;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_FORM_INFOS_BY_NAME)] =
-        &FormMgrStub::HandleDumpFormInfoByBundleName;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_FORM_INFOS_BY_ID)] =
-        &FormMgrStub::HandleDumpFormInfoByFormId;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_FORM_TIMER_INFO_BY_ID)] =
-        &FormMgrStub::HandleDumpFormTimerByFormId;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_SET_NEXT_REFRESH_TIME)] =
-        &FormMgrStub::HandleSetNextRefreshTime;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_LIFECYCLE_UPDATE)] =
-        &FormMgrStub::HandleLifecycleUpdate;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_MESSAGE_EVENT)] =
-        &FormMgrStub::HandleMessageEvent;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_DELETE_INVALID_FORMS)] =
-        &FormMgrStub::HandleDeleteInvalidForms;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_ACQUIRE_FORM_STATE)] =
-        &FormMgrStub::HandleAcquireFormState;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_NOTIFY_FORMS_VISIBLE)] =
-        &FormMgrStub::HandleNotifyFormsVisible;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_NOTIFY_FORMS_PRIVACY_PROTECTED)] =
-        &FormMgrStub::HandleNotifyFormsPrivacyProtected;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_NOTIFY_FORMS_ENABLE_UPDATE)] =
-        &FormMgrStub::HandleNotifyFormsEnableUpdate;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_ALL_FORMS_INFO)] =
-        &FormMgrStub::HandleGetAllFormsInfo;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORMS_INFO_BY_APP)] =
-        &FormMgrStub::HandleGetFormsInfoByApp;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORMS_INFO_BY_MODULE)] =
-        &FormMgrStub::HandleGetFormsInfoByModule;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORMS_INFO_BY_FILTER)] =
-        &FormMgrStub::HandleGetFormsInfoByFilter;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORMS_INFO)] =
-        &FormMgrStub::HandleGetFormsInfo;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_ROUTER_EVENT)] =
-        &FormMgrStub::HandleRouterEvent;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_BACKGROUND_EVENT)] =
-        &FormMgrStub::HandleBackgroundEvent;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_FORM)] =
-        &FormMgrStub::HandleRequestPublishForm;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_SHARE_FORM)] =
-        &FormMgrStub::HandleShareForm;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_RECV_FORM_SHARE_INFO_FROM_REMOTE)] =
-        &FormMgrStub::HandleRecvFormShareInfoFromRemote;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_IS_REQUEST_PUBLISH_FORM_SUPPORTED)] =
-        &FormMgrStub::HandleIsRequestPublishFormSupported;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_START_ABILITY)] =
-        &FormMgrStub::HandleStartAbility;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_CHECK_FMS_READY)] =
-        &FormMgrStub::HandleCheckFMSReady;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_STOP_RENDERING_FORM)] =
-        &FormMgrStub::HandleStopRenderingForm;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_FORM_ADD_OBSERVER_BY_BUNDLE)] =
-        &FormMgrStub::HandleRegisterFormAddObserverByBundle;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_FORM_REMOVE_OBSERVER_BY_BUNDLE)] =
-        &FormMgrStub::HandleRegisterFormRemoveObserverByBundle;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_ACQUIRE_DATA)] =
-        &FormMgrStub::HandleAcquireFormData;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORMS_COUNT)] =
-        &FormMgrStub::HandleGetFormsCount;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_HOST_FORMS_COUNT)] =
-        &FormMgrStub::HandleGetHostFormsCount;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_RUNNING_FORM_INFOS)] =
-        &FormMgrStub::HandleGetRunningFormInfos;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_RUNNING_FORM_INFOS_BY_BUNDLE)] =
-        &FormMgrStub::HandleGetRunningFormInfosByBundleName;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORM_INSTANCES_FROM_BY_FILTER)] =
-        &FormMgrStub::HandleGetFormInstancesByFilter;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORM_INSTANCES_FROM_BY_ID)] =
-        &FormMgrStub::HandleGetFormInstanceById;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_ADD_OBSERVER)] =
-        &FormMgrStub::HandleRegisterAddObserver;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_REMOVE_OBSERVER)] =
-        &FormMgrStub::HandleRegisterRemoveObserver;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UPDATE_PROXY_FORM)] =
-        &FormMgrStub::HandleUpdateProxyForm;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_PROXY_FORM)] =
-        &FormMgrStub::HandleRequestPublishProxyForm;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_RELEASE_RENDERER)] =
-        &FormMgrStub::HandleReleaseRenderer;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_PUBLISH_FORM_INTERCEPTOR)] =
-        &FormMgrStub::HandleRegisterPublishFormInterceptor;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_PUBLISH_FORM_INTERCEPTOR)] =
-        &FormMgrStub::HandleUnregisterPublishFormInterceptor;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_CLICK_EVENT_OBSERVER)] =
-        &FormMgrStub::HandleRegisterClickCallbackEventObserver;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_CLICK_EVENT_OBSERVER)] =
-        &FormMgrStub::HandleUnregisterClickCallbackEventObserver;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_FORM_ROUTER_PROXY)] =
-        &FormMgrStub::HandleRegisterFormRouterProxy;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_FORM_ROUTER_PROXY)] =
-        &FormMgrStub::HandleUnregisterFormRouterProxy;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_SET_FORMS_RECYCLABLE)] =
-        &FormMgrStub::HandleSetFormsRecyclable;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_RECYCLE_FORMS)] =
-        &FormMgrStub::HandleRecycleForms;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_RECOVER_FORMS)] =
-        &FormMgrStub::HandleRecoverForms;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_HAS_FORM_VISIBLE_WITH_TOKENID)] =
-        &FormMgrStub::HandleHasFormVisible;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UPDATE_FORM_LOCATION)] =
-        &FormMgrStub::HandleUpdateFormLocation;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_PUBLISH_FORM_ERRCODE_RESULT)] =
-        &FormMgrStub::HandleSetPublishFormResult;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_ACQUIRE_ADD_FORM_RESULT)] =
-        &FormMgrStub::HandleAcquireAddFormResult;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_CREATE_FORM)] =
-        &FormMgrStub::HandleCreateForm;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_FORM_WITH_SNAPSHOT)] =
-        &FormMgrStub::HandleRequestPublishFormWithSnapshot;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_BATCH_REFRESH_FORMS)] =
-        &FormMgrStub::HandleBatchRefreshForms;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_ENABLE_FORMS)] =
-        &FormMgrStub::HandleEnableForms;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_IS_SYSTEM_APP_FORM)] =
-        &FormMgrStub::HandleIsSystemAppForm;
-    memberFuncMap_[static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_IS_FORM_BUNDLE_FORBIDDEN)] =
-        &FormMgrStub::HandleIsFormBundleForbidden;
-}
+{}
 
 FormMgrStub::~FormMgrStub()
-{
-    memberFuncMap_.clear();
-}
+{}
 
 /**
  * @brief handle remote request.
+ * @param code ipc code.
  * @param data input param.
  * @param reply output param.
  * @param option message option.
@@ -200,15 +66,205 @@ int FormMgrStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParc
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    auto itFunc = memberFuncMap_.find(code);
-    if (itFunc != memberFuncMap_.end()) {
-        auto memberFunc = itFunc->second;
-        if (memberFunc != nullptr) {
-            return (this->*memberFunc)(data, reply);
-        }
-    }
-    return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+    return OnRemoteRequestFirst(code, data, reply, option);
 }
+
+/**
+ * @brief the first part of handle remote request.
+ * @param code ipc code.
+ * @param data input param.
+ * @param reply output param.
+ * @param option message option.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormMgrStub::OnRemoteRequestFirst(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    switch (code) {
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_ADD_FORM):
+            return HandleAddForm(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_DELETE_FORM):
+            return HandleDeleteForm(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_RELEASE_FORM):
+            return HandleReleaseForm(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UPDATE_FORM):
+            return HandleUpdateForm(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REQUEST_FORM):
+            return HandleRequestForm(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_NOTIFY_FORM_WHETHER_VISIBLE):
+            return HandleNotifyWhetherVisibleForms(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_CAST_TEMP_FORM):
+            return HandleCastTempForm(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_STORAGE_FORM_INFOS):
+            return HandleDumpStorageFormInfos(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_FORM_INFOS_BY_NAME):
+            return HandleDumpFormInfoByBundleName(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_FORM_INFOS_BY_ID):
+            return HandleDumpFormInfoByFormId(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_FORM_TIMER_INFO_BY_ID):
+            return HandleDumpFormTimerByFormId(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_SET_NEXT_REFRESH_TIME):
+            return HandleSetNextRefreshTime(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_LIFECYCLE_UPDATE):
+            return HandleLifecycleUpdate(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_MESSAGE_EVENT):
+            return HandleMessageEvent(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_DELETE_INVALID_FORMS):
+            return HandleDeleteInvalidForms(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_ACQUIRE_FORM_STATE):
+            return HandleAcquireFormState(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_NOTIFY_FORMS_VISIBLE):
+            return HandleNotifyFormsVisible(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_NOTIFY_FORMS_PRIVACY_PROTECTED):
+            return HandleNotifyFormsPrivacyProtected(data, reply);
+        default:
+            return OnRemoteRequestSecond(code, data, reply, option);
+    }
+}
+
+/**
+ * @brief the second part of handle remote request.
+ * @param code ipc code.
+ * @param data input param.
+ * @param reply output param.
+ * @param option message option.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormMgrStub::OnRemoteRequestSecond(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    switch (code) {
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_NOTIFY_FORMS_ENABLE_UPDATE):
+            return HandleNotifyFormsEnableUpdate(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_ALL_FORMS_INFO):
+            return HandleGetAllFormsInfo(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORMS_INFO_BY_APP):
+            return HandleGetFormsInfoByApp(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORMS_INFO_BY_MODULE):
+            return HandleGetFormsInfoByModule(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORMS_INFO_BY_FILTER):
+            return HandleGetFormsInfoByFilter(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORMS_INFO):
+            return HandleGetFormsInfo(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_ROUTER_EVENT):
+            return HandleRouterEvent(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_BACKGROUND_EVENT):
+            return HandleBackgroundEvent(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_FORM):
+            return HandleRequestPublishForm(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_SHARE_FORM):
+            return HandleShareForm(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_RECV_FORM_SHARE_INFO_FROM_REMOTE):
+            return HandleRecvFormShareInfoFromRemote(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_IS_REQUEST_PUBLISH_FORM_SUPPORTED):
+            return HandleIsRequestPublishFormSupported(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_START_ABILITY):
+            return HandleStartAbility(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_CHECK_FMS_READY):
+            return HandleCheckFMSReady(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_STOP_RENDERING_FORM):
+            return HandleStopRenderingForm(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_FORM_ADD_OBSERVER_BY_BUNDLE):
+            return HandleRegisterFormAddObserverByBundle(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_FORM_REMOVE_OBSERVER_BY_BUNDLE):
+            return HandleRegisterFormRemoveObserverByBundle(data, reply);
+        default:
+            return OnRemoteRequestThird(code, data, reply, option);
+    }
+}
+
+/**
+ * @brief the third part of handle remote request.
+ * @param code ipc code.
+ * @param data input param.
+ * @param reply output param.
+ * @param option message option.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormMgrStub::OnRemoteRequestThird(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    switch (code) {
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_ACQUIRE_DATA):
+            return HandleAcquireFormData(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORMS_COUNT):
+            return HandleGetFormsCount(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_HOST_FORMS_COUNT):
+            return HandleGetHostFormsCount(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_RUNNING_FORM_INFOS):
+            return HandleGetRunningFormInfos(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_RUNNING_FORM_INFOS_BY_BUNDLE):
+            return HandleGetRunningFormInfosByBundleName(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORM_INSTANCES_FROM_BY_FILTER):
+            return HandleGetFormInstancesByFilter(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORM_INSTANCES_FROM_BY_ID):
+            return HandleGetFormInstanceById(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_ADD_OBSERVER):
+            return HandleRegisterAddObserver(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_REMOVE_OBSERVER):
+            return HandleRegisterRemoveObserver(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UPDATE_PROXY_FORM):
+            return HandleUpdateProxyForm(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_PROXY_FORM):
+            return HandleRequestPublishProxyForm(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_RELEASE_RENDERER):
+            return HandleReleaseRenderer(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_PUBLISH_FORM_INTERCEPTOR):
+            return HandleRegisterPublishFormInterceptor(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_PUBLISH_FORM_INTERCEPTOR):
+            return HandleUnregisterPublishFormInterceptor(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_CLICK_EVENT_OBSERVER):
+            return HandleRegisterClickCallbackEventObserver(data, reply);
+        default:
+            return OnRemoteRequestFourth(code, data, reply, option);
+    }
+}
+
+/**
+ * @brief the fourth part of handle remote request.
+ * @param code ipc code.
+ * @param data input param.
+ * @param reply output param.
+ * @param option message option.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormMgrStub::OnRemoteRequestFourth(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    switch (code) {
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_CLICK_EVENT_OBSERVER):
+            return HandleUnregisterClickCallbackEventObserver(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_FORM_ROUTER_PROXY):
+            return HandleRegisterFormRouterProxy(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_FORM_ROUTER_PROXY):
+            return HandleUnregisterFormRouterProxy(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_SET_FORMS_RECYCLABLE):
+            return HandleSetFormsRecyclable(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_RECYCLE_FORMS):
+            return HandleRecycleForms(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_RECOVER_FORMS):
+            return HandleRecoverForms(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_HAS_FORM_VISIBLE_WITH_TOKENID):
+            return HandleHasFormVisible(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UPDATE_FORM_LOCATION):
+            return HandleUpdateFormLocation(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_PUBLISH_FORM_ERRCODE_RESULT):
+            return HandleSetPublishFormResult(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_ACQUIRE_ADD_FORM_RESULT):
+            return HandleAcquireAddFormResult(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_CREATE_FORM):
+            return HandleCreateForm(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_FORM_WITH_SNAPSHOT):
+            return HandleRequestPublishFormWithSnapshot(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_BATCH_REFRESH_FORMS):
+            return HandleBatchRefreshForms(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_ENABLE_FORMS):
+            return HandleEnableForms(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_IS_SYSTEM_APP_FORM):
+            return HandleIsSystemAppForm(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_IS_FORM_BUNDLE_FORBIDDEN):
+            return HandleIsFormBundleForbidden(data, reply);
+        default:
+            return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+    }
+}
+
 /**
  * @brief handle AddForm message.
  * @param data input param.

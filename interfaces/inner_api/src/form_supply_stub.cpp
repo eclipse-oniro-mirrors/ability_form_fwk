@@ -27,33 +27,10 @@
 namespace OHOS {
 namespace AppExecFwk {
 FormSupplyStub::FormSupplyStub()
-{
-    memberFuncMap_[static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_ACQUIRED)] =
-        &FormSupplyStub::HandleOnAcquire;
-    memberFuncMap_[static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_EVENT_HANDLE)] =
-        &FormSupplyStub::HandleOnEventHandle;
-    memberFuncMap_[static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_STATE_ACQUIRED)] =
-        &FormSupplyStub::HandleOnAcquireStateResult;
-    memberFuncMap_[static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_SHARE_ACQUIRED)] =
-        &FormSupplyStub::HandleOnShareAcquire;
-    memberFuncMap_[static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_RENDER_TASK_DONE)] =
-        &FormSupplyStub::HandleOnRenderTaskDone;
-    memberFuncMap_[static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_STOP_RENDERING_TASK_DONE)] =
-        &FormSupplyStub::HandleOnStopRenderingTaskDone;
-    memberFuncMap_[static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_ACQUIRED_DATA)] =
-        &FormSupplyStub::HandleOnAcquireDataResult;
-    memberFuncMap_[static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_RENDERING_BLOCK)] =
-        &FormSupplyStub::HandleOnRenderingBlock;
-    memberFuncMap_[static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_RECYCLE_FORM)] =
-        &FormSupplyStub::HandleOnRecycleForm;
-    memberFuncMap_[static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_RECOVER_FORM_BY_CONFIG_UPDATE)] =
-        &FormSupplyStub::HandleOnRecoverFormsByConfigUpdate;
-}
+{}
 
 FormSupplyStub::~FormSupplyStub()
-{
-    memberFuncMap_.clear();
-}
+{}
 /**
  * @brief handle remote request.
  * @param data input param.
@@ -71,15 +48,30 @@ int FormSupplyStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageP
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    auto itFunc = memberFuncMap_.find(code);
-    if (itFunc != memberFuncMap_.end()) {
-        auto memberFunc = itFunc->second;
-        if (memberFunc != nullptr) {
-            return (this->*memberFunc)(data, reply);
-        }
+    switch (code) {
+        case static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_ACQUIRED):
+            return HandleOnAcquire(data, reply);
+        case static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_EVENT_HANDLE):
+            return HandleOnEventHandle(data, reply);
+        case static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_STATE_ACQUIRED):
+            return HandleOnAcquireStateResult(data, reply);
+        case static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_SHARE_ACQUIRED):
+            return HandleOnShareAcquire(data, reply);
+        case static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_RENDER_TASK_DONE):
+            return HandleOnRenderTaskDone(data, reply);
+        case static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_STOP_RENDERING_TASK_DONE):
+            return HandleOnStopRenderingTaskDone(data, reply);
+        case static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_ACQUIRED_DATA):
+            return HandleOnAcquireDataResult(data, reply);
+        case static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_RENDERING_BLOCK):
+            return HandleOnRenderingBlock(data, reply);
+        case static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_RECYCLE_FORM):
+            return HandleOnRecycleForm(data, reply);
+        case static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_RECOVER_FORM_BY_CONFIG_UPDATE):
+            return HandleOnRecoverFormsByConfigUpdate(data, reply);
+        default:
+            return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
-
-    return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 /**
  * @brief handle OnAcquire message.
