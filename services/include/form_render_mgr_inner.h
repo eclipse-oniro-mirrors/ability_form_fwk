@@ -18,6 +18,7 @@
 
 #include <atomic>
 #include <queue>
+#include <shared_mutex>
 #include <unordered_map>
 
 #include "form_record.h"
@@ -94,6 +95,8 @@ private:
 
     ErrCode GetConnectionAndRenderForm(FormRecord &formRecord, Want &want);
 
+    ErrCode GetRenderObject(sptr<IRemoteObject> &renderObj);
+
 private:
     class RemoteObjHash {
     public:
@@ -104,6 +107,7 @@ private:
     };
 
     mutable std::mutex resourceMutex_;
+    mutable std::shared_mutex renderRemoteObjMutex_;
     // <formId, connectionToRenderService>
     std::unordered_map<int64_t, sptr<FormRenderConnection>> renderFormConnections_;
     // <hostToken, formIds>
