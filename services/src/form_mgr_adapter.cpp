@@ -1621,7 +1621,8 @@ ErrCode FormMgrAdapter::AcquireProviderFormInfoAsync(const int64_t formId,
 {
     std::string providerBundleName = info.GetProviderBundleName();
     if (!info.IsEnableForm()) {
-        HILOG_INFO("Bundle:%{public}s forbidden.", providerBundleName.c_str());
+        HILOG_INFO("Bundle:%{public}s forbidden", providerBundleName.c_str());
+        FormDataMgr::GetInstance().SetRefreshDuringDisableForm(formId, true);
         return ERR_OK;
     }
 
