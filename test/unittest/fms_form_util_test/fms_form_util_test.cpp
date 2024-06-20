@@ -71,49 +71,6 @@ ErrCode OsAccountManagerWrapper::QueryActiveOsAccountIds(std::vector<int32_t>& i
 }
 
 /**
- * @tc.name: FormUtilTest_001
- * @tc.desc: Verify CreateFormWant
- * @tc.type: FUNC
- */
-HWTEST_F(FormUtilTest, FormUtilTest_001, TestSize.Level1)
-{
-    AAFwk::Want want = {};
-    const std::string formName = "formName";
-    constexpr int32_t specificationId = 100;
-    constexpr bool isTemporaryForm = true;
-
-    FormUtil::CreateFormWant(formName, specificationId, isTemporaryForm, want);
-
-    auto resultBool = want.GetBoolParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
-    auto resultInt32 = want.GetIntParam(Constants::PARAM_FORM_DIMENSION_KEY, -1);
-    auto resultStr = want.GetStringParam(Constants::PARAM_FORM_NAME_KEY);
-
-    EXPECT_TRUE(resultBool == isTemporaryForm);
-    EXPECT_TRUE(resultStr == formName);
-    EXPECT_EQ(resultInt32, specificationId);
-}
-
-/**
- * @tc.name: FormUtilTest_002
- * @tc.desc: Verify CreateDefaultFormWant
- * @tc.type: FUNC
- */
-HWTEST_F(FormUtilTest, FormUtilTest_002, TestSize.Level1)
-{
-    AAFwk::Want want = {};
-    const std::string uri = "uri";
-    constexpr int32_t connectId = 100;
-
-    FormUtil::CreateDefaultFormWant(want, uri, connectId);
-
-    auto resultInt32 = want.GetIntParam(Constants::FORM_CONNECT_ID, -1);
-    auto resultStr = want.GetStringParam(Constants::FORM_SUPPLY_INFO);
-
-    EXPECT_TRUE(resultStr == uri);
-    EXPECT_EQ(resultInt32, connectId);
-}
-
-/**
  * @tc.name: FormUtilTest_004
  * @tc.desc: Verify GenerateFormId
  * @tc.type: FUNC

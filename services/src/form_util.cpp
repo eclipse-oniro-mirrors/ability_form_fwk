@@ -44,33 +44,6 @@ using namespace std;
 using namespace std::chrono;
 
 /**
- * @brief create want for form.
- * @param formName The name of the form.
- * @param specificationId specification id.
- * @param isTemporaryForm temporary form or not.
- * @param want The want of the form.
- */
-void FormUtil::CreateFormWant(const std::string &formName,
-    const int32_t specificationId,  const bool isTemporaryForm, Want &want)
-{
-    want.SetParam(Constants::PARAM_FORM_NAME_KEY, formName);
-    want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, specificationId);
-    want.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, isTemporaryForm);
-}
-
-/**
- * @brief create default want for form.
- * @param want The want of the form..
- * @param uri The uri.
- * @param connectId connect id.
- */
-void FormUtil::CreateDefaultFormWant(Want &want, const std::string &uri, const int32_t connectId)
-{
-    want.SetParam(Constants::FORM_CONNECT_ID, connectId);
-    want.SetParam(Constants::FORM_SUPPLY_INFO, uri);
-}
-
-/**
  * @brief create form id for form.
  * @param udidHash udid hash
  * @return new form id.
@@ -154,13 +127,6 @@ int64_t FormUtil::GetCurrentSteadyClockMillseconds()
 {
     return std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::steady_clock::now().time_since_epoch()).count();
-}
-
-int64_t FormUtil::GetCurrentMicrosecond()
-{
-    system_clock::time_point pointTime = system_clock::now();
-    auto timeMicroseconds = chrono::duration_cast<chrono::microseconds>(pointTime.time_since_epoch());
-    return timeMicroseconds.count();
 }
 
 int64_t FormUtil::GetNowMillisecond()
