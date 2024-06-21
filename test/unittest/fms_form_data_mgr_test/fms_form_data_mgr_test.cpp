@@ -3378,4 +3378,19 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetRecordsByFormType_001, TestSi
     EXPECT_EQ(2, inVisibleFormRecords3.size());
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetRecordsByFormType_001 end";
 }
+
+/**
+ * @tc.number: FmsFormDataMgrTest_EnableForms_001
+ * @tc.name: EnableForms
+ * @tc.desc: Verify that the map can be operated normally.
+ * @tc.details: Determine whether an element exists in the map.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_EnableForms_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_EnableForms_001 start";
+    std::vector<FormRecord> formRecords;
+    formDataMgr_.EnableForms(std::move(formRecords), true);
+    formDataMgr_.EnableForms(std::move(formRecords), false);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_EnableForms_001 end";
+}
 }

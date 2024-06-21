@@ -193,4 +193,22 @@ HWTEST_F(FormHostCallbackTest, FormHostCallbackTest_0009, TestSize.Level0)
     formHostCallback.OnAcquireFormData(wantParams, requestCode, callerToken);
     GTEST_LOG_(INFO) << "FormHostCallbackTest_0009 end";
 }
+
+/**
+ * @tc.name: FormHostCallbackTest_0010
+ * @tc.desc: test OnEnableForms function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormHostCallbackTest, FormHostCallbackTest_0010, TestSize.Level0)
+{
+    HILOG_INFO("FormHostCallbackTest_0010 start");
+    FormHostCallback formHostCallback;
+    int64_t formId = 1;
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    formHostCallback.OnEnableForms(formIds, true, callerToken);
+    formHostCallback.OnEnableForms(formIds, false, callerToken);
+    GTEST_LOG_(INFO) << "FormHostCallbackTest_0010 end";
+}
 }

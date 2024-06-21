@@ -373,4 +373,24 @@ HWTEST_F(FmsFormHostProxyTest, OnAcquireDataResponseTest_0300, Function | Medium
     proxy->OnAcquireDataResponse(wantParams, 0);
     EXPECT_NE(proxy, nullptr);
 }
+
+/*
+ * @tc.name: OnEnableFormTest_0301
+ * @tc.desc: test OnEnableForm function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormHostProxyTest, OnEnableFormTest_0301, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO)
+        << "FmsFormHostProxyTest, OnEnableFormTest_0301, TestSize.Level1";
+    MockWriteInterfaceToken(false);
+    sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
+    ASSERT_NE(nullptr, iremoteObject);
+    std::shared_ptr<FormHostProxy> proxy = std::make_shared<FormHostProxy>(iremoteObject);
+    ASSERT_NE(nullptr, proxy);
+    std::vector<int64_t> formIds{0};
+    proxy->OnEnableForm(formIds, true);
+    proxy->OnEnableForm(formIds, false);
+    EXPECT_NE(proxy, nullptr);
+}
 }

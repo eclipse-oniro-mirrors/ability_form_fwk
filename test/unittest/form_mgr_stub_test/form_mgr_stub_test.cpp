@@ -2985,4 +2985,23 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleBatchRefreshForms_001, TestSize.
     EXPECT_EQ(mockFormMgrService->HandleBatchRefreshForms(data, reply), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_HandleBatchRefreshForms_001 ends";
 }
+
+/**
+ * @tc.number: FormMgrStubTest_HandleEnableForms_001
+ * @tc.name: test HandleEnableForms function.
+ * @tc.desc: Verify that the HandleEnableForms interface is called normally and the return value is ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleEnableForms_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_HandleEnableForms_001 starts";
+    MessageParcel data;
+    MessageParcel reply;
+    const std::string bundleName = "bundleName";
+    data.WriteString(bundleName);
+    data.WriteBool(true);
+    EXPECT_CALL(*mockFormMgrService, EnableForms(_, _))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    EXPECT_EQ(mockFormMgrService->HandleEnableForms(data, reply), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_HandleEnableForms_001 ends";
+}
 }

@@ -395,5 +395,27 @@ HWTEST_F(FormHostStubTest, FormHostStubTest_018, TestSize.Level1)
     auto result = callback.OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
 }
+
+/**
+ * @tc.name: FormHostStubTest_019
+ * @tc.desc: Verify OnRemoteRequest and HandleOnEnableForm
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormHostStubTest, FormHostStubTest_019, TestSize.Level1)
+{
+    MockFormHostClient callback;
+    constexpr uint32_t code = static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_ENABLE_FORM);
+    const std::vector<int64_t> formIds;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormHostClient::GetDescriptor());
+    AAFwk::WantParams wantParams;
+    data.WriteParcelable(&wantParams);
+    data.WriteInt64Vector(formIds);
+    data.WriteBool(true);
+    auto result = callback.OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS
