@@ -41,6 +41,7 @@ namespace {
     int g_setPublishFormResult = OHOS::ERR_OK;
     int g_acquireAddFormResult = OHOS::ERR_OK;
     bool g_isRequestPublishFormSupported = true;
+    int32_t g_requestPublishForm = OHOS::ERR_OK;
     int g_stopRenderingForm = OHOS::ERR_OK;
     int g_releaseRenderer = OHOS::ERR_OK;
     int g_dumpStorageFormInfos = OHOS::ERR_OK;
@@ -140,6 +141,11 @@ void MockGetFormsInfoByModule(int mockRet)
 void MockIsRequestPublishFormSupported(bool mockRet)
 {
     g_isRequestPublishFormSupported = mockRet;
+}
+
+void MockRrequestPublishForm(int32_t mockRet)
+{
+    g_requestPublishForm = mockRet;
 }
 
 void MockStopRenderingForm(int mockRet)
@@ -255,6 +261,13 @@ int FormMgrAdapter::GetFormsInfoByModule(
 bool FormMgrAdapter::IsRequestPublishFormSupported()
 {
     return g_isRequestPublishFormSupported;
+}
+
+ErrCode FormMgrAdapter::RequestPublishForm(Want &want, bool withFormBindingData,
+    std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
+    const std::vector<FormDataProxy> &formDataProxies, bool needCheckFormPermission)
+{
+    return g_requestPublishForm;
 }
 
 int FormMgrAdapter::UpdateForm(const int64_t formId, const int32_t uid,
