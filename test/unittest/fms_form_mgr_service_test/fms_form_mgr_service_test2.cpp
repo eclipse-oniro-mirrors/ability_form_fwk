@@ -1128,4 +1128,40 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0128, TestSize.Level1)
     EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrService_0128 end";
 }
+
+/**
+ * @tc.number: FormMgrService_0129
+ * @tc.name: test GetFormsInfoByFilter function.
+ * @tc.desc: Verify that the GetFormsInfoByFilter interface deny the caller Across Local Accounts Permission
+ *           and the return value is ERR_APPEXECFWK_FORM_PERMISSION_DENY.
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0129, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0129 start";
+    FormMgrService formMgrService;
+    std::vector<FormInfo> formInfos;
+    FormInfoFilter filter;
+    MockIsSACall(true);
+    MockCheckAcrossLocalAccountsPermission(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY, formMgrService.GetFormsInfoByFilter(filter, formInfos));
+    GTEST_LOG_(INFO) << "FormMgrService_0129 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0130
+ * @tc.name: test GetFormsInfoByFilter function.
+ * @tc.desc: Verify that the GetFormsInfoByFilter interface the caller is a system app
+ *           and permit Across Local Accounts Permission, the return value is ERR_OK.
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0130, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0130 start";
+    FormMgrService formMgrService;
+    std::vector<FormInfo> formInfos;
+    FormInfoFilter filter;
+    MockIsSACall(true);
+    MockCheckAcrossLocalAccountsPermission(true);
+    EXPECT_EQ(ERR_OK, formMgrService.GetFormsInfoByFilter(filter, formInfos));
+    GTEST_LOG_(INFO) << "FormMgrService_0130 end";
+}
 }

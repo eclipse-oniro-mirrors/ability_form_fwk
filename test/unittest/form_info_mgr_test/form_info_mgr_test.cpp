@@ -28,6 +28,8 @@ using namespace OHOS;
 using namespace OHOS::AppExecFwk;
 using namespace OHOS::AAFwk;
 
+extern void MockCheckBundlePermission(bool mockRet);
+
 const std::string FORM_BUNDLE_NAME_TEST = "ohos.samples.Test";
 const std::string PARAM_MODULE_NAME_TEST = "entry";
 const std::string FORM_ABILITY_NAME_TEST = "ohos.samples.Test.MainAbility";
@@ -700,4 +702,86 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgr_ReloadFormInfos_0100, TestSize.Level1)
     formInfoMgr_.Start();
     EXPECT_EQ(ERR_OK, formInfoMgr_.ReloadFormInfos(USER_ID));
     GTEST_LOG_(INFO) << "FormInfoMgr_ReloadFormInfos_0100 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_GetFormsInfoByFilter_0100
+ * @tc.number: GetFormsInfoByFilter
+ * @tc.desc: call GetFormsInfoByFilter success
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetFormsInfoByFilter_0100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetFormsInfoByFilter_0100 start";
+    std::vector<FormInfo> formInfos;
+    FormInfoFilter filter;
+    MockCheckBundlePermission(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE, formInfoMgr_.GetFormsInfoByFilter(filter, formInfos));
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetFormsInfoByFilter_0100 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_GetFormsInfoByFilter_0200
+ * @tc.number: GetFormsInfoByFilter
+ * @tc.desc: call GetFormsInfoByFilter success
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetFormsInfoByFilter_0200, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetFormsInfoByFilter_0200 start";
+    std::shared_ptr<BundleFormInfo> bundleFormInfo = std::make_shared<BundleFormInfo>(FORM_BUNDLE_NAME_TEST);
+    std::vector<FormInfo> formInfos;
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    formInfoStorage.formInfos.push_back(GetTestCircleFormInfo());
+    bundleFormInfo->formInfoStorages_.emplace_back(formInfoStorage);
+    formInfoMgr_.bundleFormInfoMap_.emplace(FORM_BUNDLE_NAME_TEST, bundleFormInfo);
+    FormInfoFilter filter;
+    MockCheckBundlePermission(true);
+    EXPECT_EQ(ERR_OK, formInfoMgr_.GetFormsInfoByFilter(filter, formInfos));
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetFormsInfoByFilter_0200 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_GetFormsInfoByFilter_0300
+ * @tc.number: GetFormsInfoByFilter
+ * @tc.desc: call GetFormsInfoByFilter success
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetFormsInfoByFilter_0300, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetFormsInfoByFilter_0300 start";
+    std::shared_ptr<BundleFormInfo> bundleFormInfo = std::make_shared<BundleFormInfo>(FORM_BUNDLE_NAME_TEST);
+    std::vector<FormInfo> formInfos;
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    formInfoStorage.formInfos.push_back(GetTestCircleFormInfo());
+    bundleFormInfo->formInfoStorages_.emplace_back(formInfoStorage);
+    formInfoMgr_.bundleFormInfoMap_.emplace("filer", bundleFormInfo);
+    FormInfoFilter filter;
+    filter.bundleName = FORM_BUNDLE_NAME_TEST;
+    filter.moduleName = PARAM_MODULE_NAME_TEST;
+    MockCheckBundlePermission(true);
+    EXPECT_EQ(ERR_OK, formInfoMgr_.GetFormsInfoByFilter(filter, formInfos));
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetFormsInfoByFilter_0300 end";
+}
+
+/**
+ * @tc.name: FormInfoMgr_GetFormsInfoByFilter_0400
+ * @tc.number: GetFormsInfoByFilter
+ * @tc.desc: call GetFormsInfoByFilter success
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetFormsInfoByFilter_0400, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetFormsInfoByFilter_0400 start";
+    std::shared_ptr<BundleFormInfo> bundleFormInfo = std::make_shared<BundleFormInfo>(FORM_BUNDLE_NAME_TEST);
+    std::vector<FormInfo> formInfos;
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    formInfoStorage.formInfos.push_back(GetTestCircleFormInfo());
+    bundleFormInfo->formInfoStorages_.emplace_back(formInfoStorage);
+    formInfoMgr_.bundleFormInfoMap_.emplace(FORM_BUNDLE_NAME_TEST, bundleFormInfo);
+    FormInfoFilter filter;
+    filter.bundleName = FORM_BUNDLE_NAME_TEST;
+    filter.moduleName = PARAM_MODULE_NAME_TEST;
+    MockCheckBundlePermission(true);
+    EXPECT_EQ(ERR_OK, formInfoMgr_.GetFormsInfoByFilter(filter, formInfos));
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetFormsInfoByFilter_0400 end";
 }
