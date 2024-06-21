@@ -83,6 +83,7 @@ public:
     MOCK_METHOD1(ProcessFormUninstall, void(const int64_t formId));
     MOCK_METHOD0(OnDeathReceived, void());
     MOCK_METHOD2(OnError, void(const int32_t errorCode, const std::string &errorMsg));
+    MOCK_METHOD1(ProcessEnableForm, void(bool enable));
 };
 
 class ShareFormCallBackMock : public ShareFormCallBack {
@@ -589,5 +590,30 @@ HWTEST_F(FmsFormHostClientTest, OnRecycleForm_0100, TestSize.Level0)
     formHostClient->formCallbackMap_.clear();
 
     GTEST_LOG_(INFO) << "FmsFormHostClientTest OnRecycleForm_0100 end";
+}
+
+/**
+ * @tc.number: OnEnableForm_0300
+ * @tc.name: OnEnableForm
+ * @tc.desc: Verify OnEnableForm succeeded.
+ */
+HWTEST_F(FmsFormHostClientTest, OnEnableForm_0300, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest OnEnableForm_0300 start";
+    sptr<FormHostClient> formHostClient = FormHostClient::GetInstance();
+    auto callback = std::make_shared<FormCallback>();
+    std::set<std::shared_ptr<FormCallbackInterface>> callbackSet;
+    callbackSet.emplace(callback);
+    int64_t formId = 10;
+    formHostClient->formCallbackMap_.emplace(formId, callbackSet);
+
+    EXPECT_CALL(*callback, ProcessEnableForm(_)).Times(1);
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(-1);
+    formIds.emplace_back(formId);
+    formHostClient->OnEnableForm(formIds, true);
+    testing::Mock::AllowLeak(callback.get());
+    formHostClient->formCallbackMap_.clear();
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest OnEnableForm_0300 end";
 }
 }

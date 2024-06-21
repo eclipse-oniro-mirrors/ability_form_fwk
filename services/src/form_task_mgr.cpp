@@ -36,10 +36,7 @@
 #include "form_record_report.h"
 
 namespace OHOS {
-namespace AppExecFwk {
-namespace {
-constexpr int32_t FORM_TASK_DELAY_TIME = 20; // ms
-} // namespace
+namespace AppExecFwk { // namespace
 FormTaskMgr::FormTaskMgr() {}
 FormTaskMgr::~FormTaskMgr() {}
 /**
@@ -1281,6 +1278,21 @@ void FormTaskMgr::EnableFormsTaskToHost(const std::vector<int64_t> &formIds, con
 
     remoteFormHost->OnEnableForm(formIds, enable);
     HILOG_DEBUG("end.");
+}
+
+void FormTaskMgr::PostTask(const std::function<void()> &func, uint64_t delayMs)
+{
+    if (!func) {
+        HILOG_ERROR("Invalid input function.");
+        return;
+    }
+
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("Invalid serialQueue_.");
+        return;
+    }
+
+    serialQueue_->ScheduleTask(delayMs, func);
 }
 } // namespace AppExecFwk
 } // namespace OHOS
