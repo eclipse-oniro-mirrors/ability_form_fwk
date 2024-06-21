@@ -2426,4 +2426,143 @@ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_235, TestSize.Level0)
     EXPECT_EQ(formMgrAdapter.EnableForms(bundleName, true), ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
     EXPECT_EQ(formMgrAdapter.EnableForms(bundleName, false), ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
 }
+
+/**
+ * @tc.name: FormMgrAdapter_236
+ * @tc.desc: test GetBundleName function and the return value is false when needCheckFormPermission is true.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_236, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_236 start";
+    FormMgrAdapter formMgrAdapter;
+    std::string bundleName = "";
+    bool needCheckFormPermission = true;
+
+    sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
+    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
+    FormBmsHelper::GetInstance().iBundleMgr_ = nullptr;
+
+    EXPECT_EQ(false, formMgrAdapter.GetBundleName(bundleName, needCheckFormPermission));
+
+    FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
+    AppExecFwk::ApplicationInfo appInfo;
+    appInfo.isSystemApp = false;
+    EXPECT_EQ(false, formMgrAdapter.GetBundleName(bundleName, needCheckFormPermission));
+
+    appInfo.isSystemApp = true;
+    EXPECT_EQ(false, formMgrAdapter.GetBundleName(bundleName, needCheckFormPermission));
+
+    bundleName = "com.ohos.launcher";
+    EXPECT_EQ(false, formMgrAdapter.GetBundleName(bundleName, needCheckFormPermission));
+
+    needCheckFormPermission = false;
+    EXPECT_EQ(true, formMgrAdapter.GetBundleName(bundleName, needCheckFormPermission));
+
+    GTEST_LOG_(INFO) << "FormMgrAdapter_236 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_237
+ * @tc.desc: test CheckFormBundleName function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_237, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_237 start";
+    FormMgrAdapter formMgrAdapter;
+    Want want;
+    std::string bundleName = "";
+    bool needCheckFormPermission = true;
+
+    sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
+    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
+    FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
+    AppExecFwk::ApplicationInfo appInfo;
+    appInfo.isSystemApp = false;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, formMgrAdapter.CheckFormBundleName(want, bundleName,
+                                                                                        needCheckFormPermission));
+
+    appInfo.isSystemApp = true;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, formMgrAdapter.CheckFormBundleName(want, bundleName,
+                                                                                        needCheckFormPermission));
+
+    needCheckFormPermission = false;
+    bundleName = "com.ohos.launcher";
+    want.SetParam(Constants::PARAM_BUNDLE_NAME_KEY, std::string());
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.CheckFormBundleName(want, bundleName,
+                                                                                    needCheckFormPermission));
+
+    GTEST_LOG_(INFO) << "FormMgrAdapter_237 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_238
+ * @tc.desc: test RequestPublishForm function with needCheckFormPermission is false.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_238, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_238 start";
+    FormMgrAdapter formMgrAdapter;
+    Want want;
+    bool withFormBindingData = false;
+    int64_t formId1 = 1;
+    sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
+    sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
+    FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
+    std::unique_ptr<FormProviderData> formBindingData = std::make_unique<FormProviderData>();
+    std::vector<FormDataProxy> formDataProxies;
+    AppExecFwk::ApplicationInfo appInfo;
+    appInfo.isSystemApp = true;
+
+    MockRequestPublishFormToHost(false);
+    auto ret = formMgrAdapter.RequestPublishForm(want, withFormBindingData, formBindingData, formId1, formDataProxies);
+    MockRequestPublishFormToHost(true);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED);
+
+    auto bmsTaskGetBundleNameForUid = [] (const int uid, std::string &name) {
+        name = "name";
+        GTEST_LOG_(INFO) << "FormMgrAdapter_0237 bmsTaskGetBundleNameForUid called";
+        return ERR_OK;
+    };
+    EXPECT_CALL(*bmsProxy, GetNameForUid(_, _)).Times(1).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
+    appInfo.isSystemApp = false;
+    MockRequestPublishFormToHost(false);
+    ret = formMgrAdapter.RequestPublishForm(want, withFormBindingData, formBindingData, formId1, formDataProxies,
+                                            false);
+    MockRequestPublishFormToHost(true);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    FormBmsHelper::GetInstance().iBundleMgr_ = backup;
+    GTEST_LOG_(INFO) << "FormMgrAdapter_238 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_239
+ * @tc.desc: test CheckSnapshotWant function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_239, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_239 start";
+    FormMgrAdapter formMgrAdapter;
+    Want want;
+    
+    bool ret = formMgrAdapter.CheckSnapshotWant(want);
+    EXPECT_EQ(ret, false);
+    std::string snapshotinfo = "fwfaf";
+    std::string width = "20";
+    std::string height = "30";
+    std::string screenx = "40";
+    std::string screeny = "20";
+    want.SetParam(Constants::PARAM_PUBLISH_FORM_HOST_SNAPSHOT_KEY, snapshotinfo);
+    want.SetParam(Constants::PARAM_PUBLISH_FORM_HOST_WIDTH_KEY, width);
+    want.SetParam(Constants::PARAM_PUBLISH_FORM_HOST_HEIGHT_KEY, height);
+    want.SetParam(Constants::PARAM_PUBLISH_FORM_HOST_SCREENX_KEY, screenx);
+    want.SetParam(Constants::PARAM_PUBLISH_FORM_HOST_SCREENY_KEY, screeny);
+    ret = formMgrAdapter.CheckSnapshotWant(want);
+    EXPECT_EQ(ret, true);
+
+    GTEST_LOG_(INFO) << "FormMgrAdapter_239 end";
+}
 }
