@@ -35,6 +35,9 @@ using WantParams = OHOS::AAFwk::WantParams;
 enum class TaskType : int64_t {
     RECYCLE_FORM,
 };
+namespace {
+constexpr int32_t FORM_TASK_DELAY_TIME = 20; // ms
+}
 /**
  * @class FormTaskMgr
  * form task manager.
@@ -282,6 +285,13 @@ public:
      */
     void PostEnableFormsTaskToHost(const std::vector<int64_t> &formIds, const bool enable,
         const sptr<IRemoteObject> &remoteObject);
+
+    /**
+     * @brief Post task to excute.
+     * @param func Task function.
+     * @param delayMs Task excute delay time(ms).
+     */
+    void PostTask(const std::function<void()> &func, uint64_t delayMs = FORM_TASK_DELAY_TIME);
 private:
     /**
      * @brief Acquire form data from form provider.

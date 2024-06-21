@@ -16,6 +16,7 @@
 #include "form_bundle_event_callback.h"
 
 #include "form_bundle_forbid_mgr.h"
+#include "form_task_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -43,7 +44,17 @@ void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eve
         // install or update
         HILOG_INFO("bundleName:%{public}s changed", bundleName.c_str());
         formEventHelper_.HandleBundleFormInfoChanged(bundleName, userId);
-        formEventHelper_.HandleProviderUpdated(bundleName, userId);
+        std::weak_ptr<FormEventUtil> formEventHelperPtr(std::make_shared<FormEventUtil>(formEventHelper_));
+        std::function<void()> taskFunc = [formEventHelperPtr, bundleName, userId]() {
+            auto formEventHelper = formEventHelperPtr.lock();
+            if (formEventHelper == nullptr) {
+                HILOG_ERROR("Task execute failed, form event helper is nullptr.");
+                return;
+            }
+            formEventHelper->HandleUpdateFormCloud(bundleName);
+            formEventHelper->HandleProviderUpdated(bundleName, userId);
+        };
+        FormTaskMgr::GetInstance().PostTask(taskFunc, 0);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED) {
         // uninstall module/bundle
         HILOG_INFO("bundleName:%{public}s removed", bundleName.c_str());
