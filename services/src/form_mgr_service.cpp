@@ -1415,7 +1415,7 @@ bool FormMgrService::CheckAcrossLocalAccountsPermission() const
     int32_t userId = callingUid / GET_CALLING_UID_TRANSFORM_DIVISOR;
     int32_t currentActiveUserId = FormUtil::GetCurrentAccountId();
     if (userId != currentActiveUserId) {
-        HILOG_DEBUG("currentActiveUserId: %{public}d, userId: %{public}d", currentActiveUserId, userId);
+        HILOG_INFO("currentActiveUserId: %{public}d, userId: %{public}d", currentActiveUserId, userId);
         bool isCallingPermAccount =
             FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_INTERACT_ACROSS_LOCAL_ACCOUNTS);
         if (!isCallingPermAccount) {
