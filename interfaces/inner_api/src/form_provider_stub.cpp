@@ -25,33 +25,10 @@
 namespace OHOS {
 namespace AppExecFwk {
 FormProviderStub::FormProviderStub()
-{
-    memberFuncMap_[static_cast<uint32_t>(IFormProvider::Message::FORM_ACQUIRE_PROVIDER_FORM_INFO)] =
-        &FormProviderStub::HandleAcquireProviderFormInfo;
-    memberFuncMap_[static_cast<uint32_t>(IFormProvider::Message::FORM_PROVIDER_NOTIFY_FORM_DELETE)] =
-        &FormProviderStub::HandleNotifyFormDelete;
-    memberFuncMap_[static_cast<uint32_t>(IFormProvider::Message::FORM_PROVIDER_NOTIFY_FORMS_DELETE)] =
-        &FormProviderStub::HandleNotifyFormsDelete;
-    memberFuncMap_[static_cast<uint32_t>(IFormProvider::Message::FORM_PROVIDER_NOTIFY_FORM_UPDATE)] =
-        &FormProviderStub::HandleNotifyFormUpdate;
-    memberFuncMap_[static_cast<uint32_t>(IFormProvider::Message::FORM_PROVIDER_EVENT_NOTIFY)] =
-        &FormProviderStub::HandleEventNotify;
-    memberFuncMap_[static_cast<uint32_t>(IFormProvider::Message::FORM_PROVIDER_NOTIFY_TEMP_FORM_CAST)] =
-        &FormProviderStub::HandleNotifyFormCastTempForm;
-    memberFuncMap_[static_cast<uint32_t>(IFormProvider::Message::FORM_PROVIDER_EVENT_MESSAGE)] =
-        &FormProviderStub::HandleFireFormEvent;
-    memberFuncMap_[static_cast<uint32_t>(IFormProvider::Message::FORM_PROVIDER_NOTIFY_STATE_ACQUIRE)] =
-        &FormProviderStub::HandleAcquireState;
-    memberFuncMap_[static_cast<uint32_t>(IFormProvider::Message::FORM_ACQUIRE_PROVIDER_SHARE_FOMR_INFO)] =
-        &FormProviderStub::HandleAcquireShareFormData;
-    memberFuncMap_[static_cast<uint32_t>(IFormProvider::Message::FORM_ACQUIRE_PROVIDER_FOMR_DATA)] =
-        &FormProviderStub::HandleAcquireFormData;
-}
+{}
 
 FormProviderStub::~FormProviderStub()
-{
-    memberFuncMap_.clear();
-}
+{}
 /**
  * @brief handle remote request.
  * @param data input param.
@@ -69,15 +46,30 @@ int FormProviderStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messag
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    auto itFunc = memberFuncMap_.find(code);
-    if (itFunc != memberFuncMap_.end()) {
-        auto memberFunc = itFunc->second;
-        if (memberFunc != nullptr) {
-            return (this->*memberFunc)(data, reply);
-        }
+    switch (code) {
+        case static_cast<uint32_t>(IFormProvider::Message::FORM_ACQUIRE_PROVIDER_FORM_INFO):
+            return HandleAcquireProviderFormInfo(data, reply);
+        case static_cast<uint32_t>(IFormProvider::Message::FORM_PROVIDER_NOTIFY_FORM_DELETE):
+            return HandleNotifyFormDelete(data, reply);
+        case static_cast<uint32_t>(IFormProvider::Message::FORM_PROVIDER_NOTIFY_FORMS_DELETE):
+            return HandleNotifyFormsDelete(data, reply);
+        case static_cast<uint32_t>(IFormProvider::Message::FORM_PROVIDER_NOTIFY_FORM_UPDATE):
+            return HandleNotifyFormUpdate(data, reply);
+        case static_cast<uint32_t>(IFormProvider::Message::FORM_PROVIDER_EVENT_NOTIFY):
+            return HandleEventNotify(data, reply);
+        case static_cast<uint32_t>(IFormProvider::Message::FORM_PROVIDER_NOTIFY_TEMP_FORM_CAST):
+            return HandleNotifyFormCastTempForm(data, reply);
+        case static_cast<uint32_t>(IFormProvider::Message::FORM_PROVIDER_EVENT_MESSAGE):
+            return HandleFireFormEvent(data, reply);
+        case static_cast<uint32_t>(IFormProvider::Message::FORM_PROVIDER_NOTIFY_STATE_ACQUIRE):
+            return HandleAcquireState(data, reply);
+        case static_cast<uint32_t>(IFormProvider::Message::FORM_ACQUIRE_PROVIDER_SHARE_FOMR_INFO):
+            return HandleAcquireShareFormData(data, reply);
+        case static_cast<uint32_t>(IFormProvider::Message::FORM_ACQUIRE_PROVIDER_FOMR_DATA):
+            return HandleAcquireFormData(data, reply);
+        default:
+            return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
-
-    return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 
 int FormProviderStub::HandleAcquireProviderFormInfo(MessageParcel &data, MessageParcel &reply)

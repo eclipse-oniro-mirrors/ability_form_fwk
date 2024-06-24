@@ -118,9 +118,6 @@ private:
     int32_t HandleOnRecoverFormsByConfigUpdate(MessageParcel &data, MessageParcel &reply);
 
 private:
-    using FormSupplyFunc = int32_t (FormSupplyStub::*)(MessageParcel &data, MessageParcel &reply);
-    std::map<uint32_t, FormSupplyFunc> memberFuncMap_;
-
     DISALLOW_COPY_AND_MOVE(FormSupplyStub);
 };
 }  // namespace AppExecFwk

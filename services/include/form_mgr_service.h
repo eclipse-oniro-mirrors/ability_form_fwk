@@ -681,7 +681,6 @@ private:
 
     void InitFormShareMgrSerialQueue();
 
-    void DumpInit();
     void Dump(const std::vector<std::u16string> &args, std::string &result);
     bool ParseOption(const std::vector<std::u16string> &args, DumpKey &key, std::string &value, std::string &result);
     void HiDumpHelp([[maybe_unused]] const std::string &args, std::string &result);
@@ -698,12 +697,10 @@ private:
 private:
     static const int32_t ENABLE_FORM_UPDATE = 5;
     const static std::map<std::string, DumpKey> dumpKeyMap_;
-    using DumpFuncType = void (FormMgrService::*)(const std::string &args, std::string &result);
     std::string onStartBeginTime_;
     std::string onStartPublishTime_;
     std::string onStartEndTime_;
     std::string onKvDataServiceAddTime_;
-    std::map<DumpKey, DumpFuncType> dumpFuncMap_;
     ServiceRunningState state_ = ServiceRunningState::STATE_NOT_START;
     std::shared_ptr<FormEventHandler> handler_ = nullptr;
     std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;

@@ -79,8 +79,6 @@ private:
 private:
     template<typename T>
     int32_t GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos);
-    using FormRenderFunc = int32_t (FormRenderStub::*)(MessageParcel &data, MessageParcel &reply);
-    std::unordered_map<uint32_t, FormRenderFunc> memberFuncMap_;
 
     DISALLOW_COPY_AND_MOVE(FormRenderStub);
 };

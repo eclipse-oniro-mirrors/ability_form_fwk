@@ -2116,8 +2116,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0083, TestSize.Level1) {
 HWTEST_F(FormMgrStubTest, FormMgrStubTest_0084, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrStubTest_0084 starts";
     EXPECT_TRUE(mockFormMgrService != nullptr);
-    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_ACQUIRE_DATA) + 1;
-    mockFormMgrService->memberFuncMap_[code] = nullptr;
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_ACQUIRE_DATA) + 500;
     MessageParcel data;
     MessageParcel reply;
     MessageOption option{MessageOption::TF_ASYNC};

@@ -486,12 +486,11 @@ HWTEST_F(FormSupplyStubTest, FormSupplyStubTest_019, TestSize.Level1)
 HWTEST_F(FormSupplyStubTest, FormSupplyStubTest_020, TestSize.Level1)
 {
     sptr<MockFormSupplyCallback> callback = new (std::nothrow) MockFormSupplyCallback();
-    constexpr uint32_t code = static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_ACQUIRED) + 1;
+    constexpr uint32_t code = static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_ACQUIRED) + 100;
     MessageParcel data;
     MessageParcel reply;
     MessageOption option{MessageOption::TF_ASYNC};
     data.WriteInterfaceToken(MockFormSupplyCallback::GetDescriptor());
-    callback->memberFuncMap_[code] = nullptr;
     EXPECT_EQ(callback->OnRemoteRequest(code, data, reply, option), IPC_STUB_UNKNOW_TRANS_ERR);
 }
 

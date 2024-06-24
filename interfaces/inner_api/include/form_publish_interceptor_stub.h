@@ -54,10 +54,6 @@ private:
     virtual int32_t HandleProcessPublishForm(MessageParcel &data, MessageParcel &reply);
 
 private:
-    using FormPublishInterceptorFunc =
-        int32_t (FormPublishInterceptorStub::*)(MessageParcel &data, MessageParcel &reply);
-    std::map<uint32_t, FormPublishInterceptorFunc> memberFuncMap_;
-
     DISALLOW_COPY_AND_MOVE(FormPublishInterceptorStub);
 };
 }  // namespace AppExecFwk

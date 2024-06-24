@@ -317,24 +317,6 @@ HWTEST_F(FormHostStubTest, FormHostStubTest_014, TestSize.Level1)
 }
 
 /**
- * @tc.name: FormHostStubTest_015
- * @tc.desc: Verify OnRemoteRequest
- * @tc.type: FUNC
- */
-HWTEST_F(FormHostStubTest, FormHostStubTest_015, TestSize.Level1)
-{
-    MockFormHostClient callback;
-    constexpr uint32_t code = static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_SHARE_FORM_RESPONSE) + 100;
-    callback.memberFuncMap_[code] = nullptr;
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
-    data.WriteInterfaceToken(MockFormHostClient::GetDescriptor());
-    auto result = callback.OnRemoteRequest(code, data, reply, option);
-    EXPECT_EQ(result, IPC_STUB_UNKNOW_TRANS_ERR);
-}
-
-/**
  * @tc.name: FormHostStubTest_016
  * @tc.desc: Verify OnRemoteRequest and HandleOnAcquireState
  * @tc.type: FUNC

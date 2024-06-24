@@ -209,7 +209,6 @@ HWTEST_F(FormProviderStubTest, FormProviderStubTest_006, TestSize.Level1)
 {
     MockFormProviderClient callback;
     constexpr uint32_t code = static_cast<uint32_t>(IFormProvider::Message::FORM_ACQUIRE_PROVIDER_FORM_INFO) + 100;
-    callback.memberFuncMap_[code] = nullptr;
     MessageParcel data;
     MessageParcel reply;
     MessageOption option{MessageOption::TF_ASYNC};

@@ -124,7 +124,6 @@ FormMgrService::FormMgrService()
       serialQueue_(nullptr)
 {
     HILOG_INFO("called");
-    DumpInit();
 }
 
 FormMgrService::~FormMgrService()
@@ -1167,20 +1166,6 @@ int32_t FormMgrService::RecvFormShareInfoFromRemote(const FormShareInfo &info)
     return DelayedSingleton<FormShareMgr>::GetInstance()->RecvFormShareInfoFromRemote(info);
 }
 
-void FormMgrService::DumpInit()
-{
-    dumpFuncMap_[DumpKey::KEY_DUMP_HELP] = &FormMgrService::HiDumpHelp;
-    dumpFuncMap_[DumpKey::KEY_DUMP_STATIC] = &FormMgrService::HiDumpStaticBundleFormInfos;
-    dumpFuncMap_[DumpKey::KEY_DUMP_STORAGE] = &FormMgrService::HiDumpStorageFormInfos;
-    dumpFuncMap_[DumpKey::KEY_DUMP_VISIBLE] = &FormMgrService::HiDumpHasFormVisible;
-    dumpFuncMap_[DumpKey::KEY_DUMP_TEMPORARY] = &FormMgrService::HiDumpTemporaryFormInfos;
-    dumpFuncMap_[DumpKey::KEY_DUMP_BY_BUNDLE_NAME] = &FormMgrService::HiDumpFormInfoByBundleName;
-    dumpFuncMap_[DumpKey::KEY_DUMP_BY_FORM_ID] = &FormMgrService::HiDumpFormInfoByFormId;
-    dumpFuncMap_[DumpKey::KEY_DUMP_RUNNING] = &FormMgrService::HiDumpFormRunningFormInfos;
-    dumpFuncMap_[DumpKey::KEY_DUMP_BLOCKED_APPS] = &FormMgrService::HiDumpFormBlockedApps;
-}
-
-
 int FormMgrService::Dump(int fd, const std::vector<std::u16string> &args)
 {
     if (!CheckFMSReady()) {
@@ -1207,14 +1192,29 @@ void FormMgrService::Dump(const std::vector<std::u16string> &args, std::string &
         return;
     }
 
-    auto iter = dumpFuncMap_.find(key);
-    if (iter == dumpFuncMap_.end() || iter->second == nullptr) {
-        result = "error: unknow function.";
-        return;
+    switch (key) {
+        case DumpKey::KEY_DUMP_HELP:
+            return HiDumpHelp(value, result);
+        case DumpKey::KEY_DUMP_STATIC:
+            return HiDumpStaticBundleFormInfos(value, result);
+        case DumpKey::KEY_DUMP_STORAGE:
+            return HiDumpStorageFormInfos(value, result);
+        case DumpKey::KEY_DUMP_VISIBLE:
+            return HiDumpHasFormVisible(value, result);
+        case DumpKey::KEY_DUMP_TEMPORARY:
+            return HiDumpTemporaryFormInfos(value, result);
+        case DumpKey::KEY_DUMP_BY_BUNDLE_NAME:
+            return HiDumpFormInfoByBundleName(value, result);
+        case DumpKey::KEY_DUMP_BY_FORM_ID:
+            return HiDumpFormInfoByFormId(value, result);
+        case DumpKey::KEY_DUMP_RUNNING:
+            return HiDumpFormRunningFormInfos(value, result);
+        case DumpKey::KEY_DUMP_BLOCKED_APPS:
+            return HiDumpFormBlockedApps(value, result);
+        default:
+            result = "error: unknow function.";
+            return;
     }
-
-    auto dumpFunc = iter->second;
-    (this->*dumpFunc)(value, result);
 }
 
 int32_t FormMgrService::RegisterPublishFormInterceptor(const sptr<IRemoteObject> &interceptorCallback)
@@ -1257,7 +1257,7 @@ void FormMgrService::OnAddSystemAbility(int32_t systemAbilityId, const std::stri
 {
 #ifdef RES_SCHEDULE_ENABLE
     if (systemAbilityId == RES_SCHED_SYS_ABILITY_ID) {
-        auto formSystemloadLevelCb = std::bind(&FormMgrService::OnSystemloadLevel, this, std::placeholders::_1);
+        auto formSystemloadLevelCb = [this](int32_t level) { this->OnSystemloadLevel(level); };
         sptr<FormSystemloadListener> formSystemloadListener
             = new (std::nothrow) FormSystemloadListener(formSystemloadLevelCb);
         ResourceSchedule::ResSchedClient::GetInstance().RegisterSystemloadNotifier(formSystemloadListener);

@@ -26,15 +26,10 @@
 namespace OHOS {
 namespace AppExecFwk {
 FormPublishInterceptorStub::FormPublishInterceptorStub()
-{
-    memberFuncMap_[static_cast<uint32_t>(IFormPublishInterceptor::Message::FORM_PROCESS_PUBLISH_FORM)] =
-        &FormPublishInterceptorStub::HandleProcessPublishForm;
-}
+{}
 
 FormPublishInterceptorStub::~FormPublishInterceptorStub()
-{
-    memberFuncMap_.clear();
-}
+{}
 
 int FormPublishInterceptorStub::OnRemoteRequest(uint32_t code,
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
@@ -47,15 +42,12 @@ int FormPublishInterceptorStub::OnRemoteRequest(uint32_t code,
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    auto itFunc = memberFuncMap_.find(code);
-    if (itFunc != memberFuncMap_.end()) {
-        auto memberFunc = itFunc->second;
-        if (memberFunc != nullptr) {
-            return (this->*memberFunc)(data, reply);
-        }
+    switch (code) {
+        case static_cast<uint32_t>(IFormPublishInterceptor::Message::FORM_PROCESS_PUBLISH_FORM):
+            return HandleProcessPublishForm(data, reply);
+        default:
+            return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
-
-    return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 
 int FormPublishInterceptorStub::HandleProcessPublishForm(MessageParcel &data, MessageParcel &reply)

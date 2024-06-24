@@ -457,7 +457,6 @@ HWTEST_F(FormRenderStubTest, FormRenderStubTest_003, TestSize.Level0)
 {
     sptr<MockFormRenderImpl> callback = new (std::nothrow) MockFormRenderImpl();
     uint32_t code = static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_RENDER_FORM) + 100;
-    callback->memberFuncMap_[code] = nullptr;
     MessageParcel data;
     MessageParcel reply;
     MessageOption option{MessageOption::TF_ASYNC};

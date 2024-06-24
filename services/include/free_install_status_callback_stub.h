@@ -39,9 +39,6 @@ public:
 private:
     DISALLOW_COPY_AND_MOVE(FreeInstallStatusCallBackStub);
     int32_t OnInstallFinishedInner(MessageParcel &data, MessageParcel &reply);
-    using FreeInstallStatusCallbackFunc = int32_t (FreeInstallStatusCallBackStub::*)(MessageParcel &data,
-        MessageParcel &reply);
-    std::vector<FreeInstallStatusCallbackFunc> vecMemberFunc_;
 };
 } // namespace AppExecFwk
 } // namespace OHOS
