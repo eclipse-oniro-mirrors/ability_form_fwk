@@ -2270,4 +2270,5 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0120, TestSize.Level0)
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.RequestForm(formId, callerToken, want));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0120 end";
 }
+// Please add to file fms_form_mgr_adapter_test2.cpp
 }
