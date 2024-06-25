@@ -24,6 +24,18 @@ namespace {
 const std::string BMS_EVENT_ADDITIONAL_INFO_CHANGED = "bms.event.ADDITIONAL_INFO_CHANGED";
 } // namespace
 
+FormBundleEventCallback::FormBundleEventCallback()
+{
+    HILOG_INFO("create");
+    formEventHelper_ = std::make_shared<FormEventUtil>(FormEventUtil());
+}
+
+FormBundleEventCallback::~FormBundleEventCallback()
+{
+    HILOG_INFO("destroy");
+    formEventHelper_ = nullptr;
+}
+
 void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eventData)
 {
     const AAFwk::Want& want = eventData.GetWant();
@@ -36,6 +48,11 @@ void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eve
         HILOG_ERROR("%{public}s failed, empty action/bundleName", __func__);
         return;
     }
+
+    if (formEventHelper_ == nullptr) {
+        HILOG_ERROR("formEventHelper_ empty");
+        return;
+    }
     HILOG_INFO("action:%{public}s", action.c_str());
 
     wptr<FormBundleEventCallback> weakThis = this;
@@ -43,8 +60,8 @@ void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eve
         action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_CHANGED) {
         // install or update
         HILOG_INFO("bundleName:%{public}s changed", bundleName.c_str());
-        formEventHelper_.HandleBundleFormInfoChanged(bundleName, userId);
-        std::weak_ptr<FormEventUtil> formEventHelperPtr(std::make_shared<FormEventUtil>(formEventHelper_));
+        formEventHelper_->HandleBundleFormInfoChanged(bundleName, userId);
+        std::weak_ptr<FormEventUtil> formEventHelperPtr(formEventHelper_);
         std::function<void()> taskFunc = [formEventHelperPtr, bundleName, userId]() {
             auto formEventHelper = formEventHelperPtr.lock();
             if (formEventHelper == nullptr) {
@@ -58,15 +75,15 @@ void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eve
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED) {
         // uninstall module/bundle
         HILOG_INFO("bundleName:%{public}s removed", bundleName.c_str());
-        formEventHelper_.HandleBundleFormInfoRemoved(bundleName, userId);
-        formEventHelper_.HandleProviderRemoved(bundleName, userId);
+        formEventHelper_->HandleBundleFormInfoRemoved(bundleName, userId);
+        formEventHelper_->HandleProviderRemoved(bundleName, userId);
         // Ensure clear forbidden form db when bundle uninstall
         // Health contol will set again when reinstall
         FormBundleForbidMgr::GetInstance().SetBundleForbiddenStatus(bundleName, false);
     } else if (action == BMS_EVENT_ADDITIONAL_INFO_CHANGED) {
         // additional info changed
         HILOG_INFO("bundleName:%{public}s additional info changed", bundleName.c_str());
-        formEventHelper_.HandleAdditionalInfoChanged(bundleName);
+        formEventHelper_->HandleAdditionalInfoChanged(bundleName);
     }
 }
 
