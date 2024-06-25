@@ -18,6 +18,7 @@
 #include <cstddef>
 #include <cstdint>
 
+#include "form_constants.h"
 #include "form_util.h"
 #define private public
 #define protected public
@@ -52,10 +53,15 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     int32_t specificationId = static_cast<int32_t>(GetU32Data(data));
     bool isTemporaryForm = *data % ENABLE;
     Want want;
-    formUtil.CreateFormWant(formName, specificationId, isTemporaryForm, want);
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, formName);
+    want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, specificationId);
+    want.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, isTemporaryForm);
+
     std::string uri(data, size);
     int32_t connectId = static_cast<int32_t>(GetU32Data(data));
-    formUtil.CreateDefaultFormWant(want, uri, connectId);
+    want.SetParam(Constants::FORM_CONNECT_ID, connectId);
+    want.SetParam(Constants::FORM_SUPPLY_INFO, uri);
+    
     int64_t udidHash = static_cast<int64_t>(GetU32Data(data));
     formUtil.GenerateFormId(udidHash);
     uint64_t formId = static_cast<uint64_t>(GetU32Data(data));

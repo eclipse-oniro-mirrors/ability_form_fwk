@@ -59,7 +59,9 @@ void FormAcquireConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &
     FormSupplyCallback::GetInstance()->AddConnection(connection);
     Want want;
     want.SetParams(wantParams_);
-    FormUtil::CreateFormWant(info_.GetFormName(), info_.GetSpecificationId(), info_.IsTemporaryForm(), want);
+    want.SetParam(Constants::PARAM_FORM_NAME_KEY, info_.GetFormName());
+    want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, info_.GetSpecificationId());
+    want.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, info_.IsTemporaryForm());
     if (want.GetBoolParam(Constants::RECREATE_FORM_KEY, false)) {
         want.SetParam(Constants::ACQUIRE_TYPE, Constants::ACQUIRE_TYPE_RECREATE_FORM);
     } else {

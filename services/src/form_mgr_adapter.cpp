@@ -3535,10 +3535,7 @@ bool FormMgrAdapter::IsErmsSupportPublishForm(std::string bundleName, std::vecto
     callerInfo.pid = IPCSkeleton::GetCallingPid();
     callerInfo.callerAppType = GetCallerType(bundleName);
 
-    auto start = FormUtil::GetCurrentMicrosecond();
     int32_t ret = FormEcologicalRuleClient::GetInstance().IsSupportPublishForm(wants, callerInfo, isSupport);
-    auto end = FormUtil::GetCurrentMicrosecond();
-    HILOG_INFO("[ERMS-DFX] IsSupportPublishForm cost %{public}" PRId64 " micro seconds", (end - start));
     if (ret != ERR_OK) {
         HILOG_ERROR("call IsSupportPublishForm failed: %{public}d, default is support.", ret);
         return true;

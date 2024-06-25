@@ -28,23 +28,6 @@ using Want = OHOS::AAFwk::Want;
 class FormUtil {
 public:
     /**
-     * @brief create want for form.
-     * @param formName The name of the form.
-     * @param specificationId specification id.
-     * @param isTemporaryForm temporary form or not.
-     * @param want The want of the form.
-     */
-    static void CreateFormWant(const std::string &formName, const int32_t specificationId,
-        const bool isTemporaryForm, Want &want);
-    /**
-     * @brief create default want for form.
-     * @param want The want of the form..
-     * @param uri The uri.
-     * @param userId user id.
-     */
-    static void CreateDefaultFormWant(Want &want, const std::string &uri, const int32_t userId);
-
-    /**
      * @brief create form id for form.
      * @param udidHash udid hash
      * @return new form id.
@@ -80,12 +63,6 @@ public:
      * @return Current system GetCurrentSteadyClockMillseconds.
      */
     static int64_t GetCurrentSteadyClockMillseconds();
-
-    /**
-     * @brief Get current system microsecond.
-     * @return Current system microsecond.
-     */
-    static int64_t GetCurrentMicrosecond();
 
     /**
      * @brief Get current system millisecond.

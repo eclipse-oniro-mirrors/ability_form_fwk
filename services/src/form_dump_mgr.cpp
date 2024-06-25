@@ -121,49 +121,9 @@ void FormDumpMgr::DumpFormInfos(const std::vector<FormRecord> &formRecordInfos, 
 {
     HILOG_INFO("call");
     for (const auto &info : formRecordInfos) {
-        formInfos += "  FormId [" + std::to_string(info.formId)  + "]\n";
-        formInfos += "    formName [" + info.formName + "]\n";
-        formInfos += "    bundleName [" + info.bundleName + "]\n";
-        formInfos += "    moduleName [" + info.moduleName + "]\n";
-        formInfos += "    abilityName [" + info.abilityName + "]\n";
-        formInfos += "    isInited [" + std::to_string(info.isInited) + "]\n";
-        formInfos += "    needRefresh [" + std::to_string(info.needRefresh) + "]\n";
-        formInfos += "    isEnableUpdate [" + std::to_string(info.isEnableUpdate) + "]\n";
-        formInfos += "    isCountTimerRefresh [" + std::to_string(info.isCountTimerRefresh) + "]\n";
-        formInfos += "    specification [" + std::to_string(info.specification) + "]\n";
-        formInfos += "    updateDuration [" + std::to_string(info.updateDuration) + "]\n";
-        formInfos += "    updateAtHour [" + std::to_string(info.updateAtHour) + "]\n";
-        formInfos += "    updateAtMin [" + std::to_string(info.updateAtMin) + "]\n";
-        formInfos += "    formTempFlag [" + std::to_string(info.formTempFlag) + "]\n";
-        formInfos += "    formVisibleNotify [" + std::to_string(info.formVisibleNotify) + "]\n";
-        formInfos += "    formVisibleNotifyState [" + std::to_string(info.formVisibleNotifyState) + "]\n";
-        formInfos += "    userId [" + std::to_string(info.userId) + "]\n";
-        formInfos += "    type [" + std::string(info.uiSyntax == FormType::JS ? "JS" : "ArkTS") + "]\n";
-        formInfos += "    isDynamic [" + std::to_string(info.isDynamic) + "]\n";
-        formInfos += "    transparencyEnabled [" + std::to_string(info.transparencyEnabled) + "]\n";
-
-        if (!info.hapSourceDirs.empty()) {
-            formInfos += "    hapSourceDirs [";
-            for (const auto &hapDir : info.hapSourceDirs) {
-                formInfos += " hapSourceDir[" + hapDir + "]";
-            }
-            formInfos += "]\n";
-        }
-
-        if (!info.formUserUids.empty()) {
-            formInfos += "    formUserUids [";
-            for (const auto &uId : info.formUserUids) {
-                formInfos += " Uid[" + std::to_string(uId) + "] ";
-            }
-            formInfos += "]\n";
-        }
-
-        AppendBundleFormInfo(info, formInfos);
-        AppendRecycleStatus(info.recycleStatus, formInfos);
+        DumpFormInfo(info, formInfos);
         formInfos += LINE_FEED;
     }
-
-    HILOG_DEBUG("%{public}s success. Form infos:%{private}s", __func__, formInfos.c_str());
 }
 /**
  * @brief Dump form infos.
@@ -176,7 +136,6 @@ void FormDumpMgr::DumpFormHostInfo(const FormHostRecord &formHostRecord, std::st
     formInfo += "  ================FormHostRecord=================\n";
     formInfo += "  callerUid [" + std::to_string(formHostRecord.GetCallerUid()) + "]\n";
     formInfo += "  hostBundleName [" + formHostRecord.GetHostBundleName() + "]\n";
-    HILOG_DEBUG("success. Host Form infos:%{private}s", formInfo.c_str());
 }
 
 /**
@@ -233,8 +192,6 @@ void FormDumpMgr::DumpFormInfo(const FormRecord &formRecordInfo, std::string &fo
 
     AppendBundleFormInfo(formRecordInfo, formInfo);
     AppendRecycleStatus(formRecordInfo.recycleStatus, formInfo);
-
-    HILOG_DEBUG("%{public}s success. Form infos:%{private}s", __func__, formInfo.c_str());
 }
 
 /**
