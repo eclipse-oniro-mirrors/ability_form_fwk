@@ -30,6 +30,7 @@ ohos_hap("formrender_service_hap") {
     ":FormRender_js_assets",
     ":FormRender_resources",
   ]
+  publicity_file = "publicity.xml"
   shared_libraries = [ ":formrender_service" ]
   certificate_profile = "${form_render_service_path}/signature/formrender.p7b"
   hap_name = "Form_Render_Service"
