@@ -2814,4 +2814,32 @@ HWTEST_F(FormMgrTest, IsFormBundleForbidden_001, TestSize.Level0) {
     EXPECT_EQ(result, false);
     GTEST_LOG_(INFO) << "IsFormBundleForbidden_001 test ends";
 }
+
+/**
+ * @tc.name: FormMgrTest_0130
+ * @tc.desc: Verify RequestPublishFormWithSnapshot (include data proxies)
+ * @tc.type: FUNC
+ * @tc.require: issueIA6CAJ
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0130, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrTest_0130 starts";
+    EXPECT_CALL(*mockProxy, RequestPublishFormWithSnapshot(_, _, _, _))
+        .Times(2)
+        .WillOnce(Return(ERR_OK));
+    Want want;
+    int64_t formId = 0x00000008fffffffL;
+    std::unique_ptr<FormProviderData> formProviderData;
+    FormDataProxy formDataProxy("city", "");
+
+    ErrCode result = FormMgr::GetInstance().RequestPublishFormWithSnapshot(want, true, formProviderData, formId);
+    EXPECT_EQ(result, ERR_OK);
+
+    AppExecFwk::ApplicationInfo appInfo;
+    appInfo.isSystemApp = false;
+    FormMgr::GetInstance().resetFlag_ = true;
+    result = FormMgr::GetInstance().RequestPublishFormWithSnapshot(want, true, formProviderData, formId);
+    EXPECT_NE(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrTest_0130 test ends";
+}
+
 } // namespace

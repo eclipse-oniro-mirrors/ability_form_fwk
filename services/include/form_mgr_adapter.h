@@ -892,8 +892,9 @@ private:
     /**
      * @brief check request publish form want.
      * @param want The want of the form to publish.
+     * @return Returns true if have snapshot info, others on none.
      */
-    void CheckSnapshotWant(const Want &want);
+    bool CheckSnapshotWant(const Want &want);
 
     /**
      * @brief check the argv of AddRequestPublishForm.

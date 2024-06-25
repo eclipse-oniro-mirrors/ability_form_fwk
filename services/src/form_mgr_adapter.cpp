@@ -2071,7 +2071,7 @@ ErrCode FormMgrAdapter::QueryPublishFormToHost(Want &wantToHost)
     return ERR_OK;
 }
 
-void FormMgrAdapter::CheckSnapshotWant(const Want &want)
+bool FormMgrAdapter::CheckSnapshotWant(const Want &want)
 {
     if (want.HasParameter(Constants::PARAM_PUBLISH_FORM_HOST_SNAPSHOT_KEY) &&
         want.HasParameter(Constants::PARAM_PUBLISH_FORM_HOST_WIDTH_KEY) &&
@@ -2085,8 +2085,10 @@ void FormMgrAdapter::CheckSnapshotWant(const Want &want)
         std::string screenY = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_SCREENY_KEY);
         HILOG_INFO("SnapshotInfo screenX: %{public}s, screenY: %{public}s, width: %{public}s, height: %{public}s",
             screenX.c_str(), screenY.c_str(), width.c_str(), height.c_str());
+        return true;
     } else {
         HILOG_DEBUG("CheckSnapshotWant: want has no component snapshot info");
+        return false;
     }
 }
 

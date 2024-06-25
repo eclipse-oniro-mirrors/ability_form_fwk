@@ -1106,4 +1106,26 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0127, TestSize.Level1)
     EXPECT_EQ(formMgrService.EnableForms(bundleName, false), ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
     GTEST_LOG_(INFO) << "FormMgrService_0127 end";
 }
+
+/**
+ * @tc.number: FormMgrService_0128
+ * @tc.name: test RequestPublishFormWithSnapshot function.
+ * @tc.desc: Verify that the RequestPublishFormWithSnapshot interface is called normally
+ * and the return value is ERR_OK.
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0128, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0128 start";
+    FormMgrService formMgrService;
+    Want want;
+    bool withFormBindingData = true;
+    std::unique_ptr<FormProviderData> formBindingData;
+    int64_t formId = 1;
+    std::string bundleName = "ohos.samples.FormApplication";
+    want.SetParam(Constants::PARAM_BUNDLE_NAME_KEY, bundleName);
+    MockIsSACall(false);
+    ErrCode ret = formMgrService.RequestPublishFormWithSnapshot(want, withFormBindingData, formBindingData, formId);
+    EXPECT_EQ(ret, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrService_0128 end";
+}
 }
