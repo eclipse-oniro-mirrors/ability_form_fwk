@@ -2565,4 +2565,93 @@ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_239, TestSize.Level0)
 
     GTEST_LOG_(INFO) << "FormMgrAdapter_239 end";
 }
+
+/**
+ * @tc.name: FormMgrAdapter_240
+ * @tc.desc: test IncreaseAddFormRequestTimeOutTask function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_240, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_240 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId1 = 1;
+    formMgrAdapter.IncreaseAddFormRequestTimeOutTask(formId1);
+    GTEST_LOG_(INFO) << "FormMgrAdapter_240 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_241
+ * @tc.desc: test IncreaseAddFormRequestTimeOutTask function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_241, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_241 start";
+    FormMgrAdapter formMgrAdapter;
+    formMgrAdapter.Init();
+    int64_t formId1 = 1;
+    formMgrAdapter.IncreaseAddFormRequestTimeOutTask(formId1);
+    GTEST_LOG_(INFO) << "FormMgrAdapter_241 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_242
+ * @tc.desc: test CancelAddFormRequestTimeOutTask function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_242, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_242 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId1 = 1;
+    int result = ERR_OK;
+    formMgrAdapter.CancelAddFormRequestTimeOutTask(formId1, result);
+    GTEST_LOG_(INFO) << "FormMgrAdapter_242 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_243
+ * @tc.desc: test CancelAddFormRequestTimeOutTask function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_243, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_243 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId1 = 1;
+    int result = -1;
+    formMgrAdapter.CancelAddFormRequestTimeOutTask(formId1, result);
+    GTEST_LOG_(INFO) << "FormMgrAdapter_243 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_244
+ * @tc.desc: test CheckAddFormTaskTimeoutOrFailed function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_244, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_244 start";
+    FormMgrAdapter formMgrAdapter;
+    AddFormResultErrorCode formStates;
+    int64_t formId1 = 1;
+    auto result = formMgrAdapter.CheckAddFormTaskTimeoutOrFailed(formId1, formStates);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrAdapter_244 end";
+}
+
+/**
+ * @tc.name: FormMgrAdapter_245
+ * @tc.desc: test RemoveFormIdMapElement function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_245, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_245 start";
+    FormMgrAdapter formMgrAdapter;
+    int64_t formId1 = 1;
+    formMgrAdapter.RemoveFormIdMapElement(formId1);
+    GTEST_LOG_(INFO) << "FormMgrAdapter_245 end";
+}
 }
