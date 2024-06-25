@@ -1086,7 +1086,7 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0126, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormMgrService_0126 start";
     FormMgrService formMgrService;
     MockIsSACall(true);
-    std::string bundleName = "bundleName";
+    std::string bundleName = "";
     EXPECT_FALSE(formMgrService.IsFormBundleForbidden(bundleName));
     GTEST_LOG_(INFO) << "FormMgrService_0126 end";
 }
