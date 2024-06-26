@@ -45,6 +45,7 @@ void FormBundleForbidMgrTest::TearDown()
  */
 HWTEST_F(FormBundleForbidMgrTest, formbundleforbidmgr_001, TestSize.Level1)
 {
+    formbundleforbidmgr.SetBundleForbiddenStatus(BUNDLE_NAME, false);
     bool forbid = formbundleforbidmgr.IsBundleForbidden(BUNDLE_NAME);
     EXPECT_EQ(forbid, false);
 }
@@ -59,5 +60,6 @@ HWTEST_F(FormBundleForbidMgrTest, formbundleforbidmgr_002, TestSize.Level1)
     formbundleforbidmgr.SetBundleForbiddenStatus(BUNDLE_NAME, true);
     bool forbid = formbundleforbidmgr.IsBundleForbidden(BUNDLE_NAME);
     EXPECT_EQ(forbid, true);
+    formbundleforbidmgr.SetBundleForbiddenStatus(BUNDLE_NAME, false);
 }
 } // namespace
