@@ -187,5 +187,130 @@ HWTEST_F(FmsFormInfoStorageTest, FmsFormInfoStorageTest_008, TestSize.Level1)
     from_json(jsonObject, formInfoStorage);
     GTEST_LOG_(INFO) << "FmsFormInfoStorageTest_008 end";
 }
+
+/*
+* @tc.name: FmsFormInfoStorageTest_009
+* @tc.desc: Test function GetFormsInfoByFilter
+* @tc.type: FUNC
+*/
+HWTEST_F(FmsFormInfoStorageTest, FmsFormInfoStorageTest_009, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormInfoStorageTest_009 start";
+    AppExecFwk::FormInfoFilter filter;
+    int32_t userId = 11;
+    std::vector<AppExecFwk::FormInfo> formInfos;
+    formInfoStorage_->userId = 10;
+    formInfoStorage_->FormInfoStorage::GetFormsInfoByFilter(userId, filter, formInfos);
+    GTEST_LOG_(INFO) << "FmsFormInfoStorageTest_009 end";
+}
+
+/*
+* @tc.name: FmsFormInfoStorageTest_010
+* @tc.desc: Test function GetFormsInfoByFilter
+* @tc.type: FUNC
+*/
+HWTEST_F(FmsFormInfoStorageTest, FmsFormInfoStorageTest_010, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormInfoStorageTest_010 start";
+    AppExecFwk::FormInfoFilter filter;
+    filter.moduleName = "moduleName";
+    int32_t userId = 10;
+    AppExecFwk::FormInfo formInfo;
+    formInfo.moduleName = "moduleNameInfo";
+    std::vector<AppExecFwk::FormInfo> formInfos;
+    formInfoStorage_->userId = 10;
+    formInfoStorage_->formInfos.emplace_back(formInfo);
+    formInfoStorage_->FormInfoStorage::GetFormsInfoByFilter(userId, filter, formInfos);
+    GTEST_LOG_(INFO) << "FmsFormInfoStorageTest_010 end";
+}
+
+/*
+* @tc.name: FmsFormInfoStorageTest_011
+* @tc.desc: Test function GetFormsInfoByFilter
+* @tc.type: FUNC
+*/
+HWTEST_F(FmsFormInfoStorageTest, FmsFormInfoStorageTest_011, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormInfoStorageTest_011 start";
+    AppExecFwk::FormInfoFilter filter;
+    filter.moduleName = "moduleName";
+    int32_t userId = 10;
+    AppExecFwk::FormInfo formInfo;
+    formInfo.moduleName = "moduleName";
+    formInfo.supportShapes.emplace_back(10);
+    std::vector<AppExecFwk::FormInfo> formInfos;
+    formInfoStorage_->userId = 10;
+    formInfoStorage_->formInfos.emplace_back(formInfo);
+    formInfoStorage_->FormInfoStorage::GetFormsInfoByFilter(userId, filter, formInfos);
+    GTEST_LOG_(INFO) << "FmsFormInfoStorageTest_011 end";
+}
+
+/*
+* @tc.name: FmsFormInfoStorageTest_012
+* @tc.desc: Test function GetFormsInfoByFilter
+* @tc.type: FUNC
+*/
+HWTEST_F(FmsFormInfoStorageTest, FmsFormInfoStorageTest_012, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormInfoStorageTest_012 start";
+    AppExecFwk::FormInfoFilter filter;
+    filter.moduleName = "moduleName";
+    filter.supportShapes.emplace_back(10);
+    int32_t userId = 10;
+    AppExecFwk::FormInfo formInfo;
+    formInfo.moduleName = "moduleName";
+    formInfo.supportShapes.emplace_back(11);
+    std::vector<AppExecFwk::FormInfo> formInfos;
+    formInfoStorage_->userId = 10;
+    formInfoStorage_->formInfos.emplace_back(formInfo);
+    formInfoStorage_->FormInfoStorage::GetFormsInfoByFilter(userId, filter, formInfos);
+    GTEST_LOG_(INFO) << "FmsFormInfoStorageTest_012 end";
+}
+
+/*
+* @tc.name: FmsFormInfoStorageTest_013
+* @tc.desc: Test function GetFormsInfoByFilter
+* @tc.type: FUNC
+*/
+HWTEST_F(FmsFormInfoStorageTest, FmsFormInfoStorageTest_013, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormInfoStorageTest_013 start";
+    AppExecFwk::FormInfoFilter filter;
+    filter.moduleName = "moduleName";
+    filter.supportShapes.emplace_back(10);
+    int32_t userId = 10;
+    AppExecFwk::FormInfo formInfo;
+    formInfo.moduleName = "moduleName";
+    formInfo.supportShapes.emplace_back(10);
+    std::vector<AppExecFwk::FormInfo> formInfos;
+    formInfoStorage_->userId = 10;
+    formInfoStorage_->formInfos.emplace_back(formInfo);
+    formInfoStorage_->FormInfoStorage::GetFormsInfoByFilter(userId, filter, formInfos);
+    GTEST_LOG_(INFO) << "FmsFormInfoStorageTest_013 end";
+}
+
+/*
+* @tc.name: FmsFormInfoStorageTest_014
+* @tc.desc: Test function GetFormsInfoByFilter
+* @tc.type: FUNC
+*/
+HWTEST_F(FmsFormInfoStorageTest, FmsFormInfoStorageTest_014, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormInfoStorageTest_014 start";
+    AppExecFwk::FormInfoFilter filter;
+    filter.moduleName = "moduleName";
+    filter.supportShapes.emplace_back(10);
+    filter.supportDimensions.emplace_back(11);
+    int32_t userId = 10;
+    AppExecFwk::FormInfo formInfo;
+    formInfo.moduleName = "moduleName";
+    formInfo.supportShapes.emplace_back(10);
+    formInfo.supportDimensions.emplace_back(11);
+    std::vector<AppExecFwk::FormInfo> formInfos;
+    formInfoStorage_->userId = 10;
+    formInfoStorage_->formInfos.emplace_back(formInfo);
+    formInfoStorage_->FormInfoStorage::GetFormsInfoByFilter(userId, filter, formInfos);
+    GTEST_LOG_(INFO) << "FmsFormInfoStorageTest_014 end";
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS
