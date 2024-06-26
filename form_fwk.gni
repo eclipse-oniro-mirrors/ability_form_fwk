@@ -83,3 +83,11 @@ declare_args() {
     theme_mgr_enable = true
   }
 }
+
+declare_args() {
+  form_runtime_power = true
+  if (defined(global_parts_info) &&
+      !defined(global_parts_info.powermgr_power_manager)) {
+    form_runtime_power = false
+  }
+}
