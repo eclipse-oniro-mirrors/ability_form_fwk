@@ -98,9 +98,7 @@ ErrCode FormInfoHelper::LoadStageFormConfigInfo(const BundleInfo &bundleInfo, st
             for (const auto &extensionFormInfo: extensionFormInfos) {
                 FormInfo formInfo(extensionInfo, extensionFormInfo);
                 if (!bundleInfo.applicationInfo.isSystemApp) {
-                    HILOG_INFO("form provider is not systemapp");
                     formInfo.transparencyEnabled = false;
-                    formInfo.formVisibleNotify = false;
                 }
                 formInfo.versionCode = bundleInfo.versionCode;
                 formInfo.bundleType = bundleInfo.applicationInfo.bundleType;
