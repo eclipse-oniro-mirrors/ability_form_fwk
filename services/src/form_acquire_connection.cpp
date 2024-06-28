@@ -44,7 +44,7 @@ FormAcquireConnection::FormAcquireConnection(const int64_t formId, const FormIte
 void FormAcquireConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &element,
     const sptr<IRemoteObject> &remoteObject, int resultCode)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("formId:%{public}" PRId64, GetFormId());
     if (resultCode != ERR_OK) {
         HILOG_ERROR("%{public}s, abilityName:%{public}s, formId:%{public}" PRId64 ", resultCode:%{public}d",
            __func__, element.GetAbilityName().c_str(), GetFormId(), resultCode);

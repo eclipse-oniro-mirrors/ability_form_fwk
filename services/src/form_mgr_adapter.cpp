@@ -1643,9 +1643,10 @@ ErrCode FormMgrAdapter::InnerAcquireProviderFormInfoAsync(const int64_t formId,
     const FormItemInfo &info, const WantParams &wantParams)
 {
     if (formId <= 0) {
-        HILOG_ERROR("%{public}s fail, formId should be greater than 0", __func__);
+        HILOG_ERROR("formId should be greater than 0");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
+    HILOG_INFO("formId:%{public}" PRId64, formId);
 
     Want newWant;
     newWant.SetParams(wantParams);

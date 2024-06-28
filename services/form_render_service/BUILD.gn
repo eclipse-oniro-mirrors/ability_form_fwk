@@ -69,7 +69,10 @@ ohos_shared_library("formrender") {
     "src/form_render_serial_queue.cpp",
   ]
 
-  defines = [ "FMS_LOG_TAG = \"FormRenderService\"" ]
+  defines = [
+    "FMS_LOG_TAG = \"FormRenderService\"",
+    "FMS_LOG_DOMAIN = 0xD001371",
+  ]
 
   if (use_musl) {
     if (use_jemalloc && use_jemalloc_dfx_intf) {
