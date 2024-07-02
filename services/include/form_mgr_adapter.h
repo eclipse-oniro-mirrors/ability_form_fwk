@@ -1178,6 +1178,8 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     int DeleteCommonForm(const int64_t formId, const sptr<IRemoteObject> &callerToken);
+
+    void CheckUpdateFormRecord(const int64_t formId, const FormItemInfo &info, FormRecord &record);
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
