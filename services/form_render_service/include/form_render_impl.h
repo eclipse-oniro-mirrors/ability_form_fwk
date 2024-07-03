@@ -96,6 +96,7 @@ private:
     void FormRenderGCTask(const std::string &uid);
     void FormRenderGC(const std::string &uid);
     void OnConfigurationUpdatedInner();
+    void ConfirmUnlockState(Want &renderWant);
 
     std::mutex renderRecordMutex_;
     // <uid(userId + bundleName), renderRecord>
@@ -105,6 +106,7 @@ private:
     std::shared_ptr<FormRenderSerialQueue> serialQueue_ = nullptr;
     std::mutex formSupplyMutex_;
     sptr<IFormSupply> formSupplyClient_;
+    bool isVerified_ = false;
 };
 } // namespace FormRender
 } // namespace AppExecFwk

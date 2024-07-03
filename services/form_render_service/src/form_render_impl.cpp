@@ -64,7 +64,7 @@ FormRenderImpl::FormRenderImpl()
 FormRenderImpl::~FormRenderImpl() = default;
 
 int32_t FormRenderImpl::RenderForm(const FormJsInfo &formJsInfo, const Want &want,
-                                   sptr<IRemoteObject> callerToken)
+    sptr<IRemoteObject> callerToken)
 {
     HILOG_INFO("Render form, bundleName=%{public}s, abilityName=%{public}s, formName=%{public}s,"
         "moduleName=%{public}s, jsFormCodePath=%{public}s, formSrc=%{public}s, formId=%{public}" PRId64,
@@ -90,11 +90,12 @@ int32_t FormRenderImpl::RenderForm(const FormJsInfo &formJsInfo, const Want &wan
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     int32_t result = ERR_OK;
-    sptr<IRemoteObject> hostToken = want.GetRemoteObject(Constants::PARAM_FORM_HOST_TOKEN);
+    Want formRenderWant(want);
+    sptr<IRemoteObject> hostToken = formRenderWant.GetRemoteObject(Constants::PARAM_FORM_HOST_TOKEN);
     {
         std::lock_guard<std::mutex> lock(renderRecordMutex_);
         if (auto search = renderRecordMap_.find(uid); search != renderRecordMap_.end()) {
-            result = search->second->UpdateRenderRecord(formJsInfo, want, hostToken);
+            result = search->second->UpdateRenderRecord(formJsInfo, formRenderWant, hostToken);
         } else {
             auto record = FormRenderRecord::Create(formJsInfo.bundleName, uid, formJsInfo.isDynamic, formSupplyClient);
             if (record == nullptr) {
@@ -102,8 +103,10 @@ int32_t FormRenderImpl::RenderForm(const FormJsInfo &formJsInfo, const Want &wan
                 return RENDER_FORM_FAILED;
             }
 
+            ConfirmUnlockState(formRenderWant);
+
             record->SetConfiguration(configuration_);
-            result = record->UpdateRenderRecord(formJsInfo, want, hostToken);
+            result = record->UpdateRenderRecord(formJsInfo, formRenderWant, hostToken);
             if (renderRecordMap_.empty()) {
                 FormMemmgrClient::GetInstance().SetCritical(true);
             }
@@ -111,7 +114,7 @@ int32_t FormRenderImpl::RenderForm(const FormJsInfo &formJsInfo, const Want &wan
             FormRenderGCTask(uid);
         }
     }
-    formSupplyClient->OnRenderTaskDone(formJsInfo.formId, want);
+    formSupplyClient->OnRenderTaskDone(formJsInfo.formId, formRenderWant);
     return result;
 }
 
@@ -241,6 +244,12 @@ int32_t FormRenderImpl::OnUnlock()
 {
     HILOG_INFO("OnUnlock start");
     std::lock_guard<std::mutex> lock(renderRecordMutex_);
+    if (isVerified_) {
+        HILOG_WARN("Has been unlocked in render form, maybe miss or delay unlock event.");
+        return ERR_OK;
+    }
+
+    isVerified_ = true;
     for (const auto& iter : renderRecordMap_) {
         if (iter.second) {
             iter.second->OnUnlock();
@@ -431,6 +440,22 @@ int32_t FormRenderImpl::RecoverForm(const int64_t &formId, const Want &want)
     }
     HILOG_ERROR("can't find render record of %{public}s.", std::to_string(formId).c_str());
     return RENDER_FORM_FAILED;
+}
+
+void FormRenderImpl::ConfirmUnlockState(Want &renderWant)
+{
+    // Ensure that there are no issues with adding form and unlocking drawing concurrency
+    if (isVerified_) {
+        renderWant.SetParam(Constants::FORM_RENDER_STATE, true);
+    } else if (renderWant.GetBoolParam(Constants::FORM_RENDER_STATE, false)) {
+        HILOG_WARN("Maybe unlock event is missed or delayed, all form record begin to render.");
+        isVerified_ = true;
+        for (const auto& iter : renderRecordMap_) {
+            if (iter.second) {
+                iter.second->OnUnlock();
+            }
+        }
+    }
 }
 } // namespace FormRender
 } // namespace AppExecFwk
