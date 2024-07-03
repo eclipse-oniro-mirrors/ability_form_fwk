@@ -1869,7 +1869,7 @@ ErrCode FormMgrProxy::RegisterRemoveObserver(const std::string &bundleName, cons
     }
     MessageParcel reply;
     MessageOption option(MessageOption::TF_ASYNC);
-    auto error = SendTransactCmd(
+    int error = SendTransactCmd(
         IFormMgr::Message::FORM_MGR_REGISTER_REMOVE_OBSERVER, data, reply, option);
     if (error != ERR_OK) {
         HILOG_ERROR("failed to SendRequest: %{public}d", error);
@@ -1897,8 +1897,8 @@ ErrCode FormMgrProxy::RegisterFormRouterProxy(const std::vector<int64_t> &formId
     }
     MessageParcel reply;
     MessageOption option;
-    auto error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_FORM_ROUTER_PROXY), data, reply, option);
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_REGISTER_FORM_ROUTER_PROXY, data, reply, option);
     if (error != ERR_OK) {
         HILOG_ERROR("Failed to SendRequest: %{public}d", error);
         return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
@@ -1920,8 +1920,8 @@ ErrCode FormMgrProxy::UnregisterFormRouterProxy(const std::vector<int64_t> &form
     }
     MessageParcel reply;
     MessageOption option;
-    auto error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_FORM_ROUTER_PROXY), data, reply, option);
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_UNREGISTER_FORM_ROUTER_PROXY, data, reply, option);
     if (error != ERR_OK) {
         HILOG_ERROR("Failed to SendRequest: %{public}d", error);
         return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
@@ -2109,13 +2109,8 @@ ErrCode FormMgrProxy::RegisterClickEventObserver(
 
     MessageParcel reply;
     MessageOption option(MessageOption::TF_ASYNC);
-    auto remote = Remote();
-    if (remote == nullptr) {
-        HILOG_ERROR("Remote object is nullptr.");
-        return ERR_INVALID_OPERATION;
-    }
-    auto error = remote->SendRequest(
-        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_CLICK_EVENT_OBSERVER), data, reply, option);
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_REGISTER_CLICK_EVENT_OBSERVER, data, reply, option);
     if (error != ERR_OK) {
         HILOG_ERROR("Failed to SendRequest: %{public}d", error);
         return error;
@@ -2150,13 +2145,8 @@ ErrCode FormMgrProxy::UnregisterClickEventObserver(
 
     MessageParcel reply;
     MessageOption option(MessageOption::TF_ASYNC);
-    auto remote = Remote();
-    if (remote == nullptr) {
-        HILOG_ERROR("Remote object is nullptr.");
-        return ERR_INVALID_OPERATION;
-    }
-    auto error = remote->SendRequest(
-        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_CLICK_EVENT_OBSERVER), data, reply, option);
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_UNREGISTER_CLICK_EVENT_OBSERVER, data, reply, option);
     if (error != ERR_OK) {
         HILOG_ERROR("Failed to SendRequest: %{public}d", error);
         return error;
@@ -2348,13 +2338,7 @@ int32_t FormMgrProxy::EnableForms(const std::string bundleName, const bool enabl
 
     MessageParcel reply;
     MessageOption option(MessageOption::TF_SYNC);
-    auto remote = Remote();
-    if (remote == nullptr) {
-        HILOG_ERROR("Remote object is nullptr.");
-        return ERR_INVALID_OPERATION;
-    }
-    auto error = remote->SendRequest(
-        static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_ENABLE_FORMS), data, reply, option);
+    int error = SendTransactCmd(IFormMgr::Message::FORM_MGR_ENABLE_FORMS, data, reply, option);
     if (error != ERR_OK) {
         HILOG_ERROR("Failed to SendRequest: %{public}d", error);
         return error;
