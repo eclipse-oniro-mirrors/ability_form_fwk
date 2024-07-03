@@ -27,13 +27,11 @@ const std::string BMS_EVENT_ADDITIONAL_INFO_CHANGED = "bms.event.ADDITIONAL_INFO
 FormBundleEventCallback::FormBundleEventCallback()
 {
     HILOG_INFO("create");
-    formEventHelper_ = std::make_shared<FormEventUtil>(FormEventUtil());
 }
 
 FormBundleEventCallback::~FormBundleEventCallback()
 {
     HILOG_INFO("destroy");
-    formEventHelper_ = nullptr;
 }
 
 void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eventData)
@@ -49,10 +47,6 @@ void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eve
         return;
     }
 
-    if (formEventHelper_ == nullptr) {
-        HILOG_ERROR("formEventHelper_ empty");
-        return;
-    }
     HILOG_INFO("action:%{public}s", action.c_str());
 
     wptr<FormBundleEventCallback> weakThis = this;
@@ -60,30 +54,30 @@ void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eve
         action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_CHANGED) {
         // install or update
         HILOG_INFO("bundleName:%{public}s changed", bundleName.c_str());
-        formEventHelper_->HandleBundleFormInfoChanged(bundleName, userId);
-        std::weak_ptr<FormEventUtil> formEventHelperPtr(formEventHelper_);
-        std::function<void()> taskFunc = [formEventHelperPtr, bundleName, userId]() {
-            auto formEventHelper = formEventHelperPtr.lock();
-            if (formEventHelper == nullptr) {
-                HILOG_ERROR("Task execute failed, form event helper is nullptr.");
-                return;
-            }
-            formEventHelper->HandleUpdateFormCloud(bundleName);
-            formEventHelper->HandleProviderUpdated(bundleName, userId);
+        FormEventUtil::HandleBundleFormInfoChanged(bundleName, userId);
+        std::function<void()> taskFunc = [bundleName, userId]() {
+            FormEventUtil::HandleUpdateFormCloud(bundleName);
+            FormEventUtil::HandleProviderUpdated(bundleName, userId);
         };
         FormTaskMgr::GetInstance().PostTask(taskFunc, 0);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED) {
         // uninstall module/bundle
         HILOG_INFO("bundleName:%{public}s removed", bundleName.c_str());
-        formEventHelper_->HandleBundleFormInfoRemoved(bundleName, userId);
-        formEventHelper_->HandleProviderRemoved(bundleName, userId);
-        // Ensure clear forbidden form db when bundle uninstall
-        // Health contol will set again when reinstall
-        FormBundleForbidMgr::GetInstance().SetBundleForbiddenStatus(bundleName, false);
+        FormEventUtil::HandleBundleFormInfoRemoved(bundleName, userId);
+        std::function<void()> taskFunc = [bundleName, userId]() {
+            FormEventUtil::HandleProviderRemoved(bundleName, userId);
+            // Ensure clear forbidden form db when bundle uninstall
+            // Health contol will set again when reinstall
+            FormBundleForbidMgr::GetInstance().SetBundleForbiddenStatus(bundleName, false);
+        };
+        FormTaskMgr::GetInstance().PostTask(taskFunc, 0);
     } else if (action == BMS_EVENT_ADDITIONAL_INFO_CHANGED) {
         // additional info changed
         HILOG_INFO("bundleName:%{public}s additional info changed", bundleName.c_str());
-        formEventHelper_->HandleAdditionalInfoChanged(bundleName);
+        std::function<void()> taskFunc = [bundleName]() {
+            FormEventUtil::HandleAdditionalInfoChanged(bundleName);
+        };
+        FormTaskMgr::GetInstance().PostTask(taskFunc, 0);
     }
 }
 

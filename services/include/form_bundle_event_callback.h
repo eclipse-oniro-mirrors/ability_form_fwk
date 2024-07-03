@@ -43,7 +43,6 @@ public:
     void OnReceiveEvent(const EventFwk::CommonEventData eventData) override;
 private:
     DISALLOW_COPY_AND_MOVE(FormBundleEventCallback);
-    std::shared_ptr<FormEventUtil> formEventHelper_ = nullptr;
 };
 } // namespace OHOS
 } // namespace AppExecFwk

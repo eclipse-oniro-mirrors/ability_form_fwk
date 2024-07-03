@@ -397,7 +397,7 @@ void FormEventUtil::HandleTimerUpdate(const int64_t formId,
     FormTimerMgr::GetInstance().UpdateFormTimer(formId, type, newTimerCfg);
 }
 
-UpdateType FormEventUtil::GetUpdateType(const FormRecord &record, const FormTimerCfg &timerCfg) const
+UpdateType FormEventUtil::GetUpdateType(const FormRecord &record, const FormTimerCfg &timerCfg)
 {
     HILOG_DEBUG("called.");
     if (record.updateDuration > 0) {

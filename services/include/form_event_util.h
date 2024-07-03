@@ -29,37 +29,35 @@ namespace OHOS {
 namespace AppExecFwk {
 const std::string KEY_UID = "uid";
 const std::string KEY_USER_ID = "userId";
-class FormEventUtil : public std::enable_shared_from_this<FormEventUtil> {
+class FormEventUtil {
 public:
-
-    FormEventUtil() = default;
-
-    void HandleBundleFormInfoChanged(const std::string &bundleName, int32_t userId);
-    void HandleUpdateFormCloud(const std::string &bundleName);
-    void HandleProviderUpdated(const std::string &bundleName, const int userId);
-    void HandleBundleFormInfoRemoved(const std::string &bundleName, int32_t userId);
-    void HandleProviderRemoved(const std::string &bundleName, const int32_t userId);
-    void HandleBundleDataCleared(const std::string &bundleName, int32_t userId);
-    void HandleFormHostDataCleared(const int uid);
-    bool ProviderFormUpdated(const int64_t formId, FormRecord &formRecord, const std::vector<FormInfo> &targetForms);
-    bool ProviderFormUpdated(int64_t formId, FormRecord &formRecord, const BundlePackInfo &bundlePackInfo);
-    void ClearFormDBRecordData(const int uid, std::map<int64_t, bool> &removedFormsMap);
-    void ClearTempFormRecordData(const int uid, std::map<int64_t, bool> &removedFormsMap);
-    void BatchDeleteNoHostTempForms(const int uid, std::map<FormIdKey, std::set<int64_t>> &noHostTempFormsMap,
+    static void HandleBundleFormInfoChanged(const std::string &bundleName, int32_t userId);
+    static void HandleUpdateFormCloud(const std::string &bundleName);
+    static void HandleProviderUpdated(const std::string &bundleName, const int userId);
+    static void HandleBundleFormInfoRemoved(const std::string &bundleName, int32_t userId);
+    static void HandleProviderRemoved(const std::string &bundleName, const int32_t userId);
+    static void HandleBundleDataCleared(const std::string &bundleName, int32_t userId);
+    static void HandleFormHostDataCleared(const int uid);
+    static bool ProviderFormUpdated(const int64_t formId, FormRecord &formRecord,
+        const std::vector<FormInfo> &targetForms);
+    static bool ProviderFormUpdated(int64_t formId, FormRecord &formRecord, const BundlePackInfo &bundlePackInfo);
+    static void ClearFormDBRecordData(const int uid, std::map<int64_t, bool> &removedFormsMap);
+    static void ClearTempFormRecordData(const int uid, std::map<int64_t, bool> &removedFormsMap);
+    static void BatchDeleteNoHostTempForms(const int uid, std::map<FormIdKey, std::set<int64_t>> &noHostTempFormsMap,
         std::map<int64_t, bool> &foundFormsMap);
-    void GetTimerCfg(const bool updateEnabled, const int updateDuration, const std::string &configUpdateAt,
+    static void GetTimerCfg(const bool updateEnabled, const int updateDuration, const std::string &configUpdateAt,
         FormTimerCfg &cfg);
-    void HandleTimerUpdate(const int64_t formId, const FormRecord &record, const FormTimerCfg &timerCfg);
-    void ReCreateForm(const int64_t formId);
-    void BatchDeleteNoHostDBForms(const int uid, std::map<FormIdKey, std::set<int64_t>> &noHostFormDbMap,
+    static void HandleTimerUpdate(const int64_t formId, const FormRecord &record, const FormTimerCfg &timerCfg);
+    static void ReCreateForm(const int64_t formId);
+    static void BatchDeleteNoHostDBForms(const int uid, std::map<FormIdKey, std::set<int64_t>> &noHostFormDbMap,
         std::map<int64_t, bool> &removedFormsMap);
-    void HandleOnUnlock();
-    bool HandleAdditionalInfoChanged(const std::string &bundleName);
+    static void HandleOnUnlock();
+    static bool HandleAdditionalInfoChanged(const std::string &bundleName);
 
 private:
-    void UpdateFormRecord(const FormInfo &formInfo, FormRecord &formRecord);
-    void UpdateFormRecord(const AbilityFormInfo &formInfo, FormRecord &formRecord);
-    UpdateType GetUpdateType(const FormRecord &record, const FormTimerCfg &timerCfg) const;
+    static void UpdateFormRecord(const FormInfo &formInfo, FormRecord &formRecord);
+    static void UpdateFormRecord(const AbilityFormInfo &formInfo, FormRecord &formRecord);
+    static UpdateType GetUpdateType(const FormRecord &record, const FormTimerCfg &timerCfg);
 };
 } // namespace AppExecFwk
 } // namespace OHOS
