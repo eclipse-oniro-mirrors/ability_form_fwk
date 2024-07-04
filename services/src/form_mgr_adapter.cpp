@@ -1387,6 +1387,22 @@ ErrCode FormMgrAdapter::GetFormConfigInfo(const Want &want, FormItemInfo &formCo
     return ERR_OK;
 }
 
+void FormMgrAdapter::CheckUpdateFormRecord(const int64_t formId, const FormItemInfo &info, FormRecord &record)
+{
+    bool needUpdate = false;
+    if (record.recycleStatus != RecycleStatus::NON_RECYCLABLE) {
+        record.recycleStatus = RecycleStatus::NON_RECYCLABLE;
+        needUpdate = true;
+    }
+    if (record.formLocation != info.GetFormLocation()) {
+        record.formLocation = info.GetFormLocation();
+        needUpdate = true;
+    }
+    if (needUpdate) {
+        FormDataMgr::GetInstance().UpdateFormRecord(formId, record);
+    }
+}
+
 ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
     const sptr<IRemoteObject> &callerToken, const WantParams &wantParams, FormJsInfo &formInfo)
 {
@@ -1394,16 +1410,15 @@ ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
     int64_t formId = FormDataMgr::GetInstance().PaddingUdidHash(info.GetFormId());
     FormRecord record;
     bool hasRecord = FormDataMgr::GetInstance().GetFormRecord(formId, record);
-    record.formLocation = info.GetFormLocation();
     record.enableForm = info.IsEnableForm();
-    if (hasRecord && record.recycleStatus != RecycleStatus::NON_RECYCLABLE) {
-        record.recycleStatus = RecycleStatus::NON_RECYCLABLE;
-        FormDataMgr::GetInstance().UpdateFormRecord(formId, record);
+    if (hasRecord) {
+        CheckUpdateFormRecord(formId, info, record);
+        if (record.formTempFlag && !FormRenderMgr::GetInstance().IsRerenderForRenderServiceDied(formId)) {
+            HILOG_ERROR("%{public}s, addForm can not acquire temp form when select form id", __func__);
+            return ERR_APPEXECFWK_FORM_COMMON_CODE;
+        }
     }
-    if (hasRecord && record.formTempFlag && !FormRenderMgr::GetInstance().IsRerenderForRenderServiceDied(formId)) {
-        HILOG_ERROR("%{public}s, addForm can not acquire temp form when select form id", __func__);
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
+    record.formLocation = info.GetFormLocation();
 
     // ark ts form can only exist with one form host
     if (info.GetUiSyntax() == FormType::ETS &&

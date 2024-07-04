@@ -30,6 +30,7 @@
 #include "form_record.h"
 #include "form_render_mgr.h"
 #include "form_task_mgr.h"
+#include "form_trust_mgr.h"
 #include "form_util.h"
 #include "form_xml_parser.h"
 #include "ipc_skeleton.h"
@@ -2470,47 +2471,30 @@ ErrCode FormDataMgr::GetRecordsByFormType(const int32_t formRefreshType,
 {
     HILOG_INFO("formRefreshType: %{public}d", formRefreshType);
     std::lock_guard<std::mutex> lock(formRecordMutex_);
-    if (formRefreshType == Constants::REFRESH_ALL_FORM) {
-        for (auto formRecord : formRecords_) {
-            if (formRecord.second.formVisibleNotifyState == static_cast<int32_t>(FormVisibilityType::VISIBLE)) {
-                visibleFormRecords.emplace_back(formRecord.second);
-                continue;
-            }
-            invisibleFormRecords.emplace_back(formRecord.second);
+    for (auto formRecord : formRecords_) {
+        if (!FormTrustMgr::GetInstance().IsTrust(formRecord.second.bundleName)) {
+            HILOG_ERROR("formId:%{public}" PRId64 ", %{public}s is unTrust.",
+                formRecord.first, formRecord.second.bundleName.c_str());
+            continue;
         }
-    } else if (formRefreshType == Constants::REFRESH_APP_FORM) {
-        for (auto formRecord : formRecords_) {
+        if (formRefreshType == Constants::REFRESH_APP_FORM) {
             if (formRecord.second.formBundleType != BundleType::APP) {
                 continue;
             }
-            if (formRecord.second.formVisibleNotifyState == static_cast<int32_t>(FormVisibilityType::VISIBLE)) {
-                visibleFormRecords.emplace_back(formRecord.second);
-                continue;
-            }
-            invisibleFormRecords.emplace_back(formRecord.second);
-        }
-    } else if (formRefreshType == Constants::REFRESH_ATOMIC_FORM) {
-        for (auto formRecord : formRecords_) {
+        } else if (formRefreshType == Constants::REFRESH_ATOMIC_FORM) {
             if (formRecord.second.formBundleType != BundleType::ATOMIC_SERVICE) {
                 continue;
             }
-            if (formRecord.second.formVisibleNotifyState == static_cast<int32_t>(FormVisibilityType::VISIBLE)) {
-                visibleFormRecords.emplace_back(formRecord.second);
-                continue;
-            }
-            invisibleFormRecords.emplace_back(formRecord.second);
-        }
-    } else if (formRefreshType == Constants::REFRESH_SYSTEMAPP_FORM) {
-        for (auto formRecord : formRecords_) {
+        } else if (formRefreshType == Constants::REFRESH_SYSTEMAPP_FORM) {
             if (!formRecord.second.isSystemApp) {
                 continue;
             }
-            if (formRecord.second.formVisibleNotifyState == static_cast<int32_t>(FormVisibilityType::VISIBLE)) {
-                visibleFormRecords.emplace_back(formRecord.second);
-                continue;
-            }
-            invisibleFormRecords.emplace_back(formRecord.second);
         }
+        if (formRecord.second.formVisibleNotifyState == static_cast<int32_t>(FormVisibilityType::VISIBLE)) {
+            visibleFormRecords.emplace_back(formRecord.second);
+            continue;
+        }
+        invisibleFormRecords.emplace_back(formRecord.second);
     }
     return ERR_OK;
 }
