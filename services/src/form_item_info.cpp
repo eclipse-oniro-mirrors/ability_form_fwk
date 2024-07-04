@@ -613,5 +613,15 @@ void FormItemInfo::SetEnableForm(bool enableForm)
 {
     enableForm_ = enableForm;
 }
+
+Constants::RenderingMode FormItemInfo::GetRenderingMode() const
+{
+    return renderingMode_;
+}
+
+void FormItemInfo::SetRenderingMode(Constants::RenderingMode renderingMode)
+{
+    renderingMode_ = renderingMode;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

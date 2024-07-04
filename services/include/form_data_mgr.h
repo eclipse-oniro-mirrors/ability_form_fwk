@@ -744,6 +744,7 @@ public:
      * @param enable True is enable form, false is disable form.
      */
     void EnableForms(const std::vector<FormRecord> &&formRecords, const bool enable);
+
 private:
     /**
      * @brief Create form record.
@@ -754,6 +755,7 @@ private:
      */
     FormRecord CreateFormRecord(const FormItemInfo &formInfo, const int callingUid,
         const int32_t userId = Constants::DEFAULT_USER_ID) const;
+
     /**
      * @brief Create host record.
      * @param info The form item info.
@@ -764,6 +766,7 @@ private:
      */
     bool CreateHostRecord(const FormItemInfo &info, const sptr<IRemoteObject> &callerToken,
         const int callingUid, FormHostRecord &record);
+
     /**
      * @brief Parse update config.
      * @param record The form record.
@@ -771,24 +774,28 @@ private:
      * @return None.
      */
     void ParseUpdateConfig(FormRecord &record, const FormItemInfo &info) const;
+
     /**
      * @brief Parse update interval config.
      * @param record The form record.
      * @param configDuration interval duration.
      */
     void ParseIntervalConfig(FormRecord &record, const int configDuration) const;
+
     /**
      * @brief Parse at time config.
      * @param record The form record.
      * @param info form item info.
      */
     void ParseAtTimerConfig(FormRecord &record, const FormItemInfo &info) const;
+
     /**
      * @brief Get the temp forms from host and delete temp form in cache.
      * @param record The form record.
      * @param recordTempForms the temp forms.
      */
     void HandleHostDiedForTempForms(const FormHostRecord &record, std::vector<int64_t> &recordTempForms);
+
     /**
      * @brief Check if two forms is same or not.
      * @param record FormRecord.

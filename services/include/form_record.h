@@ -81,6 +81,7 @@ public:
     bool enableForm = true;
     bool isRefreshDuringDisableForm = false;
     bool isUpdateDuringDisableForm = false;
+    Constants::RenderingMode renderingMode = Constants::RenderingMode::FULL_COLOR;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

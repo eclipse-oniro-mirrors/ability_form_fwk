@@ -636,6 +636,7 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t EnableForms(const std::string bundleName, const bool enable);
+
 private:
     /**
      * @brief Get form configure info.
@@ -644,6 +645,7 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode GetFormConfigInfo(const Want& want, FormItemInfo &formItemInfo);
+
     /**
      * @brief Get bundle info.
      * @param want The want of the request.
@@ -652,6 +654,7 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode GetBundleInfo(const AAFwk::Want &want, BundleInfo &bundleInfo, std::string &packageName);
+
     /**
      * @brief Get form info.
      * @param want The want of the request.
@@ -659,6 +662,7 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode GetFormInfo(const AAFwk::Want &want, FormInfo &formInfo);
+
     /**
      * @brief Get form configure info.
      * @param want The want of the request.
@@ -669,6 +673,7 @@ private:
      */
     ErrCode GetFormItemInfo(const AAFwk::Want &want, const BundleInfo &bundleInfo, const FormInfo &formInfo,
         FormItemInfo &formItemInfo);
+
     /**
      * @brief Dimension valid check.
      * @param formInfo Form info.
@@ -676,6 +681,7 @@ private:
      * @return Returns true on success, false on failure.
      */
     bool IsDimensionValid(const FormInfo &formInfo, int dimensionId) const;
+
     /**
      * @brief Create form configure info.
      * @param bundleInfo Bundle info.
@@ -686,6 +692,7 @@ private:
      */
     ErrCode CreateFormItemInfo(const BundleInfo& bundleInfo, const FormInfo& formInfo, FormItemInfo& itemInfo,
         const AAFwk::Want &want);
+
     /**
      * @brief Set form item info params.
      * @param bundleInfo Bundle info.
@@ -693,6 +700,7 @@ private:
      * @param itemInfo Form item info.
      */
     void SetFormItemInfoParams(const BundleInfo& bundleInfo, const FormInfo& formInfo, FormItemInfo& itemInfo);
+
     /**
      * @brief Set form item module info.
      * @param hapModuleInfo Hap module info.
@@ -701,6 +709,7 @@ private:
      */
     void SetFormItemModuleInfo(const HapModuleInfo& hapModuleInfo, const FormInfo& formInfo,
         FormItemInfo& itemInfo);
+
     /**
      * @brief Allocate form by formId.
      * @param info Form configure info.
@@ -711,6 +720,7 @@ private:
      */
     ErrCode AllotFormById(const FormItemInfo &info, const sptr<IRemoteObject> &callerToken,
         const WantParams &wantParams, FormJsInfo &formInfo);
+
     /**
      * @brief Allocate form by form configure info.
      * @param info Form configure info.
@@ -721,6 +731,7 @@ private:
      */
     ErrCode AllotFormByInfo(const FormItemInfo &info, const sptr<IRemoteObject> &callerToken,
         const WantParams& wantParams, FormJsInfo &formInfo);
+
     /**
      * @brief Acquire form data from form provider.
      * @param formId The Id of the form..

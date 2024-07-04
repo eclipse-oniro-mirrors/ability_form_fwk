@@ -430,6 +430,18 @@ public:
      */
     void SetEnableForm(bool enableForm);
 
+    /**
+     * @brief Get renderingMode of form.
+     * @return renderingMode of from.
+     */
+    Constants::RenderingMode GetRenderingMode() const;
+
+    /**
+     * @brief Set renderingMode of form.
+     * @param renderingMode renderingMode
+     */
+    void SetRenderingMode(Constants::RenderingMode renderingMode);
+
 private:
     /**
      * @brief Equal or not.
@@ -478,6 +490,7 @@ private:
     bool isThemeForm_ = false;
     BundleType bundleType_ = BundleType::APP;
     bool enableForm_ = true;
+    Constants::RenderingMode renderingMode_ = Constants::RenderingMode::FULL_COLOR;
 };
 } // namespace AppExecFwk
 } // namespace OHOS
