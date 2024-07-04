@@ -925,7 +925,7 @@ void FormRenderRecord::ReleaseRenderer(
         if (ret) {
             renderRecord->UpdateFormRequestReleaseState(formId, compId, true);
         } else {
-            HILOG_ERROR("release renderer error, skip update state, formId: %{public}" PRId64, formId);
+            HILOG_ERROR("release renderer error, skip update state, formId:%{public}" PRId64, formId);
         }
     };
     eventHandler->PostSyncTask(task, "ReleaseRenderer");
@@ -1409,10 +1409,10 @@ void FormRenderRecord::HandleRecoverForm(const int64_t &formId,
             formRequest.hasRelease = false;
             AddFormRequest(formId, formRequest);
         } else {
-            HILOG_ERROR("form not released, formId: %{public}" PRId64, formId);
+            HILOG_ERROR("form not released, formId:%{public}" PRId64, formId);
         }
     } else {
-        HILOG_ERROR("formRequests size invalid, formId: %{public}" PRId64, formId);
+        HILOG_ERROR("formRequests size invalid, formId:%{public}" PRId64, formId);
     }
 }
 } // namespace FormRender

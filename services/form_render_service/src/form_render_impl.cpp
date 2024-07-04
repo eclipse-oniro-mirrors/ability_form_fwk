@@ -168,8 +168,7 @@ int32_t FormRenderImpl::StopRenderingForm(const FormJsInfo &formJsInfo, const Wa
 
 int32_t FormRenderImpl::ReleaseRenderer(int64_t formId, const std::string &compId, const std::string &uid)
 {
-    HILOG_INFO("formId: %{public}" PRId64 ", compId: %{public}s, uid: %{public}s.",
-        formId, compId.c_str(), uid.c_str());
+    HILOG_INFO("formId:%{public}" PRId64 ", compId:%{public}s, uid:%{public}s.", formId, compId.c_str(), uid.c_str());
     if (formId <= 0 || compId.empty() || uid.empty()) {
         HILOG_ERROR("param invalid");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
@@ -179,17 +178,17 @@ int32_t FormRenderImpl::ReleaseRenderer(int64_t formId, const std::string &compI
     bool isRenderGroupEmpty = false;
     auto search = renderRecordMap_.find(uid);
     if (search == renderRecordMap_.end()) {
-        HILOG_ERROR("record not found, formId: %{public}" PRId64, formId);
+        HILOG_ERROR("record not found, formId:%{public}" PRId64, formId);
         return RENDER_FORM_FAILED;
     }
 
     if (!search->second) {
-        HILOG_ERROR("record invalid, formId: %{public}" PRId64, formId);
+        HILOG_ERROR("record invalid, formId:%{public}" PRId64, formId);
         return RENDER_FORM_FAILED;
     }
 
     search->second->ReleaseRenderer(formId, compId, isRenderGroupEmpty);
-    HILOG_INFO("end, isRenderGroupEmpty: %{public}d", isRenderGroupEmpty);
+    HILOG_INFO("end, isRenderGroupEmpty:%{public}d", isRenderGroupEmpty);
     if (isRenderGroupEmpty) {
         search->second->Release();
     }
@@ -360,10 +359,10 @@ int32_t FormRenderImpl::RecycleForm(const int64_t &formId, const Want &want)
 
     std::string uid = want.GetStringParam(Constants::FORM_SUPPLY_UID);
     if (uid.empty()) {
-        HILOG_ERROR("uid is empty, formId: %{public}" PRId64, formId);
+        HILOG_ERROR("uid is empty, formId:%{public}" PRId64, formId);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
-    HILOG_INFO("formId: %{public}" PRId64 ", uid: %{public}s.", formId, uid.c_str());
+    HILOG_INFO("formId:%{public}" PRId64 ", uid:%{public}s.", formId, uid.c_str());
 
     std::string statusData;
     {
@@ -389,7 +388,7 @@ int32_t FormRenderImpl::RecycleForm(const int64_t &formId, const Want &want)
         formSupplyClient = formSupplyClient_;
     }
     if (formSupplyClient == nullptr) {
-        HILOG_ERROR("formSupplyClient_ is null, formId: %{public}" PRId64, formId);
+        HILOG_ERROR("formSupplyClient_ is null, formId:%{public}" PRId64, formId);
         return RECYCLE_FORM_FAILED;
     }
 
@@ -408,10 +407,10 @@ int32_t FormRenderImpl::RecoverForm(const int64_t &formId, const Want &want)
 
     std::string uid = want.GetStringParam(Constants::FORM_SUPPLY_UID);
     if (uid.empty()) {
-        HILOG_ERROR("uid is empty, formId: %{public}" PRId64, formId);
+        HILOG_ERROR("uid is empty, formId:%{public}" PRId64, formId);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
-    HILOG_INFO("formId:%{public}" PRId64 ", connectId: %{public}d, uid: %{public}s.",
+    HILOG_INFO("formId:%{public}" PRId64 ", connectId:%{public}d, uid:%{public}s.",
         formId, want.GetIntParam(Constants::FORM_CONNECT_ID, 0L), uid.c_str());
 
     std::string statusData = want.GetStringParam(Constants::FORM_STATUS_DATA);
