@@ -2553,7 +2553,7 @@ HWTEST_F(FmsFormMgrProxyTest, RegisterClickEventObserver_0200, Function | Medium
     GTEST_LOG_(INFO) << "FmsFormMgrProxyTest, RegisterClickEventObserver_0200, TestSize.Level1";
     sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
     ASSERT_NE(nullptr, iremoteObject);
-    int32_t errCode = -1;
+    int32_t errCode = ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
     EXPECT_CALL(*iremoteObject, SendRequest(_, _, _, _)).Times(1).WillRepeatedly(DoAll(Return(errCode)));
     std::shared_ptr<FormMgrProxy> proxy = std::make_shared<FormMgrProxy>(iremoteObject);
     ASSERT_NE(nullptr, proxy);
@@ -2600,7 +2600,7 @@ HWTEST_F(FmsFormMgrProxyTest, UnregisterClickEventObserver_0200, Function | Medi
     GTEST_LOG_(INFO) << "FmsFormMgrProxyTest, UnregisterClickEventObserver_0200, TestSize.Level1";
     sptr<MockIRemoteObject> iremoteObject = new (std::nothrow) MockIRemoteObject();
     ASSERT_NE(nullptr, iremoteObject);
-    int32_t errCode = -1;
+    int32_t errCode = ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
     EXPECT_CALL(*iremoteObject, SendRequest(_, _, _, _)).Times(1).WillRepeatedly(DoAll(Return(errCode)));
     std::shared_ptr<FormMgrProxy> proxy = std::make_shared<FormMgrProxy>(iremoteObject);
     ASSERT_NE(nullptr, proxy);
