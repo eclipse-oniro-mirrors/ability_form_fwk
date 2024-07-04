@@ -158,6 +158,12 @@ public:
      * @param timeSpeed The time speed.
      */
     void SetTimeSpeed(int32_t timeSpeed);
+    /**
+     * @brief refresh form when form visible.
+     * @param formId The Id of the form.
+     * @param userId User ID.
+     */
+    void RefreshWhenFormVisible(const int64_t &formId, const int32_t &userId);
 
 #ifdef RES_SCHEDULE_ENABLE
     /**

@@ -1408,6 +1408,12 @@ void FormTimerMgr::ExecTimerTask(const FormTimer &timerTask)
     HILOG_INFO("end");
 }
 
+void FormTimerMgr::RefreshWhenFormVisible(const int64_t &formId, const int32_t &userId)
+{
+    FormTimer timerTask(formId, true, userId);
+    ExecTimerTask(timerTask);
+}
+
 /**
  * @brief Init.
  */
