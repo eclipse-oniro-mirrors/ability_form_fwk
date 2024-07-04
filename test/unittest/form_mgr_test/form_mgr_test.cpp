@@ -2830,10 +2830,8 @@ HWTEST_F(FormMgrTest, FormMgrTest_0130, TestSize.Level1) {
     int64_t formId = 0x00000008fffffffL;
     std::unique_ptr<FormProviderData> formProviderData;
     FormDataProxy formDataProxy("city", "");
-
     ErrCode result = FormMgr::GetInstance().RequestPublishFormWithSnapshot(want, true, formProviderData, formId);
     EXPECT_EQ(result, ERR_OK);
-
     AppExecFwk::ApplicationInfo appInfo;
     appInfo.isSystemApp = false;
     FormMgr::GetInstance().resetFlag_ = true;
@@ -2841,5 +2839,4 @@ HWTEST_F(FormMgrTest, FormMgrTest_0130, TestSize.Level1) {
     EXPECT_NE(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrTest_0130 test ends";
 }
-
 } // namespace

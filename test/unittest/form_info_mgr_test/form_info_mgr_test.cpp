@@ -28,7 +28,8 @@ using namespace OHOS;
 using namespace OHOS::AppExecFwk;
 using namespace OHOS::AAFwk;
 
-extern void MockCheckBundlePermission(bool mockRet);
+extern void MockIsSACall(bool mockRet);
+extern void MockVerifyCallingPermission(bool mockRet);
 
 const std::string FORM_BUNDLE_NAME_TEST = "ohos.samples.Test";
 const std::string PARAM_MODULE_NAME_TEST = "entry";
@@ -714,7 +715,8 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetFormsInfoByFilter_0100, TestSize.Level1
     GTEST_LOG_(INFO) << "FormInfoMgr_GetFormsInfoByFilter_0100 start";
     std::vector<FormInfo> formInfos;
     FormInfoFilter filter;
-    MockCheckBundlePermission(false);
+    MockIsSACall(false);
+    MockVerifyCallingPermission(false);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE, formInfoMgr_.GetFormsInfoByFilter(filter, formInfos));
     GTEST_LOG_(INFO) << "FormInfoMgr_GetFormsInfoByFilter_0100 end";
 }
@@ -735,7 +737,7 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetFormsInfoByFilter_0200, TestSize.Level1
     bundleFormInfo->formInfoStorages_.emplace_back(formInfoStorage);
     formInfoMgr_.bundleFormInfoMap_.emplace(FORM_BUNDLE_NAME_TEST, bundleFormInfo);
     FormInfoFilter filter;
-    MockCheckBundlePermission(true);
+    MockIsSACall(true);
     EXPECT_EQ(ERR_OK, formInfoMgr_.GetFormsInfoByFilter(filter, formInfos));
     GTEST_LOG_(INFO) << "FormInfoMgr_GetFormsInfoByFilter_0200 end";
 }
@@ -758,7 +760,8 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetFormsInfoByFilter_0300, TestSize.Level1
     FormInfoFilter filter;
     filter.bundleName = FORM_BUNDLE_NAME_TEST;
     filter.moduleName = PARAM_MODULE_NAME_TEST;
-    MockCheckBundlePermission(true);
+    MockIsSACall(false);
+    MockVerifyCallingPermission(true);
     EXPECT_EQ(ERR_OK, formInfoMgr_.GetFormsInfoByFilter(filter, formInfos));
     GTEST_LOG_(INFO) << "FormInfoMgr_GetFormsInfoByFilter_0300 end";
 }
@@ -781,7 +784,7 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetFormsInfoByFilter_0400, TestSize.Level1
     FormInfoFilter filter;
     filter.bundleName = FORM_BUNDLE_NAME_TEST;
     filter.moduleName = PARAM_MODULE_NAME_TEST;
-    MockCheckBundlePermission(true);
+    MockIsSACall(true);
     EXPECT_EQ(ERR_OK, formInfoMgr_.GetFormsInfoByFilter(filter, formInfos));
     GTEST_LOG_(INFO) << "FormInfoMgr_GetFormsInfoByFilter_0400 end";
 }
