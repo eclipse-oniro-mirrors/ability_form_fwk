@@ -239,7 +239,7 @@ int FormMgr::UpdateForm(const int64_t formId, const FormProviderData &formBindin
 */
 int FormMgr::ReleaseRenderer(const int64_t formId, const std::string &compId)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("formId: %{public}" PRId64, formId);
     // check fms recover status
     if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
         HILOG_ERROR("form is in recover status, can't do action on form.");

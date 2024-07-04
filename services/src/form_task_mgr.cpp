@@ -1129,8 +1129,7 @@ void FormTaskMgr::RecycleForm(const int64_t &formId, const sptr<IRemoteObject> &
     }
 
     Want want;
-    int32_t userId = FormUtil::GetCurrentAccountId();
-    want.SetParam(Constants::FORM_SUPPLY_UID, std::to_string(userId) + formRecord.bundleName);
+    want.SetParam(Constants::FORM_SUPPLY_UID, std::to_string(formRecord.providerUserId) + formRecord.bundleName);
     want.SetParam(Constants::PARAM_FORM_HOST_TOKEN, remoteObjectOfHost);
     int32_t error = remoteFormRender->RecycleForm(formId, want);
     if (error != ERR_OK) {

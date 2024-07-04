@@ -924,6 +924,8 @@ void FormRenderRecord::ReleaseRenderer(
         bool ret = renderRecord->HandleReleaseRendererInJsThread(formId, compId, isRenderGroupEmpty);
         if (ret) {
             renderRecord->UpdateFormRequestReleaseState(formId, compId, true);
+        } else {
+            HILOG_ERROR("release renderer error, skip update state, formId: %{public}" PRId64, formId);
         }
     };
     eventHandler->PostSyncTask(task, "ReleaseRenderer");
@@ -936,18 +938,19 @@ bool FormRenderRecord::HandleReleaseRendererInJsThread(
         std::to_string(formId).c_str(), compId.c_str());
     MarkThreadAlive();
     if (compId.empty()) {
+        HILOG_ERROR("compId empty.");
         return false;
     }
 
     std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
     auto search = formRendererGroupMap_.find(formId);
     if (search == formRendererGroupMap_.end()) {
-        HILOG_INFO("HandleReleaseRenderer failed. FormRendererGroup was not founded.");
+        HILOG_ERROR("renderer group not found.");
         return false;
     }
 
     if (!search->second) {
-        HILOG_INFO("HandleReleaseRenderer failed. FormRendererGroup was founded but is null.");
+        HILOG_ERROR("renderer group is null.");
         return false;
     }
 
@@ -1405,7 +1408,11 @@ void FormRenderRecord::HandleRecoverForm(const int64_t &formId,
             AddRenderer(formRequest.formJsInfo, want);
             formRequest.hasRelease = false;
             AddFormRequest(formId, formRequest);
+        } else {
+            HILOG_ERROR("form not released, formId: %{public}" PRId64, formId);
         }
+    } else {
+        HILOG_ERROR("formRequests size invalid, formId: %{public}" PRId64, formId);
     }
 }
 } // namespace FormRender
