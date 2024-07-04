@@ -203,6 +203,7 @@ FormRecord FormDataMgr::CreateFormRecord(const FormItemInfo &formInfo, const int
     newRecord.modulePkgNameMap = formInfo.GetModulePkgNameMap();
     newRecord.formBundleType = formInfo.GetFormBundleType();
     formInfo.GetHapSourceDirs(newRecord.hapSourceDirs);
+    newRecord.renderingMode = formInfo.GetRenderingMode();
     HILOG_DEBUG("end");
     return newRecord;
 }

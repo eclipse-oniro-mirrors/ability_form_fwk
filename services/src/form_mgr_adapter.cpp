@@ -1379,11 +1379,17 @@ ErrCode FormMgrAdapter::GetFormConfigInfo(const Want &want, FormItemInfo &formCo
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     formConfigInfo.SetFormLocation((Constants::FormLocation)formLocation);
+    
+    int renderingMode = want.GetParams().GetIntParam(Constants::PARAM_FORM_RENDERINGMODE_KEY,
+        static_cast<int>(Constants::RenderingMode::FULL_COLOR));
+    formConfigInfo.SetRenderingMode((Constants::RenderingMode)renderingMode);
+
     bool isFormBundleForbidden = FormBundleForbidMgr::GetInstance().IsBundleForbidden(
         formConfigInfo.GetProviderBundleName());
     formConfigInfo.SetEnableForm(!isFormBundleForbidden);
     HILOG_DEBUG("GetFormConfigInfo end, formLocation = %{public}d, enable is %{public}d",
         formLocation, isFormBundleForbidden);
+
     return ERR_OK;
 }
 
