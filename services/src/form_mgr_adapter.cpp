@@ -3703,7 +3703,7 @@ int32_t FormMgrAdapter::RecoverForms(const std::vector<int64_t> &formIds, const 
         record.recycleStatus = RecycleStatus::NON_RECYCLABLE;
         FormDataMgr::GetInstance().UpdateFormRecord(matchedFormId, record);
         validFormIds.emplace_back(matchedFormId);
-        HILOG_INFO("formId:%{public}" PRId64 " recyclable", formId);
+        HILOG_INFO("formId:%{public}" PRId64 " non-recyclable", formId);
     }
 
     if (validFormIds.empty()) {

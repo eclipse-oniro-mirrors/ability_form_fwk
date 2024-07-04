@@ -336,8 +336,7 @@ ErrCode FormRenderMgrInner::ReleaseRenderer(int64_t formId, const FormRecord &fo
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    int32_t userId = FormUtil::GetCurrentAccountId();
-    std::string uid = std::to_string(userId) + formRecord.bundleName;
+    std::string uid = std::to_string(formRecord.providerUserId) + formRecord.bundleName;
     {
         std::lock_guard<std::mutex> lock(resourceMutex_);
         auto conIterator = renderFormConnections_.find(formRecord.formId);
@@ -641,7 +640,7 @@ ErrCode FormRenderMgrInner::RecoverForms(const std::vector<int64_t> &formIds, co
             HILOG_ERROR("form record %{public}" PRId64 " not exist", formId);
             continue;
         }
-        std::string uid = std::to_string(FormUtil::GetCurrentAccountId()) + formRecord.bundleName;
+        std::string uid = std::to_string(formRecord.providerUserId) + formRecord.bundleName;
         want.SetParam(Constants::FORM_SUPPLY_UID, uid);
 
         std::lock_guard<std::mutex> lock(resourceMutex_);
