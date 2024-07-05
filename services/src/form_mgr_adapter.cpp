@@ -2784,11 +2784,7 @@ bool FormMgrAdapter::UpdateProviderInfoToHost(const int64_t &matchedFormId, cons
     // If the form need refresh flag is true and form visibleType is FORM_VISIBLE, refresh the form host.
     if (formRecord.needRefresh && formVisibleType == Constants::FORM_VISIBLE) {
         if (formRecord.isTimerRefresh) {
-            Want want;
-            want.SetParam(Constants::KEY_IS_TIMER, true);
-            want.SetParam(Constants::KEY_TIMER_REFRESH, true);
-            want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
-            FormProviderMgr::GetInstance().RefreshForm(formRecord.formId, want, false);
+            FormTimerMgr::GetInstance().RefreshWhenFormVisible(formRecord.formId, userId);
         } else {
             std::string cacheData;
             std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
