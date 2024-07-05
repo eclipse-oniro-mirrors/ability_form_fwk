@@ -1521,4 +1521,22 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0090, Function | MediumTest | Lev
     EXPECT_EQ(0, formTimerMgr->notExecTaskVec_.size());
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0090 end";
 }
+
+/**
+ * @tc.number: Fms_FormTimerMgr_0091
+ * @tc.name: RefreshWhenFormVisible.
+ * @tc.desc: test RefreshWhenFormVisible function.
+ */
+HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0091, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0091 start";
+    std::shared_ptr<FormTimerMgr> formTimerMgr = std::make_shared<FormTimerMgr>();
+    formTimerMgr->SetTimerTaskNeeded(false);
+    EXPECT_EQ(0, formTimerMgr->notExecTaskVec_.size());
+    int64_t formId = 0;
+    int32_t userId = 0;
+    formTimerMgr->RefreshWhenFormVisible(formId, userId);
+    EXPECT_EQ(1, formTimerMgr->notExecTaskVec_.size());
+    GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0091 end";
+}
 }
