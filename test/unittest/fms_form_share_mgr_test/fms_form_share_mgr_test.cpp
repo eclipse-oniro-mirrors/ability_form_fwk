@@ -2091,10 +2091,9 @@ HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_049, TestSize.Level0)
 HWTEST_F(FmsFormShareMgrTest, FormEventUtil_0001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_0001 start";
-    FormEventUtil formEventUtil;
     std::string bundleName = "aa";
     int userId = 1;
-    formEventUtil.HandleProviderUpdated(bundleName, userId);
+    FormEventUtil::HandleProviderUpdated(bundleName, userId);
     GTEST_LOG_(INFO) << "FormEventUtil_0001 end";
 }
 
@@ -2108,7 +2107,6 @@ HWTEST_F(FmsFormShareMgrTest, FormEventUtil_0002, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormEventUtil_0002 start";
     std::string paraFormName = "com.form.name.test";
     int64_t formIds = 2;
-    FormEventUtil formEventUtil;
     FormRecord formInfo;
     formInfo.formName = "aaaaaa";
     formInfo.bundleName = paraFormName;
@@ -2116,7 +2114,7 @@ HWTEST_F(FmsFormShareMgrTest, FormEventUtil_0002, TestSize.Level0)
     FormDataMgr::GetInstance().formRecords_.emplace(formIds, formInfo);
     std::string bundleName = paraFormName;
     int userId = 1;
-    formEventUtil.HandleProviderUpdated(bundleName, userId);
+    FormEventUtil::HandleProviderUpdated(bundleName, userId);
     GTEST_LOG_(INFO) << "FormEventUtil_0002 end";
 }
 
@@ -2130,8 +2128,7 @@ HWTEST_F(FmsFormShareMgrTest, FormEventUtil_0003, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormEventUtil_0003 start";
     std::string bundleName = "com.form.name.test";
     int32_t userId = 1;
-    FormEventUtil formEventUtil;
-    formEventUtil.HandleProviderRemoved(bundleName, userId);
+    FormEventUtil::HandleProviderRemoved(bundleName, userId);
     GTEST_LOG_(INFO) << "FormEventUtil_0003 end";
 }
 
@@ -2145,9 +2142,7 @@ HWTEST_F(FmsFormShareMgrTest, FormEventUtil_0004, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormEventUtil_0004 start";
     std::string bundleName = FORM_NULL_BUNDLE_NAME;
     int32_t userId = 1;
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
-    formEventUtil->HandleBundleDataCleared(bundleName, userId);
+    FormEventUtil::HandleBundleDataCleared(bundleName, userId);
     GTEST_LOG_(INFO) << "FormEventUtil_0004 end";
 }
 
@@ -2168,9 +2163,7 @@ HWTEST_F(FmsFormShareMgrTest, FormEventUtil_0005, TestSize.Level0)
     FormDataMgr::GetInstance().formRecords_.emplace(formJsInfo.formId, formInfo);
     std::string bundleName = FORM_NULL_BUNDLE_NAME;
     int32_t userId = 1;
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
-    formEventUtil->HandleBundleDataCleared(bundleName, userId);
+    FormEventUtil::HandleBundleDataCleared(bundleName, userId);
     GTEST_LOG_(INFO) << "FormEventUtil_0005 end";
 }
 
@@ -2183,9 +2176,7 @@ HWTEST_F(FmsFormShareMgrTest, FormEventUtil_0006, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_0006 start";
     int uid = 1;
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
-    formEventUtil->HandleFormHostDataCleared(uid);
+    FormEventUtil::HandleFormHostDataCleared(uid);
     GTEST_LOG_(INFO) << "FormEventUtil_0006 end";
 }
 
@@ -2200,8 +2191,7 @@ HWTEST_F(FmsFormShareMgrTest, FormEventUtil_0007, TestSize.Level0)
     int64_t formId = 1;
     FormRecord formRecord;
     std::vector<FormInfo> targetForms;
-    FormEventUtil formEventUtil;
-    EXPECT_EQ(false, formEventUtil.ProviderFormUpdated(formId, formRecord, targetForms));
+    EXPECT_EQ(false, FormEventUtil::ProviderFormUpdated(formId, formRecord, targetForms));
     GTEST_LOG_(INFO) << "FormEventUtil_0007 end";
 }
 
@@ -2222,8 +2212,7 @@ HWTEST_F(FmsFormShareMgrTest, FormEventUtil_0008, TestSize.Level0)
     info.bundleName = "com.ohos.contactsdataability";
     std::vector<FormInfo> targetForms;
     targetForms.emplace_back(info);
-    FormEventUtil formEventUtil;
-    EXPECT_EQ(false, formEventUtil.ProviderFormUpdated(formId, formRecord, targetForms));
+    EXPECT_EQ(false, FormEventUtil::ProviderFormUpdated(formId, formRecord, targetForms));
     GTEST_LOG_(INFO) << "FormEventUtil_0008 end";
 }
 
@@ -2238,8 +2227,7 @@ HWTEST_F(FmsFormShareMgrTest, FormEventUtil_0009, TestSize.Level0)
     int64_t formId = 1;
     FormRecord formRecord;
     BundlePackInfo bundlePackInfo;
-    FormEventUtil formEventUtil;
-    formEventUtil.ProviderFormUpdated(formId, formRecord, bundlePackInfo);
+    FormEventUtil::ProviderFormUpdated(formId, formRecord, bundlePackInfo);
     GTEST_LOG_(INFO) << "FormEventUtil_0009 end";
 }
 

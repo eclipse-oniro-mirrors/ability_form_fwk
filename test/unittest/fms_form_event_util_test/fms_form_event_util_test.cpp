@@ -83,15 +83,13 @@ void FmsFormEventUtilTest::TearDown()
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_001 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     std::string bundleName = FORM_HOST_BUNDLE_NAME;
     int userId = 1;
     MockSetFormTempFlag(true);
     MockGetFormRecord(true);
     MockGetFormsInfoByBundle(false);
     MockGetBundlePackInfo(true);
-    formEventUtil->HandleProviderUpdated(bundleName, userId);
+    FormEventUtil::HandleProviderUpdated(bundleName, userId);
     GTEST_LOG_(INFO) << "FormEventUtil_001 end";
 }
 
@@ -103,15 +101,13 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_001, TestSize.Level0)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_002, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_002 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     std::string bundleName = FORM_HOST_BUNDLE_NAME;
     int userId = 1;
     MockSetFormTempFlag(false);
     MockGetFormRecord(true);
     MockGetFormsInfoByBundle(false);
     MockGetBundlePackInfo(false);
-    formEventUtil->HandleProviderUpdated(bundleName, userId);
+    FormEventUtil::HandleProviderUpdated(bundleName, userId);
     GTEST_LOG_(INFO) << "FormEventUtil_002 end";
 }
 
@@ -123,12 +119,10 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_002, TestSize.Level0)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_003, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_003 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     std::string bundleName = "aa";
     int32_t userId = 2;
     MockGetMatchCount(true);
-    formEventUtil->HandleProviderRemoved(bundleName, userId);
+    FormEventUtil::HandleProviderRemoved(bundleName, userId);
     GTEST_LOG_(INFO) << "FormEventUtil_003 end";
 }
 
@@ -140,12 +134,10 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_003, TestSize.Level0)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_004, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_004 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     std::string bundleName = "aa";
     int32_t userId = 2;
     MockGetMatchCount(false);
-    formEventUtil->HandleProviderRemoved(bundleName, userId);
+    FormEventUtil::HandleProviderRemoved(bundleName, userId);
     GTEST_LOG_(INFO) << "FormEventUtil_004 end";
 }
 
@@ -157,13 +149,11 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_004, TestSize.Level0)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_005, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_005 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     std::string bundleName = "aa";
     int32_t userId = 1;
     MockGetReCreateFormRecordsByBundleName(true);
     MockGetUidByBundleName(true);
-    formEventUtil->HandleBundleDataCleared(bundleName, userId);
+    FormEventUtil::HandleBundleDataCleared(bundleName, userId);
     GTEST_LOG_(INFO) << "FormEventUtil_005 end";
 }
 
@@ -175,13 +165,11 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_005, TestSize.Level0)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_006, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_006 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     std::string bundleName = "aa";
     int32_t userId = 1;
     MockGetReCreateFormRecordsByBundleName(false);
     MockGetUidByBundleName(false);
-    formEventUtil->HandleBundleDataCleared(bundleName, userId);
+    FormEventUtil::HandleBundleDataCleared(bundleName, userId);
     GTEST_LOG_(INFO) << "FormEventUtil_006 end";
 }
 
@@ -193,11 +181,10 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_006, TestSize.Level0)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_007, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_007 start";
-    FormEventUtil formEventUtil;
     int64_t formId = 1;
     FormRecord formRecord;
     std::vector<FormInfo> targetForms;
-    EXPECT_EQ(false, formEventUtil.ProviderFormUpdated(formId, formRecord, targetForms));
+    EXPECT_EQ(false, FormEventUtil::ProviderFormUpdated(formId, formRecord, targetForms));
     GTEST_LOG_(INFO) << "FormEventUtil_007 end";
 }
 
@@ -209,7 +196,6 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_007, TestSize.Level0)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_008, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_008 start";
-    FormEventUtil formEventUtil;
     int64_t formId = 1;
     FormRecord formRecord;
     std::vector<FormInfo> targetForms;
@@ -220,7 +206,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_008, TestSize.Level0)
     formInfo.name = FORM_NAME;
     targetForms.emplace_back(formInfo);
     MockGetUpdatedForm(false);
-    EXPECT_EQ(false, formEventUtil.ProviderFormUpdated(formId, formRecord, targetForms));
+    EXPECT_EQ(false, FormEventUtil::ProviderFormUpdated(formId, formRecord, targetForms));
     GTEST_LOG_(INFO) << "FormEventUtil_008 end";
 }
 
@@ -232,7 +218,6 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_008, TestSize.Level0)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_009, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_009 start";
-    FormEventUtil formEventUtil;
     int64_t formId = 1;
     FormRecord formRecord;
     std::vector<FormInfo> targetForms;
@@ -243,7 +228,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_009, TestSize.Level0)
     formInfo.name = FORM_NAME;
     targetForms.emplace_back(formInfo);
     MockGetUpdatedForm(true);
-    EXPECT_EQ(true, formEventUtil.ProviderFormUpdated(formId, formRecord, targetForms));
+    EXPECT_EQ(true, FormEventUtil::ProviderFormUpdated(formId, formRecord, targetForms));
     GTEST_LOG_(INFO) << "FormEventUtil_009 end";
 }
 
@@ -255,12 +240,11 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_009, TestSize.Level0)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_010, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_010 start";
-    FormEventUtil formEventUtil;
     int64_t formId = 1;
     FormRecord formRecord;
     BundlePackInfo bundlePackInfo;
     MockGetPackageForm(false);
-    EXPECT_EQ(false, formEventUtil.ProviderFormUpdated(formId, formRecord, bundlePackInfo));
+    EXPECT_EQ(false, FormEventUtil::ProviderFormUpdated(formId, formRecord, bundlePackInfo));
     GTEST_LOG_(INFO) << "FormEventUtil_010 end";
 }
 
@@ -272,12 +256,11 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_010, TestSize.Level0)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_011, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_011 start";
-    FormEventUtil formEventUtil;
     int64_t formId = 1;
     FormRecord formRecord;
     BundlePackInfo bundlePackInfo;
     MockGetPackageForm(true);
-    EXPECT_EQ(true, formEventUtil.ProviderFormUpdated(formId, formRecord, bundlePackInfo));
+    EXPECT_EQ(true, FormEventUtil::ProviderFormUpdated(formId, formRecord, bundlePackInfo));
     GTEST_LOG_(INFO) << "FormEventUtil_011 end";
 }
 
@@ -289,13 +272,11 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_011, TestSize.Level0)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_012, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_012 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     int uid = 1;
     std::map<int64_t, bool> removedFormsMap;
     MockGetNoHostDBFormsTwo(false);
     MockGetNoHostDBFormsOne(false);
-    formEventUtil->ClearFormDBRecordData(uid, removedFormsMap);
+    FormEventUtil::ClearFormDBRecordData(uid, removedFormsMap);
     GTEST_LOG_(INFO) << "FormEventUtil_012 end";
 }
 
@@ -307,13 +288,11 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_012, TestSize.Level0)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_013, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_013 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     int uid = 1;
     std::map<int64_t, bool> removedFormsMap;
     MockGetNoHostDBFormsTwo(false);
     MockGetNoHostDBFormsOne(true);
-    formEventUtil->ClearFormDBRecordData(uid, removedFormsMap);
+    FormEventUtil::ClearFormDBRecordData(uid, removedFormsMap);
     GTEST_LOG_(INFO) << "FormEventUtil_013 end";
 }
 
@@ -325,13 +304,11 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_013, TestSize.Level0)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_014, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_014 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     int uid = 1;
     std::map<int64_t, bool> removedFormsMap;
     MockGetNoHostDBFormsTwo(true);
     MockGetNoHostDBFormsOne(true);
-    formEventUtil->ClearFormDBRecordData(uid, removedFormsMap);
+    FormEventUtil::ClearFormDBRecordData(uid, removedFormsMap);
     GTEST_LOG_(INFO) << "FormEventUtil_014 end";
 }
 
@@ -343,13 +320,11 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_014, TestSize.Level0)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_015, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_015 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     int uid = 1;
     std::map<int64_t, bool> removedFormsMap;
     MockGetNoHostTempFormsOne(false);
     MockGetNoHostTempFormsTwo(false);
-    formEventUtil->ClearTempFormRecordData(uid, removedFormsMap);
+    FormEventUtil::ClearTempFormRecordData(uid, removedFormsMap);
     GTEST_LOG_(INFO) << "FormEventUtil_015 end";
 }
 
@@ -361,13 +336,11 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_015, TestSize.Level0)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_016, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_016 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     int uid = 1;
     std::map<int64_t, bool> removedFormsMap;
     MockGetNoHostTempFormsOne(true);
     MockGetNoHostTempFormsTwo(true);
-    formEventUtil->ClearTempFormRecordData(uid, removedFormsMap);
+    FormEventUtil::ClearTempFormRecordData(uid, removedFormsMap);
     GTEST_LOG_(INFO) << "FormEventUtil_016 end";
 }
 
@@ -379,12 +352,10 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_016, TestSize.Level0)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_017, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_017 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     std::string bundleName = FORM_HOST_BUNDLE_NAME;
     int32_t userId = 1;
     MockGetFormRecord(false);
-    formEventUtil->HandleProviderUpdated(bundleName, userId);
+    FormEventUtil::HandleProviderUpdated(bundleName, userId);
     GTEST_LOG_(INFO) << "FormEventUtil_017 end";
 }
 
@@ -396,13 +367,11 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_017, TestSize.Level1)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_018, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_018 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     std::string bundleName = FORM_HOST_BUNDLE_NAME;
     int32_t userId = 1;
     MockGetFormRecord(true);
     MockGetFormsInfoByBundle(false);
-    formEventUtil->HandleProviderUpdated(bundleName, userId);
+    FormEventUtil::HandleProviderUpdated(bundleName, userId);
     GTEST_LOG_(INFO) << "FormEventUtil_018 end";
 }
 
@@ -414,15 +383,13 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_018, TestSize.Level1)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_019, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_019 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     std::string bundleName = FORM_HOST_BUNDLE_NAME;
     int32_t userId = 1;
     MockGetFormRecord(true);
     MockGetFormsInfoByBundle(true);
     MockGetBundlePackInfo(true);
     MockGetUpdatedForm(true);
-    formEventUtil->HandleProviderUpdated(bundleName, userId);
+    FormEventUtil::HandleProviderUpdated(bundleName, userId);
     GTEST_LOG_(INFO) << "FormEventUtil_019 end";
 }
 
@@ -434,8 +401,6 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_019, TestSize.Level1)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_020, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_020 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     std::string bundleName = FORM_HOST_BUNDLE_NAME;
     int32_t userId = 1;
     MockGetFormRecord(true);
@@ -443,7 +408,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_020, TestSize.Level1)
     MockGetBundlePackInfo(true);
     MockGetUpdatedForm(false);
     MockGetPackageForm(true);
-    formEventUtil->HandleProviderUpdated(bundleName, userId);
+    FormEventUtil::HandleProviderUpdated(bundleName, userId);
     GTEST_LOG_(INFO) << "FormEventUtil_020 end";
 }
 
@@ -455,8 +420,6 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_020, TestSize.Level1)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_021, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_021 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     std::string bundleName = FORM_HOST_BUNDLE_NAME;
     int32_t userId = 1;
     MockGetFormRecord(true);
@@ -465,7 +428,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_021, TestSize.Level1)
     MockGetUpdatedForm(false);
     MockGetPackageForm(false);
     MockSetFormTempFlag(true);
-    formEventUtil->HandleProviderUpdated(bundleName, userId);
+    FormEventUtil::HandleProviderUpdated(bundleName, userId);
     GTEST_LOG_(INFO) << "FormEventUtil_021 end";
 }
 
@@ -477,8 +440,6 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_021, TestSize.Level1)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_022, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_022 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     std::string bundleName = FORM_HOST_BUNDLE_NAME;
     int32_t userId = 1;
     MockGetFormRecord(true);
@@ -487,7 +448,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_022, TestSize.Level1)
     MockGetUpdatedForm(false);
     MockGetPackageForm(true);
     MockSetFormTempFlag(false);
-    formEventUtil->HandleProviderUpdated(bundleName, userId);
+    FormEventUtil::HandleProviderUpdated(bundleName, userId);
     GTEST_LOG_(INFO) << "FormEventUtil_022 end";
 }
 
@@ -499,15 +460,13 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_022, TestSize.Level1)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_023, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_023 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     std::string bundleName = FORM_HOST_BUNDLE_NAME;
     int32_t userId = 1;
     MockGetFormRecord(true);
     MockGetFormsInfoByBundle(true);
     MockGetBundlePackInfo(true);
     MockGetUpdatedForm(true);
-    formEventUtil->HandleProviderUpdated(bundleName, userId);
+    FormEventUtil::HandleProviderUpdated(bundleName, userId);
     GTEST_LOG_(INFO) << "FormEventUtil_023 end";
 }
 
@@ -519,11 +478,9 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_023, TestSize.Level1)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_024, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_024 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     std::string bundleName = FORM_HOST_BUNDLE_NAME;
     int32_t userId = 1;
-    formEventUtil->HandleBundleFormInfoChanged(bundleName, userId);
+    FormEventUtil::HandleBundleFormInfoChanged(bundleName, userId);
     GTEST_LOG_(INFO) << "FormEventUtil_024 end";
 }
 
@@ -535,11 +492,9 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_024, TestSize.Level1)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_025, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_025 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     std::string bundleName = FORM_HOST_BUNDLE_NAME;
     int32_t userId = 1;
-    formEventUtil->HandleBundleFormInfoRemoved(bundleName, userId);
+    FormEventUtil::HandleBundleFormInfoRemoved(bundleName, userId);
     GTEST_LOG_(INFO) << "FormEventUtil_025 end";
 }
 
@@ -551,14 +506,12 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_025, TestSize.Level1)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_026, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_026 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     int32_t userId = 1;
     MockGetNoHostDBFormsTwo(true);
     MockGetNoHostDBFormsOne(true);
     MockGetNoHostTempFormsOne(true);
     MockGetNoHostTempFormsTwo(true);
-    formEventUtil->HandleFormHostDataCleared(userId);
+    FormEventUtil::HandleFormHostDataCleared(userId);
     GTEST_LOG_(INFO) << "FormEventUtil_026 end";
 }
 
@@ -570,8 +523,6 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_026, TestSize.Level1)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_027, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_027 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     int32_t userId = 1;
     std::map<int64_t, bool> foundFormsMap;
     std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
@@ -587,7 +538,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_027, TestSize.Level1)
         noHostTempFormsMap.emplace(formIdKey, formIdsSet);
     }
     MockNotifyProviderFormsBatchDelete(true);
-    formEventUtil->BatchDeleteNoHostTempForms(userId, noHostTempFormsMap, foundFormsMap);
+    FormEventUtil::BatchDeleteNoHostTempForms(userId, noHostTempFormsMap, foundFormsMap);
     GTEST_LOG_(INFO) << "FormEventUtil_027 end";
 }
 
@@ -599,13 +550,11 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_027, TestSize.Level1)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_028, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_028 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     const bool updateEnabled = false;
     int32_t updateDuration = 1;
     const std::string configUpdataAt = "";
     FormTimerCfg cfg = {};
-    formEventUtil->GetTimerCfg(updateEnabled, updateDuration, configUpdataAt, cfg);
+    FormEventUtil::GetTimerCfg(updateEnabled, updateDuration, configUpdataAt, cfg);
     GTEST_LOG_(INFO) << "FormEventUtil_028 end";
 }
 
@@ -617,13 +566,11 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_028, TestSize.Level1)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_029, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_029 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     const bool updateEnabled = true;
     int32_t updateDuration = static_cast<int32_t>(Constants::MIN_CONFIG_DURATION);
     const std::string configUpdataAt = "";
     FormTimerCfg cfg = {};
-    formEventUtil->GetTimerCfg(updateEnabled, updateDuration, configUpdataAt, cfg);
+    FormEventUtil::GetTimerCfg(updateEnabled, updateDuration, configUpdataAt, cfg);
     GTEST_LOG_(INFO) << "FormEventUtil_029 end";
 }
 
@@ -635,13 +582,11 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_029, TestSize.Level1)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_030, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_030 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     const bool updateEnabled = true;
     int32_t updateDuration = static_cast<int32_t>(Constants::MAX_CONFIG_DURATION);
     const std::string configUpdataAt = "";
     FormTimerCfg cfg = {};
-    formEventUtil->GetTimerCfg(updateEnabled, updateDuration, configUpdataAt, cfg);
+    FormEventUtil::GetTimerCfg(updateEnabled, updateDuration, configUpdataAt, cfg);
     GTEST_LOG_(INFO) << "FormEventUtil_030 end";
 }
 
@@ -653,13 +598,11 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_030, TestSize.Level1)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_031, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_031 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     const bool updateEnabled = true;
     int32_t updateDuration = static_cast<int32_t>(Constants::MIN_CONFIG_DURATION) + 1;
     const std::string configUpdataAt = "";
     FormTimerCfg cfg = {};
-    formEventUtil->GetTimerCfg(updateEnabled, updateDuration, configUpdataAt, cfg);
+    FormEventUtil::GetTimerCfg(updateEnabled, updateDuration, configUpdataAt, cfg);
     GTEST_LOG_(INFO) << "FormEventUtil_031 end";
 }
 
@@ -671,13 +614,11 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_031, TestSize.Level1)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_032, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_032 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     const bool updateEnabled = true;
     int32_t updateDuration = -1;
     const std::string configUpdataAt = "";
     FormTimerCfg cfg = {};
-    formEventUtil->GetTimerCfg(updateEnabled, updateDuration, configUpdataAt, cfg);
+    FormEventUtil::GetTimerCfg(updateEnabled, updateDuration, configUpdataAt, cfg);
     GTEST_LOG_(INFO) << "FormEventUtil_032 end";
 }
 
@@ -689,13 +630,11 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_032, TestSize.Level1)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_033, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_033 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     const bool updateEnabled = true;
     int32_t updateDuration = -1;
     const std::string configUpdataAt = "17:41:41";
     FormTimerCfg cfg = {};
-    formEventUtil->GetTimerCfg(updateEnabled, updateDuration, configUpdataAt, cfg);
+    FormEventUtil::GetTimerCfg(updateEnabled, updateDuration, configUpdataAt, cfg);
     GTEST_LOG_(INFO) << "FormEventUtil_033 end";
 }
 
@@ -707,13 +646,11 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_033, TestSize.Level1)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_034, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_034 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     const bool updateEnabled = true;
     int32_t updateDuration = -1;
     const std::string configUpdataAt = "17:41";
     FormTimerCfg cfg = {};
-    formEventUtil->GetTimerCfg(updateEnabled, updateDuration, configUpdataAt, cfg);
+    FormEventUtil::GetTimerCfg(updateEnabled, updateDuration, configUpdataAt, cfg);
     GTEST_LOG_(INFO) << "FormEventUtil_034 end";
 }
 
@@ -725,13 +662,11 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_034, TestSize.Level1)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_035, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_035 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     const bool updateEnabled = true;
     int32_t updateDuration = -1;
     const std::string configUpdataAt = "-1:41";
     FormTimerCfg cfg = {};
-    formEventUtil->GetTimerCfg(updateEnabled, updateDuration, configUpdataAt, cfg);
+    FormEventUtil::GetTimerCfg(updateEnabled, updateDuration, configUpdataAt, cfg);
     GTEST_LOG_(INFO) << "FormEventUtil_035 end";
 }
 
@@ -743,13 +678,11 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_035, TestSize.Level1)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_036, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_036 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     const bool updateEnabled = true;
     int32_t updateDuration = -1;
     const std::string configUpdataAt = "25:41";
     FormTimerCfg cfg = {};
-    formEventUtil->GetTimerCfg(updateEnabled, updateDuration, configUpdataAt, cfg);
+    FormEventUtil::GetTimerCfg(updateEnabled, updateDuration, configUpdataAt, cfg);
     GTEST_LOG_(INFO) << "FormEventUtil_036 end";
 }
 
@@ -761,13 +694,11 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_036, TestSize.Level1)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_037, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_037 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     const bool updateEnabled = true;
     int32_t updateDuration = -1;
     const std::string configUpdataAt = "18:-1";
     FormTimerCfg cfg = {};
-    formEventUtil->GetTimerCfg(updateEnabled, updateDuration, configUpdataAt, cfg);
+    FormEventUtil::GetTimerCfg(updateEnabled, updateDuration, configUpdataAt, cfg);
     GTEST_LOG_(INFO) << "FormEventUtil_037 end";
 }
 
@@ -779,13 +710,11 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_037, TestSize.Level1)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_038, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_038 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     const bool updateEnabled = true;
     int32_t updateDuration = -1;
     const std::string configUpdataAt = "18:61";
     FormTimerCfg cfg = {};
-    formEventUtil->GetTimerCfg(updateEnabled, updateDuration, configUpdataAt, cfg);
+    FormEventUtil::GetTimerCfg(updateEnabled, updateDuration, configUpdataAt, cfg);
     GTEST_LOG_(INFO) << "FormEventUtil_038 end";
 }
 
@@ -797,14 +726,12 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_038, TestSize.Level1)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_039, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_039 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     const int64_t formId = 1;
     FormRecord record = {};
     FormTimerCfg timerCfg = {};
     record.isEnableUpdate = false;
     timerCfg.enableUpdate = false;
-    formEventUtil->HandleTimerUpdate(formId, record, timerCfg);
+    FormEventUtil::HandleTimerUpdate(formId, record, timerCfg);
     GTEST_LOG_(INFO) << "FormEventUtil_039 end";
 }
 
@@ -816,14 +743,12 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_039, TestSize.Level1)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_040, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_040 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     const int64_t formId = 1;
     FormRecord record = {};
     FormTimerCfg timerCfg = {};
     record.isEnableUpdate = true;
     timerCfg.enableUpdate = false;
-    formEventUtil->HandleTimerUpdate(formId, record, timerCfg);
+    FormEventUtil::HandleTimerUpdate(formId, record, timerCfg);
     GTEST_LOG_(INFO) << "FormEventUtil_040 end";
 }
 
@@ -835,15 +760,13 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_040, TestSize.Level1)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_041, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_041 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     const int64_t formId = 1;
     FormRecord record = {};
     FormTimerCfg timerCfg = {};
     record.isEnableUpdate = false;
     timerCfg.enableUpdate = true;
     timerCfg.updateDuration = 1;
-    formEventUtil->HandleTimerUpdate(formId, record, timerCfg);
+    FormEventUtil::HandleTimerUpdate(formId, record, timerCfg);
     GTEST_LOG_(INFO) << "FormEventUtil_041 end";
 }
 
@@ -855,15 +778,13 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_041, TestSize.Level1)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_042, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_042 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     const int64_t formId = 1;
     FormRecord record = {};
     FormTimerCfg timerCfg = {};
     record.isEnableUpdate = false;
     timerCfg.enableUpdate = true;
     timerCfg.updateDuration = 0;
-    formEventUtil->HandleTimerUpdate(formId, record, timerCfg);
+    FormEventUtil::HandleTimerUpdate(formId, record, timerCfg);
     GTEST_LOG_(INFO) << "FormEventUtil_042 end";
 }
 
@@ -875,8 +796,6 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_042, TestSize.Level1)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_043, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_043 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     const int64_t formId = 1;
     FormRecord record = {};
     FormTimerCfg timerCfg = {};
@@ -884,7 +803,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_043, TestSize.Level1)
     timerCfg.enableUpdate = true;
     record.updateDuration = 1;
     timerCfg.updateDuration = 1;
-    formEventUtil->HandleTimerUpdate(formId, record, timerCfg);
+    FormEventUtil::HandleTimerUpdate(formId, record, timerCfg);
     GTEST_LOG_(INFO) << "FormEventUtil_043 end";
 }
 
@@ -896,8 +815,6 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_043, TestSize.Level1)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_044, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_044 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     const int64_t formId = 1;
     FormRecord record = {};
     FormTimerCfg timerCfg = {};
@@ -905,7 +822,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_044, TestSize.Level1)
     timerCfg.enableUpdate = true;
     record.updateDuration = 1;
     timerCfg.updateDuration = 2;
-    formEventUtil->HandleTimerUpdate(formId, record, timerCfg);
+    FormEventUtil::HandleTimerUpdate(formId, record, timerCfg);
     GTEST_LOG_(INFO) << "FormEventUtil_044 end";
 }
 
@@ -917,8 +834,6 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_044, TestSize.Level1)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_045, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_045 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     const int64_t formId = 1;
     FormRecord record = {};
     FormTimerCfg timerCfg = {};
@@ -926,7 +841,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_045, TestSize.Level1)
     timerCfg.enableUpdate = true;
     record.updateDuration = 1;
     timerCfg.updateDuration = 0;
-    formEventUtil->HandleTimerUpdate(formId, record, timerCfg);
+    FormEventUtil::HandleTimerUpdate(formId, record, timerCfg);
     GTEST_LOG_(INFO) << "FormEventUtil_045 end";
 }
 
@@ -938,8 +853,6 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_045, TestSize.Level1)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_046, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_046 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     const int64_t formId = 1;
     FormRecord record = {};
     FormTimerCfg timerCfg = {};
@@ -951,7 +864,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_046, TestSize.Level1)
     timerCfg.updateAtHour = 0;
     record.updateAtMin = 0;
     timerCfg.updateAtMin = 0;
-    formEventUtil->HandleTimerUpdate(formId, record, timerCfg);
+    FormEventUtil::HandleTimerUpdate(formId, record, timerCfg);
     GTEST_LOG_(INFO) << "FormEventUtil_046 end";
 }
 
@@ -963,8 +876,6 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_046, TestSize.Level1)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_047, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_047 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     const int64_t formId = 1;
     FormRecord record = {};
     FormTimerCfg timerCfg = {};
@@ -976,7 +887,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_047, TestSize.Level1)
     timerCfg.updateAtHour = 0;
     record.updateAtMin = 0;
     timerCfg.updateAtMin = 0;
-    formEventUtil->HandleTimerUpdate(formId, record, timerCfg);
+    FormEventUtil::HandleTimerUpdate(formId, record, timerCfg);
     GTEST_LOG_(INFO) << "FormEventUtil_047 end";
 }
 
@@ -988,8 +899,6 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_047, TestSize.Level1)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_048, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_048 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     const int64_t formId = 1;
     FormRecord record = {};
     FormTimerCfg timerCfg = {};
@@ -1001,7 +910,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_048, TestSize.Level1)
     timerCfg.updateAtHour = 0;
     record.updateAtMin = 1;
     timerCfg.updateAtMin = 0;
-    formEventUtil->HandleTimerUpdate(formId, record, timerCfg);
+    FormEventUtil::HandleTimerUpdate(formId, record, timerCfg);
     GTEST_LOG_(INFO) << "FormEventUtil_048 end";
 }
 
@@ -1013,8 +922,6 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_048, TestSize.Level1)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_049, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_049 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     const int64_t formId = 1;
     FormRecord record = {};
     FormTimerCfg timerCfg = {};
@@ -1022,7 +929,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_049, TestSize.Level1)
     timerCfg.enableUpdate = true;
     record.updateDuration = 0;
     timerCfg.updateDuration = 1;
-    formEventUtil->HandleTimerUpdate(formId, record, timerCfg);
+    FormEventUtil::HandleTimerUpdate(formId, record, timerCfg);
     GTEST_LOG_(INFO) << "FormEventUtil_049 end";
 }
 
@@ -1034,11 +941,9 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_049, TestSize.Level1)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_050, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_050 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     const int64_t formId = 1;
     MockGetFormRecord(false);
-    formEventUtil->ReCreateForm(formId);
+    FormEventUtil::ReCreateForm(formId);
     GTEST_LOG_(INFO) << "FormEventUtil_050 end";
 }
 
@@ -1050,11 +955,9 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_050, TestSize.Level1)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_051, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_051 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     const int64_t formId = 1;
     MockGetFormRecord(true);
-    formEventUtil->ReCreateForm(formId);
+    FormEventUtil::ReCreateForm(formId);
     GTEST_LOG_(INFO) << "FormEventUtil_051 end";
 }
 
@@ -1066,8 +969,6 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_051, TestSize.Level1)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_052, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_052 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     int32_t userId = 1;
     std::map<FormIdKey, std::set<int64_t>> noHostFormDbMap;
     std::map<int64_t, bool> removedFormsMap;
@@ -1083,7 +984,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_052, TestSize.Level1)
         noHostFormDbMap.emplace(formIdKey, formIdsSet);
     }
     MockNotifyProviderFormsBatchDelete(false);
-    formEventUtil->BatchDeleteNoHostDBForms(userId, noHostFormDbMap, removedFormsMap);
+    FormEventUtil::BatchDeleteNoHostDBForms(userId, noHostFormDbMap, removedFormsMap);
     GTEST_LOG_(INFO) << "FormEventUtil_052 end";
 }
 
@@ -1095,8 +996,6 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_052, TestSize.Level1)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_053, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_053 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     int32_t userId = 1;
     std::map<FormIdKey, std::set<int64_t>> noHostFormDbMap;
     std::map<int64_t, bool> removedFormsMap;
@@ -1113,7 +1012,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_053, TestSize.Level1)
     }
     MockNotifyProviderFormsBatchDelete(true);
     MockGetMatchCount(false);
-    formEventUtil->BatchDeleteNoHostDBForms(userId, noHostFormDbMap, removedFormsMap);
+    FormEventUtil::BatchDeleteNoHostDBForms(userId, noHostFormDbMap, removedFormsMap);
     GTEST_LOG_(INFO) << "FormEventUtil_053 end";
 }
 
@@ -1125,8 +1024,6 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_053, TestSize.Level1)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_054, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_054 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     int32_t userId = 1;
     std::map<FormIdKey, std::set<int64_t>> noHostFormDbMap;
     std::map<int64_t, bool> removedFormsMap;
@@ -1143,7 +1040,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_054, TestSize.Level1)
     }
     MockNotifyProviderFormsBatchDelete(true);
     MockGetMatchCount(true);
-    formEventUtil->BatchDeleteNoHostDBForms(userId, noHostFormDbMap, removedFormsMap);
+    FormEventUtil::BatchDeleteNoHostDBForms(userId, noHostFormDbMap, removedFormsMap);
     GTEST_LOG_(INFO) << "FormEventUtil_054 end";
 }
 
@@ -1155,8 +1052,6 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_054, TestSize.Level1)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_055, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_055 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     int32_t userId = 1;
     std::map<int64_t, bool> foundFormsMap;
     std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
@@ -1172,7 +1067,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_055, TestSize.Level1)
         noHostTempFormsMap.emplace(formIdKey, formIdsSet);
     }
     MockNotifyProviderFormsBatchDelete(false);
-    formEventUtil->BatchDeleteNoHostTempForms(userId, noHostTempFormsMap, foundFormsMap);
+    FormEventUtil::BatchDeleteNoHostTempForms(userId, noHostTempFormsMap, foundFormsMap);
     GTEST_LOG_(INFO) << "FormEventUtil_055 end";
 }
 
@@ -1184,11 +1079,9 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_055, TestSize.Level1)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_056, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_056 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     std::string bundleName = FORM_HOST_BUNDLE_NAME;
     MockGetFormRecord(false);
-    EXPECT_EQ(false, formEventUtil->HandleAdditionalInfoChanged(bundleName));
+    EXPECT_EQ(false, FormEventUtil::HandleAdditionalInfoChanged(bundleName));
     GTEST_LOG_(INFO) << "FormEventUtil_056 end";
 }
 
@@ -1200,9 +1093,6 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_056, TestSize.Level1)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_057, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_057 start";
-
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     std::string bundleName = FORM_HOST_BUNDLE_NAME;
     int64_t formId = 1;
     int64_t updateDuration = 2 * Constants::TIME_CONVERSION;
@@ -1222,7 +1112,7 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_057, TestSize.Level1)
     EXPECT_CALL(*bmsProxy, GetAdditionalInfo(_, _))
         .WillRepeatedly(DoAll(SetArgReferee<1>(additionalInfo), Return(ERR_OK)));
 
-    EXPECT_EQ(true, formEventUtil->HandleAdditionalInfoChanged(bundleName));
+    EXPECT_EQ(true, FormEventUtil::HandleAdditionalInfoChanged(bundleName));
 
     FormTimer formTimer;
     FormTimerMgr::GetInstance().GetIntervalTimer(formId, formTimer);
@@ -1240,10 +1130,8 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_057, TestSize.Level1)
 HWTEST_F(FmsFormEventUtilTest, FormEventUtil_058, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormEventUtil_058 start";
-    std::shared_ptr<FormEventUtil> formEventUtil = std::make_shared<FormEventUtil>();
-    ASSERT_NE(nullptr, formEventUtil);
     std::string bundleName = FORM_HOST_BUNDLE_NAME;
-    formEventUtil->HandleUpdateFormCloud(bundleName);
+    FormEventUtil::HandleUpdateFormCloud(bundleName);
     GTEST_LOG_(INFO) << "FormEventUtil_058 end";
 }
 }

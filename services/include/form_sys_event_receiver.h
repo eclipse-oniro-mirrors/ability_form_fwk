@@ -59,12 +59,10 @@ private:
     bool IsSameForm(const FormRecord &record, const FormInfo &formInfo);
     void HandleBundleScanFinished();
     void HandleUserSwitched(const EventFwk::CommonEventData &eventData);
-    void OnReceiveEventForAbilityUpdate(const AAFwk::Want& want, std::string &bundleName);
-    void OnReceiveEventForUserRemoved(int32_t userId);
-    void OnReceiveEventForPackageDataCleared(std::string &bundleName, int32_t userId);
-    void OnReceiveEventForUserUnlocked();
+    void HandleAbilityUpdate(const AAFwk::Want& want, std::string &bundleName);
+    void HandlePackageDataCleared(std::string &bundleName, int32_t userId);
+    void HandleUserUnlocked();
 private:
-    FormEventUtil formEventHelper_;
     std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;
 };
 }  // namespace AppExecFwk

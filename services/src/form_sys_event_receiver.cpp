@@ -45,54 +45,43 @@ FormSysEventReceiver::FormSysEventReceiver(const EventFwk::CommonEventSubscribeI
     : EventFwk::CommonEventSubscriber(subscriberInfo)
 {}
 
-void FormSysEventReceiver::OnReceiveEventForAbilityUpdate(const AAFwk::Want& want, std::string &bundleName)
+void FormSysEventReceiver::HandleAbilityUpdate(const AAFwk::Want& want, std::string &bundleName)
 {
-    std::weak_ptr<FormSysEventReceiver> weakThis = shared_from_this();
-    auto task = [weakThis, want, bundleName]() {
-        HILOG_INFO("bundle updated, bundleName:%{public}s", bundleName.c_str());
-        std::shared_ptr<FormSysEventReceiver> sharedThis = weakThis.lock();
-        if (sharedThis) {
-            int userId = want.GetIntParam(KEY_USER_ID, 0);
-            sharedThis->formEventHelper_.HandleProviderUpdated(bundleName, userId);
-        }
-    };
-    serialQueue_->ScheduleTask(0, task);
-}
-
-void FormSysEventReceiver::OnReceiveEventForUserRemoved(int32_t userId)
-{
-    std::weak_ptr<FormSysEventReceiver> weakThis = shared_from_this();
-    auto task = [weakThis, userId]() {
-        std::shared_ptr<FormSysEventReceiver> sharedThis = weakThis.lock();
-        if (sharedThis) {
-            sharedThis->HandleUserIdRemoved(userId);
-        }
-    };
-    if (userId != -1) {
-        serialQueue_->ScheduleTask(0, task);
+    if (!serialQueue_) {
+        HILOG_ERROR("serialQueue is nullptr");
+        return;
     }
-}
 
-void FormSysEventReceiver::OnReceiveEventForPackageDataCleared(std::string &bundleName, int32_t userId)
-{
-    std::weak_ptr<FormSysEventReceiver> weakThis = shared_from_this();
-    auto task = [weakThis, bundleName, userId]() {
-        std::shared_ptr<FormSysEventReceiver> sharedThis = weakThis.lock();
-        if (sharedThis) {
-            sharedThis->formEventHelper_.HandleBundleDataCleared(bundleName, userId);
-        }
+    auto task = [want, bundleName]() {
+        HILOG_INFO("bundle updated, bundleName:%{public}s", bundleName.c_str());
+        int userId = want.GetIntParam(KEY_USER_ID, 0);
+        FormEventUtil::HandleProviderUpdated(bundleName, userId);
     };
     serialQueue_->ScheduleTask(0, task);
 }
 
-void FormSysEventReceiver::OnReceiveEventForUserUnlocked()
+void FormSysEventReceiver::HandlePackageDataCleared(std::string &bundleName, int32_t userId)
 {
-    std::weak_ptr<FormSysEventReceiver> weakThis = shared_from_this();
-    auto task = [weakThis]() {
-        std::shared_ptr<FormSysEventReceiver> sharedThis = weakThis.lock();
-        if (sharedThis) {
-            sharedThis->formEventHelper_.HandleOnUnlock();
-        }
+    if (!serialQueue_) {
+        HILOG_ERROR("serialQueue is nullptr");
+        return;
+    }
+
+    auto task = [bundleName, userId]() {
+        FormEventUtil::HandleBundleDataCleared(bundleName, userId);
+    };
+    serialQueue_->ScheduleTask(0, task);
+}
+
+void FormSysEventReceiver::HandleUserUnlocked()
+{
+    if (!serialQueue_) {
+        HILOG_ERROR("serialQueue is nullptr");
+        return;
+    }
+
+    auto task = []() {
+        FormEventUtil::HandleOnUnlock();
     };
     serialQueue_->ScheduleTask(0, task);
 }
@@ -125,19 +114,19 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
     HILOG_INFO("action:%{public}s", action.c_str());
     std::weak_ptr<FormSysEventReceiver> weakThis = shared_from_this();
     if (action == EventFwk::CommonEventSupport::COMMON_EVENT_ABILITY_UPDATED) {
-        OnReceiveEventForAbilityUpdate(want, bundleName);
+        HandleAbilityUpdate(want, bundleName);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED) {
         int32_t userId = eventData.GetCode();
-        OnReceiveEventForUserRemoved(userId);
+        HandleUserIdRemoved(userId);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_BUNDLE_SCAN_FINISHED) {
         HandleBundleScanFinished();
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
         HandleUserSwitched(eventData);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_DATA_CLEARED) {
         int userId = want.GetIntParam(KEY_USER_ID, Constants::DEFAULT_USERID);
-        OnReceiveEventForPackageDataCleared(bundleName, userId);
+        HandlePackageDataCleared(bundleName, userId);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED) {
-        OnReceiveEventForUserUnlocked();
+        HandleUserUnlocked();
     } else {
         HILOG_WARN("%{public}s warnning, invalid action.", __func__);
     }
@@ -146,15 +135,27 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
 // multiuser
 void FormSysEventReceiver::HandleUserIdRemoved(const int32_t userId)
 {
-    std::vector<int64_t> removedFormIds;
-    FormDataMgr::GetInstance().DeleteFormsByUserId(userId, removedFormIds);
-    FormDbCache::GetInstance().DeleteDBFormsByUserId(userId);
-
-    // delete form timer
-    std::vector<int64_t>::iterator itRemoved;
-    for (itRemoved = removedFormIds.begin();itRemoved != removedFormIds.end(); ++itRemoved) {
-        FormTimerMgr::GetInstance().RemoveFormTimer(*itRemoved);
+    if (userId == -1) {
+        HILOG_ERROR("invalid userId: -1");
+        return;
     }
+
+    if (!serialQueue_) {
+        HILOG_ERROR("serialQueue is nullptr");
+        return;
+    }
+
+    serialQueue_->ScheduleTask(0, [userId]() {
+        std::vector<int64_t> removedFormIds;
+        FormDataMgr::GetInstance().DeleteFormsByUserId(userId, removedFormIds);
+        FormDbCache::GetInstance().DeleteDBFormsByUserId(userId);
+
+        // delete form timer
+        std::vector<int64_t>::iterator itRemoved;
+        for (itRemoved = removedFormIds.begin(); itRemoved != removedFormIds.end(); ++itRemoved) {
+            FormTimerMgr::GetInstance().RemoveFormTimer(*itRemoved);
+        }
+    });
 }
 
 void FormSysEventReceiver::HandleBundleScanFinished()

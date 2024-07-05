@@ -71,6 +71,7 @@ const std::string KEY_USER_ID = "userId";
 const std::string KEY_BUNDLE_NAME = "bundleName";
 const std::string DEVICE_ID = "ohos-phone1";
 const std::string DEF_LABEL1 = "PermissionFormRequireGrant";
+const int32_t MAIN_USER_ID = 100;
 
 class FmsFormSysEventReceiverTest : public testing::Test {
 public:
@@ -772,10 +773,55 @@ HWTEST_F(FmsFormSysEventReceiverTest, HandleUserSwitched_0002, TestSize.Level0)
     std::shared_ptr<FormSysEventReceiver> receiver = std::make_shared<FormSysEventReceiver>();
     ASSERT_NE(nullptr, receiver);
     OHOS::EventFwk::CommonEventData eventData;
-    const int32_t MAIN_USER_ID = 100;
     eventData.SetCode(MAIN_USER_ID);
     receiver->HandleUserSwitched(eventData);
     GTEST_LOG_(INFO) << "HandleUserSwitched_0002 end";
+}
+
+/**
+ * @tc.number: HandleAbilityUpdate_0001
+ * @tc.name: HandleAbilityUpdate
+ * @tc.desc: Verify whether the HandleAbilityUpdate interface is called normally
+ */
+HWTEST_F(FmsFormSysEventReceiverTest, HandleAbilityUpdate_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "HandleAbilityUpdate_0001 start";
+    std::shared_ptr<FormSysEventReceiver> receiver = std::make_shared<FormSysEventReceiver>();
+    ASSERT_NE(nullptr, receiver);
+    Want want;
+    want.SetParam(KEY_USER_ID, MAIN_USER_ID);
+    std::string bundleName = "testBundleName";
+    receiver->HandleAbilityUpdate(want, bundleName);
+    GTEST_LOG_(INFO) << "HandleAbilityUpdate_0001 end";
+}
+
+/**
+ * @tc.number: HandlePackageDataCleared_0001
+ * @tc.name: HandlePackageDataCleared
+ * @tc.desc: Verify whether the HandlePackageDataCleared interface is called normally
+ */
+HWTEST_F(FmsFormSysEventReceiverTest, HandlePackageDataCleared_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "HandlePackageDataCleared_0001 start";
+    std::shared_ptr<FormSysEventReceiver> receiver = std::make_shared<FormSysEventReceiver>();
+    ASSERT_NE(nullptr, receiver);
+    std::string bundleName = "testBundleName";
+    receiver->HandlePackageDataCleared(bundleName, MAIN_USER_ID);
+    GTEST_LOG_(INFO) << "HandlePackageDataCleared_0001 end";
+}
+
+/**
+ * @tc.number: HandleUserUnlocked_0001
+ * @tc.name: HandleUserUnlocked
+ * @tc.desc: Verify whether the HandleUserUnlocked interface is called normally
+ */
+HWTEST_F(FmsFormSysEventReceiverTest, HandleUserUnlocked_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "HandleUserUnlocked_0001 start";
+    std::shared_ptr<FormSysEventReceiver> receiver = std::make_shared<FormSysEventReceiver>();
+    ASSERT_NE(nullptr, receiver);
+    receiver->HandleUserUnlocked();
+    GTEST_LOG_(INFO) << "HandleUserUnlocked_0001 end";
 }
 
 /**
