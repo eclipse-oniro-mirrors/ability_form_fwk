@@ -21,7 +21,7 @@ ohos_unittest("FmsFormInfoMgrTest") {
 
   sources = [
     "form_info_mgr_test.cpp",
-    "mock_form_info_mgr.cpp",
+    "mock_form_util.cpp",
   ]
   include_dirs = [ "${form_fwk_path}/test/mock/include" ]
   cflags = []
