@@ -1355,6 +1355,7 @@ ErrCode FormMgr::RegisterClickEventObserver(
     }
     int errCode = Connect();
     if (errCode != ERR_OK) {
+        HILOG_ERROR("Failed, errCode:%{public}d.", errCode);
         return errCode;
     }
     return remoteProxy_->RegisterClickEventObserver(bundleName, formEventType, observer);
@@ -1374,6 +1375,7 @@ ErrCode FormMgr::UnregisterClickEventObserver(
     }
     int errCode = Connect();
     if (errCode != ERR_OK) {
+        HILOG_ERROR("Failed, errCode:%{public}d.", errCode);
         return errCode;
     }
     return remoteProxy_->UnregisterClickEventObserver(bundleName, formEventType, observer);
@@ -1388,6 +1390,7 @@ int FormMgr::RegisterFormRouterProxy(const std::vector<int64_t> &formIds, const 
     }
     auto errCode = Connect();
     if (errCode != ERR_OK) {
+        HILOG_ERROR("Failed, errCode:%{public}d.", errCode);
         return errCode;
     }
     return remoteProxy_->RegisterFormRouterProxy(formIds, callerToken);
@@ -1402,6 +1405,7 @@ int FormMgr::UnregisterFormRouterProxy(const std::vector<int64_t> &formIds)
     }
     auto errCode = Connect();
     if (errCode != ERR_OK) {
+        HILOG_ERROR("Failed, errCode:%{public}d.", errCode);
         return errCode;
     }
     return remoteProxy_->UnregisterFormRouterProxy(formIds);
