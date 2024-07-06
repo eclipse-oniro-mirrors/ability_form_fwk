@@ -644,7 +644,7 @@ public:
         std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
         const std::vector<FormDataProxy> &formDataProxies = {});
 
-    /**
+	/**
      * @brief Update form with formRefreshType, send to form manager service.
      * @param formRefreshType The type of the form to refresh, 0: AllForm 1: 2: AppForm 2: AtomicServiceForm
      * @return Returns ERR_OK on success, others on failure.
