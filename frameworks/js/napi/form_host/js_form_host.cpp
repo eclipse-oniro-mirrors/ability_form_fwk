@@ -1375,7 +1375,7 @@ private:
         UnwrapStringByPropertyName(env, argv[PARAM0], "bundleName", filter.bundleName);
 
         convertArgc++;
-        
+
         auto errCodeVal = std::make_shared<int32_t>(0);
         auto formInfoList = std::make_shared<std::vector<FormInfo>>();
         NapiAsyncTask::ExecuteCallback execute = [filter, formInfos = formInfoList, errCode = errCodeVal]() {
@@ -1437,7 +1437,7 @@ private:
             }
             convertArgc++;
         }
-        
+
         auto errCodeVal = std::make_shared<int32_t>(0);
         auto formInfoList = std::make_shared<std::vector<FormInfo>>();
         NapiAsyncTask::ExecuteCallback execute = [bName, mName, convertArgc, formInfos = formInfoList,

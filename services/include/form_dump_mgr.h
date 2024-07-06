@@ -18,12 +18,12 @@
 
 #include <singleton.h>
 
+#include "form_constants.h"
 #include "form_db_info.h"
-#include "form_dump_mgr.h"
 #include "form_host_record.h"
 #include "form_info_mgr.h"
 #include "running_form_info.h"
-#include "form_constants.h"
+
 namespace OHOS {
 namespace AppExecFwk {
 /**
