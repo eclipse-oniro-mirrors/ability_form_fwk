@@ -145,7 +145,7 @@ ErrCode FormInfoRdbStorageMgr::LoadFormData(std::vector<InnerFormInfo> &innerFor
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     SaveEntries(value, innerFormInfos);
-    
+
     HILOG_DEBUG("%{public}s end", __func__);
     return ERR_OK;
 }
@@ -232,7 +232,7 @@ ErrCode FormInfoRdbStorageMgr::LoadStatusData(const std::string &formId, std::st
             static_cast<int64_t>(CallDbFiledErrorType::DATABASE_QUERY_FORMID_FAILED));
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    
+
     return ERR_OK;
 }
 
@@ -251,7 +251,7 @@ ErrCode FormInfoRdbStorageMgr::UpdateStatusData(const std::string &formId, const
         HILOG_ERROR("update status data of %{public}s to rdbstore failed, code is %{public}d", formId.c_str(), result);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    
+
     return ERR_OK;
 }
 } // namespace AppExecFwk
