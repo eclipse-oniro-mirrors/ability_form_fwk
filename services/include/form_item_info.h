@@ -356,10 +356,10 @@ public:
      * @return systemAppFlag.
      */
     bool GetSystemAppFlag() const;
-    
+
     void SetDataProxyFlag(bool dataProxyEnabled);
     bool GetDataProxyFlag() const;
-    
+
     /**
      * @brief save the uid of formProvider.
      * @param uid the uid of formProvider.

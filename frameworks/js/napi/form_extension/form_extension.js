@@ -34,7 +34,7 @@ class FormExtension {
   }
 
   onEvent(formId, message) {
-    console.log('FormExtension onEvent, formId:' + formId + ", message:" + message);
+    console.log('FormExtension onEvent, formId:' + formId + ', message:' + message);
   }
 
   onDestroy(formId) {
