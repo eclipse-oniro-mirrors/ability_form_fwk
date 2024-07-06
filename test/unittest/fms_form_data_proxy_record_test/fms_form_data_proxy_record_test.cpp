@@ -708,13 +708,13 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_036, TestSize.Le
     int32_t uid = 1;
     FormDataProxyRecord formDataProxyRecord(formId, formRecord.bundleName, formRecord.uiSyntax, tokenId, uid);
     std::string uriString = "testUri";
-    const int64_t SUBSCRIBE_ID = 1;
-    formDataProxyRecord.RemoveSubscribeResultRecord(uriString, SUBSCRIBE_ID, true);
+    const int64_t subscribeId = 1;
+    formDataProxyRecord.RemoveSubscribeResultRecord(uriString, subscribeId, true);
     FormDataProxyRecord::SubscribeResultRecord record;
     std::map<int64_t, FormDataProxyRecord::SubscribeResultRecord> records;
-    records.emplace(SUBSCRIBE_ID, record);
+    records.emplace(subscribeId, record);
     formDataProxyRecord.rdbSubscribeResultMap_.emplace(uriString, records);
-    formDataProxyRecord.RemoveSubscribeResultRecord(uriString, SUBSCRIBE_ID, true);
+    formDataProxyRecord.RemoveSubscribeResultRecord(uriString, subscribeId, true);
     std::vector<std::string> subscribedKeys;
     formDataProxyRecord.GetFormSubscribeKeys(subscribedKeys, true);
     EXPECT_EQ(subscribedKeys.size(), 0);
@@ -735,20 +735,20 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_037, TestSize.Le
     int32_t uid = 1;
     FormDataProxyRecord formDataProxyRecord(formId, formRecord.bundleName, formRecord.uiSyntax, tokenId, uid);
     std::string uriString = "testUri";
-    const int64_t SUBSCRIBE_ID = 1;
-    formDataProxyRecord.PrintSubscribeState(uriString, SUBSCRIBE_ID, true);
+    const int64_t subscribeId = 1;
+    formDataProxyRecord.PrintSubscribeState(uriString, subscribeId, true);
     FormDataProxyRecord::SubscribeResultRecord record;
-    record.subscribeId = SUBSCRIBE_ID;
+    record.subscribeId = subscribeId;
     record.uri = uriString;
     record.ret = 0;
     record.retry = false;
     record.retryRet = 0;
     std::map<int64_t, FormDataProxyRecord::SubscribeResultRecord> records;
-    records.emplace(SUBSCRIBE_ID, record);
+    records.emplace(subscribeId, record);
     formDataProxyRecord.rdbSubscribeResultMap_.emplace(uriString, records);
-    formDataProxyRecord.PrintSubscribeState(uriString, SUBSCRIBE_ID, true);
-    const int64_t SUBSCRIBE_ID_2 = 2;
-    formDataProxyRecord.PrintSubscribeState(uriString, SUBSCRIBE_ID_2, true);
+    formDataProxyRecord.PrintSubscribeState(uriString, subscribeId, true);
+    const int64_t subscribeId2 = 2;
+    formDataProxyRecord.PrintSubscribeState(uriString, subscribeId2, true);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_037 end";
 }
 
@@ -766,9 +766,9 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_038, TestSize.Le
     int32_t uid = 1;
     FormDataProxyRecord formDataProxyRecord(formId, formRecord.bundleName, formRecord.uiSyntax, tokenId, uid);
     std::string uriString = "testUri";
-    const int64_t SUBSCRIBE_ID = 1;
+    const int64_t subscribeId = 1;
     FormDataProxyRecord::SubscribeResultRecord record;
-    record.subscribeId = SUBSCRIBE_ID;
+    record.subscribeId = subscribeId;
     record.uri = uriString;
     record.ret = 0;
     record.retry = false;
@@ -776,7 +776,7 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_038, TestSize.Le
     formDataProxyRecord.RetryFailureRdbSubscribes(record);
     record.uri = "";
     std::map<int64_t, FormDataProxyRecord::SubscribeResultRecord> records;
-    records.emplace(SUBSCRIBE_ID, record);
+    records.emplace(subscribeId, record);
     formDataProxyRecord.rdbSubscribeResultMap_.emplace(uriString, records);
     std::vector<std::string> subscribedKeys;
     formDataProxyRecord.GetFormSubscribeKeys(subscribedKeys, true);
