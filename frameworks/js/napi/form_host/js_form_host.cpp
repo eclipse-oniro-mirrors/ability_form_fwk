@@ -515,14 +515,13 @@ private:
             return false;
         }
         messageInfo = GetStringFromNapi(env, message);
-        if (napi_get_value_int32(env, publishFormErrorCode, &formErrorCode) == napi_ok) {
-            if (formErrorCode < static_cast<int32_t>(Constants::PublishFormErrorCode::SUCCESS) ||
-                    formErrorCode > static_cast<int32_t>(Constants::PublishFormErrorCode::INTERNAL_ERROR)) {
-                HILOG_ERROR("PublishFormResult is convert fail.");
-                return false;
-            }
-        } else {
+        if (napi_get_value_int32(env, publishFormErrorCode, &formErrorCode) != napi_ok) {
             HILOG_ERROR("PublishFormErrorCode is not number.");
+            return false;
+        }
+        if (formErrorCode < static_cast<int32_t>(Constants::PublishFormErrorCode::SUCCESS) ||
+                formErrorCode > static_cast<int32_t>(Constants::PublishFormErrorCode::INTERNAL_ERROR)) {
+            HILOG_ERROR("PublishFormResult is convert fail.");
             return false;
         }
         return true;
@@ -541,6 +540,7 @@ private:
         Want want;
         if (!UnwrapWant(env, argv[PARAM0], want)) {
             HILOG_ERROR("UnwrapWant failed");
+            NapiFormUtil::ThrowParamTypeError(env, "want", "Want");
             return CreateJsUndefined(env);
         }
 
@@ -1035,26 +1035,6 @@ private:
         return result;
     }
 
-    napi_value OnRegisterFormUninstallObserver(napi_env env, size_t argc, napi_value* argv)
-    {
-        // Check the number of input parameters.
-        if (argc != ARGS_TWO) {
-            HILOG_ERROR("wrong number of arguments.");
-            NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "2");
-            return CreateJsUndefined(env);
-        }
-
-        // Check the type of the PARAM1.
-        if (!IsTypeForNapiValue(env, argv[PARAM1], napi_function)) {
-            HILOG_ERROR("param1 is invalid");
-            NapiFormUtil::ThrowParamTypeError(env, "callback", "Callback<string>");
-            return CreateJsUndefined(env);
-        }
-        FormHostClient::GetInstance()->RegisterUninstallCallback(FormUninstallCallback);
-        AddFormUninstallCallback(env, argv[1]);
-        return CreateJsUndefined(env);
-    }
-
     napi_value OnSetRouterProxy(napi_env env, size_t argc, napi_value* argv)
     {
         if (argc > ARGS_THREE || argc < ARGS_TWO) {
@@ -1146,32 +1126,46 @@ private:
     napi_value OnRegisterFormObserver(napi_env env, size_t argc, napi_value* argv)
     {
         HILOG_DEBUG("called.");
-
         if (!CheckCallerIsSystemApp()) {
             HILOG_ERROR("This app is not system-app, can not use system-api");
             NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
             return CreateJsUndefined(env);
         }
 
-        std::string type;
-        if (!ConvertFromJsValue(env, argv[PARAM0], type)) {
-            HILOG_ERROR("convert type failed!");
-            NapiFormUtil::ThrowParamTypeError(env, "type",
-                "formAdd, formRemove, formUninstall, notifyVisible or notifyInvisible.");
+        // Check the number of input parameters.
+        if (argc != ARGS_TWO) {
+            HILOG_ERROR("wrong number of arguments.");
+            NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "2");
             return CreateJsUndefined(env);
         }
 
-        if (type == "formUninstall") {
-            return OnRegisterFormUninstallObserver(env, argc, argv);
-        } else {
+        std::string type;
+        if (!ConvertFromJsValue(env, argv[PARAM0], type) || type != "formUninstall") {
             HILOG_ERROR("args[0] should be formUninstall.");
             NapiFormUtil::ThrowParamTypeError(env, "type", "formUninstall");
             return CreateJsUndefined(env);
         }
+
+        // Check the type of the PARAM1.
+        if (!IsTypeForNapiValue(env, argv[PARAM1], napi_function)) {
+            HILOG_ERROR("param1 is invalid");
+            NapiFormUtil::ThrowParamTypeError(env, "callback", "Callback<string>");
+            return CreateJsUndefined(env);
+        }
+        FormHostClient::GetInstance()->RegisterUninstallCallback(FormUninstallCallback);
+        AddFormUninstallCallback(env, argv[PARAM1]);
+        return CreateJsUndefined(env);
     }
 
-    napi_value OnUnregisterFormUninstallObserver(napi_env env, size_t argc, napi_value* argv)
+    napi_value OnUnregisterFormObserver(napi_env env, size_t argc, napi_value* argv)
     {
+        HILOG_DEBUG("called.");
+        if (!CheckCallerIsSystemApp()) {
+            HILOG_ERROR("This application is not system-app, can not use system-api");
+            NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
+            return CreateJsUndefined(env);
+        }
+
         // Check the number of input parameters.
         if (argc > ARGS_TWO || argc < ARGS_ONE) {
             HILOG_ERROR("wrong number of arguments.");
@@ -1179,6 +1173,13 @@ private:
             return CreateJsUndefined(env);
         }
 
+        // Check the type of the PARAM0 and convert it to string.
+        std::string type;
+        if (!ConvertFromJsValue(env, argv[PARAM0], type) || type != "formUninstall") {
+            HILOG_ERROR("args[0] should be formUninstall.");
+            NapiFormUtil::ThrowParamTypeError(env, "type", "formUninstall");
+            return CreateJsUndefined(env);
+        }
         // Check the type of the PARAM1.
         if (argc == ARGS_TWO && !IsTypeForNapiValue(env, argv[PARAM1], napi_function)) {
             HILOG_ERROR("param1 is invalid");
@@ -1193,34 +1194,6 @@ private:
 
         ClearFormUninstallCallback();
         return CreateJsUndefined(env);
-    }
-
-    napi_value OnUnregisterFormObserver(napi_env env, size_t argc, napi_value* argv)
-    {
-        HILOG_DEBUG("called.");
-
-        if (!CheckCallerIsSystemApp()) {
-            HILOG_ERROR("This application is not system-app, can not use system-api");
-            NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
-            return CreateJsUndefined(env);
-        }
-
-        // Check the type of the PARAM0 and convert it to string.
-        std::string type;
-        if (!ConvertFromJsValue(env, argv[PARAM0], type)) {
-            HILOG_ERROR("convert type error!");
-            NapiFormUtil::ThrowParamTypeError(env, "type",
-                "formAdd, formRemove, formUninstall, notifyVisible or notifyInvisible.");
-            return CreateJsUndefined(env);
-        }
-
-        if (type == "formUninstall") {
-            return OnUnregisterFormUninstallObserver(env, argc, argv);
-        } else {
-            HILOG_ERROR("args[0] should be formUninstall.");
-            NapiFormUtil::ThrowParamTypeError(env, "type", "formUninstall");
-            return CreateJsUndefined(env);
-        }
     }
 
     napi_value OnNotifyFormsVisible(napi_env env, size_t argc, napi_value* argv)
@@ -1644,7 +1617,7 @@ private:
     napi_value OnSetFormsRecyclable(napi_env env, size_t argc, napi_value *argv)
     {
         HILOG_DEBUG("called.");
-        if (argc < ARGS_ONE) {
+        if (argc < ARGS_ONE || argc > ARGS_TWO) {
             HILOG_ERROR("Wrong number of arguments.");
             NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1 or 2");
             return CreateJsUndefined(env);
@@ -1678,7 +1651,7 @@ private:
     napi_value OnRecoverForms(napi_env env, size_t argc, napi_value *argv)
     {
         HILOG_DEBUG("called.");
-        if (argc < ARGS_ONE) {
+        if (argc < ARGS_ONE || argc > ARGS_TWO) {
             HILOG_ERROR("Wrong number of arguments.");
             NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1 or 2");
             return CreateJsUndefined(env);
@@ -1713,7 +1686,7 @@ private:
     napi_value OnRecycleForms(napi_env env, size_t argc, napi_value *argv)
     {
         HILOG_DEBUG("called.");
-        if (argc < ARGS_ONE) {
+        if (argc < ARGS_ONE || argc > ARGS_TWO) {
             HILOG_ERROR("Wrong number of arguments.");
             NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1 or 2");
             return CreateJsUndefined(env);
