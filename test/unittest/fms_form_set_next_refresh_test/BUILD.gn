@@ -54,7 +54,6 @@ ohos_unittest("FmsFormSetNextRefreshTest") {
     "ability_base:zuri",
     "ability_runtime:app_manager",
     "ability_runtime:wantagent_innerkits",
-    "appspawn:appspawn_socket_client",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
