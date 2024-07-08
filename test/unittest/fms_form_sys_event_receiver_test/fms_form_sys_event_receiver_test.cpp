@@ -811,6 +811,20 @@ HWTEST_F(FmsFormSysEventReceiverTest, HandlePackageDataCleared_0001, TestSize.Le
 }
 
 /**
+ * @tc.number: HandleScreenUnlocked_0001
+ * @tc.name: HandleScreenUnlocked
+ * @tc.desc: Verify whether the HandleScreenUnlocked interface is called normally
+ */
+HWTEST_F(FmsFormSysEventReceiverTest, HandleScreenUnlocked_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "HandleScreenUnlocked_0001 start";
+    std::shared_ptr<FormSysEventReceiver> receiver = std::make_shared<FormSysEventReceiver>();
+    ASSERT_NE(nullptr, receiver);
+    receiver->HandleScreenUnlocked();
+    GTEST_LOG_(INFO) << "HandleScreenUnlocked_0001 end";
+}
+
+/**
  * @tc.number: HandleUserUnlocked_0001
  * @tc.name: HandleUserUnlocked
  * @tc.desc: Verify whether the HandleUserUnlocked interface is called normally

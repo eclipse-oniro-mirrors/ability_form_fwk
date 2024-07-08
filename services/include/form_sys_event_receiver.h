@@ -61,6 +61,7 @@ private:
     void HandleUserSwitched(const EventFwk::CommonEventData &eventData);
     void HandleAbilityUpdate(const AAFwk::Want& want, std::string &bundleName);
     void HandlePackageDataCleared(std::string &bundleName, int32_t userId);
+    void HandleScreenUnlocked();
     void HandleUserUnlocked();
 private:
     std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;

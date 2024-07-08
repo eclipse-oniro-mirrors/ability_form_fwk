@@ -73,7 +73,7 @@ ErrCode FormRenderMgr::RenderForm(
     std::once_flag flag;
     std::function<void()> func = [this] { this->GetFormRenderState(); };
     std::call_once(flag, func);
-    HILOG_INFO("the current user authentication status:%{public}d", isVerified_);
+    HILOG_INFO("the current user authentication status:%{public}d, %{public}d", isVerified_, isScreenUnlocked_);
     if (formRecord.uiSyntax != FormType::ETS) {
         return ERR_OK;
     }
@@ -88,7 +88,7 @@ ErrCode FormRenderMgr::RenderForm(
     want.SetParam(Constants::FORM_SUPPLY_UID, std::to_string(userId) + formRecord.bundleName);
     {
         std::lock_guard<std::mutex> lock(isVerifiedMutex_);
-        want.SetParam(Constants::FORM_RENDER_STATE, isVerified_);
+        want.SetParam(Constants::FORM_RENDER_STATE, isVerified_ || isScreenUnlocked_);
     }
     if (formRecord.privacyLevel > 0) {
         InitRenderInner(true);
@@ -144,13 +144,6 @@ ErrCode FormRenderMgr::ReloadForm(
     return ERR_OK;
 }
 
-void FormRenderMgr::SetFormRenderState(bool isVerified)
-{
-    HILOG_DEBUG("start to set form render state.");
-    std::lock_guard<std::mutex> lock(isVerifiedMutex_);
-    isVerified_ = isVerified;
-}
-
 void FormRenderMgr::PostOnUnlockTask()
 {
     if (renderInner_ != nullptr) {
@@ -180,15 +173,35 @@ void FormRenderMgr::ExecAcquireProviderTask()
     }
 }
 
+void FormRenderMgr::OnScreenUnlock()
+{
+    HILOG_INFO("OnScreenUnlock called. %{public}d, %{public}d", isVerified_, isScreenUnlocked_);
+    if (isScreenUnlocked_) {
+        return;
+    }
+    
+    // el2 path maybe not unlocked, should not acquire data
+    std::lock_guard<std::mutex> lock(isVerifiedMutex_);
+    isScreenUnlocked_ = true;
+    if (!isVerified_) {
+        PostOnUnlockTask();
+    }
+}
+
 void FormRenderMgr::OnUnlock()
 {
-    HILOG_DEBUG("called. The authentication status of the current user is true. %{public}d", isVerified_);
+    HILOG_INFO("OnUserUnlock called. %{public}d, %{public}d", isVerified_, isScreenUnlocked_);
     if (isVerified_) {
         return;
     }
     
-    SetFormRenderState(true);
-    PostOnUnlockTask();
+    {
+        std::lock_guard<std::mutex> lock(isVerifiedMutex_);
+        isVerified_ = true;
+        if (!isScreenUnlocked_) {
+            PostOnUnlockTask();
+        }
+    }
     ExecAcquireProviderTask();
 }
 

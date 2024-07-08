@@ -46,6 +46,8 @@ public:
     ErrCode UpdateRenderingForm(int64_t formId, const FormProviderData &formProviderData,
         const WantParams &wantParams, bool mergeData);
 
+    void OnScreenUnlock();
+
     void OnUnlock();
 
     ErrCode StopRenderingForm(int64_t formId, const FormRecord &formRecord,
@@ -79,8 +81,6 @@ public:
 
     ErrCode ReleaseRenderer(int64_t formId, const FormRecord &formRecord, const std::string &compId);
 
-    void SetFormRenderState(bool isVerified);
-
     void AddAcquireProviderFormInfoTask(std::function<void()> task);
 
     void ExecAcquireProviderTask();
@@ -101,6 +101,7 @@ private:
     std::queue<std::function<void()>> taskQueue_;
     std::shared_ptr<FormRenderMgrInner> renderInner_ = nullptr;
     std::shared_ptr<FormSandboxRenderMgrInner> sandboxInner_ = nullptr;
+    mutable bool isScreenUnlocked_ = false;
     mutable bool isVerified_ = false;
 };
 } // namespace AppExecFwk
