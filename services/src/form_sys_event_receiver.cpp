@@ -73,6 +73,19 @@ void FormSysEventReceiver::HandlePackageDataCleared(std::string &bundleName, int
     serialQueue_->ScheduleTask(0, task);
 }
 
+void FormSysEventReceiver::HandleScreenUnlocked()
+{
+    if (!serialQueue_) {
+        HILOG_ERROR("serialQueue is nullptr");
+        return;
+    }
+
+    auto task = []() {
+        FormRenderMgr::GetInstance().OnScreenUnlock();
+    };
+    serialQueue_->ScheduleTask(0, task);
+}
+
 void FormSysEventReceiver::HandleUserUnlocked()
 {
     if (!serialQueue_) {
@@ -102,6 +115,7 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
     if (bundleName.empty() && action != EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED &&
         action != EventFwk::CommonEventSupport::COMMON_EVENT_BUNDLE_SCAN_FINISHED &&
         action != EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED &&
+        action != EventFwk::CommonEventSupport::COMMON_EVENT_USER_UNLOCKED &&
         action != EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED) {
         HILOG_ERROR("%{public}s failed, invalid param, action: %{public}s, bundleName: %{public}s",
             __func__, action.c_str(), bundleName.c_str());
@@ -126,6 +140,10 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
         int userId = want.GetIntParam(KEY_USER_ID, Constants::DEFAULT_USERID);
         HandlePackageDataCleared(bundleName, userId);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED) {
+        // el2 path maybe not unlocked
+        HandleScreenUnlocked();
+    } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_USER_UNLOCKED) {
+        // el2 path is unlocked when receive USER_UNLOCKED
         HandleUserUnlocked();
     } else {
         HILOG_WARN("%{public}s warnning, invalid action.", __func__);
