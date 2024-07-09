@@ -36,6 +36,7 @@ std::map<int64_t, FormRecordReportInfo>& FormRecordReport::GetFormRecords()
 void FormRecordReport::SetFormRecordRecordInfo(int64_t formId, const Want &want)
 {
     FormRecordReportInfo info;
+    std::lock_guard<std::mutex> guard(formRecordReportMutex_);
     info.bundleName = want.GetElement().GetBundleName();
     info.moduleName = want.GetStringParam(Constants::PARAM_MODULE_NAME_KEY);
     info.formName = want.GetStringParam(Constants::PARAM_FORM_NAME_KEY);
@@ -48,6 +49,7 @@ void FormRecordReport::IncreaseUpdateTimes(int64_t formId, HiSysEventPointType t
 {
     HILOG_DEBUG("formId:%{public}" PRId64, formId);
     FormRecordReportInfo info;
+    std::lock_guard<std::mutex> guard(formRecordReportMutex_);
     if (formRecordReportMap_.find(formId) != formRecordReportMap_.end()) {
         info = formRecordReportMap_[formId];
         switch (type) {
@@ -87,6 +89,7 @@ void FormRecordReport::IncreaseUpdateTimes(int64_t formId, HiSysEventPointType t
 
 void FormRecordReport::HandleFormRefreshCount()
 {
+    std::lock_guard<std::mutex> guard(formRecordReportMutex_);
     for (const auto& entry : formRecordReportMap_) {
         int64_t formId = entry.first;
         if (formId <= 0) {
