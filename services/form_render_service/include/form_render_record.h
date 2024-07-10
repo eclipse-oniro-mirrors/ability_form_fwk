@@ -133,7 +133,7 @@ public:
 
     int32_t RecycleForm(const int64_t &formId, std::string &statusData);
 
-    int32_t RecoverForm(const int64_t &formId, const std::string &statusData,
+    int32_t RecoverForm(const FormJsInfo &formJsInfo, const std::string &statusData,
         const bool &isRecoverFormToHandleClickEvent);
 
     size_t FormCount();
@@ -224,7 +224,7 @@ private:
 
     int32_t HandleRecycleForm(const int64_t &formId, std::string &statusData);
 
-    void HandleRecoverForm(const int64_t &formId, const std::string &statusData,
+    void HandleRecoverForm(const FormJsInfo &formJsInfo, const std::string &statusData,
         const bool &isRecoverFormToHandleClickEvent);
 
     void HandleFormRenderGC();

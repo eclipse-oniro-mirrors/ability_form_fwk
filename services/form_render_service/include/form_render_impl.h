@@ -91,7 +91,7 @@ public:
 
     int32_t RecycleForm(const int64_t &formId, const Want &want) override;
 
-    int32_t RecoverForm(const int64_t &formId, const Want &want) override;
+    int32_t RecoverForm(const FormJsInfo &formJsInfo, const Want &want) override;
 private:
     void FormRenderGCTask(const std::string &uid);
     void FormRenderGC(const std::string &uid);

@@ -263,7 +263,7 @@ public:
      * @param want The want of the request.
      * @param remoteObject Form render proxy object.
      */
-    void PostRecoverForm(const int64_t &formId, const Want &want, const sptr<IRemoteObject> &remoteObject);
+    void PostRecoverForm(const FormRecord &record, const Want &want, const sptr<IRemoteObject> &remoteObject);
 
     /**
      * @brief Cancel delay task.
@@ -502,7 +502,7 @@ private:
      * @param want The want of the request.
      * @param remoteObject Form render proxy object.
      */
-    void RecoverForm(const int64_t &formId, const Want &want, const sptr<IRemoteObject> &remoteObject);
+    void RecoverForm(const FormRecord &record, const Want &want, const sptr<IRemoteObject> &remoteObject);
 
     /**
     * @brief Notify remote observer form click event.

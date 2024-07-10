@@ -199,13 +199,17 @@ int32_t FormRenderStub::HandleRecycleForm(MessageParcel &data, MessageParcel &re
 
 int32_t FormRenderStub::HandleRecoverForm(MessageParcel &data, MessageParcel &reply)
 {
-    int64_t formId = data.ReadInt64();
-    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
-    if (!want) {
-        HILOG_ERROR("error to ReadParcelable<Want>");
+    std::unique_ptr<FormJsInfo> formJsInfo(data.ReadParcelable<FormJsInfo>());
+    if (!formJsInfo) {
+        HILOG_ERROR("read FormJsInfo error");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    int32_t result = RecoverForm(formId, *want);
+    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
+    if (!want) {
+        HILOG_ERROR("read want error");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int32_t result = RecoverForm(*formJsInfo, *want);
     reply.WriteInt32(result);
     return result;
 }
