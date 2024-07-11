@@ -173,11 +173,12 @@ ErrCode FormRenderMgrInner::UpdateRenderingForm(FormRecord &formRecord, const Fo
 
     if (formRecord.formProviderInfo.NeedCache()) {
         FormCacheMgr::GetInstance().AddData(formRecord.formId, formRecord.formProviderInfo.GetFormData());
-        std::string cacheData;
-        std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
-        // Ensure that the data in the database is the same as the data in FRS.
-        if (FormCacheMgr::GetInstance().GetData(formRecord.formId, cacheData, imageDataMap)) {
-            formRecord.formProviderInfo.SetImageDataMap(imageDataMap);
+        if (formRecord.recycleStatus != RecycleStatus::NON_RECYCLABLE) {
+            std::string cacheData;
+            std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
+            if (FormCacheMgr::GetInstance().GetData(formRecord.formId, cacheData, imageDataMap)) {
+                formRecord.formProviderInfo.SetImageDataMap(imageDataMap);
+            }
         }
     } else {
         HILOG_DEBUG("need to delete data.");
@@ -640,6 +641,13 @@ ErrCode FormRenderMgrInner::RecoverForms(const std::vector<int64_t> &formIds, co
             HILOG_ERROR("form record %{public}" PRId64 " not exist", formId);
             continue;
         }
+
+        std::string cacheData;
+        std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
+        if (FormCacheMgr::GetInstance().GetData(formRecord.formId, cacheData, imageDataMap)) {
+            formRecord.formProviderInfo.SetImageDataMap(imageDataMap);
+        }
+
         std::string uid = std::to_string(formRecord.providerUserId) + formRecord.bundleName;
         want.SetParam(Constants::FORM_SUPPLY_UID, uid);
 
@@ -659,7 +667,7 @@ ErrCode FormRenderMgrInner::RecoverForms(const std::vector<int64_t> &formIds, co
             }
             want.SetParam(Constants::FORM_STATUS_DATA, statusData);
 
-            FormTaskMgr::GetInstance().PostRecoverForm(formId, want, remoteObject);
+            FormTaskMgr::GetInstance().PostRecoverForm(formRecord, want, remoteObject);
         } else {
             HILOG_ERROR("can't find connection of %{public}" PRId64, formId);
         }

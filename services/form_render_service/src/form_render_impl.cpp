@@ -407,8 +407,9 @@ int32_t FormRenderImpl::RecycleForm(const int64_t &formId, const Want &want)
     return ERR_OK;
 }
 
-int32_t FormRenderImpl::RecoverForm(const int64_t &formId, const Want &want)
+int32_t FormRenderImpl::RecoverForm(const FormJsInfo &formJsInfo, const Want &want)
 {
+    auto formId = formJsInfo.formId;
     if (formId <= 0) {
         HILOG_ERROR("formId is negative.");
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
@@ -435,7 +436,7 @@ int32_t FormRenderImpl::RecoverForm(const int64_t &formId, const Want &want)
             HILOG_ERROR("render record of %{public}s is null.", std::to_string(formId).c_str());
             return RECYCLE_FORM_FAILED;
         }
-        return search->second->RecoverForm(formId, statusData, isRecoverFormToHandleClickEvent);
+        return search->second->RecoverForm(formJsInfo, statusData, isRecoverFormToHandleClickEvent);
     }
     HILOG_ERROR("can't find render record of %{public}s.", std::to_string(formId).c_str());
     return RENDER_FORM_FAILED;

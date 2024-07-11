@@ -294,7 +294,7 @@ int32_t FormRenderProxy::RecycleForm(const int64_t &formId, const Want &want)
     return ERR_OK;
 }
 
-int32_t FormRenderProxy::RecoverForm(const int64_t &formId, const Want &want)
+int32_t FormRenderProxy::RecoverForm(const FormJsInfo &formJsInfo, const Want &want)
 {
     MessageParcel data;
     MessageOption option(MessageOption::TF_ASYNC);
@@ -302,8 +302,8 @@ int32_t FormRenderProxy::RecoverForm(const int64_t &formId, const Want &want)
         HILOG_ERROR("failed to write interface token");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    if (!data.WriteInt64(formId)) {
-        HILOG_ERROR("failed to write formId");
+    if (!data.WriteParcelable(&formJsInfo)) {
+        HILOG_ERROR("failed to write formJsInfo");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.WriteParcelable(&want)) {

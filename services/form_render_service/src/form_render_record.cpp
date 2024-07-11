@@ -1350,9 +1350,10 @@ int32_t FormRenderRecord::HandleRecycleForm(const int64_t &formId, std::string &
     return ERR_OK;
 }
 
-int32_t FormRenderRecord::RecoverForm(const int64_t &formId,
+int32_t FormRenderRecord::RecoverForm(const FormJsInfo &formJsInfo,
     const std::string &statusData, const bool &isRecoverFormToHandleClickEvent)
 {
+    auto formId = formJsInfo.formId;
     HILOG_INFO("RecoverForm begin, formId: %{public}s.", std::to_string(formId).c_str());
     std::lock_guard<std::mutex> lock(eventHandlerMutex_);
     if (!CheckEventHandler(true, true)) {
@@ -1361,21 +1362,22 @@ int32_t FormRenderRecord::RecoverForm(const int64_t &formId,
     }
 
     std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
-    auto task = [thisWeakPtr, formId, statusData, isRecoverFormToHandleClickEvent]() {
+    auto task = [thisWeakPtr, formJsInfo, statusData, isRecoverFormToHandleClickEvent]() {
         auto renderRecord = thisWeakPtr.lock();
         if (renderRecord == nullptr) {
             HILOG_ERROR("renderRecord is nullptr");
             return;
         }
-        renderRecord->HandleRecoverForm(formId, statusData, isRecoverFormToHandleClickEvent);
+        renderRecord->HandleRecoverForm(formJsInfo, statusData, isRecoverFormToHandleClickEvent);
     };
     eventHandler_->PostTask(task, "RecoverForm");
     return ERR_OK;
 }
 
-void FormRenderRecord::HandleRecoverForm(const int64_t &formId,
+void FormRenderRecord::HandleRecoverForm(const FormJsInfo &formJsInfo,
     const std::string &statusData, const bool &isRecoverFormToHandleClickEvent)
 {
+    auto formId = formJsInfo.formId;
     HILOG_INFO("HandleRecoverForm begin, formId: %{public}s, uid: %{public}s.", std::to_string(formId).c_str(),
         uid_.c_str());
     std::unordered_map<std::string, Ace::FormRequest> formRequests;
@@ -1405,6 +1407,7 @@ void FormRenderRecord::HandleRecoverForm(const int64_t &formId,
             want.SetParam(Constants::FORM_STATUS_DATA, statusData);
             want.SetParam(Constants::FORM_IS_RECOVER_FORM_TO_HANDLE_CLICK_EVENT, isRecoverFormToHandleClickEvent);
 
+            formRequest.formJsInfo.imageDataMap = formJsInfo.imageDataMap;
             AddRenderer(formRequest.formJsInfo, want);
             formRequest.hasRelease = false;
             AddFormRequest(formId, formRequest);

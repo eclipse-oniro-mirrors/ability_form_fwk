@@ -70,7 +70,7 @@ public:
 
     virtual int32_t RecycleForm(const int64_t &formId, const Want &want) { return ERR_OK; }
 
-    virtual int32_t RecoverForm(const int64_t &formId, const Want &want) { return ERR_OK; }
+    virtual int32_t RecoverForm(const FormJsInfo &formJsInfo, const Want &want) { return ERR_OK; }
 
     enum class Message {
         // ipc id 1-1000 for kit

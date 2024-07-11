@@ -1144,7 +1144,7 @@ void FormTaskMgr::RecycleForm(const int64_t &formId, const sptr<IRemoteObject> &
  * @param want The want of the request.
  * @param remoteObject Form render proxy object.
  */
-void FormTaskMgr::PostRecoverForm(const int64_t &formId, const Want &want, const sptr<IRemoteObject> &remoteObject)
+void FormTaskMgr::PostRecoverForm(const FormRecord &record, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_DEBUG("start.");
     if (serialQueue_ == nullptr) {
@@ -1152,8 +1152,8 @@ void FormTaskMgr::PostRecoverForm(const int64_t &formId, const Want &want, const
         return;
     }
 
-    auto recoverForm = [formId, want, remoteObject]() {
-        FormTaskMgr::GetInstance().RecoverForm(formId, want, remoteObject);
+    auto recoverForm = [record, want, remoteObject]() {
+        FormTaskMgr::GetInstance().RecoverForm(record, want, remoteObject);
     };
     serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, recoverForm);
     HILOG_DEBUG("end");
@@ -1165,7 +1165,7 @@ void FormTaskMgr::PostRecoverForm(const int64_t &formId, const Want &want, const
  * @param want The want of the request.
  * @param remoteObject Form render proxy object.
  */
-void FormTaskMgr::RecoverForm(const int64_t &formId, const Want &want, const sptr<IRemoteObject> &remoteObject)
+void FormTaskMgr::RecoverForm(const FormRecord &record, const Want &want, const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_DEBUG("start.");
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
@@ -1176,7 +1176,8 @@ void FormTaskMgr::RecoverForm(const int64_t &formId, const Want &want, const spt
         return;
     }
 
-    int32_t error = remoteFormRender->RecoverForm(formId, want);
+    FormJsInfo formJsInfo = CreateFormJsInfo(record.formId, record);
+    int32_t error = remoteFormRender->RecoverForm(formJsInfo, want);
     if (error != ERR_OK) {
         RemoveConnection(connectId);
         HILOG_ERROR("Failed to recover form");
