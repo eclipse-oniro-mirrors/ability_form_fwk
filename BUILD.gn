@@ -155,6 +155,7 @@ ohos_shared_library("libfms") {
     "ipc:ipc_core",
     "kv_store:distributeddata_inner",
     "libxml2:libxml2",
+    "memmgr:memmgrclient",
     "os_account:os_account_innerkits",
     "relational_store:native_rdb",
     "resource_management:global_resmgr",
@@ -162,12 +163,6 @@ ohos_shared_library("libfms") {
     "samgr:samgr_proxy",
     "time_service:time_client",
   ]
-
-  if (cite_memmgr_plugin) {
-    external_deps += [ "memmgr_override:memmgrclient" ]
-  } else if (cite_memmgr) {
-    external_deps += [ "memmgr:memmgrclient" ]
-  }
 
   if (theme_mgr_enable) {
     external_deps += [ "theme_mgr:theme_manager_client" ]

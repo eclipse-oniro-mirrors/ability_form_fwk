@@ -74,16 +74,11 @@ ohos_unittest("FmsFormMgrReleaseFormTest") {
     "form_fwk:form_manager",
     "hilog:libhilog",
     "ipc:ipc_core",
+    "memmgr:memmgrclient",
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
-
-  if (cite_memmgr_plugin) {
-    external_deps += [ "memmgr_override:memmgrclient" ]
-  } else if (cite_memmgr) {
-    external_deps += [ "memmgr:memmgrclient" ]
-  }
 }
 
 group("unittest") {
