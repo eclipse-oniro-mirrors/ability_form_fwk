@@ -55,20 +55,6 @@ declare_args() {
 }
 
 declare_args() {
-  cite_memmgr_plugin = false
-  if (defined(global_parts_info) &&
-      defined(global_parts_info.resourceschedule_memmgr_override)) {
-    cite_memmgr_plugin = true
-  }
-
-  cite_memmgr = false
-  if (defined(global_parts_info) &&
-      defined(global_parts_info.resourceschedule_memmgr)) {
-    cite_memmgr = true
-  }
-}
-
-declare_args() {
   res_schedule_service = false
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {

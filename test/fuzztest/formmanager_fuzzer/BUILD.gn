@@ -47,15 +47,10 @@ ohos_fuzztest("FormManagerFuzzTest") {
     "ffrt:libffrt",
     "hilog:libhilog",
     "ipc:ipc_core",
+    "memmgr:memmgrclient",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
-
-  if (cite_memmgr_plugin) {
-    external_deps += [ "memmgr_override:memmgrclient" ]
-  } else if (cite_memmgr) {
-    external_deps += [ "memmgr:memmgrclient" ]
-  }
 }
 
 ###############################################################################

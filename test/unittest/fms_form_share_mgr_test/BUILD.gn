@@ -79,16 +79,11 @@ ohos_unittest("FmsFormShareMgrTest") {
     "image_framework:image_native",
     "ipc:ipc_core",
     "kv_store:distributeddata_inner",
+    "memmgr:memmgrclient",
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
-
-  if (cite_memmgr_plugin) {
-    external_deps += [ "memmgr_override:memmgrclient" ]
-  } else if (cite_memmgr) {
-    external_deps += [ "memmgr:memmgrclient" ]
-  }
 }
 
 group("unittest") {
