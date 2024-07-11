@@ -411,7 +411,7 @@ int32_t FormRenderImpl::RecoverForm(const FormJsInfo &formJsInfo, const Want &wa
 {
     auto formId = formJsInfo.formId;
     if (formId <= 0) {
-        HILOG_ERROR("formId is negative .");
+        HILOG_ERROR("formId is negative.");
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
     }
 
