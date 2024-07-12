@@ -19,6 +19,12 @@ module_output_path = "form_fwk/form_render_service"
 ohos_unittest("FrsFormRenderRecordTest") {
   module_out_path = module_output_path
 
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   sources = [
     "${form_fwk_path}/test/mock/src/mock_form_provider_client.cpp",
     "${form_fwk_path}/test/unittest/frs_form_render_record_test/frs_form_render_record_test.cpp",
