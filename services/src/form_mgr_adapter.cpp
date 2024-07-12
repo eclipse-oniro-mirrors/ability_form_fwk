@@ -777,7 +777,7 @@ int FormMgrAdapter::UpdateForm(const int64_t formId, const int32_t callingUid,
     int32_t ret = ERR_OK;
     if (formRecord.uiSyntax == FormType::ETS) {
         WantParams wantParams;
-        ret = FormRenderMgr::GetInstance().UpdateRenderingForm(formId, formProviderData, wantParams, true);
+        ret = FormRenderMgr::GetInstance().UpdateRenderingForm(formId, formProviderData, wantParams, false);
     } else {
         // update Form
         ret = FormProviderMgr::GetInstance().UpdateForm(matchedFormId, formRecord, formProviderData);
