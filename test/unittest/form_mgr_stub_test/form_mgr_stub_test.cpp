@@ -2426,6 +2426,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0097, TestSize.Level1) {
     EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0097 ends";
 }
+
 /**
  * @tc.number: FormMgrStubTest_0098
  * @tc.name: HandleGetFormInstancesByFilter
@@ -2484,6 +2485,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0100, TestSize.Level1) {
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0100 ends";
 }
+
 /**
  * @tc.name: HandleGetFormInstanceById_0100
  * @tc.desc: Verify that the return value and the size of resultInfos
