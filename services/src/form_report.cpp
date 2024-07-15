@@ -159,6 +159,7 @@ void FormReport::SetDurationEndTime(int64_t formId, int64_t endTime)
 
 void FormReport::InsertFormId(int64_t formId)
 {
+    std::lock_guard<std::mutex> guard(formIdsMutex_);
     if (FormIds.find(formId) == FormIds.end()) {
         FormIds.insert(formId);
     }
@@ -166,6 +167,7 @@ void FormReport::InsertFormId(int64_t formId)
 
 void FormReport::RemoveFormId(int64_t formId)
 {
+    std::lock_guard<std::mutex> guard(formIdsMutex_);
     if (FormIds.find(formId) != FormIds.end()) {
         FormIds.erase(formId);
     }
