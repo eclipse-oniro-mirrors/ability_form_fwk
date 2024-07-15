@@ -758,6 +758,148 @@ HWTEST_F(FormRenderStubTest, FormRenderStubTest_016, TestSize.Level0)
 }
 
 /**
+ * @tc.name: FormRenderStubTest_017
+ * @tc.desc: 1.Verify OnRemoteRequest and HandleReleaseRenderer interface executes as expected.
+ *           2.The interface return value ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderStubTest, FormRenderStubTest_017, TestSize.Level0)
+{
+    sptr<MockFormRenderImpl> callback = new (std::nothrow) MockFormRenderImpl();
+    uint32_t code = static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_RELEASE_RENDERER);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(u"ohos.appexecfwk.FormRender");
+    data.WriteInt64(1);
+    data.WriteString("<compId>");
+    data.WriteString("<uid>");
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+}
+
+/**
+ * @tc.name: FormRenderStubTest_018
+ * @tc.desc: 1.Verify OnRemoteRequest and HandleOnUnlock interface executes as expected.
+ *           2.The interface return value ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderStubTest, FormRenderStubTest_018, TestSize.Level0)
+{
+    sptr<MockFormRenderImpl> callback = new (std::nothrow) MockFormRenderImpl();
+    uint32_t code = static_cast<uint32_t>(IFormRender::Message::FORM_RENDER_UNLOCKED);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(u"ohos.appexecfwk.FormRender");
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+}
+
+/**
+ * @tc.name: FormRenderStubTest_019
+ * @tc.desc: 1.Verify OnRemoteRequest and HandleRecycleForm interface executes as expected.
+ *           2.Want is nullptr
+ *           3.The interface return value ERR_APPEXECFWK_PARCEL_ERROR.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderStubTest, FormRenderStubTest_019, TestSize.Level0)
+{
+    sptr<MockFormRenderImpl> callback = new (std::nothrow) MockFormRenderImpl();
+    uint32_t code = static_cast<uint32_t>(IFormRender::Message::FORM_RECYCLE_FORM);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(u"ohos.appexecfwk.FormRender");
+    data.WriteInt64(1);
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+}
+
+/**
+ * @tc.name: FormRenderStubTest_020
+ * @tc.desc: 1.Verify OnRemoteRequest and HandleRecycleForm interface executes as expected.
+ *           2.The interface return value ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderStubTest, FormRenderStubTest_020, TestSize.Level0)
+{
+    Want want = {};
+    sptr<MockFormRenderImpl> callback = new (std::nothrow) MockFormRenderImpl();
+    uint32_t code = static_cast<uint32_t>(IFormRender::Message::FORM_RECYCLE_FORM);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(u"ohos.appexecfwk.FormRender");
+    data.WriteInt64(1);
+    data.WriteParcelable(&want);
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+}
+
+/**
+ * @tc.name: FormRenderStubTest_021
+ * @tc.desc: 1.Verify OnRemoteRequest and HandleRecoverForm interface executes as expected.
+ *           2.The interface return value ERR_APPEXECFWK_PARCEL_ERROR.
+ *           3.FormJsInfo is nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderStubTest, FormRenderStubTest_021, TestSize.Level0)
+{
+    sptr<MockFormRenderImpl> callback = new (std::nothrow) MockFormRenderImpl();
+    uint32_t code = static_cast<uint32_t>(IFormRender::Message::FORM_RECOVER_FORM);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(u"ohos.appexecfwk.FormRender");
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+}
+
+/**
+ * @tc.name: FormRenderStubTest_022
+ * @tc.desc: 1.Verify OnRemoteRequest and HandleRecoverForm interface executes as expected.
+ *           2.The interface return value ERR_APPEXECFWK_PARCEL_ERROR.
+ *           3.want is nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderStubTest, FormRenderStubTest_022, TestSize.Level0)
+{
+    FormJsInfo formJsInfo = {};
+    sptr<MockFormRenderImpl> callback = new (std::nothrow) MockFormRenderImpl();
+    uint32_t code = static_cast<uint32_t>(IFormRender::Message::FORM_RECOVER_FORM);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(u"ohos.appexecfwk.FormRender");
+    data.WriteParcelable(&formJsInfo);
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+}
+
+/**
+ * @tc.name: FormRenderStubTest_023
+ * @tc.desc: 1.Verify OnRemoteRequest and HandleRecycleForm interface executes as expected.
+ *           2.The interface return value ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderStubTest, FormRenderStubTest_023, TestSize.Level0)
+{
+    FormJsInfo formJsInfo = {};
+    Want want = {};
+    sptr<MockFormRenderImpl> callback = new (std::nothrow) MockFormRenderImpl();
+    uint32_t code = static_cast<uint32_t>(IFormRender::Message::FORM_RECOVER_FORM);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(u"ohos.appexecfwk.FormRender");
+    data.WriteParcelable(&formJsInfo);
+    data.WriteParcelable(&want);
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+}
+
+/**
  * @tc.name: IFormSupplyTest_001
  * @tc.desc: Test OnRenderingBlock function
  * @tc.type: FUNC

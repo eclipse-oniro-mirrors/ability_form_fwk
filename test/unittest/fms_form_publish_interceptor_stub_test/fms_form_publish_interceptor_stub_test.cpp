@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -59,24 +59,91 @@ void FormPublishInterceptorStubTest::SetUp()
 void FormPublishInterceptorStubTest::TearDown()
 {}
 
+class MockFormPublishInterceptorCallback : public FormPublishInterceptorStub {
+public:
+    MockFormPublishInterceptorCallback() {};
+    virtual ~MockFormPublishInterceptorCallback() {};
+
+    sptr<IRemoteObject> AsObject() override
+    {
+        if (!asObject_) {
+            return nullptr;
+        }
+        return this;
+    };
+
+    bool asObject_ = true;
+};
+
 /**
- * @tc.number: FormPublishInterceptorStubTest_001
- * @tc.name: SubscribeFormData
- * @tc.desc: Verify that the return value is correct.
- * @tc.details:
- *      temporaryFlag is true, and tempForms is empty, then create a tempForm.
- *      formRecords_ is empty, then create formRecords.
+ * @tc.name: FormPublishInterceptorStubTest_001
+ * @tc.desc: VVerify OnRemoteRequest function and remoteDescriptor is empty
+ * @tc.type: FUNC
  */
 HWTEST_F(FormPublishInterceptorStubTest, FormPublishInterceptorStubTest_001, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "FormPublishInterceptorStubTest_001 start";
     FormPublishInterceptorStub formPublishInterceptorStub;
     uint32_t code = 1;
     MessageParcel data;
     MessageParcel reply;
-    MessageOption option;
+    MessageOption option{MessageOption::TF_ASYNC};
     int ret = formPublishInterceptorStub.OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
-    GTEST_LOG_(INFO) << "FormPublishInterceptorStubTest_001 end";
+}
+
+/**
+ * @tc.name: FormPublishInterceptorStubTest_002
+ * @tc.desc: Verify OnRemoteRequest function and memberFunc is nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormPublishInterceptorStubTest, FormPublishInterceptorStubTest_002, TestSize.Level0)
+{
+    sptr<MockFormPublishInterceptorCallback> callback = new (std::nothrow) MockFormPublishInterceptorCallback();
+    uint32_t code = static_cast<uint32_t>(IFormPublishInterceptor::Message::FORM_PROCESS_PUBLISH_FORM) + 100;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormPublishInterceptorCallback::GetDescriptor());
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, IPC_STUB_UNKNOW_TRANS_ERR);
+}
+
+/**
+ * @tc.name: FormPublishInterceptorStubTest_003
+ * @tc.desc: 1.Verify OnRemoteRequest and HandleProcessPublishForm interface executes as expected.
+ *           2.The interface return value ERR_APPEXECFWK_PARCEL_ERROR.
+ *           3.want is nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormPublishInterceptorStubTest, FormPublishInterceptorStubTest_003, TestSize.Level0)
+{
+    sptr<MockFormPublishInterceptorCallback> callback = new (std::nothrow) MockFormPublishInterceptorCallback();
+    constexpr uint32_t code = static_cast<uint32_t>(IFormPublishInterceptor::Message::FORM_PROCESS_PUBLISH_FORM);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormPublishInterceptorCallback::GetDescriptor());
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+}
+
+/**
+ * @tc.name: FormPublishInterceptorStubTest_004
+ * @tc.desc: 1.Verify OnRemoteRequest and HandleProcessPublishForm interface executes as expected.
+ *           2.The interface return value ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormPublishInterceptorStubTest, FormPublishInterceptorStubTest_004, TestSize.Level0)
+{
+    Want want = {};
+    sptr<MockFormPublishInterceptorCallback> callback = new (std::nothrow) MockFormPublishInterceptorCallback();
+    constexpr uint32_t code = static_cast<uint32_t>(IFormPublishInterceptor::Message::FORM_PROCESS_PUBLISH_FORM);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormPublishInterceptorCallback::GetDescriptor());
+    data.WriteParcelable(&want);
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
 }
 }
