@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -103,6 +103,16 @@ public:
     MOCK_METHOD2(EnableForms, int32_t(const std::string bundleName, const bool enable));
     MOCK_METHOD4(RequestPublishFormWithSnapshot, ErrCode(Want &want, bool withFormBindingData,
         std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId));
+    MOCK_METHOD2(SetNextRefreshTime, int32_t(const int64_t formId, const int64_t nextTime));
+    MOCK_METHOD4(RequestPublishForm, int32_t(Want &want, bool withFormBindingData,
+        std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId));
+    MOCK_METHOD3(LifecycleUpdate, int(
+        const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &callerToken, bool updateType));
+    MOCK_METHOD1(IsSystemAppForm, bool(const std::string &bundleName));
+    MOCK_METHOD2(ReleaseRenderer, int32_t(int64_t formId, const std::string &compId));
+    MOCK_METHOD3(GetFormInstanceById, ErrCode(const int64_t formId, bool isUnusedInclude, FormInstance &formInstance));
+    MOCK_METHOD1(IsFormBundleForbidden, bool(const std::string &bundleName));
+    MOCK_METHOD2(StopRenderingForm, int32_t(const int64_t formId, const std::string &compId));
 };
 }
 }
