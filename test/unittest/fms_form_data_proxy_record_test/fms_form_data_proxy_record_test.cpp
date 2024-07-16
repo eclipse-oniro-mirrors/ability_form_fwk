@@ -67,9 +67,12 @@ void FmsFormDataProxyRecordTest::TearDown()
 {}
 
 /**
- * @tc.name: FmsFormDataProxyRecordTest_001
- * @tc.desc: test SubscribeFormData function.
- * @tc.type: FUNC
+ * @tc.number: FmsFormDataProxyRecordTest_001
+ * @tc.name: SubscribeFormData
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *      temporaryFlag is true, and tempForms is empty, then create a tempForm.
+ *      formRecords_ is empty, then create formRecords.
  */
 HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_001, TestSize.Level0)
 {
@@ -79,43 +82,54 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_001, TestSize.Le
     uint32_t tokenId = 1;
     FormDataProxyRecord formDataProxyRecord(formId, formRecord.bundleName, formRecord.uiSyntax, tokenId, 1);
     const std::vector<FormDataProxy> formDataProxies;
+
     ErrCode ret = formDataProxyRecord.SubscribeFormData(formDataProxies);
     EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_001 end";
 }
 
 /**
- * @tc.name: FmsFormDataProxyRecordTest_002
- * @tc.desc: test OnRdbDataChange function.
- * @tc.type: FUNC
+ * @tc.number: FmsFormDataProxyRecordTest_002
+ * @tc.name: OnRdbDataChange
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *      temporaryFlag is true, and tempForms is empty, then create a tempForm.
+ *      formRecords_ is empty, then create formRecords.
  */
 HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_002, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_002 start";
+
     DataShare::RdbChangeNode changeNode;
     FormRecord formRecord;
     int64_t formId = 1;
     uint32_t tokenId = 1;
     FormDataProxyRecord formDataProxyRecord(formId, formRecord.bundleName, formRecord.uiSyntax, tokenId, 1);
     const std::vector<FormDataProxy> formDataProxies;
+
     formDataProxyRecord.OnRdbDataChange(changeNode);
     GTEST_LOG_(INFO) << "FmsFormDataMgr_002 end";
 }
 
 /**
- * @tc.name: FmsFormDataProxyRecordTest_003
- * @tc.desc: test OnPublishedDataChange function.
- * @tc.type: FUNC
+ * @tc.number: FmsFormDataProxyRecordTest_003
+ * @tc.name: OnPublishedDataChange
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *      temporaryFlag is true, and tempForms is empty, then create a tempForm.
+ *      formRecords_ is empty, then create formRecords.
  */
 HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_003, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_003 start";
+
     DataShare::PublishedDataChangeNode changeNode;
     FormRecord formRecord;
     int64_t formId = 1;
     uint32_t tokenId = 1;
     FormDataProxyRecord formDataProxyRecord(formId, formRecord.bundleName, formRecord.uiSyntax, tokenId, 1);
     const std::vector<FormDataProxy> formDataProxies;
+
     formDataProxyRecord.OnPublishedDataChange(changeNode);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_003 end";
 }
@@ -176,9 +190,12 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_010, TestSize.Le
 }
 
 /**
- * @tc.name: FmsFormDataProxyRecordTest_011
- * @tc.desc: test UnsubscribeFormData function.
- * @tc.type: FUNC
+ * @tc.number: FmsFormDataProxyRecordTest_011
+ * @tc.name: SubscribePublishFormData
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *      temporaryFlag is true, and tempForms is empty, then create a tempForm.
+ *      formRecords_ is empty, then create formRecords.
  */
 HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_011, TestSize.Level0)
 {
@@ -195,9 +212,12 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_011, TestSize.Le
 }
 
 /**
- * @tc.name: FmsFormDataProxyRecordTest_012
- * @tc.desc: test ParseFormDataProxies function.
- * @tc.type: FUNC
+ * @tc.number: FmsFormDataProxyRecordTest_012
+ * @tc.name: SubscribePublishFormData
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *      temporaryFlag is true, and tempForms is empty, then create a tempForm.
+ *      formRecords_ is empty, then create formRecords.
  */
 HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_012, TestSize.Level0)
 {
@@ -214,9 +234,12 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_012, TestSize.Le
 }
 
 /**
- * @tc.name: FmsFormDataProxyRecordTest_013
- * @tc.desc: test ConvertSubscribeMapToRequests function.
- * @tc.type: FUNC
+ * @tc.number: FmsFormDataProxyRecordTest_013
+ * @tc.name: SubscribePublishFormData
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *      temporaryFlag is true, and tempForms is empty, then create a tempForm.
+ *      formRecords_ is empty, then create formRecords.
  */
 HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_013, TestSize.Level0)
 {
@@ -232,9 +255,12 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_013, TestSize.Le
 }
 
 /**
- * @tc.name: FmsFormDataProxyRecordTest_014
- * @tc.desc: test UpdatePublishedDataForm function.
- * @tc.type: FUNC
+ * @tc.number: FmsFormDataProxyRecordTest_014
+ * @tc.name: SubscribePublishFormData
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *      temporaryFlag is true, and tempForms is empty, then create a tempForm.
+ *      formRecords_ is empty, then create formRecords.
  */
 HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_014, TestSize.Level0)
 {
@@ -251,9 +277,12 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_014, TestSize.Le
 }
 
 /**
- * @tc.name: FmsFormDataProxyRecordTest_015
- * @tc.desc: test UpdateRdbDataForm function.
- * @tc.type: FUNC
+ * @tc.number: FmsFormDataProxyRecordTest_015
+ * @tc.name: SubscribePublishFormData
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *      temporaryFlag is true, and tempForms is empty, then create a tempForm.
+ *      formRecords_ is empty, then create formRecords.
  */
 HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_015, TestSize.Level0)
 {
@@ -270,9 +299,12 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_015, TestSize.Le
 }
 
 /**
- * @tc.name: FmsFormDataProxyRecordTest_016
- * @tc.desc: test UpdateSubscribeFormData function.
- * @tc.type: FUNC
+ * @tc.number: FmsFormDataProxyRecordTest_016
+ * @tc.name: SubscribePublishFormData
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *      temporaryFlag is true, and tempForms is empty, then create a tempForm.
+ *      formRecords_ is empty, then create formRecords.
  */
 HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_016, TestSize.Level0)
 {
@@ -295,9 +327,12 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_016, TestSize.Le
 }
 
 /**
- * @tc.name: FmsFormDataProxyRecordTest_017
- * @tc.desc: test UpdateSubscribeMap function.
- * @tc.type: FUNC
+ * @tc.number: FmsFormDataProxyRecordTest_016
+ * @tc.name: SubscribePublishFormData
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *      temporaryFlag is true, and tempForms is empty, then create a tempForm.
+ *      formRecords_ is empty, then create formRecords.
  */
 HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_017, TestSize.Level0)
 {
@@ -316,9 +351,12 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_017, TestSize.Le
 }
 
 /**
- * @tc.name: FmsFormDataProxyRecordTest_018
- * @tc.desc: test EnableSubscribeFormData function.
- * @tc.type: FUNC
+ * @tc.number: FmsFormDataProxyRecordTest_018
+ * @tc.name: SubscribePublishFormData
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *      temporaryFlag is true, and tempForms is empty, then create a tempForm.
+ *      formRecords_ is empty, then create formRecords.
  */
 HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_018, TestSize.Level0)
 {
@@ -337,9 +375,12 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_018, TestSize.Le
 }
 
 /**
- * @tc.name: FmsFormDataProxyRecordTest_019
- * @tc.desc: test DisableSubscribeFormData function.
- * @tc.type: FUNC
+ * @tc.number: FmsFormDataProxyRecordTest_019
+ * @tc.name: SubscribePublishFormData
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *      temporaryFlag is true, and tempForms is empty, then create a tempForm.
+ *      formRecords_ is empty, then create formRecords.
  */
 HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_019, TestSize.Level0)
 {
@@ -358,9 +399,12 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_019, TestSize.Le
 }
 
 /**
- * @tc.name: FmsFormDataProxyRecordTest_020
- * @tc.desc: test SetRdbSubsState function.
- * @tc.type: FUNC
+ * @tc.number: FmsFormDataProxyRecordTest_020
+ * @tc.name: SubscribePublishFormData
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *      temporaryFlag is true, and tempForms is empty, then create a tempForm.
+ *      formRecords_ is empty, then create formRecords.
  */
 HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_020, TestSize.Level0)
 {
@@ -375,9 +419,12 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_020, TestSize.Le
 }
 
 /**
- * @tc.name: FmsFormDataProxyRecordTest_021
- * @tc.desc: test SetRdbSubsState function.
- * @tc.type: FUNC
+ * @tc.number: FmsFormDataProxyRecordTest_021
+ * @tc.name: SubscribePublishFormData
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *      temporaryFlag is true, and tempForms is empty, then create a tempForm.
+ *      formRecords_ is empty, then create formRecords.
  */
 HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_021, TestSize.Level0)
 {
@@ -393,9 +440,12 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_021, TestSize.Le
 }
 
 /**
- * @tc.name: FmsFormDataProxyRecordTest_022
- * @tc.desc: test SetPublishSubsState function.
- * @tc.type: FUNC
+ * @tc.number: FmsFormDataProxyRecordTest_022
+ * @tc.name: SetPublishSubsState
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *      temporaryFlag is true, and tempForms is empty, then create a tempForm.
+ *      formRecords_ is empty, then create formRecords.
  */
 HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_022, TestSize.Level0)
 {
@@ -411,9 +461,12 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_022, TestSize.Le
 }
 
 /**
- * @tc.name: FmsFormDataProxyRecordTest_023
- * @tc.desc: test PrepareImageData function.
- * @tc.type: FUNC
+ * @tc.number: FmsFormDataProxyRecordTest_023
+ * @tc.name: PrepareImageData
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *      temporaryFlag is true, and tempForms is empty, then create a tempForm.
+ *      formRecords_ is empty, then create formRecords.
  */
 HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_023, TestSize.Level0)
 {
@@ -431,9 +484,12 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_023, TestSize.Le
 }
 
 /**
- * @tc.name: FmsFormDataProxyRecordTest_024
- * @tc.desc: test PrepareImageData function.
- * @tc.type: FUNC
+ * @tc.number: FmsFormDataProxyRecordTest_024
+ * @tc.name: PrepareImageData
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *      temporaryFlag is true, and tempForms is empty, then create a tempForm.
+ *      formRecords_ is empty, then create formRecords.
  */
 HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_024, TestSize.Level0)
 {
@@ -453,9 +509,12 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_024, TestSize.Le
 }
 
 /**
- * @tc.name: FmsFormDataProxyRecordTest_025
- * @tc.desc: test PrepareImageData function.
- * @tc.type: FUNC
+ * @tc.number: FmsFormDataProxyRecordTest_025
+ * @tc.name: PrepareImageData
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *      temporaryFlag is true, and tempForms is empty, then create a tempForm.
+ *      formRecords_ is empty, then create formRecords.
  */
 HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_025, TestSize.Level0)
 {
@@ -475,9 +534,12 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_025, TestSize.Le
 }
 
 /**
- * @tc.name: FmsFormDataProxyRecordTest_026
- * @tc.desc: test PrepareImageData function.
- * @tc.type: FUNC
+ * @tc.number: FmsFormDataProxyRecordTest_026
+ * @tc.name: PrepareImageData
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *      temporaryFlag is true, and tempForms is empty, then create a tempForm.
+ *      formRecords_ is empty, then create formRecords.
  */
 HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_026, TestSize.Level0)
 {
@@ -486,19 +548,24 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_026, TestSize.Le
     int64_t formId = 1;
     uint32_t tokenId = 1;
     FormDataProxyRecord formDataProxyRecord(formId, formRecord.bundleName, formRecord.uiSyntax, tokenId, 1);
+
     const DataShare::PublishedDataItem data;
     formRecord.uiSyntax = FormType::JS;
     nlohmann::json jsonObj;
     std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
+
     bool ret = formDataProxyRecord.PrepareImageData(data, jsonObj, imageDataMap);
     EXPECT_EQ(ret, false);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_026 end";
 }
 
 /**
- * @tc.name: FmsFormDataProxyRecordTest_027
- * @tc.desc: test PrepareImageData function.
- * @tc.type: FUNC
+ * @tc.number: FmsFormDataProxyRecordTest_027
+ * @tc.name: PrepareImageData
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *      temporaryFlag is true, and tempForms is empty, then create a tempForm.
+ *      formRecords_ is empty, then create formRecords.
  */
 HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_027, TestSize.Level0)
 {
@@ -518,9 +585,12 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_027, TestSize.Le
 }
 
 /**
- * @tc.name: FmsFormDataProxyRecordTest_028
- * @tc.desc: test SetPublishSubsState function.
- * @tc.type: FUNC
+ * @tc.number: FmsFormDataProxyRecordTest_028
+ * @tc.name: SetPublishSubsState
+ * @tc.desc: Verify that the return value is correct.
+ * @tc.details:
+ *      temporaryFlag is true, and tempForms is empty, then create a tempForm.
+ *      formRecords_ is empty, then create formRecords.
  */
 HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_028, TestSize.Level0)
 {
