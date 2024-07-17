@@ -228,6 +228,10 @@ private:
         const bool &isRecoverFormToHandleClickEvent);
 
     void HandleFormRenderGC();
+    bool RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, const std::string &statusData,
+        const bool &isHandleClickEvent, const std::unordered_map<std::string, Ace::FormRequest> &recordFormRequests);
+    bool FormRenderRecord::RecoverRenderer(const std::vector<Ace::FormRequest> &groupRequests,
+        const Ace::FormRequest &currentRequest);
 
     pid_t jsThreadId_ = 0;
     pid_t processId_ = 0;
@@ -248,9 +252,13 @@ private:
     // <formId, formRendererGroup>
     std::mutex formRendererGroupMutex_;
     std::unordered_map<int64_t, std::shared_ptr<Ace::FormRendererGroup>> formRendererGroupMap_;
+    // <formId, <compId, formRequest>>
     std::mutex formRequestsMutex_;
     std::unordered_map<int64_t, std::unordered_map<std::string, Ace::FormRequest>> formRequests_;
     std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration_;
+    // <formId, <orderedCompIds, currentCompId>>
+    std::mutex recycledFormCompIdsMutex_;
+    std::unordered_map<int64_t, std::pair<std::vector<std::string>, std::string>> recycledFormCompIds_;
 
     std::string hapPath_;
     std::mutex watchDogMutex_;
