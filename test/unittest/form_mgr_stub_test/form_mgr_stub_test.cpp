@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -3004,5 +3004,93 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleEnableForms_001, TestSize.Level1
         .WillOnce(Return(ERR_OK));
     EXPECT_EQ(mockFormMgrService->HandleEnableForms(data, reply), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_HandleEnableForms_001 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_HandleReleaseRenderer_001
+ * @tc.name: test HandleReleaseRenderer function.
+ * @tc.desc: Verify that the HandleReleaseRenderer interface is called normally and the return value is ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleReleaseRenderer_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_HandleReleaseRenderer_001 starts";
+    MessageParcel data;
+    MessageParcel reply;
+    constexpr int64_t formId = 1;
+    data.WriteInt64(formId);
+    const std::string compId = "compId";
+    data.WriteString(compId);
+    EXPECT_CALL(*mockFormMgrService, ReleaseRenderer(_, _))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    EXPECT_EQ(mockFormMgrService->HandleReleaseRenderer(data, reply), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_HandleReleaseRenderer_001 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_HandleHasFormVisible_001
+ * @tc.name: test HandleHasFormVisible function.
+ * @tc.desc: Verify that the HandleHasFormVisible interface is called normally and the return value is ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleHasFormVisible_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_HandleHasFormVisible_001 starts";
+    MessageParcel data;
+    MessageParcel reply;
+    constexpr int64_t tokenId = 1;
+    data.WriteInt64(tokenId);
+    EXPECT_CALL(*mockFormMgrService, HasFormVisible(_))
+        .Times(1)
+        .WillOnce(Return(true));
+    EXPECT_EQ(mockFormMgrService->HandleHasFormVisible(data, reply), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_HandleHasFormVisible_001 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_HandleCreateForm_001
+ * @tc.name: test HandleCreateForm function.
+ * @tc.desc: Verify that the HandleCreateForm interface is called normally and the return value is ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleCreateForm_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_HandleCreateForm_001 starts";
+    MessageParcel data;
+    MessageParcel reply;
+    const Want want = {};
+    data.WriteParcelable(&want);
+    EXPECT_CALL(*mockFormMgrService, CreateForm(_, _))
+        .Times(1)
+        .WillOnce(Return(ERR_OK));
+    EXPECT_EQ(mockFormMgrService->HandleCreateForm(data, reply), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_HandleCreateForm_001 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_HandleCreateForm_001
+ * @tc.name: test HandleCreateForm function.
+ * @tc.desc: Verify that the HandleCreateForm interface is called with null want
+ *           and the return value is ERR_APPEXECFWK_PARCEL_ERROR.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleCreateForm_002, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_HandleCreateForm_002 starts";
+    MessageParcel data;
+    MessageParcel reply;
+    EXPECT_EQ(mockFormMgrService->HandleCreateForm(data, reply), ERR_APPEXECFWK_PARCEL_ERROR);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_HandleCreateForm_002 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_HandleIsSystemAppForm_001
+ * @tc.name: test HandleIsSystemAppForm function.
+ * @tc.desc: Verify that the HandleIsSystemAppForm interface is called normally and the return value is ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleIsSystemAppForm_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_HandleIsSystemAppForm_001 starts";
+    MessageParcel data;
+    MessageParcel reply;
+    const std::string bundleName = "bundleName";
+    data.WriteString(bundleName);
+    EXPECT_CALL(*mockFormMgrService, IsSystemAppForm(_))
+        .Times(1)
+        .WillOnce(Return(true));
+    EXPECT_EQ(mockFormMgrService->HandleIsSystemAppForm(data, reply), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_HandleIsSystemAppForm_001 ends";
 }
 }

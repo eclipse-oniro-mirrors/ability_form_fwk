@@ -114,6 +114,8 @@ public:
         std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId));
     MOCK_METHOD1(BatchRefreshForms, ErrCode(const int32_t formRefreshType));
     MOCK_METHOD2(EnableForms, ErrCode(const std::string bundleName, const bool enable));
+    MOCK_METHOD2(ReleaseRenderer, ErrCode(int64_t formId, const std::string &compId));
+    MOCK_METHOD1(IsSystemAppForm, bool(const std::string &bundleName));
 };
 }
 }
