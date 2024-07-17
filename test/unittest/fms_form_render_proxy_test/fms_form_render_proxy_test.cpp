@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,27 +17,30 @@
 
 #include "appexecfwk_errors.h"
 #include "gmock/gmock.h"
-#include "mock_form_mgr_service.h"
-#include "mock_form_token.h"
 #include "form_mgr_errors.h"
 #include "form_render_proxy.h"
+#include "mock_form_token.h"
+#include "mock_i_remote_object.h"
 
+using namespace testing;
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::AppExecFwk;
 
 namespace {
+constexpr int64_t TEST_FORM_ID = 1001LL;
 class FormRenderProxyTest : public testing::Test {
 public:
     void SetUp() override
     {
-        mockFormMgrService = new MockFormMgrService();
-        formRenderProxy = new FormRenderProxy(mockFormMgrService);
+        mockIRemoteObject_ = new MockIRemoteObject();
+        formRenderProxy_ = new FormRenderProxy(mockIRemoteObject_);
     }
     // TearDown() is unnecessary.
-    sptr<MockFormMgrService> mockFormMgrService;
-    sptr<FormRenderProxy> formRenderProxy;
+    sptr<MockIRemoteObject> mockIRemoteObject_;
+    sptr<FormRenderProxy> formRenderProxy_;
 };
+
 /**
  * @tc.name: FormRenderProxyTest_0001
  * @tc.desc: test RenderForm function and callerToken is not nullptr.
@@ -50,8 +53,10 @@ HWTEST_F(FormRenderProxyTest, FormRenderProxyTest_0001, TestSize.Level1) {
     Want want;
     want = want.SetElementName("", "com.example.FormAbility", "MainAbility");
     sptr<MockFormToken> callerToken = new (std::nothrow) MockFormToken();
-    int result = formRenderProxy->RenderForm(formJsInfo, want, callerToken);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    EXPECT_CALL(*mockIRemoteObject_, SendRequest(_, _, _, _)).Times(1)
+        .WillOnce(Return(ERR_OK));
+    int result = formRenderProxy_->RenderForm(formJsInfo, want, callerToken);
+    EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormRenderProxyTest_0001 test ends";
 }
 
@@ -66,7 +71,7 @@ HWTEST_F(FormRenderProxyTest, FormRenderProxyTest_0002, TestSize.Level1) {
     formJsInfo.formId = 1001L;
     Want want;
     want = want.SetElementName("", "com.example.FormAbility", "MainAbility");
-    int result = formRenderProxy->RenderForm(formJsInfo, want, nullptr);
+    int result = formRenderProxy_->RenderForm(formJsInfo, want, nullptr);
     EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
     GTEST_LOG_(INFO) << "FormRenderProxyTest_0002 test ends";
 }
@@ -83,8 +88,10 @@ HWTEST_F(FormRenderProxyTest, FormRenderProxyTest_0003, TestSize.Level1) {
     Want want;
     want = want.SetElementName("", "com.example.FormAbility", "MainAbility");
     sptr<MockFormToken> callerToken = new (std::nothrow) MockFormToken();
-    int result = formRenderProxy->StopRenderingForm(formJsInfo, want, callerToken);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    EXPECT_CALL(*mockIRemoteObject_, SendRequest(_, _, _, _)).Times(1)
+        .WillOnce(Return(ERR_OK));
+    int result = formRenderProxy_->StopRenderingForm(formJsInfo, want, callerToken);
+    EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormRenderProxyTest_0003 test ends";
 }
 
@@ -99,7 +106,7 @@ HWTEST_F(FormRenderProxyTest, FormRenderProxyTest_0004, TestSize.Level1) {
     formJsInfo.formId = 1001L;
     Want want;
     want = want.SetElementName("", "com.example.FormAbility", "MainAbility");
-    int result = formRenderProxy->StopRenderingForm(formJsInfo, want, nullptr);
+    int result = formRenderProxy_->StopRenderingForm(formJsInfo, want, nullptr);
     EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
     GTEST_LOG_(INFO) << "FormRenderProxyTest_0004 test ends";
 }
@@ -112,8 +119,10 @@ HWTEST_F(FormRenderProxyTest, FormRenderProxyTest_0004, TestSize.Level1) {
 HWTEST_F(FormRenderProxyTest, FormRenderProxyTest_0005, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormRenderProxyTest_0005 starts";
     sptr<MockFormToken> callerToken = new (std::nothrow) MockFormToken();
-    int result = formRenderProxy->CleanFormHost(callerToken);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    EXPECT_CALL(*mockIRemoteObject_, SendRequest(_, _, _, _)).Times(1)
+        .WillOnce(Return(ERR_OK));
+    int result = formRenderProxy_->CleanFormHost(callerToken);
+    EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormRenderProxyTest_0005 test ends";
 }
 
@@ -124,7 +133,7 @@ HWTEST_F(FormRenderProxyTest, FormRenderProxyTest_0005, TestSize.Level1) {
  */
 HWTEST_F(FormRenderProxyTest, FormRenderProxyTest_0006, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormRenderProxyTest_0006 starts";
-    int result = formRenderProxy->CleanFormHost(nullptr);
+    int result = formRenderProxy_->CleanFormHost(nullptr);
     EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
     GTEST_LOG_(INFO) << "FormRenderProxyTest_0006 test ends";
 }
@@ -138,8 +147,69 @@ HWTEST_F(FormRenderProxyTest, FormRenderProxyTest_0007, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormRenderProxyTest_0007 starts";
     std::vector<FormJsInfo> formJsInfos;
     Want want;
-    int result = formRenderProxy->ReloadForm(std::move(formJsInfos), want);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    EXPECT_CALL(*mockIRemoteObject_, SendRequest(_, _, _, _)).Times(1)
+        .WillOnce(Return(ERR_OK));
+    int result = formRenderProxy_->ReloadForm(std::move(formJsInfos), want);
+    EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormRenderProxyTest_0007 test ends";
+}
+
+/**
+ * @tc.name: FormRenderProxyTest_0008
+ * @tc.desc: test ReleaseRenderer function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderProxyTest, FormRenderProxyTest_0008, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormRenderProxyTest_0008 starts";
+    EXPECT_CALL(*mockIRemoteObject_, SendRequest(_, _, _, _)).Times(1)
+        .WillOnce(Return(ERR_OK));
+    int result = formRenderProxy_->ReleaseRenderer(TEST_FORM_ID, "compId", "uid");
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormRenderProxyTest_0008 test ends";
+}
+
+/**
+ * @tc.name: FormRenderProxyTest_0009
+ * @tc.desc: test OnUnlock function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderProxyTest, FormRenderProxyTest_0009, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormRenderProxyTest_0009 starts";
+    EXPECT_CALL(*mockIRemoteObject_, SendRequest(_, _, _, _)).Times(1)
+        .WillOnce(Return(ERR_OK));
+    int result = formRenderProxy_->OnUnlock();
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormRenderProxyTest_0009 test ends";
+}
+
+/**
+ * @tc.name: FormRenderProxyTest_0010
+ * @tc.desc: test RecycleForm function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderProxyTest, FormRenderProxyTest_0010, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormRenderProxyTest_0010 starts";
+    Want want = {};
+    EXPECT_CALL(*mockIRemoteObject_, SendRequest(_, _, _, _)).Times(1)
+        .WillOnce(Return(ERR_OK));
+    int result = formRenderProxy_->RecycleForm(TEST_FORM_ID, want);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormRenderProxyTest_0010 test ends";
+}
+
+/**
+ * @tc.name: FormRenderProxyTest_0011
+ * @tc.desc: test RecoverForm function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderProxyTest, FormRenderProxyTest_0011, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormRenderProxyTest_0011 starts";
+    FormJsInfo formJsInfo = {};
+    Want want = {};
+    EXPECT_CALL(*mockIRemoteObject_, SendRequest(_, _, _, _)).Times(1)
+        .WillOnce(Return(ERR_OK));
+    int result = formRenderProxy_->RecoverForm(formJsInfo, want);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormRenderProxyTest_0011 test ends";
 }
 }
