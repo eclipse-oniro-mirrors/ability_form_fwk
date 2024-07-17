@@ -1407,9 +1407,9 @@ void FormRenderRecord::HandleRecoverForm(const FormJsInfo &formJsInfo,
     }
 
     if (RecoverFormRequestsInGroup(formJsInfo, statusData, isHandleClickEvent, formRequests)) {
-        for (auto formRequest : formRequests) {
-            formRequest.hasRelease = false;
-            AddFormRequest(formId, formRequest);
+        for (auto formRequestIter : formRequests) {
+            formRequestIter.second.hasRelease = false;
+            AddFormRequest(formId, formRequestIter.second);
         }
     }
 }
@@ -1434,7 +1434,7 @@ bool FormRenderRecord::RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, 
     }
 
     std::vector<Ace::FormRequest> groupRequests;
-    int currentRequestIndex = INVALID_INDEX;
+    size_t currentRequestIndex = INVALID_INDEX;
 
     for (auto compId : orderedCompIds) {
         auto recordRequestIter = recordFormRequests.find(compId);
@@ -1470,8 +1470,9 @@ bool FormRenderRecord::RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, 
 }
 
 bool FormRenderRecord::RecoverRenderer(const std::vector<Ace::FormRequest> &groupRequests,
-    const Ace::FormRequest &currentRequest)
+    const size_t &currentRequestIndex)
 {
+    auto currentRequest = groupRequests[currentRequestIndex];
     auto context = GetContext(currentRequest.formJsInfo, currentRequest.want);
     if (context == nullptr) {
         HILOG_ERROR("Create Context failed.");

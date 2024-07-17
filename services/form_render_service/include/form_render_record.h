@@ -230,8 +230,7 @@ private:
     void HandleFormRenderGC();
     bool RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, const std::string &statusData,
         const bool &isHandleClickEvent, const std::unordered_map<std::string, Ace::FormRequest> &recordFormRequests);
-    bool FormRenderRecord::RecoverRenderer(const std::vector<Ace::FormRequest> &groupRequests,
-        const Ace::FormRequest &currentRequest);
+    bool RecoverRenderer(const std::vector<Ace::FormRequest> &groupRequests, const size_t &currentRequestIndex);
 
     pid_t jsThreadId_ = 0;
     pid_t processId_ = 0;
