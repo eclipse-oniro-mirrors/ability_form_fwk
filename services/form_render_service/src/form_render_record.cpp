@@ -42,7 +42,6 @@ namespace FormRender {
 constexpr int32_t RENDER_FORM_FAILED = -1;
 constexpr int32_t RELOAD_FORM_FAILED = -1;
 constexpr int32_t RECYCLE_FORM_FAILED = -1;
-constexpr int32_t INVALID_INDEX = -1;
 constexpr int32_t TIMEOUT = 10 * 1000;
 constexpr int32_t CHECK_THREAD_TIME = 3;
 constexpr char FORM_RENDERER_COMP_ID[] = "ohos.extra.param.key.form_comp_id";
@@ -1434,7 +1433,8 @@ bool FormRenderRecord::RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, 
     }
 
     std::vector<Ace::FormRequest> groupRequests;
-    size_t currentRequestIndex = INVALID_INDEX;
+    size_t currentRequestIndex;
+    bool currentRequestFound = false;
 
     for (auto compId : orderedCompIds) {
         auto recordRequestIter = recordFormRequests.find(compId);
@@ -1449,10 +1449,11 @@ bool FormRenderRecord::RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, 
         groupRequest.formJsInfo = recordRequest.formJsInfo; // get json data from record request
         groupRequest.formJsInfo.imageDataMap = formJsInfo.imageDataMap;
 
-        if(compId == currentCompId) {
+        if (compId == currentCompId) {
             groupRequest.want.SetParam(Constants::FORM_STATUS_DATA, statusData);
             groupRequest.want.SetParam(Constants::FORM_IS_RECOVER_FORM_TO_HANDLE_CLICK_EVENT, isHandleClickEvent);
             currentRequestIndex = groupRequests.size();
+            currentRequestFound = true;
         }
         groupRequests.emplace_back(groupRequest);
     }
@@ -1462,7 +1463,7 @@ bool FormRenderRecord::RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, 
         return false;
     }
 
-    if (currentRequestIndex == INVALID_INDEX) {
+    if (!currentRequestFound) {
         // maybe current comp deleted between recover, get last comp as new current comp to recover
         currentRequestIndex = groupRequests.size() - 1;
     }
