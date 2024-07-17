@@ -28,6 +28,8 @@ using namespace OHOS::AppExecFwk;
 namespace OHOS {
 constexpr size_t FOO_MAX_LEN = 1024;
 constexpr size_t U32_AT_SIZE = 4;
+constexpr size_t MESSAGE_BASE = 3000;
+constexpr size_t MESSAGE_RANGE = 77;
 const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.appexecfwk.FormMgr";
 
 class FormMgrStubFuzzTest : public FormMgrStub {
@@ -277,6 +279,8 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     MessageParcel reply;
     MessageOption option;
     std::shared_ptr<FormMgrStub> formmgrstub = std::make_shared<FormMgrStubFuzzTest>();
+    formmgrstub->OnRemoteRequest(code, datas, reply, option);
+    code = MESSAGE_BASE + code % MESSAGE_RANGE;
     formmgrstub->OnRemoteRequest(code, datas, reply, option);
     return true;
 }
