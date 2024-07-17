@@ -353,6 +353,7 @@ ohos_shared_library("formobserver") {
     "ability_runtime:extensionkit_native",
     "ability_runtime:napi_common",
     "ability_runtime:runtime",
+    "access_token:libaccesstoken_sdk",
     "access_token:libtokenid_sdk",
     "bundle_framework:appexecfwk_base",
     "c_utils:utils",
