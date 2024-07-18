@@ -18,7 +18,11 @@
 #include <cstddef>
 #include <cstdint>
 
+#define private public
+#define protected public
 #include "form_mgr_stub.h"
+#undef private
+#undef protected
 #include "message_parcel.h"
 #include "securec.h"
 
@@ -263,6 +267,53 @@ public:
     }
 };
 
+void HandleFormMessage(std::shared_ptr<FormMgrStub> formMgrStub, MessageParcel &data, MessageParcel &reply)
+{
+    if (formMgrStub == nullptr) {
+        return;
+    }
+    formMgrStub->HandleRegisterFormRemoveObserverByBundle(data, reply);
+    formMgrStub->HandleGetFormsCount(data, reply);
+    formMgrStub->HandleGetHostFormsCount(data, reply);
+    formMgrStub->HandleGetRunningFormInfos(data, reply);
+    formMgrStub->HandleGetRunningFormInfosByBundleName(data, reply);
+    formMgrStub->HandleGetFormInstanceById(data, reply);
+    formMgrStub->HandleGetAllFormsInfo(data, reply);
+    formMgrStub->HandleGetFormsInfoByApp(data, reply);
+    formMgrStub->HandleGetFormsInfoByModule(data, reply);
+    formMgrStub->HandleIsRequestPublishFormSupported(data, reply);
+    formMgrStub->HandleShareForm(data, reply);
+    formMgrStub->HandleCheckFMSReady(data, reply);
+    formMgrStub->HandleDeleteForm(data, reply);
+    formMgrStub->HandleStopRenderingForm(data, reply);
+    formMgrStub->HandleReleaseForm(data, reply);
+    formMgrStub->HandleSetNextRefreshTime(data, reply);
+    formMgrStub->HandleLifecycleUpdate(data, reply);
+    formMgrStub->HandleRequestForm(data, reply);
+    formMgrStub->HandleNotifyWhetherVisibleForms(data, reply);
+    formMgrStub->HandleCastTempForm(data, reply);
+    formMgrStub->HandleDumpFormInfoByBundleName(data, reply);
+    formMgrStub->HandleDumpFormInfoByFormId(data, reply);
+    formMgrStub->HandleDumpFormTimerByFormId(data, reply);
+    formMgrStub->HandleDeleteInvalidForms(data, reply);
+    formMgrStub->HandleNotifyFormsVisible(data, reply);
+    formMgrStub->HandleNotifyFormsPrivacyProtected(data, reply);
+    formMgrStub->HandleNotifyFormsEnableUpdate(data, reply);
+    formMgrStub->HandleRegisterFormAddObserverByBundle(data, reply);
+    formMgrStub->HandleAddForm(data, reply);
+    formMgrStub->HandleUpdateForm(data, reply);
+    formMgrStub->HandleRequestPublishForm(data, reply);
+    formMgrStub->HandleMessageEvent(data, reply);
+    formMgrStub->HandleBackgroundEvent(data, reply);
+    formMgrStub->HandleRouterEvent(data, reply);
+    formMgrStub->HandleAcquireFormState(data, reply);
+    formMgrStub->HandleGetFormsInfo(data, reply);
+    formMgrStub->HandleStartAbility(data, reply);
+    formMgrStub->HandleRecvFormShareInfoFromRemote(data, reply);
+    formMgrStub->HandleAcquireFormData(data, reply);
+    formMgrStub->HandleGetFormInstancesByFilter(data, reply);
+}
+
 uint32_t GetU32Data(const char* ptr)
 {
     // 将第0个数字左移24位，将第1个数字左移16位，将第2个数字左移8位，第3个数字不左移
@@ -282,6 +333,7 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formmgrstub->OnRemoteRequest(code, datas, reply, option);
     code = MESSAGE_BASE + code % MESSAGE_RANGE;
     formmgrstub->OnRemoteRequest(code, datas, reply, option);
+    HandleFormMessage(formmgrstub, datas, reply);
     return true;
 }
 }
