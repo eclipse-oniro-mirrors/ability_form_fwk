@@ -882,7 +882,6 @@ void FormRenderRecord::DeleteFormRequest(int64_t formId, const std::string &comp
     }
     HILOG_INFO("delete request formId:%{public}" PRId64 " compId:%{public}s request empty:%{public}d",
         formId, compId.c_str(), isRequestEmpty);
-    
 }
 
 void FormRenderRecord::UpdateFormRequestReleaseState(
@@ -1486,6 +1485,10 @@ bool FormRenderRecord::RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, 
 bool FormRenderRecord::RecoverRenderer(const std::vector<Ace::FormRequest> &groupRequests,
     const size_t &currentRequestIndex)
 {
+    if (currentRequestIndex >= groupRequests.size()) {
+        HILOG_ERROR("current comp index %{public}zu invalid", currentRequestIndex);
+        return false;
+    }
     auto currentRequest = groupRequests[currentRequestIndex];
     auto context = GetContext(currentRequest.formJsInfo, currentRequest.want);
     if (context == nullptr) {
