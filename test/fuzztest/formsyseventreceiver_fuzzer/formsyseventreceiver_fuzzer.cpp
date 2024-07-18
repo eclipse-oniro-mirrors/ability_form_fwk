@@ -60,6 +60,11 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     FormEventUtil::HandleBundleDataCleared(bundleName, userIds);
     int uid = static_cast<int>(GetU32Data(data));
     FormEventUtil::HandleFormHostDataCleared(uid);
+    AAFwk::Want want;
+    formSysEventReceiver.HandleAbilityUpdate(want, bundleName);
+    formSysEventReceiver.HandlePackageDataCleared(bundleName, userId);
+    formSysEventReceiver.HandleUserUnlocked();
+    formSysEventReceiver.HandleUserSwitched(eventData);
     bool flag = *data % ENABLE;
     std::map<int64_t, bool> removedFormsMap;
     removedFormsMap.emplace(formId, flag);

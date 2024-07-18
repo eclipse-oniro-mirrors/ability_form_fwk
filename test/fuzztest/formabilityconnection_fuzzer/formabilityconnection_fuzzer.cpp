@@ -18,9 +18,9 @@
 #include <cstddef>
 #include <cstdint>
 
-#include "form_ability_connection.h"
 #define private public
 #define protected public
+#include "form_ability_connection.h"
 #include "form_ams_helper.h"
 #undef private
 #undef protected
@@ -59,6 +59,12 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     sptr<IRemoteObject> providerToken = nullptr;
     formAbilityConnection.SetProviderToken(providerToken);
     formAbilityConnection.GetProviderToken();
+    formAbilityConnection.GetAppMgr();
+    formAbilityConnection.onFormAppConnect();
+    formAbilityConnection.ReportFormAppUnbindEvent();
+    formAbilityConnection.GetBundleName();
+    formAbilityConnection.GetAppFormPid();
+    formAbilityConnection.OnAbilityDisconnectDone(element, resultCode);
     int32_t connectId = static_cast<int32_t>(GetU32Data(data));
     formAbilityConnection.SetConnectId(connectId);
     FormAmsHelper formAmsHelper;
@@ -68,6 +74,9 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formAmsHelper.ConnectServiceAbility(want, connect);
     formAmsHelper.DisconnectServiceAbility(connect);
     formAmsHelper.DisconnectServiceAbilityDelay(connect);
+    formAmsHelper.StopExtensionAbility(want);
+    formAmsHelper.RegisterConfigurationObserver();
+    formAmsHelper.UnRegisterConfigurationObserver();
     sptr<AAFwk::IAbilityManager> abilityManager = nullptr;
     formAmsHelper.SetAbilityManager(abilityManager);
     formAmsHelper.DisconnectAbilityTask(connect);
