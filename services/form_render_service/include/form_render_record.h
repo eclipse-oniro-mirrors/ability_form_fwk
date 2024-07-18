@@ -211,7 +211,7 @@ private:
 
     void AddFormRequest(int64_t formId, const Ace::FormRequest &formRequest);
 
-    void DeleteFormRequest(int64_t formId, const std::string &compId, bool &needDeleteRecycledCompId);
+    void DeleteFormRequest(int64_t formId, const std::string &compId);
 
     void UpdateFormRequestReleaseState(
         int64_t formId, const std::string &compId, bool hasRelease);

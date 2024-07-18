@@ -396,6 +396,7 @@ void FormRenderRecord::DeleteRenderRecord(int64_t formId, const std::string &com
 
     if (eventHandler == nullptr) {
         HILOG_ERROR("eventHandler is null");
+        DeleteFormRequest(formId, compId);
         return;
     }
 
@@ -408,12 +409,7 @@ void FormRenderRecord::DeleteRenderRecord(int64_t formId, const std::string &com
 
         FormMemoryGuard memoryGuard;
         isRenderGroupEmpty = renderRecord->HandleDeleteInJsThread(formId, compId);
-        bool needDeleteRecycledCompId = false;
-        renderRecord->DeleteFormRequest(formId, compId, needDeleteRecycledCompId);
-        if (needDeleteRecycledCompId) {
-            std::lock_guard<std::mutex> lock(recycledFormCompIdsMutex_);
-            recycledFormCompIds_.erase(formId);
-        }
+        renderRecord->DeleteFormRequest(formId, compId);
     };
 
     if (hostRemoteObj != nullptr) {
@@ -855,30 +851,38 @@ void FormRenderRecord::AddFormRequest(int64_t formId, const Ace::FormRequest &fo
     iter->second.emplace(formRequest.compId, formRequest);
 }
 
-void FormRenderRecord::DeleteFormRequest(int64_t formId, const std::string &compId, bool &needDeleteRecycledCompId)
+void FormRenderRecord::DeleteFormRequest(int64_t formId, const std::string &compId)
 {
-    HILOG_INFO("DeleteFormRequest formId: %{public}s, compId: %{public}s.",
-        std::to_string(formId).c_str(), compId.c_str());
-    std::lock_guard<std::mutex> lock(formRequestsMutex_);
-    auto iter = formRequests_.find(formId);
-    if (iter == formRequests_.end()) {
-        return;
-    }
+    bool isRequestEmpty = false;
+    {
+        std::lock_guard<std::mutex> lock(formRequestsMutex_);
+        auto iter = formRequests_.find(formId);
+        if (iter == formRequests_.end()) {
+            HILOG_ERROR("request not found, formId:%{public}" PRId64, formId);
+            return;
+        }
 
-    if (compId.empty()) {
-        formRequests_.erase(iter);
-        needDeleteRecycledCompId = true;
-        return;
-    }
-
-    auto innerIter = iter->second.find(compId);
-    if (innerIter != iter->second.end()) {
-        iter->second.erase(innerIter);
-        if (iter->second.empty()) {
+        if (compId.empty()) {
             formRequests_.erase(iter);
-            needDeleteRecycledCompId = true;
+            isRequestEmpty = true;
+        } else {
+            auto innerIter = iter->second.find(compId);
+            if (innerIter != iter->second.end()) {
+                iter->second.erase(innerIter);
+            }
+            if (iter->second.empty()) {
+                formRequests_.erase(iter);
+                isRequestEmpty = true;
+            }
         }
     }
+    if (isRequestEmpty) {
+        std::lock_guard<std::mutex> lock(recycledFormCompIdsMutex_);
+        recycledFormCompIds_.erase(formId);
+    }
+    HILOG_INFO("delete request formId:%{public}" PRId64 " compId:%{public}s request empty:%{public}d",
+        formId, compId.c_str(), isRequestEmpty);
+    
 }
 
 void FormRenderRecord::UpdateFormRequestReleaseState(
@@ -970,6 +974,7 @@ bool FormRenderRecord::HandleReleaseRendererInJsThread(
     }
     {
         std::lock_guard<std::mutex> lock(recycledFormCompIdsMutex_);
+        recycledFormCompIds_.erase(formId);
         recycledFormCompIds_.emplace(formId, compIds);
     }
     return true;
@@ -1473,6 +1478,7 @@ bool FormRenderRecord::RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, 
     if (!currentRequestFound) {
         // maybe current comp deleted between recover, get last comp as new current comp to recover
         currentRequestIndex = groupRequests.size() - 1;
+        HILOG_WARN("current request index:%{public}zu formId:%{public}" PRId64, currentRequestIndex, formId);
     }
     return RecoverRenderer(groupRequests, currentRequestIndex);
 }
