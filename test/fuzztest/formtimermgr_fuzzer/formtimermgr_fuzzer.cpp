@@ -92,6 +92,7 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     long updateAtTime = static_cast<long>(GetU32Data(data));
     formTimerMgr.GetUpdateAtWantAgent(updateAtTime, userId);
     formTimerMgr.ClearUpdateAtTimerResource();
+    formTimerMgr.RefreshWhenFormVisible(formId, userId);
     return formTimerMgr.UpdateLimiterAlarm();
 }
 }
