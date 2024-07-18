@@ -1499,7 +1499,7 @@ bool FormRenderRecord::RecoverRenderer(const std::vector<Ace::FormRequest> &grou
         HILOG_ERROR("Create formRendererGroup failed.");
         return false;
     }
-    formRendererGroup->RecoverRenderer(groupRequests, currentRequest.compId);
+    formRendererGroup->RecoverRenderer(groupRequests, currentRequestIndex);
     HILOG_INFO("recover renderer, formId:%{public}" PRId64, currentRequest.formJsInfo.formId);
     return true;
 }
