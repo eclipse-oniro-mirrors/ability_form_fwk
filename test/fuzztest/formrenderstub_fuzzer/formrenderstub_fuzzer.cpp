@@ -18,7 +18,11 @@
 #include <cstddef>
 #include <cstdint>
 
+#define private public
+#define protected public
 #include "form_render_stub.h"
+#undef private
+#undef protected
 #include "message_parcel.h"
 #include "securec.h"
 
@@ -76,6 +80,12 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     MessageOption option;
     std::shared_ptr<FormRenderStub> formRenderStub = std::make_shared<FormRenderStubFuzzTest>();
     formRenderStub->OnRemoteRequest(code, datas, reply, option);
+    formRenderStub->HandleRenderForm(datas, reply);
+    formRenderStub->HandleCleanFormHost(datas, reply);
+    formRenderStub->HandleReloadForm(datas, reply);
+    formRenderStub->HandleStopRenderingForm(datas, reply);
+    formRenderStub->HandleOnUnlock(datas, reply);
+    formRenderStub->HandleRecoverForm(datas, reply);
     return true;
 }
 }

@@ -314,6 +314,39 @@ void HandleFormMessage(std::shared_ptr<FormMgrStub> formMgrStub, MessageParcel &
     formMgrStub->HandleGetFormInstancesByFilter(data, reply);
 }
 
+void HandleFormRequest(std::shared_ptr<FormMgrStub> formMgrStub, MessageParcel &data, MessageParcel &reply)
+{
+    if (formMgrStub == nullptr) {
+        return;
+    }
+    formMgrStub->HandleCreateForm(data, reply);
+    formMgrStub->HandleReleaseRenderer(data, reply);
+    formMgrStub->HandleSetPublishFormResult(data, reply);
+    formMgrStub->HandleAcquireAddFormResult(data, reply);
+    formMgrStub->HandleHasFormVisible(data, reply);
+    formMgrStub->HandleDumpStorageFormInfos(data, reply);
+    formMgrStub->HandleGetFormsInfoByFilter(data, reply);
+    formMgrStub->HandleIsSystemAppForm(data, reply);
+    formMgrStub->HandleRegisterAddObserver(data, reply);
+    formMgrStub->HandleRegisterRemoveObserver(data, reply);
+    formMgrStub->HandleRegisterFormRouterProxy(data, reply);
+    formMgrStub->HandleUnregisterFormRouterProxy(data, reply);
+    formMgrStub->HandleUpdateProxyForm(data, reply);
+    formMgrStub->HandleRequestPublishProxyForm(data, reply);
+    formMgrStub->HandleUnregisterPublishFormInterceptor(data, reply);
+    formMgrStub->HandleRegisterClickCallbackEventObserver(data, reply);
+    formMgrStub->HandleUnregisterClickCallbackEventObserver(data, reply);
+    std::vector<FormDataProxy> formDataProxies;
+    formMgrStub->ReadFormDataProxies(data, formDataProxies);
+    formMgrStub->HandleSetFormsRecyclable(data, reply);
+    formMgrStub->HandleRecoverForms(data, reply);
+    formMgrStub->HandleUpdateFormLocation(data, reply);
+    formMgrStub->HandleRequestPublishFormWithSnapshot(data, reply);
+    formMgrStub->HandleBatchRefreshForms(data, reply);
+    formMgrStub->HandleEnableForms(data, reply);
+    formMgrStub->HandleIsFormBundleForbidden(data, reply);
+}
+
 uint32_t GetU32Data(const char* ptr)
 {
     // 将第0个数字左移24位，将第1个数字左移16位，将第2个数字左移8位，第3个数字不左移
@@ -334,6 +367,7 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     code = MESSAGE_BASE + code % MESSAGE_RANGE;
     formmgrstub->OnRemoteRequest(code, datas, reply, option);
     HandleFormMessage(formmgrstub, datas, reply);
+    HandleFormRequest(formmgrstub, datas, reply);
     return true;
 }
 }
