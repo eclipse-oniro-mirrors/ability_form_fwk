@@ -127,6 +127,7 @@ group("unittest") {
     "unittest/frs_form_module_checker_test:unittest",
     "unittest/frs_form_render_event_report_test:unittest",
     "unittest/frs_form_render_record_test:unittest",
+    "unittest/frs_form_render_serial_queue_test:unittest",
   ]
 }
 
