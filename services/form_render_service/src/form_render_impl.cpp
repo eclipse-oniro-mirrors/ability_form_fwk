@@ -94,6 +94,7 @@ int32_t FormRenderImpl::RenderForm(const FormJsInfo &formJsInfo, const Want &wan
     sptr<IRemoteObject> hostToken = formRenderWant.GetRemoteObject(Constants::PARAM_FORM_HOST_TOKEN);
     {
         std::lock_guard<std::mutex> lock(renderRecordMutex_);
+        ConfirmUnlockState(formRenderWant);
         if (auto search = renderRecordMap_.find(uid); search != renderRecordMap_.end()) {
             result = search->second->UpdateRenderRecord(formJsInfo, formRenderWant, hostToken);
         } else {
@@ -102,8 +103,6 @@ int32_t FormRenderImpl::RenderForm(const FormJsInfo &formJsInfo, const Want &wan
                 HILOG_ERROR("record is nullptr");
                 return RENDER_FORM_FAILED;
             }
-
-            ConfirmUnlockState(formRenderWant);
 
             record->SetConfiguration(configuration_);
             result = record->UpdateRenderRecord(formJsInfo, formRenderWant, hostToken);

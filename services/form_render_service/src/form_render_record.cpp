@@ -1157,6 +1157,7 @@ int32_t FormRenderRecord::OnUnlock()
         }
         renderRecord->HandleOnUnlock();
     };
+    std::lock_guard<std::mutex> lock(eventHandlerMutex_);
     if (eventHandler_ == nullptr) {
         HILOG_ERROR("eventHandler_ is nullptr.");
         return RENDER_FORM_FAILED;
@@ -1170,10 +1171,9 @@ int32_t FormRenderRecord::HandleOnUnlock()
     HILOG_INFO("HandleOnUnlock called.");
     {
         std::lock_guard<std::mutex> lock(formRequestsMutex_);
-        for (const auto& formRequests : formRequests_) {
+        for (auto& formRequests : formRequests_) {
             for (auto& formRequestElement : formRequests.second) {
-                Want* want = const_cast<Want*>(&formRequestElement.second.want);
-                want->SetParam(Constants::FORM_RENDER_STATE, true);
+                formRequestElement.second.want.SetParam(Constants::FORM_RENDER_STATE, true);
             }
         }
     }
