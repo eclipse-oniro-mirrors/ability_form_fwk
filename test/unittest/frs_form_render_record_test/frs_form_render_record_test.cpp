@@ -33,6 +33,7 @@ using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::AppExecFwk;
 using namespace OHOS::AppExecFwk::FormRender;
+using namespace OHOS::Ace;
 
 namespace {
 constexpr int32_t RELOAD_FORM_FAILED = -1;
