@@ -876,4 +876,19 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_045, TestSize.Level0)
     formRenderMgr.RemoveConnection(formId, privacyLevel);
     GTEST_LOG_(INFO) << "FormRenderMgrTest_045 end";
 }
+
+/**
+ * @tc.name: NotifyScreenOn_001
+ * @tc.desc: test NotifyScreenOn function and privacyLevel is 0.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, NotifyScreenOn_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "NotifyScreenOn_001 start";
+    FormRenderMgr formRenderMgr;
+    formRenderMgr.sandboxInner_ = std::make_shared<FormSandboxRenderMgrInner>();
+    formRenderMgr.renderInner_ = std::make_shared<FormRenderMgrInner>();
+    formRenderMgr.NotifyScreenOn();
+    GTEST_LOG_(INFO) << "NotifyScreenOn_001 end";
+}
 }

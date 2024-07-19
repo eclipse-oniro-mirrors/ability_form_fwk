@@ -900,6 +900,24 @@ HWTEST_F(FormRenderStubTest, FormRenderStubTest_023, TestSize.Level0)
 }
 
 /**
+ * @tc.name: FormRenderStubTest_024
+ * @tc.desc: 1.Verify OnRemoteRequest and RunCachedConfigurationUpdated interface executes as expected.
+ *           2.The interface return value ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderStubTest, FormRenderStubTest_024, TestSize.Level0)
+{
+    sptr<MockFormRenderImpl> formRenderStub = new (std::nothrow) MockFormRenderImpl();
+    uint32_t code = static_cast<uint32_t>(IFormRender::Message::FORM_RUN_CACHED_CONFIG);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(u"ohos.appexecfwk.FormRender");
+    auto result = formRenderStub->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+}
+
+/**
  * @tc.name: IFormSupplyTest_001
  * @tc.desc: Test OnRenderingBlock function
  * @tc.type: FUNC

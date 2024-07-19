@@ -63,6 +63,7 @@ private:
     void HandlePackageDataCleared(std::string &bundleName, int32_t userId);
     void HandleScreenUnlocked();
     void HandleUserUnlocked();
+    void HandleScreenOn();
 private:
     std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;
 };

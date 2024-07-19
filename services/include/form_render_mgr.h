@@ -50,6 +50,8 @@ public:
 
     void OnUnlock();
 
+    void NotifyScreenOn();
+
     ErrCode StopRenderingForm(int64_t formId, const FormRecord &formRecord,
         const std::string &compId = "", const sptr<IRemoteObject> &hostToken = nullptr);
 

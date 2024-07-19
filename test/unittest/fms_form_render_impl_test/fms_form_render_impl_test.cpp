@@ -26,6 +26,9 @@
 #include "gmock/gmock.h"
 #include "fms_log_wrapper.h"
 #include "mock_form_provider_client.h"
+#ifdef SUPPORT_POWER
+#include "power_mgr_client.h"
+#endif
 #include "want.h"
 
 using namespace testing::ext;
@@ -442,7 +445,15 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_017, TestSize.Level0)
 
     formRenderImpl.configUpdateTime_ = std::chrono::steady_clock::now();
     formRenderImpl.OnConfigurationUpdated(configuration);
-    EXPECT_EQ(1, formRenderImpl.serialQueue_->taskMap_.size());
+#ifdef SUPPORT_POWER
+    bool screenOnFlag = PowerMgr::PowerMgrClient::GetInstance().IsScreenOn();
+    if (!screenOnFlag) {
+        EXPECT_EQ(0, formRenderImpl.serialQueue_->taskMap_.size());
+        EXPECT_TRUE(formRenderImpl.hasCachedConfig_);
+    } else {
+        EXPECT_EQ(1, formRenderImpl.serialQueue_->taskMap_.size());
+    }
+#endif
 }
 
 /**
@@ -863,4 +874,21 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_042, TestSize.Level0)
     formRenderImpl.ConfirmUnlockState(want);
 
     EXPECT_TRUE(formRenderImpl.isVerified_);
+}
+
+/**
+ * @tc.name: RunCachedConfigurationUpdatedTest_001
+ * @tc.desc: Verify RunCachedConfigurationUpdated interface executes as expected.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderImplTest, RunCachedConfigurationUpdatedTest_001, TestSize.Level0)
+{
+    FormRenderImpl formRenderImpl;
+    formRenderImpl.configuration_ = std::make_shared<Configuration>();
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration = std::make_shared<Configuration>();
+    formRenderImpl.configuration_->AddItem("ohos.system.colorMode", "dark");
+    formRenderImpl.hasCachedConfig_ = true;
+
+    formRenderImpl.RunCachedConfigurationUpdated();
+    EXPECT_FALSE(formRenderImpl.hasCachedConfig_);
 }

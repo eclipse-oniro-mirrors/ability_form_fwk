@@ -212,4 +212,17 @@ HWTEST_F(FormRenderProxyTest, FormRenderProxyTest_0011, TestSize.Level1) {
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormRenderProxyTest_0011 test ends";
 }
+
+/**
+ * @tc.name: RunCachedConfigurationUpdated_001
+ * @tc.desc: test RunCachedConfigurationUpdated function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderProxyTest, RunCachedConfigurationUpdated_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "RunCachedConfigurationUpdated_001 starts";
+    EXPECT_CALL(*mockIRemoteObject_, SendRequest(_, _, _, _)).Times(1)
+        .WillOnce(Return(ERR_OK));
+    formRenderProxy_->RunCachedConfigurationUpdated();
+    GTEST_LOG_(INFO) << "RunCachedConfigurationUpdated_001 test ends";
+}
 }

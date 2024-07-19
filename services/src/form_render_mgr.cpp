@@ -173,6 +173,16 @@ void FormRenderMgr::ExecAcquireProviderTask()
     }
 }
 
+void FormRenderMgr::NotifyScreenOn()
+{
+    if (renderInner_ != nullptr) {
+        renderInner_->NotifyScreenOn();
+    }
+    if (sandboxInner_ != nullptr) {
+        sandboxInner_->NotifyScreenOn();
+    }
+}
+
 void FormRenderMgr::OnScreenUnlock()
 {
     HILOG_INFO("OnScreenUnlock called. %{public}d, %{public}d", isVerified_, isScreenUnlocked_);

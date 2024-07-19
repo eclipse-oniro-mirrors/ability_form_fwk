@@ -329,5 +329,29 @@ int32_t FormRenderProxy::RecoverForm(const FormJsInfo &formJsInfo, const Want &w
 
     return ERR_OK;
 }
+
+void FormRenderProxy::RunCachedConfigurationUpdated()
+{
+    MessageParcel data;
+    MessageOption option(MessageOption::TF_ASYNC);
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("failed to write interface token");
+        return;
+    }
+    if (!Remote()) {
+        HILOG_ERROR("Remote obj is nullptr");
+        return;
+    }
+
+    MessageParcel reply;
+    int32_t error = Remote()->SendRequest(
+        static_cast<uint32_t>(IFormRender::Message::FORM_RUN_CACHED_CONFIG),
+        data,
+        reply,
+        option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("failed to SendRequest: %{public}d", error);
+    }
+}
 } // namespace AppExecFwk
 } // namespace OHOS

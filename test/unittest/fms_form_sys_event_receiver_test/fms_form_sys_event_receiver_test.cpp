@@ -851,4 +851,18 @@ HWTEST_F(FmsFormSysEventReceiverTest, FormSysEventReceiver_0001, TestSize.Level0
     ASSERT_NE(nullptr, testCase);
     GTEST_LOG_(INFO) << "FormSysEventReceiver_0001 end";
 }
+
+/**
+ * @tc.number: HandleScreenOn_0001
+ * @tc.name: HandleScreenOn
+ * @tc.desc: Verify whether the HandleScreenOn interface is called normally
+ */
+HWTEST_F(FmsFormSysEventReceiverTest, HandleScreenOn_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "HandleScreenOn_0001 start";
+    std::shared_ptr<FormSysEventReceiver> receiver = std::make_shared<FormSysEventReceiver>();
+    ASSERT_NE(nullptr, receiver);
+    receiver->HandleScreenOn();
+    GTEST_LOG_(INFO) << "HandleScreenOn_0001 end";
+}
 }
