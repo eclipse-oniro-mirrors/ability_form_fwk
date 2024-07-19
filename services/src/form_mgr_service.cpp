@@ -1083,6 +1083,10 @@ int32_t FormMgrService::ShareForm(int64_t formId, const std::string &deviceId, c
 int32_t FormMgrService::RecvFormShareInfoFromRemote(const FormShareInfo &info)
 {
     HILOG_DEBUG("%{public}s called.", __func__);
+    if (!FormUtil::IsSACall()) {
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+    }
+
     InitFormShareMgrSerialQueue();
 
     return DelayedSingleton<FormShareMgr>::GetInstance()->RecvFormShareInfoFromRemote(info);
