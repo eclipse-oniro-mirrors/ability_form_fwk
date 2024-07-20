@@ -59,6 +59,22 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formInfoMgr.GetOrCreateBundleFromInfo(bundleName);
     formInfoMgr.IsCaller(bundleName);
     formInfoMgr.CheckBundlePermission();
+    formInfoMgr.GetFormsInfoByModule(bundleName, moduleName, formInfos);
+    FormInfoHelper formInfoHelper;
+    formInfoHelper.LoadAbilityFormConfigInfo(bundleInfo, formInfos);
+    formInfoHelper.GetResourceManager(bundleInfo);
+    std::string formInfoStoragesJson(data, size);
+    BundleFormInfo bundleFormInfo(bundleName);
+    bundleFormInfo.InitFromJson(formInfoStoragesJson);
+    bundleFormInfo.Remove(userId);
+    bundleFormInfo.AddDynamicFormInfo(formInfo, userId);
+    bundleFormInfo.RemoveDynamicFormInfo(moduleName, formName, userId);
+    bundleFormInfo.RemoveAllDynamicFormsInfo(userId);
+    bundleFormInfo.Empty();
+    bundleFormInfo.GetAllFormsInfo(formInfos, userId);
+    FormInfoFilter filter;
+    bundleFormInfo.GetFormsInfoByFilter(filter, formInfos, userId);
+    bundleFormInfo.UpdateFormInfoStorageLocked();
     return formInfoMgr.ReloadFormInfos(userId);
 }
 }

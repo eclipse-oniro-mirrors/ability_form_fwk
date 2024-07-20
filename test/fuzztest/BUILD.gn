@@ -19,6 +19,7 @@ group("fuzztest") {
 
   deps = [
     "formabilityconnection_fuzzer:fuzztest",
+    "formabilityconnectionreporter_fuzzer:fuzztest",
     "formashmem_fuzzer:fuzztest",
     "formbmshelper_fuzzer:fuzztest",
     "formcachemgr_fuzzer:fuzztest",
@@ -34,6 +35,7 @@ group("fuzztest") {
     "formfreeinstalloperator_fuzzer:fuzztest",
     "formhostcaller_fuzzer:fuzztest",
     "formhostclient_fuzzer:fuzztest",
+    "formhostdelegatestub_fuzzer:fuzztest",
     "formhostrecord_fuzzer:fuzztest",
     "formhoststub_fuzzer:fuzztest",
     "forminfomgr_fuzzer:fuzztest",
@@ -58,10 +60,12 @@ group("fuzztest") {
     "formrenderconnection_fuzzer:fuzztest",
     "formrenderimpl_fuzzer:fuzztest",
     "formrendermgr_fuzzer:fuzztest",
+    "formrendermgrinner_fuzzer:fuzztest",
     "formrenderproxy_fuzzer:fuzztest",
     "formrenderrecord_fuzzer:fuzztest",
     "formrenderserviceextension_fuzzer:fuzztest",
     "formrenderstub_fuzzer:fuzztest",
+    "formsandboxrendermgrinner_fuzzer:fuzztest",
     "formsharemgr_fuzzer:fuzztest",
     "formsupplycallback_fuzzer:fuzztest",
     "formsupplyproxy_fuzzer:fuzztest",

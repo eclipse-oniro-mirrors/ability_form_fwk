@@ -38,6 +38,7 @@ uint32_t GetU32Data(const char* ptr)
     // convert fuzz input data to an integer
     return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | ptr[3];
 }
+
 bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
 {
     FormSupplyCallback formSupplyCallback;
@@ -86,6 +87,16 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     std::string formInfo(data, size);
     formDumpMgr.DumpFormHostInfo(formHostRecord, formInfo);
     formDumpMgr.DumpFormInfo(formRecord, formInfo);
+    formDumpMgr.DumpTemporaryFormInfos(formRecordInfos, formInfo);
+    std::vector<FormInfo> bundleFormInfos;
+    formDumpMgr.DumpStaticBundleFormInfos(bundleFormInfos, formInfo);
+    int32_t tokenId = static_cast<int32_t>(GetU32Data(data));
+    std::string bundleName(data, size);
+    int32_t instIndex = static_cast<int32_t>(GetU32Data(data));
+    formDumpMgr.DumpHasFormVisible(tokenId, bundleName, userId, instIndex, formInfo);
+    std::vector<std::string> subscribedKeys;
+    int64_t count = static_cast<int64_t>(GetU32Data(data));
+    formDumpMgr.DumpFormSubscribeInfo(subscribedKeys, count, formInfo);
     return formSupplyCallback.IsRemoveConnection(formId, hostToken);
 }
 }

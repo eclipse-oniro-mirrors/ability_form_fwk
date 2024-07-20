@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <chrono>
 #include <gtest/gtest.h>
 
 #include "form_constants.h"
@@ -32,10 +33,13 @@ using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::AppExecFwk;
 using namespace OHOS::AppExecFwk::FormRender;
+using namespace OHOS::Ace;
 
 namespace {
-    constexpr int32_t RELOAD_FORM_FAILED = -1;
-    constexpr int32_t RENDER_FORM_ID = -1;
+constexpr int32_t RELOAD_FORM_FAILED = -1;
+constexpr int32_t RENDER_FORM_ID = -1;
+constexpr int32_t RENDER_FORM_FAILED = -1;
+constexpr int32_t RECYCLE_FORM_FAILED = -1;
 }
 #define private public
 class FormRenderRecordMock : public FormRenderRecord {
@@ -891,12 +895,335 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_046, TestSize.Level0)
 
 /**
  * @tc.name: FormRenderRecordTest_047
- * @tc.desc: Verify RecoverFormRequestsInGroup
+ * @tc.desc: Test DeleteRendererGroup
  * @tc.type: FUNC
  */
 HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_047, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_047 start";
+    std::string uid = "2024101010";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", uid);
+    EXPECT_TRUE(formRenderRecord);
+    formRenderRecord->formRendererGroupMap_.emplace(55, nullptr);
+    int64_t formId = 64;
+    EXPECT_EQ(1, static_cast<int>(formRenderRecord->formRendererGroupMap_.size()));
+    formRenderRecord->DeleteRendererGroup(formId);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    EXPECT_EQ(1, static_cast<int>(formRenderRecord->formRendererGroupMap_.size()));
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_048
+ * @tc.desc: Test DeleteRendererGroup
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_048, TestSize.Level0)
+{
+    std::string uid = "2024101010";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", uid);
+    EXPECT_TRUE(formRenderRecord);
+    int64_t formId = 64;
+    formRenderRecord->formRendererGroupMap_.emplace(formId, nullptr);
+    EXPECT_EQ(1, static_cast<int>(formRenderRecord->formRendererGroupMap_.size()));
+    formRenderRecord->DeleteRendererGroup(formId);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    EXPECT_EQ(0, static_cast<int>(formRenderRecord->formRendererGroupMap_.size()));
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_049
+ * @tc.desc: Test UpdateRenderRecord
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_049, TestSize.Level0)
+{
+    std::string uid = "2024101010";
+    auto formRenderRecord = FormRenderRecord::Create("tdd_test", uid);
+    EXPECT_TRUE(formRenderRecord);
+
+    FormJsInfo info;
+    info.isDynamic = false;
+    Want want;
+    EXPECT_EQ(formRenderRecord->UpdateRenderRecord(info, want, nullptr), RENDER_FORM_FAILED);
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_050
+ * @tc.desc: Test UpdateRenderRecord
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_050, TestSize.Level0)
+{
+    std::string uid = "2024101010";
+    auto formRenderRecord = FormRenderRecord::Create("tdd_test", uid);
+    EXPECT_TRUE(formRenderRecord);
+
+    FormJsInfo info;
+    info.isDynamic = false;
+    Want want;
+    EXPECT_EQ(formRenderRecord->UpdateRenderRecord(info, want, nullptr), RENDER_FORM_FAILED);
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_051
+ * @tc.desc: Test UpdateRenderRecord
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_051, TestSize.Level0)
+{
+    std::string uid = "2024101010";
+    auto formRenderRecord = FormRenderRecord::Create("tdd_test", uid);
+    EXPECT_TRUE(formRenderRecord);
+
+    FormJsInfo info;
+    info.isDynamic = false;
+    info.formId = 15;
+    Want want;
+
+    sptr<IRemoteObject> hostRemoteObj = new (std::nothrow) MockFormProviderClient();
+    EXPECT_EQ(formRenderRecord->UpdateRenderRecord(info, want, hostRemoteObj), ERR_OK);
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_052
+ * @tc.desc: Test UpdateRenderRecord
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_052, TestSize.Level0)
+{
+    std::string uid = "2024101010";
+    auto formRenderRecord = FormRenderRecord::Create("tdd_test", uid);
+    EXPECT_TRUE(formRenderRecord);
+
+    FormJsInfo info;
+    info.isDynamic = false;
+    info.formId = 15;
+    Want want;
+
+    sptr<IRemoteObject> hostRemoteObj = new (std::nothrow) MockFormProviderClient();
+    EXPECT_EQ(formRenderRecord->UpdateRenderRecord(info, want, hostRemoteObj), ERR_OK);
+    sptr<IRemoteObject> hostRemoteObjOther = new (std::nothrow) MockFormProviderClient();
+    EXPECT_EQ(formRenderRecord->UpdateRenderRecord(info, want, hostRemoteObjOther), ERR_OK);
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_053
+ * @tc.desc: Test HandleDeleteRendererGroup
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_053, TestSize.Level0)
+{
+    std::string uid = "2024101010";
+    auto formRenderRecord = FormRenderRecord::Create("tdd_test", uid);
+    EXPECT_TRUE(formRenderRecord);
+
+    int64_t formId = 64;
+    formRenderRecord->formRendererGroupMap_.emplace(formId, nullptr);
+    EXPECT_EQ(1, static_cast<int>(formRenderRecord->formRendererGroupMap_.size()));
+
+    formRenderRecord->HandleDeleteRendererGroup(formId);
+    EXPECT_EQ(0, static_cast<int>(formRenderRecord->formRendererGroupMap_.size()));
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_054
+ * @tc.desc: Test HandleDeleteRendererGroup
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_054, TestSize.Level0)
+{
+    std::string uid = "2024101010";
+    auto formRenderRecord = FormRenderRecord::Create("tdd_test", uid);
+    EXPECT_TRUE(formRenderRecord);
+
+    int64_t formId = 64;
+    formRenderRecord->formRendererGroupMap_.emplace(formId, nullptr);
+    EXPECT_EQ(1, static_cast<int>(formRenderRecord->formRendererGroupMap_.size()));
+
+    formRenderRecord->HandleDeleteRendererGroup(formId + 10);
+    EXPECT_EQ(1, static_cast<int>(formRenderRecord->formRendererGroupMap_.size()));
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_055
+ * @tc.desc: Test MergeFormData
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_055, TestSize.Level0)
+{
+    std::string bundleName{ "tdd_test" };
+    std::string uid{ "2024101010" };
+    auto formRenderRecord = FormRenderRecord::Create(bundleName, uid);
+    EXPECT_TRUE(formRenderRecord);
+
+    FormRequest request;
+    request.formJsInfo.formData = "test";
+    FormJsInfo info;
+
+    formRenderRecord->MergeFormData(request, info);
+    EXPECT_EQ("", request.formJsInfo.formData);
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_056
+ * @tc.desc: Test RunTask
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_056, TestSize.Level0)
+{
+    std::string bundleName{ "tdd_test" };
+    std::string uid{ "2024101010" };
+    auto formRenderRecord = FormRenderRecord::Create(bundleName, uid);
+    EXPECT_TRUE(formRenderRecord);
+
+    EXPECT_EQ(TaskState::NO_RUNNING, formRenderRecord->RunTask());
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_057
+ * @tc.desc: Test RunTask
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_057, TestSize.Level0)
+{
+    std::string bundleName{ "tdd_test" };
+    std::string uid{ "2024101010" };
+    auto formRenderRecord = FormRenderRecord::Create(bundleName, uid);
+    EXPECT_TRUE(formRenderRecord);
+
+    formRenderRecord->CheckEventHandler(true, false);
+    formRenderRecord->threadState_ = std::make_shared<ThreadState>(2);
+    EXPECT_EQ(TaskState::RUNNING, formRenderRecord->RunTask());
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_058
+ * @tc.desc: Test RunTask
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_058, TestSize.Level0)
+{
+    std::string bundleName{ "tdd_test" };
+    std::string uid{ "2024101010" };
+    auto formRenderRecord = FormRenderRecord::Create(bundleName, uid);
+    EXPECT_TRUE(formRenderRecord);
+
+    formRenderRecord->CheckEventHandler(true, false);
+    formRenderRecord->threadState_ = std::make_shared<ThreadState>(1);
+    formRenderRecord->threadIsAlive_ = false;
+    EXPECT_EQ(TaskState::BLOCK, formRenderRecord->RunTask());
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_059
+ * @tc.desc: Test DeleteFormRequest
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_059, TestSize.Level0)
+{
+    std::string bundleName{ "tdd_test" };
+    std::string uid{ "2024101010" };
+    auto formRenderRecord = FormRenderRecord::Create(bundleName, uid);
+    EXPECT_TRUE(formRenderRecord);
+
+    int64_t formId = 15;
+    FormRequest request;
+    std::unordered_map<std::string, Ace::FormRequest> map;
+    map.emplace("1", request);
+    formRenderRecord->formRequests_.emplace(formId, map);
+    EXPECT_EQ(1, static_cast<int>(formRenderRecord->formRequests_.size()));
+
+    formRenderRecord->DeleteFormRequest(formId, "1");
+    EXPECT_EQ(0, static_cast<int>(formRenderRecord->formRequests_.size()));
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_060
+ * @tc.desc: Test DeleteFormRequest
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_060, TestSize.Level0)
+{
+    std::string bundleName{ "tdd_test" };
+    std::string uid{ "2024101010" };
+    auto formRenderRecord = FormRenderRecord::Create(bundleName, uid);
+    EXPECT_TRUE(formRenderRecord);
+
+    int64_t formId = 15;
+    FormRequest request;
+    std::unordered_map<std::string, Ace::FormRequest> map;
+    map.emplace("1", request);
+    formRenderRecord->formRequests_.emplace(formId, map);
+    EXPECT_EQ(1, static_cast<int>(formRenderRecord->formRequests_.size()));
+
+    formRenderRecord->DeleteFormRequest(formId, "test");
+    EXPECT_EQ(1, static_cast<int>(formRenderRecord->formRequests_.size()));
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_061
+ * @tc.desc: Test HandleRecycleForm
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_061, TestSize.Level0)
+{
+    std::string bundleName{ "tdd_test" };
+    std::string uid{ "2024101010" };
+    auto formRenderRecord = FormRenderRecord::Create(bundleName, uid);
+    EXPECT_TRUE(formRenderRecord);
+
+    int64_t formId = 15;
+    std::string statusData("test");
+    EXPECT_EQ(RECYCLE_FORM_FAILED, formRenderRecord->HandleRecycleForm(formId, statusData));
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_062
+ * @tc.desc: Test HandleRecycleForm
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_062, TestSize.Level0)
+{
+    std::string bundleName{ "tdd_test" };
+    std::string uid{ "2024101010" };
+    auto formRenderRecord = FormRenderRecord::Create(bundleName, uid);
+    EXPECT_TRUE(formRenderRecord);
+
+    int64_t formId = 15;
+    std::string statusData("test");
+    formRenderRecord->formRendererGroupMap_.emplace(formId, nullptr);
+    EXPECT_EQ(RECYCLE_FORM_FAILED, formRenderRecord->HandleRecycleForm(formId, statusData));
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_063
+ * @tc.desc: Test HandleRecycleForm
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_063, TestSize.Level0)
+{
+    std::string bundleName{ "tdd_test" };
+    std::string uid{ "2024101010" };
+    auto formRenderRecord = FormRenderRecord::Create(bundleName, uid);
+    EXPECT_TRUE(formRenderRecord);
+
+    int64_t formId = 15;
+    std::string statusData("test");
+    std::shared_ptr<AbilityRuntime::Context> context = nullptr;
+    std::shared_ptr<AbilityRuntime::Runtime> runtime = nullptr;
+    std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = nullptr;
+    auto group = std::make_shared<FormRendererGroup>(context, runtime, handler);
+    formRenderRecord->formRendererGroupMap_.emplace(formId, group);
+    EXPECT_EQ(ERR_OK, formRenderRecord->HandleRecycleForm(formId, statusData));
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_064
+ * @tc.desc: Verify RecoverFormRequestsInGroup
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_064, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_064 start";
     std::string uid = "uid";
     auto formRenderRecord = FormRenderRecord::Create("bundleName", uid);
     FormJsInfo formJsInfo;
@@ -905,22 +1232,22 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_047, TestSize.Level0)
     std::unordered_map<std::string, Ace::FormRequest> requests;
     bool ret = formRenderRecord->RecoverFormRequestsInGroup(formJsInfo, statusData, isHandleClickEvent, requests);
     EXPECT_EQ(false, ret);
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_047 end";
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_064 end";
 }
 
 /**
- * @tc.name: FormRenderRecordTest_048
+ * @tc.name: FormRenderRecordTest_065
  * @tc.desc: Verify RecoverRenderer
  * @tc.type: FUNC
  */
-HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_048, TestSize.Level0)
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_065, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_048 start";
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_065 start";
     std::string uid = "uid";
     auto formRenderRecord = FormRenderRecord::Create("bundleName", uid);
     std::vector<Ace::FormRequest> requests;
     size_t requestIndex = 0;
     bool ret = formRenderRecord->RecoverRenderer(requests, requestIndex);
     EXPECT_EQ(false, ret);
-    GTEST_LOG_(INFO) << "FormRenderRecordTest_048 end";
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_065 end";
 }

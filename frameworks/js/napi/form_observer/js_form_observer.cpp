@@ -16,6 +16,7 @@
 
 #include "js_form_observer.h"
 
+#include "accesstoken_kit.h"
 #include "fms_log_wrapper.h"
 #include "form_callback_interface.h"
 #include "form_host_client.h"
@@ -83,6 +84,19 @@ private:
     {
         auto selfToken = IPCSkeleton::GetSelfTokenID();
         return Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(selfToken);
+    }
+
+    bool VerifyCallingPermission(const std::string &permissionName)
+    {
+        HILOG_DEBUG("called. permission name is:%{public}s", permissionName.c_str());
+        auto selfToken = IPCSkeleton::GetSelfTokenID();
+        int32_t ret = Security::AccessToken::AccessTokenKit::VerifyAccessToken(selfToken, permissionName);
+        if (ret == Security::AccessToken::PermissionState::PERMISSION_DENIED) {
+            HILOG_ERROR("check %{public}s: PERMISSION_DENIED", permissionName.c_str());
+            return false;
+        }
+        HILOG_DEBUG("Verify calling permission success");
+        return true;
     }
 
     bool CheckParamNum(napi_env env, size_t argc, size_t minParamNum, size_t maxParamNum)
@@ -209,6 +223,12 @@ private:
             HILOG_ERROR("Convert type failed.");
             NapiFormUtil::ThrowParamTypeError(env, "type",
                 "formAdd, formRemove, notifyVisible, notifyInvisible, router, message, call.");
+            return CreateJsUndefined(env);
+        }
+
+        if (!VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_OBSERVE_FORM_RUNNING)) {
+            HILOG_ERROR("observer register check permission denied");
+            NapiFormUtil::ThrowByExternalErrorCode(env, AppExecFwk::ERR_FORM_EXTERNAL_PERMISSION_DENIED);
             return CreateJsUndefined(env);
         }
 
@@ -483,6 +503,12 @@ private:
             HILOG_ERROR("Convert type error!");
             NapiFormUtil::ThrowParamTypeError(env, "type",
                 "formAdd, formRemove, formUninstall, notifyVisible or notifyInvisible.");
+            return CreateJsUndefined(env);
+        }
+
+        if (!VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_OBSERVE_FORM_RUNNING)) {
+            HILOG_ERROR("observer unregister check permission denied");
+            NapiFormUtil::ThrowByExternalErrorCode(env, AppExecFwk::ERR_FORM_EXTERNAL_PERMISSION_DENIED);
             return CreateJsUndefined(env);
         }
 

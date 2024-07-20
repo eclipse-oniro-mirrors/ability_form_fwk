@@ -20,6 +20,7 @@
 
 #include "fms_log_wrapper.h"
 #include "form_bms_helper.h"
+#include "form_bundle_forbid_mgr.h"
 #include "form_cache_mgr.h"
 #include "form_constants.h"
 #include "form_data_proxy_mgr.h"
@@ -2474,8 +2475,11 @@ ErrCode FormDataMgr::GetRecordsByFormType(const int32_t formRefreshType,
     std::lock_guard<std::mutex> lock(formRecordMutex_);
     for (auto formRecord : formRecords_) {
         if (!FormTrustMgr::GetInstance().IsTrust(formRecord.second.bundleName)) {
-            HILOG_ERROR("formId:%{public}" PRId64 ", %{public}s is unTrust.",
-                formRecord.first, formRecord.second.bundleName.c_str());
+            HILOG_ERROR("ignore, %{public}s is unTrust.", formRecord.second.bundleName.c_str());
+            continue;
+        }
+        if (FormBundleForbidMgr::GetInstance().IsBundleForbidden(formRecord.second.bundleName)) {
+            HILOG_ERROR("ignore, %{public}s is forbidden.", formRecord.second.bundleName.c_str());
             continue;
         }
         if (formRefreshType == Constants::REFRESH_APP_FORM) {

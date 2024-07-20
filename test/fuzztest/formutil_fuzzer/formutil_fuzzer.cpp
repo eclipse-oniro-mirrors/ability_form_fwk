@@ -70,6 +70,10 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formUtil.GetCurrentNanosecond();
     formUtil.GetCurrentMillisecond();
     formUtil.GetCurrentAccountId();
+    formUtil.GetNowMillisecond();
+    std::string strInfo(data, size);
+    int64_t convertValue = static_cast<int64_t>(GetU32Data(data));
+    formUtil.ConvertStringToInt64(strInfo, convertValue);
     sptr<IRemoteObject> impl = nullptr;
     FreeInstallStatusCallBackProxy freeInstallStatusCallBackProxy(impl);
     FreeInstallStatusCallBackStubFuzzTest freeInstallStatusCallBackStubFuzzTest;
