@@ -59,7 +59,7 @@ public:
 
     ErrCode StopRenderingFormCallback(int64_t formId, const Want &want);
 
-    void GetFormRenderState() const;
+    void GetFormRenderState();
 
     bool GetIsVerified() const;
 
@@ -101,8 +101,8 @@ private:
     std::queue<std::function<void()>> taskQueue_;
     std::shared_ptr<FormRenderMgrInner> renderInner_ = nullptr;
     std::shared_ptr<FormSandboxRenderMgrInner> sandboxInner_ = nullptr;
-    mutable bool isScreenUnlocked_ = false;
-    mutable bool isVerified_ = false;
+    bool isScreenUnlocked_ = false;
+    bool isVerified_ = false;
 };
 } // namespace AppExecFwk
 } // namespace OHOS
