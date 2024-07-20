@@ -286,6 +286,7 @@ HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_002, TestSize.Level0)
     FormRecord retFormRec = FormDataMgr::GetInstance().AllotFormRecord(record1, callingUid);
     retFormRec.updateAtHour = 1;
     retFormRec.updateAtMin = 1;
+    retFormRec.providerUserId = 0;
     FormDataMgr::GetInstance().UpdateFormRecord(formId, retFormRec);
     // Set database info
     FormDBInfo formDBInfo(formId, retFormRec);
@@ -368,7 +369,7 @@ HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_003, TestSize.Level0)
     record1.specification = PARAM_FORM_DIMENSION_VALUE;
     record1.formUserUids.emplace_back(callingUid);
     record1.formTempFlag = false;
-    record1.providerUserId = FormUtil::GetCurrentAccountId();
+    record1.providerUserId = 0;
     FormDBInfo formDBInfo(formId, record1);
     FormDbCache::GetInstance().SaveFormInfo(formDBInfo);
     // Set form host record
@@ -517,6 +518,7 @@ HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_006, TestSize.Level0)
     record1.SetSpecificationId(PARAM_FORM_DIMENSION_VALUE);
     record1.SetTemporaryFlag(false);
     FormRecord retFormRec = FormDataMgr::GetInstance().AllotFormRecord(record1, callingUid);
+    retFormRec.providerUserId = 0;
     // Set database info.
     FormDBInfo formDBInfo(formId, retFormRec);
     FormDbCache::GetInstance().SaveFormInfo(formDBInfo);

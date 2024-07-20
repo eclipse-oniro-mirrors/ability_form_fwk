@@ -524,7 +524,7 @@ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_0140, TestSize.Level0)
     MockGetFormRecordParams(true);
     MockGetFormRecordParamsTemp(false);
     EXPECT_EQ(
-        ERR_APPEXECFWK_FORM_CFG_NOT_MATCH_ID, formMgrAdapter.AllotFormById(info, callerToken, wantParams, formInfo));
+        ERR_APPEXECFWK_FORM_NOT_EXIST_ID, formMgrAdapter.AllotFormById(info, callerToken, wantParams, formInfo));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0140 end";
 }
 
