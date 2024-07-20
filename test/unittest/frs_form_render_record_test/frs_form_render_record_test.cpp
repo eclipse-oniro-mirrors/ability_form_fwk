@@ -1215,3 +1215,39 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_063, TestSize.Level0)
     formRenderRecord->formRendererGroupMap_.emplace(formId, group);
     EXPECT_EQ(ERR_OK, formRenderRecord->HandleRecycleForm(formId, statusData));
 }
+
+/**
+ * @tc.name: FormRenderRecordTest_064
+ * @tc.desc: Verify RecoverFormRequestsInGroup
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_064, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_064 start";
+    std::string uid = "uid";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", uid);
+    FormJsInfo formJsInfo;
+    std::string statusData = "";
+    bool isHandleClickEvent = false;
+    std::unordered_map<std::string, Ace::FormRequest> requests;
+    bool ret = formRenderRecord->RecoverFormRequestsInGroup(formJsInfo, statusData, isHandleClickEvent, requests);
+    EXPECT_EQ(false, ret);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_064 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_065
+ * @tc.desc: Verify RecoverRenderer
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_065, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_065 start";
+    std::string uid = "uid";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", uid);
+    std::vector<Ace::FormRequest> requests;
+    size_t requestIndex = 0;
+    bool ret = formRenderRecord->RecoverRenderer(requests, requestIndex);
+    EXPECT_EQ(false, ret);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_065 end";
+}
