@@ -242,6 +242,22 @@ void FormRenderMgrInner::PostOnUnlockTask()
     FormTaskMgr::GetInstance().PostOnUnlock(remoteObject);
 }
 
+void FormRenderMgrInner::NotifyScreenOn()
+{
+    HILOG_DEBUG("called");
+    sptr<IRemoteObject> remoteObject;
+    auto ret = GetRenderObject(remoteObject);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("remote object gotten is nullptr.");
+        return;
+    }
+    sptr<IFormRender> remoteFormRenderer = iface_cast<IFormRender>(remoteObject);
+    if (remoteFormRenderer == nullptr) {
+        return;
+    }
+    remoteFormRenderer->RunCachedConfigurationUpdated();
+}
+
 ErrCode FormRenderMgrInner::StopRenderingForm(int64_t formId, const FormRecord &formRecord,
     const std::string &compId, const sptr<IRemoteObject> &hostToken)
 {

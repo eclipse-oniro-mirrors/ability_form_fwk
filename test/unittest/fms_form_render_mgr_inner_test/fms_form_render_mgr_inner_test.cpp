@@ -1069,4 +1069,18 @@ HWTEST_F(FormRenderMgrInnerTest, FormRenderMgrInnerTest_052, TestSize.Level0)
               ERR_APPEXECFWK_FORM_INVALID_PARAM);
     GTEST_LOG_(INFO) << "FormRenderMgrInnerTest_052 end";
 }
+
+/**
+ * @tc.name: NotifyScreenOn_001
+ * @tc.desc: test NotifyScreenOn function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, NotifyScreenOn_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "NotifyScreenOn_001 start";
+    FormRenderMgrInner formRenderMgrInner;
+    formRenderMgrInner.renderRemoteObj_ = new (std::nothrow) MockIFormRender();
+    formRenderMgrInner.NotifyScreenOn();
+    GTEST_LOG_(INFO) << "NotifyScreenOn_001 end";
+}
 }

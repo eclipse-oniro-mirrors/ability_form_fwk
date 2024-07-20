@@ -26,6 +26,9 @@
 #include "js_runtime.h"
 #include "service_extension.h"
 #include "form_memmgr_client.h"
+#ifdef SUPPORT_POWER
+#include "power_mgr_client.h"
+#endif
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -267,6 +270,16 @@ void FormRenderImpl::OnConfigurationUpdated(
     }
 
     SetConfiguration(configuration);
+
+#ifdef SUPPORT_POWER
+    bool screenOnFlag = PowerMgr::PowerMgrClient::GetInstance().IsScreenOn();
+    if (!screenOnFlag) {
+        HILOG_WARN("screen off");
+        hasCachedConfig_ = true;
+        return;
+    }
+#endif
+
     constexpr int64_t minDurationMs = 1500;
     const std::string taskName = "FormRenderImpl::OnConfigurationUpdated";
     serialQueue_->CancelDelayTask(taskName);
@@ -304,6 +317,7 @@ void FormRenderImpl::OnConfigurationUpdatedInner()
         }
     }
     HILOG_INFO("OnConfigurationUpdated %{public}zu forms updated.", allFormCount);
+    hasCachedConfig_ = false;
     PerformanceEventInfo eventInfo;
     eventInfo.timeStamp = FormRenderEventReport::GetNowMillisecond();
     eventInfo.bundleName = Constants::FRS_BUNDLE_NAME;
@@ -329,6 +343,15 @@ void FormRenderImpl::SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Co
     }
 
     configuration_ = config;
+}
+
+void FormRenderImpl::RunCachedConfigurationUpdated()
+{
+    HILOG_INFO("RunCachedConfigUpdated.");
+    std::lock_guard<std::mutex> lock(renderRecordMutex_);
+    if (hasCachedConfig_) {
+        OnConfigurationUpdatedInner();
+    }
 }
 
 void FormRenderImpl::FormRenderGCTask(const std::string &uid)

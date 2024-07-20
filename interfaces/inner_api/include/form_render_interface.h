@@ -72,6 +72,8 @@ public:
 
     virtual int32_t RecoverForm(const FormJsInfo &formJsInfo, const Want &want) { return ERR_OK; }
 
+    virtual void RunCachedConfigurationUpdated() {}
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -90,6 +92,7 @@ public:
         FORM_RENDER_UNLOCKED = 3106,
         FORM_RECYCLE_FORM = 3107,
         FORM_RECOVER_FORM = 3108,
+        FORM_RUN_CACHED_CONFIG = 3109,
     };
 };
 } // namespace AppExecFwk

@@ -68,6 +68,8 @@ public:
 
     void PostOnUnlockTask();
 
+    void NotifyScreenOn();
+
     int32_t GetReRenderCount() const;
 
     sptr<IFormRender> GetRenderRemoteObj() const;
