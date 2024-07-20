@@ -31,6 +31,7 @@ group("fuzztest") {
     "formdatamgrtwo_fuzzer:fuzztest",
     "formdbcache_fuzzer:fuzztest",
     "formdbcacheannex_fuzzer:fuzztest",
+    "formecologicalruleparam_fuzzer:fuzztest",
     "formerrors_fuzzer:fuzztest",
     "formfreeinstalloperator_fuzzer:fuzztest",
     "formhostcaller_fuzzer:fuzztest",
