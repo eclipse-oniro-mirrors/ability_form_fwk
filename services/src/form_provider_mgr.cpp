@@ -110,7 +110,12 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
     if (result != ERR_OK) {
         return result;
     }
-
+    HILOG_INFO("FormProviderMgr::RefreshForm, formId:%{public}" PRId64 "., record.enableForm = %{public}d",
+        formId, record.enableForm);
+    if (!record.enableForm) {
+        FormDataMgr::GetInstance().SetRefreshDuringDisableForm(formId, true);
+        return ERR_APPEXECFWK_FORM_DISABLE_REFRESH;
+    }
     bool isCountTimerRefresh = want.GetBoolParam(Constants::KEY_IS_TIMER, false);
     Want newWant(want);
     newWant.RemoveParam(Constants::KEY_IS_TIMER);
@@ -171,13 +176,6 @@ ErrCode FormProviderMgr::RefreshCheck(FormRecord &record, const int64_t formId, 
             __func__, record.providerUserId);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
-    HILOG_INFO("formId:%{public}" PRId64 ", enableForm:%{public}d",
-        formId, record.enableForm);
-    if (!record.enableForm) {
-        FormDataMgr::GetInstance().SetRefreshDuringDisableForm(formId, true);
-        return ERR_APPEXECFWK_FORM_DISABLE_REFRESH;
-    }
-
     return ERR_OK;
 }
 
