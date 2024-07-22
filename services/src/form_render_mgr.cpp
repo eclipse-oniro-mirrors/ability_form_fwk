@@ -48,15 +48,23 @@ FormRenderMgr::~FormRenderMgr()
 {
 }
 
-void FormRenderMgr::GetFormRenderState() const
+void FormRenderMgr::GetFormRenderState()
 {
-    HILOG_INFO("RenderForm for the first time");
     // Check whether the account is authenticated.
     bool isVerified = false;
     AccountSA::OsAccountManager::IsOsAccountVerified(FormUtil::GetCurrentAccountId(), isVerified);
-    HILOG_INFO("isVerified: %{public}d", isVerified);
+    HILOG_INFO("isVerified:%{public}d, screen:%{public}d", isVerified, isScreenUnlocked_);
+    if (isVerified == isVerified_) {
+        return;
+    }
+    HILOG_INFO("set isVerified");
+
     std::lock_guard<std::mutex> lock(isVerifiedMutex_);
     isVerified_ = isVerified;
+    if (!isScreenUnlocked_) {
+        PostOnUnlockTask();
+    }
+    ExecAcquireProviderTask();
 }
 
 bool FormRenderMgr::GetIsVerified() const
@@ -70,9 +78,7 @@ ErrCode FormRenderMgr::RenderForm(
     const FormRecord &formRecord, const WantParams &wantParams, const sptr<IRemoteObject> &hostToken)
 {
     HILOG_INFO("formId:%{public}" PRId64, formRecord.formId);
-    std::once_flag flag;
-    std::function<void()> func = [this] { this->GetFormRenderState(); };
-    std::call_once(flag, func);
+    GetFormRenderState();
     HILOG_INFO("the current user authentication status:%{public}d, %{public}d", isVerified_, isScreenUnlocked_);
     if (formRecord.uiSyntax != FormType::ETS) {
         return ERR_OK;
