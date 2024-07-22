@@ -2406,7 +2406,7 @@ ErrCode FormDataMgr::GetRunningFormInfosByBundleName(
 void FormDataMgr::UpdateFormCloudUpdateDuration(const std::string &bundleName, int duration)
 {
     HILOG_INFO("bundleName:%{public}s, duration:%{public}d", bundleName.c_str(), duration);
-    std::unique_lock<std::shared_mutex> lock(formCloudUpdateDurationMapMutex_);
+    std::lock_guard<std::mutex> lock(formCloudUpdateDurationMapMutex_);
     auto iter = formCloudUpdateDurationMap_.find(bundleName);
     if (iter != formCloudUpdateDurationMap_.end()) {
         iter->second = duration;
@@ -2418,7 +2418,7 @@ void FormDataMgr::UpdateFormCloudUpdateDuration(const std::string &bundleName, i
 void FormDataMgr::RemoveFormCloudUpdateDuration(const std::string &bundleName)
 {
     HILOG_DEBUG("Called.");
-    std::unique_lock<std::shared_mutex> lock(formCloudUpdateDurationMapMutex_);
+    std::lock_guard<std::mutex> lock(formCloudUpdateDurationMapMutex_);
     auto iter = formCloudUpdateDurationMap_.find(bundleName);
     if (iter != formCloudUpdateDurationMap_.end()) {
         HILOG_INFO("bundleName:%{public}s", bundleName.c_str());
@@ -2430,20 +2430,19 @@ int FormDataMgr::GetFormCloudUpdateDuration(const std::string &bundleName) const
 {
     HILOG_DEBUG("Called.");
     int duration = 0;
-    std::shared_lock<std::shared_mutex> lock(formCloudUpdateDurationMapMutex_);
+    std::lock_guard<std::mutex> lock(formCloudUpdateDurationMapMutex_);
     auto iter = formCloudUpdateDurationMap_.find(bundleName);
     if (iter != formCloudUpdateDurationMap_.end()) {
         duration = iter->second;
         HILOG_INFO("%{public}s has form cloud update duration:%{public}d.", bundleName.c_str(), duration);
     }
-    HILOG_INFO("End.");
     return duration;
 }
 
 bool FormDataMgr::HasFormCloudUpdateDuration(const std::string &bundleName) const
 {
     HILOG_DEBUG("Called.");
-    std::shared_lock<std::shared_mutex> lock(formCloudUpdateDurationMapMutex_);
+    std::lock_guard<std::mutex> lock(formCloudUpdateDurationMapMutex_);
     auto iter = formCloudUpdateDurationMap_.find(bundleName);
     if (iter != formCloudUpdateDurationMap_.end()) {
         HILOG_INFO("Has cloud update duration, bundleName: %{public}s", bundleName.c_str());
