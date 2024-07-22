@@ -37,6 +37,7 @@ ohos_unittest("FmsFormEventReportTest") {
   ]
 
   external_deps = [
+    "ability_base:want",
     "c_utils:utils",
     "hilog:libhilog",
   ]
