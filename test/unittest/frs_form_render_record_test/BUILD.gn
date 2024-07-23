@@ -23,6 +23,7 @@ ohos_unittest("FrsFormRenderRecordTest") {
     cfi = true
     cfi_cross_dso = true
     debug = false
+    blocklist = "../../../cfi_blocklist.txt"
   }
 
   sources = [

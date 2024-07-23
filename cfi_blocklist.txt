@@ -14,3 +14,5 @@
 [cfi]
 src:*/third_party/googletest/googletest/include/gtest/internal/gtest-port.h
 src:*/third_party/googletest/googlemock/include/gmock/gmock-cardinalities.h
+src:*/third_party/cJSON/*
+src:*/base/security/access_token/interfaces/innerkits/*
