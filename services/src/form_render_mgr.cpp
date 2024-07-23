@@ -341,7 +341,7 @@ void FormRenderMgr::OnRenderingBlock(const std::string &bundleName)
     FormTrustMgr::GetInstance().MarkTrustFlag(bundleName, false);
 
     Want want;
-    want.SetElementName("com.ohos.formrenderservice", "ServiceExtension");
+    want.SetElementName(Constants::FRS_BUNDLE_NAME, "ServiceExtension");
     want.AddFlags(Want::FLAG_ABILITY_FORM_ENABLED);
     FormAmsHelper::GetInstance().StopExtensionAbility(want);
 }

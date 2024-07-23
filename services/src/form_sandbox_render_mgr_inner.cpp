@@ -27,8 +27,6 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace {
 constexpr int32_t DLP_TYPE = 2;
-constexpr int32_t DEFAULT_SANDBOX_FRS_APP_INDEX = 1;
-constexpr int32_t DEFAULT_USER = 0;
 }
 using Want = OHOS::AAFwk::Want;
 FormSandboxRenderMgrInner::FormSandboxRenderMgrInner()
@@ -48,7 +46,7 @@ ErrCode FormSandboxRenderMgrInner::IsSandboxFRSInstalled() const
     BundleInfo info;
     std::string identity = IPCSkeleton::ResetCallingIdentity();
     ErrCode ret = iBundleMgr->GetSandboxBundleInfo(
-        "com.ohos.formrenderservice", DEFAULT_SANDBOX_FRS_APP_INDEX, DEFAULT_USER, info);
+        Constants::FRS_BUNDLE_NAME, Constants::DEFAULT_SANDBOX_FRS_APP_INDEX, Constants::DEFAULT_USER_ID, info);
     IPCSkeleton::SetCallingIdentity(identity);
     return ret;
 }
@@ -61,7 +59,8 @@ ErrCode FormSandboxRenderMgrInner::InstallSandboxFRS(int32_t &appIndex) const
         HILOG_ERROR("GetBundleInstaller failed.");
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
-    return bundleInstallerProxy->InstallSandboxApp("com.ohos.formrenderservice", DLP_TYPE, DEFAULT_USER, appIndex);
+    return bundleInstallerProxy->InstallSandboxApp(
+        Constants::FRS_BUNDLE_NAME, DLP_TYPE, Constants::DEFAULT_USER_ID, appIndex);
 }
 
 ErrCode FormSandboxRenderMgrInner::RenderForm(
@@ -80,7 +79,7 @@ ErrCode FormSandboxRenderMgrInner::RenderForm(
                 HILOG_ERROR("InstallSandboxFRS fail, ret: %{public}d.", ret);
                 return ret;
             }
-            if (appIndex != 1) {
+            if (appIndex != Constants::DEFAULT_SANDBOX_FRS_APP_INDEX) {
                 HILOG_ERROR("sandbox FRS already install, please check, appIndex: %{public}d.", appIndex);
                 return ERR_APPEXECFWK_FORM_INVALID_PARAM;
             }

@@ -492,8 +492,8 @@ inline ErrCode FormRenderMgrInner::ConnectRenderService(
     want.SetElementName(Constants::FRS_BUNDLE_NAME, "ServiceExtension");
     want.AddFlags(Want::FLAG_ABILITY_FORM_ENABLED);
     if (level > 0) {
-        want.SetParam(DLP_INDEX, 1);
-        want.SetParam(Constants::FRS_APP_INDEX, 1);
+        want.SetParam(DLP_INDEX, Constants::DEFAULT_SANDBOX_FRS_APP_INDEX);
+        want.SetParam(Constants::FRS_APP_INDEX, Constants::DEFAULT_SANDBOX_FRS_APP_INDEX);
     }
     connection->SetStateConnecting();
     return FormAmsHelper::GetInstance().ConnectServiceAbility(want, connection);
