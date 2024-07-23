@@ -519,6 +519,7 @@ HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_006, TestSize.Level0)
     record1.SetTemporaryFlag(false);
     FormRecord retFormRec = FormDataMgr::GetInstance().AllotFormRecord(record1, callingUid);
     retFormRec.providerUserId = 0;
+    FormDataMgr::GetInstance().UpdateFormRecord(formId, retFormRec);
     // Set database info.
     FormDBInfo formDBInfo(formId, retFormRec);
     FormDbCache::GetInstance().SaveFormInfo(formDBInfo);
