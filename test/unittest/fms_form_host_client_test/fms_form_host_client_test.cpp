@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -615,5 +615,43 @@ HWTEST_F(FmsFormHostClientTest, OnEnableForm_0300, TestSize.Level0)
     testing::Mock::AllowLeak(callback.get());
     formHostClient->formCallbackMap_.clear();
     GTEST_LOG_(INFO) << "FmsFormHostClientTest OnEnableForm_0300 end";
+}
+
+/**
+ * @tc.number: AddForm_0100
+ * @tc.name: AddForm
+ * @tc.desc: form callback is not nullptr.
+ */
+HWTEST_F(FmsFormHostClientTest, AddForm_0100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest AddForm_0100 start";
+    sptr<FormHostClient> formHostClient = FormHostClient::GetInstance();
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = 1;
+    formJsInfo.uiSyntax = FormType::ETS;
+    std::shared_ptr<FormCallbackInterface> formCallback = std::make_shared<FormCallback>();
+    ASSERT_NE(nullptr, formCallback);
+    formHostClient->AddForm(formCallback, formJsInfo);
+    EXPECT_EQ(
+        formHostClient->formCallbackMap_.find(formJsInfo.formId) != formHostClient->formCallbackMap_.end(), true);
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest AddForm_0100 end";
+}
+
+/**
+ * @tc.number: AddForm_0200
+ * @tc.name: AddForm
+ * @tc.desc: form callback is nullptr, verify AddForm failed.
+ */
+HWTEST_F(FmsFormHostClientTest, AddForm_0200, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest AddForm_0200 start";
+    sptr<FormHostClient> formHostClient = FormHostClient::GetInstance();
+    std::shared_ptr<FormCallbackInterface> formCallback = nullptr;
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = -1;
+    formHostClient->AddForm(formCallback, formJsInfo);
+    EXPECT_EQ(
+        formHostClient->formCallbackMap_.find(formJsInfo.formId) == formHostClient->formCallbackMap_.end(), true);
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest AddForm_0200 end";
 }
 }

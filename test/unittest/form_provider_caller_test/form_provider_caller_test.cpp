@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -264,5 +264,54 @@ HWTEST_F(FormProviderCallerTest, FormProviderCallerTest_0009, TestSize.Level1) {
     FormProviderCaller formProviderCaller(nullptr);
     EXPECT_EQ(formProviderCaller.OnAcquire(formJsInfo, nullptr), ERR_APPEXECFWK_FORM_COMMON_CODE);
     GTEST_LOG_(INFO) << "FormProviderCallerTest_0009 test ends";
+}
+
+/**
+ * @tc.name: FormProviderCallerTest_0010
+ * @tc.desc: text IsSameToken function and callerToken_ is nullptr .
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormProviderCallerTest, FormProviderCallerTest_0010, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormProviderCallerTest_0010 starts";
+    FormProviderCaller formProviderCaller(nullptr);
+    auto result = formProviderCaller.IsSameToken(nullptr);
+    EXPECT_EQ(result, true);
+    GTEST_LOG_(INFO) << "FormProviderCallerTest_0010 test ends";
+}
+
+/**
+ * @tc.name: FormProviderCallerTest_0011
+ * @tc.desc: text DeleteForm function and callerToken is not nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormProviderCallerTest, FormProviderCallerTest_0011, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormProviderCallerTest_0011 starts";
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = 5;
+    FormProviderCaller formProviderCaller(nullptr);
+    formProviderCaller.AddForm(formJsInfo);
+    EXPECT_EQ(
+        formProviderCaller.formJsInfoMap_.find(formJsInfo.formId) != formProviderCaller.formJsInfoMap_.end(), true);
+    formProviderCaller.DeleteForm(formJsInfo.formId);
+    EXPECT_EQ(
+        formProviderCaller.formJsInfoMap_.find(formJsInfo.formId) == formProviderCaller.formJsInfoMap_.end(), true);
+    GTEST_LOG_(INFO) << "FormProviderCallerTest_0011 test ends";
+}
+
+/**
+ * @tc.name: FormHostCallerTest_0005
+ * @tc.desc: text IsSameToken function and callerToken_ is nullptr .
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormProviderCallerTest, FormHostCallerTest_0005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormHostCallerTest_0005 starts";
+    FormJsInfo formJsInfo;
+    FormHostCaller formHostCaller(formJsInfo, nullptr);
+    auto result = formHostCaller.IsSameToken(nullptr);
+    EXPECT_EQ(result, true);
+    GTEST_LOG_(INFO) << "FormHostCallerTest_0005 test ends";
 }
 } // namespace
