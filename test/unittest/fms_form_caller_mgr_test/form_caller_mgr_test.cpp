@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -348,6 +348,42 @@ HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0017, TestSize.Level1) {
     formCallerMgr->HandleHostCallBackDiedTask(providerToken);
     formCallerMgr->HandleProviderCallBackDiedTask(providerToken);
     GTEST_LOG_(INFO) << "FormCallerMgrTest_0017 test ends";
+}
+
+/**
+ * @tc.name: FormCallerMgrTest_0018
+ * @tc.desc: test GetFormHostCaller function and formId is null
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0018, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormCallerMgrTest_0018 starts";
+    std::shared_ptr<FormCallerMgr> formCallerMgr = std::make_shared<FormCallerMgr>();
+    ASSERT_NE(nullptr, formCallerMgr);
+    auto ret = formCallerMgr->GetFormHostCaller(-5);
+    EXPECT_EQ(ret, nullptr);
+    GTEST_LOG_(INFO) << "FormCallerMgrTest_0018 test ends";
+}
+
+/**
+ * @tc.name: FormCallerMgrTest_0019
+ * @tc.desc: test GetFormHostCaller function and formId is not null
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0019, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormCallerMgrTest_0019 starts";
+    std::shared_ptr<FormCallerMgr> formCallerMgr = std::make_shared<FormCallerMgr>();
+    ASSERT_NE(nullptr, formCallerMgr);
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = 4;
+    std::shared_ptr<FormHostCaller> caller = std::make_shared<FormHostCaller>(formJsInfo, nullptr);
+    ASSERT_NE(nullptr, caller);
+    formCallerMgr->formHostCallers_[formJsInfo.formId] = caller;
+    std::shared_ptr<FormHostCaller> ret = formCallerMgr->GetFormHostCaller(formJsInfo.formId);
+    ASSERT_EQ(ret, caller);
+    formCallerMgr->RemoveFormHostCaller(formJsInfo.formId);
+    GTEST_LOG_(INFO) << "FormCallerMgrTest_0019 test ends";
 }
 
 /**
