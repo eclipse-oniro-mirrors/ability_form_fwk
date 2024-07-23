@@ -49,6 +49,7 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     FormProviderData formProviderData;
     formProviderCaller.UpdateForm(formId, formProviderData);
     formProviderCaller.UpdateForm(formJsInfo);
+    formProviderCaller.AddForm(formJsInfo);
     formProviderCaller.DeleteForm(formId);
     return formProviderCaller.HasForm(formId);
 }

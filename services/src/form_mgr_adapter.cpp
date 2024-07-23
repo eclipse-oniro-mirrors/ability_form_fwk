@@ -1427,14 +1427,15 @@ ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
     record.formLocation = info.GetFormLocation();
 
     // ark ts form can only exist with one form host
+    int32_t callingUid = IPCSkeleton::GetCallingUid();
     if (info.GetUiSyntax() == FormType::ETS &&
-        !FormDbCache::GetInstance().IsHostOwner(formId, IPCSkeleton::GetCallingUid())) {
+        !FormDbCache::GetInstance().IsHostOwner(formId, callingUid)) {
         HILOG_ERROR("the specified form id does not exist in caller. formId: %{public}s.",
             std::to_string(formId).c_str());
         return ERR_APPEXECFWK_FORM_CFG_NOT_MATCH_ID;
     }
 
-    int32_t currentUserId = FormUtil::GetCurrentAccountId();
+    int32_t currentUserId = GetCurrentUserId(callingUid);
     if (hasRecord && (record.providerUserId == currentUserId)) {
         if (!info.IsMatch(record)) {
             HILOG_ERROR("%{public}s, formId and item info not match:%{public}" PRId64 "", __func__, formId);
@@ -1613,11 +1614,9 @@ ErrCode FormMgrAdapter::AddFormTimer(const FormRecord &formRecord)
             UpdateFormCloudUpdateDuration(formRecord.bundleName);
         }
         int64_t updateDuration = formRecord.updateDuration;
-        HILOG_INFO("Get form update duration start.");
         if (!GetValidFormUpdateDuration(formRecord.formId, updateDuration)) {
             HILOG_WARN("Get updateDuration failed, uses local configuration.");
         }
-        HILOG_INFO("Get form update duration end.");
         bool ret = FormTimerMgr::GetInstance().AddFormTimer(formRecord.formId,
             updateDuration, formRecord.providerUserId);
         return ret ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
@@ -3469,7 +3468,7 @@ bool FormMgrAdapter::GetValidFormUpdateDuration(const int64_t formId, int64_t &u
         updateDuration = formRecord.updateDuration;
         return true;
     }
-    HILOG_INFO("Get form cloud update duration from cache.");
+
     int duration = FormDataMgr::GetInstance().GetFormCloudUpdateDuration(formRecord.bundleName);
     if (duration == 0) {
         HILOG_INFO("No valid cloud update duration, uses local configuration.");

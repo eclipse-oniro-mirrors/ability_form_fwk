@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <chrono>
 #include <gtest/gtest.h>
 
 #include "form_constants.h"
@@ -25,6 +26,9 @@
 #include "gmock/gmock.h"
 #include "fms_log_wrapper.h"
 #include "mock_form_provider_client.h"
+#ifdef SUPPORT_POWER
+#include "power_mgr_client.h"
+#endif
 #include "want.h"
 
 using namespace testing::ext;
@@ -33,9 +37,10 @@ using namespace OHOS::AppExecFwk;
 using namespace OHOS::AppExecFwk::FormRender;
 
 namespace {
-    constexpr int32_t RENDER_FORM_FAILED = -1;
-    constexpr int32_t RELOAD_FORM_FAILED = -1;
-}
+constexpr int32_t RENDER_FORM_FAILED = -1;
+constexpr int32_t RELOAD_FORM_FAILED = -1;
+constexpr int32_t RECYCLE_FORM_FAILED = -1;
+} // namespace
 
 class FormRenderImplTest : public testing::Test {
 public:
@@ -410,4 +415,480 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_015, TestSize.Level0)
     formSupplyClient = nullptr;
     formRenderImpl.SetConfiguration(configuration);
     GTEST_LOG_(INFO) << "FormRenderImplTest_015 end";
+}
+
+/**
+ * @tc.name: FormRenderImplTest_016
+ * @tc.desc: 1.Verify OnConfigurationUpdated interface executes as expected.
+ *           2.call OnConfigurationUpdated
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_016, TestSize.Level0)
+{
+    FormRenderImpl formRenderImpl;
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration = std::make_shared<Configuration>();
+    EXPECT_FALSE(formRenderImpl.configuration_);
+    formRenderImpl.OnConfigurationUpdated(configuration);
+    EXPECT_TRUE(formRenderImpl.configuration_);
+}
+
+/**
+ * @tc.name: FormRenderImplTest_017
+ * @tc.desc: 1.Verify OnConfigurationUpdated interface executes as expected.
+ *           2.call OnConfigurationUpdated
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_017, TestSize.Level0)
+{
+    FormRenderImpl formRenderImpl;
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration = std::make_shared<Configuration>();
+
+    formRenderImpl.configUpdateTime_ = std::chrono::steady_clock::now();
+    formRenderImpl.OnConfigurationUpdated(configuration);
+#ifdef SUPPORT_POWER
+    bool screenOnFlag = PowerMgr::PowerMgrClient::GetInstance().IsScreenOn();
+    if (!screenOnFlag) {
+        EXPECT_EQ(0, formRenderImpl.serialQueue_->taskMap_.size());
+        EXPECT_TRUE(formRenderImpl.hasCachedConfig_);
+    } else {
+        EXPECT_EQ(1, formRenderImpl.serialQueue_->taskMap_.size());
+    }
+#endif
+}
+
+/**
+ * @tc.name: FormRenderImplTest_018
+ * @tc.desc: 1.Verify OnConfigurationUpdated interface executes as expected.
+ *           2.call OnConfigurationUpdated
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_018, TestSize.Level0)
+{
+    FormRenderImpl formRenderImpl;
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration = std::make_shared<Configuration>();
+
+    formRenderImpl.configUpdateTime_ =
+        std::chrono::steady_clock::now() - std::chrono::milliseconds(3000);
+    formRenderImpl.OnConfigurationUpdated(configuration);
+    EXPECT_EQ(0, formRenderImpl.serialQueue_->taskMap_.size());
+}
+
+/**
+ * @tc.name: FormRenderImplTest_019
+ * @tc.desc: 1.Verify OnConfigurationUpdated interface executes as expected.
+ *           2.call OnConfigurationUpdated
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_019, TestSize.Level0)
+{
+    FormRenderImpl formRenderImpl;
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration;
+
+    EXPECT_FALSE(formRenderImpl.configuration_);
+    formRenderImpl.SetConfiguration(configuration);
+    EXPECT_FALSE(formRenderImpl.configuration_);
+    configuration = std::make_shared<Configuration>();
+    formRenderImpl.OnConfigurationUpdated(configuration);
+    EXPECT_TRUE(formRenderImpl.configuration_);
+}
+
+/**
+ * @tc.name: FormRenderImplTest_020
+ * @tc.desc: 1.Verify SetConfiguration interface executes as expected.
+ *           2.call SetConfiguration
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_020, TestSize.Level0)
+{
+    FormRenderImpl formRenderImpl;
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration = std::make_shared<Configuration>();
+    EXPECT_FALSE(formRenderImpl.configuration_);
+    formRenderImpl.SetConfiguration(configuration);
+    EXPECT_TRUE(formRenderImpl.configuration_);
+}
+
+/**
+ * @tc.name: FormRenderImplTest_021
+ * @tc.desc: 1.Verify SetConfiguration interface executes as expected.
+ *           2.call SetConfiguration
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_021, TestSize.Level0)
+{
+    FormRenderImpl formRenderImpl;
+    formRenderImpl.configuration_ = std::make_shared<Configuration>();
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration = std::make_shared<Configuration>();
+
+    formRenderImpl.configuration_->AddItem("ohos.system.colorMode", "rgb");
+
+    formRenderImpl.SetConfiguration(configuration);
+    EXPECT_TRUE(formRenderImpl.configuration_);
+    EXPECT_EQ(formRenderImpl.configuration_->GetItem("ohos.system.colorMode"), "rgb");
+}
+
+/**
+ * @tc.name: FormRenderImplTest_022
+ * @tc.desc: 1.Verify SetConfiguration interface executes as expected.
+ *           2.call SetConfiguration
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_022, TestSize.Level0)
+{
+    FormRenderImpl formRenderImpl;
+    int64_t formId{ -1 };
+    std::string compId{ "1" };
+    std::string uid{ "202410101010" };
+    EXPECT_EQ(formRenderImpl.ReleaseRenderer(formId, compId, uid), ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+}
+
+/**
+ * @tc.name: FormRenderImplTest_023
+ * @tc.desc: 1.Verify SetConfiguration interface executes as expected.
+ *           2.call SetConfiguration
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_023, TestSize.Level0)
+{
+    FormRenderImpl formRenderImpl;
+    int64_t formId{ 15 };
+    std::string compId{ "" };
+    std::string uid{ "202410101010" };
+    EXPECT_EQ(formRenderImpl.ReleaseRenderer(formId, compId, uid), ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+}
+
+/**
+ * @tc.name: FormRenderImplTest_024
+ * @tc.desc: 1.Verify SetConfiguration interface executes as expected.
+ *           2.call SetConfiguration
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_024, TestSize.Level0)
+{
+    FormRenderImpl formRenderImpl;
+    int64_t formId{ 15 };
+    std::string compId{ "15" };
+    std::string uid{ "" };
+    EXPECT_EQ(formRenderImpl.ReleaseRenderer(formId, compId, uid), ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+}
+
+/**
+ * @tc.name: FormRenderImplTest_025
+ * @tc.desc: 1.Verify SetConfiguration interface executes as expected.
+ *           2.call SetConfiguration
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_025, TestSize.Level0)
+{
+    FormRenderImpl formRenderImpl;
+    int64_t formId{ 15 };
+    std::string compId{ "15" };
+    std::string uid{ "202410101010" };
+    EXPECT_EQ(formRenderImpl.ReleaseRenderer(formId, compId, uid), RENDER_FORM_FAILED);
+}
+
+/**
+ * @tc.name: FormRenderImplTest_026
+ * @tc.desc: 1.Verify SetConfiguration interface executes as expected.
+ *           2.call SetConfiguration
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_026, TestSize.Level0)
+{
+    FormRenderImpl formRenderImpl;
+    int64_t formId{ 15 };
+    std::string compId{ "15" };
+    std::string uid{ "202410101010" };
+    formRenderImpl.renderRecordMap_.emplace(uid, nullptr);
+    EXPECT_EQ(formRenderImpl.ReleaseRenderer(formId, compId, uid), RENDER_FORM_FAILED);
+}
+
+/**
+ * @tc.name: FormRenderImplTest_027
+ * @tc.desc: 1.Verify SetConfiguration interface executes as expected.
+ *           2.call SetConfiguration
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_027, TestSize.Level0)
+{
+    FormRenderImpl formRenderImpl;
+    int64_t formId{ 15 };
+    std::string compId{ "15" };
+    std::string uid{ "202410101010" };
+
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", uid);
+    formRenderImpl.renderRecordMap_.emplace(uid, formRenderRecord);
+    EXPECT_EQ(formRenderImpl.ReleaseRenderer(formId, compId, uid), ERR_OK);
+}
+
+/**
+ * @tc.name: FormRenderImplTest_028
+ * @tc.desc: 1.Verify OnUnlock interface executes as expected.
+ *           2.call OnUnlock
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_028, TestSize.Level0)
+{
+    FormRenderImpl formRenderImpl;
+    EXPECT_EQ(formRenderImpl.OnUnlock(), ERR_OK);
+}
+
+/**
+ * @tc.name: FormRenderImplTest_029
+ * @tc.desc: 1.Verify OnUnlock interface executes as expected.
+ *           2.call OnUnlock
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_029, TestSize.Level0)
+{
+    FormRenderImpl formRenderImpl;
+    formRenderImpl.isVerified_ = true;
+    EXPECT_EQ(formRenderImpl.OnUnlock(), ERR_OK);
+}
+
+/**
+ * @tc.name: FormRenderImplTest_030
+ * @tc.desc: 1.Verify RecycleForm interface executes as expected.
+ *           2.call RecycleForm
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_030, TestSize.Level0)
+{
+    FormRenderImpl formRenderImpl;
+    int64_t formId{ 0 };
+    Want want;
+
+    EXPECT_EQ(formRenderImpl.RecycleForm(formId, want), ERR_APPEXECFWK_FORM_INVALID_FORM_ID);
+}
+
+/**
+ * @tc.name: FormRenderImplTest_031
+ * @tc.desc: 1.Verify RecycleForm interface executes as expected.
+ *           2.call RecycleForm
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_031, TestSize.Level0)
+{
+    FormRenderImpl formRenderImpl;
+    int64_t formId{ 3 };
+    Want want;
+
+    EXPECT_EQ(formRenderImpl.RecycleForm(formId, want), ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+}
+
+/**
+ * @tc.name: FormRenderImplTest_032
+ * @tc.desc: 1.Verify RecycleForm interface executes as expected.
+ *           2.call RecycleForm
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_032, TestSize.Level0)
+{
+    FormRenderImpl formRenderImpl;
+    int64_t formId{ 3 };
+    std::string uid{ "202410101010" };
+    Want want;
+    want.SetParam(Constants::FORM_SUPPLY_UID, uid);
+    EXPECT_EQ(formRenderImpl.RecycleForm(formId, want), RECYCLE_FORM_FAILED);
+}
+
+/**
+ * @tc.name: FormRenderImplTest_033
+ * @tc.desc: 1.Verify RecycleForm interface executes as expected.
+ *           2.call RecycleForm
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_033, TestSize.Level0)
+{
+    FormRenderImpl formRenderImpl;
+    int64_t formId{ 3 };
+    Want want;
+    std::string uid{ "202410101010" };
+    want.SetParam(Constants::FORM_SUPPLY_UID, uid);
+    formRenderImpl.renderRecordMap_.emplace("2024101010", nullptr);
+    EXPECT_EQ(formRenderImpl.RecycleForm(formId, want), RECYCLE_FORM_FAILED);
+}
+
+/**
+ * @tc.name: FormRenderImplTest_034
+ * @tc.desc: 1.Verify RecycleForm interface executes as expected.
+ *           2.call RecycleForm
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_034, TestSize.Level0)
+{
+    FormRenderImpl formRenderImpl;
+    int64_t formId{ 3 };
+    Want want;
+    std::string uid{ "202410101010" };
+    want.SetParam(Constants::FORM_SUPPLY_UID, uid);
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "2024101010");
+    formRenderImpl.renderRecordMap_.emplace("2024101010", formRenderRecord);
+    EXPECT_EQ(formRenderImpl.RecycleForm(formId, want), RECYCLE_FORM_FAILED);
+}
+
+/**
+ * @tc.name: FormRenderImplTest_035
+ * @tc.desc: 1.Verify RecycleForm interface executes as expected.
+ *           2.call RecycleForm
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_035, TestSize.Level0)
+{
+    FormRenderImpl formRenderImpl;
+    int64_t formId{ 3 };
+    Want want;
+    std::string uid{ "202410101010" };
+    want.SetParam(Constants::FORM_SUPPLY_UID, uid);
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", uid);
+    EXPECT_TRUE(formRenderRecord);
+    formRenderImpl.renderRecordMap_.emplace(uid, formRenderRecord);
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormSupplyStub();
+    sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
+    EXPECT_TRUE(formSupplyClient);
+    formRenderImpl.formSupplyClient_ = formSupplyClient;
+    EXPECT_EQ(formRenderImpl.RecycleForm(formId, want), ERR_OK);
+}
+
+/**
+ * @tc.name: FormRenderImplTest_036
+ * @tc.desc: 1.Verify RecoverForm interface executes as expected.
+ *           2.call RecoverForm
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_036, TestSize.Level0)
+{
+    FormRenderImpl formRenderImpl;
+    int64_t formId{ 0 };
+    Want want;
+    FormJsInfo info;
+    info.formId = formId;
+    EXPECT_EQ(formRenderImpl.RecoverForm(info, want), ERR_APPEXECFWK_FORM_INVALID_FORM_ID);
+}
+
+/**
+ * @tc.name: FormRenderImplTest_037
+ * @tc.desc: 1.Verify RecoverForm interface executes as expected.
+ *           2.call RecoverForm
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_037, TestSize.Level0)
+{
+    FormRenderImpl formRenderImpl;
+    int64_t formId{ 3 };
+    Want want;
+    FormJsInfo info;
+    info.formId = formId;
+    EXPECT_EQ(formRenderImpl.RecoverForm(info, want), ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+}
+
+/**
+ * @tc.name: FormRenderImplTest_038
+ * @tc.desc: 1.Verify RecoverForm interface executes as expected.
+ *           2.call RecoverForm
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_038, TestSize.Level0)
+{
+    FormRenderImpl formRenderImpl;
+    int64_t formId{ 3 };
+    Want want;
+    std::string uid{ "202410101010" };
+    want.SetParam(Constants::FORM_SUPPLY_UID, uid);
+    FormJsInfo info;
+    info.formId = formId;
+    EXPECT_EQ(formRenderImpl.RecoverForm(info, want), RENDER_FORM_FAILED);
+}
+
+/**
+ * @tc.name: FormRenderImplTest_039
+ * @tc.desc: 1.Verify RecoverForm interface executes as expected.
+ *           2.call RecoverForm
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_039, TestSize.Level0)
+{
+    FormRenderImpl formRenderImpl;
+    int64_t formId{ 3 };
+    Want want;
+    FormJsInfo info;
+    info.formId = formId;
+    std::string uid{ "202410101010" };
+    want.SetParam(Constants::FORM_SUPPLY_UID, uid);
+    std::string val{ "non" };
+    want.SetParam(Constants::FORM_STATUS_DATA, val);
+    formRenderImpl.renderRecordMap_.emplace("2024101010", nullptr);
+    EXPECT_EQ(formRenderImpl.RecoverForm(info, want), RECYCLE_FORM_FAILED);
+}
+
+/**
+ * @tc.name: FormRenderImplTest_040
+ * @tc.desc: 1.Verify RecoverForm interface executes as expected.
+ *           2.call RecoverForm
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_040, TestSize.Level0)
+{
+    FormRenderImpl formRenderImpl;
+    int64_t formId{ 3 };
+    Want want;
+    FormJsInfo info;
+    info.formId = formId;
+    std::string uid{ "202410101010" };
+    want.SetParam(Constants::FORM_SUPPLY_UID, uid);
+    std::string val{ "non" };
+    want.SetParam(Constants::FORM_STATUS_DATA, val);
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", uid);
+    formRenderImpl.renderRecordMap_.emplace(uid, formRenderRecord);
+    EXPECT_EQ(formRenderImpl.RecoverForm(info, want), ERR_OK);
+}
+
+/**
+ * @tc.name: FormRenderImplTest_041
+ * @tc.desc: 1.Verify ConfirmUnlockState interface executes as expected.
+ *           2.call ConfirmUnlockState
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_041, TestSize.Level0)
+{
+    FormRenderImpl formRenderImpl;
+    formRenderImpl.isVerified_ = true;
+    Want want;
+    formRenderImpl.ConfirmUnlockState(want);
+
+    auto param = want.GetBoolParam(Constants::FORM_RENDER_STATE, false);
+    EXPECT_TRUE(param);
+}
+
+/**
+ * @tc.name: FormRenderImplTest_042
+ * @tc.desc: 1.Verify ConfirmUnlockState interface executes as expected.
+ *           2.call ConfirmUnlockState
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_042, TestSize.Level0)
+{
+    FormRenderImpl formRenderImpl;
+    EXPECT_FALSE(formRenderImpl.isVerified_);
+    Want want;
+    want.SetParam(Constants::FORM_RENDER_STATE, true);
+    formRenderImpl.ConfirmUnlockState(want);
+
+    EXPECT_TRUE(formRenderImpl.isVerified_);
+}
+
+/**
+ * @tc.name: RunCachedConfigurationUpdatedTest_001
+ * @tc.desc: Verify RunCachedConfigurationUpdated interface executes as expected.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderImplTest, RunCachedConfigurationUpdatedTest_001, TestSize.Level0)
+{
+    FormRenderImpl formRenderImpl;
+    formRenderImpl.configuration_ = std::make_shared<Configuration>();
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration = std::make_shared<Configuration>();
+    formRenderImpl.configuration_->AddItem("ohos.system.colorMode", "dark");
+    formRenderImpl.hasCachedConfig_ = true;
+
+    formRenderImpl.RunCachedConfigurationUpdated();
+    EXPECT_FALSE(formRenderImpl.hasCachedConfig_);
 }

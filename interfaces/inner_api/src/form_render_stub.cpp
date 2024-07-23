@@ -61,6 +61,9 @@ int FormRenderStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageP
             return HandleRecycleForm(data, reply);
         case static_cast<uint32_t>(IFormRender::Message::FORM_RECOVER_FORM):
             return HandleRecoverForm(data, reply);
+        case static_cast<uint32_t>(IFormRender::Message::FORM_RUN_CACHED_CONFIG):
+            RunCachedConfigurationUpdated();
+            return ERR_OK;
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }

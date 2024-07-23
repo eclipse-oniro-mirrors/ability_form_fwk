@@ -159,13 +159,13 @@ void FormReport::SetDurationEndTime(int64_t formId, int64_t endTime)
 
 void FormReport::InsertFormId(int64_t formId)
 {
-    if (FormIds.find(formId) == FormIds.end()) {
-        FormIds.insert(formId);
-    }
+    std::lock_guard<std::mutex> guard(formIdsMutex_);
+    FormIds.insert(formId);
 }
 
 void FormReport::RemoveFormId(int64_t formId)
 {
+    std::lock_guard<std::mutex> guard(formIdsMutex_);
     if (FormIds.find(formId) != FormIds.end()) {
         FormIds.erase(formId);
     }
@@ -206,7 +206,7 @@ void FormReport::HandleAddFormStatistic(int64_t formId)
     eventInfo.acquireDuration = (record.endAquireTime_ - record.startAquireTime_);
     FormEventReport::SendFirstAddFormEvent(FormEventName::FIRST_ADD_FORM_DURATION,
         HiSysEventType::STATISTIC, eventInfo);
-    FormIds.insert(formId);
+    InsertFormId(formId);
 }
 
 void FormReport::HandleFirstUpdateStatistic(int64_t formId)

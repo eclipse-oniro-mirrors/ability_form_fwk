@@ -20,6 +20,7 @@
 
 #include "fms_log_wrapper.h"
 #include "form_bms_helper.h"
+#include "form_bundle_forbid_mgr.h"
 #include "form_cache_mgr.h"
 #include "form_constants.h"
 #include "form_data_proxy_mgr.h"
@@ -2405,7 +2406,7 @@ ErrCode FormDataMgr::GetRunningFormInfosByBundleName(
 void FormDataMgr::UpdateFormCloudUpdateDuration(const std::string &bundleName, int duration)
 {
     HILOG_INFO("bundleName:%{public}s, duration:%{public}d", bundleName.c_str(), duration);
-    std::unique_lock<std::shared_mutex> lock(formCloudUpdateDurationMapMutex_);
+    std::lock_guard<std::mutex> lock(formCloudUpdateDurationMapMutex_);
     auto iter = formCloudUpdateDurationMap_.find(bundleName);
     if (iter != formCloudUpdateDurationMap_.end()) {
         iter->second = duration;
@@ -2417,7 +2418,7 @@ void FormDataMgr::UpdateFormCloudUpdateDuration(const std::string &bundleName, i
 void FormDataMgr::RemoveFormCloudUpdateDuration(const std::string &bundleName)
 {
     HILOG_DEBUG("Called.");
-    std::unique_lock<std::shared_mutex> lock(formCloudUpdateDurationMapMutex_);
+    std::lock_guard<std::mutex> lock(formCloudUpdateDurationMapMutex_);
     auto iter = formCloudUpdateDurationMap_.find(bundleName);
     if (iter != formCloudUpdateDurationMap_.end()) {
         HILOG_INFO("bundleName:%{public}s", bundleName.c_str());
@@ -2429,20 +2430,19 @@ int FormDataMgr::GetFormCloudUpdateDuration(const std::string &bundleName) const
 {
     HILOG_DEBUG("Called.");
     int duration = 0;
-    std::shared_lock<std::shared_mutex> lock(formCloudUpdateDurationMapMutex_);
+    std::lock_guard<std::mutex> lock(formCloudUpdateDurationMapMutex_);
     auto iter = formCloudUpdateDurationMap_.find(bundleName);
     if (iter != formCloudUpdateDurationMap_.end()) {
         duration = iter->second;
         HILOG_INFO("%{public}s has form cloud update duration:%{public}d.", bundleName.c_str(), duration);
     }
-    HILOG_INFO("End.");
     return duration;
 }
 
 bool FormDataMgr::HasFormCloudUpdateDuration(const std::string &bundleName) const
 {
     HILOG_DEBUG("Called.");
-    std::shared_lock<std::shared_mutex> lock(formCloudUpdateDurationMapMutex_);
+    std::lock_guard<std::mutex> lock(formCloudUpdateDurationMapMutex_);
     auto iter = formCloudUpdateDurationMap_.find(bundleName);
     if (iter != formCloudUpdateDurationMap_.end()) {
         HILOG_INFO("Has cloud update duration, bundleName: %{public}s", bundleName.c_str());
@@ -2474,8 +2474,11 @@ ErrCode FormDataMgr::GetRecordsByFormType(const int32_t formRefreshType,
     std::lock_guard<std::mutex> lock(formRecordMutex_);
     for (auto formRecord : formRecords_) {
         if (!FormTrustMgr::GetInstance().IsTrust(formRecord.second.bundleName)) {
-            HILOG_ERROR("formId:%{public}" PRId64 ", %{public}s is unTrust.",
-                formRecord.first, formRecord.second.bundleName.c_str());
+            HILOG_ERROR("ignore, %{public}s is unTrust.", formRecord.second.bundleName.c_str());
+            continue;
+        }
+        if (FormBundleForbidMgr::GetInstance().IsBundleForbidden(formRecord.second.bundleName)) {
+            HILOG_ERROR("ignore, %{public}s is forbidden.", formRecord.second.bundleName.c_str());
             continue;
         }
         if (formRefreshType == Constants::REFRESH_APP_FORM) {

@@ -81,6 +81,7 @@ napi_value JsFormAgent::OnRequestPublishForm(napi_env env, size_t argc, napi_val
     auto apiResult = std::make_shared<int32_t>();
     auto formId = std::make_shared<int64_t>();
     NapiAsyncTask::ExecuteCallback execute = [asyncCallbackInfo, cardId = formId, ret = apiResult]() {
+        asyncCallbackInfo->want.SetParam(IS_FORM_AGENT, true);
         *ret = FormMgr::GetInstance().RequestPublishForm(asyncCallbackInfo->want, false,
             asyncCallbackInfo->formProviderData, *cardId, asyncCallbackInfo->formDataProxies);
         if (*ret != ERR_OK) {

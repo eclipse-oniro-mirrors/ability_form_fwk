@@ -116,6 +116,7 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
         action != EventFwk::CommonEventSupport::COMMON_EVENT_BUNDLE_SCAN_FINISHED &&
         action != EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED &&
         action != EventFwk::CommonEventSupport::COMMON_EVENT_USER_UNLOCKED &&
+        action != EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON &&
         action != EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED) {
         HILOG_ERROR("%{public}s failed, invalid param, action: %{public}s, bundleName: %{public}s",
             __func__, action.c_str(), bundleName.c_str());
@@ -145,6 +146,8 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_USER_UNLOCKED) {
         // el2 path is unlocked when receive USER_UNLOCKED
         HandleUserUnlocked();
+    } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
+        HandleScreenOn();
     } else {
         HILOG_WARN("%{public}s warnning, invalid action.", __func__);
     }
@@ -223,6 +226,18 @@ void FormSysEventReceiver::HandleUserSwitched(const EventFwk::CommonEventData &e
 
     serialQueue_->ScheduleTask(0, [userId]() {
         FormInfoMgr::GetInstance().ReloadFormInfos(userId);
+    });
+}
+
+void FormSysEventReceiver::HandleScreenOn()
+{
+    if (!serialQueue_) {
+        HILOG_ERROR("serialQueue is nullptr");
+        return;
+    }
+
+    serialQueue_->ScheduleTask(0, []() {
+        FormRenderMgr::GetInstance().NotifyScreenOn();
     });
 }
 }  // namespace AppExecFwk

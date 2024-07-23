@@ -18,16 +18,22 @@
 #include <cstddef>
 #include <cstdint>
 
+#define private public
+#define protected public
 #include "form_mgr_stub.h"
+#undef private
+#undef protected
 #include "message_parcel.h"
 #include "securec.h"
 
 using namespace OHOS::AppExecFwk;
 
-#define DISABLE_FUZZ
 namespace OHOS {
 constexpr size_t FOO_MAX_LEN = 1024;
 constexpr size_t U32_AT_SIZE = 4;
+constexpr size_t MESSAGE_BASE = 3001;
+constexpr size_t MESSAGE_MAX = 3077;
+constexpr size_t MESSAGE_RANGE = 77;
 const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.appexecfwk.FormMgr";
 
 class FormMgrStubFuzzTest : public FormMgrStub {
@@ -261,6 +267,86 @@ public:
     }
 };
 
+void HandleFormMessage(std::shared_ptr<FormMgrStub> formMgrStub, MessageParcel &data, MessageParcel &reply)
+{
+    if (formMgrStub == nullptr) {
+        return;
+    }
+    formMgrStub->HandleRegisterFormRemoveObserverByBundle(data, reply);
+    formMgrStub->HandleGetFormsCount(data, reply);
+    formMgrStub->HandleGetHostFormsCount(data, reply);
+    formMgrStub->HandleGetRunningFormInfos(data, reply);
+    formMgrStub->HandleGetRunningFormInfosByBundleName(data, reply);
+    formMgrStub->HandleGetFormInstanceById(data, reply);
+    formMgrStub->HandleGetAllFormsInfo(data, reply);
+    formMgrStub->HandleGetFormsInfoByApp(data, reply);
+    formMgrStub->HandleGetFormsInfoByModule(data, reply);
+    formMgrStub->HandleIsRequestPublishFormSupported(data, reply);
+    formMgrStub->HandleShareForm(data, reply);
+    formMgrStub->HandleCheckFMSReady(data, reply);
+    formMgrStub->HandleDeleteForm(data, reply);
+    formMgrStub->HandleStopRenderingForm(data, reply);
+    formMgrStub->HandleReleaseForm(data, reply);
+    formMgrStub->HandleSetNextRefreshTime(data, reply);
+    formMgrStub->HandleLifecycleUpdate(data, reply);
+    formMgrStub->HandleRequestForm(data, reply);
+    formMgrStub->HandleNotifyWhetherVisibleForms(data, reply);
+    formMgrStub->HandleCastTempForm(data, reply);
+    formMgrStub->HandleDumpFormInfoByBundleName(data, reply);
+    formMgrStub->HandleDumpFormInfoByFormId(data, reply);
+    formMgrStub->HandleDumpFormTimerByFormId(data, reply);
+    formMgrStub->HandleDeleteInvalidForms(data, reply);
+    formMgrStub->HandleNotifyFormsVisible(data, reply);
+    formMgrStub->HandleNotifyFormsPrivacyProtected(data, reply);
+    formMgrStub->HandleNotifyFormsEnableUpdate(data, reply);
+    formMgrStub->HandleRegisterFormAddObserverByBundle(data, reply);
+    formMgrStub->HandleAddForm(data, reply);
+    formMgrStub->HandleUpdateForm(data, reply);
+    formMgrStub->HandleRequestPublishForm(data, reply);
+    formMgrStub->HandleMessageEvent(data, reply);
+    formMgrStub->HandleBackgroundEvent(data, reply);
+    formMgrStub->HandleRouterEvent(data, reply);
+    formMgrStub->HandleAcquireFormState(data, reply);
+    formMgrStub->HandleGetFormsInfo(data, reply);
+    formMgrStub->HandleStartAbility(data, reply);
+    formMgrStub->HandleRecvFormShareInfoFromRemote(data, reply);
+    formMgrStub->HandleAcquireFormData(data, reply);
+    formMgrStub->HandleGetFormInstancesByFilter(data, reply);
+}
+
+void HandleFormRequest(std::shared_ptr<FormMgrStub> formMgrStub, MessageParcel &data, MessageParcel &reply)
+{
+    if (formMgrStub == nullptr) {
+        return;
+    }
+    formMgrStub->HandleCreateForm(data, reply);
+    formMgrStub->HandleReleaseRenderer(data, reply);
+    formMgrStub->HandleSetPublishFormResult(data, reply);
+    formMgrStub->HandleAcquireAddFormResult(data, reply);
+    formMgrStub->HandleHasFormVisible(data, reply);
+    formMgrStub->HandleDumpStorageFormInfos(data, reply);
+    formMgrStub->HandleGetFormsInfoByFilter(data, reply);
+    formMgrStub->HandleIsSystemAppForm(data, reply);
+    formMgrStub->HandleRegisterAddObserver(data, reply);
+    formMgrStub->HandleRegisterRemoveObserver(data, reply);
+    formMgrStub->HandleRegisterFormRouterProxy(data, reply);
+    formMgrStub->HandleUnregisterFormRouterProxy(data, reply);
+    formMgrStub->HandleUpdateProxyForm(data, reply);
+    formMgrStub->HandleRequestPublishProxyForm(data, reply);
+    formMgrStub->HandleUnregisterPublishFormInterceptor(data, reply);
+    formMgrStub->HandleRegisterClickCallbackEventObserver(data, reply);
+    formMgrStub->HandleUnregisterClickCallbackEventObserver(data, reply);
+    std::vector<FormDataProxy> formDataProxies;
+    formMgrStub->ReadFormDataProxies(data, formDataProxies);
+    formMgrStub->HandleSetFormsRecyclable(data, reply);
+    formMgrStub->HandleRecoverForms(data, reply);
+    formMgrStub->HandleUpdateFormLocation(data, reply);
+    formMgrStub->HandleRequestPublishFormWithSnapshot(data, reply);
+    formMgrStub->HandleBatchRefreshForms(data, reply);
+    formMgrStub->HandleEnableForms(data, reply);
+    formMgrStub->HandleIsFormBundleForbidden(data, reply);
+}
+
 uint32_t GetU32Data(const char* ptr)
 {
     // 将第0个数字左移24位，将第1个数字左移16位，将第2个数字左移8位，第3个数字不左移
@@ -278,6 +364,20 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     MessageOption option;
     std::shared_ptr<FormMgrStub> formmgrstub = std::make_shared<FormMgrStubFuzzTest>();
     formmgrstub->OnRemoteRequest(code, datas, reply, option);
+    code = MESSAGE_BASE + code % MESSAGE_RANGE;
+    formmgrstub->OnRemoteRequest(code, datas, reply, option);
+    for (uint32_t code = MESSAGE_BASE; code < MESSAGE_MAX; code++) {
+        MessageParcel parcel;
+        parcel.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
+        parcel.WriteBuffer(data, size);
+        parcel.RewindRead(0);
+        MessageParcel reply;
+        MessageOption option;
+        std::shared_ptr<FormMgrStub> formMgrStub = std::make_shared<FormMgrStubFuzzTest>();
+        formMgrStub->OnRemoteRequest(code, parcel, reply, option);
+    }
+    HandleFormMessage(formmgrstub, datas, reply);
+    HandleFormRequest(formmgrstub, datas, reply);
     return true;
 }
 }
@@ -311,9 +411,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
         return 0;
     }
 
-#ifndef DISABLE_FUZZ
     OHOS::DoSomethingInterestingWithMyAPI(ch, size);
-#endif
     free(ch);
     ch = nullptr;
     return 0;

@@ -585,19 +585,25 @@ private:
         }
         convertArgc++;
 
-        NapiAsyncTask::CompleteCallback complete = [formId](napi_env env, NapiAsyncTask &task, int32_t status) {
-            auto ret = FormMgr::GetInstance().DeleteForm(formId, FormHostClient::GetInstance());
-            if (ret == ERR_OK) {
+        auto apiResult = std::make_shared<int32_t>();
+        NapiAsyncTask::ExecuteCallback execute = [formId, ret = apiResult]() {
+            *ret = FormMgr::GetInstance().DeleteForm(formId, FormHostClient::GetInstance());
+        };
+
+        NapiAsyncTask::CompleteCallback complete = [formId, ret = apiResult](napi_env env,
+            NapiAsyncTask &task, int32_t status) {
+            HILOG_INFO("deleteForm ret:%{public}d, formId:%{public}" PRId64, *ret, formId);
+            if (*ret == ERR_OK) {
                 task.ResolveWithNoError(env, CreateJsUndefined(env));
             } else {
-                task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
+                task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, *ret));
             }
         };
 
         napi_value lastParam = (argc <= convertArgc) ? nullptr : argv[convertArgc];
         napi_value result = nullptr;
         NapiAsyncTask::ScheduleWithDefaultQos("JsFormHost::OnDeleteForm",
-            env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
+            env, CreateAsyncTaskWithLastParam(env, lastParam, std::move(execute), std::move(complete), &result));
         return result;
     }
 

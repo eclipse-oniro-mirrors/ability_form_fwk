@@ -68,6 +68,7 @@ public:
 
 private:
     mutable std::mutex formReport_;
+    mutable std::mutex formIdsMutex_;
     std::unordered_map<int64_t, FormStatistic> formStatisticMap_;
     std::set<int64_t> FormIds;
 };

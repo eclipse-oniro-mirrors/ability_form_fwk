@@ -67,6 +67,8 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formShareMgr.IsShareForm(want);
     int64_t msg = static_cast<int64_t>(GetU32Data(data));
     formShareMgr.OnEventTimeoutResponse(msg, eventId);
+    formShareMgr.RecvFormShareInfoFromRemote(info);
+    formShareMgr.CheckFormPackage(info, formShareInfoKey);
     return true;
 }
 }

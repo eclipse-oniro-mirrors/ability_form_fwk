@@ -84,6 +84,8 @@ public:
 
     void SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration>& config);
 
+    void RunCachedConfigurationUpdated() override;
+
     int32_t ReleaseRenderer(
         int64_t formId, const std::string &compId, const std::string &uid) override;
 
@@ -107,6 +109,7 @@ private:
     std::mutex formSupplyMutex_;
     sptr<IFormSupply> formSupplyClient_;
     bool isVerified_ = false;
+    bool hasCachedConfig_ = false;
 };
 } // namespace FormRender
 } // namespace AppExecFwk
