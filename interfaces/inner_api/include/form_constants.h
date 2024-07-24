@@ -102,6 +102,8 @@ namespace Constants {
     // The default user id
     constexpr int32_t DEFAULT_USER_ID = 0;
 
+    constexpr int32_t DEFAULT_SANDBOX_FRS_APP_INDEX = 1001;
+
     // The invalid user id
     constexpr int32_t INVALID_USER_ID = -1;
 
