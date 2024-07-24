@@ -61,6 +61,9 @@ void FormRenderMgr::GetFormRenderState()
 
     std::lock_guard<std::mutex> lock(isVerifiedMutex_);
     isVerified_ = isVerified;
+    if (!isVerified) {
+        return;
+    }
     if (!isScreenUnlocked_) {
         PostOnUnlockTask();
     }
