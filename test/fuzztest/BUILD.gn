@@ -22,6 +22,7 @@ group("fuzztest") {
     "formabilityconnectionreporter_fuzzer:fuzztest",
     "formashmem_fuzzer:fuzztest",
     "formbmshelper_fuzzer:fuzztest",
+    "formbundleforbidmgr_fuzzer:fuzztest",
     "formcachemgr_fuzzer:fuzztest",
     "formcallermgr_fuzzer:fuzztest",
     "formdatamgr_fuzzer:fuzztest",
