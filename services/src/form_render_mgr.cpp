@@ -53,13 +53,14 @@ void FormRenderMgr::GetFormRenderState()
     // Check whether the account is authenticated.
     bool isVerified = false;
     AccountSA::OsAccountManager::IsOsAccountVerified(FormUtil::GetCurrentAccountId(), isVerified);
-    HILOG_INFO("isVerified:%{public}d, screen:%{public}d", isVerified, isScreenUnlocked_);
-    if (isVerified == isVerified_) {
+    HILOG_INFO("isVerified:%{public}d, isVerified_:%{public}d, screen:%{public}d",
+        isVerified, isVerified_, isScreenUnlocked_);
+    
+    std::lock_guard<std::mutex> lock(isVerifiedMutex_);
+    if (isVerified_ == isVerified) {
         return;
     }
-    HILOG_INFO("set isVerified");
 
-    std::lock_guard<std::mutex> lock(isVerifiedMutex_);
     isVerified_ = isVerified;
     if (!isVerified) {
         return;
