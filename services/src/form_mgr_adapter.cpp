@@ -3828,6 +3828,7 @@ int32_t FormMgrAdapter::EnableForms(const std::string bundleName, const bool ena
                 iter->isRefreshDuringDisableForm = false;
                 Want want;
                 want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
+                want.SetParam(Constants::RECREATE_FORM_KEY, true);
                 FormProviderMgr::GetInstance().RefreshForm(iter->formId, want, true);
             } else if (iter->isUpdateDuringDisableForm) {
                 iter->isUpdateDuringDisableForm = false;
