@@ -87,6 +87,7 @@ extern void MockGetAbilityInfoByActionAbilityInfo(bool mockRet);
 extern void MockGetAbilityInfoByActionExtensionInfo(bool mockRet);
 extern void MockGetRunningFormInfosByFormId(int32_t mockRet);
 extern void MockGetRunningFormInfos(int32_t mockRet);
+extern void MockGenerateFormId(bool mockRet);
 void MockRequestPublishFormToHost(bool mockRet);
 
 namespace {
@@ -2407,9 +2408,11 @@ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_234, TestSize.Level0)
     MockGetFormRecord(false);
     formMgrAdapter.UpdateForm(formId1, uid, formProviderData);
     MockRequestPublishFormToHost(false);
+    MockGenerateFormId(false);
     auto ret = formMgrAdapter.RequestPublishForm(want, withFormBindingData, formBindingData, formId1, formDataProxies);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, formMgrAdapter.CheckPublishForm(want));
     FormBmsHelper::GetInstance().iBundleMgr_ = backup;
+    MockGenerateFormId(true);
     GTEST_LOG_(INFO) << "FormMgrAdapter_234 end";
 }
 
