@@ -1180,7 +1180,6 @@ private:
      * @return Returns formrecord created.
      */
     FormRecord AllotThemeRecord(const Want &want, int64_t formId);
-
 #endif
 
     /**

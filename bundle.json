@@ -54,7 +54,6 @@
               "time_service",
               "device_usage_statistics",
               "ace_engine",
-              "memmgr_override",
               "memmgr",
               "init",
               "resource_schedule_service",
