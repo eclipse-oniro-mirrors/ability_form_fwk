@@ -367,8 +367,8 @@ int32_t FormSupplyProxy::OnRecycleForm(const int64_t &formId, const Want &want)
 
     MessageParcel reply;
     MessageOption option(MessageOption::TF_ASYNC);
-    int error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_RECYCLE_FORM),
+    int error = SendTransactCmd(
+        IFormSupply::Message::TRANSACTION_FORM_RECYCLE_FORM,
         data,
         reply,
         option);

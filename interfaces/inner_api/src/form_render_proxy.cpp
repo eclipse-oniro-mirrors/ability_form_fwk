@@ -275,14 +275,9 @@ int32_t FormRenderProxy::RecycleForm(const int64_t &formId, const Want &want)
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    if (!Remote()) {
-        HILOG_ERROR("Remote obj is nullptr");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-
     MessageParcel reply;
-    int32_t error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormRender::Message::FORM_RECYCLE_FORM),
+    int32_t error = SendTransactCmd(
+        IFormRender::Message::FORM_RECYCLE_FORM,
         data,
         reply,
         option);
@@ -311,14 +306,9 @@ int32_t FormRenderProxy::RecoverForm(const FormJsInfo &formJsInfo, const Want &w
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
-    if (!Remote()) {
-        HILOG_ERROR("Remote obj is nullptr");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-
     MessageParcel reply;
-    int32_t error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormRender::Message::FORM_RECOVER_FORM),
+    int32_t error = SendTransactCmd(
+        IFormRender::Message::FORM_RECOVER_FORM,
         data,
         reply,
         option);

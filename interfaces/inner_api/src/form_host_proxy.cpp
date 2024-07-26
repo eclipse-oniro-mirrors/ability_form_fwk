@@ -303,15 +303,9 @@ void FormHostProxy::OnRecycleForm(const int64_t &formId)
         return;
     }
 
-    auto remote = Remote();
-    if (remote == nullptr) {
-        HILOG_ERROR("remote is nullptr.");
-        return;
-    }
-
     MessageParcel reply;
-    int error = remote->SendRequest(
-        static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_RECYCLE_FORM),
+    int error = SendTransactCmd(
+        IFormHost::Message::FORM_HOST_ON_RECYCLE_FORM,
         data,
         reply,
         option);
@@ -340,15 +334,9 @@ void FormHostProxy::OnEnableForm(const std::vector<int64_t> &formIds, const bool
         return;
     }
 
-    auto remote = Remote();
-    if (remote == nullptr) {
-        HILOG_ERROR("remote is nullptr.");
-        return;
-    }
-
     MessageParcel reply;
-    int error = remote->SendRequest(
-        static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_ENABLE_FORM),
+    int error = SendTransactCmd(
+        IFormHost::Message::FORM_HOST_ON_ENABLE_FORM,
         data, reply, option);
     if (error != ERR_OK) {
         HILOG_ERROR("failed to SendRequest: %{public}d", error);
