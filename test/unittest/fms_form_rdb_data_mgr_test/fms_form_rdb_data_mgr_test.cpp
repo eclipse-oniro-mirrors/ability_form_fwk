@@ -21,6 +21,7 @@
 #undef private
 #include "form_mgr_errors.h"
 #include "form_constants.h"
+#include "form_util.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -342,6 +343,82 @@ HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_015, Function | SmallTest 
         Constants::FORM_RDB_NAME);
     auto result = rdbDataCallBack_.onCorruption(Constants::FORM_RDB_TABLE_NAME);
     EXPECT_EQ(result, NativeRdb::E_OK);
+}
+
+/**
+ * @tc.name: FmsFormRdbDataMgrTest_016
+ * @tc.desc: Test OnOpen
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_016, Function | SmallTest | Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_016 start";
+    if (rdbDataCallBack_ == nullptr) {
+        rdbDataCallBack_ = std::make_shared<RdbStoreDataCallBackFormInfoStorage>(
+        Constants::FORM_MANAGER_SERVICE_PATH + Constants::FORM_RDB_NAME);
+    }
+    ASSERT_NE(nullptr, rdbDataCallBack_);
+    auto result = rdbDataCallBack_->OnOpen(*(FormRdbDataMgr::GetInstance().rdbStore_.get()));
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_016 end";
+}
+
+/**
+ * @tc.name: FmsFormRdbDataMgrTest_017
+ * @tc.desc: Test InitFormRdbTable
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_017, Function | SmallTest | Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_017 start";
+    FormRdbTableConfig formRdbTableConfig;
+    formRdbTableConfig.tableName = "";
+    auto result = FormRdbDataMgr::GetInstance().InitFormRdbTable(formRdbTableConfig);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_017 end";
+}
+
+/**
+ * @tc.name: FmsFormRdbDataMgrTest_018
+ * @tc.desc: Test DeleteData
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_018, Function | SmallTest | Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_018 start";
+    std::string key = "testKey";
+    std::string tableName = "null";
+    auto result = FormRdbDataMgr::GetInstance().DeleteData(tableName, key);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_018 end";
+}
+
+/**
+ * @tc.name: FmsFormRdbDataMgrTest_019
+ * @tc.desc: Test CheckAndRebuildRdbStore
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_019, Function | SmallTest | Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_019 start";
+    auto result = FormRdbDataMgr::GetInstance().CheckAndRebuildRdbStore(NativeRdb::E_SQLITE_ERROR);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_019 end";
+}
+
+/**
+ * @tc.name: FmsFormRdbDataMgrTest_020
+ * @tc.desc: Test CheckAndRebuildRdbStore
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_020, Function | SmallTest | Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_020 start";
+    FormRdbDataMgr::GetInstance().lastRdbBuildTime_ = FormUtil::GetCurrentMillisecond();
+    auto result = FormRdbDataMgr::GetInstance().CheckAndRebuildRdbStore(NativeRdb::E_SQLITE_CORRUPT);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_RDB_REPEATED_BUILD);
+    FormRdbDataMgr::GetInstance().lastRdbBuildTime_ = 0;
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_020 end";
 }
 }
 }
