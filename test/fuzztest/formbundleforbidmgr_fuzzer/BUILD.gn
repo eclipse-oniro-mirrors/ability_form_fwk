@@ -59,6 +59,8 @@ ohos_fuzztest("FormBundleForbidMgrFuzzTest") {
     "form_fwk:form_manager",
     "hilog:libhilog",
     "ipc:ipc_core",
+    "relational_store:native_dataability",
+    "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
