@@ -55,7 +55,7 @@ void FormRenderMgr::GetFormRenderState()
     AccountSA::OsAccountManager::IsOsAccountVerified(FormUtil::GetCurrentAccountId(), isVerified);
     HILOG_INFO("isVerified:%{public}d, isVerified_:%{public}d, screen:%{public}d",
         isVerified, isVerified_, isScreenUnlocked_);
-    
+
     std::lock_guard<std::mutex> lock(isVerifiedMutex_);
     if (isVerified_ == isVerified) {
         return;
@@ -112,7 +112,8 @@ ErrCode FormRenderMgr::RenderForm(
 ErrCode FormRenderMgr::UpdateRenderingForm(int64_t formId, const FormProviderData &formProviderData,
     const WantParams &wantParams, bool mergeData)
 {
-    HILOG_INFO("formId:%{public}" PRId64, formId);
+    HILOG_INFO("update formId:%{public}" PRId64 ", %{public}zu", formId, formProviderData.GetDataString().length());
+
     FormRecord formRecord;
     bool isGetFormRecord = FormDataMgr::GetInstance().GetFormRecord(formId, formRecord);
     if (!isGetFormRecord) {
