@@ -1706,10 +1706,10 @@ ErrCode FormMgrAdapter::InnerAcquireProviderFormInfoAsync(const int64_t formId,
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
 #ifdef RES_SCHEDULE_ENABLE
-    auto && connectCallback = [](const std::string &bundleName) {
+    auto&& connectCallback = [](const std::string &bundleName) {
         FormAbilityConnectionReporter::GetInstance().ReportFormAbilityConnection(bundleName);
     };
-    auto && disconnectCallback = [](const std::string &bundleName) {
+    auto&& disconnectCallback = [](const std::string &bundleName) {
         FormAbilityConnectionReporter::GetInstance().ReportFormAbilityDisconnection(bundleName);
     };
     formAcquireConnection->SetFormAbilityConnectCb(connectCallback);
