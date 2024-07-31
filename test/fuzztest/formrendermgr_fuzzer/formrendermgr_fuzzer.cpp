@@ -31,6 +31,7 @@ using namespace OHOS::AppExecFwk;
 namespace OHOS {
 constexpr size_t FOO_MAX_LEN = 1024;
 constexpr size_t U32_AT_SIZE = 4;
+constexpr int32_t MAIN_CALLING_USER_ID = 100 * 200000;
 constexpr uint8_t ENABLE = 2;
 uint32_t GetU32Data(const char* ptr)
 {
@@ -59,12 +60,11 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formRenderMgr.RenderFormCallback(formId, want);
     formRenderMgr.StopRenderingFormCallback(formId, want);
     sptr<FormRenderConnection> connection = new (std::nothrow) FormRenderConnection(formRecord, wantParams);
-    int32_t privacyLevel = 0;
-    formRenderMgr.AddConnection(formId, connection, privacyLevel);
+    formRenderMgr.AddConnection(formId, connection, formRecord);
     sptr<IRemoteObject> host = nullptr;
-    formRenderMgr.CleanFormHost(host);
+    formRenderMgr.CleanFormHost(host, OHOS::MAIN_CALLING_USER_ID);
     sptr<IRemoteObject> remoteObject = nullptr;
-    formRenderMgr.AddRenderDeathRecipient(remoteObject, privacyLevel);
+    formRenderMgr.AddRenderDeathRecipient(remoteObject, formRecord);
     formRenderMgr.IsNeedRender(formId);
     int32_t errorCode = static_cast<int32_t>(GetU32Data(data));
     formRenderMgr.HandleConnectFailed(formId, errorCode);

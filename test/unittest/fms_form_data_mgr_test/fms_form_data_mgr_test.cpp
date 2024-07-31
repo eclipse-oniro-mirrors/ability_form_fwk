@@ -3393,4 +3393,24 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_EnableForms_001, TestSize.Level0
     formDataMgr_.EnableForms(std::move(formRecords), false);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_EnableForms_001 end";
 }
+
+/**
+ * @tc.number: FmsFormDataMgrTest_GetFormIdsByUserId_001
+ * @tc.name: GetFormIdsByUserId
+ * @tc.desc: Verify that get all formIds by userId.
+ * @tc.details: Determine whether an element exists in the map.
+ */
+HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormIdsByUserId_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormIdsByUserId_001 start";
+    FormRecord record;
+    int64_t formId = 1;
+    int formUserUid = 100;
+    record.userId = formUserUid;
+
+    formDataMgr_.formRecords_.emplace(formId, record);
+    std::vector<int64_t> formIds;
+    formDataMgr_.GetFormIdsByUserId(formUserUid, formIds);
+    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormIdsByUserId_001 end";
+}
 }

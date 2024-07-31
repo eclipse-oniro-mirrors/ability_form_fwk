@@ -65,15 +65,15 @@ public:
 
     bool GetIsVerified() const;
 
-    ErrCode AddConnection(int64_t formId, sptr<FormRenderConnection> connection, int32_t privacyLevel);
+    ErrCode AddConnection(int64_t formId, sptr<FormRenderConnection> connection, const FormRecord &formRecord);
 
-    void RemoveConnection(int64_t formId, int32_t privacyLevel);
+    void RemoveConnection(int64_t formId, const FormRecord &formRecord);
 
-    void AddRenderDeathRecipient(const sptr<IRemoteObject> &renderRemoteObj, int32_t privacyLevel);
+    void AddRenderDeathRecipient(const sptr<IRemoteObject> &renderRemoteObj, const FormRecord &formRecord);
 
     bool IsNeedRender(int64_t formId);
 
-    void CleanFormHost(const sptr<IRemoteObject> &host);
+    void CleanFormHost(const sptr<IRemoteObject> &host, const int hostCallingUid);
 
     void HandleConnectFailed(int64_t formId, int32_t errorCode) const;
 
@@ -93,16 +93,23 @@ public:
         const sptr<IRemoteObject> &remoteObjectOfHost);
 
     ErrCode RecoverForms(const std::vector<int64_t> &formIds, const WantParams &wantParams);
+
+    void DisconnectAllRenderConnections(int32_t userId);
+
+    void RerenderAllFormsImmediate(int32_t userId);
+
 private:
-    void InitRenderInner(bool isSandbox);
+    void InitRenderInner(bool isSandbox, int32_t userId);
 
 private:
     mutable std::mutex isVerifiedMutex_;
     std::mutex renderInnerMutex_;
     std::mutex taskQueueMutex_;
     std::queue<std::function<void()>> taskQueue_;
-    std::shared_ptr<FormRenderMgrInner> renderInner_ = nullptr;
-    std::shared_ptr<FormSandboxRenderMgrInner> sandboxInner_ = nullptr;
+    // <userId, FormRenderMgrInner>
+    std::unordered_map<int32_t, std::shared_ptr<FormRenderMgrInner>> renderInners_;
+    // <userId, FormSandboxRenderMgrInner>
+    std::unordered_map<int32_t, std::shared_ptr<FormSandboxRenderMgrInner>> sandboxInners_;
     bool isScreenUnlocked_ = false;
     bool isVerified_ = false;
 };

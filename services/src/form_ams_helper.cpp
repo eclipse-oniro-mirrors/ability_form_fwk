@@ -29,7 +29,6 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-const int FORM_DISCONNECT_DELAY_TIME = 10000; // ms
 FormAmsHelper::FormAmsHelper()
 {}
 
@@ -80,7 +79,6 @@ ErrCode FormAmsHelper::ConnectServiceAbility(
 }
 /**
  * @brief Disconnect ability, disconnect session with service ability.
- * @param want Special want for service type's ability.
  * @param connect Callback used to notify caller the result of connecting or disconnecting.
  * @return Returns ERR_OK on success, others on failure.
  */
@@ -96,11 +94,11 @@ ErrCode FormAmsHelper::DisconnectServiceAbility(const sptr<AAFwk::IAbilityConnec
 }
 /**
  * @brief Disconnect ability delay, disconnect session with service ability.
- * @param want Special want for service type's ability.
  * @param connect Callback used to notify caller the result of connecting or disconnecting.
+ * @param delayTime Specifying time to delay, default is FORM_DISCONNECT_DELAY_TIME.
  * @return Returns ERR_OK on success, others on failure.
  */
-ErrCode FormAmsHelper::DisconnectServiceAbilityDelay(const sptr<AAFwk::IAbilityConnection> &connect)
+ErrCode FormAmsHelper::DisconnectServiceAbilityDelay(const sptr<AAFwk::IAbilityConnection> &connect, int delayTime)
 {
     if (serialQueue_ == nullptr) {
         HILOG_ERROR("%{public}s fail, serialQueue_ invalidate", __func__);
@@ -109,7 +107,7 @@ ErrCode FormAmsHelper::DisconnectServiceAbilityDelay(const sptr<AAFwk::IAbilityC
     auto disConnectAbilityFunc = [connect]() {
         FormAmsHelper::GetInstance().DisconnectAbilityTask(connect);
     };
-    if (!serialQueue_->ScheduleTask(FORM_DISCONNECT_DELAY_TIME, disConnectAbilityFunc)) {
+    if (!serialQueue_->ScheduleTask(delayTime, disConnectAbilityFunc)) {
         HILOG_ERROR("%{public}s, failed to disconnect ability", __func__);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }

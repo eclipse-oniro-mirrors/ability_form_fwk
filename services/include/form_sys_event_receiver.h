@@ -64,8 +64,11 @@ private:
     void HandleScreenUnlocked();
     void HandleUserUnlocked();
     void HandleScreenOn();
+    void HandleUserIdForms(int32_t currentUserId, int32_t lastUserId);
+    void RecycleForms(int32_t userId);
 private:
     std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;
+    int32_t lastUserId_ = 0;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
