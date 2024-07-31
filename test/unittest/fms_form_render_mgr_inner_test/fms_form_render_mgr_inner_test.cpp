@@ -1081,4 +1081,99 @@ HWTEST_F(FormRenderMgrInnerTest, NotifyScreenOn_001, TestSize.Level0)
     formRenderMgrInner.NotifyScreenOn();
     GTEST_LOG_(INFO) << "NotifyScreenOn_001 end";
 }
+
+/**
+ * @tc.name: SetUserId_001
+ * @tc.desc: test SetUserId function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, SetUserId_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "SetUserId_001 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    ASSERT_NE(nullptr, formRenderMgrInner);
+    int32_t userId = 100;
+    formRenderMgrInner->SetUserId(userId);
+    GTEST_LOG_(INFO) << "SetUserId_001 end";
+}
+
+
+/**
+ * @tc.name: GetUserId_001
+ * @tc.desc: test SetUserId function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, GetUserId_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "GetUserId_001 start";
+    std::shared_ptr<FormRenderMgrInner> formRenderMgrInner = std::make_shared<FormRenderMgrInner>();
+    ASSERT_NE(nullptr, formRenderMgrInner);
+    int32_t userId = 100;
+    formRenderMgrInner->SetUserId(userId);
+    EXPECT_EQ(userId, formRenderMgrInner->GetUserId());
+    GTEST_LOG_(INFO) << "GetUserId_001 end";
+}
+
+/**
+ * @tc.name: RerenderAllFormsImmediate_001
+ * @tc.desc: test RerenderAllFormsImmediate function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, RerenderAllFormsImmediate_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "RerenderAllFormsImmediate_001 start";
+    FormRenderMgrInner formRenderMgrInner;
+    formRenderMgrInner.RerenderAllFormsImmediate();
+    GTEST_LOG_(INFO) << "RerenderAllFormsImmediate_001 end";
+}
+
+/**
+ * @tc.name: RerenderAllFormsImmediate_002
+ * @tc.desc: test RerenderAllFormsImmediate function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, RerenderAllFormsImmediate_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "RerenderAllFormsImmediate_002 start";
+    FormRenderMgrInner formRenderMgrInner;
+    sptr<IRemoteObject> remote = nullptr;
+    std::unordered_set<int64_t> form;
+    int64_t formId = 1;
+    form.insert(formId);
+    formRenderMgrInner.etsHosts_.emplace(remote, form);
+    formRenderMgrInner.RerenderAllFormsImmediate();
+    GTEST_LOG_(INFO) << "RerenderAllFormsImmediate_002 end";
+}
+
+/**
+ * @tc.name: DisconnectAllRenderConnections_001
+ * @tc.desc: test DisconnectAllRenderConnections function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, DisconnectAllRenderConnections_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "DisconnectAllRenderConnections_001 start";
+    FormRenderMgrInner formRenderMgrInner;
+    int64_t formId = 1;
+    formRenderMgrInner.renderFormConnections_.emplace(formId, nullptr);
+    EXPECT_EQ(1, formRenderMgrInner.renderFormConnections_.size());
+    formRenderMgrInner.DisconnectAllRenderConnections();
+    EXPECT_EQ(0, formRenderMgrInner.renderFormConnections_.size());
+    GTEST_LOG_(INFO) << "DisconnectAllRenderConnections_001 end";
+}
+
+/**
+ * @tc.name: DisconnectAllRenderConnections_002
+ * @tc.desc: test DisconnectAllRenderConnections function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrInnerTest, DisconnectAllRenderConnections_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "DisconnectAllRenderConnections_002 start";
+    FormRenderMgrInner formRenderMgrInner;
+    EXPECT_EQ(0, formRenderMgrInner.renderFormConnections_.size());
+    formRenderMgrInner.DisconnectAllRenderConnections();
+    EXPECT_EQ(0, formRenderMgrInner.renderFormConnections_.size());
+    GTEST_LOG_(INFO) << "DisconnectAllRenderConnections_002 end";
+}
 }

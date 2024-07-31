@@ -41,6 +41,8 @@ extern void MockUpdateRenderingForm(bool mockRet);
 extern void MockStopRenderingForm(bool mockRet);
 extern void MockReleaseRenderer(bool mockRet);
 extern void MockAddConnection(bool mockRet);
+extern void MockGetCallingUid(int32_t mockRet);
+extern void MockGetCurrentAccountIdRet(int32_t userId);
 
 namespace {
 class FormRenderMgrTest : public testing::Test {
@@ -187,7 +189,10 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_007, TestSize.Level0)
     WantParams wantParams;
     bool mergeData = true;
     MockGetFormRecord(true, 1);
-    formRenderMgr.sandboxInner_ = std::make_shared<FormSandboxRenderMgrInner>();
+    auto formSandboxInner = std::make_shared<FormSandboxRenderMgrInner>();
+    int32_t userId = 0;
+    formSandboxInner->SetUserId(userId);
+    formRenderMgr.sandboxInners_.emplace(userId, formSandboxInner);
     MockUpdateRenderingForm(true);
     EXPECT_EQ(ERR_OK, formRenderMgr.UpdateRenderingForm(formId, formProviderData, wantParams, mergeData));
     GTEST_LOG_(INFO) << "FormRenderMgrTest_007 end";
@@ -230,7 +235,10 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_009, TestSize.Level0)
     WantParams wantParams;
     bool mergeData = true;
     MockGetFormRecord(true, 0);
-    formRenderMgr.renderInner_ = std::make_shared<FormRenderMgrInner>();
+    auto formInner = std::make_shared<FormRenderMgrInner>();
+    int32_t userId = 0;
+    formInner->SetUserId(userId);
+    formRenderMgr.renderInners_.emplace(userId, formInner);
     MockUpdateRenderingForm(true);
     EXPECT_EQ(ERR_OK,
         formRenderMgr.UpdateRenderingForm(formId, formProviderData, wantParams, mergeData));
@@ -296,10 +304,14 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_012, TestSize.Level0)
     sandboxFormRecord.privacyLevel = 1;
     formRecords.emplace_back(formRecord);
     formRecords.emplace_back(sandboxFormRecord);
-    formRenderMgr.sandboxInner_ = std::make_shared<FormSandboxRenderMgrInner>();
-    formRenderMgr.renderInner_ = std::make_shared<FormRenderMgrInner>();
-    std::string bundleName = "<bundleName>";
     int32_t userId = 1;
+    auto formSandboxInner = std::make_shared<FormSandboxRenderMgrInner>();
+    formSandboxInner->SetUserId(userId);
+    formRenderMgr.sandboxInners_.emplace(userId, formSandboxInner);
+    auto formInner = std::make_shared<FormRenderMgrInner>();
+    formInner->SetUserId(userId);
+    formRenderMgr.renderInners_.emplace(userId, formInner);
+    std::string bundleName = "<bundleName>";
     EXPECT_EQ(ERR_OK, formRenderMgr.ReloadForm(std::move(formRecords), bundleName, userId));
     GTEST_LOG_(INFO) << "FormRenderMgrTest_012 end";
 }
@@ -337,7 +349,9 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_014, TestSize.Level0)
     FormRecord formRecord;
     formRecord.privacyLevel = 1;
     std::string compId = "<compId>";
-    formRenderMgr.sandboxInner_ = std::make_shared<FormSandboxRenderMgrInner>();
+    auto formSandboxInner = std::make_shared<FormSandboxRenderMgrInner>();
+    formSandboxInner->SetUserId(formRecord.userId);
+    formRenderMgr.sandboxInners_.emplace(formRecord.userId, formSandboxInner);
     MockStopRenderingForm(true);
     EXPECT_EQ(ERR_OK, formRenderMgr.StopRenderingForm(formId, formRecord, compId));
     GTEST_LOG_(INFO) << "FormRenderMgrTest_014 end";
@@ -376,7 +390,9 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_016, TestSize.Level0)
     FormRecord formRecord;
     formRecord.privacyLevel = 0;
     std::string compId = "<compId>";
-    formRenderMgr.renderInner_ = std::make_shared<FormRenderMgrInner>();
+    auto formInner = std::make_shared<FormRenderMgrInner>();
+    formInner->SetUserId(formRecord.userId);
+    formRenderMgr.renderInners_.emplace(formRecord.userId, formInner);
     MockStopRenderingForm(true);
     EXPECT_EQ(ERR_OK, formRenderMgr.StopRenderingForm(formId, formRecord, compId));
     GTEST_LOG_(INFO) << "FormRenderMgrTest_016 end";
@@ -425,7 +441,12 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_019, TestSize.Level0)
     FormRenderMgr formRenderMgr;
     int64_t formId = 1;
     Want want;
-    formRenderMgr.renderInner_ = std::make_shared<FormRenderMgrInner>();
+    auto formInner = std::make_shared<FormRenderMgrInner>();
+    int32_t userId = 100;
+    formInner->SetUserId(userId);
+    formRenderMgr.renderInners_.emplace(userId, formInner);
+    int32_t callingUid {20000001};
+    MockGetCallingUid(callingUid);
     EXPECT_EQ(ERR_OK, formRenderMgr.StopRenderingFormCallback(formId, want));
     GTEST_LOG_(INFO) << "FormRenderMgrTest_019 end";
 }
@@ -442,7 +463,12 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_020, TestSize.Level0)
     FormRenderMgr formRenderMgr;
     int64_t formId = 1;
     Want want;
-    formRenderMgr.sandboxInner_ = std::make_shared<FormSandboxRenderMgrInner>();
+    auto formSandboxInner = std::make_shared<FormSandboxRenderMgrInner>();
+    int32_t userId = 100;
+    formSandboxInner->SetUserId(userId);
+    formRenderMgr.renderInners_.emplace(userId, formSandboxInner);
+    int32_t callingUid {20000001};
+    MockGetCallingUid(callingUid);
     EXPECT_EQ(ERR_OK, formRenderMgr.StopRenderingFormCallback(formId, want));
     GTEST_LOG_(INFO) << "FormRenderMgrTest_020 end";
 }
@@ -459,8 +485,15 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_021, TestSize.Level0)
     FormRenderMgr formRenderMgr;
     int64_t formId = 1;
     Want want;
-    formRenderMgr.renderInner_ = std::make_shared<FormRenderMgrInner>();
-    formRenderMgr.sandboxInner_ = std::make_shared<FormSandboxRenderMgrInner>();
+    int32_t userId = 100;
+    auto formSandboxInner = std::make_shared<FormSandboxRenderMgrInner>();
+    formSandboxInner->SetUserId(userId);
+    formRenderMgr.sandboxInners_.emplace(userId, formSandboxInner);
+    auto formInner = std::make_shared<FormRenderMgrInner>();
+    formInner->SetUserId(userId);
+    formRenderMgr.renderInners_.emplace(userId, formInner);
+    int32_t callingUid {20000001};
+    MockGetCallingUid(callingUid);
     EXPECT_EQ(ERR_OK, formRenderMgr.StopRenderingFormCallback(formId, want));
     GTEST_LOG_(INFO) << "FormRenderMgrTest_021 end";
 }
@@ -498,7 +531,9 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_023, TestSize.Level0)
     FormRecord formRecord;
     formRecord.privacyLevel = 1;
     std::string compId = "<compId>";
-    formRenderMgr.sandboxInner_ = std::make_shared<FormSandboxRenderMgrInner>();
+    auto formSandboxInner = std::make_shared<FormSandboxRenderMgrInner>();
+    formSandboxInner->SetUserId(formRecord.userId);
+    formRenderMgr.sandboxInners_.emplace(formRecord.userId, formSandboxInner);
     MockReleaseRenderer(true);
     EXPECT_EQ(ERR_OK, formRenderMgr.ReleaseRenderer(formId, formRecord, compId));
     GTEST_LOG_(INFO) << "FormRenderMgrTest_023 end";
@@ -537,7 +572,9 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_025, TestSize.Level0)
     FormRecord formRecord;
     formRecord.privacyLevel = 0;
     std::string compId = "<compId>";
-    formRenderMgr.renderInner_ = std::make_shared<FormRenderMgrInner>();
+    auto formInner = std::make_shared<FormRenderMgrInner>();
+    formInner->SetUserId(formRecord.userId);
+    formRenderMgr.renderInners_.emplace(formRecord.userId, formInner);
     MockReleaseRenderer(true);
     EXPECT_EQ(ERR_OK, formRenderMgr.ReleaseRenderer(formId, formRecord, compId));
     GTEST_LOG_(INFO) << "FormRenderMgrTest_025 end";
@@ -555,9 +592,10 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_026, TestSize.Level0)
     FormRenderMgr formRenderMgr;
     int64_t formId = 1;
     sptr<FormRenderConnection> connection = nullptr;
-    int32_t privacyLevel = 1;
+    FormRecord formRecord;
+    formRecord.privacyLevel = 1;
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM,
-        formRenderMgr.AddConnection(formId, connection, privacyLevel));
+        formRenderMgr.AddConnection(formId, connection, formRecord));
     GTEST_LOG_(INFO) << "FormRenderMgrTest_026 end";
 }
 
@@ -573,10 +611,13 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_027, TestSize.Level0)
     FormRenderMgr formRenderMgr;
     int64_t formId = 1;
     sptr<FormRenderConnection> connection = nullptr;
-    int32_t privacyLevel = 1;
-    formRenderMgr.sandboxInner_ = std::make_shared<FormSandboxRenderMgrInner>();
+    FormRecord formRecord;
+    formRecord.privacyLevel = 1;
+    auto formSandboxInner = std::make_shared<FormSandboxRenderMgrInner>();
+    formSandboxInner->SetUserId(formRecord.userId);
+    formRenderMgr.sandboxInners_.emplace(formRecord.userId, formSandboxInner);
     MockAddConnection(true);
-    EXPECT_EQ(ERR_OK, formRenderMgr.AddConnection(formId, connection, privacyLevel));
+    EXPECT_EQ(ERR_OK, formRenderMgr.AddConnection(formId, connection, formRecord));
     GTEST_LOG_(INFO) << "FormRenderMgrTest_027 end";
 }
 
@@ -592,8 +633,9 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_028, TestSize.Level0)
     FormRenderMgr formRenderMgr;
     int64_t formId = 1;
     sptr<FormRenderConnection> connection = nullptr;
-    int32_t privacyLevel = 0;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgr.AddConnection(formId, connection, privacyLevel));
+    FormRecord formRecord;
+    formRecord.privacyLevel = 0;
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formRenderMgr.AddConnection(formId, connection, formRecord));
     GTEST_LOG_(INFO) << "FormRenderMgrTest_028 end";
 }
 
@@ -609,10 +651,13 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_029, TestSize.Level0)
     FormRenderMgr formRenderMgr;
     int64_t formId = 1;
     sptr<FormRenderConnection> connection = nullptr;
-    int32_t privacyLevel = 0;
-    formRenderMgr.renderInner_ = std::make_shared<FormRenderMgrInner>();
+    FormRecord formRecord;
+    formRecord.privacyLevel = 0;
+    auto formInner = std::make_shared<FormRenderMgrInner>();
+    formInner->SetUserId(formRecord.userId);
+    formRenderMgr.renderInners_.emplace(formRecord.userId, formInner);
     MockAddConnection(true);
-    EXPECT_EQ(ERR_OK, formRenderMgr.AddConnection(formId, connection, privacyLevel));
+    EXPECT_EQ(ERR_OK, formRenderMgr.AddConnection(formId, connection, formRecord));
     GTEST_LOG_(INFO) << "FormRenderMgrTest_029 end";
 }
 
@@ -627,7 +672,9 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_030, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormRenderMgrTest_030 start";
     FormRenderMgr formRenderMgr;
     sptr<IRemoteObject> host = nullptr;
-    formRenderMgr.CleanFormHost(host);
+    int32_t hostCallingUid {0};
+    MockGetCurrentAccountIdRet(100);
+    formRenderMgr.CleanFormHost(host, hostCallingUid);
     GTEST_LOG_(INFO) << "FormRenderMgrTest_030 end";
 }
 
@@ -642,8 +689,12 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_031, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormRenderMgrTest_031 start";
     FormRenderMgr formRenderMgr;
     sptr<IRemoteObject> host = nullptr;
-    formRenderMgr.renderInner_ = std::make_shared<FormRenderMgrInner>();
-    formRenderMgr.CleanFormHost(host);
+    auto formInner = std::make_shared<FormRenderMgrInner>();
+    int32_t userId = 100;
+    formInner->SetUserId(userId);
+    formRenderMgr.renderInners_.emplace(userId, formInner);
+    int32_t hostCallingUid {20000001};
+    formRenderMgr.CleanFormHost(host, hostCallingUid);
     GTEST_LOG_(INFO) << "FormRenderMgrTest_031 end";
 }
 
@@ -658,8 +709,12 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_032, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormRenderMgrTest_032 start";
     FormRenderMgr formRenderMgr;
     sptr<IRemoteObject> host = nullptr;
-    formRenderMgr.sandboxInner_ = std::make_shared<FormSandboxRenderMgrInner>();
-    formRenderMgr.CleanFormHost(host);
+    auto formSandboxInner = std::make_shared<FormSandboxRenderMgrInner>();
+    int32_t userId = 100;
+    formSandboxInner->SetUserId(userId);
+    formRenderMgr.sandboxInners_.emplace(userId, formSandboxInner);
+    int32_t hostCallingUid {20000001};
+    formRenderMgr.CleanFormHost(host, hostCallingUid);
     GTEST_LOG_(INFO) << "FormRenderMgrTest_032 end";
 }
 
@@ -674,9 +729,15 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_033, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormRenderMgrTest_033 start";
     FormRenderMgr formRenderMgr;
     sptr<IRemoteObject> host = nullptr;
-    formRenderMgr.sandboxInner_ = std::make_shared<FormSandboxRenderMgrInner>();
-    formRenderMgr.renderInner_ = std::make_shared<FormRenderMgrInner>();
-    formRenderMgr.CleanFormHost(host);
+    int32_t userId = 100;
+    auto formInner = std::make_shared<FormRenderMgrInner>();
+    formInner->SetUserId(userId);
+    formRenderMgr.renderInners_.emplace(userId, formInner);
+    auto formSandboxInner = std::make_shared<FormSandboxRenderMgrInner>();
+    formSandboxInner->SetUserId(userId);
+    formRenderMgr.sandboxInners_.emplace(userId, formSandboxInner);
+    int32_t hostCallingUid {20000001};
+    formRenderMgr.CleanFormHost(host, hostCallingUid);
     GTEST_LOG_(INFO) << "FormRenderMgrTest_033 end";
 }
 
@@ -692,8 +753,9 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_034, TestSize.Level0)
     std::shared_ptr<FormRenderMgr> formRenderMgr = std::make_shared<FormRenderMgr>();
     ASSERT_NE(nullptr, formRenderMgr);
     sptr<IRemoteObject> remoteObject = nullptr;
-    int32_t privacyLevel = 1;
-    formRenderMgr->AddRenderDeathRecipient(remoteObject, privacyLevel);
+    FormRecord formRecord;
+    formRecord.privacyLevel = 1;
+    formRenderMgr->AddRenderDeathRecipient(remoteObject, formRecord);
     GTEST_LOG_(INFO) << "FormRenderMgrTest_034 end";
 }
 
@@ -709,9 +771,12 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_035, TestSize.Level0)
     std::shared_ptr<FormRenderMgr> formRenderMgr = std::make_shared<FormRenderMgr>();
     ASSERT_NE(nullptr, formRenderMgr);
     sptr<IRemoteObject> remoteObject = nullptr;
-    int32_t privacyLevel = 1;
-    formRenderMgr->sandboxInner_ = std::make_shared<FormSandboxRenderMgrInner>();
-    formRenderMgr->AddRenderDeathRecipient(remoteObject, privacyLevel);
+    FormRecord formRecord;
+    formRecord.privacyLevel = 1;
+    auto formSandboxInner = std::make_shared<FormSandboxRenderMgrInner>();
+    formSandboxInner->SetUserId(formRecord.userId);
+    formRenderMgr->sandboxInners_.emplace(formRecord.userId, formSandboxInner);
+    formRenderMgr->AddRenderDeathRecipient(remoteObject, formRecord);
     GTEST_LOG_(INFO) << "FormRenderMgrTest_035 end";
 }
 
@@ -727,8 +792,9 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_036, TestSize.Level0)
     std::shared_ptr<FormRenderMgr> formRenderMgr = std::make_shared<FormRenderMgr>();
     ASSERT_NE(nullptr, formRenderMgr);
     sptr<IRemoteObject> remoteObject = nullptr;
-    int32_t privacyLevel = 0;
-    formRenderMgr->AddRenderDeathRecipient(remoteObject, privacyLevel);
+    FormRecord formRecord;
+    formRecord.privacyLevel = 0;
+    formRenderMgr->AddRenderDeathRecipient(remoteObject, formRecord);
     GTEST_LOG_(INFO) << "FormRenderMgrTest_036 end";
 }
 
@@ -744,9 +810,12 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_037, TestSize.Level0)
     std::shared_ptr<FormRenderMgr> formRenderMgr = std::make_shared<FormRenderMgr>();
     ASSERT_NE(nullptr, formRenderMgr);
     sptr<IRemoteObject> remoteObject = nullptr;
-    int32_t privacyLevel = 0;
-    formRenderMgr->renderInner_ = std::make_shared<FormRenderMgrInner>();
-    formRenderMgr->AddRenderDeathRecipient(remoteObject, privacyLevel);
+    FormRecord formRecord;
+    formRecord.privacyLevel = 0;
+    auto formInner = std::make_shared<FormRenderMgrInner>();
+    formInner->SetUserId(formRecord.userId);
+    formRenderMgr->renderInners_.emplace(formRecord.userId, formInner);
+    formRenderMgr->AddRenderDeathRecipient(remoteObject, formRecord);
     GTEST_LOG_(INFO) << "FormRenderMgrTest_037 end";
 }
 
@@ -822,8 +891,9 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_042, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormRenderMgrTest_042 start";
     FormRenderMgr formRenderMgr;
     int64_t formId = 1;
-    int32_t privacyLevel = 1;
-    formRenderMgr.RemoveConnection(formId, privacyLevel);
+    FormRecord formRecord;
+    formRecord.privacyLevel = 1;
+    formRenderMgr.RemoveConnection(formId, formRecord);
     GTEST_LOG_(INFO) << "FormRenderMgrTest_042 end";
 }
 
@@ -838,9 +908,12 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_043, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormRenderMgrTest_043 start";
     FormRenderMgr formRenderMgr;
     int64_t formId = 1;
-    int32_t privacyLevel = 1;
-    formRenderMgr.sandboxInner_ = std::make_shared<FormSandboxRenderMgrInner>();
-    formRenderMgr.RemoveConnection(formId, privacyLevel);
+    FormRecord formRecord;
+    formRecord.privacyLevel = 1;
+    auto formSandboxInner = std::make_shared<FormSandboxRenderMgrInner>();
+    formSandboxInner->SetUserId(formRecord.userId);
+    formRenderMgr.sandboxInners_.emplace(formRecord.userId, formSandboxInner);
+    formRenderMgr.RemoveConnection(formId, formRecord);
     GTEST_LOG_(INFO) << "FormRenderMgrTest_043 end";
 }
 
@@ -855,8 +928,9 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_044, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormRenderMgrTest_044 start";
     FormRenderMgr formRenderMgr;
     int64_t formId = 1;
-    int32_t privacyLevel = 0;
-    formRenderMgr.RemoveConnection(formId, privacyLevel);
+    FormRecord formRecord;
+    formRecord.privacyLevel = 0;
+    formRenderMgr.RemoveConnection(formId, formRecord);
     GTEST_LOG_(INFO) << "FormRenderMgrTest_044 end";
 }
 
@@ -871,9 +945,12 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_045, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormRenderMgrTest_045 start";
     FormRenderMgr formRenderMgr;
     int64_t formId = 1;
-    int32_t privacyLevel = 1;
-    formRenderMgr.renderInner_ = std::make_shared<FormRenderMgrInner>();
-    formRenderMgr.RemoveConnection(formId, privacyLevel);
+    FormRecord formRecord;
+    formRecord.privacyLevel = 0;
+    auto formInner = std::make_shared<FormRenderMgrInner>();
+    formInner->SetUserId(formRecord.userId);
+    formRenderMgr.renderInners_.emplace(formRecord.userId, formInner);
+    formRenderMgr.RemoveConnection(formId, formRecord);
     GTEST_LOG_(INFO) << "FormRenderMgrTest_045 end";
 }
 
@@ -886,9 +963,123 @@ HWTEST_F(FormRenderMgrTest, NotifyScreenOn_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "NotifyScreenOn_001 start";
     FormRenderMgr formRenderMgr;
-    formRenderMgr.sandboxInner_ = std::make_shared<FormSandboxRenderMgrInner>();
-    formRenderMgr.renderInner_ = std::make_shared<FormRenderMgrInner>();
+    int32_t userId = 100;
+    auto formSandboxInner = std::make_shared<FormSandboxRenderMgrInner>();
+    formSandboxInner->SetUserId(userId);
+    formRenderMgr.sandboxInners_.emplace(userId, formSandboxInner);
+    auto formInner = std::make_shared<FormRenderMgrInner>();
+    formInner->SetUserId(userId);
+    formRenderMgr.renderInners_.emplace(userId, formInner);
+    MockGetCurrentAccountIdRet(userId);
     formRenderMgr.NotifyScreenOn();
     GTEST_LOG_(INFO) << "NotifyScreenOn_001 end";
+}
+
+/**
+ * @tc.name: DisconnectAllRenderConnections_001
+ * @tc.desc: test DisconnectAllRenderConnections function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, DisconnectAllRenderConnections_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "DisconnectAllRenderConnections_001 start";
+    FormRenderMgr formRenderMgr;
+    int32_t userId = 100;
+    auto formInner = std::make_shared<FormRenderMgrInner>();
+    formInner->SetUserId(userId);
+    formRenderMgr.renderInners_.emplace(userId, formInner);
+    formRenderMgr.DisconnectAllRenderConnections(userId);
+    GTEST_LOG_(INFO) << "DisconnectAllRenderConnections_001 end";
+}
+
+/**
+ * @tc.name: DisconnectAllRenderConnections_002
+ * @tc.desc: test DisconnectAllRenderConnections function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, DisconnectAllRenderConnections_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "DisconnectAllRenderConnections_002 start";
+    FormRenderMgr formRenderMgr;
+    int32_t userId = 100;
+    auto formSandboxInner = std::make_shared<FormSandboxRenderMgrInner>();
+    formSandboxInner->SetUserId(userId);
+    formRenderMgr.sandboxInners_.emplace(userId, formSandboxInner);
+    formRenderMgr.DisconnectAllRenderConnections(userId);
+    GTEST_LOG_(INFO) << "DisconnectAllRenderConnections_002 end";
+}
+
+/**
+ * @tc.name: DisconnectAllRenderConnections_003
+ * @tc.desc: test DisconnectAllRenderConnections function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, DisconnectAllRenderConnections_003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "DisconnectAllRenderConnections_003 start";
+    FormRenderMgr formRenderMgr;
+    int32_t userId = 100;
+    auto formInner = std::make_shared<FormRenderMgrInner>();
+    formInner->SetUserId(userId);
+    formRenderMgr.renderInners_.emplace(userId, formInner);
+    auto formSandboxInner = std::make_shared<FormSandboxRenderMgrInner>();
+    formSandboxInner->SetUserId(userId);
+    formRenderMgr.sandboxInners_.emplace(userId, formSandboxInner);
+    formRenderMgr.DisconnectAllRenderConnections(userId);
+    GTEST_LOG_(INFO) << "DisconnectAllRenderConnections_003 end";
+}
+
+/**
+ * @tc.name: RerenderAllFormsImmediate_001
+ * @tc.desc: test RerenderAllFormsImmediate function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, RerenderAllFormsImmediate_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "RerenderAllFormsImmediate_001 start";
+    FormRenderMgr formRenderMgr;
+    int32_t userId = 100;
+    auto formInner = std::make_shared<FormRenderMgrInner>();
+    formInner->SetUserId(userId);
+    formRenderMgr.renderInners_.emplace(userId, formInner);
+    formRenderMgr.RerenderAllFormsImmediate(userId);
+    GTEST_LOG_(INFO) << "RerenderAllFormsImmediate_001 end";
+}
+
+/**
+ * @tc.name: RerenderAllFormsImmediate_002
+ * @tc.desc: test RerenderAllFormsImmediate function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, RerenderAllFormsImmediate_002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "RerenderAllFormsImmediate_002 start";
+    FormRenderMgr formRenderMgr;
+    int32_t userId = 100;
+    auto formSandboxInner = std::make_shared<FormSandboxRenderMgrInner>();
+    formSandboxInner->SetUserId(userId);
+    formRenderMgr.sandboxInners_.emplace(userId, formSandboxInner);
+    formRenderMgr.RerenderAllFormsImmediate(userId);
+    GTEST_LOG_(INFO) << "RerenderAllFormsImmediate_002 end";
+}
+
+/**
+ * @tc.name: RerenderAllFormsImmediate_003
+ * @tc.desc: test RerenderAllFormsImmediate function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, RerenderAllFormsImmediate_003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "RerenderAllFormsImmediate_003 start";
+    FormRenderMgr formRenderMgr;
+    int32_t userId = 100;
+    auto formInner = std::make_shared<FormRenderMgrInner>();
+    formInner->SetUserId(userId);
+    formRenderMgr.renderInners_.emplace(userId, formInner);
+    auto formSandboxInner = std::make_shared<FormSandboxRenderMgrInner>();
+    formSandboxInner->SetUserId(userId);
+    formRenderMgr.sandboxInners_.emplace(userId, formSandboxInner);
+    formRenderMgr.RerenderAllFormsImmediate(userId);
+    GTEST_LOG_(INFO) << "RerenderAllFormsImmediate_003 end";
 }
 }

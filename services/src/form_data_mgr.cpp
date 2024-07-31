@@ -289,7 +289,7 @@ void FormDataMgr::RecycleAllRecyclableForms() const
 
 void FormDataMgr::RecycleForms(const std::vector<int64_t> &formIds, const int &callingUid, const Want &want) const
 {
-    HILOG_INFO("start");
+    HILOG_INFO("start callingUid:%{public}d", callingUid);
     std::lock_guard<std::mutex> lock(formHostRecordMutex_);
     for (auto itHostRecord = clientRecords_.begin(); itHostRecord != clientRecords_.end(); itHostRecord++) {
         if (itHostRecord->GetCallerUid() != callingUid) {
@@ -641,7 +641,7 @@ bool FormDataMgr::DeleteHostRecord(const sptr<IRemoteObject> &callerToken, const
             if (iter->IsEmpty()) {
                 iter->CleanResource();
                 iter = clientRecords_.erase(iter);
-                FormRenderMgr::GetInstance().CleanFormHost(callerToken);
+                FormRenderMgr::GetInstance().CleanFormHost(callerToken, iter->GetCallerUid());
             }
             break;
         }
@@ -701,6 +701,7 @@ void FormDataMgr::UpdateHostForms(const std::vector<int64_t> &updateFormIds)
 void FormDataMgr::HandleHostDied(const sptr<IRemoteObject> &remoteHost)
 {
     std::vector<int64_t> recordTempForms;
+    int remoteHostCallerUid = 0;
     {
         std::lock_guard<std::mutex> lock(formHostRecordMutex_);
         std::vector<FormHostRecord>::iterator itHostRecord;
@@ -709,6 +710,7 @@ void FormDataMgr::HandleHostDied(const sptr<IRemoteObject> &remoteHost)
                 HandleHostDiedForTempForms(*itHostRecord, recordTempForms);
                 HILOG_INFO("find died client,remove it");
                 itHostRecord->CleanResource();
+                remoteHostCallerUid = itHostRecord->GetCallerUid();
                 itHostRecord = clientRecords_.erase(itHostRecord);
                 break;
             } else {
@@ -746,7 +748,7 @@ void FormDataMgr::HandleHostDied(const sptr<IRemoteObject> &remoteHost)
             }
         }
     }
-    FormRenderMgr::GetInstance().CleanFormHost(remoteHost);
+    FormRenderMgr::GetInstance().CleanFormHost(remoteHost, remoteHostCallerUid);
 }
 
 /**
@@ -2560,6 +2562,17 @@ void FormDataMgr::EnableForms(const std::vector<FormRecord> &&formRecords, const
             itHostRecord->OnEnableForms(matchedFormIds, enable);
         }
     }
+}
+
+void FormDataMgr::GetFormIdsByUserId(int32_t userId, std::vector<int64_t> &formIds)
+{
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    for (auto formRecord : formRecords_) {
+        if (formRecord.second.userId == userId) {
+            formIds.emplace_back(formRecord.second.formId);
+        }
+    }
+    HILOG_INFO("userId:%{public}d, size:%{public}zu", userId, formIds.size());
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

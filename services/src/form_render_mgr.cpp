@@ -81,7 +81,7 @@ bool FormRenderMgr::GetIsVerified() const
 ErrCode FormRenderMgr::RenderForm(
     const FormRecord &formRecord, const WantParams &wantParams, const sptr<IRemoteObject> &hostToken)
 {
-    HILOG_INFO("formId:%{public}" PRId64, formRecord.formId);
+    HILOG_INFO("formId:%{public}" PRId64 ", formUserId:%{public}d", formRecord.formId, formRecord.userId);
     GetFormRenderState();
     HILOG_INFO("the current user authentication status:%{public}d,%{public}d", isVerified_, isScreenUnlocked_);
     if (formRecord.uiSyntax != FormType::ETS) {
@@ -92,7 +92,6 @@ ErrCode FormRenderMgr::RenderForm(
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    int32_t userId = FormUtil::GetCurrentAccountId();
     Want want;
     want.SetParams(wantParams);
     std::string recordUid = std::to_string(formRecord.providerUserId) + formRecord.bundleName;
@@ -102,11 +101,11 @@ ErrCode FormRenderMgr::RenderForm(
         want.SetParam(Constants::FORM_RENDER_STATE, isVerified_ || isScreenUnlocked_);
     }
     if (formRecord.privacyLevel > 0) {
-        InitRenderInner(true);
-        return sandboxInner_->RenderForm(formRecord, want, hostToken);
+        InitRenderInner(true, formRecord.userId);
+        return sandboxInners_[formRecord.userId]->RenderForm(formRecord, want, hostToken);
     } else {
-        InitRenderInner(false);
-        return renderInner_->RenderForm(formRecord, want, hostToken);
+        InitRenderInner(false, formRecord.userId);
+        return renderInners_[formRecord.userId]->RenderForm(formRecord, want, hostToken);
     }
 }
 
@@ -121,23 +120,27 @@ ErrCode FormRenderMgr::UpdateRenderingForm(int64_t formId, const FormProviderDat
         HILOG_ERROR("get FormRecord fail, not exist such form, formId:%{public}" PRId64 "", formId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
+    int32_t formUserId = formRecord.userId;
+    HILOG_INFO("update formUserId:%{public}d", formUserId);
     if (formRecord.privacyLevel > 0) {
-        if (sandboxInner_ == nullptr) {
+        auto iter = sandboxInners_.find(formUserId);
+        if (iter == sandboxInners_.end()) {
             return ERR_APPEXECFWK_FORM_INVALID_PARAM;
         }
-        return sandboxInner_->UpdateRenderingForm(formRecord, formProviderData, wantParams, mergeData);
+        return iter->second->UpdateRenderingForm(formRecord, formProviderData, wantParams, mergeData);
     } else {
-        if (renderInner_ == nullptr) {
+        auto iter = renderInners_.find(formUserId);
+        if (iter == renderInners_.end()) {
             return ERR_APPEXECFWK_FORM_INVALID_PARAM;
         }
-        return renderInner_->UpdateRenderingForm(formRecord, formProviderData, wantParams, mergeData);
+        return iter->second->UpdateRenderingForm(formRecord, formProviderData, wantParams, mergeData);
     }
 }
 
 ErrCode FormRenderMgr::ReloadForm(
     const std::vector<FormRecord> &&formRecords, const std::string &bundleName, int32_t userId)
 {
-    HILOG_DEBUG("call");
+    HILOG_INFO("userId:%{public}d", userId);
     std::vector<FormRecord> sandboxRecords;
     std::vector<FormRecord> normalRecords;
     for (const auto &record : formRecords) {
@@ -147,22 +150,27 @@ ErrCode FormRenderMgr::ReloadForm(
             normalRecords.emplace_back(record);
         }
     }
-    if (!normalRecords.empty() && renderInner_ != nullptr) {
-        renderInner_->ReloadForm(std::move(normalRecords), bundleName, userId);
+    auto renderIter = renderInners_.find(userId);
+    if (!normalRecords.empty() && renderIter != renderInners_.end()) {
+        renderIter->second->ReloadForm(std::move(normalRecords), bundleName, userId);
     }
-    if (!sandboxRecords.empty() && sandboxInner_ != nullptr) {
-        sandboxInner_->ReloadForm(std::move(sandboxRecords), bundleName, userId);
+    auto sandboxIter = sandboxInners_.find(userId);
+    if (!sandboxRecords.empty() && sandboxIter != sandboxInners_.end()) {
+        sandboxIter->second->ReloadForm(std::move(sandboxRecords), bundleName, userId);
     }
     return ERR_OK;
 }
 
 void FormRenderMgr::PostOnUnlockTask()
 {
-    if (renderInner_ != nullptr) {
-        renderInner_->PostOnUnlockTask();
+    int32_t userId = FormUtil::GetCurrentAccountId();
+    auto renderIter = renderInners_.find(userId);
+    if (renderIter != renderInners_.end()) {
+        renderIter->second->PostOnUnlockTask();
     }
-    if (sandboxInner_ != nullptr) {
-        sandboxInner_->PostOnUnlockTask();
+    auto sandboxIter = sandboxInners_.find(userId);
+    if (sandboxIter != sandboxInners_.end()) {
+        sandboxIter->second->PostOnUnlockTask();
     }
 }
 
@@ -187,11 +195,14 @@ void FormRenderMgr::ExecAcquireProviderTask()
 
 void FormRenderMgr::NotifyScreenOn()
 {
-    if (renderInner_ != nullptr) {
-        renderInner_->NotifyScreenOn();
+    int32_t userId = FormUtil::GetCurrentAccountId();
+    auto renderIter = renderInners_.find(userId);
+    if (renderIter != renderInners_.end()) {
+        renderIter->second->NotifyScreenOn();
     }
-    if (sandboxInner_ != nullptr) {
-        sandboxInner_->NotifyScreenOn();
+    auto sandboxIter = sandboxInners_.find(userId);
+    if (sandboxIter != sandboxInners_.end()) {
+        sandboxIter->second->NotifyScreenOn();
     }
 }
 
@@ -230,17 +241,19 @@ void FormRenderMgr::OnUnlock()
 ErrCode FormRenderMgr::StopRenderingForm(
     int64_t formId, const FormRecord &formRecord, const std::string &compId, const sptr<IRemoteObject> &hostToken)
 {
-    HILOG_DEBUG("call");
+    HILOG_INFO("formUserId:%{public}d", formRecord.userId);
     if (formRecord.privacyLevel > 0) {
-        if (sandboxInner_ == nullptr) {
+        auto iter = sandboxInners_.find(formRecord.userId);
+        if (iter == sandboxInners_.end()) {
             return ERR_APPEXECFWK_FORM_INVALID_PARAM;
         }
-        return sandboxInner_->StopRenderingForm(formId, formRecord, compId, hostToken);
+        return iter->second->StopRenderingForm(formId, formRecord, compId, hostToken);
     } else {
-        if (renderInner_ == nullptr) {
+        auto iter = renderInners_.find(formRecord.userId);
+        if (iter == renderInners_.end()) {
             return ERR_APPEXECFWK_FORM_INVALID_PARAM;
         }
-        return renderInner_->StopRenderingForm(formId, formRecord, compId, hostToken);
+        return iter->second->StopRenderingForm(formId, formRecord, compId, hostToken);
     }
 }
 
@@ -252,87 +265,103 @@ ErrCode FormRenderMgr::RenderFormCallback(int64_t formId, const Want &want)
 
 ErrCode FormRenderMgr::StopRenderingFormCallback(int64_t formId, const Want &want)
 {
-    HILOG_INFO("call");
-    if (renderInner_ != nullptr) {
-        renderInner_->StopRenderingFormCallback(formId, want);
+    int32_t callingUserId = IPCSkeleton::GetCallingUid() / Constants::CALLING_UID_TRANSFORM_DIVISOR;
+    HILOG_INFO("formId:%{public}" PRId64 ", callingUserId:%{public}d", formId, callingUserId);
+    auto renderIter = renderInners_.find(callingUserId);
+    if (renderIter != renderInners_.end()) {
+        renderIter->second->StopRenderingFormCallback(formId, want);
     }
-    if (sandboxInner_ != nullptr) {
-        sandboxInner_->StopRenderingFormCallback(formId, want);
+    auto sandboxIter = sandboxInners_.find(callingUserId);
+    if (sandboxIter != sandboxInners_.end()) {
+        sandboxIter->second->StopRenderingFormCallback(formId, want);
     }
     return ERR_OK;
 }
 
 ErrCode FormRenderMgr::ReleaseRenderer(int64_t formId, const FormRecord &formRecord, const std::string &compId)
 {
-    HILOG_DEBUG("call");
+    HILOG_INFO("formId:%{public}" PRId64 ", formUserId:%{public}d", formId, formRecord.userId);
     if (formRecord.privacyLevel > 0) {
-        if (sandboxInner_ == nullptr) {
+        auto iter = sandboxInners_.find(formRecord.userId);
+        if (iter == sandboxInners_.end()) {
             return ERR_APPEXECFWK_FORM_INVALID_PARAM;
         }
-        return sandboxInner_->ReleaseRenderer(formId, formRecord, compId);
+        return iter->second->ReleaseRenderer(formId, formRecord, compId);
     } else {
-        if (renderInner_ == nullptr) {
+        auto iter = renderInners_.find(formRecord.userId);
+        if (iter == renderInners_.end()) {
             return ERR_APPEXECFWK_FORM_INVALID_PARAM;
         }
-        return renderInner_->ReleaseRenderer(formId, formRecord, compId);
+        return iter->second->ReleaseRenderer(formId, formRecord, compId);
     }
 }
 
 ErrCode FormRenderMgr::AddConnection(
-    int64_t formId, sptr<FormRenderConnection> connection, int32_t privacyLevel)
+    int64_t formId, sptr<FormRenderConnection> connection, const FormRecord &formRecord)
 {
-    HILOG_INFO("call");
-    if (privacyLevel > 0) {
-        if (sandboxInner_ == nullptr) {
+    HILOG_INFO("formUserId: %{public}d", formRecord.userId);
+    if (formRecord.privacyLevel > 0) {
+        auto iter = sandboxInners_.find(formRecord.userId);
+        if (iter == sandboxInners_.end()) {
             return ERR_APPEXECFWK_FORM_INVALID_PARAM;
         }
-        return sandboxInner_->AddConnection(formId, connection);
+        return iter->second->AddConnection(formId, connection);
     } else {
-        if (renderInner_ == nullptr) {
+        auto iter = renderInners_.find(formRecord.userId);
+        if (iter == renderInners_.end()) {
             return ERR_APPEXECFWK_FORM_INVALID_PARAM;
         }
-        return renderInner_->AddConnection(formId, connection);
+        return iter->second->AddConnection(formId, connection);
     }
 }
 
-void FormRenderMgr::RemoveConnection(int64_t formId, int32_t privacyLevel)
+void FormRenderMgr::RemoveConnection(int64_t formId, const FormRecord &formRecord)
 {
-    HILOG_INFO("Call");
-    if (privacyLevel > 0) {
-        if (sandboxInner_ == nullptr) {
-            return;
+    HILOG_INFO("formId:%{public}" PRId64 ", formUserId:%{public}d", formId, formRecord.userId);
+    if (formRecord.privacyLevel > 0) {
+        auto iter = sandboxInners_.find(formRecord.userId);
+        if (iter != sandboxInners_.end()) {
+            iter->second->RemoveConnection(formId);
         }
-        sandboxInner_->RemoveConnection(formId);
     } else {
-        if (renderInner_ == nullptr) {
-            return;
+        auto iter = renderInners_.find(formRecord.userId);
+        if (iter != renderInners_.end()) {
+            iter->second->RemoveConnection(formId);
         }
-        renderInner_->RemoveConnection(formId);
     }
 }
 
-void FormRenderMgr::CleanFormHost(const sptr<IRemoteObject> &host)
+void FormRenderMgr::CleanFormHost(const sptr<IRemoteObject> &host, const int hostCallingUid)
 {
-    if (renderInner_ != nullptr) {
-        renderInner_->CleanFormHost(host);
+    int32_t hostUserId = hostCallingUid / Constants::CALLING_UID_TRANSFORM_DIVISOR;
+    if (hostUserId == 0) {
+        HILOG_WARN("hostUserId is 0, get current active userId ");
+        hostUserId = FormUtil::GetCurrentAccountId();
     }
-    if (sandboxInner_ != nullptr) {
-        sandboxInner_->CleanFormHost(host);
+    HILOG_INFO("hostUserId:%{public}d", hostUserId);
+    auto renderIter = renderInners_.find(hostUserId);
+    if (renderIter != renderInners_.end()) {
+        renderIter->second->CleanFormHost(host);
+    }
+    auto sandboxIter = sandboxInners_.find(hostUserId);
+    if (sandboxIter != sandboxInners_.end()) {
+        sandboxIter->second->CleanFormHost(host);
     }
 }
 
-void FormRenderMgr::AddRenderDeathRecipient(const sptr<IRemoteObject> &remoteObject, int32_t privacyLevel)
+void FormRenderMgr::AddRenderDeathRecipient(const sptr<IRemoteObject> &remoteObject, const FormRecord &formRecord)
 {
-    if (privacyLevel > 0) {
-        if (sandboxInner_ == nullptr) {
-            return;
+    HILOG_INFO("formUserId:%{public}d", formRecord.userId);
+    if (formRecord.privacyLevel > 0) {
+        auto iter = sandboxInners_.find(formRecord.userId);
+        if (iter != sandboxInners_.end()) {
+            iter->second->AddRenderDeathRecipient(remoteObject);
         }
-        sandboxInner_->AddRenderDeathRecipient(remoteObject);
     } else {
-        if (renderInner_ == nullptr) {
-            return;
+        auto iter = renderInners_.find(formRecord.userId);
+        if (iter != renderInners_.end()) {
+            iter->second->AddRenderDeathRecipient(remoteObject);
         }
-        renderInner_->AddRenderDeathRecipient(remoteObject);
     }
 }
 
@@ -387,27 +416,43 @@ bool FormRenderMgr::IsRerenderForRenderServiceDied(int64_t formId)
 {
     int32_t rerenderCount = 0;
     int32_t reSandboxRenderCount = 0;
-    if (renderInner_ != nullptr) {
-        rerenderCount = renderInner_->GetReRenderCount();
+    FormRecord formRecord;
+    bool isGetFormRecord = FormDataMgr::GetInstance().GetFormRecord(formId, formRecord);
+    if (!isGetFormRecord) {
+        HILOG_ERROR("get FormRecord fail, not exist such form, formId:%{public}" PRId64 "", formId);
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
-    if (sandboxInner_ != nullptr) {
-        reSandboxRenderCount = sandboxInner_->GetReRenderCount();
+    HILOG_INFO("formId:%{public}" PRId64 ", formUserId:%{public}d", formId, formRecord.userId);
+    auto renderIter = renderInners_.find(formRecord.userId);
+    if (renderIter != renderInners_.end()) {
+        rerenderCount = renderIter->second->GetReRenderCount();
+    }
+    auto sandboxIter = sandboxInners_.find(formRecord.userId);
+    if (sandboxIter != sandboxInners_.end()) {
+        reSandboxRenderCount = sandboxIter->second->GetReRenderCount();
     }
     bool ret = IsNeedRender(formId) && (rerenderCount > 0 || reSandboxRenderCount > 0);
     HILOG_DEBUG("Is need to rerender:%{public}d", ret);
     return ret;
 }
 
-void FormRenderMgr::InitRenderInner(bool isSandbox)
+void FormRenderMgr::InitRenderInner(bool isSandbox, int32_t userId)
 {
+    HILOG_INFO("isSandbox: %{public}d userId: %{public}d.", isSandbox, userId);
     std::lock_guard<std::mutex> lock(renderInnerMutex_);
     if (isSandbox) {
-        if (sandboxInner_ == nullptr) {
-            sandboxInner_ = std::make_shared<FormSandboxRenderMgrInner>();
+        auto iter = sandboxInners_.find(userId);
+        if (iter == sandboxInners_.end()) {
+            auto formSandboxRenderMgr = std::make_shared<FormSandboxRenderMgrInner>();
+            formSandboxRenderMgr->SetUserId(userId);
+            sandboxInners_.emplace(userId, formSandboxRenderMgr);
         }
     } else {
-        if (renderInner_ == nullptr) {
-            renderInner_ = std::make_shared<FormRenderMgrInner>();
+        auto iter = renderInners_.find(userId);
+        if (iter == renderInners_.end()) {
+            auto formRenderMgr = std::make_shared<FormRenderMgrInner>();
+            formRenderMgr->SetUserId(userId);
+            renderInners_.emplace(userId, formRenderMgr);
         }
     }
 }
@@ -415,24 +460,60 @@ void FormRenderMgr::InitRenderInner(bool isSandbox)
 ErrCode FormRenderMgr::RecycleForms(
     const std::vector<int64_t> &formIds, const Want &want, const sptr<IRemoteObject> &remoteObjectOfHost)
 {
-    if (renderInner_ != nullptr) {
-        return renderInner_->RecycleForms(formIds, want, remoteObjectOfHost);
+    int callingUserId = want.GetIntParam(Constants::RECYCLE_FORMS_USER_ID, 0);
+    if (callingUserId == 0) {
+        callingUserId = IPCSkeleton::GetCallingUid() / Constants::CALLING_UID_TRANSFORM_DIVISOR;
+        HILOG_INFO("callingUserId is 0, update callingUserId:%{public}d", callingUserId);
     }
-    if (sandboxInner_ != nullptr) {
-        return sandboxInner_->RecycleForms(formIds, want, remoteObjectOfHost);
+    auto renderIter = renderInners_.find(callingUserId);
+    if (renderIter != renderInners_.end()) {
+        return renderIter->second->RecycleForms(formIds, want, remoteObjectOfHost);
+    }
+    auto sandboxIter = sandboxInners_.find(callingUserId);
+    if (sandboxIter != sandboxInners_.end()) {
+        return sandboxIter->second->RecycleForms(formIds, want, remoteObjectOfHost);
     }
     return ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED;
 }
 
 ErrCode FormRenderMgr::RecoverForms(const std::vector<int64_t> &formIds, const WantParams &wantParams)
 {
-    if (renderInner_ != nullptr) {
-        return renderInner_->RecoverForms(formIds, wantParams);
+    int32_t callingUserId = IPCSkeleton::GetCallingUid() / Constants::CALLING_UID_TRANSFORM_DIVISOR;
+    auto renderIter = renderInners_.find(callingUserId);
+    if (renderIter != renderInners_.end()) {
+        return renderIter->second->RecoverForms(formIds, wantParams);
     }
-    if (sandboxInner_ != nullptr) {
-        return sandboxInner_->RecoverForms(formIds, wantParams);
+    auto sandboxIter = sandboxInners_.find(callingUserId);
+    if (sandboxIter != sandboxInners_.end()) {
+        return sandboxIter->second->RecoverForms(formIds, wantParams);
     }
     return ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED;
+}
+
+void FormRenderMgr::DisconnectAllRenderConnections(int userId)
+{
+    HILOG_INFO("userId: %{public}d", userId);
+    auto renderIter = renderInners_.find(userId);
+    if (renderIter != renderInners_.end()) {
+        renderIter->second->DisconnectAllRenderConnections();
+    }
+    auto sandboxIter = sandboxInners_.find(userId);
+    if (sandboxIter != sandboxInners_.end()) {
+        sandboxIter->second->DisconnectAllRenderConnections();
+    }
+}
+
+void FormRenderMgr::RerenderAllFormsImmediate(int userId)
+{
+    HILOG_INFO("userId: %{public}d", userId);
+    auto renderIter = renderInners_.find(userId);
+    if (renderIter != renderInners_.end()) {
+        renderIter->second->RerenderAllFormsImmediate();
+    }
+    auto sandboxIter = sandboxInners_.find(userId);
+    if (sandboxIter != sandboxInners_.end()) {
+        sandboxIter->second->RerenderAllFormsImmediate();
+    }
 }
 } // namespace AppExecFwk
 } // namespace OHOS

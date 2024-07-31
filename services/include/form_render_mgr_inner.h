@@ -80,6 +80,14 @@ public:
         const sptr<IRemoteObject> &remoteObjectOfHost);
 
     ErrCode RecoverForms(const std::vector<int64_t> &formIds, const WantParams &wantParams);
+
+    void SetUserId(int32_t userId);
+
+    int32_t GetUserId() const;
+
+    void RerenderAllFormsImmediate();
+
+    void DisconnectAllRenderConnections();
 private:
     ErrCode ConnectRenderService(const sptr<FormRenderConnection> &connection, int32_t level) const;
 
@@ -117,6 +125,9 @@ private:
     sptr<IFormRender> renderRemoteObj_ = nullptr;
     sptr<IRemoteObject::DeathRecipient> renderDeathRecipient_ = nullptr;
     std::atomic<int32_t> atomicRerenderCount_ = 0;
+    // userId_ is Active User
+    bool isActiveUser_ = true;
+    int32_t userId_ = 0;
 };
 
 /**
