@@ -1617,7 +1617,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_085, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormRenderRecordTest_085 start";
     auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
     ASSERT_NE(formRenderRecord, nullptr);
-    int64_t formId = FORM_ID; 
+    int64_t formId = FORM_ID;
     std::string statusData;
     EXPECT_EQ(formRenderRecord->RecycleForm(formId, statusData), RECYCLE_FORM_FAILED);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_085 end";
