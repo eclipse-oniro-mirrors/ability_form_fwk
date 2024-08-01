@@ -38,10 +38,9 @@ const std::string KEY_DELIMITER = "?"; // the delimiter between key and uid
 
 class PermissionCustomizeListener : public Security::AccessToken::PermStateChangeCallbackCustomize {
     public:
-        FormDataProxyRecord *formDataProxyRecord_;
-
+        std::weak_ptr<FormDataProxyRecord> formDataProxyRecord_;
         PermissionCustomizeListener(const Security::AccessToken::PermStateChangeScope &scopeInfo,
-            FormDataProxyRecord *formDataProxyRecord)
+            std::weak_ptr<FormDataProxyRecord> formDataProxyRecord)
             : Security::AccessToken::PermStateChangeCallbackCustomize(scopeInfo)
         {
             formDataProxyRecord_ = formDataProxyRecord;
@@ -51,7 +50,12 @@ class PermissionCustomizeListener : public Security::AccessToken::PermStateChang
         {
             HILOG_INFO("PermStateChangeCallback type:%{public}d, permissionName:%{public}s",
                 result.permStateChangeType, result.permissionName.c_str());
-            formDataProxyRecord_->PermStateChangeCallback(result.permStateChangeType, result.permissionName);
+            auto formDataProxyRecord = formDataProxyRecord_.lock();
+            if (formDataProxyRecord == nullptr) {
+                HILOG_INFO("formDataPrxyRecord is nullptr");
+                return;
+            }
+            formDataProxyRecord->PermStateChangeCallback(result.permStateChangeType, result.permissionName);
         }
 };
 
@@ -163,7 +167,7 @@ void FormDataProxyRecord::RegisterPermissionListener(const std::vector<FormDataP
     Security::AccessToken::PermStateChangeScope scopeInfo;
     scopeInfo.permList = {permList};
     scopeInfo.tokenIDs = {tokenId_};
-    callbackPtr_ = std::make_shared<PermissionCustomizeListener>(scopeInfo, this);
+    callbackPtr_ = std::make_shared<PermissionCustomizeListener>(scopeInfo, weak_from_this());
     int32_t accessTokenKit = Security::AccessToken::AccessTokenKit::RegisterPermStateChangeCallback(callbackPtr_);
     IPCSkeleton::SetCallingIdentity(callingIdentity);
     HILOG_INFO("formId:%{public}s", std::to_string(formId_).c_str());
