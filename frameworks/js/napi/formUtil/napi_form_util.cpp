@@ -41,7 +41,7 @@ constexpr int ZERO_VALUE = 0;
 constexpr int REF_COUNT = 1;
 constexpr int BASE_NUMBER = 9;
 constexpr int CALLBACK_FLG = 1;
-constexpr int64_t HEAD_BIT_NUM = 900000000000000;
+constexpr int64_t HEAD_BIT_NUM = 9000000000000000000;
 const std::map<int32_t, int32_t> ERROR_CODE_MAP = {
     { ERR_OK,                                             ERR_OK },
     { ERR_APPEXECFWK_FORM_COMMON_CODE,                    ERR_COMMON },
