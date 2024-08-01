@@ -37,7 +37,7 @@ constexpr int32_t SYSTEM_UID = 1000;
 constexpr int INT_64_LENGTH = 19;
 constexpr int ZERO_VALUE = 0;
 constexpr int BASE_NUMBER = 9;
-constexpr int64_t HEAD_BIT_NUM = 900000000000000;
+constexpr int64_t HEAD_BIT_NUM = 9000000000000000000;
 } // namespace
 
 using namespace std;
