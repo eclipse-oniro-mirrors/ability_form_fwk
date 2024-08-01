@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,6 +40,7 @@ constexpr int32_t RELOAD_FORM_FAILED = -1;
 constexpr int32_t RENDER_FORM_ID = -1;
 constexpr int32_t RENDER_FORM_FAILED = -1;
 constexpr int32_t RECYCLE_FORM_FAILED = -1;
+constexpr int32_t FORM_ID = 1;
 }
 #define private public
 class FormRenderRecordMock : public FormRenderRecord {
@@ -1250,4 +1251,473 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_065, TestSize.Level0)
     bool ret = formRenderRecord->RecoverRenderer(requests, requestIndex);
     EXPECT_EQ(false, ret);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_065 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_066
+ * @tc.desc: Verify MarkThreadAlive
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_066, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_066 start";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    ASSERT_NE(formRenderRecord, nullptr);
+    formRenderRecord->threadState_ = std::make_shared<ThreadState>(1);
+    ASSERT_NE(formRenderRecord->threadState_, nullptr);
+    formRenderRecord->MarkThreadAlive();
+    EXPECT_EQ(formRenderRecord->threadState_->state_, 0);
+    EXPECT_EQ(formRenderRecord->threadIsAlive_, true);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_066 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_067
+ * @tc.desc: Verify UpdateRuntime
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_067, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_067 start";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    ASSERT_NE(formRenderRecord, nullptr);
+    FormJsInfo formJsInfo;
+    formJsInfo.bundleName = "bundleName";
+    formJsInfo.moduleName = "moduleName";
+    formRenderRecord->contextsMapForModuleName_.emplace(formJsInfo.bundleName + ":" + formJsInfo.moduleName, nullptr);
+    bool result = formRenderRecord->UpdateRuntime(formJsInfo);
+    EXPECT_EQ(result, false);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_067 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_068
+ * @tc.desc: Verify UpdateRuntime
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_068, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_068 start";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    ASSERT_NE(formRenderRecord, nullptr);
+    FormJsInfo formJsInfo;
+    formRenderRecord->runtime_ = nullptr;
+    bool result = formRenderRecord->UpdateRuntime(formJsInfo);
+    EXPECT_EQ(result, false);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_068 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_069
+ * @tc.desc: Verify UpdateRuntime
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_069, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_069 start";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    ASSERT_NE(formRenderRecord, nullptr);
+    FormJsInfo formJsInfo;
+    formRenderRecord->runtime_ = std::make_shared<AbilityRuntime::JsRuntime>();
+    ASSERT_NE(formRenderRecord->runtime_, nullptr);
+    bool result = formRenderRecord->UpdateRuntime(formJsInfo);
+    EXPECT_EQ(result, true);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_069 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_070
+ * @tc.desc: Verify GetContext
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_070, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_070 start";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    ASSERT_NE(formRenderRecord, nullptr);
+    FormJsInfo formJsInfo;
+    Want want;
+    formJsInfo.bundleName = "bundleName";
+    formJsInfo.moduleName = "moduleName";
+    formRenderRecord->contextsMapForModuleName_.emplace(formJsInfo.bundleName + ":" + formJsInfo.moduleName, nullptr);
+    auto result = formRenderRecord->GetContext(formJsInfo, want);
+    EXPECT_EQ(result, nullptr);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_070 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_071
+ * @tc.desc: Verify AddFormRequest
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_071, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_071 start";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    ASSERT_NE(formRenderRecord, nullptr);
+    int64_t formId = FORM_ID;
+    Ace::FormRequest formRequest;
+    formRequest.compId = "compId";
+    std::unordered_map<std::string, Ace::FormRequest> requests;
+    requests.emplace(formRequest.compId, formRequest);
+    formRenderRecord->formRequests_.emplace(formId, requests);
+    formRequest.hasRelease = true;
+    EXPECT_EQ(formRenderRecord->formRequests_.find(formId)->second.find(formRequest.compId)->second.hasRelease, false);
+    formRenderRecord->AddFormRequest(formId, formRequest);
+    EXPECT_EQ(formRenderRecord->formRequests_.find(formId)->second.find(formRequest.compId)->second.hasRelease, true);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_071 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_072
+ * @tc.desc: Verify UpdateFormRequestReleaseState
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_072, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_072 start";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    ASSERT_NE(formRenderRecord, nullptr);
+    int64_t formId = FORM_ID;
+    std::string compId = "compId";
+    bool hasRelease = true;
+    std::unordered_map<std::string, Ace::FormRequest> requests;
+    formRenderRecord->formRequests_.emplace(formId, requests);
+    formRenderRecord->UpdateFormRequestReleaseState(formId, compId, hasRelease);
+    EXPECT_EQ(formRenderRecord->formRequests_.find(formId)->second.find(compId),
+              formRenderRecord->formRequests_.find(formId)->second.end());
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_072 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_073
+ * @tc.desc: Verify UpdateFormRequestReleaseState
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_073, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_073 start";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    ASSERT_NE(formRenderRecord, nullptr);
+    Ace::FormRequest formRequest;
+    int64_t formId = FORM_ID;
+    std::string compId = "compId";
+    bool hasRelease = true;
+    std::unordered_map<std::string, Ace::FormRequest> requests;
+    requests.emplace(compId, formRequest);
+    formRenderRecord->formRequests_.emplace(formId, requests);
+    formRenderRecord->UpdateFormRequestReleaseState(formId, compId, hasRelease);
+    EXPECT_EQ(formRenderRecord->formRequests_.find(formId)->second.find(compId)->second.hasRelease, true);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_073 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_074
+ * @tc.desc: Verify HandleReleaseRendererInJsThread
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_074, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_074 start";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    ASSERT_NE(formRenderRecord, nullptr);
+    int64_t formId = FORM_ID;
+    std::string compId = "";
+    bool isRenderGroupEmpty = true;
+    EXPECT_EQ(false, formRenderRecord->HandleReleaseRendererInJsThread(formId, compId, isRenderGroupEmpty));
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_074 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_075
+ * @tc.desc: Verify HandleReleaseRendererInJsThread
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_075, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_075 start";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    ASSERT_NE(formRenderRecord, nullptr);
+    int64_t formId = FORM_ID;
+    std::string compId = "compId";
+    bool isRenderGroupEmpty = true;
+    EXPECT_EQ(false, formRenderRecord->HandleReleaseRendererInJsThread(formId, compId, isRenderGroupEmpty));
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_075 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_076
+ * @tc.desc: Verify HandleReleaseRendererInJsThread
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_076, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_076 start";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    ASSERT_NE(formRenderRecord, nullptr);
+    int64_t formId = FORM_ID;
+    std::string compId = "compId";
+    bool isRenderGroupEmpty = true;
+    formRenderRecord->formRendererGroupMap_.emplace(formId, nullptr);
+    EXPECT_EQ(false, formRenderRecord->HandleReleaseRendererInJsThread(formId, compId, isRenderGroupEmpty));
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_076 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_077
+ * @tc.desc: Verify HandleReleaseRendererInJsThread
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_077, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_077 start";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    ASSERT_NE(formRenderRecord, nullptr);
+    int64_t formId = FORM_ID;
+    std::string compId = "compId";
+    bool isRenderGroupEmpty = true;
+    std::shared_ptr<AbilityRuntime::Context> context = nullptr;
+    std::shared_ptr<AbilityRuntime::Runtime> runtime = nullptr;
+    std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = nullptr;
+    auto group = std::make_shared<FormRendererGroup>(context, runtime, handler);
+    ASSERT_NE(group, nullptr);
+    formRenderRecord->formRendererGroupMap_.emplace(formId, group);
+    EXPECT_EQ(true, formRenderRecord->HandleReleaseRendererInJsThread(formId, compId, isRenderGroupEmpty));
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_077 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_078
+ * @tc.desc: Verify HandleDestroyInJsThread
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_078, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_078 start";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    ASSERT_NE(formRenderRecord, nullptr);
+    int64_t formId = FORM_ID;
+    std::shared_ptr<AbilityRuntime::Context> context = nullptr;
+    std::shared_ptr<AbilityRuntime::Runtime> runtime = nullptr;
+    std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = nullptr;
+    auto group = std::make_shared<FormRendererGroup>(context, runtime, handler);
+    ASSERT_NE(group, nullptr);
+    formRenderRecord->formRendererGroupMap_.emplace(formId, group);
+    formRenderRecord->HandleDestroyInJsThread();
+    EXPECT_EQ(formRenderRecord->formRendererGroupMap_.empty(), true);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_078 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_079
+ * @tc.desc: Verify UpdateConfiguration
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_079, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_079 start";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    ASSERT_NE(formRenderRecord, nullptr);
+    formRenderRecord->UpdateConfiguration(nullptr, nullptr);
+    EXPECT_EQ(formRenderRecord->configuration_, nullptr);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_079 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_080
+ * @tc.desc: Verify OnUnlock
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_080, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_080 start";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    ASSERT_NE(formRenderRecord, nullptr);
+    formRenderRecord->eventHandler_ = nullptr;
+    EXPECT_EQ(formRenderRecord->OnUnlock(), RENDER_FORM_FAILED);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_080 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_081
+ * @tc.desc: Verify OnUnlock
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_081, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_081 start";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    ASSERT_NE(formRenderRecord, nullptr);
+    std::string bundleName = "<bundleName>";
+    auto eventRunner = EventRunner::Create(bundleName);
+    formRenderRecord->eventHandler_ = std::make_shared<EventHandler>(eventRunner);
+    EXPECT_EQ(formRenderRecord->OnUnlock(), ERR_OK);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_081 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_082
+ * @tc.desc: Verify HandleOnUnlock
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_082, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_082 start";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    ASSERT_NE(formRenderRecord, nullptr);
+    int64_t formId = FORM_ID;
+    std::shared_ptr<AbilityRuntime::Context> context = nullptr;
+    std::shared_ptr<AbilityRuntime::Runtime> runtime = nullptr;
+    std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = nullptr;
+    auto group = std::make_shared<FormRendererGroup>(context, runtime, handler);
+    ASSERT_NE(group, nullptr);
+    formRenderRecord->formRendererGroupMap_.emplace(formId, group);
+    EXPECT_EQ(formRenderRecord->HandleOnUnlock(), ERR_OK);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_082 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_083
+ * @tc.desc: Verify FormCount
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_083, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_083 start";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    ASSERT_NE(formRenderRecord, nullptr);
+    EXPECT_EQ(formRenderRecord->FormCount(), 0);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_083 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_084
+ * @tc.desc: Verify UpdateConfiguration
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_084, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_084 start";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    ASSERT_NE(formRenderRecord, nullptr);
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> config = std::make_shared<Configuration>();
+    ASSERT_NE(config, nullptr);
+    formRenderRecord->UpdateConfiguration(config, nullptr);
+    EXPECT_NE(formRenderRecord->configuration_, nullptr);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_084 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_085
+ * @tc.desc: Verify RecycleForm
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_085, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_085 start";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    ASSERT_NE(formRenderRecord, nullptr);
+    int64_t formId = FORM_ID; 
+    std::string statusData;
+    EXPECT_EQ(formRenderRecord->RecycleForm(formId, statusData), RECYCLE_FORM_FAILED);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_085 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_086
+ * @tc.desc: Verify RecycleForm
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_086, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_086 start";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    ASSERT_NE(formRenderRecord, nullptr);
+    int64_t formId = FORM_ID;
+    formRenderRecord->formRendererGroupMap_.emplace(formId, nullptr);
+    std::string statusData;
+    EXPECT_EQ(formRenderRecord->RecycleForm(formId, statusData), RECYCLE_FORM_FAILED);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_086 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_087
+ * @tc.desc: Verify RecycleForm
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_087, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_087 start";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    ASSERT_NE(formRenderRecord, nullptr);
+    int64_t formId = FORM_ID;
+    std::shared_ptr<AbilityRuntime::Context> context = nullptr;
+    std::shared_ptr<AbilityRuntime::Runtime> runtime = nullptr;
+    std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = nullptr;
+    auto group = std::make_shared<FormRendererGroup>(context, runtime, handler);
+    ASSERT_NE(group, nullptr);
+    formRenderRecord->formRendererGroupMap_.emplace(formId, group);
+    std::string statusData;
+    EXPECT_EQ(formRenderRecord->RecycleForm(formId, statusData), ERR_OK);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_087 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_088
+ * @tc.desc: Verify RecoverForm
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_088, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_088 start";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    ASSERT_NE(formRenderRecord, nullptr);
+    FormJsInfo formJsInfo;
+    std::string statusData;
+    EXPECT_EQ(formRenderRecord->RecoverForm(formJsInfo, statusData, true), ERR_OK);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_088 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_089
+ * @tc.desc: Verify RecoverRenderer
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_089, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_089 start";
+    std::string uid = "uid";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", uid);
+    ASSERT_NE(formRenderRecord, nullptr);
+    Ace::FormRequest formRequest;
+    std::vector<Ace::FormRequest> requests;
+    requests.emplace_back(formRequest);
+    size_t requestIndex = 0;
+    bool ret = formRenderRecord->RecoverRenderer(requests, requestIndex);
+    EXPECT_EQ(true, ret);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_089 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_090
+ * @tc.desc: Verify RecoverRenderer
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_090, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_090 start";
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
+    ASSERT_NE(formRenderRecord, nullptr);
+    FormJsInfo formJsInfo;
+    formJsInfo.bundleName = "bundleName";
+    formJsInfo.moduleName = "moduleName";
+    Ace::FormRequest formRequest;
+    formRequest.formJsInfo = formJsInfo;
+    std::vector<Ace::FormRequest> requests;
+    requests.emplace_back(formRequest);
+    size_t requestIndex = 0;
+    formRenderRecord->contextsMapForModuleName_.emplace(formJsInfo.bundleName + ":" + formJsInfo.moduleName, nullptr);
+    bool ret = formRenderRecord->RecoverRenderer(requests, requestIndex);
+    EXPECT_EQ(false, ret);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_090 end";
 }
