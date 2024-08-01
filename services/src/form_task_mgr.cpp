@@ -1294,5 +1294,30 @@ void FormTaskMgr::PostTask(const std::function<void()> &func, uint64_t delayMs)
 
     serialQueue_->ScheduleTask(delayMs, func);
 }
+
+void FormTaskMgr::PostFrsDiedTaskToHost(const sptr<IRemoteObject> &remoteObject)
+{
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("serialQueue_ invalidate");
+        return;
+    }
+    auto task = [remoteObject]() {
+        FormTaskMgr::GetInstance().FrsDiedTaskToHost(remoteObject);
+    };
+    serialQueue_->ScheduleTask(FORM_FRS_DIED_TASK_DELAY_TIME, task);
+}
+
+void FormTaskMgr::FrsDiedTaskToHost(const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_INFO("call");
+
+    sptr<IFormHost> remoteFormHost = iface_cast<IFormHost>(remoteObject);
+    if (remoteFormHost == nullptr) {
+        HILOG_ERROR("Failed to get form host proxy.");
+        return;
+    }
+
+    remoteFormHost->OnError(ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED, "FormRenderService is dead.");
+}
 } // namespace AppExecFwk
 } // namespace OHOS

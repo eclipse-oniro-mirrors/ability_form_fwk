@@ -37,6 +37,7 @@ enum class TaskType : int64_t {
 };
 namespace {
 constexpr int32_t FORM_TASK_DELAY_TIME = 20; // ms
+constexpr int32_t FORM_FRS_DIED_TASK_DELAY_TIME = 100; // ms
 }
 /**
  * @class FormTaskMgr
@@ -292,6 +293,13 @@ public:
      * @param delayMs Task excute delay time(ms).
      */
     void PostTask(const std::function<void()> &func, uint64_t delayMs = FORM_TASK_DELAY_TIME);
+
+    /**
+     * @brief Post re-add form task to form host when FormRenderService is died.
+     * @param remoteObject Form host proxy object.
+     */
+    void PostFrsDiedTaskToHost(const sptr<IRemoteObject> &remoteObject);
+
 private:
     /**
      * @brief Acquire form data from form provider.
@@ -522,6 +530,13 @@ private:
      */
     void EnableFormsTaskToHost(const std::vector<int64_t> &formIds, const bool enable,
         const sptr<IRemoteObject> &remoteObject);
+
+    /**
+     * @brief Post re-add form task to form host when FormRenderService is died.
+     * @param remoteObject Form host proxy object.
+     */
+    void FrsDiedTaskToHost(const sptr<IRemoteObject> &remoteObject);
+
 private:
     std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;
 };
