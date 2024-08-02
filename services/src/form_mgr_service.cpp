@@ -56,7 +56,9 @@
 #include "tokenid_kit.h"
 #include "hisysevent.h"
 #include "xcollie/watchdog.h"
+#ifdef MEM_MGR_ENABLE
 #include "mem_mgr_client.h"
+#endif
 #include "form_report.h"
 
 #ifdef RES_SCHEDULE_ENABLE
@@ -134,9 +136,11 @@ FormMgrService::~FormMgrService()
         formSysEventReceiver_ = nullptr;
         FormBmsHelper::GetInstance().UnregisterBundleEventCallback();
     }
+#ifdef MEM_MGR_ENABLE
     if (memStatusListener_ != nullptr) {
         Memory::MemMgrClient::GetInstance().UnsubscribeAppState(*memStatusListener_);
     }
+#endif
 }
 
 /**
@@ -685,7 +689,11 @@ void FormMgrService::OnStart()
     state_ = ServiceRunningState::STATE_RUNNING;
     // listener for FormDataProxyMgr
     AddSystemAbilityListener(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
+
+#ifdef MEM_MGR_ENABLE
     AddSystemAbilityListener(MEMORY_MANAGER_SA_ID);
+#endif // MEM_MGR_ENABLE
+
 #ifdef RES_SCHEDULE_ENABLE
     AddSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
 #endif // RES_SCHEDULE_ENABLE
@@ -778,9 +786,10 @@ ErrCode FormMgrService::Init()
     HILOG_INFO("FMS onStart publish done, time: %{public}s", onStartPublishTime_.c_str());
 
     SubscribeSysEventReceiver();
-
+#ifdef MEM_MGR_ENABLE
     memStatusListener_ = std::make_shared<MemStatusListener>();
     Memory::MemMgrClient::GetInstance().SubscribeAppState(*memStatusListener_);
+#endif
 
     FormInfoMgr::GetInstance().Start();
     FormDbCache::GetInstance().Start();
@@ -1268,11 +1277,14 @@ void FormMgrService::OnAddSystemAbility(int32_t systemAbilityId, const std::stri
     }
 #endif // RES_SCHEDULE_ENABLE
 
+#ifdef MEM_MGR_ENABLE
     if (systemAbilityId == MEMORY_MANAGER_SA_ID) {
         HILOG_INFO("MEMORY_MANAGER_SA start, SubscribeAppState");
         Memory::MemMgrClient::GetInstance().SubscribeAppState(*memStatusListener_);
         return;
     }
+#endif // MEM_MGR_ENABLE
+
     if (systemAbilityId != DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID) {
         return;
     }
