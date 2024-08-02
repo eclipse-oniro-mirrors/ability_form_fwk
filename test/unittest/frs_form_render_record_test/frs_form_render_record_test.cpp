@@ -40,6 +40,7 @@ constexpr int32_t RELOAD_FORM_FAILED = -1;
 constexpr int32_t RENDER_FORM_ID = -1;
 constexpr int32_t RENDER_FORM_FAILED = -1;
 constexpr int32_t RECYCLE_FORM_FAILED = -1;
+constexpr int32_t SYNC_EVENT_SLEEP_TIME = 1000;
 }
 #define private public
 class FormRenderRecordMock : public FormRenderRecord {
@@ -84,7 +85,9 @@ void FormRenderRecordTest::SetUp()
 {}
 
 void FormRenderRecordTest::TearDown()
-{}
+{
+    std::this_thread::sleep_for(std::chrono::milliseconds(SYNC_EVENT_SLEEP_TIME));
+}
 
 /**
  * @tc.name: FormRenderRecordTest_001
