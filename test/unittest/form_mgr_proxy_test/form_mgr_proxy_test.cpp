@@ -897,4 +897,20 @@ HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_EnableForms_001, TestSize.Level1) {
     EXPECT_EQ(formMgrProxy->EnableForms(bundleName, false), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrProxyTest_EnableForms_001 test ends";
 }
+
+/**
+ * @tc.name: FormMgrProxyTest_IsSystemAppForm_001
+ * @tc.desc: Verify IsSystemAppForm
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_IsSystemAppForm_001, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_IsSystemAppForm_001 starts";
+    EXPECT_CALL(*mockFormMgrService, IsSystemAppForm(_))
+        .Times(1)
+        .WillOnce(Return(true));
+    std::string bundleName = "ohos.samples.FormApplicationTest";
+    bool result = formMgrProxy->IsSystemAppForm(bundleName);
+    EXPECT_EQ(result, true);
+    GTEST_LOG_(INFO) << "FormMgrProxyTest_IsSystemAppForm_001 test ends";
+}
 }

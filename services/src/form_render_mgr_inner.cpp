@@ -585,12 +585,12 @@ void FormRenderMgrInner::NotifyHostRenderServiceIsDead() const
         hostsForNotify.swap(tmpMap);
     }
     for (const auto &item : hostsForNotify) {
-        auto hostClient = iface_cast<IFormHost>(item.first);
+        sptr<IRemoteObject> hostClient = item.first;
         if (hostClient == nullptr) {
             HILOG_ERROR("hostClient is nullptr");
             continue;
         }
-        hostClient->OnError(ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED, "FormRenderService is dead.");
+        FormTaskMgr::GetInstance().PostFrsDiedTaskToHost(hostClient);
     }
 }
 
