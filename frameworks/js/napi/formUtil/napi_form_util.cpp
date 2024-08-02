@@ -39,9 +39,9 @@ constexpr size_t ARGS_SIZE_TWO = 2;
 constexpr int INT_64_LENGTH = 19;
 constexpr int ZERO_VALUE = 0;
 constexpr int REF_COUNT = 1;
-constexpr int DECIMAL_VALUE = 10;
 constexpr int BASE_NUMBER = 9;
 constexpr int CALLBACK_FLG = 1;
+constexpr int64_t HEAD_BIT_NUM = 9000000000000000000;
 const std::map<int32_t, int32_t> ERROR_CODE_MAP = {
     { ERR_OK,                                             ERR_OK },
     { ERR_APPEXECFWK_FORM_COMMON_CODE,                    ERR_COMMON },
@@ -263,12 +263,12 @@ bool ConvertStringToInt64(const std::string &strInfo, int64_t &int64Value)
                 return true;
             }
             // Means 0x7FFFFFFFFFFFFFFF remove the first number:(2^63 - 1 - 9 * 10 ^ 19)
-            int subValue = std::stoll(strInfo.substr(ZERO_VALUE + 1, INT_64_LENGTH - 1));
-            if (strLength == INT_64_LENGTH && subValue <= INT64_MAX - BASE_NUMBER *
-                pow(DECIMAL_VALUE, INT_64_LENGTH - 1)) {
+            int64_t subValue = std::stoll(strInfo.substr(ZERO_VALUE + 1, INT_64_LENGTH - 1));
+            if (strLength == INT_64_LENGTH && subValue <= (INT64_MAX - HEAD_BIT_NUM)) {
                 int64Value = std::stoll(strInfo);
                 return true;
             }
+            return false;
         }
         if (strLength < INT_64_LENGTH + 1) { // The minimum value: -9223372036854775808
             int64Value = std::stoll(strInfo);
@@ -282,8 +282,8 @@ bool ConvertStringToInt64(const std::string &strInfo, int64_t &int64Value)
             }
 
             // Means 0x8000000000000000 remove the first number:-(2^63 - 9 * 10 ^ 19)
-            if (std::stoll(strInfo.substr(ZERO_VALUE + 2, INT_64_LENGTH - 1)) <=
-                (INT64_MAX - BASE_NUMBER * pow(DECIMAL_VALUE, INT_64_LENGTH) + 1)) {
+            int64_t subValue = std::stoll(strInfo.substr(ZERO_VALUE + 2, INT_64_LENGTH - 1));
+            if (subValue <= (INT64_MAX - HEAD_BIT_NUM + 1)) {
                 int64Value = std::stoll(strInfo);
                 return true;
             }

@@ -48,6 +48,10 @@ FormProviderData::FormProviderData()
  */
 FormProviderData::FormProviderData(nlohmann::json &jsonData)
 {
+    if (!jsonData.is_object()) {
+        HILOG_ERROR("jsonData not object");
+        return;
+    }
     jsonFormProviderData_ = jsonData;
     ParseImagesData();
 }
@@ -60,15 +64,7 @@ FormProviderData::FormProviderData(nlohmann::json &jsonData)
  */
 FormProviderData::FormProviderData(std::string jsonDataString)
 {
-    if (jsonDataString.empty()) {
-        jsonDataString = JSON_EMPTY_STRING;
-    }
-    nlohmann::json jsonObject = nlohmann::json::parse(jsonDataString, nullptr, false);
-    if (jsonObject.is_discarded()) {
-        HILOG_ERROR("failed to parse jsonDataString: %{private}s.", jsonDataString.c_str());
-        return;
-    }
-    jsonFormProviderData_ = jsonObject;
+    SetDataString(jsonDataString);
     ParseImagesData();
 }
 
@@ -198,6 +194,10 @@ void FormProviderData::SetDataString(std::string &jsonDataString)
     nlohmann::json jsonObject = nlohmann::json::parse(jsonDataString, nullptr, false);
     if (jsonObject.is_discarded()) {
         HILOG_ERROR("failed to parse jsonDataString: %{private}s.", jsonDataString.c_str());
+        return;
+    }
+    if (!jsonObject.is_object()) {
+        HILOG_ERROR("jsonDataString not object");
         return;
     }
     jsonFormProviderData_ = jsonObject;
