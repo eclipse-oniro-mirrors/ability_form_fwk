@@ -94,7 +94,8 @@ ErrCode FormRenderMgr::RenderForm(
 
     Want want;
     want.SetParams(wantParams);
-    want.SetParam(Constants::FORM_SUPPLY_UID, std::to_string(formRecord.userId) + formRecord.bundleName);
+    std::string recordUid = std::to_string(formRecord.providerUserId) + formRecord.bundleName;
+    want.SetParam(Constants::FORM_SUPPLY_UID, recordUid);
     {
         std::lock_guard<std::mutex> lock(isVerifiedMutex_);
         want.SetParam(Constants::FORM_RENDER_STATE, isVerified_ || isScreenUnlocked_);

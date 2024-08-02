@@ -89,6 +89,8 @@ extern void MockGetRunningFormInfosByFormId(int32_t mockRet);
 extern void MockGetRunningFormInfos(int32_t mockRet);
 extern void MockGenerateFormId(bool mockRet);
 void MockRequestPublishFormToHost(bool mockRet);
+void MockCheckBundlePermission(bool mockRet);
+void MockIsCaller(bool mockRet);
 
 namespace {
 class FmsFormMgrAdapterTest2 : public testing::Test {
@@ -689,12 +691,14 @@ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_0148, TestSize.Level0)
     Want want = {};
     FormInfo formInfo = {};
     want.SetElementName("bundleName", "abilityName");
-    MockGetFormsInfoByModule(true);
-    MockGetFormsInfoByModuleParam(false);
+    MockCheckBundlePermission(false);
+    MockIsCaller(false);
     std::string str = "aa";
     want.SetParam(Constants::PARAM_MODULE_NAME_KEY, str);
     want.SetParam(Constants::PARAM_FORM_NAME_KEY, str);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE, formMgrAdapter.GetFormInfo(want, formInfo));
+    MockCheckBundlePermission(true);
+    MockIsCaller(true);
     GTEST_LOG_(INFO) << "FormMgrAdapter_0148 end";
 }
 

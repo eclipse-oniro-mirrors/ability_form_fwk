@@ -23,6 +23,8 @@
 namespace {
     bool g_mockGetFormsInfoByModuleRet = true;
     bool g_mockGetFormsInfoByModuleParam = false;
+    bool g_mockCheckBundlePermission = true;
+    bool g_mockIsCaller = true;
 }
 
 void MockGetFormsInfoByModule(bool mockRet)
@@ -33,6 +35,16 @@ void MockGetFormsInfoByModule(bool mockRet)
 void MockGetFormsInfoByModuleParam(bool mockRet)
 {
     g_mockGetFormsInfoByModuleParam = mockRet;
+}
+
+void MockCheckBundlePermission(bool mockRet)
+{
+    g_mockCheckBundlePermission = mockRet;
+}
+
+void MockIsCaller(bool mockRet)
+{
+    g_mockIsCaller = mockRet;
 }
 
 namespace OHOS {
@@ -60,6 +72,18 @@ ErrCode FormInfoMgr::GetFormsInfoByModule(const std::string &bundleName, const s
         formInfos.push_back(formInfo2);
     }
     return ERR_OK;
+}
+
+bool FormInfoMgr::IsCaller(const std::string& bundleName)
+{
+    GTEST_LOG_(INFO) << "IsCaller called " << g_mockIsCaller;
+    return g_mockIsCaller;
+}
+
+bool FormInfoMgr::CheckBundlePermission()
+{
+    GTEST_LOG_(INFO) << "CheckBundlePermission called " << g_mockCheckBundlePermission;
+    return g_mockCheckBundlePermission;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
