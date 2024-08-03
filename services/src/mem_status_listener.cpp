@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#ifdef MEM_MGR_ENABLE
 #include "mem_status_listener.h"
 #include "fms_log_wrapper.h"
 #include "form_data_mgr.h"
@@ -42,3 +43,4 @@ void MemStatusListener::ForceReclaim(int32_t pid, int32_t uid)
 }
 } // namespace AppExecFwk
 } // namespace OHOS
+#endif //MEM_MGR_ENABLE

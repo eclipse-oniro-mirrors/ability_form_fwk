@@ -633,7 +633,7 @@ public:
      */
     void OnSystemloadLevel(int32_t level);
 #endif // RES_SCHEDULE_ENABLE
-    
+
     /**
      * @brief enable/disable form update.
      * @param bundleName BundleName of the form host.
@@ -707,8 +707,9 @@ private:
     std::shared_ptr<FormSysEventReceiver> formSysEventReceiver_ = nullptr;
     mutable std::mutex instanceMutex_;
     DISALLOW_COPY_AND_MOVE(FormMgrService);
+#ifdef MEM_MGR_ENABLE
     std::shared_ptr<MemStatusListener> memStatusListener_ = nullptr;
-
+#endif
     void SubscribeSysEventReceiver();
 
     /**
