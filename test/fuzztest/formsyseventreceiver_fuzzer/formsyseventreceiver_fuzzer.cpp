@@ -53,7 +53,8 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     int32_t userIds = static_cast<int32_t>(GetU32Data(data));
     FormEventUtil::HandleProviderRemoved(bundleName, userIds);
     BundlePackInfo bundlePackInfo;
-    FormEventUtil::ProviderFormUpdated(formId, formRecord, bundlePackInfo);
+    BundleInfo bundleInfo;
+    FormEventUtil::ProviderFormUpdated(formId, formRecord, bundlePackInfo, bundleInfo);
     FormEventUtil::HandleBundleFormInfoChanged(bundleName, userIds);
     FormEventUtil::HandleUpdateFormCloud(bundleName);
     FormEventUtil::HandleBundleFormInfoRemoved(bundleName, userIds);
@@ -84,7 +85,7 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formSysEventReceiver.HandleUserIdRemoved(userIds);
     formSysEventReceiver.HandleBundleScanFinished();
     eventData.SetCode(userIds);
-    return FormEventUtil::ProviderFormUpdated(formId, formRecord, targetForms);
+    return FormEventUtil::ProviderFormUpdated(formId, formRecord, targetForms, bundleInfo);
 }
 }
 
