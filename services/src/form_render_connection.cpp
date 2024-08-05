@@ -67,8 +67,8 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
     }
 
     sptr<FormRenderConnection> connection(this);
-    FormRenderMgr::GetInstance().AddConnection(GetFormId(), connection, newRecord.privacyLevel);
-    FormRenderMgr::GetInstance().AddRenderDeathRecipient(remoteObject, newRecord.privacyLevel);
+    FormRenderMgr::GetInstance().AddConnection(GetFormId(), connection, newRecord);
+    FormRenderMgr::GetInstance().AddRenderDeathRecipient(remoteObject, newRecord);
     Want want;
     want.SetParams(wantParams_);
     want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
@@ -82,7 +82,7 @@ void FormRenderConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName
         element.GetURI().c_str(), resultCode, connectState_);
     // If connectState_ is CONNECTING, it means connect failed and host will try again, don't need to notify host
     if (resultCode && connectState_ == ConnectState::CONNECTING) {
-        FormRenderMgr::GetInstance().RemoveConnection(GetFormId(), formRecord_.privacyLevel);
+        FormRenderMgr::GetInstance().RemoveConnection(GetFormId(), formRecord_);
     }
     connectState_ = ConnectState::DISCONNECTED;
 }

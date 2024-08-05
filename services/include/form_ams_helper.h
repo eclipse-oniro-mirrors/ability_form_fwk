@@ -29,6 +29,7 @@ namespace OHOS {
 namespace AppExecFwk {
 using IAbilityConnection = OHOS::AAFwk::IAbilityConnection;
 using Want = OHOS::AAFwk::Want;
+const int FORM_DISCONNECT_DELAY_TIME = 10000; // ms
 /**
  * @class FormAmsHelper
  * Ams helpler.
@@ -60,18 +61,18 @@ public:
         const Want &want, const sptr<AAFwk::IAbilityConnection> &connect);
     /**
      * @brief Disconnect session with service ability.
-     * @param want Special want for service type's ability.
      * @param connect Callback used to notify caller the result of connecting or disconnecting.
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode DisconnectServiceAbility(const sptr<AAFwk::IAbilityConnection> &connect);
     /**
      * @brief Disconnect ability delay, disconnect session with service ability.
-     * @param want Special want for service type's ability.
      * @param connect Callback used to notify caller the result of connecting or disconnecting.
+     * @param delayTime Special time to delay, default is FORM_DISCONNECT_DELAY_TIME.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode DisconnectServiceAbilityDelay(const sptr<AAFwk::IAbilityConnection> &connect);
+    ErrCode DisconnectServiceAbilityDelay(
+        const sptr<AAFwk::IAbilityConnection> &connect, int delayTime = FORM_DISCONNECT_DELAY_TIME);
     /**
      * @brief StartAbility with want, send want to ability manager service.
      * @param want The want of the ability to start.

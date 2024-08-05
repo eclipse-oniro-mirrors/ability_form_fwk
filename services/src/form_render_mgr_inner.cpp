@@ -42,6 +42,7 @@ namespace AppExecFwk {
 namespace {
 constexpr size_t LAST_CONNECTION = 1;
 const std::string DLP_INDEX = "ohos.dlp.params.index";
+const int FORM_DISCONNECT_FRS_DELAY_TIME = 5000; // ms
 }
 using Want = OHOS::AAFwk::Want;
 FormRenderMgrInner::FormRenderMgrInner()
@@ -54,6 +55,10 @@ FormRenderMgrInner::~FormRenderMgrInner()
 ErrCode FormRenderMgrInner::RenderForm(
     const FormRecord &formRecord, Want &want, const sptr<IRemoteObject> &hostToken)
 {
+    if (!isActiveUser_) {
+        HILOG_WARN("isActiveUser is false, return");
+        return ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED;
+    }
     if (atomicRerenderCount_ > 0) {
         --atomicRerenderCount_;
     } else {
@@ -470,8 +475,15 @@ void FormRenderMgrInner::AddRenderDeathRecipient(const sptr<IRemoteObject> &remo
     }
 
     if (renderDeathRecipient_ == nullptr) {
-        renderDeathRecipient_ = new (std::nothrow)FormRenderRecipient([this]() {
-            RerenderAllForms();
+        renderDeathRecipient_ = new (std::nothrow) FormRenderRecipient([this]() {
+            HILOG_WARN("FRS is Death, userId:%{public}d, isActiveUser:%{public}d", userId_, isActiveUser_);
+            if (isActiveUser_) {
+                RerenderAllForms();
+            } else {
+                std::unique_lock<std::shared_mutex> guard(renderRemoteObjMutex_);
+                renderRemoteObj_ = nullptr;
+                guard.unlock();
+            }
         });
     }
     if (!remoteObject->AddDeathRecipient(renderDeathRecipient_)) {
@@ -499,11 +511,45 @@ inline ErrCode FormRenderMgrInner::ConnectRenderService(
     return FormAmsHelper::GetInstance().ConnectServiceAbility(want, connection);
 }
 
+void FormRenderMgrInner::SetUserId(int32_t userId)
+{
+    userId_ = userId;
+}
+
+int32_t FormRenderMgrInner::GetUserId() const
+{
+    return userId_;
+}
+
+void FormRenderMgrInner::RerenderAllFormsImmediate()
+{
+    HILOG_INFO("Called");
+    isActiveUser_ = true;
+    if (etsHosts_.empty()) {
+        HILOG_WARN("All hosts died, no need to rerender.");
+        return;
+    }
+    NotifyHostRenderServiceIsDead();
+}
+
+void FormRenderMgrInner::DisconnectAllRenderConnections()
+{
+    HILOG_INFO("renderFormConnections size: %{public}zu.", renderFormConnections_.size());
+    std::lock_guard<std::mutex> lock(resourceMutex_);
+    size_t size = renderFormConnections_.size();
+    for (auto iter = renderFormConnections_.begin(); iter != renderFormConnections_.end();) {
+        DisconnectRenderService(iter->second, size);
+        iter = renderFormConnections_.erase(iter);
+        size--;
+    }
+    isActiveUser_ = false;
+}
+
 void FormRenderMgrInner::DisconnectRenderService(const sptr<FormRenderConnection> connection, size_t size) const
 {
     if (size == LAST_CONNECTION) {
         HILOG_INFO("This is the last connection, disconnect render service delay");
-        FormAmsHelper::GetInstance().DisconnectServiceAbilityDelay(connection);
+        FormAmsHelper::GetInstance().DisconnectServiceAbilityDelay(connection, FORM_DISCONNECT_FRS_DELAY_TIME);
     } else {
         HILOG_DEBUG("Disconnect render service ability");
         FormAmsHelper::GetInstance().DisconnectServiceAbility(connection);

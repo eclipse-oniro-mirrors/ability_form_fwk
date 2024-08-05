@@ -73,7 +73,6 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace {
 const int32_t MAIN_USER_ID = 100;
-constexpr int32_t GET_CALLING_UID_TRANSFORM_DIVISOR = 200000;
 constexpr int MILLISECOND_WIDTH = 3;
 constexpr char MILLISECOND_FILLCHAR = '0';
 const int32_t API_TIME_OUT = 5;
@@ -1456,7 +1455,7 @@ bool FormMgrService::CheckAcrossLocalAccountsPermission() const
 {
     // checks whether the current user is inactive
     int callingUid = IPCSkeleton::GetCallingUid();
-    int32_t userId = callingUid / GET_CALLING_UID_TRANSFORM_DIVISOR;
+    int32_t userId = callingUid / Constants::CALLING_UID_TRANSFORM_DIVISOR;
     int32_t currentActiveUserId = FormUtil::GetCurrentAccountId();
     if (userId != currentActiveUserId) {
         HILOG_INFO("currentActiveUserId: %{public}d, userId: %{public}d", currentActiveUserId, userId);

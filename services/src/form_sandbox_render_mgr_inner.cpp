@@ -60,7 +60,7 @@ ErrCode FormSandboxRenderMgrInner::InstallSandboxFRS(int32_t &appIndex) const
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
     return bundleInstallerProxy->InstallSandboxApp(
-        Constants::FRS_BUNDLE_NAME, DLP_TYPE, Constants::DEFAULT_USER_ID, appIndex);
+        Constants::FRS_BUNDLE_NAME, DLP_TYPE, GetUserId(), appIndex);
 }
 
 ErrCode FormSandboxRenderMgrInner::RenderForm(

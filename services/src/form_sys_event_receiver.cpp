@@ -24,6 +24,8 @@
 #include "form_data_mgr.h"
 #include "form_db_cache.h"
 #include "form_info_mgr.h"
+#include "form_mgr_errors.h"
+#include "form_mgr_adapter.h"
 #include "form_render_mgr.h"
 #include "form_serial_queue.h"
 #include "form_timer_mgr.h"
@@ -35,7 +37,7 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace {
 const int32_t MAIN_USER_ID = 100;
-constexpr int32_t FORM_TASK_DELAY_TIME = 30; // ms
+constexpr int32_t TASK_DELAY_TIME = 30; // ms
 } // namespace
 /**
  * @brief Receiver Constructor.
@@ -191,7 +193,7 @@ void FormSysEventReceiver::InitFormInfosAndRegister()
         return;
     }
 
-    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, []() {
+    serialQueue_->ScheduleTask(TASK_DELAY_TIME, []() {
         int32_t currUserId = FormUtil::GetCurrentAccountId();
         if (currUserId == Constants::ANY_USERID) {
             HILOG_INFO("use MAIN_USER_ID(%{public}d) instead of current userId: ANY_USERID(%{public}d)",
@@ -213,19 +215,31 @@ void FormSysEventReceiver::HandleUserSwitched(const EventFwk::CommonEventData &e
         return;
     }
 
-    if (userId == MAIN_USER_ID) {
-        HILOG_INFO("main user id has reload");
+    if (lastUserId_ == 0) {
+        HILOG_INFO("reboot init lastUserId");
+        lastUserId_ = userId;
         return;
     }
-    HILOG_INFO("switch to userId: (%{public}d)", userId);
+
+    if (lastUserId_ == userId) {
+        HILOG_WARN("same userId");
+        return;
+    }
 
     if (!serialQueue_) {
         HILOG_ERROR("serialQueue is nullptr");
         return;
     }
 
-    serialQueue_->ScheduleTask(0, [userId]() {
-        FormInfoMgr::GetInstance().ReloadFormInfos(userId);
+    int32_t lastUserId = lastUserId_;
+    lastUserId_ = userId;
+    HILOG_INFO("switch to userId: (%{public}d)", userId);
+
+    serialQueue_->ScheduleTask(0, [userId, lastUserId, this]() {
+        if (userId != MAIN_USER_ID) {
+            FormInfoMgr::GetInstance().ReloadFormInfos(userId);
+        }
+        HandleUserIdForms(userId, lastUserId);
     });
 }
 
@@ -239,6 +253,25 @@ void FormSysEventReceiver::HandleScreenOn()
     serialQueue_->ScheduleTask(0, []() {
         FormRenderMgr::GetInstance().NotifyScreenOn();
     });
+}
+
+void FormSysEventReceiver::HandleUserIdForms(int32_t currentUserId, int32_t lastUserId)
+{
+    HILOG_INFO("currentUserId: %{public}d.", currentUserId);
+    FormRenderMgr::GetInstance().RerenderAllFormsImmediate(currentUserId);
+
+    HILOG_INFO("recycle forms and stop FRS lastUserId:%{public}d.", lastUserId);
+    RecycleForms(lastUserId);
+    FormRenderMgr::GetInstance().DisconnectAllRenderConnections(lastUserId);
+}
+
+void FormSysEventReceiver::RecycleForms(int32_t userId)
+{
+    std::vector<int64_t> formIds;
+    FormDataMgr::GetInstance().GetFormIdsByUserId(userId, formIds);
+    Want want;
+    want.SetParam(Constants::RECYCLE_FORMS_USER_ID, userId);
+    FormMgrAdapter::GetInstance().RecycleForms(formIds, want, false);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

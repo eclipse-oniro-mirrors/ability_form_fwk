@@ -744,6 +744,13 @@ public:
      */
     void EnableForms(const std::vector<FormRecord> &&formRecords, const bool enable);
 
+    /**
+     * @brief Get all formIds by userId.
+     * @param userId User ID.
+     * @param formIds The list of formId.
+     */
+    void GetFormIdsByUserId(int32_t userId, std::vector<int64_t> &formIds);
+
 private:
     /**
      * @brief Create form record.
