@@ -137,6 +137,15 @@ public:
     bool GetBundleInfoByFlags(const std::string& bundleName, int32_t flags, int32_t userId, BundleInfo &bundleInfo);
 
     /**
+     * @brief Obtains the BundleInfo based on a given bundle name.
+     * @param bundleName Indicates the application bundle name to be queried.
+     * @param userId Indicates the user ID.
+     * @param bundleInfo Indicates the obtained BundleInfo object.
+     * @return Returns ERR_OK if the BundleInfo is successfully obtained.
+     */
+    ErrCode GetBundleInfoV9(const std::string& bundleName, int32_t userId, BundleInfo &bundleInfo);
+
+    /**
      * @brief Get caller bundle name.
      * @param callerBundleName Indicates the caller bundle name.
      * @return Returns ERR_OK on success, others on failure.
