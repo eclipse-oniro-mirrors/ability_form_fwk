@@ -55,10 +55,11 @@ declare_args() {
 }
 
 declare_args() {
-  cite_memmgr_override = false
+  cite_memmgr = false
   if (defined(global_parts_info) &&
-      defined(global_parts_info.resourceschedule_memmgr_override)) {
-    cite_memmgr_override = true
+      (defined(global_parts_info.resourceschedule_memmgr_override) ||
+       defined(global_parts_info.resourceschedule_memmgr))) {
+    cite_memmgr = true
   }
 }
 
