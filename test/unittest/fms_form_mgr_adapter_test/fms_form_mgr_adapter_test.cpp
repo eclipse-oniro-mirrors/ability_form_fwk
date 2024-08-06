@@ -1411,6 +1411,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_076, TestSize.Level0)
     sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
     FormJsInfo formInfo;
     MockGetBoolParam(true);
+    MockGetFormRecord(true);
     MockCheckTempEnoughForm(true);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_MAX_SYSTEM_TEMP_FORMS, formMgrAdapter.AddForm(formId, want, callerToken, formInfo));
     GTEST_LOG_(INFO) << "FormMgrAdapter_076 end";

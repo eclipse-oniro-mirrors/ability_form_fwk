@@ -54,6 +54,7 @@ using ::testing::Return;
 using ::testing::DoAll;
 
 void MockGetCallingUid(int32_t mockRet);
+void MockIsRerenderForFrsDied(bool mockRet);
 
 namespace {
 const std::string PERMISSION_NAME_REQUIRE_FORM = "ohos.permission.REQUIRE_FORM";
@@ -619,6 +620,7 @@ HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_007, TestSize.Level0)
     want.SetParam(Constants::ACQUIRE_TYPE, Constants::ACQUIRE_TYPE_CREATE_FORM);
 
     GTEST_LOG_(INFO) << "formId :"<<formId;
+    MockIsRerenderForFrsDied(false);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_MAX_SYSTEM_TEMP_FORMS, FormMgr::GetInstance().AddForm(0, want, token_, formJsInfo));
     token_->Wait();
 
