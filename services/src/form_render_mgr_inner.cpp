@@ -201,8 +201,8 @@ ErrCode FormRenderMgrInner::UpdateRenderingForm(FormRecord &formRecord, const Fo
     want.SetParams(wantParams);
     FillBundleInfo(want, formRecord.bundleName);
     want.SetParam(Constants::FORM_RENDER_TYPE_KEY, Constants::UPDATE_RENDERING_FORM);
-    int32_t userId = FormUtil::GetCurrentAccountId();
-    want.SetParam(Constants::FORM_SUPPLY_UID, std::to_string(userId) + formRecord.bundleName);
+    std::string recordUid = std::to_string(formRecord.providerUserId) + formRecord.bundleName;
+    want.SetParam(Constants::FORM_SUPPLY_UID, recordUid);
     return GetConnectionAndRenderForm(formRecord, want);
 }
 
@@ -278,8 +278,8 @@ ErrCode FormRenderMgrInner::StopRenderingForm(int64_t formId, const FormRecord &
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     Want want;
-    int32_t userId = FormUtil::GetCurrentAccountId();
-    want.SetParam(Constants::FORM_SUPPLY_UID, std::to_string(userId) + formRecord.bundleName);
+    std::string recordUid = std::to_string(formRecord.providerUserId) + formRecord.bundleName;
+    want.SetParam(Constants::FORM_SUPPLY_UID, recordUid);
     if (!compId.empty()) {
         want.SetParam(Constants::FORM_RENDER_COMP_ID, compId);
     }

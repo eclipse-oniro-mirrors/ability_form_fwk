@@ -684,6 +684,7 @@ void FormRenderRecord::HandleUpdateForm(const FormJsInfo &formJsInfo, const Want
         std::lock_guard<std::mutex> lock(formRequestsMutex_);
         auto iter = formRequests_.find(formJsInfo.formId);
         if (iter == formRequests_.end()) {
+            HILOG_WARN("Without this form: %{public}" PRId64 "", formJsInfo.formId);
             return;
         }
 

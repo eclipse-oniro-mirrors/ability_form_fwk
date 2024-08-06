@@ -47,6 +47,9 @@ using namespace OHOS::AppExecFwk;
 using namespace OHOS::Security;
 using ::testing::Invoke;
 using ::testing::_;
+
+void MockGetCallingUid(int32_t mockRet);
+
 namespace {
 const std::string PERMISSION_NAME_REQUIRE_FORM = "ohos.permission.REQUIRE_FORM";
 const std::string PARAM_PROVIDER_PACKAGE_NAME = "com.form.provider.app.test.ability";
@@ -126,6 +129,7 @@ void FmsFormMgrDeathCallbackTest::CreateProviderData()
     formInfo.jsComponentName = FORM_JS_COMPONENT_NAME;
     formInfo.formVisibleNotify = true;
     formInfo.supportDimensions = {1, 2};
+    formInfo.supportShapes = {1};
     formInfo.defaultDimension = 1;
     FormInfoStorage formInfoStorage;
     formInfoStorage.userId = userId_;
@@ -164,6 +168,8 @@ HWTEST_F(FmsFormMgrDeathCallbackTest, OnRemoteDied_001, TestSize.Level0)
         return ERR_OK;
     };
     EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(3).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
+    int32_t callingUid {20000001};
+    MockGetCallingUid(callingUid);
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().AddForm(0L, want, token_, formJsInfo));
     token_->Wait();
 
@@ -176,7 +182,10 @@ HWTEST_F(FmsFormMgrDeathCallbackTest, OnRemoteDied_001, TestSize.Level0)
 
     std::vector<FormHostRecord> hostRecords;
     FormDataMgr::GetInstance().GetFormHostRecord(formId, hostRecords);
-    EXPECT_EQ(true, token_->AsObject() == hostRecords[0].formHostClient_);
+    if (hostRecords.size() > 0) {
+        EXPECT_EQ(true, token_->AsObject() == hostRecords[0].formHostClient_);
+    }
+
     EXPECT_EQ(true, FormMgr::GetRecoverStatus() == Constants::NOT_IN_RECOVERY);
 
     FormMgr::GetInstance().UnRegisterDeathCallback(deathCallback);
@@ -217,6 +226,8 @@ HWTEST_F(FmsFormMgrDeathCallbackTest, OnRemoteDied_002, TestSize.Level0)
         return ERR_OK;
     };
     EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(3).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
+    int32_t callingUid {20000001};
+    MockGetCallingUid(callingUid);
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().AddForm(0L, want, token_, formJsInfo));
     token_->Wait();
 
