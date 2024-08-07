@@ -365,10 +365,11 @@ ErrCode BundleFormInfo::GetAllFormsInfo(std::vector<FormInfo> &formInfos, int32_
     return ERR_OK;
 }
 
-ErrCode BundleFormInfo::GetFormsInfoByModule(const std::string &moduleName, std::vector<FormInfo> &formInfos)
+ErrCode BundleFormInfo::GetFormsInfoByModule(const std::string &moduleName, std::vector<FormInfo> &formInfos,
+    int32_t userId)
 {
     std::shared_lock<std::shared_timed_mutex> guard(formInfosMutex_);
-    int32_t userId = FormUtil::GetCurrentAccountId();
+    userId = (userId == Constants::INVALID_USER_ID) ? FormUtil::GetCurrentAccountId() : userId;
     for (const auto &item : formInfoStorages_) {
         item.GetFormsInfoByModule(userId, moduleName, formInfos);
     }
@@ -564,7 +565,7 @@ ErrCode FormInfoMgr::GetFormsInfoByBundle(
 }
 
 ErrCode FormInfoMgr::GetFormsInfoByModule(const std::string &bundleName, const std::string &moduleName,
-                                          std::vector<FormInfo> &formInfos)
+    std::vector<FormInfo> &formInfos, int32_t userId)
 {
     if (bundleName.empty()) {
         HILOG_ERROR("bundleName is empty.");
@@ -576,11 +577,11 @@ ErrCode FormInfoMgr::GetFormsInfoByModule(const std::string &bundleName, const s
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
     }
 
-    return GetFormsInfoByModuleWithoutCheck(bundleName, moduleName, formInfos);
+    return GetFormsInfoByModuleWithoutCheck(bundleName, moduleName, formInfos, userId);
 }
 
 ErrCode FormInfoMgr::GetFormsInfoByModuleWithoutCheck(const std::string &bundleName, const std::string &moduleName,
-    std::vector<FormInfo> &formInfos)
+    std::vector<FormInfo> &formInfos, int32_t userId)
 {
     if (bundleName.empty()) {
         HILOG_ERROR("bundleName is empty.");
@@ -595,7 +596,7 @@ ErrCode FormInfoMgr::GetFormsInfoByModuleWithoutCheck(const std::string &bundleN
     }
 
     if (bundleFormInfoIter->second != nullptr) {
-        bundleFormInfoIter->second->GetFormsInfoByModule(moduleName, formInfos);
+        bundleFormInfoIter->second->GetFormsInfoByModule(moduleName, formInfos, userId);
     }
     return ERR_OK;
 }

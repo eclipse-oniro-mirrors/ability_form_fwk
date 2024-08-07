@@ -50,7 +50,7 @@ void MockIsCaller(bool mockRet)
 namespace OHOS {
 namespace AppExecFwk {
 ErrCode FormInfoMgr::GetFormsInfoByModule(const std::string &bundleName, const std::string &moduleName,
-                                          std::vector<FormInfo> &formInfos)
+    std::vector<FormInfo> &formInfos, int32_t userId)
 {
     if (true == g_mockGetFormsInfoByModuleRet) {
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_BUNDLE;
