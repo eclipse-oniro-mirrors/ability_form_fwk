@@ -56,6 +56,8 @@
 #include "tokenid_kit.h"
 #include "hisysevent.h"
 #include "xcollie/watchdog.h"
+#include "xcollie/xcollie.h"
+#include "xcollie/xcollie_define.h"
 #include "mem_mgr_client.h"
 #include "form_report.h"
 
@@ -72,6 +74,7 @@ const int32_t MAIN_USER_ID = 100;
 constexpr int32_t GET_CALLING_UID_TRANSFORM_DIVISOR = 200000;
 constexpr int MILLISECOND_WIDTH = 3;
 constexpr char MILLISECOND_FILLCHAR = '0';
+const int32_t API_TIME_OUT = 5;
 #ifdef RES_SCHEDULE_ENABLE
 constexpr int32_t SYSTEMLOADLEVEL_TIMERSTOP_THRESHOLD =
     static_cast<int32_t>(ResourceSchedule::ResType::SystemloadLevel::HIGH);
@@ -155,7 +158,11 @@ bool FormMgrService::CheckFMSReady()
         HILOG_ERROR("fail, account is empty");
         return false;
     }
-    return FormInfoMgr::GetInstance().HasReloadedFormInfos();
+    int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_CheckFMSReady",
+        API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
+    bool result = FormInfoMgr::GetInstance().HasReloadedFormInfos();
+    HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
+    return result;
 }
 
 bool FormMgrService::IsSystemAppForm(const std::string &bundleName)
@@ -191,7 +198,11 @@ int FormMgrService::AddForm(const int64_t formId, const Want &want,
         return ret;
     }
     ReportAddFormEvent(formId, want);
-    return FormMgrAdapter::GetInstance().AddForm(formId, want, callerToken, formInfo);
+    int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_AddForm",
+        API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
+    ret = FormMgrAdapter::GetInstance().AddForm(formId, want, callerToken, formInfo);
+    HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
+    return ret;
 }
 
 /**
@@ -254,8 +265,11 @@ int FormMgrService::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
         eventInfo.hostBundleName = formHostRecords.begin()->GetHostBundleName();
     }
     FormEventReport::SendSecondFormEvent(FormEventName::DELETE_FORM, HiSysEventType::BEHAVIOR, eventInfo);
-
-    return FormMgrAdapter::GetInstance().DeleteForm(formId, callerToken);
+    int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_DeleteForm",
+        API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
+    ret = FormMgrAdapter::GetInstance().DeleteForm(formId, callerToken);
+    HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
+    return ret;
 }
 
 /**
@@ -439,7 +453,11 @@ int FormMgrService::NotifyWhetherVisibleForms(const std::vector<int64_t> &formId
         HILOG_ERROR("fail, event notify visible permission denied");
         return ret;
     }
-    return FormMgrAdapter::GetInstance().NotifyWhetherVisibleForms(formIds, callerToken, formVisibleType);
+    int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_NotifyWhetherVisibleForms",
+        API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
+    ret = FormMgrAdapter::GetInstance().NotifyWhetherVisibleForms(formIds, callerToken, formVisibleType);
+    HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
+    return ret;
 }
 
 /**
@@ -844,7 +862,11 @@ int FormMgrService::DeleteInvalidForms(const std::vector<int64_t> &formIds,
     }
     FormEventInfo eventInfo;
     FormEventReport::SendFormEvent(FormEventName::DELETE_INVALID_FORM, HiSysEventType::BEHAVIOR, eventInfo);
-    return FormMgrAdapter::GetInstance().DeleteInvalidForms(formIds, callerToken, numFormsDeleted);
+    int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_DeleteInvalidForms",
+        API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
+    ret = FormMgrAdapter::GetInstance().DeleteInvalidForms(formIds, callerToken, numFormsDeleted);
+    HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
+    return ret;
 }
 
 /**
@@ -972,7 +994,11 @@ int FormMgrService::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
         HILOG_ERROR("Across local accounts permission failed.");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
-    return FormMgrAdapter::GetInstance().GetAllFormsInfo(formInfos);
+    int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_GetAllFormsInfo",
+        API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
+    ErrCode ret = FormMgrAdapter::GetInstance().GetAllFormsInfo(formInfos);
+    HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
+    return ret;
 }
 
 /**
@@ -991,7 +1017,11 @@ int FormMgrService::GetFormsInfoByApp(std::string &bundleName, std::vector<FormI
         HILOG_ERROR("Across local accounts permission failed.");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
-    return FormMgrAdapter::GetInstance().GetFormsInfoByApp(bundleName, formInfos);
+    int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_GetFormsInfoByApp",
+        API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
+    ErrCode ret = FormMgrAdapter::GetInstance().GetFormsInfoByApp(bundleName, formInfos);
+    HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
+    return ret;
 }
 
 /**
@@ -1694,8 +1724,11 @@ bool FormMgrService::IsFormBundleForbidden(const std::string &bundleName)
     if (!CheckCallerIsSystemApp()) {
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
     }
-
-    return FormBundleForbidMgr::GetInstance().IsBundleForbidden(bundleName);
+    int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_IsFormBundleForbidden",
+        API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
+    bool result = FormBundleForbidMgr::GetInstance().IsBundleForbidden(bundleName);
+    HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
+    return result;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
