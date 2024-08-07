@@ -34,6 +34,9 @@ public:
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
+
+    sptr<FormBatchDeleteConnection> formBatchDeleteConnection_ = nullptr;
+    sptr<FormEventNotifyConnection> formEventNotifyConnection_ = nullptr;
 };
 
 
@@ -47,7 +50,10 @@ void FormBatchDeleteConnectionTest::SetUp()
 {}
 
 void FormBatchDeleteConnectionTest::TearDown()
-{}
+{
+    formBatchDeleteConnection_ = nullptr;
+    formEventNotifyConnection_ = nullptr;
+}
 
 /**
  * @tc.name: FormBatchDeleteConnectionTest_0001
@@ -62,13 +68,16 @@ HWTEST_F(FormBatchDeleteConnectionTest, FormBatchDeleteConnectionTest_0001, Test
     formIds.insert(formId);
     std::string bundleName = "aa";
     std::string abilityName = "bb";
-    FormBatchDeleteConnection formBatchDeleteConnection(formIds, bundleName, abilityName);
+    sptr<FormBatchDeleteConnection> formBatchDeleteConnection =
+        new FormBatchDeleteConnection(formIds, bundleName, abilityName);
+    formBatchDeleteConnection_ = formBatchDeleteConnection;
+
     // test OnAbilityConnectDone
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;
     int resultCode = 11;
-    formBatchDeleteConnection.OnAbilityConnectDone(element, remoteObject, resultCode);
-    ASSERT_FALSE(formBatchDeleteConnection.onFormAppConnect());
+    formBatchDeleteConnection->OnAbilityConnectDone(element, remoteObject, resultCode);
+    ASSERT_FALSE(formBatchDeleteConnection->onFormAppConnect());
     GTEST_LOG_(INFO) << "FormBatchDeleteConnectionTest_0001 end";
 }
 
@@ -85,12 +94,15 @@ HWTEST_F(FormBatchDeleteConnectionTest, FormBatchDeleteConnectionTest_0002, Test
     formIds.insert(formId);
     std::string bundleName = "aa";
     std::string abilityName = "bb";
-    FormBatchDeleteConnection formBatchDeleteConnection(formIds, bundleName, abilityName);
+    sptr<FormBatchDeleteConnection> formBatchDeleteConnection =
+        new FormBatchDeleteConnection(formIds, bundleName, abilityName);
+    formBatchDeleteConnection_ = formBatchDeleteConnection;
+
     // test OnAbilityConnectDone
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;
     int resultCode = ERR_OK;
-    formBatchDeleteConnection.OnAbilityConnectDone(element, remoteObject, resultCode);
+    formBatchDeleteConnection->OnAbilityConnectDone(element, remoteObject, resultCode);
     GTEST_LOG_(INFO) << "FormBatchDeleteConnectionTest_0002 end";
 }
 
@@ -108,11 +120,14 @@ HWTEST_F(FormBatchDeleteConnectionTest, FormEventNotifyConnection_0001, TestSize
     int32_t formVisibleType = 2;
     std::string bundleName = "aaa";
     std::string abilityName = "bbb";
-    FormEventNotifyConnection formEventNotifyConnection(formEvents, formVisibleType, bundleName, abilityName);
+    sptr<FormEventNotifyConnection> formEventNotifyConnection =
+        new FormEventNotifyConnection(formEvents, formVisibleType, bundleName, abilityName);
+    formEventNotifyConnection_ = formEventNotifyConnection;
+
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;
     int resultCode = 21;
-    formEventNotifyConnection.OnAbilityConnectDone(element, remoteObject, resultCode);
+    formEventNotifyConnection->OnAbilityConnectDone(element, remoteObject, resultCode);
     GTEST_LOG_(INFO) << "FormEventNotifyConnection_0001 end";
 }
 
@@ -130,11 +145,14 @@ HWTEST_F(FormBatchDeleteConnectionTest, FormEventNotifyConnection_0002, TestSize
     int32_t formVisibleType = 2;
     std::string bundleName = "aaa";
     std::string abilityName = "bbb";
-    FormEventNotifyConnection formEventNotifyConnection(formEvents, formVisibleType, bundleName, abilityName);
+    sptr<FormEventNotifyConnection> formEventNotifyConnection =
+        new FormEventNotifyConnection(formEvents, formVisibleType, bundleName, abilityName);
+    formEventNotifyConnection_ = formEventNotifyConnection;
+
     AppExecFwk::ElementName element;
     sptr<IRemoteObject> remoteObject = nullptr;
     int resultCode = ERR_OK;
-    formEventNotifyConnection.OnAbilityConnectDone(element, remoteObject, resultCode);
+    formEventNotifyConnection->OnAbilityConnectDone(element, remoteObject, resultCode);
     GTEST_LOG_(INFO) << "FormEventNotifyConnection_0002 end";
 }
 }
