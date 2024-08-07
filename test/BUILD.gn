@@ -102,6 +102,7 @@ group("unittest") {
     "unittest/fms_form_supply_stub_test:unittest",
     "unittest/fms_form_sys_event_receiver_test:unittest",
     "unittest/fms_form_systemload_listener_test:unittest",
+    "unittest/fms_form_task_mgr_test:unittest",
     "unittest/fms_form_timer_mgr_new_test:unittest",
     "unittest/fms_form_timer_mgr_test:unittest",
     "unittest/fms_form_util_permission_verify_test:unittest",
