@@ -3814,7 +3814,9 @@ int32_t FormMgrAdapter::EnableForms(const std::string bundleName, const bool ena
     HILOG_INFO("userId:%{public}d, infosSize:%{public}zu, enable:%{public}d",
         userId, formInfos.size(), enable);
     for (auto iter = formInfos.begin(); iter != formInfos.end();) {
-        if (iter->enableForm == enable) {
+        HILOG_DEBUG("bundleName:%{public}s, enableForm:%{public}d, transparencyEnabled:%{public}d",
+            iter->bundleName.c_str(), iter->enableForm, iter->transparencyEnabled);
+        if (iter->enableForm == enable || iter->transparencyEnabled) {
             iter = formInfos.erase(iter);
             continue;
         }
