@@ -50,7 +50,7 @@ void FormTaskMgrTest::TearDown()
 
 /**
  * @tc.name: FormTaskMgr_0001
- * @tc.desc: test PostAcquireTaskToHost function and eventHandler_ is nullptr
+ * @tc.desc: test PostFrsDiedTaskToHost function
  * @tc.type: FUNC
  */
 HWTEST_F(FormTaskMgrTest, FormTaskMgr_0001, TestSize.Level0)
@@ -65,7 +65,7 @@ HWTEST_F(FormTaskMgrTest, FormTaskMgr_0001, TestSize.Level0)
 
 /**
  * @tc.name: FormTaskMgr_0002
- * @tc.desc: test PostAcquireTaskToHost function and eventHandler_ is nullptr
+ * @tc.desc: test FrsDiedTaskToHost function
  * @tc.type: FUNC
  */
 HWTEST_F(FormTaskMgrTest, FormTaskMgr_0002, TestSize.Level0)
