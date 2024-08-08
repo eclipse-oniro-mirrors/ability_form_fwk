@@ -91,6 +91,12 @@ ohos_unittest("FmsFormMgrServiceTest") {
     defines += [ "DEVICE_USAGE_STATISTICS_ENABLE" ]
   }
 
+  cflags_cc = []
+  if (cite_memmgr) {
+    external_deps += [ "memmgr:memmgrclient" ]
+    cflags_cc += [ "-DMEM_MGR_ENABLE" ]
+  }
+
   if (theme_mgr_enable) {
     external_deps += [ "theme_mgr:theme_manager_client" ]
     cflags += [ "-DTHEME_MGR_ENABLE" ]
@@ -177,6 +183,12 @@ ohos_unittest("FmsFormMgrServiceTest2") {
   if (device_usage_statistics) {
     external_deps += [ "device_usage_statistics:usagestatsinner" ]
     defines += [ "DEVICE_USAGE_STATISTICS_ENABLE" ]
+  }
+
+  cflags_cc = []
+  if (cite_memmgr) {
+    external_deps += [ "memmgr:memmgrclient" ]
+    cflags_cc += [ "-DMEM_MGR_ENABLE" ]
   }
 
   if (theme_mgr_enable) {
