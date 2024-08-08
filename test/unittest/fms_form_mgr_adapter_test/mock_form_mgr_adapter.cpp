@@ -28,7 +28,7 @@ namespace OHOS {
 namespace AppExecFwk {
 
 ErrCode FormInfoMgr::GetFormsInfoByModuleWithoutCheck(const std::string &bundleName, const std::string &moduleName,
-    std::vector<FormInfo> &formInfos)
+    std::vector<FormInfo> &formInfos, int32_t userId)
 {
     FormInfo formInfo;
     formInfo.abilityName = "mm";
