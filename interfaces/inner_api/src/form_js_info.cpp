@@ -148,12 +148,12 @@ bool FormJsInfo::WriteObjects(Parcel &parcel) const
 
 bool FormJsInfo::WriteImageData(Parcel &parcel) const
 {
-    HILOG_DEBUG("%{public}s called", __func__);
+    HILOG_DEBUG("call");
     auto imageDateState = formProviderData.GetImageDataState();
     if (!parcel.WriteInt32(imageDateState)) {
         return false;
     }
-    HILOG_DEBUG("%{public}s imageDateState is %{public}d", __func__, imageDateState);
+    HILOG_DEBUG("imageDateState is %{public}d", imageDateState);
     switch (imageDateState) {
         case FormProviderData::IMAGE_DATA_STATE_ADDED: {
             auto sharedImageMap = formProviderData.GetImageDataMap();
@@ -180,35 +180,35 @@ bool FormJsInfo::WriteImageData(Parcel &parcel) const
         case FormProviderData::IMAGE_DATA_STATE_REMOVED:
             break;
         default: {
-            HILOG_WARN("%{public}s unexpected imageDateState %{public}d", __func__, imageDateState);
+            HILOG_WARN("unexpected imageDateState %{public}d", imageDateState);
             break;
         }
     }
-    HILOG_DEBUG("%{public}s end", __func__);
+    HILOG_DEBUG("end");
     return true;
 }
 
 void FormJsInfo::ReadImageData(Parcel &parcel)
 {
-    HILOG_DEBUG("%{public}s called", __func__);
+    HILOG_DEBUG("call");
     auto imageDateState = parcel.ReadInt32();
-    HILOG_DEBUG("%{public}s imageDateState is %{public}d", __func__, imageDateState);
+    HILOG_DEBUG("imageDateState is %{public}d", imageDateState);
     switch (imageDateState) {
         case FormProviderData::IMAGE_DATA_STATE_ADDED: {
             auto size = parcel.ReadInt32();
             HILOG_INFO("image numer is %{public}d", size);
             if (size > IMAGE_DATA_THRESHOLD) {
-                HILOG_WARN("%{public}s unexpected image number %{public}d", __func__, size);
+                HILOG_WARN("unexpected image number %{public}d", size);
                 break;
             }
             for (auto i = 0; i < size; i++) {
                 sptr<FormAshmem> formAshmem = parcel.ReadParcelable<FormAshmem>();
                 if (formAshmem == nullptr) {
-                    HILOG_ERROR("failed, ashmem is nullptr");
+                    HILOG_ERROR("null ashmem");
                     return;
                 }
                 auto picName = Str16ToStr8(parcel.ReadString16());
-                HILOG_INFO("picName: %{public}s", picName.c_str());
+                HILOG_INFO("picName:%{public}s", picName.c_str());
                 imageDataMap[picName] = formAshmem;
             }
             break;
@@ -218,24 +218,24 @@ void FormJsInfo::ReadImageData(Parcel &parcel)
         case FormProviderData::IMAGE_DATA_STATE_REMOVED:
             break;
         default: {
-            HILOG_WARN("%{public}s unexpected imageDateState %{public}d", __func__, imageDateState);
+            HILOG_WARN("unexpected imageDateState %{public}d", imageDateState);
             break;
         }
     }
-    HILOG_DEBUG("%{public}s end", __func__);
+    HILOG_DEBUG("end");
     return;
 }
 
 bool FormJsInfo::ConvertRawImageData()
 {
-    HILOG_DEBUG("%{public}s called", __func__);
+    HILOG_DEBUG("call");
     if (!formProviderData.ConvertRawImageData()) {
         return false;
     }
     auto sharedImageMap = formProviderData.GetImageDataMap();
     auto size = sharedImageMap.size();
     if (size > IMAGE_DATA_THRESHOLD) {
-        HILOG_ERROR("%{public}s unexpected image number %{public}zu", __func__, size);
+        HILOG_ERROR("unexpected image number %{public}zu", size);
         return false;
     }
     for (const auto &entry : sharedImageMap) {
@@ -246,7 +246,7 @@ bool FormJsInfo::ConvertRawImageData()
 
 bool FormJsInfo::WritePkgNameMap(Parcel &parcel) const
 {
-    HILOG_DEBUG("called");
+    HILOG_DEBUG("call");
     std::vector<std::string> keys;
     std::vector<std::string> values;
 
@@ -262,21 +262,21 @@ bool FormJsInfo::WritePkgNameMap(Parcel &parcel) const
 
 void FormJsInfo::ReadPkgNameMap(Parcel &parcel)
 {
-    HILOG_DEBUG("called");
+    HILOG_DEBUG("call");
     std::vector<std::string> keys;
     std::vector<std::string> values;
     if (!parcel.ReadStringVector(&keys)) {
-        HILOG_ERROR("ReadStringVector for keys failed.");
+        HILOG_ERROR("ReadStringVector for keys failed");
         return;
     }
     if (!parcel.ReadStringVector(&values)) {
-        HILOG_ERROR("ReadStringVector for values failed.");
+        HILOG_ERROR("ReadStringVector for values failed");
         return;
     }
     size_t keySize = keys.size();
     size_t valueSize = values.size();
     if (keySize != valueSize) {
-        HILOG_ERROR("ReadFromParcel failed, invalid size.");
+        HILOG_ERROR("ReadFromParcel failed, invalid size");
         return;
     }
 

@@ -32,13 +32,13 @@ void FormDistributedClient::GetDmsServiceProxy()
 {
     HILOG_DEBUG("SHAREFORM:: func call");
     if (dmsProxy_ != nullptr) {
-        HILOG_DEBUG("dms proxy already get.");
+        HILOG_DEBUG("dms proxy already get");
         return;
     }
 
     auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (samgrProxy == nullptr) {
-        HILOG_ERROR("fail to get samgr.");
+        HILOG_ERROR("get samgr failed");
         return;
     }
     dmsProxy_ = samgrProxy->GetSystemAbility(DISTRIBUTED_SCHED_SA_ID);
@@ -49,13 +49,13 @@ int32_t FormDistributedClient::ShareForm(
 {
     HILOG_DEBUG("SHAREFORM:: func call");
     if (remoteDeviceId.empty()) {
-        HILOG_ERROR("fail to input deviceId.");
+        HILOG_ERROR("input deviceId failed");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
     GetDmsServiceProxy();
     if (dmsProxy_ == nullptr) {
-        HILOG_ERROR("fail to get dmsProxy.");
+        HILOG_ERROR("get dmsProxy failed");
         return ERR_APPEXECFWK_FORM_GET_DMS_PROXY_FAILED;
     }
 
@@ -79,7 +79,7 @@ int32_t FormDistributedClient::ShareForm(
 
     int32_t error = dmsProxy_->SendRequest(START_REMOTE_SHARE_FORM, data, reply, option);
     if (error != NO_ERROR) {
-        HILOG_ERROR("request failed, error: %{public}d", error);
+        HILOG_ERROR("request failed, error:%{public}d", error);
         return error;
     }
     int32_t result = reply.ReadInt32();

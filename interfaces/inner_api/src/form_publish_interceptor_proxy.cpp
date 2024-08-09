@@ -27,18 +27,18 @@ int32_t FormPublishInterceptorProxy::ProcessPublishForm(const AAFwk::Want &want)
     MessageOption option;
 
     if (!data.WriteInterfaceToken(FormPublishInterceptorProxy::GetDescriptor())) {
-        HILOG_ERROR("failed to write interface token");
+        HILOG_ERROR("write interface token failed");
         return ERR_FLATTEN_OBJECT;
     }
 
     if (!data.WriteParcelable(&want)) {
-        HILOG_ERROR("failed to write want");
+        HILOG_ERROR("write want failed");
         return ERR_FLATTEN_OBJECT;
     }
 
     sptr<IRemoteObject> remote = Remote();
     if (remote == nullptr) {
-        HILOG_ERROR("remote object is nullptr.");
+        HILOG_ERROR("null remote");
         return ERR_NULL_OBJECT;
     }
 
@@ -48,7 +48,7 @@ int32_t FormPublishInterceptorProxy::ProcessPublishForm(const AAFwk::Want &want)
         reply,
         option);
     if (error != ERR_OK) {
-        HILOG_ERROR("failed to SendRequest: %{public}d", error);
+        HILOG_ERROR("SendRequest:%{public}d failed", error);
         return error;
     }
     int32_t result = reply.ReadInt32();

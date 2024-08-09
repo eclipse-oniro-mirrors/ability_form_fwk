@@ -36,11 +36,11 @@ FormRenderStub::~FormRenderStub()
 
 int FormRenderStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    HILOG_DEBUG("FormRenderStub::OnReceived, code = %{public}u, flags= %{public}d.", code, option.GetFlags());
+    HILOG_DEBUG("FormRenderStub::OnReceived,code = %{public}u,flags= %{public}d", code, option.GetFlags());
     std::u16string descriptor = FormRenderStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
     if (descriptor != remoteDescriptor) {
-        HILOG_ERROR("%{public}s failed, local descriptor is not equal to remote", __func__);
+        HILOG_ERROR("localDescriptor not equal to remote");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
@@ -73,18 +73,18 @@ int FormRenderStub::HandleRenderForm(MessageParcel &data, MessageParcel &reply)
 {
     std::unique_ptr<FormJsInfo> formJsInfo(data.ReadParcelable<FormJsInfo>());
     if (!formJsInfo) {
-        HILOG_ERROR("%{public}s, error to ReadParcelable<formJsInfo>", __func__);
+        HILOG_ERROR("error to ReadParcelable<formJsInfo>");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
-        HILOG_ERROR("%{public}s, error to ReadParcelable<Want>", __func__);
+        HILOG_ERROR("error to ReadParcelable<Want>");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     sptr<IRemoteObject> client = data.ReadRemoteObject();
     if (client == nullptr) {
-        HILOG_ERROR("%{public}s, error to get remote object.", __func__);
+        HILOG_ERROR("error to get remote object");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -97,18 +97,18 @@ int FormRenderStub::HandleStopRenderingForm(MessageParcel &data, MessageParcel &
 {
     std::unique_ptr<FormJsInfo> formJsInfo(data.ReadParcelable<FormJsInfo>());
     if (!formJsInfo) {
-        HILOG_ERROR("%{public}s, ReadParcelable<formJsInfo> fail", __func__);
+        HILOG_ERROR("ReadParcelable<formJsInfo> fail");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
-        HILOG_ERROR("%{public}s, ReadParcelable<Want> fail", __func__);
+        HILOG_ERROR("ReadParcelable<Want> fail");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     sptr<IRemoteObject> client = data.ReadRemoteObject();
     if (client == nullptr) {
-        HILOG_ERROR("%{public}s, failed to get remote object.", __func__);
+        HILOG_ERROR("get remote object failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -121,7 +121,7 @@ int FormRenderStub::HandleCleanFormHost(MessageParcel &data, MessageParcel &repl
 {
     sptr<IRemoteObject> hostToken = data.ReadRemoteObject();
     if (hostToken == nullptr) {
-        HILOG_ERROR("hostToken is nullptr.");
+        HILOG_ERROR("null hostToken");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -145,13 +145,13 @@ int FormRenderStub::HandleReloadForm(MessageParcel &data, MessageParcel &reply)
     std::vector<FormJsInfo> formJsInfos;
     int32_t result = GetParcelableInfos(data, formJsInfos);
     if (result != ERR_OK) {
-        HILOG_ERROR("%{public}s, failed to GetParcelableInfos<FormJsInfo>", __func__);
+        HILOG_ERROR("fail GetParcelableInfos<FormJsInfo>");
         return result;
     }
 
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
-        HILOG_ERROR("%{public}s, failed to ReadParcelable<Want>", __func__);
+        HILOG_ERROR("ReadParcelable<Want> failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -172,14 +172,14 @@ int32_t FormRenderStub::GetParcelableInfos(MessageParcel &reply, std::vector<T> 
 {
     int32_t infoSize = reply.ReadInt32();
     if (infoSize < 0 || infoSize > MAX_ALLOW_SIZE) {
-        HILOG_ERROR("%{public}s invalid size: %{public}d", __func__, infoSize);
+        HILOG_ERROR("invalid size:%{public}d", infoSize);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     for (int32_t i = 0; i < infoSize; i++) {
         std::unique_ptr<T> info(reply.ReadParcelable<T>());
         if (!info) {
-            HILOG_ERROR("%{public}s, Read Parcelable infos error", __func__);
+            HILOG_ERROR("Read Parcelable infos error");
             return ERR_APPEXECFWK_PARCEL_ERROR;
         }
         parcelableInfos.emplace_back(*info);

@@ -38,7 +38,7 @@ FormInfoStorage::FormInfoStorage(int32_t userId, const std::vector<AppExecFwk::F
 
 void FormInfoStorage::GetAllFormsInfo(int32_t userId, std::vector<AppExecFwk::FormInfo> &formInfos) const
 {
-    HILOG_DEBUG("Get all forms infos, current userId is%{public}d, this userId is %{public}d.", userId, this->userId);
+    HILOG_DEBUG("Get all forms infos, current userId is%{public}d, this userId is %{public}d", userId, this->userId);
     if (this->userId != userId && this->userId != AppExecFwk::Constants::DEFAULT_USERID) {
         return;
     }
@@ -84,9 +84,9 @@ static bool find_rect_shape(const std::vector<int32_t> &supportShapes)
 void FormInfoStorage::GetFormsInfoByFilter(int32_t userId,
     const AppExecFwk::FormInfoFilter &filter, std::vector<AppExecFwk::FormInfo> &formInfos) const
 {
-    HILOG_DEBUG("called. current userId is:%{public}d, this userId is %{public}d.", userId, this->userId);
+    HILOG_DEBUG("current userId is:%{public}d, this userId is %{public}d", userId, this->userId);
     if (this->userId != userId && this->userId != AppExecFwk::Constants::DEFAULT_USERID) {
-        HILOG_ERROR("UserId is not valid.");
+        HILOG_ERROR("Invalid userId");
         return;
     }
     for (const auto &item : this->formInfos) {
@@ -94,7 +94,7 @@ void FormInfoStorage::GetFormsInfoByFilter(int32_t userId,
             continue;
         }
         if (filter.supportShapes.empty() && !find_rect_shape(item.supportShapes)) {
-            HILOG_WARN("Empty spport shape, without rect shape");
+            HILOG_WARN("Empty spport shape,without rect shape");
             continue;
         }
         if (!filter.supportShapes.empty() && !find_match_shapes(filter.supportShapes, item.supportShapes)) {

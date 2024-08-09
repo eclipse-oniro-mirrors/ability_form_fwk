@@ -36,12 +36,12 @@ FormErmsCallerInfo *FormErmsCallerInfo::Unmarshalling(Parcel &in)
 {
     auto *info = new (std::nothrow) FormErmsCallerInfo();
     if (info == nullptr) {
-        HILOG_ERROR("new callerInfo failed, return nullptr");
+        HILOG_ERROR("new callerInfo failed,return nullptr");
         return nullptr;
     }
 
     info->packageName = in.ReadString();
-    HILOG_DEBUG("read packageName result: %{public}s", info->packageName.c_str());
+    HILOG_DEBUG("read packageName result:%{public}s", info->packageName.c_str());
 
     if (!in.ReadInt32(info->uid)) {
         HILOG_ERROR("read uid failed");

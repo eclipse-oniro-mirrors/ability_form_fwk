@@ -33,24 +33,24 @@ FormMemmgrClient::~FormMemmgrClient()
 void FormMemmgrClient::SetCritical(bool critical)
 {
     int32_t pid = getprocpid();
-    HILOG_INFO("%{public}s, pid:%{public}" PRId32 ", critical:%{public}d.", __func__, pid, critical);
+    HILOG_INFO("pid:%{public}" PRId32 ", critical:%{public}d", pid, critical);
 
     void *libMemmgrClientHandle = dlopen("libmemmgrclient.z.so", RTLD_NOW);
     if (!libMemmgrClientHandle) {
-        HILOG_ERROR("%{public}s, dlopen libmemmgrclient fail.", __func__);
+        HILOG_ERROR("dlopen libmemmgrclient fail");
         return;
     }
 
     void *setCritical = (dlsym(libMemmgrClientHandle, "set_critical"));
     if (!setCritical) {
-        HILOG_ERROR("%{public}s, dlsym set_critical fail.", __func__);
+        HILOG_ERROR("dlsym set_critical fail");
         dlclose(libMemmgrClientHandle);
         return;
     }
 
     auto setCriticalFunc = reinterpret_cast<int32_t(*)(int32_t, bool, int32_t)>(setCritical);
     if (setCriticalFunc(pid, critical, FORM_RENDER_SERVICE_SAID) != 0) {
-        HILOG_ERROR("%{public}s, setCriticalFunc fail.", __func__);
+        HILOG_ERROR("setCriticalFunc fail");
     }
     dlclose(libMemmgrClientHandle);
 }

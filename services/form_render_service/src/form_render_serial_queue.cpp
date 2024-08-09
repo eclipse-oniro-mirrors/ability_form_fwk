@@ -28,7 +28,7 @@ constexpr uint32_t CONVERSION_FACTOR = 1000; // ms to us
 
 FormRenderSerialQueue::FormRenderSerialQueue(const std::string &queueName): queue_(queueName.c_str())
 {
-    HILOG_DEBUG("create FormRenderSerialQueue, queueName : %{public}s", queueName.c_str());
+    HILOG_DEBUG("create FormRenderSerialQueue, queueName :%{public}s", queueName.c_str());
 }
 
 FormRenderSerialQueue::~FormRenderSerialQueue()
@@ -40,13 +40,13 @@ bool FormRenderSerialQueue::ScheduleTask(uint64_t ms, std::function<void()> func
 {
     HILOG_DEBUG("begin to ScheduleTask");
     if (ms > (std::numeric_limits<uint64_t>::max() / CONVERSION_FACTOR)) {
-        HILOG_ERROR("invalid ms, ScheduleTask failed");
+        HILOG_ERROR("invalid ms,ScheduleTask failed");
         return false;
     }
     std::unique_lock<std::shared_mutex> lock(mutex_);
     task_handle task_handle = queue_.submit_h(func, task_attr().delay(ms * CONVERSION_FACTOR));
     if (task_handle == nullptr) {
-        HILOG_ERROR("submit_h return null, ScheduleTask failed");
+        HILOG_ERROR("submit_h return null");
         return false;
     }
     HILOG_DEBUG("ScheduleTask success");
@@ -60,7 +60,7 @@ void FormRenderSerialQueue::ScheduleDelayTask(const std::string &taskName,
     std::unique_lock<std::shared_mutex> lock(mutex_);
     task_handle task_handle = queue_.submit_h(func, task_attr().delay(ms * CONVERSION_FACTOR));
     if (task_handle == nullptr) {
-        HILOG_ERROR("submit_h return null, ScheduleDelayTask failed");
+        HILOG_ERROR("submit_h return null");
         return;
     }
     taskMap_[taskName] = std::move(task_handle);
@@ -73,13 +73,13 @@ void FormRenderSerialQueue::CancelDelayTask(const std::string &taskName)
     std::unique_lock<std::shared_mutex> lock(mutex_);
     auto item = taskMap_.find(taskName);
     if (item == taskMap_.end()) {
-        HILOG_DEBUG("task not found, CancelDelayTask %{public}s failed", taskName.c_str());
+        HILOG_DEBUG("invalid task,CancelDelayTask %{public}s failed", taskName.c_str());
         return;
     }
     if (item->second != nullptr) {
         int32_t ret = queue_.cancel(item->second);
         if (ret != 0) {
-            HILOG_ERROR("CancelDelayTask %{public}s failed, error code : %{public}d", taskName.c_str(), ret);
+            HILOG_ERROR("CancelDelayTask %{public}s failed,errCode:%{public}d", taskName.c_str(), ret);
         }
     }
     taskMap_.erase(taskName);

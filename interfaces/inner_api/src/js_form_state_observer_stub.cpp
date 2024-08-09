@@ -35,11 +35,11 @@ JsFormStateObserverStub::~JsFormStateObserverStub()
 int32_t JsFormStateObserverStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
     MessageParcel &reply, MessageOption &option)
 {
-    HILOG_DEBUG("JsFormStateObserverStub::OnReceived, code = %{public}u, flags= %{public}d.", code, option.GetFlags());
+    HILOG_DEBUG("JsFormStateObserverStub::OnReceived,code=%{public}u,flags=%{public}d", code, option.GetFlags());
     std::u16string descriptor = JsFormStateObserverStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
     if (descriptor != remoteDescriptor) {
-        HILOG_ERROR("failed, local descriptor is not equal to remote");
+        HILOG_ERROR("local descriptor not equal to remote");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
@@ -59,11 +59,11 @@ int32_t JsFormStateObserverStub::OnRemoteRequest(uint32_t code, MessageParcel &d
 
 int32_t JsFormStateObserverStub::HandleOnAddForm(MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("call");
     std::string bundleName = data.ReadString();
     std::unique_ptr<AppExecFwk::RunningFormInfo> runningFormInfo(data.ReadParcelable<AppExecFwk::RunningFormInfo>());
     if (!runningFormInfo) {
-        HILOG_ERROR("failed to ReadParcelable<RunningFormInfo>");
+        HILOG_ERROR("ReadParcelable<RunningFormInfo> failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t result = OnAddForm(bundleName, *runningFormInfo);
@@ -73,11 +73,11 @@ int32_t JsFormStateObserverStub::HandleOnAddForm(MessageParcel &data, MessagePar
 
 int32_t JsFormStateObserverStub::HandleOnRemoveForm(MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("call");
     std::string bundleName = data.ReadString();
     std::unique_ptr<AppExecFwk::RunningFormInfo> runningFormInfo(data.ReadParcelable<AppExecFwk::RunningFormInfo>());
     if (!runningFormInfo) {
-        HILOG_ERROR("failed to ReadParcelable<RunningFormInfo>");
+        HILOG_ERROR("ReadParcelable<RunningFormInfo> failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t result = OnRemoveForm(bundleName, *runningFormInfo);
@@ -87,7 +87,7 @@ int32_t JsFormStateObserverStub::HandleOnRemoveForm(MessageParcel &data, Message
 
 int32_t JsFormStateObserverStub::HandleNotifyWhetherFormsVisible(MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("call");
     int32_t formVisiblityTypeInt = data.ReadInt32();
     std::string bundleName = data.ReadString();
     std::vector<AppExecFwk::FormInstance> infos;
@@ -105,16 +105,16 @@ int32_t JsFormStateObserverStub::HandleNotifyWhetherFormsVisible(MessageParcel &
 template<typename T>
 int32_t JsFormStateObserverStub::GetParcelableInfos(MessageParcel &data, std::vector<T> &parcelableInfos)
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("call");
     int32_t infoSize = data.ReadInt32();
     if (infoSize < 0 || infoSize > MAX_ALLOW_SIZE) {
-        HILOG_ERROR("invalid size: %{public}d", infoSize);
+        HILOG_ERROR("invalid size:%{public}d", infoSize);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     for (int32_t i = 0; i < infoSize; i++) {
         std::unique_ptr<T> info(data.ReadParcelable<T>());
         if (!info) {
-            HILOG_ERROR("failed to Read Parcelable infos");
+            HILOG_ERROR("fail Read Parcelable infos");
             return ERR_APPEXECFWK_PARCEL_ERROR;
         }
         parcelableInfos.emplace_back(*info);
@@ -125,16 +125,16 @@ int32_t JsFormStateObserverStub::GetParcelableInfos(MessageParcel &data, std::ve
 
 int32_t JsFormStateObserverStub::HandleOnFormClick(MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("Called.");
+    HILOG_DEBUG("call");
     std::string bundleName = data.ReadString();
     std::string callType = data.ReadString();
     if (callType.empty()) {
-        HILOG_ERROR("Call type is empty.");
+        HILOG_ERROR("empty callType");
         return ERR_APPEXECFWK_INSTALLD_PARAM_ERROR;
     }
     std::unique_ptr<AppExecFwk::RunningFormInfo> runningFormInfo(data.ReadParcelable<AppExecFwk::RunningFormInfo>());
     if (!runningFormInfo) {
-        HILOG_ERROR("Failed to ReadParcelable<RunningFormInfo>");
+        HILOG_ERROR("ReadParcelable<RunningFormInfo> failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t result = OnFormClickEvent(bundleName, callType, *runningFormInfo);

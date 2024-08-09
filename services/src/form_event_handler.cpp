@@ -30,7 +30,7 @@ FormEventHandler::FormEventHandler(const std::shared_ptr<FormSerialQueue> &seria
 void FormEventHandler::ProcessEvent(int64_t msg, int64_t eventId, int64_t delayTime)
 {
     if (serialQueue_ == nullptr) {
-        HILOG_ERROR("serialQueue_ is invalid");
+        HILOG_ERROR("null serialQueue_");
         return;
     }
 
@@ -39,7 +39,7 @@ void FormEventHandler::ProcessEvent(int64_t msg, int64_t eventId, int64_t delayT
         std::lock_guard<std::mutex> lock(sharedThis->observerMutex_);
         for (auto &observer : sharedThis->observers_) {
             if (observer == nullptr) {
-                HILOG_ERROR("observer is nullptr");
+                HILOG_ERROR("null observer");
                 continue;
             }
             observer->OnEventTimeoutResponse(msg, eventId);
@@ -56,11 +56,11 @@ int64_t FormEventHandler::GetEventId()
 
 void FormEventHandler::RegisterEventTimeoutObserver(const std::shared_ptr<FormEventTimeoutObserver> &observer)
 {
-    HILOG_DEBUG("%{public}s called.", __func__);
+    HILOG_DEBUG("call");
     std::lock_guard<std::mutex> lock(observerMutex_);
     auto iter = observers_.find(observer);
     if (iter != observers_.end()) {
-        HILOG_ERROR("observer repeat attach.");
+        HILOG_ERROR("observer repeat attach");
         return;
     }
     observers_.emplace(observer);
@@ -68,11 +68,11 @@ void FormEventHandler::RegisterEventTimeoutObserver(const std::shared_ptr<FormEv
 
 void FormEventHandler::UnregisterEventTimeoutObserver(const std::shared_ptr<FormEventTimeoutObserver> &observer)
 {
-    HILOG_DEBUG("%{public}s called.", __func__);
+    HILOG_DEBUG("call");
     std::lock_guard<std::mutex> lock(observerMutex_);
     auto iter = observers_.find(observer);
     if (iter == observers_.end()) {
-        HILOG_ERROR("observer is not exist.");
+        HILOG_ERROR("observer not exist");
         return;
     }
 

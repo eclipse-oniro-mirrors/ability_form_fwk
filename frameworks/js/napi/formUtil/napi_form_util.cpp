@@ -251,7 +251,7 @@ bool ConvertStringToInt64(const std::string &strInfo, int64_t &int64Value)
     std::regex pattern("^0|-?[1-9][0-9]{0,18}$"); // "^-?[0-9]{1,19}$"
     std::smatch match;
     if (regex_match(strInfo, match, pattern)) {
-        HILOG_DEBUG("%{public}s, regex_match successed.", __func__);
+        HILOG_DEBUG("regex_match successed");
         if (strInfo.substr(ZERO_VALUE, ZERO_VALUE + 1) != "-") { // maximum: 9223372036854775807
             if (strLength < INT_64_LENGTH) {
                 int64Value = std::stoll(strInfo);
@@ -289,7 +289,7 @@ bool ConvertStringToInt64(const std::string &strInfo, int64_t &int64Value)
             }
         }
     }
-    HILOG_DEBUG("%{public}s, regex_match failed.", __func__);
+    HILOG_DEBUG("regex_match failed");
     return false;
 }
 
@@ -304,7 +304,7 @@ bool ConvertStringToInt64(const std::string &strInfo, int64_t &int64Value)
  */
 void InnerCreateCallbackRetMsg(napi_env env, int32_t code, napi_value (&result)[CALLBACK_RETURN_MSG_SIZE])
 {
-    HILOG_DEBUG("%{public}s called. code:%{public}d", __func__, code);
+    HILOG_DEBUG("code:%{public}d", code);
     napi_value error = nullptr;
     napi_create_object(env, &error);
 
@@ -323,7 +323,7 @@ void InnerCreateCallbackRetMsg(napi_env env, int32_t code, napi_value (&result)[
 
     result[0] = error;
     napi_get_undefined(env, &result[1]);
-    HILOG_DEBUG("%{public}s, end.", __func__);
+    HILOG_DEBUG("end");
 }
 
 /**
@@ -337,7 +337,7 @@ void InnerCreateCallbackRetMsg(napi_env env, int32_t code, napi_value (&result)[
  */
 void InnerCreatePromiseRetMsg(napi_env env, int32_t code, napi_value* result)
 {
-    HILOG_DEBUG("%{public}s called. code:%{public}d", __func__, code);
+    HILOG_DEBUG("code:%{public}d", code);
     if (code == ERR_OK) {
         napi_get_undefined(env, result);
         return;
@@ -359,12 +359,12 @@ void InnerCreatePromiseRetMsg(napi_env env, int32_t code, napi_value* result)
     napi_set_named_property(env, errInfo, "message", errMsg);
 
     *result = errInfo;
-    HILOG_DEBUG("%{public}s, end.", __func__);
+    HILOG_DEBUG("end");
 }
 
 napi_value RetErrMsgForCallback(AsyncErrMsgCallbackInfo* asyncCallbackInfo)
 {
-    HILOG_INFO("called.");
+    HILOG_INFO("call");
 
     napi_env env = asyncCallbackInfo->env;
     napi_value value = asyncCallbackInfo->callbackValue;
@@ -409,7 +409,7 @@ napi_value RetErrMsgForCallback(AsyncErrMsgCallbackInfo* asyncCallbackInfo)
 
 napi_value RetErrMsgForPromise(AsyncErrMsgCallbackInfo* asyncCallbackInfo)
 {
-    HILOG_INFO("called.");
+    HILOG_INFO("call");
 
     napi_env env = asyncCallbackInfo->env;
     napi_deferred deferred;
@@ -450,9 +450,9 @@ napi_value RetErrMsgForPromise(AsyncErrMsgCallbackInfo* asyncCallbackInfo)
  */
 napi_value RetErrMsg(AsyncErrMsgCallbackInfo* asyncCallbackInfo)
 {
-    HILOG_INFO("called.");
+    HILOG_INFO("call");
     if (asyncCallbackInfo == nullptr) {
-        HILOG_ERROR("asyncCallback == nullptr");
+        HILOG_ERROR("null asyncCallback");
         return nullptr;
     }
     if (asyncCallbackInfo->type == CALLBACK_FLG) {
@@ -514,7 +514,7 @@ napi_value CreateFormInfos(napi_env env, const std::vector<FormInfo> &formInfos)
 
 napi_value CreateFormInfo(napi_env env, const FormInfo &formInfo)
 {
-    HILOG_DEBUG("called");
+    HILOG_DEBUG("call");
 
     napi_value objContext = nullptr;
     napi_create_object(env, &objContext);
@@ -562,7 +562,7 @@ napi_value CreateRunningFormInfos(napi_env env, const std::vector<RunningFormInf
 
 napi_value CreateRunningFormInfo(napi_env env, const RunningFormInfo &runningFormInfo)
 {
-    HILOG_DEBUG("called");
+    HILOG_DEBUG("call");
 
     napi_value objContext = nullptr;
     napi_create_object(env, &objContext);
@@ -607,12 +607,12 @@ bool ParseParam(napi_env env, napi_value args, FormInstancesFilter &filter)
     napi_get_named_property(env, args, "bundleName", &prop);
     napi_typeof(env, prop, &valueType);
     if (valueType != napi_string) {
-        HILOG_ERROR("The input bundleName is not a string.");
+        HILOG_ERROR("input bundleName not string");
         return false;
     }
     filter.bundleName = GetStringFromNapi(env, prop);
     if (filter.bundleName.empty()) {
-        HILOG_ERROR("The input bundleName is empty");
+        HILOG_ERROR("empty inputBundleName");
         return false;
     }
     prop = nullptr;
@@ -642,13 +642,13 @@ std::string GetStringFromNapi(napi_env env, napi_value value)
     size_t size = 0;
 
     if (napi_get_value_string_utf8(env, value, nullptr, 0, &size) != napi_ok) {
-        HILOG_ERROR("can not get string size");
+        HILOG_ERROR("can't get stringSize");
         return "";
     }
     result.reserve(size + 1);
     result.resize(size);
     if (napi_get_value_string_utf8(env, value, result.data(), (size + 1), &size) != napi_ok) {
-        HILOG_ERROR("can not get string value");
+        HILOG_ERROR("can't get string value");
         return "";
     }
     return result;
@@ -667,7 +667,7 @@ napi_value CreateFormInstances(napi_env env, const std::vector<FormInstance> &fo
 
 napi_value CreateFormInstance(napi_env env, const FormInstance &formInstance)
 {
-    HILOG_DEBUG("called");
+    HILOG_DEBUG("call");
 
     napi_value objContext = nullptr;
     napi_create_object(env, &objContext);
@@ -691,7 +691,7 @@ bool ConvertFormInfoFilter(napi_env env, napi_value value, AppExecFwk::FormInfoF
     napi_valuetype type = napi_undefined;
     napi_typeof(env, value, &type);
     if (type != napi_object) {
-        HILOG_ERROR("%{public}s, an object is expected, but an argument of different type is passed in.", __func__);
+        HILOG_ERROR("type not napi_object");
         return false;
     }
 
@@ -701,10 +701,10 @@ bool ConvertFormInfoFilter(napi_env env, napi_value value, AppExecFwk::FormInfoF
     napi_typeof(env, nativeDataValue, &nativeDataValueType);
     if (nativeDataValue == nullptr || (nativeDataValueType != napi_undefined &&
         !ConvertFromJsValue(env, nativeDataValue, formInfoFilter.moduleName))) {
-        HILOG_ERROR("%{public}s called, convert nativeDataValue failed.", __func__);
+        HILOG_ERROR("convert nativeDataValue failed");
         return false;
     }
-    HILOG_INFO("module:%{public}s.", formInfoFilter.moduleName.c_str());
+    HILOG_INFO("module:%{public}s", formInfoFilter.moduleName.c_str());
 
     return true;
 }

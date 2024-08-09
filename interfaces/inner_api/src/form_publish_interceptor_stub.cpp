@@ -34,11 +34,11 @@ FormPublishInterceptorStub::~FormPublishInterceptorStub()
 int FormPublishInterceptorStub::OnRemoteRequest(uint32_t code,
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    HILOG_INFO("code:%{public}u, flags:%{public}d.", code, option.GetFlags());
+    HILOG_INFO("code:%{public}u, flags:%{public}d", code, option.GetFlags());
     std::u16string descriptor = FormPublishInterceptorStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
     if (descriptor != remoteDescriptor) {
-        HILOG_ERROR("local descriptor is not equal to remote");
+        HILOG_ERROR("localDescriptor not equal to remote");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 

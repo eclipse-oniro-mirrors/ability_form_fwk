@@ -42,8 +42,8 @@ void FormDeleteConnection::OnAbilityConnectDone(
 {
     HILOG_INFO("call");
     if (resultCode != ERR_OK) {
-        HILOG_ERROR("%{public}s, abilityName:%{public}s, formId:%{public}" PRId64 ", resultCode:%{public}d",
-           __func__, element.GetAbilityName().c_str(), GetFormId(), resultCode);
+        HILOG_ERROR("abilityName:%{public}s, formId:%{public}" PRId64 ", resultCode:%{public}d",
+            element.GetAbilityName().c_str(), GetFormId(), resultCode);
         return;
     }
     onFormAppConnect();
@@ -52,7 +52,7 @@ void FormDeleteConnection::OnAbilityConnectDone(
 
     Want want;
     want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
-    HILOG_DEBUG("%{public}s, connectId:%{public}d", __func__, this->GetConnectId());
+    HILOG_DEBUG("connectId:%{public}d", this->GetConnectId());
     FormTaskMgr::GetInstance().PostDeleteTask(GetFormId(), want, remoteObject);
 }
 }  // namespace AppExecFwk

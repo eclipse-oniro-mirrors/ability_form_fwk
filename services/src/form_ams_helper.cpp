@@ -44,12 +44,12 @@ sptr<AAFwk::IAbilityManager> FormAmsHelper::GetAbilityManager()
     if (abilityManager_ == nullptr) {
         sptr<ISystemAbilityManager> systemManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
         if (systemManager == nullptr) {
-            HILOG_ERROR("%{public}s:fail to get registry", __func__);
+            HILOG_ERROR("get registry failed");
             return nullptr;
         }
         sptr<IRemoteObject> remoteObject = systemManager->GetSystemAbility(ABILITY_MGR_SERVICE_ID);
         if (remoteObject == nullptr) {
-            HILOG_ERROR("%{public}s:fail to connect AbilityMgrService", __func__);
+            HILOG_ERROR("connect AbilityMgrService failed");
             return nullptr;
         }
         HILOG_DEBUG("connect AbilityMgrService success");
@@ -87,7 +87,7 @@ ErrCode FormAmsHelper::DisconnectServiceAbility(const sptr<AAFwk::IAbilityConnec
     HILOG_INFO("call");
     sptr<AAFwk::IAbilityManager> ams = GetAbilityManager();
     if (ams == nullptr) {
-        HILOG_ERROR("%{public}s:ability service not connect", __func__);
+        HILOG_ERROR("ability service not connect");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     return IN_PROCESS_CALL(ams->DisconnectAbility(connect));
@@ -101,14 +101,14 @@ ErrCode FormAmsHelper::DisconnectServiceAbility(const sptr<AAFwk::IAbilityConnec
 ErrCode FormAmsHelper::DisconnectServiceAbilityDelay(const sptr<AAFwk::IAbilityConnection> &connect, int delayTime)
 {
     if (serialQueue_ == nullptr) {
-        HILOG_ERROR("%{public}s fail, serialQueue_ invalidate", __func__);
+        HILOG_ERROR("null serialQueue_");
         return ERR_INVALID_OPERATION;
     }
     auto disConnectAbilityFunc = [connect]() {
         FormAmsHelper::GetInstance().DisconnectAbilityTask(connect);
     };
     if (!serialQueue_->ScheduleTask(delayTime, disConnectAbilityFunc)) {
-        HILOG_ERROR("%{public}s, failed to disconnect ability", __func__);
+        HILOG_ERROR("fail disconnect ability");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     return ERR_OK;
@@ -120,7 +120,7 @@ ErrCode FormAmsHelper::DisconnectServiceAbilityDelay(const sptr<AAFwk::IAbilityC
  */
 ErrCode FormAmsHelper::StopExtensionAbility(const Want &want)
 {
-    HILOG_DEBUG("StopExtensionAbility called.");
+    HILOG_DEBUG("call");
     sptr<AAFwk::IAbilityManager> ams = GetAbilityManager();
     if (ams == nullptr) {
         HILOG_ERROR("StopExtensionAbility ability service not connect");
@@ -146,7 +146,7 @@ void FormAmsHelper::DisconnectAbilityTask(const sptr<AAFwk::IAbilityConnection> 
 {
     sptr<AAFwk::IAbilityManager> ams = GetAbilityManager();
     if (ams == nullptr) {
-        HILOG_ERROR("%{public}s, ability service not connect", __func__);
+        HILOG_ERROR("ability service not connect");
         return;
     }
     IN_PROCESS_CALL_WITHOUT_RET(ams->DisconnectAbility(connect));
@@ -156,7 +156,7 @@ ErrCode FormAmsHelper::StartAbility(const Want &want, int32_t userId)
 {
     sptr<AAFwk::IAbilityManager> ams = GetAbilityManager();
     if (ams == nullptr) {
-        HILOG_ERROR("%{public}s, ability service not connect", __func__);
+        HILOG_ERROR("ability service not connect");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     return IN_PROCESS_CALL(ams->StartAbility(want, userId));
@@ -166,17 +166,17 @@ void FormAmsHelper::RegisterConfigurationObserver()
 {
     HILOG_INFO("begin");
     if (configurationObserver != nullptr) {
-        HILOG_WARN("configurationObserver is not nullptr");
+        HILOG_WARN("configurationObserver not null");
         return;
     }
     sptr<IConfigurationObserver> configurationObserver(new (std::nothrow) FormFwkResourceObserver());
     if (configurationObserver == nullptr) {
-        HILOG_ERROR("fail to create configurationObserver");
+        HILOG_ERROR("create configurationObserver failed");
         return;
     }
     auto appMgrClient = std::make_unique<AppMgrClient>();
     if (appMgrClient == nullptr) {
-        HILOG_ERROR("fail to create appMgrClient");
+        HILOG_ERROR("create appMgrClient failed");
         return;
     }
     appMgrClient->RegisterConfigurationObserver(configurationObserver);
@@ -187,12 +187,12 @@ void FormAmsHelper::UnRegisterConfigurationObserver()
 {
     HILOG_INFO("begin");
     if (configurationObserver == nullptr) {
-        HILOG_WARN("configurationObserver is nullptr");
+        HILOG_WARN("null configurationObserver");
         return;
     }
     auto appMgrClient = std::make_unique<AppMgrClient>();
     if (appMgrClient == nullptr) {
-        HILOG_ERROR("fail to create appMgrClient");
+        HILOG_ERROR("create appMgrClient failed");
         return;
     }
     appMgrClient->UnregisterConfigurationObserver(configurationObserver);
