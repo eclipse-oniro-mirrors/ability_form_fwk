@@ -75,7 +75,7 @@ ohos_shared_library("formrender") {
   ]
 
   if (use_musl) {
-    if (use_jemalloc && use_jemalloc_dfx_intf) {
+    if (musl_use_jemalloc && musl_use_jemalloc_dfx_intf) {
       defines += [ "CONFIG_USE_JEMALLOC_DFX_INTF" ]
     }
   }
@@ -129,7 +129,7 @@ ohos_shared_library("formrender_service") {
   defines = [ "FMS_LOG_TAG = \"FormRenderService\"" ]
 
   if (use_musl) {
-    if (use_jemalloc && use_jemalloc_dfx_intf) {
+    if (musl_use_jemalloc && musl_use_jemalloc_dfx_intf) {
       defines += [ "CONFIG_USE_JEMALLOC_DFX_INTF" ]
     }
   }
