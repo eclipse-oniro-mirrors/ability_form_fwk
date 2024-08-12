@@ -29,7 +29,7 @@ using namespace OHOS::AbilityRuntime;
 
 static napi_value NapiFormHostInit(napi_env env, napi_value exports)
 {
-    HILOG_DEBUG("NapiFormHostInit is called");
+    HILOG_DEBUG("call");
     if (env == nullptr || exports == nullptr) {
         HILOG_ERROR("Invalid input parameters");
         return nullptr;

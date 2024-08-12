@@ -27,7 +27,7 @@ void FormObserverRecord::SetDeathRecipient(const sptr<IRemoteObject> &callerToke
 {
     HILOG_DEBUG("start");
     if (callerToken == nullptr || deathRecipient == nullptr) {
-        HILOG_ERROR("The callerToken or the deathRecipient is empty");
+        HILOG_ERROR("empty callerToken or deathRecipient");
         return;
     }
     std::lock_guard<std::mutex> lock(deathRecipientsMutex_);
@@ -36,7 +36,7 @@ void FormObserverRecord::SetDeathRecipient(const sptr<IRemoteObject> &callerToke
         deathRecipients_.emplace(callerToken, deathRecipient);
         callerToken->AddDeathRecipient(deathRecipient);
     } else {
-        HILOG_DEBUG("The deathRecipient has been added.");
+        HILOG_DEBUG("The deathRecipient has been added");
     }
 }
 
@@ -51,7 +51,7 @@ ErrCode FormObserverRecord::SetFormAddObserver(const std::string bundleName, con
         formAddObservers_.emplace(bundleName, observers);
     } else {
         if (std::find(iter->second.begin(), iter->second.end(), callerToken) != iter->second.end()) {
-            HILOG_DEBUG("observer added.");
+            HILOG_DEBUG("observer added");
             return ERR_OK;
         } else {
             iter->second.emplace_back(callerToken);
@@ -72,7 +72,7 @@ ErrCode FormObserverRecord::SetFormRemoveObserver(const std::string bundleName, 
         formRemoveObservers_.emplace(bundleName, observers);
     } else {
         if (std::find(iter->second.begin(), iter->second.end(), callerToken) != iter->second.end()) {
-            HILOG_DEBUG("The observer has been added.");
+            HILOG_DEBUG("The observer has been added");
             return ERR_OK;
         } else {
             iter->second.emplace_back(callerToken);
@@ -86,7 +86,7 @@ void FormObserverRecord::onFormAdd(const std::string bundleName, RunningFormInfo
 {
     HILOG_DEBUG("start");
     if (formAddObservers_.empty()) {
-        HILOG_DEBUG("No observer has been added.");
+        HILOG_DEBUG("No observer has been added");
         return;
     }
     std::lock_guard<std::mutex> lock(formAddObserverMutex_);
@@ -102,7 +102,7 @@ void FormObserverRecord::onFormRemove(const std::string bundleName, const Runnin
 {
     HILOG_DEBUG("start");
     if (formRemoveObservers_.empty()) {
-        HILOG_DEBUG("No observer has been added.");
+        HILOG_DEBUG("No observer has been added");
         return;
     }
 
@@ -122,7 +122,7 @@ void FormObserverRecord::CleanResource(const wptr<IRemoteObject> &remote)
     // Clean the formAddObservers_.
     auto object = remote.promote();
     if (object == nullptr) {
-        HILOG_ERROR("remote object is nullptr");
+        HILOG_ERROR("null remoteObject");
         return;
     }
     std::lock_guard<std::mutex> lock(formAddObserverMutex_);
@@ -175,15 +175,15 @@ void FormObserverRecord::ClientDeathRecipient::OnRemoteDied(const wptr<IRemoteOb
 void FormObserverRecord::HandleFormEvent(
     const std::string &bundleName, const std::string &formEventType, RunningFormInfo &runningFormInfo)
 {
-    HILOG_DEBUG("Called.");
+    HILOG_DEBUG("call");
     if (formEventType.empty()) {
-        HILOG_ERROR("Input string is empty.");
+        HILOG_ERROR("empty inputString");
         return;
     }
 
     auto eventId = ConvertToFormEventId(formEventType);
     if (eventId == FormEventId::FORM_EVENT_NON) {
-        HILOG_ERROR("Input event type error.");
+        HILOG_ERROR("Input event type error");
         return;
     }
 
@@ -203,7 +203,7 @@ void FormObserverRecord::HandleFormEvent(
 
 FormEventId FormObserverRecord::ConvertToFormEventId(const std::string &formEventType)
 {
-    HILOG_DEBUG("Called.");
+    HILOG_DEBUG("call");
 
     auto iter = formEventMap.find(formEventType);
     if (iter != formEventMap.end()) {
@@ -216,7 +216,7 @@ FormEventId FormObserverRecord::ConvertToFormEventId(const std::string &formEven
 void FormObserverRecord::NotifyFormEvent(const FormObserverRecordInner &recordInner,
     FormEventId formEventId, RunningFormInfo &runningFormInfo, const std::string &formEventType)
 {
-    HILOG_DEBUG("Called.");
+    HILOG_DEBUG("call");
     switch (formEventId) {
         case FormEventId::FORM_EVENT_CALL :
         case FormEventId::FORM_EVENT_MESSAGE :
@@ -229,7 +229,7 @@ void FormObserverRecord::NotifyFormEvent(const FormObserverRecordInner &recordIn
         case FormEventId::FORM_EVENT_FORM_REMOVE :
             break;
         default :
-            HILOG_ERROR("Type mismatchy.");
+            HILOG_ERROR("Type mismatchy");
             break;
     }
 }
@@ -237,21 +237,21 @@ void FormObserverRecord::NotifyFormEvent(const FormObserverRecordInner &recordIn
 ErrCode FormObserverRecord::SetFormEventObserver(
     const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("Called.");
+    HILOG_DEBUG("call");
     if (callerToken == nullptr) {
-        HILOG_ERROR("Caller token is null.");
+        HILOG_ERROR("null CallerToken");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
     // Bundle name allows empty input, representing listening to all applications.
     if (formEventType.empty()) {
-        HILOG_ERROR("Input string is empty.");
+        HILOG_ERROR("empty inputString");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
     auto eventId = ConvertToFormEventId(formEventType);
     if (eventId == FormEventId::FORM_EVENT_NON) {
-        HILOG_ERROR("Input event type error.");
+        HILOG_ERROR("Input event type error");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
@@ -261,20 +261,20 @@ ErrCode FormObserverRecord::SetFormEventObserver(
 ErrCode FormObserverRecord::RemoveFormEventObserver(
     const std::string &bundleName, const std::string &formEventType, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("Called.");
+    HILOG_DEBUG("call");
     if (formEventType.empty()) {
-        HILOG_ERROR("Input string is empty.");
+        HILOG_ERROR("empty inputString");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
     if (callerToken == nullptr) {
-        HILOG_ERROR("Caller token parameter is empty.");
+        HILOG_ERROR("empty callerTokenParameter");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
     auto eventId = ConvertToFormEventId(formEventType);
     if (eventId == FormEventId::FORM_EVENT_NON) {
-        HILOG_ERROR("Input event type error.");
+        HILOG_ERROR("Input event type error");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
@@ -284,14 +284,14 @@ ErrCode FormObserverRecord::RemoveFormEventObserver(
 ErrCode FormObserverRecord::SetFormEventObserverLocked(
     const std::string &bundleName, FormEventId eventId, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("Called.");
+    HILOG_DEBUG("call");
     FormObserverRecordInner recordInner(callerToken);
     recordInner.PushEvent(eventId);
     recordInner.SetBindHostBundle(bundleName);
 
     sptr<IRemoteObject::DeathRecipient> deathRecipient = new (std::nothrow) FormObserverRecord::ClientDeathRecipient();
     if (deathRecipient == nullptr) {
-        HILOG_ERROR("Create death recipient error.");
+        HILOG_ERROR("Create death recipient error");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -321,11 +321,11 @@ ErrCode FormObserverRecord::RemoveFormEventObserverLocked(
     const std::string &bundleName, FormEventId formEventType, const sptr<IRemoteObject> &callerToken)
 {
     // Place parameter verification on the previous layer.
-    HILOG_DEBUG("Called.");
+    HILOG_DEBUG("call");
     std::unique_lock<std::mutex> formLock(formEventObserversMutex_);
     auto observerVec = formEventObservers_.find(bundleName);
     if (observerVec == formEventObservers_.end()) {
-        HILOG_ERROR("Not found bundle key.");
+        HILOG_ERROR("invalid bundleKey");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
@@ -335,7 +335,7 @@ ErrCode FormObserverRecord::RemoveFormEventObserverLocked(
 
     auto recordInnerIter = std::find(observerVec->second.begin(), observerVec->second.end(), recordInner);
     if (recordInnerIter == observerVec->second.end()) {
-        HILOG_ERROR("Caller not found.");
+        HILOG_ERROR("invalid caller");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
@@ -353,10 +353,10 @@ ErrCode FormObserverRecord::RemoveFormEventObserverLocked(
 
 void FormObserverRecord::ClearDeathRemoteObserver(const wptr<IRemoteObject> &remote)
 {
-    HILOG_DEBUG("Called.");
+    HILOG_DEBUG("call");
     auto object = remote.promote();
     if (object == nullptr) {
-        HILOG_ERROR("remote object is nullptr");
+        HILOG_ERROR("null remoteObject");
         return;
     }
     std::lock_guard<std::mutex> formEventLock(formEventObserversMutex_);

@@ -25,7 +25,7 @@ namespace OHOS {
 namespace AppExecFwk {
 void FormHostCallerRecipient::OnRemoteDied(const wptr<IRemoteObject> &__attribute__((unused)) remote)
 {
-    HILOG_DEBUG("On remote died.");
+    HILOG_DEBUG("On remote died");
     if (handler_ != nullptr) {
         handler_(remote);
     }
@@ -33,12 +33,12 @@ void FormHostCallerRecipient::OnRemoteDied(const wptr<IRemoteObject> &__attribut
 
 void FormHostCaller::UpdateForm(int64_t formId, const FormProviderData &formProviderData)
 {
-    HILOG_DEBUG("%{public}s called.", __func__);
+    HILOG_DEBUG("call");
     FormJsInfo formJsInfo = formJsInfo_;
     formJsInfo.formData = formProviderData.GetDataString();
     formJsInfo.formProviderData = formProviderData;
     if (!formJsInfo.ConvertRawImageData()) {
-        HILOG_ERROR("convert raw image data failed.");
+        HILOG_ERROR("convert raw image data failed");
     }
     FormHostClient::GetInstance()->UpdateForm(formJsInfo);
 }
@@ -47,7 +47,7 @@ ErrCode FormHostCaller::RequestForm(int64_t formId, const sptr<IRemoteObject> &c
 {
     sptr<IFormProvider> providerToken = iface_cast<IFormProvider>(callerToken_);
     if (providerToken == nullptr) {
-        HILOG_ERROR("%{public}s error, callerToken is nullptr.", __func__);
+        HILOG_ERROR("null callerToken");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return providerToken->NotifyFormUpdate(formId, want, callerToken);
@@ -58,7 +58,7 @@ ErrCode FormHostCaller::MessageEvent(int64_t formId, const AAFwk::Want &want, co
     std::string message = want.GetStringParam(Constants::PARAM_MESSAGE_KEY);
     sptr<IFormProvider> providerToken = iface_cast<IFormProvider>(callerToken_);
     if (providerToken == nullptr) {
-        HILOG_ERROR("%{public}s error, callerToken is nullptr.", __func__);
+        HILOG_ERROR("null callerToken");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return providerToken->FireFormEvent(formId, message, want, callerToken);
@@ -71,7 +71,7 @@ bool FormHostCaller::IsSameToken(const sptr<IRemoteObject> &callerToken) const
 
 void FormHostCaller::AddDeathRecipient(sptr<IRemoteObject::DeathRecipient> deathRecipient)
 {
-    HILOG_DEBUG("%{public}s called.", __func__);
+    HILOG_DEBUG("call");
     callerToken_->AddDeathRecipient(deathRecipient);
 }
 } // namespace AppExecFwk

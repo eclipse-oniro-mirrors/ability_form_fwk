@@ -49,25 +49,25 @@ void FormRenderServiceExtension::OnStart(const AAFwk::Want &want)
         OHOS::DelayedSingleton<FormRenderImpl>::GetInstance()->SetConfiguration(context->GetConfiguration());
     }
 
-    HILOG_INFO("FormRenderServiceExtension OnStart begin..");
+    HILOG_INFO("FormRenderServiceExtension OnStart begin");
 }
 
 void FormRenderServiceExtension::OnStop()
 {
     ServiceExtension::OnStop();
-    HILOG_INFO("FormRenderServiceExtension OnStop begin.");
+    HILOG_INFO("FormRenderServiceExtension OnStop begin");
 }
 
 sptr<IRemoteObject> FormRenderServiceExtension::OnConnect(const AAFwk::Want &want)
 {
-    HILOG_INFO("%{public}s begin.", __func__);
+    HILOG_INFO("begin");
     return OHOS::DelayedSingleton<FormRenderImpl>::GetInstance()->AsObject();
 }
 
 sptr<IRemoteObject> FormRenderServiceExtension::OnConnect(const AAFwk::Want &want,
     AppExecFwk::AbilityTransactionCallbackInfo<sptr<IRemoteObject>> *callbackInfo, bool &isAsyncCallback)
 {
-    HILOG_INFO("%{public}s begin multiParams.", __func__);
+    HILOG_INFO("begin multiParams");
     return OHOS::DelayedSingleton<FormRenderImpl>::GetInstance()->AsObject();
 }
 
@@ -75,7 +75,7 @@ void FormRenderServiceExtension::OnDisconnect(const AAFwk::Want &want)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     Extension::OnDisconnect(want);
-    HILOG_DEBUG("%{public}s begin.", __func__);
+    HILOG_DEBUG("begin");
 }
 
 void FormRenderServiceExtension::OnDisconnect(const AAFwk::Want &want,
@@ -83,14 +83,13 @@ void FormRenderServiceExtension::OnDisconnect(const AAFwk::Want &want,
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     Extension::OnDisconnect(want);
-    HILOG_DEBUG("%{public}s begin.", __func__);
+    HILOG_DEBUG("begin");
 }
 
 void FormRenderServiceExtension::OnCommand(const AAFwk::Want &want, bool restart, int startId)
 {
     Extension::OnCommand(want, restart, startId);
-    HILOG_INFO("%{public}s begin restart=%{public}s,startId=%{public}d.",
-        __func__,
+    HILOG_INFO("begin restart=%{public}s,startId=%{public}d",
         restart ? "true" : "false",
         startId);
 }
@@ -98,7 +97,7 @@ void FormRenderServiceExtension::OnCommand(const AAFwk::Want &want, bool restart
 void FormRenderServiceExtension::OnConfigurationUpdated(const AppExecFwk::Configuration& configuration)
 {
     Extension::OnConfigurationUpdated(configuration);
-    HILOG_INFO("%{public}s called.", __func__);
+    HILOG_INFO("call");
     auto config = std::make_shared<AppExecFwk::Configuration>(configuration);
     OHOS::DelayedSingleton<FormRenderImpl>::GetInstance()->OnConfigurationUpdated(config);
 }

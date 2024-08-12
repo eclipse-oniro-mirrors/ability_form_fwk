@@ -48,7 +48,7 @@ sptr<FormSupplyCallback> FormSupplyCallback::GetInstance()
         if (instance_ == nullptr) {
             instance_ = new (std::nothrow) FormSupplyCallback();
             if (instance_ == nullptr) {
-                HILOG_ERROR("%{public}s error, failed to create FormSupplyCallback.", __func__);
+                HILOG_ERROR("create FormSupplyCallback failed");
             }
         }
     }
@@ -88,7 +88,7 @@ int FormSupplyCallback::OnAcquire(const FormProviderInfo &formProviderInfo, cons
 
     std::string strFormId = want.GetStringParam(Constants::PARAM_FORM_IDENTITY_KEY);
     if (strFormId.empty()) {
-        HILOG_ERROR("%{public}s error, formId is empty.", __func__);
+        HILOG_ERROR("empty formId");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     int64_t formId = std::stoll(strFormId);
@@ -109,8 +109,8 @@ int FormSupplyCallback::OnAcquire(const FormProviderInfo &formProviderInfo, cons
 
     int32_t ret = ERR_APPEXECFWK_FORM_INVALID_PARAM;
     int type = want.GetIntParam(Constants::ACQUIRE_TYPE, 0);
-    HILOG_DEBUG("%{public}s come: %{public}" PRId64 ", %{public}d, %{public}d",
-        __func__, formId, connectId, type);
+    HILOG_DEBUG("%{public}" PRId64 ",%{public}d,%{public}d",
+        formId, connectId, type);
     switch (type) {
         case Constants::ACQUIRE_TYPE_CREATE_FORM:
             ret = FormProviderMgr::GetInstance().AcquireForm(formId, formProviderInfo);
@@ -119,7 +119,7 @@ int FormSupplyCallback::OnAcquire(const FormProviderInfo &formProviderInfo, cons
             ret = FormProviderMgr::GetInstance().UpdateForm(formId, formProviderInfo);
             break;
         default:
-            HILOG_WARN("%{public}s warning, onAcquired type: %{public}d", __func__, type);
+            HILOG_WARN("onAcquired type:%{public}d", type);
     }
 
     FormDataProxyMgr::GetInstance().SubscribeFormData(formId, formProviderInfo.GetFormProxies(), want);
@@ -138,7 +138,7 @@ int FormSupplyCallback::OnEventHandle(const Want &want)
     HILOG_INFO("call");
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     std::string supplyInfo = want.GetStringParam(Constants::FORM_SUPPLY_INFO);
-    HILOG_DEBUG("%{public}s come: %{public}d, %{public}s", __func__, connectId, supplyInfo.c_str());
+    HILOG_DEBUG("%{public}d,%{public}s", connectId, supplyInfo.c_str());
     RemoveConnection(connectId);
     HILOG_INFO("end");
     return ERR_OK;
@@ -166,7 +166,7 @@ int FormSupplyCallback::OnAcquireStateResult(FormState state,
 
 int FormSupplyCallback::OnAcquireDataResult(const AAFwk::WantParams &wantParams, int64_t requestCode)
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("call");
     ErrCode errCode = FormProviderMgr::GetInstance().AcquireFormDataBack(wantParams, requestCode);
     HILOG_INFO("errCode:%{public}d", errCode);
     return errCode;
@@ -178,7 +178,7 @@ int FormSupplyCallback::OnAcquireDataResult(const AAFwk::WantParams &wantParams,
  */
 void FormSupplyCallback::AddConnection(sptr<FormAbilityConnection> connection)
 {
-    HILOG_DEBUG("%{public}s called.", __func__);
+    HILOG_DEBUG("call");
     if (connection == nullptr) {
         return;
     }
@@ -189,7 +189,7 @@ void FormSupplyCallback::AddConnection(sptr<FormAbilityConnection> connection)
     }
     connection->SetConnectId(connectKey);
     connections_.emplace(connectKey, connection);
-    HILOG_DEBUG("%{public}s end.", __func__);
+    HILOG_DEBUG("end");
 }
 
 /**
@@ -198,7 +198,7 @@ void FormSupplyCallback::AddConnection(sptr<FormAbilityConnection> connection)
  */
 void FormSupplyCallback::RemoveConnection(int32_t connectId)
 {
-    HILOG_DEBUG("%{public}s called.", __func__);
+    HILOG_DEBUG("call");
     sptr<FormAbilityConnection> connection = nullptr;
     {
         std::lock_guard<std::mutex> lock(conMutex_);
@@ -218,7 +218,7 @@ void FormSupplyCallback::RemoveConnection(int32_t connectId)
             HILOG_INFO("disconnect service ability delay");
         }
     }
-    HILOG_DEBUG("%{public}s end.", __func__);
+    HILOG_DEBUG("end");
 }
 /**
  * @brief check if disconnect ability or not.
@@ -227,7 +227,7 @@ void FormSupplyCallback::RemoveConnection(int32_t connectId)
 bool FormSupplyCallback::CanDisconnect(sptr<FormAbilityConnection> &connection)
 {
     if (connection == nullptr) {
-        HILOG_ERROR("connection is nullptr");
+        HILOG_ERROR("null connection");
         return false;
     }
     HILOG_INFO("call");
@@ -250,14 +250,14 @@ bool FormSupplyCallback::CanDisconnect(sptr<FormAbilityConnection> &connection)
 void FormSupplyCallback::OnShareAcquire(int64_t formId, const std::string &remoteDeviceId,
     const AAFwk::WantParams &wantParams, int64_t requestCode, const bool &result)
 {
-    HILOG_DEBUG("%{public}s formId %{public}" PRId64 " called.", __func__, formId);
+    HILOG_DEBUG("formId %{public}" PRId64 " call", formId);
     DelayedSingleton<FormShareMgr>::GetInstance()->HandleProviderShareData(
         formId, remoteDeviceId, wantParams, requestCode, result);
 }
 
 bool FormSupplyCallback::IsRemoveConnection(int64_t formId, const sptr<IRemoteObject> &hostToken)
 {
-    HILOG_DEBUG("%{public}s called. formId is %{public}" PRId64, __func__, formId);
+    HILOG_DEBUG("formId is %{public}" PRId64, formId);
     if (hostToken == nullptr) {
         return true;
     }
@@ -273,7 +273,7 @@ bool FormSupplyCallback::IsRemoveConnection(int64_t formId, const sptr<IRemoteOb
             }
         }
     }
-    HILOG_DEBUG("%{public}s called. count is %{public}d", __func__, count);
+    HILOG_DEBUG("count is %{public}d", count);
     if (count == 1) {
         HILOG_DEBUG("keep the connection");
         return false;
@@ -283,7 +283,7 @@ bool FormSupplyCallback::IsRemoveConnection(int64_t formId, const sptr<IRemoteOb
 
 void FormSupplyCallback::RemoveConnection(int64_t formId, const sptr<IRemoteObject> &hostToken)
 {
-    HILOG_DEBUG("%{public}s called. formId is %{public}" PRId64, __func__, formId);
+    HILOG_DEBUG("formId is %{public}" PRId64, formId);
     if (hostToken == nullptr) {
         return;
     }
@@ -302,9 +302,9 @@ void FormSupplyCallback::RemoveConnection(int64_t formId, const sptr<IRemoteObje
 
 void FormSupplyCallback::HandleHostDied(const sptr<IRemoteObject> &hostToken)
 {
-    HILOG_DEBUG("%{public}s called.", __func__);
+    HILOG_DEBUG("call");
     if (hostToken == nullptr) {
-        HILOG_ERROR("host token is nullptr.");
+        HILOG_ERROR("null hostToken");
         return;
     }
 
@@ -326,7 +326,7 @@ void FormSupplyCallback::HandleHostDied(const sptr<IRemoteObject> &hostToken)
 
 int32_t FormSupplyCallback::OnRenderTaskDone(int64_t formId, const Want &want)
 {
-    HILOG_DEBUG("%{public}s called.", __func__);
+    HILOG_DEBUG("call");
     FormRenderMgr::GetInstance().RenderFormCallback(formId, want);
     return ERR_OK;
 }
@@ -364,7 +364,7 @@ int32_t FormSupplyCallback::OnRecycleForm(const int64_t &formId, const Want &wan
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     if (formRecord.recycleStatus != RecycleStatus::RECYCLABLE) {
-        HILOG_WARN("form %{public}" PRId64 " is not RECYCLABLE", formId);
+        HILOG_WARN("form %{public}" PRId64 " not RECYCLABLE", formId);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     formRecord.recycleStatus = RecycleStatus::RECYCLED;
@@ -372,12 +372,12 @@ int32_t FormSupplyCallback::OnRecycleForm(const int64_t &formId, const Want &wan
 
     sptr<IRemoteObject> remoteObjectOfHost = want.GetRemoteObject(Constants::PARAM_FORM_HOST_TOKEN);
     if (remoteObjectOfHost == nullptr) {
-        HILOG_ERROR("remoteObjectOfHost is null.");
+        HILOG_ERROR("null remoteObjectOfHost");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     sptr<IFormHost> remoteFormHost = iface_cast<IFormHost>(remoteObjectOfHost);
     if (remoteFormHost == nullptr) {
-        HILOG_ERROR("remoteFormHost is null.");
+        HILOG_ERROR("null remoteFormHost");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     remoteFormHost->OnRecycleForm(formId);

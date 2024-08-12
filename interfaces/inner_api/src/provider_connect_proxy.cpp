@@ -29,41 +29,41 @@ namespace AppExecFwk {
 void ProviderConnectProxy::OnAbilityConnectDone(
     const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode)
 {
-    HILOG_DEBUG("%{public}s, abilityName:%{public}s,resultCode:%{public}d",
-        __func__, element.GetAbilityName().c_str(), resultCode);
+    HILOG_DEBUG("abilityName:%{public}s,resultCode:%{public}d",
+        element.GetAbilityName().c_str(), resultCode);
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
 
     if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("%{public}s, failed to write interface token", __func__);
+        HILOG_ERROR("write interface token failed");
         return;
     }
 
     if (!data.WriteParcelable(&element)) {
-        HILOG_ERROR("%{public}s, failed to write element", __func__);
+        HILOG_ERROR("fail write element");
         return;
     }
 
     if (remoteObject) {
         if (!data.WriteBool(true) || !data.WriteRemoteObject(remoteObject)) {
-            HILOG_ERROR("%{public}s, failed to write flag and remote object", __func__);
+            HILOG_ERROR("fail write flag and remote object");
             return;
         }
     } else {
         if (!data.WriteBool(false)) {
-            HILOG_ERROR("%{public}s, failed to write flag", __func__);
+            HILOG_ERROR("fail write flag");
             return;
         }
     }
 
     if (!data.WriteInt32(resultCode)) {
-        HILOG_ERROR("%{public}s, failed to write resultCode", __func__);
+        HILOG_ERROR("fail write resultCode");
         return;
     }
 
     if (!SendTransactCmd(IAbilityConnection::ON_ABILITY_CONNECT_DONE, data, reply, option)) {
-        HILOG_ERROR("%{public}s, failed to SendRequest", __func__);
+        HILOG_ERROR("fail SendRequest");
         return;
     }
 }
@@ -75,26 +75,26 @@ void ProviderConnectProxy::OnAbilityConnectDone(
 void ProviderConnectProxy::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
 {
     HILOG_DEBUG(
-        "%{public}s, element:%{public}s, resultCode:%{public}d", __func__, element.GetURI().c_str(), resultCode);
+        "element:%{public}s, resultCode:%{public}d", element.GetURI().c_str(), resultCode);
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
 
     if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("%{public}s, failed to write interface token", __func__);
+        HILOG_ERROR("write interface token failed");
         return;
     }
     if (!data.WriteParcelable(&element)) {
-        HILOG_ERROR("%{public}s, failed to write element", __func__);
+        HILOG_ERROR("fail write element");
         return;
     }
     if (!data.WriteInt32(resultCode)) {
-        HILOG_ERROR("%{public}s, failed to write resultCode", __func__);
+        HILOG_ERROR("fail write resultCode");
         return;
     }
 
     if (!SendTransactCmd(IAbilityConnection::ON_ABILITY_DISCONNECT_DONE, data, reply, option)) {
-        HILOG_ERROR("%{public}s, failed to SendRequest", __func__);
+        HILOG_ERROR("fail SendRequest");
         return;
     }
 }
@@ -102,7 +102,7 @@ void ProviderConnectProxy::OnAbilityDisconnectDone(const AppExecFwk::ElementName
 bool ProviderConnectProxy::WriteInterfaceToken(MessageParcel &data)
 {
     if (!data.WriteInterfaceToken(ProviderConnectProxy::GetDescriptor())) {
-        HILOG_ERROR("%{public}s, failed to write interface token", __func__);
+        HILOG_ERROR("write interface token failed");
         return false;
     }
     return true;
@@ -113,12 +113,12 @@ bool ProviderConnectProxy::SendTransactCmd(uint32_t code, MessageParcel &data,
 {
     sptr<IRemoteObject> remote = Remote();
     if (!remote) {
-        HILOG_ERROR("failed to get remote object, cmd: %{public}d", code);
+        HILOG_ERROR("get remoteObject failed,cmd:%{public}d", code);
         return false;
     }
     int32_t result = remote->SendRequest(static_cast<uint32_t>(code), data, reply, option);
     if (result != ERR_OK) {
-        HILOG_ERROR("failed to SendRequest: %{public}d, cmd: %{public}d", result, code);
+        HILOG_ERROR("SendRequest failed:%{public}d,cmd:%{public}d", result, code);
         return false;
     }
     return true;

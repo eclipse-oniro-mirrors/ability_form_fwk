@@ -43,7 +43,7 @@ const std::string IS_FORM_AGENT = "isFormAgent";
 
 void JsFormAgent::Finalizer(napi_env env, void *data, void *hint)
 {
-    HILOG_INFO("Finalizer is called");
+    HILOG_INFO("call");
     std::unique_ptr<JsFormAgent>(static_cast<JsFormAgent *>(data));
 }
 
@@ -54,9 +54,9 @@ napi_value JsFormAgent::RequestPublishForm(napi_env env, napi_callback_info info
 
 napi_value JsFormAgent::OnRequestPublishForm(napi_env env, size_t argc, napi_value* argv)
 {
-    HILOG_INFO("called");
+    HILOG_INFO("call");
     if (env == nullptr || argc < ARGS_SIZE_ONE || argc > ARGS_SIZE_TWO) {
-        HILOG_ERROR("wrong number of arguments.");
+        HILOG_ERROR("invalid argc");
         NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1 or 2");
         return CreateJsUndefined(env);
     }
@@ -66,13 +66,13 @@ napi_value JsFormAgent::OnRequestPublishForm(napi_env env, size_t argc, napi_val
     napi_valuetype paramZeroType = napi_undefined;
     napi_typeof(env, argv[0], &paramZeroType);
     if (paramZeroType != napi_object) {
-        HILOG_ERROR("formId is not napi_object.");
+        HILOG_ERROR("formId not napi_object");
         NapiFormUtil::ThrowParamTypeError(env, "want", "Want");
         return CreateJsUndefined(env);
     }
 
     if (!AppExecFwk::UnwrapWant(env, argv[PARAM0], asyncCallbackInfo->want)) {
-        HILOG_ERROR("Failed to convert want.");
+        HILOG_ERROR("fail convert want");
         NapiFormUtil::ThrowParamError(env, "Failed to convert want.");
         return CreateJsUndefined(env);
     }
@@ -85,7 +85,7 @@ napi_value JsFormAgent::OnRequestPublishForm(napi_env env, size_t argc, napi_val
         *ret = FormMgr::GetInstance().RequestPublishForm(asyncCallbackInfo->want, false,
             asyncCallbackInfo->formProviderData, *cardId, asyncCallbackInfo->formDataProxies);
         if (*ret != ERR_OK) {
-            HILOG_ERROR("Failed to RequestPublishForm startAbility.");
+            HILOG_ERROR("fail RequestPublishForm startAbility");
             return;
         }
         *ret = FormMgr::GetInstance().AcquireAddFormResult(*cardId);
@@ -94,10 +94,10 @@ napi_value JsFormAgent::OnRequestPublishForm(napi_env env, size_t argc, napi_val
     NapiAsyncTask::CompleteCallback complete =
         [formId, ret = apiResult](napi_env env, NapiAsyncTask &task, int32_t status) {
         if (*ret == ERR_OK) {
-            HILOG_INFO("Sucess to RequestPublishForm.");
+            HILOG_INFO("Sucess");
             task.ResolveWithNoError(env, CreateJsValue(env, std::to_string(*formId)));
         } else {
-            HILOG_ERROR("Failed to RequestPublishForm.");
+            HILOG_ERROR("fail");
             task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, *ret));
         }
     };

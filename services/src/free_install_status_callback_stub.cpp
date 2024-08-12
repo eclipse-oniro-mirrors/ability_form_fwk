@@ -28,7 +28,7 @@ int32_t FreeInstallStatusCallBackStub::OnInstallFinishedInner(MessageParcel &dat
     auto resultCode = data.ReadInt32();
     std::unique_ptr<AAFwk::Want> want(data.ReadParcelable<AAFwk::Want>());
     if (want == nullptr) {
-        HILOG_ERROR("FreeInstallStatusCallBackStub want is nullptr");
+        HILOG_ERROR("null want");
         return ERR_INVALID_VALUE;
     }
 
@@ -44,7 +44,7 @@ int32_t FreeInstallStatusCallBackStub::OnRemoteRequest(
     std::u16string descriptor = FreeInstallStatusCallBackStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
     if (descriptor != remoteDescriptor) {
-        HILOG_ERROR("Local descriptor is not equal to remote, descriptor: %{public}s, remoteDescriptor: %{public}s",
+        HILOG_ERROR("LocalDescriptor not equal to remote,descriptor:%{public}s,remoteDescriptor:%{public}s",
             Str16ToStr8(descriptor).c_str(), Str16ToStr8(remoteDescriptor).c_str());
         return ERR_INVALID_STATE;
     }

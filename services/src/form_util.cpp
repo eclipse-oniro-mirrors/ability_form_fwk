@@ -145,7 +145,7 @@ int64_t FormUtil::GetMillisecondFromTm(struct tm &tmAtTime)
 {
     time_t inputTime = mktime(&tmAtTime);
     if (inputTime == -1) {
-        HILOG_ERROR("%{public}s fail, mktime failed.", __func__);
+        HILOG_ERROR("mktime failed");
         return -1;
     }
     system_clock::time_point pointTime = system_clock::from_time_t(inputTime);
@@ -177,11 +177,11 @@ int FormUtil::GetCurrentAccountId()
     std::vector<int32_t> activeList;
     ErrCode errCode = DelayedSingleton<OsAccountManagerWrapper>::GetInstance()->QueryActiveOsAccountIds(activeList);
     if (errCode != ERR_OK) {
-        HILOG_ERROR("QueryActiveOsAccountIds failed.");
+        HILOG_ERROR("QueryActiveOsAccountIds failed");
         return Constants::ANY_USERID;
     }
     if (activeList.empty()) {
-        HILOG_ERROR("QueryActiveOsAccountIds is empty, no accounts.");
+        HILOG_ERROR("empty QueryActiveOsAccountIds,no accounts");
         return Constants::ANY_USERID;
     }
 
@@ -200,17 +200,17 @@ bool FormUtil::IsSACall()
     }
 
     if (IPCSkeleton::GetCallingUid() == SYSTEM_UID) {
-        HILOG_DEBUG("callingUid is native, verify success");
+        HILOG_DEBUG("callingUid is native,verify success");
         return true;
     }
 
-    HILOG_DEBUG("Not SA called.");
+    HILOG_DEBUG("call");
     return false;
 }
 
 bool FormUtil::VerifyCallingPermission(const std::string &permissionName)
 {
-    HILOG_DEBUG("called. permission name is:%{public}s", permissionName.c_str());
+    HILOG_DEBUG("call.permission name is:%{public}s", permissionName.c_str());
     auto callerToken = IPCSkeleton::GetCallingTokenID();
     int32_t ret = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionName);
     if (ret == Security::AccessToken::PermissionState::PERMISSION_DENIED) {
@@ -231,7 +231,7 @@ bool FormUtil::ConvertStringToInt64(const std::string &strInfo, int64_t &int64Va
     std::regex pattern("^0|-?[1-9][0-9]{0,18}$"); // "^-?[0-9]{1,19}$"
     std::smatch match;
     if (regex_match(strInfo, match, pattern)) {
-        HILOG_DEBUG("%{public}s, regex_match successed.", __func__);
+        HILOG_DEBUG("regex_match successed");
         if (strInfo.substr(ZERO_VALUE, ZERO_VALUE + 1) != "-") { // maximum: 9223372036854775807
             if (strLength < INT_64_LENGTH) {
                 int64Value = std::stoll(strInfo);
@@ -269,7 +269,7 @@ bool FormUtil::ConvertStringToInt64(const std::string &strInfo, int64_t &int64Va
             }
         }
     }
-    HILOG_DEBUG("%{public}s, regex_match failed.", __func__);
+    HILOG_DEBUG("regex_match failed");
     return false;
 }
 } // namespace AppExecFwk

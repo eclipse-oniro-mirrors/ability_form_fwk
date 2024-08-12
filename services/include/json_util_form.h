@@ -46,14 +46,14 @@ void CheckArrayType(const nlohmann::json &jsonObject, const std::string &key,
 {
     auto arrays = jsonObject.at(key);
     if (arrays.empty()) {
-        HILOG_DEBUG("array is empty");
+        HILOG_DEBUG("empty array");
         return;
     }
     switch (arrayType) {
         case ArrayType::STRING:
             for (const auto &array : arrays) {
                 if (!array.is_string()) {
-                    HILOG_ERROR("array %{public}s is not string type", key.c_str());
+                    HILOG_ERROR("array %{public}s not string type", key.c_str());
                     parseResult = ERR_APPEXECFWK_PARSE_PROFILE_PROP_TYPE_ERROR;
                 }
             }
@@ -64,7 +64,7 @@ void CheckArrayType(const nlohmann::json &jsonObject, const std::string &key,
         case ArrayType::OBJECT:
             for (const auto &array : arrays) {
                 if (!array.is_object()) {
-                    HILOG_ERROR("array %{public}s is not object type", key.c_str());
+                    HILOG_ERROR("array %{public}s not object type", key.c_str());
                     parseResult = ERR_APPEXECFWK_PARSE_PROFILE_PROP_TYPE_ERROR;
                     break;
                 }
@@ -76,7 +76,7 @@ void CheckArrayType(const nlohmann::json &jsonObject, const std::string &key,
         case ArrayType::NUMBER:
             for (const auto &array : arrays) {
                 if (!array.is_number()) {
-                    HILOG_ERROR("array %{public}s is not number type", key.c_str());
+                    HILOG_ERROR("array %{public}s not number type", key.c_str());
                     parseResult = ERR_APPEXECFWK_PARSE_PROFILE_PROP_TYPE_ERROR;
                 }
             }
@@ -85,7 +85,7 @@ void CheckArrayType(const nlohmann::json &jsonObject, const std::string &key,
             }
             break;
         case ArrayType::NOT_ARRAY:
-            HILOG_ERROR("array %{public}s is not array type", key.c_str());
+            HILOG_ERROR("array %{public}s not array type", key.c_str());
             break;
         default:
             HILOG_ERROR("array %{public}s type error", key.c_str());
@@ -105,7 +105,7 @@ void GetValueIfFindKey(const nlohmann::json &jsonObject, const nlohmann::detail:
         switch (jsonType) {
             case JsonType::BOOLEAN:
                 if (!jsonObject.at(key).is_boolean()) {
-                    HILOG_ERROR("type is error %{public}s is not boolean", key.c_str());
+                    HILOG_ERROR("type is error %{public}s not boolean", key.c_str());
                     parseResult = ERR_APPEXECFWK_PARSE_PROFILE_PROP_TYPE_ERROR;
                     break;
                 }
@@ -113,7 +113,7 @@ void GetValueIfFindKey(const nlohmann::json &jsonObject, const nlohmann::detail:
                 break;
             case JsonType::NUMBER:
                 if (!jsonObject.at(key).is_number()) {
-                    HILOG_ERROR("type is error %{public}s is not number", key.c_str());
+                    HILOG_ERROR("type is error %{public}s not number", key.c_str());
                     parseResult = ERR_APPEXECFWK_PARSE_PROFILE_PROP_TYPE_ERROR;
                     break;
                 }
@@ -121,7 +121,7 @@ void GetValueIfFindKey(const nlohmann::json &jsonObject, const nlohmann::detail:
                 break;
             case JsonType::OBJECT:
                 if (!jsonObject.at(key).is_object()) {
-                    HILOG_ERROR("type is error %{public}s is not object", key.c_str());
+                    HILOG_ERROR("type is error %{public}s not object", key.c_str());
                     parseResult = ERR_APPEXECFWK_PARSE_PROFILE_PROP_TYPE_ERROR;
                     break;
                 }
@@ -129,7 +129,7 @@ void GetValueIfFindKey(const nlohmann::json &jsonObject, const nlohmann::detail:
                 break;
             case JsonType::ARRAY:
                 if (!jsonObject.at(key).is_array()) {
-                    HILOG_ERROR("type is error %{public}s is not array", key.c_str());
+                    HILOG_ERROR("type is error %{public}s not array", key.c_str());
                     parseResult = ERR_APPEXECFWK_PARSE_PROFILE_PROP_TYPE_ERROR;
                     break;
                 }
@@ -137,7 +137,7 @@ void GetValueIfFindKey(const nlohmann::json &jsonObject, const nlohmann::detail:
                 break;
             case JsonType::STRING:
                 if (!jsonObject.at(key).is_string()) {
-                    HILOG_ERROR("type is error %{public}s is not string", key.c_str());
+                    HILOG_ERROR("type is error %{public}s not string", key.c_str());
                     parseResult = ERR_APPEXECFWK_PARSE_PROFILE_PROP_TYPE_ERROR;
                     break;
                 }
@@ -147,7 +147,7 @@ void GetValueIfFindKey(const nlohmann::json &jsonObject, const nlohmann::detail:
                 HILOG_ERROR("type is error %{public}s is nullable", key.c_str());
                 break;
             default:
-                HILOG_ERROR("type is error %{public}s is not jsonType", key.c_str());
+                HILOG_ERROR("type is error %{public}s not jsonType", key.c_str());
                 parseResult = ERR_APPEXECFWK_PARSE_PROFILE_PROP_TYPE_ERROR;
         }
         return;
@@ -169,13 +169,13 @@ template<typename T>
 bool ParseInfoFromJsonStr(const char *data, T &t)
 {
     if (data == nullptr) {
-        HILOG_ERROR("%{public}s failed due to data is nullptr", __func__);
+        HILOG_ERROR("null data");
         return false;
     }
 
     nlohmann::json jsonObject = nlohmann::json::parse(data, nullptr, false);
     if (jsonObject.is_discarded()) {
-        HILOG_ERROR("%{public}s failed due to data is discarded", __func__);
+        HILOG_ERROR("data is discarded");
         return false;
     }
 

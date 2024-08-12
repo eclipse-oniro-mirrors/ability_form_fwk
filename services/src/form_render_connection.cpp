@@ -43,8 +43,8 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
 {
     HILOG_INFO("ConnectDone, formId:%{public}" PRId64, GetFormId());
     if (resultCode != ERR_OK) {
-        HILOG_ERROR("%{public}s, abilityName:%{public}s, formId:%{public}" PRId64 ", resultCode:%{public}d",
-           __func__, element.GetAbilityName().c_str(), GetFormId(), resultCode);
+        HILOG_ERROR("abilityName:%{public}s, formId:%{public}" PRId64 ", resultCode:%{public}d",
+            element.GetAbilityName().c_str(), GetFormId(), resultCode);
         return;
     }
 
@@ -52,7 +52,7 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
     int32_t compileMode = 0;
     if (!FormBmsHelper::GetInstance().GetCompileMode(formRecord_.bundleName, formRecord_.moduleName,
         formRecord_.providerUserId, compileMode)) {
-        HILOG_ERROR("get compile mode failed.");
+        HILOG_ERROR("get compile mode failed");
         return;
     }
 
@@ -78,7 +78,7 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
 
 void FormRenderConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
 {
-    HILOG_DEBUG("element:%{public}s, resultCode:%{public}d, connectState: %{public}d",
+    HILOG_DEBUG("element:%{public}s, resultCode:%{public}d, connectState:%{public}d",
         element.GetURI().c_str(), resultCode, connectState_);
     // If connectState_ is CONNECTING, it means connect failed and host will try again, don't need to notify host
     if (resultCode && connectState_ == ConnectState::CONNECTING) {

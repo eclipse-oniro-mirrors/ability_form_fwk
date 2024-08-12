@@ -46,7 +46,7 @@ FormAbilityConnectionReporter::~FormAbilityConnectionReporter()
 void FormAbilityConnectionReporter::ReportFormAbilityConnection(const std::string &bundleName)
 {
     if (bundleName.empty()) {
-        HILOG_ERROR("Invalid bundleName!");
+        HILOG_ERROR("Invalid bundleName");
         return;
     }
     std::lock_guard<std::mutex> lock(formConnectionInfoMapMutex_);
@@ -61,10 +61,10 @@ void FormAbilityConnectionReporter::ReportFormAbilityConnection(const std::strin
     int32_t userId = FormUtil::GetCurrentAccountId();
     int32_t ret = appMgr->GetRunningProcessInformation(bundleName, userId, infos);
     if (ret != ERR_OK) {
-        HILOG_ERROR("Get running process info failed!");
+        HILOG_ERROR("Get running process info failed");
         return;
     }
-    HILOG_INFO("BundleName:%{public}s, infosSize:%{public}zu.",
+    HILOG_INFO("BundleName:%{public}s, infosSize:%{public}zu",
         bundleName.c_str(), infos.size());
     AddFormAbilityConnectProcessInfo(bundleName, infos);
     ReportConnectionInfosToRss(bundleName, true);
@@ -73,13 +73,13 @@ void FormAbilityConnectionReporter::ReportFormAbilityConnection(const std::strin
 void FormAbilityConnectionReporter::ReportFormAbilityDisconnection(const std::string &bundleName)
 {
     if (bundleName.empty()) {
-        HILOG_ERROR("Invalid bundleName!");
+        HILOG_ERROR("Invalid bundleName");
         return;
     }
     std::lock_guard<std::mutex> lock(formConnectionInfoMapMutex_);
     auto iter = formConnectionInfoMap_.find(bundleName);
     if (iter == formConnectionInfoMap_.end()) {
-        HILOG_ERROR("Disconnect ability connection: %{public}s, but without created connection notified!",
+        HILOG_ERROR("Disconnect ability connection:%{public}s, but without created connection notified!",
             bundleName.c_str());
         return;
     }
@@ -99,15 +99,15 @@ sptr<OHOS::AppExecFwk::IAppMgr> FormAbilityConnectionReporter::GetAppMgr()
     if (appManager_ == nullptr) {
         sptr<ISystemAbilityManager> systemMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
         if (systemMgr == nullptr) {
-            HILOG_ERROR("Fail to connect system ability manager.");
+            HILOG_ERROR("connect systemAbilityManager failed");
             return nullptr;
         }
         sptr<IRemoteObject> remoteObject = systemMgr->GetSystemAbility(APP_MGR_SERVICE_ID);
         if (remoteObject == nullptr) {
-            HILOG_ERROR(" Fail to connect app mgr service.");
+            HILOG_ERROR("connect appMgrService failed");
             return nullptr;
         }
-        HILOG_INFO("Connect AMS sucess.");
+        HILOG_INFO("ConnectAMS succeed");
         appManager_ = iface_cast<OHOS::AppExecFwk::IAppMgr>(remoteObject);
     }
     return appManager_;
@@ -117,7 +117,7 @@ void FormAbilityConnectionReporter::AddFormAbilityConnectProcessInfo(const std::
     std::vector<AppExecFwk::RunningProcessInfo>& infos)
 {
     if (bundleName.empty()) {
-        HILOG_WARN("Empty bundle name.");
+        HILOG_WARN("Empty bundle name");
         infos.clear();
         return;
     }
@@ -141,7 +141,7 @@ void FormAbilityConnectionReporter::ReportConnectionInfosToRss(const std::string
 {
     auto iter = formConnectionInfoMap_.find(bundleName);
     if (iter == formConnectionInfoMap_.end()) {
-        HILOG_WARN("Report connection info failed, empty info, bundle name: %{public}s.",
+        HILOG_WARN("Report connection info failed, empty info, bundle name:%{public}s",
             bundleName.c_str());
         return;
     }

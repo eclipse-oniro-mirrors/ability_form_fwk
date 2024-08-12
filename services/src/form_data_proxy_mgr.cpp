@@ -33,10 +33,10 @@ FormDataProxyMgr::~FormDataProxyMgr()
 ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<FormDataProxy> &formDataProxies,
     const AAFwk::Want &want)
 {
-    HILOG_DEBUG("subscribe form data. formId: %{public}s, proxy data size: %{public}zu",
+    HILOG_DEBUG("subscribe form data. formId:%{public}s, proxy data size:%{public}zu",
         std::to_string(formId).c_str(), formDataProxies.size());
     if (formDataProxies.empty()) {
-        HILOG_DEBUG("formDataProxies is empty.");
+        HILOG_DEBUG("empty formDataProxies");
         return ERR_OK;
     }
 
@@ -55,7 +55,7 @@ ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<Fo
     auto search = formDataProxyRecordMap_.find(formId);
     if (search != formDataProxyRecordMap_.end()) {
         if (search->second != nullptr) {
-            HILOG_DEBUG("the form has already subscribed, formId: %{public}s.", std::to_string(formId).c_str());
+            HILOG_DEBUG("the form has already subscribed, formId:%{public}s", std::to_string(formId).c_str());
             search->second->UnsubscribeFormData();
         }
     }
@@ -63,7 +63,7 @@ ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<Fo
     ApplicationInfo appInfo;
     if (FormBmsHelper::GetInstance().GetApplicationInfo(formRecord.bundleName, FormUtil::GetCurrentAccountId(),
         appInfo) != ERR_OK) {
-        HILOG_ERROR("get app info failed.");
+        HILOG_ERROR("get app info failed");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     std::shared_ptr<FormDataProxyRecord> formDataProxyRecord = std::make_shared<FormDataProxyRecord>(formId,
@@ -71,7 +71,7 @@ ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<Fo
     formDataProxyRecord->SetWant(want);
     auto ret = formDataProxyRecord->SubscribeFormData(formDataProxies);
     if (ret != ERR_OK) {
-        HILOG_ERROR("SubscribeFormData failed.");
+        HILOG_ERROR("SubscribeFormData failed");
         return ret;
     }
     formDataProxyRecordMap_[formId] = formDataProxyRecord;
@@ -80,7 +80,7 @@ ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<Fo
 
 ErrCode FormDataProxyMgr::UnsubscribeFormData(int64_t formId)
 {
-    HILOG_DEBUG("unsubscribe form data. formId: %{public}s", std::to_string(formId).c_str());
+    HILOG_DEBUG("unsubscribe form data. formId:%{public}s", std::to_string(formId).c_str());
     std::lock_guard<std::mutex> lock(formDataProxyRecordMutex_);
     auto search = formDataProxyRecordMap_.find(formId);
     if (search != formDataProxyRecordMap_.end()) {
@@ -95,7 +95,7 @@ ErrCode FormDataProxyMgr::UnsubscribeFormData(int64_t formId)
 
 void FormDataProxyMgr::UpdateSubscribeFormData(int64_t formId, const std::vector<FormDataProxy> &formDataProxies)
 {
-    HILOG_DEBUG("update subscribe form data. formId: %{public}s", std::to_string(formId).c_str());
+    HILOG_DEBUG("update subscribe form data. formId:%{public}s", std::to_string(formId).c_str());
     std::lock_guard<std::mutex> lock(formDataProxyRecordMutex_);
     auto search = formDataProxyRecordMap_.find(formId);
     if (search != formDataProxyRecordMap_.end()) {
@@ -116,7 +116,7 @@ bool FormDataProxyMgr::ConsumeFormDataProxies(int64_t formId, std::vector<FormDa
     std::lock_guard<std::mutex> lock(formDataProxiesMutex_);
     auto search = formDataProxiesMap_.find(formId);
     if (search == formDataProxiesMap_.end()) {
-        HILOG_DEBUG("no form data proxies, formId: %{public}s", std::to_string(formId).c_str());
+        HILOG_DEBUG("no form data proxies, formId:%{public}s", std::to_string(formId).c_str());
         return false;
     }
     formDataProxies = search->second;

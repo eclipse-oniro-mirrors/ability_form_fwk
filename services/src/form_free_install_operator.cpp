@@ -38,7 +38,7 @@ FormFreeInstallOperator::~FormFreeInstallOperator()
 int32_t FormFreeInstallOperator::StartFreeInstall(
     const std::string &bundleName, const std::string &moduleName, const std::string &abilityName)
 {
-    HILOG_DEBUG("called, bundleName: %{public}s, abilityName: %{public}s",
+    HILOG_DEBUG("bundleName:%{public}s,abilityName:%{public}s",
         bundleName.c_str(), abilityName.c_str());
 
     freeInstallStatusCallBack_ = new (std::nothrow) FreeInstallStatusCallBack(weak_from_this());
@@ -60,7 +60,7 @@ int32_t FormFreeInstallOperator::StartFreeInstall(
     constexpr auto flag = AppExecFwk::AbilityInfoFlag::GET_ABILITY_INFO_WITH_APPLICATION;
     if (iBundleMgr->QueryAbilityInfo(
         want, flag, FormUtil::GetCurrentAccountId(), abilityInfo, freeInstallStatusCallBack_)) {
-        HILOG_DEBUG("The app has installed.");
+        HILOG_DEBUG("The app has installed");
     }
 
     return ERR_OK;
@@ -68,7 +68,7 @@ int32_t FormFreeInstallOperator::StartFreeInstall(
 
 void FormFreeInstallOperator::OnInstallFinished(int32_t resultCode)
 {
-    HILOG_DEBUG("%{public}s called, resultCode: %{public}d", __func__, resultCode);
+    HILOG_DEBUG("resultCode:%{public}d", resultCode);
     if (serialQueue_ == nullptr) {
         return;
     }
@@ -87,15 +87,15 @@ FreeInstallStatusCallBack::FreeInstallStatusCallBack(
 
 void FreeInstallStatusCallBack::OnInstallFinished(int32_t resultCode, const Want &want, int32_t userId)
 {
-    HILOG_DEBUG("%{public}s called, resultCode:%{public}d.", __func__, resultCode);
+    HILOG_DEBUG("resultCode:%{public}d", resultCode);
 
     auto freeInstallOperator = formFreeInstallOperator_.lock();
     if (freeInstallOperator == nullptr) {
-        HILOG_ERROR("freeInstallOperator is nullptr");
+        HILOG_ERROR("null freeInstallOperator");
         return;
     }
     freeInstallOperator->OnInstallFinished(resultCode);
-    HILOG_DEBUG("%{public}s end.", __func__);
+    HILOG_DEBUG("end");
 }
 } // namespace AppExecFwk
 } // namespace OHOS

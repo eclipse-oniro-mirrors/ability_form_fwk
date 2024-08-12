@@ -24,7 +24,7 @@ using namespace OHOS::AbilityRuntime;
 
 static napi_value JsFormAgentInit(napi_env env, napi_value exports)
 {
-    HILOG_INFO("JsFormAgentInit is called");
+    HILOG_INFO("call");
 
     std::unique_ptr<JsFormAgent> jsFormAgent = std::make_unique<JsFormAgent>();
     napi_wrap(env, exports, jsFormAgent.release(), JsFormAgent::Finalizer, nullptr, nullptr);

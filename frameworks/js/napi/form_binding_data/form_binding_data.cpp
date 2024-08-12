@@ -30,7 +30,7 @@ public:
 
     static void Finalizer(napi_env env, void* data, void* hint)
     {
-        HILOG_INFO("FormBindingData::Finalizer is called");
+        HILOG_INFO("call");
         std::unique_ptr<FormBindingData>(static_cast<FormBindingData*>(data));
     }
 
@@ -45,17 +45,17 @@ private:
 
 napi_value FormBindingData::OnCreateFormBindingData(napi_env env, size_t argc, napi_value* argv)
 {
-    HILOG_INFO("called");
+    HILOG_INFO("call");
     std::string formDataStr;
     if (argc > 0) {
         napi_value nativeValue = nullptr;
         napi_valuetype type = napi_undefined;
         napi_typeof(env, argv[0], &type);
         if (type == napi_string) {
-            HILOG_DEBUG("%{public}s called, param type is string.", __func__);
+            HILOG_DEBUG("param type is string");
             nativeValue = argv[0];
         } else if (type == napi_object) {
-            HILOG_DEBUG("%{public}s called, param type is object.", __func__);
+            HILOG_DEBUG("param type is object");
             napi_value globalValue = nullptr;
             napi_get_global(env, &globalValue);
             napi_value jsonValue;
@@ -68,12 +68,12 @@ napi_value FormBindingData::OnCreateFormBindingData(napi_env env, size_t argc, n
             napi_call_function(env, jsonValue, stringifyValue, 1, funcArgv, &transValue);
             nativeValue = transValue;
         } else {
-            HILOG_ERROR("%{public}s, param type not string or object", __func__);
+            HILOG_ERROR("param type not string or object");
             return CreateJsUndefined(env);
         }
 
         if (!ConvertFromJsValue(env, nativeValue, formDataStr)) {
-            HILOG_ERROR("%{public}s, Parse formDataStr failed", __func__);
+            HILOG_ERROR("Parse formDataStr failed");
             return CreateJsUndefined(env);
         }
     }
@@ -81,14 +81,14 @@ napi_value FormBindingData::OnCreateFormBindingData(napi_env env, size_t argc, n
     napi_create_object(env, &objValue);
     formProviderData_->SetDataString(formDataStr);
     napi_set_named_property(env, objValue, "data", CreateJsValue(env, formDataStr));
-    HILOG_DEBUG("%{public}s called:%{private}s", __func__, formDataStr.c_str());
+    HILOG_DEBUG("call:%{private}s", formDataStr.c_str());
     return objValue;
 }
 }
 
 napi_value FormBindingDataInit(napi_env env, napi_value exportObj)
 {
-    HILOG_INFO("called");
+    HILOG_INFO("call");
 
     auto formProviderData = std::make_shared<AppExecFwk::FormProviderData>();
     auto formBindingData = std::make_unique<FormBindingData>(formProviderData);

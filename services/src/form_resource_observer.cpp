@@ -35,7 +35,7 @@ FormFwkResourceObserver::~FormFwkResourceObserver()
 
 void FormFwkResourceObserver::OnConfigurationUpdated(const AppExecFwk::Configuration& configuration)
 {
-    HILOG_INFO("called");
+    HILOG_INFO("call");
     bool needUpdateForms = false;
     std::string colorMode = configuration.GetItem(AAFwk::GlobalConfigurationKey::SYSTEM_COLORMODE);
     if (!colorMode.empty() && colorMode != colorMode_) {

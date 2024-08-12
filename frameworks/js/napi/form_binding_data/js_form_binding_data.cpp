@@ -30,7 +30,7 @@ public:
 
     static void Finalizer(napi_env env, void* data, void* hint)
     {
-        HILOG_INFO("Finalizer is called");
+        HILOG_INFO("call");
         std::unique_ptr<JsFormBindingData>(static_cast<JsFormBindingData*>(data));
     }
 

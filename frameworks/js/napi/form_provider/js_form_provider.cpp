@@ -45,10 +45,10 @@ const std::string IS_FORM_AGENT = "isFormAgent";
 
 bool CheckParamNum(napi_env env, size_t argc, size_t minParamNum, size_t maxParamNum)
 {
-    HILOG_DEBUG("argc is %{public}zu, param range is [%{public}zu, %{public}zu]",
+    HILOG_DEBUG("argc is %{public}zu,param range is [%{public}zu,%{public}zu]",
         argc, minParamNum, maxParamNum);
     if (argc > maxParamNum || argc < minParamNum) {
-        HILOG_ERROR("invalid param number %{public}zu.", argc);
+        HILOG_ERROR("invalid param number %{public}zu", argc);
         std::string errMsg = "[" + std::to_string(minParamNum) + ", " + std::to_string(maxParamNum) + "]";
         NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), errMsg);
         return false;
@@ -61,7 +61,7 @@ bool ConvertFormInfoFilterThrow(napi_env env, napi_value jsValue, AppExecFwk::Fo
     napi_valuetype jsValueType = napi_undefined;
     napi_typeof(env, jsValue, &jsValueType);
     if (jsValueType != napi_object) {
-        HILOG_ERROR("an object is expected, but an argument of different type is passed in.");
+        HILOG_ERROR("an object is expected, but an argument of different type is passed in");
         NapiFormUtil::ThrowParamTypeError(env, "filter", "formInfo.FormInfoFilter");
         return false;
     }
@@ -69,7 +69,7 @@ bool ConvertFormInfoFilterThrow(napi_env env, napi_value jsValue, AppExecFwk::Fo
     napi_value nativeDataValue = nullptr;
     napi_status ret = napi_get_named_property(env, jsValue, "moduleName", &nativeDataValue);
     if (ret != napi_ok) {
-        HILOG_ERROR("get property failed.");
+        HILOG_ERROR("get property failed");
         NapiFormUtil::ThrowParamError(env, "Failed to get property.");
         return false;
     }
@@ -77,12 +77,12 @@ bool ConvertFormInfoFilterThrow(napi_env env, napi_value jsValue, AppExecFwk::Fo
     napi_typeof(env, nativeDataValue, &nativeDataValueType);
     if (nativeDataValue == nullptr || (nativeDataValueType != napi_undefined &&
         !ConvertFromJsValue(env, nativeDataValue, formInfoFilter.moduleName))) {
-        HILOG_ERROR("convert nativeDataValue failed.");
+        HILOG_ERROR("convert nativeDataValue failed");
         NapiFormUtil::ThrowParamError(env, "Failed to convert FormInfoFilter.");
         return false;
     }
 
-    HILOG_INFO("module:%{public}s.", formInfoFilter.moduleName.c_str());
+    HILOG_INFO("module:%{public}s", formInfoFilter.moduleName.c_str());
 
     return true;
 }
@@ -97,28 +97,28 @@ static std::string GetStringByProp(napi_env env, napi_value value, const std::st
     napi_valuetype valueType = napi_undefined;
     napi_has_named_property(env, value, prop.c_str(), &propExist);
     if (!propExist) {
-        HILOG_ERROR("prop[%{public}s] absent.", prop.c_str());
+        HILOG_ERROR("prop[%{public}s] absent", prop.c_str());
         return result;
     }
     napi_get_named_property(env, value, prop.c_str(), &propValue);
     if (propValue == nullptr) {
-        HILOG_ERROR("prop[%{public}s] get error.", prop.c_str());
+        HILOG_ERROR("prop[%{public}s] get error", prop.c_str());
         return result;
     }
     napi_typeof(env, propValue, &valueType);
     if (valueType != napi_string) {
-        HILOG_ERROR("prop[%{public}s] is not string.", prop.c_str());
+        HILOG_ERROR("prop[%{public}s] not string", prop.c_str());
         return result;
     }
     size_t size = 0;
     if (napi_get_value_string_utf8(env, propValue, nullptr, 0, &size) != napi_ok) {
-        HILOG_ERROR("prop[%{public}s] get size error.", prop.c_str());
+        HILOG_ERROR("prop[%{public}s] get size error", prop.c_str());
         return result;
     }
     result.reserve(size + 1);
     result.resize(size);
     if (napi_get_value_string_utf8(env, propValue, result.data(), (size + 1), &size) != napi_ok) {
-        HILOG_ERROR("prop[%{public}s] get value error.", prop.c_str());
+        HILOG_ERROR("prop[%{public}s] get value error", prop.c_str());
         return "";
     }
     return result;
@@ -126,7 +126,7 @@ static std::string GetStringByProp(napi_env env, napi_value value, const std::st
 
 void JsFormProvider::Finalizer(napi_env env, void *data, void *hint)
 {
-    HILOG_INFO("Finalizer is called");
+    HILOG_INFO("call");
     std::unique_ptr<JsFormProvider>(static_cast<JsFormProvider *>(data));
 }
 
@@ -184,7 +184,7 @@ bool JsFormProvider::OnGetFormsInfoParseParam(NapiParamPackage &napiParam,
                     napi_typeof(env, argv[PARAM1], &paramTwoType);
                     isPromise = paramTwoType != napi_function;
                 } else {
-                    HILOG_ERROR("convert form info filter failed.");
+                    HILOG_ERROR("convert form info filter failed");
                     return false;
                 }
             }
@@ -197,7 +197,7 @@ bool JsFormProvider::OnGetFormsInfoParseParam(NapiParamPackage &napiParam,
 
 napi_value JsFormProvider::OnGetFormsInfo(napi_env env, size_t argc, napi_value* argv)
 {
-    HILOG_DEBUG("called");
+    HILOG_DEBUG("call");
 
     size_t convertArgc = 0;
     bool isPromise = false;
@@ -206,7 +206,7 @@ napi_value JsFormProvider::OnGetFormsInfo(napi_env env, size_t argc, napi_value*
     NapiParamPackage napiParam(env, argc, argv);
 
     if (!OnGetFormsInfoParseParam(napiParam, convertArgc, isPromise, formInfoFilter)) {
-        HILOG_ERROR("failed to parse param");
+        HILOG_ERROR("parse param failed");
         return CreateJsUndefined(env);
     }
 
@@ -235,7 +235,7 @@ napi_value JsFormProvider::SetFormNextRefreshTime(napi_env env, napi_callback_in
 
 napi_value JsFormProvider::OnSetFormNextRefreshTime(napi_env env, size_t argc, napi_value* argv)
 {
-    HILOG_DEBUG("called");
+    HILOG_DEBUG("call");
     if (CheckParamNum(env, argc, ARGS_SIZE_TWO, ARGS_SIZE_THREE) == false) {
         return CreateJsUndefined(env);
     }
@@ -248,12 +248,12 @@ napi_value JsFormProvider::OnSetFormNextRefreshTime(napi_env env, size_t argc, n
     int64_t formId = 0;
     std::string strFormId;
     if (!ConvertFromJsValue(env, argv[PARAM0], strFormId)) {
-        HILOG_ERROR("ConvertFromJsValue failed.");
+        HILOG_ERROR("ConvertFromJsValue failed");
         NapiFormUtil::ThrowParamTypeError(env, "formId", "string");
         return CreateJsUndefined(env);
     }
     if (!ConvertStringToInt64(strFormId, formId)) {
-        HILOG_ERROR("convert form string failed.");
+        HILOG_ERROR("convert form string failed");
         NapiFormUtil::ThrowParamError(env, "Failed to convert formId.");
         return CreateJsUndefined(env);
     }
@@ -296,26 +296,26 @@ napi_value JsFormProvider::OnUpdateFormParseParam(napi_env env, size_t argc, nap
     napi_valuetype paramZeroType = napi_undefined;
     napi_typeof(env, argv[PARAM0], &paramZeroType);
     if (paramZeroType != napi_string) {
-        HILOG_ERROR("formId is not napi_string.");
+        HILOG_ERROR("formId not napi_string");
         NapiFormUtil::ThrowParamTypeError(env, "formId", "string");
         return CreateJsUndefined(env);
     }
     std::string strFormId;
     bool confirm = ConvertFromJsValue(env, argv[PARAM0], strFormId);
     if (!confirm) {
-        HILOG_ERROR("ConvertFromJsValue failed.");
+        HILOG_ERROR("ConvertFromJsValue failed");
         NapiFormUtil::ThrowParamTypeError(env, "formId", "string");
         return CreateJsUndefined(env);
     }
     if (!ConvertStringToInt64(strFormId, formId)) {
-        HILOG_ERROR("convert form string failed.");
+        HILOG_ERROR("convert form string failed");
         NapiFormUtil::ThrowParamError(env, "Failed to convert formId.");
         return CreateJsUndefined(env);
     }
     napi_valuetype paramOneType = napi_undefined;
     napi_typeof(env, argv[PARAM1], &paramOneType);
     if (paramOneType != napi_object) {
-        HILOG_ERROR("formBindingData is not napi_object.");
+        HILOG_ERROR("formBindingData not napi_object");
         NapiFormUtil::ThrowParamTypeError(env, "formBindingData", "formBindingData.FormBindingData");
         return CreateJsUndefined(env);
     }
@@ -324,12 +324,12 @@ napi_value JsFormProvider::OnUpdateFormParseParam(napi_env env, size_t argc, nap
 
 napi_value JsFormProvider::OnUpdateForm(napi_env env, size_t argc, napi_value* argv)
 {
-    HILOG_DEBUG("called");
+    HILOG_DEBUG("call");
 
     int64_t formId = 0;
     napi_value parseResult = OnUpdateFormParseParam(env, argc, argv, formId);
     if (parseResult != nullptr) {
-        HILOG_ERROR("failed to parse param");
+        HILOG_ERROR("parse param failed");
         return parseResult;
     }
 
@@ -368,14 +368,14 @@ napi_value JsFormProvider::IsRequestPublishFormSupported(napi_env env, napi_call
 
 napi_value JsFormProvider::OnIsRequestPublishFormSupported(napi_env env, size_t argc, napi_value* argv)
 {
-    HILOG_DEBUG("called");
+    HILOG_DEBUG("call");
     if (CheckParamNum(env, argc, ARGS_SIZE_ZERO, ARGS_SIZE_ONE) == false) {
         return CreateJsUndefined(env);
     }
 
     auto selfToken = IPCSkeleton::GetSelfTokenID();
     if (!Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(selfToken)) {
-        HILOG_ERROR("This application is not system-app, can not use system-api");
+        HILOG_ERROR("The application not system-app,can't use system-api");
         NapiFormUtil::ThrowByExternalErrorCode(env, ERR_FORM_EXTERNAL_NOT_SYSTEM_APP);
         return CreateJsUndefined(env);
     }
@@ -400,7 +400,7 @@ napi_value JsFormProvider::RequestPublishForm(napi_env env, napi_callback_info i
 
 napi_value JsFormProvider::OnRequestPublishForm(napi_env env, size_t argc, napi_value* argv)
 {
-    HILOG_DEBUG("called");
+    HILOG_DEBUG("call");
     if (CheckParamNum(env, argc, ARGS_SIZE_ONE, ARGS_SIZE_THREE) == false) {
         return CreateJsUndefined(env);
     }
@@ -410,12 +410,12 @@ napi_value JsFormProvider::OnRequestPublishForm(napi_env env, size_t argc, napi_
     napi_valuetype paramZeroType = napi_undefined;
     napi_typeof(env, argv[PARAM0], &paramZeroType);
     if (paramZeroType != napi_object) {
-        HILOG_ERROR("formId is not napi_object.");
+        HILOG_ERROR("formId not napi_object");
         NapiFormUtil::ThrowParamTypeError(env, "want", "Want");
         return CreateJsUndefined(env);
     }
     if (!AppExecFwk::UnwrapWant(env, argv[PARAM0], asyncCallbackInfo->want)) {
-        HILOG_ERROR("Failed to convert want.");
+        HILOG_ERROR("fail convert want");
         NapiFormUtil::ThrowParamError(env, "Failed to convert want.");
         return CreateJsUndefined(env);
     }
@@ -441,7 +441,7 @@ napi_value JsFormProvider::OnRequestPublishForm(napi_env env, size_t argc, napi_
         } else if (paramOneType == napi_function) {
             asyncCallbackInfo->withFormBindingData = false;
         } else {
-            HILOG_ERROR("formBindingData is not napi_object.");
+            HILOG_ERROR("formBindingData not napi_object");
             NapiFormUtil::ThrowParamTypeError(env, "formBindingData", "formBindingData.FormBindingData");
             return CreateJsUndefined(env);
         }
@@ -475,7 +475,7 @@ bool JsFormProvider::ConvertFromDataProxies(napi_env env, napi_value value,
     bool result = false;
     napi_is_array(env, value, &result);
     if (value == nullptr || !result) {
-        HILOG_ERROR("%{public}s, jsValue is null not array", __func__);
+        HILOG_ERROR("null jsValue not array");
         return false;
     }
 
@@ -500,7 +500,7 @@ bool JsFormProvider::ConvertFormDataProxy(napi_env env, napi_value value,
     napi_valuetype valueType = napi_undefined;
     napi_typeof(env, value, &valueType);
     if (value == nullptr || valueType != napi_object) {
-        HILOG_ERROR("%{public}s, jsValue is null not object", __func__);
+        HILOG_ERROR("null jsValue,not object");
         return false;
     }
 
@@ -514,10 +514,10 @@ bool JsFormProvider::ConvertFormDataProxy(napi_env env, napi_value value,
     napi_value subscribeId = nullptr;
     napi_get_named_property(env, value, "subscriberId", &subscribeId);
     if (subscribeId != nullptr && !ConvertFromJsValue(env, subscribeId, formDataProxy.subscribeId)) {
-        HILOG_WARN("Parse subscribeId failed, use empty as default value.");
+        HILOG_WARN("Parse subscribeId failed, use empty as default value");
         formDataProxy.subscribeId = "";
     }
-    HILOG_INFO("key:%{public}s, subscribeId:%{public}s", formDataProxy.key.c_str(),
+    HILOG_INFO("key:%{public}s,subscribeId:%{public}s", formDataProxy.key.c_str(),
         formDataProxy.subscribeId.c_str());
     return true;
 }

@@ -32,11 +32,11 @@ FormHostDelegateStub::~FormHostDelegateStub()
 int32_t FormHostDelegateStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
     MessageParcel &reply, MessageOption &option)
 {
-    HILOG_INFO("code:%{public}u, flags:%{public}d.", code, option.GetFlags());
+    HILOG_INFO("code:%{public}u,flags:%{public}d", code, option.GetFlags());
     std::u16string descriptor = FormHostDelegateStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
     if (descriptor != remoteDescriptor) {
-        HILOG_ERROR("Failed, local descriptor is not equal to remote");
+        HILOG_ERROR("local descriptor not equal to remote");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
@@ -50,11 +50,11 @@ int32_t FormHostDelegateStub::OnRemoteRequest(uint32_t code, MessageParcel &data
 
 int32_t FormHostDelegateStub::HandleRouterEvent(MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_DEBUG("Called.");
+    HILOG_DEBUG("call");
     int64_t formId = data.ReadInt64();
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
-        HILOG_ERROR("Failed to ReadParcelable<Want>.");
+        HILOG_ERROR("ReadParcelable<Want> failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 

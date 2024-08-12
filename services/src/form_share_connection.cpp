@@ -35,10 +35,10 @@ FormShareConnection::FormShareConnection(int64_t formId, const std::string &bund
 void FormShareConnection::OnAbilityConnectDone(
     const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int32_t resultCode)
 {
-    HILOG_DEBUG("%{public}s called.", __func__);
+    HILOG_DEBUG("call");
     if (resultCode != ERR_OK) {
-        HILOG_ERROR("%{public}s, abilityName:%{public}s, resultCode:%{public}d",
-            __func__, element.GetAbilityName().c_str(), resultCode);
+        HILOG_ERROR("abilityName:%{public}s, resultCode:%{public}d",
+            element.GetAbilityName().c_str(), resultCode);
         FormTaskMgr::GetInstance().PostFormShareSendResponse(formShareRequestCode_,
             ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
         return;
