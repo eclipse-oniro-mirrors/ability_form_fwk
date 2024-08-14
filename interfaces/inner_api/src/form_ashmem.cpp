@@ -45,7 +45,7 @@ bool FormAshmem::ReadFromParcel(Parcel &parcel)
     if (ashmem_ == nullptr) {
         return false;
     }
-    HILOG_INFO("fd:%{public}d, size:%{public}d", ashmem_->GetAshmemFd(), ashmem_->GetAshmemSize());
+    HILOG_INFO("fd:%{public}d,size:%{public}d", ashmem_->GetAshmemFd(), ashmem_->GetAshmemSize());
     return true;
 }
 
@@ -62,7 +62,7 @@ FormAshmem* FormAshmem::Unmarshalling(Parcel &parcel)
 bool FormAshmem::WriteToAshmem(std::string name, char *data, int32_t size)
 {
     if (size <= 0) {
-        HILOG_ERROR("%{public}s: Parameter is invalid, size= %{public}d", __func__, size);
+        HILOG_ERROR("invalid param, size= %{public}d", size);
     }
 
     ashmem_ = Ashmem::CreateAshmem(name.c_str(), size);

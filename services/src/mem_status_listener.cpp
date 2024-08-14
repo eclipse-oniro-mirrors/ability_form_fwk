@@ -21,12 +21,12 @@ namespace OHOS {
 namespace AppExecFwk {
 void MemStatusListener::OnConnected()
 {
-    HILOG_DEBUG("called");
+    HILOG_DEBUG("call");
 }
 
 void MemStatusListener::OnRemoteDied(const wptr<IRemoteObject> &object)
 {
-    HILOG_DEBUG("called");
+    HILOG_DEBUG("call");
 }
 
 void MemStatusListener::OnTrim(Memory::SystemMemoryLevel level)

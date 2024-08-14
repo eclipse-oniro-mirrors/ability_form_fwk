@@ -46,8 +46,8 @@ void FormAcquireConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &
 {
     HILOG_INFO("formId:%{public}" PRId64, GetFormId());
     if (resultCode != ERR_OK) {
-        HILOG_ERROR("%{public}s, abilityName:%{public}s, formId:%{public}" PRId64 ", resultCode:%{public}d",
-           __func__, element.GetAbilityName().c_str(), GetFormId(), resultCode);
+        HILOG_ERROR("abilityName:%{public}s, formId:%{public}" PRId64 ", resultCode:%{public}d",
+            element.GetAbilityName().c_str(), GetFormId(), resultCode);
         return;
     }
     FormReport::GetInstance().SetEndBindTime(GetFormId(), FormUtil::GetCurrentSteadyClockMillseconds());
@@ -70,8 +70,8 @@ void FormAcquireConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &
     want.SetParam(Constants::FORM_CONNECT_ID, this->GetConnectId());
     want.SetElementName(info_.GetDeviceId(), info_.GetProviderBundleName(),
         info_.GetAbilityName(), info_.GetModuleName());
-    HILOG_DEBUG("%{public}s , deviceId: %{public}s, bundleName: %{public}s, abilityName: %{public}s.",
-        __func__, info_.GetDeviceId().c_str(), info_.GetProviderBundleName().c_str(), info_.GetAbilityName().c_str());
+    HILOG_DEBUG("deviceId:%{public}s, bundleName:%{public}s, abilityName:%{public}s",
+        info_.GetDeviceId().c_str(), info_.GetProviderBundleName().c_str(), info_.GetAbilityName().c_str());
 
     FormTaskMgr::GetInstance().PostAcquireTask(GetFormId(), want, remoteObject);
     FormReport::GetInstance().SetStartGetTime(GetFormId(), FormUtil::GetCurrentSteadyClockMillseconds());
@@ -108,7 +108,7 @@ void FormAcquireConnection::SetFormAbilityDisconnectCb(
 void FormAcquireConnection::OnFormAbilityConnectDoneCallback()
 {
     if (!onFormAblityConnectCb_) {
-        HILOG_ERROR("Empty form ability connect callback!");
+        HILOG_ERROR("Empty form ability connect callback");
         return;
     }
     onFormAblityConnectCb_(GetBundleName());
@@ -117,7 +117,7 @@ void FormAcquireConnection::OnFormAbilityConnectDoneCallback()
 void FormAcquireConnection::OnFormAbilityDisconnectDoneCallback()
 {
     if (!onFormAblityDisconnectCb_) {
-        HILOG_ERROR("Empty form ability disconnect callback!");
+        HILOG_ERROR("Empty form ability disconnect callback");
         return;
     }
     onFormAblityDisconnectCb_(GetBundleName());

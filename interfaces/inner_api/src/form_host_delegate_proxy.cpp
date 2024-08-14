@@ -26,15 +26,15 @@ int32_t FormHostDelegateProxy::RouterEvent(const int64_t formId, const Want &wan
 {
     MessageParcel data;
     if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("Write to interface token error.");
+        HILOG_ERROR("Write to interface token error");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.WriteInt64(formId)) {
-        HILOG_ERROR("Write to formId error.");
+        HILOG_ERROR("Write to formId error");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.WriteParcelable(&want)) {
-        HILOG_ERROR("Write to want error.");
+        HILOG_ERROR("Write to want error");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -43,7 +43,7 @@ int32_t FormHostDelegateProxy::RouterEvent(const int64_t formId, const Want &wan
     int error = Remote()->SendRequest(static_cast<uint32_t>(IFormHostDelegate::Message::FORM_ROUTER_PROXY_MGR),
         data, reply, option);
     if (error != ERR_OK) {
-        HILOG_ERROR("Failed to SendRequest: %{public}d", error);
+        HILOG_ERROR("SendRequest:%{public}d failed", error);
         return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
     }
     return reply.ReadInt32();
@@ -52,7 +52,7 @@ int32_t FormHostDelegateProxy::RouterEvent(const int64_t formId, const Want &wan
 bool FormHostDelegateProxy::WriteInterfaceToken(MessageParcel &data)
 {
     if (!data.WriteInterfaceToken(FormHostDelegateProxy::GetDescriptor())) {
-        HILOG_ERROR("Failed to write interface token.");
+        HILOG_ERROR("write interface token failed");
         return false;
     }
     return true;

@@ -40,22 +40,22 @@ FormBackgroundConnection::FormBackgroundConnection(const int64_t formId, const s
 void FormBackgroundConnection::OnAbilityConnectDone(
     const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode)
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("call");
     if (resultCode != ERR_OK) {
-        HILOG_ERROR("%{public}s, abilityName:%{public}s, resultCode:%{public}d",
-            __func__, element.GetAbilityName().c_str(), resultCode);
+        HILOG_ERROR("abilityName:%{public}s, resultCode:%{public}d",
+            element.GetAbilityName().c_str(), resultCode);
         return;
     }
     onFormAppConnect();
 
     sptr<IFormMgr> formMgrProxy = iface_cast<IFormMgr>(remoteObject);
     if (formMgrProxy == nullptr) {
-        HILOG_ERROR("Failed to get formMgrProxy");
+        HILOG_ERROR("fail get formMgrProxy");
         return;
     }
     formMgrProxy->SetBackgroundFunction(funcName_, params_);
     FormSupplyCallback::GetInstance()->RemoveConnection(this->GetConnectId());
-    HILOG_DEBUG("end.");
+    HILOG_DEBUG("end");
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

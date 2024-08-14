@@ -45,15 +45,15 @@ void FormMsgEventConnection::OnAbilityConnectDone(
 {
     HILOG_INFO("call");
     if (resultCode != ERR_OK) {
-        HILOG_ERROR("%{public}s, abilityName:%{public}s, formId:%{public}" PRId64 ", resultCode:%{public}d",
-            __func__, element.GetAbilityName().c_str(), GetFormId(), resultCode);
+        HILOG_ERROR("abilityName:%{public}s, formId:%{public}" PRId64 ", resultCode:%{public}d",
+            element.GetAbilityName().c_str(), GetFormId(), resultCode);
         return;
     }
     onFormAppConnect();
     sptr<FormMsgEventConnection> connection(this);
     FormSupplyCallback::GetInstance()->AddConnection(connection);
     if (!want_.HasParameter(Constants::PARAM_MESSAGE_KEY)) {
-        HILOG_ERROR("%{public}s error, message info is not exist", __func__);
+        HILOG_ERROR("messageInfo not exist");
         return;
     }
     std::string message = want_.GetStringParam(Constants::PARAM_MESSAGE_KEY);

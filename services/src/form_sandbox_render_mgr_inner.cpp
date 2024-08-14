@@ -40,7 +40,7 @@ ErrCode FormSandboxRenderMgrInner::IsSandboxFRSInstalled() const
 {
     sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
     if (iBundleMgr == nullptr) {
-        HILOG_ERROR("GetBundleMgr, failed to get IBundleMgr.");
+        HILOG_ERROR("get IBundleMgr failed");
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
     BundleInfo info;
@@ -56,7 +56,7 @@ ErrCode FormSandboxRenderMgrInner::InstallSandboxFRS(int32_t &appIndex) const
     HILOG_INFO("start");
     sptr<IBundleInstaller> bundleInstallerProxy = FormBmsHelper::GetInstance().GetBundleInstaller();
     if (bundleInstallerProxy == nullptr) {
-        HILOG_ERROR("GetBundleInstaller failed.");
+        HILOG_ERROR("GetBundleInstaller failed");
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
     return bundleInstallerProxy->InstallSandboxApp(
@@ -70,17 +70,17 @@ ErrCode FormSandboxRenderMgrInner::RenderForm(
     {
         std::lock_guard<std::mutex> lock(sandboxMutex_);
         if (GetRenderRemoteObj() == nullptr && IsSandboxFRSInstalled() != ERR_OK) {
-            HILOG_INFO("sandbox frs not installed.");
+            HILOG_INFO("sandbox frs not installed");
             int32_t appIndex = 0;
             std::string identity  = IPCSkeleton::ResetCallingIdentity();
             ErrCode ret = InstallSandboxFRS(appIndex);
             IPCSkeleton::SetCallingIdentity(identity);
             if (ret != ERR_OK) {
-                HILOG_ERROR("InstallSandboxFRS fail, ret: %{public}d.", ret);
+                HILOG_ERROR("InstallSandboxFRS fail, ret:%{public}d", ret);
                 return ret;
             }
             if (appIndex != Constants::DEFAULT_SANDBOX_FRS_APP_INDEX) {
-                HILOG_ERROR("sandbox FRS already install, please check, appIndex: %{public}d.", appIndex);
+                HILOG_ERROR("sandbox FRS already install, please check, appIndex:%{public}d", appIndex);
                 return ERR_APPEXECFWK_FORM_INVALID_PARAM;
             }
         }

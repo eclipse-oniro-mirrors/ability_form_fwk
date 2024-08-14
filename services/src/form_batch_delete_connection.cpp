@@ -40,8 +40,8 @@ void FormBatchDeleteConnection::OnAbilityConnectDone(
 {
     HILOG_INFO("call");
     if (resultCode != ERR_OK) {
-        HILOG_ERROR("%{public}s, abilityName:%{public}s, resultCode:%{public}d",
-            __func__, element.GetAbilityName().c_str(), resultCode);
+        HILOG_ERROR("abilityName:%{public}s, resultCode:%{public}d",
+            element.GetAbilityName().c_str(), resultCode);
         return;
     }
     onFormAppConnect();

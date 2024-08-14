@@ -38,7 +38,7 @@ int32_t FormXMLParser::Parse()
     std::lock_guard<std::mutex> lock(xmlDocumentMutex_);
     xmlDocument_ = xmlReadFile(CONFIG_FILE, nullptr, XML_PARSE_NOBLANKS);
     if (xmlDocument_ == nullptr) {
-        HILOG_ERROR("xmlDocument_ is empty");
+        HILOG_ERROR("null xmlDocument_");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
@@ -61,10 +61,10 @@ int32_t FormXMLParser::Parse()
 
 bool FormXMLParser::CheckRootNode(xmlNodePtr &node)
 {
-    HILOG_DEBUG("CheckRootNode start.");
+    HILOG_DEBUG("CheckRootNode start");
     if (node == nullptr || node->name == nullptr ||
         xmlStrcmp(node->name, reinterpret_cast<const xmlChar*>("FORM"))) {
-        HILOG_ERROR("get root element failed!");
+        HILOG_ERROR("get root element failed");
         return false;
     }
     HILOG_DEBUG("success");
@@ -73,18 +73,18 @@ bool FormXMLParser::CheckRootNode(xmlNodePtr &node)
 
 bool FormXMLParser::ParseInternal(xmlNodePtr &node)
 {
-    HILOG_DEBUG("ParseInternal start.");
+    HILOG_DEBUG("ParseInternal start");
     xmlNodePtr curNodePtr = node->xmlChildrenNode;
     std::string quantityConfig = "quantityConfig";
     std::string nodeName = reinterpret_cast<const char*>(curNodePtr->name);
     if (nodeName != quantityConfig) {
-        HILOG_ERROR("invalid node!");
+        HILOG_ERROR("invalid node");
         return false;
     }
     for (xmlNodePtr curChildNodePtr = curNodePtr->xmlChildrenNode; curChildNodePtr != nullptr;
         curChildNodePtr = curChildNodePtr->next) {
         if (curChildNodePtr->name == nullptr || curChildNodePtr->type == XML_COMMENT_NODE) {
-            HILOG_ERROR("invalid child node!");
+            HILOG_ERROR("invalid child node");
             continue;
         }
         std::string childNodeName = reinterpret_cast<const char*>(curChildNodePtr->name);
@@ -108,7 +108,7 @@ bool FormXMLParser::ParseInternal(xmlNodePtr &node)
 
 const std::map<std::string, int32_t>& FormXMLParser::GetConfigMap() const
 {
-    HILOG_DEBUG("GetConfigMap start.");
+    HILOG_DEBUG("GetConfigMap start");
     return configMap_;
 }
 } // namespace OHOS::AppExecFwk

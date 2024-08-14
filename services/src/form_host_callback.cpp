@@ -49,12 +49,12 @@ void FormHostCallback::OnUpdate(const int64_t formId, const FormRecord &record, 
 
     // check formId
     if (formId < 0) {
-        HILOG_ERROR("%{public}s: OnUpdate invalid param, formId:%{public}" PRId64 ".", __func__, formId);
+        HILOG_ERROR("OnUpdate invalid param, formId:%{public}" PRId64 ".", formId);
         return;
     }
 
     if (callerToken == nullptr) {
-        HILOG_ERROR("%{public}s: callerToken can not be NULL", __func__);
+        HILOG_ERROR("null callerToken");
         return;
     }
 
@@ -71,12 +71,12 @@ void FormHostCallback::OnUninstall(std::vector<int64_t> &formIds, const sptr<IRe
 {
     // check formId
     if (formIds.empty()) {
-        HILOG_ERROR("%{public}s: OnUninstall invalid param, formIds is empty.", __func__);
+        HILOG_ERROR("OnUninstall invalid param, formIds is empty");
         return;
     }
 
     if (callerToken == nullptr) {
-        HILOG_ERROR("%{public}s: callerToken can not be NULL", __func__);
+        HILOG_ERROR("null callerToken");
         return;
     }
     // post updateTask to host
@@ -87,7 +87,7 @@ void FormHostCallback::OnAcquireFormData(const AAFwk::WantParams &wantParams, in
                                          const sptr<IRemoteObject> &callerToken)
 {
     if (callerToken == nullptr) {
-        HILOG_ERROR("callerToken can not be NULL");
+        HILOG_ERROR("null callerToken");
         return;
     }
     // post updateTask to host
@@ -104,7 +104,7 @@ void FormHostCallback::OnAcquireState(AppExecFwk::FormState state, const AAFwk::
                                       const sptr<IRemoteObject> &callerToken)
 {
     if (callerToken == nullptr) {
-        HILOG_ERROR("%{public}s: callerToken can not be NULL", __func__);
+        HILOG_ERROR("null callerToken");
         return;
     }
     // post updateTask to host
@@ -120,13 +120,13 @@ void FormHostCallback::OnAcquireState(AppExecFwk::FormState state, const AAFwk::
 void FormHostCallback::OnRecycleForms(
     const std::vector<int64_t> &formIds, const Want &want, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("start.");
+    HILOG_DEBUG("start");
     if (formIds.empty()) {
-        HILOG_ERROR("formIds is empty.");
+        HILOG_ERROR("empty formIds");
         return;
     }
     if (callerToken == nullptr) {
-        HILOG_ERROR("callerToken can not be NULL");
+        HILOG_ERROR("null callerToken");
         return;
     }
     FormRenderMgr::GetInstance().RecycleForms(formIds, want, callerToken);
@@ -137,12 +137,12 @@ void FormHostCallback::OnEnableForms(
 {
     HILOG_INFO("size:%{public}zu, enable:%{public}d", formIds.size(), enable);
     if (formIds.empty()) {
-        HILOG_ERROR("formIds is empty.");
+        HILOG_ERROR("empty formIds");
         return;
     }
 
     if (callerToken == nullptr) {
-        HILOG_ERROR("callerToken can not be NULL");
+        HILOG_ERROR("null callerToken");
         return;
     }
     // post enableFormsTask to host

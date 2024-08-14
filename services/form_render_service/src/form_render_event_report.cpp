@@ -62,7 +62,7 @@ void FormRenderEventReport::SendBlockFaultEvent(pid_t processId, pid_t jsThreadI
     std::string traceStr;
     bool ret = dumplog.DumpCatch(processId, jsThreadId, traceStr);
     if (ret) {
-        HILOG_INFO("Print block form's process id %{public}d and thread %{public}d call stack %{public}s .",
+        HILOG_INFO("Print block form's process id %{public}d and thread %{public}d call stack %{public}s",
             processId, jsThreadId, traceStr.c_str());
     }
     HiSysEventWrite(

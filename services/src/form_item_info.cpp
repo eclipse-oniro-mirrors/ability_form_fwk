@@ -185,17 +185,17 @@ bool FormItemInfo::IsValidItem() const
 bool FormItemInfo::IsMatch(const FormRecord &record) const
 {
     HILOG_DEBUG("match data");
-    HILOG_DEBUG("FormRecord.bundleName : %{public}s", record.bundleName.c_str());
-    HILOG_DEBUG("FormRecord.moduleName : %{public}s", record.moduleName.c_str());
-    HILOG_DEBUG("FormRecord.abilityName : %{public}s", record.abilityName.c_str());
-    HILOG_DEBUG("FormRecord.formName : %{public}s", record.formName.c_str());
-    HILOG_DEBUG("FormRecord.specification : %{public}d", record.specification);
+    HILOG_DEBUG("FormRecord.bundleName :%{public}s", record.bundleName.c_str());
+    HILOG_DEBUG("FormRecord.moduleName :%{public}s", record.moduleName.c_str());
+    HILOG_DEBUG("FormRecord.abilityName :%{public}s", record.abilityName.c_str());
+    HILOG_DEBUG("FormRecord.formName :%{public}s", record.formName.c_str());
+    HILOG_DEBUG("FormRecord.specification :%{public}d", record.specification);
 
-    HILOG_DEBUG("FormItemInfo.providerBundleName_ : %{public}s", providerBundleName_.c_str());
-    HILOG_DEBUG("FormItemInfo.moduleName : %{public}s", moduleName_.c_str());
-    HILOG_DEBUG("FormItemInfo.abilityName : %{public}s", abilityName_.c_str());
-    HILOG_DEBUG("FormItemInfo.formName : %{public}s", formName_.c_str());
-    HILOG_DEBUG("FormItemInfo.specification : %{public}d", specificationId_);
+    HILOG_DEBUG("FormItemInfo.providerBundleName_ :%{public}s", providerBundleName_.c_str());
+    HILOG_DEBUG("FormItemInfo.moduleName :%{public}s", moduleName_.c_str());
+    HILOG_DEBUG("FormItemInfo.abilityName :%{public}s", abilityName_.c_str());
+    HILOG_DEBUG("FormItemInfo.formName :%{public}s", formName_.c_str());
+    HILOG_DEBUG("FormItemInfo.specification :%{public}d", specificationId_);
 
     return (record.bundleName == providerBundleName_) && (record.moduleName == moduleName_)
         && (record.abilityName == abilityName_) && (record.formName == formName_)

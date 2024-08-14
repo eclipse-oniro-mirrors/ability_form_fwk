@@ -47,8 +47,8 @@ void FormAbilityConnection::OnAbilityConnectDone(
     const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode)
 {
     if (resultCode != ERR_OK) {
-        HILOG_ERROR("%{public}s, formId:%{public}" PRId64 ", resultCode:%{public}d",
-            __func__, formId_, resultCode);
+        HILOG_ERROR("formId:%{public}" PRId64 ", resultCode:%{public}d",
+            formId_, resultCode);
         return;
     }
 
@@ -59,13 +59,13 @@ void FormAbilityConnection::OnAbilityConnectDone(
 
     std::vector<FormInfo> targetForms;
     if (FormInfoMgr::GetInstance().GetFormsInfoByBundle(bundleName_, targetForms) != ERR_OK) {
-        HILOG_ERROR("%{public}s error, failed to get forms info for %{public}s.", __func__, bundleName_.c_str());
+        HILOG_ERROR("fail get forms info for %{public}s", bundleName_.c_str());
         return;
     }
 
     FormRecord formRecord;
     if (!FormDataMgr::GetInstance().GetFormRecord(formId_, formRecord)) {
-        HILOG_ERROR("%{public}s error, not exist such form:%{public}" PRId64 ".", __func__, formId_);
+        HILOG_ERROR("not exist such form:%{public}" PRId64 ".", formId_);
         return;
     }
 
@@ -102,7 +102,7 @@ void FormAbilityConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementNam
         FormSupplyCallback::GetInstance()->RemoveConnection(connectId_);
         connectId_ = 0;
     } else {
-        HILOG_ERROR("%{public}s fail, invalid connectId_: %{public}d", __func__, connectId_);
+        HILOG_ERROR("invalid connectId_:%{public}d", connectId_);
     }
     ReportFormAppUnbindEvent();
 }
@@ -117,7 +117,7 @@ void FormAbilityConnection::OnConnectDied(const wptr<IRemoteObject> &remoteObjec
         FormSupplyCallback::GetInstance()->RemoveConnection(connectId_);
         connectId_ = 0;
     } else {
-        HILOG_ERROR("%{public}s fail, connectId_ invalidate. connectId_: %{public}d", __func__, connectId_);
+        HILOG_ERROR("connectId_ invalidate. connectId_:%{public}d", connectId_);
     }
 }
 
@@ -125,12 +125,12 @@ sptr<OHOS::AppExecFwk::IAppMgr> FormAbilityConnection::GetAppMgr()
 {
     sptr<ISystemAbilityManager> systemMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (systemMgr == nullptr) {
-        HILOG_ERROR("Fail to connect system ability manager.");
+        HILOG_ERROR("connect systemAbilityManager failed");
         return nullptr;
     }
     sptr<IRemoteObject> remoteObject = systemMgr->GetSystemAbility(APP_MGR_SERVICE_ID);
     if (remoteObject == nullptr) {
-        HILOG_ERROR(" Fail to connect app mgr service.");
+        HILOG_ERROR("connect appMgrService failed");
         return nullptr;
     }
     return iface_cast<OHOS::AppExecFwk::IAppMgr>(remoteObject);
@@ -140,12 +140,12 @@ bool FormAbilityConnection::onFormAppConnect()
 {
     std::string bundleName = GetBundleName();
     if (bundleName.empty()) {
-        HILOG_ERROR("Empty bundle name.");
+        HILOG_ERROR("Empty bundle name");
         return false;
     }
     auto appMgr = GetAppMgr();
     if (!appMgr) {
-        HILOG_ERROR("Get app mgr failed!");
+        HILOG_ERROR("Get app mgr failed");
         return false;
     }
 
@@ -153,7 +153,7 @@ bool FormAbilityConnection::onFormAppConnect()
     int32_t userId = FormUtil::GetCurrentAccountId();
     int32_t ret = appMgr->GetRunningProcessInformation(bundleName, userId, infos);
     if (ret != ERR_OK) {
-        HILOG_ERROR("Get running process info failed!");
+        HILOG_ERROR("Get running process info failed");
         return false;
     }
     std::string targetProcessName = bundleName + ":form";
@@ -174,7 +174,7 @@ void FormAbilityConnection::ReportFormAppUnbindEvent()
     eventInfo.formId = GetFormId();
     eventInfo.bundleName = GetBundleName() + ":form";
     eventInfo.formAppPid = GetAppFormPid();
-    HILOG_DEBUG("bundleName:%{public}s, formId:%{public}" PRId64 ",pid: %{public}" PRId32 ",timstamp:%{public}" PRId64,
+    HILOG_DEBUG("bundleName:%{public}s, formId:%{public}" PRId64 ",pid:%{public}" PRId32 ",timstamp:%{public}" PRId64,
         eventInfo.bundleName.c_str(), eventInfo.formId, eventInfo.formAppPid, eventInfo.timeStamp);
     FormReport::GetInstance().RemoveFormId(eventInfo.formId);
     FormEventReport::SendThirdFormEvent(FormEventName::UNBIND_FORM_APP, HiSysEventType::BEHAVIOR, eventInfo);
@@ -186,7 +186,7 @@ void FormAbilityConnection::ReportFormAppUnbindEvent()
  */
 void FormAbilityConnection::SetConnectId(int32_t connectId)
 {
-    HILOG_INFO("connectId_: %{public}d", connectId);
+    HILOG_INFO("connectId_:%{public}d", connectId);
     connectId_ = connectId;
 }
 

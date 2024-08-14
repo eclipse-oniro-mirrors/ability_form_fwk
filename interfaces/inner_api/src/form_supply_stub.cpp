@@ -40,11 +40,11 @@ FormSupplyStub::~FormSupplyStub()
  */
 int FormSupplyStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    HILOG_DEBUG("FormSupplyStub::OnReceived, code = %{public}u, flags= %{public}d.", code, option.GetFlags());
+    HILOG_DEBUG("FormSupplyStub::OnReceived,code= %{public}u,flags= %{public}d", code, option.GetFlags());
     std::u16string descriptor = FormSupplyStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
     if (descriptor != remoteDescriptor) {
-        HILOG_ERROR("%{public}s error, local descriptor is not equal to remote", __func__);
+        HILOG_ERROR("localDescriptor not equal to remote");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
@@ -83,7 +83,7 @@ int FormSupplyStub::HandleOnAcquire(MessageParcel &data, MessageParcel &reply)
 {
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
-        HILOG_ERROR("%{public}s, failed to ReadParcelable<Want>", __func__);
+        HILOG_ERROR("ReadParcelable<Want> failed");
         reply.WriteInt32(ERR_APPEXECFWK_PARCEL_ERROR);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
@@ -92,12 +92,12 @@ int FormSupplyStub::HandleOnAcquire(MessageParcel &data, MessageParcel &reply)
     do {
         errCode = want->GetIntParam(Constants::PROVIDER_FLAG, ERR_OK);
         if (errCode != ERR_OK) {
-            HILOG_ERROR("%{public}s, provider error", __func__);
+            HILOG_ERROR("get providerParam failed");
             break;
         }
         std::unique_ptr<FormProviderInfo> formInfo(data.ReadParcelable<FormProviderInfo>());
         if (formInfo == nullptr) {
-            HILOG_ERROR("%{public}s, failed to ReadParcelable<FormProviderInfo>", __func__);
+            HILOG_ERROR("fail ReadParcelable<FormProviderInfo>");
             errCode = ERR_APPEXECFWK_PARCEL_ERROR;
             break;
         }
@@ -122,7 +122,7 @@ int FormSupplyStub::HandleOnEventHandle(MessageParcel &data, MessageParcel &repl
 {
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
-        HILOG_ERROR("%{public}s, failed to ReadParcelable<Want>", __func__);
+        HILOG_ERROR("ReadParcelable<Want> failed");
         reply.WriteInt32(ERR_APPEXECFWK_PARCEL_ERROR);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
@@ -144,14 +144,14 @@ int FormSupplyStub::HandleOnAcquireStateResult(MessageParcel &data, MessageParce
     std::string provider = data.ReadString();
     std::unique_ptr<Want> wantArg(data.ReadParcelable<Want>());
     if (!wantArg) {
-        HILOG_ERROR("%{public}s, failed to ReadParcelable<Want>", __func__);
+        HILOG_ERROR("ReadParcelable<Want> failed");
         reply.WriteInt32(ERR_APPEXECFWK_PARCEL_ERROR);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
-        HILOG_ERROR("%{public}s, failed to ReadParcelable<Want>", __func__);
+        HILOG_ERROR("ReadParcelable<Want> failed");
         reply.WriteInt32(ERR_APPEXECFWK_PARCEL_ERROR);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
@@ -165,13 +165,13 @@ int32_t FormSupplyStub::HandleOnShareAcquire(MessageParcel &data, MessageParcel 
 {
     auto formId = data.ReadInt64();
     if (formId <= 0) {
-        HILOG_ERROR("failed to ReadInt64<formId>");
+        HILOG_ERROR("ReadInt64<formId> failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     auto remoteDeviceId = data.ReadString();
     if (remoteDeviceId.empty()) {
-        HILOG_ERROR("failed to ReadString<DeviceId>");
+        HILOG_ERROR("fail ReadString<DeviceId>");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -196,13 +196,13 @@ int32_t FormSupplyStub::HandleOnAcquireDataResult(MessageParcel &data, MessagePa
 {
     std::shared_ptr<AAFwk::WantParams> wantParams(data.ReadParcelable<AAFwk::WantParams>());
     if (wantParams == nullptr) {
-        HILOG_ERROR("failed to ReadParcelable<wantParams>");
+        HILOG_ERROR("ReadParcelable<wantParams> failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     auto requestCode = data.ReadInt64();
     if (requestCode <= 0) {
-        HILOG_ERROR("failed to ReadInt64<requestCode>");
+        HILOG_ERROR("fail ReadInt64<requestCode>");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -214,13 +214,13 @@ int32_t FormSupplyStub::HandleOnRenderTaskDone(MessageParcel &data, MessageParce
 {
     auto formId = data.ReadInt64();
     if (formId <= 0) {
-        HILOG_ERROR("failed to ReadInt64<formId>");
+        HILOG_ERROR("ReadInt64<formId> failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
-        HILOG_ERROR("%{public}s, failed to ReadParcelable<Want>", __func__);
+        HILOG_ERROR("ReadParcelable<Want> failed");
         reply.WriteInt32(ERR_APPEXECFWK_PARCEL_ERROR);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
@@ -234,13 +234,13 @@ int32_t FormSupplyStub::HandleOnStopRenderingTaskDone(MessageParcel &data, Messa
 {
     auto formId = data.ReadInt64();
     if (formId <= 0) {
-        HILOG_ERROR("failed to ReadInt64<formId>");
+        HILOG_ERROR("ReadInt64<formId> failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
-        HILOG_ERROR("%{public}s, failed to ReadParcelable<Want>", __func__);
+        HILOG_ERROR("ReadParcelable<Want> failed");
         reply.WriteInt32(ERR_APPEXECFWK_PARCEL_ERROR);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
@@ -254,7 +254,7 @@ int32_t FormSupplyStub::HandleOnRenderingBlock(MessageParcel &data, MessageParce
 {
     auto bundleName = data.ReadString();
     if (bundleName.empty()) {
-        HILOG_ERROR("failed to ReadString<bundleName>");
+        HILOG_ERROR("fail ReadString<bundleName>");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -267,13 +267,13 @@ int32_t FormSupplyStub::HandleOnRecycleForm(MessageParcel &data, MessageParcel &
 {
     int64_t formId = data.ReadInt64();
     if (formId <= 0) {
-        HILOG_ERROR("failed to ReadInt64<formId>");
+        HILOG_ERROR("ReadInt64<formId> failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
     if (!want) {
-        HILOG_ERROR("failed to ReadParcelable<Want>");
+        HILOG_ERROR("ReadParcelable<Want> failed");
         reply.WriteInt32(ERR_APPEXECFWK_PARCEL_ERROR);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
@@ -288,12 +288,12 @@ int32_t FormSupplyStub::HandleOnRecoverFormsByConfigUpdate(MessageParcel &data, 
     std::vector<int64_t> formIds;
 
     if (!data.ReadInt64Vector(&formIds)) {
-        HILOG_ERROR("Failed to ReadInt64Vector.");
+        HILOG_ERROR("ReadInt64Vector failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     if (formIds.empty()) {
-        HILOG_ERROR("formIds is empty.");
+        HILOG_ERROR("empty formIds");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
