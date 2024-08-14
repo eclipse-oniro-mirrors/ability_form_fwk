@@ -29,6 +29,7 @@ ohos_unittest("FrsFormRenderRecordTest") {
   sources = [
     "${form_fwk_path}/test/mock/src/mock_form_provider_client.cpp",
     "${form_fwk_path}/test/unittest/frs_form_render_record_test/frs_form_render_record_test.cpp",
+    "${form_fwk_path}/test/unittest/frs_form_render_record_test/mock_form_renderer_group.cpp",
   ]
 
   include_dirs = [
