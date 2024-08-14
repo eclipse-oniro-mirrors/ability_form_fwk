@@ -1736,8 +1736,8 @@ ErrCode FormMgrAdapter::GetBundleInfo(const AAFwk::Want &want, BundleInfo &bundl
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
 
-    int userId = FormUtil::GetCurrentAccountId();
-    ErrCode errCode = FormBmsHelper::GetInstance().GetBundleInfoV9(bundleName, userId, bundleInfo);
+    int32_t currentUserId = GetCurrentUserId(IPCSkeleton::GetCallingUid());
+    ErrCode errCode = FormBmsHelper::GetInstance().GetBundleInfoV9(bundleName, currentUserId, bundleInfo);
     if (errCode != ERR_OK) {
         HILOG_ERROR("GetBundleInfo, failed to get bundle info.");
         return errCode;
@@ -1773,9 +1773,11 @@ ErrCode FormMgrAdapter::GetFormInfo(const AAFwk::Want &want, FormInfo &formInfo)
     }
 
     std::vector<FormInfo> formInfos {};
-    ErrCode errCode = FormInfoMgr::GetInstance().GetFormsInfoByModule(bundleName, moduleName, formInfos);
+    int32_t userId = GetCurrentUserId(IPCSkeleton::GetCallingUid());
+    ErrCode errCode = FormInfoMgr::GetInstance().GetFormsInfoByModule(bundleName, moduleName,
+        formInfos, userId);
     if (errCode != ERR_OK) {
-        HILOG_ERROR("GetFormsInfoByModule, failed to get form config info.");
+        HILOG_ERROR("GetFormsInfoByModule, failed to get form config info, user id: %{public}d.", userId);
         return errCode;
     }
 
@@ -1795,8 +1797,8 @@ ErrCode FormMgrAdapter::GetFormInfo(const AAFwk::Want &want, FormInfo &formInfo)
         }
     }
 
-    HILOG_ERROR("failed to get form info failed. ability name is %{public}s, form name is %{public}s",
-        abilityName.c_str(), formName.c_str());
+    HILOG_ERROR("Failed to get form info, abilityName: %{public}s, formName: %{public}s, userId:%{public}d",
+        abilityName.c_str(), formName.c_str(), userId);
     return abilityExisting ? ERR_APPEXECFWK_FORM_GET_INFO_FAILED : ERR_APPEXECFWK_FORM_NO_SUCH_ABILITY;
 }
 

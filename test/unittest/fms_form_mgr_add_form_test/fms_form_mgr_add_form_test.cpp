@@ -53,6 +53,8 @@ using ::testing::_;
 using ::testing::Return;
 using ::testing::DoAll;
 
+void MockGetCallingUid(int32_t mockRet);
+
 namespace {
 const std::string PERMISSION_NAME_REQUIRE_FORM = "ohos.permission.REQUIRE_FORM";
 const std::string PARAM_PROVIDER_PACKAGE_NAME = "com.form.provider.app.test.ability";
@@ -69,6 +71,7 @@ const std::string FORM_HOST_BUNDLE_NAME = "com.form.host.app";
 const int32_t PARAM_FORM_DIMENSION_VALUE = 1;
 const int32_t PARAM_FORM_DIMENSION_2_1 = 5;
 const int32_t PARAM_FORM_DIMENSION_6_4 = 7;
+const int32_t DEFAULT_CALLING_UID = 20000001;
 
 const std::string DEVICE_ID = "ohos-phone1";
 const std::string DEF_LABEL1 = "PermissionFormRequireGrant";
@@ -133,6 +136,7 @@ void FmsFormMgrAddFormTest::CreateProviderData()
     formInfo.formVisibleNotify = true;
     formInfo.supportDimensions = {1, 2, 5, 7};
     formInfo.defaultDimension = 1;
+    formInfo.supportShapes = {1};
     FormInfoStorage formInfoStorage;
     formInfoStorage.userId = userId_;
     formInfoStorage.formInfos.push_back(formInfo);
@@ -230,6 +234,7 @@ HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_001, TestSize.Level0)
     EXPECT_CALL(*mockBundleMgrService, GetBundleInfoV9(_, _, _, _))
         .WillOnce(DoAll(SetArgReferee<2>(bundleInfo), Return(ERR_OK)));
     EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(3).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
+    MockGetCallingUid(DEFAULT_CALLING_UID);
     // add form
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().AddForm(0L, want, token_, formJsInfo));
     token_->Wait();
@@ -245,9 +250,12 @@ HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_001, TestSize.Level0)
     std::vector<FormDBInfo> formDBInfos;
     FormDbCache::GetInstance().GetAllFormInfo(formDBInfos);
     EXPECT_EQ(dataCnt, formDBInfos.size());
-    FormDBInfo dbInfo {formDBInfos[0]};
-    EXPECT_EQ(formId, dbInfo.formId);
-    EXPECT_EQ(dataCnt, dbInfo.formUserUids.size());
+    if (formDBInfos.size() > 0) {
+        FormDBInfo dbInfo {formDBInfos[0]};
+        EXPECT_EQ(formId, dbInfo.formId);
+        EXPECT_EQ(dataCnt, dbInfo.formUserUids.size());
+    }
+
     // Form host record alloted.
     std::vector<FormHostRecord> hostRecords;
     FormDataMgr::GetInstance().GetFormHostRecord(formId, hostRecords);
@@ -273,7 +281,7 @@ HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_002, TestSize.Level0)
     CreateProviderData();
 
     int64_t formId = 0x0ffabcff00000000;
-    int callingUid {0};
+    int callingUid {DEFAULT_CALLING_UID};
     // Set cache
     FormItemInfo record1;
     record1.SetFormId(formId);
@@ -286,7 +294,6 @@ HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_002, TestSize.Level0)
     FormRecord retFormRec = FormDataMgr::GetInstance().AllotFormRecord(record1, callingUid);
     retFormRec.updateAtHour = 1;
     retFormRec.updateAtMin = 1;
-    retFormRec.providerUserId = 0;
     FormDataMgr::GetInstance().UpdateFormRecord(formId, retFormRec);
     // Set database info
     FormDBInfo formDBInfo(formId, retFormRec);
@@ -317,6 +324,7 @@ HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_002, TestSize.Level0)
     EXPECT_CALL(*mockBundleMgrService, GetBundleInfoV9(_, _, _, _))
         .WillOnce(DoAll(SetArgReferee<2>(bundleInfo), Return(ERR_OK)));
     EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(2).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
+    MockGetCallingUid(DEFAULT_CALLING_UID);
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().AddForm(formId, want, token_, formJsInfo));
     token_->Wait();
 
@@ -331,9 +339,12 @@ HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_002, TestSize.Level0)
     std::vector<FormDBInfo> formDBInfos;
     FormDbCache::GetInstance().GetAllFormInfo(formDBInfos);
     EXPECT_EQ(dataCnt, formDBInfos.size());
-    FormDBInfo dbInfo {formDBInfos[0]};
-    EXPECT_EQ(formId, dbInfo.formId);
-    EXPECT_EQ(formUserUidCnt, dbInfo.formUserUids.size());
+    if (formDBInfos.size() > 0) {
+        FormDBInfo dbInfo {formDBInfos[0]};
+        EXPECT_EQ(formId, dbInfo.formId);
+        EXPECT_EQ(formUserUidCnt, dbInfo.formUserUids.size());
+    }
+
     // Form host record not changed.
     std::vector<FormHostRecord> hostRecords;
     FormDataMgr::GetInstance().GetFormHostRecord(formId, hostRecords);
@@ -369,7 +380,7 @@ HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_003, TestSize.Level0)
     record1.specification = PARAM_FORM_DIMENSION_VALUE;
     record1.formUserUids.emplace_back(callingUid);
     record1.formTempFlag = false;
-    record1.providerUserId = 0;
+    record1.providerUserId = 100;
     FormDBInfo formDBInfo(formId, record1);
     FormDbCache::GetInstance().SaveFormInfo(formDBInfo);
     // Set form host record
@@ -398,6 +409,7 @@ HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_003, TestSize.Level0)
     EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _))
         .Times(testing::AnyNumber()).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
     GTEST_LOG_(INFO) << "formId :"<<formId;
+    MockGetCallingUid(DEFAULT_CALLING_UID);
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().AddForm(formId, want, token_, formJsInfo));
     token_->Wait();
 
@@ -412,9 +424,12 @@ HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_003, TestSize.Level0)
     std::vector<FormDBInfo> formDBInfos;
     FormDbCache::GetInstance().GetAllFormInfo(formDBInfos);
     EXPECT_EQ(dataCnt, formDBInfos.size());
-    FormDBInfo dbInfo {formDBInfos[0]};
-    EXPECT_EQ(formId, dbInfo.formId);
-    EXPECT_EQ(formUserUidCnt, dbInfo.formUserUids.size());
+    if (formDBInfos.size() > 0) {
+        FormDBInfo dbInfo {formDBInfos[0]};
+        EXPECT_EQ(formId, dbInfo.formId);
+        EXPECT_EQ(formUserUidCnt, dbInfo.formUserUids.size());
+    }
+
     // Form host record not changed.
     std::vector<FormHostRecord> hostRecords;
     FormDataMgr::GetInstance().GetFormHostRecord(formId, hostRecords);
@@ -518,7 +533,6 @@ HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_006, TestSize.Level0)
     record1.SetSpecificationId(PARAM_FORM_DIMENSION_VALUE);
     record1.SetTemporaryFlag(false);
     FormRecord retFormRec = FormDataMgr::GetInstance().AllotFormRecord(record1, callingUid);
-    retFormRec.providerUserId = 0;
     FormDataMgr::GetInstance().UpdateFormRecord(formId, retFormRec);
     // Set database info.
     FormDBInfo formDBInfo(formId, retFormRec);
@@ -550,6 +564,7 @@ HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_006, TestSize.Level0)
         .WillOnce(DoAll(SetArgReferee<2>(bundleInfo), Return(ERR_OK)));
     EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _))
         .Times(testing::AnyNumber()).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
+    MockGetCallingUid(DEFAULT_CALLING_UID);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_CFG_NOT_MATCH_ID, FormMgr::GetInstance().AddForm(formId, want, token_, formJsInfo));
     token_->Wait();
 
@@ -726,6 +741,7 @@ HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_010, TestSize.Level0)
     EXPECT_CALL(*mockBundleMgrService, GetBundleInfoV9(_, _, _, _))
         .WillOnce(DoAll(SetArgReferee<2>(bundleInfo), Return(ERR_OK)));
     EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(3).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
+    MockGetCallingUid(DEFAULT_CALLING_UID);
     // add form
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().AddForm(0L, want, token_, formJsInfo));
     token_->Wait();
@@ -741,9 +757,12 @@ HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_010, TestSize.Level0)
     std::vector<FormDBInfo> formDBInfos;
     FormDbCache::GetInstance().GetAllFormInfo(formDBInfos);
     EXPECT_EQ(dataCnt, formDBInfos.size());
-    FormDBInfo dbInfo {formDBInfos[0]};
-    EXPECT_EQ(formId, dbInfo.formId);
-    EXPECT_EQ(dataCnt, dbInfo.formUserUids.size());
+    if (formDBInfos.size() > 0) {
+        FormDBInfo dbInfo {formDBInfos[0]};
+        EXPECT_EQ(formId, dbInfo.formId);
+        EXPECT_EQ(dataCnt, dbInfo.formUserUids.size());
+    }
+
     // Form host record alloted.
     std::vector<FormHostRecord> hostRecords;
     FormDataMgr::GetInstance().GetFormHostRecord(formId, hostRecords);
@@ -796,7 +815,7 @@ HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_011, TestSize.Level0)
     EXPECT_CALL(*mockBundleMgrService, GetBundleInfoV9(_, _, _, _))
         .WillOnce(DoAll(SetArgReferee<2>(bundleInfo), Return(ERR_OK)));
     EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(3).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
-
+    MockGetCallingUid(DEFAULT_CALLING_UID);
     // add form
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().AddForm(0L, want, token_, formJsInfo));
     token_->Wait();
@@ -812,9 +831,12 @@ HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_011, TestSize.Level0)
     std::vector<FormDBInfo> formDBInfos;
     FormDbCache::GetInstance().GetAllFormInfo(formDBInfos);
     EXPECT_EQ(dataCnt, formDBInfos.size());
-    FormDBInfo dbInfo {formDBInfos[0]};
-    EXPECT_EQ(formId, dbInfo.formId);
-    EXPECT_EQ(dataCnt, dbInfo.formUserUids.size());
+    if (formDBInfos.size() > 0) {
+        FormDBInfo dbInfo {formDBInfos[0]};
+        EXPECT_EQ(formId, dbInfo.formId);
+        EXPECT_EQ(dataCnt, dbInfo.formUserUids.size());
+    }
+
     // Form host record alloted.
     std::vector<FormHostRecord> hostRecords;
     FormDataMgr::GetInstance().GetFormHostRecord(formId, hostRecords);
@@ -867,6 +889,7 @@ HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_012, TestSize.Level0)
     EXPECT_CALL(*mockBundleMgrService, GetBundleInfoV9(_, _, _, _))
         .WillOnce(DoAll(SetArgReferee<2>(bundleInfo), Return(ERR_OK)));
     EXPECT_CALL(*mockBundleMgrService, GetNameForUid(_, _)).Times(3).WillOnce(Invoke(bmsTaskGetBundleNameForUid));
+    MockGetCallingUid(DEFAULT_CALLING_UID);
     // add form
     EXPECT_EQ(ERR_OK, FormMgr::GetInstance().AddForm(0L, want, token_, formJsInfo));
     token_->Wait();
@@ -882,9 +905,12 @@ HWTEST_F(FmsFormMgrAddFormTestExt, AddForm_012, TestSize.Level0)
     std::vector<FormDBInfo> formDBInfos;
     FormDbCache::GetInstance().GetAllFormInfo(formDBInfos);
     EXPECT_EQ(dataCnt, formDBInfos.size());
-    FormDBInfo dbInfo {formDBInfos[0]};
-    EXPECT_EQ(formId, dbInfo.formId);
-    EXPECT_EQ(dataCnt, dbInfo.formUserUids.size());
+    if (formDBInfos.size() > 0) {
+        FormDBInfo dbInfo {formDBInfos[0]};
+        EXPECT_EQ(formId, dbInfo.formId);
+        EXPECT_EQ(dataCnt, dbInfo.formUserUids.size());
+    }
+
     // Form host record alloted.
     std::vector<FormHostRecord> hostRecords;
     FormDataMgr::GetInstance().GetFormHostRecord(formId, hostRecords);

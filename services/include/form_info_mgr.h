@@ -69,7 +69,8 @@ public:
 
     ErrCode GetAllFormsInfo(std::vector<FormInfo> &formInfos, int32_t userId = Constants::INVALID_USER_ID);
 
-    ErrCode GetFormsInfoByModule(const std::string &moduleName, std::vector<FormInfo> &formInfos);
+    ErrCode GetFormsInfoByModule(const std::string &moduleName, std::vector<FormInfo> &formInfos,
+        int32_t userId = Constants::INVALID_USER_ID);
 
     ErrCode GetFormsInfoByFilter(
         const FormInfoFilter &filter, std::vector<FormInfo> &formInfos, int32_t userId = Constants::INVALID_USER_ID);
@@ -100,7 +101,7 @@ public:
         const std::string &bundleName, std::vector<FormInfo> &formInfos, int32_t userId = Constants::INVALID_USER_ID);
 
     ErrCode GetFormsInfoByModule(const std::string &bundleName, const std::string &moduleName,
-                                 std::vector<FormInfo> &formInfos);
+        std::vector<FormInfo> &formInfos, int32_t userId = Constants::INVALID_USER_ID);
 
     ErrCode GetFormsInfoByFilter(
         const FormInfoFilter &filter, std::vector<FormInfo> &formInfos, int32_t userId = Constants::INVALID_USER_ID);
@@ -108,7 +109,7 @@ public:
     ErrCode GetFormsInfoByRecord(const FormRecord &formRecord, FormInfo &formInfo);
 
     ErrCode GetFormsInfoByModuleWithoutCheck(const std::string &bundleName, const std::string &moduleName,
-        std::vector<FormInfo> &formInfos);
+        std::vector<FormInfo> &formInfos, int32_t userId = Constants::INVALID_USER_ID);
 
     ErrCode AddDynamicFormInfo(FormInfo &formInfo, int32_t userId);
 
