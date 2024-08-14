@@ -232,6 +232,10 @@ private:
         const bool &isHandleClickEvent, const std::unordered_map<std::string, Ace::FormRequest> &recordFormRequests);
     bool RecoverRenderer(const std::vector<Ace::FormRequest> &groupRequests, const size_t &currentRequestIndex);
 
+    bool ReAddIfHapPathChanged(const std::vector<FormJsInfo> &formJsInfos);
+
+    void HandleReleaseAllRendererInJsThread();
+
     pid_t jsThreadId_ = 0;
     pid_t processId_ = 0;
 

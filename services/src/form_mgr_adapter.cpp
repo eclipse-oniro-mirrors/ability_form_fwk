@@ -1736,17 +1736,11 @@ ErrCode FormMgrAdapter::GetBundleInfo(const AAFwk::Want &want, BundleInfo &bundl
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
 
-    if (IN_PROCESS_CALL(iBundleMgr->GetBundleInfoV9(bundleName,
-        (static_cast<int32_t>(AppExecFwk::GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_HAP_MODULE) +
-        static_cast<int32_t>(AppExecFwk::GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_ABILITY) +
-        static_cast<int32_t>(AppExecFwk::GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_APPLICATION) +
-        static_cast<int32_t>(AppExecFwk::GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_DISABLE) +
-        static_cast<int32_t>(AppExecFwk::GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_SIGNATURE_INFO) +
-        static_cast<int32_t>(AppExecFwk::GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_EXTENSION_ABILITY) +
-        static_cast<int32_t>(AppExecFwk::GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_METADATA)),
-        bundleInfo, FormUtil::GetCurrentAccountId())) != ERR_OK) {
+    int userId = FormUtil::GetCurrentAccountId();
+    ErrCode errCode = FormBmsHelper::GetInstance().GetBundleInfoV9(bundleName, userId, bundleInfo);
+    if (errCode != ERR_OK) {
         HILOG_ERROR("GetBundleInfo, failed to get bundle info.");
-        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+        return errCode;
     }
 
     bool moduleExist = false;

@@ -184,7 +184,8 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_007, TestSize.Level0)
     int64_t formId = 1;
     FormRecord formRecord;
     std::vector<FormInfo> targetForms;
-    EXPECT_EQ(false, FormEventUtil::ProviderFormUpdated(formId, formRecord, targetForms));
+    BundleInfo bundleInfo;
+    EXPECT_EQ(false, FormEventUtil::ProviderFormUpdated(formId, formRecord, targetForms, bundleInfo));
     GTEST_LOG_(INFO) << "FormEventUtil_007 end";
 }
 
@@ -205,8 +206,9 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_008, TestSize.Level0)
     formInfo.abilityName = FORM_PROVIDER_ABILITY_NAME;
     formInfo.name = FORM_NAME;
     targetForms.emplace_back(formInfo);
+    BundleInfo bundleInfo;
     MockGetUpdatedForm(false);
-    EXPECT_EQ(false, FormEventUtil::ProviderFormUpdated(formId, formRecord, targetForms));
+    EXPECT_EQ(false, FormEventUtil::ProviderFormUpdated(formId, formRecord, targetForms, bundleInfo));
     GTEST_LOG_(INFO) << "FormEventUtil_008 end";
 }
 
@@ -227,8 +229,9 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_009, TestSize.Level0)
     formInfo.abilityName = FORM_PROVIDER_ABILITY_NAME;
     formInfo.name = FORM_NAME;
     targetForms.emplace_back(formInfo);
+    BundleInfo bundleInfo;
     MockGetUpdatedForm(true);
-    EXPECT_EQ(true, FormEventUtil::ProviderFormUpdated(formId, formRecord, targetForms));
+    EXPECT_EQ(true, FormEventUtil::ProviderFormUpdated(formId, formRecord, targetForms, bundleInfo));
     GTEST_LOG_(INFO) << "FormEventUtil_009 end";
 }
 
@@ -243,8 +246,9 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_010, TestSize.Level0)
     int64_t formId = 1;
     FormRecord formRecord;
     BundlePackInfo bundlePackInfo;
+    BundleInfo bundleInfo;
     MockGetPackageForm(false);
-    EXPECT_EQ(false, FormEventUtil::ProviderFormUpdated(formId, formRecord, bundlePackInfo));
+    EXPECT_EQ(false, FormEventUtil::ProviderFormUpdated(formId, formRecord, bundlePackInfo, bundleInfo));
     GTEST_LOG_(INFO) << "FormEventUtil_010 end";
 }
 
@@ -259,8 +263,9 @@ HWTEST_F(FmsFormEventUtilTest, FormEventUtil_011, TestSize.Level0)
     int64_t formId = 1;
     FormRecord formRecord;
     BundlePackInfo bundlePackInfo;
+    BundleInfo bundleInfo;
     MockGetPackageForm(true);
-    EXPECT_EQ(true, FormEventUtil::ProviderFormUpdated(formId, formRecord, bundlePackInfo));
+    EXPECT_EQ(true, FormEventUtil::ProviderFormUpdated(formId, formRecord, bundlePackInfo, bundleInfo));
     GTEST_LOG_(INFO) << "FormEventUtil_011 end";
 }
 
