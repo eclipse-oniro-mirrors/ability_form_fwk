@@ -904,7 +904,6 @@ bool FormMgrAdapter::HasFormVisible(const uint32_t tokenId)
 
     std::vector<FormRecord> formInfos;
     if (!FormDataMgr::GetInstance().GetFormRecord(bundleName, formInfos)) {
-        HILOG_ERROR("GetFormRecord error");
         return false;
     }
 
@@ -916,6 +915,7 @@ bool FormMgrAdapter::HasFormVisible(const uint32_t tokenId)
         }
     }
 
+    HILOG_INFO("tokenId:%{public}d no visibleCard", tokenId);
     return false;
 }
 
