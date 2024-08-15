@@ -9,6 +9,7 @@
     "icon": "",
     "label": "$string:app_name",
     "generateBuildHash": true,
-    "distributedNotificationEnabled": true
+    "distributedNotificationEnabled": true,
+    "configuration": "$profile:configuration"
   }
 }
