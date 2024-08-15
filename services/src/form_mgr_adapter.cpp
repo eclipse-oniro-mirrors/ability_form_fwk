@@ -3813,8 +3813,7 @@ int32_t FormMgrAdapter::EnableForms(const std::string bundleName, const bool ena
     }
 
     int32_t userId = FormUtil::GetCurrentAccountId();
-    HILOG_INFO("userId:%{public}d, infosSize:%{public}zu, enable:%{public}d",
-        userId, formInfos.size(), enable);
+    HILOG_INFO("userId:%{public}d, infosSize:%{public}zu, enable:%{public}d", userId, formInfos.size(), enable);
     for (auto iter = formInfos.begin(); iter != formInfos.end();) {
         HILOG_DEBUG("bundleName:%{public}s, enableForm:%{public}d, transparencyEnabled:%{public}d",
             iter->bundleName.c_str(), iter->enableForm, iter->transparencyEnabled);
@@ -3829,8 +3828,15 @@ int32_t FormMgrAdapter::EnableForms(const std::string bundleName, const bool ena
             if (iter->isRefreshDuringDisableForm) {
                 iter->isRefreshDuringDisableForm = false;
                 Want want;
+                want.SetElementName(iter->bundleName, iter->abilityName);
                 want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
                 want.SetParam(Constants::RECREATE_FORM_KEY, true);
+                want.SetParam(Constants::PARAM_MODULE_NAME_KEY, iter->moduleName);
+                want.SetParam(Constants::PARAM_FORM_NAME_KEY, iter->formName);
+                want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, iter->specification);
+                want.SetParam(Constants::PARAM_FORM_RENDERINGMODE_KEY, static_cast<int32_t>(iter->renderingMode));
+                want.SetParam(Constants::PARAM_DYNAMIC_NAME_KEY, iter->isDynamic);
+                want.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, iter->formTempFlag);
                 FormProviderMgr::GetInstance().RefreshForm(iter->formId, want, true);
             } else if (iter->isUpdateDuringDisableForm) {
                 iter->isUpdateDuringDisableForm = false;

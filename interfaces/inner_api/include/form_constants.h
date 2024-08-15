@@ -92,6 +92,7 @@ namespace Constants {
     constexpr const char* PARAM_PUBLISH_FORM_HOST_SCREENX_KEY = "ohos.extra.param.key.add_form_to_host_screenx";
     constexpr const char* PARAM_PUBLISH_FORM_HOST_SCREENY_KEY = "ohos.extra.param.key.add_form_to_host_screeny";
     constexpr const char* CPU_SCENE_ID_CONFIG_UPDATE  = "1";
+    constexpr const char* PARAM_DYNAMIC_NAME_KEY = "isDynamic";
 
     constexpr int32_t UNKNOWN = 0;
     // The form events type which means that the form becomes visible.
