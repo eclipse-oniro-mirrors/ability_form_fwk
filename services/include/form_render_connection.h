@@ -63,6 +63,8 @@ public:
 
     void UpdateWantParams(const WantParams &wantParams);
 
+    void UpdateFormRecord(const FormRecord &formRecord);
+
 private:
     enum class ConnectState {
         DISCONNECTED,
