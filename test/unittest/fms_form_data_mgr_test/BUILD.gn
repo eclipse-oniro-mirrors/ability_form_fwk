@@ -53,6 +53,7 @@ ohos_unittest("FmsFormDataMgrTest") {
     "form_fwk:form_manager",
     "hilog:libhilog",
     "ipc:ipc_core",
+    "jsoncpp:jsoncpp",
     "relational_store:native_rdb",
   ]
 }
