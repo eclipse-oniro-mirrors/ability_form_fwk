@@ -84,6 +84,7 @@ ErrCode FormRenderMgrInner::RenderForm(
         }
         std::shared_lock<std::shared_mutex> guard(renderRemoteObjMutex_);
         if (renderRemoteObj_ == nullptr) {
+            connection->UpdateFormRecord(formRecord);
             connection->UpdateWantParams(want.GetParams());
             ErrCode ret = ConnectRenderService(connection, formRecord.privacyLevel);
             HILOG_INFO("ret:%{public}d", ret);

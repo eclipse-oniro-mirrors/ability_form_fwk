@@ -1185,6 +1185,7 @@ bool FormRenderRecord::ReAddIfHapPathChanged(const std::vector<FormJsInfo> &form
     for (const auto &formJsInfo : formJsInfos) {
         auto iter = contextsMapForModuleName_.find(GenerateContextKey(formJsInfo));
         if (iter == contextsMapForModuleName_.end()) {
+            HILOG_WARN("no Context, bundle name is %{public}s", formJsInfo.bundleName.c_str());
             continue;
         }
 
@@ -1209,6 +1210,8 @@ bool FormRenderRecord::ReAddIfHapPathChanged(const std::vector<FormJsInfo> &form
         };
         eventHandler->PostSyncTask(task, "ReleaseAllRenderer");
         Release();
+        UpdateAllFormRequest(formJsInfos, true);
+        CreateEventHandler(bundleName_, true);
         ReAddRecycledForms(formJsInfos);
         return true;
     }
@@ -1217,18 +1220,40 @@ bool FormRenderRecord::ReAddIfHapPathChanged(const std::vector<FormJsInfo> &form
 
 void FormRenderRecord::HandleReleaseAllRendererInJsThread()
 {
-    bool isRenderGroupEmpty = false;
+    std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
+    MarkThreadAlive();
+    for (const auto& iter : formRendererGroupMap_) {
+        if (!iter.second) {
+            HILOG_ERROR("null rendererGroup");
+            continue;
+        }
+        int64_t formId = iter.first;
+        HILOG_INFO("Release renderer which formId:%{public}" PRId64, formId);
+        std::pair<std::vector<std::string>, std::string> compIds = iter.second->GetOrderedAndCurrentCompIds();
+        iter.second->DeleteForm();
+        {
+            std::lock_guard<std::mutex> lock(recycledFormCompIdsMutex_);
+            recycledFormCompIds_.erase(formId);
+            recycledFormCompIds_.emplace(formId, compIds);
+        }
+    }
+    formRendererGroupMap_.clear();
+}
+
+void FormRenderRecord::UpdateAllFormRequest(const std::vector<FormJsInfo> &formJsInfos, bool hasRelease)
+{
     std::lock_guard<std::mutex> lock(formRequestsMutex_);
-    for (auto& formRequests : formRequests_) {
-        auto formId = formRequests.first;
-        for (auto& formRequestElement : formRequests.second) {
-            auto compId = formRequestElement.first;
-            bool ret = HandleReleaseRendererInJsThread(formId, compId, isRenderGroupEmpty);
-            if (ret) {
-                formRequestElement.second.hasRelease = true;
-            } else {
-                HILOG_ERROR("release renderer error, skip update state, formId:%{public}" PRId64, formId);
-            }
+    for (const auto &formJsInfo : formJsInfos) {
+        auto iter = formRequests_.find(formJsInfo.formId);
+        if (iter == formRequests_.end()) {
+            HILOG_ERROR("%{public}" PRId64 " doesn't has formRequest", formJsInfo.formId);
+            continue;
+        }
+        for (auto& formRequestIter : iter->second) {
+            auto& formRequest = formRequestIter.second;
+            formRequest.isDynamic = formJsInfo.isDynamic;
+            formRequest.formJsInfo = formJsInfo;
+            formRequest.hasRelease = hasRelease;
         }
     }
 }

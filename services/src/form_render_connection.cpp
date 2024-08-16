@@ -101,5 +101,10 @@ void FormRenderConnection::UpdateWantParams(const WantParams &wantParams)
 {
     wantParams_ = wantParams;
 }
+
+void FormRenderConnection::UpdateFormRecord(const FormRecord &formRecord)
+{
+    formRecord_ = formRecord;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS
