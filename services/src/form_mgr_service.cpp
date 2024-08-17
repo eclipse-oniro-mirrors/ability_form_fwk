@@ -76,6 +76,7 @@ const int32_t MAIN_USER_ID = 100;
 constexpr int MILLISECOND_WIDTH = 3;
 constexpr char MILLISECOND_FILLCHAR = '0';
 const int32_t API_TIME_OUT = 5;
+const int32_t API_TIME_OUT_8S = 8;
 #ifdef RES_SCHEDULE_ENABLE
 constexpr int32_t SYSTEMLOADLEVEL_TIMERSTOP_THRESHOLD =
     static_cast<int32_t>(ResourceSchedule::ResType::SystemloadLevel::HIGH);
@@ -1003,7 +1004,7 @@ int FormMgrService::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_GetAllFormsInfo",
-        API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
+        API_TIME_OUT_8S, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
     ErrCode ret = FormMgrAdapter::GetInstance().GetAllFormsInfo(formInfos);
     HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
     return ret;

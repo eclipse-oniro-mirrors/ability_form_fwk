@@ -127,6 +127,7 @@ private:
     static bool IsCaller(const std::string& bundleName);
     static bool CheckBundlePermission();
     static ErrCode CheckDynamicFormInfo(FormInfo &formInfo, const BundleInfo &bundleInfo);
+    static ErrCode GetFormBundleNames(std::set<std::string> &bundleNameSet, int32_t userId);
 
     mutable std::shared_timed_mutex bundleFormInfoMapMutex_ {};
     std::unordered_map<std::string, std::shared_ptr<BundleFormInfo>> bundleFormInfoMap_ {};
