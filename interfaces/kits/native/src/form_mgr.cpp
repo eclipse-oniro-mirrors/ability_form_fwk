@@ -340,7 +340,7 @@ int FormMgr::NotifyWhetherVisibleForms(
  */
 bool FormMgr::HasFormVisible(const uint32_t tokenId)
 {
-    HILOG_INFO("call");
+    HILOG_DEBUG("call");
     int errCode = Connect();
     if (errCode != ERR_OK) {
         HILOG_ERROR("errCode:%{public}d", errCode);

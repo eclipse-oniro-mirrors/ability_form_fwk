@@ -475,7 +475,7 @@ bool JsFormProvider::ConvertFromDataProxies(napi_env env, napi_value value,
     bool result = false;
     napi_is_array(env, value, &result);
     if (value == nullptr || !result) {
-        HILOG_ERROR("null jsValue not array");
+        HILOG_WARN("null jsValue not array");
         return false;
     }
 
@@ -500,7 +500,7 @@ bool JsFormProvider::ConvertFormDataProxy(napi_env env, napi_value value,
     napi_valuetype valueType = napi_undefined;
     napi_typeof(env, value, &valueType);
     if (value == nullptr || valueType != napi_object) {
-        HILOG_ERROR("null jsValue,not object");
+        HILOG_WARN("null jsValue,not object");
         return false;
     }
 
