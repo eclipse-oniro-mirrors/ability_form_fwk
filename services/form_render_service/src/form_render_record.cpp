@@ -684,6 +684,7 @@ void FormRenderRecord::HandleUpdateForm(const FormJsInfo &formJsInfo, const Want
         std::lock_guard<std::mutex> lock(formRequestsMutex_);
         auto iter = formRequests_.find(formJsInfo.formId);
         if (iter == formRequests_.end()) {
+            HILOG_WARN("Without this form: %{public}" PRId64 "", formJsInfo.formId);
             return;
         }
 
@@ -1002,6 +1003,7 @@ void FormRenderRecord::Release()
     }
 
     eventHandler_.reset();
+    contextsMapForModuleName_.clear();
 }
 
 void FormRenderRecord::HandleReleaseInJsThread()
@@ -1134,8 +1136,12 @@ inline std::string FormRenderRecord::GenerateContextKey(const FormJsInfo &formJs
 int32_t FormRenderRecord::ReloadFormRecord(const std::vector<FormJsInfo> &&formJsInfos, const Want &want)
 {
     HILOG_INFO("Reload form record");
-    std::lock_guard<std::mutex> lock(eventHandlerMutex_);
-    if (eventHandler_ == nullptr) {
+    std::shared_ptr<EventHandler> eventHandler = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(eventHandlerMutex_);
+        eventHandler = eventHandler_;
+    }
+    if (eventHandler == nullptr) {
         if (!CheckEventHandler(true, true)) {
             HILOG_ERROR("null eventHandler");
             return RELOAD_FORM_FAILED;
@@ -1145,6 +1151,10 @@ int32_t FormRenderRecord::ReloadFormRecord(const std::vector<FormJsInfo> &&formJ
         return ERR_OK;
     }
 
+    if (ReAddIfHapPathChanged(formJsInfos)) {
+        return ERR_OK;
+    }
+    
     std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
     auto task = [thisWeakPtr, ids = std::forward<decltype(formJsInfos)>(formJsInfos), want]() {
         HILOG_DEBUG("HandleReloadFormRecord begin");
@@ -1155,9 +1165,72 @@ int32_t FormRenderRecord::ReloadFormRecord(const std::vector<FormJsInfo> &&formJ
         }
         renderRecord->HandleReloadFormRecord(std::move(ids), want);
     };
-    eventHandler_->PostTask(task, "ReloadFormRecord");
+    eventHandler->PostTask(task, "ReloadFormRecord");
     ReAddRecycledForms(formJsInfos);
     return ERR_OK;
+}
+
+bool FormRenderRecord::ReAddIfHapPathChanged(const std::vector<FormJsInfo> &formJsInfos)
+{
+    std::shared_ptr<EventHandler> eventHandler = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(eventHandlerMutex_);
+        eventHandler = eventHandler_;
+    }
+    if (eventHandler == nullptr) {
+        HILOG_ERROR("eventHandler is nullptr");
+        return false;
+    }
+    std::lock_guard<std::mutex> lock(contextsMapMutex_);
+    for (const auto &formJsInfo : formJsInfos) {
+        auto iter = contextsMapForModuleName_.find(GenerateContextKey(formJsInfo));
+        if (iter == contextsMapForModuleName_.end()) {
+            continue;
+        }
+
+        if (iter->second == nullptr) {
+            HILOG_WARN("Context is nullptr, bundle name is %{public}s", formJsInfo.bundleName.c_str());
+            continue;
+        }
+        auto hapModuleInfo = iter->second->GetHapModuleInfo();
+        if (hapModuleInfo == nullptr || hapModuleInfo->hapPath == formJsInfo.jsFormCodePath) {
+            continue;
+        }
+        HILOG_INFO("hap path changed: %{public}s. current:%{public}s", formJsInfo.jsFormCodePath.c_str(),
+            hapModuleInfo->hapPath.c_str());
+        auto task = [weak = weak_from_this()]() {
+            auto renderRecord = weak.lock();
+            if (renderRecord == nullptr) {
+                HILOG_ERROR("renderRecord is null");
+                return;
+            }
+            FormMemoryGuard memoryGuard;
+            renderRecord->HandleReleaseAllRendererInJsThread();
+        };
+        eventHandler->PostSyncTask(task, "ReleaseAllRenderer");
+        Release();
+        ReAddRecycledForms(formJsInfos);
+        return true;
+    }
+    return false;
+}
+
+void FormRenderRecord::HandleReleaseAllRendererInJsThread()
+{
+    bool isRenderGroupEmpty = false;
+    std::lock_guard<std::mutex> lock(formRequestsMutex_);
+    for (auto& formRequests : formRequests_) {
+        auto formId = formRequests.first;
+        for (auto& formRequestElement : formRequests.second) {
+            auto compId = formRequestElement.first;
+            bool ret = HandleReleaseRendererInJsThread(formId, compId, isRenderGroupEmpty);
+            if (ret) {
+                formRequestElement.second.hasRelease = true;
+            } else {
+                HILOG_ERROR("release renderer error, skip update state, formId:%{public}" PRId64, formId);
+            }
+        }
+    }
 }
 
 int32_t FormRenderRecord::OnUnlock()

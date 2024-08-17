@@ -94,6 +94,7 @@ void FormInfoStorage::GetFormsInfoByFilter(int32_t userId,
             continue;
         }
         if (filter.supportShapes.empty() && !find_rect_shape(item.supportShapes)) {
+            HILOG_WARN("Empty spport shape, without rect shape");
             continue;
         }
         if (!filter.supportShapes.empty() && !find_match_shapes(filter.supportShapes, item.supportShapes)) {

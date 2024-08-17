@@ -15,6 +15,8 @@
 
 #include "form_event_util.h"
 
+#include <regex>
+
 #include "fms_log_wrapper.h"
 #include "form_bms_helper.h"
 #include "form_cache_mgr.h"
@@ -32,6 +34,35 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+namespace {
+void UpdateRecordByBundleInfo(const BundleInfo &bundleInfo, FormRecord &formRecord)
+{
+    if (!bundleInfo.hapModuleInfos.empty()) {
+        for (auto hapModuleInfo : bundleInfo.hapModuleInfos) {
+            auto hapPath = hapModuleInfo.hapPath;
+            auto moduleName = hapModuleInfo.moduleName;
+            HILOG_DEBUG("update record %{public}" PRId64 ". packageName is %{public}s, hap path is %{public}s",
+                formRecord.formId, hapModuleInfo.packageName.c_str(), hapPath.c_str());
+            if (hapPath.find(Constants::ABS_CODE_PATH) != std::string::npos) {
+                hapPath = std::regex_replace(hapPath, std::regex(Constants::ABS_CODE_PATH), Constants::LOCAL_BUNDLES);
+            }
+            nlohmann::json moduleInfos = {
+                {Constants::MODULE_PKG_NAME_KEY, hapModuleInfo.packageName},
+                {Constants::MODULE_HAP_PATH_KEY, hapPath}
+            };
+            formRecord.modulePkgNameMap.emplace(std::make_pair(moduleName, moduleInfos.dump()));
+            formRecord.jsFormCodePath = hapPath;
+        }
+    }
+
+    formRecord.hapSourceDirs.clear();
+    for (const auto &item : bundleInfo.applicationInfo.moduleInfos) {
+        if (formRecord.moduleName == item.moduleName) {
+            formRecord.hapSourceDirs.emplace_back(item.moduleSourceDir);
+        }
+    }
+}
+}
 void FormEventUtil::HandleBundleFormInfoChanged(const std::string &bundleName, int32_t userId)
 {
     FormTrustMgr::GetInstance().MarkTrustFlag(bundleName, true);
@@ -58,16 +89,21 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
 
     BundlePackInfo bundlePackInfo;
     bool hasPackInfo = FormBmsHelper::GetInstance().GetBundlePackInfo(bundleName, userId, bundlePackInfo);
+    BundleInfo bundleInfo;
+    if (FormBmsHelper::GetInstance().GetBundleInfoV9(bundleName, userId, bundleInfo) != ERR_OK) {
+        HILOG_ERROR("bundle update, failed to get bundle info.");
+        return;
+    }
     std::vector<int64_t> removedForms;
     std::vector<FormRecord> updatedForms;
     for (FormRecord& formRecord : formInfos) {
-        HILOG_INFO("provider update, formName:%{public}s", formRecord.formName.c_str());
+        HILOG_INFO("bundle update, formName:%{public}s", formRecord.formName.c_str());
         int64_t formId = formRecord.formId;
-        if (ProviderFormUpdated(formId, formRecord, targetForms)) {
+        if (ProviderFormUpdated(formId, formRecord, targetForms, bundleInfo)) {
             updatedForms.emplace_back(formRecord);
             continue;
         }
-        if (hasPackInfo && ProviderFormUpdated(formId, formRecord, bundlePackInfo)) {
+        if (hasPackInfo && ProviderFormUpdated(formId, formRecord, bundlePackInfo, bundleInfo)) {
             updatedForms.emplace_back(formRecord);
             continue;
         }
@@ -188,7 +224,7 @@ void FormEventUtil::HandleFormHostDataCleared(const int uid)
 }
 
 bool FormEventUtil::ProviderFormUpdated(const int64_t formId, FormRecord &formRecord,
-    const std::vector<FormInfo> &targetForms)
+    const std::vector<FormInfo> &targetForms, const BundleInfo &bundleInfo)
 {
     HILOG_INFO("start");
     if (targetForms.empty()) {
@@ -211,13 +247,14 @@ bool FormEventUtil::ProviderFormUpdated(const int64_t formId, FormRecord &formRe
     FormTimerCfg timerCfg;
     GetTimerCfg(updatedForm.updateEnabled, updatedForm.updateDuration, updatedForm.scheduledUpdateTime, timerCfg);
     HandleTimerUpdate(formId, formRecord, timerCfg);
+    UpdateRecordByBundleInfo(bundleInfo, formRecord);
     UpdateFormRecord(updatedForm, formRecord);
     FormDataMgr::GetInstance().SetVersionUpgrade(formId, true);
     return true;
 }
 
 bool FormEventUtil::ProviderFormUpdated(const int64_t formId, FormRecord &formRecord,
-    const BundlePackInfo &bundlePackInfo)
+    const BundlePackInfo &bundlePackInfo, const BundleInfo &bundleInfo)
 {
     HILOG_INFO("start");
     AbilityFormInfo packForm;
@@ -231,6 +268,7 @@ bool FormEventUtil::ProviderFormUpdated(const int64_t formId, FormRecord &formRe
     FormTimerCfg timerCfg;
     GetTimerCfg(packForm.updateEnabled, packForm.updateDuration, packForm.scheduledUpdateTime, timerCfg);
     HandleTimerUpdate(formId, formRecord, timerCfg);
+    UpdateRecordByBundleInfo(bundleInfo, formRecord);
     UpdateFormRecord(packForm, formRecord);
     FormDataMgr::GetInstance().SetVersionUpgrade(formId, true);
     return true;
