@@ -35,7 +35,7 @@ int ProviderConnectStub::OnRemoteRequest(
     std::u16string descriptor = ProviderConnectStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
     if (descriptor != remoteDescriptor) {
-        HILOG_INFO("failed, local descriptor is not equal to remote");
+        HILOG_INFO("fail,localDescriptor not equal to remote");
         return ERR_INVALID_STATE;
     }
 
@@ -43,7 +43,7 @@ int ProviderConnectStub::OnRemoteRequest(
     switch (code) {
         case IAbilityConnection::ON_ABILITY_CONNECT_DONE: {
             if (element == nullptr) {
-                HILOG_ERROR("%{public}s failed, callback stub receive element is nullptr", __func__);
+                HILOG_ERROR("null element");
                 return ERR_APPEXECFWK_PARCEL_ERROR;
             }
             sptr<IRemoteObject> remoteObject = nullptr;
@@ -57,7 +57,7 @@ int ProviderConnectStub::OnRemoteRequest(
         }
         case IAbilityConnection::ON_ABILITY_DISCONNECT_DONE: {
             if (element == nullptr) {
-                HILOG_ERROR("%{public}s failed, callback stub receive element is nullptr", __func__);
+                HILOG_ERROR("null element");
                 return ERR_APPEXECFWK_PARCEL_ERROR;
             }
             auto resultCode = data.ReadInt32();

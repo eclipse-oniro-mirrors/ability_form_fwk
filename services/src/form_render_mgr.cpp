@@ -73,7 +73,7 @@ void FormRenderMgr::GetFormRenderState()
 
 bool FormRenderMgr::GetIsVerified() const
 {
-    HILOG_DEBUG("GetIsVerified.");
+    HILOG_DEBUG("GetIsVerified");
     std::lock_guard<std::mutex> lock(isVerifiedMutex_);
     return isVerified_;
 }
@@ -83,12 +83,12 @@ ErrCode FormRenderMgr::RenderForm(
 {
     HILOG_INFO("formId:%{public}" PRId64, formRecord.formId);
     GetFormRenderState();
-    HILOG_INFO("the current user authentication status:%{public}d, %{public}d", isVerified_, isScreenUnlocked_);
+    HILOG_INFO("the current user authentication status:%{public}d,%{public}d", isVerified_, isScreenUnlocked_);
     if (formRecord.uiSyntax != FormType::ETS) {
         return ERR_OK;
     }
     if (formRecord.formId <= 0) {
-        HILOG_ERROR("%{public}s fail, formId should be greater than 0.", __func__);
+        HILOG_ERROR("formId not greater than 0");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
@@ -113,12 +113,12 @@ ErrCode FormRenderMgr::RenderForm(
 ErrCode FormRenderMgr::UpdateRenderingForm(int64_t formId, const FormProviderData &formProviderData,
     const WantParams &wantParams, bool mergeData)
 {
-    HILOG_INFO("update formId:%{public}" PRId64 ", %{public}zu", formId, formProviderData.GetDataString().length());
+    HILOG_INFO("update formId:%{public}" PRId64 ",%{public}zu", formId, formProviderData.GetDataString().length());
 
     FormRecord formRecord;
     bool isGetFormRecord = FormDataMgr::GetInstance().GetFormRecord(formId, formRecord);
     if (!isGetFormRecord) {
-        HILOG_ERROR("%{public}s fail, not exist such form, formId:%{public}" PRId64 "", __func__, formId);
+        HILOG_ERROR("get FormRecord fail, not exist such form, formId:%{public}" PRId64 "", formId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
     if (formRecord.privacyLevel > 0) {
@@ -137,7 +137,7 @@ ErrCode FormRenderMgr::UpdateRenderingForm(int64_t formId, const FormProviderDat
 ErrCode FormRenderMgr::ReloadForm(
     const std::vector<FormRecord> &&formRecords, const std::string &bundleName, int32_t userId)
 {
-    HILOG_DEBUG("called");
+    HILOG_DEBUG("call");
     std::vector<FormRecord> sandboxRecords;
     std::vector<FormRecord> normalRecords;
     for (const auto &record : formRecords) {
@@ -168,7 +168,7 @@ void FormRenderMgr::PostOnUnlockTask()
 
 void FormRenderMgr::AddAcquireProviderFormInfoTask(std::function<void()> task)
 {
-    HILOG_DEBUG("called");
+    HILOG_DEBUG("call");
     std::lock_guard<std::mutex> lock(taskQueueMutex_);
     taskQueue_.push(task);
 }
@@ -197,7 +197,7 @@ void FormRenderMgr::NotifyScreenOn()
 
 void FormRenderMgr::OnScreenUnlock()
 {
-    HILOG_INFO("OnScreenUnlock called. %{public}d, %{public}d", isVerified_, isScreenUnlocked_);
+    HILOG_INFO("call. %{public}d,%{public}d", isVerified_, isScreenUnlocked_);
     if (isScreenUnlocked_) {
         return;
     }
@@ -212,7 +212,7 @@ void FormRenderMgr::OnScreenUnlock()
 
 void FormRenderMgr::OnUnlock()
 {
-    HILOG_INFO("OnUserUnlock called. %{public}d, %{public}d", isVerified_, isScreenUnlocked_);
+    HILOG_INFO("call. %{public}d,%{public}d", isVerified_, isScreenUnlocked_);
     if (isVerified_) {
         return;
     }
@@ -230,7 +230,7 @@ void FormRenderMgr::OnUnlock()
 ErrCode FormRenderMgr::StopRenderingForm(
     int64_t formId, const FormRecord &formRecord, const std::string &compId, const sptr<IRemoteObject> &hostToken)
 {
-    HILOG_DEBUG("%{public}s called.", __func__);
+    HILOG_DEBUG("call");
     if (formRecord.privacyLevel > 0) {
         if (sandboxInner_ == nullptr) {
             return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -246,7 +246,7 @@ ErrCode FormRenderMgr::StopRenderingForm(
 
 ErrCode FormRenderMgr::RenderFormCallback(int64_t formId, const Want &want)
 {
-    HILOG_DEBUG("%{public}s called.", __func__);
+    HILOG_DEBUG("call");
     return ERR_OK;
 }
 
@@ -264,7 +264,7 @@ ErrCode FormRenderMgr::StopRenderingFormCallback(int64_t formId, const Want &wan
 
 ErrCode FormRenderMgr::ReleaseRenderer(int64_t formId, const FormRecord &formRecord, const std::string &compId)
 {
-    HILOG_DEBUG("%{public}s called.", __func__);
+    HILOG_DEBUG("call");
     if (formRecord.privacyLevel > 0) {
         if (sandboxInner_ == nullptr) {
             return ERR_APPEXECFWK_FORM_INVALID_PARAM;
@@ -357,11 +357,11 @@ bool FormRenderMgr::IsNeedRender(int64_t formId)
     FormRecord formRecord;
     bool isGetFormRecord = FormDataMgr::GetInstance().GetFormRecord(formId, formRecord);
     if (!isGetFormRecord) {
-        HILOG_ERROR("%{public}s fail, not exist such form, formId:%{public}" PRId64 "", __func__, formId);
+        HILOG_ERROR("not exist such form, formId:%{public}" PRId64 "", formId);
         return false;
     }
     if (formRecord.uiSyntax != FormType::ETS) {
-        HILOG_DEBUG("%{public}s fail, no need render, formId:%{public}" PRId64 "", __func__, formId);
+        HILOG_DEBUG("no need render, formId:%{public}" PRId64 "", formId);
         return false;
     }
     return true;
@@ -369,14 +369,14 @@ bool FormRenderMgr::IsNeedRender(int64_t formId)
 
 void FormRenderMgr::HandleConnectFailed(int64_t formId, int32_t errorCode) const
 {
-    HILOG_ERROR("Connect render service failed, formId: %{public}" PRId64 ", errorCode: %{public}d",
+    HILOG_ERROR("Connect render service failed, formId:%{public}" PRId64 ", errorCode:%{public}d",
         formId, errorCode);
     std::vector<sptr<IRemoteObject>> formHostObjs;
     FormDataMgr::GetInstance().GetFormHostRemoteObj(formId, formHostObjs);
     for (const auto &host : formHostObjs) {
         auto hostClient = iface_cast<IFormHost>(host);
         if (hostClient == nullptr) {
-            HILOG_ERROR("hostClient is nullptr");
+            HILOG_ERROR("null hostClient");
             continue;
         }
         hostClient->OnError(errorCode, "Connect FormRenderService failed");
@@ -394,7 +394,7 @@ bool FormRenderMgr::IsRerenderForRenderServiceDied(int64_t formId)
         reSandboxRenderCount = sandboxInner_->GetReRenderCount();
     }
     bool ret = IsNeedRender(formId) && (rerenderCount > 0 || reSandboxRenderCount > 0);
-    HILOG_DEBUG("Is need to rerender: %{public}d.", ret);
+    HILOG_DEBUG("Is need to rerender:%{public}d", ret);
     return ret;
 }
 

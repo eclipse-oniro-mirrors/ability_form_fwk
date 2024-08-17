@@ -26,17 +26,17 @@ const std::string NAME_FORM_CALLER_MGR = "FormCallerMgr";
 }
 FormCallerMgr::FormCallerMgr()
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("call");
 }
 
 FormCallerMgr::~FormCallerMgr()
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("call");
 }
 
 void FormCallerMgr::AddFormHostCaller(const FormJsInfo &formJsInfo, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("%{public}s called", __func__);
+    HILOG_DEBUG("call");
     std::lock_guard<std::mutex> lock(formHostCallerMutex_);
     std::shared_ptr<FormHostCaller> caller = std::make_shared<FormHostCaller>(formJsInfo, callerToken);
     formHostCallers_[formJsInfo.formId] = caller;
@@ -46,7 +46,7 @@ void FormCallerMgr::AddFormHostCaller(const FormJsInfo &formJsInfo, const sptr<I
             FormCallerMgr::GetInstance().OnHostCallBackDied(remote);
         });
     if (deathRecipient == nullptr) {
-        HILOG_ERROR("%{public}s fail, create FormHostCallerRecipient error", __func__);
+        HILOG_ERROR("create FormHostCallerRecipient error");
     } else {
         caller->AddDeathRecipient(deathRecipient);
     }
@@ -54,7 +54,7 @@ void FormCallerMgr::AddFormHostCaller(const FormJsInfo &formJsInfo, const sptr<I
 
 std::shared_ptr<FormHostCaller> FormCallerMgr::GetFormHostCaller(int64_t formId)
 {
-    HILOG_DEBUG("%{public}s called", __func__);
+    HILOG_DEBUG("call");
     std::lock_guard<std::mutex> lock(formHostCallerMutex_);
     auto iter = formHostCallers_.find(formId);
     if (iter == formHostCallers_.end()) {
@@ -65,7 +65,7 @@ std::shared_ptr<FormHostCaller> FormCallerMgr::GetFormHostCaller(int64_t formId)
 
 void FormCallerMgr::RemoveFormHostCaller(int64_t formId)
 {
-    HILOG_DEBUG("%{public}s called", __func__);
+    HILOG_DEBUG("call");
     std::lock_guard<std::mutex> lock(formHostCallerMutex_);
     formHostCallers_.erase(formId);
 }
@@ -73,7 +73,7 @@ void FormCallerMgr::RemoveFormHostCaller(int64_t formId)
 
 void FormCallerMgr::RemoveFormHostCaller(const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("%{public}s called", __func__);
+    HILOG_DEBUG("call");
     std::lock_guard<std::mutex> lock(formHostCallerMutex_);
     for (auto iter = formHostCallers_.begin(); iter != formHostCallers_.end();) {
         if (iter->second != nullptr && iter->second->IsSameToken(callerToken)) {
@@ -86,10 +86,10 @@ void FormCallerMgr::RemoveFormHostCaller(const sptr<IRemoteObject> &callerToken)
 
 void FormCallerMgr::OnHostCallBackDied(const wptr<IRemoteObject> &remote)
 {
-    HILOG_DEBUG("%{public}s called", __func__);
+    HILOG_DEBUG("call");
     auto object = remote.promote();
     if (object == nullptr) {
-        HILOG_ERROR("remote object is nullptr");
+        HILOG_ERROR("null object");
         return;
     }
     auto hostCallBackDiedFunc = [object]() {
@@ -107,7 +107,7 @@ void FormCallerMgr::HandleHostCallBackDiedTask(const sptr<IRemoteObject> &remote
 
 void FormCallerMgr::AddFormProviderCaller(const FormJsInfo &formJsInfo, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("%{public}s called", __func__);
+    HILOG_DEBUG("call");
     std::lock_guard<std::mutex> lock(formProviderCallerMutex_);
     for (const auto &formProviderCaller : formProviderCallers_) {
         if (formProviderCaller->IsSameToken(callerToken)) {
@@ -125,7 +125,7 @@ void FormCallerMgr::AddFormProviderCaller(const FormJsInfo &formJsInfo, const sp
             FormCallerMgr::GetInstance().OnProviderCallBackDied(remote);
         });
     if (deathRecipient == nullptr) {
-        HILOG_ERROR("%{public}s fail, create FormProviderCallerRecipient error", __func__);
+        HILOG_ERROR("create FormProviderCallerRecipient error");
     } else {
         caller->AddDeathRecipient(deathRecipient);
     }
@@ -134,7 +134,7 @@ void FormCallerMgr::AddFormProviderCaller(const FormJsInfo &formJsInfo, const sp
 void FormCallerMgr::GetFormProviderCaller(int64_t formId,
     std::vector<std::shared_ptr<FormProviderCaller>> &formProviderCallers)
 {
-    HILOG_DEBUG("%{public}s called", __func__);
+    HILOG_DEBUG("call");
     std::lock_guard<std::mutex> lock(formProviderCallerMutex_);
     for (const auto &formProviderCaller : formProviderCallers_) {
         if (formProviderCaller->HasForm(formId)) {
@@ -145,7 +145,7 @@ void FormCallerMgr::GetFormProviderCaller(int64_t formId,
 
 void FormCallerMgr::RemoveFormProviderCaller(int64_t formId, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("%{public}s called", __func__);
+    HILOG_DEBUG("call");
     std::lock_guard<std::mutex> lock(formProviderCallerMutex_);
     for (auto iter = formProviderCallers_.begin(); iter != formProviderCallers_.end(); ++iter) {
         if ((*iter)->IsSameToken(callerToken)) {
@@ -161,7 +161,7 @@ void FormCallerMgr::RemoveFormProviderCaller(int64_t formId, const sptr<IRemoteO
 
 void FormCallerMgr::RemoveFormProviderCaller(const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("%{public}s called", __func__);
+    HILOG_DEBUG("call");
     std::lock_guard<std::mutex> lock(formProviderCallerMutex_);
     for (auto iter = formProviderCallers_.begin(); iter != formProviderCallers_.end();) {
         if ((*iter)->IsSameToken(callerToken)) {
@@ -174,10 +174,10 @@ void FormCallerMgr::RemoveFormProviderCaller(const sptr<IRemoteObject> &callerTo
 
 void FormCallerMgr::OnProviderCallBackDied(const wptr<IRemoteObject> &remote)
 {
-    HILOG_DEBUG("%{public}s called", __func__);
+    HILOG_DEBUG("call");
     auto object = remote.promote();
     if (object == nullptr) {
-        HILOG_ERROR("remote object is nullptr");
+        HILOG_ERROR("null object");
         return;
     }
     auto providerCallBackDiedFunc = [object]() {
@@ -195,17 +195,17 @@ void FormCallerMgr::HandleProviderCallBackDiedTask(const sptr<IRemoteObject> &re
 
 std::shared_ptr<EventHandler> FormCallerMgr::GetEventHandler()
 {
-    HILOG_DEBUG("%{public}s called", __func__);
+    HILOG_DEBUG("call");
     if (eventHandler_ == nullptr) {
         auto runner = EventRunner::Create(NAME_FORM_CALLER_MGR);
         if (runner == nullptr) {
-            HILOG_ERROR("%{public}s fail, create runner error", __func__);
+            HILOG_ERROR("create runner error");
             return nullptr;
         }
 
         eventHandler_ = std::make_shared<EventHandler>(runner);
         if (eventHandler_ == nullptr) {
-            HILOG_ERROR("%{public}s fail, create event handler error", __func__);
+            HILOG_ERROR("create event handler error");
             return nullptr;
         }
     }

@@ -40,7 +40,7 @@ bool FormBundleForbidMgr::Init()
     formRdbTableConfig.createTableSql = "CREATE TABLE IF NOT EXISTS " +
         formRdbTableConfig.tableName + " (KEY TEXT NOT NULL PRIMARY KEY);";
     if (FormRdbDataMgr::GetInstance().InitFormRdbTable(formRdbTableConfig) != ERR_OK) {
-        HILOG_ERROR("Form bundle forbid mgr init form rdb table fail.");
+        HILOG_ERROR("Form bundle forbid mgr init form rdb table fail");
         return false;
     }
 
@@ -53,14 +53,14 @@ bool FormBundleForbidMgr::Init()
 bool FormBundleForbidMgr::IsBundleForbidden(const std::string &bundleName)
 {
     if (bundleName.empty()) {
-        HILOG_ERROR("Bundle name searched is invalid.");
+        HILOG_ERROR("invalid bundleName");
         return false;
     }
 
     {
         std::unique_lock<std::shared_mutex> lock(bundleForbiddenSetMutex_);
         if (!isInitialized_ && !Init()) {
-            HILOG_ERROR("Form bundle forbid mgr not init.");
+            HILOG_ERROR("Form bundle forbid mgr not init");
             return false;
         }
     }
@@ -73,13 +73,13 @@ bool FormBundleForbidMgr::IsBundleForbidden(const std::string &bundleName)
 void FormBundleForbidMgr::SetBundleForbiddenStatus(const std::string &bundleName, bool isForbidden)
 {
     if (bundleName.empty()) {
-        HILOG_ERROR("Bundle name searched is invalid.");
+        HILOG_ERROR("invalid bundleName");
         return;
     }
 
     std::unique_lock<std::shared_mutex> lock(bundleForbiddenSetMutex_);
     if (!isInitialized_ && !Init()) {
-        HILOG_ERROR("Form bundle forbid mgr not init.");
+        HILOG_ERROR("Form bundle forbid mgr not init");
         return;
     }
 

@@ -69,7 +69,7 @@ sptr<IFormEcologicalRule> FormEcologicalRuleClient::ConnectService()
 
     sptr<IFormEcologicalRule> it = iface_cast<IFormEcologicalRule>(systemAbility);
     if (it == nullptr) {
-        HILOG_ERROR("IFormEcologicalRule cast failed!");
+        HILOG_ERROR("IFormEcologicalRule cast failed");
         it = new FormEcologicalRuleProxy(systemAbility);
     }
 
@@ -100,7 +100,7 @@ int32_t FormEcologicalRuleClient::IsSupportPublishForm(const std::vector<OHOS::A
     HILOG_DEBUG("callerInfo = %{public}s", callerInfo.ToString().c_str());
     if (callerInfo.packageName.find_first_not_of(' ') == std::string::npos) {
         bSupport = true;
-        HILOG_DEBUG("callerInfo packageName is empty, bSupport = true");
+        HILOG_DEBUG("empty callerInfoPackageName,bSupport=true");
         return 0;
     }
     if (!CheckConnectService()) {
@@ -119,7 +119,7 @@ void FormEcologicalRuleDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &o
 int32_t FormEcologicalRuleProxy::IsSupportPublishForm(const std::vector<Want> &wants,
     const CallerInfo &callerInfo, bool &bSupport)
 {
-    HILOG_DEBUG("Called.");
+    HILOG_DEBUG("call");
     MessageParcel data;
     if (!data.WriteInterfaceToken(ERMS_INTERFACE_TOKEN)) {
         HILOG_ERROR("write token failed");

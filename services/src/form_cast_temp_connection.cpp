@@ -42,8 +42,8 @@ void FormCastTempConnection::OnAbilityConnectDone(
 {
     HILOG_INFO("call");
     if (resultCode != ERR_OK) {
-        HILOG_ERROR("%{public}s, abilityName:%{public}s, formId:%{public}" PRId64 ", resultCode:%{public}d",
-            __func__, element.GetAbilityName().c_str(), GetFormId(), resultCode);
+        HILOG_ERROR("abilityName:%{public}s, formId:%{public}" PRId64 ", resultCode:%{public}d",
+            element.GetAbilityName().c_str(), GetFormId(), resultCode);
         return;
     }
     onFormAppConnect();

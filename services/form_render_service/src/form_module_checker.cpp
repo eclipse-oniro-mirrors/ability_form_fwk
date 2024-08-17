@@ -88,7 +88,7 @@ bool FormModuleChecker::CheckModuleLoadable(const char *moduleName,
         }
         return true;
     }
-    HILOG_INFO("module can not load in form, module name = %{public}s", moduleName);
+    HILOG_INFO("module can't load in form,moduleName= %{public}s", moduleName);
     return false;
 }
 

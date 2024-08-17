@@ -22,7 +22,7 @@ namespace AppExecFwk {
 bool FormInfoFilter::Marshalling(Parcel &parcel) const
 {
     if (!parcel.WriteString16(Str8ToStr16(moduleName))) {
-        HILOG_ERROR("FormInfoFilter::Marshalling: failed to marshall moduleName");
+        HILOG_ERROR("marshall moduleNamen failed");
         return false;
     }
     return true;

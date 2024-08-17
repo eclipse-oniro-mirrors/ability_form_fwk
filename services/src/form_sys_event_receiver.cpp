@@ -48,7 +48,7 @@ FormSysEventReceiver::FormSysEventReceiver(const EventFwk::CommonEventSubscribeI
 void FormSysEventReceiver::HandleAbilityUpdate(const AAFwk::Want& want, std::string &bundleName)
 {
     if (!serialQueue_) {
-        HILOG_ERROR("serialQueue is nullptr");
+        HILOG_ERROR("null serialQueue");
         return;
     }
 
@@ -63,7 +63,7 @@ void FormSysEventReceiver::HandleAbilityUpdate(const AAFwk::Want& want, std::str
 void FormSysEventReceiver::HandlePackageDataCleared(std::string &bundleName, int32_t userId)
 {
     if (!serialQueue_) {
-        HILOG_ERROR("serialQueue is nullptr");
+        HILOG_ERROR("null serialQueue");
         return;
     }
 
@@ -76,7 +76,7 @@ void FormSysEventReceiver::HandlePackageDataCleared(std::string &bundleName, int
 void FormSysEventReceiver::HandleScreenUnlocked()
 {
     if (!serialQueue_) {
-        HILOG_ERROR("serialQueue is nullptr");
+        HILOG_ERROR("null serialQueue");
         return;
     }
 
@@ -89,7 +89,7 @@ void FormSysEventReceiver::HandleScreenUnlocked()
 void FormSysEventReceiver::HandleUserUnlocked()
 {
     if (!serialQueue_) {
-        HILOG_ERROR("serialQueue is nullptr");
+        HILOG_ERROR("null serialQueue");
         return;
     }
 
@@ -109,7 +109,7 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
     std::string action = want.GetAction();
     std::string bundleName = want.GetElement().GetBundleName();
     if (action.empty()) {
-        HILOG_ERROR("%{public}s failed, empty action", __func__);
+        HILOG_ERROR("empty action");
         return;
     }
     if (bundleName.empty() && action != EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED &&
@@ -118,12 +118,12 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
         action != EventFwk::CommonEventSupport::COMMON_EVENT_USER_UNLOCKED &&
         action != EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON &&
         action != EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED) {
-        HILOG_ERROR("%{public}s failed, invalid param, action: %{public}s, bundleName: %{public}s",
-            __func__, action.c_str(), bundleName.c_str());
+        HILOG_ERROR("invalid param, action:%{public}s, bundleName:%{public}s",
+            action.c_str(), bundleName.c_str());
         return;
     }
     if (serialQueue_ == nullptr) {
-        HILOG_ERROR("%{public}s fail, serialQueue_ invalidate.", __func__);
+        HILOG_ERROR("null serialQueue_");
         return;
     }
     HILOG_INFO("action:%{public}s", action.c_str());
@@ -149,7 +149,7 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
         HandleScreenOn();
     } else {
-        HILOG_WARN("%{public}s warnning, invalid action.", __func__);
+        HILOG_WARN("invalid action");
     }
 }
 
@@ -162,7 +162,7 @@ void FormSysEventReceiver::HandleUserIdRemoved(const int32_t userId)
     }
 
     if (!serialQueue_) {
-        HILOG_ERROR("serialQueue is nullptr");
+        HILOG_ERROR("null serialQueue");
         return;
     }
 
@@ -187,7 +187,7 @@ void FormSysEventReceiver::HandleBundleScanFinished()
 void FormSysEventReceiver::InitFormInfosAndRegister()
 {
     if (!serialQueue_) {
-        HILOG_ERROR("serialQueue is nullptr!");
+        HILOG_ERROR("null serialQueue");
         return;
     }
 
@@ -209,7 +209,7 @@ void FormSysEventReceiver::HandleUserSwitched(const EventFwk::CommonEventData &e
 {
     int32_t userId = eventData.GetCode();
     if (userId < 0) {
-        HILOG_ERROR("invalid switched userId: %{public}d", userId);
+        HILOG_ERROR("invalid switched userId:%{public}d", userId);
         return;
     }
 
@@ -217,10 +217,10 @@ void FormSysEventReceiver::HandleUserSwitched(const EventFwk::CommonEventData &e
         HILOG_INFO("main user id has reload");
         return;
     }
-    HILOG_INFO("switch to userId: (%{public}d)", userId);
+    HILOG_INFO("switch to userId:%{public}d", userId);
 
     if (!serialQueue_) {
-        HILOG_ERROR("serialQueue is nullptr");
+        HILOG_ERROR("null serialQueue");
         return;
     }
 
@@ -232,7 +232,7 @@ void FormSysEventReceiver::HandleUserSwitched(const EventFwk::CommonEventData &e
 void FormSysEventReceiver::HandleScreenOn()
 {
     if (!serialQueue_) {
-        HILOG_ERROR("serialQueue is nullptr");
+        HILOG_ERROR("null serialQueue");
         return;
     }
 

@@ -40,11 +40,11 @@ FormHostStub::~FormHostStub()
  */
 int FormHostStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    HILOG_INFO("code:%{public}u, flags:%{public}d.", code, option.GetFlags());
+    HILOG_INFO("code:%{public}u,flags:%{public}d", code, option.GetFlags());
     std::u16string descriptor = FormHostStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
     if (descriptor != remoteDescriptor) {
-        HILOG_ERROR("%{public}s failed, local describe is not equal to remote", __func__);
+        HILOG_ERROR("localDescribe not equal to remote");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
@@ -81,7 +81,7 @@ int FormHostStub::HandleAcquired(MessageParcel &data, MessageParcel &reply)
 {
     std::unique_ptr<FormJsInfo> formInfo(data.ReadParcelable<FormJsInfo>());
     if (!formInfo) {
-        HILOG_ERROR("%{public}s, failed to ReadParcelable<FormJsInfo>", __func__);
+        HILOG_ERROR("ReadParcelable<FormJsInfo> failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -104,7 +104,7 @@ int FormHostStub::HandleOnUpdate(MessageParcel &data, MessageParcel &reply)
 {
     std::unique_ptr<FormJsInfo> formInfo(data.ReadParcelable<FormJsInfo>());
     if (!formInfo) {
-        HILOG_ERROR("%{public}s, failed to ReadParcelable<FormJsInfo>", __func__);
+        HILOG_ERROR("ReadParcelable<FormJsInfo> failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     OnUpdate(*formInfo);
@@ -142,7 +142,7 @@ int FormHostStub::HandleOnAcquireState(MessageParcel &data, MessageParcel &reply
 
     std::unique_ptr<AAFwk::Want> want(data.ReadParcelable<AAFwk::Want>());
     if (!want) {
-        HILOG_ERROR("%{public}s, failed to ReadParcelable<Want>", __func__);
+        HILOG_ERROR("ReadParcelable<Want> failed");
         reply.WriteInt32(ERR_APPEXECFWK_PARCEL_ERROR);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
@@ -176,13 +176,13 @@ int32_t FormHostStub::HandleOnAcquireDataResponse(MessageParcel &data, MessagePa
 {
     std::shared_ptr<AAFwk::WantParams> wantParams(data.ReadParcelable<AAFwk::WantParams>());
     if (wantParams == nullptr) {
-        HILOG_ERROR("failed to ReadParcelable<wantParams>");
+        HILOG_ERROR("ReadParcelable<wantParams> failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     auto requestCode = data.ReadInt64();
     if (requestCode <= 0) {
-        HILOG_ERROR("failed to ReadInt64<requestCode>");
+        HILOG_ERROR("fail ReadInt64<requestCode>");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
@@ -204,7 +204,7 @@ int32_t FormHostStub::HandleOnEnableForm(MessageParcel &data, MessageParcel &rep
     std::vector<int64_t> formIds;
     bool ret = data.ReadInt64Vector(&formIds);
     if (!ret) {
-        HILOG_ERROR("failed to ReadInt64Vector<formIds>");
+        HILOG_ERROR("fail ReadInt64Vector<formIds>");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     bool enable = data.ReadBool();

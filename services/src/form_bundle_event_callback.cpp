@@ -43,7 +43,7 @@ void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eve
     int userId = want.GetIntParam(KEY_USER_ID, 0);
     // verify data
     if (action.empty() || bundleName.empty()) {
-        HILOG_ERROR("%{public}s failed, empty action/bundleName", __func__);
+        HILOG_ERROR("empty action/bundleName");
         return;
     }
 

@@ -33,14 +33,14 @@ void FormRouterProxyMgr::SetDeathRecipient(const sptr<IRemoteObject> &callerToke
         deathRecipients_.emplace(callerToken, deathRecipient);
         callerToken->AddDeathRecipient(deathRecipient);
     } else {
-        HILOG_DEBUG("The deathRecipient has been added.");
+        HILOG_DEBUG("The deathRecipient has been added");
     }
 }
 
 ErrCode FormRouterProxyMgr::SetFormRouterProxy(const std::vector<int64_t> &formIds,
     const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("call");
     std::lock_guard<std::mutex> lock(formRouterProxyMutex_);
     for (const auto &formId : formIds) {
         auto iter = formRouterProxyMap_.find(formId);
@@ -52,7 +52,7 @@ ErrCode FormRouterProxyMgr::SetFormRouterProxy(const std::vector<int64_t> &formI
     }
     auto dealthRecipient = new (std::nothrow) FormRouterProxyMgr::ClientDeathRecipient();
     if (dealthRecipient == nullptr) {
-        HILOG_ERROR("Failed to create FormRouterProxyMgr::ClientDealthRecipient");
+        HILOG_ERROR("create ClientDealthRecipient failed");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     SetDeathRecipient(callerToken, dealthRecipient);
@@ -61,7 +61,7 @@ ErrCode FormRouterProxyMgr::SetFormRouterProxy(const std::vector<int64_t> &formI
 
 ErrCode FormRouterProxyMgr::RemoveFormRouterProxy(const std::vector<int64_t> &formIds)
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("call");
     for (int64_t formId : formIds) {
         std::lock_guard<std::mutex> lock(formRouterProxyMutex_);
         auto formRouterProxys = formRouterProxyMap_.find(formId);
@@ -76,14 +76,14 @@ ErrCode FormRouterProxyMgr::RemoveFormRouterProxy(const std::vector<int64_t> &fo
 
 bool FormRouterProxyMgr::HasRouterProxy(int64_t formId)
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("call");
     std::lock_guard<std::mutex> lock(formRouterProxyMutex_);
     return formRouterProxyMap_.find(formId) != formRouterProxyMap_.end();
 }
 
 void FormRouterProxyMgr::OnFormRouterEvent(int64_t formId, const Want &want)
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("call");
     if (!HasRouterProxy(formId)) {
         HILOG_WARN("This form no formRouterProxy has been register");
         return;
@@ -103,7 +103,7 @@ void FormRouterProxyMgr::CleanResource(const wptr<IRemoteObject> &remote)
     // Clean the formRouterProxyMap_.
     auto object = remote.promote();
     if (object == nullptr) {
-        HILOG_ERROR("Remote object is nullptr");
+        HILOG_ERROR("null remoteObject");
         return;
     }
     std::lock_guard<std::mutex> lock(formRouterProxyMutex_);

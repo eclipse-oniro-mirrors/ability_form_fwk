@@ -35,7 +35,7 @@ int FormProviderClient::AcquireProviderFormInfo(
     const Want &want,
     const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("call");
 
     Want newWant(want);
     newWant.SetParam(Constants::ACQUIRE_TYPE, want.GetIntParam(Constants::ACQUIRE_TYPE, 0));
@@ -45,16 +45,16 @@ int FormProviderClient::AcquireProviderFormInfo(
     newWant.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, std::to_string(formJsInfo.formId));
     std::shared_ptr<Ability> ownerAbility = GetOwner();
     if (ownerAbility == nullptr) {
-        HILOG_ERROR("Owner is nullptr.");
+        HILOG_ERROR("null Owner");
         FormProviderInfo formProviderInfo;
         newWant.SetParam(Constants::PROVIDER_FLAG, ERR_APPEXECFWK_FORM_NO_SUCH_ABILITY);
         return HandleAcquire(formProviderInfo, newWant, callerToken);
     }
 
-    HILOG_INFO("AbilityName:%{public}s.", ownerAbility->GetAbilityName().c_str());
+    HILOG_INFO("AbilityName:%{public}s", ownerAbility->GetAbilityName().c_str());
 
     if (!CheckIsSystemApp()) {
-        HILOG_WARN("Permission denied.");
+        HILOG_WARN("Permission denied");
         FormProviderInfo formProviderInfo;
         newWant.SetParam(Constants::PROVIDER_FLAG, ERR_APPEXECFWK_FORM_PERMISSION_DENY);
         return HandleAcquire(formProviderInfo, newWant, callerToken);
@@ -78,7 +78,7 @@ int FormProviderClient::AcquireProviderFormInfo(
         createWant.SetParam(Constants::PARAM_FORM_CUSTOMIZE_KEY, customizeData);
     }
     FormProviderInfo formProviderInfo = ownerAbility->OnCreate(createWant);
-    HILOG_DEBUG("formId: %{public}" PRId64 ", data: %{private}s", formJsInfo.formId,
+    HILOG_DEBUG("formId:%{public}" PRId64 ", data: %{private}s", formJsInfo.formId,
         formProviderInfo.GetFormDataString().c_str());
     if (newWant.HasParameter(Constants::PARAM_FORM_HOST_TOKEN)) {
         HandleRemoteAcquire(formJsInfo, formProviderInfo, newWant, AsObject());
@@ -88,7 +88,7 @@ int FormProviderClient::AcquireProviderFormInfo(
 
 int FormProviderClient::NotifyFormDelete(const int64_t formId, const Want &want, const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("call");
 
     // The error code for business operation.
     int errorCode = ERR_OK;
@@ -101,7 +101,7 @@ int FormProviderClient::NotifyFormDelete(const int64_t formId, const Want &want,
 
         std::shared_ptr<Ability> ownerAbility = GetOwner();
         if (ownerAbility == nullptr) {
-            HILOG_ERROR("Owner is null.");
+            HILOG_ERROR("null Owner");
             errorCode = ERR_APPEXECFWK_FORM_NO_SUCH_ABILITY;
             break;
         }
@@ -112,7 +112,7 @@ int FormProviderClient::NotifyFormDelete(const int64_t formId, const Want &want,
             break;
         }
 
-        HILOG_INFO("AbilityName:%{public}s.", ownerAbility->GetAbilityName().c_str());
+        HILOG_INFO("AbilityName:%{public}s", ownerAbility->GetAbilityName().c_str());
         ownerAbility->OnDelete(formId);
     } while (false);
 
@@ -124,14 +124,14 @@ int FormProviderClient::NotifyFormsDelete(
     const Want &want,
     const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("call");
 
     // The error code for business operation.
     int errorCode = ERR_OK;
     do {
         std::shared_ptr<Ability> ownerAbility = GetOwner();
         if (ownerAbility == nullptr) {
-            HILOG_ERROR("Owner is nullptr");
+            HILOG_ERROR("null Owner");
             errorCode = ERR_APPEXECFWK_FORM_NO_SUCH_ABILITY;
             break;
         }
@@ -141,7 +141,7 @@ int FormProviderClient::NotifyFormsDelete(
             break;
         }
 
-        HILOG_INFO("formIdsSize:%{public}zu, abilityName:%{public}s.", formIds.size(),
+        HILOG_INFO("formIdsSize:%{public}zu, abilityName:%{public}s", formIds.size(),
             ownerAbility->GetAbilityName().c_str());
         for (int64_t formId : formIds) {
             ownerAbility->OnDelete(formId);
@@ -156,25 +156,25 @@ int FormProviderClient::NotifyFormUpdate(
     const Want &want,
     const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("NotifyFormUpdate start.");
+    HILOG_DEBUG("NotifyFormUpdate start");
 
     // The error code for business operation.
     int errorCode = ERR_OK;
     do {
         std::shared_ptr<Ability> ownerAbility = GetOwner();
         if (ownerAbility == nullptr) {
-            HILOG_ERROR("Owner is null.");
+            HILOG_ERROR("null Owner");
             errorCode = ERR_APPEXECFWK_FORM_NO_SUCH_ABILITY;
             break;
         }
 
         if (!CheckIsSystemApp() && !IsCallBySelfBundle()) {
-            HILOG_ERROR("Permission denied.");
+            HILOG_ERROR("Permission denied");
             errorCode = ERR_APPEXECFWK_FORM_PERMISSION_DENY;
             break;
         }
 
-        HILOG_INFO("AbilityName:%{public}s.", ownerAbility->GetAbilityName().c_str());
+        HILOG_INFO("AbilityName:%{public}s", ownerAbility->GetAbilityName().c_str());
         ownerAbility->OnUpdate(formId, want.GetParams());
     } while (false);
 
@@ -190,20 +190,20 @@ int FormProviderClient::EventNotify(
     const int32_t formVisibleType, const Want &want,
     const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("EventNotify start.");
+    HILOG_DEBUG("EventNotify start");
 
     // The error code for business operation.
     int errorCode = ERR_OK;
     do {
         std::shared_ptr<Ability> ownerAbility = GetOwner();
         if (ownerAbility == nullptr) {
-            HILOG_ERROR("Owner is nullptr.");
+            HILOG_ERROR("null Owner");
             errorCode = ERR_APPEXECFWK_FORM_NO_SUCH_ABILITY;
             break;
         }
 
         if (!CheckIsSystemApp()) {
-            HILOG_WARN("Permission denied.");
+            HILOG_WARN("Permission denied");
             errorCode = ERR_APPEXECFWK_FORM_PERMISSION_DENY;
             break;
         }
@@ -213,7 +213,7 @@ int FormProviderClient::EventNotify(
             formEventsMap.insert(std::make_pair(formId, formVisibleType));
         }
 
-        HILOG_INFO("AbilityName:%{public}s.", ownerAbility->GetAbilityName().c_str());
+        HILOG_INFO("AbilityName:%{public}s", ownerAbility->GetAbilityName().c_str());
         ownerAbility->OnVisibilityChanged(formEventsMap);
     } while (false);
 
@@ -225,14 +225,14 @@ int FormProviderClient::NotifyFormCastTempForm(
     const Want &want,
     const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("NotifyFormCastTempForm start.");
+    HILOG_DEBUG("NotifyFormCastTempForm start");
 
     // The error code for business operation.
     int errorCode = ERR_OK;
     do {
         std::shared_ptr<Ability> ownerAbility = GetOwner();
         if (ownerAbility == nullptr) {
-            HILOG_ERROR("Owner is nullptr.");
+            HILOG_ERROR("null Owner");
             errorCode = ERR_APPEXECFWK_FORM_NO_SUCH_ABILITY;
             break;
         }
@@ -243,7 +243,7 @@ int FormProviderClient::NotifyFormCastTempForm(
             break;
         }
 
-        HILOG_INFO("AbilityName:%{public}s.", ownerAbility->GetAbilityName().c_str());
+        HILOG_INFO("AbilityName:%{public}s", ownerAbility->GetAbilityName().c_str());
         ownerAbility->OnCastTemptoNormal(formId);
     } while (false);
 
@@ -256,14 +256,14 @@ int FormProviderClient::FireFormEvent(
     const Want &want,
     const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("FireFormEvent start.");
+    HILOG_DEBUG("FireFormEvent start");
 
     // The error code for business operation.
     int errorCode = ERR_OK;
     do {
         std::shared_ptr<Ability> ownerAbility = GetOwner();
         if (ownerAbility == nullptr) {
-            HILOG_ERROR("Owner is nullptr.");
+            HILOG_ERROR("null Owner");
             errorCode = ERR_APPEXECFWK_FORM_NO_SUCH_ABILITY;
             break;
         }
@@ -274,7 +274,7 @@ int FormProviderClient::FireFormEvent(
             break;
         }
 
-        HILOG_INFO("AbilityName:%{public}s.", ownerAbility->GetAbilityName().c_str());
+        HILOG_INFO("AbilityName:%{public}s", ownerAbility->GetAbilityName().c_str());
         ownerAbility->OnTriggerEvent(formId, message);
     } while (false);
 
@@ -288,7 +288,7 @@ int FormProviderClient::FireFormEvent(
 int FormProviderClient::AcquireState(const Want &wantArg, const std::string &provider, const Want &want,
                                      const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("call");
 
     // The error code for business operation.
     int errorCode = ERR_OK;
@@ -296,7 +296,7 @@ int FormProviderClient::AcquireState(const Want &wantArg, const std::string &pro
     do {
         std::shared_ptr<Ability> ownerAbility = GetOwner();
         if (ownerAbility == nullptr) {
-            HILOG_ERROR("Owner is nullptr.");
+            HILOG_ERROR("null Owner");
             errorCode = ERR_APPEXECFWK_FORM_NO_SUCH_ABILITY;
             break;
         }
@@ -306,7 +306,7 @@ int FormProviderClient::AcquireState(const Want &wantArg, const std::string &pro
             break;
         }
 
-        HILOG_INFO("AbilityName:%{public}s.", ownerAbility->GetAbilityName().c_str());
+        HILOG_INFO("AbilityName:%{public}s", ownerAbility->GetAbilityName().c_str());
         state = ownerAbility->OnAcquireFormState(wantArg);
     } while (false);
 
@@ -351,16 +351,16 @@ std::shared_ptr<Ability> FormProviderClient::GetOwner()
 
 bool FormProviderClient::CheckIsSystemApp() const
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("call");
 
     int32_t callingUid = IPCSkeleton::GetCallingUid();
     if (callingUid > Constants::MAX_SYSTEM_APP_UID) {
-        HILOG_WARN("callingUid is %{public}d, which is larger than %{public}d.", callingUid,
+        HILOG_WARN("callingUid is %{public}d, which is larger than %{public}d", callingUid,
             Constants::MAX_SYSTEM_APP_UID);
         return false;
     }
 
-    HILOG_DEBUG("callingUid is %{public}d.", callingUid);
+    HILOG_DEBUG("callingUid is %{public}d", callingUid);
     return true;
 }
 
@@ -369,10 +369,10 @@ int FormProviderClient::HandleAcquire(
     const Want &newWant,
     const sptr<IRemoteObject> &callerToken)
 {
-    HILOG_INFO("ImageState:%{public}d.", formProviderInfo.GetFormData().GetImageDataState());
+    HILOG_INFO("ImageState:%{public}d", formProviderInfo.GetFormData().GetImageDataState());
     sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
     if (formSupplyClient == nullptr) {
-        HILOG_ERROR("IFormSupply is nullptr.");
+        HILOG_ERROR("null IFormSupply");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
 
@@ -396,7 +396,7 @@ int  FormProviderClient::HandleDisconnect(const Want &want, const sptr<IRemoteOb
     HILOG_INFO("ConnectId:%{public}d", want.GetIntParam(Constants::FORM_CONNECT_ID, 0L));
     sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
     if (formSupplyClient == nullptr) {
-        HILOG_ERROR("IFormSupply is nullptr.");
+        HILOG_ERROR("null IFormSupply");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
 
@@ -410,7 +410,7 @@ int FormProviderClient::HandleAcquireStateResult(FormState state, const std::str
     HILOG_INFO("FormState:%{public}d", state);
     sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
     if (formSupplyClient == nullptr) {
-        HILOG_ERROR("IFormSupply is nullptr.");
+        HILOG_ERROR("null IFormSupply");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
 
@@ -421,27 +421,27 @@ int FormProviderClient::HandleAcquireStateResult(FormState state, const std::str
 int32_t FormProviderClient::AcquireShareFormData(int64_t formId, const std::string &remoteDeviceId,
     const sptr<IRemoteObject> &formSupplyCallback, int64_t requestCode)
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("call");
     if (formId <= 0 || remoteDeviceId.empty() || formSupplyCallback == nullptr || requestCode <= 0) {
-        HILOG_ERROR("Abnormal parameters exist.");
+        HILOG_ERROR("Abnormal parameters exist");
         return ERR_APPEXECFWK_FORM_NO_SUCH_ABILITY;
     }
 
     std::shared_ptr<Ability> ownerAbility = GetOwner();
     if (ownerAbility == nullptr) {
-        HILOG_ERROR("Owner is nullptr.");
+        HILOG_ERROR("null Owner");
         return ERR_APPEXECFWK_FORM_NO_SUCH_ABILITY;
     }
 
-    HILOG_INFO("AbilityName:%{public}s.", ownerAbility->GetAbilityName().c_str());
+    HILOG_INFO("AbilityName:%{public}s", ownerAbility->GetAbilityName().c_str());
     if (!CheckIsSystemApp()) {
-        HILOG_WARN("Permission denied.");
+        HILOG_WARN("Permission denied");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
 
     auto formCall = iface_cast<IFormSupply>(formSupplyCallback);
     if (formCall == nullptr) {
-        HILOG_ERROR("IFormSupply is nullptr.");
+        HILOG_ERROR("null IFormSupply");
         return ERR_APPEXECFWK_FORM_NO_SUCH_ABILITY;
     }
 
@@ -456,10 +456,10 @@ int32_t FormProviderClient::AcquireShareFormData(int64_t formId, const std::stri
 void FormProviderClient::HandleRemoteAcquire(const FormJsInfo &formJsInfo, const FormProviderInfo &formProviderInfo,
     const Want &want, const sptr<IRemoteObject> &token)
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("call");
     auto hostToken = want.GetRemoteObject(Constants::PARAM_FORM_HOST_TOKEN);
     if (hostToken == nullptr) {
-        HILOG_ERROR("Host token is invalid.");
+        HILOG_ERROR("null hostToken");
         return;
     }
     FormCallerMgr::GetInstance().AddFormProviderCaller(formJsInfo, hostToken);

@@ -32,35 +32,35 @@ void FreeInstallStatusCallBackProxy::OnInstallFinished(int32_t resultCode, const
     MessageOption option;
 
     if (!data.WriteInterfaceToken(IFreeInstallStatusCallBack::GetDescriptor())) {
-        HILOG_ERROR("Write interface token failed.");
+        HILOG_ERROR("Write interface token failed");
         return;
     }
 
     if (!data.WriteInt32(resultCode)) {
-        HILOG_ERROR("Write resultCode error.");
+        HILOG_ERROR("Write resultCode error");
         return;
     }
 
     if (!data.WriteParcelable(&want)) {
-        HILOG_ERROR("Write want error.");
+        HILOG_ERROR("Write want error");
         return;
     }
 
     if (!data.WriteInt32(userId)) {
-        HILOG_ERROR("Write userId error.");
+        HILOG_ERROR("Write userId error");
         return;
     }
 
     sptr<IRemoteObject> remote = Remote();
     if (remote == nullptr) {
-        HILOG_ERROR("Remote() is NULL");
+        HILOG_ERROR("null remote");
         return;
     }
 
     int32_t error = remote->SendRequest(IFreeInstallStatusCallBackCmd::ON_FREE_INSTALL_DONE, data,
         reply, option);
     if (error != NO_ERROR) {
-        HILOG_ERROR("OnFinished fail, error: %{public}d", error);
+        HILOG_ERROR("OnFinished fail, error:%{public}d", error);
         return;
     }
 }

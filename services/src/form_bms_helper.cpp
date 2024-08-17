@@ -38,7 +38,7 @@ FormBmsHelper::~FormBmsHelper()
 
 sptr<IBundleMgr> FormBmsHelper::GetBundleMgr()
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("call");
     if (iBundleMgr_ == nullptr) {
         std::lock_guard<std::mutex> lock(ibundleMutex_);
         if (iBundleMgr_ == nullptr) {
@@ -46,13 +46,13 @@ sptr<IBundleMgr> FormBmsHelper::GetBundleMgr()
             SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
             auto remoteObject = systemAbilityManager->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
             if (remoteObject == nullptr) {
-                HILOG_ERROR("error, failed to get bundle manager service.");
+                HILOG_ERROR("fail get bundle manager service");
                 return nullptr;
             }
 
             iBundleMgr_ = iface_cast<IBundleMgr>(remoteObject);
             if (iBundleMgr_ == nullptr) {
-                HILOG_ERROR("error, failed to get bundle manager service");
+                HILOG_ERROR("fail get bundle manager service");
                 return nullptr;
             }
         }
@@ -63,7 +63,7 @@ sptr<IBundleMgr> FormBmsHelper::GetBundleMgr()
 
 sptr<IBundleInstaller> FormBmsHelper::GetBundleInstaller()
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("call");
     if (bundleInstallerProxy_ == nullptr) {
         sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
         if (iBundleMgr != nullptr) {
@@ -76,7 +76,7 @@ sptr<IBundleInstaller> FormBmsHelper::GetBundleInstaller()
 
 void FormBmsHelper::SetBundleManager(const sptr<IBundleMgr> &bundleManager)
 {
-    HILOG_DEBUG("SetBundleManager called.");
+    HILOG_DEBUG("call");
     iBundleMgr_ = bundleManager;
 }
 
@@ -97,7 +97,7 @@ void FormBmsHelper::NotifyModuleRemovable(const std::string &bundleName, const s
     HILOG_DEBUG("begin to notify %{public}s removable", key.c_str());
     sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
     if (iBundleMgr == nullptr) {
-        HILOG_ERROR("failed to get IBundleMgr.");
+        HILOG_ERROR("get IBundleMgr failed");
         return;
     }
 
@@ -121,12 +121,12 @@ void FormBmsHelper::NotifyModuleNotRemovable(const std::string &bundleName, cons
     HILOG_DEBUG("begin to notify %{public}s not removable", key.c_str());
     sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
     if (iBundleMgr == nullptr) {
-        HILOG_ERROR("failed to get IBundleMgr.");
+        HILOG_ERROR("get IBundleMgr failed");
         return;
     }
 
     if (!IN_PROCESS_CALL(iBundleMgr->SetModuleRemovable(bundleName, moduleName, false))) {
-        HILOG_ERROR("set not removable failed.");
+        HILOG_ERROR("set not removable failed");
         return;
     }
     return;
@@ -143,13 +143,13 @@ bool FormBmsHelper::GetBundlePackInfo(const std::string &bundleName, const int32
     HILOG_INFO("bundleName:%{public}s", bundleName.c_str());
     sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
     if (iBundleMgr == nullptr) {
-        HILOG_ERROR("failed to get IBundleMgr.");
+        HILOG_ERROR("get IBundleMgr failed");
         return false;
     }
 
     if (IN_PROCESS_CALL(iBundleMgr->GetBundlePackInfo(bundleName, GET_PACK_INFO_ALL, bundlePackInfo, userId))
         != ERR_OK) {
-        HILOG_ERROR("error, failed to get bundle pack info.");
+        HILOG_ERROR("fail get bundle pack info");
         return false;
     }
 
@@ -160,7 +160,7 @@ bool FormBmsHelper::GetBundlePackInfo(const std::string &bundleName, const int32
 bool FormBmsHelper::GetAbilityInfo(const AAFwk::Want &want, int32_t userId, AbilityInfo &abilityInfo,
     ExtensionAbilityInfo &extensionInfo)
 {
-    HILOG_DEBUG("GetAbilityInfo called.");
+    HILOG_DEBUG("call");
     ElementName element = want.GetElement();
     std::string bundleName = element.GetBundleName();
     std::string abilityName = element.GetAbilityName();
@@ -171,23 +171,23 @@ bool FormBmsHelper::GetAbilityInfo(const AAFwk::Want &want, int32_t userId, Abil
 
     sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
     if (iBundleMgr == nullptr) {
-        HILOG_ERROR("iBundleMgr is nullptr");
+        HILOG_ERROR("null iBundleMgr");
         return false;
     }
     IN_PROCESS_CALL(iBundleMgr->QueryAbilityInfo(want, AbilityInfoFlag::GET_ABILITY_INFO_DEFAULT,
         userId, abilityInfo));
     if (abilityInfo.name.empty() || abilityInfo.bundleName.empty()) {
-        HILOG_INFO("get ability info empty, try to get extension info.");
+        HILOG_INFO("get ability info empty,try to get extension info");
         std::vector<AppExecFwk::ExtensionAbilityInfo> extensionInfos;
         IN_PROCESS_CALL(iBundleMgr->QueryExtensionAbilityInfos(want, AbilityInfoFlag::GET_ABILITY_INFO_DEFAULT,
             userId, extensionInfos));
         if (extensionInfos.empty()) {
-            HILOG_ERROR("get extension info failed.");
+            HILOG_ERROR("get extension info failed");
             return false;
         }
         extensionInfo = extensionInfos.front();
         if (extensionInfo.bundleName.empty() || extensionInfo.name.empty()) {
-            HILOG_ERROR("get extension info empty.");
+            HILOG_ERROR("get extension info empty");
             return false;
         }
     }
@@ -197,9 +197,9 @@ bool FormBmsHelper::GetAbilityInfo(const AAFwk::Want &want, int32_t userId, Abil
 bool FormBmsHelper::GetAbilityInfoByAction(const std::string &action, int32_t userId,
     AbilityInfo &abilityInfo, ExtensionAbilityInfo &extensionAbilityInfo)
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("call");
     if (action.empty()) {
-        HILOG_ERROR("input parasm error.");
+        HILOG_ERROR("input parasm error");
         return false;
     }
 
@@ -207,7 +207,7 @@ bool FormBmsHelper::GetAbilityInfoByAction(const std::string &action, int32_t us
     wantAction.SetAction(action);
     sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
     if (iBundleMgr == nullptr) {
-        HILOG_ERROR("iBundleMgr is nullptr");
+        HILOG_ERROR("null iBundleMgr");
         return false;
     }
 
@@ -233,10 +233,10 @@ bool FormBmsHelper::GetBundleInfoDefault(const std::string& bundleName, int32_t 
 bool FormBmsHelper::GetBundleInfoByFlags(const std::string& bundleName, int32_t flags, int32_t userId,
     BundleInfo &bundleInfo)
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("call");
     sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
     if (iBundleMgr == nullptr) {
-        HILOG_ERROR("iBundleMgr is nullptr");
+        HILOG_ERROR("null iBundleMgr");
         return false;
     }
     return (IN_PROCESS_CALL(iBundleMgr->GetBundleInfo(bundleName, flags, bundleInfo, userId)));
@@ -269,12 +269,12 @@ int32_t FormBmsHelper::GetCallerBundleName(std::string &callerBundleName)
 {
     sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
     if (iBundleMgr == nullptr) {
-        HILOG_ERROR("failed to get IBundleMgr.");
+        HILOG_ERROR("get IBundleMgr failed");
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
     auto callingUid = IPCSkeleton::GetCallingUid();
     if (IN_PROCESS_CALL(iBundleMgr->GetNameForUid(callingUid, callerBundleName)) != ERR_OK) {
-        HILOG_ERROR("failed to get form config info.");
+        HILOG_ERROR("fail get form config info");
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
     return ERR_OK;
@@ -284,12 +284,12 @@ int32_t FormBmsHelper::GetBundleNameByUid(const int32_t uid, std::string &bundle
 {
     sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
     if (iBundleMgr == nullptr) {
-        HILOG_ERROR("failed to get IBundleMgr.");
+        HILOG_ERROR("get IBundleMgr failed");
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
 
     if (IN_PROCESS_CALL(iBundleMgr->GetNameForUid(uid, bundleName)) != ERR_OK) {
-        HILOG_ERROR("failed to get bundle name by uid.");
+        HILOG_ERROR("fail get bundle name by uid");
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
     return ERR_OK;
@@ -299,7 +299,7 @@ int32_t FormBmsHelper::GetUidByBundleName(const std::string &bundleName, const i
 {
     sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
     if (iBundleMgr == nullptr) {
-        HILOG_ERROR("failed to get IBundleMgr.");
+        HILOG_ERROR("get IBundleMgr failed");
         return INVALID_UID;
     }
     return IN_PROCESS_CALL(iBundleMgr->GetUidByBundleName(bundleName, userId));
@@ -308,16 +308,16 @@ int32_t FormBmsHelper::GetUidByBundleName(const std::string &bundleName, const i
 bool FormBmsHelper::GetCompileMode(const std::string &bundleName, const std::string &moduleName,
     int32_t userId, int32_t &compileMode)
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("call");
     sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
     if (iBundleMgr == nullptr) {
-        HILOG_ERROR("iBundleMgr is nullptr");
+        HILOG_ERROR("null iBundleMgr");
         return false;
     }
     int32_t flags = BundleFlag::GET_BUNDLE_DEFAULT;
     BundleInfo bundleInfo;
     if (!IN_PROCESS_CALL(iBundleMgr->GetBundleInfo(bundleName, flags, bundleInfo, userId))) {
-        HILOG_ERROR("Get bundle info failed.");
+        HILOG_ERROR("Get bundle info failed");
         return false;
     }
 
@@ -329,22 +329,22 @@ bool FormBmsHelper::GetCompileMode(const std::string &bundleName, const std::str
         return true;
     }
 
-    HILOG_ERROR("Get compile mode failed.");
+    HILOG_ERROR("Get compile mode failed");
     return false;
 }
 
 bool FormBmsHelper::GetCompatibleVersion(const std::string& bundleName, int32_t userId, int32_t& compatibleVersion)
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("call");
     sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
     if (iBundleMgr == nullptr) {
-        HILOG_ERROR("iBundleMgr is nullptr");
+        HILOG_ERROR("null iBundleMgr");
         return false;
     }
     int32_t flags = BundleFlag::GET_BUNDLE_DEFAULT;
     BundleInfo bundleInfo;
     if (!IN_PROCESS_CALL(iBundleMgr->GetBundleInfo(bundleName, flags, bundleInfo, userId))) {
-        HILOG_ERROR("Get bundle info failed.");
+        HILOG_ERROR("Get bundle info failed");
         return false;
     }
 
@@ -355,10 +355,10 @@ bool FormBmsHelper::GetCompatibleVersion(const std::string& bundleName, int32_t 
 ErrCode FormBmsHelper::GetProxyDataInfos(const std::string &bundleName, const std::string &moduleName,
     int32_t userId, std::vector<ProxyData> &proxyData)
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("call");
     sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
     if (iBundleMgr == nullptr) {
-        HILOG_ERROR("iBundleMgr is nullptr");
+        HILOG_ERROR("null iBundleMgr");
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
 
@@ -367,10 +367,10 @@ ErrCode FormBmsHelper::GetProxyDataInfos(const std::string &bundleName, const st
 
 ErrCode FormBmsHelper::GetAllProxyDataInfos(int32_t userId, std::vector<ProxyData> &proxyData)
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("call");
     sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
     if (iBundleMgr == nullptr) {
-        HILOG_ERROR("iBundleMgr is nullptr");
+        HILOG_ERROR("null iBundleMgr");
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
 
@@ -379,10 +379,10 @@ ErrCode FormBmsHelper::GetAllProxyDataInfos(int32_t userId, std::vector<ProxyDat
 
 ErrCode FormBmsHelper::GetApplicationInfo(const std::string &bundleName, int32_t userId, ApplicationInfo &appInfo)
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("call");
     sptr<IBundleMgr> iBundleMgr = GetBundleMgr();
     if (iBundleMgr == nullptr) {
-        HILOG_ERROR("iBundleMgr is nullptr");
+        HILOG_ERROR("null iBundleMgr");
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
 
@@ -402,11 +402,11 @@ ErrCode FormBmsHelper::RegisterBundleEventCallback()
             }
             formBundleEventCallback_ = new (std::nothrow) FormBundleEventCallback();
             if (formBundleEventCallback_ == nullptr) {
-                HILOG_ERROR("fail, allocate formBundleEventCallback_ failed!");
+                HILOG_ERROR("allocate formBundleEventCallback_ failed");
                 return ERR_APPEXECFWK_FORM_COMMON_CODE;
             }
             if (!iBundleMgr->RegisterBundleEventCallback(formBundleEventCallback_)) {
-                HILOG_ERROR("fail, RegisterBundleEventCallback failed!");
+                HILOG_ERROR("RegisterBundleEventCallback failed");
                 return ERR_APPEXECFWK_FORM_COMMON_CODE;
             }
             hasRegisterBundleEvent_ = true;
@@ -423,7 +423,7 @@ ErrCode FormBmsHelper::UnregisterBundleEventCallback()
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
     if (!iBundleMgr->UnregisterBundleEventCallback(formBundleEventCallback_)) {
-        HILOG_ERROR("fail, RegisterBundleEventCallback failed!");
+        HILOG_ERROR("RegisterBundleEventCallback failed");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     formBundleEventCallback_ = nullptr;

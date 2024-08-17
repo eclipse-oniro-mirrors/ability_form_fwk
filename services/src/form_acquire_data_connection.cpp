@@ -36,7 +36,7 @@ FormAcquireDataConnection::FormAcquireDataConnection(const int64_t formId, const
 void FormAcquireDataConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &element,
     const sptr<IRemoteObject> &remoteObject, int resultCode)
 {
-    HILOG_DEBUG("called.");
+    HILOG_DEBUG("call");
     if (resultCode != ERR_OK) {
         HILOG_ERROR("abilityName:%{public}s, resultCode:%{public}d",
             element.GetAbilityName().c_str(), resultCode);

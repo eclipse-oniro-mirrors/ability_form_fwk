@@ -33,7 +33,7 @@ FormTrustMgr::FormTrustMgr()
     formRdbTableConfig.createTableSql = "CREATE TABLE IF NOT EXISTS " +
         formRdbTableConfig.tableName + " (KEY TEXT NOT NULL PRIMARY KEY);";
     if (FormRdbDataMgr::GetInstance().InitFormRdbTable(formRdbTableConfig) != ERR_OK) {
-        HILOG_ERROR("Form trust mgr init form rdb table fail.");
+        HILOG_ERROR("Form trust mgr init form rdb table fail");
     }
 }
 
@@ -72,7 +72,7 @@ void FormTrustMgr::MarkTrustFlag(const std::string &bundleName, bool isTrust)
     if (isTrust && iter != unTrustList_.end()) {
         auto ret = FormRdbDataMgr::GetInstance().DeleteData(UNTRUST_LIST, bundleName);
         if (ret != ERR_OK) {
-            HILOG_ERROR("DeleteData failed, key: %{public}s", bundleName.c_str());
+            HILOG_ERROR("DeleteData failed, key:%{public}s", bundleName.c_str());
         }
 
         unTrustList_.erase(iter);
@@ -91,7 +91,7 @@ void FormTrustMgr::MarkTrustFlag(const std::string &bundleName, bool isTrust)
         if (trustNum > UNTRUST_THRESHOLD) {
             auto ret = FormRdbDataMgr::GetInstance().InsertData(UNTRUST_LIST, bundleName);
             if (ret != ERR_OK) {
-                HILOG_ERROR("InsertData failed, key: %{public}s", bundleName.c_str());
+                HILOG_ERROR("InsertData failed, key:%{public}s", bundleName.c_str());
             }
         }
     }
