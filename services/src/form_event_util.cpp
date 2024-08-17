@@ -37,6 +37,7 @@ namespace AppExecFwk {
 namespace {
 void UpdateRecordByBundleInfo(const BundleInfo &bundleInfo, FormRecord &formRecord)
 {
+    formRecord.modulePkgNameMap.clear();
     if (!bundleInfo.hapModuleInfos.empty()) {
         for (auto hapModuleInfo : bundleInfo.hapModuleInfos) {
             auto hapPath = hapModuleInfo.hapPath;

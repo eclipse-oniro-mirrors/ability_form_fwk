@@ -234,6 +234,8 @@ private:
 
     bool ReAddIfHapPathChanged(const std::vector<FormJsInfo> &formJsInfos);
 
+    void UpdateAllFormRequest(const std::vector<FormJsInfo> &formJsInfos, bool hasRelease);
+
     void HandleReleaseAllRendererInJsThread();
 
     pid_t jsThreadId_ = 0;
