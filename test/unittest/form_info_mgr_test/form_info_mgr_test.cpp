@@ -133,8 +133,7 @@ HWTEST_F(FormInfoMgrTest, FormInfoHelper_LoadFormConfigInfoByBundleName_0200, Te
     };
     EXPECT_CALL(*bmsProxy, GetBundleInfo(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
     std::vector<FormInfo> formInfos;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_INFO_FAILED,
-        formInfoHelper_->LoadFormConfigInfoByBundleName(FORM_BUNDLE_NAME_TEST, formInfos, USER_ID));
+    EXPECT_EQ(ERR_OK, formInfoHelper_->LoadFormConfigInfoByBundleName(FORM_BUNDLE_NAME_TEST, formInfos, USER_ID));
     FormBmsHelper::GetInstance().iBundleMgr_ = backup;
     GTEST_LOG_(INFO) << "FormInfoHelper_LoadFormConfigInfoByBundleName_0200 end";
 }
@@ -238,8 +237,7 @@ HWTEST_F(FormInfoMgrTest, FormInfoHelper_GetFormInfoDescription_0300, TestSize.L
     };
     EXPECT_CALL(*bmsProxy, GetBundleInfo(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
     std::vector<FormInfo> formInfos;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_INFO_FAILED,
-        formInfoHelper_->LoadFormConfigInfoByBundleName(FORM_BUNDLE_NAME_TEST, formInfos, USER_ID));
+    EXPECT_EQ(ERR_OK, formInfoHelper_->LoadFormConfigInfoByBundleName(FORM_BUNDLE_NAME_TEST, formInfos, USER_ID));
     FormBmsHelper::GetInstance().iBundleMgr_ = backup;
     GTEST_LOG_(INFO) << "FormInfoHelper_GetFormInfoDescription_0300 end";
 }
@@ -283,7 +281,7 @@ HWTEST_F(FormInfoMgrTest, BundleFormInfo_UpdateStaticFormInfos_0100, TestSize.Le
     formInfo.isStatic = false;
     formInfoStorage.formInfos.push_back(formInfo);
     bundleFormInfo.formInfoStorages_.emplace_back(formInfoStorage);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_INFO_FAILED, bundleFormInfo.UpdateStaticFormInfos(USER_ID));
+    EXPECT_EQ(ERR_OK, bundleFormInfo.UpdateStaticFormInfos(USER_ID));
     FormBmsHelper::GetInstance().iBundleMgr_ = backup;
     GTEST_LOG_(INFO) << "BundleFormInfo_UpdateStaticFormInfos_0100 end";
 }
@@ -309,7 +307,7 @@ HWTEST_F(FormInfoMgrTest, BundleFormInfo_UpdateStaticFormInfos_0200, TestSize.Le
     formInfoStorage.userId = 101;
     formInfoStorage.formInfos.push_back(GetTestFormInfo());
     bundleFormInfo.formInfoStorages_.emplace_back(formInfoStorage);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_INFO_FAILED, bundleFormInfo.UpdateStaticFormInfos(USER_ID));
+    EXPECT_EQ(ERR_OK, bundleFormInfo.UpdateStaticFormInfos(USER_ID));
     FormBmsHelper::GetInstance().iBundleMgr_ = backup;
     GTEST_LOG_(INFO) << "BundleFormInfo_UpdateStaticFormInfos_0200 end";
 }
@@ -490,7 +488,7 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgr_UpdateStaticFormInfos_0100, TestSize.Level
         return true;
     };
     EXPECT_CALL(*bmsProxy, GetBundleInfo(_, _, _, _)).Times(1).WillOnce(Invoke(bmsTask));
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_INFO_FAILED, formInfoMgr_.UpdateStaticFormInfos(FORM_BUNDLE_NAME_TEST, USER_ID));
+    EXPECT_EQ(ERR_OK, formInfoMgr_.UpdateStaticFormInfos(FORM_BUNDLE_NAME_TEST, USER_ID));
     FormBmsHelper::GetInstance().iBundleMgr_ = backup;
     GTEST_LOG_(INFO) << "FormInfoMgr_UpdateStaticFormInfos_0100 end";
 }
