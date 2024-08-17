@@ -45,12 +45,15 @@ public:
 
     MOCK_METHOD1(CheckIsSystemAppByUid, bool(const int));
     MOCK_METHOD4(GetApplicationInfoV9, ErrCode(const std::string &, int32_t, int32_t, ApplicationInfo &));
-    MOCK_METHOD4(GetBundleInfo, bool(const std::string &, const BundleFlag, BundleInfo &, int32_t));
+    MOCK_METHOD4(GetBundleInfo, bool(const std::string &, int32_t, BundleInfo &, int32_t));
     MOCK_METHOD4(GetBundleInfoV9,
         ErrCode(const std::string &bundleName, int32_t flags, BundleInfo &bundleInfo, int32_t userId));
     MOCK_METHOD2(GetBundleNameForUid, bool(const int, std::string &));
     MOCK_METHOD2(GetNameForUid, int32_t(const int, std::string &));
     MOCK_METHOD2(GetAdditionalInfo, ErrCode(const std::string &, std::string &));
+    MOCK_METHOD3(QueryExtensionAbilityInfos, bool(const ExtensionAbilityType &, const int32_t &,
+        std::vector<ExtensionAbilityInfo> &));
+    MOCK_METHOD3(GetBundleInfos, bool(const BundleFlag, std::vector<BundleInfo> &, int32_t));
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
