@@ -915,7 +915,6 @@ bool FormMgrAdapter::HasFormVisible(const uint32_t tokenId)
         }
     }
 
-    HILOG_INFO("tokenId:%{public}d no visibleCard", tokenId);
     return false;
 }
 
