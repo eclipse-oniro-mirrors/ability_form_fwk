@@ -51,23 +51,17 @@ ErrCode FormInfoHelper::LoadFormConfigInfoByBundleName(const std::string &bundle
     }
 
     BundleInfo bundleInfo;
-    int32_t flag = GET_BUNDLE_WITH_EXTENSION_INFO | GET_BUNDLE_WITH_ABILITIES;
-    if (!IN_PROCESS_CALL(iBundleMgr->GetBundleInfo(bundleName, flag, bundleInfo, userId))) {
+    if (!IN_PROCESS_CALL(iBundleMgr->GetBundleInfo(bundleName, GET_BUNDLE_WITH_EXTENSION_INFO, bundleInfo, userId))) {
         HILOG_ERROR("get bundleInfo failed");
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
-    if (bundleInfo.abilityInfos.empty()) {
-        HILOG_WARN("empty abilityInfos");
-        // Check if current bundle contains FA forms.
-        LoadAbilityFormConfigInfo(bundleInfo, formInfos);
-        // Check if current bundle contains Stage forms.
-        LoadStageFormConfigInfo(bundleInfo, formInfos);
-        return ERR_OK;
+    // Check if current bundle contains FA forms.
+    if (LoadAbilityFormConfigInfo(bundleInfo, formInfos) != ERR_OK) {
+        HILOG_DEBUG("No fa form config info found for %{public}s", bundleName.c_str());
     }
-    if (bundleInfo.abilityInfos[0].isStageBasedModel) {
-        LoadStageFormConfigInfo(bundleInfo, formInfos);
-    } else {
-        LoadAbilityFormConfigInfo(bundleInfo, formInfos);
+    // Check if current bundle contains Stage forms.
+    if (LoadStageFormConfigInfo(bundleInfo, formInfos) != ERR_OK) {
+        HILOG_DEBUG("No stage form config info found for %{public}s", bundleName.c_str());
     }
     return ERR_OK;
 }
@@ -81,6 +75,7 @@ ErrCode FormInfoHelper::LoadStageFormConfigInfo(const BundleInfo &bundleInfo, st
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
 
+    std::shared_ptr<OHOS::Global::Resource::ResourceManager> resourceManager = nullptr;
     for (auto const &extensionInfo: bundleInfo.extensionInfos) {
         if (extensionInfo.type != ExtensionAbilityType::FORM) {
             continue;
@@ -107,6 +102,15 @@ ErrCode FormInfoHelper::LoadStageFormConfigInfo(const BundleInfo &bundleInfo, st
                 }
                 formInfo.versionCode = bundleInfo.versionCode;
                 formInfo.bundleType = bundleInfo.applicationInfo.bundleType;
+                if (resourceManager == nullptr) {
+                    resourceManager = GetResourceManager(bundleInfo);
+                }
+                if (resourceManager == nullptr) {
+                    HILOG_ERROR("InitResourceManager failed");
+                    return ERR_APPEXECFWK_FORM_COMMON_CODE;
+                }
+                (void)GetFormInfoDisplayName(resourceManager, formInfo);
+                (void)GetFormInfoDescription(resourceManager, formInfo);
                 formInfo.privacyLevel = privacyLevel;
                 formInfos.emplace_back(formInfo);
             }
@@ -122,6 +126,7 @@ ErrCode FormInfoHelper::LoadAbilityFormConfigInfo(const BundleInfo &bundleInfo, 
         HILOG_ERROR("get IBundleMgr failed");
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
+    std::shared_ptr<OHOS::Global::Resource::ResourceManager> resourceManager = nullptr;
     const std::string &bundleName = bundleInfo.name;
     for (const auto &moduleInfo: bundleInfo.hapModuleInfos) {
         const std::string &moduleName = moduleInfo.moduleName;
@@ -132,9 +137,18 @@ ErrCode FormInfoHelper::LoadAbilityFormConfigInfo(const BundleInfo &bundleInfo, 
         for (auto &formInfo: formInfoVec) {
             formInfo.versionCode = bundleInfo.versionCode;
             formInfo.bundleType = bundleInfo.applicationInfo.bundleType;
+            if (resourceManager == nullptr) {
+                resourceManager = GetResourceManager(bundleInfo);
+            }
+            if (resourceManager == nullptr) {
+                HILOG_ERROR("InitResourceManager failed");
+                return ERR_APPEXECFWK_FORM_COMMON_CODE;
+            }
+            (void)GetFormInfoDescription(resourceManager, formInfo);
             formInfos.emplace_back(formInfo);
         }
     }
+
     return ERR_OK;
 }
 std::shared_ptr<Global::Resource::ResourceManager> FormInfoHelper::GetResourceManager(const BundleInfo &bundleInfo)
@@ -761,10 +775,21 @@ ErrCode FormInfoMgr::ReloadFormInfos(const int32_t userId)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     HILOG_INFO("userId:%{public}d", userId);
+    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
+    if (iBundleMgr == nullptr) {
+        HILOG_ERROR("get IBundleMgr failed");
+        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
+    }
+
+    std::vector<ApplicationInfo> appInfos {};
+    if (!IN_PROCESS_CALL(iBundleMgr->GetApplicationInfos(GET_BASIC_APPLICATION_INFO, userId, appInfos))) {
+        HILOG_ERROR("get ApplicationInfo failed");
+        return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
+    }
+
     std::set<std::string> bundleNameSet {};
-    ErrCode result = GetFormBundleNames(bundleNameSet, userId);
-    if (result != ERR_OK) {
-        return result;
+    for (auto const &appInfo : appInfos) {
+        bundleNameSet.emplace(appInfo.bundleName);
     }
 
     HILOG_INFO("bundle name set number:%{public}zu", bundleNameSet.size());
@@ -802,39 +827,6 @@ bool FormInfoMgr::HasReloadedFormInfos()
 {
     HILOG_DEBUG("Reloaded Form Infos state %{public}d", hasReloadedFormInfosState_);
     return hasReloadedFormInfosState_;
-}
-
-ErrCode FormInfoMgr::GetFormBundleNames(std::set<std::string> &bundleNameSet, int32_t userId)
-{
-    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
-    if (iBundleMgr == nullptr) {
-        HILOG_ERROR("get IBundleMgr failed");
-        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
-    }
-
-    std::vector<ExtensionAbilityInfo> extensionInfos {};
-    if (!IN_PROCESS_CALL(iBundleMgr->QueryExtensionAbilityInfos(ExtensionAbilityType::FORM, userId, extensionInfos))) {
-        HILOG_ERROR("get extension infos failed");
-        return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
-    }
-
-    std::vector<BundleInfo> bundleInfos {};
-    if (!IN_PROCESS_CALL(iBundleMgr->GetBundleInfos(GET_BUNDLE_WITH_ABILITIES, bundleInfos, userId))) {
-        HILOG_ERROR("get bundle infos failed");
-        return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
-    }
-
-    // get names of bundles that must contain stage forms
-    for (auto const &extensionInfo : extensionInfos) {
-        bundleNameSet.emplace(extensionInfo.bundleName);
-    }
-    // get names of bundles that may contain fa forms
-    for (auto const &bundleInfo : bundleInfos) {
-        if (!bundleInfo.abilityInfos.empty() && !bundleInfo.abilityInfos[0].isStageBasedModel) {
-            bundleNameSet.emplace(bundleInfo.name);
-        }
-    }
-    return ERR_OK;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

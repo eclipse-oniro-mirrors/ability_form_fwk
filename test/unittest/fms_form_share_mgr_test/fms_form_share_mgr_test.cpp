@@ -1567,7 +1567,7 @@ HWTEST_F(FmsFormShareMgrTest, FormInfoHelper_030, TestSize.Level0)
     int32_t userId = 1;
     BundleFormInfo bundleFormInfo(bundleName);
     FormInfoMgr formInfoMgr;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_INFO_FAILED, formInfoMgr.UpdateStaticFormInfos(bundleNames, userId));
+    EXPECT_EQ(ERR_OK, formInfoMgr.UpdateStaticFormInfos(bundleNames, userId));
     GTEST_LOG_(INFO) << "FmsFormShareMgrTest FormInfoHelper_030 end";
 }
 
