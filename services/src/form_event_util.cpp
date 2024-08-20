@@ -37,6 +37,7 @@ namespace AppExecFwk {
 namespace {
 void UpdateRecordByBundleInfo(const BundleInfo &bundleInfo, FormRecord &formRecord)
 {
+    formRecord.modulePkgNameMap.clear();
     if (!bundleInfo.hapModuleInfos.empty()) {
         for (auto hapModuleInfo : bundleInfo.hapModuleInfos) {
             auto hapPath = hapModuleInfo.hapPath;
@@ -51,7 +52,9 @@ void UpdateRecordByBundleInfo(const BundleInfo &bundleInfo, FormRecord &formReco
                 {Constants::MODULE_HAP_PATH_KEY, hapPath}
             };
             formRecord.modulePkgNameMap.emplace(std::make_pair(moduleName, moduleInfos.dump()));
-            formRecord.jsFormCodePath = hapPath;
+            if (moduleName == formRecord.moduleName) {
+                formRecord.jsFormCodePath = hapPath;
+            }
         }
     }
 
