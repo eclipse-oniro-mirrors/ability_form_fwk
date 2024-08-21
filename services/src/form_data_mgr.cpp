@@ -1968,6 +1968,7 @@ void FormDataMgr::FillBasicRunningFormInfoByFormRecord(const FormRecord &formRec
     runningFormInfo.formVisiblity = static_cast<FormVisibilityType>(formRecord.formVisibleNotifyState);
     runningFormInfo.recycleStatus = formRecord.recycleStatus;
     runningFormInfo.formBundleType = formRecord.formBundleType;
+    runningFormInfo.userId = formRecord.userId;
 }
 
 ErrCode FormDataMgr::GetRunningFormInfosByFormId(const int64_t formId, RunningFormInfo &runningFormInfo)
@@ -2192,6 +2193,7 @@ ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, FormInstance &for
         formInstance.moduleName = formRecord.moduleName;
         formInstance.abilityName = formRecord.abilityName;
         formInstance.formName = formRecord.formName;
+        formInstance.userId = formRecord.userId;
     } else {
         return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
     }
@@ -2226,6 +2228,7 @@ ErrCode FormDataMgr::GetUnusedFormInstanceById(const int64_t formId, FormInstanc
     formInstance.formName = dbRecord.formName;
     formInstance.formUsageState = FormUsageState::UNUSED;
     formInstance.description = dbRecord.description;
+    formInstance.userId = dbRecord.userId;
     return ERR_OK;
 }
 

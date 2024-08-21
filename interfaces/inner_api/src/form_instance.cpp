@@ -32,6 +32,8 @@ bool FormInstance::ReadFromParcel(Parcel &parcel)
     formName = Str16ToStr8(parcel.ReadString16());
     formUsageState = static_cast<FormUsageState>(parcel.ReadInt32());
     description = Str16ToStr8(parcel.ReadString16());
+    appIndex = parcel.ReadInt32();
+    userId = parcel.ReadInt32();
     return true;
 }
 
@@ -84,6 +86,16 @@ bool FormInstance::Marshalling(Parcel &parcel) const
 
     // write description
     if (!parcel.WriteString16(Str8ToStr16(description))) {
+        return false;
+    }
+
+    // write appIndex
+    if (!parcel.WriteInt32(appIndex)) {
+        return false;
+    }
+
+    // write userId
+    if (!parcel.WriteInt32(userId)) {
         return false;
     }
     return true;

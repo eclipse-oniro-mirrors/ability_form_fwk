@@ -25,6 +25,7 @@ public:
 
     static std::string bundleName;
     static int userId;
+    static int instIndex;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

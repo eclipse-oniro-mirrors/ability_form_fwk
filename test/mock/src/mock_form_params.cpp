@@ -19,11 +19,13 @@ namespace OHOS {
 namespace AppExecFwk {
 std::string MockFormParams::bundleName = "";
 int MockFormParams::userId = 0;
+int MockFormParams::instIndex = 0;
 
 void MockFormParams::Reset()
 {
     bundleName = "";
     userId = 0;
+    instIndex = 0;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

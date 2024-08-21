@@ -509,10 +509,15 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0096, TestSize.Level1)
     uint32_t tokenId = 0;
     MockFormParams::bundleName = bundleName;
     MockFormParams::userId = userId;
+    MockFormParams::instIndex = instIndex;
 
     MockIsSACall(true);
     FormMgrService formMgrService;
     EXPECT_EQ(true, formMgrService.HasFormVisible(tokenId));
+
+    instIndex = 1;
+    MockFormParams::instIndex = instIndex;
+    EXPECT_EQ(false, formMgrService.HasFormVisible(tokenId));
 
     MockFormParams::Reset();
     EXPECT_EQ(false, formMgrService.HasFormVisible(tokenId));

@@ -29,6 +29,7 @@ int AccessTokenKit::GetHapTokenInfo(AccessTokenID tokenID, HapTokenInfo &hapToke
     GTEST_LOG_(INFO) << "GetHapTokenInfo called " << MockFormParams::bundleName;
     hapTokenInfo.bundleName = MockFormParams::bundleName;
     hapTokenInfo.userID = MockFormParams::userId;
+    hapTokenInfo.instIndex = MockFormParams::instIndex;
     return 0;
 }
 
