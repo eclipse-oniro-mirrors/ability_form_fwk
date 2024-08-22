@@ -25,6 +25,7 @@ namespace AppExecFwk {
 namespace {
 const std::string BMS_EVENT_ADDITIONAL_INFO_CHANGED = "bms.event.ADDITIONAL_INFO_CHANGED";
 constexpr uint64_t CRYPTED_BUNDLE_DELAY_TIME = 1000;
+const std::string BMS_EVENT_PKG_REMOVE_RESULT_CODE = "resultCode";
 } // namespace
 
 FormBundleEventCallback::FormBundleEventCallback()
@@ -80,7 +81,12 @@ void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eve
         FormTaskMgr::GetInstance().PostTask(taskFunc, delayMs);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED) {
         // uninstall module/bundle
-        HILOG_INFO("bundleName:%{public}s removed", bundleName.c_str());
+        int32_t pkgRemoveRet = want.GetIntParam(BMS_EVENT_PKG_REMOVE_RESULT_CODE, ERR_OK);
+        HILOG_INFO("bundleName:%{public}s removed, result code:%{pulic}d", bundleName.c_str(), pkgRemoveRet);
+        if (pkgRemoveRet != ERR_OK) {
+            HILOG_WARN("bundleName:%{public}s removed, but failed", bundleName.c_str());
+            return;
+        }
         FormEventUtil::HandleBundleFormInfoRemoved(bundleName, userId);
         std::function<void()> taskFunc = [bundleName, userId]() {
             FormEventUtil::HandleProviderRemoved(bundleName, userId);
