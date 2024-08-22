@@ -132,7 +132,7 @@ namespace Constants {
     constexpr int32_t MAX_CONFIG_DURATION = 2 * 24 * 7; // one week
     const long MIN_PERIOD = MIN_CONFIG_DURATION * TIME_CONVERSION; // 30 min in ms unit
     const long MAX_PERIOD = MAX_CONFIG_DURATION * TIME_CONVERSION; // 1 week in ms unit
-    const long ABS_TIME = 5 * TIME_1000; // 5s abs time
+    const long ABS_TIME = 30 * TIME_1000; // 30s abs time
     constexpr const char* TIME_DELIMETER = ":";
     constexpr int32_t UPDATE_AT_CONFIG_COUNT = 2;
 
