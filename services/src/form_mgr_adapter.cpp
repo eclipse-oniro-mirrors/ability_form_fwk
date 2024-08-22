@@ -900,7 +900,13 @@ bool FormMgrAdapter::HasFormVisible(const uint32_t tokenId)
 
     std::string bundleName = hapTokenInfo.bundleName;
     int32_t userId = hapTokenInfo.userID;
-    HILOG_DEBUG("getHapTokenInfo bundleName:%{public}s, userId:%{public}d", bundleName.c_str(), userId);
+    HILOG_INFO("bundleName:%{public}s, userId:%{public}d, instIndex:%{public}d", bundleName.c_str(), userId,
+        hapTokenInfo.instIndex);
+
+    if (hapTokenInfo.instIndex != 0) {
+        HILOG_INFO("The app is a clone application.");
+        return false;
+    }
 
     std::vector<FormRecord> formInfos;
     if (!FormDataMgr::GetInstance().GetFormRecord(bundleName, formInfos)) {

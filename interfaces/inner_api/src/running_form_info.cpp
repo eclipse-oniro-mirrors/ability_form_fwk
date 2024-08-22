@@ -34,6 +34,8 @@ bool RunningFormInfo::ReadFromParcel(Parcel &parcel)
     formVisiblity = (FormVisibilityType)formVisiblityInt;
     formUsageState = static_cast<FormUsageState>(parcel.ReadInt32());
     formLocation = static_cast<Constants::FormLocation>(parcel.ReadInt32());
+    appIndex = parcel.ReadInt32();
+    userId = parcel.ReadInt32();
     return true;
 }
 
@@ -91,6 +93,16 @@ bool RunningFormInfo::Marshalling(Parcel &parcel) const
 
     // write formLocation
     if (!parcel.WriteInt32(static_cast<int32_t>(formLocation))) {
+        return false;
+    }
+
+    // write appIndex
+    if (!parcel.WriteInt32(appIndex)) {
+        return false;
+    }
+
+    // write userId
+    if (!parcel.WriteInt32(userId)) {
         return false;
     }
     return true;
