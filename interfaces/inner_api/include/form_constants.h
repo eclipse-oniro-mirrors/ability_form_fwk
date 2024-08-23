@@ -94,6 +94,7 @@ namespace Constants {
     constexpr const char* CPU_SCENE_ID_CONFIG_UPDATE  = "1";
     constexpr const char* RECYCLE_FORMS_USER_ID = "ohos.extra.param.key.recycle_forms_user_id";
     constexpr const char* PARAM_DYNAMIC_NAME_KEY = "isDynamic";
+    constexpr const char* PARAM_APP_CLONE_INDEX_KEY = "ohos.extra.param.key.appCloneIndex";
 
     constexpr int32_t UNKNOWN = 0;
     // The form events type which means that the form becomes visible.
