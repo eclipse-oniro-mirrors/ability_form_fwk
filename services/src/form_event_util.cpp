@@ -52,7 +52,9 @@ void UpdateRecordByBundleInfo(const BundleInfo &bundleInfo, FormRecord &formReco
                 {Constants::MODULE_HAP_PATH_KEY, hapPath}
             };
             formRecord.modulePkgNameMap.emplace(std::make_pair(moduleName, moduleInfos.dump()));
-            formRecord.jsFormCodePath = hapPath;
+            if (moduleName == formRecord.moduleName) {
+                formRecord.jsFormCodePath = hapPath;
+            }
         }
     }
 
