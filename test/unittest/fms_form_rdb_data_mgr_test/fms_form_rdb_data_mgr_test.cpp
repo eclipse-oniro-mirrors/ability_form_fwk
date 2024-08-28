@@ -414,10 +414,14 @@ HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_019, Function | SmallTest 
 HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_020, Function | SmallTest | Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_020 start";
+    auto result = FormRdbDataMgr::GetInstance().CheckAndRebuildRdbStore(NativeRdb::E_SQLITE_ERROR);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
     FormRdbDataMgr::GetInstance().lastRdbBuildTime_ = FormUtil::GetCurrentMillisecond();
-    auto result = FormRdbDataMgr::GetInstance().CheckAndRebuildRdbStore(NativeRdb::E_SQLITE_CORRUPT);
+    result = FormRdbDataMgr::GetInstance().CheckAndRebuildRdbStore(NativeRdb::E_SQLITE_CORRUPT);
     EXPECT_EQ(result, ERR_APPEXECFWK_FORM_RDB_REPEATED_BUILD);
     FormRdbDataMgr::GetInstance().lastRdbBuildTime_ = 0;
+    result = FormRdbDataMgr::GetInstance().CheckAndRebuildRdbStore(NativeRdb::E_SQLITE_CORRUPT);
+    EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_020 end";
 }
 }

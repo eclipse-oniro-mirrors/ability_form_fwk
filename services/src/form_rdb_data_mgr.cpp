@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -142,14 +142,19 @@ ErrCode FormRdbDataMgr::ExecuteSql(const std::string &sql)
         ret = rdbStore_->ExecuteSql(sql);
     }
 
+    if (ret != NativeRdb::E_OK && CheckAndRebuildRdbStore(ret) == ERR_OK) {
+        HILOG_WARN("Check rdb corrupt,rebuild form rdb successfully");
+        {
+            std::shared_lock<std::shared_mutex> guard(rdbStoreMutex_);
+            ret = rdbStore_->ExecuteSql(sql);
+        }
+    }
+
     if (ret == NativeRdb::E_OK) {
         return ERR_OK;
     }
 
-    HILOG_WARN("ExecuteSql failed");
-    if (CheckAndRebuildRdbStore(ret) == ERR_OK) {
-        HILOG_WARN("Check rdb corrupt,rebuild form rdb successfully");
-    }
+    HILOG_WARN("ExecuteSql failed, ret=%{public}" PRId32, ret);
     return ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
 
@@ -175,14 +180,21 @@ ErrCode FormRdbDataMgr::InsertData(const std::string &tableName, const std::stri
         ret = rdbStore_->InsertWithConflictResolution(rowId, tableName, valuesBucket,
             NativeRdb::ConflictResolution::ON_CONFLICT_REPLACE);
     }
+
+    if (ret != NativeRdb::E_OK && CheckAndRebuildRdbStore(ret) == ERR_OK) {
+        HILOG_WARN("Check rdb corrupt,rebuild form rdb successfully");
+        {
+            std::shared_lock<std::shared_mutex> guard(rdbStoreMutex_);
+            int64_t rowId = -1;
+            ret = rdbStore_->InsertWithConflictResolution(rowId, tableName, valuesBucket,
+                NativeRdb::ConflictResolution::ON_CONFLICT_REPLACE);
+        }
+    }
+
     if (ret == NativeRdb::E_OK) {
         return ERR_OK;
     }
-
-    HILOG_WARN("Insert operation failed, key=%{public}s", key.c_str());
-    if (CheckAndRebuildRdbStore(ret) == ERR_OK) {
-        HILOG_WARN("Check rdb corrupt,rebuild form rdb successfully");
-    }
+    HILOG_WARN("Insert operation failed, key=%{public}s, ret=%{public}" PRId32, key.c_str(), ret);
     return ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
 
@@ -210,14 +222,21 @@ ErrCode FormRdbDataMgr::InsertData(const std::string &tableName, const std::stri
             NativeRdb::ConflictResolution::ON_CONFLICT_REPLACE);
     }
 
+    if (ret != NativeRdb::E_OK && CheckAndRebuildRdbStore(ret) == ERR_OK) {
+        HILOG_WARN("Check rdb corrupt,rebuild form rdb successfully");
+        {
+            std::shared_lock<std::shared_mutex> guard(rdbStoreMutex_);
+            int64_t rowId = -1;
+            ret = rdbStore_->InsertWithConflictResolution(rowId, tableName, valuesBucket,
+                NativeRdb::ConflictResolution::ON_CONFLICT_REPLACE);
+        }
+    }
+
     if (ret == NativeRdb::E_OK) {
         return ERR_OK;
     }
 
-    HILOG_WARN("Insert operation failed, key=%{public}s", key.c_str());
-    if (CheckAndRebuildRdbStore(ret) == ERR_OK) {
-        HILOG_WARN("Check rdb corrupt,rebuild form rdb successfully");
-    }
+    HILOG_WARN("Insert operation failed, key=%{public}s, ret=%{public}" PRId32, key.c_str(), ret);
     return ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
 
@@ -243,15 +262,20 @@ ErrCode FormRdbDataMgr::DeleteData(const std::string &tableName, const std::stri
         ret = rdbStore_->Delete(rowId, absRdbPredicates);
     }
 
+    if (ret != NativeRdb::E_OK && CheckAndRebuildRdbStore(ret) == ERR_OK) {
+        HILOG_WARN("Check rdb corrupt,rebuild form rdb successfully");
+        {
+            std::shared_lock<std::shared_mutex> guard(rdbStoreMutex_);
+            int32_t rowId = -1;
+            ret = rdbStore_->Delete(rowId, absRdbPredicates);
+        }
+    }
+
     if (ret == NativeRdb::E_OK) {
         return ERR_OK;
     }
 
-    HILOG_WARN("Delete operation failed, key=%{public}s", key.c_str());
-    if (CheckAndRebuildRdbStore(ret) == ERR_OK) {
-        HILOG_WARN("Check rdb corrupt,rebuild form rdb successfully");
-        return ERR_OK;
-    }
+    HILOG_WARN("Delete operation failed, key=%{public}s, ret=%{public}" PRId32, key.c_str(), ret);
     return ERR_APPEXECFWK_FORM_COMMON_CODE;
 }
 
@@ -543,15 +567,21 @@ bool FormRdbDataMgr::InsertData(
             rowId, tableName, valuesBucket, NativeRdb::ConflictResolution::ON_CONFLICT_REPLACE);
     }
 
+    if (ret != NativeRdb::E_OK && CheckAndRebuildRdbStore(ret) == ERR_OK) {
+        HILOG_WARN("Check rdb corrupt,rebuild form rdb successfully");
+        {
+            std::shared_lock<std::shared_mutex> guard(rdbStoreMutex_);
+            ret = rdbStore_->InsertWithConflictResolution(
+                rowId, tableName, valuesBucket, NativeRdb::ConflictResolution::ON_CONFLICT_REPLACE);
+        }
+    }
+
     if (ret == NativeRdb::E_OK) {
         return true;
     }
 
-    HILOG_WARN("Insert operation failed");
-    if (CheckAndRebuildRdbStore(ret) == ERR_OK) {
-        HILOG_WARN("Check rdb corrupt,rebuild form rdb successfully");
-    }
-    return ret == NativeRdb::E_OK;
+    HILOG_WARN("Insert operation failed, ret=%{public}" PRId32, ret);
+    return false;
 }
 
 bool FormRdbDataMgr::DeleteData(const NativeRdb::AbsRdbPredicates &absRdbPredicates)
@@ -568,15 +598,20 @@ bool FormRdbDataMgr::DeleteData(const NativeRdb::AbsRdbPredicates &absRdbPredica
         ret = rdbStore_->Delete(rowId, absRdbPredicates);
     }
 
+    if (ret != NativeRdb::E_OK && CheckAndRebuildRdbStore(ret) == ERR_OK) {
+        HILOG_WARN("Check rdb corrupt,rebuild form rdb successfully");
+        {
+            std::shared_lock<std::shared_mutex> guard(rdbStoreMutex_);
+            int32_t rowId = -1;
+            ret = rdbStore_->Delete(rowId, absRdbPredicates);
+        }
+    }
+
     if (ret == NativeRdb::E_OK) {
         return true;
     }
 
-    HILOG_WARN("Delete operation failed");
-    if (CheckAndRebuildRdbStore(ret) == ERR_OK) {
-        HILOG_WARN("Check rdb corrupt,rebuild form rdb successfully");
-        return true;
-    }
+    HILOG_WARN("Delete operation failed, ret=%{public}" PRId32, ret);
     return false;
 }
 
@@ -619,6 +654,13 @@ ErrCode FormRdbDataMgr::CheckAndRebuildRdbStore(int32_t rdbOperateRet)
         return ERR_APPEXECFWK_FORM_RDB_REPEATED_BUILD;
     }
 
+    auto restoreRet = rdbStore_->Restore("");
+    if (restoreRet == NativeRdb::E_OK) {
+        HILOG_INFO("Restore rdb succeeded");
+    } else {
+        HILOG_WARN("Restore rdb failed, errorCode:%{public}" PRId32, restoreRet);
+    }
+
     ErrCode ret = LoadRdbStore();
     if (ret != ERR_OK) {
         HILOG_ERROR("Reload form rdb failed, ret:%{public}" PRId32 ".", ret);
@@ -626,14 +668,17 @@ ErrCode FormRdbDataMgr::CheckAndRebuildRdbStore(int32_t rdbOperateRet)
     }
     lastRdbBuildTime_ = curTime;
 
-    for (auto iter = formRdbTableCfgMap_.begin(); iter != formRdbTableCfgMap_.end(); iter++) {
-        std::string createTableSql = !iter->second.createTableSql.empty() ? iter->second.createTableSql
-            : "CREATE TABLE IF NOT EXISTS " + iter->second.tableName
-            + " (KEY TEXT NOT NULL PRIMARY KEY, VALUE TEXT NOT NULL);";
-        int32_t result = rdbStore_->ExecuteSql(createTableSql);
-        if (result != NativeRdb::E_OK) {
-            HILOG_ERROR("Recreate form rdb table failed, ret:%{public}" PRId32 ", name is %{public}s",
-                result, iter->first.c_str());
+    if (restoreRet != NativeRdb::E_OK) {
+        //fallback restoration if Restore() did not work
+        for (auto iter = formRdbTableCfgMap_.begin(); iter != formRdbTableCfgMap_.end(); iter++) {
+            std::string createTableSql = !iter->second.createTableSql.empty() ? iter->second.createTableSql
+                : "CREATE TABLE IF NOT EXISTS " + iter->second.tableName
+                + " (KEY TEXT NOT NULL PRIMARY KEY, VALUE TEXT NOT NULL);";
+            int32_t result = rdbStore_->ExecuteSql(createTableSql);
+            if (result != NativeRdb::E_OK) {
+                HILOG_ERROR("Recreate form rdb table failed, ret:%{public}" PRId32 ", name is %{public}s",
+                    result, iter->first.c_str());
+            }
         }
     }
     return ERR_OK;
@@ -652,6 +697,7 @@ ErrCode FormRdbDataMgr::LoadRdbStore()
         "",
         NativeRdb::SecurityLevel::S1);
     rdbStoreConfig.SetAllowRebuild(true);
+    rdbStoreConfig.SetHaMode(NativeRdb::HAMode::MAIN_REPLICA);
     int32_t errCode = NativeRdb::E_OK;
     RdbStoreDataCallBackFormInfoStorage rdbDataCallBack_(rdbPath);
 
