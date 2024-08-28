@@ -20,8 +20,10 @@
 #include "form_js_info.h"
 #include "form_mgr_errors.h"
 #define private public
+#define protected public
 #include "form_render_record.h"
 #undef private
+#undef protected
 #include "gmock/gmock.h"
 #include "fms_log_wrapper.h"
 #include "js_runtime.h"
@@ -1717,4 +1719,25 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_090, TestSize.Level0)
     bool ret = formRenderRecordPtr_->RecoverRenderer(requests, requestIndex);
     EXPECT_EQ(false, ret);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_090 end";
+}
+
+/**
+ * @tc.name: FormRenderRecord_Release_00001
+ * @tc.desc: test FormRenderRecord::Release()
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecord_Release_0001, TestSize.Level1)
+{
+    ASSERT_NE(formRenderRecordPtr_, nullptr);
+    auto tempStorageEventHandler = formRenderRecordPtr_->eventHandler_;
+    auto tempStorageEventRunner = formRenderRecordPtr_->eventRunner_;
+    formRenderRecordPtr_->eventHandler_ = nullptr;
+    formRenderRecordPtr_->Release();
+    EXPECT_NE(formRenderRecordPtr_->eventRunner_, nullptr);
+
+    formRenderRecordPtr_->eventHandler_ = tempStorageEventHandler;
+    formRenderRecordPtr_->Release();
+    
+    EXPECT_EQ(formRenderRecordPtr_->eventRunner_, nullptr);
+    formRenderRecordPtr_->eventRunner_ = tempStorageEventRunner;
 }
