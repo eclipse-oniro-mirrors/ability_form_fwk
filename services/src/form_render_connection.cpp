@@ -57,13 +57,11 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
     }
 
     FormRecord newRecord(formRecord_);
-    if (!FormCacheMgr::GetInstance().NeedAcquireProviderData(newRecord.formId)) {
-        std::string cacheData;
-        std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
-        if (FormCacheMgr::GetInstance().GetData(formRecord_.formId, cacheData, imageDataMap)) {
-            newRecord.formProviderInfo.SetFormDataString(cacheData);
-            newRecord.formProviderInfo.SetImageDataMap(imageDataMap);
-        }
+    std::string cacheData;
+    std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
+    if (FormCacheMgr::GetInstance().GetData(formRecord_.formId, cacheData, imageDataMap)) {
+        newRecord.formProviderInfo.SetFormDataString(cacheData);
+        newRecord.formProviderInfo.SetImageDataMap(imageDataMap);
     }
 
     sptr<FormRenderConnection> connection(this);
