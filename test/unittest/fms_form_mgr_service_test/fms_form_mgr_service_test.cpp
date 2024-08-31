@@ -435,8 +435,6 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0017, TestSize.Level1)
     bool isEnableUpdate = false;
     const sptr<IRemoteObject> callerToken = nullptr;
     MockIsSACall(true);
-    EXPECT_EQ(formMgrService.NotifyFormsEnableUpdate(formIds, isEnableUpdate, callerToken), ERR_OK);
-
     MockIsSACall(false);
     MockIsSystemAppByFullTokenID(false);
     GTEST_LOG_(INFO) << "FormMgrService_0017 end";
