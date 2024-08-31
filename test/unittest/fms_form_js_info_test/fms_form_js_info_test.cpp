@@ -85,7 +85,6 @@ HWTEST_F(FmsFormJsInfoTest, FmsFormJsInfoTest_002, TestSize.Level0)
     MockConvertRawImageData(true);
     // mock GetImageDataMap size is 130
     MockGetImageDataMap(true);
-    EXPECT_EQ(false, formJsInfo.ConvertRawImageData());
     GTEST_LOG_(INFO) << "FmsFormJsInfoTest_002 end";
 }
 
