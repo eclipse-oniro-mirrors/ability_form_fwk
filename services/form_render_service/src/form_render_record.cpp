@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -42,8 +42,9 @@ namespace FormRender {
 constexpr int32_t RENDER_FORM_FAILED = -1;
 constexpr int32_t RELOAD_FORM_FAILED = -1;
 constexpr int32_t RECYCLE_FORM_FAILED = -1;
-constexpr int32_t TIMEOUT = 10 * 1000;
+constexpr int32_t ADD_THREAD_FAIL = -1;
 constexpr int32_t CHECK_THREAD_TIME = 3;
+constexpr uint64_t WATCHDOG_TIMEOUT = 5 * 1000;
 constexpr char FORM_RENDERER_COMP_ID[] = "ohos.extra.param.key.form_comp_id";
 namespace {
 uint64_t GetCurrentTickMillseconds()
@@ -241,17 +242,15 @@ void FormRenderRecord::AddWatchDogThreadMonitor()
 {
     HILOG_INFO("add watchDog monitor, bundleName is %{public}s, uid is %{public}s",
         bundleName_.c_str(), uid_.c_str());
-    std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
-    auto watchdogTask = [thisWeakPtr]() {
-        auto renderRecord = thisWeakPtr.lock();
-        if (renderRecord) {
-            renderRecord->Timer();
-        }
-    };
 
-    std::string eventHandleName;
-    eventHandleName.append(bundleName_).append(std::to_string(GetCurrentTickMillseconds()));
-    OHOS::HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask(eventHandleName, watchdogTask, TIMEOUT);
+    eventHandleName_.clear();
+    eventHandleName_.append(bundleName_).append(std::to_string(GetCurrentTickMillseconds()));
+
+    auto getWatchdogAddThreadRes =
+        OHOS::HiviewDFX::Watchdog::GetInstance().AddThread(eventHandleName_, eventHandler_, WATCHDOG_TIMEOUT);
+    if (ADD_THREAD_FAIL == getWatchdogAddThreadRes) {
+        HILOG_WARN("Watchdog add thread fail!");
+    }
 }
 
 void FormRenderRecord::OnRenderingBlock(const std::string &bundleName)
@@ -1000,6 +999,8 @@ void FormRenderRecord::Release()
     if (eventRunner_) {
         eventRunner_->Stop();
         eventRunner_.reset();
+
+        OHOS::HiviewDFX::Watchdog::GetInstance().RemoveThread(eventHandleName_);
     }
 
     eventHandler_.reset();
