@@ -241,6 +241,10 @@ void FormSysEventReceiver::HandleUserSwitched(const EventFwk::CommonEventData &e
         }
         HandleUserIdForms(userId, lastUserId);
     });
+
+    FormTimerMgr::GetInstance().UpdateLimiterAlarm();
+    FormTimerMgr::GetInstance().UpdateAtTimerAlarm();
+    FormTimerMgr::GetInstance().UpdateDynamicAlarm();
 }
 
 void FormSysEventReceiver::HandleScreenOn()
