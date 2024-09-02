@@ -15,7 +15,7 @@
 
 #include <gtest/gtest.h>
 
-#include "mock_form_bms_helper.h"
+#include "form_bms_helper.h"
 #include "form_mgr_errors.h"
 #include "fms_log_wrapper.h"
 namespace {
@@ -24,6 +24,12 @@ namespace {
 }
 namespace OHOS {
 namespace AppExecFwk {
+FormBmsHelper::FormBmsHelper()
+{}
+
+FormBmsHelper::~FormBmsHelper()
+{}
+
 bool FormBmsHelper::GetBundleInfoDefault(const std::string& bundleName, int32_t userId, BundleInfo &bundleInfo)
 {
     GTEST_LOG_(INFO) << "GetBundleInfoDefault called";
