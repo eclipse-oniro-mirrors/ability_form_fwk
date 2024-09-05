@@ -1183,7 +1183,7 @@ bool FormRenderRecord::ReAddIfHapPathChanged(const std::vector<FormJsInfo> &form
         return false;
     }
     std::lock_guard<std::mutex> lock(contextsMapMutex_);
-    HILOG_INFO("hap path changed, restart runtime");
+    HILOG_INFO("restart runtime");
     auto task = [weak = weak_from_this()]() {
         auto renderRecord = weak.lock();
         if (renderRecord == nullptr) {
