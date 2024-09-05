@@ -140,8 +140,7 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
 
 #ifdef SUPPORT_POWER
     bool screenOnFlag = PowerMgr::PowerMgrClient::GetInstance().IsScreenOn();
-    bool collaborationScreenOnFlag = PowerMgr::PowerMgrClient::GetInstance().IsCollaborationScreenOn();
-    if (!screenOnFlag && !collaborationScreenOnFlag) {
+    if (!screenOnFlag) {
         FormDataMgr::GetInstance().SetNeedRefresh(formId, true);
         HILOG_DEBUG("screen off, set refresh flag, do not refresh now");
         return ERR_OK;
