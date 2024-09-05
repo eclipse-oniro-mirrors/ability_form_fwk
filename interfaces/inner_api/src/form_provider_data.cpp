@@ -30,6 +30,7 @@ namespace OHOS {
 namespace AppExecFwk {
 const std::string JSON_EMPTY_STRING = "{}";
 const std::string JSON_IMAGES_STRING = "formImages";
+const std::string JSON_PROXY_STRING = "proxies";
 constexpr int32_t READ_PARCEL_MAX_IMAGE_DATA_NUM_SIZE = 1000;
 constexpr int32_t MAX_IMAGE_BYTE_SIZE = 50 * 1024 * 1024;
 /**
@@ -170,6 +171,24 @@ void FormProviderData::ParseImagesData()
         } else {
             HILOG_ERROR("fd not integer");
         }
+    }
+}
+
+void FormProviderData::ParseProxies(std::vector<AppExecFwk::FormDataProxy> &formDataProxies)
+{
+    if (jsonFormProviderData_ == nullptr) {
+        HILOG_ERROR("null jsonFormProviderData_");
+        return;
+    }
+    if (!jsonFormProviderData_.contains(JSON_PROXY_STRING)) {
+        return;
+    }
+    nlohmann::json proxies = jsonFormProviderData_.at(JSON_PROXY_STRING);
+    for (auto &iter : proxies) {
+        AppExecFwk::FormDataProxy formDataProxy("", "");
+        formDataProxy.key = iter["key"].get<std::string>();
+        formDataProxy.subscribeId = iter["subscriberId"].get<std::string>();
+        formDataProxies.push_back(formDataProxy);
     }
 }
 

@@ -112,6 +112,9 @@ public:
     MOCK_METHOD1(AcquireAddFormResult, ErrCode(const int64_t formId));
     MOCK_METHOD4(RequestPublishFormWithSnapshot, ErrCode(Want &want, bool withFormBindingData,
         std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId));
+    MOCK_METHOD5(RequestPublishProxyFormWithSnapshot, ErrCode(Want &want, bool withFormBindingData,
+    std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
+        const std::vector<FormDataProxy> &formDataProxies));
     MOCK_METHOD1(BatchRefreshForms, ErrCode(const int32_t formRefreshType));
     MOCK_METHOD2(EnableForms, ErrCode(const std::string bundleName, const bool enable));
     MOCK_METHOD2(ReleaseRenderer, ErrCode(int64_t formId, const std::string &compId));

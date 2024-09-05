@@ -411,6 +411,13 @@ public:
     {
         return ERR_OK;
     }
+
+    ErrCode RequestPublishProxyFormWithSnapshot(Want &want, bool withFormBindingData,
+        std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
+        const std::vector<FormDataProxy> &formDataProxies) override
+    {
+        return 0;
+    }
     const int number_ = 1;
 };
 
