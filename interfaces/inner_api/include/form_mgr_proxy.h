@@ -584,6 +584,20 @@ public:
         std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId) override;
 
     /**
+     * @brief Request to publish a proxy form to the form host with normal authority.
+     *
+     * @param want The want of the form to publish.
+     * @param withFormBindingData Indicates whether the formBindingData is carried wit
+     * @param formBindingData Indicates the form data.
+     * @param formId Return the form id to be published.
+     * @param formDataProxies The proxies
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RequestPublishProxyFormWithSnapshot(Want &want, bool withFormBindingData,
+        std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
+        const std::vector<FormDataProxy> &formDataProxies) override;
+
+    /**
      * @brief Update form with formRefreshType, send to form manager service.
      * @param formRefreshType The type of the form to refresh, 0: AllForm 1: 2: AppForm 2: AtomicServiceForm
      * @return Returns ERR_OK on success, others on failure.
