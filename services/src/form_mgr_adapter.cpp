@@ -79,6 +79,7 @@
 #include "form_record_report.h"
 #include "form_ability_connection_reporter.h"
 
+static const int64_t MAX_NUMBER_OF_JS = 0x20000000000000;
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
@@ -2523,9 +2524,14 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    long long tempFromId = formId;
-    want.SetParam(Constants::PARAM_FORM_ID, tempFromId);
-    want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, tempFromId);
+    if (formId < MAX_NUMBER_OF_JS) {
+        want.SetParam(Constants::PARAM_FORM_ID, formId);
+        want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, formId);
+    } else {
+        want.SetParam(Constants::PARAM_FORM_ID, std::to_string(formId).c_str());
+        want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, std::to_string(formId).c_str());
+    }
+
     want.SetParam(Constants::PARAM_APP_CLONE_INDEX_KEY, 0);
     if (!want.GetUriString().empty()) {
         HILOG_INFO("Router by uri");
