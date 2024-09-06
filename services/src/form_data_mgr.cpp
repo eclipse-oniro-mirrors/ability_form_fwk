@@ -2261,6 +2261,7 @@ ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, bool isUnusedIncl
         formInstance.formName = formRecord.formName;
         formInstance.formUsageState = FormUsageState::USED;
         formInstance.description = formRecord.description;
+        formInstance.userId = formRecord.userId;
     } else if (isUnusedIncluded) {
         ret = GetUnusedFormInstanceById(formId, formInstance);
     } else {
