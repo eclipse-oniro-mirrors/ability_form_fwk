@@ -1061,12 +1061,10 @@ void FormTimerMgr::ClearLimiterTimerResource()
         HILOG_INFO("clear limiter timer end");
         limiterTimerId_ = 0L;
     }
-    {
-        std::lock_guard<std::mutex> guard(currentLimiterWantAgentMutex_);
-        if (currentLimiterWantAgent_ != nullptr) {
-            IN_PROCESS_CALL(WantAgentHelper::Cancel(currentLimiterWantAgent_));
-            currentLimiterWantAgent_ = nullptr;
-        }
+
+    if (currentLimiterWantAgent_ != nullptr) {
+        IN_PROCESS_CALL(WantAgentHelper::Cancel(currentLimiterWantAgent_));
+        currentLimiterWantAgent_ = nullptr;
     }
     HILOG_INFO("end");
 }
