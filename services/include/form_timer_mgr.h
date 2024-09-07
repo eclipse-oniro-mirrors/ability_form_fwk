@@ -403,6 +403,7 @@ private:
     uint64_t limiterTimerId_ = 0L;
     uint64_t limiterTimerReportId_ = 0L;
 
+    mutable std::mutex currentLimiterWantAgentMutex_;
     std::shared_ptr<WantAgent> currentUpdateAtWantAgent_ = nullptr;
     std::shared_ptr<WantAgent> currentDynamicWantAgent_ = nullptr;
     std::shared_ptr<WantAgent> currentLimiterWantAgent_ = nullptr;

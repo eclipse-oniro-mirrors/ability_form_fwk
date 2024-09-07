@@ -1030,10 +1030,13 @@ bool FormTimerMgr::UpdateLimiterAlarm()
     }
     timerOption->SetWantAgent(wantAgent);
 
-    if (currentLimiterWantAgent_ != nullptr) {
-        ClearLimiterTimerResource();
+    {
+        std::lock_guard<std::mutex> guard(currentLimiterWantAgentMutex_);
+        if (currentLimiterWantAgent_ != nullptr) {
+            ClearLimiterTimerResource();
+        }
+        currentLimiterWantAgent_ = wantAgent;
     }
-    currentLimiterWantAgent_ = wantAgent;
 
     limiterTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption);
     bool bRet = MiscServices::TimeServiceClient::GetInstance()->StartTimer(limiterTimerId_,
@@ -1058,9 +1061,12 @@ void FormTimerMgr::ClearLimiterTimerResource()
         HILOG_INFO("clear limiter timer end");
         limiterTimerId_ = 0L;
     }
-    if (currentLimiterWantAgent_ != nullptr) {
-        IN_PROCESS_CALL(WantAgentHelper::Cancel(currentLimiterWantAgent_));
-        currentLimiterWantAgent_ = nullptr;
+    {
+        std::lock_guard<std::mutex> guard(currentLimiterWantAgentMutex_);
+        if (currentLimiterWantAgent_ != nullptr) {
+            IN_PROCESS_CALL(WantAgentHelper::Cancel(currentLimiterWantAgent_));
+            currentLimiterWantAgent_ = nullptr;
+        }
     }
     HILOG_INFO("end");
 }
