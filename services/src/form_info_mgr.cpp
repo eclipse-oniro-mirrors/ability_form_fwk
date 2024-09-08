@@ -352,7 +352,7 @@ ErrCode BundleFormInfo::GetAllFormsInfo(std::vector<FormInfo> &formInfos, int32_
     return ERR_OK;
 }
 
-uint32_t BundleFormInfo::GetVersionCode(int32_t userId = Constants::INVALID_USER_ID)
+uint32_t BundleFormInfo::GetVersionCode(int32_t userId)
 {
     HILOG_DEBUG("begin");
     std::vector<FormInfo> formInfos;
@@ -799,7 +799,7 @@ ErrCode FormInfoMgr::ReloadFormInfos(const int32_t userId)
             continue;
         }
         bundleVersionMap.erase(bundleVersionPair);
-        uint32_t oldVersionCode = bundleVersionPair.second;
+        uint32_t oldVersionCode = bundleVersionPair->second;
         uint32_t newVersionCode = bundleFormInfoPair.second->GetVersionCode(userId);
         if (oldVersionCode == newVersionCode) {
             HILOG_INFO("vesionCode not change, bundleName=%{public}s, versionCode:%{public}d",
@@ -812,14 +812,14 @@ ErrCode FormInfoMgr::ReloadFormInfos(const int32_t userId)
     }
 
     for (auto const &bundleVersionPair : bundleVersionMap) {
-        std::shared_ptr<BundleFormInfo> bundleFormInfoPtr = std::make_shared<BundleFormInfo>(bundleVersionPair.first);
+        std::shared_ptr<BundleFormInfo> bundleFormInfoPtr = std::make_shared<BundleFormInfo>(bundleVersionPair->first);
         ErrCode errCode = bundleFormInfoPtr->UpdateStaticFormInfos(userId);
         if (errCode != ERR_OK || bundleFormInfoPtr->Empty()) {
             continue;
         }
-        bundleFormInfoMap_[bundleVersionPair.first] = bundleFormInfoPtr;
+        bundleFormInfoMap_[bundleVersionPair->first] = bundleFormInfoPtr;
         HILOG_INFO("add forms info success, bundleName=%{public}s, versionCode:%{public}d",
-            bundleVersionPair.first.c_str(), bundleVersionPair.second);
+            bundleVersionPair->first.c_str(), bundleVersionPair->second);
     }
     hasReloadedFormInfosState_ = true;
     HILOG_INFO("end, formInfoMapSize:%{public}zu", bundleFormInfoMap_.size());
