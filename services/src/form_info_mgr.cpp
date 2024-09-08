@@ -812,14 +812,14 @@ ErrCode FormInfoMgr::ReloadFormInfos(const int32_t userId)
     }
 
     for (auto const &bundleVersionPair : bundleVersionMap) {
-        std::shared_ptr<BundleFormInfo> bundleFormInfoPtr = std::make_shared<BundleFormInfo>(bundleVersionPair->first);
+        std::shared_ptr<BundleFormInfo> bundleFormInfoPtr = std::make_shared<BundleFormInfo>(bundleVersionPair.first);
         ErrCode errCode = bundleFormInfoPtr->UpdateStaticFormInfos(userId);
         if (errCode != ERR_OK || bundleFormInfoPtr->Empty()) {
             continue;
         }
-        bundleFormInfoMap_[bundleVersionPair->first] = bundleFormInfoPtr;
+        bundleFormInfoMap_[bundleVersionPair.first] = bundleFormInfoPtr;
         HILOG_INFO("add forms info success, bundleName=%{public}s, versionCode:%{public}d",
-            bundleVersionPair->first.c_str(), bundleVersionPair->second);
+            bundleVersionPair.first.c_str(), bundleVersionPair.second);
     }
     hasReloadedFormInfosState_ = true;
     HILOG_INFO("end, formInfoMapSize:%{public}zu", bundleFormInfoMap_.size());
