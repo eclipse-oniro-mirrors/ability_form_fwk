@@ -33,6 +33,7 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace {
 const std::string FORM_METADATA_NAME = "ohos.extension.form";
+const std::uint32_t ERR_VERSION_CODE = 0;
 } // namespace
 
 ErrCode FormInfoHelper::LoadFormConfigInfoByBundleName(const std::string &bundleName, std::vector<FormInfo> &formInfos,
@@ -351,7 +352,7 @@ ErrCode BundleFormInfo::GetAllFormsInfo(std::vector<FormInfo> &formInfos, int32_
     return ERR_OK;
 }
 
-uint32_t GetVersionCode(int32_t userId = Constants::INVALID_USER_ID)
+uint32_t BundleFormInfo::GetVersionCode(int32_t userId = Constants::INVALID_USER_ID)
 {
     HILOG_DEBUG("begin");
     std::vector<FormInfo> formInfos;
@@ -360,12 +361,12 @@ uint32_t GetVersionCode(int32_t userId = Constants::INVALID_USER_ID)
     for (const auto &item : formInfoStorages_) {
         item.GetAllFormsInfo(userId, formInfos);
         for (const auto &info : formInfos) {
-            if (info) {
-                return info->versionCode;
+            if (info.versionCode != ERR_VERSION_CODE) {
+                return info.versionCode;
             }
         }
     }
-    return ERR_FAILED;
+    return ERR_VERSION_CODE;
 }
 
 ErrCode BundleFormInfo::GetFormsInfoByModule(const std::string &moduleName, std::vector<FormInfo> &formInfos,
@@ -791,7 +792,6 @@ ErrCode FormInfoMgr::ReloadFormInfos(const int32_t userId)
     std::vector<FormInfo> formInfos;
     for (auto const &bundleFormInfoPair : bundleFormInfoMap_) {
         const std::string &bundleName = bundleFormInfoPair.first;
-        uint32_t oldVersionCode = bundleFormInfoPair.second;
         auto bundleVersionPair = bundleVersionMap.find(bundleName);
         if (bundleVersionPair == bundleVersionMap.end()) {
             bundleFormInfoPair.second->Remove(userId);
@@ -799,9 +799,10 @@ ErrCode FormInfoMgr::ReloadFormInfos(const int32_t userId)
             continue;
         }
         bundleVersionMap.erase(bundleVersionPair);
+        uint32_t oldVersionCode = bundleVersionPair.second;
         uint32_t newVersionCode = bundleFormInfoPair.second->GetVersionCode(userId);
         if (oldVersionCode == newVersionCode) {
-            HILOG_INFO("vesionCode not change, bundleName=%{public}s, versionCode:%{public}d", 
+            HILOG_INFO("vesionCode not change, bundleName=%{public}s, versionCode:%{public}d",
                 bundleName.c_str(), oldVersionCode);
             continue;
         }
