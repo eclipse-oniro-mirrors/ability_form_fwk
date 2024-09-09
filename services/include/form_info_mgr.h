@@ -69,6 +69,8 @@ public:
 
     ErrCode GetAllFormsInfo(std::vector<FormInfo> &formInfos, int32_t userId = Constants::INVALID_USER_ID);
 
+    uint32_t GetVersionCode(int32_t userId = Constants::INVALID_USER_ID);
+
     ErrCode GetFormsInfoByModule(const std::string &moduleName, std::vector<FormInfo> &formInfos,
         int32_t userId = Constants::INVALID_USER_ID);
 
@@ -127,7 +129,7 @@ private:
     static bool IsCaller(const std::string& bundleName);
     static bool CheckBundlePermission();
     static ErrCode CheckDynamicFormInfo(FormInfo &formInfo, const BundleInfo &bundleInfo);
-    static ErrCode GetFormBundleNames(std::set<std::string> &bundleNameSet, int32_t userId);
+    static ErrCode GetBundleVersionMap(std::map<std::string, std::uint32_t> &bundleVersionMap, int32_t userId);
 
     mutable std::shared_timed_mutex bundleFormInfoMapMutex_ {};
     std::unordered_map<std::string, std::shared_ptr<BundleFormInfo>> bundleFormInfoMap_ {};
