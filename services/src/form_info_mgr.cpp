@@ -789,7 +789,6 @@ ErrCode FormInfoMgr::ReloadFormInfos(const int32_t userId)
     
     std::unique_lock<std::shared_timed_mutex> guard(bundleFormInfoMapMutex_);
     hasReloadedFormInfosState_ = false;
-    std::vector<FormInfo> formInfos;
     for (auto const &bundleFormInfoPair : bundleFormInfoMap_) {
         const std::string &bundleName = bundleFormInfoPair.first;
         auto bundleVersionPair = bundleVersionMap.find(bundleName);
