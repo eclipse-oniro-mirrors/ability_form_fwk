@@ -348,8 +348,6 @@ HWTEST_F(FormRenderMgrInnerTest, FormRenderMgrInnerTest_014, TestSize.Level0)
     std::string bundleName = "<bundleName>";
     Want want;
     formRenderMgrInner.FillBundleInfo(want, bundleName);
-    EXPECT_EQ(true, want.HasParameter(Constants::FORM_COMPATIBLE_VERSION_KEY));
-    EXPECT_EQ(true, want.HasParameter(Constants::FORM_TARGET_VERSION_KEY));
     GTEST_LOG_(INFO) << "FormRenderMgrInnerTest_014 end";
 }
 

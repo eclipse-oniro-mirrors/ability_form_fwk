@@ -2527,6 +2527,8 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
         want.SetParam(Constants::PARAM_FORM_ID, std::to_string(formId));
         want.SetParam(Constants::PARAM_FORM_IDENTITY_KEY, std::to_string(formId));
     }
+
+    want.SetParam(Constants::PARAM_APP_CLONE_INDEX_KEY, 0);
     if (!want.GetUriString().empty()) {
         HILOG_INFO("Router by uri");
         if (FormRouterProxyMgr::GetInstance().HasRouterProxy(formId)) {
