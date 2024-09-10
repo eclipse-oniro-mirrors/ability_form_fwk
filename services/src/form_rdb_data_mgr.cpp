@@ -142,9 +142,14 @@ ErrCode FormRdbDataMgr::ExecuteSql(const std::string &sql)
         ret = rdbStore_->ExecuteSql(sql);
     }
 
-    if (ret != NativeRdb::E_OK && CheckAndRebuildRdbStore(ret) == ERR_OK) {
-        HILOG_WARN("Check rdb corrupt,rebuild form rdb successfully");
-        {
+    if (ret == NativeRdb::E_OK) {
+        if (rdbStore_->IsSlaveDiffFromMaster()) {
+            auto backupRet = rdbStore_->Backup("");
+            HILOG_WARN("rdb slave corrupt, backup from master, ret=%{public}" PRId32, backupRet);
+        }
+    } else {
+        if (CheckAndRebuildRdbStore(ret) == ERR_OK) {
+            HILOG_WARN("Check rdb corrupt,rebuild form rdb successfully");
             std::shared_lock<std::shared_mutex> guard(rdbStoreMutex_);
             ret = rdbStore_->ExecuteSql(sql);
         }
@@ -181,9 +186,14 @@ ErrCode FormRdbDataMgr::InsertData(const std::string &tableName, const std::stri
             NativeRdb::ConflictResolution::ON_CONFLICT_REPLACE);
     }
 
-    if (ret != NativeRdb::E_OK && CheckAndRebuildRdbStore(ret) == ERR_OK) {
-        HILOG_WARN("Check rdb corrupt,rebuild form rdb successfully");
-        {
+    if (ret == NativeRdb::E_OK) {
+        if (rdbStore_->IsSlaveDiffFromMaster()) {
+            auto backupRet = rdbStore_->Backup("");
+            HILOG_WARN("rdb slave corrupt, backup from master, ret=%{public}" PRId32, backupRet);
+        }
+    } else {
+        if (CheckAndRebuildRdbStore(ret) == ERR_OK) {
+            HILOG_WARN("Check rdb corrupt,rebuild form rdb successfully");
             std::shared_lock<std::shared_mutex> guard(rdbStoreMutex_);
             int64_t rowId = -1;
             ret = rdbStore_->InsertWithConflictResolution(rowId, tableName, valuesBucket,
@@ -222,9 +232,14 @@ ErrCode FormRdbDataMgr::InsertData(const std::string &tableName, const std::stri
             NativeRdb::ConflictResolution::ON_CONFLICT_REPLACE);
     }
 
-    if (ret != NativeRdb::E_OK && CheckAndRebuildRdbStore(ret) == ERR_OK) {
-        HILOG_WARN("Check rdb corrupt,rebuild form rdb successfully");
-        {
+    if (ret == NativeRdb::E_OK) {
+        if (rdbStore_->IsSlaveDiffFromMaster()) {
+            auto backupRet = rdbStore_->Backup("");
+            HILOG_WARN("rdb slave corrupt, backup from master, ret=%{public}" PRId32, backupRet);
+        }
+    } else {
+        if (CheckAndRebuildRdbStore(ret) == ERR_OK) {
+            HILOG_WARN("Check rdb corrupt,rebuild form rdb successfully");
             std::shared_lock<std::shared_mutex> guard(rdbStoreMutex_);
             int64_t rowId = -1;
             ret = rdbStore_->InsertWithConflictResolution(rowId, tableName, valuesBucket,
@@ -262,9 +277,14 @@ ErrCode FormRdbDataMgr::DeleteData(const std::string &tableName, const std::stri
         ret = rdbStore_->Delete(rowId, absRdbPredicates);
     }
 
-    if (ret != NativeRdb::E_OK && CheckAndRebuildRdbStore(ret) == ERR_OK) {
-        HILOG_WARN("Check rdb corrupt,rebuild form rdb successfully");
-        {
+    if (ret == NativeRdb::E_OK) {
+        if (rdbStore_->IsSlaveDiffFromMaster()) {
+            auto backupRet = rdbStore_->Backup("");
+            HILOG_WARN("rdb slave corrupt, backup from master, ret=%{public}" PRId32, backupRet);
+        }
+    } else {
+        if (CheckAndRebuildRdbStore(ret) == ERR_OK) {
+            HILOG_WARN("Check rdb corrupt,rebuild form rdb successfully");
             std::shared_lock<std::shared_mutex> guard(rdbStoreMutex_);
             int32_t rowId = -1;
             ret = rdbStore_->Delete(rowId, absRdbPredicates);
@@ -567,9 +587,14 @@ bool FormRdbDataMgr::InsertData(
             rowId, tableName, valuesBucket, NativeRdb::ConflictResolution::ON_CONFLICT_REPLACE);
     }
 
-    if (ret != NativeRdb::E_OK && CheckAndRebuildRdbStore(ret) == ERR_OK) {
-        HILOG_WARN("Check rdb corrupt,rebuild form rdb successfully");
-        {
+    if (ret == NativeRdb::E_OK) {
+        if (rdbStore_->IsSlaveDiffFromMaster()) {
+            auto backupRet = rdbStore_->Backup("");
+            HILOG_WARN("rdb slave corrupt, backup from master, ret=%{public}" PRId32, backupRet);
+        }
+    } else {
+        if (CheckAndRebuildRdbStore(ret) == ERR_OK) {
+            HILOG_WARN("Check rdb corrupt,rebuild form rdb successfully");
             std::shared_lock<std::shared_mutex> guard(rdbStoreMutex_);
             ret = rdbStore_->InsertWithConflictResolution(
                 rowId, tableName, valuesBucket, NativeRdb::ConflictResolution::ON_CONFLICT_REPLACE);
@@ -598,9 +623,14 @@ bool FormRdbDataMgr::DeleteData(const NativeRdb::AbsRdbPredicates &absRdbPredica
         ret = rdbStore_->Delete(rowId, absRdbPredicates);
     }
 
-    if (ret != NativeRdb::E_OK && CheckAndRebuildRdbStore(ret) == ERR_OK) {
-        HILOG_WARN("Check rdb corrupt,rebuild form rdb successfully");
-        {
+    if (ret == NativeRdb::E_OK) {
+        if (rdbStore_->IsSlaveDiffFromMaster()) {
+            auto backupRet = rdbStore_->Backup("");
+            HILOG_WARN("rdb slave corrupt, backup from master, ret=%{public}" PRId32, backupRet);
+        }
+    } else {
+        if (CheckAndRebuildRdbStore(ret) == ERR_OK) {
+            HILOG_WARN("Check rdb corrupt,rebuild form rdb successfully");
             std::shared_lock<std::shared_mutex> guard(rdbStoreMutex_);
             int32_t rowId = -1;
             ret = rdbStore_->Delete(rowId, absRdbPredicates);
