@@ -164,6 +164,21 @@ public:
      * @param userId User ID.
      */
     void RefreshWhenFormVisible(const int64_t &formId, const int32_t &userId);
+    /**
+     * @brief Update at timer task alarm.
+     * @return Returns true on success, false on failure.
+     */
+    bool UpdateAtTimerAlarm();
+    /**
+     * @brief Update limiter task alarm.
+     * @return Returns true on success, false on failure.
+     */
+    bool UpdateLimiterAlarm();
+    /**
+     * @brief Update dynamic refresh task alarm.
+     * @return Returns true on success, false on failure.
+     */
+    bool UpdateDynamicAlarm();
 
 #ifdef RES_SCHEDULE_ENABLE
     /**
@@ -247,16 +262,6 @@ private:
      */
     bool DeleteUpdateAtTimer(int64_t formId);
     /**
-     * @brief Update at timer task alarm.
-     * @return Returns true on success, false on failure.
-     */
-    bool UpdateAtTimerAlarm();
-    /**
-     * @brief Update limiter task alarm.
-     * @return Returns true on success, false on failure.
-     */
-    bool UpdateLimiterAlarm();
-    /**
      * @brief Clear limiter timer resource.
      */
     void ClearLimiterTimerResource();
@@ -266,11 +271,6 @@ private:
      * @return Returns true on success, false on failure.
      */
     bool DeleteDynamicItem(int64_t formId);
-    /**
-     * @brief Update dynamic refresh task alarm.
-     * @return Returns true on success, false on failure.
-     */
-    bool UpdateDynamicAlarm();
     /**
      * @brief Clear dynamic refresh resource.
      */
