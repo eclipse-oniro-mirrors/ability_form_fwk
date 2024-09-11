@@ -1182,40 +1182,22 @@ bool FormRenderRecord::ReAddIfHapPathChanged(const std::vector<FormJsInfo> &form
         return false;
     }
     std::lock_guard<std::mutex> lock(contextsMapMutex_);
-    for (const auto &formJsInfo : formJsInfos) {
-        auto iter = contextsMapForModuleName_.find(GenerateContextKey(formJsInfo));
-        if (iter == contextsMapForModuleName_.end()) {
-            HILOG_WARN("no Context, bundle name is %{public}s", formJsInfo.bundleName.c_str());
-            continue;
+    HILOG_INFO("hap path changed");
+    auto task = [weak = weak_from_this()]() {
+        auto renderRecord = weak.lock();
+        if (renderRecord == nullptr) {
+            HILOG_ERROR("renderRecord is null");
+            return;
         }
-
-        if (iter->second == nullptr) {
-            HILOG_WARN("Context is nullptr, bundle name is %{public}s", formJsInfo.bundleName.c_str());
-            continue;
-        }
-        auto hapModuleInfo = iter->second->GetHapModuleInfo();
-        if (hapModuleInfo == nullptr || hapModuleInfo->hapPath == formJsInfo.jsFormCodePath) {
-            continue;
-        }
-        HILOG_INFO("hap path changed: %{public}s. current:%{public}s", formJsInfo.jsFormCodePath.c_str(),
-            hapModuleInfo->hapPath.c_str());
-        auto task = [weak = weak_from_this()]() {
-            auto renderRecord = weak.lock();
-            if (renderRecord == nullptr) {
-                HILOG_ERROR("renderRecord is null");
-                return;
-            }
-            FormMemoryGuard memoryGuard;
-            renderRecord->HandleReleaseAllRendererInJsThread();
-        };
-        eventHandler->PostSyncTask(task, "ReleaseAllRenderer");
-        Release();
-        UpdateAllFormRequest(formJsInfos, true);
-        CreateEventHandler(bundleName_, true);
-        ReAddRecycledForms(formJsInfos);
-        return true;
-    }
-    return false;
+        FormMemoryGuard memoryGuard;
+        renderRecord->HandleReleaseAllRendererInJsThread();
+    };
+    eventHandler->PostSyncTask(task, "ReleaseAllRenderer");
+    Release();
+    UpdateAllFormRequest(formJsInfos, true);
+    CreateEventHandler(bundleName_, true);
+    ReAddRecycledForms(formJsInfos);
+    return true;
 }
 
 void FormRenderRecord::HandleReleaseAllRendererInJsThread()
