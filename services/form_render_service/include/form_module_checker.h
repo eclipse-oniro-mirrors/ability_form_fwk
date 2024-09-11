@@ -38,5 +38,7 @@ private:
     static bool CheckApiAllowList(const std::string& apiPath);
     static bool IsModuelAllowToLoad(const std::string& moduleName);
     static bool CheckApiWithSuffix(const std::string& apiPath, const std::string& item);
+    static std::vector<std::string> GetModuleAllowList();
+    static std::vector<std::string> modulesFromCfg_;
 };
 #endif /* OHOS_FORM_FWK_FORM_MODULE_CHECKER_H */
