@@ -19,8 +19,10 @@
 #include <cstddef>
 #include <map>
 #include <string>
+#include <vector>
 
 #include "form_ashmem.h"
+#include "form_provider_data_proxy.h"
 #include "message_parcel.h"
 #include "nlohmann/json.hpp"
 #include "parcel.h"
@@ -92,6 +94,13 @@ public:
      * {"images": {"key": fd, "key": fd}}
      */
     void ParseImagesData();
+
+    /**
+     * @brief Parse proxies in jsonFormProviderData_. The proxies data is in the format of
+     * {"proxies": [{"key": "proxy_uri1", "subscriberId": "12345"},
+     *              {"key": "proxy_uri2", "subscriberId": "67890"}]}
+     */
+    void ParseProxies(std::vector<AppExecFwk::FormDataProxy> &formDataProxies);
 
     /**
      * @brief Removes data of an image with the specified {@code picName} from this {@code FormProviderData} instance.
