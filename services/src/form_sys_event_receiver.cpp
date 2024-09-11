@@ -227,6 +227,10 @@ void FormSysEventReceiver::HandleUserSwitched(const EventFwk::CommonEventData &e
     serialQueue_->ScheduleTask(0, [userId]() {
         FormInfoMgr::GetInstance().ReloadFormInfos(userId);
     });
+
+    FormTimerMgr::GetInstance().UpdateLimiterAlarm();
+    FormTimerMgr::GetInstance().UpdateAtTimerAlarm();
+    FormTimerMgr::GetInstance().UpdateDynamicAlarm();
 }
 
 void FormSysEventReceiver::HandleScreenOn()
