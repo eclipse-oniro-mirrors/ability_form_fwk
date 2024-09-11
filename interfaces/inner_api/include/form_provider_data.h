@@ -55,6 +55,15 @@ public:
     explicit FormProviderData(std::string jsonDataString);
 
     /**
+     * @brief A constructor used to create a {@code FormProviderData} instance with data of the {@code String} type
+     * specified.
+     * @param jsonDataString Indicates the data to be carried in the new {@code FormProviderData} instance, in JSON
+     * string format.
+     * @param isUsedInFRS Indicates is used in frs
+     */
+    explicit FormProviderData(std::string jsonDataString, bool isUsedInFRS);
+    
+    /**
      * @brief Destructor.
      */
     ~FormProviderData() override = default;
