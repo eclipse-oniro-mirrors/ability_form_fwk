@@ -1496,7 +1496,11 @@ ErrCode FormMgr::RequestPublishFormWithSnapshot(Want &want, bool withFormBinding
         HILOG_ERROR("errCode:%{public}d", errCode);
         return errCode;
     }
-    return remoteProxy_->RequestPublishFormWithSnapshot(want, withFormBindingData, formBindingData, formId);
+    if (formDataProxies.empty()) {
+        return remoteProxy_->RequestPublishFormWithSnapshot(want, withFormBindingData, formBindingData, formId);
+    }
+    return remoteProxy_->RequestPublishProxyFormWithSnapshot(want, withFormBindingData, formBindingData, formId,
+        formDataProxies);
 }
 
 int32_t FormMgr::BatchRefreshForms(const int32_t formRefreshType)
