@@ -92,6 +92,7 @@ int FormSupplyCallback::OnAcquire(const FormProviderInfo &formProviderInfo, cons
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     int64_t formId = std::stoll(strFormId);
+    FormReport::GetInstance().SetAddFormFinish(formId);
     FormReport::GetInstance().SetStartAquireTime(formId, FormUtil::GetCurrentSteadyClockMillseconds());
     FormRecordReport::GetInstance().SetFormRecordRecordInfo(formId, want);
     FormReport::GetInstance().SetFormRecordInfo(formId, want);

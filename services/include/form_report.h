@@ -43,6 +43,7 @@ public:
     int64_t endGetTime_;
     int64_t durationStartTime_;
     int64_t durationEndTime_;
+    bool addFormFinish = false;
 };
 
 class FormReport final : public DelayedRefSingleton<FormReport> {
@@ -60,6 +61,8 @@ public:
     void SetEndGetTime(int64_t formId, int64_t endTime);
     void SetDurationStartTime(int64_t formId, int64_t startTime);
     void SetDurationEndTime(int64_t formId, int64_t endTime);
+    void GetAddFormFinish(int64_t formId, bool &addFormFinish);
+    void SetAddFormFinish(int64_t formId);
     void HandleAddFormStatistic(int64_t formId);
     void HandleFirstUpdateStatistic(int64_t formId);
     void InsertFormId(int64_t formId);
