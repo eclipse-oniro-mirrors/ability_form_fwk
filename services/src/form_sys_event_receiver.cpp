@@ -115,7 +115,7 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
     if (bundleName.empty() && action != EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED &&
         action != EventFwk::CommonEventSupport::COMMON_EVENT_BUNDLE_SCAN_FINISHED &&
         action != EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED &&
-        action != EventFwk::CommonEventSupport::COMMON_EVENT_USER_UNLOCKED &&
+        action != EventFwk::CommonEventSupport::COMMON_EVENT_SECOND_MOUNTED &&
         action != EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON &&
         action != EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED) {
         HILOG_ERROR("invalid param, action:%{public}s, bundleName:%{public}s",
@@ -143,8 +143,8 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED) {
         // el2 path maybe not unlocked
         HandleScreenUnlocked();
-    } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_USER_UNLOCKED) {
-        // el2 path is unlocked when receive USER_UNLOCKED
+    } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SECOND_MOUNTED) {
+        // el2 path is unlocked when receive SECOND_MOUNTED
         HandleUserUnlocked();
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
         HandleScreenOn();
