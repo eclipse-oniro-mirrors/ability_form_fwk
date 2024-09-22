@@ -759,6 +759,7 @@ public:
         FORM_MGR_ENABLE_FORMS,
         FORM_MGR_IS_SYSTEM_APP_FORM,
         FORM_MGR_IS_FORM_BUNDLE_FORBIDDEN,
+        FORM_MGR_REQUEST_PUBLISH_PROXY_FORM_WITH_SNAPSHOT,
     };
 };
 }  // namespace AppExecFwk

@@ -2328,7 +2328,7 @@ ErrCode FormMgrProxy::RequestPublishProxyFormWithSnapshot(Want &want, bool withF
 
     MessageOption option;
     int32_t error = SendTransactCmd(
-        IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_FORM_WITH_SNAPSHOT,
+        IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_PROXY_FORM_WITH_SNAPSHOT,
         data,
         reply,
         option);
