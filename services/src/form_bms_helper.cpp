@@ -277,6 +277,7 @@ int32_t FormBmsHelper::GetCallerBundleName(std::string &callerBundleName)
         HILOG_ERROR("fail get form config info");
         return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
     }
+    HILOG_INFO("get form config info end");
     return ERR_OK;
 }
 

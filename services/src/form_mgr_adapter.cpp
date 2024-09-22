@@ -1797,7 +1797,7 @@ ErrCode FormMgrAdapter::GetFormInfo(const AAFwk::Want &want, FormInfo &formInfo)
         if ((formName.empty() && form.defaultFlag) || form.name == formName) {
             formInfo = form;
             formInfo.moduleName = moduleName;
-            HILOG_DEBUG("GetFormInfo end");
+            HILOG_INFO("GetFormInfo end");
             return ERR_OK;
         }
     }
