@@ -295,7 +295,11 @@ int FormMgrService::StopRenderingForm(const int64_t formId, const std::string &c
         HILOG_ERROR("invalid formId or not under currentActiveUser");
         return ret;
     }
-    return FormMgrAdapter::GetInstance().StopRenderingForm(formId, compId);
+    int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_StopRenderingForm",
+        API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
+    ret = FormMgrAdapter::GetInstance().StopRenderingForm(formId, compId);
+    HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
+    return ret;
 }
 
 /**
@@ -360,7 +364,11 @@ int FormMgrService::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
     eventInfo.abilityName = want.GetElement().GetAbilityName();
     FormEventReport::SendSecondFormEvent(FormEventName::REQUEST_FORM, HiSysEventType::BEHAVIOR, eventInfo);
 
-    return FormMgrAdapter::GetInstance().RequestForm(formId, callerToken, want);
+    int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_RequestForm",
+        API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
+    ret = FormMgrAdapter::GetInstance().RequestForm(formId, callerToken, want);
+    HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
+    return ret;
 }
 
 /**
