@@ -738,8 +738,7 @@ public:
         return 0;
     }
 #ifdef SUPPORT_GRAPHICS
-    int RegisterWindowManagerServiceHandler(const sptr<IWindowManagerServiceHandler>& handler,
-        bool animationEnabled = true) override
+    int RegisterWindowManagerServiceHandler(const sptr<IWindowManagerServiceHandler>& handler) override
     {
         return 0;
     }
