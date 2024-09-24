@@ -2374,6 +2374,7 @@ ErrCode FormMgrAdapter::AddRequestPublishForm(const FormItemInfo &formItemInfo, 
 
     // create form info for js
     FormDataMgr::GetInstance().CreateFormJsInfo(formId, formRecord, formJsInfo);
+    FormDataMgr::GetInstance().SetNeedRefresh(formId, true);
     if (formProviderData != nullptr) {
         formJsInfo.formData = formProviderData->GetDataString();
         formJsInfo.formProviderData = *formProviderData;
