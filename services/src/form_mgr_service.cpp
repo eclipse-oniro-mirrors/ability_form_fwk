@@ -76,8 +76,6 @@ const int32_t MAIN_USER_ID = 100;
 constexpr int MILLISECOND_WIDTH = 3;
 constexpr char MILLISECOND_FILLCHAR = '0';
 const int32_t API_TIME_OUT = 5;
-const int32_t API_TIME_OUT_15S = 15;
-const int32_t API_TIME_OUT_30S = 30;
 #ifdef RES_SCHEDULE_ENABLE
 constexpr int32_t SYSTEMLOADLEVEL_TIMERSTOP_THRESHOLD =
     static_cast<int32_t>(ResourceSchedule::ResType::SystemloadLevel::HIGH);
@@ -361,11 +359,7 @@ int FormMgrService::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
     eventInfo.abilityName = want.GetElement().GetAbilityName();
     FormEventReport::SendSecondFormEvent(FormEventName::REQUEST_FORM, HiSysEventType::BEHAVIOR, eventInfo);
 
-    int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_RequestForm",
-        API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
-    ret = FormMgrAdapter::GetInstance().RequestForm(formId, callerToken, want);
-    HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
-    return ret;
+    return FormMgrAdapter::GetInstance().RequestForm(formId, callerToken, want);
 }
 
 /**
@@ -1003,11 +997,7 @@ int FormMgrService::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
         HILOG_ERROR("Across local accounts permission failed");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
     }
-    int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_GetAllFormsInfo",
-        API_TIME_OUT_8S, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
-    ErrCode ret = FormMgrAdapter::GetInstance().GetAllFormsInfo(formInfos);
-    HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
-    return ret;
+    return FormMgrAdapter::GetInstance().GetAllFormsInfo(formInfos);
 }
 
 /**
