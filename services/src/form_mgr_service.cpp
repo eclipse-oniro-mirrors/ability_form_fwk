@@ -76,7 +76,8 @@ const int32_t MAIN_USER_ID = 100;
 constexpr int MILLISECOND_WIDTH = 3;
 constexpr char MILLISECOND_FILLCHAR = '0';
 const int32_t API_TIME_OUT = 5;
-const int32_t API_TIME_OUT_8S = 8;
+const int32_t API_TIME_OUT_15S = 15;
+const int32_t API_TIME_OUT_30S = 30;
 #ifdef RES_SCHEDULE_ENABLE
 constexpr int32_t SYSTEMLOADLEVEL_TIMERSTOP_THRESHOLD =
     static_cast<int32_t>(ResourceSchedule::ResType::SystemloadLevel::HIGH);
@@ -295,11 +296,7 @@ int FormMgrService::StopRenderingForm(const int64_t formId, const std::string &c
         HILOG_ERROR("invalid formId or not under currentActiveUser");
         return ret;
     }
-    int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_StopRenderingForm",
-        API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
-    ret = FormMgrAdapter::GetInstance().StopRenderingForm(formId, compId);
-    HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
-    return ret;
+    return FormMgrAdapter::GetInstance().StopRenderingForm(formId, compId);;
 }
 
 /**
