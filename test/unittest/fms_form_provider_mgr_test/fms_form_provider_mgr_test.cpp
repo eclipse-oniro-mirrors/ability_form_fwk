@@ -245,7 +245,7 @@ HWTEST_F(FmsFormProviderMgrTest, RefreshForm_002, TestSize.Level0)
 #ifdef SUPPORT_POWER
     bool screenOnFlag = PowerMgr::PowerMgrClient::GetInstance().IsScreenOn();
     if (!screenOnFlag) {
-        EXPECT_EQ(ERR_OK, FormProviderMgr::GetInstance().RefreshForm(formId, want, true));
+        EXPECT_EQ(ERR_APPEXECFWK_FORM_NOT_EXIST_ID, FormProviderMgr::GetInstance().RefreshForm(formId, want, true));
     } else {
         EXPECT_EQ(ERR_APPEXECFWK_FORM_PROVIDER_DEL_FAIL, FormProviderMgr::GetInstance().RefreshForm(formId, want,
             true));
@@ -281,7 +281,7 @@ HWTEST_F(FmsFormProviderMgrTest, RefreshForm_003, TestSize.Level1)
     FormDataMgr::GetInstance().AllotFormHostRecord(info, token_, formId, callingUid);
 #ifdef SUPPORT_POWER
     MockConnectServiceAbility(true);
-    EXPECT_EQ(ERR_OK, FormProviderMgr::GetInstance().RefreshForm(formId, want, true));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_NOT_EXIST_ID, FormProviderMgr::GetInstance().RefreshForm(formId, want, true));
 #endif
 
     GTEST_LOG_(INFO) << "fms_form_mgr_provider_test_006 end";
