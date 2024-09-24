@@ -294,7 +294,7 @@ int FormMgrService::StopRenderingForm(const int64_t formId, const std::string &c
         HILOG_ERROR("invalid formId or not under currentActiveUser");
         return ret;
     }
-    return FormMgrAdapter::GetInstance().StopRenderingForm(formId, compId);;
+    return FormMgrAdapter::GetInstance().StopRenderingForm(formId, compId);
 }
 
 /**
