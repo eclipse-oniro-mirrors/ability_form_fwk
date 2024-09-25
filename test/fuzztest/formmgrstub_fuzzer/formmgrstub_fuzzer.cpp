@@ -265,13 +265,6 @@ public:
     {
         return 0;
     }
-
-    ErrCode RequestPublishProxyFormWithSnapshot(Want &want, bool withFormBindingData,
-        std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
-        const std::vector<FormDataProxy> &formDataProxies) override
-    {
-        return 0;
-    }
 };
 
 void HandleFormMessage(std::shared_ptr<FormMgrStub> formMgrStub, MessageParcel &data, MessageParcel &reply)
@@ -349,7 +342,6 @@ void HandleFormRequest(std::shared_ptr<FormMgrStub> formMgrStub, MessageParcel &
     formMgrStub->HandleRecoverForms(data, reply);
     formMgrStub->HandleUpdateFormLocation(data, reply);
     formMgrStub->HandleRequestPublishFormWithSnapshot(data, reply);
-    formMgrStub->HandleRequestPublishProxyFormWithSnapshot(data, reply);
     formMgrStub->HandleBatchRefreshForms(data, reply);
     formMgrStub->HandleEnableForms(data, reply);
     formMgrStub->HandleIsFormBundleForbidden(data, reply);
