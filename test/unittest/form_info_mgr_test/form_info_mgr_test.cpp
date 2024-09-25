@@ -789,30 +789,30 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetFormsInfoByFilter_0400, TestSize.Level1
 }
 
 /**
- * @tc.name: FormInfoMgr_GetFormBundleNames_0100
- * @tc.number: GetFormBundleNames
- * @tc.desc: call GetFormBundleNames success null bundleFormInfo
+ * @tc.name: FormInfoMgr_GetBundleVersionMap_0100
+ * @tc.number: GetBundleVersionMap
+ * @tc.desc: call GetBundleVersionMap success null bundleFormInfo
  */
-HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetFormBundleNames_0100, TestSize.Level1)
+HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetBundleVersionMap_0100, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "FormInfoMgr_GetFormBundleNames_0100 start";
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetBundleVersionMap_0100 start";
     sptr<MockBundleMgrProxy> bmsProxy = new (std::nothrow) MockBundleMgrProxy(new (std::nothrow) MockBundleMgrStub());
     sptr<IBundleMgr> backup = FormBmsHelper::GetInstance().GetBundleMgr();
     FormBmsHelper::GetInstance().iBundleMgr_ = bmsProxy;
     auto bmsQueryExtensionTask = [] (const ExtensionAbilityType &extensionType, const int32_t &userId,
         std::vector<ExtensionAbilityInfo> &extensionInfos) {
-        GTEST_LOG_(INFO) << "FormInfoMgr_GetFormBundleNames_0100 bmsQueryExtensionTask called";
+        GTEST_LOG_(INFO) << "FormInfoMgr_GetBundleVersionMap_0100 bmsQueryExtensionTask called";
         return true;
     };
     EXPECT_CALL(*bmsProxy, QueryExtensionAbilityInfos(_, _, _)).Times(1).WillOnce(Invoke(bmsQueryExtensionTask));
     auto bmsGetBundleTask = [] (const BundleFlag flag, std::vector<BundleInfo> &bundleInfos, int32_t userId) {
-        GTEST_LOG_(INFO) << "FormInfoMgr_GetFormBundleNames_0100 bmsGetBundleTask called";
+        GTEST_LOG_(INFO) << "FormInfoMgr_GetBundleVersionMap_0100 bmsGetBundleTask called";
         return true;
     };
     EXPECT_CALL(*bmsProxy, GetBundleInfos(_, _, _)).Times(1).WillOnce(Invoke(bmsGetBundleTask));
-    std::set<std::string> bundleNameSet {};
+    std::map<std::string, std::uint32_t> bundleVersionMap {};
     int32_t userId = 0;
-    EXPECT_EQ(ERR_OK, formInfoMgr_.GetFormBundleNames(bundleNameSet, userId));
+    EXPECT_EQ(ERR_OK, formInfoMgr_.GetBundleVersionMap(bundleVersionMap, userId));
     FormBmsHelper::GetInstance().iBundleMgr_ = backup;
-    GTEST_LOG_(INFO) << "FormInfoMgr_GetFormBundleNames_0100 end";
+    GTEST_LOG_(INFO) << "FormInfoMgr_GetBundleVersionMap_0100 end";
 }
