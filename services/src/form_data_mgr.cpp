@@ -2180,7 +2180,7 @@ ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, FormInstance &for
             return ERR_APPEXECFWK_FORM_INVALID_PARAM;
         }
         auto info = formRecords_.find(formId);
-        isFormRecordsEnd = info != formRecords_.end();
+        isFormRecordsEnd = info == formRecords_.end();
         formRecord = info->second;
     }
     if (!isFormRecordsEnd) {
