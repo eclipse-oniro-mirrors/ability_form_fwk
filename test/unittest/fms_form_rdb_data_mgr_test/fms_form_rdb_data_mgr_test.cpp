@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include "appexecfwk_errors.h"
@@ -22,7 +23,9 @@
 #include "form_mgr_errors.h"
 #include "form_constants.h"
 #include "form_util.h"
+#include "mock_rdb_store.h"
 
+using namespace testing;
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::AppExecFwk;
@@ -34,6 +37,15 @@ const std::string FORM_ID = "FORM_ID";
 const std::string DATA_CACHE = "DATA_CACHE";
 const std::string FORM_IMAGES = "FORM_IMAGES";
 const std::string CACHE_STATE = "CACHE_STATE";
+const std::string TEST_TABLE = "table_test";
+const std::string TEST_TABLE_COL_KEY = "KEY";
+const std::string TEST_TABLE_COL_VALUE = "VALUE";
+const std::string TEST_TABLE_CREATE_SQL =
+    "CREATE TABLE IF NOT EXISTS " + TEST_TABLE + "(" +
+    TEST_TABLE_COL_KEY + " TEXT NOT NULL PRIMARY KEY, " +
+    TEST_TABLE_COL_VALUE + " TEXT);";
+const std::string TEST_KEY = "testKey";
+const std::string TEST_VALUE = "values";
 
 void MockInit(bool mockRet);
 
@@ -44,15 +56,29 @@ public:
     void SetUp() override;
     void TearDown() override;
     std::shared_ptr<RdbStoreDataCallBackFormInfoStorage> rdbDataCallBack_;
+    static std::shared_ptr<MockRdbStore> rdbStoreMock_;
 };
+
+std::shared_ptr<MockRdbStore> FmsFormRdbDataMgrTest::rdbStoreMock_ = nullptr;
 
 void FmsFormRdbDataMgrTest::SetUpTestCase()
 {
     GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest SetUpTestCase.";
+    RdbStoreConfig config(
+        "",
+        NativeRdb::StorageMode::MODE_DISK,
+        false,
+        std::vector<uint8_t>(),
+        Constants::FORM_JOURNAL_MODE,
+        Constants::FORM_SYNC_MODE,
+        "",
+        NativeRdb::SecurityLevel::S1);
+    rdbStoreMock_ = std::make_shared<MockRdbStore>(config);
 }
 
 void FmsFormRdbDataMgrTest::TearDownTestCase()
 {
+    rdbStoreMock_ = nullptr;
     GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest TearDownTestCase";
 }
 
@@ -423,6 +449,249 @@ HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_020, Function | SmallTest 
     result = FormRdbDataMgr::GetInstance().CheckAndRebuildRdbStore(NativeRdb::E_SQLITE_CORRUPT);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_020 end";
+}
+
+/**
+ * @tc.name: FmsFormRdbDataMgrTest_021
+ * @tc.desc: Test ExecuteSql
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_021, Function | SmallTest | Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_021 start";
+
+    FormRdbDataMgr::GetInstance().rdbStore_ = rdbStoreMock_;
+    std::string sql("SELECT COUNT(0) FROM ");
+    sql.append(Constants::FORM_RDB_TABLE_NAME);
+    sql.append(";");
+
+    EXPECT_CALL(*rdbStoreMock_, ExecuteSql(_, _)).Times(1).WillOnce(Return(E_OK));
+    EXPECT_CALL(*rdbStoreMock_, IsSlaveDiffFromMaster()).Times(1).WillOnce(Return(false));
+    EXPECT_CALL(*rdbStoreMock_, Backup(_, _)).Times(0);
+    auto result = FormRdbDataMgr::GetInstance().ExecuteSql(sql);
+    EXPECT_EQ(result, ERR_OK);
+
+    EXPECT_CALL(*rdbStoreMock_, ExecuteSql(_, _)).Times(1).WillOnce(Return(E_OK));
+    EXPECT_CALL(*rdbStoreMock_, IsSlaveDiffFromMaster()).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*rdbStoreMock_, Backup(_, _)).Times(1).WillOnce(Return(E_OK));
+    result = FormRdbDataMgr::GetInstance().ExecuteSql(sql);
+    EXPECT_EQ(result, ERR_OK);
+
+    FormRdbDataMgr::GetInstance().lastRdbBuildTime_ = 0;
+    EXPECT_CALL(*rdbStoreMock_, ExecuteSql(_, _)).Times(1).WillOnce(Return(E_SQLITE_CORRUPT));
+    EXPECT_CALL(*rdbStoreMock_, Restore(_, _)).Times(1).WillOnce(Return(E_OK));
+    result = FormRdbDataMgr::GetInstance().ExecuteSql(sql);
+    EXPECT_EQ(result, ERR_OK);
+    EXPECT_NE(rdbStoreMock_, FormRdbDataMgr::GetInstance().rdbStore_);
+
+    FormRdbDataMgr::GetInstance().rdbStore_ = nullptr;
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_021 end";
+}
+
+/**
+ * @tc.name: FmsFormRdbDataMgrTest_022
+ * @tc.desc: Test InsertData
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_022, Function | SmallTest | Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_022 start";
+
+    FormRdbDataMgr::GetInstance().rdbStore_ = nullptr;
+    FormRdbTableConfig formRdbTableConfig;
+    formRdbTableConfig.tableName = TEST_TABLE;
+    formRdbTableConfig.createTableSql = TEST_TABLE_CREATE_SQL;
+    auto result = FormRdbDataMgr::GetInstance().InitFormRdbTable(formRdbTableConfig);
+    EXPECT_EQ(result, ERR_OK);
+
+    FormRdbDataMgr::GetInstance().rdbStore_ = rdbStoreMock_;
+
+    EXPECT_CALL(*rdbStoreMock_, InsertWithConflictResolution(_, _, _, _)).Times(1).WillOnce(Return(E_OK));
+    EXPECT_CALL(*rdbStoreMock_, IsSlaveDiffFromMaster()).Times(1).WillOnce(Return(false));
+    EXPECT_CALL(*rdbStoreMock_, Backup(_, _)).Times(0);
+    result = FormRdbDataMgr::GetInstance().InsertData(TEST_TABLE, TEST_KEY);
+    EXPECT_EQ(result, ERR_OK);
+
+    EXPECT_CALL(*rdbStoreMock_, InsertWithConflictResolution(_, _, _, _)).Times(1).WillOnce(Return(E_OK));
+    EXPECT_CALL(*rdbStoreMock_, IsSlaveDiffFromMaster()).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*rdbStoreMock_, Backup(_, _)).Times(1).WillOnce(Return(E_OK));
+    result = FormRdbDataMgr::GetInstance().InsertData(TEST_TABLE, TEST_KEY);
+    EXPECT_EQ(result, ERR_OK);
+
+    FormRdbDataMgr::GetInstance().lastRdbBuildTime_ = 0;
+    EXPECT_CALL(*rdbStoreMock_, InsertWithConflictResolution(_, _, _, _)).Times(1).WillOnce(Return(E_SQLITE_CORRUPT));
+    EXPECT_CALL(*rdbStoreMock_, Restore(_, _)).Times(1).WillOnce(Return(E_OK));
+    result = FormRdbDataMgr::GetInstance().InsertData(TEST_TABLE, TEST_KEY);
+    EXPECT_EQ(result, ERR_OK);
+    EXPECT_NE(rdbStoreMock_, FormRdbDataMgr::GetInstance().rdbStore_);
+    std::unordered_map<std::string, std::string> data;
+    result = FormRdbDataMgr::GetInstance().QueryData(TEST_TABLE, TEST_KEY, data);
+    EXPECT_EQ(result, ERR_OK);
+    ASSERT_EQ(data.size(), 1);
+    EXPECT_STREQ(data.cbegin()->first.c_str(), TEST_KEY.c_str());
+
+    FormRdbDataMgr::GetInstance().rdbStore_ = nullptr;
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_022 end";
+}
+
+/**
+ * @tc.name: FmsFormRdbDataMgrTest_023
+ * @tc.desc: Test InsertData
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_023, Function | SmallTest | Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_023 start";
+
+    FormRdbDataMgr::GetInstance().rdbStore_ = rdbStoreMock_;
+
+    EXPECT_CALL(*rdbStoreMock_, InsertWithConflictResolution(_, _, _, _)).Times(1).WillOnce(Return(E_OK));
+    EXPECT_CALL(*rdbStoreMock_, IsSlaveDiffFromMaster()).Times(1).WillOnce(Return(false));
+    EXPECT_CALL(*rdbStoreMock_, Backup(_, _)).Times(0);
+    auto result = FormRdbDataMgr::GetInstance().InsertData(TEST_TABLE, TEST_KEY, TEST_VALUE);
+    EXPECT_EQ(result, ERR_OK);
+
+    EXPECT_CALL(*rdbStoreMock_, InsertWithConflictResolution(_, _, _, _)).Times(1).WillOnce(Return(E_OK));
+    EXPECT_CALL(*rdbStoreMock_, IsSlaveDiffFromMaster()).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*rdbStoreMock_, Backup(_, _)).Times(1).WillOnce(Return(E_OK));
+    result = FormRdbDataMgr::GetInstance().InsertData(TEST_TABLE, TEST_KEY, TEST_VALUE);
+    EXPECT_EQ(result, ERR_OK);
+
+    FormRdbDataMgr::GetInstance().lastRdbBuildTime_ = 0;
+    EXPECT_CALL(*rdbStoreMock_, InsertWithConflictResolution(_, _, _, _)).Times(1).WillOnce(Return(E_SQLITE_CORRUPT));
+    EXPECT_CALL(*rdbStoreMock_, Restore(_, _)).Times(1).WillOnce(Return(E_OK));
+    result = FormRdbDataMgr::GetInstance().InsertData(TEST_TABLE, TEST_KEY, TEST_VALUE);
+    EXPECT_EQ(result, ERR_OK);
+    EXPECT_NE(rdbStoreMock_, FormRdbDataMgr::GetInstance().rdbStore_);
+    std::unordered_map<std::string, std::string> data;
+    result = FormRdbDataMgr::GetInstance().QueryData(TEST_TABLE, TEST_KEY, data);
+    EXPECT_EQ(result, ERR_OK);
+    ASSERT_EQ(data.size(), 1);
+    EXPECT_STREQ(data[TEST_KEY].c_str(), TEST_VALUE.c_str());
+
+    FormRdbDataMgr::GetInstance().rdbStore_ = nullptr;
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_023 end";
+}
+
+/**
+ * @tc.name: FmsFormRdbDataMgrTest_024
+ * @tc.desc: Test DeleteData
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_024, Function | SmallTest | Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_024 start";
+
+    FormRdbDataMgr::GetInstance().rdbStore_ = rdbStoreMock_;
+
+    EXPECT_CALL(*rdbStoreMock_, Delete(_, _)).Times(1).WillOnce(Return(E_OK));
+    EXPECT_CALL(*rdbStoreMock_, IsSlaveDiffFromMaster()).Times(1).WillOnce(Return(false));
+    EXPECT_CALL(*rdbStoreMock_, Backup(_, _)).Times(0);
+    auto result = FormRdbDataMgr::GetInstance().DeleteData(TEST_TABLE, TEST_KEY);
+    EXPECT_EQ(result, ERR_OK);
+
+    EXPECT_CALL(*rdbStoreMock_, Delete(_, _)).Times(1).WillOnce(Return(E_OK));
+    EXPECT_CALL(*rdbStoreMock_, IsSlaveDiffFromMaster()).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*rdbStoreMock_, Backup(_, _)).Times(1).WillOnce(Return(E_OK));
+    result = FormRdbDataMgr::GetInstance().DeleteData(TEST_TABLE, TEST_KEY);
+    EXPECT_EQ(result, ERR_OK);
+
+    FormRdbDataMgr::GetInstance().lastRdbBuildTime_ = 0;
+    EXPECT_CALL(*rdbStoreMock_, Delete(_, _)).Times(1).WillOnce(Return(E_SQLITE_CORRUPT));
+    EXPECT_CALL(*rdbStoreMock_, Restore(_, _)).Times(1).WillOnce(Return(E_OK));
+    result = FormRdbDataMgr::GetInstance().DeleteData(TEST_TABLE, TEST_KEY);
+    EXPECT_EQ(result, ERR_OK);
+    EXPECT_NE(rdbStoreMock_, FormRdbDataMgr::GetInstance().rdbStore_);
+    std::unordered_map<std::string, std::string> data;
+    result = FormRdbDataMgr::GetInstance().QueryData(TEST_TABLE, TEST_KEY, data);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+
+    FormRdbDataMgr::GetInstance().rdbStore_ = nullptr;
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_024 end";
+}
+
+/**
+ * @tc.name: FmsFormRdbDataMgrTest_025
+ * @tc.desc: Test InsertData
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_025, Function | SmallTest | Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_025 start";
+
+    FormRdbDataMgr::GetInstance().rdbStore_ = rdbStoreMock_;
+
+    NativeRdb::ValuesBucket valuesBucket;
+    valuesBucket.PutString(TEST_TABLE_COL_KEY, TEST_KEY);
+    valuesBucket.PutString(TEST_TABLE_COL_VALUE, TEST_VALUE);
+    int64_t rowId;
+
+    EXPECT_CALL(*rdbStoreMock_, InsertWithConflictResolution(_, _, _, _)).Times(1).WillOnce(Return(E_OK));
+    EXPECT_CALL(*rdbStoreMock_, IsSlaveDiffFromMaster()).Times(1).WillOnce(Return(false));
+    EXPECT_CALL(*rdbStoreMock_, Backup(_, _)).Times(0);
+    auto result = FormRdbDataMgr::GetInstance().InsertData(TEST_TABLE, valuesBucket, rowId);
+    EXPECT_TRUE(result);
+
+    EXPECT_CALL(*rdbStoreMock_, InsertWithConflictResolution(_, _, _, _)).Times(1).WillOnce(Return(E_OK));
+    EXPECT_CALL(*rdbStoreMock_, IsSlaveDiffFromMaster()).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*rdbStoreMock_, Backup(_, _)).Times(1).WillOnce(Return(E_OK));
+    result = FormRdbDataMgr::GetInstance().InsertData(TEST_TABLE, valuesBucket, rowId);
+    EXPECT_TRUE(result);
+
+    FormRdbDataMgr::GetInstance().lastRdbBuildTime_ = 0;
+    EXPECT_CALL(*rdbStoreMock_, InsertWithConflictResolution(_, _, _, _)).Times(1).WillOnce(Return(E_SQLITE_CORRUPT));
+    EXPECT_CALL(*rdbStoreMock_, Restore(_, _)).Times(1).WillOnce(Return(E_OK));
+    result = FormRdbDataMgr::GetInstance().InsertData(TEST_TABLE, valuesBucket, rowId);
+    EXPECT_TRUE(result);
+    EXPECT_NE(rdbStoreMock_, FormRdbDataMgr::GetInstance().rdbStore_);
+    std::unordered_map<std::string, std::string> data;
+    result = FormRdbDataMgr::GetInstance().QueryData(TEST_TABLE, TEST_KEY, data);
+    EXPECT_EQ(result, ERR_OK);
+    ASSERT_EQ(data.size(), 1);
+    EXPECT_STREQ(data[TEST_KEY].c_str(), TEST_VALUE.c_str());
+
+    FormRdbDataMgr::GetInstance().rdbStore_ = nullptr;
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_025 end";
+}
+
+/**
+ * @tc.name: FmsFormRdbDataMgrTest_026
+ * @tc.desc: Test DeleteData
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormRdbDataMgrTest, FmsFormRdbDataMgrTest_026, Function | SmallTest | Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_026 start";
+
+    FormRdbDataMgr::GetInstance().rdbStore_ = rdbStoreMock_;
+
+    NativeRdb::AbsRdbPredicates absRdbPredicates(TEST_TABLE);
+    absRdbPredicates.EqualTo(TEST_TABLE_COL_KEY, TEST_KEY);
+
+    EXPECT_CALL(*rdbStoreMock_, Delete(_, _)).Times(1).WillOnce(Return(E_OK));
+    EXPECT_CALL(*rdbStoreMock_, IsSlaveDiffFromMaster()).Times(1).WillOnce(Return(false));
+    EXPECT_CALL(*rdbStoreMock_, Backup(_, _)).Times(0);
+    auto result = FormRdbDataMgr::GetInstance().DeleteData(absRdbPredicates);
+    EXPECT_TRUE(result);
+
+    EXPECT_CALL(*rdbStoreMock_, Delete(_, _)).Times(1).WillOnce(Return(E_OK));
+    EXPECT_CALL(*rdbStoreMock_, IsSlaveDiffFromMaster()).Times(1).WillOnce(Return(true));
+    EXPECT_CALL(*rdbStoreMock_, Backup(_, _)).Times(1).WillOnce(Return(E_OK));
+    result = FormRdbDataMgr::GetInstance().DeleteData(absRdbPredicates);
+    EXPECT_TRUE(result);
+
+    FormRdbDataMgr::GetInstance().lastRdbBuildTime_ = 0;
+    EXPECT_CALL(*rdbStoreMock_, Delete(_, _)).Times(1).WillOnce(Return(E_SQLITE_CORRUPT));
+    EXPECT_CALL(*rdbStoreMock_, Restore(_, _)).Times(1).WillOnce(Return(E_OK));
+    result = FormRdbDataMgr::GetInstance().DeleteData(absRdbPredicates);
+    EXPECT_TRUE(result);
+    EXPECT_NE(rdbStoreMock_, FormRdbDataMgr::GetInstance().rdbStore_);
+    std::unordered_map<std::string, std::string> data;
+    auto result2 = FormRdbDataMgr::GetInstance().QueryData(TEST_TABLE, TEST_KEY, data);
+    EXPECT_EQ(result2, ERR_APPEXECFWK_FORM_COMMON_CODE);
+
+    FormRdbDataMgr::GetInstance().rdbStore_ = nullptr;
+    GTEST_LOG_(INFO) << "FmsFormRdbDataMgrTest_026 end";
 }
 }
 }
