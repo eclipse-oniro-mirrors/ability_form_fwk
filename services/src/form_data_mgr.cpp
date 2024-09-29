@@ -2171,14 +2171,19 @@ ErrCode FormDataMgr::GetFormInstancesByFilter(const FormInstancesFilter &formIns
 ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, FormInstance &formInstance)
 {
     HILOG_DEBUG("get form instance by formId");
-    std::lock_guard<std::mutex> lock(formRecordMutex_);
-    if (formId <= 0) {
-        HILOG_ERROR("invalid formId");
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    bool isFormRecordsEnd = false;
+    FormRecord formRecord;
+    {
+        std::lock_guard<std::mutex> lock(formRecordMutex_);
+        if (formId <= 0) {
+            HILOG_ERROR("invalid formId");
+            return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+        }
+        auto info = formRecords_.find(formId);
+        isFormRecordsEnd = info == formRecords_.end();
+        formRecord = info->second;
     }
-    auto info = formRecords_.find(formId);
-    if (info != formRecords_.end()) {
-        FormRecord formRecord = info->second;
+    if (!isFormRecordsEnd) {
         std::vector<FormHostRecord> formHostRecords;
         GetFormHostRecord(formId, formHostRecords);
         if (formHostRecords.empty()) {
