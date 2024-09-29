@@ -212,28 +212,20 @@ bool FormCacheMgr::AddImgData(
         return true;
     }
 
-    if (!HasContent(formCache.imgCache)) {
-        // No imgCache in db
-        formCache.imgCache = newImgDbData.dump();
-        return true;
-    }
-
-    nlohmann::json imgCacheObj = nlohmann::json::parse(formCache.imgCache, nullptr, false);
-    if (imgCacheObj.is_discarded() || !imgCacheObj.is_object()) {
-        HILOG_ERROR("parse data failed");
-        return false;
-    }
-
-    // Update imgCache
-    for (auto && [key, value] : newImgDbData.items()) {
-        if (imgCacheObj.find(key) != imgCacheObj.end()) {
+    if (HasContent(formCache.imgCache)) {
+        nlohmann::json imgCacheObj = nlohmann::json::parse(formCache.imgCache, nullptr, false);
+        if (imgCacheObj.is_discarded() || !imgCacheObj.is_object()) {
+            HILOG_ERROR("parse data failed");
+            return false;
+        }
+        // delete old images
+        for (auto && [key, value] : imgCacheObj.items()) {
             DeleteImgCacheInDb(imgCacheObj[key].dump());
         }
-
-        imgCacheObj[key] = value;
     }
 
-    formCache.imgCache = imgCacheObj.dump();
+    formCache.imgCache = newImgDbData.dump();
+
     return true;
 }
 
