@@ -979,8 +979,7 @@ void FormTimerMgr::ClearUpdateAtTimerResource()
     HILOG_INFO("start");
     if (updateAtTimerId_ != 0L) {
         HILOG_INFO("clear update at timer start");
-        MiscServices::TimeServiceClient::GetInstance()->StopTimer(updateAtTimerId_);
-        MiscServices::TimeServiceClient::GetInstance()->DestroyTimer(updateAtTimerId_);
+        MiscServices::TimeServiceClient::GetInstance()->DestroyTimerAsync(updateAtTimerId_);
         HILOG_INFO("clear update at timer end");
         updateAtTimerId_ = 0L;
     }
@@ -1000,8 +999,7 @@ bool FormTimerMgr::UpdateLimiterAlarm()
     HILOG_INFO("start");
     if (limiterTimerId_ != 0L) {
         HILOG_INFO("clear limiter timer start");
-        MiscServices::TimeServiceClient::GetInstance()->StopTimer(limiterTimerId_);
-        MiscServices::TimeServiceClient::GetInstance()->DestroyTimer(limiterTimerId_);
+        MiscServices::TimeServiceClient::GetInstance()->DestroyTimerAsync(limiterTimerId_);
         HILOG_INFO("clear limiter timer end");
         limiterTimerId_ = 0L;
     }
@@ -1056,8 +1054,7 @@ void FormTimerMgr::ClearLimiterTimerResource()
     HILOG_INFO("start");
     if (limiterTimerId_ != 0L) {
         HILOG_INFO("clear limiter timer start");
-        MiscServices::TimeServiceClient::GetInstance()->StopTimer(limiterTimerId_);
-        MiscServices::TimeServiceClient::GetInstance()->DestroyTimer(limiterTimerId_);
+        MiscServices::TimeServiceClient::GetInstance()->DestroyTimerAsync(limiterTimerId_);
         HILOG_INFO("clear limiter timer end");
         limiterTimerId_ = 0L;
     }
@@ -1185,8 +1182,7 @@ void FormTimerMgr::ClearDynamicResource()
 {
     HILOG_INFO("start");
     if (dynamicAlarmTimerId_ != 0L) {
-        MiscServices::TimeServiceClient::GetInstance()->StopTimer(dynamicAlarmTimerId_);
-        MiscServices::TimeServiceClient::GetInstance()->DestroyTimer(dynamicAlarmTimerId_);
+        MiscServices::TimeServiceClient::GetInstance()->DestroyTimerAsync(dynamicAlarmTimerId_);
         HILOG_INFO("clear dynamic timer end");
         dynamicAlarmTimerId_ = 0L;
     }
@@ -1311,8 +1307,7 @@ void FormTimerMgr::InnerClearIntervalTimer()
     HILOG_INFO("start");
     if (intervalTimerId_ != 0L) {
         HILOG_INFO("Destroy intervalTimer");
-        MiscServices::TimeServiceClient::GetInstance()->StopTimer(intervalTimerId_);
-        MiscServices::TimeServiceClient::GetInstance()->DestroyTimer(intervalTimerId_);
+        MiscServices::TimeServiceClient::GetInstance()->DestroyTimerAsync(intervalTimerId_);
         intervalTimerId_ = 0L;
     }
     HILOG_INFO("end");
@@ -1323,8 +1318,7 @@ void FormTimerMgr::InnerClearIntervalReportTimer()
     HILOG_INFO("start");
     if (limiterTimerReportId_ != 0L) {
         HILOG_INFO("Destroy interval Report Timerr");
-        MiscServices::TimeServiceClient::GetInstance()->StopTimer(limiterTimerReportId_);
-        MiscServices::TimeServiceClient::GetInstance()->DestroyTimer(limiterTimerReportId_);
+        MiscServices::TimeServiceClient::GetInstance()->DestroyTimerAsync(limiterTimerReportId_);
         limiterTimerReportId_ = 0L;
     }
     HILOG_INFO("end");
