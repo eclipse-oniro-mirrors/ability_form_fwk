@@ -1672,20 +1672,25 @@ private:
         }
         convertArgc++;
 
-        NapiAsyncTask::CompleteCallback complete = [formIds](napi_env env, NapiAsyncTask &task, int32_t status) {
+        auto apiResult = std::make_shared<int32_t>();
+        NapiAsyncTask::ExecuteCallback execute = [formIds, ret = apiResult]() {
             Want want;
-            auto ret = FormMgr::GetInstance().RecoverForms(formIds, want);
-            if (ret == ERR_OK) {
+            *ret = FormMgr::GetInstance().RecoverForms(formIds, want);
+        };
+        
+        NapiAsyncTask::CompleteCallback complete =
+            [ret = apiResult](napi_env env, NapiAsyncTask &task, int32_t status) {
+            if (*ret == ERR_OK) {
                 task.ResolveWithNoError(env, CreateJsUndefined(env));
             } else {
-                task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
+                task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, *ret));
             }
         };
 
         napi_value lastParam = (argc <= convertArgc) ? nullptr : argv[convertArgc];
         napi_value result = nullptr;
         NapiAsyncTask::ScheduleWithDefaultQos("JsFormHost::OnRecoverForms",
-            env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
+            env, CreateAsyncTaskWithLastParam(env, lastParam, std::move(execute), std::move(complete), &result));
         return result;
     }
 
