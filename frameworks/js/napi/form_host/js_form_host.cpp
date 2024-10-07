@@ -1673,12 +1673,12 @@ private:
         convertArgc++;
 
         auto apiResult = std::make_shared<int32_t>();
-        NapiAsyncTask::ExecuteCallback execute = [want, formIds, ret = apiResult]() {
+        NapiAsyncTask::ExecuteCallback execute = [formIds, ret = apiResult]() {
             Want want;
             *ret = FormMgr::GetInstance().RecoverForms(formIds, want);
         };
         
-        NapiAsyncTask::CompleteCallback complete = 
+        NapiAsyncTask::CompleteCallback complete =
             [ret = apiResult](napi_env env, NapiAsyncTask &task, int32_t status) {
             if (*ret == ERR_OK) {
                 task.ResolveWithNoError(env, CreateJsUndefined(env));
