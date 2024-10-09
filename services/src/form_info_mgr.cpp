@@ -792,12 +792,12 @@ ErrCode FormInfoMgr::ReloadFormInfos(const int32_t userId)
     for (auto const &bundleFormInfoPair : bundleFormInfoMap_) {
         const std::string &bundleName = bundleFormInfoPair.first;
         auto bundleVersionPair = bundleVersionMap.find(bundleName);
-        uint32_t oldVersionCode = bundleVersionPair->second;
         if (bundleVersionPair == bundleVersionMap.end()) {
             bundleFormInfoPair.second->Remove(userId);
             HILOG_INFO("remove forms info success, bundleName=%{public}s", bundleName.c_str());
             continue;
         }
+        uint32_t oldVersionCode = bundleVersionPair->second;
         bundleVersionMap.erase(bundleVersionPair);
         uint32_t newVersionCode = bundleFormInfoPair.second->GetVersionCode(userId);
         if (oldVersionCode == newVersionCode) {
