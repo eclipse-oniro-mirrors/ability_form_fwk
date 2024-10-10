@@ -152,20 +152,6 @@ public:
     virtual ErrCode RequestPublishFormWithSnapshot(Want &want, bool withFormBindingData,
         std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId) = 0;
 
-     /**
-     * @brief Request to publish a proxy form to the form host with normal authority.
-     *
-     * @param want The want of the form to publish.
-     * @param withFormBindingData Indicates whether the formBindingData is carried wit
-     * @param formBindingData Indicates the form data.
-     * @param formId Return the form id to be published.
-     * @param formDataProxies The proxies
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    virtual ErrCode RequestPublishProxyFormWithSnapshot(Want &want, bool withFormBindingData,
-        std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
-        const std::vector<FormDataProxy> &formDataProxies) = 0;
-
     /**
      * @brief Lifecycle update.
      * @param formIds The Id of the forms.
@@ -759,7 +745,6 @@ public:
         FORM_MGR_ENABLE_FORMS,
         FORM_MGR_IS_SYSTEM_APP_FORM,
         FORM_MGR_IS_FORM_BUNDLE_FORBIDDEN,
-        FORM_MGR_REQUEST_PUBLISH_PROXY_FORM_WITH_SNAPSHOT,
     };
 };
 }  // namespace AppExecFwk

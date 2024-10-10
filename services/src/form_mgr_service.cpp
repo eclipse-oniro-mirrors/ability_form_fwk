@@ -431,6 +431,11 @@ ErrCode FormMgrService::SetPublishFormResult(const int64_t formId, Constants::Pu
 ErrCode FormMgrService::AcquireAddFormResult(const int64_t formId)
 {
     HILOG_INFO("call");
+    ErrCode ret = CheckFormPermission(AppExecFwk::Constants::PERMISSION_AGENT_REQUIRE_FORM);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("request form permission denied");
+        return ret;
+    }
     return FormMgrAdapter::GetInstance().AcquireAddFormResult(formId);
 }
 
@@ -1697,18 +1702,6 @@ ErrCode FormMgrService::RequestPublishFormWithSnapshot(Want &want, bool withForm
 
     return FormMgrAdapter::GetInstance().RequestPublishForm(want, withFormBindingData, formBindingData,
                                                             formId, {}, false);
-}
-
-ErrCode FormMgrService::RequestPublishProxyFormWithSnapshot(Want &want, bool withFormBindingData,
-    std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
-    const std::vector<FormDataProxy> &formDataProxies)
-{
-    HILOG_INFO("begin:%{public}s, publish:%{public}s, end:%{public}s, onKvDataServiceAddTime:%{public}s",
-        onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
-        onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
-
-    return FormMgrAdapter::GetInstance().RequestPublishForm(want, withFormBindingData, formBindingData,
-                                                            formId, formDataProxies, false);
 }
 
 #ifdef RES_SCHEDULE_ENABLE

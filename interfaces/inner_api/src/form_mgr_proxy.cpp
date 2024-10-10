@@ -2296,53 +2296,6 @@ ErrCode FormMgrProxy::RequestPublishFormWithSnapshot(Want &want, bool withFormBi
     return errCode;
 }
 
-ErrCode FormMgrProxy::RequestPublishProxyFormWithSnapshot(Want &want, bool withFormBindingData,
-    std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
-    const std::vector<FormDataProxy> &formDataProxies)
-{
-    MessageParcel data;
-    MessageParcel reply;
-
-    if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("write interface token failed");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    if (!data.WriteParcelable(&want)) {
-        HILOG_ERROR("write want failed");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    if (!data.WriteBool(withFormBindingData)) {
-        HILOG_ERROR("write withFormBindingData failed");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-    if (withFormBindingData) {
-        if (!data.WriteParcelable(formBindingData.get())) {
-            HILOG_ERROR("write formBindingData failed");
-            return ERR_APPEXECFWK_PARCEL_ERROR;
-        }
-    }
-    if (!WriteFormDataProxies(data, formDataProxies)) {
-        HILOG_ERROR("write formDataProxies failed");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-
-    MessageOption option;
-    int32_t error = SendTransactCmd(
-        IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_PROXY_FORM_WITH_SNAPSHOT,
-        data,
-        reply,
-        option);
-    if (error != ERR_OK) {
-        HILOG_ERROR("SendRequest:%{public}d failed", error);
-        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
-    }
-    ErrCode errCode = reply.ReadInt32();
-    if (errCode == ERR_OK) {
-        formId = reply.ReadInt64();
-    }
-    return errCode;
-}
-
 int32_t FormMgrProxy::BatchRefreshForms(const int32_t formRefreshType)
 {
     MessageParcel data;

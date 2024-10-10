@@ -252,8 +252,6 @@ int FormMgrStub::OnRemoteRequestFourth(uint32_t code, MessageParcel &data, Messa
             return HandleCreateForm(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_FORM_WITH_SNAPSHOT):
             return HandleRequestPublishFormWithSnapshot(data, reply);
-        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REQUEST_PUBLISH_PROXY_FORM_WITH_SNAPSHOT):
-            return HandleRequestPublishProxyFormWithSnapshot(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_BATCH_REFRESH_FORMS):
             return HandleBatchRefreshForms(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_ENABLE_FORMS):
@@ -1567,48 +1565,6 @@ ErrCode FormMgrStub::HandleRequestPublishFormWithSnapshot(MessageParcel &data, M
 
     int64_t formId = 0;
     ErrCode result = RequestPublishFormWithSnapshot(*want, withFormBindingData, formBindingData, formId);
-    if (!reply.WriteInt32(result)) {
-        HILOG_ERROR("write result failed");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    } else {
-        reply.WriteInt64(formId);
-    }
-    return result;
-}
-
-/**
- * @brief handle CreateForm message.
- * @param data input param.
- * @param reply output param.
- * @return Returns ERR_OK on success, others on failure.
- */
-ErrCode FormMgrStub::HandleRequestPublishProxyFormWithSnapshot(MessageParcel &data, MessageParcel &reply)
-{
-    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
-    if (want == nullptr) {
-        HILOG_ERROR("error to get want");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-
-    bool withFormBindingData = data.ReadBool();
-    std::unique_ptr<FormProviderData> formBindingData = nullptr;
-    if (withFormBindingData) {
-        formBindingData.reset(data.ReadParcelable<FormProviderData>());
-        if (formBindingData == nullptr) {
-            HILOG_ERROR("error to get formBindingData");
-            return ERR_APPEXECFWK_PARCEL_ERROR;
-        }
-    }
-
-    std::vector<FormDataProxy> formDataProxies;
-    if (!ReadFormDataProxies(data, formDataProxies)) {
-        HILOG_ERROR("fail get formDataProxies");
-        return ERR_APPEXECFWK_PARCEL_ERROR;
-    }
-
-    int64_t formId = 0;
-    ErrCode result = RequestPublishProxyFormWithSnapshot(*want, withFormBindingData, formBindingData,
-        formId, formDataProxies);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
