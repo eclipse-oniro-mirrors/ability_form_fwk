@@ -1020,7 +1020,7 @@ bool FormTimerMgr::UpdateLimiterAlarm()
     tmAtTime.tm_min = Constants::MAX_MINUTE;
     int64_t limiterWakeUpTime = FormUtil::GetMillisecondFromTm(tmAtTime);
     
-    if(!CreateLimiterTimer()) {
+    if (!CreateLimiterTimer()) {
         return false;
     }
     bool bRet = MiscServices::TimeServiceClient::GetInstance()->StartTimer(limiterTimerId_,
@@ -1065,7 +1065,7 @@ bool FormTimerMgr::CreateLimiterTimer()
         return false;
     }
     timerOption->SetWantAgent(wantAgent);
-    if(limiterTimerId_ == 0L) {
+    if (limiterTimerId_ == 0L) {
         limiterTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption);
         currentLimiterWantAgent_ = wantAgent;
     }
