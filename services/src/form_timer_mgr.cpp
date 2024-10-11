@@ -1065,9 +1065,9 @@ bool FormTimerMgr::CreateLimiterTimer()
         return false;
     }
     timerOption->SetWantAgent(wantAgent);
-    currentLimiterWantAgent_ = wantAgent;
     if(limiterTimerId_ == 0L) {
         limiterTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption);
+        currentLimiterWantAgent_ = wantAgent;
     }
     HILOG_INFO("end");
     return true;
