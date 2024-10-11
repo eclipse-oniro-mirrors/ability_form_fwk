@@ -53,6 +53,9 @@ FormTimerMgr::FormTimerMgr()
 FormTimerMgr::~FormTimerMgr()
 {
     ClearIntervalTimer();
+    if (currentLimiterWantAgent_ != nullptr) {
+        ClearLimiterTimerResource();
+    }
 }
 /**
  * @brief Add form timer by timer task.
@@ -999,7 +1002,7 @@ bool FormTimerMgr::UpdateLimiterAlarm()
     HILOG_INFO("start");
     if (limiterTimerId_ != 0L) {
         HILOG_INFO("clear limiter timer start");
-        MiscServices::TimeServiceClient::GetInstance()->DestroyTimerAsync(limiterTimerId_);
+        MiscServices::TimeServiceClient::GetInstance()->StopTimer(limiterTimerId_);
         HILOG_INFO("clear limiter timer end");
         limiterTimerId_ = 0L;
     }
@@ -1016,27 +1019,10 @@ bool FormTimerMgr::UpdateLimiterAlarm()
     tmAtTime.tm_hour = Constants::MAX_HOUR;
     tmAtTime.tm_min = Constants::MAX_MINUTE;
     int64_t limiterWakeUpTime = FormUtil::GetMillisecondFromTm(tmAtTime);
-
-    auto timerOption = std::make_shared<FormTimerOption>();
-    timerOption->SetType(timerOption->TIMER_TYPE_EXACT);
-    timerOption->SetRepeat(false);
-    timerOption->SetInterval(0);
-    std::shared_ptr<WantAgent> wantAgent = GetLimiterWantAgent();
-    if (!wantAgent) {
-        HILOG_ERROR("create wantAgent failed");
+    
+    if(!CreateLimiterTimer()) {
         return false;
     }
-    timerOption->SetWantAgent(wantAgent);
-
-    {
-        std::lock_guard<std::mutex> guard(currentLimiterWantAgentMutex_);
-        if (currentLimiterWantAgent_ != nullptr) {
-            ClearLimiterTimerResource();
-        }
-        currentLimiterWantAgent_ = wantAgent;
-    }
-
-    limiterTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption);
     bool bRet = MiscServices::TimeServiceClient::GetInstance()->StartTimer(limiterTimerId_,
         static_cast<uint64_t>(limiterWakeUpTime));
     if (!bRet) {
@@ -1064,6 +1050,27 @@ void FormTimerMgr::ClearLimiterTimerResource()
         currentLimiterWantAgent_ = nullptr;
     }
     HILOG_INFO("end");
+}
+
+bool FormTimerMgr::CreateLimiterTimer()
+{
+    HILOG_INFO("start");
+    auto timerOption = std::make_shared<FormTimerOption>();
+    timerOption->SetType(timerOption->TIMER_TYPE_EXACT);
+    timerOption->SetRepeat(false);
+    timerOption->SetInterval(0);
+    std::shared_ptr<WantAgent> wantAgent = GetLimiterWantAgent();
+    if (!wantAgent) {
+        HILOG_ERROR("create wantAgent failed");
+        return false;
+    }
+    timerOption->SetWantAgent(wantAgent);
+    currentLimiterWantAgent_ = wantAgent;
+    if(limiterTimerId_ == 0L) {
+        limiterTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption);
+    }
+    HILOG_INFO("end");
+    return true;
 }
 
 /**
@@ -1446,6 +1453,7 @@ void FormTimerMgr::Init()
     limiterTimerId_ = 0L;
     limiterTimerReportId_ = 0L;
     FormRefreshCountReport();
+    CreateLimiterTimer();
     HILOG_INFO("end");
 }
 
