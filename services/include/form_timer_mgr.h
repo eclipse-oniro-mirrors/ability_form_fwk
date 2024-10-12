@@ -293,6 +293,12 @@ private:
      */
     void ExecTimerTask(const FormTimer &task);
 
+    /**
+     * @brief create limiter timer
+     * @return Returns true on success, false on failure.
+     */
+    bool CreateLimiterTimer();
+
 #ifdef RES_SCHEDULE_ENABLE
     /**
      * @brief Execute Form timer task.
