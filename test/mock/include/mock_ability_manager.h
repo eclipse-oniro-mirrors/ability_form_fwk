@@ -87,7 +87,7 @@ public:
     }
 
     sptr<AAFwk::IWantSender> GetWantSender(
-        const AAFwk::WantSenderInfo &wantSenderInfo, const sptr<IRemoteObject> &callerToken) override
+        const AAFwk::WantSenderInfo &wantSenderInfo, const sptr<IRemoteObject> &callerToken, int32_t uid) override
     {
         return nullptr;
     }
@@ -480,7 +480,7 @@ public:
     }
 
     sptr<AAFwk::IWantSender> GetWantSender(
-        const AAFwk::WantSenderInfo &wantSenderInfo, const sptr<IRemoteObject> &callerToken) override
+        const AAFwk::WantSenderInfo &wantSenderInfo, const sptr<IRemoteObject> &callerToken, int32_t uid) override
     {
         return nullptr;
     }
