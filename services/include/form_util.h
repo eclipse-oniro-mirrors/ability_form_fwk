@@ -35,6 +35,12 @@ public:
     static int64_t GenerateFormId(int64_t udidHash);
 
     /**
+     * @brief delete form id for form.
+     * @param formId The id of the form.
+     */
+    static void DeleteFormId(int64_t formId);
+
+    /**
      * @brief padding form id.
      * @param formId The id of the form.
      * @param udidHash udid hash.
