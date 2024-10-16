@@ -101,6 +101,7 @@ bool FormDataMgr::DeleteFormRecord(const int64_t formId)
         return false;
     }
     formRecords_.erase(iter);
+    FormUtil::DeleteFormId(formId);
     return true;
 }
 /**
