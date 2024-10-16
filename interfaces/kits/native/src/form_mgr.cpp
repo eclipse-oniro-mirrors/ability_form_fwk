@@ -74,6 +74,7 @@ int FormMgr::AddForm(
     if (errCode != ERR_OK) {
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->AddForm(formId, want, callerToken, formInfo);
 }
 
@@ -91,6 +92,7 @@ int FormMgr::CreateForm(const Want &want, RunningFormInfo &runningFormInfo)
         HILOG_ERROR("Connect failed errCode:%{public}d", resultCode);
         return resultCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     resultCode = remoteProxy_->CreateForm(want, runningFormInfo);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("createForm failed,errorCode is %{public}d", resultCode);
@@ -123,6 +125,7 @@ int FormMgr::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &callerT
     if (errCode != ERR_OK) {
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     FormCallerMgr::GetInstance().RemoveFormHostCaller(formId);
     return remoteProxy_->DeleteForm(formId, callerToken);
 }
@@ -151,7 +154,7 @@ int FormMgr::StopRenderingForm(const int64_t formId, const std::string &compId)
     if (errCode != ERR_OK) {
         return errCode;
     }
-
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->StopRenderingForm(formId, compId);
 }
 
@@ -181,6 +184,7 @@ int FormMgr::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> &caller
         return errCode;
     }
     FormCallerMgr::GetInstance().RemoveFormHostCaller(formId);
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->ReleaseForm(formId, callerToken, delCache);
 }
 
@@ -225,6 +229,7 @@ int FormMgr::UpdateForm(const int64_t formId, const FormProviderData &formBindin
             formProviderCaller->UpdateForm(formId, formBindingData);
         }
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     if (formDataProxies.empty()) {
         return remoteProxy_->UpdateForm(formId, formBindingData);
     }
@@ -255,7 +260,7 @@ int FormMgr::ReleaseRenderer(const int64_t formId, const std::string &compId)
     if (errCode != ERR_OK) {
         return errCode;
     }
-
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->ReleaseRenderer(formId, compId);
 }
 
@@ -289,6 +294,7 @@ int FormMgr::RequestForm(const int64_t formId, const sptr<IRemoteObject> &caller
         HILOG_INFO("request by host caller");
         return hostCaller->RequestForm(formId, callerToken, want);
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     ErrCode resultCode = remoteProxy_->RequestForm(formId, callerToken, want);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("fail notify the form service that the form user's lifecycle is updated"
@@ -325,6 +331,7 @@ int FormMgr::NotifyWhetherVisibleForms(
     if (errCode != ERR_OK) {
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     // IPC entry
     ErrCode resultCode = remoteProxy_->NotifyWhetherVisibleForms(formIds, callerToken, formVisibleType);
     if (resultCode != ERR_OK) {
@@ -346,7 +353,7 @@ bool FormMgr::HasFormVisible(const uint32_t tokenId)
         HILOG_ERROR("errCode:%{public}d", errCode);
         return false;
     }
-
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->HasFormVisible(tokenId);
 }
 
@@ -368,6 +375,7 @@ int FormMgr::CastTempForm(const int64_t formId, const sptr<IRemoteObject> &calle
     if (errCode != ERR_OK) {
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->CastTempForm(formId, callerToken);
 }
 
@@ -383,6 +391,7 @@ int FormMgr::DumpStorageFormInfos(std::string &formInfos)
     if (errCode != ERR_OK) {
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->DumpStorageFormInfos(formInfos);
 }
 /**
@@ -398,6 +407,7 @@ int FormMgr::DumpFormInfoByBundleName(const std::string bundleName, std::string 
     if (errCode != ERR_OK) {
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->DumpFormInfoByBundleName(bundleName, formInfos);
 }
 /**
@@ -413,6 +423,7 @@ int FormMgr::DumpFormInfoByFormId(const std::int64_t formId, std::string &formIn
     if (errCode != ERR_OK) {
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->DumpFormInfoByFormId(formId, formInfo);
 }
 /**
@@ -429,6 +440,7 @@ int FormMgr::DumpFormTimerByFormId(const std::int64_t formId, std::string &isTim
         HILOG_ERROR("errCode:%{public}d", errCode);
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->DumpFormTimerByFormId(formId, isTimingService);
 }
 /**
@@ -451,6 +463,7 @@ int FormMgr::MessageEvent(const int64_t formId, const Want &want, const sptr<IRe
         HILOG_DEBUG("send message by host caller");
         return hostCaller->MessageEvent(formId, want, callerToken);
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->MessageEvent(formId, want, callerToken);
 }
 
@@ -469,6 +482,7 @@ int FormMgr::RouterEvent(const int64_t formId, Want &want, const sptr<IRemoteObj
         HILOG_ERROR("errCode:%{public}d", errCode);
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->RouterEvent(formId, want, callerToken);
 }
 
@@ -487,6 +501,7 @@ int FormMgr::BackgroundEvent(const int64_t formId, Want &want, const sptr<IRemot
         HILOG_ERROR("errCode:%{public}d", errCode);
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->BackgroundEvent(formId, want, callerToken);
 }
 
@@ -515,6 +530,7 @@ int FormMgr::SetNextRefreshTime(const int64_t formId, const int64_t nextTime)
         HILOG_ERROR("errCode:%{public}d", errCode);
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->SetNextRefreshTime(formId, nextTime);
 }
 
@@ -528,6 +544,7 @@ ErrCode FormMgr::RequestPublishForm(Want &want, bool withFormBindingData,
         HILOG_ERROR("errCode:%{public}d", errCode);
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     if (formDataProxies.empty()) {
         return remoteProxy_->RequestPublishForm(want, withFormBindingData, formBindingData, formId);
     }
@@ -547,6 +564,7 @@ ErrCode FormMgr::SetPublishFormResult(const int64_t formId, Constants::PublishFo
         HILOG_ERROR("errCode:%{public}d", errCode);
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->SetPublishFormResult(formId, errorCodeInfo);
 }
 
@@ -562,6 +580,7 @@ ErrCode FormMgr::AcquireAddFormResult(const int64_t formId)
         HILOG_ERROR("errCode:%{public}d", errCode);
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->AcquireAddFormResult(formId);
 }
 
@@ -582,6 +601,7 @@ int FormMgr::LifecycleUpdate(
         HILOG_ERROR("errCode:%{public}d", errCode);
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->LifecycleUpdate(formIds, callerToken, updateType);
 }
 /**
@@ -741,7 +761,7 @@ bool FormMgr::Reconnect()
  */
 ErrCode FormMgr::Connect()
 {
-    std::lock_guard<std::mutex> lock(connectMutex_);
+    std::lock_guard<std::shared_mutex> lock(connectMutex_);
     if (remoteProxy_ != nullptr && !resetFlag_) {
         return ERR_OK;
     }
@@ -782,7 +802,7 @@ ErrCode FormMgr::Connect()
 void FormMgr::ResetProxy(const wptr<IRemoteObject> &remote)
 {
     HILOG_DEBUG("call");
-    std::lock_guard<std::mutex> lock(connectMutex_);
+    std::lock_guard<std::shared_mutex> lock(connectMutex_);
     if (remoteProxy_ == nullptr) {
         HILOG_ERROR("null remoteProxy_");
         return;
@@ -806,7 +826,7 @@ void FormMgr::ResetProxy(const wptr<IRemoteObject> &remote)
 void FormMgr::SetFormMgrService(sptr<IFormMgr> formMgrService)
 {
     HILOG_DEBUG("call");
-    std::lock_guard<std::mutex> lock(connectMutex_);
+    std::lock_guard<std::shared_mutex> lock(connectMutex_);
     remoteProxy_ = formMgrService;
 }
 
@@ -830,6 +850,7 @@ int FormMgr::DeleteInvalidForms(const std::vector<int64_t> &formIds, const sptr<
     if (errCode != ERR_OK) {
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     int resultCode = remoteProxy_->DeleteInvalidForms(formIds, callerToken, numFormsDeleted);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("fail DeleteInvalidForms,errCode %{public}d", resultCode);
@@ -856,6 +877,7 @@ int FormMgr::AcquireFormState(const Want &want, const sptr<IRemoteObject> &calle
     if (errCode != ERR_OK) {
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     int resultCode = remoteProxy_->AcquireFormState(want, callerToken, stateInfo);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("fail AcquireFormState,errCode %{public}d", resultCode);
@@ -883,7 +905,7 @@ int FormMgr::NotifyFormsVisible(const std::vector<int64_t> &formIds, bool isVisi
     if (errCode != ERR_OK) {
         return errCode;
     }
-
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     int resultCode = remoteProxy_->NotifyFormsVisible(formIds, isVisible, callerToken);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("fail NotifyFormsVisible,errCode %{public}d", resultCode);
@@ -904,7 +926,7 @@ int FormMgr::NotifyFormsPrivacyProtected(const std::vector<int64_t> &formIds, bo
     if (errCode != ERR_OK) {
         return errCode;
     }
-
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     int resultCode = remoteProxy_->NotifyFormsPrivacyProtected(formIds, isProtected, callerToken);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("fail NotifyFormsPrivacyProtected,errCode %{public}d", resultCode);
@@ -932,7 +954,7 @@ int FormMgr::NotifyFormsEnableUpdate(const std::vector<int64_t> &formIds, bool i
     if (errCode != ERR_OK) {
         return errCode;
     }
-
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     int resultCode = remoteProxy_->NotifyFormsEnableUpdate(formIds, isEnableUpdate, callerToken);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("fail NotifyFormsEnableUpdate,errCode %{public}d", resultCode);
@@ -957,6 +979,7 @@ int FormMgr::GetAllFormsInfo(std::vector<FormInfo> &formInfos)
     if (errCode != ERR_OK) {
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     int resultCode = remoteProxy_->GetAllFormsInfo(formInfos);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("fail GetAllFormsInfo,errCode %{public}d", resultCode);
@@ -988,6 +1011,7 @@ int FormMgr::GetFormsInfoByApp(std::string &bundleName, std::vector<FormInfo> &f
         return errCode;
     }
 
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     int resultCode = remoteProxy_->GetFormsInfoByApp(bundleName, formInfos);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("fail GetFormsInfoByApp,errCode %{public}d", resultCode);
@@ -1025,6 +1049,7 @@ int FormMgr::GetFormsInfoByModule(std::string &bundleName, std::string &moduleNa
         return errCode;
     }
 
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     int resultCode = remoteProxy_->GetFormsInfoByModule(bundleName, moduleName, formInfos);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("fail GetFormsInfoByModule,errCode %{public}d", resultCode);
@@ -1039,6 +1064,7 @@ int FormMgr::GetFormsInfoByFilter(const FormInfoFilter &filter, std::vector<Form
     if (errCode != ERR_OK) {
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     int resultCode = remoteProxy_->GetFormsInfoByFilter(filter, formInfos);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("fail GetFormsInfoByFilter,errCode %{public}d", resultCode);
@@ -1053,6 +1079,7 @@ int32_t FormMgr::GetFormsInfo(const FormInfoFilter &filter, std::vector<FormInfo
     if (errCode != ERR_OK) {
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->GetFormsInfo(filter, formInfos);
 }
 
@@ -1063,6 +1090,7 @@ bool FormMgr::IsRequestPublishFormSupported()
     if (errCode != ERR_OK) {
         return false;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->IsRequestPublishFormSupported();
 }
 
@@ -1073,6 +1101,7 @@ int32_t FormMgr::StartAbility(const Want &want, const sptr<IRemoteObject> &calle
     if (errCode != ERR_OK) {
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->StartAbility(want, callerToken);
 }
 
@@ -1084,6 +1113,7 @@ int32_t FormMgr::ShareForm(int64_t formId, const std::string &remoteDeviceId,
     if (errCode != ERR_OK) {
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->ShareForm(formId, remoteDeviceId, callerToken, requestCode);
 }
 
@@ -1095,6 +1125,7 @@ int32_t FormMgr::AcquireFormData(int64_t formId, int64_t requestCode, const sptr
     if (errCode != ERR_OK) {
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->AcquireFormData(formId, requestCode, callerToken, formData);
 }
 
@@ -1105,6 +1136,7 @@ bool FormMgr::CheckFMSReady()
     if (errCode != ERR_OK) {
         return false;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     bool resultCode = remoteProxy_->CheckFMSReady();
     if (resultCode == false) {
         HILOG_ERROR("CheckFMSReady failed");
@@ -1120,6 +1152,7 @@ bool FormMgr::IsSystemAppForm(const std::string &bundleName)
         HILOG_ERROR("errCode:%{public}d", errCode);
         return false;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->IsSystemAppForm(bundleName);
 }
 
@@ -1131,6 +1164,7 @@ int32_t FormMgr::RegisterPublishFormInterceptor(const sptr<IRemoteObject> &inter
         HILOG_ERROR("register publish form failed, errCode:%{public}d", errCode);
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->RegisterPublishFormInterceptor(interceptorCallback);
 }
 
@@ -1141,6 +1175,7 @@ int32_t FormMgr::UnregisterPublishFormInterceptor(const sptr<IRemoteObject> &int
     if (errCode != ERR_OK) {
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->UnregisterPublishFormInterceptor(interceptorCallback);
 }
 
@@ -1169,7 +1204,7 @@ ErrCode FormMgr::GetRunningFormInfos(bool isUnusedIncluded, std::vector<RunningF
     if (errCode != ERR_OK) {
         return errCode;
     }
-
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     ErrCode resultCode = remoteProxy_->GetRunningFormInfos(isUnusedIncluded, runningFormInfos);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("fail GetRunningFormInfos,errCode %{public}d", resultCode);
@@ -1195,6 +1230,7 @@ ErrCode FormMgr::GetRunningFormInfosByBundleName(
         return errCode;
     }
 
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     ErrCode resultCode = remoteProxy_->GetRunningFormInfosByBundleName(
         bundleName, isUnusedIncluded, runningFormInfos);
     if (resultCode != ERR_OK) {
@@ -1215,6 +1251,7 @@ ErrCode FormMgr::RegisterFormAddObserverByBundle(const std::string bundleName,
     if (errCode != ERR_OK) {
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->RegisterFormAddObserverByBundle(bundleName, callerToken);
 }
 
@@ -1230,6 +1267,7 @@ ErrCode FormMgr::RegisterFormRemoveObserverByBundle(const std::string bundleName
     if (errCode != ERR_OK) {
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->RegisterFormRemoveObserverByBundle(bundleName, callerToken);
 }
 
@@ -1246,6 +1284,7 @@ int32_t FormMgr::GetFormsCount(bool isTempFormFlag, int32_t &formCount)
     if (errCode != ERR_OK) {
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     int32_t resultCode = remoteProxy_->GetFormsCount(isTempFormFlag, formCount);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("fail GetFormsCount,errCode %{public}d", resultCode);
@@ -1271,6 +1310,7 @@ int32_t FormMgr::GetHostFormsCount(std::string &bundleName, int32_t &formCount)
     if (errCode != ERR_OK) {
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     int32_t resultCode = remoteProxy_->GetHostFormsCount(bundleName, formCount);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("fail GetFormsCount,errCode %{public}d", resultCode);
@@ -1286,6 +1326,7 @@ ErrCode FormMgr::GetFormInstancesByFilter(const FormInstancesFilter &formInstanc
     if (errCode != ERR_OK) {
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->GetFormInstancesByFilter(formInstancesFilter, formInstances);
 }
 
@@ -1296,6 +1337,7 @@ ErrCode FormMgr::GetFormInstanceById(const int64_t formId, FormInstance &formIns
     if (errCode != ERR_OK) {
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->GetFormInstanceById(formId, formInstance);
 }
 
@@ -1310,6 +1352,7 @@ ErrCode FormMgr::GetFormInstanceById(const int64_t formId, bool isUnusedIncluded
         HILOG_ERROR("null remoteProxy_");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->GetFormInstanceById(formId, isUnusedIncluded, formInstance);
 }
 
@@ -1324,6 +1367,7 @@ ErrCode FormMgr::RegisterAddObserver(const std::string &bundleName, const sptr<I
     if (errCode != ERR_OK) {
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->RegisterAddObserver(bundleName, callerToken);
 }
 
@@ -1338,6 +1382,7 @@ ErrCode FormMgr::RegisterRemoveObserver(const std::string &bundleName, const spt
     if (errCode != ERR_OK) {
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->RegisterRemoveObserver(bundleName, callerToken);
 }
 
@@ -1358,6 +1403,7 @@ ErrCode FormMgr::RegisterClickEventObserver(
         HILOG_ERROR("errCode:%{public}d", errCode);
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->RegisterClickEventObserver(bundleName, formEventType, observer);
 }
 
@@ -1378,6 +1424,7 @@ ErrCode FormMgr::UnregisterClickEventObserver(
         HILOG_ERROR("errCode:%{public}d", errCode);
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->UnregisterClickEventObserver(bundleName, formEventType, observer);
 }
 
@@ -1393,6 +1440,7 @@ int FormMgr::RegisterFormRouterProxy(const std::vector<int64_t> &formIds, const 
         HILOG_ERROR("errCode:%{public}d", errCode);
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->RegisterFormRouterProxy(formIds, callerToken);
 }
 
@@ -1408,6 +1456,7 @@ int FormMgr::UnregisterFormRouterProxy(const std::vector<int64_t> &formIds)
         HILOG_ERROR("errCode:%{public}d", errCode);
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->UnregisterFormRouterProxy(formIds);
 }
 
@@ -1427,6 +1476,7 @@ int32_t FormMgr::SetFormsRecyclable(const std::vector<int64_t> &formIds)
         HILOG_ERROR("errCode:%{public}d", errCode);
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->SetFormsRecyclable(formIds);
 }
 
@@ -1446,6 +1496,7 @@ int32_t FormMgr::RecycleForms(const std::vector<int64_t> &formIds, const Want &w
         HILOG_ERROR("errCode:%{public}d", errCode);
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->RecycleForms(formIds, want);
 }
 
@@ -1465,6 +1516,7 @@ int32_t FormMgr::RecoverForms(const std::vector<int64_t> &formIds, const Want &w
         HILOG_ERROR("errCode:%{public}d", errCode);
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->RecoverForms(formIds, want);
 }
 
@@ -1479,6 +1531,7 @@ ErrCode FormMgr::UpdateFormLocation(const int64_t &formId, const int32_t &formLo
     if (errCode != ERR_OK) {
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     ErrCode resultCode = remoteProxy_->UpdateFormLocation(formId, formLocation);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("fail UpdateFormLocation,errCode %{public}d", resultCode);
@@ -1496,6 +1549,7 @@ ErrCode FormMgr::RequestPublishFormWithSnapshot(Want &want, bool withFormBinding
         HILOG_ERROR("errCode:%{public}d", errCode);
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->RequestPublishFormWithSnapshot(want, withFormBindingData, formBindingData, formId);
 }
 
@@ -1517,6 +1571,7 @@ int32_t FormMgr::BatchRefreshForms(const int32_t formRefreshType)
         HILOG_ERROR("errCode:%{public}d", errCode);
         return errCode;
     }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->BatchRefreshForms(formRefreshType);
 }
 
@@ -1535,7 +1590,8 @@ int32_t FormMgr::EnableForms(const std::string bundleName, const bool enable)
     if (errCode != ERR_OK) {
         return errCode;
     }
-
+    
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     ErrCode resultCode = remoteProxy_->EnableForms(bundleName, enable);
     if (resultCode != ERR_OK) {
         HILOG_ERROR("fail EnableForms,errCode %{public}d", resultCode);
@@ -1551,6 +1607,7 @@ bool FormMgr::IsFormBundleForbidden(const std::string &bundleName)
         return false;
     }
 
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
     return remoteProxy_->IsFormBundleForbidden(bundleName);
 }
 }  // namespace AppExecFwk

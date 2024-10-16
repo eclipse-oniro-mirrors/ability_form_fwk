@@ -17,6 +17,7 @@
 #define OHOS_FORM_FWK_FORM_MGR_H
 
 #include <mutex>
+#include <shared_mutex>
 #include <singleton.h>
 #include <thread>
 
@@ -702,7 +703,7 @@ private:
         DISALLOW_COPY_AND_MOVE(FormMgrDeathRecipient);
     };
 
-    std::mutex connectMutex_;
+    std::shared_mutex connectMutex_;
     sptr<IFormMgr> remoteProxy_;
 
     sptr<IRemoteObject::DeathRecipient> deathRecipient_ {nullptr};
