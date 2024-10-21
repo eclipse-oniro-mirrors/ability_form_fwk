@@ -1182,7 +1182,6 @@ bool FormRenderRecord::ReAddIfHapPathChanged(const std::vector<FormJsInfo> &form
         HILOG_ERROR("null eventHandler");
         return false;
     }
-    std::lock_guard<std::mutex> lock(contextsMapMutex_);
     HILOG_INFO("restart runtime");
     auto task = [weak = weak_from_this()]() {
         auto renderRecord = weak.lock();
@@ -1194,6 +1193,7 @@ bool FormRenderRecord::ReAddIfHapPathChanged(const std::vector<FormJsInfo> &form
         renderRecord->HandleReleaseAllRendererInJsThread();
     };
     eventHandler->PostSyncTask(task, "ReleaseAllRenderer");
+    std::lock_guard<std::mutex> lock(contextsMapMutex_);
     Release();
     UpdateAllFormRequest(formJsInfos, true);
     CreateEventHandler(bundleName_, true);
