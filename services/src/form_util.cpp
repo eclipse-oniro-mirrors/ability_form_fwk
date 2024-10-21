@@ -57,6 +57,7 @@ int64_t FormUtil::GenerateFormId(int64_t udidHash)
 {
     set<uint64_t>::iterator it;
     const int retryTimes = 5;
+    const int delayMs = 1;
     int64_t elapsedTime = 0;
     size_t elapsedHash = 0;
     uint64_t unsignedUdidHash = 0;
@@ -75,7 +76,7 @@ int64_t FormUtil::GenerateFormId(int64_t udidHash)
         it = s_memFormIds.find(formId);
         if (it != s_memFormIds.end()) {
             HILOG_INFO("repeated formId:%{public}" PRId64, ret);
-            std::this_thread::sleep_for(std::chrono::milliseconds(Constants::SLEEP_TIME));
+            std::this_thread::sleep_for(std::chrono::milliseconds(delayMs));
         } else {
             std::lock_guard<std::mutex> lock(s_memFormIdsMutex);
             s_memFormIds.insert(formId);
