@@ -159,6 +159,7 @@ void FormReport::SetDurationEndTime(int64_t formId, int64_t endTime)
 
 void FormReport::GetAddFormFinish(int64_t formId, bool &addFormFinish)
 {
+    std::lock_guard<std::mutex> guard(formReport_);
     auto it = formStatisticMap_.find(formId);
     if (it != formStatisticMap_.end()) {
         addFormFinish = formStatisticMap_[formId].addFormFinish;
