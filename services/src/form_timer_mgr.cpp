@@ -878,7 +878,10 @@ bool FormTimerMgr::UpdateAtTimerAlarm()
                 return true;
             }
         }
-        ClearUpdateAtTimerResource();
+        {
+            std::lock_guard<std::mutex> lock(currentUpdateWantAgentMutex_);
+            ClearUpdateAtTimerResource();
+        }
         atTimerWakeUpTime_ = LONG_MAX;
         HILOG_INFO("no update at task in system now");
         return true;
@@ -917,15 +920,19 @@ bool FormTimerMgr::UpdateAtTimerAlarm()
     timerOption->SetWantAgent(wantAgent);
 
     atTimerWakeUpTime_ = nextWakeUpTime;
-    if (currentUpdateAtWantAgent_ != nullptr) {
-        ClearUpdateAtTimerResource();
+    {
+        std::lock_guard<std::mutex> lock(currentUpdateWantAgentMutex_);
+        if (currentUpdateAtWantAgent_ != nullptr) {
+            ClearUpdateAtTimerResource();
+        }
+        currentUpdateAtWantAgent_ = wantAgent;
     }
+
     int64_t timeInSec = GetBootTimeMs();
     HILOG_DEBUG("timeInSec:%{public}" PRId64 ".", timeInSec);
     int64_t nextTime = timeInSec + (selectTime - currentTime);
     HILOG_INFO("nextTime:%{public}" PRId64, nextTime);
-
-    currentUpdateAtWantAgent_ = wantAgent;
+    
     updateAtTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption);
     bool bRet = MiscServices::TimeServiceClient::GetInstance()->StartTimer(updateAtTimerId_,
         static_cast<uint64_t>(nextTime));
