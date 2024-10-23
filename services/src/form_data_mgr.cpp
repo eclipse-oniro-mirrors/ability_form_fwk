@@ -2182,7 +2182,9 @@ ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, FormInstance &for
         }
         auto info = formRecords_.find(formId);
         isFormRecordsEnd = info == formRecords_.end();
-        formRecord = info->second;
+        if (!isFormRecordsEnd) {
+            formRecord = info->second;
+        }
     }
     if (!isFormRecordsEnd) {
         std::vector<FormHostRecord> formHostRecords;
