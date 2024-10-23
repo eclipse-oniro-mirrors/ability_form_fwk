@@ -1404,8 +1404,8 @@ void FormRenderRecord::HandleFormRenderGC()
         HILOG_ERROR("null runtime_");
         return;
     }
-    panda::JSNApi::TriggerGC((static_cast<AbilityRuntime::JsRuntime&>(*runtime_)).GetEcmaVm(),
-        panda::JSNApi::TRIGGER_GC_TYPE::FULL_GC);
+    panda::JSNApi::HintGC((static_cast<AbilityRuntime::JsRuntime&>(*runtime_)).GetEcmaVm(),
+        panda::JSNApi::MemoryReduceDegree::MIDDLE, panda::ecmascript::GCReason::EXTERNAL_TRIGGER);
 }
 
 int32_t FormRenderRecord::RecycleForm(const int64_t &formId, std::string &statusData)

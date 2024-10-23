@@ -42,6 +42,9 @@ ohos_fuzztest("FormMgrServiceFuzzTest") {
     "${form_fwk_path}:fmskit_native",
   ]
 
+  defines = []
+  defines += [ "MEM_MGR_ENABLE" ]
+
   external_deps = [
     "ability_base:base",
     "ability_base:want",

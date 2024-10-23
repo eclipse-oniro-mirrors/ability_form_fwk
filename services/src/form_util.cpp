@@ -15,6 +15,8 @@
 
 #include "form_util.h"
 
+#include <set>
+#include <thread>
 #include <chrono>
 #include <cinttypes>
 #include <regex>
@@ -43,6 +45,9 @@ constexpr int64_t HEAD_BIT_NUM = 9000000000000000000;
 using namespace std;
 using namespace std::chrono;
 
+static std::set<uint64_t> s_memFormIds;
+static std::mutex s_memFormIdsMutex;
+
 /**
  * @brief create form id for form.
  * @param udidHash udid hash
@@ -50,18 +55,46 @@ using namespace std::chrono;
  */
 int64_t FormUtil::GenerateFormId(int64_t udidHash)
 {
+    set<uint64_t>::iterator it;
+    const int retryTimes = 5;
+    const int delayMs = 1;
+    int64_t elapsedTime = 0;
+    size_t elapsedHash = 0;
+    uint64_t unsignedUdidHash = 0;
+    uint64_t formId = 0;
+    int64_t ret = -1;
     struct timespec t;
     t.tv_sec = 0;
     t.tv_nsec = 0;
-    clock_gettime(CLOCK_REALTIME, &t);
-
-    int64_t elapsedTime { ((t.tv_sec) * SEC_TO_NANOSEC + t.tv_nsec) };
-    size_t elapsedHash = std::hash<std::string>()(std::to_string(elapsedTime));
-    uint64_t unsignedUdidHash = static_cast<uint64_t>(udidHash);
-    uint64_t formId = unsignedUdidHash | (uint32_t)(elapsedHash & 0x000000007fffffffL);
-    int64_t ret = static_cast<int64_t>(formId);
+    for (int i = 0; i < retryTimes; i++) {
+        clock_gettime(CLOCK_REALTIME, &t);
+        elapsedTime = (t.tv_sec) * SEC_TO_NANOSEC + t.tv_nsec;
+        elapsedHash = std::hash<std::string>()(std::to_string(elapsedTime));
+        unsignedUdidHash = static_cast<uint64_t>(udidHash);
+        formId = unsignedUdidHash | (uint32_t)(elapsedHash & 0x000000007fffffffL);
+        ret = static_cast<int64_t>(formId);
+        it = s_memFormIds.find(formId);
+        if (it != s_memFormIds.end()) {
+            HILOG_INFO("repeated formId:%{public}" PRId64, ret);
+            std::this_thread::sleep_for(std::chrono::milliseconds(delayMs));
+        } else {
+            std::lock_guard<std::mutex> lock(s_memFormIdsMutex);
+            s_memFormIds.insert(formId);
+            break;
+        }
+    }
     HILOG_INFO("generate elapsed hash %{public}zu, formId:%{public}" PRId64, elapsedHash, ret);
     return ret;
+}
+
+/**
+@brief delete form id for form.
+@param formId The id of the form.
+*/
+void FormUtil::DeleteFormId(int64_t formId)
+{
+    std::lock_guard<std::mutex> lock(s_memFormIdsMutex);
+    s_memFormIds.erase(static_cast<uint64_t>(formId));
 }
 
 /**

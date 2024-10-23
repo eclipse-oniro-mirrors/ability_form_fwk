@@ -17,6 +17,7 @@
 #define OHOS_FORM_FWK_FORM_MGR_H
 
 #include <mutex>
+#include <shared_mutex>
 #include <singleton.h>
 #include <thread>
 
@@ -702,7 +703,9 @@ private:
         DISALLOW_COPY_AND_MOVE(FormMgrDeathRecipient);
     };
 
-    std::mutex connectMutex_;
+    // Shared locks are used here, write locks are used for setting remoteProxy_ operations,
+    // and concurrent read locks are used for reading remoteProxy_ operations.
+    std::shared_mutex connectMutex_;
     sptr<IFormMgr> remoteProxy_;
 
     sptr<IRemoteObject::DeathRecipient> deathRecipient_ {nullptr};

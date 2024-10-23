@@ -716,7 +716,7 @@ public:
     {
         return true;
     }
-    int StartUser(int userId, sptr<IUserCallback> callback) override
+    int StartUser(int userId, sptr<IUserCallback> callback, bool isAppRecovery) override
     {
         return 0;
     }
