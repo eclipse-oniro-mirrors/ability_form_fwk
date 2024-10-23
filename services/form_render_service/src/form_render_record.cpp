@@ -479,10 +479,12 @@ bool FormRenderRecord::CreateRuntime(const FormJsInfo &formJsInfo)
 
 bool FormRenderRecord::UpdateRuntime(const FormJsInfo &formJsInfo)
 {
-    std::lock_guard<std::mutex> lock(contextsMapMutex_);
-    auto moduleInfo = contextsMapForModuleName_.find(GenerateContextKey(formJsInfo));
-    if (moduleInfo != contextsMapForModuleName_.end()) {
-        return false;
+    {
+        std::lock_guard<std::mutex> lock(contextsMapMutex_);
+        auto moduleInfo = contextsMapForModuleName_.find(GenerateContextKey(formJsInfo));
+        if (moduleInfo != contextsMapForModuleName_.end()) {
+            return false;
+        }
     }
     if (!runtime_) {
         HILOG_ERROR("runtime is not exist. %{public}s", formJsInfo.bundleName.c_str());
