@@ -479,6 +479,7 @@ bool FormRenderRecord::CreateRuntime(const FormJsInfo &formJsInfo)
 
 bool FormRenderRecord::UpdateRuntime(const FormJsInfo &formJsInfo)
 {
+    std::lock_guard<std::mutex> lock(contextsMapMutex_);
     auto moduleInfo = contextsMapForModuleName_.find(GenerateContextKey(formJsInfo));
     if (moduleInfo != contextsMapForModuleName_.end()) {
         return false;
@@ -982,28 +983,31 @@ bool FormRenderRecord::HandleReleaseRendererInJsThread(
 void FormRenderRecord::Release()
 {
     HILOG_INFO("Release runtime and eventHandler");
-    std::lock_guard<std::mutex> lock(eventHandlerMutex_);
-    if (eventHandler_ == nullptr) {
-        HILOG_INFO("null eventHandler");
-        return;
-    }
-
-    auto syncTask = [renderRecord = this]() {
-        if (renderRecord == nullptr) {
-            HILOG_ERROR("null renderRecord");
+    {
+        std::lock_guard<std::mutex> lock(eventHandlerMutex_);
+        if (eventHandler_ == nullptr) {
+            HILOG_INFO("null eventHandler");
             return;
         }
-        renderRecord->HandleReleaseInJsThread();
-    };
-    eventHandler_->PostSyncTask(syncTask, "HandleReleaseInJsThread");
-    if (eventRunner_) {
-        eventRunner_->Stop();
-        eventRunner_.reset();
 
-        OHOS::HiviewDFX::Watchdog::GetInstance().RemoveThread(eventHandleName_);
+        auto syncTask = [renderRecord = this]() {
+            if (renderRecord == nullptr) {
+                HILOG_ERROR("null renderRecord");
+                return;
+            }
+            renderRecord->HandleReleaseInJsThread();
+        };
+        eventHandler_->PostSyncTask(syncTask, "HandleReleaseInJsThread");
+        if (eventRunner_) {
+            eventRunner_->Stop();
+            eventRunner_.reset();
+
+            OHOS::HiviewDFX::Watchdog::GetInstance().RemoveThread(eventHandleName_);
+        }
+
+        eventHandler_.reset();
     }
-
-    eventHandler_.reset();
+    std::lock_guard<std::mutex> lock(contextsMapMutex_);
     contextsMapForModuleName_.clear();
 }
 
@@ -1193,7 +1197,6 @@ bool FormRenderRecord::ReAddIfHapPathChanged(const std::vector<FormJsInfo> &form
         renderRecord->HandleReleaseAllRendererInJsThread();
     };
     eventHandler->PostSyncTask(task, "ReleaseAllRenderer");
-    std::lock_guard<std::mutex> lock(contextsMapMutex_);
     Release();
     UpdateAllFormRequest(formJsInfos, true);
     CreateEventHandler(bundleName_, true);
