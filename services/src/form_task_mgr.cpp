@@ -605,7 +605,7 @@ void FormTaskMgr::ProviderBatchDelete(std::set<int64_t> &formIds, const Want &wa
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
     if (formProviderProxy == nullptr) {
         RemoveConnection(connectId);
-        HILOG_ERROR("get formProviderProxy failed");
+        HILOG_ERROR("Failed to get formProviderProxy");
         return;
     }
     std::vector<int64_t> vFormIds;
@@ -987,7 +987,7 @@ void FormTaskMgr::RemoveConnection(int32_t connectId)
 {
     auto formSupplyCallback = FormSupplyCallback::GetInstance();
     if (formSupplyCallback == nullptr) {
-        HILOG_ERROR("null formSupplyCallback");
+        HILOG_ERROR("formSupplyCallback is nullptr.");
         return;
     }
     formSupplyCallback->RemoveConnection(connectId);

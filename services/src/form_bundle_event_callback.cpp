@@ -18,13 +18,10 @@
 #include "form_bundle_forbid_mgr.h"
 #include "form_task_mgr.h"
 
-#include "form_bms_helper.h"
-
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
 const std::string BMS_EVENT_ADDITIONAL_INFO_CHANGED = "bms.event.ADDITIONAL_INFO_CHANGED";
-constexpr uint64_t CRYPTED_BUNDLE_DELAY_TIME = 1000;
 } // namespace
 
 FormBundleEventCallback::FormBundleEventCallback()
@@ -35,17 +32,6 @@ FormBundleEventCallback::FormBundleEventCallback()
 FormBundleEventCallback::~FormBundleEventCallback()
 {
     HILOG_INFO("destroy");
-}
-
-bool FormBundleEventCallback::IsEncryptedBundle(std::string &bundleName, int32_t userId)
-{
-    ApplicationInfo appInfo;
-    if (FormBmsHelper::GetInstance().GetApplicationInfo(bundleName, userId, appInfo) != ERR_OK) {
-        HILOG_ERROR("get app info failed");
-        return false;
-    }
-    return (appInfo.applicationReservedFlag &
-        static_cast<uint32_t>(AppExecFwk::ApplicationReservedFlag::ENCRYPTED_APPLICATION)) != 0;
 }
 
 void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eventData)
@@ -73,11 +59,7 @@ void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eve
             FormEventUtil::HandleUpdateFormCloud(bundleName);
             FormEventUtil::HandleProviderUpdated(bundleName, userId);
         };
-        uint64_t delayMs = 0;
-        if (IsEncryptedBundle(bundleName, userId)) {
-            delayMs = CRYPTED_BUNDLE_DELAY_TIME;
-        }
-        FormTaskMgr::GetInstance().PostTask(taskFunc, delayMs);
+        FormTaskMgr::GetInstance().PostTask(taskFunc, 0);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED) {
         // uninstall module/bundle
         HILOG_INFO("bundleName:%{public}s removed", bundleName.c_str());

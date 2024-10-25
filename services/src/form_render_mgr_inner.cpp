@@ -56,7 +56,7 @@ ErrCode FormRenderMgrInner::RenderForm(
     const FormRecord &formRecord, Want &want, const sptr<IRemoteObject> &hostToken)
 {
     if (!isActiveUser_) {
-        HILOG_WARN("isActiveUser is false");
+        HILOG_WARN("isActiveUser is false, return");
         return ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED;
     }
     if (atomicRerenderCount_ > 0) {
@@ -524,10 +524,10 @@ int32_t FormRenderMgrInner::GetUserId() const
 
 void FormRenderMgrInner::RerenderAllFormsImmediate()
 {
-    HILOG_INFO("call");
+    HILOG_INFO("Called");
     isActiveUser_ = true;
     if (etsHosts_.empty()) {
-        HILOG_WARN("All hosts died,no need to rerender");
+        HILOG_WARN("All hosts died, no need to rerender.");
         return;
     }
     NotifyHostRenderServiceIsDead();
@@ -535,7 +535,7 @@ void FormRenderMgrInner::RerenderAllFormsImmediate()
 
 void FormRenderMgrInner::DisconnectAllRenderConnections()
 {
-    HILOG_INFO("renderFormConnections size:%{public}zu", renderFormConnections_.size());
+    HILOG_INFO("renderFormConnections size: %{public}zu.", renderFormConnections_.size());
     std::lock_guard<std::mutex> lock(resourceMutex_);
     size_t size = renderFormConnections_.size();
     for (auto iter = renderFormConnections_.begin(); iter != renderFormConnections_.end();) {

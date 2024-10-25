@@ -172,7 +172,7 @@ bool FormMgrService::CheckFMSReady()
 bool FormMgrService::IsSystemAppForm(const std::string &bundleName)
 {
     HILOG_DEBUG("check %{public}s is system form.", bundleName.c_str());
-    
+
     std::vector<FormRecord> formRecords;
     FormDataMgr::GetInstance().GetFormRecord(bundleName, formRecords);
     if (formRecords.empty()) {

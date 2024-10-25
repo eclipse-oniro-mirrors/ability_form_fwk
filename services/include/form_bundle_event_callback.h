@@ -43,7 +43,6 @@ public:
     void OnReceiveEvent(const EventFwk::CommonEventData eventData) override;
 private:
     DISALLOW_COPY_AND_MOVE(FormBundleEventCallback);
-    bool IsEncryptedBundle(std::string &bundleName, int32_t userId);
 };
 } // namespace OHOS
 } // namespace AppExecFwk

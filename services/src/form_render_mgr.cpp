@@ -299,7 +299,7 @@ ErrCode FormRenderMgr::ReleaseRenderer(int64_t formId, const FormRecord &formRec
 ErrCode FormRenderMgr::AddConnection(
     int64_t formId, sptr<FormRenderConnection> connection, const FormRecord &formRecord)
 {
-    HILOG_INFO("formUserId:%{public}d", formRecord.userId);
+    HILOG_INFO("formUserId: %{public}d", formRecord.userId);
     if (formRecord.privacyLevel > 0) {
         auto iter = sandboxInners_.find(formRecord.userId);
         if (iter == sandboxInners_.end()) {
@@ -335,7 +335,7 @@ void FormRenderMgr::CleanFormHost(const sptr<IRemoteObject> &host, const int hos
 {
     int32_t hostUserId = hostCallingUid / Constants::CALLING_UID_TRANSFORM_DIVISOR;
     if (hostUserId == 0) {
-        HILOG_WARN("hostUserId is 0,get current active userId ");
+        HILOG_WARN("hostUserId is 0, get current active userId ");
         hostUserId = FormUtil::GetCurrentAccountId();
     }
     HILOG_INFO("hostUserId:%{public}d", hostUserId);
@@ -438,7 +438,7 @@ bool FormRenderMgr::IsRerenderForRenderServiceDied(int64_t formId)
 
 void FormRenderMgr::InitRenderInner(bool isSandbox, int32_t userId)
 {
-    HILOG_INFO("isSandbox:%{public}d userId:%{public}d", isSandbox, userId);
+    HILOG_INFO("isSandbox: %{public}d userId: %{public}d.", isSandbox, userId);
     std::lock_guard<std::mutex> lock(renderInnerMutex_);
     if (isSandbox) {
         auto iter = sandboxInners_.find(userId);
@@ -492,7 +492,7 @@ ErrCode FormRenderMgr::RecoverForms(const std::vector<int64_t> &formIds, const W
 
 void FormRenderMgr::DisconnectAllRenderConnections(int userId)
 {
-    HILOG_INFO("userId:%{public}d", userId);
+    HILOG_INFO("userId: %{public}d", userId);
     auto renderIter = renderInners_.find(userId);
     if (renderIter != renderInners_.end()) {
         renderIter->second->DisconnectAllRenderConnections();
@@ -505,7 +505,7 @@ void FormRenderMgr::DisconnectAllRenderConnections(int userId)
 
 void FormRenderMgr::RerenderAllFormsImmediate(int userId)
 {
-    HILOG_INFO("userId:%{public}d", userId);
+    HILOG_INFO("userId: %{public}d", userId);
     auto renderIter = renderInners_.find(userId);
     if (renderIter != renderInners_.end()) {
         renderIter->second->RerenderAllFormsImmediate();
