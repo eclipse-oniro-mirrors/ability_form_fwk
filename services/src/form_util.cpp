@@ -73,12 +73,12 @@ int64_t FormUtil::GenerateFormId(int64_t udidHash)
         unsignedUdidHash = static_cast<uint64_t>(udidHash);
         formId = unsignedUdidHash | (uint32_t)(elapsedHash & 0x000000007fffffffL);
         ret = static_cast<int64_t>(formId);
+        std::lock_guard<std::mutex> lock(s_memFormIdsMutex);
         it = s_memFormIds.find(formId);
         if (it != s_memFormIds.end()) {
             HILOG_INFO("repeated formId:%{public}" PRId64, ret);
             std::this_thread::sleep_for(std::chrono::milliseconds(delayMs));
         } else {
-            std::lock_guard<std::mutex> lock(s_memFormIdsMutex);
             s_memFormIds.insert(formId);
             break;
         }
