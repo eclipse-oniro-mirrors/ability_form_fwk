@@ -76,12 +76,12 @@ int32_t FormRenderImpl::RenderForm(const FormJsInfo &formJsInfo, const Want &wan
         formJsInfo.formId);
 
     sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
-    if (formSupplyClient == nullptr) {
-        HILOG_ERROR("null IFormSupply");
-        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
-    }
     {
         std::lock_guard<std::mutex> lock(formSupplyMutex_);
+        if (formSupplyClient == nullptr) {
+            HILOG_ERROR("null IFormSupply");
+            return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+        }
         formSupplyClient_ = formSupplyClient;
     }
     HILOG_DEBUG("connectId:%{public}d",
