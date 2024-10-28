@@ -1051,6 +1051,7 @@ void FormTimerMgr::ClearLimiterTimerResource()
         HILOG_INFO("clear limiter timer end");
         limiterTimerId_ = 0L;
     }
+
     if (currentLimiterWantAgent_ != nullptr) {
         IN_PROCESS_CALL(WantAgentHelper::Cancel(currentLimiterWantAgent_));
         currentLimiterWantAgent_ = nullptr;

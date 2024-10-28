@@ -177,7 +177,7 @@ ErrCode FormProviderMgr::RefreshCheck(FormRecord &record, const int64_t formId, 
             record.providerUserId);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
-    
+
     bool addFormFinish = false;
     FormReport::GetInstance().GetAddFormFinish(formId, addFormFinish);
     if (!addFormFinish) {
