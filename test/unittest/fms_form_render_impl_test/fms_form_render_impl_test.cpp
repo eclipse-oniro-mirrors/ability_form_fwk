@@ -741,6 +741,11 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_035, TestSize.Level0)
     want.SetParam(Constants::FORM_SUPPLY_UID, uid);
     auto formRenderRecord = FormRenderRecord::Create("bundleName", uid);
     EXPECT_TRUE(formRenderRecord);
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = formId;
+    std::shared_ptr<AbilityRuntime::Context> context = nullptr;
+    std::shared_ptr<AbilityRuntime::Runtime> runtime = nullptr;
+    formRenderRecord->GetFormRendererGroup(formJsInfo, context, runtime);
     formRenderImpl.renderRecordMap_.emplace(uid, formRenderRecord);
     sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormSupplyStub();
     sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);

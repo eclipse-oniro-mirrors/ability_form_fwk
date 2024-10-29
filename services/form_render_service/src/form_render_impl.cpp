@@ -403,7 +403,10 @@ int32_t FormRenderImpl::RecycleForm(const int64_t &formId, const Want &want)
                 HILOG_ERROR("null renderRecord of %{public}s", std::to_string(formId).c_str());
                 return RECYCLE_FORM_FAILED;
             }
-            search->second->RecycleForm(formId, statusData);
+            auto ret = search->second->RecycleForm(formId, statusData);
+            if (ret != ERR_OK) {
+                return ret;
+            }
         } else {
             HILOG_ERROR("can't find render record of %{public}s", std::to_string(formId).c_str());
             return RECYCLE_FORM_FAILED;
