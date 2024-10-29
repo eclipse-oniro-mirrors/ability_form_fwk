@@ -1556,8 +1556,8 @@ bool FormRenderRecord::RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, 
             currentRequestIndex = groupRequests.size();
             currentRequestFound = true;
             HILOG_INFO("RecoverFormRequestsInGroup, currentRequestIndex: %{public}zu, \
-                groupRequest.formJsInfo.formData.size: %{public}s",
-                currentRequestIndex, std::string(groupRequest.formJsInfo.formData.size()).c_str());
+                groupRequest.formJsInfo.formData.size: %{public}zu",
+                currentRequestIndex, groupRequest.formJsInfo.formData.size());
         }
         groupRequests.emplace_back(groupRequest);
     }
