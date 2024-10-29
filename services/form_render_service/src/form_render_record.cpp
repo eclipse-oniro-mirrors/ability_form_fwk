@@ -730,7 +730,7 @@ void FormRenderRecord::HandleUpdateForm(const FormJsInfo &formJsInfo, const Want
 
 void FormRenderRecord::MergeFormData(Ace::FormRequest &formRequest, const FormJsInfo &formJsInfo)
 {
-    FormProviderData formProviderData = FormProviderData(formRequest.formJsInfo.formData);
+    FormProviderData formProviderData = FormProviderData(formRequest.formJsInfo.formData, true);
     nlohmann::json newFormData = formJsInfo.formProviderData.GetData();
     formProviderData.MergeData(newFormData);
 
