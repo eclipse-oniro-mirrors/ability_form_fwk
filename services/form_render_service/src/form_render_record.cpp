@@ -806,8 +806,8 @@ bool FormRenderRecord::CheckEventHandler(bool createThead, bool needMonitored)
 void FormRenderRecord::AddFormRequest(const FormJsInfo &formJsInfo, const Want &want)
 {
     auto compId = want.GetStringParam(FORM_RENDERER_COMP_ID);
-    HILOG_INFO("AddFormRequest formId:%{public}s, compId:%{public}s",
-        std::to_string(formJsInfo.formId).c_str(), compId.c_str());
+    HILOG_INFO("AddFormRequest formId: %{public}s, compId: %{public}s, formJsInfo.formData.size: %{public}s.",
+        std::to_string(formJsInfo.formId).c_str(), compId.c_str(), std::to_string(formJsInfo.formData.size()).c_str());
     if (compId.empty()) {
         return;
     }
@@ -836,8 +836,8 @@ void FormRenderRecord::AddFormRequest(const FormJsInfo &formJsInfo, const Want &
 
 void FormRenderRecord::AddFormRequest(int64_t formId, const Ace::FormRequest &formRequest)
 {
-    HILOG_INFO("AddFormRequest by FormRequest formId:%{public}s, compId:%{public}s",
-        std::to_string(formId).c_str(), formRequest.compId.c_str());
+    HILOG_INFO("AddFormRequest by FormRequest formId: %{public}s, compId: %{public}s, formRequest.formJsInfo.formData.size: %{public}s",
+        std::to_string(formId).c_str(), formRequest.compId.c_str(), std::to_string(formRequest.formJsInfo.formData.size()).c_str());
     std::lock_guard<std::mutex> lock(formRequestsMutex_);
     auto iter = formRequests_.find(formId);
     if (iter == formRequests_.end()) {
@@ -1551,6 +1551,8 @@ bool FormRenderRecord::RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, 
             groupRequest.want.SetParam(Constants::FORM_IS_RECOVER_FORM_TO_HANDLE_CLICK_EVENT, isHandleClickEvent);
             currentRequestIndex = groupRequests.size();
             currentRequestFound = true;
+            HILOG_INFO("RecoverFormRequestsInGroup, when compId == currentCompId, currentRequestIndex: %{public}zu, groupRequest.formJsInfo.formData.size: %{public}s",
+                currentRequestIndex, std::string(groupRequest.formJsInfo.formData.size()).c_str());
         }
         groupRequests.emplace_back(groupRequest);
     }
