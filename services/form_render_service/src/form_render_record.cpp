@@ -807,7 +807,9 @@ void FormRenderRecord::AddFormRequest(const FormJsInfo &formJsInfo, const Want &
 {
     auto compId = want.GetStringParam(FORM_RENDERER_COMP_ID);
     HILOG_INFO("AddFormRequest formId: %{public}s, compId: %{public}s, formJsInfo.formData.size: %{public}s.",
-        std::to_string(formJsInfo.formId).c_str(), compId.c_str(), std::to_string(formJsInfo.formData.size()).c_str());
+        std::to_string(formJsInfo.formId).c_str(),
+        compId.c_str(),
+        std::to_string(formJsInfo.formData.size()).c_str());
     if (compId.empty()) {
         return;
     }
@@ -1553,8 +1555,8 @@ bool FormRenderRecord::RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, 
             groupRequest.want.SetParam(Constants::FORM_IS_RECOVER_FORM_TO_HANDLE_CLICK_EVENT, isHandleClickEvent);
             currentRequestIndex = groupRequests.size();
             currentRequestFound = true;
-            HILOG_INFO("RecoverFormRequestsInGroup, currentRequestIndex: %{public}zu, " 
-                "groupRequest.formJsInfo.formData.size: %{public}s",
+            HILOG_INFO("RecoverFormRequestsInGroup, currentRequestIndex: %{public}zu, \
+                groupRequest.formJsInfo.formData.size: %{public}s",
                 currentRequestIndex, std::string(groupRequest.formJsInfo.formData.size()).c_str());
         }
         groupRequests.emplace_back(groupRequest);
