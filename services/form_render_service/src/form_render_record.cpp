@@ -1536,7 +1536,28 @@ bool FormRenderRecord::RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, 
     std::vector<Ace::FormRequest> groupRequests;
     size_t currentRequestIndex;
     bool currentRequestFound = false;
+    FillAttributeLogic(formId, formJsInfo, recordFormRequests, currentCompId, groupRequests, orderedCompIds,
+        currentRequestIndex, currentRequestFound);
 
+    if (groupRequests.empty()) {
+        HILOG_ERROR("group requests empty formId:%{public}" PRId64, formId);
+        return false;
+    }
+
+    if (!currentRequestFound) {
+        // maybe current comp deleted between recover, get last comp as new current comp to recover
+        currentRequestIndex = groupRequests.size() - 1;
+        HILOG_WARN("current request index:%{public}zu formId:%{public}" PRId64, currentRequestIndex, formId);
+    }
+    return RecoverRenderer(groupRequests, currentRequestIndex);
+}
+
+void FormRenderRecord::FillAttributeLogic(const std::string &formId, const FormJsInfo &formJsInfo,
+    const std::unordered_map<std::string, Ace::FormRequest> &recordFormRequests, std::string currentCompId,
+    std::vector<Ace::FormRequest> groupRequests, std::vector<std::string> orderedCompIds,
+    size_t currentRequestIndex, bool currentRequestFound)
+{
+    // 提取出来的逻辑
     for (auto compId : orderedCompIds) {
         auto recordRequestIter = recordFormRequests.find(compId);
         if (recordRequestIter == recordFormRequests.end()) {
@@ -1561,18 +1582,6 @@ bool FormRenderRecord::RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, 
         }
         groupRequests.emplace_back(groupRequest);
     }
-
-    if (groupRequests.empty()) {
-        HILOG_ERROR("group requests empty formId:%{public}" PRId64, formId);
-        return false;
-    }
-
-    if (!currentRequestFound) {
-        // maybe current comp deleted between recover, get last comp as new current comp to recover
-        currentRequestIndex = groupRequests.size() - 1;
-        HILOG_WARN("current request index:%{public}zu formId:%{public}" PRId64, currentRequestIndex, formId);
-    }
-    return RecoverRenderer(groupRequests, currentRequestIndex);
 }
 
 bool FormRenderRecord::RecoverRenderer(const std::vector<Ace::FormRequest> &groupRequests,
