@@ -16,6 +16,8 @@
 #ifndef OHOS_FORM_FWK_MEM_STATUS_LISTENER
 #define OHOS_FORM_FWK_MEM_STATUS_LISTENER
 
+#ifdef MEM_MGR_ENABLE
+
 #include "app_state_subscriber.h"
 
 namespace OHOS {
@@ -33,4 +35,5 @@ public:
 };
 }
 }
+#endif // MEM_MGR_ENABLE
 #endif // OHOS_FORM_FWK_MEM_STATUS_LISTENER
