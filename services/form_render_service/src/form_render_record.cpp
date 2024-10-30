@@ -1537,7 +1537,7 @@ bool FormRenderRecord::RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, 
     size_t currentRequestIndex;
     bool currentRequestFound = false;
     FillAttributeLogic(formId, formJsInfo, recordFormRequests, currentCompId, groupRequests, orderedCompIds,
-        currentRequestIndex, currentRequestFound);
+        currentRequestIndex, currentRequestFound, statusData, isHandleClickEvent);
 
     if (groupRequests.empty()) {
         HILOG_ERROR("group requests empty formId:%{public}" PRId64, formId);
@@ -1555,7 +1555,8 @@ bool FormRenderRecord::RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, 
 void FormRenderRecord::FillAttributeLogic(const int64_t &formId, const FormJsInfo &formJsInfo,
     const std::unordered_map<std::string, Ace::FormRequest> &recordFormRequests, const std::string &currentCompId,
     std::vector<Ace::FormRequest> &groupRequests, const std::vector<std::string> &orderedCompIds,
-    const size_t &currentRequestIndex, bool &currentRequestFound)
+    const size_t &currentRequestIndex, bool &currentRequestFound, const std::string &statusData,
+    const bool &isHandleClickEvent)
 {
     // 提取出来的逻辑
     for (auto compId : orderedCompIds) {
