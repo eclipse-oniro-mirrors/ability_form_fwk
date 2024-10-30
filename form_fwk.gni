@@ -47,6 +47,11 @@ form_fuzz_test_path = "form_fwk/form_fwk"
 init_path = "//base/startup/init"
 
 declare_args() {
+  form_fwk_form_dimension_2_3 = false
+  form_fwk_form_dimension_3_3 = false
+}
+
+declare_args() {
   device_usage_statistics = true
   if (defined(global_parts_info) &&
       !defined(global_parts_info.resourceschedule_device_usage_statistics)) {

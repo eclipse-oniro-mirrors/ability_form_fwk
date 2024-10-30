@@ -15,7 +15,10 @@
         "syscap": [
           "SystemCapability.Ability.Form"
         ],
-        "features": [],
+        "features": [
+          "form_fwk_form_dimension_2_3",
+          "form_fwk_form_dimension_3_3"
+        ],
         "adapted_system_type": [
             "standard"
         ],
