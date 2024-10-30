@@ -1552,10 +1552,10 @@ bool FormRenderRecord::RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, 
     return RecoverRenderer(groupRequests, currentRequestIndex);
 }
 
-void FormRenderRecord::FillAttributeLogic(const std::string &formId, const FormJsInfo &formJsInfo,
-    const std::unordered_map<std::string, Ace::FormRequest> &recordFormRequests, std::string currentCompId,
-    std::vector<Ace::FormRequest> groupRequests, std::vector<std::string> orderedCompIds,
-    size_t currentRequestIndex, bool currentRequestFound)
+void FormRenderRecord::FillAttributeLogic(const int64_t &formId, const FormJsInfo &formJsInfo,
+    Ace::FormRequest> &recordFormRequests, const std::string &currentCompId,
+    std::vector<Ace::FormRequest> &groupRequests, const std::vector<std::string> &orderedCompIds,
+    const size_t &currentRequestIndex, bool &currentRequestFound)
 {
     // 提取出来的逻辑
     for (auto compId : orderedCompIds) {
