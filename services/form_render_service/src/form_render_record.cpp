@@ -806,10 +806,10 @@ bool FormRenderRecord::CheckEventHandler(bool createThead, bool needMonitored)
 void FormRenderRecord::AddFormRequest(const FormJsInfo &formJsInfo, const Want &want)
 {
     auto compId = want.GetStringParam(FORM_RENDERER_COMP_ID);
-    HILOG_INFO("AddFormRequest formId: %{public}s, compId: %{public}s, formJsInfo.formData.size: %{public}s.",
+    HILOG_INFO("AddFormRequest formId: %{public}s, compId: %{public}s, formJsInfo.formData.size: %{public}zu.",
         std::to_string(formJsInfo.formId).c_str(),
         compId.c_str(),
-        std::to_string(formJsInfo.formData.size()).c_str());
+        formJsInfo.formData.size());
     if (compId.empty()) {
         return;
     }
@@ -1514,39 +1514,6 @@ void FormRenderRecord::HandleRecoverForm(const FormJsInfo &formJsInfo,
     }
 }
 
-void FormRenderRecord::FillAttributeLogic(const int64_t &formId, const FormJsInfo &formJsInfo,
-    const std::unordered_map<std::string, Ace::FormRequest> &recordFormRequests, const std::string &currentCompId,
-    std::vector<Ace::FormRequest> &groupRequests, const std::vector<std::string> &orderedCompIds,
-    size_t &currentRequestIndex, bool &currentRequestFound, const std::string &statusData,
-    const bool &isHandleClickEvent)
-{
-    // 提取出来的逻辑
-    for (auto compId : orderedCompIds) {
-        auto recordRequestIter = recordFormRequests.find(compId);
-        if (recordRequestIter == recordFormRequests.end()) {
-            HILOG_WARN("invalid formRequest,formId:%{public}" PRId64 " compId=%{public}s", formId, compId.c_str());
-            continue;
-        }
-        auto recordRequest = recordRequestIter->second;
-        Ace::FormRequest groupRequest;
-        groupRequest.compId = compId;
-        groupRequest.want = recordRequest.want;
-        groupRequest.formJsInfo = recordRequest.formJsInfo; // get json data from record request
-        groupRequest.formJsInfo.imageDataMap = formJsInfo.imageDataMap;
-
-        if (compId == currentCompId) {
-            groupRequest.want.SetParam(Constants::FORM_STATUS_DATA, statusData);
-            groupRequest.want.SetParam(Constants::FORM_IS_RECOVER_FORM_TO_HANDLE_CLICK_EVENT, isHandleClickEvent);
-            currentRequestIndex = groupRequests.size();
-            currentRequestFound = true;
-            HILOG_INFO("RecoverFormRequestsInGroup, currentRequestIndex: %{public}zu, \
-                groupRequest.formJsInfo.formData.size: %{public}zu",
-                currentRequestIndex, groupRequest.formJsInfo.formData.size());
-        }
-        groupRequests.emplace_back(groupRequest);
-    }
-}
-
 bool FormRenderRecord::RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, const std::string &statusData,
     const bool &isHandleClickEvent, const std::unordered_map<std::string, Ace::FormRequest> &recordFormRequests)
 {
@@ -1568,8 +1535,29 @@ bool FormRenderRecord::RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, 
     std::vector<Ace::FormRequest> groupRequests;
     size_t currentRequestIndex = 0;
     bool currentRequestFound = false;
-    FillAttributeLogic(formId, formJsInfo, recordFormRequests, currentCompId, groupRequests, orderedCompIds,
-        currentRequestIndex, currentRequestFound, statusData, isHandleClickEvent);
+    for (auto compId : orderedCompIds) {
+        auto recordRequestIter = recordFormRequests.find(compId);
+        if (recordRequestIter == recordFormRequests.end()) {
+            HILOG_WARN("invalid formRequest,formId:%{public}" PRId64 " compId=%{public}s", formId, compId.c_str());
+            continue;
+        }
+        auto recordRequest = recordRequestIter->second;
+        Ace::FormRequest groupRequest;
+        groupRequest.compId = compId;
+        groupRequest.want = recordRequest.want;
+        groupRequest.formJsInfo = recordRequest.formJsInfo; // get json data from record request
+        groupRequest.formJsInfo.imageDataMap = formJsInfo.imageDataMap;
+
+        if (compId == currentCompId) {
+            groupRequest.want.SetParam(Constants::FORM_STATUS_DATA, statusData);
+            groupRequest.want.SetParam(Constants::FORM_IS_RECOVER_FORM_TO_HANDLE_CLICK_EVENT, isHandleClickEvent);
+            currentRequestIndex = groupRequests.size();
+            currentRequestFound = true;
+            HILOG_INFO("currentRequestIndex: %{public}zu, formData.size: %{public}zu",
+                currentRequestIndex, groupRequest.formJsInfo.formData.size());
+        }
+        groupRequests.emplace_back(groupRequest);
+    }
 
     if (groupRequests.empty()) {
         HILOG_ERROR("group requests empty formId:%{public}" PRId64, formId);
