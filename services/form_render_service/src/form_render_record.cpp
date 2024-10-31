@@ -1514,6 +1514,19 @@ void FormRenderRecord::HandleRecoverForm(const FormJsInfo &formJsInfo,
     }
 }
 
+void FormRenderRecord::InitCompIds(const int64_t &formId,
+    std::vector<std::string> &orderedCompIds, std::string &currentCompId){
+    auto pairIter = recycledFormCompIds_.find(formId);
+    if (pairIter == recycledFormCompIds_.end()) {
+        HILOG_ERROR("invalid compIdPair,formId:%{public}" PRId64, formId);
+        return false;
+    }
+    orderedCompIds = pairIter->second.first;
+    currentCompId = pairIter->second.second;
+    HILOG_INFO("compIds size:%{public}zu,current compId:%{public}s,formId:%{public}" PRId64,
+        orderedCompIds.size(), currentCompId.c_str(), formId);    
+}
+
 bool FormRenderRecord::RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, const std::string &statusData,
     const bool &isHandleClickEvent, const std::unordered_map<std::string, Ace::FormRequest> &recordFormRequests)
 {
@@ -1522,15 +1535,7 @@ bool FormRenderRecord::RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, 
     std::string currentCompId;
     {
         std::lock_guard<std::mutex> lock(recycledFormCompIdsMutex_);
-        auto pairIter = recycledFormCompIds_.find(formId);
-        if (pairIter == recycledFormCompIds_.end()) {
-            HILOG_ERROR("invalid compIdPair,formId:%{public}" PRId64, formId);
-            return false;
-        }
-        orderedCompIds = pairIter->second.first;
-        currentCompId = pairIter->second.second;
-        HILOG_INFO("compIds size:%{public}zu,current compId:%{public}s,formId:%{public}" PRId64,
-            orderedCompIds.size(), currentCompId.c_str(), formId);
+        InitCompIds(formId, orderedCompIds, currentCompId);
     }
     std::vector<Ace::FormRequest> groupRequests;
     size_t currentRequestIndex = 0;
@@ -1557,11 +1562,14 @@ bool FormRenderRecord::RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, 
         }
         groupRequests.emplace_back(groupRequest);
     }
+
     if (groupRequests.empty()) {
         HILOG_ERROR("group requests empty formId:%{public}" PRId64, formId);
         return false;
     }
-    if (!currentRequestFound) {// maybe current comp deleted between recover, get last comp as new current comp to recover
+    
+    if (!currentRequestFound) {
+        // maybe current comp deleted between recover, get last comp as new current comp to recover
         currentRequestIndex = groupRequests.size() - 1;
         HILOG_WARN("current request index:%{public}zu formId:%{public}" PRId64, currentRequestIndex, formId);
     }
