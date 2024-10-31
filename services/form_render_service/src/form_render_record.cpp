@@ -1517,7 +1517,7 @@ void FormRenderRecord::HandleRecoverForm(const FormJsInfo &formJsInfo,
 void FormRenderRecord::FillAttributeLogic(const int64_t &formId, const FormJsInfo &formJsInfo,
     const std::unordered_map<std::string, Ace::FormRequest> &recordFormRequests, const std::string &currentCompId,
     std::vector<Ace::FormRequest> &groupRequests, const std::vector<std::string> &orderedCompIds,
-    const size_t &currentRequestIndex, bool &currentRequestFound, const std::string &statusData,
+    size_t currentRequestIndex, bool &currentRequestFound, const std::string &statusData,
     const bool &isHandleClickEvent)
 {
     // 提取出来的逻辑
@@ -1566,7 +1566,7 @@ bool FormRenderRecord::RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, 
             orderedCompIds.size(), currentCompId.c_str(), formId);
     }
     std::vector<Ace::FormRequest> groupRequests;
-    size_t currentRequestIndex;
+    size_t currentRequestIndex = 0;
     bool currentRequestFound = false;
     FillAttributeLogic(formId, formJsInfo, recordFormRequests, currentCompId, groupRequests, orderedCompIds,
         currentRequestIndex, currentRequestFound, statusData, isHandleClickEvent);
