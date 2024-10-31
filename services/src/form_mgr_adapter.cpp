@@ -83,7 +83,6 @@ static const int64_t MAX_NUMBER_OF_JS = 0x20000000000000;
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-constexpr int32_t CALLING_UID_TRANSFORM_DIVISOR = 200000;
 constexpr int32_t SYSTEM_UID = 1000;
 constexpr int32_t API_11 = 11;
 constexpr int32_t DEFAULT_USER_ID = 100;
@@ -2854,7 +2853,7 @@ bool FormMgrAdapter::CheckKeepBackgroundRunningPermission(const sptr<IBundleMgr>
 int32_t FormMgrAdapter::GetCurrentUserId(const int callingUid)
 {
     // get current userId
-    int32_t userId = callingUid / CALLING_UID_TRANSFORM_DIVISOR;
+    int32_t userId = callingUid / Constants::CALLING_UID_TRANSFORM_DIVISOR;
     AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(callingUid, userId);
     return userId;
 }
@@ -3652,9 +3651,8 @@ int32_t FormMgrAdapter::SetFormsRecyclable(const std::vector<int64_t> &formIds)
     return ERR_OK;
 }
 
-int32_t FormMgrAdapter::RecycleForms(const std::vector<int64_t> &formIds, const Want &want)
+int32_t FormMgrAdapter::RecycleForms(const std::vector<int64_t> &formIds, const Want &want, bool isCheckCallingUid)
 {
-    HILOG_DEBUG("called");
     FormRecord record;
     std::vector<int64_t> validFormIds;
     int callingUid = IPCSkeleton::GetCallingUid();
@@ -3685,12 +3683,14 @@ int32_t FormMgrAdapter::RecycleForms(const std::vector<int64_t> &formIds, const 
             HILOG_WARN("form %{public}" PRId64 " is already RECYCLED", formId);
             continue;
         }
-        if (std::find(record.formUserUids.begin(), record.formUserUids.end(), callingUid) ==
+        if (isCheckCallingUid && std::find(record.formUserUids.begin(), record.formUserUids.end(), callingUid) ==
             record.formUserUids.end()) {
             HILOG_WARN("form %{public}" PRId64 " not owned by %{public}d", formId, callingUid);
             continue;
         }
-
+        if (!isCheckCallingUid && callingUid < Constants::CALLING_UID_TRANSFORM_DIVISOR) {
+            callingUid = *(record.formUserUids.begin());
+        }
         record.recycleStatus = RecycleStatus::RECYCLABLE;
         FormDataMgr::GetInstance().UpdateFormRecord(matchedFormId, record);
         validFormIds.emplace_back(matchedFormId);

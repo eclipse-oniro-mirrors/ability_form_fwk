@@ -93,6 +93,7 @@ namespace Constants {
     constexpr const char* PARAM_PUBLISH_FORM_HOST_SCREENY_KEY = "ohos.extra.param.key.add_form_to_host_screeny";
     constexpr const char* CPU_SCENE_ID_CONFIG_UPDATE  = "1";
     constexpr const char* PARAM_DYNAMIC_NAME_KEY = "isDynamic";
+    constexpr const char* RECYCLE_FORMS_USER_ID = "ohos.extra.param.key.recycle_forms_user_id";
     constexpr const char* PARAM_APP_CLONE_INDEX_KEY = "ohos.extra.param.key.appCloneIndex";
 
     constexpr int32_t UNKNOWN = 0;
@@ -114,6 +115,8 @@ namespace Constants {
 
     // The max uid of system app.
     constexpr int32_t MAX_SYSTEM_APP_UID = 10000;
+
+    constexpr int32_t CALLING_UID_TRANSFORM_DIVISOR = 200000;
 
     constexpr int32_t MIN_TIME_SPEED = 1;
     constexpr int32_t MAX_TIME_SPEED = 1000;
