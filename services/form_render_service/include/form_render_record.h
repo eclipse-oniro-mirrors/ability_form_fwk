@@ -240,7 +240,7 @@ private:
     void FillAttributeLogic(const int64_t &formId, const FormJsInfo &formJsInfo,
         const std::unordered_map<std::string, Ace::FormRequest> &recordFormRequests, const std::string &currentCompId,
         std::vector<Ace::FormRequest> &groupRequests, const std::vector<std::string> &orderedCompIds,
-        size_t currentRequestIndex, bool &currentRequestFound, const std::string &statusData,
+        const size_t &currentRequestIndex, bool &currentRequestFound, const std::string &statusData,
         const bool &isHandleClickEvent);
 
     void HandleReleaseAllRendererInJsThread();
