@@ -230,7 +230,7 @@ private:
 
     void HandleFormRenderGC();
 
-    void FormRenderRecord::InitCompIds(const int64_t &formId,
+    void InitCompIds(const int64_t &formId,
         std::vector<std::string> &orderedCompIds, std::string &currentCompId);
 
     bool RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, const std::string &statusData,
