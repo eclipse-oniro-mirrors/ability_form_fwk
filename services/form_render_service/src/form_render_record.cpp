@@ -1547,7 +1547,6 @@ bool FormRenderRecord::RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, 
         groupRequest.want = recordRequest.want;
         groupRequest.formJsInfo = recordRequest.formJsInfo; // get json data from record request
         groupRequest.formJsInfo.imageDataMap = formJsInfo.imageDataMap;
-
         if (compId == currentCompId) {
             groupRequest.want.SetParam(Constants::FORM_STATUS_DATA, statusData);
             groupRequest.want.SetParam(Constants::FORM_IS_RECOVER_FORM_TO_HANDLE_CLICK_EVENT, isHandleClickEvent);
@@ -1558,14 +1557,11 @@ bool FormRenderRecord::RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, 
         }
         groupRequests.emplace_back(groupRequest);
     }
-
     if (groupRequests.empty()) {
         HILOG_ERROR("group requests empty formId:%{public}" PRId64, formId);
         return false;
     }
-
-    if (!currentRequestFound) {
-        // maybe current comp deleted between recover, get last comp as new current comp to recover
+    if (!currentRequestFound) {// maybe current comp deleted between recover, get last comp as new current comp to recover
         currentRequestIndex = groupRequests.size() - 1;
         HILOG_WARN("current request index:%{public}zu formId:%{public}" PRId64, currentRequestIndex, formId);
     }
