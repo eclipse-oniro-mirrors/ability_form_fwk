@@ -1517,6 +1517,7 @@ void FormRenderRecord::HandleRecoverForm(const FormJsInfo &formJsInfo,
 bool FormRenderRecord::InitCompIds(const int64_t &formId,
     std::vector<std::string> &orderedCompIds, std::string &currentCompId)
 {
+    std::lock_guard<std::mutex> lock(recycledFormCompIdsMutex_);
     auto pairIter = recycledFormCompIds_.find(formId);
     if (pairIter == recycledFormCompIds_.end()) {
         HILOG_ERROR("invalid compIdPair,formId:%{public}" PRId64, formId);
@@ -1535,14 +1536,12 @@ bool FormRenderRecord::RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, 
     auto formId = formJsInfo.formId;
     std::vector<std::string> orderedCompIds;
     std::string currentCompId;
-    {
-        std::lock_guard<std::mutex> lock(recycledFormCompIdsMutex_);
-        bool flag = InitCompIds(formId, orderedCompIds, currentCompId);
-        if (!flag) {
-            HILOG_INFO("init compIds failed,formId:%{public}" PRId64, formId);
-            return false;
-        }
+    bool flag = InitCompIds(formId, orderedCompIds, currentCompId);
+    if (!flag) {
+        HILOG_INFO("init compIds failed,formId:%{public}" PRId64, formId);
+        return false;
     }
+    
     std::vector<Ace::FormRequest> groupRequests;
     size_t currentRequestIndex = 0;
     bool currentRequestFound = false;
