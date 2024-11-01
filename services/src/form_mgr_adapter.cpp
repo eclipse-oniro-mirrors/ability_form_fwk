@@ -823,6 +823,19 @@ int FormMgrAdapter::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
     return FormProviderMgr::GetInstance().RefreshForm(matchedFormId, reqWant, true);
 }
 
+void FormMgrAdapter::SetVisibleChange(const int64_t formId, const int32_t formVisibleType)
+{
+    if (formId <= 0
+        || (formVisibleType != Constants::FORM_VISIBLE && formVisibleType > Constants::FORM_INVISIBLE)) {
+        HILOG_WARN("param is not right");
+        return;
+    }
+
+    HILOG_INFO("formId %{public}" PRId64 " formVisibleType %{public}d", formId, formVisibleType);
+    bool isVisible = (formVisibleType == Constants::FORM_VISIBLE) ? true:false;
+    FormRenderMgr::GetInstance().SetVisibleChange(formId, isVisible);
+}
+
 ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &formIds,
     const sptr<IRemoteObject> &callerToken, const int32_t formVisibleType)
 {
@@ -850,13 +863,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
             continue;
         }
         matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
-        if (formVisibleType == Constants::UNKNOWN) {
-            HILOG_WARN("visible unknow");
-        } else {
-            HILOG_INFO("formId %{public}" PRId64 " formVisibleType %{public}d", formId, formVisibleType);
-            bool isVisible = (formVisibleType == Constants::FORM_VISIBLE) ? true:false;
-            FormRenderMgr::GetInstance().SetVisibleChange(matchedFormId, isVisible);
-        }
+        SetVisibleChange(matchedFormId, formVisibleType);
         FormRecord formRecord;
 
         if (!isFormShouldUpdateProviderInfoToHost(matchedFormId, userId, callerToken, formRecord)) {

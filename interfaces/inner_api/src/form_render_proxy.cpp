@@ -252,10 +252,7 @@ int32_t FormRenderProxy::SetVisibleChange(const int64_t &formId, bool isVisible,
     }
 
     int32_t error = SendTransactCmd(
-        IFormRender::Message::FORM_SET_VISIBLE_CHANGE,
-            data,
-            reply,
-            option);
+        IFormRender::Message::FORM_SET_VISIBLE_CHANGE, data, reply, option);
     if (error != ERR_OK) {
         HILOG_ERROR("SendRequest:%{public}d failed", error);
         return error;

@@ -1192,6 +1192,8 @@ private:
     int DeleteCommonForm(const int64_t formId, const sptr<IRemoteObject> &callerToken);
 
     void CheckUpdateFormRecord(const int64_t formId, const FormItemInfo &info, FormRecord &record);
+
+    void SetVisibleChange(const int64_t formId, const int32_t formVisibleType);
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
