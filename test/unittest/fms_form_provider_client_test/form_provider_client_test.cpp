@@ -618,6 +618,27 @@ HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_AcquireShareFormData_0
 }
 
 /**
+ * @tc.name: AaFwk_FormProviderClient_AcquireFormData_0100
+ * @tc.desc: Verify that the return value of AcquireFormData is correct.
+ * @tc.type: AcquireFormData
+ */
+HWTEST_F(FormProviderClientTest, AaFwk_FormProviderClient_AcquireFormData_0100, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_AcquireFormData_0100 start";
+
+    const int64_t formId = 10;
+    const int64_t requestCode = 1;
+    const sptr<IRemoteObject> callerToken = MockFormSupplyCallback::GetInstance();
+
+    const std::shared_ptr<Ability> ability = std::make_shared<Ability>();
+    instance_->SetOwner(ability);
+
+    EXPECT_TRUE((ERR_OK == instance_->AcquireFormData(formId, callerToken, requestCode)));
+
+    GTEST_LOG_(INFO) << "AaFwk_FormProviderClient_AcquireFormData_0100 end";
+}
+
+/**
  * @tc.number: AaFwk_FormProviderClient_NotifyFormDelete_0100
  * @tc.name: NotifyFormDelete
  * @tc.desc: Verify that function NotifyFormDelete.
