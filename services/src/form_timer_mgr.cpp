@@ -899,7 +899,11 @@ bool FormTimerMgr::UpdateAtTimerAlarm()
     HILOG_INFO("selectTime:%{public}" PRId64 ", currentTime:%{public}" PRId64,
         selectTime, currentTime);
 
-    if (nextWakeUpTime == atTimerWakeUpTime_) {
+    int64_t timeInSec = GetBootTimeMs();
+    HILOG_INFO("timeInSec:%{public}" PRId64 ".", timeInSec);
+    int64_t nextTime = timeInSec + (selectTime - currentTime);
+    HILOG_INFO("nextTime:%{public}" PRId64, nextTime);
+    if (nextTime == atTimerWakeUpTime_) {
         HILOG_WARN("end, wakeUpTime not change, no need update alarm");
         return true;
     }
@@ -919,7 +923,7 @@ bool FormTimerMgr::UpdateAtTimerAlarm()
     }
     timerOption->SetWantAgent(wantAgent);
 
-    atTimerWakeUpTime_ = nextWakeUpTime;
+    atTimerWakeUpTime_ = nextTime;
     {
         std::lock_guard<std::mutex> lock(currentUpdateWantAgentMutex_);
         if (currentUpdateAtWantAgent_ != nullptr) {
@@ -927,11 +931,6 @@ bool FormTimerMgr::UpdateAtTimerAlarm()
         }
         currentUpdateAtWantAgent_ = wantAgent;
     }
-
-    int64_t timeInSec = GetBootTimeMs();
-    HILOG_DEBUG("timeInSec:%{public}" PRId64 ".", timeInSec);
-    int64_t nextTime = timeInSec + (selectTime - currentTime);
-    HILOG_INFO("nextTime:%{public}" PRId64, nextTime);
     
     updateAtTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption);
     bool bRet = MiscServices::TimeServiceClient::GetInstance()->StartTimer(updateAtTimerId_,
