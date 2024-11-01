@@ -66,7 +66,6 @@ ohos_unittest("FmsFormHostRecordTest") {
     "form_fwk:form_manager",
     "hilog:libhilog",
     "ipc:ipc_core",
-    "memmgr:memmgrclient",
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
@@ -75,6 +74,12 @@ ohos_unittest("FmsFormHostRecordTest") {
   if (device_usage_statistics) {
     external_deps += [ "device_usage_statistics:usagestatsinner" ]
     defines = [ "DEVICE_USAGE_STATISTICS_ENABLE" ]
+  }
+
+  cflags_cc = []
+  if (cite_memmgr) {
+    external_deps += [ "memmgr:memmgrclient" ]
+    cflags_cc += [ "-DMEM_MGR_ENABLE" ]
   }
 }
 

@@ -163,7 +163,7 @@ ohos_shared_library("libfms") {
     "time_service:time_client",
   ]
 
-  if (cite_memmgr_override) {
+  if (cite_memmgr) {
     external_deps += [ "memmgr:memmgrclient" ]
     cflags_cc += [ "-DMEM_MGR_ENABLE" ]
   }

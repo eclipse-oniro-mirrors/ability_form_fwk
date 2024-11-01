@@ -74,7 +74,6 @@ ohos_unittest("FmsFormMgrServiceTest") {
     "hilog:libhilog",
     "ipc:ipc_core",
     "kv_store:distributeddata_inner",
-    "memmgr:memmgrclient",
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
@@ -89,6 +88,12 @@ ohos_unittest("FmsFormMgrServiceTest") {
   if (device_usage_statistics) {
     external_deps += [ "device_usage_statistics:usagestatsinner" ]
     defines += [ "DEVICE_USAGE_STATISTICS_ENABLE" ]
+  }
+
+  cflags_cc = []
+  if (cite_memmgr) {
+    external_deps += [ "memmgr:memmgrclient" ]
+    cflags_cc += [ "-DMEM_MGR_ENABLE" ]
   }
 
   if (theme_mgr_enable) {
@@ -162,7 +167,6 @@ ohos_unittest("FmsFormMgrServiceTest2") {
     "hilog:libhilog",
     "ipc:ipc_core",
     "kv_store:distributeddata_inner",
-    "memmgr:memmgrclient",
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
@@ -177,6 +181,12 @@ ohos_unittest("FmsFormMgrServiceTest2") {
   if (device_usage_statistics) {
     external_deps += [ "device_usage_statistics:usagestatsinner" ]
     defines += [ "DEVICE_USAGE_STATISTICS_ENABLE" ]
+  }
+
+  cflags_cc = []
+  if (cite_memmgr) {
+    external_deps += [ "memmgr:memmgrclient" ]
+    cflags_cc += [ "-DMEM_MGR_ENABLE" ]
   }
 
   if (theme_mgr_enable) {
