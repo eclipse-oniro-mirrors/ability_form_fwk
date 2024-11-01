@@ -850,6 +850,13 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
             continue;
         }
         matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+        if (formVisibleType == Constants::UNKNOWN) {
+            HILOG_WARN("visible unknow");
+        } else {
+            HILOG_INFO("formId %{public}" PRId64 " formVisibleType %{public}d", formId, formVisibleType);
+            bool isVisible = (formVisibleType == Constants::FORM_VISIBLE) ? true:false;
+            FormRenderMgr::GetInstance().SetVisibleChange(matchedFormId, isVisible);
+        }
         FormRecord formRecord;
 
         if (!isFormShouldUpdateProviderInfoToHost(matchedFormId, userId, callerToken, formRecord)) {

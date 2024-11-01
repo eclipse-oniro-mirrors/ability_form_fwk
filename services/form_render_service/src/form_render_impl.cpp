@@ -37,6 +37,7 @@ namespace {
 constexpr int32_t RENDER_FORM_FAILED = -1;
 constexpr int32_t RELOAD_FORM_FAILED = -1;
 constexpr int32_t RECYCLE_FORM_FAILED = -1;
+constexpr int32_t SET_VISIBLE_CHANGE_FAILED = -1;
 constexpr int32_t FORM_RENDER_TASK_DELAY_TIME = 20; // ms
 constexpr int32_t ENABLE_FORM_FAILED = -1;
 }
@@ -255,6 +256,38 @@ int32_t FormRenderImpl::OnUnlock()
         if (iter.second) {
             iter.second->OnUnlock();
         }
+    }
+    return ERR_OK;
+}
+
+int32_t FormRenderImpl::SetVisibleChange(const int64_t &formId, bool isVisible, const Want &want)
+{
+    HILOG_INFO("SetVisibleChange start");
+    if (formId <= 0) {
+        HILOG_ERROR("formId is negative");
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+    }
+
+    std::string uid = want.GetStringParam(Constants::FORM_SUPPLY_UID);
+    if (uid.empty()) {
+        HILOG_ERROR("empty uid,formId:%{public}" PRId64, formId);
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+    }
+    HILOG_INFO("formId:%{public}" PRId64 ",uid:%{public}s", formId, uid.c_str());
+
+    std::lock_guard<std::mutex> lock(renderRecordMutex_);
+    if (auto search = renderRecordMap_.find(uid); search != renderRecordMap_.end()) {
+        if (search->second == nullptr) {
+            HILOG_ERROR("null renderRecord of %{public}s", std::to_string(formId).c_str());
+            return SET_VISIBLE_CHANGE_FAILED;
+        }
+        auto ret = search->second->SetVisibleChange(formId, isVisible);
+        if (ret != ERR_OK) {
+            return ret;
+        }
+    } else {
+        HILOG_ERROR("can't find render record of %{public}s", std::to_string(formId).c_str());
+        return SET_VISIBLE_CHANGE_FAILED;
     }
     return ERR_OK;
 }
