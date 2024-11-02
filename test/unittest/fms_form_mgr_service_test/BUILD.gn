@@ -58,7 +58,6 @@ ohos_unittest("FmsFormMgrServiceTest") {
     "ability_base:base",
     "ability_base:configuration",
     "ability_base:want",
-    "ability_runtime:abilitykit_native",
     "ability_runtime:app_manager",
     "ability_runtime:wantagent_innerkits",
     "access_token:libaccesstoken_sdk",
@@ -99,13 +98,6 @@ ohos_unittest("FmsFormMgrServiceTest") {
   if (theme_mgr_enable) {
     external_deps += [ "theme_mgr:theme_manager_client" ]
     cflags += [ "-DTHEME_MGR_ENABLE" ]
-  }
-
-  if (ability_runtime_graphics) {
-    defines += [
-      "SUPPORT_SCREEN",
-      "SUPPORT_GRAPHICS",
-    ]
   }
 }
 

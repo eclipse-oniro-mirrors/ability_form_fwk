@@ -265,6 +265,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_010, TestSize.Level0)
     sptr<IRemoteObject> callerToken = nullptr;
     MockExistFormRecord(true);
     MockGetMatchedHostClient(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, formMgrAdapter.HandleReleaseForm(formId, callerToken));
     GTEST_LOG_(INFO) << "FormMgrAdapter_010 end";
 }
 
@@ -496,6 +497,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_023, TestSize.Level0)
     MockExistFormRecord(true);
     MockExistTempForm(true);
     MockGetMatchedHostClient(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, formMgrAdapter.CastTempForm(formId, callerToken));
     GTEST_LOG_(INFO) << "FormMgrAdapter_023 end";
 }
 
@@ -513,6 +515,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_024, TestSize.Level0)
     MockExistFormRecord(true);
     MockExistTempForm(true);
     MockGetMatchedHostClient(true);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, formMgrAdapter.CastTempForm(formId, callerToken));
     GTEST_LOG_(INFO) << "FormMgrAdapter_024 end";
 }
 
@@ -703,6 +706,8 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_035, TestSize.Level0)
     WantParams wantParams;
     FormJsInfo formInfo;
     MockGenerateFormId(true);
+    EXPECT_EQ(
+        ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrAdapter.AllotFormByInfo(info, callerToken, wantParams, formInfo));
     GTEST_LOG_(INFO) << "FormMgrAdapter_035 end";
 }
 
@@ -1152,6 +1157,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_062, TestSize.Level0)
     int64_t nextTime = 1;
     int32_t userId = 2;
     MockGetRefreshCount(true);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_MAX_REFRESH, formMgrAdapter.SetNextRefreshTimeLocked(formId, nextTime, userId));
     GTEST_LOG_(INFO) << "FormMgrAdapter_062 end";
 }
 
@@ -2037,6 +2043,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0108, TestSize.Level0)
     MockGetDBRecordParam(true);
     MockDeleteHostRecord(false);
     MockRemoveFormTimer(true);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrAdapter.ReleaseForm(formId, callerToken, delCache));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0108 end";
 }
 
@@ -2055,6 +2062,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0109, TestSize.Level0)
     MockGetMatchedHostClient(true);
     MockGetMatchedHostClientParams(true);
     MockHasFormUserUids(true);
+    EXPECT_EQ(ERR_OK, formMgrAdapter.HandleReleaseForm(formId, callerToken));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0109 end";
 }
 
@@ -2074,6 +2082,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0110, TestSize.Level0)
     MockGetMatchedHostClientParams(true);
     MockHasFormUserUids(false);
     MockRemoveFormTimer(true);
+    EXPECT_EQ(ERR_OK, formMgrAdapter.HandleReleaseForm(formId, callerToken));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0110 end";
 }
 
@@ -2093,6 +2102,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0111, TestSize.Level0)
     MockGetMatchedHostClientParams(true);
     MockHasFormUserUids(false);
     MockRemoveFormTimer(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrAdapter.HandleReleaseForm(formId, callerToken));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0111 end";
 }
 
@@ -2111,6 +2121,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0112, TestSize.Level0)
     MockGetDBRecordParam(true);
     MockDeleteHostRecord(false);
     MockRemoveFormTimer(true);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrAdapter.HandleDeleteForm(formId, callerToken));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0112 end";
 }
 
@@ -2168,6 +2179,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0115, TestSize.Level0)
     MockGetFormRecordParams(true);
     MockHasFormUserUids(true);
     MockDeleteHostRecord(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrAdapter.HandleDeleteTempForm(formId, callerToken));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0115 end";
 }
 
@@ -2187,6 +2199,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0116, TestSize.Level0)
     MockHasFormUserUids(false);
     MockNotifyProviderFormDelete(true);
     MockDeleteHostRecord(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrAdapter.HandleDeleteTempForm(formId, callerToken));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0116 end";
 }
 

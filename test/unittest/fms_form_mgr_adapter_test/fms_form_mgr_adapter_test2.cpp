@@ -121,6 +121,7 @@ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_0121, TestSize.Level0)
     MockGetMatchedHostClient(true);
     MockGetMatchedHostClientParams(true);
     MockGetMatchedHostClientParamsMatchedId(formId);
+    EXPECT_EQ(ERR_OK, formMgrAdapter.RequestForm(formId, callerToken, want));
     MockGetMatchedHostClientParamsMatchedId(0);
     GTEST_LOG_(INFO) << "FormMgrAdapter_0121 end";
 }
@@ -207,6 +208,7 @@ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_0125, TestSize.Level0)
     MockGetMatchedHostClientParams(true);
     MockGetMatchedHostClientParamsMatchedId(formId);
     MockCheckEnoughForm(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_MAX_SYSTEM_TEMP_FORMS, formMgrAdapter.CastTempForm(formId, callerToken));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0125 end";
 }
 
@@ -251,6 +253,7 @@ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_0127, TestSize.Level0)
     MockCheckEnoughForm(true);
     MockGetFormRecord(true);
     MockConnectServiceAbility(true);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED, formMgrAdapter.CastTempForm(formId, callerToken));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0127 end";
 }
 
@@ -352,6 +355,7 @@ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_0131, TestSize.Level0)
     MockModifyFormTempFlag(true);
     MockAddFormUserUid(true);
     MockUpdateDBRecord(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrAdapter.CastTempForm(formId, callerToken));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0131 end";
 }
 
@@ -378,6 +382,7 @@ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_0132, TestSize.Level0)
     MockModifyFormTempFlag(true);
     MockAddFormUserUid(true);
     MockUpdateDBRecord(true);
+    EXPECT_EQ(ERR_OK, formMgrAdapter.CastTempForm(formId, callerToken));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0132 end";
 }
 
@@ -1827,6 +1832,7 @@ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_209, TestSize.Level0)
     want.SetParam(Constants::FORM_CALL_EVENT_PARAMS, params.dump());
     sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
     MockGetFormRecord(true);
+    EXPECT_EQ(ERR_OK, formMgrAdapter.BackgroundEvent(formId, want, callerToken));
     FormAmsHelper::GetInstance().abilityManager_ = amsHelperBackup;
     GTEST_LOG_(INFO) << "FormMgrAdapter_209 end";
 }
@@ -1852,6 +1858,7 @@ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_210, TestSize.Level0)
     want.SetParam(Constants::FORM_CALL_EVENT_PARAMS, params.dump());
     sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
     MockGetFormRecord(true);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.BackgroundEvent(formId, want, callerToken));
     FormAmsHelper::GetInstance().abilityManager_ = amsHelperBackup;
     GTEST_LOG_(INFO) << "FormMgrAdapter_210 end";
 }
