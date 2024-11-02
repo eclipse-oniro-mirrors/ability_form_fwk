@@ -63,7 +63,7 @@ void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eve
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED) {
         // uninstall module/bundle
         int appIndex = want.GetIntParam("appIndex", 0);
-        if(appIndex > 0) {
+        if (appIndex > 0) {
             HILOG_INFO("this application is a simulation. not support to remove the form.\
                 appIndex: %{public}d", appIndex);
             return;
