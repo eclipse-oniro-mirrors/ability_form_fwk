@@ -703,6 +703,8 @@ private:
         DISALLOW_COPY_AND_MOVE(FormMgrDeathRecipient);
     };
 
+    // Shared locks are used here, write locks are used for setting remoteProxy_ operations,
+    // and concurrent read locks are used for reading remoteProxy_ operations.
     std::shared_mutex connectMutex_;
     sptr<IFormMgr> remoteProxy_;
 
