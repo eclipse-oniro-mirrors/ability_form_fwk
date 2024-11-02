@@ -229,6 +229,10 @@ private:
         const bool &isRecoverFormToHandleClickEvent);
 
     void HandleFormRenderGC();
+
+    bool InitCompIds(const int64_t &formId,
+        std::vector<std::string> &orderedCompIds, std::string &currentCompId);
+
     bool RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, const std::string &statusData,
         const bool &isHandleClickEvent, const std::unordered_map<std::string, Ace::FormRequest> &recordFormRequests);
     bool RecoverRenderer(const std::vector<Ace::FormRequest> &groupRequests, const size_t &currentRequestIndex);
