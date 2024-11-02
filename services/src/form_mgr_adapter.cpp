@@ -831,7 +831,7 @@ void FormMgrAdapter::SetVisibleChange(const int64_t formId, const int32_t formVi
         return;
     }
 
-    bool isVisible = (formVisibleType == Constants::FORM_VISIBLE) ? true:false;
+    bool isVisible = (formVisibleType == Constants::FORM_VISIBLE) ? true : false;
     FormRenderMgr::GetInstance().SetVisibleChange(formId, isVisible);
 }
 
@@ -862,13 +862,12 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
             continue;
         }
         matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
-        SetVisibleChange(matchedFormId, formVisibleType);
         FormRecord formRecord;
 
         if (!isFormShouldUpdateProviderInfoToHost(matchedFormId, userId, callerToken, formRecord)) {
             continue;
         }
-
+        SetVisibleChange(matchedFormId, formVisibleType);
         PaddingNotifyVisibleFormsMap(formVisibleType, formId, formInstanceMaps);
 
         // Update info to host and check if the form was created by the system application.
