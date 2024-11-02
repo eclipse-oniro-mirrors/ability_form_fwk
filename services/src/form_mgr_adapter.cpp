@@ -826,12 +826,11 @@ int FormMgrAdapter::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
 void FormMgrAdapter::SetVisibleChange(const int64_t formId, const int32_t formVisibleType)
 {
     if (formId <= 0
-        || (formVisibleType != Constants::FORM_VISIBLE && formVisibleType > Constants::FORM_INVISIBLE)) {
+        || (formVisibleType != Constants::FORM_VISIBLE && formVisibleType != Constants::FORM_INVISIBLE)) {
         HILOG_WARN("param is not right");
         return;
     }
 
-    HILOG_INFO("formId %{public}" PRId64 " formVisibleType %{public}d", formId, formVisibleType);
     bool isVisible = (formVisibleType == Constants::FORM_VISIBLE) ? true:false;
     FormRenderMgr::GetInstance().SetVisibleChange(formId, isVisible);
 }
