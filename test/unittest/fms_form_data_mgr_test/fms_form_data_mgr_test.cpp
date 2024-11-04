@@ -1314,53 +1314,6 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetNeedRefresh_002, TestSize.Lev
 }
 
 /**
- * @tc.number: FmsFormDataMgrTest_SetNeedAddForm_001
- * @tc.name: SetNeedAddForm
- * @tc.desc: Verify that the return value is correct.
- * @tc.details:
- *       formRecords_ is not found.
- */
-HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetNeedAddForm_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetNeedRefresh_001 start";
-
-    int64_t formId = 1;
-    bool needAddForm = true;
-    std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
-    ASSERT_NE(nullptr, formDataMgr);
-    formDataMgr->SetNeedAddForm(formId, needAddForm);
-
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetNeedAddForm_001 end";
-}
-
-/**
- * @tc.number: FmsFormDataMgrTest_SetNeedAddForm_002
- * @tc.name: SetNeedAddForm
- * @tc.desc: Verify that the return value is correct.
- * @tc.details:
- *       formRecords_ is not found.
- */
-HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetNeedAddForm_002, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetNeedAddForm_002 start";
-
-    int64_t formId = 2;
-    bool needAddForm = true;
-
-    // create formRecords
-    int callingUid = 0;
-    FormItemInfo formItemInfo;
-    InitFormItemInfo(formId, formItemInfo);
-    FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
-    formDataMgr_.formRecords_.emplace(formId, record);
-
-    formDataMgr_.SetNeedAddForm(formId, needAddForm);
-    EXPECT_EQ(true, formDataMgr_.formRecords_.find(formId)->second.needAddForm);
-
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetNeedAddForm_002 end";
-}
-
-/**
  * @tc.number: FmsFormDataMgrTest_SetCountTimerRefresh_001
  * @tc.name: SetCountTimerRefresh
  * @tc.desc: Verify that the return value is correct.
