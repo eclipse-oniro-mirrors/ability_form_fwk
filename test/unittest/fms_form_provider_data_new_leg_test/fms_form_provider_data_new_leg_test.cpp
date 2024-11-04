@@ -591,6 +591,8 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_003, TestSize.Level0)
     bool isTimerRefresh = true;
     MockIsLimiterEnableRefresh(true);
     MockConnectServiceAbility(false);
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED,
+        formProviderMgr.ConnectAmsForRefresh(formId, record, want, isTimerRefresh));
     GTEST_LOG_(INFO) << "FormProviderMgr_003 end";
 }
 
@@ -762,6 +764,7 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_013, TestSize.Level0)
     int64_t formId = 1;
     bool isVisibleToFresh = true;
     MockIsEnableRefresh(true);
+    EXPECT_EQ(true, formProviderMgr.IsNeedToFresh(record, formId, isVisibleToFresh));
     GTEST_LOG_(INFO) << "FormProviderMgr_013 end";
 }
 

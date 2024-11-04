@@ -47,6 +47,7 @@ ohos_unittest("FrsFormRenderImplTest") {
   ]
 
   external_deps = [
+    "ability_base:configuration",
     "ability_base:extractortool",
     "ability_base:want",
     "ability_runtime:ability_deps_wrapper",
