@@ -1488,11 +1488,13 @@ ErrCode FormMgrAdapter::AddExistFormRecord(const FormItemInfo &info, const sptr<
         newRecord.formProviderInfo.SetImageDataMap(imageDataMap);
     }
     FormRenderMgr::GetInstance().RenderForm(newRecord, wantParams, callerToken);
-    if (newRecord.needRefresh || FormCacheMgr::GetInstance().NeedAcquireProviderData(newRecord.formId)
+    if (newRecord.needRefresh || newRecord.needAddForm
+        || FormCacheMgr::GetInstance().NeedAcquireProviderData(newRecord.formId)
         || wantParams.HasParam(Constants::PARAM_HOST_BG_INVERSE_COLOR_KEY)) {
         HILOG_INFO("acquire ProviderFormInfo async, formId:%{public}" PRId64, formId);
         newRecord.isInited = false;
         FormDataMgr::GetInstance().SetFormCacheInited(formId, false);
+        FormDataMgr::GetInstance().SetNeedAddForm(formId, false);
 
         // acquire formInfo from provider
         ErrCode errorCode = AcquireProviderFormInfoAsync(formId, info, wantParams);
@@ -2374,7 +2376,7 @@ ErrCode FormMgrAdapter::AddRequestPublishForm(const FormItemInfo &formItemInfo, 
 
     // create form info for js
     FormDataMgr::GetInstance().CreateFormJsInfo(formId, formRecord, formJsInfo);
-    FormDataMgr::GetInstance().SetNeedRefresh(formId, true);
+    FormDataMgr::GetInstance().SetNeedAddForm(formId, true);
     if (formProviderData != nullptr) {
         formJsInfo.formData = formProviderData->GetDataString();
         formJsInfo.formProviderData = *formProviderData;

@@ -36,6 +36,7 @@ public:
     bool needFreeInstall = false;
     bool versionUpgrade = false;
     bool needRefresh = false;
+    bool needAddForm = false;
     bool isCountTimerRefresh = false;
     std::string packageName = "";
     std::string bundleName = "";
