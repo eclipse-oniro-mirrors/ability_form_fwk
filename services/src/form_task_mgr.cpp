@@ -812,11 +812,11 @@ void FormTaskMgr::PostRenderForm(const FormRecord &formRecord, const Want &want,
     auto renderForm = [formRecord, want, remoteObject]() {
         FormTaskMgr::GetInstance().RenderForm(formRecord, want, remoteObject);
     };
-
+    
+    int64_t formId = formRecord.formId;
     int64_t lastRecoverTime = 0;
     {
         std::lock_guard<std::mutex> lock(formRecoverTimesMutex_);
-        int64_t formId = formRecord.formId;
         if (formLastRecoverTimes.find(formId) != formLastRecoverTimes.end()) {
             lastRecoverTime = formLastRecoverTimes[formId];
             formLastRecoverTimes.erase(formId);
@@ -827,7 +827,7 @@ void FormTaskMgr::PostRenderForm(const FormRecord &formRecord, const Want &want,
     if (lastRecoverTime <= 0 || recoverInterval > FORM_BUILD_DELAY_TIME) {
         serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, renderForm);
     } else {
-        HILOG_INFO("delay render task: %{public}d ms, formId is %{public}" PRId64, lastRecoverTime, formId);
+        HILOG_INFO("delay render task: %{public}" PRId32 " ms, formId is %{public}" PRId64, recoverInterval, formId);
         int32_t delayTime = FORM_BUILD_DELAY_TIME - recoverInterval;
         delayTime = std::min(delayTime, FORM_BUILD_DELAY_TIME);
         delayTime = std::max(delayTime, FORM_TASK_DELAY_TIME);
