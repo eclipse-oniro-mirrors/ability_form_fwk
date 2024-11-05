@@ -98,6 +98,7 @@ ohos_shared_library("formrender") {
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
+    "config_policy:configpolicy_util",
     "ets_runtime:libark_jsruntime",
     "eventhandler:libeventhandler",
     "faultloggerd:libbacktrace_local",

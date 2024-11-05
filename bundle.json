@@ -60,7 +60,8 @@
               "resource_schedule_service",
               "theme_mgr",
               "jsoncpp",
-              "libxml2"
+              "libxml2",
+              "config_policy"
 
           ],
           "third_party": [
