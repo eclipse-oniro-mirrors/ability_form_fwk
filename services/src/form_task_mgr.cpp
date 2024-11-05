@@ -919,7 +919,7 @@ void FormTaskMgr::PostReleaseRenderer(
     };
     {
         std::lock_guard<std::mutex> lock(formRecoverTimesMutex_);
-        formLastRecoverTimes.erase(formRecord.formId);
+        formLastRecoverTimes.erase(formId);
     }
     serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, deleterenderForm);
     HILOG_INFO("end");
