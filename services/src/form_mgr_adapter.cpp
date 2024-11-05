@@ -1706,7 +1706,7 @@ ErrCode FormMgrAdapter::InnerAcquireProviderFormInfoAsync(const int64_t formId,
     want.AddFlags(Want::FLAG_ABILITY_FORM_ENABLED);
     ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbility(want, formAcquireConnection);
     FormReport::GetInstance().SetStartBindTime(formId, FormUtil::GetCurrentSteadyClockMillseconds());
-    if (errorCode != ERR_OK) {
+    if (errorCode != ERR_OK && errorCode != ERR_ECOLOGICAL_CONTROL_STATUS) {
         HILOG_ERROR("ConnectServiceAbility failed");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
