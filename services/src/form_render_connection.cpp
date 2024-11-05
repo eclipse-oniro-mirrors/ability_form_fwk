@@ -52,7 +52,7 @@ void FormRenderConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &e
     int32_t compileMode = 0;
     if (!FormBmsHelper::GetInstance().GetCompileMode(formRecord_.bundleName, formRecord_.moduleName,
         formRecord_.providerUserId, compileMode)) {
-        HILOG_ERROR("get compile mode failed.");
+        HILOG_ERROR("get compile mode failed");
         return;
     }
 
