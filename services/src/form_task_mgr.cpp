@@ -811,6 +811,20 @@ void FormTaskMgr::PostRenderForm(const FormRecord &formRecord, const Want &want,
     auto renderForm = [formRecord, want, remoteObject]() {
         FormTaskMgr::GetInstance().RenderForm(formRecord, want, remoteObject);
     };
+    int64_t formId = formRecord.formId;
+    {
+        std::lock_guard<std::mutex> lock(formRecoverTimesMutex_);
+        int32_t recoverInterval = FormUtil::GetCurrentMillisecond() - formLastRecoverTimes[formId];
+        if (formLastRecoverTimes.find(formId) != formLastRecoverTimes.end() &&
+            recoverInterval < FORM_BUILD_DELAY_TIME){
+                int32_t delayTime = FORM_BUILD_DELAY_TIME - recoverInterval;
+                formLastRecoverTimes[formId] = FormUtil::GetCurrentMillisecond();
+                serialQueue_->ScheduleDelayTask(
+                    std::make_pair((int64_t)TaskType::RENDER_FORM, formId), delayTime, renderForm);
+                return;
+            }
+    }
+    formLastRecoverTimes[formId] = FormUtil::GetCurrentMillisecond();
     serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, renderForm);
     HILOG_DEBUG("end");
 }
@@ -854,6 +868,10 @@ void FormTaskMgr::PostStopRenderingForm(
     auto deleterenderForm = [formRecord, want, remoteObject]() {
         FormTaskMgr::GetInstance().StopRenderingForm(formRecord, want, remoteObject);
     };
+    {
+        std::lock_guard<std::mutex> lock(formRecoverTimesMutex_);
+        formLastRecoverTimes.erase(formRecord.formId);
+    }
     serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, deleterenderForm);
 }
 
@@ -892,6 +910,10 @@ void FormTaskMgr::PostReleaseRenderer(
     auto deleterenderForm = [formId, compId, uid, remoteObject]() {
         FormTaskMgr::GetInstance().ReleaseRenderer(formId, compId, uid, remoteObject);
     };
+    {
+        std::lock_guard<std::mutex> lock(formRecoverTimesMutex_);
+        formLastRecoverTimes.erase(formRecord.formId);
+    }
     serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, deleterenderForm);
     HILOG_INFO("end");
 }
@@ -1195,6 +1217,10 @@ void FormTaskMgr::PostRecoverForm(const FormRecord &record, const Want &want, co
     auto recoverForm = [record, want, remoteObject]() {
         FormTaskMgr::GetInstance().RecoverForm(record, want, remoteObject);
     };
+    {
+        std::lock_guard<std::mutex> lock(formRecoverTimesMutex_);
+        formLastRecoverTimes[record.formId] = FormUtil::GetCurrentMillisecond();
+    }
     serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, recoverForm);
     HILOG_DEBUG("end");
 }
