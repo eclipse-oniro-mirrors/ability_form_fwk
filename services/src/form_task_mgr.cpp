@@ -827,6 +827,7 @@ void FormTaskMgr::PostRenderForm(const FormRecord &formRecord, const Want &want,
     if (lastRecoverTime <= 0 || recoverInterval > FORM_BUILD_DELAY_TIME) {
         serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, renderForm);
     } else {
+        HILOG_INFO("delay render task: %{public}d ms, formId is %{public}" PRId64, lastRecoverTime, formId);
         int32_t delayTime = FORM_BUILD_DELAY_TIME - recoverInterval;
         delayTime = std::min(delayTime, FORM_BUILD_DELAY_TIME);
         delayTime = std::max(delayTime, FORM_TASK_DELAY_TIME);
