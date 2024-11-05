@@ -17,6 +17,7 @@
 
 #include <cinttypes>
 #include <utility>
+#include <cmath>
 
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
@@ -811,21 +812,26 @@ void FormTaskMgr::PostRenderForm(const FormRecord &formRecord, const Want &want,
     auto renderForm = [formRecord, want, remoteObject]() {
         FormTaskMgr::GetInstance().RenderForm(formRecord, want, remoteObject);
     };
-    int64_t formId = formRecord.formId;
+
+    int64_t lastRecoverTime = 0;
     {
         std::lock_guard<std::mutex> lock(formRecoverTimesMutex_);
-        int32_t recoverInterval = FormUtil::GetCurrentMillisecond() - formLastRecoverTimes[formId];
-        if (formLastRecoverTimes.find(formId) != formLastRecoverTimes.end() &&
-            recoverInterval < FORM_BUILD_DELAY_TIME){
-                int32_t delayTime = FORM_BUILD_DELAY_TIME - recoverInterval;
-                formLastRecoverTimes[formId] = FormUtil::GetCurrentMillisecond();
-                serialQueue_->ScheduleDelayTask(
-                    std::make_pair((int64_t)TaskType::RENDER_FORM, formId), delayTime, renderForm);
-                return;
-            }
+        int64_t formId = formRecord.formId;
+        if (formLastRecoverTimes.find(formId) != formLastRecoverTimes.end()) {
+            lastRecoverTime = formLastRecoverTimes[formId];
+            formLastRecoverTimes.erase(formId);
+        }
     }
-    formLastRecoverTimes[formId] = FormUtil::GetCurrentMillisecond();
-    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, renderForm);
+
+    int32_t recoverInterval = (int32_t) (FormUtil::GetCurrentMillisecond() - lastRecoverTime);
+    if (lastRecoverTime <= 0 || recoverInterval > FORM_BUILD_DELAY_TIME) {
+        serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, renderForm);
+    } else {
+        int32_t delayTime = FORM_BUILD_DELAY_TIME - recoverInterval;
+        delayTime = std::min(delayTime, FORM_BUILD_DELAY_TIME);
+        delayTime = std::max(delayTime, FORM_TASK_DELAY_TIME);
+        serialQueue_->ScheduleDelayTask(std::make_pair((int64_t)TaskType::RENDER_FORM, formId), delayTime, renderForm);
+    }
     HILOG_DEBUG("end");
 }
 
@@ -1157,6 +1163,10 @@ void FormTaskMgr::PostRecycleForms(const std::vector<int64_t> &formIds, const Wa
         auto recycleForm = [formId, remoteObjectOfHost, remoteObjectOfRender]() {
             FormTaskMgr::GetInstance().RecycleForm(formId, remoteObjectOfHost, remoteObjectOfRender);
         };
+        {
+            std::lock_guard<std::mutex> lock(formRecoverTimesMutex_);
+            formLastRecoverTimes.erase(formId);
+        }
         serialQueue_->ScheduleDelayTask(
             std::make_pair((int64_t)TaskType::RECYCLE_FORM, formId), delayTime, recycleForm);
     }
