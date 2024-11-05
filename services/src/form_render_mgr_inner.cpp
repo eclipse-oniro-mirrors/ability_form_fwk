@@ -264,6 +264,18 @@ void FormRenderMgrInner::NotifyScreenOn()
     remoteFormRenderer->RunCachedConfigurationUpdated();
 }
 
+void FormRenderMgrInner::PostSetVisibleChangeTask(int64_t formId, bool isVisible)
+{
+    HILOG_INFO("call");
+    sptr<IRemoteObject> remoteObject;
+    auto ret = GetRenderObject(remoteObject);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("null remoteObjectGotten");
+        return;
+    }
+    FormTaskMgr::GetInstance().PostSetVisibleChange(formId, isVisible, remoteObject);
+}
+
 ErrCode FormRenderMgrInner::StopRenderingForm(int64_t formId, const FormRecord &formRecord,
     const std::string &compId, const sptr<IRemoteObject> &hostToken)
 {

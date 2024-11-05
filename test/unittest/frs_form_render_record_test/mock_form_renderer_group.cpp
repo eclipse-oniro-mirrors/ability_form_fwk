@@ -39,6 +39,11 @@ void FormRendererGroup::OnUnlock()
     return;
 }
 
+void FormRendererGroup::SetVisibleChange(bool isVisible)
+{
+    return;
+}
+
 void FormRendererGroup::UpdateForm(const OHOS::AppExecFwk::FormJsInfo& formJsInfo)
 {
     return;

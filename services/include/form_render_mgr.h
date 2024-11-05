@@ -52,6 +52,8 @@ public:
 
     void NotifyScreenOn();
 
+    void SetVisibleChange(int64_t formId, bool isVisible);
+
     ErrCode StopRenderingForm(int64_t formId, const FormRecord &formRecord,
         const std::string &compId = "", const sptr<IRemoteObject> &hostToken = nullptr);
 
