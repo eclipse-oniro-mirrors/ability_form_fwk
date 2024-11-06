@@ -823,6 +823,18 @@ int FormMgrAdapter::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
     return FormProviderMgr::GetInstance().RefreshForm(matchedFormId, reqWant, true);
 }
 
+void FormMgrAdapter::SetVisibleChange(const int64_t formId, const int32_t formVisibleType)
+{
+    if (formId <= 0
+        || (formVisibleType != Constants::FORM_VISIBLE && formVisibleType != Constants::FORM_INVISIBLE)) {
+        HILOG_WARN("param is not right");
+        return;
+    }
+
+    bool isVisible = (formVisibleType == Constants::FORM_VISIBLE) ? true : false;
+    FormRenderMgr::GetInstance().SetVisibleChange(formId, isVisible);
+}
+
 ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &formIds,
     const sptr<IRemoteObject> &callerToken, const int32_t formVisibleType)
 {
@@ -855,7 +867,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
         if (!isFormShouldUpdateProviderInfoToHost(matchedFormId, userId, callerToken, formRecord)) {
             continue;
         }
-
+        SetVisibleChange(matchedFormId, formVisibleType);
         PaddingNotifyVisibleFormsMap(formVisibleType, formId, formInstanceMaps);
 
         // Update info to host and check if the form was created by the system application.

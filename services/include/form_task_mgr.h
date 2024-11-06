@@ -224,6 +224,8 @@ public:
 
     void PostOnUnlock(const sptr<IRemoteObject> &remoteObject);
 
+    void PostSetVisibleChange(int64_t formId, bool isVisible, const sptr<IRemoteObject> &remoteObject);
+
     /**
     * @brief Post Form visible/invisible notify.
     * @param formIds  the Ids of forms need to notify.
@@ -473,6 +475,8 @@ private:
         int64_t formId, const std::string &compId, const std::string &uid, const sptr<IRemoteObject> &remoteObject);
 
     void OnUnlock(const sptr<IRemoteObject> &remoteObject);
+
+    void SetVisibleChange(int64_t formId, bool isVisible, const sptr<IRemoteObject> &remoteObject);
 
     void RemoveConnection(int32_t connectId);
 

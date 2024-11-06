@@ -106,6 +106,10 @@ public:
 
     int32_t OnUnlock();
 
+    int32_t SetVisibleChange(const int64_t &formId, bool isVisible);
+
+    int32_t HandleSetVisibleChange(const int64_t &formId, bool isVisible);
+
     int32_t ReloadFormRecord(const std::vector<FormJsInfo> &&formJsInfos, const Want &want);
 
     int32_t HandleReloadFormRecord(const std::vector<FormJsInfo> &&formJsInfos, const Want &want);

@@ -40,6 +40,7 @@ constexpr int32_t RELOAD_FORM_FAILED = -1;
 constexpr int32_t RENDER_FORM_ID = -1;
 constexpr int32_t RENDER_FORM_FAILED = -1;
 constexpr int32_t RECYCLE_FORM_FAILED = -1;
+constexpr int32_t SET_VISIBLE_CHANGE_FAILED = -1;
 constexpr int32_t FORM_ID = 1;
 }
 #define private public
@@ -1717,4 +1718,87 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_090, TestSize.Level0)
     bool ret = formRenderRecordPtr_->RecoverRenderer(requests, requestIndex);
     EXPECT_EQ(false, ret);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_090 end";
+}
+
+/**
+* @tc.name: FormRenderRecordTest_091
+* @tc.desc: Test HandleSetVisibleChange
+* @tc.type: FUNC
+*/
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_091, TestSize.Level0)
+{
+    EXPECT_TRUE(formRenderRecordPtr_);
+    formRenderRecordPtr_->formRendererGroupMap_.clear();
+
+    int64_t formId = 15;
+    EXPECT_EQ(SET_VISIBLE_CHANGE_FAILED, formRenderRecordPtr_->HandleSetVisibleChange(formId, true));
+}
+
+/**
+* @tc.name: FormRenderRecordTest_092
+* @tc.desc: Test HandleSetVisibleChange
+* @tc.type: FUNC
+*/
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_092, TestSize.Level0)
+{
+    EXPECT_TRUE(formRenderRecordPtr_);
+    formRenderRecordPtr_->formRendererGroupMap_.clear();
+
+    int64_t formId = 15;
+    formRenderRecordPtr_->formRendererGroupMap_.emplace(formId, nullptr);
+    EXPECT_EQ(SET_VISIBLE_CHANGE_FAILED, formRenderRecordPtr_->HandleSetVisibleChange(formId, true));
+}
+
+/**
+* @tc.name: FormRenderRecordTest_093
+* @tc.desc: Test HandleSetVisibleChange
+* @tc.type: FUNC
+*/
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_093, TestSize.Level0)
+{
+    EXPECT_TRUE(formRenderRecordPtr_);
+    formRenderRecordPtr_->formRendererGroupMap_.clear();
+
+    int64_t formId = 15;
+    std::shared_ptr<AbilityRuntime::Context> context = nullptr;
+    std::shared_ptr<AbilityRuntime::Runtime> runtime = nullptr;
+    std::shared_ptr<OHOS::AppExecFwk::EventHandler> handler = nullptr;
+    auto group = std::make_shared<FormRendererGroup>(context, runtime, handler);
+    formRenderRecordPtr_->formRendererGroupMap_.emplace(formId, group);
+    EXPECT_EQ(ERR_OK, formRenderRecordPtr_->HandleSetVisibleChange(formId, true));
+}
+
+/**
+* @tc.name: FormRenderRecordTest_094
+* @tc.desc: Verify SetVisibleChange
+* @tc.type: FUNC
+*/
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_094, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_094 start";
+
+    ASSERT_NE(formRenderRecordPtr_, nullptr);
+    int64_t formId = FORM_ID;
+    formRenderRecordPtr_->eventHandler_ = nullptr;
+    EXPECT_EQ(formRenderRecordPtr_->SetVisibleChange(formId, true), SET_VISIBLE_CHANGE_FAILED);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_094 end";
+}
+
+/**
+* @tc.name: FormRenderRecordTest_095
+* @tc.desc: Verify SetVisibleChange
+* @tc.type: FUNC
+*/
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_095, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_095 start";
+
+    ASSERT_NE(formRenderRecordPtr_, nullptr);
+    int64_t formId = FORM_ID;
+    std::string bundleName = "<bundleName>";
+    auto eventRunner = EventRunner::Create(bundleName);
+    formRenderRecordPtr_->eventHandler_ = std::make_shared<EventHandler>(eventRunner);
+    EXPECT_EQ(formRenderRecordPtr_->SetVisibleChange(formId, true), ERR_OK);
+    formRenderRecordPtr_->eventHandler_ = nullptr;
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_095 end";
 }

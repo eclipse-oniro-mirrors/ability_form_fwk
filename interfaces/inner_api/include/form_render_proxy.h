@@ -64,6 +64,8 @@ public:
 
     int32_t OnUnlock() override;
 
+    int32_t SetVisibleChange(const int64_t &formId, bool isVisible, const Want &want) override;
+
     int32_t RecycleForm(const int64_t &formId, const Want &want) override;
 
     int32_t RecoverForm(const FormJsInfo &formJsInfo, const Want &want) override;

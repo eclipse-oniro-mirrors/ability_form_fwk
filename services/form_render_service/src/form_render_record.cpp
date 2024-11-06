@@ -42,6 +42,7 @@ namespace FormRender {
 constexpr int32_t RENDER_FORM_FAILED = -1;
 constexpr int32_t RELOAD_FORM_FAILED = -1;
 constexpr int32_t RECYCLE_FORM_FAILED = -1;
+constexpr int32_t SET_VISIBLE_CHANGE_FAILED = -1;
 constexpr int32_t TIMEOUT = 10 * 1000;
 constexpr int32_t CHECK_THREAD_TIME = 3;
 constexpr char FORM_RENDERER_COMP_ID[] = "ohos.extra.param.key.form_comp_id";
@@ -1282,6 +1283,51 @@ int32_t FormRenderRecord::HandleOnUnlock()
             iter.second->OnUnlock();
         }
     }
+    return ERR_OK;
+}
+
+int32_t FormRenderRecord::SetVisibleChange(const int64_t &formId, bool isVisible)
+{
+    HILOG_INFO("SetVisibleChange, formId:%{public}s", std::to_string(formId).c_str());
+    std::shared_ptr<EventHandler> eventHandler = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(eventHandlerMutex_);
+        eventHandler = eventHandler_;
+    }
+    auto task = [thisWeakPtr = weak_from_this(), formId, isVisible]() {
+        auto renderRecord = thisWeakPtr.lock();
+        if (renderRecord == nullptr) {
+            HILOG_ERROR("null renderRecord");
+            return;
+        }
+
+        renderRecord->HandleSetVisibleChange(formId, isVisible);
+    };
+
+    if (eventHandler == nullptr) {
+        HILOG_ERROR("null eventHandler");
+        return SET_VISIBLE_CHANGE_FAILED;
+    }
+    eventHandler->PostSyncTask(task, "SetVisibleChange");
+    return ERR_OK;
+}
+
+int32_t FormRenderRecord::HandleSetVisibleChange(const int64_t &formId, bool isVisible)
+{
+    HILOG_INFO("HandleSetVisibleChange begin,formId:%{public}s", std::to_string(formId).c_str());
+    MarkThreadAlive();
+
+    std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
+    auto search = formRendererGroupMap_.find(formId);
+    if (search == formRendererGroupMap_.end()) {
+        HILOG_ERROR("invalid FormRendererGroup");
+        return SET_VISIBLE_CHANGE_FAILED;
+    }
+    if (!search->second) {
+        HILOG_ERROR("FormRendererGroup was founded but null");
+        return SET_VISIBLE_CHANGE_FAILED;
+    }
+    search->second->SetVisibleChange(isVisible);
     return ERR_OK;
 }
 

@@ -918,6 +918,49 @@ HWTEST_F(FormRenderStubTest, FormRenderStubTest_024, TestSize.Level0)
 }
 
 /**
+* @tc.name: FormRenderStubTest_025
+* @tc.desc: 1.Verify OnRemoteRequest and HandleSetVisibleChange interface executes as expected.
+* 2.Want is nullptr
+* 3.The interface return value ERR_APPEXECFWK_PARCEL_ERROR.
+* @tc.type: FUNC
+*/
+HWTEST_F(FormRenderStubTest, FormRenderStubTest_025, TestSize.Level0)
+{
+    sptr<MockFormRenderImpl> callback = new (std::nothrow) MockFormRenderImpl();
+    uint32_t code = static_cast<uint32_t>(IFormRender::Message::FORM_SET_VISIBLE_CHANGE);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(u"ohos.appexecfwk.FormRender");
+    data.WriteInt64(1);
+    data.WriteBool(true);
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+}
+
+/**
+* @tc.name: FormRenderStubTest_026
+* @tc.desc: 1.Verify OnRemoteRequest and HandleSetVisibleChange interface executes as expected.
+* 2.The interface return value ERR_OK.
+* @tc.type: FUNC
+*/
+HWTEST_F(FormRenderStubTest, FormRenderStubTest_026, TestSize.Level0)
+{
+    Want want = {};
+    sptr<MockFormRenderImpl> callback = new (std::nothrow) MockFormRenderImpl();
+    uint32_t code = static_cast<uint32_t>(IFormRender::Message::FORM_SET_VISIBLE_CHANGE);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(u"ohos.appexecfwk.FormRender");
+    data.WriteInt64(1);
+    data.WriteBool(true);
+    data.WriteParcelable(&want);
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+}
+
+/**
  * @tc.name: IFormSupplyTest_001
  * @tc.desc: Test OnRenderingBlock function
  * @tc.type: FUNC
