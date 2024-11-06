@@ -807,8 +807,10 @@ bool FormRenderRecord::CheckEventHandler(bool createThead, bool needMonitored)
 void FormRenderRecord::AddFormRequest(const FormJsInfo &formJsInfo, const Want &want)
 {
     auto compId = want.GetStringParam(FORM_RENDERER_COMP_ID);
-    HILOG_INFO("AddFormRequest formId:%{public}s, compId:%{public}s",
-        std::to_string(formJsInfo.formId).c_str(), compId.c_str());
+    HILOG_INFO("AddFormRequest formId: %{public}s, compId: %{public}s, formJsInfo.formData.size: %{public}zu.",
+        std::to_string(formJsInfo.formId).c_str(),
+        compId.c_str(),
+        formJsInfo.formData.size());
     if (compId.empty()) {
         return;
     }
@@ -837,8 +839,10 @@ void FormRenderRecord::AddFormRequest(const FormJsInfo &formJsInfo, const Want &
 
 void FormRenderRecord::AddFormRequest(int64_t formId, const Ace::FormRequest &formRequest)
 {
-    HILOG_INFO("AddFormRequest by FormRequest formId:%{public}s, compId:%{public}s",
-        std::to_string(formId).c_str(), formRequest.compId.c_str());
+    HILOG_INFO("AddFormRequest by FormRequest formId: %{public}s, compId: %{public}s, formData.size: %{public}zu",
+        std::to_string(formId).c_str(),
+        formRequest.compId.c_str(),
+        formRequest.formJsInfo.formData.size());
     std::lock_guard<std::mutex> lock(formRequestsMutex_);
     auto iter = formRequests_.find(formId);
     if (iter == formRequests_.end()) {
@@ -1507,23 +1511,32 @@ void FormRenderRecord::HandleRecoverForm(const FormJsInfo &formJsInfo,
     }
 }
 
+bool FormRenderRecord::InitCompIds(const int64_t &formId,
+    std::vector<std::string> &orderedCompIds, std::string &currentCompId)
+{
+    std::lock_guard<std::mutex> lock(recycledFormCompIdsMutex_);
+    auto pairIter = recycledFormCompIds_.find(formId);
+    if (pairIter == recycledFormCompIds_.end()) {
+        HILOG_ERROR("invalid compIdPair,formId:%{public}" PRId64, formId);
+        return false;
+    }
+    orderedCompIds = pairIter->second.first;
+    currentCompId = pairIter->second.second;
+    HILOG_INFO("compIds size:%{public}zu,currentCompId:%{public}s,formId:%{public}" PRId64,
+        orderedCompIds.size(), currentCompId.c_str(), formId);
+    return true;
+}
+
 bool FormRenderRecord::RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, const std::string &statusData,
     const bool &isHandleClickEvent, const std::unordered_map<std::string, Ace::FormRequest> &recordFormRequests)
 {
     auto formId = formJsInfo.formId;
     std::vector<std::string> orderedCompIds;
     std::string currentCompId;
-    {
-        std::lock_guard<std::mutex> lock(recycledFormCompIdsMutex_);
-        auto pairIter = recycledFormCompIds_.find(formId);
-        if (pairIter == recycledFormCompIds_.end()) {
-            HILOG_ERROR("invalid compIdPair,formId:%{public}" PRId64, formId);
-            return false;
-        }
-        orderedCompIds = pairIter->second.first;
-        currentCompId = pairIter->second.second;
-        HILOG_INFO("compIds size:%{public}zu,current compId:%{public}s,formId:%{public}" PRId64,
-            orderedCompIds.size(), currentCompId.c_str(), formId);
+    bool flag = InitCompIds(formId, orderedCompIds, currentCompId);
+    if (!flag) {
+        HILOG_INFO("init compIds failed,formId:%{public}" PRId64, formId);
+        return false;
     }
 
     std::vector<Ace::FormRequest> groupRequests;
@@ -1548,6 +1561,8 @@ bool FormRenderRecord::RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, 
             groupRequest.want.SetParam(Constants::FORM_IS_RECOVER_FORM_TO_HANDLE_CLICK_EVENT, isHandleClickEvent);
             currentRequestIndex = groupRequests.size();
             currentRequestFound = true;
+            HILOG_INFO("currentRequestIndex: %{public}zu, formData.size: %{public}zu",
+                currentRequestIndex, groupRequest.formJsInfo.formData.size());
         }
         groupRequests.emplace_back(groupRequest);
     }
