@@ -269,8 +269,6 @@ int32_t FormRenderImpl::SetVisibleChange(const int64_t &formId, bool isVisible, 
     }
 
     std::string uid = want.GetStringParam(Constants::FORM_SUPPLY_UID);
-
-
     if (uid.empty()) {
         HILOG_ERROR("empty uid,formId:%{public}" PRId64, formId);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
