@@ -12,28 +12,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+ 
 #include <gtest/gtest.h>
-
+ 
 #include "form_mgr_errors.h"
 #include "form_renderer_group.h"
-
+ 
 namespace {
     bool g_mockIsFormRequestsEmpty = true;
 }
-
+ 
 void MockIsFormRequestsEmpty(bool mockRet)
 {
     g_mockIsFormRequestsEmpty = mockRet;
 }
-
+ 
 namespace OHOS {
 namespace Ace {
 void FormRendererGroup::AddForm(const OHOS::AAFwk::Want& want, const OHOS::AppExecFwk::FormJsInfo& formJsInfo)
 {
     return;
 }
-
+ 
 void FormRendererGroup::OnUnlock()
 {
     return;
@@ -48,37 +48,37 @@ void FormRendererGroup::UpdateForm(const OHOS::AppExecFwk::FormJsInfo& formJsInf
 {
     return;
 }
-
+ 
 void FormRendererGroup::DeleteForm()
 {
     return;
 }
-
+ 
 void FormRendererGroup::DeleteForm(const std::string& compId)
 {
     return;
 }
-
+ 
 void FormRendererGroup::ReloadForm(const AppExecFwk::FormJsInfo& formJsInfo)
 {
     return;
 }
-
+ 
 void FormRendererGroup::UpdateConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration>& config)
 {
     return;
 }
-
+ 
 bool FormRendererGroup::IsFormRequestsEmpty()
 {
     return g_mockIsFormRequestsEmpty;
 }
-
+ 
 void FormRendererGroup::RecycleForm(std::string& statusData) const
 {
     return;
 }
-
+ 
 void FormRendererGroup::RecoverRenderer(const std::vector<FormRequest>& formRequests, size_t currentCompIndex)
 {
     return;

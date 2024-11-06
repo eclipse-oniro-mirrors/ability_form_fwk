@@ -94,7 +94,6 @@ bool FormCacheMgr::GetData(const int64_t formId, std::string &data,
     std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> &imageDataMap) const
 {
     HILOG_DEBUG("GetData start");
-    std::lock_guard<std::mutex> lock(cacheMutex_);
     FormCache formCache;
     formCache.formId = formId;
     bool ret = GetDataCacheFromDb(formId, formCache);

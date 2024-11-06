@@ -43,29 +43,6 @@ constexpr int32_t RECYCLE_FORM_FAILED = -1;
 constexpr int32_t SET_VISIBLE_CHANGE_FAILED = -1;
 constexpr int32_t FORM_ID = 1;
 }
-#define private public
-class FormRenderRecordMock : public FormRenderRecord {
-public:
-    static std::shared_ptr<FormRenderRecordMock> Create(const std::string &bundleName, const std::string &uid,
-        bool needMonitored = true,  sptr<IFormSupply> formSupplyClient = nullptr)
-    {
-        std::shared_ptr<FormRenderRecordMock> renderRecord =
-            std::make_shared<FormRenderRecordMock>(bundleName, uid, formSupplyClient);
-        if (!renderRecord->CreateEventHandler(bundleName, needMonitored)) {
-            return nullptr;
-        }
-        return renderRecord;
-    }
-    FormRenderRecordMock(const std::string &bundleName, const std::string &uid, sptr<IFormSupply> formSupplyClient)
-        : FormRenderRecord(bundleName, uid, formSupplyClient) {}
-    bool CreateRuntime(const FormJsInfo &formJsInfo)
-    {
-        return true;
-    }
-private:
-    void HandleUpdateInJsThread(const FormJsInfo &formJsInfo, const Want &want){};
-};
-#undef private
 class FormRenderRecordTest : public testing::Test {
 public:
     static void SetUpTestCase();

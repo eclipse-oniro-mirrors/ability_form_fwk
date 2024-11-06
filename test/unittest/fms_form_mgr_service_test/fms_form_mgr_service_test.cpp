@@ -115,7 +115,9 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0002, TestSize.Level1)
     MockIsSystemAppByFullTokenID(false);
     EXPECT_EQ(formMgrService.LifecycleUpdate(formIds, callerToken, updateType),
               ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
+
     MockIsSACall(true);
+    EXPECT_EQ(formMgrService.LifecycleUpdate(formIds, callerToken, updateType), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrService_0002 end";
 }
 
@@ -132,6 +134,7 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0003, TestSize.Level1)
     const sptr<IRemoteObject> callerToken = nullptr;
     bool updateType = true;
     MockIsSACall(true);
+    EXPECT_EQ(ERR_OK, formMgrService.LifecycleUpdate(formIds, callerToken, updateType));
     GTEST_LOG_(INFO) << "FormMgrService_0003 end";
 }
 
@@ -435,8 +438,12 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0017, TestSize.Level1)
     bool isEnableUpdate = false;
     const sptr<IRemoteObject> callerToken = nullptr;
     MockIsSACall(true);
+    EXPECT_EQ(formMgrService.NotifyFormsEnableUpdate(formIds, isEnableUpdate, callerToken), ERR_OK);
+
     MockIsSACall(false);
     MockIsSystemAppByFullTokenID(false);
+    EXPECT_EQ(formMgrService.NotifyFormsEnableUpdate(formIds, isEnableUpdate, callerToken),
+              ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
     GTEST_LOG_(INFO) << "FormMgrService_0017 end";
 }
 
