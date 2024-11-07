@@ -283,7 +283,7 @@ ErrCode FormMgrAdapter::CheckFormCountLimit(const int64_t formId, const Want &wa
     bool tempFormFlag = want.GetBoolParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
     int callingUid = IPCSkeleton::GetCallingUid();
     ErrCode checkCode = 0;
-    if (tempFormFlag && !FormRenderMgr::GetInstance().IsRerenderForRenderServiceDied(formId)) {
+    if (tempFormFlag && ((formId == 0) || !FormRenderMgr::GetInstance().IsRerenderForRenderServiceDied(formId))) {
         if (formId > 0) {
             HILOG_ERROR("invalid tempFormId, formId:%{public}" PRId64 "", formId);
             return ERR_APPEXECFWK_FORM_INVALID_PARAM;
