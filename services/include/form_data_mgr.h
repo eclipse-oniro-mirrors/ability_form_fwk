@@ -256,6 +256,14 @@ public:
      * @param needRefresh true or false.
      */
     void SetNeedRefresh(const int64_t formId, const bool needRefresh);
+        
+    /**
+     * @brief Set needAddForm for FormRecord.
+     * @param formId The Id of the form.
+     * @param needAddForm true or false.
+     */
+    void SetNeedAddForm(const int64_t formId, const bool needAddForm);
+    
     /**
      * @brief Set isCountTimerRefresh for FormRecord.
      * @param formId The Id of the form.
