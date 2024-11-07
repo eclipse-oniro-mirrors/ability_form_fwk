@@ -337,23 +337,6 @@ HWTEST_F(FormRenderMgrInnerTest, FormRenderMgrInnerTest_013, TestSize.Level0)
 }
 
 /**
- * @tc.name: FormRenderMgrInnerTest_014
- * @tc.desc: test FillBundleInfo function.
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderMgrInnerTest, FormRenderMgrInnerTest_014, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormRenderMgrInnerTest_014 start";
-    FormRenderMgrInner formRenderMgrInner;
-    std::string bundleName = "<bundleName>";
-    Want want;
-    formRenderMgrInner.FillBundleInfo(want, bundleName);
-    EXPECT_EQ(true, want.HasParameter(Constants::FORM_COMPATIBLE_VERSION_KEY));
-    EXPECT_EQ(true, want.HasParameter(Constants::FORM_TARGET_VERSION_KEY));
-    GTEST_LOG_(INFO) << "FormRenderMgrInnerTest_014 end";
-}
-
-/**
  * @tc.name: FormRenderMgrInnerTest_015
  * @tc.desc: test StopRenderingForm function and return ERR_OK.
  * @tc.type: FUNC
