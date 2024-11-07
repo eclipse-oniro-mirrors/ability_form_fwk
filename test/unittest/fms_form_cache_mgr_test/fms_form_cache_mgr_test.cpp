@@ -167,4 +167,162 @@ HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_004, TestSize.Level0)
     EXPECT_FALSE(formCacheMgr_.GetData(PARAM_FORM_ID_FIRST, queryResult, imageDataMap));
     GTEST_LOG_(INFO) << "fms_form_cache_mgr_test_004 end";
 }
+
+/*
+ * Feature: FormCacheMgr
+ * Function: InnerGetImageData
+ * FunctionPoints: FormCacheMgr InnerGetImageData interface
+ * EnvConditions: Mobile that can run ohos test framework
+ */
+HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_005, TestSize.Level0)
+{
+    HILOG_INFO("fms_form_cache_mgr_test_005 start");
+    FormCache formCache;
+    std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
+    EXPECT_FALSE(formCacheMgr_.InnerGetImageData(formCache, imageDataMap));
+    GTEST_LOG_(INFO) << "fms_form_cache_mgr_test_005 end";
+}
+
+/*
+ * Feature: FormCacheMgr
+ * Function: AddData && AddImgData
+ * FunctionPoints: FormCacheMgr AddData interface
+ * EnvConditions: Mobile that can run ohos test framework
+ */
+HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_006, TestSize.Level0)
+{
+    HILOG_INFO("fms_form_cache_mgr_test_006 start");
+    int64_t formId = 0;
+    FormProviderData formProviderData;
+    EXPECT_TRUE(formCacheMgr_.AddData(formId, formProviderData));
+    GTEST_LOG_(INFO) << "fms_form_cache_mgr_test_006 end";
+}
+
+/*
+ * Feature: FormCacheMgr
+ * Function: AddCacheData
+ * FunctionPoints: FormCacheMgr AddCacheData interface
+ * EnvConditions: Mobile that can run ohos test framework
+ */
+HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_007, TestSize.Level0)
+{
+    HILOG_INFO("fms_form_cache_mgr_test_007 start");
+    FormProviderData formProviderData;
+    FormCache formCache;
+    EXPECT_TRUE(formCacheMgr_.AddCacheData(formProviderData, formCache));
+    GTEST_LOG_(INFO) << "fms_form_cache_mgr_test_007 end";
+}
+
+/*
+ * Feature: FormCacheMgr
+ * Function: AddImgDataToDb
+ * FunctionPoints: FormCacheMgr AddImgDataToDb interface
+ * EnvConditions: Mobile that can run ohos test framework
+ */
+HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_008, TestSize.Level0)
+{
+    HILOG_INFO("fms_form_cache_mgr_test_008 start");
+    FormProviderData formProviderData;
+    std::string bundle = "bundle";
+    sptr<FormAshmem> formAshmemPtr = new (std::nothrow) FormAshmem();
+    std::pair<sptr<FormAshmem>, int32_t> loadForm = std::make_pair(formAshmemPtr, 1);
+    formProviderData.imageDataMap_[bundle] = loadForm;
+    nlohmann::json imgDataJson;
+    EXPECT_FALSE(formCacheMgr_.AddImgDataToDb(formProviderData, imgDataJson));
+    GTEST_LOG_(INFO) << "fms_form_cache_mgr_test_008 end";
+}
+
+/*
+ * Feature: FormCacheMgr
+ * Function: GetImageDataFromAshmem
+ * FunctionPoints: FormCacheMgr GetImageDataFromAshmem interface
+ * EnvConditions: Mobile that can run ohos test framework
+ */
+HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_009, TestSize.Level0)
+{
+    HILOG_INFO("fms_form_cache_mgr_test_009 start");
+    std::string picName = "picName";
+    sptr<Ashmem> ashmem = nullptr;
+    int32_t len = 1;
+    std::vector<uint8_t> value;
+    EXPECT_FALSE(formCacheMgr_.GetImageDataFromAshmem(picName, ashmem, len, value));
+    GTEST_LOG_(INFO) << "fms_form_cache_mgr_test_009 end";
+}
+
+/*
+ * Feature: FormCacheMgr
+ * Function: SaveDataCacheToDb
+ * FunctionPoints: FormCacheMgr SaveDataCacheToDb interface
+ * EnvConditions: Mobile that can run ohos test framework
+ */
+HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_010, TestSize.Level0)
+{
+    HILOG_INFO("fms_form_cache_mgr_test_010 start");
+    int64_t formId = 0;
+    FormCache formCache;
+    EXPECT_TRUE(formCacheMgr_.SaveDataCacheToDb(formId, formCache));
+    GTEST_LOG_(INFO) << "fms_form_cache_mgr_test_010 end";
+}
+
+/*
+ * Feature: FormCacheMgr
+ * Function: InnerDeleteImageData
+ * FunctionPoints: FormCacheMgr InnerDeleteImageData interface
+ * EnvConditions: Mobile that can run ohos test framework
+ */
+HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_011, TestSize.Level0)
+{
+    HILOG_INFO("fms_form_cache_mgr_test_011 start");
+    FormCache formCache;
+    EXPECT_TRUE(formCacheMgr_.InnerDeleteImageData(formCache));
+    GTEST_LOG_(INFO) << "fms_form_cache_mgr_test_011 end";
+}
+
+/*
+ * Feature: FormCacheMgr
+ * Function: GetImgCacheFromDb
+ * FunctionPoints: FormCacheMgr GetImgCacheFromDb interface
+ * EnvConditions: Mobile that can run ohos test framework
+ */
+HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_012, TestSize.Level0)
+{
+    HILOG_INFO("fms_form_cache_mgr_test_012 start");
+    int64_t rowId = 0;
+    std::vector<uint8_t> blob;
+    int32_t size = 1;
+    EXPECT_FALSE(formCacheMgr_.GetImgCacheFromDb(rowId, blob, size));
+    GTEST_LOG_(INFO) << "fms_form_cache_mgr_test_012 end";
+}
+
+/*
+ * Feature: FormCacheMgr
+ * Function: SaveImgCacheToDb
+ * FunctionPoints: FormCacheMgr SaveImgCacheToDb interface
+ * EnvConditions: Mobile that can run ohos test framework
+ */
+HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_013, TestSize.Level0)
+{
+    HILOG_INFO("fms_form_cache_mgr_test_013 start");
+    std::vector<uint8_t> value;
+    int32_t size = 1;
+    int64_t rowId = 0;
+    EXPECT_TRUE(formCacheMgr_.SaveImgCacheToDb(value, size, rowId));
+    GTEST_LOG_(INFO) << "fms_form_cache_mgr_test_013 end";
+}
+
+/*
+ * Feature: FormCacheMgr
+ * Function: DeleteImgCacheInDb
+ * FunctionPoints: FormCacheMgr DeleteImgCacheInDb interface
+ * EnvConditions: Mobile that can run ohos test framework
+ */
+HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_014, TestSize.Level0)
+{
+    HILOG_INFO("fms_form_cache_mgr_test_014 start");
+    std::string rowId;
+    EXPECT_FALSE(formCacheMgr_.DeleteImgCacheInDb(rowId));
+    rowId = "rowId";
+    EXPECT_TRUE(formCacheMgr_.DeleteImgCacheInDb(rowId));
+    GTEST_LOG_(INFO) << "fms_form_cache_mgr_test_014 end";
+}
 }
