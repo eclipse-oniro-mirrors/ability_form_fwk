@@ -903,6 +903,22 @@ void FormDataMgr::SetNeedRefresh(const int64_t formId, const bool needRefresh)
 }
 
 /**
+ * @brief Set needRefresh for FormRecord.
+ * @param formId The Id of the form.
+ * @param needRefresh true or false.
+ */
+void FormDataMgr::SetNeedAddForm(const int64_t formId, const bool needAddForm)
+{
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    auto itFormRecord = formRecords_.find(formId);
+    if (itFormRecord == formRecords_.end()) {
+        HILOG_ERROR("form info not find");
+        return;
+    }
+    itFormRecord->second.needAddForm = needAddForm;
+}
+
+/**
  * @brief Set isCountTimerRefresh for FormRecord.
  * @param formId The Id of the form.
  * @param countTimerRefresh true or false.
