@@ -214,6 +214,14 @@ ohos_shared_library("forminfo_napi") {
     "napi:ace_napi",
   ]
 
+  defines = []
+  if (form_fwk_form_dimension_2_3) {
+    defines += [ "FORM_DIMENSION_2_3" ]
+  }
+  if (form_fwk_form_dimension_3_3) {
+    defines += [ "FORM_DIMENSION_3_3" ]
+  }
+
   relative_install_dir = "module/application"
 
   subsystem_name = "ability"
@@ -241,6 +249,13 @@ ohos_shared_library("forminfo") {
   ]
 
   defines = [ "ENABLE_ERRCODE" ]
+
+  if (form_fwk_form_dimension_2_3) {
+    defines += [ "FORM_DIMENSION_2_3" ]
+  }
+  if (form_fwk_form_dimension_3_3) {
+    defines += [ "FORM_DIMENSION_3_3" ]
+  }
 
   relative_install_dir = "module/app/form"
 
