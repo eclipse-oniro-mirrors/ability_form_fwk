@@ -273,7 +273,8 @@ void FormRenderImpl::OnConfigurationUpdated(
 
 #ifdef SUPPORT_POWER
     bool screenOnFlag = PowerMgr::PowerMgrClient::GetInstance().IsScreenOn();
-    if (!screenOnFlag) {
+    bool collaborationScreenOnFlag = PowerMgr::PowerMgrClient::GetInstance().IsCollaborationScreenOn();
+    if (!screenOnFlag && !collaborationScreenOnFlag) {
         HILOG_WARN("screen off");
         hasCachedConfig_ = true;
         return;

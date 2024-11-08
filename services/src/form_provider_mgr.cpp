@@ -449,7 +449,8 @@ int FormProviderMgr::MessageEvent(const int64_t formId, const FormRecord &record
 
 #ifdef SUPPORT_POWER
     bool screenOnFlag = PowerMgr::PowerMgrClient::GetInstance().IsScreenOn();
-    if (!screenOnFlag) {
+    bool collaborationScreenOnFlag = PowerMgr::PowerMgrClient::GetInstance().IsCollaborationScreenOn();
+    if (!screenOnFlag && !collaborationScreenOnFlag) {
         HILOG_WARN("screen off now");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
