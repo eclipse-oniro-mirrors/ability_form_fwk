@@ -142,6 +142,8 @@ public:
         const bool &isRecoverFormToHandleClickEvent);
 
     size_t FormCount();
+
+    void UpdateFormSizeOfGroups(const int64_t &formId, float width, float height, float borderWidth);
 private:
     class RemoteObjHash {
     public:
@@ -238,7 +240,7 @@ private:
         std::vector<std::string> &orderedCompIds, std::string &currentCompId);
 
     bool RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, const std::string &statusData,
-        const bool &isHandleClickEvent, const std::unordered_map<std::string, Ace::FormRequest> &recordFormRequests);
+        const bool &isHandleClickEvent, std::unordered_map<std::string, Ace::FormRequest> &recordFormRequests);
     bool RecoverRenderer(const std::vector<Ace::FormRequest> &groupRequests, const size_t &currentRequestIndex);
 
     bool ReAddIfHapPathChanged(const std::vector<FormJsInfo> &formJsInfos);
@@ -246,6 +248,12 @@ private:
     void UpdateAllFormRequest(const std::vector<FormJsInfo> &formJsInfos, bool hasRelease);
 
     void HandleReleaseAllRendererInJsThread();
+
+    void UpdateGroupRequestsWhenRecover(const int64_t &formId, const FormJsInfo &formJsInfo,
+        const std::vector<std::string> &orderedCompIds, const std::string &currentCompId,
+        const std::string &statusData, const bool &isHandleClickEvent, size_t &currentRequestIndex,
+        std::vector<Ace::FormRequest> &groupRequests, bool &currentRequestFound,
+        const std::unordered_map<std::string, Ace::FormRequest> &recordFormRequests);
 
     pid_t jsThreadId_ = 0;
     pid_t processId_ = 0;

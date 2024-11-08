@@ -529,5 +529,18 @@ void FormRenderMgr::RerenderAllFormsImmediate(int userId)
         sandboxIter->second->RerenderAllFormsImmediate();
     }
 }
+
+void FormRenderMgr::UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth)
+{
+    int32_t callingUserId = IPCSkeleton::GetCallingUid() / Constants::CALLING_UID_TRANSFORM_DIVISOR;
+    auto renderIter = renderInners_.find(callingUserId);
+    if (renderIter != renderInners_.end()) {
+        renderIter->second->UpdateFormSize(formId, width, height, borderWidth);
+    }
+    auto sandboxIter = sandboxInners_.find(callingUserId);
+    if (sandboxIter != sandboxInners_.end()) {
+        sandboxIter->second->UpdateFormSize(formId, width, height, borderWidth);
+    }
+}
 } // namespace AppExecFwk
 } // namespace OHOS

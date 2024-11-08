@@ -272,6 +272,12 @@ public:
      */
     void PostRecoverForm(const FormRecord &record, const Want &want, const sptr<IRemoteObject> &remoteObject);
 
+    void PostUpdateFormSize(const int64_t &formId, float width, float height, float borderWidth,
+        const std::string &uid, const sptr<IRemoteObject> &remoteObject);
+
+    void UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth, const std::string &uid,
+        const sptr<IRemoteObject> &remoteObject);
+
     /**
      * @brief Cancel delay task.
      * @param eventMsg Delay Task.
