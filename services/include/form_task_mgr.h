@@ -18,6 +18,8 @@
 
 #include <singleton.h>
 #include <vector>
+#include <unordered_map>
+#include <mutex>
 
 #include "form_event_handler.h"
 #include "form_js_info.h"
@@ -34,10 +36,12 @@ using Want = OHOS::AAFwk::Want;
 using WantParams = OHOS::AAFwk::WantParams;
 enum class TaskType : int64_t {
     RECYCLE_FORM,
+    RENDER_FORM,
 };
 namespace {
 constexpr int32_t FORM_TASK_DELAY_TIME = 20; // ms
 constexpr int32_t FORM_FRS_DIED_TASK_DELAY_TIME = 100; // ms
+constexpr int32_t FORM_BUILD_DELAY_TIME = 2000; // ms
 }
 /**
  * @class FormTaskMgr
@@ -538,6 +542,8 @@ private:
     void FrsDiedTaskToHost(const sptr<IRemoteObject> &remoteObject);
 
 private:
+    std::mutex formRecoverTimesMutex_;
+    std::unordered_map<int64_t, int64_t> formLastRecoverTimes;
     std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;
 };
 }  // namespace AppExecFwk
