@@ -152,4 +152,118 @@ HWTEST_F(FmsFormDataProxyMgrTest, FmsFormDataProxyMgrTest_002, TestSize.Level0)
 
     GTEST_LOG_(INFO) << "FmsFormDataProxyMgrTest_002 end";
 }
+
+/**
+ * @tc.name: FmsFormDataProxyMgrTest_003
+ * @tc.desc: Verify functionName SubscribeFormData.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormDataProxyMgrTest, FmsFormDataProxyMgrTest_003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataProxyMgrTest_003 start";
+    FormDataProxyMgr formDataProxyMgr;
+    FormRecord formRecord;
+    int64_t formId = 1;
+    AAFwk::Want want;
+    std::vector<FormDataProxy> formDataProxies;
+    FormDataProxy formDataProxy("test", "0002");
+    formDataProxies.push_back(formDataProxy);
+    int callingUid{0};
+    // Set cache
+    FormItemInfo record1;
+    record1.SetFormId(formId);
+    record1.SetProviderBundleName(FORM_BUNDLE_NAME);
+    record1.SetModuleName(PARAM_MODULE_NAME);
+    record1.SetAbilityName(FORM_ABILITY_NAME);
+    record1.SetFormName(PARAM_FORM_NAME);
+    record1.SetSpecificationId(PARAM_FORM_DIMENSION_VALUE);
+    record1.SetTemporaryFlag(false);
+    FormRecord formRecord2 = FormDataMgr::GetInstance().AllotFormRecord(record1, callingUid);
+    formRecord2.isDataProxy = true;
+    FormDataMgr::GetInstance().UpdateFormRecord(formId, formRecord2);
+    MockGetApplicationInfo(ERR_OK + 1);
+    std::shared_ptr<FormDataProxyRecord> formDataProxyRecordPtr = nullptr;
+    formDataProxyMgr.formDataProxyRecordMap_[formId] = formDataProxyRecordPtr;
+    auto ret = formDataProxyMgr.SubscribeFormData(formId, formDataProxies, want);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    formDataProxyRecordPtr = std::make_shared<FormDataProxyRecord>(
+        formId, formRecord2.bundleName, formRecord2.uiSyntax, 0, formRecord2.uid);
+    formDataProxyMgr.formDataProxyRecordMap_[formId] = formDataProxyRecordPtr;
+    ret = formDataProxyMgr.SubscribeFormData(formId, formDataProxies, want);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    GTEST_LOG_(INFO) << "FmsFormDataProxyMgrTest_003 end";
+}
+
+/**
+ * @tc.name: FmsFormDataProxyMgrTest_004
+ * @tc.desc: Verify functionName UnsubscribeFormData.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormDataProxyMgrTest, FmsFormDataProxyMgrTest_004, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataProxyMgrTest_004 start";
+    FormDataProxyMgr formDataProxyMgr;
+    int64_t formId = 1;
+    formDataProxyMgr.UnsubscribeFormData(formId);
+    auto ret = formDataProxyMgr.UnsubscribeFormData(formId);
+    EXPECT_EQ(ret, ERR_OK);
+    int callingUid = 0;
+    FormItemInfo record;
+    record.SetFormId(formId);
+    FormRecord formRecord = FormDataMgr::GetInstance().AllotFormRecord(record, callingUid);
+    std::shared_ptr<FormDataProxyRecord> formDataProxyRecordPtr = nullptr;
+    formDataProxyMgr.formDataProxyRecordMap_[formId] = formDataProxyRecordPtr;
+    ret = formDataProxyMgr.UnsubscribeFormData(formId);
+    EXPECT_TRUE(formDataProxyMgr.formDataProxyRecordMap_.empty());
+    formDataProxyRecordPtr = std::make_shared<FormDataProxyRecord>(
+        formId, formRecord.bundleName, formRecord.uiSyntax, 0, formRecord.uid);
+    formDataProxyMgr.formDataProxyRecordMap_[formId] = formDataProxyRecordPtr;
+    ret = formDataProxyMgr.UnsubscribeFormData(formId);
+    EXPECT_TRUE(formDataProxyMgr.formDataProxyRecordMap_.empty());
+    GTEST_LOG_(INFO) << "FmsFormDataProxyMgrTest_004 end";
+}
+
+/**
+ * @tc.name: FmsFormDataProxyMgrTest_005
+ * @tc.desc: Verify formDataProxyRecordMap_ related functions.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormDataProxyMgrTest, FmsFormDataProxyMgrTest_005, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormDataProxyMgrTest_005 start";
+    FormDataProxyMgr formDataProxyMgr;
+    std::vector<FormDataProxy> formDataProxies;
+    std::vector<int64_t> formIds = {1};
+    int64_t formId = 1;
+    std::vector<std::string> subscribedKeys;
+    int32_t count = 1;
+    formDataProxyMgr.EnableSubscribeFormData(formIds);
+    formDataProxyMgr.UpdateSubscribeFormData(formId, formDataProxies);
+    formDataProxyMgr.DisableSubscribeFormData(formIds);
+    formDataProxyMgr.GetFormSubscribeInfo(formId, subscribedKeys, count);
+    auto ret = formDataProxyMgr.formDataProxyRecordMap_.find(formId);
+    EXPECT_EQ(ret, formDataProxyMgr.formDataProxyRecordMap_.end());
+    int callingUid = 0;
+    FormItemInfo record;
+    record.SetFormId(formId);
+    FormRecord formRecord = FormDataMgr::GetInstance().AllotFormRecord(record, callingUid);
+    std::shared_ptr<FormDataProxyRecord> formDataProxyRecordPtr = nullptr;
+    formDataProxyMgr.formDataProxyRecordMap_[formId] = formDataProxyRecordPtr;
+    formDataProxyMgr.EnableSubscribeFormData(formIds);
+    formDataProxyMgr.UpdateSubscribeFormData(formId, formDataProxies);
+    formDataProxyMgr.DisableSubscribeFormData(formIds);
+    formDataProxyMgr.GetFormSubscribeInfo(formId, subscribedKeys, count);
+    auto iter = formDataProxyMgr.formDataProxyRecordMap_.find(formId);
+    EXPECT_EQ(iter->second, nullptr);
+    formDataProxyRecordPtr = std::make_shared<FormDataProxyRecord>(
+        formId, formRecord.bundleName, formRecord.uiSyntax, 0, formRecord.uid);
+    formDataProxyMgr.formDataProxyRecordMap_[formId] = formDataProxyRecordPtr;
+    formDataProxyMgr.EnableSubscribeFormData(formIds);
+    formDataProxyMgr.UpdateSubscribeFormData(formId, formDataProxies);
+    formDataProxyMgr.DisableSubscribeFormData(formIds);
+    formDataProxyMgr.GetFormSubscribeInfo(formId, subscribedKeys, count);
+    iter = formDataProxyMgr.formDataProxyRecordMap_.find(formId);
+    EXPECT_NE(iter->second, nullptr);
+    GTEST_LOG_(INFO) << "FmsFormDataProxyMgrTest_005 end";
+}
 }
