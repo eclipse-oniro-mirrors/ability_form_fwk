@@ -1874,5 +1874,24 @@ bool FormMgr::IsFormBundleForbidden(const std::string &bundleName)
     }
     return remoteProxy_->IsFormBundleForbidden(bundleName);
 }
+
+ErrCode FormMgr::UpdateFormSize(const int64_t formId, float width, float height, float borderWidth)
+{
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        return errCode;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    ErrCode resultCode = remoteProxy_->UpdateFormSize(formId, width, height, borderWidth);
+    if (resultCode != ERR_OK) {
+        HILOG_ERROR("fail UpdateFormSize,errCode %{public}d", resultCode);
+    }
+    return resultCode;
+}
+
 }  // namespace AppExecFwk
 }  // namespace OHOS

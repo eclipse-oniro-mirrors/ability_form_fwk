@@ -1577,7 +1577,7 @@ bool FormRenderRecord::InitCompIds(const int64_t &formId,
 }
 
 bool FormRenderRecord::RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, const std::string &statusData,
-    const bool &isHandleClickEvent, const std::unordered_map<std::string, Ace::FormRequest> &recordFormRequests)
+    const bool &isHandleClickEvent, std::unordered_map<std::string, Ace::FormRequest> &recordFormRequests)
 {
     auto formId = formJsInfo.formId;
     std::vector<std::string> orderedCompIds;
@@ -1591,13 +1591,44 @@ bool FormRenderRecord::RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, 
     std::vector<Ace::FormRequest> groupRequests;
     size_t currentRequestIndex = 0;
     bool currentRequestFound = false;
+    {
+        std::lock_guard<std::mutex> lock(formRequestsMutex_);
+        auto iter = formRequests_.find(formId);
+        if (iter == formRequests_.end()) {
+            HILOG_ERROR("%{public}s doesn't has formRequest", std::to_string(formId).c_str());
+            return false;
+        }
+        recordFormRequests = iter->second;
+    }
+
+    UpdateGroupRequestsWhenRecover(formId, formJsInfo, orderedCompIds, currentCompId, statusData, isHandleClickEvent,
+        currentRequestIndex, groupRequests, currentRequestFound, recordFormRequests);
+
+    if (groupRequests.empty()) {
+        HILOG_ERROR("group requests empty formId:%{public}" PRId64, formId);
+        return false;
+    }
+
+    if (!currentRequestFound) {
+        // maybe current comp deleted between recover, get last comp as new current comp to recover
+        currentRequestIndex = groupRequests.size() - 1;
+        HILOG_WARN("current request index:%{public}zu formId:%{public}" PRId64, currentRequestIndex, formId);
+    }
+    return RecoverRenderer(groupRequests, currentRequestIndex);
+}
+
+void FormRenderRecord::UpdateGroupRequestsWhenRecover(const int64_t &formId, const FormJsInfo &formJsInfo,
+    const std::vector<std::string> &orderedCompIds, const std::string &currentCompId, const std::string &statusData,
+    const bool &isHandleClickEvent, size_t &currentRequestIndex, std::vector<Ace::FormRequest> &groupRequests,
+    bool &currentRequestFound, const std::unordered_map<std::string, Ace::FormRequest> &recordFormRequests)
+{
     for (auto compId : orderedCompIds) {
         auto recordRequestIter = recordFormRequests.find(compId);
         if (recordRequestIter == recordFormRequests.end()) {
             HILOG_WARN("invalid formRequest,formId:%{public}" PRId64 " compId=%{public}s", formId, compId.c_str());
             continue;
         }
-        auto recordRequest = recordRequestIter->second;
+        auto& recordRequest = recordRequestIter->second;
         Ace::FormRequest groupRequest;
         groupRequest.compId = compId;
         groupRequest.want = recordRequest.want;
@@ -1613,18 +1644,6 @@ bool FormRenderRecord::RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, 
         }
         groupRequests.emplace_back(groupRequest);
     }
-
-    if (groupRequests.empty()) {
-        HILOG_ERROR("group requests empty formId:%{public}" PRId64, formId);
-        return false;
-    }
-
-    if (!currentRequestFound) {
-        // maybe current comp deleted between recover, get last comp as new current comp to recover
-        currentRequestIndex = groupRequests.size() - 1;
-        HILOG_WARN("current request index:%{public}zu formId:%{public}" PRId64, currentRequestIndex, formId);
-    }
-    return RecoverRenderer(groupRequests, currentRequestIndex);
 }
 
 bool FormRenderRecord::RecoverRenderer(const std::vector<Ace::FormRequest> &groupRequests,
@@ -1650,6 +1669,40 @@ bool FormRenderRecord::RecoverRenderer(const std::vector<Ace::FormRequest> &grou
     formRendererGroup->RecoverRenderer(groupRequests, currentRequestIndex);
     HILOG_INFO("recover renderer, formId:%{public}" PRId64, currentRequest.formJsInfo.formId);
     return true;
+}
+
+void FormRenderRecord::UpdateFormSizeOfGroups(const int64_t &formId, float width, float height, float borderWidth)
+{
+    {
+        std::lock_guard<std::mutex> lock(formRequestsMutex_);
+        auto iter = formRequests_.find(formId);
+        if (iter == formRequests_.end()) {
+            HILOG_ERROR("%{public}s doesn't has formRequest", std::to_string(formId).c_str());
+            return;
+        }
+        if (iter->second.empty()) {
+            HILOG_ERROR("empty formRequests");
+            return;
+        }
+        
+        HILOG_INFO("formRequests length: %{public}zu formId: %{public}" PRId64 " width: %{public}f height: %{public}f"
+            " borderWidth: %{public}f", iter->second.size(), formId, width, height, borderWidth);
+        for (auto& formRequestIter : iter->second) {
+            formRequestIter.second.want.SetParam(
+                OHOS::AppExecFwk::Constants::PARAM_FORM_WIDTH_KEY, static_cast<double>(width));
+            formRequestIter.second.want.SetParam(
+                OHOS::AppExecFwk::Constants::PARAM_FORM_HEIGHT_KEY, static_cast<double>(height));
+            formRequestIter.second.want.SetParam(
+                OHOS::AppExecFwk::Constants::PARAM_FORM_BORDER_WIDTH_KEY, static_cast<float>(borderWidth));
+        }
+    }
+
+    std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
+    auto search = formRendererGroupMap_.find(formId);
+    if (search != formRendererGroupMap_.end()) {
+        auto group = search->second;
+        group->UpdateFormSizeOfFormRequests(width, height, borderWidth);
+    }
 }
 } // namespace FormRender
 } // namespace AppExecFwk

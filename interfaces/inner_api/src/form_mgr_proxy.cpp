@@ -2369,5 +2369,39 @@ bool FormMgrProxy::IsFormBundleForbidden(const std::string &bundleName)
     }
     return reply.ReadBool();
 }
+
+ErrCode FormMgrProxy::UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth)
+{
+    HILOG_DEBUG("start");
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt64(formId)) {
+        HILOG_ERROR("fail write formId ");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteFloat(width)) {
+        HILOG_ERROR("fail write width");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteFloat(height)) {
+        HILOG_ERROR("fail write height");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteFloat(borderWidth)) {
+        HILOG_ERROR("fail write borderWidth");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+    int32_t error = SendTransactCmd(IFormMgr::Message::FORM_MGR_UPDATE_FORM_SIZE, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendTransactCmd:%{public}d failed", error);
+        return error;
+    }
+    return reply.ReadInt32();
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

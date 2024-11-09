@@ -1738,5 +1738,16 @@ bool FormMgrService::IsFormBundleForbidden(const std::string &bundleName)
     HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
     return result;
 }
+
+ErrCode FormMgrService::UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth)
+{
+    HILOG_DEBUG("call");
+    ErrCode ret = CheckFormPermission();
+    if (ret != ERR_OK) {
+        HILOG_ERROR("update formSize permission denied");
+        return ret;
+    }
+    return FormMgrAdapter::GetInstance().UpdateFormSize(formId, width, height, borderWidth);
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -379,5 +379,48 @@ void FormRenderProxy::RunCachedConfigurationUpdated()
         HILOG_ERROR("SendRequest:%{public}d failed", error);
     }
 }
+
+int32_t FormRenderProxy::UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth,
+    const std::string &uid)
+{
+    MessageParcel data;
+    MessageOption option(MessageOption::TF_ASYNC);
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt64(formId)) {
+        HILOG_ERROR("write formId failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteFloat(width)) {
+        HILOG_ERROR("fail write width");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteFloat(height)) {
+        HILOG_ERROR("fail write height");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteFloat(borderWidth)) {
+        HILOG_ERROR("fail write borderWidth");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteString(uid)) {
+        HILOG_ERROR("fail write uid");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    MessageParcel reply;
+    int32_t error = SendTransactCmd(
+        IFormRender::Message::FORM_UPDATE_FORM_SIZE,
+        data,
+        reply,
+        option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendRequest:%{public}d failed", error);
+        return error;
+    }
+
+    return ERR_OK;
+}
 } // namespace AppExecFwk
 } // namespace OHOS
