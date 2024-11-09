@@ -916,7 +916,6 @@ bool FormMgrAdapter::HasFormVisible(const uint32_t tokenId)
         }
     }
 
-    HILOG_INFO("tokenId:%{public}d no visibleCard", tokenId);
     return false;
 }
 
@@ -1779,7 +1778,7 @@ ErrCode FormMgrAdapter::GetFormInfo(const AAFwk::Want &want, FormInfo &formInfo)
     ErrCode errCode = FormInfoMgr::GetInstance().GetFormsInfoByModule(bundleName, moduleName,
         formInfos, userId);
     if (errCode != ERR_OK) {
-        HILOG_ERROR("GetFormsInfoByModule,fail get form config info.");
+        HILOG_ERROR("GetFormsInfoByModule,get formConfigInfo failed,userId:%{public}d", userId);
         return errCode;
     }
 
@@ -1799,7 +1798,7 @@ ErrCode FormMgrAdapter::GetFormInfo(const AAFwk::Want &want, FormInfo &formInfo)
         }
     }
 
-    HILOG_ERROR("Fail get form info,abilityName:%{public}s,formName:%{public}s,userId:%{public}d",
+    HILOG_ERROR("fail get form info,abilityName:%{public}s,formName:%{public}s,userId:%{public}d",
         abilityName.c_str(), formName.c_str(), userId);
     return abilityExisting ? ERR_APPEXECFWK_FORM_GET_INFO_FAILED : ERR_APPEXECFWK_FORM_NO_SUCH_ABILITY;
 }
