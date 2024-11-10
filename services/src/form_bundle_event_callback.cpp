@@ -62,6 +62,12 @@ void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eve
         FormTaskMgr::GetInstance().PostTask(taskFunc, 0);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED) {
         // uninstall module/bundle
+        int appIndex = want.GetIntParam("appIndex", 0);
+        if (appIndex > 0) {
+            HILOG_INFO("this application is a simulation. not support to remove the form.\
+                appIndex: %{public}d", appIndex);
+            return;
+        }
         HILOG_INFO("bundleName:%{public}s removed", bundleName.c_str());
         FormEventUtil::HandleBundleFormInfoRemoved(bundleName, userId);
         std::function<void()> taskFunc = [bundleName, userId]() {
