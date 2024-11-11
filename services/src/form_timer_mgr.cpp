@@ -1010,7 +1010,6 @@ bool FormTimerMgr::UpdateLimiterAlarm()
         HILOG_INFO("clear limiter timer start");
         MiscServices::TimeServiceClient::GetInstance()->StopTimer(limiterTimerId_);
         HILOG_INFO("clear limiter timer end");
-        limiterTimerId_ = 0L;
     }
 
     // make limiter wakeup time
