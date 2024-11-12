@@ -863,28 +863,28 @@ ErrCode FormMgr::Connect()
             return ERR_OK;
         }
     }
-
-    sptr<ISystemAbilityManager> systemManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (systemManager == nullptr) {
-        HILOG_ERROR("get registry failed");
-        return ERR_APPEXECFWK_FORM_GET_SYSMGR_FAILED;
-    }
-    sptr<IRemoteObject> remoteObject = systemManager->GetSystemAbility(FORM_MGR_SERVICE_ID);
-    if (remoteObject == nullptr) {
-        HILOG_ERROR("connect FormMgrService failed");
-        return ERR_APPEXECFWK_FORM_GET_FMS_FAILED;
-    }
-    deathRecipient_ = sptr<IRemoteObject::DeathRecipient>(new (std::nothrow) FormMgrDeathRecipient());
-    if (deathRecipient_ == nullptr) {
-        HILOG_ERROR("null deathRecipient_");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
-    if ((remoteObject->IsProxyObject()) && (!remoteObject->AddDeathRecipient(deathRecipient_))) {
-        HILOG_ERROR("fail add death recipient to FormMgrService");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
     {
         std::lock_guard<std::shared_mutex> lock(connectMutex_);
+        sptr<ISystemAbilityManager> systemManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        if (systemManager == nullptr) {
+            HILOG_ERROR("get registry failed");
+            return ERR_APPEXECFWK_FORM_GET_SYSMGR_FAILED;
+        }
+        sptr<IRemoteObject> remoteObject = systemManager->GetSystemAbility(FORM_MGR_SERVICE_ID);
+        if (remoteObject == nullptr) {
+            HILOG_ERROR("connect FormMgrService failed");
+            return ERR_APPEXECFWK_FORM_GET_FMS_FAILED;
+        }
+        deathRecipient_ = sptr<IRemoteObject::DeathRecipient>(new (std::nothrow) FormMgrDeathRecipient());
+        if (deathRecipient_ == nullptr) {
+            HILOG_ERROR("null deathRecipient_");
+            return ERR_APPEXECFWK_FORM_COMMON_CODE;
+        }
+        if ((remoteObject->IsProxyObject()) && (!remoteObject->AddDeathRecipient(deathRecipient_))) {
+            HILOG_ERROR("fail add death recipient to FormMgrService");
+            return ERR_APPEXECFWK_FORM_COMMON_CODE;
+        }
+    
         remoteProxy_ = iface_cast<IFormMgr>(remoteObject);
         if (remoteProxy_ == nullptr) {
             HILOG_ERROR("null remoteProxy_");
