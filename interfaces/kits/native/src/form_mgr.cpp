@@ -857,9 +857,11 @@ bool FormMgr::Reconnect()
  */
 ErrCode FormMgr::Connect()
 {
-    std::lock_guard<std::shared_mutex> lock(connectMutex_);
-    if (remoteProxy_ != nullptr && !resetFlag_) {
-        return ERR_OK;
+    {
+        std::shared_lock<std::shared_mutex> lock(connectMutex_);
+        if (remoteProxy_ != nullptr && !resetFlag_) {
+            return ERR_OK;
+        }
     }
 
     sptr<ISystemAbilityManager> systemManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
@@ -881,14 +883,16 @@ ErrCode FormMgr::Connect()
         HILOG_ERROR("fail add death recipient to FormMgrService");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-
-    remoteProxy_ = iface_cast<IFormMgr>(remoteObject);
-    if (remoteProxy_ == nullptr) {
-        HILOG_ERROR("null remoteProxy_");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    {
+        std::lock_guard<std::shared_mutex> lock(connectMutex_);
+        remoteProxy_ = iface_cast<IFormMgr>(remoteObject);
+        if (remoteProxy_ == nullptr) {
+            HILOG_ERROR("null remoteProxy_");
+            return ERR_APPEXECFWK_FORM_COMMON_CODE;
+        }
+        HILOG_DEBUG("Connecting FormMgrService success");
+        return ERR_OK;
     }
-    HILOG_DEBUG("Connecting FormMgrService success");
-    return ERR_OK;
 }
 
 /**
