@@ -135,7 +135,7 @@ void FormProviderData::AddImageData(const std::string &picName, const std::share
  */
 void FormProviderData::AddImageData(const std::string &picName, int fd)
 {
-    HILOG_INFO("fd is %{public}d", fd);
+    HILOG_BRIEF("fd is %{public}d", fd);
     if (fd < 0) {
         HILOG_ERROR("invalid fd");
         return;
@@ -146,7 +146,7 @@ void FormProviderData::AddImageData(const std::string &picName, int fd)
         HILOG_ERROR("Get file size failed, errno is %{public}d", errno);
         return;
     }
-    HILOG_INFO("File size is %{public}d", size);
+    HILOG_BRIEF("File size is %{public}d", size);
     if (lseek(fd, 0L, SEEK_SET) == -1) {
         return;
     }
@@ -166,7 +166,6 @@ void FormProviderData::AddImageData(const std::string &picName, int fd)
     }
     std::shared_ptr<char> data(bytes, DeleteBytes());
     AddImageData(picName, data, size);
-    HILOG_INFO("end");
 }
 
 void FormProviderData::ParseImagesData()
