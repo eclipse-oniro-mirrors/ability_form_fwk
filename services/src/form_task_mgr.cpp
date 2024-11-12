@@ -602,6 +602,10 @@ void FormTaskMgr::ProviderBatchDelete(std::set<int64_t> &formIds, const Want &wa
     const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_INFO("start");
+    if (formIds.empty()) {
+        HILOG_ERROR("FormIds is empty");
+        return;
+    }
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
     if (formProviderProxy == nullptr) {
