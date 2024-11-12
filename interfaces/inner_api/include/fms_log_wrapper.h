@@ -39,6 +39,10 @@
 #undef HILOG_INFO
 #endif
 
+#ifdef HILOG_BRIEF
+#undef HILOG_BRIEF
+#endif
+
 #ifdef HILOG_DEBUG
 #undef HILOG_DEBUG
 #endif
@@ -55,12 +59,20 @@
 #define FMS_FUNC_FMT "[%{public}s(%{public}s:%{public}d)]"
 #endif
 
+#ifndef FMS_FUNC_FMT_BRIEF
+#define FMS_FUNC_FMT_BRIEF "[%{public}s:%{public}d]"
+#endif
+
 #ifndef FMS_FILE_NAME
 #define FMS_FILE_NAME (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
 #endif
 
 #ifndef FMS_FUNC_INFO
 #define FMS_FUNC_INFO FMS_FILE_NAME, __FUNCTION__, __LINE__
+#endif
+
+#ifndef FMS_FUNC_INFO_BRIEF
+#define FMS_FUNC_INFO_BRIEF FMS_FILE_NAME, __LINE__
 #endif
 
 #define HILOG_ERROR(fmt, ...) do { \
@@ -76,6 +88,11 @@
 #define HILOG_INFO(fmt, ...) do { \
     (void)HILOG_IMPL(LOG_CORE, LOG_INFO, FMS_LOG_DOMAIN, FMS_LOG_TAG, \
     FMS_FUNC_FMT fmt, FMS_FUNC_INFO, ##__VA_ARGS__);                  \
+} while (0)
+
+#define HILOG_BRIEF(fmt, ...) do { \
+(void)HILOG_IMPL(LOG_CORE, LOG_INFO, FMS_LOG_DOMAIN, FMS_LOG_TAG, \
+FMS_FUNC_FMT_BRIEF fmt, FMS_FUNC_INFO_BRIEF, ##__VA_ARGS__);                  \
 } while (0)
 
 #define HILOG_DEBUG(fmt, ...) do { \
