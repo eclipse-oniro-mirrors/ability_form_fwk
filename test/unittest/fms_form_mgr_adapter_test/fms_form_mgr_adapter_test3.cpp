@@ -45,6 +45,7 @@ using ::testing::DoAll;
 using ::testing::Invoke;
 using ::testing::Return;
 using ::testing::SetArgReferee;
+
 namespace {
 static const int64_t MAX_NUMBER_OF_JS = 0x20000000000000;
 class FmsFormMgrAdapterTest3 : public testing::Test {
@@ -81,6 +82,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0246, TestSize.Level0)
     EXPECT_EQ(iter->second, AddFormResultErrorCode::SUCCESS);
     GTEST_LOG_(INFO) << "FormMgrAdapter_0246 end";
 }
+
 /**
  * @tc.name: FormMgrAdapter_0247
  * @tc.desc: test RemoveFormIdMapElement function.
@@ -96,6 +98,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0247, TestSize.Level0)
     EXPECT_EQ(formMgrAdapter.formIdMap_.find(formId), formMgrAdapter.formIdMap_.end());
     GTEST_LOG_(INFO) << "FormMgrAdapter_0247 end";
 }
+
 /**
  * @tc.name: FormMgrAdapter_0248
  * @tc.desc: test StopRenderingForm function.
@@ -121,6 +124,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0248, TestSize.Level0)
     EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrAdapter_0248 end";
 }
+
 /**
  * @tc.name: FormMgrAdapter_0249
  * @tc.desc: test PaddingNotifyVisibleFormsMap function.
@@ -166,6 +170,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0249, TestSize.Level0)
     EXPECT_EQ(formInstanceMaps.size(), mapSize + 1);
     GTEST_LOG_(INFO) << "FormMgrAdapter_0249 end";
 }
+
 /**
  * @tc.name: FormMgrAdapter_0250
  * @tc.desc: test HandlerNotifyWhetherVisibleForms function.
@@ -194,6 +199,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0250, TestSize.Level0)
     EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrAdapter_0250 end";
 }
+
 /**
  * @tc.name: FormMgrAdapter_0251
  * @tc.desc: test DumpHasFormVisible function.
@@ -212,6 +218,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0251, TestSize.Level0)
     EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrAdapter_0251 end";
 }
+
 /**
  * @tc.name: FormMgrAdapter_0252
  * @tc.desc: test CheckUpdateFormRecord function.
@@ -229,6 +236,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0252, TestSize.Level0)
     EXPECT_EQ(record.recycleStatus, RecycleStatus::NON_RECYCLABLE);
     GTEST_LOG_(INFO) << "FormMgrAdapter_0252 end";
 }
+
 /**
  * @tc.name: FormMgrAdapter_0253
  * @tc.desc: test AllotFormBySpecificId function.
@@ -246,6 +254,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0253, TestSize.Level0)
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_COMMON_CODE);
     GTEST_LOG_(INFO) << "FormMgrAdapter_0253 end";
 }
+
 /**
  * @tc.name: FormMgrAdapter_0254
  * @tc.desc: test AcquireProviderFormInfoAsync function.
@@ -263,6 +272,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0254, TestSize.Level0)
     EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrAdapter_0254 end";
 }
+
 /**
  * @tc.name: FormMgrAdapter_0255
  * @tc.desc: test SetFormItemModuleInfo function.
@@ -293,6 +303,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0255, TestSize.Level0)
     EXPECT_NE(itemInfo2.abilityModuleName_, abilityInfo.moduleName);
     GTEST_LOG_(INFO) << "FormMgrAdapter_0255 end";
 }
+
 /**
  * @tc.name: FormMgrAdapter_0256
  * @tc.desc: test ReleaseRenderer function.
@@ -319,6 +330,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0256, TestSize.Level0)
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
     GTEST_LOG_(INFO) << "FormMgrAdapter_0256 end";
 }
+
 /**
  * @tc.name: FormMgrAdapter_0257
  * @tc.desc: test RequestPublishFormToHost function.
@@ -333,6 +345,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0257, TestSize.Level0)
     EXPECT_EQ(ERR_OK, formMgrAdapter.RequestPublishFormToHost(want));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0257 end";
 }
+
 /**
  * @tc.name: FormMgrAdapter_0258
  * @tc.desc: test RouterEvent function.
@@ -349,6 +362,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0258, TestSize.Level0)
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_NOT_EXIST_ID);
     GTEST_LOG_(INFO) << "FormMgrAdapter_0258 end";
 }
+
 /**
  * @tc.name: FormMgrAdapter_0259
  * @tc.desc: test BackgroundEvent function.
@@ -366,6 +380,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0259, TestSize.Level0)
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, ret);
     GTEST_LOG_(INFO) << "FormMgrAdapter_0259 end";
 }
+
 /**
  * @tc.name: FormMgrAdapter_0260
  * @tc.desc: test HandleUpdateFormFlag function.
@@ -384,6 +399,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0260, TestSize.Level0)
     EXPECT_NE(ERR_APPEXECFWK_FORM_INVALID_PARAM, ret);
     GTEST_LOG_(INFO) << "FormMgrAdapter_0260 end";
 }
+
 /**
  * @tc.name: FormMgrAdapter_0261
  * @tc.desc: test UpdateProviderInfoToHost function.
@@ -407,6 +423,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0261, TestSize.Level0)
     EXPECT_TRUE(ret);
     GTEST_LOG_(INFO) << "FormMgrAdapter_0261 end";
 }
+
 /**
  * @tc.name: FormMgrAdapter_0262
  * @tc.desc: test GetFormsCount function.
@@ -425,6 +442,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0262, TestSize.Level0)
     EXPECT_EQ(ERR_OK, ret);
     GTEST_LOG_(INFO) << "FormMgrAdapter_0262 end";
 }
+
 /**
  * @tc.name: FormMgrAdapter_0263
  * @tc.desc: test RegisterAddObserver function.
@@ -445,6 +463,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0263, TestSize.Level0)
     EXPECT_EQ(ERR_OK, ret);
     GTEST_LOG_(INFO) << "FormMgrAdapter_0263 end";
 }
+
 /**
  * @tc.name: FormMgrAdapter_0264
  * @tc.desc: test RegisterRemoveObserver function.
@@ -467,6 +486,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0264, TestSize.Level0)
     EXPECT_EQ(ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED, ret);
     GTEST_LOG_(INFO) << "FormMgrAdapter_0264 end";
 }
+
 /**
  * @tc.name: FormMgrAdapter_0265
  * @tc.desc: test SetDeathRecipient function.
@@ -486,6 +506,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0265, TestSize.Level0)
     EXPECT_TRUE(formMgrAdapter.deathRecipients_.empty());
     GTEST_LOG_(INFO) << "FormMgrAdapter_0265 end";
 }
+
 /**
  * @tc.name: FormMgrAdapter_0266
  * @tc.desc: test CleanResource function.
@@ -503,6 +524,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0266, TestSize.Level0)
     EXPECT_TRUE(formMgrAdapter.deathRecipients_.empty());
     GTEST_LOG_(INFO) << "FormMgrAdapter_0266 end";
 }
+
 /**
  * @tc.name: FormMgrAdapter_0267
  * @tc.desc: test RegisterPublishFormInterceptor function.
@@ -517,6 +539,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0267, TestSize.Level0)
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
     GTEST_LOG_(INFO) << "FormMgrAdapter_0267 end";
 }
+
 /**
  * @tc.name: FormMgrAdapter_0268
  * @tc.desc: test UnregisterPublishFormInterceptor function.
@@ -531,6 +554,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0268, TestSize.Level0)
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
     GTEST_LOG_(INFO) << "FormMgrAdapter_0268 end";
 }
+
 /**
  * @tc.name: FormMgrAdapter_0269
  * @tc.desc: test RegisterClickEventObserver function.
@@ -547,6 +571,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0269, TestSize.Level0)
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
     GTEST_LOG_(INFO) << "FormMgrAdapter_0269 end";
 }
+
 /**
  * @tc.name: FormMgrAdapter_0270
  * @tc.desc: test UnregisterClickEventObserver function.
@@ -566,6 +591,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0270, TestSize.Level0)
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
     GTEST_LOG_(INFO) << "FormMgrAdapter_0270 end";
 }
+
 /**
  * @tc.name: FormMgrAdapter_0271
  * @tc.desc: test IsFormRenderServiceCall function.
@@ -579,6 +605,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0271, TestSize.Level0)
     EXPECT_FALSE(formMgrAdapter.IsFormRenderServiceCall(callingUid));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0271 end";
 }
+
 /**
  * @tc.name: FormMgrAdapter_0272
  * @tc.desc: test SetFormsRecyclable function.
@@ -593,6 +620,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0272, TestSize.Level0)
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
     GTEST_LOG_(INFO) << "FormMgrAdapter_0272 end";
 }
+
 /**
  * @tc.name: FormMgrAdapter_0273
  * @tc.desc: test RecycleForms function.
@@ -608,6 +636,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0273, TestSize.Level0)
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
     GTEST_LOG_(INFO) << "FormMgrAdapter_0273 end";
 }
+
 /**
  * @tc.name: FormMgrAdapter_0274
  * @tc.desc: test RecoverForms function.
