@@ -104,6 +104,7 @@ ohos_unittest("FmsFormMgrAdapterTest2") {
   sources = [
     "${form_fwk_path}/test/mock/src/mock_form_provider_client.cpp",
     "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/fms_form_mgr_adapter_test2.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/fms_form_mgr_adapter_test3.cpp",
     "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_ams_helper.cpp",
     "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_bms_helper.cpp",
     "${form_fwk_path}/test/unittest/fms_form_mgr_adapter_test/mock_form_cache_mgr.cpp",
