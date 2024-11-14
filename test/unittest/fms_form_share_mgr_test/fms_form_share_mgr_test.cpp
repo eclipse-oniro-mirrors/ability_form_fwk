@@ -17,8 +17,6 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include "accesstoken_kit.h"
-#include "dm_constants.h"
-#include "dm_device_info.h"
 #define private public
 #include "form_ams_helper.h"
 #include "form_cache_mgr.h"

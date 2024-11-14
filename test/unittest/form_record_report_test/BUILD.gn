@@ -43,6 +43,7 @@ ohos_unittest("FormRecordReporttTest") {
     "eventhandler:libeventhandler",
     "form_fwk:form_manager",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "ipc:ipc_core",
     "samgr:samgr_proxy",
   ]

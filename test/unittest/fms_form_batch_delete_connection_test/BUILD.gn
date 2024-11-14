@@ -37,10 +37,7 @@ ohos_unittest("FmsFormBatchDeleteConnectionTest") {
     "${form_fwk_path}/interfaces/inner_api/include",
   ]
 
-  configs = [
-    "${form_fwk_path}/test:formmgr_test_config",
-    "${ability_runtime_path}/services/abilitymgr:abilityms_config",
-  ]
+  configs = [ "${form_fwk_path}/test:formmgr_test_config" ]
   cflags = []
   if (target_cpu == "arm") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
@@ -54,8 +51,10 @@ ohos_unittest("FmsFormBatchDeleteConnectionTest") {
   external_deps = [
     "ability_base:base",
     "ability_base:want",
+    "ability_runtime:ability_manager",
     "ability_runtime:app_manager",
     "access_token:libaccesstoken_sdk",
+    "ace_engine:ace_form_render",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",

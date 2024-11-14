@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,7 +21,6 @@
 #undef private
 #include "form_mgr_errors.h"
 #include "if_system_ability_manager.h"
-#include "inner_bundle_info.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
 #include "mock_distributed_sched.h"
@@ -29,7 +28,6 @@
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::AppExecFwk;
-using namespace OHOS::Security;
 
 namespace {
 class FormDistributedClientTestClass : public FormDistributedClient {

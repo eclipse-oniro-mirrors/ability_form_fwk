@@ -19,10 +19,9 @@ config("formmgr_test_config") {
   configs = [ "${form_fwk_path}:formmgr_config" ]
 }
 
-public_configs = [
-  ":formmgr_test_config",
-  "${c_utils_base_path}:utils_config",
-]
+public_configs = [ ":formmgr_test_config" ]
+
+external_deps = [ "c_utils:utils" ]
 
 public_deps = [
   "${c_utils_base_path}:utils",

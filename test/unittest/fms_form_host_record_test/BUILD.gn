@@ -36,10 +36,7 @@ ohos_unittest("FmsFormHostRecordTest") {
     "${form_fwk_path}/interfaces/inner_api/include",
   ]
 
-  configs = [
-    "${form_fwk_path}/test:formmgr_test_config",
-    "${ability_runtime_path}/services/abilitymgr:abilityms_config",
-  ]
+  configs = [ "${form_fwk_path}/test:formmgr_test_config" ]
   cflags = []
   if (target_cpu == "arm") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
@@ -54,6 +51,7 @@ ohos_unittest("FmsFormHostRecordTest") {
     "ability_base:base",
     "ability_base:configuration",
     "ability_base:want",
+    "ability_runtime:ability_manager",
     "ability_runtime:app_manager",
     "access_token:libaccesstoken_sdk",
     "bundle_framework:appexecfwk_base",
@@ -66,6 +64,7 @@ ohos_unittest("FmsFormHostRecordTest") {
     "form_fwk:form_manager",
     "hilog:libhilog",
     "ipc:ipc_core",
+    "libxml2:libxml2",
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
