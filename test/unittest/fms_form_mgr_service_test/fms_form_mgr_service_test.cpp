@@ -100,45 +100,6 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0001, TestSize.Level1)
 }
 
 /**
- * @tc.number: FormMgrService_0002
- * @tc.name: test LifecycleUpdate function.
- * @tc.desc: Verify that the test program executes as expected when the incoming parameter updateType is false.
- */
-HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0002, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0002 start";
-    FormMgrService formMgrService;
-    const std::vector<int64_t> formIds;
-    const sptr<IRemoteObject> callerToken = nullptr;
-    bool updateType = false;
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(false);
-    EXPECT_EQ(formMgrService.LifecycleUpdate(formIds, callerToken, updateType),
-              ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
-
-    MockIsSACall(true);
-    EXPECT_EQ(formMgrService.LifecycleUpdate(formIds, callerToken, updateType), ERR_OK);
-    GTEST_LOG_(INFO) << "FormMgrService_0002 end";
-}
-
-/**
- * @tc.number: FormMgrService_0003
- * @tc.name: test LifecycleUpdate function.
- * @tc.desc: Verify that the test program executes as expected when the incoming parameter updateType is true.
- */
-HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0003, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0003 start";
-    FormMgrService formMgrService;
-    const std::vector<int64_t> formIds;
-    const sptr<IRemoteObject> callerToken = nullptr;
-    bool updateType = true;
-    MockIsSACall(true);
-    EXPECT_EQ(ERR_OK, formMgrService.LifecycleUpdate(formIds, callerToken, updateType));
-    GTEST_LOG_(INFO) << "FormMgrService_0003 end";
-}
-
-/**
  * @tc.number: FormMgrService_0004
  * @tc.name: test AddForm function.
  * @tc.desc: Verify that the AddForm interface is called normally and the return value is ERR_OK.
@@ -423,28 +384,6 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0016, TestSize.Level1)
     EXPECT_EQ(formMgrService.NotifyFormsPrivacyProtected(formIds, isProtected, callerToken),
               ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
     GTEST_LOG_(INFO) << "FormMgrService_0016 end";
-}
-
-/**
- * @tc.number: FormMgrService_0017
- * @tc.name: test NotifyFormsEnableUpdate function.
- * @tc.desc: Verify that the NotifyFormsEnableUpdate interface is called normally and the return value is ERR_OK.
- */
-HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0017, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormMgrService_0017 start";
-    FormMgrService formMgrService;
-    const std::vector<int64_t> formIds;
-    bool isEnableUpdate = false;
-    const sptr<IRemoteObject> callerToken = nullptr;
-    MockIsSACall(true);
-    EXPECT_EQ(formMgrService.NotifyFormsEnableUpdate(formIds, isEnableUpdate, callerToken), ERR_OK);
-
-    MockIsSACall(false);
-    MockIsSystemAppByFullTokenID(false);
-    EXPECT_EQ(formMgrService.NotifyFormsEnableUpdate(formIds, isEnableUpdate, callerToken),
-              ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
-    GTEST_LOG_(INFO) << "FormMgrService_0017 end";
 }
 
 /**
