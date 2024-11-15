@@ -148,7 +148,6 @@ void FormReport::SetDurationStartTime(int64_t formId, int64_t startTime)
 
 void FormReport::SetDurationEndTime(int64_t formId, int64_t endTime)
 {
-    std::lock_guard<std::mutex> guard(formReport_);
     auto it = formStatisticMap_.find(formId);
     if (it != formStatisticMap_.end()) {
         if (!formStatisticMap_[formId].durationEndTime_) {
@@ -235,6 +234,7 @@ void FormReport::HandleFirstUpdateStatistic(int64_t formId)
     if (formId <= 0) {
         return;
     }
+    std::lock_guard<std::mutex> guard(formReport_);
     NewFormEventInfo eventInfo;
     for (auto iter = formStatisticMap_.begin(); iter != formStatisticMap_.end(); ++iter) {
         if (formId == iter->first) {
