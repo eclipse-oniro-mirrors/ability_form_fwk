@@ -26,8 +26,8 @@ namespace OHOS {
 namespace AppExecFwk {
 FormFwkResourceObserver::FormFwkResourceObserver()
 {
-    colorMode_ == FormResourceParam::GetSystemColorMode();
-    language_ == FormResourceParam::GetSystemLanguage();
+    colorMode_ = FormResourceParam::GetSystemColorMode();
+    language_ = FormResourceParam::GetSystemLanguage();
 }
 
 FormFwkResourceObserver::~FormFwkResourceObserver()
