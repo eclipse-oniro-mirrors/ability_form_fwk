@@ -234,8 +234,8 @@ void FormReport::HandleFirstUpdateStatistic(int64_t formId)
     if (formId <= 0) {
         return;
     }
-    std::lock_guard<std::mutex> guard(formReport_);
     NewFormEventInfo eventInfo;
+    std::lock_guard<std::mutex> guard(formReport_);
     for (auto iter = formStatisticMap_.begin(); iter != formStatisticMap_.end(); ++iter) {
         if (formId == iter->first) {
             FormStatistic& record = iter->second;
