@@ -832,7 +832,7 @@ void FormTimerMgr::OnIntervalTimeOut()
     int64_t currentTime = FormUtil::GetCurrentMillisecond();
     for (auto &intervalPair : intervalTimerTasks_) {
         FormTimer &intervalTask = intervalPair.second;
-        HILOG_INFO("intervalTask formId:%{public}" PRId64 ", period:%{public}" PRId64 ""
+        HILOG_BRIEF("intervalTask formId:%{public}" PRId64 ", period:%{public}" PRId64 ""
             "currentTime:%{public}" PRId64 ", refreshTime:%{public}" PRId64 ", isEnable:%{public}d",
             intervalTask.formId, intervalTask.period, currentTime,
             intervalTask.refreshTime, intervalTask.isEnable);
@@ -1397,7 +1397,6 @@ void FormTimerMgr::ExecTimerTaskCore(const FormTimer &timerTask)
 void FormTimerMgr::ExecTimerTask(const FormTimer &timerTask)
 #endif // RES_SCHEDULE_ENABLE
 {
-    HILOG_INFO("start");
     AAFwk::Want want;
     if (timerTask.isCountTimer) {
         want.SetParam(Constants::KEY_IS_TIMER, true);
@@ -1407,15 +1406,14 @@ void FormTimerMgr::ExecTimerTask(const FormTimer &timerTask)
     }
     // multi user
     if (IsActiveUser(timerTask.userId)) {
-        HILOG_INFO("timerTask.userId is current user");
+        HILOG_BRIEF("timerTask.userId is current user");
         want.SetParam(Constants::PARAM_FORM_USER_ID, timerTask.userId);
     }
-    HILOG_INFO("userId:%{public}d", timerTask.userId);
+    HILOG_BRIEF("userId:%{public}d", timerTask.userId);
     auto task = [id = timerTask.formId, want]() {
         FormProviderMgr::GetInstance().RefreshForm(id, want, false);
     };
     ffrt::submit(task);
-    HILOG_INFO("end");
 }
 
 void FormTimerMgr::RefreshWhenFormVisible(const int64_t &formId, const int32_t &userId)
