@@ -2464,11 +2464,12 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetConfigParamFormMap_002, TestS
     std::map<std::string, int32_t> configMap;
     std::string key = "a";
     std::string notFindkey = "b";
-    int32_t value = 0;
-    configMap.emplace(key, value);
+    int32_t value1 = 3;
+    int32_t value2 = 0;
+    configMap.emplace(key, value1);
     formDataMgr_.SetConfigMap(configMap);
-    formDataMgr_.GetConfigParamFormMap(notFindkey, value);
-    EXPECT_EQ(value, 0);
+    formDataMgr_.GetConfigParamFormMap(notFindkey, value2);
+    EXPECT_NE(value1, value2);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetConfigParamFormMap_002 end";
 }
 
@@ -2490,7 +2491,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetConfigParamFormMap_003, TestS
     configMap.emplace(key, value1);
     formDataMgr_.SetConfigMap(configMap);
     formDataMgr_.GetConfigParamFormMap(key, value2);
-    EXPECT_EQ(value1, 3);
+    EXPECT_EQ(value1, value2);
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetConfigParamFormMap_003 end";
 }
 

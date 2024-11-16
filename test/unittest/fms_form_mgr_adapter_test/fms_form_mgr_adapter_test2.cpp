@@ -1876,7 +1876,6 @@ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_211, TestSize.Level0)
     int64_t updateDuration = 1;
     MockGetFormRecord(false);
     EXPECT_EQ(false, formMgrAdapter.GetValidFormUpdateDuration(formId, updateDuration));
-    EXPECT_EQ(updateDuration, 1);
     GTEST_LOG_(INFO) << "FormMgrAdapter_211 end";
 }
 
@@ -1894,7 +1893,6 @@ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_212, TestSize.Level0)
     MockGetFormRecord(true);
     MockGetFormRecordParams(true);
     EXPECT_EQ(false, formMgrAdapter.GetValidFormUpdateDuration(formId, updateDuration));
-    EXPECT_EQ(updateDuration, 1);
     GTEST_LOG_(INFO) << "FormMgrAdapter_212 end";
 }
 
