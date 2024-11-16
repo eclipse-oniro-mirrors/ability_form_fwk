@@ -306,7 +306,7 @@ config("formmgr_sdk_config") {
 
 ohos_shared_library("form_manager") {
   branch_protector_ret = "pac_ret"
-  
+
   include_dirs = []
 
   sources = [
