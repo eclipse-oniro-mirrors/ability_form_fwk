@@ -1016,6 +1016,46 @@ void FormTaskMgr::PostOnUnlock(const sptr<IRemoteObject> &remoteObject)
     HILOG_DEBUG("end");
 }
 
+void FormTaskMgr::SetVisibleChange(int64_t formId, bool isVisible, const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_INFO("begin");
+    sptr<IFormRender> remoteFormRender = iface_cast<IFormRender>(remoteObject);
+    if (remoteFormRender == nullptr) {
+        HILOG_ERROR("get formRenderProxy failed");
+        return;
+    }
+
+    FormRecord formRecord;
+    if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
+        HILOG_ERROR("form %{public}" PRId64 " not exist", formId);
+        return;
+    }
+
+    Want want;
+    want.SetParam(Constants::FORM_SUPPLY_UID, std::to_string(formRecord.providerUserId) + formRecord.bundleName);
+
+    int32_t error = remoteFormRender->SetVisibleChange(formId, isVisible, want);
+    if (error != ERR_OK) {
+        HILOG_ERROR("fail");
+        return;
+    }
+    HILOG_INFO("end");
+}
+
+void FormTaskMgr::PostSetVisibleChange(int64_t formId, bool isVisible, const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_INFO("call");
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("null serialQueue_");
+        return;
+    }
+    auto task = [formId, isVisible, remoteObject]() {
+        FormTaskMgr::GetInstance().SetVisibleChange(formId, isVisible, remoteObject);
+    };
+    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, task);
+    HILOG_INFO("end");
+}
+
 void FormTaskMgr::RemoveConnection(int32_t connectId)
 {
     auto formSupplyCallback = FormSupplyCallback::GetInstance();

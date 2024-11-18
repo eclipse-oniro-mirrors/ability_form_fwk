@@ -68,6 +68,7 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formRenderMgrInner.OnRenderingBlock(bundleName);
     formRenderMgrInner.ReleaseRenderer(formId, formRecord, compId);
     formRenderMgrInner.PostOnUnlockTask();
+    formRenderMgrInner.PostSetVisibleChangeTask(formId, true);
     formRenderMgrInner.GetReRenderCount();
     formRenderMgrInner.GetRenderRemoteObj();
     sptr<IFormRender> remoteObject = nullptr;

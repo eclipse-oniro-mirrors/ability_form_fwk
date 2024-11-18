@@ -70,6 +70,8 @@ public:
 
     void NotifyScreenOn();
 
+    void PostSetVisibleChangeTask(int64_t formId, bool isVisible);
+
     int32_t GetReRenderCount() const;
 
     sptr<IFormRender> GetRenderRemoteObj() const;

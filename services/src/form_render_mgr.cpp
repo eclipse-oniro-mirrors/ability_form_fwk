@@ -238,6 +238,20 @@ void FormRenderMgr::OnUnlock()
     ExecAcquireProviderTask();
 }
 
+void FormRenderMgr::SetVisibleChange(int64_t formId, bool isVisible)
+{
+    HILOG_INFO("call.");
+    int32_t userId = FormUtil::GetCurrentAccountId();
+    auto renderIter = renderInners_.find(userId);
+    if (renderIter != renderInners_.end()) {
+        renderIter->second->PostSetVisibleChangeTask(formId, isVisible);
+    }
+    auto sandboxIter = sandboxInners_.find(userId);
+    if (sandboxIter != sandboxInners_.end()) {
+        sandboxIter->second->PostSetVisibleChangeTask(formId, isVisible);
+    }
+}
+
 ErrCode FormRenderMgr::StopRenderingForm(
     int64_t formId, const FormRecord &formRecord, const std::string &compId, const sptr<IRemoteObject> &hostToken)
 {

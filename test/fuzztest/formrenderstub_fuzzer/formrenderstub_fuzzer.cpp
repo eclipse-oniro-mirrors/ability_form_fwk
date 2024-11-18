@@ -85,6 +85,7 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formRenderStub->HandleReloadForm(datas, reply);
     formRenderStub->HandleStopRenderingForm(datas, reply);
     formRenderStub->HandleOnUnlock(datas, reply);
+    formRenderStub->HandleSetVisibleChange(datas, reply);
     formRenderStub->HandleRecoverForm(datas, reply);
     return true;
 }
