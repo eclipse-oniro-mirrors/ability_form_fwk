@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 #include <gtest/gtest.h>
+
+#define private public
 #include "form_record_report.h"
 #include "want.h"
 
@@ -83,5 +85,160 @@ HWTEST_F(FormRecordReportTest, FormRecordReport_003, TestSize.Level1)
     formRecordReport.SetFormRecordRecordInfo(TEST_FORM_ID, want);
     formRecordReport.ClearReportInfo();
     EXPECT_TRUE(formRecordReport.GetFormRecords().empty());
+}
+
+/**
+ * @tc.name: FormRecordReport_004
+ * @tc.desc: test IncreaseUpdateTimes function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRecordReportTest, FormRecordReport_004, TestSize.Level1)
+{
+    FormRecordReportInfo formRecordReportInfo;
+    formRecordReportInfo.invisibleRefreshTimes = 0;
+    int64_t formId = 1;
+    formRecordReport.formRecordReportMap_[formId] = formRecordReportInfo;
+    HiSysEventPointType type = TYPE_INVISIBLE_UPDATE;
+    formRecordReport.IncreaseUpdateTimes(formId, type);
+    auto iter = formRecordReport.formRecordReportMap_.find(formId);
+    EXPECT_EQ(iter->second.invisibleRefreshTimes, 1);
+}
+
+/**
+ * @tc.name: FormRecordReport_005
+ * @tc.desc: test IncreaseUpdateTimes function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRecordReportTest, FormRecordReport_005, TestSize.Level1)
+{
+    FormRecordReportInfo formRecordReportInfo;
+    formRecordReportInfo.hfRefreshBlockTimes = 0;
+    int64_t formId = 1;
+    formRecordReport.formRecordReportMap_[formId] = formRecordReportInfo;
+    HiSysEventPointType type = TYPE_HIGH_FREQUENCY;
+    formRecordReport.IncreaseUpdateTimes(formId, type);
+    auto iter = formRecordReport.formRecordReportMap_.find(formId);
+    EXPECT_EQ(iter->second.hfRefreshBlockTimes, 1);
+}
+
+/**
+ * @tc.name: FormRecordReport_006
+ * @tc.desc: test IncreaseUpdateTimes function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRecordReportTest, FormRecordReport_006, TestSize.Level1)
+{
+    FormRecordReportInfo formRecordReportInfo;
+    formRecordReportInfo.invisibleRefreshBlockTimes = 0;
+    int64_t formId = 1;
+    formRecordReport.formRecordReportMap_[formId] = formRecordReportInfo;
+    HiSysEventPointType type = TYPE_INVISIBLE_INTERCEPT;
+    formRecordReport.IncreaseUpdateTimes(formId, type);
+    auto iter = formRecordReport.formRecordReportMap_.find(formId);
+    EXPECT_EQ(iter->second.invisibleRefreshBlockTimes, 1);
+}
+
+/**
+ * @tc.name: FormRecordReport_007
+ * @tc.desc: test IncreaseUpdateTimes function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRecordReportTest, FormRecordReport_007, TestSize.Level1)
+{
+    FormRecordReportInfo formRecordReportInfo;
+    formRecordReportInfo.highLoadRefreshBlockTimes = 1;
+    int64_t formId = 1;
+    formRecordReport.formRecordReportMap_[formId] = formRecordReportInfo;
+    HiSysEventPointType type = TYPE_HIGH_LOAD;
+    formRecordReport.IncreaseUpdateTimes(formId, type);
+    auto iter = formRecordReport.formRecordReportMap_.find(formId);
+    EXPECT_EQ(iter->second.highLoadRefreshBlockTimes, 0);
+}
+
+/**
+ * @tc.name: FormRecordReport_008
+ * @tc.desc: test IncreaseUpdateTimes function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRecordReportTest, FormRecordReport_008, TestSize.Level1)
+{
+    FormRecordReportInfo formRecordReportInfo;
+    formRecordReportInfo.activeRecoverRefreshTimes = 1;
+    int64_t formId = 1;
+    formRecordReport.formRecordReportMap_[formId] = formRecordReportInfo;
+    HiSysEventPointType type = TYPE_ACTIVE_RECVOER_UPDATE;
+    formRecordReport.IncreaseUpdateTimes(formId, type);
+    auto iter = formRecordReport.formRecordReportMap_.find(formId);
+    EXPECT_EQ(iter->second.activeRecoverRefreshTimes, 0);
+}
+
+/**
+ * @tc.name: FormRecordReport_009
+ * @tc.desc: test IncreaseUpdateTimes function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRecordReportTest, FormRecordReport_009, TestSize.Level1)
+{
+    FormRecordReportInfo formRecordReportInfo;
+    formRecordReportInfo.passiveRecoverRefreshTimes = 0;
+    int64_t formId = 1;
+    formRecordReport.formRecordReportMap_[formId] = formRecordReportInfo;
+    HiSysEventPointType type = TYPE_PASSIVE_RECOVER_UPDATE;
+    formRecordReport.IncreaseUpdateTimes(formId, type);
+    auto iter = formRecordReport.formRecordReportMap_.find(formId);
+    EXPECT_EQ(iter->second.passiveRecoverRefreshTimes, 1);
+}
+
+/**
+ * @tc.name: FormRecordReport_010
+ * @tc.desc: test IncreaseUpdateTimes function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRecordReportTest, FormRecordReport_010, TestSize.Level1)
+{
+    FormRecordReportInfo formRecordReportInfo;
+    formRecordReportInfo.hfRecoverRefreshTimes = 0;
+    int64_t formId = 1;
+    formRecordReport.formRecordReportMap_[formId] = formRecordReportInfo;
+    HiSysEventPointType type = TYPE_HF_RECOVER_UPDATE;
+    formRecordReport.IncreaseUpdateTimes(formId, type);
+    auto iter = formRecordReport.formRecordReportMap_.find(formId);
+    EXPECT_EQ(iter->second.hfRecoverRefreshTimes, 1);
+}
+
+/**
+ * @tc.name: FormRecordReport_011
+ * @tc.desc: test IncreaseUpdateTimes function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRecordReportTest, FormRecordReport_011, TestSize.Level1)
+{
+    FormRecordReportInfo formRecordReportInfo;
+    formRecordReportInfo.offloadRecoverRefreshTimes = 1;
+    int64_t formId = 1;
+    formRecordReport.formRecordReportMap_[formId] = formRecordReportInfo;
+    HiSysEventPointType type = TYPE_OFFLOAD_RECOVER_UPDATE;
+    formRecordReport.IncreaseUpdateTimes(formId, type);
+    auto iter = formRecordReport.formRecordReportMap_.find(formId);
+    EXPECT_EQ(iter->second.offloadRecoverRefreshTimes, 0);
+}
+
+/**
+ * @tc.name: FormRecordReport_012
+ * @tc.desc: test IncreaseUpdateTimes function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRecordReportTest, FormRecordReport_012, TestSize.Level1)
+{
+    FormRecordReportInfo formRecordReportInfo;
+    formRecordReportInfo.bundleName = "bundleName";
+    int64_t formId = 1;
+    formRecordReport.formRecordReportMap_[formId] = formRecordReportInfo;
+    std::string bundleName = "test_bundleName";
+    Want want;
+    want.GetElement().SetBundleName(bundleName);
+    formRecordReport.SetFormRecordRecordInfo(formId, want);
+    auto iter = formRecordReport.formRecordReportMap_.find(formId);
+    EXPECT_NE(iter->second.bundleName, bundleName);
 }
 } // namespace
