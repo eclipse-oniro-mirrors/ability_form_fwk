@@ -140,7 +140,7 @@ int32_t FormRenderImpl::StopRenderingForm(const FormJsInfo &formJsInfo, const Wa
 
     bool isRenderGroupEmpty = false;
     sptr<IRemoteObject> hostToken = want.GetRemoteObject(Constants::PARAM_FORM_HOST_TOKEN);
-    std::shared_ptr<FormRenderRecord>> search = nullptr;
+    std::shared_ptr<FormRenderRecord> search = nullptr;
     {
         {
             std::lock_guard<std::mutex> lock(renderRecordMutex_);
@@ -238,7 +238,7 @@ int32_t FormRenderImpl::ReloadForm(const std::vector<FormJsInfo> &&formJsInfos, 
         HILOG_ERROR("Get uid failed");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
-    std::shared_ptr<FormRenderRecord>> search = nullptr;
+    std::shared_ptr<FormRenderRecord> search = nullptr;
     {
         std::lock_guard<std::mutex> lock(renderRecordMutex_);
         auto iterator = renderRecordMap_.find(uid);
