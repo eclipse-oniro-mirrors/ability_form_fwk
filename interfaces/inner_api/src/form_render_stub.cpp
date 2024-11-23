@@ -23,7 +23,7 @@
 #include "iremote_object.h"
 #include "xcollie/watchdog.h"
 #include "xcollie/xcollie.h"
-#include "xcollie/xcollie_define.h
+#include "xcollie/xcollie_define.h"
 
 namespace OHOS {
 namespace AppExecFwk {
