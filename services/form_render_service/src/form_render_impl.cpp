@@ -140,8 +140,8 @@ int32_t FormRenderImpl::StopRenderingForm(const FormJsInfo &formJsInfo, const Wa
 
     bool isRenderGroupEmpty = false;
     sptr<IRemoteObject> hostToken = want.GetRemoteObject(Constants::PARAM_FORM_HOST_TOKEN);
-    std::shared_ptr<FormRenderRecord> search = nullptr;
     {
+        std::shared_ptr<FormRenderRecord> search = nullptr;
         {
             std::lock_guard<std::mutex> lock(renderRecordMutex_);
             auto iterator = renderRecordMap_.find(uid);
@@ -162,7 +162,12 @@ int32_t FormRenderImpl::StopRenderingForm(const FormJsInfo &formJsInfo, const Wa
         {
             std::lock_guard<std::mutex> lock(renderRecordMutex_);
             if (search->IsEmpty()) {
-                renderRecordMap_.erase(search);
+                auto iterator = renderRecordMap_.find(uid);
+                if (iterator == renderRecordMap_.end()) {
+                    HILOG_ERROR("fail.");
+                    return RENDER_FORM_FAILED;
+                }
+                renderRecordMap_.erase(iterator);
                 HILOG_INFO("DeleteRenderRecord success,uid:%{public}s", uid.c_str());
                 if (renderRecordMap_.empty()) {
                     FormMemmgrClient::GetInstance().SetCritical(false);
