@@ -359,6 +359,7 @@ ohos_shared_library("form_manager") {
     "bundle_framework:appexecfwk_base",
     "c_utils:utils",
     "hilog:libhilog",
+    "hicollie:libhicollie",
     "ipc:ipc_core",
     "jsoncpp:jsoncpp",
     "napi:ace_napi",
