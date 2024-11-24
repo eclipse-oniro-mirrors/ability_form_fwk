@@ -141,25 +141,37 @@ int32_t FormRenderImpl::StopRenderingForm(const FormJsInfo &formJsInfo, const Wa
     bool isRenderGroupEmpty = false;
     sptr<IRemoteObject> hostToken = want.GetRemoteObject(Constants::PARAM_FORM_HOST_TOKEN);
     {
-        std::lock_guard<std::mutex> lock(renderRecordMutex_);
-        auto search = renderRecordMap_.find(uid);
-        if (search == renderRecordMap_.end()) {
-            HILOG_ERROR("fail");
-            return RENDER_FORM_FAILED;
-        }
+        std::shared_ptr<FormRenderRecord> search = nullptr;
+        {
+            std::lock_guard<std::mutex> lock(renderRecordMutex_);
+            auto iterator = renderRecordMap_.find(uid);
+            if (iterator == renderRecordMap_.end()) {
+                HILOG_ERROR("fail");
+                return RENDER_FORM_FAILED;
+            }
+            search = iterator->second;
 
-        if (!search->second) {
-            HILOG_ERROR("fail");
-            return RENDER_FORM_FAILED;
+            if (!search) {
+                HILOG_ERROR("fail");
+                return RENDER_FORM_FAILED;
+            }
         }
 
         std::string compId = want.GetStringParam(Constants::FORM_RENDER_COMP_ID);
-        search->second->DeleteRenderRecord(formJsInfo.formId, compId, hostToken, isRenderGroupEmpty);
-        if (search->second->IsEmpty()) {
-            renderRecordMap_.erase(search);
-            HILOG_INFO("DeleteRenderRecord success,uid:%{public}s", uid.c_str());
-            if (renderRecordMap_.empty()) {
-                FormMemmgrClient::GetInstance().SetCritical(false);
+        search->DeleteRenderRecord(formJsInfo.formId, compId, hostToken, isRenderGroupEmpty);
+        {
+            std::lock_guard<std::mutex> lock(renderRecordMutex_);
+            if (search->IsEmpty()) {
+                auto iterator = renderRecordMap_.find(uid);
+                if (iterator == renderRecordMap_.end()) {
+                    HILOG_ERROR("fail.");
+                    return RENDER_FORM_FAILED;
+                }
+                renderRecordMap_.erase(iterator);
+                HILOG_INFO("DeleteRenderRecord success,uid:%{public}s", uid.c_str());
+                if (renderRecordMap_.empty()) {
+                    FormMemmgrClient::GetInstance().SetCritical(false);
+                }
             }
         }
     }
@@ -226,19 +238,23 @@ int32_t FormRenderImpl::CleanFormHost(const sptr<IRemoteObject> &hostToken)
 int32_t FormRenderImpl::ReloadForm(const std::vector<FormJsInfo> &&formJsInfos, const Want &want)
 {
     HILOG_INFO("ReloadForm start");
-    std::lock_guard<std::mutex> lock(renderRecordMutex_);
     std::string uid = want.GetStringParam(Constants::FORM_SUPPLY_UID);
     if (uid.empty()) {
         HILOG_ERROR("Get uid failed");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
-    auto search = renderRecordMap_.find(uid);
-    if (search == renderRecordMap_.end()) {
-        HILOG_ERROR("RenderRecord not find");
-        return RELOAD_FORM_FAILED;
+    std::shared_ptr<FormRenderRecord> search = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(renderRecordMutex_);
+        auto iterator = renderRecordMap_.find(uid);
+        if (iterator == renderRecordMap_.end()) {
+            HILOG_ERROR("RenderRecord not find");
+            return RELOAD_FORM_FAILED;
+        }
+        search = iterator->second;
     }
-    if (search->second) {
-        search->second->ReloadFormRecord(std::forward<decltype(formJsInfos)>(formJsInfos), want);
+    if (search != nullptr) {
+        search->ReloadFormRecord(std::forward<decltype(formJsInfos)>(formJsInfos), want);
     }
     return ERR_OK;
 }
