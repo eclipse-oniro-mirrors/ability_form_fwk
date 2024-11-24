@@ -1721,17 +1721,44 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_090, TestSize.Level0)
 }
 
 /**
+ * @tc.name: FormRenderRecord_Release_0001
+ * @tc.desc: test FormRenderRecord::Release()
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecord_Release_0001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecord_Release_0001 start";
+
+    ASSERT_NE(formRenderRecordPtr_, nullptr);
+    auto tempStorageEventHandler = formRenderRecordPtr_->eventHandler_;
+    auto tempStorageEventRunner = formRenderRecordPtr_->eventRunner_;
+    formRenderRecordPtr_->eventHandler_ = nullptr;
+    formRenderRecordPtr_->Release();
+    EXPECT_NE(formRenderRecordPtr_->eventRunner_, nullptr);
+
+    formRenderRecordPtr_->eventHandler_ = tempStorageEventHandler;
+    formRenderRecordPtr_->Release();
+
+    EXPECT_EQ(formRenderRecordPtr_->eventRunner_, nullptr);
+    formRenderRecordPtr_->eventRunner_ = tempStorageEventRunner;
+
+    GTEST_LOG_(INFO) << "FormRenderRecord_Release_0001 end";
+}
+
+/**
 * @tc.name: FormRenderRecordTest_091
 * @tc.desc: Test HandleSetVisibleChange
 * @tc.type: FUNC
 */
 HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_091, TestSize.Level0)
 {
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_091 start";
     EXPECT_TRUE(formRenderRecordPtr_);
     formRenderRecordPtr_->formRendererGroupMap_.clear();
 
     int64_t formId = 15;
     EXPECT_EQ(SET_VISIBLE_CHANGE_FAILED, formRenderRecordPtr_->HandleSetVisibleChange(formId, true));
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_091 end";
 }
 
 /**
@@ -1741,12 +1768,15 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_091, TestSize.Level0)
 */
 HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_092, TestSize.Level0)
 {
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_092 start";
+
     EXPECT_TRUE(formRenderRecordPtr_);
     formRenderRecordPtr_->formRendererGroupMap_.clear();
 
     int64_t formId = 15;
     formRenderRecordPtr_->formRendererGroupMap_.emplace(formId, nullptr);
     EXPECT_EQ(SET_VISIBLE_CHANGE_FAILED, formRenderRecordPtr_->HandleSetVisibleChange(formId, true));
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_092 end";
 }
 
 /**
@@ -1756,6 +1786,8 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_092, TestSize.Level0)
 */
 HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_093, TestSize.Level0)
 {
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_093 start";
+
     EXPECT_TRUE(formRenderRecordPtr_);
     formRenderRecordPtr_->formRendererGroupMap_.clear();
 
@@ -1766,6 +1798,7 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_093, TestSize.Level0)
     auto group = std::make_shared<FormRendererGroup>(context, runtime, handler);
     formRenderRecordPtr_->formRendererGroupMap_.emplace(formId, group);
     EXPECT_EQ(ERR_OK, formRenderRecordPtr_->HandleSetVisibleChange(formId, true));
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_093 end";
 }
 
 /**
@@ -1801,25 +1834,4 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_095, TestSize.Level1)
     EXPECT_EQ(formRenderRecordPtr_->SetVisibleChange(formId, true), ERR_OK);
     formRenderRecordPtr_->eventHandler_ = nullptr;
     GTEST_LOG_(INFO) << "FormRenderRecordTest_095 end";
-}
-
-/**
- * @tc.name: FormRenderRecord_Release_0001
- * @tc.desc: test FormRenderRecord::Release()
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderRecordTest, FormRenderRecord_Release_0001, TestSize.Level1)
-{
-    ASSERT_NE(formRenderRecordPtr_, nullptr);
-    auto tempStorageEventHandler = formRenderRecordPtr_->eventHandler_;
-    auto tempStorageEventRunner = formRenderRecordPtr_->eventRunner_;
-    formRenderRecordPtr_->eventHandler_ = nullptr;
-    formRenderRecordPtr_->Release();
-    EXPECT_NE(formRenderRecordPtr_->eventRunner_, nullptr);
-
-    formRenderRecordPtr_->eventHandler_ = tempStorageEventHandler;
-    formRenderRecordPtr_->Release();
-
-    EXPECT_EQ(formRenderRecordPtr_->eventRunner_, nullptr);
-    formRenderRecordPtr_->eventRunner_ = tempStorageEventRunner;
 }
