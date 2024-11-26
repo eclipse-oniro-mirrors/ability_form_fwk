@@ -816,3 +816,364 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgr_GetBundleVersionMap_0100, TestSize.Level1)
     FormBmsHelper::GetInstance().iBundleMgr_ = backup;
     GTEST_LOG_(INFO) << "FormInfoMgr_GetBundleVersionMap_0100 end";
 }
+
+/**
+ * @tc.name: FormInfoHelperTest0001
+ * @tc.number: LoadAbilityFormConfigInfo
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoHelperTest0001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoHelperTest0001 start";
+    BundleInfo bundleInfo;
+    HapModuleInfo hapModuleInfo;
+    bundleInfo.hapModuleInfos.push_back(hapModuleInfo);
+    std::vector<FormInfo> formInfos;
+    auto ret = formInfoHelper_->LoadAbilityFormConfigInfo(bundleInfo, formInfos);
+    EXPECT_EQ(ret, ERR_OK);
+    GTEST_LOG_(INFO) << "FormInfoHelperTest0001 end";
+}
+
+/**
+ * @tc.name: FormInfoHelperTest0002
+ * @tc.number: GetResourceManager
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoHelperTest0002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoHelperTest0002 start";
+    BundleInfo bundleInfo;
+    HapModuleInfo hapModuleInfo;
+    hapModuleInfo.hapPath = "hapPath";
+    bundleInfo.hapModuleInfos.push_back(hapModuleInfo);
+    auto ret = formInfoHelper_->GetResourceManager(bundleInfo);
+    EXPECT_NE(ret, nullptr);
+    GTEST_LOG_(INFO) << "FormInfoHelperTest0002 end";
+}
+
+/**
+ * @tc.name: FormInfoHelperTest0003
+ * @tc.number: GetFormInfoDisplayName
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoHelperTest0003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoHelperTest0003 start";
+    std::shared_ptr<Global::Resource::ResourceManager> resourceManager(Global::Resource::CreateResourceManager());
+    FormInfo formInfo;
+    formInfo.displayNameId = 0;
+    auto ret = formInfoHelper_->GetFormInfoDisplayName(resourceManager, formInfo);
+    EXPECT_EQ(ret, ERR_OK);
+    formInfo.displayNameId = 1;
+    ret = formInfoHelper_->GetFormInfoDisplayName(resourceManager, formInfo);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    GTEST_LOG_(INFO) << "FormInfoHelperTest0003 end";
+}
+
+/**
+ * @tc.name: BundleFormInfoTest0001
+ * @tc.number: Remove
+ */
+HWTEST_F(FormInfoMgrTest, BundleFormInfoTest0001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "BundleFormInfoTest0001 start";
+    BundleFormInfo bundleFormInfo(FORM_BUNDLE_NAME_TEST);
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = USER_ID;
+    bundleFormInfo.formInfoStorages_.push_back(formInfoStorage);
+    auto ret = bundleFormInfo.Remove(0);
+    EXPECT_EQ(ret, ERR_OK);
+    GTEST_LOG_(INFO) << "BundleFormInfoTest0001 end";
+}
+
+/**
+ * @tc.name: BundleFormInfoTest0002
+ * @tc.number: AddDynamicFormInfo
+ */
+HWTEST_F(FormInfoMgrTest, BundleFormInfoTest0002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "BundleFormInfoTest0002 start";
+    BundleFormInfo bundleFormInfo(FORM_BUNDLE_NAME_TEST);
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = 0;
+    bundleFormInfo.formInfoStorages_.push_back(formInfoStorage);
+    FormInfoStorage formInfoStorage2;
+    formInfoStorage2.userId = USER_ID;
+    FormInfo formInfo;
+    formInfo.name = "testname";
+    formInfo.moduleName = "testmoduleName";
+    formInfoStorage2.formInfos.push_back(formInfo);
+    bundleFormInfo.formInfoStorages_.push_back(formInfoStorage2);
+    auto ret = bundleFormInfo.AddDynamicFormInfo(formInfo, USER_ID);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+
+    formInfo.name = "testname";
+    formInfo.moduleName = "testmoduleName2";
+    ret = bundleFormInfo.AddDynamicFormInfo(formInfo, USER_ID);
+    EXPECT_NE(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    formInfo.name = "testname2";
+    formInfo.moduleName = "testmoduleName";
+    ret = bundleFormInfo.AddDynamicFormInfo(formInfo, USER_ID);
+    EXPECT_NE(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    formInfo.name = "testname2";
+    formInfo.moduleName = "testmoduleName2";
+    ret = bundleFormInfo.AddDynamicFormInfo(formInfo, USER_ID);
+    EXPECT_NE(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "BundleFormInfoTest0002 end";
+}
+
+/**
+ * @tc.name: BundleFormInfoTest0003
+ * @tc.number: RemoveDynamicFormInfo
+ */
+HWTEST_F(FormInfoMgrTest, BundleFormInfoTest0003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "BundleFormInfoTest0003 start";
+    BundleFormInfo bundleFormInfo(FORM_BUNDLE_NAME_TEST);
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = 0;
+    bundleFormInfo.formInfoStorages_.push_back(formInfoStorage);
+    FormInfoStorage formInfoStorage2;
+    formInfoStorage2.userId = USER_ID;
+    FormInfo formInfo;
+    formInfo.name = "testname";
+    formInfo.moduleName = "testmoduleName";
+    formInfoStorage2.formInfos.push_back(formInfo);
+    bundleFormInfo.formInfoStorages_.push_back(formInfoStorage2);
+    std::string moduleName = "test";
+    std::string formName = "testmodule";
+    auto ret = bundleFormInfo.RemoveDynamicFormInfo(moduleName, formName, USER_ID);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "BundleFormInfoTest0003 end";
+}
+
+/**
+ * @tc.name: BundleFormInfoTest0004
+ * @tc.number: RemoveAllDynamicFormsInfo
+ */
+HWTEST_F(FormInfoMgrTest, BundleFormInfoTest0004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "BundleFormInfoTest0004 start";
+    BundleFormInfo bundleFormInfo(FORM_BUNDLE_NAME_TEST);
+    FormInfoStorage formInfoStorage;
+    formInfoStorage.userId = 0;
+    bundleFormInfo.formInfoStorages_.push_back(formInfoStorage);
+    FormInfoStorage formInfoStorage2;
+    formInfoStorage2.userId = USER_ID;
+    FormInfo formInfo;
+    formInfo.name = "testname";
+    formInfo.moduleName = "testmoduleName";
+    formInfo.isStatic = false;
+    formInfoStorage2.formInfos.push_back(formInfo);
+    bundleFormInfo.formInfoStorages_.push_back(formInfoStorage2);
+    auto ret = bundleFormInfo.RemoveAllDynamicFormsInfo(USER_ID);
+    EXPECT_EQ(ret, ERR_OK);
+    GTEST_LOG_(INFO) << "BundleFormInfoTest0004 end";
+}
+
+/**
+ * @tc.name: FormInfoMgrTest0001
+ * @tc.number: UpdateStaticFormInfos
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgrTest0001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgrTest0001 start";
+    std::string bundleName = "";
+    auto ret = formInfoMgr_.UpdateStaticFormInfos(bundleName, USER_ID);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FormInfoMgrTest0001 end";
+}
+
+/**
+ * @tc.name: FormInfoMgrTest0002
+ * @tc.number: Remove
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgrTest0002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgrTest0002 start";
+    std::string bundleName = "";
+    auto ret = formInfoMgr_.Remove(bundleName, USER_ID);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FormInfoMgrTest0002 end";
+}
+
+/**
+ * @tc.name: FormInfoMgrTest0003
+ * @tc.number: GetAllFormsInfo
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgrTest0003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgrTest0003 start";
+    FormInfo formInfo;
+    formInfo.name = "testname";
+    formInfo.moduleName = "testmoduleName";
+    std::vector<FormInfo> formInfos;
+    formInfos.push_back(formInfo);
+    std::shared_ptr<BundleFormInfo> bundleFormInfo = nullptr;
+    std::string test = "test";
+    formInfoMgr_.bundleFormInfoMap_[test] = bundleFormInfo;
+    auto ret = formInfoMgr_.GetAllFormsInfo(formInfos);
+    EXPECT_EQ(ret, ERR_OK);
+    formInfoMgr_.bundleFormInfoMap_.clear();
+    std::string bundleName = "com.form.provider.service";
+    std::shared_ptr<BundleFormInfo> bundleFormInfo2 = std::make_shared<BundleFormInfo>(bundleName);
+    formInfoMgr_.bundleFormInfoMap_[test] = bundleFormInfo2;
+    ret = formInfoMgr_.GetAllFormsInfo(formInfos);
+    EXPECT_EQ(ret, ERR_OK);
+    GTEST_LOG_(INFO) << "FormInfoMgrTest0003 end";
+}
+
+/**
+ * @tc.name: FormInfoMgrTest0004
+ * @tc.number: GetFormsInfoByFilter
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgrTest0004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgrTest0004 start";
+    std::vector<FormInfo> formInfos;
+    FormInfoFilter filter;
+    filter.bundleName = "";
+    std::string bundleName = "com.form.provider.service";
+    std::shared_ptr<BundleFormInfo> bundleFormInfo = std::make_shared<BundleFormInfo>(bundleName);
+    std::string test = "test";
+    formInfoMgr_.bundleFormInfoMap_[test] = bundleFormInfo;
+    auto ret = formInfoMgr_.GetFormsInfoByFilter(filter, formInfos, USER_ID);
+    EXPECT_EQ(ret, ERR_OK);
+    filter.bundleName = "bundleName";
+    std::shared_ptr<BundleFormInfo> bundleFormInfo2 = nullptr;
+    formInfoMgr_.bundleFormInfoMap_[filter.bundleName] = bundleFormInfo2;
+    ret = formInfoMgr_.GetFormsInfoByFilter(filter, formInfos, USER_ID);
+    EXPECT_EQ(ret, ERR_OK);
+    GTEST_LOG_(INFO) << "FormInfoMgrTest0004 end";
+}
+
+/**
+ * @tc.name: FormInfoMgrTest0005
+ * @tc.number: GetFormsInfoByBundle
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgrTest0005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgrTest0005 start";
+    std::string bundleName = "com.form.provider.service";
+    std::vector<FormInfo> formInfos;
+    auto ret = formInfoMgr_.GetFormsInfoByBundle(bundleName, formInfos, USER_ID);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED);
+    std::shared_ptr<BundleFormInfo> bundleFormInfo = nullptr;
+    formInfoMgr_.bundleFormInfoMap_[bundleName] = bundleFormInfo;
+    ret = formInfoMgr_.GetFormsInfoByBundle(bundleName, formInfos, USER_ID);
+    EXPECT_EQ(ret, ERR_OK);
+    GTEST_LOG_(INFO) << "FormInfoMgrTest0005 end";
+}
+
+/**
+ * @tc.name: FormInfoMgrTest0006
+ * @tc.number: GetFormsInfoByModule
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgrTest0006, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgrTest0006 start";
+    std::string bundleName = "";
+    std::string moduleName = "";
+    std::vector<FormInfo> formInfos;
+    auto ret = formInfoMgr_.GetFormsInfoByModule(bundleName, moduleName, formInfos, USER_ID);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FormInfoMgrTest0006 end";
+}
+
+/**
+ * @tc.name: FormInfoMgrTest0007
+ * @tc.number: GetFormsInfoByModuleWithoutCheck
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgrTest0007, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgrTest0007 start";
+    std::string bundleName = "";
+    std::string moduleName = "";
+    std::vector<FormInfo> formInfos;
+    auto ret = formInfoMgr_.GetFormsInfoByModuleWithoutCheck(bundleName, moduleName, formInfos, USER_ID);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    bundleName = "com.form.provider.service";
+    ret = formInfoMgr_.GetFormsInfoByModuleWithoutCheck(bundleName, moduleName, formInfos, USER_ID);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED);
+    std::shared_ptr<BundleFormInfo> bundleFormInfo = nullptr;
+    formInfoMgr_.bundleFormInfoMap_[bundleName] = bundleFormInfo;
+    ret = formInfoMgr_.GetFormsInfoByModuleWithoutCheck(bundleName, moduleName, formInfos, USER_ID);
+    EXPECT_EQ(ret, ERR_OK);
+    GTEST_LOG_(INFO) << "FormInfoMgrTest0007 end";
+}
+
+/**
+ * @tc.name: FormInfoMgrTest0008
+ * @tc.number: GetFormsInfoByRecord
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgrTest0008, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgrTest0008 start";
+    std::string bundleName = "com.form.provider.service";
+    FormRecord formRecord;
+    formRecord.bundleName = bundleName;
+    FormInfo formInfo;
+    std::shared_ptr<BundleFormInfo> bundleFormInfo = nullptr;
+    formInfoMgr_.bundleFormInfoMap_[bundleName] = bundleFormInfo;
+    auto ret = formInfoMgr_.GetFormsInfoByRecord(formRecord, formInfo);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED);
+    GTEST_LOG_(INFO) << "FormInfoMgrTest0008 end";
+}
+
+/**
+ * @tc.name: FormInfoMgrTest0009
+ * @tc.number: CheckDynamicFormInfo
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgrTest0009, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgrTest0009 start";
+    FormInfo formInfo;
+    formInfo.moduleName = "moduleName";
+    formInfo.abilityName = "abilityName";
+    BundleInfo bundleInfo;
+    HapModuleInfo hapModuleInfo;
+    bundleInfo.hapModuleInfos.push_back(hapModuleInfo);
+    auto ret = formInfoMgr_.CheckDynamicFormInfo(formInfo, bundleInfo);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_NO_SUCH_MODULE);
+    bundleInfo.hapModuleInfos.clear();
+    hapModuleInfo.moduleName = "moduleName";
+    AbilityInfo abilityInfo;
+    hapModuleInfo.abilityInfos.push_back(abilityInfo);
+    ExtensionAbilityInfo extensionInfo;
+    extensionInfo.name = "";
+    hapModuleInfo.extensionInfos.push_back(extensionInfo);
+    ExtensionAbilityInfo extensionInfo2;
+    extensionInfo2.name = "abilityName";
+    hapModuleInfo.extensionInfos.push_back(extensionInfo2);
+    bundleInfo.hapModuleInfos.push_back(hapModuleInfo);
+    ret = formInfoMgr_.CheckDynamicFormInfo(formInfo, bundleInfo);
+    EXPECT_EQ(ret, ERR_OK);
+    GTEST_LOG_(INFO) << "FormInfoMgrTest0009 end";
+}
+
+/**
+ * @tc.name: FormInfoMgrTest0010
+ * @tc.number: RemoveDynamicFormInfo
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgrTest0010, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgrTest0010 start";
+    std::string bundleName = "com.form.provider.service";
+    std::string moduleName = "moduleName";
+    std::string formName = "formName";
+    auto ret = formInfoMgr_.RemoveDynamicFormInfo(bundleName, moduleName, formName, USER_ID);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FormInfoMgrTest0010 end";
+}
+
+/**
+ * @tc.name: FormInfoMgrTest0011
+ * @tc.number: GetOrCreateBundleFromInfo
+ */
+HWTEST_F(FormInfoMgrTest, FormInfoMgrTest0011, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgrTest0011 start";
+    std::string bundleName = "com.form.provider.service";
+    std::shared_ptr<BundleFormInfo> bundleFormInfo = nullptr;
+    formInfoMgr_.bundleFormInfoMap_[bundleName] = bundleFormInfo;
+    auto ret = formInfoMgr_.GetOrCreateBundleFromInfo(bundleName);
+    EXPECT_EQ(ret, nullptr);
+    GTEST_LOG_(INFO) << "FormInfoMgrTest0011 end";
+}
