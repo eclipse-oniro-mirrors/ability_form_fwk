@@ -2263,15 +2263,19 @@ ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, bool isUnusedIncl
         HILOG_ERROR("invalid formId");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
+    bool isFormRecordsEnd = false;
     FormRecord formRecord;
     std::vector<FormHostRecord> formHostRecords;
     {
         std::lock_guard<std::mutex> lock(formRecordMutex_);
         auto info = formRecords_.find(formId);
-        if (info != formRecords_.end()) {
+        isFormRecordsEnd = info == formRecords_.end();
+        if (!isFormRecordsEnd) {
             formRecord = info->second;
-            GetFormHostRecord(formId, formHostRecords);
         }
+    }
+    if (!isFormRecordsEnd) {
+        GetFormHostRecord(formId, formHostRecords);
     }
     ErrCode ret = ERR_OK;
     if (!formHostRecords.empty()) {
