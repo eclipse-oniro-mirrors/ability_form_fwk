@@ -67,6 +67,8 @@ int FormHostStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessagePar
             return HandleOnRecycleForm(data, reply);
         case static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_ENABLE_FORM):
             return HandleOnEnableForm(data, reply);
+        case static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_ERROR_FORMS):
+            return HandleOnErrorForms(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -212,5 +214,21 @@ int32_t FormHostStub::HandleOnEnableForm(MessageParcel &data, MessageParcel &rep
     reply.WriteInt32(ERR_OK);
     return ERR_OK;
 }
+ 
+int32_t FormHostStub::HandleOnErrorForms(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t errorCode = data.ReadInt32();
+    std::string errorMsg = Str16ToStr8(data.ReadString16());
+    std::vector<int64_t> formIds;
+    bool ret = data.ReadInt64Vector(&formIds);
+    if (!ret) {
+        HILOG_ERROR("fail ReadInt64Vector<formIds>");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    OnError(errorCode, errorMsg, formIds);
+    reply.WriteInt32(ERR_OK);
+    return ERR_OK;
+}
+ 
 }  // namespace AppExecFwk
 }  // namespace OHOS

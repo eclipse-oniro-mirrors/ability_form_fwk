@@ -572,10 +572,12 @@ public:
      * @param formInstanceMaps formInstances for visibleNotify.
      * @param eventMaps eventMaps for event notify.
      * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
+     * @param callerToken Caller ability token.
      */
     void HandlerNotifyWhetherVisibleForms(const std::vector<int64_t> &formIds,
         std::map<std::string, std::vector<FormInstance>> formInstanceMaps,
-        std::map<std::string, std::vector<int64_t>> eventMaps, const int32_t formVisibleType);
+        std::map<std::string, std::vector<int64_t>> eventMaps, const int32_t formVisibleType,
+        const sptr<IRemoteObject> &callerToken);
 
     /**
      * @brief Set forms recyclable

@@ -433,6 +433,20 @@ void FormRenderMgrInner::RemoveConnection(int64_t formId)
     }
 }
 
+ErrCode FormRenderMgrInner::checkConnectionsFormIds(std::vector<int64_t> formIds, std::vector<int64_t> &needConFormIds)
+{
+    HILOG_INFO("call");
+    std::lock_guard<std::mutex> lock(resourceMutex_);
+    for (const int64_t &formId : formIds) {
+        if (renderFormConnections_.find(formId) == renderFormConnections_.end()) {
+            HILOG_ERROR("need add connection of formId:%{public}" PRId64 "", formId);
+            needConFormIds.push_back(formId);
+        }
+    }
+    HILOG_INFO("end");
+    return ERR_OK;
+}
+
 void FormRenderMgrInner::RerenderAllForms()
 {
     HILOG_INFO("FRS is died,notify host");
@@ -691,6 +705,8 @@ ErrCode FormRenderMgrInner::RecycleForms(
                 continue;
             }
             connectedForms.emplace_back(formId);
+        } else {
+            HILOG_ERROR("can't find connection of %{public}" PRId64, formId);
         }
     }
     FormTaskMgr::GetInstance().PostRecycleForms(connectedForms, want, remoteObjectOfHost, remoteObject);
@@ -744,18 +760,7 @@ ErrCode FormRenderMgrInner::RecoverForms(const std::vector<int64_t> &formIds, co
 
             FormTaskMgr::GetInstance().PostRecoverForm(formRecord, want, remoteObject);
         } else {
-            HILOG_ERROR("can't find connection,need add connection,formId: %{public}" PRId64, formId);
-            auto formRenderConnection = new (std::nothrow) FormRenderConnection(formRecord, want.GetParams());
-            if (formRenderConnection == nullptr) {
-                HILOG_ERROR("null formRenderConnection");
-                return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
-            }
-            ErrCode errorCode = ConnectRenderService(formRenderConnection, formRecord.privacyLevel);
-            if (errorCode != ERR_OK) {
-                HILOG_ERROR("ConnectServiceAbility failed");
-                FormRenderMgr::GetInstance().HandleConnectFailed(formId, errorCode);
-                return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
-            }
+            HILOG_ERROR("can't find connection of %{public}" PRId64, formId);
         }
     }
     return ERR_OK;
