@@ -90,6 +90,14 @@ private:
     int32_t HandleOnError(MessageParcel &data, MessageParcel &reply);
 
     /**
+     * @brief handle OnError message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t HandleOnErrorForms(MessageParcel &data, MessageParcel &reply);
+    
+    /**
      * @brief handle OnAcquireDataResponse message.
      * @param data input param.
      * @param reply output param.
