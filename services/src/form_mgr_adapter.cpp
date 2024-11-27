@@ -997,7 +997,7 @@ void FormMgrAdapter::HandlerNotifyWhetherVisibleForms(const std::vector<int64_t>
     }
 
     if (!needConFormIds.empty()) {
-        HILOG_ERROR("reAddConnections, size: %{public}d", needConFormIds.size());
+        HILOG_ERROR("reAddConnections, size: %{public}zu", needConFormIds.size());
         FormRenderMgr::GetInstance().reAddConnections(needConFormIds, userId, callerToken);
     }
 }
