@@ -760,18 +760,7 @@ ErrCode FormRenderMgrInner::RecoverForms(const std::vector<int64_t> &formIds, co
 
             FormTaskMgr::GetInstance().PostRecoverForm(formRecord, want, remoteObject);
         } else {
-            HILOG_ERROR("can't find connection,need add connection,formId: %{public}" PRId64, formId);
-            auto formRenderConnection = new (std::nothrow) FormRenderConnection(formRecord, want.GetParams());
-            if (formRenderConnection == nullptr) {
-                HILOG_ERROR("null formRenderConnection");
-                return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
-            }
-            ErrCode errorCode = ConnectRenderService(formRenderConnection, formRecord.privacyLevel);
-            if (errorCode != ERR_OK) {
-                HILOG_ERROR("ConnectServiceAbility failed");
-                FormRenderMgr::GetInstance().HandleConnectFailed(formId, errorCode);
-                return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
-            }
+            HILOG_ERROR("can't find connection of %{public}" PRId64, formId);
         }
     }
     return ERR_OK;
