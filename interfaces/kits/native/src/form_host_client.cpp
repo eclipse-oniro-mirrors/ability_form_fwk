@@ -367,6 +367,34 @@ void FormHostClient::OnError(int32_t errorCode, const std::string &errorMsg)
     }
 }
 
+void FormHostClient::OnError(int32_t errorCode, const std::string &errorMsg, std::vector<int64_t> &formIds)
+{
+    HILOG_INFO("call");
+    HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
+    std::lock_guard<std::mutex> lock(callbackMutex_);
+    for (auto formId : formIds) {
+        if (etsFormIds_.find(formId) == etsFormIds_.end()) {
+            continue
+        }
+        auto callbackMapIter = formCallbackMap_.find(formId);
+        if (callbackMapIter == formCallbackMap_.end()) {
+            HILOG_ERROR("Can't find form:%{public}" PRId64 " remove it", formId);
+            etsFormIds_.erase(formId);
+            continue;
+        }
+        HILOG_ERROR("Receive error form FMS formId:%{public}s", std::to_string(formId).c_str());
+        const std::set<std::shared_ptr<FormCallbackInterface>> &callbackSet = callbackMapIter->second;
+        HILOG_DEBUG("callbackSet.size:%{public}zu", callbackSet.size());
+        for (const auto &callback : callbackSet) {
+            if (callback == nullptr) {
+                HILOG_ERROR("null FormCallback");
+                continue;
+            }
+            callback->OnError(errorCode, errorMsg);
+        }
+    }
+}
+
 void FormHostClient::RemoveShareFormCallback(int64_t requestCode)
 {
     HILOG_DEBUG("call");
