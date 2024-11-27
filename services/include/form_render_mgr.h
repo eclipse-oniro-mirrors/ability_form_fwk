@@ -71,6 +71,10 @@ public:
 
     void RemoveConnection(int64_t formId, const FormRecord &formRecord);
 
+    ErrCode checkConnectionsFormIds(std::vector<int64_t> formIds, int32_t userId, std::vector<int64_t> &needconFormIds);
+ 
+    void reAddConnections(std::vector<int64_t> formIds, int32_t userId, const sptr<IRemoteObject> &remoteObject);
+ 
     void AddRenderDeathRecipient(const sptr<IRemoteObject> &renderRemoteObj, const FormRecord &formRecord);
 
     bool IsNeedRender(int64_t formId);
