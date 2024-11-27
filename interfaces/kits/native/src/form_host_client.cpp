@@ -374,7 +374,7 @@ void FormHostClient::OnError(int32_t errorCode, const std::string &errorMsg, std
     std::lock_guard<std::mutex> lock(callbackMutex_);
     for (auto formId : formIds) {
         if (etsFormIds_.find(formId) == etsFormIds_.end()) {
-            continue
+            continue;
         }
         auto callbackMapIter = formCallbackMap_.find(formId);
         if (callbackMapIter == formCallbackMap_.end()) {
