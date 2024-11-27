@@ -193,7 +193,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0250, TestSize.Level0)
     formMgrAdapter.formObservers_[bundleName] = formObserver;
     std::vector<FormInstance> formInstanceVector;
     formInstanceMaps[bundleName] = formInstanceVector;
-    formMgrAdapter.HandlerNotifyWhetherVisibleForms(formIds, formInstanceMaps, eventMaps, formVisibleType);
+    formMgrAdapter.HandlerNotifyWhetherVisibleForms(formIds, formInstanceMaps, eventMaps, formVisibleType, iRemoteObjectPtr);
     auto iter = eventMaps.find(eventMapFirst);
     auto ret = formMgrAdapter.HandleEventNotify(iter->first, iter->second, formVisibleType);
     EXPECT_EQ(ret, ERR_OK);
