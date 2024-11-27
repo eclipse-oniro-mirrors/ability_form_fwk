@@ -272,6 +272,39 @@ void FormHostProxy::OnError(int32_t errorCode, const std::string &errorMsg)
     }
 }
 
+void FormHostProxy::OnError(int32_t errorCode, const std::string &errorMsg, std::vector<int64_t> &formIds)
+{
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_ASYNC);
+ 
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed");
+        return;
+    }
+ 
+    if (!data.WriteInt32(errorCode)) {
+        HILOG_ERROR("write ErrorCode failed");
+        return;
+    }
+ 
+    if (!data.WriteString16(Str8ToStr16(errorMsg))) {
+        HILOG_ERROR("fail write errorMsg");
+        return;
+    }
+ 
+    if (!data.WriteInt64Vector(formIds)) {
+        HILOG_ERROR("write formIds failed");
+    }
+ 
+    int error = SendTransactCmd(
+        IFormHost::Message::FORM_HOST_ON_ERROR_FORMS,
+        data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendRequest:%{public}d failed", error);
+    }
+}
+
 int FormHostProxy::SendTransactCmd(IFormHost::Message code, MessageParcel &data,
     MessageParcel &reply, MessageOption &option)
 {
