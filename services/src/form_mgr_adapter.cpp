@@ -899,7 +899,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
 
     FormTaskMgr::GetInstance().PostVisibleNotify(
         (formVisibleType == static_cast<int32_t>(FormVisibilityType::VISIBLE)) ? checkFormIds : formIds,
-        visibleNotifyDelay_, callerToken);
+        formInstanceMaps, eventMaps, formVisibleType, visibleNotifyDelay_, callerToken);
     return ERR_OK;
 }
 
