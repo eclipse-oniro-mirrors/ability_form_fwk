@@ -433,6 +433,20 @@ void FormRenderMgrInner::RemoveConnection(int64_t formId)
     }
 }
 
+ErrCode FormRenderMgrInner::checkConnectionsFormIds(std::vector<int64_t> formIds, std::vector<int64_t> &needConFormIds)
+{
+    HILOG_INFO("call");
+    std::lock_guard<std::mutex> lock(resourceMutex_);
+    for (const int64_t &formId : formIds) {
+        if (renderFormConnections_.find(formId) == renderFormConnections_.end()) {
+            HILOG_ERROR("need add connection of formId:%{public}" PRId64 "", formId);
+            needConFormIds.push_back(formId);
+        }
+    }
+    HILOG_INFO("end");
+    return ERR_OK;
+}
+
 void FormRenderMgrInner::RerenderAllForms()
 {
     HILOG_INFO("FRS is died,notify host");
