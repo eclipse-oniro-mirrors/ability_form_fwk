@@ -705,6 +705,8 @@ ErrCode FormRenderMgrInner::RecycleForms(
                 continue;
             }
             connectedForms.emplace_back(formId);
+        } else {
+            HILOG_ERROR("can't find connection of %{public}" PRId64, formId);
         }
     }
     FormTaskMgr::GetInstance().PostRecycleForms(connectedForms, want, remoteObjectOfHost, remoteObject);
