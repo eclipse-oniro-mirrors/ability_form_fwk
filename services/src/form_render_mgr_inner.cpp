@@ -55,10 +55,6 @@ FormRenderMgrInner::~FormRenderMgrInner()
 ErrCode FormRenderMgrInner::RenderForm(
     const FormRecord &formRecord, Want &want, const sptr<IRemoteObject> &hostToken)
 {
-    if (!isActiveUser_) {
-        HILOG_WARN("isActiveUser is false, return");
-        return ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED;
-    }
     if (atomicRerenderCount_ > 0) {
         --atomicRerenderCount_;
     } else {
@@ -68,6 +64,10 @@ ErrCode FormRenderMgrInner::RenderForm(
         HILOG_DEBUG("Add host token");
         AddHostToken(hostToken, formRecord.formId);
         want.SetParam(Constants::PARAM_FORM_HOST_TOKEN, hostToken);
+    }
+    if (!isActiveUser_) {
+        HILOG_WARN("isActiveUser is false, return");
+        return ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED;
     }
     FillBundleInfo(want, formRecord.bundleName);
 
