@@ -1312,7 +1312,7 @@ int32_t FormRenderRecord::SetVisibleChange(const int64_t &formId, bool isVisible
         HILOG_ERROR("null eventHandler");
         return SET_VISIBLE_CHANGE_FAILED;
     }
-    eventHandler->PostSyncTask(task, "SetVisibleChange");
+    eventHandler->PostTask(task, "SetVisibleChange");
     return ERR_OK;
 }
 
