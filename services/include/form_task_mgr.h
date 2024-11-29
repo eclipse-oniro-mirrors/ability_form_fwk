@@ -242,7 +242,6 @@ public:
     void PostVisibleNotify(const std::vector<int64_t> &formIds,
         std::map<std::string, std::vector<FormInstance>> &formInstanceMaps,
         std::map<std::string, std::vector<int64_t>> &eventMaps,
-        const int32_t formVisibleType, int32_t visibleNotifyDelay);
         const int32_t formVisibleType, int32_t visibleNotifyDelay,
         const sptr<IRemoteObject> &callerToken);
 
@@ -505,7 +504,6 @@ private:
     */
     void NotifyVisible(const std::vector<int64_t> &formIds,
         std::map<std::string, std::vector<FormInstance>> formInstanceMaps,
-        std::map<std::string, std::vector<int64_t>> eventMaps, const int32_t formVisibleType);
         std::map<std::string, std::vector<int64_t>> eventMaps, const int32_t formVisibleType,
         const sptr<IRemoteObject> &callerToken);
 
