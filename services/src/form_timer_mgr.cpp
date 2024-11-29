@@ -53,6 +53,9 @@ FormTimerMgr::FormTimerMgr()
 FormTimerMgr::~FormTimerMgr()
 {
     ClearIntervalTimer();
+    if (currentLimiterWantAgent_ != nullptr) {
+        ClearLimiterTimerResource();
+    }
 }
 /**
  * @brief Add form timer by timer task.
@@ -829,7 +832,7 @@ void FormTimerMgr::OnIntervalTimeOut()
     int64_t currentTime = FormUtil::GetCurrentMillisecond();
     for (auto &intervalPair : intervalTimerTasks_) {
         FormTimer &intervalTask = intervalPair.second;
-        HILOG_INFO("intervalTask formId:%{public}" PRId64 ", period:%{public}" PRId64 ""
+        HILOG_BRIEF("intervalTask formId:%{public}" PRId64 ", period:%{public}" PRId64 ""
             "currentTime:%{public}" PRId64 ", refreshTime:%{public}" PRId64 ", isEnable:%{public}d",
             intervalTask.formId, intervalTask.period, currentTime,
             intervalTask.refreshTime, intervalTask.isEnable);
@@ -875,7 +878,10 @@ bool FormTimerMgr::UpdateAtTimerAlarm()
                 return true;
             }
         }
-        ClearUpdateAtTimerResource();
+        {
+            std::lock_guard<std::mutex> lock(currentUpdateWantAgentMutex_);
+            ClearUpdateAtTimerResource();
+        }
         atTimerWakeUpTime_ = LONG_MAX;
         HILOG_INFO("no update at task in system now");
         return true;
@@ -893,7 +899,11 @@ bool FormTimerMgr::UpdateAtTimerAlarm()
     HILOG_INFO("selectTime:%{public}" PRId64 ", currentTime:%{public}" PRId64,
         selectTime, currentTime);
 
-    if (nextWakeUpTime == atTimerWakeUpTime_) {
+    int64_t timeInSec = GetBootTimeMs();
+    HILOG_INFO("timeInSec:%{public}" PRId64 ".", timeInSec);
+    int64_t nextTime = timeInSec + (selectTime - currentTime);
+    HILOG_INFO("nextTime:%{public}" PRId64, nextTime);
+    if (nextTime == atTimerWakeUpTime_) {
         HILOG_WARN("end, wakeUpTime not change, no need update alarm");
         return true;
     }
@@ -913,16 +923,15 @@ bool FormTimerMgr::UpdateAtTimerAlarm()
     }
     timerOption->SetWantAgent(wantAgent);
 
-    atTimerWakeUpTime_ = nextWakeUpTime;
-    if (currentUpdateAtWantAgent_ != nullptr) {
-        ClearUpdateAtTimerResource();
+    atTimerWakeUpTime_ = nextTime;
+    {
+        std::lock_guard<std::mutex> lock(currentUpdateWantAgentMutex_);
+        if (currentUpdateAtWantAgent_ != nullptr) {
+            ClearUpdateAtTimerResource();
+        }
+        currentUpdateAtWantAgent_ = wantAgent;
     }
-    int64_t timeInSec = GetBootTimeMs();
-    HILOG_DEBUG("timeInSec:%{public}" PRId64 ".", timeInSec);
-    int64_t nextTime = timeInSec + (selectTime - currentTime);
-    HILOG_INFO("nextTime:%{public}" PRId64, nextTime);
-
-    currentUpdateAtWantAgent_ = wantAgent;
+    
     updateAtTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption);
     bool bRet = MiscServices::TimeServiceClient::GetInstance()->StartTimer(updateAtTimerId_,
         static_cast<uint64_t>(nextTime));
@@ -999,9 +1008,8 @@ bool FormTimerMgr::UpdateLimiterAlarm()
     HILOG_INFO("start");
     if (limiterTimerId_ != 0L) {
         HILOG_INFO("clear limiter timer start");
-        MiscServices::TimeServiceClient::GetInstance()->DestroyTimerAsync(limiterTimerId_);
+        MiscServices::TimeServiceClient::GetInstance()->StopTimer(limiterTimerId_);
         HILOG_INFO("clear limiter timer end");
-        limiterTimerId_ = 0L;
     }
 
     // make limiter wakeup time
@@ -1017,26 +1025,9 @@ bool FormTimerMgr::UpdateLimiterAlarm()
     tmAtTime.tm_min = Constants::MAX_MINUTE;
     int64_t limiterWakeUpTime = FormUtil::GetMillisecondFromTm(tmAtTime);
 
-    auto timerOption = std::make_shared<FormTimerOption>();
-    timerOption->SetType(timerOption->TIMER_TYPE_EXACT);
-    timerOption->SetRepeat(false);
-    timerOption->SetInterval(0);
-    std::shared_ptr<WantAgent> wantAgent = GetLimiterWantAgent();
-    if (!wantAgent) {
-        HILOG_ERROR("create wantAgent failed");
+    if (!CreateLimiterTimer()) {
         return false;
     }
-    timerOption->SetWantAgent(wantAgent);
-    
-    {
-        std::lock_guard<std::mutex> guard(currentLimiterWantAgentMutex_);
-        if (currentLimiterWantAgent_ != nullptr) {
-            ClearLimiterTimerResource();
-        }
-        currentLimiterWantAgent_ = wantAgent;
-    }
-
-    limiterTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption);
     bool bRet = MiscServices::TimeServiceClient::GetInstance()->StartTimer(limiterTimerId_,
         static_cast<uint64_t>(limiterWakeUpTime));
     if (!bRet) {
@@ -1058,11 +1049,33 @@ void FormTimerMgr::ClearLimiterTimerResource()
         HILOG_INFO("clear limiter timer end");
         limiterTimerId_ = 0L;
     }
+
     if (currentLimiterWantAgent_ != nullptr) {
         IN_PROCESS_CALL(WantAgentHelper::Cancel(currentLimiterWantAgent_));
         currentLimiterWantAgent_ = nullptr;
     }
     HILOG_INFO("end");
+}
+
+bool FormTimerMgr::CreateLimiterTimer()
+{
+    HILOG_INFO("start");
+    auto timerOption = std::make_shared<FormTimerOption>();
+    timerOption->SetType(timerOption->TIMER_TYPE_EXACT);
+    timerOption->SetRepeat(false);
+    timerOption->SetInterval(0);
+    std::shared_ptr<WantAgent> wantAgent = GetLimiterWantAgent();
+    if (!wantAgent) {
+        HILOG_ERROR("create wantAgent failed");
+        return false;
+    }
+    timerOption->SetWantAgent(wantAgent);
+    if (limiterTimerId_ == 0L) {
+        limiterTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption);
+        currentLimiterWantAgent_ = wantAgent;
+    }
+    HILOG_INFO("end");
+    return true;
 }
 
 /**
@@ -1384,7 +1397,6 @@ void FormTimerMgr::ExecTimerTaskCore(const FormTimer &timerTask)
 void FormTimerMgr::ExecTimerTask(const FormTimer &timerTask)
 #endif // RES_SCHEDULE_ENABLE
 {
-    HILOG_INFO("start");
     AAFwk::Want want;
     if (timerTask.isCountTimer) {
         want.SetParam(Constants::KEY_IS_TIMER, true);
@@ -1394,15 +1406,14 @@ void FormTimerMgr::ExecTimerTask(const FormTimer &timerTask)
     }
     // multi user
     if (IsActiveUser(timerTask.userId)) {
-        HILOG_INFO("timerTask.userId is current user");
+        HILOG_BRIEF("timerTask.userId is current user");
         want.SetParam(Constants::PARAM_FORM_USER_ID, timerTask.userId);
     }
-    HILOG_INFO("userId:%{public}d", timerTask.userId);
+    HILOG_BRIEF("userId:%{public}d", timerTask.userId);
     auto task = [id = timerTask.formId, want]() {
         FormProviderMgr::GetInstance().RefreshForm(id, want, false);
     };
     ffrt::submit(task);
-    HILOG_INFO("end");
 }
 
 void FormTimerMgr::RefreshWhenFormVisible(const int64_t &formId, const int32_t &userId)
@@ -1445,6 +1456,7 @@ void FormTimerMgr::Init()
     limiterTimerId_ = 0L;
     limiterTimerReportId_ = 0L;
     FormRefreshCountReport();
+    CreateLimiterTimer();
     HILOG_INFO("end");
 }
 

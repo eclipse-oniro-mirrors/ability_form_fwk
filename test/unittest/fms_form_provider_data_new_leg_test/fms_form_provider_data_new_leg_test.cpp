@@ -576,25 +576,6 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_002, TestSize.Level0)
 }
 
 /**
- * @tc.name: FormProviderMgr_003
- * @tc.desc: test ConnectAmsForRefresh function.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_003, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormProviderMgr_003 start";
-    FormProviderMgr formProviderMgr;
-    int64_t formId = 1;
-    FormRecord record;
-    record.needFreeInstall = false;
-    Want want;
-    bool isTimerRefresh = true;
-    MockIsLimiterEnableRefresh(true);
-    MockConnectServiceAbility(false);
-    GTEST_LOG_(INFO) << "FormProviderMgr_003 end";
-}
-
-/**
  * @tc.name: FormProviderMgr_004
  * @tc.desc: test ConnectAmsForRefresh function.
  * @tc.type: FUNC
@@ -746,23 +727,6 @@ HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_012, TestSize.Level0)
     MockGetFormRecord(true);
     formProviderMgr->IncreaseTimerRefreshCount(formId);
     GTEST_LOG_(INFO) << "FormProviderMgr_012 end";
-}
-
-/**
- * @tc.name: FormProviderMgr_013
- * @tc.desc: test IsNeedToFresh function.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormProviderDataNewLegTest, FormProviderMgr_013, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormProviderMgr_013 start";
-    FormProviderMgr formProviderMgr;
-    FormRecord record;
-    record.formVisibleNotifyState = Constants::FORM_VISIBLE;
-    int64_t formId = 1;
-    bool isVisibleToFresh = true;
-    MockIsEnableRefresh(true);
-    GTEST_LOG_(INFO) << "FormProviderMgr_013 end";
 }
 
 /**

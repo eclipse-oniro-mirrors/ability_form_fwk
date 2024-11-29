@@ -69,6 +69,21 @@ FormProviderData::FormProviderData(std::string jsonDataString)
 }
 
 /**
+ * @brief A constructor used to create a {@code FormProviderData} instance with data of the {@code String} type
+ * specified.
+ * @param jsonDataString Indicates the data to be carried in the new {@code FormProviderData} instance, in JSON
+ * string format.
+ * @param isUsedInFRS Indicates is used in frs
+ */
+FormProviderData::FormProviderData(std::string jsonDataString, bool isUsedInFRS)
+{
+    SetDataString(jsonDataString);
+    if (!isUsedInFRS) {
+        ParseImagesData();
+    }
+}
+
+/**
  * @brief Updates form data in this {@code FormProviderData} object.
  * @param jsonData Indicates the new data to use, in {@code ZSONObject} format.
  */
@@ -120,7 +135,7 @@ void FormProviderData::AddImageData(const std::string &picName, const std::share
  */
 void FormProviderData::AddImageData(const std::string &picName, int fd)
 {
-    HILOG_INFO("fd is %{public}d", fd);
+    HILOG_BRIEF("fd is %{public}d", fd);
     if (fd < 0) {
         HILOG_ERROR("invalid fd");
         return;
@@ -131,7 +146,7 @@ void FormProviderData::AddImageData(const std::string &picName, int fd)
         HILOG_ERROR("Get file size failed, errno is %{public}d", errno);
         return;
     }
-    HILOG_INFO("File size is %{public}d", size);
+    HILOG_BRIEF("File size is %{public}d", size);
     if (lseek(fd, 0L, SEEK_SET) == -1) {
         return;
     }
@@ -151,7 +166,6 @@ void FormProviderData::AddImageData(const std::string &picName, int fd)
     }
     std::shared_ptr<char> data(bytes, DeleteBytes());
     AddImageData(picName, data, size);
-    HILOG_INFO("end");
 }
 
 void FormProviderData::ParseImagesData()

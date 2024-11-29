@@ -43,14 +43,13 @@ FormDbCache::~FormDbCache()
 void FormDbCache::Start()
 {
     HILOG_INFO("call");
-    std::lock_guard<std::mutex> lock(formDBInfosMutex_);
     std::vector<InnerFormInfo> innerFormInfos;
     innerFormInfos.clear();
     if (FormInfoRdbStorageMgr::GetInstance().LoadFormData(innerFormInfos) != ERR_OK) {
         HILOG_ERROR("LoadFormData failed");
         return;
     }
-
+    std::lock_guard<std::mutex> lock(formDBInfosMutex_);
     for (unsigned int i = 0; i < innerFormInfos.size(); i++) {
         FormDBInfo formDBInfo = innerFormInfos.at(i).GetFormDBInfo();
         formDBInfos_.emplace_back(formDBInfo);

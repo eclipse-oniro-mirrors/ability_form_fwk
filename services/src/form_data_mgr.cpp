@@ -101,6 +101,7 @@ bool FormDataMgr::DeleteFormRecord(const int64_t formId)
         return false;
     }
     formRecords_.erase(iter);
+    FormUtil::DeleteFormId(formId);
     return true;
 }
 /**
@@ -288,7 +289,7 @@ void FormDataMgr::RecycleAllRecyclableForms() const
 
 void FormDataMgr::RecycleForms(const std::vector<int64_t> &formIds, const int &callingUid, const Want &want) const
 {
-    HILOG_INFO("start");
+    HILOG_INFO("start callingUid:%{public}d", callingUid);
     std::lock_guard<std::mutex> lock(formHostRecordMutex_);
     for (auto itHostRecord = clientRecords_.begin(); itHostRecord != clientRecords_.end(); itHostRecord++) {
         if (itHostRecord->GetCallerUid() != callingUid) {
@@ -640,7 +641,7 @@ bool FormDataMgr::DeleteHostRecord(const sptr<IRemoteObject> &callerToken, const
             if (iter->IsEmpty()) {
                 iter->CleanResource();
                 iter = clientRecords_.erase(iter);
-                FormRenderMgr::GetInstance().CleanFormHost(callerToken);
+                FormRenderMgr::GetInstance().CleanFormHost(callerToken, iter->GetCallerUid());
             }
             break;
         }
@@ -700,6 +701,7 @@ void FormDataMgr::UpdateHostForms(const std::vector<int64_t> &updateFormIds)
 void FormDataMgr::HandleHostDied(const sptr<IRemoteObject> &remoteHost)
 {
     std::vector<int64_t> recordTempForms;
+    int remoteHostCallerUid = 0;
     {
         std::lock_guard<std::mutex> lock(formHostRecordMutex_);
         std::vector<FormHostRecord>::iterator itHostRecord;
@@ -708,6 +710,7 @@ void FormDataMgr::HandleHostDied(const sptr<IRemoteObject> &remoteHost)
                 HandleHostDiedForTempForms(*itHostRecord, recordTempForms);
                 HILOG_INFO("find died client,remove it");
                 itHostRecord->CleanResource();
+                remoteHostCallerUid = itHostRecord->GetCallerUid();
                 itHostRecord = clientRecords_.erase(itHostRecord);
                 break;
             } else {
@@ -745,7 +748,7 @@ void FormDataMgr::HandleHostDied(const sptr<IRemoteObject> &remoteHost)
             }
         }
     }
-    FormRenderMgr::GetInstance().CleanFormHost(remoteHost);
+    FormRenderMgr::GetInstance().CleanFormHost(remoteHost, remoteHostCallerUid);
 }
 
 /**
@@ -900,6 +903,22 @@ void FormDataMgr::SetNeedRefresh(const int64_t formId, const bool needRefresh)
         return;
     }
     itFormRecord->second.needRefresh = needRefresh;
+}
+
+/**
+ * @brief Set needRefresh for FormRecord.
+ * @param formId The Id of the form.
+ * @param needRefresh true or false.
+ */
+void FormDataMgr::SetNeedAddForm(const int64_t formId, const bool needAddForm)
+{
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    auto itFormRecord = formRecords_.find(formId);
+    if (itFormRecord == formRecords_.end()) {
+        HILOG_ERROR("form info not find");
+        return;
+    }
+    itFormRecord->second.needAddForm = needAddForm;
 }
 
 /**
@@ -2168,14 +2187,21 @@ ErrCode FormDataMgr::GetFormInstancesByFilter(const FormInstancesFilter &formIns
 ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, FormInstance &formInstance)
 {
     HILOG_DEBUG("get form instance by formId");
-    std::lock_guard<std::mutex> lock(formRecordMutex_);
-    if (formId <= 0) {
-        HILOG_ERROR("invalid formId");
-        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    bool isFormRecordsEnd = false;
+    FormRecord formRecord;
+    {
+        std::lock_guard<std::mutex> lock(formRecordMutex_);
+        if (formId <= 0) {
+            HILOG_ERROR("invalid formId");
+            return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+        }
+        auto info = formRecords_.find(formId);
+        isFormRecordsEnd = info == formRecords_.end();
+        if (!isFormRecordsEnd) {
+            formRecord = info->second;
+        }
     }
-    auto info = formRecords_.find(formId);
-    if (info != formRecords_.end()) {
-        FormRecord formRecord = info->second;
+    if (!isFormRecordsEnd) {
         std::vector<FormHostRecord> formHostRecords;
         GetFormHostRecord(formId, formHostRecords);
         if (formHostRecords.empty()) {
@@ -2234,15 +2260,19 @@ ErrCode FormDataMgr::GetFormInstanceById(const int64_t formId, bool isUnusedIncl
         HILOG_ERROR("invalid formId");
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
+    bool isFormRecordsEnd = false;
     FormRecord formRecord;
     std::vector<FormHostRecord> formHostRecords;
     {
         std::lock_guard<std::mutex> lock(formRecordMutex_);
         auto info = formRecords_.find(formId);
-        if (info != formRecords_.end()) {
+        isFormRecordsEnd = info == formRecords_.end();
+        if (!isFormRecordsEnd) {
             formRecord = info->second;
-            GetFormHostRecord(formId, formHostRecords);
         }
+    }
+    if (!isFormRecordsEnd) {
+        GetFormHostRecord(formId, formHostRecords);
     }
     ErrCode ret = ERR_OK;
     if (!formHostRecords.empty()) {
@@ -2559,6 +2589,17 @@ void FormDataMgr::EnableForms(const std::vector<FormRecord> &&formRecords, const
             itHostRecord->OnEnableForms(matchedFormIds, enable);
         }
     }
+}
+
+void FormDataMgr::GetFormIdsByUserId(int32_t userId, std::vector<int64_t> &formIds)
+{
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    for (auto formRecord : formRecords_) {
+        if (formRecord.second.userId == userId) {
+            formIds.emplace_back(formRecord.second.formId);
+        }
+    }
+    HILOG_INFO("userId:%{public}d, size:%{public}zu", userId, formIds.size());
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

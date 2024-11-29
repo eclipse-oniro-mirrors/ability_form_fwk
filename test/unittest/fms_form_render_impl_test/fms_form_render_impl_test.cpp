@@ -40,6 +40,7 @@ namespace {
 constexpr int32_t RENDER_FORM_FAILED = -1;
 constexpr int32_t RELOAD_FORM_FAILED = -1;
 constexpr int32_t RECYCLE_FORM_FAILED = -1;
+constexpr int32_t SET_VISIBLE_CHANGE_FAILED = -1;
 } // namespace
 
 class FormRenderImplTest : public testing::Test {
@@ -741,6 +742,11 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_035, TestSize.Level0)
     want.SetParam(Constants::FORM_SUPPLY_UID, uid);
     auto formRenderRecord = FormRenderRecord::Create("bundleName", uid);
     EXPECT_TRUE(formRenderRecord);
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = formId;
+    std::shared_ptr<AbilityRuntime::Context> context = nullptr;
+    std::shared_ptr<AbilityRuntime::Runtime> runtime = nullptr;
+    formRenderRecord->GetFormRendererGroup(formJsInfo, context, runtime);
     formRenderImpl.renderRecordMap_.emplace(uid, formRenderRecord);
     sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormSupplyStub();
     sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
@@ -874,6 +880,110 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_042, TestSize.Level0)
     formRenderImpl.ConfirmUnlockState(want);
 
     EXPECT_TRUE(formRenderImpl.isVerified_);
+}
+
+/**
+* @tc.name: FormRenderImplTest_043
+* @tc.desc: 1.Verify SetVisibleChange interface executes as expected.
+* 2.call SetVisibleChange
+* @tc.type: FUNC
+*/
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_043, TestSize.Level0)
+{
+    FormRenderImpl formRenderImpl;
+    int64_t formId{ 0 };
+    Want want;
+
+    EXPECT_EQ(formRenderImpl.SetVisibleChange(formId, true, want), ERR_APPEXECFWK_FORM_INVALID_FORM_ID);
+}
+
+/**
+* @tc.name: FormRenderImplTest_044
+* @tc.desc: 1.Verify SetVisibleChange interface executes as expected.
+* 2.call SetVisibleChange
+* @tc.type: FUNC
+*/
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_044, TestSize.Level0)
+{
+    FormRenderImpl formRenderImpl;
+    int64_t formId{ 3 };
+    Want want;
+    EXPECT_EQ(formRenderImpl.SetVisibleChange(formId, true, want), ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+}
+
+/**
+* @tc.name: FormRenderImplTest_045
+* @tc.desc: 1.Verify SetVisibleChange interface executes as expected.
+* 2.call SetVisibleChange
+* @tc.type: FUNC
+*/
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_045, TestSize.Level0)
+{
+    FormRenderImpl formRenderImpl;
+    int64_t formId{ 3 };
+    std::string uid{ "202410101010" };
+    Want want;
+    want.SetParam(Constants::FORM_SUPPLY_UID, uid);
+    EXPECT_EQ(formRenderImpl.SetVisibleChange(formId, true, want), SET_VISIBLE_CHANGE_FAILED);
+}
+
+/**
+* @tc.name: FormRenderImplTest_046
+* @tc.desc: 1.Verify SetVisibleChange interface executes as expected.
+* 2.call SetVisibleChange
+* @tc.type: FUNC
+*/
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_046, TestSize.Level0)
+{
+    FormRenderImpl formRenderImpl;
+    int64_t formId{ 3 };
+    Want want;
+    std::string uid{ "202410101010" };
+    want.SetParam(Constants::FORM_SUPPLY_UID, uid);
+    formRenderImpl.renderRecordMap_.emplace("2024101010", nullptr);
+    EXPECT_EQ(formRenderImpl.SetVisibleChange(formId, true, want), SET_VISIBLE_CHANGE_FAILED);
+}
+
+/**
+* @tc.name: FormRenderImplTest_047
+* @tc.desc: 1.Verify SetVisibleChange interface executes as expected.
+* 2.call SetVisibleChange
+* @tc.type: FUNC
+*/
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_047, TestSize.Level0)
+{
+    FormRenderImpl formRenderImpl;
+    int64_t formId{ 3 };
+    Want want;
+    std::string uid{ "202410101010" };
+    want.SetParam(Constants::FORM_SUPPLY_UID, uid);
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", "2024101010");
+    formRenderImpl.renderRecordMap_.emplace("2024101010", formRenderRecord);
+    EXPECT_EQ(formRenderImpl.SetVisibleChange(formId, true, want), SET_VISIBLE_CHANGE_FAILED);
+}
+
+/**
+* @tc.name: FormRenderImplTest_048
+* @tc.desc: 1.Verify SetVisibleChange interface executes as expected.
+* 2.call SetVisibleChange
+* @tc.type: FUNC
+*/
+HWTEST_F(FormRenderImplTest, FormRenderImplTest_048, TestSize.Level0)
+{
+    FormRenderImpl formRenderImpl;
+    int64_t formId{ 3 };
+    Want want;
+    std::string uid{ "202410101010" };
+    want.SetParam(Constants::FORM_SUPPLY_UID, uid);
+    auto formRenderRecord = FormRenderRecord::Create("bundleName", uid);
+    EXPECT_TRUE(formRenderRecord);
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = formId;
+    std::shared_ptr<AbilityRuntime::Context> context = nullptr;
+    std::shared_ptr<AbilityRuntime::Runtime> runtime = nullptr;
+    formRenderRecord->GetFormRendererGroup(formJsInfo, context, runtime);
+    formRenderImpl.renderRecordMap_.emplace(uid, formRenderRecord);
+    EXPECT_EQ(formRenderImpl.SetVisibleChange(formId, true, want), ERR_OK);
 }
 
 /**

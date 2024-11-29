@@ -19,8 +19,17 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <fstream>
+#include <filesystem>
 
 #include "fms_log_wrapper.h"
+#include "nlohmann/json.hpp"
+#include "config_policy_utils.h"
+
+const std::string FORM_MODULE_WHITE_LIST_PATH = "/etc/form_fwk_module_white_list.json";
+const std::string KEY_MODULE_ALLOW = "moduleAllowList";
+
+std::vector<std::string> FormModuleChecker::modulesFromCfg_ = FormModuleChecker::GetModuleAllowList();
 
 bool FormModuleChecker::CheckApiAllowList(const std::string& apiPath)
 {
@@ -94,6 +103,11 @@ bool FormModuleChecker::CheckModuleLoadable(const char *moduleName,
 
 bool FormModuleChecker::IsModuelAllowToLoad(const std::string& moduleName)
 {
+    for (const auto& item : modulesFromCfg_) {
+        if (item == moduleName) {
+            return true;
+        }
+    }
     const std::vector<std::string> moduleAllowList = {
         "i18n",
         "intl",
@@ -109,4 +123,32 @@ bool FormModuleChecker::IsModuelAllowToLoad(const std::string& moduleName)
     }
 
     return false;
+}
+
+std::vector<std::string> FormModuleChecker::GetModuleAllowList()
+{
+    HILOG_INFO("read moduleAllowList from config file");
+    std::vector<std::string> result;
+    char buf[MAX_PATH_LEN];
+    char* path = GetOneCfgFile(FORM_MODULE_WHITE_LIST_PATH.c_str(), buf, MAX_PATH_LEN);
+    if (path == nullptr || *path == '\0') {
+        HILOG_ERROR("config file not found");
+        return result;
+    }
+    std::ifstream file(path);
+    if (!file.is_open()) {
+        HILOG_ERROR("failed to open config file");
+        return result;
+    }
+    HILOG_INFO("success to open config file");
+    nlohmann::json jsonData;
+    file >> jsonData;
+    if (jsonData.contains(KEY_MODULE_ALLOW) && jsonData[KEY_MODULE_ALLOW].is_array()) {
+        for (const auto& module : jsonData[KEY_MODULE_ALLOW]) {
+            HILOG_INFO("read moduleAllowList module: %{public}s", std::string(module).c_str());
+            result.push_back(module);
+        }
+    }
+    file.close();
+    return result;
 }

@@ -51,12 +51,14 @@ ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<Fo
         return ERR_OK;
     }
 
-    std::lock_guard<std::mutex> lock(formDataProxyRecordMutex_);
-    auto search = formDataProxyRecordMap_.find(formId);
-    if (search != formDataProxyRecordMap_.end()) {
-        if (search->second != nullptr) {
-            HILOG_DEBUG("the form has already subscribed, formId:%{public}s", std::to_string(formId).c_str());
-            search->second->UnsubscribeFormData();
+    {
+        std::lock_guard<std::mutex> lock(formDataProxyRecordMutex_);
+        auto search = formDataProxyRecordMap_.find(formId);
+        if (search != formDataProxyRecordMap_.end()) {
+            if (search->second != nullptr) {
+                HILOG_DEBUG("the form has already subscribed, formId:%{public}s", std::to_string(formId).c_str());
+                search->second->UnsubscribeFormData();
+            }
         }
     }
 
@@ -74,6 +76,7 @@ ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<Fo
         HILOG_ERROR("SubscribeFormData failed");
         return ret;
     }
+    std::lock_guard<std::mutex> lock(formDataProxyRecordMutex_);
     formDataProxyRecordMap_[formId] = formDataProxyRecord;
     return ERR_OK;
 }

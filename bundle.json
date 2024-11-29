@@ -27,6 +27,7 @@
         "deps": {
           "components": [
               "ability_runtime",
+              "background_task_mgr",
               "distributed_notification_service",
               "bundle_framework",
               "common_event_service",
@@ -59,7 +60,8 @@
               "resource_schedule_service",
               "theme_mgr",
               "jsoncpp",
-              "libxml2"
+              "libxml2",
+              "config_policy"
 
           ],
           "third_party": [

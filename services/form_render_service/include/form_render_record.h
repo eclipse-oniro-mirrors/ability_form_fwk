@@ -106,6 +106,10 @@ public:
 
     int32_t OnUnlock();
 
+    int32_t SetVisibleChange(const int64_t &formId, bool isVisible);
+
+    int32_t HandleSetVisibleChange(const int64_t &formId, bool isVisible);
+
     int32_t ReloadFormRecord(const std::vector<FormJsInfo> &&formJsInfos, const Want &want);
 
     int32_t HandleReloadFormRecord(const std::vector<FormJsInfo> &&formJsInfos, const Want &want);
@@ -228,6 +232,10 @@ private:
         const bool &isRecoverFormToHandleClickEvent);
 
     void HandleFormRenderGC();
+
+    bool InitCompIds(const int64_t &formId,
+        std::vector<std::string> &orderedCompIds, std::string &currentCompId);
+
     bool RecoverFormRequestsInGroup(const FormJsInfo &formJsInfo, const std::string &statusData,
         const bool &isHandleClickEvent, const std::unordered_map<std::string, Ace::FormRequest> &recordFormRequests);
     bool RecoverRenderer(const std::vector<Ace::FormRequest> &groupRequests, const size_t &currentRequestIndex);

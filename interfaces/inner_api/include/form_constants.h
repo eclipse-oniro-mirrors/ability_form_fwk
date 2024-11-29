@@ -93,6 +93,7 @@ namespace Constants {
     constexpr const char* PARAM_PUBLISH_FORM_HOST_SCREENY_KEY = "ohos.extra.param.key.add_form_to_host_screeny";
     constexpr const char* CPU_SCENE_ID_CONFIG_UPDATE  = "1";
     constexpr const char* PARAM_DYNAMIC_NAME_KEY = "isDynamic";
+    constexpr const char* RECYCLE_FORMS_USER_ID = "ohos.extra.param.key.recycle_forms_user_id";
     constexpr const char* PARAM_APP_CLONE_INDEX_KEY = "ohos.extra.param.key.appCloneIndex";
 
     constexpr int32_t UNKNOWN = 0;
@@ -115,6 +116,8 @@ namespace Constants {
     // The max uid of system app.
     constexpr int32_t MAX_SYSTEM_APP_UID = 10000;
 
+    constexpr int32_t CALLING_UID_TRANSFORM_DIVISOR = 200000;
+
     constexpr int32_t MIN_TIME_SPEED = 1;
     constexpr int32_t MAX_TIME_SPEED = 1000;
     constexpr int32_t MAX_HOUR = 23;
@@ -132,7 +135,7 @@ namespace Constants {
     constexpr int32_t MAX_CONFIG_DURATION = 2 * 24 * 7; // one week
     const long MIN_PERIOD = MIN_CONFIG_DURATION * TIME_CONVERSION; // 30 min in ms unit
     const long MAX_PERIOD = MAX_CONFIG_DURATION * TIME_CONVERSION; // 1 week in ms unit
-    const long ABS_TIME = 5 * TIME_1000; // 5s abs time
+    const long ABS_TIME = 30 * TIME_1000; // 30s abs time
     constexpr const char* TIME_DELIMETER = ":";
     constexpr int32_t UPDATE_AT_CONFIG_COUNT = 2;
 

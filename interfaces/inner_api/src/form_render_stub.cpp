@@ -64,6 +64,8 @@ int FormRenderStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageP
         case static_cast<uint32_t>(IFormRender::Message::FORM_RUN_CACHED_CONFIG):
             RunCachedConfigurationUpdated();
             return ERR_OK;
+        case static_cast<uint32_t>(IFormRender::Message::FORM_SET_VISIBLE_CHANGE):
+            return HandleSetVisibleChange(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -164,6 +166,22 @@ int32_t FormRenderStub::HandleOnUnlock(MessageParcel &data, MessageParcel &reply
 {
     int32_t result = OnUnlock();
     reply.WriteInt32(result);
+    return result;
+}
+
+int32_t FormRenderStub::HandleSetVisibleChange(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_ERROR("begin");
+    int64_t formId = data.ReadInt64();
+    bool isVisible = data.ReadBool();
+    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
+    if (!want) {
+        HILOG_ERROR("error to ReadParcelable<Want>");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int32_t result = SetVisibleChange(formId, isVisible, *want);
+    reply.WriteInt32(result);
+    HILOG_ERROR("end");
     return result;
 }
 

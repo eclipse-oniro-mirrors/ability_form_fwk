@@ -293,6 +293,12 @@ private:
      */
     void ExecTimerTask(const FormTimer &task);
 
+    /**
+     * @brief create limiter timer
+     * @return Returns true on success, false on failure.
+     */
+    bool CreateLimiterTimer();
+
 #ifdef RES_SCHEDULE_ENABLE
     /**
      * @brief Execute Form timer task.
@@ -404,6 +410,7 @@ private:
     uint64_t limiterTimerReportId_ = 0L;
 
     mutable std::mutex currentLimiterWantAgentMutex_;
+    mutable std::mutex currentUpdateWantAgentMutex_;
     std::shared_ptr<WantAgent> currentUpdateAtWantAgent_ = nullptr;
     std::shared_ptr<WantAgent> currentDynamicWantAgent_ = nullptr;
     std::shared_ptr<WantAgent> currentLimiterWantAgent_ = nullptr;

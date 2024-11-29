@@ -68,6 +68,8 @@ public:
 
     virtual int32_t OnUnlock() { return ERR_OK; }
 
+    virtual int32_t SetVisibleChange(const int64_t &formId, bool isVisible, const Want &want) { return ERR_OK; }
+
     virtual int32_t RecycleForm(const int64_t &formId, const Want &want) { return ERR_OK; }
 
     virtual int32_t RecoverForm(const FormJsInfo &formJsInfo, const Want &want) { return ERR_OK; }
@@ -93,6 +95,7 @@ public:
         FORM_RECYCLE_FORM = 3107,
         FORM_RECOVER_FORM = 3108,
         FORM_RUN_CACHED_CONFIG = 3109,
+        FORM_SET_VISIBLE_CHANGE = 3110,
     };
 };
 } // namespace AppExecFwk

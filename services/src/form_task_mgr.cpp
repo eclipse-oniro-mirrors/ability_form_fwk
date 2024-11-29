@@ -17,6 +17,7 @@
 
 #include <cinttypes>
 #include <utility>
+#include <cmath>
 
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
@@ -601,11 +602,15 @@ void FormTaskMgr::ProviderBatchDelete(std::set<int64_t> &formIds, const Want &wa
     const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_INFO("start");
+    if (formIds.empty()) {
+        HILOG_ERROR("FormIds is empty");
+        return;
+    }
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);
     sptr<IFormProvider> formProviderProxy = iface_cast<IFormProvider>(remoteObject);
     if (formProviderProxy == nullptr) {
         RemoveConnection(connectId);
-        HILOG_ERROR("get formProviderProxy failed");
+        HILOG_ERROR("Failed to get formProviderProxy");
         return;
     }
     std::vector<int64_t> vFormIds;
@@ -811,7 +816,27 @@ void FormTaskMgr::PostRenderForm(const FormRecord &formRecord, const Want &want,
     auto renderForm = [formRecord, want, remoteObject]() {
         FormTaskMgr::GetInstance().RenderForm(formRecord, want, remoteObject);
     };
-    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, renderForm);
+
+    int64_t formId = formRecord.formId;
+    int64_t lastRecoverTime = 0;
+    {
+        std::lock_guard<std::mutex> lock(formRecoverTimesMutex_);
+        if (formLastRecoverTimes.find(formId) != formLastRecoverTimes.end()) {
+            lastRecoverTime = formLastRecoverTimes[formId];
+            formLastRecoverTimes.erase(formId);
+        }
+    }
+
+    int32_t recoverInterval = (int32_t) (FormUtil::GetCurrentMillisecond() - lastRecoverTime);
+    if (lastRecoverTime <= 0 || recoverInterval > FORM_BUILD_DELAY_TIME) {
+        serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, renderForm);
+    } else {
+        HILOG_INFO("delay render task: %{public}" PRId32 " ms, formId is %{public}" PRId64, recoverInterval, formId);
+        int32_t delayTime = FORM_BUILD_DELAY_TIME - recoverInterval;
+        delayTime = std::min(delayTime, FORM_BUILD_DELAY_TIME);
+        delayTime = std::max(delayTime, FORM_TASK_DELAY_TIME);
+        serialQueue_->ScheduleDelayTask(std::make_pair((int64_t)TaskType::RENDER_FORM, formId), delayTime, renderForm);
+    }
     HILOG_DEBUG("end");
 }
 
@@ -854,6 +879,10 @@ void FormTaskMgr::PostStopRenderingForm(
     auto deleterenderForm = [formRecord, want, remoteObject]() {
         FormTaskMgr::GetInstance().StopRenderingForm(formRecord, want, remoteObject);
     };
+    {
+        std::lock_guard<std::mutex> lock(formRecoverTimesMutex_);
+        formLastRecoverTimes.erase(formRecord.formId);
+    }
     serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, deleterenderForm);
 }
 
@@ -892,6 +921,10 @@ void FormTaskMgr::PostReleaseRenderer(
     auto deleterenderForm = [formId, compId, uid, remoteObject]() {
         FormTaskMgr::GetInstance().ReleaseRenderer(formId, compId, uid, remoteObject);
     };
+    {
+        std::lock_guard<std::mutex> lock(formRecoverTimesMutex_);
+        formLastRecoverTimes.erase(formId);
+    }
     serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, deleterenderForm);
     HILOG_INFO("end");
 }
@@ -983,11 +1016,51 @@ void FormTaskMgr::PostOnUnlock(const sptr<IRemoteObject> &remoteObject)
     HILOG_DEBUG("end");
 }
 
+void FormTaskMgr::SetVisibleChange(int64_t formId, bool isVisible, const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_INFO("begin");
+    sptr<IFormRender> remoteFormRender = iface_cast<IFormRender>(remoteObject);
+    if (remoteFormRender == nullptr) {
+        HILOG_ERROR("get formRenderProxy failed");
+        return;
+    }
+
+    FormRecord formRecord;
+    if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
+        HILOG_ERROR("form %{public}" PRId64 " not exist", formId);
+        return;
+    }
+
+    Want want;
+    want.SetParam(Constants::FORM_SUPPLY_UID, std::to_string(formRecord.providerUserId) + formRecord.bundleName);
+
+    int32_t error = remoteFormRender->SetVisibleChange(formId, isVisible, want);
+    if (error != ERR_OK) {
+        HILOG_ERROR("fail");
+        return;
+    }
+    HILOG_INFO("end");
+}
+
+void FormTaskMgr::PostSetVisibleChange(int64_t formId, bool isVisible, const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_INFO("call");
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("null serialQueue_");
+        return;
+    }
+    auto task = [formId, isVisible, remoteObject]() {
+        FormTaskMgr::GetInstance().SetVisibleChange(formId, isVisible, remoteObject);
+    };
+    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, task);
+    HILOG_INFO("end");
+}
+
 void FormTaskMgr::RemoveConnection(int32_t connectId)
 {
     auto formSupplyCallback = FormSupplyCallback::GetInstance();
     if (formSupplyCallback == nullptr) {
-        HILOG_ERROR("null formSupplyCallback");
+        HILOG_ERROR("formSupplyCallback is nullptr.");
         return;
     }
     formSupplyCallback->RemoveConnection(connectId);
@@ -1103,6 +1176,10 @@ void FormTaskMgr::PostRecycleForms(const std::vector<int64_t> &formIds, const Wa
         auto recycleForm = [formId, remoteObjectOfHost, remoteObjectOfRender]() {
             FormTaskMgr::GetInstance().RecycleForm(formId, remoteObjectOfHost, remoteObjectOfRender);
         };
+        {
+            std::lock_guard<std::mutex> lock(formRecoverTimesMutex_);
+            formLastRecoverTimes.erase(formId);
+        }
         serialQueue_->ScheduleDelayTask(
             std::make_pair((int64_t)TaskType::RECYCLE_FORM, formId), delayTime, recycleForm);
     }
@@ -1163,6 +1240,10 @@ void FormTaskMgr::PostRecoverForm(const FormRecord &record, const Want &want, co
     auto recoverForm = [record, want, remoteObject]() {
         FormTaskMgr::GetInstance().RecoverForm(record, want, remoteObject);
     };
+    {
+        std::lock_guard<std::mutex> lock(formRecoverTimesMutex_);
+        formLastRecoverTimes[record.formId] = FormUtil::GetCurrentMillisecond();
+    }
     serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, recoverForm);
     HILOG_DEBUG("end");
 }

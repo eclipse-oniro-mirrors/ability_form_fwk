@@ -1,4 +1,4 @@
-# Copyright (c) 2023 Huawei Device Co., Ltd.
+# Copyright (c) 2023-2024 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -29,6 +29,7 @@ ohos_unittest("FrsFormRenderRecordTest") {
   sources = [
     "${form_fwk_path}/test/mock/src/mock_form_provider_client.cpp",
     "${form_fwk_path}/test/unittest/frs_form_render_record_test/frs_form_render_record_test.cpp",
+    "${form_fwk_path}/test/unittest/frs_form_render_record_test/mock_form_renderer_group.cpp",
   ]
 
   include_dirs = [
@@ -54,6 +55,7 @@ ohos_unittest("FrsFormRenderRecordTest") {
   ]
 
   external_deps = [
+    "ability_base:configuration",
     "ability_base:extractortool",
     "ability_base:want",
     "ability_runtime:ability_deps_wrapper",

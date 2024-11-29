@@ -83,7 +83,6 @@ static const int64_t MAX_NUMBER_OF_JS = 0x20000000000000;
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-constexpr int32_t CALLING_UID_TRANSFORM_DIVISOR = 200000;
 constexpr int32_t SYSTEM_UID = 1000;
 constexpr int32_t API_11 = 11;
 constexpr int32_t DEFAULT_USER_ID = 100;
@@ -824,6 +823,18 @@ int FormMgrAdapter::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
     return FormProviderMgr::GetInstance().RefreshForm(matchedFormId, reqWant, true);
 }
 
+void FormMgrAdapter::SetVisibleChange(const int64_t formId, const int32_t formVisibleType)
+{
+    if (formId <= 0
+        || (formVisibleType != Constants::FORM_VISIBLE && formVisibleType != Constants::FORM_INVISIBLE)) {
+        HILOG_WARN("param is not right");
+        return;
+    }
+
+    bool isVisible = (formVisibleType == Constants::FORM_VISIBLE) ? true : false;
+    FormRenderMgr::GetInstance().SetVisibleChange(formId, isVisible);
+}
+
 ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &formIds,
     const sptr<IRemoteObject> &callerToken, const int32_t formVisibleType)
 {
@@ -857,7 +868,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
         if (!isFormShouldUpdateProviderInfoToHost(matchedFormId, userId, callerToken, formRecord)) {
             continue;
         }
-
+        SetVisibleChange(matchedFormId, formVisibleType);
         PaddingNotifyVisibleFormsMap(formVisibleType, formId, formInstanceMaps);
         checkFormIds.push_back(formId);
         // Update info to host and check if the form was created by the system application.
@@ -919,7 +930,6 @@ bool FormMgrAdapter::HasFormVisible(const uint32_t tokenId)
         }
     }
 
-    HILOG_INFO("tokenId:%{public}d no visibleCard", tokenId);
     return false;
 }
 
@@ -1499,11 +1509,12 @@ ErrCode FormMgrAdapter::AddExistFormRecord(const FormItemInfo &info, const sptr<
         newRecord.formProviderInfo.SetImageDataMap(imageDataMap);
     }
     FormRenderMgr::GetInstance().RenderForm(newRecord, wantParams, callerToken);
-    if (newRecord.needRefresh || FormCacheMgr::GetInstance().NeedAcquireProviderData(newRecord.formId)
+    if (newRecord.needRefresh || newRecord.needAddForm
+        || FormCacheMgr::GetInstance().NeedAcquireProviderData(newRecord.formId)
         || wantParams.HasParam(Constants::PARAM_HOST_BG_INVERSE_COLOR_KEY)) {
-        HILOG_INFO("acquire ProviderFormInfo async, formId:%{public}" PRId64, formId);
         newRecord.isInited = false;
         FormDataMgr::GetInstance().SetFormCacheInited(formId, false);
+        FormDataMgr::GetInstance().SetNeedAddForm(formId, false);
 
         // acquire formInfo from provider
         ErrCode errorCode = AcquireProviderFormInfoAsync(formId, info, wantParams);
@@ -1674,6 +1685,7 @@ ErrCode FormMgrAdapter::HandleEventNotify(const std::string &providerKey, const 
 ErrCode FormMgrAdapter::AcquireProviderFormInfoAsync(const int64_t formId,
     const FormItemInfo &info, const WantParams &wantParams)
 {
+    HILOG_INFO("acquire ProviderFormInfo async, formId:%{public}" PRId64, formId);
     std::string providerBundleName = info.GetProviderBundleName();
     if (!info.IsEnableForm()) {
         HILOG_INFO("Bundle:%{public}s forbidden", providerBundleName.c_str());
@@ -1717,7 +1729,7 @@ ErrCode FormMgrAdapter::InnerAcquireProviderFormInfoAsync(const int64_t formId,
     want.AddFlags(Want::FLAG_ABILITY_FORM_ENABLED);
     ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbility(want, formAcquireConnection);
     FormReport::GetInstance().SetStartBindTime(formId, FormUtil::GetCurrentSteadyClockMillseconds());
-    if (errorCode != ERR_OK) {
+    if (errorCode != ERR_OK && errorCode != ERR_ECOLOGICAL_CONTROL_STATUS) {
         HILOG_ERROR("ConnectServiceAbility failed");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
@@ -1793,7 +1805,7 @@ ErrCode FormMgrAdapter::GetFormInfo(const AAFwk::Want &want, FormInfo &formInfo)
     ErrCode errCode = FormInfoMgr::GetInstance().GetFormsInfoByModule(bundleName, moduleName,
         formInfos, userId);
     if (errCode != ERR_OK) {
-        HILOG_ERROR("GetFormsInfoByModule,fail get form config info.");
+        HILOG_ERROR("GetFormsInfoByModule,get formConfigInfo failed,userId:%{public}d", userId);
         return errCode;
     }
 
@@ -1813,7 +1825,7 @@ ErrCode FormMgrAdapter::GetFormInfo(const AAFwk::Want &want, FormInfo &formInfo)
         }
     }
 
-    HILOG_ERROR("Fail get form info,abilityName:%{public}s,formName:%{public}s,userId:%{public}d",
+    HILOG_ERROR("fail get form info,abilityName:%{public}s,formName:%{public}s,userId:%{public}d",
         abilityName.c_str(), formName.c_str(), userId);
     return abilityExisting ? ERR_APPEXECFWK_FORM_GET_INFO_FAILED : ERR_APPEXECFWK_FORM_NO_SUCH_ABILITY;
 }
@@ -2385,7 +2397,7 @@ ErrCode FormMgrAdapter::AddRequestPublishForm(const FormItemInfo &formItemInfo, 
 
     // create form info for js
     FormDataMgr::GetInstance().CreateFormJsInfo(formId, formRecord, formJsInfo);
-    FormDataMgr::GetInstance().SetNeedRefresh(formId, true);
+    FormDataMgr::GetInstance().SetNeedAddForm(formId, true);
     if (formProviderData != nullptr) {
         formJsInfo.formData = formProviderData->GetDataString();
         formJsInfo.formProviderData = *formProviderData;
@@ -2869,7 +2881,7 @@ bool FormMgrAdapter::CheckKeepBackgroundRunningPermission(const sptr<IBundleMgr>
 int32_t FormMgrAdapter::GetCurrentUserId(const int callingUid)
 {
     // get current userId
-    int32_t userId = callingUid / CALLING_UID_TRANSFORM_DIVISOR;
+    int32_t userId = callingUid / Constants::CALLING_UID_TRANSFORM_DIVISOR;
     AccountSA::OsAccountManager::GetOsAccountLocalIdFromUid(callingUid, userId);
     return userId;
 }
@@ -3667,9 +3679,8 @@ int32_t FormMgrAdapter::SetFormsRecyclable(const std::vector<int64_t> &formIds)
     return ERR_OK;
 }
 
-int32_t FormMgrAdapter::RecycleForms(const std::vector<int64_t> &formIds, const Want &want)
+int32_t FormMgrAdapter::RecycleForms(const std::vector<int64_t> &formIds, const Want &want, bool isCheckCallingUid)
 {
-    HILOG_DEBUG("called");
     FormRecord record;
     std::vector<int64_t> validFormIds;
     int callingUid = IPCSkeleton::GetCallingUid();
@@ -3700,12 +3711,14 @@ int32_t FormMgrAdapter::RecycleForms(const std::vector<int64_t> &formIds, const 
             HILOG_WARN("form %{public}" PRId64 " is already RECYCLED", formId);
             continue;
         }
-        if (std::find(record.formUserUids.begin(), record.formUserUids.end(), callingUid) ==
+        if (isCheckCallingUid && std::find(record.formUserUids.begin(), record.formUserUids.end(), callingUid) ==
             record.formUserUids.end()) {
             HILOG_WARN("form %{public}" PRId64 " not owned by %{public}d", formId, callingUid);
             continue;
         }
-
+        if (!isCheckCallingUid && callingUid < Constants::CALLING_UID_TRANSFORM_DIVISOR) {
+            callingUid = *(record.formUserUids.begin());
+        }
         record.recycleStatus = RecycleStatus::RECYCLABLE;
         FormDataMgr::GetInstance().UpdateFormRecord(matchedFormId, record);
         validFormIds.emplace_back(matchedFormId);

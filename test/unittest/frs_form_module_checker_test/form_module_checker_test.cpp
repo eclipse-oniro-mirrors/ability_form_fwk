@@ -18,6 +18,9 @@
 #include "form_module_checker.h"
 #undef private
 #include "utils/log.h"
+#include <algorithm>
+#include <string>
+#include <vector>
 
 class FormModuleCheckerTest : public testing::Test {
 public:
@@ -307,4 +310,19 @@ HWTEST_F(FormModuleCheckerTest, Test016, testing::ext::TestSize.Level1)
     EXPECT_TRUE(FormModuleChecker::CheckApiWithSuffix("multimedia.", "multimedia.image"));
     EXPECT_FALSE(FormModuleChecker::CheckApiWithSuffix("multimedia..", "multimedia.image.PixelMapFormat.*"));
     EXPECT_FALSE(FormModuleChecker::CheckApiWithSuffix("multimedia.abc", "multimedia.image.PixelMapFormat.*"));
+}
+
+/**
+ * @tc.name: Test017
+ * @tc.desc: test GetModuleAllowList function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormModuleCheckerTest, Test017, testing::ext::TestSize.Level1)
+{
+    std::vector<std::string> result = FormModuleChecker::GetModuleAllowList();
+    std::string targetModule = "hds.analogclock";
+    if (result.size() > 0) {
+        auto it = std::find(result.begin(), result.end(), targetModule);
+        EXPECT_TRUE(it != result.end());
+    }
 }

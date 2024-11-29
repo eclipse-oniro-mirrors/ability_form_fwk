@@ -590,9 +590,10 @@ public:
      * @brief Recycle forms
      * @param formIds Indicates the id of the forms.
      * @param want The want of forms to be recycled.
+     * @param isCheckCallingUid is need check CallingUid, default is true.
      * @return Returns ERR_OK on success, others on failure.
      */
-    int32_t RecycleForms(const std::vector<int64_t> &formIds, const Want &want);
+    int32_t RecycleForms(const std::vector<int64_t> &formIds, const Want &want, bool isCheckCallingUid = true);
 
     /**
      * @brief Recover recycled forms
@@ -1193,6 +1194,8 @@ private:
     int DeleteCommonForm(const int64_t formId, const sptr<IRemoteObject> &callerToken);
 
     void CheckUpdateFormRecord(const int64_t formId, const FormItemInfo &info, FormRecord &record);
+
+    void SetVisibleChange(const int64_t formId, const int32_t formVisibleType);
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
