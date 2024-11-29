@@ -95,7 +95,16 @@ public:
      * @param errorMsg Indicates error-message of the form.
      */
     void OnError(int32_t errorCode, const std::string &errorMsg) override;
-
+    
+     /**
+     * @brief Return error to host for forms.
+     *
+     * @param errorCode Indicates error-code of the form.
+     * @param errorMsg Indicates error-message of the form.
+     * @param formIds Indicates ids of the form.
+     */
+    void OnError(int32_t errorCode, const std::string &errorMsg, std::vector<int64_t> &formIds) override;
+    
     /**
      * @brief Form provider is acquire data
      * @param wantParams Indicates the data information acquired by the form.

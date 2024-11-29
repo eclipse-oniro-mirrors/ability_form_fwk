@@ -69,6 +69,8 @@ public:
 
     void RemoveConnection(int64_t formId, int32_t privacyLevel);
 
+    ErrCode checkConnectionsFormIds(std::vector<int64_t> formIds, std::vector<int64_t> &needconFormIds);
+
     void AddRenderDeathRecipient(const sptr<IRemoteObject> &renderRemoteObj, int32_t privacyLevel);
 
     bool IsNeedRender(int64_t formId);

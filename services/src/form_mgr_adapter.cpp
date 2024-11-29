@@ -844,6 +844,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
     int32_t userId = FormUtil::GetCurrentAccountId();
     std::map<std::string, std::vector<int64_t>> eventMaps;
     std::map<std::string, std::vector<FormInstance>> formInstanceMaps;
+    std::vector<int64_t> checkFormIds;
 
     for (int64_t formId : formIds) {
         if (formId <= 0) {
@@ -858,7 +859,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
         }
 
         PaddingNotifyVisibleFormsMap(formVisibleType, formId, formInstanceMaps);
-
+        checkFormIds.push_back(formId);
         // Update info to host and check if the form was created by the system application.
         if ((!UpdateProviderInfoToHost(matchedFormId, userId, callerToken, formVisibleType, formRecord)) ||
             (!formRecord.isSystemApp)) {
@@ -885,8 +886,9 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
         }
     }
 
-    FormTaskMgr::GetInstance().PostVisibleNotify(formIds, formInstanceMaps, eventMaps, formVisibleType,
-        visibleNotifyDelay_);
+    FormTaskMgr::GetInstance().PostVisibleNotify(
+        (formVisibleType == static_cast<int32_t>(FormVisibilityType::VISIBLE)) ? checkFormIds : formIds,
+        formInstanceMaps, eventMaps, formVisibleType, visibleNotifyDelay_, callerToken);
     return ERR_OK;
 }
 
@@ -953,9 +955,11 @@ void FormMgrAdapter::PaddingNotifyVisibleFormsMap(const int32_t formVisibleType,
 
 void FormMgrAdapter::HandlerNotifyWhetherVisibleForms(const std::vector<int64_t> &formIds,
     std::map<std::string, std::vector<FormInstance>> formInstanceMaps,
-    std::map<std::string, std::vector<int64_t>> eventMaps, const int32_t formVisibleType)
+    std::map<std::string, std::vector<int64_t>> eventMaps, const int32_t formVisibleType,
+    const sptr<IRemoteObject> &callerToken)
 {
     HILOG_DEBUG("start");
+    HILOG_INFO("start");
     FilterDataByVisibleType(formInstanceMaps, eventMaps, formVisibleType);
     for (auto formObserver : formObservers_) {
         NotifyWhetherFormsVisible(formObserver.first, formObserver.second, formInstanceMaps, formVisibleType);
@@ -969,6 +973,17 @@ void FormMgrAdapter::HandlerNotifyWhetherVisibleForms(const std::vector<int64_t>
         FormDataProxyMgr::GetInstance().EnableSubscribeFormData(formIds);
     } else if (formVisibleType == static_cast<int32_t>(FormVisibilityType::INVISIBLE)) {
         FormDataProxyMgr::GetInstance().DisableSubscribeFormData(formIds);
+    }
+        
+    int32_t userId = FormUtil::GetCurrentAccountId();
+    std::vector<int64_t> needConFormIds;
+    if (formVisibleType == static_cast<int32_t>(FormVisibilityType::VISIBLE)) {
+        FormRenderMgr::GetInstance().checkConnectionsFormIds(formIds, userId, needConFormIds);
+    }
+
+    if (!needConFormIds.empty()) {
+        HILOG_ERROR("reAddConnections, size: %{public}zu", needConFormIds.size());
+        FormRenderMgr::GetInstance().reAddConnections(needConFormIds, userId, callerToken);
     }
 }
 
