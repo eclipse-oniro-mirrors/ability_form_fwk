@@ -1123,12 +1123,9 @@ void FormTaskMgr::PostVisibleNotify(const std::vector<int64_t> &formIds,
     HILOG_DEBUG("call");
     if (serialQueue_ == nullptr) {
         HILOG_ERROR("null serialQueue_");
-        FormTaskMgr::GetInstance().NotifyVisible(formIds, formInstanceMaps, eventMaps, formVisibleType);
         FormTaskMgr::GetInstance().NotifyVisible(formIds, formInstanceMaps, eventMaps, formVisibleType, callerToken);
         return;
     }
-    auto task = [formIds, formInstanceMaps, eventMaps, formVisibleType]() {
-        FormTaskMgr::GetInstance().NotifyVisible(formIds, formInstanceMaps, eventMaps, formVisibleType);
     auto task = [formIds, formInstanceMaps, eventMaps, formVisibleType, callerToken]() {
         FormTaskMgr::GetInstance().NotifyVisible(formIds, formInstanceMaps, eventMaps, formVisibleType, callerToken);
     };
