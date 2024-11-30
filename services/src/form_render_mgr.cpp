@@ -457,7 +457,7 @@ bool FormRenderMgr::IsRerenderForRenderServiceDied(int64_t formId)
     bool isGetFormRecord = FormDataMgr::GetInstance().GetFormRecord(formId, formRecord);
     if (!isGetFormRecord) {
         HILOG_ERROR("get FormRecord fail, not exist such form, formId:%{public}" PRId64 "", formId);
-        return true;
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
     HILOG_INFO("formId:%{public}" PRId64 ", formUserId:%{public}d", formId, formRecord.userId);
     auto renderIter = renderInners_.find(formRecord.userId);

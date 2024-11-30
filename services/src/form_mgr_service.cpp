@@ -1730,7 +1730,7 @@ bool FormMgrService::IsFormBundleForbidden(const std::string &bundleName)
 {
     HILOG_DEBUG("call");
     if (!CheckCallerIsSystemApp()) {
-        return true;
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
     }
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_IsFormBundleForbidden",
         API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);

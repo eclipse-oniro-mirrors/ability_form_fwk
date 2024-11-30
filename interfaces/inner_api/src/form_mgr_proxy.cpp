@@ -2351,12 +2351,12 @@ bool FormMgrProxy::IsFormBundleForbidden(const std::string &bundleName)
     MessageParcel data;
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("write interface token failed");
-        return true;
+        return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     if (!data.WriteString(bundleName)) {
         HILOG_ERROR("write bundleName failed");
-        return true;
+        return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     MessageParcel reply;

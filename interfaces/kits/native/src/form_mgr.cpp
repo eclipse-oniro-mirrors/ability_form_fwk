@@ -396,7 +396,7 @@ bool FormMgr::HasFormVisible(const uint32_t tokenId)
     std::shared_lock<std::shared_mutex> lock(connectMutex_);
     if (remoteProxy_ == nullptr) {
         HILOG_ERROR("null remoteProxy_");
-        return false;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return remoteProxy_->HasFormVisible(tokenId);
 }
@@ -1233,7 +1233,7 @@ bool FormMgr::IsRequestPublishFormSupported()
     std::shared_lock<std::shared_mutex> lock(connectMutex_);
     if (remoteProxy_ == nullptr) {
         HILOG_ERROR("null remoteProxy_");
-        return false;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return remoteProxy_->IsRequestPublishFormSupported();
 }
@@ -1295,7 +1295,7 @@ bool FormMgr::CheckFMSReady()
     std::shared_lock<std::shared_mutex> lock(connectMutex_);
     if (remoteProxy_ == nullptr) {
         HILOG_ERROR("null remoteProxy_");
-        return false;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     bool resultCode = remoteProxy_->CheckFMSReady();
     if (resultCode == false) {
@@ -1315,7 +1315,7 @@ bool FormMgr::IsSystemAppForm(const std::string &bundleName)
     std::shared_lock<std::shared_mutex> lock(connectMutex_);
     if (remoteProxy_ == nullptr) {
         HILOG_ERROR("null remoteProxy_");
-        return false;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return remoteProxy_->IsSystemAppForm(bundleName);
 }
@@ -1870,7 +1870,7 @@ bool FormMgr::IsFormBundleForbidden(const std::string &bundleName)
     std::shared_lock<std::shared_mutex> lock(connectMutex_);
     if (remoteProxy_ == nullptr) {
         HILOG_ERROR("null remoteProxy_");
-        return false;
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return remoteProxy_->IsFormBundleForbidden(bundleName);
 }
