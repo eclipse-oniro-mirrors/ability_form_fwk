@@ -1148,7 +1148,6 @@ void FormTaskMgr::NotifyVisible(const std::vector<int64_t> &formIds,
 {
     HILOG_INFO("call");
     FormMgrAdapter::GetInstance().HandlerNotifyWhetherVisibleForms(formIds,
-        formInstanceMaps, eventMaps, formVisibleType);
         formInstanceMaps, eventMaps, formVisibleType, callerToken);
 }
 
