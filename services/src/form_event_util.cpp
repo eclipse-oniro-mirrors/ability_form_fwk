@@ -133,6 +133,7 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
 
     Want want;
     want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
+    want.SetParam(Constants::FORM_ENABLE_UPDATE_REFRESH_KEY, true);
     for (const auto &updatedForm : updatedForms) {
         FormProviderMgr::GetInstance().RefreshForm(updatedForm.formId, want, true);
     }
