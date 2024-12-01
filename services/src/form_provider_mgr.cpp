@@ -139,9 +139,11 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
     }
 
 #ifdef SUPPORT_POWER
+    bool isFormProviderUpdate = want.GetBoolParam(Constants::FORM_ENABLE_UPDATE_REFRESH_KEY, false);
+    newWant.RemoveParam(Constants::FORM_ENABLE_UPDATE_REFRESH_KEY);
     bool screenOnFlag = PowerMgr::PowerMgrClient::GetInstance().IsScreenOn();
     bool collaborationScreenOnFlag = PowerMgr::PowerMgrClient::GetInstance().IsCollaborationScreenOn();
-    if (!screenOnFlag && !collaborationScreenOnFlag) {
+    if (!screenOnFlag && !collaborationScreenOnFlag && !isFormProviderUpdate) {
         FormDataMgr::GetInstance().SetNeedRefresh(formId, true);
         HILOG_DEBUG("screen off, set refresh flag, do not refresh now");
         return ERR_OK;

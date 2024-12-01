@@ -314,6 +314,8 @@ namespace Constants {
     constexpr const char* MODULE_HAP_PATH_KEY = "hap_path";
     // Form enable skeleton key
     constexpr const char* FORM_ENABLE_SKELETON_KEY = "ohos.extra.param.key.enable_skeleton";
+    // Allow form update and refresh
+    constexpr const char* FORM_ENABLE_UPDATE_REFRESH_KEY = "enableFormUpdateRefresh";
 }  // namespace Constants
 }  // namespace AppExecFwk
 }  // namespace OHOS
