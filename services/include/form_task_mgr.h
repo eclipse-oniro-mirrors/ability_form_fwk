@@ -237,11 +237,13 @@ public:
     * @param eventMaps eventMaps for event notify.
     * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
     * @param visibleNotifyDelay delay time.
+    * @param callerToken Caller ability token.
     */
     void PostVisibleNotify(const std::vector<int64_t> &formIds,
         std::map<std::string, std::vector<FormInstance>> &formInstanceMaps,
         std::map<std::string, std::vector<int64_t>> &eventMaps,
-        const int32_t formVisibleType, int32_t visibleNotifyDelay);
+        const int32_t formVisibleType, int32_t visibleNotifyDelay,
+        const sptr<IRemoteObject> &callerToken);
 
     /**
     * @brief Post form click event.
@@ -498,10 +500,12 @@ private:
     * @param formInstanceMaps formInstances for visibleNotify.
     * @param eventMaps eventMaps for event notify.
     * @param formVisibleType The form visible type, including FORM_VISIBLE and FORM_INVISIBLE.
+    * @param callerToken Caller ability token.
     */
     void NotifyVisible(const std::vector<int64_t> &formIds,
         std::map<std::string, std::vector<FormInstance>> formInstanceMaps,
-        std::map<std::string, std::vector<int64_t>> eventMaps, const int32_t formVisibleType);
+        std::map<std::string, std::vector<int64_t>> eventMaps, const int32_t formVisibleType,
+        const sptr<IRemoteObject> &callerToken);
 
     /**
      * @brief Handle recycle form message.

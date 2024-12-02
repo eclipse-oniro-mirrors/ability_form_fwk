@@ -345,6 +345,29 @@ void FormRenderMgr::RemoveConnection(int64_t formId, const FormRecord &formRecor
     }
 }
 
+ErrCode FormRenderMgr::checkConnectionsFormIds(std::vector<int64_t> formIds, int32_t userId,
+    std::vector<int64_t> &needconFormIds)
+{
+    auto iter = renderInners_.find(userId);
+    if (iter == renderInners_.end()) {
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    return iter->second->checkConnectionsFormIds(formIds, needconFormIds);
+}
+ 
+void FormRenderMgr::reAddConnections(std::vector<int64_t> formIds,
+    int32_t userId, const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_ERROR("reAddConnections - Connect formIds, ");
+ 
+    sptr<IFormHost> hostClient = iface_cast<IFormHost>(remoteObject);
+    if (hostClient == nullptr) {
+        HILOG_ERROR("null hostClient");
+        return;
+    }
+    hostClient->OnError(ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED, "FormRenderService is dead.", formIds);
+}
+
 void FormRenderMgr::CleanFormHost(const sptr<IRemoteObject> &host, const int hostCallingUid)
 {
     int32_t hostUserId = hostCallingUid / Constants::CALLING_UID_TRANSFORM_DIVISOR;

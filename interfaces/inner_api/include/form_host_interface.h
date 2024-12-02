@@ -77,6 +77,15 @@ public:
     virtual void OnError(int32_t errorCode, const std::string &errorMsg) = 0;
 
     /**
+     * @brief Return error to host.
+     *
+     * @param errorCode Indicates error-code of the form.
+     * @param errorMsg Indicates error-message of the form.
+     * @param formIds Indicates ids of the form.
+     */
+    virtual void OnError(int32_t errorCode, const std::string &errorMsg, std::vector<int64_t> &formIds) = 0;
+
+    /**
      * @brief Called when form provider acquired data
      * @param wantParams Indicates the data information acquired by the form.
      * @param requestCode Indicates the requested id.
@@ -126,6 +135,9 @@ public:
 
         // ipc id for enable form style (3689)
         FORM_HOST_ON_ENABLE_FORM,
+                 
+        // ipc id for enable form style (3690)
+        FORM_HOST_ON_ERROR_FORMS,
     };
 };
 }  // namespace AppExecFwk

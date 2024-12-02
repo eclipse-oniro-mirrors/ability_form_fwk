@@ -44,6 +44,8 @@ public:
     {}
     void OnError(int32_t errorCode, const std::string &errorMsg) override
     {}
+    void OnError(int32_t errorCode, const std::string &errorMsg, std::vector<int64_t> &formIds) override
+    {}
     void OnAcquireDataResponse(const AAFwk::WantParams &wantParams, int64_t requestCode) override
     {}
 };
