@@ -48,7 +48,7 @@ public:
     MOCK_METHOD2(QuerySql, std::shared_ptr<AbsSharedResultSet>(const std::string&, const std::vector<std::string>&));
     MOCK_METHOD2(QuerySql, std::shared_ptr<AbsSharedResultSet>(const std::string&, const std::vector<ValueObject>&));
     MOCK_METHOD2(QueryByStep, std::shared_ptr<ResultSet>(const std::string&, const std::vector<std::string>&));
-    MOCK_METHOD2(QueryByStep, std::shared_ptr<ResultSet>(const std::string&, const std::vector<ValueObject>&));
+    MOCK_METHOD3(QueryByStep, std::shared_ptr<ResultSet>(const std::string&, const std::vector<ValueObject>&, bool));
     MOCK_METHOD2(ExecuteSql, int(const std::string&, const std::vector<ValueObject>&));
     MOCK_METHOD3(ExecuteAndGetLong, int(int64_t&, const std::string&, const std::vector<ValueObject>&));
     MOCK_METHOD3(ExecuteAndGetString, int(std::string&, const std::string&, const std::vector<ValueObject>&));
@@ -57,7 +57,8 @@ public:
     MOCK_METHOD2(Backup, int(const std::string&, const std::vector<uint8_t>&));
     MOCK_METHOD2(Count, int(int64_t&, const AbsRdbPredicates&));
     MOCK_METHOD2(Query, std::shared_ptr<AbsSharedResultSet>(const AbsRdbPredicates&, const std::vector<std::string>&));
-    MOCK_METHOD2(QueryByStep, std::shared_ptr<ResultSet>(const AbsRdbPredicates&, const std::vector<std::string>&));
+    MOCK_METHOD3(QueryByStep, std::shared_ptr<ResultSet>(const AbsRdbPredicates&, const std::vector<std::string>&,
+                 bool));
     MOCK_METHOD4(RemoteQuery, std::shared_ptr<ResultSet>(const std::string&, const AbsRdbPredicates&,
                  const std::vector<std::string>&, int&));
     MOCK_METHOD3(Update, int(int&, const ValuesBucket&, const AbsRdbPredicates&));
