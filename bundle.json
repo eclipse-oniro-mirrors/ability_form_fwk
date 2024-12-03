@@ -33,6 +33,7 @@
               "distributed_notification_service",
               "bundle_framework",
               "common_event_service",
+              "cJSON",
               "faultloggerd",
               "ffrt",
               "hilog",
@@ -63,7 +64,11 @@
               "theme_mgr",
               "jsoncpp",
               "libxml2",
-              "config_policy"
+              "config_policy",
+              "device_manager",
+              "dmsfwk",
+              "huks",
+              "selinux_adapter"
 
           ],
           "third_party": [

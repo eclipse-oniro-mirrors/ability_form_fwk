@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+# Copyright (c) 2021-2024 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -56,6 +56,7 @@ ohos_unittest("FmsFormTimerMgrTest") {
     "access_token:libtoken_setproc",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
+    "cJSON:cjson",
     "c_utils:utils",
     "common_event_service:cesfwk_core",
     "common_event_service:cesfwk_innerkits",
@@ -64,6 +65,7 @@ ohos_unittest("FmsFormTimerMgrTest") {
     "form_fwk:form_manager",
     "hilog:libhilog",
     "ipc:ipc_core",
+    "selinux_adapter:librestorecon",
     "time_service:time_client",
   ]
 }

@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+# Copyright (c) 2021-2024 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -37,10 +37,7 @@ ohos_unittest("FmsFormMgrCastTempFormTest") {
     "${form_fwk_path}/interfaces/inner_api/include",
   ]
 
-  configs = [
-    "${form_fwk_path}/test:formmgr_test_config",
-    "${ability_runtime_path}/services/abilitymgr:abilityms_config",
-  ]
+  configs = [ "${form_fwk_path}/test:formmgr_test_config" ]
   cflags = []
   if (target_cpu == "arm") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
@@ -62,12 +59,14 @@ ohos_unittest("FmsFormMgrCastTempFormTest") {
     "ability_base:base",
     "ability_base:configuration",
     "ability_base:want",
+    "ability_runtime:ability_manager",
     "ability_runtime:app_manager",
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
+    "cJSON:cjson",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "eventhandler:libeventhandler",
@@ -75,10 +74,12 @@ ohos_unittest("FmsFormMgrCastTempFormTest") {
     "form_fwk:form_manager",
     "hilog:libhilog",
     "ipc:ipc_core",
+    "libxml2:libxml2",
     "memmgr:memmgrclient",
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "selinux_adapter:librestorecon",
   ]
 }
 

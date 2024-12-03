@@ -37,10 +37,7 @@ ohos_unittest("FmsFormRdbDataMgrTest") {
     "${form_fwk_path}/interfaces/inner_api/include",
   ]
 
-  configs = [
-    "${form_fwk_path}/test:formmgr_test_config",
-    "${ability_runtime_path}/services/abilitymgr:abilityms_config",
-  ]
+  configs = [ "${form_fwk_path}/test:formmgr_test_config" ]
   cflags = []
   if (target_cpu == "arm") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
@@ -53,6 +50,7 @@ ohos_unittest("FmsFormRdbDataMgrTest") {
 
   external_deps = [
     "ability_base:want",
+    "ability_runtime:ability_manager",
     "ability_runtime:app_manager",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
@@ -60,6 +58,7 @@ ohos_unittest("FmsFormRdbDataMgrTest") {
     "eventhandler:libeventhandler",
     "form_fwk:form_manager",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "ipc:ipc_core",
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
