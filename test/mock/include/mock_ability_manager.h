@@ -834,11 +834,19 @@ public:
         return startAbilityWithSpecifyTokenId_;
     }
 
+    int StartAbilityOnlyUIAbility(const Want& want, const sptr<IRemoteObject>& callerToken,
+        uint32_t specifyTokenId)
+    {
+        return startAbilityOnlyUIAbility_;
+    }
+
     int32_t startAbility_ = 0;
 
     int32_t startAbilityByCall_ = 0;
 
     int32_t startAbilityWithSpecifyTokenId_ = 0;
+
+    int32_t startAbilityOnlyUIAbility_ = 0;
 private:
     Semaphore sem_;
 };
