@@ -2557,21 +2557,6 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
     }
 
     want.SetParam(Constants::PARAM_APP_CLONE_INDEX_KEY, 0);
-    if (!want.GetUriString().empty()) {
-        HILOG_INFO("Router by uri");
-        if (FormRouterProxyMgr::GetInstance().HasRouterProxy(formId)) {
-            HILOG_INFO("proxy was setted sucessful");
-            FormRouterProxyMgr::GetInstance().OnFormRouterEvent(formId, want);
-            return ERR_OK;
-        }
-        int32_t result = FormAmsHelper::GetInstance().GetAbilityManager()->StartAbility(want, callerToken);
-        if (result != ERR_OK && result != START_ABILITY_WAITING) {
-            HILOG_ERROR("fail StartAbility, result:%{public}d", result);
-            return result;
-        }
-        NotifyFormClickEvent(formId, FORM_CLICK_ROUTER);
-        return ERR_OK;
-    }
 
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
     FormRecord record;
@@ -2587,7 +2572,7 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
 
-    if (record.bundleName != want.GetBundle()) {
+    if (record.bundleName != want.GetBundle() && want.GetUriString().empty()) {
         if (!record.isSystemApp) {
             HILOG_WARN("Only system apps can launch the ability of the other apps");
             want.SetBundle(record.bundleName);
@@ -2605,7 +2590,20 @@ int FormMgrAdapter::RouterEvent(const int64_t formId, Want &want, const sptr<IRe
         HILOG_ERROR("Get app info failed");
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
-    result = IN_PROCESS_CALL(FormAmsHelper::GetInstance().GetAbilityManager()->StartAbilityWithSpecifyTokenId(
+
+    if (!want.GetUriString().empty()) {
+        HILOG_INFO("Router by uri");
+        int32_t result = IN_PROCESS_CALL(FormAmsHelper::GetInstance().GetAbilityManager()->StartAbilityOnlyUIAbility(
+            want, callerToken, appInfo.accessTokenId));
+        if (result != ERR_OK && result != START_ABILITY_WAITING) {
+            HILOG_ERROR("fail StartAbility, result:%{public}d", result);
+            return result;
+        }
+        NotifyFormClickEvent(formId, FORM_CLICK_ROUTER);
+        return ERR_OK;
+    }
+
+    result = IN_PROCESS_CALL(FormAmsHelper::GetInstance().GetAbilityManager()->StartAbilityOnlyUIAbility(
         want, callerToken, appInfo.accessTokenId));
     if (result != ERR_OK && result != START_ABILITY_WAITING) {
         HILOG_ERROR("fail StartAbility, result:%{public}d", result);
