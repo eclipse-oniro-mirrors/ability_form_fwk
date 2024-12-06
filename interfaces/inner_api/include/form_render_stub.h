@@ -78,6 +78,8 @@ private:
     int32_t HandleRecycleForm(MessageParcel &data, MessageParcel &reply);
 
     int32_t HandleRecoverForm(MessageParcel &data, MessageParcel &reply);
+
+    int32_t HandleUpdateFormSize(MessageParcel &data, MessageParcel &reply);
 private:
     template<typename T>
     int32_t GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos);

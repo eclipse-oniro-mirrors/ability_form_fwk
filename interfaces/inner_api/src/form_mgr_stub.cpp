@@ -260,6 +260,8 @@ int FormMgrStub::OnRemoteRequestFourth(uint32_t code, MessageParcel &data, Messa
             return HandleIsSystemAppForm(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_IS_FORM_BUNDLE_FORBIDDEN):
             return HandleIsFormBundleForbidden(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UPDATE_FORM_SIZE):
+            return HandleUpdateFormSize(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -1612,6 +1614,21 @@ ErrCode FormMgrStub::HandleIsFormBundleForbidden(MessageParcel &data, MessagePar
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleUpdateFormSize(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("call");
+    int64_t formId = data.ReadInt64();
+    float width = data.ReadFloat();
+    float height = data.ReadFloat();
+    float borderWidth = data.ReadFloat();
+    ErrCode result = UpdateFormSize(formId, width, height, borderWidth);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return result;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

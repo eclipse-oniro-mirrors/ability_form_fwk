@@ -3885,5 +3885,11 @@ int32_t FormMgrAdapter::EnableForms(const std::string bundleName, const bool ena
     }
     return ERR_OK;
 }
+	
+ErrCode FormMgrAdapter::UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth)
+{
+    FormRenderMgr::GetInstance().UpdateFormSize(formId, width, height, borderWidth);
+    return ERR_OK;
+}
 } // namespace AppExecFwk
 } // namespace OHOS

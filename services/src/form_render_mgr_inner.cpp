@@ -766,6 +766,26 @@ ErrCode FormRenderMgrInner::RecoverForms(const std::vector<int64_t> &formIds, co
     return ERR_OK;
 }
 
+ErrCode FormRenderMgrInner::UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth)
+{
+    HILOG_DEBUG("call");
+    sptr<IRemoteObject> remoteObject;
+    auto ret = GetRenderObject(remoteObject);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("null remoteObjectGotten");
+        return ret;
+    }
+
+    FormRecord formRecord;
+    if (!FormDataMgr::GetInstance().GetFormRecord(formId, formRecord)) {
+        HILOG_ERROR("form record %{public}" PRId64 " not exist", formId);
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+    std::string uid = std::to_string(formRecord.providerUserId) + formRecord.bundleName;
+    FormTaskMgr::GetInstance().PostUpdateFormSize(formId, width, height, borderWidth, uid, remoteObject);
+    return ERR_OK;
+}
+
 ErrCode FormRenderMgrInner::GetRenderObject(sptr<IRemoteObject> &renderObj)
 {
     std::shared_lock<std::shared_mutex> guard(renderRemoteObjMutex_);

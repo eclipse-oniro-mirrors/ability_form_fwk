@@ -648,6 +648,16 @@ public:
      * @return Returns true for form bundle is controlled.
      */
     bool IsFormBundleForbidden(const std::string &bundleName) override;
+
+    /**
+     * @brief Update form size.
+     * @param formId The Id of the form to update.
+     * @param width The width value to be updated.
+     * @param height The height value to be updated.
+     * @param borderWidth The borderWidth value to be updated.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth) override;
 private:
     /**
      * OnAddSystemAbility, OnAddSystemAbility will be called when the listening SA starts.

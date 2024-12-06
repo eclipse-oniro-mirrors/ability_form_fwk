@@ -583,6 +583,13 @@ private:
      */
     int OnRemoteRequestFourth(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
 
+    /**
+     * @brief Handle update form size.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleUpdateFormSize(MessageParcel &data, MessageParcel &reply);
 private:
     DISALLOW_COPY_AND_MOVE(FormMgrStub);
 
