@@ -825,6 +825,41 @@ ErrCode FormInfoMgr::ReloadFormInfos(const int32_t userId)
     return ERR_OK;
 }
 
+bool FormInfoMgr::CheckFormVersionCode(const std::string &bundleName, int32_t userId)
+{
+    HILOG_INFO("CheckFormVersionCode begin, userId:%{public}d", userId);
+    std::map<std::string, std::uint32_t> bundleVersionMap {};
+    ErrCode result = GetBundleVersionMap(bundleVersionMap, userId);
+    if (result != ERR_OK) {
+        return false;
+    }
+
+    HILOG_INFO("CheckFormVersionCode, bundleName set number:%{public}zu", bundleVersionMap.size());
+    std::unique_lock<std::shared_timed_mutex> guard(bundleFormInfoMapMutex_);
+    auto const &oldBundleVersionPair= bundleVersionMap.find(bundleName);
+    if (oldBundleVersionPair != bundleVersionMap.end()) {
+        uint32_t oldVersionCode = oldBundleVersionPair->second;
+        uint32_t newVersionCode = ERR_VERSION_CODE;
+
+        for (auto const &bundleFormInfoPair : bundleFormInfoMap_) {
+            if (bundleFormInfoPair.first == bundleName) {
+                newVersionCode = bundleFormInfoPair.second->GetVersionCode(userId);
+                break;
+            }
+        }
+        HILOG_INFO("CheckFormVersionCode, bundleName=%{public}s, oldVersionCode:%{public}d, newVersionCode:%{public}d",
+                   bundleName.c_str(), oldVersionCode, newVersionCode);
+        if (oldVersionCode == newVersionCode) {
+            HILOG_INFO("vesionCode not change, bundleName=%{public}s, versionCode:%{public}d",
+                bundleName.c_str(), oldVersionCode);
+            return true;
+        }
+    }
+    HILOG_INFO("CheckFormVersionCode end, userId:%{public}d", userId);
+    return false;
+}
+
+
 bool FormInfoMgr::HasReloadedFormInfos()
 {
     HILOG_DEBUG("Reloaded Form Infos state %{public}d", hasReloadedFormInfosState_);

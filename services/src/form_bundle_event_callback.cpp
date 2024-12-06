@@ -17,6 +17,7 @@
 
 #include "form_bundle_forbid_mgr.h"
 #include "form_task_mgr.h"
+#include "form_info_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -55,6 +56,12 @@ void FormBundleEventCallback::OnReceiveEvent(const EventFwk::CommonEventData eve
         // install or update
         HILOG_INFO("bundleName:%{public}s changed", bundleName.c_str());
         FormEventUtil::HandleBundleFormInfoChanged(bundleName, userId);
+        if (action == EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_ADDED) {
+            bool versionCodeCheck = FormInfoMgr::GetInstance().CheckFormVersionCode(bundleName, userId);
+            if (versionCodeCheck) {
+                return;
+            }
+        }
         std::function<void()> taskFunc = [bundleName, userId]() {
             FormEventUtil::HandleUpdateFormCloud(bundleName);
             FormEventUtil::HandleProviderUpdated(bundleName, userId);

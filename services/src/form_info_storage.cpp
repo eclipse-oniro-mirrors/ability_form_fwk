@@ -40,12 +40,14 @@ void FormInfoStorage::GetAllFormsInfo(int32_t userId, std::vector<AppExecFwk::Fo
 {
     HILOG_DEBUG("Get all forms infos, current userId is%{public}d, this userId is %{public}d", userId, this->userId);
     if (this->userId != userId && this->userId != AppExecFwk::Constants::DEFAULT_USERID) {
+        HILOG_INFO("GetAllFormsInfo, userId don't match");
         return;
     }
     
     for (const auto &item : this->formInfos) {
         formInfos.push_back(item);
     }
+    HILOG_INFO("GetAllFormsInfo, formInfos.size: %{public} " PRId64, formInfos.size());
 }
 
 static bool find_match_dimensions(const std::vector<int32_t> &targetDimensions,

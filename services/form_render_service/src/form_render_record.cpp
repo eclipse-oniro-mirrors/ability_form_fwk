@@ -1081,7 +1081,7 @@ void FormRenderRecord::ReAddAllRecycledForms(const sptr<IFormSupply> &formSupply
 
 void FormRenderRecord::ReAddRecycledForms(const std::vector<FormJsInfo> &formJsInfos)
 {
-    HILOG_INFO("ReAdd recycled form start");
+    HILOG_INFO("ReAdd recycled forms start");
     if (!CheckEventHandler(false, true)) {
         HILOG_ERROR("CheckEventHandler failed");
         return;
