@@ -193,6 +193,69 @@ void FormRenderMgr::ExecAcquireProviderTask()
     }
 }
 
+void FormRenderMgr::AddAcquireProviderForbiddenTask(const std::string &bundleName, int64_t formId, std::function<void()> task)
+{
+    std::lock_guard<std::mutex> lock(forbiddenTaskMapMutex_);
+
+    auto search = forbiddenTaskMap_.find(bundleName);
+    if (search == forbiddenTaskMap_.end()) {
+        std::unordered_map<int64_t, std::function<void()>> taskQueue;
+        taskQueue.emplace(formId, task);
+        forbiddenTaskMap_.emplace(bundleName, taskQueue);
+    } else {
+        search->second[formId] = task;
+    }
+}
+
+void FormRenderMgr::ExecAcquireProviderForbiddenTask(const std::string &bundleName)
+{
+    HILOG_INFO("start");
+    // start to execute asynchronous tasks in the map
+    std::lock_guard<std::mutex> lock(forbiddenTaskMapMutex_);
+    auto search = forbiddenTaskMap_.find(bundleName);
+    if (search == forbiddenTaskMap_.end()) {
+        return;
+    }
+
+    std::unordered_map<int64_t, std::function<void()>> taskQueue = search->second;
+    auto iter = taskQueue.begin();
+    while (iter != taskQueue.end()) {
+        auto task = iter->second;
+        task();
+        HILOG_INFO("exec ftask success, formId:%{public}" PRId64, iter->first);
+        iter = taskQueue.erase(iter);
+    }
+
+    forbiddenTaskMap_.erase(search);
+}
+
+void FormRenderMgr::DeleteAcquireForbiddenTasksByBundleName(const std::string &bundleName)
+{
+    std::lock_guard<std::mutex> lock(forbiddenTaskMapMutex_);
+    auto search = forbiddenTaskMap_.find(bundleName);
+    if (search != forbiddenTaskMap_.end()) {
+        forbiddenTaskMap_.erase(search);
+        HILOG_INFO("delete ftasks success, bundlename:%{public}s", bundleName.c_str());
+    }
+}
+
+void FormRenderMgr::DeleteAcquireForbiddenTaskByFormId(int64_t formId)
+{
+    std::lock_guard<std::mutex> lock(forbiddenTaskMapMutex_);
+
+    for (auto iter = forbiddenTaskMap_.begin(); iter != forbiddenTaskMap_.end(); ++iter) {
+        auto search = iter->second.find(formId);
+        if (search != iter->second.end()) {
+            iter->second.erase(search);
+            if(iter->second.empty()) {
+                forbiddenTaskMap_.erase(iter);
+            }
+            HILOG_INFO("delete ftask success, formId:%{public}" PRId64, formId);
+            break;
+        }
+    }
+}
+
 void FormRenderMgr::NotifyScreenOn()
 {
     int32_t userId = FormUtil::GetCurrentAccountId();
