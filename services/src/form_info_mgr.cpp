@@ -836,7 +836,7 @@ bool FormInfoMgr::CheckFormVersionCode(const std::string &bundleName, int32_t us
 
     HILOG_INFO("CheckFormVersionCode, bundleName set number:%{public}zu", bundleVersionMap.size());
     std::unique_lock<std::shared_timed_mutex> guard(bundleFormInfoMapMutex_);
-    auto const &oldBundleVersionPair= bundleVersionMap.find(bundleName);
+    auto const &oldBundleVersionPair = bundleVersionMap.find(bundleName);
     if (oldBundleVersionPair != bundleVersionMap.end()) {
         uint32_t oldVersionCode = oldBundleVersionPair->second;
         uint32_t newVersionCode = ERR_VERSION_CODE;
