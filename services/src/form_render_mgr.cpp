@@ -193,7 +193,8 @@ void FormRenderMgr::ExecAcquireProviderTask()
     }
 }
 
-void FormRenderMgr::AddAcquireProviderForbiddenTask(const std::string &bundleName, int64_t formId, std::function<void()> task)
+void FormRenderMgr::AddAcquireProviderForbiddenTask(const std::string &bundleName,
+    int64_t formId, std::function<void()> task)
 {
     std::lock_guard<std::mutex> lock(forbiddenTaskMapMutex_);
 
@@ -247,7 +248,7 @@ void FormRenderMgr::DeleteAcquireForbiddenTaskByFormId(int64_t formId)
         auto search = iter->second.find(formId);
         if (search != iter->second.end()) {
             iter->second.erase(search);
-            if(iter->second.empty()) {
+            if (iter->second.empty()) {
                 forbiddenTaskMap_.erase(iter);
             }
             HILOG_INFO("delete ftask success, formId:%{public}" PRId64, formId);
