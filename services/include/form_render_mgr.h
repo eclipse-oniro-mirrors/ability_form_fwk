@@ -93,6 +93,14 @@ public:
 
     void ExecAcquireProviderTask();
 
+    void AddAcquireProviderForbiddenTask(const std::string &bundleName, int64_t formId, std::function<void()> task);
+
+    void ExecAcquireProviderForbiddenTask(const std::string &bundleName);
+
+    void DeleteAcquireForbiddenTasksByBundleName(const std::string &bundleName);
+
+    void DeleteAcquireForbiddenTaskByFormId(int64_t formId);
+
     void PostOnUnlockTask();
 
     ErrCode RecycleForms(const std::vector<int64_t> &formIds, const Want &want,
@@ -114,6 +122,8 @@ private:
     std::mutex renderInnerMutex_;
     std::mutex taskQueueMutex_;
     std::queue<std::function<void()>> taskQueue_;
+    std::mutex forbiddenTaskMapMutex_;
+    std::unordered_map<std::string, std::unordered_map<int64_t, std::function<void()>>> forbiddenTaskMap_;
     // <userId, FormRenderMgrInner>
     std::unordered_map<int32_t, std::shared_ptr<FormRenderMgrInner>> renderInners_;
     // <userId, FormSandboxRenderMgrInner>
