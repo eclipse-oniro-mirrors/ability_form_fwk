@@ -882,7 +882,7 @@ bool FormInfoMgr::HasReloadedFormInfos()
     return hasReloadedFormInfosState_;
 }
 
-ErrCode FormInfoMgr::GetBundleVersionMap(std::map<std::string, std::uint32_t> &bundleVersionMap, int32_t userId,
+ErrCode FormInfoMgr::GetBundleVersionMap(std::map<std::string, std::uint32_t> &versionMap, int32_t userId,
     const std::string &bundleName)
 {
     sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
@@ -905,19 +905,19 @@ ErrCode FormInfoMgr::GetBundleVersionMap(std::map<std::string, std::uint32_t> &b
 
     // get names of bundles that must contain stage forms
     for (auto const &extensionInfo : extensionInfos) {
-        if (bundleName.size() == 0 ) {
-            bundleVersionMap.insert(std::make_pair(extensionInfo.bundleName, extensionInfo.applicationInfo.versionCode));
+        if (bundleName.size() == 0) {
+            versionMap.insert(std::make_pair(extensionInfo.bundleName, extensionInfo.applicationInfo.versionCode));
         } else if (bundleName == extensionInfo.bundleName) {
-            bundleVersionMap.insert(std::make_pair(extensionInfo.bundleName, extensionInfo.applicationInfo.versionCode));
+            versionMap.insert(std::make_pair(extensionInfo.bundleName, extensionInfo.applicationInfo.versionCode));
         }
     }
     // get names of bundles that may contain fa forms
     for (auto const &bundleInfo : bundleInfos) {
         if (!bundleInfo.abilityInfos.empty() && !bundleInfo.abilityInfos[0].isStageBasedModel) {
             if (bundleName.size() == 0 ) {
-                bundleVersionMap.insert(std::make_pair(bundleInfo.name, bundleInfo.versionCode));
+                versionMap.insert(std::make_pair(bundleInfo.name, bundleInfo.versionCode));
             } else if (bundleName == bundleInfo.name) {
-                bundleVersionMap.insert(std::make_pair(bundleInfo.name, bundleInfo.versionCode));
+                versionMap.insert(std::make_pair(bundleInfo.name, bundleInfo.versionCode));
             }
         }
     }
