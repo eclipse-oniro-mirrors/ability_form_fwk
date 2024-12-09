@@ -329,6 +329,7 @@ int32_t FormRenderProxy::RecoverForm(const FormJsInfo &formJsInfo, const Want &w
 {
     MessageParcel data;
     MessageOption option(MessageOption::TF_ASYNC);
+    HILOG_INFO("begin");
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("write interface token failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
@@ -352,7 +353,7 @@ int32_t FormRenderProxy::RecoverForm(const FormJsInfo &formJsInfo, const Want &w
         HILOG_ERROR("SendRequest:%{public}d failed", error);
         return error;
     }
-
+    HILOG_INFO("end");
     return ERR_OK;
 }
 

@@ -250,6 +250,7 @@ int32_t FormRenderStub::HandleRecycleForm(MessageParcel &data, MessageParcel &re
 
 int32_t FormRenderStub::HandleRecoverForm(MessageParcel &data, MessageParcel &reply)
 {
+    HILOG_INFO("begin");
     std::unique_ptr<FormJsInfo> formJsInfo(data.ReadParcelable<FormJsInfo>());
     if (!formJsInfo) {
         HILOG_ERROR("read FormJsInfo error");
@@ -265,6 +266,7 @@ int32_t FormRenderStub::HandleRecoverForm(MessageParcel &data, MessageParcel &re
     int32_t result = RecoverForm(*formJsInfo, *want);
     HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
     reply.WriteInt32(result);
+    HILOG_INFO("end");
     return result;
 }
 
