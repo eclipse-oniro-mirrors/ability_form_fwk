@@ -47,7 +47,7 @@ void FormInfoStorage::GetAllFormsInfo(int32_t userId, std::vector<AppExecFwk::Fo
     for (const auto &item : this->formInfos) {
         formInfos.push_back(item);
     }
-    HILOG_INFO("GetAllFormsInfo, formInfos.size: %{public}" PRId64, formInfos.size());
+    HILOG_INFO("GetAllFormsInfo, formInfos.size: %{public}zu", formInfos.size());
 }
 
 void FormInfoStorage::GetFormsInfoByBundleName(const std::string &bundleName,
@@ -59,7 +59,7 @@ void FormInfoStorage::GetFormsInfoByBundleName(const std::string &bundleName,
             formInfos.push_back(item);
         }
     }
-    HILOG_INFO("GetFormsInfoByBundleName end, formInfos.size: %{public}" PRId64, formInfos.size());
+    HILOG_INFO("GetFormsInfoByBundleName end, formInfos.size: %{public}zu" PRId64, formInfos.size());
 }
 
 static bool find_match_dimensions(const std::vector<int32_t> &targetDimensions,
