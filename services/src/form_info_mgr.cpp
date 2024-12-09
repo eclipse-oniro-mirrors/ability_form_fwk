@@ -369,6 +369,22 @@ uint32_t BundleFormInfo::GetVersionCode(int32_t userId)
     return ERR_VERSION_CODE;
 }
 
+uint32_t BundleFormInfo::GetVersionCodeByBundleName(const std::string &bundleName)
+{
+    HILOG_DEBUG("begin");
+    std::vector<FormInfo> formInfos;
+    std::shared_lock<std::shared_timed_mutex> guard(formInfosMutex_);
+    for (const auto &item : formInfoStorages_) {
+        item.GetFormsInfoByBundleName(bundleName, formInfos);
+        for (const auto &info : formInfos) {
+            if (info.versionCode != ERR_VERSION_CODE) {
+                return info.versionCode;
+            }
+        }
+    }
+    return ERR_VERSION_CODE;
+}
+
 ErrCode BundleFormInfo::GetFormsInfoByModule(const std::string &moduleName, std::vector<FormInfo> &formInfos,
     int32_t userId)
 {
@@ -801,7 +817,7 @@ ErrCode FormInfoMgr::ReloadFormInfos(const int32_t userId)
         bundleVersionMap.erase(bundleVersionPair);
         uint32_t newVersionCode = bundleFormInfoPair.second->GetVersionCode(userId);
         if (oldVersionCode == newVersionCode) {
-            HILOG_INFO("vesionCode not change, bundleName=%{public}s, versionCode:%{public}d",
+            HILOG_INFO("versionCode not change, bundleName=%{public}s, versionCode:%{public}d",
                 bundleName.c_str(), oldVersionCode);
             continue;
         }
@@ -829,29 +845,29 @@ bool FormInfoMgr::CheckFormVersionCode(const std::string &bundleName, int32_t us
 {
     HILOG_INFO("CheckFormVersionCode begin, userId:%{public}d", userId);
     std::map<std::string, std::uint32_t> bundleVersionMap {};
-    ErrCode result = GetBundleVersionMap(bundleVersionMap, userId);
+    ErrCode result = GetBundleVersionMap(bundleVersionMap, userId, bundleName);
     if (result != ERR_OK) {
         return false;
     }
 
     HILOG_INFO("CheckFormVersionCode, bundleName set number:%{public}zu", bundleVersionMap.size());
     std::unique_lock<std::shared_timed_mutex> guard(bundleFormInfoMapMutex_);
-    auto const &oldBundleVersionPair = bundleVersionMap.find(bundleName);
-    if (oldBundleVersionPair != bundleVersionMap.end()) {
-        uint32_t oldVersionCode = oldBundleVersionPair->second;
-        uint32_t newVersionCode = ERR_VERSION_CODE;
+    auto const &newBundleVersionPair = bundleVersionMap.find(bundleName);
+    if (newBundleVersionPair != bundleVersionMap.end()) {
+        uint32_t newVersionCode = newBundleVersionPair->second;
+        uint32_t oldVersionCode = ERR_VERSION_CODE;
 
         for (auto const &bundleFormInfoPair : bundleFormInfoMap_) {
             if (bundleFormInfoPair.first == bundleName) {
-                newVersionCode = bundleFormInfoPair.second->GetVersionCode(userId);
+                oldVersionCode = bundleFormInfoPair.second->GetVersionCodeByBundleName(bundleName);
                 break;
             }
         }
-        HILOG_INFO("CheckFormVersionCode, bundleName=%{public}s, oldVersionCode:%{public}d, newVersionCode:%{public}d",
-                   bundleName.c_str(), oldVersionCode, newVersionCode);
-        if (oldVersionCode == newVersionCode) {
-            HILOG_INFO("vesionCode not change, bundleName=%{public}s, versionCode:%{public}d",
-                bundleName.c_str(), oldVersionCode);
+        HILOG_INFO("CheckFormVersionCode, bundleName=%{public}s, newVersionCode:%{public}d, oldVersionCode:%{public}d",
+                   bundleName.c_str(), newVersionCode, oldVersionCode);
+        if (newVersionCode == oldVersionCode) {
+            HILOG_INFO("versionCode not change, bundleName=%{public}s, versionCode:%{public}d",
+                bundleName.c_str(), newVersionCode);
             return true;
         }
     }
@@ -866,7 +882,8 @@ bool FormInfoMgr::HasReloadedFormInfos()
     return hasReloadedFormInfosState_;
 }
 
-ErrCode FormInfoMgr::GetBundleVersionMap(std::map<std::string, std::uint32_t> &bundleVersionMap, int32_t userId)
+ErrCode FormInfoMgr::GetBundleVersionMap(std::map<std::string, std::uint32_t> &bundleVersionMap, int32_t userId,
+    const std::string &bundleName)
 {
     sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
     if (iBundleMgr == nullptr) {
@@ -888,12 +905,20 @@ ErrCode FormInfoMgr::GetBundleVersionMap(std::map<std::string, std::uint32_t> &b
 
     // get names of bundles that must contain stage forms
     for (auto const &extensionInfo : extensionInfos) {
-        bundleVersionMap.insert(std::make_pair(extensionInfo.bundleName, extensionInfo.applicationInfo.versionCode));
+        if (bundleName.size() == 0 ) {
+            bundleVersionMap.insert(std::make_pair(extensionInfo.bundleName, extensionInfo.applicationInfo.versionCode));
+        } else if (bundleName == extensionInfo.bundleName) {
+            bundleVersionMap.insert(std::make_pair(extensionInfo.bundleName, extensionInfo.applicationInfo.versionCode));
+        }
     }
     // get names of bundles that may contain fa forms
     for (auto const &bundleInfo : bundleInfos) {
         if (!bundleInfo.abilityInfos.empty() && !bundleInfo.abilityInfos[0].isStageBasedModel) {
-            bundleVersionMap.insert(std::make_pair(bundleInfo.name, bundleInfo.versionCode));
+            if (bundleName.size() == 0 ) {
+                bundleVersionMap.insert(std::make_pair(bundleInfo.name, bundleInfo.versionCode));
+            } else if (bundleName == bundleInfo.name) {
+                bundleVersionMap.insert(std::make_pair(bundleInfo.name, bundleInfo.versionCode));
+            }
         }
     }
     return ERR_OK;

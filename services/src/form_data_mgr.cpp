@@ -902,6 +902,7 @@ void FormDataMgr::SetNeedRefresh(const int64_t formId, const bool needRefresh)
         HILOG_ERROR("form info not find");
         return;
     }
+    HILOG_INFO("SetNeedRefresh end, formId:%{public}" PRId64 ", needRefresh:%{public}d", formId, needRefresh);
     itFormRecord->second.needRefresh = needRefresh;
 }
 

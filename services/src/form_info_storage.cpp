@@ -38,7 +38,7 @@ FormInfoStorage::FormInfoStorage(int32_t userId, const std::vector<AppExecFwk::F
 
 void FormInfoStorage::GetAllFormsInfo(int32_t userId, std::vector<AppExecFwk::FormInfo> &formInfos) const
 {
-    HILOG_DEBUG("Get all forms infos, current userId is%{public}d, this userId is %{public}d", userId, this->userId);
+    HILOG_DEBUG("GetAllFormsInfo, current userId is %{public}d, this userId is %{public}d", userId, this->userId);
     if (this->userId != userId && this->userId != AppExecFwk::Constants::DEFAULT_USERID) {
         HILOG_INFO("GetAllFormsInfo, userId don't match");
         return;
@@ -47,7 +47,19 @@ void FormInfoStorage::GetAllFormsInfo(int32_t userId, std::vector<AppExecFwk::Fo
     for (const auto &item : this->formInfos) {
         formInfos.push_back(item);
     }
-    HILOG_INFO("GetAllFormsInfo, formInfos.size: %{public}zu.", formInfos.size());
+    HILOG_INFO("GetAllFormsInfo, formInfos.size: %{public}" PRId64, formInfos.size());
+}
+
+void FormInfoStorage::GetFormsInfoByBundleName(const std::string &bundleName,
+    std::vector<AppExecFwk::FormInfo> &formInfos) const
+{
+    HILOG_DEBUG("GetFormsInfoByBundleName begin, bundleName: %{public}s" PRId64, bundleName.c_str());
+    for (const auto &item : this->formInfos) {
+        if (item.bundleName == bundleName) {
+            formInfos.push_back(item);
+        }
+    }
+    HILOG_INFO("GetFormsInfoByBundleName end, formInfos.size: %{public}" PRId64, formInfos.size());
 }
 
 static bool find_match_dimensions(const std::vector<int32_t> &targetDimensions,

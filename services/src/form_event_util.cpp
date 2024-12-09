@@ -241,7 +241,8 @@ bool FormEventUtil::ProviderFormUpdated(const int64_t formId, FormRecord &formRe
         HILOG_INFO("no updated form");
         return false;
     }
-    HILOG_INFO("form is still exist, form:%{public}s", formRecord.formName.c_str());
+    HILOG_INFO("form is still exist, form:%{public}s, formId:%{public}" PRId64,
+        formRecord.formName.c_str(), formId);
 
     // update resource
     FormDataMgr::GetInstance().SetNeedRefresh(formId, true);
