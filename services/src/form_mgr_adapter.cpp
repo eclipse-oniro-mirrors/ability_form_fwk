@@ -1514,6 +1514,7 @@ ErrCode FormMgrAdapter::AddExistFormRecord(const FormItemInfo &info, const sptr<
         newRecord.formProviderInfo.SetFormDataString(cacheData);
         newRecord.formProviderInfo.SetImageDataMap(imageDataMap);
     }
+    HILOG_INFO("AddExistFormRecord, newRecord.needRefresh:%{public}d", newRecord.needRefresh);
     FormRenderMgr::GetInstance().RenderForm(newRecord, wantParams, callerToken);
     if (newRecord.needRefresh || newRecord.needAddForm
         || FormCacheMgr::GetInstance().NeedAcquireProviderData(newRecord.formId)

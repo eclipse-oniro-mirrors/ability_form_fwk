@@ -31,6 +31,8 @@ struct FormInfoStorage {
     ~FormInfoStorage() = default;
 
     void GetAllFormsInfo(int32_t userId, std::vector<AppExecFwk::FormInfo> &formInfos) const;
+    void GetFormsInfoByBundleName(const std::string &bundleName,
+        std::vector<AppExecFwk::FormInfo> &formInfos) const;
     void GetFormsInfoByModule(int32_t userId, const std::string &moduleName,
         std::vector<AppExecFwk::FormInfo> &formInfos) const;
     void GetFormsInfoByFilter(int32_t userId,
