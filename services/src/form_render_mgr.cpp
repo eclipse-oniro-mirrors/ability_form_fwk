@@ -212,13 +212,16 @@ void FormRenderMgr::ExecAcquireProviderForbiddenTask(const std::string &bundleNa
 {
     HILOG_INFO("start");
     // start to execute asynchronous tasks in the map
-    std::lock_guard<std::mutex> lock(forbiddenTaskMapMutex_);
-    auto search = forbiddenTaskMap_.find(bundleName);
-    if (search == forbiddenTaskMap_.end()) {
-        return;
+    std::unordered_map<int64_t, std::function<void()>> taskQueue;
+    {
+        std::lock_guard<std::mutex> lock(forbiddenTaskMapMutex_);
+        auto search = forbiddenTaskMap_.find(bundleName);
+        if (search == forbiddenTaskMap_.end()) {
+            return;
+        }
+        taskQueue = search->second;
+        forbiddenTaskMap_.erase(search);
     }
-
-    std::unordered_map<int64_t, std::function<void()>> taskQueue = search->second;
     auto iter = taskQueue.begin();
     while (iter != taskQueue.end()) {
         auto task = iter->second;
@@ -226,8 +229,6 @@ void FormRenderMgr::ExecAcquireProviderForbiddenTask(const std::string &bundleNa
         HILOG_INFO("exec ftask success, formId:%{public}" PRId64, iter->first);
         iter = taskQueue.erase(iter);
     }
-
-    forbiddenTaskMap_.erase(search);
 }
 
 void FormRenderMgr::DeleteAcquireForbiddenTasksByBundleName(const std::string &bundleName)
