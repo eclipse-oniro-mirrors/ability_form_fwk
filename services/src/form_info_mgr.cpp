@@ -914,7 +914,7 @@ ErrCode FormInfoMgr::GetBundleVersionMap(std::map<std::string, std::uint32_t> &v
     // get names of bundles that may contain fa forms
     for (auto const &bundleInfo : bundleInfos) {
         if (!bundleInfo.abilityInfos.empty() && !bundleInfo.abilityInfos[0].isStageBasedModel) {
-            if (bundleName.size() == 0 ) {
+            if (bundleName.size() == 0) {
                 versionMap.insert(std::make_pair(bundleInfo.name, bundleInfo.versionCode));
             } else if (bundleName == bundleInfo.name) {
                 versionMap.insert(std::make_pair(bundleInfo.name, bundleInfo.versionCode));
