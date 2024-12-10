@@ -218,6 +218,8 @@ public:
 
     void PostRemoveTaskToHost(const std::string bundleName, const sptr<IRemoteObject> &remoteObject,
         const RunningFormInfo &runningFormInfo);
+        
+    void PostRefreshForm(const int64_t formId, const Want &want, bool isVisibleToFresh);
 
     void PostReleaseRenderer(
         int64_t formId, const std::string &compId, const std::string &uid, const sptr<IRemoteObject> &remoteObject);
