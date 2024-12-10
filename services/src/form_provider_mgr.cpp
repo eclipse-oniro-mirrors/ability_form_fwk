@@ -229,7 +229,7 @@ ErrCode FormProviderMgr::ConnectAmsForRefresh(const int64_t formId,
     ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbility(connectWant, formRefreshConnection);
     if (errorCode != ERR_OK) {
         HILOG_ERROR("ConnectServiceAbility failed");
-        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+        return ERR_APPEXECFWK_FORM_GET_AMS_FAILED;
     }
 
     if (record.isCountTimerRefresh) {
