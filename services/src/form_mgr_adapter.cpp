@@ -3851,7 +3851,6 @@ int32_t FormMgrAdapter::EnableForms(const std::string bundleName, const bool ena
         HILOG_ERROR("GetFormRecord error");
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
-
     if (enable) {
         FormRenderMgr::GetInstance().ExecAcquireProviderForbiddenTask(bundleName);
     }
