@@ -35,6 +35,7 @@
 #include "form_info_rdb_storage_mgr.h"
 #include "form_util.h"
 #include "form_record_report.h"
+#include "form_provider_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk { // namespace
@@ -393,6 +394,21 @@ void FormTaskMgr::PostRemoveTaskToHost(const std::string bundleName,
         FormTaskMgr::GetInstance().FormRemove(bundleName, remoteObject, runningFormInfo);
     };
     serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, removeFunc);
+    HILOG_DEBUG("end");
+}
+
+void FormTaskMgr::PostRefreshForm(const int64_t formId, const Want &want, bool isVisibleToFresh)
+{
+    HILOG_DEBUG("start");
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("serialQueue_ invalidate");
+        return;
+    }
+    auto refreshForm = [formId, want, isVisibleToFresh]() {
+        FormProviderMgr::GetInstance().RefreshForm(formId, want, isVisibleToFresh);
+    };
+    const uint64_t delayTime = 5000;
+    serialQueue_->ScheduleTask(delayTime, refreshForm);
     HILOG_DEBUG("end");
 }
 

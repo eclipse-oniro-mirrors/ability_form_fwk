@@ -30,6 +30,7 @@
 #include "form_trust_mgr.h"
 #include "form_util.h"
 #include "form_provider_mgr.h"
+#include "form_task_mgr.h"
 #include "want.h"
 
 namespace OHOS {
@@ -135,7 +136,11 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
     want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
     want.SetParam(Constants::FORM_ENABLE_UPDATE_REFRESH_KEY, true);
     for (const auto &updatedForm : updatedForms) {
-        FormProviderMgr::GetInstance().RefreshForm(updatedForm.formId, want, true);
+        ErrCode errCode = FormProviderMgr::GetInstance().RefreshForm(updatedForm.formId, want, true);
+        if (errCode == ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED) {
+            HILOG_INFO("RefreshForm failed one time, PostRefreshFormTask to retry");
+            FormTaskMgr::GetInstance().PostRefreshForm(updatedForm.formId, want, true);
+        }
     }
     FormRenderMgr::GetInstance().ReloadForm(std::move(updatedForms), bundleName, userId);
 }
