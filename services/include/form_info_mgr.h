@@ -124,8 +124,6 @@ public:
 
     ErrCode ReloadFormInfos(int32_t userId);
 
-    bool CheckFormVersionCode(const std::string &bundleName, int32_t userId);
-
     bool HasReloadedFormInfos();
 
 private:

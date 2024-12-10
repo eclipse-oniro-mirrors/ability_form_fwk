@@ -139,7 +139,7 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
         ErrCode errCode = FormProviderMgr::GetInstance().RefreshForm(updatedForm.formId, want, true);
         if (errCode == ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED) {
             HILOG_INFO("RefreshForm failed one time, PostRefreshFormTask to retry");
-            FormTaskMgr::GetInstance().PostRefreshForm(updatedForm.formId, want, true);
+            FormTaskMgr::GetInstance().PostEnterpriseAppInstallFailedRetryTask(updatedForm.formId, want, true);
         }
     }
     FormRenderMgr::GetInstance().ReloadForm(std::move(updatedForms), bundleName, userId);
