@@ -397,7 +397,7 @@ void FormTaskMgr::PostRemoveTaskToHost(const std::string bundleName,
     HILOG_DEBUG("end");
 }
 
-void FormTaskMgr::PostRefreshForm(const int64_t formId, const Want &want, bool isVisibleToFresh)
+void FormTaskMgr::PostEnterpriseAppInstallFailedRetryTask(const int64_t formId, const Want &want, bool isVisibleToFresh)
 {
     HILOG_DEBUG("start");
     if (serialQueue_ == nullptr) {
@@ -407,8 +407,7 @@ void FormTaskMgr::PostRefreshForm(const int64_t formId, const Want &want, bool i
     auto refreshForm = [formId, want, isVisibleToFresh]() {
         FormProviderMgr::GetInstance().RefreshForm(formId, want, isVisibleToFresh);
     };
-    const uint64_t delayTime = 5000;
-    serialQueue_->ScheduleTask(delayTime, refreshForm);
+    serialQueue_->ScheduleTask(ENTERPRISE_APP_INSTALL_FAILED_DELAY_TIME, refreshForm);
     HILOG_DEBUG("end");
 }
 
