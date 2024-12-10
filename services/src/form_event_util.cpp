@@ -179,6 +179,8 @@ void FormEventUtil::HandleProviderRemoved(const std::string &bundleName, const i
         FormTimerMgr::GetInstance().RemoveFormTimer(formId);
         FormDataProxyMgr::GetInstance().UnsubscribeFormData(formId);
     }
+
+    FormRenderMgr::GetInstance().DeleteAcquireForbiddenTasksByBundleName(bundleName);
 }
 
 void FormEventUtil::HandleBundleDataCleared(const std::string &bundleName, int32_t userId)
