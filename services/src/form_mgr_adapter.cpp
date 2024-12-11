@@ -459,6 +459,7 @@ int FormMgrAdapter::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
+    FormRenderMgr::GetInstance().DeleteAcquireForbiddenTaskByFormId(formId);
 #ifdef THEME_MGR_ENABLE
     FormDBInfo dbInfo;
     ErrCode getDbRet = FormDbCache::GetInstance().GetDBRecord(formId, dbInfo);
@@ -1690,6 +1691,11 @@ ErrCode FormMgrAdapter::AcquireProviderFormInfoAsync(const int64_t formId,
     if (!info.IsEnableForm()) {
         HILOG_INFO("Bundle:%{public}s forbidden", providerBundleName.c_str());
         FormDataMgr::GetInstance().SetRefreshDuringDisableForm(formId, true);
+
+        auto task = [formId, newInfo = info, newWant = wantParams]() {
+            FormMgrAdapter::GetInstance().InnerAcquireProviderFormInfoAsync(formId, newInfo, newWant);
+        };
+        FormRenderMgr::GetInstance().AddAcquireProviderForbiddenTask(info.GetProviderBundleName(), formId, task);
         return ERR_OK;
     }
 
@@ -2898,6 +2904,7 @@ int FormMgrAdapter::DeleteInvalidForms(const std::vector<int64_t> &formIds,
     std::set<int64_t> matchedFormIds {};
     for (int64_t formId : formIds) {
         int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+        FormRenderMgr::GetInstance().DeleteAcquireForbiddenTaskByFormId(matchedFormId);
         matchedFormIds.emplace(matchedFormId);
         HILOG_INFO("valid formId, formId:%{public}" PRId64, formId);
     }
@@ -3844,7 +3851,9 @@ int32_t FormMgrAdapter::EnableForms(const std::string bundleName, const bool ena
         HILOG_ERROR("GetFormRecord error");
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
-
+    if (enable) {
+        FormRenderMgr::GetInstance().ExecAcquireProviderForbiddenTask(bundleName);
+    }
     int32_t userId = FormUtil::GetCurrentAccountId();
     HILOG_INFO("userId:%{public}d, infosSize:%{public}zu, enable:%{public}d", userId, formInfos.size(), enable);
     for (auto iter = formInfos.begin(); iter != formInfos.end();) {
