@@ -302,10 +302,10 @@ HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0014, TestSize.Lev
 {
     HILOG_INFO("FormAcquireConnectionTest_0014 start");
     FormEventHandler formEventHandler(nullptr);
-    constexpr int64_t EVENT_MSG = 1;
-    constexpr int64_t EVENT_ID = 2;
+    constexpr int64_t eventMsg = 1;
+    constexpr int64_t eventId = 2;
     // text ProcessEvent
-    formEventHandler.ProcessEvent(EVENT_MSG, EVENT_ID);
+    formEventHandler.ProcessEvent(eventMsg, eventId);
     GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0014 end";
 }
 
@@ -322,10 +322,10 @@ HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0015, TestSize.Lev
     auto event = InnerEvent::Get();
     // emplace observer
     formEventHandler.RegisterEventTimeoutObserver(nullptr);
-    constexpr int64_t EVENT_MSG = 1;
-    constexpr int64_t EVENT_ID = 2;
+    constexpr int64_t eventMsg = 1;
+    constexpr int64_t eventId = 2;
     // text ProcessEvent
-    formEventHandler.ProcessEvent(EVENT_MSG, EVENT_ID);
+    formEventHandler.ProcessEvent(eventMsg, eventId);
 
     GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0015 end";
 }
@@ -344,10 +344,10 @@ HWTEST_F(FmsFormSupplyCallbackTest, FormAcquireConnectionTest_0016, TestSize.Lev
     auto event = InnerEvent::Get();
     // emplace observer
     formEventHandler.RegisterEventTimeoutObserver(observer);
-    constexpr int64_t EVENT_MSG = 1;
-    constexpr int64_t EVENT_ID = 2;
+    constexpr int64_t eventMsg = 1;
+    constexpr int64_t eventId = 2;
     // text ProcessEvent
-    formEventHandler.ProcessEvent(EVENT_MSG, EVENT_ID);
+    formEventHandler.ProcessEvent(eventMsg, eventId);
 
     GTEST_LOG_(INFO) << "FormAcquireConnectionTest_0016 end";
 }

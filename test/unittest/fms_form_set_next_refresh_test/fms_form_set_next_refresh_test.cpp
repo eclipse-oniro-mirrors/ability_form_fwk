@@ -118,7 +118,7 @@ HWTEST_F(FmsFormSetNextRefreshTest, FmsFormSetNextRefreshTest_SetNextRefreshTime
     int64_t formId = 3;
     int64_t nextTime = Constants::MIN_NEXT_TIME;
     int callingUid = IPCSkeleton::GetCallingUid();
-    int32_t userId = callingUid/UID_CALLINGUID_TRANSFORM_DIVISOR;
+    int32_t userId = callingUid / UID_CALLINGUID_TRANSFORM_DIVISOR;
     GTEST_LOG_(INFO) << "callingUid:" << callingUid << " userId:" << userId;
     // check dynamicRefreshTasks_
     EXPECT_EQ(true, FormTimerMgr::GetInstance().dynamicRefreshTasks_.empty());
@@ -173,7 +173,7 @@ HWTEST_F(FmsFormSetNextRefreshTest, FmsFormSetNextRefreshTest_SetNextRefreshTime
     int64_t formId = 5;
     int64_t nextTime = Constants::MIN_NEXT_TIME;
     int callingUid = IPCSkeleton::GetCallingUid();
-    int32_t userId = callingUid/UID_CALLINGUID_TRANSFORM_DIVISOR;
+    int32_t userId = callingUid / UID_CALLINGUID_TRANSFORM_DIVISOR;
     // creat formRecords_
     FormItemInfo iteminfo;
     iteminfo.formId_ = formId;
@@ -218,7 +218,7 @@ HWTEST_F(FmsFormSetNextRefreshTest, FmsFormSetNextRefreshTest_SetNextRefreshTime
     int64_t formId = 6;
     int64_t nextTime = Constants::MIN_NEXT_TIME;
     int32_t callingUid = IPCSkeleton::GetCallingUid();
-    int32_t userId = callingUid/UID_CALLINGUID_TRANSFORM_DIVISOR;
+    int32_t userId = callingUid / UID_CALLINGUID_TRANSFORM_DIVISOR;
 
     // creat formRecords_
     FormItemInfo iteminfo;
