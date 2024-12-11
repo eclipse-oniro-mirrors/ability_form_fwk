@@ -68,8 +68,6 @@ ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<Fo
         HILOG_ERROR("get app info failed");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    HILOG_INFO("SubscribeFormData, formId:%{public}" PRId64 ", accessTokenId:%{public}d",
-               formId, appInfo.accessTokenId);
     std::shared_ptr<FormDataProxyRecord> formDataProxyRecord = std::make_shared<FormDataProxyRecord>(formId,
         formRecord.bundleName, formRecord.uiSyntax, appInfo.accessTokenId, formRecord.uid);
     formDataProxyRecord->SetWant(want);
