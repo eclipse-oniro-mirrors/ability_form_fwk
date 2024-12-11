@@ -102,7 +102,7 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
     for (FormRecord& formRecord : formInfos) {
         HILOG_INFO("bundle update, formName:%{public}s", formRecord.formName.c_str());
         int64_t formId = formRecord.formId;
-        if (formRecord.versionCode == bundleInfo.versionCode) {
+        if (bundleInfo.versionCode == formRecord.versionCode) {
             HILOG_INFO("form: %{public}s, versionCode is same. formId:%{public}" PRId64,
                        formRecord.formName.c_str(), formId);
             continue;
