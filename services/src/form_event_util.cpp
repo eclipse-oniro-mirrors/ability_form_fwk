@@ -30,7 +30,6 @@
 #include "form_trust_mgr.h"
 #include "form_util.h"
 #include "form_provider_mgr.h"
-#include "form_task_mgr.h"
 #include "want.h"
 
 namespace OHOS {
@@ -136,11 +135,7 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
     want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
     want.SetParam(Constants::FORM_ENABLE_UPDATE_REFRESH_KEY, true);
     for (const auto &updatedForm : updatedForms) {
-        ErrCode errCode = FormProviderMgr::GetInstance().RefreshForm(updatedForm.formId, want, true);
-        if (errCode == ERR_APPEXECFWK_FORM_GET_AMSCONNECT_FAILED) {
-            HILOG_INFO("RefreshForm failed one time, PostRefreshFormTask to retry");
-            FormTaskMgr::GetInstance().PostEnterpriseAppInstallFailedRetryTask(updatedForm.formId, want, true);
-        }
+        FormProviderMgr::GetInstance().RefreshForm(updatedForm.formId, want, true);
     }
     FormRenderMgr::GetInstance().ReloadForm(std::move(updatedForms), bundleName, userId);
 }
@@ -249,8 +244,7 @@ bool FormEventUtil::ProviderFormUpdated(const int64_t formId, FormRecord &formRe
         HILOG_INFO("no updated form");
         return false;
     }
-    HILOG_INFO("form is still exist, form:%{public}s, formId:%{public}" PRId64,
-        formRecord.formName.c_str(), formId);
+    HILOG_INFO("form is still exist, form:%{public}s", formRecord.formName.c_str());
 
     // update resource
     FormDataMgr::GetInstance().SetNeedRefresh(formId, true);
