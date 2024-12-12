@@ -37,9 +37,6 @@ uint32_t GetU32Data(const char* ptr)
 bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
 {
     FormProviderData formProviderData;
-    nlohmann::json jsonData;
-    formProviderData.UpdateData(jsonData);
-    formProviderData.GetData();
     std::string picName(data, size);
     const std::shared_ptr<char> datas = nullptr;
     int32_t sizes = static_cast<int32_t>(GetU32Data(data));
