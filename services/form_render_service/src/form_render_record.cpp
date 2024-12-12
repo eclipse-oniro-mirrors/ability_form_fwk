@@ -637,6 +637,12 @@ std::shared_ptr<Ace::FormRendererGroup> FormRenderRecord::CreateFormRendererGrou
     const std::shared_ptr<AbilityRuntime::Context> &context, const std::shared_ptr<AbilityRuntime::Runtime> &runtime)
 {
     HILOG_INFO("Create formRendererGroup");
+    {
+        std::lock_guard<std::mutex> lock(eventHandlerMutex_);
+        if (eventHandler_ == nullptr) {
+            return nullptr;
+        }
+    }
     auto formRendererGroup = Ace::FormRendererGroup::Create(context, runtime, eventHandler_);
     if (formRendererGroup == nullptr) {
         HILOG_ERROR("Create formRendererGroup failed");
@@ -990,30 +996,32 @@ bool FormRenderRecord::HandleReleaseRendererInJsThread(
 void FormRenderRecord::Release()
 {
     HILOG_INFO("Release runtime and eventHandler");
+    std::shared_ptr<EventHandler> eventHandler = eventHandler_;
     {
         std::lock_guard<std::mutex> lock(eventHandlerMutex_);
         if (eventHandler_ == nullptr) {
             HILOG_INFO("null eventHandler");
             return;
         }
-
-        auto syncTask = [renderRecord = this]() {
-            if (renderRecord == nullptr) {
-                HILOG_ERROR("null renderRecord");
-                return;
-            }
-            renderRecord->HandleReleaseInJsThread();
-        };
-        eventHandler_->PostSyncTask(syncTask, "HandleReleaseInJsThread");
-        if (eventRunner_) {
-            eventRunner_->Stop();
-            eventRunner_.reset();
-
-            OHOS::HiviewDFX::Watchdog::GetInstance().RemoveThread(eventHandleName_);
-        }
-
-        eventHandler_.reset();
+        eventHandler_ = nullptr;
     }
+    auto syncTask = [renderRecord = this]() {
+        if (renderRecord == nullptr) {
+            HILOG_ERROR("null renderRecord");
+            return;
+        }
+        renderRecord->HandleReleaseInJsThread();
+    };
+    eventHandler->PostSyncTask(syncTask, "HandleReleaseInJsThread");
+    if (eventRunner_) {
+        eventRunner_->Stop();
+        eventRunner_.reset();
+
+        OHOS::HiviewDFX::Watchdog::GetInstance().RemoveThread(eventHandleName_);
+    }
+
+    eventHandler.reset();
+    
     std::lock_guard<std::mutex> lock(contextsMapMutex_);
     contextsMapForModuleName_.clear();
 }
