@@ -1404,5 +1404,40 @@ void FormTaskMgr::FrsDiedTaskToHost(const sptr<IRemoteObject> &remoteObject)
 
     remoteFormHost->OnError(ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED, "FormRenderService is dead.");
 }
+
+void FormTaskMgr::PostUpdateFormSize(const int64_t &formId, float width, float height, float borderWidth,
+    const std::string &uid, const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_DEBUG("start");
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("null serialQueue_");
+        return;
+    }
+
+    auto updateFormSize = [formId, width, height, borderWidth, uid, remoteObject]() {
+        FormTaskMgr::GetInstance().UpdateFormSize(formId, width, height, borderWidth, uid, remoteObject);
+    };
+    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, updateFormSize);
+    HILOG_DEBUG("end");
+}
+
+void FormTaskMgr::UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth,
+    const std::string &uid, const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_DEBUG("start");
+    sptr<IFormRender> remoteFormRender = iface_cast<IFormRender>(remoteObject);
+    if (remoteFormRender == nullptr) {
+        HILOG_ERROR("get formRenderProxy failed");
+        return;
+    }
+
+    int32_t error = remoteFormRender->UpdateFormSize(formId, width, height, borderWidth, uid);
+    if (error != ERR_OK) {
+        HILOG_ERROR("fail Update FormSize");
+        return;
+    }
+
+    HILOG_DEBUG("end");
+}
 } // namespace AppExecFwk
 } // namespace OHOS

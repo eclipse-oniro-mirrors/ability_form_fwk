@@ -70,6 +70,9 @@ public:
 
     int32_t RecoverForm(const FormJsInfo &formJsInfo, const Want &want) override;
 
+    int32_t UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth,
+        const std::string &uid) override;
+
     void RunCachedConfigurationUpdated() override;
 private:
     bool WriteInterfaceToken(MessageParcel &data);

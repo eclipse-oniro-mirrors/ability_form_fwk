@@ -66,6 +66,8 @@ int FormRenderStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageP
             return ERR_OK;
         case static_cast<uint32_t>(IFormRender::Message::FORM_SET_VISIBLE_CHANGE):
             return HandleSetVisibleChange(data, reply);
+        case static_cast<uint32_t>(IFormRender::Message::FORM_UPDATE_FORM_SIZE):
+            return HandleUpdateFormSize(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -231,6 +233,18 @@ int32_t FormRenderStub::HandleRecoverForm(MessageParcel &data, MessageParcel &re
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t result = RecoverForm(*formJsInfo, *want);
+    reply.WriteInt32(result);
+    return result;
+}
+
+int32_t FormRenderStub::HandleUpdateFormSize(MessageParcel &data, MessageParcel &reply)
+{
+    int64_t formId = data.ReadInt64();
+    float width = data.ReadFloat();
+    float height = data.ReadFloat();
+    float borderWidth = data.ReadFloat();
+    std::string uid = data.ReadString();
+    int32_t result = UpdateFormSize(formId, width, height, borderWidth, uid);
     reply.WriteInt32(result);
     return result;
 }

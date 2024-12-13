@@ -40,6 +40,7 @@ constexpr int32_t RECYCLE_FORM_FAILED = -1;
 constexpr int32_t SET_VISIBLE_CHANGE_FAILED = -1;
 constexpr int32_t FORM_RENDER_TASK_DELAY_TIME = 20; // ms
 constexpr int32_t ENABLE_FORM_FAILED = -1;
+constexpr int32_t UPDATE_FORM_SIZE_FAILED = -1;
 }
 using namespace AbilityRuntime;
 using namespace OHOS::AAFwk::GlobalConfigurationKey;
@@ -531,6 +532,22 @@ void FormRenderImpl::ConfirmUnlockState(Want &renderWant)
             }
         }
     }
+}
+
+int32_t FormRenderImpl::UpdateFormSize(
+    const int64_t &formId, float width, float height, float borderWidth, const std::string &uid)
+{
+    std::lock_guard<std::mutex> lock(renderRecordMutex_);
+    if (auto search = renderRecordMap_.find(uid); search != renderRecordMap_.end()) {
+        if (search->second == nullptr) {
+            HILOG_ERROR("UpdateFormSize null renderRecord of %{public}" PRId64, formId);
+            return UPDATE_FORM_SIZE_FAILED;
+        }
+        search->second->UpdateFormSizeOfGroups(formId, width, height, borderWidth);
+        return ERR_OK;
+    }
+    HILOG_ERROR("can't find render record of %{public}" PRId64, formId);
+    return UPDATE_FORM_SIZE_FAILED;
 }
 } // namespace FormRender
 } // namespace AppExecFwk

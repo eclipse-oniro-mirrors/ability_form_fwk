@@ -74,6 +74,9 @@ public:
 
     virtual int32_t RecoverForm(const FormJsInfo &formJsInfo, const Want &want) { return ERR_OK; }
 
+    virtual int32_t UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth,
+        const std::string &uid) { return ERR_OK; }
+
     virtual void RunCachedConfigurationUpdated() {}
 
     enum class Message {
@@ -96,6 +99,7 @@ public:
         FORM_RECOVER_FORM = 3108,
         FORM_RUN_CACHED_CONFIG = 3109,
         FORM_SET_VISIBLE_CHANGE = 3110,
+        FORM_UPDATE_FORM_SIZE = 3111,
     };
 };
 } // namespace AppExecFwk
