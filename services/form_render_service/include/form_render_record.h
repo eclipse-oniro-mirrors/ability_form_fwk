@@ -262,7 +262,7 @@ private:
     std::string uid_;
     std::shared_ptr<EventRunner> eventRunner_;
     std::shared_ptr<EventHandler> eventHandler_;
-    std::mutex eventHandlerMutex_;
+    std::recursive_mutex eventHandlerMutex_;
     std::shared_ptr<AbilityRuntime::Runtime> runtime_;
 
     // <formId, hostRemoteObj>
