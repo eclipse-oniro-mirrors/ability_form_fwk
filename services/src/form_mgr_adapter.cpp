@@ -250,14 +250,15 @@ int FormMgrAdapter::AddThemeDBRecord(const Want &want, int64_t formId)
 
 void FormMgrAdapter::FillThemeFormInfo(const Want &want, ThemeManager::ThemeFormInfo &themeFormInfo, int64_t formId)
 {
-    HILOG_INFO("call");
     themeFormInfo.formId = formId;
     themeFormInfo.themeFormDimension =
         static_cast<ThemeManager::ThemeFormDimension>(want.GetIntParam(Constants::PARAM_FORM_DIMENSION_KEY, 0));
     themeFormInfo.themeFormLocation =
         static_cast<ThemeManager::ThemeFormLocation>(want.GetIntParam(Constants::FORM_LOCATION_KEY, 0));
-    themeFormInfo.themeFormId = static_cast<int64_t>(want.GetLongParam(Constants::PARAM_THEME_THEME_FORM_ID, 0));
-    themeFormInfo.themeId = static_cast<int64_t>(want.GetLongParam(Constants::PARAM_THEME_THEME_ID, 0));
+    themeFormInfo.themeFormId = want.GetStringParam(Constants::PARAM_THEME_THEME_FORM_ID);
+    themeFormInfo.themeId = want.GetStringParam(Constants::PARAM_THEME_THEME_ID);
+    HILOG_INFO("get theme form info, themeFormId:%{public}s, themeId:%{public}s",
+        themeFormInfo.themeFormId.c_str(), themeFormInfo.themeId.c_str());
 }
 
 FormRecord FormMgrAdapter::AllotThemeRecord(const Want &want, int64_t formId)
