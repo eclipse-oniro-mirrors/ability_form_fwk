@@ -998,6 +998,7 @@ void FormRenderRecord::Release()
 {
     HILOG_INFO("Release runtime and eventHandler");
     std::shared_ptr<EventHandler> eventHandler = eventHandler_;
+    std::shared_ptr<EventRunner> eventRunner = eventRunner_;
     {
         std::lock_guard<std::recursive_mutex> lock(eventHandlerMutex_);
         if (eventHandler_ == nullptr) {
@@ -1005,6 +1006,7 @@ void FormRenderRecord::Release()
             return;
         }
         eventHandler_ = nullptr;
+        eventRunner_ = nullptr;
     }
     auto syncTask = [renderRecord = this]() {
         if (renderRecord == nullptr) {
@@ -1014,10 +1016,9 @@ void FormRenderRecord::Release()
         renderRecord->HandleReleaseInJsThread();
     };
     eventHandler->PostSyncTask(syncTask, "HandleReleaseInJsThread");
-    if (eventRunner_) {
-        eventRunner_->Stop();
-        eventRunner_.reset();
-
+    if (eventRunner) {
+        eventRunner->Stop();
+        eventRunner.reset();
         OHOS::HiviewDFX::Watchdog::GetInstance().RemoveThread(eventHandleName_);
     }
 
