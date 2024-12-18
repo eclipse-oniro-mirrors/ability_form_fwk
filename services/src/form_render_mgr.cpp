@@ -206,6 +206,7 @@ void FormRenderMgr::AddAcquireProviderForbiddenTask(const std::string &bundleNam
     } else {
         search->second[formId] = task;
     }
+    HILOG_INFO("add ftask success, formId:%{public}" PRId64, formId);
 }
 
 void FormRenderMgr::ExecAcquireProviderForbiddenTask(const std::string &bundleName)
