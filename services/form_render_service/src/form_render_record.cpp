@@ -991,26 +991,29 @@ bool FormRenderRecord::HandleReleaseRendererInJsThread(
 void FormRenderRecord::Release()
 {
     HILOG_INFO("Release runtime and eventHandler");
-    std::lock_guard<std::mutex> lock(eventHandlerMutex_);
-    if (eventHandler_ == nullptr) {
-        HILOG_INFO("null eventHandler");
-        return;
-    }
-
-    auto syncTask = [renderRecord = this]() {
-        if (renderRecord == nullptr) {
-            HILOG_ERROR("null renderRecord");
+    {
+        std::lock_guard<std::mutex> lock(eventHandlerMutex_);
+        if (eventHandler_ == nullptr) {
+            HILOG_INFO("null eventHandler");
             return;
         }
-        renderRecord->HandleReleaseInJsThread();
-    };
-    eventHandler_->PostSyncTask(syncTask, "HandleReleaseInJsThread");
-    if (eventRunner_) {
-        eventRunner_->Stop();
-        eventRunner_.reset();
-    }
 
-    eventHandler_.reset();
+        auto syncTask = [renderRecord = this]() {
+            if (renderRecord == nullptr) {
+                HILOG_ERROR("null renderRecord");
+                return;
+            }
+            renderRecord->HandleReleaseInJsThread();
+        };
+        eventHandler_->PostSyncTask(syncTask, "HandleReleaseInJsThread");
+        if (eventRunner_) {
+            eventRunner_->Stop();
+            eventRunner_.reset();
+        }
+
+        eventHandler_.reset();
+    }
+    std::lock_guard<std::mutex> lock(contextsMapMutex_);
     contextsMapForModuleName_.clear();
 }
 
@@ -1189,7 +1192,6 @@ bool FormRenderRecord::ReAddIfHapPathChanged(const std::vector<FormJsInfo> &form
         HILOG_ERROR("eventHandler is nullptr");
         return false;
     }
-    std::lock_guard<std::mutex> lock(contextsMapMutex_);
     HILOG_INFO("hap path changed");
     auto task = [weak = weak_from_this()]() {
         auto renderRecord = weak.lock();
