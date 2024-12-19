@@ -21,11 +21,15 @@
 #include "ipc_skeleton.h"
 #include "ipc_types.h"
 #include "iremote_object.h"
+#include "xcollie/watchdog.h"
+#include "xcollie/xcollie.h"
+#include "xcollie/xcollie_define.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
     constexpr int32_t MAX_ALLOW_SIZE = 8 * 1024;
+    constexpr int32_t FORM_RENDER_API_TIME_OUT = 30;
 }
 
 FormRenderStub::FormRenderStub()
@@ -61,9 +65,13 @@ int FormRenderStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageP
             return HandleRecycleForm(data, reply);
         case static_cast<uint32_t>(IFormRender::Message::FORM_RECOVER_FORM):
             return HandleRecoverForm(data, reply);
-        case static_cast<uint32_t>(IFormRender::Message::FORM_RUN_CACHED_CONFIG):
+        case static_cast<uint32_t>(IFormRender::Message::FORM_RUN_CACHED_CONFIG):{
+            int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FRS_RunCachedConfigurationUpdated",
+                FORM_RENDER_API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
             RunCachedConfigurationUpdated();
+            HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
             return ERR_OK;
+        }
         case static_cast<uint32_t>(IFormRender::Message::FORM_SET_VISIBLE_CHANGE):
             return HandleSetVisibleChange(data, reply);
         case static_cast<uint32_t>(IFormRender::Message::FORM_UPDATE_FORM_SIZE):
@@ -92,7 +100,10 @@ int FormRenderStub::HandleRenderForm(MessageParcel &data, MessageParcel &reply)
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
+    int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FRS_RenderForm",
+        FORM_RENDER_API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
     int32_t result = RenderForm(*formJsInfo, *want, client);
+    HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
     reply.WriteInt32(result);
     return result;
 }
@@ -116,7 +127,10 @@ int FormRenderStub::HandleStopRenderingForm(MessageParcel &data, MessageParcel &
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
+    int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FRS_StopRenderingForm",
+        FORM_RENDER_API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
     int32_t result = StopRenderingForm(*formJsInfo, *want, client);
+    HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
     reply.WriteInt32(result);
     return result;
 }
@@ -129,7 +143,10 @@ int FormRenderStub::HandleCleanFormHost(MessageParcel &data, MessageParcel &repl
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
+    int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FRS_CleanFormHost",
+        FORM_RENDER_API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
     int32_t result = CleanFormHost(hostToken);
+    HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
     reply.WriteInt32(result);
     return result;
 }
@@ -139,7 +156,10 @@ int32_t FormRenderStub::HandleReleaseRenderer(MessageParcel &data, MessageParcel
     int64_t formId = data.ReadInt64();
     std::string compId = data.ReadString();
     std::string uid = data.ReadString();
+    int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FRS_ReleaseRenderer",
+        FORM_RENDER_API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
     int32_t result = ReleaseRenderer(formId, compId, uid);
+    HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
     reply.WriteInt32(result);
     return result;
 }
@@ -159,14 +179,20 @@ int FormRenderStub::HandleReloadForm(MessageParcel &data, MessageParcel &reply)
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
+    int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FRS_ReloadForm",
+        FORM_RENDER_API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
     result = ReloadForm(std::move(formJsInfos), *want);
+    HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
     reply.WriteInt32(result);
     return result;
 }
 
 int32_t FormRenderStub::HandleOnUnlock(MessageParcel &data, MessageParcel &reply)
 {
+    int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FRS_OnUnlock",
+        FORM_RENDER_API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
     int32_t result = OnUnlock();
+    HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
     reply.WriteInt32(result);
     return result;
 }
@@ -181,7 +207,10 @@ int32_t FormRenderStub::HandleSetVisibleChange(MessageParcel &data, MessageParce
         HILOG_ERROR("error to ReadParcelable<Want>");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
+    int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FRS_SetVisibleChange",
+        FORM_RENDER_API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
     int32_t result = SetVisibleChange(formId, isVisible, *want);
+    HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
     reply.WriteInt32(result);
     HILOG_ERROR("end");
     return result;
@@ -215,7 +244,10 @@ int32_t FormRenderStub::HandleRecycleForm(MessageParcel &data, MessageParcel &re
         HILOG_ERROR("error to ReadParcelable<Want>");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
+    int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FRS_RecycleForm",
+        FORM_RENDER_API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
     int32_t result = RecycleForm(formId, *want);
+    HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
     reply.WriteInt32(result);
     return result;
 }
@@ -232,7 +264,10 @@ int32_t FormRenderStub::HandleRecoverForm(MessageParcel &data, MessageParcel &re
         HILOG_ERROR("read want error");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
+    int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FRS_RecoverForm",
+        FORM_RENDER_API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
     int32_t result = RecoverForm(*formJsInfo, *want);
+    HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
     reply.WriteInt32(result);
     return result;
 }
