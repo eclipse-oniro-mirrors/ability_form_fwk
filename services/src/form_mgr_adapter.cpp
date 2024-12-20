@@ -2922,6 +2922,7 @@ int FormMgrAdapter::DeleteInvalidForms(const std::vector<int64_t> &formIds,
         for (const auto &removedForm : removedFormsMap) {
             if (removedForm.second) {
                 FormTimerMgr::GetInstance().RemoveFormTimer(removedForm.first);
+                FormRenderMgr::GetInstance().DeleteAcquireForbiddenTaskByFormId(mremovedForm.first);
             }
         }
     }
