@@ -620,6 +620,12 @@ std::shared_ptr<Ace::FormRendererGroup> FormRenderRecord::GetFormRendererGroup(c
     const std::shared_ptr<AbilityRuntime::Context> &context, const std::shared_ptr<AbilityRuntime::Runtime> &runtime)
 {
     HILOG_INFO("Get formRendererGroup");
+    {
+        std::shared_lock<std::shared_mutex> lock(eventHandlerReset_);
+            if (eventHandleNeedReset) {
+            return nullptr;
+        }
+    }
     auto key = formJsInfo.formId;
     auto iter = formRendererGroupMap_.find(key);
     if (iter != formRendererGroupMap_.end()) {
@@ -1213,9 +1219,19 @@ bool FormRenderRecord::ReAddIfHapPathChanged(const std::vector<FormJsInfo> &form
         FormMemoryGuard memoryGuard;
         renderRecord->HandleReleaseAllRendererInJsThread();
     };
+    {
+        std::lock_guard<std::shared_mutex> lock(eventHandlerReset_);
+        HILOG_INFO("eventHandleNeedReset, reject create renderergroup");
+        eventHandleNeedReset = true;
+    }
     eventHandler->PostSyncTask(task, "ReleaseAllRenderer");
     Release();
     UpdateAllFormRequest(formJsInfos, true);
+    {
+        std::lock_guard<std::shared_mutex> lock(eventHandlerReset_);
+        HILOG_INFO("eventHandleNeedReset, Create new eventHandler");
+        eventHandleNeedReset = false;
+    }
     CreateEventHandler(bundleName_, true);
     ReAddRecycledForms(formJsInfos);
     return true;
