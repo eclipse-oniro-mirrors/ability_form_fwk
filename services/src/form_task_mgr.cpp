@@ -1268,6 +1268,28 @@ void FormTaskMgr::RecoverForm(const FormRecord &record, const Want &want, const 
     HILOG_DEBUG("end");
 }
 /**
+ * @brief post delay RecheckWhetherNeedCleanFormHost task.
+ * @param iter The iterator of vector<FormHostRecord> clientRecords_.
+ * @param remoteObjectOfHost The client stub of the form host record.
+ */
+void FormTaskMgr::PostDelayRecheckWhetherNeedCleanFormHostTask(
+    const std::vector<FormHostRecord>::iterator iter, const sptr<IRemoteObject> &remoteObjectOfHost)
+{
+    HILOG_DEBUG("start");
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("null serialQueue_");
+        return;
+    }
+    auto recheckWhetherNeedCleanFormHost = [iter, remoteObjectOfHost]() {
+        FormDataMgr::GetInstance().RecheckWhetherNeedCleanFormHost(iter, remoteObjectOfHost);
+    };
+    serialQueue_->ScheduleDelayTask(
+        std::make_pair((int64_t)TaskType::DELETE_FORM_HOST_RECORD, iter->GetCallerUid()),
+        CLEAN_FORM_HOST_TASK_DELAY_TIME,
+        recheckWhetherNeedCleanFormHost);
+    HILOG_DEBUG("end");
+}
+/**
  * @brief Cancel delay task.
  * @param eventMsg Delay Task.
  */
