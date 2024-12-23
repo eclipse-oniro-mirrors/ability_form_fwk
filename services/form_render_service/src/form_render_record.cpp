@@ -285,6 +285,7 @@ void FormRenderRecord::OnNotifyRefreshForm(const int64_t &formId)
     }
 
     formSupplyClient->OnNotifyRefreshForm(formId);
+    HILOG_WARN("Without this form:%{public}" PRId64 "", formId);
 }
 
 void FormRenderRecord::Timer()
@@ -711,9 +712,9 @@ void FormRenderRecord::HandleUpdateForm(const FormJsInfo &formJsInfo, const Want
         auto iter = formRequests_.find(formJsInfo.formId);
         if (iter == formRequests_.end()) {
             OnNotifyRefreshForm(formJsInfo.formId);
-            HILOG_WARN("Without this form:%{public}" PRId64 "", formJsInfo.formId);
             return;
         }
+
         formRequests = iter->second;
     }
     std::string compMaxId = "0";
