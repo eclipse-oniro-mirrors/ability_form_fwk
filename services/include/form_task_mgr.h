@@ -36,9 +36,10 @@ namespace AppExecFwk {
 using Want = OHOS::AAFwk::Want;
 using WantParams = OHOS::AAFwk::WantParams;
 enum class TaskType : int64_t {
-    RECYCLE_FORM,
+    RECYCLE_FORM, // add form type base 0
     RENDER_FORM,
-    DELETE_FORM_HOST_RECORD = 10000
+
+    DELETE_FORM_HOST_RECORD = 10000 // add form_host type base 10000
 };
 namespace {
 constexpr int32_t FORM_TASK_DELAY_TIME = 20; // ms
