@@ -194,6 +194,8 @@ private:
 
     void OnRenderingBlock(const std::string &bundleName);
 
+    void OnNotifyRefreshForm(const int64_t &formId);
+
     void Timer();
 
     bool BeforeHandleUpdateForm(const FormJsInfo &formJsInfo);

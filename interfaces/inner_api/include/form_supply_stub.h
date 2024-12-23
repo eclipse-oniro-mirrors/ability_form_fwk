@@ -117,6 +117,8 @@ private:
      */
     int32_t HandleOnRecoverFormsByConfigUpdate(MessageParcel &data, MessageParcel &reply);
 
+    int32_t HandleOnNotifyRefreshForm(MessageParcel &data, MessageParcel &reply);
+
 private:
     DISALLOW_COPY_AND_MOVE(FormSupplyStub);
 };

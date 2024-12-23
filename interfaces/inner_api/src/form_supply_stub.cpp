@@ -69,6 +69,8 @@ int FormSupplyStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageP
             return HandleOnRecycleForm(data, reply);
         case static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_RECOVER_FORM_BY_CONFIG_UPDATE):
             return HandleOnRecoverFormsByConfigUpdate(data, reply);
+        case static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_NOTIFY_REFRESH):
+            return HandleOnNotifyRefreshForm(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -300,6 +302,19 @@ int32_t FormSupplyStub::HandleOnRecoverFormsByConfigUpdate(MessageParcel &data, 
     int32_t result = OnRecoverFormsByConfigUpdate(formIds);
     reply.WriteInt32(result);
     return result;
+}
+
+int32_t FormSupplyStub::HandleOnNotifyRefreshForm(MessageParcel &data, MessageParcel &reply)
+{
+    int64_t formId = data.ReadInt64();
+    if (formId <= 0) {
+        HILOG_ERROR("ReadInt64<formId> failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    int32_t result = OnNotifyRefreshForm(formId);
+    reply.WriteInt32(result);
+    return ERR_OK;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

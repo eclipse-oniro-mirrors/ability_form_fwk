@@ -121,6 +121,8 @@ public:
      */
     virtual int32_t OnRecoverFormsByConfigUpdate(std::vector<int64_t> &formIds) { return ERR_OK; }
 
+    virtual int32_t OnNotifyRefreshForm(const int64_t &formId) { return ERR_OK; }
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -136,6 +138,7 @@ public:
         TRANSACTION_FORM_RENDERING_BLOCK,
         TRANSACTION_FORM_RECYCLE_FORM,
         TRANSACTION_FORM_RECOVER_FORM_BY_CONFIG_UPDATE,
+        TRANSACTION_NOTIFY_REFRESH,
     };
 };
 }  // namespace AppExecFwk

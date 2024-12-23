@@ -271,6 +271,22 @@ void FormRenderRecord::OnRenderingBlock(const std::string &bundleName)
     formSupplyClient->OnRenderingBlock(bundleName);
 }
 
+void FormRenderRecord::OnNotifyRefreshForm(const int64_t &formId)
+{
+    sptr<IFormSupply> formSupplyClient = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(formSupplyMutex_);
+        formSupplyClient = formSupplyClient_;
+    }
+
+    if (formSupplyClient == nullptr) {
+        HILOG_ERROR("null formSupplyClient");
+        return;
+    }
+
+    formSupplyClient->OnNotifyRefreshForm(formId);
+}
+
 void FormRenderRecord::Timer()
 {
     TaskState taskState = RunTask();
@@ -694,6 +710,7 @@ void FormRenderRecord::HandleUpdateForm(const FormJsInfo &formJsInfo, const Want
         std::lock_guard<std::mutex> lock(formRequestsMutex_);
         auto iter = formRequests_.find(formJsInfo.formId);
         if (iter == formRequests_.end()) {
+            OnNotifyRefreshForm(formJsInfo.formId);
             HILOG_WARN("Without this form:%{public}" PRId64 "", formJsInfo.formId);
             return;
         }
