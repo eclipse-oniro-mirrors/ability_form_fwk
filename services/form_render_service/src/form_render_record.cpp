@@ -714,7 +714,6 @@ void FormRenderRecord::HandleUpdateForm(const FormJsInfo &formJsInfo, const Want
             HILOG_WARN("Without this form:%{public}" PRId64 "", formJsInfo.formId);
             return;
         }
-
         formRequests = iter->second;
     }
     std::string compMaxId = "0";

@@ -429,7 +429,7 @@ void FormMgrAdapter::UpdateReUpdateFormMap(const int64_t formId)
     int64_t currentTime = FormUtil::GetCurrentMillisecond();
     std::lock_guard<std::mutex> lock(reUpdateFormMapMutex_);
     auto iter = reUpdateFormMap_.begin();
-    while(iter != reUpdateFormMap_.end()) {
+    while (iter != reUpdateFormMap_.end()) {
         if (currentTime - iter->second.first > jurgeMs) {
             iter = reUpdateFormMap_.erase(iter);
         } else {
@@ -437,6 +437,15 @@ void FormMgrAdapter::UpdateReUpdateFormMap(const int64_t formId)
         }
     }
     reUpdateFormMap_[formId] = std::make_pair(currentTime, false);
+}
+
+void FormMgrAdapter::SetReUpdateFormMap(const int64_t formId)
+{
+    std::lock_guard<std::mutex> lock(reUpdateFormMapMutex_);
+    auto search = reUpdateFormMap_.find(formId);
+    if (search != reUpdateFormMap_.end()) {
+        search->second.second = true;
+    }
 }
 
 ErrCode FormMgrAdapter::HandleFormAddObserver(const int64_t formId)
@@ -1531,11 +1540,7 @@ ErrCode FormMgrAdapter::AddExistFormRecord(const FormItemInfo &info, const sptr<
         newRecord.formProviderInfo.SetFormDataString(cacheData);
         newRecord.formProviderInfo.SetImageDataMap(imageDataMap);
     } else {
-        std::lock_guard<std::mutex> lock(reUpdateFormMapMutex_);
-        auto search = reUpdateFormMap_.find(formId);
-        if(search != reUpdateFormMap_.end()) {
-            search->second.second = true;
-        }
+        SetReUpdateFormMap(formId);
     }
     FormRenderMgr::GetInstance().RenderForm(newRecord, wantParams, callerToken);
     if (newRecord.needRefresh || newRecord.needAddForm
@@ -3933,7 +3938,7 @@ int32_t FormMgrAdapter::OnNotifyRefreshForm(const int64_t &formId)
     const int32_t jurgeMs = 100;
     int64_t currentTime = FormUtil::GetCurrentMillisecond();
     int64_t lastTime = 0;
-    bool isUpdate =false;
+    bool isUpdate = false;
     {
         std::lock_guard<std::mutex> lock(reUpdateFormMapMutex_);
         auto search = reUpdateFormMap_.find(formId);

@@ -1139,6 +1139,8 @@ private:
     void RemoveFormIdMapElement(const int64_t formId);
 
     void UpdateReUpdateFormMap(const int64_t formId);
+
+    void SetReUpdateFormMap(const int64_t formId);
     /**
      * @class ClientDeathRecipient
      * notices IRemoteBroker died.
