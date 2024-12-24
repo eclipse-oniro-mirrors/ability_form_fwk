@@ -448,6 +448,18 @@ void FormMgrAdapter::SetReUpdateFormMap(const int64_t formId)
     }
 }
 
+ErrCode FormMgrAdapter::UpdateTimer(const int64_t formId, const FormRecord &record)
+{
+    // start update timer
+    ErrCode errorCode = AddFormTimer(record);
+    if (errorCode != ERR_OK) {
+        return errorCode;
+    }
+    if (!record.formTempFlag) {
+        return FormDbCache::GetInstance().UpdateDBRecord(formId, record);
+    }
+    return ERR_OK;
+}
 ErrCode FormMgrAdapter::HandleFormAddObserver(const int64_t formId)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
@@ -1575,15 +1587,7 @@ ErrCode FormMgrAdapter::AddExistFormRecord(const FormItemInfo &info, const sptr<
 
     FormDataMgr::GetInstance().CreateFormJsInfo(formId, record, formInfo);
 
-    // start update timer
-    ErrCode errorCode = AddFormTimer(newRecord);
-    if (errorCode != ERR_OK) {
-        return errorCode;
-    }
-    if (!newRecord.formTempFlag) {
-        return FormDbCache::GetInstance().UpdateDBRecord(formId, newRecord);
-    }
-    return ERR_OK;
+    return UpdateTimer(formId, newRecord);
 }
 
 ErrCode FormMgrAdapter::AllotFormBySpecificId(const FormItemInfo &info,

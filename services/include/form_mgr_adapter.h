@@ -1141,6 +1141,8 @@ private:
     void UpdateReUpdateFormMap(const int64_t formId);
 
     void SetReUpdateFormMap(const int64_t formId);
+
+    ErrCode UpdateTimer(const int64_t formId, const FormRecord &record);
     /**
      * @class ClientDeathRecipient
      * notices IRemoteBroker died.
