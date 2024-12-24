@@ -33,9 +33,9 @@ using namespace OHOS::AppExecFwk;
 
 namespace {
 const std::string FORM_DB_DATA_BASE_FILE_DIR = "/data/formmgr";
-const int32_t four = 4;
-const int32_t ten = 10;
-const int32_t eleven = 11;
+const int32_t FOUR = 4;
+const int32_t TEN = 10;
+const int32_t ELEVEN = 11;
 
 class FmsFormProviderDataTest : public testing::Test {
 public:
@@ -67,7 +67,7 @@ bool FmsFormProviderDataTest::InitJsonData()
 {
     nlohmann::json tmpJson;
     tmpJson["name"] = "li";
-    tmpJson["age"] = ten;
+    tmpJson["age"] = TEN;
     jsonData_["0"] = tmpJson;
     return true;
 }
@@ -76,7 +76,7 @@ bool FmsFormProviderDataTest::InitJsonData2()
 {
     nlohmann::json tmpJson;
     tmpJson["name"] = "wang";
-    tmpJson["age"] = eleven;
+    tmpJson["age"] = ELEVEN;
     jsonData_["1"] = tmpJson;
     return true;
 }
@@ -91,7 +91,7 @@ bool FmsFormProviderDataTest::CreateJsonFileByJsonData1(const nlohmann::json &js
         return false;
     }
 
-    f << std::setw(four) << jsonData << std::endl;
+    f << std::setw(FOUR) << jsonData << std::endl;
 
     f.close();
     return true;
@@ -107,7 +107,7 @@ bool FmsFormProviderDataTest::CreateJsonFileByJsonData2(const nlohmann::json &js
         return false;
     }
 
-    f << std::setw(four) << jsonData << std::endl;
+    f << std::setw(FOUR) << jsonData << std::endl;
 
     f.close();
     return true;
@@ -123,7 +123,7 @@ bool FmsFormProviderDataTest::CreateMergeJsonFileByJsonData3(const nlohmann::jso
         return false;
     }
 
-    f << std::setw(four) << jsonData << std::endl;
+    f << std::setw(FOUR) << jsonData << std::endl;
 
     f.close();
     return true;

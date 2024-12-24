@@ -531,10 +531,10 @@ HWTEST_F(FmsFormRefreshConnectionTest, FormEventHandler_001, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormEventHandler_001 start";
     std::shared_ptr<FormEventHandler> formEventHandler = std::make_shared<FormEventHandler>(nullptr);
     ASSERT_NE(nullptr, formEventHandler);
-    constexpr int64_t EVENT_MSG = 1;
-    constexpr int64_t EVENT_ID = 2;
+    constexpr int64_t eventMsg = 1;
+    constexpr int64_t eventId = 2;
     // text ProcessEvent
-    formEventHandler->ProcessEvent(EVENT_MSG, EVENT_ID);
+    formEventHandler->ProcessEvent(eventMsg, eventId);
     GTEST_LOG_(INFO) << "FormEventHandler_001 end";
 }
 
