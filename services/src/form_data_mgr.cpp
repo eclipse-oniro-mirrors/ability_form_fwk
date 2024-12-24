@@ -119,6 +119,11 @@ bool FormDataMgr::AllotFormHostRecord(const FormItemInfo &info, const sptr<IRemo
     std::lock_guard<std::mutex> lock(formHostRecordMutex_);
     for (auto &record : clientRecords_) {
         if (callerToken == record.GetFormHostClient()) {
+            if (record.GetFormsCount() == 0) {
+                FormTaskMgr::GetInstance().CancelDelayTask(
+                    std::make_pair((int64_t)TaskType::DELETE_FORM_HOST_RECORD, callingUid));
+                HILOG_INFO("cancel delay task of recheck whether need clean form host");
+            }
             record.AddForm(formId);
             HILOG_INFO("addForm");
             return true;
@@ -639,14 +644,38 @@ bool FormDataMgr::DeleteHostRecord(const sptr<IRemoteObject> &callerToken, const
         if (callerToken == iter->GetFormHostClient()) {
             iter->DelForm(formId);
             if (iter->IsEmpty()) {
-                iter->CleanResource();
-                iter = clientRecords_.erase(iter);
-                FormRenderMgr::GetInstance().CleanFormHost(callerToken, iter->GetCallerUid());
+                HILOG_INFO("post delay recheck whether need clean form host task");
+                FormTaskMgr::GetInstance().PostDelayRecheckWhetherNeedCleanFormHostTask(
+                    iter->GetCallerUid(), callerToken);
             }
             break;
         }
     }
     return true;
+}
+/**
+ * @brief Recheck whether need clean form host.
+ * @param callerToken The client stub of the form host record.
+ */
+bool FormDataMgr::RecheckWhetherNeedCleanFormHost(const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("call");
+    std::lock_guard<std::mutex> lock(formHostRecordMutex_);
+    std::vector<FormHostRecord>::iterator iter;
+    for (iter = clientRecords_.begin(); iter != clientRecords_.end(); ++iter) {
+        if (callerToken == iter->GetFormHostClient()) {
+            if (iter->IsEmpty()) {
+                HILOG_INFO("clientRecords_ is empty, clean form host");
+                iter->CleanResource();
+                iter = clientRecords_.erase(iter);
+                FormRenderMgr::GetInstance().CleanFormHost(callerToken, iter->GetCallerUid());
+                return true;
+            }
+            break;
+        }
+    }
+    HILOG_INFO("no need to clean form host");
+    return false;
 }
 /**
  * @brief Clean removed forms form host.
