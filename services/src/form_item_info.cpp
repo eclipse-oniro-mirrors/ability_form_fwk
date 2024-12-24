@@ -623,5 +623,15 @@ void FormItemInfo::SetRenderingMode(Constants::RenderingMode renderingMode)
 {
     renderingMode_ = renderingMode;
 }
+
+bool FormItemInfo::IsLockForm() const
+{
+    return lockForm_;
+}
+
+void FormItemInfo::SetLockForm(bool lockForm)
+{
+    lockForm_ = lockForm;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

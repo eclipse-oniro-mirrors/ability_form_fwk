@@ -55,6 +55,7 @@ ohos_shared_library("libfms") {
     "services/src/form_bms_helper.cpp",
     "services/src/form_bundle_event_callback.cpp",
     "services/src/form_bundle_forbid_mgr.cpp",
+    "services/src/form_bundle_lock_mgr.cpp",
     "services/src/form_cache_mgr.cpp",
     "services/src/form_cast_temp_connection.cpp",
     "services/src/form_data_mgr.cpp",
@@ -193,6 +194,14 @@ ohos_shared_library("libfms") {
 
   if (build_variant == "root") {
     defines += [ "FORM_EVENT_FOR_TEST" ]
+  }
+
+  if (app_lock_service_enable) {
+    external_deps += [ "app_lock_service:app_lock_sdk" ]
+    defines += [ "APP_LOCK_SERVICE_ENABLE" ]
+    include_dirs += [ "services/form_app_lock_helper/include" ]
+    sources +=
+        [ "services/form_app_lock_helper/source/form_app_lock_helper.cpp" ]
   }
 
   subsystem_name = "ability"

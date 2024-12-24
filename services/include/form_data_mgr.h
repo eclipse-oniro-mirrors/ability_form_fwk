@@ -725,6 +725,20 @@ public:
         std::vector<FormRecord> &visibleFormRecords, std::vector<FormRecord> &invisibleFormRecords);
 
     /**
+     * @brief Set form lock or dislock.
+     * @param formId The Id of the form.
+     * @param lock Ture or false.
+     */
+    ErrCode SetFormLock(const int64_t formId, const bool lock);
+
+    /**
+     * @brief Set form lock or dislock.
+     * @param formId The Id of the form.
+     * @param lock Ture or false.
+     */
+    ErrCode GetFormLock(const int64_t formId, bool &lock);
+
+    /**
      * @brief Set form enable or disable.
      * @param formId The Id of the form.
      * @param enable Ture or false.
@@ -744,6 +758,13 @@ public:
      * @param enable Ture or false.
      */
     ErrCode SetUpdateDuringDisableForm(const int64_t formId, const bool enable);
+
+    /**
+     * @brief lock forms style.
+     * @param formRecords The Id list of the formRecord.
+     * @param enable True is lock form, false is unlock form.
+     */
+    void LockForms(const std::vector<FormRecord> &&formRecords, const bool lock);
 
     /**
      * @brief Enable forms style.

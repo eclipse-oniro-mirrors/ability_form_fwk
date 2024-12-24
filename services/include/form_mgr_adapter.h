@@ -641,6 +641,14 @@ public:
     int32_t EnableForms(const std::string bundleName, const bool enable);
 
     /**
+     * @brief enable/disable form lock.
+     * @param bundleName BundleName of the form host.
+     * @param lock True for lock form, false for unlock form.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t LockForms(const std::string bundleName, int32_t userId, const bool lock);
+
+    /**
      * @brief Update form size.
      * @param formId The Id of the form to update.
      * @param width The width value to be updated.

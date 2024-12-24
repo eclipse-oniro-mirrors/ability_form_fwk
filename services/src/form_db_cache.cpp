@@ -192,6 +192,7 @@ ErrCode FormDbCache::GetDBRecord(const int64_t formId, FormRecord &record) const
             record.formUserUids = dbInfo.formUserUids;
             record.formLocation = dbInfo.formLocation;
             record.enableForm = dbInfo.enableForm;
+            record.lockForm = dbInfo.lockForm;
             return ERR_OK;
         }
     }

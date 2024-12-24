@@ -314,6 +314,15 @@ public:
         const sptr<IRemoteObject> &remoteObject);
 
     /**
+     * @brief Post lock form task.
+     * @param formIds formIds The Id list of the forms.
+     * @param lock True or false.
+     * @param remoteObject Form host proxy object.
+     */
+    void PostLockFormsTaskToHost(const std::vector<int64_t> &formIds, const bool lock,
+        const sptr<IRemoteObject> &remoteObject);
+
+    /**
      * @brief Post task to excute.
      * @param func Task function.
      * @param delayMs Task excute delay time(ms).
@@ -559,6 +568,15 @@ private:
      * @param remoteObject Form host proxy object.
      */
     void EnableFormsTaskToHost(const std::vector<int64_t> &formIds, const bool enable,
+        const sptr<IRemoteObject> &remoteObject);
+
+    /**
+     * @brief Lock form or unlock form.
+     * @param formIds formIds The Id list of the forms.
+     * @param lock True or false.
+     * @param remoteObject Form host proxy object.
+     */
+    void LockFormsTaskToHost(const std::vector<int64_t> &formIds, const bool lock,
         const sptr<IRemoteObject> &remoteObject);
 
     /**

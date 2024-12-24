@@ -30,6 +30,7 @@ const std::string INNER_FORM_INFO_ABILITY_NAME = "abilityName";
 const std::string INNER_FORM_INFO_FORM_USER_UIDS = "formUserUids";
 const std::string INNER_FORM_INFO_FORM_LOCATION = "formLocation";
 const std::string INNER_FORM_INFO_FORM_ENABLE = "enableForm";
+const std::string INNER_FORM_INFO_FORM_LOCK = "lockForm";
 } // namespace
 
 /**
@@ -48,6 +49,7 @@ void InnerFormInfo::ToJson(nlohmann::json &jsonObject) const
     jsonObject[INNER_FORM_INFO_FORM_USER_UIDS] = formDBInfo_.formUserUids;
     jsonObject[INNER_FORM_INFO_FORM_LOCATION] = (int)formDBInfo_.formLocation;
     jsonObject[INNER_FORM_INFO_FORM_ENABLE] = formDBInfo_.enableForm;
+    jsonObject[INNER_FORM_INFO_FORM_LOCK] = formDBInfo_.lockForm;
 }
 
 /**
@@ -88,6 +90,9 @@ bool InnerFormInfo::FromJson(const nlohmann::json &jsonObject)
 
     GetValueIfFindKey<bool>(jsonObject, jsonObjectEnd, INNER_FORM_INFO_FORM_ENABLE,
         formDBInfo_.enableForm, JsonType::BOOLEAN, false, parseResult, ArrayType::NOT_ARRAY);
+
+    GetValueIfFindKey<bool>(jsonObject, jsonObjectEnd, INNER_FORM_INFO_FORM_LOCK,
+        formDBInfo_.lockForm, JsonType::BOOLEAN, false, parseResult, ArrayType::NOT_ARRAY);
 
     return parseResult == ERR_OK;
 }

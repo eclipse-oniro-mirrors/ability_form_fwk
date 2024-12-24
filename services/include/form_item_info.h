@@ -442,6 +442,18 @@ public:
      */
     void SetRenderingMode(Constants::RenderingMode renderingMode);
 
+    /**
+     * @brief Get whether is lock.
+     * @return True for lock, false for unlock.
+     */
+    bool IsLockForm() const;
+
+    /**
+     * @brief Set whether is lock.
+     * @param lockForm True for lock, false for unlock.
+     */
+    void SetLockForm(bool lockForm);
+
 private:
     /**
      * @brief Equal or not.
@@ -491,6 +503,7 @@ private:
     BundleType bundleType_ = BundleType::APP;
     bool enableForm_ = true;
     Constants::RenderingMode renderingMode_ = Constants::RenderingMode::FULL_COLOR;
+    bool lockForm_ = false;
 };
 } // namespace AppExecFwk
 } // namespace OHOS

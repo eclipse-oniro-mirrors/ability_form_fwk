@@ -60,6 +60,12 @@ public:
      * @param enable True is enable form, false is disable form.
      */
     virtual void ProcessEnableForm(bool enable) {}
+
+    /**
+     * @brief Lock form.
+     * @param enable True is lock form, false is unlock form.
+     */
+    virtual void ProcessLockForm(bool lock) {}
 };
 
 class FormStateCallbackInterface {

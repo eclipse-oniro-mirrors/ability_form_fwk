@@ -353,5 +353,19 @@ void FormHostRecord::OnEnableForms(const std::vector<int64_t> &formIds, const bo
     }
     formHostCallback_->OnEnableForms(formIds, enable, formHostClient_);
 }
+
+void FormHostRecord::OnLockForms(const std::vector<int64_t> &formIds, const bool lock)
+{
+    HILOG_DEBUG("start");
+    if (formIds.empty()) {
+        HILOG_ERROR("empty formIds");
+        return;
+    }
+    if (formHostCallback_ == nullptr) {
+        HILOG_ERROR("null formHostCallback_");
+        return;
+    }
+    formHostCallback_->OnLockForms(formIds, lock, formHostClient_);
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

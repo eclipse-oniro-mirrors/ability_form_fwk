@@ -105,6 +105,13 @@ public:
      */
     virtual void OnEnableForm(const std::vector<int64_t> &formIds, const bool enable) {}
 
+    /**
+     * @brief lock form style
+     * @param formIds The Id list of the forms.
+     * @param lock True is lockform, false is unlockform.
+     */
+    virtual void OnLockForm(const std::vector<int64_t> &formIds, const bool lock) {}
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -138,6 +145,9 @@ public:
          
         // ipc id for enable form style (3690)
         FORM_HOST_ON_ERROR_FORMS,
+
+        // ipc id for lock form style (3691)
+        FORM_HOST_ON_LOCK_FORM,
     };
 };
 }  // namespace AppExecFwk

@@ -93,6 +93,15 @@ public:
      * @param callerToken Caller ability token.
      */
     void OnEnableForms(const std::vector<int64_t> &formIds, const bool enable, const sptr<IRemoteObject> &callerToken);
+
+    /**
+     * @brief Lock form or unlock form.
+     * @param formIds The Id list of forms.
+     * @param userId User ID.
+     * @param lock True is lock form, false is unlock form.
+     * @param callerToken Caller ability token.
+     */
+    void OnLockForms(const std::vector<int64_t> &formIds, const bool lock, const sptr<IRemoteObject> &callerToken);
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

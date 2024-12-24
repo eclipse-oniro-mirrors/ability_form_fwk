@@ -213,6 +213,13 @@ public:
      * @param enable True is enable form, false is disable form.
      */
     void OnEnableForms(const std::vector<int64_t> &formIds, const bool enable);
+
+    /**
+     * @brief Lock form or unlock form.
+     * @param formIds The Id list of forms.
+     * @param lock True is lock form, false is unlock form.
+     */
+    void OnLockForms(const std::vector<int64_t> &formIds, const bool lock);
 private:
     int callerUid_ = 0;
     sptr<IRemoteObject> formHostClient_ = nullptr;
