@@ -131,6 +131,8 @@ public:
      */
     int32_t OnRecoverFormsByConfigUpdate(std::vector<int64_t> &formIds) override;
 
+    int32_t OnNotifyRefreshForm(const int64_t &formId) override;
+
 private:
     /**
      * @brief check if disconnect ability or not.
