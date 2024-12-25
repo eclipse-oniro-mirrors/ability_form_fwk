@@ -645,7 +645,8 @@ bool FormDataMgr::DeleteHostRecord(const sptr<IRemoteObject> &callerToken, const
             iter->DelForm(formId);
             if (iter->IsEmpty()) {
                 HILOG_INFO("post delay recheck whether need clean form host task");
-                FormTaskMgr::GetInstance().PostDelayRecheckWhetherNeedCleanFormHostTask(iter, callerToken);
+                FormTaskMgr::GetInstance().PostDelayRecheckWhetherNeedCleanFormHostTask(
+                    iter->GetCallerUid(), callerToken);
             }
             break;
         }
@@ -654,18 +655,24 @@ bool FormDataMgr::DeleteHostRecord(const sptr<IRemoteObject> &callerToken, const
 }
 /**
  * @brief Recheck whether need clean form host.
- * @param iter The iterator of vector<FormHostRecord> clientRecords_.
  * @param callerToken The client stub of the form host record.
  */
-bool FormDataMgr::RecheckWhetherNeedCleanFormHost(
-    std::vector<FormHostRecord>::iterator iter, const sptr<IRemoteObject> &callerToken)
+bool FormDataMgr::RecheckWhetherNeedCleanFormHost(const sptr<IRemoteObject> &callerToken)
 {
-    if (iter->IsEmpty()) {
-        HILOG_INFO("clientRecords_ is empty, clean form host");
-        iter->CleanResource();
-        iter = clientRecords_.erase(iter);
-        FormRenderMgr::GetInstance().CleanFormHost(callerToken, iter->GetCallerUid());
-        return true;
+    HILOG_INFO("call");
+    std::lock_guard<std::mutex> lock(formHostRecordMutex_);
+    std::vector<FormHostRecord>::iterator iter;
+    for (iter = clientRecords_.begin(); iter != clientRecords_.end(); ++iter) {
+        if (callerToken == iter->GetFormHostClient()) {
+            if (iter->IsEmpty()) {
+                HILOG_INFO("clientRecords_ is empty, clean form host");
+                iter->CleanResource();
+                iter = clientRecords_.erase(iter);
+                FormRenderMgr::GetInstance().CleanFormHost(callerToken, iter->GetCallerUid());
+                return true;
+            }
+            break;
+        }
     }
     HILOG_INFO("no need to clean form host");
     return false;

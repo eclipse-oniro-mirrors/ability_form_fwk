@@ -286,11 +286,11 @@ public:
 
     /**
      * @brief post delay RecheckWhetherNeedCleanFormHost task.
-     * @param iter The iterator of vector<FormHostRecord> clientRecords_.
+     * @param callerUid The calleruid of FormHostRecord of vector<FormHostRecord> clientRecords_.
      * @param remoteObjectOfHost The client stub of the form host record.
      */
     void PostDelayRecheckWhetherNeedCleanFormHostTask(
-        const std::vector<FormHostRecord>::iterator iter, const sptr<IRemoteObject> &remoteObjectOfHost);
+        const int callerUid, const sptr<IRemoteObject> &remoteObjectOfHost);
 
     /**
      * @brief Cancel delay task.

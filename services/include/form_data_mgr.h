@@ -761,11 +761,9 @@ public:
 
     /**
      * @brief Recheck whether need clean form host.
-     * @param iter The iterator of vector<FormHostRecord> clientRecords_.
      * @param callerToken The client stub of the form host record.
      */
-    bool RecheckWhetherNeedCleanFormHost(const std::vector<FormHostRecord>::iterator iter,
-        const sptr<IRemoteObject> &callerToken);
+    bool RecheckWhetherNeedCleanFormHost(const sptr<IRemoteObject> &callerToken);
 
 private:
     /**
