@@ -2904,7 +2904,6 @@ int FormMgrAdapter::DeleteInvalidForms(const std::vector<int64_t> &formIds,
     std::set<int64_t> matchedFormIds {};
     for (int64_t formId : formIds) {
         int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
-        FormRenderMgr::GetInstance().DeleteAcquireForbiddenTaskByFormId(matchedFormId);
         matchedFormIds.emplace(matchedFormId);
         HILOG_INFO("valid formId, formId:%{public}" PRId64, formId);
     }
@@ -2923,6 +2922,7 @@ int FormMgrAdapter::DeleteInvalidForms(const std::vector<int64_t> &formIds,
         for (const auto &removedForm : removedFormsMap) {
             if (removedForm.second) {
                 FormTimerMgr::GetInstance().RemoveFormTimer(removedForm.first);
+                FormRenderMgr::GetInstance().DeleteAcquireForbiddenTaskByFormId(removedForm.first);
             }
         }
     }
