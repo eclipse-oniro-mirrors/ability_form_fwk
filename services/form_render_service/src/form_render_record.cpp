@@ -301,7 +301,6 @@ void FormRenderRecord::Timer()
 
 TaskState FormRenderRecord::RunTask()
 {
-    std::unique_lock<std::mutex> lock(watchDogMutex_);
     {
         std::lock_guard<std::recursive_mutex> lock(eventHandlerMutex_);
         if (eventHandler_ == nullptr) {
@@ -310,6 +309,7 @@ TaskState FormRenderRecord::RunTask()
         }
     }
 
+    std::unique_lock<std::mutex> lock(watchDogMutex_);
     if (!threadIsAlive_) {
         threadState_->NextState();
         HILOG_INFO("FRS block happened with threadState is %{public}d when bundleName is %{public}s",
