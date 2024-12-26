@@ -759,6 +759,12 @@ public:
      */
     void GetFormIdsByUserId(int32_t userId, std::vector<int64_t> &formIds);
 
+    /**
+     * @brief Recheck whether need clean form host.
+     * @param callerToken The client stub of the form host record.
+     */
+    bool RecheckWhetherNeedCleanFormHost(const sptr<IRemoteObject> &callerToken);
+
 private:
     /**
      * @brief Create form record.

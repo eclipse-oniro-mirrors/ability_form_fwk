@@ -24,6 +24,7 @@
 #include "form_event_handler.h"
 #include "form_js_info.h"
 #include "form_record.h"
+#include "form_host_record.h"
 #include "form_serial_queue.h"
 #include "form_state_info.h"
 #include "iremote_object.h"
@@ -35,13 +36,16 @@ namespace AppExecFwk {
 using Want = OHOS::AAFwk::Want;
 using WantParams = OHOS::AAFwk::WantParams;
 enum class TaskType : int64_t {
-    RECYCLE_FORM,
+    RECYCLE_FORM, // add form type base 0
     RENDER_FORM,
+
+    DELETE_FORM_HOST_RECORD = 10000 // add form_host type base 10000
 };
 namespace {
 constexpr int32_t FORM_TASK_DELAY_TIME = 20; // ms
 constexpr int32_t FORM_FRS_DIED_TASK_DELAY_TIME = 100; // ms
 constexpr int32_t FORM_BUILD_DELAY_TIME = 2000; // ms
+constexpr int32_t CLEAN_FORM_HOST_TASK_DELAY_TIME = 100; // ms
 }
 /**
  * @class FormTaskMgr
@@ -279,6 +283,14 @@ public:
 
     void UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth, const std::string &uid,
         const sptr<IRemoteObject> &remoteObject);
+
+    /**
+     * @brief post delay RecheckWhetherNeedCleanFormHost task.
+     * @param callerUid The calleruid of FormHostRecord of vector<FormHostRecord> clientRecords_.
+     * @param remoteObjectOfHost The client stub of the form host record.
+     */
+    void PostDelayRecheckWhetherNeedCleanFormHostTask(
+        const int callerUid, const sptr<IRemoteObject> &remoteObjectOfHost);
 
     /**
      * @brief Cancel delay task.

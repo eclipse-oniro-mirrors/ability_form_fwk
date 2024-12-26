@@ -1012,7 +1012,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_DeleteHostRecord_001, TestSize.L
     formDataMgr_.clientRecords_.push_back(formHostRecord);
 
     EXPECT_EQ(true, formDataMgr_.DeleteHostRecord(token_, formId));
-    EXPECT_EQ(true, formDataMgr_.clientRecords_.empty());
+    EXPECT_EQ(false, formDataMgr_.clientRecords_.empty());
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_DeleteHostRecord_001 end";
 }
