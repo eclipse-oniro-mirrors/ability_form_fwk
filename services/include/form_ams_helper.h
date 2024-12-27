@@ -60,6 +60,15 @@ public:
     ErrCode ConnectServiceAbility(
         const Want &want, const sptr<AAFwk::IAbilityConnection> &connect);
     /**
+     * @brief Connect session with service ability.
+     * @param want Special want for service type's ability.
+     * @param connect Callback used to notify caller the result of connecting or disconnecting.
+     * @param userId Designation User ID.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode ConnectServiceAbilityWithUserId(
+        const Want &want, const sptr<AAFwk::IAbilityConnection> &connect, int32_t userId);
+    /**
      * @brief Disconnect session with service ability.
      * @param connect Callback used to notify caller the result of connecting or disconnecting.
      * @return Returns ERR_OK on success, others on failure.

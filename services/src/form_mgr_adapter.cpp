@@ -804,6 +804,8 @@ int FormMgrAdapter::UpdateForm(const int64_t formId, const int32_t callingUid,
     // Checks if the form provider is the currently active user.
     if (FormUtil::GetCurrentAccountId() != formRecord.providerUserId) {
         HILOG_ERROR("not under current user");
+        formProviderDataMap_[formId] = formProviderData;
+        formCallingUidMap_[formId] = formRecord.uid;
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
 
@@ -826,6 +828,21 @@ int FormMgrAdapter::UpdateForm(const int64_t formId, const int32_t callingUid,
         FormDataProxyMgr::GetInstance().UpdateSubscribeFormData(matchedFormId, formDataProxies);
     }
     return ret;
+}
+
+void FormMgrAdapter::UpdateFormByUserChange()
+{
+    HILOG_INFO("call");
+    for (auto iter = formProviderDataMap_.begin(); iter != formProviderDataMap_.end(); iter++) {
+        auto callingUid = formCallingUidMap_.find(iter->first);
+        if (callingUid == formCallingUidMap_.end()) {
+            continue;
+        }
+        UpdateForm(iter->first, callingUid->second, iter->second);
+    }
+    formProviderDataMap_.clear();
+    formCallingUidMap_.clear();
+    HILOG_INFO("end");
 }
 
 int FormMgrAdapter::RequestForm(const int64_t formId, const sptr<IRemoteObject> &callerToken, const Want &want)

@@ -535,7 +535,7 @@ inline ErrCode FormRenderMgrInner::ConnectRenderService(
         want.SetParam(Constants::FRS_APP_INDEX, Constants::DEFAULT_SANDBOX_FRS_APP_INDEX);
     }
     connection->SetStateConnecting();
-    return FormAmsHelper::GetInstance().ConnectServiceAbility(want, connection);
+    return FormAmsHelper::GetInstance().ConnectServiceAbilityWithUserId(want, connection, GetUserId());
 }
 
 void FormRenderMgrInner::SetUserId(int32_t userId)

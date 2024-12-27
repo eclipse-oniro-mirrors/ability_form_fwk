@@ -77,6 +77,26 @@ ErrCode FormAmsHelper::ConnectServiceAbility(
     }
     return IN_PROCESS_CALL(ams->ConnectAbility(want, connect, nullptr));
 }
+
+/**
+ * @brief ConnectAbility, connect session with service ability.
+ * @param want Special want for service type's ability.
+ * @param connect Callback used to notify caller the result of connecting or disconnecting.
+ * @param userId Designation User ID.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+ErrCode FormAmsHelper::ConnectServiceAbilityWithUserId(
+    const Want &want, const sptr<AAFwk::IAbilityConnection> &connect, int32_t userId)
+{
+    HILOG_DEBUG("connect service ability with userId");
+    sptr<AAFwk::IAbilityManager> abilityManagerService = GetAbilityManager();
+    if (abilityManagerService == nullptr) {
+        HILOG_ERROR("ability service not connect");
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+    }
+    return IN_PROCESS_CALL(abilityManagerService->ConnectAbility(want, connect, nullptr, userId));
+}
+
 /**
  * @brief Disconnect ability, disconnect session with service ability.
  * @param connect Callback used to notify caller the result of connecting or disconnecting.

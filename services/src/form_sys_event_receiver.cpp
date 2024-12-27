@@ -261,12 +261,8 @@ void FormSysEventReceiver::HandleScreenOn()
 
 void FormSysEventReceiver::HandleUserIdForms(int32_t currentUserId, int32_t lastUserId)
 {
-    HILOG_INFO("currentUserId: %{public}d.", currentUserId);
-    FormRenderMgr::GetInstance().RerenderAllFormsImmediate(currentUserId);
-
-    HILOG_INFO("recycle forms and stop FRS lastUserId:%{public}d.", lastUserId);
-    RecycleForms(lastUserId);
-    FormRenderMgr::GetInstance().DisconnectAllRenderConnections(lastUserId);
+    HILOG_INFO("currentUserId: %{public}d. lastUserId:%{public}d.", currentUserId, lastUserId);
+    FormMgrAdapter::GetInstance().UpdateFormByUserChange();
 }
 
 void FormSysEventReceiver::RecycleForms(int32_t userId)
