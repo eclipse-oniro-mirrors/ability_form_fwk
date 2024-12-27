@@ -36,6 +36,7 @@ struct FormDBInfo {
     Constants::FormLocation formLocation;
     bool isThemeForm = false;
     bool enableForm = true;
+    bool lockForm = false;
     /**
      * @brief Constructors
      *
@@ -59,6 +60,7 @@ struct FormDBInfo {
         formLocation = formRecord.formLocation;
         isThemeForm = formRecord.isThemeForm;
         enableForm = formRecord.enableForm;
+        lockForm = formRecord.lockForm;
     }
     bool Contains(const int uId) const
     {
@@ -118,6 +120,9 @@ struct FormDBInfo {
         if (enableForm != formDBInfo.enableForm) {
             return false;
         }
+        if (lockForm != formDBInfo.lockForm) {
+            return false;
+        }
 
         return true;
     }
@@ -149,6 +154,7 @@ public:
         formDBInfo_.formLocation = formDBInfo.formLocation;
         formDBInfo_.isThemeForm = formDBInfo.isThemeForm;
         formDBInfo_.enableForm = formDBInfo.enableForm;
+        formDBInfo_.lockForm = formDBInfo.lockForm;
     }
     /**
      * @brief Constructors
@@ -167,6 +173,7 @@ public:
         formDBInfo_.formLocation = innerFormInfo.formDBInfo_.formLocation;
         formDBInfo_.isThemeForm = innerFormInfo.formDBInfo_.isThemeForm;
         formDBInfo_.enableForm = innerFormInfo.formDBInfo_.enableForm;
+        formDBInfo_.lockForm = innerFormInfo.formDBInfo_.lockForm;
     }
      /**
      * @brief Constructors
@@ -185,6 +192,7 @@ public:
         formDBInfo_.formLocation = formRecord.formLocation;
         formDBInfo_.isThemeForm = formRecord.isThemeForm;
         formDBInfo_.enableForm = formRecord.enableForm;
+        formDBInfo_.lockForm = formRecord.lockForm;
     }
     std::string ToString() const
     {
@@ -200,6 +208,7 @@ public:
         obj["formLocation"] = formDBInfo_.formLocation;
         obj["isThemeForm"] = formDBInfo_.isThemeForm;
         obj["enableForm"] = formDBInfo_.enableForm;
+        obj["lockForm"] = formDBInfo_.lockForm;
         return obj.dump();
     }
     /**
@@ -399,6 +408,16 @@ public:
     void SetEnableForm(bool enableForm)
     {
         formDBInfo_.enableForm = enableForm;
+    }
+
+    bool IsLockForm() const
+    {
+        return formDBInfo_.lockForm;
+    }
+
+    void SetLockForm(bool lockForm)
+    {
+        formDBInfo_.lockForm = lockForm;
     }
 
     void AddUserUid(const int callingUid);

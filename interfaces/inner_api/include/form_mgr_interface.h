@@ -664,6 +664,17 @@ public:
     }
 
     /**
+     * @brief Check form bundle is lock.
+     * @param bundleName The bundle name of form to be check.
+     * @param formId The Id of the form to query.
+     * @return Returns true for form bundle is lock.
+     */
+    virtual bool IsFormBundleLocked(const std::string &bundleName, int64_t formId)
+    {
+        return false;
+    }
+
+    /**
      * @brief Update size of form.
      * @param formId The Id of the form to update.
      * @param width The width value to be updated.
@@ -759,6 +770,7 @@ public:
         FORM_MGR_IS_SYSTEM_APP_FORM,
         FORM_MGR_IS_FORM_BUNDLE_FORBIDDEN,
         FORM_MGR_UPDATE_FORM_SIZE,
+        FORM_MGR_IS_FORM_BUNDLE_LOCKED,
     };
 };
 }  // namespace AppExecFwk

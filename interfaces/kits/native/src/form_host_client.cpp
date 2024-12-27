@@ -482,5 +482,29 @@ void FormHostClient::OnEnableForm(const std::vector<int64_t> &formIds, const boo
         }
     }
 }
+
+void FormHostClient::OnLockForm(const std::vector<int64_t> &formIds, const bool lock)
+{
+    HILOG_INFO("OnLockForm size:%{public}zu", formIds.size());
+    for (auto &formId : formIds) {
+        if (formId < 0) {
+            HILOG_ERROR("the passed form id can't be negative");
+            continue;
+        }
+        std::lock_guard<std::mutex> lockMutex(callbackMutex_);
+        auto iter = formCallbackMap_.find(formId);
+        if (iter == formCallbackMap_.end()) {
+            HILOG_ERROR("not find formId:%{public}s", std::to_string(formId).c_str());
+            continue;
+        }
+        for (const auto& callback : iter->second) {
+            if (!callback) {
+                HILOG_ERROR("null callback");
+                continue;
+            }
+            callback->ProcessLockForm(lock);
+        }
+    }
+}
 } // namespace AppExecFwk
 } // namespace OHOS

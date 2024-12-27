@@ -262,6 +262,8 @@ int FormMgrStub::OnRemoteRequestFourth(uint32_t code, MessageParcel &data, Messa
             return HandleIsFormBundleForbidden(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UPDATE_FORM_SIZE):
             return HandleUpdateFormSize(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_IS_FORM_BUNDLE_LOCKED):
+            return HandleIsFormBundleLocked(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -1609,6 +1611,19 @@ ErrCode FormMgrStub::HandleIsFormBundleForbidden(MessageParcel &data, MessagePar
     HILOG_DEBUG("call");
     std::string bundleName = data.ReadString();
     bool result = IsFormBundleForbidden(bundleName);
+    if (!reply.WriteBool(result)) {
+        HILOG_ERROR("write action failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleIsFormBundleLocked(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("call");
+    std::string bundleName = data.ReadString();
+    int64_t formId = data.ReadInt64();
+    bool result = IsFormBundleLocked(bundleName, formId);
     if (!reply.WriteBool(result)) {
         HILOG_ERROR("write action failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;

@@ -650,6 +650,14 @@ public:
     bool IsFormBundleForbidden(const std::string &bundleName) override;
 
     /**
+     * @brief Check form bundle is lock.
+     * @param bundleName The bundle name of form to be check.
+     * @param formId The Id of the form to query.
+     * @return Returns true for form bundle is lock.
+     */
+    bool IsFormBundleLocked(const std::string &bundleName, int64_t formId) override;
+
+    /**
      * @brief Update form size.
      * @param formId The Id of the form to update.
      * @param width The width value to be updated.

@@ -158,6 +158,14 @@ bool FormDataMgr::CreateHostRecord(const FormItemInfo &info, const sptr<IRemoteO
     record = FormHostRecord::CreateRecord(info, callerToken, callingUid);
     return true;
 }
+
+static void GetLockFormFormCache(FormRecord &newRecord)
+{
+    FormRecord record;
+    FormDbCache::GetInstance().GetDBRecord(newRecord.formId, record);
+    newRecord.lockForm = record.lockForm;
+}
+
 /**
  * @brief Create form record.
  * @param formInfo The form item info.
@@ -198,6 +206,7 @@ FormRecord FormDataMgr::CreateFormRecord(const FormItemInfo &formInfo, const int
     newRecord.formLocation = formInfo.GetFormLocation();
     newRecord.isThemeForm = formInfo.GetIsThemeForm();
     newRecord.enableForm = formInfo.IsEnableForm();
+    GetLockFormFormCache(newRecord);
     if (newRecord.isEnableUpdate) {
         ParseUpdateConfig(newRecord, formInfo);
     }
@@ -2566,6 +2575,32 @@ ErrCode FormDataMgr::GetRecordsByFormType(const int32_t formRefreshType,
     return ERR_OK;
 }
 
+ErrCode FormDataMgr::SetFormLock(const int64_t formId, const bool lock)
+{
+    std::lock_guard<std::mutex> lockMutex(formRecordMutex_);
+    auto itFormRecord = formRecords_.find(formId);
+    if (itFormRecord == formRecords_.end()) {
+        HILOG_ERROR("form info not find");
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+    }
+    itFormRecord->second.lockForm = lock;
+    HILOG_INFO("formId:%{public}" PRId64 " lock:%{public}d", formId, lock);
+    return ERR_OK;
+}
+
+ErrCode FormDataMgr::GetFormLock(const int64_t formId, bool &lock)
+{
+    std::lock_guard<std::mutex> lockMutex(formRecordMutex_);
+    auto itFormRecord = formRecords_.find(formId);
+    if (itFormRecord == formRecords_.end()) {
+        HILOG_ERROR("form info not find");
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+    }
+    lock = itFormRecord->second.lockForm;
+    HILOG_INFO("formId:%{public}" PRId64 " lock:%{public}d", formId, lock);
+    return ERR_OK;
+}
+
 ErrCode FormDataMgr::SetFormEnable(const int64_t formId, const bool enable)
 {
     std::lock_guard<std::mutex> lock(formRecordMutex_);
@@ -2605,6 +2640,23 @@ ErrCode FormDataMgr::SetUpdateDuringDisableForm(const int64_t formId, const bool
     HILOG_INFO("formId:%{public}" PRId64 " enable:%{public}d",
         formId, enable);
     return ERR_OK;
+}
+
+void FormDataMgr::LockForms(const std::vector<FormRecord> &&formRecords, const bool lock)
+{
+    HILOG_INFO("LockForms start");
+    std::lock_guard<std::mutex> lockMutex(formHostRecordMutex_);
+    for (auto itHostRecord = clientRecords_.begin(); itHostRecord != clientRecords_.end(); itHostRecord++) {
+        std::vector<int64_t> matchedFormIds;
+        for (auto formRecord : formRecords) {
+            if (itHostRecord->Contains(formRecord.formId)) {
+                matchedFormIds.emplace_back(formRecord.formId);
+            }
+        }
+        if (!matchedFormIds.empty()) {
+            itHostRecord->OnLockForms(matchedFormIds, lock);
+        }
+    }
 }
 
 void FormDataMgr::EnableForms(const std::vector<FormRecord> &&formRecords, const bool enable)

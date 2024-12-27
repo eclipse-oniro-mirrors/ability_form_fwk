@@ -30,6 +30,7 @@
         "deps": {
           "components": [
               "ability_runtime",
+              "app_lock_service",
               "distributed_notification_service",
               "bundle_framework",
               "common_event_service",

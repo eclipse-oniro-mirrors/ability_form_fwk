@@ -148,5 +148,22 @@ void FormHostCallback::OnEnableForms(
     // post enableFormsTask to host
     FormTaskMgr::GetInstance().PostEnableFormsTaskToHost(formIds, enable, callerToken);
 }
+
+void FormHostCallback::OnLockForms(const std::vector<int64_t> &formIds,
+    const bool lock, const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("size:%{public}zu, lock:%{public}d", formIds.size(), lock);
+    if (formIds.empty()) {
+        HILOG_ERROR("empty formIds");
+        return;
+    }
+
+    if (callerToken == nullptr) {
+        HILOG_ERROR("null callerToken");
+        return;
+    }
+    // post enableFormsTask to host
+    FormTaskMgr::GetInstance().PostLockFormsTaskToHost(formIds, lock, callerToken);
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

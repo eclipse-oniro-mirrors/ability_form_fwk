@@ -1875,6 +1875,22 @@ bool FormMgr::IsFormBundleForbidden(const std::string &bundleName)
     return remoteProxy_->IsFormBundleForbidden(bundleName);
 }
 
+bool FormMgr::IsFormBundleLocked(const std::string &bundleName, int64_t formId)
+{
+    ErrCode errCode = Connect();
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("connect form mgr service failed,errCode %{public}d", errCode);
+        return false;
+    }
+
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return false;
+    }
+    return remoteProxy_->IsFormBundleLocked(bundleName, formId);
+}
+
 ErrCode FormMgr::UpdateFormSize(const int64_t formId, float width, float height, float borderWidth)
 {
     ErrCode errCode = Connect();

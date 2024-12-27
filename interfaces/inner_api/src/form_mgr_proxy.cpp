@@ -2370,6 +2370,35 @@ bool FormMgrProxy::IsFormBundleForbidden(const std::string &bundleName)
     return reply.ReadBool();
 }
 
+bool FormMgrProxy::IsFormBundleLocked(const std::string &bundleName, int64_t formId)
+{
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed");
+        return true;
+    }
+
+    if (!data.WriteString(bundleName)) {
+        HILOG_ERROR("write bundleName failed");
+        return true;
+    }
+
+    if (!data.WriteInt64(formId)) {
+        HILOG_ERROR("fail write formId ");
+        return true;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_IS_FORM_BUNDLE_LOCKED, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendRequest:%{public}d failed", error);
+        return false;
+    }
+    return reply.ReadBool();
+}
+
 ErrCode FormMgrProxy::UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth)
 {
     HILOG_DEBUG("start");

@@ -1383,6 +1383,36 @@ void FormTaskMgr::EnableFormsTaskToHost(const std::vector<int64_t> &formIds, con
     HILOG_DEBUG("end");
 }
 
+void FormTaskMgr::PostLockFormsTaskToHost(const std::vector<int64_t> &formIds, const bool lock,
+    const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_DEBUG("call");
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("serialQueue_ invalidate");
+        return;
+    }
+
+    auto lockFormsTaskToHostFunc = [formIds, lock, remoteObject]() {
+        FormTaskMgr::GetInstance().LockFormsTaskToHost(formIds, lock, remoteObject);
+    };
+    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, lockFormsTaskToHostFunc);
+}
+
+void FormTaskMgr::LockFormsTaskToHost(const std::vector<int64_t> &formIds, const bool lock,
+    const sptr<IRemoteObject> &remoteObject)
+{
+    HILOG_DEBUG("start");
+    HILOG_INFO("LockFormsTaskToHost start");
+    sptr<IFormHost> remoteFormHost = iface_cast<IFormHost>(remoteObject);
+    if (remoteFormHost == nullptr) {
+        HILOG_ERROR("get formHostProxy failed");
+        return;
+    }
+
+    remoteFormHost->OnLockForm(formIds, lock);
+    HILOG_DEBUG("end");
+}
+
 void FormTaskMgr::PostTask(const std::function<void()> &func, uint64_t delayMs)
 {
     if (!func) {

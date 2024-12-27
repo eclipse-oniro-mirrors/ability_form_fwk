@@ -78,6 +78,7 @@
 #include "form_report.h"
 #include "form_record_report.h"
 #include "form_ability_connection_reporter.h"
+#include "form_bundle_lock_mgr.h"
 
 static const int64_t MAX_NUMBER_OF_JS = 0x20000000000000;
 namespace OHOS {
@@ -1457,6 +1458,8 @@ ErrCode FormMgrAdapter::GetFormConfigInfo(const Want &want, FormItemInfo &formCo
     bool isFormBundleForbidden = FormBundleForbidMgr::GetInstance().IsBundleForbidden(
         formConfigInfo.GetProviderBundleName());
     formConfigInfo.SetEnableForm(!isFormBundleForbidden);
+    bool lock = FormBundleLockMgr::GetInstance().IsBundleLock(formConfigInfo.GetProviderBundleName(), 0);
+    formConfigInfo.SetLockForm(lock);
     HILOG_DEBUG("GetFormConfigInfo end,formLocation = %{public}d,enable is %{public}d",
         formLocation, isFormBundleForbidden);
 
@@ -1487,6 +1490,7 @@ ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
     FormRecord record;
     bool hasRecord = FormDataMgr::GetInstance().GetFormRecord(formId, record);
     record.enableForm = info.IsEnableForm();
+    record.lockForm = info.IsLockForm();
     if (hasRecord) {
         CheckUpdateFormRecord(formId, info, record);
         if (record.formTempFlag && !FormRenderMgr::GetInstance().IsRerenderForRenderServiceDied(formId)) {
@@ -3879,6 +3883,29 @@ void FormMgrAdapter::SetTimerTaskNeeded(bool isTimerTaskNeeded)
 }
 #endif // RES_SCHEDULE_ENABLE
 
+static void RefreshOrUpdateDuringDisableForm(std::vector<FormRecord>::iterator &iter, int32_t userId)
+{
+    if (iter->isRefreshDuringDisableForm) {
+        iter->isRefreshDuringDisableForm = false;
+        Want want;
+        want.SetElementName(iter->bundleName, iter->abilityName);
+        want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
+        want.SetParam(Constants::RECREATE_FORM_KEY, true);
+        want.SetParam(Constants::PARAM_MODULE_NAME_KEY, iter->moduleName);
+        want.SetParam(Constants::PARAM_FORM_NAME_KEY, iter->formName);
+        want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, iter->specification);
+        want.SetParam(Constants::PARAM_FORM_RENDERINGMODE_KEY, static_cast<int32_t>(iter->renderingMode));
+        want.SetParam(Constants::PARAM_DYNAMIC_NAME_KEY, iter->isDynamic);
+        want.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, iter->formTempFlag);
+        FormProviderMgr::GetInstance().RefreshForm(iter->formId, want, true);
+    } else if (iter->isUpdateDuringDisableForm) {
+        iter->isUpdateDuringDisableForm = false;
+        FormProviderData data = iter->formProviderInfo.GetFormData();
+        WantParams wantParams;
+        FormRenderMgr::GetInstance().UpdateRenderingForm(iter->formId, data, wantParams, true);
+    }
+}
+
 int32_t FormMgrAdapter::EnableForms(const std::string bundleName, const bool enable)
 {
     FormBundleForbidMgr::GetInstance().SetBundleForbiddenStatus(bundleName, !enable);
@@ -3903,30 +3930,47 @@ int32_t FormMgrAdapter::EnableForms(const std::string bundleName, const bool ena
         FormDataMgr::GetInstance().SetFormEnable(iter->formId, enable);
         FormDbCache::GetInstance().UpdateDBRecord(iter->formId, *iter);
         if (enable) {
-            if (iter->isRefreshDuringDisableForm) {
-                iter->isRefreshDuringDisableForm = false;
-                Want want;
-                want.SetElementName(iter->bundleName, iter->abilityName);
-                want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
-                want.SetParam(Constants::RECREATE_FORM_KEY, true);
-                want.SetParam(Constants::PARAM_MODULE_NAME_KEY, iter->moduleName);
-                want.SetParam(Constants::PARAM_FORM_NAME_KEY, iter->formName);
-                want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, iter->specification);
-                want.SetParam(Constants::PARAM_FORM_RENDERINGMODE_KEY, static_cast<int32_t>(iter->renderingMode));
-                want.SetParam(Constants::PARAM_DYNAMIC_NAME_KEY, iter->isDynamic);
-                want.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, iter->formTempFlag);
-                FormProviderMgr::GetInstance().RefreshForm(iter->formId, want, true);
-            } else if (iter->isUpdateDuringDisableForm) {
-                iter->isUpdateDuringDisableForm = false;
-                FormProviderData data = iter->formProviderInfo.GetFormData();
-                WantParams wantParams;
-                FormRenderMgr::GetInstance().UpdateRenderingForm(iter->formId, data, wantParams, true);
-            }
+            RefreshOrUpdateDuringDisableForm(iter, userId);
         }
         ++iter;
     }
     if (!formInfos.empty()) {
         FormDataMgr::GetInstance().EnableForms(std::move(formInfos), enable);
+    }
+    return ERR_OK;
+}
+
+int32_t FormMgrAdapter::LockForms(const std::string bundleName, int32_t userId, const bool lock)
+{
+    HILOG_INFO("LockForms entry");
+    FormBundleLockMgr::GetInstance().SetBundleLockStatus(bundleName, lock);
+    std::vector<FormRecord> formInfos;
+    if (!FormDataMgr::GetInstance().GetFormRecord(bundleName, formInfos, userId)) {
+        HILOG_ERROR("GetFormRecord error");
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    }
+    if (!lock) {
+        FormRenderMgr::GetInstance().ExecAcquireProviderForbiddenTask(bundleName);
+    }
+
+    HILOG_INFO("userId:%{public}d, infosSize:%{public}zu, lock:%{public}d", userId, formInfos.size(), lock);
+    for (auto iter = formInfos.begin(); iter != formInfos.end();) {
+        HILOG_DEBUG("bundleName:%{public}s, lockForm:%{public}d, transparencyEnabled:%{public}d",
+            iter->bundleName.c_str(), iter->lockForm, iter->transparencyEnabled);
+        if (iter->lockForm == lock) {
+            iter = formInfos.erase(iter);
+            continue;
+        }
+        iter->lockForm = lock;
+        FormDataMgr::GetInstance().SetFormLock(iter->formId, lock);
+        FormDbCache::GetInstance().UpdateDBRecord(iter->formId, *iter);
+        if (!lock) {
+            RefreshOrUpdateDuringDisableForm(iter, userId);
+        }
+        ++iter;
+    }
+    if (!formInfos.empty()) {
+        FormDataMgr::GetInstance().LockForms(std::move(formInfos), lock);
     }
     return ERR_OK;
 }

@@ -205,6 +205,13 @@ public:
      * @param enable True is enableform, false is disableform.
      */
     void OnEnableForm(const std::vector<int64_t> &formIds, const bool enable) override;
+
+    /**
+     * @brief lock form style
+     * @param formIds The Id list of the forms.
+     * @param lock True is lockform, false is unlockform.
+     */
+    void OnLockForm(const std::vector<int64_t> &formIds, const bool lock) override;
 private:
     static std::mutex instanceMutex_;
     static sptr<FormHostClient> instance_;

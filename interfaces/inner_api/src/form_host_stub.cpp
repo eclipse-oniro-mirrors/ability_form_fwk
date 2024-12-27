@@ -69,6 +69,8 @@ int FormHostStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessagePar
             return HandleOnEnableForm(data, reply);
         case static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_ERROR_FORMS):
             return HandleOnErrorForms(data, reply);
+        case static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_LOCK_FORM):
+            return HandleOnLockForm(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -211,6 +213,20 @@ int32_t FormHostStub::HandleOnEnableForm(MessageParcel &data, MessageParcel &rep
     }
     bool enable = data.ReadBool();
     OnEnableForm(formIds, enable);
+    reply.WriteInt32(ERR_OK);
+    return ERR_OK;
+}
+
+int32_t FormHostStub::HandleOnLockForm(MessageParcel &data, MessageParcel &reply)
+{
+    std::vector<int64_t> formIds;
+    bool ret = data.ReadInt64Vector(&formIds);
+    if (!ret) {
+        HILOG_ERROR("fail ReadInt64Vector<formIds>");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    bool enable = data.ReadBool();
+    OnLockForm(formIds, enable);
     reply.WriteInt32(ERR_OK);
     return ERR_OK;
 }
