@@ -391,5 +391,11 @@ int32_t FormSupplyCallback::OnRecoverFormsByConfigUpdate(std::vector<int64_t> &f
     Want want;
     return FormMgrAdapter::GetInstance().RecoverForms(formIds, want);
 }
+
+int32_t FormSupplyCallback::OnNotifyRefreshForm(const int64_t &formId)
+{
+    FormMgrAdapter::GetInstance().OnNotifyRefreshForm(formId);
+    return ERR_OK;
+}
 } // namespace AppExecFwk
 } // namespace OHOS
