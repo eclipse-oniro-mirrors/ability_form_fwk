@@ -374,8 +374,18 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
             return RENDER_FORM_FAILED;
         }
 
+        sptr<IFormSupply> formSupplyClient = nullptr;
+        {
+            std::lock_guard<std::mutex> lock(formSupplyMutex_);
+            formSupplyClient = formSupplyClient_;
+        }
+        if (formSupplyClient == nullptr) {
+            HILOG_ERROR("null formSupplyClient");
+            return RENDER_FORM_FAILED;
+        }
+
         std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
-        auto task = [thisWeakPtr, formJsInfo, want]() {
+        auto task = [thisWeakPtr, formJsInfo, want, formSupplyClient]() {
             HILOG_DEBUG("HandleUpdateInJsThread begin");
             auto renderRecord = thisWeakPtr.lock();
             if (renderRecord == nullptr) {
@@ -383,6 +393,7 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
                 return;
             }
             renderRecord->HandleUpdateInJsThread(formJsInfo, want);
+            formSupplyClient->OnRenderFormDone(formJsInfo.formId);
         };
         eventHandler_->PostTask(task, "UpdateRenderRecord");
     }
@@ -1556,14 +1567,25 @@ int32_t FormRenderRecord::RecoverForm(const FormJsInfo &formJsInfo,
         return RENDER_FORM_FAILED;
     }
 
+    sptr<IFormSupply> formSupplyClient = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(formSupplyMutex_);
+        formSupplyClient = formSupplyClient_;
+    }
+    if (formSupplyClient == nullptr) {
+        HILOG_ERROR("null formSupplyClient");
+        return RENDER_FORM_FAILED;
+    }
+
     std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
-    auto task = [thisWeakPtr, formJsInfo, statusData, isRecoverFormToHandleClickEvent]() {
+    auto task = [thisWeakPtr, formJsInfo, statusData, isRecoverFormToHandleClickEvent, formSupplyClient]() {
         auto renderRecord = thisWeakPtr.lock();
         if (renderRecord == nullptr) {
             HILOG_ERROR("renderRecord");
             return;
         }
         renderRecord->HandleRecoverForm(formJsInfo, statusData, isRecoverFormToHandleClickEvent);
+        formSupplyClient->OnRecoverFormDone(formJsInfo.formId);
     };
     eventHandler_->PostTask(task, "RecoverForm");
     return ERR_OK;

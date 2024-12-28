@@ -67,7 +67,8 @@ const std::map<int32_t, int32_t> ERROR_CODE_MAP_EXTERNAL = {
     { ERR_APPEXECFWK_FORM_CONNECT_FORM_RENDER_FAILED,  ERR_FORM_EXTERNAL_CONNECT_RENDER_FAILED },
     { ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED,         ERR_FORM_EXTERNAL_RENDER_DIED },
     { ERR_APPEXECFWK_FORM_NOT_TRUST,                   ERR_FORM_EXTERNAL_FORM_NOT_TRUST },
-    { ERR_APPEXECFWK_FORM_ADD_FORM_TIME_OUT,           ERR_FORM_EXTERNAL_ADD_FORM_TIME_OUT}
+    { ERR_APPEXECFWK_FORM_ADD_FORM_TIME_OUT,           ERR_FORM_EXTERNAL_ADD_FORM_TIME_OUT},
+    { ERR_APPEXECFWK_FORM_STATUS_TIMIE_OUT,            ERR_FORM_EXTERNAL_FORM_STATUS_TIMIE_OUT },
 };
 
 const std::map<int32_t, std::string> ERR_MSG_MAP_EXTERNAL = {
@@ -92,6 +93,7 @@ const std::map<int32_t, std::string> ERR_MSG_MAP_EXTERNAL = {
     { ERR_FORM_EXTERNAL_RENDER_DIED,                  "FormRenderService is dead, please reconnect." },
     { ERR_FORM_EXTERNAL_FORM_NOT_TRUST,               "Form is not trust." },
     { ERR_FORM_EXTERNAL_ADD_FORM_TIME_OUT,            "Waiting for the form addition to the desktop timed out." },
+    { ERR_FORM_EXTERNAL_FORM_STATUS_TIMIE_OUT,        "form status timeout, try reAddForm." },
 };
 
 const std::map<int32_t, std::string> ERR_MSG_MAP_INTERNAL = {
@@ -292,6 +294,9 @@ void FormErrors::InitErrorMessageMap()
         },
         {
             ERR_APPEXECFWK_FORM_RENDER_SERVICE_DIED, "FormRenderService is dead.",
+        },
+        {
+            ERR_APPEXECFWK_FORM_STATUS_TIMIE_OUT, "form status timeout, try reAddForm.",
         },
     };
 }

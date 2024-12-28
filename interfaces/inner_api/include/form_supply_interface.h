@@ -123,6 +123,27 @@ public:
 
     virtual int32_t OnNotifyRefreshForm(const int64_t &formId) { return ERR_OK; }
 
+    /**
+     * @brief Accept form render done from form render service.
+     * @param formId The Id of the form.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int32_t OnRenderFormDone(const int64_t &formId) { return ERR_OK; }
+
+    /**
+     * @brief Accept form recover done from form render service.
+     * @param formId The Id of the form.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int32_t OnRecoverFormDone(const int64_t &formId) { return ERR_OK; }
+
+    /**
+     * @brief Accept form recycle done from form render service.
+     * @param formId The Id of the form.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int32_t OnRecycleFormDone(const int64_t &formId) { return ERR_OK; }
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -139,6 +160,9 @@ public:
         TRANSACTION_FORM_RECYCLE_FORM,
         TRANSACTION_FORM_RECOVER_FORM_BY_CONFIG_UPDATE,
         TRANSACTION_NOTIFY_REFRESH,
+        TRANSACTION_FORM_RENDER_FORM_DONE,
+        TRANSACTION_FORM_RECOVER_FORM_DONE,
+        TRANSACTION_FORM_RECYCLE_FORM_DONE,
     };
 };
 }  // namespace AppExecFwk

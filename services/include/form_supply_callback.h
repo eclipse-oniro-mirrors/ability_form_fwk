@@ -133,6 +133,27 @@ public:
 
     int32_t OnNotifyRefreshForm(const int64_t &formId) override;
 
+    /**
+     * @brief Accept form render done from form render service.
+     * @param formId The Id of the form.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t OnRenderFormDone(const int64_t &formId) override;
+
+    /**
+     * @brief Accept form recover done from form render service.
+     * @param formId The Id of the form.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t OnRecoverFormDone(const int64_t &formId) override;
+
+    /**
+     * @brief Accept form recycle done from form render service.
+     * @param formId The Id of the form.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t OnRecycleFormDone(const int64_t &formId) override;
+
 private:
     /**
      * @brief check if disconnect ability or not.

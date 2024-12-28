@@ -119,6 +119,30 @@ private:
 
     int32_t HandleOnNotifyRefreshForm(MessageParcel &data, MessageParcel &reply);
 
+    /**
+     * @brief handle OnRenderForm message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t HandleOnRenderFormDone(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief handle OnRecover message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t HandleOnRecoverFormDone(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief handle OnRecycleForm message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t HandleOnRecycleFormDone(MessageParcel &data, MessageParcel &reply);
+
 private:
     DISALLOW_COPY_AND_MOVE(FormSupplyStub);
 };

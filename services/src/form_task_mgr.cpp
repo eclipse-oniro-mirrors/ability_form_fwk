@@ -35,6 +35,8 @@
 #include "form_info_rdb_storage_mgr.h"
 #include "form_util.h"
 #include "form_record_report.h"
+#include "form_status_queue.h"
+#include "form_command_queue.h"
 
 namespace OHOS {
 namespace AppExecFwk { // namespace
@@ -822,16 +824,28 @@ void FormTaskMgr::PostRenderForm(const FormRecord &formRecord, const Want &want,
             formLastRecoverTimes.erase(formId);
         }
     }
+    auto hostToken = want.GetRemoteObject(Constants::PARAM_FORM_HOST_TOKEN);
+    FormStatusQueue::GetInstance().AddFormStatusQueue(formId, hostToken);
 
     int32_t recoverInterval = (int32_t) (FormUtil::GetCurrentMillisecond() - lastRecoverTime);
     if (lastRecoverTime <= 0 || recoverInterval > FORM_BUILD_DELAY_TIME) {
-        serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, renderForm);
+        FormCommand renderCommand{
+            formId,
+            std::make_pair(TaskCommandType::RENDER_FORM, formId),
+            FORM_TASK_DELAY_TIME,
+            renderForm};
+        FormStatusQueue::GetInstance().PostFormStatusTask(renderCommand);
     } else {
         HILOG_INFO("delay render task: %{public}" PRId32 " ms, formId is %{public}" PRId64, recoverInterval, formId);
         int32_t delayTime = FORM_BUILD_DELAY_TIME - recoverInterval;
         delayTime = std::min(delayTime, FORM_BUILD_DELAY_TIME);
         delayTime = std::max(delayTime, FORM_TASK_DELAY_TIME);
-        serialQueue_->ScheduleDelayTask(std::make_pair((int64_t)TaskType::RENDER_FORM, formId), delayTime, renderForm);
+        FormCommand renderCommand{
+            formId,
+            std::make_pair(TaskCommandType::RENDER_FORM, formId),
+            delayTime,
+            renderForm};
+        FormStatusQueue::GetInstance().PostFormStatusTask(renderCommand);
     }
     HILOG_DEBUG("end");
 }
@@ -871,15 +885,21 @@ void FormTaskMgr::PostStopRenderingForm(
         HILOG_ERROR("null serialQueue_");
         return;
     }
-
+    auto formId = formRecord.formId;
+    FormStatusQueue::GetInstance().DeleteFormStatusQueue(formId);
     auto deleterenderForm = [formRecord, want, remoteObject]() {
         FormTaskMgr::GetInstance().StopRenderingForm(formRecord, want, remoteObject);
     };
     {
         std::lock_guard<std::mutex> lock(formRecoverTimesMutex_);
-        formLastRecoverTimes.erase(formRecord.formId);
+        formLastRecoverTimes.erase(formId);
     }
-    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, deleterenderForm);
+    FormCommand deleteCommand{
+        formId,
+        std::make_pair(TaskCommandType::DELETE_FORM, formId),
+        FORM_TASK_DELAY_TIME,
+        deleterenderForm};
+    FormStatusQueue::GetInstance().PostFormDeleteTask(deleteCommand);
 }
 
 void FormTaskMgr::StopRenderingForm(
@@ -921,7 +941,12 @@ void FormTaskMgr::PostReleaseRenderer(
         std::lock_guard<std::mutex> lock(formRecoverTimesMutex_);
         formLastRecoverTimes.erase(formId);
     }
-    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, deleterenderForm);
+    FormCommand releaseRenderCommand{
+        formId,
+        std::make_pair(TaskCommandType::RECYCLE_FORM, formId),
+        FORM_TASK_DELAY_TIME,
+        deleterenderForm};
+    FormStatusQueue::GetInstance().PostFormStatusTask(releaseRenderCommand);
     HILOG_INFO("end");
 }
 
@@ -1229,14 +1254,20 @@ void FormTaskMgr::PostRecoverForm(const FormRecord &record, const Want &want, co
         return;
     }
 
+    auto formId = record.formId;
     auto recoverForm = [record, want, remoteObject]() {
         FormTaskMgr::GetInstance().RecoverForm(record, want, remoteObject);
     };
     {
         std::lock_guard<std::mutex> lock(formRecoverTimesMutex_);
-        formLastRecoverTimes[record.formId] = FormUtil::GetCurrentMillisecond();
+        formLastRecoverTimes[formId] = FormUtil::GetCurrentMillisecond();
     }
-    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, recoverForm);
+    FormCommand recoverCommand{
+        formId,
+        std::make_pair(TaskCommandType::RECOVER_FORM, formId),
+        FORM_TASK_DELAY_TIME,
+        recoverForm};
+    FormStatusQueue::GetInstance().PostFormStatusTask(recoverCommand);
     HILOG_DEBUG("end");
 }
 
