@@ -120,6 +120,11 @@ public:
         const std::vector<FormDataProxy> &formDataProxies = {});
 
     /**
+     * @brief Update form with formId.
+     */
+    void UpdateFormByUserChange();
+
+    /**
      * @brief Request form with formId and want, send formId and want to form manager service.
      *
      * @param formId The Id of the form to update.
@@ -1173,6 +1178,8 @@ private:
     sptr<IFormPublishInterceptor> formPublishInterceptor_ = nullptr;
     int32_t visibleNotifyDelay_ = Constants::DEFAULT_VISIBLE_NOTIFY_DELAY;
     std::map<int64_t, AddFormResultErrorCode> formIdMap_;
+    std::map<int64_t, FormProviderData> formProviderDataMap_;
+    std::map<int64_t, int32_t> formCallingUidMap_;
     std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;
     std::mutex formResultMutex_;
     std::condition_variable condition_;
