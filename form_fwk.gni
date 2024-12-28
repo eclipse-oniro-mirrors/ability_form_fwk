@@ -49,6 +49,7 @@ init_path = "//base/startup/init"
 declare_args() {
   form_fwk_form_dimension_2_3 = false
   form_fwk_form_dimension_3_3 = false
+  form_fwk_watch_api_disable = false
 }
 
 declare_args() {

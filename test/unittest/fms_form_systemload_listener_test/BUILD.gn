@@ -32,7 +32,7 @@ ohos_unittest("FmsFormSystemloadListenerTest") {
 
   defines = []
 
-  if (res_schedule_service) {
+  if (res_schedule_service && !form_fwk_watch_api_disable) {
     external_deps += [ "resource_schedule_service:ressched_client" ]
     defines += [ "RES_SCHEDULE_ENABLE" ]
   }

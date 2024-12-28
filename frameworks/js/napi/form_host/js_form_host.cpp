@@ -609,6 +609,7 @@ private:
 
     napi_value OnReleaseForm(napi_env env, size_t argc, napi_value* argv)
     {
+#ifndef WATCH_API_DISABLE
         HILOG_DEBUG("call");
 
         if (argc > ARGS_THREE || argc < ARGS_ONE) {
@@ -651,6 +652,9 @@ private:
         NapiAsyncTask::ScheduleWithDefaultQos("JsFormHost::OnReleaseForm",
             env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
         return result;
+#else
+      return nullptr;
+#endif
     }
 
     napi_value OnRequestForm(napi_env env, size_t argc, napi_value* argv)
@@ -739,6 +743,7 @@ private:
 
     napi_value OnCastTempForm(napi_env env, size_t argc, napi_value* argv)
     {
+#ifndef WATCH_API_DISABLE
         HILOG_DEBUG("call");
 
         if (argc > ARGS_TWO || argc < ARGS_ONE) {
@@ -770,6 +775,9 @@ private:
         NapiAsyncTask::ScheduleWithDefaultQos("JsFormHost::OnCastTempForm",
             env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
         return result;
+#else
+        return nullptr;
+#endif
     }
 
     napi_value OnNotifyVisibleForms(napi_env env, size_t argc, napi_value* argv)
@@ -848,6 +856,7 @@ private:
 
     napi_value OnEnableFormsUpdate(napi_env env, size_t argc, napi_value* argv)
     {
+#ifndef WATCH_API_DISABLE
         HILOG_DEBUG("call");
 
         if (argc > ARGS_TWO || argc < ARGS_ONE) {
@@ -880,10 +889,14 @@ private:
             env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
         return result;
         HILOG_DEBUG("OnEnableFormsUpdate end");
+#else
+        return nullptr;
+#endif
     }
 
     napi_value OnDisableFormsUpdate(napi_env env, size_t argc, napi_value* argv)
     {
+#ifndef WATCH_API_DISABLE
         HILOG_DEBUG("call");
 
         if (argc > ARGS_TWO || argc < ARGS_ONE) {
@@ -915,6 +928,9 @@ private:
         NapiAsyncTask::ScheduleWithDefaultQos("JsFormHost::OnDisableFormsUpdate",
             env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
         return result;
+#else
+        return nullptr;
+#endif
     }
 
     napi_value OnIsSystemReady(napi_env env, size_t argc, napi_value* argv)
@@ -1007,6 +1023,7 @@ private:
 
     napi_value OnAcquireFormState(napi_env env, size_t argc, napi_value* argv)
     {
+#ifndef WATCH_API_DISABLE
         HILOG_DEBUG("call");
         if (argc > ARGS_TWO || argc < ARGS_ONE) {
             NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1 or 2");
@@ -1039,10 +1056,14 @@ private:
 
         InnerAcquireFormState(env, asyncTask, std::move(task), want);
         return result;
+#else
+        return nullptr;
+#endif
     }
 
     napi_value OnSetRouterProxy(napi_env env, size_t argc, napi_value* argv)
     {
+#ifndef WATCH_API_DISABLE
         if (argc > ARGS_THREE || argc < ARGS_TWO) {
             HILOG_ERROR("invalid argc");
             NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "2 or 3");
@@ -1087,10 +1108,14 @@ private:
         NapiAsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnSetRouterProxy",
             env, CreateAsyncTaskWithLastParam(env, lastParam, std::move(execute), std::move(complete), &result));
         return result;
+#else
+        return nullptr;
+#endif
     }
 
     napi_value OnClearRouterProxy(napi_env env, size_t argc, napi_value* argv)
     {
+#ifndef WATCH_API_DISABLE
         // Check the number of input parameters.
         if (argc > ARGS_TWO || argc < ARGS_ONE) {
             HILOG_ERROR("invalid argc");
@@ -1127,6 +1152,9 @@ private:
         NapiAsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnClearRouterProxy",
             env, CreateAsyncTaskWithLastParam(env, lastParam, std::move(execute), std::move(complete), &result));
         return result;
+#else
+        return nullptr;
+#endif
     }
 
     napi_value OnRegisterFormObserver(napi_env env, size_t argc, napi_value* argv)
@@ -1494,6 +1522,7 @@ private:
 
     napi_value OnShareForm(napi_env env, size_t argc, napi_value* argv)
     {
+#ifndef WATCH_API_DISABLE
         HILOG_DEBUG("call");
         if (argc > ARGS_THREE || argc < ARGS_TWO) {
             HILOG_ERROR("invalid argc");
@@ -1537,10 +1566,14 @@ private:
         InnerShareForm(env, asyncTask, std::move(task), formId, devicedId);
 
         return result;
+#else
+        return nullptr;
+#endif
     }
 
     napi_value OnAcquireFormData(napi_env env, size_t argc, napi_value* argv)
     {
+#ifndef WATCH_API_DISABLE
         HILOG_DEBUG("call");
         if (argc > ARGS_TWO || argc < ARGS_ONE) {
             HILOG_ERROR("invalid argc");
@@ -1574,10 +1607,14 @@ private:
 
         InnerAcquireFormData(env, asyncTask, std::move(task), formId);
         return result;
+#else
+        return nullptr;
+#endif
     }
 
     napi_value OnNotifyFormsPrivacyProtected(napi_env env, size_t argc, napi_value* argv)
     {
+#ifndef WATCH_API_DISABLE
         HILOG_INFO("call");
         if (argc > ARGS_THREE || argc < ARGS_TWO) {
             HILOG_ERROR("invalid argc");
@@ -1618,10 +1655,14 @@ private:
         NapiAsyncTask::ScheduleWithDefaultQos("NapiFormHost::OnNotifyFormsPrivacyProtected",
             env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
         return result;
+#else
+        return nullptr;
+#endif
     }
 
     napi_value OnSetFormsRecyclable(napi_env env, size_t argc, napi_value *argv)
     {
+#ifndef WATCH_API_DISABLE
         HILOG_DEBUG("call");
         if (argc < ARGS_ONE || argc > ARGS_TWO) {
             HILOG_ERROR("invalid argc");
@@ -1652,6 +1693,9 @@ private:
         NapiAsyncTask::ScheduleWithDefaultQos("JsFormHost::OnSetFormsRecyclable",
             env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
         return result;
+#else
+        return nullptr;
+#endif
     }
 
     napi_value OnRecoverForms(napi_env env, size_t argc, napi_value *argv)
