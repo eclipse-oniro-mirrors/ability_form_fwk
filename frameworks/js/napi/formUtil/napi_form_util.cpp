@@ -545,6 +545,7 @@ napi_value CreateFormInfo(napi_env env, const FormInfo &formInfo)
     napi_set_named_property(env, objContext, "fontScaleFollowSystem",
         CreateJsValue(env, formInfo.fontScaleFollowSystem));
     napi_set_named_property(env, objContext, "supportedShapes", CreateNativeArray(env, formInfo.supportShapes));
+    napi_set_named_property(env, objContext, "previewImages", CreateNativeArray(env, formInfo.formPreviewImages));
 
     return objContext;
 }
