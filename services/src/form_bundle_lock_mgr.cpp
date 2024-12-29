@@ -22,7 +22,6 @@ namespace OHOS {
 namespace AppExecFwk {
 namespace {
     const std::string LOCK_FORM_BUNDLE_TABLE = "lock_form_bundle_table";
-    const int32_t DEFAULT_USERID = 100;
 }
 
 FormBundleLockMgr::FormBundleLockMgr()

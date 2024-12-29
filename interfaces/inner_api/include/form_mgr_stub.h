@@ -549,7 +549,7 @@ private:
      * @param reply output param.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode HandleIsFormBundleLocked(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleIsFormLocked(MessageParcel &data, MessageParcel &reply);
 
     /**
      * @brief the first part of handle remote request.

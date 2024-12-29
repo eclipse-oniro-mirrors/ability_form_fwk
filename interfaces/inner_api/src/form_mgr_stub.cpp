@@ -263,7 +263,7 @@ int FormMgrStub::OnRemoteRequestFourth(uint32_t code, MessageParcel &data, Messa
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UPDATE_FORM_SIZE):
             return HandleUpdateFormSize(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_IS_FORM_BUNDLE_LOCKED):
-            return HandleIsFormBundleLocked(data, reply);
+            return HandleIsFormLocked(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -1618,7 +1618,7 @@ ErrCode FormMgrStub::HandleIsFormBundleForbidden(MessageParcel &data, MessagePar
     return ERR_OK;
 }
 
-ErrCode FormMgrStub::HandleIsFormBundleLocked(MessageParcel &data, MessageParcel &reply)
+ErrCode FormMgrStub::HandleIsFormLocked(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_DEBUG("call");
     std::string bundleName = data.ReadString();

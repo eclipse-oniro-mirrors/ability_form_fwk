@@ -1747,7 +1747,7 @@ ErrCode FormMgrAdapter::AcquireProviderFormInfoAsync(const int64_t formId,
     const FormItemInfo &info, const WantParams &wantParams)
 {
     std::string providerBundleName = info.GetProviderBundleName();
-    if (!info.IsEnableForm()) {
+    if (!info.IsEnableForm() || info.IsLockForm()) {
         HILOG_INFO("Bundle:%{public}s forbidden", providerBundleName.c_str());
         FormDataMgr::GetInstance().SetRefreshDuringDisableForm(formId, true);
 
@@ -3931,7 +3931,7 @@ int32_t FormMgrAdapter::EnableForms(const std::string bundleName, const bool ena
         HILOG_ERROR("GetFormRecord error");
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
-    if (enable) {
+    if (enable && !FormBundleLockMgr::GetInstance().IsBundleLock(bundleName, 0)) {
         FormRenderMgr::GetInstance().ExecAcquireProviderForbiddenTask(bundleName);
     }
     int32_t userId = FormUtil::GetCurrentAccountId();
@@ -3966,7 +3966,7 @@ int32_t FormMgrAdapter::LockForms(const std::string bundleName, int32_t userId, 
         HILOG_ERROR("GetFormRecord error");
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
-    if (!lock) {
+    if (!lock && !FormBundleForbidMgr::GetInstance().IsBundleForbidden(bundleName)) {
         FormRenderMgr::GetInstance().ExecAcquireProviderForbiddenTask(bundleName);
     }
 

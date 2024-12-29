@@ -17,18 +17,14 @@
 #include "iservice_registry.h"
 
 #include "fms_log_wrapper.h"
-#include "app_lock_manager_proxy.h"
 #include "app_lock_manager_client.h"
-#include "switch_state_listener.h"
+#include "form_event_register.h"
 #include "form_mgr_errors.h"
 #include "form_mgr_adapter.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 
-namespace {
-    constexpr int APP_LOCK_MANAGER_SA_ID = 66288;
-}
 using namespace AppSecurityPrivacy::AppLock;
 
 FormAppLockHelper::FormAppLockHelper()
@@ -43,17 +39,17 @@ FormAppLockHelper &FormAppLockHelper::GetInstance()
 ErrCode FormAppLockHelper::RegisterSwitchStateListener()
 {
     HILOG_INFO("RegisterSwitchStateListener entry");
-    OnSwitchStateChangedCbFunc onSwitchStateChanged =
-        std::bind(&FormAppLockHelper::OnSwitchStateChanged, this, std::placeholders::_1);
-    sptr<ISwitchStateListener> switchStateRemoteCallback =
-        new (std::nothrow) SwitchStateListenerStubImpl(onSwitchStateChanged);
-    WithCheckSystemAbility([this, switchStateRemoteCallback](const sptr<IAppLockManager> &proxy) {
-        if (proxy == nullptr) {
-            HILOG_ERROR("proxy is nullptr");
-            return;
-        }
-        proxy->RegisterSwitchStateListener(switchStateRemoteCallback);
-    });
+    std::shared_ptr<SwitchStateListenerImpl> switchStateNativeListener = std::make_shared<SwitchStateListenerImpl>(
+        std::bind(&FormAppLockHelper::OnSwitchStateChanged, this, std::placeholders::_1));
+    if (switchStateNativeListener == nullptr) {
+        HILOG_ERROR("failed to create switchStateNativeListener");
+        return false;
+    }
+    int32_t ret = AppLockManagerClient::GetInstance().RegisterSwitchStateListener(switchStateNativeListener);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("RegisterAppProtectedStateListener failed, res is %d", ret);
+        return ret;
+    }
     HILOG_INFO("RegisterSwitchStateListener end");
     return SUBSYS_COMMON;
 }
@@ -76,43 +72,6 @@ void FormAppLockHelper::OnSwitchStateChanged(
         }
     }
     return;
-}
-
-void FormAppLockHelper::WithCheckSystemAbility(
-    const std::function<void(const sptr<AppSecurityPrivacy::AppLock::IAppLockManager>&)>& consumer)
-{
-    auto saMgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (saMgrProxy == nullptr) {
-        HILOG_ERROR("saMgrProxy is nullptr!");
-        consumer(nullptr);
-        return;
-    }
-    auto sa = saMgrProxy->GetSystemAbility(APP_LOCK_MANAGER_SA_ID);
-    ConsumeWithSystemAbility(consumer, sa);
-}
-
-void FormAppLockHelper::ConsumeWithSystemAbility(
-    const std::function<void(const sptr<AppSecurityPrivacy::AppLock::IAppLockManager>&)>& consumer,
-    const sptr<IRemoteObject>& sa)
-{
-    if (sa == nullptr) {
-        HILOG_ERROR("sa= %{public}d is nullptr", APP_LOCK_MANAGER_SA_ID);
-        consumer(nullptr);
-        return;
-    }
-    if (sa->IsObjectDead()) {
-        HILOG_ERROR("sa= %{public}d has dead", APP_LOCK_MANAGER_SA_ID);
-        consumer(nullptr);
-        return;
-    }
-    sptr<IAppLockManager> proxy = iface_cast<IAppLockManager>(sa);
-    if (proxy == nullptr) {
-        HILOG_ERROR("iface_cast sa= %{public}d is nullptr, there is nothing we can do.", APP_LOCK_MANAGER_SA_ID);
-        consumer(nullptr);
-        return;
-    }
-    HILOG_DEBUG("cast to AppLockManager succeed");
-    consumer(proxy);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
