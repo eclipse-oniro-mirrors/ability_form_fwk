@@ -801,7 +801,7 @@ ErrCode FormInfoMgr::ReloadFormInfos(const int32_t userId)
         bundleVersionMap.erase(bundleVersionPair);
         uint32_t newVersionCode = bundleFormInfoPair.second->GetVersionCode(userId);
         if (oldVersionCode == newVersionCode) {
-            HILOG_INFO("vesionCode not change, bundleName=%{public}s, versionCode:%{public}d",
+            HILOG_INFO("versionCode not change, bundleName=%{public}s, versionCode:%{public}d",
                 bundleName.c_str(), oldVersionCode);
             continue;
         }

@@ -110,7 +110,7 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
     if (result != ERR_OK) {
         return result;
     }
-    HILOG_INFO("FormProviderMgr::RefreshForm, formId:%{public}" PRId64 "., record.enableForm = %{public}d",
+    HILOG_BRIEF("FormProviderMgr::RefreshForm, formId:%{public}" PRId64 "., record.enableForm = %{public}d",
         formId, record.enableForm);
     if (!record.enableForm) {
         FormDataMgr::GetInstance().SetRefreshDuringDisableForm(formId, true);
@@ -229,6 +229,9 @@ ErrCode FormProviderMgr::ConnectAmsForRefresh(const int64_t formId,
     ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbility(connectWant, formRefreshConnection);
     if (errorCode != ERR_OK) {
         HILOG_ERROR("ConnectServiceAbility failed");
+        if (errorCode == ERR_ECOLOGICAL_CONTROL_STATUS) {
+            return ERR_APPEXECFWK_FORM_GET_AMSCONNECT_FAILED;
+        }
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
 
