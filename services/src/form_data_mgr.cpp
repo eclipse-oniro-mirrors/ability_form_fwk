@@ -162,8 +162,12 @@ bool FormDataMgr::CreateHostRecord(const FormItemInfo &info, const sptr<IRemoteO
 static void GetLockFormFormCache(FormRecord &newRecord)
 {
     FormRecord record;
-    FormDbCache::GetInstance().GetDBRecord(newRecord.formId, record);
-    newRecord.lockForm = record.lockForm;
+    int32_t res = FormDbCache::GetInstance().GetDBRecord(newRecord.formId, record);
+    if (res != ERR_OK) {
+        HILOG_ERROR("query record from formid is failed");
+    } else {
+        newRecord.lockForm = record.lockForm;
+    }
 }
 
 /**

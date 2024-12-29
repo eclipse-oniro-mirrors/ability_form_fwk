@@ -37,11 +37,6 @@ public:
 
 private:
     FormAppLockHelper();
-    void WithCheckSystemAbility(
-        const std::function<void(const sptr<AppSecurityPrivacy::AppLock::IAppLockManager> &)> &consumer);
-    void ConsumeWithSystemAbility(
-        const std::function<void(const sptr<AppSecurityPrivacy::AppLock::IAppLockManager>&)>& consumer,
-        const sptr<IRemoteObject>& sa);
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
