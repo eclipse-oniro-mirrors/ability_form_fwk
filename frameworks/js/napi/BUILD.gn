@@ -337,6 +337,11 @@ ohos_shared_library("formhost") {
 
   subsystem_name = "ability"
   part_name = "form_fwk"
+
+  defines = []
+  if (form_fwk_watch_api_disable) {
+    defines += [ "WATCH_API_DISABLE" ]
+  }
 }
 
 ################################### formobserver ########################################
