@@ -34,6 +34,7 @@
 #include "form_report.h"
 #include "form_record_report.h"
 #include "form_mgr_adapter.h"
+#include "form_status_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -395,6 +396,27 @@ int32_t FormSupplyCallback::OnRecoverFormsByConfigUpdate(std::vector<int64_t> &f
 int32_t FormSupplyCallback::OnNotifyRefreshForm(const int64_t &formId)
 {
     FormMgrAdapter::GetInstance().OnNotifyRefreshForm(formId);
+    return ERR_OK;
+}
+
+int32_t FormSupplyCallback::OnRenderFormDone(const int64_t &formId)
+{
+    HILOG_INFO("formId:%{public}" PRId64, formId);
+    FormStatusMgr::GetInstance().OnRenderFormDone(formId);
+    return ERR_OK;
+}
+
+int32_t FormSupplyCallback::OnRecoverFormDone(const int64_t &formId)
+{
+    HILOG_INFO("formId:%{public}" PRId64, formId);
+    FormStatusMgr::GetInstance().OnRecoverFormDone(formId);
+    return ERR_OK;
+}
+
+int32_t FormSupplyCallback::OnRecycleFormDone(const int64_t &formId)
+{
+    HILOG_INFO("formId:%{public}" PRId64, formId);
+    FormStatusMgr::GetInstance().OnRecycleFormDone(formId);
     return ERR_OK;
 }
 } // namespace AppExecFwk

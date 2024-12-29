@@ -71,6 +71,12 @@ int FormSupplyStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageP
             return HandleOnRecoverFormsByConfigUpdate(data, reply);
         case static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_NOTIFY_REFRESH):
             return HandleOnNotifyRefreshForm(data, reply);
+        case static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_RENDER_FORM_DONE):
+            return HandleOnRenderFormDone(data, reply);
+        case static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_RECOVER_FORM_DONE):
+            return HandleOnRecoverFormDone(data, reply);
+        case static_cast<uint32_t>(IFormSupply::Message::TRANSACTION_FORM_RECYCLE_FORM_DONE):
+            return HandleOnRecycleFormDone(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -315,6 +321,45 @@ int32_t FormSupplyStub::HandleOnNotifyRefreshForm(MessageParcel &data, MessagePa
     int32_t result = OnNotifyRefreshForm(formId);
     reply.WriteInt32(result);
     return ERR_OK;
+}
+
+int32_t FormSupplyStub::HandleOnRenderFormDone(MessageParcel &data, MessageParcel &reply)
+{
+    auto formId = data.ReadInt64();
+    if (formId <= 0) {
+        HILOG_ERROR("ReadInt64<formId> failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    int32_t result = OnRenderFormDone(formId);
+    reply.WriteInt32(result);
+    return result;
+}
+
+int32_t FormSupplyStub::HandleOnRecoverFormDone(MessageParcel &data, MessageParcel &reply)
+{
+    auto formId = data.ReadInt64();
+    if (formId <= 0) {
+        HILOG_ERROR("ReadInt64<formId> failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    int32_t result = OnRecoverFormDone(formId);
+    reply.WriteInt32(result);
+    return result;
+}
+
+int32_t FormSupplyStub::HandleOnRecycleFormDone(MessageParcel &data, MessageParcel &reply)
+{
+    auto formId = data.ReadInt64();
+    if (formId <= 0) {
+        HILOG_ERROR("ReadInt64<formId> failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    int32_t result = OnRecycleFormDone(formId);
+    reply.WriteInt32(result);
+    return result;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
