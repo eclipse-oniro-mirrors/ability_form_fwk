@@ -36,7 +36,6 @@
 #include "form_util.h"
 #include "form_provider_mgr.h"
 #include "form_record_report.h"
-
 #include "form_status_queue.h"
 #include "form_command_queue.h"
 
