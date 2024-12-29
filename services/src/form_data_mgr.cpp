@@ -374,7 +374,7 @@ int FormDataMgr::CheckEnoughForm(const int callingUid, const int32_t currentUser
     std::lock_guard<std::mutex> lock(formRecordMutex_);
     std::vector<FormDBInfo> formDbInfos;
     FormDbCache::GetInstance().GetAllFormInfo(formDbInfos);
-    HILOG_INFO("already use %{public}zu forms", formDbInfos.size());
+    HILOG_INFO("already use %{public}zu forms by userId", formDbInfos.size());
     if (static_cast<int32_t>(formDbInfos.size()) >= maxFormsSize) {
         HILOG_WARN("exceeds max form number %{public}d", maxFormsSize);
         FormEventReport::SendFormFailedEvent(FormEventName::ADD_FORM_FAILED, HiSysEventType::FAULT,
@@ -391,7 +391,7 @@ int FormDataMgr::CheckEnoughForm(const int callingUid, const int32_t currentUser
                     continue;
                 }
                 if (++callingUidFormCounts >= maxRecordPerApp) {
-                    HILOG_WARN("already use %{public}d forms", maxRecordPerApp);
+                    HILOG_WARN("already use %{public}d forms by userId==currentAccountId", maxRecordPerApp);
                     return ERR_APPEXECFWK_FORM_MAX_FORMS_PER_CLIENT;
                 }
                 break;

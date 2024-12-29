@@ -35,6 +35,7 @@
 #include "form_info_rdb_storage_mgr.h"
 #include "form_util.h"
 #include "form_record_report.h"
+#include "form_provider_mgr.h"
 #include "form_status_queue.h"
 #include "form_command_queue.h"
 
@@ -395,6 +396,20 @@ void FormTaskMgr::PostRemoveTaskToHost(const std::string bundleName,
         FormTaskMgr::GetInstance().FormRemove(bundleName, remoteObject, runningFormInfo);
     };
     serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, removeFunc);
+    HILOG_DEBUG("end");
+}
+
+void FormTaskMgr::PostEnterpriseAppInstallFailedRetryTask(const int64_t formId, const Want &want, bool isVisibleToFresh)
+{
+    HILOG_DEBUG("start");
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("serialQueue_ invalidate");
+        return;
+    }
+    auto refreshForm = [formId, want, isVisibleToFresh]() {
+        FormProviderMgr::GetInstance().RefreshForm(formId, want, isVisibleToFresh);
+    };
+    serialQueue_->ScheduleTask(ENTERPRISE_APP_INSTALL_FAILED_DELAY_TIME, refreshForm);
     HILOG_DEBUG("end");
 }
 

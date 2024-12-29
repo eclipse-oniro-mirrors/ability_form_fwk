@@ -45,6 +45,7 @@ namespace {
 constexpr int32_t FORM_TASK_DELAY_TIME = 20; // ms
 constexpr int32_t FORM_FRS_DIED_TASK_DELAY_TIME = 100; // ms
 constexpr int32_t FORM_BUILD_DELAY_TIME = 1400; // ms
+constexpr int32_t ENTERPRISE_APP_INSTALL_FAILED_DELAY_TIME = 5000; // ms
 constexpr int32_t CLEAN_FORM_HOST_TASK_DELAY_TIME = 100; // ms
 }
 /**
@@ -226,6 +227,8 @@ public:
 
     void PostRemoveTaskToHost(const std::string bundleName, const sptr<IRemoteObject> &remoteObject,
         const RunningFormInfo &runningFormInfo);
+
+    void PostEnterpriseAppInstallFailedRetryTask(const int64_t formId, const Want &want, bool isVisibleToFresh);
 
     void PostReleaseRenderer(
         int64_t formId, const std::string &compId, const std::string &uid, const sptr<IRemoteObject> &remoteObject);
