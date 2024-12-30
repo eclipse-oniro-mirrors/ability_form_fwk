@@ -52,7 +52,8 @@ bool FormModuleChecker::CheckApiAllowList(const std::string& apiPath)
         "multimedia.image.SourceOptions.*",
         "multimedia.image.createImageSource",
         "multimedia.image.PixelMap.*",
-        "multimedia.image.ImageSource.*"
+        "multimedia.image.ImageSource.*",
+        "arkui.shape.*"
     };
 
     for (const auto& item : allowList) {
@@ -113,7 +114,8 @@ bool FormModuleChecker::IsModuelAllowToLoad(const std::string& moduleName)
         "intl",
         "effectKit",
         "font",
-        "multimedia.image"
+        "multimedia.image",
+        "arkui.shape"
     };
 
     for (const auto& item : moduleAllowList) {
