@@ -77,7 +77,7 @@ constexpr int MILLISECOND_WIDTH = 3;
 constexpr char MILLISECOND_FILLCHAR = '0';
 const int32_t API_TIME_OUT = 5;
 const int32_t API_TIME_OUT_8S = 8;
-const int32_t API_TIME_OUT_30s = 30;
+const int32_t API_TIME_OUT_30S = 30;
 #ifdef RES_SCHEDULE_ENABLE
 constexpr int32_t SYSTEMLOADLEVEL_TIMERSTOP_THRESHOLD =
     static_cast<int32_t>(ResourceSchedule::ResType::SystemloadLevel::HIGH);
@@ -204,7 +204,7 @@ int FormMgrService::AddForm(const int64_t formId, const Want &want,
     }
     ReportAddFormEvent(formId, want);
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_AddForm",
-        API_TIME_OUT_30s, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
+        API_TIME_OUT_30S, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
     ret = FormMgrAdapter::GetInstance().AddForm(formId, want, callerToken, formInfo);
     HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
     return ret;

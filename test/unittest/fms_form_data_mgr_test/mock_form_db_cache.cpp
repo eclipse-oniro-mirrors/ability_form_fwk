@@ -22,14 +22,14 @@
 #include "form_util.h"
 
 namespace {
-    int32_t mockCheckAllDBFormMaxSize = 2;
-    int32_t mockCheckAllDBFormPreAPPSize = 1;
-    int32_t mockCheckType = mockCheckAllDBFormMaxSize;
+    int32_t g_mockAllDBFormMaxSize = 2;
+    int32_t g_mockCheckAllDbFormPreAppSize = 1;
+    int32_t g_mockCheckType = g_mockAllDBFormMaxSize;
 }
 
 void MockGetAllFormInfo(int32_t mockRet)
 {
-    mockCheckType = mockRet;
+    g_mockCheckType = mockRet;
 }
 
 namespace OHOS {
@@ -43,12 +43,12 @@ void FormDbCache::GetAllFormInfo(std::vector<FormDBInfo> &formDBInfos)
 {
     FormDBInfo formDBInfo;
     int userUid = -1;
-    if (mockCheckType == mockCheckAllDBFormMaxSize) {
+    if (g_mockCheckType == g_mockAllDBFormMaxSize) {
         for (int formId_index = 0; formId_index < Constants::MAX_FORMS; formId_index++) {
             formDBInfo.providerUserId = formId_index;
             formDBInfos.emplace_back(formDBInfo);
         }
-    } else if (mockCheckType == mockCheckAllDBFormPreAPPSize) {
+    } else if (g_mockCheckType == g_mockCheckAllDbFormPreAppSize) {
         for (int formId_index = 0; formId_index < Constants::MAX_RECORD_PER_APP; formId_index++) {
             formDBInfo.formUserUids.emplace_back(userUid);
             formDBInfo.providerUserId = FormUtil::GetCurrentAccountId();
