@@ -649,6 +649,8 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth);
+
+    int32_t OnNotifyRefreshForm(const int64_t &formId);
 private:
     /**
      * @brief Get form configure info.
@@ -1136,6 +1138,11 @@ private:
 
     void RemoveFormIdMapElement(const int64_t formId);
 
+    void UpdateReUpdateFormMap(const int64_t formId);
+
+    void SetReUpdateFormMap(const int64_t formId);
+
+    ErrCode UpdateTimer(const int64_t formId, const FormRecord &record);
     /**
      * @class ClientDeathRecipient
      * notices IRemoteBroker died.
@@ -1205,6 +1212,9 @@ private:
     void CheckUpdateFormRecord(const int64_t formId, const FormItemInfo &info, FormRecord &record);
 
     void SetVisibleChange(const int64_t formId, const int32_t formVisibleType);
+
+    std::mutex reUpdateFormMapMutex_;
+    std::unordered_map<int64_t, std::pair<int64_t, bool>> reUpdateFormMap_;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

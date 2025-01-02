@@ -116,6 +116,8 @@ public:
      */
     int32_t OnRecoverFormsByConfigUpdate(std::vector<int64_t> &formIds) override;
 
+    int32_t OnNotifyRefreshForm(const int64_t &formId) override;
+
 private:
     template<typename T>
     int GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos);

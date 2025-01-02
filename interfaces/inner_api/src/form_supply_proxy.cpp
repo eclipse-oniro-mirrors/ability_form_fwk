@@ -403,5 +403,32 @@ int32_t FormSupplyProxy::OnRecoverFormsByConfigUpdate(std::vector<int64_t> &form
     }
     return error;
 }
+
+int32_t FormSupplyProxy::OnNotifyRefreshForm(const int64_t &formId)
+{
+    MessageParcel data;
+    // write in token to help identify which stub to be called.
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("error to write interface token");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (!data.WriteInt64(formId)) {
+        HILOG_ERROR("error to write formId");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    // send request.
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_ASYNC);
+    int error = SendTransactCmd(
+        IFormSupply::Message::TRANSACTION_NOTIFY_REFRESH,
+        data,
+        reply,
+        option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendRequest:%{public}d failed", error);
+    }
+    return error;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -422,6 +422,43 @@ void FormMgrAdapter::RemoveFormIdMapElement(const int64_t formId)
     }
 }
 
+void FormMgrAdapter::UpdateReUpdateFormMap(const int64_t formId)
+{
+    const int32_t jurgeMs = 100;
+    int64_t currentTime = FormUtil::GetCurrentMillisecond();
+    std::lock_guard<std::mutex> lock(reUpdateFormMapMutex_);
+    auto iter = reUpdateFormMap_.begin();
+    while (iter != reUpdateFormMap_.end()) {
+        if (currentTime - iter->second.first > jurgeMs) {
+            iter = reUpdateFormMap_.erase(iter);
+        } else {
+            ++iter;
+        }
+    }
+    reUpdateFormMap_[formId] = std::make_pair(currentTime, false);
+}
+
+void FormMgrAdapter::SetReUpdateFormMap(const int64_t formId)
+{
+    std::lock_guard<std::mutex> lock(reUpdateFormMapMutex_);
+    auto search = reUpdateFormMap_.find(formId);
+    if (search != reUpdateFormMap_.end()) {
+        search->second.second = true;
+    }
+}
+
+ErrCode FormMgrAdapter::UpdateTimer(const int64_t formId, const FormRecord &record)
+{
+    // start update timer
+    ErrCode errorCode = AddFormTimer(record);
+    if (errorCode != ERR_OK) {
+        return errorCode;
+    }
+    if (!record.formTempFlag) {
+        return FormDbCache::GetInstance().UpdateDBRecord(formId, record);
+    }
+    return ERR_OK;
+}
 ErrCode FormMgrAdapter::HandleFormAddObserver(const int64_t formId)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
@@ -1508,6 +1545,8 @@ ErrCode FormMgrAdapter::AddExistFormRecord(const FormItemInfo &info, const sptr<
     if (hasCacheData) {
         newRecord.formProviderInfo.SetFormDataString(cacheData);
         newRecord.formProviderInfo.SetImageDataMap(imageDataMap);
+    } else {
+        SetReUpdateFormMap(formId);
     }
     FormRenderMgr::GetInstance().RenderForm(newRecord, wantParams, callerToken);
     if (newRecord.needRefresh || newRecord.needAddForm
@@ -1541,15 +1580,7 @@ ErrCode FormMgrAdapter::AddExistFormRecord(const FormItemInfo &info, const sptr<
 
     FormDataMgr::GetInstance().CreateFormJsInfo(formId, record, formInfo);
 
-    // start update timer
-    ErrCode errorCode = AddFormTimer(newRecord);
-    if (errorCode != ERR_OK) {
-        return errorCode;
-    }
-    if (!newRecord.formTempFlag) {
-        return FormDbCache::GetInstance().UpdateDBRecord(formId, newRecord);
-    }
-    return ERR_OK;
+    return UpdateTimer(formId, newRecord);
 }
 
 ErrCode FormMgrAdapter::AllotFormBySpecificId(const FormItemInfo &info,
@@ -1579,6 +1610,7 @@ ErrCode FormMgrAdapter::AllotFormByInfo(const FormItemInfo &info,
         HILOG_ERROR("generateFormId no invalid formId");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
+    UpdateReUpdateFormMap(newFormId);
     HILOG_DEBUG("newFormId:%{public}" PRId64 "", newFormId);
     return AddNewFormRecord(info, newFormId, callerToken, wantParams, formInfo);
 }
@@ -3898,6 +3930,47 @@ int32_t FormMgrAdapter::EnableForms(const std::string bundleName, const bool ena
 ErrCode FormMgrAdapter::UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth)
 {
     FormRenderMgr::GetInstance().UpdateFormSize(formId, width, height, borderWidth);
+    return ERR_OK;
+}
+
+int32_t FormMgrAdapter::OnNotifyRefreshForm(const int64_t &formId)
+{
+    const int32_t jurgeMs = 100;
+    int64_t currentTime = FormUtil::GetCurrentMillisecond();
+    int64_t lastTime = 0;
+    bool isUpdate = false;
+    {
+        std::lock_guard<std::mutex> lock(reUpdateFormMapMutex_);
+        auto search = reUpdateFormMap_.find(formId);
+        if (search != reUpdateFormMap_.end()) {
+            lastTime = search->second.first;
+            isUpdate = search->second.second;
+            reUpdateFormMap_.erase(formId);
+        } else {
+            return ERR_OK;
+        }
+    }
+
+    if (currentTime - lastTime < jurgeMs && isUpdate) {
+        FormRecord formInfo;
+        if (!FormDataMgr::GetInstance().GetFormRecord(formId, formInfo)) {
+            HILOG_ERROR("GetFormRecord error");
+            return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+        }
+        HILOG_INFO("RefreshForm");
+        int32_t userId = FormUtil::GetCurrentAccountId();
+        Want want;
+        want.SetElementName(formInfo.bundleName, formInfo.abilityName);
+        want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
+        want.SetParam(Constants::RECREATE_FORM_KEY, true);
+        want.SetParam(Constants::PARAM_MODULE_NAME_KEY, formInfo.moduleName);
+        want.SetParam(Constants::PARAM_FORM_NAME_KEY, formInfo.formName);
+        want.SetParam(Constants::PARAM_FORM_DIMENSION_KEY, formInfo.specification);
+        want.SetParam(Constants::PARAM_FORM_RENDERINGMODE_KEY, static_cast<int32_t>(formInfo.renderingMode));
+        want.SetParam(Constants::PARAM_DYNAMIC_NAME_KEY, formInfo.isDynamic);
+        want.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, formInfo.formTempFlag);
+        FormProviderMgr::GetInstance().RefreshForm(formId, want, true);
+    }
     return ERR_OK;
 }
 } // namespace AppExecFwk
