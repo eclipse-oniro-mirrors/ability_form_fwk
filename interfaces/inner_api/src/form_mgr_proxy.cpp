@@ -2370,6 +2370,38 @@ bool FormMgrProxy::IsFormBundleForbidden(const std::string &bundleName)
     return reply.ReadBool();
 }
 
+int32_t FormMgrProxy::LockForms(const std::vector<FormLockInfo> &formLockInfos)
+{
+    HILOG_DEBUG("LockForms start");
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    if (formLockInfos.size() > static_cast<size_t>(MAX_ALLOW_SIZE)) {
+        HILOG_ERROR("The vector/array size exceeds the security limit!");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    data.WriteInt32(formLockInfos.size());
+    for (auto it = formLockInfos.begin(); it != formLockInfos.end(); ++it) {
+        if (!data.WriteParcelable(&(*it))) {
+            HILOG_ERROR("Write [(*it)] failed!");
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+    }
+
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+    int error = SendTransactCmd(IFormMgr::Message::FORM_MGR_LOCK_FORMS, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendRequest:%{public}d failed", error);
+        return error;
+    }
+    return ERR_OK;
+}
+
 bool FormMgrProxy::IsFormBundleLocked(const std::string &bundleName, int64_t formId)
 {
     MessageParcel data;

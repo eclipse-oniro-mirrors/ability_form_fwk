@@ -17,11 +17,13 @@
 #include "fms_log_wrapper.h"
 #include "form_mgr_errors.h"
 #include "form_data_mgr.h"
+#include "form_util.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-    const std::string LOCK_FORM_BUNDLE_TABLE = "lock_form_bundle_table";
+const std::string LOCK_FORM_BUNDLE_TABLE = "lock_form_bundle_table";
+constexpr int32_t DEFAULT_USER_ID = 100;
 }
 
 FormBundleLockMgr::FormBundleLockMgr()
@@ -53,6 +55,10 @@ bool FormBundleLockMgr::Init()
 
 bool FormBundleLockMgr::IsBundleLock(const std::string &bundleName, int64_t formId)
 {
+    if (DEFAULT_USER_ID == FormUtil::GetCurrentAccountId()) {
+        return false;
+    }
+
     if (formId != 0) {
         bool lockStatus = false;
         FormDataMgr::GetInstance().GetFormLock(formId, lockStatus);

@@ -28,6 +28,7 @@ namespace OHOS {
 namespace AppExecFwk {
 const int32_t LIMIT_PARCEL_SIZE = 1024;
 constexpr size_t MAX_PARCEL_CAPACITY = 4 * 1024 * 1024; // 4M
+static constexpr int32_t MAX_ALLOW_SIZE = 8 * 1024;
 
 void SplitString(const std::string &source, std::vector<std::string> &strings)
 {
@@ -212,6 +213,8 @@ int FormMgrStub::OnRemoteRequestThird(uint32_t code, MessageParcel &data, Messag
             return HandleUnregisterPublishFormInterceptor(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_CLICK_EVENT_OBSERVER):
             return HandleRegisterClickCallbackEventObserver(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_IS_FORM_BUNDLE_LOCKED):
+            return HandleIsFormLocked(data, reply);
         default:
             return OnRemoteRequestFourth(code, data, reply, option);
     }
@@ -262,8 +265,8 @@ int FormMgrStub::OnRemoteRequestFourth(uint32_t code, MessageParcel &data, Messa
             return HandleIsFormBundleForbidden(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UPDATE_FORM_SIZE):
             return HandleUpdateFormSize(data, reply);
-        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_IS_FORM_BUNDLE_LOCKED):
-            return HandleIsFormLocked(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_LOCK_FORMS):
+            return HandleLockForms(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -1616,6 +1619,32 @@ ErrCode FormMgrStub::HandleIsFormBundleForbidden(MessageParcel &data, MessagePar
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return ERR_OK;
+}
+
+int32_t FormMgrStub::HandleLockForms(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("call");
+    std::vector<FormLockInfo> formLockInfo;
+    int32_t infoSize = data.ReadInt32();
+    if (infoSize > static_cast<int32_t>(MAX_ALLOW_SIZE)) {
+        HILOG_ERROR("The vector/array size exceeds the security limit!");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    for (int32_t i = 0; i < infoSize; i++) {
+        std::unique_ptr<FormLockInfo> info(data.ReadParcelable<FormLockInfo>());
+        if (!info) {
+            HILOG_ERROR("error to Read Parcelable infos");
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+        formLockInfo.push_back(*info);
+    }
+    int32_t result = LockForms(formLockInfo);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return result;
 }
 
 ErrCode FormMgrStub::HandleIsFormLocked(MessageParcel &data, MessageParcel &reply)

@@ -544,6 +544,14 @@ private:
     ErrCode HandleIsFormBundleForbidden(MessageParcel &data, MessageParcel &reply);
 
     /**
+     * @brief Handle lock or unlock forms message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t HandleLockForms(MessageParcel &data, MessageParcel &reply);
+
+    /**
      * @brief Handle check form bundle is locked.
      * @param data input param.
      * @param reply output param.
