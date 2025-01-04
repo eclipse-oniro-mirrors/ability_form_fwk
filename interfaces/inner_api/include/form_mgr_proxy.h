@@ -606,6 +606,13 @@ public:
     bool IsFormBundleForbidden(const std::string &bundleName) override;
 
     /**
+     * @brief lock/unlock form update.
+     * @param formLockInfos Indicates the lockForm data.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t LockForms(const std::vector<FormLockInfo> &formLockInfos) override;
+
+    /**
      * @brief Check form bundle is lock.
      * @param bundleName The bundle name of form to be check.
      * @param formId The Id of the form to query.

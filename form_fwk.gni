@@ -92,11 +92,3 @@ declare_args() {
     form_runtime_power = false
   }
 }
-
-declare_args() {
-  app_lock_service_enable = false
-  if (defined(global_parts_info) &&
-      defined(global_parts_info.appsecurityprivacy_app_lock_service)) {
-    app_lock_service_enable = true
-  }
-}

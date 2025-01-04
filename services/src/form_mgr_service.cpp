@@ -70,10 +70,6 @@
 #include "res_type.h"
 #endif // RES_SCHEDULE_ENABLE
 
-#ifdef APP_LOCK_SERVICE_ENABLE
-#include "form_app_lock_helper.h"
-#endif // APP_LOCK_SERVICE_ENABLE
-
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
@@ -82,9 +78,6 @@ constexpr int MILLISECOND_WIDTH = 3;
 constexpr char MILLISECOND_FILLCHAR = '0';
 const int32_t API_TIME_OUT = 5;
 const int32_t API_TIME_OUT_30S = 30;
-#ifdef APP_LOCK_SERVICE_ENABLE
-constexpr int APP_LOCK_MANAGER_SA_ID = 66288;
-#endif // APP_LOCK_SERVICE_ENABLE
 #ifdef RES_SCHEDULE_ENABLE
 constexpr int32_t SYSTEMLOADLEVEL_TIMERSTOP_THRESHOLD =
     static_cast<int32_t>(ResourceSchedule::ResType::SystemloadLevel::HIGH);
@@ -716,10 +709,6 @@ void FormMgrService::OnStart()
     // listener for FormDataProxyMgr
     AddSystemAbilityListener(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
 
-#ifdef APP_LOCK_SERVICE_ENABLE
-    AddSystemAbilityListener(APP_LOCK_MANAGER_SA_ID);
-#endif // APP_LOCK_SERVICE_ENABLE
-
 #ifdef MEM_MGR_ENABLE
     AddSystemAbilityListener(MEMORY_MANAGER_SA_ID);
 #endif // MEM_MGR_ENABLE
@@ -1304,16 +1293,6 @@ int32_t FormMgrService::UnregisterPublishFormInterceptor(const sptr<IRemoteObjec
 
 void FormMgrService::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {
-    HILOG_INFO("FMS OnAddSystemAbility");
-#ifdef APP_LOCK_SERVICE_ENABLE
-    if (systemAbilityId == APP_LOCK_MANAGER_SA_ID) {
-        HILOG_INFO("APP_LOCK_MANAGER_SA_ID start,SubscribeAppState");
-        FormAppLockHelper formAppLockHelper = FormAppLockHelper::GetInstance();
-        formAppLockHelper.RegisterSwitchStateListener();
-        return;
-    }
-#endif // APP_LOCK_SERVICE_ENABLE
-
 #ifdef RES_SCHEDULE_ENABLE
     if (systemAbilityId == RES_SCHED_SYS_ABILITY_ID) {
         auto formSystemloadLevelCb = [this](int32_t level) { this->OnSystemloadLevel(level); };
@@ -1759,6 +1738,26 @@ bool FormMgrService::IsFormBundleForbidden(const std::string &bundleName)
     bool result = FormBundleForbidMgr::GetInstance().IsBundleForbidden(bundleName);
     HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
     return result;
+}
+
+int32_t FormMgrService::LockForms(const std::vector<FormLockInfo> &formLockInfos)
+{
+    ErrCode ret = CheckFormPermission();
+    if (ret != ERR_OK) {
+        HILOG_ERROR("lock forms permission denied");
+        return ret;
+    }
+
+    int32_t retErrCode = ERR_OK;
+    for (const auto &info : formLockInfos) {
+        ret = FormMgrAdapter::GetInstance().LockForms(info.bundleName, info.userId, info.lock);
+        if (ret != ERR_OK) {
+            HILOG_ERROR("LockForms failed, bundleName: %{public}s, userId: %{public}d, "
+                "lock: %{public}d, ret: %{public}d", info.bundleName.c_str(), info.userId, info.lock, ret);
+            retErrCode = ret;
+        }
+    }
+    return retErrCode;
 }
 
 bool FormMgrService::IsFormBundleLocked(const std::string &bundleName, int64_t formId)

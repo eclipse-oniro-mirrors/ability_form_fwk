@@ -29,6 +29,7 @@
 #include "ipc_types.h"
 #include "iremote_broker.h"
 #include "running_form_info.h"
+#include "form_lock_info.h"
 
 #include "want.h"
 
@@ -664,6 +665,16 @@ public:
     }
 
     /**
+     * @brief lock/unlock form update.
+     * @param formLockInfos Indicates the lockForm data.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int32_t LockForms(const std::vector<FormLockInfo> &formLockInfos)
+    {
+        return 0;
+    }
+
+    /**
      * @brief Check form bundle is lock.
      * @param bundleName The bundle name of form to be check.
      * @param formId The Id of the form to query.
@@ -770,6 +781,7 @@ public:
         FORM_MGR_IS_SYSTEM_APP_FORM,
         FORM_MGR_IS_FORM_BUNDLE_FORBIDDEN,
         FORM_MGR_UPDATE_FORM_SIZE,
+        FORM_MGR_LOCK_FORMS,
         FORM_MGR_IS_FORM_BUNDLE_LOCKED,
     };
 };

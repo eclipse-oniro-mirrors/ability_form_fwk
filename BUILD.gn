@@ -200,14 +200,6 @@ ohos_shared_library("libfms") {
     defines += [ "FORM_EVENT_FOR_TEST" ]
   }
 
-  if (app_lock_service_enable) {
-    external_deps += [ "app_lock_service:app_lock_sdk" ]
-    defines += [ "APP_LOCK_SERVICE_ENABLE" ]
-    include_dirs += [ "services/form_app_lock_helper/include" ]
-    sources +=
-        [ "services/form_app_lock_helper/source/form_app_lock_helper.cpp" ]
-  }
-
   subsystem_name = "ability"
   part_name = "form_fwk"
 }
@@ -335,6 +327,7 @@ ohos_shared_library("form_manager") {
     "interfaces/inner_api/src/form_instance.cpp",
     "interfaces/inner_api/src/form_instances_filter.cpp",
     "interfaces/inner_api/src/form_js_info.cpp",
+    "interfaces/inner_api/src/form_lock_info.cpp",
     "interfaces/inner_api/src/form_mgr_proxy.cpp",
     "interfaces/inner_api/src/form_mgr_stub.cpp",
     "interfaces/inner_api/src/form_provider_data.cpp",
