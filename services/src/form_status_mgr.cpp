@@ -92,21 +92,18 @@ bool FormStatusMgr::isProcessableFormStatus(const int64_t formId)
 void FormStatusMgr::OnRenderFormDone(const int64_t &formId)
 {
     SetFormStatus(formId, FormStatus::RECOVERED);
-    FormStatusQueue::GetInstance().CancelTimeOutReAddForm(formId);
     FormStatusQueue::GetInstance().PostFormCommandTaskByFormId(formId);
 }
 
 void FormStatusMgr::OnRecoverFormDone(const int64_t &formId)
 {
     SetFormStatus(formId, FormStatus::RECOVERED);
-    FormStatusQueue::GetInstance().CancelTimeOutReAddForm(formId);
     FormStatusQueue::GetInstance().PostFormCommandTaskByFormId(formId);
 }
 
 void FormStatusMgr::OnRecycleFormDone(const int64_t &formId)
 {
     SetFormStatus(formId, FormStatus::RECYCLED);
-    FormStatusQueue::GetInstance().CancelTimeOutReAddForm(formId);
     FormStatusQueue::GetInstance().PostFormCommandTaskByFormId(formId);
 }
 } // namespace AppExecFwk

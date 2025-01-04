@@ -139,7 +139,6 @@ void FormStatusQueue::PostFormDeleteTask(FormCommand formCommand)
     auto func = formCommand.getFunc();
     HILOG_INFO("PostFormDeleteTask , formId:%{public}" PRId64 ". ", formId);
     DeleteFormStatusQueue(formId);
-    CancelDelayTask(std::make_pair((int64_t)TaskCommandType::READDFORM_FORM, formId));
     ScheduleTask(ms, func);
 }
 
@@ -177,15 +176,12 @@ void FormStatusQueue::ProcessTask(FormCommand &formCommand)
     if (taskCommandType == TaskCommandType::RENDER_FORM) {
         FormStatusMgr::GetInstance().SetFormStatus(formId, FormStatus::UNPROCESSABLE);
         ScheduleTask(ms, func);
-        PostTimeOutReAddForm(formId);
     } else if (taskCommandType == TaskCommandType::RECOVER_FORM) {
         FormStatusMgr::GetInstance().SetFormStatus(formId, FormStatus::RECOVERING);
         ScheduleTask(ms, func);
-        PostTimeOutReAddForm(formId);
     } else if (taskCommandType == TaskCommandType::RECYCLE_FORM) {
         FormStatusMgr::GetInstance().SetFormStatus(formId, FormStatus::RECYCLING);
         ScheduleTask(ms, func);
-        PostTimeOutReAddForm(formId);
     } else {
         HILOG_ERROR("ProcessTask Error!, formId :%{public}" PRId64 ". ", formId);
     }
