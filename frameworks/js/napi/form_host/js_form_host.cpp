@@ -856,7 +856,6 @@ private:
 
     napi_value OnEnableFormsUpdate(napi_env env, size_t argc, napi_value* argv)
     {
-#ifndef WATCH_API_DISABLE
         HILOG_DEBUG("call");
 
         if (argc > ARGS_TWO || argc < ARGS_ONE) {
@@ -889,14 +888,10 @@ private:
             env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
         return result;
         HILOG_DEBUG("OnEnableFormsUpdate end");
-#else
-        return nullptr;
-#endif
     }
 
     napi_value OnDisableFormsUpdate(napi_env env, size_t argc, napi_value* argv)
     {
-#ifndef WATCH_API_DISABLE
         HILOG_DEBUG("call");
 
         if (argc > ARGS_TWO || argc < ARGS_ONE) {
@@ -928,9 +923,6 @@ private:
         NapiAsyncTask::ScheduleWithDefaultQos("JsFormHost::OnDisableFormsUpdate",
             env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
         return result;
-#else
-        return nullptr;
-#endif
     }
 
     napi_value OnIsSystemReady(napi_env env, size_t argc, napi_value* argv)
@@ -1023,7 +1015,6 @@ private:
 
     napi_value OnAcquireFormState(napi_env env, size_t argc, napi_value* argv)
     {
-#ifndef WATCH_API_DISABLE
         HILOG_DEBUG("call");
         if (argc > ARGS_TWO || argc < ARGS_ONE) {
             NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1 or 2");
@@ -1056,9 +1047,6 @@ private:
 
         InnerAcquireFormState(env, asyncTask, std::move(task), want);
         return result;
-#else
-        return nullptr;
-#endif
     }
 
     napi_value OnSetRouterProxy(napi_env env, size_t argc, napi_value* argv)
