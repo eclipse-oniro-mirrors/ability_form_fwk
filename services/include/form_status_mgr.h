@@ -38,7 +38,7 @@ DECLARE_DELAYED_REF_SINGLETON(FormStatusMgr)
 public:
     DISALLOW_COPY_AND_MOVE(FormStatusMgr);
 public:
-    void AddFormStatus(const int64_t formId);
+    void AddFormStatus(const int64_t formId, FormStatus formStatus);
     void DeleteFormStatus(const int64_t formId);
 
     bool GetFormStatus(const int64_t formId, FormStatus &formStatus);

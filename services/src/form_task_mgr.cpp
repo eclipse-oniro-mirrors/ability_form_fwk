@@ -38,6 +38,7 @@
 #include "form_provider_mgr.h"
 #include "form_status_queue.h"
 #include "form_command_queue.h"
+#include "form_status_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk { // namespace
@@ -840,7 +841,7 @@ void FormTaskMgr::PostRenderForm(const FormRecord &formRecord, const Want &want,
         }
     }
     auto hostToken = want.GetRemoteObject(Constants::PARAM_FORM_HOST_TOKEN);
-    FormStatusQueue::GetInstance().AddFormStatusQueue(formId, hostToken);
+    FormStatusQueue::GetInstance().GetOrCreateFormStatusQueue(formId, hostToken, FormStatus::RECOVERED);
 
     int32_t recoverInterval = (int32_t) (FormUtil::GetCurrentMillisecond() - lastRecoverTime);
     if (lastRecoverTime <= 0 || recoverInterval > FORM_BUILD_DELAY_TIME) {
@@ -1214,6 +1215,7 @@ void FormTaskMgr::PostRecycleForms(const std::vector<int64_t> &formIds, const Wa
         }
         serialQueue_->ScheduleDelayTask(
             std::make_pair((int64_t)TaskType::RECYCLE_FORM, formId), delayTime, recycleForm);
+        FormStatusQueue::GetInstance().GetOrCreateFormStatusQueue(formId, remoteObjectOfHost, FormStatus::RECOVERED);
     }
     HILOG_DEBUG("end");
 }
@@ -1277,6 +1279,9 @@ void FormTaskMgr::PostRecoverForm(const FormRecord &record, const Want &want, co
         std::lock_guard<std::mutex> lock(formRecoverTimesMutex_);
         formLastRecoverTimes[formId] = FormUtil::GetCurrentMillisecond();
     }
+    auto hostToken = want.GetRemoteObject(Constants::PARAM_FORM_HOST_TOKEN);
+    FormStatusQueue::GetInstance().GetOrCreateFormStatusQueue(formId, hostToken, FormStatus::RECYCLED);
+
     FormCommand recoverCommand{
         formId,
         std::make_pair(TaskCommandType::RECOVER_FORM, formId),

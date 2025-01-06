@@ -16,7 +16,6 @@
 #include <limits>
 
 #include "form_status_queue.h"
-#include "form_status_mgr.h"
 #include "fms_log_wrapper.h"
 #include "form_mgr_errors.h"
 #include "form_host_interface.h"
@@ -89,12 +88,14 @@ void FormStatusQueue::CancelDelayTask(const std::pair<int64_t, int64_t> &eventMs
     HILOG_DEBUG("CancelDelayTask success");
 }
 
-void FormStatusQueue::AddFormStatusQueue(const int64_t formId, const sptr<IRemoteObject> &remoteObjectOfHost)
+void FormStatusQueue::GetOrCreateFormStatusQueue(
+    const int64_t formId, const sptr<IRemoteObject> &remoteObjectOfHost, FormStatus formStatus)
 {
     std::unique_lock<std::shared_mutex> lock(formCommandQueueMapMutex_);
     if (formCommandQueueMap_.find(formId) == formCommandQueueMap_.end()) {
         std::shared_ptr<FormCommandQueue> formCommandQueue = std::make_shared<FormCommandQueue>(formId);
         formCommandQueueMap_.emplace(std::make_pair(formId, formCommandQueue));
+        FormStatusMgr::GetInstance().AddFormStatus(formId, formStatus);
         HILOG_INFO("formCommandQueueMap_ insert, formId:%{public}" PRId64 ". ", formId);
     }
 
@@ -102,8 +103,6 @@ void FormStatusQueue::AddFormStatusQueue(const int64_t formId, const sptr<IRemot
         formHostTokenMap_.emplace(std::make_pair(formId, remoteObjectOfHost));
         HILOG_INFO("formHostTokenMap_ insert, formId:%{public}" PRId64 ". ", formId);
     }
-
-    FormStatusMgr::GetInstance().AddFormStatus(formId);
 }
 
 void FormStatusQueue::DeleteFormStatusQueue(const int64_t formId)

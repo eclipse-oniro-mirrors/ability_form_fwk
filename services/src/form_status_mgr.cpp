@@ -29,13 +29,11 @@ FormStatusMgr::~FormStatusMgr()
     HILOG_DEBUG("destroy FormStatusMgr");
 }
 
-void FormStatusMgr::AddFormStatus(const int64_t formId)
+void FormStatusMgr::AddFormStatus(const int64_t formId, FormStatus formStatus)
 {
     std::unique_lock<std::shared_mutex> lock(formStatusMutex_);
-    if (formStatusMap_.find(formId) == formStatusMap_.end()) {
-        formStatusMap_.emplace(std::make_pair(formId, FormStatus::RECOVERED));
-        HILOG_INFO("formStatusMap_ insert, formId:%{public}" PRId64 ". ", formId);
-    }
+    formStatusMap_[formId] = formStatus;
+    HILOG_INFO("AddFormStatus formId:%{public}" PRId64 ", formStatus is %{public}d.", formId, (int)formStatus);
 }
 
 void FormStatusMgr::DeleteFormStatus(const int64_t formId)
@@ -58,6 +56,7 @@ bool FormStatusMgr::GetFormStatus(const int64_t formId, FormStatus &formStatus)
         currentFormStatus = iter->second;
     }
     formStatus = currentFormStatus;
+    HILOG_INFO("GetFormStatus formId:%{public}" PRId64 ", formStatus is %{public}d.", formId, (int)formStatus);
     return true;
 }
 
@@ -70,6 +69,7 @@ bool FormStatusMgr::SetFormStatus(const int64_t formId, FormStatus formStatus)
         return false;
     }
     iter->second = formStatus;
+    HILOG_INFO("SetFormStatus formId:%{public}" PRId64 ", formStatus is %{public}d.", formId, (int)formStatus);
     return true;
 }
 
