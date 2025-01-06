@@ -25,6 +25,7 @@
 #include "ffrt.h"
 #include "iremote_object.h"
 #include "form_command_queue.h"
+#include "form_status_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -41,7 +42,8 @@ public:
     void ScheduleDelayTask(const std::pair<int64_t, int64_t> &eventMsg, uint32_t ms, std::function<void()> func);
     void CancelDelayTask(const std::pair<int64_t, int64_t> &eventMsg);
 
-    void AddFormStatusQueue(const int64_t formId, const sptr<IRemoteObject> &remoteObjectOfHost);
+    void GetOrCreateFormStatusQueue(
+        const int64_t formId, const sptr<IRemoteObject> &remoteObjectOfHost, FormStatus formStatus);
     void DeleteFormStatusQueue(const int64_t formId);
     
     void PostFormStatusTask(FormCommand formCommand);
