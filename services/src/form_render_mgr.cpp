@@ -566,6 +566,9 @@ ErrCode FormRenderMgr::RecycleForms(
     int callingUserId = want.GetIntParam(Constants::RECYCLE_FORMS_USER_ID, 0);
     if (callingUserId == 0) {
         callingUserId = IPCSkeleton::GetCallingUid() / Constants::CALLING_UID_TRANSFORM_DIVISOR;
+        if (callingUserId == 0) {
+            callingUserId = FormUtil::GetCurrentAccountId();
+        }
         HILOG_INFO("callingUserId is 0, update callingUserId:%{public}d", callingUserId);
     }
     auto renderIter = renderInners_.find(callingUserId);
