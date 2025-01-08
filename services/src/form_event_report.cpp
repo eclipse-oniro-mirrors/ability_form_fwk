@@ -51,6 +51,7 @@ constexpr const char *EVENT_KEY_CLIENT_BUNDLE_NAME = "CLIENT_BUNDLE_NAME";
 constexpr const char *EVENT_KEY_FORM_BUNDLE_NAME = "FORM_BUNDLE_NAME";
 constexpr const char *EVENT_KEY_FORM_APP_PID = "FORM_APP_PID";
 constexpr const char *EVENT_KEY_TIMESTAMP = "TIMESTAMP";
+constexpr const char *EVENT_KEY_RENDERING_MODE = "RENDERING_MODE";
 const std::map<FormEventName, std::string> EVENT_NAME_MAP = {
     std::map<FormEventName, std::string>::value_type(FormEventName::ADD_FORM, "ADD_FORM"),
     std::map<FormEventName, std::string>::value_type(FormEventName::REQUEST_FORM, "REQUEST_FORM"),
@@ -79,6 +80,8 @@ const std::map<FormEventName, std::string> EVENT_NAME_MAP = {
     std::map<FormEventName, std::string>::value_type(
         FormEventName::INVALID_PUBLISH_FORM_TO_HOST, "INVALID_PUBLISH_FORM_TO_HOST"),
     std::map<FormEventName, std::string>::value_type(FormEventName::UNBIND_FORM_APP, "UNBIND_FORM_APP"),
+    std::map<FormEventName, std::string>::value_type(
+        FormEventName::LOAD_STAGE_FORM_CONFIG_INFO, "LOAD_STAGE_FORM_CONFIG_INFO"),
 };
 }
 
@@ -312,6 +315,22 @@ void FormEventReport::SendFirstUpdateFormEvent(const FormEventName &eventName, H
             EVENT_KEY_FORM_ID, eventInfo.formId,
             EVENT_KEY_DURATION, static_cast<float>(eventInfo.duration),
             EVENT_KEY_DURATION_TYPE, eventInfo.durationType);
+    }
+}
+
+void FormEventReport::SendLoadStageFormConfigInfoEvent(const FormEventName &eventName, HiSysEventType type,
+    const NewFormEventInfo &eventInfo)
+{
+    std::string name = ConvertEventName(eventName);
+    if (name == "INVALIDEVENTNAME") {
+        HILOG_ERROR("invalid eventName");
+        return;
+    }
+    if (eventName == FormEventName::LOAD_STAGE_FORM_CONFIG_INFO) {
+        HiSysEventWrite(HiSysEvent::Domain::FORM_MANAGER, name, type,
+            EVENT_KEY_BUNDLE_NAME, eventInfo.bundleName,
+            EVENT_KEY_FORM_NAME, eventInfo.formName,
+            EVENT_KEY_RENDERING_MODE, static_cast<int32_t>(eventInfo.renderingMode));
     }
 }
 

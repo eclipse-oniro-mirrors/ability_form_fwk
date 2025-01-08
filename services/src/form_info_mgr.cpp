@@ -28,6 +28,7 @@
 #include "ipc_skeleton.h"
 #include "json_serializer.h"
 #include "permission_verification.h"
+#include "form_event_report.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -81,18 +82,15 @@ ErrCode FormInfoHelper::LoadStageFormConfigInfo(const BundleInfo &bundleInfo, st
         HILOG_ERROR("fail get BundleMgrClient");
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
-
     for (auto const &extensionInfo: bundleInfo.extensionInfos) {
         if (extensionInfo.type != ExtensionAbilityType::FORM) {
             continue;
         }
-
         std::vector<std::string> profileInfos {};
         if (!client->GetResConfigFile(extensionInfo, FORM_METADATA_NAME, profileInfos)) {
             HILOG_ERROR("fail get form metadata");
             continue;
         }
-
         for (const auto &profileInfo: profileInfos) {
             std::vector<ExtensionFormInfo> extensionFormInfos;
             int32_t privacyLevel = 0;
@@ -109,6 +107,15 @@ ErrCode FormInfoHelper::LoadStageFormConfigInfo(const BundleInfo &bundleInfo, st
                 formInfo.versionCode = bundleInfo.versionCode;
                 formInfo.bundleType = bundleInfo.applicationInfo.bundleType;
                 formInfo.privacyLevel = privacyLevel;
+                HILOG_INFO("LoadStageFormConfigInfo, bundleName: %{public}s, name: %{public}s, "
+                    "renderingMode: %{public}d",
+                    formInfo.bundleName.c_str(), formInfo.name.c_str(), static_cast<int>(formInfo.renderingMode));
+                NewFormEventInfo eventInfo;
+                eventInfo.bundleName = formInfo.bundleName;
+                eventInfo.formName = formInfo.name;
+                eventInfo.renderingMode = static_cast<int32_t>(formInfo.renderingMode);
+                FormEventReport::SendLoadStageFormConfigInfoEvent(FormEventName::LOAD_STAGE_FORM_CONFIG_INFO,
+                    HiSysEventType::BEHAVIOR, eventInfo);
                 formInfos.emplace_back(formInfo);
             }
         }
