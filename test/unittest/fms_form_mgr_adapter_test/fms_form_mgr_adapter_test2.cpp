@@ -82,6 +82,7 @@ extern void MockModifyFormTempFlag(bool mockRet);
 extern void MockAddFormUserUid(bool mockRet);
 extern void MockGetAllFormInfo(bool mockRet);
 extern void MockGetFormHostRecord(bool mockRet);
+extern void MockGetUidByBundleName(bool mockRet);
 extern void MockGetFormRecordParamsTemp(bool mockRet);
 extern void MockGetAbilityInfoByActionAbilityInfo(bool mockRet);
 extern void MockGetAbilityInfoByActionExtensionInfo(bool mockRet);
@@ -1717,6 +1718,7 @@ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_209, TestSize.Level0)
     want.SetParam(Constants::FORM_CALL_EVENT_PARAMS, params.dump());
     sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
     MockGetFormRecord(true);
+    MockGetUidByBundleName(false);
     EXPECT_EQ(ERR_OK, formMgrAdapter.BackgroundEvent(formId, want, callerToken));
     FormBmsHelper::GetInstance().iBundleMgr_ = bmsHelperBackup;
     FormAmsHelper::GetInstance().abilityManager_ = amsHelperBackup;
