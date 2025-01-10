@@ -122,19 +122,28 @@ int32_t FormRenderImpl::RenderForm(const FormJsInfo &formJsInfo, const Want &wan
     return result;
 }
 
+bool FormRenderImpl::CheckFormSupplyClientValid(const sptr<IFormSupply> &formSupplyClient,
+    const std::string &uid)
+{
+    if (formSupplyClient == nullptr) {
+        HILOG_ERROR("null IFormSupply");
+        return false;
+
+    if (uid.empty()) {
+        HILOG_ERROR("GetUid failed");
+        return false;
+    }
+    return true;
+}
+
 int32_t FormRenderImpl::StopRenderingForm(const FormJsInfo &formJsInfo, const Want &want,
     const sptr<IRemoteObject> &callerToken)
 {
     HILOG_INFO("call");
     sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
-    if (formSupplyClient == nullptr) {
-        HILOG_ERROR("null IFormSupply");
-        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
-    }
-
     std::string uid = want.GetStringParam(Constants::FORM_SUPPLY_UID);
-    if (uid.empty()) {
-        HILOG_ERROR("GetUid failed");
+
+    if (!CheckFormSupplyClientValid(formSupplyClient, uid)) {
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
 
