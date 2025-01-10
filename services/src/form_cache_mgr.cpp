@@ -329,15 +329,33 @@ bool FormCacheMgr::GetImageDataFromAshmem(
 bool FormCacheMgr::DeleteData(const int64_t formId)
 {
     HILOG_INFO("formId:%{public}" PRId64, formId);
-    std::lock_guard<std::mutex> lock(cacheMutex_);
-    FormCache formCache;
-    bool ret = GetDataCacheFromDb(formId, formCache);
-    if (!ret) {
-        HILOG_INFO("No DataCache when delete");
-        return true;
-    }
+    bool isNeedDeleteImgCache = true;
+    nlohmann::json imgCacheObj;
+    {
+        std::lock_guard<std::mutex> lock(cacheMutex_);
+        FormCache formCache;
+        bool ret = GetDataCacheFromDb(formId, formCache);
+        if (!ret) {
+            HILOG_INFO("No DataCache when delete");
+            return true;
+        }
 
-    InnerDeleteImageData(formCache);
+        if (!HasContent(formCache.imgCache)) {
+            HILOG_INFO("Has no imgCache when delete");
+            isNeedDeleteImgCache = false;
+        }
+
+        nlohmann::json imgCacheObj = nlohmann::json::parse(formCache.imgCache, nullptr, false);
+        if (imgCacheObj.is_discarded() || !imgCacheObj.is_object()) {
+            HILOG_ERROR("parse data failed");
+            isNeedDeleteImgCache = false;
+        }
+    }
+    if (isNeedDeleteImgCache) {
+        for (auto && [key, value] : imgCacheObj.items()) {
+            DeleteImgCacheInDb(value.dump());
+        }
+    }
     return DeleteDataCacheInDb(formId);
 }
 
@@ -414,26 +432,6 @@ bool FormCacheMgr::SaveDataCacheToDb(int64_t formId, const FormCache &formCache)
         HILOG_ERROR("SaveDataCacheToDb formId:%{public}s failed.", std::to_string(formId).c_str());
         return false;
     }
-    return true;
-}
-
-bool FormCacheMgr::InnerDeleteImageData(const FormCache &formCache)
-{
-    if (!HasContent(formCache.imgCache)) {
-        HILOG_INFO("Has no imgCache when delete");
-        return true;
-    }
-
-    nlohmann::json imgCacheObj = nlohmann::json::parse(formCache.imgCache, nullptr, false);
-    if (imgCacheObj.is_discarded() || !imgCacheObj.is_object()) {
-        HILOG_ERROR("parse data failed");
-        return false;
-    }
-
-    for (auto && [key, value] : imgCacheObj.items()) {
-        DeleteImgCacheInDb(value.dump());
-    }
-
     return true;
 }
 
