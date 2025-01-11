@@ -122,28 +122,19 @@ int32_t FormRenderImpl::RenderForm(const FormJsInfo &formJsInfo, const Want &wan
     return result;
 }
 
-bool FormRenderImpl::CheckFormSupplyClientValid(const sptr<IFormSupply> &formSupplyClient,
-    const std::string &uid)
-{
-    if (formSupplyClient == nullptr) {
-        HILOG_ERROR("null IFormSupply");
-        return false;
-
-    if (uid.empty()) {
-        HILOG_ERROR("GetUid failed");
-        return false;
-    }
-    return true;
-}
-
 int32_t FormRenderImpl::StopRenderingForm(const FormJsInfo &formJsInfo, const Want &want,
     const sptr<IRemoteObject> &callerToken)
 {
     HILOG_INFO("call");
     sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
-    std::string uid = want.GetStringParam(Constants::FORM_SUPPLY_UID);
+    if (formSupplyClient == nullptr) {
+        HILOG_ERROR("null IFormSupply");
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+    }
 
-    if (!CheckFormSupplyClientValid(formSupplyClient, uid)) {
+    std::string uid = want.GetStringParam(Constants::FORM_SUPPLY_UID);
+    if (uid.empty()) {
+        HILOG_ERROR("GetUid failed");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
 
@@ -154,16 +145,11 @@ int32_t FormRenderImpl::StopRenderingForm(const FormJsInfo &formJsInfo, const Wa
         {
             std::lock_guard<std::mutex> lock(renderRecordMutex_);
             auto iterator = renderRecordMap_.find(uid);
-            if (iterator == renderRecordMap_.end()) {
+            if (iterator == renderRecordMap_.end() || !(iterator->second)) {
                 HILOG_ERROR("fail");
                 return RENDER_FORM_FAILED;
             }
             search = iterator->second;
-
-            if (!search) {
-                HILOG_ERROR("fail");
-                return RENDER_FORM_FAILED;
-            }
         }
 
         std::string compId = want.GetStringParam(Constants::FORM_RENDER_COMP_ID);
