@@ -84,13 +84,17 @@ ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<Fo
 ErrCode FormDataProxyMgr::UnsubscribeFormData(int64_t formId)
 {
     HILOG_DEBUG("unsubscribe form data. formId:%{public}s", std::to_string(formId).c_str());
-    std::lock_guard<std::mutex> lock(formDataProxyRecordMutex_);
-    auto search = formDataProxyRecordMap_.find(formId);
-    if (search != formDataProxyRecordMap_.end()) {
-        if (search->second != nullptr) {
-            search->second->UnsubscribeFormData();
+    std::shared_ptr<FormDataProxyRecord> record = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(formDataProxyRecordMutex_);
+        auto search = formDataProxyRecordMap_.find(formId);
+        if (search != formDataProxyRecordMap_.end()) {
+            record = search->second;
+            formDataProxyRecordMap_.erase(formId);
         }
-        formDataProxyRecordMap_.erase(formId);
+    }
+    if (record != nullptr) {
+        record->UnsubscribeFormData();
     }
 
     return ERR_OK;
