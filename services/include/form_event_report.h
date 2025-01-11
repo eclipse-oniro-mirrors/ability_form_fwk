@@ -80,6 +80,7 @@ struct NewFormEventInfo {
     int32_t offloadRecoverRefreshTimes;
     std::string clientBundleName = "";
     std::string formBundleName = "";
+    int32_t renderingMode;
 };
 
 enum class FormEventName {
@@ -106,6 +107,7 @@ enum class FormEventName {
     INVALID_PUBLISH_FORM_TO_HOST,
     LAUNCH_FORM_APP,
     UNBIND_FORM_APP,
+    LOAD_STAGE_FORM_CONFIG_INFO
 };
 
 class FormEventReport {
@@ -123,6 +125,8 @@ public:
     static void SendFourthFormEvent(const FormEventName &eventName, HiSysEventType type,
         const NewFormEventInfo &eventInfo, const Want &want);
     static void SendFormRefreshCountEvent(const FormEventName &eventName, HiSysEventType type,
+        const NewFormEventInfo &eventInfo);
+    static void SendLoadStageFormConfigInfoEvent(const FormEventName &eventName, HiSysEventType type,
         const NewFormEventInfo &eventInfo);
 private:
     static std::string ConvertEventName(const FormEventName &eventName);
