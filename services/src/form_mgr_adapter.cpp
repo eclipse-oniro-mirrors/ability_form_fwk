@@ -877,6 +877,7 @@ int FormMgrAdapter::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
     Want reqWant(want);
     int32_t currentActiveUserId = FormUtil::GetCurrentAccountId();
     reqWant.SetParam(Constants::PARAM_FORM_USER_ID, currentActiveUserId);
+    reqWant.SetParam(Constants::PARAM_FORM_REFRESH_TYPE, Constants::REFRESHTYPE_HOST);
     return FormProviderMgr::GetInstance().RefreshForm(matchedFormId, reqWant, true);
 }
 
@@ -1709,10 +1710,23 @@ ErrCode FormMgrAdapter::AddFormTimer(const FormRecord &formRecord)
             updateDuration, formRecord.providerUserId);
         return ret ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
+    bool scheduledUpdateFlag = false;
+    bool result1 = true;
     if (formRecord.updateAtHour >= 0 && formRecord.updateAtMin >= 0) {
-        bool ret = FormTimerMgr::GetInstance().AddFormTimer(formRecord.formId,
+        scheduledUpdateFlag = true;
+        result1 = FormTimerMgr::GetInstance().AddFormTimer(formRecord.formId,
             formRecord.updateAtHour, formRecord.updateAtMin, formRecord.providerUserId);
-        return ret ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    bool result2 = true;
+    std::vector<std::vector<int>> updateAtTimes = formRecord.updateAtTimes;
+    if (updateAtTimes.size() > 0) {
+        scheduledUpdateFlag = true;
+        HILOG_INFO("updateAtTimes size:%{public}zu", updateAtTimes.size());
+        result2 = FormTimerMgr::GetInstance().AddFormTimerForMultiUpdate(formRecord.formId,
+            updateAtTimes, formRecord.providerUserId);
+    }
+    if (scheduledUpdateFlag) {
+        return (result1 && result2)? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     HILOG_INFO("no need add form timer");
     return ERR_OK;
@@ -1965,6 +1979,7 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
     itemInfo.SetEnableUpdateFlag(formInfo.updateEnabled);
     itemInfo.SetUpdateDuration(formInfo.updateDuration);
     itemInfo.SetScheduledUpdateTime(formInfo.scheduledUpdateTime);
+    itemInfo.SetMultiScheduledUpdateTime(formInfo.multiScheduledUpdateTime);
     itemInfo.SetJsComponentName(formInfo.jsComponentName);
     itemInfo.SetFormVisibleNotify(formInfo.formVisibleNotify);
     auto formSrc = formInfo.src;
@@ -1980,6 +1995,7 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
     itemInfo.SetPrivacyLevel(formInfo.privacyLevel);
     itemInfo.SetDataProxyFlag(formInfo.dataProxyEnabled);
     itemInfo.SetFormBundleType(formInfo.bundleType);
+    itemInfo.SetConditionUpdate(formInfo.conditionUpdate);
 
     SetFormItemInfoParams(bundleInfo, formInfo, itemInfo);
     return ERR_OK;
@@ -4035,6 +4051,27 @@ int32_t FormMgrAdapter::OnNotifyRefreshForm(const int64_t &formId)
         want.SetParam(Constants::PARAM_DYNAMIC_NAME_KEY, formInfo.isDynamic);
         want.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, formInfo.formTempFlag);
         FormProviderMgr::GetInstance().RefreshForm(formId, want, true);
+    }
+    return ERR_OK;
+}
+ErrCode FormMgrAdapter::UpdateFormByCondition(int32_t type)
+{
+    HILOG_INFO("UpdateFormByCondition type:%{public}d", type);
+    std::vector<FormRecord> formInfos;
+    if (!FormDataMgr::GetInstance().GetFormRecordByCondition(type, formInfos)) {
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    }
+
+    for (FormRecord& formRecord : formInfos) {
+        if (!formRecord.isSystemApp) {
+            continue;
+        }
+        int32_t userId = FormUtil::GetCurrentAccountId();
+        Want want;
+        want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
+        want.SetParam(Constants::PARAM_FORM_REFRESH_TYPE, Constants::REFRESHTYPE_NETWORKCHANGED);
+        want.SetParam(Constants::KEY_CONNECT_REFRESH, true);
+        FormProviderMgr::GetInstance().RefreshForm(formRecord.formId, want, true);
     }
     return ERR_OK;
 }

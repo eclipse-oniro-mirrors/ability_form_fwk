@@ -124,6 +124,15 @@ std::string FormItemInfo::GetScheduledUpdateTime() const
 }
 
 /**
+ * @brief Get multiScheduledUpdateTime_.
+ * @return multiScheduledUpdateTime_.
+ */
+std::string FormItemInfo::GetMultiScheduledUpdateTime() const
+{
+    return multiScheduledUpdateTime_;
+}
+
+/**
  * @brief Get hapSourceDirs_.
  * @param dirs Hap source dirs.
  * @return Returns true on success, false on failure.
@@ -332,6 +341,14 @@ void FormItemInfo::SetUpdateDuration(int updateDuration)
 void FormItemInfo::SetScheduledUpdateTime(const std::string &scheduledUpdateTime)
 {
     scheduledUpdateTime_ = scheduledUpdateTime;
+}
+/**
+ * @brief Set value of multiScheduledUpdateTime_.
+ * @param multiScheduledUpdateTime Scheduled update time.
+ */
+void FormItemInfo::SetMultiScheduledUpdateTime(const std::string &multiScheduledUpdateTime)
+{
+    multiScheduledUpdateTime_ = multiScheduledUpdateTime;
 }
 /**
  * @brief Add hap source dir.
@@ -612,6 +629,16 @@ bool FormItemInfo::IsEnableForm() const
 void FormItemInfo::SetEnableForm(bool enableForm)
 {
     enableForm_ = enableForm;
+}
+
+std::vector<int32_t> FormItemInfo::GetConditionUpdate() const
+{
+    return conditionUpdate_;
+}
+
+void FormItemInfo::SetConditionUpdate(const std::vector<int32_t> &conditionUpdate)
+{
+    conditionUpdate_ = conditionUpdate;
 }
 
 Constants::RenderingMode FormItemInfo::GetRenderingMode() const

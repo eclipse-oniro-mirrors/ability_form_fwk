@@ -153,10 +153,20 @@ public:
      */
     std::string GetScheduledUpdateTime() const;
     /**
+     * @brief Get multiScheduledUpdateTime_.
+     * @return multiScheduledUpdateTime_.
+     */
+    std::string GetMultiScheduledUpdateTime() const;
+    /**
      * @brief Set value of scheduledUpdateTime_.
      * @param scheduledUpdateTime Scheduled update time.
      */
     void SetScheduledUpdateTime(const std::string &scheduledUpdateTime);
+    /**
+     * @brief Set value of multiScheduledUpdateTime_.
+     * @param multiScheduledUpdateTime Scheduled update time.
+     */
+    void SetMultiScheduledUpdateTime(const std::string &multiScheduledUpdateTime);
     /**
      * @brief Get hapSourceDirs_.
      * @param dirs Hap source dirs.
@@ -453,6 +463,16 @@ public:
      * @param lockForm True for lock, false for unlock.
      */
     void SetLockForm(bool lockForm);
+    /**
+     * @brief Get updateDuration_.
+     * @return updateDuration_.
+     */
+    std::vector<int32_t> GetConditionUpdate() const;
+    /**
+     * @brief Set value of updateDuration_.
+     * @param updateDuration Update duration.
+     */
+    void SetConditionUpdate(const std::vector<int32_t> &conditionUpdate);
 
 private:
     /**
@@ -475,6 +495,7 @@ private:
     bool updateFlag_ = false;
     int32_t updateDuration_ = 0;
     std::string scheduledUpdateTime_ = "";
+    std::string multiScheduledUpdateTime_ = "";
     std::vector<std::string> hapSourceDirs_;
     bool temporaryFlag_ = false;
     bool formVisibleNotify_ = false;
@@ -504,6 +525,7 @@ private:
     bool enableForm_ = true;
     Constants::RenderingMode renderingMode_ = Constants::RenderingMode::FULL_COLOR;
     bool lockForm_ = false;
+    std::vector<int32_t> conditionUpdate_;
 };
 } // namespace AppExecFwk
 } // namespace OHOS

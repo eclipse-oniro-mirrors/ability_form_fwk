@@ -36,6 +36,7 @@ public:
     bool needFreeInstall = false;
     bool versionUpgrade = false;
     bool needRefresh = false;
+    int refreshType;
     bool needAddForm = false;
     bool isCountTimerRefresh = false;
     std::string packageName = "";
@@ -49,6 +50,7 @@ public:
     int64_t updateDuration = 0;
     int updateAtHour = -1;
     int updateAtMin = -1;
+    std::vector<std::vector<int>> updateAtTimes;
     FormProviderInfo formProviderInfo;
     std::vector<std::string> hapSourceDirs;
     std::map<std::string, std::string> modulePkgNameMap;
@@ -84,6 +86,7 @@ public:
     bool isUpdateDuringDisableForm = false;
     Constants::RenderingMode renderingMode = Constants::RenderingMode::FULL_COLOR;
     bool lockForm = false;
+    std::vector<int32_t> conditionUpdate;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

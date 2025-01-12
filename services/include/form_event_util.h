@@ -49,6 +49,9 @@ public:
         std::map<int64_t, bool> &foundFormsMap);
     static void GetTimerCfg(const bool updateEnabled, const int updateDuration, const std::string &configUpdateAt,
         FormTimerCfg &cfg);
+    static void SetTimerCfgByMultUpdate(const std::string &configMultUpdateAt, FormTimerCfg& cfg);
+    static void HandleAddMultiUpdateTimes(const int64_t formId, const FormRecord &record,
+        const FormTimerCfg &timerCfg);
     static void HandleTimerUpdate(const int64_t formId, const FormRecord &record, const FormTimerCfg &timerCfg);
     static void ReCreateForm(const int64_t formId);
     static void BatchDeleteNoHostDBForms(const int uid, std::map<FormIdKey, std::set<int64_t>> &noHostFormDbMap,
@@ -57,6 +60,7 @@ public:
     static bool HandleAdditionalInfoChanged(const std::string &bundleName);
 
 private:
+    static void UpdateMultiUpdateTime(std::string multiScheduledUpdateTime, FormRecord &formRecord);
     static void UpdateFormRecord(const FormInfo &formInfo, FormRecord &formRecord);
     static void UpdateFormRecord(const AbilityFormInfo &formInfo, FormRecord &formRecord);
     static UpdateType GetUpdateType(const FormRecord &record, const FormTimerCfg &timerCfg);

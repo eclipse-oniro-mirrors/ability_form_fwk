@@ -29,6 +29,7 @@
 #include "form_state_info.h"
 #include "iremote_object.h"
 #include "running_form_info.h"
+#include "form_mgr_service.h"
 #include "want.h"
 
 namespace OHOS {
@@ -47,6 +48,7 @@ constexpr int32_t FORM_FRS_DIED_TASK_DELAY_TIME = 100; // ms
 constexpr int32_t FORM_BUILD_DELAY_TIME = 1400; // ms
 constexpr int32_t ENTERPRISE_APP_INSTALL_FAILED_DELAY_TIME = 5000; // ms
 constexpr int32_t CLEAN_FORM_HOST_TASK_DELAY_TIME = 100; // ms
+constexpr int32_t FORM_CON_NETWORK_DELAY_TIME = 500; // ms
 }
 /**
  * @class FormTaskMgr
@@ -338,6 +340,11 @@ public:
      */
     void PostFrsDiedTaskToHost(const sptr<IRemoteObject> &remoteObject);
 
+    /**
+     * @brief Post task to connect NetWork.
+     */
+    void PostConnectNetWork();
+
 private:
     /**
      * @brief Acquire form data from form provider.
@@ -587,6 +594,11 @@ private:
      * @param remoteObject Form host proxy object.
      */
     void FrsDiedTaskToHost(const sptr<IRemoteObject> &remoteObject);
+
+    /**
+     * @brief Post task to connect NetWork.
+     */
+    void ConnectNetWork();
 
 private:
     std::mutex formRecoverTimesMutex_;

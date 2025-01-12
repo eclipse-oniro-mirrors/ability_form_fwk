@@ -32,6 +32,7 @@
 #include "want.h"
 #include "form_event_report.h"
 #include "form_record_report.h"
+#include "form_data_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -114,6 +115,46 @@ bool FormTimerMgr::AddFormTimer(int64_t formId, long updateAtHour, long updateAt
     FormTimer timerTask(formId, updateAtHour, updateAtMin, userId);
     return AddFormTimer(timerTask);
 }
+
+/**
+ * @brief Add scheduled form timer.
+ * @param formId The Id of the form.
+ * @param updateAtTimes multi updatetime.
+ * @param userId User ID.
+ * @return Returns true on success, false on failure.
+ */
+bool FormTimerMgr::AddFormTimerForMultiUpdate(int64_t formId, std::vector<std::vector<int>> updateAtTimes,
+    int32_t userId)
+{
+    if (updateAtTimes.size() == 0) {
+        HILOG_ERROR("no multiUpdateAtTimes");
+        return false;
+    }
+    bool result = true;
+    for (const auto &time : updateAtTimes) {
+        FormTimer timerTask(formId, time[0], time[1], userId);
+        timerTask.needUpdateAlarm = false;
+        result = AddFormTimer(timerTask);
+        if (!result) {
+            HILOG_ERROR("set multiUpdateAtTimes failed time[0] : %{public}d ,time[1] : %{public}d ",
+                (int)time[0], (int)time[1]);
+            return false;
+        }
+    }
+    
+    if (!UpdateLimiterAlarm()) {
+        HILOG_ERROR("UpdateLimiterAlarm failed");
+        return false;
+    }
+
+    if (!UpdateAtTimerAlarm()) {
+        HILOG_ERROR("updateAtTimerAlarm failed");
+        return false;
+    }
+    return true;
+}
+
+
 /**
  * @brief Remove form timer by form id.
  * @param formId The Id of the form.
@@ -230,6 +271,19 @@ bool FormTimerMgr::UpdateAtTimerValue(int64_t formId, const FormTimerCfg &timerC
         changedItem.refreshTask.min = timerCfg.updateAtMin;
         changedItem.updateAtTime = changedItem.refreshTask.hour * Constants::MIN_PER_HOUR + changedItem.refreshTask.min;
         AddUpdateAtItem(changedItem);
+        std::vector<std::vector<int>> updateAtTimes = timerCfg.updateAtTimes;
+        if (updateAtTimes.size() > 0) {
+            bool ret = ERR_OK;
+            for (const auto &time: updateAtTimes) {
+                HILOG_INFO("time[0] : %{public}d ,time[1] : %{public}d ", (int)time[0], (int)time[1]);
+                UpdateAtItem changedItem_ = changedItem;
+                changedItem_.refreshTask.hour = time[0];
+                changedItem_.refreshTask.min = time[1];
+                auto updateAtTime = time[0] * Constants::MIN_PER_HOUR + time[1];
+                changedItem_.updateAtTime = updateAtTime;
+                AddUpdateAtItem(changedItem_);
+            }
+        }
     }
 
     if (!UpdateAtTimerAlarm()) {
@@ -266,6 +320,20 @@ bool FormTimerMgr::IntervalToAtTimer(int64_t formId, const FormTimerCfg &timerCf
             HILOG_ERROR("fail AddUpdateAtTimer");
             return false;
         }
+        std::vector<std::vector<int>> updateAtTimes = timerCfg.updateAtTimes;
+        if (updateAtTimes.size() == 0) {
+            return true;
+        }
+        for (const auto &time: updateAtTimes) {
+            FormTimer timerTask_ = timerTask;
+            timerTask_.isUpdateAt = true;
+            timerTask_.hour = time[0];
+            timerTask_.min = time[1];
+            if (!AddUpdateAtTimer(timerTask_)) {
+                HILOG_ERROR("fail AddUpdateAtTimer");
+                return false;
+            }
+        }
         return true;
     } else {
         HILOG_ERROR("intervalTimer not exist");
@@ -294,7 +362,6 @@ bool FormTimerMgr::AtTimerToIntervalTimer(int64_t formId, const FormTimerCfg &ti
             if (itItem->refreshTask.formId == formId) {
                 targetItem = *itItem;
                 updateAtTimerTasks_.erase(itItem);
-                break;
             }
         }
     }
@@ -343,7 +410,14 @@ void FormTimerMgr::IncreaseRefreshCount(int64_t formId)
  */
 bool FormTimerMgr::SetNextRefreshTime(int64_t formId, long nextGapTime, int32_t userId)
 {
-    if (nextGapTime < Constants::MIN_NEXT_TIME) {
+    FormRecord record;
+    bool bGetRecord = FormDataMgr::GetInstance().GetFormRecord(formId, record);
+    if (!bGetRecord) {
+        HILOG_ERROR("not exist such form:%{public}" PRId64 "", formId);
+        return false;
+    }
+
+    if (!record.isSystemApp && nextGapTime < Constants::MIN_NEXT_TIME) {
         HILOG_ERROR("invalid nextGapTime:%{public}ld", nextGapTime);
         return false;
     }
@@ -426,8 +500,9 @@ bool FormTimerMgr::AddUpdateAtTimer(const FormTimer &task)
     HILOG_INFO("start");
     {
         std::lock_guard<std::mutex> lock(updateAtMutex_);
+        auto updateAtTime = task.hour * Constants::MIN_PER_HOUR + task.min;
         for (const auto &updateAtTimer : updateAtTimerTasks_) {
-            if (updateAtTimer.refreshTask.formId == task.formId) {
+            if (updateAtTimer.refreshTask.formId == task.formId && updateAtTimer.updateAtTime == updateAtTime) {
                 HILOG_WARN("already exist formTimer, formId:%{public}" PRId64 " task",
                     task.formId);
                 return true;
@@ -435,18 +510,19 @@ bool FormTimerMgr::AddUpdateAtTimer(const FormTimer &task)
         }
         UpdateAtItem atItem;
         atItem.refreshTask = task;
-        atItem.updateAtTime = task.hour * Constants::MIN_PER_HOUR + task.min;
+        atItem.updateAtTime = updateAtTime;
         AddUpdateAtItem(atItem);
     }
 
-    if (!UpdateLimiterAlarm()) {
-        HILOG_ERROR("UpdateLimiterAlarm failed");
-        return false;
-    }
-
-    if (!UpdateAtTimerAlarm()) {
-        HILOG_ERROR("updateAtTimerAlarm failed");
-        return false;
+    if (task.needUpdateAlarm) {
+        if (!UpdateLimiterAlarm()) {
+            HILOG_ERROR("UpdateLimiterAlarm failed");
+            return false;
+        }
+        if (!UpdateAtTimerAlarm()) {
+            HILOG_ERROR("updateAtTimerAlarm failed");
+            return false;
+        }
     }
 
     return refreshLimiter_.AddItem(task.formId);
@@ -575,6 +651,7 @@ bool FormTimerMgr::OnUpdateAtTrigger(long updateTime)
     if (!updateList.empty()) {
         HILOG_INFO("update at timer triggered, trigger time:%{public}ld", updateTime);
         for (auto &item : updateList) {
+            item.refreshTask.refreshType = RefreshType::TYPE_UPDATETIMES;
             ExecTimerTask(item.refreshTask);
         }
     }
@@ -619,6 +696,7 @@ bool FormTimerMgr::OnDynamicTimeTrigger(int64_t updateTime)
     if (!updateList.empty()) {
         HILOG_INFO("trigger time:%{public}" PRId64, updateTime);
         for (auto &task : updateList) {
+            task.refreshType = RefreshType::TYPE_UPDATENEXTTIME;
             ExecTimerTask(task);
         }
     }
@@ -846,6 +924,7 @@ void FormTimerMgr::OnIntervalTimeOut()
 
     if (!updateList.empty()) {
         for (auto &task : updateList) {
+            task.refreshType = RefreshType::TYPE_INTERVAL;
             ExecTimerTask(task);
         }
     }
@@ -1409,6 +1488,15 @@ void FormTimerMgr::ExecTimerTask(const FormTimer &timerTask)
         HILOG_BRIEF("timerTask.userId is current user");
         want.SetParam(Constants::PARAM_FORM_USER_ID, timerTask.userId);
     }
+    if (timerTask.refreshType == RefreshType::TYPE_INTERVAL) {
+        want.SetParam(Constants::PARAM_FORM_REFRESH_TYPE, Constants::REFRESHTYPE_INTERVAL);
+    } else if (timerTask.refreshType == RefreshType::TYPE_UPDATETIMES) {
+        want.SetParam(Constants::PARAM_FORM_REFRESH_TYPE, Constants::REFRESHTYPE_UPDATETIMES);
+    } else if (timerTask.refreshType == RefreshType::TYPE_UPDATENEXTTIME) {
+        want.SetParam(Constants::PARAM_FORM_REFRESH_TYPE, Constants::REFRESHTYPE_UPDATENEXTTIME);
+    } else if (timerTask.refreshType == RefreshType::TYPE_VISIABLE) {
+        want.SetParam(Constants::PARAM_FORM_REFRESH_TYPE, Constants::REFRESHTYPE_VISIABLE);
+    }
     HILOG_BRIEF("userId:%{public}d", timerTask.userId);
     auto task = [id = timerTask.formId, want]() {
         FormProviderMgr::GetInstance().RefreshForm(id, want, false);
@@ -1419,6 +1507,7 @@ void FormTimerMgr::ExecTimerTask(const FormTimer &timerTask)
 void FormTimerMgr::RefreshWhenFormVisible(const int64_t &formId, const int32_t &userId)
 {
     FormTimer timerTask(formId, true, userId);
+    timerTask.refreshType = RefreshType::TYPE_VISIABLE;
     ExecTimerTask(timerTask);
 }
 

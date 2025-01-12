@@ -224,6 +224,7 @@ FormRecord FormDataMgr::CreateFormRecord(const FormItemInfo &formInfo, const int
     newRecord.formBundleType = formInfo.GetFormBundleType();
     formInfo.GetHapSourceDirs(newRecord.hapSourceDirs);
     newRecord.renderingMode = formInfo.GetRenderingMode();
+    newRecord.conditionUpdate = formInfo.GetConditionUpdate();
     HILOG_DEBUG("end");
     return newRecord;
 }
@@ -560,6 +561,33 @@ bool FormDataMgr::GetFormRecord(const std::string &bundleName, std::vector<FormR
         if (bundleName == itFormRecord->second.bundleName &&
             (userId == Constants::INVALID_USER_ID || userId == itFormRecord->second.userId)) {
             formInfos.emplace_back(itFormRecord->second);
+        }
+    }
+    if (formInfos.size() > 0) {
+        return true;
+    } else {
+        HILOG_DEBUG("formInfo not find");
+        return false;
+    }
+}
+
+/**
+ * @brief Get form record.
+ * @param conditionType condition Type.
+ * @param formInfos The form record.
+ * @return Returns true if this function is successfully called; returns false otherwise.
+ */
+bool FormDataMgr::GetFormRecordByCondition(int32_t conditionType, std::vector<FormRecord> &formInfos) const
+{
+    HILOG_DEBUG("get form record by conditionType");
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    for (auto itFormRecord = formRecords_.begin(); itFormRecord != formRecords_.end(); itFormRecord++) {
+        std::vector<int32_t> conditionUpdate = itFormRecord->second.conditionUpdate;
+        for (int32_t item : conditionUpdate) {
+            if (item == conditionType) {
+                formInfos.emplace_back(itFormRecord->second);
+                break;
+            }
         }
     }
     if (formInfos.size() > 0) {
@@ -952,6 +980,38 @@ void FormDataMgr::SetNeedRefresh(const int64_t formId, const bool needRefresh)
  * @param formId The Id of the form.
  * @param needRefresh true or false.
  */
+void FormDataMgr::SetRefreshType(const int64_t formId, const int refreshType)
+{
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    auto itFormRecord = formRecords_.find(formId);
+    if (itFormRecord == formRecords_.end()) {
+        HILOG_ERROR("form info not find");
+        return;
+    }
+    itFormRecord->second.refreshType = refreshType;
+}
+
+/**
+ * @brief get needRefresh for FormRecord.
+ * @param formId The Id of the form.
+ * @param needRefresh true or false.
+ */
+void FormDataMgr::GetRefreshType(const int64_t formId, int &refreshType)
+{
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    auto itFormRecord = formRecords_.find(formId);
+    if (itFormRecord == formRecords_.end()) {
+        HILOG_ERROR("form info not find");
+        return;
+    }
+    refreshType = itFormRecord->second.refreshType;
+}
+
+/**
+ * @brief Set needRefresh for FormRecord.
+ * @param formId The Id of the form.
+ * @param needRefresh true or false.
+ */
 void FormDataMgr::SetNeedAddForm(const int64_t formId, const bool needAddForm)
 {
     std::lock_guard<std::mutex> lock(formRecordMutex_);
@@ -1047,7 +1107,8 @@ void FormDataMgr::SetUpdateInfo(
     const bool enableUpdate,
     const long updateDuration,
     const int updateAtHour,
-    const int updateAtMin)
+    const int updateAtMin,
+    const std::vector<std::vector<int>> updateAtTimes)
 {
     std::lock_guard<std::mutex> lock(formRecordMutex_);
     auto itFormRecord = formRecords_.find(formId);
@@ -1060,6 +1121,7 @@ void FormDataMgr::SetUpdateInfo(
     itFormRecord->second.updateDuration = updateDuration;
     itFormRecord->second.updateAtHour = updateAtHour;
     itFormRecord->second.updateAtMin = updateAtMin;
+    itFormRecord->second.updateAtTimes = updateAtTimes;
 }
 /**
  * @brief Check if two forms is same or not.
@@ -1404,6 +1466,7 @@ void FormDataMgr::ParseUpdateConfig(FormRecord &record, const FormItemInfo &info
         ParseIntervalConfig(record, configDuration);
     } else {
         ParseAtTimerConfig(record, info);
+        ParseMultiUpdateTimeConfig(record, info);
     }
 }
 
@@ -1423,6 +1486,42 @@ void FormDataMgr::ParseIntervalConfig(FormRecord &record, const int configDurati
         record.updateDuration = configDuration * Constants::TIME_CONVERSION;
     }
     HILOG_INFO("end");
+}
+
+void FormDataMgr::ParseMultiUpdateTimeConfig(FormRecord &record, const FormItemInfo &info) const
+{
+    std::string configAtMultiTime = info.GetMultiScheduledUpdateTime();
+    HILOG_INFO("ParseMultiUpdateTimeConfig updateAt:%{public}s", configAtMultiTime.c_str());
+    if (configAtMultiTime.empty()) {
+        return;
+    }
+    std::vector<std::string> timeList = FormUtil::StringSplit(configAtMultiTime, Constants::TIMES_DELIMETER);
+    if (timeList.size() > Constants::UPDATE_AT_CONFIG_MAX_COUNT) {
+        HILOG_ERROR("invalid config, size: %{public}zu", timeList.size());
+        return;
+    }
+    std::vector<std::vector<int>> updateAtTimes;
+    for (const auto &time : timeList) {
+        std::vector<std::string> temp = FormUtil::StringSplit(time, Constants::TIME_DELIMETER);
+        if (temp.size() != Constants::UPDATE_AT_CONFIG_COUNT) {
+            HILOG_ERROR("invalid config");
+            continue;
+        }
+        int hour = std::stoi(temp[0]);
+        int min = std::stoi(temp[1]);
+        if (hour < Constants::MIN_TIME || hour > Constants::MAX_HOUR || min < Constants::MIN_TIME || min >
+            Constants::MAX_MINUTE) {
+            HILOG_ERROR("invalid time, hour:%{public}d, min:%{public}d", hour, min);
+            continue;
+        }
+        std::vector<int> newElement = {hour, min};
+        updateAtTimes.push_back(newElement);
+    }
+
+    HILOG_INFO("parseAsUpdateAt updateAtTimes size:%{public}zu", updateAtTimes.size());
+    if (updateAtTimes.size() > 0) {
+        record.updateAtTimes = updateAtTimes;
+    }
 }
 
 /**

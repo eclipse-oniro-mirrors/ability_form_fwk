@@ -591,11 +591,6 @@ int FormMgr::SetNextRefreshTime(const int64_t formId, const int64_t nextTime)
 {
     HILOG_INFO("call");
 
-    if (nextTime < (Constants::MIN_NEXT_TIME / Constants::SEC_PER_MIN)) {
-        HILOG_ERROR("next time less than 5 mins");
-        return ERR_APPEXECFWK_FORM_INVALID_REFRESH_TIME;
-    }
-
     if (GetInstance().GetRecoverStatus() == Constants::IN_RECOVERING) {
         HILOG_ERROR("formManager is in recovering");
         return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
