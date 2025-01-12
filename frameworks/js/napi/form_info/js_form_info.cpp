@@ -46,6 +46,19 @@ napi_value CreateJsColorMode(napi_env engine)
     return objValue;
 }
 
+napi_value CreateJsRenderingMode(napi_env engine)
+{
+    napi_value objValue = nullptr;
+    napi_create_object(engine, &objValue);
+    napi_set_named_property(
+        engine, objValue, "AUTO_COLOR", CreateJsValue(engine, AppExecFwk::FormsRenderingMode::AUTO_COLOR));
+    napi_set_named_property(
+        engine, objValue, "FULL_COLOR", CreateJsValue(engine, AppExecFwk::FormsRenderingMode::FULL_COLOR));
+    napi_set_named_property(
+        engine, objValue, "SINGLE_COLOR", CreateJsValue(engine, AppExecFwk::FormsRenderingMode::SINGLE_COLOR));
+    return objValue;
+}
+
 napi_value CreateJsFormState(napi_env engine)
 {
     napi_value objValue = nullptr;
@@ -218,6 +231,7 @@ napi_value FormInfoInit(napi_env engine, napi_value exportObj)
 
     napi_set_named_property(engine, exportObj, "FormType", CreateJsFormType(engine));
     napi_set_named_property(engine, exportObj, "ColorMode", CreateJsColorMode(engine));
+    napi_set_named_property(engine, exportObj, "RenderingMode", CreateJsRenderingMode(engine));
     napi_set_named_property(engine, exportObj, "FormState", CreateJsFormState(engine));
     napi_set_named_property(engine, exportObj, "FormParam", CreateJsFormParam(engine));
     napi_set_named_property(engine, exportObj, "FormDimension", CreateJsFormDimension(engine));
