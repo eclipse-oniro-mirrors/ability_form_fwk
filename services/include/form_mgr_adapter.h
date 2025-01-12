@@ -664,6 +664,14 @@ public:
     ErrCode UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth);
 
     int32_t OnNotifyRefreshForm(const int64_t &formId);
+
+    /**
+     * @brief Update form by condition.
+     * @param UpdateType The type of the form to update.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode UpdateFormByCondition(int type);
+
 private:
     /**
      * @brief Get form configure info.
@@ -1230,6 +1238,8 @@ private:
 
     std::mutex reUpdateFormMapMutex_;
     std::unordered_map<int64_t, std::pair<int64_t, bool>> reUpdateFormMap_;
+
+    std::map<int, std::vector<int64_t>> conditionUpdateFormMap;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

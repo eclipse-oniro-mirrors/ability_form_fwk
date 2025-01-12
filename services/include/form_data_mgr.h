@@ -154,6 +154,14 @@ public:
      */
     bool GetFormRecord(const std::string &bundleName, std::vector<FormRecord> &formInfos,
         int32_t userId = Constants::INVALID_USER_ID) const;
+
+    /**
+     * @brief Get form record.
+     * @param conditionType refresh type.
+     * @param formInfos The form record list.
+     * @return Returns true if this function is successfully called; returns false otherwise.
+     */
+    bool GetFormRecordByCondition(int32_t conditionType, std::vector<FormRecord> &formInfos) const;
     /**
      * @brief Get temporary form record.
      * @param formTempRecords The temp form record.
@@ -256,6 +264,20 @@ public:
      * @param needRefresh true or false.
      */
     void SetNeedRefresh(const int64_t formId, const bool needRefresh);
+
+    /**
+     * @brief Set refreshType for FormRecord.
+     * @param formId The Id of the form.
+     * @param needRefresh true or false.
+     */
+    void SetRefreshType(const int64_t formId, const int refreshType);
+
+    /**
+     * @brief Get refreshType for FormRecord.
+     * @param formId The Id of the form.
+     * @param refreshType the form refresh type.
+     */
+    void GetRefreshType(const int64_t formId, int &refreshType);
     
     /**
      * @brief Set needAddForm for FormRecord.
@@ -299,9 +321,10 @@ public:
      * @param updateDuration Update duration.
      * @param updateAtHour Update at hour.
      * @param updateAtMin Update at minute.
+     * @param updateAtTimes Update times.
      */
     void SetUpdateInfo(const int64_t formId, const bool enableUpdate, const long updateDuration,
-    const int updateAtHour, const int updateAtMin);
+    const int updateAtHour, const int updateAtMin, std::vector<std::vector<int>> updateAtTimes);
     /**
      * @brief Clean removed form records.
      * @param bundleName BundleName.
@@ -822,6 +845,13 @@ private:
      * @param configDuration interval duration.
      */
     void ParseIntervalConfig(FormRecord &record, const int configDuration) const;
+
+    /**
+     * @brief Parse multi update time config.
+     * @param record The form record.
+     * @param info form item info.
+     */
+    void ParseMultiUpdateTimeConfig(FormRecord &record, const FormItemInfo &info) const;
 
     /**
      * @brief Parse at time config.

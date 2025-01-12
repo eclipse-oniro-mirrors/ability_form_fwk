@@ -38,6 +38,11 @@ enum class RecycleStatus {
     NON_RECYCLABLE,
 };
 
+enum class ConditionUpdateType {
+    NOCONDITON = 0,
+    NETWORK,
+};
+
 struct FormInstance : public Parcelable {
     int64_t formId = 0;
     std::string formHostName = "";

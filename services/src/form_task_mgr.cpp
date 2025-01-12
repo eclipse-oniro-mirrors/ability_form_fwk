@@ -1538,5 +1538,27 @@ void FormTaskMgr::UpdateFormSize(const int64_t &formId, float width, float heigh
 
     HILOG_DEBUG("end");
 }
+void FormTaskMgr::PostConnectNetWork()
+{
+    HILOG_DEBUG("start");
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("null serialQueue_");
+        return;
+    }
+
+    auto connectNetWork = []() {
+        FormTaskMgr::GetInstance().ConnectNetWork();
+    };
+    serialQueue_->ScheduleTask(FORM_CON_NETWORK_DELAY_TIME, connectNetWork);
+    HILOG_DEBUG("end");
+}
+
+void FormTaskMgr::ConnectNetWork()
+{
+    HILOG_INFO("call");
+    DelayedSingleton<FormMgrService>::GetInstance()->SubscribeNetConn();
+}
+
+
 } // namespace AppExecFwk
 } // namespace OHOS

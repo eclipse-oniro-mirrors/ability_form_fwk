@@ -1523,10 +1523,12 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetUpdateInfo_001, TestSize.Leve
     long updateDuration = 100;
     int updateAtHour = 24;
     int updateAtMin = 59;
-
+    std::vector<std::vector<int>> updateAtTimes;
+    std::vector<int> newElement = {updateAtHour, updateAtMin};
+    updateAtTimes.push_back(newElement);
     std::shared_ptr<FormDataMgr> formDataMgr = std::make_shared<FormDataMgr>();
     ASSERT_NE(nullptr, formDataMgr);
-    formDataMgr->SetUpdateInfo(formId, enableUpdate, updateDuration, updateAtHour, updateAtMin);
+    formDataMgr->SetUpdateInfo(formId, enableUpdate, updateDuration, updateAtHour, updateAtMin, updateAtTimes);
 
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_SetUpdateInfo_001 end";
 }
@@ -1547,7 +1549,9 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetUpdateInfo_002, TestSize.Leve
     long updateDuration = 100;
     int updateAtHour = 24;
     int updateAtMin = 59;
-
+    std::vector<std::vector<int>> updateAtTimes;
+    std::vector<int> newElement = {updateAtHour, updateAtMin};
+    updateAtTimes.push_back(newElement);
     // create formRecords
     int callingUid = 0;
     FormItemInfo formItemInfo;
@@ -1555,7 +1559,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_SetUpdateInfo_002, TestSize.Leve
     FormRecord record = formDataMgr_.CreateFormRecord(formItemInfo, callingUid);
     formDataMgr_.formRecords_.emplace(formId, record);
 
-    formDataMgr_.SetUpdateInfo(formId, enableUpdate, updateDuration, updateAtHour, updateAtMin);
+    formDataMgr_.SetUpdateInfo(formId, enableUpdate, updateDuration, updateAtHour, updateAtMin, updateAtTimes);
     EXPECT_EQ(true, formDataMgr_.formRecords_.find(formId)->second.isEnableUpdate);
     EXPECT_EQ(100, formDataMgr_.formRecords_.find(formId)->second.updateDuration);
     EXPECT_EQ(24, formDataMgr_.formRecords_.find(formId)->second.updateAtHour);

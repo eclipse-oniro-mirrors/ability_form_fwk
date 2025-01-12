@@ -263,6 +263,7 @@ bool FormEventUtil::ProviderFormUpdated(const int64_t formId, FormRecord &formRe
     FormBmsHelper::GetInstance().NotifyModuleNotRemovable(formRecord.bundleName, formRecord.moduleName);
     FormTimerCfg timerCfg;
     GetTimerCfg(updatedForm.updateEnabled, updatedForm.updateDuration, updatedForm.scheduledUpdateTime, timerCfg);
+    SetTimerCfgByMultUpdate(updatedForm.multiScheduledUpdateTime, timerCfg);
     HandleTimerUpdate(formId, formRecord, timerCfg);
     UpdateRecordByBundleInfo(bundleInfo, formRecord);
     UpdateFormRecord(updatedForm, formRecord);
@@ -284,6 +285,7 @@ bool FormEventUtil::ProviderFormUpdated(const int64_t formId, FormRecord &formRe
     FormDataMgr::GetInstance().SetRecordNeedFreeInstall(formId, true);
     FormTimerCfg timerCfg;
     GetTimerCfg(packForm.updateEnabled, packForm.updateDuration, packForm.scheduledUpdateTime, timerCfg);
+    SetTimerCfgByMultUpdate(packForm.multiScheduledUpdateTime, timerCfg);
     HandleTimerUpdate(formId, formRecord, timerCfg);
     UpdateRecordByBundleInfo(bundleInfo, formRecord);
     UpdateFormRecord(packForm, formRecord);
@@ -399,6 +401,51 @@ void FormEventUtil::GetTimerCfg(const bool updateEnabled,
     }
 }
 
+void FormEventUtil::SetTimerCfgByMultUpdate(const std::string &configMultUpdateAt, FormTimerCfg& cfg)
+{
+    if (configMultUpdateAt.empty()) {
+        return;
+    }
+    std::vector<std::string> timeList = FormUtil::StringSplit(configMultUpdateAt, Constants::TIMES_DELIMETER);
+    if (timeList.size() > Constants::UPDATE_AT_CONFIG_MAX_COUNT) {
+        HILOG_ERROR("invalid config");
+        return;
+    }
+    std::vector<std::vector<int>> updateAtTimes;
+    for (const auto &time: timeList) {
+        std::vector<std::string> temp = FormUtil::StringSplit(time, Constants::TIME_DELIMETER);
+        if (temp.size() != Constants::UPDATE_AT_CONFIG_COUNT) {
+            HILOG_ERROR("invalid config");
+            continue;
+        }
+        int hour = std::stoi(temp[0]);
+        int min = std::stoi(temp[1]);
+        if (hour < Constants::MIN_TIME || hour > Constants::MAX_HOUR || min < Constants::MIN_TIME || min >
+            Constants::MAX_MINUTE) {
+            HILOG_ERROR("invalid time");
+            continue;
+        }
+        std::vector<int> newElement = {hour, min};
+        updateAtTimes.push_back(newElement);
+    }
+    if (updateAtTimes.size() > 0) {
+        cfg.updateAtTimes = updateAtTimes;
+    }
+}
+
+void FormEventUtil::HandleAddMultiUpdateTimes(const int64_t formId,
+    const FormRecord &record, const FormTimerCfg &timerCfg)
+{
+    std::vector<std::vector<int>> updateAtTimes = timerCfg.updateAtTimes;
+    if (updateAtTimes.size() > 0) {
+        for (const auto &time: updateAtTimes) {
+            HILOG_INFO("add at timer:%{public}d,%{public}d", time[0], time[1]);
+            FormTimerMgr::GetInstance().AddFormTimer(formId,
+                time[0], time[1], record.providerUserId);
+        }
+    }
+}
+
 void FormEventUtil::HandleTimerUpdate(const int64_t formId,
     const FormRecord &record, const FormTimerCfg &timerCfg)
 {
@@ -417,7 +464,7 @@ void FormEventUtil::HandleTimerUpdate(const int64_t formId,
     // disable to enable
     if (!record.isEnableUpdate && timerCfg.enableUpdate) {
         FormDataMgr::GetInstance().SetUpdateInfo(formId, true,
-            timerCfg.updateDuration, timerCfg.updateAtHour, timerCfg.updateAtMin);
+            timerCfg.updateDuration, timerCfg.updateAtHour, timerCfg.updateAtMin, timerCfg.updateAtTimes);
         if (timerCfg.updateDuration > 0) {
             HILOG_INFO("add interval timer:%{public}" PRId64, timerCfg.updateDuration);
             int64_t updateDuration = timerCfg.updateDuration;
@@ -429,6 +476,8 @@ void FormEventUtil::HandleTimerUpdate(const int64_t formId,
             HILOG_INFO("add at timer:%{public}d,%{public}d", timerCfg.updateAtHour, timerCfg.updateAtMin);
             FormTimerMgr::GetInstance().AddFormTimer(formId, timerCfg.updateAtHour,
                 timerCfg.updateAtMin, record.providerUserId);
+
+            HandleAddMultiUpdateTimes(formId, record, timerCfg);
         }
         return;
     }
@@ -440,7 +489,7 @@ void FormEventUtil::HandleTimerUpdate(const int64_t formId,
     }
 
     FormDataMgr::GetInstance().SetUpdateInfo(formId, true,
-        timerCfg.updateDuration, timerCfg.updateAtHour, timerCfg.updateAtMin);
+        timerCfg.updateDuration, timerCfg.updateAtHour, timerCfg.updateAtMin, timerCfg.updateAtTimes);
     auto newTimerCfg = timerCfg;
     if (type == TYPE_INTERVAL_CHANGE || type == TYPE_ATTIME_TO_INTERVAL) {
         int64_t updateDuration = timerCfg.updateDuration;
@@ -472,7 +521,8 @@ UpdateType FormEventUtil::GetUpdateType(const FormRecord &record, const FormTime
             // update at time to interval
             return TYPE_ATTIME_TO_INTERVAL;
         } else {
-            if (record.updateAtHour == timerCfg.updateAtHour && record.updateAtMin == timerCfg.updateAtMin) {
+            if (record.updateAtHour == timerCfg.updateAtHour && record.updateAtMin == timerCfg.updateAtMin
+                && record.updateAtTimes == timerCfg.updateAtTimes) {
                 return TYPE_NO_CHANGE;
             }
             // update at time change
@@ -581,6 +631,39 @@ bool FormEventUtil::HandleAdditionalInfoChanged(const std::string &bundleName)
     return true;
 }
 
+
+void FormEventUtil::UpdateMultiUpdateTime(std::string multiScheduledUpdateTime, FormRecord &formRecord)
+{
+    std::vector<std::string> timeList = FormUtil::StringSplit(multiScheduledUpdateTime,
+        Constants::TIMES_DELIMETER);
+    if (timeList.size() > Constants::UPDATE_AT_CONFIG_MAX_COUNT) {
+        HILOG_ERROR("invalid config");
+        return;
+    }
+
+    std::vector<std::vector<int>> updateAtTimes;
+    for (const auto &time: timeList) {
+        HILOG_INFO("UpdateFormRecord add  updateAtTimes");
+        std::vector<std::string> temp = FormUtil::StringSplit(time, Constants::TIME_DELIMETER);
+        if (temp.size() != Constants::UPDATE_AT_CONFIG_COUNT) {
+            HILOG_ERROR("invalid config");
+            continue;
+        }
+        int hour = std::stoi(temp[0]);
+        int min = std::stoi(temp[1]);
+        if (hour < Constants::MIN_TIME || hour > Constants::MAX_HOUR || min < Constants::MIN_TIME || min >
+            Constants::MAX_MINUTE) {
+            HILOG_ERROR("invalid time");
+            continue;
+        }
+        std::vector<int> newElement = {hour, min};
+        updateAtTimes.push_back(newElement);
+    }
+    if (updateAtTimes.size() > 0) {
+        formRecord.updateAtTimes = updateAtTimes;
+    }
+}
+
 void FormEventUtil::UpdateFormRecord(const FormInfo &formInfo, FormRecord &formRecord)
 {
     formRecord.formSrc = formInfo.src;
@@ -595,6 +678,10 @@ void FormEventUtil::UpdateFormRecord(const FormInfo &formInfo, FormRecord &formR
         formRecord.updateAtHour = std::stoi(time[0]);
         formRecord.updateAtMin = std::stoi(time[1]);
     }
+    std::string multiScheduledUpdateTime_ = formInfo.scheduledUpdateTime;
+    if (!multiScheduledUpdateTime_.empty()) {
+        UpdateMultiUpdateTime(multiScheduledUpdateTime_, formRecord);
+    }
     HILOG_DEBUG("formId:%{public}" PRId64 "", formRecord.formId);
     FormDataMgr::GetInstance().UpdateFormRecord(formRecord.formId, formRecord);
 }
@@ -608,6 +695,10 @@ void FormEventUtil::UpdateFormRecord(const AbilityFormInfo &formInfo, FormRecord
     if (time.size() == Constants::UPDATE_AT_CONFIG_COUNT) {
         formRecord.updateAtHour = std::stoi(time[0]);
         formRecord.updateAtMin = std::stoi(time[1]);
+    }
+    std::string multiScheduledUpdateTime_ = formInfo.scheduledUpdateTime;
+    if (!multiScheduledUpdateTime_.empty()) {
+        UpdateMultiUpdateTime(multiScheduledUpdateTime_, formRecord);
     }
     HILOG_DEBUG("formId:%{public}" PRId64 "", formRecord.formId);
     FormDataMgr::GetInstance().UpdateFormRecord(formRecord.formId, formRecord);

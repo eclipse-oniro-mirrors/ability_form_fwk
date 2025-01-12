@@ -55,6 +55,7 @@
               "hicollie",
               "hisysevent",
               "kv_store",
+              "netmanager_base",
               "resource_management",
               "time_service",
               "device_usage_statistics",

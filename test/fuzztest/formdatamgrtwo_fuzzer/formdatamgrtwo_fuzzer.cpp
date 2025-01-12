@@ -65,7 +65,10 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     long updateDuration = static_cast<long>(GetU32Data(data));
     int updateAtHour = static_cast<int>(GetU32Data(data));
     int updateAtMin = static_cast<int>(GetU32Data(data));
-    formDataMgr.SetUpdateInfo(formId, enableUpdate, updateDuration, updateAtHour, updateAtMin);
+    std::vector<std::vector<int>> updateAtTimes;
+    std::vector<int> newElement = {updateAtHour, updateAtMin};
+    updateAtTimes.push_back(newElement);
+    formDataMgr.SetUpdateInfo(formId, enableUpdate, updateDuration, updateAtHour, updateAtMin, updateAtTimes);
     formDataMgr.IsSameForm(records, updatedForm);
     std::string bundleName(data, size);
     std::set<int64_t> removedForms;

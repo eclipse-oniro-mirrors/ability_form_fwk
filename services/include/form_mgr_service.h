@@ -34,6 +34,14 @@ enum class ServiceRunningState {
     STATE_NOT_START,
     STATE_RUNNING,
 };
+
+enum class ConNetStatus {
+    DIS_CONNECT_NETWORK = 0,
+    CONNECT_NETWORK,
+    PRE_CONNECT_NETWORK,
+    PRE_DISCONNECT_NETWORK,
+};
+
 /**
  * @class FormMgrService
  * FormMgrService provides a facility for managing form life cycle.
@@ -673,6 +681,10 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth) override;
+
+    void SubscribeNetConn();
+    
+    friend class NetConnCallbackObserver;
 private:
     /**
      * OnAddSystemAbility, OnAddSystemAbility will be called when the listening SA starts.
@@ -719,6 +731,9 @@ private:
     void HiDumpFormBlockedApps([[maybe_unused]] const std::string &args, std::string &result);
     bool CheckCallerIsSystemApp() const;
     static std::string GetCurrentDateTime();
+    void SetNetConnect();
+    void SetDisConnectTypeTime();
+
 private:
     static const int32_t ENABLE_FORM_UPDATE = 5;
     const static std::map<std::string, DumpKey> dumpKeyMap_;
@@ -730,6 +745,9 @@ private:
     std::shared_ptr<FormEventHandler> handler_ = nullptr;
     std::shared_ptr<FormSerialQueue> serialQueue_ = nullptr;
     std::shared_ptr<FormSysEventReceiver> formSysEventReceiver_ = nullptr;
+    uint32_t NetSceneCallbackId_ = 0;
+    int32_t netConTime = 0;
+    int64_t lastNetLostTime_ = FormUtil::GetCurrentMillisecond();
     mutable std::mutex instanceMutex_;
     DISALLOW_COPY_AND_MOVE(FormMgrService);
 #ifdef MEM_MGR_ENABLE

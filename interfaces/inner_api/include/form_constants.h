@@ -54,6 +54,8 @@ namespace Constants {
     constexpr const char* PARAM_FORM_USER_ID = "ohos.extra.param.key.form_user_id";
     constexpr const char* KEY_IS_TIMER = "isCountTimerRefresh";
     constexpr const char* KEY_TIMER_REFRESH = "isTimerRefresh";
+    constexpr const char* KEY_CONNECT_REFRESH = "isConnectRefresh";
+    constexpr const char* PARAM_FORM_REFRESH_TYPE = "ohos.extra.param.key.refresh_type";
     constexpr const char* SYSTEM_PARAM_FORM_UPDATE_TIME = "persist.sys.fms.form.update.time";
     constexpr const char* SYSTEM_PARAM_FORM_REFRESH_MIN_TIME = "persist.sys.fms.form.refresh.min.time";
     constexpr const char* ACTION_UPDATEATTIMER = "form_update_at_timer";
@@ -137,7 +139,9 @@ namespace Constants {
     const long MAX_PERIOD = MAX_CONFIG_DURATION * TIME_CONVERSION; // 1 week in ms unit
     const long ABS_TIME = 30 * TIME_1000; // 30s abs time
     constexpr const char* TIME_DELIMETER = ":";
+    constexpr const char* TIMES_DELIMETER = ",";
     constexpr int32_t UPDATE_AT_CONFIG_COUNT = 2;
+    constexpr int32_t UPDATE_AT_CONFIG_MAX_COUNT = 24;
 
     constexpr int32_t LIMIT_COUNT = 50;
     constexpr int32_t MIN_NEXT_TIME = 300; // seconds
@@ -270,6 +274,14 @@ namespace Constants {
         PublishFormErrorCode code;
         std::string message;
     };
+    // refresh type
+    constexpr int32_t REFRESHTYPE_DEFAULT = -1;
+    constexpr int32_t REFRESHTYPE_HOST = 0;
+    constexpr int32_t REFRESHTYPE_INTERVAL = 1;
+    constexpr int32_t REFRESHTYPE_UPDATETIMES = 2;
+    constexpr int32_t REFRESHTYPE_UPDATENEXTTIME = 3;
+    constexpr int32_t REFRESHTYPE_NETWORKCHANGED = 4;
+    constexpr int32_t REFRESHTYPE_VISIABLE = 99;
 
     // rdb
     const std::string FORM_MANAGER_SERVICE_PATH = "/data/service/el1/public/database/form_storage";

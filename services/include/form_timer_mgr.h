@@ -64,6 +64,16 @@ public:
      * @return Returns true on success, false on failure.
      */
     bool AddFormTimer(int64_t formId, long updateAtHour, long updateAtMin, int32_t userId = 0);
+
+    /**
+     * @brief Add scheduled form timer.
+     * @param formId The Id of the form.
+     * @param updateAtTimes multi updatetime.
+     * @param userId User ID.
+     * @return Returns true on success, false on failure.
+     */
+    bool AddFormTimerForMultiUpdate(int64_t formId, std::vector<std::vector<int>> updateAtTimes, int32_t userId = 0);
+
     /**
      * @brief Remove form timer by form id.
      * @param formId The Id of the form.

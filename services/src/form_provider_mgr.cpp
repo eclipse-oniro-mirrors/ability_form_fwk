@@ -120,22 +120,42 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
     Want newWant(want);
     newWant.RemoveParam(Constants::KEY_IS_TIMER);
 
-    if (isCountTimerRefresh) {
-        FormDataMgr::GetInstance().SetCountTimerRefresh(formId, true);
-    }
-
     bool isTimerRefresh = want.GetBoolParam(Constants::KEY_TIMER_REFRESH, false);
+    bool isConnectRefresh = want.GetBoolParam(Constants::KEY_CONNECT_REFRESH, false);
     newWant.RemoveParam(Constants::KEY_TIMER_REFRESH);
+    newWant.RemoveParam(Constants::KEY_CONNECT_REFRESH);
 
-    if (isTimerRefresh) {
+    int refreshType = newWant.GetIntParam(Constants::PARAM_FORM_REFRESH_TYPE, Constants::REFRESHTYPE_DEFAULT);
+
+    if (isTimerRefresh || isConnectRefresh) {
         FormDataMgr::GetInstance().SetTimerRefresh(formId, true);
         bool isFormVisible = record.formVisibleNotifyState == Constants::FORM_VISIBLE;
         if (!isFormVisible) {
             HILOG_DEBUG("form is invisible");
             FormDataMgr::GetInstance().SetNeedRefresh(formId, true);
+            FormDataMgr::GetInstance().SetRefreshType(formId, refreshType);
             FormRecordReport::GetInstance().IncreaseUpdateTimes(formId, HiSysEventPointType::TYPE_INVISIBLE_INTERCEPT);
             return ERR_OK;
         }
+    }
+    
+    if (refreshType == Constants::REFRESHTYPE_VISIABLE) {
+        FormDataMgr::GetInstance().GetRefreshType(formId, refreshType);
+        HILOG_INFO("refreshType:%{public}d", refreshType);
+        if (refreshType == Constants::REFRESHTYPE_NETWORKCHANGED) {
+            isCountTimerRefresh = false;
+        }
+    }
+
+    if (record.isSystemApp && refreshType != Constants::REFRESHTYPE_DEFAULT
+        && refreshType != Constants::REFRESHTYPE_VISIABLE) {
+        newWant.SetParam(Constants::PARAM_FORM_REFRESH_TYPE, refreshType);
+    } else {
+        newWant.RemoveParam(Constants::PARAM_FORM_REFRESH_TYPE);
+    }
+
+    if (isCountTimerRefresh) {
+        FormDataMgr::GetInstance().SetCountTimerRefresh(formId, true);
     }
 
 #ifdef SUPPORT_POWER

@@ -32,6 +32,19 @@ enum UpdateType {
     TYPE_INTERVAL_ONCE,
     TYPE_NO_CHANGE,
 };
+
+/**
+ * @enum RefreshType
+ * Refresh type.
+ */
+enum RefreshType {
+    TYPE_NO_TIMER,
+    TYPE_INTERVAL,
+    TYPE_UPDATETIMES,
+    TYPE_UPDATENEXTTIME,
+    TYPE_VISIABLE,
+};
+
 /**
  * @class FormTimer
  * form timer task.
@@ -48,6 +61,8 @@ public:
     bool isEnable = true;
     bool isCountTimer;
     UpdateType type = UpdateType::TYPE_INTERVAL_CHANGE;
+    RefreshType refreshType = RefreshType::TYPE_NO_TIMER;
+    bool needUpdateAlarm = true;
 
     FormTimer()
     {
@@ -60,6 +75,7 @@ public:
         isCountTimer = false;
         refreshTime = FormUtil::GetCurrentMillisecond();
         type = UpdateType::TYPE_INTERVAL_CHANGE;
+        refreshType = RefreshType::TYPE_NO_TIMER;
     }
 
     FormTimer(int64_t id, bool countTimer, int32_t uId = 0)
@@ -73,6 +89,7 @@ public:
         isCountTimer = countTimer;
         refreshTime = FormUtil::GetCurrentMillisecond();
         type = UpdateType::TYPE_INTERVAL_CHANGE;
+        refreshType = RefreshType::TYPE_NO_TIMER;
     }
 
     FormTimer(int64_t id, long repeatTime, int32_t uId = 0)
@@ -86,6 +103,7 @@ public:
         isCountTimer = true;
         refreshTime = FormUtil::GetCurrentMillisecond();
         type = UpdateType::TYPE_INTERVAL_CHANGE;
+        refreshType = RefreshType::TYPE_NO_TIMER;
     }
 
     FormTimer(int64_t id, int hourTime, int minTime, int32_t uId = 0)
@@ -99,6 +117,7 @@ public:
         isCountTimer = false;
         refreshTime = FormUtil::GetCurrentMillisecond();
         type = UpdateType::TYPE_INTERVAL_CHANGE;
+        refreshType = RefreshType::TYPE_NO_TIMER;
     }
 
     ~FormTimer(void) {}
@@ -152,6 +171,7 @@ struct FormTimerCfg {
     int64_t updateDuration = 0L;
     int updateAtHour = -1;
     int updateAtMin = -1;
+    std::vector<std::vector<int>> updateAtTimes;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
