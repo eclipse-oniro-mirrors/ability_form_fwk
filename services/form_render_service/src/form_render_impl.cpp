@@ -145,11 +145,16 @@ int32_t FormRenderImpl::StopRenderingForm(const FormJsInfo &formJsInfo, const Wa
         {
             std::lock_guard<std::mutex> lock(renderRecordMutex_);
             auto iterator = renderRecordMap_.find(uid);
-            if (iterator == renderRecordMap_.end() || !(iterator->second)) {
+            if (iterator == renderRecordMap_.end()) {
                 HILOG_ERROR("fail");
                 return RENDER_FORM_FAILED;
             }
             search = iterator->second;
+
+            if (!search) {
+                HILOG_ERROR("fail");
+                return RENDER_FORM_FAILED;
+            }
         }
 
         std::string compId = want.GetStringParam(Constants::FORM_RENDER_COMP_ID);
