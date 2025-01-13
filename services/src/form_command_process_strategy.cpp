@@ -24,9 +24,20 @@ void RenderFormStrategy::ProcessCommandQueue(std::queue<FormCommand> &commandQue
         HILOG_ERROR("empty commandQueue, formId :%{public}" PRId64 ". ", formId);
         return;
     }
-    size_t commandNums = commandQueue.size();
-    for (size_t i = 0; i < commandNums - 1; ++i) {
+
+    std::queue<FormCommand> tempCommandQueue;
+    while (!commandQueue.empty()) {
+        auto frontCommand = commandQueue.front();
         commandQueue.pop();
+        if (frontCommand.getEventMsg().first == TaskCommandType::RENDER_FORM) {
+            tempCommandQueue.push(frontCommand);
+        }
+    }
+
+    while (!tempCommandQueue.empty()) {
+        auto frontCommand = tempCommandQueue.front();
+        tempCommandQueue.pop();
+        commandQueue.push(frontCommand);
     }
     HILOG_DEBUG("HandleRenderCommand End, formId :%{public}" PRId64 ". ", formId);
 }
