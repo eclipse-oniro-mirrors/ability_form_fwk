@@ -67,6 +67,7 @@ ohos_unittest("FmsFormDataProxyMgrTest") {
     "ipc:ipc_core",
     "jsoncpp:jsoncpp",
     "libxml2:libxml2",
+    "safwk:system_ability_fwk",
   ]
 }
 

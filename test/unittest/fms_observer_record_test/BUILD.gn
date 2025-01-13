@@ -56,6 +56,7 @@ ohos_unittest("FmsObserverRecordTest") {
     "form_fwk:form_manager",
     "hilog:libhilog",
     "ipc:ipc_core",
+    "safwk:system_ability_fwk",
     "time_service:time_client",
   ]
 }

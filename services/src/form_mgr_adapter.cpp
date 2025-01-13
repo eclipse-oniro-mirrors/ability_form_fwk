@@ -4062,6 +4062,11 @@ ErrCode FormMgrAdapter::UpdateFormByCondition(int32_t type)
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
+    NewFormEventInfo eventInfo;
+    eventInfo.conditionType = static_cast<int32_t>(type);
+    FormEventReport::SendConditonUpdateFormEvent(FormEventName::CONDITION_UPDATE_FORM,
+        HiSysEventType::BEHAVIOR, eventInfo);
+        
     for (FormRecord& formRecord : formInfos) {
         if (!formRecord.isSystemApp) {
             continue;

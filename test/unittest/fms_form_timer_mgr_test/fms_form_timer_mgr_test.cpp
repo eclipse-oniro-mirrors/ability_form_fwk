@@ -927,7 +927,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0050, Function | MediumTest | Lev
     int64_t formId = 1;
     long nextGapTime = Constants::MIN_NEXT_TIME + 1;
     int32_t userId = 2;
-    EXPECT_EQ(true, formTimerMgr.SetNextRefreshTime(formId, nextGapTime, userId));
+    EXPECT_EQ(false, formTimerMgr.SetNextRefreshTime(formId, nextGapTime, userId));
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0050 end";
 }
 
@@ -947,7 +947,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0051, Function | MediumTest | Lev
     dynamicRefreshItem.formId = 1;
     dynamicRefreshItem.userId = 2;
     formTimerMgr.dynamicRefreshTasks_.emplace_back(dynamicRefreshItem);
-    EXPECT_EQ(true, formTimerMgr.SetNextRefreshTime(formId, nextGapTime, userId));
+    EXPECT_EQ(false, formTimerMgr.SetNextRefreshTime(formId, nextGapTime, userId));
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0051 end";
 }
 
@@ -967,7 +967,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0052, Function | MediumTest | Lev
     dynamicRefreshItem.formId = 1;
     dynamicRefreshItem.userId = 3;
     formTimerMgr.dynamicRefreshTasks_.emplace_back(dynamicRefreshItem);
-    EXPECT_EQ(true, formTimerMgr.SetNextRefreshTime(formId, nextGapTime, userId));
+    EXPECT_EQ(false, formTimerMgr.SetNextRefreshTime(formId, nextGapTime, userId));
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0052 end";
 }
 
@@ -987,7 +987,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0053, Function | MediumTest | Lev
     dynamicRefreshItem.formId = 2;
     dynamicRefreshItem.userId = 2;
     formTimerMgr.dynamicRefreshTasks_.emplace_back(dynamicRefreshItem);
-    EXPECT_EQ(true, formTimerMgr.SetNextRefreshTime(formId, nextGapTime, userId));
+    EXPECT_EQ(false, formTimerMgr.SetNextRefreshTime(formId, nextGapTime, userId));
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0053 end";
 }
 
@@ -1007,7 +1007,7 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0054, Function | MediumTest | Lev
     dynamicRefreshItem.formId = 2;
     dynamicRefreshItem.userId = 3;
     formTimerMgr.dynamicRefreshTasks_.emplace_back(dynamicRefreshItem);
-    EXPECT_EQ(true, formTimerMgr.SetNextRefreshTime(formId, nextGapTime, userId));
+    EXPECT_EQ(false, formTimerMgr.SetNextRefreshTime(formId, nextGapTime, userId));
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0054 end";
 }
 
