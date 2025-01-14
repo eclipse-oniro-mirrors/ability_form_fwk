@@ -99,9 +99,6 @@ public:
 
     int32_t UpdateFormSize(
         const int64_t &formId, float width, float height, float borderWidth, const std::string &uid) override;
-
-    bool CheckFormSupplyClientValid(const sptr<IFormSupply> &formSupplyClient, const std::string &uid);
-
 private:
     void FormRenderGCTask(const std::string &uid);
     void FormRenderGC(const std::string &uid);
