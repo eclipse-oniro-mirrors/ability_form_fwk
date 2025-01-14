@@ -921,7 +921,6 @@ void FormMgrAdapter::SetVisibleChange(const int64_t formId, const int32_t formVi
         FormRenderMgr::GetInstance().ExecPostRenderFormTask(formId);
     }
 }
-}
 
 ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &formIds,
     const sptr<IRemoteObject> &callerToken, const int32_t formVisibleType)
