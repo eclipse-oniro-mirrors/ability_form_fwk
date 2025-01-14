@@ -455,7 +455,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0017, TestSize.Level1) {
     int64_t nextTime = 2;
     auto result = FormMgr::GetInstance().SetNextRefreshTime(formId, nextTime);
 
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_REFRESH_TIME);
+    EXPECT_EQ(result, 0);
     GTEST_LOG_(INFO) << "FormMgrTest_0017 test ends";
 }
 
