@@ -332,6 +332,10 @@ namespace Constants {
     constexpr const char* FORM_ENABLE_SKELETON_KEY = "ohos.extra.param.key.enable_skeleton";
     // Allow form update and refresh
     constexpr const char* FORM_ENABLE_UPDATE_REFRESH_KEY = "enableFormUpdateRefresh";
+    // Is form contains multiple app
+    const std::string IS_MULTI_APP_FORM = "isMultiAppForm";
+    // form contains multi app is true
+    const std::string IS_MULTI_APP_FORM_TRUE = "true";
 }  // namespace Constants
 }  // namespace AppExecFwk
 }  // namespace OHOS

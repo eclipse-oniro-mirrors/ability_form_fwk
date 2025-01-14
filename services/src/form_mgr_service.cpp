@@ -1872,6 +1872,17 @@ bool FormMgrService::IsFormBundleLocked(const std::string &bundleName, int64_t f
     return result;
 }
 
+int32_t FormMgrService::NotifyFormLocked(const int64_t &formId, bool isLocked)
+{
+    HILOG_DEBUG("call");
+    ErrCode ret = CheckFormPermission();
+    if (ret != ERR_OK) {
+        HILOG_ERROR("disable forms permission denied");
+        return ret;
+    }
+    return FormMgrAdapter::GetInstance().NotifyFormLocked(formId, isLocked);
+}
+
 ErrCode FormMgrService::UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth)
 {
     HILOG_DEBUG("call");
