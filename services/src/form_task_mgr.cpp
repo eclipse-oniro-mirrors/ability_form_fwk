@@ -823,7 +823,8 @@ void FormTaskMgr::PostRenderForm(const FormRecord &formRecord, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
     auto renderType = want.GetIntParam(Constants::FORM_RENDER_TYPE_KEY, Constants::RENDER_FORM);
-    if (renderType !=Constants::UPDATE_RENDERING_FORM || FormDataMgr::GetInstance().GetFormCanUpdate(formRecord.formId)) {
+    if (renderType != Constants::UPDATE_RENDERING_FORM
+        || FormDataMgr::GetInstance().GetFormCanUpdate(formRecord.formId)) {
         FormTaskMgr::GetInstance().InnerPostRenderForm(formRecord, want, remoteObject);
         return;
     }
@@ -842,7 +843,7 @@ void FormTaskMgr::PostRenderForm(const FormRecord &formRecord, const Want &want,
 }
 
 void FormTaskMgr::InnerPostRenderForm(const FormRecord &formRecord, const Want &want,
-const sptr<IRemoteObject> &remoteObject)
+    const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_DEBUG("PostRenderForm");
     if (serialQueue_ == nullptr) {

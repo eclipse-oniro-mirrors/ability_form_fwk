@@ -2806,7 +2806,7 @@ void FormDataMgr::SetFormVisible(int64_t formId, bool isVisible)
 void FormDataMgr::GetVisibleForms(std::vector<int64_t> &forms)
 {
     std::lock_guard<std::mutex> lock(formVisibleMapMutex_);
-    for(auto iter = formVisibleMap_.begin(); iter != formVisibleMap_.end(); ++iter) {
+    for (auto iter = formVisibleMap_.begin(); iter != formVisibleMap_.end(); ++iter) {
         if (iter->second) {
             forms.emplace_back(iter->first);
         }

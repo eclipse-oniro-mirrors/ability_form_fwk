@@ -1992,7 +1992,8 @@ int32_t FormMgrAdapter::ReCalcUpdateDuration(const std::string &bundleName, cons
     if (tagArray.size() > 0) {
         std::vector<AppGalleryService::AppTag> tags = tagArray[0].tags;
         if (tags.size() > 0) {
-            HILOG_INFO("get tagId of bundleName:%{public}s tagId:%{public}" PRId64, tagArray[0].bundleName.c_str(), tags[0].tagId);
+            HILOG_INFO("get tagId of bundleName:%{public}s tagId:%{public}" PRId64,
+                tagArray[0].bundleName.c_str(), tags[0].tagId);
             int64_t tagId = tags[0].tagId;
             auto search = APP_TYPE_DURATION_MAP.find(tags[0].tagId);
             if (search == APP_TYPE_DURATION_MAP.end()) {
