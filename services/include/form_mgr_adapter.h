@@ -1164,6 +1164,8 @@ private:
     void SetReUpdateFormMap(const int64_t formId);
 
     ErrCode UpdateTimer(const int64_t formId, const FormRecord &record);
+
+    int32_t ReCalcUpdateDuration(const std::string &bundleName, const int32_t updateDuration);
     /**
      * @class ClientDeathRecipient
      * notices IRemoteBroker died.

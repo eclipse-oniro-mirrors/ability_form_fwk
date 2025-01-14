@@ -169,6 +169,9 @@ ohos_shared_library("libfms") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "time_service:time_client",
+    "appgallery:appinfomanager_client",
+    "appgallery:appgallery_sa_client",
+
   ]
 
   if (cite_memmgr) {

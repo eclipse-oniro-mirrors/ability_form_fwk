@@ -79,6 +79,7 @@
 #include "form_record_report.h"
 #include "form_ability_connection_reporter.h"
 #include "form_bundle_lock_mgr.h"
+#include "appgallery_service_client_appinfo_taginfo.h"
 
 static const int64_t MAX_NUMBER_OF_JS = 0x20000000000000;
 namespace OHOS {
@@ -103,6 +104,24 @@ constexpr int ADD_FORM_REQUEST_TIMTOUT_PERIOD = 3000;
 const std::string FORM_ADD_FORM_TIMER_TASK_QUEUE = "FormMgrTimerTaskQueue";
 enum class AddFormTaskType : int64_t {
     ADD_FORM_TIMER,
+};
+
+constexpr int32_t POWER_TAG = 591;
+
+const int64_t APP_TYPE_OTHER = -1;
+const int64_t APP_TYPE_EMAIL = 673;
+const int64_t APP_TYPE_ALARM = 677;
+const int64_t APP_TYPE_TOOL = 687;
+const int64_t APP_TYPE_NEWS = 698;
+const int64_t APP_TYPE_ASSISTANT = 704;
+
+const std::map<int64_t, int32_t> APP_TYPE_DURATION_MAP = {
+    {APP_TYPE_OTHER, 48},
+    {APP_TYPE_EMAIL, 4},
+    {APP_TYPE_ALARM, 4},
+    {APP_TYPE_TOOL, 1},
+    {APP_TYPE_NEWS, 12},
+    {APP_TYPE_ASSISTANT, 1},
 };
 } // namespace
 
@@ -499,6 +518,8 @@ int FormMgrAdapter::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
     }
 
     FormRenderMgr::GetInstance().DeleteAcquireForbiddenTaskByFormId(formId);
+    FormRenderMgr::GetInstance().DeletePostRenderFormTask(formId);
+    FormDataMgr::GetInstance().DeleteFormVisible(formId);
 #ifdef THEME_MGR_ENABLE
     FormDBInfo dbInfo;
     ErrCode getDbRet = FormDbCache::GetInstance().GetDBRecord(formId, dbInfo);
@@ -891,6 +912,12 @@ void FormMgrAdapter::SetVisibleChange(const int64_t formId, const int32_t formVi
 
     bool isVisible = (formVisibleType == Constants::FORM_VISIBLE) ? true : false;
     FormRenderMgr::GetInstance().SetVisibleChange(formId, isVisible);
+
+    FormDataMgr::GetInstance().SetFormVisible(formId, isVisible);
+    if (isVisible && FormDataMgr::GetInstance().GetSystemLoad()) {
+        FormRenderMgr::GetInstance().ExecPostRenderFormTask(formId);
+    }
+}
 }
 
 ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &formIds,
@@ -1947,6 +1974,35 @@ bool FormMgrAdapter::IsDimensionValid(const FormInfo &formInfo, int dimensionId)
     return false;
 }
 
+int32_t FormMgrAdapter::ReCalcUpdateDuration(const std::string &bundleName, const int32_t updateDuration)
+{
+    if (updateDuration <= 0) {
+        return updateDuration;
+    }
+    std::vector<std::string> bundleNames;
+    bundleNames.emplace_back(bundleName);
+    std::vector<AppGalleryService::AppTagInfo> tagArray;
+    AppGalleryServiceClient::TagInfoManager::GetAppTagInfosFromSystem(POWER_TAG, bundleNames, tagArray);
+
+    int32_t duration = updateDuration;
+    if (tagArray.size() > 0) {
+        std::vector<AppGalleryService::AppTag> tags = tagArray[0].tags;
+        if (tags.size() > 0) {
+            HILOG_INFO("get tagId of bundleName:%{public}s tagId:%{public}" PRId64, tagArray[0].bundleName.c_str(), tags[0].tagId);
+            int64_t tagId = tags[0].tagId;
+            auto search = APP_TYPE_DURATION_MAP.find(tags[0].tagId);
+            if (search == APP_TYPE_DURATION_MAP.end()) {
+                tagId = APP_TYPE_OTHER;
+            }
+            if (duration < APP_TYPE_DURATION_MAP.at(tagId)) {
+                duration = APP_TYPE_DURATION_MAP.at(tagId);
+            }
+        }
+    }
+    HILOG_INFO("old updateDuration:%{public}d new updateDuration:%{public}d", updateDuration, duration);
+    return duration;
+}
+
 ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
     const FormInfo &formInfo, FormItemInfo &itemInfo, const AAFwk::Want &want)
 {
@@ -1977,7 +2033,8 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
     itemInfo.SetModuleName(formInfo.moduleName); // formInfo.moduleName: bundleMgr do not set
     itemInfo.SetFormName(formInfo.name);
     itemInfo.SetEnableUpdateFlag(formInfo.updateEnabled);
-    itemInfo.SetUpdateDuration(formInfo.updateDuration);
+    int32_t updateDuration = ReCalcUpdateDuration(bundleInfo.name, formInfo.updateDuration);
+    itemInfo.SetUpdateDuration(updateDuration);
     itemInfo.SetScheduledUpdateTime(formInfo.scheduledUpdateTime);
     itemInfo.SetMultiScheduledUpdateTime(formInfo.multiScheduledUpdateTime);
     itemInfo.SetJsComponentName(formInfo.jsComponentName);
@@ -2996,6 +3053,8 @@ int FormMgrAdapter::DeleteInvalidForms(const std::vector<int64_t> &formIds,
             if (removedForm.second) {
                 FormTimerMgr::GetInstance().RemoveFormTimer(removedForm.first);
                 FormRenderMgr::GetInstance().DeleteAcquireForbiddenTaskByFormId(removedForm.first);
+                FormRenderMgr::GetInstance().DeletePostRenderFormTask(removedForm.first);
+                FormDataMgr::GetInstance().DeleteFormVisible(removedForm.first);
             }
         }
     }
@@ -3913,6 +3972,14 @@ ErrCode FormMgrAdapter::BatchRefreshForms(const int32_t formRefreshType)
 void FormMgrAdapter::SetTimerTaskNeeded(bool isTimerTaskNeeded)
 {
     FormTimerMgr::GetInstance().SetTimerTaskNeeded(isTimerTaskNeeded);
+    if (!FormDataMgr::GetInstance().GetSystemLoad() && isTimerTaskNeeded) {
+        std::vector<int64_t> visibleForms;
+        FormDataMgr::GetInstance().GetVisibleForms(visibleForms);
+        for (auto form : visibleForms) {
+            FormRenderMgr::GetInstance().ExecPostRenderFormTask(form);
+        }
+    }
+    FormDataMgr::GetInstance().SetSystemLoad(isTimerTaskNeeded);
 }
 #endif // RES_SCHEDULE_ENABLE
 

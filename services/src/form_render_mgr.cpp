@@ -259,6 +259,42 @@ void FormRenderMgr::DeleteAcquireForbiddenTaskByFormId(int64_t formId)
     }
 }
 
+void FormRenderMgr::AddPostRenderFormTask(int64_t formId, std::function<void()> task)
+{
+    std::lock_guard<std::mutex> lock(renderFormTaskMapMutex_);
+    auto search = renderFormTaskMap_.find(formId);
+    if (search == renderFormTaskMap_.end()) {
+        renderFormTaskMap_.emplace(formId, task);
+    } else {
+        search->second = task;
+    }
+    HILOG_INFO("add PostRenderFormTask success, formId:%{public}" PRId64, formId);
+}
+
+void FormRenderMgr::ExecPostRenderFormTask(int64_t formId)
+{
+    HILOG_INFO("start");
+
+    std::lock_guard<std::mutex> lock(renderFormTaskMapMutex_);
+    auto search = renderFormTaskMap_.find(formId);
+    if (search != renderFormTaskMap_.end()) {
+        auto task = search->second;
+        task();
+        renderFormTaskMap_.erase(search);
+    }
+}
+
+void FormRenderMgr::DeletePostRenderFormTask(int64_t formId)
+{
+    HILOG_INFO("start");
+
+    std::lock_guard<std::mutex> lock(renderFormTaskMapMutex_);
+    auto search = renderFormTaskMap_.find(formId);
+    if (search != renderFormTaskMap_.end()) {
+        renderFormTaskMap_.erase(search);
+    }
+}
+
 void FormRenderMgr::NotifyScreenOn()
 {
     int32_t userId = FormUtil::GetCurrentAccountId();

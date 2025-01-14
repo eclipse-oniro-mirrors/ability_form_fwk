@@ -70,7 +70,8 @@
               "device_manager",
               "dmsfwk",
               "huks",
-              "selinux_adapter"
+              "selinux_adapter",
+              "appgallery"
 
           ],
           "third_party": [
