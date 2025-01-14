@@ -17,6 +17,9 @@ import("//foundation/ability/form_fwk/form_fwk.gni")
 ################################### libfms ########################################
 config("formmgr_log_config") {
   defines = [ "FMS_LOG_TAG = \"FormManagerService\"" ]
+  if (defined(global_parts_info) && defined(global_parts_info.cloud_appgallery)) {
+    defines += [ "APPGALLERY_ENABLE" ]
+  }
 }
 
 config("formmgr_config") {

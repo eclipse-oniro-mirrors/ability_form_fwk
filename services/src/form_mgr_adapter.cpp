@@ -79,7 +79,9 @@
 #include "form_record_report.h"
 #include "form_ability_connection_reporter.h"
 #include "form_bundle_lock_mgr.h"
+#ifdef APPGALLERY_ENABLE
 #include "appgallery_service_client_appinfo_taginfo.h"
+#endif
 
 static const int64_t MAX_NUMBER_OF_JS = 0x20000000000000;
 namespace OHOS {
@@ -105,7 +107,7 @@ const std::string FORM_ADD_FORM_TIMER_TASK_QUEUE = "FormMgrTimerTaskQueue";
 enum class AddFormTaskType : int64_t {
     ADD_FORM_TIMER,
 };
-
+#ifdef APPGALLERY_ENABLE
 constexpr int32_t POWER_TAG = 591;
 
 const int64_t APP_TYPE_OTHER = -1;
@@ -123,6 +125,7 @@ const std::map<int64_t, int32_t> APP_TYPE_DURATION_MAP = {
     {APP_TYPE_NEWS, 12},
     {APP_TYPE_ASSISTANT, 1},
 };
+#endif
 } // namespace
 
 FormMgrAdapter::FormMgrAdapter()
@@ -1974,6 +1977,7 @@ bool FormMgrAdapter::IsDimensionValid(const FormInfo &formInfo, int dimensionId)
     return false;
 }
 
+#ifdef APPGALLERY_ENABLE
 int32_t FormMgrAdapter::ReCalcUpdateDuration(const std::string &bundleName, const int32_t updateDuration)
 {
     if (updateDuration <= 0) {
@@ -2002,6 +2006,7 @@ int32_t FormMgrAdapter::ReCalcUpdateDuration(const std::string &bundleName, cons
     HILOG_INFO("old updateDuration:%{public}d new updateDuration:%{public}d", updateDuration, duration);
     return duration;
 }
+#endif
 
 ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
     const FormInfo &formInfo, FormItemInfo &itemInfo, const AAFwk::Want &want)
@@ -2033,8 +2038,12 @@ ErrCode FormMgrAdapter::CreateFormItemInfo(const BundleInfo &bundleInfo,
     itemInfo.SetModuleName(formInfo.moduleName); // formInfo.moduleName: bundleMgr do not set
     itemInfo.SetFormName(formInfo.name);
     itemInfo.SetEnableUpdateFlag(formInfo.updateEnabled);
+#ifdef APPGALLERY_ENABLE
     int32_t updateDuration = ReCalcUpdateDuration(bundleInfo.name, formInfo.updateDuration);
     itemInfo.SetUpdateDuration(updateDuration);
+#else
+    itemInfo.SetUpdateDuration(formInfo.updateDuration);
+#endif
     itemInfo.SetScheduledUpdateTime(formInfo.scheduledUpdateTime);
     itemInfo.SetMultiScheduledUpdateTime(formInfo.multiScheduledUpdateTime);
     itemInfo.SetJsComponentName(formInfo.jsComponentName);

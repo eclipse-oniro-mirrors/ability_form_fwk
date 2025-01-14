@@ -1165,7 +1165,9 @@ private:
 
     ErrCode UpdateTimer(const int64_t formId, const FormRecord &record);
 
+#ifdef APPGALLERY_ENABLE
     int32_t ReCalcUpdateDuration(const std::string &bundleName, const int32_t updateDuration);
+#endif
     /**
      * @class ClientDeathRecipient
      * notices IRemoteBroker died.
