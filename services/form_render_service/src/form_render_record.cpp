@@ -878,7 +878,12 @@ void FormRenderRecord::AddFormRequest(const FormJsInfo &formJsInfo, const Want &
     iter->second.emplace(compId, formRequest);
 }
 
-void FormRenderRecord::AddFormRequest(int64_t formId, const Ace::FormRequest &formRequest)
+void FormRenderRecord::AddFormRequest(int64_t formId, Ace::FormRequest &formRequest)
+{
+    AddFormRequest(formId, formRequest, false);
+}
+
+void FormRenderRecord::AddFormRequest(int64_t formId, Ace::FormRequest &formRequest, bool noNeedUpdateSize)
 {
     HILOG_INFO("AddFormRequest by FormRequest formId: %{public}s, compId: %{public}s, formData.size: %{public}zu",
         std::to_string(formId).c_str(),
@@ -895,6 +900,27 @@ void FormRenderRecord::AddFormRequest(int64_t formId, const Ace::FormRequest &fo
 
     auto innerIter = iter->second.find(formRequest.compId);
     if (innerIter != iter->second.end()) {
+        if (noNeedUpdateSize) {
+            double width = innerIter->second.want.GetDoubleParam(
+                OHOS::AppExecFwk::Constants::PARAM_FORM_WIDTH_KEY, -1.0f);
+            double height = innerIter->second.want.GetDoubleParam(
+                OHOS::AppExecFwk::Constants::PARAM_FORM_HEIGHT_KEY, -1.0f);
+            double borderWidth = innerIter->second.want.GetDoubleParam(
+                OHOS::AppExecFwk::Constants::PARAM_FORM_BORDER_WIDTH_KEY, -1.0f);
+            if (width > 0) {
+                formRequest.want.SetParam(
+                    OHOS::AppExecFwk::Constants::PARAM_FORM_WIDTH_KEY, width);
+            }
+            if (height > 0) {
+                formRequest.want.SetParam(
+                    OHOS::AppExecFwk::Constants::PARAM_FORM_HEIGHT_KEY, height);
+            }
+            if (borderWidth > 0) {
+                formRequest.want.SetParam(
+                    OHOS::AppExecFwk::Constants::PARAM_FORM_BORDER_WIDTH_KEY,
+                    static_cast<float>(borderWidth));
+            }
+        }
         iter->second.erase(innerIter);
     }
     iter->second.emplace(formRequest.compId, formRequest);
@@ -1420,7 +1446,7 @@ int32_t FormRenderRecord::HandleReloadFormRecord(const std::vector<FormJsInfo> &
         for (auto formRequest : group->GetAllRendererFormRequests()) {
             formRequest.isDynamic = form.isDynamic;
             formRequest.formJsInfo = form;
-            AddFormRequest(form.formId, formRequest);
+            AddFormRequest(form.formId, formRequest, true);
         }
         group->ReloadForm(form);
     }
@@ -1620,7 +1646,7 @@ void FormRenderRecord::HandleRecoverForm(const FormJsInfo &formJsInfo,
     if (RecoverFormRequestsInGroup(formJsInfo, statusData, isHandleClickEvent, formRequests)) {
         for (auto formRequestIter : formRequests) {
             formRequestIter.second.hasRelease = false;
-            AddFormRequest(formId, formRequestIter.second);
+            AddFormRequest(formId, formRequestIter.second, true);
         }
     }
 }
