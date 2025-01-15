@@ -84,7 +84,8 @@
                 "//foundation/ability/form_fwk:fms_innerkits_target",
                 "//foundation/ability/form_fwk:fmskit_native",
                 "//foundation/ability/form_fwk:fmskit_provider_client",
-                "//foundation/ability/form_fwk:form_napi_packages"
+                "//foundation/ability/form_fwk:form_napi_packages",
+                "//foundation/ability/form_fwk/frameworks/cj:cj_formBindingData_ffi"
               ],
               "service_group": [
                 "//foundation/ability/form_fwk/sa_profile:form_sa_profile",
