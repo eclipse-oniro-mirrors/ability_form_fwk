@@ -676,6 +676,14 @@ public:
     bool IsFormBundleLocked(const std::string &bundleName, int64_t formId);
 
     /**
+     * @brief Notify the form is locked or not.
+     * @param formId Indicates the ID of the form.
+     * @param isLocked locked or not.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t NotifyFormLocked(const int64_t &formId, bool isLocked);
+
+    /**
      * @brief Update form size.
      * @param formId The Id of the form to update.
      * @param width The width value to be updated.

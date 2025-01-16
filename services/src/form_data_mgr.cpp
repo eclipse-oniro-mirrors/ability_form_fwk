@@ -159,17 +159,6 @@ bool FormDataMgr::CreateHostRecord(const FormItemInfo &info, const sptr<IRemoteO
     return true;
 }
 
-static void GetLockFormFormCache(FormRecord &newRecord)
-{
-    FormRecord record;
-    int32_t res = FormDbCache::GetInstance().GetDBRecord(newRecord.formId, record);
-    if (res != ERR_OK) {
-        HILOG_ERROR("query record from formid is failed");
-    } else {
-        newRecord.lockForm = record.lockForm;
-    }
-}
-
 /**
  * @brief Create form record.
  * @param formInfo The form item info.
@@ -210,7 +199,7 @@ FormRecord FormDataMgr::CreateFormRecord(const FormItemInfo &formInfo, const int
     newRecord.formLocation = formInfo.GetFormLocation();
     newRecord.isThemeForm = formInfo.GetIsThemeForm();
     newRecord.enableForm = formInfo.IsEnableForm();
-    GetLockFormFormCache(newRecord);
+    newRecord.lockForm = formInfo.IsLockForm();
     if (newRecord.isEnableUpdate) {
         ParseUpdateConfig(newRecord, formInfo);
     }

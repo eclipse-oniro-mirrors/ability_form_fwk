@@ -686,6 +686,17 @@ public:
     }
 
     /**
+     * @brief Notify the form is locked or not.
+     * @param formId Indicates the ID of the form.
+     * @param isLocked locked or not.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int32_t NotifyFormLocked(const int64_t &formId, bool isLocked)
+    {
+        return 0;
+    }
+
+    /**
      * @brief Update size of form.
      * @param formId The Id of the form to update.
      * @param width The width value to be updated.
@@ -783,6 +794,7 @@ public:
         FORM_MGR_UPDATE_FORM_SIZE,
         FORM_MGR_LOCK_FORMS,
         FORM_MGR_IS_FORM_BUNDLE_LOCKED,
+        FORM_MGR_NOTIFY_FORM_LOCKED,
     };
 };
 }  // namespace AppExecFwk

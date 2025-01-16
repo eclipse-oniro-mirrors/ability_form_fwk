@@ -215,6 +215,8 @@ int FormMgrStub::OnRemoteRequestThird(uint32_t code, MessageParcel &data, Messag
             return HandleRegisterClickCallbackEventObserver(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_IS_FORM_BUNDLE_LOCKED):
             return HandleIsFormLocked(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_NOTIFY_FORM_LOCKED):
+            return HandleNotifyFormLocked(data, reply);
         default:
             return OnRemoteRequestFourth(code, data, reply, option);
     }
@@ -1653,6 +1655,20 @@ ErrCode FormMgrStub::HandleIsFormLocked(MessageParcel &data, MessageParcel &repl
     std::string bundleName = data.ReadString();
     int64_t formId = data.ReadInt64();
     bool result = IsFormBundleLocked(bundleName, formId);
+    if (!reply.WriteBool(result)) {
+        HILOG_ERROR("write action failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+int32_t FormMgrStub::HandleNotifyFormLocked(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("call");
+    int64_t formId = data.ReadInt64();
+    bool isLocked = data.ReadBool();
+
+    bool result = NotifyFormLocked(formId, isLocked);
     if (!reply.WriteBool(result)) {
         HILOG_ERROR("write action failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;

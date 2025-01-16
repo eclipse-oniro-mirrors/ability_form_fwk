@@ -412,6 +412,11 @@ public:
         GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnSetPublishFormResult);
     }
 
+    static napi_value UpdateFormLockedState(napi_env env, napi_callback_info info)
+    {
+        GET_CB_INFO_AND_CALL(env, info, JsFormHost, OnUpdateFormLockedState);
+    }
+
 private:
     bool CheckCallerIsSystemApp()
     {
@@ -1761,6 +1766,49 @@ private:
         return result;
     }
 
+    napi_value OnUpdateFormLockedState(napi_env env, size_t argc, napi_value* argv)
+    {
+        HILOG_DEBUG("call");
+
+        if (argc != ARGS_TWO) {
+            HILOG_ERROR("invalid argc");
+            NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "2");
+            return CreateJsUndefined(env);
+        }
+
+        decltype(argc) convertArgc = 0;
+        int64_t formId;
+        if (!ConvertFromId(env, argv[PARAM0], formId)) {
+            HILOG_ERROR("invalid formId");
+            NapiFormUtil::ThrowParamTypeError(env, "formId", "string");
+            return CreateJsUndefined(env);
+        }
+        convertArgc++;
+
+        bool isLocked = false;
+        if (!ConvertFromJsValue(env, argv[PARAM1], isLocked)) {
+            HILOG_ERROR("convert isLocked failed");
+            NapiFormUtil::ThrowParamTypeError(env, "isLocked", "boolean");
+            return CreateJsUndefined(env);
+        }
+        convertArgc++;
+
+        auto complete = [formId, isLocked](napi_env env, NapiAsyncTask &task, int32_t status) {
+            auto ret = FormMgr::GetInstance().NotifyFormLocked(formId, isLocked);
+            if (ret == ERR_OK) {
+                task.ResolveWithNoError(env, CreateJsUndefined(env));
+            } else {
+                task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
+            }
+        };
+
+        napi_value lastParam = (argc <= convertArgc) ? nullptr : argv[convertArgc];
+        napi_value result = nullptr;
+        NapiAsyncTask::ScheduleWithDefaultQos("JsFormHost::OnUpdateFormLockedState",
+            env, CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));
+        return result;
+    }
+
     napi_value OnUpdateFormLocation(napi_env env, size_t argc, napi_value *argv)
     {
         HILOG_DEBUG("call");
@@ -1880,6 +1928,7 @@ napi_value JsFormHostInit(napi_env env, napi_value exportObj)
     BindNativeFunction(env, exportObj, "updateFormLocation", moduleName, JsFormHost::UpdateFormLocation);
     BindNativeFunction(env, exportObj, "setPublishFormResult", moduleName, JsFormHost::SetPublishFormResult);
     BindNativeFunction(env, exportObj, "addForm", moduleName, JsFormHost::AddForm);
+    BindNativeFunction(env, exportObj, "updateFormLockedState", moduleName, JsFormHost::UpdateFormLockedState);
 
     return CreateJsUndefined(env);
 }

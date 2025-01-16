@@ -672,6 +672,14 @@ public:
      */
     ErrCode UpdateFormByCondition(int type);
 
+    /**
+     * @brief Notify the form is locked or not.
+     * @param formId Indicates the ID of the form.
+     * @param isLocked locked or not.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t NotifyFormLocked(const int64_t &formId, bool isLocked);
+
 private:
     /**
      * @brief Get form configure info.
@@ -1164,6 +1172,10 @@ private:
     void SetReUpdateFormMap(const int64_t formId);
 
     ErrCode UpdateTimer(const int64_t formId, const FormRecord &record);
+
+    bool CheckIsMultiAppForm(FormInfo &formInfo);
+
+    void SetLockFormStateOfFormItemInfo(FormInfo &formInfo, FormItemInfo &formConfigInfo);
     /**
      * @class ClientDeathRecipient
      * notices IRemoteBroker died.
