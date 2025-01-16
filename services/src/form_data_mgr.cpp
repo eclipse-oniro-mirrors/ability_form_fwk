@@ -1454,6 +1454,7 @@ void FormDataMgr::ParseUpdateConfig(FormRecord &record, const FormItemInfo &info
     if (configDuration > 0) {
         ParseIntervalConfig(record, configDuration);
     } else {
+        record.isEnableUpdate = false;
         ParseAtTimerConfig(record, info);
         ParseMultiUpdateTimeConfig(record, info);
     }
@@ -1510,6 +1511,7 @@ void FormDataMgr::ParseMultiUpdateTimeConfig(FormRecord &record, const FormItemI
     HILOG_INFO("parseAsUpdateAt updateAtTimes size:%{public}zu", updateAtTimes.size());
     if (updateAtTimes.size() > 0) {
         record.updateAtTimes = updateAtTimes;
+        record.isEnableUpdate = true;
     }
 }
 
@@ -1520,7 +1522,6 @@ void FormDataMgr::ParseMultiUpdateTimeConfig(FormRecord &record, const FormItemI
  */
 void FormDataMgr::ParseAtTimerConfig(FormRecord &record, const FormItemInfo &info) const
 {
-    record.isEnableUpdate = false;
     record.updateDuration = 0;
     std::string configAtTime = info.GetScheduledUpdateTime();
     HILOG_INFO("parseAsUpdateAt updateAt:%{public}s", configAtTime.c_str());
