@@ -430,6 +430,7 @@ void FormEventUtil::SetTimerCfgByMultUpdate(const std::string &configMultUpdateA
     }
     if (updateAtTimes.size() > 0) {
         cfg.updateAtTimes = updateAtTimes;
+        cfg.enableUpdate = true;
     }
 }
 

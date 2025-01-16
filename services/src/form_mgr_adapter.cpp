@@ -1721,23 +1721,16 @@ ErrCode FormMgrAdapter::AddFormTimer(const FormRecord &formRecord)
             updateDuration, formRecord.providerUserId);
         return ret ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    bool scheduledUpdateFlag = false;
-    bool result1 = true;
-    if (formRecord.updateAtHour >= 0 && formRecord.updateAtMin >= 0) {
-        scheduledUpdateFlag = true;
-        result1 = FormTimerMgr::GetInstance().AddFormTimer(formRecord.formId,
-            formRecord.updateAtHour, formRecord.updateAtMin, formRecord.providerUserId);
-    }
-    bool result2 = true;
     std::vector<std::vector<int>> updateAtTimes = formRecord.updateAtTimes;
     if (updateAtTimes.size() > 0) {
-        scheduledUpdateFlag = true;
         HILOG_INFO("updateAtTimes size:%{public}zu", updateAtTimes.size());
-        result2 = FormTimerMgr::GetInstance().AddFormTimerForMultiUpdate(formRecord.formId,
+        bool ret = FormTimerMgr::GetInstance().AddFormTimerForMultiUpdate(formRecord.formId,
             updateAtTimes, formRecord.providerUserId);
-    }
-    if (scheduledUpdateFlag) {
-        return (result1 && result2)? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
+        return ret ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
+    } else if (formRecord.updateAtHour >= 0 && formRecord.updateAtMin >= 0) {
+        bool ret = FormTimerMgr::GetInstance().AddFormTimer(formRecord.formId,
+            formRecord.updateAtHour, formRecord.updateAtMin, formRecord.providerUserId);
+        return ret ? ERR_OK : ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     HILOG_INFO("no need add form timer");
     return ERR_OK;
