@@ -2399,7 +2399,7 @@ int32_t FormMgrProxy::LockForms(const std::vector<FormLockInfo> &formLockInfos)
         HILOG_ERROR("SendRequest:%{public}d failed", error);
         return error;
     }
-    return ERR_OK;
+    return reply.ReadInt32();
 }
 
 bool FormMgrProxy::IsFormBundleLocked(const std::string &bundleName, int64_t formId)
@@ -2429,6 +2429,42 @@ bool FormMgrProxy::IsFormBundleLocked(const std::string &bundleName, int64_t for
         return false;
     }
     return reply.ReadBool();
+}
+
+int32_t FormMgrProxy::NotifyFormLocked(const int64_t &formId, bool isLocked)
+{
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("error to write interface token");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt64(formId)) {
+        HILOG_ERROR("error to write formId");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteBool(isLocked)) {
+        HILOG_ERROR("fail write bool isLocked");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_NOTIFY_FORM_LOCKED,
+        data,
+        reply,
+        option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendRequest:%{public}d failed", error);
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+
+    int32_t result = reply.ReadInt32();
+    if (result != ERR_OK) {
+        HILOG_ERROR("read reply result failed");
+        return result;
+    }
+    return result;
 }
 
 ErrCode FormMgrProxy::UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth)

@@ -97,6 +97,8 @@ public:
 
     void ExecAcquireProviderForbiddenTask(const std::string &bundleName);
 
+    void ExecAcquireProviderForbiddenTaskByFormId(const int64_t formId);
+
     void DeleteAcquireForbiddenTasksByBundleName(const std::string &bundleName);
 
     void DeleteAcquireForbiddenTaskByFormId(int64_t formId);

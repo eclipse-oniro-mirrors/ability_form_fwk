@@ -426,11 +426,13 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_015, TestSize.Level0)
  */
 HWTEST_F(FormRenderImplTest, FormRenderImplTest_016, TestSize.Level0)
 {
+    GTEST_LOG_(INFO) << "FormRenderImplTest_016 start";
     FormRenderImpl formRenderImpl;
     std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration = std::make_shared<Configuration>();
     EXPECT_FALSE(formRenderImpl.configuration_);
     formRenderImpl.OnConfigurationUpdated(configuration);
     EXPECT_TRUE(formRenderImpl.configuration_);
+    GTEST_LOG_(INFO) << "FormRenderImplTest_016 end";
 }
 
 /**
@@ -441,6 +443,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_016, TestSize.Level0)
  */
 HWTEST_F(FormRenderImplTest, FormRenderImplTest_017, TestSize.Level0)
 {
+    GTEST_LOG_(INFO) << "FormRenderImplTest_017 start";
     FormRenderImpl formRenderImpl;
     std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration = std::make_shared<Configuration>();
 
@@ -455,6 +458,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_017, TestSize.Level0)
         EXPECT_EQ(1, formRenderImpl.serialQueue_->taskMap_.size());
     }
 #endif
+    GTEST_LOG_(INFO) << "FormRenderImplTest_017 end";
 }
 
 /**
@@ -465,6 +469,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_017, TestSize.Level0)
  */
 HWTEST_F(FormRenderImplTest, FormRenderImplTest_018, TestSize.Level0)
 {
+    GTEST_LOG_(INFO) << "FormRenderImplTest_018 start";
     FormRenderImpl formRenderImpl;
     std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration = std::make_shared<Configuration>();
 
@@ -472,6 +477,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_018, TestSize.Level0)
         std::chrono::steady_clock::now() - std::chrono::milliseconds(3000);
     formRenderImpl.OnConfigurationUpdated(configuration);
     EXPECT_EQ(0, formRenderImpl.serialQueue_->taskMap_.size());
+    GTEST_LOG_(INFO) << "FormRenderImplTest_018 end";
 }
 
 /**
@@ -482,6 +488,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_018, TestSize.Level0)
  */
 HWTEST_F(FormRenderImplTest, FormRenderImplTest_019, TestSize.Level0)
 {
+    GTEST_LOG_(INFO) << "FormRenderImplTest_019 start";
     FormRenderImpl formRenderImpl;
     std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration;
 
@@ -491,6 +498,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_019, TestSize.Level0)
     configuration = std::make_shared<Configuration>();
     formRenderImpl.OnConfigurationUpdated(configuration);
     EXPECT_TRUE(formRenderImpl.configuration_);
+    GTEST_LOG_(INFO) << "FormRenderImplTest_019 end";
 }
 
 /**
@@ -501,11 +509,13 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_019, TestSize.Level0)
  */
 HWTEST_F(FormRenderImplTest, FormRenderImplTest_020, TestSize.Level0)
 {
+    GTEST_LOG_(INFO) << "FormRenderImplTest_020 start";
     FormRenderImpl formRenderImpl;
     std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration = std::make_shared<Configuration>();
     EXPECT_FALSE(formRenderImpl.configuration_);
     formRenderImpl.SetConfiguration(configuration);
     EXPECT_TRUE(formRenderImpl.configuration_);
+    GTEST_LOG_(INFO) << "FormRenderImplTest_020 end";
 }
 
 /**
@@ -516,6 +526,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_020, TestSize.Level0)
  */
 HWTEST_F(FormRenderImplTest, FormRenderImplTest_021, TestSize.Level0)
 {
+    GTEST_LOG_(INFO) << "FormRenderImplTest_021 start";
     FormRenderImpl formRenderImpl;
     formRenderImpl.configuration_ = std::make_shared<Configuration>();
     std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration = std::make_shared<Configuration>();
@@ -525,6 +536,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_021, TestSize.Level0)
     formRenderImpl.SetConfiguration(configuration);
     EXPECT_TRUE(formRenderImpl.configuration_);
     EXPECT_EQ(formRenderImpl.configuration_->GetItem("ohos.system.colorMode"), "rgb");
+    GTEST_LOG_(INFO) << "FormRenderImplTest_021 end";
 }
 
 /**
@@ -535,11 +547,13 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_021, TestSize.Level0)
  */
 HWTEST_F(FormRenderImplTest, FormRenderImplTest_022, TestSize.Level0)
 {
+    GTEST_LOG_(INFO) << "FormRenderImplTest_022 start";
     FormRenderImpl formRenderImpl;
     int64_t formId{ -1 };
     std::string compId{ "1" };
     std::string uid{ "202410101010" };
     EXPECT_EQ(formRenderImpl.ReleaseRenderer(formId, compId, uid), ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+    GTEST_LOG_(INFO) << "FormRenderImplTest_022 end";
 }
 
 /**
@@ -550,11 +564,13 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_022, TestSize.Level0)
  */
 HWTEST_F(FormRenderImplTest, FormRenderImplTest_023, TestSize.Level0)
 {
+    GTEST_LOG_(INFO) << "FormRenderImplTest_023 start";
     FormRenderImpl formRenderImpl;
     int64_t formId{ 15 };
     std::string compId{ "" };
     std::string uid{ "202410101010" };
     EXPECT_EQ(formRenderImpl.ReleaseRenderer(formId, compId, uid), ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+    GTEST_LOG_(INFO) << "FormRenderImplTest_023 end";
 }
 
 /**
@@ -565,11 +581,13 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_023, TestSize.Level0)
  */
 HWTEST_F(FormRenderImplTest, FormRenderImplTest_024, TestSize.Level0)
 {
+    GTEST_LOG_(INFO) << "FormRenderImplTest_024 start";
     FormRenderImpl formRenderImpl;
     int64_t formId{ 15 };
     std::string compId{ "15" };
     std::string uid{ "" };
     EXPECT_EQ(formRenderImpl.ReleaseRenderer(formId, compId, uid), ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+    GTEST_LOG_(INFO) << "FormRenderImplTest_024 end";
 }
 
 /**
@@ -580,11 +598,13 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_024, TestSize.Level0)
  */
 HWTEST_F(FormRenderImplTest, FormRenderImplTest_025, TestSize.Level0)
 {
+    GTEST_LOG_(INFO) << "FormRenderImplTest_025 start";
     FormRenderImpl formRenderImpl;
     int64_t formId{ 15 };
     std::string compId{ "15" };
     std::string uid{ "202410101010" };
     EXPECT_EQ(formRenderImpl.ReleaseRenderer(formId, compId, uid), RENDER_FORM_FAILED);
+    GTEST_LOG_(INFO) << "FormRenderImplTest_025 end";
 }
 
 /**
@@ -595,12 +615,14 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_025, TestSize.Level0)
  */
 HWTEST_F(FormRenderImplTest, FormRenderImplTest_026, TestSize.Level0)
 {
+    GTEST_LOG_(INFO) << "FormRenderImplTest_026 start";
     FormRenderImpl formRenderImpl;
     int64_t formId{ 15 };
     std::string compId{ "15" };
     std::string uid{ "202410101010" };
     formRenderImpl.renderRecordMap_.emplace(uid, nullptr);
     EXPECT_EQ(formRenderImpl.ReleaseRenderer(formId, compId, uid), RENDER_FORM_FAILED);
+    GTEST_LOG_(INFO) << "FormRenderImplTest_026 end";
 }
 
 /**
@@ -611,14 +633,21 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_026, TestSize.Level0)
  */
 HWTEST_F(FormRenderImplTest, FormRenderImplTest_027, TestSize.Level0)
 {
+    GTEST_LOG_(INFO) << "FormRenderImplTest_027 start";
     FormRenderImpl formRenderImpl;
     int64_t formId{ 15 };
     std::string compId{ "15" };
     std::string uid{ "202410101010" };
 
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormSupplyStub();
+    sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
+    EXPECT_TRUE(formSupplyClient);
+    formRenderImpl.formSupplyClient_ = formSupplyClient;
+
     auto formRenderRecord = FormRenderRecord::Create("bundleName", uid);
     formRenderImpl.renderRecordMap_.emplace(uid, formRenderRecord);
     EXPECT_EQ(formRenderImpl.ReleaseRenderer(formId, compId, uid), ERR_OK);
+    GTEST_LOG_(INFO) << "FormRenderImplTest_027 end";
 }
 
 /**
@@ -629,8 +658,10 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_027, TestSize.Level0)
  */
 HWTEST_F(FormRenderImplTest, FormRenderImplTest_028, TestSize.Level0)
 {
+    GTEST_LOG_(INFO) << "FormRenderImplTest_028 start";
     FormRenderImpl formRenderImpl;
     EXPECT_EQ(formRenderImpl.OnUnlock(), ERR_OK);
+    GTEST_LOG_(INFO) << "FormRenderImplTest_028 end";
 }
 
 /**
@@ -641,9 +672,11 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_028, TestSize.Level0)
  */
 HWTEST_F(FormRenderImplTest, FormRenderImplTest_029, TestSize.Level0)
 {
+    GTEST_LOG_(INFO) << "FormRenderImplTest_029 start";
     FormRenderImpl formRenderImpl;
     formRenderImpl.isVerified_ = true;
     EXPECT_EQ(formRenderImpl.OnUnlock(), ERR_OK);
+    GTEST_LOG_(INFO) << "FormRenderImplTest_029 end";
 }
 
 /**
@@ -654,11 +687,13 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_029, TestSize.Level0)
  */
 HWTEST_F(FormRenderImplTest, FormRenderImplTest_030, TestSize.Level0)
 {
+    GTEST_LOG_(INFO) << "FormRenderImplTest_030 start";
     FormRenderImpl formRenderImpl;
     int64_t formId{ 0 };
     Want want;
 
     EXPECT_EQ(formRenderImpl.RecycleForm(formId, want), ERR_APPEXECFWK_FORM_INVALID_FORM_ID);
+    GTEST_LOG_(INFO) << "FormRenderImplTest_030 end";
 }
 
 /**
@@ -669,11 +704,13 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_030, TestSize.Level0)
  */
 HWTEST_F(FormRenderImplTest, FormRenderImplTest_031, TestSize.Level0)
 {
+    GTEST_LOG_(INFO) << "FormRenderImplTest_031 start";
     FormRenderImpl formRenderImpl;
     int64_t formId{ 3 };
     Want want;
 
     EXPECT_EQ(formRenderImpl.RecycleForm(formId, want), ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+    GTEST_LOG_(INFO) << "FormRenderImplTest_031 end";
 }
 
 /**
@@ -684,12 +721,14 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_031, TestSize.Level0)
  */
 HWTEST_F(FormRenderImplTest, FormRenderImplTest_032, TestSize.Level0)
 {
+    GTEST_LOG_(INFO) << "FormRenderImplTest_032 start";
     FormRenderImpl formRenderImpl;
     int64_t formId{ 3 };
     std::string uid{ "202410101010" };
     Want want;
     want.SetParam(Constants::FORM_SUPPLY_UID, uid);
     EXPECT_EQ(formRenderImpl.RecycleForm(formId, want), RECYCLE_FORM_FAILED);
+    GTEST_LOG_(INFO) << "FormRenderImplTest_032 end";
 }
 
 /**
@@ -700,6 +739,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_032, TestSize.Level0)
  */
 HWTEST_F(FormRenderImplTest, FormRenderImplTest_033, TestSize.Level0)
 {
+    GTEST_LOG_(INFO) << "FormRenderImplTest_033 start";
     FormRenderImpl formRenderImpl;
     int64_t formId{ 3 };
     Want want;
@@ -707,6 +747,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_033, TestSize.Level0)
     want.SetParam(Constants::FORM_SUPPLY_UID, uid);
     formRenderImpl.renderRecordMap_.emplace("2024101010", nullptr);
     EXPECT_EQ(formRenderImpl.RecycleForm(formId, want), RECYCLE_FORM_FAILED);
+    GTEST_LOG_(INFO) << "FormRenderImplTest_033 end";
 }
 
 /**
@@ -717,6 +758,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_033, TestSize.Level0)
  */
 HWTEST_F(FormRenderImplTest, FormRenderImplTest_034, TestSize.Level0)
 {
+    GTEST_LOG_(INFO) << "FormRenderImplTest_034 start";
     FormRenderImpl formRenderImpl;
     int64_t formId{ 3 };
     Want want;
@@ -725,6 +767,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_034, TestSize.Level0)
     auto formRenderRecord = FormRenderRecord::Create("bundleName", "2024101010");
     formRenderImpl.renderRecordMap_.emplace("2024101010", formRenderRecord);
     EXPECT_EQ(formRenderImpl.RecycleForm(formId, want), RECYCLE_FORM_FAILED);
+    GTEST_LOG_(INFO) << "FormRenderImplTest_034 end";
 }
 
 /**
@@ -735,6 +778,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_034, TestSize.Level0)
  */
 HWTEST_F(FormRenderImplTest, FormRenderImplTest_035, TestSize.Level0)
 {
+    GTEST_LOG_(INFO) << "FormRenderImplTest_035 start";
     FormRenderImpl formRenderImpl;
     int64_t formId{ 3 };
     Want want;
@@ -753,6 +797,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_035, TestSize.Level0)
     EXPECT_TRUE(formSupplyClient);
     formRenderImpl.formSupplyClient_ = formSupplyClient;
     EXPECT_EQ(formRenderImpl.RecycleForm(formId, want), ERR_OK);
+    GTEST_LOG_(INFO) << "FormRenderImplTest_035 end";
 }
 
 /**
@@ -763,12 +808,14 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_035, TestSize.Level0)
  */
 HWTEST_F(FormRenderImplTest, FormRenderImplTest_036, TestSize.Level0)
 {
+    GTEST_LOG_(INFO) << "FormRenderImplTest_036 start";
     FormRenderImpl formRenderImpl;
     int64_t formId{ 0 };
     Want want;
     FormJsInfo info;
     info.formId = formId;
     EXPECT_EQ(formRenderImpl.RecoverForm(info, want), ERR_APPEXECFWK_FORM_INVALID_FORM_ID);
+    GTEST_LOG_(INFO) << "FormRenderImplTest_036 end";
 }
 
 /**
@@ -779,12 +826,14 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_036, TestSize.Level0)
  */
 HWTEST_F(FormRenderImplTest, FormRenderImplTest_037, TestSize.Level0)
 {
+    GTEST_LOG_(INFO) << "FormRenderImplTest_037 start";
     FormRenderImpl formRenderImpl;
     int64_t formId{ 3 };
     Want want;
     FormJsInfo info;
     info.formId = formId;
     EXPECT_EQ(formRenderImpl.RecoverForm(info, want), ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+    GTEST_LOG_(INFO) << "FormRenderImplTest_037 end";
 }
 
 /**
@@ -795,6 +844,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_037, TestSize.Level0)
  */
 HWTEST_F(FormRenderImplTest, FormRenderImplTest_038, TestSize.Level0)
 {
+    GTEST_LOG_(INFO) << "FormRenderImplTest_038 start";
     FormRenderImpl formRenderImpl;
     int64_t formId{ 3 };
     Want want;
@@ -803,6 +853,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_038, TestSize.Level0)
     FormJsInfo info;
     info.formId = formId;
     EXPECT_EQ(formRenderImpl.RecoverForm(info, want), RENDER_FORM_FAILED);
+    GTEST_LOG_(INFO) << "FormRenderImplTest_038 end";
 }
 
 /**
@@ -813,6 +864,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_038, TestSize.Level0)
  */
 HWTEST_F(FormRenderImplTest, FormRenderImplTest_039, TestSize.Level0)
 {
+    GTEST_LOG_(INFO) << "FormRenderImplTest_039 start";
     FormRenderImpl formRenderImpl;
     int64_t formId{ 3 };
     Want want;
@@ -824,6 +876,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_039, TestSize.Level0)
     want.SetParam(Constants::FORM_STATUS_DATA, val);
     formRenderImpl.renderRecordMap_.emplace("2024101010", nullptr);
     EXPECT_EQ(formRenderImpl.RecoverForm(info, want), RECYCLE_FORM_FAILED);
+    GTEST_LOG_(INFO) << "FormRenderImplTest_039 end";
 }
 
 /**
@@ -834,6 +887,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_039, TestSize.Level0)
  */
 HWTEST_F(FormRenderImplTest, FormRenderImplTest_040, TestSize.Level0)
 {
+    GTEST_LOG_(INFO) << "FormRenderImplTest_040 start";
     FormRenderImpl formRenderImpl;
     int64_t formId{ 3 };
     Want want;
@@ -844,8 +898,15 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_040, TestSize.Level0)
     std::string val{ "non" };
     want.SetParam(Constants::FORM_STATUS_DATA, val);
     auto formRenderRecord = FormRenderRecord::Create("bundleName", uid);
+
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormSupplyStub();
+    sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
+    EXPECT_TRUE(formSupplyClient);
+    formRenderRecord->formSupplyClient_ = formSupplyClient;
+
     formRenderImpl.renderRecordMap_.emplace(uid, formRenderRecord);
     EXPECT_EQ(formRenderImpl.RecoverForm(info, want), ERR_OK);
+    GTEST_LOG_(INFO) << "FormRenderImplTest_040 end";
 }
 
 /**
@@ -856,6 +917,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_040, TestSize.Level0)
  */
 HWTEST_F(FormRenderImplTest, FormRenderImplTest_041, TestSize.Level0)
 {
+    GTEST_LOG_(INFO) << "FormRenderImplTest_041 start";
     FormRenderImpl formRenderImpl;
     formRenderImpl.isVerified_ = true;
     Want want;
@@ -863,6 +925,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_041, TestSize.Level0)
 
     auto param = want.GetBoolParam(Constants::FORM_RENDER_STATE, false);
     EXPECT_TRUE(param);
+    GTEST_LOG_(INFO) << "FormRenderImplTest_041 end";
 }
 
 /**
@@ -873,6 +936,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_041, TestSize.Level0)
  */
 HWTEST_F(FormRenderImplTest, FormRenderImplTest_042, TestSize.Level0)
 {
+    GTEST_LOG_(INFO) << "FormRenderImplTest_042 start";
     FormRenderImpl formRenderImpl;
     EXPECT_FALSE(formRenderImpl.isVerified_);
     Want want;
@@ -880,6 +944,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_042, TestSize.Level0)
     formRenderImpl.ConfirmUnlockState(want);
 
     EXPECT_TRUE(formRenderImpl.isVerified_);
+    GTEST_LOG_(INFO) << "FormRenderImplTest_042 end";
 }
 
 /**
@@ -890,11 +955,13 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_042, TestSize.Level0)
 */
 HWTEST_F(FormRenderImplTest, FormRenderImplTest_043, TestSize.Level0)
 {
+    GTEST_LOG_(INFO) << "FormRenderImplTest_043 start";
     FormRenderImpl formRenderImpl;
     int64_t formId{ 0 };
     Want want;
 
     EXPECT_EQ(formRenderImpl.SetVisibleChange(formId, true, want), ERR_APPEXECFWK_FORM_INVALID_FORM_ID);
+    GTEST_LOG_(INFO) << "FormRenderImplTest_043 end";
 }
 
 /**
@@ -905,10 +972,12 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_043, TestSize.Level0)
 */
 HWTEST_F(FormRenderImplTest, FormRenderImplTest_044, TestSize.Level0)
 {
+    GTEST_LOG_(INFO) << "FormRenderImplTest_044 start";
     FormRenderImpl formRenderImpl;
     int64_t formId{ 3 };
     Want want;
     EXPECT_EQ(formRenderImpl.SetVisibleChange(formId, true, want), ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+    GTEST_LOG_(INFO) << "FormRenderImplTest_044 end";
 }
 
 /**
@@ -919,12 +988,14 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_044, TestSize.Level0)
 */
 HWTEST_F(FormRenderImplTest, FormRenderImplTest_045, TestSize.Level0)
 {
+    GTEST_LOG_(INFO) << "FormRenderImplTest_045 start";
     FormRenderImpl formRenderImpl;
     int64_t formId{ 3 };
     std::string uid{ "202410101010" };
     Want want;
     want.SetParam(Constants::FORM_SUPPLY_UID, uid);
     EXPECT_EQ(formRenderImpl.SetVisibleChange(formId, true, want), SET_VISIBLE_CHANGE_FAILED);
+    GTEST_LOG_(INFO) << "FormRenderImplTest_045 end";
 }
 
 /**
@@ -935,6 +1006,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_045, TestSize.Level0)
 */
 HWTEST_F(FormRenderImplTest, FormRenderImplTest_046, TestSize.Level0)
 {
+    GTEST_LOG_(INFO) << "FormRenderImplTest_046 start";
     FormRenderImpl formRenderImpl;
     int64_t formId{ 3 };
     Want want;
@@ -942,6 +1014,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_046, TestSize.Level0)
     want.SetParam(Constants::FORM_SUPPLY_UID, uid);
     formRenderImpl.renderRecordMap_.emplace("2024101010", nullptr);
     EXPECT_EQ(formRenderImpl.SetVisibleChange(formId, true, want), SET_VISIBLE_CHANGE_FAILED);
+    GTEST_LOG_(INFO) << "FormRenderImplTest_046 end";
 }
 
 /**
@@ -952,6 +1025,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_046, TestSize.Level0)
 */
 HWTEST_F(FormRenderImplTest, FormRenderImplTest_047, TestSize.Level0)
 {
+    GTEST_LOG_(INFO) << "FormRenderImplTest_047 start";
     FormRenderImpl formRenderImpl;
     int64_t formId{ 3 };
     Want want;
@@ -960,6 +1034,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_047, TestSize.Level0)
     auto formRenderRecord = FormRenderRecord::Create("bundleName", "2024101010");
     formRenderImpl.renderRecordMap_.emplace("2024101010", formRenderRecord);
     EXPECT_EQ(formRenderImpl.SetVisibleChange(formId, true, want), SET_VISIBLE_CHANGE_FAILED);
+    GTEST_LOG_(INFO) << "FormRenderImplTest_047 end";
 }
 
 /**
@@ -970,6 +1045,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_047, TestSize.Level0)
 */
 HWTEST_F(FormRenderImplTest, FormRenderImplTest_048, TestSize.Level0)
 {
+    GTEST_LOG_(INFO) << "FormRenderImplTest_048 start";
     FormRenderImpl formRenderImpl;
     int64_t formId{ 3 };
     Want want;
@@ -984,6 +1060,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_048, TestSize.Level0)
     formRenderRecord->GetFormRendererGroup(formJsInfo, context, runtime);
     formRenderImpl.renderRecordMap_.emplace(uid, formRenderRecord);
     EXPECT_EQ(formRenderImpl.SetVisibleChange(formId, true, want), ERR_OK);
+    GTEST_LOG_(INFO) << "FormRenderImplTest_048 end";
 }
 
 /**
@@ -993,6 +1070,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_048, TestSize.Level0)
  */
 HWTEST_F(FormRenderImplTest, RunCachedConfigurationUpdatedTest_001, TestSize.Level0)
 {
+    GTEST_LOG_(INFO) << "RunCachedConfigurationUpdatedTest_001 start";
     FormRenderImpl formRenderImpl;
     formRenderImpl.configuration_ = std::make_shared<Configuration>();
     std::shared_ptr<OHOS::AppExecFwk::Configuration> configuration = std::make_shared<Configuration>();
@@ -1001,4 +1079,5 @@ HWTEST_F(FormRenderImplTest, RunCachedConfigurationUpdatedTest_001, TestSize.Lev
 
     formRenderImpl.RunCachedConfigurationUpdated();
     EXPECT_FALSE(formRenderImpl.hasCachedConfig_);
+    GTEST_LOG_(INFO) << "RunCachedConfigurationUpdatedTest_001 end";
 }

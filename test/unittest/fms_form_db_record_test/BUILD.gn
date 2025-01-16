@@ -50,6 +50,7 @@ ohos_unittest("FmsFormDbRecordTest") {
     "hilog:libhilog",
     "ipc:ipc_core",
     "relational_store:native_rdb",
+    "safwk:system_ability_fwk",
   ]
 }
 

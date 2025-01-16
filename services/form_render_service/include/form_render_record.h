@@ -218,7 +218,9 @@ private:
 
     void AddFormRequest(const FormJsInfo &formJsInfo, const Want &want);
 
-    void AddFormRequest(int64_t formId, const Ace::FormRequest &formRequest);
+    void AddFormRequest(int64_t formId, Ace::FormRequest &formRequest);
+
+    void AddFormRequest(int64_t formId, Ace::FormRequest &formRequest, bool noNeedUpdateSize);
 
     void DeleteFormRequest(int64_t formId, const std::string &compId);
 

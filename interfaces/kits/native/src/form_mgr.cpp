@@ -1904,5 +1904,29 @@ ErrCode FormMgr::UpdateFormSize(const int64_t formId, float width, float height,
     return resultCode;
 }
 
+int32_t FormMgr::NotifyFormLocked(const int64_t &formId, bool isLocked)
+{
+    HILOG_DEBUG("call");
+    if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
+        HILOG_ERROR("form is in recover status, can't do action on form");
+        return ERR_APPEXECFWK_FORM_SERVER_STATUS_ERR;
+    }
+
+    int errCode = Connect();
+    if (errCode != ERR_OK) {
+        return errCode;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    int resultCode = remoteProxy_->NotifyFormLocked(formId, isLocked);
+    if (resultCode != ERR_OK) {
+        HILOG_ERROR("fail NotifyFormLocked, errCode %{public}d", resultCode);
+    }
+    return resultCode;
+}
+
 }  // namespace AppExecFwk
 }  // namespace OHOS
