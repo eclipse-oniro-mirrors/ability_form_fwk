@@ -71,7 +71,6 @@ private:
         const std::string& picName, const sptr<Ashmem> &ashmem, int32_t len, std::vector<uint8_t> &value);
     bool InnerGetImageData(const FormCache &formCache,
         std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> &imageDataMap) const;
-    bool InnerDeleteImageData(const FormCache &formCache);
     void ResetCacheStateAfterReboot();
 
     mutable std::mutex cacheMutex_;
