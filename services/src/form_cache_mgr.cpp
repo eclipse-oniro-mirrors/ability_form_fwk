@@ -345,7 +345,7 @@ bool FormCacheMgr::DeleteData(const int64_t formId)
             isNeedDeleteImgCache = false;
         }
 
-        nlohmann::json imgCacheObj = nlohmann::json::parse(formCache.imgCache, nullptr, false);
+        imgCacheObj = nlohmann::json::parse(formCache.imgCache, nullptr, false);
         if (imgCacheObj.is_discarded() || !imgCacheObj.is_object()) {
             HILOG_ERROR("parse data failed");
             isNeedDeleteImgCache = false;
