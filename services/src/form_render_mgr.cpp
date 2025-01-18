@@ -299,12 +299,19 @@ void FormRenderMgr::ExecPostRenderFormTask(int64_t formId)
 {
     HILOG_INFO("start");
 
-    std::lock_guard<std::mutex> lock(renderFormTaskMapMutex_);
-    auto search = renderFormTaskMap_.find(formId);
-    if (search != renderFormTaskMap_.end()) {
-        auto task = search->second;
+    std::function<void()> task;
+    bool findTask = false;
+    {
+        std::lock_guard<std::mutex> lock(renderFormTaskMapMutex_);
+        auto search = renderFormTaskMap_.find(formId);
+        if (search != renderFormTaskMap_.end()) {
+            task = search->second;
+            findTask = true;
+            renderFormTaskMap_.erase(search);
+        }
+    }
+    if (findTask) {
         task();
-        renderFormTaskMap_.erase(search);
     }
 }
 

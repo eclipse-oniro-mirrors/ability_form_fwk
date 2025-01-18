@@ -1176,10 +1176,6 @@ private:
     bool CheckIsMultiAppForm(FormInfo &formInfo);
 
     void SetLockFormStateOfFormItemInfo(FormInfo &formInfo, FormItemInfo &formConfigInfo);
-
-#ifdef APPGALLERY_ENABLE
-    int32_t ReCalcUpdateDuration(const std::string &bundleName, const int32_t updateDuration);
-#endif
     /**
      * @class ClientDeathRecipient
      * notices IRemoteBroker died.
