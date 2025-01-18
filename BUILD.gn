@@ -392,6 +392,8 @@ group("form_napi_packages") {
       "${form_fwk_napi_path}:formagent",
       "${form_fwk_napi_path}:formbindingdata",
       "${form_fwk_napi_path}:formbindingdata_napi",
+      "${form_fwk_napi_path}:formeditextensionability_napi",
+      "${form_fwk_napi_path}:formeditextensioncontext_napi",
       "${form_fwk_napi_path}:formerror_napi",
       "${form_fwk_napi_path}:formextension_napi",
       "${form_fwk_napi_path}:formextensionability",
@@ -404,8 +406,6 @@ group("form_napi_packages") {
       "${form_fwk_napi_path}:formprovider",
       "${form_fwk_napi_path}:formprovider_napi",
       "${form_fwk_napi_path}:formutil_napi",
-      "${form_fwk_napi_path}:formeditextensionability_napi",
-      "${form_fwk_napi_path}:formeditextensioncontext_napi",
     ]
   }
 }

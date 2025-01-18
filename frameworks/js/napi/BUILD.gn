@@ -557,7 +557,8 @@ ohos_shared_library("formerror_napi") {
 
 ################################### gen_form_edit_extension_ability_abc ########################################
 es2abc_gen_abc("gen_form_edit_extension_ability_abc") {
-  src_js = rebase_path("form_edit_extension_ability/form_edit_extension_ability.js")
+  src_js =
+      rebase_path("form_edit_extension_ability/form_edit_extension_ability.js")
   dst_file = rebase_path(target_out_dir + "/form_edit_extension_ability.abc")
   in_puts = [ "form_edit_extension_ability/form_edit_extension_ability.js" ]
   out_puts = [ target_out_dir + "/form_edit_extension_ability.abc" ]
@@ -570,14 +571,15 @@ gen_js_obj("form_edit_extension_ability_js") {
 }
 
 gen_js_obj("form_edit_extension_ability_abc") {
-  input = get_label_info(":gen_form_edit_extension_ability_abc", "target_out_dir") +
-          "/form_edit_extension_ability.abc"
+  input = get_label_info(":gen_form_edit_extension_ability_abc",
+                         "target_out_dir") + "/form_edit_extension_ability.abc"
   output = target_out_dir + "/form_edit_extension_ability_abc.o"
   dep = ":gen_form_edit_extension_ability_abc"
 }
 
 ohos_shared_library("formeditextensionability_napi") {
-  sources = [ "form_edit_extension_ability/form_edit_extension_ability_module.cpp" ]
+  sources =
+      [ "form_edit_extension_ability/form_edit_extension_ability_module.cpp" ]
 
   configs = [ ":fmskit_config" ]
 
@@ -595,7 +597,8 @@ ohos_shared_library("formeditextensionability_napi") {
 
 ################################### gen_form_edit_extension_context_abc ########################################
 es2abc_gen_abc("gen_form_edit_extension_context_abc") {
-  src_js = rebase_path("form_edit_extension_context/form_edit_extension_context.js")
+  src_js =
+      rebase_path("form_edit_extension_context/form_edit_extension_context.js")
   dst_file = rebase_path(target_out_dir + "/form_edit_extension_context.abc")
   in_puts = [ "form_edit_extension_context/form_edit_extension_context.js" ]
   out_puts = [ target_out_dir + "/form_edit_extension_context.abc" ]
@@ -608,14 +611,15 @@ gen_js_obj("form_edit_extension_context_js") {
 }
 
 gen_js_obj("form_edit_extension_context_abc") {
-  input = get_label_info(":gen_form_edit_extension_context_abc", "target_out_dir") +
-          "/form_edit_extension_context.abc"
+  input = get_label_info(":gen_form_edit_extension_context_abc",
+                         "target_out_dir") + "/form_edit_extension_context.abc"
   output = target_out_dir + "/form_edit_extension_context_abc.o"
   dep = ":gen_form_edit_extension_context_abc"
 }
 
 ohos_shared_library("formeditextensioncontext_napi") {
-  sources = [ "form_edit_extension_context/form_edit_extension_context_module.cpp" ]
+  sources =
+      [ "form_edit_extension_context/form_edit_extension_context_module.cpp" ]
 
   configs = [ ":fmskit_config" ]
 
@@ -629,4 +633,4 @@ ohos_shared_library("formeditextensioncontext_napi") {
   relative_install_dir = "module/application"
   subsystem_name = "ability"
   part_name = "form_fwk"
-}
+}
