@@ -159,7 +159,7 @@ public:
      * @param want The want of the form to publish.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual ErrCode RequestSCBOpenFormManageView(Want &want) = 0;
+    virtual ErrCode RequestOpenFormView(Want &want) = 0;
 
     /**
      * @brief Lifecycle update.

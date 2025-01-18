@@ -2332,7 +2332,7 @@ ErrCode FormMgrAdapter::RequestPublishForm(Want &want, bool withFormBindingData,
     return errCode;
 }
 
-ErrCode FormMgrAdapter::RequestSCBOpenFormManageView(Want &want, bool needCheckFormPermission)
+ErrCode FormMgrAdapter::RequestOpenFormView(Want &want, bool needCheckFormPermission)
 {
     HILOG_DEBUG("call");
     int callingUid = IPCSkeleton::GetCallingUid();

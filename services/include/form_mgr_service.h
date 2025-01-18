@@ -696,7 +696,7 @@ public:
 +     * @param want The want of the form to open.
 +     * @return Returns ERR_OK on success, others on failure.
 +     */
-+   ErrCode RequestSCBOpenFormManageView(Want &want) override;
++   ErrCode RequestOpenFormView(Want &want) override;
 
     void SubscribeNetConn();
     

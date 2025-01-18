@@ -461,7 +461,7 @@ public:
     * @param want The want of the form to publish.
     * @return Returns ERR_OK on success, others on failure.
     */
-    ErrCode RequestSCBOpenFormManageView(Want &want);
+    ErrCode RequestOpenFormView(Want &want);
     /**
      * @brief Acquire form data by formId.
      * @param formId The Id of the form to acquire data.

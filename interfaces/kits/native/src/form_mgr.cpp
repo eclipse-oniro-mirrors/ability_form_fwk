@@ -1249,7 +1249,7 @@ int32_t FormMgr::StartAbility(const Want &want, const sptr<IRemoteObject> &calle
 }
 
 
-ErrCode FormMgr::RequestSCBOpenFormManageView(Want &want)
+ErrCode FormMgr::RequestOpenFormView(Want &want)
 {
     HILOG_INFO("call");
     ErrCode errCode = Connect();
@@ -1262,7 +1262,7 @@ ErrCode FormMgr::RequestSCBOpenFormManageView(Want &want)
         HILOG_ERROR("null remoteProxy_");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    return remoteProxy_->RequestSCBOpenFormManageView(want);
+    return remoteProxy_->RequestOpenFormView(want);
 }
 
 int32_t FormMgr::ShareForm(int64_t formId, const std::string &remoteDeviceId,

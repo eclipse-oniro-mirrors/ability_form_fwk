@@ -1159,7 +1159,7 @@ private:
 +     * @param needCheckFormPermission Indicates whether the app have system permissions.default value is true.
 +     * @return Returns ERR_OK on success, others on failure.
 +     */
-+   ErrCode RequestSCBOpenFormManageView(Want &want, bool needCheckFormPermission = true);
++   ErrCode RequestOpenFormView(Want &want, bool needCheckFormPermission = true);
 +
 +    /**
 +     * @brief Post request to open the form manage view of sceneBoard.

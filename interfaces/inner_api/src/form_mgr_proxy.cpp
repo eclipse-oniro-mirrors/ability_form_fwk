@@ -2296,7 +2296,7 @@ ErrCode FormMgrProxy::RequestPublishFormWithSnapshot(Want &want, bool withFormBi
     return errCode;
 }
 
-ErrCode FormMgrProxy::RequestSCBOpenFormManageView(Want &want)
+ErrCode FormMgrProxy::RequestOpenFormView(Want &want)
 {
     MessageParcel data;
     MessageParcel reply;
