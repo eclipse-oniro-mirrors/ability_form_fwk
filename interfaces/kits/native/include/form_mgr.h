@@ -456,6 +456,13 @@ public:
         int64_t requestCode);
 
     /**
+    * @brief Request to SCB to Open FormManageView.
+    *
+    * @param want The want of the form to publish.
+    * @return Returns ERR_OK on success, others on failure.
+    */
+    ErrCode RequestSCBOpenFormManageView(Want &want);
+    /**
      * @brief Acquire form data by formId.
      * @param formId The Id of the form to acquire data.
      * @param requestCode The request code of this acquire form.

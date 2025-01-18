@@ -117,6 +117,8 @@ int FormMgrStub::OnRemoteRequestFirst(uint32_t code, MessageParcel &data, Messag
             return HandleNotifyFormsVisible(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_NOTIFY_FORMS_PRIVACY_PROTECTED):
             return HandleNotifyFormsPrivacyProtected(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REQUEST_SCENEBOARD_OPEN_FORM_MANAGE_VIEW):
+            return HandleRequestSCBOpenFormManageView(data, reply);
         default:
             return OnRemoteRequestSecond(code, data, reply, option);
     }
@@ -1579,6 +1581,28 @@ ErrCode FormMgrStub::HandleRequestPublishFormWithSnapshot(MessageParcel &data, M
         return ERR_APPEXECFWK_PARCEL_ERROR;
     } else {
         reply.WriteInt64(formId);
+    }
+    return result;
+}
+
+/**
+ * @brief handle CreateForm message.
+ * @param data input param.
+ * @param reply output param.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+ErrCode FormMgrStub::HandleRequestSCBOpenFormManageView(MessageParcel &data, MessageParcel &reply)
+{
+    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
+    if (want == nullptr) {
+        HILOG_ERROR("error to get want");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+ 
+    ErrCode result = RequestSCBOpenFormManageView(*want);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
 }

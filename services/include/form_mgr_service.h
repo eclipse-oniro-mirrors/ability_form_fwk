@@ -690,6 +690,14 @@ public:
      */
     ErrCode UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth) override;
 
+    /**
++     * @brief Request to publish a form to the form host for normal authority.
++     *
++     * @param want The want of the form to open.
++     * @return Returns ERR_OK on success, others on failure.
++     */
++   ErrCode RequestSCBOpenFormManageView(Want &want) override;
+
     void SubscribeNetConn();
     
     friend class NetConnCallbackObserver;

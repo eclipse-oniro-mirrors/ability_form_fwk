@@ -2296,6 +2296,33 @@ ErrCode FormMgrProxy::RequestPublishFormWithSnapshot(Want &want, bool withFormBi
     return errCode;
 }
 
+ErrCode FormMgrProxy::RequestSCBOpenFormManageView(Want &want)
+{
+    MessageParcel data;
+    MessageParcel reply;
+ 
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteParcelable(&want)) {
+        HILOG_ERROR("write want failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+ 
+    MessageOption option;
+    int32_t error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_REQUEST_SCENEBOARD_OPEN_FORM_MANAGE_VIEW,
+        data,
+        reply,
+        option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendRequest:%{public}d failed", error);
+        return ERR_APPEXECFWK_FORM_SEND_FMS_MSG;
+    }
+    return reply.ReadInt32();
+}
+
 int32_t FormMgrProxy::BatchRefreshForms(const int32_t formRefreshType)
 {
     MessageParcel data;

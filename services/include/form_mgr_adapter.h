@@ -1152,6 +1152,22 @@ private:
     void FilterEventMapsByVisibleType(std::map<std::string, std::vector<int64_t>> &eventMaps,
         const int32_t formVisibleType, std::map<int64_t, FormRecord> &restoreFormRecords);
 
+    /**
++     * @brief Request SCB to Open Form Manage View.
++     *
++     * @param want The want of the form to publish.
++     * @param needCheckFormPermission Indicates whether the app have system permissions.default value is true.
++     * @return Returns ERR_OK on success, others on failure.
++     */
++   ErrCode RequestSCBOpenFormManageView(Want &want, bool needCheckFormPermission = true);
++
++    /**
++     * @brief Post request to open the form manage view of sceneBoard.
++     * @param want The want of the form to open.
++     * @return Returns ERR_OK on success, others on failure.
++     */
++   ErrCode RequestOpenFormManageView(Want &want);
+
     ErrCode CheckFormCountLimit(const int64_t formId, const Want &want);
 
     ErrCode AllotForm(const int64_t formId, const Want &want,

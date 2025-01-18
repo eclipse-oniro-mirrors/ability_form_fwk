@@ -404,6 +404,8 @@ group("form_napi_packages") {
       "${form_fwk_napi_path}:formprovider",
       "${form_fwk_napi_path}:formprovider_napi",
       "${form_fwk_napi_path}:formutil_napi",
+      "${form_fwk_napi_path}:formeditextensionability_napi",
+      "${form_fwk_napi_path}:formeditextensioncontext_napi",
     ]
   }
 }

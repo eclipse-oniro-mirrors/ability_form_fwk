@@ -153,6 +153,14 @@ public:
     virtual ErrCode RequestPublishFormWithSnapshot(Want &want, bool withFormBindingData,
         std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId) = 0;
 
+     /**
+     * @brief Request to SCB to Open FormManageView.
+     *
+     * @param want The want of the form to publish.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode RequestSCBOpenFormManageView(Want &want) = 0;
+
     /**
      * @brief Lifecycle update.
      * @param formIds The Id of the forms.
@@ -787,6 +795,7 @@ public:
         FORM_MGR_PUBLISH_FORM_ERRCODE_RESULT,
         FORM_MGR_ACQUIRE_ADD_FORM_RESULT,
         FORM_MGR_REQUEST_PUBLISH_FORM_WITH_SNAPSHOT,
+        FORM_MGR_REQUEST_SCENEBOARD_OPEN_FORM_MANAGE_VIEW,
         FORM_MGR_BATCH_REFRESH_FORMS,
         FORM_MGR_ENABLE_FORMS,
         FORM_MGR_IS_SYSTEM_APP_FORM,

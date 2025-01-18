@@ -521,6 +521,14 @@ private:
     ErrCode HandleRequestPublishFormWithSnapshot(MessageParcel &data, MessageParcel &reply);
 
     /**
+     * @brief handle RequestSCBOpenFormManageView message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleRequestSCBOpenFormManageView(MessageParcel &data, MessageParcel &reply); 
+
+    /**
      * @brief Update form with formRefreshType, send to form manager service.
      * @param formRefreshType The type of the form to refresh, 0: AllForm 1: 2: AppForm 2: AtomicServiceForm
      * @return Returns ERR_OK on success, others on failure.
