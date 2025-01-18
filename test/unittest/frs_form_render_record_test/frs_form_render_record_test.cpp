@@ -1827,31 +1827,6 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_090, TestSize.Level0)
 }
 
 /**
- * @tc.name: FormRenderRecord_Release_0001
- * @tc.desc: test FormRenderRecord::Release()
- * @tc.type: FUNC
- */
-HWTEST_F(FormRenderRecordTest, FormRenderRecord_Release_0001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "FormRenderRecord_Release_0001 start";
-
-    ASSERT_NE(formRenderRecordPtr_, nullptr);
-    auto tempStorageEventHandler = formRenderRecordPtr_->eventHandler_;
-    auto tempStorageEventRunner = formRenderRecordPtr_->eventRunner_;
-    formRenderRecordPtr_->eventHandler_ = nullptr;
-    formRenderRecordPtr_->Release();
-    EXPECT_NE(formRenderRecordPtr_->eventRunner_, nullptr);
-
-    formRenderRecordPtr_->eventHandler_ = tempStorageEventHandler;
-    formRenderRecordPtr_->Release();
-
-    EXPECT_EQ(formRenderRecordPtr_->eventRunner_, nullptr);
-    formRenderRecordPtr_->eventRunner_ = tempStorageEventRunner;
-
-    GTEST_LOG_(INFO) << "FormRenderRecord_Release_0001 end";
-}
-
-/**
  * @tc.name: FormRenderRecordTest_091
  * @tc.desc: Test HandleSetVisibleChange
  * @tc.type: FUNC

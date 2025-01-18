@@ -19,7 +19,6 @@
 #include <memory>
 #include <unordered_map>
 #include <unordered_set>
-#include <string>
 
 #include "configuration.h"
 #include "context_impl.h"
@@ -295,7 +294,6 @@ private:
     std::shared_ptr<ThreadState> threadState_;
     std::mutex formSupplyMutex_;
     sptr<IFormSupply> formSupplyClient_;
-    std::string eventHandleName_{};
 };
 }  // namespace FormRender
 }  // namespace AppExecFwk
