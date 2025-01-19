@@ -200,6 +200,9 @@ ErrCode FormRenderMgrInner::UpdateRenderingForm(FormRecord &formRecord, const Fo
     Want want;
     want.SetParams(wantParams);
     FillBundleInfo(want, formRecord.bundleName);
+    if (wantParams.IsEmpty()) {
+        want.SetParam(Constants::FORM_UPDATE_TYPE_KEY, Constants::ADAPTER_UPDATE_FORM);
+    }
     want.SetParam(Constants::FORM_RENDER_TYPE_KEY, Constants::UPDATE_RENDERING_FORM);
     std::string recordUid = std::to_string(formRecord.providerUserId) + formRecord.bundleName;
     want.SetParam(Constants::FORM_SUPPLY_UID, recordUid);
