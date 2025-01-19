@@ -294,6 +294,9 @@ namespace Constants {
     constexpr const char* FORM_RENDER_TYPE_KEY = "form_render_type";
     constexpr int32_t RENDER_FORM = 0; // default value
     constexpr int32_t UPDATE_RENDERING_FORM = 1;
+    constexpr const char* FORM_UPDATE_TYPE_KEY = "form_update_type";
+    constexpr int32_t ADD_FORM_UPDATE_FORM = 0; // default value
+    constexpr int32_t ADAPTER_UPDATE_FORM = 1;
     constexpr const char* FORM_COMPILE_MODE_KEY = "form_compile_mode";
     constexpr const char* FORM_COMPATIBLE_VERSION_KEY = "form_compatible_version";
     constexpr const char* FORM_TARGET_VERSION_KEY = "form_target_version";
