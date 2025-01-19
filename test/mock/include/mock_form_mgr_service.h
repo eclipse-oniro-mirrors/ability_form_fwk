@@ -116,6 +116,7 @@ public:
     MOCK_METHOD2(EnableForms, ErrCode(const std::string bundleName, const bool enable));
     MOCK_METHOD2(ReleaseRenderer, ErrCode(int64_t formId, const std::string &compId));
     MOCK_METHOD1(IsSystemAppForm, bool(const std::string &bundleName));
+    MOCK_METHOD1(StartAbilityByFms, int32_t(const Want &want));
 };
 }
 }

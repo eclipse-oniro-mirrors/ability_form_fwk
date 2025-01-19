@@ -167,6 +167,8 @@ int FormMgrStub::OnRemoteRequestSecond(uint32_t code, MessageParcel &data, Messa
             return HandleRegisterFormAddObserverByBundle(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_FORM_REMOVE_OBSERVER_BY_BUNDLE):
             return HandleRegisterFormRemoveObserverByBundle(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_START_ABILITY_BY_FMS):
+            return HandleStartAbilityByFms(data, reply);
         default:
             return OnRemoteRequestThird(code, data, reply, option);
     }
@@ -1100,6 +1102,23 @@ int32_t FormMgrStub::HandleStartAbility(MessageParcel &data, MessageParcel &repl
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     int32_t result = StartAbility(*want, callerToken);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return result;
+}
+
+int32_t FormMgrStub::HandleStartAbilityByFms(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("call");
+    // retrieve want
+    std::unique_ptr<Want> want(data.ReadParcelable<Want>());
+    if (want == nullptr) {
+        HILOG_ERROR("get want failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int32_t result = StartAbilityByFms(*want);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;

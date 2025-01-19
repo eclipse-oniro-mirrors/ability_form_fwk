@@ -445,6 +445,13 @@ public:
     int32_t StartAbility(const Want &want, const sptr<IRemoteObject> &callerToken);
 
     /**
+     * @brief Start an ability by form manager service.
+     * @param want includes ability name, parameters and relative info sending to an ability.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t StartAbilityByFms(const Want &want);
+
+    /**
      * @brief Share form with formId and remote device id.
      * @param formId The Id of the forms to share.
      * @param remoteDeviceId The Id of the remote revice to share.

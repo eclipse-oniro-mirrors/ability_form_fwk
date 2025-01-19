@@ -320,6 +320,14 @@ private:
     int32_t HandleStartAbility(MessageParcel &data, MessageParcel &reply);
 
     /**
+     * @brief Handle StartAbilityByFms message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t HandleStartAbilityByFms(MessageParcel &data, MessageParcel &reply);
+
+    /**
      * @brief Check form manager service ready
      * @param data input param
      * @param reply output param

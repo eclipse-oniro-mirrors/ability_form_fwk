@@ -2199,11 +2199,16 @@ ErrCode FormMgrAdapter::QueryPublishFormToHost(Want &wantToHost)
     int callingUid = IPCSkeleton::GetCallingUid();
     int32_t userId = GetCurrentUserId(callingUid);
 
-    // Query the highest priority ability or extension ability for publishing form
+    std::string action = Constants::FORM_PUBLISH_ACTION;
+    if (!wantToHost.GetAction().empty()) {
+        action = wantToHost.GetAction();
+        HILOG_INFO("GetAction:%{public}s", action.c_str());
+    }
+    // Query the highest priority ability o r extension ability for publishing form
     AppExecFwk::AbilityInfo abilityInfo;
     AppExecFwk::ExtensionAbilityInfo extensionAbilityInfo;
     if (!FormBmsHelper::GetInstance().GetAbilityInfoByAction(
-        Constants::FORM_PUBLISH_ACTION, userId, abilityInfo, extensionAbilityInfo)) {
+        action, userId, abilityInfo, extensionAbilityInfo)) {
         HILOG_ERROR("fail ImplicitQueryInfoByPriority for publishing form");
         return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
     }
@@ -2335,6 +2340,29 @@ ErrCode FormMgrAdapter::RequestPublishForm(Want &want, bool withFormBindingData,
     IncreaseAddFormRequestTimeOutTask(formId);
     if (!formDataProxies.empty()) {
         FormDataProxyMgr::GetInstance().ProduceFormDataProxies(formId, formDataProxies);
+    }
+    return errCode;
+}
+
+ErrCode FormMgrAdapter::StartAbilityByFms(const Want &want)
+{
+    Want wantToHost(want);
+    int callingUid = IPCSkeleton::GetCallingUid();
+    int32_t userId = GetCurrentUserId(callingUid);
+    wantToHost.SetParam(Constants::PARAM_FORM_USER_ID, userId);
+
+    ElementName elementName = want.GetElement();
+    std::string dstBundleName = elementName.GetBundleName();
+    std::string dstAbilityName = elementName.GetAbilityName();
+    wantToHost.SetParam(Constants::PARAM_BUNDLE_NAME_KEY, dstBundleName);
+    wantToHost.SetParam(Constants::PARAM_ABILITY_NAME_KEY, dstAbilityName);
+
+    HILOG_INFO("dstBundleName:%{public}s, dstAbilityName:%{public}s",
+        dstBundleName.c_str(), dstAbilityName.c_str());
+    ErrCode errCode = QueryPublishFormToHost(wantToHost);
+    if (errCode == ERR_OK) {
+        HILOG_INFO("StartAbility wantToHost:%{public}s", wantToHost.ToString().c_str());
+        return FormAmsHelper::GetInstance().StartAbility(wantToHost, userId);
     }
     return errCode;
 }
