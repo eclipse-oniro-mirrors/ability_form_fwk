@@ -39,6 +39,7 @@
 #include "form_status_queue.h"
 #include "form_command_queue.h"
 #include "form_status_mgr.h"
+#include "form_cache_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk { // namespace
@@ -819,6 +820,29 @@ void FormTaskMgr::FormShareSendResponse(int64_t formShareRequestCode, int32_t re
 }
 
 void FormTaskMgr::PostRenderForm(const FormRecord &formRecord, const Want &want,
+    const sptr<IRemoteObject> &remoteObject)
+{
+    auto renderType = want.GetIntParam(Constants::FORM_RENDER_TYPE_KEY, Constants::RENDER_FORM);
+    if (renderType != Constants::UPDATE_RENDERING_FORM
+        || FormDataMgr::GetInstance().GetFormCanUpdate(formRecord.formId)) {
+        FormTaskMgr::GetInstance().InnerPostRenderForm(formRecord, want, remoteObject);
+        return;
+    }
+    auto task = [formRecord, want, remoteObject]() {
+        FormRecord newRecord(formRecord);
+        std::string cacheData;
+        std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
+        bool hasCacheData = FormCacheMgr::GetInstance().GetData(formRecord.formId, cacheData, imageDataMap);
+        if (hasCacheData) {
+            newRecord.formProviderInfo.SetFormDataString(cacheData);
+            newRecord.formProviderInfo.SetImageDataMap(imageDataMap);
+        }
+        FormTaskMgr::GetInstance().InnerPostRenderForm(newRecord, want, remoteObject);
+    };
+    FormRenderMgr::GetInstance().AddPostRenderFormTask(formRecord.formId, task);
+}
+
+void FormTaskMgr::InnerPostRenderForm(const FormRecord &formRecord, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_DEBUG("PostRenderForm");

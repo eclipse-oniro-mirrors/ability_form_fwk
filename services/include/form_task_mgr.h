@@ -600,6 +600,8 @@ private:
      */
     void ConnectNetWork();
 
+    void InnerPostRenderForm(const FormRecord &formRecord, const Want &want,
+        const sptr<IRemoteObject> &remoteObject);
 private:
     std::mutex formRecoverTimesMutex_;
     std::unordered_map<int64_t, int64_t> formLastRecoverTimes;

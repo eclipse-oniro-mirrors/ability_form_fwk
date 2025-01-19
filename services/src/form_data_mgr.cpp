@@ -2779,5 +2779,60 @@ void FormDataMgr::GetFormIdsByUserId(int32_t userId, std::vector<int64_t> &formI
     }
     HILOG_INFO("userId:%{public}d, size:%{public}zu", userId, formIds.size());
 }
+
+void FormDataMgr::SetFormVisible(int64_t formId, bool isVisible)
+{
+    std::lock_guard<std::shared_mutex> lock(formVisibleMapMutex_);
+    auto search = formVisibleMap_.find(formId);
+    if (search == formVisibleMap_.end()) {
+        formVisibleMap_.emplace(formId, isVisible);
+    } else {
+        search->second = isVisible;
+    }
+
+    HILOG_INFO("set isVisible to %{public}d, formId:%{public}" PRId64 " ", isVisible, formId);
+}
+
+void FormDataMgr::GetVisibleForms(std::vector<int64_t> &forms)
+{
+    std::shared_lock<std::shared_mutex> lock(formVisibleMapMutex_);
+    for (auto iter = formVisibleMap_.begin(); iter != formVisibleMap_.end(); ++iter) {
+        if (iter->second) {
+            forms.emplace_back(iter->first);
+        }
+    }
+}
+
+void FormDataMgr::DeleteFormVisible(int64_t formId)
+{
+    std::lock_guard<std::shared_mutex> lock(formVisibleMapMutex_);
+    auto search = formVisibleMap_.find(formId);
+    if (search != formVisibleMap_.end()) {
+        formVisibleMap_.erase(formId);
+    }
+}
+
+void FormDataMgr::SetSystemLoad(bool isLowSystemLoad)
+{
+    std::lock_guard<std::shared_mutex> lock(isLowSystemLoadMutex_);
+    isLowSystemLoad_ = isLowSystemLoad;
+}
+
+bool FormDataMgr::GetSystemLoad()
+{
+    std::shared_lock<std::shared_mutex> lock(isLowSystemLoadMutex_);
+    return isLowSystemLoad_;
+}
+
+bool FormDataMgr::GetFormCanUpdate(int64_t formId)
+{
+    std::shared_lock<std::shared_mutex> lock(formVisibleMapMutex_);
+    auto search = formVisibleMap_.find(formId);
+    if (search == formVisibleMap_.end()) {
+        HILOG_ERROR("form Id not find");
+        return false;
+    }
+    return search->second && GetSystemLoad();
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

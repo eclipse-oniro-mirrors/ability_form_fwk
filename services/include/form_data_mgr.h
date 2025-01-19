@@ -18,6 +18,7 @@
 
 #include <map>
 #include <mutex>
+#include <shared_mutex>
 #include <set>
 #include <singleton.h>
 #include <string>
@@ -809,6 +810,42 @@ public:
      */
     bool RecheckWhetherNeedCleanFormHost(const sptr<IRemoteObject> &callerToken);
 
+    /**
+     * @brief Cache the visibility of the card.
+     * @param formId form id.
+     * @param isVisible is visible.
+     */
+    void SetFormVisible(int64_t formId, bool isVisible);
+
+    /**
+     * @brief Get forms which is visible.
+     * @param forms The list of formId.
+     */
+    void GetVisibleForms(std::vector<int64_t> &forms);
+
+    /**
+     * @brief Delete Cache of card visibility.
+     * @param formId form id.
+     */
+    void DeleteFormVisible(int64_t formId);
+
+    /**
+     * @brief Cache the load status of the system.
+     * @param isLowSystemLoad is low load.
+     */
+    void SetSystemLoad(bool isLowSystemLoad);
+
+    /**
+     * @brief Get the load status of the system.
+     */
+    bool GetSystemLoad();
+
+    /**
+     * @brief Check if the card can be updated.
+     * @param formId form id.
+     */
+    bool GetFormCanUpdate(int64_t formId);
+
 private:
     /**
      * @brief Create form record.
@@ -934,6 +971,8 @@ private:
     mutable std::mutex formAcquireDataRecordMutex_;
     mutable std::mutex formConfigMapMutex_;
     mutable std::mutex formCloudUpdateDurationMapMutex_;
+    mutable std::shared_mutex formVisibleMapMutex_;
+    mutable std::shared_mutex isLowSystemLoadMutex_;
     std::map<int64_t, FormRecord> formRecords_;
     std::vector<FormHostRecord> clientRecords_;
     std::vector<int64_t> tempForms_;
@@ -946,6 +985,8 @@ private:
     std::vector<sptr<IRemoteObject>> formObservers_;
     std::map<std::string, int32_t> formConfigMap_;
     std::unordered_map<std::string, int> formCloudUpdateDurationMap_;
+    std::unordered_map<int64_t, bool> formVisibleMap_;
+    bool isLowSystemLoad_ = true;
 };
 } // namespace AppExecFwk
 } // namespace OHOS

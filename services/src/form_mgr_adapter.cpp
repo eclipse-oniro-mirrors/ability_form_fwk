@@ -499,6 +499,8 @@ int FormMgrAdapter::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
     }
 
     FormRenderMgr::GetInstance().DeleteAcquireForbiddenTaskByFormId(formId);
+    FormRenderMgr::GetInstance().DeletePostRenderFormTask(formId);
+    FormDataMgr::GetInstance().DeleteFormVisible(formId);
 #ifdef THEME_MGR_ENABLE
     FormDBInfo dbInfo;
     ErrCode getDbRet = FormDbCache::GetInstance().GetDBRecord(formId, dbInfo);
@@ -891,6 +893,11 @@ void FormMgrAdapter::SetVisibleChange(const int64_t formId, const int32_t formVi
 
     bool isVisible = (formVisibleType == Constants::FORM_VISIBLE) ? true : false;
     FormRenderMgr::GetInstance().SetVisibleChange(formId, isVisible);
+
+    FormDataMgr::GetInstance().SetFormVisible(formId, isVisible);
+    if (isVisible && FormDataMgr::GetInstance().GetSystemLoad()) {
+        FormRenderMgr::GetInstance().ExecPostRenderFormTask(formId);
+    }
 }
 
 ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &formIds,
@@ -3000,6 +3007,8 @@ int FormMgrAdapter::DeleteInvalidForms(const std::vector<int64_t> &formIds,
             if (removedForm.second) {
                 FormTimerMgr::GetInstance().RemoveFormTimer(removedForm.first);
                 FormRenderMgr::GetInstance().DeleteAcquireForbiddenTaskByFormId(removedForm.first);
+                FormRenderMgr::GetInstance().DeletePostRenderFormTask(removedForm.first);
+                FormDataMgr::GetInstance().DeleteFormVisible(removedForm.first);
             }
         }
     }
@@ -3917,6 +3926,14 @@ ErrCode FormMgrAdapter::BatchRefreshForms(const int32_t formRefreshType)
 void FormMgrAdapter::SetTimerTaskNeeded(bool isTimerTaskNeeded)
 {
     FormTimerMgr::GetInstance().SetTimerTaskNeeded(isTimerTaskNeeded);
+    if (!FormDataMgr::GetInstance().GetSystemLoad() && isTimerTaskNeeded) {
+        std::vector<int64_t> visibleForms;
+        FormDataMgr::GetInstance().GetVisibleForms(visibleForms);
+        for (auto form : visibleForms) {
+            FormRenderMgr::GetInstance().ExecPostRenderFormTask(form);
+        }
+    }
+    FormDataMgr::GetInstance().SetSystemLoad(isTimerTaskNeeded);
 }
 #endif // RES_SCHEDULE_ENABLE
 

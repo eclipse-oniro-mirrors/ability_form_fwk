@@ -103,6 +103,12 @@ public:
 
     void DeleteAcquireForbiddenTaskByFormId(int64_t formId);
 
+    void AddPostRenderFormTask(int64_t formId, std::function<void()> task);
+
+    void ExecPostRenderFormTask(int64_t formId);
+
+    void DeletePostRenderFormTask(int64_t formId);
+
     void PostOnUnlockTask();
 
     ErrCode RecycleForms(const std::vector<int64_t> &formIds, const Want &want,
@@ -126,6 +132,8 @@ private:
     std::queue<std::function<void()>> taskQueue_;
     std::mutex forbiddenTaskMapMutex_;
     std::unordered_map<std::string, std::unordered_map<int64_t, std::function<void()>>> forbiddenTaskMap_;
+    std::mutex renderFormTaskMapMutex_;
+    std::unordered_map<int64_t, std::function<void()>> renderFormTaskMap_;
     // <userId, FormRenderMgrInner>
     std::unordered_map<int32_t, std::shared_ptr<FormRenderMgrInner>> renderInners_;
     // <userId, FormSandboxRenderMgrInner>
