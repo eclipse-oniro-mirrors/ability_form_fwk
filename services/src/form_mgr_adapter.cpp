@@ -79,6 +79,7 @@
 #include "form_record_report.h"
 #include "form_ability_connection_reporter.h"
 #include "form_bundle_lock_mgr.h"
+#include "form_exempt_lock_mgr.h"
 
 static const int64_t MAX_NUMBER_OF_JS = 0x20000000000000;
 namespace OHOS {
@@ -1491,12 +1492,22 @@ ErrCode FormMgrAdapter::GetFormConfigInfo(const Want &want, FormItemInfo &formCo
 void FormMgrAdapter::SetLockFormStateOfFormItemInfo(FormInfo &formInfo, FormItemInfo &formConfigInfo)
 {
     auto formId = formConfigInfo.GetFormId();
+    // exempt form are never unlocked
+    if (formId > 0 && FormExemptLockMgr::GetInstance().IsExemptLock(formId)) {
+        formConfigInfo.SetLockForm(false);
+        return;
+    }
+
+    bool isBundleLock = FormBundleLockMgr::GetInstance().IsBundleLock(formConfigInfo.GetProviderBundleName(), 0);
     // Use DBCache to set lockForm first
     FormRecord record;
     if (formId > 0 && FormDbCache::GetInstance().GetDBRecord(formId, record) == ERR_OK) {
-        formConfigInfo.SetLockForm(record.lockForm);
+        if (isBundleLock != record.lockForm) {
+            record.lockForm = isBundleLock;
+            FormDbCache::GetInstance().UpdateDBRecord(formId, record);
+        }
+        formConfigInfo.SetLockForm(isBundleLock);
     } else {
-        bool isBundleLock = FormBundleLockMgr::GetInstance().IsBundleLock(formConfigInfo.GetProviderBundleName(), 0);
         bool isMultiAppForm = CheckIsMultiAppForm(formInfo) && formConfigInfo.GetSystemAppFlag();
         formConfigInfo.SetLockForm(isBundleLock && !isMultiAppForm);
     }
@@ -1772,7 +1783,7 @@ ErrCode FormMgrAdapter::AcquireProviderFormInfoAsync(const int64_t formId,
     const FormItemInfo &info, const WantParams &wantParams)
 {
     std::string providerBundleName = info.GetProviderBundleName();
-    if (!info.IsEnableForm() || info.IsLockForm()) {
+    if (!info.IsEnableForm() || (info.IsLockForm() && !FormExemptLockMgr::GetInstance().IsExemptLock(formId))) {
         HILOG_INFO("Bundle:%{public}s forbidden", providerBundleName.c_str());
         FormDataMgr::GetInstance().SetRefreshDuringDisableForm(formId, true);
 
@@ -4068,6 +4079,7 @@ int32_t FormMgrAdapter::LockForms(const std::string bundleName, int32_t userId, 
         FormDataMgr::GetInstance().SetFormLock(iter->formId, lock);
         FormDbCache::GetInstance().UpdateDBRecord(iter->formId, *iter);
         if (!lock) {
+            FormExemptLockMgr::GetInstance().SetExemptLockStatus(iter->formId, false);
             RefreshOrUpdateDuringDisableForm(iter, userId);
         }
         ++iter;
@@ -4104,6 +4116,7 @@ int32_t FormMgrAdapter::NotifyFormLocked(const int64_t &formId, bool isLocked)
     formRecord.lockForm = isLocked;
  
     HILOG_INFO("formId:%{public}" PRId64 ", isLocked:%{public}d", formId, isLocked);
+    FormExemptLockMgr::GetInstance().SetExemptLockStatus(formId, !isLocked);
     FormDataMgr::GetInstance().SetFormLock(formId, isLocked);
     FormDbCache::GetInstance().UpdateDBRecord(formId, formRecord);
     std::vector<FormRecord> formRecords;

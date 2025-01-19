@@ -73,6 +73,7 @@ ohos_shared_library("libfms") {
     "services/src/form_event_notify_connection.cpp",
     "services/src/form_event_report.cpp",
     "services/src/form_event_util.cpp",
+    "services/src/form_exempt_lock_mgr.cpp",
     "services/src/form_free_install_operator.cpp",
     "services/src/form_host_callback.cpp",
     "services/src/form_host_record.cpp",
