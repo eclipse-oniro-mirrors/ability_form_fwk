@@ -1906,5 +1906,6 @@ void FormMgrService::SetDisConnectTypeTime()
 {
     lastNetLostTime_ = FormUtil::GetCurrentMillisecond();
 }
+
 }  // namespace AppExecFwk
 }  // namespace OHOS

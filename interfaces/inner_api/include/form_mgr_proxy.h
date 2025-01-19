@@ -637,7 +637,6 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth) override;
-
 private:
     template<typename T>
     int GetParcelableInfos(MessageParcel &reply, std::vector<T> &parcelableInfos);
