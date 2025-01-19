@@ -1248,23 +1248,6 @@ int32_t FormMgr::StartAbility(const Want &want, const sptr<IRemoteObject> &calle
     return remoteProxy_->StartAbility(want, callerToken);
 }
 
-
-ErrCode FormMgr::RequestOpenFormView(Want &want)
-{
-    HILOG_INFO("call");
-    ErrCode errCode = Connect();
-    if (errCode != ERR_OK) {
-        HILOG_ERROR("errCode:%{public}d", errCode);
-        return errCode;
-    }
-    std::shared_lock<std::shared_mutex> lock(connectMutex_);
-    if (remoteProxy_ == nullptr) {
-        HILOG_ERROR("null remoteProxy_");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
-    return remoteProxy_->RequestOpenFormView(want);
-}
-
 int32_t FormMgr::ShareForm(int64_t formId, const std::string &remoteDeviceId,
     const sptr<IRemoteObject> &callerToken, int64_t requestCode)
 {

@@ -2332,39 +2332,6 @@ ErrCode FormMgrAdapter::RequestPublishForm(Want &want, bool withFormBindingData,
     return errCode;
 }
 
-ErrCode FormMgrAdapter::RequestOpenFormView(Want &want, bool needCheckFormPermission)
-{
-    HILOG_DEBUG("call");
-    int callingUid = IPCSkeleton::GetCallingUid();
-    int32_t userId = GetCurrentUserId(callingUid);
-    want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
-    return RequestOpenFormManageView(want);
-}
-
-ErrCode FormMgrAdapter::RequestOpenFormManageView(Want &want)
-{
-    HILOG_INFO("RequestOpenFormManageView start want:%{public}s", want.ToString().c_str());
-    Want wantToSceneBoard(want);
-    ElementName elementName = want.GetElement();
-    wantToSceneBoard.SetParam(Constants::PARAM_BUNDLE_NAME_KEY, elementName.GetBundleName());
-    wantToSceneBoard.SetParam(Constants::PARAM_ABILITY_NAME_KEY, elementName.GetAbilityName());
-    std::string bundleName = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_BUNDLE_KEY);
-    std::string abilityName = want.GetStringParam(Constants::PARAM_PUBLISH_FORM_HOST_ABILITY_KEY);
-    wantToSceneBoard.SetElementName(bundleName, abilityName);
-    ErrCode errCode = QueryPublishFormToHost(wantToSceneBoard);
-
-    if (errCode == ERR_OK) {
-        int32_t userId = want.GetIntParam(Constants::PARAM_FORM_USER_ID, -1);
-        HILOG_INFO("RequestOpenFormManageView StartAbility wantToSceneBoard:%{public}s", 
-                        wantToSceneBoard.ToString().c_str());
-        errCode = FormAmsHelper::GetInstance().StartAbility(wantToSceneBoard, userId);
-        if (errCode != ERR_OK) {
-            HILOG_ERROR("RequestOpenFormManageView end errCode:%{public}d", errCode);
-        }
-    }
-    return errCode;
-}
-
 ErrCode FormMgrAdapter::SetPublishFormResult(const int64_t formId, Constants::PublishFormResult &errorCodeInfo)
 {
     HILOG_INFO("call");

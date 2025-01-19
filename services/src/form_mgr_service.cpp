@@ -1906,15 +1906,5 @@ void FormMgrService::SetDisConnectTypeTime()
 {
     lastNetLostTime_ = FormUtil::GetCurrentMillisecond();
 }
-
-+
-+ErrCode FormMgrService::RequestOpenFormView(Want &want)
-+{
-+    HILOG_INFO("begin:%{public}s, publish:%{public}s, end:%{public}s, onKvDataServiceAddTime:%{public}s",
-+        onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
-+        onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
-+ 
-+    return FormMgrAdapter::GetInstance().RequestOpenFormView(want, false);
-+}
 }  // namespace AppExecFwk
 }  // namespace OHOS
