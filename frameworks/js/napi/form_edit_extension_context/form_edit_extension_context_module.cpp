@@ -25,14 +25,13 @@ static napi_module _module = {
     .nm_filename = "application/libformeditextensioncontext_napi.so/form_edit_extension_context.js",
     .nm_modname = "application.FormEditExtensionContext",
 };
-extern "C" __attribute__((constructor))
-void NAPI_application_FormEditExtensionContext_AutoRegister()
+extern "C" __attribute__((constructor)) void NAPI_application_FormEditExtensionContext_AutoRegister()
 {
     napi_module_register(&_module);
 }
 
-extern "C" __attribute__((visibility("default")))
-void NAPI_application_FormEditExtensionContext_GetJSCode(const char **buf, int *bufLen)
+extern "C" __attribute__((visibility("default")))void NAPI_application_FormEditExtensionContext_GetJSCode(
+    const char **buf, int *bufLen)
 {
     if (buf != nullptr) {
         *buf = _binary_form_edit_extension_context_js_start;
@@ -44,8 +43,8 @@ void NAPI_application_FormEditExtensionContext_GetJSCode(const char **buf, int *
 }
 
 // ability_context JS register
-extern "C" __attribute__((visibility("default")))
-void NAPI_application_FormEditExtensionContext_GetABCCode(const char **buf, int *buflen)
+extern "C" __attribute__((visibility("default")))void NAPI_application_FormEditExtensionContext_GetABCCode(
+    const char **buf, int *buflen)
 {
     if (buf != nullptr) {
         *buf = _binary_form_edit_extension_context_abc_start;

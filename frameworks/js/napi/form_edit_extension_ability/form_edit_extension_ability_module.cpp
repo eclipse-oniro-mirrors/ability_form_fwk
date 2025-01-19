@@ -26,14 +26,13 @@ static napi_module _module = {
     .nm_filename = "app/form/libformeditextensionability_napi.so/form_edit_extension_ability.js",
     .nm_modname = "app.form.FormEditExtensionAbility",
 };
-extern "C" __attribute__((constructor))
-void NAPI_app_form_FormEditExtensionAbility_AutoRegister()
+extern "C" __attribute__((constructor))void NAPI_app_form_FormEditExtensionAbility_AutoRegister()
 {
     napi_module_register(&_module);
 }
 
-extern "C" __attribute__((visibility("default")))
-void NAPI_app_form_FormEditExtensionAbility_GetJSCode(const char **buf, int *bufLen)
+extern "C" __attribute__((visibility("default")))void NAPI_app_form_FormEditExtensionAbility_GetJSCode(
+    const char **buf, int *bufLen)
 {
     if (buf != nullptr) {
         *buf = _binary_form_edit_extension_ability_js_start;
@@ -44,8 +43,8 @@ void NAPI_app_form_FormEditExtensionAbility_GetJSCode(const char **buf, int *buf
     }
 }
 
-extern "C" __attribute__((visibility("default")))
-void NAPI_app_form_FormEditExtensionAbility_GetABCCode(const char **buf, int *buflen)
+extern "C" __attribute__((visibility("default")))void NAPI_app_form_FormEditExtensionAbility_GetABCCode(
+    const char **buf, int *buflen)
 {
     if (buf != nullptr) {
         *buf = _binary_form_edit_extension_ability_abc_start;
