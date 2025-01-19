@@ -255,6 +255,8 @@ public:
         std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId,
         const std::vector<FormDataProxy> &formDataProxies = {}, bool needCheckFormPermission = true);
 
+    ErrCode StartAbilityByFms(const Want &want);
+
     ErrCode SetPublishFormResult(const int64_t formId, Constants::PublishFormResult &errorCodeInfo);
 
     ErrCode AcquireAddFormResult(const int64_t formId);

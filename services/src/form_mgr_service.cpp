@@ -1243,6 +1243,12 @@ int32_t FormMgrService::StartAbility(const Want &want, const sptr<IRemoteObject>
     return ams->StartAbility(want, callerToken, -1, -1);
 }
 
+int32_t FormMgrService::StartAbilityByFms(const Want &want)
+{
+    HILOG_INFO("call");
+    return FormMgrAdapter::GetInstance().StartAbilityByFms(want);
+}
+
 void FormMgrService::InitFormShareMgrSerialQueue()
 {
     DelayedSingleton<FormShareMgr>::GetInstance()->SetSerialQueue(serialQueue_);

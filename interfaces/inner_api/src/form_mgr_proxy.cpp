@@ -1432,6 +1432,36 @@ int32_t FormMgrProxy::StartAbility(const Want &want, const sptr<IRemoteObject> &
     return reply.ReadInt32();
 }
 
+int32_t FormMgrProxy::StartAbilityByFms(const Want &want)
+{
+    HILOG_INFO("start");
+    MessageParcel data;
+    // write in token to help identify which stub to be called.
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    // write in want
+    if (!data.WriteParcelable(&want)) {
+        HILOG_ERROR("write want failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    // send request.
+    MessageParcel reply;
+    MessageOption option;
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_START_ABILITY_BY_FMS,
+        data,
+        reply,
+        option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendRequest:%{public}d failed", error);
+        return error;
+    }
+    // retrieve and return result.
+    return reply.ReadInt32();
+}
+
 int32_t FormMgrProxy::ShareForm(int64_t formId, const std::string &deviceId, const sptr<IRemoteObject> &callerToken,
     int64_t requestCode)
 {

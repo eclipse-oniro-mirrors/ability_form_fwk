@@ -361,6 +361,16 @@ public:
     virtual int32_t StartAbility(const Want &want, const sptr<IRemoteObject> &callerToken) = 0;
 
     /**
+     * @brief Start an ability by form manager service.
+     * @param want includes ability name, parameters and relative info sending to an ability.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual int32_t StartAbilityByFms(const Want &want)
+    {
+        return 0;
+    }
+
+    /**
      * @brief Share form by formID and deviceID.
      * @param formId Indicates the unique id of form.
      * @param deviceId Indicates the remote device ID.
@@ -795,6 +805,7 @@ public:
         FORM_MGR_LOCK_FORMS,
         FORM_MGR_IS_FORM_BUNDLE_LOCKED,
         FORM_MGR_NOTIFY_FORM_LOCKED,
+        FORM_MGR_START_ABILITY_BY_FMS,
     };
 };
 }  // namespace AppExecFwk
