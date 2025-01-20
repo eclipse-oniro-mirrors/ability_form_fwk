@@ -1750,7 +1750,7 @@ void FormRenderRecord::MergeMap(std::map<std::string, sptr<FormAshmem>> &dst,
 {
     for (auto iter = src.begin(); iter != src.end(); ++iter) {
         auto search = dst.find(iter->first);
-        if(search == dst.end()) {
+        if (search == dst.end()) {
             dst.emplace(*iter);
         } else {
             search->second = iter->second;
