@@ -4185,15 +4185,15 @@ ErrCode FormMgrAdapter::UpdateFormByCondition(int32_t type)
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
-    NewFormEventInfo eventInfo;
-    eventInfo.conditionType = static_cast<int32_t>(type);
-    FormEventReport::SendConditonUpdateFormEvent(FormEventName::CONDITION_UPDATE_FORM,
-        HiSysEventType::BEHAVIOR, eventInfo);
-        
+    std::string reportStr = "";
+    std::set<std::string> reportList;
+ 
     for (FormRecord& formRecord : formInfos) {
         if (!formRecord.isSystemApp) {
             continue;
         }
+        std::string str = formRecord.bundleName + "-" + formRecord.formName;
+        reportList.insert(str);
         int32_t userId = FormUtil::GetCurrentAccountId();
         Want want;
         want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
@@ -4201,6 +4201,20 @@ ErrCode FormMgrAdapter::UpdateFormByCondition(int32_t type)
         want.SetParam(Constants::KEY_CONNECT_REFRESH, true);
         FormProviderMgr::GetInstance().RefreshForm(formRecord.formId, want, true);
     }
+
+    if (reportList.size() > 0) {
+        for (const auto& item : reportList) {
+            reportStr = reportStr + item;
+        }
+    }
+    std::string subStr = reportStr.substr(0, std::min((int)reportStr.size(), 30));
+    HILOG_INFO("UpdateFormByCondition reportStr:%{public}s", subStr.c_str());
+    NewFormEventInfo eventInfo;
+    eventInfo.conditionType = static_cast<int32_t>(type);
+    eventInfo.bundle_formName = reportStr;
+    FormEventReport::SendConditonUpdateFormEvent(FormEventName::CONDITION_UPDATE_FORM,
+        HiSysEventType::BEHAVIOR, eventInfo);
+
     return ERR_OK;
 }
 } // namespace AppExecFwk

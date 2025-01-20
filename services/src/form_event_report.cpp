@@ -53,6 +53,7 @@ constexpr const char *EVENT_KEY_FORM_APP_PID = "FORM_APP_PID";
 constexpr const char *EVENT_KEY_TIMESTAMP = "TIMESTAMP";
 constexpr const char *EVENT_KEY_RENDERING_MODE = "RENDERING_MODE";
 constexpr const char *EVENT_KEY_CONDITION_TYPE = "CONDITION_TYPE";
+constexpr const char *EVENT_KEY_BUNDLE_FORMNAME = "BUNDLE_FORMNAME";
 const std::map<FormEventName, std::string> EVENT_NAME_MAP = {
     std::map<FormEventName, std::string>::value_type(FormEventName::ADD_FORM, "ADD_FORM"),
     std::map<FormEventName, std::string>::value_type(FormEventName::REQUEST_FORM, "REQUEST_FORM"),
@@ -331,7 +332,8 @@ void FormEventReport::SendConditonUpdateFormEvent(const FormEventName &eventName
     }
     if (eventName == FormEventName::CONDITION_UPDATE_FORM) {
         HiSysEventWrite(HiSysEvent::Domain::FORM_MANAGER, name, type,
-            EVENT_KEY_CONDITION_TYPE, static_cast<int32_t>(eventInfo.conditionType));
+            EVENT_KEY_CONDITION_TYPE, static_cast<int32_t>(eventInfo.conditionType),
+            EVENT_KEY_BUNDLE_FORMNAME, eventInfo.bundle_formName);
     }
 }
 
