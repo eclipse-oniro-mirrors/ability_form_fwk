@@ -258,6 +258,9 @@ private:
         std::vector<Ace::FormRequest> &groupRequests, bool &currentRequestFound,
         const std::unordered_map<std::string, Ace::FormRequest> &recordFormRequests);
 
+    void MergeMap(std::map<std::string, sptr<FormAshmem>> &dst,
+        const std::map<std::string, sptr<FormAshmem>> &src)
+
     pid_t jsThreadId_ = 0;
     pid_t processId_ = 0;
 
