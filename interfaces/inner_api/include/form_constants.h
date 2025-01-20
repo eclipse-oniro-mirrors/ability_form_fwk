@@ -67,6 +67,7 @@ namespace Constants {
     constexpr const char* LOCAL_CODE_PATH = "/data/storage/el1/bundle";
     constexpr const char* LOCAL_BUNDLES = "/data/bundles";
     constexpr const char* FORM_PUBLISH_ACTION = "action.form.publish";
+    constexpr const char* FORM_PAGE_ACTION = "action.form.page";
     constexpr const char* OPEN_FORM_MANAGE_VIEW  = "openFormManageView";
     constexpr const char* OPEN_FORM_MANAGE_VIEW_ACTION  = "action.form.openFormManageView";
     constexpr const char* PAGE_ROUTER_SERVICE  = "PageRouterService";
