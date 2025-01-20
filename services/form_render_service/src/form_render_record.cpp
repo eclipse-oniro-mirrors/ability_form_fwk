@@ -1748,7 +1748,7 @@ void FormRenderRecord::UpdateGroupRequestsWhenRecover(const int64_t &formId, con
 void FormRenderRecord::MergeMap(std::map<std::string, sptr<FormAshmem>> &dst,
     const std::map<std::string, sptr<FormAshmem>> &src)
 {
-    for(auto iter = src.begin(); iter != src.end(); ++iter) {
+    for (auto iter = src.begin(); iter != src.end(); ++iter) {
         auto search = dst.find(iter->first);
         if(search == dst.end()) {
             dst.emplace(*iter);
