@@ -217,7 +217,17 @@ private:
 
     void AddFormRequest(const FormJsInfo &formJsInfo, const Want &want);
 
-    void AddFormRequest(int64_t formId, const Ace::FormRequest &formRequest);
+    void AddFormRequest(int64_t formId, Ace::FormRequest &formRequest);
+
+    /**
+     * @brief Add formRequest to formRequests_.
+     * @param formId formId.
+     * @param formRequest formRequest.
+     * @param noNeedUpdateSize If form size is modified in the
+     * formRequest parameter, this parameter should be set to false.
+     * Set this parameter to true if you want to keep the form size data in the formRequests_.
+     */
+    void AddFormRequest(int64_t formId, Ace::FormRequest &formRequest, bool noNeedUpdateSize);
 
     void DeleteFormRequest(int64_t formId, const std::string &compId);
 
