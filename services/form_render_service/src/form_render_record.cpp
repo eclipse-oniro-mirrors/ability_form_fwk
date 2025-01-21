@@ -784,7 +784,12 @@ void FormRenderRecord::MergeFormData(Ace::FormRequest &formRequest, const FormJs
     nlohmann::json newFormData = formJsInfo.formProviderData.GetData();
     formProviderData.MergeData(newFormData);
 
+    std::map<std::string, sptr<FormAshmem>> imageMap = formRequest.formJsInfo.imageDataMap;
     formRequest.formJsInfo = formJsInfo;
+    //if imageDataMap of formJsInfo is empty, do not replace
+    if (formJsInfo.imageDataMap.size() == 0) {
+        formRequest.formJsInfo.imageDataMap = imageMap;
+    }
     formRequest.formJsInfo.formData = formProviderData.GetDataString();
 }
 
