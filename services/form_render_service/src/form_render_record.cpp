@@ -141,6 +141,7 @@ FormRenderRecord::~FormRenderRecord()
         renderRecord->HandleDestroyInJsThread();
     };
     eventHandler->PostSyncTask(syncTask, "Destory FormRenderRecord");
+    Release();
 }
 
 bool FormRenderRecord::HandleHostDied(const sptr<IRemoteObject> hostRemoteObj)
@@ -1208,8 +1209,6 @@ void FormRenderRecord::HandleDestroyInJsThread()
     }
     std::lock_guard<std::mutex> lock(formRendererGroupMutex_);
     formRendererGroupMap_.clear();
-    runtime_.reset();
-    ReleaseHapFileHandle();
 }
 
 void FormRenderRecord::ReleaseHapFileHandle()
