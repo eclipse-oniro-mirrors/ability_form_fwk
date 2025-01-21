@@ -565,6 +565,13 @@ bool FormRenderRecord::SetPkgContextInfoMap(const FormJsInfo &formJsInfo, Abilit
 void FormRenderRecord::SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration>& config)
 {
     configuration_ = config;
+    std::lock_guard<std::mutex> lock(contextsMapMutex_);
+    for (const auto& pair: contextsMapForModuleName_) {
+        if (pair.second) {
+            auto context = std::static_pointer_cast<AbilityRuntime::ContextImpl>(pair.second);
+            context->SetConfiguration(config);
+        }
+    }
 }
 
 std::shared_ptr<AbilityRuntime::Context> FormRenderRecord::GetContext(const FormJsInfo &formJsInfo, const Want &want)
