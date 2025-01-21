@@ -339,6 +339,7 @@ namespace Constants {
     const std::string IS_MULTI_APP_FORM = "isMultiAppForm";
     // form contains multi app is true
     const std::string IS_MULTI_APP_FORM_TRUE = "true";
+const std::string IS_MULTI_APP_FORM_TRUE = "true";
 }  // namespace Constants
 }  // namespace AppExecFwk
 }  // namespace OHOS
