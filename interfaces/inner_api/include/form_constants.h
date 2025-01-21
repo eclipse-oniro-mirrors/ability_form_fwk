@@ -282,6 +282,8 @@ namespace Constants {
     constexpr int32_t REFRESHTYPE_UPDATENEXTTIME = 3;
     constexpr int32_t REFRESHTYPE_NETWORKCHANGED = 4;
     constexpr int32_t REFRESHTYPE_VISIABLE = 99;
+    constexpr int32_t FULL_UPDATE = 0;
+    constexpr int32_t ADD_UPDATE = 1;
 
     // rdb
     const std::string FORM_MANAGER_SERVICE_PATH = "/data/service/el1/public/database/form_storage";
@@ -339,7 +341,8 @@ namespace Constants {
     const std::string IS_MULTI_APP_FORM = "isMultiAppForm";
     // form contains multi app is true
     const std::string IS_MULTI_APP_FORM_TRUE = "true";
-const std::string IS_MULTI_APP_FORM_TRUE = "true";
+    // Form data update type
+    constexpr const char* FORM_DATA_UPDATE_TYPE = "formDataUpdateType";
 }  // namespace Constants
 }  // namespace AppExecFwk
 }  // namespace OHOS
