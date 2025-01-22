@@ -2830,7 +2830,8 @@ bool FormDataMgr::GetFormCanUpdate(int64_t formId)
     auto search = formVisibleMap_.find(formId);
     if (search == formVisibleMap_.end()) {
         HILOG_ERROR("form Id not find");
-        return false;
+        formVisibleMap_.emplace(formId, true);
+        return GetSystemLoad();
     }
     return search->second && GetSystemLoad();
 }
