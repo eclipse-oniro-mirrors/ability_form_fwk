@@ -232,8 +232,8 @@ public:
 
     void PostEnterpriseAppInstallFailedRetryTask(const int64_t formId, const Want &want, bool isVisibleToFresh);
 
-    void PostReleaseRenderer(
-        int64_t formId, const std::string &compId, const std::string &uid, const sptr<IRemoteObject> &remoteObject);
+    void PostReleaseRenderer(int64_t formId, const std::string &compId, const std::string &uid,
+        const sptr<IRemoteObject> &remoteObject, bool isDynamic = true);
 
     void PostOnUnlock(const sptr<IRemoteObject> &remoteObject);
 
