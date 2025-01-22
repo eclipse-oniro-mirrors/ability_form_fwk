@@ -68,9 +68,9 @@ napi_value JsFormEditExtensionContext::StartSecondPage(napi_env env, napi_callba
     GET_NAPI_INFO_AND_CALL(env, info, JsFormEditExtensionContext, OnStartSecondPage);
 }
 
-napi_value JsFormEditExtensionContext::OnStartSecondPage(napi_env env, NapiCallbackInfo &info){
+napi_value JsFormEditExtensionContext::OnStartSecondPage(napi_env env, NapiCallbackInfo &info)
+{
     TAG_LOGD(AAFwkTag::UI_EXT, "called: param size: %{public}d",static_cast<int32_t>(info.argc));
-
     if (info.argc != ARGC_TWO) {
         ThrowError(env, static_cast<int32_t>(FormEditErrorCode::ERROR_CODE_PARAM_ERROR), ERR_MSG_PARAMS_ERROR);
         return CreateJsUndefined(env);
@@ -95,7 +95,7 @@ napi_value JsFormEditExtensionContext::OnStartSecondPage(napi_env env, NapiCallb
             return;
         }
 
-        ErrCode errCode = context->OnStartSceneBoard(want);    
+        ErrCode errCode = context->OnStartSceneBoard(want);
         napi_value abilityResult = AppExecFwk::WrapAbilityResult(env, static_cast<int>(errCode), want);
         if (abilityResult == nullptr) {
             TAG_LOGE(AAFwkTag::UI_EXT, "Wrap abilityResult failed");
@@ -109,7 +109,8 @@ napi_value JsFormEditExtensionContext::OnStartSecondPage(napi_env env, NapiCallb
     napi_value lastParam = (info.argc > INDEX_ONE) ? info.argv[INDEX_ONE] : nullptr;
     napi_value result = nullptr;
     NapiAsyncTask::ScheduleHighQos("JsFormEditExtensionContext OnStartSecondPage", env,
-                                   CreateAsyncTaskWithLastParam(env, lastParam, nullptr, std::move(complete), &result));   
+                                   CreateAsyncTaskWithLastParam(env, lastParam, nullptr,
+                                   std::move(complete), &result));   
     return result;
 }
 } // namespace AbilityRuntime

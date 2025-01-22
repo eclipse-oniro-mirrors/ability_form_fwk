@@ -34,9 +34,9 @@ JsFormEditExtension::JsFormEditExtension(const std::unique_ptr<Runtime> &runtime
 }
 
 void JsFormEditExtension::Init(const std::shared_ptr<AppExecFwk::AbilityLocalRecord> &record,
-                                  const std::shared_ptr<AppExecFwk::OHOSApplication> &application,
-                                  std::shared_ptr<AppExecFwk::AbilityHandler> &handler,
-                                  const sptr<IRemoteObject> &token)
+                               const std::shared_ptr<AppExecFwk::OHOSApplication> &application,
+                               std::shared_ptr<AppExecFwk::AbilityHandler> &handler,
+                               const sptr<IRemoteObject> &token)
 {
     TAG_LOGD(AAFwkTag::UI_EXT, "Begin init form edit extension");
     std::shared_ptr<FormEditExtensionContext> context = std::make_shared<FormEditExtensionContext>();

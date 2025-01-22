@@ -33,7 +33,7 @@ std::map<std::string, std::string> FormEditExtensionModuleLoader::GetParams()
 {
     TAG_LOGD(AAFwkTag::FORM_EDIT_EXT, "called");
     std::map<std::string, std::string> params;
-    // type means extension type in ExtensionAbilityType of 
+    // type means extension type in ExtensionAbilityType of
     // extension_ability_info.h, 507 means formEditExtension.
     params.insert(std::pair<std::string, std::string>("type", "507"));
     params.insert(std::pair<std::string, std::string>("name", "FormEditExtensionAbility"));

@@ -37,7 +37,6 @@ public:
 
     static napi_value StartSecondPage(napi_env env, napi_callback_info info);
 
-
 private:
     napi_value OnStartSecondPage(napi_env env, NapiCallbackInfo &info);
 
