@@ -26,6 +26,7 @@ namespace AppExecFwk {
 void FormRouterProxyMgr::SetDeathRecipient(const sptr<IRemoteObject> &callerToken,
     const sptr<IRemoteObject::DeathRecipient> &deathRecipient)
 {
+#ifndef WATCH_API_DISABLE
     HILOG_DEBUG("Start");
     std::lock_guard<std::mutex> lock(deathRecipientsMutex_);
     auto iter = deathRecipients_.find(callerToken);
@@ -35,11 +36,13 @@ void FormRouterProxyMgr::SetDeathRecipient(const sptr<IRemoteObject> &callerToke
     } else {
         HILOG_DEBUG("The deathRecipient has been added");
     }
+#endif
 }
 
 ErrCode FormRouterProxyMgr::SetFormRouterProxy(const std::vector<int64_t> &formIds,
     const sptr<IRemoteObject> &callerToken)
 {
+#ifndef WATCH_API_DISABLE
     HILOG_DEBUG("call");
     std::lock_guard<std::mutex> lock(formRouterProxyMutex_);
     for (const auto &formId : formIds) {
@@ -57,6 +60,9 @@ ErrCode FormRouterProxyMgr::SetFormRouterProxy(const std::vector<int64_t> &formI
     }
     SetDeathRecipient(callerToken, dealthRecipient);
     return ERR_OK;
+#else
+    return ERR_OK;
+#endif
 }
 
 ErrCode FormRouterProxyMgr::RemoveFormRouterProxy(const std::vector<int64_t> &formIds)

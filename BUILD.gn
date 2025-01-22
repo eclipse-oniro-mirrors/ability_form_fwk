@@ -193,6 +193,10 @@ ohos_shared_library("libfms") {
     defines += [ "DEVICE_USAGE_STATISTICS_ENABLE" ]
   }
 
+  if (form_fwk_watch_api_disable) {
+    defines += [ "WATCH_API_DISABLE" ]
+  }
+
   if (res_schedule_service && !form_fwk_watch_api_disable) {
     external_deps += [ "resource_schedule_service:ressched_client" ]
     defines += [ "RES_SCHEDULE_ENABLE" ]
@@ -256,6 +260,11 @@ ohos_shared_library("fmskit_native") {
   subsystem_name = "ability"
   innerapi_tags = [ "platformsdk" ]
   part_name = "form_fwk"
+
+  defines = []
+  if (form_fwk_watch_api_disable) {
+    defines += [ "WATCH_API_DISABLE" ]
+  }
 }
 
 ################################### fmskit_provider_client ########################################

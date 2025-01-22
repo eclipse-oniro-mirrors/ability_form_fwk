@@ -2002,6 +2002,7 @@ ErrCode JsFormRouterProxyMgr::RouterEvent(int64_t formId, const Want &want)
 void JsFormRouterProxyMgr::AddFormRouterProxyCallback(napi_env env, napi_value callback,
     const std::vector<int64_t> &formIds)
 {
+#ifndef WATCH_API_DISABLE
     HILOG_DEBUG("call");
     std::lock_guard<std::mutex> lock(FormRouterProxyCallbackMutex_);
 
@@ -2018,6 +2019,7 @@ void JsFormRouterProxyMgr::AddFormRouterProxyCallback(napi_env env, napi_value c
         }
         formRouterProxyCallbackMap_.emplace(formId, callbackClient);
     }
+#endif
 }
 
 void JsFormRouterProxyMgr::RemoveFormRouterProxyCallback(const std::vector<int64_t> &formIds)
