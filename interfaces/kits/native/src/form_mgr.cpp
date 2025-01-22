@@ -187,6 +187,7 @@ int FormMgr::StopRenderingForm(const int64_t formId, const std::string &compId)
  */
 int FormMgr::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> &callerToken, const bool delCache)
 {
+#ifndef WATCH_API_DISABLE
     HILOG_INFO("formId:%{public}" PRId64 ", delCache:%{public}d", formId, delCache);
     // check fms recover status
     if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
@@ -210,6 +211,9 @@ int FormMgr::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> &caller
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return remoteProxy_->ReleaseForm(formId, callerToken, delCache);
+#else
+    return ERR_OK;
+#endif
 }
 
 /**
@@ -409,6 +413,7 @@ bool FormMgr::HasFormVisible(const uint32_t tokenId)
  */
 int FormMgr::CastTempForm(const int64_t formId, const sptr<IRemoteObject> &callerToken)
 {
+#ifndef WATCH_API_DISABLE
     HILOG_INFO("formId:%{public}" PRId64, formId);
     if (formId <= 0) {
         HILOG_ERROR("passing in form id can't be negative");
@@ -425,6 +430,9 @@ int FormMgr::CastTempForm(const int64_t formId, const sptr<IRemoteObject> &calle
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return remoteProxy_->CastTempForm(formId, callerToken);
+#else
+    return ERR_OK;
+#endif
 }
 
 /**
@@ -1664,6 +1672,7 @@ ErrCode FormMgr::UnregisterClickEventObserver(
 
 int FormMgr::RegisterFormRouterProxy(const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &callerToken)
 {
+#ifndef WATCH_API_DISABLE
     HILOG_DEBUG("call");
     if (FormMgr::GetRecoverStatus() == Constants::IN_RECOVERING) {
         HILOG_ERROR("form is in recover status, can't do action on form");
@@ -1680,6 +1689,9 @@ int FormMgr::RegisterFormRouterProxy(const std::vector<int64_t> &formIds, const 
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return remoteProxy_->RegisterFormRouterProxy(formIds, callerToken);
+#else
+    return ERR_OK;
+#endif
 }
 
 int FormMgr::UnregisterFormRouterProxy(const std::vector<int64_t> &formIds)

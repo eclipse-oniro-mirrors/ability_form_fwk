@@ -571,6 +571,7 @@ int FormMgrAdapter::StopRenderingForm(const int64_t formId, const std::string &c
 
 int FormMgrAdapter::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> &callerToken, const bool delCache)
 {
+#ifndef WATCH_API_DISABLE
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     HILOG_INFO("formId:%{public}" PRId64, formId);
     if (formId <= 0 || callerToken == nullptr) {
@@ -617,10 +618,14 @@ int FormMgrAdapter::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> 
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return ERR_OK;
+#else
+    return ERR_OK;
+#endif
 }
 
 ErrCode FormMgrAdapter::HandleReleaseForm(const int64_t formId, const sptr<IRemoteObject> &callerToken)
 {
+#ifndef WATCH_API_DISABLE
     HILOG_INFO("formId:%{public}" PRId64, formId);
     if (!FormDataMgr::GetInstance().ExistFormRecord(formId)) {
         HILOG_ERROR("not exist such db or temp form:%{public}" PRId64 "", formId);
@@ -644,6 +649,9 @@ ErrCode FormMgrAdapter::HandleReleaseForm(const int64_t formId, const sptr<IRemo
         }
     }
     return ERR_OK;
+#else
+    return ERR_OK;
+#endif
 }
 
 ErrCode FormMgrAdapter::HandleDeleteForm(const int64_t formId, const sptr<IRemoteObject> &callerToken)
@@ -1188,6 +1196,7 @@ void FormMgrAdapter::FilterEventMapsByVisibleType(std::map<std::string, std::vec
 
 int FormMgrAdapter::CastTempForm(const int64_t formId, const sptr<IRemoteObject> &callerToken)
 {
+#ifndef WATCH_API_DISABLE
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     if (formId <= 0 || callerToken == nullptr) {
         HILOG_ERROR("invalid formId or callerToken");
@@ -1254,10 +1263,14 @@ int FormMgrAdapter::CastTempForm(const int64_t formId, const sptr<IRemoteObject>
 
     // start timer
     return AddFormTimer(formRecord);
+#else
+    return ERR_OK;
+#endif
 }
 
 ErrCode FormMgrAdapter::HandleCastTempForm(const int64_t formId, const FormRecord &record)
 {
+#ifndef WATCH_API_DISABLE
     HILOG_DEBUG("cast temp form to normal form, notify supplier, package:%{public}s, class:%{public}s",
         record.bundleName.c_str(), record.abilityName.c_str());
     sptr<IAbilityConnection> castTempConnection = new FormCastTempConnection(formId,
@@ -1272,6 +1285,9 @@ ErrCode FormMgrAdapter::HandleCastTempForm(const int64_t formId, const FormRecor
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     return ERR_OK;
+#else
+    return ERR_OK;
+#endif
 }
 
 int FormMgrAdapter::DumpStorageFormInfos(std::string &formInfos) const
@@ -3374,6 +3390,7 @@ ErrCode FormMgrAdapter::RegisterRemoveObserver(const std::string &bundleName, co
 ErrCode FormMgrAdapter::RegisterFormRouterProxy(
     const std::vector<int64_t>& formIds, const sptr<IRemoteObject>& callerToken)
 {
+#ifndef WATCH_API_DISABLE
     HILOG_DEBUG("call");
     if (callerToken == nullptr) {
         HILOG_ERROR("null callerToken");
@@ -3423,6 +3440,9 @@ ErrCode FormMgrAdapter::RegisterFormRouterProxy(
     }
 
     return FormRouterProxyMgr::GetInstance().SetFormRouterProxy(hostOwnFormIds, callerToken);
+#else
+    return ERR_OK;
+#endif
 }
 
 ErrCode FormMgrAdapter::UnregisterFormRouterProxy(const std::vector<int64_t>& formIds)
