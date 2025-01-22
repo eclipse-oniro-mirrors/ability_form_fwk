@@ -1090,6 +1090,8 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_052, TestSize.Level0)
  */
 HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_053, TestSize.Level0)
 {
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
     GTEST_LOG_(INFO) << "FormRenderRecordTest_053 start";
     EXPECT_TRUE(formRenderRecordPtr_);
     formRenderRecordPtr_->formRendererGroupMap_.clear();
@@ -1110,6 +1112,8 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_053, TestSize.Level0)
  */
 HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_054, TestSize.Level0)
 {
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
     GTEST_LOG_(INFO) << "FormRenderRecordTest_054 start";
     EXPECT_TRUE(formRenderRecordPtr_);
     formRenderRecordPtr_->formRendererGroupMap_.clear();
