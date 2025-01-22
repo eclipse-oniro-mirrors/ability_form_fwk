@@ -2826,7 +2826,7 @@ bool FormDataMgr::GetSystemLoad()
 
 bool FormDataMgr::GetFormCanUpdate(int64_t formId)
 {
-    std::shared_lock<std::shared_mutex> lock(formVisibleMapMutex_);
+    std::lock_guard<std::shared_mutex> lock(formVisibleMapMutex_);
     auto search = formVisibleMap_.find(formId);
     if (search == formVisibleMap_.end()) {
         HILOG_ERROR("form Id not find");
