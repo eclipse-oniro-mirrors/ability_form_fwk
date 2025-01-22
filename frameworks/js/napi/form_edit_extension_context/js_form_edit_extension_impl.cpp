@@ -83,7 +83,6 @@ void JsFormEditExtensionImpl::BindContext()
 {
     HandleScope handleScope(jsRuntime_);
     if (jsObj_ == nullptr) {
-        TAG_LOGE(AAFwkTag::UI_EXT, "jsobj_ is nullptr");
         return;
     }
     napi_env env = jsRuntime_.GetNapiEnv();
@@ -93,7 +92,6 @@ void JsFormEditExtensionImpl::BindContext()
         return;
     }
     if (context_ == nullptr) {
-        TAG_LOGE(AAFwkTag::UI_EXT, "Context is nullptr");
         return;
     }
     napi_value contextObj = JsFormEditExtensionContext::CreateJsFormEditExtensionContext(env, context_);
@@ -119,7 +117,6 @@ void JsFormEditExtensionImpl::BindContext()
     napi_set_named_property(env, obj, "context", contextObj);
     napi_status status = napi_wrap(env, contextObj, workContext,
         [](napi_env, void *data, void *) {
-            TAG_LOGD(AAFwkTag::UI_EXT, "Finalizer called");
             if (data == nullptr) {
                 TAG_LOGE(AAFwkTag::UI_EXT, "Finalizer for weak_ptr is nullptr");
                 return;
