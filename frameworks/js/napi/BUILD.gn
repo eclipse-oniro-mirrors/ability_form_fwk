@@ -634,3 +634,78 @@ ohos_shared_library("formeditextensioncontext_napi") {
   subsystem_name = "ability"
   part_name = "form_fwk"
 }
+
+################################### gen_form_edit_extension_ability ########################################
+ohos_shared_library("form_edit_extension") {
+  include_dirs = []
+
+  sources = [
+    "form_edit_extension_ability/form_edit_extension.cpp",
+    "form_edit_extension_ability/js_form_edit_extension.cpp",
+    "form_edit_extension_context/form_edit_extension_context.cpp",
+    "form_edit_extension_context/js_form_edit_extension_context.cpp",
+    "form_edit_extension_context/js_form_edit_extension_impl.cpp",
+  ]
+
+  configs = [ ":fmskit_config" ]
+
+  deps = [
+    ":formutil_napi",
+    "${form_fwk_path}:fmskit_native",
+    "${form_fwk_path}:fmskit_provider_client",
+    "${form_fwk_path}:form_manager",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_runtime:ability_context_native",
+    "ability_runtime:abilitykit_native",
+    "ability_runtime:app_context",
+    "ability_runtime:napi_common",
+    "ability_runtime:runtime",
+    "ability_runtime:ui_extension",
+    "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "ffrt:libffrt",
+    "hilog:libhilog",
+    "hitrace:hitrace_meter",
+    "ipc:ipc_napi",
+    "napi:ace_napi",
+  ]
+
+  subsystem_name = "ability"
+  part_name = "form_fwk"
+}
+
+ohos_shared_library("form_edit_extension_module") {
+  include_dirs = []
+
+  sources =
+      [ "form_edit_extension_ability/form_edit_extension_module_loader.cpp" ]
+
+  configs = [ ":fmskit_config" ]
+
+  deps = [ ":form_edit_extension" ]
+
+  external_deps = [
+    "ability_base:configuration",
+    "ability_base:session_info",
+    "ability_base:want",
+    "ability_runtime:abilitykit_native",
+    "ability_runtime:appkit_native",
+    "ability_runtime:extensionkit_native",
+    "ability_runtime:runtime",
+    "ability_runtime:ui_extension",
+    "bundle_framework:appexecfwk_core",
+    "hilog:libhilog",
+    "napi:ace_napi",
+  ]
+
+  if (ability_runtime_graphics) {
+    deps += [ "${form_fwk_path}:form_manager" ]
+  }
+
+  relative_install_dir = "extensionability"
+  subsystem_name = "ability"
+  part_name = "form_fwk"
+}

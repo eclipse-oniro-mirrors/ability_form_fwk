@@ -389,6 +389,8 @@ ohos_prebuilt_etc("form_config") {
 group("form_napi_packages") {
   if (ability_runtime_graphics) {
     deps = [
+      "${form_fwk_napi_path}:form_edit_extension",
+      "${form_fwk_napi_path}:form_edit_extension_module",
       "${form_fwk_napi_path}:formagent",
       "${form_fwk_napi_path}:formbindingdata",
       "${form_fwk_napi_path}:formbindingdata_napi",
