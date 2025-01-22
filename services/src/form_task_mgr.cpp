@@ -966,8 +966,8 @@ void FormTaskMgr::StopRenderingForm(
     HILOG_INFO("end");
 }
 
-void FormTaskMgr::PostReleaseRenderer(
-    int64_t formId, const std::string &compId, const std::string &uid, const sptr<IRemoteObject> &remoteObject)
+void FormTaskMgr::PostReleaseRenderer(int64_t formId, const std::string &compId, const std::string &uid,
+    const sptr<IRemoteObject> &remoteObject, bool isDynamic)
 {
     HILOG_INFO("begin");
     if (serialQueue_ == nullptr) {
@@ -982,12 +982,21 @@ void FormTaskMgr::PostReleaseRenderer(
         std::lock_guard<std::mutex> lock(formRecoverTimesMutex_);
         formLastRecoverTimes.erase(formId);
     }
-    FormCommand releaseRenderCommand{
-        formId,
-        std::make_pair(TaskCommandType::RECYCLE_FORM, formId),
-        FORM_TASK_DELAY_TIME,
-        deleterenderForm};
-    FormStatusQueue::GetInstance().PostFormStatusTask(releaseRenderCommand);
+    if (!isDynamic) {
+        FormCommand deleteCommand{
+            formId,
+            std::make_pair(TaskCommandType::DELETE_FORM, formId),
+            FORM_TASK_DELAY_TIME,
+            deleterenderForm};
+        FormStatusQueue::GetInstance().PostFormDeleteTask(deleteCommand);
+    } else {
+        FormCommand releaseRenderCommand{
+            formId,
+            std::make_pair(TaskCommandType::RECYCLE_FORM, formId),
+            FORM_TASK_DELAY_TIME,
+            deleterenderForm};
+        FormStatusQueue::GetInstance().PostFormStatusTask(releaseRenderCommand);
+    }
     HILOG_INFO("end");
 }
 
