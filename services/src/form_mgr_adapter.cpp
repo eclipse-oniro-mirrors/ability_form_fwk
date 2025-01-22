@@ -4211,7 +4211,7 @@ ErrCode FormMgrAdapter::UpdateFormByCondition(int32_t type)
     HILOG_INFO("UpdateFormByCondition reportStr:%{public}s", subStr.c_str());
     NewFormEventInfo eventInfo;
     eventInfo.conditionType = static_cast<int32_t>(type);
-    eventInfo.bundle_formName = reportStr;
+    eventInfo.bundleAndFormName = reportStr;
     FormEventReport::SendConditonUpdateFormEvent(FormEventName::CONDITION_UPDATE_FORM,
         HiSysEventType::BEHAVIOR, eventInfo);
 
