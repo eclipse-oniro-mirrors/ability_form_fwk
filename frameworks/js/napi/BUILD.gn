@@ -637,6 +637,16 @@ ohos_shared_library("formeditextensioncontext_napi") {
 
 ################################### gen_form_edit_extension_ability ########################################
 ohos_shared_library("form_edit_extension") {
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    cfi_vcall_icall_only = true
+    debug = false
+  }
+
   include_dirs = []
 
   sources = [
@@ -678,6 +688,16 @@ ohos_shared_library("form_edit_extension") {
 }
 
 ohos_shared_library("form_edit_extension_module") {
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    cfi_vcall_icall_only = true
+    debug = false
+  }
+
   include_dirs = []
 
   sources =
