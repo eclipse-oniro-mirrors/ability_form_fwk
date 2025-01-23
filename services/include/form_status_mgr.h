@@ -45,7 +45,13 @@ public:
     bool SetFormStatus(const int64_t formId, FormStatus formStatus);
 
     bool isProcessableFormStatus(const int64_t formId);
-    
+
+    /*
+     * @brief Reset form status by id.
+     * @param formIds The Id list of forms.
+     */
+    void ResetFormStatus(const int64_t &formId);
+
     /*
      * @brief Send render form message to form_status_mgr.
      * @param formIds The Id list of forms.
