@@ -333,7 +333,7 @@ void FormEventReport::SendConditonUpdateFormEvent(const FormEventName &eventName
     if (eventName == FormEventName::CONDITION_UPDATE_FORM) {
         HiSysEventWrite(HiSysEvent::Domain::FORM_MANAGER, name, type,
             EVENT_KEY_CONDITION_TYPE, static_cast<int32_t>(eventInfo.conditionType),
-            EVENT_KEY_BUNDLE_FORMNAME, eventInfo.bundle_formName);
+            EVENT_KEY_BUNDLE_FORMNAME, eventInfo.bundleAndFormName);
     }
 }
 
