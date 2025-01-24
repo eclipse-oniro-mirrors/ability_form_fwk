@@ -390,7 +390,7 @@ ErrCode FormRenderMgrInner::ReleaseRenderer(int64_t formId, const FormRecord &fo
                 HILOG_ERROR("null remoteObjectGotten");
                 return ret;
             }
-            FormTaskMgr::GetInstance().PostReleaseRenderer(formId, compId, uid, remoteObject);
+            FormTaskMgr::GetInstance().PostReleaseRenderer(formId, compId, uid, remoteObject, formRecord.isDynamic);
             return ERR_OK;
         }
     }
