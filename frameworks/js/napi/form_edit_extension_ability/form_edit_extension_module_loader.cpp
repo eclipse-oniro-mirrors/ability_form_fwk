@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,8 +34,8 @@ std::map<std::string, std::string> FormEditExtensionModuleLoader::GetParams()
     TAG_LOGD(AAFwkTag::FORM_EDIT_EXT, "called");
     std::map<std::string, std::string> params;
     // type means extension type in ExtensionAbilityType of
-    // extension_ability_info.h, 507 means formEditExtension.
-    params.insert(std::pair<std::string, std::string>("type", "507"));
+    // extension_ability_info.h, 27 means formEditExtension.
+    params.insert(std::pair<std::string, std::string>("type", "27"));
     params.insert(std::pair<std::string, std::string>("name", "FormEditExtensionAbility"));
     return params;
 }

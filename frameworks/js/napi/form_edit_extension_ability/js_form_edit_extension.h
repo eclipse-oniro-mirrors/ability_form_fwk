@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,11 +37,11 @@ public:
     virtual ~JsFormEditExtension() override = default;
 
 /**
-     * @brief Init the photo editor extension.
+     * @brief Init the form edit extension.
      *
-     * @param record the photo editor extension record.
+     * @param record the form edit extension record.
      * @param application the application info.
-     * @param handler the photo editor extension handler.
+     * @param handler the form edit extension handler.
      * @param token the remote token.
      */
     virtual void Init(const std::shared_ptr<AppExecFwk::AbilityLocalRecord> &record,

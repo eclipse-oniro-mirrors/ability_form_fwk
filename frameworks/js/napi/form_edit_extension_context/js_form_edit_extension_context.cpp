@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -95,7 +95,7 @@ napi_value JsFormEditExtensionContext::OnStartSecondPage(napi_env env, NapiCallb
             return;
         }
 
-        ErrCode errCode = context->OnStartSceneBoard(want);
+        ErrCode errCode = context->StartAbilityByFms(want);
         napi_value abilityResult = AppExecFwk::WrapAbilityResult(env, static_cast<int>(errCode), want);
         if (abilityResult == nullptr) {
             TAG_LOGE(AAFwkTag::UI_EXT, "Wrap abilityResult failed");

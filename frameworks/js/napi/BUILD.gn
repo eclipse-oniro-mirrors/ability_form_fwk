@@ -666,7 +666,6 @@ ohos_shared_library("form_edit_extension") {
     "ability_runtime:ui_extension",
     "c_utils:utils",
     "eventhandler:libeventhandler",
-    "ffrt:libffrt",
     "hilog:libhilog",
     "hitrace:hitrace_meter",
     "ipc:ipc_napi",

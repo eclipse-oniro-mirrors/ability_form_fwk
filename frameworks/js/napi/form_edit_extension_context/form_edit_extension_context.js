@@ -14,9 +14,6 @@
  */
 
 let UIExtensionContext = requireNapi('application.UIExtensionContext');
-let hilog = requireNapi('hilog');
-let domainID = 0xD001320;
-let TAG = 'JSENV';
 
 export class FormEditExtensionContext extends UIExtensionContext {
     constructor(obj) {
@@ -24,7 +21,7 @@ export class FormEditExtensionContext extends UIExtensionContext {
     }
 
     startSecondPage(want, asyncCallback) {
-      hilog.sLogI(domainID, TAG, 'startSecondPage want: ' + want);
+      console.log('FormEditExtensionContext startSecondPage want: ' + want);
       return this.__context_impl__.startSecondPage(want, asyncCallback);
     }
 }
