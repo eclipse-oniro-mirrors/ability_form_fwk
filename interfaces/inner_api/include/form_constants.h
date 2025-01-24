@@ -67,6 +67,16 @@ namespace Constants {
     constexpr const char* LOCAL_CODE_PATH = "/data/storage/el1/bundle";
     constexpr const char* LOCAL_BUNDLES = "/data/bundles";
     constexpr const char* FORM_PUBLISH_ACTION = "action.form.publish";
+    constexpr const char* FORM_PAGE_ACTION = "action.form.page";
+    constexpr const char* OPEN_FORM_MANAGE_VIEW  = "openFormManageView";
+    constexpr const char* OPEN_FORM_MANAGE_VIEW_ACTION  = "action.form.openFormManageView";
+    constexpr int32_t PAGE_ROUTER_SERVICE_CODE_FORM_MANAGE = 1;
+    constexpr int32_t PAGE_ROUTER_SERVICE_CODE_CONTROL_CENTER = 2;
+    constexpr int32_t PAGE_ROUTER_SERVICE_CODE_FORM_EDIT = 3;
+    constexpr const char* PARMA_REQUEST_METHOD = "requestMehod";
+    constexpr const char* PARMA_OPEN_FORM_EDIT_SEC_PAGE_VIEW = "openFormEditSecPageView";
+    constexpr const char* PARAM_PAGE_ROUTER_SERVICE_CODE = "pageRouterServiceCode";
+    constexpr const char* PARAM_SEC_PAGE_ABILITY_NAME = "secPageAbilityName";
     constexpr const char* PARAM_DEVICE_ID_KEY = "ohos.extra.param.key.device_id";
     constexpr const char* PARAM_FORM_HOST_TOKEN = "ohos.extra.param.form.host.token";
     constexpr const char* PARAM_PUBLISH_FORM_HOST_BUNDLE_KEY = "ohos.extra.param.key.form_host_bundle_name";
