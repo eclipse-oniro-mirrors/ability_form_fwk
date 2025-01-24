@@ -89,6 +89,15 @@ bool FormStatusMgr::isProcessableFormStatus(const int64_t formId)
     }
 }
 
+void FormStatusMgr::ResetFormStatus(const int64_t &formId)
+{
+    if (isProcessableFormStatus(formId)) {
+        return;
+    }
+    HILOG_INFO("Reset formId:%{public}" PRId64 " status.", formId);
+    SetFormStatus(formId, FormStatus::RECOVERED);
+}
+
 void FormStatusMgr::OnRenderFormDone(const int64_t &formId)
 {
     SetFormStatus(formId, FormStatus::RECOVERED);

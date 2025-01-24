@@ -912,6 +912,7 @@ void FormTaskMgr::RenderForm(const FormRecord &formRecord, const Want &want, con
     if (error != ERR_OK) {
         RemoveConnection(connectId);
         HILOG_ERROR("fail add form renderer");
+        FormStatusMgr::GetInstance().ResetFormStatus(formRecord.formId);
         return;
     }
 
@@ -1347,6 +1348,7 @@ void FormTaskMgr::RecoverForm(const FormRecord &record, const Want &want, const 
     if (error != ERR_OK) {
         RemoveConnection(connectId);
         HILOG_ERROR("fail recover form");
+        FormStatusMgr::GetInstance().ResetFormStatus(record.formId);
         return;
     }
 

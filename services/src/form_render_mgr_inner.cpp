@@ -35,6 +35,7 @@
 #include "os_account_manager.h"
 #include "want.h"
 #include "form_info_rdb_storage_mgr.h"
+#include "form_status_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -469,6 +470,7 @@ void FormRenderMgrInner::RerenderAllForms()
                 continue;
             }
             item.second->SetStateDisconnected();
+            FormStatusMgr::GetInstance().ResetFormStatus(item.first);
         }
     }
 
