@@ -42,7 +42,7 @@ HWTEST_F(FormModuleCheckerTest, Test001, testing::ext::TestSize.Level1)
 {
     std::unique_ptr<ApiAllowListChecker> apiAllowListFilter = nullptr;
     std::shared_ptr<FormModuleChecker> formChecker = std::make_shared<FormModuleChecker>();
-    bool ret = formChecker->CheckModuleLoadable("effectKit", apiAllowListFilter);
+    bool ret = formChecker->CheckModuleLoadable("effectKit", apiAllowListFilter, false);
     ASSERT_TRUE(ret);
     ASSERT_TRUE((*apiAllowListFilter)("effectKit.a"));
     ASSERT_TRUE((*apiAllowListFilter)("effectKit.b"));
@@ -54,7 +54,7 @@ HWTEST_F(FormModuleCheckerTest, Test002, testing::ext::TestSize.Level1)
 {
     std::unique_ptr<ApiAllowListChecker> apiAllowListFilter = nullptr;
     std::shared_ptr<FormModuleChecker> formChecker = std::make_shared<FormModuleChecker>();
-    bool ret = formChecker->CheckModuleLoadable("multimedia.image", apiAllowListFilter);
+    bool ret = formChecker->CheckModuleLoadable("multimedia.image", apiAllowListFilter, false);
     ASSERT_TRUE(ret);
     ASSERT_TRUE((*apiAllowListFilter)("multimedia.image"));
     ASSERT_TRUE((*apiAllowListFilter)("multimedia.image.PixelMapFormat.a"));
@@ -82,7 +82,7 @@ HWTEST_F(FormModuleCheckerTest, Test003, testing::ext::TestSize.Level1)
     std::unique_ptr<ApiAllowListChecker> apiAllowListFilter = nullptr;
     std::shared_ptr<FormModuleChecker> formChecker = std::make_shared<FormModuleChecker>();
     ASSERT_TRUE(formChecker != nullptr);
-    bool ret = formChecker->CheckModuleLoadable("i18n", apiAllowListFilter);
+    bool ret = formChecker->CheckModuleLoadable("i18n", apiAllowListFilter, false);
     EXPECT_TRUE(ret);
     EXPECT_TRUE((*apiAllowListFilter)("i18n"));
     EXPECT_TRUE((*apiAllowListFilter)("i18n.System"));
@@ -103,7 +103,7 @@ HWTEST_F(FormModuleCheckerTest, Test004, testing::ext::TestSize.Level1)
     std::unique_ptr<ApiAllowListChecker> apiAllowListFilter = nullptr;
     std::shared_ptr<FormModuleChecker> formChecker = std::make_shared<FormModuleChecker>();
     ASSERT_TRUE(formChecker != nullptr);
-    bool ret = formChecker->CheckModuleLoadable("intl", apiAllowListFilter);
+    bool ret = formChecker->CheckModuleLoadable("intl", apiAllowListFilter, false);
     EXPECT_TRUE(ret);
     EXPECT_TRUE((*apiAllowListFilter)("intl"));
     EXPECT_TRUE((*apiAllowListFilter)("intl.Locale"));
@@ -125,7 +125,7 @@ HWTEST_F(FormModuleCheckerTest, Test005, testing::ext::TestSize.Level1)
     std::unique_ptr<ApiAllowListChecker> apiAllowListFilter = nullptr;
     std::shared_ptr<FormModuleChecker> formChecker = std::make_shared<FormModuleChecker>();
     ASSERT_TRUE(formChecker != nullptr);
-    bool ret = formChecker->CheckModuleLoadable("font", apiAllowListFilter);
+    bool ret = formChecker->CheckModuleLoadable("font", apiAllowListFilter, false);
     EXPECT_TRUE(ret);
     EXPECT_TRUE((*apiAllowListFilter)("font"));
     EXPECT_TRUE((*apiAllowListFilter)("font.registerFont"));
