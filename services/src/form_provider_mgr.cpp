@@ -36,6 +36,9 @@
 #endif
 namespace OHOS {
 namespace AppExecFwk {
+namespace {
+const std::string HICAR_FORM = "phone_hicar";
+}
 FormProviderMgr::FormProviderMgr() {}
 FormProviderMgr::~FormProviderMgr() {}
 /**
@@ -163,7 +166,8 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
     newWant.RemoveParam(Constants::FORM_ENABLE_UPDATE_REFRESH_KEY);
     bool screenOnFlag = PowerMgr::PowerMgrClient::GetInstance().IsScreenOn();
     bool collaborationScreenOnFlag = PowerMgr::PowerMgrClient::GetInstance().IsCollaborationScreenOn();
-    if (!screenOnFlag && !collaborationScreenOnFlag && !isFormProviderUpdate) {
+    bool isHicar = (record.moduleName == HICAR_FORM);
+    if (!screenOnFlag && !collaborationScreenOnFlag && !isFormProviderUpdate && !isHicar) {
         FormDataMgr::GetInstance().SetNeedRefresh(formId, true);
         HILOG_DEBUG("screen off, set refresh flag, do not refresh now");
         return ERR_OK;
@@ -475,7 +479,8 @@ int FormProviderMgr::MessageEvent(const int64_t formId, const FormRecord &record
 #ifdef SUPPORT_POWER
     bool screenOnFlag = PowerMgr::PowerMgrClient::GetInstance().IsScreenOn();
     bool collaborationScreenOnFlag = PowerMgr::PowerMgrClient::GetInstance().IsCollaborationScreenOn();
-    if (!screenOnFlag && !collaborationScreenOnFlag) {
+    bool isHicar = (record.moduleName == HICAR_FORM);
+    if (!screenOnFlag && !collaborationScreenOnFlag && !isHicar) {
         HILOG_WARN("screen off now");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
