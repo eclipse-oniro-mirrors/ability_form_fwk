@@ -83,8 +83,12 @@ bool FormModuleChecker::CheckApiWithSuffix(const std::string& apiPath, const std
 }
 
 bool FormModuleChecker::CheckModuleLoadable(const char *moduleName,
-    std::unique_ptr<ApiAllowListChecker> &apiAllowListChecker)
+    std::unique_ptr<ApiAllowListChecker> &apiAllowListChecker, bool isAppModule)
 {
+    if (isAppModule) {
+        HILOG_INFO("module is not system, moduleName= %{public}s", moduleName);
+        return false;
+    }
     if (std::string(moduleName) == "mediaquery") {
         HILOG_INFO("load mediaquery");
         return true;

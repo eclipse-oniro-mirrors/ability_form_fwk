@@ -33,7 +33,7 @@ public:
      * @return return true if the module can be loaded, false can not be loaded
      */
     bool CheckModuleLoadable(const char* moduleName,
-        std::unique_ptr<ApiAllowListChecker>& apiAllowListChecker) override;
+        std::unique_ptr<ApiAllowListChecker>& apiAllowListChecker, bool isAppModule) override;
 private:
     static bool CheckApiAllowList(const std::string& apiPath);
     static bool IsModuelAllowToLoad(const std::string& moduleName);
