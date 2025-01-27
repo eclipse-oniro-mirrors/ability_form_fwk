@@ -30,6 +30,7 @@ namespace AppExecFwk {
  */
 struct FormJsInfo : public Parcelable {
     static constexpr int IMAGE_DATA_THRESHOLD = 128;
+    static constexpr int BIG_DATA = 32 * 1024;
     int64_t formId;
     std::string formName;
     std::string bundleName;
@@ -50,10 +51,14 @@ struct FormJsInfo : public Parcelable {
     FormType uiSyntax = FormType::JS;
     bool isDynamic = true;
     bool transparencyEnabled = false;
+    bool isSystemApp = false;
 
     bool ReadFromParcel(Parcel &parcel);
     virtual bool Marshalling(Parcel &parcel) const override;
     static FormJsInfo *Unmarshalling(Parcel &parcel);
+    bool GetCurrentUserId(int &userId) const;
+    bool CheckIsSystemApp(const std::string& bundleName) const;
+    bool WriteFormData(Parcel &parcel) const;
     bool WriteObjects(Parcel &parcel) const;
     bool WriteImageData(Parcel &parcel) const;
     void ReadImageData(Parcel &parcel);

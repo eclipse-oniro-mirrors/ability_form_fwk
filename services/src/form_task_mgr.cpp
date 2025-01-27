@@ -803,6 +803,7 @@ FormJsInfo FormTaskMgr::CreateFormJsInfo(const int64_t formId, const FormRecord 
     form.uiSyntax = record.uiSyntax;
     form.isDynamic = record.isDynamic;
     form.transparencyEnabled = record.transparencyEnabled;
+    form.isSystemApp = record.isSystemApp;
     form.modulePkgNameMap = record.modulePkgNameMap;
     HILOG_DEBUG("jsPath: %{private}s, data: %{private}s",
         form.jsFormCodePath.c_str(), form.formData.c_str());
