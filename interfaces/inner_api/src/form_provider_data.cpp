@@ -26,12 +26,20 @@
 #include "message_parcel.h"
 #include "string_ex.h"
 
+#include <sys/mman.h>
+#include "ashmem.h"
+#include "buffer_handle_parcel.h"
+#include "ipc_file_descriptor.h"
+
 namespace OHOS {
 namespace AppExecFwk {
 const std::string JSON_EMPTY_STRING = "{}";
 const std::string JSON_IMAGES_STRING = "formImages";
 constexpr int32_t READ_PARCEL_MAX_IMAGE_DATA_NUM_SIZE = 1000;
 constexpr int32_t MAX_IMAGE_BYTE_SIZE = 50 * 1024 * 1024;
+constexpr int32_t MAX_BUFFER_SIZE = 600 * 1024 * 1024;
+constexpr int32_t BIG_DATA = 32 * 1024;
+constexpr int32_t SHARE_MEM_ALLOC = 2;
 /**
  * @brief Constructor.
  */
@@ -285,7 +293,15 @@ void FormProviderData::SetImageDataMap(std::map<std::string, std::pair<sptr<Form
  */
 bool FormProviderData::ReadFromParcel(Parcel &parcel)
 {
-    auto jsonDataString = Str16ToStr8(parcel.ReadString16());
+    int32_t formDataLength = parcel.ReadInt32();
+    HILOG_DEBUG("ReadFromParcel data length is %{public}d ", formDataLength);
+    std::string jsonDataString;
+    if (formDataLength > BIG_DATA) {
+        const void *rawData = ReadAshmemDataFromParcel(parcel, formDataLength);
+        jsonDataString = static_cast<const char*>(rawData);
+    } else {
+        jsonDataString = Str16ToStr8(parcel.ReadString16());
+    }
     nlohmann::json jsonObject = nlohmann::json::parse(jsonDataString, nullptr, false);
     if (jsonObject.is_discarded()) {
         HILOG_ERROR("fail parse jsonDataString: %{private}s.", jsonDataString.c_str());
@@ -325,6 +341,149 @@ bool FormProviderData::ReadFromParcel(Parcel &parcel)
     return true;
 }
 
+int FormProviderData::ReadFileDescriptor(Parcel &parcel)
+{
+    sptr<IPCFileDescriptor> descriptor = parcel.ReadObject<IPCFileDescriptor>();
+    if (descriptor == nullptr) {
+        HILOG_INFO("ReadFileDescriptor get descriptor failed");
+        return -1;
+    }
+    int fd = descriptor->GetFd();
+    if (fd < 0) {
+        HILOG_INFO("ReadFileDescriptor get fd failed, fd:[%{public}d].", fd);
+        return -1;
+    }
+    return dup(fd);
+}
+
+void FormProviderData::ReleaseMemory(int32_t allocType, void *addr, void *context, uint32_t size)
+{
+    if (allocType == SHARE_MEM_ALLOC) {
+        if (context != nullptr) {
+            int *fd = static_cast<int *>(context);
+            if (addr != nullptr) {
+                ::munmap(addr, size);
+            }
+            if (fd != nullptr) {
+                ::close(*fd);
+            }
+            context = nullptr;
+            addr = nullptr;
+        }
+    }
+}
+
+char *FormProviderData::ReadAshmemDataFromParcel(Parcel &parcel, int32_t bufferSize)
+{
+    char *base = nullptr;
+    int fd = ReadFileDescriptor(parcel);
+    if (!CheckAshmemSize(fd, bufferSize)) {
+        HILOG_INFO("ReadAshmemDataFromParcel check ashmem size failed, fd:[%{public}d].", fd);
+        return nullptr;
+    }
+    if (bufferSize <= 0 || bufferSize > MAX_BUFFER_SIZE) {
+        HILOG_INFO("malloc parameter bufferSize:[%{public}d] error.", bufferSize);
+        return nullptr;
+    }
+
+    void *ptr = ::mmap(nullptr, bufferSize, PROT_READ, MAP_SHARED, fd, 0);
+    if (ptr == MAP_FAILED) {
+        // do not close fd here. fd will be closed in FileDescriptor, ::close(fd)
+        HILOG_INFO("ReadImageData map failed, errno:%{public}d", errno);
+        return nullptr;
+    }
+
+    base = static_cast<char *>(malloc(bufferSize));
+    if (base == nullptr) {
+        ::munmap(ptr, bufferSize);
+        HILOG_INFO("alloc output pixel memory size:[%{public}d] error.", bufferSize);
+        return nullptr;
+    }
+    if (memcpy_s(base, bufferSize, ptr, bufferSize) != 0) {
+        ::munmap(ptr, bufferSize);
+        free(base);
+        base = nullptr;
+        HILOG_INFO("memcpy pixel data size:[%{public}d] error.", bufferSize);
+        return nullptr;
+    }
+
+    ReleaseMemory(SHARE_MEM_ALLOC, ptr, &fd, bufferSize);
+    return base;
+}
+
+bool FormProviderData::WriteFileDescriptor(Parcel &parcel, int fd) const
+{
+    if (fd < 0) {
+        HILOG_INFO("WriteFileDescriptor get fd failed, fd:[%{public}d].", fd);
+        return false;
+    }
+    int dupFd = dup(fd);
+    if (dupFd < 0) {
+        HILOG_INFO("WriteFileDescriptor dup fd failed, dupFd:[%{public}d].", dupFd);
+        return false;
+    }
+    sptr<IPCFileDescriptor> descriptor = new IPCFileDescriptor(dupFd);
+    return parcel.WriteObject<IPCFileDescriptor>(descriptor);
+}
+
+bool FormProviderData::WriteAshmemDataToParcel(Parcel &parcel, size_t size, const char* dataPtr) const
+{
+    const char *data = dataPtr;
+    std::string name = "formAshmemData";
+    int fd = AshmemCreate(name.c_str(), size);
+    HILOG_INFO("AshmemCreate:[%{public}d].", fd);
+    if (fd < 0) {
+        return false;
+    }
+
+    int result = AshmemSetProt(fd, PROT_READ | PROT_WRITE);
+    HILOG_INFO("AshmemSetProt:[%{public}d].", result);
+    if (result < 0) {
+        ::close(fd);
+        return false;
+    }
+    void *ptr = ::mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+    if (ptr == MAP_FAILED) {
+        ::close(fd);
+        HILOG_INFO("WriteAshmemData map failed, errno:%{public}d", errno);
+        return false;
+    }
+    HILOG_INFO("mmap success");
+
+    if (memcpy_s(ptr, size, data, size) != EOK) {
+        ::munmap(ptr, size);
+        ::close(fd);
+        HILOG_INFO("WriteAshmemData memcpy_s error");
+        return false;
+    }
+
+    if (!FormProviderData::WriteFileDescriptor(parcel, fd)) {
+        ::munmap(ptr, size);
+        ::close(fd);
+        HILOG_INFO("WriteAshmemData WriteFileDescriptor error");
+        return false;
+    }
+    HILOG_INFO("WriteAshmemData WriteFileDescriptor success");
+    ::munmap(ptr, size);
+    ::close(fd);
+    return true;
+}
+
+bool FormProviderData::WriteFormData(Parcel &parcel) const
+{
+    std::string formData = jsonFormProviderData_.empty() ?
+        JSON_EMPTY_STRING : jsonFormProviderData_.dump();
+    int32_t formDataLength = formData.length();
+    parcel.WriteInt32(formDataLength);
+    if (formDataLength > BIG_DATA) {
+        const char* dataPtr = formData.c_str();
+        HILOG_INFO("FormProviderData::WriteFormData data length is %{public}d", formDataLength);
+        return WriteAshmemDataToParcel(parcel, formDataLength, dataPtr);
+    } else {
+        return parcel.WriteString16(Str8ToStr16(formData));
+    }
+}
+
 /**
  * @brief Marshals this {@code FormProviderData} object into a {@link ohos.utils.Parcel} object.
  * @param parcel Indicates the {@code Parcel} object for marshalling.
@@ -333,8 +492,7 @@ bool FormProviderData::ReadFromParcel(Parcel &parcel)
 bool FormProviderData::Marshalling(Parcel &parcel) const
 {
     HILOG_DEBUG("jsonFormProviderData_ is private");
-    if (!parcel.WriteString16(Str8ToStr16(jsonFormProviderData_.empty() ?
-        JSON_EMPTY_STRING : jsonFormProviderData_.dump()))) {
+    if (!WriteFormData(parcel)) {
         return false;
     }
 
