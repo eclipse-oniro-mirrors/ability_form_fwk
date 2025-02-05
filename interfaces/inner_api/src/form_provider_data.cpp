@@ -317,21 +317,8 @@ bool FormProviderData::ReadFromParcel(Parcel &parcel)
     HILOG_DEBUG("imageDateState is %{public}d", imageDataState_);
     switch (imageDataState_) {
         case IMAGE_DATA_STATE_ADDED: {
-            int32_t imageDataNum = parcel.ReadInt32();
-            if (imageDataNum > READ_PARCEL_MAX_IMAGE_DATA_NUM_SIZE) {
+            if (!HandleImageDataStateAdded(parcel)) {
                 return false;
-            }
-            HILOG_INFO("imageDataNum is %{public}d", imageDataNum);
-            for (int32_t i = 0; i < imageDataNum; i++) {
-                sptr<FormAshmem> formAshmem = parcel.ReadParcelable<FormAshmem>();
-                if (formAshmem == nullptr) {
-                    HILOG_ERROR("null ashmem");
-                    return false;
-                }
-                int32_t len = parcel.ReadInt32();
-                std::pair<sptr<FormAshmem>, int32_t> imageDataRecord = std::make_pair(formAshmem, len);
-                auto picName = Str16ToStr8(parcel.ReadString16());
-                imageDataMap_[picName] = imageDataRecord;
             }
             break;
         }
@@ -413,6 +400,27 @@ char *FormProviderData::ReadAshmemDataFromParcel(Parcel &parcel, int32_t bufferS
 
     ReleaseMemory(SHARE_MEM_ALLOC, ptr, &fd, bufferSize);
     return base;
+}
+
+bool FormProviderData::HandleImageDataStateAdded(Parcel &parcel)
+{
+    int32_t imageDataNum = parcel.ReadInt32();
+    if (imageDataNum > READ_PARCEL_MAX_IMAGE_DATA_NUM_SIZE) {
+        return false;
+    }
+    HILOG_INFO("imageDataNum is %{public}d", imageDataNum);
+    for (int32_t i = 0; i < imageDataNum; i++) {
+        sptr formAshmem = parcel.ReadParcelable();
+        if (formAshmem == nullptr) {
+            HILOG_ERROR("null ashmem");
+            return false;
+        }
+        int32_t len = parcel.ReadInt32();
+        std::pair<sptr, int32_t> imageDataRecord = std::make_pair(formAshmem, len);
+        auto picName = Str16ToStr8(parcel.ReadString16());
+        imageDataMap_[picName] = imageDataRecord;
+    }
+    return true;
 }
 
 bool FormProviderData::WriteFileDescriptor(Parcel &parcel, int fd) const

@@ -213,6 +213,8 @@ private:
      * @param data Indicates the binary data of the image content.
      */
     void AddImageData(const std::string &picName, const std::shared_ptr<char> &data, int32_t size);
+    
+    bool HandleImageDataStateAdded(Parcel &parcel);
 private:
     struct DeleteBytes {
         void operator()(char* bytes) const
