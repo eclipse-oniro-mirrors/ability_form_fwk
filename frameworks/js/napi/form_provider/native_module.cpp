@@ -31,6 +31,8 @@ static napi_value JsProviderInit(napi_env env, napi_value exports)
 
     const char *moduleName = "JsFormProvider";
     BindNativeFunction(env, exports, "getFormsInfo", moduleName, JsFormProvider::GetFormsInfo);
+    BindNativeFunction(env, exports, "getPublishedFormsInfo", moduleName, JsFormProvider::GetPublishedFormsInfo);
+    BindNativeFunction(env, exports, "getPublishedFormInfoById", moduleName, JsFormProvider::GetPublishedFormInfoById);
     BindNativeFunction(env, exports, "setFormNextRefreshTime", moduleName, JsFormProvider::SetFormNextRefreshTime);
     BindNativeFunction(env, exports, "updateForm", moduleName, JsFormProvider::UpdateForm);
     BindNativeFunction(env, exports, "requestPublishForm", moduleName, JsFormProvider::RequestPublishForm);

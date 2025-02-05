@@ -45,6 +45,7 @@
 #include "form_trust_mgr.h"
 #include "form_util.h"
 #include "form_xml_parser.h"
+#include "running_form_info.h"
 #include "in_process_call_wrapper.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
@@ -1182,6 +1183,32 @@ int32_t FormMgrService::GetFormsInfo(const FormInfoFilter &filter, std::vector<F
     }
     HILOG_INFO("flows to GetFormsInfoByModule");
     return FormMgrAdapter::GetInstance().GetFormsInfoByModule(callerBundleName, moduleName, formInfos);
+}
+
+int32_t FormMgrService::GetPublishedFormInfoById(const int64_t formId, RunningFormInfo &formInfo)
+{
+    HILOG_DEBUG("call");
+    std::string callerBundleName;
+    ErrCode ret = FormBmsHelper::GetInstance().GetCallerBundleName(callerBundleName);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("get host bundle name failed");
+        return ret;
+    }
+    HILOG_INFO("flows to GetPublishedFormInfoById");
+    return FormDataMgr::GetInstance().GetPublishedFormInfoById(callerBundleName, formInfo, formId);
+}
+
+int32_t FormMgrService::GetPublishedFormsInfo(std::vector<RunningFormInfo> &formInfos)
+{
+    HILOG_DEBUG("call");
+    std::string callerBundleName;
+    ErrCode ret = FormBmsHelper::GetInstance().GetCallerBundleName(callerBundleName);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("get host bundle name failed");
+        return ret;
+    }
+    HILOG_INFO("flows to GetPublishedFormsInfo");
+    return FormDataMgr::GetInstance().GetPublishedFormsInfo(callerBundleName, formInfos);
 }
 
 int32_t FormMgrService::AcquireFormData(int64_t formId, int64_t requestCode, const sptr<IRemoteObject> &callerToken,

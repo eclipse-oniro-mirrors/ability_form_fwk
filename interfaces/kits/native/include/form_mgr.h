@@ -33,6 +33,7 @@
 #include "form_provider_data.h"
 #include "form_provider_data_proxy.h"
 #include "form_state_info.h"
+#include "running_form_info.h"
 #include "iremote_object.h"
 #include "want.h"
 
@@ -411,6 +412,23 @@ public:
     * @return Returns ERR_OK on success, others on failure.
     */
     int32_t GetFormsInfo(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos);
+
+    /**
+    * @brief This function is called by formProvider and gets form info by the formId of the calling ability.
+    *        The formId will be retrieved by form service manager.
+    * @param formId The formId of the calling ability
+    * @param formInfo Return the form' information of the calling formId
+    * @return Returns ERR_OK on success, others on failure.
+    */
+    int32_t GetPublishedFormInfoById(const int64_t formId, RunningFormInfo &formInfo);
+
+    /**
+    * @brief This function is called by formProvider and gets forms info by the bundle name of the calling ability.
+    *        The bundle name will be retrieved by form service manager.
+    * @param formInfos Return the forms' information of the calling bundle name
+    * @return Returns ERR_OK on success, others on failure.
+    */
+    int32_t GetPublishedFormsInfo(std::vector<RunningFormInfo> &formInfos);
 
     /**
      * @brief Get all running form infos.

@@ -18,6 +18,7 @@
 #include "appexecfwk_errors.h"
 #include "fms_log_wrapper.h"
 #include "form_mgr_errors.h"
+#include "running_form_info.h"
 #include "string_ex.h"
 
 namespace OHOS {
@@ -894,6 +895,40 @@ int FormMgrProxy::GetFormsInfo(IFormMgr::Message code, MessageParcel &data, std:
     return GetParcelableInfos<FormInfo>(reply, formInfos);
 }
 
+int FormMgrProxy::GetPublishedFormInfoById(IFormMgr::Message code, MessageParcel &data, RunningFormInfo &formInfo)
+{
+    HILOG_DEBUG("GetPublishedFormInfoById start");
+
+    auto error = GetParcelableInfo<RunningFormInfo>(IFormMgr::Message::FORM_MGR_GET_PUBLISHED_FORM_INFO_BY_ID,
+        data, formInfo);
+    if (error != ERR_OK) {
+        HILOG_ERROR("get parcelable info failed");
+    }
+
+    return error;
+}
+
+int FormMgrProxy::GetPublishedFormsInfo(IFormMgr::Message code, MessageParcel &data,
+                                        std::vector<RunningFormInfo> &formInfos)
+{
+    HILOG_DEBUG("GetPublishedFormsInfo start");
+    int error;
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+    error = SendTransactCmd(code, data, reply, option);
+    if (error != ERR_OK) {
+        return error;
+    }
+
+    error = reply.ReadInt32();
+    if (error != ERR_OK) {
+        HILOG_ERROR("read reply result fail");
+        return error;
+    }
+
+    return GetParcelableInfos<RunningFormInfo>(reply, formInfos);
+}
+
 ErrCode FormMgrProxy::GetRunningFormInfos(IFormMgr::Message code, MessageParcel &data,
     std::vector<RunningFormInfo> &runningFormInfos)
 {
@@ -1367,6 +1402,46 @@ int32_t FormMgrProxy::GetFormsInfo(const FormInfoFilter &filter, std::vector<For
     // formInfos should have been fulfilled at this point.
     if (error != ERR_OK) {
         HILOG_ERROR("fail GetAllFormsInfo:%{public}d", error);
+    }
+
+    return error;
+}
+
+int32_t FormMgrProxy::GetPublishedFormInfoById(const int64_t formId, RunningFormInfo &formInfo)
+{
+    HILOG_INFO("start");
+    MessageParcel data;
+    // write in token to help identify which stub to be called.
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt64(formId)) {
+        HILOG_ERROR("write to formId error");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int error = GetPublishedFormInfoById(IFormMgr::Message::FORM_MGR_GET_PUBLISHED_FORM_INFO_BY_ID, data, formInfo);
+    // formInfos should have been fulfilled at this point.
+    if (error != ERR_OK) {
+        HILOG_ERROR("fail GetPublishedFormInfoById:%{public}d", error);
+    }
+
+    return error;
+}
+
+int32_t FormMgrProxy::GetPublishedFormsInfo(std::vector<RunningFormInfo> &formInfos)
+{
+    HILOG_INFO("start");
+    MessageParcel data;
+    // write in token to help identify which stub to be called.
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    int error = GetPublishedFormsInfo(IFormMgr::Message::FORM_MGR_GET_PUBLISHED_FORMS_INFO, data, formInfos);
+    // formInfos should have been fulfilled at this point.
+    if (error != ERR_OK) {
+        HILOG_ERROR("fail GetPublishedFormsInfo:%{public}d", error);
     }
 
     return error;

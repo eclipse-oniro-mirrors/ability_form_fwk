@@ -20,6 +20,7 @@
 #include "form_caller_mgr.h"
 #include "form_errors.h"
 #include "form_mgr_errors.h"
+#include "running_form_info.h"
 #include "if_system_ability_manager.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
@@ -1216,6 +1217,36 @@ int32_t FormMgr::GetFormsInfo(const FormInfoFilter &filter, std::vector<FormInfo
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return remoteProxy_->GetFormsInfo(filter, formInfos);
+}
+
+int32_t FormMgr::GetPublishedFormInfoById(const int64_t formId, RunningFormInfo &formInfo)
+{
+    HILOG_DEBUG("call");
+    int errCode = Connect();
+    if (errCode != ERR_OK) {
+        return errCode;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    return remoteProxy_->GetPublishedFormInfoById(formId, formInfo);
+}
+
+int32_t FormMgr::GetPublishedFormsInfo(std::vector<RunningFormInfo> &formInfos)
+{
+    HILOG_DEBUG("call");
+    int errCode = Connect();
+    if (errCode != ERR_OK) {
+        return errCode;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    return remoteProxy_->GetPublishedFormsInfo(formInfos);
 }
 
 bool FormMgr::IsRequestPublishFormSupported()

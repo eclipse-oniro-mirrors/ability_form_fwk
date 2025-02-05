@@ -66,6 +66,13 @@ public:
     void Init();
 
     /**
+     * @brief Query the request host.
+     * @param want The want of the form to publish.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode QueryPublishFormToHost(Want &want);
+
+    /**
      * @brief Add form with want, send want to form manager service.
      * @param formId The Id of the forms to add.
      * @param want The want of the form to add.
@@ -930,13 +937,6 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode CheckPublishForm(Want &want, bool needCheckFormPermission = true);
-
-    /**
-     * @brief Query the request host.
-     * @param want The want of the form to publish.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    ErrCode QueryPublishFormToHost(Want &want);
 
     /**
      * @brief Post request publish form to host.

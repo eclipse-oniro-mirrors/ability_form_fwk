@@ -26,6 +26,7 @@
 #include "form_provider_data.h"
 #include "form_serial_queue.h"
 #include "form_sys_event_receiver.h"
+#include "running_form_info.h"
 #include "iremote_object.h"
 #include "mem_status_listener.h"
 namespace OHOS {
@@ -362,6 +363,24 @@ public:
     * @return Returns ERR_OK on success, others on failure.
     */
     int32_t GetFormsInfo(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos) override;
+
+    /**
+    * @brief This function is called by formProvider and gets forms info by the formId of the calling ability.
+    *        The formId will be retrieved here.
+    * @param formId Filter that contains attributes that the formInfos have to have.
+    * @param formInfo Return the forms' information of the calling formId
+    * @return Returns ERR_OK on success, others on failure.
+    */
+    int32_t GetPublishedFormInfoById(const int64_t formId, RunningFormInfo &formInfo) override;
+
+    /**
+    * @brief This function is called by formProvider and gets forms info by the bundle name of the calling ability.
+    *        The bundle name will be retrieved here.
+    * @param filter Filter that contains attributes that the formInfos have to have.
+    * @param formInfos Return the forms' information of the calling bundle name
+    * @return Returns ERR_OK on success, others on failure.
+    */
+    int32_t GetPublishedFormsInfo(std::vector<RunningFormInfo> &formInfos) override;
 
     /**
      * @brief Acquire form data by formId.
