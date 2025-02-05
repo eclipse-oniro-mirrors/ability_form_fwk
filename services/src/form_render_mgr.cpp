@@ -297,8 +297,6 @@ void FormRenderMgr::AddPostRenderFormTask(int64_t formId, std::function<void()> 
 
 void FormRenderMgr::ExecPostRenderFormTask(int64_t formId)
 {
-    HILOG_INFO("start");
-
     std::function<void()> task;
     bool findTask = false;
     {
@@ -312,17 +310,17 @@ void FormRenderMgr::ExecPostRenderFormTask(int64_t formId)
     }
     if (findTask) {
         task();
+        HILOG_INFO("exec task, formId:%{public}" PRId64, formId);
     }
 }
 
 void FormRenderMgr::DeletePostRenderFormTask(int64_t formId)
 {
-    HILOG_INFO("start");
-
     std::lock_guard<std::mutex> lock(renderFormTaskMapMutex_);
     auto search = renderFormTaskMap_.find(formId);
     if (search != renderFormTaskMap_.end()) {
         renderFormTaskMap_.erase(search);
+        HILOG_INFO("del task, formId:%{public}" PRId64, formId);
     }
 }
 
