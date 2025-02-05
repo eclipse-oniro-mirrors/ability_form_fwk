@@ -3872,7 +3872,9 @@ int32_t FormMgrAdapter::RecoverForms(const std::vector<int64_t> &formIds, const 
     FormRecord record;
     std::vector<int64_t> validFormIds;
     int callingUid = IPCSkeleton::GetCallingUid();
-    // 获取用户点击事件
+    bool needHandleCachedClick =
+        want.GetBoolParam(Constants::FORM_IS_RECOVER_FORM_TO_HANDLE_CLICK_EVENT, false);
+    HILOG_INFO("recover by click: %{public}d", needHandleCachedClick);
     for (int64_t formId : formIds) {
         if (formId <= 0) {
             HILOG_ERROR("form id is negative");
@@ -3891,7 +3893,8 @@ int32_t FormMgrAdapter::RecoverForms(const std::vector<int64_t> &formIds, const 
             FormDataMgr::GetInstance().UpdateFormRecord(matchedFormId, record);
             continue;
         }
-        if (record.recycleStatus != RecycleStatus::RECYCLED) {
+        // 非用户点击触发恢复时校验RECYCLED
+        if (record.recycleStatus != RecycleStatus::RECYCLED && !needHandleCachedClick) {
             HILOG_WARN("form %{public}" PRId64 " not RECYCLED", formId);
             continue;
         }
