@@ -410,13 +410,13 @@ bool FormProviderData::HandleImageDataStateAdded(Parcel &parcel)
     }
     HILOG_INFO("imageDataNum is %{public}d", imageDataNum);
     for (int32_t i = 0; i < imageDataNum; i++) {
-        sptr formAshmem = parcel.ReadParcelable();
+        sptr<FormAshmem> formAshmem = parcel.ReadParcelable<FormAshmem>();
         if (formAshmem == nullptr) {
             HILOG_ERROR("null ashmem");
             return false;
         }
         int32_t len = parcel.ReadInt32();
-        std::pair<sptr, int32_t> imageDataRecord = std::make_pair(formAshmem, len);
+        std::pair<sptr<FormAshmem>, int32_t> imageDataRecord = std::make_pair(formAshmem, len);
         auto picName = Str16ToStr8(parcel.ReadString16());
         imageDataMap_[picName] = imageDataRecord;
     }
