@@ -298,6 +298,10 @@ bool FormProviderData::ReadFromParcel(Parcel &parcel)
     std::string jsonDataString;
     if (formDataLength > BIG_DATA) {
         const void *rawData = ReadAshmemDataFromParcel(parcel, formDataLength);
+        if(rawData == nullptr) {
+            HILOG_INFO("rawData is nullptr");
+            return false;
+        }
         jsonDataString = static_cast<const char*>(rawData);
     } else {
         jsonDataString = Str16ToStr8(parcel.ReadString16());
