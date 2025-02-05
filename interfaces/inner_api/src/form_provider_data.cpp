@@ -298,7 +298,7 @@ bool FormProviderData::ReadFromParcel(Parcel &parcel)
     std::string jsonDataString;
     if (formDataLength > BIG_DATA) {
         const void *rawData = ReadAshmemDataFromParcel(parcel, formDataLength);
-        if(rawData == nullptr) {
+        if (rawData == nullptr) {
             HILOG_INFO("rawData is nullptr");
             return false;
         }

@@ -40,7 +40,7 @@ bool FormJsInfo::ReadFromParcel(Parcel &parcel)
     if (formDataLength > BIG_DATA) {
         HILOG_INFO("data length > 32k");
         const void *rawData = msgParcel->ReadRawData(formDataLength);
-        if(rawData == nullptr) {
+        if (rawData == nullptr) {
             HILOG_INFO("rawData is nullptr");
             return false;
         }
