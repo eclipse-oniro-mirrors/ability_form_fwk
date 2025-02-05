@@ -3872,6 +3872,7 @@ int32_t FormMgrAdapter::RecoverForms(const std::vector<int64_t> &formIds, const 
     FormRecord record;
     std::vector<int64_t> validFormIds;
     int callingUid = IPCSkeleton::GetCallingUid();
+    // 获取用户点击事件
     for (int64_t formId : formIds) {
         if (formId <= 0) {
             HILOG_ERROR("form id is negative");
