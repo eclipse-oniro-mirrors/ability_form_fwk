@@ -2125,11 +2125,6 @@ int FormMgrAdapter::SetNextRefreshTime(const int64_t formId, const int64_t nextT
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
 
-    if (formRecord.isDataProxy) {
-        HILOG_ERROR("data proxy form not support set next refresh time");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
-
     return SetNextRefreshTimeLocked(matchedFormId, nextTime, userId);
 }
 
