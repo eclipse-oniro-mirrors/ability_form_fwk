@@ -22,6 +22,7 @@
 
 #include "appexecfwk_errors.h"
 #include "bundle_info.h"
+#include "form_db_info.h"
 #include "form_info.h"
 #include "form_info_filter.h"
 #include "form_info_storage.h"
@@ -79,6 +80,12 @@ public:
 
 private:
     ErrCode UpdateFormInfoStorageLocked();
+
+    void HandleFormInfosMaxLimit(
+        std::vector<FormInfo> &inFormInfos, std::vector<FormInfo> &outFormInfos, std::vector<FormDBInfo> &formDBInfos);
+
+    void GetAllUsedFormName(
+        std::vector<FormDBInfo> &formDBInfos, std::vector<FormInfo> &formInfos, std::set<std::string> &formDBNames);
 
     std::string bundleName_ {};
     mutable std::shared_timed_mutex formInfosMutex_ {};

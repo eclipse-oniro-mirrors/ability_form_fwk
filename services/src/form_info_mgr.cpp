@@ -19,6 +19,7 @@
 #include "extension_form_profile.h"
 #include "fms_log_wrapper.h"
 #include "form_bms_helper.h"
+#include "form_db_cache.h"
 #include "form_info_storage.h"
 #include "form_info_rdb_storage_mgr.h"
 #include "form_mgr_errors.h"
@@ -227,16 +228,20 @@ ErrCode BundleFormInfo::UpdateStaticFormInfos(int32_t userId)
 
     std::unique_lock<std::shared_timed_mutex> guard(formInfosMutex_);
     if (!formInfos.empty()) {
+        std::vector<FormDBInfo> formDBInfos;
+        std::vector<FormInfo> finalFormInfos;
+        FormDbCache::GetInstance().GetAllFormDBInfoByBundleName(bundleName_, userId, formDBInfos);
+        HandleFormInfosMaxLimit(formInfos, finalFormInfos, formDBInfos);
         bool findUser = false;
         for (auto item = formInfoStorages_.begin(); item != formInfoStorages_.end(); ++item) {
             // Update all user's formInfos
             HILOG_DEBUG("Update formInfos, user:%{public}d", item->userId);
-            item->formInfos = formInfos;
+            item->formInfos = finalFormInfos;
             findUser = findUser || (item->userId == userId);
         }
         if (!findUser) {
             HILOG_DEBUG("Add new userId, user:%{public}d", userId);
-            formInfoStorages_.emplace_back(userId, formInfos);
+            formInfoStorages_.emplace_back(userId, finalFormInfos);
         }
     } else {
         HILOG_DEBUG("The new package of %{public}s does not contain a card, clear it", bundleName_.c_str());
@@ -415,6 +420,62 @@ ErrCode BundleFormInfo::UpdateFormInfoStorageLocked()
         errCode = FormInfoRdbStorageMgr::GetInstance().UpdateBundleFormInfos(bundleName_, formInfoStoragesStr);
     }
     return errCode;
+}
+
+void BundleFormInfo::HandleFormInfosMaxLimit(std::vector<FormInfo> &inFormInfos,
+    std::vector<FormInfo> &outFormInfos, std::vector<FormDBInfo> &formDBInfos)
+{
+    HILOG_INFO("formInfo num: %{public}lu,formDBInfo num: %{public}lu", inFormInfos.size(), formDBInfos.size());
+    std::set<std::string> formDBNames;
+    GetAllUsedFormName(formDBInfos, inFormInfos, formDBNames);
+    if (formDBInfos.empty() || inFormInfos.size() <= Constants::FORM_INFO_MAX_NUM) {
+        if (inFormInfos.size() > Constants::FORM_INFO_MAX_NUM) {
+            for (int index = 0; i < inFormInfos.size() - Constants::FORM_INFO_MAX_NUM; i++) {
+                inFormInfos.pop_back();
+            }
+        }
+        outFormInfos = inFormInfos;
+        return;
+    }
+    int addFormNum = 0;
+    int formNum = formDBInfos.size();
+    if (formDBInfos.size() < Constants::FORM_INFO_MAX_NUM) {
+        addFormNum = Constants::FORM_INFO_MAX_NUM - formDBInfos.size();
+        formNum = Constants::FORM_INFO_MAX_NUM;
+    }
+    for (auto formInfo : inFormInfos) {
+        bool isUsed = formDBNames.count(formInfo.name) > 0;
+        if (isUsed) {
+            outFormInfos.push_back(formInfo);
+        }
+        if (!isUsed && addFormNum > 0) {
+            outFormInfos.push_back(formInfo);
+            addFormNum--;
+        }
+        if (outFormInfos.size() == formNum) {
+            break;
+        }
+    }
+}
+
+void BundleFormInfo::GetAllUsedFormName(std::vector<FormDBInfo> &formDBInfos,
+    std::vector<FormInfo> &formInfos, std::set<std::string> &formDBNames)
+{
+    if (formDBInfos.empty() || formInfos.empty()) {
+        return;
+    }
+    for (auto formDBInfo : formDBInfos) {
+        if (formDBNames.count(formDBInfo.formName) > 0) {
+            continue;
+        }
+        for (auto formInfo : formInfos) {
+            if (formInfo.name == formDBInfo.formName) {
+                formDBInfos.insert(formDBInfo.formName);
+                break;
+            }
+        }
+    }
+    HILOG_INFO("used form num: %{public}lu", formDBNames.size());
 }
 
 FormInfoMgr::FormInfoMgr()
