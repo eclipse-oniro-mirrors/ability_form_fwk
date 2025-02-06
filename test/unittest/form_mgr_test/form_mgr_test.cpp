@@ -4583,4 +4583,51 @@ HWTEST_F(FormMgrTest, FormMgrTest_0244, TestSize.Level1)
     FormMgr::GetInstance().SetFormMgrService(mockProxy);
     GTEST_LOG_(INFO) << "FormMgrTest_0244 test ends";
 }
+
+/**
+ * @tc.name: FormMgrTest_0245
+ * @tc.desc: Verify IsFormBundleLocked
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0245, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_0245 begin";
+    std::string bundleName = "ohos.samples.FormApplication";
+    int64_t formId = 1;
+    bool result = FormMgr::GetInstance().IsFormBundleLocked(bundleName, formId);
+    EXPECT_EQ(result, false);
+    GTEST_LOG_(INFO) << "FormMgrTest_0245 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0246
+ * @tc.desc: Verify UpdateFormSize
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0246, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_0246 begin";
+    int64_t formId = 1;
+    float width = 100;
+    float height = 50;
+    float borderWidth = 10;
+    bool result = FormMgr::GetInstance().UpdateFormSize(formId, width, height, borderWidth);
+    EXPECT_EQ(result, true);
+    GTEST_LOG_(INFO) << "FormMgrTest_0246 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0247
+ * @tc.desc: Verify NotifyFormLocked
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0247, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_0247 begin";
+    int64_t formId = 1;
+    bool isLocked = true;
+    int32_t error = FormMgr::GetInstance().NotifyFormLocked(formId, isLocked);
+    EXPECT_EQ(error, ERR_APPEXECFWK_FORM_SEND_FMS_MSG);
+    GTEST_LOG_(INFO) << "FormMgrTest_0247 test ends";
+}
 } // namespace

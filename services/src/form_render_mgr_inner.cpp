@@ -35,6 +35,7 @@
 #include "os_account_manager.h"
 #include "want.h"
 #include "form_info_rdb_storage_mgr.h"
+#include "form_status_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -389,7 +390,7 @@ ErrCode FormRenderMgrInner::ReleaseRenderer(int64_t formId, const FormRecord &fo
                 HILOG_ERROR("null remoteObjectGotten");
                 return ret;
             }
-            FormTaskMgr::GetInstance().PostReleaseRenderer(formId, compId, uid, remoteObject);
+            FormTaskMgr::GetInstance().PostReleaseRenderer(formId, compId, uid, remoteObject, formRecord.isDynamic);
             return ERR_OK;
         }
     }
@@ -469,6 +470,7 @@ void FormRenderMgrInner::RerenderAllForms()
                 continue;
             }
             item.second->SetStateDisconnected();
+            FormStatusMgr::GetInstance().ResetFormStatus(item.first);
         }
     }
 

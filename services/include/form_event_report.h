@@ -82,6 +82,7 @@ struct NewFormEventInfo {
     std::string formBundleName = "";
     int32_t conditionType;
     int32_t renderingMode;
+    std::string bundleAndFormName;
 };
 
 enum class FormEventName {

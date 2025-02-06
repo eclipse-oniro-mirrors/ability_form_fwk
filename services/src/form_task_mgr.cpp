@@ -803,6 +803,7 @@ FormJsInfo FormTaskMgr::CreateFormJsInfo(const int64_t formId, const FormRecord 
     form.uiSyntax = record.uiSyntax;
     form.isDynamic = record.isDynamic;
     form.transparencyEnabled = record.transparencyEnabled;
+    form.isSystemApp = record.isSystemApp;
     form.modulePkgNameMap = record.modulePkgNameMap;
     HILOG_DEBUG("jsPath: %{private}s, data: %{private}s",
         form.jsFormCodePath.c_str(), form.formData.c_str());
@@ -912,6 +913,7 @@ void FormTaskMgr::RenderForm(const FormRecord &formRecord, const Want &want, con
     if (error != ERR_OK) {
         RemoveConnection(connectId);
         HILOG_ERROR("fail add form renderer");
+        FormStatusMgr::GetInstance().ResetFormStatus(formRecord.formId);
         return;
     }
 
@@ -966,8 +968,8 @@ void FormTaskMgr::StopRenderingForm(
     HILOG_INFO("end");
 }
 
-void FormTaskMgr::PostReleaseRenderer(
-    int64_t formId, const std::string &compId, const std::string &uid, const sptr<IRemoteObject> &remoteObject)
+void FormTaskMgr::PostReleaseRenderer(int64_t formId, const std::string &compId, const std::string &uid,
+    const sptr<IRemoteObject> &remoteObject, bool isDynamic)
 {
     HILOG_INFO("begin");
     if (serialQueue_ == nullptr) {
@@ -982,12 +984,21 @@ void FormTaskMgr::PostReleaseRenderer(
         std::lock_guard<std::mutex> lock(formRecoverTimesMutex_);
         formLastRecoverTimes.erase(formId);
     }
-    FormCommand releaseRenderCommand{
-        formId,
-        std::make_pair(TaskCommandType::RECYCLE_FORM, formId),
-        FORM_TASK_DELAY_TIME,
-        deleterenderForm};
-    FormStatusQueue::GetInstance().PostFormStatusTask(releaseRenderCommand);
+    if (!isDynamic) {
+        FormCommand deleteCommand{
+            formId,
+            std::make_pair(TaskCommandType::DELETE_FORM, formId),
+            FORM_TASK_DELAY_TIME,
+            deleterenderForm};
+        FormStatusQueue::GetInstance().PostFormDeleteTask(deleteCommand);
+    } else {
+        FormCommand releaseRenderCommand{
+            formId,
+            std::make_pair(TaskCommandType::RECYCLE_FORM, formId),
+            FORM_TASK_DELAY_TIME,
+            deleterenderForm};
+        FormStatusQueue::GetInstance().PostFormStatusTask(releaseRenderCommand);
+    }
     HILOG_INFO("end");
 }
 
@@ -1338,6 +1349,7 @@ void FormTaskMgr::RecoverForm(const FormRecord &record, const Want &want, const 
     if (error != ERR_OK) {
         RemoveConnection(connectId);
         HILOG_ERROR("fail recover form");
+        FormStatusMgr::GetInstance().ResetFormStatus(record.formId);
         return;
     }
 

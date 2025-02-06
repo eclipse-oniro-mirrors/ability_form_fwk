@@ -24,6 +24,7 @@
 #include "message_parcel.h"
 #include "nlohmann/json.hpp"
 #include "parcel.h"
+#include "securec.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -159,6 +160,27 @@ public:
      */
     static FormProviderData* Unmarshalling(Parcel &parcel);
 
+    bool WriteFormData(Parcel &parcel) const;
+
+    bool WriteAshmemDataToParcel(Parcel &parcel, size_t size, const char* dataPtr) const;
+
+    char *ReadAshmemDataFromParcel(Parcel &parcel, int32_t bufferSize);
+
+    bool WriteFileDescriptor(Parcel &parcel, int fd) const;
+
+    int ReadFileDescriptor(Parcel &parcel);
+
+    static bool CheckAshmemSize(const int &fd, const int32_t &bufferSize, bool isAstc = false)
+    {
+        if (fd < 0) {
+            return false;
+        }
+        int32_t ashmemSize = AshmemGetSize(fd);
+        return isAstc || bufferSize == ashmemSize;
+    }
+
+    void ReleaseMemory(int32_t allocType, void *addr, void *context, uint32_t size);
+
     /**
      * @brief Clear imageDataMap, rawImageBytesMap, imageDataState and jsonFormProviderData.
      */
@@ -179,6 +201,7 @@ public:
     static constexpr int IMAGE_DATA_STATE_REMOVED = -1;
     static constexpr int IMAGE_DATA_STATE_NO_OPERATION = 0;
     static constexpr int IMAGE_DATA_STATE_ADDED = 1;
+    nlohmann::json jsonFormProviderData_;
 
 private:
     bool WriteImageDataToParcel(Parcel &parcel, const std::string &picName, const std::shared_ptr<char> &data,
@@ -190,6 +213,8 @@ private:
      * @param data Indicates the binary data of the image content.
      */
     void AddImageData(const std::string &picName, const std::shared_ptr<char> &data, int32_t size);
+    
+    bool HandleImageDataStateAdded(Parcel &parcel);
 private:
     struct DeleteBytes {
         void operator()(char* bytes) const
@@ -197,7 +222,6 @@ private:
             delete[] bytes;
         }
     };
-    nlohmann::json jsonFormProviderData_;
     std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap_;
     std::map<std::string, std::pair<std::shared_ptr<char>, int32_t>> rawImageBytesMap_;
     int32_t imageDataState_ = 0;

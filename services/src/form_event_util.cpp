@@ -140,6 +140,7 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
     Want want;
     want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
     want.SetParam(Constants::FORM_ENABLE_UPDATE_REFRESH_KEY, true);
+    want.SetParam(Constants::FORM_DATA_UPDATE_TYPE, Constants::FULL_UPDATE);
     for (const auto &updatedForm : updatedForms) {
         ErrCode errCode = FormProviderMgr::GetInstance().RefreshForm(updatedForm.formId, want, true);
         if (errCode == ERR_APPEXECFWK_FORM_GET_AMSCONNECT_FAILED) {

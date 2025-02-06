@@ -16,6 +16,11 @@
 #include "form_js_info.h"
 #include "fms_log_wrapper.h"
 #include "string_ex.h"
+#include "message_parcel.h"
+
+#include "iservice_registry.h"
+#include "bundle_mgr_interface.h"
+#include "os_account_manager.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -29,7 +34,20 @@ bool FormJsInfo::ReadFromParcel(Parcel &parcel)
 
     formTempFlag = parcel.ReadBool();
     jsFormCodePath = Str16ToStr8(parcel.ReadString16());
-    formData = Str16ToStr8(parcel.ReadString16());
+    MessageParcel* msgParcel = static_cast<MessageParcel*>(&parcel);
+    int32_t formDataLength = parcel.ReadInt32();
+    HILOG_INFO("ReadFromParcel data length is %{public}d , formId:%{public}lld", formDataLength, formId);
+    if (formDataLength > BIG_DATA) {
+        HILOG_INFO("data length > 32k");
+        const void *rawData = msgParcel->ReadRawData(formDataLength);
+        if (rawData == nullptr) {
+            HILOG_INFO("rawData is nullptr");
+            return false;
+        }
+        formData = static_cast<const char*>(rawData);
+    } else {
+        formData = Str16ToStr8(parcel.ReadString16());
+    }
 
     formSrc = Str16ToStr8(parcel.ReadString16());
     formWindow.designWidth = parcel.ReadInt32();
@@ -43,6 +61,7 @@ bool FormJsInfo::ReadFromParcel(Parcel &parcel)
     uiSyntax = static_cast<FormType>(parcel.ReadInt32());
     isDynamic = parcel.ReadBool();
     transparencyEnabled = parcel.ReadBool();
+    isSystemApp = parcel.ReadBool();
 
     std::unique_ptr<FormProviderData> bindingData(parcel.ReadParcelable<FormProviderData>());
     if (bindingData == nullptr) {
@@ -99,7 +118,7 @@ bool FormJsInfo::Marshalling(Parcel &parcel) const
     }
 
     // write formData and formSrc
-    if (!parcel.WriteString16(Str8ToStr16(formData)) || !parcel.WriteString16(Str8ToStr16(formSrc))) {
+    if (!WriteFormData(parcel) || !parcel.WriteString16(Str8ToStr16(formSrc))) {
         return false;
     }
 
@@ -123,10 +142,82 @@ bool FormJsInfo::Marshalling(Parcel &parcel) const
     if (!parcel.WriteBool(isDynamic) || !parcel.WriteBool(transparencyEnabled)) {
         return false;
     }
+    bool isSysApp = CheckIsSystemApp(bundleName.c_str());
+    if (!parcel.WriteBool(isSysApp)) {
+        return false;
+    }
     if (!WriteObjects(parcel)) {
         return false;
     }
     return true;
+}
+
+bool FormJsInfo::GetCurrentUserId(int &userId) const
+{
+    std::vector<int> activeIds;
+    int ret = OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(activeIds);
+    if (ret != 0) {
+        userId = 100; // DEFAULT_USERID = 100
+        HILOG_INFO("GetCurrentUserId failed ret:%{public}d", ret);
+        return false;
+    }
+    if (activeIds.empty()) {
+        userId = 100; // DEFAULT_USERID = 100
+        HILOG_INFO("QueryActiveOsAccountIds activeIds empty");
+        return false;
+    }
+    userId = activeIds[0];
+    return true;
+}
+
+bool FormJsInfo::CheckIsSystemApp(const std::string& bundleName) const
+{
+    int userId = 0;
+    bool ret = GetCurrentUserId(userId);
+    HILOG_INFO("check SystemApp, userId: %{public}d", userId);
+    if (!ret) {
+        HILOG_INFO("GetCurrentUserId failed");
+        return false;
+    }
+    auto systemManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (systemManager == nullptr) {
+        HILOG_INFO("fail to get system ability manager!");
+        return false;
+    }
+    auto bundleMgrSa = systemManager->GetSystemAbility(401); // BUNDLE_MGR_SERVICE_SYS_ABILITY_ID = 401
+    if (bundleMgrSa == nullptr) {
+        HILOG_INFO("fail to get bundle manager system ability!");
+        return false;
+    }
+    auto bundleMgr = iface_cast<AppExecFwk::IBundleMgr>(bundleMgrSa);
+    if (bundleMgr == nullptr) {
+        HILOG_INFO("Bundle mgr is nullptr.");
+        return false;
+    }
+    AppExecFwk::ApplicationInfo info;
+    ErrCode code = bundleMgr->GetApplicationInfoV9(bundleName, 0, userId, info);
+    if (code != ERR_OK) {
+        HILOG_INFO("Failed to GetApplicationInfoV9");
+        return false;
+    }
+    if (info.isSystemApp) {
+        return true;
+    }
+    HILOG_INFO("Not system App.");
+    return false;
+}
+
+bool FormJsInfo::WriteFormData(Parcel &parcel) const
+{
+    MessageParcel* msgParcel = static_cast<MessageParcel *>(&parcel);
+    int32_t formDataLength = formData.length();
+    parcel.WriteInt32(formDataLength);
+    if (formDataLength > BIG_DATA) {
+        HILOG_INFO("WriteFormData data length is %{public}d", formDataLength);
+        return msgParcel->WriteRawData(formData.c_str(), formDataLength);
+    } else {
+        return parcel.WriteString16(Str8ToStr16(formData));
+    }
 }
 
 bool FormJsInfo::WriteObjects(Parcel &parcel) const

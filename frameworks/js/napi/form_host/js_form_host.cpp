@@ -1341,7 +1341,7 @@ private:
 
     napi_value GetFormsInfoByFilter(napi_env env, size_t argc, napi_value* argv)
     {
-        HILOG_DEBUG("call");
+        HILOG_INFO("call");
         if (argc != ARGS_ONE) {
             HILOG_ERROR("invalid argc");
             NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "1");
@@ -1411,7 +1411,7 @@ private:
 
     napi_value OnGetFormsInfo(napi_env env, size_t argc, napi_value* argv)
     {
-        HILOG_DEBUG("call");
+        HILOG_INFO("call");
         if (argc == ARGS_ONE && IsTypeForNapiValue(env, argv[PARAM0], napi_object)) {
             return GetFormsInfoByFilter(env, argc, argv);
         }
@@ -2002,6 +2002,7 @@ ErrCode JsFormRouterProxyMgr::RouterEvent(int64_t formId, const Want &want)
 void JsFormRouterProxyMgr::AddFormRouterProxyCallback(napi_env env, napi_value callback,
     const std::vector<int64_t> &formIds)
 {
+#ifndef WATCH_API_DISABLE
     HILOG_DEBUG("call");
     std::lock_guard<std::mutex> lock(FormRouterProxyCallbackMutex_);
 
@@ -2018,6 +2019,7 @@ void JsFormRouterProxyMgr::AddFormRouterProxyCallback(napi_env env, napi_value c
         }
         formRouterProxyCallbackMap_.emplace(formId, callbackClient);
     }
+#endif
 }
 
 void JsFormRouterProxyMgr::RemoveFormRouterProxyCallback(const std::vector<int64_t> &formIds)

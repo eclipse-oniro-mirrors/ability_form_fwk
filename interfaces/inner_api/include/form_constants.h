@@ -95,6 +95,7 @@ namespace Constants {
     const long ABS_REFRESH_MS = 2500;
     constexpr const char* PARAM_HOST_BG_INVERSE_COLOR_KEY = "ohos.extra.param.key.host_bg_inverse_color";
     constexpr const char* PARAM_FONT_FOLLOW_SYSTEM_KEY = "ohos.inner.key.font_follow_system";
+    constexpr const char* PARAM_FORM_ENABLE_BLUR_BACKGROUND_KEY = "ohos.inner.key.enable_blur_background";
     constexpr const char* PARAM_THEME_KEY  = "ohos.extra.param.key.form_is_theme";
     constexpr const char* PARAM_THEME_THEME_FORM_ID  = "themeFormId";
     constexpr const char* PARAM_THEME_THEME_ID  = "themeId";
@@ -292,6 +293,8 @@ namespace Constants {
     constexpr int32_t REFRESHTYPE_UPDATENEXTTIME = 3;
     constexpr int32_t REFRESHTYPE_NETWORKCHANGED = 4;
     constexpr int32_t REFRESHTYPE_VISIABLE = 99;
+    constexpr int32_t FULL_UPDATE = 0;
+    constexpr int32_t ADD_UPDATE = 1;
 
     // rdb
     const std::string FORM_MANAGER_SERVICE_PATH = "/data/service/el1/public/database/form_storage";
@@ -349,6 +352,8 @@ namespace Constants {
     const std::string IS_MULTI_APP_FORM = "isMultiAppForm";
     // form contains multi app is true
     const std::string IS_MULTI_APP_FORM_TRUE = "true";
+    // Form data update type
+    constexpr const char* FORM_DATA_UPDATE_TYPE = "formDataUpdateType";
 }  // namespace Constants
 }  // namespace AppExecFwk
 }  // namespace OHOS

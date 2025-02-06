@@ -91,6 +91,7 @@ constexpr int32_t DEFAULT_USER_ID = 100;
 constexpr int32_t BUNDLE_NAME_INDEX = 0;
 constexpr int32_t USER_ID_INDEX = 1;
 constexpr int32_t INSTANCE_SEQ_INDEX = 2;
+constexpr int32_t BIG_DATA = 32 * 1024;
 const std::string BUNDLE_INFO_SEPARATOR = "_";
 const std::string POINT_ETS = ".ets";
 constexpr int DATA_FIELD = 1;
@@ -571,6 +572,7 @@ int FormMgrAdapter::StopRenderingForm(const int64_t formId, const std::string &c
 
 int FormMgrAdapter::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> &callerToken, const bool delCache)
 {
+#ifndef WATCH_API_DISABLE
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     HILOG_INFO("formId:%{public}" PRId64, formId);
     if (formId <= 0 || callerToken == nullptr) {
@@ -617,10 +619,14 @@ int FormMgrAdapter::ReleaseForm(const int64_t formId, const sptr<IRemoteObject> 
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     return ERR_OK;
+#else
+    return ERR_OK;
+#endif
 }
 
 ErrCode FormMgrAdapter::HandleReleaseForm(const int64_t formId, const sptr<IRemoteObject> &callerToken)
 {
+#ifndef WATCH_API_DISABLE
     HILOG_INFO("formId:%{public}" PRId64, formId);
     if (!FormDataMgr::GetInstance().ExistFormRecord(formId)) {
         HILOG_ERROR("not exist such db or temp form:%{public}" PRId64 "", formId);
@@ -644,6 +650,9 @@ ErrCode FormMgrAdapter::HandleReleaseForm(const int64_t formId, const sptr<IRemo
         }
     }
     return ERR_OK;
+#else
+    return ERR_OK;
+#endif
 }
 
 ErrCode FormMgrAdapter::HandleDeleteForm(const int64_t formId, const sptr<IRemoteObject> &callerToken)
@@ -803,6 +812,9 @@ int FormMgrAdapter::UpdateForm(const int64_t formId, const int32_t callingUid,
     if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, formRecord)) {
         HILOG_ERROR("not exist such form:%{public}" PRId64 ".", matchedFormId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    }
+    if (formProviderData.GetData().size() > BIG_DATA && !formRecord.isSystemApp) {
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
 
     // Checks if the form provider is the currently active user.
@@ -1188,6 +1200,7 @@ void FormMgrAdapter::FilterEventMapsByVisibleType(std::map<std::string, std::vec
 
 int FormMgrAdapter::CastTempForm(const int64_t formId, const sptr<IRemoteObject> &callerToken)
 {
+#ifndef WATCH_API_DISABLE
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     if (formId <= 0 || callerToken == nullptr) {
         HILOG_ERROR("invalid formId or callerToken");
@@ -1254,10 +1267,14 @@ int FormMgrAdapter::CastTempForm(const int64_t formId, const sptr<IRemoteObject>
 
     // start timer
     return AddFormTimer(formRecord);
+#else
+    return ERR_OK;
+#endif
 }
 
 ErrCode FormMgrAdapter::HandleCastTempForm(const int64_t formId, const FormRecord &record)
 {
+#ifndef WATCH_API_DISABLE
     HILOG_DEBUG("cast temp form to normal form, notify supplier, package:%{public}s, class:%{public}s",
         record.bundleName.c_str(), record.abilityName.c_str());
     sptr<IAbilityConnection> castTempConnection = new FormCastTempConnection(formId,
@@ -1272,6 +1289,9 @@ ErrCode FormMgrAdapter::HandleCastTempForm(const int64_t formId, const FormRecor
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
     return ERR_OK;
+#else
+    return ERR_OK;
+#endif
 }
 
 int FormMgrAdapter::DumpStorageFormInfos(std::string &formInfos) const
@@ -3374,6 +3394,7 @@ ErrCode FormMgrAdapter::RegisterRemoveObserver(const std::string &bundleName, co
 ErrCode FormMgrAdapter::RegisterFormRouterProxy(
     const std::vector<int64_t>& formIds, const sptr<IRemoteObject>& callerToken)
 {
+#ifndef WATCH_API_DISABLE
     HILOG_DEBUG("call");
     if (callerToken == nullptr) {
         HILOG_ERROR("null callerToken");
@@ -3423,6 +3444,9 @@ ErrCode FormMgrAdapter::RegisterFormRouterProxy(
     }
 
     return FormRouterProxyMgr::GetInstance().SetFormRouterProxy(hostOwnFormIds, callerToken);
+#else
+    return ERR_OK;
+#endif
 }
 
 ErrCode FormMgrAdapter::UnregisterFormRouterProxy(const std::vector<int64_t>& formIds)
@@ -4185,15 +4209,15 @@ ErrCode FormMgrAdapter::UpdateFormByCondition(int32_t type)
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
-    NewFormEventInfo eventInfo;
-    eventInfo.conditionType = static_cast<int32_t>(type);
-    FormEventReport::SendConditonUpdateFormEvent(FormEventName::CONDITION_UPDATE_FORM,
-        HiSysEventType::BEHAVIOR, eventInfo);
-        
+    std::string reportStr = "";
+    std::set<std::string> reportList;
+ 
     for (FormRecord& formRecord : formInfos) {
         if (!formRecord.isSystemApp) {
             continue;
         }
+        std::string str = formRecord.bundleName + "-" + formRecord.formName;
+        reportList.insert(str);
         int32_t userId = FormUtil::GetCurrentAccountId();
         Want want;
         want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
@@ -4201,6 +4225,20 @@ ErrCode FormMgrAdapter::UpdateFormByCondition(int32_t type)
         want.SetParam(Constants::KEY_CONNECT_REFRESH, true);
         FormProviderMgr::GetInstance().RefreshForm(formRecord.formId, want, true);
     }
+
+    if (reportList.size() > 0) {
+        for (const auto& item : reportList) {
+            reportStr = reportStr + item;
+        }
+    }
+    std::string subStr = reportStr.substr(0, std::min((int)reportStr.size(), 30));
+    HILOG_INFO("UpdateFormByCondition reportStr:%{public}s", subStr.c_str());
+    NewFormEventInfo eventInfo;
+    eventInfo.conditionType = static_cast<int32_t>(type);
+    eventInfo.bundleAndFormName = reportStr;
+    FormEventReport::SendConditonUpdateFormEvent(FormEventName::CONDITION_UPDATE_FORM,
+        HiSysEventType::BEHAVIOR, eventInfo);
+
     return ERR_OK;
 }
 } // namespace AppExecFwk
