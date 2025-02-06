@@ -353,14 +353,20 @@ public:
     * @param formInfo Return the forms' information
     * @return Returns ERR_OK on success, others on failure.
     */
-    virtual int32_t GetPublishedFormInfoById(const int64_t formId, RunningFormInfo &formInfo) = 0;
+    virtual int32_t GetPublishedFormInfoById(const int64_t formId, RunningFormInfo &formInfo)
+    {
+        return 0;
+    }
 
     /**
     * @brief This function is called by formProvider and gets forms info.
     * @param formInfos Return the forms' information
     * @return Returns ERR_OK on success, others on failure.
     */
-    virtual int32_t GetPublishedFormsInfo(std::vector<RunningFormInfo> &formInfos) = 0;
+    virtual int32_t GetPublishedFormsInfo(std::vector<RunningFormInfo> &formInfos)
+    {
+        return 0;
+    }
 
     /**
      * @brief Check if the request of publishing a form is supported by the host.
