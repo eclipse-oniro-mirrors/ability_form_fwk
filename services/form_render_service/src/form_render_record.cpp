@@ -1298,7 +1298,10 @@ bool FormRenderRecord::ReAddIfHapPathChanged(const std::vector<FormJsInfo> &form
         HILOG_INFO("eventHandleNeedReset, Create new eventHandler");
         eventHandleNeedReset = false;
     }
-    CreateEventHandler(bundleName_, true);
+    {
+        std::lock_guard<std::recursive_mutex> lock(eventHandlerMutex_);
+        CreateEventHandler(bundleName_, true);
+    }
     ReAddRecycledForms(formJsInfos);
     return true;
 }
