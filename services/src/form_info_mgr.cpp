@@ -430,7 +430,7 @@ void BundleFormInfo::HandleFormInfosMaxLimit(std::vector<FormInfo> &inFormInfos,
     GetAllUsedFormName(formDBInfos, inFormInfos, formDBNames);
     if (formDBInfos.empty() || inFormInfos.size() <= Constants::FORM_INFO_MAX_NUM) {
         if (inFormInfos.size() > Constants::FORM_INFO_MAX_NUM) {
-            for (int index = 0; i < inFormInfos.size() - Constants::FORM_INFO_MAX_NUM; i++) {
+            for (int i = 0; i < inFormInfos.size() - Constants::FORM_INFO_MAX_NUM; i++) {
                 inFormInfos.pop_back();
             }
         }
@@ -470,7 +470,7 @@ void BundleFormInfo::GetAllUsedFormName(std::vector<FormDBInfo> &formDBInfos,
         }
         for (auto formInfo : formInfos) {
             if (formInfo.name == formDBInfo.formName) {
-                formDBInfos.insert(formDBInfo.formName);
+                formDBNames.insert(formDBInfo.formName);
                 break;
             }
         }
