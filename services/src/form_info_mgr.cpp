@@ -423,14 +423,14 @@ ErrCode BundleFormInfo::UpdateFormInfoStorageLocked()
 }
 
 void BundleFormInfo::HandleFormInfosMaxLimit(std::vector<FormInfo> &inFormInfos,
-    std::vector<FormInfo> &outFormInfos, std::vector<FormDBInfo> &formDBInfos)
+    std::vector<FormInfo> &outFormInfos, const std::vector<FormDBInfo> &formDBInfos)
 {
-    HILOG_INFO("formInfo num: %{public}lu,formDBInfo num: %{public}lu", inFormInfos.size(), formDBInfos.size());
+    HILOG_INFO("formInfo num: %{public}u,formDBInfo num: %{public}u", inFormInfos.size(), formDBInfos.size());
     std::set<std::string> formDBNames;
     GetAllUsedFormName(formDBInfos, inFormInfos, formDBNames);
     if (formDBInfos.empty() || inFormInfos.size() <= Constants::FORM_INFO_MAX_NUM) {
         if (inFormInfos.size() > Constants::FORM_INFO_MAX_NUM) {
-            for (int i = 0; i < inFormInfos.size() - Constants::FORM_INFO_MAX_NUM; i++) {
+            for (unsigned int i = 0; i < inFormInfos.size() - Constants::FORM_INFO_MAX_NUM; i++) {
                 inFormInfos.pop_back();
             }
         }
@@ -444,11 +444,10 @@ void BundleFormInfo::HandleFormInfosMaxLimit(std::vector<FormInfo> &inFormInfos,
         formNum = Constants::FORM_INFO_MAX_NUM;
     }
     for (auto formInfo : inFormInfos) {
-        bool isUsed = formDBNames.count(formInfo.name) > 0;
+        bool isUsed = formDBNames.find(formInfo.name) != formDBNames.end;
         if (isUsed) {
             outFormInfos.push_back(formInfo);
-        }
-        if (!isUsed && addFormNum > 0) {
+        } else if (!isUsed && addFormNum > 0) {
             outFormInfos.push_back(formInfo);
             addFormNum--;
         }
@@ -458,8 +457,8 @@ void BundleFormInfo::HandleFormInfosMaxLimit(std::vector<FormInfo> &inFormInfos,
     }
 }
 
-void BundleFormInfo::GetAllUsedFormName(std::vector<FormDBInfo> &formDBInfos,
-    std::vector<FormInfo> &formInfos, std::set<std::string> &formDBNames)
+void BundleFormInfo::GetAllUsedFormName(const std::vector<FormDBInfo> &formDBInfos,
+    const std::vector<FormInfo> &formInfos, std::set<std::string> &formDBNames)
 {
     if (formDBInfos.empty() || formInfos.empty()) {
         return;
@@ -475,7 +474,7 @@ void BundleFormInfo::GetAllUsedFormName(std::vector<FormDBInfo> &formDBInfos,
             }
         }
     }
-    HILOG_INFO("used form num: %{public}lu", formDBNames.size());
+    HILOG_INFO("used form num: %{public}u", formDBNames.size());
 }
 
 FormInfoMgr::FormInfoMgr()

@@ -82,10 +82,10 @@ private:
     ErrCode UpdateFormInfoStorageLocked();
 
     void HandleFormInfosMaxLimit(
-        std::vector<FormInfo> &inFormInfos, std::vector<FormInfo> &outFormInfos, std::vector<FormDBInfo> &formDBInfos);
+        std::vector<FormInfo> &inFormInfos, std::vector<FormInfo> &outFormInfos, const std::vector<FormDBInfo> &formDBInfos);
 
-    void GetAllUsedFormName(
-        std::vector<FormDBInfo> &formDBInfos, std::vector<FormInfo> &formInfos, std::set<std::string> &formDBNames);
+    void GetAllUsedFormName(const std::vector<FormDBInfo> &formDBInfos,
+        const std::vector<FormInfo> &formInfos, std::set<std::string> &formDBNames);
 
     std::string bundleName_ {};
     mutable std::shared_timed_mutex formInfosMutex_ {};
