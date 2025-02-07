@@ -759,7 +759,12 @@ void FormRenderRecord::MergeFormData(Ace::FormRequest &formRequest, const FormJs
     nlohmann::json newFormData = formJsInfo.formProviderData.GetData();
     formProviderData.MergeData(newFormData);
 
+    std::map<std::string, sptr<FormAshmem>> imageMap = formRequest.formJsInfo.imageDataMap;
     formRequest.formJsInfo = formJsInfo;
+    //if imageDataMap of formJsInfo is empty, do not replace
+    if (formJsInfo.imageDataMap.size() == 0) {
+        formRequest.formJsInfo.imageDataMap = imageMap;
+    }
     formRequest.formJsInfo.formData = formProviderData.GetDataString();
 }
 
@@ -1682,7 +1687,7 @@ void FormRenderRecord::UpdateGroupRequestsWhenRecover(const int64_t &formId, con
         groupRequest.compId = compId;
         groupRequest.want = recordRequest.want;
         groupRequest.formJsInfo = recordRequest.formJsInfo; // get json data from record request
-        groupRequest.formJsInfo.imageDataMap = formJsInfo.imageDataMap;
+        MergeMap(groupRequest.formJsInfo.imageDataMap, formJsInfo.imageDataMap);
         if (compId == currentCompId) {
             groupRequest.want.SetParam(Constants::FORM_STATUS_DATA, statusData);
             groupRequest.want.SetParam(Constants::FORM_IS_RECOVER_FORM_TO_HANDLE_CLICK_EVENT, isHandleClickEvent);
@@ -1692,6 +1697,19 @@ void FormRenderRecord::UpdateGroupRequestsWhenRecover(const int64_t &formId, con
                 currentRequestIndex, groupRequest.formJsInfo.formData.size());
         }
         groupRequests.emplace_back(groupRequest);
+    }
+}
+
+void FormRenderRecord::MergeMap(std::map<std::string, sptr<FormAshmem>> &dst,
+    const std::map<std::string, sptr<FormAshmem>> &src)
+{
+    for (auto iter = src.begin(); iter != src.end(); ++iter) {
+        auto search = dst.find(iter->first);
+        if (search == dst.end()) {
+            dst.emplace(*iter);
+        } else {
+            search->second = iter->second;
+        }
     }
 }
 
