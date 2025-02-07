@@ -3893,7 +3893,6 @@ int32_t FormMgrAdapter::RecoverForms(const std::vector<int64_t> &formIds, const 
             FormDataMgr::GetInstance().UpdateFormRecord(matchedFormId, record);
             continue;
         }
-        // 非用户点击触发恢复时校验RECYCLED
         if (record.recycleStatus != RecycleStatus::RECYCLED && !needHandleCachedClick) {
             HILOG_WARN("form %{public}" PRId64 " not RECYCLED", formId);
             continue;
