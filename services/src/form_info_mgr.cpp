@@ -438,13 +438,13 @@ void BundleFormInfo::HandleFormInfosMaxLimit(std::vector<FormInfo> &inFormInfos,
         return;
     }
     int addFormNum = 0;
-    int formNum = formDBInfos.size();
+    unsigned int formNum = formDBInfos.size();
     if (formDBInfos.size() < Constants::FORM_INFO_MAX_NUM) {
         addFormNum = Constants::FORM_INFO_MAX_NUM - formDBInfos.size();
         formNum = Constants::FORM_INFO_MAX_NUM;
     }
     for (auto formInfo : inFormInfos) {
-        bool isUsed = formDBNames.find(formInfo.name) != formDBNames.end;
+        bool isUsed = formDBNames.find(formInfo.name) != formDBNames.end();
         if (isUsed) {
             outFormInfos.push_back(formInfo);
         } else if (!isUsed && addFormNum > 0) {
