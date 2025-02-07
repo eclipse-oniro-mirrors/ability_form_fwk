@@ -899,8 +899,7 @@ int FormMgrProxy::GetPublishedFormInfoById(IFormMgr::Message code, MessageParcel
 {
     HILOG_DEBUG("GetPublishedFormInfoById start");
 
-    auto error = GetParcelableInfo<RunningFormInfo>(IFormMgr::Message::FORM_MGR_GET_PUBLISHED_FORM_INFO_BY_ID,
-        data, formInfo);
+    auto error = GetParcelableInfo<RunningFormInfo>(code, data, formInfo);
     if (error != ERR_OK) {
         HILOG_ERROR("get parcelable info failed");
     }
