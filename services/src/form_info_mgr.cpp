@@ -428,9 +428,10 @@ void BundleFormInfo::HandleFormInfosMaxLimit(std::vector<FormInfo> &inFormInfos,
     HILOG_INFO("formInfo num: %{public}u,formDBInfo num: %{public}u", inFormInfos.size(), formDBInfos.size());
     std::set<std::string> formDBNames;
     GetAllUsedFormName(formDBInfos, inFormInfos, formDBNames);
-    if (formDBInfos.empty() || inFormInfos.size() <= Constants::FORM_INFO_MAX_NUM) {
+    if (formDBNames.empty() || inFormInfos.size() <= Constants::FORM_INFO_MAX_NUM) {
         if (inFormInfos.size() > Constants::FORM_INFO_MAX_NUM) {
-            for (unsigned int i = 0; i < inFormInfos.size() - Constants::FORM_INFO_MAX_NUM; i++) {
+            unsigned int needPopNum = inFormInfos.size() - Constants::FORM_INFO_MAX_NUM;
+            for (unsigned int i = 0; i < needPopNum; i++) {
                 inFormInfos.pop_back();
             }
         }
@@ -438,9 +439,9 @@ void BundleFormInfo::HandleFormInfosMaxLimit(std::vector<FormInfo> &inFormInfos,
         return;
     }
     int addFormNum = 0;
-    unsigned int formNum = formDBInfos.size();
-    if (formDBInfos.size() < Constants::FORM_INFO_MAX_NUM) {
-        addFormNum = Constants::FORM_INFO_MAX_NUM - formDBInfos.size();
+    unsigned int formNum = formDBNames.size();
+    if (formDBNames.size() < Constants::FORM_INFO_MAX_NUM) {
+        addFormNum = Constants::FORM_INFO_MAX_NUM - formDBNames.size();
         formNum = Constants::FORM_INFO_MAX_NUM;
     }
     for (auto formInfo : inFormInfos) {
