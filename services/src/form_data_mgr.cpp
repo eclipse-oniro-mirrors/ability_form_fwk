@@ -40,6 +40,9 @@
 #include "form_record_report.h"
 #include "form_event_report.h"
 
+
+
+
 namespace OHOS {
 namespace AppExecFwk {
 FormDataMgr::FormDataMgr()
