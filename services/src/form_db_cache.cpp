@@ -179,7 +179,7 @@ void FormDbCache::GetAllFormInfo(std::vector<FormDBInfo> &formDBInfos)
  * @param formDBInfos all db form infos
  */
 void FormDbCache::GetAllFormDBInfoByBundleName(const std::string &bundleName, const int32_t userId,
-        std::vector<FormDBInfo> &formDBInfos)
+    std::vector<FormDBInfo> &formDBInfos)
 {
     std::lock_guard<std::mutex> lock(formDBInfosMutex_);
     for (auto dbInfo : formDBInfos_) {

@@ -81,8 +81,8 @@ public:
 private:
     ErrCode UpdateFormInfoStorageLocked();
 
-    void HandleFormInfosMaxLimit(
-        std::vector<FormInfo> &inFormInfos, std::vector<FormInfo> &outFormInfos, const std::vector<FormDBInfo> &formDBInfos);
+    void HandleFormInfosMaxLimit(std::vector<FormInfo> &inFormInfos,
+        std::vector<FormInfo> &outFormInfos, const std::vector<FormDBInfo> &formDBInfos);
 
     void GetAllUsedFormName(const std::vector<FormDBInfo> &formDBInfos,
         const std::vector<FormInfo> &formInfos, std::set<std::string> &formDBNames);
