@@ -36,6 +36,7 @@ const std::string FORM_DB_DATA_BASE_FILE_DIR = "/data/formmgr";
 const int32_t FOUR = 4;
 const int32_t TEN = 10;
 const int32_t ELEVEN = 11;
+const int32_t DEFAULT_VALUE = 0;
 
 class FmsFormProviderDataTest : public testing::Test {
 public:
@@ -432,6 +433,7 @@ HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0019, TestSize.Level1)
     EXPECT_EQ(true, InitJsonData());
     FormProviderData formProviderData(jsonData_);
     Parcel parcel;
+    parcel.WriteInt32(DEFAULT_VALUE);
     parcel.WriteString16(Str8ToStr16(jsonData_.dump()));
     parcel.WriteInt32(FormProviderData::IMAGE_DATA_STATE_NO_OPERATION);
     auto result = formProviderData.ReadFromParcel(parcel);
@@ -450,6 +452,7 @@ HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0020, TestSize.Level1)
     EXPECT_EQ(true, InitJsonData());
     FormProviderData formProviderData(jsonData_);
     Parcel parcel;
+    parcel.WriteInt32(DEFAULT_VALUE);
     parcel.WriteString16(Str8ToStr16(jsonData_.dump()));
     parcel.WriteInt32(FormProviderData::IMAGE_DATA_STATE_REMOVED);
     auto result = formProviderData.ReadFromParcel(parcel);
@@ -469,6 +472,7 @@ HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0021, TestSize.Level1)
     constexpr int32_t defaultValue = 100;
     FormProviderData formProviderData(jsonData_);
     Parcel parcel;
+    parcel.WriteInt32(DEFAULT_VALUE);
     parcel.WriteString16(Str8ToStr16(jsonData_.dump()));
     parcel.WriteInt32(defaultValue);
     auto result = formProviderData.ReadFromParcel(parcel);
@@ -487,6 +491,7 @@ HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0022, TestSize.Level1)
     EXPECT_EQ(true, InitJsonData());
     FormProviderData formProviderData(jsonData_);
     Parcel parcel;
+    parcel.WriteInt32(DEFAULT_VALUE);
     parcel.WriteString16(Str8ToStr16(jsonData_.dump()));
     parcel.WriteInt32(FormProviderData::IMAGE_DATA_STATE_ADDED);
     auto result = formProviderData.ReadFromParcel(parcel);
