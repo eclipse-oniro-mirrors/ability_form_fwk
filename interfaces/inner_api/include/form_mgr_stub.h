@@ -280,6 +280,21 @@ private:
     int32_t HandleGetFormsInfo(MessageParcel &data, MessageParcel &reply);
 
     /**
+     * @brief Handle GetFormsInfoById message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t HandleGetPublishedFormInfoById(MessageParcel &data, MessageParcel &reply);
+    /**
+     * @brief Handle GetPublishedFormsInfo message.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int32_t HandleGetPublishedFormsInfo(MessageParcel &data, MessageParcel &reply);
+
+    /**
      * @brief Handle share form message.
      * @param data input param.
      * @param reply output param.
@@ -614,6 +629,16 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     int OnRemoteRequestFourth(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+
+    /**
+     * @brief the fifth part of handle remote request.
+     * @param code ipc code.
+     * @param data input param.
+     * @param reply output param.
+     * @param option message option.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    int OnRemoteRequestFifth(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
 
     /**
      * @brief Handle update form size.

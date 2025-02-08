@@ -347,6 +347,28 @@ public:
     virtual int32_t GetFormsInfo(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos) = 0;
 
     /**
+    * @brief This function is called by formProvider and gets forms info by formId of the calling ability.
+    *        The conditions will be retrieved by form service manager.
+    * @param formId
+    * @param formInfo Return the forms' information
+    * @return Returns ERR_OK on success, others on failure.
+    */
+    virtual int32_t GetPublishedFormInfoById(const int64_t formId, RunningFormInfo &formInfo)
+    {
+        return 0;
+    }
+
+    /**
+    * @brief This function is called by formProvider and gets forms info.
+    * @param formInfos Return the forms' information
+    * @return Returns ERR_OK on success, others on failure.
+    */
+    virtual int32_t GetPublishedFormsInfo(std::vector<RunningFormInfo> &formInfos)
+    {
+        return 0;
+    }
+
+    /**
      * @brief Check if the request of publishing a form is supported by the host.
      * @return Returns true if the request is supported and false otherwise.
      */
@@ -754,6 +776,8 @@ public:
         FORM_MGR_GET_FORMS_INFO_BY_APP,
         FORM_MGR_GET_FORMS_INFO_BY_MODULE,
         FORM_MGR_GET_FORMS_INFO,
+        FORM_MGR_GET_PUBLISHED_FORMS_INFO,
+        FORM_MGR_GET_PUBLISHED_FORM_INFO_BY_ID,
         FORM_MGR_ROUTER_EVENT,
         FORM_MGR_UPDATE_ROUTER_ACTION,
         FORM_MGR_ADD_FORM_INFO,

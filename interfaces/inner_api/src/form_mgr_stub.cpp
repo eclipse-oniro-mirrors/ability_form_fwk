@@ -19,6 +19,7 @@
 #include "fms_log_wrapper.h"
 #include "form_info.h"
 #include "form_mgr_errors.h"
+#include "running_form_info.h"
 #include "ipc_skeleton.h"
 #include "ipc_types.h"
 #include "iremote_object.h"
@@ -271,6 +272,26 @@ int FormMgrStub::OnRemoteRequestFourth(uint32_t code, MessageParcel &data, Messa
             return HandleUpdateFormSize(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_LOCK_FORMS):
             return HandleLockForms(data, reply);
+        default:
+            return OnRemoteRequestFifth(code, data, reply, option);
+    }
+}
+
+/**
+ * @brief the fifth part of handle remote request.
+ * @param code ipc code.
+ * @param data input param.
+ * @param reply output param.
+ * @param option message option.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int FormMgrStub::OnRemoteRequestFifth(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    switch (code) {
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_PUBLISHED_FORM_INFO_BY_ID):
+            return HandleGetPublishedFormInfoById(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_PUBLISHED_FORMS_INFO):
+            return HandleGetPublishedFormsInfo(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -1015,6 +1036,43 @@ int32_t FormMgrStub::HandleGetFormsInfo(MessageParcel &data, MessageParcel &repl
     std::vector<FormInfo> infos;
     // call FormMgrService to get formInfos into infos.
     int32_t result = GetFormsInfo(*filter, infos);
+    reply.WriteBool(result);
+    if (result == ERR_OK) {
+        // write fetched formInfos into reply.
+        if (!WriteParcelableVector(infos, reply)) {
+            HILOG_ERROR("write failed");
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+    }
+    return result;
+}
+
+int32_t FormMgrStub::HandleGetPublishedFormInfoById(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("call");
+    int64_t formId = data.ReadInt64();
+    // write result of calling FMS into reply.
+    RunningFormInfo info;
+    // call FormMgrService to get formInfo.
+    int32_t result = GetPublishedFormInfoById(formId, info);
+    reply.WriteBool(result);
+    if (result == ERR_OK) {
+        // write fetched formInfo into reply.
+        if (!reply.WriteParcelable(&info)) {
+            HILOG_ERROR("write failed");
+            return ERR_APPEXECFWK_PARCEL_ERROR;
+        }
+    }
+    return result;
+}
+
+int32_t FormMgrStub::HandleGetPublishedFormsInfo(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_INFO("call");
+    // write result of calling FMS into reply.
+    std::vector<RunningFormInfo> infos;
+    // call FormMgrService to get formInfos into infos.
+    int32_t result = GetPublishedFormsInfo(infos);
     reply.WriteBool(result);
     if (result == ERR_OK) {
         // write fetched formInfos into reply.

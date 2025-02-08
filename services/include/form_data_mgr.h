@@ -158,6 +158,22 @@ public:
 
     /**
      * @brief Get form record.
+     * @param bundleName Bundle name & formId.
+     * @param formInfo The form record list.
+     * @return Returns true if this function is successfully called; returns false otherwise.
+     */
+    ErrCode GetPublishedFormInfoById(const std::string &bundleName, RunningFormInfo &formInfo,
+        const int64_t &formId, int32_t userId = Constants::INVALID_USER_ID) const;
+    /**
+     * @brief Get form record.
+     * @param bundleName Bundle name & formLocation.
+     * @param formInfos The form record list.
+     * @return Returns true if this function is successfully called; returns false otherwise.
+     */
+    ErrCode GetPublishedFormsInfo(const std::string &bundleName, std::vector<RunningFormInfo> &formInfos,
+        int32_t userId = Constants::INVALID_USER_ID) const;
+
+    /**
      * @param conditionType refresh type.
      * @param formInfos The form record list.
      * @return Returns true if this function is successfully called; returns false otherwise.
@@ -944,8 +960,8 @@ private:
      * @param formRecord The form record.
      * @param runningFormInfo Return the running forms' info.
      */
-    void FillBasicRunningFormInfoByFormRecord(const FormRecord &formRecord, RunningFormInfo &runningFormInfo);
-
+    void FillBasicRunningFormInfoByFormRecord(const FormRecord &formRecord,
+                                              RunningFormInfo &runningFormInfo) const;
     /**
     * @brief Get ability form info.
     * @param record Indicates form record.

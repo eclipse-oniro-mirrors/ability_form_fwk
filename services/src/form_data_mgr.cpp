@@ -562,6 +562,57 @@ bool FormDataMgr::GetFormRecord(const std::string &bundleName, std::vector<FormR
 
 /**
  * @brief Get form record.
+ * @param bundleName Bundle name & formId.
+ * @param formInfo The form record.
+ * @return Returns true if this function is successfully called; returns false otherwise.
+ */
+ErrCode FormDataMgr::GetPublishedFormInfoById(const std::string &bundleName, RunningFormInfo &formInfo,
+    const int64_t &formId, int32_t userId) const
+{
+    HILOG_DEBUG("get form record by bundleName & formId");
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    for (auto itFormRecord = formRecords_.begin(); itFormRecord != formRecords_.end(); itFormRecord++) {
+        if (bundleName == itFormRecord->second.bundleName && formId == itFormRecord->second.formId &&
+            (userId == Constants::INVALID_USER_ID || userId == itFormRecord->second.userId)) {
+            FillBasicRunningFormInfoByFormRecord(itFormRecord->second, formInfo);
+            HILOG_DEBUG("GetPublishedFormInfoById success, formId:%{public}" PRId64, formId);
+            return ERR_OK;
+        }
+    }
+    HILOG_DEBUG("formInfo not find");
+    return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
+}
+
+/**
+ * @brief Get form record.
+ * @param bundleName Bundle name.
+ * @param formInfos The form record.
+ * @return Returns true if this function is successfully called; returns false otherwise.
+ */
+ErrCode FormDataMgr::GetPublishedFormsInfo(const std::string &bundleName, std::vector<RunningFormInfo> &formInfos,
+    int32_t userId) const
+{
+    HILOG_DEBUG("get form record by bundleName");
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    for (auto itFormRecord = formRecords_.begin(); itFormRecord != formRecords_.end(); itFormRecord++) {
+        if (bundleName == itFormRecord->second.bundleName &&
+            (userId == Constants::INVALID_USER_ID || userId == itFormRecord->second.userId)) {
+            RunningFormInfo formInfo;
+            FillBasicRunningFormInfoByFormRecord(itFormRecord->second, formInfo);
+            formInfos.emplace_back(formInfo);
+        }
+    }
+    if (formInfos.size() > 0) {
+        HILOG_DEBUG("GetPublishedFormsInfo success, size:%{public}zu", formInfos.size());
+        return ERR_OK;
+    } else {
+        HILOG_DEBUG("formInfo not find");
+        return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
+    }
+}
+
+/**
+ * @brief Get form record.
  * @param conditionType condition Type.
  * @param formInfos The form record.
  * @return Returns true if this function is successfully called; returns false otherwise.
@@ -2104,8 +2155,10 @@ ErrCode FormDataMgr::CheckInvalidForm(const int64_t formId)
     return ERR_OK;
 }
 
-void FormDataMgr::FillBasicRunningFormInfoByFormRecord(const FormRecord &formRecord, RunningFormInfo &runningFormInfo)
+void FormDataMgr::FillBasicRunningFormInfoByFormRecord(const FormRecord &formRecord,
+                                                       RunningFormInfo &runningFormInfo) const
 {
+    runningFormInfo.formId = formRecord.formId;
     runningFormInfo.formName = formRecord.formName;
     runningFormInfo.dimension = formRecord.specification;
     runningFormInfo.bundleName = formRecord.bundleName;

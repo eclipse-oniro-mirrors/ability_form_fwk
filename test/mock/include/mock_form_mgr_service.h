@@ -65,6 +65,8 @@ public:
         std::vector<FormInfo> &formInfos));
     MOCK_METHOD2(GetFormsInfoByFilter, int(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos));
     MOCK_METHOD2(GetFormsInfo, int(const FormInfoFilter &filter, std::vector<FormInfo> &formInfos));
+    MOCK_METHOD2(GetPublishedFormInfoById, int32_t(const int64_t formId, RunningFormInfo &formInfo));
+    MOCK_METHOD1(GetPublishedFormsInfo, int32_t(std::vector<RunningFormInfo> &formInfos));
     MOCK_METHOD0(IsRequestPublishFormSupported, bool());
     MOCK_METHOD2(StartAbility, int32_t(const Want &want, const sptr<IRemoteObject> &callerToken));
     MOCK_METHOD4(ShareForm, int32_t(int64_t, const std::string&, const sptr<IRemoteObject>&, int64_t));
