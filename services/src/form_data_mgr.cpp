@@ -198,7 +198,7 @@ FormRecord FormDataMgr::CreateFormRecord(const FormItemInfo &formInfo, const int
     newRecord.description = formInfo.GetDescription();
     newRecord.formLocation = formInfo.GetFormLocation();
     newRecord.isThemeForm = formInfo.GetIsThemeForm();
-    newRecord.enableForm = formInfo.IsEnableForm();
+    newRecord.enableForm = formInfo.IsTransparencyEnabled() ? true : formInfo.IsEnableForm();
     newRecord.lockForm = formInfo.IsLockForm();
     if (newRecord.isEnableUpdate) {
         ParseUpdateConfig(newRecord, formInfo);

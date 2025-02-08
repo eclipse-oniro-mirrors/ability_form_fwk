@@ -4037,7 +4037,7 @@ int32_t FormMgrAdapter::EnableForms(const std::string bundleName, const bool ena
         if (enable && !FormBundleLockMgr::GetInstance().IsBundleLock(bundleName, iter->formId)) {
             FormRenderMgr::GetInstance().ExecAcquireProviderForbiddenTaskByFormId(iter->formId);
         }
-        if (iter->enableForm == enable || iter->transparencyEnabled) {
+        if (iter->enableForm == enable || (iter->transparencyEnabled && iter->enableForm == true)) {
             iter = formInfos.erase(iter);
             continue;
         }
