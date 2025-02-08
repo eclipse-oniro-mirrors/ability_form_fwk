@@ -354,6 +354,8 @@ namespace Constants {
     const std::string IS_MULTI_APP_FORM_TRUE = "true";
     // Form data update type
     constexpr const char* FORM_DATA_UPDATE_TYPE = "formDataUpdateType";
+    // Form info max num
+    constexpr const int32_t FORM_INFO_MAX_NUM = 16;
 }  // namespace Constants
 }  // namespace AppExecFwk
 }  // namespace OHOS

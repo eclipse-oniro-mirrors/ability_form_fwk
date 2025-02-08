@@ -47,6 +47,15 @@ public:
     void GetAllFormInfo(std::vector<FormDBInfo> &formDBInfos);
 
     /**
+     * @brief Get all form data in DbCache and DB by bundleName.
+     * @param bundleName BundleName.
+     * @param userId user ID.
+     * @param formDBInfos all db form infos
+     */
+    void GetAllFormDBInfoByBundleName(const std::string &bundleName, const int32_t userId,
+        std::vector<FormDBInfo> &formDBInfos);
+
+    /**
      * @brief Save or update form data to DbCache and DB.
      * @param formDBInfo Form data.
      * @return Returns ERR_OK on success, others on failure.
