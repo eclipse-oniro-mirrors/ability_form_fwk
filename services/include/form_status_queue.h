@@ -41,14 +41,11 @@ public:
     bool ScheduleTask(uint64_t ms, std::function<void()> func);
     void ScheduleDelayTask(const std::pair<int64_t, int64_t> &eventMsg, uint32_t ms, std::function<void()> func);
     void CancelDelayTask(const std::pair<int64_t, int64_t> &eventMsg);
-
-    void GetOrCreateFormStatusQueue(
-        const int64_t formId, const sptr<IRemoteObject> &remoteObjectOfHost, FormStatus formStatus);
-    void DeleteFormStatusQueue(const int64_t formId);
     
-    void PostFormStatusTask(FormCommand formCommand);
+    void PostFormStatusTask(FormCommand formCommand, sptr<IRemoteObject> remoteObjectOfHost = nullptr);
     void PostFormDeleteTask(FormCommand formCommand);
 
+    void PostFormCommandTask(std::shared_ptr<FormCommandQueue> formCommandQueue, const int64_t formId);
     void PostFormCommandTaskByFormId(const int64_t formId);
     void ProcessTask(FormCommand &formCommand);
 
@@ -56,6 +53,10 @@ public:
     void CancelTimeOutReAddForm(const int64_t &formId);
 
 private:
+    std::shared_ptr<FormCommandQueue> GetOrCreateFormStatusQueue(
+        const int64_t formId, const sptr<IRemoteObject> &remoteObjectOfHost, FormStatus formStatus);
+    void DeleteFormStatusQueue(const int64_t formId);
+
     void TimeOutReAddForm(const int64_t &formId, const sptr<IRemoteObject> &remoteObjectOfHost);
 
     //<formid, CommandQueue>
