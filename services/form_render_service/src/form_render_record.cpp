@@ -582,7 +582,7 @@ void FormRenderRecord::SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::
         auto checkConfigItem = {SYSTEM_COLORMODE, SYSTEM_LANGUAGE, SYSTEM_FONT_SIZE_SCALE, SYSTEM_FONT_WEIGHT_SCALE};
         for (const auto& item: checkConfigItem) {
             std::string value = config->GetItem(item);
-            if(!value.empty()) {
+            if (!value.empty()) {
                 configuration_->AddItem(item, value);
             }
         }
