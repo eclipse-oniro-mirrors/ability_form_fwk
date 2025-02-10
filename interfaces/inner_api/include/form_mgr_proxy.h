@@ -632,9 +632,10 @@ public:
     /**
      * @brief lock/unlock form update.
      * @param formLockInfos Indicates the lockForm data.
+     * @param type Indicates the Lock Type.
      * @return Returns ERR_OK on success, others on failure.
      */
-    int32_t LockForms(const std::vector<FormLockInfo> &formLockInfos) override;
+    int32_t LockForms(const std::vector<FormLockInfo> &formLockInfos, OHOS::AppExecFwk::LockChangeType type) override;
 
     /**
      * @brief Check form bundle is lock.

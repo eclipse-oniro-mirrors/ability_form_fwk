@@ -36,16 +36,16 @@ public:
 
     /**
      * @brief Init form bundle lock mgr.
-     * @return True fot sucessful init, false for failed init.
+     * @return True for sucessful init, false for failed init.
      */
     bool Init();
 
     /**
      * @brief Get whether bundle is lock.
      * @param bundleName Bundle name to be check.
-     * @return True fot lock, false for not lock.
+     * @return True for lock, false for not lock.
      */
-    bool IsBundleLock(const std::string &bundleName, int64_t formId);
+    bool IsBundleLock(const std::string &bundleName, int64_t formId = 0);
 
     /**
      * @brief Set whether bundle is lock.
@@ -53,10 +53,26 @@ public:
      * @param isLock True fot lock, false for not lock.
      */
     void SetBundleLockStatus(const std::string &bundleName, bool isLock);
+
+    /**
+     * @brief Get whether bundle is protect.
+     * @param bundleName Bundle name to be check.
+     * @return True for protect, false for not protect.
+     */
+    bool IsBundleProtect(const std::string &bundleName, int64_t formId = 0);
+
+    /**
+     * @brief Set whether bundle is protect.
+     * @param bundleName Bundle name to be set.
+     * @param isProtect True for protect, false for not protect.
+     */
+    void SetBundleProtectStatus(const std::string &bundleName, bool isProtect);
 private:
     bool isInitialized_ = false;
     std::set<std::string> formBundleLockSet_;
     mutable std::shared_mutex bundleLockSetMutex_;
+    std::set<std::string> formBundleProtectSet_;
+    mutable std::shared_mutex bundleProtectSetMutex_;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
