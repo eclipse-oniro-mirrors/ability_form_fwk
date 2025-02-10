@@ -273,6 +273,8 @@ private:
     std::string uid_;
     std::shared_ptr<EventRunner> eventRunner_;
     std::shared_ptr<EventHandler> eventHandler_;
+    bool eventHandleNeedReset = false;
+    std::shared_mutex eventHandlerReset_;
     std::mutex eventHandlerMutex_;
     std::shared_ptr<AbilityRuntime::Runtime> runtime_;
 
