@@ -169,6 +169,8 @@ public:
         return {};
     }
 
+    MOCK_METHOD1(GetLocalAbilityManagerProxy, sptr<IRemoteObject>(int32_t));
+
     std::weak_ptr<bool> weakGetSystemAbility_;
 };
 
