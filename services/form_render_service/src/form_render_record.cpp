@@ -644,6 +644,12 @@ std::shared_ptr<Ace::FormRendererGroup> FormRenderRecord::GetFormRendererGroup(c
     const std::shared_ptr<AbilityRuntime::Context> &context, const std::shared_ptr<AbilityRuntime::Runtime> &runtime)
 {
     HILOG_INFO("Get formRendererGroup");
+    {
+        std::shared_lock<std::shared_mutex> lock(eventHandlerReset_);
+        if (eventHandleNeedReset) {
+            return nullptr;
+        }
+    }
     auto key = formJsInfo.formId;
     auto iter = formRendererGroupMap_.find(key);
     if (iter != formRendererGroupMap_.end()) {
@@ -662,6 +668,12 @@ std::shared_ptr<Ace::FormRendererGroup> FormRenderRecord::CreateFormRendererGrou
     const std::shared_ptr<AbilityRuntime::Context> &context, const std::shared_ptr<AbilityRuntime::Runtime> &runtime)
 {
     HILOG_INFO("Create formRendererGroup");
+    {
+        std::lock_guard<std::mutex> lock(eventHandlerMutex_);
+        if (eventHandler_ == nullptr) {
+            return nullptr;
+        }
+    }
     auto formRendererGroup = Ace::FormRendererGroup::Create(context, runtime, eventHandler_);
     if (formRendererGroup == nullptr) {
         HILOG_ERROR("Create formRendererGroup failed");
@@ -1041,28 +1053,32 @@ bool FormRenderRecord::HandleReleaseRendererInJsThread(
 void FormRenderRecord::Release()
 {
     HILOG_INFO("Release runtime and eventHandler");
+    std::shared_ptr<EventHandler> eventHandler = eventHandler_;
+    std::shared_ptr<EventRunner> eventRunner = eventRunner_;
     {
         std::lock_guard<std::mutex> lock(eventHandlerMutex_);
         if (eventHandler_ == nullptr) {
             HILOG_INFO("null eventHandler");
             return;
         }
-
-        auto syncTask = [renderRecord = this]() {
-            if (renderRecord == nullptr) {
-                HILOG_ERROR("null renderRecord");
-                return;
-            }
-            renderRecord->HandleReleaseInJsThread();
-        };
-        eventHandler_->PostSyncTask(syncTask, "HandleReleaseInJsThread");
-        if (eventRunner_) {
-            eventRunner_->Stop();
-            eventRunner_.reset();
-        }
-
-        eventHandler_.reset();
+        eventHandler_ = nullptr;
+        eventRunner_ = nullptr;
     }
+
+    auto syncTask = [renderRecord = this]() {
+        if (renderRecord == nullptr) {
+            HILOG_ERROR("null renderRecord");
+            return;
+        }
+        renderRecord->HandleReleaseInJsThread();
+    };
+    eventHandler->PostSyncTask(syncTask, "HandleReleaseInJsThread");
+    if (eventRunner) {
+        eventRunner->Stop();
+        eventRunner.reset();
+    }
+    eventHandler.reset();
+    
     std::lock_guard<std::mutex> lock(contextsMapMutex_);
     contextsMapForModuleName_.clear();
 }
@@ -1252,10 +1268,20 @@ bool FormRenderRecord::ReAddIfHapPathChanged(const std::vector<FormJsInfo> &form
         FormMemoryGuard memoryGuard;
         renderRecord->HandleReleaseAllRendererInJsThread();
     };
+    {
+        std::lock_guard<std::shared_mutex> lock(eventHandlerReset_);
+        HILOG_INFO("eventHandleNeedReset, reject create renderergroup");
+        eventHandleNeedReset = true;
+    }
     eventHandler->PostSyncTask(task, "ReleaseAllRenderer");
     Release();
     UpdateAllFormRequest(formJsInfos, true);
     CreateEventHandler(bundleName_, true);
+    {
+        std::lock_guard<std::shared_mutex> lock(eventHandlerReset_);
+        HILOG_INFO("eventHandleNeedReset, Create new eventHandler");
+        eventHandleNeedReset = false;
+    }
     ReAddRecycledForms(formJsInfos);
     return true;
 }
