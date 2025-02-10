@@ -1700,6 +1700,19 @@ ErrCode FormMgrStub::HandleIsFormBundleForbidden(MessageParcel &data, MessagePar
     return ERR_OK;
 }
 
+static LockChangeType ParseLockChangeType(int32_t value)
+{
+    switch (value) {
+        case static_cast<int32_t>(LockChangeType::SWITCH_CHANGE):
+            return LockChangeType::SWITCH_CHANGE;
+        case static_cast<int32_t>(LockChangeType::PROTECT_CHANGE):
+            return LockChangeType::PROTECT_CHANGE;
+        default:
+            HILOG_ERROR("lockChangeType invalid");
+            return LockChangeType::INVALID_PARAMETER;
+    }
+}
+
 int32_t FormMgrStub::HandleLockForms(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_DEBUG("call");
@@ -1718,7 +1731,14 @@ int32_t FormMgrStub::HandleLockForms(MessageParcel &data, MessageParcel &reply)
         }
         formLockInfo.push_back(*info);
     }
-    int32_t result = LockForms(formLockInfo);
+
+    int32_t dataValue = data.ReadInt32();
+    LockChangeType type = ParseLockChangeType(dataValue);
+    if (type == LockChangeType::INVALID_PARAMETER) {
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    int32_t result = LockForms(formLockInfo, type);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;

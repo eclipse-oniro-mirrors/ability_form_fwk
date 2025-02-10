@@ -699,9 +699,10 @@ public:
     /**
      * @brief lock/unlock form update.
      * @param formLockInfos Indicates the lockForm data.
+     * @param type Indicates the Lock Type.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual int32_t LockForms(const std::vector<FormLockInfo> &formLockInfos)
+    virtual int32_t LockForms(const std::vector<FormLockInfo> &formLockInfos, OHOS::AppExecFwk::LockChangeType type)
     {
         return 0;
     }

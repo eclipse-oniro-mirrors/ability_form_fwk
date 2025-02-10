@@ -2474,7 +2474,7 @@ bool FormMgrProxy::IsFormBundleForbidden(const std::string &bundleName)
     return reply.ReadBool();
 }
 
-int32_t FormMgrProxy::LockForms(const std::vector<FormLockInfo> &formLockInfos)
+int32_t FormMgrProxy::LockForms(const std::vector<FormLockInfo> &formLockInfos, OHOS::AppExecFwk::LockChangeType type)
 {
     HILOG_DEBUG("LockForms start");
     MessageParcel data;
@@ -2495,6 +2495,8 @@ int32_t FormMgrProxy::LockForms(const std::vector<FormLockInfo> &formLockInfos)
             return ERR_APPEXECFWK_PARCEL_ERROR;
         }
     }
+
+    data.WriteInt32(static_cast<int32_t>(type));
 
     MessageParcel reply;
     MessageOption option(MessageOption::TF_SYNC);

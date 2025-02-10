@@ -86,6 +86,7 @@ public:
     bool isUpdateDuringDisableForm = false;
     Constants::RenderingMode renderingMode = Constants::RenderingMode::FULL_COLOR;
     bool lockForm = false;
+    bool protectForm = false;
     std::vector<int32_t> conditionUpdate;
 };
 }  // namespace AppExecFwk
