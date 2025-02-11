@@ -2294,17 +2294,23 @@ ErrCode FormMgrAdapter::RequestPublishFormToHost(Want &want)
     ErrCode errCode = QueryPublishFormToHost(wantToHost);
     if (errCode == ERR_OK) {
         int32_t userId = want.GetIntParam(Constants::PARAM_FORM_USER_ID, -1);
-        return FormAmsHelper::GetInstance().StartAbility(wantToHost, userId);
+        int ret = FormAmsHelper::GetInstance().StartAbility(wantToHost, userId);
+        if (ret != ERR_OK) {
+            HILOG_ERROR("fail StartAbility");
+            return ret;
+        }
     }
 
     // Handle by interceptor callback when the system handler is not found.
+    int64_t formId = std::stoll(want.GetStringParam(Constants::PARAM_FORM_IDENTITY_KEY));
     if (formPublishInterceptor_ == nullptr) {
-        HILOG_ERROR("query publish form failed, and have not publish interceptor. errCode:%{public}d", errCode);
-        return errCode;
+        return AcquireAddFormResult(formId);
     }
+
     int ret = formPublishInterceptor_->ProcessPublishForm(wantToHost);
     if (ret == ERR_OK) {
         HILOG_DEBUG("success to ProcessPublishForm");
+        return AcquireAddFormResult(formId);
     } else {
         HILOG_ERROR("fail ProcessPublishForm");
     }
