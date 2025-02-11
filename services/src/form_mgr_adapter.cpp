@@ -2294,7 +2294,7 @@ ErrCode FormMgrAdapter::RequestPublishFormToHost(Want &want)
     ErrCode errCode = QueryPublishFormToHost(wantToHost);
     if (errCode == ERR_OK) {
         int32_t userId = want.GetIntParam(Constants::PARAM_FORM_USER_ID, -1);
-        int ret =  FormAmsHelper::GetInstance().StartAbility(wantToHost, userId);
+        int ret = FormAmsHelper::GetInstance().StartAbility(wantToHost, userId);
         if (ret != ERR_OK) {
             HILOG_ERROR("fail StartAbility");
             return ret;
