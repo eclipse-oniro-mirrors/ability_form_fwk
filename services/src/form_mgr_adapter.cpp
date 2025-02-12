@@ -91,7 +91,6 @@ constexpr int32_t DEFAULT_USER_ID = 100;
 constexpr int32_t BUNDLE_NAME_INDEX = 0;
 constexpr int32_t USER_ID_INDEX = 1;
 constexpr int32_t INSTANCE_SEQ_INDEX = 2;
-constexpr int32_t BIG_DATA = 32 * 1024;
 const std::string BUNDLE_INFO_SEPARATOR = "_";
 const std::string POINT_ETS = ".ets";
 constexpr int DATA_FIELD = 1;
@@ -812,9 +811,6 @@ int FormMgrAdapter::UpdateForm(const int64_t formId, const int32_t callingUid,
     if (!FormDataMgr::GetInstance().GetFormRecord(matchedFormId, formRecord)) {
         HILOG_ERROR("not exist such form:%{public}" PRId64 ".", matchedFormId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
-    }
-    if (formProviderData.GetData().size() > BIG_DATA && !formRecord.isSystemApp) {
-        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
 
     // Checks if the form provider is the currently active user.

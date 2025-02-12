@@ -51,13 +51,10 @@ struct FormJsInfo : public Parcelable {
     FormType uiSyntax = FormType::JS;
     bool isDynamic = true;
     bool transparencyEnabled = false;
-    bool isSystemApp = false;
 
     bool ReadFromParcel(Parcel &parcel);
     virtual bool Marshalling(Parcel &parcel) const override;
     static FormJsInfo *Unmarshalling(Parcel &parcel);
-    bool GetCurrentUserId(int &userId) const;
-    bool CheckIsSystemApp(const std::string& bundleName) const;
     bool WriteFormData(Parcel &parcel) const;
     bool WriteObjects(Parcel &parcel) const;
     bool WriteImageData(Parcel &parcel) const;
