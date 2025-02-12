@@ -37,7 +37,7 @@ const std::string JSON_EMPTY_STRING = "{}";
 const std::string JSON_IMAGES_STRING = "formImages";
 constexpr int32_t READ_PARCEL_MAX_IMAGE_DATA_NUM_SIZE = 1000;
 constexpr int32_t MAX_IMAGE_BYTE_SIZE = 50 * 1024 * 1024;
-constexpr int32_t MAX_BUFFER_SIZE = 600 * 1024 * 1024;
+constexpr int32_t MAX_BUFFER_SIZE = 32 * 1024 * 1024;
 constexpr int32_t BIG_DATA = 32 * 1024;
 constexpr int32_t SHARE_MEM_ALLOC = 2;
 /**
