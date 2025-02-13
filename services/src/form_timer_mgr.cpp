@@ -259,7 +259,7 @@ bool FormTimerMgr::UpdateAtTimerValue(int64_t formId, const FormTimerCfg &timerC
             if (itItem->refreshTask.formId == formId) {
                 changedItem = *itItem;
                 updateAtTimerTasks_.erase(itItem);
-                break;
+                continue;
             }
         }
 
@@ -267,10 +267,7 @@ bool FormTimerMgr::UpdateAtTimerValue(int64_t formId, const FormTimerCfg &timerC
             HILOG_ERROR("the updateAtTimer not exist");
             return false;
         }
-        changedItem.refreshTask.hour = timerCfg.updateAtHour;
-        changedItem.refreshTask.min = timerCfg.updateAtMin;
-        changedItem.updateAtTime = changedItem.refreshTask.hour * Constants::MIN_PER_HOUR + changedItem.refreshTask.min;
-        AddUpdateAtItem(changedItem);
+
         std::vector<std::vector<int>> updateAtTimes = timerCfg.updateAtTimes;
         if (updateAtTimes.size() > 0) {
             bool ret = ERR_OK;
@@ -283,6 +280,14 @@ bool FormTimerMgr::UpdateAtTimerValue(int64_t formId, const FormTimerCfg &timerC
                 changedItem_.updateAtTime = updateAtTime;
                 AddUpdateAtItem(changedItem_);
             }
+        } else {
+            HILOG_INFO("updateAtHour : %{public}d ,updateAtMin : %{public}d ",
+                (int)timerCfg.updateAtHour, (int)timerCfg.updateAtMin);
+            changedItem.refreshTask.hour = timerCfg.updateAtHour;
+            changedItem.refreshTask.min = timerCfg.updateAtMin;
+            changedItem.updateAtTime = changedItem.refreshTask.hour * Constants::MIN_PER_HOUR
+                + changedItem.refreshTask.min;
+            AddUpdateAtItem(changedItem);
         }
     }
 
@@ -313,15 +318,15 @@ bool FormTimerMgr::IntervalToAtTimer(int64_t formId, const FormTimerCfg &timerCf
         timerTask = intervalTask->second;
         intervalTimerTasks_.erase(intervalTask);
 
-        timerTask.isUpdateAt = true;
-        timerTask.hour = timerCfg.updateAtHour;
-        timerTask.min = timerCfg.updateAtMin;
-        if (!AddUpdateAtTimer(timerTask)) {
-            HILOG_ERROR("fail AddUpdateAtTimer");
-            return false;
-        }
         std::vector<std::vector<int>> updateAtTimes = timerCfg.updateAtTimes;
         if (updateAtTimes.size() == 0) {
+            timerTask.isUpdateAt = true;
+            timerTask.hour = timerCfg.updateAtHour;
+            timerTask.min = timerCfg.updateAtMin;
+            if (!AddUpdateAtTimer(timerTask)) {
+                HILOG_ERROR("fail AddUpdateAtTimer");
+                return false;
+            }
             return true;
         }
         for (const auto &time: updateAtTimes) {
