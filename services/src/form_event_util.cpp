@@ -445,6 +445,10 @@ void FormEventUtil::HandleAddMultiUpdateTimes(const int64_t formId,
             FormTimerMgr::GetInstance().AddFormTimer(formId,
                 time[0], time[1], record.providerUserId);
         }
+    } else {
+        HILOG_INFO("add at timer:%{public}d,%{public}d", timerCfg.updateAtHour, timerCfg.updateAtMin);
+        FormTimerMgr::GetInstance().AddFormTimer(formId, timerCfg.updateAtHour,
+            timerCfg.updateAtMin, record.providerUserId);
     }
 }
 
@@ -475,10 +479,6 @@ void FormEventUtil::HandleTimerUpdate(const int64_t formId,
             }
             FormTimerMgr::GetInstance().AddFormTimer(formId, updateDuration, record.providerUserId);
         } else {
-            HILOG_INFO("add at timer:%{public}d,%{public}d", timerCfg.updateAtHour, timerCfg.updateAtMin);
-            FormTimerMgr::GetInstance().AddFormTimer(formId, timerCfg.updateAtHour,
-                timerCfg.updateAtMin, record.providerUserId);
-
             HandleAddMultiUpdateTimes(formId, record, timerCfg);
         }
         return;
@@ -680,7 +680,7 @@ void FormEventUtil::UpdateFormRecord(const FormInfo &formInfo, FormRecord &formR
         formRecord.updateAtHour = std::stoi(time[0]);
         formRecord.updateAtMin = std::stoi(time[1]);
     }
-    std::string multiScheduledUpdateTime_ = formInfo.scheduledUpdateTime;
+    std::string multiScheduledUpdateTime_ = formInfo.multiScheduledUpdateTime;
     if (!multiScheduledUpdateTime_.empty()) {
         UpdateMultiUpdateTime(multiScheduledUpdateTime_, formRecord);
     }
@@ -698,7 +698,7 @@ void FormEventUtil::UpdateFormRecord(const AbilityFormInfo &formInfo, FormRecord
         formRecord.updateAtHour = std::stoi(time[0]);
         formRecord.updateAtMin = std::stoi(time[1]);
     }
-    std::string multiScheduledUpdateTime_ = formInfo.scheduledUpdateTime;
+    std::string multiScheduledUpdateTime_ = formInfo.multiScheduledUpdateTime;
     if (!multiScheduledUpdateTime_.empty()) {
         UpdateMultiUpdateTime(multiScheduledUpdateTime_, formRecord);
     }
