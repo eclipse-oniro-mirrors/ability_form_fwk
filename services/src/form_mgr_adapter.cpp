@@ -1497,6 +1497,13 @@ ErrCode FormMgrAdapter::GetFormConfigInfo(const Want &want, FormItemInfo &formCo
         static_cast<int>(Constants::RenderingMode::FULL_COLOR));
     formConfigInfo.SetRenderingMode((Constants::RenderingMode)renderingMode);
 
+    SetFormEnableAndLockState(formInfo, formConfigInfo, formLocation);
+
+    return ERR_OK;
+}
+
+void FormMgrAdapter::SetFormEnableAndLockState(FormInfo &formInfo, FormItemInfo &formConfigInfo, int formLocation)
+{
     // form is always visible on the lock screen
     if (formLocation == static_cast<int>(Constants::FormLocation::SCREEN_LOCK)) {
         formConfigInfo.SetEnableForm(true);
@@ -1507,8 +1514,6 @@ ErrCode FormMgrAdapter::GetFormConfigInfo(const Want &want, FormItemInfo &formCo
         formConfigInfo.SetEnableForm(!isFormBundleForbidden);
         SetLockFormStateOfFormItemInfo(formInfo, formConfigInfo);
     }
-
-    return ERR_OK;
 }
 
 void FormMgrAdapter::SetLockFormStateOfFormItemInfo(FormInfo &formInfo, FormItemInfo &formConfigInfo)
