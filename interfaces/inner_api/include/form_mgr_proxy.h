@@ -638,12 +638,19 @@ public:
     int32_t LockForms(const std::vector<FormLockInfo> &formLockInfos, OHOS::AppExecFwk::LockChangeType type) override;
 
     /**
-     * @brief Check form bundle is lock.
+     * @brief Check form bundle is protect.
      * @param bundleName The bundle name of form to be check.
      * @param formId The Id of the form to query.
-     * @return Returns true for form bundle is lock.
+     * @return Returns true for form bundle is protect.
      */
-    bool IsFormBundleLocked(const std::string &bundleName, int64_t formId) override;
+    bool IsFormBundleProtected(const std::string &bundleName, int64_t formId) override;
+
+    /**
+     * @brief Check form bundle is exempt.
+     * @param formId The Id of the form to query.
+     * @return Returns true for form bundle is exempt.
+     */
+    bool IsFormBundleExempt(int64_t formId = 0) override;
 
     /**
      * @brief Notify the form is locked or not.

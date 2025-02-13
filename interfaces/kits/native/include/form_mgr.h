@@ -693,12 +693,19 @@ public:
     bool IsFormBundleForbidden(const std::string &bundleName);
 
     /**
-     * @brief Check form bundle is locked.
+     * @brief Check form bundle is protected.
      * @param bundleName The bundle name of form to be check.
      * @param formId The Id of the form to query.
-     * @return Returns true for form bundle is locked.
+     * @return Returns true for form bundle is protected.
      */
-    bool IsFormBundleLocked(const std::string &bundleName, int64_t formId);
+    bool IsFormBundleProtected(const std::string &bundleName, int64_t formId);
+
+    /**
+     * @brief Check form bundle is exempt.
+     * @param formId The Id of the form to query.
+     * @return Returns true for form bundle is exempt.
+     */
+    bool IsFormBundleExempt(int64_t formId);
 
     /**
      * @brief Notify the form is locked or not.

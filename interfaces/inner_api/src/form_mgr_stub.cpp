@@ -216,8 +216,8 @@ int FormMgrStub::OnRemoteRequestThird(uint32_t code, MessageParcel &data, Messag
             return HandleUnregisterPublishFormInterceptor(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_CLICK_EVENT_OBSERVER):
             return HandleRegisterClickCallbackEventObserver(data, reply);
-        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_IS_FORM_BUNDLE_LOCKED):
-            return HandleIsFormLocked(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_IS_FORM_BUNDLE_PEOTECTED):
+            return HandleIsFormProtected(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_NOTIFY_FORM_LOCKED):
             return HandleNotifyFormLocked(data, reply);
         default:
@@ -292,6 +292,8 @@ int FormMgrStub::OnRemoteRequestFifth(uint32_t code, MessageParcel &data, Messag
             return HandleGetPublishedFormInfoById(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_PUBLISHED_FORMS_INFO):
             return HandleGetPublishedFormsInfo(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_IS_FORM_BUNDLE_EXEMPT):
+            return HandleIsFormExempt(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -1746,12 +1748,24 @@ int32_t FormMgrStub::HandleLockForms(MessageParcel &data, MessageParcel &reply)
     return result;
 }
 
-ErrCode FormMgrStub::HandleIsFormLocked(MessageParcel &data, MessageParcel &reply)
+ErrCode FormMgrStub::HandleIsFormProtected(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_DEBUG("call");
     std::string bundleName = data.ReadString();
     int64_t formId = data.ReadInt64();
-    bool result = IsFormBundleLocked(bundleName, formId);
+    bool result = IsFormBundleProtected(bundleName, formId);
+    if (!reply.WriteBool(result)) {
+        HILOG_ERROR("write action failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleIsFormExempt(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("call");
+    int64_t formId = data.ReadInt64();
+    bool result = IsFormBundleExempt(formId);
     if (!reply.WriteBool(result)) {
         HILOG_ERROR("write action failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;

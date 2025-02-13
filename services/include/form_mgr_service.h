@@ -697,7 +697,14 @@ public:
      * @param formId The Id of the form to query.
      * @return Returns true for form bundle is lock.
      */
-    bool IsFormBundleLocked(const std::string &bundleName, int64_t formId) override;
+    bool IsFormBundleProtected(const std::string &bundleName, int64_t formId) override;
+
+    /**
+     * @brief Check form bundle is exempt.
+     * @param formId The Id of the form to query.
+     * @return Returns true for form bundle is exempt.
+     */
+    bool IsFormBundleExempt(int64_t formId) override;
 
     /**
      * @brief Notify the form is locked or not.
