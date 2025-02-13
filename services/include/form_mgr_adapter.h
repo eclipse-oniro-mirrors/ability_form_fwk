@@ -1186,6 +1186,8 @@ private:
     bool CheckIsMultiAppForm(FormInfo &formInfo);
 
     void SetLockFormStateOfFormItemInfo(FormInfo &formInfo, FormItemInfo &formConfigInfo);
+
+    bool IsActionAllowToPublish(const std::string &action);
     /**
      * @class ClientDeathRecipient
      * notices IRemoteBroker died.
