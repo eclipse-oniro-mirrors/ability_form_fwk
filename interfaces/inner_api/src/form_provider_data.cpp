@@ -297,12 +297,14 @@ bool FormProviderData::ReadFromParcel(Parcel &parcel)
     HILOG_DEBUG("ReadFromParcel data length is %{public}d ", formDataLength);
     std::string jsonDataString;
     if (formDataLength > BIG_DATA) {
-        const void *rawData = ReadAshmemDataFromParcel(parcel, formDataLength);
+        void *rawData = ReadAshmemDataFromParcel(parcel, formDataLength);
         if (rawData == nullptr) {
             HILOG_INFO("rawData is nullptr");
             return false;
         }
         jsonDataString = static_cast<const char*>(rawData);
+        free(rawData);
+        rawData = nullptr;
     } else {
         jsonDataString = Str16ToStr8(parcel.ReadString16());
     }
