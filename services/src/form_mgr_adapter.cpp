@@ -1497,12 +1497,23 @@ ErrCode FormMgrAdapter::GetFormConfigInfo(const Want &want, FormItemInfo &formCo
         static_cast<int>(Constants::RenderingMode::FULL_COLOR));
     formConfigInfo.SetRenderingMode((Constants::RenderingMode)renderingMode);
 
-    bool isFormBundleForbidden = FormBundleForbidMgr::GetInstance().IsBundleForbidden(
-        formConfigInfo.GetProviderBundleName());
-    formConfigInfo.SetEnableForm(!isFormBundleForbidden);
-    SetLockFormStateOfFormItemInfo(formInfo, formConfigInfo);
+    SetFormEnableAndLockState(formInfo, formConfigInfo, formLocation);
 
     return ERR_OK;
+}
+
+void FormMgrAdapter::SetFormEnableAndLockState(FormInfo &formInfo, FormItemInfo &formConfigInfo, int formLocation)
+{
+    // form is always visible on the lock screen
+    if (formLocation == static_cast<int>(Constants::FormLocation::SCREEN_LOCK)) {
+        formConfigInfo.SetEnableForm(true);
+        formConfigInfo.SetLockForm(false);
+    } else {
+        bool isFormBundleForbidden = FormBundleForbidMgr::GetInstance().IsBundleForbidden(
+            formConfigInfo.GetProviderBundleName());
+        formConfigInfo.SetEnableForm(!isFormBundleForbidden);
+        SetLockFormStateOfFormItemInfo(formInfo, formConfigInfo);
+    }
 }
 
 void FormMgrAdapter::SetLockFormStateOfFormItemInfo(FormInfo &formInfo, FormItemInfo &formConfigInfo)
