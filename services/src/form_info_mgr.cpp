@@ -852,8 +852,15 @@ ErrCode FormInfoMgr::ReloadFormInfos(const int32_t userId)
     if (result != ERR_OK) {
         return result;
     }
-
-    HILOG_INFO("bundle name set number:%{public}zu", bundleVersionMap.size());
+    std::string versionCode;
+    ErrCode errCode = FormInfoRdbStorageMgr::GetInstance().GetFormVersionCode(versionCode);
+    if (errCode != ERR_OK) {
+        HILOG_ERROR("get form version code failed");
+        return errCode;
+    }
+    bool isNeedUpdateAll = versionCode.empty() || Constants::FORM_VERSION_CODE > std::stoi(versionCode);
+    HILOG_INFO("bundle number:%{public}zu, old versionCode:%{public}%s, new versionCode:%{public}%d",
+        bundleVersionMap.size(), versionCode, Constants::FORM_VERSION_CODE);
     
     std::unique_lock<std::shared_timed_mutex> guard(bundleFormInfoMapMutex_);
     hasReloadedFormInfosState_ = false;
@@ -865,13 +872,15 @@ ErrCode FormInfoMgr::ReloadFormInfos(const int32_t userId)
             HILOG_INFO("remove forms info success, bundleName=%{public}s", bundleName.c_str());
             continue;
         }
-        uint32_t oldVersionCode = bundleVersionPair->second;
-        bundleVersionMap.erase(bundleVersionPair);
-        uint32_t newVersionCode = bundleFormInfoPair.second->GetVersionCode(userId);
-        if (oldVersionCode == newVersionCode) {
-            HILOG_INFO("versionCode not change, bundleName=%{public}s, versionCode:%{public}d",
-                bundleName.c_str(), oldVersionCode);
-            continue;
+        if (!isNeedUpdateAll) {
+            uint32_t oldVersionCode = bundleVersionPair->second;
+            bundleVersionMap.erase(bundleVersionPair);
+            uint32_t newVersionCode = bundleFormInfoPair.second->GetVersionCode(userId);
+            if (oldVersionCode == newVersionCode) {
+                HILOG_INFO("versionCode not change, bundleName=%{public}s, versionCode:%{public}d",
+                    bundleName.c_str(), oldVersionCode);
+                continue;
+            }
         }
         bundleFormInfoPair.second->UpdateStaticFormInfos(userId);
         HILOG_INFO("update forms info success, bundleName=%{public}s, old:%{public}d, new:%{public}d",
@@ -887,6 +896,9 @@ ErrCode FormInfoMgr::ReloadFormInfos(const int32_t userId)
         bundleFormInfoMap_[bundleVersionPair.first] = bundleFormInfoPtr;
         HILOG_INFO("add forms info success, bundleName=%{public}s, versionCode:%{public}d",
             bundleVersionPair.first.c_str(), bundleVersionPair.second);
+    }
+    if (isNeedUpdateAll) {
+        FormInfoRdbStorageMgr::GetInstance().UpdateFormVersionCode();
     }
     hasReloadedFormInfosState_ = true;
     HILOG_INFO("end, formInfoMapSize:%{public}zu", bundleFormInfoMap_.size());
