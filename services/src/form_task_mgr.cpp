@@ -1589,14 +1589,14 @@ void FormTaskMgr::ConnectNetWork()
     DelayedSingleton<FormMgrService>::GetInstance()->SubscribeNetConn();
 }
 
-void FormTaskMgr::PostDelayRefreshForms(const std::vector updatedForms, const Want &want)
+void FormTaskMgr::PostDelayRefreshForms(const std::vector<FormRecord> updatedForms, const Want &want)
 {
     HILOG_INFO("start");
     if (serialQueue_ == nullptr) {
         HILOG_ERROR("serialQueue_ invalidate");
         return;
     }
-    auto delayRefreshForms = updatedForms, want {
+    auto delayRefreshForms = [updatedForms, want]() {
         for (const auto &updatedForm : updatedForms) {
             ErrCode errCode = FormProviderMgr::GetInstance().RefreshForm(updatedForm.formId, want, true);
             if (errCode == ERR_APPEXECFWK_FORM_GET_AMSCONNECT_FAILED) {
