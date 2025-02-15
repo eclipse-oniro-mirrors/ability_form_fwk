@@ -1602,7 +1602,7 @@ void FormTaskMgr::PostDelayRefreshForms(const std::vector updatedForms, const Wa
             if (errCode == ERR_APPEXECFWK_FORM_GET_AMSCONNECT_FAILED) {
                 HILOG_INFO("RefreshForm failed one time, PostRefreshFormTask to retry. form %{public}" PRId64 "",
                     updatedForm.formId);
-            FormTaskMgr::GetInstance().PostEnterpriseAppInstallFailedRetryTask(updatedForm.formId, want, true);
+                FormTaskMgr::GetInstance().PostEnterpriseAppInstallFailedRetryTask(updatedForm.formId, want, true);
             }
         }
     };
