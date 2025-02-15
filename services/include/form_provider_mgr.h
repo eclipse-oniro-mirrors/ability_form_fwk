@@ -26,6 +26,8 @@
 namespace OHOS {
 namespace AppExecFwk {
 using Want = OHOS::AAFwk::Want;
+using IInterface = OHOS::AAFwk::IInterface;
+using WantParams = OHOS::AAFwk::WantParams;
 /**
  * @class FormProviderMgr
  * Form provider manager.
@@ -143,6 +145,7 @@ private:
      */
     ErrCode RebindByFreeInstall(const FormRecord &record, Want &want,
         const sptr<AAFwk::IAbilityConnection> formRefreshConnection);
+    void MergeWant(Want newWant, Want &oldWant);
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

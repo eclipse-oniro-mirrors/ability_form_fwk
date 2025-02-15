@@ -22,9 +22,11 @@
 #include "form_instance.h"
 #include "form_provider_info.h"
 #include "application_info.h"
+#include "want.h"
 
 namespace OHOS {
 namespace AppExecFwk {
+using Want = OHOS::AAFwk::Want;
 /**
  * @class FormRecord
  * Form data.
@@ -88,6 +90,7 @@ public:
     bool lockForm = false;
     bool protectForm = false;
     std::vector<int32_t> conditionUpdate;
+    std::map<int64_t, Want> wantCacheMap;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

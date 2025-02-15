@@ -84,6 +84,7 @@ ErrCode FormProviderMgr::AcquireForm(const int64_t formId, const FormProviderInf
     }
     formRecord.isInited = true;
     formRecord.needRefresh = false;
+    formRecord.wantCacheMap.clear();
     FormDataMgr::GetInstance().SetFormCacheInited(formId, true);
 
     formRecord.formProviderInfo = formProviderInfo;
@@ -167,11 +168,18 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
     bool screenOnFlag = PowerMgr::PowerMgrClient::GetInstance().IsScreenOn();
     bool collaborationScreenOnFlag = PowerMgr::PowerMgrClient::GetInstance().IsCollaborationScreenOn();
     bool isHicar = (record.moduleName == HICAR_FORM);
-    if (!screenOnFlag && !collaborationScreenOnFlag && !isFormProviderUpdate && !isHicar) {
-        FormDataMgr::GetInstance().SetNeedRefresh(formId, true);
-        HILOG_DEBUG("screen off, set refresh flag, do not refresh now");
-        return ERR_OK;
-    }
+    if (!screenOnFlag && !collaborationScreenOnFlag && !isFormProviderUpdate) {
+        if (record.wantCacheMap.size() != 0) {
+            MergeWant(want, record.wantCacheMap[formId]);
+        } else {
+            record.wantCacheMap[formId] = want;
+        }
+    record.needRefresh = true;
+    FormDataMgr::GetInstance().SetNeedRefresh(formId, true);
+    FormDataMgr::GetInstance().UpdateFormRecord(formId, record);
+    HILOG_INFO("screen off, set refresh flag, do not refresh now, formId:%{public}" PRId64 ".", formId);
+    return ERR_OK;
+}
 #endif
 
     bool needRefresh = IsNeedToFresh(record, formId, isVisibleToFresh);
@@ -439,6 +447,7 @@ ErrCode FormProviderMgr::UpdateForm(const int64_t formId,
     // formRecord init
     formRecord.isInited = true;
     formRecord.needRefresh = false;
+    formRecord.wantCacheMap.clear();
     FormDataMgr::GetInstance().SetFormCacheInited(formId, true);
 
     // update form for host clients
