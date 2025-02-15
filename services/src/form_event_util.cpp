@@ -141,14 +141,8 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
     want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
     want.SetParam(Constants::FORM_ENABLE_UPDATE_REFRESH_KEY, true);
     want.SetParam(Constants::FORM_DATA_UPDATE_TYPE, Constants::FULL_UPDATE);
-    for (const auto &updatedForm : updatedForms) {
-        ErrCode errCode = FormProviderMgr::GetInstance().RefreshForm(updatedForm.formId, want, true);
-        if (errCode == ERR_APPEXECFWK_FORM_GET_AMSCONNECT_FAILED) {
-            HILOG_INFO("RefreshForm failed one time, PostRefreshFormTask to retry");
-            FormTaskMgr::GetInstance().PostEnterpriseAppInstallFailedRetryTask(updatedForm.formId, want, true);
-        }
-    }
     FormRenderMgr::GetInstance().ReloadForm(std::move(updatedForms), bundleName, userId);
+    FormTaskMgr::GetInstance().PostDelayRefreshForms(updatedForms, want);
 }
 
 void FormEventUtil::HandleOnUnlock()

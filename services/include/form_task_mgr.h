@@ -49,6 +49,7 @@ constexpr int32_t FORM_BUILD_DELAY_TIME = 1400; // ms
 constexpr int32_t ENTERPRISE_APP_INSTALL_FAILED_DELAY_TIME = 5000; // ms
 constexpr int32_t CLEAN_FORM_HOST_TASK_DELAY_TIME = 100; // ms
 constexpr int32_t FORM_CON_NETWORK_DELAY_TIME = 500; // ms
+constexpr int32_t PROVIDER_UPDATE_REFRESH_FORMS_TASK_DELAY_TIME = 100; // ms
 }
 /**
  * @class FormTaskMgr
@@ -344,6 +345,13 @@ public:
      * @brief Post task to connect NetWork.
      */
     void PostConnectNetWork();
+
+    /**
+     * @brief Post delay refresh forms task when provider update.
+     * @param updatedForms Need refresh forms.
+     * @param want The want of the request.
+     */
+    void PostDelayRefreshForms(const std::vector<FormRecord> updatedForms, const Want &want);
 
 private:
     /**

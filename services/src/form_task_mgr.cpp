@@ -1589,6 +1589,27 @@ void FormTaskMgr::ConnectNetWork()
     DelayedSingleton<FormMgrService>::GetInstance()->SubscribeNetConn();
 }
 
+void FormTaskMgr::PostDelayRefreshForms(const std::vector updatedForms, const Want &want)
+{
+    HILOG_INFO("start");
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("serialQueue_ invalidate");
+        return;
+    }
+    auto delayRefreshForms = updatedForms, want {
+        for (const auto &updatedForm : updatedForms) {
+            ErrCode errCode = FormProviderMgr::GetInstance().RefreshForm(updatedForm.formId, want, true);
+            if (errCode == ERR_APPEXECFWK_FORM_GET_AMSCONNECT_FAILED) {
+                HILOG_INFO("RefreshForm failed one time, PostRefreshFormTask to retry. form %{public}" PRId64 "",
+                    updatedForm.formId);
+            FormTaskMgr::GetInstance().PostEnterpriseAppInstallFailedRetryTask(updatedForm.formId, want, true);
+            }
+        }
+    };
+    serialQueue_->ScheduleTask(PROVIDER_UPDATE_REFRESH_FORMS_TASK_DELAY_TIME, delayRefreshForms);
+    HILOG_INFO("end");
+}
+
 
 } // namespace AppExecFwk
 } // namespace OHOS
