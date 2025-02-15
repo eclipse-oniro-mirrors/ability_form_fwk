@@ -822,8 +822,10 @@ void FormRenderRecord::UpdateRenderer(const FormJsInfo &formJsInfo)
         search != formRendererGroupMap_.end()) {
         auto group = search->second;
         group->UpdateForm(formJsInfo);
+        HILOG_INFO("UpdateForm formId:%{public}s", std::to_string(formJsInfo.formId).c_str());
+    } else {
+        HILOG_ERROR("UpdateForm failed:%{public}s", std::to_string(formJsInfo.formId).c_str());
     }
-    HILOG_INFO("UpdateForm formId:%{public}s", std::to_string(formJsInfo.formId).c_str());
 }
 
 bool FormRenderRecord::HandleDeleteInJsThread(int64_t formId, const std::string &compId)
