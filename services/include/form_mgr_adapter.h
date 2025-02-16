@@ -660,7 +660,7 @@ public:
      * @param lock True for lock bundle, false for unlock bundle.
      * @return Returns ERR_OK on success, others on failure.
      */
-    int32_t SwitchLockForms(const std::string &bundleName, int32_t userId, const bool lock);
+    ErrCode SwitchLockForms(const std::string &bundleName, int32_t userId, const bool lock);
     
     /**
      * @brief this interface is invoked when the application protect status changes.
@@ -668,7 +668,7 @@ public:
      * @param lock True for protect form, false for unprotect form.
      * @return Returns ERR_OK on success, others on failure.
      */
-    int32_t ProtectLockForms(const std::string &bundleName, int32_t userId, const bool protect);
+    ErrCode ProtectLockForms(const std::string &bundleName, int32_t userId, const bool protect);
 
     /**
      * @brief Update form size.
