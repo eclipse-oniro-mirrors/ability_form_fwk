@@ -854,6 +854,7 @@ ErrCode FormInfoMgr::ReloadFormInfos(const int32_t userId)
     }
     std::unique_lock<std::shared_timed_mutex> guard(bundleFormInfoMapMutex_);
     hasReloadedFormInfosState_ = false;
+    UpdateBundleFormInfos(bundleVersionMap, userId);
     for (auto const &bundleVersionPair : bundleVersionMap) {
         std::shared_ptr<BundleFormInfo> bundleFormInfoPtr = std::make_shared<BundleFormInfo>(bundleVersionPair.first);
         ErrCode errCode = bundleFormInfoPtr->UpdateStaticFormInfos(userId);
