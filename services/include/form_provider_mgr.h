@@ -145,7 +145,8 @@ private:
      */
     ErrCode RebindByFreeInstall(const FormRecord &record, Want &want,
         const sptr<AAFwk::IAbilityConnection> formRefreshConnection);
-    void MergeWant(Want newWant, Want &oldWant);
+    void MergeWant(const Want &newWant, Want &oldWant);
+    void FormProviderMgr::UpdateWant(const int64_t formId, const Want &want, FormRecord &record);
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS
