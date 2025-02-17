@@ -99,6 +99,19 @@ ErrCode FormProviderMgr::AcquireForm(const int64_t formId, const FormProviderInf
     return ERR_OK;
 }
 
+void FormProviderMgr::MergeWant(Want newWant, Want &oldWant)
+{
+    std::map<std::string, sptr<IInterface>> newWantMap;
+    WantParams newWantParams, oldWantParams;
+    newWantParams = newWant.GetParams();
+    oldWantParams = oldWant.GetParams();
+    newWantMap = newWantParams.GetParams();
+    for (auto it = newWantMap.begin(); it != newWantMap.end(); it++) {
+        oldWantParams.SetParam(it->first, it->second);
+    }
+    oldWant.SetParams(oldWantParams);
+}
+
 /**
  * @brief Refresh form.
  *
