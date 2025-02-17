@@ -4081,7 +4081,7 @@ bool FormMgrAdapter::CheckIsMultiAppForm(FormInfo &formInfo)
     return isMultiAppForm;
 }
 
-int32_t FormMgrAdapter::SwitchLockForms(const std::string &bundleName, int32_t userId, const bool lock)
+ErrCode FormMgrAdapter::SwitchLockForms(const std::string &bundleName, int32_t userId, const bool lock)
 {
     HILOG_INFO("SwitchLockForms entry");
     if (FormBundleLockMgr::GetInstance().IsBundleLock(bundleName) == lock) {
@@ -4115,10 +4115,16 @@ int32_t FormMgrAdapter::SwitchLockForms(const std::string &bundleName, int32_t u
         }
         ++iter;
     }
+
+    ErrCode res = ProtectLockForms(bundleName, userId, lock);
+    if (res != ERR_OK) {
+        HILOG_ERROR("ProtectLockForms faild when executing the switchLockForms");
+        return res;
+    }
     return ERR_OK;
 }
 
-int32_t FormMgrAdapter::ProtectLockForms(const std::string &bundleName, int32_t userId, const bool protect)
+ErrCode FormMgrAdapter::ProtectLockForms(const std::string &bundleName, int32_t userId, const bool protect)
 {
     HILOG_INFO("ProtectLockForms entry");
     if (FormBundleLockMgr::GetInstance().IsBundleProtect(bundleName) == protect) {

@@ -55,7 +55,7 @@ bool FormBundleLockMgr::Init()
 
 bool FormBundleLockMgr::IsBundleLock(const std::string &bundleName, int64_t formId)
 {
-    if (DEFAULT_USER_ID != FormUtil::GetCurrentAccountId()) {
+    if (FormUtil::GetCurrentAccountId() != DEFAULT_USER_ID) {
         return false;
     }
  
@@ -108,7 +108,7 @@ void FormBundleLockMgr::SetBundleLockStatus(const std::string &bundleName, bool 
 
 bool FormBundleLockMgr::IsBundleProtect(const std::string &bundleName, int64_t formId)
 {
-    if (DEFAULT_USER_ID != FormUtil::GetCurrentAccountId()) {
+    if (FormUtil::GetCurrentAccountId() != DEFAULT_USER_ID) {
         return false;
     }
 

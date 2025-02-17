@@ -29,7 +29,7 @@ namespace AppExecFwk {
 enum class LockChangeType : int32_t {
     INVALID_PARAMETER = -1,
     SWITCH_CHANGE = 0,
-    PROTECT_CHANGE
+    PROTECT_CHANGE = 1,
 };
 
 struct FormLockInfo final : public Parcelable {
