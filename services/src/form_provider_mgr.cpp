@@ -99,7 +99,7 @@ ErrCode FormProviderMgr::AcquireForm(const int64_t formId, const FormProviderInf
     return ERR_OK;
 }
 
-void FormProviderMgr::MergeWant(Want newWant, Want &oldWant)
+void FormProviderMgr::MergeWant(const Want &newWant, Want &oldWant)
 {
     std::map<std::string, sptr<IInterface>> newWantMap;
     WantParams newWantParams = newWant.GetParams();
@@ -109,6 +109,15 @@ void FormProviderMgr::MergeWant(Want newWant, Want &oldWant)
         oldWantParams.SetParam(it->first, it->second);
     }
     oldWant.SetParams(oldWantParams);
+}
+
+void FormProviderMgr::UpdateWant(const int64_t formId, const Want &want, FormRecord &record)
+{
+    if (record.wantCacheMap.size() != 0) {
+        MergeWant(want, record.wantCacheMap[formId]);
+        return;
+    }
+    record.wantCacheMap[formId] = want;
 }
 
 /**
@@ -181,12 +190,8 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
     bool collaborationScreenOnFlag = PowerMgr::PowerMgrClient::GetInstance().IsCollaborationScreenOn();
     bool isHicar = (record.moduleName == HICAR_FORM);
     if (!screenOnFlag && !collaborationScreenOnFlag && !isFormProviderUpdate && !isHicar) {
-        if (record.wantCacheMap.size() != 0) {
-            MergeWant(want, record.wantCacheMap[formId]);
-        } else {
-            record.wantCacheMap[formId] = want;
-        }
         record.needRefresh = true;
+        UpdateWant(formId, want, record);
         FormDataMgr::GetInstance().SetNeedRefresh(formId, true);
         FormDataMgr::GetInstance().UpdateFormRecord(formId, record);
         HILOG_INFO("screen off, set refresh flag, do not refresh now, formId:%{public}" PRId64 ".", formId);
