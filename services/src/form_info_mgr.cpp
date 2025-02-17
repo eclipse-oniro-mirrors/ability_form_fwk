@@ -909,7 +909,8 @@ ErrCode FormInfoMgr::GetBundleVersionMap(std::map<std::string, std::uint32_t> &b
     return ERR_OK;
 }
 
-void FormInfoMgr::UpdateBundleFormInfos(std::map<std::string, std::uint32_t> &bundleVersionMap, int32_t userId){
+void FormInfoMgr::UpdateBundleFormInfos(std::map<std::string, std::uint32_t> &bundleVersionMap, int32_t userId)
+{
     std::string versionCode;
     FormInfoRdbStorageMgr::GetInstance().GetFormVersionCode(versionCode);
     bool isNeedUpdateAll = versionCode.empty() || Constants::FORM_VERSION_CODE > std::stoi(versionCode);
