@@ -168,7 +168,7 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
     bool screenOnFlag = PowerMgr::PowerMgrClient::GetInstance().IsScreenOn();
     bool collaborationScreenOnFlag = PowerMgr::PowerMgrClient::GetInstance().IsCollaborationScreenOn();
     bool isHicar = (record.moduleName == HICAR_FORM);
-    if (!screenOnFlag && !collaborationScreenOnFlag && !isFormProviderUpdate) {
+    if (!screenOnFlag && !collaborationScreenOnFlag && !isFormProviderUpdate && !isHicar) {
         if (record.wantCacheMap.size() != 0) {
             MergeWant(want, record.wantCacheMap[formId]);
         } else {
