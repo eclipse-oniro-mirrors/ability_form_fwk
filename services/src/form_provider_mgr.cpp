@@ -174,12 +174,12 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
         } else {
             record.wantCacheMap[formId] = want;
         }
-    record.needRefresh = true;
-    FormDataMgr::GetInstance().SetNeedRefresh(formId, true);
-    FormDataMgr::GetInstance().UpdateFormRecord(formId, record);
-    HILOG_INFO("screen off, set refresh flag, do not refresh now, formId:%{public}" PRId64 ".", formId);
-    return ERR_OK;
-}
+        record.needRefresh = true;
+        FormDataMgr::GetInstance().SetNeedRefresh(formId, true);
+        FormDataMgr::GetInstance().UpdateFormRecord(formId, record);
+        HILOG_INFO("screen off, set refresh flag, do not refresh now, formId:%{public}" PRId64 ".", formId);
+        return ERR_OK;
+    }
 #endif
 
     bool needRefresh = IsNeedToFresh(record, formId, isVisibleToFresh);
