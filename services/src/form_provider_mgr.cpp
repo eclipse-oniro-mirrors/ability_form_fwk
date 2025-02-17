@@ -84,6 +84,7 @@ ErrCode FormProviderMgr::AcquireForm(const int64_t formId, const FormProviderInf
     }
     formRecord.isInited = true;
     formRecord.needRefresh = false;
+    formRecord.wantCacheMap.clear();
     FormDataMgr::GetInstance().SetFormCacheInited(formId, true);
 
     formRecord.formProviderInfo = formProviderInfo;
@@ -96,6 +97,27 @@ ErrCode FormProviderMgr::AcquireForm(const int64_t formId, const FormProviderInf
         FormCacheMgr::GetInstance().AddData(formId, formProviderInfo.GetFormData());
     }
     return ERR_OK;
+}
+
+void FormProviderMgr::MergeWant(const Want &newWant, Want &oldWant)
+{
+    std::map<std::string, sptr<IInterface>> newWantMap;
+    WantParams newWantParams = newWant.GetParams();
+    WantParams oldWantParams = oldWant.GetParams();
+    newWantMap = newWantParams.GetParams();
+    for (auto it = newWantMap.begin(); it != newWantMap.end(); it++) {
+        oldWantParams.SetParam(it->first, it->second);
+    }
+    oldWant.SetParams(oldWantParams);
+}
+
+void FormProviderMgr::UpdateWant(const int64_t formId, const Want &want, FormRecord &record)
+{
+    if (record.wantCacheMap.size() != 0) {
+        MergeWant(want, record.wantCacheMap[formId]);
+        return;
+    }
+    record.wantCacheMap[formId] = want;
 }
 
 /**
@@ -168,8 +190,11 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
     bool collaborationScreenOnFlag = PowerMgr::PowerMgrClient::GetInstance().IsCollaborationScreenOn();
     bool isHicar = (record.moduleName == HICAR_FORM);
     if (!screenOnFlag && !collaborationScreenOnFlag && !isFormProviderUpdate && !isHicar) {
+        record.needRefresh = true;
+        UpdateWant(formId, want, record);
         FormDataMgr::GetInstance().SetNeedRefresh(formId, true);
-        HILOG_DEBUG("screen off, set refresh flag, do not refresh now");
+        FormDataMgr::GetInstance().UpdateFormRecord(formId, record);
+        HILOG_INFO("screen off, set refresh flag, do not refresh now, formId:%{public}" PRId64 ".", formId);
         return ERR_OK;
     }
 #endif
@@ -439,6 +464,7 @@ ErrCode FormProviderMgr::UpdateForm(const int64_t formId,
     // formRecord init
     formRecord.isInited = true;
     formRecord.needRefresh = false;
+    formRecord.wantCacheMap.clear();
     FormDataMgr::GetInstance().SetFormCacheInited(formId, true);
 
     // update form for host clients
