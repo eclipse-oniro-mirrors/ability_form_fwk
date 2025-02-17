@@ -259,8 +259,7 @@ ErrCode FormInfoRdbStorageMgr::UpdateStatusData(const std::string &formId, const
 ErrCode FormInfoRdbStorageMgr::GetFormVersionCode(std::string &versionCode)
 {
     HILOG_INFO("call");
-    ErrCode result;
-    result = FormRdbDataMgr::GetInstance().QueryData(Constants::FORM_RDB_TABLE_NAME, FORM_VERSION_KEY, versionCode);
+    ErrCode result = FormRdbDataMgr::GetInstance().QueryData(Constants::FORM_RDB_TABLE_NAME, FORM_VERSION_KEY, versionCode);
     if (result != ERR_OK) {
         HILOG_ERROR("get form version code failed, code is %{public}d", result);
         FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, HiSysEventType::FAULT,
@@ -274,8 +273,7 @@ ErrCode FormInfoRdbStorageMgr::GetFormVersionCode(std::string &versionCode)
 ErrCode FormInfoRdbStorageMgr::UpdateFormVersionCode()
 {
     HILOG_INFO("call. versioncode:%{public}d", Constants::FORM_VERSION_CODE);
-    ErrCode result;
-    result = FormRdbDataMgr::GetInstance().InsertData(Constants::FORM_RDB_TABLE_NAME, FORM_VERSION_KEY,
+    ErrCode result = FormRdbDataMgr::GetInstance().InsertData(Constants::FORM_RDB_TABLE_NAME, FORM_VERSION_KEY,
         std::to_string(Constants::FORM_VERSION_CODE));
     if (result != ERR_OK) {
         HILOG_ERROR("update form version code to rdbstore failed, code is %{public}d", result);
