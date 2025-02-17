@@ -853,14 +853,10 @@ ErrCode FormInfoMgr::ReloadFormInfos(const int32_t userId)
         return result;
     }
     std::string versionCode;
-    ErrCode errCode = FormInfoRdbStorageMgr::GetInstance().GetFormVersionCode(versionCode);
-    if (errCode != ERR_OK) {
-        HILOG_ERROR("get form version code failed");
-        return errCode;
-    }
+    FormInfoRdbStorageMgr::GetInstance().GetFormVersionCode(versionCode);
     bool isNeedUpdateAll = versionCode.empty() || Constants::FORM_VERSION_CODE > std::stoi(versionCode);
-    HILOG_INFO("bundle number:%{public}zu, old versionCode:%{public}%s, new versionCode:%{public}%d",
-        bundleVersionMap.size(), versionCode, Constants::FORM_VERSION_CODE);
+    HILOG_INFO("bundle number:%{public}zu, old versionCode:%{public}s, new versionCode:%{public}d",
+        bundleVersionMap.size(), versionCode.c_str(), Constants::FORM_VERSION_CODE);
     
     std::unique_lock<std::shared_timed_mutex> guard(bundleFormInfoMapMutex_);
     hasReloadedFormInfosState_ = false;
@@ -873,18 +869,18 @@ ErrCode FormInfoMgr::ReloadFormInfos(const int32_t userId)
             continue;
         }
         if (!isNeedUpdateAll) {
-            uint32_t oldVersionCode = bundleVersionPair->second;
-            bundleVersionMap.erase(bundleVersionPair);
-            uint32_t newVersionCode = bundleFormInfoPair.second->GetVersionCode(userId);
+            uint32_t newVersionCode = bundleVersionPair->second;
+            uint32_t oldVersionCode = bundleFormInfoPair.second->GetVersionCode(userId);
+            HILOG_INFO("bundleName=%{public}s, bundle version old:%{public}d, new:%{public}d",
+                bundleName.c_str(), oldVersionCode, newVersionCode);
             if (oldVersionCode == newVersionCode) {
-                HILOG_INFO("versionCode not change, bundleName=%{public}s, versionCode:%{public}d",
-                    bundleName.c_str(), oldVersionCode);
+                bundleVersionMap.erase(bundleVersionPair);
                 continue;
             }
         }
+        bundleVersionMap.erase(bundleVersionPair);
         bundleFormInfoPair.second->UpdateStaticFormInfos(userId);
-        HILOG_INFO("update forms info success, bundleName=%{public}s, old:%{public}d, new:%{public}d",
-            bundleName.c_str(), oldVersionCode, newVersionCode);
+        HILOG_INFO("update forms info success, bundleName=%{public}s", bundleName.c_str());
     }
 
     for (auto const &bundleVersionPair : bundleVersionMap) {

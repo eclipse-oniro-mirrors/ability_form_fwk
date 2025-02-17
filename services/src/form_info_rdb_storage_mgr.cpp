@@ -267,15 +267,16 @@ ErrCode FormInfoRdbStorageMgr::GetFormVersionCode(std::string &versionCode)
             static_cast<int64_t>(CallDbFiledErrorType::LOAD_DATABASE_FAILED));
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    HILOG_INFO("get form version code success. versionCode:${public}s", versionCode);
+    HILOG_INFO("get form version code success. versionCode:%{public}s", versionCode.c_str());
     return ERR_OK;
 }
 
 ErrCode FormInfoRdbStorageMgr::UpdateFormVersionCode()
 {
-    HILOG_INFO("call. versioncode:${public}d", Constants::FORM_VERSION_CODE);
+    HILOG_INFO("call. versioncode:%{public}d", Constants::FORM_VERSION_CODE);
     ErrCode result;
-    result = FormRdbDataMgr::GetInstance().InsertData(Constants::FORM_RDB_TABLE_NAME, FORM_VERSION_KEY, Constants::FORM_VERSION_CODE);
+    result = FormRdbDataMgr::GetInstance().InsertData(Constants::FORM_RDB_TABLE_NAME, FORM_VERSION_KEY,
+        std::to_string(Constants::FORM_VERSION_CODE));
     if (result != ERR_OK) {
         HILOG_ERROR("update form version code to rdbstore failed, code is %{public}d", result);
         FormEventReport::SendFormFailedEvent(FormEventName::CALLEN_DB_FAILED, HiSysEventType::FAULT,
