@@ -137,7 +137,7 @@ private:
     static bool CheckBundlePermission();
     static ErrCode CheckDynamicFormInfo(FormInfo &formInfo, const BundleInfo &bundleInfo);
     static ErrCode GetBundleVersionMap(std::map<std::string, std::uint32_t> &bundleVersionMap, int32_t userId);
-    void UpdateBundleFormInfos(std::map<std::string, std::uint32_t> &bundleVersionMap);
+    void UpdateBundleFormInfos(std::map<std::string, std::uint32_t> &bundleVersionMap, int32_t userId);
 
     mutable std::shared_timed_mutex bundleFormInfoMapMutex_ {};
     std::unordered_map<std::string, std::shared_ptr<BundleFormInfo>> bundleFormInfoMap_ {};
