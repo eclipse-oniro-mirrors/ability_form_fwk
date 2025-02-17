@@ -102,7 +102,8 @@ ErrCode FormProviderMgr::AcquireForm(const int64_t formId, const FormProviderInf
 void FormProviderMgr::MergeWant(Want newWant, Want &oldWant)
 {
     std::map<std::string, sptr<IInterface>> newWantMap;
-    WantParams newWantParams, oldWantParams;
+    WantParams oldWantParams;
+    WantParams newWantParams;
     newWantParams = newWant.GetParams();
     oldWantParams = oldWant.GetParams();
     newWantMap = newWantParams.GetParams();
