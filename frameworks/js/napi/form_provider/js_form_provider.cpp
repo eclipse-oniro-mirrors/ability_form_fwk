@@ -321,7 +321,6 @@ napi_value JsFormProvider::OnOpenFormManageView(napi_env env, size_t argc, napi_
 
     const std::string bundleName = want.GetBundle();
     const std::string abilityName = want.GetElement().GetAbilityName();
-    bundleName.c_str(), abilityName.c_str());
     want.SetElementName(bundleName, abilityName);
     want.SetAction(AppExecFwk::Constants::FORM_PAGE_ACTION);
     want.SetParam(AppExecFwk::Constants::PARAM_PAGE_ROUTER_SERVICE_CODE,
