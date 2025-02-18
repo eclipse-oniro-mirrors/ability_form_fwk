@@ -36,7 +36,6 @@ const std::string FORM_DB_DATA_BASE_FILE_DIR = "/data/formmgr";
 const int32_t FOUR = 4;
 const int32_t TEN = 10;
 const int32_t ELEVEN = 11;
-const int32_t DEFAULT_VALUE = 0;  // Used to adapt functional code.
 
 class FmsFormProviderDataTest : public testing::Test {
 public:
@@ -130,12 +129,7 @@ bool FmsFormProviderDataTest::CreateMergeJsonFileByJsonData3(const nlohmann::jso
     return true;
 }
 
-/**
- * @tc.name: FmsFormProviderDataTest_001
- * @tc.desc: Verify the CreateJsonFileByJsonData1 function.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_001, TestSize.Level0)
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_001, TestSize.Level0) // create
 {
     GTEST_LOG_(INFO) << "FmsFormProviderDataTest_001 start";
     EXPECT_EQ(true, InitJsonData());
@@ -144,12 +138,7 @@ HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_001, TestSize.Level0)
     GTEST_LOG_(INFO) << "FmsFormProviderDataTest_001 end";
 }
 
-/**
- * @tc.name: FmsFormProviderDataTest_002
- * @tc.desc: Verify the CreateJsonFileByJsonData2 function.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_002, TestSize.Level0)
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_002, TestSize.Level0) // test constructor with string
 {
     GTEST_LOG_(INFO) << "FmsFormProviderDataTest_002 start";
     EXPECT_EQ(true, InitJsonData());
@@ -158,12 +147,7 @@ HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_002, TestSize.Level0)
     GTEST_LOG_(INFO) << "FmsFormProviderDataTest_002 end";
 }
 
-/**
- * @tc.name: FmsFormProviderDataTest_003
- * @tc.desc: Verify the GetDataString function.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_003, TestSize.Level0)
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_003, TestSize.Level0) // test GetDataString
 {
     GTEST_LOG_(INFO) << "FmsFormProviderDataTest_003 start";
     EXPECT_EQ(true, InitJsonData());
@@ -172,12 +156,7 @@ HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_003, TestSize.Level0)
     GTEST_LOG_(INFO) << "FmsFormProviderDataTest_003 end";
 }
 
-/**
- * @tc.name: FmsFormProviderDataTest_004
- * @tc.desc: Verify the MergeData function.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_004, TestSize.Level0)
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_004, TestSize.Level0) // test MergeData
 {
     GTEST_LOG_(INFO) << "FmsFormProviderDataTest_004 start";
     EXPECT_EQ(true, InitJsonData());
@@ -194,7 +173,7 @@ HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_004, TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: issueI5KIZC
  */
-HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_005, TestSize.Level0)
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_005, TestSize.Level0) // test MergeData
 {
     GTEST_LOG_(INFO) << "FmsFormProviderDataTest_005 start";
     EXPECT_EQ(true, InitJsonData());
@@ -214,7 +193,7 @@ HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_005, TestSize.Level0)
  * @tc.desc: Verify the AddImageData and WriteImageDataToParcel function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_006, TestSize.Level0)
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_006, TestSize.Level0) // test MergeData
 {
     GTEST_LOG_(INFO) << "FmsFormProviderDataTest_006 start";
     FormProviderData formProviderData(jsonData_);
@@ -453,7 +432,6 @@ HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0019, TestSize.Level1)
     EXPECT_EQ(true, InitJsonData());
     FormProviderData formProviderData(jsonData_);
     Parcel parcel;
-    parcel.WriteInt32(DEFAULT_VALUE);
     parcel.WriteString16(Str8ToStr16(jsonData_.dump()));
     parcel.WriteInt32(FormProviderData::IMAGE_DATA_STATE_NO_OPERATION);
     auto result = formProviderData.ReadFromParcel(parcel);
@@ -472,7 +450,6 @@ HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0020, TestSize.Level1)
     EXPECT_EQ(true, InitJsonData());
     FormProviderData formProviderData(jsonData_);
     Parcel parcel;
-    parcel.WriteInt32(DEFAULT_VALUE);
     parcel.WriteString16(Str8ToStr16(jsonData_.dump()));
     parcel.WriteInt32(FormProviderData::IMAGE_DATA_STATE_REMOVED);
     auto result = formProviderData.ReadFromParcel(parcel);
@@ -492,7 +469,6 @@ HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0021, TestSize.Level1)
     constexpr int32_t defaultValue = 100;
     FormProviderData formProviderData(jsonData_);
     Parcel parcel;
-    parcel.WriteInt32(DEFAULT_VALUE);
     parcel.WriteString16(Str8ToStr16(jsonData_.dump()));
     parcel.WriteInt32(defaultValue);
     auto result = formProviderData.ReadFromParcel(parcel);
@@ -511,7 +487,6 @@ HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0022, TestSize.Level1)
     EXPECT_EQ(true, InitJsonData());
     FormProviderData formProviderData(jsonData_);
     Parcel parcel;
-    parcel.WriteInt32(DEFAULT_VALUE);
     parcel.WriteString16(Str8ToStr16(jsonData_.dump()));
     parcel.WriteInt32(FormProviderData::IMAGE_DATA_STATE_ADDED);
     auto result = formProviderData.ReadFromParcel(parcel);

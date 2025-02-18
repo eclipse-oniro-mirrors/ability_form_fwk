@@ -37,8 +37,6 @@ namespace AppExecFwk {
 extern void MockConvertRawImageData(bool mockRet);
 extern void MockGetImageDataMap(bool mockRet);
 
-const int32_t DEFAULT_VALUE = 0;
-
 class FmsFormJsInfoBaseTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -83,7 +81,6 @@ HWTEST_F(FmsFormJsInfoBaseTest, FmsFormJsInfoBaseTest_0100, TestSize.Level0)
     std::string formData = "formData";
     std::string formSrc = "formSrc";
     parcel.WriteString16(Str8ToStr16(jsFormCodePath));
-    parcel.WriteInt32(DEFAULT_VALUE);
     parcel.WriteString16(Str8ToStr16(formData));
     parcel.WriteString16(Str8ToStr16(formSrc));
     parcel.WriteInt32(10);
@@ -95,7 +92,6 @@ HWTEST_F(FmsFormJsInfoBaseTest, FmsFormJsInfoBaseTest_0100, TestSize.Level0)
     parcel.WriteInt32(10);
     parcel.WriteInt32(10);
     parcel.WriteBool(true);
-    parcel.WriteBool(false);
     parcel.WriteBool(false);
     std::string jsonData = "{ \"abc\" : \"def\"}";
     auto formProviderData = new FormProviderData(jsonData);
@@ -133,7 +129,6 @@ HWTEST_F(FmsFormJsInfoBaseTest, FmsFormJsInfoBaseTest_0200, TestSize.Level0)
     std::string formData = "formData";
     std::string formSrc = "formSrc";
     parcel.WriteString16(Str8ToStr16(jsFormCodePath));
-    parcel.WriteInt32(DEFAULT_VALUE);
     parcel.WriteString16(Str8ToStr16(formData));
     parcel.WriteString16(Str8ToStr16(formSrc));
     parcel.WriteInt32(10);
@@ -145,7 +140,6 @@ HWTEST_F(FmsFormJsInfoBaseTest, FmsFormJsInfoBaseTest_0200, TestSize.Level0)
     parcel.WriteInt32(10);
     parcel.WriteInt32(10);
     parcel.WriteBool(true);
-    parcel.WriteBool(false);
     parcel.WriteBool(false);
     auto result = formJsInfo.ReadFromParcel(parcel);
     EXPECT_FALSE(result);
@@ -178,7 +172,6 @@ HWTEST_F(FmsFormJsInfoBaseTest, FmsFormJsInfoBaseTest_0300, TestSize.Level0)
     std::string formData = "formData";
     std::string formSrc = "formSrc";
     parcel.WriteString16(Str8ToStr16(jsFormCodePath));
-    parcel.WriteInt32(DEFAULT_VALUE);
     parcel.WriteString16(Str8ToStr16(formData));
     parcel.WriteString16(Str8ToStr16(formSrc));
     parcel.WriteInt32(10);
@@ -190,7 +183,6 @@ HWTEST_F(FmsFormJsInfoBaseTest, FmsFormJsInfoBaseTest_0300, TestSize.Level0)
     parcel.WriteInt32(10);
     parcel.WriteInt32(10);
     parcel.WriteBool(true);
-    parcel.WriteBool(false);
     parcel.WriteBool(false);
     std::string jsonData = "{ \"abc\" : \"def\"}";
     auto formProviderData = new FormProviderData(jsonData);
@@ -226,7 +218,6 @@ HWTEST_F(FmsFormJsInfoBaseTest, FmsFormJsInfoBaseTest_0400, TestSize.Level0)
     std::string formData = "formData";
     std::string formSrc = "formSrc";
     parcel.WriteString16(Str8ToStr16(jsFormCodePath));
-    parcel.WriteInt32(DEFAULT_VALUE);
     parcel.WriteString16(Str8ToStr16(formData));
     parcel.WriteString16(Str8ToStr16(formSrc));
     parcel.WriteInt32(10);
@@ -238,7 +229,6 @@ HWTEST_F(FmsFormJsInfoBaseTest, FmsFormJsInfoBaseTest_0400, TestSize.Level0)
     parcel.WriteInt32(10);
     parcel.WriteInt32(10);
     parcel.WriteBool(true);
-    parcel.WriteBool(false);
     parcel.WriteBool(false);
     auto result = formJsInfo.Unmarshalling(parcel);
     EXPECT_EQ(result, nullptr);
