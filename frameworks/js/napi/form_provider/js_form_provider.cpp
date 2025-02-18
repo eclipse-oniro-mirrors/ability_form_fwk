@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "fms_log_wrapper.h"
+#include "form_constants.h"
 #include "form_mgr_errors.h"
 #include "form_mgr.h"
 #include "running_form_info.h"
@@ -300,6 +301,48 @@ napi_value JsFormProvider::OnGetPublishedFormsInfo(napi_env env, size_t argc, na
 
     napi_value result = nullptr;
     NapiAsyncTask::ScheduleWithDefaultQos("JsFormProvider::OnGetPublishedFormsInfo",
+        env, CreateAsyncTaskWithLastParam(env, nullptr, nullptr, std::move(complete), &result));
+    return result;
+}
+napi_value JsFormProvider::OpenFormManageView(napi_env env, napi_callback_info info)
+{
+    GET_CB_INFO_AND_CALL(env, info, JsFormProvider, OnOpenFormManageView);
+}
+
+napi_value JsFormProvider::OnOpenFormManageView(napi_env env, size_t argc, napi_value* argv)
+{
+    HILOG_DEBUG("call");
+    Want want;
+    if (!AppExecFwk::UnwrapWant(env, argv[PARAM0], want)) {
+        HILOG_ERROR("fail convert want");
+        NapiFormUtil::ThrowParamError(env, "Failed to convert want.");
+        return CreateJsUndefined(env);
+    }
+
+    const std::string bundleName = want.GetBundle();
+    const std::string abilityName = want.GetElement().GetAbilityName();
+    bundleName.c_str(), abilityName.c_str());
+    want.SetElementName(bundleName, abilityName);
+    want.SetAction(AppExecFwk::Constants::FORM_PAGE_ACTION);
+    want.SetParam(AppExecFwk::Constants::PARAM_PAGE_ROUTER_SERVICE_CODE,
+                  AppExecFwk::Constants::PAGE_ROUTER_SERVICE_CODE_FORM_MANAGE);
+    const std::string key = AppExecFwk::Constants::PARMA_REQUEST_METHOD;
+    const std::string value = AppExecFwk::Constants::OPEN_FORM_MANAGE_VIEW;
+    want.SetParam(key, value);
+    HILOG_DEBUG("JsFormProvider OnOpenFormManageView want:%{public}s", want.ToString().c_str());
+
+    NapiAsyncTask::CompleteCallback complete =
+            [want](napi_env env, NapiAsyncTask &task, int32_t status) {
+                auto ret = FormMgr::GetInstance().StartAbilityByFms(want);
+                if (ret != ERR_OK) {
+                    task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
+                    return;
+                }
+                task.ResolveWithNoError(env, CreateJsUndefined(env));
+            };
+
+    napi_value result = nullptr;
+    NapiAsyncTask::ScheduleWithDefaultQos("JsFormProvider::OnOpenFormManageView",
         env, CreateAsyncTaskWithLastParam(env, nullptr, nullptr, std::move(complete), &result));
     return result;
 }
