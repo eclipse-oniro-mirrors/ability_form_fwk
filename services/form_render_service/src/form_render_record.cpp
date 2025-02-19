@@ -535,8 +535,9 @@ bool FormRenderRecord::UpdateRuntime(const FormJsInfo &formJsInfo)
         if (pkgNameInfo != options.packageNameList.end()) {
             packageName = pkgNameInfo->second;
         }
-        runtime_->UpdatePkgContextInfoJson(moduleName, contextInfo->second, packageName);
         if (runtime_->GetLanguage() == AbilityRuntime::Runtime::Language::JS) {
+            (static_cast<AbilityRuntime::JsRuntime&>(*runtime_)).SetPkgContextInfoJson(moduleName, contextInfo->second,
+                packageName);
             HILOG_INFO("%{public}s load components of new module %{public}s",
                 formJsInfo.bundleName.c_str(), moduleName.c_str());
             (static_cast<AbilityRuntime::JsRuntime&>(*runtime_)).ReloadFormComponent();
