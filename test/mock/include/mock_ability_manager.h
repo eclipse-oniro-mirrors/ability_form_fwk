@@ -798,12 +798,12 @@ public:
         return 0;
     }
 
-    int32_t AttachAppDebug(const std::string &bundleName)
+    int32_t AttachAppDebug(const std::string &bundleName, bool isDebugFromLocal)
     {
         return 0;
     }
 
-    int32_t DetachAppDebug(const std::string &bundleName)
+    int32_t DetachAppDebug(const std::string &bundleName, bool isDebugFromLocal)
     {
         return 0;
     }
