@@ -29,6 +29,7 @@
 #include "in_process_call_wrapper.h"
 #include "os_account_manager_wrapper.h"
 #include "time_service_client.h"
+#include "time_common.h"
 #include "want.h"
 #include "form_event_report.h"
 #include "form_record_report.h"
@@ -1091,9 +1092,13 @@ bool FormTimerMgr::UpdateLimiterAlarm()
 {
     HILOG_INFO("start");
     if (limiterTimerId_ != 0L) {
-        HILOG_INFO("clear limiter timer start");
-        MiscServices::TimeServiceClient::GetInstance()->StopTimer(limiterTimerId_);
-        HILOG_INFO("clear limiter timer end");
+        HILOG_INFO("stop limiter timer start");
+        int32_t retCode = MiscServices::TimeServiceClient::GetInstance()->StopTimerV9(limiterTimerId_);
+        if (retCode == MiscServices::E_TIME_DEAL_FAILED) {
+            HILOG_WARN("reset limiter timer");
+            limiterTimerId_ = 0L;
+        }
+        HILOG_INFO("stop limiter timer end");
     }
 
     // make limiter wakeup time
@@ -1156,6 +1161,7 @@ bool FormTimerMgr::CreateLimiterTimer()
     timerOption->SetWantAgent(wantAgent);
     if (limiterTimerId_ == 0L) {
         limiterTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption);
+        HILOG_INFO("new timerId:%{public}" PRId64 ".", limiterTimerId_);
         currentLimiterWantAgent_ = wantAgent;
     }
     HILOG_INFO("end");
