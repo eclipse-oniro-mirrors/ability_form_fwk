@@ -212,6 +212,7 @@ ohos_shared_library("forminfo_napi") {
     "c_utils:utils",
     "hilog:libhilog",
     "napi:ace_napi",
+    "ipc:ipc_core",
   ]
 
   defines = []
@@ -246,6 +247,7 @@ ohos_shared_library("forminfo") {
     "c_utils:utils",
     "hilog:libhilog",
     "napi:ace_napi",
+    "ipc:ipc_core",
   ]
 
   defines = [ "ENABLE_ERRCODE" ]
