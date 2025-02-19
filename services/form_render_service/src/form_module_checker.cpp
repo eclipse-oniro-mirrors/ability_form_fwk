@@ -28,35 +28,15 @@
 
 const std::string FORM_MODULE_WHITE_LIST_PATH = "/etc/form_fwk_module_white_list.json";
 const std::string KEY_MODULE_ALLOW = "moduleAllowList";
+const std::string KEY_MODULE_ALLOW_WITH_API = "moduleAllowWithApiList";
+const std::string KEY_API_ALLOW = "apiAllowList";
 
-std::vector<std::string> FormModuleChecker::modulesFromCfg_ = FormModuleChecker::GetModuleAllowList();
+std::map<std::string, std::vectorstd::string> FormModuleChecker::modulesFromCfg_ =
+    FormModuleChecker::GetModuleAllowList();
 
 bool FormModuleChecker::CheckApiAllowList(const std::string& apiPath)
 {
-    const std::vector<std::string> allowList = {
-        "i18n.System.getSystemLanguage",
-        "i18n.System.is24HourClock",
-        "intl.Locale.*",
-        "intl.DateTimeFormat.*",
-        "effectKit.*",
-        "font.registerFont",
-        "multimedia.image.PixelMapFormat.*",
-        "multimedia.image.Size.*",
-        "multimedia.image.AlphaType.*",
-        "multimedia.image.ScaleMode.*",
-        "multimedia.image.Region.*",
-        "multimedia.image.PositionArea.*",
-        "multimedia.image.ImageInfo.*",
-        "multimedia.image.DecodingOptions.*",
-        "multimedia.image.InitializationOptions.*",
-        "multimedia.image.SourceOptions.*",
-        "multimedia.image.createImageSource",
-        "multimedia.image.PixelMap.*",
-        "multimedia.image.ImageSource.*",
-        "arkui.shape.*"
-    };
-
-    for (const auto& item : allowList) {
+    for (const auto& item : modulesFromCfg_[KEY_API_ALLOW]) {
         if (CheckApiWithSuffix(apiPath, item)) {
             return true;
         }
@@ -89,10 +69,16 @@ bool FormModuleChecker::CheckModuleLoadable(const char *moduleName,
         HILOG_INFO("module is not system, moduleName= %{public}s", moduleName);
         return false;
     }
-    if (std::string(moduleName) == "mediaquery") {
-        HILOG_INFO("load mediaquery");
-        return true;
+
+    // only check module
+    for (const auto& item : modulesFromCfg_[KEY_MODULE_ALLOW]) {
+        if (item == moduleName) {
+            HILOG_INFO("load moduleName= %{public}s", moduleName);
+            return true;
+        }
     }
+
+    // check module and api
     if (IsModuelAllowToLoad(moduleName)) {
         HILOG_INFO("module has been allowed by the allowlist in form, module name = %{public}s", moduleName);
         if (apiAllowListChecker == nullptr) {
@@ -108,21 +94,7 @@ bool FormModuleChecker::CheckModuleLoadable(const char *moduleName,
 
 bool FormModuleChecker::IsModuelAllowToLoad(const std::string& moduleName)
 {
-    for (const auto& item : modulesFromCfg_) {
-        if (item == moduleName) {
-            return true;
-        }
-    }
-    const std::vector<std::string> moduleAllowList = {
-        "i18n",
-        "intl",
-        "effectKit",
-        "font",
-        "multimedia.image",
-        "arkui.shape"
-    };
-
-    for (const auto& item : moduleAllowList) {
+    for (const auto& item : modulesFromCfg_[KEY_MODULE_ALLOW_WITH_API]) {
         if (item == moduleName) {
             return true;
         }
@@ -131,7 +103,7 @@ bool FormModuleChecker::IsModuelAllowToLoad(const std::string& moduleName)
     return false;
 }
 
-std::vector<std::string> FormModuleChecker::GetModuleAllowList()
+std::map<std::string, std::vector<std::string> FormModuleChecker::GetModuleAllowList()
 {
     HILOG_INFO("read moduleAllowList from config file");
     std::vector<std::string> result;
@@ -152,9 +124,26 @@ std::vector<std::string> FormModuleChecker::GetModuleAllowList()
     if (jsonData.contains(KEY_MODULE_ALLOW) && jsonData[KEY_MODULE_ALLOW].is_array()) {
         for (const auto& module : jsonData[KEY_MODULE_ALLOW]) {
             HILOG_INFO("read moduleAllowList module: %{public}s", std::string(module).c_str());
-            result.push_back(module);
+            result[KEY_MODULE_ALLOW].push_back(module);
+        }
+    }
+    if (jsonData.contains(KEY_MODULE_ALLOW_WITH_API) && jsonData[KEY_MODULE_ALLOW_WITH_API].is_array()) {
+        for (const auto& module : jsonData[KEY_MODULE_ALLOW_WITH_API]) {
+            HILOG_INFO("read moduleAllowWithApiList module: %{public}s", std::string(module).c_str());
+            result[KEY_MODULE_ALLOW_WITH_API].push_back(module);
+        }
+    }
+    if (jsonData.contains(KEY_API_ALLOW) && jsonData[KEY_API_ALLOW].is_array()) {
+        for (const auto& module : jsonData[KEY_API_ALLOW]) {
+            HILOG_INFO("read apiAllowList api: %{public}s", std::string(api).c_str());
+            result[KEY_API_ALLOW].push_back(api);
         }
     }
     file.close();
     return result;
+}
+
+bool FormModuleChecker::DiskCheckOnly()
+{
+    return false;
 }
