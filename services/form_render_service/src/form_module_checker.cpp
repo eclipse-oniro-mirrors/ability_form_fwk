@@ -106,7 +106,7 @@ bool FormModuleChecker::IsModuelAllowToLoad(const std::string& moduleName)
 std::map<std::string, std::vector<std::string>> FormModuleChecker::GetModuleAllowList()
 {
     HILOG_INFO("read moduleAllowList from config file");
-    std::vector<std::string> result;
+    std::map<std::string, std::vector<std::string>> result;
     char buf[MAX_PATH_LEN];
     char* path = GetOneCfgFile(FORM_MODULE_WHITE_LIST_PATH.c_str(), buf, MAX_PATH_LEN);
     if (path == nullptr || *path == '\0') {
@@ -134,12 +134,13 @@ std::map<std::string, std::vector<std::string>> FormModuleChecker::GetModuleAllo
         }
     }
     if (jsonData.contains(KEY_API_ALLOW) && jsonData[KEY_API_ALLOW].is_array()) {
-        for (const auto& module : jsonData[KEY_API_ALLOW]) {
+        for (const auto& api : jsonData[KEY_API_ALLOW]) {
             HILOG_INFO("read apiAllowList api: %{public}s", std::string(api).c_str());
             result[KEY_API_ALLOW].push_back(api);
         }
     }
     file.close();
+
     return result;
 }
 
