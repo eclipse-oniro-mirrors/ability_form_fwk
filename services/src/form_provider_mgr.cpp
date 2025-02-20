@@ -33,6 +33,7 @@
 #include "form_record_report.h"
 #ifdef SUPPORT_POWER
 #include "power_mgr_client.h"
+#include "form_exempt_lock_mgr.h"
 #endif
 namespace OHOS {
 namespace AppExecFwk {
@@ -137,7 +138,8 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
     }
     HILOG_BRIEF("FormProviderMgr::RefreshForm, formId:%{public}" PRId64 "., record.enableForm = %{public}d",
         formId, record.enableForm);
-    if (!record.enableForm || record.lockForm) {
+    if (!record.enableForm || (record.protectForm &&
+        !FormExemptLockMgr::GetInstance().IsExemptLock(formId))) {
         FormDataMgr::GetInstance().SetRefreshDuringDisableForm(formId, true);
         return ERR_APPEXECFWK_FORM_DISABLE_REFRESH;
     }
