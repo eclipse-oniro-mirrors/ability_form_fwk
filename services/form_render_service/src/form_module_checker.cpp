@@ -31,7 +31,7 @@ const std::string KEY_MODULE_ALLOW = "moduleAllowList";
 const std::string KEY_MODULE_ALLOW_WITH_API = "moduleAllowWithApiList";
 const std::string KEY_API_ALLOW = "apiAllowList";
 
-std::map<std::string, std::vector<std::string> FormModuleChecker::modulesFromCfg_ =
+std::map<std::string, std::vector<std::string>> FormModuleChecker::modulesFromCfg_ =
     FormModuleChecker::GetModuleAllowList();
 
 bool FormModuleChecker::CheckApiAllowList(const std::string& apiPath)
@@ -103,7 +103,7 @@ bool FormModuleChecker::IsModuelAllowToLoad(const std::string& moduleName)
     return false;
 }
 
-std::map<std::string, std::vector<std::string> FormModuleChecker::GetModuleAllowList()
+std::map<std::string, std::vector<std::string>> FormModuleChecker::GetModuleAllowList()
 {
     HILOG_INFO("read moduleAllowList from config file");
     std::vector<std::string> result;
