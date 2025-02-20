@@ -31,7 +31,7 @@ const std::string KEY_MODULE_ALLOW = "moduleAllowList";
 const std::string KEY_MODULE_ALLOW_WITH_API = "moduleAllowWithApiList";
 const std::string KEY_API_ALLOW = "apiAllowList";
 
-std::map<std::string, std::vectorstd::string> FormModuleChecker::modulesFromCfg_ =
+std::map<std::string, std::vector<std::string> FormModuleChecker::modulesFromCfg_ =
     FormModuleChecker::GetModuleAllowList();
 
 bool FormModuleChecker::CheckApiAllowList(const std::string& apiPath)
