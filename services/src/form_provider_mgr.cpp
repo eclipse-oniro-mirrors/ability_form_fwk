@@ -31,6 +31,7 @@
 #include "form_timer_mgr.h"
 #include "form_report.h"
 #include "form_record_report.h"
+#include "form_mgr_adapter.h"
 #ifdef SUPPORT_POWER
 #include "power_mgr_client.h"
 #endif
