@@ -428,7 +428,7 @@ public:
     * @param formInfos Return the forms' information of the calling bundle name
     * @return Returns ERR_OK on success, others on failure.
     */
-    int32_t GetPublishedFormsInfo(std::vector<RunningFormInfo> &formInfos);
+    int32_t GetPublishedFormInfos(std::vector<RunningFormInfo> &formInfos);
 
     /**
      * @brief Get all running form infos.

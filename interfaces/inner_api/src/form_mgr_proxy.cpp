@@ -907,10 +907,10 @@ int FormMgrProxy::GetPublishedFormInfoById(IFormMgr::Message code, MessageParcel
     return error;
 }
 
-int FormMgrProxy::GetPublishedFormsInfo(IFormMgr::Message code, MessageParcel &data,
+int FormMgrProxy::GetPublishedFormInfos(IFormMgr::Message code, MessageParcel &data,
                                         std::vector<RunningFormInfo> &formInfos)
 {
-    HILOG_DEBUG("GetPublishedFormsInfo start");
+    HILOG_DEBUG("GetPublishedFormInfos start");
     int error;
     MessageParcel reply;
     MessageOption option(MessageOption::TF_SYNC);
@@ -1428,7 +1428,7 @@ int32_t FormMgrProxy::GetPublishedFormInfoById(const int64_t formId, RunningForm
     return error;
 }
 
-int32_t FormMgrProxy::GetPublishedFormsInfo(std::vector<RunningFormInfo> &formInfos)
+int32_t FormMgrProxy::GetPublishedFormInfos(std::vector<RunningFormInfo> &formInfos)
 {
     HILOG_INFO("start");
     MessageParcel data;
@@ -1437,10 +1437,10 @@ int32_t FormMgrProxy::GetPublishedFormsInfo(std::vector<RunningFormInfo> &formIn
         HILOG_ERROR("write interface token failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
-    int error = GetPublishedFormsInfo(IFormMgr::Message::FORM_MGR_GET_PUBLISHED_FORMS_INFO, data, formInfos);
+    int error = GetPublishedFormInfos(IFormMgr::Message::FORM_MGR_GET_PUBLISHED_FORM_INFOS, data, formInfos);
     // formInfos should have been fulfilled at this point.
     if (error != ERR_OK) {
-        HILOG_ERROR("fail GetPublishedFormsInfo:%{public}d", error);
+        HILOG_ERROR("fail GetPublishedFormInfos:%{public}d", error);
     }
 
     return error;

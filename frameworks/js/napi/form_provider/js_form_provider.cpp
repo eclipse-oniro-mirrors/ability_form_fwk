@@ -279,19 +279,19 @@ napi_value JsFormProvider::OnGetPublishedFormInfoById(napi_env env, size_t argc,
     return result;
 }
 
-napi_value JsFormProvider::GetPublishedFormsInfo(napi_env env, napi_callback_info info)
+napi_value JsFormProvider::GetPublishedFormInfos(napi_env env, napi_callback_info info)
 {
-    GET_CB_INFO_AND_CALL(env, info, JsFormProvider, OnGetPublishedFormsInfo);
+    GET_CB_INFO_AND_CALL(env, info, JsFormProvider, OnGetPublishedFormInfos);
 }
 
-napi_value JsFormProvider::OnGetPublishedFormsInfo(napi_env env, size_t argc, napi_value* argv)
+napi_value JsFormProvider::OnGetPublishedFormInfos(napi_env env, size_t argc, napi_value* argv)
 {
     HILOG_DEBUG("call");
 
     NapiAsyncTask::CompleteCallback complete =
         [](napi_env env, NapiAsyncTask &task, int32_t status) {
             std::vector<RunningFormInfo> formInfos;
-            auto ret = FormMgr::GetInstance().GetPublishedFormsInfo(formInfos);
+            auto ret = FormMgr::GetInstance().GetPublishedFormInfos(formInfos);
             if (ret != ERR_OK) {
                 task.Reject(env, NapiFormUtil::CreateErrorByInternalErrorCode(env, ret));
                 return;
@@ -300,7 +300,7 @@ napi_value JsFormProvider::OnGetPublishedFormsInfo(napi_env env, size_t argc, na
         };
 
     napi_value result = nullptr;
-    NapiAsyncTask::ScheduleWithDefaultQos("JsFormProvider::OnGetPublishedFormsInfo",
+    NapiAsyncTask::ScheduleWithDefaultQos("JsFormProvider::OnGetPublishedFormInfos",
         env, CreateAsyncTaskWithLastParam(env, nullptr, nullptr, std::move(complete), &result));
     return result;
 }

@@ -1242,7 +1242,7 @@ int32_t FormMgr::GetPublishedFormInfoById(const int64_t formId, RunningFormInfo 
     return remoteProxy_->GetPublishedFormInfoById(formId, formInfo);
 }
 
-int32_t FormMgr::GetPublishedFormsInfo(std::vector<RunningFormInfo> &formInfos)
+int32_t FormMgr::GetPublishedFormInfos(std::vector<RunningFormInfo> &formInfos)
 {
     HILOG_DEBUG("call");
     int errCode = Connect();
@@ -1254,7 +1254,7 @@ int32_t FormMgr::GetPublishedFormsInfo(std::vector<RunningFormInfo> &formInfos)
         HILOG_ERROR("null remoteProxy_");
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
-    return remoteProxy_->GetPublishedFormsInfo(formInfos);
+    return remoteProxy_->GetPublishedFormInfos(formInfos);
 }
 
 bool FormMgr::IsRequestPublishFormSupported()
