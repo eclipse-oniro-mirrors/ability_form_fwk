@@ -249,12 +249,14 @@ bool FormEventUtil::ProviderFormUpdated(const int64_t formId, FormRecord &formRe
         HILOG_INFO("no updated form");
         return false;
     }
-    HILOG_INFO("form is still exist, form:%{public}s, formId:%{public}" PRId64,
-        formRecord.formName.c_str(), formId);
+    HILOG_INFO("form is still exist, form:%{public}s, formId:%{public}" PRId64 ", isDataProxy: %{public}d",
+        formRecord.formName.c_str(), formId, formRecord.isDataProxy);
 
     // update resource
+    if (!formRecord.isDataProxy) {
+        FormCacheMgr::GetInstance().DeleteData(formId);
+    }
     FormDataMgr::GetInstance().SetNeedRefresh(formId, true);
-    FormCacheMgr::GetInstance().DeleteData(formId);
     FormBmsHelper::GetInstance().NotifyModuleNotRemovable(formRecord.bundleName, formRecord.moduleName);
     FormTimerCfg timerCfg;
     GetTimerCfg(updatedForm.updateEnabled, updatedForm.updateDuration, updatedForm.scheduledUpdateTime, timerCfg);
