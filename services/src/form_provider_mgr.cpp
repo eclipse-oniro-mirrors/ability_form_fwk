@@ -125,7 +125,7 @@ void FormProviderMgr::DataProxyUpdate(const int64_t formId, const FormRecord &re
     if (isFormProviderUpdate && record.isDataProxy) {
         FormProviderData formProviderData;
         std::string cacheData;
-        std::map<std::string, std::pair<sptr, int32_t>> imageDataMap;
+        std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
         if (FormCacheMgr::GetInstance().GetData(formId, cacheData, imageDataMap)) {
             formProviderData.SetDataString(cacheData);
             formProviderData.SetImageDataMap(imageDataMap);
