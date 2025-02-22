@@ -1080,7 +1080,7 @@ void FormMgrAdapter::HandlerNotifyWhetherVisibleForms(const std::vector<int64_t>
     } else if (formVisibleType == static_cast<int32_t>(FormVisibilityType::INVISIBLE)) {
         FormDataProxyMgr::GetInstance().DisableSubscribeFormData(formIds);
     }
-
+    
     int32_t userId = FormUtil::GetCurrentAccountId();
     std::vector<int64_t> needConFormIds;
     if (formVisibleType == static_cast<int32_t>(FormVisibilityType::VISIBLE)) {
@@ -1509,7 +1509,7 @@ ErrCode FormMgrAdapter::GetFormConfigInfo(const Want &want, FormItemInfo &formCo
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     formConfigInfo.SetFormLocation((Constants::FormLocation)formLocation);
-
+    
     int renderingMode = want.GetParams().GetIntParam(Constants::PARAM_FORM_RENDERINGMODE_KEY,
         static_cast<int>(Constants::RenderingMode::FULL_COLOR));
     formConfigInfo.SetRenderingMode((Constants::RenderingMode)renderingMode);
@@ -2422,16 +2422,16 @@ ErrCode FormMgrAdapter::StartAbilityByFms(const Want &want)
 
         std::vector<AppExecFwk::AppStateData> curForegroundApps;
         IN_PROCESS_CALL_WITHOUT_RET(appMgrProxy->GetForegroundApplications(curForegroundApps));
-        bool isPromise = false;
+        bool checkFlag = false;
         for (auto &appData : curForegroundApps) {
             HILOG_DEBUG("appData.bundleName: %{public}s", appData.bundleName.c_str());
             if (appData.bundleName == dstBundleName) {
-                isPromise = true;
+                checkFlag = true;
                 HILOG_DEBUG("This application is a foreground program");
                 break;
             }
         }
-        if (!isPromise) {
+        if (!checkFlag) {
             HILOG_ERROR("This application is not a foreground program");
             return ERR_APPEXECFWK_FORM_NOT_TRUST;
         }
@@ -4236,7 +4236,7 @@ int32_t FormMgrAdapter::NotifyFormLocked(const int64_t &formId, bool isLocked)
     }
 
     formRecord.protectForm = isLocked;
-
+ 
     HILOG_INFO("formId:%{public}" PRId64 ", isLocked:%{public}d", formId, isLocked);
     FormExemptLockMgr::GetInstance().SetExemptLockStatus(formId, !isLocked);
     FormDataMgr::GetInstance().SetFormProtect(formId, isLocked);
@@ -4308,7 +4308,7 @@ ErrCode FormMgrAdapter::UpdateFormByCondition(int32_t type)
 
     std::string reportStr = "";
     std::set<std::string> reportList;
-
+ 
     for (FormRecord& formRecord : formInfos) {
         if (!formRecord.isSystemApp) {
             continue;
