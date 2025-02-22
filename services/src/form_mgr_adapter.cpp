@@ -2410,9 +2410,9 @@ ErrCode FormMgrAdapter::StartAbilityByFms(const Want &want)
     ElementName elementName = want.GetElement();
     std::string dstBundleName = elementName.GetBundleName();
 
-    std::string pageRouterServiceCode = want.GetStringParam(Constants::PARAM_PAGE_ROUTER_SERVICE_CODE);
-    int32_t intValue = std::stoi(pageRouterServiceCode);
-    if (intValue == Constants::PAGE_ROUTER_SERVICE_CODE_FORM_MANAGE) {
+    int32_t pageRouterServiceCode = want.GetIntParam(Constants::PARAM_PAGE_ROUTER_SERVICE_CODE, -1);
+    HILOG_DEBUG("StartAbilityByFms pageRouterServiceCode: %{public}" PRId32, pageRouterServiceCode);
+    if (pageRouterServiceCode == Constants::PAGE_ROUTER_SERVICE_CODE_FORM_MANAGE) {
         HILOG_DEBUG("StartAbilityByFms getForegroundApplications begin");
         auto appMgrProxy = GetAppMgr();
         if (!appMgrProxy) {
