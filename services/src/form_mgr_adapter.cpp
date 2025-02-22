@@ -2410,26 +2410,29 @@ ErrCode FormMgrAdapter::StartAbilityByFms(const Want &want)
     ElementName elementName = want.GetElement();
     std::string dstBundleName = elementName.GetBundleName();
 
-    HILOG_DEBUG("StartAbilityByFms getForegroundApplications begin");
-    auto appMgrProxy = GetAppMgr();
-    if (!appMgrProxy) {
-        HILOG_ERROR("Get app mgr failed");
-        return ERR_APPEXECFWK_FORM_NOT_TRUST;
-    }
-
-    std::vector<AppExecFwk::AppStateData> curForegroundApps;
-    IN_PROCESS_CALL_WITHOUT_RET(appMgrProxy->GetForegroundApplications(curForegroundApps));
-    bool isPromise = false;
-    for (auto appData : curForegroundApps) {
-        HILOG_DEBUG("appData.bundleName: %{public}s", appData.bundleName.c_str());
-        if (appData.bundleName == dstBundleName) {
-            isPromise = true;
-            HILOG_DEBUG("This application is a foreground program");
+    std::string pageRouterServiceCode = want.GetStringParam(Constants::PARAM_PAGE_ROUTER_SERVICE_CODE);
+    if(pageRouterServiceCode == Constants::PAGE_ROUTER_SERVICE_CODE_FORM_MANAGE) {
+        HILOG_DEBUG("StartAbilityByFms getForegroundApplications begin");
+        auto appMgrProxy = GetAppMgr();
+        if (!appMgrProxy) {
+            HILOG_ERROR("Get app mgr failed");
+            return ERR_APPEXECFWK_FORM_NOT_TRUST;
         }
-    }
-    if (!isPromise) {
-        HILOG_ERROR("This application is not a foreground program");
-        return ERR_APPEXECFWK_FORM_NOT_TRUST;
+
+        std::vector<AppExecFwk::AppStateData> curForegroundApps;
+        IN_PROCESS_CALL_WITHOUT_RET(appMgrProxy->GetForegroundApplications(curForegroundApps));
+        bool isPromise = false;
+        for (auto appData : curForegroundApps) {
+            HILOG_DEBUG("appData.bundleName: %{public}s", appData.bundleName.c_str());
+            if (appData.bundleName == dstBundleName) {
+                isPromise = true;
+                HILOG_DEBUG("This application is a foreground program");
+            }
+        }
+        if (!isPromise) {
+            HILOG_ERROR("This application is not a foreground program");
+            return ERR_APPEXECFWK_FORM_NOT_TRUST;
+        }
     }
 
     std::string dstAbilityName = elementName.GetAbilityName();
