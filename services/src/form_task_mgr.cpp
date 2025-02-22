@@ -803,7 +803,6 @@ FormJsInfo FormTaskMgr::CreateFormJsInfo(const int64_t formId, const FormRecord 
     form.uiSyntax = record.uiSyntax;
     form.isDynamic = record.isDynamic;
     form.transparencyEnabled = record.transparencyEnabled;
-    form.isSystemApp = record.isSystemApp;
     form.modulePkgNameMap = record.modulePkgNameMap;
     HILOG_DEBUG("jsPath: %{private}s, data: %{private}s",
         form.jsFormCodePath.c_str(), form.formData.c_str());
@@ -867,8 +866,6 @@ void FormTaskMgr::InnerPostRenderForm(const FormRecord &formRecord, const Want &
         }
     }
     auto hostToken = want.GetRemoteObject(Constants::PARAM_FORM_HOST_TOKEN);
-    FormStatusQueue::GetInstance().GetOrCreateFormStatusQueue(formId, hostToken, FormStatus::RECOVERED);
-
     int32_t recoverInterval = (int32_t) (FormUtil::GetCurrentMillisecond() - lastRecoverTime);
     if (lastRecoverTime <= 0 || recoverInterval > FORM_BUILD_DELAY_TIME) {
         FormCommand renderCommand{
@@ -876,7 +873,7 @@ void FormTaskMgr::InnerPostRenderForm(const FormRecord &formRecord, const Want &
             std::make_pair(TaskCommandType::RENDER_FORM, formId),
             FORM_TASK_DELAY_TIME,
             renderForm};
-        FormStatusQueue::GetInstance().PostFormStatusTask(renderCommand);
+        FormStatusQueue::GetInstance().PostFormStatusTask(renderCommand, hostToken);
     } else {
         HILOG_INFO("delay render task: %{public}" PRId32 " ms, formId is %{public}" PRId64, recoverInterval, formId);
         int32_t delayTime = FORM_BUILD_DELAY_TIME - recoverInterval;
@@ -887,7 +884,7 @@ void FormTaskMgr::InnerPostRenderForm(const FormRecord &formRecord, const Want &
             std::make_pair(TaskCommandType::RENDER_FORM, formId),
             delayTime,
             renderForm};
-        FormStatusQueue::GetInstance().PostFormStatusTask(renderCommand);
+        FormStatusQueue::GetInstance().PostFormStatusTask(renderCommand, hostToken);
     }
     HILOG_DEBUG("end");
 }
@@ -929,7 +926,6 @@ void FormTaskMgr::PostStopRenderingForm(
         return;
     }
     auto formId = formRecord.formId;
-    FormStatusQueue::GetInstance().DeleteFormStatusQueue(formId);
     auto deleterenderForm = [formRecord, want, remoteObject]() {
         FormTaskMgr::GetInstance().StopRenderingForm(formRecord, want, remoteObject);
     };
@@ -1251,7 +1247,6 @@ void FormTaskMgr::PostRecycleForms(const std::vector<int64_t> &formIds, const Wa
         }
         serialQueue_->ScheduleDelayTask(
             std::make_pair((int64_t)TaskType::RECYCLE_FORM, formId), delayTime, recycleForm);
-        FormStatusQueue::GetInstance().GetOrCreateFormStatusQueue(formId, remoteObjectOfHost, FormStatus::RECOVERED);
     }
     HILOG_DEBUG("end");
 }
@@ -1316,14 +1311,12 @@ void FormTaskMgr::PostRecoverForm(const FormRecord &record, const Want &want, co
         formLastRecoverTimes[formId] = FormUtil::GetCurrentMillisecond();
     }
     auto hostToken = want.GetRemoteObject(Constants::PARAM_FORM_HOST_TOKEN);
-    FormStatusQueue::GetInstance().GetOrCreateFormStatusQueue(formId, hostToken, FormStatus::RECYCLED);
-
     FormCommand recoverCommand{
         formId,
         std::make_pair(TaskCommandType::RECOVER_FORM, formId),
         FORM_TASK_DELAY_TIME,
         recoverForm};
-    FormStatusQueue::GetInstance().PostFormStatusTask(recoverCommand);
+    FormStatusQueue::GetInstance().PostFormStatusTask(recoverCommand, hostToken);
     HILOG_DEBUG("end");
 }
 
@@ -1594,6 +1587,27 @@ void FormTaskMgr::ConnectNetWork()
 {
     HILOG_INFO("call");
     DelayedSingleton<FormMgrService>::GetInstance()->SubscribeNetConn();
+}
+
+void FormTaskMgr::PostDelayRefreshForms(const std::vector<FormRecord> updatedForms, const Want &want)
+{
+    HILOG_INFO("start");
+    if (serialQueue_ == nullptr) {
+        HILOG_ERROR("serialQueue_ invalidate");
+        return;
+    }
+    auto delayRefreshForms = [updatedForms, want]() {
+        for (const auto &updatedForm : updatedForms) {
+            ErrCode errCode = FormProviderMgr::GetInstance().RefreshForm(updatedForm.formId, want, true);
+            if (errCode == ERR_APPEXECFWK_FORM_GET_AMSCONNECT_FAILED) {
+                HILOG_INFO("RefreshForm failed one time, PostRefreshFormTask to retry. form %{public}" PRId64 "",
+                    updatedForm.formId);
+                FormTaskMgr::GetInstance().PostEnterpriseAppInstallFailedRetryTask(updatedForm.formId, want, true);
+            }
+        }
+    };
+    serialQueue_->ScheduleTask(PROVIDER_UPDATE_REFRESH_FORMS_TASK_DELAY_TIME, delayRefreshForms);
+    HILOG_INFO("end");
 }
 
 

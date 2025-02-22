@@ -55,21 +55,21 @@ bool FormBundleLockMgr::Init()
 
 bool FormBundleLockMgr::IsBundleLock(const std::string &bundleName, int64_t formId)
 {
-    if (DEFAULT_USER_ID == FormUtil::GetCurrentAccountId()) {
+    if (FormUtil::GetCurrentAccountId() != DEFAULT_USER_ID) {
         return false;
     }
-
+ 
     if (formId != 0) {
         bool lockStatus = false;
         FormDataMgr::GetInstance().GetFormLock(formId, lockStatus);
         return lockStatus;
     }
-
+ 
     if (bundleName.empty()) {
         HILOG_ERROR("invalid bundleName");
         return false;
     }
-
+ 
     {
         std::unique_lock<std::shared_mutex> lock(bundleLockSetMutex_);
         if (!isInitialized_ && !Init()) {
@@ -77,7 +77,7 @@ bool FormBundleLockMgr::IsBundleLock(const std::string &bundleName, int64_t form
             return false;
         }
     }
-
+ 
     std::shared_lock<std::shared_mutex> lock(bundleLockSetMutex_);
     auto iter = formBundleLockSet_.find(bundleName);
     return iter != formBundleLockSet_.end();
@@ -103,6 +103,46 @@ void FormBundleLockMgr::SetBundleLockStatus(const std::string &bundleName, bool 
     } else if (!isLock && iter != formBundleLockSet_.end()) {
         formBundleLockSet_.erase(bundleName);
         FormRdbDataMgr::GetInstance().DeleteData(LOCK_FORM_BUNDLE_TABLE, bundleName);
+    }
+}
+
+bool FormBundleLockMgr::IsBundleProtect(const std::string &bundleName, int64_t formId)
+{
+    if (FormUtil::GetCurrentAccountId() != DEFAULT_USER_ID) {
+        return false;
+    }
+
+    if (formId != 0) {
+        bool protectStatus = false;
+        FormDataMgr::GetInstance().GetFormProtect(formId, protectStatus);
+        return protectStatus;
+    }
+
+    if (bundleName.empty()) {
+        HILOG_ERROR("invalid bundleName");
+        return false;
+    }
+
+    std::shared_lock<std::shared_mutex> lock(bundleProtectSetMutex_);
+    auto iter = formBundleProtectSet_.find(bundleName);
+    return iter != formBundleProtectSet_.end();
+}
+
+void FormBundleLockMgr::SetBundleProtectStatus(const std::string &bundleName, bool isProtect)
+{
+    if (bundleName.empty()) {
+        HILOG_ERROR("invalid bundleName");
+        return;
+    }
+
+    std::unique_lock<std::shared_mutex> lock(bundleProtectSetMutex_);
+    auto iter = formBundleProtectSet_.find(bundleName);
+    if (isProtect && iter == formBundleProtectSet_.end()) {
+        formBundleProtectSet_.insert(bundleName);
+    } else if (!isProtect && iter != formBundleProtectSet_.end()) {
+        formBundleProtectSet_.erase(bundleName);
+    } else {
+        HILOG_ERROR("set bundle protect status failed");
     }
 }
 }  // namespace AppExecFwk

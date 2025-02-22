@@ -216,8 +216,8 @@ int FormMgrStub::OnRemoteRequestThird(uint32_t code, MessageParcel &data, Messag
             return HandleUnregisterPublishFormInterceptor(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_CLICK_EVENT_OBSERVER):
             return HandleRegisterClickCallbackEventObserver(data, reply);
-        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_IS_FORM_BUNDLE_LOCKED):
-            return HandleIsFormLocked(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_IS_FORM_BUNDLE_PEOTECTED):
+            return HandleIsFormProtected(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_NOTIFY_FORM_LOCKED):
             return HandleNotifyFormLocked(data, reply);
         default:
@@ -292,6 +292,8 @@ int FormMgrStub::OnRemoteRequestFifth(uint32_t code, MessageParcel &data, Messag
             return HandleGetPublishedFormInfoById(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_PUBLISHED_FORM_INFOS):
             return HandleGetPublishedFormInfos(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_IS_FORM_BUNDLE_EXEMPT):
+            return HandleIsFormExempt(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -1700,6 +1702,19 @@ ErrCode FormMgrStub::HandleIsFormBundleForbidden(MessageParcel &data, MessagePar
     return ERR_OK;
 }
 
+static LockChangeType ParseLockChangeType(int32_t value)
+{
+    switch (value) {
+        case static_cast<int32_t>(LockChangeType::SWITCH_CHANGE):
+            return LockChangeType::SWITCH_CHANGE;
+        case static_cast<int32_t>(LockChangeType::PROTECT_CHANGE):
+            return LockChangeType::PROTECT_CHANGE;
+        default:
+            HILOG_ERROR("lockChangeType invalid");
+            return LockChangeType::INVALID_PARAMETER;
+    }
+}
+
 int32_t FormMgrStub::HandleLockForms(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_DEBUG("call");
@@ -1718,7 +1733,14 @@ int32_t FormMgrStub::HandleLockForms(MessageParcel &data, MessageParcel &reply)
         }
         formLockInfo.push_back(*info);
     }
-    int32_t result = LockForms(formLockInfo);
+
+    int32_t dataValue = data.ReadInt32();
+    LockChangeType type = ParseLockChangeType(dataValue);
+    if (type == LockChangeType::INVALID_PARAMETER) {
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    int32_t result = LockForms(formLockInfo, type);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
@@ -1726,12 +1748,24 @@ int32_t FormMgrStub::HandleLockForms(MessageParcel &data, MessageParcel &reply)
     return result;
 }
 
-ErrCode FormMgrStub::HandleIsFormLocked(MessageParcel &data, MessageParcel &reply)
+ErrCode FormMgrStub::HandleIsFormProtected(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_DEBUG("call");
     std::string bundleName = data.ReadString();
     int64_t formId = data.ReadInt64();
-    bool result = IsFormBundleLocked(bundleName, formId);
+    bool result = IsFormBundleProtected(bundleName, formId);
+    if (!reply.WriteBool(result)) {
+        HILOG_ERROR("write action failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrStub::HandleIsFormExempt(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("call");
+    int64_t formId = data.ReadInt64();
+    bool result = IsFormBundleExempt(formId);
     if (!reply.WriteBool(result)) {
         HILOG_ERROR("write action failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;

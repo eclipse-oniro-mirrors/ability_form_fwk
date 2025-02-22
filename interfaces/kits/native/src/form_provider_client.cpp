@@ -30,7 +30,6 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-constexpr int32_t BIG_DATA = 32 * 1024;
 int FormProviderClient::AcquireProviderFormInfo(
     const FormJsInfo &formJsInfo,
     const Want &want,
@@ -81,9 +80,6 @@ int FormProviderClient::AcquireProviderFormInfo(
     FormProviderInfo formProviderInfo = ownerAbility->OnCreate(createWant);
     HILOG_DEBUG("formId:%{public}" PRId64 ", data: %{private}s", formJsInfo.formId,
         formProviderInfo.GetFormDataString().c_str());
-    if (formJsInfo.formProviderData.jsonFormProviderData_.size() > BIG_DATA && !formJsInfo.isSystemApp) {
-        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
-    }
     if (newWant.HasParameter(Constants::PARAM_FORM_HOST_TOKEN)) {
         HandleRemoteAcquire(formJsInfo, formProviderInfo, newWant, AsObject());
     }

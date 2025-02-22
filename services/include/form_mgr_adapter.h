@@ -655,12 +655,20 @@ public:
     int32_t EnableForms(const std::string bundleName, const bool enable);
 
     /**
-     * @brief enable/disable form lock.
+     * @brief this interface is invoked when the application lock status changes.
      * @param bundleName BundleName of the form host.
-     * @param lock True for lock form, false for unlock form.
+     * @param lock True for lock bundle, false for unlock bundle.
      * @return Returns ERR_OK on success, others on failure.
      */
-    int32_t LockForms(const std::string bundleName, int32_t userId, const bool lock);
+    ErrCode SwitchLockForms(const std::string &bundleName, int32_t userId, const bool lock);
+    
+    /**
+     * @brief this interface is invoked when the application protect status changes.
+     * @param bundleName BundleName of the form host.
+     * @param lock True for protect form, false for unprotect form.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode ProtectLockForms(const std::string &bundleName, int32_t userId, const bool protect);
 
     /**
      * @brief Update form size.
@@ -1176,6 +1184,8 @@ private:
     ErrCode UpdateTimer(const int64_t formId, const FormRecord &record);
 
     bool CheckIsMultiAppForm(FormInfo &formInfo);
+    
+    void SetFormEnableAndLockState(FormInfo &formInfo, FormItemInfo &formConfigInfo, int formLocation);
 
     void SetLockFormStateOfFormItemInfo(FormInfo &formInfo, FormItemInfo &formConfigInfo);
     /**

@@ -211,6 +211,7 @@ ohos_shared_library("forminfo_napi") {
     "bundle_framework:appexecfwk_base",
     "c_utils:utils",
     "hilog:libhilog",
+    "ipc:ipc_core",
     "napi:ace_napi",
   ]
 
@@ -245,6 +246,7 @@ ohos_shared_library("forminfo") {
     "bundle_framework:appexecfwk_base",
     "c_utils:utils",
     "hilog:libhilog",
+    "ipc:ipc_core",
     "napi:ace_napi",
   ]
 

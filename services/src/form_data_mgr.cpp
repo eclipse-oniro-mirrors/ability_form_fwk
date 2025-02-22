@@ -159,19 +159,9 @@ bool FormDataMgr::CreateHostRecord(const FormItemInfo &info, const sptr<IRemoteO
     return true;
 }
 
-/**
- * @brief Create form record.
- * @param formInfo The form item info.
- * @param callingUid The UID of the proxy.
- * @param userId User ID.
- * @return Form record.
- */
-FormRecord FormDataMgr::CreateFormRecord(const FormItemInfo &formInfo, const int callingUid, const int32_t userId) const
+static void initFormRecord(FormRecord &newRecord, const FormItemInfo &formInfo)
 {
-    HILOG_INFO("create");
-    FormRecord newRecord;
     newRecord.formId = formInfo.GetFormId();
-    newRecord.userId = userId;
     newRecord.providerUserId = FormUtil::GetCurrentAccountId();
     newRecord.packageName = formInfo.GetPackageName();
     newRecord.bundleName = formInfo.GetProviderBundleName();
@@ -198,8 +188,24 @@ FormRecord FormDataMgr::CreateFormRecord(const FormItemInfo &formInfo, const int
     newRecord.description = formInfo.GetDescription();
     newRecord.formLocation = formInfo.GetFormLocation();
     newRecord.isThemeForm = formInfo.GetIsThemeForm();
-    newRecord.enableForm = formInfo.IsEnableForm();
+    newRecord.enableForm = formInfo.IsTransparencyEnabled() ? true : formInfo.IsEnableForm();
     newRecord.lockForm = formInfo.IsLockForm();
+    newRecord.protectForm = formInfo.IsLockForm();
+}
+
+/**
+ * @brief Create form record.
+ * @param formInfo The form item info.
+ * @param callingUid The UID of the proxy.
+ * @param userId User ID.
+ * @return Form record.
+ */
+FormRecord FormDataMgr::CreateFormRecord(const FormItemInfo &formInfo, const int callingUid, const int32_t userId) const
+{
+    HILOG_INFO("create");
+    FormRecord newRecord;
+    initFormRecord(newRecord, formInfo);
+    newRecord.userId = userId;
     if (newRecord.isEnableUpdate) {
         ParseUpdateConfig(newRecord, formInfo);
     }
@@ -2744,6 +2750,32 @@ ErrCode FormDataMgr::GetFormLock(const int64_t formId, bool &lock)
     }
     lock = itFormRecord->second.lockForm;
     HILOG_INFO("formId:%{public}" PRId64 " lock:%{public}d", formId, lock);
+    return ERR_OK;
+}
+
+ErrCode FormDataMgr::SetFormProtect(const int64_t formId, const bool protect)
+{
+    std::lock_guard<std::mutex> lockMutex(formRecordMutex_);
+    auto itFormRecord = formRecords_.find(formId);
+    if (itFormRecord == formRecords_.end()) {
+        HILOG_ERROR("form info not find");
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+    }
+    itFormRecord->second.protectForm = protect;
+    HILOG_INFO("formId:%{public}" PRId64 " protect:%{public}d", formId, protect);
+    return ERR_OK;
+}
+
+ErrCode FormDataMgr::GetFormProtect(const int64_t formId, bool &protect)
+{
+    std::lock_guard<std::mutex> lockMutex(formRecordMutex_);
+    auto itFormRecord = formRecords_.find(formId);
+    if (itFormRecord == formRecords_.end()) {
+        HILOG_ERROR("form info not find");
+        return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
+    }
+    protect = itFormRecord->second.protectForm;
+    HILOG_INFO("formId:%{public}" PRId64 " protect:%{public}d", formId, protect);
     return ERR_OK;
 }
 

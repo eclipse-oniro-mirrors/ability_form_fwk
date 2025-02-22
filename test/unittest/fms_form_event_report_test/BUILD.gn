@@ -41,6 +41,7 @@ ohos_unittest("FmsFormEventReportTest") {
     "c_utils:utils",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
+    "ipc:ipc_core",
   ]
 }
 

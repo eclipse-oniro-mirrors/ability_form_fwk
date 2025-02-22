@@ -19,6 +19,19 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+/**
+ * @enum LockChangeType
+ * Defines form lock change type.
+ * The difference is that the application lock switch status and protection status change.
+ * When the application lock switch of the application changes, SWITCH_CHANGE is used.
+ * When the protection status changes, it is used. When the switch status changes, the protection status also changes.
+ */
+enum class LockChangeType : int32_t {
+    INVALID_PARAMETER = -1,
+    SWITCH_CHANGE = 0,
+    PROTECT_CHANGE = 1,
+};
+
 struct FormLockInfo final : public Parcelable {
     std::string bundleName = "";
     int32_t userId = 0;

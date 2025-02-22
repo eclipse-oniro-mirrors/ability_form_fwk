@@ -91,7 +91,6 @@ constexpr int32_t DEFAULT_USER_ID = 100;
 constexpr int32_t BUNDLE_NAME_INDEX = 0;
 constexpr int32_t USER_ID_INDEX = 1;
 constexpr int32_t INSTANCE_SEQ_INDEX = 2;
-constexpr int32_t BIG_DATA = 32 * 1024;
 const std::string BUNDLE_INFO_SEPARATOR = "_";
 const std::string POINT_ETS = ".ets";
 constexpr int DATA_FIELD = 1;
@@ -813,9 +812,6 @@ int FormMgrAdapter::UpdateForm(const int64_t formId, const int32_t callingUid,
         HILOG_ERROR("not exist such form:%{public}" PRId64 ".", matchedFormId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
-    if (formProviderData.GetData().size() > BIG_DATA && !formRecord.isSystemApp) {
-        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
-    }
 
     // Checks if the form provider is the currently active user.
     if (FormUtil::GetCurrentAccountId() != formRecord.providerUserId) {
@@ -1501,12 +1497,23 @@ ErrCode FormMgrAdapter::GetFormConfigInfo(const Want &want, FormItemInfo &formCo
         static_cast<int>(Constants::RenderingMode::FULL_COLOR));
     formConfigInfo.SetRenderingMode((Constants::RenderingMode)renderingMode);
 
-    bool isFormBundleForbidden = FormBundleForbidMgr::GetInstance().IsBundleForbidden(
-        formConfigInfo.GetProviderBundleName());
-    formConfigInfo.SetEnableForm(!isFormBundleForbidden);
-    SetLockFormStateOfFormItemInfo(formInfo, formConfigInfo);
+    SetFormEnableAndLockState(formInfo, formConfigInfo, formLocation);
 
     return ERR_OK;
+}
+
+void FormMgrAdapter::SetFormEnableAndLockState(FormInfo &formInfo, FormItemInfo &formConfigInfo, int formLocation)
+{
+    // form is always visible on the lock screen
+    if (formLocation == static_cast<int>(Constants::FormLocation::SCREEN_LOCK)) {
+        formConfigInfo.SetEnableForm(true);
+        formConfigInfo.SetLockForm(false);
+    } else {
+        bool isFormBundleForbidden = FormBundleForbidMgr::GetInstance().IsBundleForbidden(
+            formConfigInfo.GetProviderBundleName());
+        formConfigInfo.SetEnableForm(!isFormBundleForbidden);
+        SetLockFormStateOfFormItemInfo(formInfo, formConfigInfo);
+    }
 }
 
 void FormMgrAdapter::SetLockFormStateOfFormItemInfo(FormInfo &formInfo, FormItemInfo &formConfigInfo)
@@ -1518,18 +1525,18 @@ void FormMgrAdapter::SetLockFormStateOfFormItemInfo(FormInfo &formInfo, FormItem
         return;
     }
 
-    bool isBundleLock = FormBundleLockMgr::GetInstance().IsBundleLock(formConfigInfo.GetProviderBundleName(), 0);
+    bool isBundleProtect = FormBundleLockMgr::GetInstance().IsBundleProtect(formConfigInfo.GetProviderBundleName(), 0);
     // Use DBCache to set lockForm first
     FormRecord record;
     if (formId > 0 && FormDbCache::GetInstance().GetDBRecord(formId, record) == ERR_OK) {
-        if (isBundleLock != record.lockForm) {
-            record.lockForm = isBundleLock;
+        if (isBundleProtect != record.lockForm) {
+            record.lockForm = isBundleProtect;
             FormDbCache::GetInstance().UpdateDBRecord(formId, record);
         }
-        formConfigInfo.SetLockForm(isBundleLock);
+        formConfigInfo.SetLockForm(isBundleProtect);
     } else {
         bool isMultiAppForm = CheckIsMultiAppForm(formInfo) && formConfigInfo.GetSystemAppFlag();
-        formConfigInfo.SetLockForm(isBundleLock && !isMultiAppForm);
+        formConfigInfo.SetLockForm(isBundleProtect && !isMultiAppForm);
     }
 }
 
@@ -1803,7 +1810,7 @@ ErrCode FormMgrAdapter::AcquireProviderFormInfoAsync(const int64_t formId,
     const FormItemInfo &info, const WantParams &wantParams)
 {
     std::string providerBundleName = info.GetProviderBundleName();
-    if (!info.IsEnableForm() || (info.IsLockForm() && !FormExemptLockMgr::GetInstance().IsExemptLock(formId))) {
+    if (!info.IsEnableForm() || (info.IsProtectForm() && !FormExemptLockMgr::GetInstance().IsExemptLock(formId))) {
         HILOG_INFO("Bundle:%{public}s forbidden", providerBundleName.c_str());
         FormDataMgr::GetInstance().SetRefreshDuringDisableForm(formId, true);
 
@@ -2125,11 +2132,6 @@ int FormMgrAdapter::SetNextRefreshTime(const int64_t formId, const int64_t nextT
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
 
-    if (formRecord.isDataProxy) {
-        HILOG_ERROR("data proxy form not support set next refresh time");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
-    }
-
     return SetNextRefreshTimeLocked(matchedFormId, nextTime, userId);
 }
 
@@ -2299,17 +2301,23 @@ ErrCode FormMgrAdapter::RequestPublishFormToHost(Want &want)
     ErrCode errCode = QueryPublishFormToHost(wantToHost);
     if (errCode == ERR_OK) {
         int32_t userId = want.GetIntParam(Constants::PARAM_FORM_USER_ID, -1);
-        return FormAmsHelper::GetInstance().StartAbility(wantToHost, userId);
+        int ret = FormAmsHelper::GetInstance().StartAbility(wantToHost, userId);
+        if (ret != ERR_OK) {
+            HILOG_ERROR("fail StartAbility");
+            return ret;
+        }
     }
 
     // Handle by interceptor callback when the system handler is not found.
+    int64_t formId = std::stoll(want.GetStringParam(Constants::PARAM_FORM_IDENTITY_KEY));
     if (formPublishInterceptor_ == nullptr) {
-        HILOG_ERROR("query publish form failed, and have not publish interceptor. errCode:%{public}d", errCode);
-        return errCode;
+        return AcquireAddFormResult(formId);
     }
+
     int ret = formPublishInterceptor_->ProcessPublishForm(wantToHost);
     if (ret == ERR_OK) {
         HILOG_DEBUG("success to ProcessPublishForm");
+        return AcquireAddFormResult(formId);
     } else {
         HILOG_ERROR("fail ProcessPublishForm");
     }
@@ -2959,11 +2967,13 @@ bool FormMgrAdapter::UpdateProviderInfoToHost(const int64_t &matchedFormId, cons
     }
 
     HILOG_INFO("formId:%{public}" PRId64 ", needRefresh:%{public}d, formVisibleType:%{public}d,"
-        "isTimerRefresh:%{public}d", matchedFormId, formRecord.needRefresh,
-        static_cast<int32_t>(formVisibleType), formRecord.isTimerRefresh);
+        "isTimerRefresh:%{public}d, wantCacheMapSize:%{public}d", matchedFormId, formRecord.needRefresh,
+        static_cast<int32_t>(formVisibleType), formRecord.isTimerRefresh, (int)formRecord.wantCacheMap.size());
     // If the form need refresh flag is true and form visibleType is FORM_VISIBLE, refresh the form host.
     if (formRecord.needRefresh && formVisibleType == Constants::FORM_VISIBLE) {
-        if (formRecord.isTimerRefresh) {
+        if (formRecord.wantCacheMap.size() != 0) {
+            FormProviderMgr::GetInstance().RefreshForm(formRecord.formId, formRecord.wantCacheMap[matchedFormId], true);
+        } else if (formRecord.isTimerRefresh) {
             FormTimerMgr::GetInstance().RefreshWhenFormVisible(formRecord.formId, userId);
         } else {
             std::string cacheData;
@@ -3896,6 +3906,9 @@ int32_t FormMgrAdapter::RecoverForms(const std::vector<int64_t> &formIds, const 
     FormRecord record;
     std::vector<int64_t> validFormIds;
     int callingUid = IPCSkeleton::GetCallingUid();
+    bool needHandleCachedClick =
+        want.GetBoolParam(Constants::FORM_IS_RECOVER_FORM_TO_HANDLE_CLICK_EVENT, false);
+    HILOG_INFO("recover by click: %{public}d", needHandleCachedClick);
     for (int64_t formId : formIds) {
         if (formId <= 0) {
             HILOG_ERROR("form id is negative");
@@ -3914,7 +3927,7 @@ int32_t FormMgrAdapter::RecoverForms(const std::vector<int64_t> &formIds, const 
             FormDataMgr::GetInstance().UpdateFormRecord(matchedFormId, record);
             continue;
         }
-        if (record.recycleStatus != RecycleStatus::RECYCLED) {
+        if (record.recycleStatus != RecycleStatus::RECYCLED && !needHandleCachedClick) {
             HILOG_WARN("form %{public}" PRId64 " not RECYCLED", formId);
             continue;
         }
@@ -4039,7 +4052,7 @@ int32_t FormMgrAdapter::EnableForms(const std::string bundleName, const bool ena
         if (enable && !FormBundleLockMgr::GetInstance().IsBundleLock(bundleName, iter->formId)) {
             FormRenderMgr::GetInstance().ExecAcquireProviderForbiddenTaskByFormId(iter->formId);
         }
-        if (iter->enableForm == enable || iter->transparencyEnabled) {
+        if (iter->enableForm == enable || (iter->transparencyEnabled && iter->enableForm == true)) {
             iter = formInfos.erase(iter);
             continue;
         }
@@ -4070,11 +4083,11 @@ bool FormMgrAdapter::CheckIsMultiAppForm(FormInfo &formInfo)
     return isMultiAppForm;
 }
 
-int32_t FormMgrAdapter::LockForms(const std::string bundleName, int32_t userId, const bool lock)
+ErrCode FormMgrAdapter::SwitchLockForms(const std::string &bundleName, int32_t userId, const bool lock)
 {
-    HILOG_INFO("LockForms entry");
-    if (FormBundleLockMgr::GetInstance().IsBundleLock(bundleName, 0) == lock) {
-        HILOG_INFO("No need to change lock status, bundleName = %{public}s, lockstatus = %{public}d",
+    HILOG_INFO("SwitchLockForms entry");
+    if (FormBundleLockMgr::GetInstance().IsBundleLock(bundleName) == lock) {
+        HILOG_INFO("No need to change lock status, bundleName = %{public}s, lock = %{public}d",
             bundleName.c_str(), lock);
         return ERR_OK;
     }
@@ -4083,9 +4096,6 @@ int32_t FormMgrAdapter::LockForms(const std::string bundleName, int32_t userId, 
     if (!FormDataMgr::GetInstance().GetFormRecord(bundleName, formInfos, userId)) {
         HILOG_ERROR("GetFormRecord error");
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
-    }
-    if (!lock && !FormBundleForbidMgr::GetInstance().IsBundleForbidden(bundleName)) {
-        FormRenderMgr::GetInstance().ExecAcquireProviderForbiddenTask(bundleName);
     }
 
     HILOG_INFO("userId:%{public}d, infosSize:%{public}zu, lock:%{public}d", userId, formInfos.size(), lock);
@@ -4104,12 +4114,55 @@ int32_t FormMgrAdapter::LockForms(const std::string bundleName, int32_t userId, 
         FormDbCache::GetInstance().UpdateDBRecord(iter->formId, *iter);
         if (!lock) {
             FormExemptLockMgr::GetInstance().SetExemptLockStatus(iter->formId, false);
+        }
+        ++iter;
+    }
+
+    ErrCode res = ProtectLockForms(bundleName, userId, lock);
+    if (res != ERR_OK) {
+        HILOG_ERROR("ProtectLockForms faild when executing the switchLockForms");
+        return res;
+    }
+    return ERR_OK;
+}
+
+ErrCode FormMgrAdapter::ProtectLockForms(const std::string &bundleName, int32_t userId, const bool protect)
+{
+    HILOG_INFO("ProtectLockForms entry");
+    if (FormBundleLockMgr::GetInstance().IsBundleProtect(bundleName) == protect) {
+        HILOG_INFO("No need to change protect status, bundleName = %{public}s, protect = %{public}d",
+            bundleName.c_str(), protect);
+        return ERR_OK;
+    }
+    FormBundleLockMgr::GetInstance().SetBundleProtectStatus(bundleName, protect);
+    std::vector<FormRecord> formInfos;
+    if (!FormDataMgr::GetInstance().GetFormRecord(bundleName, formInfos, userId)) {
+        HILOG_ERROR("GetFormRecord error");
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    }
+    if (!protect && !FormBundleForbidMgr::GetInstance().IsBundleForbidden(bundleName)) {
+        FormRenderMgr::GetInstance().ExecAcquireProviderForbiddenTask(bundleName);
+    }
+ 
+    HILOG_INFO("userId:%{public}d, infosSize:%{public}zu, protect:%{public}d", userId, formInfos.size(), protect);
+    for (auto iter = formInfos.begin(); iter != formInfos.end();) {
+        HILOG_DEBUG("bundleName:%{public}s, lockForm:%{public}d, transparencyEnabled:%{public}d",
+            iter->bundleName.c_str(), iter->lockForm, iter->transparencyEnabled);
+        if (iter->protectForm == protect ||
+            FormExemptLockMgr::GetInstance().IsExemptLock(iter->formId)) {
+            iter = formInfos.erase(iter);
+            continue;
+        }
+        iter->protectForm = protect;
+        FormDataMgr::GetInstance().SetFormProtect(iter->formId, protect);
+        FormDbCache::GetInstance().UpdateDBRecord(iter->formId, *iter);
+        if (!protect) {
             RefreshOrUpdateDuringDisableForm(iter, userId);
         }
         ++iter;
     }
     if (!formInfos.empty()) {
-        FormDataMgr::GetInstance().LockForms(std::move(formInfos), lock);
+        FormDataMgr::GetInstance().LockForms(std::move(formInfos), protect);
     }
     return ERR_OK;
 }
@@ -4123,13 +4176,13 @@ int32_t FormMgrAdapter::NotifyFormLocked(const int64_t &formId, bool isLocked)
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
 
-    bool isBundleLocked = FormBundleLockMgr::GetInstance().IsBundleLock(formRecord.bundleName, 0);
-    if (!isBundleLocked && isLocked) {
-        HILOG_ERROR("can't lock form when bundle unlocked, formId %{public}" PRId64, formId);
+    bool isBundleProtected = FormBundleLockMgr::GetInstance().IsBundleProtect(formRecord.bundleName, 0);
+    if (!isBundleProtected && isLocked) {
+        HILOG_ERROR("can't lock form when bundle unprotected, formId %{public}" PRId64, formId);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
-    if (formRecord.lockForm == isLocked) {
-        HILOG_WARN("lockForm state is same as before, formId:%{public}" PRId64, formId);
+    if (formRecord.protectForm == isLocked) {
+        HILOG_WARN("protectForm state is same as before, formId:%{public}" PRId64, formId);
         return ERR_OK;
     }
 
@@ -4137,12 +4190,11 @@ int32_t FormMgrAdapter::NotifyFormLocked(const int64_t &formId, bool isLocked)
         FormRenderMgr::GetInstance().ExecAcquireProviderForbiddenTaskByFormId(formId);
     }
 
-    formRecord.lockForm = isLocked;
+    formRecord.protectForm = isLocked;
  
     HILOG_INFO("formId:%{public}" PRId64 ", isLocked:%{public}d", formId, isLocked);
     FormExemptLockMgr::GetInstance().SetExemptLockStatus(formId, !isLocked);
-    FormDataMgr::GetInstance().SetFormLock(formId, isLocked);
-    FormDbCache::GetInstance().UpdateDBRecord(formId, formRecord);
+    FormDataMgr::GetInstance().SetFormProtect(formId, isLocked);
     std::vector<FormRecord> formRecords;
     formRecords.push_back(formRecord);
     FormDataMgr::GetInstance().LockForms(std::move(formRecords), isLocked);

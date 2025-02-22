@@ -575,12 +575,20 @@ private:
     int32_t HandleLockForms(MessageParcel &data, MessageParcel &reply);
 
     /**
-     * @brief Handle check form bundle is locked.
+     * @brief Handle check form bundle is exempt.
      * @param data input param.
      * @param reply output param.
      * @return Returns ERR_OK on success, others on failure.
      */
-    ErrCode HandleIsFormLocked(MessageParcel &data, MessageParcel &reply);
+    ErrCode HandleIsFormExempt(MessageParcel &data, MessageParcel &reply);
+
+    /**
+     * @brief Handle check form bundle is protected.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode HandleIsFormProtected(MessageParcel &data, MessageParcel &reply);
 
     /**
      * @brief Handle NotifyFormLocked message.

@@ -699,20 +699,31 @@ public:
     /**
      * @brief lock/unlock form update.
      * @param formLockInfos Indicates the lockForm data.
+     * @param type Indicates the Lock Type.
      * @return Returns ERR_OK on success, others on failure.
      */
-    virtual int32_t LockForms(const std::vector<FormLockInfo> &formLockInfos)
+    virtual int32_t LockForms(const std::vector<FormLockInfo> &formLockInfos, OHOS::AppExecFwk::LockChangeType type)
     {
         return 0;
     }
 
     /**
-     * @brief Check form bundle is lock.
+     * @brief Check form bundle is protect.
      * @param bundleName The bundle name of form to be check.
      * @param formId The Id of the form to query.
-     * @return Returns true for form bundle is lock.
+     * @return Returns true for form bundle is protect.
      */
-    virtual bool IsFormBundleLocked(const std::string &bundleName, int64_t formId)
+    virtual bool IsFormBundleProtected(const std::string &bundleName, int64_t formId)
+    {
+        return false;
+    }
+
+    /**
+     * @brief Check form bundle is exempt.
+     * @param formId The Id of the form to query.
+     * @return Returns true for form bundle is exempt.
+     */
+    virtual bool IsFormBundleExempt(int64_t formId)
     {
         return false;
     }
@@ -825,7 +836,8 @@ public:
         FORM_MGR_IS_FORM_BUNDLE_FORBIDDEN,
         FORM_MGR_UPDATE_FORM_SIZE,
         FORM_MGR_LOCK_FORMS,
-        FORM_MGR_IS_FORM_BUNDLE_LOCKED,
+        FORM_MGR_IS_FORM_BUNDLE_PEOTECTED,
+        FORM_MGR_IS_FORM_BUNDLE_EXEMPT,
         FORM_MGR_NOTIFY_FORM_LOCKED,
         FORM_MGR_START_ABILITY_BY_FMS,
         FORM_MGR_GET_PUBLISHED_FORM_INFOS,

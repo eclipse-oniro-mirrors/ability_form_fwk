@@ -4586,7 +4586,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0244, TestSize.Level1)
 
 /**
  * @tc.name: FormMgrTest_0245
- * @tc.desc: Verify IsFormBundleLocked
+ * @tc.desc: Verify IsFormBundleProtected
  * @tc.type: FUNC
  */
 HWTEST_F(FormMgrTest, FormMgrTest_0245, TestSize.Level1)
@@ -4594,7 +4594,7 @@ HWTEST_F(FormMgrTest, FormMgrTest_0245, TestSize.Level1)
     GTEST_LOG_(INFO) << "FormMgrTest_0245 begin";
     std::string bundleName = "ohos.samples.FormApplication";
     int64_t formId = 1;
-    bool result = FormMgr::GetInstance().IsFormBundleLocked(bundleName, formId);
+    bool result = FormMgr::GetInstance().IsFormBundleProtected(bundleName, formId);
     EXPECT_EQ(result, false);
     GTEST_LOG_(INFO) << "FormMgrTest_0245 test ends";
 }

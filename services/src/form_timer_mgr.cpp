@@ -29,6 +29,7 @@
 #include "in_process_call_wrapper.h"
 #include "os_account_manager_wrapper.h"
 #include "time_service_client.h"
+#include "time_common.h"
 #include "want.h"
 #include "form_event_report.h"
 #include "form_record_report.h"
@@ -259,7 +260,7 @@ bool FormTimerMgr::UpdateAtTimerValue(int64_t formId, const FormTimerCfg &timerC
             if (itItem->refreshTask.formId == formId) {
                 changedItem = *itItem;
                 updateAtTimerTasks_.erase(itItem);
-                break;
+                continue;
             }
         }
 
@@ -267,10 +268,7 @@ bool FormTimerMgr::UpdateAtTimerValue(int64_t formId, const FormTimerCfg &timerC
             HILOG_ERROR("the updateAtTimer not exist");
             return false;
         }
-        changedItem.refreshTask.hour = timerCfg.updateAtHour;
-        changedItem.refreshTask.min = timerCfg.updateAtMin;
-        changedItem.updateAtTime = changedItem.refreshTask.hour * Constants::MIN_PER_HOUR + changedItem.refreshTask.min;
-        AddUpdateAtItem(changedItem);
+
         std::vector<std::vector<int>> updateAtTimes = timerCfg.updateAtTimes;
         if (updateAtTimes.size() > 0) {
             bool ret = ERR_OK;
@@ -283,6 +281,14 @@ bool FormTimerMgr::UpdateAtTimerValue(int64_t formId, const FormTimerCfg &timerC
                 changedItem_.updateAtTime = updateAtTime;
                 AddUpdateAtItem(changedItem_);
             }
+        } else {
+            HILOG_INFO("updateAtHour : %{public}d ,updateAtMin : %{public}d ",
+                (int)timerCfg.updateAtHour, (int)timerCfg.updateAtMin);
+            changedItem.refreshTask.hour = timerCfg.updateAtHour;
+            changedItem.refreshTask.min = timerCfg.updateAtMin;
+            changedItem.updateAtTime = changedItem.refreshTask.hour * Constants::MIN_PER_HOUR
+                + changedItem.refreshTask.min;
+            AddUpdateAtItem(changedItem);
         }
     }
 
@@ -313,15 +319,15 @@ bool FormTimerMgr::IntervalToAtTimer(int64_t formId, const FormTimerCfg &timerCf
         timerTask = intervalTask->second;
         intervalTimerTasks_.erase(intervalTask);
 
-        timerTask.isUpdateAt = true;
-        timerTask.hour = timerCfg.updateAtHour;
-        timerTask.min = timerCfg.updateAtMin;
-        if (!AddUpdateAtTimer(timerTask)) {
-            HILOG_ERROR("fail AddUpdateAtTimer");
-            return false;
-        }
         std::vector<std::vector<int>> updateAtTimes = timerCfg.updateAtTimes;
         if (updateAtTimes.size() == 0) {
+            timerTask.isUpdateAt = true;
+            timerTask.hour = timerCfg.updateAtHour;
+            timerTask.min = timerCfg.updateAtMin;
+            if (!AddUpdateAtTimer(timerTask)) {
+                HILOG_ERROR("fail AddUpdateAtTimer");
+                return false;
+            }
             return true;
         }
         for (const auto &time: updateAtTimes) {
@@ -1086,9 +1092,13 @@ bool FormTimerMgr::UpdateLimiterAlarm()
 {
     HILOG_INFO("start");
     if (limiterTimerId_ != 0L) {
-        HILOG_INFO("clear limiter timer start");
-        MiscServices::TimeServiceClient::GetInstance()->StopTimer(limiterTimerId_);
-        HILOG_INFO("clear limiter timer end");
+        HILOG_INFO("stop limiter timer start");
+        int32_t retCode = MiscServices::TimeServiceClient::GetInstance()->StopTimerV9(limiterTimerId_);
+        if (retCode == MiscServices::E_TIME_DEAL_FAILED) {
+            HILOG_WARN("reset limiter timer");
+            limiterTimerId_ = 0L;
+        }
+        HILOG_INFO("stop limiter timer end");
     }
 
     // make limiter wakeup time
@@ -1151,6 +1161,7 @@ bool FormTimerMgr::CreateLimiterTimer()
     timerOption->SetWantAgent(wantAgent);
     if (limiterTimerId_ == 0L) {
         limiterTimerId_ = MiscServices::TimeServiceClient::GetInstance()->CreateTimer(timerOption);
+        HILOG_INFO("new timerId:%{public}" PRId64 ".", limiterTimerId_);
         currentLimiterWantAgent_ = wantAgent;
     }
     HILOG_INFO("end");

@@ -777,6 +777,20 @@ public:
      * @param lock Ture or false.
      */
     ErrCode GetFormLock(const int64_t formId, bool &lock);
+    
+    /**
+     * @brief Set form protect or disprotect.
+     * @param formId The Id of the form.
+     * @param protect Ture or false.
+     */
+    ErrCode SetFormProtect(const int64_t formId, const bool protect);
+
+    /**
+     * @brief Set form protect or disprotect.
+     * @param formId The Id of the form.
+     * @param protect Ture or false.
+     */
+    ErrCode GetFormProtect(const int64_t formId, bool &protect);
 
     /**
      * @brief Set form enable or disable.
@@ -800,11 +814,11 @@ public:
     ErrCode SetUpdateDuringDisableForm(const int64_t formId, const bool enable);
 
     /**
-     * @brief lock forms style.
+     * @brief protect forms style.
      * @param formRecords The Id list of the formRecord.
-     * @param enable True is lock form, false is unlock form.
+     * @param protect True is protect form, false is unprotect form.
      */
-    void LockForms(const std::vector<FormRecord> &&formRecords, const bool lock);
+    void LockForms(const std::vector<FormRecord> &&formRecords, const bool protect);
 
     /**
      * @brief Enable forms style.

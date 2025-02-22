@@ -63,6 +63,7 @@
 #include "net_conn_client.h"
 #include "net_handle.h"
 #include "form_bundle_lock_mgr.h"
+#include "form_exempt_lock_mgr.h"
 #ifdef MEM_MGR_ENABLE
 #include "mem_mgr_client.h"
 #endif
@@ -1872,7 +1873,7 @@ bool FormMgrService::IsFormBundleForbidden(const std::string &bundleName)
     return result;
 }
 
-int32_t FormMgrService::LockForms(const std::vector<FormLockInfo> &formLockInfos)
+int32_t FormMgrService::LockForms(const std::vector<FormLockInfo> &formLockInfos, LockChangeType type)
 {
     ErrCode ret = CheckFormPermission();
     if (ret != ERR_OK) {
@@ -1882,25 +1883,47 @@ int32_t FormMgrService::LockForms(const std::vector<FormLockInfo> &formLockInfos
 
     int32_t retErrCode = ERR_OK;
     for (const auto &info : formLockInfos) {
-        ret = FormMgrAdapter::GetInstance().LockForms(info.bundleName, info.userId, info.lock);
-        if (ret != ERR_OK) {
-            HILOG_ERROR("LockForms failed, bundleName: %{public}s, userId: %{public}d, "
-                "lock: %{public}d, ret: %{public}d", info.bundleName.c_str(), info.userId, info.lock, ret);
-            retErrCode = ret;
+        if (type == LockChangeType::SWITCH_CHANGE) {
+            ret = FormMgrAdapter::GetInstance().SwitchLockForms(info.bundleName, info.userId, info.lock);
+            if (ret != ERR_OK) {
+                HILOG_ERROR("SwitchLockForms failed, bundleName: %{public}s, userId: %{public}d, "
+                    "lock: %{public}d, ret: %{public}d", info.bundleName.c_str(), info.userId, info.lock, ret);
+                retErrCode = ret;
+            }
+        } else {
+            ret = FormMgrAdapter::GetInstance().ProtectLockForms(info.bundleName, info.userId, info.lock);
+            if (ret != ERR_OK) {
+                HILOG_ERROR("ProtectLockForms failed, bundleName: %{public}s, userId: %{public}d, "
+                    "protect: %{public}d, ret: %{public}d", info.bundleName.c_str(), info.userId, info.lock, ret);
+                retErrCode = ret;
+            }
         }
     }
     return retErrCode;
 }
 
-bool FormMgrService::IsFormBundleLocked(const std::string &bundleName, int64_t formId)
+bool FormMgrService::IsFormBundleProtected(const std::string &bundleName, int64_t formId)
 {
     HILOG_DEBUG("call");
     if (!CheckCallerIsSystemApp()) {
         return true;
     }
-    int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_IsFormBundleLocked",
+    int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_IsFormBundleProtected",
         API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
-    bool result = FormBundleLockMgr::GetInstance().IsBundleLock(bundleName, formId);
+    bool result = FormBundleLockMgr::GetInstance().IsBundleProtect(bundleName, formId);
+    HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
+    return result;
+}
+
+bool FormMgrService::IsFormBundleExempt(int64_t formId)
+{
+    HILOG_DEBUG("call");
+    if (!CheckCallerIsSystemApp()) {
+        return true;
+    }
+    int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("FMS_IsFormBundleExempt",
+        API_TIME_OUT, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
+    bool result = FormExemptLockMgr::GetInstance().IsExemptLock(formId);
     HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
     return result;
 }
