@@ -49,7 +49,7 @@ constexpr int32_t FORM_BUILD_DELAY_TIME = 1400; // ms
 constexpr int32_t ENTERPRISE_APP_INSTALL_FAILED_DELAY_TIME = 5000; // ms
 constexpr int32_t CLEAN_FORM_HOST_TASK_DELAY_TIME = 100; // ms
 constexpr int32_t FORM_CON_NETWORK_DELAY_TIME = 500; // ms
-constexpr int32_t PROVIDER_UPDATE_REFRESH_FORMS_TASK_DELAY_TIME = 100; // ms
+constexpr int32_t PROVIDER_UPDATE_REFRESH_FORMS_TASK_DELAY_TIME = 500; // ms
 }
 /**
  * @class FormTaskMgr

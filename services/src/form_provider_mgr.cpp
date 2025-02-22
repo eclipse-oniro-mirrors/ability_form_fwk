@@ -31,6 +31,7 @@
 #include "form_timer_mgr.h"
 #include "form_report.h"
 #include "form_record_report.h"
+#include "form_mgr_adapter.h"
 #ifdef SUPPORT_POWER
 #include "power_mgr_client.h"
 #endif
@@ -120,6 +121,22 @@ void FormProviderMgr::UpdateWant(const int64_t formId, const Want &want, FormRec
     record.wantCacheMap[formId] = want;
 }
 
+void FormProviderMgr::DataProxyUpdate(const int64_t formId, const FormRecord &record, bool isFormProviderUpdate)
+{
+    if (isFormProviderUpdate && record.isDataProxy) {
+        FormProviderData formProviderData;
+        std::string cacheData;
+        std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
+        if (FormCacheMgr::GetInstance().GetData(formId, cacheData, imageDataMap)) {
+            formProviderData.SetDataString(cacheData);
+            formProviderData.SetImageDataMap(imageDataMap);
+            FormMgrAdapter::GetInstance().UpdateForm(formId, record.uid, formProviderData);
+        }
+        HILOG_INFO("Upgrade APP data agent card update, cacheData: %{public}d, formId:%{public}" PRId64,
+            cacheData.size(), formId);
+    }
+}
+
 /**
  * @brief Refresh form.
  *
@@ -182,9 +199,9 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
     if (isCountTimerRefresh) {
         FormDataMgr::GetInstance().SetCountTimerRefresh(formId, true);
     }
-
-#ifdef SUPPORT_POWER
     bool isFormProviderUpdate = want.GetBoolParam(Constants::FORM_ENABLE_UPDATE_REFRESH_KEY, false);
+    DataProxyUpdate(formId, record, isFormProviderUpdate);
+#ifdef SUPPORT_POWER
     newWant.RemoveParam(Constants::FORM_ENABLE_UPDATE_REFRESH_KEY);
     bool screenOnFlag = PowerMgr::PowerMgrClient::GetInstance().IsScreenOn();
     bool collaborationScreenOnFlag = PowerMgr::PowerMgrClient::GetInstance().IsCollaborationScreenOn();
