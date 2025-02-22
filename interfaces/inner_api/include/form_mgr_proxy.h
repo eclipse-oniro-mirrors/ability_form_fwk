@@ -322,7 +322,7 @@ public:
     * @param formInfos Return the forms' information of the calling bundle name
     * @return Returns ERR_OK on success, others on failure.
     */
-    int32_t GetPublishedFormsInfo(std::vector<RunningFormInfo> &formInfos) override;
+    int32_t GetPublishedFormInfos(std::vector<RunningFormInfo> &formInfos) override;
 
     /**
      * @brief Check if the request of publishing a form is supported by the host.
@@ -679,7 +679,7 @@ private:
     int GetStringInfo(IFormMgr::Message code, MessageParcel &data, std::string &stringInfo);
     int32_t GetFormsInfo(IFormMgr::Message code, MessageParcel &data, std::vector<FormInfo> &formInfos);
     int32_t GetPublishedFormInfoById(IFormMgr::Message code, MessageParcel &data, RunningFormInfo &formInfo);
-    int32_t GetPublishedFormsInfo(IFormMgr::Message code, MessageParcel &data, std::vector<RunningFormInfo> &formInfos);
+    int32_t GetPublishedFormInfos(IFormMgr::Message code, MessageParcel &data, std::vector<RunningFormInfo> &formInfos);
     ErrCode GetRunningFormInfos(IFormMgr::Message code, MessageParcel &data,
         std::vector<RunningFormInfo> &runningFormInfos);
     int32_t GetFormInstance(IFormMgr::Message code, MessageParcel &data, std::vector<FormInstance> &formInstances);

@@ -170,7 +170,7 @@ public:
      * @param formInfos The form record list.
      * @return Returns true if this function is successfully called; returns false otherwise.
      */
-    ErrCode GetPublishedFormsInfo(const std::string &bundleName, std::vector<RunningFormInfo> &formInfos,
+    ErrCode GetPublishedFormInfos(const std::string &bundleName, std::vector<RunningFormInfo> &formInfos,
         int32_t userId = Constants::INVALID_USER_ID) const;
 
     /**

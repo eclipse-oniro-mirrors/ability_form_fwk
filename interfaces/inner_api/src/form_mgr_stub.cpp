@@ -290,8 +290,8 @@ int FormMgrStub::OnRemoteRequestFifth(uint32_t code, MessageParcel &data, Messag
     switch (code) {
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_PUBLISHED_FORM_INFO_BY_ID):
             return HandleGetPublishedFormInfoById(data, reply);
-        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_PUBLISHED_FORMS_INFO):
-            return HandleGetPublishedFormsInfo(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_PUBLISHED_FORM_INFOS):
+            return HandleGetPublishedFormInfos(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_IS_FORM_BUNDLE_EXEMPT):
             return HandleIsFormExempt(data, reply);
         default:
@@ -1068,13 +1068,13 @@ int32_t FormMgrStub::HandleGetPublishedFormInfoById(MessageParcel &data, Message
     return result;
 }
 
-int32_t FormMgrStub::HandleGetPublishedFormsInfo(MessageParcel &data, MessageParcel &reply)
+int32_t FormMgrStub::HandleGetPublishedFormInfos(MessageParcel &data, MessageParcel &reply)
 {
     HILOG_INFO("call");
     // write result of calling FMS into reply.
     std::vector<RunningFormInfo> infos;
     // call FormMgrService to get formInfos into infos.
-    int32_t result = GetPublishedFormsInfo(infos);
+    int32_t result = GetPublishedFormInfos(infos);
     reply.WriteBool(result);
     if (result == ERR_OK) {
         // write fetched formInfos into reply.

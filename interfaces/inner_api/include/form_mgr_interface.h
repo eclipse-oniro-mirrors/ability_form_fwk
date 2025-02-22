@@ -363,7 +363,7 @@ public:
     * @param formInfos Return the forms' information
     * @return Returns ERR_OK on success, others on failure.
     */
-    virtual int32_t GetPublishedFormsInfo(std::vector<RunningFormInfo> &formInfos)
+    virtual int32_t GetPublishedFormInfos(std::vector<RunningFormInfo> &formInfos)
     {
         return 0;
     }
@@ -840,7 +840,7 @@ public:
         FORM_MGR_IS_FORM_BUNDLE_EXEMPT,
         FORM_MGR_NOTIFY_FORM_LOCKED,
         FORM_MGR_START_ABILITY_BY_FMS,
-        FORM_MGR_GET_PUBLISHED_FORMS_INFO,
+        FORM_MGR_GET_PUBLISHED_FORM_INFOS,
         FORM_MGR_GET_PUBLISHED_FORM_INFO_BY_ID,
     };
 };

@@ -1199,7 +1199,7 @@ int32_t FormMgrService::GetPublishedFormInfoById(const int64_t formId, RunningFo
     return FormDataMgr::GetInstance().GetPublishedFormInfoById(callerBundleName, formInfo, formId);
 }
 
-int32_t FormMgrService::GetPublishedFormsInfo(std::vector<RunningFormInfo> &formInfos)
+int32_t FormMgrService::GetPublishedFormInfos(std::vector<RunningFormInfo> &formInfos)
 {
     HILOG_DEBUG("call");
     std::string callerBundleName;
@@ -1208,8 +1208,8 @@ int32_t FormMgrService::GetPublishedFormsInfo(std::vector<RunningFormInfo> &form
         HILOG_ERROR("get host bundle name failed");
         return ret;
     }
-    HILOG_INFO("flows to GetPublishedFormsInfo");
-    return FormDataMgr::GetInstance().GetPublishedFormsInfo(callerBundleName, formInfos);
+    HILOG_INFO("flows to GetPublishedFormInfos");
+    return FormDataMgr::GetInstance().GetPublishedFormInfos(callerBundleName, formInfos);
 }
 
 int32_t FormMgrService::AcquireFormData(int64_t formId, int64_t requestCode, const sptr<IRemoteObject> &callerToken,

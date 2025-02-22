@@ -595,7 +595,7 @@ ErrCode FormDataMgr::GetPublishedFormInfoById(const std::string &bundleName, Run
  * @param formInfos The form record.
  * @return Returns true if this function is successfully called; returns false otherwise.
  */
-ErrCode FormDataMgr::GetPublishedFormsInfo(const std::string &bundleName, std::vector<RunningFormInfo> &formInfos,
+ErrCode FormDataMgr::GetPublishedFormInfos(const std::string &bundleName, std::vector<RunningFormInfo> &formInfos,
     int32_t userId) const
 {
     HILOG_DEBUG("get form record by bundleName");
@@ -609,7 +609,7 @@ ErrCode FormDataMgr::GetPublishedFormsInfo(const std::string &bundleName, std::v
         }
     }
     if (formInfos.size() > 0) {
-        HILOG_DEBUG("GetPublishedFormsInfo success, size:%{public}zu", formInfos.size());
+        HILOG_DEBUG("GetPublishedFormInfos success, size:%{public}zu", formInfos.size());
         return ERR_OK;
     } else {
         HILOG_DEBUG("formInfo not find");
