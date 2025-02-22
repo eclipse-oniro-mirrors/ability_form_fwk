@@ -2422,11 +2422,12 @@ ErrCode FormMgrAdapter::StartAbilityByFms(const Want &want)
         std::vector<AppExecFwk::AppStateData> curForegroundApps;
         IN_PROCESS_CALL_WITHOUT_RET(appMgrProxy->GetForegroundApplications(curForegroundApps));
         bool isPromise = false;
-        for (auto appData : curForegroundApps) {
+        for (auto &appData : curForegroundApps) {
             HILOG_DEBUG("appData.bundleName: %{public}s", appData.bundleName.c_str());
             if (appData.bundleName == dstBundleName) {
                 isPromise = true;
                 HILOG_DEBUG("This application is a foreground program");
+                break;
             }
         }
         if (!isPromise) {
