@@ -132,8 +132,8 @@ void FormProviderMgr::DataProxyUpdate(const int64_t formId, const FormRecord &re
             formProviderData.SetImageDataMap(imageDataMap);
             FormMgrAdapter::GetInstance().UpdateForm(formId, record.uid, formProviderData);
         }
-        HILOG_INFO("Upgrade APP data agent card update, cacheData: %{public}s, formId:%{public}" PRId64,
-            cacheData.c_str(), formId);
+        HILOG_INFO("Upgrade APP data agent card update, cacheData: %{public}d, formId:%{public}" PRId64,
+            cacheData.size(), formId);
     }
 }
 
