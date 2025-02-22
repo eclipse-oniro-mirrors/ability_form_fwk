@@ -2411,7 +2411,7 @@ ErrCode FormMgrAdapter::StartAbilityByFms(const Want &want)
     std::string dstBundleName = elementName.GetBundleName();
 
     std::string pageRouterServiceCode = want.GetStringParam(Constants::PARAM_PAGE_ROUTER_SERVICE_CODE);
-    if(pageRouterServiceCode == Constants::PAGE_ROUTER_SERVICE_CODE_FORM_MANAGE) {
+    if (pageRouterServiceCode == Constants::PAGE_ROUTER_SERVICE_CODE_FORM_MANAGE) {
         HILOG_DEBUG("StartAbilityByFms getForegroundApplications begin");
         auto appMgrProxy = GetAppMgr();
         if (!appMgrProxy) {
