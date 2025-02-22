@@ -69,7 +69,6 @@ namespace Constants {
     constexpr const char* FORM_PUBLISH_ACTION = "action.form.publish";
     constexpr const char* FORM_PAGE_ACTION = "action.form.page";
     constexpr const char* OPEN_FORM_MANAGE_VIEW  = "openFormManageView";
-    constexpr const char* OPEN_FORM_MANAGE_VIEW_ACTION  = "action.form.openFormManageView";
     constexpr int32_t PAGE_ROUTER_SERVICE_CODE_FORM_MANAGE = 1;
     constexpr int32_t PAGE_ROUTER_SERVICE_CODE_CONTROL_CENTER = 2;
     constexpr int32_t PAGE_ROUTER_SERVICE_CODE_FORM_EDIT = 3;

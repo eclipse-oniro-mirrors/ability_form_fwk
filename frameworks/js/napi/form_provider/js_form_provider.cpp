@@ -304,12 +304,12 @@ napi_value JsFormProvider::OnGetPublishedFormInfos(napi_env env, size_t argc, na
         env, CreateAsyncTaskWithLastParam(env, nullptr, nullptr, std::move(complete), &result));
     return result;
 }
-napi_value JsFormProvider::OpenFormManageView(napi_env env, napi_callback_info info)
+napi_value JsFormProvider::OpenFormManage(napi_env env, napi_callback_info info)
 {
-    GET_CB_INFO_AND_CALL(env, info, JsFormProvider, OnOpenFormManageView);
+    GET_CB_INFO_AND_CALL(env, info, JsFormProvider, OnOpenFormManage);
 }
 
-napi_value JsFormProvider::OnOpenFormManageView(napi_env env, size_t argc, napi_value* argv)
+napi_value JsFormProvider::OnOpenFormManage(napi_env env, size_t argc, napi_value* argv)
 {
     HILOG_DEBUG("call");
     Want want;
@@ -328,7 +328,7 @@ napi_value JsFormProvider::OnOpenFormManageView(napi_env env, size_t argc, napi_
     const std::string key = AppExecFwk::Constants::PARMA_REQUEST_METHOD;
     const std::string value = AppExecFwk::Constants::OPEN_FORM_MANAGE_VIEW;
     want.SetParam(key, value);
-    HILOG_DEBUG("JsFormProvider OnOpenFormManageView want:%{public}s", want.ToString().c_str());
+    HILOG_DEBUG("JsFormProvider OnOpenFormManage want:%{public}s", want.ToString().c_str());
 
     NapiAsyncTask::CompleteCallback complete =
             [want](napi_env env, NapiAsyncTask &task, int32_t status) {
@@ -341,7 +341,7 @@ napi_value JsFormProvider::OnOpenFormManageView(napi_env env, size_t argc, napi_
             };
 
     napi_value result = nullptr;
-    NapiAsyncTask::ScheduleWithDefaultQos("JsFormProvider::OnOpenFormManageView",
+    NapiAsyncTask::ScheduleWithDefaultQos("JsFormProvider::OnOpenFormManage",
         env, CreateAsyncTaskWithLastParam(env, nullptr, nullptr, std::move(complete), &result));
     return result;
 }
