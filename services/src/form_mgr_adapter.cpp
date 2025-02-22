@@ -2236,8 +2236,12 @@ ErrCode FormMgrAdapter::QueryPublishFormToHost(Want &wantToHost)
     if (!wantToHost.GetAction().empty()) {
         action = wantToHost.GetAction();
         HILOG_INFO("GetAction:%{public}s", action.c_str());
+        if (!IsActionAllowToPublish(action)) {
+            HILOG_ERROR("action is not allowed for publishing form");
+            return ERR_APPEXECFWK_FORM_GET_HOST_FAILED;
+        }
     }
-    // Query the highest priority ability o r extension ability for publishing form
+    // Query the highest priority ability or extension ability for publishing form
     AppExecFwk::AbilityInfo abilityInfo;
     AppExecFwk::ExtensionAbilityInfo extensionAbilityInfo;
     if (!FormBmsHelper::GetInstance().GetAbilityInfoByAction(
@@ -2263,6 +2267,22 @@ ErrCode FormMgrAdapter::QueryPublishFormToHost(Want &wantToHost)
         wantToHost.SetElementName(extensionAbilityInfo.bundleName, extensionAbilityInfo.name);
     }
     return ERR_OK;
+}
+
+bool FormMgrAdapter::IsActionAllowToPublish(const std::string &action)
+{
+    const std::vector<std::string> actionAllowList = {
+        Constants::FORM_PUBLISH_ACTION,
+        Constants::FORM_PAGE_ACTION
+    };
+
+    for (const auto &item : actionAllowList) {
+        if (item.compare(action) == 0) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 bool FormMgrAdapter::CheckSnapshotWant(const Want &want)

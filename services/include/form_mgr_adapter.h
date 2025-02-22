@@ -1188,6 +1188,8 @@ private:
     void SetFormEnableAndLockState(FormInfo &formInfo, FormItemInfo &formConfigInfo, int formLocation);
 
     void SetLockFormStateOfFormItemInfo(FormInfo &formInfo, FormItemInfo &formConfigInfo);
+
+    bool IsActionAllowToPublish(const std::string &action);
     /**
      * @class ClientDeathRecipient
      * notices IRemoteBroker died.
