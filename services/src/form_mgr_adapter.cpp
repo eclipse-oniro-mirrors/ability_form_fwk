@@ -22,6 +22,8 @@
 #include <unordered_set>
 
 #include "ability_manager_errors.h"
+#include "app_mgr_interface.h"
+#include "app_state_data.h"
 #include "form_record.h"
 #include "form_info_filter.h"
 #include "accesstoken_kit.h"
@@ -907,6 +909,21 @@ void FormMgrAdapter::SetVisibleChange(const int64_t formId, const int32_t formVi
     if (isVisible && FormDataMgr::GetInstance().GetSystemLoad()) {
         FormRenderMgr::GetInstance().ExecPostRenderFormTask(formId);
     }
+}
+
+sptr<OHOS::AppExecFwk::IAppMgr> FormMgrAdapter::GetAppMgr()
+{
+    sptr<ISystemAbilityManager> systemMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (systemMgr == nullptr) {
+        HILOG_ERROR("connect systemAbilityManager failed");
+        return nullptr;
+    }
+    sptr<IRemoteObject> remoteObject = systemMgr->GetSystemAbility(APP_MGR_SERVICE_ID);
+    if (remoteObject == nullptr) {
+        HILOG_ERROR("connect appMgrService failed");
+        return nullptr;
+    }
+    return iface_cast<OHOS::AppExecFwk::IAppMgr>(remoteObject);
 }
 
 ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &formIds,
@@ -2392,6 +2409,29 @@ ErrCode FormMgrAdapter::StartAbilityByFms(const Want &want)
 
     ElementName elementName = want.GetElement();
     std::string dstBundleName = elementName.GetBundleName();
+
+    HILOG_DEBUG("StartAbilityByFms getForegroundApplications begin");
+    auto appMgrProxy = GetAppMgr();
+    if (!appMgrProxy) {
+        HILOG_ERROR("Get app mgr failed");
+        return ERR_APPEXECFWK_FORM_NOT_TRUST;
+    }
+
+    std::vector<AppExecFwk::AppStateData> curForegroundApps;
+    IN_PROCESS_CALL_WITHOUT_RET(appMgrProxy->GetForegroundApplications(curForegroundApps));
+    bool isPromise = false;
+    for (auto appData : curForegroundApps) {
+        HILOG_DEBUG("appData.bundleName: %{public}s", appData.bundleName.c_str());
+        if (appData.bundleName == dstBundleName) {
+            isPromise = true;
+            HILOG_DEBUG("This application is a foreground program");
+        }
+    }
+    if (!isPromise) {
+        HILOG_ERROR("This application is not a foreground program");
+        return ERR_APPEXECFWK_FORM_NOT_TRUST;
+    }
+
     std::string dstAbilityName = elementName.GetAbilityName();
     wantToHost.SetParam(Constants::PARAM_BUNDLE_NAME_KEY, dstBundleName);
     wantToHost.SetParam(Constants::PARAM_ABILITY_NAME_KEY, dstAbilityName);

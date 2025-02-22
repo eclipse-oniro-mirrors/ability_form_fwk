@@ -18,6 +18,7 @@
 
 #include <singleton.h>
 
+#include "app_mgr_interface.h"
 #include "bundle_info.h"
 #include "bundle_mgr_interface.h"
 #include "form_constants.h"
@@ -1259,6 +1260,8 @@ private:
     void CheckUpdateFormRecord(const int64_t formId, const FormItemInfo &info, FormRecord &record);
 
     void SetVisibleChange(const int64_t formId, const int32_t formVisibleType);
+
+    sptr<OHOS::AppExecFwk::IAppMgr> GetAppMgr();
 
     std::mutex reUpdateFormMapMutex_;
     std::unordered_map<int64_t, std::pair<int64_t, bool>> reUpdateFormMap_;
