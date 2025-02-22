@@ -69,12 +69,12 @@ public:
     static napi_value RequestPublishForm(napi_env env, napi_callback_info info);
     static napi_value GetPublishedFormInfoById(napi_env env, napi_callback_info info);
     static napi_value GetPublishedFormInfos(napi_env env, napi_callback_info info);
-    static napi_value OpenFormManage(napi_env env, napi_callback_info info);
+    static napi_value OpenFormManager(napi_env env, napi_callback_info info);
 private:
     napi_value OnGetFormsInfo(napi_env env, size_t argc, napi_value* argv);
     napi_value OnGetPublishedFormInfoById(napi_env env, size_t argc, napi_value* argv);
     napi_value OnGetPublishedFormInfos(napi_env env, size_t argc, napi_value* argv);
-    napi_value OnOpenFormManage(napi_env env, size_t argc, napi_value* argv);
+    napi_value OnOpenFormManager(napi_env env, size_t argc, napi_value* argv);
     napi_value OnSetFormNextRefreshTime(napi_env env, size_t argc, napi_value* argv);
     napi_value OnUpdateForm(napi_env env, size_t argc, napi_value* argv);
     napi_value OnIsRequestPublishFormSupported(napi_env env, size_t argc, napi_value* argv);
