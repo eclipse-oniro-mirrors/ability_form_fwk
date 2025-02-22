@@ -80,6 +80,7 @@ void FormReport::SetEndAquireTime(int64_t formId, int64_t endTime)
 
 void FormReport::GetEndAquireTime(int64_t formId, int64_t &endTime)
 {
+    std::lock_guard<std::mutex> guard(formReport_);
     auto it = formStatisticMap_.find(formId);
     if (it != formStatisticMap_.end()) {
         endTime = formStatisticMap_[formId].endAquireTime_;

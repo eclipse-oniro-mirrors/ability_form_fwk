@@ -463,6 +463,18 @@ public:
      * @param lockForm True for lock, false for unlock.
      */
     void SetLockForm(bool lockForm);
+
+    /**
+     * @brief Get whether is protect.
+     * @return True for protect, false for unprotect.
+     */
+    bool IsProtectForm() const;
+
+    /**
+     * @brief Set whether is protect.
+     * @param protectForm True for protect, false for unprotect.
+     */
+    void SetProtectForm(bool protectForm);
     /**
      * @brief Get updateDuration_.
      * @return updateDuration_.
@@ -525,6 +537,7 @@ private:
     bool enableForm_ = true;
     Constants::RenderingMode renderingMode_ = Constants::RenderingMode::FULL_COLOR;
     bool lockForm_ = false;
+    bool protectForm_ = false;
     std::vector<int32_t> conditionUpdate_;
 };
 } // namespace AppExecFwk

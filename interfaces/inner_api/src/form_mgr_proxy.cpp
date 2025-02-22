@@ -2474,7 +2474,7 @@ bool FormMgrProxy::IsFormBundleForbidden(const std::string &bundleName)
     return reply.ReadBool();
 }
 
-int32_t FormMgrProxy::LockForms(const std::vector<FormLockInfo> &formLockInfos)
+int32_t FormMgrProxy::LockForms(const std::vector<FormLockInfo> &formLockInfos, OHOS::AppExecFwk::LockChangeType type)
 {
     HILOG_DEBUG("LockForms start");
     MessageParcel data;
@@ -2496,6 +2496,8 @@ int32_t FormMgrProxy::LockForms(const std::vector<FormLockInfo> &formLockInfos)
         }
     }
 
+    data.WriteInt32(static_cast<int32_t>(type));
+
     MessageParcel reply;
     MessageOption option(MessageOption::TF_SYNC);
     int error = SendTransactCmd(IFormMgr::Message::FORM_MGR_LOCK_FORMS, data, reply, option);
@@ -2506,7 +2508,7 @@ int32_t FormMgrProxy::LockForms(const std::vector<FormLockInfo> &formLockInfos)
     return reply.ReadInt32();
 }
 
-bool FormMgrProxy::IsFormBundleLocked(const std::string &bundleName, int64_t formId)
+bool FormMgrProxy::IsFormBundleProtected(const std::string &bundleName, int64_t formId)
 {
     MessageParcel data;
     if (!WriteInterfaceToken(data)) {
@@ -2527,7 +2529,31 @@ bool FormMgrProxy::IsFormBundleLocked(const std::string &bundleName, int64_t for
     MessageParcel reply;
     MessageOption option;
     int error = SendTransactCmd(
-        IFormMgr::Message::FORM_MGR_IS_FORM_BUNDLE_LOCKED, data, reply, option);
+        IFormMgr::Message::FORM_MGR_IS_FORM_BUNDLE_PEOTECTED, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendRequest:%{public}d failed", error);
+        return false;
+    }
+    return reply.ReadBool();
+}
+
+bool FormMgrProxy::IsFormBundleExempt(int64_t formId)
+{
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed");
+        return true;
+    }
+
+    if (!data.WriteInt64(formId)) {
+        HILOG_ERROR("fail write formId ");
+        return true;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int error = SendTransactCmd(
+        IFormMgr::Message::FORM_MGR_IS_FORM_BUNDLE_EXEMPT, data, reply, option);
     if (error != ERR_OK) {
         HILOG_ERROR("SendRequest:%{public}d failed", error);
         return false;

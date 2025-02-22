@@ -88,7 +88,7 @@ void FormStatusQueue::CancelDelayTask(const std::pair<int64_t, int64_t> &eventMs
     HILOG_DEBUG("CancelDelayTask success");
 }
 
-void FormStatusQueue::GetOrCreateFormStatusQueue(
+std::shared_ptr<FormCommandQueue> FormStatusQueue::GetOrCreateFormStatusQueue(
     const int64_t formId, const sptr<IRemoteObject> &remoteObjectOfHost, FormStatus formStatus)
 {
     std::unique_lock<std::shared_mutex> lock(formCommandQueueMapMutex_);
@@ -103,6 +103,7 @@ void FormStatusQueue::GetOrCreateFormStatusQueue(
         formHostTokenMap_.emplace(std::make_pair(formId, remoteObjectOfHost));
         HILOG_INFO("formHostTokenMap_ insert, formId:%{public}" PRId64 ". ", formId);
     }
+    return formCommandQueueMap_[formId];
 }
 
 void FormStatusQueue::DeleteFormStatusQueue(const int64_t formId)
@@ -114,21 +115,26 @@ void FormStatusQueue::DeleteFormStatusQueue(const int64_t formId)
     HILOG_INFO("formCommandQueueMap_ erase, formId:%{public}" PRId64 ". ", formId);
 }
 
-void FormStatusQueue::PostFormStatusTask(FormCommand formCommand)
+void FormStatusQueue::PostFormStatusTask(FormCommand formCommand, sptr<IRemoteObject> remoteObjectOfHost)
 {
     auto formId = formCommand.getFormId();
+    auto taskCommandType = formCommand.getEventMsg().first;
     std::shared_ptr<FormCommandQueue> formCommandQueue;
-    {
-        std::shared_lock<std::shared_mutex> lock(formCommandQueueMapMutex_);
-        if (formCommandQueueMap_.find(formId) == formCommandQueueMap_.end()) {
-            HILOG_ERROR("formCommandQueueMap_ query failed, formId:%{public}" PRId64 ". ", formId);
-            return;
-        }
-        formCommandQueue = formCommandQueueMap_[formId];
+    if (taskCommandType == TaskCommandType::RENDER_FORM || taskCommandType == TaskCommandType::RECYCLE_FORM) {
+        formCommandQueue = GetOrCreateFormStatusQueue(formId, remoteObjectOfHost, FormStatus::RECOVERED);
+    } else if (taskCommandType == TaskCommandType::RECOVER_FORM) {
+        formCommandQueue = GetOrCreateFormStatusQueue(formId, remoteObjectOfHost, FormStatus::RECYCLED);
+    } else {
+        HILOG_ERROR("taskCommandType is unknown , formId:%{public}" PRId64 ". ", formId);
+        return;
+    }
+    if (formCommandQueue == nullptr) {
+        HILOG_ERROR("formCommandQueue is null , formId:%{public}" PRId64 ". ", formId);
+        return;
     }
 
     formCommandQueue->PushFormCommand(formCommand);
-    PostFormCommandTaskByFormId(formId);
+    PostFormCommandTask(formCommandQueue, formId);
 }
 
 void FormStatusQueue::PostFormDeleteTask(FormCommand formCommand)
@@ -139,6 +145,20 @@ void FormStatusQueue::PostFormDeleteTask(FormCommand formCommand)
     HILOG_INFO("PostFormDeleteTask , formId:%{public}" PRId64 ". ", formId);
     DeleteFormStatusQueue(formId);
     ScheduleTask(ms, func);
+}
+
+void FormStatusQueue::PostFormCommandTask(std::shared_ptr<FormCommandQueue> formCommandQueue, const int64_t formId)
+{
+    if (FormStatusMgr::GetInstance().isProcessableFormStatus(formId)) {
+        FormCommand formCommand{};
+        if (!formCommandQueue->PopFormCommand(formCommand)) {
+            HILOG_INFO("formCommandQueue is empty, formId:%{public}" PRId64 ". ", formId);
+            return;
+        }
+        ProcessTask(formCommand);
+    } else {
+        HILOG_INFO("FormStatus is unProcessable, formId:%{public}" PRId64 ". ", formId);
+    }
 }
 
 void FormStatusQueue::PostFormCommandTaskByFormId(const int64_t formId)
@@ -189,8 +209,9 @@ void FormStatusQueue::ProcessTask(FormCommand &formCommand)
 void FormStatusQueue::PostTimeOutReAddForm(const int64_t formId)
 {
     HILOG_DEBUG("start");
-    if (formHostTokenMap_.find(formId) == formHostTokenMap_.end()) {
+    if (formHostTokenMap_.find(formId) == formHostTokenMap_.end() || formHostTokenMap_[formId] == nullptr) {
         HILOG_ERROR("formHostToken is null, formId:%{public}" PRId64 ". ", formId);
+        return;
     }
     auto remoteObjectOfHost = formHostTokenMap_[formId];
     auto timeOutReAddForm = [formId, remoteObjectOfHost]() {

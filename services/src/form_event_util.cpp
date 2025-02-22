@@ -141,13 +141,7 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
     want.SetParam(Constants::PARAM_FORM_USER_ID, userId);
     want.SetParam(Constants::FORM_ENABLE_UPDATE_REFRESH_KEY, true);
     want.SetParam(Constants::FORM_DATA_UPDATE_TYPE, Constants::FULL_UPDATE);
-    for (const auto &updatedForm : updatedForms) {
-        ErrCode errCode = FormProviderMgr::GetInstance().RefreshForm(updatedForm.formId, want, true);
-        if (errCode == ERR_APPEXECFWK_FORM_GET_AMSCONNECT_FAILED) {
-            HILOG_INFO("RefreshForm failed one time, PostRefreshFormTask to retry");
-            FormTaskMgr::GetInstance().PostEnterpriseAppInstallFailedRetryTask(updatedForm.formId, want, true);
-        }
-    }
+    FormTaskMgr::GetInstance().PostDelayRefreshForms(updatedForms, want);
     FormRenderMgr::GetInstance().ReloadForm(std::move(updatedForms), bundleName, userId);
 }
 
@@ -255,12 +249,14 @@ bool FormEventUtil::ProviderFormUpdated(const int64_t formId, FormRecord &formRe
         HILOG_INFO("no updated form");
         return false;
     }
-    HILOG_INFO("form is still exist, form:%{public}s, formId:%{public}" PRId64,
-        formRecord.formName.c_str(), formId);
+    HILOG_INFO("form is still exist, form:%{public}s, formId:%{public}" PRId64 ", isDataProxy: %{public}d",
+        formRecord.formName.c_str(), formId, formRecord.isDataProxy);
 
     // update resource
+    if (!formRecord.isDataProxy) {
+        FormCacheMgr::GetInstance().DeleteData(formId);
+    }
     FormDataMgr::GetInstance().SetNeedRefresh(formId, true);
-    FormCacheMgr::GetInstance().DeleteData(formId);
     FormBmsHelper::GetInstance().NotifyModuleNotRemovable(formRecord.bundleName, formRecord.moduleName);
     FormTimerCfg timerCfg;
     GetTimerCfg(updatedForm.updateEnabled, updatedForm.updateDuration, updatedForm.scheduledUpdateTime, timerCfg);
@@ -445,6 +441,10 @@ void FormEventUtil::HandleAddMultiUpdateTimes(const int64_t formId,
             FormTimerMgr::GetInstance().AddFormTimer(formId,
                 time[0], time[1], record.providerUserId);
         }
+    } else {
+        HILOG_INFO("add at timer:%{public}d,%{public}d", timerCfg.updateAtHour, timerCfg.updateAtMin);
+        FormTimerMgr::GetInstance().AddFormTimer(formId, timerCfg.updateAtHour,
+            timerCfg.updateAtMin, record.providerUserId);
     }
 }
 
@@ -475,10 +475,6 @@ void FormEventUtil::HandleTimerUpdate(const int64_t formId,
             }
             FormTimerMgr::GetInstance().AddFormTimer(formId, updateDuration, record.providerUserId);
         } else {
-            HILOG_INFO("add at timer:%{public}d,%{public}d", timerCfg.updateAtHour, timerCfg.updateAtMin);
-            FormTimerMgr::GetInstance().AddFormTimer(formId, timerCfg.updateAtHour,
-                timerCfg.updateAtMin, record.providerUserId);
-
             HandleAddMultiUpdateTimes(formId, record, timerCfg);
         }
         return;
@@ -680,7 +676,7 @@ void FormEventUtil::UpdateFormRecord(const FormInfo &formInfo, FormRecord &formR
         formRecord.updateAtHour = std::stoi(time[0]);
         formRecord.updateAtMin = std::stoi(time[1]);
     }
-    std::string multiScheduledUpdateTime_ = formInfo.scheduledUpdateTime;
+    std::string multiScheduledUpdateTime_ = formInfo.multiScheduledUpdateTime;
     if (!multiScheduledUpdateTime_.empty()) {
         UpdateMultiUpdateTime(multiScheduledUpdateTime_, formRecord);
     }
@@ -698,7 +694,7 @@ void FormEventUtil::UpdateFormRecord(const AbilityFormInfo &formInfo, FormRecord
         formRecord.updateAtHour = std::stoi(time[0]);
         formRecord.updateAtMin = std::stoi(time[1]);
     }
-    std::string multiScheduledUpdateTime_ = formInfo.scheduledUpdateTime;
+    std::string multiScheduledUpdateTime_ = formInfo.multiScheduledUpdateTime;
     if (!multiScheduledUpdateTime_.empty()) {
         UpdateMultiUpdateTime(multiScheduledUpdateTime_, formRecord);
     }

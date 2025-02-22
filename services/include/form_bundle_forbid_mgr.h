@@ -36,14 +36,14 @@ public:
 
     /**
      * @brief Init form bundle forbid mgr.
-     * @return True fot sucessful init, false for failed init.
+     * @return True for sucessful init, false for failed init.
      */
     bool Init();
 
     /**
      * @brief Get whether bundle is forbidden.
      * @param bundleName Bundle name to be check.
-     * @return True fot forbidden, false for not forbidden.
+     * @return True for forbidden, false for not forbidden.
      */
     bool IsBundleForbidden(const std::string &bundleName);
 

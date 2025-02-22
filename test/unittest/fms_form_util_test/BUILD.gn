@@ -35,7 +35,9 @@ ohos_unittest("FmsFormUtilTest") {
   external_deps = [
     "ability_base:want",
     "ability_runtime:ability_deps_wrapper",
+    "c_utils:utils",
     "form_fwk:form_manager",
+    "ipc:ipc_core",
   ]
 }
 

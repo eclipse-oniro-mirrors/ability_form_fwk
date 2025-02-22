@@ -660,5 +660,15 @@ void FormItemInfo::SetLockForm(bool lockForm)
 {
     lockForm_ = lockForm;
 }
+
+bool FormItemInfo::IsProtectForm() const
+{
+    return protectForm_;
+}
+
+void FormItemInfo::SetProtectForm(bool protectForm)
+{
+    protectForm_ = protectForm;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

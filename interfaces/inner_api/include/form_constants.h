@@ -72,7 +72,7 @@ namespace Constants {
     constexpr int32_t PAGE_ROUTER_SERVICE_CODE_FORM_MANAGE = 1;
     constexpr int32_t PAGE_ROUTER_SERVICE_CODE_CONTROL_CENTER = 2;
     constexpr int32_t PAGE_ROUTER_SERVICE_CODE_FORM_EDIT = 3;
-    constexpr const char* PARMA_REQUEST_METHOD = "requestMehod";
+    constexpr const char* PARMA_REQUEST_METHOD = "requestMethod";
     constexpr const char* PARMA_OPEN_FORM_EDIT_SEC_PAGE_VIEW = "openFormEditSecPageView";
     constexpr const char* PARAM_PAGE_ROUTER_SERVICE_CODE = "pageRouterServiceCode";
     constexpr const char* PARAM_SEC_PAGE_ABILITY_NAME = "secPageAbilityName";
@@ -88,6 +88,7 @@ namespace Constants {
     constexpr const char* PARAM_FORM_BORDER_WIDTH_KEY = "ohos.extra.param.key.form_border_width";
     constexpr const char* FORM_LOCATION_KEY = "ohos.extra.param.key.form_location";
     constexpr const char* FORM_DISABLE_GESTURE_KEY = "ohos.extra.param.key.form_disable_gesture";
+    constexpr const char* FORM_DISABLE_BLUR_BACKGROUND = "ohos.extra.param.key.form_disable_blur_background";
     constexpr int32_t TYPE_RESET_LIMIT = 1;
     constexpr int32_t TYPE_STATIC_UPDATE = 2;
     constexpr int32_t TYPE_DYNAMIC_UPDATE = 3;
@@ -353,6 +354,10 @@ namespace Constants {
     const std::string IS_MULTI_APP_FORM_TRUE = "true";
     // Form data update type
     constexpr const char* FORM_DATA_UPDATE_TYPE = "formDataUpdateType";
+    // Form info max num
+    constexpr const int32_t FORM_INFO_MAX_NUM = 16;
+    // Form version code
+    constexpr const int32_t FORM_VERSION_CODE = 100000;
 }  // namespace Constants
 }  // namespace AppExecFwk
 }  // namespace OHOS

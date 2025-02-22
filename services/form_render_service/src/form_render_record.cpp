@@ -535,8 +535,9 @@ bool FormRenderRecord::UpdateRuntime(const FormJsInfo &formJsInfo)
         if (pkgNameInfo != options.packageNameList.end()) {
             packageName = pkgNameInfo->second;
         }
-        runtime_->UpdatePkgContextInfoJson(moduleName, contextInfo->second, packageName);
         if (runtime_->GetLanguage() == AbilityRuntime::Runtime::Language::JS) {
+            (static_cast<AbilityRuntime::JsRuntime&>(*runtime_)).SetPkgContextInfoJson(moduleName, contextInfo->second,
+                packageName);
             HILOG_INFO("%{public}s load components of new module %{public}s",
                 formJsInfo.bundleName.c_str(), moduleName.c_str());
             (static_cast<AbilityRuntime::JsRuntime&>(*runtime_)).ReloadFormComponent();
@@ -578,13 +579,16 @@ bool FormRenderRecord::SetPkgContextInfoMap(const FormJsInfo &formJsInfo, Abilit
 
 void FormRenderRecord::SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration>& config)
 {
-    configuration_ = config;
-    std::lock_guard<std::mutex> lock(contextsMapMutex_);
-    for (const auto& pair: contextsMapForModuleName_) {
-        if (pair.second) {
-            auto context = std::static_pointer_cast<AbilityRuntime::ContextImpl>(pair.second);
-            context->SetConfiguration(config);
+    if (configuration_) {
+        auto checkConfigItem = {SYSTEM_COLORMODE, SYSTEM_LANGUAGE, SYSTEM_FONT_SIZE_SCALE, SYSTEM_FONT_WEIGHT_SCALE};
+        for (const auto& item: checkConfigItem) {
+            std::string value = config->GetItem(item);
+            if (!value.empty()) {
+                configuration_->AddItem(item, value);
+            }
         }
+    } else {
+        configuration_ = config;
     }
 }
 
@@ -819,8 +823,10 @@ void FormRenderRecord::UpdateRenderer(const FormJsInfo &formJsInfo)
         search != formRendererGroupMap_.end()) {
         auto group = search->second;
         group->UpdateForm(formJsInfo);
+        HILOG_INFO("UpdateForm formId:%{public}s", std::to_string(formJsInfo.formId).c_str());
+    } else {
+        HILOG_ERROR("UpdateForm failed:%{public}s", std::to_string(formJsInfo.formId).c_str());
     }
-    HILOG_INFO("UpdateForm formId:%{public}s", std::to_string(formJsInfo.formId).c_str());
 }
 
 bool FormRenderRecord::HandleDeleteInJsThread(int64_t formId, const std::string &compId)
@@ -1298,7 +1304,10 @@ bool FormRenderRecord::ReAddIfHapPathChanged(const std::vector<FormJsInfo> &form
         HILOG_INFO("eventHandleNeedReset, Create new eventHandler");
         eventHandleNeedReset = false;
     }
-    CreateEventHandler(bundleName_, true);
+    {
+        std::lock_guard<std::recursive_mutex> lock(eventHandlerMutex_);
+        CreateEventHandler(bundleName_, true);
+    }
     ReAddRecycledForms(formJsInfos);
     return true;
 }
