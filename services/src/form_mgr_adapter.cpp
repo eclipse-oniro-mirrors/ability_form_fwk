@@ -1080,7 +1080,7 @@ void FormMgrAdapter::HandlerNotifyWhetherVisibleForms(const std::vector<int64_t>
     } else if (formVisibleType == static_cast<int32_t>(FormVisibilityType::INVISIBLE)) {
         FormDataProxyMgr::GetInstance().DisableSubscribeFormData(formIds);
     }
-    
+
     int32_t userId = FormUtil::GetCurrentAccountId();
     std::vector<int64_t> needConFormIds;
     if (formVisibleType == static_cast<int32_t>(FormVisibilityType::VISIBLE)) {
@@ -1509,7 +1509,7 @@ ErrCode FormMgrAdapter::GetFormConfigInfo(const Want &want, FormItemInfo &formCo
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     formConfigInfo.SetFormLocation((Constants::FormLocation)formLocation);
-    
+
     int renderingMode = want.GetParams().GetIntParam(Constants::PARAM_FORM_RENDERINGMODE_KEY,
         static_cast<int>(Constants::RenderingMode::FULL_COLOR));
     formConfigInfo.SetRenderingMode((Constants::RenderingMode)renderingMode);
@@ -2410,7 +2410,7 @@ ErrCode FormMgrAdapter::StartAbilityByFms(const Want &want)
     ElementName elementName = want.GetElement();
     std::string dstBundleName = elementName.GetBundleName();
 
-    std::string pageRouterServiceCode = want.GetStringParam(Constants::PARAM_PAGE_ROUTER_SERVICE_CODE);
+    const std::string pageRouterServiceCode = want.GetStringParam(Constants::PARAM_PAGE_ROUTER_SERVICE_CODE);
     if (pageRouterServiceCode == Constants::PAGE_ROUTER_SERVICE_CODE_FORM_MANAGE) {
         HILOG_DEBUG("StartAbilityByFms getForegroundApplications begin");
         auto appMgrProxy = GetAppMgr();
@@ -4186,7 +4186,7 @@ ErrCode FormMgrAdapter::ProtectLockForms(const std::string &bundleName, int32_t 
     if (!protect && !FormBundleForbidMgr::GetInstance().IsBundleForbidden(bundleName)) {
         FormRenderMgr::GetInstance().ExecAcquireProviderForbiddenTask(bundleName);
     }
- 
+
     HILOG_INFO("userId:%{public}d, infosSize:%{public}zu, protect:%{public}d", userId, formInfos.size(), protect);
     for (auto iter = formInfos.begin(); iter != formInfos.end();) {
         HILOG_DEBUG("bundleName:%{public}s, lockForm:%{public}d, transparencyEnabled:%{public}d",
@@ -4234,7 +4234,7 @@ int32_t FormMgrAdapter::NotifyFormLocked(const int64_t &formId, bool isLocked)
     }
 
     formRecord.protectForm = isLocked;
- 
+
     HILOG_INFO("formId:%{public}" PRId64 ", isLocked:%{public}d", formId, isLocked);
     FormExemptLockMgr::GetInstance().SetExemptLockStatus(formId, !isLocked);
     FormDataMgr::GetInstance().SetFormProtect(formId, isLocked);
@@ -4306,7 +4306,7 @@ ErrCode FormMgrAdapter::UpdateFormByCondition(int32_t type)
 
     std::string reportStr = "";
     std::set<std::string> reportList;
- 
+
     for (FormRecord& formRecord : formInfos) {
         if (!formRecord.isSystemApp) {
             continue;
