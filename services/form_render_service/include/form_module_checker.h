@@ -16,7 +16,6 @@
 #ifndef OHOS_FORM_FWK_FORM_MODULE_CHECKER_H
 #define OHOS_FORM_FWK_FORM_MODULE_CHECKER_H
 
-#include <map>
 #include "module_checker_delegate.h"
 
 /**
