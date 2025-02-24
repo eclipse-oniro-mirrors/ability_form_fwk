@@ -239,7 +239,6 @@ void FormSysEventReceiver::HandleUserSwitched(const EventFwk::CommonEventData &e
         if (userId != MAIN_USER_ID) {
             FormInfoMgr::GetInstance().ReloadFormInfos(userId);
         }
-        HandleUserIdForms(userId, lastUserId);
     });
 
     FormTimerMgr::GetInstance().UpdateLimiterAlarm();
@@ -257,12 +256,6 @@ void FormSysEventReceiver::HandleScreenOn()
     serialQueue_->ScheduleTask(0, []() {
         FormRenderMgr::GetInstance().NotifyScreenOn();
     });
-}
-
-void FormSysEventReceiver::HandleUserIdForms(int32_t currentUserId, int32_t lastUserId)
-{
-    HILOG_INFO("currentUserId: %{public}d. lastUserId:%{public}d.", currentUserId, lastUserId);
-    FormMgrAdapter::GetInstance().UpdateFormByUserChange();
 }
 
 void FormSysEventReceiver::RecycleForms(int32_t userId)

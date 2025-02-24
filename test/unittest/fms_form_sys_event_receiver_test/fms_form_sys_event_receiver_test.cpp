@@ -867,22 +867,6 @@ HWTEST_F(FmsFormSysEventReceiverTest, HandleScreenOn_0001, TestSize.Level0)
 }
 
 /**
- * @tc.number: HandleUserIdForms_0001
- * @tc.name: HandleUserIdForms
- * @tc.desc: Verify whether the HandleUserIdForms interface is called normally
- */
-HWTEST_F(FmsFormSysEventReceiverTest, HandleUserIdForms_0001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "HandleUserIdForms_0001 start";
-    std::shared_ptr<FormSysEventReceiver> receiver = std::make_shared<FormSysEventReceiver>();
-    ASSERT_NE(nullptr, receiver);
-    int32_t currentUserId = 100;
-    int32_t lastUserId = 101;
-    receiver->HandleUserIdForms(currentUserId, lastUserId);
-    GTEST_LOG_(INFO) << "HandleUserIdForms_0001 end";
-}
-
-/**
  * @tc.number: RecycleForms_0001
  * @tc.name: RecycleForms
  * @tc.desc: Verify whether the RecycleForms interface is called normally
