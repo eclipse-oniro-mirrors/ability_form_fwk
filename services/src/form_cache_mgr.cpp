@@ -222,7 +222,7 @@ bool FormCacheMgr::AddImgData(
         for (auto && [key, value] : imgCacheObj.items()) {
             rowIds.push_back(value.dump());
         }
-        DeleteImgCacheInDbs(rowIds);
+        DeleteImgCachesInDb(rowIds);
     }
 
     formCache.imgCache = newImgDbData.dump();
@@ -358,7 +358,7 @@ bool FormCacheMgr::DeleteData(const int64_t formId)
         for (auto && [key, value] : imgCacheObj.items()) {
             rowIds.push_back(value.dump());
         }
-        if (!DeleteImgCacheInDbs(rowIds)) {
+        if (!DeleteImgCachesInDb(rowIds)) {
             HILOG_ERROR("delete img cache failed");
         }
     }
@@ -514,7 +514,7 @@ bool FormCacheMgr::DeleteImgCacheInDb(const std::string &rowId)
     return FormRdbDataMgr::GetInstance().DeleteData(absRdbPredicates);
 }
 
-bool FormCacheMgr::DeleteImgCacheInDbs(const std::vector<std::string> &rowIds)
+bool FormCacheMgr::DeleteImgCachesInDb(const std::vector<std::string> &rowIds)
 {
     if (rowIds.empty()) {
         return false;
