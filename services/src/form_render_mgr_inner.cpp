@@ -36,7 +36,6 @@
 #include "want.h"
 #include "form_info_rdb_storage_mgr.h"
 #include "form_status_mgr.h"
-#include "form_exempt_lock_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {
@@ -194,8 +193,7 @@ ErrCode FormRenderMgrInner::UpdateRenderingForm(FormRecord &formRecord, const Fo
     FormDataMgr::GetInstance().SetFormCacheInited(formRecord.formId, true);
     
     HILOG_INFO("enableForm:%{public}d, protectForm:%{public}d", formRecord.enableForm, formRecord.protectForm);
-    if (!formRecord.enableForm || (formRecord.protectForm &&
-        !FormExemptLockMgr::GetInstance().IsExemptLock(formRecord.formId))) {
+    if (!formRecord.enableForm) {
         FormDataMgr::GetInstance().UpdateFormRecord(formRecord.formId, formRecord);
         FormDataMgr::GetInstance().SetUpdateDuringDisableForm(formRecord.formId, true);
         return ERR_APPEXECFWK_FORM_DISABLE_REFRESH;

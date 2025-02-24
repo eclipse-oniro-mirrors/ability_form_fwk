@@ -1810,7 +1810,7 @@ ErrCode FormMgrAdapter::AcquireProviderFormInfoAsync(const int64_t formId,
     const FormItemInfo &info, const WantParams &wantParams)
 {
     std::string providerBundleName = info.GetProviderBundleName();
-    if (!info.IsEnableForm() || (info.IsProtectForm() && !FormExemptLockMgr::GetInstance().IsExemptLock(formId))) {
+    if (!info.IsEnableForm()) {
         HILOG_INFO("Bundle:%{public}s forbidden", providerBundleName.c_str());
         FormDataMgr::GetInstance().SetRefreshDuringDisableForm(formId, true);
 
@@ -4049,7 +4049,7 @@ int32_t FormMgrAdapter::EnableForms(const std::string bundleName, const bool ena
     for (auto iter = formInfos.begin(); iter != formInfos.end();) {
         HILOG_DEBUG("bundleName:%{public}s, enableForm:%{public}d, transparencyEnabled:%{public}d",
             iter->bundleName.c_str(), iter->enableForm, iter->transparencyEnabled);
-        if (enable && !FormBundleLockMgr::GetInstance().IsBundleLock(bundleName, iter->formId)) {
+        if (enable) {
             FormRenderMgr::GetInstance().ExecAcquireProviderForbiddenTaskByFormId(iter->formId);
         }
         if (iter->enableForm == enable || (iter->transparencyEnabled && iter->enableForm == true)) {
@@ -4156,9 +4156,6 @@ ErrCode FormMgrAdapter::ProtectLockForms(const std::string &bundleName, int32_t 
         iter->protectForm = protect;
         FormDataMgr::GetInstance().SetFormProtect(iter->formId, protect);
         FormDbCache::GetInstance().UpdateDBRecord(iter->formId, *iter);
-        if (!protect) {
-            RefreshOrUpdateDuringDisableForm(iter, userId);
-        }
         ++iter;
     }
     if (!formInfos.empty()) {
@@ -4186,10 +4183,6 @@ int32_t FormMgrAdapter::NotifyFormLocked(const int64_t &formId, bool isLocked)
         return ERR_OK;
     }
 
-    if (!isLocked && !FormBundleForbidMgr::GetInstance().IsBundleForbidden(formRecord.bundleName)) {
-        FormRenderMgr::GetInstance().ExecAcquireProviderForbiddenTaskByFormId(formId);
-    }
-
     formRecord.protectForm = isLocked;
  
     HILOG_INFO("formId:%{public}" PRId64 ", isLocked:%{public}d", formId, isLocked);
@@ -4201,7 +4194,6 @@ int32_t FormMgrAdapter::NotifyFormLocked(const int64_t &formId, bool isLocked)
     if (!isLocked) {
         int32_t userId = FormUtil::GetCurrentAccountId();
         auto iter = formRecords.begin();
-        RefreshOrUpdateDuringDisableForm(iter, userId);
     }
 
     return ERR_OK;
