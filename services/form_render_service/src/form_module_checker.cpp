@@ -28,15 +28,56 @@
 
 const std::string FORM_MODULE_WHITE_LIST_PATH = "/etc/form_fwk_module_white_list.json";
 const std::string KEY_MODULE_ALLOW = "moduleAllowList";
-const std::string KEY_MODULE_ALLOW_WITH_API = "moduleAllowWithApiList";
-const std::string KEY_API_ALLOW = "apiAllowList";
+const std::vector<std::string> MODULE_ALLOW_LIST = {
+    "mediaquery",
+    "display",
+    "effectKit",
+    "arkui.shape",
+    "hilog",
+    "util",
+    "url",
+    "util.ArrayList",
+    "util.HashMap",
+    "util.List",
+    "util.json"
+};
+const std::vector<std::string> MODULE_ALLOW_WITH_API_LIST = {
+    "i18n",
+    "intl",
+    "font",
+    "multimedia.image",
+    "deviceInfo"
+};
+const std::vector<std::string> API_ALLOW_LIST = {
+    "i18n.System.getSystemLanguage",
+    "i18n.System.is24HourClock",
+    "i18n.System.getSystemLocale",
+    "i18n.isRTL",
+    "intl.Locale.*",
+    "intl.DateTimeFormat.*",
+    "intl.NumberFormat.*",
+    "font.registerFont",
+    "multimedia.image.PixelMapFormat.*",
+    "multimedia.image.Size.*",
+    "multimedia.image.AlphaType.*",
+    "multimedia.image.ScaleMode.*",
+    "multimedia.image.Region.*",
+    "multimedia.image.PositionArea.*",
+    "multimedia.image.ImageInfo.*",
+    "multimedia.image.DecodingOptions.*",
+    "multimedia.image.InitializationOptions.*",
+    "multimedia.image.SourceOptions.*",
+    "multimedia.image.createImageSource",
+    "multimedia.image.PixelMap.*",
+    "multimedia.image.ImageSource.*",
+    "deviceInfo.deviceType"
+};
 
-std::map<std::string, std::vector<std::string>> FormModuleChecker::modulesFromCfg_ =
-    FormModuleChecker::GetModuleAllowList();
+std::vector<std::string> FormModuleChecker::modulesFromCfg_ = FormModuleChecker::GetModuleAllowList();
 
 bool FormModuleChecker::CheckApiAllowList(const std::string& apiPath)
 {
-    for (const auto& item : modulesFromCfg_[KEY_API_ALLOW]) {
+    for (const auto& item : API_ALLOW_LIST) {
         if (CheckApiWithSuffix(apiPath, item)) {
             return true;
         }
@@ -71,14 +112,20 @@ bool FormModuleChecker::CheckModuleLoadable(const char *moduleName,
     }
 
     // only check module
-    for (const auto& item : modulesFromCfg_[KEY_MODULE_ALLOW]) {
+    for (const auto& item : modulesFromCfg_) {
+        if (item == moduleName) {
+            HILOG_INFO("load moduleName= %{public}s", moduleName);
+            return true;
+        }
+    }
+    for (const auto& item : MODULE_ALLOW_LIST) {
         if (item == moduleName) {
             HILOG_INFO("load moduleName= %{public}s", moduleName);
             return true;
         }
     }
 
-    // check module and api
+    // check mnodule and api
     if (IsModuelAllowToLoad(moduleName)) {
         HILOG_INFO("module has been allowed by the allowlist in form, module name = %{public}s", moduleName);
         if (apiAllowListChecker == nullptr) {
@@ -94,7 +141,7 @@ bool FormModuleChecker::CheckModuleLoadable(const char *moduleName,
 
 bool FormModuleChecker::IsModuelAllowToLoad(const std::string& moduleName)
 {
-    for (const auto& item : modulesFromCfg_[KEY_MODULE_ALLOW_WITH_API]) {
+    for (const auto& item : MODULE_ALLOW_WITH_API_LIST) {
         if (item == moduleName) {
             return true;
         }
@@ -103,10 +150,10 @@ bool FormModuleChecker::IsModuelAllowToLoad(const std::string& moduleName)
     return false;
 }
 
-std::map<std::string, std::vector<std::string>> FormModuleChecker::GetModuleAllowList()
+std::vector<std::string> FormModuleChecker::GetModuleAllowList()
 {
     HILOG_INFO("read moduleAllowList from config file");
-    std::map<std::string, std::vector<std::string>> result;
+    std::vector<std::string> result;
     char buf[MAX_PATH_LEN];
     char* path = GetOneCfgFile(FORM_MODULE_WHITE_LIST_PATH.c_str(), buf, MAX_PATH_LEN);
     if (path == nullptr || *path == '\0') {
@@ -124,23 +171,10 @@ std::map<std::string, std::vector<std::string>> FormModuleChecker::GetModuleAllo
     if (jsonData.contains(KEY_MODULE_ALLOW) && jsonData[KEY_MODULE_ALLOW].is_array()) {
         for (const auto& module : jsonData[KEY_MODULE_ALLOW]) {
             HILOG_INFO("read moduleAllowList module: %{public}s", std::string(module).c_str());
-            result[KEY_MODULE_ALLOW].push_back(module);
-        }
-    }
-    if (jsonData.contains(KEY_MODULE_ALLOW_WITH_API) && jsonData[KEY_MODULE_ALLOW_WITH_API].is_array()) {
-        for (const auto& module : jsonData[KEY_MODULE_ALLOW_WITH_API]) {
-            HILOG_INFO("read moduleAllowWithApiList module: %{public}s", std::string(module).c_str());
-            result[KEY_MODULE_ALLOW_WITH_API].push_back(module);
-        }
-    }
-    if (jsonData.contains(KEY_API_ALLOW) && jsonData[KEY_API_ALLOW].is_array()) {
-        for (const auto& api : jsonData[KEY_API_ALLOW]) {
-            HILOG_INFO("read apiAllowList api: %{public}s", std::string(api).c_str());
-            result[KEY_API_ALLOW].push_back(api);
+            result.push_back(module);
         }
     }
     file.close();
-
     return result;
 }
 
