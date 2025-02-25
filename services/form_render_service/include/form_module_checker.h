@@ -34,6 +34,8 @@ public:
      */
     bool CheckModuleLoadable(const char* moduleName,
         std::unique_ptr<ApiAllowListChecker>& apiAllowListChecker, bool isAppModule) override;
+
+    bool DiskCheckOnly() override;
 private:
     static bool CheckApiAllowList(const std::string& apiPath);
     static bool IsModuelAllowToLoad(const std::string& moduleName);

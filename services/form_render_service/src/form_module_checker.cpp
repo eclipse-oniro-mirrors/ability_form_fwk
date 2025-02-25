@@ -26,37 +26,61 @@
 #include "nlohmann/json.hpp"
 #include "config_policy_utils.h"
 
+namespace {
 const std::string FORM_MODULE_WHITE_LIST_PATH = "/etc/form_fwk_module_white_list.json";
 const std::string KEY_MODULE_ALLOW = "moduleAllowList";
+const std::vector<std::string> MODULE_ALLOW_LIST = {
+    "mediaquery",
+    "display",
+    "effectKit",
+    "arkui.shape",
+    "hilog",
+    "util",
+    "url",
+    "util.ArrayList",
+    "util.HashMap",
+    "util.List",
+    "util.json",
+    "animator"
+};
+const std::vector<std::string> MODULE_ALLOW_WITH_API_LIST = {
+    "i18n",
+    "intl",
+    "font",
+    "multimedia.image",
+    "deviceInfo"
+};
+const std::vector<std::string> API_ALLOW_LIST = {
+    "i18n.System.getSystemLanguage",
+    "i18n.System.is24HourClock",
+    "i18n.System.getSystemLocale",
+    "i18n.isRTL",
+    "intl.Locale.*",
+    "intl.DateTimeFormat.*",
+    "intl.NumberFormat.*",
+    "font.registerFont",
+    "multimedia.image.PixelMapFormat.*",
+    "multimedia.image.Size.*",
+    "multimedia.image.AlphaType.*",
+    "multimedia.image.ScaleMode.*",
+    "multimedia.image.Region.*",
+    "multimedia.image.PositionArea.*",
+    "multimedia.image.ImageInfo.*",
+    "multimedia.image.DecodingOptions.*",
+    "multimedia.image.InitializationOptions.*",
+    "multimedia.image.SourceOptions.*",
+    "multimedia.image.createImageSource",
+    "multimedia.image.PixelMap.*",
+    "multimedia.image.ImageSource.*",
+    "deviceInfo.deviceType"
+};
+} // namespace
 
 std::vector<std::string> FormModuleChecker::modulesFromCfg_ = FormModuleChecker::GetModuleAllowList();
 
 bool FormModuleChecker::CheckApiAllowList(const std::string& apiPath)
 {
-    const std::vector<std::string> allowList = {
-        "i18n.System.getSystemLanguage",
-        "i18n.System.is24HourClock",
-        "intl.Locale.*",
-        "intl.DateTimeFormat.*",
-        "effectKit.*",
-        "font.registerFont",
-        "multimedia.image.PixelMapFormat.*",
-        "multimedia.image.Size.*",
-        "multimedia.image.AlphaType.*",
-        "multimedia.image.ScaleMode.*",
-        "multimedia.image.Region.*",
-        "multimedia.image.PositionArea.*",
-        "multimedia.image.ImageInfo.*",
-        "multimedia.image.DecodingOptions.*",
-        "multimedia.image.InitializationOptions.*",
-        "multimedia.image.SourceOptions.*",
-        "multimedia.image.createImageSource",
-        "multimedia.image.PixelMap.*",
-        "multimedia.image.ImageSource.*",
-        "arkui.shape.*"
-    };
-
-    for (const auto& item : allowList) {
+    for (const auto& item : API_ALLOW_LIST) {
         if (CheckApiWithSuffix(apiPath, item)) {
             return true;
         }
@@ -89,10 +113,22 @@ bool FormModuleChecker::CheckModuleLoadable(const char *moduleName,
         HILOG_INFO("module is not system, moduleName= %{public}s", moduleName);
         return false;
     }
-    if (std::string(moduleName) == "mediaquery") {
-        HILOG_INFO("load mediaquery");
-        return true;
+
+    // only check module
+    for (const auto& item : modulesFromCfg_) {
+        if (item == moduleName) {
+            HILOG_INFO("load moduleName= %{public}s", moduleName);
+            return true;
+        }
     }
+    for (const auto& item : MODULE_ALLOW_LIST) {
+        if (item == moduleName) {
+            HILOG_INFO("load moduleName= %{public}s", moduleName);
+            return true;
+        }
+    }
+
+    // check mnodule and api
     if (IsModuelAllowToLoad(moduleName)) {
         HILOG_INFO("module has been allowed by the allowlist in form, module name = %{public}s", moduleName);
         if (apiAllowListChecker == nullptr) {
@@ -108,21 +144,7 @@ bool FormModuleChecker::CheckModuleLoadable(const char *moduleName,
 
 bool FormModuleChecker::IsModuelAllowToLoad(const std::string& moduleName)
 {
-    for (const auto& item : modulesFromCfg_) {
-        if (item == moduleName) {
-            return true;
-        }
-    }
-    const std::vector<std::string> moduleAllowList = {
-        "i18n",
-        "intl",
-        "effectKit",
-        "font",
-        "multimedia.image",
-        "arkui.shape"
-    };
-
-    for (const auto& item : moduleAllowList) {
+    for (const auto& item : MODULE_ALLOW_WITH_API_LIST) {
         if (item == moduleName) {
             return true;
         }
@@ -157,4 +179,9 @@ std::vector<std::string> FormModuleChecker::GetModuleAllowList()
     }
     file.close();
     return result;
+}
+
+bool FormModuleChecker::DiskCheckOnly()
+{
+    return false;
 }
