@@ -62,6 +62,7 @@ private:
     bool GetImgCacheFromDb(int64_t rowId, std::vector<uint8_t> &blob, int32_t &size) const;
     bool SaveImgCacheToDb(const std::vector<uint8_t> &value, int32_t size, int64_t &rowId);
     bool DeleteImgCacheInDb(const std::string &rowId);
+    bool DeleteImgCachesInDb(const std::vector<std::string> &rowIds);
 
     bool AddCacheData(const FormProviderData &formProviderData, FormCache &formCache);
     bool AddImgData(const FormProviderData &formProviderData, FormCache &formCache);

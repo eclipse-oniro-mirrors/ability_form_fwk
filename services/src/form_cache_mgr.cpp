@@ -218,8 +218,12 @@ bool FormCacheMgr::AddImgData(
             return false;
         }
         // delete old images
+        std::vector<std::string> rowIds;
         for (auto && [key, value] : imgCacheObj.items()) {
-            DeleteImgCacheInDb(imgCacheObj[key].dump());
+            rowIds.push_back(value.dump());
+        }
+        if (!DeleteImgCachesInDb(rowIds)) {
+            HILOG_ERROR("delete img caches failed");
         }
     }
 
@@ -352,8 +356,12 @@ bool FormCacheMgr::DeleteData(const int64_t formId)
         }
     }
     if (isNeedDeleteImgCache) {
+        std::vector<std::string> rowIds;
         for (auto && [key, value] : imgCacheObj.items()) {
-            DeleteImgCacheInDb(value.dump());
+            rowIds.push_back(value.dump());
+        }
+        if (!DeleteImgCachesInDb(rowIds)) {
+            HILOG_ERROR("delete img caches failed");
         }
     }
     return DeleteDataCacheInDb(formId);
@@ -506,6 +514,23 @@ bool FormCacheMgr::DeleteImgCacheInDb(const std::string &rowId)
     NativeRdb::AbsRdbPredicates absRdbPredicates(IMG_CACHE_TABLE);
     absRdbPredicates.EqualTo(IMAGE_ID, rowId);
     return FormRdbDataMgr::GetInstance().DeleteData(absRdbPredicates);
+}
+
+bool FormCacheMgr::DeleteImgCachesInDb(const std::vector<std::string> &rowIds)
+{
+    if (rowIds.empty()) {
+        return false;
+    }
+    HILOG_INFO("size:%{public}zu", rowIds.size());
+    std::string sql = "DELETE FROM " + IMG_CACHE_TABLE + " WHERE " + IMAGE_ID + " IN (";
+    for (auto iter = rowIds.begin(); iter != rowIds.end(); ++iter) {
+        sql += "\'";
+        sql += *iter;
+        sql += "\',";
+    }
+    sql.erase(sql.length() - 1);
+    sql += ");";
+    return FormRdbDataMgr::GetInstance().ExecuteSql(sql) == ERR_OK;
 }
 
 void FormCacheMgr::ResetCacheStateAfterReboot()
