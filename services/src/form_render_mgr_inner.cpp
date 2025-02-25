@@ -192,8 +192,8 @@ ErrCode FormRenderMgrInner::UpdateRenderingForm(FormRecord &formRecord, const Fo
     }
     FormDataMgr::GetInstance().SetFormCacheInited(formRecord.formId, true);
     
-    HILOG_INFO("enableForm:%{public}d", formRecord.enableForm);
-    if (!formRecord.enableForm || formRecord.lockForm) {
+    HILOG_INFO("enableForm:%{public}d, protectForm:%{public}d", formRecord.enableForm, formRecord.protectForm);
+    if (!formRecord.enableForm) {
         FormDataMgr::GetInstance().UpdateFormRecord(formRecord.formId, formRecord);
         FormDataMgr::GetInstance().SetUpdateDuringDisableForm(formRecord.formId, true);
         return ERR_APPEXECFWK_FORM_DISABLE_REFRESH;

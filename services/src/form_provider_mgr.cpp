@@ -154,7 +154,7 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
     }
     HILOG_BRIEF("FormProviderMgr::RefreshForm, formId:%{public}" PRId64 "., record.enableForm = %{public}d",
         formId, record.enableForm);
-    if (!record.enableForm || record.lockForm) {
+    if (!record.enableForm) {
         FormDataMgr::GetInstance().SetRefreshDuringDisableForm(formId, true);
         return ERR_APPEXECFWK_FORM_DISABLE_REFRESH;
     }
