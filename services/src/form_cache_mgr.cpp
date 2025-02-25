@@ -222,7 +222,9 @@ bool FormCacheMgr::AddImgData(
         for (auto && [key, value] : imgCacheObj.items()) {
             rowIds.push_back(value.dump());
         }
-        DeleteImgCachesInDb(rowIds);
+        if (!DeleteImgCachesInDb(rowIds)) {
+            HILOG_ERROR("delete img caches failed");
+        }
     }
 
     formCache.imgCache = newImgDbData.dump();
@@ -359,7 +361,7 @@ bool FormCacheMgr::DeleteData(const int64_t formId)
             rowIds.push_back(value.dump());
         }
         if (!DeleteImgCachesInDb(rowIds)) {
-            HILOG_ERROR("delete img cache failed");
+            HILOG_ERROR("delete img caches failed");
         }
     }
     return DeleteDataCacheInDb(formId);
