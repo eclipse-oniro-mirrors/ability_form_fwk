@@ -411,19 +411,23 @@ public:
     {
         return ERR_OK;
     }
-        int32_t LockForms(const std::vector<FormLockInfo> &formLockInfos,
+
+    int32_t LockForms(const std::vector<FormLockInfo> &formLockInfos,
         OHOS::AppExecFwk::LockChangeType type) override
     {
         return ERR_OK;
     }
+
     bool IsFormBundleProtected(const std::string &bundleName, int64_t formId) override
     {
         return true;
     }
+
     bool IsFormBundleExempt(int64_t formId) override
     {
         return true;
     }
+
     const int number_ = 1;
 };
 
