@@ -26,6 +26,7 @@
 #include "nlohmann/json.hpp"
 #include "config_policy_utils.h"
 
+namespace {
 const std::string FORM_MODULE_WHITE_LIST_PATH = "/etc/form_fwk_module_white_list.json";
 const std::string KEY_MODULE_ALLOW = "moduleAllowList";
 const std::vector<std::string> MODULE_ALLOW_LIST = {
@@ -73,6 +74,7 @@ const std::vector<std::string> API_ALLOW_LIST = {
     "multimedia.image.ImageSource.*",
     "deviceInfo.deviceType"
 };
+} // namespace
 
 std::vector<std::string> FormModuleChecker::modulesFromCfg_ = FormModuleChecker::GetModuleAllowList();
 
