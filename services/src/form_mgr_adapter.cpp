@@ -507,7 +507,7 @@ int FormMgrAdapter::DeleteForm(const int64_t formId, const sptr<IRemoteObject> &
 #ifdef THEME_MGR_ENABLE
     FormDBInfo dbInfo;
     ErrCode getDbRet = FormDbCache::GetInstance().GetDBRecord(formId, dbInfo);
-    HILOG_INFO("getDbRet:%{public}d", getDbRet);
+    HILOG_INFO("getDbRet:%{public}d, isThemeForm:%{public}d", getDbRet, dbInfo.isThemeForm);
     if (getDbRet == ERR_OK && dbInfo.isThemeForm) {
         return DeleteThemeForm(formId);
     }
