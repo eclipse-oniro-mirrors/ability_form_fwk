@@ -567,10 +567,12 @@ bool FormDataMgr::GetFormRecord(const std::string &bundleName, std::vector<FormR
 }
 
 /**
- * @brief Get form record.
- * @param bundleName Bundle name & formId.
+ * @brief Get published form record by formId.
+ * @param bundleName Bundle name.
  * @param formInfo The form record.
- * @return Returns true if this function is successfully called; returns false otherwise.
+ * @param formId The Id of the form.
+ * @param userId User ID.
+ * @return Returns ERR_OK on success, others on failure.
  */
 ErrCode FormDataMgr::GetPublishedFormInfoById(const std::string &bundleName, RunningFormInfo &formInfo,
     const int64_t &formId, int32_t userId) const
@@ -590,10 +592,11 @@ ErrCode FormDataMgr::GetPublishedFormInfoById(const std::string &bundleName, Run
 }
 
 /**
- * @brief Get form record.
+ * @brief Get published form records.
  * @param bundleName Bundle name.
- * @param formInfos The form record.
- * @return Returns true if this function is successfully called; returns false otherwise.
+ * @param formInfos The form record list.
+ * @param userId User ID.
+ * @return Returns ERR_OK on success, others on failure.
  */
 ErrCode FormDataMgr::GetPublishedFormInfos(const std::string &bundleName, std::vector<RunningFormInfo> &formInfos,
     int32_t userId) const

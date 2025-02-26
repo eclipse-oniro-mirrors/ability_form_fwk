@@ -1058,12 +1058,9 @@ int32_t FormMgrStub::HandleGetPublishedFormInfoById(MessageParcel &data, Message
     // call FormMgrService to get formInfo.
     int32_t result = GetPublishedFormInfoById(formId, info);
     reply.WriteBool(result);
-    if (result == ERR_OK) {
-        // write fetched formInfo into reply.
-        if (!reply.WriteParcelable(&info)) {
-            HILOG_ERROR("write failed");
-            return ERR_APPEXECFWK_PARCEL_ERROR;
-        }
+    if (result == ERR_OK && !reply.WriteParcelable(&info)) {
+        HILOG_ERROR("write failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
 }
@@ -1076,12 +1073,9 @@ int32_t FormMgrStub::HandleGetPublishedFormInfos(MessageParcel &data, MessagePar
     // call FormMgrService to get formInfos into infos.
     int32_t result = GetPublishedFormInfos(infos);
     reply.WriteBool(result);
-    if (result == ERR_OK) {
-        // write fetched formInfos into reply.
-        if (!WriteParcelableVector(infos, reply)) {
-            HILOG_ERROR("write failed");
-            return ERR_APPEXECFWK_PARCEL_ERROR;
-        }
+    if (result == ERR_OK && !WriteParcelableVector(infos, reply)) {
+        HILOG_ERROR("write failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     return result;
 }
