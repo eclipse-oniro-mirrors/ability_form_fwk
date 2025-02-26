@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -746,5 +746,90 @@ HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0035, TestSize.Level1)
     formProviderData.jsonFormProviderData_.clear();
     EXPECT_EQ(formProviderData.imageDataState_, formProviderData.GetImageDataState());
     GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0035 end";
+}
+
+/**
+ * @tc.number: FmsFormProviderDataTest_0036
+ * @tc.name: Verify the WriteAshmemDataToParcel function.
+ * @tc.desc: Verify whether the WriteAshmemDataToParcel interface calls normally.
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0036, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0036 start";
+    Parcel parcel;
+    std::string name = "formAshmemData";
+    size_t size = sizeof(name);
+    const char* dataPtr = "formAshmemData";
+    FormProviderData formProviderData("");
+    formProviderData.jsonFormProviderData_.clear();
+    auto result = formProviderData.WriteAshmemDataToParcel(parcel, size, dataPtr);
+    EXPECT_EQ(result, true);
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0036 end";
+}
+
+/**
+ * @tc.number: FmsFormProviderDataTest_0037
+ * @tc.name: Verify the ReadAshmemDataFromParcel function.
+ * @tc.desc: Verify whether the ReadAshmemDataFromParcel interface calls normally.
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0037, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0037 start";
+    Parcel parcel;
+    size_t bufferSize = 0;
+    FormProviderData formProviderData("");
+    formProviderData.jsonFormProviderData_.clear();
+    auto result = formProviderData.ReadAshmemDataFromParcel(parcel, bufferSize);
+    EXPECT_EQ(result, nullptr);
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0037 end";
+}
+
+/**
+ * @tc.number: FmsFormProviderDataTest_0038
+ * @tc.name: Verify the WriteFileDescriptor function.
+ * @tc.desc: Verify whether the WriteFileDescriptor interface calls normally.
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0038, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0038 start";
+    Parcel parcel;
+    int fd = -1;
+    FormProviderData formProviderData("");
+    formProviderData.jsonFormProviderData_.clear();
+    auto result = formProviderData.WriteFileDescriptor(parcel, fd);
+    EXPECT_EQ(result, false);
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0038 end";
+}
+
+/**
+ * @tc.number: FmsFormProviderDataTest_0039
+ * @tc.name: Verify the ReadFileDescriptor and ReleaseMemory function.
+ * @tc.desc: Verify whether ReadFileDescriptor and ReleaseMemory interface calls normally.
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0039, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0039 start";
+    Parcel parcel;
+    FormProviderData formProviderData;
+    formProviderData.ReleaseMemory(2, nullptr, nullptr, 0);
+    auto result = formProviderData.ReadFileDescriptor(parcel);
+    EXPECT_EQ(result, -1);
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0039 end";
+}
+
+/**
+ * @tc.number: FmsFormProviderDataTest_0040
+ * @tc.name: Verify the CheckAshmemSize function.
+ * @tc.desc: Verify whether the CheckAshmemSize interface calls normally.
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0040, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0040 start";
+    int fd = -1;
+    int32_t bufferSize = 0;
+    bool isAstc = false;
+    auto result =  FormProviderData::CheckAshmemSize(fd, bufferSize, isAstc);
+    EXPECT_EQ(result, false);
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0040 end";
 }
 }

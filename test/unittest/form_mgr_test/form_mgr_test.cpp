@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -4629,5 +4629,19 @@ HWTEST_F(FormMgrTest, FormMgrTest_0247, TestSize.Level1)
     int32_t error = FormMgr::GetInstance().NotifyFormLocked(formId, isLocked);
     EXPECT_EQ(error, ERR_APPEXECFWK_FORM_SEND_FMS_MSG);
     GTEST_LOG_(INFO) << "FormMgrTest_0247 test ends";
+}
+
+/**
+ * @tc.name: FormMgrTest_0248
+ * @tc.desc: Verify IsFormBundleExempt
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0248, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_0248 begin";
+    int64_t formId = 1;
+    bool result = FormMgr::GetInstance().IsFormBundleExempt(formId);
+    EXPECT_EQ(result, false);
+    GTEST_LOG_(INFO) << "FormMgrTest_0248 begin";
 }
 } // namespace

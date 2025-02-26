@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -405,12 +405,29 @@ public:
     {
         return ERR_OK;
     }
-    
+
     ErrCode RequestPublishFormWithSnapshot(Want &want, bool withFormBindingData,
         std::unique_ptr<FormProviderData> &formBindingData, int64_t &formId) override
     {
         return ERR_OK;
     }
+
+    int32_t LockForms(const std::vector<FormLockInfo> &formLockInfos,
+        OHOS::AppExecFwk::LockChangeType type) override
+    {
+        return ERR_OK;
+    }
+
+    bool IsFormBundleProtected(const std::string &bundleName, int64_t formId) override
+    {
+        return true;
+    }
+
+    bool IsFormBundleExempt(int64_t formId) override
+    {
+        return true;
+    }
+
     const int number_ = 1;
 };
 
@@ -1027,6 +1044,44 @@ HWTEST_F(FormRenderStubTest, IFormMgrTest_004, TestSize.Level0)
     std::vector<FormDataProxy> formDataProxies;
     IFormMgrTest iFormMgrTest;
     EXPECT_EQ(iFormMgrTest.UpdateProxyForm(formId, formProviderData, formDataProxies), ERR_OK);
+}
+
+/**
+ * @tc.name: IFormMgrTest_005
+ * @tc.desc: Test LockForms function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderStubTest, IFormMgrTest_005, TestSize.Level0)
+{
+    std::vector<FormLockInfo> formLockInfos;
+    OHOS::AppExecFwk::LockChangeType type = LockChangeType::SWITCH_CHANGE;
+    IFormMgrTest iFormMgrTest;
+    EXPECT_EQ(iFormMgrTest.LockForms(formLockInfos, type), ERR_OK);
+}
+
+/**
+ * @tc.name: IFormMgrTest_006
+ * @tc.desc: Test IsFormBundleProtected function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderStubTest, IFormMgrTest_006, TestSize.Level0)
+{
+    std::string bundleName = "com.ohos.example.bundleName";
+    int64_t formId = 1;
+    IFormMgrTest iFormMgrTest;
+    EXPECT_EQ(iFormMgrTest.IsFormBundleProtected(bundleName, formId), true);
+}
+
+/**
+ * @tc.name: IFormMgrTest_007
+ * @tc.desc: Test IsFormBundleExempt function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderStubTest, IFormMgrTest_007, TestSize.Level0)
+{
+    int64_t formId = 1;
+    IFormMgrTest iFormMgrTest;
+    EXPECT_EQ(iFormMgrTest.IsFormBundleExempt(formId), true);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
