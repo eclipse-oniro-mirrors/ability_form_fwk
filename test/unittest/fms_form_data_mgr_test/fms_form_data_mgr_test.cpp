@@ -4206,7 +4206,7 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_DeleteInvalidTempForms_001, Test
 * @tc.name: GetFormCanUpdate
 * @tc.desc: Verify that the return value is correct.
 * @tc.details: If the value corresponding to the key is not found in the map.
- 
+
 */
 HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormCanUpdate_001, TestSize.Level0)
 {
@@ -4223,7 +4223,6 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormCanUpdate_001, TestSize.L
 * @tc.name: GetFormCanUpdate
 * @tc.desc: Verify that the return value is correct.
 * @tc.details: If the value corresponding to the key is found in the map.
-
 */
 HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormCanUpdate_002, TestSize.Level0)
 {
