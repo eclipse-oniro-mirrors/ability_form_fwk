@@ -379,8 +379,7 @@ void FormHostProxy::OnEnableForm(const std::vector<int64_t> &formIds, const bool
 void FormHostProxy::OnLockForm(const std::vector<int64_t> &formIds, const bool lock)
 {
     MessageParcel data;
-    MessageOption option(MessageOption::TF_ASYNC);
-
+    
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("write interface token failed");
         return;
@@ -397,6 +396,7 @@ void FormHostProxy::OnLockForm(const std::vector<int64_t> &formIds, const bool l
     }
 
     MessageParcel reply;
+    MessageOption option(MessageOption::TF_ASYNC);
     int error = SendTransactCmd(
         IFormHost::Message::FORM_HOST_ON_LOCK_FORM,
         data, reply, option);

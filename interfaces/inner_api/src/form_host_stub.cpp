@@ -142,8 +142,6 @@ int FormHostStub::HandleOnUninstall(MessageParcel &data, MessageParcel &reply)
  */
 int FormHostStub::HandleOnAcquireState(MessageParcel &data, MessageParcel &reply)
 {
-    auto state = (FormState) data.ReadInt32();
-
     std::unique_ptr<AAFwk::Want> want(data.ReadParcelable<AAFwk::Want>());
     if (!want) {
         HILOG_ERROR("ReadParcelable<Want> failed");
@@ -151,6 +149,7 @@ int FormHostStub::HandleOnAcquireState(MessageParcel &data, MessageParcel &reply
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
+    auto state = (FormState) data.ReadInt32();
     OnAcquireState(state, *want);
     reply.WriteInt32(ERR_OK);
     return ERR_OK;
