@@ -54,7 +54,12 @@ const std::vector<std::string> API_ALLOW_LIST = {
     "i18n.System.getSystemLanguage",
     "i18n.System.is24HourClock",
     "i18n.System.getSystemLocale",
+    "i18n.System.getSystemRegion",
     "i18n.isRTL",
+    "i18n.getTimeZone",
+    "i18n.getCalendar"
+    "i18n.Calendar.*",
+    "i18n.TimeZone.*",
     "intl.Locale.*",
     "intl.DateTimeFormat.*",
     "intl.NumberFormat.*",
