@@ -4202,38 +4202,6 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_DeleteInvalidTempForms_001, Test
 }
 
 /**
-* @tc.number: FmsFormDataMgrTest_GetVisibleForms_001
-* @tc.name: GetVisibleForms
-* @tc.desc: Verify that the return value is correct.
-*/
-HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetVisibleForms_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetVisibleForms_001 start";
-    std::vector<int64_t> forms;
-    int64_t formId = FORM_ID_ZERO;
-    formDataMgr_.SetFormVisible(formId, true);
-    std::vector<int64_t> value(1, 0);
-    formDataMgr_.GetVisibleForms(forms);
-    EXPECT_EQ(forms, value);
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetVisibleForms_001 end";
-}
-
-/**
-* @tc.number: FmsFormDataMgrTest_GetSystemLoad_001
-* @tc.name: GetSystemLoad
-* @tc.desc: Verify that the return value is correct.
-*/
-HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetSystemLoad_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetSystemLoad_001 start";
-    std::vector<int64_t> forms;
-    formDataMgr_.SetSystemLoad(true);
-    bool value = formDataMgr_.GetSystemLoad();
-    EXPECT_EQ(value, true);
-    GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetSystemLoad_001 end";
-}
-
-/**
 * @tc.number: FmsFormDataMgrTest_GetFormCanUpdate_001
 * @tc.name: GetFormCanUpdate
 * @tc.desc: Verify that the return value is correct.
@@ -4255,13 +4223,11 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormCanUpdate_001, TestSize.L
 * @tc.name: GetFormCanUpdate
 * @tc.desc: Verify that the return value is correct.
 * @tc.details: If the value corresponding to the key is found in the map.
-
 */
 HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormCanUpdate_002, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormCanUpdate_002 start";
     int64_t formId = FORM_ID_ZERO;
-    formDataMgr_.SetSystemLoad(true);
     formDataMgr_.SetFormVisible(formId, true);
     bool value = formDataMgr_.GetFormCanUpdate(formId);
     EXPECT_EQ(value, true);

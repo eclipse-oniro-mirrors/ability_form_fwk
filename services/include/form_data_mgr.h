@@ -851,27 +851,10 @@ public:
     void SetFormVisible(int64_t formId, bool isVisible);
 
     /**
-     * @brief Get forms which is visible.
-     * @param forms The list of formId.
-     */
-    void GetVisibleForms(std::vector<int64_t> &forms);
-
-    /**
      * @brief Delete Cache of card visibility.
      * @param formId form id.
      */
     void DeleteFormVisible(int64_t formId);
-
-    /**
-     * @brief Cache the load status of the system.
-     * @param isLowSystemLoad is low load.
-     */
-    void SetSystemLoad(bool isLowSystemLoad);
-
-    /**
-     * @brief Get the load status of the system.
-     */
-    bool GetSystemLoad();
 
     /**
      * @brief Check if the card can be updated.
@@ -1005,7 +988,6 @@ private:
     mutable std::mutex formConfigMapMutex_;
     mutable std::mutex formCloudUpdateDurationMapMutex_;
     mutable std::shared_mutex formVisibleMapMutex_;
-    mutable std::shared_mutex isLowSystemLoadMutex_;
     std::map<int64_t, FormRecord> formRecords_;
     std::vector<FormHostRecord> clientRecords_;
     std::vector<int64_t> tempForms_;
@@ -1019,7 +1001,6 @@ private:
     std::map<std::string, int32_t> formConfigMap_;
     std::unordered_map<std::string, int> formCloudUpdateDurationMap_;
     std::unordered_map<int64_t, bool> formVisibleMap_;
-    bool isLowSystemLoad_ = true;
 };
 } // namespace AppExecFwk
 } // namespace OHOS
