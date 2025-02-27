@@ -89,6 +89,12 @@ public:
      */
     bool PopFormCommand(FormCommand &formCommand);
 
+    /**
+     * @brief check command queue is empty.
+     * @return bool.
+     */
+    bool IsCommondQueueEmpty();
+
 private:
     /**
      * @brief Processes the tasks in the command queue based on the current card state.

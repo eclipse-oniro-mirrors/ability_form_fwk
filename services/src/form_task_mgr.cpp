@@ -938,7 +938,8 @@ void FormTaskMgr::PostStopRenderingForm(
         std::make_pair(TaskCommandType::DELETE_FORM, formId),
         FORM_TASK_DELAY_TIME,
         deleterenderForm};
-    FormStatusQueue::GetInstance().PostFormDeleteTask(deleteCommand);
+    std::string compId = want.GetStringParam(Constants::FORM_RENDER_COMP_ID);
+    FormStatusQueue::GetInstance().PostFormDeleteTask(deleteCommand, compId);
 }
 
 void FormTaskMgr::StopRenderingForm(
@@ -986,7 +987,7 @@ void FormTaskMgr::PostReleaseRenderer(int64_t formId, const std::string &compId,
             std::make_pair(TaskCommandType::DELETE_FORM, formId),
             FORM_TASK_DELAY_TIME,
             deleterenderForm};
-        FormStatusQueue::GetInstance().PostFormDeleteTask(deleteCommand);
+        FormStatusQueue::GetInstance().PostFormDeleteTask(deleteCommand, compId);
     } else {
         FormCommand releaseRenderCommand{
             formId,

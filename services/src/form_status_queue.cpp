@@ -137,13 +137,17 @@ void FormStatusQueue::PostFormStatusTask(FormCommand formCommand, sptr<IRemoteOb
     PostFormCommandTask(formCommandQueue, formId);
 }
 
-void FormStatusQueue::PostFormDeleteTask(FormCommand formCommand)
+void PostFormDeleteTask(FormCommand formCommand, const std::string compId)
 {
     auto formId = formCommand.getFormId();
     auto ms = formCommand.getMs();
     auto func = formCommand.getFunc();
     HILOG_INFO("PostFormDeleteTask , formId:%{public}" PRId64 ". ", formId);
-    DeleteFormStatusQueue(formId);
+    if (compId.empty() ||
+        formCommandQueueMap_.find(formId) == formCommandQueueMap_.end() ||
+        formCommandQueueMap_[formId]->IsCommondQueueEmpty()) {
+        DeleteFormStatusQueue(formId);
+    }
     ScheduleTask(ms, func);
 }
 
