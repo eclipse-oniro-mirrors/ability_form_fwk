@@ -137,7 +137,7 @@ void FormStatusQueue::PostFormStatusTask(FormCommand formCommand, sptr<IRemoteOb
     PostFormCommandTask(formCommandQueue, formId);
 }
 
-void PostFormDeleteTask(FormCommand formCommand, const std::string compId)
+void FormStatusQueue::PostFormDeleteTask(FormCommand formCommand, const std::string compId)
 {
     auto formId = formCommand.getFormId();
     auto ms = formCommand.getMs();
