@@ -43,7 +43,7 @@ public:
     void CancelDelayTask(const std::pair<int64_t, int64_t> &eventMsg);
     
     void PostFormStatusTask(FormCommand formCommand, sptr<IRemoteObject> remoteObjectOfHost = nullptr);
-    void PostFormDeleteTask(FormCommand formCommand);
+    void PostFormDeleteTask(FormCommand formCommand, const std::string compId);
 
     void PostFormCommandTask(std::shared_ptr<FormCommandQueue> formCommandQueue, const int64_t formId);
     void PostFormCommandTaskByFormId(const int64_t formId);

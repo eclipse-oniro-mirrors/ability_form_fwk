@@ -53,6 +53,17 @@ bool FormCommandQueue::PopFormCommand(FormCommand &formCommand)
     return true;
 }
 
+bool FormCommandQueue::IsCommondQueueEmpty()
+{
+    std::lock_guard<std::mutex> lock(formCommandQueueMutex_);
+    if (CommandQueue.empty()) {
+        HILOG_INFO("empty CommandQueue, formId :%{public}" PRId64 ". ", formId_);
+        return true;
+    }
+    HILOG_INFO("CommandQueue not empty, formId :%{public}" PRId64 ". ", formId_);
+    return false;
+}
+
 void FormCommandQueue::ProcessCommandQueue()
 {
     if (CommandQueue.empty()) {
