@@ -4228,7 +4228,6 @@ HWTEST_F(FmsFormDataMgrTest, FmsFormDataMgrTest_GetFormCanUpdate_002, TestSize.L
 {
     GTEST_LOG_(INFO) << "FmsFormDataMgrTest_GetFormCanUpdate_002 start";
     int64_t formId = FORM_ID_ZERO;
-    formDataMgr_.SetSystemLoad(true);
     formDataMgr_.SetFormVisible(formId, true);
     bool value = formDataMgr_.GetFormCanUpdate(formId);
     EXPECT_EQ(value, true);
