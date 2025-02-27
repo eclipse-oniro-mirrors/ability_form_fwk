@@ -2881,16 +2881,6 @@ void FormDataMgr::SetFormVisible(int64_t formId, bool isVisible)
     HILOG_INFO("set isVisible to %{public}d, formId:%{public}" PRId64 " ", isVisible, formId);
 }
 
-void FormDataMgr::GetVisibleForms(std::vector<int64_t> &forms)
-{
-    std::shared_lock<std::shared_mutex> lock(formVisibleMapMutex_);
-    for (auto iter = formVisibleMap_.begin(); iter != formVisibleMap_.end(); ++iter) {
-        if (iter->second) {
-            forms.emplace_back(iter->first);
-        }
-    }
-}
-
 void FormDataMgr::DeleteFormVisible(int64_t formId)
 {
     std::lock_guard<std::shared_mutex> lock(formVisibleMapMutex_);
@@ -2900,18 +2890,6 @@ void FormDataMgr::DeleteFormVisible(int64_t formId)
     }
 }
 
-void FormDataMgr::SetSystemLoad(bool isLowSystemLoad)
-{
-    std::lock_guard<std::shared_mutex> lock(isLowSystemLoadMutex_);
-    isLowSystemLoad_ = isLowSystemLoad;
-}
-
-bool FormDataMgr::GetSystemLoad()
-{
-    std::shared_lock<std::shared_mutex> lock(isLowSystemLoadMutex_);
-    return isLowSystemLoad_;
-}
-
 bool FormDataMgr::GetFormCanUpdate(int64_t formId)
 {
     std::lock_guard<std::shared_mutex> lock(formVisibleMapMutex_);
@@ -2919,9 +2897,9 @@ bool FormDataMgr::GetFormCanUpdate(int64_t formId)
     if (search == formVisibleMap_.end()) {
         HILOG_ERROR("form Id not find");
         formVisibleMap_.emplace(formId, true);
-        return GetSystemLoad();
+        return true;
     }
-    return search->second && GetSystemLoad();
+    return search->second;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -878,12 +878,12 @@ void FormMgrAdapter::SetVisibleChange(const int64_t formId, const int32_t formVi
         HILOG_WARN("param is not right");
         return;
     }
-
+ 
     bool isVisible = (formVisibleType == Constants::FORM_VISIBLE) ? true : false;
     FormRenderMgr::GetInstance().SetVisibleChange(formId, isVisible);
-
+ 
     FormDataMgr::GetInstance().SetFormVisible(formId, isVisible);
-    if (isVisible && FormDataMgr::GetInstance().GetSystemLoad()) {
+    if (isVisible) {
         FormRenderMgr::GetInstance().ExecPostRenderFormTask(formId);
     }
 }
@@ -4044,14 +4044,6 @@ ErrCode FormMgrAdapter::BatchRefreshForms(const int32_t formRefreshType)
 void FormMgrAdapter::SetTimerTaskNeeded(bool isTimerTaskNeeded)
 {
     FormTimerMgr::GetInstance().SetTimerTaskNeeded(isTimerTaskNeeded);
-    if (!FormDataMgr::GetInstance().GetSystemLoad() && isTimerTaskNeeded) {
-        std::vector<int64_t> visibleForms;
-        FormDataMgr::GetInstance().GetVisibleForms(visibleForms);
-        for (auto form : visibleForms) {
-            FormRenderMgr::GetInstance().ExecPostRenderFormTask(form);
-        }
-    }
-    FormDataMgr::GetInstance().SetSystemLoad(isTimerTaskNeeded);
 }
 #endif // RES_SCHEDULE_ENABLE
 
