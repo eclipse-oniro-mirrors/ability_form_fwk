@@ -804,8 +804,7 @@ FormJsInfo FormTaskMgr::CreateFormJsInfo(const int64_t formId, const FormRecord 
     form.isDynamic = record.isDynamic;
     form.transparencyEnabled = record.transparencyEnabled;
     form.modulePkgNameMap = record.modulePkgNameMap;
-    HILOG_DEBUG("jsPath: %{private}s, data: %{private}s",
-        form.jsFormCodePath.c_str(), form.formData.c_str());
+    HILOG_DEBUG("jsPath: %{private}s, data: %{private}s", form.jsFormCodePath.c_str(), form.formData.c_str());
     return form;
 }
 
@@ -822,8 +821,7 @@ void FormTaskMgr::FormShareSendResponse(int64_t formShareRequestCode, int32_t re
 void FormTaskMgr::PostRenderForm(const FormRecord &formRecord, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
-    auto renderType = want.GetIntParam(Constants::FORM_UPDATE_TYPE_KEY,
-        Constants::ADD_FORM_UPDATE_FORM);
+    auto renderType = want.GetIntParam(Constants::FORM_UPDATE_TYPE_KEY, Constants::ADD_FORM_UPDATE_FORM);
     if (renderType != Constants::ADAPTER_UPDATE_FORM
         || FormDataMgr::GetInstance().GetFormCanUpdate(formRecord.formId)) {
         FormTaskMgr::GetInstance().InnerPostRenderForm(formRecord, want, remoteObject);
