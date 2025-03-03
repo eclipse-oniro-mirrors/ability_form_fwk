@@ -1,4 +1,3 @@
-1
 /*
  * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -71,6 +70,7 @@ public:
     static napi_value GetPublishedFormInfoById(napi_env env, napi_callback_info info);
     static napi_value GetPublishedFormInfos(napi_env env, napi_callback_info info);
     static napi_value OpenFormManager(napi_env env, napi_callback_info info);
+    static napi_value OpenFormEditAbility(napi_env env, napi_callback_info info);
 private:
     napi_value OnGetFormsInfo(napi_env env, size_t argc, napi_value* argv);
     napi_value OnGetPublishedFormInfoById(napi_env env, size_t argc, napi_value* argv);
@@ -87,6 +87,7 @@ private:
     bool OnGetFormsInfoParseParam(NapiParamPackage &napiParam,
         size_t &convertArgc, bool &isPromise, AppExecFwk::FormInfoFilter &formInfoFilter);
     napi_value OnUpdateFormParseParam(napi_env env, size_t argc, napi_value* argv, int64_t &formId);
+    napi_value OnOpenFormEditAbility(napi_env env, size_t argc, napi_value* argv);
 };
 }  // namespace AbilityRuntime
 }  // namespace OHOS
