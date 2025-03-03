@@ -27,9 +27,6 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-#define BIND_REQUEST_FUNC(msgId, func) \
-    { IFormMgr::Message::msgId, std::bind(&FormMgrStub::func, this, std::placeholders::_1, std::placeholders::_2) }
-using RemoteRequestFunction = std::function<ErrCode (MessageParcel &data, MessageParcel &reply)>;
 const int32_t LIMIT_PARCEL_SIZE = 1024;
 constexpr size_t MAX_PARCEL_CAPACITY = 4 * 1024 * 1024; // 4M
 static constexpr int32_t MAX_ALLOW_SIZE = 8 * 1024;
@@ -52,86 +49,6 @@ FormMgrStub::FormMgrStub()
 
 FormMgrStub::~FormMgrStub()
 {}
-
-std::map<IFormMgr::Message, RemoteRequestFunction> FormMgrStub::RequestFuncMap()
-{
-    const static std::map<IFormMgr::Message, RemoteRequestFunction> requestFuncMap = {
-        BIND_REQUEST_FUNC(FORM_MGR_ADD_FORM, HandleAddForm),
-        BIND_REQUEST_FUNC(FORM_MGR_DELETE_FORM, HandleDeleteForm),
-        BIND_REQUEST_FUNC(FORM_MGR_RELEASE_FORM, HandleReleaseForm),
-        BIND_REQUEST_FUNC(FORM_MGR_UPDATE_FORM, HandleUpdateForm),
-        BIND_REQUEST_FUNC(FORM_MGR_REQUEST_FORM, HandleRequestForm),
-        BIND_REQUEST_FUNC(FORM_MGR_NOTIFY_FORM_WHETHER_VISIBLE, HandleNotifyWhetherVisibleForms),
-        BIND_REQUEST_FUNC(FORM_MGR_CAST_TEMP_FORM, HandleCastTempForm),
-        BIND_REQUEST_FUNC(FORM_MGR_STORAGE_FORM_INFOS, HandleDumpStorageFormInfos),
-        BIND_REQUEST_FUNC(FORM_MGR_FORM_INFOS_BY_NAME, HandleDumpFormInfoByBundleName),
-        BIND_REQUEST_FUNC(FORM_MGR_FORM_INFOS_BY_ID, HandleDumpFormInfoByFormId),
-        BIND_REQUEST_FUNC(FORM_MGR_FORM_TIMER_INFO_BY_ID, HandleDumpFormTimerByFormId),
-        BIND_REQUEST_FUNC(FORM_MGR_SET_NEXT_REFRESH_TIME, HandleSetNextRefreshTime),
-        BIND_REQUEST_FUNC(FORM_MGR_LIFECYCLE_UPDATE, HandleLifecycleUpdate),
-        BIND_REQUEST_FUNC(FORM_MGR_MESSAGE_EVENT, HandleMessageEvent),
-        BIND_REQUEST_FUNC(FORM_MGR_DELETE_INVALID_FORMS, HandleDeleteInvalidForms),
-        BIND_REQUEST_FUNC(FORM_MGR_ACQUIRE_FORM_STATE, HandleAcquireFormState),
-        BIND_REQUEST_FUNC(FORM_MGR_NOTIFY_FORMS_VISIBLE, HandleNotifyFormsVisible),
-        BIND_REQUEST_FUNC(FORM_MGR_NOTIFY_FORMS_PRIVACY_PROTECTED, HandleNotifyFormsPrivacyProtected),
-        BIND_REQUEST_FUNC(FORM_MGR_NOTIFY_FORMS_ENABLE_UPDATE, HandleNotifyFormsEnableUpdate),
-        BIND_REQUEST_FUNC(FORM_MGR_GET_ALL_FORMS_INFO, HandleGetAllFormsInfo),
-        BIND_REQUEST_FUNC(FORM_MGR_GET_FORMS_INFO_BY_APP, HandleGetFormsInfoByApp),
-        BIND_REQUEST_FUNC(FORM_MGR_GET_FORMS_INFO_BY_MODULE, HandleGetFormsInfoByModule),
-        BIND_REQUEST_FUNC(FORM_MGR_GET_FORMS_INFO_BY_FILTER, HandleGetFormsInfoByFilter),
-        BIND_REQUEST_FUNC(FORM_MGR_GET_FORMS_INFO, HandleGetFormsInfo),
-        BIND_REQUEST_FUNC(FORM_MGR_ROUTER_EVENT, HandleRouterEvent),
-        BIND_REQUEST_FUNC(FORM_MGR_BACKGROUND_EVENT, HandleBackgroundEvent),
-        BIND_REQUEST_FUNC(FORM_MGR_REQUEST_PUBLISH_FORM, HandleRequestPublishForm),
-        BIND_REQUEST_FUNC(FORM_MGR_SHARE_FORM, HandleShareForm),
-        BIND_REQUEST_FUNC(FORM_MGR_RECV_FORM_SHARE_INFO_FROM_REMOTE, HandleRecvFormShareInfoFromRemote),
-        BIND_REQUEST_FUNC(FORM_MGR_IS_REQUEST_PUBLISH_FORM_SUPPORTED, HandleIsRequestPublishFormSupported),
-        BIND_REQUEST_FUNC(FORM_MGR_START_ABILITY, HandleStartAbility),
-        BIND_REQUEST_FUNC(FORM_MGR_CHECK_FMS_READY, HandleCheckFMSReady),
-        BIND_REQUEST_FUNC(FORM_MGR_STOP_RENDERING_FORM, HandleStopRenderingForm),
-        BIND_REQUEST_FUNC(FORM_MGR_REGISTER_FORM_ADD_OBSERVER_BY_BUNDLE, HandleRegisterFormAddObserverByBundle),
-        BIND_REQUEST_FUNC(FORM_MGR_REGISTER_FORM_REMOVE_OBSERVER_BY_BUNDLE, HandleRegisterFormRemoveObserverByBundle),
-        BIND_REQUEST_FUNC(FORM_MGR_START_ABILITY_BY_FMS, HandleStartAbilityByFms),
-        BIND_REQUEST_FUNC(FORM_MGR_ACQUIRE_DATA, HandleAcquireFormData),
-        BIND_REQUEST_FUNC(FORM_MGR_GET_FORMS_COUNT, HandleGetFormsCount),
-        BIND_REQUEST_FUNC(FORM_MGR_GET_HOST_FORMS_COUNT, HandleGetHostFormsCount),
-        BIND_REQUEST_FUNC(FORM_MGR_GET_RUNNING_FORM_INFOS, HandleGetRunningFormInfos),
-        BIND_REQUEST_FUNC(FORM_MGR_GET_RUNNING_FORM_INFOS_BY_BUNDLE, HandleGetRunningFormInfosByBundleName),
-        BIND_REQUEST_FUNC(FORM_MGR_GET_FORM_INSTANCES_FROM_BY_FILTER, HandleGetFormInstancesByFilter),
-        BIND_REQUEST_FUNC(FORM_MGR_GET_FORM_INSTANCES_FROM_BY_ID, HandleGetFormInstanceById),
-        BIND_REQUEST_FUNC(FORM_MGR_REGISTER_ADD_OBSERVER, HandleRegisterAddObserver),
-        BIND_REQUEST_FUNC(FORM_MGR_REGISTER_REMOVE_OBSERVER, HandleRegisterRemoveObserver),
-        BIND_REQUEST_FUNC(FORM_MGR_UPDATE_PROXY_FORM, HandleUpdateProxyForm),
-        BIND_REQUEST_FUNC(FORM_MGR_REQUEST_PUBLISH_PROXY_FORM, HandleRequestPublishProxyForm),
-        BIND_REQUEST_FUNC(FORM_MGR_RELEASE_RENDERER, HandleReleaseRenderer),
-        BIND_REQUEST_FUNC(FORM_MGR_REGISTER_PUBLISH_FORM_INTERCEPTOR, HandleRegisterPublishFormInterceptor),
-        BIND_REQUEST_FUNC(FORM_MGR_UNREGISTER_PUBLISH_FORM_INTERCEPTOR, HandleUnregisterPublishFormInterceptor),
-        BIND_REQUEST_FUNC(FORM_MGR_REGISTER_CLICK_EVENT_OBSERVER, HandleRegisterClickCallbackEventObserver),
-        BIND_REQUEST_FUNC(FORM_MGR_IS_FORM_BUNDLE_PEOTECTED, HandleIsFormProtected),
-        BIND_REQUEST_FUNC(FORM_MGR_IS_FORM_BUNDLE_EXEMPT, HandleIsFormExempt),
-        BIND_REQUEST_FUNC(FORM_MGR_NOTIFY_FORM_LOCKED, HandleNotifyFormLocked),
-        BIND_REQUEST_FUNC(FORM_MGR_UNREGISTER_CLICK_EVENT_OBSERVER, HandleUnregisterClickCallbackEventObserver),
-        BIND_REQUEST_FUNC(FORM_MGR_REGISTER_FORM_ROUTER_PROXY, HandleRegisterFormRouterProxy),
-        BIND_REQUEST_FUNC(FORM_MGR_UNREGISTER_FORM_ROUTER_PROXY, HandleUnregisterFormRouterProxy),
-        BIND_REQUEST_FUNC(FORM_MGR_SET_FORMS_RECYCLABLE, HandleSetFormsRecyclable),
-        BIND_REQUEST_FUNC(FORM_MGR_RECYCLE_FORMS, HandleRecycleForms),
-        BIND_REQUEST_FUNC(FORM_MGR_RECOVER_FORMS, HandleRecoverForms),
-        BIND_REQUEST_FUNC(FORM_MGR_HAS_FORM_VISIBLE_WITH_TOKENID, HandleHasFormVisible),
-        BIND_REQUEST_FUNC(FORM_MGR_UPDATE_FORM_LOCATION, HandleUpdateFormLocation),
-        BIND_REQUEST_FUNC(FORM_MGR_PUBLISH_FORM_ERRCODE_RESULT, HandleSetPublishFormResult),
-        BIND_REQUEST_FUNC(FORM_MGR_ACQUIRE_ADD_FORM_RESULT, HandleAcquireAddFormResult),
-        BIND_REQUEST_FUNC(FORM_MGR_CREATE_FORM, HandleCreateForm),
-        BIND_REQUEST_FUNC(FORM_MGR_REQUEST_PUBLISH_FORM_WITH_SNAPSHOT, HandleRequestPublishFormWithSnapshot),
-        BIND_REQUEST_FUNC(FORM_MGR_BATCH_REFRESH_FORMS, HandleBatchRefreshForms),
-        BIND_REQUEST_FUNC(FORM_MGR_ENABLE_FORMS, HandleEnableForms),
-        BIND_REQUEST_FUNC(FORM_MGR_IS_SYSTEM_APP_FORM, HandleIsSystemAppForm),
-        BIND_REQUEST_FUNC(FORM_MGR_IS_FORM_BUNDLE_FORBIDDEN, HandleIsFormBundleForbidden),
-        BIND_REQUEST_FUNC(FORM_MGR_UPDATE_FORM_SIZE, HandleUpdateFormSize),
-        BIND_REQUEST_FUNC(FORM_MGR_LOCK_FORMS, HandleLockForms),
-        BIND_REQUEST_FUNC(FORM_MGR_OPEN_FORM_EDIT_ABILITY, HandleOpenFormEditAbility)
-    };
-    return requestFuncMap;
-}
 
 /**
  * @brief handle remote request.
@@ -361,8 +278,6 @@ int FormMgrStub::OnRemoteRequestFourth(uint32_t code, MessageParcel &data, Messa
             return HandleUpdateFormSize(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_LOCK_FORMS):
             return HandleLockForms(data, reply);
-        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_OPEN_FORM_EDIT_ABILITY):
-            return HandleOpenFormEditAbility(data, reply);
         default:
             return OnRemoteRequestFifth(code, data, reply, option);
     }
@@ -385,6 +300,8 @@ int FormMgrStub::OnRemoteRequestFifth(uint32_t code, MessageParcel &data, Messag
             return HandleGetPublishedFormInfos(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_IS_FORM_BUNDLE_EXEMPT):
             return HandleIsFormExempt(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_OPEN_FORM_EDIT_ABILITY):
+            return HandleOpenFormEditAbility(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
