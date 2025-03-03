@@ -1,4 +1,3 @@
-1
 /*
  * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -727,6 +726,14 @@ public:
 
     void SubscribeNetConn();
     
+    /**
+     * @brief Handle open form edit ability.
+     * @param data input param.
+     * @param reply output param.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode OpenFormEditAbility(const std::string &abilityName, const int64_t &formId, bool isMainPage) override;
+
     friend class NetConnCallbackObserver;
 private:
     /**
