@@ -1982,9 +1982,6 @@ ErrCode FormMgrService::OpenFormEditAbility(const std::string &abilityName, cons
         HILOG_ERROR("Get running form info by id failed");
         return ret;
     }
-    HILOG_INFO("callerName: %{public}s, hostBundleName: %{public}s uid: %{public}d, formVisiblity: %{public}s",
-        callerName.c_str(), runningFormInfo.hostBundleName.c_str(), uid,
-        runningFormInfo.formVisiblity == FormVisibilityType::VISIBLE ? "true" : "false");
 
     if (runningFormInfo.bundleName != callerName) {
         HILOG_ERROR("check bundleName fialed");
@@ -2019,7 +2016,6 @@ ErrCode FormMgrService::OpenFormEditAbility(const std::string &abilityName, cons
     want.SetAction(Constants::FORM_PAGE_ACTION);
     want.SetElementName(callerName, abilityName);
     want.SetParams(wantarams);
-    HILOG_WARN("StartAbility want:%{public}s", want.ToString().c_str());
     return FormMgrAdapter::GetInstance().StartAbilityByFms(want);
 }
 }  // namespace AppExecFwk
