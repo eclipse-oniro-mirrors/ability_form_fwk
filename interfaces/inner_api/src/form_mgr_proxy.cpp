@@ -2630,5 +2630,36 @@ ErrCode FormMgrProxy::UpdateFormSize(const int64_t &formId, float width, float h
     }
     return reply.ReadInt32();
 }
+
+ErrCode FormMgrProxy::OpenFormEditAbility(const std::string &abilityName, const int64_t &formId, bool isMainPage)
+{
+    HILOG_DEBUG("start");
+    MessageParcel data;
+    if (!WriteInterfaceToken(data)) {
+        HILOG_ERROR("write interface token failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteString(abilityName)) {
+        HILOG_ERROR("fail write abilityName ");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteInt64(formId)) {
+        HILOG_ERROR("fail write formId ");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    if (!data.WriteBool(isMainPage)) {
+        HILOG_ERROR("fail write isMainPage ");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+    int32_t error = SendTransactCmd(IFormMgr::Message::FORM_MGR_OPEN_FORM_EDIT_ABILITY, data, reply, option);
+    if (error != ERR_OK) {
+        HILOG_ERROR("SendTransactCmd:%{public}d failed", error);
+        return error;
+    }
+    return reply.ReadInt32();
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

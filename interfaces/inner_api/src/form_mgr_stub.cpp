@@ -294,6 +294,8 @@ int FormMgrStub::OnRemoteRequestFifth(uint32_t code, MessageParcel &data, Messag
             return HandleGetPublishedFormInfos(data, reply);
         case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_IS_FORM_BUNDLE_EXEMPT):
             return HandleIsFormExempt(data, reply);
+        case static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_OPEN_FORM_EDIT_ABILITY):
+            return HandleOpenFormEditAbility(data, reply);
         default:
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
@@ -1789,6 +1791,20 @@ ErrCode FormMgrStub::HandleUpdateFormSize(MessageParcel &data, MessageParcel &re
     float height = data.ReadFloat();
     float borderWidth = data.ReadFloat();
     ErrCode result = UpdateFormSize(formId, width, height, borderWidth);
+    if (!reply.WriteInt32(result)) {
+        HILOG_ERROR("write result failed");
+        return ERR_APPEXECFWK_PARCEL_ERROR;
+    }
+    return result;
+}
+
+ErrCode FormMgrStub::HandleOpenFormEditAbility(MessageParcel &data, MessageParcel &reply)
+{
+    HILOG_DEBUG("call");
+    std::string abilityName = data.ReadString();
+    int64_t formId = data.ReadInt64();
+    bool isMainPage = data.ReadBool();
+    ErrCode result = OpenFormEditAbility(abilityName, formId, isMainPage);
     if (!reply.WriteInt32(result)) {
         HILOG_ERROR("write result failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;

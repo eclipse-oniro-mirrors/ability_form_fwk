@@ -64,6 +64,9 @@
 #include "net_handle.h"
 #include "form_bundle_lock_mgr.h"
 #include "form_exempt_lock_mgr.h"
+#include "string_wrapper.h"
+#include "int_wrapper.h"
+#include "want_params_wrapper.h"
 #ifdef MEM_MGR_ENABLE
 #include "mem_mgr_client.h"
 #endif
@@ -1963,5 +1966,57 @@ void FormMgrService::SetDisConnectTypeTime()
     lastNetLostTime_ = FormUtil::GetCurrentMillisecond();
 }
 
+ErrCode FormMgrService::OpenFormEditAbility(const std::string &abilityName, const int64_t &formId, bool isMainPage)
+{
+    int uid = IPCSkeleton::GetCallingUid();
+    std::string callerName;
+    ErrCode ret = FormBmsHelper::GetInstance().GetBundleNameByUid(uid, callerName);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("Get bundleName by uid failed");
+        return ret;
+    }
+
+    RunningFormInfo runningFormInfo;
+    ret = FormDataMgr::GetInstance().GetRunningFormInfosByFormId(formId, runningFormInfo);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("Get running form info by id failed");
+        return ret;
+    }
+
+    if (runningFormInfo.bundleName != callerName) {
+        HILOG_ERROR("check bundleName fialed");
+        return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
+    }
+
+    if (runningFormInfo.formVisiblity != FormVisibilityType::VISIBLE) {
+        HILOG_ERROR("check form visibility fialed");
+        return ERR_APPEXECFWK_FORM_NOT_TRUST;
+    }
+
+    WantParams wantarams;
+    if (isMainPage) {
+        WantParams formInfoParam;
+        formInfoParam.SetParam("bundleName", String::Box(runningFormInfo.bundleName));
+        formInfoParam.SetParam("abilityName", String::Box(runningFormInfo.abilityName));
+        formInfoParam.SetParam("moduleName", String::Box(runningFormInfo.moduleName));
+        formInfoParam.SetParam("cardDimension", Integer::Box(runningFormInfo.dimension));
+        formInfoParam.SetParam("cardName", String::Box(runningFormInfo.formName));
+        formInfoParam.SetParam("cardId", String::Box(std::to_string(formId)));
+        formInfoParam.SetParam("formConfigAbility", String::Box(abilityName));
+        wantarams.SetParam("formInfo", WantParamWrapper::Box(formInfoParam));
+        wantarams.SetParam(Constants::PARMA_REQUEST_METHOD, String::Box(Constants::PARMA_OPEN_FORM_EDIT_VIEW));
+    } else {
+        wantarams.SetParam(Constants::PARMA_REQUEST_METHOD, String::Box(Constants::PARMA_OPEN_FORM_EDIT_SEC_PAGE_VIEW));
+        wantarams.SetParam(Constants::PARAM_SEC_PAGE_ABILITY_NAME, String::Box(abilityName));
+    }
+    wantarams.SetParam(Constants::PARAM_PAGE_ROUTER_SERVICE_CODE,
+        Integer::Box(Constants::PAGE_ROUTER_SERVICE_CODE_FORM_EDIT));
+
+    Want want;
+    want.SetAction(Constants::FORM_PAGE_ACTION);
+    want.SetElementName(callerName, abilityName);
+    want.SetParams(wantarams);
+    return FormMgrAdapter::GetInstance().StartAbilityByFms(want);
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

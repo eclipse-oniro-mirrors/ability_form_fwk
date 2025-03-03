@@ -752,6 +752,18 @@ public:
         return ERR_OK;
     }
 
+    /**
+     * @brief Open the form edit ability.
+     * @param abilityName The form edit ability name.
+     * @param formId The edit form ID.
+     * @param isMainPage Open the main edit page.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    virtual ErrCode OpenFormEditAbility(const std::string &abilityName, const int64_t &formId, bool isMainPage)
+    {
+        return ERR_OK;
+    }
+
     enum class Message {
         // ipc id 1-1000 for kit
         // ipc id 1001-2000 for DMS
@@ -842,6 +854,7 @@ public:
         FORM_MGR_START_ABILITY_BY_FMS,
         FORM_MGR_GET_PUBLISHED_FORM_INFOS,
         FORM_MGR_GET_PUBLISHED_FORM_INFO_BY_ID,
+        FORM_MGR_OPEN_FORM_EDIT_ABILITY
     };
 };
 }  // namespace AppExecFwk
