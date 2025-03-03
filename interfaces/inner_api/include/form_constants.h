@@ -1,4 +1,3 @@
-1
 /*
  * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -74,6 +73,7 @@ namespace Constants {
     constexpr int32_t PAGE_ROUTER_SERVICE_CODE_CONTROL_CENTER = 2;
     constexpr int32_t PAGE_ROUTER_SERVICE_CODE_FORM_EDIT = 3;
     constexpr const char* PARMA_REQUEST_METHOD = "requestMethod";
+    constexpr const char* PARMA_OPEN_FORM_EDIT_VIEW = "openFormEditView";
     constexpr const char* PARMA_OPEN_FORM_EDIT_SEC_PAGE_VIEW = "openFormEditSecPageView";
     constexpr const char* PARAM_PAGE_ROUTER_SERVICE_CODE = "pageRouterServiceCode";
     constexpr const char* PARAM_SEC_PAGE_ABILITY_NAME = "secPageAbilityName";
