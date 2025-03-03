@@ -89,7 +89,7 @@ static bool ConvertFormInfoFilterThrow(napi_env env, napi_value jsValue, AppExec
     return true;
 }
 
-static bool ConvertFromId(napi_env env, napi_value jsValue, int64_t &formId)
+static bool ConvertFormId(napi_env env, napi_value jsValue, int64_t &formId)
 {
     std::string strFormId;
     if (!ConvertFromJsValue(env, jsValue, strFormId)) {
@@ -431,7 +431,7 @@ napi_value JsFormProvider::OnUpdateFormParseParam(napi_env env, size_t argc, nap
     if (CheckParamNum(env, argc, ARGS_SIZE_TWO, ARGS_SIZE_THREE) == false) {
         return CreateJsUndefined(env);
     }
-    if (!ConvertFromId(env, argv[PARAM0], formId)) {
+    if (!ConvertFormId(env, argv[PARAM0], formId)) {
         HILOG_ERROR("convert form string failed");
         NapiFormUtil::ThrowParamError(env, "Failed to convert formId.");
         return CreateJsUndefined(env);
