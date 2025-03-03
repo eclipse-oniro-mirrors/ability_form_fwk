@@ -1979,7 +1979,7 @@ ErrCode FormMgrService::OpenFormEditAbility(const std::string &abilityName, cons
     RunningFormInfo runningFormInfo;
     ret = FormDataMgr::GetInstance().GetRunningFormInfosByFormId(formId, runningFormInfo);
     if (ret != ERR_OK) {
-        HILOG_ERROR("Get form instance by id failed");
+        HILOG_ERROR("Get running form info by id failed");
         return ret;
     }
     HILOG_INFO("callerName: %{public}s, hostBundleName: %{public}s uid: %{public}d, formVisiblity: %{public}s",
