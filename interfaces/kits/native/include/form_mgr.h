@@ -1,4 +1,3 @@
-1
 /*
  * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -725,6 +724,15 @@ public:
      * @return Returns ERR_OK on success, others on failure.
      */
     int32_t UpdateFormSize(const int64_t formId, float width, float height, float borderWidth);
+
+    /**
+     * @brief Open the form edit ability.
+     * @param abilityName The form edit ability name.
+     * @param formId The edit form ID.
+     * @param isMainPage Open the main edit page.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode OpenFormEditAbility(const std::string &abilityName, const int64_t &formId, bool isMainPage);
 private:
     /**
      * @brief Connect form manager service.
