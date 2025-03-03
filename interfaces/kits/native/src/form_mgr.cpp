@@ -1,4 +1,3 @@
-1
 /*
  * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -2003,5 +2002,24 @@ int32_t FormMgr::NotifyFormLocked(const int64_t &formId, bool isLocked)
     return resultCode;
 }
 
+ErrCode FormMgr::OpenFormEditAbility(const std::string &abilityName, const int64_t &formId, bool isMainPage)
+{
+    HILOG_INFO("abilityName: %{public}s, formId: %{public}" PRId64 ", isMainPage: %{public}s",
+        abilityName.c_str(), formId, isMainPage ? "true" : "false");
+    ErrCode resultCode = Connect();
+    if (resultCode != ERR_OK) {
+        return resultCode;
+    }
+    std::shared_lock<std::shared_mutex> lock(connectMutex_);
+    if (remoteProxy_ == nullptr) {
+        HILOG_ERROR("null remoteProxy_");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    resultCode = remoteProxy_->OpenFormEditAbility(abilityName, formId, isMainPage);
+    if (resultCode != ERR_OK) {
+        HILOG_ERROR("fail OpenFormEditAbility,errCode %{public}d", resultCode);
+    }
+    return resultCode;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS
