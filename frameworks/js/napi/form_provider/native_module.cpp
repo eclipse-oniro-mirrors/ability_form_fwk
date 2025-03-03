@@ -1,4 +1,3 @@
-1
 /*
  * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -40,6 +39,7 @@ static napi_value JsProviderInit(napi_env env, napi_value exports)
     BindNativeFunction(env, exports, "requestPublishForm", moduleName, JsFormProvider::RequestPublishForm);
     BindNativeFunction(env, exports, "isRequestPublishFormSupported", moduleName,
         JsFormProvider::IsRequestPublishFormSupported);
+    BindNativeFunction(env, exports, "openFormEditAbility", moduleName, JsFormProvider::OpenFormEditAbility);
     return exports;
 }
 
