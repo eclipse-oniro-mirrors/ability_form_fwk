@@ -607,7 +607,7 @@ private:
      * @return Returns ERR_OK on success, others on failure.
      */
     int OnRemoteRequestFirst(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
-    
+
     /**
      * @brief the second part of handle remote request.
      * @param code ipc code.
