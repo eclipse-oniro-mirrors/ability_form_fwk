@@ -666,7 +666,7 @@ napi_value JsFormProvider::OnOpenFormEditAbility(napi_env env, size_t argc, napi
     }
 
     int64_t formId = 0;
-    if (!ConvertFromId(env, argv[PARAM1], formId)) {
+    if (!ConvertFormId(env, argv[PARAM1], formId)) {
         HILOG_ERROR("ConvertFromJsValue");
         NapiFormUtil::ThrowParamTypeError(env, "formId", "string");
         return CreateJsUndefined(env);
