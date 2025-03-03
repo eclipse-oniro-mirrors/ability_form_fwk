@@ -68,13 +68,7 @@ int FormMgrStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParc
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
-    auto funcMap = RequestFuncMap();
-    auto func = funcMap.find(static_cast<IFormMgr::Message>(code));
-    if (func != funcMap.end()) {
-        func->second(data, reply);
-    }
-
-    return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+    return OnRemoteRequestFirst(code, data, reply, option);
 }
 
 /**
