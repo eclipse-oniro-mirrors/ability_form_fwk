@@ -728,8 +728,9 @@ public:
     
     /**
      * @brief Handle open form edit ability.
-     * @param data input param.
-     * @param reply output param.
+     * @param abilityName The form edit ability name.
+     * @param formId The edit form ID.
+     * @param isMainPage Open the main edit page.
      * @return Returns ERR_OK on success, others on failure.
      */
     ErrCode OpenFormEditAbility(const std::string &abilityName, const int64_t &formId, bool isMainPage) override;
