@@ -1,4 +1,3 @@
-1
 /*
  * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -59,7 +58,7 @@ bool CheckParamNum(napi_env env, size_t argc, size_t minParamNum, size_t maxPara
     return true;
 }
 
-bool ConvertFormInfoFilterThrow(napi_env env, napi_value jsValue, AppExecFwk::FormInfoFilter &formInfoFilter)
+static bool ConvertFormInfoFilterThrow(napi_env env, napi_value jsValue, AppExecFwk::FormInfoFilter &formInfoFilter)
 {
     napi_valuetype jsValueType = napi_undefined;
     napi_typeof(env, jsValue, &jsValueType);
@@ -87,6 +86,26 @@ bool ConvertFormInfoFilterThrow(napi_env env, napi_value jsValue, AppExecFwk::Fo
 
     HILOG_INFO("module:%{public}s", formInfoFilter.moduleName.c_str());
 
+    return true;
+}
+
+static bool ConvertFromId(napi_env env, napi_value jsValue, int64_t &formId)
+{
+    std::string strFormId;
+    if (!ConvertFromJsValue(env, jsValue, strFormId)) {
+        HILOG_ERROR("convert strFormId failed");
+        return false;
+    }
+
+    if (strFormId.empty()) {
+        HILOG_ERROR("empty strFormId");
+        return false;
+    }
+
+    if (!ConvertStringToInt64(strFormId, formId)) {
+        HILOG_ERROR("convert string formId to int64 failed");
+        return false;
+    }
     return true;
 }
 }
@@ -412,21 +431,7 @@ napi_value JsFormProvider::OnUpdateFormParseParam(napi_env env, size_t argc, nap
     if (CheckParamNum(env, argc, ARGS_SIZE_TWO, ARGS_SIZE_THREE) == false) {
         return CreateJsUndefined(env);
     }
-    napi_valuetype paramZeroType = napi_undefined;
-    napi_typeof(env, argv[PARAM0], &paramZeroType);
-    if (paramZeroType != napi_string) {
-        HILOG_ERROR("formId not napi_string");
-        NapiFormUtil::ThrowParamTypeError(env, "formId", "string");
-        return CreateJsUndefined(env);
-    }
-    std::string strFormId;
-    bool confirm = ConvertFromJsValue(env, argv[PARAM0], strFormId);
-    if (!confirm) {
-        HILOG_ERROR("ConvertFromJsValue failed");
-        NapiFormUtil::ThrowParamTypeError(env, "formId", "string");
-        return CreateJsUndefined(env);
-    }
-    if (!ConvertStringToInt64(strFormId, formId)) {
+    if (!ConvertFromId(env, argv[PARAM0], formId)) {
         HILOG_ERROR("convert form string failed");
         NapiFormUtil::ThrowParamError(env, "Failed to convert formId.");
         return CreateJsUndefined(env);
@@ -639,6 +644,47 @@ bool JsFormProvider::ConvertFormDataProxy(napi_env env, napi_value value,
     HILOG_INFO("key:%{public}s,subscribeId:%{public}s", formDataProxy.key.c_str(),
         formDataProxy.subscribeId.c_str());
     return true;
+}
+
+napi_value JsFormProvider::OpenFormEditAbility(napi_env env, napi_callback_info info)
+{
+    GET_CB_INFO_AND_CALL(env, info, JsFormProvider, OnOpenFormEditAbility);
+}
+
+napi_value JsFormProvider::OnOpenFormEditAbility(napi_env env, size_t argc, napi_value* argv)
+{
+    HILOG_DEBUG("call");
+    if (!CheckParamNum(env, argc, ARGS_SIZE_TWO, ARGS_SIZE_THREE)) {
+        NapiFormUtil::ThrowParamNumError(env, std::to_string(argc), "2 or 3");
+        return CreateJsUndefined(env);
+    }
+    std::string abilityName;
+    if (!ConvertFromJsValue(env, argv[PARAM0], abilityName)) {
+        HILOG_ERROR("ConvertFromJsValue failed");
+        NapiFormUtil::ThrowParamTypeError(env, "abilityName", "string");
+        return CreateJsUndefined(env);
+    }
+
+    int64_t formId = 0;
+    if (!ConvertFromId(env, argv[PARAM1], formId)) {
+        HILOG_ERROR("ConvertFromJsValue");
+        NapiFormUtil::ThrowParamTypeError(env, "formId", "string");
+        return CreateJsUndefined(env);
+    }
+
+    bool isMainPage = true;
+    if (argc == ARGS_SIZE_THREE) {
+        if (!ConvertFromJsValue(env, argv[PARAM2], isMainPage)) {
+            isMainPage = true;
+        }
+    }
+    HILOG_INFO("OnOpenFormEditAbility abilityName: %{public}s, formId: %{public}" PRId64 "isMainPage: %{public}s",
+        abilityName.c_str(), formId, isMainPage ? "true" : "false");
+    auto ret = FormMgr::GetInstance().OpenFormEditAbility(abilityName, formId, isMainPage);
+    if (ret != ERR_OK) {
+        NapiFormUtil::ThrowByInternalErrorCode(env, ret);
+    }
+    return CreateJsUndefined(env);
 }
 }  // namespace AbilityRuntime
 }  // namespace OHOS
