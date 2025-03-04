@@ -582,6 +582,7 @@ ErrCode FormDataMgr::GetPublishedFormInfoById(const std::string &bundleName, Run
     for (auto itFormRecord = formRecords_.begin(); itFormRecord != formRecords_.end(); itFormRecord++) {
         if (bundleName == itFormRecord->second.bundleName && formId == itFormRecord->second.formId &&
             (userId == Constants::INVALID_USER_ID || userId == itFormRecord->second.userId)) {
+            formInfo.formId = itFormRecord->second.formId;
             FillBasicRunningFormInfoByFormRecord(itFormRecord->second, formInfo);
             HILOG_DEBUG("GetPublishedFormInfoById success, formId:%{public}" PRId64, formId);
             return ERR_OK;
@@ -607,6 +608,7 @@ ErrCode FormDataMgr::GetPublishedFormInfos(const std::string &bundleName, std::v
         if (bundleName == itFormRecord->second.bundleName &&
             (userId == Constants::INVALID_USER_ID || userId == itFormRecord->second.userId)) {
             RunningFormInfo formInfo;
+            formInfo.formId = itFormRecord->second.formId;
             FillBasicRunningFormInfoByFormRecord(itFormRecord->second, formInfo);
             formInfos.emplace_back(formInfo);
         }
@@ -2167,7 +2169,6 @@ ErrCode FormDataMgr::CheckInvalidForm(const int64_t formId)
 void FormDataMgr::FillBasicRunningFormInfoByFormRecord(const FormRecord &formRecord,
                                                        RunningFormInfo &runningFormInfo) const
 {
-    runningFormInfo.formId = formRecord.formId;
     runningFormInfo.formName = formRecord.formName;
     runningFormInfo.dimension = formRecord.specification;
     runningFormInfo.bundleName = formRecord.bundleName;
