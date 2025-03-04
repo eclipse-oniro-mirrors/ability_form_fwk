@@ -1838,11 +1838,11 @@ ErrCode FormMgrService::RequestPublishFormWithSnapshot(Want &want, bool withForm
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
     if (!CheckCallerIsSystemApp()) {
-        want.SetAction(AppExecFwk::Constants::FORM_PAGE_ACTION);
-        want.SetParam(AppExecFwk::Constants::PARAM_PAGE_ROUTER_SERVICE_CODE,
-                      AppExecFwk::Constants::PAGE_ROUTER_SERVICE_CODE_FORM_MANAGE);
-        const std::string key = AppExecFwk::Constants::PARMA_REQUEST_METHOD;
-        const std::string value = AppExecFwk::Constants::OPEN_FORM_MANAGE_VIEW;
+        want.SetAction(Constants::FORM_PAGE_ACTION);
+        want.SetParam(Constants::PARAM_PAGE_ROUTER_SERVICE_CODE,
+                      Constants::PAGE_ROUTER_SERVICE_CODE_FORM_MANAGE);
+        const std::string key = Constants::PARMA_REQUEST_METHOD;
+        const std::string value = Constants::OPEN_FORM_MANAGE_VIEW;
         want.SetParam(key, value);
         return FormMgrAdapter::GetInstance().StartAbilityByFms(want);
     }
