@@ -4182,8 +4182,7 @@ ErrCode FormMgrAdapter::ProtectLockForms(const std::string &bundleName, int32_t 
     for (auto iter = formInfos.begin(); iter != formInfos.end();) {
         HILOG_DEBUG("bundleName:%{public}s, lockForm:%{public}d, transparencyEnabled:%{public}d",
             iter->bundleName.c_str(), iter->lockForm, iter->transparencyEnabled);
-        if (iter->protectForm == protect ||
-            FormExemptLockMgr::GetInstance().IsExemptLock(iter->formId)) {
+        if (FormExemptLockMgr::GetInstance().IsExemptLock(iter->formId)) {
             iter = formInfos.erase(iter);
             continue;
         }
