@@ -1719,7 +1719,7 @@ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_209, TestSize.Level0)
     sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
     MockGetFormRecord(true);
     MockGetUidByBundleName(false);
-    EXPECT_EQ(ERR_OK, formMgrAdapter.BackgroundEvent(formId, want, callerToken));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY, formMgrAdapter.BackgroundEvent(formId, want, callerToken));
     FormBmsHelper::GetInstance().iBundleMgr_ = bmsHelperBackup;
     FormAmsHelper::GetInstance().abilityManager_ = amsHelperBackup;
     GTEST_LOG_(INFO) << "FormMgrAdapter_209 end";
@@ -1750,7 +1750,7 @@ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_210, TestSize.Level0)
     want.SetParam(Constants::FORM_CALL_EVENT_PARAMS, params.dump());
     sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
     MockGetFormRecord(true);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.BackgroundEvent(formId, want, callerToken));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY, formMgrAdapter.BackgroundEvent(formId, want, callerToken));
     FormBmsHelper::GetInstance().iBundleMgr_ = bmsHelperBackup;
     FormAmsHelper::GetInstance().abilityManager_ = amsHelperBackup;
     GTEST_LOG_(INFO) << "FormMgrAdapter_210 end";
