@@ -41,7 +41,8 @@ const std::vector<std::string> MODULE_ALLOW_LIST = {
     "util.HashMap",
     "util.List",
     "util.json",
-    "animator"
+    "animator",
+    "measure"
 };
 const std::vector<std::string> MODULE_ALLOW_WITH_API_LIST = {
     "i18n",
