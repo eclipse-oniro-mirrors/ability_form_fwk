@@ -110,8 +110,8 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
     if (result != ERR_OK) {
         return result;
     }
-    HILOG_INFO("FormProviderMgr::RefreshForm, formId:%{public}" PRId64 "., record.enableForm = %{public}d",
-        formId, record.enableForm);
+    HILOG_INFO("RefreshForm, formId:%{public}" PRId64 ".enableForm:%{public}d, "
+        "isVisibleToFresh:%{public}d", formId, record.enableForm, isVisibleToFresh);
     if (!record.enableForm) {
         FormDataMgr::GetInstance().SetRefreshDuringDisableForm(formId, true);
         return ERR_APPEXECFWK_FORM_DISABLE_REFRESH;
@@ -126,7 +126,9 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
 
     bool isTimerRefresh = want.GetBoolParam(Constants::KEY_TIMER_REFRESH, false);
     newWant.RemoveParam(Constants::KEY_TIMER_REFRESH);
-
+    HILOG_INFO("RefreshForm, formId:%{public}" PRId64 ".isCountTimerRefresh:%{public}d, isTimerRefresh:%{public}d, "
+        "formVisibleNotifyState:%{public}d", formId, isCountTimerRefresh, isTimerRefresh,
+        record.formVisibleNotifyState);
     if (isTimerRefresh) {
         FormDataMgr::GetInstance().SetTimerRefresh(formId, true);
         bool isFormVisible = record.formVisibleNotifyState == Constants::FORM_VISIBLE;
@@ -157,6 +159,7 @@ ErrCode FormProviderMgr::RefreshForm(const int64_t formId, const Want &want, boo
         return ERR_OK;
     }
 
+    HILOG_INFO("RefreshForm ConnectAmsForRefresh. formId:%{public}" PRId64, formId);
     FormRecord refreshRecord = GetFormAbilityInfo(record);
     refreshRecord.isCountTimerRefresh = isCountTimerRefresh;
     refreshRecord.isTimerRefresh = isTimerRefresh;
