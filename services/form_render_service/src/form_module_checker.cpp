@@ -35,18 +35,20 @@ const std::vector<std::string> MODULE_ALLOW_LIST = {
     "effectKit",
     "arkui.shape",
     "hilog",
-    "util",
     "url",
+    "util",
     "util.ArrayList",
     "util.HashMap",
     "util.List",
     "util.json",
     "animator",
-    "measure"
+    "measure",
+    "intl",
+    "systemDateTime",
+    "batteryInfo"
 };
 const std::vector<std::string> MODULE_ALLOW_WITH_API_LIST = {
     "i18n",
-    "intl",
     "font",
     "multimedia.image",
     "deviceInfo"
@@ -61,9 +63,6 @@ const std::vector<std::string> API_ALLOW_LIST = {
     "i18n.getCalendar"
     "i18n.Calendar.*",
     "i18n.TimeZone.*",
-    "intl.Locale.*",
-    "intl.DateTimeFormat.*",
-    "intl.NumberFormat.*",
     "font.registerFont",
     "multimedia.image.PixelMapFormat.*",
     "multimedia.image.Size.*",
@@ -92,6 +91,7 @@ bool FormModuleChecker::CheckApiAllowList(const std::string& apiPath)
         }
     }
 
+    HILOG_ERROR("api not allowed, apiPath: '%{public}s'", apiPath.c_str());
     return false;
 }
 
@@ -116,27 +116,27 @@ bool FormModuleChecker::CheckModuleLoadable(const char *moduleName,
     std::unique_ptr<ApiAllowListChecker> &apiAllowListChecker, bool isAppModule)
 {
     if (isAppModule) {
-        HILOG_INFO("module is not system, moduleName= %{public}s", moduleName);
+        HILOG_ERROR("module is not system, moduleName= %{public}s", moduleName);
         return false;
     }
 
     // only check module
     for (const auto& item : modulesFromCfg_) {
         if (item == moduleName) {
-            HILOG_INFO("load moduleName= %{public}s", moduleName);
+            HILOG_DEBUG("load moduleName= %{public}s", moduleName);
             return true;
         }
     }
     for (const auto& item : MODULE_ALLOW_LIST) {
         if (item == moduleName) {
-            HILOG_INFO("load moduleName= %{public}s", moduleName);
+            HILOG_DEBUG("load moduleName= %{public}s", moduleName);
             return true;
         }
     }
 
     // check mnodule and api
     if (IsModuelAllowToLoad(moduleName)) {
-        HILOG_INFO("module has been allowed by the allowlist in form, module name = %{public}s", moduleName);
+        HILOG_DEBUG("module has been allowed by the allowlist in form, module name = %{public}s", moduleName);
         if (apiAllowListChecker == nullptr) {
             apiAllowListChecker = std::make_unique<ApiAllowListChecker>([](const std::string& apiPath) {
                 return CheckApiAllowList(apiPath);
@@ -144,7 +144,7 @@ bool FormModuleChecker::CheckModuleLoadable(const char *moduleName,
         }
         return true;
     }
-    HILOG_INFO("module can't load in form,moduleName= %{public}s", moduleName);
+    HILOG_ERROR("module can't load in form,moduleName= %{public}s", moduleName);
     return false;
 }
 
