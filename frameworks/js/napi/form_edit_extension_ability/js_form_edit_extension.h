@@ -34,7 +34,7 @@ class JsFormEditExtensionImpl;
 class JsFormEditExtension : public FormEditExtension, public std::enable_shared_from_this<JsFormEditExtension> {
 public:
     explicit JsFormEditExtension(const std::unique_ptr<Runtime> &runtime);
-    virtual ~JsFormEditExtension() override = default;
+    ~JsFormEditExtension() override = default;
 
 /**
      * @brief Init the form edit extension.
@@ -44,9 +44,9 @@ public:
      * @param handler the form edit extension handler.
      * @param token the remote token.
      */
-    virtual void Init(const std::shared_ptr<AppExecFwk::AbilityLocalRecord> &record,
-                      const std::shared_ptr<AppExecFwk::OHOSApplication> &application,
-                      std::shared_ptr<AppExecFwk::AbilityHandler> &handler, const sptr<IRemoteObject> &token) override;
+    void Init(const std::shared_ptr<AppExecFwk::AbilityLocalRecord> &record,
+        const std::shared_ptr<AppExecFwk::OHOSApplication> &application,
+        std::shared_ptr<AppExecFwk::AbilityHandler> &handler, const sptr<IRemoteObject> &token) override;
 
     /**
      * @brief Create JsFormEditExtension.
