@@ -16,10 +16,10 @@
 #include "native_engine/native_engine.h"
 #include "napi/native_api.h"
 
-const char _binary_form_edit_extension_ability_js_start[];
-const char _binary_form_edit_extension_ability_js_end[];
-const char _binary_form_edit_extension_ability_abc_start[];
-const char _binary_form_edit_extension_ability_abc_end[];
+extern const char _binary_form_edit_extension_ability_js_start[];
+extern const char _binary_form_edit_extension_ability_js_end[];
+extern const char _binary_form_edit_extension_ability_abc_start[];
+extern const char _binary_form_edit_extension_ability_abc_end[];
 
 static napi_module _module = {
     .nm_version = 0,
