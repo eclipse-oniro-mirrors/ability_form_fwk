@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include "form_info_mgr.h"
 
 #include "bundle_mgr_client.h"
@@ -441,7 +440,7 @@ void BundleFormInfo::HandleFormInfosMaxLimit(std::vector<FormInfo> &inFormInfos,
     int addFormNum = 0;
     unsigned int formNum = formDBNames.size();
     if (formDBNames.size() < Constants::FORM_INFO_MAX_NUM) {
-        addFormNum = Constants::FORM_INFO_MAX_NUM - static_cast<int32_t>formDBNames.size();
+        addFormNum = Constants::FORM_INFO_MAX_NUM - static_cast<int32_t>(formDBNames.size());
         formNum = Constants::FORM_INFO_MAX_NUM;
     }
     for (auto formInfo : inFormInfos) {
