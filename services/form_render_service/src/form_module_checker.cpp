@@ -51,7 +51,8 @@ const std::vector<std::string> MODULE_ALLOW_WITH_API_LIST = {
     "i18n",
     "font",
     "multimedia.image",
-    "deviceInfo"
+    "deviceInfo",
+    "window"
 };
 const std::vector<std::string> API_ALLOW_LIST = {
     "i18n.System.getSystemLanguage",
@@ -77,7 +78,26 @@ const std::vector<std::string> API_ALLOW_LIST = {
     "multimedia.image.createImageSource",
     "multimedia.image.PixelMap.*",
     "multimedia.image.ImageSource.*",
-    "deviceInfo.deviceType"
+    "deviceInfo.deviceType",
+    "window.WindowType.*",
+    "window.AvoidAreaType.*",
+    "window.WindowMode.*",
+    "window.ColorSpace.*",
+    "window.WindowStageEventType.*",
+    "window.WindowEventType.*",
+    "window.WindowLayoutMode.*",
+    "window.Orientation.*",
+    "window.BlurStyle.*",
+    "window.WmErrorCode.*",
+    "window.WMError.*",
+    "window.WindowStatusType.*",
+    "window.RectChangeReason.*",
+    "window.MaximizePresentation.*",
+    "window.ExtensionWindowAttribute.*",
+    "window.ModalityType.*",
+    "window._napiwrapper.*",
+    "window.getTopWindow.*",
+    "window.getLastWindow.*"
 };
 } // namespace
 
@@ -97,18 +117,18 @@ bool FormModuleChecker::CheckApiAllowList(const std::string& apiPath)
 
 bool FormModuleChecker::CheckApiWithSuffix(const std::string& apiPath, const std::string& item)
 {
+    HILOG_DEBUG("apiPath: '%{public}s', item: '%{public}s'", apiPath.c_str(), item.c_str());
     if (item.compare(0, apiPath.size(), apiPath) == 0) {
-        HILOG_DEBUG("api allowed by allowlist: '%{public}s' matches '%{public}s'", apiPath.c_str(), item.c_str());
         return true;
     }
     const int32_t kSuffixLength = 2;
     if (item.size() >= kSuffixLength && item.substr(item.size() - kSuffixLength) == ".*") {
         const std::string path = item.substr(0, item.rfind('.'));
         if (apiPath.compare(0, path.size(), path) == 0) {
-            HILOG_DEBUG("api allowed by allowlist: '%{public}s' matches '%{public}s'", apiPath.c_str(), item.c_str());
             return true;
         }
     }
+
     return false;
 }
 
