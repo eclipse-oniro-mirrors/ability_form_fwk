@@ -141,7 +141,7 @@ napi_value CreateJsFormDimension(napi_env engine)
     #ifdef FORM_DIMENSION_3_4
         napi_set_named_property(
             engine, objValue, "DIMENSION_3_4", CreateJsValue(engine, AppExecFwk::Constants::Dimension::DIMENSION_3_4));
-    #endif    
+    #endif
     return objValue;
 }
 
