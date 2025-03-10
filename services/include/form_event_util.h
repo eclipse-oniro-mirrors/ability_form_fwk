@@ -56,7 +56,7 @@ public:
     static void ReCreateForm(const int64_t formId);
     static void BatchDeleteNoHostDBForms(const int uid, std::map<FormIdKey, std::set<int64_t>> &noHostFormDbMap,
         std::map<int64_t, bool> &removedFormsMap);
-    static void HandleOnUnlock();
+    static void HandleOnUnlock(int32_t userId);
     static bool HandleAdditionalInfoChanged(const std::string &bundleName);
 
 private:

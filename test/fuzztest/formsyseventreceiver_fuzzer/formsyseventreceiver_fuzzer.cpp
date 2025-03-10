@@ -63,7 +63,7 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     AAFwk::Want want;
     formSysEventReceiver.HandleAbilityUpdate(want, bundleName);
     formSysEventReceiver.HandlePackageDataCleared(bundleName, userId);
-    formSysEventReceiver.HandleUserUnlocked();
+    formSysEventReceiver.HandleUserUnlocked(uid);
     formSysEventReceiver.HandleUserSwitched(eventData);
     bool flag = *data % ENABLE;
     std::map<int64_t, bool> removedFormsMap;
