@@ -367,7 +367,7 @@ void FormRenderMgr::OnScreenUnlock()
     }
 }
 
-void FormRenderMgr::OnUnlock()
+void FormRenderMgr::OnUnlock(int32_t userId)
 {
     HILOG_INFO("call. %{public}d,%{public}d,%{public}d", isVerified_, isScreenUnlocked_, userId);
     if (isVerified_) {
