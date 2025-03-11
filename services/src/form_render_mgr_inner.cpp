@@ -190,7 +190,11 @@ ErrCode FormRenderMgrInner::UpdateRenderingForm(FormRecord &formRecord, const Fo
         HILOG_DEBUG("need to delete data");
         FormCacheMgr::GetInstance().DeleteData(formRecord.formId);
     }
-    FormDataMgr::GetInstance().SetFormCacheInited(formRecord.formId, true);
+    if (formRecord.isTimerRefresh) {
+        formRecord.isInited = true;
+    } else {
+        FormDataMgr::GetInstance().SetFormCacheInited(formRecord.formId, true);
+    }
     
     HILOG_INFO("enableForm:%{public}d", formRecord.enableForm);
     if (!formRecord.enableForm) {
