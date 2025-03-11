@@ -52,9 +52,10 @@ void FormRenderMgr::GetFormRenderState()
 {
     // Check whether the account is authenticated.
     bool isVerified = false;
-    AccountSA::OsAccountManager::IsOsAccountVerified(FormUtil::GetCurrentAccountId(), isVerified);
-    HILOG_INFO("isVerified:%{public}d, isVerified_:%{public}d, screen:%{public}d",
-        isVerified, isVerified_, isScreenUnlocked_);
+    int32_t userId = FormUtil::GetCurrentAccountId();
+    AccountSA::OsAccountManager::IsOsAccountVerified(userId, isVerified);
+    HILOG_INFO("isVerified:%{public}d, isVerified_:%{public}d, screen:%{public}d, userId:%{public}d",
+        isVerified, isVerified_, isScreenUnlocked_, userId);
 
     std::lock_guard<std::mutex> lock(isVerifiedMutex_);
     if (isVerified_ == isVerified) {
@@ -68,7 +69,7 @@ void FormRenderMgr::GetFormRenderState()
     if (!isScreenUnlocked_) {
         PostOnUnlockTask();
     }
-    ExecAcquireProviderTask();
+    ExecAcquireProviderTask(userId);
 }
 
 bool FormRenderMgr::GetIsVerified() const
@@ -174,23 +175,38 @@ void FormRenderMgr::PostOnUnlockTask()
     }
 }
 
-void FormRenderMgr::AddAcquireProviderFormInfoTask(std::function<void()> task)
+void FormRenderMgr::AddAcquireProviderFormInfoTask(int32_t userId, std::function<void()> task)
 {
     HILOG_DEBUG("call");
     std::lock_guard<std::mutex> lock(taskQueueMutex_);
-    taskQueue_.push(task);
+    auto iter = taskQueueMap_.find(userId);
+    if (iter == taskQueueMap_.end()) {
+        std::queue<std::function<void()>> taskQueue;
+        taskQueue.push(task);
+        taskQueueMap_.emplace(userId, taskQueue);
+        return;
+    }
+    iter->second.push(task);
 }
 
-void FormRenderMgr::ExecAcquireProviderTask()
+void FormRenderMgr::ExecAcquireProviderTask(int32_t userId)
 {
-    HILOG_INFO("start");
+    HILOG_INFO("start, userId:%{public}d", userId);
     // start to execute asynchronous tasks in the queue
     std::lock_guard<std::mutex> lock(taskQueueMutex_);
-    while (!taskQueue_.empty()) {
-        auto task = taskQueue_.front();
-        task();
-        taskQueue_.pop();
+    auto iter = taskQueueMap_.find(userId);
+    if (iter == taskQueueMap_.end()) {
+        HILOG_WARN("taskQueueMap_ not find userId:%{public}d", userId);
+        return;
     }
+    auto taskQueue = iter->second;
+    while (!taskQueue.empty()) {
+        auto task = taskQueue.front();
+        task();
+        taskQueue.pop();
+    }
+    taskQueueMap_.erase(userId);
+    HILOG_INFO("end, userId:%{public}d", userId);
 }
 
 void FormRenderMgr::AddAcquireProviderForbiddenTask(const std::string &bundleName,
@@ -352,9 +368,9 @@ void FormRenderMgr::OnScreenUnlock()
     }
 }
 
-void FormRenderMgr::OnUnlock()
+void FormRenderMgr::OnUnlock(int32_t userId)
 {
-    HILOG_INFO("call. %{public}d,%{public}d", isVerified_, isScreenUnlocked_);
+    HILOG_INFO("call. %{public}d,%{public}d,%{public}d", isVerified_, isScreenUnlocked_, userId);
     if (isVerified_) {
         return;
     }
@@ -366,7 +382,7 @@ void FormRenderMgr::OnUnlock()
             PostOnUnlockTask();
         }
     }
-    ExecAcquireProviderTask();
+    ExecAcquireProviderTask(userId);
 }
 
 void FormRenderMgr::SetVisibleChange(int64_t formId, bool isVisible)

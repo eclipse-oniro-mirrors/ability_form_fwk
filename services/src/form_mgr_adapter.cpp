@@ -1821,10 +1821,17 @@ ErrCode FormMgrAdapter::AcquireProviderFormInfoAsync(const int64_t formId,
     }
 
     HILOG_INFO("The currentUser not unlocked");
+    FormRecord record;
+    bool result = FormDataMgr::GetInstance().GetFormRecord(formId, record);
+    if (!result) {
+        HILOG_ERROR("not exist such form:%{public}" PRId64 "", formId);
+        return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
+    }
+
     auto task = [formId, newInfo = info, newWant = wantParams]() {
         FormMgrAdapter::GetInstance().InnerAcquireProviderFormInfoAsync(formId, newInfo, newWant);
     };
-    FormRenderMgr::GetInstance().AddAcquireProviderFormInfoTask(task);
+    FormRenderMgr::GetInstance().AddAcquireProviderFormInfoTask(record.providerUserId, task);
     return ERR_OK;
 }
 

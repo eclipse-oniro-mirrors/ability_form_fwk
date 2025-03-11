@@ -145,9 +145,9 @@ void FormEventUtil::HandleProviderUpdated(const std::string &bundleName, const i
     FormRenderMgr::GetInstance().ReloadForm(std::move(updatedForms), bundleName, userId);
 }
 
-void FormEventUtil::HandleOnUnlock()
+void FormEventUtil::HandleOnUnlock(int32_t userId)
 {
-    FormRenderMgr::GetInstance().OnUnlock();
+    FormRenderMgr::GetInstance().OnUnlock(userId);
 }
 
 void FormEventUtil::HandleBundleFormInfoRemoved(const std::string &bundleName, int32_t userId)

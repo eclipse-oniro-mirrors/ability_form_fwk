@@ -48,7 +48,7 @@ public:
 
     void OnScreenUnlock();
 
-    void OnUnlock();
+    void OnUnlock(int32_t userId);
 
     void NotifyScreenOn();
 
@@ -89,9 +89,9 @@ public:
 
     ErrCode ReleaseRenderer(int64_t formId, const FormRecord &formRecord, const std::string &compId);
 
-    void AddAcquireProviderFormInfoTask(std::function<void()> task);
+    void AddAcquireProviderFormInfoTask(int32_t userId, std::function<void()> task);
 
-    void ExecAcquireProviderTask();
+    void ExecAcquireProviderTask(int32_t userId);
 
     void AddAcquireProviderForbiddenTask(const std::string &bundleName, int64_t formId, std::function<void()> task);
 
@@ -129,7 +129,7 @@ private:
     mutable std::mutex isVerifiedMutex_;
     std::mutex renderInnerMutex_;
     std::mutex taskQueueMutex_;
-    std::queue<std::function<void()>> taskQueue_;
+    std::unordered_map<int32_t, std::queue<std::function<void()>>> taskQueueMap_;
     std::mutex forbiddenTaskMapMutex_;
     std::unordered_map<std::string, std::unordered_map<int64_t, std::function<void()>>> forbiddenTaskMap_;
     std::mutex renderFormTaskMapMutex_;

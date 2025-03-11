@@ -834,7 +834,7 @@ HWTEST_F(FmsFormSysEventReceiverTest, HandleUserUnlocked_0001, TestSize.Level0)
     GTEST_LOG_(INFO) << "HandleUserUnlocked_0001 start";
     std::shared_ptr<FormSysEventReceiver> receiver = std::make_shared<FormSysEventReceiver>();
     ASSERT_NE(nullptr, receiver);
-    receiver->HandleUserUnlocked();
+    receiver->HandleUserUnlocked(MAIN_USER_ID);
     GTEST_LOG_(INFO) << "HandleUserUnlocked_0001 end";
 }
 
