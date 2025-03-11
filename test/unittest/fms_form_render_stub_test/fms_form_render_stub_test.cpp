@@ -427,6 +427,21 @@ public:
     {
         return true;
     }
+	
+    int32_t GetPublishedFormInfoById(const int64_t formId, RunningFormInfo &formInfo) override
+    {
+        return 0;
+    }
+
+    int32_t GetPublishedFormInfos(std::vector<RunningFormInfo> &formInfos) override
+    {
+        return 0;
+    }
+
+    ErrCode OpenFormEditAbility(const std::string &abilityName, const int64_t &formId, bool isMainPage) override
+    {
+        return ERR_OK;
+    }
 
     const int number_ = 1;
 };
@@ -1082,6 +1097,45 @@ HWTEST_F(FormRenderStubTest, IFormMgrTest_007, TestSize.Level0)
     int64_t formId = 1;
     IFormMgrTest iFormMgrTest;
     EXPECT_EQ(iFormMgrTest.IsFormBundleExempt(formId), true);
+}
+
+/**
+ * @tc.name: IFormMgrTest_008
+ * @tc.desc: Test GetPublishedFormInfoById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderStubTest, IFormMgrTest_008, TestSize.Level0)
+{
+    int64_t formId = 1;
+    RunningFormInfo formInfo;
+    IFormMgrTest iFormMgrTest;
+    EXPECT_EQ(iFormMgrTest.GetPublishedFormInfoById(formId, formInfo), 0);
+}
+
+/**
+ * @tc.name: IFormMgrTest_009
+ * @tc.desc: Test GetPublishedFormInfos function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderStubTest, IFormMgrTest_009, TestSize.Level0)
+{
+    std::vector<RunningFormInfo> formInfos;
+    IFormMgrTest iFormMgrTest;
+    EXPECT_EQ(iFormMgrTest.GetPublishedFormInfos(formInfos), 0);
+}
+
+/**
+ * @tc.name: IFormMgrTest_010
+ * @tc.desc: Test OpenFormEditAbility function
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderStubTest, IFormMgrTest_010, TestSize.Level0)
+{
+    std::string abilityName = "123";
+    int64_t formId = 1;
+    bool isMainPage = true;
+    IFormMgrTest iFormMgrTest;
+    EXPECT_EQ(iFormMgrTest.OpenFormEditAbility(abilityName, formId, isMainPage), ERR_OK);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

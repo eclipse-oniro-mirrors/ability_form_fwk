@@ -4644,4 +4644,121 @@ HWTEST_F(FormMgrTest, FormMgrTest_0248, TestSize.Level1)
     EXPECT_EQ(result, false);
     GTEST_LOG_(INFO) << "FormMgrTest_0248 begin";
 }
+
+/**
+ * @tc.name: FormMgrTest_0249
+ * @tc.desc: Verify GetPublishedFormInfoById
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0249, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_0249 begin";
+    int64_t formId = 1;
+    RunningFormInfo runningFormInfo;
+    int32_t result = FormMgr::GetInstance().GetPublishedFormInfoById(formId, runningFormInfo);
+    HILOG_INFO("FormMgrTest_0249,result: %{public}d", result);
+    EXPECT_EQ(result, ERROR_NUMS);
+    GTEST_LOG_(INFO) << "FormMgrTest_0249 end";
+}
+
+/**
+ * @tc.name: FormMgrTest_0250
+ * @tc.desc: Verify GetPublishedFormInfoById
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0250, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_0250 begin";
+    int64_t formId = 2;
+    RunningFormInfo runningFormInfo;
+    FormMgr::GetInstance().remoteProxy_ = nullptr;
+    int32_t result = FormMgr::GetInstance().GetPublishedFormInfoById(formId, runningFormInfo);
+    HILOG_INFO("FormMgrTest_0250,result: %{public}d", result);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    GTEST_LOG_(INFO) << "FormMgrTest_0250 end";
+}
+
+/**
+ * @tc.name: FormMgrTest_0251
+ * @tc.desc: Verify GetPublishedFormInfos
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0251, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_0251 begin";
+    std::vector<RunningFormInfo> runningFormInfos;
+    int32_t result = FormMgr::GetInstance().GetPublishedFormInfos(runningFormInfos);
+    HILOG_INFO("FormMgrTest_0251,result: %{public}d", result);
+    EXPECT_EQ(result, ERROR_NUMS);
+    GTEST_LOG_(INFO) << "FormMgrTest_0251 end";
+}
+
+/**
+ * @tc.name: FormMgrTest_0252
+ * @tc.desc: Verify GetPublishedFormInfos
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0252, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_0252 begin";
+    std::vector<RunningFormInfo> runningFormInfos;
+    FormMgr::GetInstance().remoteProxy_ = nullptr;
+    int32_t result = FormMgr::GetInstance().GetPublishedFormInfos(runningFormInfos);
+    HILOG_INFO("FormMgrTest_0252,result: %{public}d", result);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    GTEST_LOG_(INFO) << "FormMgrTest_0252 end";
+}
+
+/**
+ * @tc.name: FormMgrTest_0253
+ * @tc.desc: Verify OpenFormEditAbility
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0253, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_0253 begin";
+    std::string abilityName = "";
+    int64_t formId = 1;
+    bool isMainPage = true;
+    ErrCode result = FormMgr::GetInstance().OpenFormEditAbility(abilityName, formId, isMainPage);
+    HILOG_INFO("FormMgrTest_0253,result: %{public}d", result);
+    EXPECT_EQ(result, ERROR_NUMS);
+    GTEST_LOG_(INFO) << "FormMgrTest_0253 end";
+}
+
+/**
+ * @tc.name: FormMgrTest_0254
+ * @tc.desc: Verify OpenFormEditAbility
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0254, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_0254 begin";
+    std::string abilityName = "123";
+    int64_t formId = 2;
+    bool isMainPage = true;
+    FormMgr::GetInstance().remoteProxy_ = nullptr;
+    ErrCode result = FormMgr::GetInstance().OpenFormEditAbility(abilityName, formId, isMainPage);
+    HILOG_INFO("FormMgrTest_0254,result: %{public}d", result);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    GTEST_LOG_(INFO) << "FormMgrTest_0254 end";
+}
+
+/**
+ * @tc.name: FormMgrTest_0255
+ * @tc.desc: Verify OpenFormEditAbility
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormMgrTest, FormMgrTest_0255, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrTest_0255 begin";
+    std::string abilityName = "456";
+    int64_t formId = 2;
+    bool isMainPage = false;
+    FormMgr::GetInstance().remoteProxy_ = nullptr;
+    ErrCode result = FormMgr::GetInstance().OpenFormEditAbility(abilityName, formId, isMainPage);
+    HILOG_INFO("FormMgrTest_0255,result: %{public}d", result);
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_COMMON_CODE);
+    GTEST_LOG_(INFO) << "FormMgrTest_0255 end";
+}
 } // namespace
