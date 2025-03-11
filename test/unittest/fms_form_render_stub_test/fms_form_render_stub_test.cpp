@@ -428,7 +428,7 @@ public:
         return true;
     }
 	
-	int32_t GetPublishedFormInfoById(const int64_t formId, RunningFormInfo &formInfo) override
+    int32_t GetPublishedFormInfoById(const int64_t formId, RunningFormInfo &formInfo) override
     {
         return 0;
     }
