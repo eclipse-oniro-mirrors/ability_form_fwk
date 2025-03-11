@@ -467,6 +467,7 @@ ErrCode FormInfoMgr::UpdateStaticFormInfos(const std::string &bundleName, int32_
 
     ErrCode errCode = bundleFormInfoPtr->UpdateStaticFormInfos(userId);
     if (errCode != ERR_OK) {
+        HILOG_ERROR("UpdateStaticFormInfos failed!");
         return errCode;
     }
 
