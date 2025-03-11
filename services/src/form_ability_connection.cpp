@@ -47,8 +47,7 @@ void FormAbilityConnection::OnAbilityConnectDone(
     const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode)
 {
     if (resultCode != ERR_OK) {
-        HILOG_ERROR("formId:%{public}" PRId64 ", resultCode:%{public}d",
-            formId_, resultCode);
+        HILOG_ERROR("formId:%{public}" PRId64 ", resultCode:%{public}d", formId_, resultCode);
         return;
     }
 
