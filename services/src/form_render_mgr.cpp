@@ -196,6 +196,7 @@ void FormRenderMgr::ExecAcquireProviderTask(int32_t userId)
     std::lock_guard<std::mutex> lock(taskQueueMutex_);
     auto iter = taskQueueMap_.find(userId);
     if (iter == taskQueueMap_.end()) {
+        HILOG_WARN("taskQueueMap_ not find userId:%{public}d", userId);
         return;
     }
     auto taskQueue = iter->second;
