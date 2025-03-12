@@ -487,7 +487,7 @@ bool FormProviderData::WriteFormData(Parcel &parcel) const
 {
     std::string formData = jsonFormProviderData_.empty() ?
         JSON_EMPTY_STRING : jsonFormProviderData_.dump();
-    int32_t formDataLength = formData.length();
+    int32_t formDataLength = static_cast<int32_t>(formData.length());
     parcel.WriteInt32(formDataLength);
     if (formDataLength > BIG_DATA) {
         const char* dataPtr = formData.c_str();
