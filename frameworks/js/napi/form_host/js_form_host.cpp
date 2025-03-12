@@ -1507,7 +1507,6 @@ private:
 
     napi_value OnShareForm(napi_env env, size_t argc, napi_value* argv)
     {
-#ifndef WATCH_API_DISABLE
         HILOG_DEBUG("call");
         if (argc > ARGS_THREE || argc < ARGS_TWO) {
             HILOG_ERROR("invalid argc");
@@ -1551,9 +1550,6 @@ private:
         InnerShareForm(env, asyncTask, std::move(task), formId, devicedId);
 
         return result;
-#else
-        return nullptr;
-#endif
     }
 
     napi_value OnAcquireFormData(napi_env env, size_t argc, napi_value* argv)
