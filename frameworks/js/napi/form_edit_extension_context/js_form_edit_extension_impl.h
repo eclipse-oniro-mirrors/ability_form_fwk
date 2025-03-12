@@ -28,7 +28,7 @@ class FormEditExtensionContext;
 class JsFormEditExtensionImpl : public JsUIExtensionBase {
 public:
     explicit JsFormEditExtensionImpl(const std::unique_ptr<Runtime> &runtime);
-    virtual ~JsFormEditExtensionImpl() override = default;
+    ~JsFormEditExtensionImpl() override = default;
 
     void SetContext(const std::shared_ptr<FormEditExtensionContext> &context)
     {
