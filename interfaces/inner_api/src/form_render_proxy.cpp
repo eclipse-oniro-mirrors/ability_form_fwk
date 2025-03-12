@@ -27,7 +27,7 @@ int32_t FormRenderProxy::RenderForm(const FormJsInfo &formJsInfo, const Want &wa
 {
     MessageParcel data;
     MessageParcel reply;
-    MessageOption option(MessageOption::TF_ASYNC);
+    MessageOption option(MessageOption::TF_SYNC);
 
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("write interface token failed");
@@ -56,7 +56,7 @@ int32_t FormRenderProxy::RenderForm(const FormJsInfo &formJsInfo, const Want &wa
         HILOG_ERROR("error to SendRequest:%{public}d", error);
         return error;
     }
-    return ERR_OK;
+    return reply.ReadInt32();
 }
 
 int32_t FormRenderProxy::StopRenderingForm(const FormJsInfo &formJsInfo, const Want &want,
@@ -297,7 +297,7 @@ int32_t FormRenderProxy::WriteParcelableVector(const std::vector<T> &parcelableV
 int32_t FormRenderProxy::RecycleForm(const int64_t &formId, const Want &want)
 {
     MessageParcel data;
-    MessageOption option(MessageOption::TF_ASYNC);
+    MessageOption option(MessageOption::TF_SYNC);
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("write interface token failed");
         return ERR_APPEXECFWK_PARCEL_ERROR;
@@ -322,13 +322,13 @@ int32_t FormRenderProxy::RecycleForm(const int64_t &formId, const Want &want)
         return error;
     }
 
-    return ERR_OK;
+    return reply.ReadInt32();
 }
 
 int32_t FormRenderProxy::RecoverForm(const FormJsInfo &formJsInfo, const Want &want)
 {
     MessageParcel data;
-    MessageOption option(MessageOption::TF_ASYNC);
+    MessageOption option(MessageOption::TF_SYNC);
     HILOG_INFO("begin");
     if (!WriteInterfaceToken(data)) {
         HILOG_ERROR("write interface token failed");
@@ -354,7 +354,7 @@ int32_t FormRenderProxy::RecoverForm(const FormJsInfo &formJsInfo, const Want &w
         return error;
     }
     HILOG_INFO("end");
-    return ERR_OK;
+    return reply.ReadInt32();
 }
 
 void FormRenderProxy::RunCachedConfigurationUpdated()
