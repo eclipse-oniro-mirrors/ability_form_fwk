@@ -55,7 +55,7 @@ public:
 private:
     std::shared_ptr<FormCommandQueue> GetOrCreateFormStatusQueue(
         const int64_t formId, const sptr<IRemoteObject> &remoteObjectOfHost, FormStatus formStatus);
-    void DeleteFormStatusQueue(const int64_t formId);
+    void DeleteFormStatusQueueIfNecessary(const int64_t formId, const std::string compId);
 
     void TimeOutReAddForm(const int64_t &formId, const sptr<IRemoteObject> &remoteObjectOfHost);
 

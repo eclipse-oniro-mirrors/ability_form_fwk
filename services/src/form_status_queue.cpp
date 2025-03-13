@@ -106,13 +106,17 @@ std::shared_ptr<FormCommandQueue> FormStatusQueue::GetOrCreateFormStatusQueue(
     return formCommandQueueMap_[formId];
 }
 
-void FormStatusQueue::DeleteFormStatusQueue(const int64_t formId)
+void FormStatusQueue::DeleteFormStatusQueueIfNecessary(const int64_t formId, const std::string compId)
 {
     std::unique_lock<std::shared_mutex> lock(formCommandQueueMapMutex_);
-    formCommandQueueMap_.erase(formId);
-    formHostTokenMap_.erase(formId);
-    FormStatusMgr::GetInstance().DeleteFormStatus(formId);
-    HILOG_INFO("formCommandQueueMap_ erase, formId:%{public}" PRId64 ". ", formId);
+    if (compId.empty() ||
+        formCommandQueueMap_.find(formId) == formCommandQueueMap_.end() ||
+        formCommandQueueMap_[formId]->IsCommondQueueEmpty()) {
+        formCommandQueueMap_.erase(formId);
+        formHostTokenMap_.erase(formId);
+        FormStatusMgr::GetInstance().DeleteFormStatus(formId);
+        HILOG_INFO("formCommandQueueMap_ erase, formId:%{public}" PRId64 ". ", formId);
+    }
 }
 
 void FormStatusQueue::PostFormStatusTask(FormCommand formCommand, sptr<IRemoteObject> remoteObjectOfHost)
@@ -143,11 +147,7 @@ void FormStatusQueue::PostFormDeleteTask(FormCommand formCommand, const std::str
     auto ms = formCommand.getMs();
     auto func = formCommand.getFunc();
     HILOG_INFO("PostFormDeleteTask , formId:%{public}" PRId64 ". ", formId);
-    if (compId.empty() ||
-        formCommandQueueMap_.find(formId) == formCommandQueueMap_.end() ||
-        formCommandQueueMap_[formId]->IsCommondQueueEmpty()) {
-        DeleteFormStatusQueue(formId);
-    }
+    DeleteFormStatusQueueIfNecessary(formId, compId);
     ScheduleTask(ms, func);
 }
 
