@@ -91,7 +91,6 @@ void FormStatusQueue::CancelDelayTask(const std::pair<int64_t, int64_t> &eventMs
 std::shared_ptr<FormCommandQueue> FormStatusQueue::GetOrCreateFormStatusQueue(
     const int64_t formId, const sptr<IRemoteObject> &remoteObjectOfHost, FormStatus formStatus)
 {
-    std::unique_lock<std::shared_mutex> lock(formCommandQueueMapMutex_);
     if (formCommandQueueMap_.find(formId) == formCommandQueueMap_.end()) {
         std::shared_ptr<FormCommandQueue> formCommandQueue = std::make_shared<FormCommandQueue>(formId);
         formCommandQueueMap_.emplace(std::make_pair(formId, formCommandQueue));
@@ -108,7 +107,6 @@ std::shared_ptr<FormCommandQueue> FormStatusQueue::GetOrCreateFormStatusQueue(
 
 void FormStatusQueue::DeleteFormStatusQueue(const int64_t formId)
 {
-    std::unique_lock<std::shared_mutex> lock(formCommandQueueMapMutex_);
     formCommandQueueMap_.erase(formId);
     formHostTokenMap_.erase(formId);
     FormStatusMgr::GetInstance().DeleteFormStatus(formId);
@@ -119,6 +117,7 @@ void FormStatusQueue::PostFormStatusTask(FormCommand formCommand, sptr<IRemoteOb
 {
     auto formId = formCommand.getFormId();
     auto taskCommandType = formCommand.getEventMsg().first;
+    std::unique_lock<std::shared_mutex> lock(formCommandQueueMapMutex_);
     std::shared_ptr<FormCommandQueue> formCommandQueue;
     if (taskCommandType == TaskCommandType::RENDER_FORM || taskCommandType == TaskCommandType::RECYCLE_FORM) {
         formCommandQueue = GetOrCreateFormStatusQueue(formId, remoteObjectOfHost, FormStatus::RECOVERED);
@@ -143,10 +142,13 @@ void FormStatusQueue::PostFormDeleteTask(FormCommand formCommand, const std::str
     auto ms = formCommand.getMs();
     auto func = formCommand.getFunc();
     HILOG_INFO("PostFormDeleteTask , formId:%{public}" PRId64 ". ", formId);
-    if (compId.empty() ||
-        formCommandQueueMap_.find(formId) == formCommandQueueMap_.end() ||
-        formCommandQueueMap_[formId]->IsCommondQueueEmpty()) {
-        DeleteFormStatusQueue(formId);
+    {
+        std::unique_lock<std::shared_mutex> lock(formCommandQueueMapMutex_);
+        if (compId.empty() ||
+            formCommandQueueMap_.find(formId) == formCommandQueueMap_.end() ||
+            formCommandQueueMap_[formId]->IsCommondQueueEmpty()) {
+            DeleteFormStatusQueue(formId);
+        }
     }
     ScheduleTask(ms, func);
 }
