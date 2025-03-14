@@ -68,7 +68,7 @@ napi_value AttachUIExtensionContext(napi_env env, void *value, void *)
         nullptr, nullptr);
     if (status != napi_ok && workContext != nullptr) {
         TAG_LOGE(AAFwkTag::UI_EXT, "napi_wrap Failed: %{public}d", status);
-        workContext.reset();
+        delete workContext;
         return nullptr;
     }
 
@@ -110,7 +110,7 @@ void JsFormEditExtensionImpl::BindContext()
         TAG_LOGE(AAFwkTag::UI_EXT, "Fail to get context native object");
         return;
     }
-    auto workContext = std::make_shared<FormEditExtensionContext>(context_);
+    auto workContext = new (std::nothrow) std::make_shared<FormEditExtensionContext>(context_);
     if (workContext == nullptr) {
         TAG_LOGE(AAFwkTag::UI_EXT, "workContext is nullptr");
         return;
@@ -129,7 +129,7 @@ void JsFormEditExtensionImpl::BindContext()
         }, nullptr, nullptr);
     if (status != napi_ok && workContext != nullptr) {
         TAG_LOGE(AAFwkTag::UI_EXT, "napi_wrap Failed: %{public}d", status);
-        delete workContext;
+        workContext.reset();
         return;
     }
 }
