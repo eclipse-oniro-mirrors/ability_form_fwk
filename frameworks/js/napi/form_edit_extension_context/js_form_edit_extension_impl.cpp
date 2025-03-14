@@ -110,7 +110,7 @@ void JsFormEditExtensionImpl::BindContext()
         TAG_LOGE(AAFwkTag::UI_EXT, "Fail to get context native object");
         return;
     }
-    auto workContext = new (std::nothrow) std::make_shared<FormEditExtensionContext>(context_);
+    auto workContext = std::make_shared<FormEditExtensionContext>(context_);
     if (workContext == nullptr) {
         TAG_LOGE(AAFwkTag::UI_EXT, "workContext is nullptr");
         return;
