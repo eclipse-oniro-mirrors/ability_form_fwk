@@ -68,7 +68,7 @@ napi_value AttachUIExtensionContext(napi_env env, void *value, void *)
         nullptr, nullptr);
     if (status != napi_ok && workContext != nullptr) {
         TAG_LOGE(AAFwkTag::UI_EXT, "napi_wrap Failed: %{public}d", status);
-        delete workContext;
+        workContext.reset();
         return nullptr;
     }
 
