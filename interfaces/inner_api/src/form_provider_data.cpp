@@ -143,7 +143,7 @@ void FormProviderData::AddImageData(const std::string &picName, const std::share
  */
 void FormProviderData::AddImageData(const std::string &picName, int fd)
 {
-    HILOG_BRIEF("fd is %{public}d", fd);
+    HILOG_BRIEF("fd is %{public}d, picName:%{public}s", fd, picName.c_str());
     if (fd < 0) {
         HILOG_ERROR("invalid fd");
         return;
@@ -576,6 +576,7 @@ bool FormProviderData::WriteImageDataToParcel(Parcel &parcel, const std::string 
         return false;
     }
 
+    HILOG_INFO("write FormAshmem success, picName:%{public}s, size:%{public}d", picName.c_str(), size);
     return true;
 }
 
