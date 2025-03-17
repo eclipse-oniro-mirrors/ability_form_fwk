@@ -919,7 +919,6 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
 
-    
     int32_t userId = FormUtil::GetCurrentAccountId();
     std::map<std::string, std::vector<int64_t>> eventMaps;
     std::map<std::string, std::vector<FormInstance>> formInstanceMaps;
