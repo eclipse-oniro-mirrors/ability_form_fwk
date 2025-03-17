@@ -238,7 +238,8 @@ namespace Constants {
         DIMENSION_6_4,
         DIMENSION_2_3,
         DIMENSION_3_3,
-        DIMENSION_MAX = DIMENSION_3_3
+        DIMENSION_3_4,
+        DIMENSION_MAX = DIMENSION_3_4
     };
 
     enum class Shape : int8_t {
@@ -255,7 +256,8 @@ namespace Constants {
         {Dimension::DIMENSION_1_1, "1*1"},
         {Dimension::DIMENSION_6_4, "6*4"},
         {Dimension::DIMENSION_2_3, "2*3"},
-        {Dimension::DIMENSION_3_3, "3*3"}
+        {Dimension::DIMENSION_3_3, "3*3"},
+        {Dimension::DIMENSION_3_4, "3*4"}
     };
 
     enum class RenderingMode : int8_t {

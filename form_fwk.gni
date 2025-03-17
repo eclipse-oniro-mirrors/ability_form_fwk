@@ -50,6 +50,7 @@ declare_args() {
   form_fwk_form_dimension_2_3 = false
   form_fwk_form_dimension_3_3 = false
   form_fwk_watch_api_disable = false
+  form_fwk_form_dimension_3_4 = false
 }
 
 declare_args() {
