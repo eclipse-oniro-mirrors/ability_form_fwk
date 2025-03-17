@@ -21,7 +21,7 @@ config("FmsFormAshmemTest_config") {
 }
 
 ohos_unittest("FmsFormAshmemTest") {
-  module_out_path = "form_fwk/form_mgr"
+  module_out_path = "form_fwk/form_fwk/form_mgr"
 
   configs = [ "${form_fwk_path}/test:formmgr_test_config" ]
 

@@ -19,7 +19,7 @@ config("form_napi_util_test_config") {
 
 # ohos_unittest is a template that will add gtest as deps.
 ohos_unittest("FmsFormNapiUtilTest") {
-  module_out_path = "form_fwk/form_napi_util"
+  module_out_path = "form_fwk/form_fwk/form_napi_util"
 
   configs = [ ":form_napi_util_test_config" ]
 

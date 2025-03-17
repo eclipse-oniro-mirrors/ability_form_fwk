@@ -14,7 +14,7 @@ import("//build/test.gni")
 import("//foundation/ability/form_fwk/form_fwk.gni")
 
 ohos_unittest("FmsFormMemmgrClientTest") {
-  module_out_path = "form_fwk/form_mgr"
+  module_out_path = "form_fwk/form_fwk/form_mgr"
 
   cflags = [ "-g3" ]
 

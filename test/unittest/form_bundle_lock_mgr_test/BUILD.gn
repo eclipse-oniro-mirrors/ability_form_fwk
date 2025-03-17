@@ -19,7 +19,7 @@ config("Form_Bundle_Lock_config") {
 
 # ohos_unittest is a template that will add gtest as deps.
 ohos_unittest("FormBundleLockTest") {
-  module_out_path = "form_fwk/form_mgr"
+  module_out_path = "form_fwk/form_fwk/form_mgr"
 
   configs = [ ":Form_Bundle_Lock_config" ]
 

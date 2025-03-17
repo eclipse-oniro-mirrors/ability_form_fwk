@@ -21,7 +21,7 @@ config("form_errors_test_config") {
 }
 
 ohos_unittest("FmsFormErrorsTest") {
-  module_out_path = "form_fwk/form_mgr"
+  module_out_path = "form_fwk/form_fwk/form_mgr"
 
   configs = [ ":form_errors_test_config" ]
 

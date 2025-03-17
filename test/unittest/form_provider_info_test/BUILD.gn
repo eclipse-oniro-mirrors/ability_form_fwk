@@ -18,7 +18,7 @@ config("form_provider_info_test_config") {
 }
 
 ohos_unittest("FmsFormProviderInfoTest") {
-  module_out_path = "form_fwk/form_mgr"
+  module_out_path = "form_fwk/form_fwk/form_mgr"
 
   configs = [ ":form_provider_info_test_config" ]
 
