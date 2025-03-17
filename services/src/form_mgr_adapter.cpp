@@ -952,7 +952,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
     
             if (!IN_PROCESS_CALL(iBundleMgr->GetApplicationInfo(formRecord.bundleName,
                 AppExecFwk::ApplicationFlag::GET_BASIC_APPLICATION_INFO, formRecord.providerUserId, info))) {
-                HILOG_ERROR("get ApplicationInfo failed");
+                HILOG_DEBUG("get ApplicationInfo failed %{public}s", formRecord.bundleName);
                 continue;
             }
     
@@ -971,12 +971,12 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
             (formVisibleType == static_cast<int32_t>(FormVisibilityType::VISIBLE)) ? checkFormIds : formIds,
             formInstanceMaps, eventMaps, formVisibleType, Constants::DEFAULT_VISIBLE_NOTIFY_DELAY, callerToken);
     };
-        eventHandler_ = std::make_shared<EventHandler>(EventRunner::Current());
-        if (eventHandler_ == nullptr) {
-            HILOG_ERROR("Create event handler failed");
-            return ERR_APPEXECFWK_FORM_COMMON_CODE;
-        }
-        eventHandler_->PostTask(task, "NotifyWhetherVisibleForms");
+    eventHandler_ = std::make_shared<EventHandler>(EventRunner::Current());
+    if (eventHandler_ == nullptr) {
+        HILOG_ERROR("Create event handler failed");
+        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+    }
+    eventHandler_->PostTask(task, "NotifyWhetherVisibleForms");
     return ERR_OK;
 }
 
