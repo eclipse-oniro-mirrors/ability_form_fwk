@@ -919,55 +919,65 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
 
-    int64_t matchedFormId = 0;
+    
     int32_t userId = FormUtil::GetCurrentAccountId();
     std::map<std::string, std::vector<int64_t>> eventMaps;
     std::map<std::string, std::vector<FormInstance>> formInstanceMaps;
-    std::vector<int64_t> checkFormIds;
 
-    for (int64_t formId : formIds) {
-        if (formId <= 0) {
-            HILOG_WARN("formId %{public}" PRId64 " is less than 0", formId);
-            continue;
+    auto task = [formIds, userId, callerToken, formVisibleType, &formInstanceMaps, &eventMaps, &iBundleMgr]() {
+        int64_t matchedFormId = 0;
+        std::vector<int64_t> checkFormIds;
+        for (int64_t formId : formIds) {
+            if (formId <= 0) {
+                HILOG_WARN("formId %{public}" PRId64 " is less than 0", formId);
+                continue;
+            }
+            matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+            FormRecord formRecord;
+    
+            if (!FormMgrAdapter::GetInstance().isFormShouldUpdateProviderInfoToHost(matchedFormId, userId,
+                callerToken, formRecord)) {
+                continue;
+            }
+            FormMgrAdapter::GetInstance().SetVisibleChange(matchedFormId, formVisibleType);
+            FormMgrAdapter::GetInstance().PaddingNotifyVisibleFormsMap(formVisibleType, formId, formInstanceMaps);
+            checkFormIds.push_back(formId);
+            // Update info to host and check if the form was created by the system application.
+            if ((!FormMgrAdapter::GetInstance().UpdateProviderInfoToHost(matchedFormId, userId, callerToken,
+                formVisibleType, formRecord)) || (!formRecord.isSystemApp)) {
+                continue;
+            }
+    
+            // Check the value of formVisibleNotify.
+            AppExecFwk::ApplicationInfo info;
+    
+            if (!IN_PROCESS_CALL(iBundleMgr->GetApplicationInfo(formRecord.bundleName,
+                AppExecFwk::ApplicationFlag::GET_BASIC_APPLICATION_INFO, formRecord.providerUserId, info))) {
+                HILOG_ERROR("get ApplicationInfo failed");
+                continue;
+            }
+    
+            if (!info.formVisibleNotify) {
+                HILOG_DEBUG("the value of formVisibleNotify is false");
+                continue;
+            }
+    
+            // Create eventMaps
+            if (!FormMgrAdapter::GetInstance().CreateHandleEventMap(matchedFormId, formRecord, eventMaps)) {
+                continue;
+            }
         }
-        matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
-        FormRecord formRecord;
-
-        if (!isFormShouldUpdateProviderInfoToHost(matchedFormId, userId, callerToken, formRecord)) {
-            continue;
+    
+        FormTaskMgr::GetInstance().PostVisibleNotify(
+            (formVisibleType == static_cast<int32_t>(FormVisibilityType::VISIBLE)) ? checkFormIds : formIds,
+            formInstanceMaps, eventMaps, formVisibleType, Constants::DEFAULT_VISIBLE_NOTIFY_DELAY, callerToken);
+    };
+        eventHandler_ = std::make_shared<EventHandler>(EventRunner::Current());
+        if (eventHandler_ == nullptr) {
+            HILOG_ERROR("Create event handler failed");
+            return ERR_APPEXECFWK_FORM_COMMON_CODE;
         }
-        SetVisibleChange(matchedFormId, formVisibleType);
-        PaddingNotifyVisibleFormsMap(formVisibleType, formId, formInstanceMaps);
-        checkFormIds.push_back(formId);
-        // Update info to host and check if the form was created by the system application.
-        if ((!UpdateProviderInfoToHost(matchedFormId, userId, callerToken, formVisibleType, formRecord)) ||
-            (!formRecord.isSystemApp)) {
-            continue;
-        }
-
-        // Check the value of formVisibleNotify.
-        AppExecFwk::ApplicationInfo info;
-
-        if (!IN_PROCESS_CALL(iBundleMgr->GetApplicationInfo(formRecord.bundleName,
-            AppExecFwk::ApplicationFlag::GET_BASIC_APPLICATION_INFO, formRecord.providerUserId, info))) {
-            HILOG_ERROR("get ApplicationInfo failed");
-            return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
-        }
-
-        if (!info.formVisibleNotify) {
-            HILOG_DEBUG("the value of formVisibleNotify is false");
-            continue;
-        }
-
-        // Create eventMaps
-        if (!CreateHandleEventMap(matchedFormId, formRecord, eventMaps)) {
-            continue;
-        }
-    }
-
-    FormTaskMgr::GetInstance().PostVisibleNotify(
-        (formVisibleType == static_cast<int32_t>(FormVisibilityType::VISIBLE)) ? checkFormIds : formIds,
-        formInstanceMaps, eventMaps, formVisibleType, visibleNotifyDelay_, callerToken);
+        eventHandler_->PostTask(task, "NotifyWhetherVisibleForms");
     return ERR_OK;
 }
 
