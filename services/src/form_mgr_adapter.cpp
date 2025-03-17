@@ -952,7 +952,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
     
             if (!IN_PROCESS_CALL(iBundleMgr->GetApplicationInfo(formRecord.bundleName,
                 AppExecFwk::ApplicationFlag::GET_BASIC_APPLICATION_INFO, formRecord.providerUserId, info))) {
-                HILOG_DEBUG("get ApplicationInfo failed %{public}s", formRecord.bundleName);
+                HILOG_DEBUG("get ApplicationInfo failed %{public}s", formRecord.bundleName.c_str());
                 continue;
             }
     
