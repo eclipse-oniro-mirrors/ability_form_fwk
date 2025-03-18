@@ -21,7 +21,7 @@ config("form_publish_interceptor_proxy_test_config") {
 }
 
 ohos_unittest("FmsFormPublishInterceptorProxyTest") {
-  module_out_path = "form_fwk/form_mgr_service"
+  module_out_path = "form_fwk/form_fwk/form_mgr_service"
 
   configs = [ ":form_publish_interceptor_proxy_test_config" ]
 

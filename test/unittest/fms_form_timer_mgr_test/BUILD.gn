@@ -14,7 +14,7 @@
 import("//build/test.gni")
 import("//foundation/ability/form_fwk/form_fwk.gni")
 
-module_output_path = "form_fwk/form_mgr_service"
+module_output_path = "form_fwk/form_fwk/form_mgr_service"
 
 ohos_unittest("FmsFormTimerMgrTest") {
   module_out_path = module_output_path
