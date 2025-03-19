@@ -302,7 +302,7 @@ bool FormProviderData::ReadFromParcel(Parcel &parcel)
             HILOG_INFO("rawData is nullptr");
             return false;
         }
-        jsonDataString = static_cast<const char*>(rawData);
+        jsonDataString = std::string(static_cast<const char*>(rawData), formDataLength);
         free(rawData);
         rawData = nullptr;
     } else {
