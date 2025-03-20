@@ -617,7 +617,7 @@ void FormTaskMgr::HostDied(const sptr<IRemoteObject> &remoteHost)
  * @param want The want of the request.
  * @param remoteObject Form provider proxy object.
  */
-void FormTaskMgr::ProviderBatchDelete(std::set<int64_t> &formIds, const Want &want,
+void FormTaskMgr::ProviderBatchDelete(std::set<int64_t> formIds, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_INFO("start");
