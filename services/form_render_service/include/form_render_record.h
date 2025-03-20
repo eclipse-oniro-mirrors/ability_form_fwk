@@ -122,6 +122,8 @@ public:
 
     bool IsEmpty();
 
+    bool HasRenderFormTask();
+
     void UpdateConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration>& config,
         const sptr<IFormSupply> &formSupplyClient);
 
@@ -269,6 +271,8 @@ private:
     void MergeMap(std::map<std::string, sptr<FormAshmem>> &dst,
         const std::map<std::string, sptr<FormAshmem>> &src);
 
+    void MarkRenderFormTaskDone(int32_t renderType);
+
     pid_t jsThreadId_ = 0;
     pid_t processId_ = 0;
 
@@ -305,6 +309,7 @@ private:
     std::shared_ptr<ThreadState> threadState_;
     std::mutex formSupplyMutex_;
     sptr<IFormSupply> formSupplyClient_;
+    std::atomic<int> renderFormTasksNum = 0;
 };
 }  // namespace FormRender
 }  // namespace AppExecFwk
