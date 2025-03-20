@@ -252,7 +252,7 @@ void FormTaskMgr::PostProviderBatchDeleteTask(std::set<int64_t> &formIds, const 
         HILOG_ERROR("null serialQueue_");
         return;
     }
-    auto batchDeleteFunc = [&formIds, want, remoteObject]() {
+    auto batchDeleteFunc = [formIds, want, remoteObject]() {
         FormTaskMgr::GetInstance().ProviderBatchDelete(formIds, want, remoteObject);
     };
     serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, batchDeleteFunc);
