@@ -252,7 +252,7 @@ void FormTaskMgr::PostProviderBatchDeleteTask(std::set<int64_t> &formIds, const 
         HILOG_ERROR("null serialQueue_");
         return;
     }
-    auto batchDeleteFunc = [&formIds, want, remoteObject]() {
+    auto batchDeleteFunc = [formIds, want, remoteObject]() {
         FormTaskMgr::GetInstance().ProviderBatchDelete(formIds, want, remoteObject);
     };
     serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, batchDeleteFunc);
@@ -617,7 +617,7 @@ void FormTaskMgr::HostDied(const sptr<IRemoteObject> &remoteHost)
  * @param want The want of the request.
  * @param remoteObject Form provider proxy object.
  */
-void FormTaskMgr::ProviderBatchDelete(std::set<int64_t> &formIds, const Want &want,
+void FormTaskMgr::ProviderBatchDelete(std::set<int64_t> formIds, const Want &want,
     const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_INFO("start");

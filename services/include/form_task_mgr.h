@@ -436,7 +436,7 @@ private:
      * @param want The want of the request.
      * @param remoteObject Form provider proxy object.
      */
-    void ProviderBatchDelete(std::set<int64_t> &formIds, const Want &want, const sptr<IRemoteObject> &remoteObject);
+    void ProviderBatchDelete(std::set<int64_t> formIds, const Want &want, const sptr<IRemoteObject> &remoteObject);
     /**
      * @brief Fire message event to form provider.
      * @param formId The Id of the from.
