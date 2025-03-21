@@ -920,7 +920,6 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
     }
 
     int32_t userId = FormUtil::GetCurrentAccountId();
-    std::map<std::string, std::vector<int64_t>> eventMaps;
     std::map<std::string, std::vector<FormInstance>> formInstanceMaps;
 
     auto task = [formIds, userId, callerToken, formVisibleType, &formInstanceMaps, &eventMaps, &iBundleMgr]() {
@@ -946,30 +945,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
                 formVisibleType, formRecord)) || (!formRecord.isSystemApp)) {
                 continue;
             }
-    
-            // Check the value of formVisibleNotify.
-            AppExecFwk::ApplicationInfo info;
-    
-            if (!IN_PROCESS_CALL(iBundleMgr->GetApplicationInfo(formRecord.bundleName,
-                AppExecFwk::ApplicationFlag::GET_BASIC_APPLICATION_INFO, formRecord.providerUserId, info))) {
-                HILOG_DEBUG("get ApplicationInfo failed %{public}s", formRecord.bundleName.c_str());
-                continue;
-            }
-    
-            if (!info.formVisibleNotify) {
-                HILOG_DEBUG("the value of formVisibleNotify is false");
-                continue;
-            }
-    
-            // Create eventMaps
-            if (!FormMgrAdapter::GetInstance().CreateHandleEventMap(matchedFormId, formRecord, eventMaps)) {
-                continue;
-            }
         }
-    
-        FormTaskMgr::GetInstance().PostVisibleNotify(
-            (formVisibleType == static_cast<int32_t>(FormVisibilityType::VISIBLE)) ? checkFormIds : formIds,
-            formInstanceMaps, eventMaps, formVisibleType, Constants::DEFAULT_VISIBLE_NOTIFY_DELAY, callerToken);
     };
     eventHandler_ = std::make_shared<EventHandler>(EventRunner::Current());
     if (eventHandler_ == nullptr) {
