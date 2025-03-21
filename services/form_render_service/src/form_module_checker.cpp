@@ -52,7 +52,8 @@ const std::vector<std::string> MODULE_ALLOW_WITH_API_LIST = {
     "font",
     "multimedia.image",
     "deviceInfo",
-    "window"
+    "window",
+    "process"
 };
 const std::vector<std::string> API_ALLOW_LIST = {
     "i18n.System.getSystemLanguage",
@@ -97,7 +98,9 @@ const std::vector<std::string> API_ALLOW_LIST = {
     "window.ModalityType.*",
     "window._napiwrapper.*",
     "window.getTopWindow.*",
-    "window.getLastWindow.*"
+    "window.getLastWindow.*",
+    "process.pid",
+    "process.tid"
 };
 } // namespace
 
