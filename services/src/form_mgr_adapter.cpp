@@ -932,12 +932,12 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
         matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
         FormRecord formRecord;
 
-        if (!sFormShouldUpdateProviderInfoToHost(matchedFormId, userId, callerToken, formRecord)) {
+        if (!isFormShouldUpdateProviderInfoToHost(matchedFormId, userId, callerToken, formRecord)) {
             continue;
         }
         SetVisibleChange(matchedFormId, formVisibleType);
-        FPaddingNotifyVisibleFormsMap(formVisibleType, formId, formInstanceMaps);
-        checkFormIds.push_back(formId);ß
+        PaddingNotifyVisibleFormsMap(formVisibleType, formId, formInstanceMaps);
+        checkFormIds.push_back(formId);
         // Update info to host and check if the form was created by the system application.
         if ((!UpdateProviderInfoToHost(matchedFormId, userId, callerToken, formVisibleType, formRecord)) ||
             (!formRecord.isSystemApp)) {
