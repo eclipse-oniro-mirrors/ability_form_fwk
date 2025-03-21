@@ -919,40 +919,31 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
         return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
     }
 
+    int64_t matchedFormId = 0;
     int32_t userId = FormUtil::GetCurrentAccountId();
     std::map<std::string, std::vector<FormInstance>> formInstanceMaps;
+    std::vector<int64_t> checkFormIds;
 
-    auto task = [formIds, userId, callerToken, formVisibleType, &formInstanceMaps, &iBundleMgr]() {
-        int64_t matchedFormId = 0;
-        std::vector<int64_t> checkFormIds;
-        for (int64_t formId : formIds) {
-            if (formId <= 0) {
-                HILOG_WARN("formId %{public}" PRId64 " is less than 0", formId);
-                continue;
-            }
-            matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
-            FormRecord formRecord;
-    
-            if (!FormMgrAdapter::GetInstance().isFormShouldUpdateProviderInfoToHost(matchedFormId, userId,
-                callerToken, formRecord)) {
-                continue;
-            }
-            FormMgrAdapter::GetInstance().SetVisibleChange(matchedFormId, formVisibleType);
-            FormMgrAdapter::GetInstance().PaddingNotifyVisibleFormsMap(formVisibleType, formId, formInstanceMaps);
-            checkFormIds.push_back(formId);
-            // Update info to host and check if the form was created by the system application.
-            if ((!FormMgrAdapter::GetInstance().UpdateProviderInfoToHost(matchedFormId, userId, callerToken,
-                formVisibleType, formRecord)) || (!formRecord.isSystemApp)) {
-                continue;
-            }
+    for (int64_t formId : formIds) {
+        if (formId <= 0) {
+            HILOG_WARN("formId %{public}" PRId64 " is less than 0", formId);
+            continue;
         }
-    };
-    eventHandler_ = std::make_shared<EventHandler>(EventRunner::Current());
-    if (eventHandler_ == nullptr) {
-        HILOG_ERROR("Create event handler failed");
-        return ERR_APPEXECFWK_FORM_COMMON_CODE;
+        matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
+        FormRecord formRecord;
+
+        if (!sFormShouldUpdateProviderInfoToHost(matchedFormId, userId, callerToken, formRecord)) {
+            continue;
+        }
+        SetVisibleChange(matchedFormId, formVisibleType);
+        FPaddingNotifyVisibleFormsMap(formVisibleType, formId, formInstanceMaps);
+        checkFormIds.push_back(formId);ß
+        // Update info to host and check if the form was created by the system application.
+        if ((!UpdateProviderInfoToHost(matchedFormId, userId, callerToken, formVisibleType, formRecord)) ||
+            (!formRecord.isSystemApp)) {
+            continue;
+        }
     }
-    eventHandler_->PostTask(task, "NotifyWhetherVisibleForms");
     return ERR_OK;
 }
 
