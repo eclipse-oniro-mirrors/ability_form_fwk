@@ -922,7 +922,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
     int32_t userId = FormUtil::GetCurrentAccountId();
     std::map<std::string, std::vector<FormInstance>> formInstanceMaps;
 
-    auto task = [formIds, userId, callerToken, formVisibleType, &formInstanceMaps, &eventMaps, &iBundleMgr]() {
+    auto task = [formIds, userId, callerToken, formVisibleType, &formInstanceMaps, &iBundleMgr]() {
         int64_t matchedFormId = 0;
         std::vector<int64_t> checkFormIds;
         for (int64_t formId : formIds) {
