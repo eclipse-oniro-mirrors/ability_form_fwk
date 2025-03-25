@@ -46,7 +46,7 @@ public:
     ErrCode UpdateRenderingForm(int64_t formId, const FormProviderData &formProviderData,
         const WantParams &wantParams, bool mergeData);
 
-    void OnScreenUnlock();
+    void OnScreenUnlock(int32_t userId);
 
     void OnUnlock(int32_t userId);
 
@@ -65,7 +65,7 @@ public:
 
     void GetFormRenderState();
 
-    bool GetIsVerified() const;
+    bool GetIsSecondMounted() const;
 
     ErrCode AddConnection(int64_t formId, sptr<FormRenderConnection> connection, const FormRecord &formRecord);
 
@@ -140,6 +140,7 @@ private:
     std::unordered_map<int32_t, std::shared_ptr<FormSandboxRenderMgrInner>> sandboxInners_;
     bool isScreenUnlocked_ = false;
     bool isVerified_ = false;
+    bool isSecondMounted_ = false;
 };
 } // namespace AppExecFwk
 } // namespace OHOS

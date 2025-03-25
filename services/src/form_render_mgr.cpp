@@ -54,8 +54,8 @@ void FormRenderMgr::GetFormRenderState()
     bool isVerified = false;
     int32_t userId = FormUtil::GetCurrentAccountId();
     AccountSA::OsAccountManager::IsOsAccountVerified(userId, isVerified);
-    HILOG_INFO("isVerified:%{public}d, isVerified_:%{public}d, screen:%{public}d, userId:%{public}d",
-        isVerified, isVerified_, isScreenUnlocked_, userId);
+    HILOG_INFO("isVerified:%{public}d,isVerified_:%{public}d,mounted:%{public}d,screen:%{public}d,userId:%{public}d",
+        isVerified, isVerified_, isSecondMounted_, isScreenUnlocked_, userId);
 
     std::lock_guard<std::mutex> lock(isVerifiedMutex_);
     if (isVerified_ == isVerified) {
@@ -69,14 +69,16 @@ void FormRenderMgr::GetFormRenderState()
     if (!isScreenUnlocked_) {
         PostOnUnlockTask();
     }
-    ExecAcquireProviderTask(userId);
+    if (isSecondMounted_) {
+        ExecAcquireProviderTask(userId);
+    }
 }
 
-bool FormRenderMgr::GetIsVerified() const
+bool FormRenderMgr::GetIsSecondMounted() const
 {
-    HILOG_DEBUG("GetIsVerified");
+    HILOG_DEBUG("GetIsSecondMounted");
     std::lock_guard<std::mutex> lock(isVerifiedMutex_);
-    return isVerified_;
+    return isSecondMounted_;
 }
 
 ErrCode FormRenderMgr::RenderForm(
@@ -353,15 +355,23 @@ void FormRenderMgr::NotifyScreenOn()
     }
 }
 
-void FormRenderMgr::OnScreenUnlock()
+void FormRenderMgr::OnScreenUnlock(int32_t userId)
 {
-    HILOG_INFO("call. %{public}d,%{public}d", isVerified_, isScreenUnlocked_);
+    // Check whether the account is authenticated.
+    bool isVerified = false;
+    AccountSA::OsAccountManager::IsOsAccountVerified(userId, isVerified);
+    HILOG_INFO("isVerified_:%{public}d, screenUnlocked:%{public}d, isVerified:%{public}d, userId:%{public}d",
+        isVerified_, isScreenUnlocked_, isVerified, userId);
+    std::lock_guard<std::mutex> lock(isVerifiedMutex_);
+    if (isVerified && !isSecondMounted_) {
+        isSecondMounted_ = true;
+    }
+    
     if (isScreenUnlocked_) {
         return;
     }
     
     // el2 path maybe not unlocked, should not acquire data
-    std::lock_guard<std::mutex> lock(isVerifiedMutex_);
     isScreenUnlocked_ = true;
     if (!isVerified_) {
         PostOnUnlockTask();
@@ -370,14 +380,15 @@ void FormRenderMgr::OnScreenUnlock()
 
 void FormRenderMgr::OnUnlock(int32_t userId)
 {
-    HILOG_INFO("call. %{public}d,%{public}d,%{public}d", isVerified_, isScreenUnlocked_, userId);
-    if (isVerified_) {
+    HILOG_INFO("call. %{public}d,%{public}d,%{public}d,%{public}d",
+        isVerified_, isSecondMounted_, isScreenUnlocked_, userId);
+    if (isSecondMounted_) {
         return;
     }
     
     {
         std::lock_guard<std::mutex> lock(isVerifiedMutex_);
-        isVerified_ = true;
+        isSecondMounted_ = true;
         if (!isScreenUnlocked_) {
             PostOnUnlockTask();
         }

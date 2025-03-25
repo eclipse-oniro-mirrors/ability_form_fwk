@@ -75,15 +75,15 @@ void FormSysEventReceiver::HandlePackageDataCleared(std::string &bundleName, int
     serialQueue_->ScheduleTask(0, task);
 }
 
-void FormSysEventReceiver::HandleScreenUnlocked()
+void FormSysEventReceiver::HandleScreenUnlocked(int32_t userId)
 {
     if (!serialQueue_) {
         HILOG_ERROR("null serialQueue");
         return;
     }
 
-    auto task = []() {
-        FormRenderMgr::GetInstance().OnScreenUnlock();
+    auto task = [userId]() {
+        FormRenderMgr::GetInstance().OnScreenUnlock(userId);
     };
     serialQueue_->ScheduleTask(0, task);
 }
@@ -148,8 +148,9 @@ void FormSysEventReceiver::OnReceiveEvent(const EventFwk::CommonEventData &event
         int userId = want.GetIntParam(KEY_USER_ID, Constants::DEFAULT_USERID);
         HandlePackageDataCleared(bundleName, userId);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED) {
+        int userId = want.GetIntParam(KEY_USER_ID, Constants::DEFAULT_USERID);
         // el2 path maybe not unlocked
-        HandleScreenUnlocked();
+        HandleScreenUnlocked(userId);
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SECOND_MOUNTED) {
         // el2 path is unlocked when receive SECOND_MOUNTED
         int userId = want.GetIntParam(KEY_USER_ID, Constants::DEFAULT_USERID);
