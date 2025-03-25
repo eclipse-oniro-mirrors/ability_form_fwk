@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#include "form_status_mgr.h"
-#include "form_status_queue.h"
+#include "status_mgr_center/form_status_mgr.h"
+#include "status_mgr_center/form_status_queue.h"
 #include "fms_log_wrapper.h"
 
 namespace OHOS {

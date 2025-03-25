@@ -18,8 +18,8 @@
 #include <cstddef>
 #include <cstdint>
 
-#include "form_free_install_operator.h"
-#include "form_host_callback.h"
+#include "feature/form_share/form_free_install_operator.h"
+#include "form_host/form_host_callback.h"
 #include "securec.h"
 
 using namespace OHOS::AppExecFwk;

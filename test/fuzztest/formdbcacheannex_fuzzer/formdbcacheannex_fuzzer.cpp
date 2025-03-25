@@ -20,7 +20,7 @@
 
 #define private public
 #define protected public
-#include "form_db_cache.h"
+#include "data_center/database/form_db_cache.h"
 #undef private
 #undef protected
 #include "securec.h"

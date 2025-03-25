@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 #include <gtest/gtest.h>
-#include "form_bundle_lock_mgr.h"
+#include "feature/bundle_lock/form_bundle_lock_mgr.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -87,4 +87,4 @@ HWTEST_F(FormBundleLockMgrTest, formBundleLockMgr_004, TestSize.Level1)
     EXPECT_EQ(forbid, true);
     formBundleLockMgr.SetBundleProtectStatus(BUNDLE_NAME, false);
 }
-} // namespace
+} // namespace

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "form_ability_connection.h"
+#include "common/connection/form_ability_connection.h"
 
 namespace OHOS {
 namespace AppExecFwk {

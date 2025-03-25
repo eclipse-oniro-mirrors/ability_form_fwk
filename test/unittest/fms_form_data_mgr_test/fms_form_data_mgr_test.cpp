@@ -20,13 +20,13 @@
 
 #include "appexecfwk_errors.h"
 #define private public
-#include "form_db_cache.h"
-#include "form_data_mgr.h"
+#include "data_center/database/form_db_cache.h"
+#include "data_center/form_data_mgr.h"
 #undef private
 #include "form_constants.h"
 #include "form_mgr_errors.h"
-#include "form_record.h"
-#include "form_util.h"
+#include "data_center/form_record/form_record.h"
+#include "common/util/form_util.h"
 #include "fms_log_wrapper.h"
 #include "ipc_skeleton.h"
 #include "mock_form_host_client.h"

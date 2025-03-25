@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "form_event_report.h"
+#include "common/event/form_event_report.h"
 
 #include <map>
 

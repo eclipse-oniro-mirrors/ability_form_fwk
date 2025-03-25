@@ -13,14 +13,14 @@
  * limitations under the License.
  */
 
-#include "form_info_rdb_storage_mgr.h"
+#include "data_center/form_info/form_info_rdb_storage_mgr.h"
 
 #include <cinttypes>
 #include <thread>
 #include <unistd.h>
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
-#include "form_event_report.h"
+#include "common/event/form_event_report.h"
 
 namespace OHOS {
 namespace AppExecFwk {

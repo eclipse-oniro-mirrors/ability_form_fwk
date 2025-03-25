@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 
-#include "form_db_cache.h"
+#include "data_center/database/form_db_cache.h"
 
 #include "form_mgr_errors.h"
-#include "form_util.h"
+#include "common/util/form_util.h"
 #include "ipc_skeleton.h"
 
 namespace {

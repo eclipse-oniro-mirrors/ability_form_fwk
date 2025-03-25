@@ -18,10 +18,10 @@
 #include <cstddef>
 #include <cstdint>
 
-#include "form_item_info.h"
+#include "data_center/form_info/form_item_info.h"
 #define private public
 #define protected public
-#include "form_provider_mgr.h"
+#include "form_provider/form_provider_mgr.h"
 #undef private
 #undef protected
 #include "securec.h"

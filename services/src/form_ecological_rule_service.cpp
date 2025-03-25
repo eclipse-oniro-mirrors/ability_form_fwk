@@ -16,7 +16,7 @@
 #include <cinttypes>
 #include <chrono>
 
-#include "form_ecological_rule_service.h"
+#include "feature/ecological_rule/form_ecological_rule_service.h"
 #include "fms_log_wrapper.h"
 #include "iremote_broker.h"
 #include "iservice_registry.h"

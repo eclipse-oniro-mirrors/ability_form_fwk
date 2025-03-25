@@ -18,7 +18,7 @@
 #include <cstddef>
 #include <cstdint>
 
-#include "form_mgr_service.h"
+#include "form_mgr/form_mgr_service.h"
 #include "message_parcel.h"
 #include "securec.h"
 

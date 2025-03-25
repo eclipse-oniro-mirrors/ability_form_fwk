@@ -13,23 +13,23 @@
  * limitations under the License.
  */
 
-#include "form_sys_event_receiver.h"
+#include "common/event/system_event/form_sys_event_receiver.h"
 
 #include <cinttypes>
 
 #include "common_event_support.h"
 #include "fms_log_wrapper.h"
-#include "form_bms_helper.h"
+#include "bms_mgr/form_bms_helper.h"
 #include "form_constants.h"
-#include "form_data_mgr.h"
-#include "form_db_cache.h"
-#include "form_info_mgr.h"
+#include "data_center/form_data_mgr.h"
+#include "data_center/database/form_db_cache.h"
+#include "data_center/form_info/form_info_mgr.h"
 #include "form_mgr_errors.h"
-#include "form_mgr_adapter.h"
-#include "form_render_mgr.h"
-#include "form_serial_queue.h"
-#include "form_timer_mgr.h"
-#include "form_util.h"
+#include "form_mgr/form_mgr_adapter.h"
+#include "form_render/form_render_mgr.h"
+#include "status_mgr_center/form_serial_queue.h"
+#include "common/timer_mgr/form_timer_mgr.h"
+#include "common/util/form_util.h"
 #include "in_process_call_wrapper.h"
 #include "want.h"
 

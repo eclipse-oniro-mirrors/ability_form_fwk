@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#include "form_record_report.h"
+#include "data_center/form_record/form_record_report.h"
 #include "fms_log_wrapper.h"
-#include "form_event_report.h"
+#include "common/event/form_event_report.h"
 
 namespace OHOS {
 namespace AppExecFwk {

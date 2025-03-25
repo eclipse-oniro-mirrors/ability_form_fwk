@@ -20,7 +20,7 @@
 
 #define private public
 #define protected public
-#include "form_mgr_adapter.h"
+#include "form_mgr/form_mgr_adapter.h"
 #undef private
 #undef protected
 #include "securec.h"

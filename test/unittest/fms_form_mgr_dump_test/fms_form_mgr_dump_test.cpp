@@ -15,11 +15,11 @@
 
 #include <gtest/gtest.h>
 
-#include "form_ams_helper.h"
-#include "form_bms_helper.h"
+#include "ams_mgr/form_ams_helper.h"
+#include "bms_mgr/form_bms_helper.h"
 #define private public
-#include "form_dump_mgr.h"
-#include "form_mgr_service.h"
+#include "common/util/form_dump_mgr.h"
+#include "form_mgr/form_mgr_service.h"
 #undef private
 #include "if_system_ability_manager.h"
 #include "mock_ability_manager.h"

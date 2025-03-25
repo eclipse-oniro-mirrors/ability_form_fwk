@@ -13,15 +13,15 @@
  * limitations under the License.
  */
 
-#include "form_acquire_data_connection.h"
+#include "form_provider/connection/form_acquire_data_connection.h"
 
 #include <cinttypes>
 
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
-#include "form_supply_callback.h"
-#include "form_task_mgr.h"
-#include "form_util.h"
+#include "form_provider/form_supply_callback.h"
+#include "status_mgr_center/form_task_mgr.h"
+#include "common/util/form_util.h"
 #include "want.h"
 
 namespace OHOS {

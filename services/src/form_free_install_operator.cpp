@@ -13,14 +13,14 @@
  * limitations under the License.
  */
 
-#include "form_free_install_operator.h"
+#include "feature/form_share/form_free_install_operator.h"
 
 #include "fms_log_wrapper.h"
-#include "form_bms_helper.h"
+#include "bms_mgr/form_bms_helper.h"
 #include "form_mgr_errors.h"
-#include "form_serial_queue.h"
-#include "form_share_mgr.h"
-#include "form_util.h"
+#include "status_mgr_center/form_serial_queue.h"
+#include "feature/form_share/form_share_mgr.h"
+#include "common/util/form_util.h"
 
 namespace OHOS {
 namespace AppExecFwk {

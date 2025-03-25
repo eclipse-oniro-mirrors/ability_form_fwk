@@ -20,7 +20,7 @@
 
 #define private public
 #define protected public
-#include "form_ability_connection_reporter.h"
+#include "common/connection/form_ability_connection_reporter.h"
 #undef private
 #undef protected
 #include "message_parcel.h"

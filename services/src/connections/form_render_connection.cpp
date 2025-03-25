@@ -13,19 +13,19 @@
  * limitations under the License.
  */
 
-#include "form_render_connection.h"
+#include "form_render/form_render_connection.h"
 
 #include <cinttypes>
 
 #include "fms_log_wrapper.h"
-#include "form_bms_helper.h"
-#include "form_cache_mgr.h"
+#include "bms_mgr/form_bms_helper.h"
+#include "data_center/form_cache_mgr.h"
 #include "form_constants.h"
 #include "form_mgr_errors.h"
-#include "form_supply_callback.h"
-#include "form_render_mgr.h"
-#include "form_task_mgr.h"
-#include "form_util.h"
+#include "form_provider/form_supply_callback.h"
+#include "form_render/form_render_mgr.h"
+#include "status_mgr_center/form_task_mgr.h"
+#include "common/util/form_util.h"
 #include "ipc_skeleton.h"
 #include "want.h"
 

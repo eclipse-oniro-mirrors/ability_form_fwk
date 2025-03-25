@@ -15,7 +15,7 @@
 
 #include <gtest/gtest.h>
 
-#include "form_util.h"
+#include "common/util/form_util.h"
 #include "bundle_constants.h"
 #include "form_mgr_errors.h"
 #include "fms_log_wrapper.h"

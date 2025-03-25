@@ -15,7 +15,7 @@
 
 #include <gtest/gtest.h>
 
-#include "form_info_rdb_storage_mgr.h"
+#include "data_center/form_info/form_info_rdb_storage_mgr.h"
 #include "form_mgr_errors.h"
 
 using namespace testing::ext;

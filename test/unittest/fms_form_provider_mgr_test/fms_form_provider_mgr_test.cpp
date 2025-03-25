@@ -16,18 +16,18 @@
 #include <gtest/gtest.h>
 
 #include "accesstoken_kit.h"
-#include "form_ams_helper.h"
-#include "form_bms_helper.h"
+#include "ams_mgr/form_ams_helper.h"
+#include "bms_mgr/form_bms_helper.h"
 #define private public
-#include "form_data_mgr.h"
-#include "form_db_cache.h"
-#include "form_refresh_limiter.h"
-#include "form_util.h"
+#include "data_center/form_data_mgr.h"
+#include "data_center/database/form_db_cache.h"
+#include "common/timer_mgr/form_refresh_limiter.h"
+#include "common/util/form_util.h"
 #include "form_host_interface.h"
 #undef private
 #include "form_mgr_errors.h"
-#include "form_mgr_service.h"
-#include "form_provider_mgr.h"
+#include "form_mgr/form_mgr_service.h"
+#include "form_provider/form_provider_mgr.h"
 #include "if_system_ability_manager.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"

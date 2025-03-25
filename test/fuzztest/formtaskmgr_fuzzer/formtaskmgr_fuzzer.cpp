@@ -20,8 +20,8 @@
 
 #define private public
 #define protected public
-#include "form_distributed_client.h"
-#include "form_task_mgr.h"
+#include "feature/form_share/form_distributed_client.h"
+#include "status_mgr_center/form_task_mgr.h"
 #undef private
 #undef protected
 #include "securec.h"

@@ -25,11 +25,11 @@
 #include "form_constants.h"
 #define private public
 #include "form_host_delegate_stub.h"
-#include "form_item_info.h"
+#include "data_center/form_info/form_item_info.h"
 #undef private
 #include "form_mgr_errors.h"
-#include "form_record.h"
-#include "form_util.h"
+#include "data_center/form_record/form_record.h"
+#include "common/util/form_util.h"
 #include "fms_log_wrapper.h"
 #include "ipc_skeleton.h"
 

@@ -13,32 +13,32 @@
  * limitations under the License.
  */
 
-#include "form_data_mgr.h"
+#include "data_center/form_data_mgr.h"
 
 #include <cinttypes>
 #include <type_traits>
 
 #include "fms_log_wrapper.h"
-#include "form_bms_helper.h"
-#include "form_bundle_forbid_mgr.h"
-#include "form_cache_mgr.h"
+#include "bms_mgr/form_bms_helper.h"
+#include "feature/bundle_forbidden/form_bundle_forbid_mgr.h"
+#include "data_center/form_cache_mgr.h"
 #include "form_constants.h"
-#include "form_data_proxy_mgr.h"
-#include "form_db_cache.h"
+#include "data_center/form_data_proxy_mgr.h"
+#include "data_center/database/form_db_cache.h"
 #include "form_mgr_errors.h"
-#include "form_observer_record.h"
-#include "form_provider_mgr.h"
-#include "form_record.h"
-#include "form_render_mgr.h"
-#include "form_task_mgr.h"
-#include "form_trust_mgr.h"
-#include "form_util.h"
+#include "form_observer/form_observer_record.h"
+#include "form_provider/form_provider_mgr.h"
+#include "data_center/form_record/form_record.h"
+#include "form_render/form_render_mgr.h"
+#include "status_mgr_center/form_task_mgr.h"
+#include "common/util/form_trust_mgr.h"
+#include "common/util/form_util.h"
 #include "form_xml_parser.h"
 #include "ipc_skeleton.h"
 #include "js_form_state_observer_interface.h"
 #include "running_form_info.h"
-#include "form_record_report.h"
-#include "form_event_report.h"
+#include "data_center/form_record/form_record_report.h"
+#include "common/event/form_event_report.h"
 
 namespace OHOS {
 namespace AppExecFwk {

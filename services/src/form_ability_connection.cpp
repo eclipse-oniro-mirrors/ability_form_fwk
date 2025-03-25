@@ -14,26 +14,26 @@
  * limitations under the License.
  */
 
-#include "form_ability_connection.h"
+#include "common/connection/form_ability_connection.h"
 
 #include <cinttypes>
 
 #include "fms_log_wrapper.h"
-#include "form_ams_helper.h"
-#include "form_bms_helper.h"
-#include "form_data_mgr.h"
-#include "form_db_cache.h"
-#include "form_event_report.h"
+#include "ams_mgr/form_ams_helper.h"
+#include "bms_mgr/form_bms_helper.h"
+#include "data_center/form_data_mgr.h"
+#include "data_center/database/form_db_cache.h"
+#include "common/event/form_event_report.h"
 #include "form_info.h"
-#include "form_info_mgr.h"
-#include "form_supply_callback.h"
-#include "form_timer_mgr.h"
-#include "form_util.h"
+#include "data_center/form_info/form_info_mgr.h"
+#include "form_provider/form_supply_callback.h"
+#include "common/timer_mgr/form_timer_mgr.h"
+#include "common/util/form_util.h"
 #include "iremote_proxy.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 #include "want.h"
-#include "form_report.h"
+#include "common/util/form_report.h"
 
 namespace OHOS {
 namespace AppExecFwk {

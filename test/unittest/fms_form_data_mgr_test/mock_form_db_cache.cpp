@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
-#include "form_db_cache.h"
+#include "data_center/database/form_db_cache.h"
 
 #include <cinttypes>
 
-#include "form_db_info.h"
+#include "data_center/database/form_db_info.h"
 #include "form_mgr_errors.h"
-#include "form_util.h"
+#include "common/util/form_util.h"
 
 namespace {
     int32_t g_mockAllDBFormMaxSize = 2;

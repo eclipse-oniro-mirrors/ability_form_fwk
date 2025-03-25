@@ -18,11 +18,11 @@
 #include <cstddef>
 #include <cstdint>
 
-#include "form_info_storage.h"
+#include "data_center/form_info/form_info_storage.h"
 #define private public
 #define protected public
-#include "form_dump_mgr.h"
-#include "form_supply_callback.h"
+#include "common/util/form_dump_mgr.h"
+#include "form_provider/form_supply_callback.h"
 #undef private
 #undef protected
 #include "securec.h"

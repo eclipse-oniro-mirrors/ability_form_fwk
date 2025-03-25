@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "form_ams_helper.h"
+#include "ams_mgr/form_ams_helper.h"
 #include "ability_connect_callback_interface.h"
 #include "ability_manager_interface.h"
 #include "form_mgr_errors.h"

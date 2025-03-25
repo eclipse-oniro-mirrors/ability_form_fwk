@@ -16,7 +16,7 @@
 #include <gtest/gtest.h>
 #include <memory>
 #define private public
-#include "form_event_notify_connection.h"
+#include "common/event/form_event_notify_connection.h"
 #undef private
 #include "fms_log_wrapper.h"
 #include "mock_form_provider_client.h"

@@ -20,7 +20,7 @@
 
 #define private public
 #define protected public
-#include "form_bundle_forbid_mgr.h"
+#include "feature/bundle_forbidden/form_bundle_forbid_mgr.h"
 #undef private
 #undef protected
 #include "message_parcel.h"

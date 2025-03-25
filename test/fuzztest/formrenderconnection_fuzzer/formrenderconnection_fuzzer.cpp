@@ -20,7 +20,7 @@
 
 #define private public
 #define protected public
-#include "form_render_connection.h"
+#include "form_render/form_render_connection.h"
 #undef private
 #undef protected
 #include "message_parcel.h"

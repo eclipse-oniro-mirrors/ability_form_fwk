@@ -13,25 +13,25 @@
  * limitations under the License.
  */
 
-#include "form_provider_mgr.h"
+#include "form_provider/form_provider_mgr.h"
 
 #include <cinttypes>
 
 #include "fms_log_wrapper.h"
-#include "form_ams_helper.h"
-#include "form_batch_delete_connection.h"
-#include "form_cache_mgr.h"
+#include "ams_mgr/form_ams_helper.h"
+#include "form_provider/connection/form_batch_delete_connection.h"
+#include "data_center/form_cache_mgr.h"
 #include "form_constants.h"
-#include "form_data_mgr.h"
-#include "form_delete_connection.h"
+#include "data_center/form_data_mgr.h"
+#include "form_provider/connection/form_delete_connection.h"
 #include "form_mgr_errors.h"
-#include "form_msg_event_connection.h"
-#include "form_record.h"
-#include "form_refresh_connection.h"
-#include "form_timer_mgr.h"
-#include "form_report.h"
-#include "form_record_report.h"
-#include "form_mgr_adapter.h"
+#include "form_provider/connection/form_msg_event_connection.h"
+#include "data_center/form_record/form_record.h"
+#include "form_provider/connection/form_refresh_connection.h"
+#include "common/timer_mgr/form_timer_mgr.h"
+#include "common/util/form_report.h"
+#include "data_center/form_record/form_record_report.h"
+#include "form_mgr/form_mgr_adapter.h"
 #ifdef SUPPORT_POWER
 #include "power_mgr_client.h"
 #endif

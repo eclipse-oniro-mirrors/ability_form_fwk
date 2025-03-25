@@ -12,12 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "form_exempt_lock_mgr.h"
+#include "feature/bundle_lock/form_exempt_lock_mgr.h"
 
 #include "fms_log_wrapper.h"
 #include "form_mgr_errors.h"
-#include "form_data_mgr.h"
-#include "form_util.h"
+#include "data_center/form_data_mgr.h"
+#include "common/util/form_util.h"
 
 namespace OHOS {
 namespace AppExecFwk {

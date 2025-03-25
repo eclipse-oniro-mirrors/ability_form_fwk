@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "form_bundle_forbid_mgr.h"
+#include "feature/bundle_forbidden/form_bundle_forbid_mgr.h"
 
 #include "fms_log_wrapper.h"
 #include "form_mgr_errors.h"

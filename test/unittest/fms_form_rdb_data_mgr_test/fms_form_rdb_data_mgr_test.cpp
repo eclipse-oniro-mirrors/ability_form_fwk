@@ -18,11 +18,11 @@
 
 #include "appexecfwk_errors.h"
 #define private public
-#include "form_rdb_data_mgr.h"
+#include "data_center/database/form_rdb_data_mgr.h"
 #undef private
 #include "form_mgr_errors.h"
 #include "form_constants.h"
-#include "form_util.h"
+#include "common/util/form_util.h"
 #include "mock_rdb_store.h"
 
 using namespace testing;

@@ -14,7 +14,7 @@
  */
 #ifdef RES_SCHEDULE_ENABLE
 
-#include "form_systemload_listener.h"
+#include "common/event/system_event/form_systemload_listener.h"
 #include "fms_log_wrapper.h"
 
 namespace OHOS {

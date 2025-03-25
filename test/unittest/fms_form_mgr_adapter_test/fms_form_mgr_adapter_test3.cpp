@@ -23,15 +23,15 @@
 
 #include "form_constants.h"
 #include "form_mgr_errors.h"
-#include "form_util.h"
+#include "common/util/form_util.h"
 #define private public
-#include "form_mgr_adapter.h"
+#include "form_mgr/form_mgr_adapter.h"
 #include "ipc_types.h"
 #include "fms_log_wrapper.h"
 #include "ipc_skeleton.h"
-#include "form_bms_helper.h"
-#include "form_data_mgr.h"
-#include "form_info_mgr.h"
+#include "bms_mgr/form_bms_helper.h"
+#include "data_center/form_data_mgr.h"
+#include "data_center/form_info/form_info_mgr.h"
 #undef private
 #include "mock_ability_manager.h"
 #include "mock_bundle_mgr.h"

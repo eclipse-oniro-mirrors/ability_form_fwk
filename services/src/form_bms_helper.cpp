@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "form_bms_helper.h"
+#include "bms_mgr/form_bms_helper.h"
 
 #include "ability_manager_interface.h"
 #include "fms_log_wrapper.h"

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "form_distributed_client.h"
+#include "feature/form_share/form_distributed_client.h"
 
 #include "fms_log_wrapper.h"
 #include "form_mgr_errors.h"

@@ -16,7 +16,7 @@
 #include <gtest/gtest.h>
 
 #define private public
-#include "form_db_info.h"
+#include "data_center/database/form_db_info.h"
 #undef private
 
 using namespace testing::ext;

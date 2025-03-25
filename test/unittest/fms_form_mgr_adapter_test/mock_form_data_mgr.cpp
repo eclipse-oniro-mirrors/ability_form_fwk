@@ -16,9 +16,9 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #define private public
-#include "form_data_mgr.h"
+#include "data_center/form_data_mgr.h"
 #include "form_mgr_errors.h"
-#include "form_util.h"
+#include "common/util/form_util.h"
 #undef private
 #include "ipc_skeleton.h"
 

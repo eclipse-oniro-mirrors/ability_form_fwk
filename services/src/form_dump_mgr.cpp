@@ -13,11 +13,11 @@
  * limitations under the License.
  */
 
-#include "form_dump_mgr.h"
+#include "common/util/form_dump_mgr.h"
 
 #include "fms_log_wrapper.h"
-#include "form_cache_mgr.h"
-#include "form_mgr_adapter.h"
+#include "data_center/form_cache_mgr.h"
+#include "form_mgr/form_mgr_adapter.h"
 #include <utility>
 #include <map>
 

@@ -20,7 +20,7 @@
 
 #define private public
 #define protected public
-#include "form_share_mgr.h"
+#include "feature/form_share/form_share_mgr.h"
 #undef private
 #undef protected
 #include "securec.h"

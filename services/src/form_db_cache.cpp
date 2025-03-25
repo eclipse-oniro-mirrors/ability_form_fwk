@@ -13,16 +13,16 @@
  * limitations under the License.
  */
 
-#include "form_db_cache.h"
+#include "data_center/database/form_db_cache.h"
 
 #include <cinttypes>
 
 #include "fms_log_wrapper.h"
-#include "form_bms_helper.h"
-#include "form_data_mgr.h"
-#include "form_db_info.h"
+#include "bms_mgr/form_bms_helper.h"
+#include "data_center/form_data_mgr.h"
+#include "data_center/database/form_db_info.h"
 #include "form_mgr_errors.h"
-#include "form_provider_mgr.h"
+#include "form_provider/form_provider_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {

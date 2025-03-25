@@ -19,11 +19,11 @@
 #include <cstdint>
 
 #include "form_constants.h"
-#include "form_util.h"
+#include "common/util/form_util.h"
 #define private public
 #define protected public
-#include "free_install_status_callback_proxy.h"
-#include "free_install_status_callback_stub.h"
+#include "feature/free_install/free_install_status_callback_proxy.h"
+#include "feature/free_install/free_install_status_callback_stub.h"
 #undef private
 #undef protected
 #include "securec.h"

@@ -20,9 +20,9 @@
 
 #define private public
 #define protected public
-#include "form_cache_mgr.h"
-#include "form_event_handler.h"
-#include "form_serial_queue.h"
+#include "data_center/form_cache_mgr.h"
+#include "common/event/form_event_handler.h"
+#include "status_mgr_center/form_serial_queue.h"
 #undef private
 #undef protected
 #include "securec.h"
