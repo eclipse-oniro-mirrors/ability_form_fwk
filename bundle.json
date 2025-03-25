@@ -60,8 +60,8 @@
               "theme_mgr",
               "jsoncpp",
               "libxml2",
-              "config_policy"
-
+              "config_policy",
+              "runtime_core"
           ],
           "third_party": [
               "node",
@@ -74,7 +74,8 @@
                 "//foundation/ability/form_fwk:fms_innerkits_target",
                 "//foundation/ability/form_fwk:fmskit_native",
                 "//foundation/ability/form_fwk:fmskit_provider_client",
-                "//foundation/ability/form_fwk:form_napi_packages"
+                "//foundation/ability/form_fwk:form_napi_packages",
+                "//foundation/ability/form_fwk:form_ani_package"
               ],
               "service_group": [
                 "//foundation/ability/form_fwk/sa_profile:form_sa_profile",
