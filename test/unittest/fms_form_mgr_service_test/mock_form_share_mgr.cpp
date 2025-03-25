@@ -15,7 +15,7 @@
 
 #include <gtest/gtest.h>
 
-#include "form_share_mgr.h"
+#include "feature/form_share/form_share_mgr.h"
 #include "form_mgr_errors.h"
 
 namespace {

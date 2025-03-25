@@ -15,7 +15,7 @@
 #include <gtest/gtest.h>
 
 #define private public
-#include "form_record_report.h"
+#include "data_center/form_record/form_record_report.h"
 #include "want.h"
 
 using namespace testing::ext;

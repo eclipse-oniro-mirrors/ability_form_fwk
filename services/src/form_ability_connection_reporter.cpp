@@ -15,10 +15,10 @@
 
 #include <unordered_map>
 
-#include "form_ability_connection_reporter.h"
+#include "common/connection/form_ability_connection_reporter.h"
 #include "fms_log_wrapper.h"
 #include "form_mgr_errors.h"
-#include "form_util.h"
+#include "common/util/form_util.h"
 #include "iremote_proxy.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"

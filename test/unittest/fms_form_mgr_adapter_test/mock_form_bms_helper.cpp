@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "form_bms_helper.h"
+#include "bms/form_bms_helper.h"
 
 #include "form_constants.h"
 #include "form_mgr_errors.h"

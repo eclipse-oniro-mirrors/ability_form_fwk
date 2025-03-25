@@ -14,7 +14,7 @@
  */
 
 #include <gtest/gtest.h>
-#include "form_ability_connection_reporter.h"
+#include "common/connection/form_ability_connection_reporter.h"
 
 using namespace testing::ext;
 

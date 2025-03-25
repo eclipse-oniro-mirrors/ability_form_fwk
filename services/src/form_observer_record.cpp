@@ -13,11 +13,11 @@
  * limitations under the License.
  */
 
-#include "form_observer_record.h"
+#include "form_observer/form_observer_record.h"
 
 #include "fms_log_wrapper.h"
 #include "form_mgr_errors.h"
-#include "form_task_mgr.h"
+#include "status_mgr_center/form_task_mgr.h"
 #include "running_form_info.h"
 
 namespace OHOS {

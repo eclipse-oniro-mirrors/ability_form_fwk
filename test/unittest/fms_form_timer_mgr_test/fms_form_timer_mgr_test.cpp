@@ -20,8 +20,8 @@
 #include "common_event_support.h"
 #include "form_constants.h"
 #define private public
-#include "form_refresh_limiter.h"
-#include "form_timer_mgr.h"
+#include "common/timer_mgr/form_refresh_limiter.h"
+#include "common/timer_mgr/form_timer_mgr.h"
 #undef private
 #include "remote_native_token.h"
 

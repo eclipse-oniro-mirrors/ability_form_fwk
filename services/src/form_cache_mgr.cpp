@@ -13,15 +13,15 @@
  * limitations under the License.
  */
 
-#include "form_cache_mgr.h"
+#include "data_center/form_cache_mgr.h"
 
 #include <sstream>
 
 #include "fms_log_wrapper.h"
 #include "nlohmann/json.hpp"
-#include "scope_guard.h"
-#include "form_util.h"
-#include "form_report.h"
+#include "common/util/scope_guard.h"
+#include "common/util/form_util.h"
+#include "common/util/form_report.h"
 
 namespace OHOS {
 namespace AppExecFwk {

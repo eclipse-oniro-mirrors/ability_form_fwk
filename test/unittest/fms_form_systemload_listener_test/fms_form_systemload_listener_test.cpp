@@ -14,7 +14,7 @@
  */
 #include <chrono>
 #include <gtest/gtest.h>
-#include "form_systemload_listener.h"
+#include "common/event/system_event/form_systemload_listener.h"
 
 using namespace testing::ext;
 using namespace OHOS;

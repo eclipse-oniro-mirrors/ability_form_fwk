@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#include "form_bms_helper.h"
+#include "bms/form_bms_helper.h"
 #include "form_mgr_errors.h"
-#include "form_mgr_adapter.h"
+#include "form_mgr/form_mgr_adapter.h"
 
 namespace {
     bool g_mockGetAbilityInfoRet = true;

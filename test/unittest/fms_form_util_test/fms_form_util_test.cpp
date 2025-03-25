@@ -16,7 +16,7 @@
 #include <gtest/gtest.h>
 #include <ctime>
 #define private public
-#include "form_util.h"
+#include "common/util/form_util.h"
 #include "form_constants.h"
 #include "form_mgr_errors.h"
 #include "os_account_manager_wrapper.h"

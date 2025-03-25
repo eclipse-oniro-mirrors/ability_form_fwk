@@ -13,24 +13,24 @@
  * limitations under the License.
  */
 
-#include "form_render_mgr.h"
+#include "form_render/form_render_mgr.h"
 
 #include <mutex>
 
 #include "fms_log_wrapper.h"
-#include "form_ams_helper.h"
-#include "form_bms_helper.h"
-#include "form_cache_mgr.h"
+#include "ams/form_ams_helper.h"
+#include "bms/form_bms_helper.h"
+#include "data_center/form_cache_mgr.h"
 #include "form_constants.h"
-#include "form_data_mgr.h"
-#include "form_event_report.h"
+#include "data_center/form_data_mgr.h"
+#include "common/event/form_event_report.h"
 #include "form_host_interface.h"
 #include "form_mgr_errors.h"
-#include "form_sandbox_render_mgr_inner.h"
-#include "form_supply_callback.h"
-#include "form_task_mgr.h"
-#include "form_trust_mgr.h"
-#include "form_util.h"
+#include "form_render/form_sandbox_render_mgr_inner.h"
+#include "form_provider/form_supply_callback.h"
+#include "status_mgr_center/form_task_mgr.h"
+#include "common/util/form_trust_mgr.h"
+#include "common/util/form_util.h"
 #include "ipc_skeleton.h"
 #include "os_account_manager.h"
 #include "want.h"

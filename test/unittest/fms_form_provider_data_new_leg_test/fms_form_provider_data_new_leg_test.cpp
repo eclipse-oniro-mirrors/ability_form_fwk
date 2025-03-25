@@ -23,8 +23,8 @@
 #include "form_mgr_errors.h"
 #define private public
 #include "form_provider_data.h"
-#include "form_provider_mgr.h"
-#include "form_share_mgr.h"
+#include "form_provider/form_provider_mgr.h"
+#include "feature/form_share/form_share_mgr.h"
 #undef private
 #include "form_ashmem.h"
 #include "fms_log_wrapper.h"

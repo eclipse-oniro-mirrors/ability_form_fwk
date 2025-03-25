@@ -30,7 +30,7 @@
 #include "want.h"
 #define private public
 #define protected public
-#include "form_bms_helper.h"
+#include "bms/form_bms_helper.h"
 #include "form_mgr_errors.h"
 #undef private
 #undef protected

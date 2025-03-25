@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 
-#include "form_host_record.h"
+#include "form_host/form_host_record.h"
 
 #include <cinttypes>
-#include "form_task_mgr.h"
+#include "status_mgr_center/form_task_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {

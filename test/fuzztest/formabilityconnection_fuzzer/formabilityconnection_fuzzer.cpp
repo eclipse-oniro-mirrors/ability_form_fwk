@@ -20,8 +20,8 @@
 
 #define private public
 #define protected public
-#include "form_ability_connection.h"
-#include "form_ams_helper.h"
+#include "common/connection/form_ability_connection.h"
+#include "ams/form_ams_helper.h"
 #undef private
 #undef protected
 #include "securec.h"

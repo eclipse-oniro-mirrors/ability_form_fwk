@@ -16,7 +16,7 @@
 #ifndef OHOS_FORM_FWK_FORM_MGR_PROXY_H
 #define OHOS_FORM_FWK_FORM_MGR_PROXY_H
 
-#include "form_db_info.h"
+#include "data_center/database/form_db_info.h"
 #include "form_info.h"
 #include "form_mgr_interface.h"
 #include "form_state_info.h"

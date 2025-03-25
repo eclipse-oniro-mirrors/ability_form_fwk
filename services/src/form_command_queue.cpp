@@ -13,11 +13,11 @@
  * limitations under the License.
  */
 
-#include "form_command_queue.h"
+#include "status_mgr_center/form_command_queue.h"
 #include "fms_log_wrapper.h"
-#include "form_command_process_strategy.h"
-#include "form_status_mgr.h"
-#include "form_status_queue.h"
+#include "status_mgr_center/form_command_process_strategy.h"
+#include "status_mgr_center/form_status_mgr.h"
+#include "status_mgr_center/form_status_queue.h"
 
 namespace OHOS {
 namespace AppExecFwk {

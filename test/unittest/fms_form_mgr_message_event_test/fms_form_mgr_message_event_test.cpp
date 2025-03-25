@@ -16,21 +16,21 @@
 
 #include "accesstoken_kit.h"
 #define private public
-#include "form_ability_connection.h"
+#include "common/connection/form_ability_connection.h"
 #undef private
-#include "form_ams_helper.h"
-#include "form_bms_helper.h"
+#include "ams/form_ams_helper.h"
+#include "bms/form_bms_helper.h"
 #define private public
-#include "form_data_mgr.h"
-#include "form_db_cache.h"
+#include "data_center/form_data_mgr.h"
+#include "data_center/database/form_db_cache.h"
 #undef private
 #include "form_host_interface.h"
 #define private public
-#include "form_info_mgr.h"
+#include "data_center/form_info/form_info_mgr.h"
 #include "form_mgr.h"
 #undef private
 #include "form_mgr_errors.h"
-#include "form_mgr_service.h"
+#include "form_mgr/form_mgr_service.h"
 #include "if_system_ability_manager.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"

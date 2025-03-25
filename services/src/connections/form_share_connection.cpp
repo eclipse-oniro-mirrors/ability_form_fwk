@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-#include "form_share_connection.h"
+#include "feature/form_share/form_share_connection.h"
 
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
 #include "form_mgr_errors.h"
-#include "form_supply_callback.h"
-#include "form_task_mgr.h"
+#include "form_provider/form_supply_callback.h"
+#include "status_mgr_center/form_task_mgr.h"
 #include "want.h"
 
 namespace OHOS {

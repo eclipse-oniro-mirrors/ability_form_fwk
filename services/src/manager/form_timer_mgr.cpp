@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "form_timer_mgr.h"
+#include "common/timer_mgr/form_timer_mgr.h"
 
 #include <cinttypes>
 
@@ -23,17 +23,17 @@
 #include "ffrt.h"
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
-#include "form_provider_mgr.h"
-#include "form_timer_option.h"
-#include "form_util.h"
+#include "form_provider/form_provider_mgr.h"
+#include "common/timer_mgr/form_timer_option.h"
+#include "common/util/form_util.h"
 #include "in_process_call_wrapper.h"
 #include "os_account_manager_wrapper.h"
 #include "time_service_client.h"
 #include "time_common.h"
 #include "want.h"
-#include "form_event_report.h"
-#include "form_record_report.h"
-#include "form_data_mgr.h"
+#include "common/event/form_event_report.h"
+#include "data_center/form_record/form_record_report.h"
+#include "data_center/form_data_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {

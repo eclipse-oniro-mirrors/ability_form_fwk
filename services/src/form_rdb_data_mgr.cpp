@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "form_rdb_data_mgr.h"
+#include "data_center/database/form_rdb_data_mgr.h"
 
 #include <cinttypes>
 #include <thread>
@@ -23,9 +23,9 @@
 #include "fms_log_wrapper.h"
 #include "form_constants.h"
 #include "form_mgr_errors.h"
-#include "form_util.h"
-#include "scope_guard.h"
-#include "form_event_report.h"
+#include "common/util/form_util.h"
+#include "common/util/scope_guard.h"
+#include "common/event/form_event_report.h"
 
 namespace OHOS {
 namespace AppExecFwk {

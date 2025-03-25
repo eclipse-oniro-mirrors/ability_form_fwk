@@ -13,28 +13,28 @@
  * limitations under the License.
  */
 
-#include "form_supply_callback.h"
+#include "form_provider/form_supply_callback.h"
 
 #include <cinttypes>
 
 #include "fms_log_wrapper.h"
-#include "form_ams_helper.h"
+#include "ams/form_ams_helper.h"
 #include "form_constants.h"
-#include "form_data_proxy_mgr.h"
+#include "data_center/form_data_proxy_mgr.h"
 #include "form_mgr_errors.h"
-#include "form_provider_mgr.h"
-#include "form_render_mgr.h"
-#include "form_share_mgr.h"
-#include "form_task_mgr.h"
-#include "form_util.h"
+#include "form_provider/form_provider_mgr.h"
+#include "form_render/form_render_mgr.h"
+#include "feature/form_share/form_share_mgr.h"
+#include "status_mgr_center/form_task_mgr.h"
+#include "common/util/form_util.h"
 #include "hitrace_meter.h"
-#include "form_info_rdb_storage_mgr.h"
-#include "form_data_mgr.h"
+#include "data_center/form_info/form_info_rdb_storage_mgr.h"
+#include "data_center/form_data_mgr.h"
 #include "form_host_interface.h"
-#include "form_report.h"
-#include "form_record_report.h"
-#include "form_mgr_adapter.h"
-#include "form_status_mgr.h"
+#include "common/util/form_report.h"
+#include "data_center/form_record/form_record_report.h"
+#include "form_mgr/form_mgr_adapter.h"
+#include "status_mgr_center/form_status_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {

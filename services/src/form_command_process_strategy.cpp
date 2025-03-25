@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "form_command_process_strategy.h"
+#include "status_mgr_center/form_command_process_strategy.h"
 #include "fms_log_wrapper.h"
 
 namespace OHOS {

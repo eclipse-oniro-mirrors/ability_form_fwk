@@ -13,14 +13,14 @@
  * limitations under the License.
  */
 
-#include "form_host_callback.h"
+#include "form_host/form_host_callback.h"
 
 #include <cinttypes>
 
 #include "fms_log_wrapper.h"
 #include "form_host_interface.h"
-#include "form_task_mgr.h"
-#include "form_render_mgr.h"
+#include "status_mgr_center/form_task_mgr.h"
+#include "form_render/form_render_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {

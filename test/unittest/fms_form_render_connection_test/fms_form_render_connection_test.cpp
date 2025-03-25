@@ -23,7 +23,7 @@
 #include "form_constants.h"
 #include "form_mgr_errors.h"
 #define private public
-#include "form_render_connection.h"
+#include "form_render/form_render_connection.h"
 #undef private
 #include "ipc_types.h"
 #include "fms_log_wrapper.h"

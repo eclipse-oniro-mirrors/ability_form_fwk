@@ -20,7 +20,7 @@
 
 #define private public
 #define protected public
-#include "form_sys_event_receiver.h"
+#include "common/event/system_event/form_sys_event_receiver.h"
 #undef private
 #undef protected
 #include "securec.h"

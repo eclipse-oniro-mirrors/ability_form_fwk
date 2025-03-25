@@ -16,14 +16,14 @@
 #include <gtest/gtest.h>
 
 #include "accesstoken_kit.h"
-#include "form_bms_helper.h"
-#include "form_db_cache.h"
+#include "bms/form_bms_helper.h"
+#include "data_center/database/form_db_cache.h"
 #include "form_host_interface.h"
 #define private public
-#include "form_data_mgr.h"
+#include "data_center/form_data_mgr.h"
 #include "form_mgr.h"
 #include "form_mgr_errors.h"
-#include "form_mgr_service.h"
+#include "form_mgr/form_mgr_service.h"
 #undef private
 #include "if_system_ability_manager.h"
 #include "ipc_skeleton.h"

@@ -20,7 +20,7 @@
 
 #define private public
 #define protected public
-#include "form_render_mgr_inner.h"
+#include "form_render/form_render_mgr_inner.h"
 #undef private
 #undef protected
 #include "message_parcel.h"

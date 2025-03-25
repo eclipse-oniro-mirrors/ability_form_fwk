@@ -20,7 +20,7 @@
 
 #define private public
 #define protected public
-#include "form_item_info.h"
+#include "data_center/form_info/form_item_info.h"
 #undef private
 #undef protected
 #include "securec.h"

@@ -15,23 +15,23 @@
 #include <gtest/gtest.h>
 
 #include "accesstoken_kit.h"
-#include "form_ams_helper.h"
+#include "ams/form_ams_helper.h"
 #define private public
-#include "form_bms_helper.h"
-#include "form_info_mgr.h"
+#include "bms/form_bms_helper.h"
+#include "data_center/form_info/form_info_mgr.h"
 #undef private
-#include "form_data_mgr.h"
-#include "form_db_cache.h"
+#include "data_center/form_data_mgr.h"
+#include "data_center/database/form_db_cache.h"
 #define private public
-#include "form_db_info.h"
-#include "form_free_install_operator.h"
+#include "data_center/database/form_db_info.h"
+#include "feature/form_share/form_free_install_operator.h"
 #undef private
 #include "form_host_interface.h"
 #define private public
 #include "form_mgr.h"
 #include "form_mgr_errors.h"
-#include "form_mgr_service.h"
-#include "form_share_mgr.h"
+#include "form_mgr/form_mgr_service.h"
+#include "feature/form_share/form_share_mgr.h"
 #undef private
 #include "if_system_ability_manager.h"
 #include "ipc_skeleton.h"

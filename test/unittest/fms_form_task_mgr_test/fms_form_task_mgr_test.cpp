@@ -16,13 +16,13 @@
 #include <gtest/gtest.h>
 #include <memory>
 #define private public
-#include "form_task_mgr.h"
+#include "status_mgr_center/form_task_mgr.h"
 #undef private
 #include "fms_log_wrapper.h"
 #include "mock_form_provider_client.h"
 #include "gmock/gmock.h"
 #include "form_render_interface.h"
-#include "form_share_mgr.h"
+#include "feature/form_share/form_share_mgr.h"
 #include "js_form_state_observer_interface.h"
 #include "form_host_interface.h"
 

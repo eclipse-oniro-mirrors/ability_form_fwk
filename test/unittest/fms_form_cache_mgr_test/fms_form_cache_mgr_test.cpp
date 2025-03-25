@@ -16,7 +16,7 @@
 #include <gtest/gtest.h>
 
 #define private public
-#include "form_cache_mgr.h"
+#include "data_center/form_cache_mgr.h"
 #undef private
 #include "fms_log_wrapper.h"
 

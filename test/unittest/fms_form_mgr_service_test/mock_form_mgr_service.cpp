@@ -15,9 +15,9 @@
 
 #include <gtest/gtest.h>
 
-#include "form_mgr_service.h"
+#include "form_mgr/form_mgr_service.h"
 #include "form_mgr_errors.h"
-#include "form_util.h"
+#include "common/util/form_util.h"
 #include "fms_log_wrapper.h"
 
 namespace {

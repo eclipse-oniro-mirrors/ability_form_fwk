@@ -16,15 +16,15 @@
 #include <gtest/gtest.h>
 #include <memory>
 #define private public
-#include "form_cache_mgr.h"
-#include "form_event_handler.h"
-#include "form_supply_callback.h"
-#include "form_share_mgr.h"
+#include "data_center/form_cache_mgr.h"
+#include "common/event/form_event_handler.h"
+#include "form_provider/form_supply_callback.h"
+#include "feature/form_share/form_share_mgr.h"
 #undef private
 #include "appexecfwk_errors.h"
-#include "form_ability_connection.h"
-#include "form_acquire_connection.h"
-#include "form_data_mgr.h"
+#include "common/connection/form_ability_connection.h"
+#include "form_provider/connection/form_acquire_connection.h"
+#include "data_center/form_data_mgr.h"
 #include "form_host_caller.h"
 #include "form_mgr.h"
 #include "fms_log_wrapper.h"

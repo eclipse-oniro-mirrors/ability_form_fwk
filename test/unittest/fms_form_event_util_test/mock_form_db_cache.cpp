@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "form_db_cache.h"
+#include "data_center/database/form_db_cache.h"
 
 #include "form_mgr_errors.h"
 #include "fms_log_wrapper.h"

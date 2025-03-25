@@ -17,10 +17,10 @@
 #include <string>
 #include <thread>
 #define private public
-#include "form_db_cache.h"
-#include "form_mgr_adapter.h"
+#include "data_center/database/form_db_cache.h"
+#include "form_mgr/form_mgr_adapter.h"
 #undef private
-#include "form_record.h"
+#include "data_center/form_record/form_record.h"
 #include "fms_log_wrapper.h"
 #include "want.h"
 

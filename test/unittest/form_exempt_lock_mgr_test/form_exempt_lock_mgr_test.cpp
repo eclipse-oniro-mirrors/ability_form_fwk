@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 #include <gtest/gtest.h>
-#include "form_exempt_lock_mgr.h"
+#include "feature/bundle_lock/form_exempt_lock_mgr.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -58,4 +58,4 @@ HWTEST_F(FormExemptLockMgrTest, formExemptLockMgr_002, TestSize.Level1)
     EXPECT_EQ(exempt, true);
     formExemptLockMgr.SetExemptLockStatus(FORM_ID, false);
 }
-} // namespace
+} // namespace

@@ -15,7 +15,7 @@
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include "form_rdb_data_mgr.h"
+#include "data_center/database/form_rdb_data_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {

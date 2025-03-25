@@ -17,7 +17,7 @@
 #include <iremote_stub.h>
 
 #define private public
-#include "form_distributed_client.h"
+#include "feature/form_share/form_distributed_client.h"
 #undef private
 #include "form_mgr_errors.h"
 #include "if_system_ability_manager.h"

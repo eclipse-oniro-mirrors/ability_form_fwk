@@ -15,7 +15,7 @@
 
 #include "form_info.h"
 #include "form_info_filter.h"
-#include "form_info_storage.h"
+#include "data_center/form_info/form_info_storage.h"
 
 #include "fms_log_wrapper.h"
 #include "json_serializer.h"

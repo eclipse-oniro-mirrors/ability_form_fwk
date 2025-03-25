@@ -18,7 +18,7 @@
 #include <cstddef>
 #include <cstdint>
 
-#include "form_host_record.h"
+#include "form_host/form_host_record.h"
 #include "securec.h"
 
 using namespace OHOS::AppExecFwk;

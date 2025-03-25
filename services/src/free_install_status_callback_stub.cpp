@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "free_install_status_callback_stub.h"
+#include "feature/free_install/free_install_status_callback_stub.h"
 #include "fms_log_wrapper.h"
 #include "ipc_types.h"
 #include "message_parcel.h"

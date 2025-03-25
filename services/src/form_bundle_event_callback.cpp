@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 
-#include "form_bundle_event_callback.h"
+#include "bms/form_bundle_event_callback.h"
 
-#include "form_bundle_forbid_mgr.h"
-#include "form_task_mgr.h"
+#include "feature/bundle_forbidden/form_bundle_forbid_mgr.h"
+#include "status_mgr_center/form_task_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {

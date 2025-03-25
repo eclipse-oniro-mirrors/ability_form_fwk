@@ -16,7 +16,7 @@
 #include <gtest/gtest.h>
 #include <memory>
 #define private public
-#include "form_batch_delete_connection.h"
+#include "form_provider/connection/form_batch_delete_connection.h"
 #undef private
 #include "fms_log_wrapper.h"
 #include "mock_form_provider_client.h"

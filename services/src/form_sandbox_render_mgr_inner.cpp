@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
-#include "form_sandbox_render_mgr_inner.h"
+#include "form_render/form_sandbox_render_mgr_inner.h"
 
 #include <mutex>
 
 #include "fms_log_wrapper.h"
-#include "form_bms_helper.h"
-#include "form_trust_mgr.h"
+#include "bms/form_bms_helper.h"
+#include "common/util/form_trust_mgr.h"
 #include "ipc_skeleton.h"
 #include "want.h"
 

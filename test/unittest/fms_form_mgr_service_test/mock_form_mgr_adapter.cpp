@@ -15,7 +15,7 @@
 
 #include <gtest/gtest.h>
 
-#include "form_mgr_adapter.h"
+#include "form_mgr/form_mgr_adapter.h"
 #include "form_mgr_errors.h"
 #include "fms_log_wrapper.h"
 

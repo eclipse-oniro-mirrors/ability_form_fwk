@@ -16,7 +16,7 @@
 #include <gtest/gtest.h>
 
 #define private public
-#include "form_observer_record.h"
+#include "form_observer/form_observer_record.h"
 #include "form_constants.h"
 #include "mock_form_provider_client.h"
 #include "form_mgr_errors.h"

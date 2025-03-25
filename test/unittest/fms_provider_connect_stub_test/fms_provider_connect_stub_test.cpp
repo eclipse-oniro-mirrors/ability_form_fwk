@@ -15,7 +15,7 @@
 
 #include "provider_connect_stub.h"
 #include <gtest/gtest.h>
-#include "form_ability_connection.h"
+#include "common/connection/form_ability_connection.h"
 #include "ipc_types.h"
 #include "iremote_broker.h"
 #include "message_parcel.h"

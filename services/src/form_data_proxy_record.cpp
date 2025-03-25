@@ -13,22 +13,22 @@
  * limitations under the License.
  */
 
-#include "form_data_proxy_record.h"
+#include "data_center/form_data_proxy_record.h"
 
 #include <cstddef>
 #include <string>
 #include <vector>
 
 #include "fms_log_wrapper.h"
-#include "form_bms_helper.h"
-#include "form_data_mgr.h"
-#include "form_mgr_adapter.h"
+#include "bms/form_bms_helper.h"
+#include "data_center/form_data_mgr.h"
+#include "form_mgr/form_mgr_adapter.h"
 #include "form_mgr_errors.h"
-#include "form_provider_mgr.h"
-#include "form_util.h"
+#include "form_provider/form_provider_mgr.h"
+#include "common/util/form_util.h"
 #include "ipc_skeleton.h"
 #include "accesstoken_kit.h"
-#include "form_event_report.h"
+#include "common/event/form_event_report.h"
 
 namespace OHOS {
 namespace AppExecFwk {

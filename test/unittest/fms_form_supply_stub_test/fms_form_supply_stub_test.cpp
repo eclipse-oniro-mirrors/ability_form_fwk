@@ -21,7 +21,7 @@
 #include "element_name.h"
 #include "form_mgr_errors.h"
 #include "form_constants.h"
-#include "form_supply_callback.h"
+#include "form_provider/form_supply_callback.h"
 #include "form_supply_stub.h"
 #include "ipc_types.h"
 #include "iremote_broker.h"

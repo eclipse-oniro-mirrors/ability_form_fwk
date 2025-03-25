@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 #include <gtest/gtest.h>
-#include "form_bundle_forbid_mgr.h"
+#include "feature/bundle_forbidden/form_bundle_forbid_mgr.h"
 
 using namespace testing::ext;
 using namespace OHOS;

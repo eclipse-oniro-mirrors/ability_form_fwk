@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "form_render_mgr.h"
+#include "form_render/form_render_mgr.h"
 
 namespace {
     bool g_mockIsRerenderForFrsDied = true;

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 #include "form_mgr_errors.h"
-#include "form_mgr_adapter.h"
-#include "form_info_mgr.h"
+#include "form_mgr/form_mgr_adapter.h"
+#include "data_center/form_info/form_info_mgr.h"
 namespace {
     bool g_mockRequestPublishFormToHost = true;
 }

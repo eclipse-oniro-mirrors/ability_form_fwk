@@ -20,9 +20,9 @@
 #include "common_event_support.h"
 #include "form_constants.h"
 #define private public
-#include "form_refresh_limiter.h"
-#include "free_install_status_callback_proxy.h"
-#include "free_install_status_callback_stub.h"
+#include "common/timer_mgr/form_refresh_limiter.h"
+#include "feature/free_install/free_install_status_callback_proxy.h"
+#include "feature/free_install/free_install_status_callback_stub.h"
 #undef private
 #include "remote_native_token.h"
 

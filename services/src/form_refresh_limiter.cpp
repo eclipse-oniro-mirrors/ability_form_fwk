@@ -17,8 +17,8 @@
 
 #include "form_constants.h"
 #include "fms_log_wrapper.h"
-#include "form_refresh_limiter.h"
-#include "form_record_report.h"
+#include "common/timer_mgr/form_refresh_limiter.h"
+#include "data_center/form_record/form_record_report.h"
 
 namespace OHOS {
 namespace AppExecFwk {

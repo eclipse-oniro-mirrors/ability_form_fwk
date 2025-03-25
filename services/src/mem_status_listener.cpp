@@ -14,9 +14,9 @@
  */
 
 #ifdef MEM_MGR_ENABLE
-#include "mem_status_listener.h"
+#include "common/util/mem_status_listener.h"
 #include "fms_log_wrapper.h"
-#include "form_data_mgr.h"
+#include "data_center/form_data_mgr.h"
 
 namespace OHOS {
 namespace AppExecFwk {

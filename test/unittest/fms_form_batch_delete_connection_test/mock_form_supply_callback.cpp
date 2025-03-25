@@ -16,8 +16,8 @@
 #include <gtest/gtest.h>
 
 #include "fms_log_wrapper.h"
-#include "form_supply_callback.h"
-#include "form_ability_connection.h"
+#include "form_provider/form_supply_callback.h"
+#include "common/connection/form_ability_connection.h"
 
 namespace OHOS {
 namespace AppExecFwk {

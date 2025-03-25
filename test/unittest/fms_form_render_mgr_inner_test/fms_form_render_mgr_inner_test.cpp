@@ -24,7 +24,7 @@
 #include "form_mgr_errors.h"
 #define private public
 #include "form_render_interface.h"
-#include "form_render_mgr_inner.h"
+#include "form_render/form_render_mgr_inner.h"
 #undef private
 #include "ipc_types.h"
 #include "fms_log_wrapper.h"
