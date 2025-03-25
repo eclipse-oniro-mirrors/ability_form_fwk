@@ -18,7 +18,7 @@
 #include <mutex>
 
 #include "fms_log_wrapper.h"
-#include "bms/form_bms_helper.h"
+#include "bms_mgr/form_bms_helper.h"
 #include "common/util/form_trust_mgr.h"
 #include "ipc_skeleton.h"
 #include "want.h"

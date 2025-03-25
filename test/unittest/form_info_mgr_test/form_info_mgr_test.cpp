@@ -17,7 +17,7 @@
 #include <gmock/gmock.h>
 
 #define private public
-#include "bms/form_bms_helper.h"
+#include "bms_mgr/form_bms_helper.h"
 #include "data_center/form_info/form_info_mgr.h"
 #include "mock_bundle_mgr.h"
 #undef private

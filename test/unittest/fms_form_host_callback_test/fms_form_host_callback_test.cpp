@@ -16,7 +16,7 @@
 #include <gtest/gtest.h>
 #include <memory>
 #define private public
-#include "bms/form_bms_helper.h"
+#include "bms_mgr/form_bms_helper.h"
 #include "form_host/form_host_callback.h"
 #undef private
 #include "form_mgr_errors.h"

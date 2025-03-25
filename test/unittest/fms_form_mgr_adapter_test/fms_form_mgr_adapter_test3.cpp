@@ -29,7 +29,7 @@
 #include "ipc_types.h"
 #include "fms_log_wrapper.h"
 #include "ipc_skeleton.h"
-#include "bms/form_bms_helper.h"
+#include "bms_mgr/form_bms_helper.h"
 #include "data_center/form_data_mgr.h"
 #include "data_center/form_info/form_info_mgr.h"
 #undef private

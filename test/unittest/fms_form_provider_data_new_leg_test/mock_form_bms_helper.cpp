@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "bms/form_bms_helper.h"
+#include "bms_mgr/form_bms_helper.h"
 
 namespace {
     bool g_mockGetBundleInfoRet = true;

@@ -19,7 +19,7 @@
 #include "common_event_manager.h"
 #include "common_event_data.h"
 #include "common_event_support.h"
-#include "ams/form_ams_helper.h"
+#include "ams_mgr/form_ams_helper.h"
 #include "form_constants.h"
 #define private public
 #include "data_center/form_data_mgr.h"
@@ -36,7 +36,7 @@
 #include "common/event/system_event/form_sys_event_receiver.h"
 #include "if_system_ability_manager.h"
 #include "ipc_skeleton.h"
-#include "bms/form_bms_helper.h"
+#include "bms_mgr/form_bms_helper.h"
 #include "iservice_registry.h"
 
 #include "mock_ability_manager.h"

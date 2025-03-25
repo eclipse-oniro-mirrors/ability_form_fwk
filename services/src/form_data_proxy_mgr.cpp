@@ -16,7 +16,7 @@
 #include "data_center/form_data_proxy_mgr.h"
 
 #include "fms_log_wrapper.h"
-#include "bms/form_bms_helper.h"
+#include "bms_mgr/form_bms_helper.h"
 #include "data_center/form_data_mgr.h"
 #include "data_center/form_data_proxy_record.h"
 #include "common/util/form_util.h"

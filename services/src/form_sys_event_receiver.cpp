@@ -19,7 +19,7 @@
 
 #include "common_event_support.h"
 #include "fms_log_wrapper.h"
-#include "bms/form_bms_helper.h"
+#include "bms_mgr/form_bms_helper.h"
 #include "form_constants.h"
 #include "data_center/form_data_mgr.h"
 #include "data_center/database/form_db_cache.h"

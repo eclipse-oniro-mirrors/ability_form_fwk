@@ -19,7 +19,7 @@
 #include <type_traits>
 
 #include "fms_log_wrapper.h"
-#include "bms/form_bms_helper.h"
+#include "bms_mgr/form_bms_helper.h"
 #include "feature/bundle_forbidden/form_bundle_forbid_mgr.h"
 #include "data_center/form_cache_mgr.h"
 #include "form_constants.h"

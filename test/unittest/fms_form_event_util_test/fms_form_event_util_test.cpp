@@ -23,7 +23,7 @@
 #include "form_constants.h"
 #include "form_mgr_errors.h"
 #define private public
-#include "bms/form_bms_helper.h"
+#include "bms_mgr/form_bms_helper.h"
 #include "data_center/form_data_mgr.h"
 #include "common/event/form_event_util.h"
 #include "common/timer_mgr/form_timer_mgr.h"

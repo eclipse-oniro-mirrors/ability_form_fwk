@@ -15,9 +15,9 @@
 #include <gtest/gtest.h>
 
 #include "accesstoken_kit.h"
-#include "ams/form_ams_helper.h"
+#include "ams_mgr/form_ams_helper.h"
 #define private public
-#include "bms/form_bms_helper.h"
+#include "bms_mgr/form_bms_helper.h"
 #include "data_center/form_info/form_info_mgr.h"
 #undef private
 #include "data_center/form_data_mgr.h"

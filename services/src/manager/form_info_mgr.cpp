@@ -18,7 +18,7 @@
 #include "bundle_mgr_client.h"
 #include "extension_form_profile.h"
 #include "fms_log_wrapper.h"
-#include "bms/form_bms_helper.h"
+#include "bms_mgr/form_bms_helper.h"
 #include "data_center/database/form_db_cache.h"
 #include "data_center/form_info/form_info_storage.h"
 #include "data_center/form_info/form_info_rdb_storage_mgr.h"

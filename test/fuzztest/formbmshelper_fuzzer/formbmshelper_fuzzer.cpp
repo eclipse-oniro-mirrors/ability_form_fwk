@@ -20,7 +20,7 @@
 
 #define private public
 #define protected public
-#include "bms/form_bms_helper.h"
+#include "bms_mgr/form_bms_helper.h"
 #undef private
 #undef protected
 #include "securec.h"

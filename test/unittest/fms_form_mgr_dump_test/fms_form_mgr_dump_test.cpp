@@ -15,8 +15,8 @@
 
 #include <gtest/gtest.h>
 
-#include "ams/form_ams_helper.h"
-#include "bms/form_bms_helper.h"
+#include "ams_mgr/form_ams_helper.h"
+#include "bms_mgr/form_bms_helper.h"
 #define private public
 #include "common/util/form_dump_mgr.h"
 #include "form_mgr/form_mgr_service.h"

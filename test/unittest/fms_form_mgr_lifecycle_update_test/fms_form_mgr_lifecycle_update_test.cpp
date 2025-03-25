@@ -16,7 +16,7 @@
 #include <gtest/gtest.h>
 
 #include "accesstoken_kit.h"
-#include "bms/form_bms_helper.h"
+#include "bms_mgr/form_bms_helper.h"
 #include "data_center/database/form_db_cache.h"
 #include "form_host_interface.h"
 #define private public

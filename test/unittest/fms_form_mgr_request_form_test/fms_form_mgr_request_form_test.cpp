@@ -23,8 +23,8 @@
 #undef private
 #include "form_mgr_errors.h"
 #include "form_mgr/form_mgr_service.h"
-#include "ams/form_ams_helper.h"
-#include "bms/form_bms_helper.h"
+#include "ams_mgr/form_ams_helper.h"
+#include "bms_mgr/form_bms_helper.h"
 #include "fms_log_wrapper.h"
 #include "if_system_ability_manager.h"
 #include "ipc_skeleton.h"

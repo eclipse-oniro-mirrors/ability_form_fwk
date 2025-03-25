@@ -18,7 +18,7 @@
 #include <cinttypes>
 
 #include "fms_log_wrapper.h"
-#include "ams/form_ams_helper.h"
+#include "ams_mgr/form_ams_helper.h"
 #include "form_constants.h"
 #include "data_center/form_data_proxy_mgr.h"
 #include "form_mgr_errors.h"

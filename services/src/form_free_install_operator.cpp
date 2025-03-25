@@ -16,7 +16,7 @@
 #include "feature/form_share/form_free_install_operator.h"
 
 #include "fms_log_wrapper.h"
-#include "bms/form_bms_helper.h"
+#include "bms_mgr/form_bms_helper.h"
 #include "form_mgr_errors.h"
 #include "status_mgr_center/form_serial_queue.h"
 #include "feature/form_share/form_share_mgr.h"

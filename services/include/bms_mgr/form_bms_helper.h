@@ -20,7 +20,7 @@
 #include "ability_manager_interface.h"
 #include "bundle_mgr_interface.h"
 #include "bundle_installer_interface.h"
-#include "bms/form_bundle_event_callback.h"
+#include "bms_mgr/form_bundle_event_callback.h"
 #include "want.h"
 
 namespace OHOS {

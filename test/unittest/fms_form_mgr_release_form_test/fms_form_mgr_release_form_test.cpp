@@ -17,7 +17,7 @@
 
 #include "accesstoken_kit.h"
 #include "appexecfwk_errors.h"
-#include "bms/form_bms_helper.h"
+#include "bms_mgr/form_bms_helper.h"
 #include "data_center/form_cache_mgr.h"
 #include "data_center/form_data_mgr.h"
 #include "data_center/database/form_db_cache.h"

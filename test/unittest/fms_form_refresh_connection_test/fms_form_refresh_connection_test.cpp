@@ -25,7 +25,7 @@
 #define private public
 #include "form_provider/connection/form_acquire_connection.h"
 #include "form_provider/connection/form_acquire_state_connection.h"
-#include "bms/form_bundle_event_callback.h"
+#include "bms_mgr/form_bundle_event_callback.h"
 #include "data_center/form_cache_mgr.h"
 #include "form_provider/connection/form_cast_temp_connection.h"
 #include "form_provider/connection/form_delete_connection.h"

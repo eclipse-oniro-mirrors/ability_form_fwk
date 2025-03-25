@@ -18,11 +18,11 @@
 #include <gmock/gmock.h>
 #include "accesstoken_kit.h"
 #define private public
-#include "ams/form_ams_helper.h"
+#include "ams_mgr/form_ams_helper.h"
 #include "data_center/form_cache_mgr.h"
 #include "common/util/form_dump_mgr.h"
 #undef private
-#include "bms/form_bms_helper.h"
+#include "bms_mgr/form_bms_helper.h"
 #include "data_center/database/form_db_cache.h"
 #include "form_mgr_errors.h"
 #include "form_mgr/form_mgr_service.h"

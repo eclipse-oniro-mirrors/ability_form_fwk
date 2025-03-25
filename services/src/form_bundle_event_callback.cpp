@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "bms/form_bundle_event_callback.h"
+#include "bms_mgr/form_bundle_event_callback.h"
 
 #include "feature/bundle_forbidden/form_bundle_forbid_mgr.h"
 #include "status_mgr_center/form_task_mgr.h"

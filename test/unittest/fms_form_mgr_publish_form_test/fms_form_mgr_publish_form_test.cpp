@@ -18,8 +18,8 @@
 #include "accesstoken_kit.h"
 #define private public
 #undef private
-#include "ams/form_ams_helper.h"
-#include "bms/form_bms_helper.h"
+#include "ams_mgr/form_ams_helper.h"
+#include "bms_mgr/form_bms_helper.h"
 #define private public
 #include "data_center/form_data_mgr.h"
 #undef private

@@ -20,7 +20,7 @@
 #include "accesstoken_kit.h"
 #include "appexecfwk_errors.h"
 #define private public
-#include "bms/form_bms_helper.h"
+#include "bms_mgr/form_bms_helper.h"
 #include "form_constants.h"
 #include "data_center/form_data_mgr.h"
 #include "form_mgr.h"

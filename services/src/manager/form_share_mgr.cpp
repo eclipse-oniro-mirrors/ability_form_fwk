@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 #include "feature/form_share/form_share_mgr.h"
-#include "ams/form_ams_helper.h"
-#include "bms/form_bms_helper.h"
+#include "ams_mgr/form_ams_helper.h"
+#include "bms_mgr/form_bms_helper.h"
 #include "form_constants.h"
 #include "data_center/form_data_mgr.h"
 #include "common/event/form_event_handler.h"

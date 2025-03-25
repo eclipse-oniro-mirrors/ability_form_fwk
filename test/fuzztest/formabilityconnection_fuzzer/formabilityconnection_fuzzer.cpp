@@ -21,7 +21,7 @@
 #define private public
 #define protected public
 #include "common/connection/form_ability_connection.h"
-#include "ams/form_ams_helper.h"
+#include "ams_mgr/form_ams_helper.h"
 #undef private
 #undef protected
 #include "securec.h"
