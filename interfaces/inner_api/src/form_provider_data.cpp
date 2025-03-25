@@ -386,7 +386,7 @@ char *FormProviderData::ReadAshmemDataFromParcel(Parcel &parcel, int32_t bufferS
         return nullptr;
     }
     if (fd == -1) {
-        HILOG_INFO("ReadFileDescriptor Error");
+        HILOG_ERROR("ReadFileDescriptor Error");
         return nullptr;
     }
     fdsan_exchange_owner_tag(fd, 0, Constants::FORM_DOMAIN_ID);
