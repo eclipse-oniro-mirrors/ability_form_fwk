@@ -1829,15 +1829,6 @@ ErrCode FormMgrAdapter::InnerAcquireProviderFormInfoAsync(const int64_t formId,
         HILOG_ERROR("null formAcquireConnection");
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
-    Want want;
-    want.SetElementName(info.GetProviderBundleName(), info.GetAbilityName());
-    want.AddFlags(Want::FLAG_ABILITY_FORM_ENABLED);
-    ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbility(want, formAcquireConnection);
-    FormReport::GetInstance().SetStartBindTime(formId, FormUtil::GetCurrentSteadyClockMillseconds());
-    if (errorCode != ERR_OK && errorCode != ERR_ECOLOGICAL_CONTROL_STATUS) {
-        HILOG_ERROR("ConnectServiceAbility failed");
-        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
-    }
 #ifdef RES_SCHEDULE_ENABLE
     auto&& connectCallback = [](const std::string &bundleName) {
         FormAbilityConnectionReporter::GetInstance().ReportFormAbilityConnection(bundleName);
@@ -1848,6 +1839,15 @@ ErrCode FormMgrAdapter::InnerAcquireProviderFormInfoAsync(const int64_t formId,
     formAcquireConnection->SetFormAbilityConnectCb(connectCallback);
     formAcquireConnection->SetFormAbilityDisconnectCb(disconnectCallback);
 #endif
+    Want want;
+    want.SetElementName(info.GetProviderBundleName(), info.GetAbilityName());
+    want.AddFlags(Want::FLAG_ABILITY_FORM_ENABLED);
+    ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbility(want, formAcquireConnection);
+    FormReport::GetInstance().SetStartBindTime(formId, FormUtil::GetCurrentSteadyClockMillseconds());
+    if (errorCode != ERR_OK && errorCode != ERR_ECOLOGICAL_CONTROL_STATUS) {
+        HILOG_ERROR("ConnectServiceAbility failed");
+        return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
+    }
     return ERR_OK;
 }
 
