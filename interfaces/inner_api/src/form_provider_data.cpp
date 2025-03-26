@@ -358,7 +358,7 @@ void FormProviderData::ReleaseMemory(int32_t allocType, void *addr, void *contex
                 ::munmap(addr, size);
             }
             if (fd != nullptr) {
-                ::close(*fd);
+                fdsan_close_with_tag(*fd, Constants::FORM_DOMAIN_ID);
             }
             context = nullptr;
             addr = nullptr;
@@ -385,10 +385,15 @@ char *FormProviderData::ReadAshmemDataFromParcel(Parcel &parcel, int32_t bufferS
         HILOG_INFO("ReadImageData map failed, errno:%{public}d", errno);
         return nullptr;
     }
-
+    if (fd == -1) {
+        HILOG_ERROR("ReadFileDescriptor Error");
+        return nullptr;
+    }
+    fdsan_exchange_owner_tag(fd, 0, Constants::FORM_DOMAIN_ID);
     base = static_cast<char *>(malloc(bufferSize));
     if (base == nullptr) {
         ::munmap(ptr, bufferSize);
+        fdsan_close_with_tag(fd, Constants::FORM_DOMAIN_ID);
         HILOG_INFO("alloc output pixel memory size:[%{public}d] error.", bufferSize);
         return nullptr;
     }
@@ -396,6 +401,7 @@ char *FormProviderData::ReadAshmemDataFromParcel(Parcel &parcel, int32_t bufferS
         ::munmap(ptr, bufferSize);
         free(base);
         base = nullptr;
+        fdsan_close_with_tag(fd, Constants::FORM_DOMAIN_ID);
         HILOG_INFO("memcpy pixel data size:[%{public}d] error.", bufferSize);
         return nullptr;
     }
@@ -449,16 +455,16 @@ bool FormProviderData::WriteAshmemDataToParcel(Parcel &parcel, size_t size, cons
     if (fd < 0) {
         return false;
     }
-
+    fdsan_exchange_owner_tag(fd, 0, Constants::FORM_DOMAIN_ID);
     int result = AshmemSetProt(fd, PROT_READ | PROT_WRITE);
     HILOG_INFO("AshmemSetProt:[%{public}d].", result);
     if (result < 0) {
-        ::close(fd);
+        fdsan_close_with_tag(fd, Constants::FORM_DOMAIN_ID);
         return false;
     }
     void *ptr = ::mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     if (ptr == MAP_FAILED) {
-        ::close(fd);
+        fdsan_close_with_tag(fd, Constants::FORM_DOMAIN_ID);
         HILOG_INFO("WriteAshmemData map failed, errno:%{public}d", errno);
         return false;
     }
@@ -466,20 +472,20 @@ bool FormProviderData::WriteAshmemDataToParcel(Parcel &parcel, size_t size, cons
 
     if (memcpy_s(ptr, size, data, size) != EOK) {
         ::munmap(ptr, size);
-        ::close(fd);
+        fdsan_close_with_tag(fd, Constants::FORM_DOMAIN_ID);
         HILOG_INFO("WriteAshmemData memcpy_s error");
         return false;
     }
 
     if (!FormProviderData::WriteFileDescriptor(parcel, fd)) {
         ::munmap(ptr, size);
-        ::close(fd);
+        fdsan_close_with_tag(fd, Constants::FORM_DOMAIN_ID);
         HILOG_INFO("WriteAshmemData WriteFileDescriptor error");
         return false;
     }
     HILOG_INFO("WriteAshmemData WriteFileDescriptor success");
     ::munmap(ptr, size);
-    ::close(fd);
+    fdsan_close_with_tag(fd, Constants::FORM_DOMAIN_ID);
     return true;
 }
 
