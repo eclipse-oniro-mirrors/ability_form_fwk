@@ -16,19 +16,19 @@
 #include "form_render/form_render_mgr.h"
 
 namespace {
-    bool g_mockGetIsVerified = true;
+    bool g_mockGetIsSecondMounted = true;
 }
 
-void MockGetIsVerified(bool mockRet)
+void MockGetIsSecondMounted(bool mockRet)
 {
-    g_mockGetIsVerified = mockRet;
+    g_mockGetIsSecondMounted = mockRet;
 }
 
 namespace OHOS {
 namespace AppExecFwk {
-bool FormRenderMgr::GetIsVerified() const
+bool FormRenderMgr::GetIsSecondMounted() const
 {
-    return g_mockGetIsVerified;
+    return g_mockGetIsSecondMounted;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
