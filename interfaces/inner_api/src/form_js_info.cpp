@@ -150,7 +150,7 @@ bool FormJsInfo::Marshalling(Parcel &parcel) const
 bool FormJsInfo::WriteFormData(Parcel &parcel) const
 {
     MessageParcel* msgParcel = static_cast<MessageParcel *>(&parcel);
-    int32_t formDataLength = formData.length();
+    int32_t formDataLength = static_cast<int32_t>(formData.length());
     parcel.WriteInt32(formDataLength);
     if (formDataLength > BIG_DATA) {
         HILOG_INFO("WriteFormData data length is %{public}d", formDataLength);
