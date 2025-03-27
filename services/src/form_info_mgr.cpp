@@ -19,7 +19,6 @@
 #include "extension_form_profile.h"
 #include "fms_log_wrapper.h"
 #include "form_bms_helper.h"
-#include "form_db_cache.h"
 #include "form_info_storage.h"
 #include "form_info_rdb_storage_mgr.h"
 #include "form_mgr_errors.h"
@@ -228,20 +227,16 @@ ErrCode BundleFormInfo::UpdateStaticFormInfos(int32_t userId)
 
     std::unique_lock<std::shared_timed_mutex> guard(formInfosMutex_);
     if (!formInfos.empty()) {
-        std::vector<FormDBInfo> formDBInfos;
-        std::vector<FormInfo> finalFormInfos;
-        FormDbCache::GetInstance().GetAllFormDBInfoByBundleName(bundleName_, userId, formDBInfos);
-        HandleFormInfosMaxLimit(formInfos, finalFormInfos, formDBInfos);
         bool findUser = false;
         for (auto item = formInfoStorages_.begin(); item != formInfoStorages_.end(); ++item) {
             // Update all user's formInfos
             HILOG_DEBUG("Update formInfos, user:%{public}d", item->userId);
-            item->formInfos = finalFormInfos;
+            item->formInfos = formInfos;
             findUser = findUser || (item->userId == userId);
         }
         if (!findUser) {
             HILOG_DEBUG("Add new userId, user:%{public}d", userId);
-            formInfoStorages_.emplace_back(userId, finalFormInfos);
+            formInfoStorages_.emplace_back(userId, formInfos);
         }
     } else {
         HILOG_DEBUG("The new package of %{public}s does not contain a card, clear it", bundleName_.c_str());
@@ -420,62 +415,6 @@ ErrCode BundleFormInfo::UpdateFormInfoStorageLocked()
         errCode = FormInfoRdbStorageMgr::GetInstance().UpdateBundleFormInfos(bundleName_, formInfoStoragesStr);
     }
     return errCode;
-}
-
-void BundleFormInfo::HandleFormInfosMaxLimit(std::vector<FormInfo> &inFormInfos,
-    std::vector<FormInfo> &outFormInfos, const std::vector<FormDBInfo> &formDBInfos)
-{
-    HILOG_INFO("formInfo num: %{public}u,formDBInfo num: %{public}u", inFormInfos.size(), formDBInfos.size());
-    std::set<std::string> formDBNames;
-    GetAllUsedFormName(formDBInfos, inFormInfos, formDBNames);
-    if (formDBNames.empty() || inFormInfos.size() <= Constants::FORM_INFO_MAX_NUM) {
-        if (inFormInfos.size() > Constants::FORM_INFO_MAX_NUM) {
-            unsigned int needPopNum = inFormInfos.size() - Constants::FORM_INFO_MAX_NUM;
-            for (unsigned int i = 0; i < needPopNum; i++) {
-                inFormInfos.pop_back();
-            }
-        }
-        outFormInfos = inFormInfos;
-        return;
-    }
-    int32_t addFormNum = 0;
-    unsigned int formNum = formDBNames.size();
-    if (formDBNames.size() < Constants::FORM_INFO_MAX_NUM) {
-        addFormNum = Constants::FORM_INFO_MAX_NUM - static_cast<int32_t>(formDBNames.size());
-        formNum = Constants::FORM_INFO_MAX_NUM;
-    }
-    for (auto formInfo : inFormInfos) {
-        bool isUsed = formDBNames.find(formInfo.name) != formDBNames.end();
-        if (isUsed) {
-            outFormInfos.push_back(formInfo);
-        } else if (!isUsed && addFormNum > 0) {
-            outFormInfos.push_back(formInfo);
-            addFormNum--;
-        }
-        if (outFormInfos.size() == formNum) {
-            break;
-        }
-    }
-}
-
-void BundleFormInfo::GetAllUsedFormName(const std::vector<FormDBInfo> &formDBInfos,
-    const std::vector<FormInfo> &formInfos, std::set<std::string> &formDBNames)
-{
-    if (formDBInfos.empty() || formInfos.empty()) {
-        return;
-    }
-    for (auto formDBInfo : formDBInfos) {
-        if (formDBNames.count(formDBInfo.formName) > 0) {
-            continue;
-        }
-        for (auto formInfo : formInfos) {
-            if (formInfo.name == formDBInfo.formName) {
-                formDBNames.insert(formDBInfo.formName);
-                break;
-            }
-        }
-    }
-    HILOG_INFO("used form num: %{public}u", formDBNames.size());
 }
 
 FormInfoMgr::FormInfoMgr()
@@ -853,9 +792,32 @@ ErrCode FormInfoMgr::ReloadFormInfos(const int32_t userId)
     if (result != ERR_OK) {
         return result;
     }
+
+    HILOG_INFO("bundle name set number:%{public}zu", bundleVersionMap.size());
+
     std::unique_lock<std::shared_timed_mutex> guard(bundleFormInfoMapMutex_);
     hasReloadedFormInfosState_ = false;
-    UpdateBundleFormInfos(bundleVersionMap, userId);
+    for (auto const &bundleFormInfoPair : bundleFormInfoMap_) {
+        const std::string &bundleName = bundleFormInfoPair.first;
+        auto bundleVersionPair = bundleVersionMap.find(bundleName);
+        if (bundleVersionPair == bundleVersionMap.end()) {
+            bundleFormInfoPair.second->Remove(userId);
+            HILOG_INFO("remove forms info success, bundleName=%{public}s", bundleName.c_str());
+            continue;
+        }
+        uint32_t oldVersionCode = bundleVersionPair->second;
+        bundleVersionMap.erase(bundleVersionPair);
+        uint32_t newVersionCode = bundleFormInfoPair.second->GetVersionCode(userId);
+        if (oldVersionCode == newVersionCode) {
+            HILOG_INFO("versionCode not change, bundleName=%{public}s, versionCode:%{public}d",
+                bundleName.c_str(), oldVersionCode);
+            continue;
+        }
+        bundleFormInfoPair.second->UpdateStaticFormInfos(userId);
+        HILOG_INFO("update forms info success, bundleName=%{public}s, old:%{public}d, new:%{public}d",
+            bundleName.c_str(), oldVersionCode, newVersionCode);
+    }
+
     for (auto const &bundleVersionPair : bundleVersionMap) {
         std::shared_ptr<BundleFormInfo> bundleFormInfoPtr = std::make_shared<BundleFormInfo>(bundleVersionPair.first);
         ErrCode errCode = bundleFormInfoPtr->UpdateStaticFormInfos(userId);
@@ -908,40 +870,6 @@ ErrCode FormInfoMgr::GetBundleVersionMap(std::map<std::string, std::uint32_t> &b
         }
     }
     return ERR_OK;
-}
-
-void FormInfoMgr::UpdateBundleFormInfos(std::map<std::string, std::uint32_t> &bundleVersionMap, int32_t userId)
-{
-    std::string versionCode;
-    FormInfoRdbStorageMgr::GetInstance().GetFormVersionCode(versionCode);
-    bool isNeedUpdateAll = versionCode.empty() || Constants::FORM_VERSION_CODE > std::stoi(versionCode);
-    HILOG_INFO("bundle number:%{public}zu, old versionCode:%{public}s, new versionCode:%{public}d",
-        bundleVersionMap.size(), versionCode.c_str(), Constants::FORM_VERSION_CODE);
-    for (auto const &bundleFormInfoPair : bundleFormInfoMap_) {
-        const std::string &bundleName = bundleFormInfoPair.first;
-        auto bundleVersionPair = bundleVersionMap.find(bundleName);
-        if (bundleVersionPair == bundleVersionMap.end()) {
-            bundleFormInfoPair.second->Remove(userId);
-            HILOG_INFO("remove forms info success, bundleName=%{public}s", bundleName.c_str());
-            continue;
-        }
-        if (!isNeedUpdateAll) {
-            uint32_t newVersionCode = bundleVersionPair->second;
-            uint32_t oldVersionCode = bundleFormInfoPair.second->GetVersionCode(userId);
-            HILOG_INFO("bundleName=%{public}s, bundle version old:%{public}d, new:%{public}d",
-                bundleName.c_str(), oldVersionCode, newVersionCode);
-            if (oldVersionCode == newVersionCode) {
-                bundleVersionMap.erase(bundleVersionPair);
-                continue;
-            }
-        }
-        bundleVersionMap.erase(bundleVersionPair);
-        bundleFormInfoPair.second->UpdateStaticFormInfos(userId);
-        HILOG_INFO("update forms info success, bundleName=%{public}s", bundleName.c_str());
-    }
-    if (isNeedUpdateAll) {
-        FormInfoRdbStorageMgr::GetInstance().UpdateFormVersionCode();
-    }
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
