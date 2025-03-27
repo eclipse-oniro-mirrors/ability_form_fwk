@@ -20,7 +20,7 @@ ohos_unittest("FmsObserverRecordTest") {
   module_out_path = module_output_path
 
   sources = [
-    "${form_fwk_path}/services/src/form_observer_record.cpp",
+    "${form_fwk_path}/services/src/form_observer/form_observer_record.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_provider_client.cpp",
     "fms_observer_record_test.cpp",
   ]

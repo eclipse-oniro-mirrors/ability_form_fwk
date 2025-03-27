@@ -20,7 +20,7 @@ ohos_unittest("FmsFormAbilityConnectionReporterTest") {
   module_out_path = module_output_path
 
   sources = [
-    "${form_fwk_path}/services/src/form_ability_connection_reporter.cpp",
+    "${form_fwk_path}/services/src/connection/form_ability_connection_reporter.cpp",
     "${form_fwk_path}/test/unittest/fms_form_bms_helper_test/fms_form_ability_connection_reporter_test.cpp",
   ]
 

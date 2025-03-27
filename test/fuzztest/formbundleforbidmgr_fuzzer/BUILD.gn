@@ -34,7 +34,7 @@ ohos_fuzztest("FormBundleForbidMgrFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
   sources = [
-    "${form_fwk_path}/services/src/form_bundle_forbid_mgr.cpp",
+    "${form_fwk_path}/services/src/feature/bundle_forbidden/form_bundle_forbid_mgr.cpp",
     "formbundleforbidmgr_fuzzer.cpp",
   ]
 

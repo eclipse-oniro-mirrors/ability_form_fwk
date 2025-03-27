@@ -24,11 +24,11 @@ ohos_unittest("FormBundleLockTest") {
   configs = [ ":Form_Bundle_Lock_config" ]
 
   sources = [
-    "${form_fwk_path}/services/src/form_bundle_lock_mgr.cpp",
-    "${form_fwk_path}/services/src/form_data_mgr.cpp",
-    "${form_fwk_path}/services/src/form_event_report.cpp",
-    "${form_fwk_path}/services/src/form_rdb_data_mgr.cpp",
-    "${form_fwk_path}/services/src/form_util.cpp",
+    "${form_fwk_path}/services/src/feature/bundle_lock/form_bundle_lock_mgr.cpp",
+    "${form_fwk_path}/services/src/data_center/form_data_mgr.cpp",
+    "${form_fwk_path}/services/src/common/event/form_event_report.cpp",
+    "${form_fwk_path}/services/src/data_center/database/form_rdb_data_mgr.cpp",
+    "${form_fwk_path}/services/src/common/util/form_util.cpp",
     "form_bundle_lock_mgr_test.cpp",
   ]
 

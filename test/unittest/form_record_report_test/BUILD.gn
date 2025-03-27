@@ -28,7 +28,7 @@ ohos_unittest("FormRecordReporttTest") {
   configs = [ ":Form_Record_Report_config" ]
 
   sources = [
-    "${form_fwk_path}/services/src/form_record_report.cpp",
+    "${form_fwk_path}/services/src/data_center/form_record/form_record_report.cpp",
     "form_record_report_test.cpp",
   ]
 

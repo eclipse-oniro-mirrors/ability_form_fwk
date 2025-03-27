@@ -20,8 +20,8 @@ ohos_unittest("FmsFormDataProxyMgrTest") {
   module_out_path = module_output_path
 
   sources = [
-    "${form_fwk_path}/services/src/form_data_proxy_mgr.cpp",
-    "${form_fwk_path}/services/src/form_data_proxy_record.cpp",
+    "${form_fwk_path}/services/src/data_center/form_data_proxy_mgr.cpp",
+    "${form_fwk_path}/services/src/data_center/form_data_proxy_record.cpp",
     "${form_fwk_path}/test/unittest/fms_form_data_proxy_mgr_test/fms_form_data_proxy_mgr_test.cpp",
   ]
 

@@ -20,8 +20,8 @@ ohos_unittest("FmsFreeInstallStatusCallbackProxyTest") {
   module_out_path = module_output_path
 
   sources = [
-    "${form_fwk_path}/services/src/free_install_status_callback_proxy.cpp",
-    "${form_fwk_path}/services/src/free_install_status_callback_stub.cpp",
+    "${form_fwk_path}/services/src/feature/free_install/free_install_status_callback_proxy.cpp",
+    "${form_fwk_path}/services/src/feature/free_install/free_install_status_callback_stub.cpp",
     "${form_fwk_path}/test/mock/src/remote_native_token.cpp",
     "fms_free_install_status_callback_proxy_test.cpp",
   ]
