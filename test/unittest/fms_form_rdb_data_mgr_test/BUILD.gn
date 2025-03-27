@@ -20,7 +20,7 @@ ohos_unittest("FmsFormRdbDataMgrTest") {
   module_out_path = module_output_path
 
   sources = [
-    "${form_fwk_path}/services/src/form_rdb_data_mgr.cpp",
+    "${form_fwk_path}/services/src/data_center/database/form_rdb_data_mgr.cpp",
     "${form_fwk_path}/test/mock/src/mock_bundle_manager.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_host_client.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_provider_client.cpp",
