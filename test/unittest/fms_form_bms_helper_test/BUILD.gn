@@ -20,7 +20,7 @@ ohos_unittest("FmsFormBmsHelperTest") {
   module_out_path = module_output_path
 
   sources = [
-    "${form_fwk_path}/services/src/form_bms_helper.cpp",
+    "${form_fwk_path}/services/src/bms_mgr/form_bms_helper.cpp",
     "${form_fwk_path}/test/unittest/fms_form_bms_helper_test/fms_form_bms_helper_test.cpp",
   ]
 
