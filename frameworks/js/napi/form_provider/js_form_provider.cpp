@@ -97,11 +97,6 @@ static bool ConvertFormId(napi_env env, napi_value jsValue, int64_t &formId)
         return false;
     }
 
-    if (strFormId.empty()) {
-        HILOG_ERROR("empty strFormId");
-        return false;
-    }
-
     if (!ConvertStringToInt64(strFormId, formId)) {
         HILOG_ERROR("convert string formId to int64 failed");
         return false;
