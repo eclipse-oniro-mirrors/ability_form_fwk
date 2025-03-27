@@ -1920,3 +1920,895 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_095, TestSize.Level1)
     formRenderRecordPtr_->eventHandler_ = nullptr;
     GTEST_LOG_(INFO) << "FormRenderRecordTest_095 end";
 }
+
+
+/**
+ * @tc.name: FormRenderRecordTest_096
+ * @tc.desc: Verify OnRenderingBlock
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_096, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_096 start";
+    formRenderRecordPtr_->OnRenderingBlock("123");
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_096 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_097
+ * @tc.desc: Verify OnNotifyRefreshForm
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_097, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_097 start";
+    formRenderRecordPtr_->OnNotifyRefreshForm(123);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_097 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_098
+ * @tc.desc: Verify Timer
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_098, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_098 start";
+    formRenderRecordPtr_->threadIsAlive_ = false;
+    formRenderRecordPtr_->threadState_ = std::make_shared<ThreadState>(0);
+    formRenderRecordPtr_->Timer();
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_098 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_099
+ * @tc.desc: Verify RunTask
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_099, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_099 start";
+    formRenderRecordPtr_->eventHandler_ = nullptr;
+    EXPECT_EQ(formRenderRecordPtr_->RunTask(), TaskState::NO_RUNNING);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_099 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_100
+ * @tc.desc: Verify DumpEventHandler
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_100 start";
+    formRenderRecordPtr_->eventHandler_ = nullptr;
+    formRenderRecordPtr_->DumpEventHandler();
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_100 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_101
+ * @tc.desc: Verify UpdateRenderRecord
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_101, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_101 start";
+    formRenderRecordPtr_->eventHandler_ = nullptr;
+    FormJsInfo info;
+    info.isDynamic = false;
+    Want want;
+    formRenderRecordPtr_->UpdateRenderRecord(info, want, nullptr);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_101 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_102
+ * @tc.desc: Verify UpdateRenderRecord
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_102, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_102 start";
+    std::string bundleName = "<bundleName>";
+    auto eventRunner = EventRunner::Create(bundleName);
+    formRenderRecordPtr_->eventHandler_ = std::make_shared<EventHandler>(eventRunner);
+    FormJsInfo info;
+    info.isDynamic = false;
+    Want want;
+    formRenderRecordPtr_->UpdateRenderRecord(info, want, nullptr);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_102 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_103
+ * @tc.desc: Verify DeleteRenderRecord
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_103, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_103 start";
+    formRenderRecordPtr_->eventHandler_ = nullptr;
+    bool isRenderGroupEmpty = true;
+    formRenderRecordPtr_->DeleteRenderRecord(123, "123", nullptr, isRenderGroupEmpty);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_103 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_104
+ * @tc.desc: Verify DeleteRenderRecord
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_104, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_104 start";
+    std::string bundleName = "<bundleName>";
+    auto eventRunner = EventRunner::Create(bundleName);
+    formRenderRecordPtr_->eventHandler_ = std::make_shared<EventHandler>(eventRunner);
+    sptr<IRemoteObject> hostRemoteObj = new (std::nothrow) MockFormProviderClient();
+    bool isRenderGroupEmpty = true;
+    formRenderRecordPtr_->DeleteRenderRecord(123, "123", hostRemoteObj, isRenderGroupEmpty);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_104 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_105
+ * @tc.desc: Verify CreateRuntime
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_105, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_105 start";
+    formRenderRecordPtr_->runtime_ = nullptr;
+    std::string bundleName = "<bundleName>";
+    auto eventRunner = EventRunner::Create(bundleName);
+    formRenderRecordPtr_->eventHandler_ = std::make_shared<EventHandler>(eventRunner);
+    FormJsInfo info;
+    formRenderRecordPtr_->CreateRuntime(info);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_105 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_106
+ * @tc.desc: Verify UpdateRuntime
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_106, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_106 start";
+    formRenderRecordPtr_->runtime_ = nullptr;
+    FormJsInfo info;
+    formRenderRecordPtr_->UpdateRuntime(info);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_106 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_107
+ * @tc.desc: Verify UpdateRuntime
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_107, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_107 start";
+    formRenderRecordPtr_->runtime_ = std::make_shared<AbilityRuntime::JsRuntime>();
+    FormJsInfo info;
+    info.formName = "123";
+    info.moduleName = "456";
+    info.isDynamic = false;
+    info.abilityName = "789";
+    formRenderRecordPtr_->UpdateRuntime(info);
+    formRenderRecordPtr_->runtime_ = nullptr;
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_107 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_108
+ * @tc.desc: Verify SetPkgContextInfoMap
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_108, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_108 start";
+    FormJsInfo info;
+    std::map<std::string, std::string> modulePkgNameMap;
+    modulePkgNameMap.insert(std::pair<std::string, std::string>("pkg_name", "pkg_name"));
+    modulePkgNameMap.insert(std::pair<std::string, std::string>("hap_path", "hap_path"));
+    info.modulePkgNameMap = modulePkgNameMap;
+    AbilityRuntime::Runtime::Options options;
+    formRenderRecordPtr_->SetPkgContextInfoMap(info, options);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_108 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_109
+ * @tc.desc: Verify SetPkgContextInfoMap
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_109, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_109 start";
+    FormJsInfo info;
+    std::map<std::string, std::string> modulePkgNameMap;
+    modulePkgNameMap.insert(std::pair<std::string, std::string>("123", "123"));
+    modulePkgNameMap.insert(std::pair<std::string, std::string>("456", "456"));
+    info.modulePkgNameMap = modulePkgNameMap;
+    AbilityRuntime::Runtime::Options options;
+    formRenderRecordPtr_->SetPkgContextInfoMap(info, options);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_109 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_110
+ * @tc.desc: Verify SetConfiguration
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_110, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_110 start";
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> config = std::make_shared<Configuration>();
+    config->AddItem(OHOS::AAFwk::GlobalConfigurationKey::SYSTEM_COLORMODE, "0");
+    config->AddItem(OHOS::AAFwk::GlobalConfigurationKey::SYSTEM_FONT_SIZE_SCALE, "1.7");
+    formRenderRecordPtr_->configuration_ = config;
+    formRenderRecordPtr_->SetConfiguration(config);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_110 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_111
+ * @tc.desc: Verify GetContext
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_111, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_111 start";
+    FormJsInfo formJsInfo;
+    Want want;
+    want.SetParam("form_compatible_version", 1);
+    formJsInfo.bundleName = "bundleName";
+    formJsInfo.moduleName = "moduleName";
+    formRenderRecordPtr_->contextsMapForModuleName_.clear();
+    formRenderRecordPtr_->contextsMapForModuleName_.emplace(formJsInfo.bundleName + ":" + formJsInfo.moduleName,
+        nullptr);
+    auto result = formRenderRecordPtr_->GetContext(formJsInfo, want);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_111 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_112
+ * @tc.desc: Verify CreateFormRendererGroupLock
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_112, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_112 start";
+    FormJsInfo formJsInfo;
+    std::shared_ptr<AbilityRuntime::Context> context = nullptr;
+    std::shared_ptr<AbilityRuntime::Runtime> runtime = nullptr;
+    formRenderRecordPtr_->eventHandler_ = nullptr;
+    formRenderRecordPtr_->CreateFormRendererGroupLock(formJsInfo, context, runtime);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_112 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_113
+ * @tc.desc: Verify HandleUpdateForm
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_113, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_113 start";
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = 1;
+    Want want;
+    want.SetParam(Constants::FORM_RENDER_TYPE_KEY, Constants::UPDATE_RENDERING_FORM);
+    formRenderRecordPtr_->HandleUpdateForm(formJsInfo, want);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_113 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_114
+ * @tc.desc: Verify AddRenderer
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_114, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_114 start";
+    FormJsInfo formJsInfo;
+    Want want;
+    want.SetParam(Constants::FORM_COMPATIBLE_VERSION_KEY, 1);
+    formJsInfo.bundleName = "bundleName";
+    formJsInfo.moduleName = "moduleName";
+    formRenderRecordPtr_->contextsMapForModuleName_.clear();
+    formRenderRecordPtr_->contextsMapForModuleName_.emplace(formJsInfo.bundleName + ":" + formJsInfo.moduleName,
+        nullptr);
+    formRenderRecordPtr_->AddRenderer(formJsInfo, want);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_114 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_115
+ * @tc.desc: Verify UpdateRenderer
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_115, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_114 start";
+    int64_t formId = 1;
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = formId;
+    formJsInfo.bundleName = "bundleName";
+    formJsInfo.moduleName = "moduleName";
+    formRenderRecordPtr_->formRendererGroupMap_.emplace(formId, nullptr);
+    formRenderRecordPtr_->UpdateRenderer(formJsInfo);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_115 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_116
+ * @tc.desc: Verify UpdateRenderer
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_116, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_116 start";
+    FormJsInfo formJsInfo;
+    formRenderRecordPtr_->UpdateRenderer(formJsInfo);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_116 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_117
+ * @tc.desc: Verify HandleDeleteInJsThread
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_117, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_117 start";
+    int64_t formId = 123;
+    std::string compId = "compId";
+    formRenderRecordPtr_->formRendererGroupMap_.clear();
+    formRenderRecordPtr_->formRendererGroupMap_.emplace(formId, nullptr);
+    EXPECT_EQ(false, formRenderRecordPtr_->HandleDeleteInJsThread(formId, compId));
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_117 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_118
+ * @tc.desc: Verify AddFormRequest
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_118, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_118 start";
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = 1;
+    Want want;
+    want.SetParam(OHOS::AppExecFwk::Constants::FORM_RENDER_COMP_ID, 1);
+    formRenderRecordPtr_->AddFormRequest(formJsInfo, want);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_118 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_119
+ * @tc.desc: Verify AddFormRequest
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_119, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_119 start";
+
+    ASSERT_NE(formRenderRecordPtr_, nullptr);
+    formRenderRecordPtr_->formRequests_.clear();
+
+    int64_t formId = FORM_ID;
+    Ace::FormRequest formRequest;
+    formRequest.compId = "compId";
+    std::unordered_map<std::string, Ace::FormRequest> requests;
+    requests.emplace(formRequest.compId, formRequest);
+    formRenderRecordPtr_->formRequests_.emplace(formId, requests);
+    formRequest.hasRelease = true;
+    EXPECT_EQ(formRenderRecordPtr_->formRequests_.find(formId)->second.find(formRequest.compId)->second.hasRelease,
+        false);
+    formRenderRecordPtr_->AddFormRequest(formId, formRequest, true);
+    EXPECT_EQ(formRenderRecordPtr_->formRequests_.find(formId)->second.find(formRequest.compId)->second.hasRelease,
+        true);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_119 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_120
+ * @tc.desc: Test DeleteFormRequest
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_120, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_120 start";
+
+    EXPECT_TRUE(formRenderRecordPtr_);
+    formRenderRecordPtr_->formRequests_.clear();
+    int64_t formId = 15;
+    FormRequest request;
+    std::unordered_map<std::string, Ace::FormRequest> map;
+    map.emplace("1", request);
+    formRenderRecordPtr_->formRequests_.emplace(formId, map);
+    EXPECT_EQ(1, static_cast<int>(formRenderRecordPtr_->formRequests_.size()));
+    formRenderRecordPtr_->DeleteFormRequest(formId, "");
+    EXPECT_EQ(0, static_cast<int>(formRenderRecordPtr_->formRequests_.size()));
+    formRenderRecordPtr_->formRequests_.clear();
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_120 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_121
+ * @tc.desc: Verify ReleaseRenderer
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_121, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_121 start";
+    ASSERT_NE(nullptr, formRenderRecordPtr_);
+    int64_t formId = 1;
+    std::string compId = "compId";
+    bool isRenderGroupEmpty = true;
+    Want want;
+    formRenderRecordPtr_->eventHandler_ = nullptr;
+    formRenderRecordPtr_->ReleaseRenderer(formId, compId, isRenderGroupEmpty);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_121 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_122
+ * @tc.desc: Verify RecoverFormsByConfigUpdate
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_122, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_122 start";
+    std::vector<int64_t> formIds;
+    sptr<IFormSupply> formSupplyClient;
+    formRenderRecordPtr_->RecoverFormsByConfigUpdate(formIds, formSupplyClient);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_122 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_123
+ * @tc.desc: Verify RecoverFormsByConfigUpdate
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_123, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_123 start";
+    std::vector<int64_t> formIds;
+    sptr<IFormSupply> formSupplyClient;
+    formRenderRecordPtr_->RecoverFormsByConfigUpdate(formIds, formSupplyClient);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_123 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_124
+ * @tc.desc: Verify ReAddAllRecycledForms
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_124, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_124 start";
+    sptr<IFormSupply> formSupplyClient;
+    formRenderRecordPtr_->ReAddAllRecycledForms(formSupplyClient);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_124 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_125
+ * @tc.desc: Verify ReAddAllRecycledForms
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_125, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_125 start";
+    sptr<IFormSupply> formSupplyClient;
+    formRenderRecordPtr_->eventHandler_ = nullptr;
+    formRenderRecordPtr_->ReAddAllRecycledForms(formSupplyClient);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_125 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_126
+ * @tc.desc: Verify ReAddRecycledForms
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_126, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_126 start";
+    FormJsInfo formJsInfo1;
+    FormJsInfo formJsInfo2;
+    FormJsInfo formJsInfo3;
+    std::vector<FormJsInfo> formJsInfos = {formJsInfo1, formJsInfo2, formJsInfo3};
+    std::string bundleName = "<bundleName>";
+    auto eventRunner = EventRunner::Create(bundleName);
+    formRenderRecordPtr_->eventHandler_ = std::make_shared<EventHandler>(eventRunner);
+    formRenderRecordPtr_->ReAddRecycledForms(formJsInfos);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_126 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_127
+ * @tc.desc: Verify ReloadFormRecord
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_127, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_127 start";
+    std::vector<FormJsInfo> formJsInfos;
+    Want want;
+    formRenderRecordPtr_->eventHandler_ = nullptr;
+    formRenderRecordPtr_->ReloadFormRecord(std::move(formJsInfos), want);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_127 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_128
+ * @tc.desc: Verify ReloadFormRecord
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_128, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_128 start";
+    std::vector<FormJsInfo> formJsInfos;
+    Want want;
+    std::string bundleName = "<bundleName>";
+    auto eventRunner = EventRunner::Create(bundleName);
+    formRenderRecordPtr_->eventHandler_ = std::make_shared<EventHandler>(eventRunner);
+    formRenderRecordPtr_->ReloadFormRecord(std::move(formJsInfos), want);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_128 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_129
+ * @tc.desc: Verify ReloadFormRecord
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_129, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_129 start";
+    std::vector<FormJsInfo> formJsInfos;
+    std::string bundleName = "<bundleName>";
+    auto eventRunner = EventRunner::Create(bundleName);
+    formRenderRecordPtr_->eventHandler_ = std::make_shared<EventHandler>(eventRunner);
+    formRenderRecordPtr_->ReAddIfHapPathChanged(formJsInfos);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_129 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_130
+ * @tc.desc: Verify ReAddIfHapPathChanged
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_130, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_130 start";
+    std::vector<FormJsInfo> formJsInfos;
+    formRenderRecordPtr_->eventHandler_ = nullptr;
+    formRenderRecordPtr_->ReAddIfHapPathChanged(formJsInfos);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_130 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_131
+ * @tc.desc: Verify UpdateAllFormRequest
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_131, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_131 start";
+    bool hasRelease = true;
+    FormJsInfo formJsInfo1;
+    FormJsInfo formJsInfo2;
+    FormJsInfo formJsInfo3;
+    std::vector<FormJsInfo> formJsInfos = {formJsInfo1, formJsInfo2, formJsInfo3};
+    formRenderRecordPtr_->UpdateAllFormRequest(formJsInfos, hasRelease);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_131 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_132
+ * @tc.desc: Verify OnUnlock
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_132, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_132 start";
+    std::string bundleName = "<bundleName>";
+    auto eventRunner = EventRunner::Create(bundleName);
+    formRenderRecordPtr_->eventHandler_ = std::make_shared<EventHandler>(eventRunner);
+    formRenderRecordPtr_->OnUnlock();
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_132 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_133
+ * @tc.desc: Verify HandleReloadFormRecord
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_133, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_133 start";
+    std::vector<FormJsInfo> formJsInfos;
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = 123;
+    formJsInfos.emplace_back(formJsInfo);
+    Want want;
+    formRenderRecordPtr_->formRendererGroupMap_.clear();
+    formRenderRecordPtr_->formRendererGroupMap_.emplace(456, nullptr);
+    formRenderRecordPtr_->runtime_ = std::make_shared<AbilityRuntime::JsRuntime>();
+    formRenderRecordPtr_->HandleReloadFormRecord(std::move(formJsInfos), want);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_133 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_134
+ * @tc.desc: Verify HandleUpdateConfiguration
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_134, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_134 start";
+    formRenderRecordPtr_->formRendererGroupMap_.emplace(456, nullptr);
+    std::shared_ptr<OHOS::AppExecFwk::Configuration> config;
+    formRenderRecordPtr_->HandleUpdateConfiguration(config);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_134 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_136
+ * @tc.desc: Verify FormRenderGC
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_136, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_136 start";
+    formRenderRecordPtr_->eventHandler_ = nullptr;
+    formRenderRecordPtr_->FormRenderGC();
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_136 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_137
+ * @tc.desc: Verify RecycleForm
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_137, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_137 start";
+    formRenderRecordPtr_->eventHandler_ = nullptr;
+    int64_t formId = 123;
+    std::string statusData;
+    formRenderRecordPtr_->RecycleForm(formId, statusData);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_137 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_138
+ * @tc.desc: Verify HandleRecoverForm
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_138, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_138 start";
+    EXPECT_TRUE(formRenderRecordPtr_);
+    formRenderRecordPtr_->formRequests_.clear();
+    Ace::FormRequest formRequest;
+    std::unordered_map<std::string, Ace::FormRequest> formRequests = {{"345", formRequest}};
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = 345;
+    formRenderRecordPtr_->formRequests_.emplace(345, formRequests);
+    std::string statusData = "123";
+    bool isHandleClickEvent = true;
+    formRenderRecordPtr_->HandleRecoverForm(formJsInfo, statusData, isHandleClickEvent);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_138 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_139
+ * @tc.desc: Verify HandleRecoverForm
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_139, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_139 start";
+    EXPECT_TRUE(formRenderRecordPtr_);
+    formRenderRecordPtr_->formRequests_.clear();
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = 345;
+    std::unordered_map<std::string, Ace::FormRequest> formRequests;
+    formRenderRecordPtr_->formRequests_.emplace(345, formRequests);
+    std::string statusData = "123";
+    bool isHandleClickEvent = true;
+    formRenderRecordPtr_->HandleRecoverForm(formJsInfo, statusData, isHandleClickEvent);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_139 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_140
+ * @tc.desc: Verify InitCompIds
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_140, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_140 start";
+    int64_t formId = 123;
+    std::vector<std::string> orderedCompIds = {"123", "456", "789"};
+    std::string currentCompId = "456";
+    formRenderRecordPtr_->recycledFormCompIds_.clear();
+    std::pair<std::vector<std::string>, std::string> pp;
+    formRenderRecordPtr_->recycledFormCompIds_.emplace(formId, pp);
+    formRenderRecordPtr_->InitCompIds(formId, orderedCompIds, currentCompId);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_140 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_141
+ * @tc.desc: Verify RecoverFormRequestsInGroup
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_141, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_141 start";
+    int64_t formId = 123;
+    formRenderRecordPtr_->recycledFormCompIds_.clear();
+    std::pair<std::vector<std::string>, std::string> pp;
+    formRenderRecordPtr_->recycledFormCompIds_.emplace(formId, pp);
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = 123;
+    std::string statusData = "123";
+    bool isHandleClickEvent = true;
+    std::unordered_map<std::string, Ace::FormRequest> recordFormRequests;
+    formRenderRecordPtr_->RecoverFormRequestsInGroup(formJsInfo, statusData, isHandleClickEvent, recordFormRequests);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_141 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_142
+ * @tc.desc: Verify RecoverFormRequestsInGroup
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_142, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_142 start";
+    int64_t formId = 123;
+    formRenderRecordPtr_->recycledFormCompIds_.clear();
+    std::pair<std::vector<std::string>, std::string> pp;
+    formRenderRecordPtr_->recycledFormCompIds_.emplace(formId, pp);
+    std::unordered_map<std::string, Ace::FormRequest> formRequests;
+    formRenderRecordPtr_->formRequests_.emplace(123, formRequests);
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = 123;
+    std::string statusData = "123";
+    bool isHandleClickEvent = true;
+    std::unordered_map<std::string, Ace::FormRequest> recordFormRequests;
+    formRenderRecordPtr_->RecoverFormRequestsInGroup(formJsInfo, statusData, isHandleClickEvent, recordFormRequests);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_142 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_143
+ * @tc.desc: Verify UpdateGroupRequestsWhenRecover
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_143, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_143 start";
+    int64_t formId = 123;
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = 123;
+    std::vector<std::string> orderedCompIds = {"123", "456", "789"};
+    std::string currentCompId = "123";
+    std::string statusData = "123";
+    bool isHandleClickEvent = true;
+    size_t currentRequestIndex;
+    Ace::FormRequest formRequest1;
+    std::vector<Ace::FormRequest> groupRequests;
+    bool currentRequestFound = true;
+    std::unordered_map<std::string, Ace::FormRequest> recordFormRequests {{"456", formRequest1}};
+    formRenderRecordPtr_->UpdateGroupRequestsWhenRecover(formId, formJsInfo, orderedCompIds, currentCompId,
+        statusData, isHandleClickEvent, currentRequestIndex, groupRequests, currentRequestFound,
+        recordFormRequests);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_143 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_144
+ * @tc.desc: Verify UpdateGroupRequestsWhenRecover
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_144, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_144 start";
+    int64_t formId = 123;
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = 123;
+    std::vector<std::string> orderedCompIds = {"123", "456", "789"};
+    std::string currentCompId = "456";
+    std::string statusData = "123";
+    bool isHandleClickEvent = true;
+    size_t currentRequestIndex;
+    Ace::FormRequest formRequest1;
+    std::string compId;
+    OHOS::AAFwk::Want want;
+    formRequest1.compId = "123";
+    formRequest1.want = want;
+    Ace::FormRequest formRequest2;
+    Ace::FormRequest formRequest3;
+    std::vector<Ace::FormRequest> groupRequests;
+    bool currentRequestFound = true;
+    std::unordered_map<std::string, Ace::FormRequest> recordFormRequests {{"123", formRequest1}, {"456", formRequest2}};
+    recordFormRequests.insert({"567", formRequest3});
+    formRenderRecordPtr_->UpdateGroupRequestsWhenRecover(formId, formJsInfo, orderedCompIds, currentCompId,
+        statusData, isHandleClickEvent, currentRequestIndex, groupRequests, currentRequestFound,
+        recordFormRequests);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_144 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_145
+ * @tc.desc: Verify MergeMap
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_145, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_145 start";
+    sptr<FormAshmem> formAshmem1;
+    sptr<FormAshmem> formAshmem2;
+    sptr<FormAshmem> formAshmem3;
+    sptr<FormAshmem> formAshmem4;
+    sptr<FormAshmem> formAshmem5;
+    std::map<std::string, sptr<FormAshmem>> dst;
+    dst.insert({"123", formAshmem1});
+    dst.insert({"456", formAshmem2});
+    dst.insert({"789", formAshmem4});
+    std::map<std::string, sptr<FormAshmem>> src;
+    src.insert({"123", formAshmem1});
+    src.insert({"345", formAshmem3});
+    src.insert({"789", formAshmem5});
+    formRenderRecordPtr_->MergeMap(dst, src);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_145 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_146
+ * @tc.desc: Verify UpdateFormSizeOfGroups
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_146, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_146 start";
+    int64_t formId = 123;
+    float width = 1;
+    float height = 1;
+    float borderWidth = 1;
+    formRenderRecordPtr_->UpdateFormSizeOfGroups(formId, width, height, borderWidth);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_146 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_147
+ * @tc.desc: Verify UpdateFormSizeOfGroups
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_147, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_147 start";
+
+    EXPECT_TRUE(formRenderRecordPtr_);
+
+    formRenderRecordPtr_->formRequests_.clear();
+    int64_t formId = 123;
+    FormRequest request;
+    std::unordered_map<std::string, Ace::FormRequest> map;
+    map.emplace("123", request);
+    formRenderRecordPtr_->formRequests_.emplace(formId, map);
+    float width = 1;
+    float height = 1;
+    float borderWidth = 1;
+    formRenderRecordPtr_->UpdateFormSizeOfGroups(formId, width, height, borderWidth);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_147 end";
+}
