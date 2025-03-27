@@ -29,8 +29,8 @@ ohos_unittest("FormReportTest") {
 
   sources = [
     "${form_fwk_path}/services/src/common/event/form_event_report.cpp",
-    "${form_fwk_path}/services/src/data_center/form_record/form_record_report.cpp",
     "${form_fwk_path}/services/src/common/util/form_report.cpp",
+    "${form_fwk_path}/services/src/data_center/form_record/form_record_report.cpp",
     "form_report_test.cpp",
   ]
 
