@@ -62,7 +62,7 @@ public:
      * @param remoteObject Form provider proxy object.
      */
     void PostProviderBatchDeleteTask(std::set<int64_t> &formIds, const Want &want,
-                                     const sptr<IRemoteObject> &remoteObject);
+        const sptr<IRemoteObject> &remoteObject);
 
     /**
      * @brief Cast temp form data from form provider(task).
@@ -82,7 +82,7 @@ public:
     * @param remoteObject Form provider proxy object.
     */
     void PostAcquireStateTask(const Want &wantArg, const std::string &provider, const Want &want,
-                              const sptr <IRemoteObject> &remoteObject);
+        const sptr <IRemoteObject> &remoteObject);
 
     /**
     * @brief Post acquire data to form provider.
@@ -100,7 +100,7 @@ public:
      * @param remoteObject Form provider proxy object.
      */
     void PostFormEventTask(const int64_t formId, const std::string &message, const Want &want,
-                           const sptr<IRemoteObject> &remoteObject);
+        const sptr<IRemoteObject> &remoteObject);
 
 private:
     /**
@@ -137,7 +137,7 @@ private:
      * @param remoteObject Form provider proxy object.
      */
     void AcquireState(const Want &wantArg, const std::string &provider, const Want &want,
-                      const sptr <IRemoteObject> &remoteObject);
+        const sptr <IRemoteObject> &remoteObject);
 
     /**
      * @brief Acquire form data to form provider.
@@ -155,7 +155,7 @@ private:
      * @param remoteObject Form provider proxy object.
      */
     void FireFormEvent(const int64_t formId, const std::string &message, const Want &want,
-                       const sptr<IRemoteObject> &remoteObject);
+        const sptr<IRemoteObject> &remoteObject);
 
     void RemoveConnection(int32_t connectId);
 };

@@ -59,7 +59,7 @@ public:
     * @param remoteObject Form provider proxy object.
     */
     void PostAcquireStateTaskToHost(AppExecFwk::FormState state, const AAFwk::Want &want,
-                                    const sptr<IRemoteObject> &remoteObject);
+        const sptr<IRemoteObject> &remoteObject);
 
     /**
     * @brief Post acquire form data message to form host(task).
@@ -68,7 +68,7 @@ public:
     * @param remoteObject Form provider proxy object.
     */
     void PostAcquireDataTaskToHost(const AAFwk::WantParams &wantParams, int64_t requestCode,
-                                    const sptr<IRemoteObject> &remoteObject);
+        const sptr<IRemoteObject> &remoteObject);
 
     /**
      * @brief Post enable form task.
@@ -102,7 +102,7 @@ private:
      * @param remoteObject Form provider proxy object.
      */
     void AcquireTaskToHost(const int64_t formId, const FormRecord &record,
-                            const sptr<IRemoteObject> &remoteObject);
+        const sptr<IRemoteObject> &remoteObject);
 
     /**
      * @brief Post form data to form host when update form.
@@ -126,7 +126,7 @@ private:
      * @param remoteObject Form provider proxy object.
      */
     void AcquireStateBack(AppExecFwk::FormState state, const AAFwk::Want &want,
-                          const sptr <IRemoteObject> &remoteObject);
+        const sptr <IRemoteObject> &remoteObject);
 
     /**
      * @brief Handle acquire data.
@@ -135,7 +135,7 @@ private:
      * @param remoteObject Form provider proxy object.
      */
     void AcquireFormDataBack(const AAFwk::WantParams &wantParams, int64_t requestCode,
-                            const sptr<IRemoteObject> &remoteObject);
+        const sptr<IRemoteObject> &remoteObject);
 
     /**
      * @brief Enable form or disable form.
