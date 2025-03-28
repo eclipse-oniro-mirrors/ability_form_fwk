@@ -921,6 +921,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
 
     int64_t matchedFormId = 0;
     int32_t userId = FormUtil::GetCurrentAccountId();
+    std::map<std::string, std::vector<int64_t>> eventMaps;
     std::map<std::string, std::vector<FormInstance>> formInstanceMaps;
     std::vector<int64_t> checkFormIds;
 
@@ -944,6 +945,9 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
             continue;
         }
     }
+    FormTaskMgr::GetInstance().PostVisibleNotify(
+        (formVisibleType == static_cast<int32_t>(FormVisibilityType::VISIBLE)) ? checkFormIds : formIds,
+        formInstanceMaps, eventMaps, formVisibleType, Constants::DEFAULT_VISIBLE_NOTIFY_DELAY, callerToken);
     return ERR_OK;
 }
 
