@@ -67,7 +67,8 @@ void FormStatusTaskMgr::PostRecycleForms(const std::vector<int64_t> &formIds, co
  * @param want The want of the request.
  * @param remoteObject Form render proxy object.
  */
-void FormStatusTaskMgr::PostRecoverForm(const FormRecord &record, const Want &want, const sptr<IRemoteObject> &remoteObject)
+void FormStatusTaskMgr::PostRecoverForm(const FormRecord &record, const Want &want,
+    const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_DEBUG("start");
 
@@ -325,7 +326,8 @@ void FormStatusTaskMgr::StopRenderingForm(
     HILOG_INFO("end");
 }
 
-void FormStatusTaskMgr::RenderForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject)
+void FormStatusTaskMgr::RenderForm(const FormRecord &formRecord, const Want &want,
+    const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_INFO("render form");
     auto connectId = want.GetIntParam(Constants::FORM_CONNECT_ID, 0);

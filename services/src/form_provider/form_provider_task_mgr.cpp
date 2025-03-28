@@ -32,7 +32,8 @@ FormProviderTaskMgr::~FormProviderTaskMgr() {}
  * @param want The want of the request.
  * @param remoteObject Form provider proxy object.
  */
-void FormProviderTaskMgr::PostAcquireTask(const int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject)
+void FormProviderTaskMgr::PostAcquireTask(const int64_t formId, const Want &want,
+    const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_DEBUG("call");
 
@@ -50,7 +51,8 @@ void FormProviderTaskMgr::PostAcquireTask(const int64_t formId, const Want &want
  * @param remoteObject Form provider proxy object.
  * @return none.
  */
-void FormProviderTaskMgr::PostRefreshTask(const int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject)
+void FormProviderTaskMgr::PostRefreshTask(const int64_t formId, const Want &want,
+    const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_DEBUG("call");
 
@@ -66,7 +68,8 @@ void FormProviderTaskMgr::PostRefreshTask(const int64_t formId, const Want &want
  * @param want The want of the request.
  * @param remoteObject Form provider proxy object.
  */
-void FormProviderTaskMgr::PostDeleteTask(const int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject)
+void FormProviderTaskMgr::PostDeleteTask(const int64_t formId, const Want &want,
+    const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_DEBUG("call");
 
@@ -101,7 +104,8 @@ void FormProviderTaskMgr::PostProviderBatchDeleteTask(std::set<int64_t> &formIds
  * @param remoteObject Form provider proxy object.
  * @return none.
  */
-void FormProviderTaskMgr::PostCastTempTask(const int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject)
+void FormProviderTaskMgr::PostCastTempTask(const int64_t formId, const Want &want,
+    const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_DEBUG("call");
 
@@ -119,7 +123,7 @@ void FormProviderTaskMgr::PostCastTempTask(const int64_t formId, const Want &wan
 * @param remoteObject Form provider proxy object.
 */
 void FormProviderTaskMgr::PostAcquireStateTask(const Want &wantArg, const std::string &provider, const Want &want,
-                                       const sptr<IRemoteObject> &remoteObject)
+    const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_DEBUG("call");
 
@@ -136,7 +140,7 @@ void FormProviderTaskMgr::PostAcquireStateTask(const Want &wantArg, const std::s
 * @param remoteObject Form provider proxy object.
 */
 void FormProviderTaskMgr::PostAcquireDataTask(const int64_t formId, const Want &want,
-                                      const sptr<IRemoteObject> &remoteObject)
+    const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_DEBUG("call");
 
@@ -172,7 +176,8 @@ void FormProviderTaskMgr::PostFormEventTask(const int64_t formId, const std::str
  * @param remoteObject Form provider proxy object.
  * @return none.
  */
-void FormProviderTaskMgr::NotifyFormUpdate(const int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject)
+void FormProviderTaskMgr::NotifyFormUpdate(const int64_t formId, const Want &want,
+    const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_DEBUG("call");
 
@@ -229,7 +234,8 @@ void FormProviderTaskMgr::ProviderBatchDelete(std::set<int64_t> &formIds, const 
  * @param remoteObject Form provider proxy object.
  * @return none.
  */
-void FormProviderTaskMgr::NotifyCastTemp(const int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject)
+void FormProviderTaskMgr::NotifyCastTemp(const int64_t formId, const Want &want,
+    const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_INFO("call");
 
@@ -256,7 +262,7 @@ void FormProviderTaskMgr::NotifyCastTemp(const int64_t formId, const Want &want,
  * @param remoteObject Form provider proxy object.
  */
 void FormProviderTaskMgr::AcquireState(const Want &wantArg, const std::string &provider, const Want &want,
-                               const sptr<IRemoteObject> &remoteObject)
+    const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_INFO("start");
 
@@ -282,7 +288,8 @@ void FormProviderTaskMgr::AcquireState(const Want &wantArg, const std::string &p
  * @param want The want of the request.
  * @param remoteObject Form provider proxy object.
  */
-void FormProviderTaskMgr::AcquireFormData(const int64_t formId, const Want &want, const sptr<IRemoteObject> &remoteObject)
+void FormProviderTaskMgr::AcquireFormData(const int64_t formId, const Want &want,
+    const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_INFO("start");
 

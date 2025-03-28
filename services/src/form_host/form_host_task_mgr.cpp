@@ -73,7 +73,8 @@ void FormHostTaskMgr::PostUpdateTaskToHost(const int64_t formId, const FormRecor
  * @param formIds The Id list of the forms.
  * @param remoteObject Form provider proxy object.
  */
-void FormHostTaskMgr::PostUninstallTaskToHost(const std::vector<int64_t> &formIds, const sptr<IRemoteObject> &remoteObject)
+void FormHostTaskMgr::PostUninstallTaskToHost(const std::vector<int64_t> &formIds,
+    const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_DEBUG("call");
 
@@ -90,7 +91,7 @@ void FormHostTaskMgr::PostUninstallTaskToHost(const std::vector<int64_t> &formId
 * @param remoteObject Form provider proxy object.
 */
 void FormHostTaskMgr::PostAcquireStateTaskToHost(AppExecFwk::FormState state, const AAFwk::Want &want,
-                                             const sptr<IRemoteObject> &remoteObject)
+    const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_DEBUG("call");
 
@@ -242,7 +243,7 @@ void FormHostTaskMgr::FormUninstall(const std::vector<int64_t> &formIds,
  * @param remoteObject Form provider proxy object.
  */
 void FormHostTaskMgr::AcquireStateBack(AppExecFwk::FormState state, const AAFwk::Want &want,
-                                   const sptr<IRemoteObject> &remoteObject)
+    const sptr<IRemoteObject> &remoteObject)
 {
     HILOG_DEBUG("start");
 

@@ -81,18 +81,12 @@ public:
 private:
     void RecycleForm(const int64_t &formId, const sptr<IRemoteObject> &remoteObjectOfHost,
         const sptr<IRemoteObject> &remoteObjectOfRender);
-
     void RecoverForm(const FormRecord &record, const Want &want, const sptr<IRemoteObject> &remoteObject);
-
     void ReleaseRenderer( int64_t formId, const std::string &compId, const std::string &uid,
         const sptr<IRemoteObject> &remoteObject);
-
     void InnerPostRenderForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject);
-
     void StopRenderingForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject);
-
     void RenderForm(const FormRecord &formRecord, const Want &want, const sptr<IRemoteObject> &remoteObject);
-
     void RemoveConnection(int32_t connectId);
 
     std::mutex formRecoverTimesMutex_;
