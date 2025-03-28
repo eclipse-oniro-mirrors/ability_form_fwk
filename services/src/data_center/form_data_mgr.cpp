@@ -60,7 +60,8 @@ FormDataMgr::~FormDataMgr()
  */
 FormRecord FormDataMgr::AllotFormRecord(const FormItemInfo &formInfo, const int callingUid, const int32_t userId)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("call formId: %{public}" PRId64 " userId: %{public}d callingUid: %{public}d",
+        formInfo.GetFormId(), userId, callingUid);
     if (formInfo.IsTemporaryForm() && !ExistTempForm(formInfo.GetFormId())) {
         std::lock_guard<std::mutex> lock(formTempMutex_);
         tempForms_.emplace_back(formInfo.GetFormId());
@@ -83,7 +84,7 @@ FormRecord FormDataMgr::AllotFormRecord(const FormItemInfo &formInfo, const int 
             }
         }
     }
-    HILOG_INFO("end");
+    HILOG_INFO("end formId: %{public}" PRId64, formInfo.GetFormId());
     return record;
 }
 /**
@@ -115,7 +116,7 @@ bool FormDataMgr::DeleteFormRecord(const int64_t formId)
 bool FormDataMgr::AllotFormHostRecord(const FormItemInfo &info, const sptr<IRemoteObject> &callerToken,
     const int64_t formId, const int callingUid)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("call formId: %{public}" PRId64, formId);
     std::lock_guard<std::mutex> lock(formHostRecordMutex_);
     for (auto &record : clientRecords_) {
         if (callerToken == record.GetFormHostClient()) {
@@ -202,7 +203,7 @@ static void initFormRecord(FormRecord &newRecord, const FormItemInfo &formInfo)
  */
 FormRecord FormDataMgr::CreateFormRecord(const FormItemInfo &formInfo, const int callingUid, const int32_t userId) const
 {
-    HILOG_INFO("create");
+    HILOG_INFO("create formId: %{public}" PRId64 " userId: %{public}d", formInfo.GetFormId(), userId);
     FormRecord newRecord;
     initFormRecord(newRecord, formInfo);
     newRecord.userId = userId;
@@ -1529,7 +1530,7 @@ void FormDataMgr::ParseUpdateConfig(FormRecord &record, const FormItemInfo &info
  */
 void FormDataMgr::ParseIntervalConfig(FormRecord &record, const int configDuration) const
 {
-    HILOG_INFO("configDuration:%{public}d", configDuration);
+    HILOG_INFO("configDuration:%{public}d formId: %{public}" PRId64, configDuration, record.formId);
     if (configDuration <= Constants::MIN_CONFIG_DURATION) {
         record.updateDuration = Constants::MIN_PERIOD;
     } else if (configDuration >= Constants::MAX_CONFIG_DURATION) {

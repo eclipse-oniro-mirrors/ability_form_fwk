@@ -134,18 +134,19 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     HILOG_DEBUG("call");
     if (formId < 0 || callerToken == nullptr) {
-        HILOG_ERROR("null callerToken");
+        HILOG_ERROR("param error, formId: %{public}" PRId64 " code: %{public}d",
+            formId, ERR_APPEXECFWK_FORM_INVALID_PARAM);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
     AddFormResultErrorCode states = AddFormResultErrorCode::SUCCESS;
     ErrCode ret = CheckAddFormTaskTimeoutOrFailed(formId, states);
     if (ret != ERR_OK) {
-        HILOG_ERROR("AddForm Task Timeout or Failed");
+        HILOG_ERROR("AddForm Task Timeout or Failed. formId: %{public}" PRId64 " code: %{public}d", formId, ret);
         return ret;
     }
     ret = CheckFormCountLimit(formId, want);
     if (ret != ERR_OK) {
-        HILOG_ERROR("CheckFormCountLimit failed");
+        HILOG_ERROR("CheckFormCountLimit failed. code: %{public}d", ret);
         return ret;
     }
     if (formId > 0) {
@@ -158,19 +159,21 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
     formItemInfo.SetFormId(formId);
     int32_t errCode = GetFormConfigInfo(want, formItemInfo);
     if (errCode != ERR_OK) {
-        HILOG_ERROR("get form config info failed");
+        HILOG_ERROR("get %{public}s form config info failed. formId: %{public}" PRId64 " code: %{public}d",
+            formJsInfo.bundleName.c_str(), formId, errCode);
         return errCode;
     }
     // Check trust list
     if (!FormTrustMgr::GetInstance().IsTrust(formItemInfo.GetProviderBundleName())) {
-        HILOG_ERROR("AddForm fail,%{public}s is unTrust", formItemInfo.GetProviderBundleName().c_str());
+        HILOG_ERROR("AddForm fail,%{public}s is unTrust. formId: %{public}" PRId64 " code: %{public}d",
+            formItemInfo.GetProviderBundleName().c_str(), formId, ERR_APPEXECFWK_FORM_NOT_TRUST);
         return ERR_APPEXECFWK_FORM_NOT_TRUST;
     }
     // publish form
     if (formId > 0 && FormDataMgr::GetInstance().IsRequestPublishForm(formId)) {
         ret = AddRequestPublishForm(formItemInfo, want, callerToken, formJsInfo);
         if (ret != ERR_OK) {
-            HILOG_ERROR("add request publish form failed");
+            HILOG_ERROR("add request publish form failed. formId: %{public}" PRId64 " code: %{public}d", formId, ret);
             return ret;
         }
         bool tempFormFlag = want.GetBoolParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
@@ -185,7 +188,7 @@ int FormMgrAdapter::AddForm(const int64_t formId, const Want &want,
     ret = AllotForm(formId, want, callerToken, formJsInfo, formItemInfo);
     RemoveFormIdMapElement(formId);
     if (ret != ERR_OK) {
-        HILOG_ERROR("allot form failed");
+        HILOG_ERROR("allot form failed. formId: %{public}" PRId64 " code: %{public}d", formId, ret);
     }
     return ret;
 }
@@ -1666,14 +1669,15 @@ ErrCode FormMgrAdapter::AllotFormByInfo(const FormItemInfo &info,
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
     UpdateReUpdateFormMap(newFormId);
-    HILOG_DEBUG("newFormId:%{public}" PRId64 "", newFormId);
+    HILOG_INFO("Add new form bundleName: %{public}s abilityName: %{public}s formId: %{public}" PRId64,
+        formInfo.bundleName.c_str(), formInfo.abilityName.c_str(), newFormId);
     return AddNewFormRecord(info, newFormId, callerToken, wantParams, formInfo);
 }
 
 ErrCode FormMgrAdapter::AddNewFormRecord(const FormItemInfo &info, const int64_t formId,
     const sptr<IRemoteObject> &callerToken, const WantParams &wantParams, FormJsInfo &formJsInfo)
 {
-    HILOG_INFO("call");
+    HILOG_INFO("call formId: %{public}" PRId64, formId);
     FormItemInfo newInfo(info);
     newInfo.SetFormId(formId);
     // allot form host record
@@ -2676,12 +2680,12 @@ int FormMgrAdapter::MessageEvent(const int64_t formId, const Want &want, const s
     }
 
     if (callerToken == nullptr) {
-        HILOG_ERROR("null callerToken");
+        HILOG_ERROR("null callerToken formId: %{public}" PRId64, formId);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
     if (!want.HasParameter(Constants::PARAM_MESSAGE_KEY)) {
-        HILOG_ERROR("messageInfo not exist");
+        HILOG_ERROR("messageInfo not exist formId: %{public}" PRId64, formId);
         return ERR_APPEXECFWK_FORM_INVALID_PARAM;
     }
 
@@ -2696,12 +2700,12 @@ int FormMgrAdapter::MessageEvent(const int64_t formId, const Want &want, const s
     FormHostRecord formHostRecord;
     bool isHostExist = FormDataMgr::GetInstance().GetMatchedHostClient(callerToken, formHostRecord);
     if (!isHostExist) {
-        HILOG_ERROR("cannot find target client");
+        HILOG_ERROR("cannot find target client formId: %{public}" PRId64, formId);
         return ERR_APPEXECFWK_FORM_COMMON_CODE;
     }
 
     if (!formHostRecord.Contains(matchedFormId)) {
-        HILOG_ERROR("form not self-owned");
+        HILOG_ERROR("form not self-owned formId: %{public}" PRId64, formId);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
 
@@ -2709,7 +2713,7 @@ int FormMgrAdapter::MessageEvent(const int64_t formId, const Want &want, const s
     if (errCode != ERR_OK) {
         return errCode;
     }
-    HILOG_INFO("find target client");
+    HILOG_INFO("find target client formId: %{public}" PRId64, formId);
 
     NotifyFormClickEvent(formId, FORM_CLICK_MESSAGE);
 #ifdef DEVICE_USAGE_STATISTICS_ENABLE

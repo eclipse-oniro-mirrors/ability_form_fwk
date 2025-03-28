@@ -195,7 +195,6 @@ int32_t FormRenderStub::HandleOnUnlock(MessageParcel &data, MessageParcel &reply
 
 int32_t FormRenderStub::HandleSetVisibleChange(MessageParcel &data, MessageParcel &reply)
 {
-    HILOG_ERROR("begin");
     int64_t formId = data.ReadInt64();
     bool isVisible = data.ReadBool();
     std::unique_ptr<Want> want(data.ReadParcelable<Want>());
@@ -208,7 +207,6 @@ int32_t FormRenderStub::HandleSetVisibleChange(MessageParcel &data, MessageParce
     int32_t result = SetVisibleChange(formId, isVisible, *want);
     HiviewDFX::XCollie::GetInstance().CancelTimer(timerId);
     reply.WriteInt32(result);
-    HILOG_ERROR("end");
     return result;
 }
 
