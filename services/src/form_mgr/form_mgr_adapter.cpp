@@ -921,7 +921,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
 
     int64_t matchedFormId = 0;
     int32_t userId = FormUtil::GetCurrentAccountId();
-    std::map<std::string, std::vector<int64_t>> eventMaps;
+    std::map<std::string, std::vector<int64_t>> eventMaps = {};
     std::map<std::string, std::vector<FormInstance>> formInstanceMaps;
     std::vector<int64_t> checkFormIds;
 
