@@ -1705,7 +1705,7 @@ int32_t FormMgrProxy::SetBackgroundFunction(const std::string funcName, const st
     }
     // send request
     MessageParcel reply;
-    MessageOption option;
+    MessageOption option(MessageOption::TF_ASYNC);
     sptr<IRemoteObject> remote = Remote();
     if (!remote) {
         HILOG_ERROR("get remoteObject failed");
