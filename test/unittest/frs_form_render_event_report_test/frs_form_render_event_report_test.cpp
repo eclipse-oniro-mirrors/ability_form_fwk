@@ -77,5 +77,18 @@ HWTEST_F(FormRenderEventReportTest, SendBlockFaultEvent_001, TestSize.Level0)
     FormRenderEventReport::SendBlockFaultEvent(processId, jsThreadId, bundleName);
     GTEST_LOG_(INFO) << "SendBlockFaultEvent_001 test ends";
 }
+
+/**
+ * @tc.name: GetNowMillisecond_001
+ * @tc.desc: Check GetNowMillisecond Test
+ * @tc.type: FUNC
+ * @tc.require: issuesI9MVRJ
+ */
+HWTEST_F(FormRenderEventReportTest, GetNowMillisecond_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "GetNowMillisecond_001 begin";
+    FormRenderEventReport::GetNowMillisecond();
+    GTEST_LOG_(INFO) << "GetNowMillisecond_001 test ends";
+}
 } // namespace AppExecFwk
 } // namespace OHOS
