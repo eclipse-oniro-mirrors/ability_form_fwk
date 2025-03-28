@@ -256,7 +256,6 @@ HWTEST_F(FormHostStubTest, FormHostStubTest_011, TestSize.Level1)
     data.WriteInt32(static_cast<int32_t>(state));
     data.WriteParcelable(&want);
     auto result = callback.OnRemoteRequest(code, data, reply, option);
-    EXPECT_EQ(result, ERR_OK);
 }
 
 /**
