@@ -967,7 +967,7 @@ void FormTaskMgr::StopRenderingForm(
 void FormTaskMgr::PostReleaseRenderer(int64_t formId, const std::string &compId, const std::string &uid,
     const sptr<IRemoteObject> &remoteObject, bool isDynamic)
 {
-    HILOG_INFO("begin");
+    HILOG_INFO("begin formId: %{public}" PRId64, formId);
     if (serialQueue_ == nullptr) {
         HILOG_ERROR("null serialQueue_");
         return;
@@ -995,13 +995,13 @@ void FormTaskMgr::PostReleaseRenderer(int64_t formId, const std::string &compId,
             deleterenderForm};
         FormStatusQueue::GetInstance().PostFormStatusTask(releaseRenderCommand);
     }
-    HILOG_INFO("end");
+    HILOG_INFO("end formId: %{public}" PRId64, formId);
 }
 
 void FormTaskMgr::ReleaseRenderer(
     int64_t formId, const std::string &compId, const std::string &uid, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("begin");
+    HILOG_INFO("begin formId: %{public}" PRId64, formId);
     sptr<IFormRender> remoteFormDeleteRender = iface_cast<IFormRender>(remoteObject);
     if (remoteFormDeleteRender == nullptr) {
         HILOG_ERROR("get formRenderProxy failed");
@@ -1013,7 +1013,7 @@ void FormTaskMgr::ReleaseRenderer(
         HILOG_ERROR("fail release form renderer");
         return;
     }
-    HILOG_INFO("end");
+    HILOG_INFO("end formId: %{public}" PRId64, formId);
 }
 
 void FormTaskMgr::ReloadForm(const std::vector<FormRecord> &&formRecords, const Want &want,
@@ -1087,7 +1087,6 @@ void FormTaskMgr::PostOnUnlock(const sptr<IRemoteObject> &remoteObject)
 
 void FormTaskMgr::SetVisibleChange(int64_t formId, bool isVisible, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("begin");
     sptr<IFormRender> remoteFormRender = iface_cast<IFormRender>(remoteObject);
     if (remoteFormRender == nullptr) {
         HILOG_ERROR("get formRenderProxy failed");
@@ -1108,21 +1107,20 @@ void FormTaskMgr::SetVisibleChange(int64_t formId, bool isVisible, const sptr<IR
         HILOG_ERROR("fail");
         return;
     }
-    HILOG_INFO("end");
+    HILOG_INFO("formId: %{public}" PRId64 " isVisible change to: %{public}d", formId, isVisible);
 }
 
 void FormTaskMgr::PostSetVisibleChange(int64_t formId, bool isVisible, const sptr<IRemoteObject> &remoteObject)
 {
-    HILOG_INFO("call");
     if (serialQueue_ == nullptr) {
-        HILOG_ERROR("null serialQueue_");
+        HILOG_ERROR("null serialQueue_, formId: %{public}" PRId64 " isVisible: %{public}d", formId, isVisible);
         return;
     }
     auto task = [formId, isVisible, remoteObject]() {
         FormTaskMgr::GetInstance().SetVisibleChange(formId, isVisible, remoteObject);
     };
     serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, task);
-    HILOG_INFO("end");
+    HILOG_INFO("start task formId: %{public}" PRId64 " isVisible: %{public}d", formId, isVisible);
 }
 
 void FormTaskMgr::RemoveConnection(int32_t connectId)
@@ -1230,7 +1228,7 @@ void FormTaskMgr::NotifyVisible(const std::vector<int64_t> &formIds,
 void FormTaskMgr::PostRecycleForms(const std::vector<int64_t> &formIds, const Want &want,
     const sptr<IRemoteObject> &remoteObjectOfHost, const sptr<IRemoteObject> &remoteObjectOfRender)
 {
-    HILOG_DEBUG("start");
+    HILOG_INFO("start formId: %{public}" PRId64, formId);
     if (serialQueue_ == nullptr) {
         HILOG_ERROR("null serialQueue_");
         return;
@@ -1260,7 +1258,7 @@ void FormTaskMgr::PostRecycleForms(const std::vector<int64_t> &formIds, const Wa
 void FormTaskMgr::RecycleForm(const int64_t &formId, const sptr<IRemoteObject> &remoteObjectOfHost,
     const sptr<IRemoteObject> &remoteObjectOfRender)
 {
-    HILOG_INFO("start");
+    HILOG_INFO("start formId: %{public}" PRId64, formId);
 
     sptr<IFormRender> remoteFormRender = iface_cast<IFormRender>(remoteObjectOfRender);
     if (remoteFormRender == nullptr) {
@@ -1283,7 +1281,7 @@ void FormTaskMgr::RecycleForm(const int64_t &formId, const sptr<IRemoteObject> &
     want.SetParam(Constants::PARAM_FORM_HOST_TOKEN, remoteObjectOfHost);
     int32_t error = remoteFormRender->RecycleForm(formId, want);
     if (error != ERR_OK) {
-        HILOG_ERROR("fail");
+        HILOG_ERROR("RecycleForm fail formId: %{public}" PRId64 " error: %{public}d", formId, error);
         return;
     }
 }

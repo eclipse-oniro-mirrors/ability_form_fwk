@@ -230,34 +230,32 @@ int32_t FormRenderProxy::SetVisibleChange(const int64_t &formId, bool isVisible,
     MessageParcel data;
     MessageParcel reply;
     MessageOption option(MessageOption::TF_ASYNC);
-    HILOG_ERROR("begin");
 
     if (!WriteInterfaceToken(data)) {
-        HILOG_ERROR("error to write interface token");
+        HILOG_ERROR("error to write interface token formId: %{public}" PRId64, formId);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     if (!data.WriteInt64(formId)) {
-        HILOG_ERROR("write formId failed");
+        HILOG_ERROR("write formId failed formId: %{public}" PRId64, formId);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
     if (!data.WriteBool(isVisible)) {
-        HILOG_ERROR("write isVisible failed");
+        HILOG_ERROR("write isVisible failed formId: %{public}" PRId64, formId);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     if (!data.WriteParcelable(&want)) {
-        HILOG_ERROR("write want failed");
+        HILOG_ERROR("write want failed formId: %{public}" PRId64, formId);
         return ERR_APPEXECFWK_PARCEL_ERROR;
     }
 
     int32_t error = SendTransactCmd(
         IFormRender::Message::FORM_SET_VISIBLE_CHANGE, data, reply, option);
     if (error != ERR_OK) {
-        HILOG_ERROR("SendRequest:%{public}d failed", error);
+        HILOG_ERROR("SendRequest:%{public}d failed formId: %{public}" PRId64, error, formId);
         return error;
     }
-    HILOG_ERROR("end");
     return ERR_OK;
 }
 

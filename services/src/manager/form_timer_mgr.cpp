@@ -223,7 +223,8 @@ bool FormTimerMgr::UpdateIntervalValue(int64_t formId, const FormTimerCfg &timer
 {
     if (timerCfg.updateDuration < Constants::MIN_PERIOD || timerCfg.updateDuration > Constants::MAX_PERIOD
         || (timerCfg.updateDuration % Constants::MIN_PERIOD) != 0) {
-        HILOG_ERROR("invalid param");
+            HILOG_ERROR("invalid param formId: %{public}" PRId64 " updateDuration: %{public}" PRId64,
+                formId, timerCfg.updateDuration / Constants::TIME_CONVERSION);
         return false;
     }
 
@@ -231,9 +232,11 @@ bool FormTimerMgr::UpdateIntervalValue(int64_t formId, const FormTimerCfg &timer
     auto intervalTask = intervalTimerTasks_.find(formId);
     if (intervalTask != intervalTimerTasks_.end()) {
         intervalTask->second.period = timerCfg.updateDuration / timeSpeed_;
+        HILOG_INFO("formId %{public}" PRId64 " update interval %{public}" PRId64,
+            formId, intervalTask->second.period);
         return true;
     } else {
-        HILOG_ERROR("intervalTimer not exist");
+        HILOG_ERROR("formId %{public}" PRId64 " intervalTimer not exist", formId);
         return false;
     }
 }

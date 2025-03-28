@@ -284,7 +284,7 @@ int32_t FormRenderImpl::OnUnlock()
 
 int32_t FormRenderImpl::SetVisibleChange(const int64_t &formId, bool isVisible, const Want &want)
 {
-    HILOG_INFO("SetVisibleChange start");
+    HILOG_INFO("formId:%{public}" PRId64 " isVisble: %{public}d", formId, isVisible);
     if (formId <= 0) {
         HILOG_ERROR("formId is negative");
         return ERR_APPEXECFWK_FORM_INVALID_FORM_ID;
@@ -295,20 +295,20 @@ int32_t FormRenderImpl::SetVisibleChange(const int64_t &formId, bool isVisible, 
         HILOG_ERROR("empty uid,formId:%{public}" PRId64, formId);
         return ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED;
     }
-    HILOG_INFO("formId:%{public}" PRId64 ",uid:%{public}s", formId, uid.c_str());
 
     std::lock_guard<std::mutex> lock(renderRecordMutex_);
     if (auto search = renderRecordMap_.find(uid); search != renderRecordMap_.end()) {
         if (search->second == nullptr) {
-            HILOG_ERROR("null renderRecord of %{public}s", std::to_string(formId).c_str());
+            HILOG_ERROR("null renderRecord of %{public}" PRId64, formId);
             return SET_VISIBLE_CHANGE_FAILED;
         }
         auto ret = search->second->SetVisibleChange(formId, isVisible);
         if (ret != ERR_OK) {
+            HILOG_ERROR("SetVisibleChange %{public}" PRId64 " failed.", formId);
             return ret;
         }
     } else {
-        HILOG_ERROR("can't find render record of %{public}s", std::to_string(formId).c_str());
+        HILOG_ERROR("can't find render record of %{public}" PRId64, formId);
         return SET_VISIBLE_CHANGE_FAILED;
     }
     return ERR_OK;

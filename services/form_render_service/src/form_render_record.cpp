@@ -1420,6 +1420,10 @@ int32_t FormRenderRecord::SetVisibleChange(const int64_t &formId, bool isVisible
         std::lock_guard<std::recursive_mutex> lock(eventHandlerMutex_);
         eventHandler = eventHandler_;
     }
+    if (eventHandler == nullptr) {
+        HILOG_ERROR("null eventHandler");
+        return SET_VISIBLE_CHANGE_FAILED;
+    }
     auto task = [thisWeakPtr = weak_from_this(), formId, isVisible]() {
         auto renderRecord = thisWeakPtr.lock();
         if (renderRecord == nullptr) {
@@ -1430,10 +1434,6 @@ int32_t FormRenderRecord::SetVisibleChange(const int64_t &formId, bool isVisible
         renderRecord->HandleSetVisibleChange(formId, isVisible);
     };
 
-    if (eventHandler == nullptr) {
-        HILOG_ERROR("null eventHandler");
-        return SET_VISIBLE_CHANGE_FAILED;
-    }
     eventHandler->PostSyncTask(task, "SetVisibleChange");
     return ERR_OK;
 }
