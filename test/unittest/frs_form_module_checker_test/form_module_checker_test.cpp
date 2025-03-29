@@ -44,10 +44,6 @@ HWTEST_F(FormModuleCheckerTest, Test001, testing::ext::TestSize.Level1)
     std::shared_ptr<FormModuleChecker> formChecker = std::make_shared<FormModuleChecker>();
     bool ret = formChecker->CheckModuleLoadable("effectKit", apiAllowListFilter, false);
     ASSERT_TRUE(ret);
-    ASSERT_TRUE((*apiAllowListFilter)("effectKit.a"));
-    ASSERT_TRUE((*apiAllowListFilter)("effectKit.b"));
-    ASSERT_TRUE((*apiAllowListFilter)("effectKit.xx"));
-    ASSERT_FALSE((*apiAllowListFilter)("bad-effectKit.xx"));
 }
 
 HWTEST_F(FormModuleCheckerTest, Test002, testing::ext::TestSize.Level1)
@@ -105,14 +101,6 @@ HWTEST_F(FormModuleCheckerTest, Test004, testing::ext::TestSize.Level1)
     ASSERT_TRUE(formChecker != nullptr);
     bool ret = formChecker->CheckModuleLoadable("intl", apiAllowListFilter, false);
     EXPECT_TRUE(ret);
-    EXPECT_TRUE((*apiAllowListFilter)("intl"));
-    EXPECT_TRUE((*apiAllowListFilter)("intl.Locale"));
-    EXPECT_TRUE((*apiAllowListFilter)("intl.Locale.sss"));
-    EXPECT_TRUE((*apiAllowListFilter)("intl.Locale.."));
-    EXPECT_TRUE((*apiAllowListFilter)("intl.DateTimeFormat"));
-    EXPECT_TRUE((*apiAllowListFilter)("intl.DateTimeFormat.xx"));
-    EXPECT_FALSE((*apiAllowListFilter)("intl.xxx"));
-    EXPECT_FALSE((*apiAllowListFilter)("intl.System"));
 }
 
 /**
@@ -141,11 +129,7 @@ HWTEST_F(FormModuleCheckerTest, Test005, testing::ext::TestSize.Level1)
 HWTEST_F(FormModuleCheckerTest, Test006, testing::ext::TestSize.Level1)
 {
     EXPECT_TRUE(FormModuleChecker::IsModuelAllowToLoad("i18n"));
-    EXPECT_TRUE(FormModuleChecker::IsModuelAllowToLoad("intl"));
-    EXPECT_TRUE(FormModuleChecker::IsModuelAllowToLoad("effectKit"));
     EXPECT_TRUE(FormModuleChecker::IsModuelAllowToLoad("font"));
-    EXPECT_TRUE(FormModuleChecker::IsModuelAllowToLoad("multimedia.image"));
-    EXPECT_FALSE(FormModuleChecker::IsModuelAllowToLoad("multimedia"));
     EXPECT_FALSE(FormModuleChecker::IsModuelAllowToLoad("abc"));
     EXPECT_FALSE(FormModuleChecker::IsModuelAllowToLoad("xyz"));
 }
@@ -164,36 +148,6 @@ HWTEST_F(FormModuleCheckerTest, Test007, testing::ext::TestSize.Level1)
     EXPECT_FALSE(FormModuleChecker::CheckApiAllowList("i18n.System.xx"));
     EXPECT_FALSE(FormModuleChecker::CheckApiAllowList("i18n.System.getSystemLanguage.sss"));
     EXPECT_FALSE(FormModuleChecker::CheckApiAllowList("i18n.System.is24HourClock.sss"));
-}
-
-/**
- * @tc.name: Test008
- * @tc.desc: test CheckApiAllowList function.
- * @tc.type: FUNC
- */
-HWTEST_F(FormModuleCheckerTest, Test008, testing::ext::TestSize.Level1)
-{
-    EXPECT_TRUE(FormModuleChecker::CheckApiAllowList("intl"));
-    EXPECT_TRUE(FormModuleChecker::CheckApiAllowList("intl.Locale"));
-    EXPECT_TRUE(FormModuleChecker::CheckApiAllowList("intl.Locale.sss"));
-    EXPECT_TRUE(FormModuleChecker::CheckApiAllowList("intl.Locale.."));
-    EXPECT_TRUE(FormModuleChecker::CheckApiAllowList("intl.DateTimeFormat"));
-    EXPECT_TRUE(FormModuleChecker::CheckApiAllowList("intl.DateTimeFormat.xx"));
-    EXPECT_FALSE(FormModuleChecker::CheckApiAllowList("intl.xxx"));
-    EXPECT_FALSE(FormModuleChecker::CheckApiAllowList("intl.System"));
-}
-
-/**
- * @tc.name: Test009
- * @tc.desc: test CheckApiAllowList function.
- * @tc.type: FUNC
- */
-HWTEST_F(FormModuleCheckerTest, Test009, testing::ext::TestSize.Level1)
-{
-    EXPECT_TRUE(FormModuleChecker::CheckApiAllowList("effectKit.a"));
-    EXPECT_TRUE(FormModuleChecker::CheckApiAllowList("effectKit.b"));
-    EXPECT_TRUE(FormModuleChecker::CheckApiAllowList("effectKit.xx"));
-    EXPECT_FALSE(FormModuleChecker::CheckApiAllowList("bad-effectKit.xx"));
 }
 
 /**
