@@ -98,18 +98,6 @@ public:
      */
     ErrCode UpdateStatusData(const std::string &formId, const std::string &statusData);
 
-    /**
-     * @brief Get version code of form from DB.
-     * @param versionCode version code.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    ErrCode GetFormVersionCode(std::string &versionCode);
-
-    /**
-     * @brief Save or update the version code of form in DB.
-     * @return Returns ERR_OK on success, others on failure.
-     */
-    ErrCode UpdateFormVersionCode();
 private:
     void SaveEntries(const std::unordered_map<std::string, std::string> &value,
         std::vector<InnerFormInfo> &innerFormInfos);
