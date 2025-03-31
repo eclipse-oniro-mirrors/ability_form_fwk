@@ -39,7 +39,7 @@ uint32_t GetU32Data(const char* ptr)
 bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
 {
     FormBundleForbidMgr& formbundleforbidmgr = FormBundleForbidMgr::GetInstance();
-	FormBundleForbidMgr bundleForbidMgr;
+    FormBundleForbidMgr bundleForbidMgr;
     formbundleforbidmgr.Init();
     std::string bundleName(data, size);
     formbundleforbidmgr.IsBundleForbidden(bundleName);
