@@ -38,6 +38,7 @@ uint32_t GetU32Data(const char* ptr)
     // convert fuzz input data to an integer
     return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | ptr[3];
 }
+
 bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
 {
     FormAbilityConnection formAbilityConnection;
@@ -68,10 +69,24 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formAbilityConnection.GetBundleName();
     formAbilityConnection.GetAppFormPid();
     formAbilityConnection.OnAbilityDisconnectDone(element, resultCode);
+    wptr<IRemoteObject> remoteObject1;
+    formAbilityConnection.OnConnectDied(remoteObject1);
+    DoSomethingInterestingPart2(data, size);
+    return formAbilityConnection.GetConnectId();
+}
+
+void DoSomethingInterestingPart2(const char* data, size_t size)
+{
     FormAmsHelper formAmsHelper;
-    formAmsHelper.GetAbilityManager();
+    std::string bundleName(data, size);
+    std::string abilityName(data, size);
+    AppExecFwk::ElementName element;
+    sptr<IRemoteObject> providerToken = nullptr;
+    sptr<IRemoteObject> remoteObjects = nullptr;
+    int resultCode = static_cast<int>(GetU32Data(data));
     Want want;
     sptr<AAFwk::IAbilityConnection> connect = nullptr;
+    formAmsHelper.GetAbilityManager();
     formAmsHelper.ConnectServiceAbility(want, connect);
     formAmsHelper.DisconnectServiceAbility(connect);
     formAmsHelper.DisconnectServiceAbilityDelay(connect);
@@ -83,15 +98,13 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formAmsHelper.DisconnectAbilityTask(connect);
     int32_t userId = static_cast<int32_t>(GetU32Data(data));
     formAmsHelper.StartAbility(want, userId);
-    wptr<IRemoteObject> remoteObject1;
-    formAbilityConnection.OnConnectDied(remoteObject1);
     std::set<int64_t> formIds;
     sptr<IAbilityConnection> batchDeleteConnection = new FormBatchDeleteConnection(formIds, bundleName, abilityName);
     batchDeleteConnection->OnAbilityConnectDone(element, providerToken, userId);
     sptr<IAbilityConnection> castTempConnection = new FormCastTempConnection(formId, bundleName, abilityName);
     castTempConnection->OnAbilityConnectDone(element, remoteObjects, resultCode);
-    return formAbilityConnection.GetConnectId();
 }
+
 }
 
 /* Fuzzer entry point */
