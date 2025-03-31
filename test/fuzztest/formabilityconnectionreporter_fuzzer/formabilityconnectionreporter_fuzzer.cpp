@@ -47,7 +47,7 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formAbilityConnectionReporter.AddFormAbilityConnectProcessInfo(bundleName, infos);
     bool isConnected = *data % ENABLE;
     formAbilityConnectionReporter.ReportConnectionInfosToRss(bundleName, isConnected);
-	formAbilityConnectionReporter.ReportFormAbilityDisconnection(bundleName);
+    formAbilityConnectionReporter.ReportFormAbilityDisconnection(bundleName);
     return true;
 }
 }
