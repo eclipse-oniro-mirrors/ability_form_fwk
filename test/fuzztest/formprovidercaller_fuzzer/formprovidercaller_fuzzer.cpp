@@ -50,6 +50,9 @@ bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider *fdp)
     formProviderCaller.UpdateForm(formJsInfo);
     formProviderCaller.AddForm(formJsInfo);
     formProviderCaller.DeleteForm(formId);
+    FormProviderInfo formProviderInfo;
+    AAFwk::Want want;
+    formProviderCaller.OnAcquire(formProviderInfo, want, token);
     return formProviderCaller.HasForm(formId);
 }
 }

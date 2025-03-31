@@ -41,6 +41,7 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     int32_t sizes = static_cast<int32_t>(GetU32Data(data));
     formAshmem.WriteToAshmem(name, nullptr, sizes);
     formAshmem.GetAshmemSize();
+	formAshmem.GetAshmem();
     return formAshmem.GetAshmemFd();
 }
 }

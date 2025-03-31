@@ -49,6 +49,8 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     std::string bundleName(data, size);
     int32_t userId = static_cast<int32_t>(GetU32Data(data));
     std::vector<FormDBInfo> removedDBForms;
+    std::vector<FormDBInfo> formDBInfos;
+    formDbCache.GetAllFormDBInfoByBundleName(bundleName, userId, formDBInfos);
     removedDBForms.emplace_back(formDBInfo);
     formDbCache.DeleteFormInfoByBundleName(bundleName, userId, removedDBForms);
     return true;
