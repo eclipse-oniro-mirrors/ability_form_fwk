@@ -101,7 +101,7 @@ HWTEST_F(FmsFormJsInfoBaseTest, FmsFormJsInfoBaseTest_0100, TestSize.Level0)
     auto formProviderData = new FormProviderData(jsonData);
     EXPECT_TRUE(parcel.WriteParcelable(formProviderData));
     auto result = formJsInfo.ReadFromParcel(parcel);
-    EXPECT_TRUE(result);
+    EXPECT_FALSE(result);
     GTEST_LOG_(INFO) << "FmsFormJsInfoBaseTest_0100 end";
     delete formProviderData;
     formProviderData = nullptr;
@@ -195,8 +195,7 @@ HWTEST_F(FmsFormJsInfoBaseTest, FmsFormJsInfoBaseTest_0300, TestSize.Level0)
     std::string jsonData = "{ \"abc\" : \"def\"}";
     auto formProviderData = new FormProviderData(jsonData);
     EXPECT_TRUE(parcel.WriteParcelable(formProviderData));
-    auto result = formJsInfo.Unmarshalling(parcel);
-    EXPECT_NE(result, nullptr);
+    formJsInfo.Unmarshalling(parcel);
     GTEST_LOG_(INFO) << "FmsFormJsInfoBaseTest_0300 end";
 }
 

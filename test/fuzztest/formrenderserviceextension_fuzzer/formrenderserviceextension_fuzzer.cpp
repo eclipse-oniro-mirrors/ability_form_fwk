@@ -53,6 +53,8 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     bool restart = *data % ENABLE;
     int startId = static_cast<int64_t>(GetU32Data(data));
     formRenderServiceExtension->OnCommand(want, restart, startId);
+    AppExecFwk::Configuration configuration;
+    formRenderServiceExtension->OnConfigurationUpdated(configuration);
     delete formRenderServiceExtension;
     formRenderServiceExtension = nullptr;
     return true;

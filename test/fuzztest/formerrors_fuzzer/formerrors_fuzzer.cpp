@@ -39,6 +39,11 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     FormErrors formErrors;
     int errorCode = static_cast<int>(GetU32Data(data));
     formErrors.InitErrorMessageMap();
+    int32_t internalErrorCode = static_cast<int32_t>(GetU32Data(data));
+    formErrors.QueryExternalErrorCode(internalErrorCode);
+    int32_t externalErrorCode = static_cast<int32_t>(GetU32Data(data));
+    formErrors.QueryExternalErrorMessage(internalErrorCode, externalErrorCode);
+    formErrors.GetErrorMsgByExternalErrorCode(externalErrorCode);
     return formErrors.GetErrorMessage(errorCode) == "aa";
 }
 }
