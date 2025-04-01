@@ -41,6 +41,7 @@ constexpr int32_t SET_VISIBLE_CHANGE_FAILED = -1;
 constexpr int32_t FORM_RENDER_TASK_DELAY_TIME = 20; // ms
 constexpr int32_t ENABLE_FORM_FAILED = -1;
 constexpr int32_t UPDATE_FORM_SIZE_FAILED = -1;
+constexpr int32_t FORM_CLIENT_INVALID = -1;
 }
 using namespace AbilityRuntime;
 using namespace OHOS::AAFwk::GlobalConfigurationKey;
@@ -190,6 +191,7 @@ int32_t FormRenderImpl::ReleaseRenderer(int64_t formId, const std::string &compI
     }
     if (formSupplyClient == nullptr) {
         HILOG_ERROR("null formSupplyClient");
+        return FORM_CLIENT_INVALID;
     }
 
     if (formId <= 0 || compId.empty() || uid.empty()) {
