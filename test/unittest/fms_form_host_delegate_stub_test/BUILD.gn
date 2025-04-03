@@ -37,7 +37,7 @@ ohos_unittest("FmsFormHostDelegateStubTest") {
   }
   deps = [
     "${form_fwk_path}:fms_target",
-    "${form_fwk_path}:formHostDelegate_stub",
+    "${form_fwk_path}:form_Host_Delegate_stub",
     "${form_fwk_path}:libfms",
   ]
 
