@@ -20,7 +20,6 @@ ohos_unittest("FmsFormHostDelegateStubTest") {
   module_out_path = module_output_path
 
   sources = [
-    "${form_fwk_path}/interfaces/inner_api/src/form_host_delegate_stub.cpp",
     "${form_fwk_path}/test/unittest/fms_form_host_delegate_stub_test/fms_form_host_delegate_stub_test.cpp",
   ]
 
@@ -40,6 +39,7 @@ ohos_unittest("FmsFormHostDelegateStubTest") {
   }
   deps = [
     "${form_fwk_path}:fms_target",
+    "${form_fwk_path}:formHostDelegate_stub",
     "${form_fwk_path}:libfms",
   ]
 

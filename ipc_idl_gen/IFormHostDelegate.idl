@@ -1,0 +1,4 @@
+sequenceable OHOS.AAFwk.Want;
+interface OHOS.AppExecFwk.IFormHostDelegate {
+    [ipccode 4002] void RouterEvent([in] long formId, [in] Want want);
+}
