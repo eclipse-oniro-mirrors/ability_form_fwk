@@ -36,8 +36,7 @@ ohos_unittest("FmsFormHostProxyTest") {
   deps = [
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:formHostDelegate_proxy",
-    "//third_party/googletest:gmock_main",test/unittest/fms_form_host_proxy_test/BUILD.gn
-    
+    "//third_party/googletest:gmock_main",  
   ]
 
   external_deps = [
