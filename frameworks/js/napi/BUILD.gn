@@ -322,7 +322,7 @@ ohos_shared_library("formhost") {
   deps = [
     ":formutil_napi",
     "${form_fwk_path}:fmskit_native",
-    "${form_fwk_path}:form_Host_Delegate_stub",
+    "${form_fwk_path}:form_host_delegate_stub",
     "${form_fwk_path}:form_manager",
   ]
 
@@ -373,7 +373,7 @@ ohos_shared_library("formobserver") {
     ":formutil_napi",
     "${form_fwk_napi_path}:formhost",
     "${form_fwk_path}:fmskit_native",
-    "${form_fwk_path}:form_Host_Delegate_stub",
+    "${form_fwk_path}:form_host_delegate_stub",
     "${form_fwk_path}:form_manager",
   ]
 
