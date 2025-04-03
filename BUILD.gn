@@ -11,12 +11,71 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build/config/components/idl_tool/idl.gni")
 import("//build/ohos.gni")
 import("//foundation/ability/form_fwk/form_fwk.gni")
 
 ################################### libfms ########################################
 config("formmgr_log_config") {
   defines = [ "FMS_LOG_TAG = \"FormManagerService\"" ]
+}
+
+config("fms_idl_config") {
+  include_dirs = [
+    "${target_gen_dir}",
+    "interfaces/inner_api/include",
+  ]
+}
+
+idl_gen_interface("formHostDelegate_interface") {
+  sources = [ "ipc_idl_gen/IFormHostDelegate.idl" ]
+  log_domainid = "0xD001301"
+  log_tag = "FormManagerService"
+  subsystem_name = "ability"
+  part_name = "form_fwk"
+}
+
+ohos_source_set("formHostDelegate_proxy") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  output_values = get_target_outputs(":formHostDelegate_interface")
+  sources = filter_include(output_values, [ "*_proxy.cpp" ])
+  public_configs = [ ":fms_idl_config" ]
+  deps = [ ":formHostDelegate_interface" ]
+  external_deps = [
+    "ability_base:want",
+    "bundle_framework:appexecfwk_base",
+    "c_utils:utils",
+    "hilog:libhilog",
+    "ipc:ipc_single",
+    "samgr:samgr_proxy",
+  ]
+  subsystem_name = "ability"
+  part_name = "form_fwk"
+}
+
+ohos_source_set("formHostDelegate_stub") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  output_values = get_target_outputs(":formHostDelegate_interface")
+  sources = filter_include(output_values, [ "*_stub.cpp" ])
+  public_configs = [ ":fms_idl_config" ]
+  deps = [ ":formHostDelegate_interface" ]
+  external_deps = [
+    "ability_base:want",
+    "bundle_framework:appexecfwk_base",
+    "c_utils:utils",
+    "hilog:libhilog",
+    "ipc:ipc_single",
+  ]
+  subsystem_name = "ability"
+  part_name = "form_fwk"
 }
 
 config("formmgr_config") {
@@ -223,7 +282,10 @@ config("fmskit_public_config") {
 }
 
 ohos_shared_library("fmskit_native") {
-  configs = [ ":fmskit_config" ]
+  configs = [
+    ":fmskit_config",
+    ":fms_idl_config",
+  ]
   public_configs = [ ":fmskit_public_config" ]
   sources = [
     "interfaces/kits/native/src/form_caller_mgr.cpp",
@@ -330,8 +392,6 @@ ohos_shared_library("form_manager") {
   sources = [
     "interfaces/inner_api/src/form_ashmem.cpp",
     "interfaces/inner_api/src/form_ecological_rule_param.cpp",
-    "interfaces/inner_api/src/form_host_delegate_proxy.cpp",
-    "interfaces/inner_api/src/form_host_delegate_stub.cpp",
     "interfaces/inner_api/src/form_host_proxy.cpp",
     "interfaces/inner_api/src/form_host_stub.cpp",
     "interfaces/inner_api/src/form_info_filter.cpp",
@@ -366,7 +426,10 @@ ohos_shared_library("form_manager") {
     ":formmgr_config",
   ]
 
-  deps = []
+  deps = [
+      ":formHostDelegate_proxy",
+      ":formHostDelegate_stub",
+    ]
 
   external_deps = [
     "ability_base:want",

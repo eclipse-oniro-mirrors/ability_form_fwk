@@ -32,6 +32,7 @@
 #include "common/util/form_util.h"
 #include "fms_log_wrapper.h"
 #include "ipc_skeleton.h"
+#include "ipc_types.h"
 
 
 using namespace testing::ext;
@@ -90,12 +91,12 @@ public:
 HWTEST_F(FmsFormHostDelegateStubTest, FormHostDelegateStubTest_001, TestSize.Level0)
 {
     sptr<MockFormHostDelegateCallback> callback = new (std::nothrow) MockFormHostDelegateCallback();
-    uint32_t code = static_cast<uint32_t>(IFormHostDelegate::Message::FORM_ROUTER_PROXY_MGR);
+    uint32_t code = static_cast<uint32_t>(IFormHostDelegateIpcCode::COMMAND_ROUTER_EVENT);
     MessageParcel data;
     MessageParcel reply;
     MessageOption option{MessageOption::TF_ASYNC};
     auto result = callback->OnRemoteRequest(code, data, reply, option);
-    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    EXPECT_EQ(result, ERR_TRANSACTION_FAILED);
 }
 
 /**
@@ -106,7 +107,7 @@ HWTEST_F(FmsFormHostDelegateStubTest, FormHostDelegateStubTest_001, TestSize.Lev
 HWTEST_F(FmsFormHostDelegateStubTest, FormHostDelegateStubTest_002, TestSize.Level0)
 {
     sptr<MockFormHostDelegateCallback> callback = new (std::nothrow) MockFormHostDelegateCallback();
-    uint32_t code = static_cast<uint32_t>(IFormHostDelegate::Message::FORM_ROUTER_PROXY_MGR) + 100;
+    uint32_t code = static_cast<uint32_t>(IFormHostDelegateIpcCode::COMMAND_ROUTER_EVENT) + 100;
     MessageParcel data;
     MessageParcel reply;
     MessageOption option{MessageOption::TF_ASYNC};
@@ -125,14 +126,14 @@ HWTEST_F(FmsFormHostDelegateStubTest, FormHostDelegateStubTest_002, TestSize.Lev
 HWTEST_F(FmsFormHostDelegateStubTest, FormHostDelegateStubTest_003, TestSize.Level0)
 {
     sptr<MockFormHostDelegateCallback> callback = new (std::nothrow) MockFormHostDelegateCallback();
-    constexpr uint32_t code = static_cast<uint32_t>(IFormHostDelegate::Message::FORM_ROUTER_PROXY_MGR);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormHostDelegateIpcCode::COMMAND_ROUTER_EVENT);
     MessageParcel data;
     MessageParcel reply;
     MessageOption option{MessageOption::TF_ASYNC};
     data.WriteInterfaceToken(MockFormHostDelegateCallback::GetDescriptor());
     data.WriteInt64(TEST_FORM_ID);
     auto result = callback->OnRemoteRequest(code, data, reply, option);
-    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+    EXPECT_EQ(result, ERR_INVALID_DATA);
 }
 
 /**
@@ -152,7 +153,7 @@ HWTEST_F(FmsFormHostDelegateStubTest, FormHostDelegateStubTest_004, TestSize.Lev
     data.WriteInt64(TEST_FORM_ID);
     Want want = {};
     data.WriteParcelable(&want);
-    constexpr uint32_t code = static_cast<uint32_t>(IFormHostDelegate::Message::FORM_ROUTER_PROXY_MGR);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormHostDelegateIpcCode::COMMAND_ROUTER_EVENT);
     auto result = callback->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
 }
