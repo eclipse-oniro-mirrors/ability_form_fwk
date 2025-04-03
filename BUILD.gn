@@ -390,9 +390,9 @@ ohos_shared_library("form_manager") {
 
   include_dirs = []
   sanitize = {
-      cfi = true
-      cfi_cross_dso = true
-      debug = false
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
   }
 
   sources = [
@@ -433,9 +433,9 @@ ohos_shared_library("form_manager") {
   ]
 
   deps = [
-      ":formHostDelegate_proxy",
-      ":formHostDelegate_stub",
-    ]
+    ":formHostDelegate_proxy",
+    ":formHostDelegate_stub",
+  ]
 
   external_deps = [
     "ability_base:want",
