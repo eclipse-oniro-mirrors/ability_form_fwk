@@ -27,7 +27,7 @@ config("fms_idl_config") {
   ]
 }
 
-idl_gen_interface("formHostDelegate_interface") {
+idl_gen_interface("form_Host_Delegate_interface") {
   sources = [ "ipc_idl_gen/IFormHostDelegate.idl" ]
   log_domainid = "0xD001301"
   log_tag = "FormManagerService"
@@ -35,16 +35,16 @@ idl_gen_interface("formHostDelegate_interface") {
   part_name = "form_fwk"
 }
 
-ohos_source_set("formHostDelegate_proxy") {
+ohos_source_set("form_Host_Delegate_proxy") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
     debug = false
   }
-  output_values = get_target_outputs(":formHostDelegate_interface")
+  output_values = get_target_outputs(":form_Host_Delegate_interface")
   sources = filter_include(output_values, [ "*_proxy.cpp" ])
   public_configs = [ ":fms_idl_config" ]
-  deps = [ ":formHostDelegate_interface" ]
+  deps = [ ":form_Host_Delegate_interface" ]
   external_deps = [
     "ability_base:want",
     "bundle_framework:appexecfwk_base",
@@ -57,16 +57,16 @@ ohos_source_set("formHostDelegate_proxy") {
   part_name = "form_fwk"
 }
 
-ohos_source_set("formHostDelegate_stub") {
+ohos_source_set("form_Host_Delegate_stub") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
     debug = false
   }
-  output_values = get_target_outputs(":formHostDelegate_interface")
+  output_values = get_target_outputs(":form_Host_Delegate_interface")
   sources = filter_include(output_values, [ "*_stub.cpp" ])
   public_configs = [ ":fms_idl_config" ]
-  deps = [ ":formHostDelegate_interface" ]
+  deps = [ ":form_Host_Delegate_interface" ]
   external_deps = [
     "ability_base:want",
     "bundle_framework:appexecfwk_base",
@@ -433,8 +433,8 @@ ohos_shared_library("form_manager") {
   ]
 
   deps = [
-    ":formHostDelegate_proxy",
-    ":formHostDelegate_stub",
+    ":form_Host_Delegate_proxy",
+    ":form_Host_Delegate_stub",
   ]
 
   external_deps = [
