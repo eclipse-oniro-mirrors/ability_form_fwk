@@ -19,9 +19,7 @@ module_output_path = "form_fwk/form_fwk/form_mgr_service"
 ohos_unittest("FmsFormHostDelegateStubTest") {
   module_out_path = module_output_path
 
-  sources = [
-    "${form_fwk_path}/test/unittest/fms_form_host_delegate_stub_test/fms_form_host_delegate_stub_test.cpp",
-  ]
+  sources = [ "${form_fwk_path}/test/unittest/fms_form_host_delegate_stub_test/fms_form_host_delegate_stub_test.cpp" ]
 
   include_dirs = [
     "//third_party/json/include",
