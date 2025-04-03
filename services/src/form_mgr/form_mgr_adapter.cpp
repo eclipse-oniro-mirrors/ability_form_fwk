@@ -1851,7 +1851,7 @@ ErrCode FormMgrAdapter::InnerAcquireProviderFormInfoAsync(const int64_t formId,
     want.SetElementName(info.GetProviderBundleName(), info.GetAbilityName());
     want.AddFlags(Want::FLAG_ABILITY_FORM_ENABLED);
     FormRecord record;
-    if (!FormDataMgr::GetInstance().GetFormRecord(formId, record))) {
+    if (!FormDataMgr::GetInstance().GetFormRecord(formId, record)) {
         HILOG_ERROR("not found in formRecord");
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
