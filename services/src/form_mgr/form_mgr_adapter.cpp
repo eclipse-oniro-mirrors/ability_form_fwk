@@ -1852,10 +1852,6 @@ ErrCode FormMgrAdapter::InnerAcquireProviderFormInfoAsync(const int64_t formId,
         HILOG_ERROR("not found in formRecord");
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
-    if (!record.providerUserId) {
-        HILOG_ERROR("not self form:%{public}" PRId64 "", formId);
-        return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
-    }
     Want want;
     want.SetElementName(info.GetProviderBundleName(), info.GetAbilityName());
     want.AddFlags(Want::FLAG_ABILITY_FORM_ENABLED);
