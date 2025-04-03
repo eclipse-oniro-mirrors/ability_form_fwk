@@ -39,6 +39,7 @@ ohos_fuzztest("FormHostDelegateStubFuzzTest") {
   deps = [
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
+    "${form_fwk_path}:form_host_delegate_stub",
   ]
 
   external_deps = [

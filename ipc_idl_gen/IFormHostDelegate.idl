@@ -1,0 +1,13 @@
+  /*
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+@@ -13,29 +13,7 @@
+ * limitations under the License.
+ */
+
+sequenceable OHOS.AAFwk.Want;
+interface OHOS.AppExecFwk.IFormHostDelegate {
+    [ipccode 4002] void RouterEvent([in] long formId, [in] Want want);
+}

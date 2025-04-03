@@ -51,7 +51,6 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     MessageParcel reply;
     MessageOption option;
     formHostDelegateStub.OnRemoteRequest(code, datas, reply, option);
-    formHostDelegateStub.HandleRouterEvent(datas, reply);
     return true;
 }
 }
