@@ -1850,8 +1850,8 @@ ErrCode FormMgrAdapter::InnerAcquireProviderFormInfoAsync(const int64_t formId,
     Want want;
     want.SetElementName(info.GetProviderBundleName(), info.GetAbilityName());
     want.AddFlags(Want::FLAG_ABILITY_FORM_ENABLED);
-	FormRecord record;
-	if (!FormDataMgr::GetInstance().GetFormRecord(formId, record))) {
+    FormRecord record;
+    if (!FormDataMgr::GetInstance().GetFormRecord(formId, record))) {
         HILOG_ERROR("not found in formRecord");
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
@@ -1860,7 +1860,7 @@ ErrCode FormMgrAdapter::InnerAcquireProviderFormInfoAsync(const int64_t formId,
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
     ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbilityWithUserId(
-		want, formAcquireConnection, record.providerUserId);
+        want, formAcquireConnection, record.providerUserId);
     FormReport::GetInstance().SetStartBindTime(formId, FormUtil::GetCurrentSteadyClockMillseconds());
     if (errorCode != ERR_OK && errorCode != ERR_ECOLOGICAL_CONTROL_STATUS) {
         HILOG_ERROR("ConnectServiceAbility failed");
