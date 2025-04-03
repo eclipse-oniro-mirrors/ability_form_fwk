@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+# Copyright (c) 2024 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -14,29 +14,31 @@
 import("//build/test.gni")
 import("//foundation/ability/form_fwk/form_fwk.gni")
 
-module_output_path = "form_fwk/form_fwk/form_mgr_proxy"
+module_output_path = "form_fwk/form_fwk/form_mgr_service"
 
-ohos_unittest("FmsFormHostProxyTest") {
+ohos_unittest("FmsFormHostDelegateStubTest") {
   module_out_path = module_output_path
 
-  sources = [ "${form_fwk_path}/test/mock/src/mock_message_parcel.cpp" ]
-
-  sources += [ "fms_form_host_proxy_test.cpp" ]
+  sources = [ "${form_fwk_path}/test/unittest/fms_form_host_delegate_stub_test/fms_form_host_delegate_stub_test.cpp" ]
 
   include_dirs = [
+    "//third_party/json/include",
+    "${ability_runtime_path}/services/formmgr/include",
+    "${systemabilitymgr_path}/samgr/interfaces/innerkits/samgr_proxy/include/",
     "${form_fwk_path}/interfaces/inner_api/include",
+    "${form_fwk_path}/services/include",
     "${form_fwk_path}/test/mock/include",
   ]
 
-  configs = [ "${form_fwk_path}/test:formmgr_test_config" ]
+  configs = []
   cflags = []
   if (target_cpu == "arm") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
   deps = [
     "${form_fwk_path}:fms_target",
-    "${form_fwk_path}:formHostDelegate_proxy",
-    "//third_party/googletest:gmock_main",
+    "${form_fwk_path}:formHostDelegate_stub",
+    "${form_fwk_path}:libfms",
   ]
 
   external_deps = [
@@ -44,20 +46,21 @@ ohos_unittest("FmsFormHostProxyTest") {
     "ability_base:want",
     "ability_base:zuri",
     "ability_runtime:app_manager",
-    "ability_runtime:wantagent_innerkits",
-    "access_token:libnativetoken",
-    "access_token:libtoken_setproc",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "c_utils:utils",
+    "data_share:datashare_common",
+    "data_share:datashare_consumer",
+    "data_share:datashare_provider",
     "form_fwk:form_manager",
     "hilog:libhilog",
     "ipc:ipc_core",
   ]
 }
 
+###############################################################################
 group("unittest") {
   testonly = true
 
-  deps = [ ":FmsFormHostProxyTest" ]
+  deps = [ ":FmsFormHostDelegateStubTest" ]
 }
