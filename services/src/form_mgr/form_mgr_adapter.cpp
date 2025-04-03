@@ -1847,9 +1847,6 @@ ErrCode FormMgrAdapter::InnerAcquireProviderFormInfoAsync(const int64_t formId,
     formAcquireConnection->SetFormAbilityConnectCb(connectCallback);
     formAcquireConnection->SetFormAbilityDisconnectCb(disconnectCallback);
 #endif
-    Want want;
-    want.SetElementName(info.GetProviderBundleName(), info.GetAbilityName());
-    want.AddFlags(Want::FLAG_ABILITY_FORM_ENABLED);
     FormRecord record;
     if (!FormDataMgr::GetInstance().GetFormRecord(formId, record)) {
         HILOG_ERROR("not found in formRecord");
@@ -1859,6 +1856,9 @@ ErrCode FormMgrAdapter::InnerAcquireProviderFormInfoAsync(const int64_t formId,
         HILOG_ERROR("not self form:%{public}" PRId64 "", formId);
         return ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF;
     }
+    Want want;
+    want.SetElementName(info.GetProviderBundleName(), info.GetAbilityName());
+    want.AddFlags(Want::FLAG_ABILITY_FORM_ENABLED);
     ErrCode errorCode = FormAmsHelper::GetInstance().ConnectServiceAbilityWithUserId(
         want, formAcquireConnection, record.providerUserId);
     FormReport::GetInstance().SetStartBindTime(formId, FormUtil::GetCurrentSteadyClockMillseconds());
