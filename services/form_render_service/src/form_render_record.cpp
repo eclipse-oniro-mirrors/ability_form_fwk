@@ -39,18 +39,28 @@ using namespace OHOS::AAFwk::GlobalConfigurationKey;
 namespace OHOS {
 namespace AppExecFwk {
 namespace FormRender {
+namespace {
 constexpr int32_t RENDER_FORM_FAILED = -1;
 constexpr int32_t RELOAD_FORM_FAILED = -1;
 constexpr int32_t RECYCLE_FORM_FAILED = -1;
 constexpr int32_t TIMEOUT = 10 * 1000;
 constexpr int32_t SET_VISIBLE_CHANGE_FAILED = -1;
 constexpr int32_t CHECK_THREAD_TIME = 3;
+constexpr size_t THREAD_NAME_LEN = 15;
 constexpr char FORM_RENDERER_COMP_ID[] = "ohos.extra.param.key.form_comp_id";
-namespace {
-uint64_t GetCurrentTickMillseconds()
+
+inline uint64_t GetCurrentTickMillseconds()
 {
     return std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::steady_clock::now().time_since_epoch()).count();
+}
+
+inline std::string GetThreadNameByBundle(const std::string &bundleName)
+{
+    if (bundleName.length() <= THREAD_NAME_LEN) {
+        return bundleName;
+    }
+    return bundleName.substr(bundleName.length() - THREAD_NAME_LEN);
 }
 }
 
@@ -205,7 +215,7 @@ bool FormRenderRecord::CreateEventHandler(const std::string &bundleName, bool ne
     // Create event runner
     HILOG_INFO("Create eventHandle");
     if (eventRunner_ == nullptr) {
-        eventRunner_ = EventRunner::Create(bundleName);
+        eventRunner_ = EventRunner::Create(GetThreadNameByBundle(bundleName));
         if (eventRunner_ == nullptr) {
             HILOG_ERROR("Create event runner Failed");
             return false;
@@ -1129,6 +1139,7 @@ void FormRenderRecord::Release()
 void FormRenderRecord::HandleReleaseInJsThread()
 {
     if (runtime_) {
+        runtime_->ForceFullGC();
         runtime_.reset();
     }
     ReleaseHapFileHandle();
