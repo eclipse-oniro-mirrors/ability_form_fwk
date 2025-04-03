@@ -381,8 +381,8 @@ ohos_shared_library("form_manager") {
     "ipc:ipc_core",
     "jsoncpp:jsoncpp",
     "napi:ace_napi",
-    "samgr:samgr_proxy",
     "os_account:os_account_innerkits",
+    "samgr:samgr_proxy",
   ]
 
   subsystem_name = "ability"
@@ -419,6 +419,16 @@ group("form_napi_packages") {
       "${form_fwk_napi_path}:formprovider",
       "${form_fwk_napi_path}:formprovider_napi",
       "${form_fwk_napi_path}:formutil_napi",
+    ]
+  }
+}
+
+group("form_ani_package") {
+  deps = []
+  if (ability_runtime_graphics) {
+    deps += [
+      "${form_fwk_ani_path}/form_binding_data:formBindingData_ani",
+      "${form_fwk_ani_path}/form_binding_data:form_binding_data_etc",
     ]
   }
 }
