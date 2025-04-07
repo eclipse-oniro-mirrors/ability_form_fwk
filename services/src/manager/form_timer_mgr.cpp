@@ -1491,6 +1491,16 @@ void FormTimerMgr::ExecTimerTask(const FormTimer &timerTask)
 #endif // RES_SCHEDULE_ENABLE
 {
     AAFwk::Want want;
+    BuildTimerWant(timerTask, want);
+    HILOG_BRIEF("userId:%{public}d", timerTask.userId);
+    auto task = [id = timerTask.formId, want]() {
+        FormProviderMgr::GetInstance().RefreshForm(id, want, false);
+    };
+    ffrt::submit(task);
+}
+
+void FormTimerMgr::BuildTimerWant(const FormTimer &timerTask, AAFwk::Want &want)
+{
     if (timerTask.isCountTimer) {
         want.SetParam(Constants::KEY_IS_TIMER, true);
     }
@@ -1511,18 +1521,29 @@ void FormTimerMgr::ExecTimerTask(const FormTimer &timerTask)
     } else if (timerTask.refreshType == RefreshType::TYPE_VISIABLE) {
         want.SetParam(Constants::PARAM_FORM_REFRESH_TYPE, Constants::REFRESHTYPE_VISIABLE);
     }
-    HILOG_BRIEF("userId:%{public}d", timerTask.userId);
-    auto task = [id = timerTask.formId, want]() {
-        FormProviderMgr::GetInstance().RefreshForm(id, want, false);
-    };
-    ffrt::submit(task);
 }
 
 void FormTimerMgr::RefreshWhenFormVisible(const int64_t &formId, const int32_t &userId)
 {
-    FormTimer timerTask(formId, true, userId);
-    timerTask.refreshType = RefreshType::TYPE_VISIABLE;
-    ExecTimerTask(timerTask);
+    FormRecord record;
+    bool bGetRecord = FormDataMgr::GetInstance().GetFormRecord(formId, record);
+    if (!bGetRecord) {
+        HILOG_ERROR("not exist such, form:%{public}" PRId64 ", visible refresh", formId);
+        return;
+    }
+    AAFwk::Want want;
+    if (record.isTimerRefresh) {
+        FormTimer timerTask(formId, true, userId);
+        timerTask.refreshType = RefreshType::TYPE_VISIABLE;
+        BuildTimerWant(timerTask, want);
+    }
+    if (record.isHostRefresh && record.wantCacheMap.find(formId) != record.wantCacheMap.end()) {
+        FormProviderMgr::GetInstance().MergeWant(record.wantCacheMap[formId], want);
+    }
+    ErrCode ret = FormProviderMgr::GetInstance().RefreshForm(formId, want, true);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("Visible Refresh faild.");
+    }
 }
 
 /**

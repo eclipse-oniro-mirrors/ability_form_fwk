@@ -126,6 +126,7 @@ public:
      * @return Returns true if execute success, false otherwise.
      */
     int MessageEvent(const int64_t formId, const FormRecord &record, const Want &want);
+    void MergeWant(const Want &newWant, Want &oldWant);
 private:
     bool IsNeedToFresh(FormRecord &record, int64_t formId, bool isVisibleToFresh);
 

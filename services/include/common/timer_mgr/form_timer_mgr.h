@@ -401,6 +401,7 @@ private:
     void FormRefreshCountReport();
     void InnerClearIntervalTimer();
     void InnerClearIntervalReportTimer();
+    void BuildTimerWant(const FormTimer &timerTask, AAFwk::Want &want);
 
     mutable std::mutex intervalMutex_;
     mutable std::mutex updateAtMutex_;

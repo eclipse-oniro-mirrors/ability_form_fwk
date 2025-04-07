@@ -319,7 +319,20 @@ public:
      * @param timerRefresh true or false.
      */
     void SetTimerRefresh(const int64_t formId, const bool timerRefresh);
-
+    
+    /**
+    * @brief Set isHostRefresh for FormRecord.
+    * @param formId The Id of the form.
+    * @param hostRefresh true or false.
+    */
+    void SetHostRefresh(const int64_t formId, const bool hostRefresh);
+ 
+    /**
+    * @brief Clear want cache for FormRecord.
+    * @param formId The Id of the form.
+    */
+    void ClearWantCache(const int64_t formId);
+    
     /**
      * @brief Get updated form info.
      * @param record FormRecord.
