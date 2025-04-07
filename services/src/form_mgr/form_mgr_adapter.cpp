@@ -3010,7 +3010,7 @@ bool FormMgrAdapter::UpdateProviderInfoToHost(const int64_t &matchedFormId, cons
         formRecord.needRefresh, static_cast<int32_t>(formVisibleType), formRecord.isTimerRefresh,
         (int)formRecord.wantCacheMap.size(), formRecord.isHostRefresh);
     // If the form need refresh flag is true and form visibleType is FORM_VISIBLE, refresh the form host.
-     if (formRecord.needRefresh && formVisibleType == Constants::FORM_VISIBLE) {
+    if (formRecord.needRefresh && formVisibleType == Constants::FORM_VISIBLE) {
         if (formRecord.isTimerRefresh || formRecord.isHostRefresh) {
             FormTimerMgr::GetInstance().RefreshWhenFormVisible(formRecord.formId, userId);
         } else {

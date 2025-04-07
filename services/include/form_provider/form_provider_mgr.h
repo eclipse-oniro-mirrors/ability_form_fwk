@@ -146,7 +146,6 @@ private:
      */
     ErrCode RebindByFreeInstall(const FormRecord &record, Want &want,
         const sptr<AAFwk::IAbilityConnection> formRefreshConnection);
-    void MergeWant(const Want &newWant, Want &oldWant);
     void UpdateWant(const int64_t formId, const Want &want, FormRecord &record);
     void DataProxyUpdate(const int64_t formId, const FormRecord &record, bool isFormProviderUpdate);
 };
