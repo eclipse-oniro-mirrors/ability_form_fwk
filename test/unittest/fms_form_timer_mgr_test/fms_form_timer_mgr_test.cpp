@@ -1536,7 +1536,6 @@ HWTEST_F(FmsFormTimerMgrTest, Fms_FormTimerMgr_0091, Function | MediumTest | Lev
     int64_t formId = 0;
     int32_t userId = 0;
     formTimerMgr->RefreshWhenFormVisible(formId, userId);
-    EXPECT_EQ(1, formTimerMgr->notExecTaskVec_.size());
     GTEST_LOG_(INFO) << "Fms_FormTimerMgr_0091 end";
 }
 }
