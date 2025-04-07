@@ -1108,6 +1108,37 @@ void FormDataMgr::SetTimerRefresh(const int64_t formId, const bool timerRefresh)
 }
 
 /**
+ * @brief Set isHostRefresh for FormRecord.
+ * @param formId The Id of the form.
+ * @param hostRefresh true or false.
+ */
+void FormDataMgr::SetHostRefresh(const int64_t formId, const bool hostRefresh)
+{
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    auto itFormRecord = formRecords_.find(formId);
+    if (itFormRecord == formRecords_.end()) {
+        HILOG_ERROR("form info not find, form:%{public}" PRId64, formId);
+        return;
+    }
+    itFormRecord->second.isHostRefresh = hostRefresh;
+}
+ 
+/**
+ * @brief Clear want cache for FormRecord.
+ * @param formId The Id of the form.
+ */
+void FormDataMgr::ClearWantCache(const int64_t formId)
+{
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    auto itFormRecord = formRecords_.find(formId);
+    if (itFormRecord == formRecords_.end()) {
+        HILOG_ERROR("form info not find, form:%{public}" PRId64, formId);
+        return;
+    }
+    itFormRecord->second.wantCacheMap.clear();
+}
+
+/**
  * @brief Get updated form.
  * @param record FormRecord.
  * @param targetForms Target forms.
