@@ -20,14 +20,11 @@ ohos_unittest("FmsFormAbilityConnectionReporterTest") {
   module_out_path = module_output_path
 
   sources = [
-    "${form_fwk_path}/services/src/connection/form_ability_connection_reporter.cpp",
-    "${form_fwk_path}/test/unittest/fms_form_bms_helper_test/fms_form_ability_connection_reporter_test.cpp",
+    "${form_fwk_path}/services/src/common/connection/form_ability_connection_reporter.cpp",
+    "${form_fwk_path}/test/unittest/fms_form_ability_connection_reporter_test/fms_form_ability_connection_reporter_test.cpp",
   ]
 
   include_dirs = [
-    "//third_party/json/include",
-    "${ability_runtime_path}/services/formmgr/include",
-    "${systemabilitymgr_path}/samgr/interfaces/innerkits/samgr_proxy/include",
     "${form_fwk_path}/interfaces/inner_api/include",
     "${form_fwk_path}/services/include",
   ]
