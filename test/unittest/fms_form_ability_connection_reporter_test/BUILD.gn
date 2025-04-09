@@ -37,7 +37,6 @@ ohos_unittest("FmsFormAbilityConnectionReporterTest") {
   deps = [
     "${form_fwk_path}:fms_target",
     "${form_fwk_path}:fmskit_native",
-    "//third_party/googletest:gmock_main",
   ]
 
   external_deps = [
