@@ -290,7 +290,8 @@ HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_013, Function | Me
     formObserverRecord.NotifyFormEvent(recordInner, FormEventId::FORM_EVENT_MESSAGE, runningFormInfo, formEventType);
     formObserverRecord.NotifyFormEvent(recordInner, FormEventId::FORM_EVENT_ROUTER, runningFormInfo, formEventType);
     formObserverRecord.NotifyFormEvent(recordInner, FormEventId::FORM_EVENT_FORM_ADD, runningFormInfo, formEventType);
-    formObserverRecord.NotifyFormEvent(recordInner, FormEventId::FORM_EVENT_FORM_REMOVE, runningFormInfo, formEventType);
+    formObserverRecord.NotifyFormEvent(recordInner,
+        FormEventId::FORM_EVENT_FORM_REMOVE, runningFormInfo, formEventType);
     GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_013 end";
 }
 
