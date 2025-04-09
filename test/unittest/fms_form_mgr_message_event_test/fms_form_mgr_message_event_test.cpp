@@ -809,7 +809,7 @@ HWTEST_F(FmsFormMgrMessageEventTest, FormAbilityConnection_004, TestSize.Level0)
     ASSERT_NE(nullptr, formAbilityConnection);
     AppExecFwk::ElementName element;
     int resultCode = 1;
-	formAbilityConnection->SetConnectId(0);
+    formAbilityConnection->SetConnectId(0);
     formAbilityConnection->OnAbilityDisconnectDone(element, resultCode);
     GTEST_LOG_(INFO) << "FmsFormMgrMessageEventTest FormAbilityConnection_004 end";
 }
