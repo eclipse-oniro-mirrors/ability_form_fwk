@@ -47,7 +47,7 @@ void FmsFormAbilityConnectionReporterTest::TearDown() {}
 HWTEST_F(FmsFormAbilityConnectionReporterTest, FormAbilityConnectionReporterTest_001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormAbilityConnectionReporterTest_ReportFormAbilityConnection begin";
-    std::string bundleName = "testBundleName";
+    std::string bundleName = "";
     FormAbilityConnectionReporter::GetInstance().ReportFormAbilityConnection(bundleName);
     GTEST_LOG_(INFO) << "FormAbilityConnectionReporterTest_ReportFormAbilityConnection end";
 }
@@ -60,7 +60,7 @@ HWTEST_F(FmsFormAbilityConnectionReporterTest, FormAbilityConnectionReporterTest
 HWTEST_F(FmsFormAbilityConnectionReporterTest, FormAbilityConnectionReporterTest_002, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FormAbilityConnectionReporterTest_ReportFormAbilityDisconnection begin";
-    std::string bundleName = "testBundleName";
+    std::string bundleName = "";
     FormAbilityConnectionReporter::GetInstance().ReportFormAbilityDisconnection(bundleName);
     GTEST_LOG_(INFO) << "FormAbilityConnectionReporterTest_ReportFormAbilityDisconnection end";
 }

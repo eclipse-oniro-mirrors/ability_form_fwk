@@ -811,20 +811,6 @@ HWTEST_F(FmsFormSysEventReceiverTest, HandlePackageDataCleared_0001, TestSize.Le
 }
 
 /**
- * @tc.number: HandleScreenUnlocked_0001
- * @tc.name: HandleScreenUnlocked
- * @tc.desc: Verify whether the HandleScreenUnlocked interface is called normally
- */
-HWTEST_F(FmsFormSysEventReceiverTest, HandleScreenUnlocked_0001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "HandleScreenUnlocked_0001 start";
-    std::shared_ptr<FormSysEventReceiver> receiver = std::make_shared<FormSysEventReceiver>();
-    ASSERT_NE(nullptr, receiver);
-    receiver->HandleScreenUnlocked(100);
-    GTEST_LOG_(INFO) << "HandleScreenUnlocked_0001 end";
-}
-
-/**
  * @tc.number: HandleUserUnlocked_0001
  * @tc.name: HandleUserUnlocked
  * @tc.desc: Verify whether the HandleUserUnlocked interface is called normally
@@ -879,5 +865,376 @@ HWTEST_F(FmsFormSysEventReceiverTest, RecycleForms_0001, TestSize.Level0)
     int32_t userId = 100;
     receiver->RecycleForms(userId);
     GTEST_LOG_(INFO) << "RecycleForms_0001 end";
+}
+
+
+/**
+ * @tc.number: HandleAbilityUpdate_0002
+ * @tc.name: HandleAbilityUpdate
+ * @tc.desc: Verify whether the HandleAbilityUpdate interface is called normally
+ */
+HWTEST_F(FmsFormSysEventReceiverTest, HandleAbilityUpdate_0002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "HandleAbilityUpdate_0002 start";
+    std::shared_ptr<FormSysEventReceiver> receiver = std::make_shared<FormSysEventReceiver>();
+    ASSERT_NE(nullptr, receiver);
+    Want want;
+    want.SetParam(KEY_USER_ID, MAIN_USER_ID);
+    std::string bundleName = "testBundleName";
+    const std::string queueName = "queue";
+    std::shared_ptr<FormSerialQueue> serialQueue = std::make_shared<FormSerialQueue>(queueName.c_str());;
+    receiver->SetSerialQueue(serialQueue);
+    receiver->HandleAbilityUpdate(want, bundleName);
+    GTEST_LOG_(INFO) << "HandleAbilityUpdate_0002 end";
+}
+
+/**
+ * @tc.number: HandleUserUnlocked_0002
+ * @tc.name: HandleUserUnlocked
+ * @tc.desc: Verify whether the HandleUserUnlocked interface is called normally
+ */
+HWTEST_F(FmsFormSysEventReceiverTest, HandleUserUnlocked_0002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "HandleUserUnlocked_0002 start";
+    std::shared_ptr<FormSysEventReceiver> receiver = std::make_shared<FormSysEventReceiver>();
+    ASSERT_NE(nullptr, receiver);
+    receiver->HandleUserUnlocked(-1);
+    GTEST_LOG_(INFO) << "HandleUserUnlocked_0002 end";
+}
+
+/**
+ * @tc.number: HandleUserUnlocked_0003
+ * @tc.name: HandleUserUnlocked
+ * @tc.desc: Verify whether the HandleUserUnlocked interface is called normally
+ */
+HWTEST_F(FmsFormSysEventReceiverTest, HandleUserUnlocked_0003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "HandleUserUnlocked_0003 start";
+    std::shared_ptr<FormSysEventReceiver> receiver = std::make_shared<FormSysEventReceiver>();
+    ASSERT_NE(nullptr, receiver);
+    const std::string queueName = "queue";
+    std::shared_ptr<FormSerialQueue> serialQueue = std::make_shared<FormSerialQueue>(queueName.c_str());;
+    receiver->SetSerialQueue(serialQueue);
+    receiver->HandleUserUnlocked(MAIN_USER_ID);
+    GTEST_LOG_(INFO) << "HandleUserUnlocked_0003 end";
+}
+
+/**
+ * @tc.number: OnReceiveEvent_0017
+ * @tc.name: OnReceiveEvent
+ * @tc.desc: When the action is COMMON_EVENT_PACKAGE_REPLACED, the program executes normally as expected
+ */
+HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_0017, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "OnReceiveEvent_0017 start";
+    std::shared_ptr<FormSysEventReceiver> testCase = std::make_shared<FormSysEventReceiver>();
+    EXPECT_TRUE(testCase != nullptr);
+    EventFwk::CommonEventData eventData;
+    AAFwk::Want want = eventData.GetWant();
+    std::string action = EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REPLACED;
+    std::string bundleName = EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED;
+    std::string abilityName = "abc";
+    want.SetAction(action);
+    want.SetElementName(bundleName, abilityName);
+    eventData.SetWant(want);
+    const std::string queueName = "queue";
+    std::shared_ptr<FormSerialQueue> serialQueue = std::make_shared<FormSerialQueue>(queueName.c_str());;
+    testCase->SetSerialQueue(serialQueue);
+    testCase->OnReceiveEvent(eventData);
+    GTEST_LOG_(INFO) << "OnReceiveEvent_0017 end";
+}
+
+/**
+ * @tc.number: OnReceiveEvent_0018
+ * @tc.name: OnReceiveEvent
+ * @tc.desc: When the action is COMMON_EVENT_SCREEN_ON, the program executes normally as expected
+ */
+HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_0018, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "OnReceiveEvent_0018 start";
+    std::shared_ptr<FormSysEventReceiver> testCase = std::make_shared<FormSysEventReceiver>();
+    EXPECT_TRUE(testCase != nullptr);
+    EventFwk::CommonEventData eventData;
+    AAFwk::Want want = eventData.GetWant();
+    std::string action = EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON;
+    std::string bundleName = EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED;
+    std::string abilityName = "abc";
+    want.SetAction(action);
+    want.SetElementName(bundleName, abilityName);
+    eventData.SetWant(want);
+    const std::string queueName = "queue";
+    std::shared_ptr<FormSerialQueue> serialQueue = std::make_shared<FormSerialQueue>(queueName.c_str());;
+    testCase->SetSerialQueue(serialQueue);
+    testCase->OnReceiveEvent(eventData);
+    GTEST_LOG_(INFO) << "OnReceiveEvent_0018 end";
+}
+
+/**
+ * @tc.number: OnReceiveEvent_0019
+ * @tc.name: OnReceiveEvent
+ * @tc.desc: When the action is COMMON_EVENT_USER_REMOVED, the program executes normally as expected
+ */
+HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_0019, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "OnReceiveEvent_0019 start";
+    std::shared_ptr<FormSysEventReceiver> testCase = std::make_shared<FormSysEventReceiver>();
+    EXPECT_TRUE(testCase != nullptr);
+    EventFwk::CommonEventData eventData;
+    AAFwk::Want want = eventData.GetWant();
+    std::string action = EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED;
+    std::string bundleName = EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED;
+    std::string abilityName = "abc";
+    want.SetAction(action);
+    want.SetElementName(bundleName, abilityName);
+    eventData.SetWant(want);
+    const std::string queueName = "queue";
+    std::shared_ptr<FormSerialQueue> serialQueue = std::make_shared<FormSerialQueue>(queueName.c_str());;
+    testCase->SetSerialQueue(serialQueue);
+    testCase->OnReceiveEvent(eventData);
+    GTEST_LOG_(INFO) << "OnReceiveEvent_0019 end";
+}
+
+/**
+ * @tc.number: OnReceiveEvent_0020
+ * @tc.name: OnReceiveEvent
+ * @tc.desc: When the action is COMMON_EVENT_BUNDLE_SCAN_FINISHED, the program executes normally as expected
+ */
+HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_0020, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "OnReceiveEvent_0020 start";
+    std::shared_ptr<FormSysEventReceiver> testCase = std::make_shared<FormSysEventReceiver>();
+    EXPECT_TRUE(testCase != nullptr);
+    EventFwk::CommonEventData eventData;
+    AAFwk::Want want = eventData.GetWant();
+    std::string action = EventFwk::CommonEventSupport::COMMON_EVENT_BUNDLE_SCAN_FINISHED;
+    std::string bundleName = EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED;
+    std::string abilityName = "abc";
+    want.SetAction(action);
+    want.SetElementName(bundleName, abilityName);
+    eventData.SetWant(want);
+    const std::string queueName = "queue";
+    std::shared_ptr<FormSerialQueue> serialQueue = std::make_shared<FormSerialQueue>(queueName.c_str());;
+    testCase->SetSerialQueue(serialQueue);
+    testCase->OnReceiveEvent(eventData);
+    GTEST_LOG_(INFO) << "OnReceiveEvent_0020 end";
+}
+
+/**
+ * @tc.number: OnReceiveEvent_0021
+ * @tc.name: OnReceiveEvent
+ * @tc.desc: When the action is COMMON_EVENT_USER_SWITCHED, the program executes normally as expected
+ */
+HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_0021, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "OnReceiveEvent_0021 start";
+    std::shared_ptr<FormSysEventReceiver> testCase = std::make_shared<FormSysEventReceiver>();
+    EXPECT_TRUE(testCase != nullptr);
+    EventFwk::CommonEventData eventData;
+    AAFwk::Want want = eventData.GetWant();
+    std::string action = EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED;
+    std::string bundleName = EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED;
+    std::string abilityName = "abc";
+    want.SetAction(action);
+    want.SetElementName(bundleName, abilityName);
+    eventData.SetWant(want);
+    const std::string queueName = "queue";
+    std::shared_ptr<FormSerialQueue> serialQueue = std::make_shared<FormSerialQueue>(queueName.c_str());;
+    testCase->SetSerialQueue(serialQueue);
+    testCase->OnReceiveEvent(eventData);
+    GTEST_LOG_(INFO) << "OnReceiveEvent_0021 end";
+}
+
+/**
+ * @tc.number: OnReceiveEvent_0022
+ * @tc.name: OnReceiveEvent
+ * @tc.desc: When the action is COMMON_EVENT_SECOND_MOUNTED, the program executes normally as expected
+ */
+HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_0022, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "OnReceiveEvent_0022 start";
+    std::shared_ptr<FormSysEventReceiver> testCase = std::make_shared<FormSysEventReceiver>();
+    EXPECT_TRUE(testCase != nullptr);
+    EventFwk::CommonEventData eventData;
+    AAFwk::Want want = eventData.GetWant();
+    std::string action = EventFwk::CommonEventSupport::COMMON_EVENT_SECOND_MOUNTED;
+    std::string bundleName = EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED;
+    std::string abilityName = "abc";
+    want.SetAction(action);
+    want.SetElementName(bundleName, abilityName);
+    eventData.SetWant(want);
+    const std::string queueName = "queue";
+    std::shared_ptr<FormSerialQueue> serialQueue = std::make_shared<FormSerialQueue>(queueName.c_str());;
+    testCase->SetSerialQueue(serialQueue);
+    testCase->OnReceiveEvent(eventData);
+    GTEST_LOG_(INFO) << "OnReceiveEvent_0022 end";
+}
+
+/**
+ * @tc.number: OnReceiveEvent_0023
+ * @tc.name: OnReceiveEvent
+ * @tc.desc: When the action is COMMON_EVENT_SCREEN_UNLOCKED, the program executes normally as expected
+ */
+HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_0023, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "OnReceiveEvent_0023 start";
+    std::shared_ptr<FormSysEventReceiver> testCase = std::make_shared<FormSysEventReceiver>();
+    EXPECT_TRUE(testCase != nullptr);
+    EventFwk::CommonEventData eventData;
+    AAFwk::Want want = eventData.GetWant();
+    std::string action = EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED;
+    std::string bundleName = EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED;
+    std::string abilityName = "abc";
+    want.SetAction(action);
+    want.SetElementName(bundleName, abilityName);
+    eventData.SetWant(want);
+    const std::string queueName = "queue";
+    std::shared_ptr<FormSerialQueue> serialQueue = std::make_shared<FormSerialQueue>(queueName.c_str());;
+    testCase->SetSerialQueue(serialQueue);
+    testCase->OnReceiveEvent(eventData);
+    GTEST_LOG_(INFO) << "OnReceiveEvent_0023 end";
+}
+
+/**
+ * @tc.number: OnReceiveEvent_0024
+ * @tc.name: OnReceiveEvent
+ * @tc.desc: When the action is COMMON_EVENT_ABILITY_UPDATED, the program executes normally as expected
+ */
+HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_0024, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "OnReceiveEvent_0024 start";
+    std::shared_ptr<FormSysEventReceiver> testCase = std::make_shared<FormSysEventReceiver>();
+    EXPECT_TRUE(testCase != nullptr);
+    EventFwk::CommonEventData eventData;
+    AAFwk::Want want = eventData.GetWant();
+    std::string action = EventFwk::CommonEventSupport::COMMON_EVENT_ABILITY_UPDATED;
+    std::string bundleName = EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED;
+    std::string abilityName = "abc";
+    want.SetAction(action);
+    want.SetElementName(bundleName, abilityName);
+    eventData.SetWant(want);
+    const std::string queueName = "queue";
+    std::shared_ptr<FormSerialQueue> serialQueue = std::make_shared<FormSerialQueue>(queueName.c_str());;
+    testCase->SetSerialQueue(serialQueue);
+    testCase->OnReceiveEvent(eventData);
+    GTEST_LOG_(INFO) << "OnReceiveEvent_0024 end";
+}
+
+/**
+ * @tc.number: OnReceiveEvent_0025
+ * @tc.name: OnReceiveEvent
+ * @tc.desc: When the action is COMMON_EVENT_PACKAGE_DATA_CLEARED, the program executes normally as expected
+ */
+HWTEST_F(FmsFormSysEventReceiverTest, OnReceiveEvent_0025, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "OnReceiveEvent_0025 start";
+    std::shared_ptr<FormSysEventReceiver> testCase = std::make_shared<FormSysEventReceiver>();
+    EXPECT_TRUE(testCase != nullptr);
+    EventFwk::CommonEventData eventData;
+    AAFwk::Want want = eventData.GetWant();
+    std::string action = EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_DATA_CLEARED;
+    std::string bundleName = EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED;
+    std::string abilityName = "abc";
+    want.SetAction(action);
+    want.SetElementName(bundleName, abilityName);
+    eventData.SetWant(want);
+    const std::string queueName = "queue";
+    std::shared_ptr<FormSerialQueue> serialQueue = std::make_shared<FormSerialQueue>(queueName.c_str());;
+    testCase->SetSerialQueue(serialQueue);
+    testCase->OnReceiveEvent(eventData);
+    GTEST_LOG_(INFO) << "OnReceiveEvent_0025 end";
+}
+
+/**
+ * @tc.number: HandleUserIdRemoved_0002
+ * @tc.name: HandleUserIdRemoved
+ * @tc.desc: Verify whether the HandleUserIdRemoved interface is called normally
+ */
+HWTEST_F(FmsFormSysEventReceiverTest, HandleUserIdRemoved_0002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "HandleUserIdRemoved_0002 start";
+    std::shared_ptr<FormSysEventReceiver> testCase = std::make_shared<FormSysEventReceiver>();
+    ASSERT_NE(nullptr, testCase);
+    const int32_t userId = -1;
+    testCase->HandleUserIdRemoved(userId);
+    GTEST_LOG_(INFO) << "HandleUserIdRemoved_0002 end";
+}
+
+/**
+ * @tc.number: HandleUserIdRemoved_0003
+ * @tc.name: HandleUserIdRemoved
+ * @tc.desc: Verify whether the HandleUserIdRemoved interface is called normally
+ */
+HWTEST_F(FmsFormSysEventReceiverTest, HandleUserIdRemoved_0003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "HandleUserIdRemoved_0003 start";
+    std::shared_ptr<FormSysEventReceiver> testCase = std::make_shared<FormSysEventReceiver>();
+    ASSERT_NE(nullptr, testCase);
+    const int32_t userId = 0;
+    const std::string queueName = "queue";
+    std::shared_ptr<FormSerialQueue> serialQueue = std::make_shared<FormSerialQueue>(queueName.c_str());;
+    testCase->SetSerialQueue(serialQueue);
+    testCase->HandleUserIdRemoved(userId);
+    GTEST_LOG_(INFO) << "HandleUserIdRemoved_0003 end";
+}
+
+/**
+ * @tc.number: InitFormInfosAndRegister_0001
+ * @tc.name: InitFormInfosAndRegister
+ * @tc.desc: Verify whether the HandleUserIdRemoved interface is called normally
+ */
+HWTEST_F(FmsFormSysEventReceiverTest, InitFormInfosAndRegister_0001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "InitFormInfosAndRegister_0001 start";
+    std::shared_ptr<FormSysEventReceiver> testCase = std::make_shared<FormSysEventReceiver>();
+    ASSERT_NE(nullptr, testCase);
+    const std::string queueName = "queue";
+    std::shared_ptr<FormSerialQueue> serialQueue = std::make_shared<FormSerialQueue>(queueName.c_str());;
+    testCase->SetSerialQueue(serialQueue);
+    testCase->InitFormInfosAndRegister();
+    GTEST_LOG_(INFO) << "InitFormInfosAndRegister_0001 end";
+}
+
+/**
+ * @tc.number: HandleUserSwitched_0003
+ * @tc.name: HandleUserSwitched
+ * @tc.desc: Verify whether the HandleUserSwitched interface is called normally
+ */
+HWTEST_F(FmsFormSysEventReceiverTest, HandleUserSwitched_0003, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "HandleUserSwitched_0003 start";
+    std::shared_ptr<FormSysEventReceiver> receiver = std::make_shared<FormSysEventReceiver>();
+    ASSERT_NE(nullptr, receiver);
+    OHOS::EventFwk::CommonEventData eventData;
+    eventData.SetCode(MAIN_USER_ID);
+    OHOS::EventFwk::CommonEventData eventData1;
+    eventData1.SetCode(200);
+    OHOS::EventFwk::CommonEventData eventData2;
+    eventData2.SetCode(300);
+    receiver->HandleUserSwitched(eventData);
+    receiver->HandleUserSwitched(eventData);
+    receiver->SetSerialQueue(nullptr);
+    receiver->HandleUserSwitched(eventData1);
+    const std::string queueName = "queue";
+    std::shared_ptr<FormSerialQueue> serialQueue = std::make_shared<FormSerialQueue>(queueName.c_str());;
+    receiver->SetSerialQueue(serialQueue);
+    receiver->HandleUserSwitched(eventData2);
+    GTEST_LOG_(INFO) << "HandleUserSwitched_0003 end";
+}
+
+/**
+ * @tc.number: HandleScreenOn_0002
+ * @tc.name: HandleScreenOn
+ * @tc.desc: Verify whether the HandleScreenOn interface is called normally
+ */
+HWTEST_F(FmsFormSysEventReceiverTest, HandleScreenOn_0002, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "HandleScreenOn_0002 start";
+    std::shared_ptr<FormSysEventReceiver> receiver = std::make_shared<FormSysEventReceiver>();
+    ASSERT_NE(nullptr, receiver);
+    const std::string queueName = "queue";
+    std::shared_ptr<FormSerialQueue> serialQueue = std::make_shared<FormSerialQueue>(queueName.c_str());;
+    receiver->SetSerialQueue(serialQueue);
+    receiver->HandleScreenOn();
+    GTEST_LOG_(INFO) << "HandleScreenOn_0002 end";
 }
 }
