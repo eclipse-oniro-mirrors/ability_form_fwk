@@ -428,7 +428,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_019, TestSize.Level0)
     int64_t formId = 1;
     sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
     Want want;
-    MockExistFormRecord(false);
+    MockGetFormRecord(false);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_NOT_EXIST_ID, formMgrAdapter.RequestForm(formId, callerToken, want));
     GTEST_LOG_(INFO) << "FormMgrAdapter_019 end";
 }
@@ -1558,7 +1558,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_084, TestSize.Level0)
     int64_t formId = 1;
     sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
     Want want;
-    MockExistFormRecord(true);
+    MockGetFormRecord(true);
     MockGetMatchedHostClient(false);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.RequestForm(formId, callerToken, want));
     GTEST_LOG_(INFO) << "FormMgrAdapter_084 end";
@@ -1576,7 +1576,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_085, TestSize.Level0)
     int64_t formId = 1;
     sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
     Want want;
-    MockExistFormRecord(true);
+    MockGetFormRecord(true);
     MockGetMatchedHostClient(true);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, formMgrAdapter.RequestForm(formId, callerToken, want));
     GTEST_LOG_(INFO) << "FormMgrAdapter_085 end";
