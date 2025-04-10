@@ -2934,5 +2934,26 @@ bool FormDataMgr::GetFormCanUpdate(int64_t formId)
     }
     return search->second;
 }
+
+void FormDataMgr::MergeFormWant(const Want &newWant, Want &oldWant)
+{
+    std::map<std::string, sptr<IInterface>> newWantMap;
+    WantParams newWantParams = newWant.GetParams();
+    WantParams oldWantParams = oldWant.GetParams();
+    newWantMap = newWantParams.GetParams();
+    for (auto it = newWantMap.begin(); it != newWantMap.end(); it++) {
+        oldWantParams.SetParam(it->first, it->second);
+    }
+    oldWant.SetParams(oldWantParams);
+}
+
+void FormDataMgr::UpdateFormWant(const int64_t formId, const Want &want, FormRecord &record)
+{
+    if (record.wantCacheMap.size() != 0) {
+        MergeFormWant(want, record.wantCacheMap[formId]);
+        return;
+    }
+    record.wantCacheMap[formId] = want;
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

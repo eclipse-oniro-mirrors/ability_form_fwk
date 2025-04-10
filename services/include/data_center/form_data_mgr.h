@@ -875,6 +875,21 @@ public:
      */
     bool GetFormCanUpdate(int64_t formId);
 
+    /**
+     * @brief merge form new want to old want.
+     * @param newWant new want info.
+     * @param oldWant old want info.
+     */
+    void MergeFormWant(const Want &newWant, Want &oldWant);
+
+    /**
+     * @brief Update form want.
+     * @param formId form id.
+     * @param want new want.
+     * @param record form record info.
+     */
+    void UpdateFormWant(const int64_t formId, const Want &want, FormRecord &record);
+
 private:
     /**
      * @brief Create form record.

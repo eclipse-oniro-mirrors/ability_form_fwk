@@ -849,7 +849,9 @@ int FormMgrAdapter::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
     }
 
     int64_t matchedFormId = FormDataMgr::GetInstance().FindMatchedFormId(formId);
-    if (!FormDataMgr::GetInstance().ExistFormRecord(matchedFormId)) {
+    FormRecord record;
+    bool result = FormDataMgr::GetInstance().GetFormRecord(matchedFormId, record);
+    if (!result) {
         HILOG_ERROR("not exist such formId:%{public}" PRId64 ".", matchedFormId);
         return ERR_APPEXECFWK_FORM_NOT_EXIST_ID;
     }
@@ -871,6 +873,8 @@ int FormMgrAdapter::RequestForm(const int64_t formId, const sptr<IRemoteObject> 
     int32_t currentActiveUserId = FormUtil::GetCurrentAccountId();
     reqWant.SetParam(Constants::PARAM_FORM_USER_ID, currentActiveUserId);
     reqWant.SetParam(Constants::PARAM_FORM_REFRESH_TYPE, Constants::REFRESHTYPE_HOST);
+    FormDataMgr::GetInstance().UpdateFormWant(matchedFormId, want, record);
+    FormDataMgr::GetInstance().UpdateFormRecord(matchedFormId, record);
     return FormProviderMgr::GetInstance().RefreshForm(matchedFormId, reqWant, true);
 }
 
@@ -1542,13 +1546,17 @@ ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
     bool hasRecord = FormDataMgr::GetInstance().GetFormRecord(formId, record);
     record.enableForm = info.IsEnableForm();
 
+    Want allotFormWant;
+    allotFormWant.SetParams(wantParams);
     if (hasRecord) {
         CheckUpdateFormRecord(formId, info, record);
         if (record.formTempFlag && !FormRenderMgr::GetInstance().IsRerenderForRenderServiceDied(formId)) {
             HILOG_ERROR("addForm can't acquire tempForm when select formId");
             return ERR_APPEXECFWK_FORM_COMMON_CODE;
         }
+        FormDataMgr::GetInstance().MergeFormWant(record.wantCacheMap[formId], allotFormWant);
     }
+    const WantParams wholeWantParams = allotFormWant.GetParams();
     record.formLocation = info.GetFormLocation();
 
     // ark ts form can only exist with one form host
@@ -1566,14 +1574,14 @@ ErrCode FormMgrAdapter::AllotFormById(const FormItemInfo &info,
             HILOG_ERROR("formId and item info not match:%{public}" PRId64 "", formId);
             return ERR_APPEXECFWK_FORM_CFG_NOT_MATCH_ID;
         }
-        return AddExistFormRecord(info, callerToken, record, formId, wantParams, formInfo);
+        return AddExistFormRecord(info, callerToken, record, formId, wholeWantParams, formInfo);
     }
 
     // find in db but not in cache
     FormRecord dbRecord;
     ErrCode getDbRet = FormDbCache::GetInstance().GetDBRecord(formId, dbRecord);
     if (getDbRet == ERR_OK && (dbRecord.providerUserId == currentUserId)) {
-        return AddNewFormRecord(info, formId, callerToken, wantParams, formInfo);
+        return AddNewFormRecord(info, formId, callerToken, wholeWantParams, formInfo);
     }
 
     HILOG_INFO("no such formId:%{public}" PRId64, formId);
