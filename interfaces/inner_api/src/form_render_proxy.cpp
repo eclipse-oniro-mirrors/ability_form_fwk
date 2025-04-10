@@ -369,8 +369,8 @@ void FormRenderProxy::RunCachedConfigurationUpdated()
     }
 
     MessageParcel reply;
-    int32_t error = Remote()->SendRequest(
-        static_cast<uint32_t>(IFormRender::Message::FORM_RUN_CACHED_CONFIG),
+    int32_t error = SendTransactCmd(
+        IFormRender::Message::FORM_RUN_CACHED_CONFIG,
         data,
         reply,
         option);
