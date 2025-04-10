@@ -19,37 +19,6 @@
 #include "ani.h"
 #include "fms_log_wrapper.h"
 
-std::string ANIUtils_ANIStringToStdString(ani_env *env, const ani_string &ani_str)
-{
-    HILOG_INFO("ANIUtils_ANIStringToStdString call");
-    if (env == nullptr) {
-        HILOG_ERROR("env is nullptr ");
-        return "";
-    }
-    ani_status status = ANI_OK;
-    ani_size strSize;
-    status = env->String_GetUTF8Size(ani_str, &strSize);
-    if (status != ANI_OK) {
-        HILOG_ERROR("String_GetUTF8Size %{public}d ", static_cast<int>(status));
-        return "";
-    }
-
-    std::vector<char> buffer(strSize + 1);
-    char *utfBuffer = buffer.data();
-
-    ani_size bytes_written = 0;
-    status = env->String_GetUTF8(ani_str, utfBuffer, strSize + 1, &bytes_written);
-    if (status != ANI_OK) {
-        HILOG_ERROR("String_GetUTF8 %{public}d ", static_cast<int>(status));
-        return "";
-    }
-
-    utfBuffer[bytes_written] = '\0';
-    std::string content = std::string(utfBuffer);
-    HILOG_INFO("ANIUtils_ANIStringToStdString end");
-    return content;
-}
-
 static ani_object CreateFormBindingData([[maybe_unused]] ani_env *env, ani_object paramObject)
 {
     HILOG_INFO("CreateFormBindingData call");
@@ -98,6 +67,7 @@ static ani_object CreateFormBindingData([[maybe_unused]] ani_env *env, ani_objec
     return formBindingDataObj;
 }
 
+extern "C" {
 ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
 {
     HILOG_INFO("ANI_Constructor call");
@@ -136,4 +106,5 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
     *result = ANI_VERSION_1;
     HILOG_INFO("ANI_Constructor end");
     return ANI_OK;
+}
 }
