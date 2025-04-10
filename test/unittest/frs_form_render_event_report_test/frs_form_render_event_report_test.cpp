@@ -15,6 +15,7 @@
 
 #include <gtest/gtest.h>
 
+#include "form_memory_guard.h"
 #include "fms_log_wrapper.h"
 #define private public
 #include "form_render_event_report.h"
@@ -89,6 +90,19 @@ HWTEST_F(FormRenderEventReportTest, GetNowMillisecond_001, TestSize.Level0)
     GTEST_LOG_(INFO) << "GetNowMillisecond_001 begin";
     FormRenderEventReport::GetNowMillisecond();
     GTEST_LOG_(INFO) << "GetNowMillisecond_001 test ends";
+}
+
+/**
+ * @tc.name: FormMemoryGuardTest_001
+ * @tc.desc: Check FormMemoryGuard Test
+ * @tc.type: FUNC
+ * @tc.require: issuesI9MVRJ
+ */
+HWTEST_F(FormRenderEventReportTest, FormMemoryGuardTest_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMemoryGuardTest_001 begin";
+    FormMemoryGuard formMemoryGuard;
+    GTEST_LOG_(INFO) << "FormMemoryGuardTest_001 test ends";
 }
 } // namespace AppExecFwk
 } // namespace OHOS

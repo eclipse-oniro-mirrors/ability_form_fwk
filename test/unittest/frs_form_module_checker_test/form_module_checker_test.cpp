@@ -280,3 +280,30 @@ HWTEST_F(FormModuleCheckerTest, Test017, testing::ext::TestSize.Level1)
         EXPECT_TRUE(it != result.end());
     }
 }
+
+/**
+ * @tc.name: Test018
+ * @tc.desc: test CheckModuleLoadable function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormModuleCheckerTest, Test018, testing::ext::TestSize.Level1)
+{
+    std::unique_ptr<ApiAllowListChecker> apiAllowListFilter = nullptr;
+    std::shared_ptr<FormModuleChecker> formChecker = std::make_shared<FormModuleChecker>();
+    ASSERT_TRUE(formChecker != nullptr);
+    bool ret = formChecker->CheckModuleLoadable("intl", apiAllowListFilter, true);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: Test019
+ * @tc.desc: test CheckModuleLoadable function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormModuleCheckerTest, Test019, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<FormModuleChecker> formChecker = std::make_shared<FormModuleChecker>();
+    ASSERT_TRUE(formChecker != nullptr);
+    bool ret = formChecker->DiskCheckOnly();
+    EXPECT_FALSE(ret);
+}
