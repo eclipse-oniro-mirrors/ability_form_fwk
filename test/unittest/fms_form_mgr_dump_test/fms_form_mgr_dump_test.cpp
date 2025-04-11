@@ -405,6 +405,8 @@ HWTEST_F(FmsFormMgrDumpTest, Dump_017, TestSize.Level1)
     FormDumpMgr::GetInstance().AppendFormLocation(Constants::FormLocation::NEGATIVE_SCREEN, infosResult);
     FormDumpMgr::GetInstance().AppendFormLocation(Constants::FormLocation::FORM_CENTER_NEGATIVE_SCREEN, infosResult);
     FormDumpMgr::GetInstance().AppendFormLocation(Constants::FormLocation::FORM_MANAGER_NEGATIVE_SCREEN, infosResult);
+    FormDumpMgr::GetInstance().AppendFormLocation(Constants::FormLocation::SCREEN_LOCK, infosResult);
+    FormDumpMgr::GetInstance().AppendFormLocation(Constants::FormLocation::AI_SUGGESTION, infosResult);
     GTEST_LOG_(INFO) << "Dump_017 end";
 }
 

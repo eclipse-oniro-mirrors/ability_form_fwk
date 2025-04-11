@@ -268,4 +268,33 @@ HWTEST_F(FormReportTest, FormReport_015, TestSize.Level1)
     auto statisticIt = formReport.GetStatistic().find(testFormId);
     EXPECT_NE(statisticIt, formReport.GetStatistic().end());
 }
+
+/**
+ * @tc.name: FormReport_016
+ * @tc.desc: test GetAddFormFinish function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormReportTest, FormReport_016, TestSize.Level1)
+{
+    formReport.SetFormRecordInfo(testFormId, want);
+    formReport.InsertFormId(testFormId);
+    bool addFormFinish;
+    formReport.GetAddFormFinish(testFormId, addFormFinish);
+    auto statisticIt = formReport.GetStatistic().find(testFormId);
+    EXPECT_NE(statisticIt, formReport.GetStatistic().end());
+}
+
+/**
+ * @tc.name: FormReport_017
+ * @tc.desc: test SetAddFormFinish function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormReportTest, FormReport_017, TestSize.Level1)
+{
+    formReport.SetFormRecordInfo(testFormId, want);
+    formReport.InsertFormId(testFormId);
+    formReport.SetAddFormFinish(testFormId);
+    auto statisticIt = formReport.GetStatistic().find(testFormId);
+    EXPECT_NE(statisticIt, formReport.GetStatistic().end());
+}
 } // namespace
