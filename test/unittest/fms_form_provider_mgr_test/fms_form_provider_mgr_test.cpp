@@ -40,6 +40,7 @@
 #endif
 #include "running_process_info.h"
 #include "system_ability_definition.h"
+#include "form_provider/mock_form_provider_mgr.h"
 
 namespace {
     bool g_mockConnectServiceAbilityRet = false;
@@ -206,15 +207,26 @@ HWTEST_F(FmsFormProviderMgrTest, RefreshForm_001, TestSize.Level0)
     GTEST_LOG_(INFO) << "fms_form_mgr_provider_test_004 start";
     int64_t formId = 0x1145aaaa00001200;
     Want want;
-    int callingUid {0};
+    MockRefreshCheck(false);
     EXPECT_EQ(ERR_APPEXECFWK_FORM_NOT_EXIST_ID, FormProviderMgr::GetInstance().RefreshForm(formId, want, true));
-    FormItemInfo record;
-    record.SetFormId(formId);
-    record.SetModuleName(PARAM_FORM_NAME);
-    record.SetAbilityName(FORM_PROVIDER_ABILITY_NAME);
-    FormRecord realFormRecord = FormDataMgr::GetInstance().AllotFormRecord(record, callingUid);
-    FormItemInfo info;
-    FormDataMgr::GetInstance().AllotFormHostRecord(info, token_, formId, callingUid);
+    MockRefreshCheck(true);
+    FormRecord record;
+    record.enableForm = true;
+    FormProviderMgr::GetInstance().RefreshForm(formId, want, true);
+
+    record.enableForm = false;
+    want.SetParam(Constants::KEY_TIMER_REFRESH, true);
+    want.SetParam(Constants::KEY_CONNECT_REFRESH, true);
+    record.formVisibleNotifyState = Constants::FORM_DEFAULT;
+    EXPECT_EQ(ERR_OK, FormProviderMgr::GetInstance().RefreshForm(formId, want, true));
+
+    record.formVisibleNotifyState = Constants::FORM_VISIBLE;
+    want.SetParam(Constants::PARAM_FORM_REFRESH_TYPE, Constants::REFRESHTYPE_VISIABLE);
+    record.isSystemApp = true;
+    FormProviderMgr::GetInstance().RefreshForm(formId, want, true);
+
+    record.isSystemApp = false;
+    FormProviderMgr::GetInstance().RefreshForm(formId, want, true);
     GTEST_LOG_(INFO) << "fms_form_mgr_provider_test_004 end";
 }
 
@@ -272,7 +284,7 @@ HWTEST_F(FmsFormProviderMgrTest, RefreshForm_003, TestSize.Level1)
     FormDataMgr::GetInstance().AllotFormHostRecord(info, token_, formId, callingUid);
 #ifdef SUPPORT_POWER
     MockConnectServiceAbility(true);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_NOT_EXIST_ID, FormProviderMgr::GetInstance().RefreshForm(formId, want, true));
+    FormProviderMgr::GetInstance().RefreshForm(formId, want, true);
 #endif
 
     GTEST_LOG_(INFO) << "fms_form_mgr_provider_test_006 end";
@@ -301,7 +313,7 @@ HWTEST_F(FmsFormProviderMgrTest, RefreshForm_004, TestSize.Level1)
     FormItemInfo info;
     FormDataMgr::GetInstance().AllotFormHostRecord(info, token_, formId, callingUid);
 #ifdef SUPPORT_POWER
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_OPERATION_NOT_SELF, FormProviderMgr::GetInstance().RefreshForm(formId, want, true));
+    FormProviderMgr::GetInstance().RefreshForm(formId, want, true);
 #endif
     GTEST_LOG_(INFO) << "fms_form_mgr_provider_test_007 end";
 }

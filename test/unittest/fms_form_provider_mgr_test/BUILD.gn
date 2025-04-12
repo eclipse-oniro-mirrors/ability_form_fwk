@@ -23,6 +23,7 @@ ohos_unittest("FmsFormProviderMgrTest") {
     "${form_fwk_path}/test/mock/src/mock_bundle_manager.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_host_client.cpp",
     "${form_fwk_path}/test/mock/src/mock_form_provider_client.cpp",
+    "${form_fwk_path}/test/mock/src/form_provider/mock_form_provider_mgr.cpp",
   ]
   sources += [ "fms_form_provider_mgr_test.cpp" ]
 

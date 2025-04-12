@@ -120,7 +120,10 @@ HWTEST_F(FormUtilTest, FormUtilTest_007, TestSize.Level1)
 {
     int64_t udidHash = 0x1111111100000000L;
     auto result = FormUtil::GenerateUdidHash(udidHash);
+    EXPECT_TRUE(result);
 
+    udidHash = 0xFFFFL;
+    result = FormUtil::GenerateUdidHash(udidHash);
     EXPECT_TRUE(result);
 }
 
@@ -244,7 +247,7 @@ HWTEST_F(FormUtilTest, FormUtilTest_015, TestSize.Level1)
 }
 
 /**
- * @tc.name: FormUtilTest_010
+ * @tc.name: FormUtilTest_016
  * @tc.desc: Verify GetNowMillisecond
  * @tc.type: FUNC
  */
@@ -255,5 +258,46 @@ HWTEST_F(FormUtilTest, FormUtilTest_016, TestSize.Level1)
 
     EXPECT_TRUE(result2 >= result1);
 }
+
+/**
+ * @tc.name: FormUtilTest_017
+ * @tc.desc: Verify GetNowMillisecond
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormUtilTest, FormUtilTest_017, TestSize.Level1)
+{
+    std::string strInfo = "";
+    int64_t int64Value = 1;
+    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
+
+    strInfo = "abcd";
+    EXPECT_FALSE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
+
+    strInfo = "123";
+    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
+
+    strInfo = "1234567890123456789";
+    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
+
+    strInfo = "9134567890123456789";
+    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
+
+    strInfo = "9234567890123456789";
+    EXPECT_FALSE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
+
+    strInfo = "-123";
+    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
+
+    strInfo = "-1234567890123456789";
+    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
+
+    strInfo = "-9134567890123456789";
+    EXPECT_TRUE(FormUtil::ConvertStringToInt64(strInfo, int64Value));
+
+    strInfo = "-9134567890123456789";
+    FormUtil::ConvertStringToInt64(strInfo, int64Value);
+}
+
+
 }  // namespace AppExecFwk
 }  // namespace OHOS

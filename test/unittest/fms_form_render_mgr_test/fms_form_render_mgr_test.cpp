@@ -955,6 +955,370 @@ HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_045, TestSize.Level0)
 }
 
 /**
+ * @tc.name: FormRenderMgrTest_046
+ * @tc.desc: 1.test AddAcquireProviderFormInfoTask function and privacyLevel is 0.
+ *           2.renderInner_ is not nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_046, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_046 start";
+    FormRenderMgr formRenderMgr;
+    int32_t userId = 100;
+    std::function<void()> task;
+
+    formRenderMgr.AddAcquireProviderFormInfoTask(userId, task);
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_046 end";
+}
+
+/**
+ * @tc.name: FormRenderMgrTest_047
+ * @tc.desc: 1.test ExecAcquireProviderTask function and privacyLevel is 0.
+ *           2.renderInner_ is not nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_047, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_047 start";
+    FormRenderMgr formRenderMgr;
+    int32_t userId = 100;
+
+    formRenderMgr.ExecAcquireProviderTask(userId);
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_047 end";
+}
+
+/**
+ * @tc.name: FormRenderMgrTest_048
+ * @tc.desc: 1.test ExecAcquireProviderForbiddenTask function and privacyLevel is 0.
+ *           2.renderInner_ is not nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_048, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_048 start";
+    FormRenderMgr formRenderMgr;
+    std::string bundleName = "<bundleName>";
+
+    formRenderMgr.ExecAcquireProviderForbiddenTask(bundleName);
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_048 end";
+}
+
+/**
+ * @tc.name: FormRenderMgrTest_049
+ * @tc.desc: 1.test ExecAcquireProviderForbiddenTaskByFormId function and privacyLevel is 0.
+ *           2.renderInner_ is not nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_049, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_049 start";
+    FormRenderMgr formRenderMgr;
+    int64_t formId = 1;
+
+    formRenderMgr.ExecAcquireProviderForbiddenTaskByFormId(formId);
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_049 end";
+}
+
+/**
+ * @tc.name: FormRenderMgrTest_050
+ * @tc.desc: 1.test AddPostRenderFormTask function and privacyLevel is 0.
+ *           2.renderInner_ is not nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_050, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_050 start";
+    FormRenderMgr formRenderMgr;
+    int32_t userId = 100;
+    std::function<void()> task;
+
+    formRenderMgr.AddPostRenderFormTask(userId, task);
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_050 end";
+}
+
+/**
+ * @tc.name: FormRenderMgrTest_051
+ * @tc.desc: 1.test ExecPostRenderFormTask function and privacyLevel is 0.
+ *           2.renderInner_ is not nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_051, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_051 start";
+    FormRenderMgr formRenderMgr;
+    int64_t formId = 1;
+
+    formRenderMgr.ExecPostRenderFormTask(formId);
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_051 end";
+}
+
+/**
+ * @tc.name: FormRenderMgrTest_052
+ * @tc.desc: 1.test OnScreenUnlock function and privacyLevel is 0.
+ *           2.renderInner_ is not nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_052, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_052 start";
+    FormRenderMgr formRenderMgr;
+    int32_t userId = 100;
+
+    formRenderMgr.OnScreenUnlock(userId);
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_052 end";
+}
+
+/**
+ * @tc.name: FormRenderMgrTest_053
+ * @tc.desc: 1.test OnUnlock function and privacyLevel is 0.
+ *           2.renderInner_ is not nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_053, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_053 start";
+    FormRenderMgr formRenderMgr;
+    int32_t userId = 100;
+
+    formRenderMgr.OnUnlock(userId);
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_053 end";
+}
+
+/**
+ * @tc.name: FormRenderMgrTest_054
+ * @tc.desc: 1.test SetVisibleChange function and privacyLevel is 0.
+ *           2.renderInner_ is not nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_054, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_054 start";
+    FormRenderMgr formRenderMgr;
+    int64_t formId = 1;
+    bool isVisible = true;
+
+    formRenderMgr.SetVisibleChange(formId, isVisible);
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_054 end";
+}
+
+/**
+ * @tc.name: FormRenderMgrTest_055
+ * @tc.desc: 1.test reAddConnections function and privacyLevel is 0.
+ *           2.renderInner_ is not nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_055, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_055 start";
+    FormRenderMgr formRenderMgr;
+    std::vector<int64_t> formIds = {1, 2};
+    int32_t userId = 100;
+    sptr<IRemoteObject> remoteObject = nullptr;
+
+    formRenderMgr.reAddConnections(formIds, userId, remoteObject);
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_055 end";
+}
+
+/**
+ * @tc.name: FormRenderMgrTest_056
+ * @tc.desc: 1.test OnRenderingBlock function and privacyLevel is 0.
+ *           2.renderInner_ is not nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_056, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_056 start";
+    FormRenderMgr formRenderMgr;
+    std::string bundleName = "<bundleName>";
+
+    formRenderMgr.OnRenderingBlock(bundleName);
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_056 end";
+}
+
+/**
+ * @tc.name: FormRenderMgrTest_057
+ * @tc.desc: 1.test RecycleForms function and privacyLevel is 0.
+ *           2.renderInner_ is not nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_057, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_057 start";
+    FormRenderMgr formRenderMgr;
+    std::vector<int64_t> formIds = {1, 2};
+    Want want;
+    sptr<IRemoteObject> remoteObject = nullptr;
+
+    formRenderMgr.RecycleForms(formIds, want, remoteObject);
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_057 end";
+}
+
+/**
+ * @tc.name: FormRenderMgrTest_058
+ * @tc.desc: 1.test RecycleForms function and privacyLevel is 0.
+ *           2.renderInner_ is not nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_058, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_058 start";
+    FormRenderMgr formRenderMgr;
+    std::vector<int64_t> formIds = {1, 2};
+    WantParams wantParams;
+    
+    formRenderMgr.RecoverForms(formIds, wantParams);
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_058 end";
+}
+
+/**
+ * @tc.name: FormRenderMgrTest_059
+ * @tc.desc: 1.test UpdateFormSize function and privacyLevel is 0.
+ *           2.renderInner_ is not nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_059, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_059 start";
+    FormRenderMgr formRenderMgr;
+    int64_t formId = 1;
+    float width = 1.1;
+    float height = 1.1;
+    float borderWidth = 1.1;
+
+    formRenderMgr.UpdateFormSize(formId, width, height, borderWidth);
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_059 end";
+}
+
+/**
+ * @tc.name: FormRenderMgrTest_060
+ * @tc.desc: 1.test GetFormRenderState function and privacyLevel is 0.
+ *           2.renderInner_ is not nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_060, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_060 start";
+    FormRenderMgr formRenderMgr;
+
+    formRenderMgr.GetFormRenderState();
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_060 end";
+}
+
+/**
+ * @tc.name: FormRenderMgrTest_061
+ * @tc.desc: 1.test PostOnUnlockTask function and privacyLevel is 0.
+ *           2.renderInner_ is not nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_061, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_061 start";
+    FormRenderMgr formRenderMgr;
+
+    formRenderMgr.PostOnUnlockTask();
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_061 end";
+}
+
+/**
+ * @tc.name: FormRenderMgrTest_062
+ * @tc.desc: 1.test GetIsSecondMounted function and privacyLevel is 0.
+ *           2.renderInner_ is not nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_062, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_062 start";
+    FormRenderMgr formRenderMgr;
+
+    formRenderMgr.GetIsSecondMounted();
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_062 end";
+}
+
+/**
+ * @tc.name: FormRenderMgrTest_063
+ * @tc.desc: 1.test AddAcquireProviderForbiddenTask function and privacyLevel is 0.
+ *           2.renderInner_ is not nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_063, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_063 start";
+    FormRenderMgr formRenderMgr;
+    std::string bundleName = "<bundleName>";
+    int64_t formId = 1;
+    std::function<void()> task;
+
+    formRenderMgr.AddAcquireProviderForbiddenTask(bundleName, formId, task);
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_063 end";
+}
+
+/**
+ * @tc.name: FormRenderMgrTest_064
+ * @tc.desc: 1.test checkConnectionsFormIds function and privacyLevel is 0.
+ *           2.renderInner_ is not nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_064, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_064 start";
+    FormRenderMgr formRenderMgr;
+    std::vector<int64_t> formIds = {1, 2};
+    int32_t userId = 100;
+    std::vector<int64_t> needconFormIds = {1, 2};
+
+    formRenderMgr.checkConnectionsFormIds(formIds, userId, needconFormIds);
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_064 end";
+}
+
+/**
+ * @tc.name: FormRenderMgrTest_065
+ * @tc.desc: 1.test DeleteAcquireForbiddenTasksByBundleName function and privacyLevel is 0.
+ *           2.renderInner_ is not nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_065, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_065 start";
+    FormRenderMgr formRenderMgr;
+    std::string bundleName = "<bundleName>";
+
+    formRenderMgr.DeleteAcquireForbiddenTasksByBundleName(bundleName);
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_065 end";
+}
+
+/**
+ * @tc.name: FormRenderMgrTest_066
+ * @tc.desc: 1.test DeleteAcquireForbiddenTaskByFormId function and privacyLevel is 0.
+ *           2.renderInner_ is not nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_066, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_066 start";
+    FormRenderMgr formRenderMgr;
+    int64_t formId = 1;
+
+    formRenderMgr.DeleteAcquireForbiddenTaskByFormId(formId);
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_066 end";
+}
+
+/**
+ * @tc.name: FormRenderMgrTest_067
+ * @tc.desc: 1.test DeletePostRenderFormTask function and privacyLevel is 0.
+ *           2.renderInner_ is not nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderMgrTest, FormRenderMgrTest_067, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_067 start";
+    FormRenderMgr formRenderMgr;
+    int64_t formId = 1;
+
+    formRenderMgr.DeletePostRenderFormTask(formId);
+    GTEST_LOG_(INFO) << "FormRenderMgrTest_067 end";
+}
+
+/**
  * @tc.name: NotifyScreenOn_001
  * @tc.desc: test NotifyScreenOn function and privacyLevel is 0.
  * @tc.type: FUNC
