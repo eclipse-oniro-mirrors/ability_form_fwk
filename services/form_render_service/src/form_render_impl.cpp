@@ -368,10 +368,13 @@ void FormRenderImpl::OnConfigurationUpdatedInner()
 
     configUpdateTime_ = std::chrono::steady_clock::now();
     size_t allFormCount = 0;
-    for (auto iter = renderRecordMap_.begin(); iter != renderRecordMap_.end(); ++iter) {
-        if (iter->second) {
-            iter->second->UpdateConfiguration(configuration_, formSupplyClient);
-            allFormCount += iter->second->FormCount();
+    {
+        std::lock_guard<std::mutex> lock(renderRecordMutex_);
+        for (auto iter = renderRecordMap_.begin(); iter != renderRecordMap_.end(); ++iter) {
+            if (iter->second) {
+                iter->second->UpdateConfiguration(configuration_, formSupplyClient);
+                allFormCount += iter->second->FormCount();
+            }
         }
     }
     HILOG_INFO("OnConfigurationUpdated %{public}zu forms updated.", allFormCount);
@@ -533,6 +536,7 @@ void FormRenderImpl::ConfirmUnlockState(Want &renderWant)
     } else if (renderWant.GetBoolParam(Constants::FORM_RENDER_STATE, false)) {
         HILOG_WARN("Maybe unlock event is missed or delayed, all form record begin to render");
         isVerified_ = true;
+        std::lock_guard<std::mutex> lock(renderRecordMutex_);
         for (const auto& iter : renderRecordMap_) {
             if (iter.second) {
                 iter.second->OnUnlock();
