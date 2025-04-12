@@ -284,7 +284,7 @@ bool ConvertStringToInt64(const std::string &strInfo, int64_t &int64Value)
 
             // Means 0x8000000000000000 remove the first number:-(2^63 - 9 * 10 ^ 19)
             int64_t subValue = static_cast<int64_t>(NapiFormUtil::ConvertStringToLongLong(strInfo.substr(ZERO_VALUE + 2,
-                INT_64_LENGTH - 1)));            
+                INT_64_LENGTH - 1)));
             if (subValue <= (INT64_MAX - HEAD_BIT_NUM + 1)) {
                 int64Value = static_cast<int64_t>(NapiFormUtil::ConvertStringToLongLong(strInfo));
                 return true;
