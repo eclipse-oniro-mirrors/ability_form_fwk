@@ -20,6 +20,7 @@
 
 namespace OHOS {
 namespace AppExecFwk {
+constexpr int BASE_REQUEST_CODE_NUM = 10;
 using Want = OHOS::AAFwk::Want;
 /**
  * @class FormUtil
@@ -119,6 +120,10 @@ public:
      * @return Return the convert result
      */
     static bool ConvertStringToInt64(const std::string &strInfo, int64_t &int64Value);
+
+    static int ConvertStringToInt(const std::string &strInfo, int radix = BASE_REQUEST_CODE_NUM);
+
+    static long long ConvertStringToLongLong(const std::string &strInfo, int radix = BASE_REQUEST_CODE_NUM);
 };
 } // namespace AppExecFwk
 } // namespace OHOS

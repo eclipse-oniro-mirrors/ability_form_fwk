@@ -54,6 +54,7 @@ const int32_t ERR_IN_RECOVERY = 36;
 const int32_t ERR_DISTRIBUTED_SCHEDULE_FAILED = 37;
 
 const int32_t CALLBACK_RETURN_MSG_SIZE = 2;
+constexpr int BASE_REQUEST_CODE_NUM = 10;
 
 struct AsyncCallbackInfoBase {
     napi_env env = nullptr;
@@ -106,6 +107,9 @@ public:
 
     static bool ThrowParamError(napi_env env, const std::string &extraMessage);
 
+    static int ConvertStringToInt(const std::string &strInfo, int radix = BASE_REQUEST_CODE_NUM);
+    
+    static long long ConvertStringToLongLong(const std::string &strInfo, int radix = BASE_REQUEST_CODE_NUM);
 private:
     static std::string CreateParamTypeErrorMessage(const std::string &paramName, const std::string &type);
 };
