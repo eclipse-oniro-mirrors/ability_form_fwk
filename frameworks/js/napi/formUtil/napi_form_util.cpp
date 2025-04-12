@@ -713,6 +713,7 @@ bool ConvertFormInfoFilter(napi_env env, napi_value value, AppExecFwk::FormInfoF
 
     return true;
 }
+
 int NapiFormUtil::ConvertStringToInt(const std::string &strInfo, int radix)
 {
     return static_cast<int>(strtol(strInfo.c_str(), nullptr, radix));
