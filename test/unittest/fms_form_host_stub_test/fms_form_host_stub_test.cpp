@@ -398,5 +398,106 @@ HWTEST_F(FormHostStubTest, FormHostStubTest_019, TestSize.Level1)
     auto result = callback.OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
 }
+
+/**
+ * @tc.name: FormHostStubTest_020
+ * @tc.desc: Verify OnRemoteRequest and HandleOnEnableForm
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormHostStubTest, FormHostStubTest_020, TestSize.Level1)
+{
+    MockFormHostClient callback;
+    constexpr uint32_t code = static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_ENABLE_FORM);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormHostClient::GetDescriptor());
+    auto result = callback.OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+}
+
+/**
+ * @tc.name: FormHostStubTest_021
+ * @tc.desc: Verify OnRemoteRequest and HandleOnError
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormHostStubTest, FormHostStubTest_021, TestSize.Level1)
+{
+    MockFormHostClient callback;
+    constexpr uint32_t code = static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_ERROR);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormHostClient::GetDescriptor());
+    int32_t errorCode = 1;
+    data.WriteInt32(errorCode);
+    std::string errorMsg = "errorMsg";
+    data.WriteString16(Str8ToStr16(errorMsg));
+    auto result = callback.OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+}
+
+/**
+ * @tc.name: FormHostStubTest_022
+ * @tc.desc: Verify OnRemoteRequest and HandleOnRecycleForm
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormHostStubTest, FormHostStubTest_022, TestSize.Level1)
+{
+    MockFormHostClient callback;
+    constexpr uint32_t code = static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_RECYCLE_FORM);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormHostClient::GetDescriptor());
+    int64_t formId = 1;
+    data.WriteInt32(formId);
+    auto result = callback.OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+}
+
+/**
+ * @tc.name: FormHostStubTest_023
+ * @tc.desc: Verify OnRemoteRequest and HandleOnErrorForms
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormHostStubTest, FormHostStubTest_023, TestSize.Level1)
+{
+    MockFormHostClient callback;
+    constexpr uint32_t code = static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_ERROR_FORMS);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormHostClient::GetDescriptor());
+    int32_t errorCode = 1;
+    data.WriteInt32(errorCode);
+    std::string errorMsg = "errorMsg";
+    data.WriteString16(Str8ToStr16(errorMsg));
+    std::vector<int64_t> formIds = {1, 2};
+    data.WriteInt64Vector(formIds);
+    auto result = callback.OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+}
+
+/**
+ * @tc.name: FormHostStubTest_024
+ * @tc.desc: Verify OnRemoteRequest and HandleOnLockForm
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormHostStubTest, FormHostStubTest_024, TestSize.Level1)
+{
+    MockFormHostClient callback;
+    constexpr uint32_t code = static_cast<uint32_t>(IFormHost::Message::FORM_HOST_ON_LOCK_FORM);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormHostClient::GetDescriptor());
+    std::vector<int64_t> formIds = {1, 2};
+    data.WriteInt64Vector(formIds);
+    data.WriteBool(true);
+    auto result = callback.OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+}
+
 }  // namespace AppExecFwk
 }  // namespace OHOS
