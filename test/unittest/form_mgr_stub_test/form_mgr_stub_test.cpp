@@ -3115,8 +3115,6 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0130, TestSize.Level1) {
     data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
     const int64_t formId = 1;
     data.WriteInt64(formId);
-    // const OverflowInfo overflowInfo;
-    // data.WriteRemoteObject(overflowInfo);
     const bool isOverflow = true;
     data.WriteBool(isOverflow);
     EXPECT_CALL(*mockFormMgrService, RequestOverflow(_, _, _)).Times(1).WillOnce(Return(ERR_OK));
