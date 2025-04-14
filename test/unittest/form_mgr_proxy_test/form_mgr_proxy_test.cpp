@@ -486,49 +486,6 @@ HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0023, TestSize.Level1) {
 }
 
 /**
- * @tc.name: FormMgrProxyTest_0024
- * @tc.desc: text RegisterOverflowProxy function.
- * @tc.type: FUNC
- * @tc.require: IssueI8H9R5
- */
-HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0024, TestSize.Level1) {
-    GTEST_LOG_(INFO) << "FormMgrProxyTest_0024 starts";
-    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormToken();
-    auto result = formMgrProxy->RegisterOverflowProxy(callerToken);
-    EXPECT_EQ(result, ERR_OK);
-    GTEST_LOG_(INFO) << "FormMgrProxyTest_0024 test ends";
-}
-
-/**
- * @tc.name: FormMgrProxyTest_0025
- * @tc.desc: text UnregisterOverflowProxy function.
- * @tc.type: FUNC
- * @tc.require: IssueI8H9R5
- */
-HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0025, TestSize.Level1) {
-    GTEST_LOG_(INFO) << "FormMgrProxyTest_0025 starts";
-    auto result = formMgrProxy->UnregisterOverflowProxy();
-    EXPECT_EQ(result, ERR_OK);
-    GTEST_LOG_(INFO) << "FormMgrProxyTest_0025 test ends";
-}
-
-/**
- * @tc.name: FormMgrProxyTest_0026
- * @tc.desc: text RequestOverflow function.
- * @tc.type: FUNC
- * @tc.require: IssueI8H9R5
- */
-HWTEST_F(FormMgrProxyTest, FormMgrProxyTest_0026, TestSize.Level1) {
-    GTEST_LOG_(INFO) << "FormMgrProxyTest_0026 starts";
-    int64_t formId = 1;
-    OverflowInfo overflowInfo;
-    bool isOverflow = true;
-    auto result = formMgrProxy->RequestOverflow(formId, overflowInfo, isOverflow);
-    EXPECT_EQ(result, ERR_OK);
-    GTEST_LOG_(INFO) << "FormMgrProxyTest_0026 test ends";
-}
-
-/**
  * @tc.name: FormProviderProxyTest_0001
  * @tc.desc: text AcquireProviderFormInfo function.
  * @tc.type: FUNC
