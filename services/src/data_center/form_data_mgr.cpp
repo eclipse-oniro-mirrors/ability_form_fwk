@@ -1591,8 +1591,8 @@ void FormDataMgr::ParseMultiUpdateTimeConfig(FormRecord &record, const FormItemI
             HILOG_ERROR("invalid config");
             continue;
         }
-        int hour = std::stoi(temp[0]);
-        int min = std::stoi(temp[1]);
+        int hour = FormUtil::ConvertStringToInt(temp[0]);
+        int min = FormUtil::ConvertStringToInt(temp[1]);
         if (hour < Constants::MIN_TIME || hour > Constants::MAX_HOUR || min < Constants::MIN_TIME || min >
             Constants::MAX_MINUTE) {
             HILOG_ERROR("invalid time, hour:%{public}d, min:%{public}d", hour, min);
@@ -1630,8 +1630,8 @@ void FormDataMgr::ParseAtTimerConfig(FormRecord &record, const FormItemInfo &inf
     }
     int hour = -1;
     int min = -1;
-    hour = std::stoi(temp[0]);
-    min = std::stoi(temp[1]);
+    hour = FormUtil::ConvertStringToInt(temp[0]);
+    min = FormUtil::ConvertStringToInt(temp[1]);
     if (hour < Constants::MIN_TIME || hour > Constants::MAX_HOUR || min < Constants::MIN_TIME || min >
         Constants::MAX_MINUTE) {
         HILOG_ERROR("invalid time");

@@ -383,8 +383,8 @@ void FormEventUtil::GetTimerCfg(const bool updateEnabled,
             HILOG_ERROR("invalid config");
             return;
         }
-        int hour = std::stoi(temp[0]);
-        int min = std::stoi(temp[1]);
+        int hour = FormUtil::ConvertStringToInt(temp[0]);
+        int min = FormUtil::ConvertStringToInt(temp[1]);
         if (hour < Constants::MIN_TIME || hour > Constants::MAX_HOUR || min < Constants::MIN_TIME || min >
             Constants::MAX_MINUTE) {
             HILOG_ERROR("invalid time");
@@ -415,8 +415,8 @@ void FormEventUtil::SetTimerCfgByMultUpdate(const std::string &configMultUpdateA
             HILOG_ERROR("invalid config");
             continue;
         }
-        int hour = std::stoi(temp[0]);
-        int min = std::stoi(temp[1]);
+        int hour = FormUtil::ConvertStringToInt(temp[0]);
+        int min = FormUtil::ConvertStringToInt(temp[1]);
         if (hour < Constants::MIN_TIME || hour > Constants::MAX_HOUR || min < Constants::MIN_TIME || min >
             Constants::MAX_MINUTE) {
             HILOG_ERROR("invalid time");
@@ -647,8 +647,8 @@ void FormEventUtil::UpdateMultiUpdateTime(std::string multiScheduledUpdateTime, 
             HILOG_ERROR("invalid config");
             continue;
         }
-        int hour = std::stoi(temp[0]);
-        int min = std::stoi(temp[1]);
+        int hour = FormUtil::ConvertStringToInt(temp[0]);
+        int min = FormUtil::ConvertStringToInt(temp[1]);
         if (hour < Constants::MIN_TIME || hour > Constants::MAX_HOUR || min < Constants::MIN_TIME || min >
             Constants::MAX_MINUTE) {
             HILOG_ERROR("invalid time");
@@ -673,8 +673,8 @@ void FormEventUtil::UpdateFormRecord(const FormInfo &formInfo, FormRecord &formR
     formRecord.updateDuration = formInfo.updateDuration * Constants::TIME_CONVERSION;
     std::vector<std::string> time = FormUtil::StringSplit(formInfo.scheduledUpdateTime, Constants::TIME_DELIMETER);
     if (time.size() == Constants::UPDATE_AT_CONFIG_COUNT) {
-        formRecord.updateAtHour = std::stoi(time[0]);
-        formRecord.updateAtMin = std::stoi(time[1]);
+        formRecord.updateAtHour = FormUtil::ConvertStringToInt(time[0]);
+        formRecord.updateAtMin = FormUtil::ConvertStringToInt(time[1]);
     }
     std::string multiScheduledUpdateTime_ = formInfo.multiScheduledUpdateTime;
     if (!multiScheduledUpdateTime_.empty()) {
@@ -691,8 +691,8 @@ void FormEventUtil::UpdateFormRecord(const AbilityFormInfo &formInfo, FormRecord
     formRecord.updateDuration = formInfo.updateDuration * Constants::TIME_CONVERSION;
     std::vector<std::string> time = FormUtil::StringSplit(formInfo.scheduledUpdateTime, Constants::TIME_DELIMETER);
     if (time.size() == Constants::UPDATE_AT_CONFIG_COUNT) {
-        formRecord.updateAtHour = std::stoi(time[0]);
-        formRecord.updateAtMin = std::stoi(time[1]);
+        formRecord.updateAtHour = FormUtil::ConvertStringToInt(time[0]);
+        formRecord.updateAtMin = FormUtil::ConvertStringToInt(time[1]);
     }
     std::string multiScheduledUpdateTime_ = formInfo.multiScheduledUpdateTime;
     if (!multiScheduledUpdateTime_.empty()) {

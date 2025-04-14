@@ -1347,10 +1347,12 @@ int FormMgrAdapter::DumpHasFormVisible(const std::string &bundleInfo, std::strin
     std::string bundleName = bundleInfoList[BUNDLE_NAME_INDEX];
     int32_t userId = DEFAULT_USER_ID;
     int32_t instIndex = 0;
+    int64_t userIdValue = 0;
     if (size > USER_ID_INDEX) {
-        userId = std::stoi(bundleInfoList[USER_ID_INDEX]);
+        userId = static_cast<int32_t>(FormUtil::ConvertStringToInt64(bundleInfoList[USER_ID_INDEX], userIdValue));
         if (size > INSTANCE_SEQ_INDEX) {
-            instIndex = std::stoi(bundleInfoList[INSTANCE_SEQ_INDEX]);
+            instIndex = static_cast<int32_t>(FormUtil::ConvertStringToInt64(bundleInfoList[INSTANCE_SEQ_INDEX],
+                userIdValue));
         }
     }
     HILOG_INFO("resolve bundleInfo, bundleName:%{public}s, userId:%{public}d, instIndex:%{public}d",
@@ -2328,7 +2330,9 @@ ErrCode FormMgrAdapter::RequestPublishFormToHost(Want &want)
     }
 
     // Handle by interceptor callback when the system handler is not found.
-    int64_t formId = std::stoll(want.GetStringParam(Constants::PARAM_FORM_IDENTITY_KEY));
+    int64_t userIdValue = 0;
+    int64_t formId = FormUtil::ConvertStringToInt64(want.GetStringParam(Constants::PARAM_FORM_IDENTITY_KEY),
+        userIdValue);
     if (formPublishInterceptor_ == nullptr) {
         return AcquireAddFormResult(formId);
     }
@@ -3757,7 +3761,7 @@ void FormMgrAdapter::UpdateFormCloudUpdateDuration(const std::string &bundleName
         if (searchResult[DATA_FIELD].str().length() > FORM_UPDATE_LEVEL_VALUE_MAX_LENGTH) {
             continue;
         }
-        int val = std::stoi(searchResult[DATA_FIELD].str());
+        int val = FormUtil::ConvertStringToInt(searchResult[DATA_FIELD].str());
         if (val >= Constants::MIN_CONFIG_DURATION && val <= Constants::MAX_CONFIG_DURATION) {
             durationArray.emplace_back(val);
         }
