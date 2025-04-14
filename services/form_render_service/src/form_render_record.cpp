@@ -365,10 +365,26 @@ void FormRenderRecord::MarkThreadAlive()
     threadState_->ResetState();
 }
 
+void FormRenderRecord::MarkRenderFormTaskDone(int32_t renderType)
+{
+    if (renderType == Constants::RENDER_FORM) {
+        renderFormTasksNum--;
+    }
+}
+
+bool FormRenderRecord::HasRenderFormTask()
+{
+    return renderFormTasksNum > 0;
+}
+
 int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const Want &want,
     const sptr<IRemoteObject> hostRemoteObj)
 {
     HILOG_DEBUG("Updated record");
+    auto renderType = want.GetIntParam(Constants::FORM_RENDER_TYPE_KEY, Constants::RENDER_FORM);
+    if (renderType == Constants::RENDER_FORM) {
+        renderFormTasksNum++;
+    }
     {
         // Some resources need to be initialized in a JS thread
         std::lock_guard<std::recursive_mutex> lock(eventHandlerMutex_);
@@ -388,15 +404,17 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
         }
 
         std::weak_ptr<FormRenderRecord> thisWeakPtr(shared_from_this());
-        auto task = [thisWeakPtr, formJsInfo, want, formSupplyClient]() {
+        auto task = [thisWeakPtr, formJsInfo, want, formSupplyClient, renderType]() {
             HILOG_DEBUG("HandleUpdateInJsThread begin");
             auto renderRecord = thisWeakPtr.lock();
             if (renderRecord == nullptr) {
                 HILOG_ERROR("null renderRecord");
+                renderRecord->MarkRenderFormTaskDone(renderType);
                 return;
             }
             renderRecord->HandleUpdateInJsThread(formJsInfo, want);
             formSupplyClient->OnRenderFormDone(formJsInfo.formId);
+            renderRecord->MarkRenderFormTaskDone(renderType);
         };
         eventHandler_->PostTask(task, "UpdateRenderRecord");
     }

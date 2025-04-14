@@ -156,7 +156,7 @@ int32_t FormRenderImpl::StopRenderingForm(const FormJsInfo &formJsInfo, const Wa
         search->DeleteRenderRecord(formJsInfo.formId, compId, hostToken, isRenderGroupEmpty);
         {
             std::lock_guard<std::mutex> lock(renderRecordMutex_);
-            if (search->IsEmpty()) {
+            if (search->IsEmpty() && !search->HasRenderFormTask()) {
                 auto iterator = renderRecordMap_.find(uid);
                 if (iterator == renderRecordMap_.end()) {
                     HILOG_ERROR("fail.");
