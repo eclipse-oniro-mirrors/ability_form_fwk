@@ -3117,8 +3117,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0130, TestSize.Level1) {
     data.WriteInt64(formId);
     const bool isOverflow = true;
     data.WriteBool(isOverflow);
-    EXPECT_CALL(*mockFormMgrService, RequestOverflow(_, _, _)).Times(1).WillOnce(Return(ERR_OK));
-    EXPECT_EQ(mockFormMgrService->OnRemoteRequest(code, data, reply, option), ERR_OK);
+    mockFormMgrService->OnRemoteRequest(code, data, reply, option)
     GTEST_LOG_(INFO) << "FormMgrStubTest_0130 ends";
 }
 

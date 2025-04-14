@@ -127,7 +127,6 @@ public:
     MOCK_METHOD3(OpenFormEditAbility, ErrCode(const std::string &abilityName, const int64_t &formId, bool isMainPage));
     MOCK_METHOD1(RegisterOverflowProxy, bool(const sptr<IRemoteObject> &callerToken));
     MOCK_METHOD0(UnregisterOverflowProxy, bool());
-    MOCK_METHOD3(RequestOverflow, ErrCode(const int64_t formId, const OverflowInfo &overflowInfo, bool isOverflow));
 };
 }
 }
