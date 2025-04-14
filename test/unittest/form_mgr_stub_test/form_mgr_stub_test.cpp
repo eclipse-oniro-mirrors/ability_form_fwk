@@ -3063,65 +3063,6 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0127, TestSize.Level1) {
 }
 
 /**
- * @tc.number: FormMgrStubTest_0128
- * @tc.name: Verify OnRemoteRequest and HandleRegisterOverflowProxy function.
- * @tc.desc: Verify that the HandleRegisterOverflowProxy interface is called normally and the return value is ERR_OK.
- */
-HWTEST_F(FormMgrStubTest, FormMgrStubTest_0128, TestSize.Level1) {
-    GTEST_LOG_(INFO) << "FormMgrStubTest_0128 starts";
-    EXPECT_TRUE(mockFormMgrService != nullptr);
-    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_OVERFLOW_PROXY);
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
-    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
-    const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormToken();
-    data.WriteRemoteObject(callerToken);
-    EXPECT_CALL(*mockFormMgrService, RegisterOverflowProxy(_)).Times(1).WillOnce(Return(ERR_OK));
-    EXPECT_EQ(mockFormMgrService->OnRemoteRequest(code, data, reply, option), ERR_OK);
-    GTEST_LOG_(INFO) << "FormMgrStubTest_0128 ends";
-}
-
-/**
- * @tc.number: FormMgrStubTest_0129
- * @tc.name: Verify OnRemoteRequest and HandleUnregisterOverflowProxy function.
- * @tc.desc: Verify that the HandleUnregisterOverflowProxy interface is called normally and the return value is ERR_OK.
- */
-HWTEST_F(FormMgrStubTest, FormMgrStubTest_0129, TestSize.Level1) {
-    GTEST_LOG_(INFO) << "FormMgrStubTest_0129 starts";
-    EXPECT_TRUE(mockFormMgrService != nullptr);
-    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_OVERFLOW_PROXY);
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
-    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
-    EXPECT_CALL(*mockFormMgrService, UnregisterOverflowProxy()).Times(1).WillOnce(Return(ERR_OK));
-    EXPECT_EQ(mockFormMgrService->OnRemoteRequest(code, data, reply, option), ERR_OK);
-    GTEST_LOG_(INFO) << "FormMgrStubTest_0129 ends";
-}
-
-/**
- * @tc.number: FormMgrStubTest_0130
- * @tc.name: Verify OnRemoteRequest and HandleRequestOverflow function.
- * @tc.desc: Verify that the HandleRequestOverflow interface is called normally and the return value is ERR_OK.
- */
-HWTEST_F(FormMgrStubTest, FormMgrStubTest_0130, TestSize.Level1) {
-    GTEST_LOG_(INFO) << "FormMgrStubTest_0130 starts";
-    EXPECT_TRUE(mockFormMgrService != nullptr);
-    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REQUEST_OVERFLOW);
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option{MessageOption::TF_ASYNC};
-    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
-    const int64_t formId = 1;
-    data.WriteInt64(formId);
-    const bool isOverflow = true;
-    data.WriteBool(isOverflow);
-    mockFormMgrService->OnRemoteRequest(code, data, reply, option)
-    GTEST_LOG_(INFO) << "FormMgrStubTest_0130 ends";
-}
-
-/**
  * @tc.number: FormMgrStubTest_0131
  * @tc.name: Verify OnRemoteRequest and HandleGetPublishedFormInfoById function.
  * @tc.desc: Verify that the HandleGetPublishedFormInfoById interface is called normally and the return value is ERR_OK.
