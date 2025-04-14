@@ -119,12 +119,12 @@ public:
     MOCK_METHOD2(ReleaseRenderer, ErrCode(int64_t formId, const std::string &compId));
     MOCK_METHOD1(IsSystemAppForm, bool(const std::string &bundleName));
     MOCK_METHOD1(StartAbilityByFms, int32_t(const Want &want));
-    MOCK_METHOD2(IsFormBundleProtected, bool(const std::string &bundleName, int64_t formId));
+    MOCK_METHOD2(IsFormBundleProtected, bool(const std::string bundleName, int64_t formId));
     MOCK_METHOD1(IsFormBundleExempt, bool(int64_t formId));
-    MOCK_METHOD2(NotifyFormLocked, int32_t(const int64_t &formId, bool isLocked));
-    MOCK_METHOD4(UpdateFormSize, ErrCode(const int64_t &formId, float width, float height, float borderWidth));
+    MOCK_METHOD2(NotifyFormLocked, int32_t(const int64_t formId, bool isLocked));
+    MOCK_METHOD4(UpdateFormSize, ErrCode(const int64_t formId, float width, float height, float borderWidth));
     MOCK_METHOD2(LockForms, int32_t(const std::vector<FormLockInfo> &formLockInfos, LockChangeType type));
-    MOCK_METHOD3(OpenFormEditAbility, ErrCode(const std::string &abilityName, const int64_t &formId, bool isMainPage));
+    MOCK_METHOD3(OpenFormEditAbility, ErrCode(const std::string abilityName, const int64_t formId, bool isMainPage));
 };
 }
 }
