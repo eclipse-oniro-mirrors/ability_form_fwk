@@ -2812,3 +2812,33 @@ HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_147, TestSize.Level1)
     formRenderRecordPtr_->UpdateFormSizeOfGroups(formId, width, height, borderWidth);
     GTEST_LOG_(INFO) << "FormRenderRecordTest_147 end";
 }
+
+/**
+ * @tc.name: FormRenderRecordTest_148
+ * @tc.desc: Verify UpdateFormSizeOfGroups
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_148, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_148 start";
+    EXPECT_TRUE(formRenderRecordPtr_);
+    formRenderRecordPtr_->HasRenderFormTask();
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_148 end";
+}
+
+/**
+ * @tc.name: FormRenderRecordTest_149
+ * @tc.desc: Verify AddFormRequest
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormRenderRecordTest, FormRenderRecordTest_149, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_149 start";
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = 1;
+    std::string value = "1";
+    Want want;
+    want.SetParam(OHOS::AppExecFwk::Constants::FORM_RENDER_COMP_ID, value);
+    formRenderRecordPtr_->AddFormRequest(formJsInfo, want);
+    GTEST_LOG_(INFO) << "FormRenderRecordTest_149 end";
+}

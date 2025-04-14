@@ -15,7 +15,7 @@ import("//build/ohos.gni")
 
 ohos_copy("copy_ohos_test") {
   sources = [ "./ohos_test.xml" ]
-  outputs = [ "$root_out_dir/tests/unittest/form_fwk/form_mgr_service/resource/ohos_test.xml" ]
+  outputs = [ "$root_out_dir/tests/unittest/form_fwk/form_fwk/form_mgr_service/resource/ohos_test.xml" ]
 
   subsystem_name = "ability"
   part_name = "form_fwk"
