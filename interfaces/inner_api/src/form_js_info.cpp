@@ -44,7 +44,7 @@ bool FormJsInfo::ReadFromParcel(Parcel &parcel)
             HILOG_INFO("rawData is nullptr");
             return false;
         }
-        formData = static_cast<const char*>(rawData);
+        formData = std::string(static_cast<const char*>(rawData), formDataLength);
     } else {
         formData = Str16ToStr8(parcel.ReadString16());
     }
