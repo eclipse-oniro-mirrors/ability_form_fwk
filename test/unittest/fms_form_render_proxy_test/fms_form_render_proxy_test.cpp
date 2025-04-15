@@ -229,6 +229,26 @@ HWTEST_F(FormRenderProxyTest, FormRenderProxyTest_0012, TestSize.Level1) {
 }
 
 /**
+* @tc.name: FormRenderProxyTest_0013
+* @tc.desc: test UpdateFormSize function.
+* @tc.type: FUNC
+*/
+HWTEST_F(FormRenderProxyTest, FormRenderProxyTest_0013, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormRenderProxyTest_0013 starts";
+    Want want = {};
+    EXPECT_CALL(*mockIRemoteObject_, SendRequest(_, _, _, _)).Times(1)
+        .WillOnce(Return(ERR_OK));
+    int64_t formId = 1;
+    float width = 1.1;
+    float height = 1.1;
+    float borderWidth = 1.1;
+    std::string uid = "uid";
+    int result = formRenderProxy_->UpdateFormSize(formId, width, height, borderWidth, uid);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormRenderProxyTest_0013 test ends";
+}
+
+/**
  * @tc.name: RunCachedConfigurationUpdated_001
  * @tc.desc: test RunCachedConfigurationUpdated function.
  * @tc.type: FUNC

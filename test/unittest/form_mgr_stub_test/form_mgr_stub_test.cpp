@@ -166,9 +166,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0003, TestSize.Level1) {
     // initialize input parameters.
     MessageParcel data;
     MessageParcel reply;
-    EXPECT_CALL(*mockFormMgrService, IsRequestPublishFormSupported())
-        .Times(1)
-        .WillOnce(Return(true));
+    EXPECT_CALL(*mockFormMgrService, IsRequestPublishFormSupported()).Times(1).WillOnce(Return(true));
     // test.
     int32_t errCode = mockFormMgrService->HandleIsRequestPublishFormSupported(data, reply);
     // check errorcode
@@ -403,9 +401,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0010, TestSize.Level1) {
     data.WriteInt64(formId);
     data.WriteParcelable(&want);
     data.WriteRemoteObject(callerToken);
-    EXPECT_CALL(*mockFormMgrService, AddForm(_, _, _, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, AddForm(_, _, _, _)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0010 ends";
@@ -471,9 +467,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0013, TestSize.Level1) {
     data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
     data.WriteInt64(formId);
     data.WriteRemoteObject(callerToken);
-    EXPECT_CALL(*mockFormMgrService, DeleteForm(_, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, DeleteForm(_, _)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0013 ends";
@@ -519,9 +513,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0015, TestSize.Level1) {
     data.WriteInt64(formId);
     data.WriteRemoteObject(callerToken);
     data.WriteBool(delCache);
-    EXPECT_CALL(*mockFormMgrService, ReleaseForm(_, _, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, ReleaseForm(_, _, _)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0015 ends";
@@ -565,9 +557,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0017, TestSize.Level1) {
     data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
     data.WriteInt64(formId);
     data.WriteParcelable(&formProviderData);
-    EXPECT_CALL(*mockFormMgrService, UpdateForm(_, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, UpdateForm(_, _)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0017 ends";
@@ -592,9 +582,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0018, TestSize.Level1) {
     data.WriteInt64(formId);
     data.WriteRemoteObject(callerToken);
     data.WriteParcelable(&want);
-    EXPECT_CALL(*mockFormMgrService, RequestForm(_, _, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, RequestForm(_, _, _)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0018 ends";
@@ -664,9 +652,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0021, TestSize.Level1) {
     data.WriteInt64Vector(formIds);
     data.WriteRemoteObject(callerToken);
     data.WriteInt32(formVisibleType);
-    EXPECT_CALL(*mockFormMgrService, NotifyWhetherVisibleForms(_, _, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, NotifyWhetherVisibleForms(_, _, _)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0021 ends";
@@ -750,9 +736,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0025, TestSize.Level1) {
     MessageOption option{MessageOption::TF_ASYNC};
     data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
     data.WriteInt64(formId);
-    EXPECT_CALL(*mockFormMgrService, DumpStorageFormInfos(_))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, DumpStorageFormInfos(_)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0025 ends";
@@ -797,9 +781,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0027, TestSize.Level1) {
     MessageOption option{MessageOption::TF_ASYNC};
     data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
     data.WriteString(bundleName);
-    EXPECT_CALL(*mockFormMgrService, DumpFormInfoByBundleName(_, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, DumpFormInfoByBundleName(_, _)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0027 ends";
@@ -844,9 +826,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0029, TestSize.Level1) {
     MessageOption option{MessageOption::TF_ASYNC};
     data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
     data.WriteInt64(formId);
-    EXPECT_CALL(*mockFormMgrService, DumpFormInfoByFormId(_, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, DumpFormInfoByFormId(_, _)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0029 ends";
@@ -891,9 +871,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0031, TestSize.Level1) {
     MessageOption option{MessageOption::TF_ASYNC};
     data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
     data.WriteInt64(formId);
-    EXPECT_CALL(*mockFormMgrService, DumpFormTimerByFormId(_, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, DumpFormTimerByFormId(_, _)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0031 ends";
@@ -940,9 +918,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0033, TestSize.Level1) {
     data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
     data.WriteInt64(formId);
     data.WriteInt64(nextTime);
-    EXPECT_CALL(*mockFormMgrService, SetNextRefreshTime(_, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, SetNextRefreshTime(_, _)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0033 ends";
@@ -967,9 +943,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0034, TestSize.Level1) {
     data.WriteInt64Vector(formIds);
     data.WriteRemoteObject(callerToken);
     data.WriteBool(updateType);
-    EXPECT_CALL(*mockFormMgrService, LifecycleUpdate(_, _, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, LifecycleUpdate(_, _, _)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0034 ends";
@@ -1036,9 +1010,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0037, TestSize.Level1) {
     data.WriteInt64(formId);
     data.WriteParcelable(&want);
     data.WriteRemoteObject(callerToken);
-    EXPECT_CALL(*mockFormMgrService, MessageEvent(_, _, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, MessageEvent(_, _, _)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0037 ends";
@@ -1105,9 +1077,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0040, TestSize.Level1) {
     data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
     data.WriteInt64Vector(formIds);
     data.WriteRemoteObject(callerToken);
-    EXPECT_CALL(*mockFormMgrService, DeleteInvalidForms(_, _, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, DeleteInvalidForms(_, _, _)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0040 ends";
@@ -1172,9 +1142,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0043, TestSize.Level1) {
     data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
     data.WriteParcelable(&want);
     data.WriteRemoteObject(callerToken);
-    EXPECT_CALL(*mockFormMgrService, AcquireFormState(_, _, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, AcquireFormState(_, _, _)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0043 ends";
@@ -1239,9 +1207,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0046, TestSize.Level1) {
     data.WriteInt64Vector(formIds);
     data.WriteBool(isVisible);
     data.WriteRemoteObject(callerToken);
-    EXPECT_CALL(*mockFormMgrService, NotifyFormsVisible(_, _, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, NotifyFormsVisible(_, _, _)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0046 ends";
@@ -1331,9 +1297,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0050, TestSize.Level1) {
     data.WriteInt64Vector(formIds);
     data.WriteBool(isVisible);
     data.WriteRemoteObject(callerToken);
-    EXPECT_CALL(*mockFormMgrService, NotifyFormsPrivacyProtected(_, _, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, NotifyFormsPrivacyProtected(_, _, _)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0050 ends";
@@ -1423,9 +1387,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0054, TestSize.Level1) {
     data.WriteInt64Vector(formIds);
     data.WriteBool(isVisible);
     data.WriteRemoteObject(callerToken);
-    EXPECT_CALL(*mockFormMgrService, NotifyFormsEnableUpdate(_, _, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, NotifyFormsEnableUpdate(_, _, _)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0054 ends";
@@ -1509,9 +1471,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0058, TestSize.Level1) {
     MessageParcel reply;
     MessageOption option{MessageOption::TF_ASYNC};
     data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
-    EXPECT_CALL(*mockFormMgrService, GetAllFormsInfo(_))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, GetAllFormsInfo(_)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0058 ends";
@@ -1554,9 +1514,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0060, TestSize.Level1) {
     MessageOption option{MessageOption::TF_ASYNC};
     data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
     data.WriteString(bundleName);
-    EXPECT_CALL(*mockFormMgrService, GetFormsInfoByApp(_, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, GetFormsInfoByApp(_, _)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0060 ends";
@@ -1603,9 +1561,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0062, TestSize.Level1) {
     data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
     data.WriteString(bundleName);
     data.WriteString(moduleName);
-    EXPECT_CALL(*mockFormMgrService, GetFormsInfoByModule(_, _, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, GetFormsInfoByModule(_, _, _)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0062 ends";
@@ -1652,9 +1608,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0064, TestSize.Level1) {
     MessageOption option{MessageOption::TF_ASYNC};
     data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
     data.WriteParcelable(&filter);
-    EXPECT_CALL(*mockFormMgrService, GetFormsInfo(_, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, GetFormsInfo(_, _)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0064 ends";
@@ -1703,9 +1657,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0066, TestSize.Level1) {
     data.WriteInt64(formId);
     data.WriteParcelable(&want);
     data.WriteRemoteObject(callerToken);
-    EXPECT_CALL(*mockFormMgrService, RouterEvent(_, _, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, RouterEvent(_, _, _)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0066 ends";
@@ -1774,9 +1726,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0069, TestSize.Level1) {
     data.WriteParcelable(&want);
     data.WriteBool(withFormBindingData);
     data.WriteParcelable(&formProviderData);
-    EXPECT_CALL(*mockFormMgrService, RequestPublishForm(_, _, _, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, RequestPublishForm(_, _, _, _)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0069 ends";
@@ -1848,9 +1798,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0072, TestSize.Level1) {
     data.WriteString(deviceId);
     data.WriteRemoteObject(callerToken);
     data.WriteInt64(requestCode);
-    EXPECT_CALL(*mockFormMgrService, ShareForm(_, _, _, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, ShareForm(_, _, _, _)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0072 ends";
@@ -1872,9 +1820,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0073, TestSize.Level1) {
     MessageOption option{MessageOption::TF_ASYNC};
     data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
     data.WriteParcelable(&info);
-    EXPECT_CALL(*mockFormMgrService, RecvFormShareInfoFromRemote(_))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, RecvFormShareInfoFromRemote(_)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0073 ends";
@@ -1913,9 +1859,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0075, TestSize.Level1) {
     MessageParcel reply;
     MessageOption option{MessageOption::TF_ASYNC};
     data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
-    EXPECT_CALL(*mockFormMgrService, IsRequestPublishFormSupported())
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, IsRequestPublishFormSupported()).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0075 ends";
@@ -1938,9 +1882,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0076, TestSize.Level1) {
     data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
     data.WriteParcelable(&want);
     data.WriteRemoteObject(callerToken);
-    EXPECT_CALL(*mockFormMgrService, StartAbility(_, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, StartAbility(_, _)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0076 ends";
@@ -1999,9 +1941,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0079, TestSize.Level1) {
     MessageParcel reply;
     MessageOption option{MessageOption::TF_ASYNC};
     data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
-    EXPECT_CALL(*mockFormMgrService, CheckFMSReady())
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, CheckFMSReady()).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0079 ends";
@@ -2024,9 +1964,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0080, TestSize.Level1) {
     data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
     data.WriteInt64(formId);
     data.WriteRemoteObject(callerToken);
-    EXPECT_CALL(*mockFormMgrService, CastTempForm(_, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, CastTempForm(_, _)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0080 ends";
@@ -2049,9 +1987,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0081, TestSize.Level1) {
     data.WriteString(compId);
     MessageParcel reply;
     MessageOption option{MessageOption::TF_ASYNC};
-    EXPECT_CALL(*mockFormMgrService, StopRenderingForm(_, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, StopRenderingForm(_, _)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0081 ends";
@@ -2099,9 +2035,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0083, TestSize.Level1) {
     data.WriteRemoteObject(callerToken);
     MessageParcel reply;
     MessageOption option{MessageOption::TF_ASYNC};
-    EXPECT_CALL(*mockFormMgrService, AcquireFormData(_, _, _, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, AcquireFormData(_, _, _, _)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0083 ends";
@@ -2277,9 +2211,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0091, TestSize.Level1) {
     data.WriteInt64(formId);
     data.WriteParcelable(&formProviderData);
     WriteFormDataProxies(data, formDataProxies);
-    EXPECT_CALL(*mockFormMgrService, UpdateProxyForm(_, _, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, UpdateProxyForm(_, _, _)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0091 ends";
@@ -2308,9 +2240,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0092, TestSize.Level1) {
     data.WriteBool(withFormBindingData);
     data.WriteParcelable(&formProviderData);
     WriteFormDataProxies(data, formDataProxies);
-    EXPECT_CALL(*mockFormMgrService, RequestPublishProxyForm(_, _, _, _, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, RequestPublishProxyForm(_, _, _, _, _)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0092 ends";
@@ -2333,9 +2263,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0093, TestSize.Level1) {
     data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
     data.WriteInt64Vector(formIds);
     data.WriteRemoteObject(callerToken);
-    EXPECT_CALL(*mockFormMgrService, RegisterFormRouterProxy(_, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, RegisterFormRouterProxy(_, _)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0093 ends";
@@ -2398,9 +2326,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0096, TestSize.Level1) {
     MessageOption option{MessageOption::TF_ASYNC};
     data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
     data.WriteInt64Vector(formIds);
-    EXPECT_CALL(*mockFormMgrService, UnregisterFormRouterProxy(_))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, UnregisterFormRouterProxy(_)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0096 ends";
@@ -2495,9 +2421,7 @@ HWTEST_F(FormMgrStubTest, HandleGetFormInstanceById_0100, TestSize.Level1) {
     GTEST_LOG_(INFO) << "HandleGetFormInstanceById_0100 starts";
     MessageParcel data;
     MessageParcel reply;
-    EXPECT_CALL(*mockFormMgrService, GetFormInstanceById(_, _, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, GetFormInstanceById(_, _, _)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->HandleGetFormInstanceById(data, reply);
     std::vector<FormInfo> resultInfos;
     GetParcelableInfos(reply, resultInfos);
@@ -2515,9 +2439,7 @@ HWTEST_F(FormMgrStubTest, HandleGetRunningFormInfos_0100, TestSize.Level1) {
     GTEST_LOG_(INFO) << "HandleGetRunningFormInfos_0100 starts";
     MessageParcel data;
     MessageParcel reply;
-    EXPECT_CALL(*mockFormMgrService, GetRunningFormInfos(_, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, GetRunningFormInfos(_, _)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->HandleGetRunningFormInfos(data, reply);
     std::vector<FormInfo> resultInfos;
     GetParcelableInfos(reply, resultInfos);
@@ -2536,9 +2458,7 @@ HWTEST_F(FormMgrStubTest, HandleUpdateFormLocation_0100, TestSize.Level1) {
     GTEST_LOG_(INFO) << "HandleUpdateFormLocation_0100 starts";
     MessageParcel data;
     MessageParcel reply;
-    EXPECT_CALL(*mockFormMgrService, UpdateFormLocation(_, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, UpdateFormLocation(_, _)).Times(1).WillOnce(Return(ERR_OK));
     EXPECT_EQ(ERR_OK, mockFormMgrService->HandleUpdateFormLocation(data, reply));
     GTEST_LOG_(INFO) << "HandleUpdateFormLocation_0100 ends";
 }
@@ -2552,9 +2472,7 @@ HWTEST_F(FormMgrStubTest, HandleGetRunningFormInfosByBundleName_0100, TestSize.L
     GTEST_LOG_(INFO) << "HandleGetRunningFormInfosByBundleName_0100 starts";
     MessageParcel data;
     MessageParcel reply;
-    EXPECT_CALL(*mockFormMgrService, GetRunningFormInfosByBundleName(_, _, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, GetRunningFormInfosByBundleName(_, _, _)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->HandleGetRunningFormInfosByBundleName(data, reply);
     std::vector<FormInfo> resultInfos;
     GetParcelableInfos(reply, resultInfos);
@@ -2600,9 +2518,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0102, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrStubTest_0102 starts";
     MessageParcel data;
     MessageParcel reply;
-    EXPECT_CALL(*mockFormMgrService, SetPublishFormResult(_, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, SetPublishFormResult(_, _)).Times(1).WillOnce(Return(ERR_OK));
     EXPECT_EQ(mockFormMgrService->HandleSetPublishFormResult(data, reply), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0102 ends";
 }
@@ -2616,9 +2532,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0103, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrStubTest_0103 starts";
     MessageParcel data;
     MessageParcel reply;
-    EXPECT_CALL(*mockFormMgrService, AcquireAddFormResult(_))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, AcquireAddFormResult(_)).Times(1).WillOnce(Return(ERR_OK));
     EXPECT_EQ(mockFormMgrService->HandleAcquireAddFormResult(data, reply), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0103 ends";
 }
@@ -2643,9 +2557,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0104, TestSize.Level1) {
     data.WriteParcelable(&want);
     data.WriteBool(withFormBindingData);
     data.WriteParcelable(&formProviderData);
-    EXPECT_CALL(*mockFormMgrService, RequestPublishFormWithSnapshot(_, _, _, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, RequestPublishFormWithSnapshot(_, _, _, _)).Times(1).WillOnce(Return(ERR_OK));
     auto result = mockFormMgrService->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0104 ends";
@@ -2705,14 +2617,16 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0106, TestSize.Level1) {
  */
 HWTEST_F(FormMgrStubTest, FormMgrStubTest_0107, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrStubTest_0107 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_PUBLISH_FORM_INTERCEPTOR);
     MessageParcel data;
     MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
     const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormToken();
     data.WriteRemoteObject(callerToken);
-    EXPECT_CALL(*mockFormMgrService, RegisterPublishFormInterceptor(_))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
-    EXPECT_EQ(mockFormMgrService->HandleRegisterPublishFormInterceptor(data, reply), ERR_OK);
+    EXPECT_CALL(*mockFormMgrService, RegisterPublishFormInterceptor(_)).Times(1).WillOnce(Return(ERR_OK));
+    EXPECT_EQ(mockFormMgrService->OnRemoteRequest(code, data, reply, option), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0107 ends";
 }
 
@@ -2724,14 +2638,16 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0107, TestSize.Level1) {
  */
 HWTEST_F(FormMgrStubTest, FormMgrStubTest_0108, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrStubTest_0108 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_PUBLISH_FORM_INTERCEPTOR);
     MessageParcel data;
     MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
     const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormToken();
     data.WriteRemoteObject(callerToken);
-    EXPECT_CALL(*mockFormMgrService, UnregisterPublishFormInterceptor(_))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
-    EXPECT_EQ(mockFormMgrService->HandleUnregisterPublishFormInterceptor(data, reply), ERR_OK);
+    EXPECT_CALL(*mockFormMgrService, UnregisterPublishFormInterceptor(_)).Times(1).WillOnce(Return(ERR_OK));
+    EXPECT_EQ(mockFormMgrService->OnRemoteRequest(code, data, reply, option), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0108 ends";
 }
 
@@ -2743,18 +2659,20 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0108, TestSize.Level1) {
  */
 HWTEST_F(FormMgrStubTest, FormMgrStubTest_0109, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrStubTest_0109 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_CLICK_EVENT_OBSERVER);
     MessageParcel data;
     MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
     const std::string bundleName = "bundleName";
     data.WriteString(bundleName);
     const std::string formEventType = "formEventType";
     data.WriteString(formEventType);
     const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormToken();
     data.WriteRemoteObject(callerToken);
-    EXPECT_CALL(*mockFormMgrService, RegisterClickEventObserver(_, _, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
-    EXPECT_EQ(mockFormMgrService->HandleRegisterClickCallbackEventObserver(data, reply), ERR_OK);
+    EXPECT_CALL(*mockFormMgrService, RegisterClickEventObserver(_, _, _)).Times(1).WillOnce(Return(ERR_OK));
+    EXPECT_EQ(mockFormMgrService->OnRemoteRequest(code, data, reply, option), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0109 ends";
 }
 
@@ -2766,18 +2684,20 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0109, TestSize.Level1) {
  */
 HWTEST_F(FormMgrStubTest, FormMgrStubTest_0110, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrStubTest_0110 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UNREGISTER_CLICK_EVENT_OBSERVER);
     MessageParcel data;
     MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
     const std::string bundleName = "bundleName";
     data.WriteString(bundleName);
     const std::string formEventType = "formEventType";
     data.WriteString(formEventType);
     const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormToken();
     data.WriteRemoteObject(callerToken);
-    EXPECT_CALL(*mockFormMgrService, UnregisterClickEventObserver(_, _, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
-    EXPECT_EQ(mockFormMgrService->HandleUnregisterClickCallbackEventObserver(data, reply), ERR_OK);
+    EXPECT_CALL(*mockFormMgrService, UnregisterClickEventObserver(_, _, _)).Times(1).WillOnce(Return(ERR_OK));
+    EXPECT_EQ(mockFormMgrService->OnRemoteRequest(code, data, reply, option), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0110 ends";
 }
 
@@ -2788,16 +2708,18 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0110, TestSize.Level1) {
  */
 HWTEST_F(FormMgrStubTest, FormMgrStubTest_0111, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrStubTest_0111 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_ADD_OBSERVER);
     MessageParcel data;
     MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
     const std::string bundleName = "bundleName";
     data.WriteString(bundleName);
     const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormToken();
     data.WriteRemoteObject(callerToken);
-    EXPECT_CALL(*mockFormMgrService, RegisterAddObserver(_, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
-    EXPECT_EQ(mockFormMgrService->HandleRegisterAddObserver(data, reply), ERR_OK);
+    EXPECT_CALL(*mockFormMgrService, RegisterAddObserver(_, _)).Times(1).WillOnce(Return(ERR_OK));
+    EXPECT_EQ(mockFormMgrService->OnRemoteRequest(code, data, reply, option), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0111 ends";
 }
 
@@ -2808,16 +2730,18 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0111, TestSize.Level1) {
  */
 HWTEST_F(FormMgrStubTest, FormMgrStubTest_0112, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrStubTest_0112 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_REGISTER_REMOVE_OBSERVER);
     MessageParcel data;
     MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
     const std::string bundleName = "bundleName";
     data.WriteString(bundleName);
     const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormToken();
     data.WriteRemoteObject(callerToken);
-    EXPECT_CALL(*mockFormMgrService, RegisterRemoveObserver(_, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
-    EXPECT_EQ(mockFormMgrService->HandleRegisterRemoveObserver(data, reply), ERR_OK);
+    EXPECT_CALL(*mockFormMgrService, RegisterRemoveObserver(_, _)).Times(1).WillOnce(Return(ERR_OK));
+    EXPECT_EQ(mockFormMgrService->OnRemoteRequest(code, data, reply, option), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0112 ends";
 }
 
@@ -2834,9 +2758,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0113, TestSize.Level1) {
     data.WriteString(bundleName);
     const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormToken();
     data.WriteRemoteObject(callerToken);
-    EXPECT_CALL(*mockFormMgrService, RegisterRemoveObserver(_, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, RegisterRemoveObserver(_, _)).Times(1).WillOnce(Return(ERR_OK));
     EXPECT_EQ(mockFormMgrService->HandleRegisterRemoveObserver(data, reply), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0113 ends";
 }
@@ -2852,9 +2774,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0114, TestSize.Level1) {
     MessageParcel reply;
     std::vector<int64_t> formIds;
     data.WriteInt64Vector(formIds);
-    EXPECT_CALL(*mockFormMgrService, SetFormsRecyclable(_))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, SetFormsRecyclable(_)).Times(1).WillOnce(Return(ERR_OK));
     EXPECT_EQ(mockFormMgrService->HandleSetFormsRecyclable(data, reply), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0114 ends";
 }
@@ -2866,14 +2786,16 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0114, TestSize.Level1) {
  */
 HWTEST_F(FormMgrStubTest, FormMgrStubTest_0115, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrStubTest_0115 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_RECYCLE_FORMS);
     MessageParcel data;
     MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
     const Want want = {};
     data.WriteParcelable(&want);
-    EXPECT_CALL(*mockFormMgrService, RecycleForms(_, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
-    EXPECT_EQ(mockFormMgrService->HandleRecycleForms(data, reply), ERR_OK);
+    EXPECT_CALL(*mockFormMgrService, RecycleForms(_, _)).Times(1).WillOnce(Return(ERR_OK));
+    EXPECT_EQ(mockFormMgrService->OnRemoteRequest(code, data, reply, option), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0115 ends";
 }
 
@@ -2884,74 +2806,298 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_0115, TestSize.Level1) {
  */
 HWTEST_F(FormMgrStubTest, FormMgrStubTest_0116, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrStubTest_0116 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_RECOVER_FORMS);
     MessageParcel data;
     MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
     const Want want = {};
     data.WriteParcelable(&want);
-    EXPECT_CALL(*mockFormMgrService, RecoverForms(_, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
-    EXPECT_EQ(mockFormMgrService->HandleRecoverForms(data, reply), ERR_OK);
+    EXPECT_CALL(*mockFormMgrService, RecoverForms(_, _)).Times(1).WillOnce(Return(ERR_OK));
+    EXPECT_EQ(mockFormMgrService->OnRemoteRequest(code, data, reply, option), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0116 ends";
 }
 
 
 /**
  * @tc.number: FormMgrStubTest_0117
- * @tc.name: test HandleBackgroundEvent function.
+ * @tc.name: Verify OnRemoteRequest and HandleBackgroundEvent function.
  * @tc.desc: Verify that the HandleBackgroundEvent interface is called normally and the return value is ERR_OK.
  */
 HWTEST_F(FormMgrStubTest, FormMgrStubTest_0117, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrStubTest_0117 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_BACKGROUND_EVENT);
     MessageParcel data;
     MessageParcel reply;
-    constexpr int64_t formId = 1;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    int64_t formId = 1;
     data.WriteInt64(formId);
     const Want want = {};
     data.WriteParcelable(&want);
-    const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormToken();
-    data.WriteRemoteObject(callerToken);
-    EXPECT_CALL(*mockFormMgrService, BackgroundEvent(_, _, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
-    EXPECT_EQ(mockFormMgrService->HandleBackgroundEvent(data, reply), ERR_OK);
+    const sptr<IRemoteObject> client = new (std::nothrow) MockFormToken();
+    data.WriteRemoteObject(client);
+    EXPECT_CALL(*mockFormMgrService, BackgroundEvent(_, _, _)).Times(1).WillOnce(Return(ERR_OK));
+    EXPECT_EQ(mockFormMgrService->OnRemoteRequest(code, data, reply, option), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0117 ends";
 }
 
 /**
  * @tc.number: FormMgrStubTest_0118
- * @tc.name: test HandleGetFormsCount function.
+ * @tc.name: Verify OnRemoteRequest and HandleGetFormsCount function.
  * @tc.desc: Verify that the HandleGetFormsCount interface is called normally and the return value is ERR_OK.
  */
 HWTEST_F(FormMgrStubTest, FormMgrStubTest_0118, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrStubTest_0118 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_FORMS_COUNT);
     MessageParcel data;
     MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
     bool isTempFormFlag = false;
     data.WriteBool(isTempFormFlag);
-    EXPECT_CALL(*mockFormMgrService, GetFormsCount(_, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
-    EXPECT_EQ(mockFormMgrService->HandleGetFormsCount(data, reply), ERR_OK);
+    EXPECT_CALL(*mockFormMgrService, GetFormsCount(_, _)).Times(1).WillOnce(Return(ERR_OK));
+    EXPECT_EQ(mockFormMgrService->OnRemoteRequest(code, data, reply, option), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0118 ends";
 }
 
 /**
  * @tc.number: FormMgrStubTest_0119
- * @tc.name: test HandleGetHostFormsCount function.
+ * @tc.name: Verify OnRemoteRequest and HandleGetHostFormsCount function.
  * @tc.desc: Verify that the HandleGetHostFormsCount interface is called normally and the return value is ERR_OK.
  */
 HWTEST_F(FormMgrStubTest, FormMgrStubTest_0119, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrStubTest_0119 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_HOST_FORMS_COUNT);
     MessageParcel data;
     MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
     const std::string bundleName = "bundleName";
     data.WriteString(bundleName);
-    EXPECT_CALL(*mockFormMgrService, GetHostFormsCount(_, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
-    EXPECT_EQ(mockFormMgrService->HandleGetHostFormsCount(data, reply), ERR_OK);
+    EXPECT_CALL(*mockFormMgrService, GetHostFormsCount(_, _)).Times(1).WillOnce(Return(ERR_OK));
+    EXPECT_EQ(mockFormMgrService->OnRemoteRequest(code, data, reply, option), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_0119 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_0120
+ * @tc.name: Verify OnRemoteRequest and HandleStartAbilityByFms function.
+ * @tc.desc: Verify that the HandleStartAbilityByFms interface is called normally and the return value is ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0120, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0120 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_START_ABILITY_BY_FMS);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    const Want want = {};
+    data.WriteParcelable(&want);
+    EXPECT_CALL(*mockFormMgrService, StartAbilityByFms(_)).Times(1).WillOnce(Return(ERR_OK));
+    EXPECT_EQ(mockFormMgrService->OnRemoteRequest(code, data, reply, option), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0120 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_0121
+ * @tc.name: Verify OnRemoteRequest and HandleIsFormProtected function.
+ * @tc.desc: Verify that the HandleIsFormProtected interface is called normally and the return value is ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0121, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0121 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_IS_FORM_BUNDLE_PEOTECTED);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    const std::string bundleName = "bundleName";
+    data.WriteString(bundleName);
+    const int64_t formId = 1;
+    data.WriteInt64(formId);
+    EXPECT_CALL(*mockFormMgrService, IsFormBundleProtected(_, _)).Times(1).WillOnce(Return(ERR_OK));
+    EXPECT_EQ(mockFormMgrService->OnRemoteRequest(code, data, reply, option), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0121 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_0122
+ * @tc.name: Verify OnRemoteRequest and HandleIsFormExempt function.
+ * @tc.desc: Verify that the HandleIsFormExempt interface is called normally and the return value is ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0122, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0122 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_IS_FORM_BUNDLE_EXEMPT);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    const int64_t formId = 1;
+    data.WriteInt64(formId);
+    EXPECT_CALL(*mockFormMgrService, IsFormBundleExempt(_)).Times(1).WillOnce(Return(ERR_OK));
+    EXPECT_EQ(mockFormMgrService->OnRemoteRequest(code, data, reply, option), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0122 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_0123
+ * @tc.name: Verify OnRemoteRequest and HandleNotifyFormLocked function.
+ * @tc.desc: Verify that the HandleNotifyFormLocked interface is called normally and the return value is ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0123, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0123 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_NOTIFY_FORM_LOCKED);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    const int64_t formId = 1;
+    data.WriteInt64(formId);
+    const bool isLocked = true;
+    data.WriteBool(isLocked);
+    EXPECT_CALL(*mockFormMgrService, NotifyFormLocked(_, _)).Times(1).WillOnce(Return(ERR_OK));
+    EXPECT_EQ(mockFormMgrService->OnRemoteRequest(code, data, reply, option), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0123 ends";
+}
+
+
+/**
+ * @tc.number: FormMgrStubTest_0124
+ * @tc.name: Verify OnRemoteRequest and HandleUpdateFormSize function.
+ * @tc.desc: Verify that the HandleUpdateFormSize interface is called normally and the return value is ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0124, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0124 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_UPDATE_FORM_SIZE);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    const int64_t formId = 1;
+    data.WriteInt64(formId);
+    const float width = 1.1;
+    data.WriteFloat(width);
+    const float height = 1.1;
+    data.WriteFloat(height);
+    const float borderWidth = 1.1;
+    data.WriteFloat(borderWidth);
+    EXPECT_CALL(*mockFormMgrService, UpdateFormSize(_, _, _, _)).Times(1).WillOnce(Return(ERR_OK));
+    EXPECT_EQ(mockFormMgrService->OnRemoteRequest(code, data, reply, option), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0124 ends";
+}
+
+
+/**
+ * @tc.number: FormMgrStubTest_0125
+ * @tc.name: Verify OnRemoteRequest and HandleLockForms function.
+ * @tc.desc: Verify that the HandleLockForms interface is called normally and the return value is ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0125, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0125 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_LOCK_FORMS);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    const int32_t infoSize = 1;
+    data.WriteInt32(infoSize);
+    const int32_t dataValue = 0;
+    data.WriteInt32(dataValue);
+    EXPECT_EQ(mockFormMgrService->OnRemoteRequest(code, data, reply, option), ERR_APPEXECFWK_PARCEL_ERROR);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0125 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_0126
+ * @tc.name: Verify OnRemoteRequest and HandleLockForms function.
+ * @tc.desc: Verify that the HandleLockForms interface is called normally and the return value is ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0126, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0126 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_LOCK_FORMS);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    const int32_t infoSize = 1;
+    data.WriteInt32(infoSize);
+    const int32_t dataValue = -1;
+    data.WriteInt32(dataValue);
+    EXPECT_EQ(mockFormMgrService->OnRemoteRequest(code, data, reply, option), ERR_APPEXECFWK_PARCEL_ERROR);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0126 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_0127
+ * @tc.name: Verify OnRemoteRequest and HandleOpenFormEditAbility function.
+ * @tc.desc: Verify that the HandleOpenFormEditAbility interface is called normally and the return value is ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0127, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0127 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_OPEN_FORM_EDIT_ABILITY);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    const std::string abilityName = "abilityName";
+    data.WriteString(abilityName);
+    const int64_t formId = 1;
+    data.WriteInt64(formId);
+    const bool isMainPage = true;
+    data.WriteBool(isMainPage);
+    EXPECT_CALL(*mockFormMgrService, OpenFormEditAbility(_, _, _)).Times(1).WillOnce(Return(ERR_OK));
+    EXPECT_EQ(mockFormMgrService->OnRemoteRequest(code, data, reply, option), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0127 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_0131
+ * @tc.name: Verify OnRemoteRequest and HandleGetPublishedFormInfoById function.
+ * @tc.desc: Verify that the HandleGetPublishedFormInfoById interface is called normally and the return value is ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0131, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0131 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_PUBLISHED_FORM_INFO_BY_ID);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    const int64_t formId = 1;
+    data.WriteInt64(formId);
+    EXPECT_CALL(*mockFormMgrService, GetPublishedFormInfoById(_, _)).Times(1).WillOnce(Return(ERR_OK));
+    EXPECT_EQ(mockFormMgrService->OnRemoteRequest(code, data, reply, option), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0131 ends";
+}
+
+/**
+ * @tc.number: FormMgrStubTest_0132
+ * @tc.name: Verify OnRemoteRequest and HandleGetPublishedFormInfos function.
+ * @tc.desc: Verify that the HandleGetPublishedFormInfos interface is called normally and the return value is ERR_OK.
+ */
+HWTEST_F(FormMgrStubTest, FormMgrStubTest_0132, TestSize.Level1) {
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0132 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_GET_PUBLISHED_FORM_INFOS);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
+    EXPECT_CALL(*mockFormMgrService, GetPublishedFormInfos(_)).Times(1).WillOnce(Return(ERR_OK));
+    EXPECT_EQ(mockFormMgrService->OnRemoteRequest(code, data, reply, option), ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrStubTest_0132 ends";
 }
 
 /**
@@ -2980,9 +3126,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleBatchRefreshForms_001, TestSize.
     MessageParcel reply;
     const std::string bundleName = "bundleName";
     data.WriteString(bundleName);
-    EXPECT_CALL(*mockFormMgrService, BatchRefreshForms(_))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, BatchRefreshForms(_)).Times(1).WillOnce(Return(ERR_OK));
     EXPECT_EQ(mockFormMgrService->HandleBatchRefreshForms(data, reply), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_HandleBatchRefreshForms_001 ends";
 }
@@ -2999,9 +3143,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleEnableForms_001, TestSize.Level1
     const std::string bundleName = "bundleName";
     data.WriteString(bundleName);
     data.WriteBool(true);
-    EXPECT_CALL(*mockFormMgrService, EnableForms(_, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, EnableForms(_, _)).Times(1).WillOnce(Return(ERR_OK));
     EXPECT_EQ(mockFormMgrService->HandleEnableForms(data, reply), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_HandleEnableForms_001 ends";
 }
@@ -3013,16 +3155,18 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleEnableForms_001, TestSize.Level1
  */
 HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleReleaseRenderer_001, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormMgrStubTest_HandleReleaseRenderer_001 starts";
+    EXPECT_TRUE(mockFormMgrService != nullptr);
+    constexpr uint32_t code = static_cast<uint32_t>(IFormMgr::Message::FORM_MGR_RELEASE_RENDERER);
     MessageParcel data;
     MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(MockFormMgrService::GetDescriptor());
     constexpr int64_t formId = 1;
     data.WriteInt64(formId);
     const std::string compId = "compId";
     data.WriteString(compId);
-    EXPECT_CALL(*mockFormMgrService, ReleaseRenderer(_, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
-    EXPECT_EQ(mockFormMgrService->HandleReleaseRenderer(data, reply), ERR_OK);
+    EXPECT_CALL(*mockFormMgrService, ReleaseRenderer(_, _)).Times(1).WillOnce(Return(ERR_OK));
+    EXPECT_EQ(mockFormMgrService->OnRemoteRequest(code, data, reply, option), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_HandleReleaseRenderer_001 ends";
 }
 
@@ -3037,9 +3181,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleHasFormVisible_001, TestSize.Lev
     MessageParcel reply;
     constexpr int64_t tokenId = 1;
     data.WriteInt64(tokenId);
-    EXPECT_CALL(*mockFormMgrService, HasFormVisible(_))
-        .Times(1)
-        .WillOnce(Return(true));
+    EXPECT_CALL(*mockFormMgrService, HasFormVisible(_)).Times(1).WillOnce(Return(ERR_OK));
     EXPECT_EQ(mockFormMgrService->HandleHasFormVisible(data, reply), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_HandleHasFormVisible_001 ends";
 }
@@ -3055,9 +3197,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleCreateForm_001, TestSize.Level1)
     MessageParcel reply;
     const Want want = {};
     data.WriteParcelable(&want);
-    EXPECT_CALL(*mockFormMgrService, CreateForm(_, _))
-        .Times(1)
-        .WillOnce(Return(ERR_OK));
+    EXPECT_CALL(*mockFormMgrService, CreateForm(_, _)).Times(1).WillOnce(Return(ERR_OK));
     EXPECT_EQ(mockFormMgrService->HandleCreateForm(data, reply), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_HandleCreateForm_001 ends";
 }
@@ -3087,9 +3227,7 @@ HWTEST_F(FormMgrStubTest, FormMgrStubTest_HandleIsSystemAppForm_001, TestSize.Le
     MessageParcel reply;
     const std::string bundleName = "bundleName";
     data.WriteString(bundleName);
-    EXPECT_CALL(*mockFormMgrService, IsSystemAppForm(_))
-        .Times(1)
-        .WillOnce(Return(true));
+    EXPECT_CALL(*mockFormMgrService, IsSystemAppForm(_)).Times(1).WillOnce(Return(ERR_OK));
     EXPECT_EQ(mockFormMgrService->HandleIsSystemAppForm(data, reply), ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrStubTest_HandleIsSystemAppForm_001 ends";
 }

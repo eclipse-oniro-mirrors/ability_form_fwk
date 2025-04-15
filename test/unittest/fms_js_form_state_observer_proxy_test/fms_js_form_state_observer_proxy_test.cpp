@@ -88,7 +88,7 @@ HWTEST_F(JsFormStateObserverProxyTest, JsFormStateObserverProxyTest_0003, TestSi
 
 /**
  * @tc.name: JsFormStateObserverProxyTest_0004
- * @tc.desc: test NotifyWhetherFormsVisible function.
+ * @tc.desc: test OnFormClickEvent function.
  * @tc.type: FUNC
  */
 HWTEST_F(JsFormStateObserverProxyTest, JsFormStateObserverProxyTest_0004, TestSize.Level1) {

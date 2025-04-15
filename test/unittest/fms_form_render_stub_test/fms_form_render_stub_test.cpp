@@ -82,6 +82,11 @@ public:
     {
         return ERR_OK;
     };
+    int32_t UpdateFormSize(const int64_t &formId, float width, float height, float borderWidth,
+        const std::string &uid) override
+    {
+        return ERR_OK;
+    };
 };
 
 class MockFormSupplyStub : public FormSupplyStub {
@@ -430,12 +435,12 @@ public:
 	
     int32_t GetPublishedFormInfoById(const int64_t formId, RunningFormInfo &formInfo) override
     {
-        return 0;
+        return ERR_OK;
     }
 
     int32_t GetPublishedFormInfos(std::vector<RunningFormInfo> &formInfos) override
     {
-        return 0;
+        return ERR_OK;
     }
 
     ErrCode OpenFormEditAbility(const std::string &abilityName, const int64_t &formId, bool isMainPage) override
@@ -993,6 +998,33 @@ HWTEST_F(FormRenderStubTest, FormRenderStubTest_026, TestSize.Level0)
 }
 
 /**
+* @tc.name: FormRenderStubTest_027
+* @tc.desc: 1.Verify OnRemoteRequest and HandleUpdateFormSize interface executes as expected.
+* 2.The interface return value ERR_OK.
+* @tc.type: FUNC
+*/
+HWTEST_F(FormRenderStubTest, FormRenderStubTest_027, TestSize.Level0)
+{
+    sptr<MockFormRenderImpl> callback = new (std::nothrow) MockFormRenderImpl();
+    uint32_t code = static_cast<uint32_t>(IFormRender::Message::FORM_UPDATE_FORM_SIZE);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(u"ohos.appexecfwk.FormRender");
+    int64_t formId = 1;
+    data.WriteInt64(formId);
+    float width = 1.1;
+    float height = 1.1;
+    float borderWidth = 1.1;
+    data.WriteFloat(width);
+    data.WriteFloat(height);
+    data.WriteFloat(borderWidth);
+    data.WriteString("<uid>");
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+}
+
+/**
  * @tc.name: IFormSupplyTest_001
  * @tc.desc: Test OnRenderingBlock function
  * @tc.type: FUNC
@@ -1109,7 +1141,7 @@ HWTEST_F(FormRenderStubTest, IFormMgrTest_008, TestSize.Level0)
     int64_t formId = 1;
     RunningFormInfo formInfo;
     IFormMgrTest iFormMgrTest;
-    EXPECT_EQ(iFormMgrTest.GetPublishedFormInfoById(formId, formInfo), 0);
+    EXPECT_EQ(iFormMgrTest.GetPublishedFormInfoById(formId, formInfo), ERR_OK);
 }
 
 /**
@@ -1121,7 +1153,7 @@ HWTEST_F(FormRenderStubTest, IFormMgrTest_009, TestSize.Level0)
 {
     std::vector<RunningFormInfo> formInfos;
     IFormMgrTest iFormMgrTest;
-    EXPECT_EQ(iFormMgrTest.GetPublishedFormInfos(formInfos), 0);
+    EXPECT_EQ(iFormMgrTest.GetPublishedFormInfos(formInfos), ERR_OK);
 }
 
 /**
