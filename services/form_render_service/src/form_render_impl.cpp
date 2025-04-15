@@ -320,7 +320,6 @@ void FormRenderImpl::OnConfigurationUpdated(
     const std::shared_ptr<OHOS::AppExecFwk::Configuration>& configuration)
 {
     HILOG_DEBUG("OnConfigurationUpdated start");
-    std::lock_guard<std::mutex> lock(renderRecordMutex_);
     if (!configuration) {
         HILOG_ERROR("null configuration");
         return;
@@ -409,7 +408,6 @@ void FormRenderImpl::SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Co
 void FormRenderImpl::RunCachedConfigurationUpdated()
 {
     HILOG_INFO("RunCachedConfigUpdated");
-    std::lock_guard<std::mutex> lock(renderRecordMutex_);
     if (hasCachedConfig_) {
         OnConfigurationUpdatedInner();
     }
@@ -536,7 +534,6 @@ void FormRenderImpl::ConfirmUnlockState(Want &renderWant)
     } else if (renderWant.GetBoolParam(Constants::FORM_RENDER_STATE, false)) {
         HILOG_WARN("Maybe unlock event is missed or delayed, all form record begin to render");
         isVerified_ = true;
-        std::lock_guard<std::mutex> lock(renderRecordMutex_);
         for (const auto& iter : renderRecordMap_) {
             if (iter.second) {
                 iter.second->OnUnlock();
