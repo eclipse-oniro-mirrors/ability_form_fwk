@@ -895,7 +895,7 @@ public:
      * @param userId User ID.
      * @param formRecords The list of formRecord.
      */
-     void GetFormRecordsByUserId(const int32_t userId, std::vector<FormRecord> &formRecords);
+    void GetFormRecordsByUserId(const int32_t userId, std::vector<FormRecord> &formRecords);
 
 private:
     /**
