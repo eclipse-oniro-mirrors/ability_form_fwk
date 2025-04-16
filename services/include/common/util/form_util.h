@@ -105,7 +105,16 @@ public:
      * @return string list.
      */
     static std::vector<std::string> StringSplit(const std::string &in, const std::string &delim);
-    static int TestFormId(int &formId);
+    static int TestFormId1(int &formId);
+    static int TestFormId2(int &formId);
+    static int TestFormId3(int &formId);
+    static int TestFormId4(int &formId);
+    static int TestFormId5(int &formId);
+    static int TestFormId6(int &formId);
+    static int TestFormId7(int &formId);
+    static int TestFormId8(int &formId);
+    static int TestFormId9(int &formId);
+    static int TestFormId10(int &formId);
 
     /**
      * @brief get current active account id.
