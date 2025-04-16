@@ -693,6 +693,12 @@ public:
      */
     int32_t NotifyFormLocked(const int64_t &formId, bool isLocked);
 
+    /**
+     * @brief Refresh the form when screen on.
+     * @return Returns ERR_OK on success, others on failure.
+     */
+    ErrCode RefreshFormsByScreenOn();
+
 private:
     /**
      * @brief Get form configure info.

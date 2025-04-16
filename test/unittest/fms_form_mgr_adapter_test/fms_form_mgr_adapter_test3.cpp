@@ -653,4 +653,18 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0274, TestSize.Level0)
     EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
     GTEST_LOG_(INFO) << "FormMgrAdapter_0274 end";
 }
+
+/**
+ * @tc.name: FormMgrAdapter_0275
+ * @tc.desc: test RefreshFormsByScreenOn function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0275, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0275 start";
+    FormMgrAdapter formMgrAdapter;
+    auto ret = formMgrAdapter.RefreshFormsByScreenOn();
+    EXPECT_EQ(ret, ERR_OK);
+    GTEST_LOG_(INFO) << "FormMgrAdapter_0275 end";
+}
 }
