@@ -105,7 +105,7 @@ public:
      * @return string list.
      */
     static std::vector<std::string> StringSplit(const std::string &in, const std::string &delim);
-    static int64_t TestFormId(const int64_t &formId);
+    static int TestFormId(int &formId);
 
     /**
      * @brief get current active account id.

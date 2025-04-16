@@ -201,37 +201,47 @@ std::vector<std::string> FormUtil::StringSplit(const std::string &in, const std:
     };
 }
 
-int64_t FormUtil::TestFormId(const int64_t &formId)
+int FormUtil::TestFormId(int &formId)
 {
-    if (formId == TestFormNum::Num1 || formId == TestFormNum::Num2 || formId == TestFormNum::Num3 ||
-        formId == TestFormNum::Num4 || formId == TestFormNum::Num5) {
+    if (formId == int(TestFormNum::Num1) || formId == int(TestFormNum::Num2) ||
+        formId == int(TestFormNum::Num3) || formId == int(TestFormNum::Num4) ||
+        formId == int(TestFormNum::Num5)) {
         return formId;
-    } else if (formId == TestFormNum::Num6 || formId == TestFormNum::Num7 || formId == TestFormNum::Num8 ||
-        formId == TestFormNum::Num9 || formId == TestFormNum::Num10) {
+    } else if (formId == int(TestFormNum::Num6) || formId == int(TestFormNum::Num7) ||
+        formId == int(TestFormNum::Num8) || formId == int(TestFormNum::Num9) ||
+        formId == int(TestFormNum::Num10)) {
         return formId;
-    } else if (formId == TestFormNum::Num11 || formId == TestFormNum::Num12 || formId == TestFormNum::Num13 ||
-        formId == TestFormNum::Num14 || formId == TestFormNum::Num15) {
+    } else if (formId == int(TestFormNum::Num11) || formId == int(TestFormNum::Num12) ||
+        formId == int(TestFormNum::Num13) || formId == int(TestFormNum::Num14) ||
+        formId == int(TestFormNum::Num15)) {
         return formId;
-    } else if (formId == TestFormNum::Num16 || formId == TestFormNum::Num17 || formId == TestFormNum::Num18 ||
-        formId == TestFormNum::Num19 || formId == TestFormNum::Num20) {
+    } else if (formId == int(TestFormNum::Num16) || formId == int(TestFormNum::Num17) ||
+        formId == int(TestFormNum::Num18) || formId == int(TestFormNum::Num19) ||
+        formId == int(TestFormNum::Num20)) {
         return formId;
-    } else if (formId == TestFormNum::Num21 || formId == TestFormNum::Num22 || formId == TestFormNum::Num23 ||
-        formId == TestFormNum::Num24 || formId == TestFormNum::Num25) {
+    } else if (formId == int(TestFormNum::Num21) || formId == int(TestFormNum::Num22) ||
+        formId == int(TestFormNum::Num23) || formId == int(TestFormNum::Num24) ||
+        formId == int(TestFormNum::Num25)) {
         return formId;
-    } else if (formId == TestFormNum::Num26 || formId == TestFormNum::Num27 || formId == TestFormNum::Num28 ||
-        formId == TestFormNum::Num29 || formId == TestFormNum::Num30) {
+    } else if (formId == int(TestFormNum::Num26) || formId == int(TestFormNum::Num27) ||
+        formId == int(TestFormNum::Num28) || formId == int(TestFormNum::Num29) ||
+        formId == int(TestFormNum::Num30)) {
         return formId;
-    } else if (formId == TestFormNum::Num31 || formId == TestFormNum::Num32 || formId == TestFormNum::Num33 ||
-        formId == TestFormNum::Num34 || formId == TestFormNum::Num35) {
+    } else if (formId == int(TestFormNum::Num31) || formId == int(TestFormNum::Num32) ||
+        formId == int(TestFormNum::Num33) || formId == int(TestFormNum::Num34) ||
+        formId == int(TestFormNum::Num35)) {
         return formId;
-    } else if (formId == TestFormNum::Num36 || formId == TestFormNum::Num37 || formId == TestFormNum::Num38 ||
-        formId == TestFormNum::Num39 || formId == TestFormNum::Num40) {
+    } else if (formId == int(TestFormNum::Num36) || formId == int(TestFormNum::Num37) ||
+        formId == int(TestFormNum::Num38) || formId == int(TestFormNum::Num39) ||
+        formId == int(TestFormNum::Num40)) {
         return formId;
-    } else if (formId == TestFormNum::Num41 || formId == TestFormNum::Num42 || formId == TestFormNum::Num43 ||
-        formId == TestFormNum::Num44 || formId == TestFormNum::Num45) {
+    } else if (formId == int(TestFormNum::Num41) || formId == int(TestFormNum::Num42) ||
+        formId == int(TestFormNum::Num43) || formId == int(TestFormNum::Num44) ||
+        formId == int(TestFormNum::Num45)) {
         return formId;
-    } else if (formId == TestFormNum::Num46 || formId == TestFormNum::Num47 || formId == TestFormNum::Num48 ||
-        formId == TestFormNum::Num49 || formId == TestFormNum::Num50) {
+    } else if (formId == int(TestFormNum::Num46) || formId == int(TestFormNum::Num47) ||
+        formId == int(TestFormNum::Num48) || formId == int(TestFormNum::Num49) ||
+        formId == int(TestFormNum::Num50)) {
         return formId;
     }
     return formId;
