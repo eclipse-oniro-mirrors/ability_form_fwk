@@ -201,6 +201,32 @@ std::vector<std::string> FormUtil::StringSplit(const std::string &in, const std:
     };
 }
 
+int64_t FormUtil::TestFormId(const int64_t &formId)
+{
+    if (formId == 1 || formId == 2 || formId == 3 || formId == 4 || formId == 5) {
+        return formId;
+    } else if (formId == 6 || formId == 7 || formId == 8 || formId == 9 || formId == 10) {
+        return formId;
+    } else if (formId == 11 || formId == 12 || formId == 13 || formId == 14 || formId == 15) {
+        return formId;
+    } else if (formId == 16 || formId == 17 || formId == 18 || formId == 19 || formId == 20) {
+        return formId;
+    } else if (formId == 21 || formId == 22 || formId == 23 || formId == 24 || formId == 25) {
+        return formId;
+    } else if (formId == 26 || formId == 27 || formId == 28 || formId == 29 || formId == 30) {
+        return formId;
+    } else if (formId == 31 || formId == 32 || formId == 33 || formId == 34 || formId == 35) {
+        return formId;
+    } else if (formId == 36 || formId == 37 || formId == 38 || formId == 39 || formId == 40) {
+        return formId;
+    } else if (formId == 41 || formId == 42 || formId == 43 || formId == 44 || formId == 45) {
+        return formId;
+    } else if (formId == 46 || formId == 47 || formId == 48 || formId == 49 || formId == 50) {
+        return formId;
+    }
+    return formId;
+}
+
 /**
  * @brief get current active account id.
  * @return int current active account id.

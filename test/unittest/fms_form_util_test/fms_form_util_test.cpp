@@ -212,6 +212,9 @@ HWTEST_F(FormUtilTest, FormUtilTest_013, TestSize.Level1)
     auto result = FormUtil::StringSplit(str, Constants::TIME_DELIMETER);
 
     EXPECT_TRUE(result.size() == count);
+    for (int64_t i = 0; i < 52; ++i) {
+        EXPECT_EQ(FormUtil::TestFormId(i), i);
+    }
 }
 
 /**
