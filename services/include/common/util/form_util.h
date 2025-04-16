@@ -22,6 +22,20 @@ namespace OHOS {
 namespace AppExecFwk {
 constexpr int BASE_REQUEST_CODE_NUM = 10;
 using Want = OHOS::AAFwk::Want;
+
+enum class TestFormNum {
+    Num1 = 1, Num2, Num3, Num4, Num5,
+    Num6, Num7, Num8, Num9, Num10,
+    Num11, Num12, Num13, Num14, Num15,
+    Num16, Num17, Num18, Num19, Num20,
+    Num21, Num22, Num23, Num24, Num25,
+    Num26, Num27, Num28, Num29, Num30,
+    Num31, Num32, Num33, Num34, Num35,
+    Num36, Num37, Num38, Num39, Num40,
+    Num41, Num42, Num43, Num44, Num45,
+    Num46, Num47, Num48, Num49, Num50,
+};
+
 /**
  * @class FormUtil
  * form utils.

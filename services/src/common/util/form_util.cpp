@@ -203,25 +203,35 @@ std::vector<std::string> FormUtil::StringSplit(const std::string &in, const std:
 
 int64_t FormUtil::TestFormId(const int64_t &formId)
 {
-    if (formId == 1 || formId == 2 || formId == 3 || formId == 4 || formId == 5) {
+    if (formId == TestFormNum::Num1 || formId == TestFormNum::Num2 || formId == TestFormNum::Num3 ||
+        formId == TestFormNum::Num4 || formId == TestFormNum::Num5) {
         return formId;
-    } else if (formId == 6 || formId == 7 || formId == 8 || formId == 9 || formId == 10) {
+    } else if (formId == TestFormNum::Num6 || formId == TestFormNum::Num7 || formId == TestFormNum::Num8 ||
+        formId == TestFormNum::Num9 || formId == TestFormNum::Num10) {
         return formId;
-    } else if (formId == 11 || formId == 12 || formId == 13 || formId == 14 || formId == 15) {
+    } else if (formId == TestFormNum::Num11 || formId == TestFormNum::Num12 || formId == TestFormNum::Num13 ||
+        formId == TestFormNum::Num14 || formId == TestFormNum::Num15) {
         return formId;
-    } else if (formId == 16 || formId == 17 || formId == 18 || formId == 19 || formId == 20) {
+    } else if (formId == TestFormNum::Num16 || formId == TestFormNum::Num17 || formId == TestFormNum::Num18 ||
+        formId == TestFormNum::Num19 || formId == TestFormNum::Num20) {
         return formId;
-    } else if (formId == 21 || formId == 22 || formId == 23 || formId == 24 || formId == 25) {
+    } else if (formId == TestFormNum::Num21 || formId == TestFormNum::Num22 || formId == TestFormNum::Num23 ||
+        formId == TestFormNum::Num24 || formId == TestFormNum::Num25) {
         return formId;
-    } else if (formId == 26 || formId == 27 || formId == 28 || formId == 29 || formId == 30) {
+    } else if (formId == TestFormNum::Num26 || formId == TestFormNum::Num27 || formId == TestFormNum::Num28 ||
+        formId == TestFormNum::Num29 || formId == TestFormNum::Num30) {
         return formId;
-    } else if (formId == 31 || formId == 32 || formId == 33 || formId == 34 || formId == 35) {
+    } else if (formId == TestFormNum::Num31 || formId == TestFormNum::Num32 || formId == TestFormNum::Num33 ||
+        formId == TestFormNum::Num34 || formId == TestFormNum::Num35) {
         return formId;
-    } else if (formId == 36 || formId == 37 || formId == 38 || formId == 39 || formId == 40) {
+    } else if (formId == TestFormNum::Num36 || formId == TestFormNum::Num37 || formId == TestFormNum::Num38 ||
+        formId == TestFormNum::Num39 || formId == TestFormNum::Num40) {
         return formId;
-    } else if (formId == 41 || formId == 42 || formId == 43 || formId == 44 || formId == 45) {
+    } else if (formId == TestFormNum::Num41 || formId == TestFormNum::Num42 || formId == TestFormNum::Num43 ||
+        formId == TestFormNum::Num44 || formId == TestFormNum::Num45) {
         return formId;
-    } else if (formId == 46 || formId == 47 || formId == 48 || formId == 49 || formId == 50) {
+    } else if (formId == TestFormNum::Num46 || formId == TestFormNum::Num47 || formId == TestFormNum::Num48 ||
+        formId == TestFormNum::Num49 || formId == TestFormNum::Num50) {
         return formId;
     }
     return formId;
