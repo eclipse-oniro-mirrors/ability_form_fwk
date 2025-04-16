@@ -4326,5 +4326,25 @@ ErrCode FormMgrAdapter::UpdateFormByCondition(int32_t type)
 
     return ERR_OK;
 }
+
+ErrCode FormMgrAdapter::RefreshFormsByScreenOn()
+{
+    const int32_t currUserId = FormUtil::GetCurrentAccountId();
+    HILOG_INFO("screen on and refresh forms, currUserId:%{public}d", currUserId);
+    std::vector<FormRecord> formRecords;
+    FormDataMgr::GetInstance().GetFormRecordsByUserId(currUserId, formRecords);
+    for (FormRecord& formRecord : formRecords) {
+        if (!formRecord.needRefresh) {
+            continue;
+        }
+        if (formRecord.formVisibleNotifyState == Constants::FORM_INVISIBLE) {
+            continue;
+        }
+        if (formRecord.isTimerRefresh) {
+            FormTimerMgr::GetInstance().RefreshWhenFormVisible(formRecord.formId, currUserId);
+        }
+    }
+    return ERR_OK;
+}
 } // namespace AppExecFwk
 } // namespace OHOS
