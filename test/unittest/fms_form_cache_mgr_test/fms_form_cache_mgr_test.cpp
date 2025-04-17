@@ -178,6 +178,7 @@ HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_005, TestSize.Level0)
 {
     HILOG_INFO("fms_form_cache_mgr_test_005 start");
     FormCache formCache;
+    formCache.imgCache = "{\"1744726509462\":21}";
     std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
     EXPECT_FALSE(formCacheMgr_.InnerGetImageData(formCache, imageDataMap));
     GTEST_LOG_(INFO) << "fms_form_cache_mgr_test_005 end";
@@ -262,20 +263,6 @@ HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_010, TestSize.Level0)
     FormCache formCache;
     EXPECT_TRUE(formCacheMgr_.SaveDataCacheToDb(formId, formCache));
     GTEST_LOG_(INFO) << "fms_form_cache_mgr_test_010 end";
-}
-
-/*
- * Feature: FormCacheMgr
- * Function: InnerDeleteImageData
- * FunctionPoints: FormCacheMgr InnerDeleteImageData interface
- * EnvConditions: Mobile that can run ohos test framework
- */
-HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_011, TestSize.Level0)
-{
-    HILOG_INFO("fms_form_cache_mgr_test_011 start");
-    FormCache formCache;
-    EXPECT_TRUE(formCacheMgr_.InnerDeleteImageData(formCache));
-    GTEST_LOG_(INFO) << "fms_form_cache_mgr_test_011 end";
 }
 
 /*

@@ -29,6 +29,15 @@ namespace {
 const std::string FORM_PROVIDER_BUNDLE_NAME = "ohos.samples.ut.form";
 const std::string FORM_PROVIDER_ABILITY_NAME = "FormAbility";
 
+class MockFormDataCallback : public FormDataCallbackInterface {
+public:
+    MockFormDataCallback()
+    {}
+    virtual ~MockFormDataCallback() = default;
+    void ProcessAcquireFormData(AAFwk::WantParams data) override
+    {}
+};
+
 class FmsFormHostClientTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -247,6 +256,26 @@ HWTEST_F(FmsFormHostClientTest, AddAcqiureFormDataCallback_0100, TestSize.Level0
     formHostClient->OnAcquireDataResponse(wantParams, requestCode);
     formHostClient->RemoveAcquireDataCallback(requestCode);
     GTEST_LOG_(INFO) << "FmsFormHostClientTest AddAcqiureFormDataCallback_0100 end";
+}
+
+/**
+ * @tc.name: OnAcquireDataResponse_0100
+ * @tc.desc: test OnAcquireDataResponse function.
+ * @tc.type: FUNC
+ * @tc.require: Cover OnAcquireDataResponse
+ */
+HWTEST_F(FmsFormHostClientTest, OnAcquireDataResponse_0100, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest OnAcquireDataResponse_0100 start";
+    std::shared_ptr<FormDataCallbackInterface> formDataCallbackInterface = std::make_shared<MockFormDataCallback>();
+    int64_t requestCode = 1;
+    sptr<FormHostClient> formHostClient = FormHostClient::GetInstance();
+    AAFwk::WantParams wantParams;
+    formHostClient->OnAcquireDataResponse(wantParams, requestCode);
+    formHostClient->AddAcqiureFormDataCallback(formDataCallbackInterface, requestCode);
+    formHostClient->OnAcquireDataResponse(wantParams, requestCode);
+    formHostClient->RemoveAcquireDataCallback(requestCode);
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest OnAcquireDataResponse_0100 end";
 }
 
 /**
@@ -534,10 +563,14 @@ HWTEST_F(FmsFormHostClientTest, OnUninstall_0200, TestSize.Level0)
     EXPECT_CALL(*callback, ProcessFormUninstall(_)).Times(1);
     std::vector<int64_t> formIds;
     formIds.emplace_back(-1);
+    formIds.emplace_back(100);
     formIds.emplace_back(formId);
     formHostClient->OnUninstall(formIds);
     testing::Mock::AllowLeak(callback.get());
     formHostClient->formCallbackMap_.clear();
+    formIds.clear();
+    formIds.emplace_back(-1);
+    formHostClient->OnUninstall(formIds);
     GTEST_LOG_(INFO) << "FmsFormHostClientTest OnUninstall_0200 end";
 }
 
@@ -653,5 +686,52 @@ HWTEST_F(FmsFormHostClientTest, AddForm_0200, TestSize.Level1)
     EXPECT_EQ(
         formHostClient->formCallbackMap_.find(formJsInfo.formId) == formHostClient->formCallbackMap_.end(), true);
     GTEST_LOG_(INFO) << "FmsFormHostClientTest AddForm_0200 end";
+}
+
+/**
+ * @tc.number: OnError_0100
+ * @tc.name: OnError
+ * @tc.desc: Cover OnError.
+ */
+HWTEST_F(FmsFormHostClientTest, OnError_0100, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest OnError_0100 start";
+    sptr<FormHostClient> formHostClient = FormHostClient::GetInstance();
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = 1;
+    formJsInfo.uiSyntax = FormType::ETS;
+    formHostClient->AddForm(nullptr, formJsInfo);
+    formJsInfo.formId = 2;
+    std::shared_ptr<FormCallbackInterface> formCallback = std::make_shared<FormCallback>();
+    formHostClient->AddForm(formCallback, formJsInfo);
+    formHostClient->etsFormIds_.emplace(3);
+    int32_t errorCode = 1;
+    std::string errorMsg = "this is errorMsg";
+    formHostClient->OnError(errorCode, errorMsg);
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest OnError_0100 end";
+}
+
+/**
+ * @tc.number: OnError_0200
+ * @tc.name: OnError
+ * @tc.desc: Cover OnError.
+ */
+HWTEST_F(FmsFormHostClientTest, OnError_0200, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest OnError_0200 start";
+    sptr<FormHostClient> formHostClient = FormHostClient::GetInstance();
+    std::vector<int64_t> formIds = {1, 2, 3, 4};
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = 1;
+    formJsInfo.uiSyntax = FormType::ETS;
+    formHostClient->AddForm(nullptr, formJsInfo);
+    formJsInfo.formId = 2;
+    std::shared_ptr<FormCallbackInterface> formCallback = std::make_shared<FormCallback>();
+    formHostClient->AddForm(nullptr, formJsInfo);
+    formHostClient->etsFormIds_.emplace(3);
+    int32_t errorCode = 1;
+    std::string errorMsg = "this is errorMsg";
+    formHostClient->OnError(errorCode, errorMsg, formIds);
+    GTEST_LOG_(INFO) << "FmsFormHostClientTest OnError_0200 end";
 }
 }
