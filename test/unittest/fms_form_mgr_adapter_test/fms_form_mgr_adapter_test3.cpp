@@ -59,7 +59,8 @@ public:
     void TearDown();
 };
 
-void FmsFormMgrAdapterTest3::SetUp() {
+void FmsFormMgrAdapterTest3::SetUp()
+{
     formItemInfo_ = new FormItemInfo();
     callerToken_ = new sptr<IRemoteObject>();
     formJsInfo_ = new FormJsInfo();
@@ -67,10 +68,14 @@ void FmsFormMgrAdapterTest3::SetUp() {
     formIdMap_.clear();
     formResultMutex_.unlock();
 }
-void FmsFormMgrAdapterTest3::TearDown() {
+void FmsFormMgrAdapterTest3::TearDown()
+{
     delete formItemInfo_;
+    formItemInfo_ = nullptr;
     delete callerToken_;
+    callerToken_ = nullptr;
     delete formJsInfo_;
+    formJsInfo_ = nullptr;
     formResultMutex_.lock();
     formIdMap_.clear();
     formResultMutex_.unlock();
