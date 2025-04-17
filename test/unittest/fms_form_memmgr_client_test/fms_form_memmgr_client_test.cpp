@@ -74,5 +74,17 @@ HWTEST_F(FmsFormMemmgrClientTest, FmsFormMemmgrClientTest_001, TestSize.Level1)
     EXPECT_TRUE(true);
     GTEST_LOG_(INFO) << "FmsFormMemmgrClientTest_001 end";
 }
+
+/*
+* @tc.number: FmsFormMemmgrClientTest_002
+* @tc.name: SetCritical
+* @tc.desc: 
+*/
+HWTEST_F(FmsFormMemmgrClientTest, FmsFormMemmgrClientTest_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormMemmgrClientTest_002 start";
+    FormMemmgrClient::GetInstance().SetCritical(true);
+    GTEST_LOG_(INFO) << "FmsFormMemmgrClientTest_002 end";
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

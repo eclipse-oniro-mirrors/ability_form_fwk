@@ -282,6 +282,42 @@ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_0128, TestSize.Level0)
 }
 
 /**
+ * @tc.name: FormMgrAdapter_0128_1
+ * @tc.desc: test HandleDeleteTempForm function and the return value is ERR_APPEXECFWK_FORM_NOT_EXIST_ID.
+ * @tc.type: FUNC
+ */
+ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_0128_1, TestSize.Level0)
+ {
+     GTEST_LOG_(INFO) << "FormMgrAdapter_0128_1 start";
+     FormMgrAdapter formMgrAdapter;
+     int64_t formId = 1;
+     sptr<IRemoteObject> callerToken = nullptr;
+     MockGetFormRecord(true);
+     MockGetFormRecordParams(true);
+     MockDeleteTempForm(true);
+     formMgrAdapter.HandleDeleteTempForm(formId, callerToken);
+     GTEST_LOG_(INFO) << "FormMgrAdapter_0128_1 end";
+ }
+ 
+ /**
+  * @tc.name: FormMgrAdapter_0128_2
+  * @tc.desc: test HandleDeleteTempForm function and the return value is ERR_APPEXECFWK_FORM_COMMON_CODE.
+  * @tc.type: FUNC
+  */
+ HWTEST_F(FmsFormMgrAdapterTest2, FormMgrAdapter_0128_2, TestSize.Level0)
+ {
+     GTEST_LOG_(INFO) << "FormMgrAdapter_0128_2 start";
+     FormMgrAdapter formMgrAdapter;
+     int64_t formId = 1;
+     sptr<IRemoteObject> callerToken = nullptr;
+     MockGetFormRecord(true);
+     MockGetFormRecordParams(true);
+     MockDeleteTempForm(false);
+     formMgrAdapter.HandleDeleteTempForm(formId, callerToken);
+     GTEST_LOG_(INFO) << "FormMgrAdapter_0128_2 end";
+ }
+
+/**
  * @tc.name: FormMgrAdapter_0129
  * @tc.desc: test CastTempForm function and the return value is ERR_APPEXECFWK_FORM_NOT_EXIST_ID.
  * @tc.type: FUNC

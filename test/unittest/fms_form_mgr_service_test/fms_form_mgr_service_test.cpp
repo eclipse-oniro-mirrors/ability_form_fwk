@@ -528,6 +528,9 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0020, TestSize.Level1)
 
     MockCheckInvalidForm(ERR_OK);
     EXPECT_EQ(formMgrService.ShareForm(formId, deviceId, callerToken, requestCode), ERR_OK);
+
+    sptr<IRemoteObject> callerToken1 = nullptr;
+    EXPECT_EQ(formMgrService.ShareForm(formId, deviceId, callerToken1, requestCode), ERR_APPEXECFWK_FORM_COMMON_CODE);
     GTEST_LOG_(INFO) << "FormMgrService_0020 end";
 }
 
@@ -1619,5 +1622,36 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0080, TestSize.Level1)
     EXPECT_EQ(ret, ERR_OK);
     GTEST_LOG_(INFO) << "FormMgrService_0080 end";
 }
+
+// FormMgrService_0140-0179 start
+
+/**
+ * @tc.number: FormMgrService_0140
+ * @tc.name: test formMgrService function.
+ * @tc.desc: Verify 
+ */
+ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0140, TestSize.Level1)
+ {
+     GTEST_LOG_(INFO) << "FormMgrService_0140 start";
+     FormMgrService formMgrService;
+     int64_t formId = 1;
+     RunningFormInfo formInfo;
+     std::vector<RunningFormInfo> formInfos;
+     MockGetCallerBundleName(-1);
+     int32_t ret = formMgrService.GetPublishedFormInfoById(formId, formInfo);
+     int32_t ret1 = formMgrService.GetPublishedFormInfos(formInfos);
+     EXPECT_EQ(ret, -1);
+     EXPECT_EQ(ret1, -1);
+     MockGetCallerBundleName(ERR_OK);
+     formMgrService.GetPublishedFormInfoById(formId, formInfo);
+     formMgrService.GetPublishedFormInfos(formInfos);
+     int32_t userId = 0;
+     MockGetCurrentAccountIdRet(userId);
+     MockVerifyCallingPermission(false);
+     bool ret2 = formMgrService.CheckAcrossLocalAccountsPermission();
+     EXPECT_FALSE(ret2);
+     GTEST_LOG_(INFO) << "FormMgrService_0140 end";
+ }
+// FormMgrService_0140-0179 end
 // Please add to file fms_form_mgr_service_test2.cpp
 }
