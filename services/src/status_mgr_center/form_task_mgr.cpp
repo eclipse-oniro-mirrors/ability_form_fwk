@@ -1150,7 +1150,7 @@ void FormTaskMgr::PostRouterProxyToHost(const int64_t formId, const sptr<IRemote
     auto routerProxyFunc = [formId, want, remoteObject]() {
         FormTaskMgr::GetInstance().FormRouterEventProxy(formId, remoteObject, want);
     };
-    serialQueue_->ScheduleTask(FORM_TASK_DELAY_TIME, routerProxyFunc);
+    serialQueue_->ScheduleTask(0, routerProxyFunc);
 }
 
 /**
