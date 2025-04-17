@@ -90,7 +90,7 @@ const int32_t CONDITION_NETWORK = 1;
 const long FORM_DISCON_NETWORK_CHECK_TIME = 600000; // ms
 #ifdef RES_SCHEDULE_ENABLE
 constexpr int32_t SYSTEMLOADLEVEL_TIMERSTOP_THRESHOLD =
-    static_cast<int32_t>(ResourceSchedule::ResType::SystemloadLevel::HIGH);
+    static_cast<int32_t>(ResourceSchedule::ResType::SystemloadLevel::OVERHEATED);
 #endif // RES_SCHEDULE_ENABLE
 }
 using namespace std::chrono;
