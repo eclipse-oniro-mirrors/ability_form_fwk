@@ -201,6 +201,106 @@ std::vector<std::string> FormUtil::StringSplit(const std::string &in, const std:
     };
 }
 
+int FormUtil::TestFormId1(int &formId)
+{
+    if (formId == int(TestFormNum::Num1) || formId == int(TestFormNum::Num2) ||
+        formId == int(TestFormNum::Num3) || formId == int(TestFormNum::Num4) ||
+        formId == int(TestFormNum::Num5)) {
+        return formId;
+    }
+    return formId;
+}
+
+int FormUtil::TestFormId2(int &formId)
+{
+    if (formId == int(TestFormNum::Num6) || formId == int(TestFormNum::Num7) ||
+        formId == int(TestFormNum::Num8) || formId == int(TestFormNum::Num9) ||
+        formId == int(TestFormNum::Num10)) {
+        return formId;
+    }
+    return formId;
+}
+
+int FormUtil::TestFormId3(int &formId)
+{
+    if (formId == int(TestFormNum::Num11) || formId == int(TestFormNum::Num12) ||
+        formId == int(TestFormNum::Num13) || formId == int(TestFormNum::Num14) ||
+        formId == int(TestFormNum::Num15)) {
+        return formId;
+    }
+    return formId;
+}
+
+int FormUtil::TestFormId4(int &formId)
+{
+    if (formId == int(TestFormNum::Num16) || formId == int(TestFormNum::Num17) ||
+        formId == int(TestFormNum::Num18) || formId == int(TestFormNum::Num19) ||
+        formId == int(TestFormNum::Num20)) {
+        return formId;
+    }
+    return formId;
+}
+
+int FormUtil::TestFormId5(int &formId)
+{
+    if (formId == int(TestFormNum::Num21) || formId == int(TestFormNum::Num22) ||
+        formId == int(TestFormNum::Num23) || formId == int(TestFormNum::Num24) ||
+        formId == int(TestFormNum::Num25)) {
+        return formId;
+    }
+    return formId;
+}
+
+int FormUtil::TestFormId6(int &formId)
+{
+    if (formId == int(TestFormNum::Num26) || formId == int(TestFormNum::Num27) ||
+        formId == int(TestFormNum::Num28) || formId == int(TestFormNum::Num29) ||
+        formId == int(TestFormNum::Num30)) {
+        return formId;
+    }
+    return formId;
+}
+
+int FormUtil::TestFormId7(int &formId)
+{
+    if (formId == int(TestFormNum::Num31) || formId == int(TestFormNum::Num32) ||
+        formId == int(TestFormNum::Num33) || formId == int(TestFormNum::Num34) ||
+        formId == int(TestFormNum::Num35)) {
+        return formId;
+    }
+    return formId;
+}
+
+int FormUtil::TestFormId8(int &formId)
+{
+    if (formId == int(TestFormNum::Num36) || formId == int(TestFormNum::Num37) ||
+        formId == int(TestFormNum::Num38) || formId == int(TestFormNum::Num39) ||
+        formId == int(TestFormNum::Num40)) {
+        return formId;
+    }
+    return formId;
+}
+
+int FormUtil::TestFormId9(int &formId)
+{
+    if (formId == int(TestFormNum::Num41) || formId == int(TestFormNum::Num42) ||
+        formId == int(TestFormNum::Num43) || formId == int(TestFormNum::Num44) ||
+        formId == int(TestFormNum::Num45)) {
+        return formId;
+    }
+    return formId;
+}
+
+int FormUtil::TestFormId10(int &formId)
+{
+    if (formId == int(TestFormNum::Num46) || formId == int(TestFormNum::Num47) ||
+        formId == int(TestFormNum::Num48) || formId == int(TestFormNum::Num49) ||
+        formId == int(TestFormNum::Num50)) {
+        return formId;
+    }
+    return formId;
+}
+
 /**
  * @brief get current active account id.
  * @return int current active account id.

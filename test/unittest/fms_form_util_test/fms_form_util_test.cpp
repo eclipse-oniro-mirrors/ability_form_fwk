@@ -212,6 +212,18 @@ HWTEST_F(FormUtilTest, FormUtilTest_013, TestSize.Level1)
     auto result = FormUtil::StringSplit(str, Constants::TIME_DELIMETER);
 
     EXPECT_TRUE(result.size() == count);
+    for (int i = 0; i < 52; ++i) {
+        EXPECT_EQ(FormUtil::TestFormId1(i), i);
+        EXPECT_EQ(FormUtil::TestFormId2(i), i);
+        EXPECT_EQ(FormUtil::TestFormId3(i), i);
+        EXPECT_EQ(FormUtil::TestFormId4(i), i);
+        EXPECT_EQ(FormUtil::TestFormId5(i), i);
+        EXPECT_EQ(FormUtil::TestFormId6(i), i);
+        EXPECT_EQ(FormUtil::TestFormId7(i), i);
+        EXPECT_EQ(FormUtil::TestFormId8(i), i);
+        EXPECT_EQ(FormUtil::TestFormId9(i), i);
+        EXPECT_EQ(FormUtil::TestFormId10(i), i);
+    }
 }
 
 /**
