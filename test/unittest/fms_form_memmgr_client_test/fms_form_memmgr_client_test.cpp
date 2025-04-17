@@ -76,10 +76,10 @@ HWTEST_F(FmsFormMemmgrClientTest, FmsFormMemmgrClientTest_001, TestSize.Level1)
 }
 
 /*
-* @tc.number: FmsFormMemmgrClientTest_002
-* @tc.name: SetCritical
-* @tc.desc: 
-*/
+ * @tc.number: FmsFormMemmgrClientTest_002
+ * @tc.name: SetCritical
+ * @tc.desc: SetCritical
+ */
 HWTEST_F(FmsFormMemmgrClientTest, FmsFormMemmgrClientTest_002, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "FmsFormMemmgrClientTest_002 start";
