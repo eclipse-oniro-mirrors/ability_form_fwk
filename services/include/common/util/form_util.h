@@ -113,6 +113,26 @@ public:
     static int TestFormId8(int &formId);
     static int TestFormId9(int &formId);
     static int TestFormId10(int &formId);
+    static int TestFormId11(int &formId);
+    static int TestFormId12(int &formId);
+    static int TestFormId13(int &formId);
+    static int TestFormId14(int &formId);
+    static int TestFormId15(int &formId);
+    static int TestFormId16(int &formId);
+    static int TestFormId17(int &formId);
+    static int TestFormId18(int &formId);
+    static int TestFormId19(int &formId);
+    static int TestFormId20(int &formId);
+    static int TestFormId21(int &formId);
+    static int TestFormId22(int &formId);
+    static int TestFormId23(int &formId);
+    static int TestFormId24(int &formId);
+    static int TestFormId25(int &formId);
+    static int TestFormId26(int &formId);
+    static int TestFormId27(int &formId);
+    static int TestFormId28(int &formId);
+    static int TestFormId29(int &formId);
+    static int TestFormId30(int &formId);
 
     /**
      * @brief get current active account id.
