@@ -32,8 +32,6 @@ enum class TestFormNum {
     Num26, Num27, Num28, Num29, Num30,
     Num31, Num32, Num33, Num34, Num35,
     Num36, Num37, Num38, Num39, Num40,
-    Num41, Num42, Num43, Num44, Num45,
-    Num46, Num47, Num48, Num49, Num50,
 };
 
 /**
@@ -115,6 +113,26 @@ public:
     static int TestFormId8(int &formId);
     static int TestFormId9(int &formId);
     static int TestFormId10(int &formId);
+    static int TestFormId11(int &formId);
+    static int TestFormId12(int &formId);
+    static int TestFormId13(int &formId);
+    static int TestFormId14(int &formId);
+    static int TestFormId15(int &formId);
+    static int TestFormId16(int &formId);
+    static int TestFormId17(int &formId);
+    static int TestFormId18(int &formId);
+    static int TestFormId19(int &formId);
+    static int TestFormId20(int &formId);
+    static int TestFormId21(int &formId);
+    static int TestFormId22(int &formId);
+    static int TestFormId23(int &formId);
+    static int TestFormId24(int &formId);
+    static int TestFormId25(int &formId);
+    static int TestFormId26(int &formId);
+    static int TestFormId27(int &formId);
+    static int TestFormId28(int &formId);
+    static int TestFormId29(int &formId);
+    static int TestFormId30(int &formId);
 
     /**
      * @brief get current active account id.
