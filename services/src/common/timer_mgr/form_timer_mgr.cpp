@@ -1446,7 +1446,7 @@ void FormTimerMgr::AddToNotExecTaskVec(const FormTimer &task)
         }
     }
     notExecTaskVec_.emplace_back(task);
-    HILOG_DEBUG("the task(formId:%{public}" PRId64 ", userId:%{public}d) is added to notExecTaskVec",
+    HILOG_INFO("the task(formId:%{public}" PRId64 ", userId:%{public}d) is added to notExecTaskVec",
         task.formId, task.userId);
 }
 
