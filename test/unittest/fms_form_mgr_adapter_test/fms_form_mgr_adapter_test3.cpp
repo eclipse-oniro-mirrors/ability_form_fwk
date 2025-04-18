@@ -50,12 +50,36 @@ namespace {
 static const int64_t MAX_NUMBER_OF_JS = 0x20000000000000;
 class FmsFormMgrAdapterTest3 : public testing::Test {
 public:
+    FormItemInfo* formItemInfo_;
+    sptr<IRemoteObject>* callerToken_;
+    FormJsInfo* formJsInfo_;
+    std::mutex formResultMutex_;
+    std::map<int64_t, AddFormResultErrorCode> formIdMap_;
     void SetUp();
     void TearDown();
 };
 
-void FmsFormMgrAdapterTest3::SetUp() {}
-void FmsFormMgrAdapterTest3::TearDown() {}
+void FmsFormMgrAdapterTest3::SetUp()
+{
+    formItemInfo_ = new FormItemInfo();
+    callerToken_ = new sptr<IRemoteObject>();
+    formJsInfo_ = new FormJsInfo();
+    formResultMutex_.lock();
+    formIdMap_.clear();
+    formResultMutex_.unlock();
+}
+void FmsFormMgrAdapterTest3::TearDown()
+{
+    delete formItemInfo_;
+    formItemInfo_ = nullptr;
+    delete callerToken_;
+    callerToken_ = nullptr;
+    delete formJsInfo_;
+    formJsInfo_ = nullptr;
+    formResultMutex_.lock();
+    formIdMap_.clear();
+    formResultMutex_.unlock();
+}
 
 /**
  * @tc.name: FormMgrAdapter_0246
@@ -656,15 +680,286 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0274, TestSize.Level0)
 
 /**
  * @tc.name: FormMgrAdapter_0275
- * @tc.desc: test RefreshFormsByScreenOn function.
+ * @tc.desc: test AllotForm function.
  * @tc.type: FUNC
  */
-HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0275, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormMgrAdapter_0275 start";
-    FormMgrAdapter formMgrAdapter;
-    auto ret = formMgrAdapter.RefreshFormsByScreenOn();
-    EXPECT_EQ(ret, ERR_OK);
-    GTEST_LOG_(INFO) << "FormMgrAdapter_0275 end";
-}
+ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0275, TestSize.Level1)
+ {
+     GTEST_LOG_(INFO) << "FormMgrAdapter_0275 start";
+     FormMgrAdapter formMgrAdapter;
+     int64_t formId = 0;
+     Want want;
+     // Set up Want parameters for share form
+     want.SetParam(Constants::KEY_DIRECT_CALL_INAPP, true);
+     want.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, false);
+ 
+     // Set up FormItemInfo
+     formItemInfo_->SetProviderBundleName("providerBundle");
+     formItemInfo_->SetHostBundleName("hostBundle");
+     formItemInfo_->SetTransparencyEnabled(false);
+ 
+     // Call the method under test
+     ErrCode ret = formMgrAdapter.AllotForm(formId, want, *callerToken_, *formJsInfo_, *formItemInfo_);
+ 
+     // Verify the result
+     EXPECT_EQ(ret, 2293761);
+     GTEST_LOG_(INFO) << "FormMgrAdapter_0275 end";
+ }
+ 
+ /**
+  * @tc.name: FormMgrAdapter_0276
+  * @tc.desc: test AllotForm function.
+  * @tc.type: FUNC
+  */
+ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0276, TestSize.Level1)
+ {
+     GTEST_LOG_(INFO) << "FormMgrAdapter_0276 start";
+     FormMgrAdapter formMgrAdapter;
+     int64_t formId = 123;
+     Want want;
+     // Set up Want parameters for specific form
+     want.SetParam(Constants::PARAM_FORM_MIGRATE_FORM_KEY, true);
+ 
+     // Set up FormItemInfo
+     formItemInfo_->SetProviderBundleName("providerBundle");
+     formItemInfo_->SetHostBundleName("hostBundle");
+     formItemInfo_->SetTransparencyEnabled(false);
+ 
+     // Call the method under test
+     ErrCode ret = formMgrAdapter.AllotForm(formId, want, *callerToken_, *formJsInfo_, *formItemInfo_);
+ 
+     // Verify the result
+     EXPECT_EQ(ret, 2293780);
+     GTEST_LOG_(INFO) << "FormMgrAdapter_0276 end";
+ }
+ 
+ /**
+  * @tc.name: FormMgrAdapter_0277
+  * @tc.desc: test AllotForm function.
+  * @tc.type: FUNC
+  */
+ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0277, TestSize.Level1)
+ {
+     GTEST_LOG_(INFO) << "FormMgrAdapter_0277 start";
+     FormMgrAdapter formMgrAdapter;
+     int64_t formId = 456;
+     Want want;
+     // Set up Want parameters for non-specific form
+     want.SetParam(Constants::PARAM_FORM_MIGRATE_FORM_KEY, false);
+ 
+     // Set up FormItemInfo
+     formItemInfo_->SetProviderBundleName("providerBundle");
+     formItemInfo_->SetHostBundleName("hostBundle");
+     formItemInfo_->SetTransparencyEnabled(false);
+ 
+     // Call the method under test
+     ErrCode ret = formMgrAdapter.AllotForm(formId, want, *callerToken_, *formJsInfo_, *formItemInfo_);
+ 
+     // Verify the result
+     EXPECT_EQ(ret, 2293780);
+     GTEST_LOG_(INFO) << "FormMgrAdapter_0277 end";
+ }
+ 
+ /**
+  * @tc.name: FormMgrAdapter_0278
+  * @tc.desc: test AllotForm function.
+  * @tc.type: FUNC
+  */
+ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0278, TestSize.Level1)
+ {
+     GTEST_LOG_(INFO) << "FormMgrAdapter_0278 start";
+     FormMgrAdapter formMgrAdapter;
+     int64_t formId = 0;
+     Want want;
+     // Set up Want parameters for temporary form
+     want.SetParam(Constants::PARAM_FORM_TEMPORARY_KEY, true);
+ 
+     // Set up FormItemInfo
+     formItemInfo_->SetProviderBundleName("providerBundle");
+     formItemInfo_->SetHostBundleName("hostBundle");
+     formItemInfo_->SetTransparencyEnabled(false);
+ 
+     // Call the method under test
+     ErrCode ret = formMgrAdapter.AllotForm(formId, want, *callerToken_, *formJsInfo_, *formItemInfo_);
+ 
+     // Verify the result
+     EXPECT_EQ(ret, 2293761);
+     GTEST_LOG_(INFO) << "FormMgrAdapter_0278 end";
+ }
+ 
+ /**
+  * @tc.name: FormMgrAdapter_0279
+  * @tc.desc: test CheckAddFormTaskTimeoutOrFailed function.
+  * @tc.type: FUNC
+  */
+ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0279, TestSize.Level1)
+ {
+     GTEST_LOG_(INFO) << "FormMgrAdapter_0279 start";
+     FormMgrAdapter formMgrAdapter;
+     int64_t formId = 123;
+     AddFormResultErrorCode expectedState = AddFormResultErrorCode::SUCCESS;
+     formResultMutex_.lock();
+     formIdMap_[formId] = AddFormResultErrorCode::SUCCESS;
+     formResultMutex_.unlock();
+ 
+     AddFormResultErrorCode formStates = AddFormResultErrorCode::UNKNOWN;
+     formMgrAdapter.CheckAddFormTaskTimeoutOrFailed(formId, formStates);
+     GTEST_LOG_(INFO) << "FormMgrAdapter_0279 end";
+ }
+ 
+ /**
+  * @tc.name: FormMgrAdapter_0280
+  * @tc.desc: Test case for CheckAddFormTaskTimeoutOrFailed when form task is failed
+  * @tc.type: FUNC
+  */
+ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0280, TestSize.Level1)
+ {
+     GTEST_LOG_(INFO) << "FormMgrAdapter_0280 start";
+     FormMgrAdapter formMgrAdapter;
+     int64_t formId = 456;
+     formResultMutex_.lock();
+     formIdMap_[formId] = AddFormResultErrorCode::FAILED;
+     formResultMutex_.unlock();
+ 
+     AddFormResultErrorCode formStates = AddFormResultErrorCode::UNKNOWN;
+     ErrCode ret = formMgrAdapter.CheckAddFormTaskTimeoutOrFailed(formId, formStates);
+ 
+     EXPECT_EQ(ret, ERR_OK);
+     // formStates should remain unchanged as it's only set for SUCCESS case
+     EXPECT_NE(formStates, AddFormResultErrorCode::SUCCESS);
+     GTEST_LOG_(INFO) << "FormMgrAdapter_0280 end";
+ }
+ 
+ /**
+  * @tc.name: FormMgrAdapter_0281
+  * @tc.desc: Test case for CheckAddFormTaskTimeoutOrFailed when form task is timed out
+  * @tc.type: FUNC
+  */
+ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0281, TestSize.Level1)
+ {
+     GTEST_LOG_(INFO) << "FormMgrAdapter_0281 start";
+     FormMgrAdapter formMgrAdapter;
+     int64_t formId = 789;
+     formResultMutex_.lock();
+     formIdMap_[formId] = AddFormResultErrorCode::TIMEOUT;
+     formResultMutex_.unlock();
+ 
+     AddFormResultErrorCode formStates = AddFormResultErrorCode::UNKNOWN;
+     ErrCode ret = formMgrAdapter.CheckAddFormTaskTimeoutOrFailed(formId, formStates);
+ 
+     EXPECT_EQ(ret, ERR_OK);
+     // formStates should remain unchanged as it's only set for SUCCESS case
+     EXPECT_NE(formStates, AddFormResultErrorCode::SUCCESS);
+     GTEST_LOG_(INFO) << "FormMgrAdapter_0281 end";
+ }
+ 
+ /**
+  * @tc.name: FormMgrAdapter_0282
+  * @tc.desc: Test case for CheckAddFormTaskTimeoutOrFailed when form task is in unknown state
+  * @tc.type: FUNC
+  */
+ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0282, TestSize.Level1)
+ {
+     GTEST_LOG_(INFO) << "FormMgrAdapter_0282 start";
+     FormMgrAdapter formMgrAdapter;
+     int64_t formId = 101;
+     formResultMutex_.lock();
+     formIdMap_[formId] = AddFormResultErrorCode::UNKNOWN;
+     formResultMutex_.unlock();
+ 
+     AddFormResultErrorCode formStates = AddFormResultErrorCode::UNKNOWN;
+     ErrCode ret = formMgrAdapter.CheckAddFormTaskTimeoutOrFailed(formId, formStates);
+ 
+     EXPECT_EQ(ret, ERR_OK);
+     EXPECT_EQ(formStates, AddFormResultErrorCode::UNKNOWN);
+     GTEST_LOG_(INFO) << "FormMgrAdapter_0282 end";
+ }
+ 
+ /**
+  * @tc.name: FormMgrAdapter_0283
+  * @tc.desc: Test case for CheckAddFormTaskTimeoutOrFailed when form task does not exist
+  * @tc.type: FUNC
+  */
+ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0283, TestSize.Level1)
+ {
+     GTEST_LOG_(INFO) << "FormMgrAdapter_0283 start";
+     FormMgrAdapter formMgrAdapter;
+     int64_t formId = 202;
+     AddFormResultErrorCode formStates = AddFormResultErrorCode::UNKNOWN;
+     ErrCode ret = formMgrAdapter.CheckAddFormTaskTimeoutOrFailed(formId, formStates);
+ 
+     EXPECT_EQ(ret, ERR_OK);
+     // formStates remains as UNKNOWN since the formId was not found
+     EXPECT_EQ(formStates, AddFormResultErrorCode::UNKNOWN);
+     GTEST_LOG_(INFO) << "FormMgrAdapter_0283 end";
+ }
+ 
+ /**
+  * @tc.name: FormMgrAdapter_0284
+  * @tc.desc: Test case for UpdateReUpdateFormMap when formId is added and some entries are expired
+  * @tc.type: FUNC
+  */
+ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0284, TestSize.Level1)
+ {
+     GTEST_LOG_(INFO) << "FormMgrAdapter_0284 start";
+     FormMgrAdapter formMgrAdapter;
+     int64_t formId = 123;
+     formMgrAdapter.UpdateReUpdateFormMap(formId);
+     formMgrAdapter.SetReUpdateFormMap(formId);
+     formMgrAdapter.UpdateReUpdateFormMap(formId);
+     formMgrAdapter.SetReUpdateFormMap(formId);
+     GTEST_LOG_(INFO) << "FormMgrAdapter_0284 end";
+ }
+ 
+ /**
+  * @tc.name: FormMgrAdapter_0285
+  * @tc.desc: Test case for SetVisibleChange
+  * @tc.type: FUNC
+  */
+ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0285, TestSize.Level1)
+ {
+     GTEST_LOG_(INFO) << "FormMgrAdapter_0285 start";
+     FormMgrAdapter formMgrAdapter;
+     int64_t formId = 0;
+     int32_t formVisibleType = 0;
+     formMgrAdapter.SetVisibleChange(formId, formVisibleType);
+     GTEST_LOG_(INFO) << "FormMgrAdapter_0285 end";
+ }
+ 
+ /**
+  * @tc.name: FormMgrAdapter_0286
+  * @tc.desc: Test case for SetVisibleChange
+  * @tc.type: FUNC
+  */
+ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0286, TestSize.Level1)
+ {
+     GTEST_LOG_(INFO) << "FormMgrAdapter_0286 start";
+     FormMgrAdapter formMgrAdapter;
+     int64_t formId = 1;
+     int32_t formVisibleType = Constants::FORM_VISIBLE;
+     formMgrAdapter.SetVisibleChange(formId, formVisibleType);
+     GTEST_LOG_(INFO) << "FormMgrAdapter_0286 end";
+ }
+ 
+ /**
+  * @tc.name: FormMgrAdapter_0287
+  * @tc.desc: Test case for SetVisibleChange
+  * @tc.type: FUNC
+  */
+ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0287, TestSize.Level1)
+ {
+     GTEST_LOG_(INFO) << "FormMgrAdapter_0287 start";
+     FormMgrAdapter formMgrAdapter;
+     auto ret = formMgrAdapter.RefreshFormsByScreenOn();
+     EXPECT_EQ(ret, ERR_OK);
+     Want want;
+     FormItemInfo formItemInfo;
+     formMgrAdapter.GetFormConfigInfo(want, formItemInfo);
+     FormInfo formInfo;
+     FormItemInfo formConfigInfo;
+     int formLocation = 0;
+     formMgrAdapter.SetFormEnableAndLockState(formInfo, formConfigInfo, formLocation);
+     formMgrAdapter.SetLockFormStateOfFormItemInfo(formInfo, formConfigInfo);
+     GTEST_LOG_(INFO) << "FormMgrAdapter_0287 end";
+ }
 }

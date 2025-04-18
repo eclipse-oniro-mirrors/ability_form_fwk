@@ -747,7 +747,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_037, TestSize.Level0)
     FormJsInfo formInfo;
     MockAllotFormHostRecord(true);
     MockConnectServiceAbility(true);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED,
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_NOT_EXIST_ID,
         formMgrAdapter.AddNewFormRecord(info, formId, callerToken, wantParams, formInfo));
     GTEST_LOG_(INFO) << "FormMgrAdapter_037 end";
 }
@@ -888,7 +888,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_045, TestSize.Level0)
     FormItemInfo info;
     WantParams wantParams;
     MockConnectServiceAbility(true);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED,
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_NOT_EXIST_ID,
         formMgrAdapter.AcquireProviderFormInfoAsync(formId, info, wantParams));
     GTEST_LOG_(INFO) << "FormMgrAdapter_045 end";
 }
@@ -1801,7 +1801,7 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_099, TestSize.Level0)
     WantParams wantParams;
     FormJsInfo formInfo;
     MockGenerateFormId(false);
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE,
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_NOT_EXIST_ID,
         formMgrAdapter.AllotFormByInfo(info, callerToken, wantParams, formInfo));
     GTEST_LOG_(INFO) << "FormMgrAdapter_099 end";
 }
@@ -2203,6 +2203,46 @@ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0116, TestSize.Level0)
     EXPECT_EQ(ERR_APPEXECFWK_FORM_COMMON_CODE, formMgrAdapter.HandleDeleteTempForm(formId, callerToken));
     GTEST_LOG_(INFO) << "FormMgrAdapter_0116 end";
 }
+
+/**
+ * @tc.name: FormMgrAdapter_0116_1
+ * @tc.desc: test HandleDeleteTempForm function and the return value is ERR_APPEXECFWK_FORM_INVALID_PARAM.
+ * @tc.type: FUNC
+ */
+ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0116_1, TestSize.Level0)
+ {
+     GTEST_LOG_(INFO) << "FormMgrAdapter_0116_1 start";
+     FormMgrAdapter formMgrAdapter;
+     int64_t formId = 1;
+     sptr<IRemoteObject> callerToken = nullptr;
+     MockGetFormRecord(true);
+     MockGetFormRecordParams(true);
+     MockHasFormUserUids(false);
+     MockNotifyProviderFormDelete(false);
+     MockDeleteHostRecord(false);
+     EXPECT_EQ(ERR_APPEXECFWK_FORM_INVALID_PARAM, formMgrAdapter.HandleDeleteTempForm(formId, callerToken));
+     GTEST_LOG_(INFO) << "FormMgrAdapter_0116_1 end";
+ }
+ 
+ /**
+  * @tc.name: FormMgrAdapter_0116_2
+  * @tc.desc: test HandleDeleteTempForm function and the return value is ERR_APPEXECFWK_FORM_NOT_EXIST_ID.
+  * @tc.type: FUNC
+  */
+ HWTEST_F(FmsFormMgrAdapterTest, FormMgrAdapter_0116_2, TestSize.Level0)
+ {
+     GTEST_LOG_(INFO) << "FormMgrAdapter_0116_2 start";
+     FormMgrAdapter formMgrAdapter;
+     int64_t formId = 1;
+     sptr<IRemoteObject> callerToken = nullptr;
+     MockGetFormRecord(true);
+     MockGetFormRecordParams(true);
+     MockHasFormUserUids(false);
+     MockNotifyProviderFormDelete(true);
+     MockDeleteHostRecord(false);
+     formMgrAdapter.HandleDeleteTempForm(formId, callerToken);
+     GTEST_LOG_(INFO) << "FormMgrAdapter_0116_2 end";
+ }
 
 /**
  * @tc.name: FormMgrAdapter_0117

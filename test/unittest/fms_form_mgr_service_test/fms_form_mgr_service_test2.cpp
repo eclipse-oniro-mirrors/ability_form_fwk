@@ -41,6 +41,7 @@
 #include "gmock/gmock.h"
 #include "mock_ability_manager.h"
 #include "mock_form_params.h"
+#include "system_ability_definition.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -1168,5 +1169,191 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0130, TestSize.Level1)
     MockCheckAcrossLocalAccountsPermission(true);
     EXPECT_EQ(ERR_OK, formMgrService.GetFormsInfoByFilter(filter, formInfos));
     GTEST_LOG_(INFO) << "FormMgrService_0130 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0131
+ * @tc.name: test OnStart function.
+ * @tc.desc: Verify that the OnStart
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0131, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0131 start";
+    FormMgrService formMgrService;
+    formMgrService.OnStart();
+    GTEST_LOG_(INFO) << "FormMgrService_0131 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0132
+ * @tc.name: test SubscribeSysEventReceiver function.
+ * @tc.desc: Verify that the SubscribeSysEventReceiver
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0132, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0132 start";
+    FormMgrService formMgrService;
+    formMgrService.SubscribeSysEventReceiver();
+    GTEST_LOG_(INFO) << "FormMgrService_0132 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0133
+ * @tc.name: test FormMgrService function.
+ * @tc.desc: Verify that the FormMgrService
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0133, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0133 start";
+    FormMgrService* service = new FormMgrService();
+    service->Init();
+    service->SubscribeSysEventReceiver();
+    delete service;
+    GTEST_LOG_(INFO) << "FormMgrService_0133 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0134
+ * @tc.name: test CheckFMSReady function.
+ * @tc.desc: userId == Constants::ANY_USERID.
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0134, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0134 start";
+    FormMgrService formMgrService;
+    formMgrService.state_ = ServiceRunningState::STATE_RUNNING;
+    constexpr int32_t userId = Constants::ANY_USERID;
+
+    EXPECT_FALSE(formMgrService.CheckFMSReady());
+    GTEST_LOG_(INFO) << "FormMgrService_0134 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0135
+ * @tc.name: test IsSystemAppForm function.
+ * @tc.desc: !formRecords.empty()
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0135, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0135 start";
+    FormMgrService formMgrService;
+    std::string bundleName = "bundleName";
+    EXPECT_FALSE(formMgrService.IsSystemAppForm(bundleName));
+    GTEST_LOG_(INFO) << "FormMgrService_0135 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0136
+ * @tc.name: test IsSystemAppForm function.
+ * @tc.desc: formRecords.empty()
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0136, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0136 start";
+    FormMgrService formMgrService;
+    std::string bundleName = "bundleName";
+
+    EXPECT_FALSE(formMgrService.IsSystemAppForm(bundleName));
+    GTEST_LOG_(INFO) << "FormMgrService_0136 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0137
+ * @tc.name: test HasFormVisible function.
+ * @tc.desc: formRecords.empty()
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0137, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0137 start";
+    FormMgrService formMgrService;
+    uint32_t tokenId = 1;
+    MockIsSACall(false);
+    EXPECT_FALSE(formMgrService.HasFormVisible(tokenId));
+    GTEST_LOG_(INFO) << "FormMgrService_0137 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0138
+ * @tc.name: test HasFormVisible function.
+ * @tc.desc: formRecords.empty()
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0138, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0138 start";
+    FormMgrService formMgrService;
+    std::string abilityName = "abilityName";
+    int64_t formId = 1;
+    formMgrService.SubscribeSysEventReceiver();
+    formMgrService.OnStart();
+    formMgrService.OnStop();
+    formMgrService.SubscribeSysEventReceiver();
+    RunningFormInfo formInfo;
+    std::vector<RunningFormInfo> formInfos;
+    Want want;
+    formMgrService.StartAbilityByFms(want);
+    std::vector<std::u16string> args;
+    std::string result = "result";
+    int fd = 1;
+    formMgrService.Dump(fd, args);
+    formMgrService.Dump(args, result);
+    formMgrService.SetNetConnect();
+    formMgrService.SetDisConnectTypeTime();
+    formMgrService.OpenFormEditAbility(abilityName, formId, true);
+    formMgrService.OpenFormEditAbility(abilityName, formId, false);
+    GTEST_LOG_(INFO) << "FormMgrService_0138 end";
+}
+
+/**
+ * @tc.number: FormMgrService_0139
+ * @tc.name: test RegisterPublishFormInterceptor function.
+ * @tc.desc: Verify that the RegisterPublishFormInterceptor interface is called normally
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0139, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0139 start";
+    FormMgrService formMgrService;
+    const sptr<IRemoteObject> callerToken = nullptr;
+    EXPECT_EQ(formMgrService.RegisterPublishFormInterceptor(callerToken), ERR_APPEXECFWK_FORM_PERMISSION_DENY);
+    EXPECT_EQ(formMgrService.UnregisterPublishFormInterceptor(callerToken), ERR_APPEXECFWK_FORM_PERMISSION_DENY);
+    GTEST_LOG_(INFO) << "FormMgrService_0139 end";
+}
+
+// FormMgrService_0140-0179 in file fms_form_mgr_service_test.cpp
+
+/**
+ * @tc.number: FormMgrService_0180
+ * @tc.name: test formMgrService function.
+ * @tc.desc: Verify
+ */
+HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0180, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormMgrService_0180 start";
+    FormMgrService formMgrService;
+    int64_t formId = 1;
+    std::string abilityName = "abilityName";
+    std::string bundleName = "bundleName";
+    float width = 1;
+    float height = 1;
+    float borderWidth = 1;
+    FormLockInfo formLockInfo;
+    formLockInfo.bundleName = "bundleName";
+    formLockInfo.userId = 1;
+    formLockInfo.lock = true;
+    FormLockInfo formLockInfo1;
+    std::vector<FormLockInfo> formLockInfos = {formLockInfo, formLockInfo1};
+    MockIsSACall(false);
+    formMgrService.LockForms(formLockInfos, LockChangeType::SWITCH_CHANGE);
+    formMgrService.IsFormBundleProtected(bundleName, formId);
+    formMgrService.IsFormBundleExempt(formId);
+    formMgrService.NotifyFormLocked(formId, true);
+    formMgrService.UpdateFormSize(formId, width, height, borderWidth);
+    MockIsSACall(true);
+    formMgrService.LockForms(formLockInfos, LockChangeType::SWITCH_CHANGE);
+    formMgrService.LockForms(formLockInfos, LockChangeType::PROTECT_CHANGE);
+    formMgrService.IsFormBundleProtected(bundleName, formId);
+    formMgrService.IsFormBundleExempt(formId);
+    formMgrService.NotifyFormLocked(formId, true);
+    formMgrService.UpdateFormSize(formId, width, height, borderWidth);
+    GTEST_LOG_(INFO) << "FormMgrService_0180 end";
 }
 }

@@ -528,6 +528,9 @@ HWTEST_F(FmsFormMgrServiceTest, FormMgrService_0020, TestSize.Level1)
 
     MockCheckInvalidForm(ERR_OK);
     EXPECT_EQ(formMgrService.ShareForm(formId, deviceId, callerToken, requestCode), ERR_OK);
+
+    sptr<IRemoteObject> callerToken1 = nullptr;
+    EXPECT_EQ(formMgrService.ShareForm(formId, deviceId, callerToken1, requestCode), ERR_APPEXECFWK_FORM_COMMON_CODE);
     GTEST_LOG_(INFO) << "FormMgrService_0020 end";
 }
 
