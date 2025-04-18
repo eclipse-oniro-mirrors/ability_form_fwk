@@ -1323,7 +1323,7 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0139, TestSize.Level1)
 /**
  * @tc.number: FormMgrService_0180
  * @tc.name: test formMgrService function.
- * @tc.desc: Verify 
+ * @tc.desc: Verify
  */
 HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0180, TestSize.Level1)
 {
