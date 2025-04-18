@@ -680,20 +680,6 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0274, TestSize.Level0)
 
 /**
  * @tc.name: FormMgrAdapter_0275
- * @tc.desc: test RefreshFormsByScreenOn function.
- * @tc.type: FUNC
- */
-HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0275, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "FormMgrAdapter_0275 start";
-    FormMgrAdapter formMgrAdapter;
-    auto ret = formMgrAdapter.RefreshFormsByScreenOn();
-    EXPECT_EQ(ret, ERR_OK);
-    GTEST_LOG_(INFO) << "FormMgrAdapter_0275 end";
-}
-
-/**
- * @tc.name: FormMgrAdapter_0275
  * @tc.desc: test AllotForm function.
  * @tc.type: FUNC
  */
@@ -817,7 +803,7 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0275, TestSize.Level0)
      formResultMutex_.unlock();
  
      AddFormResultErrorCode formStates = AddFormResultErrorCode::UNKNOWN;
-     ErrCode ret = formMgrAdapter.CheckAddFormTaskTimeoutOrFailed(formId, formStates);
+     formMgrAdapter.CheckAddFormTaskTimeoutOrFailed(formId, formStates);
      GTEST_LOG_(INFO) << "FormMgrAdapter_0279 end";
  }
  
@@ -964,6 +950,8 @@ HWTEST_F(FmsFormMgrAdapterTest3, FormMgrAdapter_0275, TestSize.Level0)
  {
      GTEST_LOG_(INFO) << "FormMgrAdapter_0287 start";
      FormMgrAdapter formMgrAdapter;
+     auto ret = formMgrAdapter.RefreshFormsByScreenOn();
+     EXPECT_EQ(ret, ERR_OK);
      Want want;
      FormItemInfo formItemInfo;
      formMgrAdapter.GetFormConfigInfo(want, formItemInfo);
