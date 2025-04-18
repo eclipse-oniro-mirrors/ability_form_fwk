@@ -1139,6 +1139,25 @@ void FormDataMgr::ClearWantCache(const int64_t formId)
 }
 
 /**
+ * @brief Clear host refresh flag.
+ * @param formId The Id of the form.
+ */
+void FormDataMgr::ClearHostRefreshFlag(const int64_t formId)
+{
+    std::lock_guard<std::mutex> lock(formRecordMutex_);
+    auto itFormRecord = formRecords_.find(formId);
+    if (itFormRecord == formRecords_.end()) {
+        HILOG_ERROR("form info not find, form:%{public}" PRId64, formId);
+        return;
+    }
+    if (itFormRecord->second.isHostRefresh) {
+        HILOG_INFO("clean host refresh flag, form:%{public}" PRId64, formId);
+        itFormRecord->second.isHostRefresh = false;
+        itFormRecord->second.wantCacheMap.clear();
+    }
+}
+
+/**
  * @brief Get updated form.
  * @param record FormRecord.
  * @param targetForms Target forms.

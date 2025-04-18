@@ -309,12 +309,6 @@ ErrCode FormProviderMgr::ConnectAmsForRefresh(const int64_t formId,
         FormDataMgr::GetInstance().SetTimerRefresh(formId, false);
     }
 
-    if (record.isHostRefresh) {
-        HILOG_INFO("clean host refresh flag, form:%{public}" PRId64, formId);
-        FormDataMgr::GetInstance().SetHostRefresh(formId, false);
-        FormDataMgr::GetInstance().ClearWantCache(formId);
-    }
-
     return ERR_OK;
 }
 
