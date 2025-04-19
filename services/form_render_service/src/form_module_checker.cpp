@@ -45,7 +45,8 @@ const std::vector<std::string> MODULE_ALLOW_LIST = {
     "measure",
     "intl",
     "systemDateTime",
-    "batteryInfo"
+    "batteryInfo",
+    "commonEventManager"
 };
 const std::vector<std::string> MODULE_ALLOW_WITH_API_LIST = {
     "i18n",
@@ -65,6 +66,7 @@ const std::vector<std::string> API_ALLOW_LIST = {
     "i18n.getCalendar"
     "i18n.Calendar.*",
     "i18n.TimeZone.*",
+    "i18n.Unicode.*",
     "font.registerFont",
     "multimedia.image.PixelMapFormat.*",
     "multimedia.image.Size.*",
