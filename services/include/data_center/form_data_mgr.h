@@ -334,6 +334,12 @@ public:
     void ClearWantCache(const int64_t formId);
     
     /**
+    * @brief Clear host refresh flag.
+    * @param formId The Id of the form.
+    */
+    void ClearHostRefreshFlag(const int64_t formId);
+    
+    /**
      * @brief Get updated form info.
      * @param record FormRecord.
      * @param targetForms Target forms.
