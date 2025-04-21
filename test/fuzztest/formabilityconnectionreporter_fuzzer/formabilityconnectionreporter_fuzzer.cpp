@@ -51,7 +51,7 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     return true;
 }
 
-bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
+bool DoSomethingInterestingWithMyAPI8(const char* data, size_t size)
 {
     FormAbilityConnectionReporter formAbilityConnectionReporter;
     std::string bundleName(data, size);
