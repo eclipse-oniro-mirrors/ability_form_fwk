@@ -1120,7 +1120,7 @@ HWTEST_F(FmsFormDataProxyRecordTest, FmsFormDataProxyRecordTest_051, TestSize.Le
     nlohmann::json object;
     formDataProxyRecord.UpdateRdbDataForm(data);
     GTEST_LOG_(INFO) << "FmsFormDataProxyRecordTest_051 end";
- }
+}
  
 /**
  * @tc.number: FmsFormDataProxyRecordTest_075
