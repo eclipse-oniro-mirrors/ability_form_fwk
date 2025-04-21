@@ -301,6 +301,146 @@ HWTEST_F(FormProviderCallerTest, FormProviderCallerTest_0011, TestSize.Level1)
 }
 
 /**
+ * @tc.name: FormProviderCallerTest_0012
+ * @tc.desc: text DeleteForm function and callerToken is not nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormProviderCallerTest, FormProviderCallerTest_0012, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormProviderCallerTest_0012 starts";
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = 5;
+    FormProviderCaller formProviderCaller(nullptr);
+    formProviderCaller.AddForm(formJsInfo);
+    EXPECT_EQ(
+        formProviderCaller.formJsInfoMap_.find(formJsInfo.formId) != formProviderCaller.formJsInfoMap_.end(), true);
+    formProviderCaller.DeleteForm(formJsInfo.formId);
+    EXPECT_EQ(
+        formProviderCaller.formJsInfoMap_.find(formJsInfo.formId) == formProviderCaller.formJsInfoMap_.end(), true);
+    GTEST_LOG_(INFO) << "FormProviderCallerTest_0012 test ends";
+}
+
+/**
+ * @tc.name: FormProviderCallerTest_0013
+ * @tc.desc: text DeleteForm function and callerToken is not nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormProviderCallerTest, FormProviderCallerTest_0013, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormProviderCallerTest_0013 starts";
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = 5;
+    FormProviderCaller formProviderCaller(nullptr);
+    formProviderCaller.AddForm(formJsInfo);
+    EXPECT_EQ(
+        formProviderCaller.formJsInfoMap_.find(formJsInfo.formId) != formProviderCaller.formJsInfoMap_.end(), true);
+    formProviderCaller.DeleteForm(formJsInfo.formId);
+    EXPECT_EQ(
+        formProviderCaller.formJsInfoMap_.find(formJsInfo.formId) == formProviderCaller.formJsInfoMap_.end(), true);
+    GTEST_LOG_(INFO) << "FormProviderCallerTest_0013 test ends";
+}
+
+/**
+ * @tc.name: FormProviderCallerTest_0014
+ * @tc.desc: text DeleteForm function and callerToken is not nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormProviderCallerTest, FormProviderCallerTest_0014, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormProviderCallerTest_0014 starts";
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = 5;
+    FormProviderCaller formProviderCaller(nullptr);
+    formProviderCaller.AddForm(formJsInfo);
+    EXPECT_EQ(
+        formProviderCaller.formJsInfoMap_.find(formJsInfo.formId) != formProviderCaller.formJsInfoMap_.end(), true);
+    formProviderCaller.DeleteForm(formJsInfo.formId);
+    EXPECT_EQ(
+        formProviderCaller.formJsInfoMap_.find(formJsInfo.formId) == formProviderCaller.formJsInfoMap_.end(), true);
+    GTEST_LOG_(INFO) << "FormProviderCallerTest_0014 test ends";
+}
+
+/**
+ * @tc.name: FormProviderCallerTest_0015
+ * @tc.desc: text DeleteForm function and callerToken is not nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormProviderCallerTest, FormProviderCallerTest_0015, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormProviderCallerTest_0015 starts";
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = 5;
+    FormProviderCaller formProviderCaller(nullptr);
+    formProviderCaller.AddForm(formJsInfo);
+    EXPECT_EQ(
+        formProviderCaller.formJsInfoMap_.find(formJsInfo.formId) != formProviderCaller.formJsInfoMap_.end(), true);
+    formProviderCaller.DeleteForm(formJsInfo.formId);
+    EXPECT_EQ(
+        formProviderCaller.formJsInfoMap_.find(formJsInfo.formId) == formProviderCaller.formJsInfoMap_.end(), true);
+    GTEST_LOG_(INFO) << "FormProviderCallerTest_0015 test ends";
+}
+
+/**
+ * @tc.name: FormProviderCallerTest_0016
+ * @tc.desc: text DeleteForm function and callerToken is not nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormProviderCallerTest, FormProviderCallerTest_0016, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormProviderCallerTest_0016 starts";
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = 5;
+    FormProviderCaller formProviderCaller(nullptr);
+    formProviderCaller.AddForm(formJsInfo);
+    EXPECT_EQ(
+        formProviderCaller.formJsInfoMap_.find(formJsInfo.formId) != formProviderCaller.formJsInfoMap_.end(), true);
+    formProviderCaller.DeleteForm(formJsInfo.formId);
+    EXPECT_EQ(
+        formProviderCaller.formJsInfoMap_.find(formJsInfo.formId) == formProviderCaller.formJsInfoMap_.end(), true);
+    GTEST_LOG_(INFO) << "FormProviderCallerTest_0016 test ends";
+}
+
+/**
+ * @tc.name: FormProviderCallerTest_0017
+ * @tc.desc: text DeleteForm function and callerToken is not nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormProviderCallerTest, FormProviderCallerTest_0017, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormProviderCallerTest_0017 starts";
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = 5;
+    FormProviderCaller formProviderCaller(nullptr);
+    formProviderCaller.AddForm(formJsInfo);
+    EXPECT_EQ(
+        formProviderCaller.formJsInfoMap_.find(formJsInfo.formId) != formProviderCaller.formJsInfoMap_.end(), true);
+    formProviderCaller.DeleteForm(formJsInfo.formId);
+    EXPECT_EQ(
+        formProviderCaller.formJsInfoMap_.find(formJsInfo.formId) == formProviderCaller.formJsInfoMap_.end(), true);
+    GTEST_LOG_(INFO) << "FormProviderCallerTest_0017 test ends";
+}
+
+/**
+ * @tc.name: FormProviderCallerTest_0018
+ * @tc.desc: text DeleteForm function and callerToken is not nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormProviderCallerTest, FormProviderCallerTest_0018, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormProviderCallerTest_0018 starts";
+    FormJsInfo formJsInfo;
+    formJsInfo.formId = 5;
+    FormProviderCaller formProviderCaller(nullptr);
+    formProviderCaller.AddForm(formJsInfo);
+    EXPECT_EQ(
+        formProviderCaller.formJsInfoMap_.find(formJsInfo.formId) != formProviderCaller.formJsInfoMap_.end(), true);
+    formProviderCaller.DeleteForm(formJsInfo.formId);
+    EXPECT_EQ(
+        formProviderCaller.formJsInfoMap_.find(formJsInfo.formId) == formProviderCaller.formJsInfoMap_.end(), true);
+    GTEST_LOG_(INFO) << "FormProviderCallerTest_0018 test ends";
+}
+
+/**
  * @tc.name: FormHostCallerTest_0005
  * @tc.desc: text IsSameToken function and callerToken_ is nullptr .
  * @tc.type: FUNC
