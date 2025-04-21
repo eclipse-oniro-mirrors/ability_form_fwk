@@ -69,6 +69,321 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formDataMgr.HandleHostDied(remoteHost);
     return true;
 }
+
+bool DoSomethingInterestingWithMyAPI0(const char* data, size_t size)
+{
+    FormDataMgr formDataMgr;
+    int formUserUid = static_cast<int>(GetU32Data(data));
+    std::vector<int> formUserUids;
+    formUserUids.emplace_back(formUserUid);
+    formDataMgr.IsCallingUidValid(formUserUids);
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    bool formTempFlag = *data % ENABLE;
+    formDataMgr.ModifyFormTempFlag(formId, formTempFlag);
+    formDataMgr.AddFormUserUid(formId, formUserUid);
+    int uid = static_cast<int>(GetU32Data(data));
+    formDataMgr.DeleteFormUserUid(formId, uid);
+    FormRecord formRecord;
+    formDataMgr.UpdateFormRecord(formId, formRecord);
+    std::string bundleName(data, size);
+    std::vector<FormRecord> formInfos;
+    formInfos.emplace_back(formRecord);
+    formDataMgr.GetFormRecord(bundleName, formInfos);
+    formDataMgr.ExistFormRecord(formId);
+    formDataMgr.HasFormUserUids(formId);
+    FormHostRecord formHostRecord;
+    std::vector<FormHostRecord> formHostRecords;
+    formHostRecords.emplace_back(formHostRecord);
+    formDataMgr.GetFormHostRecord(formId, formHostRecords);
+    sptr<IRemoteObject> callerToken = nullptr;
+    formDataMgr.DeleteHostRecord(callerToken, formId);
+    std::vector<int64_t> removedFormIds;
+    removedFormIds.emplace_back(formId);
+    formDataMgr.CleanHostRemovedForms(removedFormIds);
+    sptr<IRemoteObject> remoteHost = nullptr;
+    formDataMgr.HandleHostDied(remoteHost);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI1(const char* data, size_t size)
+{
+    FormDataMgr formDataMgr;
+    int formUserUid = static_cast<int>(GetU32Data(data));
+    std::vector<int> formUserUids;
+    formUserUids.emplace_back(formUserUid);
+    formDataMgr.IsCallingUidValid(formUserUids);
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    bool formTempFlag = *data % ENABLE;
+    formDataMgr.ModifyFormTempFlag(formId, formTempFlag);
+    formDataMgr.AddFormUserUid(formId, formUserUid);
+    int uid = static_cast<int>(GetU32Data(data));
+    formDataMgr.DeleteFormUserUid(formId, uid);
+    FormRecord formRecord;
+    formDataMgr.UpdateFormRecord(formId, formRecord);
+    std::string bundleName(data, size);
+    std::vector<FormRecord> formInfos;
+    formInfos.emplace_back(formRecord);
+    formDataMgr.GetFormRecord(bundleName, formInfos);
+    formDataMgr.ExistFormRecord(formId);
+    formDataMgr.HasFormUserUids(formId);
+    FormHostRecord formHostRecord;
+    std::vector<FormHostRecord> formHostRecords;
+    formHostRecords.emplace_back(formHostRecord);
+    formDataMgr.GetFormHostRecord(formId, formHostRecords);
+    sptr<IRemoteObject> callerToken = nullptr;
+    formDataMgr.DeleteHostRecord(callerToken, formId);
+    std::vector<int64_t> removedFormIds;
+    removedFormIds.emplace_back(formId);
+    formDataMgr.CleanHostRemovedForms(removedFormIds);
+    sptr<IRemoteObject> remoteHost = nullptr;
+    formDataMgr.HandleHostDied(remoteHost);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI2(const char* data, size_t size)
+{
+    FormDataMgr formDataMgr;
+    int formUserUid = static_cast<int>(GetU32Data(data));
+    std::vector<int> formUserUids;
+    formUserUids.emplace_back(formUserUid);
+    formDataMgr.IsCallingUidValid(formUserUids);
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    bool formTempFlag = *data % ENABLE;
+    formDataMgr.ModifyFormTempFlag(formId, formTempFlag);
+    formDataMgr.AddFormUserUid(formId, formUserUid);
+    int uid = static_cast<int>(GetU32Data(data));
+    formDataMgr.DeleteFormUserUid(formId, uid);
+    FormRecord formRecord;
+    formDataMgr.UpdateFormRecord(formId, formRecord);
+    std::string bundleName(data, size);
+    std::vector<FormRecord> formInfos;
+    formInfos.emplace_back(formRecord);
+    formDataMgr.GetFormRecord(bundleName, formInfos);
+    formDataMgr.ExistFormRecord(formId);
+    formDataMgr.HasFormUserUids(formId);
+    FormHostRecord formHostRecord;
+    std::vector<FormHostRecord> formHostRecords;
+    formHostRecords.emplace_back(formHostRecord);
+    formDataMgr.GetFormHostRecord(formId, formHostRecords);
+    sptr<IRemoteObject> callerToken = nullptr;
+    formDataMgr.DeleteHostRecord(callerToken, formId);
+    std::vector<int64_t> removedFormIds;
+    removedFormIds.emplace_back(formId);
+    formDataMgr.CleanHostRemovedForms(removedFormIds);
+    sptr<IRemoteObject> remoteHost = nullptr;
+    formDataMgr.HandleHostDied(remoteHost);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI3(const char* data, size_t size)
+{
+    FormDataMgr formDataMgr;
+    int formUserUid = static_cast<int>(GetU32Data(data));
+    std::vector<int> formUserUids;
+    formUserUids.emplace_back(formUserUid);
+    formDataMgr.IsCallingUidValid(formUserUids);
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    bool formTempFlag = *data % ENABLE;
+    formDataMgr.ModifyFormTempFlag(formId, formTempFlag);
+    formDataMgr.AddFormUserUid(formId, formUserUid);
+    int uid = static_cast<int>(GetU32Data(data));
+    formDataMgr.DeleteFormUserUid(formId, uid);
+    FormRecord formRecord;
+    formDataMgr.UpdateFormRecord(formId, formRecord);
+    std::string bundleName(data, size);
+    std::vector<FormRecord> formInfos;
+    formInfos.emplace_back(formRecord);
+    formDataMgr.GetFormRecord(bundleName, formInfos);
+    formDataMgr.ExistFormRecord(formId);
+    formDataMgr.HasFormUserUids(formId);
+    FormHostRecord formHostRecord;
+    std::vector<FormHostRecord> formHostRecords;
+    formHostRecords.emplace_back(formHostRecord);
+    formDataMgr.GetFormHostRecord(formId, formHostRecords);
+    sptr<IRemoteObject> callerToken = nullptr;
+    formDataMgr.DeleteHostRecord(callerToken, formId);
+    std::vector<int64_t> removedFormIds;
+    removedFormIds.emplace_back(formId);
+    formDataMgr.CleanHostRemovedForms(removedFormIds);
+    sptr<IRemoteObject> remoteHost = nullptr;
+    formDataMgr.HandleHostDied(remoteHost);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI4(const char* data, size_t size)
+{
+    FormDataMgr formDataMgr;
+    int formUserUid = static_cast<int>(GetU32Data(data));
+    std::vector<int> formUserUids;
+    formUserUids.emplace_back(formUserUid);
+    formDataMgr.IsCallingUidValid(formUserUids);
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    bool formTempFlag = *data % ENABLE;
+    formDataMgr.ModifyFormTempFlag(formId, formTempFlag);
+    formDataMgr.AddFormUserUid(formId, formUserUid);
+    int uid = static_cast<int>(GetU32Data(data));
+    formDataMgr.DeleteFormUserUid(formId, uid);
+    FormRecord formRecord;
+    formDataMgr.UpdateFormRecord(formId, formRecord);
+    std::string bundleName(data, size);
+    std::vector<FormRecord> formInfos;
+    formInfos.emplace_back(formRecord);
+    formDataMgr.GetFormRecord(bundleName, formInfos);
+    formDataMgr.ExistFormRecord(formId);
+    formDataMgr.HasFormUserUids(formId);
+    FormHostRecord formHostRecord;
+    std::vector<FormHostRecord> formHostRecords;
+    formHostRecords.emplace_back(formHostRecord);
+    formDataMgr.GetFormHostRecord(formId, formHostRecords);
+    sptr<IRemoteObject> callerToken = nullptr;
+    formDataMgr.DeleteHostRecord(callerToken, formId);
+    std::vector<int64_t> removedFormIds;
+    removedFormIds.emplace_back(formId);
+    formDataMgr.CleanHostRemovedForms(removedFormIds);
+    sptr<IRemoteObject> remoteHost = nullptr;
+    formDataMgr.HandleHostDied(remoteHost);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI5(const char* data, size_t size)
+{
+    FormDataMgr formDataMgr;
+    int formUserUid = static_cast<int>(GetU32Data(data));
+    std::vector<int> formUserUids;
+    formUserUids.emplace_back(formUserUid);
+    formDataMgr.IsCallingUidValid(formUserUids);
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    bool formTempFlag = *data % ENABLE;
+    formDataMgr.ModifyFormTempFlag(formId, formTempFlag);
+    formDataMgr.AddFormUserUid(formId, formUserUid);
+    int uid = static_cast<int>(GetU32Data(data));
+    formDataMgr.DeleteFormUserUid(formId, uid);
+    FormRecord formRecord;
+    formDataMgr.UpdateFormRecord(formId, formRecord);
+    std::string bundleName(data, size);
+    std::vector<FormRecord> formInfos;
+    formInfos.emplace_back(formRecord);
+    formDataMgr.GetFormRecord(bundleName, formInfos);
+    formDataMgr.ExistFormRecord(formId);
+    formDataMgr.HasFormUserUids(formId);
+    FormHostRecord formHostRecord;
+    std::vector<FormHostRecord> formHostRecords;
+    formHostRecords.emplace_back(formHostRecord);
+    formDataMgr.GetFormHostRecord(formId, formHostRecords);
+    sptr<IRemoteObject> callerToken = nullptr;
+    formDataMgr.DeleteHostRecord(callerToken, formId);
+    std::vector<int64_t> removedFormIds;
+    removedFormIds.emplace_back(formId);
+    formDataMgr.CleanHostRemovedForms(removedFormIds);
+    sptr<IRemoteObject> remoteHost = nullptr;
+    formDataMgr.HandleHostDied(remoteHost);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI6(const char* data, size_t size)
+{
+    FormDataMgr formDataMgr;
+    int formUserUid = static_cast<int>(GetU32Data(data));
+    std::vector<int> formUserUids;
+    formUserUids.emplace_back(formUserUid);
+    formDataMgr.IsCallingUidValid(formUserUids);
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    bool formTempFlag = *data % ENABLE;
+    formDataMgr.ModifyFormTempFlag(formId, formTempFlag);
+    formDataMgr.AddFormUserUid(formId, formUserUid);
+    int uid = static_cast<int>(GetU32Data(data));
+    formDataMgr.DeleteFormUserUid(formId, uid);
+    FormRecord formRecord;
+    formDataMgr.UpdateFormRecord(formId, formRecord);
+    std::string bundleName(data, size);
+    std::vector<FormRecord> formInfos;
+    formInfos.emplace_back(formRecord);
+    formDataMgr.GetFormRecord(bundleName, formInfos);
+    formDataMgr.ExistFormRecord(formId);
+    formDataMgr.HasFormUserUids(formId);
+    FormHostRecord formHostRecord;
+    std::vector<FormHostRecord> formHostRecords;
+    formHostRecords.emplace_back(formHostRecord);
+    formDataMgr.GetFormHostRecord(formId, formHostRecords);
+    sptr<IRemoteObject> callerToken = nullptr;
+    formDataMgr.DeleteHostRecord(callerToken, formId);
+    std::vector<int64_t> removedFormIds;
+    removedFormIds.emplace_back(formId);
+    formDataMgr.CleanHostRemovedForms(removedFormIds);
+    sptr<IRemoteObject> remoteHost = nullptr;
+    formDataMgr.HandleHostDied(remoteHost);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI7(const char* data, size_t size)
+{
+    FormDataMgr formDataMgr;
+    int formUserUid = static_cast<int>(GetU32Data(data));
+    std::vector<int> formUserUids;
+    formUserUids.emplace_back(formUserUid);
+    formDataMgr.IsCallingUidValid(formUserUids);
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    bool formTempFlag = *data % ENABLE;
+    formDataMgr.ModifyFormTempFlag(formId, formTempFlag);
+    formDataMgr.AddFormUserUid(formId, formUserUid);
+    int uid = static_cast<int>(GetU32Data(data));
+    formDataMgr.DeleteFormUserUid(formId, uid);
+    FormRecord formRecord;
+    formDataMgr.UpdateFormRecord(formId, formRecord);
+    std::string bundleName(data, size);
+    std::vector<FormRecord> formInfos;
+    formInfos.emplace_back(formRecord);
+    formDataMgr.GetFormRecord(bundleName, formInfos);
+    formDataMgr.ExistFormRecord(formId);
+    formDataMgr.HasFormUserUids(formId);
+    FormHostRecord formHostRecord;
+    std::vector<FormHostRecord> formHostRecords;
+    formHostRecords.emplace_back(formHostRecord);
+    formDataMgr.GetFormHostRecord(formId, formHostRecords);
+    sptr<IRemoteObject> callerToken = nullptr;
+    formDataMgr.DeleteHostRecord(callerToken, formId);
+    std::vector<int64_t> removedFormIds;
+    removedFormIds.emplace_back(formId);
+    formDataMgr.CleanHostRemovedForms(removedFormIds);
+    sptr<IRemoteObject> remoteHost = nullptr;
+    formDataMgr.HandleHostDied(remoteHost);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI8(const char* data, size_t size)
+{
+    FormDataMgr formDataMgr;
+    int formUserUid = static_cast<int>(GetU32Data(data));
+    std::vector<int> formUserUids;
+    formUserUids.emplace_back(formUserUid);
+    formDataMgr.IsCallingUidValid(formUserUids);
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    bool formTempFlag = *data % ENABLE;
+    formDataMgr.ModifyFormTempFlag(formId, formTempFlag);
+    formDataMgr.AddFormUserUid(formId, formUserUid);
+    int uid = static_cast<int>(GetU32Data(data));
+    formDataMgr.DeleteFormUserUid(formId, uid);
+    FormRecord formRecord;
+    formDataMgr.UpdateFormRecord(formId, formRecord);
+    std::string bundleName(data, size);
+    std::vector<FormRecord> formInfos;
+    formInfos.emplace_back(formRecord);
+    formDataMgr.GetFormRecord(bundleName, formInfos);
+    formDataMgr.ExistFormRecord(formId);
+    formDataMgr.HasFormUserUids(formId);
+    FormHostRecord formHostRecord;
+    std::vector<FormHostRecord> formHostRecords;
+    formHostRecords.emplace_back(formHostRecord);
+    formDataMgr.GetFormHostRecord(formId, formHostRecords);
+    sptr<IRemoteObject> callerToken = nullptr;
+    formDataMgr.DeleteHostRecord(callerToken, formId);
+    std::vector<int64_t> removedFormIds;
+    removedFormIds.emplace_back(formId);
+    formDataMgr.CleanHostRemovedForms(removedFormIds);
+    sptr<IRemoteObject> remoteHost = nullptr;
+    formDataMgr.HandleHostDied(remoteHost);
+    return true;
+}
 }
 
 /* Fuzzer entry point */

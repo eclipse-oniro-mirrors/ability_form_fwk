@@ -60,6 +60,195 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formHostClient.UpdateForm(formJsInfo);
     return formHostClient.GetInstance() == nullptr;
 }
+
+bool DoSomethingInterestingWithMyAPI1(const char* data, size_t size)
+{
+    FormHostClient formHostClient;
+    std::shared_ptr<FormCallbackInterface> formCallback = nullptr;
+    int64_t formId = 1;
+    FormJsInfo formJsInfo;
+    formHostClient.AddForm(formCallback, formJsInfo);
+    formHostClient.RemoveForm(formCallback, formId);
+    formHostClient.ContainsForm(formId);
+    FormHostClient::UninstallCallback callback = nullptr;
+    formHostClient.RegisterUninstallCallback(callback);
+    sptr<IRemoteObject> token = nullptr;
+    formHostClient.OnAcquired(formJsInfo, token);
+    formHostClient.OnUpdate(formJsInfo);
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+    formHostClient.OnUninstall(formIds);
+    std::shared_ptr<ShareFormCallBack> shareFormCallback = nullptr;
+    int64_t requestCode = 1;
+    formHostClient.AddShareFormCallback(shareFormCallback, requestCode);
+    int32_t result = static_cast<int32_t>(GetU32Data(data));
+    formHostClient.OnShareFormResponse(requestCode, result);
+    formHostClient.RemoveShareFormCallback(requestCode);
+    formHostClient.UpdateForm(formJsInfo);
+    return formHostClient.GetInstance() == nullptr;
+}
+
+bool DoSomethingInterestingWithMyAPI2(const char* data, size_t size)
+{
+    FormHostClient formHostClient;
+    std::shared_ptr<FormCallbackInterface> formCallback = nullptr;
+    int64_t formId = 1;
+    FormJsInfo formJsInfo;
+    formHostClient.AddForm(formCallback, formJsInfo);
+    formHostClient.RemoveForm(formCallback, formId);
+    formHostClient.ContainsForm(formId);
+    FormHostClient::UninstallCallback callback = nullptr;
+    formHostClient.RegisterUninstallCallback(callback);
+    sptr<IRemoteObject> token = nullptr;
+    formHostClient.OnAcquired(formJsInfo, token);
+    formHostClient.OnUpdate(formJsInfo);
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+    formHostClient.OnUninstall(formIds);
+    std::shared_ptr<ShareFormCallBack> shareFormCallback = nullptr;
+    int64_t requestCode = 1;
+    formHostClient.AddShareFormCallback(shareFormCallback, requestCode);
+    int32_t result = static_cast<int32_t>(GetU32Data(data));
+    formHostClient.OnShareFormResponse(requestCode, result);
+    formHostClient.RemoveShareFormCallback(requestCode);
+    formHostClient.UpdateForm(formJsInfo);
+    return formHostClient.GetInstance() == nullptr;
+}
+
+bool DoSomethingInterestingWithMyAPI3(const char* data, size_t size)
+{
+    FormHostClient formHostClient;
+    std::shared_ptr<FormCallbackInterface> formCallback = nullptr;
+    int64_t formId = 1;
+    FormJsInfo formJsInfo;
+    formHostClient.AddForm(formCallback, formJsInfo);
+    formHostClient.RemoveForm(formCallback, formId);
+    formHostClient.ContainsForm(formId);
+    FormHostClient::UninstallCallback callback = nullptr;
+    formHostClient.RegisterUninstallCallback(callback);
+    sptr<IRemoteObject> token = nullptr;
+    formHostClient.OnAcquired(formJsInfo, token);
+    formHostClient.OnUpdate(formJsInfo);
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+    formHostClient.OnUninstall(formIds);
+    std::shared_ptr<ShareFormCallBack> shareFormCallback = nullptr;
+    int64_t requestCode = 1;
+    formHostClient.AddShareFormCallback(shareFormCallback, requestCode);
+    int32_t result = static_cast<int32_t>(GetU32Data(data));
+    formHostClient.OnShareFormResponse(requestCode, result);
+    formHostClient.RemoveShareFormCallback(requestCode);
+    formHostClient.UpdateForm(formJsInfo);
+    return formHostClient.GetInstance() == nullptr;
+}
+
+bool DoSomethingInterestingWithMyAPI4(const char* data, size_t size)
+{
+    FormHostClient formHostClient;
+    std::shared_ptr<FormCallbackInterface> formCallback = nullptr;
+    int64_t formId = 1;
+    FormJsInfo formJsInfo;
+    formHostClient.AddForm(formCallback, formJsInfo);
+    formHostClient.RemoveForm(formCallback, formId);
+    formHostClient.ContainsForm(formId);
+    FormHostClient::UninstallCallback callback = nullptr;
+    formHostClient.RegisterUninstallCallback(callback);
+    sptr<IRemoteObject> token = nullptr;
+    formHostClient.OnAcquired(formJsInfo, token);
+    formHostClient.OnUpdate(formJsInfo);
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+    formHostClient.OnUninstall(formIds);
+    std::shared_ptr<ShareFormCallBack> shareFormCallback = nullptr;
+    int64_t requestCode = 1;
+    formHostClient.AddShareFormCallback(shareFormCallback, requestCode);
+    int32_t result = static_cast<int32_t>(GetU32Data(data));
+    formHostClient.OnShareFormResponse(requestCode, result);
+    formHostClient.RemoveShareFormCallback(requestCode);
+    formHostClient.UpdateForm(formJsInfo);
+    return formHostClient.GetInstance() == nullptr;
+}
+
+bool DoSomethingInterestingWithMyAPI5(const char* data, size_t size)
+{
+    FormHostClient formHostClient;
+    std::shared_ptr<FormCallbackInterface> formCallback = nullptr;
+    int64_t formId = 1;
+    FormJsInfo formJsInfo;
+    formHostClient.AddForm(formCallback, formJsInfo);
+    formHostClient.RemoveForm(formCallback, formId);
+    formHostClient.ContainsForm(formId);
+    FormHostClient::UninstallCallback callback = nullptr;
+    formHostClient.RegisterUninstallCallback(callback);
+    sptr<IRemoteObject> token = nullptr;
+    formHostClient.OnAcquired(formJsInfo, token);
+    formHostClient.OnUpdate(formJsInfo);
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+    formHostClient.OnUninstall(formIds);
+    std::shared_ptr<ShareFormCallBack> shareFormCallback = nullptr;
+    int64_t requestCode = 1;
+    formHostClient.AddShareFormCallback(shareFormCallback, requestCode);
+    int32_t result = static_cast<int32_t>(GetU32Data(data));
+    formHostClient.OnShareFormResponse(requestCode, result);
+    formHostClient.RemoveShareFormCallback(requestCode);
+    formHostClient.UpdateForm(formJsInfo);
+    return formHostClient.GetInstance() == nullptr;
+}
+
+bool DoSomethingInterestingWithMyAPI6(const char* data, size_t size)
+{
+    FormHostClient formHostClient;
+    std::shared_ptr<FormCallbackInterface> formCallback = nullptr;
+    int64_t formId = 1;
+    FormJsInfo formJsInfo;
+    formHostClient.AddForm(formCallback, formJsInfo);
+    formHostClient.RemoveForm(formCallback, formId);
+    formHostClient.ContainsForm(formId);
+    FormHostClient::UninstallCallback callback = nullptr;
+    formHostClient.RegisterUninstallCallback(callback);
+    sptr<IRemoteObject> token = nullptr;
+    formHostClient.OnAcquired(formJsInfo, token);
+    formHostClient.OnUpdate(formJsInfo);
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+    formHostClient.OnUninstall(formIds);
+    std::shared_ptr<ShareFormCallBack> shareFormCallback = nullptr;
+    int64_t requestCode = 1;
+    formHostClient.AddShareFormCallback(shareFormCallback, requestCode);
+    int32_t result = static_cast<int32_t>(GetU32Data(data));
+    formHostClient.OnShareFormResponse(requestCode, result);
+    formHostClient.RemoveShareFormCallback(requestCode);
+    formHostClient.UpdateForm(formJsInfo);
+    return formHostClient.GetInstance() == nullptr;
+}
+
+bool DoSomethingInterestingWithMyAPI7(const char* data, size_t size)
+{
+    FormHostClient formHostClient;
+    std::shared_ptr<FormCallbackInterface> formCallback = nullptr;
+    int64_t formId = 1;
+    FormJsInfo formJsInfo;
+    formHostClient.AddForm(formCallback, formJsInfo);
+    formHostClient.RemoveForm(formCallback, formId);
+    formHostClient.ContainsForm(formId);
+    FormHostClient::UninstallCallback callback = nullptr;
+    formHostClient.RegisterUninstallCallback(callback);
+    sptr<IRemoteObject> token = nullptr;
+    formHostClient.OnAcquired(formJsInfo, token);
+    formHostClient.OnUpdate(formJsInfo);
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+    formHostClient.OnUninstall(formIds);
+    std::shared_ptr<ShareFormCallBack> shareFormCallback = nullptr;
+    int64_t requestCode = 1;
+    formHostClient.AddShareFormCallback(shareFormCallback, requestCode);
+    int32_t result = static_cast<int32_t>(GetU32Data(data));
+    formHostClient.OnShareFormResponse(requestCode, result);
+    formHostClient.RemoveShareFormCallback(requestCode);
+    formHostClient.UpdateForm(formJsInfo);
+    return formHostClient.GetInstance() == nullptr;
+}
 }
 
 /* Fuzzer entry point */

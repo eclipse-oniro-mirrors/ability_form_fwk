@@ -70,7 +70,414 @@ void DoSomethingInterestingPart2(const char* data, size_t size)
     castTempConnection->OnAbilityConnectDone(element, remoteObjects, resultCode);
 }
 
+void DoSomethingInterestingPart3(const char* data, size_t size)
+{
+    FormAmsHelper formAmsHelper;
+    std::string bundleName(data, size);
+    std::string abilityName(data, size);
+    AppExecFwk::ElementName element;
+    sptr<IRemoteObject> providerToken = nullptr;
+    sptr<IRemoteObject> remoteObjects = nullptr;
+    int resultCode = static_cast<int>(GetU32Data(data));
+    Want want;
+    sptr<AAFwk::IAbilityConnection> connect = nullptr;
+    formAmsHelper.GetAbilityManager();
+    formAmsHelper.ConnectServiceAbility(want, connect);
+    formAmsHelper.DisconnectServiceAbility(connect);
+    formAmsHelper.DisconnectServiceAbilityDelay(connect);
+    formAmsHelper.StopExtensionAbility(want);
+    formAmsHelper.RegisterConfigurationObserver();
+    formAmsHelper.UnRegisterConfigurationObserver();
+    sptr<AAFwk::IAbilityManager> abilityManager = nullptr;
+    formAmsHelper.SetAbilityManager(abilityManager);
+    formAmsHelper.DisconnectAbilityTask(connect);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    formAmsHelper.StartAbility(want, userId);
+    std::set<int64_t> formIds;
+    sptr<IAbilityConnection> batchDeleteConnection = new FormBatchDeleteConnection(formIds, bundleName, abilityName);
+    batchDeleteConnection->OnAbilityConnectDone(element, providerToken, userId);
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    sptr<IAbilityConnection> castTempConnection = new FormCastTempConnection(formId, bundleName, abilityName);
+    castTempConnection->OnAbilityConnectDone(element, remoteObjects, resultCode);
+}
+
+void DoSomethingInterestingPart4(const char* data, size_t size)
+{
+    FormAmsHelper formAmsHelper;
+    std::string bundleName(data, size);
+    std::string abilityName(data, size);
+    AppExecFwk::ElementName element;
+    sptr<IRemoteObject> providerToken = nullptr;
+    sptr<IRemoteObject> remoteObjects = nullptr;
+    int resultCode = static_cast<int>(GetU32Data(data));
+    Want want;
+    sptr<AAFwk::IAbilityConnection> connect = nullptr;
+    formAmsHelper.GetAbilityManager();
+    formAmsHelper.ConnectServiceAbility(want, connect);
+    formAmsHelper.DisconnectServiceAbility(connect);
+    formAmsHelper.DisconnectServiceAbilityDelay(connect);
+    formAmsHelper.StopExtensionAbility(want);
+    formAmsHelper.RegisterConfigurationObserver();
+    formAmsHelper.UnRegisterConfigurationObserver();
+    sptr<AAFwk::IAbilityManager> abilityManager = nullptr;
+    formAmsHelper.SetAbilityManager(abilityManager);
+    formAmsHelper.DisconnectAbilityTask(connect);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    formAmsHelper.StartAbility(want, userId);
+    std::set<int64_t> formIds;
+    sptr<IAbilityConnection> batchDeleteConnection = new FormBatchDeleteConnection(formIds, bundleName, abilityName);
+    batchDeleteConnection->OnAbilityConnectDone(element, providerToken, userId);
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    sptr<IAbilityConnection> castTempConnection = new FormCastTempConnection(formId, bundleName, abilityName);
+    castTempConnection->OnAbilityConnectDone(element, remoteObjects, resultCode);
+}
+
+void DoSomethingInterestingPart5(const char* data, size_t size)
+{
+    FormAmsHelper formAmsHelper;
+    std::string bundleName(data, size);
+    std::string abilityName(data, size);
+    AppExecFwk::ElementName element;
+    sptr<IRemoteObject> providerToken = nullptr;
+    sptr<IRemoteObject> remoteObjects = nullptr;
+    int resultCode = static_cast<int>(GetU32Data(data));
+    Want want;
+    sptr<AAFwk::IAbilityConnection> connect = nullptr;
+    formAmsHelper.GetAbilityManager();
+    formAmsHelper.ConnectServiceAbility(want, connect);
+    formAmsHelper.DisconnectServiceAbility(connect);
+    formAmsHelper.DisconnectServiceAbilityDelay(connect);
+    formAmsHelper.StopExtensionAbility(want);
+    formAmsHelper.RegisterConfigurationObserver();
+    formAmsHelper.UnRegisterConfigurationObserver();
+    sptr<AAFwk::IAbilityManager> abilityManager = nullptr;
+    formAmsHelper.SetAbilityManager(abilityManager);
+    formAmsHelper.DisconnectAbilityTask(connect);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    formAmsHelper.StartAbility(want, userId);
+    std::set<int64_t> formIds;
+    sptr<IAbilityConnection> batchDeleteConnection = new FormBatchDeleteConnection(formIds, bundleName, abilityName);
+    batchDeleteConnection->OnAbilityConnectDone(element, providerToken, userId);
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    sptr<IAbilityConnection> castTempConnection = new FormCastTempConnection(formId, bundleName, abilityName);
+    castTempConnection->OnAbilityConnectDone(element, remoteObjects, resultCode);
+}
+
+void DoSomethingInterestingPart6(const char* data, size_t size)
+{
+    FormAmsHelper formAmsHelper;
+    std::string bundleName(data, size);
+    std::string abilityName(data, size);
+    AppExecFwk::ElementName element;
+    sptr<IRemoteObject> providerToken = nullptr;
+    sptr<IRemoteObject> remoteObjects = nullptr;
+    int resultCode = static_cast<int>(GetU32Data(data));
+    Want want;
+    sptr<AAFwk::IAbilityConnection> connect = nullptr;
+    formAmsHelper.GetAbilityManager();
+    formAmsHelper.ConnectServiceAbility(want, connect);
+    formAmsHelper.DisconnectServiceAbility(connect);
+    formAmsHelper.DisconnectServiceAbilityDelay(connect);
+    formAmsHelper.StopExtensionAbility(want);
+    formAmsHelper.RegisterConfigurationObserver();
+    formAmsHelper.UnRegisterConfigurationObserver();
+    sptr<AAFwk::IAbilityManager> abilityManager = nullptr;
+    formAmsHelper.SetAbilityManager(abilityManager);
+    formAmsHelper.DisconnectAbilityTask(connect);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    formAmsHelper.StartAbility(want, userId);
+    std::set<int64_t> formIds;
+    sptr<IAbilityConnection> batchDeleteConnection = new FormBatchDeleteConnection(formIds, bundleName, abilityName);
+    batchDeleteConnection->OnAbilityConnectDone(element, providerToken, userId);
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    sptr<IAbilityConnection> castTempConnection = new FormCastTempConnection(formId, bundleName, abilityName);
+    castTempConnection->OnAbilityConnectDone(element, remoteObjects, resultCode);
+}
+
+void DoSomethingInterestingPart7(const char* data, size_t size)
+{
+    FormAmsHelper formAmsHelper;
+    std::string bundleName(data, size);
+    std::string abilityName(data, size);
+    AppExecFwk::ElementName element;
+    sptr<IRemoteObject> providerToken = nullptr;
+    sptr<IRemoteObject> remoteObjects = nullptr;
+    int resultCode = static_cast<int>(GetU32Data(data));
+    Want want;
+    sptr<AAFwk::IAbilityConnection> connect = nullptr;
+    formAmsHelper.GetAbilityManager();
+    formAmsHelper.ConnectServiceAbility(want, connect);
+    formAmsHelper.DisconnectServiceAbility(connect);
+    formAmsHelper.DisconnectServiceAbilityDelay(connect);
+    formAmsHelper.StopExtensionAbility(want);
+    formAmsHelper.RegisterConfigurationObserver();
+    formAmsHelper.UnRegisterConfigurationObserver();
+    sptr<AAFwk::IAbilityManager> abilityManager = nullptr;
+    formAmsHelper.SetAbilityManager(abilityManager);
+    formAmsHelper.DisconnectAbilityTask(connect);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    formAmsHelper.StartAbility(want, userId);
+    std::set<int64_t> formIds;
+    sptr<IAbilityConnection> batchDeleteConnection = new FormBatchDeleteConnection(formIds, bundleName, abilityName);
+    batchDeleteConnection->OnAbilityConnectDone(element, providerToken, userId);
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    sptr<IAbilityConnection> castTempConnection = new FormCastTempConnection(formId, bundleName, abilityName);
+    castTempConnection->OnAbilityConnectDone(element, remoteObjects, resultCode);
+}
+
 bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
+{
+    FormAbilityConnection formAbilityConnection;
+    AppExecFwk::ElementName element;
+    sptr<IRemoteObject> remoteObjects = nullptr;
+    int resultCode = static_cast<int>(GetU32Data(data));
+    bool isFreeInstall = *data % ENABLE;
+    formAbilityConnection.SetFreeInstall(isFreeInstall);
+    int32_t connectId = static_cast<int32_t>(GetU32Data(data));
+    formAbilityConnection.SetConnectId(connectId);
+    formAbilityConnection.OnAbilityConnectDone(element, remoteObjects, resultCode);
+    formAbilityConnection.GetProviderKey();
+    std::string bundleName(data, size);
+    std::string abilityName(data, size);
+    formAbilityConnection.SetProviderKey(bundleName, abilityName);
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    formAbilityConnection.SetFormId(formId);
+    formAbilityConnection.GetFormId();
+    sptr<IRemoteObject> hostToken = nullptr;
+    formAbilityConnection.SetHostToken(hostToken);
+    formAbilityConnection.GetHostToken();
+    sptr<IRemoteObject> providerToken = nullptr;
+    formAbilityConnection.SetProviderToken(providerToken);
+    formAbilityConnection.GetProviderToken();
+    formAbilityConnection.GetAppMgr();
+    formAbilityConnection.onFormAppConnect();
+    formAbilityConnection.ReportFormAppUnbindEvent();
+    formAbilityConnection.GetBundleName();
+    formAbilityConnection.GetAppFormPid();
+    formAbilityConnection.OnAbilityDisconnectDone(element, resultCode);
+    wptr<IRemoteObject> remoteObject1;
+    formAbilityConnection.OnConnectDied(remoteObject1);
+    DoSomethingInterestingPart2(data, size);
+    return formAbilityConnection.GetConnectId();
+}
+
+bool DoSomethingInterestingWithMyAPI1(const char* data, size_t size)
+{
+    FormAbilityConnection formAbilityConnection;
+    AppExecFwk::ElementName element;
+    sptr<IRemoteObject> remoteObjects = nullptr;
+    int resultCode = static_cast<int>(GetU32Data(data));
+    bool isFreeInstall = *data % ENABLE;
+    formAbilityConnection.SetFreeInstall(isFreeInstall);
+    int32_t connectId = static_cast<int32_t>(GetU32Data(data));
+    formAbilityConnection.SetConnectId(connectId);
+    formAbilityConnection.OnAbilityConnectDone(element, remoteObjects, resultCode);
+    formAbilityConnection.GetProviderKey();
+    std::string bundleName(data, size);
+    std::string abilityName(data, size);
+    formAbilityConnection.SetProviderKey(bundleName, abilityName);
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    formAbilityConnection.SetFormId(formId);
+    formAbilityConnection.GetFormId();
+    sptr<IRemoteObject> hostToken = nullptr;
+    formAbilityConnection.SetHostToken(hostToken);
+    formAbilityConnection.GetHostToken();
+    sptr<IRemoteObject> providerToken = nullptr;
+    formAbilityConnection.SetProviderToken(providerToken);
+    formAbilityConnection.GetProviderToken();
+    formAbilityConnection.GetAppMgr();
+    formAbilityConnection.onFormAppConnect();
+    formAbilityConnection.ReportFormAppUnbindEvent();
+    formAbilityConnection.GetBundleName();
+    formAbilityConnection.GetAppFormPid();
+    formAbilityConnection.OnAbilityDisconnectDone(element, resultCode);
+    wptr<IRemoteObject> remoteObject1;
+    formAbilityConnection.OnConnectDied(remoteObject1);
+    DoSomethingInterestingPart2(data, size);
+    return formAbilityConnection.GetConnectId();
+}
+
+bool DoSomethingInterestingWithMyAPI2(const char* data, size_t size)
+{
+    FormAbilityConnection formAbilityConnection;
+    AppExecFwk::ElementName element;
+    sptr<IRemoteObject> remoteObjects = nullptr;
+    int resultCode = static_cast<int>(GetU32Data(data));
+    bool isFreeInstall = *data % ENABLE;
+    formAbilityConnection.SetFreeInstall(isFreeInstall);
+    int32_t connectId = static_cast<int32_t>(GetU32Data(data));
+    formAbilityConnection.SetConnectId(connectId);
+    formAbilityConnection.OnAbilityConnectDone(element, remoteObjects, resultCode);
+    formAbilityConnection.GetProviderKey();
+    std::string bundleName(data, size);
+    std::string abilityName(data, size);
+    formAbilityConnection.SetProviderKey(bundleName, abilityName);
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    formAbilityConnection.SetFormId(formId);
+    formAbilityConnection.GetFormId();
+    sptr<IRemoteObject> hostToken = nullptr;
+    formAbilityConnection.SetHostToken(hostToken);
+    formAbilityConnection.GetHostToken();
+    sptr<IRemoteObject> providerToken = nullptr;
+    formAbilityConnection.SetProviderToken(providerToken);
+    formAbilityConnection.GetProviderToken();
+    formAbilityConnection.GetAppMgr();
+    formAbilityConnection.onFormAppConnect();
+    formAbilityConnection.ReportFormAppUnbindEvent();
+    formAbilityConnection.GetBundleName();
+    formAbilityConnection.GetAppFormPid();
+    formAbilityConnection.OnAbilityDisconnectDone(element, resultCode);
+    wptr<IRemoteObject> remoteObject1;
+    formAbilityConnection.OnConnectDied(remoteObject1);
+    DoSomethingInterestingPart2(data, size);
+    return formAbilityConnection.GetConnectId();
+}
+
+bool DoSomethingInterestingWithMyAPI3(const char* data, size_t size)
+{
+    FormAbilityConnection formAbilityConnection;
+    AppExecFwk::ElementName element;
+    sptr<IRemoteObject> remoteObjects = nullptr;
+    int resultCode = static_cast<int>(GetU32Data(data));
+    bool isFreeInstall = *data % ENABLE;
+    formAbilityConnection.SetFreeInstall(isFreeInstall);
+    int32_t connectId = static_cast<int32_t>(GetU32Data(data));
+    formAbilityConnection.SetConnectId(connectId);
+    formAbilityConnection.OnAbilityConnectDone(element, remoteObjects, resultCode);
+    formAbilityConnection.GetProviderKey();
+    std::string bundleName(data, size);
+    std::string abilityName(data, size);
+    formAbilityConnection.SetProviderKey(bundleName, abilityName);
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    formAbilityConnection.SetFormId(formId);
+    formAbilityConnection.GetFormId();
+    sptr<IRemoteObject> hostToken = nullptr;
+    formAbilityConnection.SetHostToken(hostToken);
+    formAbilityConnection.GetHostToken();
+    sptr<IRemoteObject> providerToken = nullptr;
+    formAbilityConnection.SetProviderToken(providerToken);
+    formAbilityConnection.GetProviderToken();
+    formAbilityConnection.GetAppMgr();
+    formAbilityConnection.onFormAppConnect();
+    formAbilityConnection.ReportFormAppUnbindEvent();
+    formAbilityConnection.GetBundleName();
+    formAbilityConnection.GetAppFormPid();
+    formAbilityConnection.OnAbilityDisconnectDone(element, resultCode);
+    wptr<IRemoteObject> remoteObject1;
+    formAbilityConnection.OnConnectDied(remoteObject1);
+    DoSomethingInterestingPart2(data, size);
+    return formAbilityConnection.GetConnectId();
+}
+
+bool DoSomethingInterestingWithMyAPI4(const char* data, size_t size)
+{
+    FormAbilityConnection formAbilityConnection;
+    AppExecFwk::ElementName element;
+    sptr<IRemoteObject> remoteObjects = nullptr;
+    int resultCode = static_cast<int>(GetU32Data(data));
+    bool isFreeInstall = *data % ENABLE;
+    formAbilityConnection.SetFreeInstall(isFreeInstall);
+    int32_t connectId = static_cast<int32_t>(GetU32Data(data));
+    formAbilityConnection.SetConnectId(connectId);
+    formAbilityConnection.OnAbilityConnectDone(element, remoteObjects, resultCode);
+    formAbilityConnection.GetProviderKey();
+    std::string bundleName(data, size);
+    std::string abilityName(data, size);
+    formAbilityConnection.SetProviderKey(bundleName, abilityName);
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    formAbilityConnection.SetFormId(formId);
+    formAbilityConnection.GetFormId();
+    sptr<IRemoteObject> hostToken = nullptr;
+    formAbilityConnection.SetHostToken(hostToken);
+    formAbilityConnection.GetHostToken();
+    sptr<IRemoteObject> providerToken = nullptr;
+    formAbilityConnection.SetProviderToken(providerToken);
+    formAbilityConnection.GetProviderToken();
+    formAbilityConnection.GetAppMgr();
+    formAbilityConnection.onFormAppConnect();
+    formAbilityConnection.ReportFormAppUnbindEvent();
+    formAbilityConnection.GetBundleName();
+    formAbilityConnection.GetAppFormPid();
+    formAbilityConnection.OnAbilityDisconnectDone(element, resultCode);
+    wptr<IRemoteObject> remoteObject1;
+    formAbilityConnection.OnConnectDied(remoteObject1);
+    DoSomethingInterestingPart2(data, size);
+    return formAbilityConnection.GetConnectId();
+}
+
+bool DoSomethingInterestingWithMyAPI5(const char* data, size_t size)
+{
+    FormAbilityConnection formAbilityConnection;
+    AppExecFwk::ElementName element;
+    sptr<IRemoteObject> remoteObjects = nullptr;
+    int resultCode = static_cast<int>(GetU32Data(data));
+    bool isFreeInstall = *data % ENABLE;
+    formAbilityConnection.SetFreeInstall(isFreeInstall);
+    int32_t connectId = static_cast<int32_t>(GetU32Data(data));
+    formAbilityConnection.SetConnectId(connectId);
+    formAbilityConnection.OnAbilityConnectDone(element, remoteObjects, resultCode);
+    formAbilityConnection.GetProviderKey();
+    std::string bundleName(data, size);
+    std::string abilityName(data, size);
+    formAbilityConnection.SetProviderKey(bundleName, abilityName);
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    formAbilityConnection.SetFormId(formId);
+    formAbilityConnection.GetFormId();
+    sptr<IRemoteObject> hostToken = nullptr;
+    formAbilityConnection.SetHostToken(hostToken);
+    formAbilityConnection.GetHostToken();
+    sptr<IRemoteObject> providerToken = nullptr;
+    formAbilityConnection.SetProviderToken(providerToken);
+    formAbilityConnection.GetProviderToken();
+    formAbilityConnection.GetAppMgr();
+    formAbilityConnection.onFormAppConnect();
+    formAbilityConnection.ReportFormAppUnbindEvent();
+    formAbilityConnection.GetBundleName();
+    formAbilityConnection.GetAppFormPid();
+    formAbilityConnection.OnAbilityDisconnectDone(element, resultCode);
+    wptr<IRemoteObject> remoteObject1;
+    formAbilityConnection.OnConnectDied(remoteObject1);
+    DoSomethingInterestingPart2(data, size);
+    return formAbilityConnection.GetConnectId();
+}
+
+bool DoSomethingInterestingWithMyAPI6(const char* data, size_t size)
+{
+    FormAbilityConnection formAbilityConnection;
+    AppExecFwk::ElementName element;
+    sptr<IRemoteObject> remoteObjects = nullptr;
+    int resultCode = static_cast<int>(GetU32Data(data));
+    bool isFreeInstall = *data % ENABLE;
+    formAbilityConnection.SetFreeInstall(isFreeInstall);
+    int32_t connectId = static_cast<int32_t>(GetU32Data(data));
+    formAbilityConnection.SetConnectId(connectId);
+    formAbilityConnection.OnAbilityConnectDone(element, remoteObjects, resultCode);
+    formAbilityConnection.GetProviderKey();
+    std::string bundleName(data, size);
+    std::string abilityName(data, size);
+    formAbilityConnection.SetProviderKey(bundleName, abilityName);
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    formAbilityConnection.SetFormId(formId);
+    formAbilityConnection.GetFormId();
+    sptr<IRemoteObject> hostToken = nullptr;
+    formAbilityConnection.SetHostToken(hostToken);
+    formAbilityConnection.GetHostToken();
+    sptr<IRemoteObject> providerToken = nullptr;
+    formAbilityConnection.SetProviderToken(providerToken);
+    formAbilityConnection.GetProviderToken();
+    formAbilityConnection.GetAppMgr();
+    formAbilityConnection.onFormAppConnect();
+    formAbilityConnection.ReportFormAppUnbindEvent();
+    formAbilityConnection.GetBundleName();
+    formAbilityConnection.GetAppFormPid();
+    formAbilityConnection.OnAbilityDisconnectDone(element, resultCode);
+    wptr<IRemoteObject> remoteObject1;
+    formAbilityConnection.OnConnectDied(remoteObject1);
+    DoSomethingInterestingPart2(data, size);
+    return formAbilityConnection.GetConnectId();
+}
+
+bool DoSomethingInterestingWithMyAPI7(const char* data, size_t size)
 {
     FormAbilityConnection formAbilityConnection;
     AppExecFwk::ElementName element;

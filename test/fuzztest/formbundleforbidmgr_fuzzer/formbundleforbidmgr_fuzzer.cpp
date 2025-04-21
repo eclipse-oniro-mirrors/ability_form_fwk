@@ -47,6 +47,90 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formbundleforbidmgr.SetBundleForbiddenStatus(bundleName, isForbidden);
     return true;
 }
+
+bool DoSomethingInterestingWithMyAPI1(const char* data, size_t size)
+{
+    FormBundleForbidMgr& formbundleforbidmgr = FormBundleForbidMgr::GetInstance();
+    FormBundleForbidMgr bundleForbidMgr;
+    formbundleforbidmgr.Init();
+    std::string bundleName(data, size);
+    formbundleforbidmgr.IsBundleForbidden(bundleName);
+    bool isForbidden = *data % ENABLE;
+    formbundleforbidmgr.SetBundleForbiddenStatus(bundleName, isForbidden);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI2(const char* data, size_t size)
+{
+    FormBundleForbidMgr& formbundleforbidmgr = FormBundleForbidMgr::GetInstance();
+    FormBundleForbidMgr bundleForbidMgr;
+    formbundleforbidmgr.Init();
+    std::string bundleName(data, size);
+    formbundleforbidmgr.IsBundleForbidden(bundleName);
+    bool isForbidden = *data % ENABLE;
+    formbundleforbidmgr.SetBundleForbiddenStatus(bundleName, isForbidden);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI3(const char* data, size_t size)
+{
+    FormBundleForbidMgr& formbundleforbidmgr = FormBundleForbidMgr::GetInstance();
+    FormBundleForbidMgr bundleForbidMgr;
+    formbundleforbidmgr.Init();
+    std::string bundleName(data, size);
+    formbundleforbidmgr.IsBundleForbidden(bundleName);
+    bool isForbidden = *data % ENABLE;
+    formbundleforbidmgr.SetBundleForbiddenStatus(bundleName, isForbidden);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI4(const char* data, size_t size)
+{
+    FormBundleForbidMgr& formbundleforbidmgr = FormBundleForbidMgr::GetInstance();
+    FormBundleForbidMgr bundleForbidMgr;
+    formbundleforbidmgr.Init();
+    std::string bundleName(data, size);
+    formbundleforbidmgr.IsBundleForbidden(bundleName);
+    bool isForbidden = *data % ENABLE;
+    formbundleforbidmgr.SetBundleForbiddenStatus(bundleName, isForbidden);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI5(const char* data, size_t size)
+{
+    FormBundleForbidMgr& formbundleforbidmgr = FormBundleForbidMgr::GetInstance();
+    FormBundleForbidMgr bundleForbidMgr;
+    formbundleforbidmgr.Init();
+    std::string bundleName(data, size);
+    formbundleforbidmgr.IsBundleForbidden(bundleName);
+    bool isForbidden = *data % ENABLE;
+    formbundleforbidmgr.SetBundleForbiddenStatus(bundleName, isForbidden);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI6(const char* data, size_t size)
+{
+    FormBundleForbidMgr& formbundleforbidmgr = FormBundleForbidMgr::GetInstance();
+    FormBundleForbidMgr bundleForbidMgr;
+    formbundleforbidmgr.Init();
+    std::string bundleName(data, size);
+    formbundleforbidmgr.IsBundleForbidden(bundleName);
+    bool isForbidden = *data % ENABLE;
+    formbundleforbidmgr.SetBundleForbiddenStatus(bundleName, isForbidden);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI7(const char* data, size_t size)
+{
+    FormBundleForbidMgr& formbundleforbidmgr = FormBundleForbidMgr::GetInstance();
+    FormBundleForbidMgr bundleForbidMgr;
+    formbundleforbidmgr.Init();
+    std::string bundleName(data, size);
+    formbundleforbidmgr.IsBundleForbidden(bundleName);
+    bool isForbidden = *data % ENABLE;
+    formbundleforbidmgr.SetBundleForbiddenStatus(bundleName, isForbidden);
+    return true;
+}
 }
 
 /* Fuzzer entry point */

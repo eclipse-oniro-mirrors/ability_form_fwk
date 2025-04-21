@@ -68,6 +68,244 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formDbCache.DeleteInvalidDBForms(userId, callingUid, matchedFormIds, foundFormsMap);
     return true;
 }
+
+bool DoSomethingInterestingWithMyAPI1(const char* data, size_t size)
+{
+    FormDbCache formDbCache;
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    FormRecord record;
+    formDbCache.GetDBRecord(formId, record);
+    FormDBInfo records;
+    formDbCache.GetDBRecord(formId, records);
+    formDbCache.UpdateDBRecord(formId, record);
+    int uid = static_cast<int>(GetU32Data(data));
+    std::set<int64_t> formNums;
+    formNums.insert(formId);
+    std::string bundleName(data, size);
+    std::string abilityName(data, size);
+    FormIdKey formIdKey(bundleName, abilityName);
+    std::map<FormIdKey, std::set<int64_t>> noHostFormDBList;
+    noHostFormDBList.emplace(formIdKey, formNums);
+    std::map<int64_t, bool> foundFormsMap;
+    bool flag = *data % ENABLE;
+    foundFormsMap.emplace(formId, flag);
+    formDbCache.GetNoHostDBForms(uid, noHostFormDBList, foundFormsMap);
+    std::string moduleName(data, size);
+    formDbCache.GetMatchCount(bundleName, moduleName);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    formDbCache.DeleteDBFormsByUserId(userId);
+    int32_t callingUid = static_cast<int32_t>(GetU32Data(data));
+    std::set<int64_t> matchedFormIds;
+    matchedFormIds.insert(formId);
+    formDbCache.GetNoHostInvalidDBForms(userId, callingUid, matchedFormIds, noHostFormDBList, foundFormsMap);
+    formDbCache.BatchDeleteNoHostDBForms(callingUid, noHostFormDBList, foundFormsMap);
+    formDbCache.DeleteInvalidDBForms(userId, callingUid, matchedFormIds, foundFormsMap);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI2(const char* data, size_t size)
+{
+    FormDbCache formDbCache;
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    FormRecord record;
+    formDbCache.GetDBRecord(formId, record);
+    FormDBInfo records;
+    formDbCache.GetDBRecord(formId, records);
+    formDbCache.UpdateDBRecord(formId, record);
+    int uid = static_cast<int>(GetU32Data(data));
+    std::set<int64_t> formNums;
+    formNums.insert(formId);
+    std::string bundleName(data, size);
+    std::string abilityName(data, size);
+    FormIdKey formIdKey(bundleName, abilityName);
+    std::map<FormIdKey, std::set<int64_t>> noHostFormDBList;
+    noHostFormDBList.emplace(formIdKey, formNums);
+    std::map<int64_t, bool> foundFormsMap;
+    bool flag = *data % ENABLE;
+    foundFormsMap.emplace(formId, flag);
+    formDbCache.GetNoHostDBForms(uid, noHostFormDBList, foundFormsMap);
+    std::string moduleName(data, size);
+    formDbCache.GetMatchCount(bundleName, moduleName);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    formDbCache.DeleteDBFormsByUserId(userId);
+    int32_t callingUid = static_cast<int32_t>(GetU32Data(data));
+    std::set<int64_t> matchedFormIds;
+    matchedFormIds.insert(formId);
+    formDbCache.GetNoHostInvalidDBForms(userId, callingUid, matchedFormIds, noHostFormDBList, foundFormsMap);
+    formDbCache.BatchDeleteNoHostDBForms(callingUid, noHostFormDBList, foundFormsMap);
+    formDbCache.DeleteInvalidDBForms(userId, callingUid, matchedFormIds, foundFormsMap);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI3(const char* data, size_t size)
+{
+    FormDbCache formDbCache;
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    FormRecord record;
+    formDbCache.GetDBRecord(formId, record);
+    FormDBInfo records;
+    formDbCache.GetDBRecord(formId, records);
+    formDbCache.UpdateDBRecord(formId, record);
+    int uid = static_cast<int>(GetU32Data(data));
+    std::set<int64_t> formNums;
+    formNums.insert(formId);
+    std::string bundleName(data, size);
+    std::string abilityName(data, size);
+    FormIdKey formIdKey(bundleName, abilityName);
+    std::map<FormIdKey, std::set<int64_t>> noHostFormDBList;
+    noHostFormDBList.emplace(formIdKey, formNums);
+    std::map<int64_t, bool> foundFormsMap;
+    bool flag = *data % ENABLE;
+    foundFormsMap.emplace(formId, flag);
+    formDbCache.GetNoHostDBForms(uid, noHostFormDBList, foundFormsMap);
+    std::string moduleName(data, size);
+    formDbCache.GetMatchCount(bundleName, moduleName);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    formDbCache.DeleteDBFormsByUserId(userId);
+    int32_t callingUid = static_cast<int32_t>(GetU32Data(data));
+    std::set<int64_t> matchedFormIds;
+    matchedFormIds.insert(formId);
+    formDbCache.GetNoHostInvalidDBForms(userId, callingUid, matchedFormIds, noHostFormDBList, foundFormsMap);
+    formDbCache.BatchDeleteNoHostDBForms(callingUid, noHostFormDBList, foundFormsMap);
+    formDbCache.DeleteInvalidDBForms(userId, callingUid, matchedFormIds, foundFormsMap);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI4(const char* data, size_t size)
+{
+    FormDbCache formDbCache;
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    FormRecord record;
+    formDbCache.GetDBRecord(formId, record);
+    FormDBInfo records;
+    formDbCache.GetDBRecord(formId, records);
+    formDbCache.UpdateDBRecord(formId, record);
+    int uid = static_cast<int>(GetU32Data(data));
+    std::set<int64_t> formNums;
+    formNums.insert(formId);
+    std::string bundleName(data, size);
+    std::string abilityName(data, size);
+    FormIdKey formIdKey(bundleName, abilityName);
+    std::map<FormIdKey, std::set<int64_t>> noHostFormDBList;
+    noHostFormDBList.emplace(formIdKey, formNums);
+    std::map<int64_t, bool> foundFormsMap;
+    bool flag = *data % ENABLE;
+    foundFormsMap.emplace(formId, flag);
+    formDbCache.GetNoHostDBForms(uid, noHostFormDBList, foundFormsMap);
+    std::string moduleName(data, size);
+    formDbCache.GetMatchCount(bundleName, moduleName);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    formDbCache.DeleteDBFormsByUserId(userId);
+    int32_t callingUid = static_cast<int32_t>(GetU32Data(data));
+    std::set<int64_t> matchedFormIds;
+    matchedFormIds.insert(formId);
+    formDbCache.GetNoHostInvalidDBForms(userId, callingUid, matchedFormIds, noHostFormDBList, foundFormsMap);
+    formDbCache.BatchDeleteNoHostDBForms(callingUid, noHostFormDBList, foundFormsMap);
+    formDbCache.DeleteInvalidDBForms(userId, callingUid, matchedFormIds, foundFormsMap);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI5(const char* data, size_t size)
+{
+    FormDbCache formDbCache;
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    FormRecord record;
+    formDbCache.GetDBRecord(formId, record);
+    FormDBInfo records;
+    formDbCache.GetDBRecord(formId, records);
+    formDbCache.UpdateDBRecord(formId, record);
+    int uid = static_cast<int>(GetU32Data(data));
+    std::set<int64_t> formNums;
+    formNums.insert(formId);
+    std::string bundleName(data, size);
+    std::string abilityName(data, size);
+    FormIdKey formIdKey(bundleName, abilityName);
+    std::map<FormIdKey, std::set<int64_t>> noHostFormDBList;
+    noHostFormDBList.emplace(formIdKey, formNums);
+    std::map<int64_t, bool> foundFormsMap;
+    bool flag = *data % ENABLE;
+    foundFormsMap.emplace(formId, flag);
+    formDbCache.GetNoHostDBForms(uid, noHostFormDBList, foundFormsMap);
+    std::string moduleName(data, size);
+    formDbCache.GetMatchCount(bundleName, moduleName);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    formDbCache.DeleteDBFormsByUserId(userId);
+    int32_t callingUid = static_cast<int32_t>(GetU32Data(data));
+    std::set<int64_t> matchedFormIds;
+    matchedFormIds.insert(formId);
+    formDbCache.GetNoHostInvalidDBForms(userId, callingUid, matchedFormIds, noHostFormDBList, foundFormsMap);
+    formDbCache.BatchDeleteNoHostDBForms(callingUid, noHostFormDBList, foundFormsMap);
+    formDbCache.DeleteInvalidDBForms(userId, callingUid, matchedFormIds, foundFormsMap);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI6(const char* data, size_t size)
+{
+    FormDbCache formDbCache;
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    FormRecord record;
+    formDbCache.GetDBRecord(formId, record);
+    FormDBInfo records;
+    formDbCache.GetDBRecord(formId, records);
+    formDbCache.UpdateDBRecord(formId, record);
+    int uid = static_cast<int>(GetU32Data(data));
+    std::set<int64_t> formNums;
+    formNums.insert(formId);
+    std::string bundleName(data, size);
+    std::string abilityName(data, size);
+    FormIdKey formIdKey(bundleName, abilityName);
+    std::map<FormIdKey, std::set<int64_t>> noHostFormDBList;
+    noHostFormDBList.emplace(formIdKey, formNums);
+    std::map<int64_t, bool> foundFormsMap;
+    bool flag = *data % ENABLE;
+    foundFormsMap.emplace(formId, flag);
+    formDbCache.GetNoHostDBForms(uid, noHostFormDBList, foundFormsMap);
+    std::string moduleName(data, size);
+    formDbCache.GetMatchCount(bundleName, moduleName);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    formDbCache.DeleteDBFormsByUserId(userId);
+    int32_t callingUid = static_cast<int32_t>(GetU32Data(data));
+    std::set<int64_t> matchedFormIds;
+    matchedFormIds.insert(formId);
+    formDbCache.GetNoHostInvalidDBForms(userId, callingUid, matchedFormIds, noHostFormDBList, foundFormsMap);
+    formDbCache.BatchDeleteNoHostDBForms(callingUid, noHostFormDBList, foundFormsMap);
+    formDbCache.DeleteInvalidDBForms(userId, callingUid, matchedFormIds, foundFormsMap);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI7(const char* data, size_t size)
+{
+    FormDbCache formDbCache;
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    FormRecord record;
+    formDbCache.GetDBRecord(formId, record);
+    FormDBInfo records;
+    formDbCache.GetDBRecord(formId, records);
+    formDbCache.UpdateDBRecord(formId, record);
+    int uid = static_cast<int>(GetU32Data(data));
+    std::set<int64_t> formNums;
+    formNums.insert(formId);
+    std::string bundleName(data, size);
+    std::string abilityName(data, size);
+    FormIdKey formIdKey(bundleName, abilityName);
+    std::map<FormIdKey, std::set<int64_t>> noHostFormDBList;
+    noHostFormDBList.emplace(formIdKey, formNums);
+    std::map<int64_t, bool> foundFormsMap;
+    bool flag = *data % ENABLE;
+    foundFormsMap.emplace(formId, flag);
+    formDbCache.GetNoHostDBForms(uid, noHostFormDBList, foundFormsMap);
+    std::string moduleName(data, size);
+    formDbCache.GetMatchCount(bundleName, moduleName);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    formDbCache.DeleteDBFormsByUserId(userId);
+    int32_t callingUid = static_cast<int32_t>(GetU32Data(data));
+    std::set<int64_t> matchedFormIds;
+    matchedFormIds.insert(formId);
+    formDbCache.GetNoHostInvalidDBForms(userId, callingUid, matchedFormIds, noHostFormDBList, foundFormsMap);
+    formDbCache.BatchDeleteNoHostDBForms(callingUid, noHostFormDBList, foundFormsMap);
+    formDbCache.DeleteInvalidDBForms(userId, callingUid, matchedFormIds, foundFormsMap);
+    return true;
+}
 }
 
 /* Fuzzer entry point */

@@ -55,6 +55,160 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formDbCache.DeleteFormInfoByBundleName(bundleName, userId, removedDBForms);
     return true;
 }
+
+bool DoSomethingInterestingWithMyAPI1(const char* data, size_t size)
+{
+    FormDbCache formDbCache;
+    formDbCache.Start();
+    FormDBInfo formDBInfo;
+    formDbCache.SaveFormInfo(formDBInfo);
+    formDbCache.SaveFormInfoNolock(formDBInfo);
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    formDbCache.DeleteFormInfo(formId);
+    int32_t hostUid = static_cast<int32_t>(GetU32Data(data));
+    formDbCache.IsHostOwner(formId, hostUid);
+    formDbCache.UpdateFormLocation(formId, hostUid);
+    std::string bundleName(data, size);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    std::vector<FormDBInfo> removedDBForms;
+    std::vector<FormDBInfo> formDBInfos;
+    formDbCache.GetAllFormDBInfoByBundleName(bundleName, userId, formDBInfos);
+    removedDBForms.emplace_back(formDBInfo);
+    formDbCache.DeleteFormInfoByBundleName(bundleName, userId, removedDBForms);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI2(const char* data, size_t size)
+{
+    FormDbCache formDbCache;
+    formDbCache.Start();
+    FormDBInfo formDBInfo;
+    formDbCache.SaveFormInfo(formDBInfo);
+    formDbCache.SaveFormInfoNolock(formDBInfo);
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    formDbCache.DeleteFormInfo(formId);
+    int32_t hostUid = static_cast<int32_t>(GetU32Data(data));
+    formDbCache.IsHostOwner(formId, hostUid);
+    formDbCache.UpdateFormLocation(formId, hostUid);
+    std::string bundleName(data, size);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    std::vector<FormDBInfo> removedDBForms;
+    std::vector<FormDBInfo> formDBInfos;
+    formDbCache.GetAllFormDBInfoByBundleName(bundleName, userId, formDBInfos);
+    removedDBForms.emplace_back(formDBInfo);
+    formDbCache.DeleteFormInfoByBundleName(bundleName, userId, removedDBForms);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI3(const char* data, size_t size)
+{
+    FormDbCache formDbCache;
+    formDbCache.Start();
+    FormDBInfo formDBInfo;
+    formDbCache.SaveFormInfo(formDBInfo);
+    formDbCache.SaveFormInfoNolock(formDBInfo);
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    formDbCache.DeleteFormInfo(formId);
+    int32_t hostUid = static_cast<int32_t>(GetU32Data(data));
+    formDbCache.IsHostOwner(formId, hostUid);
+    formDbCache.UpdateFormLocation(formId, hostUid);
+    std::string bundleName(data, size);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    std::vector<FormDBInfo> removedDBForms;
+    std::vector<FormDBInfo> formDBInfos;
+    formDbCache.GetAllFormDBInfoByBundleName(bundleName, userId, formDBInfos);
+    removedDBForms.emplace_back(formDBInfo);
+    formDbCache.DeleteFormInfoByBundleName(bundleName, userId, removedDBForms);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI4(const char* data, size_t size)
+{
+    FormDbCache formDbCache;
+    formDbCache.Start();
+    FormDBInfo formDBInfo;
+    formDbCache.SaveFormInfo(formDBInfo);
+    formDbCache.SaveFormInfoNolock(formDBInfo);
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    formDbCache.DeleteFormInfo(formId);
+    int32_t hostUid = static_cast<int32_t>(GetU32Data(data));
+    formDbCache.IsHostOwner(formId, hostUid);
+    formDbCache.UpdateFormLocation(formId, hostUid);
+    std::string bundleName(data, size);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    std::vector<FormDBInfo> removedDBForms;
+    std::vector<FormDBInfo> formDBInfos;
+    formDbCache.GetAllFormDBInfoByBundleName(bundleName, userId, formDBInfos);
+    removedDBForms.emplace_back(formDBInfo);
+    formDbCache.DeleteFormInfoByBundleName(bundleName, userId, removedDBForms);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI5(const char* data, size_t size)
+{
+    FormDbCache formDbCache;
+    formDbCache.Start();
+    FormDBInfo formDBInfo;
+    formDbCache.SaveFormInfo(formDBInfo);
+    formDbCache.SaveFormInfoNolock(formDBInfo);
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    formDbCache.DeleteFormInfo(formId);
+    int32_t hostUid = static_cast<int32_t>(GetU32Data(data));
+    formDbCache.IsHostOwner(formId, hostUid);
+    formDbCache.UpdateFormLocation(formId, hostUid);
+    std::string bundleName(data, size);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    std::vector<FormDBInfo> removedDBForms;
+    std::vector<FormDBInfo> formDBInfos;
+    formDbCache.GetAllFormDBInfoByBundleName(bundleName, userId, formDBInfos);
+    removedDBForms.emplace_back(formDBInfo);
+    formDbCache.DeleteFormInfoByBundleName(bundleName, userId, removedDBForms);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI6(const char* data, size_t size)
+{
+    FormDbCache formDbCache;
+    formDbCache.Start();
+    FormDBInfo formDBInfo;
+    formDbCache.SaveFormInfo(formDBInfo);
+    formDbCache.SaveFormInfoNolock(formDBInfo);
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    formDbCache.DeleteFormInfo(formId);
+    int32_t hostUid = static_cast<int32_t>(GetU32Data(data));
+    formDbCache.IsHostOwner(formId, hostUid);
+    formDbCache.UpdateFormLocation(formId, hostUid);
+    std::string bundleName(data, size);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    std::vector<FormDBInfo> removedDBForms;
+    std::vector<FormDBInfo> formDBInfos;
+    formDbCache.GetAllFormDBInfoByBundleName(bundleName, userId, formDBInfos);
+    removedDBForms.emplace_back(formDBInfo);
+    formDbCache.DeleteFormInfoByBundleName(bundleName, userId, removedDBForms);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI7(const char* data, size_t size)
+{
+    FormDbCache formDbCache;
+    formDbCache.Start();
+    FormDBInfo formDBInfo;
+    formDbCache.SaveFormInfo(formDBInfo);
+    formDbCache.SaveFormInfoNolock(formDBInfo);
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    formDbCache.DeleteFormInfo(formId);
+    int32_t hostUid = static_cast<int32_t>(GetU32Data(data));
+    formDbCache.IsHostOwner(formId, hostUid);
+    formDbCache.UpdateFormLocation(formId, hostUid);
+    std::string bundleName(data, size);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    std::vector<FormDBInfo> removedDBForms;
+    std::vector<FormDBInfo> formDBInfos;
+    formDbCache.GetAllFormDBInfoByBundleName(bundleName, userId, formDBInfos);
+    removedDBForms.emplace_back(formDBInfo);
+    formDbCache.DeleteFormInfoByBundleName(bundleName, userId, removedDBForms);
+    return true;
+}
 }
 
 /* Fuzzer entry point */

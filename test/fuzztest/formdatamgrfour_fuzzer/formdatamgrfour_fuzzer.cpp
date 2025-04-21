@@ -75,6 +75,293 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formDataMgr.SetRecordNeedFreeInstall(formId, isNeedFreeInstall);
     return true;
 }
+
+bool DoSomethingInterestingWithMyAPI1(const char* data, size_t size)
+{
+    FormDataMgr formDataMgr;
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    std::vector<int64_t> removedFormIds;
+    removedFormIds.emplace_back(formId);
+    formDataMgr.DeleteFormsByUserId(userId, removedFormIds);
+    formDataMgr.ClearFormRecords();
+    int32_t callingUid = static_cast<int32_t>(GetU32Data(data));
+    std::set<int64_t> matchedFormIds;
+    matchedFormIds.insert(formId);
+    std::string bundleName(data, size);
+    std::string abilityName(data, size);
+    FormIdKey formIdKey(bundleName, abilityName);
+    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    noHostTempFormsMap.emplace(formIdKey, matchedFormIds);
+    std::map<int64_t, bool> foundFormsMap;
+    bool flag = *data % ENABLE;
+    foundFormsMap.emplace(formId, flag);
+    formDataMgr.GetNoHostInvalidTempForms(userId, callingUid, matchedFormIds, noHostTempFormsMap, foundFormsMap);
+    formDataMgr.BatchDeleteNoHostTempForms(callingUid, noHostTempFormsMap, foundFormsMap);
+    formDataMgr.DeleteInvalidTempForms(userId, callingUid, matchedFormIds, foundFormsMap);
+    formDataMgr.DeleteInvalidPublishForms(userId, bundleName, matchedFormIds);
+    formDataMgr.ClearHostDataByInvalidForms(callingUid, foundFormsMap);
+    Want want;
+    std::unique_ptr<FormProviderData> formProviderData = nullptr;
+    formDataMgr.AddRequestPublishFormInfo(formId, want, formProviderData);
+    formDataMgr.RemoveRequestPublishFormInfo(formId);
+    formDataMgr.IsRequestPublishForm(formId);
+    formDataMgr.GetRequestPublishFormInfo(formId, want, formProviderData);
+    FormRecord record;
+    BundlePackInfo bundlePackInfo;
+    AbilityFormInfo abilityFormInfo;
+    formDataMgr.GetPackageForm(record, bundlePackInfo, abilityFormInfo);
+    formDataMgr.IsSameForm(record, abilityFormInfo);
+    bool isNeedFreeInstall = *data % ENABLE;
+    formDataMgr.SetRecordNeedFreeInstall(formId, isNeedFreeInstall);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI2(const char* data, size_t size)
+{
+    FormDataMgr formDataMgr;
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    std::vector<int64_t> removedFormIds;
+    removedFormIds.emplace_back(formId);
+    formDataMgr.DeleteFormsByUserId(userId, removedFormIds);
+    formDataMgr.ClearFormRecords();
+    int32_t callingUid = static_cast<int32_t>(GetU32Data(data));
+    std::set<int64_t> matchedFormIds;
+    matchedFormIds.insert(formId);
+    std::string bundleName(data, size);
+    std::string abilityName(data, size);
+    FormIdKey formIdKey(bundleName, abilityName);
+    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    noHostTempFormsMap.emplace(formIdKey, matchedFormIds);
+    std::map<int64_t, bool> foundFormsMap;
+    bool flag = *data % ENABLE;
+    foundFormsMap.emplace(formId, flag);
+    formDataMgr.GetNoHostInvalidTempForms(userId, callingUid, matchedFormIds, noHostTempFormsMap, foundFormsMap);
+    formDataMgr.BatchDeleteNoHostTempForms(callingUid, noHostTempFormsMap, foundFormsMap);
+    formDataMgr.DeleteInvalidTempForms(userId, callingUid, matchedFormIds, foundFormsMap);
+    formDataMgr.DeleteInvalidPublishForms(userId, bundleName, matchedFormIds);
+    formDataMgr.ClearHostDataByInvalidForms(callingUid, foundFormsMap);
+    Want want;
+    std::unique_ptr<FormProviderData> formProviderData = nullptr;
+    formDataMgr.AddRequestPublishFormInfo(formId, want, formProviderData);
+    formDataMgr.RemoveRequestPublishFormInfo(formId);
+    formDataMgr.IsRequestPublishForm(formId);
+    formDataMgr.GetRequestPublishFormInfo(formId, want, formProviderData);
+    FormRecord record;
+    BundlePackInfo bundlePackInfo;
+    AbilityFormInfo abilityFormInfo;
+    formDataMgr.GetPackageForm(record, bundlePackInfo, abilityFormInfo);
+    formDataMgr.IsSameForm(record, abilityFormInfo);
+    bool isNeedFreeInstall = *data % ENABLE;
+    formDataMgr.SetRecordNeedFreeInstall(formId, isNeedFreeInstall);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI3(const char* data, size_t size)
+{
+    FormDataMgr formDataMgr;
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    std::vector<int64_t> removedFormIds;
+    removedFormIds.emplace_back(formId);
+    formDataMgr.DeleteFormsByUserId(userId, removedFormIds);
+    formDataMgr.ClearFormRecords();
+    int32_t callingUid = static_cast<int32_t>(GetU32Data(data));
+    std::set<int64_t> matchedFormIds;
+    matchedFormIds.insert(formId);
+    std::string bundleName(data, size);
+    std::string abilityName(data, size);
+    FormIdKey formIdKey(bundleName, abilityName);
+    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    noHostTempFormsMap.emplace(formIdKey, matchedFormIds);
+    std::map<int64_t, bool> foundFormsMap;
+    bool flag = *data % ENABLE;
+    foundFormsMap.emplace(formId, flag);
+    formDataMgr.GetNoHostInvalidTempForms(userId, callingUid, matchedFormIds, noHostTempFormsMap, foundFormsMap);
+    formDataMgr.BatchDeleteNoHostTempForms(callingUid, noHostTempFormsMap, foundFormsMap);
+    formDataMgr.DeleteInvalidTempForms(userId, callingUid, matchedFormIds, foundFormsMap);
+    formDataMgr.DeleteInvalidPublishForms(userId, bundleName, matchedFormIds);
+    formDataMgr.ClearHostDataByInvalidForms(callingUid, foundFormsMap);
+    Want want;
+    std::unique_ptr<FormProviderData> formProviderData = nullptr;
+    formDataMgr.AddRequestPublishFormInfo(formId, want, formProviderData);
+    formDataMgr.RemoveRequestPublishFormInfo(formId);
+    formDataMgr.IsRequestPublishForm(formId);
+    formDataMgr.GetRequestPublishFormInfo(formId, want, formProviderData);
+    FormRecord record;
+    BundlePackInfo bundlePackInfo;
+    AbilityFormInfo abilityFormInfo;
+    formDataMgr.GetPackageForm(record, bundlePackInfo, abilityFormInfo);
+    formDataMgr.IsSameForm(record, abilityFormInfo);
+    bool isNeedFreeInstall = *data % ENABLE;
+    formDataMgr.SetRecordNeedFreeInstall(formId, isNeedFreeInstall);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI4(const char* data, size_t size)
+{
+    FormDataMgr formDataMgr;
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    std::vector<int64_t> removedFormIds;
+    removedFormIds.emplace_back(formId);
+    formDataMgr.DeleteFormsByUserId(userId, removedFormIds);
+    formDataMgr.ClearFormRecords();
+    int32_t callingUid = static_cast<int32_t>(GetU32Data(data));
+    std::set<int64_t> matchedFormIds;
+    matchedFormIds.insert(formId);
+    std::string bundleName(data, size);
+    std::string abilityName(data, size);
+    FormIdKey formIdKey(bundleName, abilityName);
+    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    noHostTempFormsMap.emplace(formIdKey, matchedFormIds);
+    std::map<int64_t, bool> foundFormsMap;
+    bool flag = *data % ENABLE;
+    foundFormsMap.emplace(formId, flag);
+    formDataMgr.GetNoHostInvalidTempForms(userId, callingUid, matchedFormIds, noHostTempFormsMap, foundFormsMap);
+    formDataMgr.BatchDeleteNoHostTempForms(callingUid, noHostTempFormsMap, foundFormsMap);
+    formDataMgr.DeleteInvalidTempForms(userId, callingUid, matchedFormIds, foundFormsMap);
+    formDataMgr.DeleteInvalidPublishForms(userId, bundleName, matchedFormIds);
+    formDataMgr.ClearHostDataByInvalidForms(callingUid, foundFormsMap);
+    Want want;
+    std::unique_ptr<FormProviderData> formProviderData = nullptr;
+    formDataMgr.AddRequestPublishFormInfo(formId, want, formProviderData);
+    formDataMgr.RemoveRequestPublishFormInfo(formId);
+    formDataMgr.IsRequestPublishForm(formId);
+    formDataMgr.GetRequestPublishFormInfo(formId, want, formProviderData);
+    FormRecord record;
+    BundlePackInfo bundlePackInfo;
+    AbilityFormInfo abilityFormInfo;
+    formDataMgr.GetPackageForm(record, bundlePackInfo, abilityFormInfo);
+    formDataMgr.IsSameForm(record, abilityFormInfo);
+    bool isNeedFreeInstall = *data % ENABLE;
+    formDataMgr.SetRecordNeedFreeInstall(formId, isNeedFreeInstall);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI5(const char* data, size_t size)
+{
+    FormDataMgr formDataMgr;
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    std::vector<int64_t> removedFormIds;
+    removedFormIds.emplace_back(formId);
+    formDataMgr.DeleteFormsByUserId(userId, removedFormIds);
+    formDataMgr.ClearFormRecords();
+    int32_t callingUid = static_cast<int32_t>(GetU32Data(data));
+    std::set<int64_t> matchedFormIds;
+    matchedFormIds.insert(formId);
+    std::string bundleName(data, size);
+    std::string abilityName(data, size);
+    FormIdKey formIdKey(bundleName, abilityName);
+    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    noHostTempFormsMap.emplace(formIdKey, matchedFormIds);
+    std::map<int64_t, bool> foundFormsMap;
+    bool flag = *data % ENABLE;
+    foundFormsMap.emplace(formId, flag);
+    formDataMgr.GetNoHostInvalidTempForms(userId, callingUid, matchedFormIds, noHostTempFormsMap, foundFormsMap);
+    formDataMgr.BatchDeleteNoHostTempForms(callingUid, noHostTempFormsMap, foundFormsMap);
+    formDataMgr.DeleteInvalidTempForms(userId, callingUid, matchedFormIds, foundFormsMap);
+    formDataMgr.DeleteInvalidPublishForms(userId, bundleName, matchedFormIds);
+    formDataMgr.ClearHostDataByInvalidForms(callingUid, foundFormsMap);
+    Want want;
+    std::unique_ptr<FormProviderData> formProviderData = nullptr;
+    formDataMgr.AddRequestPublishFormInfo(formId, want, formProviderData);
+    formDataMgr.RemoveRequestPublishFormInfo(formId);
+    formDataMgr.IsRequestPublishForm(formId);
+    formDataMgr.GetRequestPublishFormInfo(formId, want, formProviderData);
+    FormRecord record;
+    BundlePackInfo bundlePackInfo;
+    AbilityFormInfo abilityFormInfo;
+    formDataMgr.GetPackageForm(record, bundlePackInfo, abilityFormInfo);
+    formDataMgr.IsSameForm(record, abilityFormInfo);
+    bool isNeedFreeInstall = *data % ENABLE;
+    formDataMgr.SetRecordNeedFreeInstall(formId, isNeedFreeInstall);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI6(const char* data, size_t size)
+{
+    FormDataMgr formDataMgr;
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    std::vector<int64_t> removedFormIds;
+    removedFormIds.emplace_back(formId);
+    formDataMgr.DeleteFormsByUserId(userId, removedFormIds);
+    formDataMgr.ClearFormRecords();
+    int32_t callingUid = static_cast<int32_t>(GetU32Data(data));
+    std::set<int64_t> matchedFormIds;
+    matchedFormIds.insert(formId);
+    std::string bundleName(data, size);
+    std::string abilityName(data, size);
+    FormIdKey formIdKey(bundleName, abilityName);
+    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    noHostTempFormsMap.emplace(formIdKey, matchedFormIds);
+    std::map<int64_t, bool> foundFormsMap;
+    bool flag = *data % ENABLE;
+    foundFormsMap.emplace(formId, flag);
+    formDataMgr.GetNoHostInvalidTempForms(userId, callingUid, matchedFormIds, noHostTempFormsMap, foundFormsMap);
+    formDataMgr.BatchDeleteNoHostTempForms(callingUid, noHostTempFormsMap, foundFormsMap);
+    formDataMgr.DeleteInvalidTempForms(userId, callingUid, matchedFormIds, foundFormsMap);
+    formDataMgr.DeleteInvalidPublishForms(userId, bundleName, matchedFormIds);
+    formDataMgr.ClearHostDataByInvalidForms(callingUid, foundFormsMap);
+    Want want;
+    std::unique_ptr<FormProviderData> formProviderData = nullptr;
+    formDataMgr.AddRequestPublishFormInfo(formId, want, formProviderData);
+    formDataMgr.RemoveRequestPublishFormInfo(formId);
+    formDataMgr.IsRequestPublishForm(formId);
+    formDataMgr.GetRequestPublishFormInfo(formId, want, formProviderData);
+    FormRecord record;
+    BundlePackInfo bundlePackInfo;
+    AbilityFormInfo abilityFormInfo;
+    formDataMgr.GetPackageForm(record, bundlePackInfo, abilityFormInfo);
+    formDataMgr.IsSameForm(record, abilityFormInfo);
+    bool isNeedFreeInstall = *data % ENABLE;
+    formDataMgr.SetRecordNeedFreeInstall(formId, isNeedFreeInstall);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI7(const char* data, size_t size)
+{
+    FormDataMgr formDataMgr;
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    std::vector<int64_t> removedFormIds;
+    removedFormIds.emplace_back(formId);
+    formDataMgr.DeleteFormsByUserId(userId, removedFormIds);
+    formDataMgr.ClearFormRecords();
+    int32_t callingUid = static_cast<int32_t>(GetU32Data(data));
+    std::set<int64_t> matchedFormIds;
+    matchedFormIds.insert(formId);
+    std::string bundleName(data, size);
+    std::string abilityName(data, size);
+    FormIdKey formIdKey(bundleName, abilityName);
+    std::map<FormIdKey, std::set<int64_t>> noHostTempFormsMap;
+    noHostTempFormsMap.emplace(formIdKey, matchedFormIds);
+    std::map<int64_t, bool> foundFormsMap;
+    bool flag = *data % ENABLE;
+    foundFormsMap.emplace(formId, flag);
+    formDataMgr.GetNoHostInvalidTempForms(userId, callingUid, matchedFormIds, noHostTempFormsMap, foundFormsMap);
+    formDataMgr.BatchDeleteNoHostTempForms(callingUid, noHostTempFormsMap, foundFormsMap);
+    formDataMgr.DeleteInvalidTempForms(userId, callingUid, matchedFormIds, foundFormsMap);
+    formDataMgr.DeleteInvalidPublishForms(userId, bundleName, matchedFormIds);
+    formDataMgr.ClearHostDataByInvalidForms(callingUid, foundFormsMap);
+    Want want;
+    std::unique_ptr<FormProviderData> formProviderData = nullptr;
+    formDataMgr.AddRequestPublishFormInfo(formId, want, formProviderData);
+    formDataMgr.RemoveRequestPublishFormInfo(formId);
+    formDataMgr.IsRequestPublishForm(formId);
+    formDataMgr.GetRequestPublishFormInfo(formId, want, formProviderData);
+    FormRecord record;
+    BundlePackInfo bundlePackInfo;
+    AbilityFormInfo abilityFormInfo;
+    formDataMgr.GetPackageForm(record, bundlePackInfo, abilityFormInfo);
+    formDataMgr.IsSameForm(record, abilityFormInfo);
+    bool isNeedFreeInstall = *data % ENABLE;
+    formDataMgr.SetRecordNeedFreeInstall(formId, isNeedFreeInstall);
+    return true;
+}
 }
 
 /* Fuzzer entry point */
