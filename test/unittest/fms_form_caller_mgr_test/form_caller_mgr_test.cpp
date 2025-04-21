@@ -478,7 +478,7 @@ HWTEST_F(FormCallerMgrTest, FormHostCallerTest_0002, TestSize.Level1) {
  * @tc.desc: test RemoveFormHostCaller function forHostCallers is not empty and IsSameToken is true
  * @tc.type: FUNC
  */
- HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0020, TestSize.Level1) {
+HWTEST_F(FormCallerMgrTest, FormCallerMgrTest_0020, TestSize.Level1) {
     GTEST_LOG_(INFO) << "FormCallerMgrTest_0020 starts";
     std::shared_ptr<FormCallerMgr> formCallerMgr = std::make_shared<FormCallerMgr>();
     ASSERT_NE(nullptr, formCallerMgr);
