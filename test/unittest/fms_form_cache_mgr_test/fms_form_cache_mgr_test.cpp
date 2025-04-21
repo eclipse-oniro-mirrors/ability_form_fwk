@@ -312,4 +312,283 @@ HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_014, TestSize.Level0)
     EXPECT_TRUE(formCacheMgr_.DeleteImgCacheInDb(rowId));
     GTEST_LOG_(INFO) << "fms_form_cache_mgr_test_014 end";
 }
+
+/*
+ * Feature: FormCacheMgr
+ * Function: AddData
+ * FunctionPoints: FormCacheMgr AddData interface
+ * EnvConditions: Mobile that can run ohos test framework
+ * CaseDescription: cache contains data and add the new data by input param.
+ */
+HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_015, TestSize.Level0)
+{
+    HILOG_INFO("FmsFormCacheMgrTest_015 start");
+    std::string result1 = "{\"a\":\"1\",\"b\":\"2\"}";
+    std::string result2 = "{\"a\":\"2\",\"b\":\"2\"}";
+    nlohmann::json dataResult1 = R"(
+        {
+            "a" : "1",
+            "b" : "2"
+        }
+    )"_json;
+    nlohmann::json dataResult2 = R"(
+        {
+            "a" : "2",
+            "b" : "2"
+        }
+    )"_json;
+    FormProviderData formProviderData;
+    formProviderData.UpdateData(dataResult1);
+    EXPECT_TRUE(formCacheMgr_.AddData(PARAM_FORM_ID_FIRST, formProviderData));
+
+    std::string queryResult;
+    std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
+    EXPECT_TRUE(formCacheMgr_.GetData(PARAM_FORM_ID_FIRST, queryResult, imageDataMap));
+    EXPECT_EQ(result1, queryResult);
+
+    formProviderData.UpdateData(dataResult2);
+    EXPECT_TRUE(formCacheMgr_.AddData(PARAM_FORM_ID_FIRST, formProviderData));
+    EXPECT_TRUE(formCacheMgr_.GetData(PARAM_FORM_ID_FIRST, queryResult, imageDataMap));
+    EXPECT_EQ(result2, queryResult);
+    GTEST_LOG_(INFO) << "FmsFormCacheMgrTest_015 end";
+}
+
+ /*
+ * Feature: FormCacheMgr
+ * Function: AddData
+ * FunctionPoints: FormCacheMgr AddData interface
+ * EnvConditions: Mobile that can run ohos test framework
+ * CaseDescription: cache contains data and add the new data by input param.
+ */
+HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_016, TestSize.Level0)
+{
+    HILOG_INFO("FmsFormCacheMgrTest_016 start");
+    std::string result1 = "{\"a\":\"1\",\"b\":\"2\"}";
+    std::string result2 = "{\"a\":\"2\",\"b\":\"2\"}";
+    nlohmann::json dataResult1 = R"(
+        {
+            "a" : "1",
+            "b" : "2"
+        }
+    )"_json;
+    nlohmann::json dataResult2 = R"(
+        {
+            "a" : "2",
+            "b" : "2"
+        }
+    )"_json;
+    FormProviderData formProviderData;
+    formProviderData.UpdateData(dataResult1);
+    EXPECT_TRUE(formCacheMgr_.AddData(PARAM_FORM_ID_FIRST, formProviderData));
+
+    std::string queryResult;
+    std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
+    EXPECT_TRUE(formCacheMgr_.GetData(PARAM_FORM_ID_FIRST, queryResult, imageDataMap));
+    EXPECT_EQ(result1, queryResult);
+
+    formProviderData.UpdateData(dataResult2);
+    EXPECT_TRUE(formCacheMgr_.AddData(PARAM_FORM_ID_FIRST, formProviderData));
+    EXPECT_TRUE(formCacheMgr_.GetData(PARAM_FORM_ID_FIRST, queryResult, imageDataMap));
+    EXPECT_EQ(result2, queryResult);
+    GTEST_LOG_(INFO) << "fms_form_cache_mgr_test_003 end";
+}
+/*
+ * Feature: FormCacheMgr
+ * Function: AddData
+ * FunctionPoints: FormCacheMgr AddData interface
+ * EnvConditions: Mobile that can run ohos test framework
+ * CaseDescription: cache contains data and add the new data by input param.
+ */
+HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_017, TestSize.Level0)
+{
+    HILOG_INFO("FmsFormCacheMgrTest_017 start");
+    std::string result1 = "{\"a\":\"1\",\"b\":\"2\"}";
+    std::string result2 = "{\"a\":\"2\",\"b\":\"2\"}";
+    nlohmann::json dataResult1 = R"(
+        {
+            "a" : "1",
+            "b" : "2"
+        }
+    )"_json;
+    nlohmann::json dataResult2 = R"(
+        {
+            "a" : "2",
+            "b" : "2"
+        }
+    )"_json;
+    FormProviderData formProviderData;
+    formProviderData.UpdateData(dataResult1);
+    EXPECT_TRUE(formCacheMgr_.AddData(PARAM_FORM_ID_FIRST, formProviderData));
+
+    std::string queryResult;
+    std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
+    EXPECT_TRUE(formCacheMgr_.GetData(PARAM_FORM_ID_FIRST, queryResult, imageDataMap));
+    EXPECT_EQ(result1, queryResult);
+
+    formProviderData.UpdateData(dataResult2);
+    EXPECT_TRUE(formCacheMgr_.AddData(PARAM_FORM_ID_FIRST, formProviderData));
+    EXPECT_TRUE(formCacheMgr_.GetData(PARAM_FORM_ID_FIRST, queryResult, imageDataMap));
+    EXPECT_EQ(result2, queryResult);
+    GTEST_LOG_(INFO) << "FmsFormCacheMgrTest_017 end";
+}
+
+ /*
+ * Feature: FormCacheMgr
+ * Function: AddData
+ * FunctionPoints: FormCacheMgr AddData interface
+ * EnvConditions: Mobile that can run ohos test framework
+ * CaseDescription: cache contains data and add the new data by input param.
+ */
+HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_018, TestSize.Level0)
+{
+    HILOG_INFO("FmsFormCacheMgrTest_018 start");
+    std::string result1 = "{\"a\":\"1\",\"b\":\"2\"}";
+    std::string result2 = "{\"a\":\"2\",\"b\":\"2\"}";
+    nlohmann::json dataResult1 = R"(
+        {
+            "a" : "1",
+            "b" : "2"
+        }
+    )"_json;
+    nlohmann::json dataResult2 = R"(
+        {
+            "a" : "2",
+            "b" : "2"
+        }
+    )"_json;
+    FormProviderData formProviderData;
+    formProviderData.UpdateData(dataResult1);
+    EXPECT_TRUE(formCacheMgr_.AddData(PARAM_FORM_ID_FIRST, formProviderData));
+
+    std::string queryResult;
+    std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
+    EXPECT_TRUE(formCacheMgr_.GetData(PARAM_FORM_ID_FIRST, queryResult, imageDataMap));
+    EXPECT_EQ(result1, queryResult);
+
+    formProviderData.UpdateData(dataResult2);
+    EXPECT_TRUE(formCacheMgr_.AddData(PARAM_FORM_ID_FIRST, formProviderData));
+    EXPECT_TRUE(formCacheMgr_.GetData(PARAM_FORM_ID_FIRST, queryResult, imageDataMap));
+    EXPECT_EQ(result2, queryResult);
+    GTEST_LOG_(INFO) << "FmsFormCacheMgrTest_018 end";
+}
+
+/*
+ * Feature: FormCacheMgr
+ * Function: AddData
+ * FunctionPoints: FormCacheMgr AddData interface
+ * EnvConditions: Mobile that can run ohos test framework
+ * CaseDescription: cache contains data and add the new data by input param.
+ */
+ HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_019, TestSize.Level0)
+ {
+    HILOG_INFO("FmsFormCacheMgrTest_019 start");
+    std::string result1 = "{\"a\":\"1\",\"b\":\"2\"}";
+    std::string result2 = "{\"a\":\"2\",\"b\":\"2\"}";
+    nlohmann::json dataResult1 = R"(
+        {
+            "a" : "1",
+            "b" : "2"
+        }
+    )"_json;
+    nlohmann::json dataResult2 = R"(
+        {
+            "a" : "2",
+            "b" : "2"
+        }
+    )"_json;
+    FormProviderData formProviderData;
+    formProviderData.UpdateData(dataResult1);
+    EXPECT_TRUE(formCacheMgr_.AddData(PARAM_FORM_ID_FIRST, formProviderData));
+
+    std::string queryResult;
+    std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
+    EXPECT_TRUE(formCacheMgr_.GetData(PARAM_FORM_ID_FIRST, queryResult, imageDataMap));
+    EXPECT_EQ(result1, queryResult);
+
+    formProviderData.UpdateData(dataResult2);
+    EXPECT_TRUE(formCacheMgr_.AddData(PARAM_FORM_ID_FIRST, formProviderData));
+    EXPECT_TRUE(formCacheMgr_.GetData(PARAM_FORM_ID_FIRST, queryResult, imageDataMap));
+    EXPECT_EQ(result2, queryResult);
+    GTEST_LOG_(INFO) << "FmsFormCacheMgrTest_019 end";
+}
+
+ /*
+ * Feature: FormCacheMgr
+ * Function: AddData
+ * FunctionPoints: FormCacheMgr AddData interface
+ * EnvConditions: Mobile that can run ohos test framework
+ * CaseDescription: cache contains data and add the new data by input param.
+ */
+HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_020, TestSize.Level0)
+{
+    HILOG_INFO("FmsFormCacheMgrTest_020 start");
+    std::string result1 = "{\"a\":\"1\",\"b\":\"2\"}";
+    std::string result2 = "{\"a\":\"2\",\"b\":\"2\"}";
+    nlohmann::json dataResult1 = R"(
+        {
+            "a" : "1",
+            "b" : "2"
+        }
+    )"_json;
+    nlohmann::json dataResult2 = R"(
+        {
+            "a" : "2",
+            "b" : "2"
+        }
+    )"_json;
+    FormProviderData formProviderData;
+    formProviderData.UpdateData(dataResult1);
+    EXPECT_TRUE(formCacheMgr_.AddData(PARAM_FORM_ID_FIRST, formProviderData));
+
+    std::string queryResult;
+    std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
+    EXPECT_TRUE(formCacheMgr_.GetData(PARAM_FORM_ID_FIRST, queryResult, imageDataMap));
+    EXPECT_EQ(result1, queryResult);
+
+    formProviderData.UpdateData(dataResult2);
+    EXPECT_TRUE(formCacheMgr_.AddData(PARAM_FORM_ID_FIRST, formProviderData));
+    EXPECT_TRUE(formCacheMgr_.GetData(PARAM_FORM_ID_FIRST, queryResult, imageDataMap));
+    EXPECT_EQ(result2, queryResult);
+    GTEST_LOG_(INFO) << "FmsFormCacheMgrTest_020 end";
+}
+
+/*
+ * Feature: FormCacheMgr
+ * Function: AddData
+ * FunctionPoints: FormCacheMgr AddData interface
+ * EnvConditions: Mobile that can run ohos test framework
+ * CaseDescription: cache contains data and add the new data by input param.
+ */
+ HWTEST_F(FmsFormCacheMgrTest, FmsFormCacheMgrTest_021, TestSize.Level0)
+{
+    HILOG_INFO("FmsFormCacheMgrTest_021 start");
+    std::string result1 = "{\"a\":\"1\",\"b\":\"2\"}";
+    std::string result2 = "{\"a\":\"2\",\"b\":\"2\"}";
+    nlohmann::json dataResult1 = R"(
+        {
+            "a" : "1",
+            "b" : "2"
+        }
+    )"_json;
+    nlohmann::json dataResult2 = R"(
+        {
+            "a" : "2",
+            "b" : "2"
+        }
+    )"_json;
+    FormProviderData formProviderData;
+    formProviderData.UpdateData(dataResult1);
+    EXPECT_TRUE(formCacheMgr_.AddData(PARAM_FORM_ID_FIRST, formProviderData));
+
+    std::string queryResult;
+    std::map<std::string, std::pair<sptr<FormAshmem>, int32_t>> imageDataMap;
+    EXPECT_TRUE(formCacheMgr_.GetData(PARAM_FORM_ID_FIRST, queryResult, imageDataMap));
+    EXPECT_EQ(result1, queryResult);
+
+    formProviderData.UpdateData(dataResult2);
+    EXPECT_TRUE(formCacheMgr_.AddData(PARAM_FORM_ID_FIRST, formProviderData));
+    EXPECT_TRUE(formCacheMgr_.GetData(PARAM_FORM_ID_FIRST, queryResult, imageDataMap));
+    EXPECT_EQ(result2, queryResult);
+    GTEST_LOG_(INFO) << "FmsFormCacheMgrTest_021 end";
+}
 }

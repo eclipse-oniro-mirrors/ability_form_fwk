@@ -254,6 +254,146 @@ HWTEST_F(FmsFormAshmemTest, FmsFormAshmemTest_012, TestSize.Level1)
 }
 
 /*
+ * @tc.number: FmsFormAshmemTest_014
+ * @tc.name: WriteToAshmem
+ * @tc.desc: Verify function WriteToAshmem return value is true
+ */
+HWTEST_F(FmsFormAshmemTest, FmsFormAshmemTest_014, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormAshmemTest_014 start";
+    std::string name = "abc";
+    char data[] = "ab";
+    int32_t size = 1;
+    int32_t fd = -1;
+    form_ashmem_->ashmem_ = new (std::nothrow) Ashmem(fd, size);
+    MockMapReadAndWriteAshmem(true);
+    MockWriteToAshmem(true);
+    form_ashmem_->WriteToAshmem(name, data, size);
+    EXPECT_TRUE(form_ashmem_->WriteToAshmem(name, data, size));
+    GTEST_LOG_(INFO) << "FmsFormAshmemTest_014 end";
+}
+
+/*
+ * @tc.number: FmsFormAshmemTest_015
+ * @tc.name: WriteToAshmem
+ * @tc.desc: Verify function WriteToAshmem return value is true
+ */
+HWTEST_F(FmsFormAshmemTest, FmsFormAshmemTest_015, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormAshmemTest_015 start";
+    std::string name = "abc";
+    char data[] = "ab";
+    int32_t size = 1;
+    int32_t fd = -1;
+    form_ashmem_->ashmem_ = new (std::nothrow) Ashmem(fd, size);
+    MockMapReadAndWriteAshmem(true);
+    MockWriteToAshmem(true);
+    form_ashmem_->WriteToAshmem(name, data, size);
+    EXPECT_TRUE(form_ashmem_->WriteToAshmem(name, data, size));
+    GTEST_LOG_(INFO) << "FmsFormAshmemTest_015 end";
+}
+
+/*
+ * @tc.number: FmsFormAshmemTest_016
+ * @tc.name: WriteToAshmem
+ * @tc.desc: Verify function WriteToAshmem return value is true
+ */
+HWTEST_F(FmsFormAshmemTest, FmsFormAshmemTest_016, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormAshmemTest_016 start";
+    std::string name = "abc";
+    char data[] = "ab";
+    int32_t size = 1;
+    int32_t fd = -1;
+    form_ashmem_->ashmem_ = new (std::nothrow) Ashmem(fd, size);
+    MockMapReadAndWriteAshmem(true);
+    MockWriteToAshmem(true);
+    form_ashmem_->WriteToAshmem(name, data, size);
+    EXPECT_TRUE(form_ashmem_->WriteToAshmem(name, data, size));
+    GTEST_LOG_(INFO) << "FmsFormAshmemTest_016 end";
+}
+
+/*
+ * @tc.number: FmsFormAshmemTest_017
+ * @tc.name: WriteToAshmem
+ * @tc.desc: Verify function WriteToAshmem return value is true
+ */
+HWTEST_F(FmsFormAshmemTest, FmsFormAshmemTest_017, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormAshmemTest_017 start";
+    std::string name = "abc";
+    char data[] = "ab";
+    int32_t size = 1;
+    int32_t fd = -1;
+    form_ashmem_->ashmem_ = new (std::nothrow) Ashmem(fd, size);
+    MockMapReadAndWriteAshmem(true);
+    MockWriteToAshmem(true);
+    form_ashmem_->WriteToAshmem(name, data, size);
+    EXPECT_TRUE(form_ashmem_->WriteToAshmem(name, data, size));
+    GTEST_LOG_(INFO) << "FmsFormAshmemTest_017 end";
+}
+
+/*
+ * @tc.number: FmsFormAshmemTest_018
+ * @tc.name: WriteToAshmem
+ * @tc.desc: Verify function WriteToAshmem return value is true
+ */
+HWTEST_F(FmsFormAshmemTest, FmsFormAshmemTest_018, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormAshmemTest_018 start";
+    std::string name = "abc";
+    char data[] = "ab";
+    int32_t size = 1;
+    int32_t fd = -1;
+    form_ashmem_->ashmem_ = new (std::nothrow) Ashmem(fd, size);
+    MockMapReadAndWriteAshmem(true);
+    MockWriteToAshmem(true);
+    form_ashmem_->WriteToAshmem(name, data, size);
+    EXPECT_TRUE(form_ashmem_->WriteToAshmem(name, data, size));
+    GTEST_LOG_(INFO) << "FmsFormAshmemTest_018 end";
+}
+
+/*
+ * @tc.number: FmsFormAshmemTest_019
+ * @tc.name: WriteToAshmem
+ * @tc.desc: Verify function WriteToAshmem return value is true
+ */
+HWTEST_F(FmsFormAshmemTest, FmsFormAshmemTest_019, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormAshmemTest_019 start";
+    std::string name = "abc";
+    char data[] = "ab";
+    int32_t size = 1;
+    int32_t fd = -1;
+    form_ashmem_->ashmem_ = new (std::nothrow) Ashmem(fd, size);
+    MockMapReadAndWriteAshmem(true);
+    MockWriteToAshmem(true);
+    form_ashmem_->WriteToAshmem(name, data, size);
+    EXPECT_TRUE(form_ashmem_->WriteToAshmem(name, data, size));
+    GTEST_LOG_(INFO) << "FmsFormAshmemTest_019 end";
+}
+
+/*
+ * @tc.number: FmsFormAshmemTest_020
+ * @tc.name: WriteToAshmem
+ * @tc.desc: Verify function WriteToAshmem return value is true
+ */
+HWTEST_F(FmsFormAshmemTest, FmsFormAshmemTest_020, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormAshmemTest_020 start";
+    std::string name = "abc";
+    char data[] = "ab";
+    int32_t size = 1;
+    int32_t fd = -1;
+    form_ashmem_->ashmem_ = new (std::nothrow) Ashmem(fd, size);
+    MockMapReadAndWriteAshmem(true);
+    MockWriteToAshmem(true);
+    form_ashmem_->WriteToAshmem(name, data, size);
+    EXPECT_TRUE(form_ashmem_->WriteToAshmem(name, data, size));
+    GTEST_LOG_(INFO) << "FmsFormAshmemTest_020 end";
+}
+
+/*
 * @tc.number: FmsFormAshmemTest_013
 * @tc.name: WriteToAshmem
 * @tc.desc: Verify function WriteToAshmem return value is true
