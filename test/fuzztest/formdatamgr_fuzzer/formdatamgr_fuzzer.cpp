@@ -58,6 +58,181 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formDataMgr.ExistTempForm(formId);
     return true;
 }
+
+bool DoSomethingInterestingWithMyAPI1(const char* data, size_t size)
+{
+    FormDataMgr formDataMgr;
+    FormItemInfo formInfo;
+    int callingUid = static_cast<int>(GetU32Data(data));
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    formDataMgr.AllotFormRecord(formInfo, callingUid, userId);
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    formDataMgr.DeleteFormRecord(formId);
+    sptr<IRemoteObject> callerToken = nullptr;
+    formDataMgr.AllotFormHostRecord(formInfo, callerToken, formId, callingUid);
+    FormHostRecord record;
+    formDataMgr.CreateHostRecord(formInfo, callerToken, callingUid, record);
+    formDataMgr.CreateFormRecord(formInfo, callingUid, userId);
+    FormRecord records;
+    FormJsInfo formInfos;
+    formDataMgr.CreateFormJsInfo(formId, records, formInfos);
+    formDataMgr.CheckTempEnoughForm();
+    int32_t currentUserId = static_cast<int32_t>(GetU32Data(data));
+    formDataMgr.CheckEnoughForm(callingUid, currentUserId);
+    formDataMgr.DeleteTempForm(formId);
+    formDataMgr.ExistTempForm(formId);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI2(const char* data, size_t size)
+{
+    FormDataMgr formDataMgr;
+    FormItemInfo formInfo;
+    int callingUid = static_cast<int>(GetU32Data(data));
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    formDataMgr.AllotFormRecord(formInfo, callingUid, userId);
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    formDataMgr.DeleteFormRecord(formId);
+    sptr<IRemoteObject> callerToken = nullptr;
+    formDataMgr.AllotFormHostRecord(formInfo, callerToken, formId, callingUid);
+    FormHostRecord record;
+    formDataMgr.CreateHostRecord(formInfo, callerToken, callingUid, record);
+    formDataMgr.CreateFormRecord(formInfo, callingUid, userId);
+    FormRecord records;
+    FormJsInfo formInfos;
+    formDataMgr.CreateFormJsInfo(formId, records, formInfos);
+    formDataMgr.CheckTempEnoughForm();
+    int32_t currentUserId = static_cast<int32_t>(GetU32Data(data));
+    formDataMgr.CheckEnoughForm(callingUid, currentUserId);
+    formDataMgr.DeleteTempForm(formId);
+    formDataMgr.ExistTempForm(formId);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI3(const char* data, size_t size)
+{
+    FormDataMgr formDataMgr;
+    FormItemInfo formInfo;
+    int callingUid = static_cast<int>(GetU32Data(data));
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    formDataMgr.AllotFormRecord(formInfo, callingUid, userId);
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    formDataMgr.DeleteFormRecord(formId);
+    sptr<IRemoteObject> callerToken = nullptr;
+    formDataMgr.AllotFormHostRecord(formInfo, callerToken, formId, callingUid);
+    FormHostRecord record;
+    formDataMgr.CreateHostRecord(formInfo, callerToken, callingUid, record);
+    formDataMgr.CreateFormRecord(formInfo, callingUid, userId);
+    FormRecord records;
+    FormJsInfo formInfos;
+    formDataMgr.CreateFormJsInfo(formId, records, formInfos);
+    formDataMgr.CheckTempEnoughForm();
+    int32_t currentUserId = static_cast<int32_t>(GetU32Data(data));
+    formDataMgr.CheckEnoughForm(callingUid, currentUserId);
+    formDataMgr.DeleteTempForm(formId);
+    formDataMgr.ExistTempForm(formId);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI4(const char* data, size_t size)
+{
+    FormDataMgr formDataMgr;
+    FormItemInfo formInfo;
+    int callingUid = static_cast<int>(GetU32Data(data));
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    formDataMgr.AllotFormRecord(formInfo, callingUid, userId);
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    formDataMgr.DeleteFormRecord(formId);
+    sptr<IRemoteObject> callerToken = nullptr;
+    formDataMgr.AllotFormHostRecord(formInfo, callerToken, formId, callingUid);
+    FormHostRecord record;
+    formDataMgr.CreateHostRecord(formInfo, callerToken, callingUid, record);
+    formDataMgr.CreateFormRecord(formInfo, callingUid, userId);
+    FormRecord records;
+    FormJsInfo formInfos;
+    formDataMgr.CreateFormJsInfo(formId, records, formInfos);
+    formDataMgr.CheckTempEnoughForm();
+    int32_t currentUserId = static_cast<int32_t>(GetU32Data(data));
+    formDataMgr.CheckEnoughForm(callingUid, currentUserId);
+    formDataMgr.DeleteTempForm(formId);
+    formDataMgr.ExistTempForm(formId);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI5(const char* data, size_t size)
+{
+    FormDataMgr formDataMgr;
+    FormItemInfo formInfo;
+    int callingUid = static_cast<int>(GetU32Data(data));
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    formDataMgr.AllotFormRecord(formInfo, callingUid, userId);
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    formDataMgr.DeleteFormRecord(formId);
+    sptr<IRemoteObject> callerToken = nullptr;
+    formDataMgr.AllotFormHostRecord(formInfo, callerToken, formId, callingUid);
+    FormHostRecord record;
+    formDataMgr.CreateHostRecord(formInfo, callerToken, callingUid, record);
+    formDataMgr.CreateFormRecord(formInfo, callingUid, userId);
+    FormRecord records;
+    FormJsInfo formInfos;
+    formDataMgr.CreateFormJsInfo(formId, records, formInfos);
+    formDataMgr.CheckTempEnoughForm();
+    int32_t currentUserId = static_cast<int32_t>(GetU32Data(data));
+    formDataMgr.CheckEnoughForm(callingUid, currentUserId);
+    formDataMgr.DeleteTempForm(formId);
+    formDataMgr.ExistTempForm(formId);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI6(const char* data, size_t size)
+{
+    FormDataMgr formDataMgr;
+    FormItemInfo formInfo;
+    int callingUid = static_cast<int>(GetU32Data(data));
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    formDataMgr.AllotFormRecord(formInfo, callingUid, userId);
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    formDataMgr.DeleteFormRecord(formId);
+    sptr<IRemoteObject> callerToken = nullptr;
+    formDataMgr.AllotFormHostRecord(formInfo, callerToken, formId, callingUid);
+    FormHostRecord record;
+    formDataMgr.CreateHostRecord(formInfo, callerToken, callingUid, record);
+    formDataMgr.CreateFormRecord(formInfo, callingUid, userId);
+    FormRecord records;
+    FormJsInfo formInfos;
+    formDataMgr.CreateFormJsInfo(formId, records, formInfos);
+    formDataMgr.CheckTempEnoughForm();
+    int32_t currentUserId = static_cast<int32_t>(GetU32Data(data));
+    formDataMgr.CheckEnoughForm(callingUid, currentUserId);
+    formDataMgr.DeleteTempForm(formId);
+    formDataMgr.ExistTempForm(formId);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI7(const char* data, size_t size)
+{
+    FormDataMgr formDataMgr;
+    FormItemInfo formInfo;
+    int callingUid = static_cast<int>(GetU32Data(data));
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    formDataMgr.AllotFormRecord(formInfo, callingUid, userId);
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    formDataMgr.DeleteFormRecord(formId);
+    sptr<IRemoteObject> callerToken = nullptr;
+    formDataMgr.AllotFormHostRecord(formInfo, callerToken, formId, callingUid);
+    FormHostRecord record;
+    formDataMgr.CreateHostRecord(formInfo, callerToken, callingUid, record);
+    formDataMgr.CreateFormRecord(formInfo, callingUid, userId);
+    FormRecord records;
+    FormJsInfo formInfos;
+    formDataMgr.CreateFormJsInfo(formId, records, formInfos);
+    formDataMgr.CheckTempEnoughForm();
+    int32_t currentUserId = static_cast<int32_t>(GetU32Data(data));
+    formDataMgr.CheckEnoughForm(callingUid, currentUserId);
+    formDataMgr.DeleteTempForm(formId);
+    formDataMgr.ExistTempForm(formId);
+    return true;
+}
 }
 
 /* Fuzzer entry point */

@@ -79,6 +79,321 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formDataMgr.GetReCreateFormRecordsByBundleName(bundleName, removedForms);
     return true;
 }
+
+bool DoSomethingInterestingWithMyAPI1(const char* data, size_t size)
+{
+    FormDataMgr formDataMgr;
+    FormHostRecord record;
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    std::vector<int64_t> recordTempForms;
+    recordTempForms.emplace_back(formId);
+    formDataMgr.HandleHostDiedForTempForms(record, recordTempForms);
+    formDataMgr.PaddingUdidHash(formId);
+    formDataMgr.GenerateFormId();
+    formDataMgr.GenerateUdidHash();
+    formDataMgr.GetUdidHash();
+    int64_t udidHash = static_cast<int64_t>(GetU32Data(data));
+    formDataMgr.SetUdidHash(udidHash);
+    sptr<IRemoteObject> callerToken = nullptr;
+    formDataMgr.GetMatchedHostClient(callerToken, record);
+    bool needRefresh = *data % ENABLE;
+    formDataMgr.SetNeedRefresh(formId, needRefresh);
+    bool countTimerRefresh = *data % ENABLE;
+    formDataMgr.SetCountTimerRefresh(formId, countTimerRefresh);
+    FormRecord records;
+    std::vector<FormInfo> targetForms;
+    FormInfo updatedForm;
+    targetForms.emplace_back(updatedForm);
+    formDataMgr.GetUpdatedForm(records, targetForms, updatedForm);
+    bool enableUpdate = *data % ENABLE;
+    formDataMgr.SetEnableUpdate(formId, enableUpdate);
+    long updateDuration = static_cast<long>(GetU32Data(data));
+    int updateAtHour = static_cast<int>(GetU32Data(data));
+    int updateAtMin = static_cast<int>(GetU32Data(data));
+    std::vector<std::vector<int>> updateAtTimes;
+    std::vector<int> newElement = {updateAtHour, updateAtMin};
+    updateAtTimes.push_back(newElement);
+    formDataMgr.SetUpdateInfo(formId, enableUpdate, updateDuration, updateAtHour, updateAtMin, updateAtTimes);
+    formDataMgr.IsSameForm(records, updatedForm);
+    std::string bundleName(data, size);
+    std::set<int64_t> removedForms;
+    removedForms.insert(formId);
+    formDataMgr.CleanRemovedFormRecords(bundleName, removedForms);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    formDataMgr.CleanRemovedTempFormRecords(bundleName, userId, removedForms);
+    formDataMgr.GetReCreateFormRecordsByBundleName(bundleName, removedForms);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI2(const char* data, size_t size)
+{
+    FormDataMgr formDataMgr;
+    FormHostRecord record;
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    std::vector<int64_t> recordTempForms;
+    recordTempForms.emplace_back(formId);
+    formDataMgr.HandleHostDiedForTempForms(record, recordTempForms);
+    formDataMgr.PaddingUdidHash(formId);
+    formDataMgr.GenerateFormId();
+    formDataMgr.GenerateUdidHash();
+    formDataMgr.GetUdidHash();
+    int64_t udidHash = static_cast<int64_t>(GetU32Data(data));
+    formDataMgr.SetUdidHash(udidHash);
+    sptr<IRemoteObject> callerToken = nullptr;
+    formDataMgr.GetMatchedHostClient(callerToken, record);
+    bool needRefresh = *data % ENABLE;
+    formDataMgr.SetNeedRefresh(formId, needRefresh);
+    bool countTimerRefresh = *data % ENABLE;
+    formDataMgr.SetCountTimerRefresh(formId, countTimerRefresh);
+    FormRecord records;
+    std::vector<FormInfo> targetForms;
+    FormInfo updatedForm;
+    targetForms.emplace_back(updatedForm);
+    formDataMgr.GetUpdatedForm(records, targetForms, updatedForm);
+    bool enableUpdate = *data % ENABLE;
+    formDataMgr.SetEnableUpdate(formId, enableUpdate);
+    long updateDuration = static_cast<long>(GetU32Data(data));
+    int updateAtHour = static_cast<int>(GetU32Data(data));
+    int updateAtMin = static_cast<int>(GetU32Data(data));
+    std::vector<std::vector<int>> updateAtTimes;
+    std::vector<int> newElement = {updateAtHour, updateAtMin};
+    updateAtTimes.push_back(newElement);
+    formDataMgr.SetUpdateInfo(formId, enableUpdate, updateDuration, updateAtHour, updateAtMin, updateAtTimes);
+    formDataMgr.IsSameForm(records, updatedForm);
+    std::string bundleName(data, size);
+    std::set<int64_t> removedForms;
+    removedForms.insert(formId);
+    formDataMgr.CleanRemovedFormRecords(bundleName, removedForms);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    formDataMgr.CleanRemovedTempFormRecords(bundleName, userId, removedForms);
+    formDataMgr.GetReCreateFormRecordsByBundleName(bundleName, removedForms);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI3(const char* data, size_t size)
+{
+    FormDataMgr formDataMgr;
+    FormHostRecord record;
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    std::vector<int64_t> recordTempForms;
+    recordTempForms.emplace_back(formId);
+    formDataMgr.HandleHostDiedForTempForms(record, recordTempForms);
+    formDataMgr.PaddingUdidHash(formId);
+    formDataMgr.GenerateFormId();
+    formDataMgr.GenerateUdidHash();
+    formDataMgr.GetUdidHash();
+    int64_t udidHash = static_cast<int64_t>(GetU32Data(data));
+    formDataMgr.SetUdidHash(udidHash);
+    sptr<IRemoteObject> callerToken = nullptr;
+    formDataMgr.GetMatchedHostClient(callerToken, record);
+    bool needRefresh = *data % ENABLE;
+    formDataMgr.SetNeedRefresh(formId, needRefresh);
+    bool countTimerRefresh = *data % ENABLE;
+    formDataMgr.SetCountTimerRefresh(formId, countTimerRefresh);
+    FormRecord records;
+    std::vector<FormInfo> targetForms;
+    FormInfo updatedForm;
+    targetForms.emplace_back(updatedForm);
+    formDataMgr.GetUpdatedForm(records, targetForms, updatedForm);
+    bool enableUpdate = *data % ENABLE;
+    formDataMgr.SetEnableUpdate(formId, enableUpdate);
+    long updateDuration = static_cast<long>(GetU32Data(data));
+    int updateAtHour = static_cast<int>(GetU32Data(data));
+    int updateAtMin = static_cast<int>(GetU32Data(data));
+    std::vector<std::vector<int>> updateAtTimes;
+    std::vector<int> newElement = {updateAtHour, updateAtMin};
+    updateAtTimes.push_back(newElement);
+    formDataMgr.SetUpdateInfo(formId, enableUpdate, updateDuration, updateAtHour, updateAtMin, updateAtTimes);
+    formDataMgr.IsSameForm(records, updatedForm);
+    std::string bundleName(data, size);
+    std::set<int64_t> removedForms;
+    removedForms.insert(formId);
+    formDataMgr.CleanRemovedFormRecords(bundleName, removedForms);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    formDataMgr.CleanRemovedTempFormRecords(bundleName, userId, removedForms);
+    formDataMgr.GetReCreateFormRecordsByBundleName(bundleName, removedForms);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI4(const char* data, size_t size)
+{
+    FormDataMgr formDataMgr;
+    FormHostRecord record;
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    std::vector<int64_t> recordTempForms;
+    recordTempForms.emplace_back(formId);
+    formDataMgr.HandleHostDiedForTempForms(record, recordTempForms);
+    formDataMgr.PaddingUdidHash(formId);
+    formDataMgr.GenerateFormId();
+    formDataMgr.GenerateUdidHash();
+    formDataMgr.GetUdidHash();
+    int64_t udidHash = static_cast<int64_t>(GetU32Data(data));
+    formDataMgr.SetUdidHash(udidHash);
+    sptr<IRemoteObject> callerToken = nullptr;
+    formDataMgr.GetMatchedHostClient(callerToken, record);
+    bool needRefresh = *data % ENABLE;
+    formDataMgr.SetNeedRefresh(formId, needRefresh);
+    bool countTimerRefresh = *data % ENABLE;
+    formDataMgr.SetCountTimerRefresh(formId, countTimerRefresh);
+    FormRecord records;
+    std::vector<FormInfo> targetForms;
+    FormInfo updatedForm;
+    targetForms.emplace_back(updatedForm);
+    formDataMgr.GetUpdatedForm(records, targetForms, updatedForm);
+    bool enableUpdate = *data % ENABLE;
+    formDataMgr.SetEnableUpdate(formId, enableUpdate);
+    long updateDuration = static_cast<long>(GetU32Data(data));
+    int updateAtHour = static_cast<int>(GetU32Data(data));
+    int updateAtMin = static_cast<int>(GetU32Data(data));
+    std::vector<std::vector<int>> updateAtTimes;
+    std::vector<int> newElement = {updateAtHour, updateAtMin};
+    updateAtTimes.push_back(newElement);
+    formDataMgr.SetUpdateInfo(formId, enableUpdate, updateDuration, updateAtHour, updateAtMin, updateAtTimes);
+    formDataMgr.IsSameForm(records, updatedForm);
+    std::string bundleName(data, size);
+    std::set<int64_t> removedForms;
+    removedForms.insert(formId);
+    formDataMgr.CleanRemovedFormRecords(bundleName, removedForms);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    formDataMgr.CleanRemovedTempFormRecords(bundleName, userId, removedForms);
+    formDataMgr.GetReCreateFormRecordsByBundleName(bundleName, removedForms);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI5(const char* data, size_t size)
+{
+    FormDataMgr formDataMgr;
+    FormHostRecord record;
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    std::vector<int64_t> recordTempForms;
+    recordTempForms.emplace_back(formId);
+    formDataMgr.HandleHostDiedForTempForms(record, recordTempForms);
+    formDataMgr.PaddingUdidHash(formId);
+    formDataMgr.GenerateFormId();
+    formDataMgr.GenerateUdidHash();
+    formDataMgr.GetUdidHash();
+    int64_t udidHash = static_cast<int64_t>(GetU32Data(data));
+    formDataMgr.SetUdidHash(udidHash);
+    sptr<IRemoteObject> callerToken = nullptr;
+    formDataMgr.GetMatchedHostClient(callerToken, record);
+    bool needRefresh = *data % ENABLE;
+    formDataMgr.SetNeedRefresh(formId, needRefresh);
+    bool countTimerRefresh = *data % ENABLE;
+    formDataMgr.SetCountTimerRefresh(formId, countTimerRefresh);
+    FormRecord records;
+    std::vector<FormInfo> targetForms;
+    FormInfo updatedForm;
+    targetForms.emplace_back(updatedForm);
+    formDataMgr.GetUpdatedForm(records, targetForms, updatedForm);
+    bool enableUpdate = *data % ENABLE;
+    formDataMgr.SetEnableUpdate(formId, enableUpdate);
+    long updateDuration = static_cast<long>(GetU32Data(data));
+    int updateAtHour = static_cast<int>(GetU32Data(data));
+    int updateAtMin = static_cast<int>(GetU32Data(data));
+    std::vector<std::vector<int>> updateAtTimes;
+    std::vector<int> newElement = {updateAtHour, updateAtMin};
+    updateAtTimes.push_back(newElement);
+    formDataMgr.SetUpdateInfo(formId, enableUpdate, updateDuration, updateAtHour, updateAtMin, updateAtTimes);
+    formDataMgr.IsSameForm(records, updatedForm);
+    std::string bundleName(data, size);
+    std::set<int64_t> removedForms;
+    removedForms.insert(formId);
+    formDataMgr.CleanRemovedFormRecords(bundleName, removedForms);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    formDataMgr.CleanRemovedTempFormRecords(bundleName, userId, removedForms);
+    formDataMgr.GetReCreateFormRecordsByBundleName(bundleName, removedForms);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI6(const char* data, size_t size)
+{
+    FormDataMgr formDataMgr;
+    FormHostRecord record;
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    std::vector<int64_t> recordTempForms;
+    recordTempForms.emplace_back(formId);
+    formDataMgr.HandleHostDiedForTempForms(record, recordTempForms);
+    formDataMgr.PaddingUdidHash(formId);
+    formDataMgr.GenerateFormId();
+    formDataMgr.GenerateUdidHash();
+    formDataMgr.GetUdidHash();
+    int64_t udidHash = static_cast<int64_t>(GetU32Data(data));
+    formDataMgr.SetUdidHash(udidHash);
+    sptr<IRemoteObject> callerToken = nullptr;
+    formDataMgr.GetMatchedHostClient(callerToken, record);
+    bool needRefresh = *data % ENABLE;
+    formDataMgr.SetNeedRefresh(formId, needRefresh);
+    bool countTimerRefresh = *data % ENABLE;
+    formDataMgr.SetCountTimerRefresh(formId, countTimerRefresh);
+    FormRecord records;
+    std::vector<FormInfo> targetForms;
+    FormInfo updatedForm;
+    targetForms.emplace_back(updatedForm);
+    formDataMgr.GetUpdatedForm(records, targetForms, updatedForm);
+    bool enableUpdate = *data % ENABLE;
+    formDataMgr.SetEnableUpdate(formId, enableUpdate);
+    long updateDuration = static_cast<long>(GetU32Data(data));
+    int updateAtHour = static_cast<int>(GetU32Data(data));
+    int updateAtMin = static_cast<int>(GetU32Data(data));
+    std::vector<std::vector<int>> updateAtTimes;
+    std::vector<int> newElement = {updateAtHour, updateAtMin};
+    updateAtTimes.push_back(newElement);
+    formDataMgr.SetUpdateInfo(formId, enableUpdate, updateDuration, updateAtHour, updateAtMin, updateAtTimes);
+    formDataMgr.IsSameForm(records, updatedForm);
+    std::string bundleName(data, size);
+    std::set<int64_t> removedForms;
+    removedForms.insert(formId);
+    formDataMgr.CleanRemovedFormRecords(bundleName, removedForms);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    formDataMgr.CleanRemovedTempFormRecords(bundleName, userId, removedForms);
+    formDataMgr.GetReCreateFormRecordsByBundleName(bundleName, removedForms);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI7(const char* data, size_t size)
+{
+    FormDataMgr formDataMgr;
+    FormHostRecord record;
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    std::vector<int64_t> recordTempForms;
+    recordTempForms.emplace_back(formId);
+    formDataMgr.HandleHostDiedForTempForms(record, recordTempForms);
+    formDataMgr.PaddingUdidHash(formId);
+    formDataMgr.GenerateFormId();
+    formDataMgr.GenerateUdidHash();
+    formDataMgr.GetUdidHash();
+    int64_t udidHash = static_cast<int64_t>(GetU32Data(data));
+    formDataMgr.SetUdidHash(udidHash);
+    sptr<IRemoteObject> callerToken = nullptr;
+    formDataMgr.GetMatchedHostClient(callerToken, record);
+    bool needRefresh = *data % ENABLE;
+    formDataMgr.SetNeedRefresh(formId, needRefresh);
+    bool countTimerRefresh = *data % ENABLE;
+    formDataMgr.SetCountTimerRefresh(formId, countTimerRefresh);
+    FormRecord records;
+    std::vector<FormInfo> targetForms;
+    FormInfo updatedForm;
+    targetForms.emplace_back(updatedForm);
+    formDataMgr.GetUpdatedForm(records, targetForms, updatedForm);
+    bool enableUpdate = *data % ENABLE;
+    formDataMgr.SetEnableUpdate(formId, enableUpdate);
+    long updateDuration = static_cast<long>(GetU32Data(data));
+    int updateAtHour = static_cast<int>(GetU32Data(data));
+    int updateAtMin = static_cast<int>(GetU32Data(data));
+    std::vector<std::vector<int>> updateAtTimes;
+    std::vector<int> newElement = {updateAtHour, updateAtMin};
+    updateAtTimes.push_back(newElement);
+    formDataMgr.SetUpdateInfo(formId, enableUpdate, updateDuration, updateAtHour, updateAtMin, updateAtTimes);
+    formDataMgr.IsSameForm(records, updatedForm);
+    std::string bundleName(data, size);
+    std::set<int64_t> removedForms;
+    removedForms.insert(formId);
+    formDataMgr.CleanRemovedFormRecords(bundleName, removedForms);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    formDataMgr.CleanRemovedTempFormRecords(bundleName, userId, removedForms);
+    formDataMgr.GetReCreateFormRecordsByBundleName(bundleName, removedForms);
+    return true;
+}
 }
 
 /* Fuzzer entry point */

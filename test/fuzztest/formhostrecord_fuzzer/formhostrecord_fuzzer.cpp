@@ -77,6 +77,335 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     formHostRecord.SetHostBundleName(hostBundleName);
     return formHostRecord.IsEmpty();
 }
+
+bool DoSomethingInterestingWithMyAPI1(const char* data, size_t size)
+{
+    FormHostRecord formHostRecord;
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    formHostRecord.AddForm(formId);
+    formHostRecord.DelForm(formId);
+    formHostRecord.Contains(formId);
+    bool flag = *data % ENABLE;
+    formHostRecord.SetEnableRefresh(formId, flag);
+    formHostRecord.IsEnableRefresh(formId);
+    bool enable = *data % ENABLE;
+    formHostRecord.SetEnableUpdate(formId, enable);
+    formHostRecord.IsEnableUpdate(formId);
+    formHostRecord.SetNeedRefresh(formId, flag);
+    formHostRecord.IsNeedRefresh(formId);
+    formHostRecord.GetFormHostClient();
+    int64_t id = static_cast<int64_t>(GetU32Data(data));
+    FormRecord record;
+    formHostRecord.OnAcquire(id, record);
+    formHostRecord.OnUpdate(id, record);
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+    formHostRecord.OnFormUninstalled(formIds);
+    AppExecFwk::FormState state = AppExecFwk::FormState::UNKNOWN;
+    AAFwk::Want want;
+    formHostRecord.OnAcquireState(state, want);
+    formHostRecord.CleanResource();
+    int callerUid = static_cast<int>(GetU32Data(data));
+    formHostRecord.SetCallerUid(callerUid);
+    sptr<IRemoteObject> formHostClient = nullptr;
+    formHostRecord.SetFormHostClient(formHostClient);
+    std::shared_ptr<FormHostCallback> formHostCallback = nullptr;
+    formHostRecord.SetCallback(formHostCallback);
+    formHostRecord.GetDeathRecipient();
+    sptr<IRemoteObject::DeathRecipient> deathRecipient = nullptr;
+    formHostRecord.SetDeathRecipient(deathRecipient);
+    formHostRecord.AddDeathRecipient(deathRecipient);
+    FormItemInfo info;
+    sptr<IRemoteObject> callback = nullptr;
+    int callingUid = static_cast<int>(GetU32Data(data));
+    formHostRecord.CreateRecord(info, callback, callingUid);
+    formHostRecord.GetHostBundleName();
+    std::string hostBundleName(data, size);
+    formHostRecord.SetHostBundleName(hostBundleName);
+    return formHostRecord.IsEmpty();
+}
+
+bool DoSomethingInterestingWithMyAPI2(const char* data, size_t size)
+{
+    FormHostRecord formHostRecord;
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    formHostRecord.AddForm(formId);
+    formHostRecord.DelForm(formId);
+    formHostRecord.Contains(formId);
+    bool flag = *data % ENABLE;
+    formHostRecord.SetEnableRefresh(formId, flag);
+    formHostRecord.IsEnableRefresh(formId);
+    bool enable = *data % ENABLE;
+    formHostRecord.SetEnableUpdate(formId, enable);
+    formHostRecord.IsEnableUpdate(formId);
+    formHostRecord.SetNeedRefresh(formId, flag);
+    formHostRecord.IsNeedRefresh(formId);
+    formHostRecord.GetFormHostClient();
+    int64_t id = static_cast<int64_t>(GetU32Data(data));
+    FormRecord record;
+    formHostRecord.OnAcquire(id, record);
+    formHostRecord.OnUpdate(id, record);
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+    formHostRecord.OnFormUninstalled(formIds);
+    AppExecFwk::FormState state = AppExecFwk::FormState::UNKNOWN;
+    AAFwk::Want want;
+    formHostRecord.OnAcquireState(state, want);
+    formHostRecord.CleanResource();
+    int callerUid = static_cast<int>(GetU32Data(data));
+    formHostRecord.SetCallerUid(callerUid);
+    sptr<IRemoteObject> formHostClient = nullptr;
+    formHostRecord.SetFormHostClient(formHostClient);
+    std::shared_ptr<FormHostCallback> formHostCallback = nullptr;
+    formHostRecord.SetCallback(formHostCallback);
+    formHostRecord.GetDeathRecipient();
+    sptr<IRemoteObject::DeathRecipient> deathRecipient = nullptr;
+    formHostRecord.SetDeathRecipient(deathRecipient);
+    formHostRecord.AddDeathRecipient(deathRecipient);
+    FormItemInfo info;
+    sptr<IRemoteObject> callback = nullptr;
+    int callingUid = static_cast<int>(GetU32Data(data));
+    formHostRecord.CreateRecord(info, callback, callingUid);
+    formHostRecord.GetHostBundleName();
+    std::string hostBundleName(data, size);
+    formHostRecord.SetHostBundleName(hostBundleName);
+    return formHostRecord.IsEmpty();
+}
+
+bool DoSomethingInterestingWithMyAPI3(const char* data, size_t size)
+{
+    FormHostRecord formHostRecord;
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    formHostRecord.AddForm(formId);
+    formHostRecord.DelForm(formId);
+    formHostRecord.Contains(formId);
+    bool flag = *data % ENABLE;
+    formHostRecord.SetEnableRefresh(formId, flag);
+    formHostRecord.IsEnableRefresh(formId);
+    bool enable = *data % ENABLE;
+    formHostRecord.SetEnableUpdate(formId, enable);
+    formHostRecord.IsEnableUpdate(formId);
+    formHostRecord.SetNeedRefresh(formId, flag);
+    formHostRecord.IsNeedRefresh(formId);
+    formHostRecord.GetFormHostClient();
+    int64_t id = static_cast<int64_t>(GetU32Data(data));
+    FormRecord record;
+    formHostRecord.OnAcquire(id, record);
+    formHostRecord.OnUpdate(id, record);
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+    formHostRecord.OnFormUninstalled(formIds);
+    AppExecFwk::FormState state = AppExecFwk::FormState::UNKNOWN;
+    AAFwk::Want want;
+    formHostRecord.OnAcquireState(state, want);
+    formHostRecord.CleanResource();
+    int callerUid = static_cast<int>(GetU32Data(data));
+    formHostRecord.SetCallerUid(callerUid);
+    sptr<IRemoteObject> formHostClient = nullptr;
+    formHostRecord.SetFormHostClient(formHostClient);
+    std::shared_ptr<FormHostCallback> formHostCallback = nullptr;
+    formHostRecord.SetCallback(formHostCallback);
+    formHostRecord.GetDeathRecipient();
+    sptr<IRemoteObject::DeathRecipient> deathRecipient = nullptr;
+    formHostRecord.SetDeathRecipient(deathRecipient);
+    formHostRecord.AddDeathRecipient(deathRecipient);
+    FormItemInfo info;
+    sptr<IRemoteObject> callback = nullptr;
+    int callingUid = static_cast<int>(GetU32Data(data));
+    formHostRecord.CreateRecord(info, callback, callingUid);
+    formHostRecord.GetHostBundleName();
+    std::string hostBundleName(data, size);
+    formHostRecord.SetHostBundleName(hostBundleName);
+    return formHostRecord.IsEmpty();
+}
+
+bool DoSomethingInterestingWithMyAPI4(const char* data, size_t size)
+{
+    FormHostRecord formHostRecord;
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    formHostRecord.AddForm(formId);
+    formHostRecord.DelForm(formId);
+    formHostRecord.Contains(formId);
+    bool flag = *data % ENABLE;
+    formHostRecord.SetEnableRefresh(formId, flag);
+    formHostRecord.IsEnableRefresh(formId);
+    bool enable = *data % ENABLE;
+    formHostRecord.SetEnableUpdate(formId, enable);
+    formHostRecord.IsEnableUpdate(formId);
+    formHostRecord.SetNeedRefresh(formId, flag);
+    formHostRecord.IsNeedRefresh(formId);
+    formHostRecord.GetFormHostClient();
+    int64_t id = static_cast<int64_t>(GetU32Data(data));
+    FormRecord record;
+    formHostRecord.OnAcquire(id, record);
+    formHostRecord.OnUpdate(id, record);
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+    formHostRecord.OnFormUninstalled(formIds);
+    AppExecFwk::FormState state = AppExecFwk::FormState::UNKNOWN;
+    AAFwk::Want want;
+    formHostRecord.OnAcquireState(state, want);
+    formHostRecord.CleanResource();
+    int callerUid = static_cast<int>(GetU32Data(data));
+    formHostRecord.SetCallerUid(callerUid);
+    sptr<IRemoteObject> formHostClient = nullptr;
+    formHostRecord.SetFormHostClient(formHostClient);
+    std::shared_ptr<FormHostCallback> formHostCallback = nullptr;
+    formHostRecord.SetCallback(formHostCallback);
+    formHostRecord.GetDeathRecipient();
+    sptr<IRemoteObject::DeathRecipient> deathRecipient = nullptr;
+    formHostRecord.SetDeathRecipient(deathRecipient);
+    formHostRecord.AddDeathRecipient(deathRecipient);
+    FormItemInfo info;
+    sptr<IRemoteObject> callback = nullptr;
+    int callingUid = static_cast<int>(GetU32Data(data));
+    formHostRecord.CreateRecord(info, callback, callingUid);
+    formHostRecord.GetHostBundleName();
+    std::string hostBundleName(data, size);
+    formHostRecord.SetHostBundleName(hostBundleName);
+    return formHostRecord.IsEmpty();
+}
+
+bool DoSomethingInterestingWithMyAPI5(const char* data, size_t size)
+{
+    FormHostRecord formHostRecord;
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    formHostRecord.AddForm(formId);
+    formHostRecord.DelForm(formId);
+    formHostRecord.Contains(formId);
+    bool flag = *data % ENABLE;
+    formHostRecord.SetEnableRefresh(formId, flag);
+    formHostRecord.IsEnableRefresh(formId);
+    bool enable = *data % ENABLE;
+    formHostRecord.SetEnableUpdate(formId, enable);
+    formHostRecord.IsEnableUpdate(formId);
+    formHostRecord.SetNeedRefresh(formId, flag);
+    formHostRecord.IsNeedRefresh(formId);
+    formHostRecord.GetFormHostClient();
+    int64_t id = static_cast<int64_t>(GetU32Data(data));
+    FormRecord record;
+    formHostRecord.OnAcquire(id, record);
+    formHostRecord.OnUpdate(id, record);
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+    formHostRecord.OnFormUninstalled(formIds);
+    AppExecFwk::FormState state = AppExecFwk::FormState::UNKNOWN;
+    AAFwk::Want want;
+    formHostRecord.OnAcquireState(state, want);
+    formHostRecord.CleanResource();
+    int callerUid = static_cast<int>(GetU32Data(data));
+    formHostRecord.SetCallerUid(callerUid);
+    sptr<IRemoteObject> formHostClient = nullptr;
+    formHostRecord.SetFormHostClient(formHostClient);
+    std::shared_ptr<FormHostCallback> formHostCallback = nullptr;
+    formHostRecord.SetCallback(formHostCallback);
+    formHostRecord.GetDeathRecipient();
+    sptr<IRemoteObject::DeathRecipient> deathRecipient = nullptr;
+    formHostRecord.SetDeathRecipient(deathRecipient);
+    formHostRecord.AddDeathRecipient(deathRecipient);
+    FormItemInfo info;
+    sptr<IRemoteObject> callback = nullptr;
+    int callingUid = static_cast<int>(GetU32Data(data));
+    formHostRecord.CreateRecord(info, callback, callingUid);
+    formHostRecord.GetHostBundleName();
+    std::string hostBundleName(data, size);
+    formHostRecord.SetHostBundleName(hostBundleName);
+    return formHostRecord.IsEmpty();
+}
+
+bool DoSomethingInterestingWithMyAPI6(const char* data, size_t size)
+{
+    FormHostRecord formHostRecord;
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    formHostRecord.AddForm(formId);
+    formHostRecord.DelForm(formId);
+    formHostRecord.Contains(formId);
+    bool flag = *data % ENABLE;
+    formHostRecord.SetEnableRefresh(formId, flag);
+    formHostRecord.IsEnableRefresh(formId);
+    bool enable = *data % ENABLE;
+    formHostRecord.SetEnableUpdate(formId, enable);
+    formHostRecord.IsEnableUpdate(formId);
+    formHostRecord.SetNeedRefresh(formId, flag);
+    formHostRecord.IsNeedRefresh(formId);
+    formHostRecord.GetFormHostClient();
+    int64_t id = static_cast<int64_t>(GetU32Data(data));
+    FormRecord record;
+    formHostRecord.OnAcquire(id, record);
+    formHostRecord.OnUpdate(id, record);
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+    formHostRecord.OnFormUninstalled(formIds);
+    AppExecFwk::FormState state = AppExecFwk::FormState::UNKNOWN;
+    AAFwk::Want want;
+    formHostRecord.OnAcquireState(state, want);
+    formHostRecord.CleanResource();
+    int callerUid = static_cast<int>(GetU32Data(data));
+    formHostRecord.SetCallerUid(callerUid);
+    sptr<IRemoteObject> formHostClient = nullptr;
+    formHostRecord.SetFormHostClient(formHostClient);
+    std::shared_ptr<FormHostCallback> formHostCallback = nullptr;
+    formHostRecord.SetCallback(formHostCallback);
+    formHostRecord.GetDeathRecipient();
+    sptr<IRemoteObject::DeathRecipient> deathRecipient = nullptr;
+    formHostRecord.SetDeathRecipient(deathRecipient);
+    formHostRecord.AddDeathRecipient(deathRecipient);
+    FormItemInfo info;
+    sptr<IRemoteObject> callback = nullptr;
+    int callingUid = static_cast<int>(GetU32Data(data));
+    formHostRecord.CreateRecord(info, callback, callingUid);
+    formHostRecord.GetHostBundleName();
+    std::string hostBundleName(data, size);
+    formHostRecord.SetHostBundleName(hostBundleName);
+    return formHostRecord.IsEmpty();
+}
+
+bool DoSomethingInterestingWithMyAPI7(const char* data, size_t size)
+{
+    FormHostRecord formHostRecord;
+    int64_t formId = static_cast<int64_t>(GetU32Data(data));
+    formHostRecord.AddForm(formId);
+    formHostRecord.DelForm(formId);
+    formHostRecord.Contains(formId);
+    bool flag = *data % ENABLE;
+    formHostRecord.SetEnableRefresh(formId, flag);
+    formHostRecord.IsEnableRefresh(formId);
+    bool enable = *data % ENABLE;
+    formHostRecord.SetEnableUpdate(formId, enable);
+    formHostRecord.IsEnableUpdate(formId);
+    formHostRecord.SetNeedRefresh(formId, flag);
+    formHostRecord.IsNeedRefresh(formId);
+    formHostRecord.GetFormHostClient();
+    int64_t id = static_cast<int64_t>(GetU32Data(data));
+    FormRecord record;
+    formHostRecord.OnAcquire(id, record);
+    formHostRecord.OnUpdate(id, record);
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+    formHostRecord.OnFormUninstalled(formIds);
+    AppExecFwk::FormState state = AppExecFwk::FormState::UNKNOWN;
+    AAFwk::Want want;
+    formHostRecord.OnAcquireState(state, want);
+    formHostRecord.CleanResource();
+    int callerUid = static_cast<int>(GetU32Data(data));
+    formHostRecord.SetCallerUid(callerUid);
+    sptr<IRemoteObject> formHostClient = nullptr;
+    formHostRecord.SetFormHostClient(formHostClient);
+    std::shared_ptr<FormHostCallback> formHostCallback = nullptr;
+    formHostRecord.SetCallback(formHostCallback);
+    formHostRecord.GetDeathRecipient();
+    sptr<IRemoteObject::DeathRecipient> deathRecipient = nullptr;
+    formHostRecord.SetDeathRecipient(deathRecipient);
+    formHostRecord.AddDeathRecipient(deathRecipient);
+    FormItemInfo info;
+    sptr<IRemoteObject> callback = nullptr;
+    int callingUid = static_cast<int>(GetU32Data(data));
+    formHostRecord.CreateRecord(info, callback, callingUid);
+    formHostRecord.GetHostBundleName();
+    std::string hostBundleName(data, size);
+    formHostRecord.SetHostBundleName(hostBundleName);
+    return formHostRecord.IsEmpty();
+}
 }
 
 /* Fuzzer entry point */
