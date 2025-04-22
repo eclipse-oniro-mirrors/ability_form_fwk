@@ -51,21 +51,6 @@ bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
     return true;
 }
 
-bool DoSomethingInterestingWithMyAPI8(const char* data, size_t size)
-{
-    FormAbilityConnectionReporter formAbilityConnectionReporter;
-    std::string bundleName(data, size);
-    formAbilityConnectionReporter.ReportFormAbilityConnection(bundleName);
-    formAbilityConnectionReporter.ReportFormAbilityConnection(bundleName);
-    formAbilityConnectionReporter.GetAppMgr();
-    std::vector<AppExecFwk::RunningProcessInfo> infos;
-    formAbilityConnectionReporter.AddFormAbilityConnectProcessInfo(bundleName, infos);
-    bool isConnected = *data % ENABLE;
-    formAbilityConnectionReporter.ReportConnectionInfosToRss(bundleName, isConnected);
-    formAbilityConnectionReporter.ReportFormAbilityDisconnection(bundleName);
-    return true;
-}
-
 bool DoSomethingInterestingWithMyAPI1(const char* data, size_t size)
 {
     FormAbilityConnectionReporter formAbilityConnectionReporter;
@@ -157,6 +142,201 @@ bool DoSomethingInterestingWithMyAPI6(const char* data, size_t size)
 }
 
 bool DoSomethingInterestingWithMyAPI7(const char* data, size_t size)
+{
+    FormAbilityConnectionReporter formAbilityConnectionReporter;
+    std::string bundleName(data, size);
+    formAbilityConnectionReporter.ReportFormAbilityConnection(bundleName);
+    formAbilityConnectionReporter.ReportFormAbilityConnection(bundleName);
+    formAbilityConnectionReporter.GetAppMgr();
+    std::vector<AppExecFwk::RunningProcessInfo> infos;
+    formAbilityConnectionReporter.AddFormAbilityConnectProcessInfo(bundleName, infos);
+    bool isConnected = *data % ENABLE;
+    formAbilityConnectionReporter.ReportConnectionInfosToRss(bundleName, isConnected);
+    formAbilityConnectionReporter.ReportFormAbilityDisconnection(bundleName);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI8(const char* data, size_t size)
+{
+    FormAbilityConnectionReporter formAbilityConnectionReporter;
+    std::string bundleName(data, size);
+    formAbilityConnectionReporter.ReportFormAbilityConnection(bundleName);
+    formAbilityConnectionReporter.ReportFormAbilityConnection(bundleName);
+    formAbilityConnectionReporter.GetAppMgr();
+    std::vector<AppExecFwk::RunningProcessInfo> infos;
+    formAbilityConnectionReporter.AddFormAbilityConnectProcessInfo(bundleName, infos);
+    bool isConnected = *data % ENABLE;
+    formAbilityConnectionReporter.ReportConnectionInfosToRss(bundleName, isConnected);
+    formAbilityConnectionReporter.ReportFormAbilityDisconnection(bundleName);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI9(const char* data, size_t size)
+{
+    FormAbilityConnectionReporter formAbilityConnectionReporter;
+    std::string bundleName(data, size);
+    formAbilityConnectionReporter.ReportFormAbilityConnection(bundleName);
+    formAbilityConnectionReporter.ReportFormAbilityConnection(bundleName);
+    formAbilityConnectionReporter.GetAppMgr();
+    std::vector<AppExecFwk::RunningProcessInfo> infos;
+    formAbilityConnectionReporter.AddFormAbilityConnectProcessInfo(bundleName, infos);
+    bool isConnected = *data % ENABLE;
+    formAbilityConnectionReporter.ReportConnectionInfosToRss(bundleName, isConnected);
+    formAbilityConnectionReporter.ReportFormAbilityDisconnection(bundleName);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI10(const char* data, size_t size)
+{
+    FormAbilityConnectionReporter formAbilityConnectionReporter;
+    std::string bundleName(data, size);
+    formAbilityConnectionReporter.ReportFormAbilityConnection(bundleName);
+    formAbilityConnectionReporter.ReportFormAbilityConnection(bundleName);
+    formAbilityConnectionReporter.GetAppMgr();
+    std::vector<AppExecFwk::RunningProcessInfo> infos;
+    formAbilityConnectionReporter.AddFormAbilityConnectProcessInfo(bundleName, infos);
+    bool isConnected = *data % ENABLE;
+    formAbilityConnectionReporter.ReportConnectionInfosToRss(bundleName, isConnected);
+    formAbilityConnectionReporter.ReportFormAbilityDisconnection(bundleName);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI11(const char* data, size_t size)
+{
+    FormAbilityConnectionReporter formAbilityConnectionReporter;
+    std::string bundleName(data, size);
+    formAbilityConnectionReporter.ReportFormAbilityConnection(bundleName);
+    formAbilityConnectionReporter.ReportFormAbilityConnection(bundleName);
+    formAbilityConnectionReporter.GetAppMgr();
+    std::vector<AppExecFwk::RunningProcessInfo> infos;
+    formAbilityConnectionReporter.AddFormAbilityConnectProcessInfo(bundleName, infos);
+    bool isConnected = *data % ENABLE;
+    formAbilityConnectionReporter.ReportConnectionInfosToRss(bundleName, isConnected);
+    formAbilityConnectionReporter.ReportFormAbilityDisconnection(bundleName);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI12(const char* data, size_t size)
+{
+    FormAbilityConnectionReporter formAbilityConnectionReporter;
+    std::string bundleName(data, size);
+    formAbilityConnectionReporter.ReportFormAbilityConnection(bundleName);
+    formAbilityConnectionReporter.ReportFormAbilityConnection(bundleName);
+    formAbilityConnectionReporter.GetAppMgr();
+    std::vector<AppExecFwk::RunningProcessInfo> infos;
+    formAbilityConnectionReporter.AddFormAbilityConnectProcessInfo(bundleName, infos);
+    bool isConnected = *data % ENABLE;
+    formAbilityConnectionReporter.ReportConnectionInfosToRss(bundleName, isConnected);
+    formAbilityConnectionReporter.ReportFormAbilityDisconnection(bundleName);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI13(const char* data, size_t size)
+{
+    FormAbilityConnectionReporter formAbilityConnectionReporter;
+    std::string bundleName(data, size);
+    formAbilityConnectionReporter.ReportFormAbilityConnection(bundleName);
+    formAbilityConnectionReporter.ReportFormAbilityConnection(bundleName);
+    formAbilityConnectionReporter.GetAppMgr();
+    std::vector<AppExecFwk::RunningProcessInfo> infos;
+    formAbilityConnectionReporter.AddFormAbilityConnectProcessInfo(bundleName, infos);
+    bool isConnected = *data % ENABLE;
+    formAbilityConnectionReporter.ReportConnectionInfosToRss(bundleName, isConnected);
+    formAbilityConnectionReporter.ReportFormAbilityDisconnection(bundleName);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI14(const char* data, size_t size)
+{
+    FormAbilityConnectionReporter formAbilityConnectionReporter;
+    std::string bundleName(data, size);
+    formAbilityConnectionReporter.ReportFormAbilityConnection(bundleName);
+    formAbilityConnectionReporter.ReportFormAbilityConnection(bundleName);
+    formAbilityConnectionReporter.GetAppMgr();
+    std::vector<AppExecFwk::RunningProcessInfo> infos;
+    formAbilityConnectionReporter.AddFormAbilityConnectProcessInfo(bundleName, infos);
+    bool isConnected = *data % ENABLE;
+    formAbilityConnectionReporter.ReportConnectionInfosToRss(bundleName, isConnected);
+    formAbilityConnectionReporter.ReportFormAbilityDisconnection(bundleName);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI15(const char* data, size_t size)
+{
+    FormAbilityConnectionReporter formAbilityConnectionReporter;
+    std::string bundleName(data, size);
+    formAbilityConnectionReporter.ReportFormAbilityConnection(bundleName);
+    formAbilityConnectionReporter.ReportFormAbilityConnection(bundleName);
+    formAbilityConnectionReporter.GetAppMgr();
+    std::vector<AppExecFwk::RunningProcessInfo> infos;
+    formAbilityConnectionReporter.AddFormAbilityConnectProcessInfo(bundleName, infos);
+    bool isConnected = *data % ENABLE;
+    formAbilityConnectionReporter.ReportConnectionInfosToRss(bundleName, isConnected);
+    formAbilityConnectionReporter.ReportFormAbilityDisconnection(bundleName);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI16(const char* data, size_t size)
+{
+    FormAbilityConnectionReporter formAbilityConnectionReporter;
+    std::string bundleName(data, size);
+    formAbilityConnectionReporter.ReportFormAbilityConnection(bundleName);
+    formAbilityConnectionReporter.ReportFormAbilityConnection(bundleName);
+    formAbilityConnectionReporter.GetAppMgr();
+    std::vector<AppExecFwk::RunningProcessInfo> infos;
+    formAbilityConnectionReporter.AddFormAbilityConnectProcessInfo(bundleName, infos);
+    bool isConnected = *data % ENABLE;
+    formAbilityConnectionReporter.ReportConnectionInfosToRss(bundleName, isConnected);
+    formAbilityConnectionReporter.ReportFormAbilityDisconnection(bundleName);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI17(const char* data, size_t size)
+{
+    FormAbilityConnectionReporter formAbilityConnectionReporter;
+    std::string bundleName(data, size);
+    formAbilityConnectionReporter.ReportFormAbilityConnection(bundleName);
+    formAbilityConnectionReporter.ReportFormAbilityConnection(bundleName);
+    formAbilityConnectionReporter.GetAppMgr();
+    std::vector<AppExecFwk::RunningProcessInfo> infos;
+    formAbilityConnectionReporter.AddFormAbilityConnectProcessInfo(bundleName, infos);
+    bool isConnected = *data % ENABLE;
+    formAbilityConnectionReporter.ReportConnectionInfosToRss(bundleName, isConnected);
+    formAbilityConnectionReporter.ReportFormAbilityDisconnection(bundleName);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI18(const char* data, size_t size)
+{
+    FormAbilityConnectionReporter formAbilityConnectionReporter;
+    std::string bundleName(data, size);
+    formAbilityConnectionReporter.ReportFormAbilityConnection(bundleName);
+    formAbilityConnectionReporter.ReportFormAbilityConnection(bundleName);
+    formAbilityConnectionReporter.GetAppMgr();
+    std::vector<AppExecFwk::RunningProcessInfo> infos;
+    formAbilityConnectionReporter.AddFormAbilityConnectProcessInfo(bundleName, infos);
+    bool isConnected = *data % ENABLE;
+    formAbilityConnectionReporter.ReportConnectionInfosToRss(bundleName, isConnected);
+    formAbilityConnectionReporter.ReportFormAbilityDisconnection(bundleName);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI19(const char* data, size_t size)
+{
+    FormAbilityConnectionReporter formAbilityConnectionReporter;
+    std::string bundleName(data, size);
+    formAbilityConnectionReporter.ReportFormAbilityConnection(bundleName);
+    formAbilityConnectionReporter.ReportFormAbilityConnection(bundleName);
+    formAbilityConnectionReporter.GetAppMgr();
+    std::vector<AppExecFwk::RunningProcessInfo> infos;
+    formAbilityConnectionReporter.AddFormAbilityConnectProcessInfo(bundleName, infos);
+    bool isConnected = *data % ENABLE;
+    formAbilityConnectionReporter.ReportConnectionInfosToRss(bundleName, isConnected);
+    formAbilityConnectionReporter.ReportFormAbilityDisconnection(bundleName);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI20(const char* data, size_t size)
 {
     FormAbilityConnectionReporter formAbilityConnectionReporter;
     std::string bundleName(data, size);

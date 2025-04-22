@@ -64,5 +64,109 @@ HWTEST_F(FmsFormAbilityConnectionReporterTest, FormAbilityConnectionReporterTest
     FormAbilityConnectionReporter::GetInstance().ReportFormAbilityDisconnection(bundleName);
     GTEST_LOG_(INFO) << "FormAbilityConnectionReporterTest_ReportFormAbilityDisconnection end";
 }
+
+/**
+ * @tc.name: FormAbilityConnectionReporterTest_003
+ * @tc.desc: Verify function ReportFormAbilityConnection.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormAbilityConnectionReporterTest, FormAbilityConnectionReporterTest_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormAbilityConnectionReporterTest_ReportFormAbilityConnection begin";
+    std::string bundleName = "";
+    FormAbilityConnectionReporter::GetInstance().ReportFormAbilityConnection(bundleName);
+    GTEST_LOG_(INFO) << "FormAbilityConnectionReporterTest_ReportFormAbilityConnection end";
+}
+
+/**
+ * @tc.name: FormAbilityConnectionReporterTest_004
+ * @tc.desc: Verify function ReportFormAbilityDisconnection.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormAbilityConnectionReporterTest, FormAbilityConnectionReporterTest_004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormAbilityConnectionReporterTest_ReportFormAbilityDisconnection begin";
+    std::string bundleName = "";
+    FormAbilityConnectionReporter::GetInstance().ReportFormAbilityDisconnection(bundleName);
+    GTEST_LOG_(INFO) << "FormAbilityConnectionReporterTest_ReportFormAbilityDisconnection end";
+}
+
+/**
+ * @tc.name: FormAbilityConnectionReporterTest_005
+ * @tc.desc: Verify function ReportFormAbilityConnection.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormAbilityConnectionReporterTest, FormAbilityConnectionReporterTest_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormAbilityConnectionReporterTest_ReportFormAbilityConnection begin";
+    std::string bundleName = "";
+    FormAbilityConnectionReporter::GetInstance().ReportFormAbilityConnection(bundleName);
+    GTEST_LOG_(INFO) << "FormAbilityConnectionReporterTest_ReportFormAbilityConnection end";
+}
+
+/**
+ * @tc.name: FormAbilityConnectionReporterTest_006
+ * @tc.desc: Verify function ReportFormAbilityDisconnection.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormAbilityConnectionReporterTest, FormAbilityConnectionReporterTest_006, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormAbilityConnectionReporterTest_ReportFormAbilityDisconnection begin";
+    std::string bundleName = "";
+    FormAbilityConnectionReporter::GetInstance().ReportFormAbilityDisconnection(bundleName);
+    GTEST_LOG_(INFO) << "FormAbilityConnectionReporterTest_ReportFormAbilityDisconnection end";
+}
+
+/**
+ * @tc.name: FormAbilityConnectionReporterTest_007
+ * @tc.desc: Verify function ReportFormAbilityConnection.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormAbilityConnectionReporterTest, FormAbilityConnectionReporterTest_007, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormAbilityConnectionReporterTest_ReportFormAbilityConnection begin";
+    std::string bundleName = "";
+    FormAbilityConnectionReporter::GetInstance().ReportFormAbilityConnection(bundleName);
+    GTEST_LOG_(INFO) << "FormAbilityConnectionReporterTest_ReportFormAbilityConnection end";
+}
+
+/**
+ * @tc.name: FormAbilityConnectionReporterTest_008
+ * @tc.desc: Verify function ReportFormAbilityDisconnection.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormAbilityConnectionReporterTest, FormAbilityConnectionReporterTest_008, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormAbilityConnectionReporterTest_ReportFormAbilityDisconnection begin";
+    std::string bundleName = "";
+    FormAbilityConnectionReporter::GetInstance().ReportFormAbilityDisconnection(bundleName);
+    GTEST_LOG_(INFO) << "FormAbilityConnectionReporterTest_ReportFormAbilityDisconnection end";
+}
+
+/**
+ * @tc.name: FormAbilityConnectionReporterTest_009
+ * @tc.desc: Verify function ReportFormAbilityConnection.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormAbilityConnectionReporterTest, FormAbilityConnectionReporterTest_009, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormAbilityConnectionReporterTest_ReportFormAbilityConnection begin";
+    std::string bundleName = "";
+    FormAbilityConnectionReporter::GetInstance().ReportFormAbilityConnection(bundleName);
+    GTEST_LOG_(INFO) << "FormAbilityConnectionReporterTest_ReportFormAbilityConnection end";
+}
+
+/**
+ * @tc.name: FormAbilityConnectionReporterTest_0010
+ * @tc.desc: Verify function ReportFormAbilityDisconnection.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormAbilityConnectionReporterTest, FormAbilityConnectionReporterTest_010, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormAbilityConnectionReporterTest_ReportFormAbilityDisconnection begin";
+    std::string bundleName = "";
+    FormAbilityConnectionReporter::GetInstance().ReportFormAbilityDisconnection(bundleName);
+    GTEST_LOG_(INFO) << "FormAbilityConnectionReporterTest_ReportFormAbilityDisconnection end";
+}
 } // namespace AppExecFwk
 } // namespace OHOS

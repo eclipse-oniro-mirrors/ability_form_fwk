@@ -169,6 +169,210 @@ bool DoSomethingInterestingWithMyAPI7(const char* data, size_t size)
     formBmsHelper.GetUidByBundleName(bundleName, userId);
     return true;
 }
+
+bool DoSomethingInterestingWithMyAPI8(const char* data, size_t size)
+{
+    FormBmsHelper formBmsHelper;
+    sptr<IBundleMgr> bundleManager = nullptr;
+    formBmsHelper.SetBundleManager(bundleManager);
+    std::string bundleName(data, size);
+    std::string moduleName(data, size);
+    formBmsHelper.NotifyModuleRemovable(bundleName, moduleName);
+    formBmsHelper.NotifyModuleNotRemovable(bundleName, moduleName);
+    formBmsHelper.GenerateModuleKey(bundleName, moduleName);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    BundleInfo bundleInfo;
+    formBmsHelper.GetBundleInfo(bundleName, userId, bundleInfo);
+    formBmsHelper.GetUidByBundleName(bundleName, userId);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI9(const char* data, size_t size)
+{
+    FormBmsHelper formBmsHelper;
+    sptr<IBundleMgr> bundleManager = nullptr;
+    formBmsHelper.SetBundleManager(bundleManager);
+    std::string bundleName(data, size);
+    std::string moduleName(data, size);
+    formBmsHelper.NotifyModuleRemovable(bundleName, moduleName);
+    formBmsHelper.NotifyModuleNotRemovable(bundleName, moduleName);
+    formBmsHelper.GenerateModuleKey(bundleName, moduleName);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    BundleInfo bundleInfo;
+    formBmsHelper.GetBundleInfo(bundleName, userId, bundleInfo);
+    formBmsHelper.GetUidByBundleName(bundleName, userId);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI10(const char* data, size_t size)
+{
+    FormBmsHelper formBmsHelper;
+    sptr<IBundleMgr> bundleManager = nullptr;
+    formBmsHelper.SetBundleManager(bundleManager);
+    std::string bundleName(data, size);
+    std::string moduleName(data, size);
+    formBmsHelper.NotifyModuleRemovable(bundleName, moduleName);
+    formBmsHelper.NotifyModuleNotRemovable(bundleName, moduleName);
+    formBmsHelper.GenerateModuleKey(bundleName, moduleName);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    BundleInfo bundleInfo;
+    formBmsHelper.GetBundleInfo(bundleName, userId, bundleInfo);
+    formBmsHelper.GetUidByBundleName(bundleName, userId);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI11(const char* data, size_t size)
+{
+    FormBmsHelper formBmsHelper;
+    sptr<IBundleMgr> bundleManager = nullptr;
+    formBmsHelper.SetBundleManager(bundleManager);
+    std::string bundleName(data, size);
+    std::string moduleName(data, size);
+    formBmsHelper.NotifyModuleRemovable(bundleName, moduleName);
+    formBmsHelper.NotifyModuleNotRemovable(bundleName, moduleName);
+    formBmsHelper.GenerateModuleKey(bundleName, moduleName);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    BundleInfo bundleInfo;
+    formBmsHelper.GetBundleInfo(bundleName, userId, bundleInfo);
+    formBmsHelper.GetUidByBundleName(bundleName, userId);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI12(const char* data, size_t size)
+{
+    FormBmsHelper formBmsHelper;
+    sptr<IBundleMgr> bundleManager = nullptr;
+    formBmsHelper.SetBundleManager(bundleManager);
+    std::string bundleName(data, size);
+    std::string moduleName(data, size);
+    formBmsHelper.NotifyModuleRemovable(bundleName, moduleName);
+    formBmsHelper.NotifyModuleNotRemovable(bundleName, moduleName);
+    formBmsHelper.GenerateModuleKey(bundleName, moduleName);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    BundleInfo bundleInfo;
+    formBmsHelper.GetBundleInfo(bundleName, userId, bundleInfo);
+    formBmsHelper.GetUidByBundleName(bundleName, userId);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI13(const char* data, size_t size)
+{
+    FormBmsHelper formBmsHelper;
+    sptr<IBundleMgr> bundleManager = nullptr;
+    formBmsHelper.SetBundleManager(bundleManager);
+    std::string bundleName(data, size);
+    std::string moduleName(data, size);
+    formBmsHelper.NotifyModuleRemovable(bundleName, moduleName);
+    formBmsHelper.NotifyModuleNotRemovable(bundleName, moduleName);
+    formBmsHelper.GenerateModuleKey(bundleName, moduleName);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    BundleInfo bundleInfo;
+    formBmsHelper.GetBundleInfo(bundleName, userId, bundleInfo);
+    formBmsHelper.GetUidByBundleName(bundleName, userId);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI14(const char* data, size_t size)
+{
+    FormBmsHelper formBmsHelper;
+    sptr<IBundleMgr> bundleManager = nullptr;
+    formBmsHelper.SetBundleManager(bundleManager);
+    std::string bundleName(data, size);
+    std::string moduleName(data, size);
+    formBmsHelper.NotifyModuleRemovable(bundleName, moduleName);
+    formBmsHelper.NotifyModuleNotRemovable(bundleName, moduleName);
+    formBmsHelper.GenerateModuleKey(bundleName, moduleName);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    BundleInfo bundleInfo;
+    formBmsHelper.GetBundleInfo(bundleName, userId, bundleInfo);
+    formBmsHelper.GetUidByBundleName(bundleName, userId);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI15(const char* data, size_t size)
+{
+    FormBmsHelper formBmsHelper;
+    sptr<IBundleMgr> bundleManager = nullptr;
+    formBmsHelper.SetBundleManager(bundleManager);
+    std::string bundleName(data, size);
+    std::string moduleName(data, size);
+    formBmsHelper.NotifyModuleRemovable(bundleName, moduleName);
+    formBmsHelper.NotifyModuleNotRemovable(bundleName, moduleName);
+    formBmsHelper.GenerateModuleKey(bundleName, moduleName);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    BundleInfo bundleInfo;
+    formBmsHelper.GetBundleInfo(bundleName, userId, bundleInfo);
+    formBmsHelper.GetUidByBundleName(bundleName, userId);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI16(const char* data, size_t size)
+{
+    FormBmsHelper formBmsHelper;
+    sptr<IBundleMgr> bundleManager = nullptr;
+    formBmsHelper.SetBundleManager(bundleManager);
+    std::string bundleName(data, size);
+    std::string moduleName(data, size);
+    formBmsHelper.NotifyModuleRemovable(bundleName, moduleName);
+    formBmsHelper.NotifyModuleNotRemovable(bundleName, moduleName);
+    formBmsHelper.GenerateModuleKey(bundleName, moduleName);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    BundleInfo bundleInfo;
+    formBmsHelper.GetBundleInfo(bundleName, userId, bundleInfo);
+    formBmsHelper.GetUidByBundleName(bundleName, userId);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI17(const char* data, size_t size)
+{
+    FormBmsHelper formBmsHelper;
+    sptr<IBundleMgr> bundleManager = nullptr;
+    formBmsHelper.SetBundleManager(bundleManager);
+    std::string bundleName(data, size);
+    std::string moduleName(data, size);
+    formBmsHelper.NotifyModuleRemovable(bundleName, moduleName);
+    formBmsHelper.NotifyModuleNotRemovable(bundleName, moduleName);
+    formBmsHelper.GenerateModuleKey(bundleName, moduleName);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    BundleInfo bundleInfo;
+    formBmsHelper.GetBundleInfo(bundleName, userId, bundleInfo);
+    formBmsHelper.GetUidByBundleName(bundleName, userId);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI18(const char* data, size_t size)
+{
+    FormBmsHelper formBmsHelper;
+    sptr<IBundleMgr> bundleManager = nullptr;
+    formBmsHelper.SetBundleManager(bundleManager);
+    std::string bundleName(data, size);
+    std::string moduleName(data, size);
+    formBmsHelper.NotifyModuleRemovable(bundleName, moduleName);
+    formBmsHelper.NotifyModuleNotRemovable(bundleName, moduleName);
+    formBmsHelper.GenerateModuleKey(bundleName, moduleName);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    BundleInfo bundleInfo;
+    formBmsHelper.GetBundleInfo(bundleName, userId, bundleInfo);
+    formBmsHelper.GetUidByBundleName(bundleName, userId);
+    return true;
+}
+
+bool DoSomethingInterestingWithMyAPI19(const char* data, size_t size)
+{
+    FormBmsHelper formBmsHelper;
+    sptr<IBundleMgr> bundleManager = nullptr;
+    formBmsHelper.SetBundleManager(bundleManager);
+    std::string bundleName(data, size);
+    std::string moduleName(data, size);
+    formBmsHelper.NotifyModuleRemovable(bundleName, moduleName);
+    formBmsHelper.NotifyModuleNotRemovable(bundleName, moduleName);
+    formBmsHelper.GenerateModuleKey(bundleName, moduleName);
+    int32_t userId = static_cast<int32_t>(GetU32Data(data));
+    BundleInfo bundleInfo;
+    formBmsHelper.GetBundleInfo(bundleName, userId, bundleInfo);
+    formBmsHelper.GetUidByBundleName(bundleName, userId);
+    return true;
+}
 }
 
 /* Fuzzer entry point */
