@@ -97,8 +97,12 @@ void FormRenderServiceExtension::OnCommand(const AAFwk::Want &want, bool restart
 void FormRenderServiceExtension::OnConfigurationUpdated(const AppExecFwk::Configuration& configuration)
 {
     Extension::OnConfigurationUpdated(configuration);
-    HILOG_INFO("call");
     auto config = std::make_shared<AppExecFwk::Configuration>(configuration);
+    if (!config) {
+        HILOG_ERROR("null configuration");
+        return;
+    }
+    HILOG_INFO("configuration detail: %{public}s", config->GetName().c_str());
     OHOS::DelayedSingleton<FormRenderImpl>::GetInstance()->OnConfigurationUpdated(config);
 }
 }
