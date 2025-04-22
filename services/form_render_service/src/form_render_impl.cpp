@@ -384,17 +384,17 @@ void FormRenderImpl::OnConfigurationUpdatedInner()
 void FormRenderImpl::SetConfiguration(const std::shared_ptr<OHOS::AppExecFwk::Configuration>& config)
 {
     if (config != nullptr && configuration_ != nullptr) {
-        std::string colorMode = config->GetItem(SYSTEM_COLORMODE);
-        std::string languageTag = config->GetItem(SYSTEM_LANGUAGE);
-        std::string colorModeOld = configuration_->GetItem(SYSTEM_COLORMODE);
-        std::string languageTagOld = configuration_->GetItem(SYSTEM_LANGUAGE);
+        auto checkConfigItem = { SYSTEM_COLORMODE, SYSTEM_LANGUAGE, SYSTEM_FONT_SIZE_SCALE, SYSTEM_FONT_WEIGHT_SCALE };
+        for (const auto& item: checkConfigItem) {
+            std::string newValue = config->GetItem(item);
+            std::string oldValue = configuration_->GetItem(item);
+            if (newValue.empty() && !oldValue.empty()) {
+                config->AddItem(item, oldValue);
+            }
+        }
+
         configuration_ = config;
-        if (colorMode.empty()) {
-            configuration_->AddItem(SYSTEM_COLORMODE, colorModeOld);
-        }
-        if (languageTag.empty()) {
-            configuration_->AddItem(SYSTEM_LANGUAGE, languageTagOld);
-        }
+        HILOG_INFO("current configuration_:%{public}s", configuration_->GetName().c_str());
         return;
     }
 
