@@ -360,7 +360,7 @@ namespace Constants {
     // Form info max num
     constexpr const int32_t FORM_INFO_MAX_NUM = 16;
     // Form version code
-    constexpr const int32_t FORM_VERSION_CODE = 100000;
+    constexpr const int32_t FORM_VERSION_CODE = 100001;
     // Form domain id
     constexpr uint64_t FORM_DOMAIN_ID = 0xD001301;
 }  // namespace Constants

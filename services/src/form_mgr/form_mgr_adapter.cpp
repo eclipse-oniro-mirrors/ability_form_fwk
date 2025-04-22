@@ -951,6 +951,17 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
             (!formRecord.isSystemApp)) {
             continue;
         }
+        
+        // Check the value of appFormVisibleNotiry.
+        if (!FormInfoMgr::GetInstance().GetAppFormVisibleNotify(formRecord.bundleName)) {
+            HILOG_DEBUG("the value of appFormVisibleNotiry is false");
+            continue;
+        }
+ 
+        // Create eventMaps
+        if (!CreateHandleEventMap(matchedFormId, formRecord, eventMaps)) {
+            continue;
+        }
     }
     FormTaskMgr::GetInstance().PostVisibleNotify(
         (formVisibleType == static_cast<int32_t>(FormVisibilityType::VISIBLE)) ? checkFormIds : formIds,
