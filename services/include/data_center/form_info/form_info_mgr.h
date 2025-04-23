@@ -77,6 +77,8 @@ public:
 
     ErrCode GetFormsInfoByFilter(
         const FormInfoFilter &filter, std::vector<FormInfo> &formInfos, int32_t userId = Constants::INVALID_USER_ID);
+    
+    bool GetAppFormVisibleNotify();
 
 private:
     ErrCode UpdateFormInfoStorageLocked();
@@ -130,6 +132,11 @@ public:
     ErrCode ReloadFormInfos(int32_t userId);
 
     bool HasReloadedFormInfos();
+
+    static ErrCode LoadAppFormVisibleNotify(
+        const BundleInfo &bundleInfo, std::vector<FormInfo> &formInfos, int32_t userId);
+ 
+    bool GetAppFormVisibleNotify(const std::string &bundleName);
 
 private:
     std::shared_ptr<BundleFormInfo> GetOrCreateBundleFromInfo(const std::string &bundleName);
