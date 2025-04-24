@@ -1358,12 +1358,16 @@ int FormMgrAdapter::DumpHasFormVisible(const std::string &bundleInfo, std::strin
     std::string bundleName = bundleInfoList[BUNDLE_NAME_INDEX];
     int32_t userId = DEFAULT_USER_ID;
     int32_t instIndex = 0;
-    int64_t userIdValue = 0;
     if (size > USER_ID_INDEX) {
-        userId = static_cast<int32_t>(FormUtil::ConvertStringToInt64(bundleInfoList[USER_ID_INDEX], userIdValue));
+        if (!FormUtil::ConvertStringToInt64(bundleInfoList[USER_ID_INDEX], userId)) {
+            HILOG_ERROR("userId ConvertStringToInt64 failed");
+            return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+        }
         if (size > INSTANCE_SEQ_INDEX) {
-            instIndex = static_cast<int32_t>(FormUtil::ConvertStringToInt64(bundleInfoList[INSTANCE_SEQ_INDEX],
-                userIdValue));
+            if (!FormUtil::ConvertStringToInt64(bundleInfoList[INSTANCE_SEQ_INDEX], instIndex)) {
+                HILOG_ERROR("instIndex ConvertStringToInt64 failed");
+                return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+            }
         }
     }
     HILOG_INFO("resolve bundleInfo, bundleName:%{public}s, userId:%{public}d, instIndex:%{public}d",
@@ -2341,9 +2345,11 @@ ErrCode FormMgrAdapter::RequestPublishFormToHost(Want &want)
     }
 
     // Handle by interceptor callback when the system handler is not found.
-    int64_t userIdValue = 0;
-    int64_t formId = FormUtil::ConvertStringToInt64(want.GetStringParam(Constants::PARAM_FORM_IDENTITY_KEY),
-        userIdValue);
+    if (!FormUtil::ConvertStringToInt64(want.GetStringParam(Constants::PARAM_FORM_IDENTITY_KEY), formId)) {
+        HILOG_ERROR("formId ConvertStringToInt64 failed");
+        return ERR_APPEXECFWK_FORM_INVALID_PARAM;
+    }
+        
     if (formPublishInterceptor_ == nullptr) {
         return AcquireAddFormResult(formId);
     }
