@@ -419,7 +419,6 @@ int32_t FormRenderRecord::UpdateRenderRecord(const FormJsInfo &formJsInfo, const
             auto renderRecord = thisWeakPtr.lock();
             if (renderRecord == nullptr) {
                 HILOG_ERROR("null renderRecord");
-                renderRecord->MarkRenderFormTaskDone(renderType);
                 return;
             }
             renderRecord->HandleUpdateInJsThread(formJsInfo, want);
