@@ -36,6 +36,7 @@ ohos_unittest("FmsFormSystemloadListenerTest") {
     external_deps += [
       "resource_schedule_service:ressched_client",
       "samgr:samgr_proxy",
+      "hilog:libhilog_base"
     ]
     defines += [ "RES_SCHEDULE_ENABLE" ]
   }
