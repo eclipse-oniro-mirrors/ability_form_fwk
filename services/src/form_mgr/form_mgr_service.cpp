@@ -1277,6 +1277,17 @@ int32_t FormMgrService::StartAbility(const Want &want, const sptr<IRemoteObject>
 int32_t FormMgrService::StartAbilityByFms(const Want &want)
 {
     HILOG_INFO("call");
+    std::string dstBundleName = want.GetElement().GetBundleName();
+    std::string bundleName;
+    auto ret = FormBmsHelper::GetInstance().GetCallerBundleName(bundleName);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("get BundleName failed");
+        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+    }
+    if (dstBundleName != bundleName) {
+        HILOG_ERROR("dstBundleName not self");
+        return ERR_APPEXECFWK_FORM_INVALID_BUNDLENAME;
+    }
     return FormMgrAdapter::GetInstance().StartAbilityByFms(want);
 }
 
