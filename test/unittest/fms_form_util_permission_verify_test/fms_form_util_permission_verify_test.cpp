@@ -121,4 +121,134 @@ HWTEST_F(FmsFormUtilPermissionVerifyTest, FmsFormUtilPermissionVerifyTest_0005, 
     EXPECT_EQ(true, FormUtil::VerifyCallingPermission("ohos.permission.REQUIRE_FORM"));
     GTEST_LOG_(INFO) << "FmsFormUtilPermissionVerifyTest_0005 end";
 }
+
+/**
+ * @tc.number: FmsFormUtilPermissionVerifyTest_0006
+ * @tc.name: test VerifyCallingPermission function.
+ * @tc.desc: Verify that the VerifyCallingPermission interface is called normally and the return value is true.
+ */
+HWTEST_F(FmsFormUtilPermissionVerifyTest, FmsFormUtilPermissionVerifyTest_0006, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormUtilPermissionVerifyTest_0006 start";
+    MockVerifyAccessToken(0);
+    EXPECT_EQ(true, FormUtil::VerifyCallingPermission("ohos.permission.REQUIRE_FORM"));
+    GTEST_LOG_(INFO) << "FmsFormUtilPermissionVerifyTest_0006 end";
+}
+
+/**
+ * @tc.number: FmsFormUtilPermissionVerifyTest_0007
+ * @tc.name: test VerifyCallingPermission function.
+ * @tc.desc: Verify that the VerifyCallingPermission interface is called normally and the return value is true.
+ */
+HWTEST_F(FmsFormUtilPermissionVerifyTest, FmsFormUtilPermissionVerifyTest_0007, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormUtilPermissionVerifyTest_0007 start";
+    MockVerifyAccessToken(0);
+    EXPECT_EQ(true, FormUtil::VerifyCallingPermission("ohos.permission.REQUIRE_FORM"));
+    GTEST_LOG_(INFO) << "FmsFormUtilPermissionVerifyTest_0007 end";
+}
+
+/**
+ * @tc.number: FmsFormUtilPermissionVerifyTest_0008
+ * @tc.name: test VerifyCallingPermission function.
+ * @tc.desc: Verify that the VerifyCallingPermission interface is called normally and the return value is true.
+ */
+HWTEST_F(FmsFormUtilPermissionVerifyTest, FmsFormUtilPermissionVerifyTest_0008, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormUtilPermissionVerifyTest_0008 start";
+    MockVerifyAccessToken(0);
+    EXPECT_EQ(true, FormUtil::VerifyCallingPermission("ohos.permission.REQUIRE_FORM"));
+    GTEST_LOG_(INFO) << "FmsFormUtilPermissionVerifyTest_0008 end";
+}
+
+/**
+ * @tc.number: FmsFormUtilPermissionVerifyTest_0009
+ * @tc.name: test VerifyCallingPermission function.
+ * @tc.desc: Verify that the VerifyCallingPermission interface is called normally and the return value is true.
+ */
+HWTEST_F(FmsFormUtilPermissionVerifyTest, FmsFormUtilPermissionVerifyTest_0009, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormUtilPermissionVerifyTest_0009 start";
+    MockVerifyAccessToken(0);
+    EXPECT_EQ(true, FormUtil::VerifyCallingPermission("ohos.permission.REQUIRE_FORM"));
+    GTEST_LOG_(INFO) << "FmsFormUtilPermissionVerifyTest_0009 end";
+}
+
+/**
+ * @tc.number: FmsFormUtilPermissionVerifyTest_0010
+ * @tc.name: test VerifyCallingPermission function.
+ * @tc.desc: Verify that the VerifyCallingPermission interface is called normally and the return value is true.
+ */
+HWTEST_F(FmsFormUtilPermissionVerifyTest, FmsFormUtilPermissionVerifyTest_0010, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormUtilPermissionVerifyTest_0010 start";
+    MockVerifyAccessToken(0);
+    EXPECT_EQ(true, FormUtil::VerifyCallingPermission("ohos.permission.REQUIRE_FORM"));
+    GTEST_LOG_(INFO) << "FmsFormUtilPermissionVerifyTest_0010 end";
+}
+
+/**
+ * @tc.number: FmsFormUtilPermissionVerifyTest_0011
+ * @tc.name: test VerifyCallingPermission function.
+ * @tc.desc: Verify that the VerifyCallingPermission interface is called normally and the return value is true.
+ */
+HWTEST_F(FmsFormUtilPermissionVerifyTest, FmsFormUtilPermissionVerifyTest_0011, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormUtilPermissionVerifyTest_0011 start";
+    MockVerifyAccessToken(0);
+    EXPECT_EQ(true, FormUtil::VerifyCallingPermission("ohos.permission.REQUIRE_FORM"));
+    GTEST_LOG_(INFO) << "FmsFormUtilPermissionVerifyTest_0011 end";
+}
+
+/**
+ * @tc.number: FmsFormUtilPermissionVerifyTest_0012
+ * @tc.name: test VerifyCallingPermission function.
+ * @tc.desc: Verify that the VerifyCallingPermission interface is called normally and the return value is true.
+ */
+HWTEST_F(FmsFormUtilPermissionVerifyTest, FmsFormUtilPermissionVerifyTest_0012, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormUtilPermissionVerifyTest_0012 start";
+    MockVerifyAccessToken(0);
+    EXPECT_EQ(true, FormUtil::VerifyCallingPermission("ohos.permission.REQUIRE_FORM"));
+    GTEST_LOG_(INFO) << "FmsFormUtilPermissionVerifyTest_0012 end";
+}
+
+/**
+ * @tc.number: FmsFormUtilPermissionVerifyTest_0013
+ * @tc.name: test VerifyCallingPermission function.
+ * @tc.desc: Verify that the VerifyCallingPermission interface is called normally and the return value is true.
+ */
+HWTEST_F(FmsFormUtilPermissionVerifyTest, FmsFormUtilPermissionVerifyTest_0013, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormUtilPermissionVerifyTest_0013 start";
+    MockVerifyAccessToken(0);
+    EXPECT_EQ(true, FormUtil::VerifyCallingPermission("ohos.permission.REQUIRE_FORM"));
+    GTEST_LOG_(INFO) << "FmsFormUtilPermissionVerifyTest_0013 end";
+}
+
+/**
+ * @tc.number: FmsFormUtilPermissionVerifyTest_0014
+ * @tc.name: test VerifyCallingPermission function.
+ * @tc.desc: Verify that the VerifyCallingPermission interface is called normally and the return value is true.
+ */
+HWTEST_F(FmsFormUtilPermissionVerifyTest, FmsFormUtilPermissionVerifyTest_0014, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormUtilPermissionVerifyTest_0014 start";
+    MockVerifyAccessToken(0);
+    EXPECT_EQ(true, FormUtil::VerifyCallingPermission("ohos.permission.REQUIRE_FORM"));
+    GTEST_LOG_(INFO) << "FmsFormUtilPermissionVerifyTest_0014 end";
+}
+
+/**
+ * @tc.number: FmsFormUtilPermissionVerifyTest_0015
+ * @tc.name: test VerifyCallingPermission function.
+ * @tc.desc: Verify that the VerifyCallingPermission interface is called normally and the return value is true.
+ */
+HWTEST_F(FmsFormUtilPermissionVerifyTest, FmsFormUtilPermissionVerifyTest_0015, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormUtilPermissionVerifyTest_0015 start";
+    MockVerifyAccessToken(0);
+    EXPECT_EQ(true, FormUtil::VerifyCallingPermission("ohos.permission.REQUIRE_FORM"));
+    GTEST_LOG_(INFO) << "FmsFormUtilPermissionVerifyTest_0015 end";
+}
 }
