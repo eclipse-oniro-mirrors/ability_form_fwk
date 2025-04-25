@@ -1008,5 +1008,182 @@ HWTEST_F(FormProviderStubTest, FormProviderStubTest_038, TestSize.Level1)
     EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
     GTEST_LOG_(INFO) << "FormProviderStubTest_038 end";
 }
+
+/**
+ * @tc.name: FormProviderStubTest_039
+ * @tc.desc: Verify OnRemoteRequest
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormProviderStubTest, FormProviderStubTest_039, TestSize.Level0)
+{
+    MockFormProviderClient callback;
+    uint32_t code = 1;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    auto result = callback.OnRemoteRequest(code, data, reply, option);
+
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+}
+
+/**
+ * @tc.name: FormProviderStubTest_040
+ * @tc.desc: Verify OnRemoteRequest
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormProviderStubTest, FormProviderStubTest_040, TestSize.Level0)
+{
+    MockFormProviderClient callback;
+    uint32_t code = 2;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    auto result = callback.OnRemoteRequest(code, data, reply, option);
+
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+}
+
+/**
+ * @tc.name: FormProviderStubTest_041
+ * @tc.desc: Verify OnRemoteRequest
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormProviderStubTest, FormProviderStubTest_041, TestSize.Level0)
+{
+    MockFormProviderClient callback;
+    uint32_t code = 3;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    auto result = callback.OnRemoteRequest(code, data, reply, option);
+
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+}
+
+/**
+ * @tc.name: FormProviderStubTest_042
+ * @tc.desc: Verify OnRemoteRequest
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormProviderStubTest, FormProviderStubTest_042, TestSize.Level0)
+{
+    MockFormProviderClient callback;
+    uint32_t code = 4;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    auto result = callback.OnRemoteRequest(code, data, reply, option);
+
+    EXPECT_EQ(result, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+}
+
+/**
+ * @tc.name: FormProviderStubTest_043
+ * @tc.desc: 1.Verify that the OnRemoteRequest interface executes as expected.
+ *           2.The interface return value IPC_STUB_UNKNOW_TRANS_ERR.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormProviderStubTest, FormProviderStubTest_043, TestSize.Level1)
+{
+    MockFormProviderClient callback;
+    constexpr uint32_t code = static_cast<uint32_t>(IFormProvider::Message::FORM_ACQUIRE_PROVIDER_FORM_INFO) + 100;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(u"ohos.appexecfwk.FormProvider");
+    auto result = callback.OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, IPC_STUB_UNKNOW_TRANS_ERR);
+}
+
+/**
+ * @tc.name: FormProviderStubTest_044
+ * @tc.desc: 1.Verify that the OnRemoteRequest interface executes as expected.
+ *           2.The interface return value IPC_STUB_UNKNOW_TRANS_ERR.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormProviderStubTest, FormProviderStubTest_044, TestSize.Level1)
+{
+    MockFormProviderClient callback;
+    constexpr uint32_t code = static_cast<uint32_t>(IFormProvider::Message::FORM_ACQUIRE_PROVIDER_FORM_INFO) + 100;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(u"ohos.appexecfwk.FormProvider");
+    auto result = callback.OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, IPC_STUB_UNKNOW_TRANS_ERR);
+}
+
+/**
+ * @tc.name: FormProviderStubTest_045
+ * @tc.desc: Verify OnRemoteRequest and HandleAcquireProviderFormInfo interface executes as expected.
+ *           2.The interface return value ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormProviderStubTest, FormProviderStubTest_045, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormProviderStubTest_045 start";
+    const FormJsInfo formJsInfo = {};
+    const Want want = {};
+    const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormSupplyStub();
+    const sptr<MockFormProviderClient> callback = new (std::nothrow) MockFormProviderClient();
+    constexpr uint32_t code = static_cast<uint32_t>(IFormProvider::Message::FORM_ACQUIRE_PROVIDER_FORM_INFO);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(u"ohos.appexecfwk.FormProvider");
+    data.WriteParcelable(&formJsInfo);
+    data.WriteParcelable(&want);
+    data.WriteRemoteObject(callerToken);
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_OK);
+    GTEST_LOG_(INFO) << "FormProviderStubTest_045 end";
+}
+
+/**
+ * @tc.name: FormProviderStubTest_046
+ * @tc.desc: Verify OnRemoteRequest and HandleAcquireProviderFormInfo interface executes as expected.
+ *           2.The interface return value ERR_APPEXECFWK_PARCEL_ERROR.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormProviderStubTest, FormProviderStubTest_046, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormProviderStubTest_046 start";
+    const Want want = {};
+    const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormSupplyStub();
+    const sptr<MockFormProviderClient> callback = new (std::nothrow) MockFormProviderClient();
+    constexpr uint32_t code = static_cast<uint32_t>(IFormProvider::Message::FORM_ACQUIRE_PROVIDER_FORM_INFO);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(u"ohos.appexecfwk.FormProvider");
+    data.WriteParcelable(&want);
+    data.WriteRemoteObject(callerToken);
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+    GTEST_LOG_(INFO) << "FormProviderStubTest_046 end";
+}
+
+/**
+ * @tc.name: FormProviderStubTest_047
+ * @tc.desc: Verify OnRemoteRequest and HandleAcquireProviderFormInfo interface executes as expected.
+ *           2.The interface return value ERR_APPEXECFWK_PARCEL_ERROR.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FormProviderStubTest, FormProviderStubTest_047, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormProviderStubTest_047 start";
+    const FormJsInfo formJsInfo = {};
+    const sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormSupplyStub();
+    const sptr<MockFormProviderClient> callback = new (std::nothrow) MockFormProviderClient();
+    constexpr uint32_t code = static_cast<uint32_t>(IFormProvider::Message::FORM_ACQUIRE_PROVIDER_FORM_INFO);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(u"ohos.appexecfwk.FormProvider");
+    data.WriteParcelable(&formJsInfo);
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+    GTEST_LOG_(INFO) << "FormProviderStubTest_047 end";
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS

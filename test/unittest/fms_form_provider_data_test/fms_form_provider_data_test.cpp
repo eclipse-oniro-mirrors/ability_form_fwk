@@ -832,4 +832,158 @@ HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_0040, TestSize.Level1)
     EXPECT_EQ(result, false);
     GTEST_LOG_(INFO) << "FmsFormProviderDataTest_0040 end";
 }
+
+/**
+ * @tc.name: FmsFormProviderDataTest_042
+ * @tc.desc: Verify the CreateJsonFileByJsonData1 function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_042, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_042 start";
+    EXPECT_EQ(true, InitJsonData());
+    FormProviderData formProviderData(jsonData_);
+    EXPECT_EQ(true, CreateJsonFileByJsonData1(formProviderData.jsonFormProviderData_));
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_042 end";
+}
+
+/**
+ * @tc.name: FmsFormProviderDataTest_043
+ * @tc.desc: Verify the CreateJsonFileByJsonData2 function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_043, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_043 start";
+    EXPECT_EQ(true, InitJsonData());
+    FormProviderData formProviderData(jsonData_.dump());
+    EXPECT_EQ(true, CreateJsonFileByJsonData2(formProviderData.jsonFormProviderData_));
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_043 end";
+}
+
+/**
+ * @tc.name: FmsFormProviderDataTest_044
+ * @tc.desc: Verify the GetDataString function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_044, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_044 start";
+    EXPECT_EQ(true, InitJsonData());
+    FormProviderData formProviderData(jsonData_);
+    GTEST_LOG_(INFO) << "print:" <<formProviderData.GetDataString();
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_044 end";
+}
+
+/**
+ * @tc.name: FmsFormProviderDataTest_045
+ * @tc.desc: Verify the MergeData function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_045, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_045 start";
+    EXPECT_EQ(true, InitJsonData());
+    FormProviderData formProviderData(jsonData_);
+    EXPECT_EQ(true, InitJsonData2());
+    formProviderData.MergeData(jsonData_);
+    EXPECT_EQ(true, CreateMergeJsonFileByJsonData3(formProviderData.jsonFormProviderData_));
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_045 end";
+}
+
+/**
+ * @tc.name: FmsFormProviderDataTest_046
+ * @tc.desc: Verify the ConvertRawImageData function.
+ * @tc.type: FUNC
+ * @tc.require: issueI5KIZC
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_046, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_046 start";
+    EXPECT_EQ(true, InitJsonData());
+    FormProviderData formProviderData(jsonData_);
+    std::string picName = "image";
+    char* bytes = new char[1];
+    bytes[0] = 'a';
+    std::shared_ptr<char> data(bytes);
+    formProviderData.AddImageData(picName, data, 1);
+    EXPECT_TRUE(formProviderData.ConvertRawImageData());
+    EXPECT_EQ(1, formProviderData.GetImageDataMap().size());
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_046 end";
+}
+
+/**
+ * @tc.name: FmsFormProviderDataTest_047
+ * @tc.desc: Verify the AddImageData and WriteImageDataToParcel function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_047, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_047 start";
+    FormProviderData formProviderData(jsonData_);
+    std::string picName = "image";
+    formProviderData.AddImageData(picName, 1);
+    Parcel parcel;
+    char* bytes = new char[1];
+    bytes[0] = 'a';
+    std::shared_ptr<char> data(bytes);
+    EXPECT_EQ(true, formProviderData.WriteImageDataToParcel(parcel, picName, data, 1));
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_047 end";
+}
+/**
+ * @tc.name: FmsFormProviderDataTest_048
+ * @tc.desc: Verify the UpdateData and GetData function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_048, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_048 start";
+    EXPECT_EQ(true, InitJsonData());
+    FormProviderData formProviderData(jsonData_);
+    formProviderData.UpdateData(jsonData_);
+    auto result = formProviderData.GetData();
+
+    EXPECT_EQ(jsonData_, result);
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_048 end";
+}
+
+/**
+ * @tc.name: FmsFormProviderDataTest_049
+ * @tc.desc: Verify the RemoveImageData and AddImageData function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_049, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_049 start";
+    EXPECT_EQ(true, InitJsonData());
+    FormProviderData formProviderData(jsonData_);
+    std::string picName = "abc";
+    int32_t size = 1;
+    std::shared_ptr<char> data;
+    formProviderData.AddImageData(picName, data, size);
+    formProviderData.RemoveImageData(picName);
+
+    EXPECT_TRUE(formProviderData.rawImageBytesMap_.empty());
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_049 end";
+
+}
+
+/**
+ 0* @tc.name: FmsFormProviderDataTest_050
+ * @tc.desc: Verify the SetDataString and GetDataString function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderDataTest, FmsFormProviderDataTest_050, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_050 start";
+    EXPECT_EQ(true, InitJsonData());
+    FormProviderData formProviderData(jsonData_);
+    std::string jsonDataString = "abc";
+    formProviderData.SetDataString(jsonDataString);
+    auto result = formProviderData.GetDataString();
+
+    EXPECT_FALSE(result.empty());
+    GTEST_LOG_(INFO) << "FmsFormProviderDataTest_050 end";
+
+}
 }
