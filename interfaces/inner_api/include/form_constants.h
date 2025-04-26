@@ -22,6 +22,9 @@
 namespace OHOS {
 namespace AppExecFwk {
 namespace Constants {
+    constexpr int32_t FOUNDATION_UID = 5523;
+}
+namespace Constants {
     constexpr const char* PERMISSION_INTERACT_ACROSS_LOCAL_ACCOUNTS = "ohos.permission.INTERACT_ACROSS_LOCAL_ACCOUNTS";
     constexpr const char* PERMISSION_REQUIRE_FORM = "ohos.permission.REQUIRE_FORM";
     constexpr const char* PERMISSION_AGENT_REQUIRE_FORM = "ohos.permission.AGENT_REQUIRE_FORM";

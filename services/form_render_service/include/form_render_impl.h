@@ -104,6 +104,7 @@ private:
     void FormRenderGC(const std::string &uid);
     void OnConfigurationUpdatedInner();
     void ConfirmUnlockState(Want &renderWant);
+    bool CheckIsFoundationCall();
 
     std::mutex renderRecordMutex_;
     // <uid(userId + bundleName), renderRecord>
