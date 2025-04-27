@@ -732,7 +732,7 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0107, TestSize.Level1)
     FormMgrService formMgrService;
     bool isTempFormFlag = true;
     int32_t formCount;
-    EXPECT_EQ(formMgrService.GetFormsCount(isTempFormFlag, formCount), ERR_OK);
+    EXPECT_EQ(formMgrService.GetFormsCount(isTempFormFlag, formCount), ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
 
     GTEST_LOG_(INFO) << "FormMgrService_0107 end";
 }
@@ -748,7 +748,7 @@ HWTEST_F(FmsFormMgrServiceTest2, FormMgrService_0108, TestSize.Level1)
     FormMgrService formMgrService;
     std::string bundleName = "bundleName";
     int32_t formCount;
-    EXPECT_EQ(formMgrService.GetHostFormsCount(bundleName, formCount), ERR_OK);
+    EXPECT_EQ(formMgrService.GetHostFormsCount(bundleName, formCount), ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS);
 
     GTEST_LOG_(INFO) << "FormMgrService_0108 end";
 }
