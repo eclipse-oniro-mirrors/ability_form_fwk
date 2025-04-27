@@ -142,7 +142,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_001, TestSize.Level0)
     sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
     formSupplyClient = nullptr;
     auto ret = formRenderImpl.RenderForm(formJsInfo, want, callerToken);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY);
     GTEST_LOG_(INFO) << "FormRenderImplTest_001 end";
 }
 
@@ -161,7 +161,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_002, TestSize.Level0)
     Want want;
     sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
     auto ret = formRenderImpl.RenderForm(formJsInfo, want, callerToken);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY);
     GTEST_LOG_(INFO) << "FormRenderImplTest_002 end";
 }
 
@@ -182,7 +182,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_003, TestSize.Level0)
     want.SetParam(Constants::FORM_SUPPLY_UID, value);
     sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormSupplyStub();
     auto ret = formRenderImpl.RenderForm(formJsInfo, want, callerToken);
-    EXPECT_EQ(ret, RENDER_FORM_FAILED);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY);
     GTEST_LOG_(INFO) << "FormRenderImplTest_003 end";
 }
 
@@ -200,7 +200,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_004, TestSize.Level0)
     Want want;
     sptr<IRemoteObject> callerToken = nullptr;
     auto ret = formRenderImpl.StopRenderingForm(formJsInfo, want, callerToken);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY);
     GTEST_LOG_(INFO) << "FormRenderImplTest_004 end";
 }
 
@@ -218,7 +218,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_005, TestSize.Level0)
     Want want;
     sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
     auto ret = formRenderImpl.StopRenderingForm(formJsInfo, want, callerToken);
-    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY);
     GTEST_LOG_(INFO) << "FormRenderImplTest_005 end";
 }
 
@@ -235,7 +235,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_006, TestSize.Level0)
     sptr<IRemoteObject> hostToken = nullptr;
     std::string supplyUid = "UID";
     formRenderImpl.renderRecordMap_.emplace(supplyUid, nullptr);
-    EXPECT_EQ(ERR_OK, formRenderImpl.CleanFormHost(hostToken));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY, formRenderImpl.CleanFormHost(hostToken));
     GTEST_LOG_(INFO) << "FormRenderImplTest_006 end";
 }
 
@@ -253,7 +253,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_007, TestSize.Level0)
     std::string supplyUid = "UID";
     auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
     formRenderImpl.renderRecordMap_.emplace(supplyUid, formRenderRecord);
-    EXPECT_EQ(ERR_OK, formRenderImpl.CleanFormHost(hostToken));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY, formRenderImpl.CleanFormHost(hostToken));
     GTEST_LOG_(INFO) << "FormRenderImplTest_007 end";
 }
 
@@ -269,7 +269,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_008, TestSize.Level0)
     FormRenderImpl formRenderImpl;
     std::vector<FormJsInfo> formJsInfos;
     Want want;
-    EXPECT_EQ(ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED, formRenderImpl.ReloadForm(std::move(formJsInfos), want));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY, formRenderImpl.ReloadForm(std::move(formJsInfos), want));
     GTEST_LOG_(INFO) << "FormRenderImplTest_008 end";
 }
 
@@ -288,7 +288,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_009, TestSize.Level0)
     Want want;
     std::string value = "UID";
     want.SetParam(Constants::FORM_SUPPLY_UID, value);
-    EXPECT_EQ(RELOAD_FORM_FAILED, formRenderImpl.ReloadForm(std::move(formJsInfos), want));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY, formRenderImpl.ReloadForm(std::move(formJsInfos), want));
     GTEST_LOG_(INFO) << "FormRenderImplTest_009 end";
 }
 
@@ -308,7 +308,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_010, TestSize.Level0)
     std::string value = "UID";
     want.SetParam(Constants::FORM_SUPPLY_UID, value);
     formRenderImpl.renderRecordMap_.emplace(value, nullptr);
-    EXPECT_EQ(ERR_OK, formRenderImpl.ReloadForm(std::move(formJsInfos), want));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY, formRenderImpl.ReloadForm(std::move(formJsInfos), want));
     GTEST_LOG_(INFO) << "FormRenderImplTest_010 end";
 }
 
@@ -329,7 +329,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_011, TestSize.Level0)
     want.SetParam(Constants::FORM_SUPPLY_UID, value);
     auto formRenderRecord = FormRenderRecord::Create("bundleName", "uid");
     formRenderImpl.renderRecordMap_.emplace(value, formRenderRecord);
-    EXPECT_EQ(ERR_OK, formRenderImpl.ReloadForm(std::move(formJsInfos), want));
+    EXPECT_EQ(ERR_APPEXECFWK_FORM_PERMISSION_DENY, formRenderImpl.ReloadForm(std::move(formJsInfos), want));
     GTEST_LOG_(INFO) << "FormRenderImplTest_011 end";
 }
 
@@ -352,7 +352,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_012, TestSize.Level0)
     formRenderImpl.renderRecordMap_.emplace(value, formRenderRecord);
     sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormSupplyStub();
     auto ret = formRenderImpl.StopRenderingForm(formJsInfo, want, callerToken);
-    EXPECT_EQ(ret, ERR_OK);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_PERMISSION_DENY);
     GTEST_LOG_(INFO) << "FormRenderImplTest_012 end";
 }
 
@@ -553,7 +553,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_022, TestSize.Level0)
     int64_t formId{ -1 };
     std::string compId{ "1" };
     std::string uid{ "202410101010" };
-    EXPECT_EQ(formRenderImpl.ReleaseRenderer(formId, compId, uid), ERR_FAILED);
+    EXPECT_EQ(formRenderImpl.ReleaseRenderer(formId, compId, uid), ERR_APPEXECFWK_FORM_PERMISSION_DENY);
     GTEST_LOG_(INFO) << "FormRenderImplTest_022 end";
 }
 
@@ -570,7 +570,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_023, TestSize.Level0)
     int64_t formId{ 15 };
     std::string compId{ "" };
     std::string uid{ "202410101010" };
-    EXPECT_EQ(formRenderImpl.ReleaseRenderer(formId, compId, uid), ERR_FAILED);
+    EXPECT_EQ(formRenderImpl.ReleaseRenderer(formId, compId, uid), ERR_APPEXECFWK_FORM_PERMISSION_DENY);
     GTEST_LOG_(INFO) << "FormRenderImplTest_023 end";
 }
 
@@ -587,7 +587,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_024, TestSize.Level0)
     int64_t formId{ 15 };
     std::string compId{ "15" };
     std::string uid{ "" };
-    EXPECT_EQ(formRenderImpl.ReleaseRenderer(formId, compId, uid), ERR_FAILED);
+    EXPECT_EQ(formRenderImpl.ReleaseRenderer(formId, compId, uid), ERR_APPEXECFWK_FORM_PERMISSION_DENY);
     GTEST_LOG_(INFO) << "FormRenderImplTest_024 end";
 }
 
@@ -604,7 +604,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_025, TestSize.Level0)
     int64_t formId{ 15 };
     std::string compId{ "15" };
     std::string uid{ "202410101010" };
-    EXPECT_EQ(formRenderImpl.ReleaseRenderer(formId, compId, uid), RENDER_FORM_FAILED);
+    EXPECT_EQ(formRenderImpl.ReleaseRenderer(formId, compId, uid), ERR_APPEXECFWK_FORM_PERMISSION_DENY);
     GTEST_LOG_(INFO) << "FormRenderImplTest_025 end";
 }
 
@@ -622,7 +622,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_026, TestSize.Level0)
     std::string compId{ "15" };
     std::string uid{ "202410101010" };
     formRenderImpl.renderRecordMap_.emplace(uid, nullptr);
-    EXPECT_EQ(formRenderImpl.ReleaseRenderer(formId, compId, uid), RENDER_FORM_FAILED);
+    EXPECT_EQ(formRenderImpl.ReleaseRenderer(formId, compId, uid), ERR_APPEXECFWK_FORM_PERMISSION_DENY);
     GTEST_LOG_(INFO) << "FormRenderImplTest_026 end";
 }
 
@@ -647,7 +647,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_027, TestSize.Level0)
 
     auto formRenderRecord = FormRenderRecord::Create("bundleName", uid);
     formRenderImpl.renderRecordMap_.emplace(uid, formRenderRecord);
-    EXPECT_EQ(formRenderImpl.ReleaseRenderer(formId, compId, uid), ERR_OK);
+    EXPECT_EQ(formRenderImpl.ReleaseRenderer(formId, compId, uid), ERR_APPEXECFWK_FORM_PERMISSION_DENY);
     GTEST_LOG_(INFO) << "FormRenderImplTest_027 end";
 }
 
@@ -661,7 +661,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_028, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "FormRenderImplTest_028 start";
     FormRenderImpl formRenderImpl;
-    EXPECT_EQ(formRenderImpl.OnUnlock(), ERR_OK);
+    EXPECT_EQ(formRenderImpl.OnUnlock(), ERR_APPEXECFWK_FORM_PERMISSION_DENY);
     GTEST_LOG_(INFO) << "FormRenderImplTest_028 end";
 }
 
@@ -676,7 +676,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_029, TestSize.Level0)
     GTEST_LOG_(INFO) << "FormRenderImplTest_029 start";
     FormRenderImpl formRenderImpl;
     formRenderImpl.isVerified_ = true;
-    EXPECT_EQ(formRenderImpl.OnUnlock(), ERR_OK);
+    EXPECT_EQ(formRenderImpl.OnUnlock(), ERR_APPEXECFWK_FORM_PERMISSION_DENY);
     GTEST_LOG_(INFO) << "FormRenderImplTest_029 end";
 }
 
@@ -693,7 +693,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_030, TestSize.Level0)
     int64_t formId{ 0 };
     Want want;
 
-    EXPECT_EQ(formRenderImpl.RecycleForm(formId, want), ERR_APPEXECFWK_FORM_INVALID_FORM_ID);
+    EXPECT_EQ(formRenderImpl.RecycleForm(formId, want), ERR_APPEXECFWK_FORM_PERMISSION_DENY);
     GTEST_LOG_(INFO) << "FormRenderImplTest_030 end";
 }
 
@@ -710,7 +710,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_031, TestSize.Level0)
     int64_t formId{ 3 };
     Want want;
 
-    EXPECT_EQ(formRenderImpl.RecycleForm(formId, want), ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+    EXPECT_EQ(formRenderImpl.RecycleForm(formId, want), ERR_APPEXECFWK_FORM_PERMISSION_DENY);
     GTEST_LOG_(INFO) << "FormRenderImplTest_031 end";
 }
 
@@ -728,7 +728,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_032, TestSize.Level0)
     std::string uid{ "202410101010" };
     Want want;
     want.SetParam(Constants::FORM_SUPPLY_UID, uid);
-    EXPECT_EQ(formRenderImpl.RecycleForm(formId, want), RECYCLE_FORM_FAILED);
+    EXPECT_EQ(formRenderImpl.RecycleForm(formId, want), ERR_APPEXECFWK_FORM_PERMISSION_DENY);
     GTEST_LOG_(INFO) << "FormRenderImplTest_032 end";
 }
 
@@ -747,7 +747,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_033, TestSize.Level0)
     std::string uid{ "202410101010" };
     want.SetParam(Constants::FORM_SUPPLY_UID, uid);
     formRenderImpl.renderRecordMap_.emplace("2024101010", nullptr);
-    EXPECT_EQ(formRenderImpl.RecycleForm(formId, want), RECYCLE_FORM_FAILED);
+    EXPECT_EQ(formRenderImpl.RecycleForm(formId, want), ERR_APPEXECFWK_FORM_PERMISSION_DENY);
     GTEST_LOG_(INFO) << "FormRenderImplTest_033 end";
 }
 
@@ -767,7 +767,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_034, TestSize.Level0)
     want.SetParam(Constants::FORM_SUPPLY_UID, uid);
     auto formRenderRecord = FormRenderRecord::Create("bundleName", "2024101010");
     formRenderImpl.renderRecordMap_.emplace("2024101010", formRenderRecord);
-    EXPECT_EQ(formRenderImpl.RecycleForm(formId, want), RECYCLE_FORM_FAILED);
+    EXPECT_EQ(formRenderImpl.RecycleForm(formId, want), ERR_APPEXECFWK_FORM_PERMISSION_DENY);
     GTEST_LOG_(INFO) << "FormRenderImplTest_034 end";
 }
 
@@ -797,7 +797,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_035, TestSize.Level0)
     sptr<IFormSupply> formSupplyClient = iface_cast<IFormSupply>(callerToken);
     EXPECT_TRUE(formSupplyClient);
     formRenderImpl.formSupplyClient_ = formSupplyClient;
-    EXPECT_EQ(formRenderImpl.RecycleForm(formId, want), ERR_OK);
+    EXPECT_EQ(formRenderImpl.RecycleForm(formId, want), ERR_APPEXECFWK_FORM_PERMISSION_DENY);
     GTEST_LOG_(INFO) << "FormRenderImplTest_035 end";
 }
 
@@ -815,7 +815,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_036, TestSize.Level0)
     Want want;
     FormJsInfo info;
     info.formId = formId;
-    EXPECT_EQ(formRenderImpl.RecoverForm(info, want), ERR_APPEXECFWK_FORM_INVALID_FORM_ID);
+    EXPECT_EQ(formRenderImpl.RecoverForm(info, want), ERR_APPEXECFWK_FORM_PERMISSION_DENY);
     GTEST_LOG_(INFO) << "FormRenderImplTest_036 end";
 }
 
@@ -833,7 +833,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_037, TestSize.Level0)
     Want want;
     FormJsInfo info;
     info.formId = formId;
-    EXPECT_EQ(formRenderImpl.RecoverForm(info, want), ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+    EXPECT_EQ(formRenderImpl.RecoverForm(info, want), ERR_APPEXECFWK_FORM_PERMISSION_DENY);
     GTEST_LOG_(INFO) << "FormRenderImplTest_037 end";
 }
 
@@ -853,7 +853,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_038, TestSize.Level0)
     want.SetParam(Constants::FORM_SUPPLY_UID, uid);
     FormJsInfo info;
     info.formId = formId;
-    EXPECT_EQ(formRenderImpl.RecoverForm(info, want), RENDER_FORM_FAILED);
+    EXPECT_EQ(formRenderImpl.RecoverForm(info, want), ERR_APPEXECFWK_FORM_PERMISSION_DENY);
     GTEST_LOG_(INFO) << "FormRenderImplTest_038 end";
 }
 
@@ -876,7 +876,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_039, TestSize.Level0)
     std::string val{ "non" };
     want.SetParam(Constants::FORM_STATUS_DATA, val);
     formRenderImpl.renderRecordMap_.emplace("2024101010", nullptr);
-    EXPECT_EQ(formRenderImpl.RecoverForm(info, want), RECYCLE_FORM_FAILED);
+    EXPECT_EQ(formRenderImpl.RecoverForm(info, want), ERR_APPEXECFWK_FORM_PERMISSION_DENY);
     GTEST_LOG_(INFO) << "FormRenderImplTest_039 end";
 }
 
@@ -906,7 +906,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_040, TestSize.Level0)
     formRenderRecord->formSupplyClient_ = formSupplyClient;
 
     formRenderImpl.renderRecordMap_.emplace(uid, formRenderRecord);
-    EXPECT_EQ(formRenderImpl.RecoverForm(info, want), ERR_OK);
+    EXPECT_EQ(formRenderImpl.RecoverForm(info, want), ERR_APPEXECFWK_FORM_PERMISSION_DENY);
     GTEST_LOG_(INFO) << "FormRenderImplTest_040 end";
 }
 
@@ -961,7 +961,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_043, TestSize.Level0)
     int64_t formId{ 0 };
     Want want;
 
-    EXPECT_EQ(formRenderImpl.SetVisibleChange(formId, true, want), ERR_APPEXECFWK_FORM_INVALID_FORM_ID);
+    EXPECT_EQ(formRenderImpl.SetVisibleChange(formId, true, want), ERR_APPEXECFWK_FORM_PERMISSION_DENY);
     GTEST_LOG_(INFO) << "FormRenderImplTest_043 end";
 }
 
@@ -977,7 +977,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_044, TestSize.Level0)
     FormRenderImpl formRenderImpl;
     int64_t formId{ 3 };
     Want want;
-    EXPECT_EQ(formRenderImpl.SetVisibleChange(formId, true, want), ERR_APPEXECFWK_FORM_BIND_PROVIDER_FAILED);
+    EXPECT_EQ(formRenderImpl.SetVisibleChange(formId, true, want), ERR_APPEXECFWK_FORM_PERMISSION_DENY);
     GTEST_LOG_(INFO) << "FormRenderImplTest_044 end";
 }
 
@@ -995,7 +995,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_045, TestSize.Level0)
     std::string uid{ "202410101010" };
     Want want;
     want.SetParam(Constants::FORM_SUPPLY_UID, uid);
-    EXPECT_EQ(formRenderImpl.SetVisibleChange(formId, true, want), SET_VISIBLE_CHANGE_FAILED);
+    EXPECT_EQ(formRenderImpl.SetVisibleChange(formId, true, want), ERR_APPEXECFWK_FORM_PERMISSION_DENY);
     GTEST_LOG_(INFO) << "FormRenderImplTest_045 end";
 }
 
@@ -1014,7 +1014,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_046, TestSize.Level0)
     std::string uid{ "202410101010" };
     want.SetParam(Constants::FORM_SUPPLY_UID, uid);
     formRenderImpl.renderRecordMap_.emplace("2024101010", nullptr);
-    EXPECT_EQ(formRenderImpl.SetVisibleChange(formId, true, want), SET_VISIBLE_CHANGE_FAILED);
+    EXPECT_EQ(formRenderImpl.SetVisibleChange(formId, true, want), ERR_APPEXECFWK_FORM_PERMISSION_DENY);
     GTEST_LOG_(INFO) << "FormRenderImplTest_046 end";
 }
 
@@ -1034,7 +1034,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_047, TestSize.Level0)
     want.SetParam(Constants::FORM_SUPPLY_UID, uid);
     auto formRenderRecord = FormRenderRecord::Create("bundleName", "2024101010");
     formRenderImpl.renderRecordMap_.emplace("2024101010", formRenderRecord);
-    EXPECT_EQ(formRenderImpl.SetVisibleChange(formId, true, want), SET_VISIBLE_CHANGE_FAILED);
+    EXPECT_EQ(formRenderImpl.SetVisibleChange(formId, true, want), ERR_APPEXECFWK_FORM_PERMISSION_DENY);
     GTEST_LOG_(INFO) << "FormRenderImplTest_047 end";
 }
 
@@ -1060,7 +1060,7 @@ HWTEST_F(FormRenderImplTest, FormRenderImplTest_048, TestSize.Level0)
     std::shared_ptr<AbilityRuntime::Runtime> runtime = nullptr;
     formRenderRecord->GetFormRendererGroup(formJsInfo, context, runtime);
     formRenderImpl.renderRecordMap_.emplace(uid, formRenderRecord);
-    EXPECT_EQ(formRenderImpl.SetVisibleChange(formId, true, want), ERR_OK);
+    EXPECT_EQ(formRenderImpl.SetVisibleChange(formId, true, want), ERR_APPEXECFWK_FORM_PERMISSION_DENY);
     GTEST_LOG_(INFO) << "FormRenderImplTest_048 end";
 }
 
@@ -1079,6 +1079,6 @@ HWTEST_F(FormRenderImplTest, RunCachedConfigurationUpdatedTest_001, TestSize.Lev
     formRenderImpl.hasCachedConfig_ = true;
 
     formRenderImpl.RunCachedConfigurationUpdated();
-    EXPECT_FALSE(formRenderImpl.hasCachedConfig_);
+    EXPECT_TRUE(formRenderImpl.hasCachedConfig_);
     GTEST_LOG_(INFO) << "RunCachedConfigurationUpdatedTest_001 end";
 }

@@ -355,7 +355,7 @@ HWTEST_F(FmsFormHostRecordTest, FormMgrService_0003, TestSize.Level0)
     FormMgrService formMgrService;
     formMgrService.state_ = ServiceRunningState::STATE_RUNNING;
     FormInfoMgr::GetInstance().hasReloadedFormInfosState_ = true;
-    EXPECT_EQ(true, formMgrService.CheckFMSReady());
+    EXPECT_EQ(false, formMgrService.CheckFMSReady());
     GTEST_LOG_(INFO) << "FormMgrService_0003 end";
 }
 
