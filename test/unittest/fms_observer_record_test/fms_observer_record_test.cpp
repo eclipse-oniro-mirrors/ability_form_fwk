@@ -314,5 +314,277 @@ HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_014, Function | Me
     formObserverRecord.SetFormEventObserverLocked(bundleName, FormEventId::FORM_EVENT_FORM_REMOVE, callerToken);
     GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_014 end";
 }
+
+/**
+ * @tc.number: FmsFormObserverRecordTest_015
+ * @tc.name: SetDeathRecipient.
+ * @tc.desc: Verify that the SetDeathRecipient interface executes normally and exits without exception.
+ */
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_015, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_015 start";
+    FormObserverRecord formObserverRecord;
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    formObserverRecord.SetDeathRecipient(callerToken, nullptr);
+    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_015 end";
+}
+
+/**
+ * @tc.number: FmsFormObserverRecordTest_016
+ * @tc.name: SetFormAddObserver.
+ * @tc.desc: Verify that the SetFormAddObserver interface executes normally and exits without exception.
+ */
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_016, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_016 start";
+    FormObserverRecord formObserverRecord;
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    std::string bundleName = "bundle";
+    EXPECT_EQ(ERR_OK, formObserverRecord.SetFormAddObserver(bundleName, callerToken));
+    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_016 end";
+}
+
+/**
+ * @tc.number: FmsFormObserverRecordTest_017
+ * @tc.name: SetFormRemoveObserver.
+ * @tc.desc: Verify that the SetFormAddObserver interface executes normally and exits without exception.
+ */
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_017, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_017 start";
+    FormObserverRecord formObserverRecord;
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    std::string bundleName = "bundle";
+    EXPECT_EQ(ERR_OK, formObserverRecord.SetFormRemoveObserver(bundleName, callerToken));
+    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_017 end";
+}
+
+/**
+ * @tc.number: FmsFormObserverRecordTest_018
+ * @tc.name: onFormAdd.
+ * @tc.desc: Verify that the SetFormAddObserver interface executes normally and exits without exception.
+ */
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_018, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_018 start";
+    FormObserverRecord formObserverRecord;
+    RunningFormInfo runningFormInfo;
+    std::string bundleName = "bundle";
+    formObserverRecord.onFormAdd(bundleName, runningFormInfo);
+    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_018 end";
+}
+
+/**
+ * @tc.number: FmsFormObserverRecordTest_019
+ * @tc.name: onFormRemove.
+ * @tc.desc: Verify that the SetFormAddObserver interface executes normally and exits without exception.
+ */
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_019, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_019 start";
+    FormObserverRecord formObserverRecord;
+    RunningFormInfo runningFormInfo;
+    std::string bundleName = "bundle";
+    formObserverRecord.onFormRemove(bundleName, runningFormInfo);
+    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_019 end";
+}
+
+/**
+ * @tc.number: FmsFormObserverRecordTest_020
+ * @tc.name: CleanResource.
+ * @tc.desc: Verify that the SetFormAddObserver interface executes normally and exits without exception.
+ */
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_020, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_020 start";
+    FormObserverRecord formObserverRecord;
+    RunningFormInfo runningFormInfo;
+    wptr<IRemoteObject> remote;
+    formObserverRecord.CleanResource(remote);
+    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_020 end";
+}
+
+/**
+ * @tc.number: FmsFormObserverRecordTest_021
+ * @tc.name: SetFormEventObserver.
+ * @tc.desc: Verify that the SetFormAddObserver interface executes normally and exits without exception.
+ */
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_021, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_021 start";
+    FormObserverRecord formObserverRecord;
+    std::string bundleName = "bundleName";
+    std::string formEventType = "";
+    sptr<IRemoteObject> callerToken = nullptr;
+    auto ret = formObserverRecord.SetFormEventObserver(bundleName, formEventType, callerToken);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    sptr<IRemoteObject> callerToken2 = new (std::nothrow) MockFormProviderClient();
+    ret = formObserverRecord.SetFormEventObserver(bundleName, formEventType, callerToken2);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    formEventType = "test";
+    ret = formObserverRecord.SetFormEventObserver(bundleName, formEventType, callerToken2);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_021 end";
+}
+
+/**
+ * @tc.number: FmsFormObserverRecordTest_022
+ * @tc.name: RemoveFormEventObserver.
+ * @tc.desc: Verify that the SetFormAddObserver interface executes normally and exits without exception.
+ */
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_022, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_022 start";
+    FormObserverRecord formObserverRecord;
+    std::string bundleName = "bundleName";
+    std::string formEventType = "";
+    sptr<IRemoteObject> callerToken = nullptr;
+    auto ret = formObserverRecord.RemoveFormEventObserver(bundleName, formEventType, callerToken);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    formEventType = "test";
+    ret = formObserverRecord.RemoveFormEventObserver(bundleName, formEventType, callerToken);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    sptr<IRemoteObject> callerToken2 = new (std::nothrow) MockFormProviderClient();
+    ret = formObserverRecord.RemoveFormEventObserver(bundleName, formEventType, callerToken2);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    formEventType = "message";
+    ret = formObserverRecord.RemoveFormEventObserver(bundleName, formEventType, callerToken2);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_022 end";
+}
+
+/**
+ * @tc.number: FmsFormObserverRecordTest_023
+ * @tc.name: RemoveFormEventObserverLocked.
+ * @tc.desc: Verify that the SetFormAddObserver interface executes normally and exits without exception.
+ */
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_023, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_023 start";
+    FormObserverRecord formObserverRecord;
+    std::string bundleName = "bundleName";
+    FormEventId formEventType = FormEventId::FORM_EVENT_CALL;
+    sptr<IRemoteObject> callerToken = nullptr;
+    auto ret = formObserverRecord.RemoveFormEventObserverLocked(bundleName, formEventType, callerToken);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+
+    formObserverRecord.formEventObservers_.clear();
+    FormObserverRecordInner recordInner(callerToken);
+    recordInner.PushEvent(formEventType);
+    recordInner.SetBindHostBundle(bundleName);
+    std::vector<FormObserverRecordInner> observerVec{recordInner};
+    formObserverRecord.formEventObservers_[bundleName] = observerVec;
+    ret = formObserverRecord.RemoveFormEventObserverLocked(bundleName, formEventType, callerToken);
+    EXPECT_EQ(ret, ERR_OK);
+
+    formObserverRecord.formEventObservers_.clear();
+    sptr<IRemoteObject> callerToken2 = new (std::nothrow) MockFormProviderClient();
+    FormObserverRecordInner recordInner2(callerToken2);
+    std::vector<FormObserverRecordInner> observerVec2{recordInner};
+    ret = formObserverRecord.RemoveFormEventObserverLocked(bundleName, formEventType, callerToken);
+    EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_INVALID_PARAM);
+    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_023 end";
+}
+
+/**
+ * @tc.number: FmsFormObserverRecordTest_024
+ * @tc.name: ClearDeathRemoteObserver.
+ * @tc.desc: Verify that the SetFormAddObserver interface executes normally and exits without exception.
+ */
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_024, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_024 start";
+    FormObserverRecord formObserverRecord;
+    std::string bundleName = "bundleName";
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    FormObserverRecordInner recordInner(callerToken);
+    std::vector<FormObserverRecordInner> observerVec{recordInner};
+    formObserverRecord.formEventObservers_[bundleName] = observerVec;
+    wptr<IRemoteObject> remote = new (std::nothrow) MockFormProviderClient();
+    EXPECT_NE(remote.promote(), nullptr);
+    formObserverRecord.ClearDeathRemoteObserver(remote);
+    EXPECT_EQ(remote.promote(), nullptr);
+    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_024 end";
+}
+
+/**
+ * @tc.number: FmsFormObserverRecordTest_025
+ * @tc.name: RemoveFormEventObserverLocked.
+ * @tc.desc: Verify that the SetFormAddObserver interface executes normally and exits without exception.
+ */
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_025, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_025 start";
+    sptr<IRemoteObject> callerToken = nullptr;
+    FormObserverRecordInner formObserverRecordInner(callerToken);
+    FormEventId type = FormEventId::FORM_EVENT_NON;
+    formObserverRecordInner.eventGroup_.push_back(FormEventId::FORM_EVENT_FORM_REMOVE);
+    formObserverRecordInner.eventGroup_.push_back(FormEventId::FORM_EVENT_CALL);
+    formObserverRecordInner.eventGroup_.push_back(FormEventId::FORM_EVENT_MESSAGE);
+    auto size = formObserverRecordInner.eventGroup_.size();
+    formObserverRecordInner.RemoveEvent(type);
+    EXPECT_EQ(formObserverRecordInner.eventGroup_.size(), size);
+    type = FormEventId::FORM_EVENT_FORM_REMOVE;
+    formObserverRecordInner.RemoveEvent(type);
+    EXPECT_EQ(formObserverRecordInner.eventGroup_.size(), size - 1);
+    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_025 end";
+}
+
+/**
+ * @tc.number: FmsFormObserverRecordTest_026
+ * @tc.name: OnRemoteDied.
+ * @tc.desc: OnRemoteDied
+ */
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_026, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_026 start";
+    FormObserverRecord::ClientDeathRecipient clientDeathRecipient;
+    wptr<IRemoteObject> remote;
+    clientDeathRecipient.OnRemoteDied(remote);
+    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_026 end";
+}
+
+/**
+ * @tc.number: FmsFormObserverRecordTest_027
+ * @tc.name: NotifyFormEvent.
+ * @tc.desc: NotifyFormEvent
+ */
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_027, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_027 start";
+    FormObserverRecord formObserverRecord;
+    sptr<IRemoteObject> callerToken = nullptr;
+    FormObserverRecordInner recordInner(callerToken);
+    RunningFormInfo runningFormInfo;
+    std::string formEventType = "";
+    formObserverRecord.NotifyFormEvent(recordInner, FormEventId::FORM_EVENT_NON, runningFormInfo, formEventType);
+    formObserverRecord.NotifyFormEvent(recordInner, FormEventId::FORM_EVENT_CALL, runningFormInfo, formEventType);
+    formObserverRecord.NotifyFormEvent(recordInner, FormEventId::FORM_EVENT_MESSAGE, runningFormInfo, formEventType);
+    formObserverRecord.NotifyFormEvent(recordInner, FormEventId::FORM_EVENT_ROUTER, runningFormInfo, formEventType);
+    formObserverRecord.NotifyFormEvent(recordInner, FormEventId::FORM_EVENT_FORM_ADD, runningFormInfo, formEventType);
+    formObserverRecord.NotifyFormEvent(recordInner,
+        FormEventId::FORM_EVENT_FORM_REMOVE, runningFormInfo, formEventType);
+    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_027 end";
+}
+
+/**
+ * @tc.number: FmsFormObserverRecordTest_028
+ * @tc.name: SetFormEventObserverLocked.
+ * @tc.desc: SetFormEventObserverLocked
+ */
+HWTEST_F(FmsFormObserverRecordTest, FmsFormObserverRecordTest_028, Function | MediumTest | Level1)
+{
+    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_028 start";
+    FormObserverRecord formObserverRecord;
+    std::string bundleName = "";
+    sptr<IRemoteObject> callerToken;
+    formObserverRecord.SetFormEventObserverLocked(bundleName, FormEventId::FORM_EVENT_NON, callerToken);
+    formObserverRecord.SetFormEventObserverLocked(bundleName, FormEventId::FORM_EVENT_CALL, callerToken);
+    formObserverRecord.SetFormEventObserverLocked(bundleName, FormEventId::FORM_EVENT_MESSAGE, callerToken);
+    formObserverRecord.SetFormEventObserverLocked(bundleName, FormEventId::FORM_EVENT_ROUTER, callerToken);
+    formObserverRecord.SetFormEventObserverLocked(bundleName, FormEventId::FORM_EVENT_FORM_ADD, callerToken);
+    formObserverRecord.SetFormEventObserverLocked(bundleName, FormEventId::FORM_EVENT_FORM_REMOVE, callerToken);
+    GTEST_LOG_(INFO) << "FmsFormObserverRecordTest_028 end";
+}
 }
 }

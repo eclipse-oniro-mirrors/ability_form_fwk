@@ -375,5 +375,72 @@ HWTEST_F(JSFormStateObserverStubTest, JSFormStateObserverStubTest_013, TestSize.
     auto result = callback->OnRemoteRequest(code, data, reply, option);
     EXPECT_EQ(result, ERR_OK);
 }
+
+/**
+ * @tc.name: JSFormStateObserverStubTest_014
+ * @tc.desc: 1.Verify OnRemoteRequest and HandleOnFormClick interface executes as expected.
+ *           2.The interface return value ERR_APPEXECFWK_INSTALLD_PARAM_ERROR.
+ *           3.callType is nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(JSFormStateObserverStubTest, JSFormStateObserverStubTest_014, TestSize.Level0)
+{
+    sptr<MockJsFormStateObserverCallback> callback = new (std::nothrow) MockJsFormStateObserverCallback();
+    ASSERT_NE(callback, nullptr);
+    uint32_t code = static_cast<uint32_t>(IJsFormStateObserver::Message::FORM_STATE_OBSERVER_ON_FORM_CLICK);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(JsFormStateObserverStub::GetDescriptor());
+    data.WriteString("bundleName");
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_INSTALLD_PARAM_ERROR);
+}
+
+/**
+ * @tc.name: JSFormStateObserverStubTest_015
+ * @tc.desc: 1.Verify OnRemoteRequest and HandleOnFormClick interface executes as expected.
+ *           2.The interface return value ERR_APPEXECFWK_PARCEL_ERROR.
+ *           3.RunningFormInfo is nullptr.
+ * @tc.type: FUNC
+ */
+HWTEST_F(JSFormStateObserverStubTest, JSFormStateObserverStubTest_015, TestSize.Level0)
+{
+    sptr<MockJsFormStateObserverCallback> callback = new (std::nothrow) MockJsFormStateObserverCallback();
+    ASSERT_NE(callback, nullptr);
+    uint32_t code = static_cast<uint32_t>(IJsFormStateObserver::Message::FORM_STATE_OBSERVER_ON_FORM_CLICK);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(JsFormStateObserverStub::GetDescriptor());
+    data.WriteString("bundleName");
+    data.WriteString("callType");
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    EXPECT_EQ(result, ERR_APPEXECFWK_PARCEL_ERROR);
+}
+
+/**
+ * @tc.name: JSFormStateObserverStubTest_016
+ * @tc.desc: 1.Verify OnRemoteRequest and HandleOnFormClick interface executes as expected.
+ *           2.The interface return value ERR_OK.
+ * @tc.type: FUNC
+ */
+HWTEST_F(JSFormStateObserverStubTest, JSFormStateObserverStubTest_016, TestSize.Level0)
+{
+    RunningFormInfo runningFormInfo = {};
+    sptr<MockJsFormStateObserverCallback> callback = new (std::nothrow) MockJsFormStateObserverCallback();
+    ASSERT_NE(callback, nullptr);
+    uint32_t code = static_cast<uint32_t>(IJsFormStateObserver::Message::FORM_STATE_OBSERVER_ON_FORM_CLICK);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option{MessageOption::TF_ASYNC};
+    data.WriteInterfaceToken(JsFormStateObserverStub::GetDescriptor());
+    data.WriteString("bundleName");
+    data.WriteString("callType");
+    data.WriteParcelable(&runningFormInfo);
+    auto result = callback->OnRemoteRequest(code, data, reply, option);
+    
+    EXPECT_EQ(result, ERR_OK);
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS
