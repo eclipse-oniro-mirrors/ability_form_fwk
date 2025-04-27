@@ -487,4 +487,100 @@ HWTEST_F(FmsFormProviderMgrTest, FormProviderMgrTest_006, TestSize.Level1)
     FormProviderMgr::GetInstance().MessageEvent(formId, formRecord, want);
     GTEST_LOG_(INFO) << "FormProviderMgrTest_006 end";
 }
+
+/**
+ * @tc.name: FormProviderMgrTest_007
+ * @tc.desc: Verify NotifyProviderFormDelete
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderMgrTest, FormProviderMgrTest_007, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormProviderMgrTest_007 start";
+    int64_t formId = 123;
+    FormRecord formRecord;
+    formRecord.abilityName = "abilityName";
+    FormProviderMgr::GetInstance().NotifyProviderFormDelete(formId, formRecord);
+    GTEST_LOG_(INFO) << "FormProviderMgrTest_007 end";
+}
+
+/**
+ * @tc.name: FormProviderMgrTest_008
+ * @tc.desc: Verify NotifyProviderFormDelete
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderMgrTest, FormProviderMgrTest_008, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormProviderMgrTest_008 start";
+    int64_t formId = 123;
+    FormRecord formRecord;
+    formRecord.abilityName = "abilityName";
+    formRecord.bundleName = "bundleName";
+    FormProviderMgr::GetInstance().NotifyProviderFormDelete(formId, formRecord);
+    GTEST_LOG_(INFO) << "FormProviderMgrTest_008 end";
+}
+
+/**
+ * @tc.name: FormProviderMgrTest_009
+ * @tc.desc: Verify MessageEvent
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderMgrTest, FormProviderMgrTest_009, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormProviderMgrTest_009 start";
+    int64_t formId = 123;
+    FormRecord formRecord;
+    formRecord.abilityName = "abilityName";
+    formRecord.bundleName = "bundleName";
+    Want want;
+    FormProviderMgr::GetInstance().MessageEvent(formId, formRecord, want);
+    GTEST_LOG_(INFO) << "FormProviderMgrTest_009 end";
+}
+
+/**
+ * @tc.name: FormProviderMgrTest_010
+ * @tc.desc: Verify NotifyProviderFormDelete
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderMgrTest, FormProviderMgrTest_010, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormProviderMgrTest_010 start";
+    int64_t formId = 123;
+    FormRecord formRecord;
+    formRecord.abilityName = "abilityName";
+    FormProviderMgr::GetInstance().NotifyProviderFormDelete(formId, formRecord);
+    GTEST_LOG_(INFO) << "FormProviderMgrTest_010 end";
+}
+
+/**
+ * @tc.name: FormProviderMgrTest_011
+ * @tc.desc: Verify NotifyProviderFormDelete
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderMgrTest, FormProviderMgrTest_011, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormProviderMgrTest_011 start";
+    int64_t formId = 123;
+    FormRecord formRecord;
+    formRecord.abilityName = "abilityName";
+    formRecord.bundleName = "bundleName";
+    FormProviderMgr::GetInstance().NotifyProviderFormDelete(formId, formRecord);
+    GTEST_LOG_(INFO) << "FormProviderMgrTest_011 end";
+}
+
+/**
+ * @tc.name: FormProviderMgrTest_012
+ * @tc.desc: Verify MessageEvent
+ * @tc.type: FUNC
+ */
+HWTEST_F(FmsFormProviderMgrTest, FormProviderMgrTest_012, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormProviderMgrTest_012 start";
+    int64_t formId = 123;
+    FormRecord formRecord;
+    formRecord.abilityName = "abilityName";
+    formRecord.bundleName = "bundleName";
+    Want want;
+    FormProviderMgr::GetInstance().MessageEvent(formId, formRecord, want);
+    GTEST_LOG_(INFO) << "FormProviderMgrTest_012 end";
+}
 }
