@@ -21,7 +21,7 @@
 
 namespace OHOS {
 namespace AppExecFwk {
-namespace Constants {
+namespace FormConstants {
     constexpr int32_t FOUNDATION_UID = 5523;
 }
 namespace Constants {
