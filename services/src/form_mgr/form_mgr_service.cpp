@@ -167,6 +167,10 @@ FormMgrService::~FormMgrService()
 
 bool FormMgrService::CheckFMSReady()
 {
+    if (!CheckIsHostCall()) {
+        HILOG_ERROR("Caller not host");
+        return false;
+    }
     if (state_ != ServiceRunningState::STATE_RUNNING) {
         return false;
     }
@@ -1641,12 +1645,20 @@ ErrCode FormMgrService::RegisterFormRemoveObserverByBundle(const std::string bun
 int32_t FormMgrService::GetFormsCount(bool isTempFormFlag, int32_t &formCount)
 {
     HILOG_DEBUG("call");
+    if (!CheckIsSystemAppCall()) {
+        HILOG_ERROR("Caller not host");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
     return FormMgrAdapter::GetInstance().GetFormsCount(isTempFormFlag, formCount);
 }
 
 int32_t FormMgrService::GetHostFormsCount(std::string &bundleName, int32_t &formCount)
 {
     HILOG_DEBUG("call");
+    if (!CheckIsSystemAppCall()) {
+        HILOG_ERROR("Caller not host");
+        return ERR_APPEXECFWK_FORM_PERMISSION_DENY_SYS;
+    }
     return FormMgrAdapter::GetInstance().GetHostFormsCount(bundleName, formCount);
 }
 
@@ -1848,6 +1860,18 @@ ErrCode FormMgrService::RequestPublishFormWithSnapshot(Want &want, bool withForm
     HILOG_INFO("begin:%{public}s, publish:%{public}s, end:%{public}s, onKvDataServiceAddTime:%{public}s",
         onStartBeginTime_.c_str(), onStartPublishTime_.c_str(),
         onStartEndTime_.c_str(), onKvDataServiceAddTime_.c_str());
+    ElementName elementName = want.GetElement();
+    std::string dstBundleName = elementName.GetBundleName();
+    std::string bundleName;
+    auto ret = FormBmsHelper::GetInstance().GetCallerBundleName(bundleName);
+    if (ret != ERR_OK) {
+        HILOG_ERROR("get BundleName failed");
+        return ERR_APPEXECFWK_FORM_GET_BUNDLE_FAILED;
+    }
+    if (dstBundleName != bundleName) {
+        HILOG_ERROR("dstBundleName not self");
+        return ERR_APPEXECFWK_FORM_INVALID_BUNDLENAME;
+    }
     if (!CheckCallerIsSystemApp()) {
         want.SetAction(Constants::FORM_PAGE_ACTION);
         want.SetParam(Constants::PARAM_PAGE_ROUTER_SERVICE_CODE,
@@ -2036,6 +2060,17 @@ ErrCode FormMgrService::OpenFormEditAbility(const std::string &abilityName, cons
     want.SetElementName(callerName, abilityName);
     want.SetParams(wantarams);
     return FormMgrAdapter::GetInstance().StartAbilityByFms(want);
+}
+
+bool FormMgrService::CheckIsHostCall()
+{
+    return CheckIsSystemAppCall() && FormUtil::VerifyCallingPermission(AppExecFwk::Constants::PERMISSION_REQUIRE_FORM);
+}
+
+bool FormMgrService::CheckIsSystemAppCall()
+{
+    auto callerTokenID = IPCSkeleton::GetCallingTokenID();
+    return Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(callerTokenID);
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

@@ -213,6 +213,8 @@ public:
      */
     void OnLockForm(const std::vector<int64_t> &formIds, const bool lock) override;
 private:
+    bool CheckIsFoundationCall();
+
     static std::mutex instanceMutex_;
     static sptr<FormHostClient> instance_;
     mutable std::mutex callbackMutex_;
