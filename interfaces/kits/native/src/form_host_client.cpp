@@ -523,7 +523,7 @@ void FormHostClient::OnLockForm(const std::vector<int64_t> &formIds, const bool 
         if (formId < 0) {
             HILOG_ERROR("the passed form id can't be negative");
             continue;
-        }0
+        }
         std::lock_guard<std::mutex> lockMutex(callbackMutex_);
         auto iter = formCallbackMap_.find(formId);
         if (iter == formCallbackMap_.end()) {
