@@ -77,7 +77,6 @@ int32_t FormRenderImpl::RenderForm(const FormJsInfo &formJsInfo, const Want &wan
         formJsInfo.bundleName.c_str(), formJsInfo.abilityName.c_str(), formJsInfo.formName.c_str(),
         formJsInfo.moduleName.c_str(), formJsInfo.jsFormCodePath.c_str(), formJsInfo.formSrc.c_str(),
         formJsInfo.formId);
-
     if (!CheckIsFoundationCall()) {
         HILOG_ERROR("Caller not foundation");
         return ERR_APPEXECFWK_FORM_PERMISSION_DENY;
@@ -93,7 +92,6 @@ int32_t FormRenderImpl::RenderForm(const FormJsInfo &formJsInfo, const Want &wan
     }
     HILOG_DEBUG("connectId:%{public}d",
         want.GetIntParam(Constants::FORM_CONNECT_ID, 0L));
-
     std::string uid = want.GetStringParam(Constants::FORM_SUPPLY_UID);
     if (uid.empty()) {
         HILOG_ERROR("GetUid failed");
@@ -113,7 +111,6 @@ int32_t FormRenderImpl::RenderForm(const FormJsInfo &formJsInfo, const Want &wan
                 HILOG_ERROR("null record");
                 return RENDER_FORM_FAILED;
             }
-
             record->SetConfiguration(configuration_);
             result = record->UpdateRenderRecord(formJsInfo, formRenderWant, hostToken);
             if (renderRecordMap_.empty()) {
@@ -604,7 +601,7 @@ int32_t FormRenderImpl::UpdateFormSize(
 
 bool FormRenderImpl::CheckIsFoundationCall()
 {
-    return IPCSkeleton::GetCallingUid() = FormConstants::FOUNDATION_UID;
+    return IPCSkeleton::GetCallingUid() == FormConstants::FOUNDATION_UID;
 };
 } // namespace FormRender
 } // namespace AppExecFwk

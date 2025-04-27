@@ -188,7 +188,7 @@ void FormHostClient::OnAcquired(const FormJsInfo &formJsInfo, const sptr<IRemote
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     HILOG_DEBUG("call");
-    if (!CheckIsFoundationCall) {
+    if (!CheckIsFoundationCall()) {
         HILOG_ERROR("Caller not foundation");
     }
     if (token != nullptr) {
@@ -208,7 +208,7 @@ void FormHostClient::OnUpdate(const FormJsInfo &formJsInfo)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     HILOG_DEBUG("call");
-    if (!CheckIsFoundationCall) {
+    if (!CheckIsFoundationCall()) {
         HILOG_ERROR("Caller not foundation");
     }
     UpdateForm(formJsInfo);
@@ -224,7 +224,7 @@ void FormHostClient::OnUninstall(const std::vector<int64_t> &formIds)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     HILOG_INFO("call");
-    if (!CheckIsFoundationCall) {
+    if (!CheckIsFoundationCall()) {
         HILOG_ERROR("Caller not foundation");
     }
     if (formIds.empty()) {
@@ -264,7 +264,7 @@ void FormHostClient::OnAcquireState(FormState state, const AAFwk::Want &want)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     HILOG_INFO("state:%{public}d", state);
-    if (!CheckIsFoundationCall) {
+    if (!CheckIsFoundationCall()) {
         HILOG_ERROR("Caller not foundation");
     }
     std::string bundleName = want.GetElement().GetBundleName();
@@ -321,7 +321,7 @@ bool FormHostClient::AddAcqiureFormDataCallback(const std::shared_ptr<FormDataCa
 void FormHostClient::OnAcquireDataResponse(const AAFwk::WantParams &wantParams, int64_t requestCode)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    if (!CheckIsFoundationCall) {
+    if (!CheckIsFoundationCall()) {
         HILOG_ERROR("Caller not foundation");
     }
     std::lock_guard<std::mutex> lock(AcquireDataCallbackMutex_);
@@ -342,7 +342,7 @@ void FormHostClient::OnShareFormResponse(int64_t requestCode, int32_t result)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     HILOG_DEBUG("result:%{public}d", result);
-    if (!CheckIsFoundationCall) {
+    if (!CheckIsFoundationCall()) {
         HILOG_ERROR("Caller not foundation");
     }
     std::lock_guard<std::mutex> lock(shareFormCallbackMutex_);
@@ -363,7 +363,7 @@ void FormHostClient::OnError(int32_t errorCode, const std::string &errorMsg)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     HILOG_ERROR("Receive error form FMS, errorCode:%{public}d, errorMsg:%{public}s", errorCode, errorMsg.c_str());
-    if (!CheckIsFoundationCall) {
+    if (!CheckIsFoundationCall()) {
         HILOG_ERROR("Caller not foundation");
     }
     std::lock_guard<std::mutex> lock(callbackMutex_);
@@ -393,7 +393,7 @@ void FormHostClient::OnError(int32_t errorCode, const std::string &errorMsg, std
 {
     HILOG_INFO("call");
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
-    if (!CheckIsFoundationCall) {
+    if (!CheckIsFoundationCall()) {
         HILOG_ERROR("Caller not foundation");
     }
     std::lock_guard<std::mutex> lock(callbackMutex_);
@@ -468,7 +468,7 @@ void FormHostClient::OnRecycleForm(const int64_t &formId)
 {
     HITRACE_METER_NAME(HITRACE_TAG_ABILITY_MANAGER, __PRETTY_FUNCTION__);
     HILOG_DEBUG("formId:%{public}s", std::to_string(formId).c_str());
-    if (!CheckIsFoundationCall) {
+    if (!CheckIsFoundationCall()) {
         HILOG_ERROR("Caller not foundation");
     }
     if (formId < 0) {
@@ -489,7 +489,7 @@ void FormHostClient::OnRecycleForm(const int64_t &formId)
 void FormHostClient::OnEnableForm(const std::vector<int64_t> &formIds, const bool enable)
 {
     HILOG_INFO("size:%{public}zu", formIds.size());
-    if (!CheckIsFoundationCall) {
+    if (!CheckIsFoundationCall()) {
         HILOG_ERROR("Caller not foundation");
     }
     for (auto &formId : formIds) {
@@ -516,7 +516,7 @@ void FormHostClient::OnEnableForm(const std::vector<int64_t> &formIds, const boo
 void FormHostClient::OnLockForm(const std::vector<int64_t> &formIds, const bool lock)
 {
     HILOG_INFO("OnLockForm size:%{public}zu", formIds.size());
-    if (!CheckIsFoundationCall) {
+    if (!CheckIsFoundationCall()) {
         HILOG_ERROR("Caller not foundation");
     }
     for (auto &formId : formIds) {
@@ -542,7 +542,7 @@ void FormHostClient::OnLockForm(const std::vector<int64_t> &formIds, const bool 
 
 bool FormHostClient::CheckIsFoundationCall()
 {
-    return IPCSkeleton::GetCallingUid() = FormConstants::FOUNDATION_UID;
+    return IPCSkeleton::GetCallingUid() == FormConstants::FOUNDATION_UID;
 };
 } // namespace AppExecFwk
 } // namespace OHOS
