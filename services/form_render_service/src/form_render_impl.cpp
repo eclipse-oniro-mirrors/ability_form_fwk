@@ -71,8 +71,8 @@ FormRenderImpl::~FormRenderImpl() = default;
 
 int32_t FormRenderImpl::RenderForm(const FormJsInfo &formJsInfo, const Want &want, sptr<IRemoteObject> callerToken)
 {
-    HILOG_INFO("Render form,formId=%{public},bundleName=%{public}s,abilityName=%{public}s,formName=%{public}s,"
-        "moduleName=%{public}s,jsFormCodePath=%{public}s,formSrc=%{public}s," PRId64, formJsInfo.formId,
+    HILOG_INFO("Render form,formId=%{public}" PRId64 ",bundleName=%{public}s,abilityName=%{public}s,formName="
+        "%{public}s, moduleName=%{public}s,jsFormCodePath=%{public}s,formSrc=%{public}s,", formJsInfo.formId,
         formJsInfo.bundleName.c_str(), formJsInfo.abilityName.c_str(), formJsInfo.formName.c_str(),
         formJsInfo.moduleName.c_str(), formJsInfo.jsFormCodePath.c_str(), formJsInfo.formSrc.c_str());
     if (!CheckIsFoundationCall()) {
