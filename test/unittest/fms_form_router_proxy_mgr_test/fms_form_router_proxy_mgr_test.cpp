@@ -251,5 +251,200 @@ HWTEST_F(FormRouterProxyMgrTest, FormRouterProxyMgrTest_010, TestSize.Level2)
     EXPECT_EQ(0, formRouterProxyMgr.formRouterProxyMap_.size());
     GTEST_LOG_(INFO) << "FormRouterProxyMgrTest_010 end";
 }
+
+/**
+ * @tc.number: FormRouterProxyMgrTest_011
+ * @tc.name: FormRouterProxyMgrTest
+ * @tc.desc: Verify that the SetDeathRecipient interface is called normally
+ * and the formRouterProxyMap size is 1.
+ */
+HWTEST_F(FormRouterProxyMgrTest, FormRouterProxyMgrTest_011, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRouterProxyMgrTest_011 start";
+    FormRouterProxyMgr formRouterProxyMgr;
+    int64_t formId = 1;
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    auto dealthRecipient = new (std::nothrow) FormRouterProxyMgr::ClientDeathRecipient();
+    formRouterProxyMgr.SetDeathRecipient(callerToken, dealthRecipient);
+    EXPECT_EQ(1, formRouterProxyMgr.deathRecipients_.size());
+    GTEST_LOG_(INFO) << "FormRouterProxyMgrTest_011 end";
+}
+
+/**
+ * @tc.number: FormRouterProxyMgrTest_012
+ * @tc.name: FormRouterProxyMgrTest
+ * @tc.desc: Verify that the SetFormRouterProxy interface is called normally
+ * and the return value is ERR_OK.
+ */
+HWTEST_F(FormRouterProxyMgrTest, FormRouterProxyMgrTest_012, TestSize.Level2)
+{
+    GTEST_LOG_(INFO) << "FormRouterProxyMgrTest_012 start";
+    FormRouterProxyMgr formRouterProxyMgr;
+    int64_t formId = 1;
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    auto ret = formRouterProxyMgr.SetFormRouterProxy(formIds, callerToken);
+    EXPECT_EQ(ERR_OK, ret);
+    GTEST_LOG_(INFO) << "FormRouterProxyMgrTest_012 end";
+}
+
+/**
+ * @tc.number: FormRouterProxyMgrTest_013
+ * @tc.name: FormRouterProxyMgrTest
+ * @tc.desc: Verify that the SetFormRouterProxy interface is called normally
+ * and the formRouterProxyMap_ size is 1.
+ */
+HWTEST_F(FormRouterProxyMgrTest, FormRouterProxyMgrTest_013, TestSize.Level2)
+{
+    GTEST_LOG_(INFO) << "FormRouterProxyMgrTest_013 start";
+    FormRouterProxyMgr formRouterProxyMgr;
+    int64_t formId = 1;
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    formRouterProxyMgr.SetFormRouterProxy(formIds, callerToken);
+    EXPECT_EQ(1, formRouterProxyMgr.formRouterProxyMap_.size());
+    GTEST_LOG_(INFO) << "FormRouterProxyMgrTest_013 end";
+}
+
+/**
+ * @tc.number: FormRouterProxyMgrTest_014
+ * @tc.name: FormRouterProxyMgrTest
+ * @tc.desc: Verify that the RemoveFormRouterProxy interface is called normally
+ * and the return value size is ERR_OK.
+ */
+HWTEST_F(FormRouterProxyMgrTest, FormRouterProxyMgrTest_014, TestSize.Level2)
+{
+    GTEST_LOG_(INFO) << "FormRouterProxyMgrTest_014 start";
+    FormRouterProxyMgr formRouterProxyMgr;
+    int64_t formId = 1;
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+    auto ret = formRouterProxyMgr.RemoveFormRouterProxy(formIds);
+    EXPECT_EQ(ERR_OK, ret);
+    GTEST_LOG_(INFO) << "FormRouterProxyMgrTest_014 end";
+}
+
+/**
+ * @tc.number: FormRouterProxyMgrTest_015
+ * @tc.name: FormRouterProxyMgrTest
+ * @tc.desc: Verify that the RemoveFormRouterProxy interface is called normally
+ * and the formRouterProxyMap_ size is 0.
+ */
+HWTEST_F(FormRouterProxyMgrTest, FormRouterProxyMgrTest_015, TestSize.Level2)
+{
+    GTEST_LOG_(INFO) << "FormRouterProxyMgrTest_015 start";
+    FormRouterProxyMgr formRouterProxyMgr;
+    int64_t formId = 1;
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+    formRouterProxyMgr.RemoveFormRouterProxy(formIds);
+    EXPECT_EQ(0, formRouterProxyMgr.formRouterProxyMap_.size());
+    GTEST_LOG_(INFO) << "FormRouterProxyMgrTest_015 end";
+}
+
+/**
+ * @tc.number: FormRouterProxyMgrTest_016
+ * @tc.name: FormRouterProxyMgrTest
+ * @tc.desc: Verify that the HasRouterProxy interface is called normally
+ * and the return value is true.
+ */
+HWTEST_F(FormRouterProxyMgrTest, FormRouterProxyMgrTest_016, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRouterProxyMgrTest_016 start";
+    FormRouterProxyMgr formRouterProxyMgr;
+    int64_t formId = 1;
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    formRouterProxyMgr.SetFormRouterProxy(formIds, callerToken);
+    auto ret = formRouterProxyMgr.HasRouterProxy(formId);
+    EXPECT_EQ(true, ret);
+    GTEST_LOG_(INFO) << "FormRouterProxyMgrTest_016 end";
+}
+
+/**
+ * @tc.number: FormRouterProxyMgrTest_017
+ * @tc.name: FormRouterProxyMgrTest
+ * @tc.desc: Verify that the HasRouterProxy interface is called normally
+ * and the return value is false.
+ */
+HWTEST_F(FormRouterProxyMgrTest, FormRouterProxyMgrTest_017, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormRouterProxyMgrTest_017 start";
+    FormRouterProxyMgr formRouterProxyMgr;
+    int64_t formIdNoRegister = 0;
+    auto ret = formRouterProxyMgr.HasRouterProxy(formIdNoRegister);
+    EXPECT_EQ(false, ret);
+    GTEST_LOG_(INFO) << "FormRouterProxyMgrTest_017 end";
+}
+
+/**
+ * @tc.number: FormRouterProxyMgrTest_018
+ * @tc.name: FormRouterProxyMgrTest
+ * @tc.desc: Verify that the OnFormRouterEvent interface is called normally
+ * and the formRouterProxyMap_[formId] value is 0.
+ */
+HWTEST_F(FormRouterProxyMgrTest, FormRouterProxyMgrTest_018, TestSize.Level2)
+{
+    GTEST_LOG_(INFO) << "FormRouterProxyMgrTest_018 start";
+    FormRouterProxyMgr formRouterProxyMgr;
+    int64_t formIdNoRegister = 0;
+    Want want;
+    formRouterProxyMgr.OnFormRouterEvent(formIdNoRegister, want);
+    int64_t formId = 1;
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+    sptr<IRemoteObject> callerToken = nullptr;
+    formRouterProxyMgr.formRouterProxyMap_.emplace(formId, nullptr);
+    formRouterProxyMgr.OnFormRouterEvent(formId, want);
+    EXPECT_EQ(NULL, formRouterProxyMgr.formRouterProxyMap_[formId]);
+    GTEST_LOG_(INFO) << "FormRouterProxyMgrTest_018 end";
+}
+
+/**
+ * @tc.number: FormRouterProxyMgrTest_019
+ * @tc.name: FormRouterProxyMgrTest
+ * @tc.desc: Verify that the OnFormRouterEvent interface is called normally
+ * and the formRouterProxyMap_[formId] value is setted callerToken.
+ */
+HWTEST_F(FormRouterProxyMgrTest, FormRouterProxyMgrTest_019, TestSize.Level2)
+{
+    GTEST_LOG_(INFO) << "FormRouterProxyMgrTest_019 start";
+    FormRouterProxyMgr formRouterProxyMgr;
+    Want want;
+    int64_t formId = 1;
+    std::vector<int64_t> formIds;
+    formIds.emplace_back(formId);
+    sptr<IRemoteObject> callerToken = new (std::nothrow) MockFormProviderClient();
+    formRouterProxyMgr.SetFormRouterProxy(formIds, callerToken);
+    formRouterProxyMgr.OnFormRouterEvent(formId, want);
+    EXPECT_EQ(callerToken, formRouterProxyMgr.formRouterProxyMap_[formId]);
+    GTEST_LOG_(INFO) << "FormRouterProxyMgrTest_019 end";
+}
+
+/**
+ * @tc.number: FormRouterProxyMgrTest_020
+ * @tc.name: FormRouterProxyMgrTest
+ * @tc.desc: Verify that the CleanResource interface is called normally
+ * and the formRouterProxyMap_ size is 0.
+ */
+HWTEST_F(FormRouterProxyMgrTest, FormRouterProxyMgrTest_020, TestSize.Level2)
+{
+    GTEST_LOG_(INFO) << "FormRouterProxyMgrTest_020 start";
+    FormRouterProxyMgr formRouterProxyMgr;
+    formRouterProxyMgr.CleanResource(nullptr);
+
+    int64_t formId = 1;
+    wptr<IRemoteObject> object = new (std::nothrow) MockFormProviderClient();
+    auto callerToken = object.promote();
+    formRouterProxyMgr.formRouterProxyMap_.emplace(formId, callerToken);
+    formRouterProxyMgr.CleanResource(object);
+    EXPECT_EQ(0, formRouterProxyMgr.formRouterProxyMap_.size());
+    GTEST_LOG_(INFO) << "FormRouterProxyMgrTest_020 end";
+}
 }  // namespace AppExecFwk
 }  // namespace OHOS
