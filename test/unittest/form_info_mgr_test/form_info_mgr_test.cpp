@@ -1392,19 +1392,19 @@ HWTEST_F(FormInfoMgrTest, FormInfoMgrTest0022, TestSize.Level1)
  * @tc.name: FormInfoMgrTest0023
  * @tc.number: GetAppFormVisibleNotifyByBundleName
  */
- HWTEST_F(FormInfoMgrTest, FormInfoMgrTest0023, TestSize.Level1)
- {
-     GTEST_LOG_(INFO) << "FormInfoMgrTest0023 start";
-     std::string bundleName = "com.form.provider.service";
-     int32_t prviderUserId = Constants::DEFAULT_PROVIDER_USER_ID;
-     bool appFormVisibleNotify = false;
-     auto ret = formInfoMgr_.GetAppFormVisibleNotifyByBundleName(bundleName, prviderUserId, appFormVisibleNotify);
-     if (ret == ERR_OK) {
-         EXPECT_EQ(ret, ERR_OK);
-     } else if (ret == ERR_APPEXECFWK_FORM_GET_INFO_FAILED) {
-         EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
-     } else {
-         EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_GET_BMS_FAILED);
-     }
-     GTEST_LOG_(INFO) << "FormInfoMgrTest0023 end";
- }
+HWTEST_F(FormInfoMgrTest, FormInfoMgrTest0023, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "FormInfoMgrTest0023 start";
+    std::string bundleName = "com.form.provider.service";
+    int32_t prviderUserId = Constants::DEFAULT_PROVIDER_USER_ID;
+    bool appFormVisibleNotify = false;
+    auto ret = formInfoMgr_.GetAppFormVisibleNotifyByBundleName(bundleName, prviderUserId, appFormVisibleNotify);
+    if (ret == ERR_OK) {
+        EXPECT_EQ(ret, ERR_OK);
+    } else if (ret == ERR_APPEXECFWK_FORM_GET_INFO_FAILED) {
+        EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_GET_INFO_FAILED);
+    } else {
+        EXPECT_EQ(ret, ERR_APPEXECFWK_FORM_GET_BMS_FAILED);
+    }
+    GTEST_LOG_(INFO) << "FormInfoMgrTest0023 end";
+}
