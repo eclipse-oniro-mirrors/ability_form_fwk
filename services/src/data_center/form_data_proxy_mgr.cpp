@@ -33,10 +33,10 @@ FormDataProxyMgr::~FormDataProxyMgr()
 ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<FormDataProxy> &formDataProxies,
     const AAFwk::Want &want)
 {
-    HILOG_DEBUG("subscribe form data. formId:%{public}s, proxy data size:%{public}zu",
+    HILOG_INFO("subscribe form data. formId:%{public}s, proxy data size:%{public}zu",
         std::to_string(formId).c_str(), formDataProxies.size());
     if (formDataProxies.empty()) {
-        HILOG_DEBUG("empty formDataProxies");
+        HILOG_INFO("empty formDataProxies");
         return ERR_OK;
     }
 
@@ -47,7 +47,7 @@ ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<Fo
     }
 
     if (!formRecord.isDataProxy) {
-        HILOG_DEBUG("not data proxy form, formId:%{public}" PRId64 ".", formId);
+        HILOG_WARN("not data proxy form, formId:%{public}" PRId64 ".", formId);
         return ERR_OK;
     }
 
@@ -56,7 +56,7 @@ ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<Fo
         auto search = formDataProxyRecordMap_.find(formId);
         if (search != formDataProxyRecordMap_.end()) {
             if (search->second != nullptr) {
-                HILOG_DEBUG("the form has already subscribed, formId:%{public}s", std::to_string(formId).c_str());
+                HILOG_INFO("the form has already subscribed, formId:%{public}s", std::to_string(formId).c_str());
                 search->second->UnsubscribeFormData();
             }
         }
@@ -83,7 +83,7 @@ ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<Fo
 
 ErrCode FormDataProxyMgr::UnsubscribeFormData(int64_t formId)
 {
-    HILOG_DEBUG("unsubscribe form data. formId:%{public}s", std::to_string(formId).c_str());
+    HILOG_INFO("unsubscribe form data. formId:%{public}s", std::to_string(formId).c_str());
     std::shared_ptr<FormDataProxyRecord> record = nullptr;
     {
         std::lock_guard<std::mutex> lock(formDataProxyRecordMutex_);
@@ -102,7 +102,7 @@ ErrCode FormDataProxyMgr::UnsubscribeFormData(int64_t formId)
 
 void FormDataProxyMgr::UpdateSubscribeFormData(int64_t formId, const std::vector<FormDataProxy> &formDataProxies)
 {
-    HILOG_DEBUG("update subscribe form data. formId:%{public}s", std::to_string(formId).c_str());
+    HILOG_INFO("update subscribe form data. formId:%{public}s", std::to_string(formId).c_str());
     std::lock_guard<std::mutex> lock(formDataProxyRecordMutex_);
     auto search = formDataProxyRecordMap_.find(formId);
     if (search != formDataProxyRecordMap_.end()) {
@@ -152,7 +152,6 @@ void FormDataProxyMgr::DisableSubscribeFormData(const std::vector<int64_t> &form
         if (search != formDataProxyRecordMap_.end()) {
             if (search->second != nullptr) {
                 search->second->DisableSubscribeFormData();
-                HILOG_INFO("formId:%{public}s", std::to_string(formId).c_str());
             }
         }
     }

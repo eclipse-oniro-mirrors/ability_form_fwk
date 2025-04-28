@@ -61,7 +61,7 @@ class PermissionCustomizeListener : public Security::AccessToken::PermStateChang
 
 void FormDataProxyRecord::PermStateChangeCallback(const int32_t permStateChangeType, const std::string permissionName)
 {
-    HILOG_DEBUG("Permission has been changed, form id:%{public}" PRId64 ", permission name:%{public}s", formId_,
+    HILOG_INFO("Permission has been changed, form id:%{public}" PRId64 ", permission name:%{public}s", formId_,
         permissionName.c_str());
     auto search = formDataPermissionProxyMap_.find(permissionName);
     if (search == formDataPermissionProxyMap_.end()) {
@@ -111,6 +111,7 @@ void FormDataProxyRecord::GetSubscribeFormDataProxies(const FormDataProxy formDa
     std::string token = std::to_string(tokenId_);
     std::string uri = formDataProxy.key + "?" + "user=" + userId + "&srcToken=" + token +
         "&dstBundleName=" + bundleName_;
+    HILOG_INFO("get sub data, uri:%{public}s, formId_:%{public}" PRId64, uri.c_str(), formId_);
     auto rdbSubscribeResult = rdbSubscribeResultMap_.find(uri);
     if (rdbSubscribeResult != rdbSubscribeResultMap_.end()) {
         int64_t subscriberId = formId_;
@@ -279,7 +280,7 @@ ErrCode FormDataProxyRecord::SubscribeRdbFormData(const SubscribeMap &rdbSubscri
                 failNum++;
             }
         }
-        HILOG_DEBUG("subscribe rdb data. subscribeId:%{public}s, failNum:%{public}d, totalNum:%{public}zu",
+        HILOG_INFO("subscribe rdb data. subscribeId:%{public}s, failNum:%{public}d, totalNum:%{public}zu",
             std::to_string(search.subscribeId).c_str(), failNum, search.uris.size());
     }
 
@@ -323,7 +324,7 @@ ErrCode FormDataProxyRecord::SubscribePublishFormData(const SubscribeMap &publis
                 failNum++;
             }
         }
-        HILOG_DEBUG("subscribe published data. subscribeId:%{public}s, failNum:%{public}d, totalNum:%{public}zu",
+        HILOG_INFO("subscribe published data. subscribeId:%{public}s, failNum:%{public}d, totalNum:%{public}zu",
             std::to_string(search.subscribeId).c_str(), failNum, search.uris.size());
     }
 
@@ -352,6 +353,9 @@ ErrCode FormDataProxyRecord::UnsubscribeFormData(SubscribeMap &rdbSubscribeMap, 
         for (const auto &uri : search.uris) {
             RemoveSubscribeResultRecord(uri, search.subscribeId, true);
         }
+        HILOG_INFO("Unsubscribe rdb. subscribeId:%{public}s, totalNum:%{public}zu, bundleName_:%{public}s, "
+            "formId_:%{public}" PRId64, std::to_string(search.subscribeId).c_str(), search.uris.size(),
+            bundleName_.c_str(), formId_);
     }
     rdbSubscribeMap.clear();
 
@@ -362,6 +366,8 @@ ErrCode FormDataProxyRecord::UnsubscribeFormData(SubscribeMap &rdbSubscribeMap, 
         for (const auto &uri : search.uris) {
             RemoveSubscribeResultRecord(uri, search.subscribeId, false);
         }
+        HILOG_INFO("Unsubscribe publish. subscribeId:%{public}s, totalNum:%{public}zu, "
+            "formId_:%{public}" PRId64, std::to_string(search.subscribeId).c_str(), search.uris.size(), formId_);
     }
     publishSubscribeMap.clear();
     return ERR_OK;
@@ -373,10 +379,6 @@ void FormDataProxyRecord::ParseFormDataProxies(const std::vector<FormDataProxy> 
     std::vector<ProxyData> proxyData;
     FormBmsHelper::GetInstance().GetAllProxyDataInfos(FormUtil::GetCurrentAccountId(), proxyData);
     HILOG_INFO("size:%{public}zu", proxyData.size());
-    for (size_t i = 0; i < proxyData.size(); ++i) {
-        HILOG_INFO("proxyData[%{public}zu].uri:%{public}s", i, proxyData[i].uri.c_str());
-    }
-
     std::unordered_set<std::string> expectedKeys;
     for (auto &data : proxyData) {
         expectedKeys.emplace(data.uri);
@@ -406,8 +408,8 @@ void FormDataProxyRecord::ParseFormDataProxiesIntoSubscribeMapWithExpectedKeys(
         } else {
             it->second.emplace(subscribe);
         }
-        HILOG_INFO("parse subscribe, key:%{public}s, subscribeId:%{public}s",
-            formDataProxy.key.c_str(), subscribe.c_str());
+        HILOG_INFO("parse subscribe, uri:%{public}s, subscribeId:%{public}s, rdb:%{public}d formId_:%{public}" PRId64,
+            formDataProxy.key.c_str(), subscribe.c_str(), keyCheckingNeeded, formId_);
     }
 }
 
@@ -429,6 +431,7 @@ void FormDataProxyRecord::ConvertSubscribeMapToRequests(
             }
 
             std::string uri = key + "?" + "user=" + userId + "&srcToken=" + token + "&dstBundleName=" + bundleName_;
+            HILOG_INFO("Convert data, uri:%{public}s, subscriberId:%{public}" PRId64, uri.c_str(), subscriberId);
             auto it = subscribeId2UrisMap.find(subscriberId);
             if (it == subscribeId2UrisMap.end()) {
                 std::vector<std::string> uris;
@@ -471,10 +474,9 @@ void FormDataProxyRecord::UpdatePublishedDataForm(const std::vector<DataShare::P
         }
     }
     std::string formDataStr = object.empty() ? "" : object.dump();
-    std::string subStr = formDataStr.substr(0, std::min((int)formDataStr.length(), 30));
-    HILOG_INFO("[formId:%{public}s] update published data. formDataStr[len:%{public}zu]: %{private}s, "
-        "formDataKeysStr:%{public}s, imageDataMap size:%{public}zu", std::to_string(formId_).c_str(),
-        formDataStr.length(), subStr.c_str(), formDataKeysStr.c_str(), imageDataMap.size());
+    HILOG_INFO("[formId:%{public}s] update published data. formDataStr[len:%{public}zu], formDataKeysStr:%{public}s, "
+        "imageDataMap size:%{public}zu", std::to_string(formId_).c_str(), formDataStr.length(),
+        formDataKeysStr.c_str(), imageDataMap.size());
 
     FormProviderData formProviderData;
     formProviderData.SetDataString(formDataStr);
@@ -507,9 +509,8 @@ void FormDataProxyRecord::UpdateRdbDataForm(const std::vector<std::string> &data
     }
 
     std::string formDataStr = object.empty() ? "" : object.dump();
-    std::string subStr = formDataStr.substr(0, std::min((int)formDataStr.size(), 30));
-    HILOG_INFO("[formId:%{public}s] update rdb data. formDataStr[len:%{public}zu]: %{private}s.",
-        std::to_string(formId_).c_str(), formDataStr.length(), subStr.c_str());
+    HILOG_INFO("[formId:%{public}s] update rdb data. formDataStr[len:%{public}zu].",
+        std::to_string(formId_).c_str(), formDataStr.length());
 
     FormProviderData formProviderData;
     formProviderData.SetDataString(formDataStr);
@@ -566,7 +567,7 @@ void FormDataProxyRecord::EnableSubscribeFormData()
 
 void FormDataProxyRecord::DisableSubscribeFormData()
 {
-    HILOG_DEBUG("disable subscribe form, formId:%{public}s", std::to_string(formId_).c_str());
+    HILOG_INFO("disable subscribe form, formId:%{public}s", std::to_string(formId_).c_str());
     SetRdbSubsState(rdbSubscribeMap_, false);
     SetPublishSubsState(publishSubscribeMap_, false);
 }
