@@ -2069,7 +2069,7 @@ bool FormMgrService::CheckIsHostCall()
 
 bool FormMgrService::CheckIsSystemAppCall()
 {
-    auto callerTokenID = IPCSkeleton::GetCallingTokenID();
+    auto callerTokenID = IPCSkeleton::GetCallingFullTokenID();
     return Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(callerTokenID);
 }
 }  // namespace AppExecFwk
