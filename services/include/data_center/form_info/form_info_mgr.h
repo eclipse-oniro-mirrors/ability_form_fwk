@@ -77,8 +77,6 @@ public:
 
     ErrCode GetFormsInfoByFilter(
         const FormInfoFilter &filter, std::vector<FormInfo> &formInfos, int32_t userId = Constants::INVALID_USER_ID);
-    
-    bool GetAppFormVisibleNotify();
 
 private:
     ErrCode UpdateFormInfoStorageLocked();
