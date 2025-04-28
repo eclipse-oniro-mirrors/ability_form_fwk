@@ -34,6 +34,7 @@ ohos_unittest("FmsFormSystemloadListenerTest") {
 
   if (res_schedule_service && !form_fwk_watch_api_disable) {
     external_deps += [
+      "hilog:libhilog_base",
       "resource_schedule_service:ressched_client",
       "samgr:samgr_proxy",
     ]
