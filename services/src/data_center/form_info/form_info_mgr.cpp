@@ -948,8 +948,8 @@ ErrCode FormInfoMgr::GetAppFormVisibleNotifyByBundleName(const std::string &bund
     int32_t providerUserId, bool &appFormVisibleNotify)
 {
     std::lock_guard<std::mutex> lock(appFormVisibleNotifyMapMutex_);
-    auto it = appFormVisibleNotifyMap_.find(bundleName);
-    if (it == appFormVisibleNotifyMap_.end()) {
+    auto iter = appFormVisibleNotifyMap_.find(bundleName);
+    if (iter == appFormVisibleNotifyMap_.end()) {
         sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
         if (iBundleMgr == nullptr) {
             HILOG_ERROR("get IBundleMgr failed");
@@ -965,7 +965,7 @@ ErrCode FormInfoMgr::GetAppFormVisibleNotifyByBundleName(const std::string &bund
         appFormVisibleNotify = info.formVisibleNotify;
         HILOG_INFO("bundleName=%{public}s, appFormVisibleNotify=%{public}d", bundleName.c_str(), appFormVisibleNotify);
     } else {
-        appFormVisibleNotify = it->second;
+        appFormVisibleNotify = iter->second;
     }
     return ERR_OK;
 }
