@@ -72,8 +72,6 @@ ErrCode FormInfoHelper::LoadFormConfigInfoByBundleName(const std::string &bundle
     } else {
         LoadAbilityFormConfigInfo(bundleInfo, formInfos);
     }
-    // Update ApplicationInfo visibleNotify
-    FormInfoMgr::LoadAppFormVisibleNotify(bundleInfo, formInfos, userId);
     return ERR_OK;
 }
 
