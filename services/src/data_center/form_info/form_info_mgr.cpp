@@ -72,8 +72,6 @@ ErrCode FormInfoHelper::LoadFormConfigInfoByBundleName(const std::string &bundle
     } else {
         LoadAbilityFormConfigInfo(bundleInfo, formInfos);
     }
-    // Update ApplicationInfo visibleNotify
-    FormInfoMgr::LoadAppFormVisibleNotify(bundleInfo, formInfos, userId);
     return ERR_OK;
 }
 
@@ -478,19 +476,6 @@ void BundleFormInfo::GetAllUsedFormName(const std::vector<FormDBInfo> &formDBInf
         }
     }
     HILOG_INFO("used form num: %{public}u", formDBNames.size());
-}
-
-bool BundleFormInfo::GetAppFormVisibleNotify()
-{
-    HILOG_DEBUG("begin");
-    std::shared_lock<std::shared_timed_mutex> guard(formInfosMutex_);
-    if (!formInfoStorages_.empty()) {
-        auto& firstStorage = formInfoStorages_.front();
-        if (!firstStorage.formInfos.empty()) {
-            return firstStorage.formInfos.front().appFormVisibleNotify;
-        }
-    }
-    return false;
 }
 
 FormInfoMgr::FormInfoMgr()
@@ -959,38 +944,30 @@ void FormInfoMgr::UpdateBundleFormInfos(std::map<std::string, std::uint32_t> &bu
     }
 }
 
-ErrCode FormInfoMgr::LoadAppFormVisibleNotify(
-    const BundleInfo &bundleInfo, std::vector<FormInfo> &formInfos, int32_t userId)
+ErrCode FormInfoMgr::GetAppFormVisibleNotifyByBundleName(const std::string &bundleName,
+    int32_t providerUserId, bool &appFormVisibleNotify)
 {
-    sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
-    if (iBundleMgr == nullptr) {
-        HILOG_ERROR("get IBundleMgr failed");
-        return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
-    }
-    const std::string &bundleName = bundleInfo.name;
-    AppExecFwk::ApplicationInfo info;
-    if (!IN_PROCESS_CALL(iBundleMgr->GetApplicationInfo(bundleName,
-        AppExecFwk::ApplicationFlag::GET_BASIC_APPLICATION_INFO, userId, info))) {
-        HILOG_ERROR("get ApplicationInfo failed");
-        return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
-    }
-    for (auto &formInfo: formInfos) {
-        formInfo.appFormVisibleNotify = info.formVisibleNotify;
+    std::lock_guard<std::mutex> lock(appFormVisibleNotifyMapMutex_);
+    auto iter = appFormVisibleNotifyMap_.find(bundleName);
+    if (iter == appFormVisibleNotifyMap_.end()) {
+        sptr<IBundleMgr> iBundleMgr = FormBmsHelper::GetInstance().GetBundleMgr();
+        if (iBundleMgr == nullptr) {
+            HILOG_ERROR("get IBundleMgr failed");
+            return ERR_APPEXECFWK_FORM_GET_BMS_FAILED;
+        }
+        AppExecFwk::ApplicationInfo info;
+        if (!IN_PROCESS_CALL(iBundleMgr->GetApplicationInfo(bundleName,
+            AppExecFwk::ApplicationFlag::GET_BASIC_APPLICATION_INFO, providerUserId, info))) {
+            HILOG_ERROR("get ApplicationInfo failed");
+            return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
+        }
+        appFormVisibleNotifyMap_.emplace(bundleName, info.formVisibleNotify);
+        appFormVisibleNotify = info.formVisibleNotify;
+        HILOG_INFO("bundleName=%{public}s, appFormVisibleNotify=%{public}d", bundleName.c_str(), appFormVisibleNotify);
+    } else {
+        appFormVisibleNotify = iter->second;
     }
     return ERR_OK;
-}
- 
-bool FormInfoMgr::GetAppFormVisibleNotify(const std::string &bundleName)
-{
-    bool appFormVisibleNotify = false;
-    auto search = bundleFormInfoMap_.find(bundleName);
-    if (search != bundleFormInfoMap_.end()) {
-        std::shared_ptr<BundleFormInfo> bundleFormInfoPtr = search->second;
-        appFormVisibleNotify = bundleFormInfoPtr->GetAppFormVisibleNotify();
-        HILOG_INFO("bundleName=%{public}s, appFormVisibleNotify=%{public}d",
-                   bundleName.c_str(), appFormVisibleNotify);
-    }
-    return appFormVisibleNotify;
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS
