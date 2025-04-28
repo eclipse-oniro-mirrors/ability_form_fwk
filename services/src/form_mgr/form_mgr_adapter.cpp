@@ -958,7 +958,7 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
             formRecord.bundleName, formRecord.providerUserId, appFormVisibleNotify);
         if (ret != ERR_OK) {
             HILOG_ERROR("get app formVisibleNotify failed");
-            return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
+            return ret;
         }
         if (!appFormVisibleNotify) {
             HILOG_DEBUG("the value of formVisibleNotify is false");
