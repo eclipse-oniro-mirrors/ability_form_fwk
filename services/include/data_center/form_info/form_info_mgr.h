@@ -133,10 +133,8 @@ public:
 
     bool HasReloadedFormInfos();
 
-    static ErrCode LoadAppFormVisibleNotify(
-        const BundleInfo &bundleInfo, std::vector<FormInfo> &formInfos, int32_t userId);
- 
-    bool GetAppFormVisibleNotify(const std::string &bundleName);
+    ErrCode GetAppFormVisibleNotifyByBundleName(const std::string &bundleName,
+        int32_t providerUserId, bool &appFormVisibleNofify);
 
 private:
     std::shared_ptr<BundleFormInfo> GetOrCreateBundleFromInfo(const std::string &bundleName);
@@ -149,6 +147,8 @@ private:
     mutable std::shared_timed_mutex bundleFormInfoMapMutex_ {};
     std::unordered_map<std::string, std::shared_ptr<BundleFormInfo>> bundleFormInfoMap_ {};
     bool hasReloadedFormInfosState_ = false;
+    std::map<std::string, bool> appFormVisibleNotifyMap_;
+    std::mutex appFormVisibleNotifyMapMutex_;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

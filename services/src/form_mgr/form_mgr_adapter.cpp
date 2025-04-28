@@ -952,12 +952,18 @@ ErrCode FormMgrAdapter::NotifyWhetherVisibleForms(const std::vector<int64_t> &fo
             continue;
         }
         
-        // Check the value of appFormVisibleNotiry.
-        if (!FormInfoMgr::GetInstance().GetAppFormVisibleNotify(formRecord.bundleName)) {
-            HILOG_DEBUG("the value of appFormVisibleNotiry is false");
+        // Check the value of formVisibleNotify.
+        bool appFormVisibleNotify = false;
+        auto ret = FormInfoMgr::GetInstance().GetAppFormVisibleNotifyByBundleName(
+            formRecord.bundleName, formRecord.providerUserId, appFormVisibleNotify);
+        if (ret != ERR_OK) {
+            HILOG_ERROR("get app formVisibleNotify failed");
+            return ERR_APPEXECFWK_FORM_GET_INFO_FAILED;
+        }
+        if (!appFormVisibleNotify) {
+            HILOG_DEBUG("the value of formVisibleNotify is false");
             continue;
         }
- 
         // Create eventMaps
         if (!CreateHandleEventMap(matchedFormId, formRecord, eventMaps)) {
             continue;
