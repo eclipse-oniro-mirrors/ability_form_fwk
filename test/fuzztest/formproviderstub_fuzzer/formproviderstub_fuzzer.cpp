@@ -59,6 +59,11 @@ public:
     {
         return 0;
     }
+    int NotifyConfigurationUpdate(const AppExecFwk::Configuration &configuration,
+        const Want &want, const sptr<IRemoteObject> &callerToken) override
+    {
+        return 0;
+    }
     int FireFormEvent(const int64_t formId, const std::string &message, const Want &want,
         const sptr<IRemoteObject> &callerToken) override
     {

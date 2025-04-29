@@ -124,6 +124,22 @@ int MockFormProviderClient::NotifyFormCastTempForm(const int64_t formId, const W
     HILOG_DEBUG("Notify cast temp form");
     return ERR_OK;
 }
+
+/**
+ * @brief Notify provider when the system configuration changed.
+ *
+ * @param configuration system Configuration.
+ * @param want Indicates the structure containing form info.
+ * @param callerToken Caller ability token.
+ * @return Returns ERR_OK on success, others on failure.
+ */
+int MockFormProviderClient::NotifyConfigurationUpdate(const AppExecFwk::Configuration &configuration,
+    const Want &want, const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_DEBUG("Notify Configuration Update");
+    return ERR_OK;
+}
+
 /**
  * @brief Fire message event to form provider.
  * @param formId The Id of the from.

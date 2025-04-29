@@ -250,6 +250,36 @@ int FormProviderClient::NotifyFormCastTempForm(
     return DCRtnHelper(errorCode, want, callerToken);
 }
 
+int FormProviderClient::NotifyConfigurationUpdate(
+    const AppExecFwk::Configuration &configuration,
+    const Want &want,
+    const sptr<IRemoteObject> &callerToken)
+{
+    HILOG_INFO("NotifyConfigurationUpdate start");
+
+    // The error code for business operation.
+    int errorCode = ERR_OK;
+    do {
+        std::shared_ptr<Ability> ownerAbility = GetOwner();
+        if (ownerAbility == nullptr) {
+            HILOG_ERROR("null Owner");
+            errorCode = ERR_APPEXECFWK_FORM_NO_SUCH_ABILITY;
+            break;
+        }
+
+        if (!CheckIsSystemApp()) {
+            HILOG_WARN("Permission denied");
+            errorCode = ERR_APPEXECFWK_FORM_PERMISSION_DENY;
+            break;
+        }
+
+        HILOG_INFO("AbilityName:%{public}s", ownerAbility->GetAbilityName().c_str());
+        ownerAbility->OnConfigurationUpdated(configuration);
+    } while (false);
+
+    return DCRtnHelper(errorCode, want, callerToken);
+}
+
 int FormProviderClient::FireFormEvent(
     const int64_t formId,
     const std::string &message,
