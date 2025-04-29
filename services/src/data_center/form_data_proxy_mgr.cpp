@@ -33,8 +33,8 @@ FormDataProxyMgr::~FormDataProxyMgr()
 ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<FormDataProxy> &formDataProxies,
     const AAFwk::Want &want)
 {
-    HILOG_INFO("subscribe form data. formId:%{public}s, proxy data size:%{public}zu",
-        std::to_string(formId).c_str(), formDataProxies.size());
+    HILOG_INFO("subscribe form data. formId:%{public} " PRId64 ", proxy data size:%{public}zu",
+        formId, formDataProxies.size());
     if (formDataProxies.empty()) {
         HILOG_INFO("empty formDataProxies");
         return ERR_OK;
@@ -56,7 +56,7 @@ ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<Fo
         auto search = formDataProxyRecordMap_.find(formId);
         if (search != formDataProxyRecordMap_.end()) {
             if (search->second != nullptr) {
-                HILOG_INFO("the form has already subscribed, formId:%{public}s", std::to_string(formId).c_str());
+                HILOG_INFO("the form has already subscribed, formId:%{public}" PRId64, formId);
                 search->second->UnsubscribeFormData();
             }
         }
@@ -83,7 +83,7 @@ ErrCode FormDataProxyMgr::SubscribeFormData(int64_t formId, const std::vector<Fo
 
 ErrCode FormDataProxyMgr::UnsubscribeFormData(int64_t formId)
 {
-    HILOG_INFO("unsubscribe form data. formId:%{public}s", std::to_string(formId).c_str());
+    HILOG_INFO("unsubscribe form data. formId:%{public}" PRId64, formId);
     std::shared_ptr<FormDataProxyRecord> record = nullptr;
     {
         std::lock_guard<std::mutex> lock(formDataProxyRecordMutex_);
@@ -102,7 +102,7 @@ ErrCode FormDataProxyMgr::UnsubscribeFormData(int64_t formId)
 
 void FormDataProxyMgr::UpdateSubscribeFormData(int64_t formId, const std::vector<FormDataProxy> &formDataProxies)
 {
-    HILOG_INFO("update subscribe form data. formId:%{public}s", std::to_string(formId).c_str());
+    HILOG_INFO("update subscribe form data. formId:%{public}" PRId64, formId);
     std::lock_guard<std::mutex> lock(formDataProxyRecordMutex_);
     auto search = formDataProxyRecordMap_.find(formId);
     if (search != formDataProxyRecordMap_.end()) {
@@ -123,7 +123,7 @@ bool FormDataProxyMgr::ConsumeFormDataProxies(int64_t formId, std::vector<FormDa
     std::lock_guard<std::mutex> lock(formDataProxiesMutex_);
     auto search = formDataProxiesMap_.find(formId);
     if (search == formDataProxiesMap_.end()) {
-        HILOG_DEBUG("no form data proxies, formId:%{public}s", std::to_string(formId).c_str());
+        HILOG_DEBUG("no form data proxies, formId:%{public}" PRId64, formId);
         return false;
     }
     formDataProxies = search->second;
