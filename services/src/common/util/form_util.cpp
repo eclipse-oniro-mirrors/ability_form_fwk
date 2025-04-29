@@ -1689,8 +1689,7 @@ bool FormUtil::ConvertStringToInt64(const std::string &strInfo, int64_t &int64Va
             int64_t subValue = static_cast<int64_t>(ConvertStringToLongLong(strInfo.substr(ZERO_VALUE + 1,
                 INT_64_LENGTH - 1)));
             if (strLength == INT_64_LENGTH && subValue <= (INT64_MAX - HEAD_BIT_NUM)) {
-                int64_t subValue = static_cast<int64_t>(ConvertStringToLongLong(strInfo.substr(ZERO_VALUE + 1,
-                    INT_64_LENGTH - 1)));
+                int64Value = static_cast<int64_t>(ConvertStringToLongLong(strInfo));
                 return true;
             }
             return false;
