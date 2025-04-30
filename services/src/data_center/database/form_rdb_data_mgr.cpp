@@ -180,7 +180,6 @@ ErrCode FormRdbDataMgr::InsertData(const std::string &tableName, const std::stri
     valuesBucket.PutString(FORM_KEY, key);
     int32_t ret = NativeRdb::E_OK;
     {
-        std::shared_lock<std::shared_mutex> guard(rdbStoreMutex_);
         int64_t rowId = -1;
         ret = rdbStore_->InsertWithConflictResolution(rowId, tableName, valuesBucket,
             NativeRdb::ConflictResolution::ON_CONFLICT_REPLACE);
@@ -194,7 +193,6 @@ ErrCode FormRdbDataMgr::InsertData(const std::string &tableName, const std::stri
     } else {
         if (CheckAndRebuildRdbStore(ret) == ERR_OK) {
             HILOG_WARN("Check rdb corrupt,rebuild form rdb successfully");
-            std::shared_lock<std::shared_mutex> guard(rdbStoreMutex_);
             int64_t rowId = -1;
             ret = rdbStore_->InsertWithConflictResolution(rowId, tableName, valuesBucket,
                 NativeRdb::ConflictResolution::ON_CONFLICT_REPLACE);
@@ -226,7 +224,6 @@ ErrCode FormRdbDataMgr::InsertData(const std::string &tableName, const std::stri
     valuesBucket.PutString(FORM_VALUE, value);
     int32_t ret = NativeRdb::E_OK;
     {
-        std::shared_lock<std::shared_mutex> guard(rdbStoreMutex_);
         int64_t rowId = -1;
         ret = rdbStore_->InsertWithConflictResolution(rowId, tableName, valuesBucket,
             NativeRdb::ConflictResolution::ON_CONFLICT_REPLACE);
@@ -240,7 +237,6 @@ ErrCode FormRdbDataMgr::InsertData(const std::string &tableName, const std::stri
     } else {
         if (CheckAndRebuildRdbStore(ret) == ERR_OK) {
             HILOG_WARN("Check rdb corrupt,rebuild form rdb successfully");
-            std::shared_lock<std::shared_mutex> guard(rdbStoreMutex_);
             int64_t rowId = -1;
             ret = rdbStore_->InsertWithConflictResolution(rowId, tableName, valuesBucket,
                 NativeRdb::ConflictResolution::ON_CONFLICT_REPLACE);
@@ -272,7 +268,6 @@ ErrCode FormRdbDataMgr::DeleteData(const std::string &tableName, const std::stri
     absRdbPredicates.EqualTo(FORM_KEY, key);
     int32_t ret = NativeRdb::E_OK;
     {
-        std::shared_lock<std::shared_mutex> guard(rdbStoreMutex_);
         int32_t rowId = -1;
         ret = rdbStore_->Delete(rowId, absRdbPredicates);
     }
@@ -285,7 +280,6 @@ ErrCode FormRdbDataMgr::DeleteData(const std::string &tableName, const std::stri
     } else {
         if (CheckAndRebuildRdbStore(ret) == ERR_OK) {
             HILOG_WARN("Check rdb corrupt,rebuild form rdb successfully");
-            std::shared_lock<std::shared_mutex> guard(rdbStoreMutex_);
             int32_t rowId = -1;
             ret = rdbStore_->Delete(rowId, absRdbPredicates);
         }
@@ -582,7 +576,6 @@ bool FormRdbDataMgr::InsertData(
 
     int32_t ret = NativeRdb::E_OK;
     {
-        std::shared_lock<std::shared_mutex> guard(rdbStoreMutex_);
         ret = rdbStore_->InsertWithConflictResolution(
             rowId, tableName, valuesBucket, NativeRdb::ConflictResolution::ON_CONFLICT_REPLACE);
     }
@@ -595,7 +588,6 @@ bool FormRdbDataMgr::InsertData(
     } else {
         if (CheckAndRebuildRdbStore(ret) == ERR_OK) {
             HILOG_WARN("Check rdb corrupt,rebuild form rdb successfully");
-            std::shared_lock<std::shared_mutex> guard(rdbStoreMutex_);
             ret = rdbStore_->InsertWithConflictResolution(
                 rowId, tableName, valuesBucket, NativeRdb::ConflictResolution::ON_CONFLICT_REPLACE);
         }
@@ -618,7 +610,6 @@ bool FormRdbDataMgr::DeleteData(const NativeRdb::AbsRdbPredicates &absRdbPredica
 
     int32_t ret = NativeRdb::E_OK;
     {
-        std::shared_lock<std::shared_mutex> guard(rdbStoreMutex_);
         int32_t rowId = -1;
         ret = rdbStore_->Delete(rowId, absRdbPredicates);
     }
@@ -631,7 +622,6 @@ bool FormRdbDataMgr::DeleteData(const NativeRdb::AbsRdbPredicates &absRdbPredica
     } else {
         if (CheckAndRebuildRdbStore(ret) == ERR_OK) {
             HILOG_WARN("Check rdb corrupt,rebuild form rdb successfully");
-            std::shared_lock<std::shared_mutex> guard(rdbStoreMutex_);
             int32_t rowId = -1;
             ret = rdbStore_->Delete(rowId, absRdbPredicates);
         }
@@ -647,7 +637,6 @@ bool FormRdbDataMgr::DeleteData(const NativeRdb::AbsRdbPredicates &absRdbPredica
 
 bool FormRdbDataMgr::IsFormRdbLoaded()
 {
-    std::unique_lock<std::shared_mutex> guard(rdbStoreMutex_);
     if (rdbStore_ != nullptr) {
         return true;
     }
